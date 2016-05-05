@@ -1,0 +1,13 @@
+Package: IsoplotR
+Title: Statistical Toolbox for Radiometric Geochronology
+Version: 0.2
+Authors@R: person("Pieter", "Vermeesch", , "p.vermeesch@ucl.ac.uk", role = c("aut", "cre")) 
+Description: An R implementation of Ken Ludwig's popular Isoplot add-in to Microsoft Excel. Currently plots U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams, taking into account error correlations. Future versions will include functionality for the Ar-Ar, Rb-Sr, Sm-Nd, Re-Os, U-Th-He, fission track and cosmogenic nuclide methods, including isochrons, age spectra, ternary diagrams, kernel density estimates, radial plots, banana diagrams and multidimensional scaling plots. A graphical user interface is provided as an RStudio Shiny app.
+Author: Pieter Vermeesch [aut, cre]
+Maintainer: Pieter Vermeesch <p.vermeesch@ucl.ac.uk>
+Depends: R (>= 3.0.0)
+Imports: methods
+License: GPL-2
+LazyData: true
+RoxygenNote: 5.0.1
+Built: R 3.3.0; ; 2016-05-05 20:30:42 UTC; unix
