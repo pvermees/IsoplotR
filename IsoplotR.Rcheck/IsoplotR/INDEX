@@ -1,4 +1,5 @@
 I.A                     Isotope abundance
+U238U235                238U/235 ratio
 UPb                     An example U-Pb dataset
 concordia.plot          Concordia diagram
 get.covmat              Get the covariance matrix of a sample

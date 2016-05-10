@@ -4,15 +4,90 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘0.2’
-* checking CRAN incoming feasibility ... Note_to_CRAN_maintainers
+* this is package ‘IsoplotR’ version ‘0.3’
+* checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
+
+Days since last update: 5
 * checking package namespace information ... OK
 * checking package dependencies ... OK
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
-* checking for executable files ... OK
-* checking for hidden files and directories ... OK
+* checking for executable files ... WARNING
+Found the following executable files:
+  .git/objects/01/9c0c0aa3b90520ee654b82fecd5a3a5aa4248d
+  .git/objects/02/68d8f72ffeb3b31afa6c083d716bc76852851b
+  .git/objects/04/10109af3672f4653978cf9f3cf46f7b952df0b
+  .git/objects/07/3035c7cf0b8cf773868f751d227d73b114228d
+  .git/objects/07/a8b9d99d8973bc617c5a88c0063b399e2306a4
+  .git/objects/0a/c86df09024d0794c63563ca5a98ec8f8127002
+  .git/objects/0d/be86bd9156b83c4751e45eb2265509e08db77e
+  .git/objects/10/5bdfb760fdbd00d48b98d7b13c69d31e1bffab
+  .git/objects/11/b666393beb529a669a5246a9e7b4d73075ccbb
+  .git/objects/17/4285c711ebc73351aa4f97f3e54a36e1722b3a
+  .git/objects/19/4f97d0f8e7bcb03fcb151f30c3e98a067633ae
+  .git/objects/1c/6a5fd33622952856e476b2c9ad588079568f11
+  .git/objects/1e/7670b59d36f7780234f3b11da009d1c8455c59
+  .git/objects/20/1ae08614ca990e905f07f9ae63ce860ee177d3
+  .git/objects/21/87b09566c9fbf9db5e82a2b146cda5724a666c
+  .git/objects/26/f30a842a9b35034d7dbc5594c90add67d8e192
+  .git/objects/39/08f9b28a2262c6087773a328bf32ce3f82868a
+  .git/objects/3b/65e3cbb872050f5dbcfacd3f2057d52d28ba0e
+  .git/objects/3d/eab1f2fa233006f68240a4d99fb1b98216e869
+  .git/objects/3e/5e124dd2a10b014d0b5226a5f62b0b9da610ec
+  .git/objects/40/2774013cee42862ff2aac0e583c2b167a4d8ee
+  .git/objects/55/41863ce4f760a62ba6b3eac16551fe3c4727d1
+  .git/objects/5b/20e53036a218ac6eac5b35a9c7543a42e205d0
+  .git/objects/5b/ed9c37aaf529e8c572363cce07d02cbc62905d
+  .git/objects/66/31c6c29a2d72d28a868fe72085283fc2056de8
+  .git/objects/68/0d973fbf1ac2190e747a14464a6abfffc74d7f
+  .git/objects/6a/5d036adea0ee1180b8e316acd7b65d2ecf0c02
+  .git/objects/6c/0cdb32e9ad1a62cd80a682bb476ef8f59eb4de
+  .git/objects/6f/b3c3647427521d21d336097445eb91b9b3d59e
+  .git/objects/71/5ae695c578c5b9b7c630d767e99852f6b7282c
+  .git/objects/7a/93b3fe51f80dd7121c027757ba5c3968ef90fb
+  .git/objects/7c/c89a706dd9cec02dde09e57c2ff64ff6cbb840
+  .git/objects/8c/88b0e79a1ef536a6a7ab82299ef8a1879b785a
+  .git/objects/98/58eb1fc9e39cd9fa66a16425d84ce945451022
+  .git/objects/98/bf826156f12b60f0a095843d440cb72fa29117
+  .git/objects/99/9c0f1429d3fb49896fead6804b62b79dd30c1a
+  .git/objects/9d/ab18924ea7d36b2e298ad93d6f608664999e9e
+  .git/objects/a2/223eb33c44c781206a06be883b492bfbcebe59
+  .git/objects/a4/f0b748d143ea1ed4cf004af0f29390746efd6b
+  .git/objects/a6/421b75ed6632dfe1a13856b10ae26f3457f827
+  .git/objects/a7/7592db696ea73a5d8984bd9ca916866c90bd0b
+  .git/objects/a9/9e74c0dcca66d91b7d58a97bcb6ca8e696d1c4
+  .git/objects/ac/ac38ea215c9828414eda6c41c872a721992048
+  .git/objects/b5/0426f139178770493b25b0be649da64be3c6c3
+  .git/objects/b6/9b4c430c459b1ea8e8e40cdca8d52c8d08be79
+  .git/objects/bb/9eceec017ac58e9aebe6dd3709475de2337822
+  .git/objects/bc/9f3e6c91920ef7bbdb591de23e85b1a3a327cc
+  .git/objects/bf/de82423c3b167a885671908166218fb64e4c18
+  .git/objects/c1/3ab944d5cdc14acb05157f2bae795a27d44ee3
+  .git/objects/c4/6156e0c5c70f4ab5a9031004af4ce7fec093c0
+  .git/objects/cc/62ab7560d3941bc747e8931d0c9b5d1518fec2
+  .git/objects/d2/fc5b0dfd2a8b9afbefd628a40fafafd2b44835
+  .git/objects/d5/292ec841c5daaf4d9807f9652e7cd030bfc8f9
+  .git/objects/dc/61c116d9136bedd20ec7df7cfc177c61f007ec
+  .git/objects/dc/da7d9f90f0665f8fd790542d60806c9810b511
+  .git/objects/e5/bf8b15bf475ea2a9fb25f414bfeed7c00a4102
+  .git/objects/e7/b3bc556b7b52eed3e57ffab2d849cfd9d85d40
+  .git/objects/e9/80c19690488f002701dfe41b5295e5fbcef755
+  .git/objects/e9/b8e4abf206336594c1851a49eeb061b6601838
+  .git/objects/ea/25f7ad2adc5a4e6a50120dfc39b4bf470a547e
+  .git/objects/ee/044240447052b972b52e14ee08b36f427c7317
+  .git/objects/ef/9e70a35b45f9afb8a0b5d6c9d1afc843874d35
+  .git/objects/fd/b0b2c7db258101fabd91a55d46cf203bc6c8c1
+Source packages should not contain undeclared executable files.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .git
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+
+CRAN-pack does not know about
+  .git
 * checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘IsoplotR’ can be installed ... OK
@@ -28,6 +103,9 @@ Non-standard file/directory found at top level:
 Found the following directory with the name of a check directory:
   ./IsoplotR.Rcheck
 Most likely, these were included erroneously.
+Found the following directory with the name of a version control directory:
+  ./.git
+These should not be in a package tarball.
 * checking R files for non-ASCII characters ... OK
 * checking R files for syntax errors ... OK
 * checking whether the package can be loaded ... OK
@@ -57,4 +135,4 @@ Most likely, these were included erroneously.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 WARNING, 1 NOTE
+Status: 2 WARNINGs, 3 NOTEs

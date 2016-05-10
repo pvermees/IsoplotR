@@ -29,12 +29,37 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-I.A('U238')
+print(I.A('U238')$x)
+# use the 238U/235U ratio of Steiger and Jaeger (1977)
+U238U235(138.88,0)
+print(I.A('U238')$x)
 
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("I.A", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("U238U235")
+### * U238U235
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: U238U235
+### Title: 238U/235 ratio
+### Aliases: U238U235
+
+### ** Examples
+
+print(U238U235()$x)
+# use the 238U/235U ratio of Steiger and Jaeger (1977)
+U238U235(138.88,0)
+print(U238U235()$x)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("U238U235", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("UPb")
 ### * UPb
@@ -151,7 +176,10 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-lambda('U238')
+print(lambda('U238')$x)
+# use the decay constant of Kovarik and Adams (1932)
+lambda('U238',0.0001537,0.0000068)
+print(lambda('U238')$x)
 
 
 

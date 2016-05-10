@@ -4,14 +4,18 @@
 \alias{I.A}
 \title{Isotope abundance}
 \usage{
-I.A(nuclide)
+I.A(nuclide, x = NULL, e = NULL)
 }
 \arguments{
 \item{nuclide}{one of either \code{'U'}, \code{'U238'},
 \code{'U235'}, or \code{'Th232'}}
+
+\item{x}{new value for the isotope abundance}
+
+\item{e}{new value for the standard error of the abundance}
 }
 \value{
-a two element list containing:
+if x == e == NULL, returns a two element list containing:
 
 \code{x}: a number or a vector of numbers between 0 (absent) and 1 (dominant)
 
@@ -25,9 +29,12 @@ or, if \code{nuclide} = \code{'U'}:
 isotopes
 }
 \description{
-Returns the natural abundance of isotopes
+Gets or sets the natural abundance of isotopes
 }
 \examples{
-I.A('U238')
+print(I.A('U238')$x)
+# use the 238U/235U ratio of Steiger and Jaeger (1977)
+U238U235(138.88,0)
+print(I.A('U238')$x)
 }
 

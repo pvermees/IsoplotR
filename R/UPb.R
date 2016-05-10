@@ -31,8 +31,8 @@ get.ratios.UPb <- function(age){
     out <- list()
     l8 <- lambda('U238')$x
     l5 <- lambda('U235')$x
-    R.x <- 1/R238235()$x
-    R.e <- R.x*R238235()$e/R238235()$x
+    R.x <- 1/U238U235()$x
+    R.e <- R.x*U238U235()$e/U238U235()$x
     Pb206U238 <- (exp(l8*age)-1)
     U238Pb206 <- 1/(exp(l8*age)-1)
     Pb207U235 <- (exp(l5*age)-1)

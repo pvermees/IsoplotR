@@ -48,19 +48,43 @@ Type 'q()' to quit R.
 > 
 > ### ** Examples
 > 
-> I.A('U238')
-$x
+> print(I.A('U238')$x)
      U238 
 0.9927963 
-
-$e
-[1] 1.167592e-06
-
+> # use the 238U/235U ratio of Steiger and Jaeger (1977)
+> U238U235(138.88,0)
+> print(I.A('U238')$x)
+    U238 
+0.992851 
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("I.A", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("U238U235")
+> ### * U238U235
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: U238U235
+> ### Title: 238U/235 ratio
+> ### Aliases: U238U235
+> 
+> ### ** Examples
+> 
+> print(U238U235()$x)
+[1] 138.88
+> # use the 238U/235U ratio of Steiger and Jaeger (1977)
+> U238U235(138.88,0)
+> print(U238U235()$x)
+[1] 138.88
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("U238U235", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("UPb")
 > ### * UPb
@@ -165,14 +189,14 @@ Pb207U235   6.726822e-04  1.099622e-08 8.464000e-07
 > get.ratios(4567,'U-Pb')
 $x
 Pb207Pb206  Pb206U238  Pb207U235  U238Pb206 
- 0.6251858  1.0308529 88.8202050  0.9700705 
+ 0.6204051  1.0308529 88.8202050  0.9700705 
 
 $cov
               Pb207Pb206    Pb206U238    Pb207U235    U238Pb206
-Pb207Pb206  3.082790e-05 4.124349e-07 -0.002238036 3.881164e-07
-Pb206U238   4.124349e-07 1.324837e-06  0.000000000 1.246721e-06
-Pb207U235  -2.238036e-03 0.000000e+00  0.163211323 0.000000e+00
-U238Pb206   3.881164e-07 1.246721e-06  0.000000000 1.173210e-06
+Pb207Pb206  1.404360e-05 1.830772e-07 -0.001027881 1.722824e-07
+Pb206U238   1.830772e-07 5.926184e-07  0.000000000 5.576757e-07
+Pb207U235  -1.027881e-03 0.000000e+00  0.075536997 0.000000e+00
+U238Pb206   1.722824e-07 5.576757e-07  0.000000000 5.247933e-07
 
 > 
 > 
@@ -192,13 +216,12 @@ U238Pb206   3.881164e-07 1.246721e-06  0.000000000 1.173210e-06
 > 
 > ### ** Examples
 > 
-> lambda('U238')
-$x
+> print(lambda('U238')$x)
 [1] 0.000155125
-
-$e
-[1] 1.241e-07
-
+> # use the decay constant of Kovarik and Adams (1932)
+> lambda('U238',0.0001537,0.0000068)
+> print(lambda('U238')$x)
+[1] 0.0001537
 > 
 > 
 > 
@@ -253,7 +276,7 @@ $e
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.308 0.02 0.327 0 0 
+Time elapsed:  0.3 0.012 0.314 0 0 
 > grDevices::dev.off()
 null device 
           1 

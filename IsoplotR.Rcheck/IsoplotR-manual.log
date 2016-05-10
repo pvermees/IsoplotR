@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2016.1.16)  5 MAY 2016 21:30
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2016.1.16)  10 MAY 2016 12:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -736,7 +736,7 @@ File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 ) [5]
-Overfull \hbox (32.24094pt too wide) in paragraph at lines 265--269
+Overfull \hbox (32.24094pt too wide) in paragraph at lines 279--283
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Rb-Sr\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \
@@ -751,25 +751,28 @@ File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 ) [6]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-) (./Rd2.ind [7] [8
+)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
+) [7] (./Rd2.ind [8]
+[9
 
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 358.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 358.
-
-(./Rd2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 358.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 358.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 410.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 410.
+ (./Rd2.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 410.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 410.
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: F19D4BBF582A1D93C7602B88F2029F9D;481.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 358.
+(rerunfilecheck)             Checksum: B15FB26DF997B1E7279F857F8922FC89;530.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 410.
  ) 
 Here is how much of TeX's memory you used:
- 6431 strings out of 493304
- 91922 string characters out of 6139871
+ 6442 strings out of 493304
+ 92131 string characters out of 6139871
  170188 words of memory out of 5000000
- 9700 multiletter control sequences out of 15000+600000
+ 9701 multiletter control sequences out of 15000+600000
  38763 words of font info for 50 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  38i,6n,27p,658b,505s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -782,10 +785,10 @@ ype1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><
 /usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texl
 ive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (8 pages, 86700 bytes).
+Output written on Rd2.pdf (9 pages, 90881 bytes).
 PDF statistics:
- 207 PDF objects out of 1000 (max. 8388607)
- 188 compressed objects within 2 object streams
- 73 named destinations out of 1000 (max. 500000)
- 81 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 225 PDF objects out of 1000 (max. 8388607)
+ 204 compressed objects within 3 object streams
+ 81 named destinations out of 1000 (max. 500000)
+ 89 words of extra memory for PDF output out of 10000 (max. 10000000)
 
