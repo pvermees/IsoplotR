@@ -22,17 +22,12 @@ concordia.plot <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=
     if (wetherill){
         vars <- c('Pb207U235','Pb206U238')
     } else {
-        vars <- c('Pb206U238','Pb207Pb206')
+        vars <- c('U238Pb206','Pb207Pb206')
     }
     for (i in 1:nrow(x$x)){
         x0 <- x$x[i,vars[1]]
         y0 <- x$x[i,vars[2]]
         covmat <- get.covmat.UPb(x,i)[vars,vars]
-        if (!wetherill){
-            J <- matrix(c(-1/(x0*x0),0,0,1),nrow=2)
-            covmat <- J %*% covmat %*% t(J)
-            x0 <- 1/x0
-        }
         ell <- get.ellipse(x0,y0,covmat,alpha=alpha)
         graphics::polygon(ell,col=ellipse.col)
         graphics::points(x0,y0,pch=19,cex=0.25)
@@ -62,15 +57,17 @@ concordia.line <- function(X,limits,wetherill,col,alpha=0.05,dcu=TRUE){
     for (i in 1:nn){
         UPbratios <- get.ratios.UPb(tt[i])
         if (wetherill){
-            xc <- UPbratios$x[3]
-            yc <- UPbratios$x[2]
+            xc <- UPbratios$x['Pb207U235']
+            yc <- UPbratios$x['Pb206U238']
         } else {
-            xc <- UPbratios$x[4]
-            yc <- UPbratios$x[1]
+            xc <- UPbratios$x['U238Pb206']
+            yc <- UPbratios$x['Pb207Pb206']
         }
         if (dcu){ # show decay constant uncertainty   
-            if (wetherill){ covmat <- UPbratios$cov[c(3,2),c(3,2)] }
-            else { covmat <- UPbratios$cov[c(4,1),c(4,1)] }
+            if (wetherill){ covmat <- UPbratios$cov[c('Pb207U235','Pb206U238'),
+                                                    c('Pb207U235','Pb206U238')] }
+            else { covmat <- UPbratios$cov[c('U238Pb206','Pb207Pb206'),
+                                           c('U238Pb206','Pb207Pb206')] }
             if (i > 1) oldell <- ell
             ell <- get.ellipse(xc,yc,covmat,alpha=alpha)
             if (i > 1){
@@ -88,15 +85,17 @@ concordia.line <- function(X,limits,wetherill,col,alpha=0.05,dcu=TRUE){
     for (i in 1:length(ticks)){
         UPbratios <- get.ratios.UPb(ticks[i])
         if (wetherill){
-            xt <- UPbratios$x[3]
-            yt <- UPbratios$x[2]
+            xt <- UPbratios$x['Pb207U235']
+            yt <- UPbratios$x['Pb206U238']
         } else {
-            xt <- UPbratios$x[4]
-            yt <- UPbratios$x[1]
+            xt <- UPbratios$x['U238Pb206']
+            yt <- UPbratios$x['Pb207Pb206']
         }
         if (dcu){ # show ticks as ellipse
-            if (wetherill){ covmat <- UPbratios$cov[c(3,2),c(3,2)] }
-            else { covmat <- UPbratios$cov[c(4,1),c(4,1)] }
+            if (wetherill){ covmat <- UPbratios$cov[c('Pb207U235','Pb206U238'),
+                                                    c('Pb207U235','Pb206U238')] }
+            else { covmat <- UPbratios$cov[c('U238Pb206','Pb207Pb206'),
+                                           c('U238Pb206','Pb207Pb206')] }
             ell <- get.ellipse(xt,yt,covmat,alpha=alpha)
             graphics::polygon(ell,col='white')
         } else {
@@ -114,22 +113,22 @@ get.concordia.limits <- function(X,limits,wetherill){
     if (!is.null(limits) && wetherill){
         out$min.t <- limits[1]
         out$max.t <- limits[2]
-        out$min.x <- get.ratios.UPb(out$min.t)$x[3]
-        out$max.x <- get.ratios.UPb(out$max.t)$x[3]
-        out$min.y <- get.ratios.UPb(out$min.t)$x[2]
-        out$max.y <- get.ratios.UPb(out$max.t)$x[2]
+        out$min.x <- get.ratios.UPb(out$min.t)$x['Pb207U235']
+        out$max.x <- get.ratios.UPb(out$max.t)$x['Pb207U235']
+        out$min.y <- get.ratios.UPb(out$min.t)$x['Pb206U238']
+        out$max.y <- get.ratios.UPb(out$max.t)$x['Pb206U238']
     } else if (!is.null(limits) && !wetherill){
         if (limits[1] > 0){
             out$min.t <- limits[1]
         } else {
-            out$max.x <- 1/min(X$x[,'Pb206U238']-2*X$x[,'errPb206U238'])
+            out$max.x <- max(X$x[,'U238Pb206']+2*X$x[,'errU238Pb206'])
             out$min.t <- get.Pb206U238age(1/out$max.x)
         }
         out$max.t <- limits[2]
-        out$min.x <- get.ratios.UPb(out$max.t)$x[4]
-        out$min.y <- get.ratios.UPb(out$max.t)$x[1]
-        out$max.x <- get.ratios.UPb(out$min.t)$x[4]
-        out$max.y <- get.ratios.UPb(out$min.t)$x[1]
+        out$min.x <- get.ratios.UPb(out$max.t)$x['U238Pb206']
+        out$min.y <- get.ratios.UPb(out$max.t)$x['Pb207Pb206']
+        out$max.x <- get.ratios.UPb(out$min.t)$x['U238Pb206']
+        out$max.y <- get.ratios.UPb(out$min.t)$x['Pb207Pb206']
     } else if (is.null(limits) && wetherill) {
         out$min.x <- min(X$x[,'Pb207U235']-2*X$x[,'errPb207U235'])
         out$max.x <- max(X$x[,'Pb207U235']+2*X$x[,'errPb207U235'])
@@ -138,12 +137,12 @@ get.concordia.limits <- function(X,limits,wetherill){
         out$min.t <- get.Pb206U238age(out$min.y)
         out$max.t <- get.Pb207U235age(out$max.x)
     } else if (is.null(limits) && !wetherill){
-        out$min.x <- 1/(max(X$x[,'Pb206U238']+2*X$x[,'errPb206U238']))
-        out$max.x <- 1/min(X$x[,'Pb206U238']-2*X$x[,'errPb206U238'])
+        out$min.x <- min(X$x[,'U238Pb206']-2*X$x[,'errU238Pb206'])
+        out$max.x <- max(X$x[,'U238Pb206']+2*X$x[,'errU238Pb206'])
         out$min.y <- min(X$x[,'Pb207Pb206']-2*X$x[,'errPb207Pb206'])
         out$max.y <- max(X$x[,'Pb207Pb206']+2*X$x[,'errPb207Pb206'])
-        out$min.t <- get.Pb206U238age(1/out$max.x)
-        out$max.t <- get.Pb207Pb206age(out$max.y)
+        out$min.t <- min(get.Pb206U238age(1/out$max.x),get.Pb207Pb206age(out$min.y))
+        out$max.t <- max(get.Pb206U238age(1/out$min.x),get.Pb207Pb206age(out$max.y))
     }
     out
 }

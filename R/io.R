@@ -50,16 +50,23 @@ read.matrix <- function(x,method='U-Pb',format=1){
 
 as.UPb <- function(x,format=1){
     out <- list()
+    class(out) <- "UPb"
     out$x <- NA
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        out$x <- as.matrix(x)
-        colnames(out$x) <- c('Pb207Pb206','errPb207Pb206',
+        X <- as.matrix(x)
+        colnames(X) <- c('Pb207Pb206','errPb207Pb206',
+                         'Pb206U238','errPb206U238',
+                         'Pb207U235','errPb207U235')
+        out$x <- cbind(X[,c('Pb207U235','errPb207U235','Pb206U238','errPb206U238')],
+                       1/X[,'Pb206U238'], sqrt(X[,'errPb206U238'])/X[,'Pb206U238'],
+                       X[,c('Pb207Pb206','errPb207Pb206')])
+        colnames(out$x) <- c('Pb207U235','errPb207U235',
                              'Pb206U238','errPb206U238',
-                             'Pb207U235','errPb207U235')
+                             'U238Pb206','errU238Pb206',
+                             'Pb207Pb206','errPb207Pb206')
     }
-    class(out) <- "UPb"
     out
 }

@@ -272,11 +272,33 @@ U238Pb206   1.722824e-07 5.576757e-07  0.000000000 5.247933e-07
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("read.matrix", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("settings")
+> ### * settings
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: settings
+> ### Title: Load settings to and from json
+> ### Aliases: settings
+> 
+> ### ** Examples
+> 
+> json <- system.file("defaults.json",package="IsoplotR")
+> settings(json)
+> print(settings())
+[1] "{\"I.A\":{\"Th232\":{\"x\":1,\"e\":0}},\"lambda\":{\"U238\":{\"x\":0.000155125,\"e\":8.3e-08},\"U235\":{\"x\":0.00098485,\"e\":6.7e-07},\"Th232\":{\"x\":4.9475e-05,\"e\":0}},\"U238U235\":{\"x\":137.818,\"e\":0.0225}}"
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("settings", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > ### * <FOOTER>
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.3 0.012 0.314 0 0 
+Time elapsed:  0.36 0 0.364 0 0 
 > grDevices::dev.off()
 null device 
           1 

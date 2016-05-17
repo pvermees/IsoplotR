@@ -1,0 +1,16 @@
+# returns a five item list containing \code{x}: the geometric mean
+# isotopic composition, \code{cov}: the covariance matrix of the
+# geometric mean isotopic composition, \code{mswd}: the reduced
+# chi-square statistic for the geometric mean composition,
+# \code{age}: the 206Pb/238U-207Pb/235U concordia age, and
+# \code{err}: its standard error
+concordia.age <- function(x){
+
+}
+
+# X = U-Pb dataset
+# mu = 'central' U-Pb composition
+# sigma = overdispersion
+LL.concordia <- function(X,mu,sigma){
+    n <- 
+}

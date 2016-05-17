@@ -8,3 +8,4 @@ get.ratios              Calculate the isotopic ratio for a given age
 lambda                  Decay constants
 read.data               Read geochronology data
 read.matrix             Read geochronology data
+settings                Load settings to and from json

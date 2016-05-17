@@ -1,6 +1,17 @@
 .IsoplotR <- new.env(parent = emptyenv())
 
-# load settings to and from json
+#' Load settings to and from json
+#'
+#' Get and set preferred values for decay constants and isotopic
+#' abundances from and to a \code{.json} file format
+#'
+#' @param fname the path of a \code{.json} file
+#' @return if fname==NULL, returns a \code{.json} string
+#' @examples
+#' json <- system.file("defaults.json",package="IsoplotR")
+#' settings(json)
+#' print(settings())
+#' @export
 settings <- function(fname=NULL){
     if (is.null(fname)){
         preferences <- as.list(.IsoplotR)
