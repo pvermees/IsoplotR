@@ -121,21 +121,6 @@ I.A <- function(nuclide,x=NULL,e=NULL){
     }
 }
 
-I.R <- function(x,y,value=NULL){
-    if (is.null(value)){
-        return(get.I.R(x,y))
-    } else {
-        set.I.R(x,y,value)
-    }
-}
-
-get.I.R <- function(x,y){
-    out <- list()
-    if (x=='U235' & y=='U238' ){
-    }
-    out
-}
-
 # helper function for I.A
 get.I.A <- function(nuclide){
     out <- list()

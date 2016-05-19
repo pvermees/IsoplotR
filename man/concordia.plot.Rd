@@ -6,7 +6,7 @@
 \usage{
 concordia.plot(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  concordia.col = "darksalmon", dcu = TRUE)
+  concordia.col = "darksalmon", dcu = TRUE, show.age = 0)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -24,6 +24,14 @@ concordia.plot(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 \item{concordia.col}{colour of the concordia line}
 
 \item{dcu}{show decay constant uncertainty?}
+
+\item{show.age}{one of either
+
+\code{0}: don't show the age
+
+\code{1}: calculate the concordia age
+
+(\code{2}: fit a discordia line - not implemented yet)}
 }
 \description{
 Wetherill and Tera-Wasserburg concordia diagrams

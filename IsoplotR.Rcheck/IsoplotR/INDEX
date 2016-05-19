@@ -1,10 +1,9 @@
 I.A                     Isotope abundance
 U238U235                238U/235 ratio
 UPb                     An example U-Pb dataset
+concordia.age           Calculate U-Pb concordia ages
 concordia.plot          Concordia diagram
-get.covmat              Get the covariance matrix of a sample
-get.ellipse             Get coordinates of error ellipse for plotting
-get.ratios              Calculate the isotopic ratio for a given age
+ellipse                 Get coordinates of error ellipse for plotting
 lambda                  Decay constants
 read.data               Read geochronology data
 read.matrix             Read geochronology data

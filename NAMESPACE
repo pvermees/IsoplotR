@@ -2,10 +2,9 @@
 
 export(I.A)
 export(U238U235)
+export(concordia.age)
 export(concordia.plot)
-export(get.covmat)
-export(get.ellipse)
-export(get.ratios)
+export(ellipse)
 export(lambda)
 export(read.data)
 export(read.matrix)

@@ -1,7 +1,6 @@
+concordia.age	concordia.age
 concordia.plot	concordia.plot
-get.covmat	get.covmat
-get.ellipse	get.ellipse
-get.ratios	get.ratios
+ellipse	ellipse
 I.A	I.A
 lambda	lambda
 read.data	read.data

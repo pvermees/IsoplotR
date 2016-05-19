@@ -74,6 +74,10 @@ get.ratios.UPb <- function(age){
     out
 }
 
+get.ages.UPb <- function(x){
+    
+}
+
 get.Pb207U235age <- function(Pb207U235){
     log(1+Pb207U235)/lambda('U235')$x
 }

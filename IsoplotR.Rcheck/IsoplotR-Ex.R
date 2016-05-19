@@ -101,41 +101,21 @@ concordia.plot(UPb)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("concordia.plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("get.covmat")
-### * get.covmat
+nameEx("ellipse")
+### * ellipse
 
 flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: get.covmat
-### Title: Get the covariance matrix of a sample
-### Aliases: get.covmat
-
-### ** Examples
-
-data(UPb)
-get.covmat(UPb,2)
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("get.covmat", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
-nameEx("get.ellipse")
-### * get.ellipse
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: get.ellipse
+### Name: ellipse
 ### Title: Get coordinates of error ellipse for plotting
-### Aliases: get.ellipse
+### Aliases: ellipse
 
 ### ** Examples
 
 x = 99; y = 101;
 covmat <- matrix(c(1,0.9,0.9,1),nrow=2)
-ell <- get.ellipse(x,y,covmat)
+ell <- ellipse(x,y,covmat)
 plot(c(90,110),c(90,110),type='l')
 polygon(ell,col=rgb(0,1,0,0.5))
 points(x,y,pch=21,bg='black')
@@ -143,26 +123,7 @@ points(x,y,pch=21,bg='black')
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("get.ellipse", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
-nameEx("get.ratios")
-### * get.ratios
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: get.ratios
-### Title: Calculate the isotopic ratio for a given age
-### Aliases: get.ratios
-
-### ** Examples
-
-get.ratios(4567,'U-Pb')
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("get.ratios", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+base::cat("ellipse", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("lambda")
 ### * lambda

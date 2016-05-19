@@ -1,16 +1,71 @@
-# returns a five item list containing \code{x}: the geometric mean
-# isotopic composition, \code{cov}: the covariance matrix of the
-# geometric mean isotopic composition, \code{mswd}: the reduced
-# chi-square statistic for the geometric mean composition,
-# \code{age}: the 206Pb/238U-207Pb/235U concordia age, and
-# \code{err}: its standard error
-concordia.age <- function(x){
-
+concordia.age <- function(x,wetherill=TRUE){
+    X <- UPb.preprocess(x,wetherill)
+    fit.comp <- optim(c(1,1), LL.concordia, x=X, method="BFGS", hessian=TRUE)
+    out <- list()
+    out$x <- fit.comp$par
+    out$x.cov <- solve(fit.comp$hessian)
+    selection <- names(X[[1]]$x)
+    names(out$x) <- selection
+    colnames(out$x.cov) <- selection
+    rownames(out$x.cov) <- selection
+    t.init <- initial.concordia.age.guess(out$x,wetherill)
+    fit.age <- optim(t.init, LL.concordia.age, x=out$x, covmat=out$x.cov,
+                     wetherill=wetherill, method="BFGS", hessian=TRUE)
+    out$age <- fit.age$par
+    out$age.err <- sqrt(solve(fit.age$hessian))
+    out
 }
 
-# X = U-Pb dataset
-# mu = 'central' U-Pb composition
-# sigma = overdispersion
-LL.concordia <- function(X,mu,sigma){
-    n <- 
+initial.concordia.age.guess <- function(x,wetherill=TRUE){
+    if (wetherill){
+        Pb207U235age <- get.Pb207U235age(x['Pb207U235'])
+        Pb206U238age <- get.Pb206U238age(x['Pb206U238'])
+        out <- mean(c(Pb207U235age,Pb206U238age))
+    } else {
+        Pb206U238age <- get.Pb206U238age(1/x['U238Pb206'])
+        Pb207Pb206age <- get.Pb207Pb206age(x['Pb207Pb206'])
+        out <- mean(c(Pb206U238age,Pb207Pb206age))
+    }
+    out
+}
+
+get.UPb.selection <- function(wetherill=TRUE){
+    if (wetherill) selection <- c('Pb207U235','Pb206U238')
+    else selection <- c('U238Pb206','Pb207Pb206')
+    selection
+}
+
+UPb.preprocess <- function(x,wetherill){
+    selection <- get.UPb.selection(wetherill)
+    out <- list()
+    for (i in 1:nrow(x$x)){
+        X <- x$x[i,selection]
+        covmat <- get.covmat.UPb(x,i)[selection,selection]
+        out[[i]] <- list(x=X, cov=covmat)
+    }
+    out   
+}
+
+LL.concordia <- function(mu,x){
+    LL <- 0
+    for (i in 1:length(x)){
+        X <- matrix(x[[i]]$x-mu,1,2)
+        covmat <- x[[i]]$cov
+        LL <- LL + LL.norm(X,covmat)
+    }
+    -LL
+}
+
+LL.concordia.age <- function(age,x,covmat,wetherill=TRUE){
+    UPbratios <- get.ratios.UPb(age)
+    if (wetherill) selection <- c('Pb207U235','Pb206U238')
+    else selection <- c('U238Pb206','Pb207Pb206')
+    X <- matrix(x[selection]-UPbratios$x[selection],1,2)
+    COVMAT <- UPbratios$cov[selection,selection] + covmat[selection,selection]
+    -LL.norm(X,COVMAT)
+}
+
+LL.norm <- function(x,covmat){
+    - log(2*pi) - 0.5*determinant(covmat,logarithmic=TRUE)$modulus -
+                  0.5* x %*% solve(covmat) %*% t(x)
 }
