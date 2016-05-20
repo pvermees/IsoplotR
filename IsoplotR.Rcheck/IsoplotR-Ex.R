@@ -17,49 +17,28 @@ library('IsoplotR')
 
 base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 cleanEx()
-nameEx("I.A")
-### * I.A
+nameEx("I.R")
+### * I.R
 
 flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: I.A
-### Title: Isotope abundance
-### Aliases: I.A
+### Name: I.R
+### Title: Isotopic ratios
+### Aliases: I.R
 
 ### ** Examples
 
-print(I.A('U238')$x)
-# use the 238U/235U ratio of Steiger and Jaeger (1977)
-U238U235(138.88,0)
-print(I.A('U238')$x)
+# returns the 238U/235U ratio of Hiess et al. (2012):
+print(I.R('U238U235'))
+# use the 238U/235U ratio of Steiger and Jaeger (1977):
+I.R('U238U235',138.88,0)
+print(I.R('U238U235'))
 
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("I.A", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
-nameEx("U238U235")
-### * U238U235
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: U238U235
-### Title: 238U/235 ratio
-### Aliases: U238U235
-
-### ** Examples
-
-print(U238U235()$x)
-# use the 238U/235U ratio of Steiger and Jaeger (1977)
-U238U235(138.88,0)
-print(U238U235()$x)
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("U238U235", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+base::cat("I.R", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("UPb")
 ### * UPb
@@ -80,6 +59,27 @@ concordia.plot(UPb)
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("UPb", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("concordia.age")
+### * concordia.age
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: concordia.age
+### Title: Calculate U-Pb concordia ages
+### Aliases: concordia.age
+
+### ** Examples
+
+data(UPb)
+fit <- concordia.age(UPb)
+print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("concordia.age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("concordia.plot")
 ### * concordia.plot
@@ -137,10 +137,10 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-print(lambda('U238')$x)
+print(lambda('U238'))
 # use the decay constant of Kovarik and Adams (1932)
 lambda('U238',0.0001537,0.0000068)
-print(lambda('U238')$x)
+print(lambda('U238'))
 
 
 

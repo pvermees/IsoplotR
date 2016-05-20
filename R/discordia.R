@@ -31,7 +31,11 @@
 #' \code{p.value}: a list with two items (\code{equivalence} and
 #' \code{concordance}) containing the p-value of the Chi-square test
 #' for isotopic equivalence and age concordance, respectively.
-#'
+#' @importFrom stats optim
+#' @examples
+#' data(UPb)
+#' fit <- concordia.age(UPb)
+#' print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
 #' @export
 concordia.age <- function(x,wetherill=TRUE){
     X <- UPb.preprocess(x,wetherill)

@@ -14,19 +14,16 @@ lambda(nuclide, x = NULL, e = NULL)
 \item{e}{new value for the decay constant uncertainty}
 }
 \value{
-if x == e == NULL, returns a two-item list containing:
-
-\code{x}: the decay constant  [in Ma-1]
-
-\code{e}: the standard error of the decay constant [in Ma-1]
+if x == e == NULL, returns a two-item vector containing the
+    decay constant [in Ma-1] and its standard error, respectively.
 }
 \description{
 Gets or sets the decay constants of radioactive istopes
 }
 \examples{
-print(lambda('U238')$x)
+print(lambda('U238'))
 # use the decay constant of Kovarik and Adams (1932)
 lambda('U238',0.0001537,0.0000068)
-print(lambda('U238')$x)
+print(lambda('U238'))
 }
 

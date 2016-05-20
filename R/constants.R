@@ -19,8 +19,7 @@ settings <- function(fname=NULL){
     } else {
         prefs <- fromJSON(file=fname)
         .IsoplotR$lambda <- prefs$lambda
-        .IsoplotR$U238U235 <- prefs$U238U235
-        .IsoplotR$I.A <- prefs$I.A
+        .IsoplotR$I.R <- prefs$I.R
     }
 }
 
@@ -31,143 +30,65 @@ settings <- function(fname=NULL){
 #' @param nuclide the nuclide name
 #' @param x new value for the decay constant
 #' @param e new value for the decay constant uncertainty
-#' @return if x == e == NULL, returns a two-item list containing:
-#'
-#' \code{x}: the decay constant  [in Ma-1]
-#'
-#' \code{e}: the standard error of the decay constant [in Ma-1]
-#'
+#' @return if x == e == NULL, returns a two-item vector containing the
+#'     decay constant [in Ma-1] and its standard error, respectively.
 #' @examples
-#' print(lambda('U238')$x)
+#' print(lambda('U238'))
 #' # use the decay constant of Kovarik and Adams (1932)
 #' lambda('U238',0.0001537,0.0000068)
-#' print(lambda('U238')$x)
+#' print(lambda('U238'))
 #' @export
 lambda <- function(nuclide,x=NULL,e=NULL){
-    if (is.null(x) & is.null(e)){
-        return(.IsoplotR$lambda[[nuclide]])
-    }
-    if (is.numeric(x)){
-        .IsoplotR$lambda[[nuclide]]$x <- x
-    }
-    if (is.numeric(e)){
-        .IsoplotR$lambda[[nuclide]]$e <- e
-    }
+    if (is.null(x) & is.null(e)) return(.IsoplotR$lambda[[nuclide]])
+    if (is.numeric(x)) .IsoplotR$lambda[[nuclide]][1] <- x
+    if (is.numeric(e)) .IsoplotR$lambda[[nuclide]][2] <- e
 }
 
-#' 238U/235 ratio
+#' Isotopic ratios
 #'
-#' Gets or sets the natural 238U/235 ratio. The default value of
-#' 137.818 is taken from Hiess et al. (2012)
+#' Gets or sets natural isotopic ratios.
 #'
-#' @param x new value for 238U/235U ratio
+#' @param ratio one of either \code{'U238U235'}, \code{'Ar40Ar36'},
+#'     \code{'Ar38Ar36'}, \code{'Rb85Rb87'}, \code{'Sr88Sr86'},
+#'     \code{'Sr87Sr86'}, \code{'Sr84Sr86'}, \code{'Re185Re187'},
+#'     \code{'Os184Os192'}, \code{'Os186Os192'}, \code{'Os187Os192'},
+#'     \code{'Os188Os192'}, \code{'Os189Os192'}
+#' @param x new value for ratio
 #' @param e new value for its standard error
-#' @return if x == e == NULL, returns a two-item list containing:
-#'
-#' \code{x}: the 238U/235U ratio
-#'
-#' \code{e}: the standard error of the 238U/235U ratio
-#'
+#' @return if x == e == NULL, returns a two-item vector containing the
+#'     mean value of the requested ratio and its standard error,
+#'     respectively.
 #' @examples
-#' print(U238U235()$x)
-#' # use the 238U/235U ratio of Steiger and Jaeger (1977)
-#' U238U235(138.88,0)
-#' print(U238U235()$x)
+#' # returns the 238U/235U ratio of Hiess et al. (2012):
+#' print(I.R('U238U235'))
+#' # use the 238U/235U ratio of Steiger and Jaeger (1977):
+#' I.R('U238U235',138.88,0)
+#' print(I.R('U238U235'))
+#' @references
+#' Ar: Lee, Jee-Yon, et al. "A redetermination of the isotopic abundances
+#' of atmospheric Ar." Geochimica et Cosmochimica Acta 70.17 (2006): 4507-4512.
+#'
+#' Rb: Catanzaro, E. J., et al. "Absolute isotopic abundance ratio and
+#' atomic weight of terrestrial rubidium." J. Res. Natl. Bur. Stand. A 73
+#' (1969): 511-516.
+#'
+#' Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
+#' weight of a reference sample of strontium." J. Res. Natl.Bur. Stand.
+#' 87.1 (1982): 1-8.
+#'
+#' Re: Gramlich, John W., et al. "Absolute isotopic abundance ratio and
+#' atomic weight of a reference sample of rhenium." J. Res. Natl. Bur.
+#' Stand. A 77 (1973): 691-698.
+#'
+#' Os: Voelkening, Joachim, Thomas Walczyk, and Klaus G. Heumann.
+#' "Osmium isotope ratio determinations by negative thermal ionization
+#' mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
+#' 
+#' U: Hiess, Joe, et al. "238U/235U systematics in terrestrial
+#' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 #' @export
-U238U235 <- function(x=NULL,e=NULL){
-    if (is.null(x) & is.null(e)){
-        return(.IsoplotR$U238U235)
-    }
-    if (is.numeric(x)){
-        .IsoplotR$U238U235$x <- x
-    }
-    if (is.numeric(e)){
-        .IsoplotR$U238U235$e <- e
-    }
-}
-
-#' Isotope abundance
-#'
-#' Gets or sets the natural abundance of isotopes
-#'
-#' @param nuclide one of either \code{'U'}, \code{'U238'},
-#'     \code{'U235'}, or \code{'Th232'}
-#' @param x new value for the isotope abundance
-#' @param e new value for the standard error of the abundance
-#' @return if x == e == NULL, returns a two element list containing:
-#'
-#' \code{x}: a number or a vector of numbers between 0 (absent) and 1 (dominant)
-#'
-#' and
-#'
-#' \code{e}: the standard error or covariance matrix of x
-#'
-#' or, if \code{nuclide} = \code{'U'}:
-#'
-#' \code{cov}: the covariance matrix of all naturally occurring
-#' isotopes
-#'
-#' @examples
-#' print(I.A('U238')$x)
-#' # use the 238U/235U ratio of Steiger and Jaeger (1977)
-#' U238U235(138.88,0)
-#' print(I.A('U238')$x)
-#' @export
-I.A <- function(nuclide,x=NULL,e=NULL){
-    if (is.null(x) & is.null(e)){
-        return(get.I.A(nuclide))        
-    } else {
-        set.I.A(nuclide,x,e)
-    }
-}
-
-I.R <- function(x,y,value=NULL){
-    if (is.null(value)){
-        return(get.I.R(x,y))
-    } else {
-        set.I.R(x,y,value)
-    }
-}
-
-get.I.R <- function(x,y){
-    out <- list()
-    if (x=='U235' & y=='U238' ){
-    }
-    out
-}
-
-# helper function for I.A
-get.I.A <- function(nuclide){
-    out <- list()
-    if (nuclide == 'U'){
-        R <- U238U235()
-        A238 <- R$x/(1+R$x)
-        A235 <- 1/(1+R$x)
-        out$x <- c(A238,A235)
-        J <- matrix(c(1/(R$x+1)^2,-1/(R$x+1)^2),nrow=2,ncol=1)
-        E <- R$e^2
-        out$cov <- J %*% E %*% t(J)
-        names(out$x) <- c('U238','U235')
-        rownames(out$cov) <- names(out$x)
-        colnames(out$cov) <- names(out$x)
-    } else if (nuclide == 'U238'){
-        out$x <- I.A('U')$x[1]
-        out$e <- sqrt(I.A('U')$cov[1,1])
-    } else if (nuclide == 'U235'){
-        out$x <- I.A('U')$x[2]
-        out$e <- sqrt(I.A('U')$cov[2,2])
-    } else {
-        out <- .IsoplotR$I.A[[nuclide]]
-    }
-    out
-}
-
-# helper function for I.A
-set.I.A <- function(nuclide,x=NULL,e=NULL){
-    if (is.numeric(x)){
-        .IsoplotR$I.A[[nuclide]]$x <- x
-    }
-    if (is.numeric(e)){
-        .IsoplotR$I.A[[nuclide]]$e <- e
-    }
+I.R <- function(ratio,x=NULL,e=NULL){
+    if (is.null(x) & is.null(e)) return(.IsoplotR$I.R[[ratio]])
+    if (is.numeric(x)) .IsoplotR$I.R[[ratio]][1] <- x
+    if (is.numeric(e)) .IsoplotR$I.R[[ratio]][2] <- e
 }

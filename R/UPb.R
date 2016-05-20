@@ -43,10 +43,10 @@ get.covmat.UPb <- function(x,i){
 get.ratios.UPb <- function(age){
     if (age == 0){ age <- 1e-10 }
     out <- list()
-    l8 <- lambda('U238')$x
-    l5 <- lambda('U235')$x
-    R.x <- 1/U238U235()$x
-    R.e <- R.x*U238U235()$e/U238U235()$x
+    l8 <- lambda('U238')[1]
+    l5 <- lambda('U235')[1]
+    R.x <- 1/I.R('U238U235')[1]
+    R.e <- R.x*I.R('U238U235')[2]/I.R('U238U235')[1]
 
     Pb207U235 <- (exp(l5*age)-1)
     Pb206U238 <- (exp(l8*age)-1)
@@ -57,8 +57,8 @@ get.ratios.UPb <- function(age){
 
     E <- matrix(0,3,3)
     E[1,1] <- R.e^2
-    E[2,2] <- lambda('U235')$e^2
-    E[3,3] <- lambda('U238')$e^2
+    E[2,2] <- lambda('U235')[2]^2
+    E[3,3] <- lambda('U238')[2]^2
 
     J <- matrix(0,nrow=4,ncol=3)
     J[1,2] <- age*exp(l5*age)
@@ -75,11 +75,11 @@ get.ratios.UPb <- function(age){
 }
 
 get.Pb207U235age <- function(Pb207U235){
-    log(1+Pb207U235)/lambda('U235')$x
+    log(1+Pb207U235)/lambda('U235')[1]
 }
 
 get.Pb206U238age <- function(Pb206U238){
-    log(1+Pb206U238)/lambda('U238')$x
+    log(1+Pb206U238)/lambda('U238')[1]
 }
 
 get.Pb207Pb206age <- function(Pb207Pb206){

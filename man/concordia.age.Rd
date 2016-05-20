@@ -43,4 +43,9 @@ the corresponding concordia age using the method of maximum
 likelihood, computes the mswd of equivalence and concordance and
 their respective Chi-squared p-values.
 }
+\examples{
+data(UPb)
+fit <- concordia.age(UPb)
+print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
+}
 

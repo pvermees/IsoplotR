@@ -19,6 +19,8 @@
 #' (\code{2}: fit a discordia line - not implemented yet)
 #'
 #' @importFrom grDevices rgb
+#' @importFrom graphics polygon title
+#' @importFrom stats pchisq
 #' @examples
 #' data(UPb)
 #' concordia.plot(UPb)

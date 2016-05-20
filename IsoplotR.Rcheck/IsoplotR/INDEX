@@ -1,5 +1,4 @@
-I.A                     Isotope abundance
-U238U235                238U/235 ratio
+I.R                     Isotopic ratios
 UPb                     An example U-Pb dataset
 concordia.age           Calculate U-Pb concordia ages
 concordia.plot          Concordia diagram
