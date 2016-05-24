@@ -31,7 +31,7 @@ concordia.plot(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 
 \code{1}: calculate the concordia age
 
-(\code{2}: fit a discordia line - not implemented yet)}
+\code{2}: fit a discordia line}
 }
 \description{
 Wetherill and Tera-Wasserburg concordia diagrams

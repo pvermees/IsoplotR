@@ -82,8 +82,20 @@ get.Pb206U238age <- function(Pb206U238){
     log(1+Pb206U238)/lambda('U238')[1]
 }
 
+#' @importFrom stats optimize
 get.Pb207Pb206age <- function(Pb207Pb206){
     Pb207Pb206.misfit <- function(x,y) { (get.ratios.UPb(x)$x[1] - y)^2 }
-    out <- stats::optimize(Pb207Pb206.misfit,c(0,4600),y=Pb207Pb206)
+    out <- optimize(Pb207Pb206.misfit,c(0,4600),y=Pb207Pb206)
     out$minimum
+}
+
+UPb.preprocess <- function(x,wetherill){
+    selection <- get.UPb.selection(wetherill)
+    out <- list()
+    for (i in 1:nrow(x$x)){
+        X <- x$x[i,selection]
+        covmat <- get.covmat.UPb(x,i)[selection,selection]
+        out[[i]] <- list(x=X, cov=covmat)
+    }
+    out   
 }

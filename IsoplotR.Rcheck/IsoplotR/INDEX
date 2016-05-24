@@ -2,8 +2,11 @@ I.R                     Isotopic ratios
 UPb                     An example U-Pb dataset
 concordia.age           Calculate U-Pb concordia ages
 concordia.plot          Concordia diagram
+discordia.age           Linear regression on a U-Pb concordia diagram
 ellipse                 Get coordinates of error ellipse for plotting
 lambda                  Decay constants
 read.data               Read geochronology data
 read.matrix             Read geochronology data
 settings                Load settings to and from json
+yorkfit                 Linear regression of X,Y-variables with
+                        correlated errors

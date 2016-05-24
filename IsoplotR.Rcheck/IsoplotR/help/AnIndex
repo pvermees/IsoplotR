@@ -1,5 +1,6 @@
 concordia.age	concordia.age
 concordia.plot	concordia.plot
+discordia.age	discordia.age
 ellipse	ellipse
 I.R	I.R
 lambda	lambda
@@ -7,3 +8,4 @@ read.data	read.data
 read.matrix	read.matrix
 settings	settings
 UPb	UPb
+yorkfit	yorkfit

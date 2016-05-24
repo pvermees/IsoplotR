@@ -101,6 +101,27 @@ concordia.plot(UPb)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("concordia.plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("discordia.age")
+### * discordia.age
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: discordia.age
+### Title: Linear regression on a U-Pb concordia diagram
+### Aliases: discordia.age
+
+### ** Examples
+
+data(UPb)
+fit <- discordia.age(UPb)
+print(paste('lower intercept = ',fit$x[1],'+/-',sqrt(fit$cov[1,1]),'Ma'))
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("discordia.age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("ellipse")
 ### * ellipse
 
@@ -212,6 +233,43 @@ print(settings())
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("settings", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("yorkfit")
+### * yorkfit
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: yorkfit
+### Title: Linear regression of X,Y-variables with correlated errors
+### Aliases: yorkfit
+
+### ** Examples
+
+   X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
+          28.530,50.540,51.595,86.51,106.40,157.35)
+   Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
+          .8642,.9584,.9617,1.135,1.230,1.490)
+   n <- length(X)
+   sX <- X*0.01
+   sY <- Y*0.005
+   rXY <- rep(0.8,n)
+   fit <- yorkfit(X,Y,sX,sY,rXY)
+   covmat <- matrix(0,2,2)
+   plot(range(X),fit$a+fit$b*range(X),type='l',ylim=range(Y))
+   for (i in 1:n){
+       covmat[1,1] <- sX[i]^2
+       covmat[2,2] <- sY[i]^2
+       covmat[1,2] <- rXY[i]*sX[i]*sY[i]
+       covmat[2,1] <- covmat[1,2]
+       ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
+       polygon(ell)
+   }
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("yorkfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 ### * <FOOTER>
 ###
 options(digits = 7L)

@@ -4,7 +4,7 @@
 \alias{concordia.age}
 \title{Calculate U-Pb concordia ages}
 \usage{
-concordia.age(x, wetherill = TRUE)
+concordia.age(x, wetherill = TRUE, dcu = TRUE)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -12,6 +12,8 @@ concordia.age(x, wetherill = TRUE)
 \item{wetherill}{boolean flag to indicate whether the data should
 be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 (\code{FALSE}) space}
+
+\item{dcu}{propagate the decay constant uncertainties?}
 }
 \value{
 a list with the following items:
