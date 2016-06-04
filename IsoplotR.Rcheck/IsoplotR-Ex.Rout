@@ -303,7 +303,7 @@ Warning in file(con, "r") :
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.644 0.48 0.572 0 0 
+Time elapsed:  0.672 0.536 0.626 0 0 
 > grDevices::dev.off()
 null device 
           1 

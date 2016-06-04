@@ -1,3 +1,5 @@
+# The following code was lifted from Alex Couture-Beil <rjson_pkg at mofo.ca>'s
+# rjson package (version 0.2.15) The C-code was removed and only native R code retained
 toJSON <- function(x)
 {
     #convert factors to characters

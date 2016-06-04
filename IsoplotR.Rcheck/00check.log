@@ -22,14 +22,17 @@ Found the following executable files:
   .git/objects/03/46c712ff554fd63d489da603e41a4fe9679f56
   .git/objects/04/10109af3672f4653978cf9f3cf46f7b952df0b
   .git/objects/05/d6c90378619c4cd501231bbf7db62cfbc1d01d
+  .git/objects/06/28ef52b40a4c824ebb5fbf33ee01213f688202
   .git/objects/07/3035c7cf0b8cf773868f751d227d73b114228d
   .git/objects/07/a8b9d99d8973bc617c5a88c0063b399e2306a4
   .git/objects/09/046bd4cdfacf7a284477d67d313fbfd287f8d1
   .git/objects/0a/c86df09024d0794c63563ca5a98ec8f8127002
+  .git/objects/0c/0d44e7c9c4fe37866233cad7d9a69464862987
   .git/objects/0c/aa028715b6b251aa83e5d697b9cf21116f9742
   .git/objects/0d/be86bd9156b83c4751e45eb2265509e08db77e
   .git/objects/0e/4a875b41be877586e88dab361ad396e1bfdcf0
   .git/objects/10/5bdfb760fdbd00d48b98d7b13c69d31e1bffab
+  .git/objects/10/94f52658804ee66ea7ed2e9270c1e0e827b293
   .git/objects/10/bb51ab5026d47a5b4f2e95084c29b5478f6f0c
   .git/objects/11/4ab61686b700cdfcb4d96b8c3efbbf29710f22
   .git/objects/11/b666393beb529a669a5246a9e7b4d73075ccbb
@@ -41,6 +44,8 @@ Found the following executable files:
   .git/objects/16/2d3d56481a63dcbb497629ce13ebfd27e95410
   .git/objects/17/4285c711ebc73351aa4f97f3e54a36e1722b3a
   .git/objects/18/273c85d8d1cd01cb7a7de282d05e9df48eedbe
+  .git/objects/18/4b2250178bd6b738d0efa689bf3ccd88f3dd29
+  .git/objects/18/776e65e31e643a3063f2870ff4d2d69a2f010b
   .git/objects/19/4f97d0f8e7bcb03fcb151f30c3e98a067633ae
   .git/objects/1a/0075d054f4f1b1df52b4233c5cfc27fbe11250
   .git/objects/1a/2332abdd233abb2d629e8fb613d4639dee19e6
@@ -52,7 +57,9 @@ Found the following executable files:
   .git/objects/1c/6a5fd33622952856e476b2c9ad588079568f11
   .git/objects/1c/e77198f7b4a59cbaa5cb6e58019dfa49dc75ac
   .git/objects/1e/7670b59d36f7780234f3b11da009d1c8455c59
+  .git/objects/1e/8196fc03313a0ea0068d4d2d1705257b8580ba
   .git/objects/1e/c5190b474f5fccbec4da58196e1defe2db6caa
+  .git/objects/1f/6ff1ad6186ad2ca11f843d7842fcd73a65bbdf
   .git/objects/20/1ae08614ca990e905f07f9ae63ce860ee177d3
   .git/objects/21/6ce50f39399249acc83688c33b1b513ccdb8ba
   .git/objects/21/87b09566c9fbf9db5e82a2b146cda5724a666c
@@ -63,15 +70,18 @@ Found the following executable files:
   .git/objects/25/040384dd745167369f31d31b9e7a7486732cff
   .git/objects/25/6115a4185ac3097cde9e9d1a9b9afac44d9270
   .git/objects/25/6f2b4d026b4baec3ff7620eacd204c6f2667d6
+  .git/objects/26/9756dff5807c7300b19d5e9778804250c72450
   .git/objects/26/f30a842a9b35034d7dbc5594c90add67d8e192
   .git/objects/2d/53ec571bea7506999585180667aa6bb0338c75
   .git/objects/2d/e83c5a32756c045b9c39e9240fc2f285896fdc
+  .git/objects/2f/2eb6d29531fd9b5efc13d9b9c7923f985b7fa4
   .git/objects/31/a8596215f5aee2069fa7cc085ce31987b2e463
   .git/objects/31/ae9f3b30bb00697a91c32e51d8eda2808ea5e3
   .git/objects/32/e229b7e6938db84fa4fe03bbbc5b87b050ff36
   .git/objects/33/5b1c1d5f91decdf7aa75c790abac3dff4bfc28
   .git/objects/34/2c682622953c8e36b24995b4936a94d27b6811
   .git/objects/34/ed8ba7df2c0b6f74df43c710bb91ff9544f01d
+  .git/objects/35/3ea4ef0ac7171082ec31796031b554509dca9a
   .git/objects/37/4c2391d603c5e8b32a063913fb17d2f3c00edb
   .git/objects/37/89f158ef116306b0d54ecb5391b9cfe9a16d85
   .git/objects/38/2e3c8d6360cc4decf22dade79ef2fb6d931031
@@ -85,6 +95,7 @@ Found the following executable files:
   .git/objects/3b/65e3cbb872050f5dbcfacd3f2057d52d28ba0e
   .git/objects/3b/b2c64085a266d526eff2803c9f6471121fe5a9
   .git/objects/3c/de03d85b896e937e332a453f3671f2e3e7eb19
+  .git/objects/3d/e2e7d7bed4b74d0b8e190caadc8da239016a3a
   .git/objects/3d/eab1f2fa233006f68240a4d99fb1b98216e869
   .git/objects/3e/5e124dd2a10b014d0b5226a5f62b0b9da610ec
   .git/objects/40/2774013cee42862ff2aac0e583c2b167a4d8ee
@@ -95,20 +106,28 @@ Found the following executable files:
   .git/objects/47/21f8a5ee65c5f5257b440b2a216a2fc61e3797
   .git/objects/47/be976017a76c6cfa421ad954584e4ca0ecb81b
   .git/objects/49/23c5ec985c8938bea11e7c342a7d8afcee84a9
+  .git/objects/4c/436772a1d9619f489067665693f416aaebb6de
+  .git/objects/4c/511f0cff69eb360e39bdc3cab602f9493767c5
   .git/objects/4d/0f59b47c90faffa764703845ca9be923bd4341
   .git/objects/50/808b37d8fa312441c6c07e48fcf8f4f6056ce5
   .git/objects/51/bdef728b78c1a676d82917784bc997f6ade86d
   .git/objects/51/bfdd8896cfeb3d962c943c1e03299ddce5f96e
+  .git/objects/52/da72cb74aeeda4c45a42401ff09d5285cb83d1
   .git/objects/55/41863ce4f760a62ba6b3eac16551fe3c4727d1
   .git/objects/56/0b9d6d2e46fb5834ceedd3191650011b9bb9ef
   .git/objects/56/d536f7ca02d9620bace742f0b12f34923a7973
+  .git/objects/58/0e944fce3b1b9fb23d4176868011bad4a4ab41
+  .git/objects/5a/071c00504ab223016b2cace8510b8c3f3e73c2
   .git/objects/5a/c1566c64a10363d7e6b55fd009d47a7d09ba07
   .git/objects/5b/06b4203913eaa21cd36f014f9052ddce8cd385
   .git/objects/5b/20e53036a218ac6eac5b35a9c7543a42e205d0
   .git/objects/5b/ed9c37aaf529e8c572363cce07d02cbc62905d
   .git/objects/5d/687000b5a3c961f5ec03dbcd8749066e53e44e
+  .git/objects/5e/ab77bfcf06e32549032fcb559b0874ba053979
   .git/objects/5e/b1d6c69b9aae76da8018bca861c78f19d12ec5
   .git/objects/60/767451d1fb8c6b197e9e2e22883c43e7ad7896
+  .git/objects/60/dfac1a84c6b04cb2282dff225eabdbd1f1a48e
+  .git/objects/62/10849ae0a463e65ea86d7dc318ffd81b69613e
   .git/objects/63/64fce80f6c3fe688528ba5d5514d2e03f8a39e
   .git/objects/64/11fd5f6646481cdf075a98376904f4df90ee8d
   .git/objects/64/19bc842adc4a800db0b164f9189b7fda65cbf4
@@ -119,15 +138,18 @@ Found the following executable files:
   .git/objects/66/9adeee169129513358547f31881af85f70c813
   .git/objects/68/0d973fbf1ac2190e747a14464a6abfffc74d7f
   .git/objects/6a/5d036adea0ee1180b8e316acd7b65d2ecf0c02
+  .git/objects/6b/25201fc01210e7a79543f2faf51ced3edc8df6
   .git/objects/6c/0cdb32e9ad1a62cd80a682bb476ef8f59eb4de
   .git/objects/6c/b6e4c472179f98b8004fd7c3ab4d082dfdd7cb
   .git/objects/6d/f0091251eb68c2c7e112e542445b22ed7cabf8
   .git/objects/6e/e1a8114e39375965996b55b0e246bdcfb48300
+  .git/objects/6f/45b5784d7c1e48fca2197de28bca56c63cd7ee
   .git/objects/6f/9c2f81db75713491e3ce8f196fa9812d19c3e3
   .git/objects/6f/b3c3647427521d21d336097445eb91b9b3d59e
   .git/objects/70/7f600041f091d5fbcdb13d98bda7501b4ae1a3
   .git/objects/70/993c1634c7736f988d4636b90de4b896bdfab5
   .git/objects/71/5ae695c578c5b9b7c630d767e99852f6b7282c
+  .git/objects/72/21a148ca9ac4209b4879b48a53290224ff288a
   .git/objects/72/56bf40778972f426b00a9670cbd5234481f1b7
   .git/objects/74/92a0286d3818a22c1bdc9d74d575a60d7272ab
   .git/objects/75/61f53c8a4215e1a90fc46895f08ea42bc0c1b7
@@ -138,6 +160,7 @@ Found the following executable files:
   .git/objects/7a/93b3fe51f80dd7121c027757ba5c3968ef90fb
   .git/objects/7c/c89a706dd9cec02dde09e57c2ff64ff6cbb840
   .git/objects/7e/3c258b33ac824ef9b846cf8238de803be467d7
+  .git/objects/81/363b3f7159d2db86593ef19743b1342057df6a
   .git/objects/81/b333ea8d2e8fdb79e02d9f8bf52753b49ebc4c
   .git/objects/82/89a2008c4a51c12d9e95d912f4dda6c0b3cf45
   .git/objects/82/cd75a3fa83d013fdd58588b87acb4a26e84566
@@ -145,6 +168,8 @@ Found the following executable files:
   .git/objects/84/cedc05aecc0dfaeef057700a472bdf4a62c1f6
   .git/objects/88/7428ccec8e0c0832eed4eac2f10c4fbaf0a6d0
   .git/objects/88/e4112eb5092965b7c06eda3ff0214c2e7c9656
+  .git/objects/89/25a6ba69a65b222147266d5063da298990e128
+  .git/objects/89/9c4b32e1a7248eec700a3d735cd2bf0f58a7a8
   .git/objects/89/b6440103bd8fd5621849b6debd8330baf77873
   .git/objects/89/cb9b2d6a8a1cb6a20a12e12c62393c78e09375
   .git/objects/8c/88b0e79a1ef536a6a7ab82299ef8a1879b785a
@@ -156,12 +181,15 @@ Found the following executable files:
   .git/objects/90/b7282fc1b2d8ec934dc7f5f026ae5d78c0470c
   .git/objects/92/770676a5fb44b25bc6e8dcfd6f3518278cd8de
   .git/objects/92/9b539788d677808277eb5cb11e1f69f2e7676c
+  .git/objects/94/f45549cc597aa8ca14ee798fc5363870c4a6c3
   .git/objects/96/009e340725148c8eaa1f6ab600e61a4ebda705
+  .git/objects/96/ddc8415290b14e6bd5a3165631b9e3aed8fb89
   .git/objects/98/58eb1fc9e39cd9fa66a16425d84ce945451022
   .git/objects/98/bf826156f12b60f0a095843d440cb72fa29117
   .git/objects/99/9c0f1429d3fb49896fead6804b62b79dd30c1a
   .git/objects/9c/b3c68e24164397e2cc8776fdf6d257eb882ea2
   .git/objects/9d/ab18924ea7d36b2e298ad93d6f608664999e9e
+  .git/objects/9f/9318c67cdf727460d51005d6d0206c315e135c
   .git/objects/9f/e757d6cf0dd32c2852ee4bbb2963f467415d1c
   .git/objects/a1/1768266a8b3d172781fffb3f7c1ddb183e3cce
   .git/objects/a1/7db8f3827c87fb697998c05155f6bf7b2d6304
@@ -184,35 +212,43 @@ Found the following executable files:
   .git/objects/a9/9e74c0dcca66d91b7d58a97bcb6ca8e696d1c4
   .git/objects/a9/eebcb14558677b296d56083f737ee2622547a1
   .git/objects/aa/daaa9823b86d77f3a4a8d77a1ceccc7eaffc3c
+  .git/objects/ac/91e684bde71dfc3ee1063c8e4b649973bc89cb
   .git/objects/ac/ac38ea215c9828414eda6c41c872a721992048
+  .git/objects/ae/2eb80faeb66b5941cc54d0507b028ee9870821
   .git/objects/af/5cf4ef21f02c9645ebbfddcf7e88e12fb20283
   .git/objects/af/938fb143e6a53655ac0e75a20543e3ea72708c
   .git/objects/b0/0839611865b9983c647e46b99b20d6fe7fe3f3
   .git/objects/b0/0bf990ffe6f814bf58da2477fcf2438c7c9ace
   .git/objects/b1/2b934e5956755dd8c0bb52fdaaa455e87d3882
   .git/objects/b1/4439dee9d83e441cfff422bfbfa3a5d19ad8cb
+  .git/objects/b1/6066a7166eef898163b2ee0635524677ae52bd
   .git/objects/b4/23f1cec9899fcfaf19b6a6221dbe01dcfe711f
   .git/objects/b4/67369a89b0516ed35fe329451d6d1388183790
   .git/objects/b5/0426f139178770493b25b0be649da64be3c6c3
   .git/objects/b6/9b4c430c459b1ea8e8e40cdca8d52c8d08be79
   .git/objects/b7/607cefab367b8f73b5c2ff54a151ccbb23eb24
   .git/objects/bb/9eceec017ac58e9aebe6dd3709475de2337822
+  .git/objects/bb/ee9fe960d932fce54612960f6718134485c780
   .git/objects/bc/558b3e2082a3ff755dc894d9951a42afb89ee7
   .git/objects/bc/9f3e6c91920ef7bbdb591de23e85b1a3a327cc
   .git/objects/bc/abf182d5347b4d140ee1ca9a69a003034c0865
+  .git/objects/bd/67bc5091121356446b6809d58340fdb9f9d54b
   .git/objects/bd/aa199c688614c42219946a5840f5a7eb2f8ad3
   .git/objects/bf/5734340db8418df7f5a0423633b2bbdb0fdb57
   .git/objects/bf/de82423c3b167a885671908166218fb64e4c18
   .git/objects/bf/e26c25b85e4e2b06e49fe2f852cb71702c231c
   .git/objects/c0/4874641976deefeeb8d34a8d5165e9d3ac435d
+  .git/objects/c0/7351da4ebe83dd66cad80837b8308f16828551
   .git/objects/c0/97f20171bd4a61c3bd8d0084877edca30f579a
   .git/objects/c1/3ab944d5cdc14acb05157f2bae795a27d44ee3
   .git/objects/c1/c885dca6a2488cc1c980b40b02f0a149b32ab1
+  .git/objects/c2/5435899ea4d68ce597ce575cdafd197236aa59
   .git/objects/c4/6156e0c5c70f4ab5a9031004af4ce7fec093c0
   .git/objects/c5/a034ac08acd893c0a99599c5a0e135687e0407
   .git/objects/c5/e7ded942dbc4a8e779b03c1db167ac8d08cce4
   .git/objects/c6/64a8bbbe9d61d9c5fa36cee33af3b82701002d
   .git/objects/c8/662946dc3cf9370b5268f0e786633fa0f73c54
+  .git/objects/c8/6ec902ae51f5393ed879044a784efadc1ede52
   .git/objects/c8/72a620d0b269bad66750815c332648c44fe8e5
   .git/objects/ca/0775fd0b307b1f11a994be5ef0cab38c2a3736
   .git/objects/cb/56e43e0c0c3610098a33a44476b42488dad430
@@ -222,10 +258,13 @@ Found the following executable files:
   .git/objects/ce/fb9e4bd2031f32ce19dd806e31543dfba0b700
   .git/objects/cf/73b41dd8ecbaaba68f4c2db218698de4a3050e
   .git/objects/cf/e414677e28f736928bd3d1bf4721bc49d37b1f
+  .git/objects/d0/8fc883f811637623092c0e89fcb7fd0361645a
   .git/objects/d0/ab989b32e53546088e57e8f43acad21ef8dcb4
   .git/objects/d1/912f8c1213ac52b9b01fc2d4588dae3aa9a557
   .git/objects/d2/fc5b0dfd2a8b9afbefd628a40fafafd2b44835
+  .git/objects/d3/51634b6f64ce02069da96bcb3e03af052890fb
   .git/objects/d4/488a6edee356574d66ddfd0ef8b75fbb7ab5c1
+  .git/objects/d5/09c2e0ba68b7f0331fa89fe7da51eafef15d24
   .git/objects/d5/292ec841c5daaf4d9807f9652e7cd030bfc8f9
   .git/objects/d6/294f400a7ea273faef8a84dc444e82b4259c39
   .git/objects/d6/c5996dd215ee603863aa6750316dd99d19ac58
@@ -234,6 +273,7 @@ Found the following executable files:
   .git/objects/dc/22ba47f98e1c1df0d249a2cd46899551696e56
   .git/objects/dc/61c116d9136bedd20ec7df7cfc177c61f007ec
   .git/objects/dc/da7d9f90f0665f8fd790542d60806c9810b511
+  .git/objects/de/cbc64fd7ae2eb18d50fbe87260b423a93c4c7f
   .git/objects/df/8da668c6bc6c97bcc1c6027e1fce9a267c5557
   .git/objects/df/9e32fd7f2eac2687b93be9d7db8fcd6fb71b47
   .git/objects/e0/1ac04cfedb2ee16ff832b315e028373a7ca8d5
@@ -241,11 +281,13 @@ Found the following executable files:
   .git/objects/e4/61e2cbed9daf6db8eeb615a3b6e2adda4c9131
   .git/objects/e4/8434e06b001f4cec72177ac39875e9cc4b1575
   .git/objects/e5/bf8b15bf475ea2a9fb25f414bfeed7c00a4102
+  .git/objects/e7/4ac5dd074687bed721871e2e948f25db30cf77
   .git/objects/e7/b3bc556b7b52eed3e57ffab2d849cfd9d85d40
   .git/objects/e9/80c19690488f002701dfe41b5295e5fbcef755
   .git/objects/e9/b8e4abf206336594c1851a49eeb061b6601838
   .git/objects/ea/059f3cb1297c534c04d6722a829d36ea75853f
   .git/objects/ea/25f7ad2adc5a4e6a50120dfc39b4bf470a547e
+  .git/objects/ec/1c85424e2efa1c1735165fac40db55f9ed1b7b
   .git/objects/ec/b9fb4f87a69abcf925c9270fbaae8f189bf773
   .git/objects/ed/9c54502d3dbf5f940c73a22a34234639b93745
   .git/objects/ee/044240447052b972b52e14ee08b36f427c7317
@@ -253,6 +295,8 @@ Found the following executable files:
   .git/objects/ef/9e70a35b45f9afb8a0b5d6c9d1afc843874d35
   .git/objects/f1/a1abadc02f2d1d2a8c50ce6898e77e807cdab8
   .git/objects/f3/94e0184303c1b32f3f9b9f5198ec324fd774b1
+  .git/objects/f4/8dcc24727a9b6ba06aa7463890d6f1f35d724f
+  .git/objects/f4/c1707c525c18c535a0627aa166baaf7ea822da
   .git/objects/f5/94b4baeae42d345b822afe383aaa8869aa5976
   .git/objects/fc/0b86df49fc445e822b84d6ca8ce2f9c64adbd7
   .git/objects/fc/aa31d04418036988fb5cb8477f8e18ebcb0f5c
@@ -278,8 +322,8 @@ CRAN-pack does not know about
 * checking package directory ... OK
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
-Non-standard files/directories found at top level:
-  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
+Non-standard file/directory found at top level:
+  ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING

@@ -44,8 +44,20 @@ read.data <- function(fname,method='U-Pb',format=1,...){
 #' @export
 read.matrix <- function(x,method='U-Pb',format=1){
     if (identical(method,'U-Pb')){
-        return(as.UPb(x,format))
+        out <- as.UPb(x,format)
+    } else if (identical(method,'detrital')){
+        out <- as.detrital(x)
     }
+    out
+}
+
+as.detrital <- function(x){
+    ns = length(x)
+    out <- list()
+    for (i in 1:ns){
+        out[[names(x)[i]]] = x[!is.na(x[,i]),i]
+    }
+    out
 }
 
 as.UPb <- function(x,format=1){
