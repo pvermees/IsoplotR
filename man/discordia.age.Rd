@@ -33,8 +33,8 @@ taking into account error correlations and decay constant
 uncertainties.
 }
 \examples{
-data(UPb)
-fit <- discordia.age(UPb)
+data(examples)
+fit <- discordia.age(examples$UPb)
 print(paste('lower intercept = ',fit$x[1],'+/-',sqrt(fit$cov[1,1]),'Ma'))
 }
 

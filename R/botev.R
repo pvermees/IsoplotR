@@ -10,8 +10,9 @@
 #' D. P. Kroese. "Kernel density estimation via diffusion." The Annals
 #' of Statistics 38.5 (2010): 2916-2957.
 #' @examples
-#' fname <- system.file("DZ.csv",package="provenance")
-#' bw <- botev(read.distributional(fname)$x$N1)
+#' data(examples)
+#' samp <- examples$DZ[['N1']]
+#' bw <- botev(samp)
 #' print(bw)
 #' @export
 botev <- function(x){

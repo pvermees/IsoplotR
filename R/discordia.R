@@ -34,8 +34,8 @@
 #' for isotopic equivalence and age concordance, respectively.
 #' @importFrom stats optim
 #' @examples
-#' data(UPb)
-#' fit <- concordia.age(UPb)
+#' data(examples)
+#' fit <- concordia.age(examples$UPb)
 #' print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
 #' @export
 concordia.age <- function(x,wetherill=TRUE,dcu=TRUE){
@@ -149,8 +149,8 @@ get.UPb.labels <- function(wetherill=TRUE){
 #'
 #' @importFrom stats optim optimHess
 #' @examples
-#' data(UPb)
-#' fit <- discordia.age(UPb)
+#' data(examples)
+#' fit <- discordia.age(examples$UPb)
 #' print(paste('lower intercept = ',fit$x[1],'+/-',sqrt(fit$cov[1,1]),'Ma'))
 #' @export
 discordia.age <- function(x,wetherill=TRUE,dcu=TRUE){

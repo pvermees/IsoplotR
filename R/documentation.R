@@ -1,19 +1,30 @@
-#' An example U-Pb dataset
+#' Example datasets for testing \code{IsoplotR}
 #'
-#' An example U-Pb dataset provided with Ludwig's Isoplot add-in
+#' U-Pb and detrital zircon datasets
 #'
-#' \code{UPb} is an object of class \code{UPb}, i.e. a list with two items
+#' \code{examples} is a list with two items
 #'
-#' \code{x}: a matrix formatted according to \code{format}
+#' \code{UPb}: an object of class \code{'UPb'} containing a high
+#' precision U-Pb dataset packaged with Ken Ludwig's \code{Isoplot}
+#' program.
 #'
-#' \code{format}: an integer defining the format of \code{x}. Options are:
+#' \code{DZ}: an object of class \code{'detrital'} containing a
+#' detrital zircon U-Pb dataset from Namibia.
 #'
 #' \code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]
 #' 
-#' @name UPb
+#' @name examples
 #' @docType data
 #' @examples
-#' data(UPb)
-#' concordia.plot(UPb)
+#' data(examples)
+#' concordia.plot(examples$UPb)
 #' @author Ken Ludwig and Pieter Vermeesch
+#' @references
+#' 
+#' Ludwig, K. R. User's manual for Isoplot 3.00: a geochronological
+#'     toolkit for Microsoft Excel. No. 4. Kenneth R. Ludwig, 2003.
+#'
+#' Vermeesch, Pieter, and Eduardo
+#' Garzanti. "Making geological sense of 'Big Data' in sedimentary provenance analysis."
+#' Chemical Geology 409 (2015): 20-27.
 NULL

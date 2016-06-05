@@ -27,8 +27,8 @@
 #'
 #' ages: the data values from the input to the \code{KDE} function
 #' @examples
-#' data(DZ)
-#' dens <- kde(DZ[['N1']],0,3000,kernel="epanechnikov")
+#' data(examples)
+#' dens <- kde(examples$DZ[['N1']],0,3000,kernel="epanechnikov")
 #' plot(dens)
 #' @seealso kdes
 #' @export
@@ -82,7 +82,6 @@ kde <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
 #' all the samples.
 #' @param adaptive boolean flag switching on the adaptive bandwidth
 #' modifier of Abramson (1982)
-#' @param pch (optional) symbol to be used to mark the sample points along the x-axis
 #' @param normalise boolean flag indicating whether or not the KDEs
 #' should all integrate to the same value.
 #' @param log boolean flag indicating whether the data should by
@@ -100,18 +99,15 @@ kde <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
 #' 
 #' themax: the maximum probability density of all the KDEs
 #'
-#' pch: the plot symbol to be used by \code{plot.KDEs}
-#'
 #' xlabel: the x-axis label to be used by \code{plot.KDEs}
 #' @examples
-#' data(DZ)
-#' KDES <- kdes(DZ,0,3000,pch=NA)
-#' summaryplot(KDES,ncol=3)
+#' data(examples)
+#' KDES <- kdes(examples$DZ,from=0,to=3000)
+#' plot(KDES)
 #' @seealso kde
 #' @export
 kdes <- function(x,from=NA,to=NA,bw=NA,samebandwidth=TRUE,
-                 adaptive=TRUE,pch=NA,normalise=FALSE,
-                 log=FALSE,n=512,...){
+                 adaptive=TRUE,normalise=FALSE,log=FALSE,n=512,...){
     if (is.na(from) | is.na(to)) {
         mM <- getmM(unlist(x),from,to,log)
         from <- mM$m
@@ -134,7 +130,6 @@ kdes <- function(x,from=NA,to=NA,bw=NA,samebandwidth=TRUE,
     out$from <- from
     out$to <- to
     out$themax <- themax
-    out$pch <- pch
     out$log <- log
     class(out) <- "KDEs"
     out
@@ -184,36 +179,59 @@ Abramson <- function(dat,from,to,bw,n=512,...){
 #'     Set \code{pch = NA} to turn them off.
 #' @param xlab the label of the x-axis
 #' @param ylab the label of the y-axis
+#' @param kde.col the fill colour of the KDE specified as a four
+#'     element vector of r, g, b, alpha values
+#' @param show.hist boolean flag indicating whether a histogram should
+#'     be added to the KDE
+#' @param hist.col the fill colour of the histogram specified as a
+#'     four element vector of r, g, b, alpha values
+#' @param binwidth scalar width of the histogram bins, in Myr if
+#'     \code{x$log==FALSE}, or as a fractional value if
+#'     \code{x$log==TRUE}. Sturges' Rule is used if \code{binwidth==NA}
+#' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
+#'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
+#'     around the plot
 #' @param ... optional parameters to be passed on to the graphics
 #'     object
 #' @examples
-#' data(Namib)
-#' samp <- Namib$DZ$x[['N1']]
-#' dens <- KDE(samp,from=0,to=3000)
+#' data(examples)
+#' dens <- kde(examples$DZ[['N1']],from=0,to=3000)
 #' plot(dens)
+#' @importFrom graphics axis hist par rect
 #' @seealso KDE
 #' @method plot KDE
 #' @export
-plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",kde.col=rgb(1,0,1,0.6),
-                     show.hist=TRUE,hist.col=rgb(0,1,0,0.2),
-                     binwidth=NA,bty='n',...){
-    if (is.na(binwidth)) breaks <- "Sturges"
+plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
+                     kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
+                     hist.col=rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
+    m <- x$x[1]
+    M <- utils::tail(x$x,n=1)
+    inrange <- x$ages >= m & x$ages <= M
+    ages <- x$ages[inrange]
+    if (is.na(binwidth)) nb <- log2(length(ages))+1 # Sturges' Rule
     if (x$log){
         do.log <- 'x'
-        if (!is.na(binwidth))
-            breaks <- exp(seq(log(x$x[1]),log(tail(x$x,n=1)),by=binwidth))
-        h <- hist(log(x$ages),breaks=breaks,plot=FALSE)
-        width <- diff(exp(h$breaks))
+        if (is.na(binwidth)) {
+            breaks <- exp(seq(log(m),log(M),length.out=nb+1))
+        } else {
+            breaks <- exp(seq(log(m),log(M),by=binwidth))
+        }
+        h <- hist(log(ages),breaks=log(breaks),plot=FALSE)
     } else {
         do.log <- ''
-        if (!is.na(binwidth)) breaks <- seq(0,tail(x$x,1),by=binwidth)
-        h <- hist(x$ages,breaks=breaks,plot=FALSE)
-        width <- diff(h$breaks)
+        if (is.na(binwidth)) {
+            breaks <- seq(0,M,length.out=nb+1)
+        } else {
+            breaks <- seq(0,M,by=binwidth)
+        }
+        h <- hist(ages,breaks=breaks,plot=FALSE)
     }
-    graphics::plot(x$x,x$y,type='n',log=do.log,xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
+    nb <- length(breaks)-1
+    graphics::plot(x$x,x$y,type='n',log=do.log,
+                   xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
     if (show.hist){
-        barplot(height=h$density,width=width,
-                space=0,add=TRUE,col=hist.col,yaxt='n',...)
+        rect(xleft=breaks[1:nb],xright=breaks[2:(nb+1)],
+             ybottom=0,ytop=h$density,col=hist.col)
         if (par('yaxt')!='n') {
             fact <- max(h$counts)/max(h$density)
             labels <- pretty(fact*h$density)
@@ -223,11 +241,48 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",kde.col=rgb(1,0,1,0.6),
     }
     graphics::polygon(x$x,x$y,col=kde.col)
     graphics::lines(x$x,x$y,col='black')
-    graphics::points(x$ages,rep(graphics::par("usr")[3]/2,length(x$ages)),pch=pch)
-    graphics::text(utils::tail(x$x,n=1),.9*max(x$y),paste0("n=",length(x$ages)),pos=2)
+    graphics::points(ages,rep(graphics::par("usr")[3]/2,length(ages)),pch=pch)
+    graphics::text(M,max(x$y),paste0("n=",length(ages)),pos=2)
 }
 
-plot.KDEs <- function(x,ncol=1,...){
+#' Plot a list of kernel density estimates
+#'
+#' Plots an object of class \code{KDEs}
+#' 
+#' @param x an object of class \code{KDEs}
+#' @param ncol scalar value indicating the number of columns over
+#'     which the KDEs should be divided
+#' @param pch the symbol used to show the samples. May be a vector.
+#'     Set \code{pch = NA} to turn them off.
+#' @param xlab the label of the x-axis
+#' @param ylab the label of the y-axis
+#' @param kde.col the fill colour of the KDE specified as a four
+#'     element vector of r, g, b, alpha values
+#' @param show.hist boolean flag indicating whether a histogram should
+#'     be added to the KDE
+#' @param hist.col the fill colour of the histogram specified as a
+#'     four element vector of r, g, b, alpha values
+#' @param binwidth scalar width of the histogram bins, in Myr if
+#'     \code{x$log==FALSE}, or as a fractional value if
+#'     \code{x$log==TRUE}. Sturges' Rule is used if
+#'     \code{binwidth==NA}
+#' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
+#'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
+#'     around the plot
+#' @param ... optional parameters to be passed on to the graphics
+#'     object
+#' @importFrom graphics mtext
+#' @examples
+#' data(examples)
+#' KDES <- kdes(examples$DZ)
+#' plot(KDES)
+#' @seealso KDE
+#' @method plot KDEs
+#' @export
+plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
+                      kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
+                      hist.col=rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
+    if (is.na(ncol)) ncol <- ceiling(sqrt(length(x)/2))
     oldpar <- graphics::par(no.readonly=T)
     snames <- names(x$kdes)
     ns <- length(snames)
@@ -236,10 +291,20 @@ plot.KDEs <- function(x,ncol=1,...){
     np <- nppc*ncol # number of subpanels
     graphics::layout(matrix(1:np,nppc,length(w)),w,rep(1,nppc))
     si <- ceiling(seq(from=0,to=ns,length.out=ncol+1)) # sample index
-    graphics::par(xpd=TRUE,mar=rep(1,4),oma=c(3,1,1,1))#, mfcol=c(nppc,nd))
+    graphics::par(xpd=TRUE,mar=rep(1,4),oma=c(3,1,1,1))
     for (i in 1:ns){
-        if ((i%%nppc)==0 | (i==ns)) plot.KDE(x$kdes[[i]],...)
-        else plot.KDE(x$kdes[[i]],xaxt='n',...)
+        if ((i%%nppc)==0 | (i==ns)) {
+            plot.KDE(x$kdes[[i]],pch=pch,xlab=xlab,ylab=ylab,
+                     kde.col=kde.col,show.hist=show.hist,
+                     hist.col=hist.col,binwidth=binwidth,
+                     bty=bty,ann=FALSE,...)
+            mtext(side=1,text=xlab,line=2,cex=0.8)
+        } else {
+            plot.KDE(x$kdes[[i]],pch=pch,xlab=xlab,ylab=ylab,
+                     kde.col=kde.col,show.hist=show.hist,
+                     hist.col=hist.col,binwidth=binwidth,
+                     bty=bty,xaxt='n',...)
+        }
         title(snames[i])
     }
     graphics::par(oldpar)

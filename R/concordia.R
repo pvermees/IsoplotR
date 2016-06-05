@@ -22,8 +22,8 @@
 #' @importFrom graphics polygon title points text
 #' @importFrom stats pchisq
 #' @examples
-#' data(UPb)
-#' concordia.plot(UPb)
+#' data(examples)
+#' concordia.plot(examples$UPb)
 #' @export
 concordia.plot <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                            ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',

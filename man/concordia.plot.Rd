@@ -37,7 +37,7 @@ concordia.plot(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 Wetherill and Tera-Wasserburg concordia diagrams
 }
 \examples{
-data(UPb)
-concordia.plot(UPb)
+data(examples)
+concordia.plot(examples$UPb)
 }
 

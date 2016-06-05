@@ -46,8 +46,8 @@ likelihood, computes the mswd of equivalence and concordance and
 their respective Chi-squared p-values.
 }
 \examples{
-data(UPb)
-fit <- concordia.age(UPb)
+data(examples)
+fit <- concordia.age(examples$UPb)
 print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
 }
 
