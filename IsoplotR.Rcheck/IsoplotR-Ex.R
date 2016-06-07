@@ -40,25 +40,27 @@ print(I.R('U238U235'))
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("I.R", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("UPb")
-### * UPb
+nameEx("botev")
+### * botev
 
 flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: UPb
-### Title: An example U-Pb dataset
-### Aliases: UPb
+### Name: botev
+### Title: Compute the optimal kernel bandwidth
+### Aliases: botev
 
 ### ** Examples
 
-data(UPb)
-concordia.plot(UPb)
+data(examples)
+samp <- examples$DZ[['N1']]
+bw <- botev(samp)
+print(bw)
 
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("UPb", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+base::cat("botev", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("concordia.age")
 ### * concordia.age
@@ -72,8 +74,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(UPb)
-fit <- concordia.age(UPb)
+data(examples)
+fit <- concordia.age(examples$UPb)
 print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
 
 
@@ -93,8 +95,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(UPb)
-concordia.plot(UPb)
+data(examples)
+concordia.plot(examples$UPb)
 
 
 
@@ -113,8 +115,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(UPb)
-fit <- discordia.age(UPb)
+data(examples)
+fit <- discordia.age(examples$UPb)
 print(paste('lower intercept = ',fit$x[1],'+/-',sqrt(fit$cov[1,1]),'Ma'))
 
 
@@ -146,6 +148,88 @@ points(x,y,pch=21,bg='black')
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("ellipse", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("examples")
+### * examples
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: examples
+### Title: Example datasets for testing 'IsoplotR'
+### Aliases: examples
+
+### ** Examples
+
+data(examples)
+concordia.plot(examples$UPb)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("examples", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("kde")
+### * kde
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: kde
+### Title: Create a kernel density estimate
+### Aliases: kde
+
+### ** Examples
+
+data(examples)
+dens <- kde(examples$DZ[['N1']],0,3000,kernel="epanechnikov")
+plot(dens)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("kde", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("kde.plot")
+### * kde.plot
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: kde.plot
+### Title: Plot (a) kernel density estimate(s)
+### Aliases: kde.plot
+
+### ** Examples
+
+data(examples)
+kde.plot(examples$DZ[['N2']])
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("kde.plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("kdes")
+### * kdes
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: kdes
+### Title: Create a list of KDEs
+### Aliases: kdes
+
+### ** Examples
+
+data(examples)
+KDES <- kdes(examples$DZ,from=0,to=3000)
+plot(KDES)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("kdes", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("lambda")
 ### * lambda
 
@@ -167,6 +251,48 @@ print(lambda('U238'))
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("lambda", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("plot.KDE")
+### * plot.KDE
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: plot.KDE
+### Title: Plot a kernel density estimate
+### Aliases: plot.KDE
+
+### ** Examples
+
+data(examples)
+dens <- kde(examples$DZ[['N1']],from=0,to=3000)
+plot(dens)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("plot.KDE", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("plot.KDEs")
+### * plot.KDEs
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: plot.KDEs
+### Title: Plot a list of kernel density estimates
+### Aliases: plot.KDEs
+
+### ** Examples
+
+data(examples)
+KDES <- kdes(examples$DZ)
+plot(KDES)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("plot.KDEs", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("read.data")
 ### * read.data

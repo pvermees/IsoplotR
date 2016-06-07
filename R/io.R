@@ -45,17 +45,18 @@ read.data <- function(fname,method='U-Pb',format=1,...){
 read.matrix <- function(x,method='U-Pb',format=1){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format)
-    } else if (identical(method,'detrital')){
-        out <- as.detrital(x)
+    } else if (identical(method,'detritals')){
+        out <- as.detritals(x)
     }
     out
 }
 
-as.detrital <- function(x){
-    ns = length(x)
+as.detritals <- function(x){
+    snames <- colnames(x)
     out <- list()
-    for (i in 1:ns){
-        out[[names(x)[i]]] = x[!is.na(x[,i]),i]
+    class(out) <- "detritals"
+    for (sname in snames){
+        out[[sname]] = x[!is.na(x[,sname]),sname]
     }
     out
 }

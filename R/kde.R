@@ -292,20 +292,69 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
     graphics::layout(matrix(1:np,nppc,length(w)),w,rep(1,nppc))
     si <- ceiling(seq(from=0,to=ns,length.out=ncol+1)) # sample index
     graphics::par(xpd=TRUE,mar=rep(1,4),oma=c(3,1,1,1))
+    if (x$themax>0) ylim <- c(0,x$themax)
+    else ylim <- NULL
     for (i in 1:ns){
         if ((i%%nppc)==0 | (i==ns)) {
             plot.KDE(x$kdes[[i]],pch=pch,xlab=xlab,ylab=ylab,
                      kde.col=kde.col,show.hist=show.hist,
                      hist.col=hist.col,binwidth=binwidth,
-                     bty=bty,ann=FALSE,...)
+                     bty=bty,ann=FALSE,ylim=ylim,...)
             mtext(side=1,text=xlab,line=2,cex=0.8)
         } else {
             plot.KDE(x$kdes[[i]],pch=pch,xlab=xlab,ylab=ylab,
                      kde.col=kde.col,show.hist=show.hist,
                      hist.col=hist.col,binwidth=binwidth,
-                     bty=bty,xaxt='n',...)
+                     bty=bty,xaxt='n',ylim=ylim,...)
         }
         title(snames[i])
     }
     graphics::par(oldpar)
+}
+
+#' Plot (a) kernel density estimate(s)
+#'
+#' Plots geochronological datsets as kernel density estimates using a
+#' combination of the Botev (2010) bandwidth selector and the Abramson
+#' (1982) adaptive kernel bandwidth modifier.
+#' 
+#' @param x an object of class \code{UPb} or \code{detritals}
+#' @param from minimum age of the time axis. If NULL, this is set
+#'     automatically
+#' @param to maximum age of the time axis. If NULL, this is set
+#'     automatically
+#' @param bw the bandwidth of the KDE. If NULL, bw will be calculated
+#'     automatically using \code{botev()}
+#' @param adaptive boolean flag controlling if the adaptive KDE
+#'     modifier of Abramson (1982) is used
+#' @param log transform the ages to a log scale if TRUE
+#' @param n horizontal resolution of the density estimate
+#' @param samebandwidth boolean flag indicating whether the same
+#'     bandwidth should be used for all samples. If samebandwidth =
+#'     TRUE and bw = NULL, then the function will use the median
+#'     bandwidth of all the samples. This option is only used if
+#'     \code{x} is of class \code{detritals}.
+#' @param normalise boolean flag indicating whether or not the KDEs
+#'     should all integrate to the same value. This option is only
+#'     used if \code{x} is of class \code{detritals}.
+#' @param binwidth scalar width of the histogram bins, in Myr if
+#'     \code{x$log==FALSE}, or as a fractional value if
+#'     \code{x$log==TRUE}. Sturges' Rule is used if
+#'     \code{binwidth==NA}
+#' @param ... optional arguments to be passed on to \code{plot.KDEs}
+#'     (if \code{x} is of class \code{detritals} or \code{plot.KDE}
+#'     otherwise
+#' @examples
+#' data(examples)
+#' kde.plot(examples$DZ[['N2']])
+#' @seealso kde kdes plot.KDE plot.KDEs
+#' @export
+kde.plot <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                     n=512,samebandwidth=TRUE,normalise=FALSE,binwidth=NA,...){
+    if (methods::is(x,'detritals')){
+        plot.KDEs(kdes(x,from=from,to=to,bw=bw,samebandwidth=samebandwidth,
+                       adaptive=adaptive,normalise=normalise,log=log,n=n),binwidth=binwidth,...)
+    } else {
+        plot.KDE(kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n),binwidth=binwidth,...)
+    }
 }
