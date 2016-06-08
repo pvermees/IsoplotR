@@ -46,7 +46,7 @@ concordia.plot <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=
     }
     if (show.age==1){
         fit <- concordia.age(x,wetherill,dcu)
-        ell <- ellipse(fit$x[1],fit$x[2],fit$x.cov)
+        ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         polygon(ell,col='white')
         title(concordia.title(fit))
     }
@@ -194,4 +194,186 @@ concordia.title <- function(fit){
                              b=signif(fit$p.value$concordance,2)))
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)
+}
+
+#' Calculate U-Pb concordia ages
+#'
+#' Evaluates the equivalence of multiple
+#' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
+#' compositions, computes the weighted mean isotopic composition and
+#' the corresponding concordia age using the method of maximum
+#' likelihood, computes the mswd of equivalence and concordance and
+#' their respective Chi-squared p-values.
+#'
+#' @param x either an object of class \code{UPb}, or a list containing
+#'     two items, \code{x} and \code{cov}, corresponding to a U-Pb
+#'     composition and its covariance matrix, respectively.
+#' @rdname concordia.age
+#' @export
+concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
+#' @param wetherill boolean flag to indicate whether the data should
+#'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
+#'     (\code{FALSE}) space
+#' @param dcu propagate the decay constant uncertainties?
+#' @param ... optional arguments
+#' @return a list with the following items:
+#'
+#' \code{x}: a named vector with the (weighted mean) U-Pb composition
+#'
+#' \code{cov}: the covariance matrix of the (mean) U-Pb composition
+#'
+#' \code{age}: the concordia age (in Ma)
+#'
+#' \code{age.err}: the standard error of the concordia age
+#'
+#' And, additionally (if \code{x} has class \code{UPb} and
+#' \code{!is.na(i)}):
+#'
+#' \code{mswd}: a list with two items (\code{equivalence} and
+#' \code{concordance}) containing the MSWD (Mean of the Squared
+#' Weighted Deviates, a.k.a the reduced Chi-squared statistic outside
+#' of geochronology) of isotopic equivalence and age concordance,
+#' respectively.
+#'
+#' \code{p.value}: a list with two items (\code{equivalence} and
+#' \code{concordance}) containing the p-value of the Chi-square test
+#' for isotopic equivalence and age concordance, respectively.
+#' 
+#' @importFrom stats optim
+#' @rdname concordia.age
+#' @export
+concordia.age.default <- function(x,wetherill=TRUE,dcu=TRUE,...){
+    out <- x
+    t.init <- initial.concordia.age.guess(out$x,wetherill)
+    fit.age <- optim(t.init, LL.concordia.age, x=out$x, covmat=out$cov,
+                     wetherill=wetherill, dcu=dcu, method="BFGS", hessian=TRUE)
+    out$age <- fit.age$par
+    out$age.err <- as.numeric(sqrt(solve(fit.age$hessian)))
+    out
+}
+#' @param i (optional) scalar index of a particular aliquot. If omitted, the
+#' concordia age corresponding to the weighted mean composition is calculated
+#' @examples
+#' data(examples)
+#' fit <- concordia.age(examples$UPb)
+#' print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
+#' @rdname concordia.age
+#' @export
+concordia.age.UPb <- function(x,wetherill=TRUE,dcu=TRUE,i=NA,...){
+    if (is.na(i)){
+        X <- UPb.preprocess(x,wetherill)
+        CC <- concordia.comp(X,wetherill,dcu)
+        out <- concordia.age.default(CC,wetherill,dcu,...)
+        mswd <- mswd.concordia(X,out$x,out$cov,out$age,wetherill)
+        out$mswd <- mswd$mswd
+        out$p.value <- mswd$p.value
+    } else {
+        CC <- UPb.preprocess(x,wetherill,i)
+        out <- concordia.age.default(CC,wetherill,dcu,...)
+    }
+    out
+}
+
+# x is a list of lists of U-Pb compositions and covariance
+# matrices prepared by the UPb.preprocess function
+concordia.comp <- function(x,wetherill=TRUE,dcu=TRUE){
+    xy <- initialise.concordant.composition(x,wetherill)
+    fit.comp <- optim(xy, LL.concordia.comp, x=x, method="BFGS", hessian=TRUE)
+    out <- list()
+    out$x <- fit.comp$par
+    out$cov <- solve(fit.comp$hessian)
+    selection <- names(x[[1]]$x)
+    names(out$x) <- selection
+    colnames(out$cov) <- selection
+    rownames(out$cov) <- selection
+    out
+}
+
+# x = object of class UPb
+# generates a list of lists containing U-Pb/Pb-Pb pairs and
+# covariance matrices. Is used to calculate discordia lines
+UPb.preprocess <- function(x,wetherill,i=NA){
+    selection <- get.UPb.selection(wetherill)
+    if (!is.na(i)){
+        X <- x$x[i,selection]
+        covmat <- get.covmat.UPb(x,i)[selection,selection]
+        out <- list(x=X,cov=covmat)
+    } else {
+        out <- list()
+        for (i in 1:nrow(x$x))
+            out[[i]] <- UPb.preprocess(x,wetherill,i)
+    }
+    out
+}
+
+# x is a list containing single aliquots of U-Pb analyses
+initialise.concordant.composition <- function(x,wetherill=TRUE){
+    selection <- get.UPb.selection(wetherill)
+    rs <- x[[1]]$x # running sum
+    ns <- length(x) # number of samples
+    for (i in 2:length(x)){
+        rs <- rs + x[[i]]$x
+    }
+    rs/length(x)
+}
+
+initial.concordia.age.guess <- function(x,wetherill=TRUE){
+    if (wetherill){
+        Pb207U235age <- get.Pb207U235age(x['Pb207U235'])
+        Pb206U238age <- get.Pb206U238age(x['Pb206U238'])
+        out <- mean(c(Pb207U235age,Pb206U238age))
+    } else {
+        Pb206U238age <- get.Pb206U238age(1/x['U238Pb206'])
+        Pb207Pb206age <- get.Pb207Pb206age(x['Pb207Pb206'])
+        out <- mean(c(Pb206U238age,Pb207Pb206age))
+    }
+    out
+}
+
+get.UPb.selection <- function(wetherill=TRUE){
+    if (wetherill) selection <- c('Pb207U235','Pb206U238')
+    else selection <- c('U238Pb206','Pb207Pb206')
+    selection
+}
+
+mswd.concordia <- function(x,mu,covmat,age,wetherill=TRUE,dcu=TRUE){
+    out <- list()
+    SS.equivalence <- LL.concordia.comp(mu,x,TRUE)
+    SS.concordance <- LL.concordia.age(age,mu,covmat,wetherill,mswd=TRUE,dcu=dcu)
+    df.equivalence <- 2*length(x)-1
+    df.concordance <- 1
+    out$mswd <- list(equivalence = SS.equivalence/df.equivalence,
+                     concordance = SS.concordance/df.concordance)
+    out$p.value <- list(equivalence = 1-pchisq(SS.equivalence,df.equivalence),
+                        concordance = 1-pchisq(SS.concordance,df.concordance))
+    out
+}
+
+LL.concordia.comp <- function(mu,x,mswd=FALSE){
+    out <- 0
+    for (i in 1:length(x)){
+        X <- matrix(x[[i]]$x-mu,1,2)
+        covmat <- x[[i]]$cov
+        if (mswd) out <- out + get.SS(X,covmat)
+        else out <- out + LL.norm(X,covmat)
+    }
+    out
+}
+
+LL.concordia.age <- function(age,x,covmat,wetherill=TRUE,mswd=FALSE,dcu=TRUE){
+    UPbratios <- get.ratios.UPb(age)
+    selection <- get.UPb.labels(wetherill)
+    X <- matrix(x[selection]-UPbratios$x[selection],1,2)
+    COVMAT <- covmat[selection,selection]
+    if (dcu) COVMAT <- COVMAT + UPbratios$cov[selection,selection]
+    if (mswd) out <- get.SS(X,COVMAT)
+    else out <- LL.norm(X,COVMAT)
+    out
+}
+
+get.UPb.labels <- function(wetherill=TRUE){
+    if (wetherill) selection <- c('Pb207U235','Pb206U238')
+    else selection <- c('U238Pb206','Pb207Pb206')
+    selection
 }

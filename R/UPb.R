@@ -3,7 +3,6 @@ get.covmat.UPb <- function(x,i){
     rownames(covmat) <- c('Pb207U235','Pb206U238','U238Pb206','Pb207Pb206')
     colnames(covmat) <- rownames(covmat)
     if (x$format == 1){
-
         covmat[1,1] <- x$x[i,'errPb207U235']^2
         covmat[2,2] <- x$x[i,'errPb206U238']^2
         covmat[3,3] <- (x$x[i,'errPb206U238']^2)/(x$x[i,'Pb206U238']^4)
@@ -84,22 +83,9 @@ get.Pb206U238age <- function(Pb206U238){
 
 #' @importFrom stats optimize
 get.Pb207Pb206age <- function(Pb207Pb206){
-    Pb207Pb206.misfit <- function(x,y) { (get.ratios.UPb(x)$x[1] - y)^2 }
+    Pb207Pb206.misfit <- function(x,y) { (get.ratios.UPb(x)$x['Pb207Pb206'] - y)^2 }
     out <- optimize(Pb207Pb206.misfit,c(0,4600),y=Pb207Pb206)
     out$minimum
-}
-
-# generates a list of lists containing U-Pb/Pb-Pb pairs and
-# covariance matrices. Is used to calculate discordia lines
-UPb.preprocess <- function(x,wetherill){
-    selection <- get.UPb.selection(wetherill)
-    out <- list()
-    for (i in 1:nrow(x$x)){
-        X <- x$x[i,selection]
-        covmat <- get.covmat.UPb(x,i)[selection,selection]
-        out[[i]] <- list(x=X, cov=covmat)
-    }
-    out   
 }
 
 #' Calculate isotopic ages
@@ -107,6 +93,8 @@ UPb.preprocess <- function(x,wetherill){
 #' Calculates U-Pb ages
 #'
 #' @param x an object of class \code{UPb}
+#' @param i (optional) index of a particular aliquot
+#' @param ... optional arguments
 #' @rdname age
 #' @export
 age <- function(x,...){ UseMethod("age",x) }
@@ -127,12 +115,101 @@ age.default <- function(x,...){ stop('invalid input') }
 #'
 #' @rdname age
 #' @export
-age.UPb <- function(x,concordia=0,...){
-    if (concordia==0) { UPb.ages(x,...) }
+age.UPb <- function(x,concordia=0,i=NA,...){
+    if (concordia==0) { UPb.ages(x,i=i,...) }
     else if (concordia==1) { concordia.age(x,...) }
     else if (concordia==2) { discordia.age(x,...) }
 }
 
-UPb.ages <- function(x,...){
-    for ()
+# x an object of class \code{UPb}
+# i index of a particular aliquot
+# if i=NA, returns a matrix of 7/5, 6/8, 7/6 and concordia ages
+# and their uncertainties. If i!=NA, returns a list with those
+# same ages of aliquot i and their covariance matrix
+UPb.age <- function(x,i=NA){
+    agelabels <- c('7/5-age','6/8-age','7/6-age','concordia-age')
+    errlabels <- c('err[7/5-age]','err[6/8-age]','err[7/6-age]','err[concordia-age]')
+    if (!is.na(i)){
+        tc <- concordia.age.UPb(x,i=i)
+        t.75 <- get.Pb207U235age(x$x[i,'Pb207U235'])
+        t.68 <- get.Pb206U238age(x$x[i,'Pb206U238'])
+        t.76 <- get.Pb207Pb206age(x$x[i,'Pb207Pb206'])
+        t.conc <- tc$age
+        E <- E.UPb.age(x,i)
+        J <- J.UPb.age(x,i,t.76)
+        out <- list()
+        out$x <- c(t.75,t.68,t.76,t.conc)
+        out$cov <- matrix(NA,4,4)
+        out$cov[(1:3),(1:3)] <- J %*% E %*% t(J)
+        out$cov[4,4] <- tc$age.err^2
+        names(out$x) <- agelabels
+        colnames(out$cov) <- agelabels
+        rownames(out$cov) <- agelabels
+    } else {
+        matrixlabels <- c('7/5-age','err[7/5-age]','6/8-age','err[6/8-age]',
+                          '7/6-age','err[7/6-age]','concordia-age','err[concordia-age]')
+        nn <- nrow(x$x)
+        out <- matrix(0,nn,8)
+        colnames(out) <- matrixlabels
+        for (i in 1:nn){
+            xc <- UPb.age(x,i)
+            out[i,agelabels] <- xc$x
+            out[i,errlabels] <- sqrt(diag(xc$cov))
+        }
+    }
+    out
+}
+
+E.UPb.age <- function(x,i){
+    out <- matrix(0,6,6)
+    out[1,1] <- x$x[i,'errPb207U235']^2
+    out[2,2] <- x$x[i,'errPb206U238']^2
+    out[3,3] <- x$x[i,'errPb207Pb206']^2
+    out[4,4] <- lambda('U235')[2]^2
+    out[5,5] <- lambda('U238')[2]^2
+    out[6,6] <- iratio('U238U235')[2]^2
+    out
+}
+
+J.UPb.age <- function(x,i,t.76){
+    r75 <- x$x[i,'Pb207U235']
+    r68 <- x$x[i,'Pb206U238']
+    r76 <- x$x[i,'Pb207Pb206']
+    l5 <- lambda('U235')[1]
+    l8 <- lambda('U238')[1]
+    R <- iratio('U238U235')[1]
+    out <- matrix(0,3,6)
+    out[1,1] <- 1/(l5*(1+r75)) # d(t75)/d(75)
+    out[1,4] <- -log(1+r75)/l5^2 # d(t75)/d(l5)
+    out[2,2] <- 1/(l8*(1+r68))  # d(t68)/d(68)
+    out[2,5] <- -log(1+r68)/l8^2 # d(t68)/d(l8)
+    out[3,3] <- -(-1)/dD76dt(t.76,l5,l8,R)
+    out[3,4] <- -dD76dl5(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R)
+    out[3,5] <- -dD76dl8(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R)
+    out[3,6] <- -dD76dR(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R)
+    out
+}
+
+dD76dt <- function(t.76,l5,l8,R){
+    el8t1 <- exp(l8*t.76)-1
+    el5t1 <- exp(l5*t.76)-1
+    num <- el8t1*l5*exp(l5*t.76)-el5t1*l8*exp(l8*t.76)
+    den <- R*el8t1^2
+    num/den
+}
+
+dD76dl5 <- function(t.76,l5,l8,R){
+    el8t1 <- exp(l8*t.76)-1
+    t.76*exp(l5*t.76)/(R*el8t1)
+}
+
+dD76dl8 <- function(t.76,l5,l8,R){
+    el8t1 <- exp(l8*t.76)-1
+    t.76*exp(l5*t.76)/(R*el8t1)
+}
+
+dD76dR <- function(t.76,l5,l8,R){
+    el5t1 <- exp(l5*t.76)-1
+    el8t1 <- exp(l8*t.76)-1
+    -el5t1/(el8t1*R^2)
 }

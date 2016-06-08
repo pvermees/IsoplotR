@@ -67,7 +67,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: concordia.age
 ### Title: Calculate U-Pb concordia ages
-### Aliases: concordia.age
+### Aliases: concordia.age concordia.age.UPb concordia.age.default
 
 ### ** Examples
 

@@ -71,6 +71,49 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...)
     out$ages <- x
     out
 }
+#' @param type scalar indicating whether to plot the 207Pb/235U age
+#'     (type=1), the 206Pb/238U age (type=2), the 207Pb/206Pb age
+#'     (type=3), the 207Pb/206Pb-206Pb/238U age (type=4), or the
+#'     (Wetherill) concordia age (type=5)
+#' @param cutoff.76 the age (in Ma) below which the 206Pb/238U and
+#'     above which the 207Pb/206Pb age is used. This parameter is only
+#'     used if \code{type=4}.
+#' @param cutoff.disc two element vector with the maximum and minimum
+#'     percentage discordance allowed between the 207Pb/235U and
+#'     206Pb/238U age (if 206Pb/238U < cutoff.76) or between the
+#'     206Pb/238U and 207Pb/206Pb age (if 206Pb/238U > cutoff.76).
+#'     Set \code{cutoff.disc=NA} if you do not want to use this
+#'     filter.
+#' @rdname kde
+#' @export
+kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
+                    log=FALSE,n=512,type=4,cutoff.76=1100,
+                    cutoff.disc=c(-15,5),...){
+    tt <- UPb.age(x)
+    do.76 <- tt[,'6/8-age'] > cutoff.76
+    if (any(is.na(cutoff.disc))) {
+        is.concordant <- rep(TRUE,nrow(x))
+    } else {
+        disc.75.68 <- 100*(1-tt[,'7/5-age']/tt[,'6/8-age'])
+        disc.68.76 <- 100*(1-tt[,'6/8-age']/tt[,'7/6-age'])
+        is.concordant <- (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
+                         (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
+    }
+    if (type==1){
+        ttt <- tt[,'7/5-age']
+    } else if (type==2){
+        ttt <- tt[,'6/8-age']
+    } else if (type==3){
+        ttt <- tt[,'7/6-age']
+    } else if (type==4){
+        i.76 <- as.vector(which(do.76 & is.concordant))
+        i.68 <- as.vector(which(!do.76 & is.concordant))
+        ttt <- c(tt[i.68,'6/8-age'],tt[i.76,'7/6-age'])
+    } else if (type==4){
+        ttt <- tt[,'concordia-age']
+    }
+    out <- kde.default(ttt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...)
+}
 #' @param samebandwidth boolean flag indicating whether the same
 #' bandwidth should be used for all samples. If samebandwidth = TRUE
 #' and bw = NULL, then the function will use the median bandwidth of
@@ -201,21 +244,25 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
     ages <- x$ages[inrange]
     if (is.na(binwidth)) nb <- log2(length(ages))+1 # Sturges' Rule
     if (x$log){
+        R <- log(M)-log(m)
         do.log <- 'x'
         if (is.na(binwidth)) {
-            breaks <- exp(seq(log(m),log(M),length.out=nb+1))
+            breaks <- exp(seq(log(m)-R/5,log(M)+R/5,length.out=nb+1))
         } else {
-            breaks <- exp(seq(log(m),log(M),by=binwidth))
+            breaks <- exp(seq(log(m)-R/5,log(M)+R/5,by=binwidth))
         }
-        h <- hist(log(ages),breaks=log(breaks),plot=FALSE)
+        if (M/m < breaks[2]/breaks[1]) show.hist <- FALSE
+        else h <- hist(log(ages),breaks=log(breaks),plot=FALSE)
     } else {
+        R <- M-m
         do.log <- ''
         if (is.na(binwidth)) {
-            breaks <- seq(0,M,length.out=nb+1)
+            breaks <- seq(0,M+R/5,length.out=nb+1)
         } else {
-            breaks <- seq(0,M,by=binwidth)
+            breaks <- seq(0,M+R/5,by=binwidth)
         }
-        h <- hist(ages,breaks=breaks,plot=FALSE)
+        if ((M-m) < (breaks[2]-breaks[1])) show.hist <- FALSE
+        else h <- hist(ages,breaks=breaks,plot=FALSE)
     }
     nb <- length(breaks)-1
     graphics::plot(x$x,x$y,type='n',log=do.log,

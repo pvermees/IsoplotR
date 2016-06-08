@@ -1,5 +1,10 @@
+age	age
+age.default	age
+age.UPb	age
 botev	botev
 concordia.age	concordia.age
+concordia.age.default	concordia.age
+concordia.age.UPb	concordia.age
 concordia.plot	concordia.plot
 discordia.age	discordia.age
 ellipse	ellipse

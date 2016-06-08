@@ -1,5 +1,6 @@
 KDE.plot                Generate and plot (a) kernel density
                         estimate(s)
+age                     Calculate isotopic ages
 botev                   Compute the optimal kernel bandwidth
 concordia.age           Calculate U-Pb concordia ages
 concordia.plot          Concordia diagram

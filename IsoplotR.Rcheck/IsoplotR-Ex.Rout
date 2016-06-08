@@ -87,15 +87,15 @@ Type 'q()' to quit R.
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: concordia.age
 > ### Title: Calculate U-Pb concordia ages
-> ### Aliases: concordia.age
+> ### Aliases: concordia.age concordia.age.UPb concordia.age.default
 > 
 > ### ** Examples
 > 
 > data(examples)
 > fit <- concordia.age(examples$UPb)
 > print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
-[1] "age =  249.47208452359 +/- 0.141708201420294 Ma, MSWD =  260.208819049681"
-[2] "age =  249.47208452359 +/- 0.141708201420294 Ma, MSWD =  10.9242746271603"
+[1] "age =  249.472085058063 +/- 0.141708201929579 Ma, MSWD =  260.208819049681"
+[2] "age =  249.472085058063 +/- 0.141708201929579 Ma, MSWD =  10.9242747641499"
 > 
 > 
 > 
@@ -412,7 +412,7 @@ Warning in file(con, "r") :
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  6.884 0.588 6.828 0 0 
+Time elapsed:  6.74 0.612 6.727 0 0 
 > grDevices::dev.off()
 null device 
           1 
