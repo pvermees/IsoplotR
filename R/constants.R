@@ -19,7 +19,7 @@ settings <- function(fname=NULL){
     } else {
         prefs <- fromJSON(file=fname)
         .IsoplotR$lambda <- prefs$lambda
-        .IsoplotR$I.R <- prefs$I.R
+        .IsoplotR$iratio <- prefs$iratio
     }
 }
 
@@ -60,10 +60,10 @@ lambda <- function(nuclide,x=NULL,e=NULL){
 #'     respectively.
 #' @examples
 #' # returns the 238U/235U ratio of Hiess et al. (2012):
-#' print(I.R('U238U235'))
+#' print(iratio('U238U235'))
 #' # use the 238U/235U ratio of Steiger and Jaeger (1977):
-#' I.R('U238U235',138.88,0)
-#' print(I.R('U238U235'))
+#' iratio('U238U235',138.88,0)
+#' print(iratio('U238U235'))
 #' @references
 #' Ar: Lee, Jee-Yon, et al. "A redetermination of the isotopic abundances
 #' of atmospheric Ar." Geochimica et Cosmochimica Acta 70.17 (2006): 4507-4512.
@@ -87,8 +87,8 @@ lambda <- function(nuclide,x=NULL,e=NULL){
 #' U: Hiess, Joe, et al. "238U/235U systematics in terrestrial
 #' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 #' @export
-I.R <- function(ratio,x=NULL,e=NULL){
-    if (is.null(x) & is.null(e)) return(.IsoplotR$I.R[[ratio]])
-    if (is.numeric(x)) .IsoplotR$I.R[[ratio]][1] <- x
-    if (is.numeric(e)) .IsoplotR$I.R[[ratio]][2] <- e
+iratio <- function(ratio,x=NULL,e=NULL){
+    if (is.null(x) & is.null(e)) return(.IsoplotR$iratio[[ratio]])
+    if (is.numeric(x)) .IsoplotR$iratio[[ratio]][1] <- x
+    if (is.numeric(e)) .IsoplotR$iratio[[ratio]][2] <- e
 }

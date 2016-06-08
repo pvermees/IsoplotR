@@ -1,23 +1,27 @@
-#' Create a kernel density estimate
+#' Create (a) kernel density estimate(s)
 #'
-#' Turns a vector of numbers into an object of class \code{KDE} using
-#' a combination of the Botev (2010) bandwidth selector and the
-#' Abramson (1982) adaptive kernel bandwidth modifier.
-#' 
-#' @param x a vector of numbers
+#' Creates one or more kernel density estimates using a combination of
+#' the Botev (2010) bandwidth selector and the Abramson (1982)
+#' adaptive kernel bandwidth modifier.
+#'
+#' @param x a vector of numbers or an object of class \code{UPb} or
+#'     \code{detrital}
+#' @rdname kde
+#' @export
+kde <- function(x,...){ UseMethod("kde",x) }
 #' @param from minimum age of the time axis. If NULL, this is set
-#' automatically
+#'     automatically
 #' @param to maximum age of the time axis. If NULL, this is set
-#' automatically
+#'     automatically
 #' @param bw the bandwidth of the KDE. If NULL, bw will be calculated
-#' automatically using \code{botev()}
+#'     automatically using \code{botev()}
 #' @param adaptive boolean flag controlling if the adaptive KDE
-#' modifier of Abramson (1982) is used
+#'     modifier of Abramson (1982) is used
 #' @param log transform the ages to a log scale if TRUE
 #' @param n horizontal resolution of the density estimate
 #' @param ... optional arguments to be passed on to \code{density}
-#' @return an object of class \code{KDE}, i.e. a list
-#' containing the following items:
+#' @return an object of class \code{KDE}, i.e. a list containing the
+#'     following items:
 #'
 #' x: horizontal plot coordinates
 #'
@@ -26,13 +30,15 @@
 #' bw: the base bandwidth of the density estimate
 #'
 #' ages: the data values from the input to the \code{KDE} function
+#'
 #' @examples
 #' data(examples)
 #' dens <- kde(examples$DZ[['N1']],0,3000,kernel="epanechnikov")
 #' plot(dens)
-#' @seealso kdes
+#' 
+#' @rdname kde
 #' @export
-kde <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
+kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
     out <- list()
     class(out) <- "KDE"
     out$name <- deparse(substitute(x))
@@ -65,31 +71,18 @@ kde <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
     out$ages <- x
     out
 }
-
-#' Create a list of KDEs
-#'
-#' Convert a list of numerical vectors into a list of objects of class
-#' \code{KDE}
-#' 
-#' @param x a named list of vectors containing ordinal data
-#' @param from minimum limit of the x-axis.
-#' @param to maximum limit of the x-axis.
-#' @param bw the bandwidth of the kernel density estimates. If bw =
-#' NA, the bandwidth will be set automatically using \code{botev()}
 #' @param samebandwidth boolean flag indicating whether the same
 #' bandwidth should be used for all samples. If samebandwidth = TRUE
 #' and bw = NULL, then the function will use the median bandwidth of
 #' all the samples.
-#' @param adaptive boolean flag switching on the adaptive bandwidth
-#' modifier of Abramson (1982)
 #' @param normalise boolean flag indicating whether or not the KDEs
 #' should all integrate to the same value.
-#' @param log boolean flag indicating whether the data should by
-#' plotted on a logarithmic scale.
-#' @param n horizontal resolution of the density estimates
-#' @param ... optional parameters to be passed on to \code{density}
-#' @return an object of class \code{KDEs}, i.e. a list containing the
-#' following items:
+#' @return
+#'
+#' or
+#'
+#' if \code{class(x)=='detritals'}, an object of class \code{KDEs},
+#' i.e. a list containing the following items:
 #'
 #' kdes: a named list with objects of class \code{KDE}
 #'
@@ -101,12 +94,11 @@ kde <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
 #'
 #' xlabel: the x-axis label to be used by \code{plot.KDEs}
 #' @examples
-#' data(examples)
-#' KDES <- kdes(examples$DZ,from=0,to=3000)
+#' KDES <- kde(examples$DZ,from=0,to=3000)
 #' plot(KDES)
-#' @seealso kde
+#' @rdname kde
 #' @export
-kdes <- function(x,from=NA,to=NA,bw=NA,samebandwidth=TRUE,
+kde.detritals <- function(x,from=NA,to=NA,bw=NA,samebandwidth=TRUE,
                  adaptive=TRUE,normalise=FALSE,log=FALSE,n=512,...){
     if (is.na(from) | is.na(to)) {
         mM <- getmM(unlist(x),from,to,log)
@@ -198,7 +190,6 @@ Abramson <- function(dat,from,to,bw,n=512,...){
 #' dens <- kde(examples$DZ[['N1']],from=0,to=3000)
 #' plot(dens)
 #' @importFrom graphics axis hist par rect
-#' @seealso KDE
 #' @method plot KDE
 #' @export
 plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
@@ -274,9 +265,8 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
 #' @importFrom graphics mtext
 #' @examples
 #' data(examples)
-#' KDES <- kdes(examples$DZ)
+#' KDES <- kde(examples$DZ)
 #' plot(KDES)
-#' @seealso KDE
 #' @method plot KDEs
 #' @export
 plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
@@ -312,7 +302,7 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
     graphics::par(oldpar)
 }
 
-#' Plot (a) kernel density estimate(s)
+#' Generate and plot (a) kernel density estimate(s)
 #'
 #' Plots geochronological datsets as kernel density estimates using a
 #' combination of the Botev (2010) bandwidth selector and the Abramson
@@ -329,32 +319,44 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
 #'     modifier of Abramson (1982) is used
 #' @param log transform the ages to a log scale if TRUE
 #' @param n horizontal resolution of the density estimate
-#' @param samebandwidth boolean flag indicating whether the same
-#'     bandwidth should be used for all samples. If samebandwidth =
-#'     TRUE and bw = NULL, then the function will use the median
-#'     bandwidth of all the samples. This option is only used if
-#'     \code{x} is of class \code{detritals}.
-#' @param normalise boolean flag indicating whether or not the KDEs
-#'     should all integrate to the same value. This option is only
-#'     used if \code{x} is of class \code{detritals}.
+#' @param pch the symbol used to show the samples. May be a vector.
+#'     Set \code{pch = NA} to turn them off.
+#' @param xlab the label of the x-axis
+#' @param ylab the label of the y-axis
+#' @param kde.col the fill colour of the KDE specified as a four
+#'     element vector of r, g, b, alpha values
+#' @param show.hist boolean flag indicating whether a histogram should
+#'     be added to the KDE
+#' @param hist.col the fill colour of the histogram specified as a
+#'     four element vector of r, g, b, alpha values
 #' @param binwidth scalar width of the histogram bins, in Myr if
 #'     \code{x$log==FALSE}, or as a fractional value if
 #'     \code{x$log==TRUE}. Sturges' Rule is used if
 #'     \code{binwidth==NA}
-#' @param ... optional arguments to be passed on to \code{plot.KDEs}
-#'     (if \code{x} is of class \code{detritals} or \code{plot.KDE}
-#'     otherwise
+#' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
+#'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
+#'     around the plot
+#' @param ncol scalar value indicating the number of columns over
+#'     which the KDEs should be divided. This option is only used if
+#'     \code{x} is of class \code{detritals}.
+#' @param ... optional arguments to be passed on to \code{kde(x,...)}
 #' @examples
 #' data(examples)
-#' kde.plot(examples$DZ[['N2']])
-#' @seealso kde kdes plot.KDE plot.KDEs
+#' KDE.plot(examples$DZ[['N2']])
 #' @export
-kde.plot <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
-                     n=512,samebandwidth=TRUE,normalise=FALSE,binwidth=NA,...){
+KDE.plot <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                     n=512,pch=NA,xlab="age [Ma]", ylab="",
+                     kde.col=rgb(1,0,1,0.6), hist.col=rgb(0,1,0,0.2),
+                     show.hist=TRUE,bty='n',binwidth=NA, ncol=NA,...){
     if (methods::is(x,'detritals')){
-        plot.KDEs(kdes(x,from=from,to=to,bw=bw,samebandwidth=samebandwidth,
-                       adaptive=adaptive,normalise=normalise,log=log,n=n),binwidth=binwidth,...)
+        plot.KDEs(kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...),
+                  pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
+                  hist.col=hist.col, show.hist=show.hist,bty=bty,
+                  binwidth=binwidth,ncol=ncol)
     } else {
-        plot.KDE(kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n),binwidth=binwidth,...)
+        plot.KDE(kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...),
+                 pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
+                 hist.col=hist.col, show.hist=show.hist,bty=bty,
+                 binwidth=binwidth)
     }
 }

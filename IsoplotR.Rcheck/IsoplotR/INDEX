@@ -1,13 +1,13 @@
-I.R                     Isotopic ratios
+KDE.plot                Generate and plot (a) kernel density
+                        estimate(s)
 botev                   Compute the optimal kernel bandwidth
 concordia.age           Calculate U-Pb concordia ages
 concordia.plot          Concordia diagram
 discordia.age           Linear regression on a U-Pb concordia diagram
 ellipse                 Get coordinates of error ellipse for plotting
 examples                Example datasets for testing 'IsoplotR'
-kde                     Create a kernel density estimate
-kde.plot                Plot (a) kernel density estimate(s)
-kdes                    Create a list of KDEs
+iratio                  Isotopic ratios
+kde                     Create (a) kernel density estimate(s)
 lambda                  Decay constants
 plot.KDE                Plot a kernel density estimate
 plot.KDEs               Plot a list of kernel density estimates

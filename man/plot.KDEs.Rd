@@ -47,10 +47,7 @@ Plots an object of class \code{KDEs}
 }
 \examples{
 data(examples)
-KDES <- kdes(examples$DZ)
+KDES <- kde(examples$DZ)
 plot(KDES)
-}
-\seealso{
-KDE
 }
 

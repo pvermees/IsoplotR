@@ -4,10 +4,11 @@ concordia.plot	concordia.plot
 discordia.age	discordia.age
 ellipse	ellipse
 examples	examples
-I.R	I.R
+iratio	iratio
 kde	kde
-kde.plot	kde.plot
-kdes	kdes
+kde.default	kde
+kde.detritals	kde
+KDE.plot	KDE.plot
 lambda	lambda
 plot.KDE	plot.KDE
 plot.KDEs	plot.KDEs

@@ -2,13 +2,24 @@
 % Please edit documentation in R/kde.R
 \name{kde}
 \alias{kde}
-\title{Create a kernel density estimate}
+\alias{kde.default}
+\alias{kde.detritals}
+\title{Create (a) kernel density estimate(s)}
 \usage{
-kde(x, from = NA, to = NA, bw = NA, adaptive = TRUE, log = FALSE,
+kde(x, ...)
+
+\method{kde}{default}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, ...)
+
+\method{kde}{detritals}(x, from = NA, to = NA, bw = NA,
+  samebandwidth = TRUE, adaptive = TRUE, normalise = FALSE, log = FALSE,
   n = 512, ...)
 }
 \arguments{
-\item{x}{a vector of numbers}
+\item{x}{a vector of numbers or an object of class \code{UPb} or
+\code{detrital}}
+
+\item{...}{optional arguments to be passed on to \code{density}}
 
 \item{from}{minimum age of the time axis. If NULL, this is set
 automatically}
@@ -26,11 +37,17 @@ modifier of Abramson (1982) is used}
 
 \item{n}{horizontal resolution of the density estimate}
 
-\item{...}{optional arguments to be passed on to \code{density}}
+\item{samebandwidth}{boolean flag indicating whether the same
+bandwidth should be used for all samples. If samebandwidth = TRUE
+and bw = NULL, then the function will use the median bandwidth of
+all the samples.}
+
+\item{normalise}{boolean flag indicating whether or not the KDEs
+should all integrate to the same value.}
 }
 \value{
-an object of class \code{KDE}, i.e. a list
-containing the following items:
+an object of class \code{KDE}, i.e. a list containing the
+    following items:
 
 x: horizontal plot coordinates
 
@@ -39,18 +56,33 @@ y: vertical plot coordinates
 bw: the base bandwidth of the density estimate
 
 ages: the data values from the input to the \code{KDE} function
+
+or
+
+if \code{class(x)=='detritals'}, an object of class \code{KDEs},
+i.e. a list containing the following items:
+
+kdes: a named list with objects of class \code{KDE}
+
+from: the beginning of the common time scale
+
+to: the end of the common time scale
+
+themax: the maximum probability density of all the KDEs
+
+xlabel: the x-axis label to be used by \code{plot.KDEs}
 }
 \description{
-Turns a vector of numbers into an object of class \code{KDE} using
-a combination of the Botev (2010) bandwidth selector and the
-Abramson (1982) adaptive kernel bandwidth modifier.
+Creates one or more kernel density estimates using a combination of
+the Botev (2010) bandwidth selector and the Abramson (1982)
+adaptive kernel bandwidth modifier.
 }
 \examples{
 data(examples)
 dens <- kde(examples$DZ[['N1']],0,3000,kernel="epanechnikov")
 plot(dens)
-}
-\seealso{
-kdes
+
+KDES <- kde(examples$DZ,from=0,to=3000)
+plot(KDES)
 }
 

@@ -235,7 +235,7 @@ concordia.intersection <- function(fit,wetherill){
 intersection.misfit <- function(age,a,b,wetherill){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
-    R <- I.R('U238U235')[1]
+    R <- iratio('U238U235')[1]
     if (wetherill){
         out <- a-b+1 + b*exp(l5*age) - exp(l8*age)
     } else {
@@ -252,7 +252,7 @@ discordant.composition <- function(d,tl,itu,wetherill=TRUE){
     out <- list()
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
-    R <- I.R('U238U235')[1]
+    R <- iratio('U238U235')[1]
     if (wetherill){
         X <- d*(exp(l5*tl)-1) + (1-d)*(exp(l5*itu)-1)
         Y <- d*(exp(l8*tl)-1) + (1-d)*(exp(l8*itu)-1)
@@ -282,7 +282,7 @@ discordant.composition <- function(d,tl,itu,wetherill=TRUE){
     E <- matrix(0,3,3)
     E[1,1] <- lambda('U235')[2]^2
     E[2,2] <- lambda('U238')[2]^2
-    E[3,3] <- I.R('U238U235')[2]^2
+    E[3,3] <- iratio('U238U235')[2]^2
     covmat <- J %*% E %*% t(J)
     out$x <- c(X,Y)
     out$cov <- covmat

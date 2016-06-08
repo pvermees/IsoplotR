@@ -46,7 +46,4 @@ data(examples)
 dens <- kde(examples$DZ[['N1']],from=0,to=3000)
 plot(dens)
 }
-\seealso{
-KDE
-}
 

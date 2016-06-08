@@ -45,8 +45,8 @@ get.ratios.UPb <- function(age){
     out <- list()
     l8 <- lambda('U238')[1]
     l5 <- lambda('U235')[1]
-    R.x <- 1/I.R('U238U235')[1]
-    R.e <- R.x*I.R('U238U235')[2]/I.R('U238U235')[1]
+    R.x <- 1/iratio('U238U235')[1]
+    R.e <- R.x*iratio('U238U235')[2]/iratio('U238U235')[1]
 
     Pb207U235 <- (exp(l5*age)-1)
     Pb206U238 <- (exp(l8*age)-1)
@@ -89,6 +89,8 @@ get.Pb207Pb206age <- function(Pb207Pb206){
     out$minimum
 }
 
+# generates a list of lists containing U-Pb/Pb-Pb pairs and
+# covariance matrices. Is used to calculate discordia lines
 UPb.preprocess <- function(x,wetherill){
     selection <- get.UPb.selection(wetherill)
     out <- list()
@@ -98,4 +100,39 @@ UPb.preprocess <- function(x,wetherill){
         out[[i]] <- list(x=X, cov=covmat)
     }
     out   
+}
+
+#' Calculate isotopic ages
+#'
+#' Calculates U-Pb ages
+#'
+#' @param x an object of class \code{UPb}
+#' @rdname age
+#' @export
+age <- function(x,...){ UseMethod("age",x) }
+#' @rdname age
+#' @export
+age.default <- function(x,...){ stop('invalid input') }
+#' @param concordia one of either
+#'
+#' 0: consider each U-Pb analysis separately
+#'
+#' 1: calculate a concordia age from all U-Pb analyses together
+#'
+#' 2: fit a discordia line through all the U-Pb analyses
+#' @return if \code{x} has class \code{UPb} and \code{concordia} = 0,
+#'     a table with the following columns:
+#'
+#' 
+#'
+#' @rdname age
+#' @export
+age.UPb <- function(x,concordia=0,...){
+    if (concordia==0) { UPb.ages(x,...) }
+    else if (concordia==1) { concordia.age(x,...) }
+    else if (concordia==2) { discordia.age(x,...) }
+}
+
+UPb.ages <- function(x,...){
+    for ()
 }
