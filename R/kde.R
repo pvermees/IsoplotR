@@ -244,25 +244,22 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
     ages <- x$ages[inrange]
     if (is.na(binwidth)) nb <- log2(length(ages))+1 # Sturges' Rule
     if (x$log){
-        R <- log(M)-log(m)
         do.log <- 'x'
         if (is.na(binwidth)) {
-            breaks <- exp(seq(log(m)-R/5,log(M)+R/5,length.out=nb+1))
+            breaks <- exp(seq(log(m),log(M),length.out=nb+1))
         } else {
-            breaks <- exp(seq(log(m)-R/5,log(M)+R/5,by=binwidth))
+            breaks <- exp(seq(log(m),log(M)+binwidth,by=binwidth))
         }
         if (M/m < breaks[2]/breaks[1]) show.hist <- FALSE
         else h <- hist(log(ages),breaks=log(breaks),plot=FALSE)
     } else {
-        R <- M-m
         do.log <- ''
         if (is.na(binwidth)) {
-            breaks <- seq(0,M+R/5,length.out=nb+1)
+            breaks <- seq(m,M,length.out=nb+1)
         } else {
-            breaks <- seq(0,M+R/5,by=binwidth)
+            breaks <- seq(m,M+binwidth,by=binwidth)
         }
-        if ((M-m) < (breaks[2]-breaks[1])) show.hist <- FALSE
-        else h <- hist(ages,breaks=breaks,plot=FALSE)
+        h <- hist(ages,breaks=breaks,plot=FALSE)
     }
     nb <- length(breaks)-1
     graphics::plot(x$x,x$y,type='n',log=do.log,
@@ -387,22 +384,22 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
 #'     which the KDEs should be divided. This option is only used if
 #'     \code{x} is of class \code{detritals}.
 #' @param ... optional arguments to be passed on to \code{kde(x,...)}
+#' @importFrom methods is
 #' @examples
 #' data(examples)
-#' KDE.plot(examples$DZ[['N2']])
+#' kdeplot(examples$DZ[['N2']])
 #' @export
-KDE.plot <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+kdeplot <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,pch=NA,xlab="age [Ma]", ylab="",
                      kde.col=rgb(1,0,1,0.6), hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA, ncol=NA,...){
-    if (methods::is(x,'detritals')){
-        plot.KDEs(kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...),
-                  pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
+    X <- kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...)
+    if (is(x,'detritals')){
+        plot.KDEs(X,pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
                   hist.col=hist.col, show.hist=show.hist,bty=bty,
                   binwidth=binwidth,ncol=ncol)
     } else {
-        plot.KDE(kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...),
-                 pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
+        plot.KDE(X,pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
                  hist.col=hist.col, show.hist=show.hist,bty=bty,
                  binwidth=binwidth)
     }

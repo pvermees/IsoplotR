@@ -21,7 +21,9 @@ detrital zircon U-Pb dataset from Namibia.
 }
 \examples{
 data(examples)
-concordia.plot(examples$UPb)
+concordiaplot(examples$UPb)
+dev.new()
+kdeplot(examples$DZ)
 }
 \author{
 Ken Ludwig and Pieter Vermeesch

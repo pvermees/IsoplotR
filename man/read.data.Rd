@@ -34,6 +34,6 @@ Cast a .csv file into one of \code{IsoplotR}'s data classes
 # load one of the built-in .csv files:
 fname <- system.file("UPb.csv",package="IsoplotR")
 UPb <- read.data(fname,'U-Pb')
-concordia.plot(UPb)
+concordiaplot(UPb)
 }
 

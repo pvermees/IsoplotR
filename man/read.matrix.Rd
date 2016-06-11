@@ -24,6 +24,6 @@ Cast a matrix into one of \code{IsoplotR}'s data classes
 fname <- system.file("UPb.csv",package="IsoplotR")
 dat <- read.csv(fname,header=TRUE)
 UPb <- read.matrix(dat,method='U-Pb',format=1)
-concordia.plot(UPb)
+concordiaplot(UPb)
 }
 

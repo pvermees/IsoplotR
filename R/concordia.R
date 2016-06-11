@@ -23,9 +23,9 @@
 #' @importFrom stats pchisq
 #' @examples
 #' data(examples)
-#' concordia.plot(examples$UPb)
+#' concordiaplot(examples$UPb)
 #' @export
-concordia.plot <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
+concordiaplot <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                            ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
                            dcu=TRUE, show.age=0){
     concordia.line(x,limits,wetherill,concordia.col,alpha,dcu)

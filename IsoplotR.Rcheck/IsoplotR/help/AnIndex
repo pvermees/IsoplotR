@@ -5,7 +5,7 @@ botev	botev
 concordia.age	concordia.age
 concordia.age.default	concordia.age
 concordia.age.UPb	concordia.age
-concordia.plot	concordia.plot
+concordiaplot	concordiaplot
 discordia.age	discordia.age
 ellipse	ellipse
 examples	examples
@@ -13,7 +13,8 @@ iratio	iratio
 kde	kde
 kde.default	kde
 kde.detritals	kde
-KDE.plot	KDE.plot
+kde.UPb	kde
+kdeplot	kdeplot
 lambda	lambda
 plot.KDE	plot.KDE
 plot.KDEs	plot.KDEs

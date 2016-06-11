@@ -88,39 +88,6 @@ get.Pb207Pb206age <- function(Pb207Pb206){
     out$minimum
 }
 
-#' Calculate isotopic ages
-#'
-#' Calculates U-Pb ages
-#'
-#' @param x an object of class \code{UPb}
-#' @param i (optional) index of a particular aliquot
-#' @param ... optional arguments
-#' @rdname age
-#' @export
-age <- function(x,...){ UseMethod("age",x) }
-#' @rdname age
-#' @export
-age.default <- function(x,...){ stop('invalid input') }
-#' @param concordia one of either
-#'
-#' 0: consider each U-Pb analysis separately
-#'
-#' 1: calculate a concordia age from all U-Pb analyses together
-#'
-#' 2: fit a discordia line through all the U-Pb analyses
-#' @return if \code{x} has class \code{UPb} and \code{concordia} = 0,
-#'     a table with the following columns:
-#'
-#' 
-#'
-#' @rdname age
-#' @export
-age.UPb <- function(x,concordia=0,i=NA,...){
-    if (concordia==0) { UPb.ages(x,i=i,...) }
-    else if (concordia==1) { concordia.age(x,...) }
-    else if (concordia==2) { discordia.age(x,...) }
-}
-
 # x an object of class \code{UPb}
 # i index of a particular aliquot
 # if i=NA, returns a matrix of 7/5, 6/8, 7/6 and concordia ages

@@ -36,25 +36,47 @@ Type 'q()' to quit R.
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > cleanEx()
-> nameEx("KDE.plot")
-> ### * KDE.plot
+> nameEx("age")
+> ### * age
 > 
 > flush(stderr()); flush(stdout())
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: KDE.plot
-> ### Title: Generate and plot (a) kernel density estimate(s)
-> ### Aliases: KDE.plot
+> ### Name: age
+> ### Title: Calculate isotopic ages
+> ### Aliases: age age.UPb age.default
 > 
 > ### ** Examples
 > 
 > data(examples)
-> KDE.plot(examples$DZ[['N2']])
+> age(examples$UPb)
+       7/5-age err[7/5-age]  6/8-age err[6/8-age]  7/6-age err[7/6-age]
+ [1,] 252.1636    0.3327781 251.9031    0.2822366 253.7468     2.555230
+ [2,] 251.7675    0.7488598 251.5931    0.2821679 252.4017     7.404241
+ [3,] 251.7675    0.6796299 251.4692    0.6344108 253.7468     4.021362
+ [4,] 251.6090    0.5128490 251.3452    0.3379093 252.8502     4.427487
+ [5,] 251.7675    0.3813597 251.0972    0.2820582 257.3284     3.243669
+ [6,] 251.5298    0.6567536 251.0352    0.6344024 255.0908     3.625510
+ [7,] 251.6883    0.5578766 250.7871    0.2819897 259.1162     5.241270
+ [8,] 251.4505    0.4831095 250.7251    0.3954781 257.3284     3.622336
+ [9,] 251.9260    0.3813606 251.2212    0.2820856 257.7755     3.243182
+[10,] 230.9532    0.3669518 228.4268    0.3342463 255.5386     2.554475
+      concordia-age err[concordia-age]
+ [1,]      251.9817          0.2693552
+ [2,]      251.6014          0.2799967
+ [3,]      251.5664          0.6199135
+ [4,]      251.3792          0.3329432
+ [5,]      251.2422          0.2724837
+ [6,]      251.2329          0.6164089
+ [7,]      250.8577          0.2791453
+ [8,]      250.8897          0.3865274
+ [9,]      251.3740          0.2724799
+[10,]      229.2819          0.3243414
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("KDE.plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> base::cat("age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("botev")
 > ### * botev
@@ -102,25 +124,25 @@ Type 'q()' to quit R.
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("concordia.age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-> nameEx("concordia.plot")
-> ### * concordia.plot
+> nameEx("concordiaplot")
+> ### * concordiaplot
 > 
 > flush(stderr()); flush(stdout())
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: concordia.plot
+> ### Name: concordiaplot
 > ### Title: Concordia diagram
-> ### Aliases: concordia.plot
+> ### Aliases: concordiaplot
 > 
 > ### ** Examples
 > 
 > data(examples)
-> concordia.plot(examples$UPb)
+> concordiaplot(examples$UPb)
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("concordia.plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> base::cat("concordiaplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("discordia.age")
 > ### * discordia.age
@@ -181,7 +203,9 @@ Type 'q()' to quit R.
 > ### ** Examples
 > 
 > data(examples)
-> concordia.plot(examples$UPb)
+> concordiaplot(examples$UPb)
+> dev.new()
+> kdeplot(examples$DZ)
 > 
 > 
 > 
@@ -221,7 +245,7 @@ Type 'q()' to quit R.
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: kde
 > ### Title: Create (a) kernel density estimate(s)
-> ### Aliases: kde kde.default kde.detritals
+> ### Aliases: kde kde.UPb kde.default kde.detritals
 > 
 > ### ** Examples
 > 
@@ -236,6 +260,26 @@ Type 'q()' to quit R.
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("kde", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("kdeplot")
+> ### * kdeplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: kdeplot
+> ### Title: Generate and plot (a) kernel density estimate(s)
+> ### Aliases: kdeplot
+> 
+> ### ** Examples
+> 
+> data(examples)
+> kdeplot(examples$DZ[['N2']])
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("kdeplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("lambda")
 > ### * lambda
@@ -318,7 +362,7 @@ Type 'q()' to quit R.
 > # load one of the built-in .csv files:
 > fname <- system.file("UPb.csv",package="IsoplotR")
 > UPb <- read.data(fname,'U-Pb')
-> concordia.plot(UPb)
+> concordiaplot(UPb)
 > 
 > 
 > 
@@ -341,7 +385,7 @@ Type 'q()' to quit R.
 > fname <- system.file("UPb.csv",package="IsoplotR")
 > dat <- read.csv(fname,header=TRUE)
 > UPb <- read.matrix(dat,method='U-Pb',format=1)
-> concordia.plot(UPb)
+> concordiaplot(UPb)
 > 
 > 
 > 
@@ -412,10 +456,10 @@ Warning in file(con, "r") :
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  6.74 0.612 6.727 0 0 
+Time elapsed:  9.768 0.624 9.681 0 0 
 > grDevices::dev.off()
-null device 
-          1 
+pdf 
+  2 
 > ###
 > ### Local variables: ***
 > ### mode: outline-minor ***

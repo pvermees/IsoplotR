@@ -17,25 +17,25 @@ library('IsoplotR')
 
 base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 cleanEx()
-nameEx("KDE.plot")
-### * KDE.plot
+nameEx("age")
+### * age
 
 flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: KDE.plot
-### Title: Generate and plot (a) kernel density estimate(s)
-### Aliases: KDE.plot
+### Name: age
+### Title: Calculate isotopic ages
+### Aliases: age age.UPb age.default
 
 ### ** Examples
 
 data(examples)
-KDE.plot(examples$DZ[['N2']])
+age(examples$UPb)
 
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("KDE.plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+base::cat("age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("botev")
 ### * botev
@@ -80,25 +80,25 @@ print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("concordia.age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("concordia.plot")
-### * concordia.plot
+nameEx("concordiaplot")
+### * concordiaplot
 
 flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: concordia.plot
+### Name: concordiaplot
 ### Title: Concordia diagram
-### Aliases: concordia.plot
+### Aliases: concordiaplot
 
 ### ** Examples
 
 data(examples)
-concordia.plot(examples$UPb)
+concordiaplot(examples$UPb)
 
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("concordia.plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+base::cat("concordiaplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("discordia.age")
 ### * discordia.age
@@ -158,7 +158,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
-concordia.plot(examples$UPb)
+concordiaplot(examples$UPb)
+dev.new()
+kdeplot(examples$DZ)
 
 
 
@@ -196,7 +198,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
-### Aliases: kde kde.default kde.detritals
+### Aliases: kde kde.UPb kde.default kde.detritals
 
 ### ** Examples
 
@@ -211,6 +213,26 @@ plot(KDES)
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("kde", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("kdeplot")
+### * kdeplot
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: kdeplot
+### Title: Generate and plot (a) kernel density estimate(s)
+### Aliases: kdeplot
+
+### ** Examples
+
+data(examples)
+kdeplot(examples$DZ[['N2']])
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("kdeplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("lambda")
 ### * lambda
@@ -291,7 +313,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 # load one of the built-in .csv files:
 fname <- system.file("UPb.csv",package="IsoplotR")
 UPb <- read.data(fname,'U-Pb')
-concordia.plot(UPb)
+concordiaplot(UPb)
 
 
 
@@ -314,7 +336,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 fname <- system.file("UPb.csv",package="IsoplotR")
 dat <- read.csv(fname,header=TRUE)
 UPb <- read.matrix(dat,method='U-Pb',format=1)
-concordia.plot(UPb)
+concordiaplot(UPb)
 
 
 

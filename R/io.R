@@ -20,7 +20,7 @@
 #' # load one of the built-in .csv files:
 #' fname <- system.file("UPb.csv",package="IsoplotR")
 #' UPb <- read.data(fname,'U-Pb')
-#' concordia.plot(UPb)
+#' concordiaplot(UPb)
 #' @export
 read.data <- function(fname,method='U-Pb',format=1,...){
     x <- utils::read.csv(fname,...)
@@ -40,7 +40,7 @@ read.data <- function(fname,method='U-Pb',format=1,...){
 #' fname <- system.file("UPb.csv",package="IsoplotR")
 #' dat <- read.csv(fname,header=TRUE)
 #' UPb <- read.matrix(dat,method='U-Pb',format=1)
-#' concordia.plot(UPb)
+#' concordiaplot(UPb)
 #' @export
 read.matrix <- function(x,method='U-Pb',format=1){
     if (identical(method,'U-Pb')){

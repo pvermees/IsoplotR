@@ -2,6 +2,7 @@
 % Please edit documentation in R/kde.R
 \name{kde}
 \alias{kde}
+\alias{kde.UPb}
 \alias{kde.default}
 \alias{kde.detritals}
 \title{Create (a) kernel density estimate(s)}
@@ -10,6 +11,10 @@ kde(x, ...)
 
 \method{kde}{default}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, ...)
+
+\method{kde}{UPb}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, type = 4, cutoff.76 = 1100,
+  cutoff.disc = c(-15, 5), ...)
 
 \method{kde}{detritals}(x, from = NA, to = NA, bw = NA,
   samebandwidth = TRUE, adaptive = TRUE, normalise = FALSE, log = FALSE,
@@ -36,6 +41,22 @@ modifier of Abramson (1982) is used}
 \item{log}{transform the ages to a log scale if TRUE}
 
 \item{n}{horizontal resolution of the density estimate}
+
+\item{type}{scalar indicating whether to plot the 207Pb/235U age
+(type=1), the 206Pb/238U age (type=2), the 207Pb/206Pb age
+(type=3), the 207Pb/206Pb-206Pb/238U age (type=4), or the
+(Wetherill) concordia age (type=5)}
+
+\item{cutoff.76}{the age (in Ma) below which the 206Pb/238U and
+above which the 207Pb/206Pb age is used. This parameter is only
+used if \code{type=4}.}
+
+\item{cutoff.disc}{two element vector with the maximum and minimum
+percentage discordance allowed between the 207Pb/235U and
+206Pb/238U age (if 206Pb/238U < cutoff.76) or between the
+206Pb/238U and 207Pb/206Pb age (if 206Pb/238U > cutoff.76).
+Set \code{cutoff.disc=NA} if you do not want to use this
+filter.}
 
 \item{samebandwidth}{boolean flag indicating whether the same
 bandwidth should be used for all samples. If samebandwidth = TRUE
