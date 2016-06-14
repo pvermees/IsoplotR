@@ -1,8 +1,9 @@
 #' Read geochronology data
 #'
-#' Cast a .csv file into one of \code{IsoplotR}'s data classes
+#' Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s
+#' data classes
 #'
-#' @param fname file name (.csv format)
+#' @param x a file name (\code{.csv} format) or matrix
 #' @param method one of \code{'U-Pb'}, \code{'Ar-Ar'}, \code{'Rb-Sr'},
 #'     \code{'Sm-Nd'}, \code{'Re-Os'}, \code{'U-Th-He'},
 #'     \code{'fission tracks'}, \code{'cosmogenic nuclides'} or
@@ -10,8 +11,8 @@
 #' @param format formatting option, depends on the value of
 #'     \code{method}. If \code{method = 'U-Pb'}, then \code{format} is
 #'     one of either:
-#'
 #' \code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]
+#' (other formats will be added later)
 #' @param ... optional arguments to the \code{read.csv} function
 #' @return an object of class \code{'UPb'}, \code{'ArAr'},
 #'     \code{'RbSr'}, \code{'SmNd'}, \code{'ReOs'}, \code{'UThHe'},
@@ -20,35 +21,30 @@
 #' # load one of the built-in .csv files:
 #' fname <- system.file("UPb.csv",package="IsoplotR")
 #' UPb <- read.data(fname,'U-Pb')
-#' concordiaplot(UPb)
+#' concordia(UPb)
+#' @rdname read.data
 #' @export
-read.data <- function(fname,method='U-Pb',format=1,...){
-    x <- utils::read.csv(fname,...)
-    read.matrix(x,method,format)
+read.data <- function(x,...){ UseMethod("read.data",x) }
+#' @rdname read.data
+#' @export
+read.data.default <- function(x,method='Pb206U238',format=1,...){
+    X <- utils::read.csv(x,...)
+    read.data.matrix(X,method=method,format=format)
 }
-
-#' Read geochronology data
-#'
-#' Cast a matrix into one of \code{IsoplotR}'s data classes
-#'
-#' @param x a matrix
-#' @param method see \code{read.data} for details
-#' @param format see \code{read.data} for details
-#' @return see \code{read.data} for details
-#' @examples
-#' # load one of the built-in .csv files:
-#' fname <- system.file("UPb.csv",package="IsoplotR")
-#' dat <- read.csv(fname,header=TRUE)
-#' UPb <- read.matrix(dat,method='U-Pb',format=1)
-#' concordiaplot(UPb)
+#' @rdname read.data
 #' @export
-read.matrix <- function(x,method='U-Pb',format=1){
+read.data.matrix <- function(x,method='U-Pb',format=1,...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     }
-    out
+    out    
+}
+#' @rdname read.data
+#' @export
+read.data.data.frame <- function(x,method='U-Pb',format=1,...){
+    read.data.matrix(as.matrix(x),method=method,format=format,...)
 }
 
 as.detritals <- function(x){

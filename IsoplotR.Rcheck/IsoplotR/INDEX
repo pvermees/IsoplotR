@@ -1,21 +1,14 @@
 age                     Calculate isotopic ages
 botev                   Compute the optimal kernel bandwidth
-cadplot                 Plot continuous data as cumulative age
+cad                     Plot continuous data as cumulative age
                         distributions
-concordia.age           Calculate U-Pb concordia ages
-concordiaplot           Concordia diagram
-discordia.age           Linear regression on a U-Pb concordia diagram
+concordia               Concordia diagram
 ellipse                 Get coordinates of error ellipse for plotting
 examples                Example datasets for testing 'IsoplotR'
 iratio                  Isotopic ratios
 kde                     Create (a) kernel density estimate(s)
-kdeplot                 Generate and plot (a) kernel density
-                        estimate(s)
 lambda                  Decay constants
-plot.KDE                Plot a kernel density estimate
-plot.KDEs               Plot a list of kernel density estimates
 read.data               Read geochronology data
-read.matrix             Read geochronology data
 settings                Load settings to and from json
 yorkfit                 Linear regression of X,Y-variables with
                         correlated errors

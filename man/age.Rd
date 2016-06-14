@@ -4,49 +4,111 @@
 \alias{age}
 \alias{age.UPb}
 \alias{age.default}
+\alias{age.detritals}
 \title{Calculate isotopic ages}
 \usage{
 age(x, ...)
 
-\method{age}{default}(x, ...)
+\method{age}{default}(x, method = "Pb206U238", dcu = TRUE, ...)
 
-\method{age}{UPb}(x, concordia = 0, i = NA, ...)
+\method{age}{UPb}(x, concordia = 1, wetherill = TRUE, dcu = TRUE,
+  i = NA, ...)
+
+\method{age}{detritals}(x, ...)
 }
 \arguments{
-\item{x}{an object of class \code{UPb}}
+\item{x}{a scalar containing an isotopic ratio, a two element
+vector containing an isotopic ratio and its standard error, or
+an object of class \code{UPb} or \code{detritals}.}
 
 \item{...}{optional arguments}
 
-\item{concordia}{one of either
+\item{method}{one of either \code{'Pb206U238'}, \code{'Pb207U235'},
+or \code{'Pb207Pb206'}}
 
-0: consider each U-Pb analysis separately
+\item{dcu}{propagate the decay constant uncertainties?}
 
-1: calculate a concordia age from all U-Pb analyses together
+\item{concordia}{scalar flag indicating whether each U-Pb analysis
+should be considered separately (\code{concordia=1}), a
+concordia age should be calculated from all U-Pb analyses
+together (\code{concordia=2}), or a discordia line should be
+fit through all the U-Pb analyses (\code{concordia=2}).}
 
-2: fit a discordia line through all the U-Pb analyses}
+\item{wetherill}{boolean flag to indicate whether the data should
+be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
+(\code{FALSE}) space.  This option is only used when
+\code{concordia=2}}
 
 \item{i}{(optional) index of a particular aliquot}
 }
 \value{
-if \code{x} has class \code{UPb}, \code{concordia}=0,
-    returns a table with the following columns: 't.75',
-    'err[t.75]','t.68','err[t.68]', 't.76','err[t.76]',
-    't.conc','err[t.conc]', containing the 207Pb/235U-age
-    and standard error, the 206Pb/238U-age and standard error,
-    the 207Pb/206Pb-age and standard error, and the concordia
-    age and standard error, respectively.
+if \code{x} is a scalar or a vector, returns the age using
+    the geochronometer given by \code{method} and its standard
+    error.
 
-if \code{x} has class \code{UPb} and \code{concordia=1}, returns
-the output of \link{concordia.age}
+if \code{x} has class \code{UPb} and \code{concordia=1}, returns a
+table with the following columns: `t.75', `err[t.75]', `t.68',
+`err[t.68]', `t.76',`err[t.76]', `t.conc', `err[t.conc]',
+containing the 207Pb/235U-age and standard error, the
+\eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
+\eqn{^{207}}Pb/\eqn{^{206}} Pb-age and standard error, and the
+concordia age and standard error, respectively.
 
-if \code{x} has class \code{UPb} and \code{concordia=2}, returns
-the output of \link{discordia.age}
+
+if \code{x} has class \code{UPb} and \code{concordia=2}, returns a
+list with the following items:
+
+\describe{
+\item{x}{ a named vector with the (weighted mean) U-Pb composition }
+
+\item{cov}{ the covariance matrix of the (mean) U-Pb composition }
+
+\item{age}{ the concordia age (in Ma) }
+
+\item{age.err}{ the standard error of the concordia age }
+
+\item{mswd}{ a list with two items (\code{equivalence} and
+\code{concordance}) containing the MSWD (Mean of the Squared
+Weighted Deviates, a.k.a the reduced Chi-squared statistic outside
+of geochronology) of isotopic equivalence and age concordance,
+respectively. }
+
+\item{p.value}{ a list with two items (\code{equivalence} and
+\code{concordance}) containing the p-value of the Chi-square test
+for isotopic equivalence and age concordance, respectively. }
+}
+
+if \code{x} has class \code{UPb} and \code{concordia=3}, returns a
+list with the following items:
+
+\describe{
+\item{x}{ a two element vector with the upper and lower intercept
+ages (if wetherill==TRUE) or the lower intercept age and
+\eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg) }
+
+\item{cov}{ the covariance matrix of the elements in \code{x} }
+}
 }
 \description{
-Calculates U-Pb and Ar-Ar ages
+Calculates U-Pb ages and propagates their analytical
+uncertainties. Evaluates the equivalence of multiple
+(\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
+\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
+compositions, computes the weighted mean isotopic composition and
+the corresponding concordia age using the method of maximum
+likelihood, computes the mswd of equivalence and concordance and
+their respective Chi-squared p-values. Performs linear regression
+of U-Pb data on Wetherill and Tera-Wasserburg concordia
+diagrams. Computes the upper and lower intercept ages (for
+Wetherill) or the lower intercept age and the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg),
+taking into account error correlations and decay constant
+uncertainties.
 }
 \examples{
 data(examples)
-age(examples$UPb)
+print(age(examples$UPb))
+print(age(examples$UPb,concordia=1))
+print(age(examples$UPb,concordia=2))
 }
 

@@ -18,8 +18,8 @@ iratio(ratio, x = NULL, e = NULL)
 \item{e}{new value for its standard error}
 }
 \value{
-if x == e == NULL, returns a two-item vector containing the
-    mean value of the requested ratio and its standard error,
+if \code{x=e=NULL}, returns a two-item vector containing
+    the mean value of the requested ratio and its standard error,
     respectively.
 }
 \description{
@@ -52,7 +52,7 @@ Os: Voelkening, Joachim, Thomas Walczyk, and Klaus G. Heumann.
 "Osmium isotope ratio determinations by negative thermal ionization
 mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
 
-U: Hiess, Joe, et al. "238U/235U systematics in terrestrial
+U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
 uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 }
 

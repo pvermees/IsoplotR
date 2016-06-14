@@ -19,14 +19,12 @@ yorkfit(X, Y, sX, sY, rXY)
 }
 \value{
 a five element list containing
-
-\code{a}: the intercept of the straight line fit
-
-\code{b}: the slope of the fit
-
-\code{sa}: the standard error of the intercept
-
-\code{sb}: the standard error of the slope
+\describe{
+\item{a}{ the intercept of the straight line fit }
+\item{b}{ the slope of the fit }
+\item{sa}{ the standard error of the intercept }
+\item{sb}{ the standard error of the slope }
+}
 }
 \description{
 Implements the unified regression algorithm of York et al. (2004)

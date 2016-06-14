@@ -1,39 +1,11 @@
-#' Linear regression on a U-Pb concordia diagram
-#'
-#' Performs linear regression of U-Pb data on Wetherill and
-#' Tera-Wasserburg concordia diagrams. Computes the upper and lower
-#' intercept ages (for Wetherill) or the lower intercept age and the
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg),
-#' taking into account error correlations and decay constant
-#' uncertainties.
-#'
-#' @param x an object of class \code{UPb}
-#' @param wetherill boolean flag to indicate whether the data should
-#'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
-#'     (\code{FALSE}) space
-#' @param dcu propagate the decay constant uncertainties?
-#' @return a list with the following items:
-#'
-#' \code{x}: a two element vector with the upper and lower intercept
-#' ages (if wetherill==TRUE) or the lower intercept age and
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg)
-#'
-#' \code{cov}: the covariance matrix of the elements in \code{x}
-#'
-#' @importFrom stats optim optimHess
-#' @examples
-#' data(examples)
-#' fit <- discordia.age(examples$UPb)
-#' print(paste('lower intercept = ',fit$x[1],'+/-',sqrt(fit$cov[1,1]),'Ma'))
-#' @export
 discordia.age <- function(x,wetherill=TRUE,dcu=TRUE){
     out <- list()
     d <- UPb2york(x,wetherill)
     X <- UPb.preprocess(x,wetherill)
     fit <- yorkfit(d$X,d$Y,d$sX,d$sY,d$rXY)
     itt <- concordia.intersection(fit,wetherill)
-    hess <- optimHess(itt,LL.concordia.intersection,
-                      d=d,X=X,wetherill=wetherill,dcu=dcu)
+    hess <- stats::optimHess(itt,LL.concordia.intersection, d=d,X=X,
+                             wetherill=wetherill,dcu=dcu)
     out$x <- itt
     out$cov <- solve(hess)
     out

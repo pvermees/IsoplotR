@@ -14,8 +14,9 @@ lambda(nuclide, x = NULL, e = NULL)
 \item{e}{new value for the decay constant uncertainty}
 }
 \value{
-if x == e == NULL, returns a two-item vector containing the
-    decay constant [in Ma-1] and its standard error, respectively.
+if \code{x==e==NULL}, returns a two-item vector containing
+    the decay constant [in Ma-1] and its standard error,
+    respectively.
 }
 \description{
 Gets or sets the decay constants of radioactive istopes

@@ -1,6 +1,18 @@
 #' Concordia diagram
 #'
-#' Wetherill and Tera-Wasserburg concordia diagrams
+#' Plot U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams,
+#' calculate concordia ages and compositions, evaluates the
+#' equivalence of multiple
+#' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
+#' compositions, computes the weighted mean isotopic composition and
+#' the corresponding concordia age using the method of maximum
+#' likelihood, computes the mswd of equivalence and concordance and
+#' their respective Chi-squared p-values. Performs linear regression
+#' and computes the upper and lower intercept ages (for Wetherill) or
+#' the lower intercept age and the \eqn{^{207}}Pb/\eqn{^{206}}Pb
+#' intercept (for Tera-Wasserburg), taking into account error
+#' correlations and decay constant uncertainties.
 #'
 #' @param x an object of class \code{UPb}
 #' @param limits age limits of the concordia line
@@ -12,24 +24,24 @@
 #' @param dcu show decay constant uncertainty?
 #' @param show.age one of either
 #'
-#' \code{0}: don't show the age
+#' \code{1}: don't show the age
 #'
-#' \code{1}: calculate the concordia age
+#' \code{2}: calculate the concordia age
 #'
-#' \code{2}: fit a discordia line
+#' \code{3}: fit a discordia line
 #'
 #' @importFrom grDevices rgb
 #' @importFrom graphics polygon title points text
 #' @importFrom stats pchisq
 #' @examples
 #' data(examples)
-#' concordiaplot(examples$UPb)
+#' concordia(examples$UPb)
 #' @export
-concordiaplot <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
+concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                            ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                           dcu=TRUE, show.age=0){
+                           dcu=TRUE, show.age=1){
     concordia.line(x,limits,wetherill,concordia.col,alpha,dcu)
-    if (show.age==2){
+    if (show.age==3){
         fit <- discordia.age(x,wetherill)
         discordia.plot(fit,wetherill)
         title(discordia.title(fit,wetherill))
@@ -44,7 +56,7 @@ concordiaplot <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=F
         points(x0,y0,pch=19,cex=0.25)
         if (show.numbers) { text(x0,y0,i) }
     }
-    if (show.age==1){
+    if (show.age==2){
         fit <- concordia.age(x,wetherill,dcu)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         polygon(ell,col='white')
@@ -67,11 +79,11 @@ concordia.line <- function(X,limits,wetherill,col,alpha=0.05,dcu=TRUE){
     range.t <- lims$max.t-lims$min.t
     m <- max(0.8*lims$min.t,lims$min.t-range.t/20)
     M <- min(1.2*lims$max.t,lims$max.t+range.t/20)
-    nn <- 30
+    nn <- 30 # number of segments into which the concordia line is divided
     if (wetherill){ tt <- seq(from=m,to=M,length.out=nn) }
     else { tt <- exp(seq(from=log(m),to=log(M),length.out=nn)) }
     concordia <- list(x=NULL,y=NULL)
-    for (i in 1:nn){
+    for (i in 1:nn){ # build the concordia line
         UPbratios <- get.ratios.UPb(tt[i])
         if (wetherill){
             xc <- UPbratios$x['Pb207U235']
@@ -140,7 +152,7 @@ get.concordia.limits <- function(X,limits,wetherill){
             out$min.t <- limits[1]
         } else {
             out$max.x <- max(X$x[,'U238Pb206']+nse*X$x[,'errU238Pb206'])
-            out$min.t <- get.Pb206U238age(1/out$max.x)
+            out$min.t <- get.Pb206U238age(1/out$max.x)[1]
         }
         out$max.t <- limits[2]
         out$min.x <- get.ratios.UPb(out$max.t)$x['U238Pb206']
@@ -152,15 +164,15 @@ get.concordia.limits <- function(X,limits,wetherill){
         out$max.x <- max(X$x[,'Pb207U235']+nse*X$x[,'errPb207U235'])
         out$min.y <- min(X$x[,'Pb206U238']-nse*X$x[,'errPb206U238'])
         out$max.y <- max(X$x[,'Pb206U238']+nse*X$x[,'errPb206U238'])
-        out$min.t <- get.Pb206U238age(out$min.y)
-        out$max.t <- get.Pb207U235age(out$max.x)
+        out$min.t <- get.Pb206U238age(out$min.y)[1]
+        out$max.t <- get.Pb207U235age(out$max.x)[1]
     } else if (is.null(limits) && !wetherill){
         out$min.x <- min(X$x[,'U238Pb206']-nse*X$x[,'errU238Pb206'])
         out$max.x <- max(X$x[,'U238Pb206']+nse*X$x[,'errU238Pb206'])
         out$min.y <- min(X$x[,'Pb207Pb206']-nse*X$x[,'errPb207Pb206'])
         out$max.y <- max(X$x[,'Pb207Pb206']+nse*X$x[,'errPb207Pb206'])
-        out$min.t <- min(get.Pb206U238age(1/out$max.x),get.Pb207Pb206age(out$min.y))
-        out$max.t <- max(get.Pb206U238age(1/out$min.x),get.Pb207Pb206age(out$max.y))
+        out$min.t <- min(get.Pb206U238age(1/out$max.x)[1],get.Pb207Pb206age(out$min.y)[1])
+        out$max.t <- max(get.Pb206U238age(1/out$min.x)[1],get.Pb207Pb206age(out$max.y)[1])
     }
     out
 }
@@ -196,70 +208,17 @@ concordia.title <- function(fit){
     graphics::mtext(line2,line=0)
 }
 
-#' Calculate U-Pb concordia ages
-#'
-#' Evaluates the equivalence of multiple
-#' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
-#' compositions, computes the weighted mean isotopic composition and
-#' the corresponding concordia age using the method of maximum
-#' likelihood, computes the mswd of equivalence and concordance and
-#' their respective Chi-squared p-values.
-#'
-#' @param x either an object of class \code{UPb}, or a list containing
-#'     two items, \code{x} and \code{cov}, corresponding to a U-Pb
-#'     composition and its covariance matrix, respectively.
-#' @rdname concordia.age
-#' @export
 concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
-#' @param wetherill boolean flag to indicate whether the data should
-#'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
-#'     (\code{FALSE}) space
-#' @param dcu propagate the decay constant uncertainties?
-#' @param ... optional arguments
-#' @return a list with the following items:
-#'
-#' \code{x}: a named vector with the (weighted mean) U-Pb composition
-#'
-#' \code{cov}: the covariance matrix of the (mean) U-Pb composition
-#'
-#' \code{age}: the concordia age (in Ma)
-#'
-#' \code{age.err}: the standard error of the concordia age
-#'
-#' And, additionally (if \code{x} has class \code{UPb} and
-#' \code{!is.na(i)}):
-#'
-#' \code{mswd}: a list with two items (\code{equivalence} and
-#' \code{concordance}) containing the MSWD (Mean of the Squared
-#' Weighted Deviates, a.k.a the reduced Chi-squared statistic outside
-#' of geochronology) of isotopic equivalence and age concordance,
-#' respectively.
-#'
-#' \code{p.value}: a list with two items (\code{equivalence} and
-#' \code{concordance}) containing the p-value of the Chi-square test
-#' for isotopic equivalence and age concordance, respectively.
-#' 
-#' @importFrom stats optim
-#' @rdname concordia.age
-#' @export
 concordia.age.default <- function(x,wetherill=TRUE,dcu=TRUE,...){
     out <- x
     t.init <- initial.concordia.age.guess(out$x,wetherill)
-    fit.age <- optim(t.init, LL.concordia.age, x=out$x, covmat=out$cov,
-                     wetherill=wetherill, dcu=dcu, method="BFGS", hessian=TRUE)
+    fit.age <- stats::optim(t.init, LL.concordia.age, x=out$x,
+                            covmat=out$cov, wetherill=wetherill,
+                            dcu=dcu, method="BFGS", hessian=TRUE)
     out$age <- fit.age$par
     out$age.err <- as.numeric(sqrt(solve(fit.age$hessian)))
     out
 }
-#' @param i (optional) scalar index of a particular aliquot. If omitted, the
-#' concordia age corresponding to the weighted mean composition is calculated
-#' @examples
-#' data(examples)
-#' fit <- concordia.age(examples$UPb)
-#' print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
-#' @rdname concordia.age
-#' @export
 concordia.age.UPb <- function(x,wetherill=TRUE,dcu=TRUE,i=NA,...){
     if (is.na(i)){
         X <- UPb.preprocess(x,wetherill)
@@ -279,7 +238,7 @@ concordia.age.UPb <- function(x,wetherill=TRUE,dcu=TRUE,i=NA,...){
 # matrices prepared by the UPb.preprocess function
 concordia.comp <- function(x,wetherill=TRUE,dcu=TRUE){
     xy <- initialise.concordant.composition(x,wetherill)
-    fit.comp <- optim(xy, LL.concordia.comp, x=x, method="BFGS", hessian=TRUE)
+    fit.comp <- stats::optim(xy, LL.concordia.comp, x=x, method="BFGS", hessian=TRUE)
     out <- list()
     out$x <- fit.comp$par
     out$cov <- solve(fit.comp$hessian)
@@ -320,12 +279,12 @@ initialise.concordant.composition <- function(x,wetherill=TRUE){
 
 initial.concordia.age.guess <- function(x,wetherill=TRUE){
     if (wetherill){
-        Pb207U235age <- get.Pb207U235age(x['Pb207U235'])
-        Pb206U238age <- get.Pb206U238age(x['Pb206U238'])
+        Pb207U235age <- get.Pb207U235age(x['Pb207U235'])[1]
+        Pb206U238age <- get.Pb206U238age(x['Pb206U238'])[1]
         out <- mean(c(Pb207U235age,Pb206U238age))
     } else {
-        Pb206U238age <- get.Pb206U238age(1/x['U238Pb206'])
-        Pb207Pb206age <- get.Pb207Pb206age(x['Pb207Pb206'])
+        Pb206U238age <- get.Pb206U238age(1/x['U238Pb206'])[1]
+        Pb207Pb206age <- get.Pb207Pb206age(x['Pb207Pb206'])[1]
         out <- mean(c(Pb206U238age,Pb207Pb206age))
     }
     out

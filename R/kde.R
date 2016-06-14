@@ -19,26 +19,157 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #'     modifier of Abramson (1982) is used
 #' @param log transform the ages to a log scale if TRUE
 #' @param n horizontal resolution of the density estimate
+#' @param plot show the KDE as a plot
+#' @param pch the symbol used to show the samples. May be a vector.
+#'     Set \code{pch = NA} to turn them off.
+#' @param xlab the label of the x-axis
+#' @param ylab the label of the y-axis
+#' @param kde.col the fill colour of the KDE specified as a four
+#'     element vector of \code{r, g, b, alpha} values
+#' @param show.hist boolean flag indicating whether a histogram should
+#'     be added to the KDE
+#' @param hist.col the fill colour of the histogram specified as a
+#'     four element vector of r, g, b, alpha values
+#' @param binwidth scalar width of the histogram bins, in Myr if
+#'     \code{x$log==FALSE}, or as a fractional value if
+#'     \code{x$log==TRUE}. Sturges' Rule is used if
+#'     \code{binwidth==NA}
+#' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
+#'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
+#'     around the plot
+#' @param ncol scalar value indicating the number of columns over
+#'     which the KDEs should be divided. This option is only used if
+#'     \code{x} is of class \code{detritals}.
 #' @param ... optional arguments to be passed on to \code{density}
-#' @return an object of class \code{KDE}, i.e. a list containing the
-#'     following items:
+#' @return
 #'
-#' x: horizontal plot coordinates
-#'
-#' y: vertical plot coordinates
-#'
-#' bw: the base bandwidth of the density estimate
-#'
-#' ages: the data values from the input to the \code{KDE} function
-#'
+#' if \code{plot==TRUE}, returns an object of class \code{KDE}, i.e. a
+#'     list containing the following items:
+#' 
+#' \describe{
+#' \item{x}{ horizontal plot coordinates}
+#' \item{y}{ vertical plot coordinates}
+#' \item{bw}{ the base bandwidth of the density estimate}
+#' \item{ages}{ the data values from the input to the \code{KDE} function}
+#' }
+#' 
 #' @examples
 #' data(examples)
-#' dens <- kde(examples$DZ[['N1']],0,3000,kernel="epanechnikov")
-#' plot(dens)
-#' 
+#' kde(examples$DZ[['N1']],kernel="epanechnikov")
 #' @rdname kde
 #' @export
-kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
+kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                        n=512,plot=TRUE,pch=NA,xlab="age [Ma]",
+                        ylab="",kde.col=rgb(1,0,1,0.6),
+                        hist.col=rgb(0,1,0,0.2),show.hist=TRUE,
+                        bty='n',binwidth=NA,ncol=NA,...){
+    X <- getkde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...)
+    if (plot) {
+        plot.KDE(X,pch=pch,xlab=xlab,ylab=ylab,kde.col=kde.col,
+                 hist.col=hist.col,show.hist=show.hist,bty=bty,
+                 binwidth=binwidth)
+    } else {
+        return(X)
+    }
+}
+#' @param type scalar indicating whether to plot the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
+#'     (type=4), or the (Wetherill) concordia age (type=5) 
+#' @param cutoff.76 the age (in Ma) below which the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
+#'     only used if \code{type=4}.
+#' @param cutoff.disc two element vector with the maximum and minimum
+#'     percentage discordance allowed between the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
+#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
+#'     the \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+#'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' @rdname kde
+#' @export
+kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                    n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
+                    kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
+                    show.hist=TRUE, bty='n',binwidth=NA, ncol=NA,
+                    type=4,cutoff.76=1100,cutoff.disc=c(-15,5),...){
+    tt <- UPb.age(x)
+    do.76 <- tt[,'t.68'] > cutoff.76
+    if (any(is.na(cutoff.disc))) {
+        is.concordant <- rep(TRUE,nrow(x))
+    } else {
+        disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
+        disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
+        is.concordant <- (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
+                         (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
+    }
+    if (type==1){
+        ttt <- tt[,'t.75']
+    } else if (type==2){
+        ttt <- tt[,'t.68']
+    } else if (type==3){
+        ttt <- tt[,'t.76']
+    } else if (type==4){
+        i.76 <- as.vector(which(do.76 & is.concordant))
+        i.68 <- as.vector(which(!do.76 & is.concordant))
+        ttt <- c(tt[i.68,'t.68'],tt[i.76,'t.76'])
+    } else if (type==4){
+        ttt <- tt[,'t.conc']
+    }
+    kde.default(ttt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
+                n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
+                kde.col=kde.col, hist.col=hist.col,
+                show.hist=show.hist,bty=bty,binwidth=binwidth,
+                ncol=ncol,...)
+}
+#' @param samebandwidth boolean flag indicating whether the same
+#' bandwidth should be used for all samples. If samebandwidth = TRUE
+#' and bw = NULL, then the function will use the median bandwidth of
+#' all the samples.
+#' @param normalise boolean flag indicating whether or not the KDEs
+#' should all integrate to the same value.
+#' @return
+#'
+#' or, if \code{class(x)=='detritals'}, an object of class
+#' \code{KDEs}, i.e. a list containing the following items:
+#'
+#' \describe{
+#' \item{kdes}{a named list with objects of class \code{KDE}}
+#' \item{from}{the beginning of the common time scale}
+#' \item{to}{the end of the common time scale}
+#' \item{themax}{the maximum probability density of all the KDEs}
+#' \item{xlabel}{the x-axis label to be used by \code{plot.KDEs}}
+#' }
+#' 
+#' @examples
+#' kde(examples$DZ,from=0,to=3000)
+#' @rdname kde
+#' @export
+kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
+                          log=FALSE, n=512,plot=TRUE,pch=NA,
+                          xlab="age [Ma]",ylab="",
+                          kde.col=rgb(1,0,1,0.6),
+                          hist.col=rgb(0,1,0,0.2),show.hist=TRUE,
+                          bty='n',binwidth=NA,ncol=NA,
+                          samebandwidth=TRUE,normalise=TRUE,...){
+    X <- getkde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,
+                samebandwidth=samebandwidth,normalise=normalise,...)
+    if (plot){
+        plot.KDEs(X,pch=pch,xlab=xlab,ylab=ylab,kde.col=kde.col,
+                  hist.col=hist.col,show.hist=show.hist,bty=bty,
+                  binwidth=binwidth,ncol=ncol)
+    } else {
+        return(X)
+    }
+}
+
+# helper functions for the generic kde function
+getkde <- function(x,...){ UseMethod("getkde",x) }
+getkde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...){
     out <- list()
     class(out) <- "KDE"
     out$name <- deparse(substitute(x))
@@ -71,78 +202,9 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,...)
     out$ages <- x
     out
 }
-#' @param type scalar indicating whether to plot the 207Pb/235U age
-#'     (type=1), the 206Pb/238U age (type=2), the 207Pb/206Pb age
-#'     (type=3), the 207Pb/206Pb-206Pb/238U age (type=4), or the
-#'     (Wetherill) concordia age (type=5)
-#' @param cutoff.76 the age (in Ma) below which the 206Pb/238U and
-#'     above which the 207Pb/206Pb age is used. This parameter is only
-#'     used if \code{type=4}.
-#' @param cutoff.disc two element vector with the maximum and minimum
-#'     percentage discordance allowed between the 207Pb/235U and
-#'     206Pb/238U age (if 206Pb/238U < cutoff.76) or between the
-#'     206Pb/238U and 207Pb/206Pb age (if 206Pb/238U > cutoff.76).
-#'     Set \code{cutoff.disc=NA} if you do not want to use this
-#'     filter.
-#' @rdname kde
-#' @export
-kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
-                    log=FALSE,n=512,type=4,cutoff.76=1100,
-                    cutoff.disc=c(-15,5),...){
-    tt <- UPb.age(x)
-    do.76 <- tt[,'t.68'] > cutoff.76
-    if (any(is.na(cutoff.disc))) {
-        is.concordant <- rep(TRUE,nrow(x))
-    } else {
-        disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
-        disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
-        is.concordant <- (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
-                         (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
-    }
-    if (type==1){
-        ttt <- tt[,'t.75']
-    } else if (type==2){
-        ttt <- tt[,'t.68']
-    } else if (type==3){
-        ttt <- tt[,'t.76']
-    } else if (type==4){
-        i.76 <- as.vector(which(do.76 & is.concordant))
-        i.68 <- as.vector(which(!do.76 & is.concordant))
-        ttt <- c(tt[i.68,'t.68'],tt[i.76,'t.76'])
-    } else if (type==4){
-        ttt <- tt[,'t.conc']
-    }
-    out <- kde.default(ttt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...)
-}
-#' @param samebandwidth boolean flag indicating whether the same
-#' bandwidth should be used for all samples. If samebandwidth = TRUE
-#' and bw = NULL, then the function will use the median bandwidth of
-#' all the samples.
-#' @param normalise boolean flag indicating whether or not the KDEs
-#' should all integrate to the same value.
-#' @return
-#'
-#' or
-#'
-#' if \code{class(x)=='detritals'}, an object of class \code{KDEs},
-#' i.e. a list containing the following items:
-#'
-#' kdes: a named list with objects of class \code{KDE}
-#'
-#' from: the beginning of the common time scale
-#'
-#' to: the end of the common time scale
-#' 
-#' themax: the maximum probability density of all the KDEs
-#'
-#' xlabel: the x-axis label to be used by \code{plot.KDEs}
-#' @examples
-#' KDES <- kde(examples$DZ,from=0,to=3000)
-#' plot(KDES)
-#' @rdname kde
-#' @export
-kde.detritals <- function(x,from=NA,to=NA,bw=NA,samebandwidth=TRUE,
-                 adaptive=TRUE,normalise=FALSE,log=FALSE,n=512,...){
+getkde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
+                             log=FALSE, n=512,samebandwidth=TRUE,
+                             normalise=TRUE,...){
     if (is.na(from) | is.na(to)) {
         mM <- getmM(unlist(x),from,to,log)
         from <- mM$m
@@ -154,7 +216,8 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,samebandwidth=TRUE,
     if (is.na(bw) & samebandwidth) bw <- commonbandwidth(x)
     for (name in snames){
         thekdes[[name]] <- kde(x[[name]],from=from,to=to,bw=bw,
-                               adaptive=adaptive,log=log,n=n,...)
+                               adaptive=adaptive,log=log,n=n,
+                               plot=FALSE,...)
         if (normalise){
             maxval <- max(thekdes[[name]]$y)
             if (themax < maxval) {themax <- maxval}
@@ -205,36 +268,6 @@ Abramson <- function(dat,from,to,bw,n=512,...){
     dens
 }
 
-#' Plot a kernel density estimate
-#'
-#' Plots an object of class \code{KDE}
-#' 
-#' @param x an object of class \code{KDE}
-#' @param pch the symbol used to show the samples. May be a vector.
-#'     Set \code{pch = NA} to turn them off.
-#' @param xlab the label of the x-axis
-#' @param ylab the label of the y-axis
-#' @param kde.col the fill colour of the KDE specified as a four
-#'     element vector of r, g, b, alpha values
-#' @param show.hist boolean flag indicating whether a histogram should
-#'     be added to the KDE
-#' @param hist.col the fill colour of the histogram specified as a
-#'     four element vector of r, g, b, alpha values
-#' @param binwidth scalar width of the histogram bins, in Myr if
-#'     \code{x$log==FALSE}, or as a fractional value if
-#'     \code{x$log==TRUE}. Sturges' Rule is used if \code{binwidth==NA}
-#' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
-#'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
-#'     around the plot
-#' @param ... optional parameters to be passed on to the graphics
-#'     object
-#' @examples
-#' data(examples)
-#' dens <- kde(examples$DZ[['N1']],from=0,to=3000)
-#' plot(dens)
-#' @importFrom graphics axis hist par rect
-#' @method plot KDE
-#' @export
 plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
                      hist.col=rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
@@ -251,7 +284,7 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
             breaks <- exp(seq(log(m),log(M)+binwidth,by=binwidth))
         }
         if (M/m < breaks[2]/breaks[1]) show.hist <- FALSE
-        else h <- hist(log(ages),breaks=log(breaks),plot=FALSE)
+        else h <- graphics::hist(log(ages),breaks=log(breaks),plot=FALSE)
     } else {
         do.log <- ''
         if (is.na(binwidth)) {
@@ -259,19 +292,19 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
         } else {
             breaks <- seq(m,M+binwidth,by=binwidth)
         }
-        h <- hist(ages,breaks=breaks,plot=FALSE)
+        h <- graphics::hist(ages,breaks=breaks,plot=FALSE)
     }
     nb <- length(breaks)-1
     graphics::plot(x$x,x$y,type='n',log=do.log,
                    xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
     if (show.hist){
-        rect(xleft=breaks[1:nb],xright=breaks[2:(nb+1)],
-             ybottom=0,ytop=h$density,col=hist.col)
-        if (par('yaxt')!='n') {
+        graphics::rect(xleft=breaks[1:nb],xright=breaks[2:(nb+1)],
+                       ybottom=0,ytop=h$density,col=hist.col)
+        if (graphics::par('yaxt')!='n') {
             fact <- max(h$counts)/max(h$density)
             labels <- pretty(fact*h$density)
             at <- labels/fact
-            axis(2,at=at,labels=labels)
+            graphics::axis(2,at=at,labels=labels)
         }
     }
     graphics::polygon(x$x,x$y,col=kde.col)
@@ -280,39 +313,6 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
     graphics::text(M,max(x$y),paste0("n=",length(ages)),pos=2)
 }
 
-#' Plot a list of kernel density estimates
-#'
-#' Plots an object of class \code{KDEs}
-#' 
-#' @param x an object of class \code{KDEs}
-#' @param ncol scalar value indicating the number of columns over
-#'     which the KDEs should be divided
-#' @param pch the symbol used to show the samples. May be a vector.
-#'     Set \code{pch = NA} to turn them off.
-#' @param xlab the label of the x-axis
-#' @param ylab the label of the y-axis
-#' @param kde.col the fill colour of the KDE specified as a four
-#'     element vector of r, g, b, alpha values
-#' @param show.hist boolean flag indicating whether a histogram should
-#'     be added to the KDE
-#' @param hist.col the fill colour of the histogram specified as a
-#'     four element vector of r, g, b, alpha values
-#' @param binwidth scalar width of the histogram bins, in Myr if
-#'     \code{x$log==FALSE}, or as a fractional value if
-#'     \code{x$log==TRUE}. Sturges' Rule is used if
-#'     \code{binwidth==NA}
-#' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
-#'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
-#'     around the plot
-#' @param ... optional parameters to be passed on to the graphics
-#'     object
-#' @importFrom graphics mtext
-#' @examples
-#' data(examples)
-#' KDES <- kde(examples$DZ)
-#' plot(KDES)
-#' @method plot KDEs
-#' @export
 plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
                       kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
                       hist.col=rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
@@ -334,7 +334,7 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
                      kde.col=kde.col,show.hist=show.hist,
                      hist.col=hist.col,binwidth=binwidth,
                      bty=bty,ann=FALSE,ylim=ylim,...)
-            mtext(side=1,text=xlab,line=2,cex=0.8)
+            graphics::mtext(side=1,text=xlab,line=2,cex=0.8)
         } else {
             plot.KDE(x$kdes[[i]],pch=pch,xlab=xlab,ylab=ylab,
                      kde.col=kde.col,show.hist=show.hist,
@@ -344,63 +344,4 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
         title(snames[i])
     }
     graphics::par(oldpar)
-}
-
-#' Generate and plot (a) kernel density estimate(s)
-#'
-#' Plots geochronological datsets as kernel density estimates using a
-#' combination of the Botev (2010) bandwidth selector and the Abramson
-#' (1982) adaptive kernel bandwidth modifier.
-#' 
-#' @param x an object of class \code{UPb} or \code{detritals}
-#' @param from minimum age of the time axis. If NULL, this is set
-#'     automatically
-#' @param to maximum age of the time axis. If NULL, this is set
-#'     automatically
-#' @param bw the bandwidth of the KDE. If NULL, bw will be calculated
-#'     automatically using \code{botev()}
-#' @param adaptive boolean flag controlling if the adaptive KDE
-#'     modifier of Abramson (1982) is used
-#' @param log transform the ages to a log scale if TRUE
-#' @param n horizontal resolution of the density estimate
-#' @param pch the symbol used to show the samples. May be a vector.
-#'     Set \code{pch = NA} to turn them off.
-#' @param xlab the label of the x-axis
-#' @param ylab the label of the y-axis
-#' @param kde.col the fill colour of the KDE specified as a four
-#'     element vector of r, g, b, alpha values
-#' @param show.hist boolean flag indicating whether a histogram should
-#'     be added to the KDE
-#' @param hist.col the fill colour of the histogram specified as a
-#'     four element vector of r, g, b, alpha values
-#' @param binwidth scalar width of the histogram bins, in Myr if
-#'     \code{x$log==FALSE}, or as a fractional value if
-#'     \code{x$log==TRUE}. Sturges' Rule is used if
-#'     \code{binwidth==NA}
-#' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
-#'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
-#'     around the plot
-#' @param ncol scalar value indicating the number of columns over
-#'     which the KDEs should be divided. This option is only used if
-#'     \code{x} is of class \code{detritals}.
-#' @param ... optional arguments to be passed on to \code{kde(x,...)}
-#' @importFrom methods is
-#' @examples
-#' data(examples)
-#' kdeplot(examples$DZ[['N2']])
-#' @export
-kdeplot <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
-                     n=512,pch=NA,xlab="age [Ma]", ylab="",
-                     kde.col=rgb(1,0,1,0.6), hist.col=rgb(0,1,0,0.2),
-                     show.hist=TRUE,bty='n',binwidth=NA, ncol=NA,...){
-    X <- kde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...)
-    if (is(x,'detritals')){
-        plot.KDEs(X,pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
-                  hist.col=hist.col, show.hist=show.hist,bty=bty,
-                  binwidth=binwidth,ncol=ncol)
-    } else {
-        plot.KDE(X,pch=pch,xlab=xlab,ylab=ylab, kde.col=kde.col,
-                 hist.col=hist.col, show.hist=show.hist,bty=bty,
-                 binwidth=binwidth)
-    }
 }

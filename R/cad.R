@@ -1,7 +1,7 @@
 #' Plot continuous data as cumulative age distributions
 #'
-#' Plot a dataset as Cumulative Age Distributions (CAD), also known as
-#' `empirical cumulative distribution function'.
+#' Plot a dataset as a Cumulative Age Distribution (CADs), also known
+#' as a `empirical cumulative distribution function'.
 #' 
 #' @param x an object of class \code{UPb} or \code{detritals}
 #' @param method a string indicating what kind of age should be plotted.
@@ -23,18 +23,18 @@
 #' @param ... optional arguments to the generic \code{plot} function
 #' @examples
 #' data(examples)
-#' cadplot(examples$DZ)
+#' cad(examples$DZ)
 #' @export
-cadplot <- function(x,method=NA,pch=NA,verticals=TRUE,xlab='age [Ma]',
+cad <- function(x,method=NA,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     colmap='heat.colors',col='black',...){
     X <- age(x)
     ns <- 1
-    if (is(x,'detritals')) {        
+    if (methods::is(x,'detritals')) {        
         ns <- length(x)
         snames <- names(x)
         col <- do.call(colmap,list(ns))
     } else if (is.na(method)){
-        if (is(x,'UPb')) method <- 't.68'
+        if (methods::is(x,'UPb')) method <- 't.68'
         X <- list(X[,method])
     }
     graphics::plot(range(X),c(0,1),type='n',xlab=xlab,ylab='cumulative probability',...)
@@ -42,6 +42,6 @@ cadplot <- function(x,method=NA,pch=NA,verticals=TRUE,xlab='age [Ma]',
         graphics::lines(stats::ecdf(X[[i]]),verticals=verticals,
                         pch=pch,col=col[i],...)
     }
-    if (is(x,'detritals'))
+    if (methods::is(x,'detritals'))
         graphics::legend("bottomright",legend=snames,lwd=1,col=col)
 }

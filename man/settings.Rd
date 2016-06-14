@@ -10,7 +10,7 @@ settings(fname = NULL)
 \item{fname}{the path of a \code{.json} file}
 }
 \value{
-if fname==NULL, returns a \code{.json} string
+if \code{fname==NULL}, returns a \code{.json} string
 }
 \description{
 Get and set preferred values for decay constants and isotopic

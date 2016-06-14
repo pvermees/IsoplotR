@@ -2,12 +2,23 @@
 % Please edit documentation in R/io.R
 \name{read.data}
 \alias{read.data}
+\alias{read.data.data.frame}
+\alias{read.data.default}
+\alias{read.data.matrix}
 \title{Read geochronology data}
 \usage{
-read.data(fname, method = "U-Pb", format = 1, ...)
+read.data(x, ...)
+
+\method{read.data}{default}(x, method = "Pb206U238", format = 1, ...)
+
+\method{read.data}{matrix}(x, method = "U-Pb", format = 1, ...)
+
+\method{read.data}{data.frame}(x, method = "U-Pb", format = 1, ...)
 }
 \arguments{
-\item{fname}{file name (.csv format)}
+\item{x}{a file name (\code{.csv} format) or matrix}
+
+\item{...}{optional arguments to the \code{read.csv} function}
 
 \item{method}{one of \code{'U-Pb'}, \code{'Ar-Ar'}, \code{'Rb-Sr'},
 \code{'Sm-Nd'}, \code{'Re-Os'}, \code{'U-Th-He'},
@@ -17,10 +28,8 @@ read.data(fname, method = "U-Pb", format = 1, ...)
 \item{format}{formatting option, depends on the value of
     \code{method}. If \code{method = 'U-Pb'}, then \code{format} is
     one of either:
-
-\code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]}
-
-\item{...}{optional arguments to the \code{read.csv} function}
+\code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]
+(other formats will be added later)}
 }
 \value{
 an object of class \code{'UPb'}, \code{'ArAr'},
@@ -28,12 +37,13 @@ an object of class \code{'UPb'}, \code{'ArAr'},
     \code{'fission'}, \code{'cosmogenics'}, or \code{'other'}
 }
 \description{
-Cast a .csv file into one of \code{IsoplotR}'s data classes
+Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s
+data classes
 }
 \examples{
 # load one of the built-in .csv files:
 fname <- system.file("UPb.csv",package="IsoplotR")
 UPb <- read.data(fname,'U-Pb')
-concordiaplot(UPb)
+concordia(UPb)
 }
 

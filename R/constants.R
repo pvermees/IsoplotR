@@ -6,7 +6,7 @@
 #' abundances from and to a \code{.json} file format
 #'
 #' @param fname the path of a \code{.json} file
-#' @return if fname==NULL, returns a \code{.json} string
+#' @return if \code{fname==NULL}, returns a \code{.json} string
 #' @examples
 #' json <- system.file("defaults.json",package="IsoplotR")
 #' settings(json)
@@ -30,8 +30,9 @@ settings <- function(fname=NULL){
 #' @param nuclide the nuclide name
 #' @param x new value for the decay constant
 #' @param e new value for the decay constant uncertainty
-#' @return if x == e == NULL, returns a two-item vector containing the
-#'     decay constant [in Ma-1] and its standard error, respectively.
+#' @return if \code{x==e==NULL}, returns a two-item vector containing
+#'     the decay constant [in Ma-1] and its standard error,
+#'     respectively.
 #' @examples
 #' print(lambda('U238'))
 #' # use the decay constant of Kovarik and Adams (1932)
@@ -55,8 +56,8 @@ lambda <- function(nuclide,x=NULL,e=NULL){
 #'     \code{'Os188Os192'}, \code{'Os189Os192'}
 #' @param x new value for ratio
 #' @param e new value for its standard error
-#' @return if x == e == NULL, returns a two-item vector containing the
-#'     mean value of the requested ratio and its standard error,
+#' @return if \code{x=e=NULL}, returns a two-item vector containing
+#'     the mean value of the requested ratio and its standard error,
 #'     respectively.
 #' @examples
 #' # returns the 238U/235U ratio of Hiess et al. (2012):
@@ -84,7 +85,7 @@ lambda <- function(nuclide,x=NULL,e=NULL){
 #' "Osmium isotope ratio determinations by negative thermal ionization
 #' mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
 #' 
-#' U: Hiess, Joe, et al. "238U/235U systematics in terrestrial
+#' U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
 #' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 #' @export
 iratio <- function(ratio,x=NULL,e=NULL){

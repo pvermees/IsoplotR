@@ -10,15 +10,21 @@
 kde(x, ...)
 
 \method{kde}{default}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
-  log = FALSE, n = 512, ...)
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, ...)
 
 \method{kde}{UPb}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
-  log = FALSE, n = 512, type = 4, cutoff.76 = 1100,
-  cutoff.disc = c(-15, 5), ...)
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, type = 4,
+  cutoff.76 = 1100, cutoff.disc = c(-15, 5), ...)
 
-\method{kde}{detritals}(x, from = NA, to = NA, bw = NA,
-  samebandwidth = TRUE, adaptive = TRUE, normalise = FALSE, log = FALSE,
-  n = 512, ...)
+\method{kde}{detritals}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA,
+  samebandwidth = TRUE, normalise = TRUE, ...)
 }
 \arguments{
 \item{x}{a vector of numbers or an object of class \code{UPb} or
@@ -42,21 +48,57 @@ modifier of Abramson (1982) is used}
 
 \item{n}{horizontal resolution of the density estimate}
 
-\item{type}{scalar indicating whether to plot the 207Pb/235U age
-(type=1), the 206Pb/238U age (type=2), the 207Pb/206Pb age
-(type=3), the 207Pb/206Pb-206Pb/238U age (type=4), or the
-(Wetherill) concordia age (type=5)}
+\item{plot}{show the KDE as a plot}
 
-\item{cutoff.76}{the age (in Ma) below which the 206Pb/238U and
-above which the 207Pb/206Pb age is used. This parameter is only
-used if \code{type=4}.}
+\item{pch}{the symbol used to show the samples. May be a vector.
+Set \code{pch = NA} to turn them off.}
+
+\item{xlab}{the label of the x-axis}
+
+\item{ylab}{the label of the y-axis}
+
+\item{kde.col}{the fill colour of the KDE specified as a four
+element vector of \code{r, g, b, alpha} values}
+
+\item{hist.col}{the fill colour of the histogram specified as a
+four element vector of r, g, b, alpha values}
+
+\item{show.hist}{boolean flag indicating whether a histogram should
+be added to the KDE}
+
+\item{bty}{change to \code{"o"}, \code{"l"}, \code{"7"},
+\code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
+around the plot}
+
+\item{binwidth}{scalar width of the histogram bins, in Myr if
+\code{x$log==FALSE}, or as a fractional value if
+\code{x$log==TRUE}. Sturges' Rule is used if
+\code{binwidth==NA}}
+
+\item{ncol}{scalar value indicating the number of columns over
+which the KDEs should be divided. This option is only used if
+\code{x} is of class \code{detritals}.}
+
+\item{type}{scalar indicating whether to plot the
+\eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
+\eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
+(type=4), or the (Wetherill) concordia age (type=5)}
+
+\item{cutoff.76}{the age (in Ma) below which the
+\eqn{^{206}}Pb/\eqn{^{238}}U and above which the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
+only used if \code{type=4}.}
 
 \item{cutoff.disc}{two element vector with the maximum and minimum
-percentage discordance allowed between the 207Pb/235U and
-206Pb/238U age (if 206Pb/238U < cutoff.76) or between the
-206Pb/238U and 207Pb/206Pb age (if 206Pb/238U > cutoff.76).
-Set \code{cutoff.disc=NA} if you do not want to use this
-filter.}
+percentage discordance allowed between the
+\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
+age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
+the \eqn{^{206}}Pb/\eqn{^{238}}U and
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
+\eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+\code{cutoff.disc=NA} if you do not want to use this filter.}
 
 \item{samebandwidth}{boolean flag indicating whether the same
 bandwidth should be used for all samples. If samebandwidth = TRUE
@@ -67,31 +109,26 @@ all the samples.}
 should all integrate to the same value.}
 }
 \value{
-an object of class \code{KDE}, i.e. a list containing the
-    following items:
+if \code{plot==TRUE}, returns an object of class \code{KDE}, i.e. a
+    list containing the following items:
 
-x: horizontal plot coordinates
+\describe{
+\item{x}{ horizontal plot coordinates}
+\item{y}{ vertical plot coordinates}
+\item{bw}{ the base bandwidth of the density estimate}
+\item{ages}{ the data values from the input to the \code{KDE} function}
+}
 
-y: vertical plot coordinates
+or, if \code{class(x)=='detritals'}, an object of class
+\code{KDEs}, i.e. a list containing the following items:
 
-bw: the base bandwidth of the density estimate
-
-ages: the data values from the input to the \code{KDE} function
-
-or
-
-if \code{class(x)=='detritals'}, an object of class \code{KDEs},
-i.e. a list containing the following items:
-
-kdes: a named list with objects of class \code{KDE}
-
-from: the beginning of the common time scale
-
-to: the end of the common time scale
-
-themax: the maximum probability density of all the KDEs
-
-xlabel: the x-axis label to be used by \code{plot.KDEs}
+\describe{
+\item{kdes}{a named list with objects of class \code{KDE}}
+\item{from}{the beginning of the common time scale}
+\item{to}{the end of the common time scale}
+\item{themax}{the maximum probability density of all the KDEs}
+\item{xlabel}{the x-axis label to be used by \code{plot.KDEs}}
+}
 }
 \description{
 Creates one or more kernel density estimates using a combination of
@@ -100,10 +137,7 @@ adaptive kernel bandwidth modifier.
 }
 \examples{
 data(examples)
-dens <- kde(examples$DZ[['N1']],0,3000,kernel="epanechnikov")
-plot(dens)
-
-KDES <- kde(examples$DZ,from=0,to=3000)
-plot(KDES)
+kde(examples$DZ[['N1']],kernel="epanechnikov")
+kde(examples$DZ,from=0,to=3000)
 }
 

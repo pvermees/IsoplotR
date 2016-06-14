@@ -16,14 +16,12 @@ program.
 
 \code{DZ}: an object of class \code{'detrital'} containing a
 detrital zircon U-Pb dataset from Namibia.
-
-\code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]
 }
 \examples{
 data(examples)
-concordiaplot(examples$UPb)
+concordia(examples$UPb)
 dev.new()
-kdeplot(examples$DZ)
+kde(examples$DZ)
 }
 \author{
 Ken Ludwig and Pieter Vermeesch
