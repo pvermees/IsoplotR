@@ -89,13 +89,12 @@ get.Pb207Pb206age <- function(Pb207Pb206){
 }
 
 # x an object of class \code{UPb}
-# i index of a particular aliquot
-# if i=NA, returns a matrix of 7/5, 6/8, 7/6 and concordia ages
+# returns a matrix of 7/5, 6/8, 7/6 and concordia ages
 # and their uncertainties. If i!=NA, returns a list with those
 # same ages of aliquot i and their covariance matrix
 UPb.age <- function(x,i=NA){
-    agelabels <- c('7/5-age','6/8-age','7/6-age','concordia-age')
-    errlabels <- c('err[7/5-age]','err[6/8-age]','err[7/6-age]','err[concordia-age]')
+    labels <- c('t.75','s[t.75]','t.68','s[t.68]',
+                't.76','s[t.76]','t.conc','s[t.conc]')
     if (!is.na(i)){
         tc <- concordia.age.UPb(x,i=i)
         t.75 <- get.Pb207U235age(x$x[i,'Pb207U235'])
@@ -104,24 +103,21 @@ UPb.age <- function(x,i=NA){
         t.conc <- tc$age
         E <- E.UPb.age(x,i)
         J <- J.UPb.age(x,i,t.76)
-        out <- list()
-        out$x <- c(t.75,t.68,t.76,t.conc)
-        out$cov <- matrix(NA,4,4)
-        out$cov[(1:3),(1:3)] <- J %*% E %*% t(J)
-        out$cov[4,4] <- tc$age.err^2
-        names(out$x) <- agelabels
-        colnames(out$cov) <- agelabels
-        rownames(out$cov) <- agelabels
+        covmat <- J %*% E %*% t(J)
+        ages <- c(t.75,t.68,t.76,t.conc)
+        stderrs <- c(sqrt(diag(covmat)),tc$age.err)
+        t.75.out <- roundit(ages[1],stderrs[1])
+        t.68.out <- roundit(ages[2],stderrs[2])
+        t.76.out <- roundit(ages[3],stderrs[3])
+        t.conc.out <- roundit(ages[4],stderrs[4])
+        out <- c(t.75.out$x,t.75.out$err,t.68.out$x,t.68.out$err,
+                 t.76.out$x,t.76.out$err,t.conc.out$x,t.conc.out$err)
     } else {
-        matrixlabels <- c('7/5-age','err[7/5-age]','6/8-age','err[6/8-age]',
-                          '7/6-age','err[7/6-age]','concordia-age','err[concordia-age]')
         nn <- nrow(x$x)
         out <- matrix(0,nn,8)
-        colnames(out) <- matrixlabels
+        colnames(out) <- labels
         for (i in 1:nn){
-            xc <- UPb.age(x,i)
-            out[i,agelabels] <- xc$x
-            out[i,errlabels] <- sqrt(diag(xc$cov))
+            out[i,] <- UPb.age(x,i)
         }
     }
     out

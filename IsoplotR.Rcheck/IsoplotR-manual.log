@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2016.1.16)  11 JUN 2016 15:21
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2016.1.16)  13 JUN 2016 20:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -22,7 +22,7 @@ File: bk10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(/usr/local/lib/R-devel/lib/R/share/texmf/tex/latex/Rd.sty
+(/usr/local/R-devel/share/texmf/tex/latex/Rd.sty
 Package: Rd 
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
@@ -717,20 +717,27 @@ LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 44.
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2013/06/07 Fontinst v1.933 font definitions for TS1/zi4.
 )
-Overfull \hbox (8.5873pt too wide) in paragraph at lines 68--73
-\T1/ptm/m/n/10 'err[7/5-age]', '6/8-age', 'err[6/8-age]', '7/6-age', 'err[7/6-a
-ge]', 'concordia-age', and 'err[concordia-
+Overfull \hbox (40.63724pt too wide) in paragraph at lines 68--75
+[]\T1/ptm/m/n/10 if \T1/zi4/m/n/10 x \T1/ptm/m/n/10 has class \T1/zi4/m/n/10 UP
+b\T1/ptm/m/n/10 , \T1/zi4/m/n/10 concordia\T1/ptm/m/n/10 =0, re-turns a ta-ble 
+with the fol-low-ing columns: 't.75', 'err[t.75]','t.68','err[t.68]',
  []
 
-[2] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-)
+
+Overfull \hbox (29.68791pt too wide) in paragraph at lines 68--75
+\T1/ptm/m/n/10 't.76','err[t.76]', 't.conc','err[t.conc]', con-tain-ing the 207
+Pb/235U-age and stan-dard er-ror, the 206Pb/238U-
+ []
+
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-) [3] [4]
+) [2]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-)
+) [3]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
+) [4]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 ) [5]
@@ -743,7 +750,10 @@ File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 )
-Overfull \hbox (3.87054pt too wide) in paragraph at lines 404--409
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
+) [8]
+Overfull \hbox (3.87054pt too wide) in paragraph at lines 451--456
 []\T1/ptm/m/n/10 one of ei-ther \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U238U235\TS1/zi
 4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar40Ar36\TS1/zi4/m/n
 /10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar38Ar36\TS1/zi4/m/n/10 '
@@ -753,7 +763,7 @@ n/10 ,
  []
 
 
-Overfull \hbox (47.15097pt too wide) in paragraph at lines 404--409
+Overfull \hbox (47.15097pt too wide) in paragraph at lines 451--456
 \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr87Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/
 zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 Re185Re187\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/
@@ -763,20 +773,17 @@ zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
  []
 
 
-Overfull \hbox (3.06654pt too wide) in paragraph at lines 423--425
+Overfull \hbox (3.06654pt too wide) in paragraph at lines 470--472
 []\T1/ptm/m/n/10 Ar: Lee, Jee-Yon, et al. "A re-de-ter-mi-na-tion of the iso-to
 pic abun-dances of at-mo-spheric Ar." Geochim-
  []
 
-[8] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-) [9]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-) [10] [11]
+) [9] [10]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-)
+) [11]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 ) [12]
@@ -785,8 +792,11 @@ File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 ) [13]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
+) [14]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 )
-Overfull \hbox (32.24094pt too wide) in paragraph at lines 820--824
+Overfull \hbox (32.24094pt too wide) in paragraph at lines 867--871
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Rb-Sr\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \
@@ -796,36 +806,37 @@ m/n/10 '\T1/zi4/m/n/10 Re-Os\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '
 4/m/n/10 fission tracks\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 ,
  []
 
-[14] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+[15] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
 )
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-) [15]
+) [16]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2008/04/05 v1.1m UTF-8 support for inputenc
-) [16] (./Rd2.ind
-[17] [18
+) [17] (./Rd2.ind
+[18] [19
 
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 992.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 992.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1039.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1039.
  (./Rd2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 992.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 992.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1039.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1039.
+
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: 3A9E0BEDEAD73C317E5601EAE9D1EBBE;863.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 992.
+(rerunfilecheck)             Checksum: F0DC3343C1AED15AEE0AC5AC77055990;910.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1039.
  ) 
 Here is how much of TeX's memory you used:
- 6530 strings out of 493304
- 93737 string characters out of 6139871
+ 6540 strings out of 493304
+ 93903 string characters out of 6139871
  171188 words of memory out of 5000000
- 9708 multiletter control sequences out of 15000+600000
+ 9709 multiletter control sequences out of 15000+600000
  38763 words of font info for 50 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 38i,6n,27p,877b,592s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,6n,27p,877b,590s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/s
 hare/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-dist/font
@@ -835,10 +846,10 @@ pe1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/time
 s/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></
 usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (18 pages, 114342 bytes).
+Output written on Rd2.pdf (19 pages, 115470 bytes).
 PDF statistics:
- 373 PDF objects out of 1000 (max. 8388607)
- 342 compressed objects within 4 object streams
- 148 named destinations out of 1000 (max. 500000)
- 145 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 390 PDF objects out of 1000 (max. 8388607)
+ 358 compressed objects within 4 object streams
+ 155 named destinations out of 1000 (max. 500000)
+ 153 words of extra memory for PDF output out of 10000 (max. 10000000)
 

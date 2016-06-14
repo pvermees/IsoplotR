@@ -90,27 +90,27 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                     log=FALSE,n=512,type=4,cutoff.76=1100,
                     cutoff.disc=c(-15,5),...){
     tt <- UPb.age(x)
-    do.76 <- tt[,'6/8-age'] > cutoff.76
+    do.76 <- tt[,'t.68'] > cutoff.76
     if (any(is.na(cutoff.disc))) {
         is.concordant <- rep(TRUE,nrow(x))
     } else {
-        disc.75.68 <- 100*(1-tt[,'7/5-age']/tt[,'6/8-age'])
-        disc.68.76 <- 100*(1-tt[,'6/8-age']/tt[,'7/6-age'])
+        disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
+        disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
         is.concordant <- (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
                          (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
     }
     if (type==1){
-        ttt <- tt[,'7/5-age']
+        ttt <- tt[,'t.75']
     } else if (type==2){
-        ttt <- tt[,'6/8-age']
+        ttt <- tt[,'t.68']
     } else if (type==3){
-        ttt <- tt[,'7/6-age']
+        ttt <- tt[,'t.76']
     } else if (type==4){
         i.76 <- as.vector(which(do.76 & is.concordant))
         i.68 <- as.vector(which(!do.76 & is.concordant))
-        ttt <- c(tt[i.68,'6/8-age'],tt[i.76,'7/6-age'])
+        ttt <- c(tt[i.68,'t.68'],tt[i.76,'t.76'])
     } else if (type==4){
-        ttt <- tt[,'concordia-age']
+        ttt <- tt[,'t.conc']
     }
     out <- kde.default(ttt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,...)
 }

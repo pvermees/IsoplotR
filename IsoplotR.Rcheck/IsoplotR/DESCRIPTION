@@ -10,4 +10,4 @@ Imports: methods
 License: GPL-2
 LazyData: true
 RoxygenNote: 5.0.1
-Built: R 3.3.0; ; 2016-06-11 14:21:22 UTC; unix
+Built: R 3.4.0; ; 2016-06-13 19:30:46 UTC; unix

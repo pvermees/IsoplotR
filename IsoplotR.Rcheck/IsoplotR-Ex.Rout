@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2016-01-21 r69971) -- "Unsuffered Consequences"
+R Under development (unstable) (2016-06-10 r70760) -- "Unsuffered Consequences"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -50,28 +50,17 @@ Type 'q()' to quit R.
 > 
 > data(examples)
 > age(examples$UPb)
-       7/5-age err[7/5-age]  6/8-age err[6/8-age]  7/6-age err[7/6-age]
- [1,] 252.1636    0.3327781 251.9031    0.2822366 253.7468     2.555230
- [2,] 251.7675    0.7488598 251.5931    0.2821679 252.4017     7.404241
- [3,] 251.7675    0.6796299 251.4692    0.6344108 253.7468     4.021362
- [4,] 251.6090    0.5128490 251.3452    0.3379093 252.8502     4.427487
- [5,] 251.7675    0.3813597 251.0972    0.2820582 257.3284     3.243669
- [6,] 251.5298    0.6567536 251.0352    0.6344024 255.0908     3.625510
- [7,] 251.6883    0.5578766 250.7871    0.2819897 259.1162     5.241270
- [8,] 251.4505    0.4831095 250.7251    0.3954781 257.3284     3.622336
- [9,] 251.9260    0.3813606 251.2212    0.2820856 257.7755     3.243182
-[10,] 230.9532    0.3669518 228.4268    0.3342463 255.5386     2.554475
-      concordia-age err[concordia-age]
- [1,]      251.9817          0.2693552
- [2,]      251.6014          0.2799967
- [3,]      251.5664          0.6199135
- [4,]      251.3792          0.3329432
- [5,]      251.2422          0.2724837
- [6,]      251.2329          0.6164089
- [7,]      250.8577          0.2791453
- [8,]      250.8897          0.3865274
- [9,]      251.3740          0.2724799
-[10,]      229.2819          0.3243414
+        t.75 s[t.75]   t.68 s[t.68]  t.76 s[t.76] t.conc s[t.conc]
+ [1,] 252.16    0.33 251.90    0.28 253.7     2.6 251.98      0.27
+ [2,] 251.77    0.75 251.59    0.28 252.4     7.4 251.60      0.28
+ [3,] 251.77    0.68 251.47    0.63 253.7     4.0 251.57      0.62
+ [4,] 251.61    0.51 251.35    0.34 252.9     4.4 251.38      0.33
+ [5,] 251.77    0.38 251.10    0.28 257.3     3.2 251.24      0.27
+ [6,] 251.53    0.66 251.04    0.63 255.1     3.6 251.23      0.62
+ [7,] 251.69    0.56 250.79    0.28 259.1     5.2 250.86      0.28
+ [8,] 251.45    0.48 250.73    0.40 257.3     3.6 250.89      0.39
+ [9,] 251.93    0.38 251.22    0.28 257.8     3.2 251.37      0.27
+[10,] 230.95    0.37 228.43    0.33 255.5     2.6 229.28      0.32
 > 
 > 
 > 
@@ -101,6 +90,26 @@ Type 'q()' to quit R.
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("botev", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("cadplot")
+> ### * cadplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: cadplot
+> ### Title: Plot continuous data as cumulative age distributions
+> ### Aliases: cadplot
+> 
+> ### ** Examples
+> 
+> data(examples)
+> cadplot(examples$DZ)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("cadplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("concordia.age")
 > ### * concordia.age
 > 
@@ -116,8 +125,8 @@ Type 'q()' to quit R.
 > data(examples)
 > fit <- concordia.age(examples$UPb)
 > print(paste('age = ',fit$age,'+/-',fit$age.err,'Ma, MSWD = ',fit$mswd))
-[1] "age =  249.472085058063 +/- 0.141708201929579 Ma, MSWD =  260.208819049681"
-[2] "age =  249.472085058063 +/- 0.141708201929579 Ma, MSWD =  10.9242747641499"
+[1] "age =  249.472085168269 +/- 0.1417082020351 Ma, MSWD =  260.208819049681"
+[2] "age =  249.472085168269 +/- 0.1417082020351 Ma, MSWD =  10.9242746186689"
 > 
 > 
 > 
@@ -456,7 +465,7 @@ Warning in file(con, "r") :
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  9.768 0.624 9.681 0 0 
+Time elapsed:  6.068 0.06 6.123 0 0 
 > grDevices::dev.off()
 pdf 
   2 

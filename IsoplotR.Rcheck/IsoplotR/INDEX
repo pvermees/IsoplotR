@@ -1,5 +1,7 @@
 age                     Calculate isotopic ages
 botev                   Compute the optimal kernel bandwidth
+cadplot                 Plot continuous data as cumulative age
+                        distributions
 concordia.age           Calculate U-Pb concordia ages
 concordiaplot           Concordia diagram
 discordia.age           Linear regression on a U-Pb concordia diagram
