@@ -36,6 +36,8 @@ read.data.default <- function(x,method='Pb206U238',format=1,...){
 read.data.matrix <- function(x,method='U-Pb',format=1,...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format)
+    } else if (identical(method,'Ar-Ar')){
+        out <- as.ArAr(x)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     }
@@ -69,13 +71,37 @@ as.UPb <- function(x,format=1){
         colnames(X) <- c('Pb207Pb206','errPb207Pb206',
                          'Pb206U238','errPb206U238',
                          'Pb207U235','errPb207U235')
+        U238Pb206 <- 1/X[,'Pb206U238']
+        errU238Pb206 <- X[,'errPb206U238']/X[,'Pb206U238']^2
         out$x <- cbind(X[,c('Pb207U235','errPb207U235','Pb206U238','errPb206U238')],
-                       1/X[,'Pb206U238'], sqrt(X[,'errPb206U238'])/X[,'Pb206U238'],
+                       U238Pb206, errU238Pb206,
                        X[,c('Pb207Pb206','errPb207Pb206')])
         colnames(out$x) <- c('Pb207U235','errPb207U235',
                              'Pb206U238','errPb206U238',
                              'U238Pb206','errU238Pb206',
                              'Pb207Pb206','errPb207Pb206')
+    }
+    out
+}
+
+as.ArAr <- function(x,format=1){
+    out <- list()
+    class(out) <- "ArAr"
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    if (format == 1 & nc == 6){
+        X <- as.matrix(x)
+        colnames(X) <- c('Ar39Ar40','errAr39Ar40',
+                         'Ar36Ar40','errAr36Ar40',
+                         'Ar39Ar36','errAr39Ar36')
+        Ar40Ar36 <- 1/X[,'Ar36Ar40']
+        errAr40Ar36 <- X[,'errAr36Ar40']/X[,'Ar36Ar40']^2
+        out$x <- cbind(X,Ar40Ar36,errAr40Ar36)
+        colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
+                             'Ar36Ar40','errAr36Ar40',
+                             'Ar39Ar36','errAr39Ar36',
+                             'Ar40Ar36','errAr40Ar36')
     }
     out
 }

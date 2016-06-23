@@ -34,7 +34,7 @@ class \code{detritals})}
 \item{...}{optional arguments to the generic \code{plot} function}
 }
 \description{
-Plot a dataset as a Cumulative Age Distribution (CADs), also known
+Plot a dataset as a Cumulative Age Distribution (CAD), also known
 as a `empirical cumulative distribution function'.
 }
 \examples{

@@ -381,7 +381,7 @@ Warning in file(con, "r") :
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  4.928 0.02 4.946 0 0 
+Time elapsed:  3.604 0.024 3.635 0 0 
 > grDevices::dev.off()
 pdf 
   2 

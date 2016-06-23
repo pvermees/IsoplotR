@@ -99,7 +99,7 @@ get.york.xy <- function(X,Y,sX,sY,rXY,a,b){
 }
 
 UPb2york <- function(x,wetherill=TRUE){
-    selection <- get.UPb.selection(wetherill)
+    selection <- get.UPb.selection(wetherill=wetherill)
     out <- list()
     nn <- nrow(x$x)
     out$X <- x$x[,selection[1]]
@@ -108,10 +108,10 @@ UPb2york <- function(x,wetherill=TRUE){
     out$sY <- rep(0,nn)
     out$rXY <- rep(0,nn)
     for (i in 1:nn){
-        covmat <- get.covmat.UPb(x,i)
+        covmat <- get.covmat.UPb(x,i)[selection,selection]
         out$sX[i] <- sqrt(covmat[1,1])
         out$sY[i] <- sqrt(covmat[2,2])
-        out$rXY[i] <- covmat[1,2]/(out$sX[i]*out$sY[i])
+        out$rXY[i] <- cov2cor(covmat)
     }
     out
 }

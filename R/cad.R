@@ -1,6 +1,6 @@
 #' Plot continuous data as cumulative age distributions
 #'
-#' Plot a dataset as a Cumulative Age Distribution (CADs), also known
+#' Plot a dataset as a Cumulative Age Distribution (CAD), also known
 #' as a `empirical cumulative distribution function'.
 #' 
 #' @param x an object of class \code{UPb} or \code{detritals}

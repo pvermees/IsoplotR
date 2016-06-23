@@ -98,7 +98,7 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,...){
 #' @rdname age
 #' @export
 age.UPb <- function(x,concordia=1,wetherill=TRUE,dcu=TRUE,i=NA,...){
-    if (concordia==1) { UPb.age(x,i=i,...) }
+    if (concordia==1) { UPb.age(x,dcu=dcu,i=i,...) }
     else if (concordia==2) { concordia.age(x,wetherill=TRUE,dcu=TRUE,...) }
     else if (concordia==3) { discordia.age(x,wetherill=TRUE,dcu=TRUE) }
 }
