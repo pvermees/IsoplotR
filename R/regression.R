@@ -78,7 +78,20 @@ yorkfit <- function(X,Y,sX,sY,rXY){
     out$b <- b
     out$sa <- sa
     out$sb <- sb
+    out$mswd <- get.york.mswd(X,Y,sX,sY,rXY,a,b)
     out
+}
+
+get.york.mswd <- function(X,Y,sX,sY,rXY,a,b){
+    xy <- get.york.xy(X,Y,sX,sY,rXY,a,b)
+    X2 <- 0
+    nn <- length(X)
+    for (i in 1:nn){
+        E <- cor2cov(sX[i],sY[i],rXY[i])
+        x <- matrix(c(X[i]-xy[i,1],Y[i]-xy[i,2]),1,2)
+        X2 <- X2 + 0.5*x %*% solve(E) %*% t(x)
+    }
+    X2/(2*nn-2)
 }
 
 # get fitted x and y given a dataset X,Y,sX,sY,rXY,
@@ -98,8 +111,7 @@ get.york.xy <- function(X,Y,sX,sY,rXY,a,b){
     out
 }
 
-UPb2york <- function(x,wetherill=TRUE){
-    selection <- get.UPb.selection(wetherill=wetherill)
+data2york <- function(x,selection=NULL){ 
     out <- list()
     nn <- nrow(x$x)
     out$X <- x$x[,selection[1]]
@@ -108,7 +120,7 @@ UPb2york <- function(x,wetherill=TRUE){
     out$sY <- rep(0,nn)
     out$rXY <- rep(0,nn)
     for (i in 1:nn){
-        covmat <- get.covmat.UPb(x,i)[selection,selection]
+        covmat <- get.covmat(x,i)[selection,selection]
         out$sX[i] <- sqrt(covmat[1,1])
         out$sY[i] <- sqrt(covmat[2,2])
         out$rXY[i] <- cov2cor(covmat)

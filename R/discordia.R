@@ -1,6 +1,7 @@
 discordia.age <- function(x,wetherill=TRUE,dcu=TRUE){
     out <- list()
-    d <- UPb2york(x,wetherill)
+    selection <- get.selection(x,wetherill)
+    d <- data2york(x,selection)
     fit <- yorkfit(d$X,d$Y,d$sX,d$sY,d$rXY)
     itt <- concordia.intersection(fit,wetherill)
     X <- UPb.preprocess(x,wetherill)
@@ -31,12 +32,12 @@ LL.concordia.intersection <- function(itt,d,X,wetherill,dcu){
     if (wetherill) disc <- (XYu[1]-xy[,1])/(XYu[1]-XYl[1])
     else disc <- (XYl[1]-xy[,1])/XYl[1]
     for (i in 1:length(X)){
-        COVMAT <- X[[i]]$cov
+        covmat <- X[[i]]$cov
         if (dcu) {
             dcomp <- discordant.composition(disc[i],itt[1],itt[2],wetherill)
-            COVMAT <- COVMAT + dcomp$cov
+            covmat <- covmat + dcomp$cov
         }
-        LL <- LL + LL.norm(matrix(mu[i,],1,2),COVMAT)        
+        LL <- LL + LL.norm(matrix(mu[i,],1,2),covmat)
     }
     LL
 }

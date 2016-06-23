@@ -107,3 +107,11 @@ age.UPb <- function(x,concordia=1,wetherill=TRUE,dcu=TRUE,i=NA,...){
 age.detritals <- function(x,...){
     x
 }
+#' @rdname age
+#' @export
+age.ArAr <- function(x,isochron=1,dcu=TRUE,i=NA,...){
+    if (isochron==1){
+    } else if (isochron==2){
+    } else if (isochron==3){
+    }
+}

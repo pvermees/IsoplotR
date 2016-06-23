@@ -50,7 +50,7 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
     for (i in 1:nrow(x$x)){
         x0 <- x$x[i,vars[1]]
         y0 <- x$x[i,vars[2]]
-        covmat <- get.covmat.UPb(x,i)[vars,vars]
+        covmat <- get.covmat(x,i)[vars,vars]
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
         polygon(ell,col=ellipse.col)
         points(x0,y0,pch=19,cex=0.25)
@@ -253,10 +253,10 @@ concordia.comp <- function(x,wetherill=TRUE,dcu=TRUE){
 # generates a list of lists containing U-Pb/Pb-Pb pairs and
 # covariance matrices. Is used to calculate discordia lines
 UPb.preprocess <- function(x,wetherill,i=NA){
-    selection <- get.UPb.selection(wetherill)
+    selection <- get.selection(x,wetherill)
     if (!is.na(i)){
         X <- x$x[i,selection]
-        covmat <- get.covmat.UPb(x,i)[selection,selection]
+        covmat <- get.covmat(x,i)[selection,selection]
         out <- list(x=X,cov=covmat)
     } else {
         out <- list()
@@ -268,7 +268,7 @@ UPb.preprocess <- function(x,wetherill,i=NA){
 
 # x is a list containing single aliquots of U-Pb analyses
 initialise.concordant.composition <- function(x,wetherill=TRUE){
-    selection <- get.UPb.selection(wetherill)
+    selection <- get.selection(x,wetherill)
     rs <- x[[1]]$x # running sum
     ns <- length(x) # number of samples
     for (i in 2:length(x)){
@@ -288,12 +288,6 @@ initial.concordia.age.guess <- function(x,wetherill=TRUE){
         out <- mean(c(Pb206U238age,Pb207Pb206age))
     }
     out
-}
-
-get.UPb.selection <- function(wetherill=TRUE){
-    if (wetherill) selection <- c('Pb207U235','Pb206U238')
-    else selection <- c('U238Pb206','Pb207Pb206')
-    selection
 }
 
 mswd.concordia <- function(x,mu,covmat,age,wetherill=TRUE,dcu=TRUE){

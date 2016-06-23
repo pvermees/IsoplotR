@@ -1,12 +1,18 @@
-get.covmat.UPb <- function(x,i){
-    covmat <- matrix(rep(0,16),nrow=4)
-    rownames(covmat) <- c('Pb207U235','Pb206U238','U238Pb206','Pb207Pb206')
-    colnames(covmat) <- rownames(covmat)
+get.selection.UPb <- function(x,wetherill=TRUE,...){
+    if (wetherill) selection <- c('Pb207U235','Pb206U238')
+    else selection <- c('U238Pb206','Pb207Pb206')
+    selection
+}
+
+get.covmat.UPb <- function(x,i,...){
+    out <- matrix(rep(0,16),nrow=4)
+    rownames(out) <- c('Pb207U235','Pb206U238','U238Pb206','Pb207Pb206')
+    colnames(out) <- rownames(out)
     if (x$format == 1){
-        covmat['Pb207U235','Pb207U235'] <- x$x[i,'errPb207U235']^2
-        covmat['Pb206U238','Pb206U238'] <- x$x[i,'errPb206U238']^2
-        covmat['U238Pb206','U238Pb206'] <- x$x[i,'errU238Pb206']^2
-        covmat['Pb207Pb206','Pb207Pb206'] <- x$x[i,'errPb207Pb206']^2
+        out['Pb207U235','Pb207U235'] <- x$x[i,'errPb207U235']^2
+        out['Pb206U238','Pb206U238'] <- x$x[i,'errPb206U238']^2
+        out['U238Pb206','U238Pb206'] <- x$x[i,'errU238Pb206']^2
+        out['Pb207Pb206','Pb207Pb206'] <- x$x[i,'errPb207Pb206']^2
 
         Pb207U235 <- x$x[i,'Pb207U235']
         errPb207U235 <- x$x[i,'errPb207U235']
@@ -25,33 +31,33 @@ get.covmat.UPb <- function(x,i){
         Pb207U238 <- Pb207U235/R
         errPb207U238 <- errPb207U235/R
 
-        covmat.Pb207U235.Pb206U235 <- get.covmat.xzyz(
+        out.Pb207U235.Pb206U235 <- get.cov.xzyz(
             Pb207U235,errPb207U235,Pb206U235,errPb206U235,errPb207Pb206
         )
-        covmat.Pb207U235.U235Pb206 <- get.covmat.xzzy(
+        out.Pb207U235.U235Pb206 <- get.cov.xzzy(
             Pb207U235,errPb207U235,U235Pb206,errU235Pb206,errPb207Pb206
         )
 
-        covmat['Pb207U235','Pb206U238'] <- covmat.Pb207U235.Pb206U235/R
-        covmat['Pb207U235','U238Pb206'] <- covmat.Pb207U235.U235Pb206*R
-        covmat['Pb207U235','Pb207Pb206'] <- get.covmat.zxzy(
+        out['Pb207U235','Pb206U238'] <- out.Pb207U235.Pb206U235/R
+        out['Pb207U235','U238Pb206'] <- out.Pb207U235.U235Pb206*R
+        out['Pb207U235','Pb207Pb206'] <- get.cov.zxzy(
             Pb207U235,errPb207U235,Pb207Pb206,errPb207Pb206,errU235Pb206
         )
-        covmat['Pb206U238','U238Pb206'] <- -1
-        covmat['Pb206U238','Pb207Pb206'] <- get.covmat.xzzy(
+        out['Pb206U238','U238Pb206'] <- -1
+        out['Pb206U238','Pb207Pb206'] <- get.cov.xzzy(
             Pb207Pb206,errPb207Pb206,Pb206U238,errPb206U238,errPb207U238
         )
-        covmat['U238Pb206','Pb207Pb206'] <- get.covmat.xzyz(
+        out['U238Pb206','Pb207Pb206'] <- get.cov.xzyz(
             Pb207Pb206,errPb207Pb206,U238Pb206,errU238Pb206,errPb207U238
         )
-        covmat['Pb206U238','Pb207U235'] <- covmat['Pb207U235','Pb206U238']
-        covmat['U238Pb206','Pb207U235'] <- covmat['Pb207U235','U238Pb206']
-        covmat['Pb207Pb206','Pb207U235'] <- covmat['Pb207U235','Pb207Pb206']
-        covmat['U238Pb206','Pb206U238'] <- covmat['Pb206U238','U238Pb206']
-        covmat['Pb207Pb206','Pb206U238'] <- covmat['Pb206U238','Pb207Pb206']
-        covmat['Pb207Pb206','U238Pb206'] <- covmat['U238Pb206','Pb207Pb206']
+        out['Pb206U238','Pb207U235'] <- out['Pb207U235','Pb206U238']
+        out['U238Pb206','Pb207U235'] <- out['Pb207U235','U238Pb206']
+        out['Pb207Pb206','Pb207U235'] <- out['Pb207U235','Pb207Pb206']
+        out['U238Pb206','Pb206U238'] <- out['Pb206U238','U238Pb206']
+        out['Pb207Pb206','Pb206U238'] <- out['Pb206U238','Pb207Pb206']
+        out['Pb207Pb206','U238Pb206'] <- out['U238Pb206','Pb207Pb206']
     }
-    covmat
+    out
 }
 
 get.ratios.UPb <- function(age){

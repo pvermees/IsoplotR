@@ -25,7 +25,7 @@ settings <- function(fname=NULL){
 
 #' Decay constants
 #'
-#' Gets or sets the decay constants of radioactive istopes
+#' Gets or sets the decay constants of radioactive isotopes
 #'
 #' @param nuclide the nuclide name
 #' @param x new value for the decay constant
@@ -33,11 +33,21 @@ settings <- function(fname=NULL){
 #' @return if \code{x==e==NULL}, returns a two-item vector containing
 #'     the decay constant [in Ma-1] and its standard error,
 #'     respectively.
-#' @examples
-#' print(lambda('U238'))
+#' @examples print(lambda('U238'))
 #' # use the decay constant of Kovarik and Adams (1932)
 #' lambda('U238',0.0001537,0.0000068)
 #' print(lambda('U238'))
+#' @references
+#' U: Jaffey, A. H., et al. "Precision measurement of half-lives and
+#' specific activities of U 235 and U 238." Physical Review C 4.5 (1971): 1889.
+#'
+#' Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of 232Th."
+#' Proceedings of the National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
+#' 
+#' Ar: Renne, Paul R., et al. "Joint determination of 40 K decay
+#' constants and 40Ar∗/40K for the Fish Canyon sanidine standard,
+#' and improved accuracy for 40Ar/39Ar geochronology."
+#' Geochimica et Cosmochimica Acta 74.18 (2010): 5349-5367.
 #' @export
 lambda <- function(nuclide,x=NULL,e=NULL){
     if (is.null(x) & is.null(e)) return(.IsoplotR$lambda[[nuclide]])
