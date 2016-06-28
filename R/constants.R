@@ -44,7 +44,7 @@ settings <- function(fname=NULL){
 #' Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of 232Th."
 #' Proceedings of the National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
 #' 
-#' Ar: Renne, Paul R., et al. "Joint determination of 40 K decay
+#' Ar: Renne, Paul R., et al. "Joint determination of 40K decay
 #' constants and 40Ar∗/40K for the Fish Canyon sanidine standard,
 #' and improved accuracy for 40Ar/39Ar geochronology."
 #' Geochimica et Cosmochimica Acta 74.18 (2010): 5349-5367.

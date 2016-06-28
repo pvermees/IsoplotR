@@ -177,26 +177,6 @@ get.concordia.limits <- function(X,limits,wetherill){
     out
 }
 
-discordia.title <- function(fit,wetherill){
-    if (wetherill){
-        lower.age <- roundit(fit$x[1],sqrt(fit$cov[1,1]))
-        upper.age <- roundit(fit$x[2],sqrt(fit$cov[2,2]))
-        line1 <- substitute('lower intercept ='~a%+-%b~'[Ma]',
-                            list(a=lower.age$x, b=lower.age$err))
-        line2 <- substitute('upper intercept ='~a%+-%b~'[Ma]',
-                            list(a=upper.age$x, b=upper.age$err))
-    } else {
-        lower.age <- roundit(fit$x[1],sqrt(fit$cov[1,1]))
-        intercept <- roundit(fit$x[2],sqrt(fit$cov[2,2]))
-        line1 <- substitute('age ='~a%+-%b~'[Ma]',
-                            list(a=lower.age$x, b=lower.age$err))
-        line2 <- substitute('('^207*'Pb/'^206*'Pb)'[0]~'='~a%+-%b,
-                              list(a=intercept$x, b=intercept$err))
-    }
-    graphics::mtext(line1,line=1)
-    graphics::mtext(line2,line=0)
-}
-
 concordia.title <- function(fit){
     rounded.age <- roundit(fit$age,fit$age.err)
     line1 <- substitute('concordia age ='~a%+-%b~'[Ma] (1'~sigma~')',

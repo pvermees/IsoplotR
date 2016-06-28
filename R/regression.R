@@ -10,12 +10,10 @@
 #' @param sX standard errors of \code{X}
 #' @param sY standard errors of \code{Y}
 #' @param rXY correlation coefficients between X and Y
-#' @return a five element list containing
+#' @return a two element list of vectors containing
 #' \describe{
-#' \item{a}{ the intercept of the straight line fit }
-#' \item{b}{ the slope of the fit }
-#' \item{sa}{ the standard error of the intercept }
-#' \item{sb}{ the standard error of the slope }
+#' \item{a}{ the intercept of the straight line fit and its standard error}
+#' \item{b}{ the slope of the fit and its standard error}
 #' }
 #' @references
 #'
@@ -74,11 +72,11 @@ yorkfit <- function(X,Y,sX,sY,rXY){
     sb <- sqrt(1/sum(W*u^2))
     sa <- sqrt(1/sum(W)+(xbar*sb)^2)
     out <- list()
-    out$a <- a
-    out$b <- b
-    out$sa <- sa
-    out$sb <- sb
-    out$mswd <- get.york.mswd(X,Y,sX,sY,rXY,a,b)
+    out$a <- c(a,sa)
+    out$b <- c(b,sb)
+    mswd <- get.york.mswd(X,Y,sX,sY,rXY,a,b)
+    out$mswd <- mswd$mswd
+    out$p.value <- mswd$p.value
     out
 }
 
@@ -91,7 +89,11 @@ get.york.mswd <- function(X,Y,sX,sY,rXY,a,b){
         x <- matrix(c(X[i]-xy[i,1],Y[i]-xy[i,2]),1,2)
         X2 <- X2 + 0.5*x %*% solve(E) %*% t(x)
     }
-    X2/(2*nn-2)
+    df <- (2*nn-2)
+    out <- list()
+    out$mswd <- X2/df
+    out$p.value <- 1-pchisq(X2,df)
+    out
 }
 
 # get fitted x and y given a dataset X,Y,sX,sY,rXY,

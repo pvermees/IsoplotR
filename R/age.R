@@ -98,20 +98,27 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,...){
 #' @rdname age
 #' @export
 age.UPb <- function(x,concordia=1,wetherill=TRUE,dcu=TRUE,i=NA,...){
-    if (concordia==1) { UPb.age(x,dcu=dcu,i=i,...) }
-    else if (concordia==2) { concordia.age(x,wetherill=TRUE,dcu=TRUE,...) }
-    else if (concordia==3) { discordia.age(x,wetherill=TRUE,dcu=TRUE) }
+    if (concordia==1) { out <- UPb.age(x,dcu=dcu,i=i,...) }
+    else if (concordia==2) { out <- concordia.age(x,wetherill=TRUE,dcu=TRUE,...) }
+    else if (concordia==3) { out <- discordia.age(x,wetherill=TRUE,dcu=TRUE) }
+    out
 }
 #' @rdname age
 #' @export
 age.detritals <- function(x,...){
     x
 }
+#' @param isochron boolean flag indicating whether each Ar-Ar analysis
+#'     should be considered separately (\code{isochron=FALSE}) or an
+#'     isochron age should be calculated from all Ar-Ar analyses
+#'     together (\code{isochron=TRUE}).
 #' @rdname age
 #' @export
-age.ArAr <- function(x,isochron=1,dcu=TRUE,i=NA,...){
-    if (isochron==1){
-    } else if (isochron==2){
-    } else if (isochron==3){
+age.ArAr <- function(x,isochron=FALSE,dcu=TRUE,i=NA,...){
+    if (isochron){
+        out <- isochron(x,plot=FALSE)
+    } else {
+        out <- ArAr.age(x,dcu=dcu,i=i,...)
     }
+    out
 }
