@@ -25,7 +25,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
-### Aliases: age age.UPb age.default age.detritals
+### Aliases: age age.ArAr age.UPb age.default age.detritals
 
 ### ** Examples
 
@@ -170,6 +170,26 @@ print(iratio('U238U235'))
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("iratio", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("isochron")
+### * isochron
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: isochron
+### Title: Calculate and plot isochrons
+### Aliases: isochron isochron.ArAr isochron.default
+
+### ** Examples
+
+data(examples)
+isochron(examples$ArAr)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("isochron", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("kde")
 ### * kde
 
@@ -221,15 +241,14 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: read.data
 ### Title: Read geochronology data
-### Aliases: read.data read.data.data.frame read.data.default
-###   read.data.matrix
+### Aliases: read.data read.data.default read.data.matrix
 
 ### ** Examples
 
 # load one of the built-in .csv files:
-fname <- system.file("UPb.csv",package="IsoplotR")
-UPb <- read.data(fname,'U-Pb')
-concordia(UPb)
+data(examples)#fname <- system.file("UPb.csv",package="IsoplotR")
+#UPb <- read.data(fname,'U-Pb')
+concordia(examples$UPb)
 
 
 
@@ -279,7 +298,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
    rXY <- rep(0.8,n)
    fit <- yorkfit(X,Y,sX,sY,rXY)
    covmat <- matrix(0,2,2)
-   plot(range(X),fit$a+fit$b*range(X),type='l',ylim=range(Y))
+   plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
    for (i in 1:n){
        covmat[1,1] <- sX[i]^2
        covmat[2,2] <- sY[i]^2

@@ -47,6 +47,7 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,...){
 #'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 #'     (\code{FALSE}) space.  This option is only used when
 #'     \code{concordia=2}
+#' @param sigdig number of significant digits for the uncertainty estimate
 #' @return
 #' if \code{x} has class \code{UPb} and \code{concordia=1}, returns a
 #' table with the following columns: `t.75', `err[t.75]', `t.68',
@@ -97,10 +98,15 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,...){
 #' print(age(examples$UPb,concordia=2))
 #' @rdname age
 #' @export
-age.UPb <- function(x,concordia=1,wetherill=TRUE,dcu=TRUE,i=NA,...){
-    if (concordia==1) { out <- UPb.age(x,dcu=dcu,i=i,...) }
-    else if (concordia==2) { out <- concordia.age(x,wetherill=TRUE,dcu=TRUE,...) }
-    else if (concordia==3) { out <- discordia.age(x,wetherill=TRUE,dcu=TRUE) }
+age.UPb <- function(x,concordia=1,wetherill=TRUE,
+                    dcu=TRUE,i=NA,sigdig=2,...){
+    if (concordia==1) {
+        out <- UPb.age(x,dcu=dcu,i=i,sigdig=sigdig,...)
+    } else if (concordia==2) {
+        out <- concordia.age(x,wetherill=TRUE,dcu=TRUE,sigdig=sigdig,...)
+    } else if (concordia==3) {
+        out <- discordia.age(x,wetherill=TRUE,dcu=TRUE,sigdig=sigdig,...)
+    }
     out
 }
 #' @rdname age
@@ -114,11 +120,11 @@ age.detritals <- function(x,...){
 #'     together (\code{isochron=TRUE}).
 #' @rdname age
 #' @export
-age.ArAr <- function(x,isochron=FALSE,dcu=TRUE,i=NA,...){
+age.ArAr <- function(x,isochron=FALSE,dcu=TRUE,i=NA,sigdig=2,...){
     if (isochron){
-        out <- isochron(x,plot=FALSE)
+        out <- isochron(x,plot=FALSE,sigdig=sigdig)
     } else {
-        out <- ArAr.age(x,dcu=dcu,i=i,...)
+        out <- ArAr.age(x,dcu=dcu,i=i,sigdig=sigdig,...)
     }
     out
 }

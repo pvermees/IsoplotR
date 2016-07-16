@@ -2,7 +2,6 @@
 % Please edit documentation in R/io.R
 \name{read.data}
 \alias{read.data}
-\alias{read.data.data.frame}
 \alias{read.data.default}
 \alias{read.data.matrix}
 \title{Read geochronology data}
@@ -12,8 +11,6 @@ read.data(x, ...)
 \method{read.data}{default}(x, method = "Pb206U238", format = 1, ...)
 
 \method{read.data}{matrix}(x, method = "U-Pb", format = 1, ...)
-
-\method{read.data}{data.frame}(x, method = "U-Pb", format = 1, ...)
 }
 \arguments{
 \item{x}{a file name (\code{.csv} format) or matrix}
@@ -28,7 +25,9 @@ read.data(x, ...)
 \item{format}{formatting option, depends on the value of
     \code{method}. If \code{method = 'U-Pb'}, then \code{format} is
     one of either:
+
 \code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]
+
 (other formats will be added later)}
 }
 \value{
@@ -42,8 +41,8 @@ data classes
 }
 \examples{
 # load one of the built-in .csv files:
-fname <- system.file("UPb.csv",package="IsoplotR")
-UPb <- read.data(fname,'U-Pb')
-concordia(UPb)
+data(examples)#fname <- system.file("UPb.csv",package="IsoplotR")
+#UPb <- read.data(fname,'U-Pb')
+concordia(examples$UPb)
 }
 

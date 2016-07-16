@@ -37,7 +37,7 @@
 #'    rXY <- rep(0.8,n)
 #'    fit <- yorkfit(X,Y,sX,sY,rXY)
 #'    covmat <- matrix(0,2,2)
-#'    plot(range(X),fit$a+fit$b*range(X),type='l',ylim=range(Y))
+#'    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
 #'    for (i in 1:n){
 #'        covmat[1,1] <- sX[i]^2
 #'        covmat[2,2] <- sY[i]^2
@@ -113,9 +113,11 @@ get.york.xy <- function(X,Y,sX,sY,rXY,a,b){
     out
 }
 
-data2york <- function(x,selection=NULL){ 
+data2york <- function(x,selection=NA){
     out <- list()
     nn <- nrow(x$x)
+    if (any(is.na(selection)))
+        selection <- c(1,2)
     out$X <- x$x[,selection[1]]
     out$Y <- x$x[,selection[2]]
     out$sX <- rep(0,nn)
@@ -125,7 +127,7 @@ data2york <- function(x,selection=NULL){
         covmat <- get.covmat(x,i)[selection,selection]
         out$sX[i] <- sqrt(covmat[1,1])
         out$sY[i] <- sqrt(covmat[2,2])
-        out$rXY[i] <- cov2cor(covmat)
+        out$rXY[i] <- stats::cov2cor(covmat)[1,2]
     }
     out
 }

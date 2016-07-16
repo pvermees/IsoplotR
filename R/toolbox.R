@@ -1,7 +1,36 @@
-roundit <- function(age,err){
+select <- function(x,selection){
+    out <- x
+    i <- which(names(x$x) %in% selection)
+    out$x <- x$x[i]
+    out$covmat <- x$covmat[i,i]
+    out
+}
+
+zip.matrix <- function(x){
+    nc <- ncol(x)
+    nr <- nrow(x)
+    out <- rep(0,nr*nc)
+    i <- seq(from=0,to=(nr-1)*nc,by=nc)
+    for (j in 1:nc){
+        out[i+j] <- x[,j]
+    }
+    out
+}
+
+unzip.vector <- function(x,nc=2){
+    nr <- length(x)/nc
+    out <- matrix(0,nr,nc)
+    i <- seq(from=0,to=(nr-1)*nc,by=nc)
+    for (j in 1:nc){
+        out[,j] <- x[i+j]
+    }
+    out
+}
+
+roundit <- function(age,err,sigdig=2){
     out <- list()
-    out$err <- signif(err,2)
-    nd <- log10(trunc(abs(age)/err))+2
+    out$err <- signif(err,sigdig)
+    nd <- log10(trunc(abs(age)/err))+sigdig
     out$x <- signif(age,nd)
     out
 }
@@ -30,10 +59,6 @@ emptyplot <- function(){
     graphics::plot(c(0,1),c(0,1),type='n',axes=FALSE,xlab="",ylab="")
 }
 
-cov2cor <- function(covmat){
-    covmat[1,2]/sqrt(covmat[1,1]*covmat[2,2])
-}
-
 cor2cov <- function(sX,sY,rXY){
     covmat <- matrix(0,2,2)
     covmat[1,1] <- sX^2
@@ -50,12 +75,12 @@ get.cov.xzyz <- function(xz,err.xz,yz,err.yz,err.xy){
 
 get.cov.zxzy <- function(zx,err.zx,zy,err.zy,err.xy){
     xy <- zy/zx
-    0.5*zx*zy*((err.zy/zy)^2+(err.zx/zx)^2+(err.xy/xy)^2)
+    0.5*zx*zy*((err.zy/zy)^2 + (err.zx/zx)^2 - (err.xy/xy)^2)
 }
 
 get.cov.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
     xy <- xz*zy
-    0.5*xz*zy*((err.xy/xy)^2-(err.xz/xz)^2-(err.zy/zy)^2)
+    0.5*xz*zy*((err.xy/xy)^2 - (err.xz/xz)^2 - (err.zy/zy)^2)
 }
 
 get.covmat <- function(x,...){ UseMethod("get.covmat",x) }

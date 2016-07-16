@@ -18,12 +18,10 @@ yorkfit(X, Y, sX, sY, rXY)
 \item{rXY}{correlation coefficients between X and Y}
 }
 \value{
-a five element list containing
+a two element list of vectors containing
 \describe{
-\item{a}{ the intercept of the straight line fit }
-\item{b}{ the slope of the fit }
-\item{sa}{ the standard error of the intercept }
-\item{sb}{ the standard error of the slope }
+\item{a}{ the intercept of the straight line fit and its standard error}
+\item{b}{ the slope of the fit and its standard error}
 }
 }
 \description{
@@ -43,7 +41,7 @@ Titterington (1994)
    rXY <- rep(0.8,n)
    fit <- yorkfit(X,Y,sX,sY,rXY)
    covmat <- matrix(0,2,2)
-   plot(range(X),fit$a+fit$b*range(X),type='l',ylim=range(Y))
+   plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
    for (i in 1:n){
        covmat[1,1] <- sX[i]^2
        covmat[2,2] <- sY[i]^2

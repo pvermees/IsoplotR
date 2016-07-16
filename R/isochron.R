@@ -1,57 +1,95 @@
+#' Calculate and plot isochrons
+#'
+#' Plots cogenetic \eqn{^{40}}Ar/\eqn{^{39}}Ar data as X-Y
+#' scatterplots, fits an isochron curve through them using the
+#' \code{yorkfit} function, and computes the corresponding isochron
+#' age, including decay constant uncertainties.
+#'
+#' @param x EITHER a list with the following vectors:
+#'
+#' \code{X:} the x-variable
+#'
+#' \code{Y:} the y-variable
+#'
+#' \code{sX:} the standard error of X
+#'
+#' \code{sY:} the standard error of Y
+#'
+#' \code{rXY:} the correlation coefficient of X and Y
+#'
+#' OR an object of class \code{ArAr}
+#'
+#' @param xlim 2-element vector with the plot limits of the x-axis
+#' @param ylim 2-element vector with the plot limits of the y-axis
+#' @param alpha confidence cutoff for the error ellipses
+#' @param show.numbers boolean flag (TRUE to show grain numbers)
+#' @param ellipse.col background colour of the error ellipses
+#' @param line.col colour of the isochron line
+#' @param lwd line width
+#' @param ... optional arguments
+#' @rdname isochron
+#' @export
 isochron <- function(x,...){ UseMethod("isochron",x) }
-# x is a list with the following vectors:
-# X the x-variable
-# Y the y-variable
-# sX the standard error of X
-# sY the standard error of Y
-# rXY the correlation coefficient of X and Y
+#' @rdname isochron
+#' @export
 isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='grey',lwd=2,...){
     fit <- yorkfit(x$X,x$Y,x$sX,x$sY,x$rXY)
-    if (any(is.na(xlim))) xlim <- get.limits(x$X,x$sX)
-    if (any(is.na(ylim))) ylim <- get.limits(x$Y,x$sY)
-    plot(xlim,ylim,type='n',xlab='',ylab='')
-    lines(xlim,fit$a[1]+fit$b[1]*xlim,col=line.col,lwd=lwd)
-    ns <- length(x$X)
-    for (i in 1:ns){
-        x0 <- x$X[i]
-        y0 <- x$Y[i]
-        covmat <- cor2cov(x$sX[i],x$sY[i],x$rXY[i])
-        ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        polygon(ell,col=ellipse.col)
-        points(x0,y0,pch=19,cex=0.25)
-        if (show.numbers) { text(x0,y0,i) }
-    }
+    scatterplot(x,alpha=0.05,show.numbers=show.numbers,
+                ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
+                line.col=line.col,lwd=lwd)
 }
+#' @param plot if \code{FALSE}, suppresses the graphical output
+#' @param inverse if \code{TRUE}, plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
+#'     vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar. If \code{FALSE}, plots
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
+#' @return
+#' if \code{plot=FALSE}, returns a list with the following items:
+#'
+#' \code{a:} the intercept of the straight line fit and its standard error
+#' 
+#' \code{b:} the slope of the fit and its standard error
+#' 
+#' \code{y0:} the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and its standard error
+#' 
+#' \code{age:} the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard error
+#' 
+#' @examples
+#' data(examples)
+#' isochron(examples$ArAr)
+#' @rdname isochron
+#' @export
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
-                          inverse=TRUE,plot=TRUE,...){
+                          inverse=TRUE,line.col='grey',lwd=2,plot=TRUE,...){
     d <- data2york(x,get.selection(x,inverse))
-    fit <- yorkfit(d$X,d$Y,d$sX,d$sY,d$rXY)
-    out <- fit
-    class(out) <- "isochron"
-    out$inverse <- inverse
     if (inverse){
-        x0 <- -fit$a[1]/fit$b[1]
-        # doesn't take into account covariance between a and b!
-        sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2)
-        y0 <- 1/fit$a[1]
-        sy0 <- fit$a[2]/fit$a[1]^2
-        out$y0 <- c(y0,sy0)
-        out$age <- get.ArAr.age(1/x0,sx0/x0^2,x$J[1],x$J[2])
+        fit <- yorkfit(d$Y,d$X,d$sY,d$sX,-d$rXY) # X and Y reversed!
+        x0 <- 1/fit$a[1]
+        sx0 <- fit$a[2]/fit$a[1]^2
+        y0 <- -fit$b[1]/fit$a[1]
+        sy0 <- y0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2)
+        tt <- get.ArAr.age(x0,sx0,x$J[1],x$J[2])
         x.lab <- expression(paste(""^"39","Ar/"^"40","Ar"))
         y.lab <- expression(paste(""^"36","Ar/"^"40","Ar"))
     } else {
-        out$y0 <- fit$a
-        out$age <- get.ArAr.age(fit$b[1],fit$b[2],x$J[1],x$J[2])
+        fit <- yorkfit(d$X,d$Y,d$sX,d$sY,d$rXY)
+        y0 <- fit$a[1]
+        sy0 <- fit$a[2]
+        tt <- get.ArAr.age(fit$b[1],fit$b[2],x$J[1],x$J[2])
         x.lab <- expression(paste(""^"39","Ar/"^"36","Ar"))
         y.lab <- expression(paste(""^"40","Ar/"^"36","Ar"))
     }
+    out <- fit
+    class(out) <- "isochron"
+    out$y0 <- c(y0,sy0)
+    out$age <- tt
     if (plot) {
-        isochron.default(d,xlim,ylim,alpha,show.numbers,
-                         ellipse.col,...)
+        isochron.default(d,alpha=0.05,show.numbers=show.numbers,
+                         ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
+                         line.col=line.col,lwd=lwd)
         tt <- roundit(out$age[1],out$age[2])
         title(isochron.title(out),xlab=x.lab,ylab=y.lab)
     } else {

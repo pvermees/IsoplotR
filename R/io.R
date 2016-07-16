@@ -21,9 +21,9 @@
 #'     \code{'fission'}, \code{'cosmogenics'}, or \code{'other'}
 #' @examples
 #' # load one of the built-in .csv files:
-#' fname <- system.file("UPb.csv",package="IsoplotR")
-#' UPb <- read.data(fname,'U-Pb')
-#' concordia(UPb)
+#' data(examples)#fname <- system.file("UPb.csv",package="IsoplotR")
+#' #UPb <- read.data(fname,'U-Pb')
+#' concordia(examples$UPb)
 #' @rdname read.data
 #' @export
 read.data <- function(x,...){ UseMethod("read.data",x) }

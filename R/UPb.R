@@ -43,7 +43,7 @@ get.covmat.UPb <- function(x,i,...){
         out['Pb207U235','Pb207Pb206'] <- get.cov.zxzy(
             Pb207U235,errPb207U235,Pb207Pb206,errPb207Pb206,errU235Pb206
         )
-        out['Pb206U238','U238Pb206'] <- -1
+        out['Pb206U238','U238Pb206'] <- -0
         out['Pb206U238','Pb207Pb206'] <- get.cov.xzzy(
             Pb207Pb206,errPb207Pb206,Pb206U238,errPb206U238,errPb207U238
         )
@@ -157,7 +157,7 @@ get.Pb207Pb206age <- function(r76,sr76=0,dcu=TRUE){
 
 # x an object of class \code{UPb} returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,dcu=TRUE,i=NA){
+UPb.age <- function(x,dcu=TRUE,i=NA,sigdig=2){
     labels <- c('t.75','s[t.75]','t.68','s[t.68]',
                 't.76','s[t.76]','t.conc','s[t.conc]')
     if (!is.na(i)){
@@ -165,10 +165,10 @@ UPb.age <- function(x,dcu=TRUE,i=NA){
         t.75 <- get.Pb207U235age(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],dcu=dcu)
         t.68 <- get.Pb206U238age(x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],dcu=dcu)
         t.76 <- get.Pb207Pb206age(x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],dcu=dcu)
-        t.75.out <- roundit(t.75[1],t.75[2])
-        t.68.out <- roundit(t.68[1],t.68[2])
-        t.76.out <- roundit(t.76[1],t.76[2])
-        t.conc.out <- roundit(t.conc$age,t.conc$age.err)
+        t.75.out <- roundit(t.75[1],t.75[2],sigdig=sigdig)
+        t.68.out <- roundit(t.68[1],t.68[2],sigdig=sigdig)
+        t.76.out <- roundit(t.76[1],t.76[2],sigdig=sigdig)
+        t.conc.out <- roundit(t.conc$age,t.conc$age.err,sigdig=sigdig)
         out <- c(t.75.out$x,t.75.out$err,t.68.out$x,t.68.out$err,
                  t.76.out$x,t.76.out$err,t.conc.out$x,t.conc.out$err)
     } else {

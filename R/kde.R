@@ -166,6 +166,19 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
         return(X)
     }
 }
+#' @rdname kde
+#' @export
+kde.ArAr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                    n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
+                    kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
+                    show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,...){
+    tt <- ArAr.age(x)[,1]
+    kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
+                n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
+                kde.col=kde.col, hist.col=hist.col,
+                show.hist=show.hist,bty=bty,binwidth=binwidth,
+                ncol=ncol,...)
+}
 
 # helper functions for the generic kde function
 getkde <- function(x,...){ UseMethod("getkde",x) }
@@ -174,21 +187,21 @@ getkde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,.
     class(out) <- "KDE"
     out$name <- deparse(substitute(x))
     out$log <- log
+    if (log) d <- log(x)
+    else d <- x
+    if (is.na(bw)) bw <- botev(d)
     if (is.na(from) | is.na(to)) {
         mM <- getmM(x,from,to,log)
+        to <- mM$M + bw
         from <- mM$m
-        to <- mM$M
+        if (mM$m > bw) from <- from - bw
     }
     if (log) {
-        d <- log(x)
+        bw <- bw/(stats::median(x))
         from <- log(from)
         to <- log(to)
-        bw <- bw/(stats::median(x))
-    } else {
-        d <- x
     }
     out$x <- seq(from=from,to=to,length.out=n)
-    if (is.na(bw)){ bw <- botev(d) }
     if (adaptive){
         out$y <- Abramson(d,from=from,to=to,bw=bw,n=n,...)
     } else {
@@ -295,7 +308,9 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
         h <- graphics::hist(ages,breaks=breaks,plot=FALSE)
     }
     nb <- length(breaks)-1
-    graphics::plot(x$x,x$y,type='n',log=do.log,
+    maxy <- max(x$y)
+    if (show.hist) maxy <- max(maxy,max(h$density))
+    graphics::plot(x$x,x$y,type='n',log=do.log,ylim=c(0,maxy),
                    xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
     if (show.hist){
         graphics::rect(xleft=breaks[1:nb],xright=breaks[2:(nb+1)],
@@ -310,7 +325,7 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
     graphics::polygon(x$x,x$y,col=kde.col)
     graphics::lines(x$x,x$y,col='black')
     graphics::points(ages,rep(graphics::par("usr")[3]/2,length(ages)),pch=pch)
-    graphics::text(M,max(x$y),paste0("n=",length(ages)),pos=2)
+    graphics::text(M,maxy,paste0("n=",length(ages)),pos=2)
 }
 
 plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",

@@ -30,7 +30,7 @@ get.covmat.ArAr <- function(x,i,...){
             x$x[i,'Ar39Ar36'],x$x[i,'errAr39Ar36'],
             x$x[i,'Ar36Ar40'],x$x[i,'errAr36Ar40'],x$x[i,'errAr39Ar40']
         )
-        out['Ar36Ar40','Ar40Ar36'] <- -1
+        out['Ar36Ar40','Ar40Ar36'] <- 0
         out['Ar39Ar36','Ar40Ar36'] <- get.cov.xzyz(
             x$x[i,'Ar39Ar36'],x$x[i,'errAr39Ar36'],
             x$x[i,'Ar40Ar36'],x$x[i,'errAr40Ar36'],x$x[i,'errAr39Ar40']
@@ -63,9 +63,9 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,dcu=TRUE){
 
 # x an object of class \code{ArAr} returns a matrix of 40Ar/39Ar-ages
 # and their uncertainties.
-ArAr.age <- function(x,dcu=TRUE,i=NA){
-    nn <- nrow(x$x)
-    out <- matrix(0,nn,2)
+ArAr.age <- function(x,dcu=TRUE,i=NA,sigdig=2){
+    ns <- nrow(x$x)
+    out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     Ar4036 <- x$x[,"Ar40Ar36"]
     sAr4036 <- x$x[,"errAr40Ar36"]
@@ -74,15 +74,17 @@ ArAr.age <- function(x,dcu=TRUE,i=NA){
     Ar4039x <- Ar4039-iratio("Ar40Ar36")[1]/x$x[,"Ar39Ar36"]
     J <- matrix(0,1,3)
     E <- matrix(0,3,3)
-    for (j in 1:nn) {
-        covmat <- get.covmat.ArAr(x,i)
-        J[1,1] <- -1/x$x[i,"Ar39Ar40"]^2
-        J[1,2] <- iratio("Ar40Ar36")[1]/x$x[i,"Ar39Ar36"]^2
-        J[1,3] <- -1/x$x[i,"Ar39Ar36"]
+    for (j in 1:ns) {
+        covmat <- get.covmat.ArAr(x,j)
+        J[1,1] <- -1/x$x[j,"Ar39Ar40"]^2
+        J[1,2] <- iratio("Ar40Ar36")[1]/x$x[j,"Ar39Ar36"]^2
+        J[1,3] <- -1/x$x[j,"Ar39Ar36"]
         E[1:2,1:2] <- covmat[c("Ar39Ar40","Ar39Ar36"),c("Ar39Ar40","Ar39Ar36")]
         E[3,3] <- iratio("Ar40Ar36")[2]^2
         sAr4039x <- J %*% E %*% t(J)
-        out[j,] <- get.ArAr.age(Ar4039x[j],sAr4039x,x$J[1],x$J[2],dcu=dcu)
+        tt <- get.ArAr.age(Ar4039x[j],sAr4039x,x$J[1],x$J[2],dcu=dcu)
+        t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
+        out[j,] <- c(t.out$x,t.out$err)
     }
     if (!is.na(i)) out <- out[i,]
     out

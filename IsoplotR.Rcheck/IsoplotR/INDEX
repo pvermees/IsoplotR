@@ -6,6 +6,7 @@ concordia               Concordia diagram
 ellipse                 Get coordinates of error ellipse for plotting
 examples                Example datasets for testing 'IsoplotR'
 iratio                  Isotopic ratios
+isochron                Calculate and plot isochrons
 kde                     Create (a) kernel density estimate(s)
 lambda                  Decay constants
 read.data               Read geochronology data

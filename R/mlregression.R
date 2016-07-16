@@ -1,0 +1,168 @@
+# x is a list with numbers
+# x$x = 2n-element vector
+# x$covmat = 2n x 2n covariance matrix
+# where n is the number of aliquots
+mlregression <- function(x){
+    d <- data2york.new(x)
+    initial.fit <- yorkfit(d$X,d$Y,d$sX,d$sY,d$rXY)
+    ab <- c(initial.fit$a[1],initial.fit$b[1])
+    EXY.inv <- solve(x$covmat)
+    fit <- optim(par=ab,fn=LL.ab,gr=LL.ab.gradient,
+                 d=d,EXY.inv=EXY.inv,method='BFGS',
+                 hessian=TRUE)
+    out <- list()
+    covmat <- -solve(fit$hessian)
+    out$a <- c(fit$par[1],sqrt(covmat[1,1]))
+    out$b <- c(fit$par[2],sqrt(covmat[2,2]))
+    out$mswd <- 1
+    out$p.value <- 1
+    out
+}
+
+data2york.new <- function(x){
+    ns <- length(x$x)/2
+    ix <- seq(from=1,to=2*ns-1,by=2)
+    iy <- seq(from=2,to=2*ns,by=2)
+    out <- list()
+    out$X <- x$x[ix]
+    out$Y <- x$x[iy]
+    out$sX <- sqrt(diag(x$covmat)[ix])
+    out$sY <- sqrt(diag(x$covmat)[iy])
+    cormat <- stats::cov2cor(x$covmat)
+    out$rXY <- cormat[cbind(ix,ix+1)]
+    out
+}
+
+LL.test <- function(x){
+    if (FALSE) { # remove covariances
+        ns <- length(x$x)/2
+        xdiag <- diag(x$covmat)
+        x$covmat <- x$covmat*0
+        diag(x$covmat) <- xdiag
+    }
+
+    d <- data2york.new(x)
+    ns <- length(d$X)
+    EXY.inv <- solve(x$covmat)
+    XY <- matrix(0,2*ns,1)
+    XY[seq(from=1,to=2*ns-1,by=2),1] <- d$X
+    XY[seq(from=2,to=2*ns,by=2),1] <- d$Y
+
+    initial.fit <- yorkfit(d$X,d$Y,d$sX,d$sY,d$rXY)
+    a.york <- initial.fit$a[1]
+    b.york <- initial.fit$b[1]
+    
+    nn <- 50
+    LL <- matrix(0,nn,nn)
+    a <- seq(from=2e-03,to=8e-03,length.out=nn) # 3.651241e-03 # 3.648762e-03
+    b <- seq(from=-0.015,to=-0.006,length.out=nn) # -8.298261e-03 # -0.008294281
+    for (i in 1:nn){
+        for (j in 1:nn){
+            LL[i,j] <- get.LL.ab(c(a[i],b[j]),d,EXY.inv,gradient=FALSE)
+            #if (LL[i,j] > 1e3) LL[i,j] <- 1e3
+            #if (LL[i,j] > -30000) LL[i,j] <- -30000 
+        }
+    }
+    contour(a,b,LL,xlab='a',ylab='b')
+    initial.ab <- c(0.005260984,-0.012)
+    gr <- LL.ab.gradient(initial.ab,d,EXY.inv)
+    points(a.york,b.york,pch=21,bg='yellow') # York solution
+    points(initial.ab[1],initial.ab[2],pch=21,bg='blue') # starting point
+    da <- -0.001*gr[1]/abs(gr[1])
+    next.ab <- c(initial.ab[1]+da,initial.ab[2]+da*gr[2]/gr[1])
+    gr.line <- rbind(initial.ab,next.ab)
+    lines(gr.line)
+
+    fit <- mlregression(x)
+    points(fit$a[1],fit$b[1],pch=21,bg='red') # final solution
+}
+
+get.UV <- function(Xs,XY,EXY.inv,a,b){
+    ns <- length(Xs)
+    A <- -matrix(rep(c(0,a),ns),2*ns,1)
+    B <- matrix(0,2*ns,ns)
+    j <- 1:ns
+    i <- 2*j-1
+    B[cbind(i,j)] <- -1
+    B[cbind(i+1,j)] <- -b
+    U <- (t(XY)+t(A)) %*% EXY.inv %*% B
+    V <- t(B) %*% EXY.inv %*% B
+    list(U=U,V=V)
+}
+
+get.KLMNO <- function(a,b,XY,EXY.inv,Xs){
+    ns <- length(XY)/2
+    IA <- -matrix(rep(c(0,1),ns),2*ns,1)
+    IB <- matrix(0,2*ns,ns)
+    B1 <- matrix(0,2*ns,ns)
+    ri <- seq(from=2,to=2*ns,by=2)
+    ci <- 1:ns
+    IB[cbind(ri,ci)] <- -1
+    B1[cbind(ri-1,ci)] <- -1
+    K <- t(IA) %*% EXY.inv %*% IA
+    L <- 2 * ( t(XY) %*% EXY.inv %*% IA +
+               t(IA) %*% EXY.inv %*% B1 %*% Xs )
+    M <- 2 * t(IA) %*% EXY.inv %*% IB %*% Xs
+    N <- 2 * t(XY) %*% EXY.inv %*% IB %*% Xs +
+             t(Xs) %*% t(IB) %*% EXY.inv %*% B1 %*% Xs +
+             t(Xs) %*% t(B1) %*% EXY.inv %*% IB %*% Xs
+    O <- t(Xs) %*% t(IB) %*% EXY.inv %*% IB %*% Xs
+    list(K=K,L=L,M=M,N=N,O=O)
+}
+
+get.LL.Xstar <- function(Xs,XY,EXY.inv,a,b,gradient=FALSE){
+    p <- get.UV(Xs,XY,EXY.inv,a,b)
+    if (gradient){
+        LL <- 2*p$U + 2*t(Xs) %*% p$V
+    } else {
+        LL <- 2*p$U %*% Xs + t(Xs) %*% p$V %*% Xs
+    }
+    LL
+}
+
+LL.Xstar <- function(Xs,XY,EXY.inv,a,b){
+    get.LL.Xstar(Xs,XY,EXY.inv,a,b,gradient=FALSE)
+}
+
+LL.Xstar.gradient <- function(Xs,XY,EXY.inv,a,b){
+    get.LL.Xstar(Xs,XY,EXY.inv,a,b,gradient=TRUE)
+}
+
+get.LL.ab <- function(ab,d,EXY.inv,gradient=FALSE){
+    ns <- length(d$X)
+    XY <- matrix(0,2*ns,1)
+    XY[seq(from=1,to=2*ns-1,by=2),1] <- d$X
+    XY[seq(from=2,to=2*ns,by=2),1] <- d$Y
+    a <- ab[1]
+    b <- ab[2]
+    Xs.init <- d$X
+    Xs.york <- get.york.xy(d$X,d$Y,d$sX,d$sY,d$rXY,a,b)[,1]
+    Xs <- Xs.init
+    Xs <- optim(par=Xs.init,fn=LL.Xstar,gr=LL.Xstar.gradient,
+                XY=XY,EXY.inv=EXY.inv,a=a,b=b,method='BFGS')$par
+    p <- get.KLMNO(a,b,XY,EXY.inv,Xs)
+    if (gradient) {
+        dLLda <- 2*p$K*a  + p$L + p$M*b
+        dLLdb <- p$M*a + p$N + 2*p$O*b
+        LL <- c(dLLda,dLLdb)
+    } else {
+        ns <- length(Xs)
+        A <- -matrix(rep(c(0,a),ns),2*ns,1)
+        B <- matrix(0,2*ns,ns)
+        j <- 1:ns
+        i <- 2*j-1
+        B[cbind(i,j)] <- -1
+        B[cbind(i+1,j)] <- -b
+        #LL <- t(XY + A + B %*% Xs) %*% EXY.inv %*% (XY + A + B %*% Xs)
+        LL <- p$K*a^2  + p$L*a + p$M*a*b + p$N*b + p$O*b^2
+    }
+    LL
+}
+
+LL.ab <- function(ab,d,EXY.inv){
+    get.LL.ab(ab,d,EXY.inv,gradient=FALSE)
+}
+
+LL.ab.gradient <- function(ab,d,EXY.inv){
+    -get.LL.ab(ab,d,EXY.inv,gradient=TRUE)
+}

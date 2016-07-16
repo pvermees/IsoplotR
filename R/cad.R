@@ -34,10 +34,11 @@ cad <- function(x,method=NA,pch=NA,verticals=TRUE,xlab='age [Ma]',
         snames <- names(x)
         col <- do.call(colmap,list(ns))
     } else if (is.na(method)){
-        if (methods::is(x,'UPb')) method <- 't.68'
-        X <- list(X[,method])
+        if (methods::is(x,'UPb')) X <- list(X[,'t.68'])
+        else X <- list(X[,1])
     }
-    graphics::plot(range(X),c(0,1),type='n',xlab=xlab,ylab='cumulative probability',...)
+    graphics::plot(range(X),c(0,1),type='n',xlab=xlab,
+                   ylab='cumulative probability',...)
     for (i in 1:ns){
         graphics::lines(stats::ecdf(X[[i]]),verticals=verticals,
                         pch=pch,col=col[i],...)

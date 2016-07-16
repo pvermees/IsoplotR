@@ -2,6 +2,7 @@
 % Please edit documentation in R/age.R
 \name{age}
 \alias{age}
+\alias{age.ArAr}
 \alias{age.UPb}
 \alias{age.default}
 \alias{age.detritals}
@@ -15,6 +16,8 @@ age(x, ...)
   i = NA, ...)
 
 \method{age}{detritals}(x, ...)
+
+\method{age}{ArAr}(x, isochron = FALSE, dcu = TRUE, i = NA, ...)
 }
 \arguments{
 \item{x}{a scalar containing an isotopic ratio, a two element
@@ -40,6 +43,11 @@ be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 \code{concordia=2}}
 
 \item{i}{(optional) index of a particular aliquot}
+
+\item{isochron}{boolean flag indicating whether each Ar-Ar analysis
+should be considered separately (\code{isochron=FALSE}) or an
+isochron age should be calculated from all Ar-Ar analyses
+together (\code{isochron=TRUE}).}
 }
 \value{
 if \code{x} is a scalar or a vector, returns the age using
