@@ -289,7 +289,7 @@ LL.concordia.comp <- function(mu,x,mswd=FALSE){
     for (i in 1:length(x)){
         X <- matrix(x[[i]]$x-mu,1,2)
         covmat <- x[[i]]$cov
-        if (mswd) out <- out + get.SS(X,covmat)
+        if (mswd) out <- out + get.concordia.SS(X,covmat)
         else out <- out + LL.norm(X,covmat)
     }
     out
@@ -301,7 +301,7 @@ LL.concordia.age <- function(age,x,covmat,wetherill=TRUE,mswd=FALSE,dcu=TRUE){
     X <- matrix(x[selection]-UPbratios$x[selection],1,2)
     COVMAT <- covmat[selection,selection]
     if (dcu) COVMAT <- COVMAT + UPbratios$cov[selection,selection]
-    if (mswd) out <- get.SS(X,COVMAT)
+    if (mswd) out <- get.concordia.SS(X,COVMAT)
     else out <- LL.norm(X,COVMAT)
     out
 }

@@ -6,7 +6,7 @@
 \usage{
 concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  concordia.col = "darksalmon", dcu = TRUE, show.age = 1)
+  concordia.col = "darksalmon", dcu = TRUE, show.age = 1, sigdig = 2)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -32,6 +32,8 @@ concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 \code{2}: calculate the concordia age
 
 \code{3}: fit a discordia line}
+
+\item{sigdig}{number of significant digits for the concordia/discordia age}
 }
 \description{
 Plot U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams,

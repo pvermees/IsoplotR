@@ -4,8 +4,8 @@
 #' the Botev (2010) bandwidth selector and the Abramson (1982)
 #' adaptive kernel bandwidth modifier.
 #'
-#' @param x a vector of numbers or an object of class \code{UPb} or
-#'     \code{detrital}
+#' @param x a vector of numbers or an object of class \code{UPb},
+#'     \code{ArAr} or \code{detrital}
 #' @rdname kde
 #' @export
 kde <- function(x,...){ UseMethod("kde",x) }
@@ -97,30 +97,8 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                     show.hist=TRUE, bty='n',binwidth=NA, ncol=NA,
                     type=4,cutoff.76=1100,cutoff.disc=c(-15,5),...){
-    tt <- UPb.age(x)
-    do.76 <- tt[,'t.68'] > cutoff.76
-    if (any(is.na(cutoff.disc))) {
-        is.concordant <- rep(TRUE,nrow(x))
-    } else {
-        disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
-        disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
-        is.concordant <- (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
-                         (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
-    }
-    if (type==1){
-        ttt <- tt[,'t.75']
-    } else if (type==2){
-        ttt <- tt[,'t.68']
-    } else if (type==3){
-        ttt <- tt[,'t.76']
-    } else if (type==4){
-        i.76 <- as.vector(which(do.76 & is.concordant))
-        i.68 <- as.vector(which(!do.76 & is.concordant))
-        ttt <- c(tt[i.68,'t.68'],tt[i.76,'t.76'])
-    } else if (type==4){
-        ttt <- tt[,'t.conc']
-    }
-    kde.default(ttt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
+    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc)[,1]
+    kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col, hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
@@ -310,7 +288,7 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
     nb <- length(breaks)-1
     maxy <- max(x$y)
     if (show.hist) maxy <- max(maxy,max(h$density))
-    graphics::plot(x$x,x$y,type='n',log=do.log,ylim=c(0,maxy),
+    graphics::plot(range(x$x),c(0,maxy),type='n',log=do.log,
                    xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
     if (show.hist){
         graphics::rect(xleft=breaks[1:nb],xright=breaks[2:(nb+1)],

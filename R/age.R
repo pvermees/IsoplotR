@@ -43,11 +43,15 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,...){
 #'     concordia age should be calculated from all U-Pb analyses
 #'     together (\code{concordia=2}), or a discordia line should be
 #'     fit through all the U-Pb analyses (\code{concordia=2}).
+#' 
 #' @param wetherill boolean flag to indicate whether the data should
 #'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 #'     (\code{FALSE}) space.  This option is only used when
 #'     \code{concordia=2}
-#' @param sigdig number of significant digits for the uncertainty estimate
+#' 
+#' @param sigdig number of significant digits for the uncertainty
+#'     estimate (only used if \code{concordia=1})
+#' 
 #' @return
 #' if \code{x} has class \code{UPb} and \code{concordia=1}, returns a
 #' table with the following columns: `t.75', `err[t.75]', `t.68',
@@ -103,9 +107,9 @@ age.UPb <- function(x,concordia=1,wetherill=TRUE,
     if (concordia==1) {
         out <- UPb.age(x,dcu=dcu,i=i,sigdig=sigdig,...)
     } else if (concordia==2) {
-        out <- concordia.age(x,wetherill=TRUE,dcu=TRUE,sigdig=sigdig,...)
+        out <- concordia.age(x,wetherill=TRUE,dcu=TRUE,...)
     } else if (concordia==3) {
-        out <- discordia.age(x,wetherill=TRUE,dcu=TRUE,sigdig=sigdig,...)
+        out <- discordia.age(x,wetherill=TRUE,dcu=TRUE,...)
     }
     out
 }

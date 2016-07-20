@@ -105,3 +105,6 @@ as.detritals <- function(x){
     }
     out
 }
+as.RbSr <- function(x){
+
+}

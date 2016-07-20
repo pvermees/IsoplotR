@@ -37,7 +37,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='grey',lwd=2,...){
     fit <- yorkfit(x$X,x$Y,x$sX,x$sY,x$rXY)
-    scatterplot(x,alpha=0.05,show.numbers=show.numbers,
+    scatterplot(x,alpha=alpha,show.numbers=show.numbers,
                 ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                 line.col=line.col,lwd=lwd)
 }
@@ -87,7 +87,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,
     out$y0 <- c(y0,sy0)
     out$age <- tt
     if (plot) {
-        isochron.default(d,alpha=0.05,show.numbers=show.numbers,
+        isochron.default(d,alpha=alpha,show.numbers=show.numbers,
                          ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                          line.col=line.col,lwd=lwd)
         tt <- roundit(out$age[1],out$age[2])

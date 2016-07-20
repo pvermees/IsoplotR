@@ -141,10 +141,10 @@ discordant.composition <- function(d,tl,itu,wetherill=TRUE){
 
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){
-    log(2*pi) + 0.5*determinant(covmat,logarithmic=TRUE)$modulus + 0.5*get.SS(x,covmat)
+    log(2*pi) + 0.5*determinant(covmat,logarithmic=TRUE)$modulus + 0.5*get.concordia.SS(x,covmat)
 }
 
-get.SS <- function(x,covmat){
+get.concordia.SS <- function(x,covmat){
     x %*% solve(covmat) %*% t(x)
 }
 

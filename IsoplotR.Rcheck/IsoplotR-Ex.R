@@ -198,7 +198,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
-### Aliases: kde kde.UPb kde.default kde.detritals
+### Aliases: kde kde.ArAr kde.UPb kde.default kde.detritals
 
 ### ** Examples
 
@@ -275,6 +275,28 @@ print(settings())
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("settings", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("weightedmean")
+### * weightedmean
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: weightedmean
+### Title: Calculate the weighted mean age
+### Aliases: weightedmean weightedmean.ArAr weightedmean.UPb
+###   weightedmean.default
+
+### ** Examples
+
+data(examples)
+weightedmean(examples$ArAr)
+
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("weightedmean", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("yorkfit")
 ### * yorkfit

@@ -2,6 +2,7 @@
 % Please edit documentation in R/kde.R
 \name{kde}
 \alias{kde}
+\alias{kde.ArAr}
 \alias{kde.UPb}
 \alias{kde.default}
 \alias{kde.detritals}
@@ -25,10 +26,15 @@ kde(x, ...)
   ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
   show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA,
   samebandwidth = TRUE, normalise = TRUE, ...)
+
+\method{kde}{ArAr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, ...)
 }
 \arguments{
-\item{x}{a vector of numbers or an object of class \code{UPb} or
-\code{detrital}}
+\item{x}{a vector of numbers or an object of class \code{UPb},
+\code{ArAr} or \code{detrital}}
 
 \item{...}{optional arguments to be passed on to \code{density}}
 

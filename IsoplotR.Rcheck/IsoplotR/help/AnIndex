@@ -13,6 +13,7 @@ isochron	isochron
 isochron.ArAr	isochron
 isochron.default	isochron
 kde	kde
+kde.ArAr	kde
 kde.default	kde
 kde.detritals	kde
 kde.UPb	kde
@@ -21,4 +22,8 @@ read.data	read.data
 read.data.default	read.data
 read.data.matrix	read.data
 settings	settings
+weightedmean	weightedmean
+weightedmean.ArAr	weightedmean
+weightedmean.default	weightedmean
+weightedmean.UPb	weightedmean
 yorkfit	yorkfit

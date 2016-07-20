@@ -14,7 +14,7 @@ isochron(x, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5), inverse = TRUE,
-  plot = TRUE, ...)
+  line.col = "grey", lwd = 2, plot = TRUE, ...)
 }
 \arguments{
 \item{x}{EITHER a list with the following vectors:

@@ -13,11 +13,12 @@ age(x, ...)
 \method{age}{default}(x, method = "Pb206U238", dcu = TRUE, ...)
 
 \method{age}{UPb}(x, concordia = 1, wetherill = TRUE, dcu = TRUE,
-  i = NA, ...)
+  i = NA, sigdig = 2, ...)
 
 \method{age}{detritals}(x, ...)
 
-\method{age}{ArAr}(x, isochron = FALSE, dcu = TRUE, i = NA, ...)
+\method{age}{ArAr}(x, isochron = FALSE, dcu = TRUE, i = NA, sigdig = 2,
+  ...)
 }
 \arguments{
 \item{x}{a scalar containing an isotopic ratio, a two element
@@ -43,6 +44,9 @@ be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 \code{concordia=2}}
 
 \item{i}{(optional) index of a particular aliquot}
+
+\item{sigdig}{number of significant digits for the uncertainty
+estimate (only used if \code{concordia=1})}
 
 \item{isochron}{boolean flag indicating whether each Ar-Ar analysis
 should be considered separately (\code{isochron=FALSE}) or an

@@ -176,7 +176,7 @@ UPb.age <- function(x,dcu=TRUE,i=NA,sigdig=2){
         out <- matrix(0,nn,8)
         colnames(out) <- labels
         for (i in 1:nn){
-            out[i,] <- UPb.age(x,i=i,dcu=dcu)
+            out[i,] <- UPb.age(x,i=i,dcu=dcu,sigdig=sigdig)
         }
     }
     out
@@ -204,4 +204,31 @@ dD76dR <- function(t.76,l5,l8,R){
     el5t1 <- exp(l5*t.76)-1
     el8t1 <- exp(l8*t.76)-1
     -el5t1/(el8t1*R^2)
+}
+
+filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5)){
+    tt <- UPb.age(x)
+    do.76 <- tt[,'t.68'] > cutoff.76
+    if (any(is.na(cutoff.disc))) {
+        is.concordant <- rep(TRUE,nrow(x))
+    } else {
+        disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
+        disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
+        is.concordant <- (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
+                         (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
+    }
+    if (type==1){
+        out <- tt[,c('t.75','s[t.75]')]
+    } else if (type==2){
+        out <- tt[,c('t.68','s[t.68]')]
+    } else if (type==3){
+        out <- tt[,c('t.76','s[t.76]')]
+    } else if (type==4){
+        i.76 <- as.vector(which(do.76 & is.concordant))
+        i.68 <- as.vector(which(!do.76 & is.concordant))
+        out <- rbind(tt[i.68,c('t.68','s[t.68]')],tt[i.76,c('t.76','s[t.76]')])
+    } else if (type==4){
+        out <- tt[,c('t.conc','s[t.conc]')]
+    }
+    out
 }

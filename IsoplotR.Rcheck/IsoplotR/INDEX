@@ -11,5 +11,6 @@ kde                     Create (a) kernel density estimate(s)
 lambda                  Decay constants
 read.data               Read geochronology data
 settings                Load settings to and from json
+weightedmean            Calculate the weighted mean age
 yorkfit                 Linear regression of X,Y-variables with
                         correlated errors

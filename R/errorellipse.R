@@ -23,11 +23,11 @@ ellipse <- function(x,y,covmat,alpha=0.05){
     a <- sqrt(cutoff*e$values[1]) # major axis
     b <- sqrt(cutoff*e$values[2]) # minor axis
     v <- e$vectors[,1] # largest eigenvector
-    alpha <- atan(v[2]/v[1]) # rotation angle of the ellipse
+    beta <- atan(v[2]/v[1]) # rotation angle of the ellipse
     theta <- seq(0, 2 * pi, length=nn)
     out <- matrix(0,nrow=nn,ncol=2)
-    out[,1] <- x + a * cos(theta) * cos(alpha) - b * sin(theta) * sin(alpha)
-    out[,2] <- y + a * cos(theta) * sin(alpha) + b * sin(theta) * cos(alpha)
+    out[,1] <- x + a * cos(theta) * cos(beta) - b * sin(theta) * sin(beta)
+    out[,2] <- y + a * cos(theta) * sin(beta) + b * sin(theta) * cos(beta)
     colnames(out) <- c('x','y')
     out
 }
