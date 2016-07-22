@@ -35,7 +35,7 @@ isochron <- function(x,...){ UseMethod("isochron",x) }
 isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
-                             line.col='grey',lwd=2,...){
+                             line.col='red',lwd=2,...){
     fit <- yorkfit(x$X,x$Y,x$sX,x$sY,x$rXY)
     scatterplot(x,alpha=alpha,show.numbers=show.numbers,
                 ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
@@ -63,7 +63,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
 #' @export
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
-                          inverse=TRUE,line.col='grey',lwd=2,plot=TRUE,...){
+                          inverse=TRUE,line.col='red',lwd=2,plot=TRUE,...){
     d <- data2york(x,get.selection(x,inverse))
     if (inverse){
         fit <- yorkfit(d$Y,d$X,d$sY,d$sX,-d$rXY) # X and Y reversed!

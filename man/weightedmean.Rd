@@ -85,14 +85,14 @@ population is not overdispersed.
 }
 \description{
 Models the data as a Normal distribution with two sources of
-variance.  Estimates the mean and `overdispersion' using the method
+variance.  Estimates the mean and 'overdispersion' using the method
 of Maximum Likelihood. Computes the MSWD of a Normal fit without
 overdispersion. Implements Chauvenet's Criterion to detect and
 reject outliers.
 }
 \examples{
-data(examples)
-weightedmean(examples$ArAr)
-
+ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
+errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
+weightedmean(cbind(ages,errs))
 }
 

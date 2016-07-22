@@ -18,11 +18,20 @@
 #' @param x a scalar containing an isotopic ratio, a two element
 #'     vector containing an isotopic ratio and its standard error, or
 #'     an object of class \code{UPb} or \code{detritals}.
+#' 
 #' @param method one of either \code{'Pb206U238'}, \code{'Pb207U235'},
-#'     or \code{'Pb207Pb206'}
+#'     \code{'Pb207Pb206'} or \code{'Ar40Ar39'}
+#' 
 #' @param dcu propagate the decay constant uncertainties?
+#' 
+#' @param J two element vector with the J-factor and its standard
+#'     error.  This option is only used if \code{method} =
+#'     \code{'Ar40Ar39'}.
+#' 
 #' @param i (optional) index of a particular aliquot
+#' 
 #' @param ... optional arguments
+#' 
 #' @return if \code{x} is a scalar or a vector, returns the age using
 #'     the geochronometer given by \code{method} and its standard
 #'     error.
@@ -31,12 +40,17 @@
 age <- function(x,...){ UseMethod("age",x) }
 #' @rdname age
 #' @export
-age.default <- function(x,method='Pb206U238',dcu=TRUE,...){
+age.default <- function(x,method='Pb206U238',dcu=TRUE,J=c(NA,NA),...){
     if (length(x)==1) X <- c(x,0)
     else X <- x[1:2]
-    if (identical(method,'Pb207U235')) out <- get.Pb207U235age(X[1],X[2],dcu)
-    else if (identical(method,'Pb206U238')) out <- get.Pb206U238age(X[1],X[2],dcu)
-    else if (identical(method,'Pb207Pb206')) out <- get.Pb207Pb206age(X[1],X[2],dcu)
+    if (identical(method,'Pb207U235'))
+        out <- get.Pb207U235age(X[1],X[2],dcu)
+    else if (identical(method,'Pb206U238'))
+        out <- get.Pb206U238age(X[1],X[2],dcu)
+    else if (identical(method,'Pb207Pb206'))
+        out <- get.Pb207Pb206age(X[1],X[2],dcu)
+    else if (identical(method,'Ar40Ar39'))
+        out <- get.ArAr.age(X[1],X[2],J[1],J[2],dcu)
 }
 #' @param concordia scalar flag indicating whether each U-Pb analysis
 #'     should be considered separately (\code{concordia=1}), a

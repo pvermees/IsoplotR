@@ -29,14 +29,14 @@ print(lambda('U238'))
 }
 \references{
 U: Jaffey, A. H., et al. "Precision measurement of half-lives and
-specific activities of U 235 and U 238." Physical Review C 4.5 (1971): 1889.
+specific activities of U235 and U238." Physical Review C 4.5 (1971): 1889.
 
-Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of 232Th."
-Proceedings of the National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
+Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of 232Th.
+"Proceedings of the National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
 
-Ar: Renne, Paul R., et al. "Joint determination of 40K decay
-constants and 40Ar*/40K for the Fish Canyon sanidine standard,
-and improved accuracy for 40Ar/39Ar geochronology."
-Geochimica et Cosmochimica Acta 74.18 (2010): 5349-5367.
+Ar: Renne, Paul R., et al. "Response to the comment by WH Schwarz et al. on
+"Joint determination of 40K decay constants and 40Ar*/40K for the Fish Canyon
+sanidine standard, and improved accuracy for 40 Ar/39 Ar geochronology"
+by PR Renne et al.(2010)." Geochimica et Cosmochimica Acta 75.17 (2011): 5097-5100.
 }
 

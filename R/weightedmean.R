@@ -1,39 +1,17 @@
 #' Calculate the weighted mean age
 #'
 #' Models the data as a Normal distribution with two sources of
-#' variance.  Estimates the mean and `overdispersion' using the method
+#' variance.  Estimates the mean and 'overdispersion' using the method
 #' of Maximum Likelihood. Computes the MSWD of a Normal fit without
 #' overdispersion. Implements Chauvenet's Criterion to detect and
 #' reject outliers.
 #' 
-#' @rdname weightedmean
-#' @export
-weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
 #'     \code{UPb} OR an object of class \code{ArAr}
-#' 
-#' @param detect.outliers Boolean flag indicating whether outliers
-#'     should be detected and rejected using Chauvenet's Criterion.
-#'
-#' @param plot Boolean flag indicating whether the function should
-#'     produce graphical output or return numerical values to the
-#'     user.
-#'
-#' @param rect.col the fill colour of the rectangles used to show the
-#'     measurements or age estimates.
-#'
-#' @param outlier.col if \code{detect.outliers=TRUE}, the outliers are
-#'     given a different colour.
-#'
-#' @param sigdig the number of significant digits of the numerical
-#'     values reported in the title of the graphical output.
-#'
-#' @param alpha the confidence limits of the error bars/rectangles.
-#'
 #' @param ... optional arguments
-#'
-#' @return if \code{PLOT=FALSE}, returns a list with the follwing items:
+#' @return
+#' if \code{PLOT=FALSE}, returns a list with the follwing items:
 #'
 #' \code{mean:} a two element vector with the weighted mean and its
 #' standard error.
@@ -47,11 +25,22 @@ weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
 #' \code{p.value:} the p-value of a Chi-square test with n-1 degrees
 #' of freedom, testing the null hypothesis that the underlying
 #' population is not overdispersed.
-#'
-#' @examples
-#' data(examples)
-#' weightedmean(examples$ArAr)
-#'
+#' 
+#' @rdname weightedmean
+#' @export
+weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
+#' @param detect.outliers Boolean flag indicating whether outliers
+#'     should be detected and rejected using Chauvenet's Criterion.
+#' @param plot Boolean flag indicating whether the function should
+#'     produce graphical output or return numerical values to the
+#'     user.
+#' @param rect.col the fill colour of the rectangles used to show the
+#'     measurements or age estimates.
+#' @param outlier.col if \code{detect.outliers=TRUE}, the outliers are
+#'     given a different colour.
+#' @param sigdig the number of significant digits of the numerical
+#'     values reported in the title of the graphical output.
+#' @param alpha the confidence limits of the error bars/rectangles.
 #' @rdname weightedmean
 #' @export
 weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
@@ -62,7 +51,7 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     sX <- x[,2]
     ns <- length(X)
     if (detect.outliers){
-        avg <- mean(x[,1])
+        avg <- mean(X)
         prob <- stats::pnorm(X,mean=avg,sd=sX)
         valid <- (prob > 0.5/ns)
         fit <- get.weightedmean(X[valid],sX[valid])
@@ -84,7 +73,7 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
             graphics::rect(xleft=i-0.4,ybottom=X[i]-fact*sX[i],
                            xright=i+0.4,ytop=X[i]+fact*sX[i],col=col)
         }
-        title(weightedmean.title(fit,sigdig=sigdig))
+        title(wtdmean.title(fit,sigdig=sigdig))
     } else {
         return(fit)
     }
@@ -95,12 +84,10 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
 #'     (type=4), or the (Wetherill) concordia age (type=5)
-#' 
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
-#' 
 #' @param cutoff.disc two element vector with the maximum and minimum
 #'     percentage discordance allowed between the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
@@ -109,7 +96,12 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
-#' 
+#' @examples
+#' data(examples)
+#' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
+#' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
+#' weightedmean(cbind(ages,errs))
+#' #weightedmean(examples$UPb)
 #' @rdname weightedmean
 #' @export
 weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
@@ -118,7 +110,7 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
                              sigdig=2,type=4,cutoff.76=1100,
                              cutoff.disc=c(-15,5),...){
     tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                          cutoff.disc=cutoff.disc)
+                          cutoff.disc=cutoff.disc,dcu=FALSE)
     weightedmean.default(tt,detect.outliers=detect.outliers,
                          plot=plot, rect.col=rect.col,
                          outlier.col=outlier.col, sigdig=sigdig,...)
@@ -129,7 +121,7 @@ weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5),
                               sigdig=2,...){
-    tt <- ArAr.age(x)
+    tt <- ArAr.age(x,dcu=FALSE)
     weightedmean.default(tt,detect.outliers=detect.outliers,
                          plot=plot,rect.col=rect.col,
                          outlier.col=outlier.col,sigdig=sigdig,...)
@@ -158,7 +150,7 @@ LL.weightedmean <- function(MZ,X,sX){
     -sum(stats::dnorm(X,mean=M,sd=sqrt(sX^2+Z^2),log=TRUE))
 }
 
-weightedmean.title <- function(fit,sigdig=2){
+wtdmean.title <- function(fit,sigdig=2){
     rounded.mean <- roundit(fit$mean[1],fit$mean[2],sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
                         list(a=rounded.mean$x, b=rounded.mean$err))

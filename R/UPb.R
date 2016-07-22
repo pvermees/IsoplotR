@@ -206,8 +206,8 @@ dD76dR <- function(t.76,l5,l8,R){
     -el5t1/(el8t1*R^2)
 }
 
-filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5)){
-    tt <- UPb.age(x)
+filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),dcu=TRUE){
+    tt <- UPb.age(x,dcu=dcu)
     do.76 <- tt[,'t.68'] > cutoff.76
     if (any(is.na(cutoff.disc))) {
         is.concordant <- rep(TRUE,nrow(x))
