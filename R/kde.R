@@ -95,7 +95,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                    show.hist=TRUE, bty='n',binwidth=NA, ncol=NA,
+                    show.hist=TRUE, bty='n',binwidth=NA,ncol=NA,
                     type=4,cutoff.76=1100,cutoff.disc=c(-15,5),...){
     tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,

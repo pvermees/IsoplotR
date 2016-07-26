@@ -1,4 +1,5 @@
 age                     Calculate isotopic ages
+agespectrum             Plot a (^{40}Ar/^{39}Ar) release spectrum
 botev                   Compute the optimal kernel bandwidth
 cad                     Plot continuous data as cumulative age
                         distributions

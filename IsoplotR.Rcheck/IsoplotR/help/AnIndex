@@ -3,8 +3,15 @@ age.ArAr	age
 age.default	age
 age.detritals	age
 age.UPb	age
+agespectrum	agespectrum
+agespectrum.ArAr	agespectrum
+agespectrum.default	agespectrum
 botev	botev
 cad	cad
+cad.ArAr	cad
+cad.default	cad
+cad.detritals	cad
+cad.UPb	cad
 concordia	concordia
 ellipse	ellipse
 examples	examples

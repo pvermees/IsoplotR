@@ -5,7 +5,7 @@
 #' \code{yorkfit} function, and computes the corresponding isochron
 #' age, including decay constant uncertainties.
 #'
-#' @param x EITHER a list with the following vectors:
+#' @param x EITHER a list or a matrix with the following vectors:
 #'
 #' \code{X:} the x-variable
 #'
@@ -23,9 +23,12 @@
 #' @param ylim 2-element vector with the plot limits of the y-axis
 #' @param alpha confidence cutoff for the error ellipses
 #' @param show.numbers boolean flag (TRUE to show grain numbers)
+#' @param sigdig the number of significant digits of the numerical
+#'     values reported in the title of the graphical output
 #' @param ellipse.col background colour of the error ellipses
 #' @param line.col colour of the isochron line
 #' @param lwd line width
+#' @param title add a title to the plot?
 #' @param ... optional arguments
 #' @rdname isochron
 #' @export
@@ -33,13 +36,17 @@ isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
 isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
-                             show.numbers=FALSE,
+                             sigdig=2,show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
-                             line.col='red',lwd=2,...){
+                             line.col='red',lwd=2,title=TRUE,...){
+    if (is(x,'matrix') | is(x,'data.frame'))
+        x <- list(X=x[,1],sX=x[,2],Y=x[,3],sY=x[,4],rXY=x[,5])
     fit <- yorkfit(x$X,x$Y,x$sX,x$sY,x$rXY)
     scatterplot(x,alpha=alpha,show.numbers=show.numbers,
                 ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                 line.col=line.col,lwd=lwd)
+    if (title)
+        title(regression.title(fit,sigdig=sigdig),xlab='X',ylab='Y')
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
 #' @param inverse if \code{TRUE}, plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
@@ -61,7 +68,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
 #' isochron(examples$ArAr)
 #' @rdname isochron
 #' @export
-isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,
+isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=sigdig,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,...){
     d <- data2york(x,get.selection(x,inverse))
@@ -89,9 +96,9 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,
     if (plot) {
         isochron.default(d,alpha=alpha,show.numbers=show.numbers,
                          ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
-                         line.col=line.col,lwd=lwd)
+                         line.col=line.col,lwd=lwd,title=FALSE)
         tt <- roundit(out$age[1],out$age[2])
-        title(isochron.title(out),xlab=x.lab,ylab=y.lab)
+        title(isochron.title(out,sigdig=2),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -103,12 +110,24 @@ get.limits <- function(X,sX){
     c(minx,maxx)
 }
 
-isochron.title <- function(fit){
-    rounded.age <- roundit(fit$age[1],fit$age[2])
-    rounded.intercept <- roundit(fit$y0[1],fit$y0[2])
+isochron.title <- function(fit,sigdig=2){
+    rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
+    rounded.intercept <- roundit(fit$y0[1],fit$y0[2],sigdig=sigdig)
     line1 <- substitute('age ='~a%+-%b~'(1'~sigma~'), intercept ='~c%+-%d~'(1'~sigma~')',
                         list(a=rounded.age$x, b=rounded.age$err,
                              c=rounded.intercept$x, d=rounded.intercept$err))
+    line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+                        list(a=signif(fit$mswd,2), b=signif(fit$p.value,2)))
+    graphics::mtext(line1,line=1)
+    graphics::mtext(line2,line=0)
+}
+
+regression.title <- function(fit,sigdig=2){
+    intercept <- roundit(fit$a[1],fit$a[2],sigdig=sigdig)
+    slope <- roundit(fit$b[1],fit$b[2],sigdig=sigdig)
+    line1 <- substitute('slope ='~a%+-%b~'(1'~sigma~'), intercept ='~c%+-%d~'(1'~sigma~')',
+                        list(a=slope$x, b=slope$err,
+                             c=intercept$x, d=intercept$err))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,2), b=signif(fit$p.value,2)))
     graphics::mtext(line1,line=1)

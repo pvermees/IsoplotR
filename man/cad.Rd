@@ -2,21 +2,34 @@
 % Please edit documentation in R/cad.R
 \name{cad}
 \alias{cad}
+\alias{cad.ArAr}
+\alias{cad.UPb}
+\alias{cad.default}
+\alias{cad.detritals}
 \title{Plot continuous data as cumulative age distributions}
 \usage{
-cad(x, method = NA, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+cad(x, ...)
+
+\method{cad}{default}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   colmap = "heat.colors", col = "black", ...)
+
+\method{cad}{detritals}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  colmap = "heat.colors", ...)
+
+\method{cad}{UPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
+  ...)
+
+\method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", ...)
 }
 \arguments{
-\item{x}{an object of class \code{UPb} or \code{detritals}}
+\item{x}{a numerical vector OR an object of class \code{UPb} or
+\code{detritals}}
 
-\item{method}{a string indicating what kind of age should be plotted.
+\item{...}{optional arguments to the generic \code{plot} function}
 
-If \code{x} has class \code{UPb}, \code{type} could be one of
-either \code{t.75}, \code{t.68} (default), \code{t.76} or
-\code{t.conc}}
-
-\item{pch}{(optional) plot character}
+\item{pch}{plot character to mark the beginning of each CAD step}
 
 \item{verticals}{boolean flag indicating if the horizontal lines of
 the CAD should be connected by vertical lines}
@@ -31,7 +44,26 @@ of class \code{detritals}.}
 \item{col}{colour to give to single sample datasets (i.e. not of
 class \code{detritals})}
 
-\item{...}{optional arguments to the generic \code{plot} function}
+\item{type}{scalar indicating whether to plot the
+\eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
+\eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
+(type=4), or the (Wetherill) concordia age (type=5)}
+
+\item{cutoff.76}{the age (in Ma) below which the
+\eqn{^{206}}Pb/\eqn{^{238}}U and above which the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
+only used if \code{type=4}.}
+
+\item{cutoff.disc}{two element vector with the maximum and minimum
+percentage discordance allowed between the
+\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
+age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
+the \eqn{^{206}}Pb/\eqn{^{238}}U and
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
+\eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+\code{cutoff.disc=NA} if you do not want to use this filter.}
 }
 \description{
 Plot a dataset as a Cumulative Age Distribution (CAD), also known
@@ -39,6 +71,6 @@ as a `empirical cumulative distribution function'.
 }
 \examples{
 data(examples)
-cad(examples$DZ)
+cad(examples$DZ,verticals=FALSE,pch=20)
 }
 

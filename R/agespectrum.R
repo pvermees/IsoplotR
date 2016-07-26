@@ -22,10 +22,24 @@
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
 #'     NOT belong to the plateau are given a different colour.
 #' @param sigdig the number of significant digits of the numerical
-#'     values reported in the title of the graphical output
-#'     (only used if \code{plateau=FALSE}).
+#'     values reported in the title of the graphical output (only used
+#'     if \code{plateau=FALSE}).
 #' @param line.col colour of the isochron line
 #' @param lwd line width
+#' @param title add a title to the plot? If \code{FALSE}, returns a
+#'     list with plateau parameters.
+#' @param ... optional parameters to the generic plot function
+#' @return
+#' if \code{title=FALSE}, a list with the following items:
+#'
+#' \code{mean} a 2-element vector with the plateau mean and standard error
+#'
+#' \code{mswd} the mean square of the weighted deviates of the plateau
+#'
+#' \code{p.value} the p-value of a Chi-square test with n-1 degrees of
+#' freedom, where n is the number of steps in the plateau.n
+#'
+#' \code{fract} the fraction of \eqn{^{39}Ar} contained in the plateau
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
@@ -34,7 +48,8 @@ agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 plateau.col=rgb(0,1,0,0.5),
                                 non.plateau.col=rgb(0,1,1,0.5),
-                                sigdig=2,line.col='red',lwd=2,...){
+                                sigdig=2,line.col='red',lwd=2,
+                                title=TRUE,...){
     ns <- nrow(x)
     X <- c(0,cumsum(x[,1])/sum(x[,1]))
     Y <- x[,2]
@@ -42,20 +57,21 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     fact <- stats::qnorm(1-alpha/2)
     maxY <- max(Y+fact*sY)
     minY <- min(Y-fact*sY)
-    plot(c(0,1),c(minY,maxY),type='n',...)
+    graphics::plot(c(0,1),c(minY,maxY),type='n',...)
+    plat <- plateau(x,alpha=alpha)
     if (plateau) {
-        plat <- plateau(x,alpha=alpha)
         colour <- rep(non.plateau.col,ns)
         colour[plat$i] <- plateau.col
-        title(plateau.title(plat,sigdig=sigdig))
-        lines(c(0,1),rep(plat$mean[1],2),col=line.col,lwd=lwd)
+        graphics::lines(c(0,1),rep(plat$mean[1],2),col=line.col,lwd=lwd)
     } else {
         colour <- rep(plateau.col,ns)
     }
     for (i in 1:ns){
-        rect(X[i],Y[i]-fact*sY[i],X[i+1],Y[i]+fact*sY[i],col=colour[i])
-        if (i<ns) lines(rep(X[i+1],2),c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
+        graphics::rect(X[i],Y[i]-fact*sY[i],X[i+1],Y[i]+fact*sY[i],col=colour[i])
+        if (i<ns) graphics::lines(rep(X[i+1],2),c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
     }
+    if (title) title(plateau.title(plat,sigdig=sigdig))
+    else return(plat)
 }
 #' @param dcu propagate the decay constant uncertainties?
 #' @examples
@@ -67,16 +83,23 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              plateau.col=rgb(0,1,0,0.5),
                              non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
                              dcu=TRUE,line.col='red',lwd=2,...){
-    tt <- age(x,dcu=FALSE)
+    tt <- ArAr.age(x,jcu=FALSE,dcu=FALSE)
     if (x$format==2){
         X <- cbind(x$x[,'Ar39'],tt)
     } else {
         X <- cbind(seq(0,1,length.out=nrow(x$x)),tt)
     }
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
-    agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
-                        plateau=TRUE,sigdig=sigdig,line.col=line.col,
-                        lwd=lwd,...)
+    plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
+                                plateau=plateau,sigdig=sigdig,line.col=line.col,
+                                lwd=lwd,title=FALSE,...)
+    # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
+    R <- get.ArAr.ratio(plat$mean[1],plat$mean[2],x$J[1],0,dcu=FALSE)
+    # recalculate the weighted mean age, this time taking into account decay and J uncertainties
+    plat$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],dcu=dcu)
+    if (plateau){
+        title(plateau.title(plat,sigdig=sigdig))
+    }
 }
 
 # x is a three column vector with Ar39 cumulative fractions, ages and uncertainties

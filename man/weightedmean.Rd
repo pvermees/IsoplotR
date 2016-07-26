@@ -15,11 +15,12 @@ weightedmean(x, ...)
 
 \method{weightedmean}{UPb}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5), ...)
+  sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
+  alpha = 0.05, ...)
 
 \method{weightedmean}{ArAr}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, ...)
+  sigdig = 2, alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
@@ -82,6 +83,9 @@ standard error.
 \code{p.value:} the p-value of a Chi-square test with n-1 degrees
 of freedom, testing the null hypothesis that the underlying
 population is not overdispersed.
+
+\code{valid:} vector of Boolean flags indicating which steps are
+included into the weighted mean calculation
 }
 \description{
 Models the data as a Normal distribution with two sources of
@@ -91,8 +95,10 @@ overdispersion. Implements Chauvenet's Criterion to detect and
 reject outliers.
 }
 \examples{
+data(examples)
 ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
-weightedmean(cbind(ages,errs))
+#weightedmean(cbind(ages,errs))
+weightedmean(examples$ArAr)
 }
 

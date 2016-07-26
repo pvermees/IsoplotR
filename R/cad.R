@@ -33,7 +33,7 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @rdname cad
 #' @export
 cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                          colmap='heat.colors',col='black',...){
+                          colmap='heat.colors',...){
     ns <- length(x)
     snames <- names(x)
     col <- do.call(colmap,list(ns))
@@ -69,14 +69,12 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     col='black',type=4,cutoff.76=1100,
                     cutoff.disc=c(-15,5),...){
     tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                colmap=colmap,col=col,...)
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
 #' @rdname cad
 #' @export
 cad.ArAr <- function(x,pch=NA,verticals=TRUE,
                      xlab='age [Ma]',col='black',...){
     tt <- ArAr.age(x)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,
-                xlab=xlab,colmap=colmap,col=col,...)
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }

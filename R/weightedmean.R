@@ -25,6 +25,9 @@
 #' \code{p.value:} the p-value of a Chi-square test with n-1 degrees
 #' of freedom, testing the null hypothesis that the underlying
 #' population is not overdispersed.
+#'
+#' \code{valid:} vector of Boolean flags indicating which steps are
+#' included into the weighted mean calculation
 #' 
 #' @rdname weightedmean
 #' @export
@@ -50,30 +53,17 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     X <- x[,1]
     sX <- x[,2]
     ns <- length(X)
+    valid <- rep(TRUE,ns)
     if (detect.outliers){
         avg <- mean(X)
         prob <- stats::pnorm(X,mean=avg,sd=sX)
         valid <- (prob > 0.5/ns)
-        fit <- get.weightedmean(X[valid],sX[valid])
-    } else {
-        fit <- get.weightedmean(X,sX)
-        valid <- rep(TRUE,ns)
     }
-    fact <- stats::qnorm(1-alpha/2)
+    fit <- get.weightedmean(X,sX,valid)
     if (plot){
-        minX <- min(X-fact*sX)
-        maxX <- max(X+fact*sX)
-        graphics::plot(c(0,ns+1),c(minX,maxX),type='n',axes=FALSE,xlab='N',ylab='')
-        graphics::lines(c(0,ns+1),c(fit$mean[1],fit$mean[1]))
-        graphics::axis(side=1,at=1:ns)
-        graphics::axis(side=2)
-        for (i in 1:ns){
-            if (valid[i]) col <- rect.col
-            else col <- outlier.col
-            graphics::rect(xleft=i-0.4,ybottom=X[i]-fact*sX[i],
-                           xright=i+0.4,ytop=X[i]+fact*sX[i],col=col)
-        }
-        title(wtdmean.title(fit,sigdig=sigdig))
+        plot.weightedmean(X,sX,fit,rect.col=rect.col,
+                          outlier.col=outlier.col,sigdig=sigdig,
+                          alpha=alpha,...)
     } else {
         return(fit)
     }
@@ -97,37 +87,62 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
 #' @examples
-#' data(examples)
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
 #' weightedmean(cbind(ages,errs))
-#' #weightedmean(examples$UPb)
+#' #data(examples)
+#' #weightedmean(examples$ArAr)
 #' @rdname weightedmean
 #' @export
 weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
                              rect.col=rgb(0,1,0,0.5),
                              outlier.col=rgb(0,1,1,0.5),
                              sigdig=2,type=4,cutoff.76=1100,
-                             cutoff.disc=c(-15,5),...){
+                             cutoff.disc=c(-15,5),alpha=0.05,...){
+    # first ignore decay uncertainties
     tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                           cutoff.disc=cutoff.disc,dcu=FALSE)
-    weightedmean.default(tt,detect.outliers=detect.outliers,
-                         plot=plot, rect.col=rect.col,
-                         outlier.col=outlier.col, sigdig=sigdig,...)
+    # calculate weighted mean age
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    # get weighted mean U-Pb ratios from the weighted mean age
+    X <- get.ratios.UPb(tt=fit$mean[1],st=fit$mean[2],dcu=TRUE,as.UPb=TRUE)
+    # recalculate the age, this time taking into account decay constant uncertainties
+    fit$mean <- filter.UPb.ages(X,type=type,cutoff.76=cutoff.76,
+                          cutoff.disc=cutoff.disc,dcu=TRUE)
+    if (plot){
+        plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
+                          outlier.col=outlier.col,sigdig=sigdig,
+                          alpha=alpha)
+    } else {
+        return(fit)
+    }
 }
 #' @rdname weightedmean
 #' @export
 weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5),
-                              sigdig=2,...){
-    tt <- ArAr.age(x,dcu=FALSE)
-    weightedmean.default(tt,detect.outliers=detect.outliers,
-                         plot=plot,rect.col=rect.col,
-                         outlier.col=outlier.col,sigdig=sigdig,...)
+                              sigdig=2,alpha=0.05,...){
+    # first ignore J-constant uncertainties (systematic error)
+    tt <- ArAr.age(x,jcu=FALSE,dcu=FALSE)
+    # calculated weighted mean age ignoring decay constant and J uncertainties
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
+    R <- get.ArAr.ratio(fit$mean[1],fit$mean[2],x$J[1],0,dcu=FALSE)
+    # recalculate the weighted mean age, this time taking into account decay and J uncertainties
+    fit$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],dcu=dcu)
+    if (plot){
+        plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
+                          outlier.col=outlier.col,sigdig=sigdig,
+                          alpha=alpha)
+    } else {
+        return(fit)
+    }
 }
 
-get.weightedmean <- function(X,sX){
+get.weightedmean <- function(X,sX,valid=TRUE){
+    X <- X[valid]
+    sX <- sX[valid]
     MZ <- c(mean(X),stats::sd(X))
     fit <- stats::optim(MZ,LL.weightedmean,X=X,sX=sX,
                         method='BFGS',hessian=TRUE)
@@ -139,6 +154,7 @@ get.weightedmean <- function(X,sX){
     SS <- sum(((X-out$mean[1])/sX)^2)
     out$mswd <- SS/df
     out$p.value <- 1-pchisq(SS,df)
+    out$valid <- valid
     out
 }
 
@@ -165,4 +181,24 @@ wtdmean.title <- function(fit,sigdig=2){
                             list(a=rounded.disp$x, b=rounded.disp$err))
         graphics::mtext(line3,line=0)
     }
+}
+
+plot.weightedmean <- function(X,sX,fit,rect.col=rgb(0,1,0,0.5),
+                              outlier.col=rgb(0,1,1,0.5),sigdig=2,
+                              alpha=0.05){
+    ns <- length(X)
+    fact <- stats::qnorm(1-alpha/2)
+    minX <- min(X-fact*sX)
+    maxX <- max(X+fact*sX)
+    graphics::plot(c(0,ns+1),c(minX,maxX),type='n',axes=FALSE,xlab='N',ylab='')
+    graphics::lines(c(0,ns+1),c(fit$mean[1],fit$mean[1]))
+    graphics::axis(side=1,at=1:ns)
+    graphics::axis(side=2)
+    for (i in 1:ns){
+        if (fit$valid[i]) col <- rect.col
+        else col <- outlier.col
+        graphics::rect(xleft=i-0.4,ybottom=X[i]-fact*sX[i],
+                       xright=i+0.4,ytop=X[i]+fact*sX[i],col=col)
+    }
+    title(wtdmean.title(fit,sigdig=sigdig))
 }

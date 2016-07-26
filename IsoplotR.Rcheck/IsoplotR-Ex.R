@@ -39,6 +39,26 @@ print(age(examples$UPb,concordia=2))
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("agespectrum")
+### * agespectrum
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: agespectrum
+### Title: Plot a (^{40}Ar/^{39}Ar) release spectrum
+### Aliases: agespectrum agespectrum.ArAr agespectrum.default
+
+### ** Examples
+
+data(examples)
+agespectrum(examples$ArAr)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("agespectrum", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("botev")
 ### * botev
 
@@ -69,12 +89,12 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
-### Aliases: cad
+### Aliases: cad cad.ArAr cad.UPb cad.default cad.detritals
 
 ### ** Examples
 
 data(examples)
-cad(examples$DZ)
+cad(examples$DZ,verticals=FALSE,pch=20)
 
 
 
@@ -289,9 +309,11 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
+data(examples)
 ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
-weightedmean(cbind(ages,errs))
+#weightedmean(cbind(ages,errs))
+weightedmean(examples$ArAr)
 
 
 

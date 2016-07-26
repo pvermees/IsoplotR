@@ -9,15 +9,15 @@
 isochron(x, ...)
 
 \method{isochron}{default}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "grey", lwd = 2, ...)
+  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  line.col = "red", lwd = 2, title = TRUE, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5), inverse = TRUE,
-  line.col = "grey", lwd = 2, plot = TRUE, ...)
+  sigdig = sigdig, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE, ...)
 }
 \arguments{
-\item{x}{EITHER a list with the following vectors:
+\item{x}{EITHER a list or a matrix with the following vectors:
 
 \code{X:} the x-variable
 
@@ -39,6 +39,9 @@ OR an object of class \code{ArAr}}
 
 \item{alpha}{confidence cutoff for the error ellipses}
 
+\item{sigdig}{the number of significant digits of the numerical
+values reported in the title of the graphical output}
+
 \item{show.numbers}{boolean flag (TRUE to show grain numbers)}
 
 \item{ellipse.col}{background colour of the error ellipses}
@@ -46,6 +49,8 @@ OR an object of class \code{ArAr}}
 \item{line.col}{colour of the isochron line}
 
 \item{lwd}{line width}
+
+\item{title}{add a title to the plot?}
 
 \item{inverse}{if \code{TRUE}, plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
 vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar. If \code{FALSE}, plots
