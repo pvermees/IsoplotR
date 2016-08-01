@@ -16,11 +16,11 @@ weightedmean(x, ...)
 \method{weightedmean}{UPb}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
-  alpha = 0.05, ...)
+  alpha = 0.05, dcu = TRUE, ...)
 
 \method{weightedmean}{ArAr}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ...)
+  sigdig = 2, alpha = 0.05, dcu = TRUE, ...)
 }
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
@@ -67,6 +67,8 @@ the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
+
+\item{dcu}{propagate decay constant uncertainty?}
 }
 \value{
 if \code{PLOT=FALSE}, returns a list with the follwing items:
@@ -92,13 +94,15 @@ Models the data as a Normal distribution with two sources of
 variance.  Estimates the mean and 'overdispersion' using the method
 of Maximum Likelihood. Computes the MSWD of a Normal fit without
 overdispersion. Implements Chauvenet's Criterion to detect and
-reject outliers.
+reject outliers. Only propagates the analytical uncertainty
+associated with decay constants and J-factors after computing the
+weighted mean isotopic composition.
 }
 \examples{
-data(examples)
 ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
-#weightedmean(cbind(ages,errs))
-weightedmean(examples$ArAr)
+weightedmean(cbind(ages,errs))
+#data(examples)
+#weightedmean(examples$ArAr)
 }
 

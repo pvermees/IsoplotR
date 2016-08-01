@@ -42,12 +42,18 @@ settings <- function(fname=NULL){
 #' specific activities of U235 and U238." Physical Review C 4.5 (1971): 1889.
 #'
 #' Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of 232Th.
-#' "Proceedings of the National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
+#' "Proceedings of the National Meeting on Nuclear Energy, Pretoria,
+#' South Africa. 1963.
+#'
+#' Sm: Lugmair, G. W., and K. Marti. "Lunar initial 143Nd/144Nd: differential
+#' evolution of the lunar crust and mantle." Earth and Planetary Science
+#' Letters 39.3 (1978): 349-357.
 #' 
 #' Ar: Renne, Paul R., et al. "Response to the comment by WH Schwarz et al. on
 #' "Joint determination of 40K decay constants and 40Ar*/40K for the Fish Canyon
 #' sanidine standard, and improved accuracy for 40 Ar/39 Ar geochronology"
 #' by PR Renne et al.(2010)." Geochimica et Cosmochimica Acta 75.17 (2011): 5097-5100.
+#'
 #' @export
 lambda <- function(nuclide,x=NULL,e=NULL){
     if (is.null(x) & is.null(e)) return(.IsoplotR$lambda[[nuclide]])
@@ -86,6 +92,10 @@ lambda <- function(nuclide,x=NULL,e=NULL){
 #' Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
 #' weight of a reference sample of strontium." J. Res. Natl.Bur. Stand.
 #' 87.1 (1982): 1-8.
+#'
+#' Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic
+#' weight of samarium." International Journal of Mass Spectrometry 218.2
+#' (2002): 167-172.
 #'
 #' Re: Gramlich, John W., et al. "Absolute isotopic abundance ratio and
 #' atomic weight of a reference sample of rhenium." J. Res. Natl. Bur.

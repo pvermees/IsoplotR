@@ -15,12 +15,26 @@
 #' taking into account error correlations and decay constant
 #' uncertainties.
 #'
-#' @param x a scalar containing an isotopic ratio, a two element
-#'     vector containing an isotopic ratio and its standard error, or
-#'     an object of class \code{UPb} or \code{detritals}.
+#' @param x can be:
+#'
+#' a scalar containing an isotopic ratio,
+#'
+#' a two element vector containing an isotopic ratio and its standard error,
+#'
+#' a four element vector containing \code{Ar40Ar39}, \code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
+#'
+#' an six element vector containing \code{U}, \code{s[U]}, \code{Th},
+#' \code{s[Th]}, \code{He} and \code{s[He]}
+#'
+#' an eight element vector containing \code{U}, \code{s[U]}, \code{Th},
+#' \code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and \code{s[Sm]},
+#'
+#' OR
+#' 
+#' an object of class \code{UPb}, \code{ArAr} or \code{UThHe}.
 #' 
 #' @param method one of either \code{'Pb206U238'}, \code{'Pb207U235'},
-#'     \code{'Pb207Pb206'} or \code{'Ar40Ar39'}
+#'     \code{'Pb207Pb206'}, \code{'Ar40Ar39'} or \code{U-Th-He}
 #' 
 #' @param dcu propagate the decay constant uncertainties?
 #' 
@@ -50,7 +64,13 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,J=c(NA,NA),...){
     else if (identical(method,'Pb207Pb206'))
         out <- get.Pb207Pb206age(X[1],X[2],dcu)
     else if (identical(method,'Ar40Ar39'))
-        out <- get.ArAr.age(X[1],X[2],J[1],J[2],dcu)
+        out <- get.ArAr.age(X[1],X[2],X[3],X[4],dcu)
+    else if (identical(method,'U-Th-He'))
+        if (length(x)==6)
+            out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
+        else if (length(x)==8)
+            out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6],X[7],X[8])
+    out
 }
 #' @param concordia scalar flag indicating whether each U-Pb analysis
 #'     should be considered separately (\code{concordia=1}), a
@@ -139,6 +159,14 @@ age.detritals <- function(x,...){
 #' @rdname age
 #' @export
 age.ArAr <- function(x,isochron=FALSE,dcu=TRUE,i=NA,sigdig=2,...){
+    if (isochron){
+        out <- isochron(x,plot=FALSE,sigdig=sigdig)
+    } else {
+        out <- ArAr.age(x,dcu=dcu,i=i,sigdig=sigdig,...)
+    }
+    out
+}
+age.UThHe <- function(x,i=NA,sigdig=2,...){
     if (isochron){
         out <- isochron(x,plot=FALSE,sigdig=sigdig)
     } else {

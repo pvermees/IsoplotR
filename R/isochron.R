@@ -39,12 +39,12 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              sigdig=2,show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='red',lwd=2,title=TRUE,...){
-    if (is(x,'matrix') | is(x,'data.frame'))
+    if (methods::is(x,'matrix') | methods::is(x,'data.frame'))
         x <- list(X=x[,1],sX=x[,2],Y=x[,3],sY=x[,4],rXY=x[,5])
     fit <- yorkfit(x$X,x$Y,x$sX,x$sY,x$rXY)
-    scatterplot(x,alpha=alpha,show.numbers=show.numbers,
-                ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
-                line.col=line.col,lwd=lwd)
+    scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
+                show.numbers=show.numbers, ellipse.col=ellipse.col,
+                a=fit$a[1],b=fit$b[1], line.col=line.col,lwd=lwd)
     if (title)
         title(regression.title(fit,sigdig=sigdig),xlab='X',ylab='Y')
 }

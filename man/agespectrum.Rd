@@ -10,7 +10,7 @@ agespectrum(x, ...)
 
 \method{agespectrum}{default}(x, alpha = 0.05, plateau = TRUE,
   plateau.col = rgb(0, 1, 0, 0.5), non.plateau.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, line.col = "red", lwd = 2, ...)
+  sigdig = 2, line.col = "red", lwd = 2, title = TRUE, ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
   plateau.col = rgb(0, 1, 0, 0.5), non.plateau.col = rgb(0, 1, 1, 0.5),
@@ -41,19 +41,36 @@ the steps belonging to the age plateau.}
 NOT belong to the plateau are given a different colour.}
 
 \item{sigdig}{the number of significant digits of the numerical
-values reported in the title of the graphical output
-(only used if \code{plateau=FALSE}).}
+values reported in the title of the graphical output (only used
+if \code{plateau=FALSE}).}
 
 \item{line.col}{colour of the isochron line}
 
 \item{lwd}{line width}
 
+\item{title}{add a title to the plot? If \code{FALSE}, returns a
+list with plateau parameters.}
+
 \item{dcu}{propagate the decay constant uncertainties?}
+}
+\value{
+if \code{title=FALSE}, a list with the following items:
+
+\code{mean} a 2-element vector with the plateau mean and standard error
+
+\code{mswd} the mean square of the weighted deviates of the plateau
+
+\code{p.value} the p-value of a Chi-square test with n-1 degrees of
+freedom, where n is the number of steps in the plateau.n
+
+\code{fract} the fraction of \eqn{^{39}Ar} contained in the plateau
 }
 \description{
 Produces a plot of boxes whose widths correspond to the cumulative
 amount of \eqn{^{39}}Ar (or any other volume proxy), and whose
-heights express the analytical uncertainties.
+heights express the analytical uncertainties.  Only propagates the
+analytical uncertainty associated with decay constants and
+J-factors after computing the plateau composition.
 }
 \examples{
 data(examples)

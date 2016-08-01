@@ -2,7 +2,9 @@
 #'
 #' Produces a plot of boxes whose widths correspond to the cumulative
 #' amount of \eqn{^{39}}Ar (or any other volume proxy), and whose
-#' heights express the analytical uncertainties.
+#' heights express the analytical uncertainties.  Only propagates the
+#' analytical uncertainty associated with decay constants and
+#' J-factors after computing the plateau composition.
 #'
 #' @param x a three column matrix whose first column gives the amount
 #'     of \eqn{^{39}}Ar in each aliquot, and whose second and third
@@ -76,7 +78,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 #' @param dcu propagate the decay constant uncertainties?
 #' @examples
 #' data(examples)
-#' agespectrum(examples$ArAr)
+#' agespectrum(examples$ArAr,ylim=c(0,80))
 #' @rdname agespectrum
 #' @export
 agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,

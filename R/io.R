@@ -13,23 +13,27 @@
 #'     one of either:
 #' 
 #' \code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]
-#' 
-#' (other formats will be added later)
+#'
+#' If \code{method = 'Ar-Ar'}, then \code{format} is one of either:
+#'
+#' \code{1}: 39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]
+#'
+#' \code{2}: 39, 39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]
+#'
 #' @param ... optional arguments to the \code{read.csv} function
 #' @return an object of class \code{'UPb'}, \code{'ArAr'},
 #'     \code{'RbSr'}, \code{'SmNd'}, \code{'ReOs'}, \code{'UThHe'},
 #'     \code{'fission'}, \code{'cosmogenics'}, or \code{'other'}
 #' @examples
 #' # load one of the built-in .csv files:
-#' data(examples)#fname <- system.file("UPb.csv",package="IsoplotR")
-#' #UPb <- read.data(fname,'U-Pb')
+#' data(examples)
 #' concordia(examples$UPb)
 #' @rdname read.data
 #' @export
 read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
-read.data.default <- function(x,method='Pb206U238',format=1,...){
+read.data.default <- function(x,method='U-Pb',format=1,...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
     read.data.matrix(X,method=method,format=format)
 }
@@ -40,10 +44,12 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.UPb(x,format)
     } else if (identical(method,'Ar-Ar')){
         out <- as.ArAr(x,format)
+    } else if (identical(method,'U-Th-He')){
+        out <- as.UThHe(x)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     } else if (identical(method,'other')){
-        out <- x
+        out <- matrix(as.numeric(x),ncol=ncol(x))
     }
     out
 }
@@ -72,7 +78,7 @@ as.UPb <- function(x,format=1){
     }
     out
 }
-as.ArAr <- function(x,format=1){
+as.ArAr <- function(x,format=2){
     out <- list()
     class(out) <- "ArAr"
     out$format <- format
@@ -106,6 +112,14 @@ as.ArAr <- function(x,format=1){
                              'Ar39Ar36','errAr39Ar36',
                              'Ar40Ar36','errAr40Ar36')
     }
+    out
+}
+as.UThHe <- function(x){
+    nc <- ncol(x)
+    nr <- nrow(x)
+    out <- matrix(as.numeric(x[2:nr,]),nr-1,nc)
+    class(out) <- "UThHe"
+    colnames(out) <- c('U','errU','Th','errTh','Sm','errSm','He','errHe')
     out
 }
 as.detritals <- function(x){

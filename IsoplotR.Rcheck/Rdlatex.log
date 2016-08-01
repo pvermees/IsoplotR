@@ -87,16 +87,16 @@ LaTeX Warning: Command \textasciicircum invalid in math mode on input line 177.
 
 
 [3]
-Overfull \hbox (15.94826pt too wide) in paragraph at lines 217--221
+Overfull \hbox (15.94826pt too wide) in paragraph at lines 219--223
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether a plateau age should be cal
 -cu-lated if \T1/zi4/m/n/10 plateau=TRUE\T1/ptm/m/n/10 ,
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [4]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [5]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [6]
+[4] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [5] [6]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [7]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [8]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (3.87054pt too wide) in paragraph at lines 531--536
+Overfull \hbox (3.87054pt too wide) in paragraph at lines 549--554
 []\T1/ptm/m/n/10 one of ei-ther \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U238U235\TS1/zi
 4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar40Ar36\TS1/zi4/m/n
 /10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar38Ar36\TS1/zi4/m/n/10 '
@@ -104,22 +104,22 @@ Overfull \hbox (3.87054pt too wide) in paragraph at lines 531--536
 tm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr88Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 ,
 
-Overfull \hbox (47.15097pt too wide) in paragraph at lines 531--536
+Overfull \hbox (47.15097pt too wide) in paragraph at lines 549--554
 \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr87Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/
 zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 Re185Re187\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/
 10 '\T1/zi4/m/n/10 Os184Os192\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 
 '\T1/zi4/m/n/10 Os186Os192\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T
 1/zi4/m/n/10 Os187Os192\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 ,
-
-Overfull \hbox (3.06654pt too wide) in paragraph at lines 550--552
+[9]
+Overfull \hbox (3.06654pt too wide) in paragraph at lines 568--570
 []\T1/ptm/m/n/10 Ar: Lee, Jee-Yon, et al. "A re-de-ter-mi-na-tion of the iso-to
 pic abun-dances of at-mo-spheric Ar." Geochim-
-[9] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [11] [12] [13]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10] [11]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [12] [13]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [14]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (32.24094pt too wide) in paragraph at lines 917--921
+Overfull \hbox (32.24094pt too wide) in paragraph at lines 935--939
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Rb-Sr\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \
@@ -127,7 +127,7 @@ TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sm-Nd\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/
 m/n/10 '\T1/zi4/m/n/10 Re-Os\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '
 \T1/zi4/m/n/10 U-Th-He\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi
 4/m/n/10 fission tracks\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 ,
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [15]
+[15] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [16] [17]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [18]
 No file Rd2.ind.
@@ -143,13 +143,14 @@ ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
 ta/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/In
 consolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
-utmri8a.pfb>
-Output written on Rd2.pdf (19 pages, 125786 bytes).
+m/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr1
+0.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
+rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
+a.pfb>
+Output written on Rd2.pdf (19 pages, 133630 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2013] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (15 entries accepted, 0 rejected).
@@ -244,7 +245,7 @@ LaTeX Warning: Command \textasciicircum invalid in math mode on input line 177.
 
 
 [3]
-Overfull \hbox (15.94826pt too wide) in paragraph at lines 217--221
+Overfull \hbox (15.94826pt too wide) in paragraph at lines 219--223
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether a plateau age should be cal
 -cu-lated if \T1/zi4/m/n/10 plateau=TRUE\T1/ptm/m/n/10 ,
 [4] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
@@ -253,7 +254,7 @@ Overfull \hbox (15.94826pt too wide) in paragraph at lines 217--221
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [8]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (3.87054pt too wide) in paragraph at lines 531--536
+Overfull \hbox (3.87054pt too wide) in paragraph at lines 549--554
 []\T1/ptm/m/n/10 one of ei-ther \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U238U235\TS1/zi
 4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar40Ar36\TS1/zi4/m/n
 /10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar38Ar36\TS1/zi4/m/n/10 '
@@ -261,7 +262,7 @@ Overfull \hbox (3.87054pt too wide) in paragraph at lines 531--536
 tm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr88Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 ,
 
-Overfull \hbox (47.15097pt too wide) in paragraph at lines 531--536
+Overfull \hbox (47.15097pt too wide) in paragraph at lines 549--554
 \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr87Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/
 zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 Re185Re187\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/
@@ -269,14 +270,14 @@ zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
 '\T1/zi4/m/n/10 Os186Os192\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T
 1/zi4/m/n/10 Os187Os192\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 ,
 [9]
-Overfull \hbox (3.06654pt too wide) in paragraph at lines 550--552
+Overfull \hbox (3.06654pt too wide) in paragraph at lines 568--570
 []\T1/ptm/m/n/10 Ar: Lee, Jee-Yon, et al. "A re-de-ter-mi-na-tion of the iso-to
 pic abun-dances of at-mo-spheric Ar." Geochim-
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10] [11]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [12] [13]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [14]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (32.24094pt too wide) in paragraph at lines 917--921
+Overfull \hbox (32.24094pt too wide) in paragraph at lines 935--939
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Rb-Sr\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \
@@ -299,13 +300,14 @@ ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
 ta/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/In
 consolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
-utmri8a.pfb>
-Output written on Rd2.pdf (20 pages, 128339 bytes).
+m/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr1
+0.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
+rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
+a.pfb>
+Output written on Rd2.pdf (20 pages, 136636 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2013] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (15 entries accepted, 0 rejected).
@@ -400,7 +402,7 @@ LaTeX Warning: Command \textasciicircum invalid in math mode on input line 177.
 
 
 [3]
-Overfull \hbox (15.94826pt too wide) in paragraph at lines 217--221
+Overfull \hbox (15.94826pt too wide) in paragraph at lines 219--223
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether a plateau age should be cal
 -cu-lated if \T1/zi4/m/n/10 plateau=TRUE\T1/ptm/m/n/10 ,
 [4] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
@@ -409,7 +411,7 @@ Overfull \hbox (15.94826pt too wide) in paragraph at lines 217--221
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [8]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (3.87054pt too wide) in paragraph at lines 531--536
+Overfull \hbox (3.87054pt too wide) in paragraph at lines 549--554
 []\T1/ptm/m/n/10 one of ei-ther \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U238U235\TS1/zi
 4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar40Ar36\TS1/zi4/m/n
 /10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar38Ar36\TS1/zi4/m/n/10 '
@@ -417,7 +419,7 @@ Overfull \hbox (3.87054pt too wide) in paragraph at lines 531--536
 tm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr88Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 ,
 
-Overfull \hbox (47.15097pt too wide) in paragraph at lines 531--536
+Overfull \hbox (47.15097pt too wide) in paragraph at lines 549--554
 \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr87Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/
 zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 Re185Re187\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/
@@ -425,14 +427,14 @@ zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
 '\T1/zi4/m/n/10 Os186Os192\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T
 1/zi4/m/n/10 Os187Os192\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 ,
 [9]
-Overfull \hbox (3.06654pt too wide) in paragraph at lines 550--552
+Overfull \hbox (3.06654pt too wide) in paragraph at lines 568--570
 []\T1/ptm/m/n/10 Ar: Lee, Jee-Yon, et al. "A re-de-ter-mi-na-tion of the iso-to
 pic abun-dances of at-mo-spheric Ar." Geochim-
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10] [11]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [12] [13]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [14]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (32.24094pt too wide) in paragraph at lines 917--921
+Overfull \hbox (32.24094pt too wide) in paragraph at lines 935--939
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Rb-Sr\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \
@@ -449,14 +451,15 @@ ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
 ta/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/inconsolata/In
 consolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
-utmri8a.pfb>
-Output written on Rd2.pdf (20 pages, 128721 bytes).
+m/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr1
+0.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
+rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
+a.pfb>
+Output written on Rd2.pdf (20 pages, 136983 bytes).
 Transcript written on Rd2.log.
 Saving output to 'IsoplotR-manual.pdf' ...
 Done
-You may want to clean up by 'rm -rf /tmp/RtmpK2l9Zp/Rd2pdf6792580666aa'
+You may want to clean up by 'rm -rf /tmp/RtmpfaZ2q9/Rd2pdfd94319b634a'

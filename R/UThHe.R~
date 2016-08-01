@@ -1,0 +1,35 @@
+get.UThHe.age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
+    
+}
+
+LL.UThHe <- function(tt,U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
+    HeFit <- ageUThSm2He(tt,U,sU,Th,sTh,Sm=Sm,sSm=sSm)
+}
+
+ageUThSm2He <- function(tt,U,sU,Th,sTh,Sm=0,sSm=0){
+    R <- iratio('U238U235')[1]
+    L8 <- lambda('U238')[1]
+    L5 <- lambda('U235')[1]
+    L2 <- lambda('Th232')[1]
+    L7 <- lambda('Sm147')[1]
+    f147 <- f147Sm()[1]
+    He <- 8*(exp(L8*tt)-1)*U*R/(1+R) + 7*(exp(L5*tt)-1)*U/(1+R) +
+          6*(exp(L2*tt)-1)*Th + f147*(exp(L7*tt)-1)*Sm
+    J <- matrix(0,1,3)
+    E <- matrix(0,3,3)
+    if (dcu) {
+        J[1,1] <- 8*(exp(L8*tt)-1)*R/(1+R) + 7*(exp(L5*tt)-1)/(1+R) # dHedU
+        J[1,2] <- 6*(exp(L2*tt)-1) # dHedTh
+        J[1,3] <- f147*(exp(L7*tt)-1) # dHedSm
+        E[1,1] <- sU^2
+        E[2,2] <- sTh^2
+        E[3,3] <- sSm^2
+    }
+    sHe <- sqrt( J%*%E%*%t(J) )
+    c(He,sHe)
+}
+
+# atomic abundance of 147Sm (Chang et al., 2002)
+f147Sm <- function(){
+    c(0.1502,0.0003)    
+}
