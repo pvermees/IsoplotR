@@ -1,0 +1,110 @@
+# x is an object of class UThHe
+helioplot <- function(x,f=1,...){
+    graphics::plot(c(0,1),c(0,1),type='n',xaxt='n',yaxt='n',
+                   xlab='',ylab='',asp=1,bty='n',...)
+    corners <- xyz2xy(matrix(c(1,0,0,1,0,1,0,0,0,0,1,0),ncol=3))
+    graphics::lines(corners)
+    graphics::text(corners[1:3,],labels=c('He','U','Th'),pos=c(3,1,1))
+}
+
+get.UThHe.age.limits <- function(x,f=1){
+    tt <- age(x)
+    rt <- range(tt[,1])
+    dt <- log(rt[2])-log(rt[1])
+    mint <- exp( log(rt[1]) - f*dt )
+    maxt <- exp( log(rt[2]) + f*dt )
+    c(mint,maxt)
+}
+
+logratioplot <- function(x,f=1,...){
+    R <- iratio('U238U235')[1]
+    L8 <- lambda('U238')[1]
+    L5 <- lambda('U235')[1]
+    L2 <- lambda('Th232')[1]
+    L7 <- lambda('Sm147')[1]
+    vw <- UThHe2vw(x)
+    lims <- get.logratioplot.limits(vw,f=f)
+    #lims[c(1,3)] <- lims[c(1,3)] - 1
+    #lims[c(2,4)] <- lims[c(2,4)] + 1
+    graphics::plot(lims[1:2],lims[3:4],type='n')
+    ticks <- pretty(get.UThHe.age.limits(x,f=f))
+    res <- 50 # resolution
+    dv <- lims[2]-lims[1]
+    dw <- lims[4]-lims[3]
+    for (i in 1:length(ticks)){
+        tt <- ticks[i]
+        a <- 8*R*(exp(L8*tt)-1)/(1+R) +
+             7*(exp(L5*tt)-1)/(1+R)
+        b <- 6*(exp(L2*tt)-1)
+        vw.plot <- NULL
+        for (j in 1:res){
+            v <- lims[1]+dv*j/res
+            exp.w <- (1-a*exp(v))/b
+            if (exp.w > exp(lims[3]) & exp.w < exp(lims[4])){
+                w <- log(exp.w)
+                vw.plot <- rbind(vw.plot,c(v,w))
+            }
+        }
+        if (!is.null(vw.plot)){
+            vw.first <- vw.plot[1,]
+            vw.last <- vw.plot[nrow(vw.plot),]
+            vw.plot <- rbind(vw.plot,c(vw.last[1],lims[3]))
+            vw.plot <- rbind(vw.plot,lims[c(1,3)])
+            vw.plot <- rbind(vw.plot,c(lims[1],vw.first[2]))
+            vw.plot <- rbind(vw.plot,vw.first)
+            graphics::lines(vw.plot)
+        }
+    }
+}
+
+get.logratioplot.limits <- function(vw,f=1){
+    rv <- range(vw[,1])
+    rw <- range(vw[,2])
+    dv <- diff(rv)
+    dw <- diff(rw)
+    minv <- rv[1] - f*dv
+    maxv <- rv[2] + f*dv
+    minw <- rw[1] - f*dw
+    maxw <- rw[2] + f*dw
+    c(minv,maxv,minw,maxw)
+}
+
+# x is an object of class UThHe
+UThHe2vw <- function(x){
+    cbind(log(x[,'U']/x[,'He']),log(x[,'Th']/x[,'He']))
+}
+
+UThHe2vw.covmat <- function(x,i){
+    out <- list()
+    U <- x[i,'U']
+    sU <- x[i,'errU']
+    Th <- x[i,'Th']
+    sTh <- x[i,'errTh']
+    He <- x[i,'He']
+    sHe <- x[i,'errHe']
+    out$vw <- c(log(U)-log(He),log(Th)-log(He))
+    out$covmat <- matrix(0,2,2)
+    out$covmat[1,1] <- (sU/U)^2 + (sHe/(U*He))^2
+    out$covmat[2,2] <- (sTh/Th)^2 + (sHe/(Th*He))^2
+    out$covmat[1,2] <- (sHe^2)/(U*Th*He^2)
+    out$covmat[2,1] <- covmat[1,2]
+    out
+}
+
+xyz2xy <- function(xyz){
+    if (methods::is(xyz,"matrix")){
+        n <- nrow(xyz)
+        x <- xyz[,1]
+        y <- xyz[,2]
+        z <- xyz[,3]
+    } else {
+        n <- 1
+        x <- xyz[1]
+        y <- xyz[2]
+        z <- xyz[3]
+    }
+    xy <- matrix(0,nrow=n,ncol=2)
+    xy[,1] <- 0.5*(x+2*z)/(x+y+z)
+    xy[,2] <- sin(pi/3)*x/(x+y+z)
+    return(xy)
+}

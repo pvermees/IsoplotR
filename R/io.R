@@ -117,9 +117,12 @@ as.ArAr <- function(x,format=2){
 as.UThHe <- function(x){
     nc <- ncol(x)
     nr <- nrow(x)
-    out <- matrix(as.numeric(x[2:nr,]),nr-1,nc)
-    class(out) <- "UThHe"
-    colnames(out) <- c('U','errU','Th','errTh','Sm','errSm','He','errHe')
+    out <- matrix(1e-10,nr-1,8) # populate with small numbers
+    colnames(out) <- c('He','errHe','U','errU','Th','errTh','Sm','errSm')
+    out[1:(nr-1),1:nc] <- matrix(as.numeric(x[2:nr,]),nr-1,nc)
+    # replace bad values by small ones:
+    out[is.na(out) | out<=0] <- 1e-10
+    class(out) <- append(class(out),"UThHe")
     out
 }
 as.detritals <- function(x){

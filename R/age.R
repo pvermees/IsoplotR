@@ -166,11 +166,8 @@ age.ArAr <- function(x,isochron=FALSE,dcu=TRUE,i=NA,sigdig=2,...){
     }
     out
 }
+#' @rdname age
+#' @export
 age.UThHe <- function(x,i=NA,sigdig=2,...){
-    if (isochron){
-        out <- isochron(x,plot=FALSE,sigdig=sigdig)
-    } else {
-        out <- ArAr.age(x,dcu=dcu,i=i,sigdig=sigdig,...)
-    }
-    out
+    UThHe.age(x,i=i,sigdig=sigdig)
 }

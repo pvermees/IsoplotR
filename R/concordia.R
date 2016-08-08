@@ -39,8 +39,8 @@
 #' concordia(examples$UPb)
 #' @export
 concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
-                           ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                           dcu=TRUE,show.age=1,sigdig=2){
+                      ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
+                      dcu=TRUE,show.age=1,sigdig=2){
     concordia.line(x,limits,wetherill,concordia.col,alpha,dcu)
     if (show.age==3){
         fit <- discordia.age(x,wetherill)

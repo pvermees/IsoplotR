@@ -88,3 +88,22 @@ get.covmat.default <- function(x,i,...){ stop('Invalid input into covmat() funct
 
 get.selection <- function(x,...){ UseMethod("get.selection",x) }
 get.selection.default <- function(x,...){ x }
+
+uvw2UThSmHe <- function(uvw){
+    v <- uvw[1]
+    w <- uvw[2]
+    w <- uvw[2]
+    x <- exp(v)/(exp(v)+exp(w)+1)
+    y <- exp(w)/(exp(v)+exp(w)+1)
+    z <- 1/(exp(v)+exp(w)+1)
+    c(x,y,z)
+}
+
+xyz2vw <- function(xyz){
+    x <- xyz[1]
+    y <- xyz[2]
+    z <- xyz[3]
+    v <- log(x/z)
+    w <- log(y/z)
+    c(v,w)
+}
