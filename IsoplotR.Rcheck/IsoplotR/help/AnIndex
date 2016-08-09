@@ -3,6 +3,7 @@ age.ArAr	age
 age.default	age
 age.detritals	age
 age.UPb	age
+age.UThHe	age
 agespectrum	agespectrum
 agespectrum.ArAr	agespectrum
 agespectrum.default	agespectrum
@@ -12,9 +13,11 @@ cad.ArAr	cad
 cad.default	cad
 cad.detritals	cad
 cad.UPb	cad
+cad.UThHe	cad
 concordia	concordia
 ellipse	ellipse
 examples	examples
+helioplot	helioplot
 iratio	iratio
 isochron	isochron
 isochron.ArAr	isochron
@@ -24,7 +27,11 @@ kde.ArAr	kde
 kde.default	kde
 kde.detritals	kde
 kde.UPb	kde
+kde.UThHe	kde
 lambda	lambda
+mds	mds
+mds.default	mds
+mds.detritals	mds
 read.data	read.data
 read.data.default	read.data
 read.data.matrix	read.data

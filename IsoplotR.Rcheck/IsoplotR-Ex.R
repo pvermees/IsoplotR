@@ -25,7 +25,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
-### Aliases: age age.ArAr age.UPb age.default age.detritals
+### Aliases: age age.ArAr age.UPb age.UThHe age.default age.detritals
 
 ### ** Examples
 
@@ -52,7 +52,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
-agespectrum(examples$ArAr)
+agespectrum(examples$ArAr,ylim=c(0,80))
 
 
 
@@ -89,7 +89,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
-### Aliases: cad cad.ArAr cad.UPb cad.default cad.detritals
+### Aliases: cad cad.ArAr cad.UPb cad.UThHe cad.default cad.detritals
 
 ### ** Examples
 
@@ -167,6 +167,28 @@ kde(examples$DZ)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("examples", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("helioplot")
+### * helioplot
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: helioplot
+### Title: Visualise U-Th-He data on a logratio plot or ternary diagram
+### Aliases: helioplot
+
+### ** Examples
+
+data(examples)
+helioplot(examples$UThHe)
+dev.new()
+helioplot(examples$UThHe,logratio=FALSE)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("helioplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("iratio")
 ### * iratio
 
@@ -218,7 +240,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
-### Aliases: kde kde.ArAr kde.UPb kde.default kde.detritals
+### Aliases: kde kde.ArAr kde.UPb kde.UThHe kde.default kde.detritals
 
 ### ** Examples
 
@@ -253,6 +275,29 @@ print(lambda('U238'))
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("lambda", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("mds")
+### * mds
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: mds
+### Title: Multidimensional Scaling
+### Aliases: mds mds.default mds.detritals
+
+### ** Examples
+
+data(examples)
+# Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.
+mds(examples$DZ,nnlines=TRUE,cex=5,xaxt='n',yaxt='n')
+dev.new()
+mds(examples$DZ,shepard=TRUE)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("mds", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("read.data")
 ### * read.data
 
@@ -266,8 +311,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 # load one of the built-in .csv files:
-data(examples)#fname <- system.file("UPb.csv",package="IsoplotR")
-#UPb <- read.data(fname,'U-Pb')
+data(examples)
 concordia(examples$UPb)
 
 

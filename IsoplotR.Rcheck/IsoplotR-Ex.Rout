@@ -44,7 +44,7 @@ Type 'q()' to quit R.
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: age
 > ### Title: Calculate isotopic ages
-> ### Aliases: age age.ArAr age.UPb age.default age.detritals
+> ### Aliases: age age.ArAr age.UPb age.UThHe age.default age.detritals
 > 
 > ### ** Examples
 > 
@@ -128,7 +128,7 @@ $p.value$concordance
 > ### ** Examples
 > 
 > data(examples)
-> agespectrum(examples$ArAr)
+> agespectrum(examples$ArAr,ylim=c(0,80))
 > 
 > 
 > 
@@ -166,7 +166,7 @@ $p.value$concordance
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: cad
 > ### Title: Plot continuous data as cumulative age distributions
-> ### Aliases: cad cad.ArAr cad.UPb cad.default cad.detritals
+> ### Aliases: cad cad.ArAr cad.UPb cad.UThHe cad.default cad.detritals
 > 
 > ### ** Examples
 > 
@@ -244,6 +244,29 @@ $p.value$concordance
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("examples", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("helioplot")
+> ### * helioplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: helioplot
+> ### Title: Visualise U-Th-He data on a logratio plot or ternary diagram
+> ### Aliases: helioplot
+> 
+> ### ** Examples
+> 
+> data(examples)
+> helioplot(examples$UThHe)
+> dev.new()
+dev.new(): using pdf(file="Rplots1.pdf")
+> helioplot(examples$UThHe,logratio=FALSE)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("helioplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("iratio")
 > ### * iratio
 > 
@@ -297,7 +320,7 @@ $p.value$concordance
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: kde
 > ### Title: Create (a) kernel density estimate(s)
-> ### Aliases: kde kde.ArAr kde.UPb kde.default kde.detritals
+> ### Aliases: kde kde.ArAr kde.UPb kde.UThHe kde.default kde.detritals
 > 
 > ### ** Examples
 > 
@@ -334,6 +357,54 @@ $p.value$concordance
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("lambda", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("mds")
+> ### * mds
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: mds
+> ### Title: Multidimensional Scaling
+> ### Aliases: mds mds.default mds.detritals
+> 
+> ### ** Examples
+> 
+> data(examples)
+> # Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.
+> mds(examples$DZ,nnlines=TRUE,cex=5,xaxt='n',yaxt='n')
+initial  value 10.433734 
+iter   5 value 8.523890
+iter  10 value 8.154735
+iter  15 value 8.048099
+iter  20 value 7.871811
+iter  20 value 7.868858
+iter  25 value 7.642453
+iter  25 value 7.640889
+iter  25 value 7.640383
+final  value 7.640383 
+converged
+NULL
+> dev.new()
+dev.new(): using pdf(file="Rplots2.pdf")
+> mds(examples$DZ,shepard=TRUE)
+initial  value 10.433734 
+iter   5 value 8.523890
+iter  10 value 8.154735
+iter  15 value 8.048099
+iter  20 value 7.871811
+iter  20 value 7.868858
+iter  25 value 7.642453
+iter  25 value 7.640889
+iter  25 value 7.640383
+final  value 7.640383 
+converged
+NULL
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("mds", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("read.data")
 > ### * read.data
 > 
@@ -347,8 +418,7 @@ $p.value$concordance
 > ### ** Examples
 > 
 > # load one of the built-in .csv files:
-> data(examples)#fname <- system.file("UPb.csv",package="IsoplotR")
-> #UPb <- read.data(fname,'U-Pb')
+> data(examples)
 > concordia(examples$UPb)
 > 
 > 
@@ -444,7 +514,7 @@ Warning in file(con, "r") :
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  3.728 0.036 3.764 0 0 
+Time elapsed:  8.456 0.176 8.499 0 0 
 > grDevices::dev.off()
 pdf 
   2 

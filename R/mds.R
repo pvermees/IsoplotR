@@ -44,7 +44,6 @@
 #' dev.new()
 #' mds(examples$DZ,shepard=TRUE)
 #' @rdname mds
-#' @importFrom MASS isoMDS
 #' @export
 mds <- function(x,...){ UseMethod("mds",x) }
 #' @rdname mds
@@ -63,7 +62,7 @@ mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
                        col=col,bg=bg,xlab=xlab, ylab=ylab,...)
     else return(out)
 }
-#' @rdname MDS
+#' @rdname mds
 #' @export
 mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
                         nnlines=FALSE,pch=21,pos=NULL,cex.symbols=2.5,

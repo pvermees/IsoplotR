@@ -8,7 +8,7 @@
 \usage{
 read.data(x, ...)
 
-\method{read.data}{default}(x, method = "Pb206U238", format = 1, ...)
+\method{read.data}{default}(x, method = "U-Pb", format = 1, ...)
 
 \method{read.data}{matrix}(x, method = "U-Pb", format = 1, ...)
 }
@@ -28,7 +28,11 @@ read.data(x, ...)
 
 \code{1}: 7/6, s[7/6], 6/8, s[6/8], 7/5, s[7/5]
 
-(other formats will be added later)}
+If \code{method = 'Ar-Ar'}, then \code{format} is one of either:
+
+\code{1}: 39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]
+
+\code{2}: 39, 39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]}
 }
 \value{
 an object of class \code{'UPb'}, \code{'ArAr'},
@@ -41,8 +45,7 @@ data classes
 }
 \examples{
 # load one of the built-in .csv files:
-data(examples)#fname <- system.file("UPb.csv",package="IsoplotR")
-#UPb <- read.data(fname,'U-Pb')
+data(examples)
 concordia(examples$UPb)
 }
 

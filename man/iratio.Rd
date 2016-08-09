@@ -44,6 +44,10 @@ Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
 weight of a reference sample of strontium." J. Res. Natl.Bur. Stand.
 87.1 (1982): 1-8.
 
+Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic
+weight of samarium." International Journal of Mass Spectrometry 218.2
+(2002): 167-172.
+
 Re: Gramlich, John W., et al. "Absolute isotopic abundance ratio and
 atomic weight of a reference sample of rhenium." J. Res. Natl. Bur.
 Stand. A 77 (1973): 691-698.

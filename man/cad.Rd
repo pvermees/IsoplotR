@@ -4,6 +4,7 @@
 \alias{cad}
 \alias{cad.ArAr}
 \alias{cad.UPb}
+\alias{cad.UThHe}
 \alias{cad.default}
 \alias{cad.detritals}
 \title{Plot continuous data as cumulative age distributions}
@@ -21,6 +22,9 @@ cad(x, ...)
   ...)
 
 \method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", ...)
+
+\method{cad}{UThHe}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", ...)
 }
 \arguments{

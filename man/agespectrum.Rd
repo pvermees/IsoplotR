@@ -74,6 +74,6 @@ J-factors after computing the plateau composition.
 }
 \examples{
 data(examples)
-agespectrum(examples$ArAr)
+agespectrum(examples$ArAr,ylim=c(0,80))
 }
 

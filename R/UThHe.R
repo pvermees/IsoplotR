@@ -47,6 +47,20 @@ get.UThHe.age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
     c(tt,st)
 }
 
+get.He <- function(tt,U,Th,Sm=0){
+    R <- iratio('U238U235')[1]
+    L8 <- lambda('U238')[1]
+    L5 <- lambda('U235')[1]
+    L2 <- lambda('Th232')[1]
+    L7 <- lambda('Sm147')[1]
+    f147 <- f147Sm()[1]
+    aa <- 8*R*(exp(L8*tt)-1)/(1+R) +
+          7*(exp(L5*tt)-1)/(1+R)
+    bb <- 6*(exp(L2*tt)-1)
+    cc <- f147*(exp(L7*tt)-1)
+    aa*U + bb*Th + cc*Sm
+}
+
 # atomic abundance of 147Sm (Chang et al., 2002)
 f147Sm <- function(){
     c(0.1502,0.0003)    

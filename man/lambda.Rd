@@ -32,7 +32,12 @@ U: Jaffey, A. H., et al. "Precision measurement of half-lives and
 specific activities of U235 and U238." Physical Review C 4.5 (1971): 1889.
 
 Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of 232Th.
-"Proceedings of the National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
+"Proceedings of the National Meeting on Nuclear Energy, Pretoria,
+South Africa. 1963.
+
+Sm: Lugmair, G. W., and K. Marti. "Lunar initial 143Nd/144Nd: differential
+evolution of the lunar crust and mantle." Earth and Planetary Science
+Letters 39.3 (1978): 349-357.
 
 Ar: Renne, Paul R., et al. "Response to the comment by WH Schwarz et al. on
 "Joint determination of 40K decay constants and 40Ar*/40K for the Fish Canyon

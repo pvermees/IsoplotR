@@ -10,6 +10,25 @@
 #'
 #' \code{DZ}: an object of class \code{'detrital'} containing a
 #' detrital zircon U-Pb dataset from Namibia.
+#'
+#' \code{ArAr}: an object of class \code{'ArAr'} containing a
+#' \eqn{^{40}Ar/^{39}Ar} spectrum of Skye basalt produced by Sarah
+#' Sherlock (Open University).
+#'
+#' \code{UThHe}: an object of class \code{'UThHe'} containing a
+#' U-Th-Sm-He dataset of Fish Lake apatite produced by Daniel Stockli
+#' (UT Austin).
+#'
+#' \code{average}: an object of class \code{'other'} containing the
+#' \eqn{^{206}Pb/^{238}U}-ages and errors of dataset \code{UPb}.
+#'
+#' \code{KDE}: an object of class \code{'other'} containing the
+#' \eqn{^{206}Pb/^{238}U}-ages (but not the errors) of dataset
+#' \code{UPb}.
+#'
+#' \code{spectrum}: an object of class \code{'other'} containing the
+#' \eqn{^{39}Ar} abundances, \eqn{^{40}Ar/^{39}Ar}-ages and errors of
+#' dataset \code{ArAr}.
 #' 
 #' @name examples
 #' @docType data
@@ -27,4 +46,7 @@
 #' Vermeesch, Pieter, and Eduardo
 #' Garzanti. "Making geological sense of 'Big Data' in sedimentary provenance analysis."
 #' Chemical Geology 409 (2015): 20-27.
+#'
+#' Vermeesch, Pieter. "Three new ways to calculate average (U-Th)/He ages."
+#' Chemical Geology 249.3 (2008): 339-347.
 NULL

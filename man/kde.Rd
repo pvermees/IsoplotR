@@ -4,6 +4,7 @@
 \alias{kde}
 \alias{kde.ArAr}
 \alias{kde.UPb}
+\alias{kde.UThHe}
 \alias{kde.default}
 \alias{kde.detritals}
 \title{Create (a) kernel density estimate(s)}
@@ -28,6 +29,11 @@ kde(x, ...)
   samebandwidth = TRUE, normalise = TRUE, ...)
 
 \method{kde}{ArAr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, ...)
+
+\method{kde}{UThHe}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
   ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
   show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, ...)

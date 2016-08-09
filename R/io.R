@@ -49,7 +49,7 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     } else if (identical(method,'other')){
-        out <- matrix(as.numeric(x),ncol=ncol(x))
+        out <- as.other(x)
     }
     out
 }
@@ -140,4 +140,10 @@ as.detritals <- function(x){
 }
 as.RbSr <- function(x){
 
+}
+as.other <- function(x){
+    nc <- ncol(x)
+    has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
+    if (has.header) x <- x[-1,]
+    matrix(as.numeric(x),ncol=nc)
 }
