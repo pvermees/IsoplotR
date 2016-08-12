@@ -7,7 +7,8 @@
 #' @param logratio Boolean flag indicating whether the data should be
 #'     shown on bivariate log[He/Th] vs. log[U/He] diagramme, or a
 #'     U-Th-He ternary diagramme.
-#' @param show.age calculate the U-Th-He central age?
+#' @param show.central.comp show the geometric mean composition as a
+#'     white ellipse?
 #' @param show.numbers show the grain numbers inside the error
 #'     ellipses?
 #' @param alpha confidence cutoff for the error ellipses
@@ -31,10 +32,11 @@
 #' dev.new()
 #' helioplot(examples$UThHe,logratio=FALSE)
 #' @export
-helioplot <- function(x,logratio=TRUE,show.age=TRUE,
+helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                       show.numbers=FALSE,alpha=0.05,
                       contour.col=c('white','red'),
-                      ellipse.col=rgb(0,1,0,0.5),sigdig=2, xlim=NA,
+                      ellipse.col=rgb(0,1,0,0.5),
+                      sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,...){
     fit <- centralage.UThHe(x)
     if (logratio) {
@@ -42,19 +44,16 @@ helioplot <- function(x,logratio=TRUE,show.age=TRUE,
         plot.logratio.ellipses(x,alpha=alpha,ellipse.col=ellipse.col,
                                show.numbers=show.numbers)
     } else {
-        if (all(is.na(fact))){
-            HeUTh <- uv2HeUTh(fit$uvw[1:2])
-            fact <- signif(1/HeUTh,1)
-        }
+        if (all(is.na(fact))) fact <- getfact(x,fit)
         plot.helioplot.contours(x,fact=fact,contour.col=contour.col,
                                 xlim=xlim,ylim=ylim)
         plot.helioplot.ellipses(x,fact=fact,alpha=alpha,
                                 ellipse.col=ellipse.col,
                                 show.numbers=show.numbers)
     }
-    if (show.age){
+    if (show.central.comp){
         plot.central.ellipse(fit,fact=fact,logratio=logratio,
-                             alpha=alpha)
+                             alpha=alpha,doSm=doSm(x))
         title(helioplot.title(fit,sigdig=sigdig))
     }
 }
@@ -79,31 +78,48 @@ plot.helioplot.frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
 plot.logratio.ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
                                    ellipse.col=rgb(0,1,0,0.5)){
     ns <- nrow(x)
+    doSm <- doSm(x)
     for (i in 1:ns){
-        uvwc <- UThHe2uvw.covmat(x,i)
-        x0 <- uvwc$uvw[1]
-        y0 <- uvwc$uvw[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
+        if (doSm){
+            uvwc <- UThHe2uvw.covmat(x,i)
+            x0 <- uvwc$uvw[1]
+            y0 <- uvwc$uvw[2]
+            ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
+        } else {
+            uvc <- UThHe2uv.covmat(x,i)
+            x0 <- uvc$uv[1]
+            y0 <- uvc$uv[2]
+            ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
+        }
         graphics::polygon(ell,col=ellipse.col)
         graphics::points(x0,y0,pch=19,cex=0.25)
         if (show.numbers) graphics::text(x0,y0,i)
     }
+   
 }
-
 plot.helioplot.ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
                                     show.numbers=FALSE,
                                     ellipse.col=rgb(0,1,0,0.5)){
     ns <- nrow(x)
+    doSm <- doSm(x)
     for (i in 1:ns){
-        uvwc <- UThHe2uvw.covmat(x,i)
-        x0 <- uvwc$uvw[1]
-        y0 <- uvwc$uvw[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
+        if (doSm){
+            uvwc <- UThHe2uvw.covmat(x,i)
+            x0 <- uvwc$uvw[1]
+            y0 <- uvwc$uvw[2]
+            ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
+            HeUTh0 <- uv2HeUTh(uvwc$uvw[1:2])
+        } else {
+            uvc <- UThHe2uv.covmat(x,i)
+            x0 <- uvc$uv[1]
+            y0 <- uvc$uv[2]
+            ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
+            HeUTh0 <- uv2HeUTh(uvc$uv)
+        }
         HeUTh <- uv2HeUTh(ell)
         xyz <- renormalise(HeUTh,fact=fact)
         xy <- xyz2xy(xyz)
         graphics::polygon(xy,col=ellipse.col)
-        HeUTh0 <- uv2HeUTh(uvwc$uvw[1:2])
         xyz0 <- renormalise(HeUTh0,fact=fact)
         x0y0 <- xyz2xy(xyz0)
         graphics::points(x0y0[1],x0y0[2],pch=19,cex=0.25)
@@ -112,9 +128,14 @@ plot.helioplot.ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
 }
 
 plot.central.ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
-                                 alpha=0.05){
-    ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
-                   covmat=fit$covmat[1:2,1:2],alpha=alpha)
+                                 alpha=0.05,doSm=TRUE){
+    if (doSm){
+        ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
+                       covmat=fit$covmat[1:2,1:2],alpha=alpha)
+    } else {
+        ell <- ellipse(x=fit$uv[1],y=fit$uv[2],
+                       covmat=fit$covmat,alpha=alpha)
+    }
     if (logratio){
         graphics::polygon(ell,col='white')
     } else {
@@ -179,39 +200,61 @@ helioplot.title <- function(fit,sigdig=2){
 }
 
 centralage.UThHe <- function(x){
-    uvw <- UThHe2uvw(x)
-    fit <- stats::optim(c(0,0,0),SS.UThHe,method='BFGS',
-                        hessian=TRUE,x=x)
     out <- list()
     ns <- nrow(x)
     df <- 2*(ns-1)
-    out$uvw <- fit$par
-    out$covmat <- solve(fit$hessian)
-    nms <- c('u','v','w')
-    names(out$uvw) <- nms
+    doSm <- doSm(x)
+    if (doSm){
+        uvw <- UThHe2uvw(x)
+        fit <- stats::optim(c(0,0,0),SS.UThHe.uvw,method='BFGS',
+                            hessian=TRUE,x=x)
+        out$uvw <- fit$par
+        out$covmat <- solve(fit$hessian)
+        nms <- c('u','v','w')
+        cc <- uvw2UThHe(out$uvw,out$covmat)
+        out$age <- get.UThHe.age(cc['U'],cc['sU'],cc['Th'],cc['sTh'],
+                                 cc['He'],cc['sHe'],cc['Sm'],cc['sSm'])
+        SS <- SS.UThHe.uv(out$uvw[1:2],x)
+    } else {
+        uv <- UThHe2uv(x)
+        fit <- stats::optim(c(0,0),SS.UThHe.uv,method='BFGS',
+                            hessian=TRUE,x=x)
+        out$uv <- fit$par
+        out$covmat <- solve(fit$hessian)
+        nms <- c('u','v')
+        cc <- uv2UThHe(out$uv,out$covmat)
+        out$age <- get.UThHe.age(cc['U'],cc['sU'],
+                                 cc['Th'],cc['sTh'],
+                                 cc['He'],cc['sHe'])
+        SS <- SS.UThHe.uv(out$uv,x)
+    }
+    names(out$uv) <- nms
     colnames(out$covmat) <- nms
     rownames(out$covmat) <- nms
-    SS <- SS.UThHe(out$uvw,x,Sm=FALSE)
     out$mswd <- SS/df
     out$p.value <- 1-pchisq(SS,df)
-    cc <- uvw2UThHe(out$uvw,out$covmat)
-    out$age <- get.UThHe.age(cc['U'],cc['sU'],cc['Th'],cc['sTh'],
-                             cc['He'],cc['sHe'],cc['Sm'],cc['sSm'])
     out
 }
 
 # UVW = central composition
-SS.UThHe <- function(UVW,x,Sm=TRUE){
+SS.UThHe.uvw <- function(UVW,x){
     ns <- nrow(x)
     SS <- 0
     for (i in 1:ns){
         uvwc <- UThHe2uvw.covmat(x,i)
         X <- UVW-uvwc$uvw
         Ei <- solve(uvwc$covmat)
-        if (!Sm) {
-            X <- matrix(X[1:2],1,2)
-            Ei <- Ei[1:2,1:2]
-        }
+        SS <- SS + X %*% Ei %*% t(X)
+    }
+    SS
+}
+SS.UThHe.uv <- function(UV,x){
+    ns <- nrow(x)
+    SS <- 0
+    for (i in 1:ns){
+        uvc <- UThHe2uv.covmat(x,i)
+        X <- UV-uvc$uv
+        Ei <- solve(uvc$covmat)
         SS <- SS + X %*% Ei %*% t(X)
     }
     SS
@@ -224,39 +267,60 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
     L5 <- lambda('U235')[1]
     L2 <- lambda('Th232')[1]
     L7 <- lambda('Sm147')[1]
-    uvw <- UThHe2uvw(x)
-    f <- 0.5
-    out$lims <- get.logratioplot.limits(uvw[,c('u','v')],f=f)
+    f147 <- f147Sm()[1]
+    doSm <- doSm(x)
+    if (doSm){
+        uvw <- UThHe2uvw(x)
+        out$lims <- get.logratioplot.limits(uvw[,c('u','v')])
+        w <- mean(uvw[,'w'])
+        Sm <- geomean.Sm(x)
+    } else {
+        uv <- UThHe2uv(x)
+        out$lims <- get.logratioplot.limits(uv)
+        w <- 0
+        Sm <- 0
+    }
     if (all(!is.na(xlim))) out$lims[1:2] <- xlim
     if (all(!is.na(ylim))) out$lims[3:4] <- ylim
     du <- out$lims[2]-out$lims[1]
     dv <- out$lims[4]-out$lims[3]
+    tticks <- get.logratio.tticks(out$lims,Sm=Sm)
     out$uv <- list()
-    tticks <- get.logratio.tticks(out$lims)
-    nt <- length(tticks)
-    out$tticks <- rep(0,nt)
-    for (i in 1:nt){
+    out$tticks <- NULL
+    nt <- 0
+    for (i in 1:length(tticks)){
         tt <- tticks[i]
-        a <- 8*R*(exp(L8*tt)-1)/(1+R) +
+        aa <- 8*(exp(L8*tt)-1)*R/(1+R) +
              7*(exp(L5*tt)-1)/(1+R)
-        b <- 6*(exp(L2*tt)-1)
+        bb <- 6*(exp(L2*tt)-1)
+        if (doSm)
+            cc <- f147*(exp(L7*tt)-1)
+        else
+            cc <- 0
         uv.plot <- NULL
         for (j in 1:res){
             u <- out$lims[1]+du*j/res
-            exp.v <- (1-a*exp(u))/b
+            exp.v <- (1-aa*exp(u)-cc*exp(w))/bb
             if (exp.v > exp(out$lims[3]) & exp.v < exp(out$lims[4])){
                 v <- log(exp.v)
                 uv.plot <- rbind(uv.plot,c(u,v))
             }
         }
-        out$tticks[i] <- tt
-        out$uv[[i]] <- uv.plot
+        if (!is.null(uv.plot)){
+            nt <- nt + 1
+            out$tticks[nt] <- tt
+            out$uv[[nt]] <- uv.plot
+        }
     }
     out
 }
-
 get.helioplot.contours <- function(x,fact=c(1,1,1),res=100){
     out <- list()
+    doSm <- doSm(x)
+    if (doSm){
+        uvw <- UThHe2uvw(x)
+        SmU <- exp(mean(uvw[,'w']-uvw[,'u']))
+    }
     out$tticks <- get.helioplot.tticks(fact)
     out$xyz <- list()
     nt <- length(out$tticks)
@@ -264,24 +328,17 @@ get.helioplot.contours <- function(x,fact=c(1,1,1),res=100){
         tt <- out$tticks[i]
         U <- seq(1,0,length.out=res)
         Th <- seq(0,1,length.out=res)
-        He <- get.He(tt,U,Th)
+        if (doSm) Sm <- SmU*U
+        else Sm <- 0
+        He <- get.He(tt,U,Th,Sm)
         out$xyz[[i]] <- cbind(He,U,Th)
     }
     out
 }
 
-# f = the distance from the ternary corners for
-# the maximum and minimum age contours to be plotted
-get.helioplot.tticks <- function(fact,f=0.05){
-    m <- c(f,1-f,0)/fact
-    M <- c(1-f,f,0)/fact
-    mint <- get.UThHe.age(m[2],0,m[3],0,m[1],0)[1]
-    maxt <- get.UThHe.age(M[2],0,M[3],0,M[1],0)[1]
-    get.tticks(mint,maxt)
-}
 # f = the distance from the X- and Y-margins for
 # the maximum and minimum age contours to be plotted
-get.logratio.tticks <- function(lims,f=0.05){
+get.logratio.tticks <- function(lims,f=0.05,Sm=0){
     tlims <- rep(0,4)
     tlims[1] <- lims[1]+f*(lims[3]-lims[1])
     tlims[2] <- lims[2]+f*(lims[4]-lims[2])
@@ -293,8 +350,17 @@ get.logratio.tticks <- function(lims,f=0.05){
     Umin <- exp(tlims[3])/(exp(tlims[3])+exp(tlims[4])+1)
     Thmin <- exp(tlims[4])/(exp(tlims[3])+exp(tlims[4])+1)
     Hemin <- 1/(exp(tlims[3])+exp(tlims[4])+1)
-    mint <- get.UThHe.age(Umin,0,Thmin,0,Hemin,0)[1]
-    maxt <- get.UThHe.age(Umax,0,Thmax,0,Hemax,0)[1]
+    mint <- get.UThHe.age(Umin,0,Thmin,0,Hemin,0,Sm,0)[1]
+    maxt <- get.UThHe.age(Umax,0,Thmax,0,Hemax,0,Sm,0)[1]
+    get.tticks(mint,maxt)
+}
+# f = the distance from the ternary corners for
+# the maximum and minimum age contours to be plotted
+get.helioplot.tticks <- function(fact,f=0.05,Sm=0){
+    m <- c(f,1-f,0)/fact
+    M <- c(1-f,f,0)/fact
+    mint <- get.UThHe.age(m[2],0,m[3],0,m[1],0,Sm,0)[1]
+    maxt <- get.UThHe.age(M[2],0,M[3],0,M[1],0,Sm,0)[1]
     get.tticks(mint,maxt)
 }
 get.tticks <- function(mint,maxt){
@@ -324,20 +390,13 @@ UThHe2uvw <- function(x){
     colnames(out) <- c('u','v','w')
     out
 }
-
-uv2HeUTh <- function(uv){
-    if (methods::is(uv,"matrix")){
-        u <- uv[,1]
-        v <- uv[,2]
-    } else {
-        u <- uv[1]
-        v <- uv[2]
-    }
-    D <- exp(u)+exp(v)+1
-    U <- exp(u)/D
-    Th <- exp(v)/D
-    He <- 1/D
-    cbind(He,U,Th)
+UThHe2uv <- function(x){
+    if (methods::is(x,'UThHe'))
+        out <- log(x[,c('U','Th')])-log(x[,'He'])
+    else
+        out <- matrix(log(x[c('U','Th')])-log(x['He']),1,2)
+    colnames(out) <- c('u','v')
+    out
 }
 
 uvw2UThHe <- function(uvw,covmat=matrix(0,3,3)){
@@ -371,6 +430,42 @@ uvw2UThHe <- function(uvw,covmat=matrix(0,3,3)){
     names(out) <- c('U','sU','Th','sTh','Sm','sSm','He','sHe')
     out
 }
+uv2UThHe <- function(uv,covmat=matrix(0,2,2)){
+    u <- uv[1]
+    v <- uv[2]
+    D <- exp(u)+exp(v)+1
+    U <- exp(u)/D
+    Th <- exp(v)/D
+    He <- 1/D
+    J <- matrix(0,3,2)
+    J[1,1] <- exp(u)*(exp(v)+1)/D^2
+    J[1,2] <- -exp(u)*exp(v)/D^2
+    J[2,1] <- -exp(v)*exp(u)/D^2
+    J[2,2] <- exp(v)*(exp(u)+1)/D^2
+    J[3,1] <- -exp(u)/D^2
+    J[3,2] <- -exp(v)/D^2
+    E <- J %*% covmat %*% t(J)
+    sU <- sqrt(E[1,1])
+    sTh <- sqrt(E[2,2])
+    sHe <- sqrt(E[3,3])
+    out <- c(U,sU,Th,sTh,He,sHe)
+    names(out) <- c('U','sU','Th','sTh','He','sHe')
+    out
+}
+uv2HeUTh <- function(uv){
+    if (methods::is(uv,"matrix")){
+        u <- uv[,1]
+        v <- uv[,2]
+    } else {
+        u <- uv[1]
+        v <- uv[2]
+    }
+    D <- exp(u)+exp(v)+1
+    U <- exp(u)/D
+    Th <- exp(v)/D
+    He <- 1/D
+    cbind(He,U,Th)
+}
 
 UThHe2uvw.covmat <- function(x,i){
     out <- list()
@@ -396,6 +491,25 @@ UThHe2uvw.covmat <- function(x,i){
     out$covmat[2,1] <- out$covmat[1,2]
     out$covmat[3,1] <- out$covmat[1,3]
     out$covmat[3,2] <- out$covmat[2,3]
+    out
+}
+UThHe2uv.covmat <- function(x,i){
+    out <- list()
+    U <- x[i,'U']
+    sU <- x[i,'errU']
+    Th <- x[i,'Th']
+    sTh <- x[i,'errTh']
+    He <- x[i,'He']
+    sHe <- x[i,'errHe']
+    out$uv <- UThHe2uv(x[i,])
+    out$covmat <- matrix(0,2,2)
+    names(out$uv) <- c("u","v")
+    rownames(out$covmat) <- c("u","v")
+    colnames(out$covmat) <- c("u","v")
+    out$covmat[1,1] <- (sU/U)^2 + (sHe/(U*He))^2
+    out$covmat[2,2] <- (sTh/Th)^2 + (sHe/(Th*He))^2
+    out$covmat[1,2] <- (sHe^2)/(U*Th*He^2)
+    out$covmat[2,1] <- out$covmat[1,2]
     out
 }
 
@@ -429,4 +543,15 @@ renormalise <- function(xyz,fact=c(1,1,1)){
         out <- xyz*fact/sum(xyz*fact)
     }
     out
+}
+
+geomean.Sm <- function(x){
+    UVW <- colMeans(UThHe2uvw(x))
+    exp(UVW[3])/(exp(UVW[1])+exp(UVW[2])+exp(UVW[3])+1)
+}
+
+getfact <- function(x,fit){
+    if (doSm(x)) HeUTh <- uv2HeUTh(fit$uvw[1:2])
+    else HeUTh <- uv2HeUTh(fit$uv[1:2])
+    fact <- signif(1/HeUTh,1)
 }
