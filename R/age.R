@@ -58,19 +58,20 @@ age <- function(x,...){ UseMethod("age",x) }
 age.default <- function(x,method='Pb206U238',dcu=TRUE,J=c(NA,NA),...){
     if (length(x)==1) X <- c(x,0)
     else X <- x[1:2]
-    if (identical(method,'Pb207U235'))
+    if (identical(method,'Pb207U235')){
         out <- get.Pb207U235age(X[1],X[2],dcu)
-    else if (identical(method,'Pb206U238'))
+    } else if (identical(method,'Pb206U238')){
         out <- get.Pb206U238age(X[1],X[2],dcu)
-    else if (identical(method,'Pb207Pb206'))
+    } else if (identical(method,'Pb207Pb206')){
         out <- get.Pb207Pb206age(X[1],X[2],dcu)
-    else if (identical(method,'Ar40Ar39'))
+    } else if (identical(method,'Ar40Ar39')){
         out <- get.ArAr.age(X[1],X[2],X[3],X[4],dcu)
-    else if (identical(method,'U-Th-He'))
+    } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
         else if (length(x)==8)
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6],X[7],X[8])
+    }
     out
 }
 #' @param concordia scalar flag indicating whether each U-Pb analysis
@@ -216,7 +217,12 @@ age.ArAr <- function(x,isochron=FALSE,dcu=TRUE,i=NA,sigdig=2,...){
 #' @rdname age
 #' @export
 age.UThHe <- function(x,central=FALSE,i=NA,sigdig=2,...){
-    if (central) out <- centralage(x)
+    if (central) out <- central(x)
     else out <- UThHe.age(x,i=i,sigdig=sigdig)
+    out
+}
+age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=2,...){
+    if (central) out <- central(x)
+    else out <- fissiontrack.age(x,i=i,sigdig=sigdig)
     out
 }

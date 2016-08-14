@@ -14,6 +14,9 @@ cad.default	cad
 cad.detritals	cad
 cad.UPb	cad
 cad.UThHe	cad
+central	central
+central.default	central
+central.UThHe	central
 concordia	concordia
 ellipse	ellipse
 examples	examples

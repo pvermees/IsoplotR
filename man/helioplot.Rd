@@ -4,9 +4,10 @@
 \alias{helioplot}
 \title{Visualise U-Th-He data on a logratio plot or ternary diagram}
 \usage{
-helioplot(x, logratio = TRUE, show.age = TRUE, show.numbers = FALSE,
-  alpha = 0.05, contour.col = c("white", "red"), ellipse.col = rgb(0, 1,
-  0, 0.5), sigdig = 2, xlim = NA, ylim = NA, fact = NA, ...)
+helioplot(x, logratio = TRUE, show.central.comp = TRUE,
+  show.numbers = FALSE, alpha = 0.05, contour.col = c("white", "red"),
+  ellipse.col = rgb(0, 1, 0, 0.5), sigdig = 2, xlim = NA, ylim = NA,
+  fact = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe}}
@@ -15,7 +16,8 @@ helioplot(x, logratio = TRUE, show.age = TRUE, show.numbers = FALSE,
 shown on bivariate log[He/Th] vs. log[U/He] diagramme, or a
 U-Th-He ternary diagramme.}
 
-\item{show.age}{calculate the U-Th-He central age?}
+\item{show.central.comp}{show the geometric mean composition as a
+white ellipse?}
 
 \item{show.numbers}{show the grain numbers inside the error
 ellipses?}

@@ -1,8 +1,0 @@
-#' @rdname agespectrum
-#' @export
-agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
-#' @rdname agespectrum
-#' @export
-weightedmean.default <- function(x){
-
-}

@@ -46,6 +46,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.ArAr(x,format)
     } else if (identical(method,'U-Th-He')){
         out <- as.UThHe(x)
+    } else if (identical(method,'fissiontracks')){
+        out <- as.fissiontracks(x,format)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     } else if (identical(method,'other')){
@@ -131,14 +133,25 @@ as.UThHe <- function(x){
     out[is.na(out) | out<=0] <- 1e-10
     out
 }
+as.fissiontracks <- function(x,format=1){
+    out <- list()
+    class(out) <- "fissiontracks"
+    out$format <- format
+    out$zeta <- as.numeric(x[2,1:2])
+    out$rhoD <- as.numeric(x[4,1:2])
+    nr <- nrow(x)
+    out$x <- matrix(as.numeric(x[6:nr,]),nr-5,2)
+    colnames(out$x) <- c('Ns','Ni')
+    out
+}
 as.detritals <- function(x){
+    out <- list()
+    class(out) <- "detritals"
     nr <- nrow(x)
     nc <- ncol(x)
     snames <- x[1,]
     X <- matrix(as.numeric(x[(2:nr),]),nr-1,nc)
     colnames(X) <- snames
-    out <- list()
-    class(out) <- "detritals"
     for (sname in snames){
         out[[sname]] = X[!is.na(X[,sname]),sname]
     }

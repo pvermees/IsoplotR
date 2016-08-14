@@ -83,39 +83,12 @@ get.cov.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
     0.5*xz*zy*((err.xy/xy)^2 - (err.xz/xz)^2 - (err.zy/zy)^2)
 }
 
+hasClass <- function(x,classname){
+    classname %in% class(x)
+}
+
 get.covmat <- function(x,...){ UseMethod("get.covmat",x) }
 get.covmat.default <- function(x,i,...){ stop('Invalid input into covmat() function') }
 
 get.selection <- function(x,...){ UseMethod("get.selection",x) }
 get.selection.default <- function(x,...){ x }
-
-#' Calculate U-Th-He (and fission track) central ages
-#'
-#' Computes the geometric mean composition of a set of fission track
-#' or U-Th-He data and returns the corresponding age and fitting
-#' parameters.
-#'
-#' @param x an object of class \code{UThHe} or \code{fissiontracks}
-#' @param ... optional arguments
-#' @return if \code{x} has class \code{UThHe}, retuns a list
-#'     containing the following items:
-#'
-#' \code{uvw}: the geometric mean log[U/He], log[Th/He] and log[Sm/He]
-#' composition
-#'
-#' \code{covmat}: the covariance matrix of \code{uvw}
-#'
-#' \code{mswd}: the reduced Chi-square statistic of data concordance,
-#' i.e. mswd = SS/(2n-2) where SS is the sum of squares of the
-#' log[U/He]-log[Th/He] compositions and n is the number of samples.
-#'
-#' \code{p.value}: the p-value of a Chi-square test with n-2 degrees
-#' of freedom
-#'
-#' \code{age}: a two-column vector with the central age and its
-#' standard error.
-#'
-#' @rdname centralage
-#' @export
-centralage <- function(x,...){ UseMethod("centralage",x) }
-centrage.default <- function(x,...){ stop('Invalid input into centralage(...) function'); }

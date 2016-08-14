@@ -38,7 +38,7 @@ helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                       ellipse.col=rgb(0,1,0,0.5),
                       sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,...){
-    fit <- centralage.UThHe(x)
+    fit <- central.UThHe(x)
     if (logratio) {
         plot.logratio.contours(x,contour.col=contour.col,...)
         plot.logratio.ellipses(x,alpha=alpha,ellipse.col=ellipse.col,
@@ -199,43 +199,6 @@ helioplot.title <- function(fit,sigdig=2){
     graphics::mtext(line2,line=0)
 }
 
-centralage.UThHe <- function(x){
-    out <- list()
-    ns <- nrow(x)
-    df <- 2*(ns-1)
-    doSm <- doSm(x)
-    if (doSm){
-        uvw <- UThHe2uvw(x)
-        fit <- stats::optim(c(0,0,0),SS.UThHe.uvw,method='BFGS',
-                            hessian=TRUE,x=x)
-        out$uvw <- fit$par
-        out$covmat <- solve(fit$hessian)
-        nms <- c('u','v','w')
-        cc <- uvw2UThHe(out$uvw,out$covmat)
-        out$age <- get.UThHe.age(cc['U'],cc['sU'],cc['Th'],cc['sTh'],
-                                 cc['He'],cc['sHe'],cc['Sm'],cc['sSm'])
-        SS <- SS.UThHe.uv(out$uvw[1:2],x)
-    } else {
-        uv <- UThHe2uv(x)
-        fit <- stats::optim(c(0,0),SS.UThHe.uv,method='BFGS',
-                            hessian=TRUE,x=x)
-        out$uv <- fit$par
-        out$covmat <- solve(fit$hessian)
-        nms <- c('u','v')
-        cc <- uv2UThHe(out$uv,out$covmat)
-        out$age <- get.UThHe.age(cc['U'],cc['sU'],
-                                 cc['Th'],cc['sTh'],
-                                 cc['He'],cc['sHe'])
-        SS <- SS.UThHe.uv(out$uv,x)
-    }
-    names(out$uv) <- nms
-    colnames(out$covmat) <- nms
-    rownames(out$covmat) <- nms
-    out$mswd <- SS/df
-    out$p.value <- 1-pchisq(SS,df)
-    out
-}
-
 # UVW = central composition
 SS.UThHe.uvw <- function(UVW,x){
     ns <- nrow(x)
@@ -383,7 +346,7 @@ get.logratioplot.limits <- function(uv,f=1){
 
 # x is an object of class UThHe
 UThHe2uvw <- function(x){
-    if (methods::is(x,'UThHe'))
+    if (hasClass(x,'UThHe'))
         out <- log(x[,c('U','Th','Sm')])-log(x[,'He'])
     else
         out <- matrix(log(x[c('U','Th','Sm')])-log(x['He']),1,3)
@@ -391,7 +354,7 @@ UThHe2uvw <- function(x){
     out
 }
 UThHe2uv <- function(x){
-    if (methods::is(x,'UThHe'))
+    if (hasClass(x,'UThHe'))
         out <- log(x[,c('U','Th')])-log(x[,'He'])
     else
         out <- matrix(log(x[c('U','Th')])-log(x['He']),1,2)
@@ -453,7 +416,7 @@ uv2UThHe <- function(uv,covmat=matrix(0,2,2)){
     out
 }
 uv2HeUTh <- function(uv){
-    if (methods::is(uv,"matrix")){
+    if (hasClass(uv,"matrix")){
         u <- uv[,1]
         v <- uv[,2]
     } else {
@@ -515,7 +478,7 @@ UThHe2uv.covmat <- function(x,i){
 
 # ternary compositions to plot coordinates
 xyz2xy <- function(xyz){
-    if (methods::is(xyz,"matrix")){
+    if (hasClass(xyz,"matrix")){
         n <- nrow(xyz)
         x <- xyz[,1]
         y <- xyz[,2]
@@ -533,7 +496,7 @@ xyz2xy <- function(xyz){
 }
 
 renormalise <- function(xyz,fact=c(1,1,1)){
-    if (methods::is(xyz,"matrix")){
+    if (hasClass(xyz,"matrix")){
         nr <- nrow(xyz)
         FACT <- matrix(rep(fact,nr),nrow=nr,byrow=TRUE)
         out <- xyz*FACT

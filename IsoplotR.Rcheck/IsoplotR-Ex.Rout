@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2016-06-10 r70760) -- "Unsuffered Consequences"
+R Under development (unstable) (2016-08-12 r71089) -- "Unsuffered Consequences"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -177,6 +177,29 @@ $p.value$concordance
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("cad", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("central")
+> ### * central
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: central
+> ### Title: Calculate U-Th-He (and fission track) central ages and
+> ###   compositions
+> ### Aliases: central central.UThHe central.default
+> 
+> ### ** Examples
+> 
+> data(examples)
+> print(central(examples$UThHe)$age)
+         U            
+6.40800509 0.05909253 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("concordia")
 > ### * concordia
@@ -514,7 +537,7 @@ Warning in file(con, "r") :
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.456 0.176 8.499 0 0 
+Time elapsed:  5.652 0.036 5.696 0 0 
 > grDevices::dev.off()
 pdf 
   2 
