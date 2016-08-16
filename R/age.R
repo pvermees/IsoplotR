@@ -88,15 +88,15 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,J=c(NA,NA),...){
 #' @param sigdig number of significant digits for the uncertainty
 #'     estimate (only used if \code{concordia=1},
 #'     \code{isochron=FALSE} or \code{central=FALSE}).
-#' 
-#' @return
-#' if \code{x} has class \code{UPb} and \code{concordia=1}, returns a
-#' table with the following columns: `t.75', `err[t.75]', `t.68',
-#' `err[t.68]', `t.76',`err[t.76]', `t.conc', `err[t.conc]',
-#' containing the 207Pb/235U-age and standard error, the
-#' \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
-#' \eqn{^{207}}Pb/\eqn{^{206}} Pb-age and standard error, and the
-#' concordia age and standard error, respectively.
+#'
+#' @return if \code{x} has class \code{UPb} and \code{concordia=1},
+#'     returns a table with the following columns:
+#'     `t.75', `err[t.75]', `t.68', `err[t.68]', `t.76',`err[t.76]',
+#'     `t.conc', `err[t.conc]', containing the 207Pb/235U-age and
+#'     standard error, the \eqn{^{206}}Pb/\eqn{^{238}}U-age and
+#'     standard error, the \eqn{^{207}}Pb/\eqn{^{206}} Pb-age and
+#'     standard error, and the concordia age and standard error,
+#'     respectively.
 #'  
 #' if \code{x} has class \code{UPb} and \code{concordia=2}, returns a
 #' list with the following items:
@@ -221,8 +221,13 @@ age.UThHe <- function(x,central=FALSE,i=NA,sigdig=2,...){
     else out <- UThHe.age(x,i=i,sigdig=sigdig)
     out
 }
-age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=2,...){
+#' @param external propagate external fission track errors (associated
+#'     with \code{x$zeta} and \code{x$rhoD})
+#'
+#' @rdname age
+#' @export
+age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=2,external=TRUE,...){
     if (central) out <- central(x)
-    else out <- fissiontrack.age(x,i=i,sigdig=sigdig)
+    else out <- fissiontrack.age(x,i=i,sigdig=sigdig,external=external)
     out
 }

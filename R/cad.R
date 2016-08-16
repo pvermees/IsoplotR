@@ -85,3 +85,10 @@ cad.UThHe <- function(x,pch=NA,verticals=TRUE,
     tt <- UThHe.age(x)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
+#' @rdname cad
+#' @export
+cad.fissiontracks <- function(x,pch=NA,verticals=TRUE,
+                      xlab='age [Ma]',col='black',...){
+    tt <- fissiontrack.age(x)[,1]
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
+}

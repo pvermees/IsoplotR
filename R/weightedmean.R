@@ -59,7 +59,8 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     if (detect.outliers){
         avg <- mean(X)
         prob <- stats::pnorm(X,mean=avg,sd=sX)
-        valid <- (prob > 0.5/ns)
+        cutoff <- 0.5/ns
+        valid <- (prob > cutoff & (1-prob) > cutoff )
     }
     fit <- get.weightedmean(X,sX,valid)
     if (plot){
@@ -138,6 +139,43 @@ weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
         R <- get.ArAr.ratio(fit$mean[1],fit$mean[2],x$J[1],0,dcu=FALSE)
         # recalculate the weighted mean age, this time taking into account decay and J uncertainties
         fit$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],dcu=TRUE)
+    }
+    if (plot){
+        plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
+                          outlier.col=outlier.col,sigdig=sigdig,
+                          alpha=alpha)
+    } else {
+        return(fit)
+    }
+}
+#' @rdname weightedmean
+#' @export
+weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
+                               rect.col=rgb(0,1,0,0.5),
+                               outlier.col=rgb(0,1,1,0.5),
+                               sigdig=2,alpha=0.05,dcu=TRUE,...){
+    tt <- UThHe.age(x)
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    if (plot){
+        plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
+                          outlier.col=outlier.col,sigdig=sigdig,
+                          alpha=alpha)
+    } else {
+        return(fit)
+    }
+}
+#' @rdname weightedmean
+#' @export
+weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
+                                       rect.col=rgb(0,1,0,0.5),
+                                       outlier.col=rgb(0,1,1,0.5),
+                                       sigdig=2,alpha=0.05,external=TRUE,...){
+    tt <- fissiontrack.age(x,external=FALSE)
+    # calculated weighted mean age ignoring zeta and rhoD uncertainties
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    if (external){
+        stt2 <- (fit$mean[2]/fit$mean[1])^2
+        fit$mean[2] <- fit$mean[1] * sqrt( stt2 + (x$rhoD[2]/x$rhoD[1])^2 + (x$zeta[2]/x$zeta[1])^2 )
     }
     if (plot){
         plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
