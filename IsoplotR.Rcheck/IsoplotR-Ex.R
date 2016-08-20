@@ -26,6 +26,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
 ### Aliases: age age.ArAr age.UPb age.UThHe age.default age.detritals
+###   age.fissiontracks
 
 ### ** Examples
 
@@ -90,6 +91,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
 ### Aliases: cad cad.ArAr cad.UPb cad.UThHe cad.default cad.detritals
+###   cad.fissiontracks
 
 ### ** Examples
 
@@ -262,6 +264,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
 ### Aliases: kde kde.ArAr kde.UPb kde.UThHe kde.default kde.detritals
+###   kde.fissiontracks
 
 ### ** Examples
 
@@ -319,6 +322,27 @@ mds(examples$DZ,shepard=TRUE)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("mds", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("radialplot")
+### * radialplot
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: radialplot
+### Title: Visualise heteroscedastic data on a radial plot
+### Aliases: radialplot radialplot.ArAr radialplot.UPb radialplot.UThHe
+###   radialplot.default radialplot.fissiontracks
+
+### ** Examples
+
+data(examples)
+radialplot(examples$FT)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("radialplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("read.data")
 ### * read.data
 
@@ -370,7 +394,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: weightedmean
 ### Title: Calculate the weighted mean age
 ### Aliases: weightedmean weightedmean.ArAr weightedmean.UPb
-###   weightedmean.default
+###   weightedmean.UThHe weightedmean.default weightedmean.fissiontracks
 
 ### ** Examples
 

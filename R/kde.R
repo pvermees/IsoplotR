@@ -147,9 +147,9 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
 #' @rdname kde
 #' @export
 kde.ArAr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
-                    n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
-                    kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                    show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,...){
+                     n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
+                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
+                     show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,...){
     tt <- ArAr.age(x)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,

@@ -6,7 +6,7 @@
 \usage{
 concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  concordia.col = "darksalmon", dcu = TRUE, show.age = 1, sigdig = 2)
+  concordia.col = "darksalmon", exterr = TRUE, show.age = 1, sigdig = 2)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -23,7 +23,7 @@ concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 
 \item{concordia.col}{colour of the concordia line}
 
-\item{dcu}{show decay constant uncertainty?}
+\item{exterr}{show decay constant uncertainty?}
 
 \item{show.age}{one of either
 

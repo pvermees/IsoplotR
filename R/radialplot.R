@@ -9,111 +9,220 @@
 #'
 #' OR
 #'
-#' and object of class \code{fissiontracks}
-#'
+#' and object of class \code{fissiontracks}, \code{UThHe},
+#' \code{ArAr}, or \code{UPb}
+#' @param from minimum age limit of the radial scale
+#' @param to maximum age limit of the radial scale
+#' @param t0 central value
+#' @param transformation one of either \code{log}, \code{linear} or
+#'     (if \code{x} has class \code{fissiontracks})
+#' @param sigdig the number of significant digits of the numerical
+#'     values reported in the title of the graphical output.
+#' @param ... additional arguments to the generic \code{plot} function
+#' @examples
+#' data(examples)
+#' radialplot(examples$FT)
 #' @rdname radialplot
 #' @export
 radialplot <- function(x,...){ UseMethod("radialplot",x) }
 #' @rdname radialplot
 #' @export
-radialplot.default <- function(x,from=NA,to=NA,z0=NA,transformation='log',...){
-    if (identical(transformation,'log')){
-        z <- log(x[,1])
-        s <- x[,2]/x[,1]
-        xlab <- expression(1/sigma)
-    } else {
-        z <- x[,1]
-        s <- x[,2]
-        xlab <- expression(1/sigma)
-    }
-    z0 <- mean(z)
-    rs <- radial.scale(z,s,z0,from=from,to=to,
-                       transformation=transformation,...)
-    radial.plot(z,s,z0,rs,...)
+radialplot.default <- function(x,from=NA,to=NA,t0=NA,
+                               transformation='log',
+                               sigdig=2,...){
+    X <- x2zs(x,transformation=transformation,t0=t0)
+    radial.plot(X,from=from,to=to,
+                transformation=transformation,...)
 }
 #' @rdname radialplot
 #' @export
 radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
-                                     transformation='arcsin',...){
+                                     transformation='arcsin',
+                                     sigdig=2,...){
+    X <- x2zs(x,transformation=transformation,t0=t0)
+    radial.plot(X,from=from,to=to,zeta=x$zeta[1],
+                rhoD=x$rhoD[1],transformation=transformation,...)
+}
+#' @param type scalar indicating whether to plot the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
+#'     (type=4), or the (Wetherill) concordia age (type=5)
+#' @param cutoff.76 the age (in Ma) below which the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
+#'     only used if \code{type=4}.
+#' @param cutoff.disc two element vector with the maximum and minimum
+#'     percentage discordance allowed between the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
+#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
+#'     the \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+#'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' @rdname radialplot
+#' @export
+radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
+                           transformation='log',
+                           type=4,cutoff.76=1100,
+                           cutoff.disc=c(-15,5),
+                           sigdig=2,...){
+    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc,exterr=FALSE)
+    radialplot.default(tt,from=from,to=to,t0=NA,
+                       transformation=transformation,...)
+}
+#' @rdname radialplot
+#' @export
+radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,
+                            transformation='log',
+                            sigdig=2,...){
+    tt <- ArAr.age(x,exterr=FALSE)
+    radialplot.default(tt,from=from,to=to,t0=NA,
+                       transformation=transformation,...)
+}
+#' @rdname radialplot
+#' @export
+radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,
+                             transformation='log',
+                             sigdig=2,...){
+    tt <- UThHe.age(x)
+    radialplot.default(tt,from=from,to=to,t0=NA,
+                       transformation=transformation,...)
+}
+
+radial.plot <- function(x,from=NA,to=NA,zeta=0,rhoD=0,
+                        transformation='arcsin',asprat=3/4,...){
+    # 1. get z and t limits of the radial scale
+    zlim <- range(x$z) # initialise using linear transformation
+    tlim <- c(from,to)
+    if (is.na(from)){
+        if (identical(transformation,'log'))
+            from <- exp(min(x$z))
+        else if (identical(transformation,'arcsin'))
+            from <- iatt(min(x$z),zeta,rhoD)
+        else if (identical(transformation,'linear'))
+            from <- min(x$z)
+    }
+    if (is.na(to)){
+        if (identical(transformation,'log'))
+            to <- exp(zlim[2])
+        else if (identical(transformation,'arcsin'))
+            to <- iatt(zlim[2],zeta,rhoD)
+        else if (identical(transformation,'linear'))
+            to <- zlim[2]
+    }
+    # 2. get time ticks and z limits
+    tticks <- get.radial.tticks(from,to,transformation)
+    if (identical(transformation,'log'))
+        zticks <- log(tticks)
+    else if (identical(transformation,'arcsin'))
+        zticks <- att(tticks,zeta,rhoD)
+    else if (identical(transformation,'linear'))
+        zticks <- tticks
+    zlim <- range(zticks)
+    # 3. get axis labels
+    if (identical(transformation,'log'))
+        xlab <- expression(t/sigma)
+    else if (identical(transformation,'arcsin'))
+        xlab <- 'Ns+Ni'
+    else
+        xlab <- expression(1/sigma)
+    ylab <- 'standardised estimate'
+    # 4. draw arc
+    fz <- stats::optim(0.5,get.fz,method='BFGS',
+                       z0=x$z0,zlim=zlim,asprat=asprat)$par
+    fxy <- get.fxy(x,fz,asprat)
+    zscale <- seq(zlim[1],zlim[2],length.out=50)
+    rx <- cos(fz*(zscale-x$z0))
+    ry <- sin(fz*(zscale-x$z0))
+    graphics::plot(rx,ry,type='l',xlim=c(0,1),bty='n',
+                   axes=FALSE,xlab=xlab,ylab=ylab,...)
+    # 5. draw the ticks
+    for (i in 1:length(tticks)){
+        rxb <- cos(fz*(zticks[i]-x$z0))
+        ryb <- sin(fz*(zticks[i]-x$z0))
+        rxe <- 0.98*rxb
+        rye <- 0.98*ryb
+        graphics::lines(c(rxb,rxe),c(ryb,rye))
+        graphics::text(rxb,ryb,labels=tticks[i],pos=4,xpd=NA)
+    }
+    # 6. plot points
+    rx <- fxy/x$s
+    ry <- fxy*fz*(x$z-x$z0)/x$s
+    points(rx,ry)
+    # 7. x and y axes
+    graphics::Axis(side=2,at=fxy*fz*c(-2,0,2),labels=c(-2,0,2))
+    if (identical(transformation,'arcsin')){
+        plabels <- pretty(c(0,range(1/(2*x$s)^2 - 1/2)))
+        pticks <- fxy*(2*sqrt(plabels+1/2))
+    } else {
+        plabels <- pretty(c(0,1/x$s))
+        pticks <- fxy*plabels
+    }
+    graphics::Axis(side=1,at=pticks,labels=plabels)
+}
+
+get.radial.tticks <- function(from,to,transformation){
+    if (identical(transformation,'log'))
+        return(grDevices::axisTicks(usr=log10(c(from,to)),log=TRUE))
+    else
+        return(pretty(c(from,to)))
+}
+
+get.fxy <- function(x,fz,asprat,buffer=0.9){
+    xx <- 1/x$s
+    yy <- fz*(x$z-x$z0)/x$s
+    rd <- sqrt(xx^2+yy^2) # radial distance
+    buffer/max(rd)
+}
+
+get.fz <- function(fz,z0,zlim,asprat){
+    (sin(atan(fz*(zlim[2]-z0))) + sin(atan(fz*(z0-zlim[1]))) - asprat)^2
+}
+
+x2zs <- function(x,...){ UseMethod("x2zs",x) }
+x2zs.default <- function(x,transformation='log',t0=NA,...){
+    out <- list()
+    if (identical(transformation,'log')){
+        out$z <- log(x[,1])
+        out$s <- x[,2]/x[,1]
+        out$xlab <- expression(t/sigma)
+        if (is.na(t0)) out$z0 <- mean(out$z)
+        else out$z0 <- log(t0)
+    } else {
+        out$z <- x[,1]
+        out$s <- x[,2]
+        out$xlab <- expression(1/sigma)
+        if (is.na(t0)) out$z0 <- mean(out$z)
+        else out$z0 <- t0
+    }
+    out
+}
+x2zs.fissiontracks <- function(x,transformation='arcsin',t0=NA,...){
+    out <- list()
     Ns <- x$x[,'Ns']
     Ni <- x$x[,'Ni']
     if (identical(transformation,'arcsin')){
-        z <- atan(sqrt((Ns+3/8)/(Ni+3/8)))
-        s <- sqrt(1/(Ns+Ni+1/2))/2
+        out$z <- atan(sqrt((Ns+3/8)/(Ni+3/8)))
+        out$s <- sqrt(1/(Ns+Ni+1/2))/2
         if (is.na(t0))
-            z0 <- atan(sqrt(sum(Ns)/sum(Ni)))
+            out$z0 <- atan(sqrt(sum(Ns)/sum(Ni)))
         else
-            z0 <- att(t0,x$zeta[1],x$rhoD[1])
+            out$z0 <- att(t0,x$zeta[1],x$rhoD[1])
     } else if (identical(transformation,'log')){
         tt <- fissiontrack.age(x,external=FALSE)
-        z <- log(tt[,'t'])
-        s <- tt[,'st']/tt[,'t']
-        z0 <- mean(z)
+        out$z <- log(tt[,'t'])
+        out$s <- tt[,'s[t]']/tt[,'t']
+        if (is.na(t0)) out$z0 <- mean(x$z)
+        else out$z0 <- log(t0)
     } else if (identical(transformation,'linear')){
         tt <- fissiontrack.age(x,external=FALSE)
-        z <- tt[,'t']
-        s <- tt[,'st']
-        z0 <- mean(z)
+        out$z <- tt[,'t']
+        out$s <- tt[,'s[t]']
+        if (is.na(t0)) out$z0 <- mean(x$z)
+        else out$z0 <- mean(t0)
     }
-    rs <- radial.scale(z,s,z0,from=from,to=to,zeta=x$zeta[1],
-                       rhoD=x$rhoD[1],transformation=transformation,...)
-    radial.plot(z,s,z0,rs,...)
-}
-
-radial.plot <- function(z,s,z0,rs,...){
-    x <- list(rx=1/s,ry=(z-z0)/s)    
-    xlim <- c(0,max(rs$rx))
-    ylim <- c(min(rs$ry),max(rs$ry))
-    plot(xlim,ylim,bty='n',axes=FALSE,type='n',
-         xlab=rs$xlab,ylab='standardised estimate',
-         asp=1,...)
-    Axis(side=2,at=c(-2,0,2))
-    Axis(side=1,at=rs$xticks,labels=rs$xlabels)
-    points(x$rx,x$ry)
-    lines(rs$rx,rs$ry)
-}
-
-radial.scale <- function(z,s,z0,from=NA,to=NA,zeta=0,rhoD=0,
-                         transformation='arcsin',f=1.1){
-    zlim <- range(z)
-    out <- list()
-    nn <- 100
-    if (is.na(from)) zlim[1] <- min(z)
-    if (is.na(to)) zlim[2] <- max(z)
-    if (identical(transformation,'log')){
-        if (!is.na(from)) zlim[1] <- log(from)
-        if (!is.na(to)) zlim[2] <- max(z)
-        tlim <- exp(zlim)
-        out$tticks <- pretty(tlim)
-        zticks <- log(out$tticks)
-        out$xlab <- expression(t/sigma)
-        out$xticks <- pretty(range(1/s))
-        out$xlabels <- out$xticks
-    } else if (identical(transformation,'lin')){
-        if (!is.na(from)) zlim[1] <- from
-        if (!is.na(to)) zlim[2] <- to
-        tlim <- zlim
-        out$tticks <- pretty(tlim)
-        zticks <- out$tticks
-        out$xlab <- expression(1/sigma)
-        out$xticks <- pretty(range(1/s))
-        out$xlabels <- out$xticks
-    } else if (identical(transformation,'arcsin')){
-        if (!is.na(from)) zlim[1] <- att(from,zeta,rhoD)
-        if (!is.na(to)) zlim[2] <- att(to,zeta,rhoD)
-        tlim <- iatt(zlim,zeta,rhoD)
-        out$tticks <- pretty(tlim)
-        zticks <- att(out$tticks,zeta,rhoD)
-        out$xlab <- 'Ns+Ni'
-        xrange <- range(1/s)
-        NsNiRange <- (xrange/2)^2 - 1/2
-        out$xlabels <- pretty(NsNiRange)
-        out$xticks <- 2*sqrt(out$xlabels+0.5)
-    }
-    zrs <- seq(zlim[1],zlim[2],length.out=nn)
-    r <- f*max(1/s)
-    out$rx <- r*cos(atan(zrs-z0))
-    out$ry <- r*sin(atan(zrs-z0))
     out
 }
 

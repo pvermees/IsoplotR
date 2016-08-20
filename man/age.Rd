@@ -7,22 +7,26 @@
 \alias{age.UThHe}
 \alias{age.default}
 \alias{age.detritals}
+\alias{age.fissiontracks}
 \title{Calculate isotopic ages}
 \usage{
 age(x, ...)
 
-\method{age}{default}(x, method = "Pb206U238", dcu = TRUE, J = c(NA, NA),
-  ...)
+\method{age}{default}(x, method = "Pb206U238", exterr = TRUE, J = c(NA,
+  NA), ...)
 
-\method{age}{UPb}(x, concordia = 1, wetherill = TRUE, dcu = TRUE,
+\method{age}{UPb}(x, concordia = 1, wetherill = TRUE, exterr = TRUE,
   i = NA, sigdig = 2, ...)
 
 \method{age}{detritals}(x, ...)
 
-\method{age}{ArAr}(x, isochron = FALSE, dcu = TRUE, i = NA, sigdig = 2,
-  ...)
+\method{age}{ArAr}(x, isochron = FALSE, exterr = TRUE, i = NA,
+  sigdig = 2, ...)
 
 \method{age}{UThHe}(x, central = FALSE, i = NA, sigdig = 2, ...)
+
+\method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = 2,
+  external = TRUE, ...)
 }
 \arguments{
 \item{x}{can be:
@@ -49,7 +53,8 @@ an object of class \code{UPb}, \code{ArAr} or \code{UThHe}.}
 \item{method}{one of either \code{'Pb206U238'}, \code{'Pb207U235'},
 \code{'Pb207Pb206'}, \code{'Ar40Ar39'} or \code{U-Th-He}}
 
-\item{dcu}{propagate the decay constant uncertainties?}
+\item{exterr}{propagate the external (decay constant and
+calibration factor) uncertainties?}
 
 \item{J}{two element vector with the J-factor and its standard
 error.  This option is only used if \code{method} =
@@ -81,19 +86,23 @@ together (\code{isochron=TRUE}).}
 should be considered separately (\code{central=FALSE}) or a
 central age should be calculated from all U-Th-He analyses
 together (\code{central=TRUE}).}
+
+\item{external}{propagate external fission track errors (associated
+with \code{x$zeta} and \code{x$rhoD})}
 }
 \value{
 if \code{x} is a scalar or a vector, returns the age using
     the geochronometer given by \code{method} and its standard
     error.
 
-if \code{x} has class \code{UPb} and \code{concordia=1}, returns a
-table with the following columns: `t.75', `err[t.75]', `t.68',
-`err[t.68]', `t.76',`err[t.76]', `t.conc', `err[t.conc]',
-containing the 207Pb/235U-age and standard error, the
-\eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
-\eqn{^{207}}Pb/\eqn{^{206}} Pb-age and standard error, and the
-concordia age and standard error, respectively.
+if \code{x} has class \code{UPb} and \code{concordia=1},
+    returns a table with the following columns:
+    `t.75', `err[t.75]', `t.68', `err[t.68]', `t.76',`err[t.76]',
+    `t.conc', `err[t.conc]', containing the 207Pb/235U-age and
+    standard error, the \eqn{^{206}}Pb/\eqn{^{238}}U-age and
+    standard error, the \eqn{^{207}}Pb/\eqn{^{206}} Pb-age and
+    standard error, and the concordia age and standard error,
+    respectively.
  
 if \code{x} has class \code{UPb} and \code{concordia=2}, returns a
 list with the following items:

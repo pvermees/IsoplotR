@@ -37,7 +37,8 @@
 #' @param method one of either \code{'Pb206U238'}, \code{'Pb207U235'},
 #'     \code{'Pb207Pb206'}, \code{'Ar40Ar39'} or \code{U-Th-He}
 #' 
-#' @param dcu propagate the decay constant uncertainties?
+#' @param exterr propagate the external (decay constant and
+#'     calibration factor) uncertainties?
 #' 
 #' @param J two element vector with the J-factor and its standard
 #'     error.  This option is only used if \code{method} =
@@ -55,17 +56,17 @@
 age <- function(x,...){ UseMethod("age",x) }
 #' @rdname age
 #' @export
-age.default <- function(x,method='Pb206U238',dcu=TRUE,J=c(NA,NA),...){
+age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),...){
     if (length(x)==1) X <- c(x,0)
     else X <- x[1:2]
     if (identical(method,'Pb207U235')){
-        out <- get.Pb207U235age(X[1],X[2],dcu)
+        out <- get.Pb207U235age(X[1],X[2],exterr)
     } else if (identical(method,'Pb206U238')){
-        out <- get.Pb206U238age(X[1],X[2],dcu)
+        out <- get.Pb206U238age(X[1],X[2],exterr)
     } else if (identical(method,'Pb207Pb206')){
-        out <- get.Pb207Pb206age(X[1],X[2],dcu)
+        out <- get.Pb207Pb206age(X[1],X[2],exterr)
     } else if (identical(method,'Ar40Ar39')){
-        out <- get.ArAr.age(X[1],X[2],X[3],X[4],dcu)
+        out <- get.ArAr.age(X[1],X[2],X[3],X[4],exterr)
     } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
@@ -185,13 +186,13 @@ age.default <- function(x,method='Pb206U238',dcu=TRUE,J=c(NA,NA),...){
 #' @rdname age
 #' @export
 age.UPb <- function(x,concordia=1,wetherill=TRUE,
-                    dcu=TRUE,i=NA,sigdig=2,...){
+                    exterr=TRUE,i=NA,sigdig=2,...){
     if (concordia==1)
-        out <- UPb.age(x,dcu=dcu,i=i,sigdig=sigdig,...)
+        out <- UPb.age(x,exterr=exterr,i=i,sigdig=sigdig,...)
     else if (concordia==2)
-        out <- concordia.age(x,wetherill=TRUE,dcu=TRUE,...)
+        out <- concordia.age(x,wetherill=TRUE,exterr=TRUE,...)
     else if (concordia==3)
-        out <- discordia.age(x,wetherill=TRUE,dcu=TRUE,...)
+        out <- discordia.age(x,wetherill=TRUE,exterr=TRUE,...)
     out
 }
 #' @rdname age
@@ -205,9 +206,9 @@ age.detritals <- function(x,...){
 #'     together (\code{isochron=TRUE}).
 #' @rdname age
 #' @export
-age.ArAr <- function(x,isochron=FALSE,dcu=TRUE,i=NA,sigdig=2,...){
+age.ArAr <- function(x,isochron=FALSE,exterr=TRUE,i=NA,sigdig=2,...){
     if (isochron) out <- isochron(x,plot=FALSE)
-    else out <- ArAr.age(x,dcu=dcu,i=i,sigdig=sigdig,...)
+    else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,...)
     out
 }
 #' @param central Boolean flag indicating whether each U-Th-He analysis

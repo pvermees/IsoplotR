@@ -75,7 +75,8 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     if (title) title(plateau.title(plat,sigdig=sigdig))
     else return(plat)
 }
-#' @param dcu propagate the decay constant uncertainties?
+#' @param exterr propagate the external (decay constant and
+#'     calibration factor) uncertainties?
 #' @examples
 #' data(examples)
 #' agespectrum(examples$ArAr,ylim=c(0,80))
@@ -84,8 +85,8 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              plateau.col=rgb(0,1,0,0.5),
                              non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
-                             dcu=TRUE,line.col='red',lwd=2,...){
-    tt <- ArAr.age(x,jcu=FALSE,dcu=FALSE)
+                             exterr=TRUE,line.col='red',lwd=2,...){
+    tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE)
     if (x$format==2){
         X <- cbind(x$x[,'Ar39'],tt)
     } else {
@@ -96,9 +97,9 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                                 plateau=plateau,sigdig=sigdig,line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
     # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
-    R <- get.ArAr.ratio(plat$mean[1],plat$mean[2],x$J[1],0,dcu=FALSE)
+    R <- get.ArAr.ratio(plat$mean[1],plat$mean[2],x$J[1],0,exterr=FALSE)
     # recalculate the weighted mean age, this time taking into account decay and J uncertainties
-    plat$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],dcu=dcu)
+    plat$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
     if (plateau){
         title(plateau.title(plat,sigdig=sigdig))
     }

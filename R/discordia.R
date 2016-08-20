@@ -1,4 +1,4 @@
-discordia.age <- function(x,wetherill=TRUE,dcu=TRUE){
+discordia.age <- function(x,wetherill=TRUE,exterr=TRUE){
     out <- list()
     selection <- get.selection(x,wetherill)
     d <- data2york(x,selection)
@@ -6,7 +6,7 @@ discordia.age <- function(x,wetherill=TRUE,dcu=TRUE){
     itt <- concordia.intersection(fit,wetherill)
     X <- UPb.preprocess(x,wetherill)
     hess <- stats::optimHess(itt,LL.concordia.intersection, d=d,X=X,
-                             wetherill=wetherill,dcu=dcu)
+                             wetherill=wetherill,exterr=exterr)
     out$x <- itt
     out$cov <- solve(hess)
     out
@@ -15,7 +15,7 @@ discordia.age <- function(x,wetherill=TRUE,dcu=TRUE){
 # itt = output of the yorkfit function
 # d = output of UPb2york
 # X = output of UPb.preprocess
-LL.concordia.intersection <- function(itt,d,X,wetherill,dcu){
+LL.concordia.intersection <- function(itt,d,X,wetherill,exterr){
     LL <- 0
     selection <- get.UPb.labels(wetherill)
     XYl <- get.ratios.UPb(itt[1])$x[selection]
@@ -33,7 +33,7 @@ LL.concordia.intersection <- function(itt,d,X,wetherill,dcu){
     else disc <- (XYl[1]-xy[,1])/XYl[1]
     for (i in 1:length(X)){
         covmat <- X[[i]]$cov
-        if (dcu) {
+        if (exterr) {
             dcomp <- discordant.composition(disc[i],itt[1],itt[2],wetherill)
             covmat <- covmat + dcomp$cov
         }

@@ -4,7 +4,9 @@
 \alias{weightedmean}
 \alias{weightedmean.ArAr}
 \alias{weightedmean.UPb}
+\alias{weightedmean.UThHe}
 \alias{weightedmean.default}
+\alias{weightedmean.fissiontracks}
 \title{Calculate the weighted mean age}
 \usage{
 weightedmean(x, ...)
@@ -16,11 +18,19 @@ weightedmean(x, ...)
 \method{weightedmean}{UPb}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
-  alpha = 0.05, dcu = TRUE, ...)
+  alpha = 0.05, exterr = TRUE, ...)
 
 \method{weightedmean}{ArAr}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, dcu = TRUE, ...)
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ...)
+
+\method{weightedmean}{UThHe}(x, detect.outliers = TRUE, plot = TRUE,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ...)
+
+\method{weightedmean}{fissiontracks}(x, detect.outliers = TRUE, plot = TRUE,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ...)
 }
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
@@ -68,7 +78,7 @@ the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
 
-\item{dcu}{propagate decay constant uncertainty?}
+\item{exterr}{propagate decay constant uncertainty?}
 }
 \value{
 if \code{PLOT=FALSE}, returns a list with the follwing items:

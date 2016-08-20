@@ -7,6 +7,7 @@
 \alias{cad.UThHe}
 \alias{cad.default}
 \alias{cad.detritals}
+\alias{cad.fissiontracks}
 \title{Plot continuous data as cumulative age distributions}
 \usage{
 cad(x, ...)
@@ -26,6 +27,9 @@ cad(x, ...)
 
 \method{cad}{UThHe}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", ...)
+
+\method{cad}{fissiontracks}(x, pch = NA, verticals = TRUE,
+  xlab = "age [Ma]", col = "black", ...)
 }
 \arguments{
 \item{x}{a numerical vector OR an object of class \code{UPb} or

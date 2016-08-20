@@ -46,7 +46,7 @@ get.covmat.ArAr <- function(x,i,...){
     out
 }
 
-get.ArAr.ratio <- function(tt,st,J,sJ,dcu=TRUE){
+get.ArAr.ratio <- function(tt,st,J,sJ,exterr=TRUE){
     L <- lambda("K40")[1]
     sL <- lambda("K40")[2]
     R <- (exp(L*tt)-1)/J
@@ -63,13 +63,13 @@ get.ArAr.ratio <- function(tt,st,J,sJ,dcu=TRUE){
 }
 
 # get a single Ar-Ar age
-get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,dcu=TRUE){
+get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
     L <- lambda("K40")[1]
     tt <- log(J*Ar40Ar39+1)/L
     Jac <- matrix(0,1,3)
     Jac[1,1] <- J/(L*(J*Ar40Ar39+1))
     Jac[1,2] <- Ar40Ar39/(L*(J*Ar40Ar39+1))
-    if (dcu) Jac[1,3] <- -tt/L
+    if (exterr) Jac[1,3] <- -tt/L
     E <- matrix(0,3,3)
     E[1,1] <- sAr40Ar39^2
     E[2,2] <- sJ^2
@@ -80,7 +80,7 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,dcu=TRUE){
 
 # x an object of class \code{ArAr} returns a matrix of 40Ar/39Ar-ages
 # and their uncertainties. jcu = J-constant uncertainties.
-ArAr.age <- function(x,jcu=TRUE,dcu=TRUE,i=NA,sigdig=2){
+ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=2){
     if (!jcu) x$J[2] <- 0
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)
@@ -100,7 +100,7 @@ ArAr.age <- function(x,jcu=TRUE,dcu=TRUE,i=NA,sigdig=2){
         E[1:2,1:2] <- covmat[c("Ar39Ar40","Ar39Ar36"),c("Ar39Ar40","Ar39Ar36")]
         E[3,3] <- iratio("Ar40Ar36")[2]^2
         sAr4039x <- sqrt(J %*% E %*% t(J))
-        tt <- get.ArAr.age(Ar4039x[j],sAr4039x,x$J[1],x$J[2],dcu=dcu)
+        tt <- get.ArAr.age(Ar4039x[j],sAr4039x,x$J[1],x$J[2],exterr=exterr)
         t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
         out[j,] <- c(t.out$x,t.out$err)
     }

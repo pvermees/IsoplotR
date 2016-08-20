@@ -21,7 +21,7 @@
 #' @param show.numbers boolean flag (TRUE to show grain numbers)
 #' @param ellipse.col background colour of the error ellipses
 #' @param concordia.col colour of the concordia line
-#' @param dcu show decay constant uncertainty?
+#' @param exterr show decay constant uncertainty?
 #' @param show.age one of either
 #'
 #' \code{1}: don't show the age
@@ -40,8 +40,8 @@
 #' @export
 concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                      dcu=TRUE,show.age=1,sigdig=2){
-    concordia.line(x,limits,wetherill,concordia.col,alpha,dcu)
+                      exterr=TRUE,show.age=1,sigdig=2){
+    concordia.line(x,limits,wetherill,concordia.col,alpha,exterr)
     if (show.age==3){
         fit <- discordia.age(x,wetherill)
         discordia.plot(fit,wetherill)
@@ -58,7 +58,7 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
         if (show.numbers) { text(x0,y0,i) }
     }
     if (show.age==2){
-        fit <- concordia.age(x,wetherill,dcu)
+        fit <- concordia.age(x,wetherill,exterr)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         polygon(ell,col='white')
         title(concordia.title(fit,sigdig=sigdig))
@@ -66,7 +66,7 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
 }
 
 # helper function for plot.concordia
-concordia.line <- function(X,limits,wetherill,col,alpha=0.05,dcu=TRUE){
+concordia.line <- function(X,limits,wetherill,col,alpha=0.05,exterr=TRUE){
     lims <- get.concordia.limits(X,limits,wetherill)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
@@ -93,7 +93,7 @@ concordia.line <- function(X,limits,wetherill,col,alpha=0.05,dcu=TRUE){
             xc <- UPbratios$x['U238Pb206']
             yc <- UPbratios$x['Pb207Pb206']
         }
-        if (dcu){ # show decay constant uncertainty   
+        if (exterr){ # show decay constant uncertainty   
             if (wetherill){ covmat <- UPbratios$cov[c('Pb207U235','Pb206U238'),
                                                     c('Pb207U235','Pb206U238')] }
             else { covmat <- UPbratios$cov[c('U238Pb206','Pb207Pb206'),
@@ -121,7 +121,7 @@ concordia.line <- function(X,limits,wetherill,col,alpha=0.05,dcu=TRUE){
             xt <- UPbratios$x['U238Pb206']
             yt <- UPbratios$x['Pb207Pb206']
         }
-        if (dcu){ # show ticks as ellipse
+        if (exterr){ # show ticks as ellipse
             if (wetherill){ covmat <- UPbratios$cov[c('Pb207U235','Pb206U238'),
                                                     c('Pb207U235','Pb206U238')] }
             else { covmat <- UPbratios$cov[c('U238Pb206','Pb207Pb206'),
@@ -132,7 +132,7 @@ concordia.line <- function(X,limits,wetherill,col,alpha=0.05,dcu=TRUE){
             graphics::points(xt,yt,pch=21,bg='white')
         }
         pos <- 2
-        if (dcu & (wetherill & diff(range(concordia$x))<0.05)
+        if (exterr & (wetherill & diff(range(concordia$x))<0.05)
             | (!wetherill & diff(range(concordia$x))<2.5)){ pos <- NULL }
         graphics::text(xt,yt,as.character(ticks[i]),pos=pos)
     }
@@ -190,34 +190,34 @@ concordia.title <- function(fit,sigdig=2){
 }
 
 concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
-concordia.age.default <- function(x,wetherill=TRUE,dcu=TRUE,...){
+concordia.age.default <- function(x,wetherill=TRUE,exterr=TRUE,...){
     out <- x
     t.init <- initial.concordia.age.guess(out$x,wetherill)
     fit.age <- stats::optim(t.init, LL.concordia.age, x=out$x,
                             covmat=out$cov, wetherill=wetherill,
-                            dcu=dcu, method="BFGS", hessian=TRUE)
+                            exterr=exterr, method="BFGS", hessian=TRUE)
     out$age <- fit.age$par
     out$age.err <- as.numeric(sqrt(solve(fit.age$hessian)))
     out
 }
-concordia.age.UPb <- function(x,wetherill=TRUE,dcu=TRUE,i=NA,...){
+concordia.age.UPb <- function(x,wetherill=TRUE,exterr=TRUE,i=NA,...){
     if (is.na(i)){
         X <- UPb.preprocess(x,wetherill)
-        CC <- concordia.comp(X,wetherill,dcu)
-        out <- concordia.age.default(CC,wetherill,dcu,...)
+        CC <- concordia.comp(X,wetherill,exterr)
+        out <- concordia.age.default(CC,wetherill,exterr,...)
         mswd <- mswd.concordia(X,out$x,out$cov,out$age,wetherill)
         out$mswd <- mswd$mswd
         out$p.value <- mswd$p.value
     } else {
         CC <- UPb.preprocess(x,wetherill,i)
-        out <- concordia.age.default(CC,wetherill,dcu,...)
+        out <- concordia.age.default(CC,wetherill,exterr,...)
     }
     out
 }
 
 # x is a list of lists of U-Pb compositions and covariance
 # matrices prepared by the UPb.preprocess function
-concordia.comp <- function(x,wetherill=TRUE,dcu=TRUE){
+concordia.comp <- function(x,wetherill=TRUE,exterr=TRUE){
     xy <- initialise.concordant.composition(x,wetherill)
     fit.comp <- stats::optim(xy, LL.concordia.comp, x=x, method="BFGS", hessian=TRUE)
     out <- list()
@@ -271,10 +271,10 @@ initial.concordia.age.guess <- function(x,wetherill=TRUE){
     out
 }
 
-mswd.concordia <- function(x,mu,covmat,age,wetherill=TRUE,dcu=TRUE){
+mswd.concordia <- function(x,mu,covmat,age,wetherill=TRUE,exterr=TRUE){
     out <- list()
     SS.equivalence <- LL.concordia.comp(mu,x,TRUE)
-    SS.concordance <- LL.concordia.age(age,mu,covmat,wetherill,mswd=TRUE,dcu=dcu)
+    SS.concordance <- LL.concordia.age(age,mu,covmat,wetherill,mswd=TRUE,exterr=exterr)
     df.equivalence <- 2*length(x)-1
     df.concordance <- 1
     out$mswd <- list(equivalence = SS.equivalence/df.equivalence,
@@ -295,12 +295,12 @@ LL.concordia.comp <- function(mu,x,mswd=FALSE){
     out
 }
 
-LL.concordia.age <- function(age,x,covmat,wetherill=TRUE,mswd=FALSE,dcu=TRUE){
+LL.concordia.age <- function(age,x,covmat,wetherill=TRUE,mswd=FALSE,exterr=TRUE){
     UPbratios <- get.ratios.UPb(age)
     selection <- get.UPb.labels(wetherill)
     X <- matrix(x[selection]-UPbratios$x[selection],1,2)
     COVMAT <- covmat[selection,selection]
-    if (dcu) COVMAT <- COVMAT + UPbratios$cov[selection,selection]
+    if (exterr) COVMAT <- COVMAT + UPbratios$cov[selection,selection]
     if (mswd) out <- get.concordia.SS(X,COVMAT)
     else out <- LL.norm(X,COVMAT)
     out

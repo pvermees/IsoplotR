@@ -57,10 +57,9 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     ns <- length(X)
     valid <- rep(TRUE,ns)
     if (detect.outliers){
-        avg <- mean(X)
-        prob <- stats::pnorm(X,mean=avg,sd=sX)
+        prob <- stats::pnorm(X,mean=mean(X),sd=stats::sd(X))
         cutoff <- 0.5/ns
-        valid <- (prob > cutoff & (1-prob) > cutoff )
+        valid <- (prob > cutoff & (1-prob) > cutoff)
     }
     fit <- get.weightedmean(X,sX,valid)
     if (plot){
@@ -89,7 +88,7 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
-#' @param dcu propagate decay constant uncertainty?
+#' @param exterr propagate decay constant uncertainty?
 #' @examples
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
@@ -103,18 +102,18 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
                              outlier.col=rgb(0,1,1,0.5),
                              sigdig=2,type=4,cutoff.76=1100,
                              cutoff.disc=c(-15,5),alpha=0.05,
-                             dcu=TRUE,...){
+                             exterr=TRUE,...){
     # first ignore decay uncertainties
     tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                          cutoff.disc=cutoff.disc,dcu=FALSE)
+                          cutoff.disc=cutoff.disc,exterr=FALSE)
     # calculate weighted mean age
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
-    if (dcu){
+    if (exterr){
         # get weighted mean U-Pb ratios from the weighted mean age
-        X <- get.ratios.UPb(tt=fit$mean[1],st=fit$mean[2],dcu=TRUE,as.UPb=TRUE)
+        X <- get.ratios.UPb(tt=fit$mean[1],st=fit$mean[2],exterr=TRUE,as.UPb=TRUE)
         # recalculate the age, this time taking into account decay constant uncertainties
         fit$mean <- filter.UPb.ages(X,type=type,cutoff.76=cutoff.76,
-                                    cutoff.disc=cutoff.disc,dcu=TRUE)
+                                    cutoff.disc=cutoff.disc,exterr=TRUE)
     }
     if (plot){
         plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
@@ -129,16 +128,17 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
 weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5),
-                              sigdig=2,alpha=0.05,dcu=TRUE,...){
+                              sigdig=2,alpha=0.05,exterr=TRUE,...){
     # first ignore J-constant uncertainties (systematic error)
-    tt <- ArAr.age(x,jcu=FALSE,dcu=FALSE)
+    tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE)
     # calculated weighted mean age ignoring decay constant and J uncertainties
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
-    if (dcu){
+    if (exterr){
         # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
-        R <- get.ArAr.ratio(fit$mean[1],fit$mean[2],x$J[1],0,dcu=FALSE)
-        # recalculate the weighted mean age, this time taking into account decay and J uncertainties
-        fit$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],dcu=TRUE)
+        R <- get.ArAr.ratio(fit$mean[1],fit$mean[2],x$J[1],0,exterr=FALSE)
+        # recalculate the weighted mean age, this time taking
+        # into account decay and J uncertainties
+        fit$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
     }
     if (plot){
         plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
@@ -153,7 +153,7 @@ weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
 weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
                                rect.col=rgb(0,1,0,0.5),
                                outlier.col=rgb(0,1,1,0.5),
-                               sigdig=2,alpha=0.05,dcu=TRUE,...){
+                               sigdig=2,alpha=0.05,exterr=TRUE,...){
     tt <- UThHe.age(x)
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
     if (plot){
@@ -169,13 +169,14 @@ weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
 weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
                                        rect.col=rgb(0,1,0,0.5),
                                        outlier.col=rgb(0,1,1,0.5),
-                                       sigdig=2,alpha=0.05,external=TRUE,...){
-    tt <- fissiontrack.age(x,external=FALSE)
+                                       sigdig=2,alpha=0.05,exterr=TRUE,...){
+    tt <- fissiontrack.age(x,exterr=FALSE)
     # calculated weighted mean age ignoring zeta and rhoD uncertainties
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
-    if (external){
+    if (exterr){
         stt2 <- (fit$mean[2]/fit$mean[1])^2
-        fit$mean[2] <- fit$mean[1] * sqrt( stt2 + (x$rhoD[2]/x$rhoD[1])^2 + (x$zeta[2]/x$zeta[1])^2 )
+        fit$mean[2] <- fit$mean[1] *
+            sqrt( stt2 + (x$rhoD[2]/x$rhoD[1])^2 + (x$zeta[2]/x$zeta[1])^2 )
     }
     if (plot){
         plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,

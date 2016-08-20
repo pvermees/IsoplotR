@@ -14,7 +14,7 @@ agespectrum(x, ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
   plateau.col = rgb(0, 1, 0, 0.5), non.plateau.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, dcu = TRUE, line.col = "red", lwd = 2, ...)
+  sigdig = 2, exterr = TRUE, line.col = "red", lwd = 2, ...)
 }
 \arguments{
 \item{x}{a three column matrix whose first column gives the amount
@@ -51,7 +51,8 @@ if \code{plateau=FALSE}).}
 \item{title}{add a title to the plot? If \code{FALSE}, returns a
 list with plateau parameters.}
 
-\item{dcu}{propagate the decay constant uncertainties?}
+\item{exterr}{propagate the external (decay constant and
+calibration factor) uncertainties?}
 }
 \value{
 if \code{title=FALSE}, a list with the following items:

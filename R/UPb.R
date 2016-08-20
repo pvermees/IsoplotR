@@ -61,7 +61,7 @@ get.covmat.UPb <- function(x,i,...){
 }
 
 # as.UPb: returns an 'UPb' data object
-get.ratios.UPb <- function(tt,st=0,dcu=TRUE,as.UPb=FALSE){
+get.ratios.UPb <- function(tt,st=0,exterr=TRUE,as.UPb=FALSE){
     if (tt == 0){ tt <- 1e-10 }
     out <- list()
     l8 <- lambda('U238')[1]
@@ -117,13 +117,13 @@ get.ratios.UPb <- function(tt,st=0,dcu=TRUE,as.UPb=FALSE){
     }
 }
 
-get.Pb207U235age <- function(r75,sr75=0,dcu=TRUE){
+get.Pb207U235age <- function(r75,sr75=0,exterr=TRUE){
     l5 <- lambda('U235')[1]
     sl5 <- lambda('U235')[2]
     t.75 <- log(1+r75)/l5
     J <- matrix(0,1,2)
     J[1,1] <- 1/(l5*(1+r75))
-    if (dcu) J[1,2] <- log(1+r75)/l5^2
+    if (exterr) J[1,2] <- log(1+r75)/l5^2
     E <- matrix(0,2,2)
     E[1,1] <- sr75^2
     E[2,2] <- sl5^2
@@ -132,13 +132,13 @@ get.Pb207U235age <- function(r75,sr75=0,dcu=TRUE){
     out
 }
 
-get.Pb206U238age <- function(r68,sr68=0,dcu=TRUE){
+get.Pb206U238age <- function(r68,sr68=0,exterr=TRUE){
     l8 <- lambda('U238')[1]
     sl8 <- lambda('U238')[2]
     t.68 <- log(1+r68)/l8
     J <- matrix(0,1,2)
     J[1,1] <- 1/(l8*(1+r68))
-    if (dcu) J[1,2] <- log(1+r68)/l8^2
+    if (exterr) J[1,2] <- log(1+r68)/l8^2
     E <- matrix(0,2,2)
     E[1,1] <- sr68^2
     E[2,2] <- sl8^2
@@ -148,7 +148,7 @@ get.Pb206U238age <- function(r68,sr68=0,dcu=TRUE){
 }
 
 #' @importFrom stats optimize
-get.Pb207Pb206age <- function(r76,sr76=0,dcu=TRUE){
+get.Pb207Pb206age <- function(r76,sr76=0,exterr=TRUE){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     sl5 <- lambda('U235')[2]
@@ -162,7 +162,7 @@ get.Pb207Pb206age <- function(r76,sr76=0,dcu=TRUE){
     t.76 <- fit$minimum
     J <- matrix(0,1,4)
     J[1,1] <- -(-1)/dD76dt(t.76,l5,l8,R)                      # d76/dt
-    if (dcu) {
+    if (exterr) {
         J[1,2] <- -dD76dl5(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R) # d76/dl5
         J[1,3] <- -dD76dl8(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R) # d76/dl8
         J[1,4] <- -dD76dR(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R)  # d76/dR
@@ -179,14 +179,14 @@ get.Pb207Pb206age <- function(r76,sr76=0,dcu=TRUE){
 
 # x an object of class \code{UPb} returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,dcu=TRUE,i=NA,sigdig=2){
+UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=2){
     labels <- c('t.75','s[t.75]','t.68','s[t.68]',
                 't.76','s[t.76]','t.conc','s[t.conc]')
     if (!is.na(i)){
-        t.conc <- concordia.age(x,i=i,dcu=dcu)
-        t.75 <- get.Pb207U235age(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],dcu=dcu)
-        t.68 <- get.Pb206U238age(x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],dcu=dcu)
-        t.76 <- get.Pb207Pb206age(x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],dcu=dcu)
+        t.conc <- concordia.age(x,i=i,exterr=exterr)
+        t.75 <- get.Pb207U235age(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],exterr=exterr)
+        t.68 <- get.Pb206U238age(x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],exterr=exterr)
+        t.76 <- get.Pb207Pb206age(x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],exterr=exterr)
         t.75.out <- roundit(t.75[1],t.75[2],sigdig=sigdig)
         t.68.out <- roundit(t.68[1],t.68[2],sigdig=sigdig)
         t.76.out <- roundit(t.76[1],t.76[2],sigdig=sigdig)
@@ -198,7 +198,7 @@ UPb.age <- function(x,dcu=TRUE,i=NA,sigdig=2){
         out <- matrix(0,nn,8)
         colnames(out) <- labels
         for (i in 1:nn){
-            out[i,] <- UPb.age(x,i=i,dcu=dcu,sigdig=sigdig)
+            out[i,] <- UPb.age(x,i=i,exterr=exterr,sigdig=sigdig)
         }
     }
     out
@@ -228,8 +228,8 @@ dD76dR <- function(t.76,l5,l8,R){
     -el5t1/(el8t1*R^2)
 }
 
-filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),dcu=TRUE){
-    tt <- UPb.age(x,dcu=dcu)
+filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),exterr=TRUE){
+    tt <- UPb.age(x,exterr=exterr)
     do.76 <- tt[,'t.68'] > cutoff.76
     if (any(is.na(cutoff.disc))) {
         is.concordant <- rep(TRUE,nrow(x))
