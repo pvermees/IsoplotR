@@ -26,7 +26,7 @@ age(x, ...)
 \method{age}{UThHe}(x, central = FALSE, i = NA, sigdig = 2, ...)
 
 \method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = 2,
-  external = TRUE, ...)
+  exterr = TRUE, ...)
 }
 \arguments{
 \item{x}{can be:
@@ -86,9 +86,6 @@ together (\code{isochron=TRUE}).}
 should be considered separately (\code{central=FALSE}) or a
 central age should be calculated from all U-Th-He analyses
 together (\code{central=TRUE}).}
-
-\item{external}{propagate external fission track errors (associated
-with \code{x$zeta} and \code{x$rhoD})}
 }
 \value{
 if \code{x} is a scalar or a vector, returns the age using

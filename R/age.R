@@ -222,13 +222,10 @@ age.UThHe <- function(x,central=FALSE,i=NA,sigdig=2,...){
     else out <- UThHe.age(x,i=i,sigdig=sigdig)
     out
 }
-#' @param external propagate external fission track errors (associated
-#'     with \code{x$zeta} and \code{x$rhoD})
-#'
 #' @rdname age
 #' @export
-age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=2,external=TRUE,...){
+age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=2,exterr=TRUE,...){
     if (central) out <- central(x)
-    else out <- fissiontrack.age(x,i=i,sigdig=sigdig,external=external)
+    else out <- fissiontrack.age(x,i=i,sigdig=sigdig,exterr=exterr)
     out
 }

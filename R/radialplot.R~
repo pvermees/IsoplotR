@@ -1,7 +1,0 @@
-radialplot <- function(x,...){ UseMethod("radialplot",x) }
-radialplot.default <- function(x,from=NA,to=NA,...){
-
-}
-radialplot.fissiontracks <- function(x,from=NA,to=NA,...){
-
-}

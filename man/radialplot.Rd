@@ -12,20 +12,25 @@
 radialplot(x, ...)
 
 \method{radialplot}{default}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", sigdig = 2, ...)
+  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
+  bg = "white", ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
-  transformation = "arcsin", sigdig = 2, ...)
+  transformation = "arcsin", sigdig = 2, show.numbers = FALSE, pch = 21,
+  bg = "white", ...)
 
 \method{radialplot}{UPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", type = 4, cutoff.76 = 1100,
-  cutoff.disc = c(-15, 5), sigdig = 2, ...)
+  cutoff.disc = c(-15, 5), sigdig = 2, show.numbers = FALSE, pch = 21,
+  bg = "white", ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", sigdig = 2, ...)
+  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
+  bg = "white", ...)
 
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", sigdig = 2, ...)
+  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
+  bg = "white", ...)
 }
 \arguments{
 \item{x}{Either an nx2 matix of (transformed) values z and their
@@ -36,7 +41,7 @@ OR
 and object of class \code{fissiontracks}, \code{UThHe},
 \code{ArAr}, or \code{UPb}}
 
-\item{...}{additional arguments to the generic \code{plot} function}
+\item{...}{additional arguments to the generic \code{points} function}
 
 \item{from}{minimum age limit of the radial scale}
 
@@ -49,6 +54,12 @@ and object of class \code{fissiontracks}, \code{UThHe},
 
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output.}
+
+\item{show.numbers}{boolean flag (TRUE to show grain numbers)}
+
+\item{pch}{plot character (default is a filled circle)}
+
+\item{bg}{background colour of the plot character}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the

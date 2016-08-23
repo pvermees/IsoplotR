@@ -18,7 +18,10 @@
 #'     (if \code{x} has class \code{fissiontracks})
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output.
-#' @param ... additional arguments to the generic \code{plot} function
+#' @param show.numbers boolean flag (TRUE to show grain numbers)
+#' @param pch plot character (default is a filled circle)
+#' @param bg background colour of the plot character
+#' @param ... additional arguments to the generic \code{points} function
 #' @examples
 #' data(examples)
 #' radialplot(examples$FT)
@@ -28,20 +31,25 @@ radialplot <- function(x,...){ UseMethod("radialplot",x) }
 #' @rdname radialplot
 #' @export
 radialplot.default <- function(x,from=NA,to=NA,t0=NA,
-                               transformation='log',
-                               sigdig=2,...){
+                               transformation='log',sigdig=2,
+                               show.numbers=FALSE,pch=21,
+                               bg='white',...){
     X <- x2zs(x,transformation=transformation,t0=t0)
     radial.plot(X,from=from,to=to,
-                transformation=transformation,...)
+                transformation=transformation,
+                show.numbers=show.numbers,
+                pch=pch,bg=bg,...)
 }
 #' @rdname radialplot
 #' @export
 radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      transformation='arcsin',
-                                     sigdig=2,...){
+                                     sigdig=2,show.numbers=FALSE,
+                                     pch=21,bg='white',...){
     X <- x2zs(x,transformation=transformation,t0=t0)
     radial.plot(X,from=from,to=to,zeta=x$zeta[1],
-                rhoD=x$rhoD[1],transformation=transformation,...)
+                rhoD=x$rhoD[1],transformation=transformation,
+                show.numbers=show.numbers,pch=pch,bg=bg,...)
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
@@ -67,32 +75,44 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',
                            type=4,cutoff.76=1100,
                            cutoff.disc=c(-15,5),
-                           sigdig=2,...){
-    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc,exterr=FALSE)
-    radialplot.default(tt,from=from,to=to,t0=NA,
-                       transformation=transformation,...)
+                           sigdig=2,show.numbers=FALSE,
+                           pch=21,bg='white',...){
+    tt <- filter.UPb.ages(x,type,cutoff.76,
+                          cutoff.disc,exterr=FALSE)
+    radialplot.default(tt,from=from,to=to,t0=t0,
+                       transformation=transformation,
+                       show.numbers=show.numbers,
+                       pch=pch,bg=bg,...)
 }
 #' @rdname radialplot
 #' @export
 radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,
                             transformation='log',
-                            sigdig=2,...){
+                            sigdig=2,show.numbers=FALSE,
+                            pch=21,bg='white',...){
     tt <- ArAr.age(x,exterr=FALSE)
-    radialplot.default(tt,from=from,to=to,t0=NA,
-                       transformation=transformation,...)
+    radialplot.default(tt,from=from,to=to,t0=t0,
+                       transformation=transformation,
+                       show.numbers=show.numbers,
+                       pch=pch,bg=bg,...)
 }
 #' @rdname radialplot
 #' @export
 radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,
                              transformation='log',
-                             sigdig=2,...){
+                             sigdig=2,show.numbers=FALSE,
+                             pch=21,bg='white',...){
     tt <- UThHe.age(x)
-    radialplot.default(tt,from=from,to=to,t0=NA,
-                       transformation=transformation,...)
+    radialplot.default(tt,from=from,to=to,t0=t0,
+                       transformation=transformation,
+                       show.numbers=show.numbers,
+                       pch=pch,bg=bg,...)
 }
 
 radial.plot <- function(x,from=NA,to=NA,zeta=0,rhoD=0,
-                        transformation='arcsin',asprat=3/4,...){
+                        transformation='arcsin',asprat=3/4,
+                        show.numbers=FALSE,
+                        pch=21,bg='white',...){
     # 1. get z and t limits of the radial scale
     zlim <- range(x$z) # initialise using linear transformation
     tlim <- c(from,to)
@@ -137,7 +157,7 @@ radial.plot <- function(x,from=NA,to=NA,zeta=0,rhoD=0,
     rx <- cos(fz*(zscale-x$z0))
     ry <- sin(fz*(zscale-x$z0))
     graphics::plot(rx,ry,type='l',xlim=c(0,1),bty='n',
-                   axes=FALSE,xlab=xlab,ylab=ylab,...)
+                   axes=FALSE,xlab=xlab,ylab=ylab)
     # 5. draw the ticks
     for (i in 1:length(tticks)){
         rxb <- cos(fz*(zticks[i]-x$z0))
@@ -145,12 +165,21 @@ radial.plot <- function(x,from=NA,to=NA,zeta=0,rhoD=0,
         rxe <- 0.98*rxb
         rye <- 0.98*ryb
         graphics::lines(c(rxb,rxe),c(ryb,rye))
-        graphics::text(rxb,ryb,labels=tticks[i],pos=4,xpd=NA)
+        graphics::text(rxb,ryb,labels=tticks[i],
+                       pos=4,xpd=NA)
     }
     # 6. plot points
     rx <- fxy/x$s
     ry <- fxy*fz*(x$z-x$z0)/x$s
-    points(rx,ry)
+    if (show.numbers) {
+        if('cex' %in% names(list(...)))
+            points(rx,ry,pch=pch,bg=bg,...)
+        else
+            points(rx,ry,pch=pch,bg=bg,cex=3,...)
+        text(rx,ry,1:length(rx))
+    } else {
+        points(rx,ry,pch=pch,bg=bg,...)
+    }
     # 7. x and y axes
     graphics::Axis(side=2,at=fxy*fz*c(-2,0,2),labels=c(-2,0,2))
     if (identical(transformation,'arcsin')){
@@ -165,9 +194,21 @@ radial.plot <- function(x,from=NA,to=NA,zeta=0,rhoD=0,
 
 get.radial.tticks <- function(from,to,transformation){
     if (identical(transformation,'log'))
-        return(grDevices::axisTicks(usr=log10(c(from,to)),log=TRUE))
+        out <- grDevices::axisTicks(usr=log10(c(from,to)),log=TRUE)
     else
-        return(pretty(c(from,to)))
+        out <- pretty(c(from,to))
+    nt <- length(out)
+    reldiff <- (to-out[nt])/(out[nt]-out[nt-1])
+    if (reldiff > 0.25) {
+        sigdig <- ceiling(1-log10(1-out[nt]/to))
+        out <- c(out,signif(to,sigdig))
+    }
+    reldiff <- (out[1]-from)/(out[2]-out[1])
+    if (reldiff > 0.25) {
+        sigdig <- ceiling(1-log10(1-from/out[1]))
+        out <- c(signif(from,sigdig),out)
+    }
+    out
 }
 
 get.fxy <- function(x,fz,asprat,buffer=0.9){
@@ -203,6 +244,24 @@ x2zs.fissiontracks <- function(x,transformation='arcsin',t0=NA,...){
     out <- list()
     Ns <- x$x[,'Ns']
     Ni <- x$x[,'Ni']
+    if (identical(transformation,'linear')){
+        tt <- fissiontrack.age(x,exterr=FALSE)
+        out$z <- tt[,'t']
+        out$s <- tt[,'s[t]']
+        if (is.na(t0)) out$z0 <- mean(out$z)
+        else out$z0 <- mean(t0)
+    }
+    if (identical(transformation,'log')){
+        tt <- fissiontrack.age(x,exterr=FALSE)
+        if (any(tt[,'t']<=0)) {
+            transformation <- 'arcsin'
+        } else {
+            out$z <- log(tt[,'t'])
+            out$s <- tt[,'s[t]']/tt[,'t']
+            if (is.na(t0)) out$z0 <- mean(out$z)
+            else out$z0 <- log(t0)
+        }
+    }
     if (identical(transformation,'arcsin')){
         out$z <- atan(sqrt((Ns+3/8)/(Ni+3/8)))
         out$s <- sqrt(1/(Ns+Ni+1/2))/2
@@ -210,18 +269,6 @@ x2zs.fissiontracks <- function(x,transformation='arcsin',t0=NA,...){
             out$z0 <- atan(sqrt(sum(Ns)/sum(Ni)))
         else
             out$z0 <- att(t0,x$zeta[1],x$rhoD[1])
-    } else if (identical(transformation,'log')){
-        tt <- fissiontrack.age(x,external=FALSE)
-        out$z <- log(tt[,'t'])
-        out$s <- tt[,'s[t]']/tt[,'t']
-        if (is.na(t0)) out$z0 <- mean(x$z)
-        else out$z0 <- log(t0)
-    } else if (identical(transformation,'linear')){
-        tt <- fissiontrack.age(x,external=FALSE)
-        out$z <- tt[,'t']
-        out$s <- tt[,'s[t]']
-        if (is.na(t0)) out$z0 <- mean(x$z)
-        else out$z0 <- mean(t0)
     }
     out
 }

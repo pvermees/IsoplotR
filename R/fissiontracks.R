@@ -1,8 +1,8 @@
-fissiontrack.age <- function(x,i=NA,sigdig=2,external=TRUE){
+fissiontrack.age <- function(x,i=NA,sigdig=2,exterr=TRUE){
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
-    if (external){
+    if (exterr){
         zeta <- x$zeta
         rhoD <- x$rhoD
     } else {
