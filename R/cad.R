@@ -23,10 +23,10 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' @rdname cad
 #' @export
 cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                        colmap='heat.colors',col='black',...){    
-    graphics::plot(range(x),c(0,1),type='n',xlab=xlab,
-                   ylab='cumulative probability',...)
-    graphics::lines(stats::ecdf(x),pch=pch,verticals=verticals,col=col,...)
+                        colmap='heat.colors',col='black',...){
+    graphics::plot(range(x),c(0,1),type='n',
+                   ylab='cumulative probability',log='x',...)
+    graphics::lines(stats::ecdf(x),pch=pch,verticals=verticals,col=col)
 }
 #' @param col colour to give to single sample datasets (i.e. not of
 #'     class \code{detritals})
@@ -41,7 +41,7 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                    ylab='cumulative probability',...)
     for (i in 1:ns){
         graphics::lines(stats::ecdf(x[[i]]),pch=pch,
-                        verticals=verticals,col=col[i],...)
+                        verticals=verticals,col=col[i])
     }
     graphics::legend("bottomright",legend=snames,lwd=1,col=col)
 }

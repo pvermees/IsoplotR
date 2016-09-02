@@ -134,14 +134,33 @@ as.UThHe <- function(x){
     out
 }
 as.fissiontracks <- function(x,format=1){
+    nr <- nrow(x)
+    nc <- ncol(x)
     out <- list()
     class(out) <- "fissiontracks"
     out$format <- format
-    out$zeta <- as.numeric(x[2,1:2])
-    out$rhoD <- as.numeric(x[4,1:2])
-    nr <- nrow(x)
-    out$x <- matrix(as.numeric(x[6:nr,]),nr-5,2)
-    colnames(out$x) <- c('Ns','Ni')
+    if (format==1){
+        out$zeta <- as.numeric(x[2,1:2])
+        out$rhoD <- as.numeric(x[4,1:2])
+        out$x <- matrix(as.numeric(x[6:nr,]),nr-5,2)
+        colnames(out$x) <- c('Ns','Ni')
+    } else if (format==2){
+        out$zeta <- as.numeric(x[2,1:2])
+        Ns <- as.numeric(x[4:nr,1])
+        A <- as.numeric(x[4:nr,2])
+        valid <- which(!is.na(Ns))
+        out$Ns <- Ns[valid]
+        out$A <- A[valid]
+        out$U <- list()
+        out$sU <- list()
+        j <- seq(from=3,to=nc-1,by=2)
+        for (i in valid){
+            U <- as.numeric(x[i+3,j])
+            out$U[[i]] <- U[!is.na(U)]
+            sU <- as.numeric(x[i+3,j+1])
+            out$sU[[i]] <- U[!is.na(U)]
+        }
+    }
     out
 }
 as.detritals <- function(x){

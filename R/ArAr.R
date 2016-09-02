@@ -80,7 +80,7 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
 
 # x an object of class \code{ArAr} returns a matrix of 40Ar/39Ar-ages
 # and their uncertainties. jcu = J-constant uncertainties.
-ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=2){
+ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA){
     if (!jcu) x$J[2] <- 0
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)

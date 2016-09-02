@@ -1,4 +1,4 @@
-UThHe.age <- function(x,i=NA,sigdig=2){
+UThHe.age <- function(x,i=NA,sigdig=NA){
     ns <- nrow(x)
     doSm <- doSm(x)
     out <- matrix(0,ns,2)

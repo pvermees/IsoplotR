@@ -68,7 +68,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
 #' isochron(examples$ArAr)
 #' @rdname isochron
 #' @export
-isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=sigdig,
+isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,...){
     d <- data2york(x,get.selection(x,inverse))
@@ -98,7 +98,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=sigdig,
                          ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                          line.col=line.col,lwd=lwd,title=FALSE)
         tt <- roundit(out$age[1],out$age[2])
-        title(isochron.title(out,sigdig=2),xlab=x.lab,ylab=y.lab)
+        title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }

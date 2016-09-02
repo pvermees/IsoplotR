@@ -29,9 +29,14 @@ unzip.vector <- function(x,nc=2){
 
 roundit <- function(age,err,sigdig=2){
     out <- list()
-    out$err <- signif(err,sigdig)
-    nd <- log10(trunc(abs(age)/err))+sigdig
-    out$x <- signif(age,nd)
+    if (is.na(sigdig)){
+        out$x <- age
+        out$err <- err
+    } else {
+        out$err <- signif(err,sigdig)
+        nd <- log10(trunc(abs(age)/err))+sigdig
+        out$x <- signif(age,nd)
+    }
     out
 }
 

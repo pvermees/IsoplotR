@@ -179,7 +179,7 @@ get.Pb207Pb206age <- function(r76,sr76=0,exterr=TRUE){
 
 # x an object of class \code{UPb} returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=2){
+UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA){
     labels <- c('t.75','s[t.75]','t.68','s[t.68]',
                 't.76','s[t.76]','t.conc','s[t.conc]')
     if (!is.na(i)){

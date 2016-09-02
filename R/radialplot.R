@@ -46,6 +46,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      transformation='arcsin',
                                      sigdig=2,show.numbers=FALSE,
                                      pch=21,bg='white',...){
+    if (x$format==2 & transformation=='arcsin')
+        transformation <- 'log'
     X <- x2zs(x,transformation=transformation,t0=t0)
     radial.plot(X,from=from,to=to,zeta=x$zeta[1],
                 rhoD=x$rhoD[1],transformation=transformation,
@@ -193,10 +195,10 @@ radial.plot <- function(x,from=NA,to=NA,zeta=0,rhoD=0,
 }
 
 get.radial.tticks <- function(from,to,transformation){
-    if (identical(transformation,'log'))
-        out <- grDevices::axisTicks(usr=log10(c(from,to)),log=TRUE)
-    else
+    if (identical(transformation,'linear'))
         out <- pretty(c(from,to))
+    else
+        out <- grDevices::axisTicks(usr=log10(c(from,to)),log=TRUE)
     nt <- length(out)
     reldiff <- (to-out[nt])/(out[nt]-out[nt-1])
     if (reldiff > 0.25) {
@@ -242,33 +244,38 @@ x2zs.default <- function(x,transformation='log',t0=NA,...){
 }
 x2zs.fissiontracks <- function(x,transformation='arcsin',t0=NA,...){
     out <- list()
-    Ns <- x$x[,'Ns']
-    Ni <- x$x[,'Ni']
-    if (identical(transformation,'linear')){
+    if (x$format==2){
         tt <- fissiontrack.age(x,exterr=FALSE)
-        out$z <- tt[,'t']
-        out$s <- tt[,'s[t]']
-        if (is.na(t0)) out$z0 <- mean(out$z)
-        else out$z0 <- mean(t0)
-    }
-    if (identical(transformation,'log')){
-        tt <- fissiontrack.age(x,exterr=FALSE)
-        if (any(tt[,'t']<=0)) {
-            transformation <- 'arcsin'
-        } else {
-            out$z <- log(tt[,'t'])
-            out$s <- tt[,'s[t]']/tt[,'t']
+        out <- x2zs.default(tt,transformation=transformation,t0=t0)
+    } else if (x$format==1){
+        Ns <- x$x[,'Ns']
+        Ni <- x$x[,'Ni']
+        if (identical(transformation,'linear')){
+            tt <- fissiontrack.age(x,exterr=FALSE)
+            out$z <- tt[,'t']
+            out$s <- tt[,'s[t]']
             if (is.na(t0)) out$z0 <- mean(out$z)
-            else out$z0 <- log(t0)
+            else out$z0 <- mean(t0)
         }
-    }
-    if (identical(transformation,'arcsin')){
-        out$z <- atan(sqrt((Ns+3/8)/(Ni+3/8)))
-        out$s <- sqrt(1/(Ns+Ni+1/2))/2
-        if (is.na(t0))
-            out$z0 <- atan(sqrt(sum(Ns)/sum(Ni)))
-        else
-            out$z0 <- att(t0,x$zeta[1],x$rhoD[1])
+        if (identical(transformation,'log')){
+            tt <- fissiontrack.age(x,exterr=FALSE)
+            if (any(tt[,'t']<=0)) {
+                transformation <- 'arcsin'
+            } else {
+                out$z <- log(tt[,'t'])
+                out$s <- tt[,'s[t]']/tt[,'t']
+                if (is.na(t0)) out$z0 <- mean(out$z)
+                else out$z0 <- log(t0)
+            }
+        }
+        if (identical(transformation,'arcsin')){
+            out$z <- atan(sqrt((Ns+3/8)/(Ni+3/8)))
+            out$s <- sqrt(1/(Ns+Ni+1/2))/2
+            if (is.na(t0))
+                out$z0 <- atan(sqrt(sum(Ns)/sum(Ni)))
+            else
+                out$z0 <- att(t0,x$zeta[1],x$rhoD[1])
+        }
     }
     out
 }

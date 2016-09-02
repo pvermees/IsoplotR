@@ -202,7 +202,6 @@ getkde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,n=512,.
         if (mM$m > bw) from <- from - bw
     }
     if (log) {
-        bw <- bw/(stats::median(x))
         from <- log(from)
         to <- log(to)
     }

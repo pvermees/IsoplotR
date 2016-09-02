@@ -175,8 +175,15 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
     if (exterr){
         stt2 <- (fit$mean[2]/fit$mean[1])^2
+        if (x$format==1) {
+            rhoD <- x$rhoD
+            zeta <- x$zeta
+        } else {
+            rhoD <- c(1,0)
+            zeta <- x$zeta
+        }
         fit$mean[2] <- fit$mean[1] *
-            sqrt( stt2 + (x$rhoD[2]/x$rhoD[1])^2 + (x$zeta[2]/x$zeta[1])^2 )
+            sqrt( stt2 + (rhoD[2]/rhoD[1])^2 + (zeta[2]/zeta[1])^2 )
     }
     if (plot){
         plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
