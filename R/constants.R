@@ -8,7 +8,7 @@
 #' @param fname the path of a \code{.json} file
 #' @return if \code{fname==NULL}, returns a \code{.json} string
 #' @examples
-#' json <- system.file("defaults.json",package="IsoplotR")
+#' json <- system.file("constants.json",package="IsoplotR")
 #' settings(json)
 #' print(settings())
 #' @export
@@ -20,6 +20,10 @@ settings <- function(fname=NULL){
         prefs <- fromJSON(file=fname)
         .IsoplotR$lambda <- prefs$lambda
         .IsoplotR$iratio <- prefs$iratio
+        .IsoplotR$imass <- prefs$imass
+        .IsoplotR$etchfact <- prefs$etchfact
+        .IsoplotR$tracklength <- prefs$tracklength
+        .IsoplotR$mindens <- prefs$mindens
     }
 }
 
@@ -112,4 +116,22 @@ iratio <- function(ratio,x=NULL,e=NULL){
     if (is.null(x) & is.null(e)) return(.IsoplotR$iratio[[ratio]])
     if (is.numeric(x)) .IsoplotR$iratio[[ratio]][1] <- x
     if (is.numeric(e)) .IsoplotR$iratio[[ratio]][2] <- e
+}
+
+imass <- function(nuclide,x=NULL,e=NULL){
+    if (is.null(x) & is.null(e)) return(.IsoplotR$imass[[nuclide]])
+    if (is.numeric(x)) .IsoplotR$imass[[nuclide]][1] <- x
+    if (is.numeric(e)) .IsoplotR$imass[[nuclide]][2] <- e
+}
+etchfact <- function(mineral,x=NULL){
+    if (is.null(x)) return(.IsoplotR$etchfact[[mineral]])
+    if (is.numeric(x)) .IsoplotR$etchfact[[mineral]] <- x
+}
+tracklength <- function(mineral,x=NULL){
+    if (is.null(x)) return(.IsoplotR$tracklength[[mineral]])
+    if (is.numeric(x)) .IsoplotR$tracklength[[mineral]] <- x
+}
+mindens <- function(mineral,x=NULL){
+    if (is.null(x)) return(.IsoplotR$mindens[[mineral]])
+    if (is.numeric(x)) .IsoplotR$mindens[[mineral]] <- x
 }

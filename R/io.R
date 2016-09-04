@@ -144,10 +144,15 @@ as.fissiontracks <- function(x,format=1){
         out$rhoD <- as.numeric(x[4,1:2])
         out$x <- matrix(as.numeric(x[6:nr,]),nr-5,2)
         colnames(out$x) <- c('Ns','Ni')
-    } else if (format==2){
-        out$zeta <- as.numeric(x[2,1:2])
-        Ns <- as.numeric(x[4:nr,1])
-        A <- as.numeric(x[4:nr,2])
+    } else {
+        if (format==2){
+            out$zeta <- as.numeric(x[2,1:2])
+            si <- 4 # start index
+        } else {
+            si <- 2
+        }
+        Ns <- as.numeric(x[si:nr,1])
+        A <- as.numeric(x[si:nr,2])
         valid <- which(!is.na(Ns))
         out$Ns <- Ns[valid]
         out$A <- A[valid]
@@ -155,9 +160,9 @@ as.fissiontracks <- function(x,format=1){
         out$sU <- list()
         j <- seq(from=3,to=nc-1,by=2)
         for (i in valid){
-            U <- as.numeric(x[i+3,j])
+            U <- as.numeric(x[i+si-1,j])
             out$U[[i]] <- U[!is.na(U)]
-            sU <- as.numeric(x[i+3,j+1])
+            sU <- as.numeric(x[i+si-1,j+1])
             out$sU[[i]] <- U[!is.na(U)]
         }
     }

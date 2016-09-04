@@ -24,7 +24,7 @@
 #' @param ... additional arguments to the generic \code{points} function
 #' @examples
 #' data(examples)
-#' radialplot(examples$FT)
+#' radialplot(examples$FT1)
 #' @rdname radialplot
 #' @export
 radialplot <- function(x,...){ UseMethod("radialplot",x) }
@@ -46,8 +46,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      transformation='arcsin',
                                      sigdig=2,show.numbers=FALSE,
                                      pch=21,bg='white',...){
-    if (x$format==2 & transformation=='arcsin')
-        transformation <- 'log'
+    if (x$format>1 & transformation=='arcsin') transformation <- 'log'
     X <- x2zs(x,transformation=transformation,t0=t0)
     radial.plot(X,from=from,to=to,zeta=x$zeta[1],
                 rhoD=x$rhoD[1],transformation=transformation,
@@ -244,10 +243,7 @@ x2zs.default <- function(x,transformation='log',t0=NA,...){
 }
 x2zs.fissiontracks <- function(x,transformation='arcsin',t0=NA,...){
     out <- list()
-    if (x$format==2){
-        tt <- fissiontrack.age(x,exterr=FALSE)
-        out <- x2zs.default(tt,transformation=transformation,t0=t0)
-    } else if (x$format==1){
+    if (x$format==1){
         Ns <- x$x[,'Ns']
         Ni <- x$x[,'Ni']
         if (identical(transformation,'linear')){
@@ -276,6 +272,9 @@ x2zs.fissiontracks <- function(x,transformation='arcsin',t0=NA,...){
             else
                 out$z0 <- att(t0,x$zeta[1],x$rhoD[1])
         }
+    } else {
+        tt <- fissiontrack.age(x,exterr=FALSE)
+        out <- x2zs.default(tt,transformation=transformation,t0=t0)
     }
     out
 }
