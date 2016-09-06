@@ -71,7 +71,7 @@ get.UsU <- function(U,sU){
             sppg <- length(U[[i]]) # spots per grain
             muhat[i] <- mean(log(U[[i]]))
             num <- num + sum((log(U[[i]])-muhat[i])^2)
-            den <- den + sppg - 1
+            den <- den + max(1,sppg-1)
         } else {
             out[i,'U'] <- U[[i]]
             out[i,'sU'] <- sU[[i]]
