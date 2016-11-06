@@ -22,7 +22,7 @@
 #' @param ylim optional limits of the y-axis (log[Th/He]) of the
 #'     logratio plot. If \code{ylim=NA}, the axis limits are
 #'     determined automatically.
-#' @param fact three element vector with the scaling factors of the
+#' @param fact three-element vector with the scaling factors of the
 #'     ternary diagram if \code{fact=NA}, these will be determined
 #'     automatically
 #' @param ... optional arguments to the generic \code{plot} function

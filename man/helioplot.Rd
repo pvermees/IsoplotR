@@ -39,7 +39,7 @@ determined automatically.}
 logratio plot. If \code{ylim=NA}, the axis limits are
 determined automatically.}
 
-\item{fact}{three element vector with the scaling factors of the
+\item{fact}{three-element vector with the scaling factors of the
 ternary diagram if \code{fact=NA}, these will be determined
 automatically}
 

@@ -4,20 +4,21 @@
 #' the Botev (2010) bandwidth selector and the Abramson (1982)
 #' adaptive kernel bandwidth modifier.
 #'
-#' @param x a vector of numbers or an object of class \code{UPb},
-#'     \code{ArAr} or \code{detrital}
+#' @param x a vector of numbers OR an object of class \code{UPb},
+#'     \code{ArAr}, \code{UThHe}, \code{fissiontracks} or
+#'     \code{detrital}
 #' @rdname kde
 #' @export
 kde <- function(x,...){ UseMethod("kde",x) }
-#' @param from minimum age of the time axis. If NULL, this is set
+#' @param from minimum age of the time axis. If \code{NULL}, this is set
 #'     automatically
-#' @param to maximum age of the time axis. If NULL, this is set
+#' @param to maximum age of the time axis. If \code{NULL}, this is set
 #'     automatically
-#' @param bw the bandwidth of the KDE. If NULL, bw will be calculated
+#' @param bw the bandwidth of the KDE. If \code{NULL}, \code{bw} will be calculated
 #'     automatically using \code{botev()}
-#' @param adaptive boolean flag controlling if the adaptive KDE
+#' @param adaptive logical flag controlling if the adaptive KDE
 #'     modifier of Abramson (1982) is used
-#' @param log transform the ages to a log scale if TRUE
+#' @param log transform the ages to a log scale if \code{TRUE}
 #' @param n horizontal resolution of the density estimate
 #' @param plot show the KDE as a plot
 #' @param pch the symbol used to show the samples. May be a vector.
@@ -26,24 +27,24 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' @param ylab the label of the y-axis
 #' @param kde.col the fill colour of the KDE specified as a four
 #'     element vector of \code{r, g, b, alpha} values
-#' @param show.hist boolean flag indicating whether a histogram should
+#' @param show.hist logical flag indicating whether a histogram should
 #'     be added to the KDE
 #' @param hist.col the fill colour of the histogram specified as a
 #'     four element vector of r, g, b, alpha values
 #' @param binwidth scalar width of the histogram bins, in Myr if
-#'     \code{x$log==FALSE}, or as a fractional value if
-#'     \code{x$log==TRUE}. Sturges' Rule is used if
-#'     \code{binwidth==NA}
+#'     \code{x$log = FALSE}, or as a fractional value if
+#'     \code{x$log = TRUE}. Sturges' Rule is used if
+#'     \code{binwidth = NA}
 #' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
 #'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
 #'     around the plot
 #' @param ncol scalar value indicating the number of columns over
 #'     which the KDEs should be divided. This option is only used if
-#'     \code{x} is of class \code{detritals}.
+#'     \code{x} has class \code{detritals}.
 #' @param ... optional arguments to be passed on to \code{density}
 #' @return
 #'
-#' if \code{plot==TRUE}, returns an object of class \code{KDE}, i.e. a
+#' if \code{plot = TRUE}, returns an object of class \code{KDE}, i.e. a
 #'     list containing the following items:
 #' 
 #' \describe{
@@ -52,7 +53,18 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' \item{bw}{ the base bandwidth of the density estimate}
 #' \item{ages}{ the data values from the input to the \code{KDE} function}
 #' }
-#' 
+#'
+#' @references
+#' Abramson, I.S., 1982. On bandwidth variation in kernel estimates-a
+#' square root law. The annals of Statistics, pp.1217-1223.
+#'
+#' Botev, Z. I., J. F. Grotowski, and
+#' D. P. Kroese. "Kernel density estimation via diffusion." The Annals
+#' of Statistics 38.5 (2010): 2916-2957.
+#'
+#' Vermeesch, P., 2012. On the visualisation of detrital age
+#' distributions. Chemical Geology, 312, pp.190-194.
+#'
 #' @examples
 #' data(examples)
 #' kde(examples$DZ[['N1']],kernel="epanechnikov")
@@ -73,22 +85,23 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
     }
 }
 #' @param type scalar indicating whether to plot the
-#'     \eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
-#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (type=4), or the (Wetherill) concordia age (type=5) 
+#'     (\code{type}=4), or the (Wetherill) concordia age
+#'     (\code{type}=5)
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
-#'     only used if \code{type=4}.
+#'     only used if \code{\code{type}=4}.
 #' @param cutoff.disc two element vector with the maximum and minimum
 #'     percentage discordance allowed between the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
-#'     the \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
+#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
 #' @rdname kde
 #' @export
@@ -104,15 +117,15 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
                 ncol=ncol,...)
 }
-#' @param samebandwidth boolean flag indicating whether the same
-#' bandwidth should be used for all samples. If samebandwidth = TRUE
-#' and bw = NULL, then the function will use the median bandwidth of
-#' all the samples.
-#' @param normalise boolean flag indicating whether or not the KDEs
-#' should all integrate to the same value.
+#' @param samebandwidth logical flag indicating whether the same
+#'     bandwidth should be used for all samples. If
+#'     \code{samebandwidth = TRUE} and \code{bw = NULL}, then the
+#'     function will use the median bandwidth of all the samples.
+#' @param normalise logical flag indicating whether or not the KDEs
+#'     should all integrate to the same value.
 #' @return
 #'
-#' or, if \code{class(x)=='detritals'}, an object of class
+#' or, if \code{x} has class \code{=detritals}, an object of class
 #' \code{KDEs}, i.e. a list containing the following items:
 #'
 #' \describe{

@@ -39,10 +39,10 @@ standard errors (second column) OR an object of class
 
 \item{...}{optional arguments}
 
-\item{detect.outliers}{Boolean flag indicating whether outliers
+\item{detect.outliers}{logical flag indicating whether outliers
 should be detected and rejected using Chauvenet's Criterion.}
 
-\item{plot}{Boolean flag indicating whether the function should
+\item{plot}{logical flag indicating whether the function should
 produce graphical output or return numerical values to the
 user.}
 
@@ -58,46 +58,48 @@ values reported in the title of the graphical output.}
 \item{alpha}{the confidence limits of the error bars/rectangles.}
 
 \item{type}{scalar indicating whether to plot the
-\eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
-\eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
-\eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
+\eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
+\eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-(type=4), or the (Wetherill) concordia age (type=5)}
+(\code{type}=4), or the (Wetherill) concordia age (\code{type}=5)}
 
 \item{cutoff.76}{the age (in Ma) below which the
 \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
-only used if \code{type=4}.}
+only used if \code{\code{type}=4}.}
 
 \item{cutoff.disc}{two element vector with the maximum and minimum
 percentage discordance allowed between the
 \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
-the \eqn{^{206}}Pb/\eqn{^{238}}U and
+age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
+between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-\eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+\eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
 
 \item{exterr}{propagate decay constant uncertainty?}
 }
 \value{
-if \code{PLOT=FALSE}, returns a list with the follwing items:
+if \code{PLOT=FALSE}, returns a list with the following items:
 
-\code{mean:} a two element vector with the weighted mean and its
-standard error.
+\description{
+\item{mean}{a two element vector with the weighted mean and its
+standard error.}
 
-\code{disp:} a two element vector with the (over)dispersion and its
-standard error.
+\item{disp}{a two element vector with the (over)dispersion and its
+standard error.}
 
-\code{mswd:} the Mean Square of the Weighted Deviates
-(a.k.a. `reduced Chi-square' statistic)
+\item{mswd}{the Mean Square of the Weighted Deviates
+(a.k.a. `reduced Chi-square' statistic)}
 
-\code{p.value:} the p-value of a Chi-square test with n-1 degrees
+\item{p.value}{the p-value of a Chi-square test with n-1 degrees
 of freedom, testing the null hypothesis that the underlying
-population is not overdispersed.
+population is not overdispersed.}
 
-\code{valid:} vector of Boolean flags indicating which steps are
-included into the weighted mean calculation
+\item{valid}{vector of logical flags indicating which steps are
+included into the weighted mean calculation}
+}
 }
 \description{
 Models the data as a Normal distribution with two sources of

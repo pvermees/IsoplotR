@@ -2,7 +2,7 @@ Package: IsoplotR
 Title: Statistical Toolbox for Radiometric Geochronology
 Version: 0.8
 Authors@R: person("Pieter", "Vermeesch", , "p.vermeesch@ucl.ac.uk", role = c("aut", "cre")) 
-Description: An R implementation of Ken Ludwig's popular Isoplot add-in to Microsoft Excel. Currently plots U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams. Calculates concordia and discordia ages. Performs linear regression of measurements with correlated errors using the 'York' approach. Generates Kernel Density Estimates (KDEs) and Cumulative Age Distributions (CADs). Produces Multidimensional Scaling (MDS) configurations and Shepard plots of multi-sample detrital datasets using the Kolmogorov-Smirnov distance as a dissimilarity measure. Calculates 40A/39Ar ages, isochrons, and age spectra. Computes weighted means accounting for overdispersion. Calculates U-Th-He (single grain and central) ages, logratio plots and ternary diagrams. Future versions will include functionality for the Rb-Sr, Sm-Nd, Re-Os, fission track and cosmogenic nuclide methods, radial plots and banana diagrams. A graphical user interface is provided as an RStudio Shiny app at http://isoplotr.london-geochron.com. Offline access to this interface will be provided at a later point in time.
+Description: An R implementation of Ken Ludwig's popular Isoplot add-in to Microsoft Excel. Currently plots U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams. Calculates concordia and discordia ages. Performs linear regression of measurements with correlated errors using the 'York' approach. Generates Kernel Density Estimates (KDEs) and Cumulative Age Distributions (CADs). Produces Multidimensional Scaling (MDS) configurations and Shepard plots of multi-sample detrital datasets using the Kolmogorov-Smirnov distance as a dissimilarity measure. Calculates 40Ar/39Ar ages, isochrons, and age spectra. Computes weighted means accounting for overdispersion. Calculates U-Th-He (single grain and central) ages, logratio plots and ternary diagrams. Processes fission track data using the external detector method and LA-ICP-MS, calculates central ages and plots fission track and other data on radial (a.k.a. 'Galbraith' plots). Future versions will include functionality for the Rb-Sr, Sm-Nd, Re-Os, Lu-Hf and U-series dating methods. A graphical user interface is provided as an RStudio Shiny app at http://isoplotr.london-geochron.com. Offline access to this interface will be provided at a later point in time.
 Author: Pieter Vermeesch [aut, cre]
 Maintainer: Pieter Vermeesch <p.vermeesch@ucl.ac.uk>
 Depends: R (>= 3.0.0)
@@ -11,4 +11,4 @@ Suggests:
 License: GPL-2
 LazyData: true
 RoxygenNote: 5.0.1
-Built: R 3.4.0; ; 2016-08-23 12:20:59 UTC; unix
+Built: R 3.4.0; ; 2016-09-13 10:30:23 UTC; unix

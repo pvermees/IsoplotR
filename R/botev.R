@@ -1,20 +1,4 @@
-#' Compute the optimal kernel bandwidth
-#'
-#' Uses the diffusion algorithm of Zdravko Botev (2011)
-#' to calculate the bandwidth for kernel density estimation
-#'
-#' @param x a vector of ordinal data
-#' @return a scalar value with the optimal bandwidth
-#' @author Dzdravko Botev
-#' @references Botev, Z. I., J. F. Grotowski, and
-#' D. P. Kroese. "Kernel density estimation via diffusion." The Annals
-#' of Statistics 38.5 (2010): 2916-2957.
-#' @examples
-#' data(examples)
-#' samp <- examples$DZ[['N1']]
-#' bw <- botev(samp)
-#' print(bw)
-#' @export
+# Compute the optimal kernel bandwidth
 botev <- function(x){
     n <- 512
     minimum <- min(x)

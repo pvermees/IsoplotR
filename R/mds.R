@@ -3,16 +3,17 @@
 #' Performs classical or nonmetric Multidimensional Scaling analysis
 #' @param x a dissimilarity matrix OR an object of class
 #'     \code{detrital}
-#' @param classical boolean flag indicating whether classical (TRUE)
-#'     or nonmetric (FALSE) MDS should be used
+#' @param classical logical flag indicating whether classical
+#'     (\code{TRUE}) or nonmetric (\code{FALSE}) MDS should be used
 #' @param plot show the MDS configuration (if \code{shepard=FALSE}) or
 #'     Shepard plot (if \code{shepard=TRUE}) on a graphical device
-#' @param shepard Boolean flag indicating whether the graphical output
+#' @param shepard logical flag indicating whether the graphical output
 #'     should show the MDS configuration (\code{shepard=FALSE}) or a
 #'     Shepard plot with the 'stress' value. This argument is only
 #'     used if \code{plot=TRUE}.
-#' @param nnlines if TRUE, draws nearest neighbour lines
-#' @param pch plot character (see ?plot for details). May be a vector.
+#' @param nnlines if \code{TRUE}, draws nearest neighbour lines
+#' @param pch plot character (see \code{?plot} for details). May be a
+#'     vector.
 #' @param pos a position specifier for the labels (if \code{pch !=
 #'     NA}). Values of 1, 2, 3 and 4 indicate positions below, to the
 #'     left of, above and to the right of the MDS coordinates,
@@ -26,17 +27,18 @@
 #' @param ... optional arguments to the generic \code{plot} function
 #' @return if \code{plot=FALSE}, returns an object of class
 #'     \code{MDS}, i.e. a list containing the following items:
-#'
-#' \code{points}: a two column vector of the fitted configuration
-#'
-#' \code{classical}: a boolean flag indicating whether the MDS
+#' \describe{
+#' \item{points}{a two column vector of the fitted configuration}
+#' \item{classical}{a logical flag indicating whether the MDS
 #' configuration was obtained by classical (\code{TRUE}) or nonmetric
-#' (\code{FALSE}) MDS.
-#'
-#' \code{diss}: the dissimilarity matrix used for the MDS analysis
-#' 
-#' \code{stress}: (only if \code{classical=TRUE}) the final stress
-#' achieved (in percent)
+#' (\code{FALSE}) MDS}
+#' \item{diss}{the dissimilarity matrix used for the MDS analysis} 
+#' \item{stress}{(only if \code{classical=TRUE}) the final stress
+#' achieved (in percent)}
+#' }
+#' @references
+#' Vermeesch, P., 2013. Multi-sample comparison of detrital age
+#' distributions. Chemical Geology, 341, pp.140-146.
 #' @examples
 #' data(examples)
 #' # Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.

@@ -18,11 +18,16 @@
 #'     (if \code{x} has class \code{fissiontracks})
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output.
-#' @param show.numbers boolean flag (TRUE to show grain numbers)
+#' @param show.numbers boolean flag (\code{TRUE} to show grain numbers)
 #' @param pch plot character (default is a filled circle)
 #' @param bg background colour of the plot character
 #' @param title add a title to the plot?
 #' @param ... additional arguments to the generic \code{points} function
+#' @references
+#' Galbraith, R.F., 1990. The radial plot: graphical assessment of
+#' spread in ages. International Journal of Radiation Applications and
+#' Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
+#' 17(3), pp.207-214.
 #' @examples
 #' data(examples)
 #' radialplot(examples$FT1)
@@ -49,11 +54,12 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
     if (title) title(radial.title(central(x),sigdig=sigdig))
 }
 #' @param type scalar indicating whether to plot the
-#'     \eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (type=4), or the (Wetherill) concordia age (type=5)
+#'     (\code{type}=4), or the (Wetherill) concordia age
+#'     (\code{type}=5)
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
@@ -61,10 +67,10 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #' @param cutoff.disc two element vector with the maximum and minimum
 #'     percentage discordance allowed between the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
-#'     the \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
+#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
 #' @rdname radialplot
 #' @export
@@ -323,7 +329,7 @@ get.z0 <- function(x,t0=NA,from=NA,to=NA){
             z0 <- mean(log(c(from,to)+x$offset))
         } else if (identical(x$transformation,'linear')) {
             z0 <- mean(c(from,to))
-        } else {n
+        } else {
             stop('illegal input')
         }
     } else if (identical(x$transformation,'log')){

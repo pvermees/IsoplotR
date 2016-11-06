@@ -62,7 +62,8 @@ These should not be in a package tarball.
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
 * checking R code for possible problems ... OK
-* checking Rd files ... OK
+* checking Rd files ... WARNING
+checkRd: (7) kde.Rd:113: Tag \code is invalid in a \code block
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
 * checking Rd cross-references ... OK
@@ -77,4 +78,4 @@ These should not be in a package tarball.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 4 NOTEs
+Status: 3 WARNINGs, 4 NOTEs

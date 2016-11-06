@@ -8,7 +8,6 @@ age.UThHe	age
 agespectrum	agespectrum
 agespectrum.ArAr	agespectrum
 agespectrum.default	agespectrum
-botev	botev
 cad	cad
 cad.ArAr	cad
 cad.default	cad
@@ -18,6 +17,7 @@ cad.UPb	cad
 cad.UThHe	cad
 central	central
 central.default	central
+central.fissiontracks	central
 central.UThHe	central
 concordia	concordia
 ellipse	ellipse

@@ -15,9 +15,9 @@ concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 
 \item{alpha}{confidence cutoff for the error ellipses}
 
-\item{wetherill}{boolean flag (FALSE for Tera-Wasserburg)}
+\item{wetherill}{logical flag (\code{FALSE} for Tera-Wasserburg)}
 
-\item{show.numbers}{boolean flag (TRUE to show grain numbers)}
+\item{show.numbers}{logical flag (\code{TRUE} to show grain numbers)}
 
 \item{ellipse.col}{background colour of the error ellipses}
 
@@ -43,7 +43,7 @@ equivalence of multiple
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
 compositions, computes the weighted mean isotopic composition and
 the corresponding concordia age using the method of maximum
-likelihood, computes the mswd of equivalence and concordance and
+likelihood, computes the MSWD of equivalence and concordance and
 their respective Chi-squared p-values. Performs linear regression
 and computes the upper and lower intercept ages (for Wetherill) or
 the lower intercept age and the \eqn{^{207}}Pb/\eqn{^{206}}Pb

@@ -23,6 +23,11 @@ get.absolute.zeta <- function(mineral){
     c(zeta,0)
 }
 
+zeta <- function(x,tst=c(0,0)){
+    ngrains <- length(x$Ns)
+    
+}
+
 ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
     ngrains <- length(x$Ns)
     tt <- rep(0,ngrains)
@@ -32,9 +37,9 @@ ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
     } else {
         zeta <- c(x$zeta[1],0)
     }
-    UsU <- get.UsU(x$U,x$sU)
     ipos <- which(x$Ns>0)
     izero <- which(x$Ns<1)
+    UsU <- get.UsU(x)
     # first calculate the ages of the non-zero track data:
     for (i in ipos){
         tst <- get.ICP.age(x$Ns[i],x$A[i],UsU[i,],zeta)
@@ -55,32 +60,39 @@ ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
     out
 }
 
-get.UsU <- function(U,sU){
-    ngrains <- length(U)
-    nspots <- length(unlist(U))
-    do.average <- (nspots>ngrains)
-    out <- matrix(0,ngrains,2)
+get.UsU <- function(x){
+    Aicp <- pi*(x$spotSize/2)^2
+    n <- length(x$U)
+    nspots <- length(unlist(x$U))
+    do.average <- (nspots>n)
+    out <- matrix(0,n,2)
     colnames(out) <- c('U','sU')
+    m <- rep(0,n)
     if (do.average) {
-        muhat <- rep(0,ngrains)
+        uhat <- rep(0,n)
         num <- 0
         den <- 0
     }
-    for (i in 1:ngrains){
+    for (j in 1:n){
         if (do.average){
-            sppg <- length(U[[i]]) # spots per grain
-            muhat[i] <- mean(log(U[[i]]))
-            num <- num + sum((log(U[[i]])-muhat[i])^2)
-            den <- den + sppg - 1
+            m[j] <- length(x$U[[j]]) # spots per grain
+            uhat[j] <- mean(log(x$U[[j]]))
+            num <- num + sum((log(x$U[[j]])-uhat[j])^2)
+            den <- den + m[j] - 1
         } else {
-            out[i,'U'] <- U[[i]]
-            out[i,'sU'] <- sU[[i]]
+            out[j,'U'] <- x$U[[j]]
+            out[j,'sU'] <- x$sU[[j]]
         }
     }
     if (do.average){
-        vhat <- num/den
-        out[,'U'] <- exp(muhat) #exp(muhat+vhat/2)
-        out[,'sU'] <- out[,'U']*sqrt(vhat) #sqrt(exp(vhat)-1)
+        out[,'U'] <- exp(uhat)
+        vhat <- rep(num/den,n)
+        for (j in 1:n){
+            suhat <- x$sU[[j]]/x$U[[j]]
+            vhat[j] <- vhat[j]*(1-m[j]*Aicp/x$A[j])^2 +
+                       sum(suhat^2)*(Aicp/x$A[j])^2
+        }
+        out[,'sU'] <- exp(uhat)*sqrt(vhat)
     }
     out
 }

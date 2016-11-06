@@ -14,8 +14,8 @@ lambda(nuclide, x = NULL, e = NULL)
 \item{e}{new value for the decay constant uncertainty}
 }
 \value{
-if \code{x==e==NULL}, returns a two-item vector containing
-    the decay constant [in Ma-1] and its standard error,
+if \code{x=e=NULL}, returns a two-item vector containing
+    the decay constant [in Myr\eqn{^{-1}}] and its standard error,
     respectively.
 }
 \description{
@@ -29,19 +29,19 @@ print(lambda('U238'))
 }
 \references{
 U: Jaffey, A. H., et al. "Precision measurement of half-lives and
-specific activities of U235 and U238." Physical Review C 4.5 (1971): 1889.
+specific activities of U\eqn{^{235}} and U\eqn{^{238}}." Physical Review C 4.5 (1971): 1889.
 
-Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of 232Th.
+Th: Le Roux, L. J., and L. E. Glendenin. "Half-life of \eqn{^{232}}Th.
 "Proceedings of the National Meeting on Nuclear Energy, Pretoria,
 South Africa. 1963.
 
-Sm: Lugmair, G. W., and K. Marti. "Lunar initial 143Nd/144Nd: differential
+Sm: Lugmair, G. W., and K. Marti. "Lunar initial \eqn{^{143}}Nd/\eqn{^{144}}Nd: differential
 evolution of the lunar crust and mantle." Earth and Planetary Science
 Letters 39.3 (1978): 349-357.
 
 Ar: Renne, Paul R., et al. "Response to the comment by WH Schwarz et al. on
-"Joint determination of 40K decay constants and 40Ar*/40K for the Fish Canyon
-sanidine standard, and improved accuracy for 40 Ar/39 Ar geochronology"
+"Joint determination of 40K decay constants and \eqn{^{40}}Ar*/\eqn{^{40}}K for the Fish Canyon
+sanidine standard, and improved accuracy for \eqn{^{40}}Ar/\eqn{^{39}}Ar geochronology"
 by PR Renne et al.(2010)." Geochimica et Cosmochimica Acta 75.17 (2011): 5097-5100.
 }
 

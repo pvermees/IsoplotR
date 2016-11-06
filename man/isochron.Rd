@@ -13,7 +13,7 @@ isochron(x, ...)
   line.col = "red", lwd = 2, title = TRUE, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = sigdig, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE, ...)
 }
 \arguments{
@@ -42,7 +42,7 @@ OR an object of class \code{ArAr}}
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output}
 
-\item{show.numbers}{boolean flag (TRUE to show grain numbers)}
+\item{show.numbers}{logical flag (\code{TRUE} to show grain numbers)}
 
 \item{ellipse.col}{background colour of the error ellipses}
 
@@ -60,14 +60,12 @@ vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar. If \code{FALSE}, plots
 }
 \value{
 if \code{plot=FALSE}, returns a list with the following items:
-
-\code{a:} the intercept of the straight line fit and its standard error
-
-\code{b:} the slope of the fit and its standard error
-
-\code{y0:} the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and its standard error
-
-\code{age:} the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard error
+\describe{
+\item{a}{the intercept of the straight line fit and its standard error} 
+\item{b}{the slope of the fit and its standard error}
+\item{y0}{the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and its standard error}
+\item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard error}
+}
 }
 \description{
 Plots cogenetic \eqn{^{40}}Ar/\eqn{^{39}}Ar data as X-Y

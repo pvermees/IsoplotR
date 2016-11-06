@@ -22,7 +22,7 @@
 #' @param xlim 2-element vector with the plot limits of the x-axis
 #' @param ylim 2-element vector with the plot limits of the y-axis
 #' @param alpha confidence cutoff for the error ellipses
-#' @param show.numbers boolean flag (TRUE to show grain numbers)
+#' @param show.numbers logical flag (\code{TRUE} to show grain numbers)
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output
 #' @param ellipse.col background colour of the error ellipses
@@ -54,15 +54,12 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
 #' @return
 #' if \code{plot=FALSE}, returns a list with the following items:
-#'
-#' \code{a:} the intercept of the straight line fit and its standard error
-#' 
-#' \code{b:} the slope of the fit and its standard error
-#' 
-#' \code{y0:} the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and its standard error
-#' 
-#' \code{age:} the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard error
-#' 
+#' \describe{
+#' \item{a}{the intercept of the straight line fit and its standard error} 
+#' \item{b}{the slope of the fit and its standard error}
+#' \item{y0}{the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and its standard error}
+#' \item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard error}
+#' }
 #' @examples
 #' data(examples)
 #' isochron(examples$ArAr)

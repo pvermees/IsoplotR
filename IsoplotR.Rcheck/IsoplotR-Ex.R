@@ -47,7 +47,7 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: agespectrum
-### Title: Plot a (^{40}Ar/^{39}Ar) release spectrum
+### Title: Plot a (40Ar/39Ar) release spectrum
 ### Aliases: agespectrum agespectrum.ArAr agespectrum.default
 
 ### ** Examples
@@ -59,28 +59,6 @@ agespectrum(examples$ArAr,ylim=c(0,80))
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("agespectrum", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
-nameEx("botev")
-### * botev
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: botev
-### Title: Compute the optimal kernel bandwidth
-### Aliases: botev
-
-### ** Examples
-
-data(examples)
-samp <- examples$DZ[['N1']]
-bw <- botev(samp)
-print(bw)
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("botev", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("cad")
 ### * cad
@@ -112,7 +90,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: central
 ### Title: Calculate U-Th-He (and fission track) central ages and
 ###   compositions
-### Aliases: central central.UThHe central.default
+### Aliases: central central.UThHe central.default central.fissiontracks
 
 ### ** Examples
 
@@ -336,7 +314,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
-radialplot(examples$FT)
+radialplot(examples$FT1)
 
 
 
@@ -376,7 +354,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-json <- system.file("defaults.json",package="IsoplotR")
+json <- system.file("constants.json",package="IsoplotR")
 settings(json)
 print(settings())
 

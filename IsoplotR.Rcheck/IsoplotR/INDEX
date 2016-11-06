@@ -1,6 +1,5 @@
 age                     Calculate isotopic ages
-agespectrum             Plot a (^{40}Ar/^{39}Ar) release spectrum
-botev                   Compute the optimal kernel bandwidth
+agespectrum             Plot a (40Ar/39Ar) release spectrum
 cad                     Plot continuous data as cumulative age
                         distributions
 central                 Calculate U-Th-He (and fission track) central

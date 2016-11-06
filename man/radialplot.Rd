@@ -12,25 +12,25 @@
 radialplot(x, ...)
 
 \method{radialplot}{default}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
-  bg = "white", ...)
+  transformation = NA, show.numbers = FALSE, pch = 21, bg = "white",
+  ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
   transformation = "arcsin", sigdig = 2, show.numbers = FALSE, pch = 21,
-  bg = "white", ...)
+  bg = "white", title = TRUE, ...)
 
 \method{radialplot}{UPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", type = 4, cutoff.76 = 1100,
-  cutoff.disc = c(-15, 5), sigdig = 2, show.numbers = FALSE, pch = 21,
-  bg = "white", ...)
+  cutoff.disc = c(-15, 5), show.numbers = FALSE, pch = 21, bg = "white",
+  ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
-  bg = "white", ...)
+  transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
+  ...)
 
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
-  bg = "white", ...)
+  transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
+  ...)
 }
 \arguments{
 \item{x}{Either an nx2 matix of (transformed) values z and their
@@ -52,21 +52,24 @@ and object of class \code{fissiontracks}, \code{UThHe},
 \item{transformation}{one of either \code{log}, \code{linear} or
 (if \code{x} has class \code{fissiontracks})}
 
-\item{sigdig}{the number of significant digits of the numerical
-values reported in the title of the graphical output.}
-
-\item{show.numbers}{boolean flag (TRUE to show grain numbers)}
+\item{show.numbers}{boolean flag (\code{TRUE} to show grain numbers)}
 
 \item{pch}{plot character (default is a filled circle)}
 
 \item{bg}{background colour of the plot character}
 
+\item{sigdig}{the number of significant digits of the numerical
+values reported in the title of the graphical output.}
+
+\item{title}{add a title to the plot?}
+
 \item{type}{scalar indicating whether to plot the
-\eqn{^{207}}Pb/\eqn{^{235}}U age (type=1), the
-\eqn{^{206}}Pb/\eqn{^{238}}U age (type=2), the
+\eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
+\eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (type=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-(type=4), or the (Wetherill) concordia age (type=5)}
+(\code{type}=4), or the (Wetherill) concordia age
+(\code{type}=5)}
 
 \item{cutoff.76}{the age (in Ma) below which the
 \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
@@ -76,10 +79,10 @@ only used if \code{type=4}.}
 \item{cutoff.disc}{two element vector with the maximum and minimum
 percentage discordance allowed between the
 \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
-the \eqn{^{206}}Pb/\eqn{^{238}}U and
+age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
+between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-\eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
+\eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
 }
 \description{
@@ -89,6 +92,12 @@ standard errors.
 }
 \examples{
 data(examples)
-radialplot(examples$FT)
+radialplot(examples$FT1)
+}
+\references{
+Galbraith, R.F., 1990. The radial plot: graphical assessment of
+spread in ages. International Journal of Radiation Applications and
+Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
+17(3), pp.207-214.
 }
 

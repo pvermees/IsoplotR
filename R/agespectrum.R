@@ -1,4 +1,4 @@
-#' Plot a (\eqn{^{40}}Ar/\eqn{^{39}}Ar) release spectrum
+#' Plot a (40Ar/39Ar) release spectrum
 #'
 #' Produces a plot of boxes whose widths correspond to the cumulative
 #' amount of \eqn{^{39}}Ar (or any other volume proxy), and whose
@@ -6,42 +6,44 @@
 #' analytical uncertainty associated with decay constants and
 #' J-factors after computing the plateau composition.
 #'
-#' @param x a three column matrix whose first column gives the amount
+#' @param x - a three-column matrix whose first column gives the amount
 #'     of \eqn{^{39}}Ar in each aliquot, and whose second and third
 #'     columns give the age and its uncertainty.
 #'
 #' OR
 #'
-#' an object of class \code{ArAr} with \code{format=2}
+#' - an object of class \code{ArAr} with \code{format=2}
 #' 
 #' @param alpha the confidence limits of the error bars/boxes.
-#' @param plateau Boolean flag indicating whether a plateau age should
-#'     be calculated if \code{plateau=TRUE}, the function will compute
-#'     the weighted mean of the largest succession of steps that yield
-#'     values passing the Chi-square test for age homogeneity.
+#' @param plateau logical flag indicating whether a plateau age should
+#'     be calculated. If \code{plateau=TRUE}, the function will
+#'     compute the weighted mean of the largest succession of steps
+#'     that yield values passing the Chi-square test for age
+#'     homogeneity.
 #' @param plateau.col the fill colour of the rectangles used to mark
 #'     the steps belonging to the age plateau.
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
 #'     NOT belong to the plateau are given a different colour.
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output (only used
-#'     if \code{plateau=FALSE}).
+#'     if \code{plateau=TRUE}).
 #' @param line.col colour of the isochron line
 #' @param lwd line width
 #' @param title add a title to the plot? If \code{FALSE}, returns a
 #'     list with plateau parameters.
-#' @param ... optional parameters to the generic plot function
-#' @return
-#' if \code{title=FALSE}, a list with the following items:
+#' @param ... optional parameters to the generic \code{plot} function
+#' @return if \code{title=FALSE}, a list with the following items:
 #'
-#' \code{mean} a 2-element vector with the plateau mean and standard error
+#' \describe{
+#' \item{mean}{a 2-element vector with the plateau mean and standard error}
 #'
-#' \code{mswd} the mean square of the weighted deviates of the plateau
+#' \item{mswd}{the mean square of the weighted deviates of the plateau}
 #'
-#' \code{p.value} the p-value of a Chi-square test with n-1 degrees of
-#' freedom, where n is the number of steps in the plateau.n
+#' \item{p.value}{the p-value of a Chi-square test with n-1 degrees of
+#' freedom, where n is the number of steps in the plateau.}
 #'
-#' \code{fract} the fraction of \eqn{^{39}Ar} contained in the plateau
+#' \item{fract}{the fraction of \eqn{^{39}}Ar contained in the
+#' plateau} }
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }

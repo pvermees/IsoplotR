@@ -10,14 +10,14 @@ settings(fname = NULL)
 \item{fname}{the path of a \code{.json} file}
 }
 \value{
-if \code{fname==NULL}, returns a \code{.json} string
+if \code{fname=NULL}, returns a \code{.json} string
 }
 \description{
 Get and set preferred values for decay constants and isotopic
 abundances from and to a \code{.json} file format
 }
 \examples{
-json <- system.file("defaults.json",package="IsoplotR")
+json <- system.file("constants.json",package="IsoplotR")
 settings(json)
 print(settings())
 }

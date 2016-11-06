@@ -13,60 +13,73 @@
 age(x, ...)
 
 \method{age}{default}(x, method = "Pb206U238", exterr = TRUE, J = c(NA,
-  NA), ...)
+  NA), zeta = c(NA, NA), rhoD = c(NA, NA), ...)
 
 \method{age}{UPb}(x, concordia = 1, wetherill = TRUE, exterr = TRUE,
-  i = NA, sigdig = 2, ...)
+  i = NA, sigdig = NA, ...)
 
 \method{age}{detritals}(x, ...)
 
 \method{age}{ArAr}(x, isochron = FALSE, exterr = TRUE, i = NA,
-  sigdig = 2, ...)
+  sigdig = NA, ...)
 
-\method{age}{UThHe}(x, central = FALSE, i = NA, sigdig = 2, ...)
+\method{age}{UThHe}(x, central = FALSE, i = NA, sigdig = NA, ...)
 
-\method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = 2,
+\method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA,
   exterr = TRUE, ...)
 }
 \arguments{
 \item{x}{can be:
 
-a scalar containing an isotopic ratio,
+- a scalar containing an isotopic ratio,
 
-a two element vector containing an isotopic ratio and its standard error,
+- a two element vector containing an isotopic ratio and its standard
+error, or the spontaneous and induced track densities \code{Ns} and
+\code{Ni} (if \code{method='fissiontracks'}),
 
-a four element vector containing \code{Ar40Ar39},
+- a four element vector containing \code{Ar40Ar39},
 \code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
 
-an six element vector containing \code{U}, \code{s[U]}, \code{Th},
-\code{s[Th]}, \code{He} and \code{s[He]}
+- a six element vector containing \code{U}, \code{s[U]}, \code{Th},
+\code{s[Th]}, \code{He} and \code{s[He]},
 
-an eight element vector containing \code{U}, \code{s[U]}, \code{Th},
-\code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and \code{s[Sm]},
+- an eight element vector containing \code{U}, \code{s[U]},
+\code{Th}, \code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and
+\code{s[Sm]},
 
 OR
 
-an object of class \code{UPb}, \code{ArAr} or \code{UThHe}.}
+- an object of class \code{UPb}, \code{ArAr}, \code{UThHe} or
+\code{fissiontracks}.}
 
 \item{...}{optional arguments}
 
 \item{method}{one of either \code{'Pb206U238'}, \code{'Pb207U235'},
-\code{'Pb207Pb206'}, \code{'Ar40Ar39'} or \code{U-Th-He}}
+\code{'Pb207Pb206'}, \code{'Ar40Ar39'}, \code{U-Th-He} or
+\code{fissiontracks}}
 
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}
 
-\item{J}{two element vector with the J-factor and its standard
+\item{J}{two-element vector with the J-factor and its standard
 error.  This option is only used if \code{method} =
 \code{'Ar40Ar39'}.}
+
+\item{zeta}{two-element vector with the zeta-factor and its standard
+error.  This option is only used if \code{method} =
+\code{'fissiontracks'}.}
+
+\item{rhoD}{two-element vector with the track density of the
+dosimeter glass and its standard error.  This option is only
+used if \code{method} = \code{'fissiontracks'}.}
 
 \item{concordia}{scalar flag indicating whether each U-Pb analysis
 should be considered separately (\code{concordia=1}), a
 concordia age should be calculated from all U-Pb analyses
 together (\code{concordia=2}), or a discordia line should be
-fit through all the U-Pb analyses (\code{concordia=2}).}
+fit through all the U-Pb analyses (\code{concordia=3}).}
 
-\item{wetherill}{boolean flag to indicate whether the data should
+\item{wetherill}{logical flag to indicate whether the data should
 be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 (\code{FALSE}) space.  This option is only used when
 \code{concordia=2}}
@@ -74,35 +87,35 @@ be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 \item{i}{(optional) index of a particular aliquot}
 
 \item{sigdig}{number of significant digits for the uncertainty
-estimate (only used if \code{concordia=1},
-\code{isochron=FALSE} or \code{central=FALSE}).}
+estimate (only used if \code{concordia=1}, \code{isochron=FALSE}
+or \code{central=FALSE}).}
 
-\item{isochron}{Boolean flag indicating whether each Ar-Ar analysis
+\item{isochron}{logical flag indicating whether each Ar-Ar analysis
 should be considered separately (\code{isochron=FALSE}) or an
 isochron age should be calculated from all Ar-Ar analyses
 together (\code{isochron=TRUE}).}
 
-\item{central}{Boolean flag indicating whether each U-Th-He analysis
+\item{central}{logical flag indicating whether each U-Th-He analysis
 should be considered separately (\code{central=FALSE}) or a
 central age should be calculated from all U-Th-He analyses
 together (\code{central=TRUE}).}
 }
 \value{
-if \code{x} is a scalar or a vector, returns the age using
-    the geochronometer given by \code{method} and its standard
-    error.
+\enumerate{
 
-if \code{x} has class \code{UPb} and \code{concordia=1},
-    returns a table with the following columns:
-    `t.75', `err[t.75]', `t.68', `err[t.68]', `t.76',`err[t.76]',
-    `t.conc', `err[t.conc]', containing the 207Pb/235U-age and
-    standard error, the \eqn{^{206}}Pb/\eqn{^{238}}U-age and
-    standard error, the \eqn{^{207}}Pb/\eqn{^{206}} Pb-age and
-    standard error, and the concordia age and standard error,
-    respectively.
+\item if \code{x} is a scalar or a vector, returns the age using
+the geochronometer given by \code{method} and its standard error.
+
+\item if \code{x} has class \code{UPb} and \code{concordia=1},
+returns a table with the following columns: `t.75', `err[t.75]',
+`t.68', `err[t.68]', `t.76',`err[t.76]', `t.conc', `err[t.conc]',
+containing the \eqn{^{207}}Pb/\eqn{^{235}} U-age and standard
+error, the \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
+\eqn{^{207}}Pb/\eqn{^{206}} Pb-age and standard error, and the
+concordia age and standard error, respectively.
  
-if \code{x} has class \code{UPb} and \code{concordia=2}, returns a
-list with the following items:
+\item if \code{x} has class \code{UPb} and \code{concordia=2},
+returns a list with the following items:
 
 \describe{
 \item{x}{ a named vector with the (weighted mean) U-Pb composition }
@@ -124,8 +137,8 @@ respectively. }
 for isotopic equivalence and age concordance, respectively. }
 }
 
-if \code{x} has class \code{UPb} and \code{concordia=3}, returns a
-list with the following items:
+\item if \code{x} has class \code{UPb} and \code{concordia=3},
+returns a list with the following items:
 
 \describe{
 \item{x}{ a two element vector with the upper and lower intercept
@@ -135,10 +148,10 @@ ages (if wetherill==TRUE) or the lower intercept age and
 \item{cov}{ the covariance matrix of the elements in \code{x} }
 }
 
-if \code{x} has class \code{ArAr} and \code{isochron=FALSE},
+\item if \code{x} has class \code{ArAr} and \code{isochron=FALSE},
 returns a table of Ar-Ar ages and standard errors.
 
-if \code{x} has class \code{ArAr} and \code{isochron=TRUE},
+\item if \code{x} has class \code{ArAr} and \code{isochron=TRUE},
 returns a list with the following items:
 
 \describe{
@@ -156,10 +169,10 @@ error. }
 
 }
 
-if \code{x} has class \code{UThHe} and \code{central=FALSE},
+\item if \code{x} has class \code{UThHe} and \code{central=FALSE},
 returns a table of U-Th-He ages and standard errors.
 
-if \code{x} has class \code{UThHe} and \code{central=TRUE},
+\item if \code{x} has class \code{UThHe} and \code{central=TRUE},
 returns a list with the following items:
 
 \describe{
@@ -179,21 +192,32 @@ log[U/He]-log[Th/He] compositions. }
 standard error. }
 
 }
+
+\item if \code{x} has class \code{fissiontracks} and
+\code{central=FALSE}, returns a table of fission track ages and
+standard errors.
+
+\item if \code{x} has class \code{fissiontracks} and
+\code{central=TRUE}, returns a list with the following items:
+
+\describe{
+
+\item{mswd}{ the reduced Chi-square value for the fission track
+ages. }
+
+\item{p.value}{ the p-value of concordance between the fission
+track ages. }
+
+\item{age}{ a two-element vector with the central age and its
+standard error. }
+
+\item{disp}{ the (over)dispersion of the single grain ages beyond
+the formal analytical uncertainties. }
+}
+}
 }
 \description{
-Calculates U-Pb ages and propagates their analytical
-uncertainties. Evaluates the equivalence of multiple
-(\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
-\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
-compositions, computes the weighted mean isotopic composition and
-the corresponding concordia age using the method of maximum
-likelihood, computes the mswd of equivalence and concordance and
-their respective Chi-squared p-values. Performs linear regression
-of U-Pb data on Wetherill and Tera-Wasserburg concordia
-diagrams. Computes the upper and lower intercept ages (for
-Wetherill) or the lower intercept age and the
-\eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg),
-taking into account error correlations and decay constant
+Calculates  ages and propagates their analytical
 uncertainties.
 }
 \examples{

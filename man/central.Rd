@@ -4,6 +4,7 @@
 \alias{central}
 \alias{central.UThHe}
 \alias{central.default}
+\alias{central.fissiontracks}
 \title{Calculate U-Th-He (and fission track) central ages and compositions}
 \usage{
 central(x, ...)
@@ -11,31 +12,59 @@ central(x, ...)
 \method{central}{default}(x, ...)
 
 \method{central}{UThHe}(x, ...)
+
+\method{central}{fissiontracks}(x, mineral = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe} or \code{fissiontracks}}
 
 \item{...}{optional arguments}
+
+\item{mineral}{setting this parameter to either \code{apatite} or
+\code{zircon} changes the default efficiency factor, initial
+fission track length and density to preset values (only affects
+results if \code{x$format = 2}.)}
 }
 \value{
-if \code{x} has class \code{UThHe}, retuns a list
-    containing the following items:
+a list containing the following items:
 
-\code{uvw} (if the input data table contains Sm) or \code{uv} (if it doesn't):
-the geometric mean log[U/He], log[Th/He] (, log[Sm/He]) and log[Sm/He]
-composition
+\describe{
 
-\code{covmat}: the covariance matrix of \code{uvw} or \code{uv}
+\item{mswd}{the reduced Chi-square statistic of data concordance,
+i.e. mswd = SS/(2n-2) where, SS is the sum of squares of the
+log[U/He]-log[Th/He] compositions and n is the number of
+samples. If \code{x} has class \code{fissiontracks}, then mswd =
+X2/(n-1), where X2 is a Chi-square statistic of the EDM data or ICP
+ages.}
 
-\code{mswd}: the reduced Chi-square statistic of data concordance,
-i.e. mswd = SS/(2n-2) where SS is the sum of squares of the
-log[U/He]-log[Th/He] compositions and n is the number of samples.
+\item{p.value}{the p-value of a Chi-square test with n-2 degrees of
+freedom}
 
-\code{p.value}: the p-value of a Chi-square test with n-2 degrees
-of freedom
+\item{age}{a two-column vector with the central age and its
+standard error.}
 
-\code{age}: a two-column vector with the central age and its
-standard error.
+}
+
+Additionally, if \code{x} has class \code{UThHe}:
+
+\describe{
+
+\item{uvw}{(if the input data table contains Sm) or \strong{uv} (if
+it doesn't): the geometric mean log[U/He], log[Th/He] (,
+log[Sm/He]) and log[Sm/He] composition}
+
+\item{covmat}{the covariance matrix of \code{uvw} or \code{uv}}
+
+}
+
+OR, if \code{x} has class \code{fissiontracks}:
+
+\describe{
+
+\item{disp}{the (over)dispersion of the ages (value between 0 and
+1)}
+
+}
 }
 \description{
 Computes the geometric mean composition of a set of fission track

@@ -8,30 +8,43 @@
 #' @param ... optional arguments
 #' @return a list containing the following items:
 #'
-#' \code{mswd}: the reduced Chi-square statistic of data concordance,
+#' \describe{
+#'
+#' \item{mswd}{the reduced Chi-square statistic of data concordance,
 #' i.e. mswd = SS/(2n-2) where, SS is the sum of squares of the
 #' log[U/He]-log[Th/He] compositions and n is the number of
-#' samples. If \code{x} has class \code{fissiontracks}, mswd =
+#' samples. If \code{x} has class \code{fissiontracks}, then mswd =
 #' X2/(n-1), where X2 is a Chi-square statistic of the EDM data or ICP
-#' ages.
+#' ages.}
 #'
-#' \code{p.value}: the p-value of a Chi-square test with n-2 degrees
-#' of freedom
+#' \item{p.value}{the p-value of a Chi-square test with n-2 degrees of
+#' freedom}
 #'
-#' \code{age}: a two-column vector with the central age and its
-#' standard error.
+#' \item{age}{a two-column vector with the central age and its
+#' standard error.}
+#'
+#' }
 #'
 #' Additionally, if \code{x} has class \code{UThHe}:
 #'
-#' \code{uvw} (if the input data table contains Sm) or \code{uv} (if
-#' it doesn't): the geometric mean log[U/He], log[Th/He] (,
-#' log[Sm/He]) and log[Sm/He] composition
+#' \describe{
 #'
-#' \code{covmat}: the covariance matrix of \code{uvw} or \code{uv}
+#' \item{uvw}{(if the input data table contains Sm) or \strong{uv} (if
+#' it doesn't): the geometric mean log[U/He], log[Th/He] (,
+#' log[Sm/He]) and log[Sm/He] composition}
+#'
+#' \item{covmat}{the covariance matrix of \code{uvw} or \code{uv}}
+#'
+#' }
 #'
 #' OR, if \code{x} has class \code{fissiontracks}:
 #'
-#' \code{disp}: the (over)dispersion of the ages (value between 0 and 1).
+#' \describe{
+#'
+#' \item{disp}{the (over)dispersion of the ages (value between 0 and
+#' 1)}
+#'
+#' }
 #'
 #' @examples
 #' data(examples)
@@ -80,6 +93,11 @@ central.UThHe <- function(x,...){
     out$p.value <- 1-pchisq(SS,df)
     out
 }
+
+#' @param mineral setting this parameter to either \code{apatite} or
+#'     \code{zircon} changes the default efficiency factor, initial
+#'     fission track length and density to preset values (only affects
+#'     results if \code{x$format = 2}.)
 #' @rdname central
 #' @export
 central.fissiontracks <- function(x,mineral=NA,...){
@@ -111,7 +129,7 @@ central.fissiontracks <- function(x,mineral=NA,...){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         zu <- log(tst[,'t'])
         su <- tst[,'s[t]']/tst[,'t']
-        fit <- optim(c(mean(zu),sigma),eq6.8.9,zu=zu,su=su)
+        fit <- stats::optim(c(mean(zu),sigma),eq6.8.9,zu=zu,su=su)
         mu <- fit$par[1]
         sigma <- fit$par[2]
         tt <- exp(mu)

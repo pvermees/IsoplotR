@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.8.13)  23 AUG 2016 13:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.8.13)  13 SEP 2016 11:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -709,7 +709,7 @@ File: latin1.def 2015/03/17 v1.2c Input encoding file
 
 
 Writing index file Rd2.idx
-(/tmp/RtmpfbfrIB/Rd2pdf79d3f2e5904/Rd2.aux)
+(/tmp/RtmpfUJdWa/Rd2pdf6bb0757e50a1/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -766,8 +766,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/tmp/RtmpfbfrIB/Rd2pdf79d3f2e5904/Rd2.out)
-(/tmp/RtmpfbfrIB/Rd2pdf79d3f2e5904/Rd2.out)
+(/tmp/RtmpfUJdWa/Rd2pdf6bb0757e50a1/Rd2.out)
+(/tmp/RtmpfUJdWa/Rd2pdf6bb0757e50a1/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -794,7 +794,7 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 28.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
-(/tmp/RtmpfbfrIB/Rd2pdf79d3f2e5904/Rd2.toc
+(/tmp/RtmpfUJdWa/Rd2pdf6bb0757e50a1/Rd2.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 1.
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -809,68 +809,64 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 )
-Overfull \hbox (1.48364pt too wide) in paragraph at lines 39--53
-\T1/ptm/m/n/10 mul-ti-ple ($[]$Pb/$[]$U-$[]$Pb/$[]$U or $[]$Pb/$[]$Pb-$[]$Pb/$[
-]$U) com-po-si-tions, com-putes the weighted
- []
+LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 51.
 
-LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 63.
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
 ) [2]
-Overfull \hbox (13.98053pt too wide) in paragraph at lines 106--108
-[]\T1/ptm/m/n/10 one of ei-ther \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb206U238\TS1/z
-i4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207U235\TS1/zi4/m
-/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207Pb206\TS1/zi4/m/n/
-10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar40Ar39\TS1/zi4/m/n/10 ' 
-\T1/ptm/m/n/10 or \T1/zi4/m/n/10 U-Th-He 
+Overfull \hbox (9.38914pt too wide) in paragraph at lines 77--80
+\T1/ptm/m/n/10 spon-ta-neous and in-duced track den-si-ties \T1/zi4/m/n/10 Ns \
+T1/ptm/m/n/10 and \T1/zi4/m/n/10 Ni \T1/ptm/m/n/10 (if \T1/zi4/m/n/10 method=\T
+S1/zi4/m/n/10 '\T1/zi4/m/n/10 fissiontracks\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 ), 
  []
 
 
-Overfull \hbox (10.97786pt too wide) in paragraph at lines 129--132
+Overfull \hbox (6.37054pt too wide) in paragraph at lines 98--101
+[]\T1/ptm/m/n/10 one of ei-ther \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb206U238\TS1/z
+i4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207U235\TS1/zi4/m
+/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207Pb206\TS1/zi4/m/n/
+10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar40Ar39\TS1/zi4/m/n/10 '\
+T1/ptm/m/n/10 , \T1/zi4/m/n/10 U-Th-He
+ []
+
+
+Overfull \hbox (10.97786pt too wide) in paragraph at lines 130--133
 []\T1/ptm/m/n/10 number of sig-nif-i-cant dig-its for the un-cer-tainty es-ti-m
 ate (only used if \T1/zi4/m/n/10 concordia=1\T1/ptm/m/n/10 ,
  []
 
-[3] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+[3] [4] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 )
-
-LaTeX Warning: Command \textasciicircum invalid in math mode on input line 260.
-
-
-
-LaTeX Warning: Command \textasciicircum invalid in math mode on input line 260.
-
-
-[4]
-Overfull \hbox (15.94826pt too wide) in paragraph at lines 302--306
-[]\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether a plateau age should be cal
--cu-lated if \T1/zi4/m/n/10 plateau=TRUE\T1/ptm/m/n/10 ,
+Overfull \hbox (13.88815pt too wide) in paragraph at lines 332--337
+[]\T1/ptm/m/n/10 logical flag in-di-cat-ing whether a plateau age should be cal
+-cu-lated. If \T1/zi4/m/n/10 plateau=TRUE\T1/ptm/m/n/10 ,
  []
 
 [5] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
+) [6]
+Overfull \hbox (9.08253pt too wide) in paragraph at lines 461--465
+[]\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U-age and above wh
+ich the $[]$Pb/$[]$Pb-
+ []
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
+) [7] [8]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 )
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [6] [7]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [8]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [9]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
+) [10] [11]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 )
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [10]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [11]
-Overfull \hbox (3.81812pt too wide) in paragraph at lines 729--732
+Overfull \hbox (3.81812pt too wide) in paragraph at lines 789--792
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether the data should be shown on
  bi-vari-ate log[He/Th]
  []
@@ -878,7 +874,7 @@ Overfull \hbox (3.81812pt too wide) in paragraph at lines 729--732
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [12]
-Overfull \hbox (3.87054pt too wide) in paragraph at lines 787--792
+Overfull \hbox (3.87054pt too wide) in paragraph at lines 847--852
 []\T1/ptm/m/n/10 one of ei-ther \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U238U235\TS1/zi
 4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar40Ar36\TS1/zi4/m/n
 /10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar38Ar36\TS1/zi4/m/n/10 '
@@ -888,7 +884,7 @@ n/10 ,
  []
 
 
-Overfull \hbox (47.15097pt too wide) in paragraph at lines 787--792
+Overfull \hbox (47.15097pt too wide) in paragraph at lines 847--852
 \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Sr87Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/
 zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 Re185Re187\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/
@@ -898,7 +894,7 @@ zi4/m/n/10 '\T1/zi4/m/n/10 Sr84Sr86\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m
  []
 
 
-Overfull \hbox (3.06654pt too wide) in paragraph at lines 806--808
+Overfull \hbox (3.06654pt too wide) in paragraph at lines 866--868
 []\T1/ptm/m/n/10 Ar: Lee, Jee-Yon, et al. "A re-de-ter-mi-na-tion of the iso-to
 pic abun-dances of at-mo-spheric Ar." Geochim-
  []
@@ -908,14 +904,14 @@ File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [14]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [15] [16]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [17]
+) [15] [16] [17]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [18]
-Overfull \hbox (16.32802pt too wide) in paragraph at lines 1205--1207
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
+)
+Overfull \hbox (16.32802pt too wide) in paragraph at lines 1279--1281
 []\T1/ptm/m/n/10 show the MDS con-fig-u-ra-tion (if \T1/zi4/m/n/10 shepard=FALS
 E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 0 )
@@ -923,11 +919,11 @@ E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 
 [19] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [20]
+) [20] [21]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [21]
-Overfull \hbox (32.24094pt too wide) in paragraph at lines 1393--1397
+)
+Overfull \hbox (32.24094pt too wide) in paragraph at lines 1469--1473
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Rb-Sr\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \
@@ -937,53 +933,52 @@ m/n/10 '\T1/zi4/m/n/10 Re-Os\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '
 4/m/n/10 fission tracks\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 ,
  []
 
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+[22] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [22]
+)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [23] [24]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [25]
-(/tmp/RtmpfbfrIB/Rd2pdf79d3f2e5904/Rd2.ind [26] [27
+) [25] [26]
+(/tmp/RtmpfUJdWa/Rd2pdf6bb0757e50a1/Rd2.ind [27] [28
 
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1661.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1661.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1757.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1757.
 
-(/tmp/RtmpfbfrIB/Rd2pdf79d3f2e5904/Rd2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1661.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1661.
+(/tmp/RtmpfUJdWa/Rd2pdf6bb0757e50a1/Rd2.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1757.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1757.
 
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: 6CCF97D051D6DF48405D26C29E86FABA;925.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1661.
+(rerunfilecheck)             Checksum: 2ED15ADC92A77AEE4BCFA836521F8F94;882.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1757.
  ) 
 Here is how much of TeX's memory you used:
- 6686 strings out of 493029
- 95701 string characters out of 6136234
+ 6687 strings out of 493029
+ 95602 string characters out of 6136234
  174194 words of memory out of 5000000
- 9881 multiletter control sequences out of 15000+600000
+ 9880 multiletter control sequences out of 15000+600000
  38763 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,6n,27p,1195b,590s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,6n,27p,1331b,592s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/s
 hare/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-dist/font
 s/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helve
-tic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (27 pages, 163983 bytes).
+type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/ur
+w/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb
+8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (28 pages, 159154 bytes).
 PDF statistics:
- 482 PDF objects out of 1000 (max. 8388607)
- 439 compressed objects within 5 object streams
- 203 named destinations out of 1000 (max. 500000)
- 161 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 481 PDF objects out of 1000 (max. 8388607)
+ 438 compressed objects within 5 object streams
+ 207 named destinations out of 1000 (max. 500000)
+ 153 words of extra memory for PDF output out of 10000 (max. 10000000)
 
