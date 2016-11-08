@@ -179,9 +179,12 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
         if (x$format==1) {
             rhoD <- x$rhoD
             zeta <- x$zeta
-        } else {
+        } else if (x$format==2) {
             rhoD <- c(1,0)
             zeta <- x$zeta
+        } else {
+            rhoD <- c(1,0)
+            zeta <- c(1,0)
         }
         fit$mean[2] <- fit$mean[1] *
             sqrt( stt2 + (rhoD[2]/rhoD[1])^2 + (zeta[2]/zeta[1])^2 )

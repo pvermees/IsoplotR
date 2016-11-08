@@ -54,7 +54,9 @@
 central <- function(x,...){ UseMethod("central",x) }
 #' @rdname central
 #' @export
-central.default <- function(x,...){ stop('Invalid input into central(...) function'); }
+central.default <- function(x,...){
+    stop('Invalid input into central(...) function');
+}
 #' @rdname central
 #' @export
 central.UThHe <- function(x,...){
@@ -93,7 +95,6 @@ central.UThHe <- function(x,...){
     out$p.value <- 1-pchisq(SS,df)
     out
 }
-
 #' @param mineral setting this parameter to either \code{apatite} or
 #'     \code{zircon} changes the default efficiency factor, initial
 #'     fission track length and density to preset values (only affects
@@ -103,7 +104,7 @@ central.UThHe <- function(x,...){
 central.fissiontracks <- function(x,mineral=NA,...){
     out <- list()
     L8 <- lambda('U238')[1]
-    sigma <- 0.15
+    sigma <- 0.15 # convenient starting value
     if (x$format<2){
         Nsj <- x$x[,'Ns']
         Ns <- sum(Nsj)
@@ -129,11 +130,19 @@ central.fissiontracks <- function(x,mineral=NA,...){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         zu <- log(tst[,'t'])
         su <- tst[,'s[t]']/tst[,'t']
-        fit <- stats::optim(c(mean(zu),sigma),eq6.8.9,zu=zu,su=su)
-        mu <- fit$par[1]
-        sigma <- fit$par[2]
+        for (i in 1:30){
+            wu <- 1/(sigma^2+su^2)
+            mu <- sum(wu*zu)/sum(wu)
+            fit1 <- stats::optimize(eq.6.9,c(0,0.1),mu=mu,zu=zu,su=su)
+            fit2 <- stats::optimize(eq.6.9,c(0.1,1),mu=mu,zu=zu,su=su)
+            if (fit1$objective < fit2$objective) fit <- fit1
+            else fit <- fit2
+            fit3 <- stats::optimize(eq.6.9,c(1,10),mu=mu,zu=zu,su=su)
+            if (fit3$objective < fit$objective) fit <- fit3
+            sigma <- fit$minimum
+        }
         tt <- exp(mu)
-        st <- 1/sqrt(sum(1/(sigma^2+su^2)))
+        st <- 1/sqrt(sum(wu))
         if (x$format==2)
             st <- tt * sqrt((st/tt)^2 + (x$zeta[2]/x$zeta[1])^2)
         df <- length(zu)-1
@@ -146,11 +155,24 @@ central.fissiontracks <- function(x,mineral=NA,...){
     out
 }
 
-eq6.8.9 <- function(x,zu,su){
-    mu <- x[1]
-    sigma <- x[2]
+eq.6.9 <- function(sigma,mu,zu,su){
     wu <- 1/(sigma^2+su^2)
-    misfit1 <- mu - sum(wu*zu)/sum(wu)
-    misfit2 <- sum((wu*(zu-mu))^2) - sum(wu)
-    misfit1^2 + misfit2^2
+    (sum((wu*(zu-mu))^2) - sum(wu))^2
+}
+
+gr.6.9 <- function(sigma,mu,zu,su){
+    wu <- 1/(sigma^2+su^2)
+    dwudsigma <- -2*sigma*wu^2
+    out <- 2*(sum((wu*(zu-mu))^2) - sum(wu)) *
+        (sum(2*wu*(zu-mu)*dwudsigma) - sum(dwudsigma))
+    out
+}
+
+foo <- function(){
+    x <- seq(0,1,length.out=100)
+    y <- x
+    for (j in 1:100){
+        y[j] <- eq.6.9(x[j],mu,zu,su)
+    }
+    plot(x,y,type='l')
 }

@@ -18,10 +18,10 @@ yorkfit(X, Y, sX, sY, rXY)
 \item{rXY}{correlation coefficients between X and Y}
 }
 \value{
-a two element list of vectors containing
+a two-element list of vectors containing
 \describe{
-\item{a}{ the intercept of the straight line fit and its standard error}
-\item{b}{ the slope of the fit and its standard error}
+\item{a}{the intercept of the straight line fit and its standard error}
+\item{b}{the slope of the fit and its standard error}
 }
 }
 \description{
@@ -52,7 +52,7 @@ Titterington (1994)
    }
 }
 \references{
-Ludwig, K. R., and D. M. Titterington. "Calculation of 230ThU
+Ludwig, K. R., and D. M. Titterington. "Calculation of \eqn{^{230}}Th/U
 isochrons, ages, and errors." Geochimica et Cosmochimica Acta
 58.22 (1994): 5031-5042.
 

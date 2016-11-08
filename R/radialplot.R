@@ -38,19 +38,23 @@ radialplot <- function(x,...){ UseMethod("radialplot",x) }
 #' @export
 radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                transformation=NA,show.numbers=FALSE,
-                               pch=21, bg='white',...){
+                               pch=21,bg='white',markers=NULL,...){
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
-    radial.plot(X,show.numbers=show.numbers,pch=pch,bg=bg,...)
+    radial.plot(X,show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,...)
 }
 #' @rdname radialplot
 #' @export
 radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      transformation='arcsin',
                                      sigdig=2,show.numbers=FALSE,
-                                     pch=21,bg='white',title=TRUE,...){
+                                     pch=21,bg='white',title=TRUE,
+                                     markers=NULL,k=0,exterr=TRUE,...){
+    peaks <- peakfit(x,k=k,exterr=exterr)
+    markers <- c(markers,peaks$peaks)
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
-                show.numbers=show.numbers,pch=pch,bg=bg,...)
+                show.numbers=show.numbers,pch=pch,
+                bg=bg,markers=markers,...)
     if (title) title(radial.title(central(x),sigdig=sigdig))
 }
 #' @param type scalar indicating whether to plot the
@@ -75,54 +79,67 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #' @rdname radialplot
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
-                           transformation='log',
-                           type=4,cutoff.76=1100,
-                           cutoff.disc=c(-15,5),
-                           show.numbers=FALSE,
-                           pch=21,bg='white',...){
-    tt <- filter.UPb.ages(x,type,cutoff.76,
-                          cutoff.disc,exterr=FALSE)
-    radialplot.default(tt,from=from,to=to,t0=t0,
-                       transformation=transformation,
-                       show.numbers=show.numbers,
-                       pch=pch,bg=bg,...)
+                           transformation='log',type=4,
+                           cutoff.76=1100, cutoff.disc=c(-15,5),
+                           show.numbers=FALSE, pch=21,bg='white',
+                           markers=NULL,k=0,...){
+    age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
+               type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+               show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,
+               k=k,...)
 }
 #' @rdname radialplot
 #' @export
 radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,
-                            transformation='log',
-                            show.numbers=FALSE,
-                            pch=21,bg='white',...){
-    tt <- ArAr.age(x,exterr=FALSE)
-    radialplot.default(tt,from=from,to=to,t0=t0,
-                       transformation=transformation,
-                       show.numbers=show.numbers,
-                       pch=pch,bg=bg,...)
+                            transformation='log', show.numbers=FALSE,
+                            pch=21,bg='white',markers=NULL,k=0,...){
+    age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
+               show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,
+               k=k...)
 }
 #' @rdname radialplot
 #' @export
 radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,
-                             transformation='log',
-                             show.numbers=FALSE,
-                             pch=21,bg='white',...){
-    tt <- UThHe.age(x)
+                             transformation='log',show.numbers=FALSE,
+                             pch=21,bg='white',markers=NULL,k=0,...){
+    age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
+               show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,
+               k=k,...)
+}
+
+age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
+                       type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+                       show.numbers=FALSE,pch=21,bg='white',
+                       markers=NULL,k=0,...){
+    if (hasClass(x,'UPb')){
+        tt <- filter.UPb.ages(x,type,cutoff.76,
+                              cutoff.disc,exterr=FALSE)
+    } else if (hasClass(x,'ArAr')){
+        tt <- ArAr.age(x,exterr=FALSE)
+    } else if (hasClass(x,'UThHe')){
+        tt <- UThHe.age(x)
+    }
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,
-                       show.numbers=show.numbers,
-                       pch=pch,bg=bg,...)
+                       show.numbers=show.numbers,pch=pch,bg=bg,
+                       markers=markers,...)
 }
 
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
-                        show.numbers=FALSE,
-                        pch=21,bg='white',...){
+                        show.numbers=FALSE, pch=21,bg='white',
+                        markers=NULL,...){
     # 1. get time ticks and z limits
     tticks <- get.radial.tticks(x)
-    if (identical(x$transformation,'log'))
+    if (identical(x$transformation,'log')){
         zticks <- log(tticks+x$offset)
-    else if (identical(x$transformation,'arcsin'))
+        zmarkers <- log(markers+x$offset)
+    } else if (identical(x$transformation,'arcsin')){
         zticks <- att(tticks,zeta,rhoD)
-    else if (identical(x$transformation,'linear'))
+        zmarkers <- att(markers,zeta,rhoD)
+    } else if (identical(x$transformation,'linear')){
         zticks <- tticks
+        zmarkers <- markers
+    }
     zlim <- range(zticks)
     # 2. draw arc
     fz <- 1/diff(zlim)
@@ -134,7 +151,7 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
     ry <- sin(fz*(zscale-x$z0))
     graphics::plot(rx,ry,type='l',xlim=c(0,1),bty='n',axes=FALSE,
                    xlab=x$xlab,ylab='standardised estimate')
-    # 3. draw the ticks
+    # 3. draw the ticks and markers
     for (i in 1:length(tticks)){
         rxb <- cos(fz*(zticks[i]-x$z0))
         ryb <- sin(fz*(zticks[i]-x$z0))
@@ -142,6 +159,11 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
         rye <- 0.98*ryb
         graphics::lines(c(rxb,rxe),c(ryb,rye))
         graphics::text(rxb,ryb,labels=tticks[i],pos=4,xpd=NA)
+    }
+    for (i in 1:length(markers)){
+        rxb <- cos(fz*(zmarkers[i]-x$z0))
+        ryb <- sin(fz*(zmarkers[i]-x$z0))
+        graphics::lines(c(rxb,0),c(ryb,0))
     }
     # 4. plot points
     rx <- fxy/x$s
