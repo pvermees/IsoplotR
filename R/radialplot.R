@@ -185,10 +185,8 @@ radial.scale <- function(x,zeta=0,rhoD=0){
     zM <- t2z(x$to,x,zeta,rhoD)
     padding <- 1.1
     N <- 50
-    rx <- rep(0,N)
-    ry <- rep(0,N)
     a <- grDevices::dev.size()[2]/grDevices::dev.size()[1] # aspect ratio
-    e <- a/atan(zM-zm) # ellipticity of the arc
+    e <- a/(zM-zm) # ellipticity of the arc
     # get rxM
     theta <- atan(e*(x$z-x$z0))
     rxy <- data2rxry(x)

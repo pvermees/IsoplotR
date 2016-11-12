@@ -54,15 +54,21 @@ peakfit.default <- function(x,k=1,sigdig=2,...){
             fiu[,i] <- stats::dnorm(yu,betai[i]*xu,1)
         }
         for (u in 1:n){
-            piu[u,] <- pii*fiu[u,]/sum(pii*fiu[u,])
+            if (sum(pii*fiu[u,])>0)
+                piu[u,] <- pii*fiu[u,]/sum(pii*fiu[u,])
+            else
+                piu[u,] <- 0
         }
         fu <- rep(0,n)
         for (i in 1:k){
+            if (sum(piu[,i]*xu^2)>0)
+                betai[i] <- sum(piu[,i]*xu*yu)/sum(piu[,i]*xu^2)
+            else
+                betai[i] <- 0
             pii[i] <- mean(piu[,i])
-            betai[i] <- sum(piu[,i]*xu*yu)/sum(piu[,i]*xu^2)
             fu <- fu + pii[i] * fiu[,i]
         }
-        newL <- sum(log(fu))
+        newL <- sum(log(fu[fu>0]))
         if (((newL-L)/newL)^2 < 1e-20) break;
         L <- newL
     }
