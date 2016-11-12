@@ -11,28 +11,64 @@
 \usage{
 peakfit(x, ...)
 
-\method{peakfit}{default}(x, k = 1, ...)
+\method{peakfit}{default}(x, k = 1, sigdig = 2, ...)
 
-\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, ...)
+\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, ...)
 
 \method{peakfit}{UPb}(x, k = 1, type = 4, cutoff.76 = 1100,
-  cutoff.disc = c(-15, 5), exterr = TRUE, ...)
+  cutoff.disc = c(-15, 5), exterr = TRUE, sigdig = 2, ...)
 
-\method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, ...)
+\method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2, ...)
 
-\method{peakfit}{UThHe}(x, k = 1, ...)
+\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, ...)
 }
 \arguments{
 \item{x}{either a \code{[2 x n]} matrix with measurements and their
 standard errors, or an object of class \code{fissiontracks}}
+
+\item{...}{optional arguments (not used)}
 
 \item{k}{the number of discrete age components to be
 sought. Setting this parameter to \code{'auto'} automatically
 selects the optimal number of components (up to a maximum of 5)
 using the Bayes Information Criterion (BIC).}
 
+\item{sigdig}{number of significant digits to be used for any legend
+in which the peak fitting results are to be displayed.}
+
 \item{exterr}{propagate the external sources of uncertainty into
 the component age errors?}
+
+\item{type}{scalar indicating whether to plot the
+\eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
+\eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
+(\code{type}=4), or the (Wetherill) concordia age (\code{type}=5)}
+
+\item{cutoff.76}{the age (in Ma) below which the
+\eqn{^{206}}Pb/\eqn{^{238}}U and above which the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
+only used if \code{type=4}.}
+
+\item{cutoff.disc}{two element vector with the maximum and minimum
+percentage discordance allowed between the
+\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
+age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
+between the \eqn{^{206}}Pb/\eqn{^{238}}U and
+\eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
+\eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
+\code{cutoff.disc=NA} if you do not want to use this filter.}
+}
+\value{
+a list with the following items:
+\describe{
+\item{peaks}{a vector of peak locations}
+\item{props}{a vector of peak proportions}
+\item{peaks.err}{the standard errors of the peak locations}
+\item{props.err}{the standard errors of the peak proportions}
+\item{legend}{a vector of text expressions to be used in a figure legend}
+}
 }
 \description{
 Implements the discrete mixture modelling algorithms of Galbraith

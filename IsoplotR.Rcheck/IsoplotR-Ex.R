@@ -300,6 +300,27 @@ mds(examples$DZ,shepard=TRUE)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("mds", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("peakfit")
+### * peakfit
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: peakfit
+### Title: Finite mixture modelling of geochronological datasets
+### Aliases: peakfit peakfit.ArAr peakfit.UPb peakfit.UThHe peakfit.default
+###   peakfit.fissiontracks
+
+### ** Examples
+
+data(examples)
+peakfit(examples$FT1,k=2)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("peakfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("radialplot")
 ### * radialplot
 
@@ -315,6 +336,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 data(examples)
 radialplot(examples$FT1)
+#fname <- system.file("FT1.csv",package="IsoplotR")
+#FT <- read.data(fname,method="fissiontracks",format=1)
 
 
 

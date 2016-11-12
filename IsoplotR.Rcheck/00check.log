@@ -8,8 +8,6 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-Number of updates in past 6 months: 7
-
 The build time stamp is missing.
 * checking package namespace information ... OK
 * checking package dependencies ... OK
@@ -18,6 +16,7 @@ The build time stamp is missing.
 * checking for executable files ... WARNING
 Found the following executable files:
   .git/objects/1b/4718fa8df55f440a807300a3098ba2c506fb05
+  .git/objects/23/6c3a49f1accb74bd37ce442663ec5b7aa32344
   .git/objects/2d/a810ebbbabccc9c17f1c63956fe449d22a0cb7
 Source packages should not contain undeclared executable files.
 See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
@@ -37,8 +36,8 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... NOTE
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -62,8 +61,7 @@ These should not be in a package tarball.
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
 * checking R code for possible problems ... OK
-* checking Rd files ... WARNING
-checkRd: (7) kde.Rd:113: Tag \code is invalid in a \code block
+* checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
 * checking Rd cross-references ... OK
@@ -78,4 +76,4 @@ checkRd: (7) kde.Rd:113: Tag \code is invalid in a \code block
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 3 WARNINGs, 4 NOTEs
+Status: 2 WARNINGs, 4 NOTEs

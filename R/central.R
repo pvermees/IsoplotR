@@ -130,9 +130,10 @@ central.fissiontracks <- function(x,mineral=NA,...){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         zu <- log(tst[,'t'])
         su <- tst[,'s[t]']/tst[,'t']
-        for (i in 1:30){
+        for (i in 1:30){ # page 100 of Galbraith (2005)
             wu <- 1/(sigma^2+su^2)
             mu <- sum(wu*zu)/sum(wu)
+            # fit in 3 parts to make sure optimize finds global minimum
             fit1 <- stats::optimize(eq.6.9,c(0,0.1),mu=mu,zu=zu,su=su)
             fit2 <- stats::optimize(eq.6.9,c(0.1,1),mu=mu,zu=zu,su=su)
             if (fit1$objective < fit2$objective) fit <- fit1
@@ -158,21 +159,4 @@ central.fissiontracks <- function(x,mineral=NA,...){
 eq.6.9 <- function(sigma,mu,zu,su){
     wu <- 1/(sigma^2+su^2)
     (sum((wu*(zu-mu))^2) - sum(wu))^2
-}
-
-gr.6.9 <- function(sigma,mu,zu,su){
-    wu <- 1/(sigma^2+su^2)
-    dwudsigma <- -2*sigma*wu^2
-    out <- 2*(sum((wu*(zu-mu))^2) - sum(wu)) *
-        (sum(2*wu*(zu-mu)*dwudsigma) - sum(dwudsigma))
-    out
-}
-
-foo <- function(){
-    x <- seq(0,1,length.out=100)
-    y <- x
-    for (j in 1:100){
-        y[j] <- eq.6.9(x[j],mu,zu,su)
-    }
-    plot(x,y,type='l')
 }

@@ -430,6 +430,42 @@ NULL
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("mds", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("peakfit")
+> ### * peakfit
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: peakfit
+> ### Title: Finite mixture modelling of geochronological datasets
+> ### Aliases: peakfit peakfit.ArAr peakfit.UPb peakfit.UThHe peakfit.default
+> ###   peakfit.fissiontracks
+> 
+> ### ** Examples
+> 
+> data(examples)
+> peakfit(examples$FT1,k=2)
+$peaks
+[1] 207.9650 315.3076
+
+$props
+[1] 0.5530111 0.4469889
+
+$peaks.err
+[1] 22.17262 30.49409
+
+$props.err
+[1] 0.1065929 0.1065929
+
+$legend
+[1] "Peak 1: 208+/-22 (0.553+/-0.11%)" "Peak 2: 315+/-30 (0.447+/-0.11%)"
+
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("peakfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("radialplot")
 > ### * radialplot
 > 
@@ -445,6 +481,8 @@ NULL
 > 
 > data(examples)
 > radialplot(examples$FT1)
+> #fname <- system.file("FT1.csv",package="IsoplotR")
+> #FT <- read.data(fname,method="fissiontracks",format=1)
 > 
 > 
 > 
@@ -487,7 +525,7 @@ NULL
 > json <- system.file("constants.json",package="IsoplotR")
 > settings(json)
 > print(settings())
-[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[2.84e-05,2.7e-07]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00013],\"Rb85\":[84.911789738,5.7e-07],\"Rb87\":[86.909180532,7e-09],\"Sr84\":[83.9134191,1.3e-06],\"Sr86\":[85.9092606,1.2e-06],\"Sr87\":[86.9088775,1.2e-06],\"Sr88\":[87.9056125,1.2e-06]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
+[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00013],\"Rb85\":[84.911789738,5.7e-07],\"Rb87\":[86.909180532,7e-09],\"Sr84\":[83.9134191,1.3e-06],\"Sr86\":[85.9092606,1.2e-06],\"Sr87\":[86.9088775,1.2e-06],\"Sr88\":[87.9056125,1.2e-06]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
 > 
 > 
 > 
@@ -558,7 +596,7 @@ NULL
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  5.016 0.024 5.063 0 0 
+Time elapsed:  5.188 0.044 5.236 0 0 
 > grDevices::dev.off()
 pdf 
   2 

@@ -22,6 +22,7 @@
 #' @param pch plot character (default is a filled circle)
 #' @param bg background colour of the plot character
 #' @param title add a title to the plot?
+#' @param markers vector of ages of radial marker lines to add to the plot.
 #' @param ... additional arguments to the generic \code{points} function
 #' @references
 #' Galbraith, R.F., 1990. The radial plot: graphical assessment of
@@ -31,6 +32,8 @@
 #' @examples
 #' data(examples)
 #' radialplot(examples$FT1)
+#' #fname <- system.file("FT1.csv",package="IsoplotR")
+#' #FT <- read.data(fname,method="fissiontracks",format=1)
 #' @rdname radialplot
 #' @export
 radialplot <- function(x,...){ UseMethod("radialplot",x) }
@@ -42,6 +45,9 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,...)
 }
+#' @param k number of mixture model components to fit.
+#' @param exterr propagate the external sources of uncertainty into
+#'     the mixture model errors?
 #' @rdname radialplot
 #' @export
 radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
@@ -49,13 +55,15 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      sigdig=2,show.numbers=FALSE,
                                      pch=21,bg='white',title=TRUE,
                                      markers=NULL,k=0,exterr=TRUE,...){
-    peaks <- peakfit(x,k=k,exterr=exterr)
+    peaks <- peakfit(x,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks)
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
                 show.numbers=show.numbers,pch=pch,
                 bg=bg,markers=markers,...)
     if (title) title(radial.title(central(x),sigdig=sigdig))
+    if (!is.null(peaks$legend))
+        graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -82,29 +90,42 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
                            cutoff.76=1100, cutoff.disc=c(-15,5),
                            show.numbers=FALSE, pch=21,bg='white',
-                           markers=NULL,k=0,...){
+                           markers=NULL,k=0,exterr=TRUE,...){
+    peaks <- peakfit(x,k=k,exterr=exterr)
+    markers <- c(markers,peaks$peaks)
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,
                k=k,...)
+    if (!is.null(peaks$legend))
+        graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
 #' @rdname radialplot
 #' @export
 radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,
                             transformation='log', show.numbers=FALSE,
-                            pch=21,bg='white',markers=NULL,k=0,...){
+                            pch=21,bg='white',markers=NULL,k=0,
+                            exterr=TRUE,...){
+    peaks <- peakfit(x,k=k,exterr=exterr)
+    markers <- c(markers,peaks$peaks)
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,
-               k=k...)
+               k=k,...)
+    if (!is.null(peaks$legend))
+        graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
 #' @rdname radialplot
 #' @export
 radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,
                              transformation='log',show.numbers=FALSE,
                              pch=21,bg='white',markers=NULL,k=0,...){
+    peaks <- peakfit(x,k=k)
+    markers <- c(markers,peaks$peaks)
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,
                k=k,...)
+    if (!is.null(peaks$legend))
+        graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
 
 age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
@@ -128,65 +149,90 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                         show.numbers=FALSE, pch=21,bg='white',
                         markers=NULL,...){
-    # 1. get time ticks and z limits
+    exM <- radial.scale(x,zeta,rhoD)
     tticks <- get.radial.tticks(x)
-    if (identical(x$transformation,'log')){
-        zticks <- log(tticks+x$offset)
-        zmarkers <- log(markers+x$offset)
-    } else if (identical(x$transformation,'arcsin')){
-        zticks <- att(tticks,zeta,rhoD)
-        zmarkers <- att(markers,zeta,rhoD)
-    } else if (identical(x$transformation,'linear')){
-        zticks <- tticks
-        zmarkers <- markers
+    plot.radial.lines(tticks,l=0.025,x,exM[1],exM[2],
+                      zeta,rhoD,label=TRUE)
+    if (!is.null(markers)){
+        plot.radial.lines(markers,x,exM[1],exM[2],
+                          zeta,rhoD,label=FALSE)
     }
-    zlim <- range(zticks)
-    # 2. draw arc
-    fz <- 1/diff(zlim)
-    fz <- stats::optim(fz,get.fz,method='BFGS',
-                       z0=x$z0,zlim=zlim,asprat=asprat)$par
-    fxy <- get.fxy(x,fz,asprat)
-    zscale <- seq(zlim[1],zlim[2],length.out=50)
-    rx <- cos(fz*(zscale-x$z0))
-    ry <- sin(fz*(zscale-x$z0))
-    graphics::plot(rx,ry,type='l',xlim=c(0,1),bty='n',axes=FALSE,
-                   xlab=x$xlab,ylab='standardised estimate')
-    # 3. draw the ticks and markers
-    for (i in 1:length(tticks)){
-        rxb <- cos(fz*(zticks[i]-x$z0))
-        ryb <- sin(fz*(zticks[i]-x$z0))
-        rxe <- 0.98*rxb
-        rye <- 0.98*ryb
-        graphics::lines(c(rxb,rxe),c(ryb,rye))
-        graphics::text(rxb,ryb,labels=tticks[i],pos=4,xpd=NA)
-    }
-    for (i in 1:length(markers)){
-        rxb <- cos(fz*(zmarkers[i]-x$z0))
-        ryb <- sin(fz*(zmarkers[i]-x$z0))
-        graphics::lines(c(rxb,0),c(ryb,0))
-    }
-    # 4. plot points
-    rx <- fxy/x$s
-    ry <- fxy*fz*(x$z-x$z0)/x$s
-    if (show.numbers) {
-        if('cex' %in% names(list(...)))
-            points(rx,ry,pch=pch,bg=bg,...)
-        else
-            points(rx,ry,pch=pch,bg=bg,cex=3,...)
-        text(rx,ry,1:length(rx))
-    } else {
-        points(rx,ry,pch=pch,bg=bg,...)
-    }
-    # 5. x and y axes
-    graphics::Axis(side=2,at=fxy*fz*c(-2,0,2),labels=c(-2,0,2))
+    plot.radial.axes(x)
+    rxy <- data2rxry(x)
+    points(rxy[,1],rxy[,2])
+}
+
+plot.radial.axes <- function(x){
+    graphics::Axis(side=2,at=c(-2,0,2),labels=c(-2,0,2))
     if (identical(x$transformation,'arcsin')){
         plabels <- pretty(c(0,range(1/(2*x$s)^2 - 1/2)))
-        pticks <- fxy*(2*sqrt(plabels+1/2))
+        pticks <- (2*sqrt(plabels+1/2))
     } else {
         plabels <- pretty(c(0,1/x$s))
-        pticks <- fxy*plabels
+        pticks <- plabels
     }
     graphics::Axis(side=1,at=pticks,labels=plabels)
+}
+
+data2rxry <- function(x){
+    rx <- 1/x$s
+    ry <- (x$z-x$z0)/x$s
+    cbind(rx,ry)
+}
+
+radial.scale <- function(x,zeta=0,rhoD=0){
+    zm <- t2z(x$from,x,zeta,rhoD)
+    zM <- t2z(x$to,x,zeta,rhoD)
+    padding <- 1.1
+    N <- 50
+    rx <- rep(0,N)
+    ry <- rep(0,N)
+    a <- grDevices::dev.size()[2]/grDevices::dev.size()[1] # aspect ratio
+    e <- a/atan(zM-zm) # ellipticity of the arc
+    # get rxM
+    theta <- atan(e*(x$z-x$z0))
+    rxy <- data2rxry(x)
+    xM <- padding * sqrt(max(
+          (rxy[,1]^2+rxy[,2]^2)/(cos(theta)^2+(sin(theta)/e)^2)
+          ))
+    # plot arc
+    Z <- seq(zm-x$z0,zM-x$z0,length.out=N)
+    rxy <- z2rxy(Z,e,xM)
+    graphics::plot(rxy[,1],rxy[,2],type='l',xlim=c(0,xM),axes=FALSE,bty='n',
+                   xlab=x$xlab,ylab='standardised estimate')
+    c(e,xM)
+}
+
+plot.radial.lines <- function(tt,x,e,xM,zeta=0,rhoD=0,l=1,label=FALSE){
+    z <- t2z(tt,x,zeta,rhoD)
+    rxyb <- z2rxy(z-x$z0,e,xM)
+    rxye <- z2rxy(z-x$z0,e,(1-l)*xM)
+    for (i in 1:length(tt)){
+        graphics::lines(c(rxyb[i,1],rxye[i,1]),
+                        c(rxyb[i,2],rxye[i,2]))
+        if (label) {
+            graphics::text(rxyb[i,1],rxyb[i,2],
+                           labels=tt[i],pos=4,xpd=NA)
+        }
+    }
+}
+
+z2rxy <- function(Z,e,xM){
+    theta <- atan(e*Z)
+    rx <- xM*cos(theta)
+    ry <- (xM/e)*sin(theta)
+    cbind(rx,ry)
+}
+
+t2z <- function(tt,x,zeta,rhoD){
+    if (identical(x$transformation,'log')){
+        out <- log(tt+x$offset)
+    } else if (identical(x$transformation,'arcsin')){
+        out <- att(tt,zeta,rhoD)
+    } else if (identical(x$transformation,'linear')){
+        out <- tt
+    }
+    out
 }
 
 get.radial.tticks <- function(x){

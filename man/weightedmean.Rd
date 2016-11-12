@@ -67,7 +67,7 @@ values reported in the title of the graphical output.}
 \item{cutoff.76}{the age (in Ma) below which the
 \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
-only used if \code{\code{type}=4}.}
+only used if \code{type=4}.}
 
 \item{cutoff.disc}{two element vector with the maximum and minimum
 percentage discordance allowed between the
@@ -83,7 +83,7 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \value{
 if \code{PLOT=FALSE}, returns a list with the following items:
 
-\description{
+\describe{
 \item{mean}{a two element vector with the weighted mean and its
 standard error.}
 

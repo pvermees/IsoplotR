@@ -13,24 +13,25 @@ radialplot(x, ...)
 
 \method{radialplot}{default}(x, from = NA, to = NA, t0 = NA,
   transformation = NA, show.numbers = FALSE, pch = 21, bg = "white",
-  ...)
+  markers = NULL, ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
   transformation = "arcsin", sigdig = 2, show.numbers = FALSE, pch = 21,
-  bg = "white", title = TRUE, ...)
+  bg = "white", title = TRUE, markers = NULL, k = 0, exterr = TRUE,
+  ...)
 
 \method{radialplot}{UPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", type = 4, cutoff.76 = 1100,
   cutoff.disc = c(-15, 5), show.numbers = FALSE, pch = 21, bg = "white",
-  ...)
+  markers = NULL, k = 0, exterr = TRUE, ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
-  ...)
+  markers = NULL, k = 0, exterr = TRUE, ...)
 
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
-  ...)
+  markers = NULL, k = 0, ...)
 }
 \arguments{
 \item{x}{Either an nx2 matix of (transformed) values z and their
@@ -58,10 +59,17 @@ and object of class \code{fissiontracks}, \code{UThHe},
 
 \item{bg}{background colour of the plot character}
 
+\item{markers}{vector of ages of radial marker lines to add to the plot.}
+
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output.}
 
 \item{title}{add a title to the plot?}
+
+\item{k}{number of mixture model components to fit.}
+
+\item{exterr}{propagate the external sources of uncertainty into
+the mixture model errors?}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -93,6 +101,8 @@ standard errors.
 \examples{
 data(examples)
 radialplot(examples$FT1)
+#fname <- system.file("FT1.csv",package="IsoplotR")
+#FT <- read.data(fname,method="fissiontracks",format=1)
 }
 \references{
 Galbraith, R.F., 1990. The radial plot: graphical assessment of

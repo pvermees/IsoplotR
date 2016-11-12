@@ -38,6 +38,12 @@ lambda	lambda
 mds	mds
 mds.default	mds
 mds.detritals	mds
+peakfit	peakfit
+peakfit.ArAr	peakfit
+peakfit.default	peakfit
+peakfit.fissiontracks	peakfit
+peakfit.UPb	peakfit
+peakfit.UThHe	peakfit
 radialplot	radialplot
 radialplot.ArAr	radialplot
 radialplot.default	radialplot

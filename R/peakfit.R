@@ -12,6 +12,17 @@
 #'     using the Bayes Information Criterion (BIC).
 #' @param exterr propagate the external sources of uncertainty into
 #'     the component age errors?
+#' @param sigdig number of significant digits to be used for any legend
+#' in which the peak fitting results are to be displayed.
+#' @param ... optional arguments (not used)
+#' @return a list with the following items:
+#' \describe{
+#' \item{peaks}{a vector of peak locations}
+#' \item{props}{a vector of peak proportions}
+#' \item{peaks.err}{the standard errors of the peak locations}
+#' \item{props.err}{the standard errors of the peak proportions}
+#' \item{legend}{a vector of text expressions to be used in a figure legend}
+#' }
 #' @references
 #' Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
 #' mixed fission track ages. Nuclear tracks and radiation
@@ -24,7 +35,8 @@
 peakfit <- function(x,...){ UseMethod("peakfit",x) }
 #' @rdname peakfit
 #' @export
-peakfit.default <- function(x,k=1,...){
+peakfit.default <- function(x,k=1,sigdig=2,...){
+    if (k<1) return(NULL)
     zu <- x[,1]
     su <- x[,2]
     xu <- 1/su
@@ -39,7 +51,7 @@ peakfit.default <- function(x,k=1,...){
     L <- -Inf
     for (j in 1:100){
         for (i in 1:k){
-            fiu[,i] <- dnorm(yu,betai[i]*xu,1)
+            fiu[,i] <- stats::dnorm(yu,betai[i]*xu,1)
         }
         for (u in 1:n){
             piu[u,] <- pii*fiu[u,]/sum(pii*fiu[u,])
@@ -63,11 +75,13 @@ peakfit.default <- function(x,k=1,...){
     props.err <- get.props.err(E)
     out <- list(peaks=betai,props=pii,
                 peaks.err=peaks.err,props.err=props.err)
+    out$legend <- peaks2legend(out,sigdig=sigdig)
     out
 }
 #' @rdname peakfit
 #' @export
-peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,...){
+peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,...){
+    if (k == 0) return(NULL)
     if (x$format == 1){
         yu <- x$x[,'Ns']
         mu <- x$x[,'Ns'] + x$x[,'Ni']
@@ -83,7 +97,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,...){
         # loop until convergence has been achieved
         for (j in 1:100){
             for (i in 1:k){
-                fiu[,i] <- dbinom(yu,mu,thetai[i])
+                fiu[,i] <- stats::dbinom(yu,mu,thetai[i])
             }
             for (u in 1:n){
                 piu[u,] <- pii*fiu[u,]/sum(pii*fiu[u,])
@@ -126,13 +140,34 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,...){
     } else {
         out <- ages2peaks(x,k)
     }
+    out$legend <- peaks2legend(out,sigdig=sigdig)
     out
 }
+#' @param type scalar indicating whether to plot the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
+#'     (\code{type}=4), or the (Wetherill) concordia age (\code{type}=5)
+#' @param cutoff.76 the age (in Ma) below which the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
+#'     only used if \code{type=4}.
+#' @param cutoff.disc two element vector with the maximum and minimum
+#'     percentage discordance allowed between the
+#'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
+#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
+#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
+#'     \code{cutoff.disc=NA} if you do not want to use this filter.
 #' @rdname peakfit
 #' @export
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
-                        cutoff.disc=c(-15,5),exterr=TRUE,...){
-    fit <- ages2peaks(x,k,type=type,cutoff.76=cutoff.76,
+                        cutoff.disc=c(-15,5),exterr=TRUE,
+                        sigdig=2,...){
+    if (k<1) return(NULL)
+    fit <- ages2peaks(x,k=k,type=type,cutoff.76=cutoff.76,
                       cutoff.disc=cutoff.disc)
     if (exterr){
         for (i in 1:k){
@@ -143,12 +178,14 @@ peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
             fit$peaks.err[i] <- age.with.exterr[2]
         }
     }
+    fit$legend <- peaks2legend(fit,sigdig=sigdig)
     fit
 }
 #' @rdname peakfit
 #' @export
-peakfit.ArAr <- function(x,k=1,exterr=TRUE,...){
-    fit <- ages2peaks(x,k)
+peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,...){
+    if (k<1) return(NULL)
+    fit <- ages2peaks(x,k=k)
     if (exterr){
         for (i in 1:k){
             R <- get.ArAr.ratio(fit$peaks[i],fit$peaks.err[i],
@@ -157,16 +194,20 @@ peakfit.ArAr <- function(x,k=1,exterr=TRUE,...){
             fit$peaks.err[i] <- age.with.exterr[2]
         }
     }
+    fit$legend <- peaks2legend(fit,sigdig=sigdig)
     fit
 }
 #' @rdname peakfit
 #' @export
-peakfit.UThHe <- function(x,k=1,...){
-    ages2peaks(x,k)
+peakfit.UThHe <- function(x,k=1,sigdig=2,...){
+    if (k<1) return(NULL)
+    fit <- ages2peaks(x,k=k)
+    fit$legend <- peaks2legend(fit,sigdig=sigdig)
+    fit
 }
 
-ages2peaks <- function(x,k,type=4,cutoff.76=1100,
-                       cutoff.disc=c(-15,5)){
+ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
+                       cutoff.disc=c(-15,5),log=TRUE){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type,cutoff.76,
                               cutoff.disc,exterr=FALSE)
@@ -177,10 +218,13 @@ ages2peaks <- function(x,k,type=4,cutoff.76=1100,
     } else if (hasClass(x,'fissiontracks')){
         tt <- fissiontrack.age(x,exterr=FALSE)
     }
-    zs <- cbind(log(tt[,1]),tt[,2]/tt[,1])
+    if (log) zs <- cbind(log(tt[,1]),tt[,2]/tt[,1])
+    else zs <- tt
     out <- peakfit.default(zs,k)
-    out$peaks <- exp(out$peaks)
-    out$peaks.err <- out$peaks * out$peaks.err
+    if (log) {
+        out$peaks <- exp(out$peaks)
+        out$peaks.err <- out$peaks * out$peaks.err
+    }
     out
 }
 
@@ -227,6 +271,19 @@ get.props.err <- function(E){
         out <- c(sqrt(vars[1:(k-1)]),prop.k.err)
     } else {
         out <- 0
+    }
+    out
+}
+
+peaks2legend <- function(fit,sigdig=2){
+    out <- NULL
+    for (i in 1:length(fit$peaks)){
+        rounded.age <- roundit(fit$peaks[i],fit$peaks.err[i],sigdig=sigdig)
+        rounded.prop <- roundit(fit$props[i],fit$props.err[i],sigdig=sigdig)
+        line <- paste0('Peak ',i,': ',rounded.age$x,'+/-',
+                       rounded.age$err,' (',rounded.prop$x,'+/-',
+                       rounded.prop$err,'%)')
+        out <- c(out,line)
     }
     out
 }

@@ -14,6 +14,8 @@ isochron                Calculate and plot isochrons
 kde                     Create (a) kernel density estimate(s)
 lambda                  Decay constants
 mds                     Multidimensional Scaling
+peakfit                 Finite mixture modelling of geochronological
+                        datasets
 radialplot              Visualise heteroscedastic data on a radial plot
 read.data               Read geochronology data
 settings                Load settings to and from json
