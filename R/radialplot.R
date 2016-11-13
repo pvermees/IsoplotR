@@ -39,11 +39,15 @@
 radialplot <- function(x,...){ UseMethod("radialplot",x) }
 #' @rdname radialplot
 #' @export
-radialplot.default <- function(x,from=NA,to=NA,t0=NA,
-                               transformation=NA,show.numbers=FALSE,
-                               pch=21,bg='white',markers=NULL,...){
+radialplot.default <- function(x,from=NA,to=NA,t0=NA,transformation='log',
+                               sigdig=2,show.numbers=FALSE,pch=21,
+                               bg='white',k=0,markers=NULL,...){
+    peaks <- peakfit(x,k=k,sigdig=sigdig)
+    markers <- c(markers,peaks$peaks)
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,...)
+    if (!is.null(peaks$legend))
+        graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
 #' @param k number of mixture model components to fit.
 #' @param exterr propagate the external sources of uncertainty into

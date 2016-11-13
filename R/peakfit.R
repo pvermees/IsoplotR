@@ -42,7 +42,10 @@ peakfit.default <- function(x,k=1,sigdig=2,...){
     xu <- 1/su
     yu <- zu/su
     n <- length(yu)
-    betai <- seq(min(zu),max(zu),length.out=k)
+    if (k>1)
+        betai <- seq(min(zu),max(zu),length.out=k)
+    else
+        betai <- median(zu)
     pii <- rep(1,k)/k
     piu <- matrix(0,n,k)
     fiu <- matrix(0,n,k)
@@ -61,10 +64,7 @@ peakfit.default <- function(x,k=1,sigdig=2,...){
         }
         fu <- rep(0,n)
         for (i in 1:k){
-            if (sum(piu[,i]*xu^2)>0)
-                betai[i] <- sum(piu[,i]*xu*yu)/sum(piu[,i]*xu^2)
-            else
-                betai[i] <- 0
+            betai[i] <- sum(piu[,i]*xu*yu)/sum(piu[,i]*xu^2)
             pii[i] <- mean(piu[,i])
             fu <- fu + pii[i] * fiu[,i]
         }
