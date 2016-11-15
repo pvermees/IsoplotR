@@ -11,16 +11,18 @@
 \usage{
 peakfit(x, ...)
 
-\method{peakfit}{default}(x, k = 1, sigdig = 2, ...)
+\method{peakfit}{default}(x, k = "auto", sigdig = 2, log = TRUE, ...)
 
-\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, ...)
+\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, ...)
 
 \method{peakfit}{UPb}(x, k = 1, type = 4, cutoff.76 = 1100,
-  cutoff.disc = c(-15, 5), exterr = TRUE, sigdig = 2, ...)
+  cutoff.disc = c(-15, 5), exterr = TRUE, sigdig = 2, log = TRUE, ...)
 
-\method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2, ...)
+\method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
+  ...)
 
-\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, ...)
+\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, ...)
 }
 \arguments{
 \item{x}{either a \code{[2 x n]} matrix with measurements and their
@@ -35,6 +37,8 @@ using the Bayes Information Criterion (BIC).}
 
 \item{sigdig}{number of significant digits to be used for any legend
 in which the peak fitting results are to be displayed.}
+
+\item{log}{take the logs of the data before applying the mixture model?}
 
 \item{exterr}{propagate the external sources of uncertainty into
 the component age errors?}

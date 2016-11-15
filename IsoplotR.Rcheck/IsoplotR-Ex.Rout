@@ -445,6 +445,9 @@ NULL
 > 
 > data(examples)
 > peakfit(examples$FT1,k=2)
+$L
+[1] -124.6088
+
 $peaks
 [1] 207.9650 315.3076
 
@@ -458,7 +461,7 @@ $props.err
 [1] 0.1065929 0.1065929
 
 $legend
-[1] "Peak 1: 208+/-22 (0.553+/-0.11%)" "Peak 2: 315+/-30 (0.447+/-0.11%)"
+[1] "Peak 1: 208+/-22 (55.3+/-11%)" "Peak 2: 315+/-30 (44.7+/-11%)"
 
 > 
 > 
@@ -596,7 +599,7 @@ $legend
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  5.188 0.044 5.236 0 0 
+Time elapsed:  4.836 0.024 4.865 0 0 
 > grDevices::dev.off()
 pdf 
   2 

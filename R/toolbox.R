@@ -1,3 +1,12 @@
+numgrains <- function(x,...){ UseMethod("numgrains",x) }
+numgrains.default <- function(x){ length(x[,1]) }
+numgrains.UPb <- function(x){ length(x$x[,1]) }
+numgrains.ArAr <- function(x){ length(x$x[,1]) }
+numgrains.RbSr <- function(x){ length(x$x[,1]) }
+numgrains.SmNd <- function(x){ length(x$x[,1]) }
+numgrains.ReOs <- function(x){ length(x$x[,1]) }
+numgrains.fissiontracks <- function(x){ length(x$x[,1]) }
+
 select <- function(x,selection){
     out <- x
     i <- which(names(x$x) %in% selection)

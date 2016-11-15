@@ -12,8 +12,8 @@
 radialplot(x, ...)
 
 \method{radialplot}{default}(x, from = NA, to = NA, t0 = NA,
-  transformation = NA, show.numbers = FALSE, pch = 21, bg = "white",
-  markers = NULL, ...)
+  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
+  bg = "white", k = 0, markers = NULL, ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
   transformation = "arcsin", sigdig = 2, show.numbers = FALSE, pch = 21,
@@ -53,20 +53,20 @@ and object of class \code{fissiontracks}, \code{UThHe},
 \item{transformation}{one of either \code{log}, \code{linear} or
 (if \code{x} has class \code{fissiontracks})}
 
+\item{sigdig}{the number of significant digits of the numerical
+values reported in the title of the graphical output.}
+
 \item{show.numbers}{boolean flag (\code{TRUE} to show grain numbers)}
 
 \item{pch}{plot character (default is a filled circle)}
 
 \item{bg}{background colour of the plot character}
 
+\item{k}{number of mixture model components to fit.}
+
 \item{markers}{vector of ages of radial marker lines to add to the plot.}
 
-\item{sigdig}{the number of significant digits of the numerical
-values reported in the title of the graphical output.}
-
 \item{title}{add a title to the plot?}
-
-\item{k}{number of mixture model components to fit.}
 
 \item{exterr}{propagate the external sources of uncertainty into
 the mixture model errors?}
