@@ -140,7 +140,6 @@ as.UThHe <- function(x){
     nr <- nrow(x)
     out <- matrix(0,nr-1,nc)
     out[1:(nr-1),1:nc] <- matrix(as.numeric(x[2:nr,]),nr-1,nc)
-    class(out) <- append(class(out),"UThHe")
     if (nc==8) {
         colnames(out) <- c('He','errHe','U','errU','Th','errTh','Sm','errSm')
     } else if (nc==6) {
@@ -149,7 +148,13 @@ as.UThHe <- function(x){
         stop("Input table must have 6 or 8 columns.")
     }
     # replace bad values by small ones:
+    isbad <- matrix(is.na(out)|out<=0,nr-1,nc)
+    goodrows <- apply(!isbad,1,any)
+    goodcols <- apply(!isbad,2,any)
+    out <- out[goodrows,goodcols]
+    out[isbad[goodrows,goodcols]] <- 1e-10
     out[is.na(out) | out<=0] <- 1e-10
+    class(out) <- append(class(out),"UThHe")
     out
 }
 as.fissiontracks <- function(x,format=1){

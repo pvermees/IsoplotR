@@ -162,8 +162,22 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                           zeta,rhoD,label=FALSE)
     }
     plot.radial.axes(x)
+    plot.points(x,show.numbers,pch,bg,...)
+}
+
+plot.points <- function(x,show.numbers=FALSE,pch=21,bg='white',...){
     rxy <- data2rxry(x)
-    points(rxy[,1],rxy[,2])
+    rx <- rxy[,1]
+    ry <- rxy[,2]
+    if (show.numbers) {
+        if('cex' %in% names(list(...)))
+            points(rx,ry,pch=pch,bg=bg,...)
+        else
+            points(rx,ry,pch=pch,bg=bg,cex=3,...)
+        text(rx,ry,1:length(rx))
+    } else {
+        points(rx,ry,pch=pch,bg=bg,...)
+    }
 }
 
 plot.radial.axes <- function(x){
