@@ -18,22 +18,33 @@
 #'     (if \code{x} has class \code{fissiontracks})
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output.
-#' @param show.numbers boolean flag (\code{TRUE} to show grain numbers)
+#' @param show.numbers boolean flag (\code{TRUE} to show grain
+#'     numbers)
 #' @param pch plot character (default is a filled circle)
 #' @param bg background colour of the plot character
 #' @param title add a title to the plot?
-#' @param markers vector of ages of radial marker lines to add to the plot.
-#' @param ... additional arguments to the generic \code{points} function
-#' @references
-#' Galbraith, R.F., 1990. The radial plot: graphical assessment of
-#' spread in ages. International Journal of Radiation Applications and
-#' Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
-#' 17(3), pp.207-214.
+#' @param k number of peaks to fit using the finite mixture models of
+#'     Galbraith and Green (1993). Setting \code{k='auto'}
+#'     automatically selects an optimal number of components based on
+#'     the Bayes Information Criterion (BIC). Setting \code{k='min'}
+#'     estimates the minimum value using a three parameter model
+#'     consisting of a Normal distribution truncated by a discrete
+#'     component.
+#' @param markers vector of ages of radial marker lines to add to the
+#'     plot.
+#' @param ... additional arguments to the generic \code{points}
+#'     function
+#' @references Galbraith, R.F., 1990. The radial plot: graphical
+#'     assessment of spread in ages. International Journal of
+#'     Radiation Applications and Instrumentation. Part D. Nuclear
+#'     Tracks and Radiation Measurements, 17(3), pp.207-214.
+#'
+#' Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
+#' mixed fission track ages. Nuclear tracks and radiation
+#' measurements, 21(4), pp.459-470.
 #' @examples
 #' data(examples)
 #' radialplot(examples$FT1)
-#' #fname <- system.file("FT1.csv",package="IsoplotR")
-#' #FT <- read.data(fname,method="fissiontracks",format=1)
 #' @rdname radialplot
 #' @export
 radialplot <- function(x,...){ UseMethod("radialplot",x) }

@@ -23,9 +23,52 @@ get.absolute.zeta <- function(mineral){
     c(zeta,0)
 }
 
-zeta <- function(x,tst=c(0,0)){
-    ngrains <- length(x$Ns)
-    
+#' Calculate the zeta calibration coefficient for fission track dating
+#'
+#' Updates the zeta calibration constant of a fission track dataset
+#' (EDM or LA-ICP-MS) given its true age and analytical uncertainty.
+#'
+#' @param x an object of class \code{fissiontracks}
+#' @param tst a two-element vector with the true age and its standard
+#'     error
+#' @param external logical flag indicating whether the external
+#'     uncertainties associated with the age standard or the dosimeter
+#'     glass (for the EDM) should be accounted for when propagating
+#'     the uncertainty of the zeta calibration constant.
+#' @return an object of class \code{fissiontracks} with an updated
+#'     \code{x$zeta} value
+#' @examples
+#' data(examples)
+#' print(examples$FT1$zeta)
+#' FT <- set.zeta(examples$FT1,tst=c(250,5))
+#' print(FT$zeta)
+#' @export
+set.zeta <- function(x,tst=c(0,0),external=TRUE){
+    N <- length(x$Ns)
+    L8 <- lambda('U238')[1]
+    tt <- tst[1]
+    st <- tst[2]
+    if (!external) st <- 0
+    if (x$format==1){
+        Ns <- sum(x$x[,'Ns'])
+        Ni <- sum(x$x[,'Ni'])
+        rhoD <- x$rhoD
+        if (!external) rhoD[2] <- 0
+        zeta <- 2e6*(exp(L8*tt)-1)/(L8*rhoD[1]*Ns/Ni)
+        zetaErr <- zeta * sqrt( (L8*exp(L8*tt)*st/(exp(L8*tt)-1))^2 +
+                                (rhoD[2]/rhoD[1])^2 + 1/Ns + 1/Ni )
+    } else {
+        Ns <- sum(x$Ns)
+        UsU <- get.UsU(x)
+        UA <- sum(UsU[,1]*x$A)
+        UAerr <- sqrt( sum(UsU[,2]*x$A)^2 )
+        zeta <- (exp(L8*tt)-1)/(L8*Ns/(2*UA))
+        zetaErr <- zeta * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
+                                1/Ns + (UAerr/UA)^2 )
+    }
+    out <- x
+    out$zeta <- c(zeta,zetaErr)
+    out
 }
 
 ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
