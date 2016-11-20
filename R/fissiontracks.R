@@ -25,7 +25,7 @@ get.absolute.zeta <- function(mineral){
 
 #' Calculate the zeta calibration coefficient for fission track dating
 #'
-#' Updates the zeta calibration constant of a fission track dataset
+#' Determines the zeta calibration constant of a fission track dataset
 #' (EDM or LA-ICP-MS) given its true age and analytical uncertainty.
 #'
 #' @param x an object of class \code{fissiontracks}
@@ -35,6 +35,11 @@ get.absolute.zeta <- function(mineral){
 #'     uncertainties associated with the age standard or the dosimeter
 #'     glass (for the EDM) should be accounted for when propagating
 #'     the uncertainty of the zeta calibration constant.
+#' @param update logical flag indicating whether the function should
+#'     return an updated version of the input data, or simply return a
+#'     two-element vector with the calibration constant and its
+#'     standard error.
+#' @param sigdig number of significant digits
 #' @return an object of class \code{fissiontracks} with an updated
 #'     \code{x$zeta} value
 #' @examples
@@ -43,7 +48,7 @@ get.absolute.zeta <- function(mineral){
 #' FT <- set.zeta(examples$FT1,tst=c(250,5))
 #' print(FT$zeta)
 #' @export
-set.zeta <- function(x,tst=c(0,0),external=TRUE){
+set.zeta <- function(x,tst=c(0,0),external=TRUE,update=TRUE,sigdig=2){
     N <- length(x$Ns)
     L8 <- lambda('U238')[1]
     tt <- tst[1]
@@ -66,8 +71,14 @@ set.zeta <- function(x,tst=c(0,0),external=TRUE){
         zetaErr <- zeta * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
                                 1/Ns + (UAerr/UA)^2 )
     }
-    out <- x
-    out$zeta <- c(zeta,zetaErr)
+    zsz <- roundit(zeta,zetaErr,sigdig=sigdig)
+    if (update){
+        out <- x
+        out$zeta <- c(zsz$x,zsz$err)
+    } else {
+        out <- matrix(c(zsz$x,zsz$err),1,2)
+        colnames(out) <- c('zeta','s[zeta]')
+    }
     out
 }
 
