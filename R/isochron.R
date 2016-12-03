@@ -100,6 +100,15 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         return(out)
     }
 }
+isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                          inverse=TRUE,line.col='red',lwd=2,plot=TRUE,...){
+    fit <- yorkfit(x$x[,'X'],x$x[,'Y'],x$x[,'sX'],x$x[,'sY'],x$x[,'rXY'])
+    class(out) <- "isochron"
+    out$y0 <- c(fit$a[1],fit$a[2])
+    tt <- get.ReOs.age(fit$b[1],fit$b[2],x$J[1],x$J[2])
+    fit
+}
 
 get.limits <- function(X,sX){
     minx <- min(X-3*sX)

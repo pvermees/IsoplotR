@@ -53,6 +53,7 @@ radialplot.UThHe	radialplot
 read.data	read.data
 read.data.default	read.data
 read.data.matrix	read.data
+set.zeta	set.zeta
 settings	settings
 weightedmean	weightedmean
 weightedmean.ArAr	weightedmean

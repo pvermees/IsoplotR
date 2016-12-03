@@ -336,8 +336,6 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 data(examples)
 radialplot(examples$FT1)
-#fname <- system.file("FT1.csv",package="IsoplotR")
-#FT <- read.data(fname,method="fissiontracks",format=1)
 
 
 
@@ -364,6 +362,29 @@ concordia(examples$UPb)
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("set.zeta")
+### * set.zeta
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: set.zeta
+### Title: Calculate the zeta calibration coefficient for fission track
+###   dating
+### Aliases: set.zeta
+
+### ** Examples
+
+data(examples)
+print(examples$FT1$zeta)
+FT <- set.zeta(examples$FT1,tst=c(250,5))
+print(FT$zeta)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("set.zeta", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("settings")
 ### * settings

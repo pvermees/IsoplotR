@@ -20,8 +20,8 @@ ellipse <- function(x,y,covmat,alpha=0.05){
     nn <- 50
     cutoff <- stats::qchisq(1-alpha,2)
     e <- eigen(covmat)
-    a <- sqrt(cutoff*e$values[1]) # major axis
-    b <- sqrt(cutoff*e$values[2]) # minor axis
+    a <- sqrt(cutoff*abs(e$values[1])) # major axis
+    b <- sqrt(cutoff*abs(e$values[2])) # minor axis
     v <- e$vectors[,1] # largest eigenvector
     beta <- atan(v[2]/v[1]) # rotation angle of the ellipse
     theta <- seq(0, 2 * pi, length=nn)

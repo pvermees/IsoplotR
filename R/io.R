@@ -63,6 +63,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.UPb(x,format)
     } else if (identical(method,'Ar-Ar')){
         out <- as.ArAr(x,format)
+    } else if (identical(method,'Re-Os')){
+        out <- as.ReOs(x,format)
     } else if (identical(method,'U-Th-He')){
         out <- as.UThHe(x)
     } else if (identical(method,'fissiontracks')){
@@ -132,6 +134,22 @@ as.ArAr <- function(x,format=2){
                              'Ar36Ar40','errAr36Ar40',
                              'Ar39Ar36','errAr39Ar36',
                              'Ar40Ar36','errAr40Ar36')
+    }
+    out
+}
+as.ReOs <- function(x,format=1){
+    out <- list()
+    class(out) <- "ReOs"
+    out$x <- NA
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    if (format == 1 & nc == 6){
+        X <- matrix(as.numeric(x[(2:nr),]),nr-1,nc)
+        colnames(X) <- c('Reppm','errReppm',
+                         'Osppt','errOsppt',
+                         'Os187Os188','errOs187Os188')
+        out$x <- ID.Re(X)
     }
     out
 }

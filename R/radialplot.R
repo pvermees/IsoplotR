@@ -60,7 +60,6 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,transformation='log',
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
-#' @param k number of mixture model components to fit.
 #' @param exterr propagate the external sources of uncertainty into
 #'     the mixture model errors?
 #' @rdname radialplot

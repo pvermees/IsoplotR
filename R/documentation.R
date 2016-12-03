@@ -19,8 +19,8 @@
 #' U-Th-Sm-He dataset of Fish Lake apatite produced by Daniel Stockli
 #' (UT Austin).
 #'
-#' \code{FT1}: an object of class \code{fissiontracks} containing an
-#' external detector dataset published by Galbraith and Green (1990)
+#' \code{FT1}: an object of class \code{fissiontracks} containing a
+#' synthetic external detector dataset.
 #'
 #' \code{FT2}: an object of class \code{fissiontracks} containing a
 #' synthetic LA-ICP-MS-based fission track dataset using the zeta

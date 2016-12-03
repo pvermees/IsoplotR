@@ -139,18 +139,19 @@ E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 [19] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [20]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [21] [22]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [23]
-Overfull \hbox (11.2109pt too wide) in paragraph at lines 1602--1605
+Overfull \hbox (11.2109pt too wide) in paragraph at lines 1613--1616
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 detritals\TS1/zi4/m/n/10 ' '\T1/zi4/m/n/
 10 U-Th-He\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fis
 siontracks\TS1/zi4/m/n/10 ' \T1/ptm/m/n/10 or \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 o
 ther\TS1/zi4/m/n/10 ' 
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [24]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25] [26]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [27]
+[24] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [26] [27]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [28]
 No file Rd2.ind.
-[28] (/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.aux)
+[29] (/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -169,7 +170,7 @@ xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
 a.pfb>
-Output written on Rd2.pdf (28 pages, 167058 bytes).
+Output written on Rd2.pdf (29 pages, 168684 bytes).
 Transcript written on Rd2.log.
 This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
@@ -230,19 +231,19 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.aux)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.out)
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.out)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.out)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
 updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (9.38914pt too wide) in paragraph at lines 77--80
@@ -271,8 +272,8 @@ ich the $[]$Pb/$[]$Pb-
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [7] [8]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [9]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10] [11]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [11]
 Overfull \hbox (3.81812pt too wide) in paragraph at lines 789--792
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether the data should be shown on
  bi-vari-ate log[He/Th]
@@ -312,18 +313,19 @@ E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 [19] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [20] [21]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [22] [23]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (11.2109pt too wide) in paragraph at lines 1602--1605
+Overfull \hbox (11.2109pt too wide) in paragraph at lines 1613--1616
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 detritals\TS1/zi4/m/n/10 ' '\T1/zi4/m/n/
 10 U-Th-He\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fis
 siontracks\TS1/zi4/m/n/10 ' \T1/ptm/m/n/10 or \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 o
 ther\TS1/zi4/m/n/10 ' 
-[24] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25] [26]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [27] [28]
+[24] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [26] [27]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [28]
 No file Rd2.ind.
-[29] (/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.aux) )
+[29] (/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
@@ -336,12 +338,12 @@ xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
 a.pfb>
-Output written on Rd2.pdf (29 pages, 169054 bytes).
+Output written on Rd2.pdf (29 pages, 170822 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (19 entries accepted, 0 rejected).
-Sorting entries....done (73 comparisons).
-Generating output file Rd2.ind....done (59 lines written, 0 warnings).
+Scanning input file Rd2.idx....done (20 entries accepted, 0 rejected).
+Sorting entries....done (77 comparisons).
+Generating output file Rd2.ind....done (60 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex)
@@ -403,19 +405,19 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.aux)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.out)
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.out)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.out)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
 updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (9.38914pt too wide) in paragraph at lines 77--80
@@ -444,8 +446,8 @@ ich the $[]$Pb/$[]$Pb-
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [7] [8]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [9]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10] [11]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [11]
 Overfull \hbox (3.81812pt too wide) in paragraph at lines 789--792
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether the data should be shown on
  bi-vari-ate log[He/Th]
@@ -485,18 +487,19 @@ E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 [19] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [20] [21]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [22] [23]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (11.2109pt too wide) in paragraph at lines 1602--1605
+Overfull \hbox (11.2109pt too wide) in paragraph at lines 1613--1616
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 detritals\TS1/zi4/m/n/10 ' '\T1/zi4/m/n/
 10 U-Th-He\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fis
 siontracks\TS1/zi4/m/n/10 ' \T1/ptm/m/n/10 or \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 o
 ther\TS1/zi4/m/n/10 ' 
-[24] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25] [26]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [27] [28]
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.ind [29] [30])
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.aux)
+[24] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [26] [27]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [28]
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.ind [29] [30])
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -515,12 +518,12 @@ xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
 a.pfb>
-Output written on Rd2.pdf (30 pages, 170312 bytes).
+Output written on Rd2.pdf (30 pages, 172253 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (19 entries accepted, 0 rejected).
-Sorting entries....done (73 comparisons).
-Generating output file Rd2.ind....done (59 lines written, 0 warnings).
+Scanning input file Rd2.idx....done (20 entries accepted, 0 rejected).
+Sorting entries....done (77 comparisons).
+Generating output file Rd2.ind....done (60 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex)
@@ -582,19 +585,19 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.aux)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.out)
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.out)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.out)
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
 updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (9.38914pt too wide) in paragraph at lines 77--80
@@ -623,8 +626,8 @@ ich the $[]$Pb/$[]$Pb-
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [7] [8]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [9]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10] [11]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [10]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [11]
 Overfull \hbox (3.81812pt too wide) in paragraph at lines 789--792
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether the data should be shown on
  bi-vari-ate log[He/Th]
@@ -664,18 +667,19 @@ E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 [19] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [20] [21]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [22] [23]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (11.2109pt too wide) in paragraph at lines 1602--1605
+Overfull \hbox (11.2109pt too wide) in paragraph at lines 1613--1616
 []\T1/ptm/m/n/10 one of \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 U-Pb\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Ar-Ar\TS1/zi4/m/n/10 '\T1/ptm/m/
 n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 detritals\TS1/zi4/m/n/10 ' '\T1/zi4/m/n/
 10 U-Th-He\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 , \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fis
 siontracks\TS1/zi4/m/n/10 ' \T1/ptm/m/n/10 or \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 o
 ther\TS1/zi4/m/n/10 ' 
-[24] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25] [26]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [27] [28]
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.ind [29] [30])
-(/tmp/RtmpugQd8I/Rd2pdf1487276de194/Rd2.aux) )
+[24] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [25]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [26] [27]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [28]
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.ind [29] [30])
+(/tmp/RtmpyVW9he/Rd2pdf48f759f9245c/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
@@ -688,8 +692,8 @@ xlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8
 a.pfb>
-Output written on Rd2.pdf (30 pages, 171064 bytes).
+Output written on Rd2.pdf (30 pages, 173179 bytes).
 Transcript written on Rd2.log.
 Saving output to 'IsoplotR-manual.pdf' ...
 Done
-You may want to clean up by 'rm -rf /tmp/RtmpugQd8I/Rd2pdf1487276de194'
+You may want to clean up by 'rm -rf /tmp/RtmpyVW9he/Rd2pdf48f759f9245c'

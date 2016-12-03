@@ -446,22 +446,22 @@ NULL
 > data(examples)
 > peakfit(examples$FT1,k=2)
 $L
-[1] -124.6088
+[1] -71.94616
 
 $peaks
-[1] 207.9650 315.3076
+[1] 103.4657 103.4678
 
 $props
-[1] 0.5530111 0.4469889
+[1] 0.3054743 0.6945257
 
 $peaks.err
-[1] 22.17262 30.49409
+[1] 80.41139 53.37054
 
 $props.err
-[1] 0.1065929 0.1065929
+[1] 3627.387 3627.387
 
 $legend
-[1] "Peak 1: 208+/-22 (55.3+/-11%)" "Peak 2: 315+/-30 (44.7+/-11%)"
+[1] "Peak 1: 100+/-80 (30+/-360000%)" "Peak 2: 100+/-53 (70+/-360000%)"
 
 > 
 > 
@@ -484,8 +484,6 @@ $legend
 > 
 > data(examples)
 > radialplot(examples$FT1)
-> #fname <- system.file("FT1.csv",package="IsoplotR")
-> #FT <- read.data(fname,method="fissiontracks",format=1)
 > 
 > 
 > 
@@ -513,6 +511,31 @@ $legend
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("set.zeta")
+> ### * set.zeta
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: set.zeta
+> ### Title: Calculate the zeta calibration coefficient for fission track
+> ###   dating
+> ### Aliases: set.zeta
+> 
+> ### ** Examples
+> 
+> data(examples)
+> print(examples$FT1$zeta)
+[1] 350  10
+> FT <- set.zeta(examples$FT1,tst=c(250,5))
+> print(FT$zeta)
+[1] 855  36
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("set.zeta", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("settings")
 > ### * settings
 > 
@@ -528,7 +551,7 @@ $legend
 > json <- system.file("constants.json",package="IsoplotR")
 > settings(json)
 > print(settings())
-[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00013],\"Rb85\":[84.911789738,5.7e-07],\"Rb87\":[86.909180532,7e-09],\"Sr84\":[83.9134191,1.3e-06],\"Sr86\":[85.9092606,1.2e-06],\"Sr87\":[86.9088775,1.2e-06],\"Sr88\":[87.9056125,1.2e-06]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
+[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
 > 
 > 
 > 
@@ -599,7 +622,7 @@ $legend
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  4.836 0.024 4.865 0 0 
+Time elapsed:  4.832 0.048 4.895 0 0 
 > grDevices::dev.off()
 pdf 
   2 
