@@ -3,6 +3,7 @@
 \name{isochron}
 \alias{isochron}
 \alias{isochron.ArAr}
+\alias{isochron.ReOs}
 \alias{isochron.default}
 \title{Calculate and plot isochrons}
 \usage{
@@ -15,21 +16,26 @@ isochron(x, ...)
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE, ...)
+
+\method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  line.col = "red", lwd = 2, plot = TRUE, ...)
 }
 \arguments{
-\item{x}{EITHER a list or a matrix with the following vectors:
+\item{x}{EITHER a list or a matrix with the following vectors or
+    columns:
 
 \code{X:} the x-variable
 
-\code{Y:} the y-variable
-
 \code{sX:} the standard error of X
+
+\code{Y:} the y-variable
 
 \code{sY:} the standard error of Y
 
 \code{rXY:} the correlation coefficient of X and Y
 
-OR an object of class \code{ArAr}}
+OR an object of class \code{ArAr} or \code{ReOs}}
 
 \item{...}{optional arguments}
 

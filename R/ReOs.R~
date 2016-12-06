@@ -1,6 +1,6 @@
 # x = matrix with columns 'Reppm','errReppm', 'Osppt','errOsppt' 
 # and 'Os187Os188','errOs187Os188')
-ID.Re <- function(x,exterr=FALSE){
+ID.Re <- function(x){
     R57Re <- iratio('Re185Re187')[1]
     R42Os <- iratio('Os184Os192')[1]
     R62Os <- iratio('Os186Os192')[1]
@@ -25,16 +25,14 @@ ID.Re <- function(x,exterr=FALSE){
     dinvf188Os.dR92Os <- 1/R82Os
     E <- matrix(0,11,11)
     J <- matrix(0,2,11)
-    if (exterr){
-        E[1,1] <- iratio('Re185Re187')[2]^2 # var(R57Re)
-        E[2,2] <- iratio('Os184Os192')[2]^2 # var(R42Os)
-        E[3,3] <- iratio('Os186Os192')[2]^2 # var(R62Os)
-        E[4,4] <- iratio('Os188Os192')[2]^2 # var(R82Os)
-        E[5,5] <- iratio('Os189Os192')[2]^2 # var(R92Os)
-        E[6,6] <- iratio('Os190Os192')[2]^2 # var(R02Os)
-        Ef[7,7] <- imass('Re')[2]^2
-        E[8,8] <- imass('Os')[2]^2
-    }
+    E[1,1] <- iratio('Re185Re187')[2]^2 # var(R57Re)
+    E[2,2] <- iratio('Os184Os192')[2]^2 # var(R42Os)
+    E[3,3] <- iratio('Os186Os192')[2]^2 # var(R62Os)
+    E[4,4] <- iratio('Os188Os192')[2]^2 # var(R82Os)
+    E[5,5] <- iratio('Os189Os192')[2]^2 # var(R92Os)
+    E[6,6] <- iratio('Os190Os192')[2]^2 # var(R02Os)
+    E[7,7] <- imass('Re')[2]^2
+    E[8,8] <- imass('Os')[2]^2
     nn <- dim(x)[1]
     out <- matrix(0,nn,5) # X,sX,Y,sY,rXY with X=Re187/Os188 and Y=Os187/Os188
     colnames(out) <- c('X','sX','Y','sY','rXY')
@@ -64,15 +62,6 @@ ID.Re <- function(x,exterr=FALSE){
     out
 }
 
-get.ReOs.age <- function(Os187Re187,exterr=TRUE){
-    l187 <- lambda('Re187')
-    tt <- log(1 + Os187Re187[1])/l187[1]
-    E <- matrix(0,2,2)
-    J <- matrix(0,1,2)
-    E[1,1] <- Os187Re187[2]^2
-    if (exterr) E[2,2] <- l187[2]^2
-    J[1,1] <- 1/(l187[1]*(1 + Os187Re187[1]))
-    J[1,2] <- -tt/l187[1]
-    st <- J %*% E %*% t(J)
-    c(tt,st)
+get.ReOs.Age <- function(x){
+    
 }

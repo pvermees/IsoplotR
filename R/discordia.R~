@@ -2,7 +2,7 @@ discordia.age <- function(x,wetherill=TRUE,exterr=TRUE){
     out <- list()
     selection <- get.selection(x,wetherill)
     d <- data2york(x,selection)
-    fit <- yorkfit(d$X,d$sX,d$Y,d$sY,d$rXY)
+    fit <- yorkfit(d$X,d$Y,d$sX,d$sY,d$rXY)
     itt <- concordia.intersection(fit,wetherill)
     X <- UPb.preprocess(x,wetherill)
     hess <- stats::optimHess(itt,LL.concordia.intersection, d=d,X=X,
@@ -27,7 +27,7 @@ LL.concordia.intersection <- function(itt,d,X,wetherill,exterr){
         a <- itt[2]
         b <- (XYl[2]-a)/XYl[1]
     }
-    xy <- get.york.xy(d$X,d$sX,d$Y,d$sY,d$rXY,a,b)
+    xy <- get.york.xy(d$X,d$Y,d$sX,d$sY,d$rXY,a,b)
     mu <- cbind(d$X,d$Y)-xy
     if (wetherill) disc <- (XYu[1]-xy[,1])/(XYu[1]-XYl[1])
     else disc <- (XYl[1]-xy[,1])/XYl[1]

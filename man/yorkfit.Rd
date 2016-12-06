@@ -4,25 +4,32 @@
 \alias{yorkfit}
 \title{Linear regression of X,Y-variables with correlated errors}
 \usage{
-yorkfit(X, Y, sX, sY, rXY)
+yorkfit(X, sX = NULL, Y = NULL, sY = NULL, rXY = NULL)
 }
 \arguments{
-\item{X}{vector of measurements}
+\item{X}{EITHER a vector with the X-values OR a 5-column matrix
+with the X-values, the analytical uncertainties of the
+X-values, the Y-values, the analytical uncertainties of the
+Y-values, and the correlation coefficients of the X- and
+Y-values.}
 
-\item{Y}{vector of measurements}
+\item{sX}{standard errors of \code{X} OR \code{NULL} if X is a
+matrix or data frame}
 
-\item{sX}{standard errors of \code{X}}
+\item{Y}{vector of measurements with the same length as X OR
+\code{NULL} if X is a matrix or data frame}
 
-\item{sY}{standard errors of \code{Y}}
+\item{sY}{standard errors of \code{Y} OR \code{NULL} if X is a
+matrix or data frame}
 
-\item{rXY}{correlation coefficients between X and Y}
+\item{rXY}{correlation coefficients between X and Y OR \code{NULL}
+if X is a matrix or data frame}
 }
 \value{
-a two-element list of vectors containing
-\describe{
-\item{a}{the intercept of the straight line fit and its standard error}
-\item{b}{the slope of the fit and its standard error}
-}
+a two-element list of vectors containing \describe{
+    \item{a}{the intercept of the straight line fit and its
+    standard error} \item{b}{the slope of the fit and its standard
+    error} }
 }
 \description{
 Implements the unified regression algorithm of York et al. (2004)
@@ -39,7 +46,7 @@ Titterington (1994)
    sX <- X*0.01
    sY <- Y*0.005
    rXY <- rep(0.8,n)
-   fit <- yorkfit(X,Y,sX,sY,rXY)
+   fit <- yorkfit(X,sX,Y,sY,rXY)
    covmat <- matrix(0,2,2)
    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
    for (i in 1:n){

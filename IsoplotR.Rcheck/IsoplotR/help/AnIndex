@@ -27,6 +27,7 @@ iratio	iratio
 isochron	isochron
 isochron.ArAr	isochron
 isochron.default	isochron
+isochron.ReOs	isochron
 kde	kde
 kde.ArAr	kde
 kde.default	kde

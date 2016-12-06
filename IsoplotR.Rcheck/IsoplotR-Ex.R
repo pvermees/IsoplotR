@@ -221,7 +221,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: isochron
 ### Title: Calculate and plot isochrons
-### Aliases: isochron isochron.ArAr isochron.default
+### Aliases: isochron isochron.ArAr isochron.ReOs isochron.default
 
 ### ** Examples
 
@@ -451,7 +451,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
    sX <- X*0.01
    sY <- Y*0.005
    rXY <- rep(0.8,n)
-   fit <- yorkfit(X,Y,sX,sY,rXY)
+   fit <- yorkfit(X,sX,Y,sY,rXY)
    covmat <- matrix(0,2,2)
    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
    for (i in 1:n){
