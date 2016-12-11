@@ -23,19 +23,19 @@
 #' 
 #' OR
 #' 
-#' - an object of class \code{UPb}, \code{ArAr}, \code{UThHe} or
-#' \code{fissiontracks}.
+#' - an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
+#' \code{UThHe} or \code{fissiontracks}.
 #' 
 #' @param method one of either \code{'Pb206U238'}, \code{'Pb207U235'},
-#'     \code{'Pb207Pb206'}, \code{'Ar40Ar39'}, \code{U-Th-He} or
-#'     \code{fissiontracks}
+#'     \code{'Pb207Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
+#'     \code{U-Th-He} or \code{fissiontracks}
 #' 
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
 #' 
 #' @param J two-element vector with the J-factor and its standard
 #'     error.  This option is only used if \code{method} =
-#'     \code{'Ar40Ar39'}.
+#'     \code{'Ar-Ar'}.
 #' 
 #' @param zeta two-element vector with the zeta-factor and its standard
 #'     error.  This option is only used if \code{method} =
@@ -64,8 +64,10 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
         out <- get.Pb206U238age(X[1],X[2],exterr)
     } else if (identical(method,'Pb207Pb206')){
         out <- get.Pb207Pb206age(X[1],X[2],exterr)
-    } else if (identical(method,'Ar40Ar39')){
+    } else if (identical(method,'Ar-Ar')){
         out <- get.ArAr.age(X[1],X[2],X[3],X[4],exterr)
+    } else if (identical(method,'Re-Os')){
+        out <- get.ReOs.age(X[1],X[2],exterr)
     } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
@@ -257,5 +259,12 @@ age.UThHe <- function(x,central=FALSE,i=NA,sigdig=NA,...){
 age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
     if (central) out <- central(x)
     else out <- fissiontrack.age(x,i=i,sigdig=sigdig,exterr=exterr)
+    out
+}
+#' @rdname age
+#' @export
+age.ReOs <- function(x,isochron=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+    if (isochron) out <- isochron(x,plot=FALSE)
+    else out <- ReOs.age(x,exterr=exterr,i=i,sigdig=sigdig,...)
     out
 }

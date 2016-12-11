@@ -149,7 +149,7 @@ as.ReOs <- function(x,format=1){
         colnames(X) <- c('Reppm','errReppm',
                          'Osppt','errOsppt',
                          'Os187Os188','errOs187Os188')
-        out$x <- ID.Re(X)
+        out$x <- X
     }
     out
 }

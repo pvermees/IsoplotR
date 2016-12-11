@@ -53,7 +53,12 @@ settings <- function(fname=NULL){
 #' Sm: Lugmair, G. W., and K. Marti. "Lunar initial \eqn{^{143}}Nd/\eqn{^{144}}Nd: differential
 #' evolution of the lunar crust and mantle." Earth and Planetary Science
 #' Letters 39.3 (1978): 349-357.
-#' 
+#'
+#' Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and Hannah, J.L., 2007.
+#' Assessment of the 187Re decay constant by cross calibration of Re-Os molybdenite
+#' and U-Pb zircon chronometers in magmatic ore systems. Geochimica et Cosmochimica
+#' Acta, 71(8), pp.1999-2013.
+#'
 #' Ar: Renne, Paul R., et al. "Response to the comment by WH Schwarz et al. on
 #' "Joint determination of 40K decay constants and \eqn{^{40}}Ar*/\eqn{^{40}}K for the Fish Canyon
 #' sanidine standard, and improved accuracy for \eqn{^{40}}Ar/\eqn{^{39}}Ar geochronology"
