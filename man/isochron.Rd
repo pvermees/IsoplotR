@@ -15,11 +15,12 @@ isochron(x, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE, ...)
+  inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
+  exterr = TRUE, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, ...)
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 }
 \arguments{
 \item{x}{EITHER a list or a matrix with the following vectors or
@@ -63,6 +64,8 @@ vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar. If \code{FALSE}, plots
 \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.}
 
 \item{plot}{if \code{FALSE}, suppresses the graphical output}
+
+\item{exterr}{propagate external sources of uncertainty (J, decay constant)?}
 }
 \value{
 if \code{plot=FALSE}, returns a list with the following items:

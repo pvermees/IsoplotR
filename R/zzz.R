@@ -1,3 +1,3 @@
 .onLoad <- function(libname, pkgname){
-    settings(system.file("constants.json",package=pkgname))
+    settings(fname=system.file("constants.json",package=pkgname))
 }

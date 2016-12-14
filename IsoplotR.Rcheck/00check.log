@@ -13,8 +13,21 @@ The build time stamp is missing.
 * checking package dependencies ... OK
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
-* checking for executable files ... OK
-* checking for hidden files and directories ... OK
+* checking for executable files ... WARNING
+Found the following executable files:
+  .git/objects/1b/4718fa8df55f440a807300a3098ba2c506fb05
+  .git/objects/23/6c3a49f1accb74bd37ce442663ec5b7aa32344
+  .git/objects/2d/a810ebbbabccc9c17f1c63956fe449d22a0cb7
+Source packages should not contain undeclared executable files.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .git
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+
+CRAN-pack does not know about
+  .git
 * checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘IsoplotR’ can be installed ... OK
@@ -23,14 +36,17 @@ The build time stamp is missing.
 * checking DESCRIPTION meta-information ... NOTE
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
 Found the following directory with the name of a check directory:
   ./IsoplotR.Rcheck
 Most likely, these were included erroneously.
+Found the following directory with the name of a version control directory:
+  ./.git
+These should not be in a package tarball.
 * checking R files for non-ASCII characters ... OK
 * checking R files for syntax errors ... OK
 * checking whether the package can be loaded ... OK
@@ -60,4 +76,4 @@ Most likely, these were included erroneously.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 WARNING, 3 NOTEs
+Status: 2 WARNINGs, 4 NOTEs

@@ -3,6 +3,7 @@
 \name{age}
 \alias{age}
 \alias{age.ArAr}
+\alias{age.ReOs}
 \alias{age.UPb}
 \alias{age.UThHe}
 \alias{age.default}
@@ -27,6 +28,9 @@ age(x, ...)
 
 \method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA,
   exterr = TRUE, ...)
+
+\method{age}{ReOs}(x, isochron = TRUE, exterr = TRUE, i = NA,
+  sigdig = NA, ...)
 }
 \arguments{
 \item{x}{can be:
@@ -49,21 +53,21 @@ error, or the spontaneous and induced track densities \code{Ns} and
 
 OR
 
-- an object of class \code{UPb}, \code{ArAr}, \code{UThHe} or
-\code{fissiontracks}.}
+- an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
+\code{UThHe} or \code{fissiontracks}.}
 
 \item{...}{optional arguments}
 
 \item{method}{one of either \code{'Pb206U238'}, \code{'Pb207U235'},
-\code{'Pb207Pb206'}, \code{'Ar40Ar39'}, \code{U-Th-He} or
-\code{fissiontracks}}
+\code{'Pb207Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
+\code{U-Th-He} or \code{fissiontracks}}
 
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}
 
 \item{J}{two-element vector with the J-factor and its standard
 error.  This option is only used if \code{method} =
-\code{'Ar40Ar39'}.}
+\code{'Ar-Ar'}.}
 
 \item{zeta}{two-element vector with the zeta-factor and its standard
 error.  This option is only used if \code{method} =
@@ -221,9 +225,9 @@ Calculates  ages and propagates their analytical
 uncertainties.
 }
 \examples{
-data(examples)
-print(age(examples$UPb))
-print(age(examples$UPb,concordia=1))
-print(age(examples$UPb,concordia=2))
+#data(examples)
+#print(age(examples$UPb))
+#print(age(examples$UPb,concordia=1))
+#print(age(examples$UPb,concordia=2))
 }
 

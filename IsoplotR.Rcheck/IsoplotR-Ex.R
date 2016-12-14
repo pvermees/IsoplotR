@@ -25,15 +25,15 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
-### Aliases: age age.ArAr age.UPb age.UThHe age.default age.detritals
-###   age.fissiontracks
+### Aliases: age age.ArAr age.ReOs age.UPb age.UThHe age.default
+###   age.detritals age.fissiontracks
 
 ### ** Examples
 
-data(examples)
-print(age(examples$UPb))
-print(age(examples$UPb,concordia=1))
-print(age(examples$UPb,concordia=2))
+#data(examples)
+#print(age(examples$UPb))
+#print(age(examples$UPb,concordia=1))
+#print(age(examples$UPb,concordia=2))
 
 
 
@@ -190,29 +190,6 @@ helioplot(examples$UThHe,logratio=FALSE)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("helioplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("iratio")
-### * iratio
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: iratio
-### Title: Isotopic ratios
-### Aliases: iratio
-
-### ** Examples
-
-# returns the 238U/235U ratio of Hiess et al. (2012):
-print(iratio('U238U235'))
-# use the 238U/235U ratio of Steiger and Jaeger (1977):
-iratio('U238U235',138.88,0)
-print(iratio('U238U235'))
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("iratio", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
 nameEx("isochron")
 ### * isochron
 
@@ -254,28 +231,6 @@ kde(examples$DZ,from=0,to=3000)
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("kde", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
-nameEx("lambda")
-### * lambda
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: lambda
-### Title: Decay constants
-### Aliases: lambda
-
-### ** Examples
-
-print(lambda('U238'))
-# use the decay constant of Kovarik and Adams (1932)
-lambda('U238',0.0001537,0.0000068)
-print(lambda('U238'))
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("lambda", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("mds")
 ### * mds
@@ -398,9 +353,20 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
+# load and show the default constants that come with IsoplotR
 json <- system.file("constants.json",package="IsoplotR")
-settings(json)
+settings(fname=json)
 print(settings())
+
+# use the decay constant of Kovarik and Adams (1932)
+settings('lambda','U238',0.0001537,0.0000068)
+print(settings('lambda','U238'))
+
+# returns the 238U/235U ratio of Hiess et al. (2012):
+print(settings('iratio','U238U235'))
+# use the 238U/235U ratio of Steiger and Jaeger (1977):
+settings('iratio','U238U235',138.88,0)
+print(settings('iratio','U238U235'))
 
 
 

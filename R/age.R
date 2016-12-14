@@ -211,10 +211,10 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
 #' }
 #' 
 #' @examples
-#' data(examples)
-#' print(age(examples$UPb))
-#' print(age(examples$UPb,concordia=1))
-#' print(age(examples$UPb,concordia=2))
+#' #data(examples)
+#' #print(age(examples$UPb))
+#' #print(age(examples$UPb,concordia=1))
+#' #print(age(examples$UPb,concordia=2))
 #' @rdname age
 #' @export
 age.UPb <- function(x,concordia=1,wetherill=TRUE,

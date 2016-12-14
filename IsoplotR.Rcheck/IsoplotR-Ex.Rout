@@ -44,94 +44,15 @@ Type 'q()' to quit R.
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: age
 > ### Title: Calculate isotopic ages
-> ### Aliases: age age.ArAr age.UPb age.UThHe age.default age.detritals
-> ###   age.fissiontracks
+> ### Aliases: age age.ArAr age.ReOs age.UPb age.UThHe age.default
+> ###   age.detritals age.fissiontracks
 > 
 > ### ** Examples
 > 
-> data(examples)
-> print(age(examples$UPb))
-          t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
- [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.555230 251.9817
- [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4017 7.404241 251.6014
- [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.021362 251.5664
- [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.427487 251.3791
- [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.243669 251.2422
- [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.625510 251.2328
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1162 5.241270 250.8574
- [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.622336 250.8896
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7755 3.243182 251.3739
-[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.2817
-      s[t.conc]
- [1,] 0.2693649
- [2,] 0.2800342
- [3,] 0.6199301
- [4,] 0.3329737
- [5,] 0.2724978
- [6,] 0.6164272
- [7,] 0.2791730
- [8,] 0.3865456
- [9,] 0.2724946
-[10,] 0.3243521
-> print(age(examples$UPb,concordia=1))
-          t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
- [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.555230 251.9817
- [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4017 7.404241 251.6014
- [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.021362 251.5664
- [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.427487 251.3791
- [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.243669 251.2422
- [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.625510 251.2328
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1162 5.241270 250.8574
- [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.622336 250.8896
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7755 3.243182 251.3739
-[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.2817
-      s[t.conc]
- [1,] 0.2693649
- [2,] 0.2800342
- [3,] 0.6199301
- [4,] 0.3329737
- [5,] 0.2724978
- [6,] 0.6164272
- [7,] 0.2791730
- [8,] 0.3865456
- [9,] 0.2724946
-[10,] 0.3243521
-> print(age(examples$UPb,concordia=2))
-$x
- Pb207U235  Pb206U238 
-0.27913440 0.03941493 
-
-$cov
-             Pb207U235    Pb206U238
-Pb207U235 2.233412e-08 1.610024e-09
-Pb206U238 1.610024e-09 2.270768e-10
-
-$age
-[1] 249.4722
-
-$age.err
-[1] 0.141713
-
-$mswd
-$mswd$equivalence
-         [,1]
-[1,] 260.2127
-
-$mswd$concordance
-         [,1]
-[1,] 10.93234
-
-
-$p.value
-$p.value$equivalence
-     [,1]
-[1,]    0
-
-$p.value$concordance
-             [,1]
-[1,] 0.0009449995
-
-
+> #data(examples)
+> #print(age(examples$UPb))
+> #print(age(examples$UPb,concordia=1))
+> #print(age(examples$UPb,concordia=2))
 > 
 > 
 > 
@@ -291,31 +212,6 @@ dev.new(): using pdf(file="Rplots1.pdf")
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("helioplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-> nameEx("iratio")
-> ### * iratio
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: iratio
-> ### Title: Isotopic ratios
-> ### Aliases: iratio
-> 
-> ### ** Examples
-> 
-> # returns the 238U/235U ratio of Hiess et al. (2012):
-> print(iratio('U238U235'))
-[1] 137.8180   0.0225
-> # use the 238U/235U ratio of Steiger and Jaeger (1977):
-> iratio('U238U235',138.88,0)
-> print(iratio('U238U235'))
-[1] 138.88   0.00
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("iratio", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
 > nameEx("isochron")
 > ### * isochron
 > 
@@ -357,30 +253,6 @@ dev.new(): using pdf(file="Rplots1.pdf")
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("kde", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("lambda")
-> ### * lambda
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: lambda
-> ### Title: Decay constants
-> ### Aliases: lambda
-> 
-> ### ** Examples
-> 
-> print(lambda('U238'))
-[1] 0.000155125 0.000000083
-> # use the decay constant of Kovarik and Adams (1932)
-> lambda('U238',0.0001537,0.0000068)
-> print(lambda('U238'))
-[1] 0.0001537 0.0000068
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("lambda", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("mds")
 > ### * mds
@@ -449,13 +321,13 @@ $L
 [1] -71.94616
 
 $peaks
-[1] 103.4657 103.4678
+[1] 103.4581 103.4602
 
 $props
 [1] 0.3054743 0.6945257
 
 $peaks.err
-[1] 80.41139 53.37054
+[1] 80.40549 53.36663
 
 $props.err
 [1] 3627.387 3627.387
@@ -548,10 +420,24 @@ $legend
 > 
 > ### ** Examples
 > 
+> # load and show the default constants that come with IsoplotR
 > json <- system.file("constants.json",package="IsoplotR")
-> settings(json)
+> settings(fname=json)
 > print(settings())
-[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Re187\":[1.6689e-05,3.8e-08],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
+[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Re187\":[1.6689e-05,3.8e-08],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0.00045],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
+> 
+> # use the decay constant of Kovarik and Adams (1932)
+> settings('lambda','U238',0.0001537,0.0000068)
+> print(settings('lambda','U238'))
+[1] 0.0001537 0.0000068
+> 
+> # returns the 238U/235U ratio of Hiess et al. (2012):
+> print(settings('iratio','U238U235'))
+[1] 137.8180   0.0225
+> # use the 238U/235U ratio of Steiger and Jaeger (1977):
+> settings('iratio','U238U235',138.88,0)
+> print(settings('iratio','U238U235'))
+[1] 138.88   0.00
 > 
 > 
 > 
@@ -622,7 +508,7 @@ $legend
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  4.716 0.052 4.779 0 0 
+Time elapsed:  9.3 0.168 9.372 0 0 
 > grDevices::dev.off()
 pdf 
   2 

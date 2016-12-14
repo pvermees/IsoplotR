@@ -4,21 +4,154 @@
 \alias{settings}
 \title{Load settings to and from json}
 \usage{
-settings(fname = NULL)
+settings(setting = NA, ..., fname = NA)
 }
 \arguments{
+\item{setting}{unless \code{fname} is provided, this should be one
+    of either:
+
+\code{'lambda'}: to get and set decay constants
+
+\code{'iratio'}: isotopic ratios
+
+\code{'imass'}: isotopic molar masses
+
+\code{'mindens'}: mineral densities
+
+\code{'etchfact'}: fission track etch efficiency factors
+
+\code{'tracklength'}: equivalent isotropic fission track length}
+
+\item{...}{depends on the value for \code{setting}:
+
+for \code{'lambda'}: the isotope of interest (one of either
+\code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"Th232"},
+\code{"Re187"}, \code{"Sm147"}, or \code{"K40"}) PLUS (optionally)
+the decay constant value and its analytical error.  Omitting these
+two numbers simply returns the existing values.
+
+for \code{'iratio'}: the isotopic ratio of interest (one of either
+\code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
+\code{"Sr88Sr86"}, \code{"Sr87Sr86"}, \code{"Sr84Sr86"},
+\code{"Re185Re187"}, \code{"Os184Os192"} \code{"Os186Os192"},
+\code{"Os187Os192"}, \code{"Os188Os192"}, \code{"Os189Os192"},
+\code{"Os190Os192"}, \code{"U238U235"}, \code{"Sm144Sm152"},
+\code{"Sm147Sm152"}, \code{"Sm148Sm152"}, \code{"Sm149Sm152"},
+\code{"Sm150Sm152"}, or \code{"Sm154Sm152"}) PLUS (optionally) the
+isotopic ratio and its analytical error.  Omitting these two
+numbers simply returns the existing values.
+
+for \code{'imass'}: the (isotopic) molar mass of interest (one of
+either \code{"U"}, \code{"Rb"}, \code{"Rb85"}, \code{"Rb87"},
+\code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"}, \code{"Sr88"},
+\code{"Re"}, \code{"Re185"}, \code{"Re187"}, \code{"Os"},
+\code{"Os184"}, \code{"Os186"}, \code{"Os187"}, \code{"Os188"},
+\code{"Os189"}, \code{"Os190"}, or \code{"Os192"}) PLUS
+(optionally) the molar mass and its analytical error.  Omitting
+these two numbers simply returns the existing values.
+
+for \code{'mindens'}: the mineral of interest (one of either
+\code{"apatite"} or \code{"zircon"}) PLUS the mineral
+density. Omitting this number simply returns the existing value.
+
+\code{'etchfact'}: the mineral of interest (one of either
+\code{"apatite"} or \code{"zircon"}) PLUS the etch efficiency
+factor. Omitting this number simply returns the existing value.
+
+\code{'tracklength'}: the mineral of interest (one of either
+\code{"apatite"} or \code{"zircon"}) PLUS the equivalent isotropic
+fission track length. Omitting this number simply returns the
+existing value.}
+
 \item{fname}{the path of a \code{.json} file}
 }
 \value{
-if \code{fname=NULL}, returns a \code{.json} string
+if \code{setting=NA} and \code{fname=NA}, returns a
+    \code{.json} string
+if \code{...} contains only the name of an isotope, isotopic ratio,
+element, or mineral and no new value, \code{settings} returns
+either a scalar with the existing value, or a two-element vector
+with the value and its uncertainty.
 }
 \description{
-Get and set preferred values for decay constants and isotopic
-abundances from and to a \code{.json} file format
+Get and set preferred values for decay constants, isotopic
+abundances, molar masses, fission track etch efficiences, and
+etchable lengths, and mineral densities, either individually or via
+a \code{.json} file format.
 }
 \examples{
+# load and show the default constants that come with IsoplotR
 json <- system.file("constants.json",package="IsoplotR")
-settings(json)
+settings(fname=json)
 print(settings())
+
+# use the decay constant of Kovarik and Adams (1932)
+settings('lambda','U238',0.0001537,0.0000068)
+print(settings('lambda','U238'))
+
+# returns the 238U/235U ratio of Hiess et al. (2012):
+print(settings('iratio','U238U235'))
+# use the 238U/235U ratio of Steiger and Jaeger (1977):
+settings('iratio','U238U235',138.88,0)
+print(settings('iratio','U238U235'))
+}
+\references{
+1. Decay constants:
+
+U: Jaffey, A. H., et al. "Precision measurement of half-lives and
+specific activities of U\eqn{^{235}} and
+U\eqn{^{238}}." Physical Review C 4.5 (1971): 1889.
+
+Th: Le Roux, L. J., and
+L. E. Glendenin. "Half-life of \eqn{^{232}}Th.  "Proceedings of the
+National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
+
+Sm: Lugmair, G. W., and
+K. Marti. "Lunar initial \eqn{^{143}}Nd/\eqn{^{144}}Nd: differential
+evolution of the lunar crust and mantle."
+Earth and Planetary Science Letters 39.3 (1978): 349-357.
+
+Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and Hannah,
+J.L., 2007.  Assessment of the 187Re decay constant by cross
+calibration of Re-Os molybdenite and U-Pb zircon chronometers in
+magmatic ore systems. Geochimica et Cosmochimica Acta, 71(8),
+pp.1999-2013.
+
+Ar: Renne, Paul R., et
+al. "Response to the comment by WH Schwarz et al. on "Joint
+determination of 40K decay constants and
+\eqn{^{40}}Ar*/\eqn{^{40}}K for the Fish Canyon sanidine standard,
+and improved accuracy for \eqn{^{40}}Ar/\eqn{^{39}}Ar
+geochronology" by PR Renne et al.(2010)." Geochimica et
+Cosmochimica Acta 75.17 (2011): 5097-5100.
+
+2. Isotopic ratios:
+
+Ar: Lee, Jee-Yon, et
+al. "A redetermination of the isotopic abundances of atmospheric Ar."
+Geochimica et Cosmochimica Acta 70.17 (2006): 4507-4512.
+
+Rb: Catanzaro, E. J., et al. "Absolute isotopic abundance ratio and
+atomic weight of terrestrial rubidium." J. Res. Natl. Bur. Stand. A 73
+(1969): 511-516.
+
+Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
+weight of a reference sample of strontium." J. Res. Natl.Bur. Stand.
+87.1 (1982): 1-8.
+
+Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic
+weight of samarium." International Journal of Mass Spectrometry 218.2
+(2002): 167-172.
+
+Re: Gramlich, John W., et al. "Absolute isotopic abundance ratio and
+atomic weight of a reference sample of rhenium." J. Res. Natl. Bur.
+Stand. A 77 (1973): 691-698.
+
+Os: Voelkening, Joachim, Thomas Walczyk, and Klaus G. Heumann.
+"Osmium isotope ratio determinations by negative thermal ionization
+mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
+
+U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
+uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 }
 
