@@ -133,13 +133,7 @@ central.fissiontracks <- function(x,mineral=NA,...){
         for (i in 1:30){ # page 100 of Galbraith (2005)
             wu <- 1/(sigma^2+su^2)
             mu <- sum(wu*zu)/sum(wu)
-            # fit in 3 parts to make sure optimize finds global minimum
-            fit1 <- stats::optimize(eq.6.9,c(0,0.1),mu=mu,zu=zu,su=su)
-            fit2 <- stats::optimize(eq.6.9,c(0.1,1),mu=mu,zu=zu,su=su)
-            if (fit1$objective < fit2$objective) fit <- fit1
-            else fit <- fit2
-            fit3 <- stats::optimize(eq.6.9,c(1,10),mu=mu,zu=zu,su=su)
-            if (fit3$objective < fit$objective) fit <- fit3
+            fit <- stats::optimize(eq.6.9,c(0,10),mu=mu,zu=zu,su=su)
             sigma <- fit$minimum
         }
         tt <- exp(mu)
@@ -147,7 +141,7 @@ central.fissiontracks <- function(x,mineral=NA,...){
         if (x$format==2)
             st <- tt * sqrt((st/tt)^2 + (x$zeta[2]/x$zeta[1])^2)
         df <- length(zu)-1
-        Chi2 <- sum((zu/su)^2 - (sum(zu/su^2)^2)/sum(1/su^2))
+        Chi2 <- sum((zu/su)^2) - (sum(zu/su^2)^2)/sum(1/su^2)
     }
     out$age <- c(tt,st)
     out$disp <- sigma
@@ -158,5 +152,5 @@ central.fissiontracks <- function(x,mineral=NA,...){
 
 eq.6.9 <- function(sigma,mu,zu,su){
     wu <- 1/(sigma^2+su^2)
-    (sum((wu*(zu-mu))^2) - sum(wu))^2
+    (1-sum((wu*(zu-mu))^2)/sum(wu))^2
 }
