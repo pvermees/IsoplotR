@@ -6,13 +6,14 @@
 #' analytical uncertainty associated with decay constants and
 #' J-factors after computing the plateau composition.
 #'
-#' @param x - a three-column matrix whose first column gives the amount
+#' @param x
+#' a three-column matrix whose first column gives the amount
 #'     of \eqn{^{39}}Ar in each aliquot, and whose second and third
 #'     columns give the age and its uncertainty.
-#'
+#' 
 #' OR
-#'
-#' - an object of class \code{ArAr} with \code{format=2}
+#' 
+#' an object of class \code{ArAr} with \code{format=2}
 #' 
 #' @param alpha the confidence limits of the error bars/boxes.
 #' @param plateau logical flag indicating whether a plateau age should
@@ -32,7 +33,8 @@
 #' @param title add a title to the plot? If \code{FALSE}, returns a
 #'     list with plateau parameters.
 #' @param ... optional parameters to the generic \code{plot} function
-#' @return if \code{title=FALSE}, a list with the following items:
+#' @return if \code{title=FALSE}, returns a list with the following
+#'     items:
 #'
 #' \describe{
 #' \item{mean}{a 2-element vector with the plateau mean and standard error}

@@ -7,18 +7,16 @@
 #'
 #' @param x EITHER a list or a matrix with the following vectors or
 #'     columns:
+#' \describe{
+#' \item{X}{the x-variable}
+#' \item{sX}{the standard error of \code{X}}
+#' \item{Y}{the y-variable}
+#' \item{sY}{the standard error of \code{Y}}
+#' \item{rXY}{the correlation coefficient of \code{X} and \code{Y}}
+#' }
+#' OR
 #'
-#' \code{X:} the x-variable
-#'
-#' \code{sX:} the standard error of X
-#'
-#' \code{Y:} the y-variable
-#'
-#' \code{sY:} the standard error of Y
-#'
-#' \code{rXY:} the correlation coefficient of X and Y
-#'
-#' OR an object of class \code{ArAr} or \code{ReOs}
+#' an object of class \code{ArAr} or \code{ReOs}
 #'
 #' @param xlim 2-element vector with the plot limits of the x-axis
 #' @param ylim 2-element vector with the plot limits of the y-axis

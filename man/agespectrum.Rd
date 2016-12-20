@@ -17,13 +17,13 @@ agespectrum(x, ...)
   sigdig = 2, exterr = TRUE, line.col = "red", lwd = 2, ...)
 }
 \arguments{
-\item{x}{- a three-column matrix whose first column gives the amount
+\item{x}{a three-column matrix whose first column gives the amount
     of \eqn{^{39}}Ar in each aliquot, and whose second and third
     columns give the age and its uncertainty.
 
 OR
 
-- an object of class \code{ArAr} with \code{format=2}}
+an object of class \code{ArAr} with \code{format=2}}
 
 \item{...}{optional parameters to the generic \code{plot} function}
 
@@ -56,7 +56,8 @@ list with plateau parameters.}
 calibration factor) uncertainties?}
 }
 \value{
-if \code{title=FALSE}, a list with the following items:
+if \code{title=FALSE}, returns a list with the following
+    items:
 
 \describe{
 \item{mean}{a 2-element vector with the plateau mean and standard error}

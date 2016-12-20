@@ -4,28 +4,30 @@
 #' uncertainties.
 #'
 #' @param x can be:
+#' \itemize{
+#' \item a scalar containing an isotopic ratio,
 #'
-#' - a scalar containing an isotopic ratio,
-#'
-#' - a two element vector containing an isotopic ratio and its standard
+#' \item a two element vector containing an isotopic ratio and its standard
 #' error, or the spontaneous and induced track densities \code{Ns} and
 #' \code{Ni} (if \code{method='fissiontracks'}),
 #'
-#' - a four element vector containing \code{Ar40Ar39},
+#' \item a four element vector containing \code{Ar40Ar39},
 #' \code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
 #'
-#' - a six element vector containing \code{U}, \code{s[U]}, \code{Th},
+#' \item a six element vector containing \code{U}, \code{s[U]}, \code{Th},
 #' \code{s[Th]}, \code{He} and \code{s[He]},
 #'
-#' - an eight element vector containing \code{U}, \code{s[U]},
+#' \item an eight element vector containing \code{U}, \code{s[U]},
 #' \code{Th}, \code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and
-#' \code{s[Sm]},
-#' 
+#' \code{s[Sm]}
+#' }
+#'
 #' OR
-#' 
-#' - an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
+#'
+#' \itemize{
+#' \item an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
 #' \code{UThHe} or \code{fissiontracks}.
-#' 
+#' }
 #' @param method one of either \code{'Pb206U238'}, \code{'Pb207U235'},
 #'     \code{'Pb207Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
 #'     \code{U-Th-He} or \code{fissiontracks}
@@ -33,21 +35,9 @@
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
 #' 
-#' @param J two-element vector with the J-factor and its standard
-#'     error.  This option is only used if \code{method} =
-#'     \code{'Ar-Ar'}.
-#' 
-#' @param zeta two-element vector with the zeta-factor and its standard
-#'     error.  This option is only used if \code{method} =
-#'     \code{'fissiontracks'}.
-#' 
-#' @param rhoD two-element vector with the track density of the
-#'     dosimeter glass and its standard error.  This option is only
-#'     used if \code{method} = \code{'fissiontracks'}.
-#' 
 #' @param i (optional) index of a particular aliquot
 #' 
-#' @param ... optional arguments
+#' @param ... additional arguments
 #' 
 #' @rdname age
 #' @export
@@ -101,11 +91,12 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
 #' the geochronometer given by \code{method} and its standard error.
 #'
 #' \item if \code{x} has class \code{UPb} and \code{concordia=1},
-#' returns a table with the following columns: `t.75', `err[t.75]',
-#' `t.68', `err[t.68]', `t.76',`err[t.76]', `t.conc', `err[t.conc]',
-#' containing the \eqn{^{207}}Pb/\eqn{^{235}} U-age and standard
-#' error, the \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
-#' \eqn{^{207}}Pb/\eqn{^{206}} Pb-age and standard error, and the
+#' returns a table with the following columns: \code{t.75},
+#' \code{err[t.75]}, \code{t.68}, \code{err[t.68]}, \code{t.76},
+#' \code{err[t.76]}, \code{t.conc}, \code{err[t.conc]}, containing the
+#' \eqn{^{207}}Pb/\eqn{^{235}}U-age and standard error, the
+#' \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, and the
 #' concordia age and standard error, respectively.
 #'  
 #' \item if \code{x} has class \code{UPb} and \code{concordia=2},
@@ -142,11 +133,11 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
 #' \item{cov}{ the covariance matrix of the elements in \code{x} }
 #' }
 #'
-#' \item if \code{x} has class \code{ArAr} and \code{isochron=FALSE},
-#' returns a table of Ar-Ar ages and standard errors.
+#' \item if \code{x} has class \code{ArAr} or \code{ReOs} and \code{isochron=FALSE},
+#' returns a table of Ar-Ar or Re-Os ages and standard errors.
 #'
-#' \item if \code{x} has class \code{ArAr} and \code{isochron=TRUE},
-#' returns a list with the following items:
+#' \item if \code{x} has class \code{ArAr} or \code{ReOs} and
+#' \code{isochron=TRUE}, returns a list with the following items:
 #'
 #' \describe{
 #'
@@ -155,11 +146,11 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
 #' 
 #' \item{b}{ the slope of the fit and its standard error. }
 #' 
-#' \item{y0}{ the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and
-#' its standard error. }
+#' \item{y0}{ the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
+#' \eqn{^{187}}Os/\eqn{^{188}}Os ratio and its standard error. }
 #' 
-#' \item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard
-#' error. }
+#' \item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar or
+#' \eqn{^{187}}Os/\eqn{^{187}}Re age and its standard error. }
 #' 
 #' }
 #' 
@@ -211,10 +202,10 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
 #' }
 #' 
 #' @examples
-#' #data(examples)
-#' #print(age(examples$UPb))
-#' #print(age(examples$UPb,concordia=1))
-#' #print(age(examples$UPb,concordia=2))
+#' data(examples)
+#' print(age(examples$UPb))
+#' print(age(examples$UPb,concordia=1))
+#' print(age(examples$UPb,concordia=2))
 #' @rdname age
 #' @export
 age.UPb <- function(x,concordia=1,wetherill=TRUE,
@@ -232,6 +223,8 @@ age.UPb <- function(x,concordia=1,wetherill=TRUE,
 age.detritals <- function(x,...){
     x
 }
+#' @param J two-element vector with the J-factor and its standard
+#'     error.
 #' @param isochron logical flag indicating whether each Ar-Ar analysis
 #'     should be considered separately (\code{isochron=FALSE}) or an
 #'     isochron age should be calculated from all Ar-Ar analyses
@@ -254,6 +247,10 @@ age.UThHe <- function(x,central=FALSE,i=NA,sigdig=NA,...){
     else out <- UThHe.age(x,i=i,sigdig=sigdig)
     out
 }
+#' @param zeta two-element vector with the zeta-factor and its standard
+#'     error.
+#' @param rhoD two-element vector with the track density of the
+#'     dosimeter glass and its standard error.
 #' @rdname age
 #' @export
 age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){

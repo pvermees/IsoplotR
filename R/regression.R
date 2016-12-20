@@ -18,7 +18,7 @@
 #'     matrix or data frame
 #' @param rXY correlation coefficients between X and Y OR \code{NULL}
 #'     if X is a matrix or data frame
-#' @return a two-element list of vectors containing \describe{
+#' @return a two-element list of vectors containing: \describe{
 #'     \item{a}{the intercept of the straight line fit and its
 #'     standard error} \item{b}{the slope of the fit and its standard
 #'     error} }

@@ -3,22 +3,22 @@
 #' Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s
 #' data classes
 #'
-#' @param x a file name (\code{.csv} format) or matrix
+#' @param x either a file name (\code{.csv} format) OR a matrix
 #' @param method one of \code{'U-Pb'}, \code{'Ar-Ar'},
 #'     \code{'detritals'} \code{'U-Th-He'}, \code{'fissiontracks'} or
 #'     \code{'other'}
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
-#'
-#' - if \code{method = 'Ar-Ar'}, then \code{format} is one of either:
+#' 
+#' if \code{method = 'Ar-Ar'}, then \code{format} is one of either:
 #'
 #' \enumerate{
 #' \item{\code{39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]}}
 #' \item{\code{39, 39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]}}
 #' }
 #'
-#' - if \code{method = 'fissiontracks'}, then \code{format} is
-#' one of either:
+#' if \code{method = 'fissiontracks'}, then \code{format} is one of
+#' either:
 #'
 #' \enumerate{
 #' \item{the External Detector Method (EDM), which requires a
@@ -39,10 +39,51 @@
 #' or more U/Ca- or U-concentration measurements and their analytical
 #' uncertainties.}
 #' }
+#'
+#' @details
+#' Example input files can be found by using \code{R}'s
+#' \code{system.file(...)} function:
+#'
+#' \enumerate{
+#' \item \code{method = 'U-Pb'}:
+#'
+#' \code{file.show(system.file("UPb.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'Ar-Ar'} and \code{format = 1}:
+#'
+#' \code{file.show(system.file("ArAr1.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'Ar-Ar'} and \code{format = 2}:
+#'
+#' \code{file.show(system.file("ArAr2.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'Re-Os'}:
+#'
+#' \code{file.show(system.file("ReOs.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'U-Th-He'}:
+#'
+#' \code{file.show(system.file("UThHe.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'fissiontracks'} and \code{format = 1}:
+#'
+#' \code{file.show(system.file("FT1.csv",package="IsoplotR"))}
 #' 
+#' \item \code{method = 'fissiontracks'} and \code{format = 2}:
+#'
+#' \code{file.show(system.file("FT2.csv",package="IsoplotR"))}
+#' 
+#' \item \code{method = 'fissiontracks'} and \code{format = 3}:
+#'
+#' \code{file.show(system.file("FT3.csv",package="IsoplotR"))}
+#' 
+#' \item \code{method = 'detritals'}:
+#'
+#' \code{file.show(system.file("DZ.csv",package="IsoplotR"))}
+#' }
 #' @param ... optional arguments to the \code{read.csv} function
 #' @return an object of class \code{UPb}, \code{ArAr}, \code{UThHe},
-#'     \code{detritals} \code{fissiontracks} or \code{other}
+#'     \code{detritals}, \code{fissiontracks} or \code{other}
 #' @examples
 #' # load one of the built-in .csv files:
 #' data(examples)

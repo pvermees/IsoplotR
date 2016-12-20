@@ -50,14 +50,14 @@ mindens <- function(mineral,x=NULL){
 #'
 #' \code{'tracklength'}: equivalent isotropic fission track length
 #' @param ... depends on the value for \code{setting}:
-#'
-#' for \code{'lambda'}: the isotope of interest (one of either
+#' \itemize{
+#' \item for \code{'lambda'}: the isotope of interest (one of either
 #' \code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"Th232"},
 #' \code{"Re187"}, \code{"Sm147"}, or \code{"K40"}) PLUS (optionally)
 #' the decay constant value and its analytical error.  Omitting these
 #' two numbers simply returns the existing values.
 #'
-#' for \code{'iratio'}: the isotopic ratio of interest (one of either
+#' \item for \code{'iratio'}: the isotopic ratio of interest (one of either
 #' \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
 #' \code{"Sr88Sr86"}, \code{"Sr87Sr86"}, \code{"Sr84Sr86"},
 #' \code{"Re185Re187"}, \code{"Os184Os192"} \code{"Os186Os192"},
@@ -68,7 +68,7 @@ mindens <- function(mineral,x=NULL){
 #' isotopic ratio and its analytical error.  Omitting these two
 #' numbers simply returns the existing values.
 #'
-#' for \code{'imass'}: the (isotopic) molar mass of interest (one of
+#' \item for \code{'imass'}: the (isotopic) molar mass of interest (one of
 #' either \code{"U"}, \code{"Rb"}, \code{"Rb85"}, \code{"Rb87"},
 #' \code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"}, \code{"Sr88"},
 #' \code{"Re"}, \code{"Re185"}, \code{"Re187"}, \code{"Os"},
@@ -77,18 +77,19 @@ mindens <- function(mineral,x=NULL){
 #' (optionally) the molar mass and its analytical error.  Omitting
 #' these two numbers simply returns the existing values.
 #'
-#' for \code{'mindens'}: the mineral of interest (one of either
+#' \item for \code{'mindens'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the mineral
 #' density. Omitting this number simply returns the existing value.
 #'
-#' \code{'etchfact'}: the mineral of interest (one of either
+#' \item \code{'etchfact'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the etch efficiency
 #' factor. Omitting this number simply returns the existing value.
 #'
-#' \code{'tracklength'}: the mineral of interest (one of either
+#' \item \code{'tracklength'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the equivalent isotropic
 #' fission track length. Omitting this number simply returns the
 #' existing value.
+#' }
 #' @param fname the path of a \code{.json} file
 #' @return if \code{setting=NA} and \code{fname=NA}, returns a
 #'     \code{.json} string
@@ -97,64 +98,66 @@ mindens <- function(mineral,x=NULL){
 #' either a scalar with the existing value, or a two-element vector
 #' with the value and its uncertainty.
 #' @references
-#' 1. Decay constants:
-#'
-#' U: Jaffey, A. H., et al. "Precision measurement of half-lives and
+#' \enumerate{
+#' \item Decay constants:
+#' \itemize{
+#' \item U: Jaffey, A. H., et al. "Precision measurement of half-lives and
 #' specific activities of U\eqn{^{235}} and
 #' U\eqn{^{238}}." Physical Review C 4.5 (1971): 1889.
 #'
-#' Th: Le Roux, L. J., and
+#' \item Th: Le Roux, L. J., and
 #' L. E. Glendenin. "Half-life of \eqn{^{232}}Th.  "Proceedings of the
 #' National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
 #'
-#' Sm: Lugmair, G. W., and
+#' \item Sm: Lugmair, G. W., and
 #' K. Marti. "Lunar initial \eqn{^{143}}Nd/\eqn{^{144}}Nd: differential
 #' evolution of the lunar crust and mantle."
 #' Earth and Planetary Science Letters 39.3 (1978): 349-357.
 #'
-#' Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and Hannah,
+#' \item Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and Hannah,
 #' J.L., 2007.  Assessment of the 187Re decay constant by cross
 #' calibration of Re-Os molybdenite and U-Pb zircon chronometers in
 #' magmatic ore systems. Geochimica et Cosmochimica Acta, 71(8),
 #' pp.1999-2013.
 #'
-#' Ar: Renne, Paul R., et
+#' \item Ar: Renne, Paul R., et
 #' al. "Response to the comment by WH Schwarz et al. on "Joint
 #' determination of 40K decay constants and
 #' \eqn{^{40}}Ar*/\eqn{^{40}}K for the Fish Canyon sanidine standard,
 #' and improved accuracy for \eqn{^{40}}Ar/\eqn{^{39}}Ar
 #' geochronology" by PR Renne et al.(2010)." Geochimica et
 #' Cosmochimica Acta 75.17 (2011): 5097-5100.
-#'
-#' 2. Isotopic ratios:
-#'
-#' Ar: Lee, Jee-Yon, et
+#' }
+#' \item Isotopic ratios:
+#' \itemize{
+#' \item Ar: Lee, Jee-Yon, et
 #' al. "A redetermination of the isotopic abundances of atmospheric Ar."
 #' Geochimica et Cosmochimica Acta 70.17 (2006): 4507-4512.
 #'
-#' Rb: Catanzaro, E. J., et al. "Absolute isotopic abundance ratio and
+#' \item Rb: Catanzaro, E. J., et al. "Absolute isotopic abundance ratio and
 #' atomic weight of terrestrial rubidium." J. Res. Natl. Bur. Stand. A 73
 #' (1969): 511-516.
 #'
-#' Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
+#' \item Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
 #' weight of a reference sample of strontium." J. Res. Natl.Bur. Stand.
 #' 87.1 (1982): 1-8.
 #'
-#' Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic
+#' \item Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic
 #' weight of samarium." International Journal of Mass Spectrometry 218.2
 #' (2002): 167-172.
 #'
-#' Re: Gramlich, John W., et al. "Absolute isotopic abundance ratio and
+#' \item Re: Gramlich, John W., et al. "Absolute isotopic abundance ratio and
 #' atomic weight of a reference sample of rhenium." J. Res. Natl. Bur.
 #' Stand. A 77 (1973): 691-698.
 #'
-#' Os: Voelkening, Joachim, Thomas Walczyk, and Klaus G. Heumann.
+#' \item Os: Voelkening, Joachim, Thomas Walczyk, and Klaus G. Heumann.
 #' "Osmium isotope ratio determinations by negative thermal ionization
 #' mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
 #' 
-#' U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
+#' \item U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
 #' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
-#'
+#' }
+#' }
 #' @examples
 #' # load and show the default constants that come with IsoplotR
 #' json <- system.file("constants.json",package="IsoplotR")

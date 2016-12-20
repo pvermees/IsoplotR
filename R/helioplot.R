@@ -302,17 +302,17 @@ get.helioplot.contours <- function(x,fact=c(1,1,1),res=100){
 # f = the distance from the X- and Y-margins for
 # the maximum and minimum age contours to be plotted
 get.logratio.tticks <- function(lims,f=0.05,Sm=0){
-    tlims <- rep(0,4)
-    tlims[1] <- lims[1]+f*(lims[3]-lims[1])
-    tlims[2] <- lims[2]+f*(lims[4]-lims[2])
-    tlims[3] <- lims[3]-f*(lims[3]-lims[1])
-    tlims[4] <- lims[4]-f*(lims[4]-lims[2])
-    Umax <- exp(tlims[1])/(exp(tlims[1])+exp(tlims[2])+1)
-    Thmax <- exp(tlims[2])/(exp(tlims[1])+exp(tlims[2])+1)
-    Hemax <- 1/(exp(tlims[1])+exp(tlims[2])+1)
-    Umin <- exp(tlims[3])/(exp(tlims[3])+exp(tlims[4])+1)
-    Thmin <- exp(tlims[4])/(exp(tlims[3])+exp(tlims[4])+1)
-    Hemin <- 1/(exp(tlims[3])+exp(tlims[4])+1)
+    uv.lims <- rep(0,4)
+    uv.lims[1] <- lims[1]+f*(lims[3]-lims[1])
+    uv.lims[2] <- lims[2]+f*(lims[4]-lims[2])
+    uv.lims[3] <- lims[3]-f*(lims[3]-lims[1])
+    uv.lims[4] <- lims[4]-f*(lims[4]-lims[2])
+    Umax <- exp(uv.lims[1])/(exp(uv.lims[1])+exp(uv.lims[3])+1)
+    Thmax <- exp(uv.lims[3])/(exp(uv.lims[1])+exp(uv.lims[3])+1)
+    Hemax <- 1/(exp(uv.lims[1])+exp(uv.lims[3])+1)
+    Umin <- exp(uv.lims[2])/(exp(uv.lims[2])+exp(uv.lims[4])+1)
+    Thmin <- exp(uv.lims[4])/(exp(uv.lims[2])+exp(uv.lims[4])+1)
+    Hemin <- 1/(exp(uv.lims[2])+exp(uv.lims[4])+1)
     mint <- get.UThHe.age(Umin,0,Thmin,0,Hemin,0,Sm,0)[1]
     maxt <- get.UThHe.age(Umax,0,Thmax,0,Hemax,0,Sm,0)[1]
     get.tticks(mint,maxt)

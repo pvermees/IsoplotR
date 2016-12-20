@@ -30,6 +30,9 @@
 #' synthetic LA-ICP-MS-based fission track dataset using the absolute
 #' dating approach.
 #'
+#' \code{ReOs}: an object of class \code{ReOs} containing a
+#' \eqn{^{187}Os/^{187}Re}-dataset from Selby (2007).
+#'
 #' \code{average}: an object of class \code{other} containing the
 #' \eqn{^{206}Pb/^{238}U}-ages and errors of dataset \code{UPb}.
 #'
@@ -52,7 +55,6 @@
 #' concordia(examples$UPb)
 #' dev.new()
 #' kde(examples$DZ)
-#' @author Ken Ludwig and Pieter Vermeesch
 #' @references
 #' Brandon, M.T. and Vance, J.A., 1992. Tectonic evolution of the
 #' Cenozoic Olympic subduction complex, Washington State, as deduced
@@ -65,6 +67,11 @@
 #' 
 #' Ludwig, K. R. User's manual for Isoplot 3.00: a geochronological
 #'     toolkit for Microsoft Excel. No. 4. Kenneth R. Ludwig, 2003.
+#'
+#' Selby, D., 2007. Direct Rhenium-Osmium age of the
+#' Oxfordian-Kimmeridgian boundary, Staffin bay, Isle of Skye, UK, and
+#' the Late Jurassic time scale.  Norsk Geologisk Tidsskrift, 87(3),
+#' p.291.
 #'
 #' Vermeesch, Pieter, and Eduardo
 #' Garzanti. "Making geological sense of 'Big Data' in sedimentary provenance analysis."

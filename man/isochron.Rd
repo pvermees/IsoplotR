@@ -25,18 +25,16 @@ isochron(x, ...)
 \arguments{
 \item{x}{EITHER a list or a matrix with the following vectors or
     columns:
+\describe{
+\item{X}{the x-variable}
+\item{sX}{the standard error of \code{X}}
+\item{Y}{the y-variable}
+\item{sY}{the standard error of \code{Y}}
+\item{rXY}{the correlation coefficient of \code{X} and \code{Y}}
+}
+OR
 
-\code{X:} the x-variable
-
-\code{sX:} the standard error of X
-
-\code{Y:} the y-variable
-
-\code{sY:} the standard error of Y
-
-\code{rXY:} the correlation coefficient of X and Y
-
-OR an object of class \code{ArAr} or \code{ReOs}}
+an object of class \code{ArAr} or \code{ReOs}}
 
 \item{...}{optional arguments}
 

@@ -34,29 +34,32 @@ age(x, ...)
 }
 \arguments{
 \item{x}{can be:
+\itemize{
+\item a scalar containing an isotopic ratio,
 
-- a scalar containing an isotopic ratio,
-
-- a two element vector containing an isotopic ratio and its standard
+\item a two element vector containing an isotopic ratio and its standard
 error, or the spontaneous and induced track densities \code{Ns} and
 \code{Ni} (if \code{method='fissiontracks'}),
 
-- a four element vector containing \code{Ar40Ar39},
+\item a four element vector containing \code{Ar40Ar39},
 \code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
 
-- a six element vector containing \code{U}, \code{s[U]}, \code{Th},
+\item a six element vector containing \code{U}, \code{s[U]}, \code{Th},
 \code{s[Th]}, \code{He} and \code{s[He]},
 
-- an eight element vector containing \code{U}, \code{s[U]},
+\item an eight element vector containing \code{U}, \code{s[U]},
 \code{Th}, \code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and
-\code{s[Sm]},
+\code{s[Sm]}
+}
 
 OR
 
-- an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
-\code{UThHe} or \code{fissiontracks}.}
+\itemize{
+\item an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
+\code{UThHe} or \code{fissiontracks}.
+}}
 
-\item{...}{optional arguments}
+\item{...}{additional arguments}
 
 \item{method}{one of either \code{'Pb206U238'}, \code{'Pb207U235'},
 \code{'Pb207Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
@@ -66,16 +69,13 @@ OR
 calibration factor) uncertainties?}
 
 \item{J}{two-element vector with the J-factor and its standard
-error.  This option is only used if \code{method} =
-\code{'Ar-Ar'}.}
+error.}
 
 \item{zeta}{two-element vector with the zeta-factor and its standard
-error.  This option is only used if \code{method} =
-\code{'fissiontracks'}.}
+error.}
 
 \item{rhoD}{two-element vector with the track density of the
-dosimeter glass and its standard error.  This option is only
-used if \code{method} = \code{'fissiontracks'}.}
+dosimeter glass and its standard error.}
 
 \item{concordia}{scalar flag indicating whether each U-Pb analysis
 should be considered separately (\code{concordia=1}), a
@@ -111,11 +111,12 @@ together (\code{central=TRUE}).}
 the geochronometer given by \code{method} and its standard error.
 
 \item if \code{x} has class \code{UPb} and \code{concordia=1},
-returns a table with the following columns: `t.75', `err[t.75]',
-`t.68', `err[t.68]', `t.76',`err[t.76]', `t.conc', `err[t.conc]',
-containing the \eqn{^{207}}Pb/\eqn{^{235}} U-age and standard
-error, the \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
-\eqn{^{207}}Pb/\eqn{^{206}} Pb-age and standard error, and the
+returns a table with the following columns: \code{t.75},
+\code{err[t.75]}, \code{t.68}, \code{err[t.68]}, \code{t.76},
+\code{err[t.76]}, \code{t.conc}, \code{err[t.conc]}, containing the
+\eqn{^{207}}Pb/\eqn{^{235}}U-age and standard error, the
+\eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
+\eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, and the
 concordia age and standard error, respectively.
  
 \item if \code{x} has class \code{UPb} and \code{concordia=2},
@@ -152,11 +153,11 @@ ages (if wetherill==TRUE) or the lower intercept age and
 \item{cov}{ the covariance matrix of the elements in \code{x} }
 }
 
-\item if \code{x} has class \code{ArAr} and \code{isochron=FALSE},
-returns a table of Ar-Ar ages and standard errors.
+\item if \code{x} has class \code{ArAr} or \code{ReOs} and \code{isochron=FALSE},
+returns a table of Ar-Ar or Re-Os ages and standard errors.
 
-\item if \code{x} has class \code{ArAr} and \code{isochron=TRUE},
-returns a list with the following items:
+\item if \code{x} has class \code{ArAr} or \code{ReOs} and
+\code{isochron=TRUE}, returns a list with the following items:
 
 \describe{
 
@@ -165,11 +166,11 @@ error. }
 
 \item{b}{ the slope of the fit and its standard error. }
 
-\item{y0}{ the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and
-its standard error. }
+\item{y0}{ the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
+\eqn{^{187}}Os/\eqn{^{188}}Os ratio and its standard error. }
 
-\item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard
-error. }
+\item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar or
+\eqn{^{187}}Os/\eqn{^{187}}Re age and its standard error. }
 
 }
 
@@ -225,9 +226,9 @@ Calculates  ages and propagates their analytical
 uncertainties.
 }
 \examples{
-#data(examples)
-#print(age(examples$UPb))
-#print(age(examples$UPb,concordia=1))
-#print(age(examples$UPb,concordia=2))
+data(examples)
+print(age(examples$UPb))
+print(age(examples$UPb,concordia=1))
+print(age(examples$UPb,concordia=2))
 }
 
