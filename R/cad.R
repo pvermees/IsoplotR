@@ -26,7 +26,7 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' @export
 cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                         colmap='heat.colors',col='black',...){
-    graphics::plot(range(x),c(0,1),type='n',
+    graphics::plot(range(x,na.rm=TRUE),c(0,1),type='n',
                    ylab='cumulative probability',log='x',...)
     graphics::lines(stats::ecdf(x),pch=pch,verticals=verticals,col=col)
 }
@@ -39,7 +39,7 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     ns <- length(x)
     snames <- names(x)
     col <- do.call(colmap,list(ns))
-    graphics::plot(range(x),c(0,1),type='n',xlab=xlab,
+    graphics::plot(range(x,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
                    ylab='cumulative probability',...)
     for (i in 1:ns){
         graphics::lines(stats::ecdf(x[[i]]),pch=pch,

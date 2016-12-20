@@ -191,12 +191,13 @@ plot.points <- function(x,show.numbers=FALSE,pch=21,bg='white',...){
 }
 
 plot.radial.axes <- function(x){
+    xs <- stats::na.omit(x$s)
     graphics::Axis(side=2,at=c(-2,0,2),labels=c(-2,0,2))
     if (identical(x$transformation,'arcsin')){
-        plabels <- pretty(c(0,range(1/(2*x$s)^2 - 1/2)))
+        plabels <- pretty(c(0,range(1/(2*xs)^2 - 1/2)))
         pticks <- (2*sqrt(plabels+1/2))
     } else {
-        plabels <- pretty(c(0,1/x$s))
+        plabels <- pretty(c(0,1/xs))
         pticks <- plabels
     }
     graphics::Axis(side=1,at=pticks,labels=plabels)
@@ -219,7 +220,7 @@ radial.scale <- function(x,zeta=0,rhoD=0){
     theta <- atan(e*(x$z-x$z0))
     rxy <- data2rxry(x)
     xM <- padding * sqrt(max(
-          (rxy[,1]^2+rxy[,2]^2)/(cos(theta)^2+(sin(theta)/e)^2)
+          (rxy[,1]^2+rxy[,2]^2)/(cos(theta)^2+(sin(theta)/e)^2), na.rm=TRUE
           ))
     # plot arc
     Z <- seq(zm-x$z0,zM-x$z0,length.out=N)
@@ -319,21 +320,21 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
     # reset limits if necessary
     if (is.na(from)){
         if (identical(transformation,'log'))
-            out$from <- exp(min(out$z))-out$offset
+            out$from <- exp(min(out$z,na.rm=TRUE))-out$offset
         else
-            out$from <- min(out$z)
+            out$from <- min(out$z,na.rm=TRUE)
     } else {
         out$from <- from
     }
     if (is.na(to)){
         if (identical(transformation,'log'))
-            out$to <- exp(max(out$z))-out$offset
+            out$to <- exp(max(out$z,na.rm=TRUE))-out$offset
         else if (identical(transformation,'linear'))
-            out$to <- max(out$z)
+            out$to <- max(out$z,na.rm=TRUE)
     } else {
         out$to <- to
     }
-    out$zlim <- range(out$z)
+    out$zlim <- range(out$z,na.rm=TRUE)
     out
 }
 x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
@@ -371,11 +372,12 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
             out$s <- sqrt(1/(Ns+Ni+1/2))/2
             if (is.na(t0))
                 if (is.na(from) | is.na(to)) {
-                    out$z0 <- atan(sqrt(sum(Ns)/sum(Ni)))
+                    out$z0 <- atan(sqrt(sum(Ns,na.rm=TRUE)/
+                                        sum(Ni,na.rm=TRUE)))
                 } else {
                     zmin <- att(from,x$zeta[1],x$rhoD[1])
                     zmax <- att(to,x$zeta[1],x$rhoD[1])
-                    out$z0 <- mean(c(zmin,zmax))
+                    out$z0 <- mean(c(zmin,zmax),na.rm=TRUE)
                 }
             else {
                 out$z0 <- att(t0,x$zeta[1],x$rhoD[1])
@@ -383,24 +385,26 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
             out$xlab <- 'Ns+Ni'
         }
         # reset limits if necessary
-        out$zlim <- range(out$z)
+        out$zlim <- range(out$z,na.rm=TRUE)
         if (is.na(from)){
             if (identical(transformation,'log'))
-                out$from <- exp(min(out$z))
+                out$from <- exp(min(out$z,na.rm=TRUE))
             else if (identical(transformation,'arcsin'))
-                out$from <- iatt(min(out$z),x$zeta[1],x$rhoD[1])
+                out$from <- iatt(min(out$z,na.rm=TRUE),
+                                 x$zeta[1],x$rhoD[1])
             else if (identical(transformation,'linear'))
-                out$from <- min(out$z)
+                out$from <- min(out$z,na.rm=TRUE)
         } else {
             out$from <- from
         }
         if (is.na(to)){
             if (identical(transformation,'log'))
-                out$to <- exp(max(out$z))
+                out$to <- exp(max(out$z,na.rm=TRUE))
             else if (identical(transformation,'arcsin'))
-                out$to <- iatt(max(out$z),x$zeta[1],x$rhoD[1])
+                out$to <- iatt(max(out$z,na.rm=TRUE),
+                               x$zeta[1],x$rhoD[1])
             else if (identical(transformation,'linear'))
-                out$to <- max(out$z)
+                out$to <- max(out$z,na.rm=TRUE)
         } else {
             out$to <- to
         }
@@ -418,11 +422,11 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
 get.z0 <- function(x,t0=NA,from=NA,to=NA){
     if (is.na(t0)){
         if (is.na(from) | is.na(to)) {
-            z0 <- mean(x$z)
+            z0 <- mean(x$z,na.rm=TRUE)
         } else if (identical(x$transformation,'log')) {
-            z0 <- mean(log(c(from,to)+x$offset))
+            z0 <- mean(log(c(from,to)+x$offset),na.rm=TRUE)
         } else if (identical(x$transformation,'linear')) {
-            z0 <- mean(c(from,to))
+            z0 <- mean(c(from,to),na.rm=TRUE)
         } else {
             stop('illegal input')
         }
@@ -459,8 +463,7 @@ radial.title <- function(fit,sigdig=2){
 }
 
 get.offset <- function(x,from=NA){
-    m <- min(x)
-    if (!is.na(from)) m <- min(c(m,from))
+    m <- min(c(x,from),na.rm=TRUE)
     if (m>0){
         offset <- 0;
     } else if (m==0){

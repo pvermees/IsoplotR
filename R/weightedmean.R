@@ -56,11 +56,12 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     X <- x[,1]
     sX <- x[,2]
     ns <- length(X)
-    valid <- rep(TRUE,ns)
+    valid <- !is.na(X) & !is.na(sX)
     if (detect.outliers){
-        prob <- stats::pnorm(X,mean=mean(X),sd=stats::sd(X))
+        prob <- stats::pnorm(X,mean=mean(X,na.rm=TRUE),
+                             sd=stats::sd(X,na.rm=TRUE))
         cutoff <- 0.5/ns
-        valid <- (prob > cutoff & (1-prob) > cutoff)
+        valid <- valid & (prob > cutoff) & ((1-prob) > cutoff)
     }
     fit <- get.weightedmean(X,sX,valid)
     if (plot){
@@ -199,20 +200,25 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
 }
 
 get.weightedmean <- function(X,sX,valid=TRUE){
+    out <- list()
     X <- X[valid]
     sX <- sX[valid]
-    MZ <- c(mean(X),stats::sd(X))
-    fit <- stats::optim(MZ,LL.weightedmean,X=X,sX=sX,
-                        method='BFGS',hessian=TRUE)
-    covmat <- solve(fit$hessian)
-    out <- list()
-    out$mean <- c(fit$par[1],sqrt(covmat[1,1]))
-    out$disp <- c(fit$par[2],sqrt(covmat[2,2]))
-    df <- length(X)-1
-    SS <- sum(((X-out$mean[1])/sX)^2)
-    out$mswd <- SS/df
-    out$p.value <- 1-pchisq(SS,df)
-    out$valid <- valid
+    if (length(X)>1){
+        MZ <- c(mean(X,na.rm=TRUE),stats::sd(X,na.rm=TRUE))
+        fit <- stats::optim(MZ,LL.weightedmean,X=X,sX=sX,
+                            method='BFGS',hessian=TRUE)
+        covmat <- solve(fit$hessian)
+        out$mean <- c(fit$par[1],sqrt(covmat[1,1]))
+        out$disp <- c(fit$par[2],sqrt(covmat[2,2]))
+        df <- length(X)-1
+        SS <- sum(((X-out$mean[1])/sX)^2)
+        out$mswd <- SS/df
+        out$p.value <- 1-pchisq(SS,df)
+        out$valid <- valid
+    } else {
+        out$mean <- X
+        out$p.value <- 0
+    }
     out
 }
 
@@ -246,8 +252,8 @@ plot.weightedmean <- function(X,sX,fit,rect.col=rgb(0,1,0,0.5),
                               alpha=0.05){
     ns <- length(X)
     fact <- stats::qnorm(1-alpha/2)
-    minX <- min(X-fact*sX)
-    maxX <- max(X+fact*sX)
+    minX <- min(X-fact*sX,na.rm=TRUE)
+    maxX <- max(X+fact*sX,na.rm=TRUE)
     graphics::plot(c(0,ns+1),c(minX,maxX),type='n',axes=FALSE,xlab='N',ylab='')
     graphics::lines(c(0,ns+1),c(fit$mean[1],fit$mean[1]))
     graphics::axis(side=1,at=1:ns)

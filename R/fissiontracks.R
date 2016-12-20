@@ -84,8 +84,8 @@ set.zeta <- function(x,tst=c(0,0),exterr=TRUE,update=TRUE,sigdig=2){
 
 ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
     ngrains <- length(x$Ns)
-    tt <- rep(0,ngrains)
-    st <- rep(0,ngrains)
+    tt <- rep(NA,ngrains)
+    st <- rep(NA,ngrains)
     if (exterr){
         zeta <- x$zeta
     } else {
@@ -129,9 +129,10 @@ get.UsU <- function(x){
     }
     for (j in 1:n){
         if (do.average){
-            m[j] <- length(x$U[[j]]) # spots per grain
-            uhat[j] <- mean(log(x$U[[j]]))
-            num <- num + sum((log(x$U[[j]])-uhat[j])^2)
+            Uj <- stats::na.omit(x$U[[j]])
+            m[j] <- length(Uj) # spots per grain
+            uhat[j] <- mean(log(Uj))
+            num <- num + sum((log(Uj)-uhat[j])^2)
             den <- den + m[j] - 1
         } else {
             out[j,'U'] <- x$U[[j]]
@@ -144,7 +145,7 @@ get.UsU <- function(x){
         for (j in 1:n){
             suhat <- x$sU[[j]]/x$U[[j]]
             vhat[j] <- vhat[j]*(1-m[j]*Aicp/x$A[j])^2 +
-                       sum(suhat^2)*(Aicp/x$A[j])^2
+                       sum(suhat^2,na.rm=TRUE)*(Aicp/x$A[j])^2
         }
         out[,'sU'] <- exp(uhat)*sqrt(vhat)
     }

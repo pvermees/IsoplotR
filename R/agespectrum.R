@@ -57,12 +57,13 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 sigdig=2,line.col='red',lwd=2,
                                 title=TRUE,...){
     ns <- nrow(x)
-    X <- c(0,cumsum(x[,1])/sum(x[,1]))
-    Y <- x[,2]
-    sY <- x[,3]
+    valid <- !is.na(rowSums(x))
+    X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
+    Y <- x[valid,2]
+    sY <- x[valid,3]
     fact <- stats::qnorm(1-alpha/2)
-    maxY <- max(Y+fact*sY)
-    minY <- min(Y-fact*sY)
+    maxY <- max(Y+fact*sY,na.rm=TRUE)
+    minY <- min(Y-fact*sY,na.rm=TRUE)
     graphics::plot(c(0,1),c(minY,maxY),type='n',...)
     plat <- plateau(x,alpha=alpha)
     if (plateau) {
@@ -112,7 +113,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
 
 # x is a three column vector with Ar39 cumulative fractions, ages and uncertainties
 plateau <- function(x,alpha=0.05){
-    X <- x[,1]/sum(x[,1])
+    X <- x[,1]/sum(x[,1],na.rm=TRUE)
     YsY <- x[,c(2,3)]
     ns <- length(X)
     out <- list()
@@ -122,7 +123,7 @@ plateau <- function(x,alpha=0.05){
     out$fract <- 0
     for (i in 1:(ns-1)){
         for (j in (i+1):ns){
-            fract <- sum(X[i:j])
+            fract <- sum(X[i:j],na.rm=TRUE)
             avg <- weightedmean(YsY[i:j,],plot=FALSE,
                                 detect.outliers=FALSE)
             if (avg$p.value < alpha) {

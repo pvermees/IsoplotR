@@ -66,20 +66,20 @@ yorkfit <- function(X,sX=NULL,Y=NULL,sY=NULL,rXY=NULL){
         bold <- b
         alpha <- sqrt(wX*wY)
         W <- wX*wY/(wX+b*b*wY-2*b*rXY*alpha)
-        Xbar <- sum(W*X)/sum(W)
-        Ybar <- sum(W*Y)/sum(W)
+        Xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
+        Ybar <- sum(W*Y,na.rm=TRUE)/sum(W,na.rm=TRUE)
         U <- X-Xbar
         V <- Y-Ybar
         beta <- W*(U/wY+b*V/wX-(b*U+V)*rXY/alpha)
-        b <- sum(W*beta*V)/sum(W*beta*U)
+        b <- sum(W*beta*V,na.rm=TRUE)/sum(W*beta*U,na.rm=TRUE)
         if ((bold/b-1)^2 < 1e-15) break # convergence reached
     }
     a <- Ybar-b*Xbar
     x <- Xbar + beta
-    xbar <- sum(W*x)/sum(W)
+    xbar <- sum(W*x,na.rm=TRUE)/sum(W,na.rm=TRUE)
     u <- x-xbar
-    sb <- sqrt(1/sum(W*u^2))
-    sa <- sqrt(1/sum(W)+(xbar*sb)^2)
+    sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
+    sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- list()
     out$a <- c(a,sa)
     out$b <- c(b,sb)
@@ -96,7 +96,8 @@ get.york.mswd <- function(X,sX,Y,sY,rXY,a,b){
     for (i in 1:nn){
         E <- cor2cov(sX[i],sY[i],rXY[i])
         x <- matrix(c(X[i]-xy[i,1],Y[i]-xy[i,2]),1,2)
-        X2 <- X2 + 0.5*x %*% solve(E) %*% t(x)
+        if (!any(is.na(x)))
+            X2 <- X2 + 0.5*x %*% solve(E) %*% t(x)
     }
     df <- (2*nn-2)
     out <- list()
@@ -113,7 +114,7 @@ get.york.xy <- function(X,sX,Y,sY,rXY,a,b){
     wY <- 1/sY^2
     alpha <- sqrt(wX*wY)
     W <- wX*wY/(wX+b*b*wY-2*b*rXY*alpha)
-    Xbar <- sum(W*X)/sum(W)
+    Xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
     Ybar <- a + b*Xbar
     U <- X-Xbar
     V <- Y-Ybar

@@ -126,7 +126,7 @@ as.UPb <- function(x,format=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        X <- matrix(as.numeric(x[(2:nr),]),nr-1,nc)
+        X <- x2X(x,2,nr,nc)
         colnames(X) <- c('Pb207Pb206','errPb207Pb206',
                          'Pb206U238','errPb206U238',
                          'Pb207U235','errPb207U235')
@@ -150,7 +150,7 @@ as.ArAr <- function(x,format=2){
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        X <- matrix(as.numeric(x[4:nr,]),nr-3,nc)
+        X <- x2X(x,4,nr,nc)
         colnames(X) <- c('Ar39Ar40','errAr39Ar40',
                          'Ar36Ar40','errAr36Ar40',
                          'Ar39Ar36','errAr39Ar36')
@@ -162,7 +162,7 @@ as.ArAr <- function(x,format=2){
                              'Ar39Ar36','errAr39Ar36',
                              'Ar40Ar36','errAr40Ar36')
     } else if (format == 2 & nc == 7){
-        X <- matrix(as.numeric(x[4:nr,]),nr-3,nc)
+        X <- x2X(x,4,nr,nc)
         colnames(X) <- c('Ar39',
                          'Ar39Ar40','errAr39Ar40',
                          'Ar36Ar40','errAr36Ar40',
@@ -186,7 +186,7 @@ as.ReOs <- function(x,format=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        X <- matrix(as.numeric(x[(2:nr),]),nr-1,nc)
+        X <- x2X(x,2,nr,nc)
         colnames(X) <- c('Reppm','errReppm',
                          'Osppt','errOsppt',
                          'Os187Os188','errOs187Os188')
@@ -198,7 +198,7 @@ as.UThHe <- function(x){
     nc <- ncol(x)
     nr <- nrow(x)
     out <- matrix(0,nr-1,nc)
-    out[1:(nr-1),1:nc] <- matrix(as.numeric(x[2:nr,]),nr-1,nc)
+    out[1:(nr-1),1:nc] <- x2X(x,2,nr,nc)
     if (nc==8) {
         colnames(out) <- c('He','errHe','U','errU','Th','errTh','Sm','errSm')
     } else if (nc==6) {
@@ -206,13 +206,6 @@ as.UThHe <- function(x){
     } else {
         stop("Input table must have 6 or 8 columns.")
     }
-    # replace bad values by small ones:
-    isbad <- matrix(is.na(out)|out<=0,nr-1,nc)
-    goodrows <- apply(!isbad,1,any)
-    goodcols <- apply(!isbad,2,any)
-    out <- out[goodrows,goodcols]
-    out[isbad[goodrows,goodcols]] <- 1e-10
-    out[is.na(out) | out<=0] <- 1e-10
     class(out) <- append(class(out),"UThHe")
     out
 }
@@ -225,7 +218,8 @@ as.fissiontracks <- function(x,format=1){
     if (format==1){
         out$zeta <- as.numeric(x[2,1:2])
         out$rhoD <- as.numeric(x[4,1:2])
-        out$x <- matrix(as.numeric(x[6:nr,]),nr-5,2)
+        X <- x2X(x,6,nr,2)
+        out$x <- x2X(x,6,nr,2)
         colnames(out$x) <- c('Ns','Ni')
     } else {
         if (format==2){
@@ -236,19 +230,19 @@ as.fissiontracks <- function(x,format=1){
             out$spotSize <- as.numeric(x[2,1])
             si <- 4
         }
+        ns <- nr-si+1
         Ns <- as.numeric(x[si:nr,1])
         A <- as.numeric(x[si:nr,2])
-        valid <- which(!is.na(Ns))
-        out$Ns <- Ns[valid]
-        out$A <- A[valid]
+        out$Ns <- Ns
+        out$A <- A
         out$U <- list()
         out$sU <- list()
         j <- seq(from=3,to=nc-1,by=2)
-        for (i in valid){
+        for (i in 1:ns){
             U <- as.numeric(x[i+si-1,j])
-            out$U[[i]] <- U[!is.na(U)]
+            out$U[[i]] <- U
             sU <- as.numeric(x[i+si-1,j+1])
-            out$sU[[i]] <- sU[!is.na(sU)]
+            out$sU[[i]] <- sU
         }
     }
     out
@@ -259,7 +253,7 @@ as.detritals <- function(x){
     nr <- nrow(x)
     nc <- ncol(x)
     snames <- x[1,]
-    X <- matrix(as.numeric(x[(2:nr),]),nr-1,nc)
+    X <- x2X(x,2,nr,nc)
     colnames(X) <- snames
     for (sname in snames){
         out[[sname]] = X[!is.na(X[,sname]),sname]
@@ -274,4 +268,10 @@ as.other <- function(x){
     has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
     if (has.header) x <- x[-1,]
     matrix(as.numeric(x),ncol=nc)
+}
+
+x2X <- function(x,br,nr,nc){
+    suppressWarnings(
+        return(matrix(as.numeric(x[(br:nr),]),nr-br+1,nc))
+    )
 }

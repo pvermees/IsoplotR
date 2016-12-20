@@ -158,8 +158,12 @@ get.Pb207Pb206age <- function(r76,sr76=0,exterr=TRUE){
     Pb207Pb206.misfit <- function(tt,x) {
         (get.ratios.UPb(tt)$x['Pb207Pb206']-x)^2
     }
-    fit <- optimize(Pb207Pb206.misfit,c(0,4600),x=r76)
-    t.76 <- fit$minimum
+    if (is.na(r76)){
+        t.76 <- NA
+    } else {
+        fit <- optimize(Pb207Pb206.misfit,c(0,4600),x=r76)
+        t.76 <- fit$minimum
+    }
     J <- matrix(0,1,4)
     J[1,1] <- -(-1)/dD76dt(t.76,l5,l8,R)                      # d76/dt
     if (exterr) {

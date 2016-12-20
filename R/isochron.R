@@ -130,8 +130,8 @@ isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 
 get.limits <- function(X,sX){
-    minx <- min(X-3*sX)
-    maxx <- max(X+3*sX)    
+    minx <- min(X-3*sX,na.rm=TRUE)
+    maxx <- max(X+3*sX,na.rm=TRUE)    
     c(minx,maxx)
 }
 

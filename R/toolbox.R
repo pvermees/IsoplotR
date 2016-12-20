@@ -51,9 +51,9 @@ roundit <- function(age,err,sigdig=2){
 
 # set minimum and maximum values of a dataset
 getmM <- function(x,from=NA,to=NA,log=FALSE){
-    if (is.na(from)) { from <- min(x); getm <- TRUE }
+    if (is.na(from)) { from <- min(x,na.rm=TRUE); getm <- TRUE }
     else { getm <- FALSE }
-    if (is.na(to)) { to <- max(x); getM <- TRUE }
+    if (is.na(to)) { to <- max(x,na.rm=TRUE); getM <- TRUE }
     else { getM <- FALSE }
     if (getm) {
         if (log) { from <- from/2 }

@@ -44,12 +44,14 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
     }
     ns <- length(x$X)
     for (i in 1:ns){
-        x0 <- x$X[i]
-        y0 <- x$Y[i]
-        covmat <- cor2cov(x$sX[i],x$sY[i],x$rXY[i])
-        ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.col)
-        graphics::points(x0,y0,pch=19,cex=0.25)
-        if (show.numbers) { text(x0,y0,i) }
+        if (!any(is.na(c(x$X[i],x$Y[i],x$sX[i],x$sY[i],x$rXY[i])))){
+            x0 <- x$X[i]
+            y0 <- x$Y[i]
+            covmat <- cor2cov(x$sX[i],x$sY[i],x$rXY[i])
+            ell <- ellipse(x0,y0,covmat,alpha=alpha)
+            graphics::polygon(ell,col=ellipse.col)
+            graphics::points(x0,y0,pch=19,cex=0.25)
+            if (show.numbers) { text(x0,y0,i) }
+        }
     }
 }

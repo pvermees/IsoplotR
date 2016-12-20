@@ -77,16 +77,18 @@ plot.helioplot.frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
 
 plot.logratio.ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
                                    ellipse.col=rgb(0,1,0,0.5)){
-    ns <- nrow(x)
-    doSm <- doSm(x)
+    valid <- is.finite(rowSums(x))
+    X <- x[valid,]
+    ns <- nrow(X)
+    doSm <- doSm(X)
     for (i in 1:ns){
         if (doSm){
-            uvwc <- UThHe2uvw.covmat(x,i)
+            uvwc <- UThHe2uvw.covmat(X,i)
             x0 <- uvwc$uvw[1]
             y0 <- uvwc$uvw[2]
             ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
         } else {
-            uvc <- UThHe2uv.covmat(x,i)
+            uvc <- UThHe2uv.covmat(X,i)
             x0 <- uvc$uv[1]
             y0 <- uvc$uv[2]
             ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
@@ -100,17 +102,19 @@ plot.logratio.ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
 plot.helioplot.ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
                                     show.numbers=FALSE,
                                     ellipse.col=rgb(0,1,0,0.5)){
-    ns <- nrow(x)
-    doSm <- doSm(x)
+    valid <- is.finite(rowSums(x))
+    X <- x[valid,]
+    ns <- nrow(X)
+    doSm <- doSm(X)
     for (i in 1:ns){
         if (doSm){
-            uvwc <- UThHe2uvw.covmat(x,i)
+            uvwc <- UThHe2uvw.covmat(X,i)
             x0 <- uvwc$uvw[1]
             y0 <- uvwc$uvw[2]
             ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
             HeUTh0 <- uv2HeUTh(uvwc$uvw[1:2])
         } else {
-            uvc <- UThHe2uv.covmat(x,i)
+            uvc <- UThHe2uv.covmat(X,i)
             x0 <- uvc$uv[1]
             y0 <- uvc$uv[2]
             ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
@@ -207,7 +211,8 @@ SS.UThHe.uvw <- function(UVW,x){
         uvwc <- UThHe2uvw.covmat(x,i)
         X <- UVW-uvwc$uvw
         Ei <- solve(uvwc$covmat)
-        SS <- SS + X %*% Ei %*% t(X)
+        SSi <- X %*% Ei %*% t(X)
+        if (is.finite(SSi)) SS <- SS + SSi
     }
     SS
 }
@@ -218,7 +223,8 @@ SS.UThHe.uv <- function(UV,x){
         uvc <- UThHe2uv.covmat(x,i)
         X <- UV-uvc$uv
         Ei <- solve(uvc$covmat)
-        SS <- SS + X %*% Ei %*% t(X)
+        SSi <- X %*% Ei %*% t(X)
+        if (is.finite(SSi)) SS <- SS + SSi
     }
     SS
 }
@@ -235,7 +241,7 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
     if (doSm){
         uvw <- UThHe2uvw(x)
         out$lims <- get.logratioplot.limits(uvw[,c('u','v')])
-        w <- mean(uvw[,'w'])
+        w <- mean(uvw[,'w'],na.rm=TRUE)
         Sm <- geomean.Sm(x)
     } else {
         uv <- UThHe2uv(x)
@@ -243,8 +249,8 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
         w <- 0
         Sm <- 0
     }
-    if (all(!is.na(xlim))) out$lims[1:2] <- xlim
-    if (all(!is.na(ylim))) out$lims[3:4] <- ylim
+    if (all(is.finite(xlim))) out$lims[1:2] <- xlim
+    if (all(is.finite(ylim))) out$lims[3:4] <- ylim
     du <- out$lims[2]-out$lims[1]
     dv <- out$lims[4]-out$lims[3]
     tticks <- get.logratio.tticks(out$lims,Sm=Sm)
@@ -282,7 +288,7 @@ get.helioplot.contours <- function(x,fact=c(1,1,1),res=100){
     doSm <- doSm(x)
     if (doSm){
         uvw <- UThHe2uvw(x)
-        SmU <- exp(mean(uvw[,'w']-uvw[,'u']))
+        SmU <- exp(mean(uvw[,'w']-uvw[,'u'],na.rm=TRUE))
     }
     out$tticks <- get.helioplot.tticks(fact)
     out$xyz <- list()
@@ -333,8 +339,8 @@ get.tticks <- function(mint,maxt){
 }
 
 get.logratioplot.limits <- function(uv,f=1){
-    ru <- range(uv[,1])
-    rv <- range(uv[,2])
+    ru <- range(uv[,1],na.rm=TRUE)
+    rv <- range(uv[,2],na.rm=TRUE)
     du <- diff(ru)
     dv <- diff(rv)
     minu <- ru[1] - f*du
@@ -509,7 +515,7 @@ renormalise <- function(xyz,fact=c(1,1,1)){
 }
 
 geomean.Sm <- function(x){
-    UVW <- colMeans(UThHe2uvw(x))
+    UVW <- colMeans(UThHe2uvw(x),na.rm=TRUE)
     exp(UVW[3])/(exp(UVW[1])+exp(UVW[2])+exp(UVW[3])+1)
 }
 

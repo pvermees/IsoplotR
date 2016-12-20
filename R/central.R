@@ -132,16 +132,16 @@ central.fissiontracks <- function(x,mineral=NA,...){
         su <- tst[,'s[t]']/tst[,'t']
         for (i in 1:30){ # page 100 of Galbraith (2005)
             wu <- 1/(sigma^2+su^2)
-            mu <- sum(wu*zu)/sum(wu)
+            mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
             fit <- stats::optimize(eq.6.9,c(0,10),mu=mu,zu=zu,su=su)
             sigma <- fit$minimum
         }
         tt <- exp(mu)
-        st <- 1/sqrt(sum(wu))
+        st <- 1/sqrt(sum(wu,na.rm=TRUE))
         if (x$format==2)
             st <- tt * sqrt((st/tt)^2 + (x$zeta[2]/x$zeta[1])^2)
         df <- length(zu)-1
-        Chi2 <- sum((zu/su)^2) - (sum(zu/su^2)^2)/sum(1/su^2)
+        Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/sum(1/su^2,na.rm=TRUE)
     }
     out$age <- c(tt,st)
     out$disp <- sigma
@@ -152,5 +152,5 @@ central.fissiontracks <- function(x,mineral=NA,...){
 
 eq.6.9 <- function(sigma,mu,zu,su){
     wu <- 1/(sigma^2+su^2)
-    (1-sum((wu*(zu-mu))^2)/sum(wu))^2
+    (1-sum((wu*(zu-mu))^2,na.rm=TRUE)/sum(wu,na.rm=TRUE))^2
 }

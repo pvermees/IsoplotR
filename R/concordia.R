@@ -52,10 +52,12 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
         x0 <- x$x[i,vars[1]]
         y0 <- x$x[i,vars[2]]
         covmat <- get.covmat(x,i)[vars,vars]
-        ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        polygon(ell,col=ellipse.col)
-        points(x0,y0,pch=19,cex=0.25)
-        if (show.numbers) { text(x0,y0,i) }
+        if (!any(is.na(covmat))){
+            ell <- ellipse(x0,y0,covmat,alpha=alpha)
+            polygon(ell,col=ellipse.col)
+            points(x0,y0,pch=19,cex=0.25)
+            if (show.numbers) { text(x0,y0,i) }
+        }
     }
     if (show.age==2){
         fit <- concordia.age(x,wetherill,exterr)
@@ -152,7 +154,7 @@ get.concordia.limits <- function(X,limits,wetherill){
         if (limits[1] > 0){
             out$min.t <- limits[1]
         } else {
-            out$max.x <- max(X$x[,'U238Pb206']+nse*X$x[,'errU238Pb206'])
+            out$max.x <- max(X$x[,'U238Pb206']+nse*X$x[,'errU238Pb206'],na.rm=TRUE)
             out$min.t <- get.Pb206U238age(1/out$max.x)[1]
         }
         out$max.t <- limits[2]
@@ -161,19 +163,21 @@ get.concordia.limits <- function(X,limits,wetherill){
         out$max.x <- get.ratios.UPb(out$min.t)$x['U238Pb206']
         out$max.y <- get.ratios.UPb(out$min.t)$x['Pb207Pb206']
     } else if (is.null(limits) && wetherill) {
-        out$min.x <- min(X$x[,'Pb207U235']-nse*X$x[,'errPb207U235'])
-        out$max.x <- max(X$x[,'Pb207U235']+nse*X$x[,'errPb207U235'])
-        out$min.y <- min(X$x[,'Pb206U238']-nse*X$x[,'errPb206U238'])
-        out$max.y <- max(X$x[,'Pb206U238']+nse*X$x[,'errPb206U238'])
+        out$min.x <- min(X$x[,'Pb207U235']-nse*X$x[,'errPb207U235'],na.rm=TRUE)
+        out$max.x <- max(X$x[,'Pb207U235']+nse*X$x[,'errPb207U235'],na.rm=TRUE)
+        out$min.y <- min(X$x[,'Pb206U238']-nse*X$x[,'errPb206U238'],na.rm=TRUE)
+        out$max.y <- max(X$x[,'Pb206U238']+nse*X$x[,'errPb206U238'],na.rm=TRUE)
         out$min.t <- get.Pb206U238age(out$min.y)[1]
         out$max.t <- get.Pb207U235age(out$max.x)[1]
     } else if (is.null(limits) && !wetherill){
-        out$min.x <- min(X$x[,'U238Pb206']-nse*X$x[,'errU238Pb206'])
-        out$max.x <- max(X$x[,'U238Pb206']+nse*X$x[,'errU238Pb206'])
-        out$min.y <- min(X$x[,'Pb207Pb206']-nse*X$x[,'errPb207Pb206'])
-        out$max.y <- max(X$x[,'Pb207Pb206']+nse*X$x[,'errPb207Pb206'])
-        out$min.t <- min(get.Pb206U238age(1/out$max.x)[1],get.Pb207Pb206age(out$min.y)[1])
-        out$max.t <- max(get.Pb206U238age(1/out$min.x)[1],get.Pb207Pb206age(out$max.y)[1])
+        out$min.x <- min(X$x[,'U238Pb206']-nse*X$x[,'errU238Pb206'],na.rm=TRUE)
+        out$max.x <- max(X$x[,'U238Pb206']+nse*X$x[,'errU238Pb206'],na.rm=TRUE)
+        out$min.y <- min(X$x[,'Pb207Pb206']-nse*X$x[,'errPb207Pb206'],na.rm=TRUE)
+        out$max.y <- max(X$x[,'Pb207Pb206']+nse*X$x[,'errPb207Pb206'],na.rm=TRUE)
+        out$min.t <- min(get.Pb206U238age(1/out$max.x)[1],
+                         get.Pb207Pb206age(out$min.y)[1],na.rm=TRUE)
+        out$max.t <- max(get.Pb206U238age(1/out$min.x)[1],
+                         get.Pb207Pb206age(out$max.y)[1],na.rm=TRUE)
     }
     out
 }
@@ -193,11 +197,16 @@ concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
 concordia.age.default <- function(x,wetherill=TRUE,exterr=TRUE,...){
     out <- x
     t.init <- initial.concordia.age.guess(out$x,wetherill)
-    fit.age <- stats::optim(t.init, LL.concordia.age, x=out$x,
-                            covmat=out$cov, wetherill=wetherill,
-                            exterr=exterr, method="BFGS", hessian=TRUE)
-    out$age <- fit.age$par
-    out$age.err <- as.numeric(sqrt(solve(fit.age$hessian)))
+    if (is.na(t.init)){
+        out$age <- NA
+        out$age.err <- NA
+    } else {
+        fit.age <- stats::optim(t.init, LL.concordia.age, x=out$x,
+                                covmat=out$cov, wetherill=wetherill,
+                                exterr=exterr, method="BFGS", hessian=TRUE)
+        out$age <- fit.age$par
+        out$age.err <- as.numeric(sqrt(solve(fit.age$hessian)))
+    }
     out
 }
 concordia.age.UPb <- function(x,wetherill=TRUE,exterr=TRUE,i=NA,...){

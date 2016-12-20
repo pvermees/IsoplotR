@@ -1,8 +1,8 @@
 # Compute the optimal kernel bandwidth
 botev <- function(x){
     n <- 512
-    minimum <- min(x)
-    maximum <- max(x)
+    minimum <- min(x,na.rm=TRUE)
+    maximum <- max(x,na.rm=TRUE)
     Range <- maximum - minimum
     MIN <- minimum-Range/10
     MAX <- maximum+Range/10

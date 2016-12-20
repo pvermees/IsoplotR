@@ -48,7 +48,7 @@ ID.Re <- function(x,exterr=FALSE,isochron=TRUE){
         E[9,9] <- imass('Os')[2]^2
     }
     nn <- dim(x$x)[1]
-    out <- matrix(0,nn,5) # X,sX,Y,sY,rXY with X=Re187/Os188 and Y=Os187/Os188
+    out <- matrix(NA,nn,5) # X,sX,Y,sY,rXY with X=Re187/Os188 and Y=Os187/Os188
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out[,1] <- Re187Os188
     out[,3] <- R78Os
@@ -71,9 +71,11 @@ ID.Re <- function(x,exterr=FALSE,isochron=TRUE){
         J[2,5] <- dR78Os.dR82Os
         J[2,10] <- dR78Os.dR78Os
         E2 <- J %*% E %*% t(J)
-        out[i,2] <- sqrt(E2[1,1])
-        out[i,4] <- sqrt(E2[2,2])
-        out[i,5] <- stats::cov2cor(E2)[1,2]
+        if (all(is.finite(E2))){
+            out[i,2] <- sqrt(E2[1,1])
+            out[i,4] <- sqrt(E2[2,2])
+            out[i,5] <- stats::cov2cor(E2)[1,2]
+        }
     }
     out
 }

@@ -275,25 +275,27 @@ getG <- function(pdens) {
 # Abramson
 # get fixed bandwidth pilot density
 pilotdensity <- function(dat,bw){
-    n <- length(dat)
+    d <- stats::na.omit(dat)
+    n <- length(d)
     dens <- rep(0,n)
     for (i in 1:n){
-        dens[i] <- mean(stats::density(dat,bw,from=(dat[i]-1e-10),
-                                to=(dat[i]+1e-10),n=2)$y)
+        dens[i] <- mean(stats::density(d,bw,from=(d[i]-1e-10),
+                                       to=(d[i]+1e-10),n=2)$y)
     }
     dens
 }
 
 # adaptive KDE algorithm of Abramson (1982) as summarised by Jahn (2007)
 Abramson <- function(dat,from,to,bw,n=512,...){
-    nn <- length(dat)
-    pdens <- pilotdensity(dat,bw)
+    d <- stats::na.omit(dat)
+    nn <- length(d)
+    pdens <- pilotdensity(d,bw)
     G <- getG(pdens)
     lambda <- 0
     dens <- rep(0,n)
     for (i in 1:nn){
         lambda = sqrt(G/pdens[i])
-        dens <- dens + stats::density(dat[i],bw*lambda,from=from,to=to,n=n,...)$y
+        dens <- dens + stats::density(d[i],bw*lambda,from=from,to=to,n=n,...)$y
     }
     dens
 }
