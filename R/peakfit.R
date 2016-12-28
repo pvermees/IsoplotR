@@ -213,8 +213,8 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
     for (i in 1:length(fit$peaks)){
         rounded.age <- roundit(fit$peaks[i],fit$peaks.err[i],sigdig=sigdig)
         rounded.prop <- roundit(fit$props[i],fit$props.err[i],sigdig=sigdig)
-        line <- paste0('Peak ',i,': ',rounded.age$x,'+/-',
-                       rounded.age$err,' (',100*rounded.prop$x,'+/-',
+        line <- paste0('Peak ',i,': ',rounded.age$x,'\u00B1',
+                       rounded.age$err,' (',100*rounded.prop$x,'\u00B1',
                        100*rounded.prop$err,'%)')
         out <- c(out,line)
     }

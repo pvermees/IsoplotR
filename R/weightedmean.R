@@ -235,8 +235,8 @@ wtdmean.title <- function(fit,sigdig=2){
     line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
                         list(a=rounded.mean$x, b=rounded.mean$err))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,2),
-                             b=signif(fit$p.value,2)))
+                        list(a=signif(fit$mswd,sigdig),
+                             b=signif(fit$p.value,sigdig)))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     if (fit$p.value < 0.05){ # only show when the data are overdispersed

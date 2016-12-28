@@ -145,8 +145,8 @@ plateau.title <- function(fit,sigdig=2){
     line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
                         list(a=rounded.mean$x, b=rounded.mean$err))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,2),
-                             b=signif(fit$p.value,2)))
+                        list(a=signif(fit$mswd,sigdig),
+                             b=signif(fit$p.value,sigdig)))
     a <- signif(100*fit$fract,sigdig)
     line3 <- bquote(paste("Includes ",.(a),"% of the",""^"39","Ar"))
     graphics::mtext(line1,line=2)

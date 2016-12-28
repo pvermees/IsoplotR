@@ -412,7 +412,7 @@ $props.err
 [1] 3627.387 3627.387
 
 $legend
-[1] "Peak 1: 100+/-80 (30+/-360000%)" "Peak 2: 100+/-53 (70+/-360000%)"
+[1] "Peak 1: 100±80 (30±360000%)" "Peak 2: 100±53 (70±360000%)"
 
 > 
 > 
@@ -587,7 +587,7 @@ $legend
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  5.244 0.244 5.292 0 0 
+Time elapsed:  5.384 0.248 5.42 0 0 
 > grDevices::dev.off()
 pdf 
   2 

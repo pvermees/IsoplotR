@@ -456,8 +456,8 @@ radial.title <- function(fit,sigdig=2){
     line1 <- substitute('central age ='~a%+-%b~'(1'~sigma~')',
                         list(a=rounded.age$x, b=rounded.age$err))
     line2 <- substitute('dispersion ='~a~'%, p('~chi^2*')='~b,
-                        list(a=signif(100*fit$disp,2),
-                             b=signif(fit$p.value,2)))
+                        list(a=signif(100*fit$disp,sigdig),
+                             b=signif(fit$p.value,sigdig)))
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)
 }

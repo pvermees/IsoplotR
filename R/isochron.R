@@ -142,7 +142,7 @@ isochron.title <- function(fit,sigdig=2){
                         list(a=rounded.age$x, b=rounded.age$err,
                              c=rounded.intercept$x, d=rounded.intercept$err))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,2), b=signif(fit$p.value,2)))
+                        list(a=signif(fit$mswd,sigdig), b=signif(fit$p.value,sigdig)))
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)
 }
@@ -154,7 +154,7 @@ regression.title <- function(fit,sigdig=2){
                         list(a=slope$x, b=slope$err,
                              c=intercept$x, d=intercept$err))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,2), b=signif(fit$p.value,2)))
+                        list(a=signif(fit$mswd,sigdig), b=signif(fit$p.value,sigdig)))
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)
 }

@@ -117,7 +117,7 @@ ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
 get.UsU <- function(x){
     Aicp <- pi*(x$spotSize/2)^2
     n <- length(x$U)
-    nspots <- length(unlist(x$U))
+    nspots <- length(stats::na.omit(unlist(x$U)))
     do.average <- (nspots>n)
     out <- matrix(0,n,2)
     colnames(out) <- c('U','sU')
@@ -135,8 +135,8 @@ get.UsU <- function(x){
             num <- num + sum((log(Uj)-uhat[j])^2)
             den <- den + m[j] - 1
         } else {
-            out[j,'U'] <- x$U[[j]]
-            out[j,'sU'] <- x$sU[[j]]
+            out[j,'U'] <- stats::na.omit(x$U[[j]])
+            out[j,'sU'] <- stats::na.omit(x$sU[[j]])
         }
     }
     if (do.average){
