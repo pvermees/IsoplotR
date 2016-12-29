@@ -29,8 +29,8 @@ age(x, ...)
 \method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA,
   exterr = TRUE, ...)
 
-\method{age}{ReOs}(x, isochron = TRUE, exterr = TRUE, i = NA,
-  sigdig = NA, ...)
+\method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, ...)
 }
 \arguments{
 \item{x}{can be:
@@ -103,6 +103,11 @@ together (\code{isochron=TRUE}).}
 should be considered separately (\code{central=FALSE}) or a
 central age should be calculated from all U-Th-He analyses
 together (\code{central=TRUE}).}
+
+\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
+`excess', or `common') \eqn{^{187}Os/^{188}Os} ratio from an
+isochron fit. Setting \code{i2i} to \code{FALSE} uses the
+default values stored in \code{settings('iratio',...)}}
 }
 \value{
 \enumerate{

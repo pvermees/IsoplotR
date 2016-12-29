@@ -258,10 +258,14 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
     else out <- fissiontrack.age(x,i=i,sigdig=sigdig,exterr=exterr)
     out
 }
+#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
+#'     `excess', or `common') \eqn{^{187}Os/^{188}Os} ratio from an
+#'     isochron fit. Setting \code{i2i} to \code{FALSE} uses the
+#'     default values stored in \code{settings('iratio',...)}
 #' @rdname age
 #' @export
-age.ReOs <- function(x,isochron=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE)
-    else out <- ReOs.age(x,exterr=exterr,i=i,sigdig=sigdig,...)
+    else out <- ReOs.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }

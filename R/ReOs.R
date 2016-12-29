@@ -93,9 +93,17 @@ get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=TRUE){
     c(tt,st)
 }
 
-ReOs.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA){
+# i2i = isochron to intercept
+ReOs.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE){
     ns <- nrow(x$x)
-    dat <- ID.Re(x,exterr=exterr,isochron=FALSE)
+    if (i2i){
+        fit <- isochron.ReOs(x,plot=FALSE,exterr=exterr)
+        dat <- ID.Re(x,exterr=exterr,isochron=TRUE)
+        dat[,'Y'] <- dat[,'Y'] - fit$a[1]
+        if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + fit$a[2]^2)
+    } else {
+        dat <- ID.Re(x,exterr=exterr,isochron=FALSE)
+    }
     out <- matrix(0,ns,2)
     E <- matrix(0,2,2)
     J <- matrix(0,1,2)
@@ -104,8 +112,8 @@ ReOs.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA){
         E[2,2] <- dat[j,'sY']^2
         E[1,2] <- dat[j,'rXY']*dat[j,'sX']*dat[j,'sY']
         E[2,1] <- E[1,2]
-        J[1,1] <- 1/dat[j,'Y']
-        J[1,2] <- -dat[j,'X']/dat[j,'Y']^2        
+        J[1,1] <- -dat[j,'Y']/dat[j,'X']^2
+        J[1,2] <- 1/dat[j,'X']        
         Os187Re187 <- dat[j,'Y']/dat[j,'X']
         sOs187Re187 <- sqrt(J%*%E%*%t(J))
         out[j,] <- get.ReOs.age(Os187Re187,sOs187Re187,exterr=TRUE)

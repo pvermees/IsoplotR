@@ -18,10 +18,13 @@
 #'     matrix or data frame
 #' @param rXY correlation coefficients between X and Y OR \code{NULL}
 #'     if X is a matrix or data frame
-#' @return a two-element list of vectors containing: \describe{
+#' @return a three-element list of vectors containing:
+#'     \describe{
 #'     \item{a}{the intercept of the straight line fit and its
-#'     standard error} \item{b}{the slope of the fit and its standard
-#'     error} }
+#'     standard error}
+#'     \item{b}{the slope of the fit and its standard error}
+#'     \item{cov.ab}{the covariance of the slope and intercept}
+#'     }
 #' @references
 #'
 #' Ludwig, K. R., and D. M. Titterington. "Calculation of \eqn{^{230}}Th/U
@@ -83,6 +86,7 @@ yorkfit <- function(X,sX=NULL,Y=NULL,sY=NULL,rXY=NULL){
     out <- list()
     out$a <- c(a,sa)
     out$b <- c(b,sb)
+    out$cov.ab <- -Xbar*sb^2
     mswd <- get.york.mswd(X,sX,Y,sY,rXY,a,b)
     out$mswd <- mswd$mswd
     out$p.value <- mswd$p.value

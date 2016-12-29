@@ -26,10 +26,13 @@ matrix or data frame}
 if X is a matrix or data frame}
 }
 \value{
-a two-element list of vectors containing: \describe{
+a three-element list of vectors containing:
+    \describe{
     \item{a}{the intercept of the straight line fit and its
-    standard error} \item{b}{the slope of the fit and its standard
-    error} }
+    standard error}
+    \item{b}{the slope of the fit and its standard error}
+    \item{cov.ab}{the covariance of the slope and intercept}
+    }
 }
 \description{
 Implements the unified regression algorithm of York et al. (2004)
