@@ -80,6 +80,20 @@ ID.Re <- function(x,exterr=FALSE,isochron=TRUE){
     out
 }
 
+get.ReOs.ratio <- function(tt,st,exterr=TRUE){
+    L <- lambda("Re187")[1]
+    sL <- lambda("Re187")[2]
+    R <- exp(L*tt)-1
+    Jac <- matrix(0,1,2)
+    E <- matrix(0,2,2)
+    Jac[1,1] <- tt*exp(L*tt)
+    Jac[1,2] <- L*exp(L*tt)
+    E[1,1] <- sL^2
+    E[2,2] <- st^2
+    sR <- sqrt(Jac %*% E %*% t(Jac))
+    out <- c(R,sR)
+}
+
 get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=TRUE){
     l187 <- lambda('Re187')
     tt <- log(1 + Os187Re187)/l187[1]
@@ -116,7 +130,9 @@ ReOs.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE){
         J[1,2] <- 1/dat[j,'X']        
         Os187Re187 <- dat[j,'Y']/dat[j,'X']
         sOs187Re187 <- sqrt(J%*%E%*%t(J))
-        out[j,] <- get.ReOs.age(Os187Re187,sOs187Re187,exterr=TRUE)
+        tt <- get.ReOs.age(Os187Re187,sOs187Re187,exterr=TRUE)
+        t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
+        out[j,] <- c(t.out$x,t.out$err)
     }
     if (!is.na(i)) out <- out[i,]
     out

@@ -91,62 +91,71 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,...){
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
                         cutoff.disc=c(-15,5),exterr=TRUE,
                         sigdig=2,log=TRUE,...){
-    if (k<1) return(NULL)
-    if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
-    fit <- ages2peaks(x,k=k,type=type,cutoff.76=cutoff.76,
-                      cutoff.disc=cutoff.disc,log=log)
-    if (exterr){
-        if (identical(k,'min')) numpeaks <- 1
-        else numpeaks <- k
-        for (i in 1:numpeaks){
-            R <- get.ratios.UPb(tt=fit$peaks[i],st=fit$peaks.err[i],
-                                exterr=TRUE,as.UPb=TRUE)
-            age.with.exterr <- filter.UPb.ages(R,type=type,cutoff.76=cutoff.76,
-                                               cutoff.disc=cutoff.disc,exterr=TRUE)
-            fit$peaks.err[i] <- age.with.exterr[2]
-        }
-    }
-    fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
-    fit
+    peakfit.helper(x,k=k,type=type,cutoff.76=cutoff.76,
+                   cutoff.disc=cutoff.disc,exterr=exterr,
+                   sigdig=sigdig,log=log,...)
+}
+#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
+#'     `excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+#'     \eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+#'     \code{i2i} to \code{FALSE} uses the default values stored in
+#'     \code{settings('iratio',...)}
+#' @rdname peakfit
+#' @export
+peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,...){
+    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,...){
-    if (k<1) return(NULL)
-    if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
-    fit <- ages2peaks(x,k=k,log=log)
-    if (exterr){
-        if (identical(k,'min')) numpeaks <- 1
-        else numpeaks <- k
-        for (i in 1:numpeaks){
-            R <- get.ArAr.ratio(fit$peaks[i],fit$peaks.err[i],
-                                x$J[1],0,exterr=FALSE)
-            age.with.exterr <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
-            fit$peaks.err[i] <- age.with.exterr[2]
-        }
-    }
-    fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
-    fit
+peakfit.ReOs <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
+    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,...){
+    peakfit.helper(x,k=k,exterr=FALSE,sigdig=sigdig,log=log,...)
+}
+peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
+                           cutoff.disc=c(-15,5),exterr=TRUE,sigdig=2,
+                           log=TRUE,i2i=FALSE,...){
     if (k<1) return(NULL)
     if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
-    fit <- ages2peaks(x,k=k,log=log)
+    fit <- ages2peaks(x,k=k,log=log,i2i=i2i)
+    if (exterr){
+        if (identical(k,'min')) numpeaks <- 1
+        else numpeaks <- k
+        for (i in 1:numpeaks){
+            if (hasClass(x,'UPb')){
+                R <- get.ratios.UPb(tt=fit$peaks[i],st=fit$peaks.err[i],
+                                    exterr=TRUE,as.UPb=TRUE)
+                age.with.exterr <- filter.UPb.ages(R,type=type,cutoff.76=cutoff.76,
+                                                   cutoff.disc=cutoff.disc,exterr=TRUE)
+            } else if (hasClass(x,'ArAr')){
+                R <- get.ArAr.ratio(fit$peaks[i],fit$peaks.err[i],
+                                    x$J[1],0,exterr=FALSE)
+                age.with.exterr <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
+            } else if (hasClass(x,'ReOs')){
+                R <- get.ReOs.ratio(fit$peaks[i],fit$peaks.err[i],exterr=FALSE)
+                age.with.exterr <- get.ReOs.age(R[1],R[2],exterr=TRUE)
+            }
+            fit$peaks.err[i] <- age.with.exterr[2]
+        }
+    }
     fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
-    fit
+    fit    
 }
 
 ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
-                       cutoff.disc=c(-15,5),log=TRUE){
+                       cutoff.disc=c(-15,5),log=TRUE,i2i=FALSE){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type,cutoff.76,
                               cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){
-        tt <- ArAr.age(x,exterr=FALSE)
+        tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){
         tt <- UThHe.age(x)
+    } else if (hasClass(x,'ReOs')){
+        tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'fissiontracks')){
         tt <- fissiontrack.age(x,exterr=FALSE)
     }
