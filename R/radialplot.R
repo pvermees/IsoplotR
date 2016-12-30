@@ -10,7 +10,7 @@
 #' OR
 #'
 #' and object of class \code{fissiontracks}, \code{UThHe},
-#' \code{ArAr}, or \code{UPb}
+#' \code{ArAr}, \code{ReOs} or \code{UPb}
 #' @param from minimum age limit of the radial scale
 #' @param to maximum age limit of the radial scale
 #' @param t0 central value

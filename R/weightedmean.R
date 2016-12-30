@@ -10,10 +10,11 @@
 #' 
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
-#'     \code{UPb} OR an object of class \code{ArAr}
+#'     \code{UPb}, \code{ArAr}, \code{ReOs}, \code{fissiontracks} or
+#'     \code{UThHe}
 #' @param ... optional arguments
-#' @return
-#' if \code{PLOT=FALSE}, returns a list with the following items:
+#' @return if \code{PLOT=FALSE}, returns a list with the following
+#'     items:
 #'
 #' \describe{
 #' \item{mean}{a two element vector with the weighted mean and its
@@ -105,50 +106,38 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
                              sigdig=2,type=4,cutoff.76=1100,
                              cutoff.disc=c(-15,5),alpha=0.05,
                              exterr=TRUE,...){
-    # first ignore decay uncertainties
-    tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                          cutoff.disc=cutoff.disc,exterr=FALSE)
-    # calculate weighted mean age
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
-    if (exterr){
-        # get weighted mean U-Pb ratios from the weighted mean age
-        X <- get.ratios.UPb(tt=fit$mean[1],st=fit$mean[2],exterr=TRUE,as.UPb=TRUE)
-        # recalculate the age, this time taking into account decay constant uncertainties
-        fit$mean <- filter.UPb.ages(X,type=type,cutoff.76=cutoff.76,
-                                    cutoff.disc=cutoff.disc,exterr=TRUE)
-    }
-    if (plot){
-        plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
-                          outlier.col=outlier.col,sigdig=sigdig,
-                          alpha=alpha)
-    } else {
-        return(fit)
-    }
+    weightedmean.helper(x,detect.outliers=detect.outliers,plot=plot,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        type=type,cutoff.76=cutoff.76,
+                        cutoff.disc=cutoff.disc, sigdig=sigdig,
+                        alpha=alpha,exterr=exterr,...)
 }
+#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
+#'     `excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+#'     \eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+#'     \code{i2i} to \code{FALSE} uses the default values stored in
+#'     \code{settings('iratio',...)}
 #' @rdname weightedmean
 #' @export
 weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
-                              outlier.col=rgb(0,1,1,0.5),
-                              sigdig=2,alpha=0.05,exterr=TRUE,...){
-    # first ignore J-constant uncertainties (systematic error)
-    tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE)
-    # calculated weighted mean age ignoring decay constant and J uncertainties
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
-    if (exterr){
-        # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
-        R <- get.ArAr.ratio(fit$mean[1],fit$mean[2],x$J[1],0,exterr=FALSE)
-        # recalculate the weighted mean age, this time taking
-        # into account decay and J uncertainties
-        fit$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
-    }
-    if (plot){
-        plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
-                          outlier.col=outlier.col,sigdig=sigdig,
-                          alpha=alpha)
-    } else {
-        return(fit)
-    }
+                              outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                              alpha=0.05,exterr=TRUE,i2i=FALSE,...){
+    weightedmean.helper(x,detect.outliers=detect.outliers,plot=plot,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=exterr,
+                        i2i=i2i,...)
+}
+#' @rdname weightedmean
+#' @export
+weightedmean.ReOs <- function(x,detect.outliers=TRUE,plot=TRUE,
+                              rect.col=rgb(0,1,0,0.5),
+                              outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                              alpha=0.05,exterr=TRUE,i2i=TRUE,...){
+    weightedmean.helper(x,detect.outliers=detect.outliers,plot=plot,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=exterr,
+                        i2i=i2i,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -194,6 +183,41 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
         plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha)
+    } else {
+        return(fit)
+    }
+}
+weightedmean.helper <- function(x,detect.outliers=TRUE,plot=TRUE,
+                                rect.col=rgb(0,1,0,0.5),type=4,
+                                cutoff.76=1100,cutoff.disc=c(-15,5),
+                                outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                                alpha=0.05,exterr=TRUE,i2i=FALSE,...){
+    if (hasClass(x,'UPb')){
+        tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
+                              cutoff.disc=cutoff.disc,exterr=FALSE)
+    } else if (hasClass(x,'ArAr')){
+        tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'ReOs')){
+        tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
+    }
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    if (exterr){
+        if (hasClass(x,'UPb')){
+            X <- get.ratios.UPb(tt=fit$mean[1],st=fit$mean[2],
+                                exterr=TRUE,as.UPb=TRUE)
+            fit$mean <- filter.UPb.ages(X,type=type,cutoff.76=cutoff.76,
+                                        cutoff.disc=cutoff.disc,exterr=TRUE)
+        } else if (hasClass(x,'ArAr')){
+            R <- get.ArAr.ratio(fit$mean[1],fit$mean[2],x$J[1],0,exterr=FALSE)
+            fit$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
+        } else if (hasClass(x,'ReOs')){
+            R <- get.ReOs.ratio(fit$mean[1],fit$mean[2],exterr=FALSE)
+            fit$mean <- get.ReOs.age(R[1],R[2],exterr=TRUE)
+        }
+    }
+    if (plot){
+        plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
+                          outlier.col=outlier.col,sigdig=sigdig,alpha=alpha)
     } else {
         return(fit)
     }

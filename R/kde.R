@@ -5,7 +5,7 @@
 #' adaptive kernel bandwidth modifier.
 #'
 #' @param x a vector of numbers OR an object of class \code{UPb},
-#'     \code{ArAr}, \code{UThHe}, \code{fissiontracks} or
+#'     \code{ArAr}, \code{ReOs}, \code{UThHe}, \code{fissiontracks} or
 #'     \code{detrital}
 #' @rdname kde
 #' @export
@@ -157,16 +157,36 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
         return(X)
     }
 }
+#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
+#'     `excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+#'     \eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+#'     \code{i2i} to \code{FALSE} uses the default values stored in
+#'     \code{settings('iratio',...)}
 #' @rdname kde
 #' @export
 kde.ArAr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                     show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,...){
-    tt <- ArAr.age(x)[,1]
+                     show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,
+                     i2i=FALSE,...){
+    tt <- ArAr.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
-                kde.col=kde.col, hist.col=hist.col,
+                kde.col=kde.col,hist.col=hist.col,
+                show.hist=show.hist,bty=bty,binwidth=binwidth,
+                ncol=ncol,...)
+}
+#' @rdname kde
+#' @export
+kde.ReOs <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                     n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
+                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
+                     show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,
+                     i2i=TRUE,...){
+    tt <- ReOs.age(x,i2i=i2i)[,1]
+    kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
+                n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
+                kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
                 ncol=ncol,...)
 }
