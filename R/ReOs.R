@@ -1,7 +1,7 @@
 # convert isotope dilution derived concentrations to ratios
 # x = matrix with columns 'Reppm','errReppm', 'Osppt','errOsppt' 
 # and 'Os187Os188','errOs187Os188'
-ID.Re <- function(x,exterr=FALSE,isochron=TRUE){
+ppm2ratios.ReOs <- function(x,exterr=FALSE,isochron=TRUE,...){
     R57Re <- iratio('Re185Re187')[1]
     R42Os <- iratio('Os184Os192')[1]
     R62Os <- iratio('Os186Os192')[1]
@@ -81,59 +81,13 @@ ID.Re <- function(x,exterr=FALSE,isochron=TRUE){
 }
 
 get.ReOs.ratio <- function(tt,st,exterr=TRUE){
-    L <- lambda("Re187")[1]
-    sL <- lambda("Re187")[2]
-    R <- exp(L*tt)-1
-    Jac <- matrix(0,1,2)
-    E <- matrix(0,2,2)
-    Jac[1,1] <- tt*exp(L*tt)
-    Jac[1,2] <- L*exp(L*tt)
-    E[1,1] <- sL^2
-    E[2,2] <- st^2
-    sR <- sqrt(Jac %*% E %*% t(Jac))
-    out <- c(R,sR)
+    get.PD.ratio(tt,st,'Re187',exterr)
 }
 
 get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=TRUE){
-    l187 <- lambda('Re187')
-    tt <- log(1 + Os187Re187)/l187[1]
-    E <- matrix(0,2,2)
-    J <- matrix(0,1,2)
-    E[1,1] <- sOs187Re187^2
-    if (exterr) E[2,2] <- l187[2]^2
-    J[1,1] <- 1/(l187[1]*(1 + Os187Re187))
-    J[1,2] <- -tt/l187[1]
-    st <- sqrt(J %*% E %*% t(J))
-    c(tt,st)
+    get.PD.age(Os187Re187,sOs187Re187,'Re187',exterr)
 }
 
-# i2i = isochron to intercept
-ReOs.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE){
-    ns <- nrow(x$x)
-    if (i2i){
-        fit <- isochron.ReOs(x,plot=FALSE,exterr=exterr)
-        dat <- ID.Re(x,exterr=exterr,isochron=TRUE)
-        dat[,'Y'] <- dat[,'Y'] - fit$a[1]
-        if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + fit$a[2]^2)
-    } else {
-        dat <- ID.Re(x,exterr=exterr,isochron=FALSE)
-    }
-    out <- matrix(0,ns,2)
-    E <- matrix(0,2,2)
-    J <- matrix(0,1,2)
-    for (j in 1:ns) {
-        E[1,1] <- dat[j,'sX']^2
-        E[2,2] <- dat[j,'sY']^2
-        E[1,2] <- dat[j,'rXY']*dat[j,'sX']*dat[j,'sY']
-        E[2,1] <- E[1,2]
-        J[1,1] <- -dat[j,'Y']/dat[j,'X']^2
-        J[1,2] <- 1/dat[j,'X']        
-        Os187Re187 <- dat[j,'Y']/dat[j,'X']
-        sOs187Re187 <- sqrt(J%*%E%*%t(J))
-        tt <- get.ReOs.age(Os187Re187,sOs187Re187,exterr=TRUE)
-        t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
-        out[j,] <- c(t.out$x,t.out$err)
-    }
-    if (!is.na(i)) out <- out[i,]
-    out
+ReOs.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
+    PD.age(x,'Re187',exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
 }

@@ -106,6 +106,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.ArAr(x,format)
     } else if (identical(method,'Re-Os')){
         out <- as.ReOs(x,format)
+    } else if (identical(method,'Sm-Nd')){
+        out <- as.SmNd(x,format)
     } else if (identical(method,'U-Th-He')){
         out <- as.UThHe(x)
     } else if (identical(method,'fissiontracks')){
@@ -190,6 +192,22 @@ as.ReOs <- function(x,format=1){
         colnames(X) <- c('Reppm','errReppm',
                          'Osppt','errOsppt',
                          'Os187Os188','errOs187Os188')
+        out$x <- X
+    }
+    out
+}
+as.SmNd <- function(x,format=1){
+    out <- list()
+    class(out) <- "SmNd"
+    out$x <- NA
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    if (format == 1 & nc == 6){
+        X <- x2X(x,2,nr,nc)
+        colnames(X) <- c('Smppm','errSmppm',
+                         'Ndppm','errNdppm',
+                         'Nd143Nd144','errNd143Nd144')
         out$x <- X
     }
     out

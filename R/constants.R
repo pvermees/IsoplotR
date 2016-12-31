@@ -57,12 +57,14 @@ mindens <- function(mineral,x=NULL){
 #' the decay constant value and its analytical error.  Omitting these
 #' two numbers simply returns the existing values.
 #'
-#' \item for \code{'iratio'}: the isotopic ratio of interest (one of either
-#' \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
+#' \item for \code{'iratio'}: the isotopic ratio of interest (one of
+#' either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
 #' \code{"Sr88Sr86"}, \code{"Sr87Sr86"}, \code{"Sr84Sr86"},
 #' \code{"Re185Re187"}, \code{"Os184Os192"} \code{"Os186Os192"},
 #' \code{"Os187Os192"}, \code{"Os188Os192"}, \code{"Os189Os192"},
-#' \code{"Os190Os192"}, \code{"U238U235"}, \code{"Sm144Sm152"},
+#' \code{"Os190Os192"}, \code{"U238U235"}, \code{"Nd142Nd144"},
+#' \code{"Nd143Nd144"}, \code{"Nd145Nd144"}, \code{"Nd146Nd144"},
+#' \code{"Nd148Nd144"}, or \code{"Nd150Nd144"}, \code{"Sm144Sm152"},
 #' \code{"Sm147Sm152"}, \code{"Sm148Sm152"}, \code{"Sm149Sm152"},
 #' \code{"Sm150Sm152"}, or \code{"Sm154Sm152"}) PLUS (optionally) the
 #' isotopic ratio and its analytical error.  Omitting these two
@@ -114,6 +116,11 @@ mindens <- function(mineral,x=NULL){
 #' evolution of the lunar crust and mantle."
 #' Earth and Planetary Science Letters 39.3 (1978): 349-357.
 #'
+#' \item Nd: Zhao, Motian, et
+#' al. "Absolute measurements of neodymium isotopic abundances and atomic
+#' weight by MC-ICPMS." International Journal of Mass Spectrometry 245.1
+#' (2005): 36-40.
+#' 
 #' \item Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and Hannah,
 #' J.L., 2007.  Assessment of the 187Re decay constant by cross
 #' calibration of Re-Os molybdenite and U-Pb zircon chronometers in

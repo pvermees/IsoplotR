@@ -108,15 +108,39 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
-    X <- ID.Re(x,exterr=exterr,isochron=TRUE)
+    isochron.PD(x,'Re187',xlim=xlim, ylim=ylim,alpha=alpha,
+                sigdig=sigdig, show.numbers=show.numbers,
+                ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
+                plot=plot,exterr=exterr,...)
+}
+#' @rdname isochron
+#' @export
+isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+    isochron.PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
+                sigdig=sigdig, show.numbers=show.numbers,
+                ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
+                plot=plot,exterr=exterr,...)
+}
+isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
+                        sigdig=2,show.numbers=FALSE,
+                        ellipse.col=rgb(0,1,0,0.5),line.col='red',
+                        lwd=2,plot=TRUE,exterr=TRUE,...){
+    if (identical(nuclide,'Sm147')){
+        x.lab <- expression(paste(""^"147","Sm/"^"144","Nd"))
+        y.lab <- expression(paste(""^"143","Nd/"^"144","Nd"))
+    } else if (identical(nuclide,'Re187')){
+        x.lab <- expression(paste(""^"187","Re/"^"188","Os"))
+        y.lab <- expression(paste(""^"187","Os/"^"188","Os"))
+    }
+    X <- ppm2ratios(x,exterr=exterr,isochron=TRUE)
     fit <- yorkfit(X)
     out <- fit
     class(out) <- "isochron"
     out$y0 <- c(fit$a[1],fit$a[2])
-    out$age <- get.ReOs.age(fit$b[1],fit$b[2],exterr=exterr)
+    out$age <- get.PD.age(fit$b[1],fit$b[2],nuclide,exterr=exterr)
     if (plot){
-        x.lab <- expression(paste(""^"187","Re/"^"188","Os"))
-        y.lab <- expression(paste(""^"187","Os/"^"188","Os"))
         isochron.default(X,xlim=xlim,ylim=ylim,alpha=alpha,
                          show.numbers=show.numbers,
                          ellipse.col=ellipse.col,a=fit$a[1],
