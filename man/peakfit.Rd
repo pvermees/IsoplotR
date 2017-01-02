@@ -3,6 +3,8 @@
 \name{peakfit}
 \alias{peakfit}
 \alias{peakfit.ArAr}
+\alias{peakfit.ReOs}
+\alias{peakfit.SmNd}
 \alias{peakfit.UPb}
 \alias{peakfit.UThHe}
 \alias{peakfit.default}
@@ -20,7 +22,13 @@ peakfit(x, ...)
   cutoff.disc = c(-15, 5), exterr = TRUE, sigdig = 2, log = TRUE, ...)
 
 \method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  ...)
+  i2i = FALSE, ...)
+
+\method{peakfit}{ReOs}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
+  i2i = TRUE, ...)
+
+\method{peakfit}{SmNd}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
+  i2i = TRUE, ...)
 
 \method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, ...)
 }
@@ -63,6 +71,12 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
+
+\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
+`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+\code{i2i} to \code{FALSE} uses the default values stored in
+\code{settings('iratio',...)}}
 }
 \value{
 a list with the following items:

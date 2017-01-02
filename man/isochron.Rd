@@ -4,6 +4,7 @@
 \alias{isochron}
 \alias{isochron.ArAr}
 \alias{isochron.ReOs}
+\alias{isochron.SmNd}
 \alias{isochron.default}
 \title{Calculate and plot isochrons}
 \usage{
@@ -19,6 +20,10 @@ isochron(x, ...)
   exterr = TRUE, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
+
+\method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 }

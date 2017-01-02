@@ -112,6 +112,11 @@ peakfit.ReOs <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
 }
 #' @rdname peakfit
 #' @export
+peakfit.SmNd <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
+    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+}
+#' @rdname peakfit
+#' @export
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,...){
     peakfit.helper(x,k=k,exterr=FALSE,sigdig=sigdig,log=log,...)
 }

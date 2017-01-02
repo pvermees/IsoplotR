@@ -87,8 +87,9 @@ yorkfit <- function(X,sX=NULL,Y=NULL,sY=NULL,rXY=NULL){
     out$a <- c(a,sa)
     out$b <- c(b,sb)
     out$cov.ab <- -Xbar*sb^2
+    out$mswd <- 0
     mswd <- get.york.mswd(X,sX,Y,sY,rXY,a,b)
-    out$mswd <- mswd$mswd
+   out$mswd <- mswd$mswd
     out$p.value <- mswd$p.value
     out
 }

@@ -4,6 +4,7 @@
 \alias{age}
 \alias{age.ArAr}
 \alias{age.ReOs}
+\alias{age.SmNd}
 \alias{age.UPb}
 \alias{age.UThHe}
 \alias{age.default}
@@ -21,8 +22,8 @@ age(x, ...)
 
 \method{age}{detritals}(x, ...)
 
-\method{age}{ArAr}(x, isochron = FALSE, exterr = TRUE, i = NA,
-  sigdig = NA, ...)
+\method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, ...)
 
 \method{age}{UThHe}(x, central = FALSE, i = NA, sigdig = NA, ...)
 
@@ -30,6 +31,9 @@ age(x, ...)
   exterr = TRUE, ...)
 
 \method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, ...)
+
+\method{age}{SmNd}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
 }
 \arguments{
@@ -99,15 +103,16 @@ should be considered separately (\code{isochron=FALSE}) or an
 isochron age should be calculated from all Ar-Ar analyses
 together (\code{isochron=TRUE}).}
 
+\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
+`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+\code{i2i} to \code{FALSE} uses the default values stored in
+\code{settings('iratio',...)}}
+
 \item{central}{logical flag indicating whether each U-Th-He analysis
 should be considered separately (\code{central=FALSE}) or a
 central age should be calculated from all U-Th-He analyses
 together (\code{central=TRUE}).}
-
-\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{187}Os/^{188}Os} ratio from an
-isochron fit. Setting \code{i2i} to \code{FALSE} uses the
-default values stored in \code{settings('iratio',...)}}
 }
 \value{
 \enumerate{

@@ -3,6 +3,7 @@
 \name{cad}
 \alias{cad}
 \alias{cad.ArAr}
+\alias{cad.ReOs}
 \alias{cad.UPb}
 \alias{cad.UThHe}
 \alias{cad.default}
@@ -23,7 +24,10 @@ cad(x, ...)
   ...)
 
 \method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", ...)
+  col = "black", i2i = FALSE, ...)
+
+\method{cad}{ReOs}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", i2i = FALSE, ...)
 
 \method{cad}{UThHe}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", ...)
@@ -33,7 +37,7 @@ cad(x, ...)
 }
 \arguments{
 \item{x}{a numerical vector OR an object of class \code{UPb},
-\code{ArAr}, \code{UThHe}, \code{fissiontracks} or
+\code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs} or
 \code{detritals}}
 
 \item{...}{optional arguments to the generic \code{plot} function}
@@ -75,6 +79,12 @@ the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
+
+\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
+`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+\code{i2i} to \code{FALSE} uses the default values stored in
+\code{settings('iratio',...)}}
 }
 \description{
 Plot a dataset as a Cumulative Age Distribution (CAD), also known

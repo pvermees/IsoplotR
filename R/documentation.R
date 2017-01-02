@@ -33,6 +33,9 @@
 #' \code{ReOs}: an object of class \code{ReOs} containing a
 #' \eqn{^{187}Os/^{187}Re}-dataset from Selby (2007).
 #'
+#' \code{SmNd}: an object of class \code{SmNd} containing a
+#' \eqn{^{143}Nd/^{147}Sm}-dataset from Lugmair et al. (1975).
+#'
 #' \code{average}: an object of class \code{other} containing the
 #' \eqn{^{206}Pb/^{238}U}-ages and errors of dataset \code{UPb}.
 #'

@@ -3,6 +3,7 @@
 \name{weightedmean}
 \alias{weightedmean}
 \alias{weightedmean.ArAr}
+\alias{weightedmean.ReOs}
 \alias{weightedmean.UPb}
 \alias{weightedmean.UThHe}
 \alias{weightedmean.default}
@@ -22,7 +23,11 @@ weightedmean(x, ...)
 
 \method{weightedmean}{ArAr}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ...)
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = FALSE, ...)
+
+\method{weightedmean}{ReOs}(x, detect.outliers = TRUE, plot = TRUE,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ...)
 
 \method{weightedmean}{UThHe}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
@@ -35,7 +40,8 @@ weightedmean(x, ...)
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
 standard errors (second column) OR an object of class
-\code{UPb} OR an object of class \code{ArAr}}
+\code{UPb}, \code{ArAr}, \code{ReOs}, \code{fissiontracks} or
+\code{UThHe}}
 
 \item{...}{optional arguments}
 
@@ -79,9 +85,16 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \code{cutoff.disc=NA} if you do not want to use this filter.}
 
 \item{exterr}{propagate decay constant uncertainty?}
+
+\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
+`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+\code{i2i} to \code{FALSE} uses the default values stored in
+\code{settings('iratio',...)}}
 }
 \value{
-if \code{PLOT=FALSE}, returns a list with the following items:
+if \code{PLOT=FALSE}, returns a list with the following
+    items:
 
 \describe{
 \item{mean}{a two element vector with the weighted mean and its

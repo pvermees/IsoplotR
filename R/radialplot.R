@@ -106,10 +106,10 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            show.numbers=FALSE, pch=21,bg='white',
                            markers=NULL,k=0,exterr=TRUE,...){
     radialplot.helper(x,from=from,to=to,t0=t0,
-                     transformation=transformation,type=type,
-                     cutoff.76=cutoff.76, cutoff.disc=cutoff.disc,
-                     show.numbers=show.numbers,pch=pch,bg=bg,
-                     markers=markers,k=k,exterr=exterr,...)
+                      transformation=transformation,type=type,
+                      cutoff.76=cutoff.76, cutoff.disc=cutoff.disc,
+                      show.numbers=show.numbers,pch=pch,bg=bg,
+                      markers=markers,k=k,exterr=exterr,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
 #'     `excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
@@ -123,9 +123,9 @@ radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,
                             pch=21,bg='white',markers=NULL,k=0,
                             exterr=TRUE,i2i=FALSE,...){
     radialplot.helper(x,from=from,to=to,t0=t0,
-                     transformation=transformation,
-                     show.numbers=show.numbers,pch=pch,bg=bg,
-                     markers=markers,k=k,exterr=exterr,i2i=i2i,...)
+                      transformation=transformation,
+                      show.numbers=show.numbers,pch=pch,bg=bg,
+                      markers=markers,k=k,exterr=exterr,i2i=i2i,...)
 }
 #' @rdname radialplot
 #' @export
@@ -133,9 +133,9 @@ radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,
                              transformation='log',show.numbers=FALSE,
                              pch=21,bg='white',markers=NULL,k=0,...){
     radialplot.helper(x,from=from,to=to,t0=t0,
-                     transformation=transformation,
-                     show.numbers=show.numbers,pch=pch,bg=bg,
-                     markers=markers,k=k,exterr=exterr,...)
+                      transformation=transformation,
+                      show.numbers=show.numbers,pch=pch,bg=bg,
+                      markers=markers,k=k,exterr=FALSE,...)
 }
 #' @rdname radialplot
 #' @export
@@ -144,9 +144,20 @@ radialplot.ReOs <- function(x,from=NA,to=NA,t0=NA,
                             pch=21,bg='white',markers=NULL,k=0,
                             exterr=TRUE,i2i=TRUE,...){
     radialplot.helper(x,from=from,to=to,t0=t0,
-                     transformation=transformation,
-                     show.numbers=show.numbers,pch=pch,bg=bg,
-                     markers=markers,k=k,exterr=exterr,i2i=i2i,...)
+                      transformation=transformation,
+                      show.numbers=show.numbers,pch=pch,bg=bg,
+                      markers=markers,k=k,exterr=exterr,i2i=i2i,...)
+}
+#' @rdname radialplot
+#' @export
+radialplot.SmNd <- function(x,from=NA,to=NA,t0=NA,
+                            transformation='log',show.numbers=FALSE,
+                            pch=21,bg='white',markers=NULL,k=0,
+                            exterr=TRUE,i2i=TRUE,...){
+    radialplot.helper(x,from=from,to=to,t0=t0,
+                      transformation=transformation,
+                      show.numbers=show.numbers,pch=pch,bg=bg,
+                      markers=markers,k=k,exterr=exterr,i2i=i2i,...)
 }
 radialplot.helper <- function(x,from=NA,to=NA,t0=NA,
                              transformation='log',type=4,
@@ -177,6 +188,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
         tt <- UThHe.age(x)
     } else if (hasClass(x,'ReOs')){
         tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'SmNd')){
+        tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
     }
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,

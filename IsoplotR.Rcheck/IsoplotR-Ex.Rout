@@ -44,7 +44,7 @@ Type 'q()' to quit R.
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: age
 > ### Title: Calculate isotopic ages
-> ### Aliases: age age.ArAr age.ReOs age.UPb age.UThHe age.default
+> ### Aliases: age age.ArAr age.ReOs age.SmNd age.UPb age.UThHe age.default
 > ###   age.detritals age.fissiontracks
 > 
 > ### ** Examples
@@ -166,8 +166,8 @@ $p.value$concordance
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: cad
 > ### Title: Plot continuous data as cumulative age distributions
-> ### Aliases: cad cad.ArAr cad.UPb cad.UThHe cad.default cad.detritals
-> ###   cad.fissiontracks
+> ### Aliases: cad cad.ArAr cad.ReOs cad.UPb cad.UThHe cad.default
+> ###   cad.detritals cad.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -299,7 +299,8 @@ dev.new(): using pdf(file="Rplots1.pdf")
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: isochron
 > ### Title: Calculate and plot isochrons
-> ### Aliases: isochron isochron.ArAr isochron.ReOs isochron.default
+> ### Aliases: isochron isochron.ArAr isochron.ReOs isochron.SmNd
+> ###   isochron.default
 > 
 > ### ** Examples
 > 
@@ -319,8 +320,8 @@ dev.new(): using pdf(file="Rplots1.pdf")
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: kde
 > ### Title: Create (a) kernel density estimate(s)
-> ### Aliases: kde kde.ArAr kde.UPb kde.UThHe kde.default kde.detritals
-> ###   kde.fissiontracks
+> ### Aliases: kde kde.ArAr kde.ReOs kde.UPb kde.UThHe kde.default
+> ###   kde.detritals kde.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -389,8 +390,8 @@ NULL
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: peakfit
 > ### Title: Finite mixture modelling of geochronological datasets
-> ### Aliases: peakfit peakfit.ArAr peakfit.UPb peakfit.UThHe peakfit.default
-> ###   peakfit.fissiontracks
+> ### Aliases: peakfit peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.UPb
+> ###   peakfit.UThHe peakfit.default peakfit.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -428,8 +429,9 @@ $legend
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: radialplot
 > ### Title: Visualise heteroscedastic data on a radial plot
-> ### Aliases: radialplot radialplot.ArAr radialplot.UPb radialplot.UThHe
-> ###   radialplot.default radialplot.fissiontracks
+> ### Aliases: radialplot radialplot.ArAr radialplot.ReOs radialplot.SmNd
+> ###   radialplot.UPb radialplot.UThHe radialplot.default
+> ###   radialplot.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -503,7 +505,7 @@ $legend
 > json <- system.file("constants.json",package="IsoplotR")
 > settings(fname=json)
 > print(settings())
-[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Re187\":[1.6689e-05,3.8e-08],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0.00045],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":14.34,\"zircon\":10.6}}"
+[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Re187\":[1.6689e-05,3.8e-08],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06],\"Sm\":[150.36,0.03],\"Nd\":[144.2415,0.0013]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr88Sr86\":[8.37861,0.001624],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr84Sr86\":[0.056549,7.15e-05],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0.00045],\"U238U235\":[137.818,0.0225],\"Nd142Nd144\":[1.14101,7e-04],\"Nd143Nd144\":[0.51154,4e-04],\"Nd145Nd144\":[0.34848,0.00015],\"Nd146Nd144\":[0.72228,0.00051],\"Nd148Nd144\":[0.24186,3e-04],\"Nd150Nd144\":[0.23691,0.00042],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":14.34,\"zircon\":10.6}}"
 > 
 > # use the decay constant of Kovarik and Adams (1932)
 > settings('lambda','U238',0.0001537,0.0000068)
@@ -531,8 +533,9 @@ $legend
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: weightedmean
 > ### Title: Calculate the weighted mean age
-> ### Aliases: weightedmean weightedmean.ArAr weightedmean.UPb
-> ###   weightedmean.UThHe weightedmean.default weightedmean.fissiontracks
+> ### Aliases: weightedmean weightedmean.ArAr weightedmean.ReOs
+> ###   weightedmean.UPb weightedmean.UThHe weightedmean.default
+> ###   weightedmean.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -587,7 +590,7 @@ $legend
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  9.076 0.164 9.175 0 0 
+Time elapsed:  8.072 0.28 8.106 0 0 
 > grDevices::dev.off()
 pdf 
   2 

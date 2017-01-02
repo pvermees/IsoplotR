@@ -3,6 +3,8 @@
 \name{radialplot}
 \alias{radialplot}
 \alias{radialplot.ArAr}
+\alias{radialplot.ReOs}
+\alias{radialplot.SmNd}
 \alias{radialplot.UPb}
 \alias{radialplot.UThHe}
 \alias{radialplot.default}
@@ -27,11 +29,19 @@ radialplot(x, ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
-  markers = NULL, k = 0, exterr = TRUE, ...)
+  markers = NULL, k = 0, exterr = TRUE, i2i = FALSE, ...)
 
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
   markers = NULL, k = 0, ...)
+
+\method{radialplot}{ReOs}(x, from = NA, to = NA, t0 = NA,
+  transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
+  markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, ...)
+
+\method{radialplot}{SmNd}(x, from = NA, to = NA, t0 = NA,
+  transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
+  markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, ...)
 }
 \arguments{
 \item{x}{Either an nx2 matix of (transformed) values z and their
@@ -40,7 +50,7 @@ radialplot(x, ...)
 OR
 
 and object of class \code{fissiontracks}, \code{UThHe},
-\code{ArAr}, or \code{UPb}}
+\code{ArAr}, \code{ReOs} or \code{UPb}}
 
 \item{...}{additional arguments to the generic \code{points}
 function}
@@ -101,6 +111,12 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
+
+\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
+`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
+\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+\code{i2i} to \code{FALSE} uses the default values stored in
+\code{settings('iratio',...)}}
 }
 \description{
 Implementation of a graphical device developed by Rex Galbraith to

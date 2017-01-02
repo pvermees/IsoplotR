@@ -18,6 +18,7 @@ Found the following executable files:
   .git/objects/1b/4718fa8df55f440a807300a3098ba2c506fb05
   .git/objects/23/6c3a49f1accb74bd37ce442663ec5b7aa32344
   .git/objects/2d/a810ebbbabccc9c17f1c63956fe449d22a0cb7
+  .git/objects/7f/23851bd0d47fba6eb16df661c70175d27dce9f
 Source packages should not contain undeclared executable files.
 See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking for hidden files and directories ... NOTE
