@@ -19,8 +19,8 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,isochron=TRUE,...){
         dR78Os.dR72Os <- -1/R82Os
         dR78Os.dR82Os <- R72Os/R82Os^2 
     }
-    Re <- x$x[,'Reppm']*1000
-    Os <- x$x[,'Osppt']
+    Re <- x$x[,'Reppm']
+    Os <- x$x[,'Osppm']
     MMOs <- imass('Os')[1]
     MMRe <- imass('Re')[1]
     invf188Os <- R42Os/R82Os + R62Os/R82Os + R78Os + 1 +
@@ -54,8 +54,8 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,isochron=TRUE,...){
     out[,3] <- R78Os
     for (i in 1:nn){
         E[10,10] <- x$x[i,'errOs187Os188']^2
-        E[11,11] <- (x$x[i,'errReppm']*1000)^2
-        E[12,12] <- x$x[i,'errOsppt']^2
+        E[11,11] <- (x$x[i,'errReppm'])^2
+        E[12,12] <- x$x[i,'errOsppm']^2
         J[1,1] <- (df187Re.dR57Re*invf188Os[i])*(Re[i]/Os[i])*(MMOs/MMRe)
         J[1,2] <- (f187Re*dinvf188Os.dR42Os)*(Re[i]/Os[i])*(MMOs/MMRe)
         J[1,3] <- (f187Re*dinvf188Os.dR62Os)*(Re[i]/Os[i])*(MMOs/MMRe)

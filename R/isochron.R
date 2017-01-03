@@ -16,7 +16,7 @@
 #' }
 #' OR
 #'
-#' an object of class \code{ArAr} or \code{ReOs}
+#' an object of class \code{ArAr}, \code{ReOs} or  \code{SmNd}
 #'
 #' @param xlim 2-element vector with the plot limits of the x-axis
 #' @param ylim 2-element vector with the plot limits of the y-axis

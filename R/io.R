@@ -190,7 +190,7 @@ as.ReOs <- function(x,format=1){
     if (format == 1 & nc == 6){
         X <- x2X(x,2,nr,nc)
         colnames(X) <- c('Reppm','errReppm',
-                         'Osppt','errOsppt',
+                         'Osppm','errOsppm',
                          'Os187Os188','errOs187Os188')
         out$x <- X
     }

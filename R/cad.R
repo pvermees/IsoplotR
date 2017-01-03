@@ -4,8 +4,8 @@
 #' as a `empirical cumulative distribution function'.
 #' 
 #' @param x a numerical vector OR an object of class \code{UPb},
-#'     \code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs} or
-#'     \code{detritals}
+#'     \code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs},
+#'     \code{SmNd} or \code{detritals}
 #' @rdname cad
 #' @export
 cad <- function(x,...){ UseMethod("cad",x) }
@@ -91,6 +91,13 @@ cad.ArAr <- function(x,pch=NA,verticals=TRUE,
 cad.ReOs <- function(x,pch=NA,verticals=TRUE,
                      xlab='age [Ma]',col='black',i2i=FALSE,...){
     tt <- ReOs.age(x,i2i=i2i)[,1]
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
+}
+#' @rdname cad
+#' @export
+cad.SmNd <- function(x,pch=NA,verticals=TRUE,
+                     xlab='age [Ma]',col='black',i2i=FALSE,...){
+    tt <- SmNd.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
 #' @rdname cad

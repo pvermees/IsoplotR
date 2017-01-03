@@ -36,6 +36,7 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
         dat <- ppm2ratios(x,exterr=exterr,isochron=FALSE)
     }
     out <- matrix(0,ns,2)
+    colnames(out) <- c('t','s[t]')
     E <- matrix(0,2,2)
     J <- matrix(0,1,2)
     for (j in 1:ns) {

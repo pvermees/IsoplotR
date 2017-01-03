@@ -5,29 +5,29 @@
 #' geochronological datasets.
 #'
 #' @param x either a \code{[2 x n]} matrix with measurements and their
-#'     standard errors, or an object of class \code{fissiontracks}
+#'     standard errors, or an object of class \code{fissiontracks},
+#'     \code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd} or
+#'     \code{UThHe}
 #' @param k the number of discrete age components to be
 #'     sought. Setting this parameter to \code{'auto'} automatically
 #'     selects the optimal number of components (up to a maximum of 5)
 #'     using the Bayes Information Criterion (BIC).
 #' @param exterr propagate the external sources of uncertainty into
 #'     the component age errors?
-#' @param sigdig number of significant digits to be used for any legend
-#' in which the peak fitting results are to be displayed.
-#' @param log take the logs of the data before applying the mixture model?
+#' @param sigdig number of significant digits to be used for any
+#'     legend in which the peak fitting results are to be displayed.
+#' @param log take the logs of the data before applying the mixture
+#'     model?
 #' @param ... optional arguments (not used)
-#' @return a list with the following items:
-#' \describe{
-#' \item{peaks}{a vector of peak locations}
-#' \item{props}{a vector of peak proportions}
-#' \item{peaks.err}{the standard errors of the peak locations}
-#' \item{props.err}{the standard errors of the peak proportions}
-#' \item{legend}{a vector of text expressions to be used in a figure legend}
-#' }
-#' @references
-#' Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
-#' mixed fission track ages. Nuclear tracks and radiation
-#' measurements, 21(4), pp.459-470.
+#' @return a list with the following items: \describe{ \item{peaks}{a
+#'     vector of peak locations} \item{props}{a vector of peak
+#'     proportions} \item{peaks.err}{the standard errors of the peak
+#'     locations} \item{props.err}{the standard errors of the peak
+#'     proportions} \item{legend}{a vector of text expressions to be
+#'     used in a figure legend} }
+#' @references Galbraith, R.F. and Laslett, G.M., 1993. Statistical
+#'     models for mixed fission track ages. Nuclear tracks and
+#'     radiation measurements, 21(4), pp.459-470.
 #' @examples
 #' data(examples)
 #' peakfit(examples$FT1,k=2)
@@ -139,7 +139,7 @@ peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
                 R <- get.ArAr.ratio(fit$peaks[i],fit$peaks.err[i],
                                     x$J[1],0,exterr=FALSE)
                 age.with.exterr <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
-            } else if (hasClass(x,'ReOs')){
+            } else if (hasClass(x,'ReOs')|hasClass(x,'SmNd')){
                 R <- get.ReOs.ratio(fit$peaks[i],fit$peaks.err[i],exterr=FALSE)
                 age.with.exterr <- get.ReOs.age(R[1],R[2],exterr=TRUE)
             }
@@ -161,6 +161,8 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
         tt <- UThHe.age(x)
     } else if (hasClass(x,'ReOs')){
         tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'SmNd')){
+        tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'fissiontracks')){
         tt <- fissiontrack.age(x,exterr=FALSE)
     }
