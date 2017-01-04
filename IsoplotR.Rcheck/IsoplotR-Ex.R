@@ -68,7 +68,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
-### Aliases: cad cad.ArAr cad.ReOs cad.UPb cad.UThHe cad.default
+### Aliases: cad cad.ArAr cad.ReOs cad.SmNd cad.UPb cad.UThHe cad.default
 ###   cad.detritals cad.fissiontracks
 
 ### ** Examples
@@ -219,7 +219,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
-### Aliases: kde kde.ArAr kde.ReOs kde.UPb kde.UThHe kde.default
+### Aliases: kde kde.ArAr kde.ReOs kde.SmNd kde.UPb kde.UThHe kde.default
 ###   kde.detritals kde.fissiontracks
 
 ### ** Examples
@@ -384,8 +384,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: weightedmean
 ### Title: Calculate the weighted mean age
 ### Aliases: weightedmean weightedmean.ArAr weightedmean.ReOs
-###   weightedmean.UPb weightedmean.UThHe weightedmean.default
-###   weightedmean.fissiontracks
+###   weightedmean.SmNd weightedmean.UPb weightedmean.UThHe
+###   weightedmean.default weightedmean.fissiontracks
 
 ### ** Examples
 

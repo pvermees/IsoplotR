@@ -34,7 +34,9 @@ peakfit(x, ...)
 }
 \arguments{
 \item{x}{either a \code{[2 x n]} matrix with measurements and their
-standard errors, or an object of class \code{fissiontracks}}
+standard errors, or an object of class \code{fissiontracks},
+\code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd} or
+\code{UThHe}}
 
 \item{...}{optional arguments (not used)}
 
@@ -43,10 +45,11 @@ sought. Setting this parameter to \code{'auto'} automatically
 selects the optimal number of components (up to a maximum of 5)
 using the Bayes Information Criterion (BIC).}
 
-\item{sigdig}{number of significant digits to be used for any legend
-in which the peak fitting results are to be displayed.}
+\item{sigdig}{number of significant digits to be used for any
+legend in which the peak fitting results are to be displayed.}
 
-\item{log}{take the logs of the data before applying the mixture model?}
+\item{log}{take the logs of the data before applying the mixture
+model?}
 
 \item{exterr}{propagate the external sources of uncertainty into
 the component age errors?}
@@ -79,14 +82,12 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \code{settings('iratio',...)}}
 }
 \value{
-a list with the following items:
-\describe{
-\item{peaks}{a vector of peak locations}
-\item{props}{a vector of peak proportions}
-\item{peaks.err}{the standard errors of the peak locations}
-\item{props.err}{the standard errors of the peak proportions}
-\item{legend}{a vector of text expressions to be used in a figure legend}
-}
+a list with the following items: \describe{ \item{peaks}{a
+    vector of peak locations} \item{props}{a vector of peak
+    proportions} \item{peaks.err}{the standard errors of the peak
+    locations} \item{props.err}{the standard errors of the peak
+    proportions} \item{legend}{a vector of text expressions to be
+    used in a figure legend} }
 }
 \description{
 Implements the discrete mixture modelling algorithms of Galbraith
@@ -98,8 +99,8 @@ data(examples)
 peakfit(examples$FT1,k=2)
 }
 \references{
-Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
-mixed fission track ages. Nuclear tracks and radiation
-measurements, 21(4), pp.459-470.
+Galbraith, R.F. and Laslett, G.M., 1993. Statistical
+    models for mixed fission track ages. Nuclear tracks and
+    radiation measurements, 21(4), pp.459-470.
 }
 

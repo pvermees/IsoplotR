@@ -29,11 +29,11 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
     ns <- nrow(x$x)
     if (i2i){
         fit <- isochron(x,plot=FALSE,exterr=exterr)
-        dat <- ppm2ratios(x,exterr=exterr,isochron=TRUE)
+        dat <- ppm2ratios(x,exterr=exterr,common=FALSE)
         dat[,'Y'] <- dat[,'Y'] - fit$a[1]
         if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + fit$a[2]^2)
     } else {
-        dat <- ppm2ratios(x,exterr=exterr,isochron=FALSE)
+        dat <- ppm2ratios(x,exterr=exterr,common=TRUE)
     }
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')

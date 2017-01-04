@@ -50,7 +50,7 @@ radialplot(x, ...)
 OR
 
 and object of class \code{fissiontracks}, \code{UThHe},
-\code{ArAr}, \code{ReOs} or \code{UPb}}
+\code{ArAr}, \code{ReOs}, \code{SmNd} or \code{UPb}}
 
 \item{...}{additional arguments to the generic \code{points}
 function}

@@ -370,9 +370,9 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
                        ybottom=0,ytop=h$density,col=hist.col)
         if (graphics::par('yaxt')!='n') {
             fact <- max(h$counts)/max(h$density)
-            labels <- pretty(fact*h$density)
-            at <- labels/fact
-            graphics::axis(2,at=at,labels=labels)
+            lbls <- pretty(fact*h$density)
+            at <- lbls/fact
+            graphics::axis(2,at=at,labels=lbls)
         }
     }
     graphics::polygon(x$x,x$y,col=kde.col)

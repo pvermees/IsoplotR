@@ -16,6 +16,7 @@ cad.default	cad
 cad.detritals	cad
 cad.fissiontracks	cad
 cad.ReOs	cad
+cad.SmNd	cad
 cad.UPb	cad
 cad.UThHe	cad
 central	central
@@ -37,6 +38,7 @@ kde.default	kde
 kde.detritals	kde
 kde.fissiontracks	kde
 kde.ReOs	kde
+kde.SmNd	kde
 kde.UPb	kde
 kde.UThHe	kde
 mds	mds
@@ -68,6 +70,7 @@ weightedmean.ArAr	weightedmean
 weightedmean.default	weightedmean
 weightedmean.fissiontracks	weightedmean
 weightedmean.ReOs	weightedmean
+weightedmean.SmNd	weightedmean
 weightedmean.UPb	weightedmean
 weightedmean.UThHe	weightedmean
 yorkfit	yorkfit

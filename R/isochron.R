@@ -134,7 +134,7 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         x.lab <- expression(paste(""^"187","Re/"^"188","Os"))
         y.lab <- expression(paste(""^"187","Os/"^"188","Os"))
     }
-    X <- ppm2ratios(x,exterr=exterr,isochron=TRUE)
+    X <- ppm2ratios(x,exterr=exterr,common=FALSE)
     fit <- yorkfit(X)
     out <- fit
     class(out) <- "isochron"

@@ -1,7 +1,7 @@
 # convert isotope dilution derived concentrations to ratios
 # x = matrix with columns 'Sm[ppm]','errSm[ppm]', 'Nd[ppm]','errNd[ppm]' 
 # and 'Nd143Nd144','errNd143Nd144'
-ppm2ratios.SmNd <- function(x,exterr=FALSE,isochron=TRUE,...){
+ppm2ratios.SmNd <- function(x,exterr=FALSE,common=FALSE,...){
     R4452Sm <- iratio('Sm144Sm152')[1]
     R4752Sm <- iratio('Sm147Sm152')[1]
     R4852Sm <- iratio('Sm148Sm152')[1]
@@ -14,12 +14,12 @@ ppm2ratios.SmNd <- function(x,exterr=FALSE,isochron=TRUE,...){
     R64Nd <- iratio('Nd146Nd144')[1]
     R84Nd <- iratio('Nd148Nd144')[1]
     R04Nd <- iratio('Nd150Nd144')[1]
-    if (isochron){
-        R34Nd <- x$x[,'Nd143Nd144']
-        dR34Nd.dR34Nd0 <- 0
-    } else { # make common Nd correction
+    if (common){ # make common Nd correction
         R34Nd <-  x$x[,'Nd143Nd144'] - R34Nd0
         dR34Nd.dR34Nd0 <- -1
+    } else {
+        R34Nd <- x$x[,'Nd143Nd144']
+        dR34Nd.dR34Nd0 <- 0
     }
     Sm <- x$x[,'Smppm']
     Nd <- x$x[,'Ndppm']

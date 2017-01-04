@@ -39,7 +39,7 @@ isochron(x, ...)
 }
 OR
 
-an object of class \code{ArAr} or \code{ReOs}}
+an object of class \code{ArAr}, \code{ReOs} or  \code{SmNd}}
 
 \item{...}{optional arguments}
 

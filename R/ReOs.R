@@ -1,7 +1,7 @@
 # convert isotope dilution derived concentrations to ratios
 # x = matrix with columns 'Reppm','errReppm', 'Osppt','errOsppt' 
 # and 'Os187Os188','errOs187Os188'
-ppm2ratios.ReOs <- function(x,exterr=FALSE,isochron=TRUE,...){
+ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
     R57Re <- iratio('Re185Re187')[1]
     R42Os <- iratio('Os184Os192')[1]
     R62Os <- iratio('Os186Os192')[1]
@@ -10,14 +10,14 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,isochron=TRUE,...){
     R02Os <- iratio('Os190Os192')[1]
     R92Os <- iratio('Os189Os192')[1]
     dR78Os.dR78Os <- 1
-    if (isochron) {
-        R78Os <- x$x[,'Os187Os188']
-        dR78Os.dR72Os <- 0
-        dR78Os.dR82Os <- 0
-    } else { # make common Os correction
+    if (common) { # make common Os correction
         R78Os <-  x$x[,'Os187Os188'] - R72Os/R82Os
         dR78Os.dR72Os <- -1/R82Os
         dR78Os.dR82Os <- R72Os/R82Os^2 
+    } else {
+        R78Os <- x$x[,'Os187Os188']
+        dR78Os.dR72Os <- 0
+        dR78Os.dR82Os <- 0
     }
     Re <- x$x[,'Reppm']
     Os <- x$x[,'Osppm']

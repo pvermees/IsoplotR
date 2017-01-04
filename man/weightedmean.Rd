@@ -4,6 +4,7 @@
 \alias{weightedmean}
 \alias{weightedmean.ArAr}
 \alias{weightedmean.ReOs}
+\alias{weightedmean.SmNd}
 \alias{weightedmean.UPb}
 \alias{weightedmean.UThHe}
 \alias{weightedmean.default}
@@ -29,6 +30,10 @@ weightedmean(x, ...)
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ...)
 
+\method{weightedmean}{SmNd}(x, detect.outliers = TRUE, plot = TRUE,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ...)
+
 \method{weightedmean}{UThHe}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, ...)
@@ -40,8 +45,8 @@ weightedmean(x, ...)
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
 standard errors (second column) OR an object of class
-\code{UPb}, \code{ArAr}, \code{ReOs}, \code{fissiontracks} or
-\code{UThHe}}
+\code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
+\code{fissiontracks} or \code{UThHe}}
 
 \item{...}{optional arguments}
 
