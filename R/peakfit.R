@@ -6,8 +6,8 @@
 #'
 #' @param x either a \code{[2 x n]} matrix with measurements and their
 #'     standard errors, or an object of class \code{fissiontracks},
-#'     \code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd} or
-#'     \code{UThHe}
+#'     \code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr}
+#'     or \code{UThHe}
 #' @param k the number of discrete age components to be
 #'     sought. Setting this parameter to \code{'auto'} automatically
 #'     selects the optimal number of components (up to a maximum of 5)
@@ -117,6 +117,11 @@ peakfit.SmNd <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
 }
 #' @rdname peakfit
 #' @export
+peakfit.RbSr <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
+    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+}
+#' @rdname peakfit
+#' @export
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,...){
     peakfit.helper(x,k=k,exterr=FALSE,sigdig=sigdig,log=log,...)
 }
@@ -139,7 +144,7 @@ peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
                 R <- get.ArAr.ratio(fit$peaks[i],fit$peaks.err[i],
                                     x$J[1],0,exterr=FALSE)
                 age.with.exterr <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
-            } else if (hasClass(x,'ReOs')|hasClass(x,'SmNd')){
+            } else if (hasClass(x,'ReOs')|hasClass(x,'SmNd')|hasClass(x,'RbSr')){
                 R <- get.ReOs.ratio(fit$peaks[i],fit$peaks.err[i],exterr=FALSE)
                 age.with.exterr <- get.ReOs.age(R[1],R[2],exterr=TRUE)
             }
@@ -163,6 +168,8 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
         tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'SmNd')){
         tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'RbSr')){
+        tt <- RbSr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'fissiontracks')){
         tt <- fissiontrack.age(x,exterr=FALSE)
     }

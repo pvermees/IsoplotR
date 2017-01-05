@@ -3,6 +3,7 @@
 \name{isochron}
 \alias{isochron}
 \alias{isochron.ArAr}
+\alias{isochron.RbSr}
 \alias{isochron.ReOs}
 \alias{isochron.SmNd}
 \alias{isochron.default}
@@ -18,6 +19,10 @@ isochron(x, ...)
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
   exterr = TRUE, ...)
+
+\method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),

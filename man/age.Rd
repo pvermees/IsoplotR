@@ -3,6 +3,7 @@
 \name{age}
 \alias{age}
 \alias{age.ArAr}
+\alias{age.RbSr}
 \alias{age.ReOs}
 \alias{age.SmNd}
 \alias{age.UPb}
@@ -35,6 +36,9 @@ age(x, ...)
 
 \method{age}{SmNd}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
+
+\method{age}{RbSr}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, ...)
 }
 \arguments{
 \item{x}{can be:
@@ -54,6 +58,15 @@ error, or the spontaneous and induced track densities \code{Ns} and
 \item an eight element vector containing \code{U}, \code{s[U]},
 \code{Th}, \code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and
 \code{s[Sm]}
+
+\item a six element vector containing \code{Rb}, \code{s[Rb]},
+\code{Sr}, \code{s[Sr]}, \code{Sr87Sr86}, and \code{s[Sr87Sr86]}
+
+\item a six element vector containing \code{Re}, \code{s[Re]},
+\code{Os}, \code{s[Os]}, \code{Os187Os188}, and \code{s[Os187Os188]}
+
+\item a six element vector containing \code{Sm}, \code{s[Sm]},
+\code{Nd}, \code{s[Nd]}, \code{Nd143Nd144}, and \code{s[Nd144Nd143]}
 }
 
 OR
@@ -67,7 +80,8 @@ OR
 
 \item{method}{one of either \code{'Pb206U238'}, \code{'Pb207U235'},
 \code{'Pb207Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
-\code{U-Th-He} or \code{fissiontracks}}
+\code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{U-Th-He} or
+\code{fissiontracks}}
 
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}

@@ -20,6 +20,15 @@
 #' \item an eight element vector containing \code{U}, \code{s[U]},
 #' \code{Th}, \code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and
 #' \code{s[Sm]}
+#'
+#' \item a six element vector containing \code{Rb}, \code{s[Rb]},
+#' \code{Sr}, \code{s[Sr]}, \code{Sr87Sr86}, and \code{s[Sr87Sr86]}
+#'
+#' \item a six element vector containing \code{Re}, \code{s[Re]},
+#' \code{Os}, \code{s[Os]}, \code{Os187Os188}, and \code{s[Os187Os188]}
+#'
+#' \item a six element vector containing \code{Sm}, \code{s[Sm]},
+#' \code{Nd}, \code{s[Nd]}, \code{Nd143Nd144}, and \code{s[Nd144Nd143]}
 #' }
 #'
 #' OR
@@ -28,9 +37,11 @@
 #' \item an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
 #' \code{UThHe} or \code{fissiontracks}.
 #' }
+#'
 #' @param method one of either \code{'Pb206U238'}, \code{'Pb207U235'},
 #'     \code{'Pb207Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
-#'     \code{U-Th-He} or \code{fissiontracks}
+#'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{U-Th-He} or
+#'     \code{fissiontracks}
 #' 
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
@@ -272,6 +283,11 @@ age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
 #' @export
 age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     age.PD(x,'Sm147',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
+}
+#' @rdname age
+#' @export
+age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+    age.PD(x,'Rb87',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
 }
 age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig)

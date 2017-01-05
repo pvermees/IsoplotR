@@ -3,6 +3,7 @@ age.ArAr	age
 age.default	age
 age.detritals	age
 age.fissiontracks	age
+age.RbSr	age
 age.ReOs	age
 age.SmNd	age
 age.UPb	age
@@ -15,6 +16,7 @@ cad.ArAr	cad
 cad.default	cad
 cad.detritals	cad
 cad.fissiontracks	cad
+cad.RbSr	cad
 cad.ReOs	cad
 cad.SmNd	cad
 cad.UPb	cad
@@ -30,6 +32,7 @@ helioplot	helioplot
 isochron	isochron
 isochron.ArAr	isochron
 isochron.default	isochron
+isochron.RbSr	isochron
 isochron.ReOs	isochron
 isochron.SmNd	isochron
 kde	kde
@@ -37,6 +40,7 @@ kde.ArAr	kde
 kde.default	kde
 kde.detritals	kde
 kde.fissiontracks	kde
+kde.RbSr	kde
 kde.ReOs	kde
 kde.SmNd	kde
 kde.UPb	kde
@@ -48,6 +52,7 @@ peakfit	peakfit
 peakfit.ArAr	peakfit
 peakfit.default	peakfit
 peakfit.fissiontracks	peakfit
+peakfit.RbSr	peakfit
 peakfit.ReOs	peakfit
 peakfit.SmNd	peakfit
 peakfit.UPb	peakfit
@@ -56,6 +61,7 @@ radialplot	radialplot
 radialplot.ArAr	radialplot
 radialplot.default	radialplot
 radialplot.fissiontracks	radialplot
+radialplot.RbSr	radialplot
 radialplot.ReOs	radialplot
 radialplot.SmNd	radialplot
 radialplot.UPb	radialplot
@@ -69,6 +75,7 @@ weightedmean	weightedmean
 weightedmean.ArAr	weightedmean
 weightedmean.default	weightedmean
 weightedmean.fissiontracks	weightedmean
+weightedmean.RbSr	weightedmean
 weightedmean.ReOs	weightedmean
 weightedmean.SmNd	weightedmean
 weightedmean.UPb	weightedmean

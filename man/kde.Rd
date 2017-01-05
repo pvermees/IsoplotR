@@ -3,6 +3,7 @@
 \name{kde}
 \alias{kde}
 \alias{kde.ArAr}
+\alias{kde.RbSr}
 \alias{kde.ReOs}
 \alias{kde.SmNd}
 \alias{kde.UPb}
@@ -49,6 +50,12 @@ kde(x, ...)
   show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, i2i = TRUE,
   ...)
 
+\method{kde}{RbSr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, i2i = TRUE,
+  ...)
+
 \method{kde}{UThHe}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
   ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
@@ -62,8 +69,8 @@ kde(x, ...)
 }
 \arguments{
 \item{x}{a vector of numbers OR an object of class \code{UPb},
-\code{ArAr}, \code{ReOs}, \code{SmNd}, \code{UThHe},
-\code{fissiontracks} or \code{detrital}}
+\code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr},
+\code{UThHe}, \code{fissiontracks} or \code{detrital}}
 
 \item{...}{optional arguments to be passed on to \code{density}}
 

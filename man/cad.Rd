@@ -3,6 +3,7 @@
 \name{cad}
 \alias{cad}
 \alias{cad.ArAr}
+\alias{cad.RbSr}
 \alias{cad.ReOs}
 \alias{cad.SmNd}
 \alias{cad.UPb}
@@ -28,10 +29,13 @@ cad(x, ...)
   col = "black", i2i = FALSE, ...)
 
 \method{cad}{ReOs}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = FALSE, ...)
+  col = "black", i2i = TRUE, ...)
 
 \method{cad}{SmNd}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = FALSE, ...)
+  col = "black", i2i = TRUE, ...)
+
+\method{cad}{RbSr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", i2i = TRUE, ...)
 
 \method{cad}{UThHe}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", ...)
@@ -42,7 +46,7 @@ cad(x, ...)
 \arguments{
 \item{x}{a numerical vector OR an object of class \code{UPb},
 \code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs},
-\code{SmNd} or \code{detritals}}
+\code{RbSr}, \code{SmNd} or \code{detritals}}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 

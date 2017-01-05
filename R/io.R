@@ -106,6 +106,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.ArAr(x,format)
     } else if (identical(method,'Re-Os')){
         out <- as.ReOs(x,format)
+    } else if (identical(method,'Rb-Sr')){
+        out <- as.RbSr(x,format)
     } else if (identical(method,'Sm-Nd')){
         out <- as.SmNd(x,format)
     } else if (identical(method,'U-Th-He')){
@@ -177,6 +179,22 @@ as.ArAr <- function(x,format=2){
                              'Ar36Ar40','errAr36Ar40',
                              'Ar39Ar36','errAr39Ar36',
                              'Ar40Ar36','errAr40Ar36')
+    }
+    out
+}
+as.RbSr <- function(x,format=1){
+    out <- list()
+    class(out) <- "RbSr"
+    out$x <- NA
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    if (format == 1 & nc == 6){
+        X <- x2X(x,2,nr,nc)
+        colnames(X) <- c('Rbppm','errRbppm',
+                         'Srppm','errSrppm',
+                         'Sr87Sr86','errSr87Sr86')
+        out$x <- X
     }
     out
 }
@@ -277,9 +295,6 @@ as.detritals <- function(x){
         out[[sname]] = X[!is.na(X[,sname]),sname]
     }
     out
-}
-as.RbSr <- function(x){
-
 }
 as.other <- function(x){
     nc <- ncol(x)

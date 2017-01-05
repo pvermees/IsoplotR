@@ -10,7 +10,7 @@
 #' 
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
-#'     \code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
+#'     \code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr},
 #'     \code{fissiontracks} or \code{UThHe}
 #' @param ... optional arguments
 #' @return if \code{PLOT=FALSE}, returns a list with the following
@@ -152,6 +152,17 @@ weightedmean.SmNd <- function(x,detect.outliers=TRUE,plot=TRUE,
 }
 #' @rdname weightedmean
 #' @export
+weightedmean.RbSr <- function(x,detect.outliers=TRUE,plot=TRUE,
+                              rect.col=rgb(0,1,0,0.5),
+                              outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                              alpha=0.05,exterr=TRUE,i2i=TRUE,...){
+    weightedmean.helper(x,detect.outliers=detect.outliers,plot=plot,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=exterr,
+                        i2i=i2i,...)
+}
+#' @rdname weightedmean
+#' @export
 weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
                                rect.col=rgb(0,1,0,0.5),
                                outlier.col=rgb(0,1,1,0.5),
@@ -212,6 +223,8 @@ weightedmean.helper <- function(x,detect.outliers=TRUE,plot=TRUE,
         tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'SmNd')){
         tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'RbSr')){
+        tt <- RbSr.age(x,exterr=FALSE,i2i=i2i)
     }
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
     if (exterr){
@@ -226,6 +239,12 @@ weightedmean.helper <- function(x,detect.outliers=TRUE,plot=TRUE,
         } else if (hasClass(x,'ReOs')){
             R <- get.ReOs.ratio(fit$mean[1],fit$mean[2],exterr=FALSE)
             fit$mean <- get.ReOs.age(R[1],R[2],exterr=TRUE)
+        } else if (hasClass(x,'SmNd')){
+            R <- get.SmNd.ratio(fit$mean[1],fit$mean[2],exterr=FALSE)
+            fit$mean <- get.SmNd.age(R[1],R[2],exterr=TRUE)
+        } else if (hasClass(x,'RbSr')){
+            R <- get.RbSr.ratio(fit$mean[1],fit$mean[2],exterr=FALSE)
+            fit$mean <- get.RbSr.age(R[1],R[2],exterr=TRUE)
         }
     }
     if (plot){

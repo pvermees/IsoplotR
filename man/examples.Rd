@@ -42,6 +42,9 @@ dating approach.
 \code{SmNd}: an object of class \code{SmNd} containing a
 \eqn{^{143}Nd/^{147}Sm}-dataset from Lugmair et al. (1975).
 
+\code{RbSr}: an object of class \code{RbSr} containing an
+\eqn{^{87}Rb/^{86}Sr}-dataset from Compston et al. (1971).
+
 \code{average}: an object of class \code{other} containing the
 \eqn{^{206}Pb/^{238}U}-ages and errors of dataset \code{UPb}.
 

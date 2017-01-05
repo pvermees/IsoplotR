@@ -25,8 +25,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
-### Aliases: age age.ArAr age.ReOs age.SmNd age.UPb age.UThHe age.default
-###   age.detritals age.fissiontracks
+### Aliases: age age.ArAr age.RbSr age.ReOs age.SmNd age.UPb age.UThHe
+###   age.default age.detritals age.fissiontracks
 
 ### ** Examples
 
@@ -68,8 +68,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
-### Aliases: cad cad.ArAr cad.ReOs cad.SmNd cad.UPb cad.UThHe cad.default
-###   cad.detritals cad.fissiontracks
+### Aliases: cad cad.ArAr cad.RbSr cad.ReOs cad.SmNd cad.UPb cad.UThHe
+###   cad.default cad.detritals cad.fissiontracks
 
 ### ** Examples
 
@@ -198,8 +198,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: isochron
 ### Title: Calculate and plot isochrons
-### Aliases: isochron isochron.ArAr isochron.ReOs isochron.SmNd
-###   isochron.default
+### Aliases: isochron isochron.ArAr isochron.RbSr isochron.ReOs
+###   isochron.SmNd isochron.default
 
 ### ** Examples
 
@@ -219,8 +219,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
-### Aliases: kde kde.ArAr kde.ReOs kde.SmNd kde.UPb kde.UThHe kde.default
-###   kde.detritals kde.fissiontracks
+### Aliases: kde kde.ArAr kde.RbSr kde.ReOs kde.SmNd kde.UPb kde.UThHe
+###   kde.default kde.detritals kde.fissiontracks
 
 ### ** Examples
 
@@ -264,8 +264,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: peakfit
 ### Title: Finite mixture modelling of geochronological datasets
-### Aliases: peakfit peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.UPb
-###   peakfit.UThHe peakfit.default peakfit.fissiontracks
+### Aliases: peakfit peakfit.ArAr peakfit.RbSr peakfit.ReOs peakfit.SmNd
+###   peakfit.UPb peakfit.UThHe peakfit.default peakfit.fissiontracks
 
 ### ** Examples
 
@@ -285,8 +285,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: radialplot
 ### Title: Visualise heteroscedastic data on a radial plot
-### Aliases: radialplot radialplot.ArAr radialplot.ReOs radialplot.SmNd
-###   radialplot.UPb radialplot.UThHe radialplot.default
+### Aliases: radialplot radialplot.ArAr radialplot.RbSr radialplot.ReOs
+###   radialplot.SmNd radialplot.UPb radialplot.UThHe radialplot.default
 ###   radialplot.fissiontracks
 
 ### ** Examples
@@ -383,9 +383,9 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: weightedmean
 ### Title: Calculate the weighted mean age
-### Aliases: weightedmean weightedmean.ArAr weightedmean.ReOs
-###   weightedmean.SmNd weightedmean.UPb weightedmean.UThHe
-###   weightedmean.default weightedmean.fissiontracks
+### Aliases: weightedmean weightedmean.ArAr weightedmean.RbSr
+###   weightedmean.ReOs weightedmean.SmNd weightedmean.UPb
+###   weightedmean.UThHe weightedmean.default weightedmean.fissiontracks
 
 ### ** Examples
 

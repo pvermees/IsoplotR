@@ -3,6 +3,7 @@
 \name{peakfit}
 \alias{peakfit}
 \alias{peakfit.ArAr}
+\alias{peakfit.RbSr}
 \alias{peakfit.ReOs}
 \alias{peakfit.SmNd}
 \alias{peakfit.UPb}
@@ -30,13 +31,16 @@ peakfit(x, ...)
 \method{peakfit}{SmNd}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
   i2i = TRUE, ...)
 
+\method{peakfit}{RbSr}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
+  i2i = TRUE, ...)
+
 \method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, ...)
 }
 \arguments{
 \item{x}{either a \code{[2 x n]} matrix with measurements and their
 standard errors, or an object of class \code{fissiontracks},
-\code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd} or
-\code{UThHe}}
+\code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr}
+or \code{UThHe}}
 
 \item{...}{optional arguments (not used)}
 

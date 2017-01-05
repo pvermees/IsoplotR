@@ -5,7 +5,7 @@
 #' 
 #' @param x a numerical vector OR an object of class \code{UPb},
 #'     \code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs},
-#'     \code{SmNd} or \code{detritals}
+#'     \code{RbSr}, \code{SmNd} or \code{detritals}
 #' @rdname cad
 #' @export
 cad <- function(x,...){ UseMethod("cad",x) }
@@ -89,15 +89,22 @@ cad.ArAr <- function(x,pch=NA,verticals=TRUE,
 #' @rdname cad
 #' @export
 cad.ReOs <- function(x,pch=NA,verticals=TRUE,
-                     xlab='age [Ma]',col='black',i2i=FALSE,...){
+                     xlab='age [Ma]',col='black',i2i=TRUE,...){
     tt <- ReOs.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
 #' @rdname cad
 #' @export
 cad.SmNd <- function(x,pch=NA,verticals=TRUE,
-                     xlab='age [Ma]',col='black',i2i=FALSE,...){
+                     xlab='age [Ma]',col='black',i2i=TRUE,...){
     tt <- SmNd.age(x,i2i=i2i)[,1]
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
+}
+#' @rdname cad
+#' @export
+cad.RbSr <- function(x,pch=NA,verticals=TRUE,
+                     xlab='age [Ma]',col='black',i2i=TRUE,...){
+    tt <- RbSr.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
 #' @rdname cad

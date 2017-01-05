@@ -105,6 +105,16 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
+isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+    isochron.PD(x,'Rb87',xlim=xlim, ylim=ylim,alpha=alpha,
+                sigdig=sigdig, show.numbers=show.numbers,
+                ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
+                plot=plot,exterr=exterr,...)
+}
+#' @rdname isochron
+#' @export
 isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
@@ -133,6 +143,9 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
     } else if (identical(nuclide,'Re187')){
         x.lab <- expression(paste(""^"187","Re/"^"188","Os"))
         y.lab <- expression(paste(""^"187","Os/"^"188","Os"))
+    } else if (identical(nuclide,'Rb87')){
+        x.lab <- expression(paste(""^"87","Rb/"^"86","Sr"))
+        y.lab <- expression(paste(""^"87","Sr/"^"86","Sr"))
     }
     X <- ppm2ratios(x,exterr=exterr,common=FALSE)
     fit <- yorkfit(X)

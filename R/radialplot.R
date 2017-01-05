@@ -10,7 +10,7 @@
 #' OR
 #'
 #' and object of class \code{fissiontracks}, \code{UThHe},
-#' \code{ArAr}, \code{ReOs}, \code{SmNd} or \code{UPb}
+#' \code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr} or \code{UPb}
 #' @param from minimum age limit of the radial scale
 #' @param to maximum age limit of the radial scale
 #' @param t0 central value
@@ -159,6 +159,17 @@ radialplot.SmNd <- function(x,from=NA,to=NA,t0=NA,
                       show.numbers=show.numbers,pch=pch,bg=bg,
                       markers=markers,k=k,exterr=exterr,i2i=i2i,...)
 }
+#' @rdname radialplot
+#' @export
+radialplot.RbSr <- function(x,from=NA,to=NA,t0=NA,
+                            transformation='log',show.numbers=FALSE,
+                            pch=21,bg='white',markers=NULL,k=0,
+                            exterr=TRUE,i2i=TRUE,...){
+    radialplot.helper(x,from=from,to=to,t0=t0,
+                      transformation=transformation,
+                      show.numbers=show.numbers,pch=pch,bg=bg,
+                      markers=markers,k=k,exterr=exterr,i2i=i2i,...)
+}
 radialplot.helper <- function(x,from=NA,to=NA,t0=NA,
                              transformation='log',type=4,
                              cutoff.76=1100, cutoff.disc=c(-15,5),
@@ -190,6 +201,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
         tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'SmNd')){
         tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'RbSr')){
+        tt <- RbSr.age(x,exterr=FALSE,i2i=i2i)
     }
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,
