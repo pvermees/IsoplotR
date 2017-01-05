@@ -137,7 +137,7 @@ radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,
                       show.numbers=show.numbers,pch=pch,bg=bg,
                       markers=markers,k=k,exterr=FALSE,...)
 }
-#' @rdname radialplot
+#' @rdname radia
 #' @export
 radialplot.ReOs <- function(x,from=NA,to=NA,t0=NA,
                             transformation='log',show.numbers=FALSE,
@@ -275,8 +275,9 @@ radial.scale <- function(x,zeta=0,rhoD=0){
     # plot arc
     Z <- seq(zm-x$z0,zM-x$z0,length.out=N)
     rxy <- z2rxy(Z,e,xM)
-    graphics::plot(rxy[,1],rxy[,2],type='l',xlim=c(0,xM),axes=FALSE,bty='n',
-                   xlab=x$xlab,ylab='standardised estimate')
+    graphics::plot(rxy[,1],rxy[,2],type='l',xlim=c(0,xM),
+                   axes=FALSE,bty='n',xlab=x$xlab,
+                   ylab='standardised estimate')
     c(e,xM)
 }
 
@@ -336,24 +337,13 @@ get.radial.tticks <- function(x){
     out
 }
 
-get.fxy <- function(x,fz,asprat,buffer=0.9){
-    xx <- 1/x$s
-    yy <- fz*(x$z-x$z0)/x$s
-    rd <- sqrt(xx^2+yy^2) # radial distance
-    buffer/max(rd)
-}
-
-get.fz <- function(fz,z0,zlim,asprat){
-    (sin(atan(fz*(zlim[2]-z0))) + sin(atan(fz*(z0-zlim[1]))) - asprat)^2
-}
-
 x2zs <- function(x,...){ UseMethod("x2zs",x) }
 x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
     out <- list()
     if (is.na(transformation)) out$transformation <- 'log'
     else out$transformation <- transformation
     if (identical(transformation,'log')){
-        out$offset <- get.offset(x[,1],from)
+        out$offset <- get.offset(x[,1]-2*x[,2],from)
         out$z <- log(x[,1]+out$offset)
         out$s <- x[,2]/(x[,1]+out$offset)
         if (out$offset>0){
@@ -369,22 +359,24 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
     out$z0 <- get.z0(out,t0,from,to)
     # reset limits if necessary
     if (is.na(from)){
-        if (identical(transformation,'log'))
-            out$from <- exp(min(out$z,na.rm=TRUE))-out$offset
-        else
-            out$from <- min(out$z,na.rm=TRUE)
+        min.z <- get.min.z(out)
+        if (identical(transformation,'log')){
+            out$from <- exp(min.z)-out$offset
+        } else {
+            out$from <- min.z
+        }
     } else {
         out$from <- from
     }
     if (is.na(to)){
+        max.z <- get.max.z(out)
         if (identical(transformation,'log'))
-            out$to <- exp(max(out$z,na.rm=TRUE))-out$offset
+            out$to <- exp(max.z)-out$offset
         else if (identical(transformation,'linear'))
-            out$to <- max(out$z,na.rm=TRUE)
+            out$to <- max.z
     } else {
         out$to <- to
     }
-    out$zlim <- range(out$z,na.rm=TRUE)
     out
 }
 x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
@@ -435,7 +427,6 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
             out$xlab <- 'Ns+Ni'
         }
         # reset limits if necessary
-        out$zlim <- range(out$z,na.rm=TRUE)
         if (is.na(from)){
             if (identical(transformation,'log'))
                 out$from <- exp(min(out$z,na.rm=TRUE))
@@ -522,4 +513,28 @@ get.offset <- function(x,from=NA){
         offset = 10^(floor(log10(-m))+1);
     }
     offset
+}
+
+get.min.z <- function(x){
+    rxry <- data2rxry(x)
+    min.ry <- min(rxry[,2],na.rm=TRUE)
+    if (min.ry > -2){ # if the data are underdispersed
+        max.rx <- max(rxry[,1],na.rm=TRUE)
+        min.z <- x$z0-2/max.rx
+    } else {
+        min.z <- min(x$z,na.rm=TRUE)
+    }
+    min.z
+}
+
+get.max.z <- function(x){
+    rxry <- data2rxry(x)
+    max.ry <- max(rxry[,2],na.rm=TRUE)
+    if (max.ry < 2){ # if the data are underdispersed
+        max.rx <- max(rxry[,1],na.rm=TRUE)
+        max.z <- x$z0+2/max.rx
+    } else {
+        max.z <- max(x$z,na.rm=TRUE)
+    }
+    max.z
 }

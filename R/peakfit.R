@@ -123,7 +123,7 @@ peakfit.RbSr <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
 #' @rdname peakfit
 #' @export
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,...){
-    peakfit.helper(x,k=k,exterr=FALSE,sigdig=sigdig,log=log,...)
+    peakfit.helper(x,k=k,sigdig=sigdig,log=log,...)
 }
 peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
                            cutoff.disc=c(-15,5),exterr=TRUE,sigdig=2,
