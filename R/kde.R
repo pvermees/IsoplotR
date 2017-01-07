@@ -23,8 +23,8 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' @param plot show the KDE as a plot
 #' @param pch the symbol used to show the samples. May be a vector.
 #'     Set \code{pch = NA} to turn them off.
-#' @param xlab the label of the x-axis
-#' @param ylab the label of the y-axis
+#' @param xlab the x-axis label
+#' @param ylab the y-axis label
 #' @param kde.col the fill colour of the KDE specified as a four
 #'     element vector of \code{r, g, b, alpha} values
 #' @param show.hist logical flag indicating whether a histogram should
@@ -158,10 +158,11 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
     }
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
-#'     `excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
-#'     \eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
-#'     \code{i2i} to \code{FALSE} uses the default values stored in
-#'     \code{settings('iratio',...)}
+#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}
 #' @rdname kde
 #' @export
 kde.ArAr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,

@@ -16,7 +16,8 @@
 #' }
 #' OR
 #'
-#' an object of class \code{ArAr}, \code{ReOs} or  \code{SmNd}
+#' an object of class \code{ArAr}, \code{ReOs}, \code{RbSr} or
+#' \code{SmNd}
 #'
 #' @param xlim 2-element vector with the plot limits of the x-axis
 #' @param ylim 2-element vector with the plot limits of the y-axis
@@ -57,8 +58,11 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
 #' \describe{
 #' \item{a}{the intercept of the straight line fit and its standard error} 
 #' \item{b}{the slope of the fit and its standard error}
-#' \item{y0}{the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and its standard error}
-#' \item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard error}
+#' \item{y0}{this either equals \code{a} or, if \code{x} has class
+#' \code{ArAr}, the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and
+#' its standard error}
+#' \item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar, Re-Os, Rb-Sr or Sm-Nd
+#' age and its standard error}
 #' }
 #' @examples
 #' data(examples)

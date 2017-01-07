@@ -1,7 +1,7 @@
 #' Concordia diagram
 #'
-#' Plot U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams,
-#' calculate concordia ages and compositions, evaluates the
+#' Plots U-Pb data on Wetherill and Tera-Wasserburg concordia
+#' diagrams, calculate concordia ages and compositions, evaluates the
 #' equivalence of multiple
 #' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)

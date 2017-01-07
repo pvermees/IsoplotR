@@ -7,7 +7,8 @@
 #' @param y y-coordinate (scalar) for the centre of the ellipse
 #' @param covmat covariance matrix of the x-y coordinates
 #' @param alpha the probability cutoff for the error ellipses
-#' @return a [50x2] matrix of plot coordinates
+#' @param n the resolution of the error ellipses
+#' @return a [\code{n}x2] matrix of plot coordinates
 #' @examples
 #' x = 99; y = 101;
 #' covmat <- matrix(c(1,0.9,0.9,1),nrow=2)
@@ -16,7 +17,7 @@
 #' polygon(ell,col=rgb(0,1,0,0.5))
 #' points(x,y,pch=21,bg='black')
 #' @export
-ellipse <- function(x,y,covmat,alpha=0.05){
+ellipse <- function(x,y,covmat,alpha=0.05,n=50){
     nn <- 50
     cutoff <- stats::qchisq(1-alpha,2)
     e <- eigen(covmat)

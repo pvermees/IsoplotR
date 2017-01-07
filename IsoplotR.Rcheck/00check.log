@@ -8,6 +8,10 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
+No package encoding and non-ASCII characters in the following R files:
+  R/documentation.R
+    97: #' Vermeesch, P., 2008. Three new ways to calculate average (U<e2><80><93>Th)/He ages.
+
 The build time stamp is missing.
 * checking package namespace information ... OK
 * checking package dependencies ... OK
@@ -23,11 +27,13 @@ Source packages should not contain undeclared executable files.
 See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
+  .Rd2pdf10030
   .git
 These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
 
 CRAN-pack does not know about
+  .Rd2pdf10030
   .git
 * checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
@@ -45,6 +51,9 @@ Non-standard file/directory found at top level:
 Found the following directory with the name of a check directory:
   ./IsoplotR.Rcheck
 Most likely, these were included erroneously.
+Found the following directory with the name of a Rd2pdf directory:
+  ./.Rd2pdf10030
+Most likely, these were included erroneously.
 Found the following directory with the name of a version control directory:
   ./.git
 These should not be in a package tarball.
@@ -61,20 +70,4 @@ These should not be in a package tarball.
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... OK
-* checking Rd files ... OK
-* checking Rd metadata ... OK
-* checking Rd line widths ... OK
-* checking Rd cross-references ... OK
-* checking for missing documentation entries ... OK
-* checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... OK
-* checking Rd contents ... OK
-* checking for unstated dependencies in examples ... OK
-* checking contents of ‘data’ directory ... OK
-* checking data for non-ASCII characters ... OK
-* checking data for ASCII and uncompressed saves ... OK
-* checking examples ... OK
-* checking PDF version of manual ... OK
-* DONE
-Status: 2 WARNINGs, 4 NOTEs
+* checking R code for possible problems ...

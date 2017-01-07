@@ -44,7 +44,8 @@ isochron(x, ...)
 }
 OR
 
-an object of class \code{ArAr}, \code{ReOs} or  \code{SmNd}}
+an object of class \code{ArAr}, \code{ReOs}, \code{RbSr} or
+\code{SmNd}}
 
 \item{...}{optional arguments}
 
@@ -80,8 +81,11 @@ if \code{plot=FALSE}, returns a list with the following items:
 \describe{
 \item{a}{the intercept of the straight line fit and its standard error} 
 \item{b}{the slope of the fit and its standard error}
-\item{y0}{the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and its standard error}
-\item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar age and its standard error}
+\item{y0}{this either equals \code{a} or, if \code{x} has class
+\code{ArAr}, the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and
+its standard error}
+\item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar, Re-Os, Rb-Sr or Sm-Nd
+age and its standard error}
 }
 }
 \description{

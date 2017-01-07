@@ -13,17 +13,17 @@ X-values, the Y-values, the analytical uncertainties of the
 Y-values, and the correlation coefficients of the X- and
 Y-values.}
 
-\item{sX}{standard errors of \code{X} OR \code{NULL} if X is a
+\item{sX}{standard errors of \code{X} OR \code{NULL} if \code{X} is a
 matrix or data frame}
 
-\item{Y}{vector of measurements with the same length as X OR
-\code{NULL} if X is a matrix or data frame}
+\item{Y}{vector of measurements with the same length as \code{X} OR
+\code{NULL} if \code{X} is a matrix or data frame}
 
-\item{sY}{standard errors of \code{Y} OR \code{NULL} if X is a
+\item{sY}{standard errors of \code{Y} OR \code{NULL} if \code{X} is a
 matrix or data frame}
 
-\item{rXY}{correlation coefficients between X and Y OR \code{NULL}
-if X is a matrix or data frame}
+\item{rXY}{correlation coefficients between \code{X} and \code{Y}
+OR \code{NULL} if \code{X} is a matrix or data frame}
 }
 \value{
 a three-element list of vectors containing:

@@ -95,9 +95,9 @@ modifier of Abramson (1982) is used}
 \item{pch}{the symbol used to show the samples. May be a vector.
 Set \code{pch = NA} to turn them off.}
 
-\item{xlab}{the label of the x-axis}
+\item{xlab}{the x-axis label}
 
-\item{ylab}{the label of the y-axis}
+\item{ylab}{the y-axis label}
 
 \item{kde.col}{the fill colour of the KDE specified as a four
 element vector of \code{r, g, b, alpha} values}
@@ -152,10 +152,11 @@ function will use the median bandwidth of all the samples.}
 should all integrate to the same value.}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
-\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
-\code{i2i} to \code{FALSE} uses the default values stored in
-\code{settings('iratio',...)}}
+`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+\eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron
+fit. Setting \code{i2i} to \code{FALSE} uses the default values
+stored in \code{settings('iratio',...)}}
 }
 \value{
 if \code{plot = TRUE}, returns an object of class \code{KDE}, i.e. a

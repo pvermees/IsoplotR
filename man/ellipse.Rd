@@ -4,7 +4,7 @@
 \alias{ellipse}
 \title{Get coordinates of error ellipse for plotting}
 \usage{
-ellipse(x, y, covmat, alpha = 0.05)
+ellipse(x, y, covmat, alpha = 0.05, n = 50)
 }
 \arguments{
 \item{x}{x-coordinate (scalar) for the centre of the ellipse}
@@ -14,9 +14,11 @@ ellipse(x, y, covmat, alpha = 0.05)
 \item{covmat}{covariance matrix of the x-y coordinates}
 
 \item{alpha}{the probability cutoff for the error ellipses}
+
+\item{n}{the resolution of the error ellipses}
 }
 \value{
-a [50x2] matrix of plot coordinates
+a [\code{n}x2] matrix of plot coordinates
 }
 \description{
 Construct an error ellipse age a given confidence level from its

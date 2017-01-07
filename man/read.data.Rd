@@ -18,8 +18,8 @@ read.data(x, ...)
 \item{...}{optional arguments to the \code{read.csv} function}
 
 \item{method}{one of \code{'U-Pb'}, \code{'Ar-Ar'},
-\code{'detritals'} \code{'U-Th-He'}, \code{'fissiontracks'} or
-\code{'other'}}
+\code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os},
+\code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}}
 
 \item{format}{formatting option, depends on the value of
     \code{method}.
@@ -56,7 +56,8 @@ uncertainties.}
 }
 \value{
 an object of class \code{UPb}, \code{ArAr}, \code{UThHe},
-    \code{detritals}, \code{fissiontracks} or \code{other}
+    \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{detritals},
+    \code{fissiontracks} or \code{other}
 }
 \description{
 Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s
@@ -82,6 +83,14 @@ Example input files can be found by using \code{R}'s
 \item \code{method = 'Re-Os'}:
 
 \code{file.show(system.file("ReOs.csv",package="IsoplotR"))}
+
+\item \code{method = 'Rb-Sr'}:
+
+\code{file.show(system.file("RbSr.csv",package="IsoplotR"))}
+
+\item \code{method = 'Sm-Nd'}:
+
+\code{file.show(system.file("SmNd.csv",package="IsoplotR"))}
 
 \item \code{method = 'U-Th-He'}:
 

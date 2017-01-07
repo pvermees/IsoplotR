@@ -34,14 +34,15 @@
 #' OR
 #'
 #' \itemize{
-#' \item an object of class \code{UPb}, \code{ArAr}, \code{ReOs},
-#' \code{UThHe} or \code{fissiontracks}.
+#' \item an object of class \code{UPb}, \code{ArAr},
+#' \code{RbSr}, \code{SmNd}, \code{ReOs} \code{UThHe} or
+#' \code{fissiontracks}.
 #' }
 #'
-#' @param method one of either \code{'Pb206U238'}, \code{'Pb207U235'},
-#'     \code{'Pb207Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
-#'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{U-Th-He} or
-#'     \code{fissiontracks}
+#' @param method one of either \code{'U238-Pb206'}, \code{'U235-Pb207'},
+#'     \code{'Pb207-Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
+#'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{'U-Th-He'} or
+#'     \code{'fissiontracks'}
 #' 
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
@@ -55,20 +56,24 @@
 age <- function(x,...){ UseMethod("age",x) }
 #' @rdname age
 #' @export
-age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
+age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
                         zeta=c(NA,NA),rhoD=c(NA,NA),...){
     if (length(x)==1) X <- c(x,0)
     else X <- x[1:2]
-    if (identical(method,'Pb207U235')){
+    if (identical(method,'U235-Pb207')){
         out <- get.Pb207U235age(X[1],X[2],exterr)
-    } else if (identical(method,'Pb206U238')){
+    } else if (identical(method,'U238-Pb206')){
         out <- get.Pb206U238age(X[1],X[2],exterr)
-    } else if (identical(method,'Pb207Pb206')){
+    } else if (identical(method,'Pb206-Pb207')){
         out <- get.Pb207Pb206age(X[1],X[2],exterr)
     } else if (identical(method,'Ar-Ar')){
         out <- get.ArAr.age(X[1],X[2],X[3],X[4],exterr)
     } else if (identical(method,'Re-Os')){
         out <- get.ReOs.age(X[1],X[2],exterr)
+    } else if (identical(method,'Rb-Sr')){
+        out <- get.RbSr.age(X[1],X[2],exterr)
+    } else if (identical(method,'Sm-Nd')){
+        out <- get.SmNd.age(X[1],X[2],exterr)
     } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
@@ -76,6 +81,8 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6],X[7],X[8])
     } else if (identical(method,'fissiontracks')){
         out <- get.EDM.age(X[1],X[2],zeta,rhoD)
+    } else {
+        out <- x
     }
     out
 }
@@ -144,11 +151,13 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
 #' \item{cov}{ the covariance matrix of the elements in \code{x} }
 #' }
 #'
-#' \item if \code{x} has class \code{ArAr} or \code{ReOs} and \code{isochron=FALSE},
-#' returns a table of Ar-Ar or Re-Os ages and standard errors.
+#' \item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd}
+#' or \code{ReOs} and \code{isochron=FALSE}, returns a table of Ar-Ar,
+#' Rb-Sr, Sm-Nd or Re-Os ages and standard errors.
 #'
-#' \item if \code{x} has class \code{ArAr} or \code{ReOs} and
-#' \code{isochron=TRUE}, returns a list with the following items:
+#' \item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd}
+#' or \code{ReOs} and \code{isochron=TRUE}, returns a list with the
+#' following items:
 #'
 #' \describe{
 #'
@@ -158,10 +167,12 @@ age.default <- function(x,method='Pb206U238',exterr=TRUE,J=c(NA,NA),
 #' \item{b}{ the slope of the fit and its standard error. }
 #' 
 #' \item{y0}{ the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
-#' \eqn{^{187}}Os/\eqn{^{188}}Os ratio and its standard error. }
+#' \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{87}}Sr/\eqn{^{86}}Sr, or
+#' \eqn{^{143}}Nd/\eqn{^{144}}Nd ratio and its standard error. }
 #' 
-#' \item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar or
-#' \eqn{^{187}}Os/\eqn{^{187}}Re age and its standard error. }
+#' \item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar,
+#' \eqn{^{187}}Os/\eqn{^{187}}Re, \eqn{^{87}}Sr/\eqn{^{86}}Sr, or
+#' \eqn{^{143}}Nd/\eqn{^{144}}Nd age and its standard error. }
 #' 
 #' }
 #' 
@@ -228,11 +239,6 @@ age.UPb <- function(x,concordia=1,wetherill=TRUE,
     else if (concordia==3)
         out <- discordia.age(x,wetherill=TRUE,exterr=TRUE,...)
     out
-}
-#' @rdname age
-#' @export
-age.detritals <- function(x,...){
-    x
 }
 #' @param J two-element vector with the J-factor and its standard
 #'     error.

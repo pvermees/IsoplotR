@@ -57,10 +57,9 @@ list with plateau parameters.}
 calibration factor) uncertainties?}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
-\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
-\code{i2i} to \code{FALSE} uses the default values stored in
-\code{settings('iratio',...)}}
+`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from an
+isochron fit. Setting \code{i2i} to \code{FALSE} uses the
+default values stored in \code{settings('iratio',...)}}
 }
 \value{
 if \code{title=FALSE}, returns a list with the following

@@ -81,10 +81,9 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     else return(plat)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
-#'     `excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
-#'     \eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
-#'     \code{i2i} to \code{FALSE} uses the default values stored in
-#'     \code{settings('iratio',...)}
+#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from an
+#'     isochron fit. Setting \code{i2i} to \code{FALSE} uses the
+#'     default values stored in \code{settings('iratio',...)}
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
 #' @examples

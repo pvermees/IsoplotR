@@ -81,7 +81,7 @@ values reported in the title of the graphical output.}
 (\code{type}=4), or the (Wetherill) concordia age (\code{type}=5)}
 
 \item{cutoff.76}{the age (in Ma) below which the
-\eqn{^{206}}Pb/\eqn{^{238}}U and above which the
+\eqn{^{206}}Pb/\eqn{^{238}}U age and above which the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 only used if \code{type=4}.}
 
@@ -97,8 +97,8 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \item{exterr}{propagate decay constant uncertainty?}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
-\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar or
+\eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron fit. Setting
 \code{i2i} to \code{FALSE} uses the default values stored in
 \code{settings('iratio',...)}}
 }

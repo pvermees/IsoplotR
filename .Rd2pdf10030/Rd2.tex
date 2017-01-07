@@ -1,0 +1,27 @@
+\documentclass[letterpaper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[latin1]{inputenc} % @SET ENCODING@
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `IsoplotR'}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\item[Title]\AsIs{Statistical Toolbox for Radiometric Geochronology}
+\item[Version]\AsIs{0.10}
+\item[Description]\AsIs{An R implementation of Ken Ludwig's popular Isoplot add-in to Microsoft Excel. Currently plots U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams. Calculates concordia and discordia ages. Performs linear regression of measurements with correlated errors using the 'York' approach. Generates Kernel Density Estimates (KDEs) and Cumulative Age Distributions (CADs). Produces Multidimensional Scaling (MDS) configurations and Shepard plots of multi-sample detrital datasets using the Kolmogorov-Smirnov distance as a dissimilarity measure. Calculates 40Ar/39Ar ages, isochrons, and age spectra. Computes weighted means accounting for overdispersion. Calculates U-Th-He (single grain and central) ages, logratio plots and ternary diagrams. Processes fission track data using the external detector method and LA-ICP-MS, calculates central ages and plots fission track and other data on radial (a.k.a. 'Galbraith' plots). Constructs Re-Os isochrons. Future versions will include functionality for the Rb-Sr, Sm-Nd, Lu-Hf and U-series dating methods. A graphical user interface is provided as an RStudio Shiny app at <http://isoplotr.london-geochron.com>. Offline access to this interface will be provided at a later point in time.}
+\item[Author]\AsIs{Pieter Vermeesch [aut, cre]}
+\item[Maintainer]\AsIs{Pieter Vermeesch }\email{p.vermeesch@ucl.ac.uk}\AsIs{}
+\item[Depends]\AsIs{R (>= 3.0.0)}
+\item[Imports]\AsIs{MASS}
+\item[Suggests]\AsIs{}
+\item[License]\AsIs{GPL-2}
+\item[LazyData]\AsIs{true}
+\item[RoxygenNote]\AsIs{5.0.1}
+\end{description}
+\Rdcontents{\R{} topics documented:}

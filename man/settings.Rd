@@ -43,14 +43,15 @@ either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
 isotopic ratio and its analytical error.  Omitting these two
 numbers simply returns the existing values.
 
-\item for \code{'imass'}: the (isotopic) molar mass of interest (one of
-either \code{"U"}, \code{"Rb"}, \code{"Rb85"}, \code{"Rb87"},
-\code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"}, \code{"Sr88"},
-\code{"Re"}, \code{"Re185"}, \code{"Re187"}, \code{"Os"},
-\code{"Os184"}, \code{"Os186"}, \code{"Os187"}, \code{"Os188"},
-\code{"Os189"}, \code{"Os190"}, or \code{"Os192"}) PLUS
-(optionally) the molar mass and its analytical error.  Omitting
-these two numbers simply returns the existing values.
+\item for \code{'imass'}: the (isotopic) molar mass of interest
+(one of either \code{"U"}, \code{"Rb"}, \code{"Rb85"},
+\code{"Rb87"}, \code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"},
+\code{"Sr88"}, \code{"Re"}, \code{"Re185"}, \code{"Re187"},
+\code{"Os"}, \code{"Os184"}, \code{"Os186"}, \code{"Os187"},
+\code{"Os188"}, \code{"Os189"}, \code{"Os190"}, \code{"Os192"},
+\code{"Sm"} or \code{"Nd"}) PLUS (optionally) the molar mass and
+its analytical error.  Omitting these two numbers simply returns
+the existing values.
 
 \item for \code{'mindens'}: the mineral of interest (one of either
 \code{"apatite"} or \code{"zircon"}) PLUS the mineral
@@ -71,6 +72,7 @@ existing value.
 \value{
 if \code{setting=NA} and \code{fname=NA}, returns a
     \code{.json} string
+
 if \code{...} contains only the name of an isotope, isotopic ratio,
 element, or mineral and no new value, \code{settings} returns
 either a scalar with the existing value, or a two-element vector
@@ -128,7 +130,7 @@ pp.1999-2013.
 
 \item Ar: Renne, Paul R., et
 al. "Response to the comment by WH Schwarz et al. on "Joint
-determination of 40K decay constants and
+determination of \eqn{^{40}}K decay constants and
 \eqn{^{40}}Ar*/\eqn{^{40}}K for the Fish Canyon sanidine standard,
 and improved accuracy for \eqn{^{40}}Ar/\eqn{^{39}}Ar
 geochronology" by PR Renne et al.(2010)." Geochimica et

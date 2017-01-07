@@ -10,14 +10,14 @@
 #'     X-values, the Y-values, the analytical uncertainties of the
 #'     Y-values, and the correlation coefficients of the X- and
 #'     Y-values.
-#' @param sX standard errors of \code{X} OR \code{NULL} if X is a
+#' @param sX standard errors of \code{X} OR \code{NULL} if \code{X} is a
 #'     matrix or data frame
-#' @param Y vector of measurements with the same length as X OR
-#'     \code{NULL} if X is a matrix or data frame
-#' @param sY standard errors of \code{Y} OR \code{NULL} if X is a
+#' @param Y vector of measurements with the same length as \code{X} OR
+#'     \code{NULL} if \code{X} is a matrix or data frame
+#' @param sY standard errors of \code{Y} OR \code{NULL} if \code{X} is a
 #'     matrix or data frame
-#' @param rXY correlation coefficients between X and Y OR \code{NULL}
-#'     if X is a matrix or data frame
+#' @param rXY correlation coefficients between \code{X} and \code{Y}
+#'     OR \code{NULL} if \code{X} is a matrix or data frame
 #' @return a three-element list of vectors containing:
 #'     \describe{
 #'     \item{a}{the intercept of the straight line fit and its

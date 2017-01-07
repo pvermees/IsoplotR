@@ -26,6 +26,9 @@
 #'     ternary diagram if \code{fact=NA}, these will be determined
 #'     automatically
 #' @param ... optional arguments to the generic \code{plot} function
+#' @references
+#' Vermeesch, P., 2010. HelioPlot, and the treatment of overdispersed
+#' (U-Th-Sm)/He data. Chemical Geology, 271(3), pp.108-111.
 #' @examples
 #' data(examples)
 #' helioplot(examples$UThHe)

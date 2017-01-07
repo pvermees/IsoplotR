@@ -5,8 +5,8 @@
 #'
 #' @param x either a file name (\code{.csv} format) OR a matrix
 #' @param method one of \code{'U-Pb'}, \code{'Ar-Ar'},
-#'     \code{'detritals'} \code{'U-Th-He'}, \code{'fissiontracks'} or
-#'     \code{'other'}
+#'     \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os},
+#'     \code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
 #' 
@@ -61,6 +61,14 @@
 #'
 #' \code{file.show(system.file("ReOs.csv",package="IsoplotR"))}
 #'
+#' \item \code{method = 'Rb-Sr'}:
+#'
+#' \code{file.show(system.file("RbSr.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'Sm-Nd'}:
+#'
+#' \code{file.show(system.file("SmNd.csv",package="IsoplotR"))}
+#'
 #' \item \code{method = 'U-Th-He'}:
 #'
 #' \code{file.show(system.file("UThHe.csv",package="IsoplotR"))}
@@ -83,7 +91,8 @@
 #' }
 #' @param ... optional arguments to the \code{read.csv} function
 #' @return an object of class \code{UPb}, \code{ArAr}, \code{UThHe},
-#'     \code{detritals}, \code{fissiontracks} or \code{other}
+#'     \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{detritals},
+#'     \code{fissiontracks} or \code{other}
 #' @examples
 #' # load one of the built-in .csv files:
 #' data(examples)
