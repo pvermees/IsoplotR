@@ -301,7 +301,8 @@ normal.mixtures <- function(x,k,sigdig=2,...){
 binomial.mixtures <- function(x,k,exterr=TRUE,...){
     yu <- x$x[,'Ns']
     mu <- x$x[,'Ns'] + x$x[,'Ni']
-    theta <- (x$x[,'Ns']/x$x[,'Ni'])/(1+x$x[,'Ns']/x$x[,'Ni'])
+    NsNi <- (x$x[,'Ns']+0.5)/(x$x[,'Ni']+0.5)
+    theta <- NsNi/(1+NsNi)
     thetai <- seq(min(theta),max(theta),length.out=k)
     pii <- rep(1,k)/k
     n <- length(yu)
@@ -333,14 +334,14 @@ binomial.mixtures <- function(x,k,exterr=TRUE,...){
         biu[,i] <- (yu-thetai[i]*mu)^2 - thetai[i]*(1-thetai[i])*mu
     }
     E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
-    theta.var <- diag(E)[k:(2*k-1)]
-    pe <- theta2age(x,thetai,theta.var,exterr)
+    beta.var <- diag(E)[k:(2*k-1)]
+    pe <- theta2age(x,thetai,beta.var,exterr)
     props.err <- get.props.err(E)
     list(L=L,peaks=pe$peaks,props=pii,
          peaks.err=pe$peaks.err,props.err=props.err)
 }
 
-theta2age <- function(x,theta,theta.var,exterr=TRUE){
+theta2age <- function(x,theta,beta.var,exterr=TRUE){
     rhoD <- x$rhoD
     zeta <- x$zeta
     if (!exterr) {
@@ -352,11 +353,10 @@ theta2age <- function(x,theta,theta.var,exterr=TRUE){
     peaks.err <- rep(0,k)
     for (i in 1:k){
         NsNi <- theta[i]/(1-theta[i])
-        relErrNsNi <- theta.var[i]/theta[i]^2
         L8 <- lambda('U238')[1]
         peaks[i] <- log(1+0.5*L8*(zeta[1]/1e6)*rhoD[1]*(NsNi))/L8
-        peaks.err[i] <- peaks[i]*sqrt(relErrNsNi +
-                                      (rhoD[2]/rhoD[1])^2 + (zeta[2]/zeta[1])^2)
+        peaks.err[i] <- peaks[i]*sqrt(beta.var[i] +
+                        (rhoD[2]/rhoD[1])^2 + (zeta[2]/zeta[1])^2)
     }
     list(peaks=peaks,peaks.err=peaks.err)
 }

@@ -62,7 +62,7 @@ dataset of dispersed zircon fission track ages from Brandon and
 Vance (1992).
 }
 \examples{
-data(examples)
+data(example)
 concordia(examples$UPb)
 dev.new()
 kde(examples$DZ)
@@ -82,8 +82,8 @@ Galbraith, R. F. and Green, P. F., 1990: Estimating the component
 ages in a finite mixture, Nuclear Tracks and Radiation
 Measurements, 17, 197-206.
 
-Ludwig, K. R. User's manual for Isoplot 3.00: a geochronological
-    toolkit for Microsoft Excel. No. 4. Kenneth R. Ludwig, 2003.
+Ludwig, K. R., 2003. User's manual for Isoplot 3.00: a
+    geochronological toolkit for Microsoft Excel. No. 4.
 
 Lugmair, G.W., Scheinin, N.B. and Marti, K., 1975. Sm-Nd age and
 history of Apollo 17 basalt 75075-Evidence for early
@@ -99,7 +99,7 @@ Vermeesch, P. and Garzanti, E., 2015. Making geological sense of
 'Big Data' in sedimentary provenance analysis. Chemical Geology, 409,
 pp.20-27.
 
-Vermeesch, P., 2008. Three new ways to calculate average (U–Th)/He ages.
+Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He ages.
 Chemical Geology, 249(3),pp.339-347.
 }
 
