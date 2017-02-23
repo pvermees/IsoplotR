@@ -62,9 +62,13 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,...){
     if (k == 0) return(NULL)
     if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
     if (x$format == 1 & !identical(k,'min'))
-        out <- binomial.mixtures(x,k,...)
-    else
+        out <- binomial.mixtures(x,k,exterr=exterr,...)
+    else if (x$format == 2){
+        out <- peakfit.helper(x,k=k,sigdig=sigdig,log=log,
+                              exterr=exterr,...)
+    } else if (x$format == 3){
         out <- ages2peaks(x,k,log=log)
+    }
     out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
 }
@@ -133,6 +137,7 @@ peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
     if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
     fit <- ages2peaks(x,k=k,log=log,i2i=i2i)
     if (exterr){
+        age.with.exterr <- c(0,0)
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
         for (i in 1:numpeaks){
@@ -148,6 +153,9 @@ peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
             } else if (hasClass(x,'ReOs')|hasClass(x,'SmNd')|hasClass(x,'RbSr')){
                 R <- get.ReOs.ratio(fit$peaks[i],fit$peaks.err[i],exterr=FALSE)
                 age.with.exterr <- get.ReOs.age(R[1],R[2],exterr=TRUE)
+            } else if (hasClass(x,'fissiontracks')){
+                age.with.exterr[2] <- fit$peaks[i] *
+                    sqrt( (x$zeta[2]/x$zeta[1])^2 + (fit$peaks.err[i]/fit$peaks[i])^2 )
             }
             fit$peaks.err[i] <- age.with.exterr[2]
         }

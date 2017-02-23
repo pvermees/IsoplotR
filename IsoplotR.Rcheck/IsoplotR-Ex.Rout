@@ -258,7 +258,8 @@ $p.value$concordance
 > 
 > ### ** Examples
 > 
-> data(examples)
+> data(example)
+Warning in data(example) : data set ‘example’ not found
 > concordia(examples$UPb)
 > dev.new()
 > kde(examples$DZ)
@@ -401,19 +402,19 @@ $L
 [1] -71.94616
 
 $peaks
-[1] 103.4581 103.4602
+[1] 103.4585 103.4604
 
 $props
-[1] 0.3054743 0.6945257
+[1] 0.4118593 0.5881407
 
 $peaks.err
-[1] 80.40549 53.36663
+[1] 13.65063 11.53875
 
 $props.err
-[1] 3627.387 3627.387
+[1] 4143.565 4143.565
 
 $legend
-[1] "Peak 1: 100±80 (30±360000%)" "Peak 2: 100±53 (70±360000%)"
+[1] "Peak 1: 103±14 (40±410000%)" "Peak 2: 103±12 (60±410000%)"
 
 > 
 > 
@@ -590,7 +591,7 @@ $legend
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  5.004 0.132 5.002 0 0 
+Time elapsed:  5.364 0.2 5.374 0 0 
 > grDevices::dev.off()
 pdf 
   2 

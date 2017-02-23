@@ -158,7 +158,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(examples)
+data(example)
 concordia(examples$UPb)
 dev.new()
 kde(examples$DZ)

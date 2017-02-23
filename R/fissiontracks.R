@@ -173,7 +173,7 @@ EDM.age <- function(x,i=NA,sigdig=2,exterr=TRUE){
 }
 
 # zeta and rhoD are two-element vectors
-get.EDM.age <- function(Ns,Ni,zeta,rhoD){
+get.EDM.age <- function(Ns,Ni,zeta,rhoD=c(1,0)){
     L8 <- lambda('U238')[1]
     if (Ns<1){
         Ns <- Ns+0.5
