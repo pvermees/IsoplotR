@@ -8,7 +8,7 @@ get.covmat.UPb <- function(x,i,...){
     out <- matrix(rep(0,16),nrow=4)
     rownames(out) <- c('Pb207U235','Pb206U238','U238Pb206','Pb207Pb206')
     colnames(out) <- rownames(out)
-    if (x$format == 1){
+    if (x$format %in% c(1,2,3)){
         out['Pb207U235','Pb207U235'] <- x$x[i,'errPb207U235']^2
         out['Pb206U238','Pb206U238'] <- x$x[i,'errPb206U238']^2
         out['U238Pb206','U238Pb206'] <- x$x[i,'errU238Pb206']^2

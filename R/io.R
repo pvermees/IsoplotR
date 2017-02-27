@@ -10,6 +10,14 @@
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
 #' 
+#' if \code{method = 'U-Pb'}, then \code{format} is one of either:
+#'
+#' \enumerate{
+#' \item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
+#' \item{\code{8/6, s[8/6], 7/6, s[7/6], rho}}
+#' \item{\code{7/6, s[7/6], 7/5, s[7/5], 6/8, s[6/8], 7/5, s[7/5]}}
+#' }
+#'
 #' if \code{method = 'Ar-Ar'}, then \code{format} is one of either:
 #'
 #' \enumerate{
@@ -45,9 +53,17 @@
 #' \code{system.file(...)} function:
 #'
 #' \enumerate{
-#' \item \code{method = 'U-Pb'}:
+#' \item \code{method = 'U-Pb'} and \code{format = 1}:
 #'
-#' \code{file.show(system.file("UPb.csv",package="IsoplotR"))}
+#' \code{file.show(system.file("UPb1.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'U-Pb'} and \code{format = 2}:
+#'
+#' \code{file.show(system.file("UPb2.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'U-Pb'} and \code{format = 3}:
+#'
+#' \code{file.show(system.file("UPb3.csv",package="IsoplotR"))}
 #'
 #' \item \code{method = 'Ar-Ar'} and \code{format = 1}:
 #'
@@ -102,15 +118,15 @@
 read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
-read.data.default <- function(x,method='U-Pb',format=1,...){
+read.data.default <- function(x,method='U-Pb',format=1,exterr=FALSE,...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
-    read.data.matrix(X,method=method,format=format)
+    read.data.matrix(X,method=method,format=format,exterr=exterr)
 }
 #' @rdname read.data
 #' @export
-read.data.matrix <- function(x,method='U-Pb',format=1,...){
+read.data.matrix <- function(x,method='U-Pb',format=1,exterr=FALSE,...){
     if (identical(method,'U-Pb')){
-        out <- as.UPb(x,format)
+        out <- as.UPb(x,format,exterr=exterr)
     } else if (identical(method,'Ar-Ar')){
         out <- as.ArAr(x,format)
     } else if (identical(method,'Re-Os')){
@@ -131,15 +147,29 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
     out
 }
 
-as.UPb <- function(x,format=1){
+as.UPb <- function(x,format=1,exterr=FALSE){
     out <- list()
     class(out) <- "UPb"
     out$x <- NA
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
-    if (format == 1 & nc == 6){
-        X <- x2X(x,2,nr,nc)
+    X <- shiny2matrix(x,2,nr,nc)
+    cnames <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
+                'U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')
+    if (format == 1 & nc == 5){
+        colnames(X) <- c('Pb207U235','errPb207U235',
+                         'Pb206U238','errPb206U238',
+                         'rho')
+        Y <- format1to2(X,exterr=exterr)
+        out$x <- cbind(X[,c('Pb207U235','errPb207U235','Pb206U238','errPb206U238')],
+                       Y[,c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')])
+    } else if (format == 2 & nc == 4) {
+        colnames(X) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')
+        Y <- format2to1(X,exterr=exterr)
+        out$x <- cbind(Y[,c('Pb207U235','errPb207U235','Pb206U238','errPb206U238')],
+                       X[,c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')])
+    } else if (format == 3 & nc == 6){
         colnames(X) <- c('Pb207Pb206','errPb207Pb206',
                          'Pb206U238','errPb206U238',
                          'Pb207U235','errPb207U235')
@@ -148,11 +178,52 @@ as.UPb <- function(x,format=1){
         out$x <- cbind(X[,c('Pb207U235','errPb207U235','Pb206U238','errPb206U238')],
                        U238Pb206, errU238Pb206,
                        X[,c('Pb207Pb206','errPb207Pb206')])
-        colnames(out$x) <- c('Pb207U235','errPb207U235',
-                             'Pb206U238','errPb206U238',
-                             'U238Pb206','errU238Pb206',
-                             'Pb207Pb206','errPb207Pb206')
     }
+    colnames(out$x) <- cnames
+    out
+}
+format1to2 <- function(X,exterr=FALSE){
+    out <- NULL
+    U238U235 <- iratio('U238U235')[1]
+    U238Pb206 <- 1/X[,'Pb206U238']
+    Pb207Pb206 <- X[,'Pb207U235']/(X[,'Pb206U238']*U238U235)
+    J <- matrix(0,2,3)
+    covmat <- matrix(0,3,3)
+    covmat[3,3] <- iratio('U238U235')[2]^2
+    for (i in 1:nrow(X)){
+        J[1,2] <- -1/X[i,'Pb206U238']^2
+        J[2,1] <- 1/(X[i,'Pb206U238']*U238U235)
+        J[2,2] <- -Pb207Pb206[i]/X[i,'Pb206U238']
+        if (exterr) J[2,3] <- -Pb207Pb206[i]/U238U235
+        covmat[1:2,1:2] <- cor2cov(X[i,'errPb207U235'],X[i,'errPb206U238'],X[i,'rho'])
+        E <- J %*% covmat %*% t(J)
+        out <- rbind(out,c(U238Pb206[i],sqrt(E[1,1]),
+                           Pb207Pb206[i],sqrt(E[2,2]),E[1,2]))
+    }
+    colnames(out) <- c('U238Pb206','errU238Pb206',
+                       'Pb207Pb206','errPb207Pb206','rho')
+    out
+}
+format2to1 <- function(X,exterr=FALSE){
+    out <- NULL
+    U238U235 <- iratio('U238U235')[1]
+    Pb207U235 <- U238U235*X[,'Pb207Pb206']/X[,'U238Pb206']
+    Pb206U238 <- 1/X[,'U238Pb206']
+    J <- matrix(0,2,3)
+    covmat <- matrix(0,3,3)
+    covmat[3,3] <- iratio('U238U235')[2]^2
+    for (i in 1:nrow(X)){
+        J[1,1] <- -Pb207U235[i]/X[i,'U238Pb206']
+        J[1,2] <- U238U235/X[i,'U238Pb206']
+        if (exterr) J[1,3] <- X[i,'Pb207Pb206']/X[i,'U238Pb206']
+        J[2,1] <- -1/X[i,'U238Pb206']^2
+        covmat[1:2,1:2] <- cor2cov(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],0)
+        E <- J %*% covmat %*% t(J)
+        out <- rbind(out,c(Pb207U235[i],sqrt(E[1,1]),
+                           Pb206U238[i],sqrt(E[2,2]),E[1,2]))
+    }
+    colnames(out) <- c('Pb207U235','errPb207U235',
+                       'Pb206U238','errPb206U238','rho')
     out
 }
 as.ArAr <- function(x,format=2){
@@ -163,7 +234,7 @@ as.ArAr <- function(x,format=2){
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        X <- x2X(x,4,nr,nc)
+        X <- shiny2matrix(x,4,nr,nc)
         colnames(X) <- c('Ar39Ar40','errAr39Ar40',
                          'Ar36Ar40','errAr36Ar40',
                          'Ar39Ar36','errAr39Ar36')
@@ -175,7 +246,7 @@ as.ArAr <- function(x,format=2){
                              'Ar39Ar36','errAr39Ar36',
                              'Ar40Ar36','errAr40Ar36')
     } else if (format == 2 & nc == 7){
-        X <- x2X(x,4,nr,nc)
+        X <- shiny2matrix(x,4,nr,nc)
         colnames(X) <- c('Ar39',
                          'Ar39Ar40','errAr39Ar40',
                          'Ar36Ar40','errAr36Ar40',
@@ -199,7 +270,7 @@ as.RbSr <- function(x,format=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        X <- x2X(x,2,nr,nc)
+        X <- shiny2matrix(x,2,nr,nc)
         colnames(X) <- c('Rbppm','errRbppm',
                          'Srppm','errSrppm',
                          'Sr87Sr86','errSr87Sr86')
@@ -215,7 +286,7 @@ as.ReOs <- function(x,format=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        X <- x2X(x,2,nr,nc)
+        X <- shiny2matrix(x,2,nr,nc)
         colnames(X) <- c('Reppm','errReppm',
                          'Osppm','errOsppm',
                          'Os187Os188','errOs187Os188')
@@ -231,7 +302,7 @@ as.SmNd <- function(x,format=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (format == 1 & nc == 6){
-        X <- x2X(x,2,nr,nc)
+        X <- shiny2matrix(x,2,nr,nc)
         colnames(X) <- c('Smppm','errSmppm',
                          'Ndppm','errNdppm',
                          'Nd143Nd144','errNd143Nd144')
@@ -243,7 +314,7 @@ as.UThHe <- function(x){
     nc <- ncol(x)
     nr <- nrow(x)
     out <- matrix(0,nr-1,nc)
-    out[1:(nr-1),1:nc] <- x2X(x,2,nr,nc)
+    out[1:(nr-1),1:nc] <- shiny2matrix(x,2,nr,nc)
     if (nc==8) {
         colnames(out) <- c('He','errHe','U','errU','Th','errTh','Sm','errSm')
     } else if (nc==6) {
@@ -263,8 +334,8 @@ as.fissiontracks <- function(x,format=1){
     if (format==1){
         out$zeta <- as.numeric(x[2,1:2])
         out$rhoD <- as.numeric(x[4,1:2])
-        X <- x2X(x,6,nr,2)
-        out$x <- x2X(x,6,nr,2)
+        X <- shiny2matrix(x,6,nr,2)
+        out$x <- shiny2matrix(x,6,nr,2)
         colnames(out$x) <- c('Ns','Ni')
     } else {
         if (format==2){
@@ -298,7 +369,7 @@ as.detritals <- function(x){
     nr <- nrow(x)
     nc <- ncol(x)
     snames <- x[1,]
-    X <- x2X(x,2,nr,nc)
+    X <- shiny2matrix(x,2,nr,nc)
     colnames(X) <- snames
     for (sname in snames){
         out[[sname]] = X[!is.na(X[,sname]),sname]
@@ -312,7 +383,9 @@ as.other <- function(x){
     matrix(as.numeric(x),ncol=nc)
 }
 
-x2X <- function(x,br,nr,nc){
+# x = a numerical vector, br = length of the preamble with parameters
+# nr = number of rows, nc = number of columns
+shiny2matrix <- function(x,br,nr,nc){
     suppressWarnings(
         return(matrix(as.numeric(x[(br:nr),]),nr-br+1,nc))
     )
