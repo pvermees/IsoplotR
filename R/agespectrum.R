@@ -13,7 +13,7 @@
 #' 
 #' OR
 #' 
-#' an object of class \code{ArAr} with \code{format=2}
+#' an object of class \code{ArAr}
 #' 
 #' @param alpha the confidence limits of the error bars/boxes.
 #' @param plateau logical flag indicating whether a plateau age should
@@ -57,6 +57,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 sigdig=2,line.col='red',lwd=2,
                                 title=TRUE,...){
     ns <- nrow(x)
+    print(x)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
@@ -97,11 +98,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              exterr=TRUE,line.col='red',lwd=2,
                              i2i=FALSE,...){
     tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
-    if (x$format==2){
-        X <- cbind(x$x[,'Ar39'],tt)
-    } else {
-        X <- cbind(seq(0,1,length.out=nrow(x$x)),tt)
-    }
+    X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
                                 plateau=plateau,sigdig=sigdig,line.col=line.col,

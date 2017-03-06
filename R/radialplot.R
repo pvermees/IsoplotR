@@ -340,7 +340,7 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA){
     if (is.na(transformation)) out$transformation <- 'log'
     else out$transformation <- transformation
     if (identical(transformation,'log')){
-        out$offset <- get.offset(x[,1]-2*x[,2],from)
+        out$offset <- get.offset(x[,1],from)
         out$z <- log(x[,1]+out$offset)
         out$s <- x[,2]/(x[,1]+out$offset)
         if (out$offset>0){

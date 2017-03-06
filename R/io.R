@@ -18,13 +18,6 @@
 #' \item{\code{7/6, s[7/6], 7/5, s[7/5], 6/8, s[6/8], 7/5, s[7/5]}}
 #' }
 #'
-#' if \code{method = 'Ar-Ar'}, then \code{format} is one of either:
-#'
-#' \enumerate{
-#' \item{\code{39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]}}
-#' \item{\code{39, 39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]}}
-#' }
-#'
 #' if \code{method = 'fissiontracks'}, then \code{format} is one of
 #' either:
 #'
@@ -65,13 +58,9 @@
 #'
 #' \code{file.show(system.file("UPb3.csv",package="IsoplotR"))}
 #'
-#' \item \code{method = 'Ar-Ar'} and \code{format = 1}:
+#' \item \code{method = 'Ar-Ar'}:
 #'
-#' \code{file.show(system.file("ArAr1.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'Ar-Ar'} and \code{format = 2}:
-#'
-#' \code{file.show(system.file("ArAr2.csv",package="IsoplotR"))}
+#' \code{file.show(system.file("ArAr.csv",package="IsoplotR"))}
 #'
 #' \item \code{method = 'Re-Os'}:
 #'
@@ -164,8 +153,10 @@ as.UPb <- function(x,format=1,exterr=FALSE){
         Y <- format1to2(X,exterr=exterr)
         out$x <- cbind(X[,c('Pb207U235','errPb207U235','Pb206U238','errPb206U238')],
                        Y[,c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')])
-    } else if (format == 2 & nc == 4) {
-        colnames(X) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')
+    } else if (format == 2 & nc %in% c(4,5)) {
+        cn <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')
+        if (nc==4) colnames(X) <- cn
+        else colnames(X) <- c(cn,'rho')
         Y <- format2to1(X,exterr=exterr)
         out$x <- cbind(Y[,c('Pb207U235','errPb207U235','Pb206U238','errPb206U238')],
                        X[,c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206')])
@@ -212,12 +203,16 @@ format2to1 <- function(X,exterr=FALSE){
     J <- matrix(0,2,3)
     covmat <- matrix(0,3,3)
     covmat[3,3] <- iratio('U238U235')[2]^2
-    for (i in 1:nrow(X)){
+    nr <- nrow(X)
+    nc <- ncol(X)
+    rho <- 0
+    for (i in 1:nr){
         J[1,1] <- -Pb207U235[i]/X[i,'U238Pb206']
         J[1,2] <- U238U235/X[i,'U238Pb206']
         if (exterr) J[1,3] <- X[i,'Pb207Pb206']/X[i,'U238Pb206']
         J[2,1] <- -1/X[i,'U238Pb206']^2
-        covmat[1:2,1:2] <- cor2cov(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],0)
+        if (nc==5) rho <- X[i,'rho']
+        covmat[1:2,1:2] <- cor2cov(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],rho)
         E <- J %*% covmat %*% t(J)
         out <- rbind(out,c(Pb207U235[i],sqrt(E[1,1]),
                            Pb206U238[i],sqrt(E[2,2]),E[1,2]))
@@ -226,40 +221,40 @@ format2to1 <- function(X,exterr=FALSE){
                        'Pb206U238','errPb206U238','rho')
     out
 }
-as.ArAr <- function(x,format=2){
+as.ArAr <- function(x,format=1){
     out <- list()
     class(out) <- "ArAr"
     out$format <- format
     out$J <- as.numeric(x[2,1:2])
     nc <- ncol(x)
     nr <- nrow(x)
-    if (format == 1 & nc == 6){
-        X <- shiny2matrix(x,4,nr,nc)
+    bi <- 4 # begin index
+    if (nc == 6){
+        X <- shiny2matrix(x,bi,nr,nc)
         colnames(X) <- c('Ar39Ar40','errAr39Ar40',
                          'Ar36Ar40','errAr36Ar40',
                          'Ar39Ar36','errAr39Ar36')
+        ns <- nr-bi+1 # number of samples
+        Ar39 <- rep(1/ns,ns)
         Ar40Ar36 <- 1/X[,'Ar36Ar40']
         errAr40Ar36 <- X[,'errAr36Ar40']/X[,'Ar36Ar40']^2
-        out$x <- cbind(X,Ar40Ar36,errAr40Ar36)
-        colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
-                             'Ar36Ar40','errAr36Ar40',
-                             'Ar39Ar36','errAr39Ar36',
-                             'Ar40Ar36','errAr40Ar36')
-    } else if (format == 2 & nc == 7){
-        X <- shiny2matrix(x,4,nr,nc)
-        colnames(X) <- c('Ar39',
-                         'Ar39Ar40','errAr39Ar40',
+        out$x <- cbind(X,Ar39,Ar40Ar36,errAr40Ar36)
+    } else if (nc == 7){
+        X <- shiny2matrix(x,bi,nr,nc)
+        colnames(X) <- c('Ar39Ar40','errAr39Ar40',
                          'Ar36Ar40','errAr36Ar40',
-                         'Ar39Ar36','errAr39Ar36')
+                         'Ar39Ar36','errAr39Ar36',
+                         'Ar39')
         Ar40Ar36 <- 1/X[,'Ar36Ar40']
         errAr40Ar36 <- X[,'errAr36Ar40']/X[,'Ar36Ar40']^2
         out$x <- cbind(X,Ar40Ar36,errAr40Ar36)
-        colnames(out$x) <- c('Ar39',
-                             'Ar39Ar40','errAr39Ar40',
-                             'Ar36Ar40','errAr36Ar40',
-                             'Ar39Ar36','errAr39Ar36',
-                             'Ar40Ar36','errAr40Ar36')
     }
+    colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
+                         'Ar36Ar40','errAr36Ar40',
+                         'Ar39Ar36','errAr39Ar36',
+                         'Ar39',
+                         'Ar40Ar36','errAr40Ar36')
+    print(out)
     out
 }
 as.RbSr <- function(x,format=1){
