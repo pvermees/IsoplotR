@@ -198,7 +198,7 @@ plot.helioplot.contours <- function(x,fact=c(1,1,1),
 helioplot.title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
     line1 <- substitute('central age ='~a%+-%b~'[Ma] (1'~sigma~')',
-                        list(a=rounded.age$x, b=rounded.age$err))
+                        list(a=rounded.age[1], b=rounded.age[2]))
     line2 <- substitute('MSWD (concordance) ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,2),
                              b=signif(fit$p.value,2)))

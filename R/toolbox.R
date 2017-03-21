@@ -37,14 +37,11 @@ unzip.vector <- function(x,nc=2){
 }
 
 roundit <- function(age,err,sigdig=2){
-    out <- list()
-    if (is.na(sigdig)){
-        out$x <- age
-        out$err <- err
-    } else {
-        out$err <- signif(err,sigdig)
+    out <- c(age,err)
+    if (!is.na(sigdig)){
+        out[2] <- signif(err,sigdig)
         nd <- log10(trunc(abs(age)/err))+sigdig
-        out$x <- signif(age,nd)
+        out[1] <- signif(age,nd)
     }
     out
 }
@@ -86,15 +83,24 @@ get.cov.xzyz <- function(xz,err.xz,yz,err.yz,err.xy){
     xy <- xz/yz
     0.5*xz*yz*((err.xz/xz)^2 + (err.yz/yz)^2 - (err.xy/xy)^2)
 }
+get.cor.xzyz <- function(xz,err.xz,yz,err.yz,err.xy){
+    get.cov.xzyz(xz,err.xz,yz,err.yz,err.xy)/(err.xz*err.yz)
+}
 
 get.cov.zxzy <- function(zx,err.zx,zy,err.zy,err.xy){
     xy <- zy/zx
     0.5*zx*zy*((err.zy/zy)^2 + (err.zx/zx)^2 - (err.xy/xy)^2)
 }
+get.cor.zxzy <- function(zx,err.zx,zy,err.zy,err.xy){
+    get.cov.zxzy(zx,err.zx,zy,err.zy,err.xy)/(err.zx*err.zy)
+}
 
 get.cov.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
     xy <- xz*zy
     0.5*xz*zy*((err.xy/xy)^2 - (err.xz/xz)^2 - (err.zy/zy)^2)
+}
+get.cor.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
+    get.cov.xzzy(xz,err.xz,zy,err.zy,err.xy)/(err.xz*err.zy)
 }
 
 hasClass <- function(x,classname){
@@ -106,3 +112,9 @@ get.covmat.default <- function(x,i,...){ stop('Invalid input into covmat() funct
 
 get.selection <- function(x,...){ UseMethod("get.selection",x) }
 get.selection.default <- function(x,...){ x }
+
+# negative multivariate log likelihood to be fed into R's optim function
+LL.norm <- function(x,covmat){
+    log(2*pi) + 0.5*determinant(covmat,logarithmic=TRUE)$modulus +
+                                0.5*get.concordia.SS(x,covmat)
+}

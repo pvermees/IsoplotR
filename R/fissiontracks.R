@@ -74,9 +74,9 @@ set.zeta <- function(x,tst=c(0,0),exterr=TRUE,update=TRUE,sigdig=2){
     zsz <- roundit(zeta,zetaErr,sigdig=sigdig)
     if (update){
         out <- x
-        out$zeta <- c(zsz$x,zsz$err)
+        out$zeta <- zsz
     } else {
-        out <- matrix(c(zsz$x,zsz$err),1,2)
+        out <- matrix(zsz,1,2)
         colnames(out) <- c('zeta','s[zeta]')
     }
     out
@@ -108,8 +108,7 @@ ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
         tt[i] <- tst[1]
         st[i] <- tst[2]
     }
-    tst <- roundit(tt,st,sigdig=sigdig)
-    out <- cbind(tst$x,tst$err)
+    out <- roundit(tt,st,sigdig=sigdig)
     colnames(out) <- c('t','s[t]')
     out
 }
@@ -165,8 +164,7 @@ EDM.age <- function(x,i=NA,sigdig=2,exterr=TRUE){
     }
     for (j in 1:ns){
         tt <- get.EDM.age(x$x[j,'Ns'],x$x[j,'Ni'],zeta,rhoD)
-        t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
-        out[j,] <- c(t.out$x,t.out$err)
+        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
     }
     if (!is.na(i)) out <- out[i,]
     out

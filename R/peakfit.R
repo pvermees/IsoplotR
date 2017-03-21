@@ -137,26 +137,10 @@ peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
     if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
     fit <- ages2peaks(x,k=k,log=log,i2i=i2i)
     if (exterr){
-        age.with.exterr <- c(0,0)
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
         for (i in 1:numpeaks){
-            if (hasClass(x,'UPb')){
-                R <- get.ratios.UPb(tt=fit$peaks[i],st=fit$peaks.err[i],
-                                    exterr=TRUE,as.UPb=TRUE)
-                age.with.exterr <- filter.UPb.ages(R,type=type,cutoff.76=cutoff.76,
-                                                   cutoff.disc=cutoff.disc,exterr=TRUE)
-            } else if (hasClass(x,'ArAr')){
-                R <- get.ArAr.ratio(fit$peaks[i],fit$peaks.err[i],
-                                    x$J[1],0,exterr=FALSE)
-                age.with.exterr <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
-            } else if (hasClass(x,'ReOs')|hasClass(x,'SmNd')|hasClass(x,'RbSr')){
-                R <- get.ReOs.ratio(fit$peaks[i],fit$peaks.err[i],exterr=FALSE)
-                age.with.exterr <- get.ReOs.age(R[1],R[2],exterr=TRUE)
-            } else if (hasClass(x,'fissiontracks')){
-                age.with.exterr[2] <- fit$peaks[i] *
-                    sqrt( (x$zeta[2]/x$zeta[1])^2 + (fit$peaks.err[i]/fit$peaks[i])^2 )
-            }
+            age.with.exterr <- add.exterr(x,fit$peaks[i],fit$peaks.err[i])
             fit$peaks.err[i] <- age.with.exterr[2]
         }
     }
@@ -245,16 +229,16 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
     for (i in 1:length(fit$peaks)){
         rounded.age <- roundit(fit$peaks[i],fit$peaks.err[i],sigdig=sigdig)
         rounded.prop <- roundit(fit$props[i],fit$props.err[i],sigdig=sigdig)
-        line <- paste0('Peak ',i,': ',rounded.age$x,'\u00B1',
-                       rounded.age$err,' (',100*rounded.prop$x,'\u00B1',
-                       100*rounded.prop$err,'%)')
+        line <- paste0('Peak ',i,': ',rounded.age[1],'\u00B1',
+                       rounded.age[2],' (',100*rounded.prop[1],'\u00B1',
+                       100*rounded.prop[2],'%)')
         out <- c(out,line)
     }
     out
 }
 minage2legend <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$peaks,fit$peaks.err,sigdig=sigdig)
-    paste0('Minimum: ',rounded.age$x,'+/-',rounded.age$err)
+    paste0('Minimum: ',rounded.age[1],'+/-',rounded.age[2])
 }
 
 normal.mixtures <- function(x,k,sigdig=2,...){

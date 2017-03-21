@@ -1,12 +1,10 @@
 discordia.age <- function(x,wetherill=TRUE,exterr=TRUE){
-    out <- list()
-    selection <- get.selection(x,wetherill)
-    d <- data2york(x,selection)
-    fit <- yorkfit(d$X,d$sX,d$Y,d$sY,d$rXY)
+    d <- data2york(x,wetherill=wetherill)
+    fit <- yorkfit(d)
     itt <- concordia.intersection(fit,wetherill)
-    X <- UPb.preprocess(x,wetherill)
-    hess <- stats::optimHess(itt,LL.concordia.intersection, d=d,X=X,
+    hess <- stats::optimHess(itt,LL.concordia.intersection, d=d,x=x,
                              wetherill=wetherill,exterr=exterr)
+    out <- list()
     out$x <- itt
     out$cov <- solve(hess)
     out
@@ -15,27 +13,28 @@ discordia.age <- function(x,wetherill=TRUE,exterr=TRUE){
 # itt = output of the yorkfit function
 # d = output of UPb2york
 # X = output of UPb.preprocess
-LL.concordia.intersection <- function(itt,d,X,wetherill,exterr){
+LL.concordia.intersection <- function(itt,d,x,wetherill,exterr){
     LL <- 0
-    selection <- get.UPb.labels(wetherill)
-    XYl <- get.ratios.UPb(itt[1])$x[selection]
     if (wetherill){
-        XYu <- get.ratios.UPb(itt[2])$x[selection]
-        b <- (XYu[2]-XYl[2])/(XYu[1]-XYl[1])
-        a <- XYu[2]-b*XYu[1]
+        XYl <- age.to.wetherill.ratios(itt[1])
+        XYu <- age.to.wetherill.ratios(itt[2])
+        b <- (XYu$x[2]-XYl$x[2])/(XYu$x[1]-XYl$x[1])
+        a <- XYu$x[2]-b*XYu$x[1]
     } else {
+        XYl <- age.to.terawasserburg.ratios(itt[1])
         a <- itt[2]
-        b <- (XYl[2]-a)/XYl[1]
+        b <- (XYl$x[2]-a)/XYl$x[1]
     }
-    xy <- get.york.xy(d$X,d$sX,d$Y,d$sY,d$rXY,a,b)
-    mu <- cbind(d$X,d$Y)-xy
-    if (wetherill) disc <- (XYu[1]-xy[,1])/(XYu[1]-XYl[1])
-    else disc <- (XYl[1]-xy[,1])/XYl[1]
-    for (i in 1:length(X)){
-        covmat <- X[[i]]$cov
+    xy <- get.york.xy(d,a,b)
+    mu <- d[,c('X','Y')]-xy
+    if (wetherill) disc <- (XYu$x[1]-xy[,1])/(XYu$x[1]-XYl$x[1])
+    else disc <- (XYl$x[1]-xy[,1])/XYl$x[1]
+    for (i in 1:length(x)){
+        if (wetherill) samp <- wetherill(x,i)
+        else samp <- tera.wasserburg(x,i)
         if (exterr) {
             dcomp <- discordant.composition(disc[i],itt[1],itt[2],wetherill)
-            covmat <- covmat + dcomp$cov
+            covmat <- samp$cov + dcomp$cov
         }
         LL <- LL + LL.norm(matrix(mu[i,],1,2),covmat)
     }
@@ -44,11 +43,12 @@ LL.concordia.intersection <- function(itt,d,X,wetherill,exterr){
 
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection <- function(fit,wetherill){
+concordia.intersection <- function(fit,wetherill=TRUE){
     if (wetherill){
         search.range <- c(0,10000)
         midpoint <- stats::optimize(intersection.misfit, search.range,
-                                    a=fit$a[1], b=fit$b[1], wetherill=wetherill)$minimum
+                                    a=fit$a[1], b=fit$b[1],
+                                    wetherill=wetherill)$minimum
         range1 <- c(-1000,midpoint)
         range2 <- c(midpoint,10000)
         tt <- search.range # tl, tu
@@ -57,19 +57,23 @@ concordia.intersection <- function(fit,wetherill){
         tt[2] <- stats::uniroot(intersection.misfit, range2, 
                                 a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
         out <- tt
+        names(out) <- c('t[l]','t[u]')
     } else {
         search.range <- c(1/10000,10000)
         it <- c(1,fit$a[1]) # tl, 7/6 intercept
+        names(it) <- c('t[l]','Pb207Pb206')
         if (fit$b[1]<0) { # negative slope => two intersections with concordia line
             midpoint <- stats::optimize(intersection.misfit, search.range,
-                                        a=fit$a[1], b=fit$b[1], wetherill=wetherill)$minimum
+                                        a=fit$a[1], b=fit$b[1],
+                                        wetherill=wetherill)$minimum
             search.range[2] <- midpoint
             it[1] <- stats::uniroot(intersection.misfit, search.range, 
-                                    a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
-            out <- it
+                                    a=fit$a[1], b=fit$b[1],
+                                    wetherill=wetherill)$root
         } else {
             it[1] <- stats::uniroot(intersection.misfit, search.range,
-                                    a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
+                                    a=fit$a[1], b=fit$b[1],
+                                    wetherill=wetherill)$root
         }
         out <- it
     }
@@ -82,11 +86,10 @@ intersection.misfit <- function(age,a,b,wetherill){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     R <- iratio('U238U235')[1]
-    if (wetherill){
+    if (wetherill)
         out <- a-b+1 + b*exp(l5*age) - exp(l8*age)
-    } else {
+    else
         out <- (exp(l5*age)-1)/(exp(l8*age)-1) - a*R - b*R/(exp(l8*age)-1)
-    }
     out
 }
 
@@ -132,32 +135,20 @@ discordant.composition <- function(d,tl,itu,wetherill=TRUE){
     covmat <- J %*% E %*% t(J)
     out$x <- c(X,Y)
     out$cov <- covmat
-    labels <- get.UPb.labels(wetherill)
-    names(out$x) <- labels
-    rownames(out$cov) <- labels
-    colnames(out$cov) <- labels
     out
 }
 
-# negative multivariate log likelihood to be fed into R's optim function
-LL.norm <- function(x,covmat){
-    log(2*pi) + 0.5*determinant(covmat,logarithmic=TRUE)$modulus + 0.5*get.concordia.SS(x,covmat)
-}
-
-get.concordia.SS <- function(x,covmat){
-    x %*% solve(covmat) %*% t(x)
-}
-
 discordia.plot <- function(fit,wetherill=TRUE){
-    selection <- get.UPb.labels(wetherill)
-    comp.l <- get.ratios.UPb(fit$x[1])$x[selection]
+    X <- c(0,0)
+    Y <- c(0,0)
     if (wetherill) {
-        comp.u <- get.ratios.UPb(fit$x[2])$x[selection]
+        X <- age.to.Pb207U235.ratio(fit$x)[,'75']
+        Y <- age.to.Pb206U238.ratio(fit$x)[,'68']
     } else {
-        comp.u <- c(0,fit$x[2])
+        X[1] <- age.to.U238Pb206.ratio(fit$x['t[l]'])[,'86']
+        Y[1] <- age.to.Pb207Pb206.ratio(fit$x['t[l]'])[,'76']
+        Y[2] <- fit$x['Pb207Pb206']
     }
-    X <- c(comp.l[1],comp.u[1])
-    Y <- c(comp.l[2],comp.u[2])
     graphics::lines(X,Y)
 }
 
@@ -166,16 +157,16 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         lower.age <- roundit(fit$x[1],sqrt(fit$cov[1,1]),sigdig=sigdig)
         upper.age <- roundit(fit$x[2],sqrt(fit$cov[2,2]),sigdig=sigdig)
         line1 <- substitute('lower intercept ='~a%+-%b~'[Ma]',
-                            list(a=lower.age$x, b=lower.age$err))
+                            list(a=lower.age[1], b=lower.age[2]))
         line2 <- substitute('upper intercept ='~a%+-%b~'[Ma]',
-                            list(a=upper.age$x, b=upper.age$err))
+                            list(a=upper.age[1], b=upper.age[2]))
     } else {
         lower.age <- roundit(fit$x[1],sqrt(fit$cov[1,1]),sigdig=sigdig)
         intercept <- roundit(fit$x[2],sqrt(fit$cov[2,2]),sigdig=sigdig)
         line1 <- substitute('age ='~a%+-%b~'[Ma]',
-                            list(a=lower.age$x, b=lower.age$err))
+                            list(a=lower.age[1], b=lower.age[2]))
         line2 <- substitute('('^207*'Pb/'^206*'Pb)'[0]~'='~a%+-%b,
-                              list(a=intercept$x, b=intercept$err))
+                              list(a=intercept[1], b=intercept[2]))
     }
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)

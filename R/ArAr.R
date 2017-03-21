@@ -8,7 +8,7 @@ get.covmat.ArAr <- function(x,i,...){
     out <- matrix(rep(0,16),nrow=4)
     rownames(out) <- c('Ar39Ar40','Ar36Ar40','Ar39Ar36','Ar40Ar36')
     colnames(out) <- rownames(out)
-    if (x$format == 1 | x$format == 2){
+    if (x$format == 1){
         out['Ar39Ar40','Ar39Ar40'] <- x$x[i,'errAr39Ar40']^2
         out['Ar36Ar40','Ar36Ar40'] <- x$x[i,'errAr36Ar40']^2
         out['Ar39Ar36','Ar39Ar36'] <- x$x[i,'errAr39Ar36']^2
@@ -111,9 +111,10 @@ ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
         }
         sAr4039x <- sqrt(J %*% E %*% t(J))
         tt <- get.ArAr.age(Ar4039x[j],sAr4039x,x$J[1],x$J[2],exterr=exterr)
-        t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
-        out[j,] <- c(t.out$x,t.out$err)
+        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
     }
     if (!is.na(i)) out <- out[i,]
     out
 }
+
+length.ArAr <- function(x){ nrow(x$x) }

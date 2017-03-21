@@ -26,14 +26,12 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE){
 
 # i2i = isochron to intercept
 PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
-    ns <- nrow(x$x)
+    ns <- length(x)
+    dat <- data2york(x,exterr=exterr,common=FALSE)
     if (i2i){
-        fit <- isochron(x,plot=FALSE,exterr=exterr)
-        dat <- ppm2ratios(x,exterr=exterr,common=FALSE)
+        fit <- isochron(x,plot=FALSE,exterr=exterr)        
         dat[,'Y'] <- dat[,'Y'] - fit$a[1]
         if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + fit$a[2]^2)
-    } else {
-        dat <- ppm2ratios(x,exterr=exterr,common=TRUE)
     }
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
@@ -49,8 +47,7 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
         DP <- dat[j,'Y']/dat[j,'X']
         sDP <- sqrt(J%*%E%*%t(J))
         tt <- get.PD.age(DP,sDP,nuclide,exterr=TRUE)
-        t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
-        out[j,] <- c(t.out$x,t.out$err)
+        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
     }
     if (!is.na(i)) out <- out[i,]
     out
@@ -60,3 +57,5 @@ ppm2ratios <- function(x,...){ UseMethod("ppm2ratios",x) }
 ppm2ratios.default <- function(x,...){
     stop('Method ppm2ratios not available for this class.')
 }
+
+length.PD <- function(x,...){ nrow(x$x) }

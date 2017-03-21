@@ -5,8 +5,8 @@
 #' \code{yorkfit} function, and computes the corresponding isochron
 #' age, including decay constant uncertainties.
 #'
-#' @param x EITHER a list or a matrix with the following vectors or
-#'     columns:
+#' @param x EITHER a matrix with the following five columns:
+#'
 #' \describe{
 #' \item{X}{the x-variable}
 #' \item{sX}{the standard error of \code{X}}
@@ -14,6 +14,7 @@
 #' \item{sY}{the standard error of \code{Y}}
 #' \item{rXY}{the correlation coefficient of \code{X} and \code{Y}}
 #' }
+#'
 #' OR
 #'
 #' an object of class \code{ArAr}, \code{ReOs}, \code{RbSr} or
@@ -39,9 +40,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              sigdig=2,show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='red',lwd=2,title=TRUE,...){
-    if (hasClass(x,'matrix') | hasClass(x,'data.frame'))
-        x <- list(X=x[,1],sX=x[,2],Y=x[,3],sY=x[,4],rXY=x[,5])
-    fit <- yorkfit(x$X,x$sX,x$Y,x$sY,x$rXY)
+    fit <- yorkfit(x)
     scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.numbers=show.numbers, ellipse.col=ellipse.col,
                 a=fit$a[1],b=fit$b[1], line.col=line.col,lwd=lwd)
@@ -73,9 +72,9 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,...){
-    d <- data2york(x,get.selection(x,inverse))
+    d <- data2york(x,inverse=inverse)
+    fit <- yorkfit(d)
     if (inverse){
-        fit <- yorkfit(d$Y,d$sY,d$X,d$sX,-d$rXY) # X and Y reversed!
         x0 <- 1/fit$a[1]
         sx0 <- fit$a[2]/fit$a[1]^2
         y0 <- -fit$b[1]/fit$a[1]
@@ -84,7 +83,6 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         x.lab <- expression(paste(""^"39","Ar/"^"40","Ar"))
         y.lab <- expression(paste(""^"36","Ar/"^"40","Ar"))
     } else {
-        fit <- yorkfit(d$X,d$sX,d$Y,d$sY,d$rXY)
         y0 <- fit$a[1]
         sy0 <- fit$a[2]
         tt <- get.ArAr.age(fit$b[1],fit$b[2],x$J[1],x$J[2],exterr=exterr)
@@ -101,7 +99,6 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          ellipse.col=ellipse.col,a=fit$a[1],
                          b=fit$b[1], line.col=line.col,lwd=lwd,
                          title=FALSE)
-        tt <- roundit(out$age[1],out$age[2])
         title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
@@ -151,7 +148,7 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         x.lab <- expression(paste(""^"87","Rb/"^"86","Sr"))
         y.lab <- expression(paste(""^"87","Sr/"^"86","Sr"))
     }
-    X <- ppm2ratios(x,exterr=exterr,common=FALSE)
+    X <- data2york(x,exterr=exterr,common=FALSE)
     fit <- yorkfit(X)
     out <- fit
     class(out) <- "isochron"
@@ -163,7 +160,6 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
                          ellipse.col=ellipse.col,a=fit$a[1],
                          b=fit$b[1], line.col=line.col,lwd=lwd,
                          title=FALSE)
-        tt <- roundit(out$age[1],out$age[2])
         title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
@@ -180,8 +176,8 @@ isochron.title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
     rounded.intercept <- roundit(fit$y0[1],fit$y0[2],sigdig=sigdig)
     line1 <- substitute('age ='~a%+-%b~'(1'~sigma~'), intercept ='~c%+-%d~'(1'~sigma~')',
-                        list(a=rounded.age$x, b=rounded.age$err,
-                             c=rounded.intercept$x, d=rounded.intercept$err))
+                        list(a=rounded.age[1], b=rounded.age[2],
+                             c=rounded.intercept[1], d=rounded.intercept[2]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig), b=signif(fit$p.value,sigdig)))
     graphics::mtext(line1,line=1)
@@ -192,8 +188,8 @@ regression.title <- function(fit,sigdig=2){
     intercept <- roundit(fit$a[1],fit$a[2],sigdig=sigdig)
     slope <- roundit(fit$b[1],fit$b[2],sigdig=sigdig)
     line1 <- substitute('slope ='~a%+-%b~'(1'~sigma~'), intercept ='~c%+-%d~'(1'~sigma~')',
-                        list(a=slope$x, b=slope$err,
-                             c=intercept$x, d=intercept$err))
+                        list(a=slope[1], b=slope[2],
+                             c=intercept[1], d=intercept[2]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig), b=signif(fit$p.value,sigdig)))
     graphics::mtext(line1,line=1)

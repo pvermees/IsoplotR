@@ -11,8 +11,7 @@ UThHe.age <- function(x,i=NA,sigdig=NA){
         else tt <- get.UThHe.age(U=x[j,'U'],sU=x[j,'errU'],
                                  Th=x[j,'Th'],sTh=x[j,'errTh'],
                                  He=x[j,'He'],sHe=x[j,'errHe'])
-        t.out <- roundit(tt[1],tt[2],sigdig=sigdig)
-        out[j,] <- c(t.out$x,t.out$err)
+        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
     }
     if (!is.na(i)) out <- out[i,]
     out

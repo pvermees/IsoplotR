@@ -299,27 +299,6 @@ radialplot(examples$FT1)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("radialplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("read.data")
-### * read.data
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: read.data
-### Title: Read geochronology data
-### Aliases: read.data read.data.default read.data.matrix
-
-### ** Examples
-
-# load one of the built-in .csv files:
-data(examples)
-concordia(examples$UPb)
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
 nameEx("set.zeta")
 ### * set.zeta
 

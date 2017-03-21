@@ -33,22 +33,23 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
     out
 }
 
+# x = matrix with columns X, sX, Y, sY, rXY
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,
                         ellipse.col=rgb(0,1,0,0.5),
                         a=NA,b=NA,line.col='red',lwd=2,...){
-    if (any(is.na(xlim))) xlim <- get.limits(x$X,x$sX)
-    if (any(is.na(ylim))) ylim <- get.limits(x$Y,x$sY)
+    if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
     graphics::plot(xlim,ylim,type='n',xlab='',ylab='')
     if (!is.na(a) & !is.na(b)){
         graphics::lines(xlim,a+b*xlim,col=line.col,lwd=lwd)
     }
-    ns <- length(x$X)
+    ns <- nrow(x)
     for (i in 1:ns){
-        if (!any(is.na(c(x$X[i],x$Y[i],x$sX[i],x$sY[i],x$rXY[i])))){
-            x0 <- x$X[i]
-            y0 <- x$Y[i]
-            covmat <- cor2cov(x$sX[i],x$sY[i],x$rXY[i])
+        if (!any(is.na(x[i,]))){
+            x0 <- x[i,'X']
+            y0 <- x[i,'Y']
+            covmat <- cor2cov(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
             ell <- ellipse(x0,y0,covmat,alpha=alpha)
             graphics::polygon(ell,col=ellipse.col)
             graphics::points(x0,y0,pch=19,cex=0.25)

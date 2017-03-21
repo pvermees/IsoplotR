@@ -109,7 +109,7 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
     weightedmean.helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         type=type,cutoff.76=cutoff.76,
-                        cutoff.disc=cutoff.disc, sigdig=sigdig,
+                        cutoff.disc=cutoff.disc,sigdig=sigdig,
                         alpha=alpha,exterr=exterr,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
@@ -228,24 +228,8 @@ weightedmean.helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     }
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
     if (exterr){
-        if (hasClass(x,'UPb')){
-            X <- get.ratios.UPb(tt=fit$mean[1],st=fit$mean[2],
-                                exterr=TRUE,as.UPb=TRUE)
-            fit$mean <- filter.UPb.ages(X,type=type,cutoff.76=cutoff.76,
-                                        cutoff.disc=cutoff.disc,exterr=TRUE)
-        } else if (hasClass(x,'ArAr')){
-            R <- get.ArAr.ratio(fit$mean[1],fit$mean[2],x$J[1],0,exterr=FALSE)
-            fit$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
-        } else if (hasClass(x,'ReOs')){
-            R <- get.ReOs.ratio(fit$mean[1],fit$mean[2],exterr=FALSE)
-            fit$mean <- get.ReOs.age(R[1],R[2],exterr=TRUE)
-        } else if (hasClass(x,'SmNd')){
-            R <- get.SmNd.ratio(fit$mean[1],fit$mean[2],exterr=FALSE)
-            fit$mean <- get.SmNd.age(R[1],R[2],exterr=TRUE)
-        } else if (hasClass(x,'RbSr')){
-            R <- get.RbSr.ratio(fit$mean[1],fit$mean[2],exterr=FALSE)
-            fit$mean <- get.RbSr.age(R[1],R[2],exterr=TRUE)
-        }
+        fit$mean <- add.exterr(x,fit$mean[1],fit$mean[2],
+                               cutoff.76=cutoff.76,type=type)
     }
     if (plot){
         plot.weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
@@ -289,7 +273,7 @@ LL.weightedmean <- function(MZ,X,sX){
 wtdmean.title <- function(fit,sigdig=2){
     rounded.mean <- roundit(fit$mean[1],fit$mean[2],sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
-                        list(a=rounded.mean$x, b=rounded.mean$err))
+                        list(a=rounded.mean[1], b=rounded.mean[2]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
@@ -298,7 +282,7 @@ wtdmean.title <- function(fit,sigdig=2){
     if (fit$p.value < 0.05){ # only show when the data are overdispersed
         rounded.disp <- roundit(fit$disp[1],fit$disp[2],sigdig=sigdig)
         line3 <- substitute('overdispersion ='~a%+-%b~' (1'~sigma~')',
-                            list(a=rounded.disp$x, b=rounded.disp$err))
+                            list(a=rounded.disp[1], b=rounded.disp[2]))
         graphics::mtext(line3,line=0)
     }
 }

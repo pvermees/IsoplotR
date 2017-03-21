@@ -57,7 +57,6 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 sigdig=2,line.col='red',lwd=2,
                                 title=TRUE,...){
     ns <- nrow(x)
-    print(x)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
@@ -145,7 +144,7 @@ plateau <- function(x,alpha=0.05){
 plateau.title <- function(fit,sigdig=2){
     rounded.mean <- roundit(fit$mean[1],fit$mean[2],sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
-                        list(a=rounded.mean$x, b=rounded.mean$err))
+                        list(a=rounded.mean[1], b=rounded.mean[2]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))

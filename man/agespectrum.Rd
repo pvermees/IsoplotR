@@ -24,7 +24,7 @@ agespectrum(x, ...)
 
 OR
 
-an object of class \code{ArAr} with \code{format=2}}
+an object of class \code{ArAr}}
 
 \item{...}{optional parameters to the generic \code{plot} function}
 

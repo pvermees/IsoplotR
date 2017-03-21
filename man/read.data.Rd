@@ -8,9 +8,11 @@
 \usage{
 read.data(x, ...)
 
-\method{read.data}{default}(x, method = "U-Pb", format = 1, ...)
+\method{read.data}{default}(x, method = "U-Pb", format = 1,
+  exterr = FALSE, ...)
 
-\method{read.data}{matrix}(x, method = "U-Pb", format = 1, ...)
+\method{read.data}{matrix}(x, method = "U-Pb", format = 1, exterr = FALSE,
+  ...)
 }
 \arguments{
 \item{x}{either a file name (\code{.csv} format) OR a matrix}
@@ -24,11 +26,12 @@ read.data(x, ...)
 \item{format}{formatting option, depends on the value of
     \code{method}.
 
-if \code{method = 'Ar-Ar'}, then \code{format} is one of either:
+if \code{method = 'U-Pb'}, then \code{format} is one of either:
 
 \enumerate{
-\item{\code{39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]}}
-\item{\code{39, 39/40, s[39/40], 36/40, s[36/40], 39/36, s[39/36]}}
+\item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
+\item{\code{8/6, s[8/6], 7/6, s[7/6], rho}}
+\item{\code{7/6, s[7/6], 7/5, s[7/5], 6/8, s[6/8], 7/5, s[7/5]}}
 }
 
 if \code{method = 'fissiontracks'}, then \code{format} is one of
@@ -51,8 +54,12 @@ uncertainties.}
 dating' method, which only requires a table with the the number of
 spontaneous tracks, the area over which these were counted and one
 or more U/Ca- or U-concentration measurements and their analytical
-uncertainties.}
-}}
+uncertainties.}  }}
+
+\item{exterr}{propagate the external error of the
+\eqn{^{238}}U/\eqn{^{235}}U-ratio into the
+\eqn{^{207}}Pb/\eqn{^{235}}U- or \eqn{^{207}}Pb/\eqn{^{206}}Pb
+ratio (only applies to U-Pb data when \code{format} = 1 or 2).}
 }
 \value{
 an object of class \code{UPb}, \code{ArAr}, \code{UThHe},
@@ -65,20 +72,24 @@ data classes
 }
 \details{
 Example input files can be found by using \code{R}'s
-\code{system.file(...)} function:
+    \code{system.file(...)} function:
 
 \enumerate{
-\item \code{method = 'U-Pb'}:
+\item \code{method = 'U-Pb'} and \code{format = 1}:
 
-\code{file.show(system.file("UPb.csv",package="IsoplotR"))}
+\code{file.show(system.file("UPb1.csv",package="IsoplotR"))}
 
-\item \code{method = 'Ar-Ar'} and \code{format = 1}:
+\item \code{method = 'U-Pb'} and \code{format = 2}:
 
-\code{file.show(system.file("ArAr1.csv",package="IsoplotR"))}
+\code{file.show(system.file("UPb2.csv",package="IsoplotR"))}
 
-\item \code{method = 'Ar-Ar'} and \code{format = 2}:
+\item \code{method = 'U-Pb'} and \code{format = 3}:
 
-\code{file.show(system.file("ArAr2.csv",package="IsoplotR"))}
+\code{file.show(system.file("UPb3.csv",package="IsoplotR"))}
+
+\item \code{method = 'Ar-Ar'}:
+
+\code{file.show(system.file("ArAr.csv",package="IsoplotR"))}
 
 \item \code{method = 'Re-Os'}:
 

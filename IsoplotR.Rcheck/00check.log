@@ -66,7 +66,12 @@ These should not be in a package tarball.
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
 * checking Rd cross-references ... OK
-* checking for missing documentation entries ... OK
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  ‘read.data’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
 * checking for code/documentation mismatches ... OK
 * checking Rd \usage sections ... OK
 * checking Rd contents ... OK
@@ -77,4 +82,4 @@ These should not be in a package tarball.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 4 NOTEs
+Status: 3 WARNINGs, 4 NOTEs

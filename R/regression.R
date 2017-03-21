@@ -5,25 +5,14 @@
 #' consistent with maximum likelihood estimates of Ludwig and
 #' Titterington (1994)
 #'
-#' @param X EITHER a vector with the X-values OR a 5-column matrix
-#'     with the X-values, the analytical uncertainties of the
-#'     X-values, the Y-values, the analytical uncertainties of the
-#'     Y-values, and the correlation coefficients of the X- and
-#'     Y-values.
-#' @param sX standard errors of \code{X} OR \code{NULL} if \code{X} is a
-#'     matrix or data frame
-#' @param Y vector of measurements with the same length as \code{X} OR
-#'     \code{NULL} if \code{X} is a matrix or data frame
-#' @param sY standard errors of \code{Y} OR \code{NULL} if \code{X} is a
-#'     matrix or data frame
-#' @param rXY correlation coefficients between \code{X} and \code{Y}
-#'     OR \code{NULL} if \code{X} is a matrix or data frame
-#' @return a three-element list of vectors containing:
-#'     \describe{
+#' @param x a 5-column matrix with the X-values, the analytical
+#'     uncertainties of the X-values, the Y-values, the analytical
+#'     uncertainties of the Y-values, and the correlation coefficients
+#'     of the X- and Y-values.
+#' @return a three-element list of vectors containing: \describe{
 #'     \item{a}{the intercept of the straight line fit and its
-#'     standard error}
-#'     \item{b}{the slope of the fit and its standard error}
-#'     \item{cov.ab}{the covariance of the slope and intercept}
+#'     standard error} \item{b}{the slope of the fit and its standard
+#'     error} \item{cov.ab}{the covariance of the slope and intercept}
 #'     }
 #' @references
 #'
@@ -45,7 +34,8 @@
 #'    sX <- X*0.01
 #'    sY <- Y*0.005
 #'    rXY <- rep(0.8,n)
-#'    fit <- yorkfit(X,sX,Y,sY,rXY)
+#'    dat <- cbind(X,sX,Y,sY,rXY)
+#'    fit <- yorkfit(dat)
 #'    covmat <- matrix(0,2,2)
 #'    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
 #'    for (i in 1:n){
@@ -57,92 +47,137 @@
 #'        polygon(ell)
 #'    }
 #' @export
-yorkfit <- function(X,sX=NULL,Y=NULL,sY=NULL,rXY=NULL){
-    if (hasClass(X,'matrix') | hasClass(X,'data.frame'))
-        return(yorkfit(X[,1],X[,2],X[,3],X[,4],X[,5]))
-    ab <- lm(Y ~ X)$coefficients # initial guess
+yorkfit <- function(x){
+    ab <- lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]
     b <- ab[2]
-    wX <- 1/sX^2
-    wY <- 1/sY^2
+    wX <- 1/x[,'sX']^2
+    wY <- 1/x[,'sY']^2
     for (i in 1:50){ # 50 = maximum number of iterations
         bold <- b
         alpha <- sqrt(wX*wY)
-        W <- wX*wY/(wX+b*b*wY-2*b*rXY*alpha)
-        Xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
-        Ybar <- sum(W*Y,na.rm=TRUE)/sum(W,na.rm=TRUE)
-        U <- X-Xbar
-        V <- Y-Ybar
-        beta <- W*(U/wY+b*V/wX-(b*U+V)*rXY/alpha)
+        W <- wX*wY/(wX+b*b*wY-2*b*x[,'rXY']*alpha)
+        Xbar <- sum(W*x[,'X'],na.rm=TRUE)/sum(W,na.rm=TRUE)
+        Ybar <- sum(W*x[,'Y'],na.rm=TRUE)/sum(W,na.rm=TRUE)
+        U <- x[,'X']-Xbar
+        V <- x[,'Y']-Ybar
+        beta <- W*(U/wY+b*V/wX-(b*U+V)*x[,'rXY']/alpha)
         b <- sum(W*beta*V,na.rm=TRUE)/sum(W*beta*U,na.rm=TRUE)
         if ((bold/b-1)^2 < 1e-15) break # convergence reached
     }
     a <- Ybar-b*Xbar
-    x <- Xbar + beta
-    xbar <- sum(W*x,na.rm=TRUE)/sum(W,na.rm=TRUE)
-    u <- x-xbar
+    X <- Xbar + beta
+    xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
+    u <- X-xbar
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- list()
     out$a <- c(a,sa)
     out$b <- c(b,sb)
     out$cov.ab <- -Xbar*sb^2
-    out$mswd <- 0
-    mswd <- get.york.mswd(X,sX,Y,sY,rXY,a,b)
-   out$mswd <- mswd$mswd
-    out$p.value <- mswd$p.value
+    mswd <- get.york.mswd(x,a,b)
+    out <- c(out,mswd)
     out
 }
 
-get.york.mswd <- function(X,sX,Y,sY,rXY,a,b){
-    xy <- get.york.xy(X,sX,Y,sY,rXY,a,b)
+get.york.mswd <- function(x,a,b){
+    xy <- get.york.xy(x,a,b)
     X2 <- 0
-    nn <- length(X)
+    nn <- length(x[,'X'])
     for (i in 1:nn){
-        E <- cor2cov(sX[i],sY[i],rXY[i])
-        x <- matrix(c(X[i]-xy[i,1],Y[i]-xy[i,2]),1,2)
-        if (!any(is.na(x)))
-            X2 <- X2 + 0.5*x %*% solve(E) %*% t(x)
+        E <- cor2cov(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
+        X <- matrix(c(x[i,'X']-xy[i,1],x[i,'Y']-xy[i,2]),1,2)
+        if (!any(is.na(X)))
+            X2 <- X2 + 0.5*X %*% solve(E) %*% t(X)
     }
     df <- (2*nn-2)
     out <- list()
-    out$mswd <- X2/df
-    out$p.value <- 1-pchisq(X2,df)
+    out$mswd <- as.numeric(X2/df)
+    out$p.value <- as.numeric(1-pchisq(X2,df))
     out
 }
 
-# get fitted x and y given a dataset X,sX,Y,sY,rXY,
+# get fitted X and X given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
-get.york.xy <- function(X,sX,Y,sY,rXY,a,b){
-    wX <- 1/sX^2
-    wY <- 1/sY^2
+get.york.xy <- function(x,a,b){
+    wX <- 1/x[,'sX']^2
+    wY <- 1/x[,'sY']^2
     alpha <- sqrt(wX*wY)
-    W <- wX*wY/(wX+b*b*wY-2*b*rXY*alpha)
-    Xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
+    W <- wX*wY/(wX+b*b*wY-2*b*x[,'rXY']*alpha)
+    Xbar <- sum(W*x[,'X'],na.rm=TRUE)/sum(W,na.rm=TRUE)
     Ybar <- a + b*Xbar
-    U <- X-Xbar
-    V <- Y-Ybar
-    beta <- W*(U/wY+b*V/wX-(b*U+V)*rXY/alpha)
+    U <- x[,'X']-Xbar
+    V <- x[,'Y']-Ybar
+    beta <- W*(U/wY+b*V/wX-(b*U+V)*x[,'rXY']/alpha)
     out <- cbind(Xbar+beta,Ybar+b*beta)
     out
 }
 
-data2york <- function(x,selection=NA){
-    out <- list()
-    nn <- nrow(x$x)
-    if (any(is.na(selection)))
-        selection <- c(1,2)
-    out$X <- x$x[,selection[1]]
-    out$Y <- x$x[,selection[2]]
-    out$sX <- rep(0,nn)
-    out$sY <- rep(0,nn)
-    out$rXY <- rep(0,nn)
-    for (i in 1:nn){
-        covmat <- get.covmat(x,i)[selection,selection]
-        out$sX[i] <- sqrt(covmat[1,1])
-        out$sY[i] <- sqrt(covmat[2,2])
-        out$rXY[i] <- stats::cov2cor(covmat)[1,2]
+data2york <- function(x,...){ UseMethod("data2york",x) }
+data2york.default <- function(x,...){ stop('default function undefined') }
+data2york.UPb <- function(x,wetherill=TRUE){
+    ns <- length(x)
+    out <- matrix(0,ns,5)
+    colnames(out) <- c('X','sX','Y','sY','rXY')
+    if (wetherill){
+        if (x$format==1 | x$format==3){
+            out <- x$x[,c('Pb207U235','errPb207U235',
+                          'Pb206U238','errPb206U238','rhoXY')]
+        } else if (x$format==2){
+            for (i in 1:ns){
+                samp <- wetherill(x,i=i,exterr=FALSE)
+                out[i,1] <- samp$x['Pb207U235']
+                out[i,2] <- sqrt(samp$cov['Pb207U235','Pb207U235'])
+                out[i,3] <- samp$x['Pb206U238']
+                out[i,4] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
+                out[i,5] <- stats::cov2cor(samp$cov)[1,2]
+            }
+        }
+    } else {
+        if (x$format==2){
+            out <- x$x[,c('U238Pb206','errU238Pb206',
+                          'Pb207Pb206','errPb207Pb206','rhoXY')]
+        } else if (x$format==1 | x$format==3){
+            for (i in 1:ns){
+                samp <- tera.wasserburg(x,i=i,exterr=FALSE)
+                out[i,1] <- samp$x['U238Pb206']
+                out[i,2] <- sqrt(samp$cov['U238Pb206','U238Pb206'])
+                out[i,3] <- samp$x['Pb207Pb206']
+                out[i,4] <- sqrt(samp$cov['Pb207Pb206','Pb207Pb206'])
+                out[i,5] <- stats::cov2cor(samp$cov)[1,2]
+            }
+        }
     }
+    colnames(out) <- c('X','sX','Y','sY','rXY')
+    out
+}
+data2york.ArAr <- function(x,inverse=TRUE){
+    ns <- length(x)
+    out <- matrix(0,ns,5)
+    colnames(out) <- c('X','sX','Y','sY','rXY')
+    for (i in 1:ns){
+        E <- get.covmat.ArAr(x,i)
+        if (inverse){
+            out[i,c('X','sX','Y','sY')] <-
+                x$x[i,c('Ar39Ar40','errAr39Ar40','Ar36Ar40','errAr36Ar40')]
+            out[i,'rXY'] <- E['Ar39Ar40','Ar36Ar40']/
+                (x$x[i,'errAr39Ar40']*x$x[i,'errAr36Ar40'])
+        } else {
+            out[i,c('X','sX','Y','sY')] <-
+                x$x[i,c('Ar39Ar36','errAr39Ar36','Ar40Ar36','errAr40Ar36')]
+            out[i,'rXY'] <- E['Ar39Ar36','Ar40Ar36']/
+                (x$x[i,'errAr39Ar36']*x$x[i,'errAr40Ar36'])
+        }
+    }
+    out
+}
+data2york.PD <- function(x,exterr=FALSE,common=FALSE){
+    if (x$format==1){
+        out <- x$x
+    } else if (x$format==2){
+        out <- ppm2ratios(x,exterr=exterr,common=common)
+    }
+    colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
