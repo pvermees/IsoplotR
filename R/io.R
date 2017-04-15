@@ -23,7 +23,7 @@
 #' if \code{method = 'Rb-Sr'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Rb87/Sr86, s[Rb87/Sr86], Sr87/Sr86, s[Sr87/Sr86], rho}}
+#' \item{\code{Rb87/Sr86, s[Rb87/Sr86], Sr87/Sr86, s[Sr87/Sr86], (rho)}}
 #' \item{\code{Rb, s[Rb], Sr, s[Sr], Sr87/Sr86, s[Sr87/Sr86]}}
 #' }
 #'
@@ -32,7 +32,7 @@
 #' if \code{method = 'Sm-Nd'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144], rho}}
+#' \item{\code{Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144], (rho)}}
 #' \item{\code{Sm, s[Sm], Nd, s[Nd], Nd143/Nd144, s[Nd143/Nd144]}}
 #' }
 #'
@@ -41,7 +41,7 @@
 #' if \code{method = 'Re-Os'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188], rho}}
+#' \item{\code{Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188], (rho)}}
 #' \item{\code{Re, s[Re], Os, s[Os], Os187/Os188, s[Os187/Os188]}}
 #' }
 #'
@@ -196,15 +196,13 @@ as.UPb <- function(x,format=3){
             rhoYZ <- X[,8]
             i <- which(is.na(rhoXY))
             j <- which(is.na(rhoYZ))
-        }
-        if (nc == 7){
+        } else if (nc == 7){
             rhoXY <- X[,7]
             rhoYZ <- rep(0,nr-1)
             i <- which(is.na(rhoXY))
             j <- 1:(nr-1)
             X <- cbind(X,rhoYZ)
-        }
-        if (nc == 6){
+        } else {
             rhoXY <- rep(0,nr-1)
             rhoYZ <- rep(0,nr-1)
             i <- 1:(nr-1)
@@ -232,7 +230,7 @@ get.cor.68.76 <- function(Pb207U235,errPb207U235,Pb206U238,errPb206U238,
     cor.68.76 <- cov.68.76/(errPb206U238*Pb207Pb206)
     cor.68.76
 }
-as.ArAr <- function(x,format=1){
+as.ArAr <- function(x,format=3){
     out <- list()
     class(out) <- "ArAr"
     out$format <- format
@@ -240,31 +238,47 @@ as.ArAr <- function(x,format=1){
     nc <- ncol(x)
     nr <- nrow(x)
     bi <- 4 # begin index
-    if (nc == 6){
-        X <- shiny2matrix(x,bi,nr,nc)
-        colnames(X) <- c('Ar39Ar40','errAr39Ar40',
-                         'Ar36Ar40','errAr36Ar40',
-                         'Ar39Ar36','errAr39Ar36')
-        ns <- nr-bi+1 # number of samples
-        Ar39 <- rep(1/ns,ns)
-        Ar40Ar36 <- 1/X[,'Ar36Ar40']
-        errAr40Ar36 <- X[,'errAr36Ar40']/X[,'Ar36Ar40']^2
-        out$x <- cbind(X,Ar39,Ar40Ar36,errAr40Ar36)
-    } else if (nc == 7){
-        X <- shiny2matrix(x,bi,nr,nc)
-        colnames(X) <- c('Ar39Ar40','errAr39Ar40',
-                         'Ar36Ar40','errAr36Ar40',
-                         'Ar39Ar36','errAr39Ar36',
-                         'Ar39')
-        Ar40Ar36 <- 1/X[,'Ar36Ar40']
-        errAr40Ar36 <- X[,'errAr36Ar40']/X[,'Ar36Ar40']^2
-        out$x <- cbind(X,Ar40Ar36,errAr40Ar36)
+    X <- shiny2matrix(x,bi,nr,nc)
+    if (format==1 & nc %in% c(4,5,6)){
+        if (nc==6){
+            out$x <- X
+        } else {
+            ns <- nr-bi+1 # number of samples
+            Ar39 <- rep(1/ns,ns)
+            out$x <- cbind(X,Ar39)
+        }
+        if (nc==4) {
+            rho <- 0
+        }
+        colnames(out$x) <- c('Ar39Ar36','errAr39Ar36',
+                             'Ar40Ar36','errAr40Ar36',
+                             'rho','Ar39')
+    } else if (format==2 & nc %in% c(4,5,6)){
+        if (nc==5){
+            out$x <- X
+        } else {
+            ns <- nr-bi+1 # number of samples
+            Ar39 <- rep(1/ns,ns)
+            out$x <- cbind(X,Ar39)
+        }
+        if (nc==4) {
+            rho <- 0
+        }
+        colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
+                             'Ar36Ar40','errAr36Ar40',
+                             'rho','Ar39')
+    } else if (format==3 & nc %in% c(6,7)){
+        if (nc==7){
+            out$x <- X
+        } else {
+            ns <- nr-bi+1 # number of samples
+            Ar39 <- rep(1/ns,ns)
+            out$x <- cbind(X,Ar39)            
+        }
+        colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
+                             'Ar36Ar40','errAr36Ar40',
+                             'Ar39Ar36','errAr39Ar36','Ar39')
     }
-    colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
-                         'Ar36Ar40','errAr36Ar40',
-                         'Ar39Ar36','errAr39Ar36',
-                         'Ar39',
-                         'Ar40Ar36','errAr40Ar36')
     out
 }
 as.RbSr <- function(x,format=2){

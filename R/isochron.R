@@ -40,6 +40,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              sigdig=2,show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='red',lwd=2,title=TRUE,...){
+    colnames(x) <- c('X','sX','Y','sY','rXY')
     fit <- yorkfit(x)
     scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.numbers=show.numbers, ellipse.col=ellipse.col,

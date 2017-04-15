@@ -8,11 +8,9 @@
 \usage{
 read.data(x, ...)
 
-\method{read.data}{default}(x, method = "U-Pb", format = 1,
-  exterr = FALSE, ...)
+\method{read.data}{default}(x, method = "U-Pb", format = 1, ...)
 
-\method{read.data}{matrix}(x, method = "U-Pb", format = 1, exterr = FALSE,
-  ...)
+\method{read.data}{matrix}(x, method = "U-Pb", format = 1, ...)
 }
 \arguments{
 \item{x}{either a file name (\code{.csv} format) OR a matrix}
@@ -30,9 +28,38 @@ if \code{method = 'U-Pb'}, then \code{format} is one of either:
 
 \enumerate{
 \item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
-\item{\code{8/6, s[8/6], 7/6, s[7/6], rho}}
-\item{\code{7/6, s[7/6], 7/5, s[7/5], 6/8, s[6/8], 7/5, s[7/5]}}
+\item{\code{8/6, s[8/6], 7/6, s[7/6], (rho)}}
+\item{\code{X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z], (rho[X,Y]), (rho[Y,Z])}}
 }
+
+where optional columns are marked in round brackets
+
+if \code{method = 'Rb-Sr'}, then \code{format} is one of either:
+
+\enumerate{
+\item{\code{Rb87/Sr86, s[Rb87/Sr86], Sr87/Sr86, s[Sr87/Sr86], (rho)}}
+\item{\code{Rb, s[Rb], Sr, s[Sr], Sr87/Sr86, s[Sr87/Sr86]}}
+}
+
+where \code{Rb} and \code{Sr} are in ppm
+
+if \code{method = 'Sm-Nd'}, then \code{format} is one of either:
+
+\enumerate{
+\item{\code{Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144], (rho)}}
+\item{\code{Sm, s[Sm], Nd, s[Nd], Nd143/Nd144, s[Nd143/Nd144]}}
+}
+
+where \code{Sm} and \code{Nd} are in ppm
+
+if \code{method = 'Re-Os'}, then \code{format} is one of either:
+
+\enumerate{
+\item{\code{Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188], (rho)}}
+\item{\code{Re, s[Re], Os, s[Os], Os187/Os188, s[Os187/Os188]}}
+}
+
+where \code{Re} and \code{Os} are in ppm
 
 if \code{method = 'fissiontracks'}, then \code{format} is one of
 either:
@@ -55,11 +82,6 @@ dating' method, which only requires a table with the the number of
 spontaneous tracks, the area over which these were counted and one
 or more U/Ca- or U-concentration measurements and their analytical
 uncertainties.}  }}
-
-\item{exterr}{propagate the external error of the
-\eqn{^{238}}U/\eqn{^{235}}U-ratio into the
-\eqn{^{207}}Pb/\eqn{^{235}}U- or \eqn{^{207}}Pb/\eqn{^{206}}Pb
-ratio (only applies to U-Pb data when \code{format} = 1 or 2).}
 }
 \value{
 an object of class \code{UPb}, \code{ArAr}, \code{UThHe},

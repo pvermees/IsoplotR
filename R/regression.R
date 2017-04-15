@@ -48,6 +48,7 @@
 #'    }
 #' @export
 yorkfit <- function(x){
+    colnames(x) <- c('X','sX','Y','sY','rXY')
     ab <- lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]
     b <- ab[2]
@@ -153,23 +154,11 @@ data2york.UPb <- function(x,wetherill=TRUE){
     out
 }
 data2york.ArAr <- function(x,inverse=TRUE){
-    ns <- length(x)
-    out <- matrix(0,ns,5)
+    if (inverse)
+        out <- ArAr.inverse.ratios(x)
+    else
+        out <- ArAr.normal.ratios(x)
     colnames(out) <- c('X','sX','Y','sY','rXY')
-    for (i in 1:ns){
-        E <- get.covmat.ArAr(x,i)
-        if (inverse){
-            out[i,c('X','sX','Y','sY')] <-
-                x$x[i,c('Ar39Ar40','errAr39Ar40','Ar36Ar40','errAr36Ar40')]
-            out[i,'rXY'] <- E['Ar39Ar40','Ar36Ar40']/
-                (x$x[i,'errAr39Ar40']*x$x[i,'errAr36Ar40'])
-        } else {
-            out[i,c('X','sX','Y','sY')] <-
-                x$x[i,c('Ar39Ar36','errAr39Ar36','Ar40Ar36','errAr40Ar36')]
-            out[i,'rXY'] <- E['Ar39Ar36','Ar40Ar36']/
-                (x$x[i,'errAr39Ar36']*x$x[i,'errAr40Ar36'])
-        }
-    }
     out
 }
 data2york.PD <- function(x,exterr=FALSE,common=FALSE){

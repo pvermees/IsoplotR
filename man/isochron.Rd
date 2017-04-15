@@ -33,8 +33,8 @@ isochron(x, ...)
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 }
 \arguments{
-\item{x}{EITHER a list or a matrix with the following vectors or
-    columns:
+\item{x}{EITHER a matrix with the following five columns:
+
 \describe{
 \item{X}{the x-variable}
 \item{sX}{the standard error of \code{X}}
@@ -42,6 +42,7 @@ isochron(x, ...)
 \item{sY}{the standard error of \code{Y}}
 \item{rXY}{the correlation coefficient of \code{X} and \code{Y}}
 }
+
 OR
 
 an object of class \code{ArAr}, \code{ReOs}, \code{RbSr} or

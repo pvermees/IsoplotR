@@ -37,11 +37,11 @@ unzip.vector <- function(x,nc=2){
 }
 
 roundit <- function(age,err,sigdig=2){
-    out <- c(age,err)
+    out <- cbind(age,err)
     if (!is.na(sigdig)){
-        out[2] <- signif(err,sigdig)
+        out[,2] <- signif(err,sigdig)
         nd <- log10(trunc(abs(age)/err))+sigdig
-        out[1] <- signif(age,nd)
+        out[,1] <- signif(age,nd)
     }
     out
 }
@@ -101,6 +101,16 @@ get.cov.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
 }
 get.cor.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
     get.cov.xzzy(xz,err.xz,zy,err.zy,err.xy)/(err.xz*err.zy)
+}
+
+# simultaneously performs error propagation for multiple samples
+errorprop <- function(J11,J12,J21,J22,E11,E12,E22){
+    out <- matrix(0,length(J11),3)
+    colnames(out) <- c('varX','varY','cov')
+    out[,'varX'] <- J11*J11*E11 + J11*J12*E12 + J11*J12*E12 + J12*J12*E22
+    out[,'varY'] <- E11*J21*J21 + J21*J22*E12 + J21*J22*E12 + J22*J22*E22
+    out[,'cov'] <- J11*J21*E11 + J12*J21*E12 + J11*J22*E12 + J12*J22*E22
+    out
 }
 
 hasClass <- function(x,classname){

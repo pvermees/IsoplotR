@@ -4,34 +4,19 @@
 \alias{yorkfit}
 \title{Linear regression of X,Y-variables with correlated errors}
 \usage{
-yorkfit(X, sX = NULL, Y = NULL, sY = NULL, rXY = NULL)
+yorkfit(x)
 }
 \arguments{
-\item{X}{EITHER a vector with the X-values OR a 5-column matrix
-with the X-values, the analytical uncertainties of the
-X-values, the Y-values, the analytical uncertainties of the
-Y-values, and the correlation coefficients of the X- and
-Y-values.}
-
-\item{sX}{standard errors of \code{X} OR \code{NULL} if \code{X} is a
-matrix or data frame}
-
-\item{Y}{vector of measurements with the same length as \code{X} OR
-\code{NULL} if \code{X} is a matrix or data frame}
-
-\item{sY}{standard errors of \code{Y} OR \code{NULL} if \code{X} is a
-matrix or data frame}
-
-\item{rXY}{correlation coefficients between \code{X} and \code{Y}
-OR \code{NULL} if \code{X} is a matrix or data frame}
+\item{x}{a 5-column matrix with the X-values, the analytical
+uncertainties of the X-values, the Y-values, the analytical
+uncertainties of the Y-values, and the correlation coefficients
+of the X- and Y-values.}
 }
 \value{
-a three-element list of vectors containing:
-    \describe{
+a three-element list of vectors containing: \describe{
     \item{a}{the intercept of the straight line fit and its
-    standard error}
-    \item{b}{the slope of the fit and its standard error}
-    \item{cov.ab}{the covariance of the slope and intercept}
+    standard error} \item{b}{the slope of the fit and its standard
+    error} \item{cov.ab}{the covariance of the slope and intercept}
     }
 }
 \description{
@@ -49,7 +34,8 @@ Titterington (1994)
    sX <- X*0.01
    sY <- Y*0.005
    rXY <- rep(0.8,n)
-   fit <- yorkfit(X,sX,Y,sY,rXY)
+   dat <- cbind(X,sX,Y,sY,rXY)
+   fit <- yorkfit(dat)
    covmat <- matrix(0,2,2)
    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
    for (i in 1:n){

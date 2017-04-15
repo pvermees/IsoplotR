@@ -17,8 +17,8 @@ age(x, ...)
 \method{age}{default}(x, method = "U238-Pb206", exterr = TRUE, J = c(NA,
   NA), zeta = c(NA, NA), rhoD = c(NA, NA), ...)
 
-\method{age}{UPb}(x, concordia = 1, wetherill = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE, i = NA,
+  sigdig = NA, ...)
 
 \method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -93,21 +93,21 @@ error.}
 \item{rhoD}{two-element vector with the track density of the
 dosimeter glass and its standard error.}
 
-\item{concordia}{scalar flag indicating whether each U-Pb analysis
-should be considered separately (\code{concordia=1}), a
+\item{type}{scalar flag indicating whether each U-Pb analysis
+should be considered separately (\code{type=1}), a
 concordia age should be calculated from all U-Pb analyses
-together (\code{concordia=2}), or a discordia line should be
-fit through all the U-Pb analyses (\code{concordia=3}).}
+together (\code{type=2}), or a discordia line should be
+fit through all the U-Pb analyses (\code{type=3}).}
 
 \item{wetherill}{logical flag to indicate whether the data should
 be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 (\code{FALSE}) space.  This option is only used when
-\code{concordia=2}}
+\code{type=2}}
 
 \item{i}{(optional) index of a particular aliquot}
 
 \item{sigdig}{number of significant digits for the uncertainty
-estimate (only used if \code{concordia=1}, \code{isochron=FALSE}
+estimate (only used if \code{type=1}, \code{isochron=FALSE}
 or \code{central=FALSE}).}
 
 \item{isochron}{logical flag indicating whether each Ar-Ar analysis
@@ -132,7 +132,7 @@ together (\code{central=TRUE}).}
 \item if \code{x} is a scalar or a vector, returns the age using
 the geochronometer given by \code{method} and its standard error.
 
-\item if \code{x} has class \code{UPb} and \code{concordia=1},
+\item if \code{x} has class \code{UPb} and \code{type=1},
 returns a table with the following columns: \code{t.75},
 \code{err[t.75]}, \code{t.68}, \code{err[t.68]}, \code{t.76},
 \code{err[t.76]}, \code{t.conc}, \code{err[t.conc]}, containing the
@@ -141,7 +141,7 @@ returns a table with the following columns: \code{t.75},
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, and the
 concordia age and standard error, respectively.
  
-\item if \code{x} has class \code{UPb} and \code{concordia=2},
+\item if \code{x} has class \code{UPb} and \code{type=2},
 returns a list with the following items:
 
 \describe{
@@ -164,7 +164,7 @@ respectively. }
 for isotopic equivalence and age concordance, respectively. }
 }
 
-\item if \code{x} has class \code{UPb} and \code{concordia=3},
+\item if \code{x} has class \code{UPb} and \code{type=3},
 returns a list with the following items:
 
 \describe{
@@ -254,7 +254,7 @@ uncertainties.
 \examples{
 data(examples)
 print(age(examples$UPb))
-print(age(examples$UPb,concordia=1))
-print(age(examples$UPb,concordia=2))
+print(age(examples$UPb,type=1))
+print(age(examples$UPb,type=2))
 }
 

@@ -32,8 +32,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 data(examples)
 print(age(examples$UPb))
-print(age(examples$UPb,concordia=1))
-print(age(examples$UPb,concordia=2))
+print(age(examples$UPb,type=1))
+print(age(examples$UPb,type=2))
 
 
 
@@ -299,6 +299,27 @@ radialplot(examples$FT1)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("radialplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("read.data")
+### * read.data
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: read.data
+### Title: Read geochronology data
+### Aliases: read.data read.data.default read.data.matrix
+
+### ** Examples
+
+# load one of the built-in .csv files:
+data(examples)
+concordia(examples$UPb)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("set.zeta")
 ### * set.zeta
 
@@ -399,7 +420,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
    sX <- X*0.01
    sY <- Y*0.005
    rXY <- rep(0.8,n)
-   fit <- yorkfit(X,sX,Y,sY,rXY)
+   dat <- cbind(X,sX,Y,sY,rXY)
+   fit <- yorkfit(dat)
    covmat <- matrix(0,2,2)
    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
    for (i in 1:n){
