@@ -22,7 +22,7 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' @param n horizontal resolution of the density estimate
 #' @param plot show the KDE as a plot
 #' @param pch the symbol used to show the samples. May be a vector.
-#'     Set \code{pch = NA} to turn them off.
+#'     Set \code{pch=NA} to turn them off.
 #' @param xlab the x-axis label
 #' @param ylab the y-axis label
 #' @param kde.col the fill colour of the KDE specified as a four

@@ -6,8 +6,8 @@
 #' \code{examples} a 14-item list containing:
 #'
 #' \code{UPb}: an object of class \code{UPb} containing a high
-#' precision U-Pb dataset packaged with Ken Ludwig's \code{Isoplot}
-#' program.
+#' precision U-Pb dataset of Kamo et al. (1996) packaged with Ken
+#' Ludwig's \code{Isoplot} program.
 #'
 #' \code{DZ}: an object of class \code{detrital} containing a detrital
 #' zircon U-Pb dataset from Namibia (Vermeesch et al., 2015).
@@ -76,7 +76,11 @@
 #' Galbraith, R. F. and Green, P. F., 1990: Estimating the component
 #' ages in a finite mixture, Nuclear Tracks and Radiation
 #' Measurements, 17, 197-206.
-#' 
+#'
+#' Kamo, S.L., Czamanske, G.K. and Krogh, T.E., 1996. A minimum U-Pb
+#' age for Siberian flood-basalt volcanism. Geochimica et Cosmochimica
+#' Acta, 60(18), 3505-3511.
+#'
 #' Ludwig, K. R., 2003. User's manual for Isoplot 3.00: a
 #'     geochronological toolkit for Microsoft Excel. No. 4.
 #'

@@ -10,44 +10,52 @@
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
 #' 
-#' if \code{method = 'U-Pb'}, then \code{format} is one of either:
+#' if \code{method='U-Pb'}, then \code{format} is one of either:
 #'
 #' \enumerate{
 #' \item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
-#' \item{\code{8/6, s[8/6], 7/6, s[7/6], (rho)}}
-#' \item{\code{X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z], (rho[X,Y]), (rho[Y,Z])}}
+#' \item{\code{8/6, s[8/6], 7/6, s[7/6] (, rho)}}
+#' \item{\code{X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z] (, rho[X,Y]) (, rho[Y,Z])}}
 #' }
 #'
 #' where optional columns are marked in round brackets
 #'
-#' if \code{method = 'Rb-Sr'}, then \code{format} is one of either:
+#' if \code{method='Ar-Ar'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Rb87/Sr86, s[Rb87/Sr86], Sr87/Sr86, s[Sr87/Sr86], (rho)}}
+#' \item{\code{9/6, s[9/6], 0/6, s[0/6], rho (, 39)}}
+#' \item{\code{6/0, s[6/0], 9/0, s[9/0] (, rho) (, 39)}}
+#' \item{\code{9/0, s[9/0], 6/0, s[6/0], 9/6, s[9/6] (, 39)}}
+#' }
+#'
+#' if \code{method='Rb-Sr'}, then \code{format} is one of either:
+#'
+#' \enumerate{
+#' \item{\code{Rb87/Sr86, s[Rb87/Sr86], Sr87/Sr86, s[Sr87/Sr86] (, rho)}}
 #' \item{\code{Rb, s[Rb], Sr, s[Sr], Sr87/Sr86, s[Sr87/Sr86]}}
 #' }
 #'
 #' where \code{Rb} and \code{Sr} are in ppm
 #'
-#' if \code{method = 'Sm-Nd'}, then \code{format} is one of either:
+#' if \code{method='Sm-Nd'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144], (rho)}}
+#' \item{\code{Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144] (, rho)}}
 #' \item{\code{Sm, s[Sm], Nd, s[Nd], Nd143/Nd144, s[Nd143/Nd144]}}
 #' }
 #'
 #' where \code{Sm} and \code{Nd} are in ppm
 #'
-#' if \code{method = 'Re-Os'}, then \code{format} is one of either:
+#' if \code{method='Re-Os'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188], (rho)}}
+#' \item{\code{Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188] (, rho)}}
 #' \item{\code{Re, s[Re], Os, s[Os], Os187/Os188, s[Os187/Os188]}}
 #' }
 #'
 #' where \code{Re} and \code{Os} are in ppm
 #'
-#' if \code{method = 'fissiontracks'}, then \code{format} is one of
+#' if \code{method='fissiontracks'}, then \code{format} is one of
 #' either:
 #'
 #' \enumerate{
@@ -85,9 +93,17 @@
 #'
 #' \code{file.show(system.file("UPb3.csv",package="IsoplotR"))}
 #'
-#' \item \code{method = 'Ar-Ar'}:
+#' \item \code{method = 'Ar-Ar'} and \code{format = 1}:
 #'
-#' \code{file.show(system.file("ArAr.csv",package="IsoplotR"))}
+#' \code{file.show(system.file("ArAr1.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'Ar-Ar'} and \code{format = 2}:
+#'
+#' \code{file.show(system.file("ArAr2.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'Ar-Ar'} and \code{format = 3}:
+#'
+#' \code{file.show(system.file("ArAr3.csv",package="IsoplotR"))}
 #'
 #' \item \code{method = 'Re-Os'}:
 #'
@@ -120,6 +136,15 @@
 #' \item \code{method = 'detritals'}:
 #'
 #' \code{file.show(system.file("DZ.csv",package="IsoplotR"))}
+#'
+#' \item \code{method = 'detritals'}:
+#'
+#' \code{file.show(system.file("MountTom.csv",package="IsoplotR"))}
+#'
+#' \code{file.show(system.file("spectrum",package="IsoplotR"))}
+#'
+#' \code{file.show(system.file("average.csv",package="IsoplotR"))}
+#'
 #' }
 #' @param ... optional arguments to the \code{read.csv} function
 #' @return an object of class \code{UPb}, \code{ArAr}, \code{UThHe},
@@ -239,35 +264,7 @@ as.ArAr <- function(x,format=3){
     nr <- nrow(x)
     bi <- 4 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
-    if (format==1 & nc %in% c(4,5,6)){
-        if (nc==6){
-            out$x <- X
-        } else {
-            ns <- nr-bi+1 # number of samples
-            Ar39 <- rep(1/ns,ns)
-            out$x <- cbind(X,Ar39)
-        }
-        if (nc==4) {
-            rho <- 0
-        }
-        colnames(out$x) <- c('Ar39Ar36','errAr39Ar36',
-                             'Ar40Ar36','errAr40Ar36',
-                             'rho','Ar39')
-    } else if (format==2 & nc %in% c(4,5,6)){
-        if (nc==5){
-            out$x <- X
-        } else {
-            ns <- nr-bi+1 # number of samples
-            Ar39 <- rep(1/ns,ns)
-            out$x <- cbind(X,Ar39)
-        }
-        if (nc==4) {
-            rho <- 0
-        }
-        colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
-                             'Ar36Ar40','errAr36Ar40',
-                             'rho','Ar39')
-    } else if (format==3 & nc %in% c(6,7)){
+    if (format==3 & nc %in% c(6,7)){
         if (nc==7){
             out$x <- X
         } else {
@@ -278,6 +275,26 @@ as.ArAr <- function(x,format=3){
         colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
                              'Ar36Ar40','errAr36Ar40',
                              'Ar39Ar36','errAr39Ar36','Ar39')
+    } else if (nc %in% c(4,5,6)){
+        if (nc==6){
+            out$x <- X
+        } else {
+            ns <- nr-bi+1 # number of samples
+            Ar39 <- rep(1/ns,ns)
+            out$x <- cbind(X,Ar39)
+        }
+        if (nc==4) {
+            rho <- 0
+        }
+        if (format==1) {
+            colnames(out$x) <- c('Ar39Ar36','errAr39Ar36',
+                                 'Ar40Ar36','errAr40Ar36',
+                                 'rho','Ar39')
+        } else {
+            colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
+                                 'Ar36Ar40','errAr36Ar40',
+                                 'rho','Ar39')
+        }
     }
     out
 }
