@@ -13,10 +13,15 @@ uncertainties of the Y-values, and the correlation coefficients
 of the X- and Y-values.}
 }
 \value{
-a three-element list of vectors containing: \describe{
+a four-element list of vectors containing:
+    \describe{
     \item{a}{the intercept of the straight line fit and its
-    standard error} \item{b}{the slope of the fit and its standard
-    error} \item{cov.ab}{the covariance of the slope and intercept}
+    standard error}
+    \item{b}{the slope of the fit and its standard
+    error}
+    \item{cov.ab}{the covariance of the slope and intercept}
+    \item{mswd}{the mean square of the residuals (a.k.a
+    `reduced Chi-square') statistic}
     }
 }
 \description{

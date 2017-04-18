@@ -76,10 +76,11 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     d <- data2york(x,inverse=inverse)
     fit <- yorkfit(d)
     if (inverse){
-        x0 <- 1/fit$a[1]
-        sx0 <- fit$a[2]/fit$a[1]^2
-        y0 <- -fit$b[1]/fit$a[1]
-        sy0 <- y0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2)
+        x0 <- -fit$b[1]/fit$a[1]
+        sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2 -
+                       2*fit$a[2]*fit$b[2]*fit$cov.ab)
+        y0 <- 1/fit$a[1]
+        sy0 <- fit$a[2]/fit$a[1]^2
         tt <- get.ArAr.age(x0,sx0,x$J[1],x$J[2],exterr=exterr)
         x.lab <- expression(paste(""^"39","Ar/"^"40","Ar"))
         y.lab <- expression(paste(""^"36","Ar/"^"40","Ar"))

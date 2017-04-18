@@ -39,10 +39,10 @@ used if \code{plot=TRUE}.}
 \item{pch}{plot character (see \code{?plot} for details). May be a
 vector.}
 
-\item{pos}{a position specifier for the labels (if \code{pch !=
-NA}). Values of 1, 2, 3 and 4 indicate positions below, to the
-left of, above and to the right of the MDS coordinates,
-respectively.}
+\item{pos}{a position specifier for the labels (if
+\code{pch!=NA}). Values of 1, 2, 3 and 4 indicate positions
+below, to the left of, above and to the right of the MDS
+coordinates, respectively.}
 
 \item{cex.symbols}{a numerical value giving the amount by which
 plotting symbols should be magnified relative to the default}
@@ -58,15 +58,13 @@ plotting symbols should be magnified relative to the default}
 \value{
 if \code{plot=FALSE}, returns an object of class
     \code{MDS}, i.e. a list containing the following items:
-\describe{
-\item{points}{a two column vector of the fitted configuration}
-\item{classical}{a logical flag indicating whether the MDS
-configuration was obtained by classical (\code{TRUE}) or nonmetric
-(\code{FALSE}) MDS}
-\item{diss}{the dissimilarity matrix used for the MDS analysis} 
-\item{stress}{(only if \code{classical=TRUE}) the final stress
-achieved (in percent)}
-}
+    \describe{ \item{points}{a two column vector of the fitted
+    configuration} \item{classical}{a logical flag indicating
+    whether the MDS configuration was obtained by classical
+    (\code{TRUE}) or nonmetric (\code{FALSE}) MDS} \item{diss}{the
+    dissimilarity matrix used for the MDS analysis}
+    \item{stress}{(only if \code{classical=TRUE}) the final stress
+    achieved (in percent)} }
 }
 \description{
 Performs classical or nonmetric Multidimensional Scaling analysis
@@ -79,7 +77,7 @@ dev.new()
 mds(examples$DZ,shepard=TRUE)
 }
 \references{
-Vermeesch, P., 2013. Multi-sample comparison of detrital age
-distributions. Chemical Geology, 341, pp.140-146.
+Vermeesch, P., 2013. Multi-sample comparison of
+    detrital age distributions. Chemical Geology, 341, pp.140-146.
 }
 

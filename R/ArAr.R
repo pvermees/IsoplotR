@@ -93,8 +93,7 @@ ArAr.age.ratios <- function(x){
         J21 <- 1
         E11 <- x$x[,'errAr39Ar36']^2
         E22 <- x$x[,'errAr40Ar36']^2
-        E12 <- x$x[,'rho']*x$x[,'errAr40Ar39']*x$x[,'errAr39Ar36']
-        E21 <- E21
+        E12 <- x$x[,'rho']*x$x[,'errAr39Ar36']*x$x[,'errAr40Ar36']
         covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
     } else if (x$format==2){
         Ar40Ar39 <- 1/x$x[,'Ar39Ar40']
@@ -105,8 +104,7 @@ ArAr.age.ratios <- function(x){
         J21 <- 1/x$x[,'Ar36Ar40']
         E11 <- x$x[,'errAr39Ar40']^2
         E22 <- x$x[,'errAr36Ar40']^2
-        E12 <- x$x[,'rho']*x$x[,'errAr40Ar39']*x$x[,'errAr39Ar36']
-        E21 <- E21
+        E12 <- x$x[,'rho']*x$x[,'errAr39Ar40']*x$x[,'errAr36Ar40']
         covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
     } else if (x$format==3){
         Ar40Ar39 <- 1/x$x[,'Ar39Ar40']
@@ -178,7 +176,7 @@ ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     E <- matrix(0,3,3)
     for (j in 1:ns) {
         J[1,1] <- 1
-        J[1,3] <- -1/x$x[j,'Ar39Ar36']
+        J[1,3] <- -1/rat[j,'Ar39Ar36']
         E[1,1] <- rat[j,'varAr40Ar39']
         E[2,2] <- rat[j,'varAr39Ar36']
         E[1,2] <- rat[j,'cov']

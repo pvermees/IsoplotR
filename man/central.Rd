@@ -23,7 +23,7 @@ central(x, ...)
 \item{mineral}{setting this parameter to either \code{apatite} or
 \code{zircon} changes the default efficiency factor, initial
 fission track length and density to preset values (only affects
-results if \code{x$format = 2}.)}
+results if \code{x$format=2}.)}
 }
 \value{
 a list containing the following items:
@@ -31,14 +31,14 @@ a list containing the following items:
 \describe{
 
 \item{mswd}{the reduced Chi-square statistic of data concordance,
-i.e. mswd = SS/(2n-2) where, SS is the sum of squares of the
-log[U/He]-log[Th/He] compositions and n is the number of
-samples. If \code{x} has class \code{fissiontracks}, then mswd =
-X2/(n-1), where X2 is a Chi-square statistic of the EDM data or ICP
-ages.}
+i.e. \eqn{mswd=SS/(2n-2)}, where \eqn{SS} is the sum of squares
+of the log[U/He]-log[Th/He] compositions and \eqn{n} is the number
+of samples. If \code{x} has class \code{fissiontracks}, then
+\eqn{mswd=X^2/(n-1)}, where \eqn{X^2} is a Chi-square statistic of
+the EDM data or ICP ages.}
 
-\item{p.value}{the p-value of a Chi-square test with n-2 degrees of
-freedom}
+\item{p.value}{the p-value of a Chi-square test with \eqn{n-2}
+degrees of freedom}
 
 \item{age}{a two-column vector with the central age and its
 standard error.}

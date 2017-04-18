@@ -116,8 +116,8 @@ isochron age should be calculated from all Ar-Ar analyses
 together (\code{isochron=TRUE}).}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}Ar/^{36}Ar} or
-\eqn{^{187}Os/^{188}Os} ratio from an isochron fit. Setting
+`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar or
+\eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron fit. Setting
 \code{i2i} to \code{FALSE} uses the default values stored in
 \code{settings('iratio',...)}}
 
@@ -169,7 +169,7 @@ returns a list with the following items:
 
 \describe{
 \item{x}{ a two element vector with the upper and lower intercept
-ages (if wetherill==TRUE) or the lower intercept age and
+ages (if \code{wetherill=TRUE}) or the lower intercept age and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg) }
 
 \item{cov}{ the covariance matrix of the elements in \code{x} }
@@ -211,7 +211,7 @@ returns a list with the following items:
 \item{uvw}{ a three-element list with the weighted mean log[U/He],
 log[Th/He] and log[Sm/He] compositions. }
 
-\item{covmat}{ a 3x3 covariance matrix for uvw}
+\item{covmat}{ a 3x3 covariance matrix for \code{uvw}}
 
 \item{mswd}{ the reduced Chi-square value for the
 log[U/He]-log[Th/He] compositions. }

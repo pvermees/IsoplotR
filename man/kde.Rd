@@ -93,7 +93,7 @@ modifier of Abramson (1982) is used}
 \item{plot}{show the KDE as a plot}
 
 \item{pch}{the symbol used to show the samples. May be a vector.
-Set \code{pch = NA} to turn them off.}
+Set \code{pch=NA} to turn them off.}
 
 \item{xlab}{the x-axis label}
 
