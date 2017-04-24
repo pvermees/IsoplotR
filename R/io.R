@@ -77,83 +77,60 @@
 #' or more U/Ca- or U-concentration measurements and their analytical
 #' uncertainties.}  }
 #'
-#' @details Example input files can be found by using \code{R}'s
-#'     \code{system.file(...)} function:
+#' @details IsoplotR provides the following example input files:
 #'
-#' \enumerate{
-#' \item \code{method = 'U-Pb'} and \code{format = 1}:
-#'
-#' \code{file.show(system.file("UPb1.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'U-Pb'} and \code{format = 2}:
-#'
-#' \code{file.show(system.file("UPb2.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'U-Pb'} and \code{format = 3}:
-#'
-#' \code{file.show(system.file("UPb3.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'Ar-Ar'} and \code{format = 1}:
-#'
-#' \code{file.show(system.file("ArAr1.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'Ar-Ar'} and \code{format = 2}:
-#'
-#' \code{file.show(system.file("ArAr2.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'Ar-Ar'} and \code{format = 3}:
-#'
-#' \code{file.show(system.file("ArAr3.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'Re-Os'}:
-#'
-#' \code{file.show(system.file("ReOs.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'Rb-Sr'}:
-#'
-#' \code{file.show(system.file("RbSr.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'Sm-Nd'}:
-#'
-#' \code{file.show(system.file("SmNd.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'U-Th-He'}:
-#'
-#' \code{file.show(system.file("UThHe.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'fissiontracks'} and \code{format = 1}:
-#'
-#' \code{file.show(system.file("FT1.csv",package="IsoplotR"))}
-#' 
-#' \item \code{method = 'fissiontracks'} and \code{format = 2}:
-#'
-#' \code{file.show(system.file("FT2.csv",package="IsoplotR"))}
-#' 
-#' \item \code{method = 'fissiontracks'} and \code{format = 3}:
-#'
-#' \code{file.show(system.file("FT3.csv",package="IsoplotR"))}
-#' 
-#' \item \code{method = 'detritals'}:
-#'
-#' \code{file.show(system.file("DZ.csv",package="IsoplotR"))}
-#'
-#' \item \code{method = 'detritals'}:
-#'
-#' \code{file.show(system.file("MountTom.csv",package="IsoplotR"))}
-#'
-#' \code{file.show(system.file("spectrum",package="IsoplotR"))}
-#'
-#' \code{file.show(system.file("average.csv",package="IsoplotR"))}
-#'
+#' \itemize{
+#' \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv}}
+#' \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
+#' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}}
+#' \item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}}
+#' \item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}}
+#' \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv}, \code{FT3.csv}}
+#' \item{U-Th-He: \code{UThHe.csv}, \code{UThSmHe.csv}}
+#' \item{detritals: \code{Namib.csv}}
+#' \item{other: \code{MountTom.csv}, \code{average.csv}, \code{spectrum.csv}}
 #' }
+#' 
+#' The contents of these files can be viewed using the
+#' \code{system.file(...)} function.
+#'
 #' @param ... optional arguments to the \code{read.csv} function
 #' @return an object of class \code{UPb}, \code{ArAr}, \code{UThHe},
 #'     \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{detritals},
 #'     \code{fissiontracks} or \code{other}
 #' @examples
-#' # load one of the built-in .csv files:
-#' data(examples)
-#' concordia(examples$UPb)
+#' file.show(system.file("spectrum.csv",package="IsoplotR"))
+#'
+#' f1 <- system.file("UPb1.csv",package="IsoplotR")
+#' d1 <- read.data(f1,method="U-Pb",format=1)
+#' concordia(d1)
+#'
+#' f2 <- system.file("ArAr1.csv",package="IsoplotR")
+#' d2 <- read.data(f2,method="Ar-Ar",format=1)
+#' agespectrum(d2)
+#'
+#' f3 <- system.file("ReOs1.csv",package="IsoplotR")
+#' d3 <- read.data(f3,method="Re-Os",format=1)
+#' isochron(d2)
+#'
+#' f4 <- system.file("FT1.csv",package="IsoplotR")
+#' d4 <- read.data(f4,method="fissiontracks",format=1)
+#' radialplot(d4)
+#'
+#' f5 <- system.file("UThSmHe.csv",package="IsoplotR")
+#' d5 <- read.data(f5,method="U-Th-He")
+#' helioplot(d5)
+#'
+#' #  one detrital zircon U-Pb file (detritals.csv)
+#' f6 <- system.file("Namib.csv",package="IsoplotR")
+#' d6 <- read.data(f6,method="detritals")
+#' kde(d6)
+#'
+#' #  three `other' files (MountTom.csv, spectrum.csv, average.csv)
+#' f7 <- system.file("MountTom.csv",package="IsoplotR")
+#' d7 <- read.data(f7,method="other")
+#' radialplot(d7)
+#'
 #' @rdname read.data
 #' @export
 read.data <- function(x,...){ UseMethod("read.data",x) }

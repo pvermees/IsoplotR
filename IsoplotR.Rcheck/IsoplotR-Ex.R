@@ -311,9 +311,38 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-# load one of the built-in .csv files:
-data(examples)
-concordia(examples$UPb)
+file.show(system.file("spectrum.csv",package="IsoplotR"))
+
+f1 <- system.file("UPb1.csv",package="IsoplotR")
+d1 <- read.data(f1,method="U-Pb",format=1)
+concordia(d1)
+
+f2 <- system.file("ArAr1.csv",package="IsoplotR")
+d2 <- read.data(f2,method="Ar-Ar",format=1)
+agespectrum(d2)
+
+f3 <- system.file("ReOs1.csv",package="IsoplotR")
+d3 <- read.data(f3,method="Re-Os",format=1)
+isochron(d2)
+
+f4 <- system.file("FT1.csv",package="IsoplotR")
+d4 <- read.data(f4,method="fissiontracks",format=1)
+radialplot(d4)
+
+f5 <- system.file("UThSmHe.csv",package="IsoplotR")
+d5 <- read.data(f5,method="U-Th-He")
+helioplot(d5)
+
+#  one detrital zircon U-Pb file (detritals.csv)
+f6 <- system.file("Namib.csv",package="IsoplotR")
+d6 <- read.data(f6,method="detritals")
+kde(d6)
+
+#  three `other' files (MountTom.csv, spectrum.csv, average.csv)
+f7 <- system.file("MountTom.csv",package="IsoplotR")
+d7 <- read.data(f7,method="other")
+radialplot(d7)
+
 
 
 

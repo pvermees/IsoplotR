@@ -456,9 +456,54 @@ $legend
 > 
 > ### ** Examples
 > 
-> # load one of the built-in .csv files:
-> data(examples)
-> concordia(examples$UPb)
+> file.show(system.file("spectrum.csv",package="IsoplotR"))
+f,X,errX
+0.021,4.4339,0.935
+0.025,4.6771,0.1225
+0.024,4.6533,0.0964
+0.024,4.7417,0.0861
+0.026,4.7153,0.0776
+0.026,4.708,0.0734
+0.028,4.7417,0.0717
+0.029,4.7855,0.0677
+0.430,4.7863,0.0134
+0.052,4.7709,0.0388
+0.091,4.8116,0.0246
+0.136,4.7947,0.0207
+0.076,4.9116,0.0472
+0.012,4.5317,0.1952
+
+> 
+> f1 <- system.file("UPb1.csv",package="IsoplotR")
+> d1 <- read.data(f1,method="U-Pb",format=1)
+> concordia(d1)
+> 
+> f2 <- system.file("ArAr1.csv",package="IsoplotR")
+> d2 <- read.data(f2,method="Ar-Ar",format=1)
+> agespectrum(d2)
+> 
+> f3 <- system.file("ReOs1.csv",package="IsoplotR")
+> d3 <- read.data(f3,method="Re-Os",format=1)
+> isochron(d2)
+> 
+> f4 <- system.file("FT1.csv",package="IsoplotR")
+> d4 <- read.data(f4,method="fissiontracks",format=1)
+> radialplot(d4)
+> 
+> f5 <- system.file("UThSmHe.csv",package="IsoplotR")
+> d5 <- read.data(f5,method="U-Th-He")
+> helioplot(d5)
+> 
+> #  one detrital zircon U-Pb file (detritals.csv)
+> f6 <- system.file("Namib.csv",package="IsoplotR")
+> d6 <- read.data(f6,method="detritals")
+> kde(d6)
+> 
+> #  three `other' files (MountTom.csv, spectrum.csv, average.csv)
+> f7 <- system.file("MountTom.csv",package="IsoplotR")
+> d7 <- read.data(f7,method="other")
+> radialplot(d7)
+> 
 > 
 > 
 > 
@@ -593,7 +638,7 @@ $legend
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.864 0.224 12.033 0 0 
+Time elapsed:  7.672 0.24 7.699 0 0 
 > grDevices::dev.off()
 pdf 
   2 

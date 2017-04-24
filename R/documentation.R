@@ -40,6 +40,9 @@
 #' \code{RbSr}: an object of class \code{RbSr} containing an
 #' \eqn{^{87}}Rb/\eqn{^{86}}Sr-dataset from Compston et al. (1971).
 #'
+#' \code{Namib}: an object of class \code{detritals} containing a
+#' detrital zircon U-Pb dataset of Vermeesch and Garzanti (2015)
+#'
 #' \code{average}: an object of class \code{other} containing the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U-ages and errors of dataset \code{UPb}.
 #'
@@ -58,10 +61,25 @@
 #' @name examples
 #' @docType data
 #' @examples
-#' data(example)
+#' data(examples)
 #' concordia(examples$UPb)
-#' dev.new()
-#' kde(examples$DZ)
+#'
+#' agespectrum(examples$ArAr)
+#'
+#' isochron(examples$ReOs)
+#'
+#' radialplot(examples$FT)
+#'
+#' helioplot(examples$UThHe)
+#'
+#' kde(examples$Namib)
+#'
+#' radialplot(examples$MountTom)
+#'
+#' agespectrum(examples$spectrum)
+#'
+#' weightedmean(examples$average)
+#'
 #' @references
 #' Brandon, M.T. and Vance, J.A., 1992. Tectonic evolution of the
 #' Cenozoic Olympic subduction complex, Washington State, as deduced
