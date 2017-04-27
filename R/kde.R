@@ -292,7 +292,7 @@ getkde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
     snames <- names(x)
     thekdes <- list()
     themax <- -1
-    if (is.na(bw) & samebandwidth) bw <- commonbandwidth(x)
+    if (is.na(bw) & samebandwidth) bw <- commonbandwidth(x,log=log)
     for (name in snames){
         thekdes[[name]] <- kde(x[[name]],from=from,to=to,bw=bw,
                                adaptive=adaptive,log=log,n=n,

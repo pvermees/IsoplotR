@@ -56,12 +56,13 @@ fixedpoint <-  function(tt,N,II,a2){
 }
 
 # returns the median bandwidth for plotting several KDEs together
-commonbandwidth <- function(x){
+commonbandwidth <- function(x,log=FALSE){
     dnames <- names(x)
     n <- length(dnames)
     bw <- rep(0,n)
     for (i in 1:n){
-        bw[i] <- botev(x[[i]])
+        if (log) bw[i] <- botev(log(x[[i]]))
+        else bw[i] <- botev(x[[i]])
     }
     return(stats::median(bw))
 }
