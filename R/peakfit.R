@@ -59,15 +59,15 @@ peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,...){
 #' @rdname peakfit
 #' @export
 peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,...){
-    if (k == 0) return(NULL)
+    if (k == 0) return(out)
     if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
-    if (x$format == 1 & !identical(k,'min'))
+    if (x$format == 1 & !identical(k,'min')){
         out <- binomial.mixtures(x,k,exterr=exterr,...)
-    else if (x$format == 2){
+    }  else if (x$format == 3){
+        out <- ages2peaks(x,k,log=log)
+    } else {
         out <- peakfit.helper(x,k=k,sigdig=sigdig,log=log,
                               exterr=exterr,...)
-    } else if (x$format == 3){
-        out <- ages2peaks(x,k,log=log)
     }
     out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
@@ -166,14 +166,7 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
     } else if (hasClass(x,'fissiontracks')){
         tt <- fissiontrack.age(x,exterr=FALSE)
     }
-    if (log) zs <- cbind(log(tt[,1]),tt[,2]/tt[,1])
-    else zs <- tt
-    out <- peakfit.default(zs,k)
-    if (log) {
-        out$peaks <- exp(out$peaks)
-        out$peaks.err <- out$peaks * out$peaks.err
-    }
-    out
+    peakfit.default(tt,k,log=log)
 }
 
 get.peakfit.covmat <- function(k,pii,piu,aiu,biu){
@@ -392,7 +385,7 @@ min.age.model <- function(zs,sigdig=2){
     }
     H <- stats::optimHess(fit,get.min.age.L,zs=zs)
     E <- solve(H)
-    out <- list(L=L,peaks=fit[1],props=fit[2],
+    out <- list(L=L,peaks=fit[1],
                 peaks.err=sqrt(E[1,1]),props.err=sqrt(E[3,3]))
     out
 }
