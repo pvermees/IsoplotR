@@ -59,6 +59,7 @@ peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,...){
 #' @rdname peakfit
 #' @export
 peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,...){
+    out <- NULL
     if (k == 0) return(out)
     if (identical(k,'auto')) k <- BIC.fit(x,5,log=log)
     if (x$format == 1 & !identical(k,'min')){
