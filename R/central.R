@@ -137,11 +137,12 @@ central.fissiontracks <- function(x,mineral=NA,...){
             sigma <- fit$minimum
         }
         tt <- exp(mu)
-        st <- 1/sqrt(sum(wu,na.rm=TRUE))
+        st <- tt/sqrt(sum(wu,na.rm=TRUE))
         if (x$format==2)
             st <- tt * sqrt((st/tt)^2 + (x$zeta[2]/x$zeta[1])^2)
         df <- length(zu)-1
-        Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/sum(1/su^2,na.rm=TRUE)
+        Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/
+            sum(1/su^2,na.rm=TRUE)
     }
     out$age <- c(tt,st)
     out$disp <- sigma

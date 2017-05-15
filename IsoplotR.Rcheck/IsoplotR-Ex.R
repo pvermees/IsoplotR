@@ -158,10 +158,25 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(example)
+data(examples)
 concordia(examples$UPb)
-dev.new()
-kde(examples$DZ)
+
+agespectrum(examples$ArAr)
+
+isochron(examples$ReOs)
+
+radialplot(examples$FT1)
+
+helioplot(examples$UThHe)
+
+kde(examples$Namib)
+
+radialplot(examples$MountTom)
+
+agespectrum(examples$spectrum)
+
+weightedmean(examples$average)
+
 
 
 

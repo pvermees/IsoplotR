@@ -258,11 +258,25 @@ attr(,"class")
 > 
 > ### ** Examples
 > 
-> data(example)
-Warning in data(example) : data set ‘example’ not found
+> data(examples)
 > concordia(examples$UPb)
-> dev.new()
-> kde(examples$DZ)
+> 
+> agespectrum(examples$ArAr)
+> 
+> isochron(examples$ReOs)
+> 
+> radialplot(examples$FT1)
+> 
+> helioplot(examples$UThHe)
+> 
+> kde(examples$Namib)
+> 
+> radialplot(examples$MountTom)
+> 
+> agespectrum(examples$spectrum)
+> 
+> weightedmean(examples$average)
+> 
 > 
 > 
 > 
@@ -284,7 +298,6 @@ Warning in data(example) : data set ‘example’ not found
 > data(examples)
 > helioplot(examples$UThHe)
 > dev.new()
-dev.new(): using pdf(file="Rplots1.pdf")
 > helioplot(examples$UThHe,logratio=FALSE)
 > 
 > 
@@ -363,7 +376,7 @@ final  value 7.640383
 converged
 NULL
 > dev.new()
-dev.new(): using pdf(file="Rplots2.pdf")
+dev.new(): using pdf(file="Rplots1.pdf")
 > mds(examples$DZ,shepard=TRUE)
 initial  value 10.433734 
 iter   5 value 8.523890
@@ -638,7 +651,7 @@ f,X,errX
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  7.672 0.24 7.699 0 0 
+Time elapsed:  7.524 0.356 7.581 0 0 
 > grDevices::dev.off()
 pdf 
   2 

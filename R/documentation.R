@@ -68,7 +68,7 @@
 #'
 #' isochron(examples$ReOs)
 #'
-#' radialplot(examples$FT)
+#' radialplot(examples$FT1)
 #'
 #' helioplot(examples$UThHe)
 #'
