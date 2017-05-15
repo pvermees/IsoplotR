@@ -55,7 +55,26 @@ central <- function(x,...){ UseMethod("central",x) }
 #' @rdname central
 #' @export
 central.default <- function(x,...){
-    stop('Invalid input into central(...) function');
+    sigma <- 0.15 # convenient starting value
+    zu <- log(x[,1])
+    su <- x[,2]/x[,1]
+    for (i in 1:30){ # page 100 of Galbraith (2005)
+        wu <- 1/(sigma^2+su^2)
+        mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
+        fit <- stats::optimize(eq.6.9,c(0,10),mu=mu,zu=zu,su=su)
+        sigma <- fit$minimum
+    }
+    tt <- exp(mu)
+    st <- tt/sqrt(sum(wu,na.rm=TRUE))
+    df <- length(zu)-1
+    Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/
+        sum(1/su^2,na.rm=TRUE)
+    out <- list()
+    out$age <- c(tt,st)
+    out$disp <- sigma
+    out$mswd <- Chi2/df
+    out$p.value <- 1-pchisq(Chi2,df)
+    out
 }
 #' @rdname central
 #' @export
@@ -103,9 +122,9 @@ central.UThHe <- function(x,...){
 #' @export
 central.fissiontracks <- function(x,mineral=NA,...){
     out <- list()
-    L8 <- lambda('U238')[1]
-    sigma <- 0.15 # convenient starting value
     if (x$format<2){
+        L8 <- lambda('U238')[1]
+        sigma <- 0.15 # convenient starting value
         Nsj <- x$x[,'Ns']
         Ns <- sum(Nsj)
         Nij <- x$x[,'Ni']
@@ -126,28 +145,14 @@ central.fissiontracks <- function(x,mineral=NA,...){
         st <- tt * sqrt( 1/(sum(wj)*(theta*(1-theta))^2) +
                          (x$rhoD[2]/x$rhoD[1])^2 +
                          (x$zeta[2]/x$zeta[1])^2 )
+        out$age <- c(tt,st)
+        out$disp <- sigma
+        out$mswd <- Chi2/df
+        out$p.value <- 1-pchisq(Chi2,df)
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE,mineral=mineral)
-        zu <- log(tst[,'t'])
-        su <- tst[,'s[t]']/tst[,'t']
-        for (i in 1:30){ # page 100 of Galbraith (2005)
-            wu <- 1/(sigma^2+su^2)
-            mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
-            fit <- stats::optimize(eq.6.9,c(0,10),mu=mu,zu=zu,su=su)
-            sigma <- fit$minimum
-        }
-        tt <- exp(mu)
-        st <- tt/sqrt(sum(wu,na.rm=TRUE))
-        if (x$format==2)
-            st <- tt * sqrt((st/tt)^2 + (x$zeta[2]/x$zeta[1])^2)
-        df <- length(zu)-1
-        Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/
-            sum(1/su^2,na.rm=TRUE)
+        out <- central.default(tst)
     }
-    out$age <- c(tt,st)
-    out$disp <- sigma
-    out$mswd <- Chi2/df
-    out$p.value <- 1-pchisq(Chi2,df)
     out
 }
 
