@@ -66,7 +66,9 @@ mindens <- function(mineral,x=NULL){
 #' \code{"Sm147Sm152"}, \code{"Sm148Sm152"}, \code{"Sm149Sm152"},
 #' \code{"Sm150Sm152"}, \code{"Sm154Sm152"}, \code{"Nd142Nd144"},
 #' \code{"Nd143Nd144"}, \code{"Nd145Nd144"}, \code{"Nd146Nd144"},
-#' \code{"Nd148Nd144"}, or \code{"Nd150Nd144"}) PLUS (optionally) the
+#' \code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
+#' \code{"Hf174Hf177"},	\code{"Hf176Hf177"}, \code{"Hf178Hf177"},
+#' \code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS (optionally) the
 #' isotopic ratio and its analytical error.  Omitting these two
 #' numbers simply returns the existing values.
 #'
@@ -76,9 +78,9 @@ mindens <- function(mineral,x=NULL){
 #' \code{"Sr88"}, \code{"Re"}, \code{"Re185"}, \code{"Re187"},
 #' \code{"Os"}, \code{"Os184"}, \code{"Os186"}, \code{"Os187"},
 #' \code{"Os188"}, \code{"Os189"}, \code{"Os190"}, \code{"Os192"},
-#' \code{"Sm"} or \code{"Nd"}) PLUS (optionally) the molar mass and
-#' its analytical error.  Omitting these two numbers simply returns
-#' the existing values.
+#' \code{"Sm"}, \code{"Nd"}, \code{"Lu"}, \code{"Hf"}) PLUS
+#' (optionally) the molar mass and its analytical error.  Omitting
+#' these two numbers simply returns the existing values.
 #'
 #' \item for \code{'mindens'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the mineral
@@ -138,8 +140,13 @@ mindens <- function(mineral,x=NULL){
 #' Cosmochimica Acta 75.17 (2011): 5097-5100.
 #'
 #' \item Rb: Villa, I.M., De Bievre, P., Holden, N.E. and Renne, P.R., 2015.
-#' IUPAC-IUGS recommendation on the half life of \eqn{^{87}}Rb.
+#' "IUPAC-IUGS recommendation on the half life of \eqn{^{87}}Rb".
 #' Geochimica et Cosmochimica Acta, 164, pp.382-385.
+#'
+#' \item Lu: Soederlund, Ulf, et al. "The 176 Lu decay constant
+#' determined by Lu–Hf and U–Pb isotope systematics of Precambrian
+#' mafic intrusions." Earth and Planetary Science Letters 219.3 (2004): 311-324.
+#' 
 #' }
 #' \item Isotopic ratios:
 #' \itemize{
@@ -166,6 +173,15 @@ mindens <- function(mineral,x=NULL){
 #' \item Os: Voelkening, Joachim, Thomas Walczyk, and Klaus G. Heumann.
 #' "Osmium isotope ratio determinations by negative thermal ionization
 #' mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
+#'
+#' \item Lu: De Laeter, J. R., and N. Bukilic.
+#' "Solar abundance of Lu 176 and s-process nucleosynthesis."
+#' Physical Review C 73.4 (2006): 045806.
+#'
+#' \item Hf: Patchett, P. Jonathan.
+#' "Importance of the Lu-Hf isotopic system in studies of planetary
+#' chronology and chemical evolution." Geochimica et Cosmochimica
+#' Acta 47.1 (1983): 81-91.
 #' 
 #' \item U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
 #' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.

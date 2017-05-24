@@ -1,10 +1,12 @@
-#' Calculate U-Th-He (and fission track) central ages and compositions
+#' Calculate U-Th-He and fission track central ages and compositions
 #'
 #' Computes the geometric mean composition of a set of fission track
 #' or U-Th-He data and returns the corresponding age and fitting
 #' parameters.
 #'
-#' @param x an object of class \code{UThHe} or \code{fissiontracks}
+#' @param x an object of class \code{UThHe} or \code{fissiontracks},
+#'     OR a 2-column matrix with (strictly positive) values and
+#'     uncertainties
 #' @param ... optional arguments
 #' @return a list containing the following items:
 #'

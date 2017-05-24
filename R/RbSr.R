@@ -36,7 +36,7 @@ ppm2ratios.RbSr <- function(x,exterr=FALSE,common=TRUE){
         E[6,6] <- imass('Sr')[2]^2 # var(MMSr)
     }
     nn <- dim(x$x)[1]
-    out <- matrix(NA,nn,5) # X=Rb87/Sr86 and Y=Sr87Sr86
+    out <- matrix(NA,nn,5) # X=Rb87/Sr86 and Y=Sr87/Sr86
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out[,1] <- Rb87Sr86
     out[,3] <- R76Sr
@@ -45,16 +45,16 @@ ppm2ratios.RbSr <- function(x,exterr=FALSE,common=TRUE){
         E[8,8] <- x$x[i,'errRbppm']^2
         E[9,9] <- x$x[i,'errSrppm']^2
         J[1,1] <- -Rb87Sr86[i]*dinvf7Rb.dR57Rb/invf7Rb
-        J[1,2] <- -Rb87Sr86[i]*dinvf6Sr.dR46Sr/invf6Sr[i]
-        J[1,3] <- -Rb87Sr86[i]*dinvf6Sr.dR76Sr0/invf6Sr[i]
-        J[1,4] <- -Rb87Sr86[i]*dinvf6Sr.dR86Sr/invf6Sr[i]
+        J[1,2] <-  Rb87Sr86[i]*dinvf6Sr.dR46Sr/invf6Sr[i]
+        J[1,3] <-  Rb87Sr86[i]*dinvf6Sr.dR76Sr0/invf6Sr[i]
+        J[1,4] <-  Rb87Sr86[i]*dinvf6Sr.dR86Sr/invf6Sr[i]
         J[1,5] <- -Rb87Sr86[i]/MMRb
-        J[1,6] <- (invf6Sr[i]/invf7Rb)*(Rb[i]/Sr[i])/MMRb
-        J[1,7] <- -Rb87Sr86[i]*dinvf6Sr.dR76Sr/invf6Sr[i]
-        J[1,8] <- (invf6Sr[i]/invf7Rb)*(MMSr/MMRb)/Sr[i]
+        J[1,6] <-  Rb87Sr86[i]/MMSr
+        J[1,7] <-  Rb87Sr86[i]*dinvf6Sr.dR76Sr/invf6Sr[i]
+        J[1,8] <-  Rb87Sr86[i]/Rb[i]
         J[1,9] <- -Rb87Sr86[i]/Sr[i]
-        J[2,3] <- dR76Sr.dR76Sr0
-        J[2,7] <- 1
+        J[2,3] <-  dR76Sr.dR76Sr0
+        J[2,7] <-  1
         E2 <- J %*% E %*% t(J)
         if (all(is.finite(E2))){
             out[i,2] <- sqrt(E2[1,1])

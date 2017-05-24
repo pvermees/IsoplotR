@@ -153,6 +153,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.RbSr(x,format)
     } else if (identical(method,'Sm-Nd')){
         out <- as.SmNd(x,format)
+    } else if (identical(method,'Lu-Hf')){
+        out <- as.LuHf(x,format)
     } else if (identical(method,'U-Th-He')){
         out <- as.UThHe(x)
     } else if (identical(method,'fissiontracks')){
