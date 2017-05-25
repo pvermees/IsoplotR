@@ -100,7 +100,7 @@
 #' Acta, 60(18), 3505-3511.
 #'
 #' Ludwig, K. R., 2003. User's manual for Isoplot 3.00: a
-#'     geochronological toolkit for Microsoft Excel. No. 4.
+#' geochronological toolkit for Microsoft Excel. No. 4.
 #'
 #' Lugmair, G.W., Scheinin, N.B. and Marti, K., 1975. Sm-Nd age and
 #' history of Apollo 17 basalt 75075-Evidence for early

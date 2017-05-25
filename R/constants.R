@@ -143,8 +143,8 @@ mindens <- function(mineral,x=NULL){
 #' "IUPAC-IUGS recommendation on the half life of \eqn{^{87}}Rb".
 #' Geochimica et Cosmochimica Acta, 164, pp.382-385.
 #'
-#' \item Lu: Soederlund, Ulf, et al. "The 176 Lu decay constant
-#' determined by Lu–Hf and U–Pb isotope systematics of Precambrian
+#' \item Lu: Soederlund, Ulf, et al. "The \eqn{^{176}}Lu decay constant
+#' determined by Lu-Hf and U-Pb isotope systematics of Precambrian
 #' mafic intrusions." Earth and Planetary Science Letters 219.3 (2004): 311-324.
 #' 
 #' }
@@ -175,7 +175,7 @@ mindens <- function(mineral,x=NULL){
 #' mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
 #'
 #' \item Lu: De Laeter, J. R., and N. Bukilic.
-#' "Solar abundance of Lu 176 and s-process nucleosynthesis."
+#' "Solar abundance of Lu\eqn{^{176}} and s-process nucleosynthesis."
 #' Physical Review C 73.4 (2006): 045806.
 #'
 #' \item Hf: Patchett, P. Jonathan.
