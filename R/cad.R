@@ -5,7 +5,7 @@
 #' 
 #' @param x a numerical vector OR an object of class \code{UPb},
 #'     \code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs},
-#'     \code{RbSr}, \code{SmNd} or \code{detritals}
+#'     \code{RbSr}, \code{SmNd}, \code{LuHf} or \code{detritals}
 #' @rdname cad
 #' @export
 cad <- function(x,...){ UseMethod("cad",x) }
@@ -74,12 +74,13 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
+#' @param i2i
+#'     `isochron to intercept': calculates the initial (aka `inherited',
 #'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in \code{settings('iratio',...)}
 #' @rdname cad
 #' @export
 cad.ArAr <- function(x,pch=NA,verticals=TRUE,
@@ -106,6 +107,13 @@ cad.SmNd <- function(x,pch=NA,verticals=TRUE,
 cad.RbSr <- function(x,pch=NA,verticals=TRUE,
                      xlab='age [Ma]',col='black',i2i=TRUE,...){
     tt <- RbSr.age(x,i2i=i2i)[,1]
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
+}
+#' @rdname cad
+#' @export
+cad.LuHf <- function(x,pch=NA,verticals=TRUE,
+                     xlab='age [Ma]',col='black',i2i=TRUE,...){
+    tt <- LuHf.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
 #' @rdname cad

@@ -77,8 +77,8 @@ get.LuHf.ratio <- function(tt,st,exterr=TRUE){
     get.PD.ratio(tt,st,'Lu176',exterr)
 }
 
-get.LuHf.age <- function(Hf177Lu176,sHf177Lu176,exterr=TRUE){
-    get.PD.age(Hf177Lu176,sHf177Lu176,'Lu176',exterr)
+get.LuHf.age <- function(Hf176Lu176,sHf176Lu176,exterr=TRUE){
+    get.PD.age(Hf176Lu176,sHf176Lu176,'Lu176',exterr)
 }
 
 LuHf.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){

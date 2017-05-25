@@ -29,19 +29,22 @@
 #'
 #' \item a six element vector containing \code{Sm}, \code{s[Sm]},
 #' \code{Nd}, \code{s[Nd]}, \code{Nd143Nd144}, and \code{s[Nd144Nd143]}
+#'
+#' \item a six element vector containing \code{Lu}, \code{s[Lu]},
+#' \code{Hf}, \code{s[Hf]}, \code{Hf176Hf177}, and \code{s[Hf176Hf177]}
 #' }
 #'
 #' OR
 #'
 #' \itemize{
 #' \item an object of class \code{UPb}, \code{ArAr},
-#' \code{RbSr}, \code{SmNd}, \code{ReOs} \code{UThHe} or
+#' \code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf} \code{UThHe} or
 #' \code{fissiontracks}.
 #' }
 #'
 #' @param method one of either \code{'U238-Pb206'}, \code{'U235-Pb207'},
 #'     \code{'Pb207-Pb206'}, \code{'Ar-Ar'}, \code{'Re-Os'},
-#'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{'U-Th-He'} or
+#'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{'Lu-Hf'}, \code{'U-Th-He'} or
 #'     \code{'fissiontracks'}
 #' 
 #' @param exterr propagate the external (decay constant and
@@ -74,6 +77,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
         out <- get.RbSr.age(X[1],X[2],exterr)
     } else if (identical(method,'Sm-Nd')){
         out <- get.SmNd.age(X[1],X[2],exterr)
+    } else if (identical(method,'Lu-Hf')){
+        out <- get.LuHf.age(X[1],X[2],exterr)
     } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
@@ -151,12 +156,12 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \item{cov}{ the covariance matrix of the elements in \code{x} }
 #' }
 #'
-#' \item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd}
-#' or \code{ReOs} and \code{isochron=FALSE}, returns a table of Ar-Ar,
-#' Rb-Sr, Sm-Nd or Re-Os ages and standard errors.
+#' \item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd},
+#' \code{ReOs}, \code{LuHf} and \code{isochron=FALSE}, returns a table of Ar-Ar,
+#' Rb-Sr, Sm-Nd, Re-Os or Lu-Hf ages and standard errors.
 #'
-#' \item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd}
-#' or \code{ReOs} and \code{isochron=TRUE}, returns a list with the
+#' \item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd},
+#' \code{ReOs} or \code{LuHf} and \code{isochron=TRUE}, returns a list with the
 #' following items:
 #'
 #' \describe{
@@ -167,12 +172,14 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \item{b}{ the slope of the fit and its standard error. }
 #' 
 #' \item{y0}{ the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
-#' \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{87}}Sr/\eqn{^{86}}Sr, or
-#' \eqn{^{143}}Nd/\eqn{^{144}}Nd ratio and its standard error. }
+#' \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#' \eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#' ratio and its standard error. }
 #' 
 #' \item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar,
-#' \eqn{^{187}}Os/\eqn{^{187}}Re, \eqn{^{87}}Sr/\eqn{^{86}}Sr, or
-#' \eqn{^{143}}Nd/\eqn{^{144}}Nd age and its standard error. }
+#' \eqn{^{187}}Os/\eqn{^{187}}Re, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#' \eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf age
+#' and its standard error. }
 #' 
 #' }
 #' 
@@ -246,11 +253,12 @@ age.UPb <- function(x,type=1,wetherill=TRUE,
 #'     should be considered separately (\code{isochron=FALSE}) or an
 #'     isochron age should be calculated from all Ar-Ar analyses
 #'     together (\code{isochron=TRUE}).
-#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
-#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar or
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron fit. Setting
-#'     \code{i2i} to \code{FALSE} uses the default values stored in
-#'     \code{settings('iratio',...)}
+#' @param i2i
+#'     `isochron to intercept': calculates the initial (aka `inherited',
+#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in \code{settings('iratio',...)}
 #' @rdname age
 #' @export
 age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
@@ -295,12 +303,16 @@ age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
 age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     age.PD(x,'Rb87',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
 }
+#' @rdname age
+#' @export
+age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+    age.PD(x,'Lu176',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
+}
 age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig)
     else out <- PD.age(x,nuclide,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }
-
 # tt and st are the age and error (scalars produced by peakfit or weightedmean)
 # calculated without taking into account the external errors
 add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
@@ -328,6 +340,9 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     } else if (hasClass(x,'RbSr')){
         R <- get.RbSr.ratio(tt,st,exterr=FALSE)
         out <- get.RbSr.age(R[1],R[2],exterr=TRUE)
+    } else if (hasClass(x,'LuHf')){
+        R <- get.LuHf.ratio(tt,st,exterr=FALSE)
+        out <- get.LuHf.age(R[1],R[2],exterr=TRUE)
     } else if (hasClass(x,'fissiontracks')){
         out[2] <- tt * sqrt( (x$zeta[2]/x$zeta[1])^2 + (st/tt)^2 )
     }

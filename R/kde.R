@@ -157,12 +157,13 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
         return(X)
     }
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
+#' @param i2i
+#'     `isochron to intercept': calculates the initial (aka `inherited',
 #'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in \code{settings('iratio',...)}
 #' @rdname kde
 #' @export
 kde.ArAr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
@@ -213,6 +214,20 @@ kde.RbSr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,
                      i2i=TRUE,...){
     tt <- RbSr.age(x,i2i=i2i)[,1]
+    kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
+                n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
+                kde.col=kde.col,hist.col=hist.col,
+                show.hist=show.hist,bty=bty,binwidth=binwidth,
+                ncol=ncol,...)
+}
+#' @rdname kde
+#' @export
+kde.LuHf <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                     n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
+                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
+                     show.hist=TRUE,bty='n',binwidth=NA,ncol=NA,
+                     i2i=TRUE,...){
+    tt <- LuHf.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,

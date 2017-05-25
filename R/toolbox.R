@@ -5,6 +5,7 @@ numgrains.ArAr <- function(x){ length(x$x[,1]) }
 numgrains.RbSr <- function(x){ length(x$x[,1]) }
 numgrains.SmNd <- function(x){ length(x$x[,1]) }
 numgrains.ReOs <- function(x){ length(x$x[,1]) }
+numgrains.LuHf <- function(x){ length(x$x[,1]) }
 numgrains.fissiontracks <- function(x){ length(x$x[,1]) }
 
 select <- function(x,selection){
