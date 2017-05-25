@@ -48,8 +48,8 @@ ppm2ratios.LuHf <- function(x,exterr=FALSE,common=FALSE,...){
     out[,3] <- R67Hf
     for (i in 1:nn){
         E[9,9] <- x$x[i,'errHf176Hf177']^2 # var(R67Hf)
-        E[10,10] <- x$x[i,'errLuppm']^2
-        E[11,11] <- x$x[i,'errHfppm']^2
+        E[10,10] <- x$x[i,'errLuppm']^2    # var(Lu)
+        E[11,11] <- x$x[i,'errHfppm']^2    # var(Hf)
         J[1,1] <- -Lu176Hf177[i]*dinvf6Lu.dR65Lu/invf6Lu
         J[1,2] <-  Lu176Hf177[i]*dinvf7Hf.dR47Lu/invf7Hf[i]
         J[1,3] <-  Lu176Hf177[i]*dinvf7Hf.dR67Hf0/invf7Hf[i]

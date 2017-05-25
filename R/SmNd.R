@@ -68,24 +68,24 @@ ppm2ratios.SmNd <- function(x,exterr=FALSE,common=FALSE,...){
     out[,3] <- R34Nd
     for (i in 1:nn){
         E[15,15] <- x$x[i,'errNd143Nd144']^2 # var(R34Nd)
-        E[16,16] <- x$x[i,'errSmppm']^2
-        E[17,17] <- x$x[i,'errNdppm']^2
+        E[16,16] <- x$x[i,'errSmppm']^2 # var(Sm)
+        E[17,17] <- x$x[i,'errNdppm']^2 # var(Nd)
         J[1,1] <- -Sm147Nd144[i]*dinvf147Sm.dR4452Sm/invf147Sm
         J[1,2] <- -Sm147Nd144[i]*dinvf147Sm.dR4752Sm/invf147Sm
         J[1,3] <- -Sm147Nd144[i]*dinvf147Sm.dR4852Sm/invf147Sm
         J[1,4] <- -Sm147Nd144[i]*dinvf147Sm.dR4952Sm/invf147Sm
         J[1,5] <- -Sm147Nd144[i]*dinvf147Sm.dR5052Sm/invf147Sm
         J[1,6] <- -Sm147Nd144[i]*dinvf147Sm.dR5452Sm/invf147Sm
-        J[1,7] <- (dinvf144Nd.dR24Nd/invf147Sm)*(Sm[i]/Nd[i])*(MMNd/MMSm)
-        J[1,8] <- (dinvf144Nd.dR34Nd0/invf147Sm)*(Sm[i]/Nd[i])*(MMNd/MMSm)
-        J[1,9] <- (dinvf144Nd.dR54Nd/invf147Sm)*(Sm[i]/Nd[i])*(MMNd/MMSm)
-        J[1,10] <- (dinvf144Nd.dR64Nd/invf147Sm)*(Sm[i]/Nd[i])*(MMNd/MMSm)
-        J[1,11] <- (dinvf144Nd.dR84Nd/invf147Sm)*(Sm[i]/Nd[i])*(MMNd/MMSm)
-        J[1,12] <- (dinvf144Nd.dR04Nd/invf147Sm)*(Sm[i]/Nd[i])*(MMNd/MMSm)
+        J[1,7] <-  Sm147Nd144[i]*dinvf144Nd.dR24Nd/invf144Nd[i]
+        J[1,8] <-  Sm147Nd144[i]*dinvf144Nd.dR34Nd0/invf144Nd[i]
+        J[1,9] <-  Sm147Nd144[i]*dinvf144Nd.dR54Nd/invf144Nd[i]
+        J[1,10] <- Sm147Nd144[i]*dinvf144Nd.dR64Nd/invf144Nd[i]
+        J[1,11] <- Sm147Nd144[i]*dinvf144Nd.dR84Nd/invf144Nd[i]
+        J[1,12] <- Sm147Nd144[i]*dinvf144Nd.dR04Nd/invf144Nd[i]
         J[1,13] <- -Sm147Nd144[i]/MMSm
-        J[1,14] <- (invf144Nd[i]/invf147Sm)*(Sm[i]/Nd[i])/MMSm
-        J[1,15] <- (dinvf144Nd.dR34Nd/invf147Sm)*(Sm[i]/Nd[i])*(MMNd/MMSm)
-        J[1,16] <- (invf144Nd[i]/invf147Sm)*(MMNd/MMSm)/Nd[i]
+        J[1,14] <-  Sm147Nd144[i]/MMNd
+        J[1,15] <-  Sm147Nd144[i]*dinvf144Nd.dR34Nd/invf144Nd[i]
+        J[1,16] <-  Sm147Nd144[i]/Sm[i]
         J[1,17] <- -Sm147Nd144[i]/Nd[i]
         J[2,8] <- dR34Nd.dR34Nd0
         J[2,15] <- 1

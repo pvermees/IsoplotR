@@ -7,8 +7,8 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
     R62Os <- iratio('Os186Os192')[1]
     R72Os <- iratio('Os187Os192')[1]
     R82Os <- iratio('Os188Os192')[1]
-    R02Os <- iratio('Os190Os192')[1]
     R92Os <- iratio('Os189Os192')[1]
+    R02Os <- iratio('Os190Os192')[1]
     dR78Os.dR78Os <- 1
     if (common) { # make common Os correction
         R78Os <-  x$x[,'Os187Os188'] - R72Os/R82Os
@@ -65,12 +65,12 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
         J[1,6] <- Re187Os188[i]*dinvf188Os.dR92Os/invf188Os[i]
         J[1,7] <- Re187Os188[i]*dinvf188Os.dR02Os/invf188Os[i]
         J[1,8] <- -Re187Os188[i]/MMRe
-        J[1,9] <- Re187Os188[i]/MMOs
+        J[1,9] <-  Re187Os188[i]/MMOs
         J[1,10] <- Re187Os188[i]*dinvf188Os.dR78Os/invf188Os[i]
-        J[1,11] <- Re187Os188[i]*dinvf188Os.dR78Os/Re[i]
-        J[1,12] <- Re187Os188[i]*dinvf188Os.dR78Os/Os[i]
-        J[2,4] <- dR78Os.dR72Os
-        J[2,5] <- dR78Os.dR82Os
+        J[1,11] <-  Re187Os188[i]/Re[i]
+        J[1,12] <- -Re187Os188[i]/Os[i]
+        J[2,4] <-  dR78Os.dR72Os
+        J[2,5] <-  dR78Os.dR82Os
         J[2,10] <- dR78Os.dR78Os
         E2 <- J %*% E %*% t(J)
         if (all(is.finite(E2))){
