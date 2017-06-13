@@ -9,6 +9,7 @@
 \alias{cad.ReOs}
 \alias{cad.SmNd}
 \alias{cad.RbSr}
+\alias{cad.LuHf}
 \alias{cad.UThHe}
 \alias{cad.fissiontracks}
 \title{Plot continuous data as cumulative age distributions}
@@ -37,6 +38,9 @@ cad(x, ...)
 \method{cad}{RbSr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", i2i = TRUE, ...)
 
+\method{cad}{LuHf}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", i2i = TRUE, ...)
+
 \method{cad}{UThHe}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", ...)
 
@@ -46,7 +50,7 @@ cad(x, ...)
 \arguments{
 \item{x}{a numerical vector OR an object of class \code{UPb},
 \code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs},
-\code{RbSr}, \code{SmNd} or \code{detritals}}
+\code{RbSr}, \code{SmNd}, \code{LuHf} or \code{detritals}}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 
@@ -90,10 +94,10 @@ the \eqn{^{206}}Pb/\eqn{^{238}}U and
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
 `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-\eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron
-fit. Setting \code{i2i} to \code{FALSE} uses the default values
-stored in \code{settings('iratio',...)}}
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+\eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+uses the default values stored in \code{settings('iratio',...)}}
 }
 \description{
 Plot a dataset as a Cumulative Age Distribution (CAD), also known

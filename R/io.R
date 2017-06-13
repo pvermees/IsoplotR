@@ -55,6 +55,15 @@
 #'
 #' where \code{Re} and \code{Os} are in ppm
 #'
+#' if \code{method='Lu-Hf'}, then \code{format} is one of either:
+#'
+#' \enumerate{
+#' \item{\code{Lu176/Hf177, s[Lu176/Hf177], Hf176/Hf177, s[Hf176/Hf177] (, rho)}}
+#' \item{\code{Lu, s[Lu], Hf, s[Hf], Hf176/Hf177, s[Hf176/Hf177]}}
+#' }
+#'
+#' where \code{Lu} and \code{Hf} are in ppm
+#'
 #' if \code{method='fissiontracks'}, then \code{format} is one of
 #' either:
 #'
@@ -85,6 +94,7 @@
 #' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}}
 #' \item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}}
 #' \item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}}
+#' \item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
 #' \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv}, \code{FT3.csv}}
 #' \item{U-Th-He: \code{UThHe.csv}, \code{UThSmHe.csv}}
 #' \item{detritals: \code{Namib.csv}}
@@ -145,6 +155,8 @@ read.data.default <- function(x,method='U-Pb',format=1,...){
 read.data.matrix <- function(x,method='U-Pb',format=1,...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format)
+    } else if (identical(method,'Pb-Pb')){
+        out <- as.PbPb(x,format)
     } else if (identical(method,'Ar-Ar')){
         out <- as.ArAr(x,format)
     } else if (identical(method,'Re-Os')){
@@ -181,7 +193,8 @@ as.UPb <- function(x,format=3){
                     'Pb206U238','errPb206U238','rhoXY')        
         out$x <- X
     } else if (format == 2 & nc %in% c(4,5)) {
-        cnames <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rhoXY')
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb207Pb206','errPb207Pb206','rhoXY')
         if (nc == 4){
             rho <- rep(0,nr-1)
             out$x <- cbind(X,rho)
@@ -222,17 +235,81 @@ as.UPb <- function(x,format=3){
 }
 get.cor.75.68 <- function(Pb207U235,errPb207U235,Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
-    cov.75.68 <- Pb207U235*Pb206U238*((errPb207U235/Pb207U235)^2+
-                 (errPb206U238/Pb206U238)^2-(errPb207Pb206/Pb207Pb206)^2)/2
-    cor.75.68 <- cov.75.68/(errPb207U235*errPb206U238)
-    cor.75.68
+    get.cor.div(Pb207U235,errPb207U235,
+                Pb206U238,errPb206U238,
+                Pb207Pb206,errPb207Pb206)
 }
 get.cor.68.76 <- function(Pb207U235,errPb207U235,Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
-    cov.68.76 <- Pb206U238*Pb207U235*((errPb207U235/Pb207U235)^2-
-                 (errPb206U238/Pb206U238)^2-(errPb207Pb206/Pb207Pb206)^2)/2
-    cor.68.76 <- cov.68.76/(errPb206U238*Pb207Pb206)
-    cor.68.76
+    get.cor.mult(Pb206U238,errPb206U238,
+                 Pb207Pb206,errPb207Pb206,
+                 Pb207U235,errPb207U235)
+}
+as.PbPb <- function(x,format=1){
+    out <- list()
+    class(out) <- "PbPb"
+    out$x <- NA
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    X <- shiny2matrix(x,2,nr,nc)
+    cnames <- NULL
+    if (format == 1 & nc == 5){
+        cnames <- c('Pb206Pb204','errPb206Pb204',
+                    'Pb207Pb204','errPb207Pb204','rhoXY')        
+        out$x <- X
+    } else if (format == 2 & nc %in% c(4,5)) {
+        cnames <- c('Pb204Pb206','errPb204Pb206',
+                    'Pb207Pb206','errPb207Pb206','rhoXY')
+        if (nc == 4){
+            rho <- rep(0,nr-1)
+            out$x <- cbind(X,rho)
+        } else {
+            i <- which(is.na(X[,5]))
+            X[i,5] <- 0
+            out$x <- X
+        }
+    } else if (format == 3 & nc %in% c(6,7,8)){
+        cnames <- c('Pb204Pb206','errPb204Pb206',
+                    'Pb207Pb206','errPb207Pb206',
+                    'Pb204Pb207','errPb204Pb207',
+                    'rhoXY','rhoYZ')
+        if (nc == 8){
+            rhoXY <- X[,7]
+            rhoYZ <- X[,8]
+            i <- which(is.na(rhoXY))
+            j <- which(is.na(rhoYZ))
+        } else if (nc == 7){
+            rhoXY <- X[,7]
+            rhoYZ <- rep(0,nr-1)
+            i <- which(is.na(rhoXY))
+            j <- 1:(nr-1)
+            X <- cbind(X,rhoYZ)
+        } else {
+            rhoXY <- rep(0,nr-1)
+            rhoYZ <- rep(0,nr-1)
+            i <- 1:(nr-1)
+            j <- 1:(nr-1)
+            X <- cbind(X,rhoXY,rhoYZ)
+        }
+        X[i,7] <- get.cor.46.76(X[i,1],X[i,2],X[i,3],X[i,4],X[,5],X[i,6])
+        X[j,8] <- get.cor.76.47(X[j,1],X[j,2],X[j,3],X[j,4],X[,5],X[j,6])
+        out$x <- X
+    }
+    colnames(out$x) <- cnames
+    out
+}
+get.cor.46.76 <- function(Pb204Pb206,errPb204Pb206,Pb207Pb206,
+                          errPb207Pb206,Pb204Pb207,errPb204Pb207){
+    get.cor.div(Pb204Pb206,errPb204Pb206,
+                Pb207Pb206,errPb207Pb206,
+                Pb204Pb207,errPb204Pb207)
+}
+get.cor.76.47 <- function(Pb204Pb206,errPb204Pb206,Pb207Pb206,
+                          errPb207Pb206,Pb204Pb207,errPb204Pb207){
+    get.cor.mult(Pb207Pb206,errPb207Pb206,
+                 Pb204Pb207,errPb204Pb207,
+                 Pb204Pb206,errPb204Pb206)
 }
 as.ArAr <- function(x,format=3){
     out <- list()

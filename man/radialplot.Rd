@@ -10,6 +10,7 @@
 \alias{radialplot.ReOs}
 \alias{radialplot.SmNd}
 \alias{radialplot.RbSr}
+\alias{radialplot.LuHf}
 \title{Visualise heteroscedastic data on a radial plot}
 \usage{
 radialplot(x, ...)
@@ -47,6 +48,10 @@ radialplot(x, ...)
 \method{radialplot}{RbSr}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
   markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, ...)
+
+\method{radialplot}{LuHf}(x, from = NA, to = NA, t0 = NA,
+  transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
+  markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, ...)
 }
 \arguments{
 \item{x}{Either an nx2 matix of (transformed) values z and their
@@ -55,7 +60,8 @@ radialplot(x, ...)
 OR
 
 and object of class \code{fissiontracks}, \code{UThHe},
-\code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr} or \code{UPb}}
+\code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{LuHf} or
+\code{UPb}}
 
 \item{...}{additional arguments to the generic \code{points}
 function}
@@ -119,10 +125,10 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
 `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-\eqn{^{187}}Os/\eqn{^{188}}Os ratio from an isochron
-fit. Setting \code{i2i} to \code{FALSE} uses the default values
-stored in \code{settings('iratio',...)}}
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+\eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+uses the default values stored in \code{settings('iratio',...)}}
 }
 \description{
 Implementation of a graphical device developed by Rex Galbraith to

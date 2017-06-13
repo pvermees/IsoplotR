@@ -26,7 +26,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
 ### Aliases: age age.default age.UPb age.ArAr age.UThHe age.fissiontracks
-###   age.ReOs age.SmNd age.RbSr
+###   age.ReOs age.SmNd age.RbSr age.LuHf
 
 ### ** Examples
 
@@ -69,7 +69,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
 ### Aliases: cad cad.default cad.detritals cad.UPb cad.ArAr cad.ReOs
-###   cad.SmNd cad.RbSr cad.UThHe cad.fissiontracks
+###   cad.SmNd cad.RbSr cad.LuHf cad.UThHe cad.fissiontracks
 
 ### ** Examples
 
@@ -159,6 +159,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
+
 concordia(examples$UPb)
 
 agespectrum(examples$ArAr)
@@ -235,7 +236,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
 ### Aliases: kde kde.default kde.UPb kde.detritals kde.ArAr kde.ReOs
-###   kde.SmNd kde.RbSr kde.UThHe kde.fissiontracks
+###   kde.SmNd kde.RbSr kde.LuHf kde.UThHe kde.fissiontracks
 
 ### ** Examples
 
@@ -280,7 +281,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: peakfit
 ### Title: Finite mixture modelling of geochronological datasets
 ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
-###   peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr peakfit.UThHe
+###   peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr peakfit.LuHf
+###   peakfit.UThHe
 
 ### ** Examples
 
@@ -302,7 +304,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Title: Visualise heteroscedastic data on a radial plot
 ### Aliases: radialplot radialplot.default radialplot.fissiontracks
 ###   radialplot.UPb radialplot.ArAr radialplot.UThHe radialplot.ReOs
-###   radialplot.SmNd radialplot.RbSr
+###   radialplot.SmNd radialplot.RbSr radialplot.LuHf
 
 ### ** Examples
 
@@ -429,7 +431,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Title: Calculate the weighted mean age
 ### Aliases: weightedmean weightedmean.default weightedmean.UPb
 ###   weightedmean.ArAr weightedmean.ReOs weightedmean.SmNd
-###   weightedmean.RbSr weightedmean.UThHe weightedmean.fissiontracks
+###   weightedmean.RbSr weightedmean.LuHf weightedmean.UThHe
+###   weightedmean.fissiontracks
 
 ### ** Examples
 

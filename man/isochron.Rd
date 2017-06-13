@@ -50,8 +50,8 @@ isochron(x, ...)
 
 OR
 
-an object of class \code{ArAr}, \code{ReOs}, \code{RbSr} or
-\code{SmNd}}
+an object of class \code{ArAr}, \code{ReOs}, \code{RbSr},
+\code{SmNd} or \code{LuHf}.}
 
 \item{...}{optional arguments}
 
@@ -95,7 +95,7 @@ age and its standard error}
 }
 }
 \description{
-Plots cogenetic \eqn{^{40}}Ar/\eqn{^{39}}Ar data as X-Y
+Plots cogenetic Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf data as X-Y
 scatterplots, fits an isochron curve through them using the
 \code{yorkfit} function, and computes the corresponding isochron
 age, including decay constant uncertainties.

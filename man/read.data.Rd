@@ -69,6 +69,15 @@ if \code{method='Re-Os'}, then \code{format} is one of either:
 
 where \code{Re} and \code{Os} are in ppm
 
+if \code{method='Lu-Hf'}, then \code{format} is one of either:
+
+\enumerate{
+\item{\code{Lu176/Hf177, s[Lu176/Hf177], Hf176/Hf177, s[Hf176/Hf177] (, rho)}}
+\item{\code{Lu, s[Lu], Hf, s[Hf], Hf176/Hf177, s[Hf176/Hf177]}}
+}
+
+where \code{Lu} and \code{Hf} are in ppm
+
 if \code{method='fissiontracks'}, then \code{format} is one of
 either:
 
@@ -109,6 +118,7 @@ IsoplotR provides the following example input files:
 \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}}
 \item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}}
 \item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}}
+\item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
 \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv}, \code{FT3.csv}}
 \item{U-Th-He: \code{UThHe.csv}, \code{UThSmHe.csv}}
 \item{detritals: \code{Namib.csv}}

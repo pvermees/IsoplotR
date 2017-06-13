@@ -116,9 +116,9 @@ ArAr.age.ratios <- function(x){
         colnames(covmat) <- c('varX','varY','cov')
         covmat[,'varX'] <- errAr40Ar39^2
         covmat[,'varY'] <- errAr39Ar36^2
-        covmat[,'cov'] <- get.cov.xzzy(Ar40Ar39,errAr40Ar39,
+        covmat[,'cov'] <- get.cov.mult(Ar40Ar39,errAr40Ar39,
                                        Ar39Ar36,errAr39Ar36,
-                                       errAr40Ar36)
+                                       Ar40Ar39*Ar39Ar36,errAr40Ar36)
     }
     out <- cbind(Ar40Ar39,covmat[,'varX'],Ar39Ar36,covmat[,'varY'],covmat[,'cov'])
     colnames(out) <- c('Ar40Ar39','varAr40Ar39',

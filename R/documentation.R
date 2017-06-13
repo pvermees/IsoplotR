@@ -1,6 +1,6 @@
 #' Example datasets for testing \code{IsoplotR}
 #'
-#' U-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, U-Th-He, fission track and
+#' U-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, fission track and
 #' detrital datasets
 #'
 #' \code{examples} a 14-item list containing:
@@ -40,6 +40,9 @@
 #' \code{RbSr}: an object of class \code{RbSr} containing an
 #' \eqn{^{87}}Rb/\eqn{^{86}}Sr-dataset from Compston et al. (1971).
 #'
+#' \code{LuHf}: an object of class \code{LuHf} containing an
+#' \eqn{^{176}}Lu/\eqn{^{177}}Hf-dataset from Barfod et al. (2002).
+#'
 #' \code{Namib}: an object of class \code{detritals} containing a
 #' detrital zircon U-Pb dataset of Vermeesch and Garzanti (2015)
 #'
@@ -62,6 +65,7 @@
 #' @docType data
 #' @examples
 #' data(examples)
+#'
 #' concordia(examples$UPb)
 #'
 #' agespectrum(examples$ArAr)
@@ -85,6 +89,11 @@
 #' Cenozoic Olympic subduction complex, Washington State, as deduced
 #' from fission track ages for detrial zircons. American Journal of
 #' Science, 292, pp.565-565.
+#'
+#' Barfod, G.H., Albarede, F., Knoll, A.H., Xiao, S., Telouk, P.,
+#' Frei, R. and Baker, J., 2002. New Lu-Hf and Pb-Pb age constraints on
+#' the earliest animal fossils. Earth and Planetary Science Letters, 201(1),
+#' pp.203-212.
 #'
 #' Compston, W., Berry, H., Vernon, M.J., Chappell, B.W. and Kaye,
 #' M.J., 1971. Rubidium-strontium chronology and chemistry of lunar

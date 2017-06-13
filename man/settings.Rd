@@ -174,7 +174,7 @@ Stand. A 77 (1973): 691-698.
 mass spectrometry." Int. J. Mass Spect. Ion Proc. 105.2 (1991): 147-159.
 
 \item Lu: De Laeter, J. R., and N. Bukilic.
-"Solar abundance of Lu\eqn{^{176}} and s-process nucleosynthesis."
+"Solar abundance of \eqn{^{176}}Lu and s-process nucleosynthesis."
 Physical Review C 73.4 (2006): 045806.
 
 \item Hf: Patchett, P. Jonathan.

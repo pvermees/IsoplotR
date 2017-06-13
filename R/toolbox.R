@@ -80,28 +80,17 @@ cor2cov <- function(sX,sY,rXY){
     covmat
 }
 
-get.cov.xzyz <- function(xz,err.xz,yz,err.yz,err.xy){
-    xy <- xz/yz
-    0.5*xz*yz*((err.xz/xz)^2 + (err.yz/yz)^2 - (err.xy/xy)^2)
+get.cov.div <- function(A,err.A,B,err.B,AB,err.AB){
+    0.5*A*B*((err.A/A)^2+(err.B/B)^2-(err.AB/AB)^2)
 }
-get.cor.xzyz <- function(xz,err.xz,yz,err.yz,err.xy){
-    get.cov.xzyz(xz,err.xz,yz,err.yz,err.xy)/(err.xz*err.yz)
+get.cor.div <- function(A,err.A,B,err.B,AB,err.AB){
+    get.cov.div(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
 }
-
-get.cov.zxzy <- function(zx,err.zx,zy,err.zy,err.xy){
-    xy <- zy/zx
-    0.5*zx*zy*((err.zy/zy)^2 + (err.zx/zx)^2 - (err.xy/xy)^2)
+get.cov.mult <- function(A,err.A,B,err.B,AB,err.AB){
+    0.5*A*B*((err.AB/AB)^2 - (err.A/A)^2 - (err.B/B)^2)
 }
-get.cor.zxzy <- function(zx,err.zx,zy,err.zy,err.xy){
-    get.cov.zxzy(zx,err.zx,zy,err.zy,err.xy)/(err.zx*err.zy)
-}
-
-get.cov.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
-    xy <- xz*zy
-    0.5*xz*zy*((err.xy/xy)^2 - (err.xz/xz)^2 - (err.zy/zy)^2)
-}
-get.cor.xzzy <- function(xz,err.xz,zy,err.zy,err.xy){
-    get.cov.xzzy(xz,err.xz,zy,err.zy,err.xy)/(err.xz*err.zy)
+get.cor.mult <- function(A,err.A,B,err.B,AB,err.AB){
+    get.cov.mult(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
 }
 
 # simultaneously performs error propagation for multiple samples
