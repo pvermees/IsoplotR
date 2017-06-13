@@ -108,6 +108,45 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
+isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                          inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
+                          exterr=TRUE,...){
+    d <- data2york(x,inverse=inverse)
+    fit <- yorkfit(d)
+    if (inverse){
+        x0 <- -fit$b[1]/fit$a[1]
+        sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2 -
+                       2*fit$a[2]*fit$b[2]*fit$cov.ab)
+        y0 <- 1/fit$a[1]
+        sy0 <- fit$a[2]/fit$a[1]^2
+        tt <- get.PbPb.age(x0,sx0,exterr=exterr)
+        x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
+        y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
+    } else {
+        y0 <- fit$a[1]
+        sy0 <- fit$a[2]
+        tt <- get.PbPb.age(fit$b[1],fit$b[2],exterr=exterr)
+        x.lab <- expression(paste(""^"204","Pb/"^"206","Pb"))
+        y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
+    }
+    out <- fit
+    class(out) <- "isochron"
+    out$y0 <- c(y0,sy0)
+    out$age <- tt
+    if (plot) {
+        isochron.default(d,xlim=xlim,ylim=ylim,alpha=alpha,
+                         show.numbers=show.numbers,
+                         ellipse.col=ellipse.col,a=fit$a[1],
+                         b=fit$b[1], line.col=line.col,lwd=lwd,
+                         title=FALSE)
+        title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+    } else {
+        return(out)
+    }
+}
+#' @rdname isochron
+#' @export
 isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){

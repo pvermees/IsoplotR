@@ -166,6 +166,14 @@ data2york.ArAr <- function(x,inverse=TRUE){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+data2york.PbPb <- function(x,inverse=TRUE){
+    if (inverse)
+        out <- PbPb.inverse.ratios(x)
+    else
+        out <- PbPb.normal.ratios(x)
+    colnames(out) <- c('X','sX','Y','sY','rXY')
+    out
+}
 data2york.PD <- function(x,exterr=FALSE,common=FALSE){
     if (x$format==1){
         out <- x$x

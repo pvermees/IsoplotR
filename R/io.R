@@ -190,7 +190,7 @@ as.UPb <- function(x,format=3){
     cnames <- NULL
     if (format == 1 & nc == 5){
         cnames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238','rhoXY')        
+                    'Pb206U238','errPb206U238','rhoXY')
         out$x <- X
     } else if (format == 2 & nc %in% c(4,5)) {
         cnames <- c('U238Pb206','errU238Pb206',
@@ -256,7 +256,7 @@ as.PbPb <- function(x,format=1){
     cnames <- NULL
     if (format == 1 & nc == 5){
         cnames <- c('Pb206Pb204','errPb206Pb204',
-                    'Pb207Pb204','errPb207Pb204','rhoXY')        
+                    'Pb207Pb204','errPb207Pb204','rhoXY')
         out$x <- X
     } else if (format == 2 & nc %in% c(4,5)) {
         cnames <- c('Pb204Pb206','errPb204Pb206',
