@@ -55,8 +55,8 @@ PbPb.inverse.ratios <- function(x){
         J22 <-  1/x$x[,'Pb206Pb204']
         J12 <-  0
         J21 <- -x$x[,'Pb207Pb204']/x$x[,'Pb206Pb204']^2
-        E11 <- x$x[,'Pb206Pb204']^2
-        E22 <- x$x[,'Pb207Pb204']^2
+        E11 <- x$x[,'errPb206Pb204']^2
+        E22 <- x$x[,'errPb207Pb204']^2
         E12 <- x$x[,'rhoXY']*x$x[,'errPb206Pb204']*x$x[,'errPb207Pb204']
         covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
         errPb204Pb206 <- sqrt(covmat[,'varX'])
@@ -75,6 +75,4 @@ PbPb.inverse.ratios <- function(x){
     out
 }
 
-get.PbPb.age <- function(Pb207Pb206,sPb207Pb206,exterr=TRUE){
-    c(0,0)
-}
+length.PbPb <- function(x){ nrow(x$x) }
