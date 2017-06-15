@@ -256,60 +256,18 @@ as.PbPb <- function(x,format=1){
     cnames <- NULL
     if (format == 1 & nc == 5){
         cnames <- c('Pb206Pb204','errPb206Pb204',
-                    'Pb207Pb204','errPb207Pb204','rhoXY')
-        out$x <- X
-    } else if (format == 2 & nc %in% c(4,5)) {
+                    'Pb207Pb204','errPb207Pb204','rho')
+    } else if (format == 2 & nc == 5) {
         cnames <- c('Pb204Pb206','errPb204Pb206',
-                    'Pb207Pb206','errPb207Pb206','rhoXY')
-        if (nc == 4){
-            rho <- rep(0,nr-1)
-            out$x <- cbind(X,rho)
-        } else {
-            i <- which(is.na(X[,5]))
-            X[i,5] <- 0
-            out$x <- X
-        }
-    } else if (format == 3 & nc %in% c(6,7,8)){
-        cnames <- c('Pb204Pb206','errPb204Pb206',
-                    'Pb207Pb206','errPb207Pb206',
-                    'Pb204Pb207','errPb204Pb207',
-                    'rhoXY','rhoYZ')
-        if (nc == 8){
-            rhoXY <- X[,7]
-            rhoYZ <- X[,8]
-            i <- which(is.na(rhoXY))
-            j <- which(is.na(rhoYZ))
-        } else if (nc == 7){
-            rhoXY <- X[,7]
-            rhoYZ <- rep(0,nr-1)
-            i <- which(is.na(rhoXY))
-            j <- 1:(nr-1)
-            X <- cbind(X,rhoYZ)
-        } else {
-            rhoXY <- rep(0,nr-1)
-            rhoYZ <- rep(0,nr-1)
-            i <- 1:(nr-1)
-            j <- 1:(nr-1)
-            X <- cbind(X,rhoXY,rhoYZ)
-        }
-        X[i,7] <- get.cor.46.76(X[i,1],X[i,2],X[i,3],X[i,4],X[,5],X[i,6])
-        X[j,8] <- get.cor.76.47(X[j,1],X[j,2],X[j,3],X[j,4],X[,5],X[j,6])
-        out$x <- X
+                    'Pb207Pb206','errPb207Pb206','rho')
+    } else if (format == 3 & nc == 6){
+        cnames <- c('Pb206Pb204','errPb206Pb204',
+                    'Pb207Pb204','errPb207Pb204',
+                    'Pb207Pb206','errPb207Pb206')
     }
+    out$x <- X
     colnames(out$x) <- cnames
     out
-}
-get.cor.46.76 <- function(Pb204Pb206,errPb204Pb206,Pb207Pb206,
-                          errPb207Pb206,Pb204Pb207,errPb204Pb207){
-    get.cor.div(Pb204Pb206,errPb204Pb206,
-                Pb207Pb206,errPb207Pb206,
-                Pb204Pb207,errPb204Pb207)
-}
-get.cor.76.47 <- function(Pb204Pb206,errPb204Pb206,Pb207Pb206,
-                          errPb207Pb206,Pb204Pb207,errPb204Pb207){
-    get.cor.mult(Pb207Pb206,errPb207Pb206,
-                 Pb204Pb207,errPb204Pb207,
-                 Pb204Pb206,errPb204Pb206)
 }
 as.ArAr <- function(x,format=3){
     out <- list()
