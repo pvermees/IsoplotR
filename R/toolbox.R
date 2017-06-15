@@ -1,12 +1,12 @@
-numgrains <- function(x,...){ UseMethod("numgrains",x) }
-numgrains.default <- function(x){ length(x[,1]) }
-numgrains.UPb <- function(x){ length(x$x[,1]) }
-numgrains.ArAr <- function(x){ length(x$x[,1]) }
-numgrains.RbSr <- function(x){ length(x$x[,1]) }
-numgrains.SmNd <- function(x){ length(x$x[,1]) }
-numgrains.ReOs <- function(x){ length(x$x[,1]) }
-numgrains.LuHf <- function(x){ length(x$x[,1]) }
-numgrains.fissiontracks <- function(x){ length(x$x[,1]) }
+length.UPb  <- function(x){ nrow(x$x) }
+length.PbPb <- function(x){ nrow(x$x) }
+length.ArAr <- function(x){ nrow(x$x) }
+length.RbSr <- function(x){ nrow(x$x) }
+length.SmNd <- function(x){ nrow(x$x) }
+length.ReOs <- function(x){ nrow(x$x) }
+length.LuHf <- function(x){ nrow(x$x) }
+length.fissiontracks <- function(x){ nrow(x$x) }
+length.UThHe <- function(x){ nrow(x) }
 
 select <- function(x,selection){
     out <- x

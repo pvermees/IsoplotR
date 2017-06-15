@@ -189,5 +189,3 @@ ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     if (!is.na(i)) out <- out[i,]
     out
 }
-
-length.ArAr <- function(x){ nrow(x$x) }

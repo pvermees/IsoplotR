@@ -109,6 +109,11 @@ peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
 #'     uses the default values stored in \code{settings('iratio',...)}
 #' @rdname peakfit
 #' @export
+peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
+    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+}
+#' @rdname peakfit
+#' @export
 peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,...){
     peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
@@ -160,6 +165,8 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type,cutoff.76,
                               cutoff.disc,exterr=FALSE)
+    } else if (hasClass(x,'PbPb')){
+        tt <- PbPb.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){
@@ -356,7 +363,7 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
 }
 
 BIC.fit <- function(x,max.k,...){
-    n <- numgrains(x)
+    n <- length(x)
     BIC <- Inf
     for (k in 1:max.k){
         fit <- peakfit(x,k,...)

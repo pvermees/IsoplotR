@@ -121,14 +121,14 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         y0 <- 1/fit$a[1]
         sy0 <- fit$a[2]/fit$a[1]^2
         tt <- get.Pb207Pb206.age(fit$a[1],fit$a[2],exterr=exterr)
-        x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
-        y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
+        x.lab <- expression(paste(""^"204","Pb/"^"206","Pb"))
+        y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
     } else {
         y0 <- fit$b[1]
         sy0 <- fit$b[2]
         tt <- get.Pb207Pb206.age(y0,sy0,exterr=exterr)
-        x.lab <- expression(paste(""^"204","Pb/"^"206","Pb"))
-        y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
+        x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
+        y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
     }
     out <- fit
     class(out) <- "isochron"

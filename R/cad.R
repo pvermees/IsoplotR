@@ -83,6 +83,13 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     uses the default values stored in \code{settings('iratio',...)}
 #' @rdname cad
 #' @export
+cad.PbPb <- function(x,pch=NA,verticals=TRUE,
+                     xlab='age [Ma]',col='black',i2i=FALSE,...){
+    tt <- PbPb.age(x,i2i=i2i)[,1]
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
+}
+#' @rdname cad
+#' @export
 cad.ArAr <- function(x,pch=NA,verticals=TRUE,
                      xlab='age [Ma]',col='black',i2i=FALSE,...){
     tt <- ArAr.age(x,i2i=i2i)[,1]

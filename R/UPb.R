@@ -442,5 +442,3 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
     colnames(out) <- c('t','s[t]')
     out
 }
-
-length.UPb <- function(x){ nrow(x$x) }

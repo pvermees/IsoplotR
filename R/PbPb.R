@@ -91,4 +91,30 @@ PbPb.inverse.ratios <- function(x){
     out
 }
 
-length.PbPb <- function(x){ nrow(x$x) }
+PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
+    ns <- length(x)
+    dat <- data2york(x,inverse=FALSE)
+    if (i2i){
+        fit <- isochron(x,plot=FALSE,exterr=exterr)        
+        dat[,'Y'] <- dat[,'Y'] - fit$a[1]
+        if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + fit$a[2]^2)
+    }
+    out <- matrix(0,ns,2)
+    colnames(out) <- c('t','s[t]')
+    E <- matrix(0,2,2)
+    J <- matrix(0,1,2)
+    for (j in 1:ns) {
+        E[1,1] <- dat[j,'sX']^2
+        E[2,2] <- dat[j,'sY']^2
+        E[1,2] <- dat[j,'rXY']*dat[j,'sX']*dat[j,'sY']
+        E[2,1] <- E[1,2]
+        J[1,1] <- -dat[j,'Y']/dat[j,'X']^2
+        J[1,2] <- 1/dat[j,'X']        
+        DP <- dat[j,'Y']/dat[j,'X']
+        sDP <- sqrt(J%*%E%*%t(J))
+        tt <- get.Pb207Pb206.age(DP,sDP,nuclide,exterr=exterr)
+        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
+    }
+    if (!is.na(i)) out <- out[i,]
+    out
+}

@@ -247,6 +247,13 @@ age.UPb <- function(x,type=1,wetherill=TRUE,
         out <- discordia.age(x,wetherill=TRUE,exterr=TRUE,...)
     out
 }
+#' @rdname age
+#' @export
+age.PbPb <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+    if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
+    else out <- PbPb.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
+    out
+}
 #' @param J two-element vector with the J-factor and its standard
 #'     error.
 #' @param isochron logical flag indicating whether each Ar-Ar analysis
@@ -262,7 +269,7 @@ age.UPb <- function(x,type=1,wetherill=TRUE,
 #' @rdname age
 #' @export
 age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
-    if (isochron) out <- isochron(x,plot=FALSE,...)
+    if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
     else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }
@@ -328,6 +335,9 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
             R <- age.to.Pb207Pb206.ratio(tt,st)
             out <- get.Pb207Pb206.age(R[,1],R[,2],exterr=TRUE)
         }
+    } else if (hasClass(x,'PbPb')){
+        R <- age.to.Pb207Pb206.ratio(tt,st)
+        out <- get.Pb207Pb206.age(R[,1],R[,2],exterr=TRUE)
     } else if (hasClass(x,'ArAr')){
         R <- get.ArAr.ratio(tt,st,x$J[1],0,exterr=FALSE)
         out <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
