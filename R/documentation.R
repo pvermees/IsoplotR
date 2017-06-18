@@ -1,13 +1,16 @@
 #' Example datasets for testing \code{IsoplotR}
 #'
-#' U-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, fission track and
+#' U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, fission track and
 #' detrital datasets
 #'
-#' \code{examples} a 14-item list containing:
+#' \code{examples} a 17-item list containing:
 #'
 #' \code{UPb}: an object of class \code{UPb} containing a high
 #' precision U-Pb dataset of Kamo et al. (1996) packaged with Ken
 #' Ludwig's \code{Isoplot} program.
+#'
+#' \code{PbPb}: an object of class \code{PbPb} containing a Pb-Pb
+#' dataset from Connelley et al. (2017).
 #'
 #' \code{DZ}: an object of class \code{detrital} containing a detrital
 #' zircon U-Pb dataset from Namibia (Vermeesch et al., 2015).
@@ -65,9 +68,9 @@
 #' @docType data
 #' @examples
 #' data(examples)
-#'
+#' 
 #' concordia(examples$UPb)
-#'
+#' 
 #' agespectrum(examples$ArAr)
 #'
 #' isochron(examples$ReOs)
@@ -100,6 +103,10 @@
 #' material from the Ocean of Storms. In Lunar and Planetary Science
 #' Conference Proceedings (Vol. 2, p. 1471).
 #'
+#' Connelly, J.N., Bollard, J. and Bizzarro, M., 2017. Pb-Pb
+#' chronometry and the early Solar System. Geochimica et Cosmochimica
+#' Acta, 201, pp.345-363.
+#' 
 #' Galbraith, R. F. and Green, P. F., 1990: Estimating the component
 #' ages in a finite mixture, Nuclear Tracks and Radiation
 #' Measurements, 17, 197-206.
@@ -122,7 +129,7 @@
 #' p.291.
 #'
 #' Vermeesch, P. and Garzanti, E., 2015. Making geological sense of
-#' 'Big Data' in sedimentary provenance analysis. Chemical Geology, 409,
+#' `Big Data' in sedimentary provenance analysis. Chemical Geology, 409,
 #' pp.20-27.
 #'
 #' Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He ages.

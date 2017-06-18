@@ -49,13 +49,16 @@ mindens <- function(mineral,x=NULL){
 #' \code{'etchfact'}: fission track etch efficiency factors
 #'
 #' \code{'tracklength'}: equivalent isotropic fission track length
-#' @param ... depends on the value for \code{setting}: \itemize{ \item
-#'     for \code{'lambda'}: the isotope of interest (one of either
-#'     \code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"Th232"},
-#'     \code{"Re187"}, \code{"Sm147"}, \code{"Rb87"}, or \code{"K40"})
-#'     PLUS (optionally) the decay constant value and its analytical
-#'     error.  Omitting these two numbers simply returns the existing
-#'     values.
+#' @param ... depends on the value for \code{setting}:
+#'
+#' \itemize{
+#'
+#' \item for \code{'lambda'}: the isotope of interest (one of either
+#' \code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"Th232"},
+#' \code{"Re187"}, \code{"Sm147"}, \code{"Rb87"}, \code{"Lu176"}, or
+#' \code{"K40"}) PLUS (optionally) the decay constant value and its
+#' analytical error.  Omitting these two numbers simply returns the
+#' existing values.
 #'
 #' \item for \code{'iratio'}: the isotopic ratio of interest (one of
 #' either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
@@ -67,7 +70,7 @@ mindens <- function(mineral,x=NULL){
 #' \code{"Sm150Sm152"}, \code{"Sm154Sm152"}, \code{"Nd142Nd144"},
 #' \code{"Nd143Nd144"}, \code{"Nd145Nd144"}, \code{"Nd146Nd144"},
 #' \code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
-#' \code{"Hf174Hf177"},	\code{"Hf176Hf177"}, \code{"Hf178Hf177"},
+#' \code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
 #' \code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS (optionally) the
 #' isotopic ratio and its analytical error.  Omitting these two
 #' numbers simply returns the existing values.

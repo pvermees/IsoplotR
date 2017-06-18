@@ -8,35 +8,6 @@ length.LuHf <- function(x){ nrow(x$x) }
 length.fissiontracks <- function(x){ nrow(x$x) }
 length.UThHe <- function(x){ nrow(x) }
 
-select <- function(x,selection){
-    out <- x
-    i <- which(names(x$x) %in% selection)
-    out$x <- x$x[i]
-    out$covmat <- x$covmat[i,i]
-    out
-}
-
-zip.matrix <- function(x){
-    nc <- ncol(x)
-    nr <- nrow(x)
-    out <- rep(0,nr*nc)
-    i <- seq(from=0,to=(nr-1)*nc,by=nc)
-    for (j in 1:nc){
-        out[i+j] <- x[,j]
-    }
-    out
-}
-
-unzip.vector <- function(x,nc=2){
-    nr <- length(x)/nc
-    out <- matrix(0,nr,nc)
-    i <- seq(from=0,to=(nr-1)*nc,by=nc)
-    for (j in 1:nc){
-        out[,j] <- x[i+j]
-    }
-    out
-}
-
 roundit <- function(age,err,sigdig=2){
     out <- cbind(age,err)
     if (!is.na(sigdig)){
@@ -65,10 +36,6 @@ getmM <- function(x,from=NA,to=NA,log=FALSE){
         else { to <- to+(to-from)/10 }
     }
     list(m=from,M=to)
-}
-
-emptyplot <- function(){
-    graphics::plot(c(0,1),c(0,1),type='n',axes=FALSE,xlab="",ylab="")
 }
 
 cor2cov <- function(sX,sY,rXY){
@@ -106,12 +73,6 @@ errorprop <- function(J11,J12,J21,J22,E11,E12,E22){
 hasClass <- function(x,classname){
     classname %in% class(x)
 }
-
-get.covmat <- function(x,...){ UseMethod("get.covmat",x) }
-get.covmat.default <- function(x,i,...){ stop('Invalid input into covmat() function') }
-
-get.selection <- function(x,...){ UseMethod("get.selection",x) }
-get.selection.default <- function(x,...){ x }
 
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){

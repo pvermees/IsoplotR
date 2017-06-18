@@ -8,7 +8,7 @@
 #' @param covmat covariance matrix of the x-y coordinates
 #' @param alpha the probability cutoff for the error ellipses
 #' @param n the resolution of the error ellipses
-#' @return a [\code{n}x2] matrix of plot coordinates
+#' @return an [\code{n x 2}] matrix of plot coordinates
 #' @examples
 #' x = 99; y = 101;
 #' covmat <- matrix(c(1,0.9,0.9,1),nrow=2)
@@ -34,6 +34,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 }
 
 # x = matrix with columns X, sX, Y, sY, rXY
+
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,
                         ellipse.col=rgb(0,1,0,0.5),

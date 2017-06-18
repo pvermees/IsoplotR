@@ -112,7 +112,7 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
         J[1,2] <- 1/dat[j,'X']        
         DP <- dat[j,'Y']/dat[j,'X']
         sDP <- sqrt(J%*%E%*%t(J))
-        tt <- get.Pb207Pb206.age(DP,sDP,nuclide,exterr=exterr)
+        tt <- get.Pb207Pb206.age(DP,sDP,exterr=exterr)
         out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
     }
     if (!is.na(i)) out <- out[i,]

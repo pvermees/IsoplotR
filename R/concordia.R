@@ -30,13 +30,17 @@
 #'
 #' \code{3}: fit a discordia line
 #'
-#' @param sigdig number of significant digits for the concordia/discordia age
+#' @param sigdig number of significant digits for the
+#'     concordia/discordia age
 #' @importFrom grDevices rgb
 #' @importFrom graphics polygon title points text
 #' @importFrom stats pchisq
 #' @examples
-#' data(examples)
+#' data(examples) 
 #' concordia(examples$UPb)
+#' @references Ludwig, K.R., 1998. On the treatment of concordant
+#'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
+#'     pp.665-676.
 #' @export
 concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
