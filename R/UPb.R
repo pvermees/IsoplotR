@@ -70,11 +70,6 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
     class(out) <- "terawasserburg"
     out
 }
-titterington <- function(x,i){
-    out <- list()
-    class(out) <- "titterington"
-    out
-}
 
 age.to.wetherill.ratios <- function(tt,st=0,exterr=FALSE){
     out <- list()
@@ -125,9 +120,6 @@ age.to.terawasserburg.ratios <- function(tt,st=0,exterr=FALSE){
     rownames(out$cov) <- labels
     colnames(out$cov) <- labels
     out
-}
-age.to.titterington.ratios <- function(tt,st=0,exterr=FALSE){
-    
 }
 
 age.to.Pb207U235.ratio <- function(tt,st=0){

@@ -2,7 +2,7 @@
 #'
 #' Plots cogenetic Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf data as X-Y
 #' scatterplots, fits an isochron curve through them using the
-#' \code{yorkfit} function, and computes the corresponding isochron
+#' \code{york} function, and computes the corresponding isochron
 #' age, including decay constant uncertainties.
 #'
 #' @param x EITHER a matrix with the following five columns:
@@ -41,7 +41,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='red',lwd=2,title=TRUE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
-    fit <- yorkfit(x)
+    fit <- york(x)
     scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.numbers=show.numbers, ellipse.col=ellipse.col,
                 a=fit$a[1],b=fit$b[1], line.col=line.col,lwd=lwd)
@@ -74,7 +74,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,...){
     d <- data2york(x,inverse=inverse)
-    fit <- yorkfit(d)
+    fit <- york(d)
     if (inverse){
         x0 <- -fit$b[1]/fit$a[1]
         sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2 -
@@ -113,7 +113,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,...){
     d <- data2york(x,inverse=inverse)
-    fit <- yorkfit(d)
+    fit <- york(d)
     if (inverse){
         x0 <- -fit$b[1]/fit$a[1]
         sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2 -
@@ -203,7 +203,7 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
     }
     X <- data2york(x,exterr=exterr,common=FALSE)
-    fit <- yorkfit(X)
+    fit <- york(X)
     out <- fit
     class(out) <- "isochron"
     out$y0 <- c(fit$a[1],fit$a[2])

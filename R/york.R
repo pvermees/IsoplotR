@@ -2,8 +2,8 @@
 #'
 #' Implements the unified regression algorithm of York et al. (2004)
 #' which, although based on least squares, yields results that are
-#' consistent with maximum likelihood estimates of Ludwig and
-#' Titterington (1994)
+#' consistent with maximum likelihood estimates of Titterington and
+#' Halliday (1979)
 #'
 #' @param x a 5-column matrix with the X-values, the analytical
 #'     uncertainties of the X-values, the Y-values, the analytical
@@ -20,10 +20,9 @@
 #'     `reduced Chi-square') statistic}
 #'     }
 #' @references
-#'
-#' Ludwig, K. R., and D. M. Titterington. "Calculation of \eqn{^{230}}Th/U
-#' isochrons, ages, and errors." Geochimica et Cosmochimica Acta
-#' 58.22 (1994): 5031-5042.
+#' Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
+#' parallel isochrons and the method of maximum likelihood. Chemical
+#' Geology, 26(3), pp.183-195.
 #' 
 #' York, Derek, et al. "Unified equations for the slope,
 #' intercept, and standard errors of the best straight line."
@@ -40,7 +39,7 @@
 #'    sY <- Y*0.005
 #'    rXY <- rep(0.8,n)
 #'    dat <- cbind(X,sX,Y,sY,rXY)
-#'    fit <- yorkfit(dat)
+#'    fit <- york(dat)
 #'    covmat <- matrix(0,2,2)
 #'    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
 #'    for (i in 1:n){
@@ -52,7 +51,7 @@
 #'        polygon(ell)
 #'    }
 #' @export
-yorkfit <- function(x){
+york <- function(x){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     ab <- lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]

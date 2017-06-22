@@ -1,6 +1,6 @@
 discordia.age <- function(x,wetherill=TRUE,exterr=TRUE){
     d <- data2york(x,wetherill=wetherill)
-    fit <- yorkfit(d)
+    fit <- york(d)
     itt <- concordia.intersection(fit,wetherill)
     hess <- stats::optimHess(itt,LL.concordia.intersection, d=d,x=x,
                              wetherill=wetherill,exterr=exterr)
@@ -10,7 +10,7 @@ discordia.age <- function(x,wetherill=TRUE,exterr=TRUE){
     out
 }
 
-# itt = output of the yorkfit function
+# itt = output of the york function
 # d = output of UPb2york
 # X = output of UPb.preprocess
 LL.concordia.intersection <- function(itt,d,x,wetherill,exterr){

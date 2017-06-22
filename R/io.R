@@ -177,6 +177,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.SmNd(x,format)
     } else if (identical(method,'Lu-Hf')){
         out <- as.LuHf(x,format)
+    } else if (identical(method,'Th-U')){
+        out <- as.ThU(x,format)
     } else if (identical(method,'U-Th-He')){
         out <- as.UThHe(x)
     } else if (identical(method,'fissiontracks')){
@@ -372,6 +374,28 @@ as.PD <- function(x,classname,colnames1,colnames2,format){
         colnames(X) <- colnames2
         out$x <- X
     }
+    out
+}
+as.ThU <- function(x,format=1){
+    out <- list()
+    class(out) <- "ThU"
+    out$x <- NA
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    X <- shiny2matrix(x,2,nr,nc)
+    cnames <- NULL
+    if (format == 1 & nc == 7){
+        cnames <- c('U238Th232','errU238Th232',
+                    'U234Th232','errU234Th232',
+                    'rhoXY','rhoXZ','rhoYZ')
+    } else if (format == 2 & nc == 7) {
+        cnames <- c('Th232U238','errTh232U238',
+                    'U234U238','errU234U238',
+                    'rhoXY','rhoXZ','rhoYZ')
+    }
+    out$x <- X
+    colnames(out$x) <- cnames
     out
 }
 as.UThHe <- function(x){
