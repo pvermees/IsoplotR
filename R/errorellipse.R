@@ -34,11 +34,11 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 }
 
 # x = matrix with columns X, sX, Y, sY, rXY
-
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,
                         ellipse.col=rgb(0,1,0,0.5),
                         a=NA,b=NA,line.col='red',lwd=2,...){
+    colnames(x) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
     if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
     graphics::plot(xlim,ylim,type='n',xlab='',ylab='')
@@ -50,7 +50,7 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
         if (!any(is.na(x[i,]))){
             x0 <- x[i,'X']
             y0 <- x[i,'Y']
-            covmat <- cor2cov(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
+            covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
             ell <- ellipse(x0,y0,covmat,alpha=alpha)
             graphics::polygon(ell,col=ellipse.col)
             graphics::points(x0,y0,pch=19,cex=0.25)

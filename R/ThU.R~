@@ -1,0 +1,3 @@
+get.ThU.age <- function(U234U238,sU234U238,Th230U238,sTh230U238,exterr=TRUE){
+    L <- lambda(nuclide)
+}

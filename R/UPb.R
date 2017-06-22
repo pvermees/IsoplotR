@@ -7,7 +7,7 @@ wetherill <- function(x,i,exterr=FALSE){
         diag(out$cov) <-
             x$x[i,c('errPb207U235','errPb206U238')]^2
         out$cov <-
-            cor2cov(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],x$x[i,'rhoXY'])
+            cor2cov2(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],x$x[i,'rhoXY'])
     } else if (x$format==2){
         U238U235 <- iratio('U238U235')[1]
         Pb207U235 <- U238U235*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
@@ -20,7 +20,7 @@ wetherill <- function(x,i,exterr=FALSE){
         J[1,2] <- U238U235/x$x[i,'U238Pb206']
         if (exterr) J[1,3] <- x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
         J[2,1] <- -1/x$x[i,'U238Pb206']^2
-        E[1:2,1:2] <- cor2cov(x$x[i,'errU238Pb206'],
+        E[1:2,1:2] <- cor2cov2(x$x[i,'errU238Pb206'],
                               x$x[i,'errPb207Pb206'],x$x[i,'rhoXY'])
         out$cov <- J %*% E %*% t(J)
     }
@@ -44,7 +44,7 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
         J[2,1] <- 1/(x$x[i,'Pb206U238']*U238U235)
         J[2,2] <- -Pb207Pb206/x$x[i,'Pb206U238']
         if (exterr) J[2,3] <- -Pb207Pb206/U238U235
-        E[1:2,1:2] <- cor2cov(x$x[i,'errPb207U235'],
+        E[1:2,1:2] <- cor2cov2(x$x[i,'errPb207U235'],
                               x$x[i,'errPb206U238'],x$x[i,'rhoXY'])
         out$x <- c(U238Pb206,Pb207Pb206)
         out$cov <- J %*% E %*% t(J)
@@ -53,13 +53,13 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
         out$cov <- matrix(0,2,2)
         diag(out$cov) <- x$x[i,c('errU238Pb206','errPb207Pb206')]^2
         out$cov <-
-            cor2cov(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],x$x[i,'rhoXY'])
+            cor2cov2(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],x$x[i,'rhoXY'])
     } else if (x$format==3){
         U238Pb206 <- 1/x$x[i,'Pb206U238']
         out$x <- c(U238Pb206,x$x[i,'Pb207Pb206'])
         J <- matrix(0,2,2)
         E <- matrix(0,2,2)
-        E <- cor2cov(x$x[i,'errPb206U238'],x$x[i,'errPb207Pb206'],x$x[i,'rhoYZ'])
+        E <- cor2cov2(x$x[i,'errPb206U238'],x$x[i,'errPb207Pb206'],x$x[i,'rhoYZ'])
         J[1,1] <- -U238Pb206^2
         J[2,2] <- 1
         out$cov <- J %*% E %*% t(J)

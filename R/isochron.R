@@ -36,15 +36,15 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
+isochron.default <- function(x,fit,xlim=NA,ylim=NA,alpha=0.05,
                              sigdig=2,show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='red',lwd=2,title=TRUE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     fit <- york(x)
     scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
-                show.numbers=show.numbers, ellipse.col=ellipse.col,
-                a=fit$a[1],b=fit$b[1], line.col=line.col,lwd=lwd)
+                show.numbers=show.numbers,ellipse.col=ellipse.col,
+                a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
         title(regression.title(fit,sigdig=sigdig),xlab='X',ylab='Y')
 }
@@ -96,11 +96,9 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$y0 <- c(y0,sy0)
     out$age <- tt
     if (plot) {
-        isochron.default(d,xlim=xlim,ylim=ylim,alpha=alpha,
-                         show.numbers=show.numbers,
-                         ellipse.col=ellipse.col,a=fit$a[1],
-                         b=fit$b[1], line.col=line.col,lwd=lwd,
-                         title=FALSE)
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.numbers=show.numbers,ellipse.col=ellipse.col,
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
         title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
@@ -135,11 +133,9 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$y0 <- c(y0,sy0)
     out$age <- tt
     if (plot) {
-        isochron.default(d,xlim=xlim,ylim=ylim,alpha=alpha,
-                         show.numbers=show.numbers,
-                         ellipse.col=ellipse.col,a=fit$a[1],
-                         b=fit$b[1], line.col=line.col,lwd=lwd,
-                         title=FALSE)
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.numbers=show.numbers,ellipse.col=ellipse.col,
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
         title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
@@ -202,18 +198,96 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         x.lab <- expression(paste(""^"176","Lu/"^"177","Hf"))
         y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
     }
-    X <- data2york(x,exterr=exterr,common=FALSE)
-    fit <- york(X)
+    d <- data2york(x,exterr=exterr,common=FALSE)
+    fit <- york(d)
     out <- fit
     class(out) <- "isochron"
     out$y0 <- c(fit$a[1],fit$a[2])
     out$age <- get.PD.age(fit$b[1],fit$b[2],nuclide,exterr=exterr)
     if (plot){
-        isochron.default(X,xlim=xlim,ylim=ylim,alpha=alpha,
-                         show.numbers=show.numbers,
-                         ellipse.col=ellipse.col,a=fit$a[1],
-                         b=fit$b[1], line.col=line.col,lwd=lwd,
-                         title=FALSE)
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.numbers=show.numbers,ellipse.col=ellipse.col,
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
+        title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+    } else {
+        return(out)
+    }
+}
+
+#' @param type following the classification of
+#' Ludwig and Titterington (1994), one of either:
+#' 
+#' \enumerate{
+#' 
+#' \item `Rosholt type-II' isochron setting out
+#' \eqn{^{230}Th/^{232}Th} vs. \eqn{^{238}U/^{232}Th}
+#' 
+#' \item `Osmond type-II' isochron setting out \eqn{^{230}Th/^{238}U}
+#' vs. \eqn{^{232}Th/^{238}U}
+#'
+#' \item `Rosholt type-II' isochron setting out \eqn{^{234}U/^{232}Th}
+#' vs. \eqn{^{238}U/^{232}Th}
+#' 
+#' \item `Osmond type-II' isochron setting out \eqn{^{234}U/^{238}U}
+#' vs. \eqn{^{232}Th/^{238}U}
+#'
+#' }
+isochron.ThU <- function (x,type=3,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+    if (type == 1){
+        osmond <- FALSE
+        ia <- 'a'
+        ib <- 'b'
+        i48 <- 'b'
+        i08 <- 'B'
+        id <- c('X','sX','Y','sY','rXY')
+        x.lab <- expression(paste(""^"238","U/"^"232","Th"))
+        y.lab <- expression(paste(""^"230","Th/"^"232","Th"))
+    } else if (type == 2){
+        osmond <- TRUE
+        ia <- 'a'
+        ib <- 'b'
+        i48 <- 'a'
+        i08 <- 'A'
+        id <- c('X','sX','Y','sY','rXY')
+        x.lab <- expression(paste(""^"232","Th/"^"238","U"))
+        y.lab <- expression(paste(""^"230","Th/"^"238","U"))
+    } else if (type == 3){
+        osmond <- FALSE
+        ia <- 'A'
+        ib <- 'B'
+        i48 <- 'b'
+        i08 <- 'B'
+        id <- c('X','sX','Z','sZ','rXZ')
+        x.lab <- expression(paste(""^"238","U/"^"232","Th"))
+        y.lab <- expression(paste(""^"234","U/"^"232","Th"))
+    } else if (type == 4){
+        osmond <- TRUE
+        ia <- 'A'
+        ib <- 'B'
+        i48 <- 'a'
+        i08 <- 'A'
+        id <- c('X','sX','Z','sZ','rXZ')
+        x.lab <- expression(paste(""^"232","Th/"^"238","U"))
+        y.lab <- expression(paste(""^"234","U/"^"238","U"))
+    }
+    d <- data2tit(x,osmond=osmond)
+    fit <- titterington(d)
+    out <- fit
+    class(out) <- "isochron"
+    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
+    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
+    out$cov.ab <- fit$cov[ia,ib]
+    out$y0 <- out$a
+    out$p.value <- 0
+    out$age <- get.ThU.age(fit$par[i48],sqrt(fit$cov[i48,i48]),
+                           fit$par[i08],sqrt(fit$cov[i08,i08]),
+                           fit$cov[i48,i08],exterr=exterr)
+    if (plot){
+        scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.numbers=show.numbers,ellipse.col=ellipse.col,
+                    a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd)
         title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)

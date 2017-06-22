@@ -5,6 +5,7 @@ length.RbSr <- function(x){ nrow(x$x) }
 length.SmNd <- function(x){ nrow(x$x) }
 length.ReOs <- function(x){ nrow(x$x) }
 length.LuHf <- function(x){ nrow(x$x) }
+length.ThU <- function(x){ nrow(x$x) }
 length.fissiontracks <- function(x){ nrow(x$x) }
 length.UThHe <- function(x){ nrow(x) }
 
@@ -38,12 +39,25 @@ getmM <- function(x,from=NA,to=NA,log=FALSE){
     list(m=from,M=to)
 }
 
-cor2cov <- function(sX,sY,rXY){
+cor2cov2 <- function(sX,sY,rXY){
     covmat <- matrix(0,2,2)
     covmat[1,1] <- sX^2
     covmat[2,2] <- sY^2
     covmat[1,2] <- rXY*sX*sY
     covmat[2,1] <- covmat[1,2]
+    covmat
+}
+cor2cov3 <- function(sX,sY,sZ,rXY,rXZ,rYZ){
+    covmat <- matrix(0,3,3)
+    covmat[1,1] <- sX^2
+    covmat[2,2] <- sY^2
+    covmat[3,3] <- sZ^2
+    covmat[1,2] <- rXY*sX*sY
+    covmat[1,3] <- rXZ*sX*sZ
+    covmat[2,3] <- rYZ*sY*sZ
+    covmat[2,1] <- covmat[1,2]
+    covmat[3,1] <- covmat[1,3]
+    covmat[3,2] <- covmat[2,3]
     covmat
 }
 

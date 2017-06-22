@@ -385,13 +385,15 @@ as.ThU <- function(x,format=1){
     nr <- nrow(x)
     X <- shiny2matrix(x,2,nr,nc)
     cnames <- NULL
-    if (format == 1 & nc == 7){
+    if (format == 1 & nc == 9){
         cnames <- c('U238Th232','errU238Th232',
                     'U234Th232','errU234Th232',
+                    'Th230Th232','errTh230Th232',
                     'rhoXY','rhoXZ','rhoYZ')
-    } else if (format == 2 & nc == 7) {
+    } else if (format == 2 & nc == 9) {
         cnames <- c('Th232U238','errTh232U238',
                     'U234U238','errU234U238',
+                    'Th230U238','errTh230U238',
                     'rhoXY','rhoXZ','rhoYZ')
     }
     out$x <- X
