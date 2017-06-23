@@ -22,13 +22,16 @@ settings(setting = NA, ..., fname = NA)
 
 \code{'tracklength'}: equivalent isotropic fission track length}
 
-\item{...}{depends on the value for \code{setting}: \itemize{ \item
-    for \code{'lambda'}: the isotope of interest (one of either
-    \code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"Th232"},
-    \code{"Re187"}, \code{"Sm147"}, \code{"Rb87"}, or \code{"K40"})
-    PLUS (optionally) the decay constant value and its analytical
-    error.  Omitting these two numbers simply returns the existing
-    values.
+\item{...}{depends on the value for \code{setting}:
+
+\itemize{
+
+\item for \code{'lambda'}: the isotope of interest (one of either
+\code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"U234"},
+\code{"Th232"}, \code{"Th230"}, \code{"Re187"}, \code{"Sm147"},
+\code{"Rb87"}, \code{"Lu176"}, or \code{"K40"}) PLUS (optionally)
+the decay constant value and its analytical error.  Omitting these
+two numbers simply returns the existing values.
 
 \item for \code{'iratio'}: the isotopic ratio of interest (one of
 either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
@@ -40,7 +43,7 @@ either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
 \code{"Sm150Sm152"}, \code{"Sm154Sm152"}, \code{"Nd142Nd144"},
 \code{"Nd143Nd144"}, \code{"Nd145Nd144"}, \code{"Nd146Nd144"},
 \code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
-\code{"Hf174Hf177"},    \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
+\code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
 \code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS (optionally) the
 isotopic ratio and its analytical error.  Omitting these two
 numbers simply returns the existing values.
@@ -106,13 +109,22 @@ print(settings('iratio','U238U235'))
 \enumerate{
 \item Decay constants:
 \itemize{
-\item U: Jaffey, A. H., et al. "Precision measurement of half-lives and
-specific activities of U\eqn{^{235}} and
-U\eqn{^{238}}." Physical Review C 4.5 (1971): 1889.
 
-\item Th: Le Roux, L. J., and
+\item \eqn{^{238}}U, \eqn{^{235}}U: Jaffey, A. H., et
+al. "Precision measurement of half-lives and specific activities of U\eqn{^{235}} and U\eqn{^{238}}."
+Physical Review C 4.5 (1971): 1889.
+
+\item \eqn{^{232}}Th: Le Roux, L. J., and
 L. E. Glendenin. "Half-life of \eqn{^{232}}Th.  "Proceedings of the
 National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
+
+\item \eqn{^{234}}U, \eqn{^{230}}Th: Cheng, H., Edwards, R.L.,
+Shen, C.C., Polyak, V.J., Asmerom, Y., Woodhead, J., Hellstrom, J.,
+Wang, Y., Kong, X., Spotl, C. and Wang, X., 2013. Improvements in
+\eqn{^{230}}Th dating, \eqn{^{230}}Th and \eqn{^{234}}U half-life
+values, and U-Th isotopic measurements by multi-collector
+inductively coupled plasma mass spectrometry. Earth and Planetary
+Science Letters, 371, pp.82-91.
 
 \item Sm: Lugmair, G. W., and
 K. Marti. "Lunar initial \eqn{^{143}}Nd/\eqn{^{144}}Nd: differential

@@ -44,8 +44,8 @@ Type 'q()' to quit R.
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: age
 > ### Title: Calculate isotopic ages
-> ### Aliases: age age.default age.UPb age.ArAr age.UThHe age.fissiontracks
-> ###   age.ReOs age.SmNd age.RbSr age.LuHf
+> ### Aliases: age age.default age.UPb age.PbPb age.ArAr age.UThHe
+> ###   age.fissiontracks age.ReOs age.SmNd age.RbSr age.LuHf
 > 
 > ### ** Examples
 > 
@@ -58,9 +58,9 @@ Type 'q()' to quit R.
  [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.427487 251.3588
  [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.243669 251.1650
  [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.625510 251.2366
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1162 5.241270 250.8009
+ [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.241270 250.8009
  [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.622336 250.8320
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7755 3.243182 251.2929
+ [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.2929
 [10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.0388
       s[t.conc]
  [1,] 0.2460580
@@ -81,9 +81,9 @@ Type 'q()' to quit R.
  [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.427487 251.3588
  [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.243669 251.1650
  [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.625510 251.2366
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1162 5.241270 250.8009
+ [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.241270 250.8009
  [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.622336 250.8320
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7755 3.243182 251.2929
+ [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.2929
 [10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.0388
       s[t.conc]
  [1,] 0.2460580
@@ -166,8 +166,8 @@ attr(,"class")
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: cad
 > ### Title: Plot continuous data as cumulative age distributions
-> ### Aliases: cad cad.default cad.detritals cad.UPb cad.ArAr cad.ReOs
-> ###   cad.SmNd cad.RbSr cad.LuHf cad.UThHe cad.fissiontracks
+> ### Aliases: cad cad.default cad.detritals cad.UPb cad.PbPb cad.ArAr
+> ###   cad.ReOs cad.SmNd cad.RbSr cad.LuHf cad.UThHe cad.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -199,6 +199,7 @@ attr(,"class")
 > 
 > 
 > 
+> 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
@@ -214,7 +215,7 @@ attr(,"class")
 > 
 > ### ** Examples
 > 
-> data(examples)
+> data(examples) 
 > concordia(examples$UPb)
 > 
 > 
@@ -314,8 +315,8 @@ attr(,"class")
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: isochron
 > ### Title: Calculate and plot isochrons
-> ### Aliases: isochron isochron.default isochron.ArAr isochron.RbSr
-> ###   isochron.ReOs isochron.SmNd isochron.LuHf
+> ### Aliases: isochron isochron.default isochron.ArAr isochron.PbPb
+> ###   isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf isochron.ThU
 > 
 > ### ** Examples
 > 
@@ -335,8 +336,8 @@ attr(,"class")
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: kde
 > ### Title: Create (a) kernel density estimate(s)
-> ### Aliases: kde kde.default kde.UPb kde.detritals kde.ArAr kde.ReOs
-> ###   kde.SmNd kde.RbSr kde.LuHf kde.UThHe kde.fissiontracks
+> ### Aliases: kde kde.default kde.UPb kde.detritals kde.PbPb kde.ArAr
+> ###   kde.ReOs kde.SmNd kde.RbSr kde.LuHf kde.UThHe kde.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -364,303 +365,24 @@ attr(,"class")
 > data(examples)
 > # Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.
 > mds(examples$DZ,nnlines=TRUE,cex=5,xaxt='n',yaxt='n')
-initial  value 10.433734 
-iter   5 value 8.523890
-iter  10 value 8.154735
-iter  15 value 8.048099
-iter  20 value 7.871811
-iter  20 value 7.868858
-iter  25 value 7.642453
-iter  25 value 7.640889
-iter  25 value 7.640383
-final  value 7.640383 
-converged
-NULL
-> dev.new()
-dev.new(): using pdf(file="Rplots1.pdf")
-> mds(examples$DZ,shepard=TRUE)
-initial  value 10.433734 
-iter   5 value 8.523890
-iter  10 value 8.154735
-iter  15 value 8.048099
-iter  20 value 7.871811
-iter  20 value 7.868858
-iter  25 value 7.642453
-iter  25 value 7.640889
-iter  25 value 7.640383
-final  value 7.640383 
-converged
-NULL
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("mds", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("peakfit")
-> ### * peakfit
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: peakfit
-> ### Title: Finite mixture modelling of geochronological datasets
-> ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
-> ###   peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr peakfit.LuHf
-> ###   peakfit.UThHe
-> 
-> ### ** Examples
-> 
-> data(examples)
-> peakfit(examples$FT1,k=2)
-$L
-[1] -71.94616
 
-$peaks
-[1] 103.4585 103.4604
+ *** caught segfault ***
+address 0x5, cause 'memory not mapped'
 
-$props
-[1] 0.4118593 0.5881407
-
-$peaks.err
-[1] 13.65063 11.53875
-
-$props.err
-[1] 4143.565 4143.565
-
-$legend
-[1] "Peak 1: 103±14 (40±410000%)" "Peak 2: 103±12 (60±410000%)"
-
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("peakfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("radialplot")
-> ### * radialplot
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: radialplot
-> ### Title: Visualise heteroscedastic data on a radial plot
-> ### Aliases: radialplot radialplot.default radialplot.fissiontracks
-> ###   radialplot.UPb radialplot.ArAr radialplot.UThHe radialplot.ReOs
-> ###   radialplot.SmNd radialplot.RbSr radialplot.LuHf
-> 
-> ### ** Examples
-> 
-> data(examples)
-> radialplot(examples$FT1)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("radialplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("read.data")
-> ### * read.data
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: read.data
-> ### Title: Read geochronology data
-> ### Aliases: read.data read.data.default read.data.matrix
-> 
-> ### ** Examples
-> 
-> file.show(system.file("spectrum.csv",package="IsoplotR"))
-f,X,errX
-0.021,4.4339,0.935
-0.025,4.6771,0.1225
-0.024,4.6533,0.0964
-0.024,4.7417,0.0861
-0.026,4.7153,0.0776
-0.026,4.708,0.0734
-0.028,4.7417,0.0717
-0.029,4.7855,0.0677
-0.430,4.7863,0.0134
-0.052,4.7709,0.0388
-0.091,4.8116,0.0246
-0.136,4.7947,0.0207
-0.076,4.9116,0.0472
-0.012,4.5317,0.1952
-
-> 
-> f1 <- system.file("UPb1.csv",package="IsoplotR")
-> d1 <- read.data(f1,method="U-Pb",format=1)
-> concordia(d1)
-> 
-> f2 <- system.file("ArAr1.csv",package="IsoplotR")
-> d2 <- read.data(f2,method="Ar-Ar",format=1)
-> agespectrum(d2)
-> 
-> f3 <- system.file("ReOs1.csv",package="IsoplotR")
-> d3 <- read.data(f3,method="Re-Os",format=1)
-> isochron(d2)
-> 
-> f4 <- system.file("FT1.csv",package="IsoplotR")
-> d4 <- read.data(f4,method="fissiontracks",format=1)
-> radialplot(d4)
-> 
-> f5 <- system.file("UThSmHe.csv",package="IsoplotR")
-> d5 <- read.data(f5,method="U-Th-He")
-> helioplot(d5)
-> 
-> #  one detrital zircon U-Pb file (detritals.csv)
-> f6 <- system.file("Namib.csv",package="IsoplotR")
-> d6 <- read.data(f6,method="detritals")
-> kde(d6)
-> 
-> #  three `other' files (MountTom.csv, spectrum.csv, average.csv)
-> f7 <- system.file("MountTom.csv",package="IsoplotR")
-> d7 <- read.data(f7,method="other")
-> radialplot(d7)
-> 
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("set.zeta")
-> ### * set.zeta
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: set.zeta
-> ### Title: Calculate the zeta calibration coefficient for fission track
-> ###   dating
-> ### Aliases: set.zeta
-> 
-> ### ** Examples
-> 
-> data(examples)
-> print(examples$FT1$zeta)
-[1] 350  10
-> FT <- set.zeta(examples$FT1,tst=c(250,5))
-> print(FT$zeta)
-     age err
-[1,] 855  36
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("set.zeta", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("settings")
-> ### * settings
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: settings
-> ### Title: Load settings to and from json
-> ### Aliases: settings
-> 
-> ### ** Examples
-> 
-> # load and show the default constants that come with IsoplotR
-> json <- system.file("constants.json",package="IsoplotR")
-> settings(fname=json)
-> print(settings())
-[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"Th232\":[4.95e-05,2.5e-06],\"Rb87\":[1.3972e-05,4.5e-07],\"Re187\":[1.6689e-05,3.8e-08],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06],\"Lu176\":[1.867e-05,8e-08]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr\":[87.62,0.01],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06],\"Sm\":[150.36,0.03],\"Nd\":[144.2415,0.0013],\"Lu\":[174.9668,1e-04],\"Hf\":[178.49,0.02]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr84Sr86\":[0.056549,7.15e-05],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr88Sr86\":[8.37861,0.001624],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0.00045],\"U238U235\":[137.818,0.0225],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484],\"Nd142Nd144\":[1.14101,7e-04],\"Nd143Nd144\":[0.51154,4e-04],\"Nd145Nd144\":[0.34848,0.00015],\"Nd146Nd144\":[0.72228,0.00051],\"Nd148Nd144\":[0.24186,3e-04],\"Nd150Nd144\":[0.23691,0.00042],\"Lu176Lu175\":[0.02668,1.3e-05],\"Hf174Hf177\":[0.00871,5e-05],\"Hf176Hf177\":[0.2829,0.003],\"Hf178Hf177\":[1.4671,1e-04],\"Hf179Hf177\":[0.7325,0],\"Hf180Hf177\":[1.88651,0.00012]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
-> 
-> # use the decay constant of Kovarik and Adams (1932)
-> settings('lambda','U238',0.0001537,0.0000068)
-> print(settings('lambda','U238'))
-[1] 0.0001537 0.0000068
-> 
-> # returns the 238U/235U ratio of Hiess et al. (2012):
-> print(settings('iratio','U238U235'))
-[1] 137.8180   0.0225
-> # use the 238U/235U ratio of Steiger and Jaeger (1977):
-> settings('iratio','U238U235',138.88,0)
-> print(settings('iratio','U238U235'))
-[1] 138.88   0.00
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("settings", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("weightedmean")
-> ### * weightedmean
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: weightedmean
-> ### Title: Calculate the weighted mean age
-> ### Aliases: weightedmean weightedmean.default weightedmean.UPb
-> ###   weightedmean.ArAr weightedmean.ReOs weightedmean.SmNd
-> ###   weightedmean.RbSr weightedmean.LuHf weightedmean.UThHe
-> ###   weightedmean.fissiontracks
-> 
-> ### ** Examples
-> 
-> ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
-> errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
-> weightedmean(cbind(ages,errs))
-> data(examples)
-> weightedmean(examples$ArAr)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("weightedmean", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("yorkfit")
-> ### * yorkfit
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: yorkfit
-> ### Title: Linear regression of X,Y-variables with correlated errors
-> ### Aliases: yorkfit
-> 
-> ### ** Examples
-> 
->    X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
-+           28.530,50.540,51.595,86.51,106.40,157.35)
->    Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-+           .8642,.9584,.9617,1.135,1.230,1.490)
->    n <- length(X)
->    sX <- X*0.01
->    sY <- Y*0.005
->    rXY <- rep(0.8,n)
->    dat <- cbind(X,sX,Y,sY,rXY)
->    fit <- yorkfit(dat)
->    covmat <- matrix(0,2,2)
->    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
->    for (i in 1:n){
-+        covmat[1,1] <- sX[i]^2
-+        covmat[2,2] <- sY[i]^2
-+        covmat[1,2] <- rXY[i]*sX[i]*sY[i]
-+        covmat[2,1] <- covmat[1,2]
-+        ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
-+        polygon(ell)
-+    }
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("yorkfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> ### * <FOOTER>
-> ###
-> options(digits = 7L)
-> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  7.736 0.376 7.72 0 0 
-> grDevices::dev.off()
-pdf 
-  2 
-> ###
-> ### Local variables: ***
-> ### mode: outline-minor ***
-> ### outline-regexp: "\\(> \\)?### [*]+" ***
-> ### End: ***
-> quit('no')
+Traceback:
+ 1: dyn.load(file, DLLpath = DLLpath, ...)
+ 2: library.dynam(lib, package, package.lib)
+ 3: loadNamespace(name)
+ 4: doTryCatch(return(expr), name, parentenv, handler)
+ 5: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+ 6: tryCatchList(expr, classes, parentenv, handlers)
+ 7: tryCatch(loadNamespace(name), error = function(e) stop(e))
+ 8: getNamespace(ns)
+ 9: asNamespace(ns)
+10: getExportedValue(pkg, name)
+11: MASS::isoMDS
+12: mds.default(d, classical = classical, plot = plot, shepard = shepard,     nnlines = nnlines, pch = pch, pos = pos, cex.symbols = cex.symbols,     col = col, bg = bg, xlab = xlab, ylab = ylab, ...)
+13: mds.detritals(examples$DZ, nnlines = TRUE, cex = 5, xaxt = "n",     yaxt = "n")
+14: mds(examples$DZ, nnlines = TRUE, cex = 5, xaxt = "n", yaxt = "n")
+An irrecoverable exception occurred. R is aborting now ...
+Segmentation fault (core dumped)

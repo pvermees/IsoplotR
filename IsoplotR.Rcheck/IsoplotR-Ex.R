@@ -25,8 +25,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
-### Aliases: age age.default age.UPb age.ArAr age.UThHe age.fissiontracks
-###   age.ReOs age.SmNd age.RbSr age.LuHf
+### Aliases: age age.default age.UPb age.PbPb age.ArAr age.UThHe
+###   age.fissiontracks age.ReOs age.SmNd age.RbSr age.LuHf
 
 ### ** Examples
 
@@ -68,8 +68,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
-### Aliases: cad cad.default cad.detritals cad.UPb cad.ArAr cad.ReOs
-###   cad.SmNd cad.RbSr cad.LuHf cad.UThHe cad.fissiontracks
+### Aliases: cad cad.default cad.detritals cad.UPb cad.PbPb cad.ArAr
+###   cad.ReOs cad.SmNd cad.RbSr cad.LuHf cad.UThHe cad.fissiontracks
 
 ### ** Examples
 
@@ -99,6 +99,7 @@ print(central(examples$UThHe)$age)
 
 
 
+
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
@@ -114,7 +115,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(examples)
+data(examples) 
 concordia(examples$UPb)
 
 
@@ -214,8 +215,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: isochron
 ### Title: Calculate and plot isochrons
-### Aliases: isochron isochron.default isochron.ArAr isochron.RbSr
-###   isochron.ReOs isochron.SmNd isochron.LuHf
+### Aliases: isochron isochron.default isochron.ArAr isochron.PbPb
+###   isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf isochron.ThU
 
 ### ** Examples
 
@@ -235,8 +236,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
-### Aliases: kde kde.default kde.UPb kde.detritals kde.ArAr kde.ReOs
-###   kde.SmNd kde.RbSr kde.LuHf kde.UThHe kde.fissiontracks
+### Aliases: kde kde.default kde.UPb kde.detritals kde.PbPb kde.ArAr
+###   kde.ReOs kde.SmNd kde.RbSr kde.LuHf kde.UThHe kde.fissiontracks
 
 ### ** Examples
 
@@ -281,8 +282,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: peakfit
 ### Title: Finite mixture modelling of geochronological datasets
 ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
-###   peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr peakfit.LuHf
-###   peakfit.UThHe
+###   peakfit.PbPb peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr
+###   peakfit.LuHf peakfit.UThHe
 
 ### ** Examples
 
@@ -303,8 +304,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: radialplot
 ### Title: Visualise heteroscedastic data on a radial plot
 ### Aliases: radialplot radialplot.default radialplot.fissiontracks
-###   radialplot.UPb radialplot.ArAr radialplot.UThHe radialplot.ReOs
-###   radialplot.SmNd radialplot.RbSr radialplot.LuHf
+###   radialplot.UPb radialplot.PbPb radialplot.ArAr radialplot.UThHe
+###   radialplot.ReOs radialplot.SmNd radialplot.RbSr radialplot.LuHf
 
 ### ** Examples
 
@@ -355,7 +356,7 @@ f6 <- system.file("Namib.csv",package="IsoplotR")
 d6 <- read.data(f6,method="detritals")
 kde(d6)
 
-#  three `other' files (MountTom.csv, spectrum.csv, average.csv)
+#  three 'other' files (MountTom.csv, spectrum.csv, average.csv)
 f7 <- system.file("MountTom.csv",package="IsoplotR")
 d7 <- read.data(f7,method="other")
 radialplot(d7)
@@ -430,9 +431,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: weightedmean
 ### Title: Calculate the weighted mean age
 ### Aliases: weightedmean weightedmean.default weightedmean.UPb
-###   weightedmean.ArAr weightedmean.ReOs weightedmean.SmNd
-###   weightedmean.RbSr weightedmean.LuHf weightedmean.UThHe
-###   weightedmean.fissiontracks
+###   weightedmean.PbPb weightedmean.ArAr weightedmean.ReOs
+###   weightedmean.SmNd weightedmean.RbSr weightedmean.LuHf
+###   weightedmean.UThHe weightedmean.fissiontracks
 
 ### ** Examples
 
@@ -447,15 +448,15 @@ weightedmean(examples$ArAr)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("weightedmean", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("yorkfit")
-### * yorkfit
+nameEx("york")
+### * york
 
 flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: yorkfit
+### Name: york
 ### Title: Linear regression of X,Y-variables with correlated errors
-### Aliases: yorkfit
+### Aliases: york
 
 ### ** Examples
 
@@ -468,7 +469,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
    sY <- Y*0.005
    rXY <- rep(0.8,n)
    dat <- cbind(X,sX,Y,sY,rXY)
-   fit <- yorkfit(dat)
+   fit <- york(dat)
    covmat <- matrix(0,2,2)
    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
    for (i in 1:n){
@@ -483,7 +484,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("yorkfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+base::cat("york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 ### * <FOOTER>
 ###
 options(digits = 7L)

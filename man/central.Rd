@@ -76,4 +76,13 @@ parameters.
 \examples{
 data(examples)
 print(central(examples$UThHe)$age)
+
+}
+\references{
+Galbraith, R.F. and Laslett, G.M., 1993. Statistical
+    models for mixed fission track ages. Nuclear tracks and
+    radiation measurements, 21(4), pp.459-470.
+
+Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
+    ages. Chemical Geology, 249(3), pp.339-347.
 }

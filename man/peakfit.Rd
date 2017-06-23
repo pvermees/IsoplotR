@@ -5,6 +5,7 @@
 \alias{peakfit.default}
 \alias{peakfit.fissiontracks}
 \alias{peakfit.UPb}
+\alias{peakfit.PbPb}
 \alias{peakfit.ArAr}
 \alias{peakfit.ReOs}
 \alias{peakfit.SmNd}
@@ -22,6 +23,9 @@ peakfit(x, ...)
 
 \method{peakfit}{UPb}(x, k = 1, type = 4, cutoff.76 = 1100,
   cutoff.disc = c(-15, 5), exterr = TRUE, sigdig = 2, log = TRUE, ...)
+
+\method{peakfit}{PbPb}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
+  i2i = TRUE, ...)
 
 \method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
   i2i = FALSE, ...)
@@ -83,12 +87,14 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
 
-\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+\item{i2i}{`isochron to intercept': calculates the initial (aka
+`inherited', `excess', or `common')
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
 \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
 \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
 ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in \code{settings('iratio',...)}}
+uses the default values stored in \code{settings('iratio',...)
+or zero (for the Pb-Pb method).}}
 }
 \value{
 a list with the following items: \describe{ \item{peaks}{a

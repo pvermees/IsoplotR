@@ -4,6 +4,7 @@
 \alias{weightedmean}
 \alias{weightedmean.default}
 \alias{weightedmean.UPb}
+\alias{weightedmean.PbPb}
 \alias{weightedmean.ArAr}
 \alias{weightedmean.ReOs}
 \alias{weightedmean.SmNd}
@@ -23,6 +24,10 @@ weightedmean(x, ...)
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
   alpha = 0.05, exterr = TRUE, ...)
+
+\method{weightedmean}{PbPb}(x, detect.outliers = TRUE, plot = TRUE,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = FALSE, ...)
 
 \method{weightedmean}{ArAr}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
@@ -55,8 +60,8 @@ weightedmean(x, ...)
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
 standard errors (second column) OR an object of class
-\code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr},
-\code{LuHf}, \code{fissiontracks} or \code{UThHe}}
+\code{UPb}, \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
+\code{RbSr}, \code{LuHf}, \code{fissiontracks} or \code{UThHe}}
 
 \item{...}{optional arguments}
 
@@ -101,12 +106,14 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 
 \item{exterr}{propagate decay constant uncertainty?}
 
-\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+\item{i2i}{`isochron to intercept': calculates the initial (aka
+`inherited', `excess', or `common')
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
 \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
 \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
 ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in \code{settings('iratio',...)}}
+uses the default values stored in \code{settings('iratio',...)
+or zero (for the Pb-Pb method).}}
 }
 \value{
 if \code{PLOT=FALSE}, returns a list with the following

@@ -33,7 +33,8 @@ concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 
 \code{3}: fit a discordia line}
 
-\item{sigdig}{number of significant digits for the concordia/discordia age}
+\item{sigdig}{number of significant digits for the
+concordia/discordia age}
 }
 \description{
 Plots U-Pb data on Wetherill and Tera-Wasserburg concordia
@@ -51,6 +52,11 @@ intercept (for Tera-Wasserburg), taking into account error
 correlations and decay constant uncertainties.
 }
 \examples{
-data(examples)
+data(examples) 
 concordia(examples$UPb)
+}
+\references{
+Ludwig, K.R., 1998. On the treatment of concordant
+    uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
+    pp.665-676.
 }

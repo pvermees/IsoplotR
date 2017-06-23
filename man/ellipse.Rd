@@ -18,7 +18,7 @@ ellipse(x, y, covmat, alpha = 0.05, n = 50)
 \item{n}{the resolution of the error ellipses}
 }
 \value{
-a [\code{n}x2] matrix of plot coordinates
+an [\code{n x 2}] matrix of plot coordinates
 }
 \description{
 Construct an error ellipse age a given confidence level from its

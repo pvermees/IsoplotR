@@ -255,7 +255,7 @@ ThU.convert <- function(x){
     J[3,3] <- 1/x['X']
     E <- cor2cov3(x['sX'],x['sY'],x['sZ'],x['rXY'],x['rXZ'],x['rYZ'])
     covmat <- J %*% E %*% t(J)
-    cormat <- cov2cor(covmat)
+    cormat <- stats::cov2cor(covmat)
     out['sX'] <- sqrt(covmat[1,1])
     out['sY'] <- sqrt(covmat[2,2])
     out['sZ'] <- sqrt(covmat[3,3])

@@ -38,3 +38,7 @@ print(examples$FT1$zeta)
 FT <- set.zeta(examples$FT1,tst=c(250,5))
 print(FT$zeta)
 }
+\references{
+Vermeesch, P., 2017. Statistics for LA-ICP-MS based
+    fission track dating. Chemical Geology, 456, pp.19-27.
+}

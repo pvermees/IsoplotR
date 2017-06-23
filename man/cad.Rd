@@ -5,6 +5,7 @@
 \alias{cad.default}
 \alias{cad.detritals}
 \alias{cad.UPb}
+\alias{cad.PbPb}
 \alias{cad.ArAr}
 \alias{cad.ReOs}
 \alias{cad.SmNd}
@@ -25,6 +26,9 @@ cad(x, ...)
 \method{cad}{UPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
   ...)
+
+\method{cad}{PbPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", i2i = FALSE, ...)
 
 \method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", i2i = FALSE, ...)
@@ -49,8 +53,9 @@ cad(x, ...)
 }
 \arguments{
 \item{x}{a numerical vector OR an object of class \code{UPb},
-\code{ArAr}, \code{UThHe}, \code{fissiontracks}, \code{ReOs},
-\code{RbSr}, \code{SmNd}, \code{LuHf} or \code{detritals}}
+\code{PbPb}, \code{ArAr}, \code{UThHe}, \code{fissiontracks},
+\code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf} or
+\code{detritals}}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 
@@ -92,12 +97,14 @@ the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
 
-\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+\item{i2i}{`isochron to intercept': calculates the initial (aka
+`inherited', `excess', or `common')
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
 \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
 \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
 ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in \code{settings('iratio',...)}}
+uses the default values stored in \code{settings('iratio',...)
+or zero (for the Pb-Pb method).}}
 }
 \description{
 Plot a dataset as a Cumulative Age Distribution (CAD), also known
@@ -106,4 +113,10 @@ as a `empirical cumulative distribution function'.
 \examples{
 data(examples)
 cad(examples$DZ,verticals=FALSE,pch=20)
+}
+\references{
+Vermeesch, P., 2007. Quantitative geomorphology of the
+    White Mountains (California) using detrital apatite fission
+    track thermochronology. Journal of Geophysical Research: Earth
+    Surface, 112(F3).
 }

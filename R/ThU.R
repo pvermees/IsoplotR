@@ -6,7 +6,7 @@ get.ThU.age <- function(U234U238,sU234U238,Th230U238,sTh230U238,cov4808,exterr=T
     covAa <- cov4808
     l4 <- lambda('U234')
     l0 <- lambda('Th230')
-    fit <- optim(0.1,fn=ThU.misfit,gr=ThU.gr,method='BFGS',A=A,a=a,l0=l0,l4=l4)
+    fit <- stat::optim(0.1,fn=ThU.misfit,gr=ThU.gr,method='BFGS',A=A,a=a,l0=l0,l4=l4)
     tt <- fit$par
     D <- l0[1]*(exp(-l0[1]*tt)+(a-1)*exp((l4[1]-l0[1])*tt))
     k1 <- k1(tt,l0,l4)

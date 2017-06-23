@@ -36,7 +36,7 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,fit,xlim=NA,ylim=NA,alpha=0.05,
+isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                              sigdig=2,show.numbers=FALSE,
                              ellipse.col=rgb(0,1,0,0.5),
                              line.col='red',lwd=2,title=TRUE,...){
@@ -213,7 +213,6 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         return(out)
     }
 }
-
 #' @param type following the classification of
 #' Ludwig and Titterington (1994), one of either:
 #' 
@@ -232,6 +231,8 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
 #' vs. \eqn{^{232}Th/^{238}U}
 #'
 #' }
+#' @rdname isochron
+#' @export
 isochron.ThU <- function (x,type=3,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){

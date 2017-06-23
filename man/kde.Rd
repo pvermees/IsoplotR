@@ -5,6 +5,7 @@
 \alias{kde.default}
 \alias{kde.UPb}
 \alias{kde.detritals}
+\alias{kde.PbPb}
 \alias{kde.ArAr}
 \alias{kde.ReOs}
 \alias{kde.SmNd}
@@ -32,6 +33,12 @@ kde(x, ...)
   ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
   show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA,
   samebandwidth = TRUE, normalise = TRUE, ...)
+
+\method{kde}{PbPb}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, i2i = FALSE,
+  ...)
 
 \method{kde}{ArAr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
@@ -76,8 +83,9 @@ kde(x, ...)
 }
 \arguments{
 \item{x}{a vector of numbers OR an object of class \code{UPb},
-\code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr},
-\code{UThHe}, \code{fissiontracks} or \code{detrital}}
+\code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
+\code{RbSr}, \code{UThHe}, \code{fissiontracks} or
+\code{detrital}}
 
 \item{...}{optional arguments to be passed on to \code{density}}
 
@@ -158,12 +166,14 @@ function will use the median bandwidth of all the samples.}
 \item{normalise}{logical flag indicating whether or not the KDEs
 should all integrate to the same value.}
 
-\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+\item{i2i}{`isochron to intercept': calculates the initial (aka
+`inherited', `excess', or `common')
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
 \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
 \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
 ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in \code{settings('iratio',...)}}
+uses the default values stored in \code{settings('iratio',...)
+or zero (for the Pb-Pb method).}}
 }
 \value{
 if \code{plot = TRUE}, returns an object of class \code{KDE}, i.e. a

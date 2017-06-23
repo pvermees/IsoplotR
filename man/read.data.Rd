@@ -17,7 +17,7 @@ read.data(x, ...)
 
 \item{...}{optional arguments to the \code{read.csv} function}
 
-\item{method}{one of \code{'U-Pb'}, \code{'Ar-Ar'},
+\item{method}{one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
 \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os},
 \code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}}
 
@@ -33,6 +33,14 @@ if \code{method='U-Pb'}, then \code{format} is one of either:
 }
 
 where optional columns are marked in round brackets
+
+if \code{method='Pb-Pb'}, then \code{format} is one of either:
+
+\enumerate{
+\item{\code{6/4, s[6/4], 7/4, s[7/4], rho}}
+\item{\code{4/6, s[4/6], 7/6, s[7/6], rho}}
+\item{\code{6/4, s[6/4], 7/4, s[7/4], 7/6, s[7/6]}}
+}
 
 if \code{method='Ar-Ar'}, then \code{format} is one of either:
 
@@ -101,9 +109,10 @@ or more U/Ca- or U-concentration measurements and their analytical
 uncertainties.}  }}
 }
 \value{
-an object of class \code{UPb}, \code{ArAr}, \code{UThHe},
-    \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{detritals},
-    \code{fissiontracks} or \code{other}
+an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
+    \code{UThHe}, \code{ReOs}, \code{SmNd}, \code{RbSr},
+    \code{LuHf}, \code{detritals}, \code{fissiontracks} or
+    \code{other}
 }
 \description{
 Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s
@@ -114,6 +123,7 @@ IsoplotR provides the following example input files:
 
 \itemize{
 \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv}}
+\item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv}}
 \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
 \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}}
 \item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}}
@@ -156,7 +166,7 @@ f6 <- system.file("Namib.csv",package="IsoplotR")
 d6 <- read.data(f6,method="detritals")
 kde(d6)
 
-#  three `other' files (MountTom.csv, spectrum.csv, average.csv)
+#  three 'other' files (MountTom.csv, spectrum.csv, average.csv)
 f7 <- system.file("MountTom.csv",package="IsoplotR")
 d7 <- read.data(f7,method="other")
 radialplot(d7)

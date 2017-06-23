@@ -4,6 +4,7 @@
 \alias{age}
 \alias{age.default}
 \alias{age.UPb}
+\alias{age.PbPb}
 \alias{age.ArAr}
 \alias{age.UThHe}
 \alias{age.fissiontracks}
@@ -20,6 +21,9 @@ age(x, ...)
 
 \method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE, i = NA,
   sigdig = NA, ...)
+
+\method{age}{PbPb}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, ...)
 
 \method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -76,7 +80,7 @@ error, or the spontaneous and induced track densities \code{Ns} and
 OR
 
 \itemize{
-\item an object of class \code{UPb}, \code{ArAr},
+\item an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
 \code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf} \code{UThHe} or
 \code{fissiontracks}.
 }}
@@ -122,11 +126,14 @@ should be considered separately (\code{isochron=FALSE}) or an
 isochron age should be calculated from all Ar-Ar analyses
 together (\code{isochron=TRUE}).}
 
-\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+\item{i2i}{`isochron to intercept': calculates the initial (aka
+`inherited', `excess', or `common')
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
 \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
 ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in \code{settings('iratio',...)}}
+uses the default values stored in \code{settings('iratio',...)
+or zero (for the Pb-Pb method).}}
 
 \item{central}{logical flag indicating whether each U-Th-He analysis
 should be considered separately (\code{central=FALSE}) or a
@@ -182,13 +189,13 @@ ages (if \code{wetherill=TRUE}) or the lower intercept age and
 \item{cov}{ the covariance matrix of the elements in \code{x} }
 }
 
-\item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd},
-\code{ReOs}, \code{LuHf} and \code{isochron=FALSE}, returns a table of Ar-Ar,
-Rb-Sr, Sm-Nd, Re-Os or Lu-Hf ages and standard errors.
+\item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr}, \code{SmNd},
+\code{ReOs}, \code{LuHf} and \code{isochron=FALSE}, returns a table of Pb-Pb,
+Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf ages and standard errors.
 
-\item if \code{x} has class \code{ArAr}, \code{RbSr}, \code{SmNd},
-\code{ReOs} or \code{LuHf} and \code{isochron=TRUE}, returns a list with the
-following items:
+\item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
+\code{SmNd}, \code{ReOs} or \code{LuHf} and \code{isochron=TRUE},
+returns a list with the following items:
 
 \describe{
 
@@ -198,14 +205,14 @@ error. }
 \item{b}{ the slope of the fit and its standard error. }
 
 \item{y0}{ the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
-\eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-\eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-ratio and its standard error. }
+\eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{187}}Os/\eqn{^{188}}Os,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio and its standard error. }
 
-\item{age}{ the \eqn{^{40}}Ar/\eqn{^{39}}Ar,
-\eqn{^{187}}Os/\eqn{^{187}}Re, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-\eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf age
-and its standard error. }
+\item{age}{ the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
+\eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{187}}Os/\eqn{^{187}}Re,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf age and its standard error. }
 
 }
 

@@ -4,10 +4,12 @@
 \alias{isochron}
 \alias{isochron.default}
 \alias{isochron.ArAr}
+\alias{isochron.PbPb}
 \alias{isochron.RbSr}
 \alias{isochron.ReOs}
 \alias{isochron.SmNd}
 \alias{isochron.LuHf}
+\alias{isochron.ThU}
 \title{Calculate and plot isochrons}
 \usage{
 isochron(x, ...)
@@ -17,6 +19,11 @@ isochron(x, ...)
   line.col = "red", lwd = 2, title = TRUE, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
+  exterr = TRUE, ...)
+
+\method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
   exterr = TRUE, ...)
@@ -34,6 +41,10 @@ isochron(x, ...)
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
+
+\method{isochron}{ThU}(x, type = 3, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 }
@@ -81,6 +92,25 @@ vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar. If \code{FALSE}, plots
 \item{plot}{if \code{FALSE}, suppresses the graphical output}
 
 \item{exterr}{propagate external sources of uncertainty (J, decay constant)?}
+
+\item{type}{following the classification of
+Ludwig and Titterington (1994), one of either:
+
+\enumerate{
+
+\item `Rosholt type-II' isochron setting out
+\eqn{^{230}Th/^{232}Th} vs. \eqn{^{238}U/^{232}Th}
+
+\item `Osmond type-II' isochron setting out \eqn{^{230}Th/^{238}U}
+vs. \eqn{^{232}Th/^{238}U}
+
+\item `Rosholt type-II' isochron setting out \eqn{^{234}U/^{232}Th}
+vs. \eqn{^{238}U/^{232}Th}
+
+\item `Osmond type-II' isochron setting out \eqn{^{234}U/^{238}U}
+vs. \eqn{^{232}Th/^{238}U}
+
+}}
 }
 \value{
 if \code{plot=FALSE}, returns a list with the following items:
@@ -97,7 +127,7 @@ age and its standard error}
 \description{
 Plots cogenetic Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf data as X-Y
 scatterplots, fits an isochron curve through them using the
-\code{yorkfit} function, and computes the corresponding isochron
+\code{york} function, and computes the corresponding isochron
 age, including decay constant uncertainties.
 }
 \examples{

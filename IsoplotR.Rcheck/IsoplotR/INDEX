@@ -11,6 +11,9 @@ helioplot               Visualise U-Th-He data on a logratio plot or
                         ternary diagram
 isochron                Calculate and plot isochrons
 kde                     Create (a) kernel density estimate(s)
+ludwig                  Linear regression of X,Y,Z-variables with
+                        correlated errors, taking into account decay
+                        constant uncertainties
 mds                     Multidimensional Scaling
 peakfit                 Finite mixture modelling of geochronological
                         datasets
@@ -19,6 +22,8 @@ read.data               Read geochronology data
 set.zeta                Calculate the zeta calibration coefficient for
                         fission track dating
 settings                Load settings to and from json
+titterington            Linear regression of X,Y,Z-variables with
+                        correlated errors
 weightedmean            Calculate the weighted mean age
-yorkfit                 Linear regression of X,Y-variables with
+york                    Linear regression of X,Y-variables with
                         correlated errors
