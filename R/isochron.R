@@ -281,7 +281,6 @@ isochron.ThU <- function (x,type=3,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
     out$cov.ab <- fit$cov[ia,ib]
     out$y0 <- out$a
-    out$p.value <- 0
     out$age <- get.ThU.age(fit$par[i48],sqrt(fit$cov[i48,i48]),
                            fit$par[i08],sqrt(fit$cov[i08,i08]),
                            fit$cov[i48,i08],exterr=exterr)

@@ -40,7 +40,8 @@ titterington <- function(x){
     out <- list()
     out$par <- fit$par
     out$cov <- covmat[(ns-3):ns,(ns-3):ns]
-    out$mswd <- get.tit.mswd(fit$par,dat)
+    mswd <- mswd.tit(fit$par,dat)
+    out <- c(out,mswd)
     parnames <- c('a','b','A','B')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
@@ -48,11 +49,31 @@ titterington <- function(x){
     out
 }
 
-get.tit.mswd <- function(abAB,dat){
-    S <- S.tit(abAB,dat)
-    ns <- length(dat$XYZ)
+mswd.tit <- function(abAB,dat){
+    a <- abAB[1]
+    b <- abAB[2]
+    A <- abAB[3]
+    B <- abAB[4]
+    XYZ <- dat$XYZ
+    omega <- dat$omega
+    ns <- length(XYZ)
+    S <- 0
+    for (i in 1:ns){
+        X <- XYZ[[i]][1]
+        Y <- XYZ[[i]][2]
+        Z <- XYZ[[i]][3]
+        abg <- alpha.beta.gamma(a,b,A,B,XYZ[[i]],omega[[i]])
+        alpha <- abg[1]
+        beta <- abg[2]
+        gamma <- abg[3]
+        x <- X + beta/alpha
+        S <- S + alpha*(X-x)^2 + 2*beta*(X-x) + gamma
+    }
     df <- 2*ns-4
-    S/df
+    out <- list()
+    out$mswd <- S/df
+    out$p.value <- as.numeric(1-pchisq(S,df))
+    out
 }
 
 matrix2covlist <- function(x){
@@ -97,7 +118,6 @@ fisher.tit <- function(abAB,dat){
     d2L.dadB <- 0
     d2L.dbdA <- 0
     d2L.dbdB <- 0
-    d2L.dxdx <- 0
     for (i in 1:ns){
         XYZ <- dat$XYZ[[i]]
         X <- XYZ[1]
