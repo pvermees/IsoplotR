@@ -145,7 +145,7 @@ fisher.tit <- function(abAB,dat){
         d2L.dbdx <- -x*(omega[1,2] + b*omega[2,2] + B*omega[2,3])
         d2L.dAdx <- -(omega[1,3] + b*omega[2,3] + B*omega[3,3])
         d2L.dBdx <- -x*(omega[1,3] + b*omega[2,3] + B*omega[3,3])
-        d2L.dx2 <- -(omega[1,2] + 2*b*omega[1,2] + 2*B*omega[1,3] +
+        d2L.dx2 <- -(omega[1,1] + 2*b*omega[1,2] + 2*B*omega[1,3] +
                      omega[2,2]*b^2 + omega[2,3]*B^2 + 2*omega[3,3]*b*B)
         out[i,i] <- -d2L.dx2
         out[i,ns+1] <- -d2L.dadx

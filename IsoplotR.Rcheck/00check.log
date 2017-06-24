@@ -1,5 +1,5 @@
 * using log directory ‘/home/pvermees/Dropbox/Programming/R/IsoplotR/IsoplotR.Rcheck’
-* using R Under development (unstable) (2016-08-17 r71112)
+* using R Under development (unstable) (2017-05-16 r72684)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * using session charset: UTF-8
 * using option ‘--as-cran’
@@ -8,7 +8,7 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-Days since last update: 5
+Days since last update: 6
 
 The build time stamp is missing.
 * checking package namespace information ... OK
@@ -39,8 +39,8 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... NOTE
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-Non-standard files/directories found at top level:
-  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
+Non-standard file/directory found at top level:
+  ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -59,26 +59,7 @@ These should not be in a package tarball.
 * checking whether the namespace can be unloaded cleanly ... OK
 * checking loading without being on the library search path ... OK
 * checking use of S3 registration ... OK
-* checking dependencies in R code ... NOTE
-
- *** caught segfault ***
-address 0x5, cause 'memory not mapped'
-
-Traceback:
- 1: dyn.load(file, DLLpath = DLLpath, ...)
- 2: library.dynam(lib, package, package.lib)
- 3: loadNamespace(p)
- 4: withCallingHandlers(expr, message = function(c) invokeRestart("muffleMessage"))
- 5: suppressMessages(loadNamespace(p))
- 6: withCallingHandlers(expr, warning = function(w) invokeRestart("muffleWarning"))
- 7: suppressWarnings(suppressMessages(loadNamespace(p)))
- 8: doTryCatch(return(expr), name, parentenv, handler)
- 9: tryCatchOne(expr, names, parentenv, handlers[[1L]])
-10: tryCatchList(expr, classes, parentenv, handlers)
-11: tryCatch(suppressWarnings(suppressMessages(loadNamespace(p))),     error = function(e) e)
-12: tools:::.check_packages_used(package = "IsoplotR")
-An irrecoverable exception occurred. R is aborting now ...
-Segmentation fault (core dumped)
+* checking dependencies in R code ... OK
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
@@ -95,41 +76,7 @@ Segmentation fault (core dumped)
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... ERROR
-Running examples in ‘IsoplotR-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: mds
-> ### Title: Multidimensional Scaling
-> ### Aliases: mds mds.default mds.detritals
-> 
-> ### ** Examples
-> 
-> data(examples)
-> # Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.
-> mds(examples$DZ,nnlines=TRUE,cex=5,xaxt='n',yaxt='n')
-
- *** caught segfault ***
-address 0x5, cause 'memory not mapped'
-
-Traceback:
- 1: dyn.load(file, DLLpath = DLLpath, ...)
- 2: library.dynam(lib, package, package.lib)
- 3: loadNamespace(name)
- 4: doTryCatch(return(expr), name, parentenv, handler)
- 5: tryCatchOne(expr, names, parentenv, handlers[[1L]])
- 6: tryCatchList(expr, classes, parentenv, handlers)
- 7: tryCatch(loadNamespace(name), error = function(e) stop(e))
- 8: getNamespace(ns)
- 9: asNamespace(ns)
-10: getExportedValue(pkg, name)
-11: MASS::isoMDS
-12: mds.default(d, classical = classical, plot = plot, shepard = shepard,     nnlines = nnlines, pch = pch, pos = pos, cex.symbols = cex.symbols,     col = col, bg = bg, xlab = xlab, ylab = ylab, ...)
-13: mds.detritals(examples$DZ, nnlines = TRUE, cex = 5, xaxt = "n",     yaxt = "n")
-14: mds(examples$DZ, nnlines = TRUE, cex = 5, xaxt = "n", yaxt = "n")
-An irrecoverable exception occurred. R is aborting now ...
-Segmentation fault (core dumped)
+* checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 ERROR, 2 WARNINGs, 5 NOTEs
+Status: 2 WARNINGs, 4 NOTEs
