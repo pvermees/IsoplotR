@@ -255,36 +255,6 @@ S.tit <- function(abAB,dat){
     S
 }
 
-ThU.convert <- function(x){
-    labels <- c('X','sX','Y','sY','Z','sZ','rXY','rXZ','rYZ')
-    out <- rep(0,9)
-    names(x) <- labels
-    names(out) <- labels
-    out['X'] <- 1/x['X']
-    out['Y'] <- x['Y']/x['X']
-    out['Z'] <- x['Z']/x['X']
-    J <- matrix(0,3,3)
-    J[1,1] <- -1/x['X']
-    J[1,2] <- 0
-    J[1,3] <- 0
-    J[2,1] <- -x['Y']/x['X']^2
-    J[2,2] <- 1/x['X']
-    J[2,3] <- 0
-    J[3,1] <- -x['Z']/x['X']^2
-    J[2,3] <- 0
-    J[3,3] <- 1/x['X']
-    E <- cor2cov3(x['sX'],x['sY'],x['sZ'],x['rXY'],x['rXZ'],x['rYZ'])
-    covmat <- J %*% E %*% t(J)
-    cormat <- stats::cov2cor(covmat)
-    out['sX'] <- sqrt(covmat[1,1])
-    out['sY'] <- sqrt(covmat[2,2])
-    out['sZ'] <- sqrt(covmat[3,3])
-    out['rXY'] <- cormat[1,2]
-    out['rXZ'] <- cormat[1,3]
-    out['rYZ'] <- cormat[2,3]
-    out
-}
-
 data2tit <- function(x,...){ UseMethod("data2tit",x) }
 data2tit.default <- function(x,...){ stop('default function undefined') }
 # osmond = FALSE: 8/2 - 4/2 - 0/2

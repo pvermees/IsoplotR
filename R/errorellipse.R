@@ -37,11 +37,12 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,
                         ellipse.col=rgb(0,1,0,0.5),
-                        a=NA,b=NA,line.col='red',lwd=2,...){
+                        a=NA,b=NA,line.col='red',lwd=2,
+                        new.plot=TRUE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
     if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
-    graphics::plot(xlim,ylim,type='n',xlab='',ylab='')
+    if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='')
     if (!is.na(a) & !is.na(b)){
         graphics::lines(xlim,a+b*xlim,col=line.col,lwd=lwd)
     }
