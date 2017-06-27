@@ -44,11 +44,6 @@ get.ThU.age <- function(U234U238,sU234U238,Th230U238,sTh230U238,cov4808,exterr=T
     E[1,2] <- covAa
     E[2,1] <- E[1,2]
     covmat <- J %*% E %*% t(J)
-    # The above gives the same result as equation 6 of 
-    # Ludwig and Titterington (2004), with a fixed typo:
-    # D <- l0[1]*(exp(-l0[1]*tt)+(a-1)*exp((l4[1]-l0[1])*tt))
-    # k1 <- k1(tt,l0,l4)
-    # st <- sqrt((sA^22 + (k1*sa)^2 - 2*k1*covAa)/D^2)
     st <- sqrt(covmat[1,1])
     sa0 <- sqrt(covmat[2,2])
     covta0 <- covmat[1,2]
@@ -112,4 +107,16 @@ get.Th230U238 <- function(tt,U234U238_0){
 get.U234U238 <- function(tt,U234U238_0){
     l4 <- lambda('U234')
     1 + (U234U238_0-1)*exp(-l4[1]*tt)
+}
+
+ThU.age <- function(x,exterr=FALSE){
+    ns <- length(x)
+    d <- data2evolution(x)
+    out <- matrix(0,ns,5)
+    for (i in 1:ns){
+        out[i,] <- get.ThU.age(d[i,'U234U238'],d[i,'errU234U238'],d[i,'Th230U238'],
+                               d[i,'errTh230U238'],d[i,'cov'],exterr=exterr)
+    }
+    colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
+    out
 }

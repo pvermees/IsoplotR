@@ -75,7 +75,7 @@ get.cor.mult <- function(A,err.A,B,err.B,AB,err.AB){
 }
 
 # simultaneously performs error propagation for multiple samples
-errorprop <- function(J11,J12,J21,J22,E11,E12,E22){
+errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
     out <- matrix(0,length(J11),3)
     colnames(out) <- c('varX','varY','cov')
     out[,'varX'] <- J11*J11*E11 + J11*J12*E12 + J11*J12*E12 + J12*J12*E22

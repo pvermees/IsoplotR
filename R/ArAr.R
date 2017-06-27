@@ -18,7 +18,7 @@ ArAr.normal.ratios <- function(x){
         E11 <- x$x[,'errAr39Ar40']^2
         E22 <- x$x[,'errAr36Ar40']^2
         E12 <- x$x[,'rho']*x$x[,'errAr39Ar40']*x$x[,'errAr36Ar40']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         errAr39Ar36 <- sqrt(covmat[,'varX'])
         errAr40Ar36 <- sqrt(covmat[,'varY'])
         rho <- covmat[,'cov']/(errAr39Ar36*errAr40Ar36)
@@ -50,7 +50,7 @@ ArAr.inverse.ratios <- function(x){
         E11 <- x$x[,'errAr39Ar36']^2
         E22 <- x$x[,'errAr40Ar36']^2
         E12 <- x$x[,'rho']*x$x[,'errAr39Ar36']*x$x[,'errAr40Ar36']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         errAr39Ar40 <- sqrt(covmat[,'varX'])
         errAr36Ar40 <- sqrt(covmat[,'varY'])
         rho <- covmat[,'cov']/(errAr39Ar40*errAr36Ar40)
@@ -88,7 +88,7 @@ ArAr.age.ratios <- function(x){
         E11 <- x$x[,'errAr39Ar36']^2
         E22 <- x$x[,'errAr40Ar36']^2
         E12 <- x$x[,'rho']*x$x[,'errAr39Ar36']*x$x[,'errAr40Ar36']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
     } else if (x$format==2){
         Ar40Ar39 <- 1/x$x[,'Ar39Ar40']
         Ar39Ar36 <- x$x[,'Ar39Ar40']/x$x[,'Ar36Ar40']
@@ -99,7 +99,7 @@ ArAr.age.ratios <- function(x){
         E11 <- x$x[,'errAr39Ar40']^2
         E22 <- x$x[,'errAr36Ar40']^2
         E12 <- x$x[,'rho']*x$x[,'errAr39Ar40']*x$x[,'errAr36Ar40']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
     } else if (x$format==3){
         Ar40Ar39 <- 1/x$x[,'Ar39Ar40']
         Ar39Ar36 <- x$x[,'Ar39Ar36']

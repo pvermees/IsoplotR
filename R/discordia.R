@@ -2,7 +2,7 @@ discordia.age <- function(x,wetherill=TRUE,exterr=TRUE){
     d <- data2york(x,wetherill=wetherill)
     fit <- york(d)
     itt <- concordia.intersection(fit,wetherill)
-    hess <- stats::optimHess(itt,LL.concordia.intersection, d=d,x=x,
+    hess <- stats::optimHess(itt,LL.concordia.intersection,d=d,x=x,
                              wetherill=wetherill,exterr=exterr)
     out <- list()
     out$x <- itt
@@ -32,6 +32,7 @@ LL.concordia.intersection <- function(itt,d,x,wetherill,exterr){
     for (i in 1:length(x)){
         if (wetherill) samp <- wetherill(x,i)
         else samp <- tera.wasserburg(x,i)
+        covmat <- samp$cov
         if (exterr) {
             dcomp <- discordant.composition(disc[i],itt[1],itt[2],wetherill)
             covmat <- samp$cov + dcomp$cov
