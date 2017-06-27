@@ -32,13 +32,16 @@
 #'
 #' \item a six element vector containing \code{Lu}, \code{s[Lu]},
 #' \code{Hf}, \code{s[Hf]}, \code{Hf176Hf177}, and \code{s[Hf176Hf177]}
+#'
+#' \item a five element vector containing \code{4/8}, \code{s[4/8]},
+#' \code{0/8}, \code{s[0/8]}, and \code{cov[4/8,0/8]}
 #' }
 #'
 #' OR
 #'
 #' \itemize{
-#' \item an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
-#' \code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf} \code{UThHe} or
+#' \item an object of class \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ThU},
+#' \code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{UThHe} or
 #' \code{fissiontracks}.
 #' }
 #'
@@ -79,6 +82,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
         out <- get.SmNd.age(X[1],X[2],exterr)
     } else if (identical(method,'Lu-Hf')){
         out <- get.LuHf.age(X[1],X[2],exterr)
+    } else if (identical(method,'Th-U')){
+        out <- get.ThU.age(X[1],X[2],X[3],X[4],X[5],exterr)
     } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
             out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
@@ -295,6 +300,13 @@ age.UThHe <- function(x,central=FALSE,i=NA,sigdig=NA,...){
 age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
     if (central) out <- central(x)
     else out <- fissiontrack.age(x,i=i,sigdig=sigdig,exterr=exterr)
+    out
+}
+#' @rdname age
+#' @export
+age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+    if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
+    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }
 #' @rdname age

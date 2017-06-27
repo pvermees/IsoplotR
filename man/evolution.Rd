@@ -5,7 +5,7 @@
 \title{Th-U evolution diagram}
 \usage{
 evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
-  show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
+  project = FALSE, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   line.col = "darksalmon", isochron = FALSE, exterr = TRUE, sigdig = 2,
   ...)
 }
@@ -20,6 +20,8 @@ evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
 
 \item{transform}{if \code{TRUE}, plots
 \eqn{^{234}}U/\eqn{^{238}}U vs. Th-U age.}
+
+\item{project}{project the compositions along the isochron?}
 
 \item{show.numbers}{logical flag (\code{TRUE} to show grain
 numbers)}

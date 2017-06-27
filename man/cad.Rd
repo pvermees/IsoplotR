@@ -7,6 +7,7 @@
 \alias{cad.UPb}
 \alias{cad.PbPb}
 \alias{cad.ArAr}
+\alias{cad.ThU}
 \alias{cad.ReOs}
 \alias{cad.SmNd}
 \alias{cad.RbSr}
@@ -31,6 +32,9 @@ cad(x, ...)
   col = "black", i2i = FALSE, ...)
 
 \method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", i2i = FALSE, ...)
+
+\method{cad}{ThU}(x, pch = NA, verticals = TRUE, xlab = "age [ka]",
   col = "black", i2i = FALSE, ...)
 
 \method{cad}{ReOs}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",

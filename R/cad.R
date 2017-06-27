@@ -103,6 +103,13 @@ cad.ArAr <- function(x,pch=NA,verticals=TRUE,
 }
 #' @rdname cad
 #' @export
+cad.ThU <- function(x,pch=NA,verticals=TRUE,
+                    xlab='age [ka]',col='black',i2i=FALSE,...){
+    tt <- ThU.age(x,i2i=i2i)[,1]
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
+}
+#' @rdname cad
+#' @export
 cad.ReOs <- function(x,pch=NA,verticals=TRUE,
                      xlab='age [Ma]',col='black',i2i=TRUE,...){
     tt <- ReOs.age(x,i2i=i2i)[,1]

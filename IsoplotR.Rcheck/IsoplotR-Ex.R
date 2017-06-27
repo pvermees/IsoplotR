@@ -26,7 +26,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
 ### Aliases: age age.default age.UPb age.PbPb age.ArAr age.UThHe
-###   age.fissiontracks age.ReOs age.SmNd age.RbSr age.LuHf
+###   age.fissiontracks age.ThU age.ReOs age.SmNd age.RbSr age.LuHf
 
 ### ** Examples
 
@@ -69,7 +69,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
 ### Aliases: cad cad.default cad.detritals cad.UPb cad.PbPb cad.ArAr
-###   cad.ReOs cad.SmNd cad.RbSr cad.LuHf cad.UThHe cad.fissiontracks
+###   cad.ThU cad.ReOs cad.SmNd cad.RbSr cad.LuHf cad.UThHe
+###   cad.fissiontracks
 
 ### ** Examples
 
@@ -257,7 +258,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
 ### Aliases: kde kde.default kde.UPb kde.detritals kde.PbPb kde.ArAr
-###   kde.ReOs kde.SmNd kde.RbSr kde.LuHf kde.UThHe kde.fissiontracks
+###   kde.ThU kde.ReOs kde.SmNd kde.RbSr kde.LuHf kde.UThHe
+###   kde.fissiontracks
 
 ### ** Examples
 

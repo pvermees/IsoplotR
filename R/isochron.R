@@ -233,7 +233,7 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
 #' }
 #' @rdname isochron
 #' @export
-isochron.ThU <- function (x,type=3,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
     if (type == 1){

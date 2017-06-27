@@ -44,7 +44,7 @@ isochron(x, ...)
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 
-\method{isochron}{ThU}(x, type = 3, xlim = NA, ylim = NA, alpha = 0.05,
+\method{isochron}{ThU}(x, type = 4, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
 }

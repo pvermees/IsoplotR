@@ -8,6 +8,7 @@
 \alias{age.ArAr}
 \alias{age.UThHe}
 \alias{age.fissiontracks}
+\alias{age.ThU}
 \alias{age.ReOs}
 \alias{age.SmNd}
 \alias{age.RbSr}
@@ -32,6 +33,9 @@ age(x, ...)
 
 \method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA,
   exterr = TRUE, ...)
+
+\method{age}{ThU}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, ...)
 
 \method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -75,13 +79,16 @@ error, or the spontaneous and induced track densities \code{Ns} and
 
 \item a six element vector containing \code{Lu}, \code{s[Lu]},
 \code{Hf}, \code{s[Hf]}, \code{Hf176Hf177}, and \code{s[Hf176Hf177]}
+
+\item a five element vector containing \code{4/8}, \code{s[4/8]},
+\code{0/8}, \code{s[0/8]}, and \code{cov[4/8,0/8]}
 }
 
 OR
 
 \itemize{
-\item an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
-\code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf} \code{UThHe} or
+\item an object of class \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ThU},
+\code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{UThHe} or
 \code{fissiontracks}.
 }}
 

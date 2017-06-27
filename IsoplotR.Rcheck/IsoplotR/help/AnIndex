@@ -7,6 +7,7 @@ age.PbPb	age
 age.RbSr	age
 age.ReOs	age
 age.SmNd	age
+age.ThU	age
 age.UPb	age
 age.UThHe	age
 agespectrum	agespectrum
@@ -22,6 +23,7 @@ cad.PbPb	cad
 cad.RbSr	cad
 cad.ReOs	cad
 cad.SmNd	cad
+cad.ThU	cad
 cad.UPb	cad
 cad.UThHe	cad
 central	central
@@ -52,6 +54,7 @@ kde.PbPb	kde
 kde.RbSr	kde
 kde.ReOs	kde
 kde.SmNd	kde
+kde.ThU	kde
 kde.UPb	kde
 kde.UThHe	kde
 ludwig	ludwig

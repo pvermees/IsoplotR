@@ -1,12 +1,14 @@
-get.ThU.age <- function(U234U238,sU234U238,Th230U238,sTh230U238,cov4808,exterr=TRUE){
+get.ThU.age <- function(U234U238,sU234U238,Th230U238,sTh230U238,cov4808,
+                        exterr=TRUE,cor=FALSE){
+    l0 <- lambda('Th230')
+    l4 <- lambda('U234')
     a <- U234U238
-    sa <- sU234U238
     A <- Th230U238
+    sa <- sU234U238
     sA <- sTh230U238
     covAa <- cov4808
-    l4 <- lambda('U234')
-    l0 <- lambda('Th230')
-    fit <- stats::optim(0,fn=ThU.misfit,gr=ThU.gr,method='BFGS',A=A,a=a,l0=l0,l4=l4)
+    fit <- stats::optim(0,fn=ThU.misfit,gr=ThU.gr,method='BFGS',
+                        A=A,a=a,l0=l0,l4=l4)
     tt <- fit$par
     a0 <- 1+(a-1)*exp(l4[1]*tt)
     l40 <- l4[1]-l0[1]
@@ -46,11 +48,15 @@ get.ThU.age <- function(U234U238,sU234U238,Th230U238,sTh230U238,cov4808,exterr=T
     covmat <- J %*% E %*% t(J)
     st <- sqrt(covmat[1,1])
     sa0 <- sqrt(covmat[2,2])
-    covta0 <- covmat[1,2]
-    out <- c(tt,st,a0,sa0,covta0)
+    out <- c(tt,st,a0,sa0,covmat[1,2])
     names(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
+    if (cor){
+        out[5] <- covmat[1,2]*st*sa0
+        names(out)[5] <- 'cor[t,48_0]'
+    }
     out
 }
+
 
 k1 <- function(tt,l0,l4){
     (1-exp((l4[1]-l0[1])*tt))*l0[1]/(l4[1]-l0[1])
@@ -109,14 +115,34 @@ get.U234U238 <- function(tt,U234U238_0){
     1 + (U234U238_0-1)*exp(-l4[1]*tt)
 }
 
-ThU.age <- function(x,exterr=FALSE){
+ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     ns <- length(x)
     d <- data2evolution(x)
-    out <- matrix(0,ns,5)
-    for (i in 1:ns){
-        out[i,] <- get.ThU.age(d[i,'U234U238'],d[i,'errU234U238'],d[i,'Th230U238'],
-                               d[i,'errTh230U238'],d[i,'cov'],exterr=exterr)
+    if (i2i){
+        osmond <- data2tit.ThU(x,osmond=TRUE)
+        fit <- titterington(osmond)
     }
+    out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
+    if (cor) colnames(out)[5] <- 'cor[t,48_0]'
+    for (j in 1:ns){
+        a <- d[j,'U234U238']
+        sa <- d[j,'errU234U238']
+        A <- d[j,'Th230U238']
+        sA <- d[j,'errTh230U238']
+        covAa <- d[j,'cov']
+        if (i2i){ # project onto 08-48 plane
+            a0 <- a - fit$par['b']*osmond[j,'X']
+            A0 <- A - fit$par['B']*osmond[j,'X']
+            out[j,] <- get.ThU.age(a0,sa,A0,sA,covAa,exterr=exterr,cor=cor)
+        } else {
+            out[j,] <- get.ThU.age(a,sa,A,sA,covAa,exterr=exterr,cor=cor)
+        }
+    }
+    if (!is.na(sigdig)){
+        out[,c(1,2)] <- roundit(out[,1],out[,2],sigdig=sigdig)
+        out[,c(3,4)] <- roundit(out[,3],out[,4],sigdig=sigdig)
+    }
+    if (!is.na(i)) out <- out[i,]
     out
 }
