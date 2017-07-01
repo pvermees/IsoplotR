@@ -142,6 +142,7 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     if (!is.na(sigdig)){
         out[,c(1,2)] <- roundit(out[,1],out[,2],sigdig=sigdig)
         out[,c(3,4)] <- roundit(out[,3],out[,4],sigdig=sigdig)
+        out[,5] <- signif(out[,5],sigdig)
     }
     if (!is.na(i)) out <- out[i,]
     out

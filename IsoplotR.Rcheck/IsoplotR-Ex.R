@@ -305,7 +305,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Title: Finite mixture modelling of geochronological datasets
 ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
 ###   peakfit.PbPb peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr
-###   peakfit.LuHf peakfit.UThHe
+###   peakfit.LuHf peakfit.ThU peakfit.UThHe
 
 ### ** Examples
 
@@ -328,6 +328,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Aliases: radialplot radialplot.default radialplot.fissiontracks
 ###   radialplot.UPb radialplot.PbPb radialplot.ArAr radialplot.UThHe
 ###   radialplot.ReOs radialplot.SmNd radialplot.RbSr radialplot.LuHf
+###   radialplot.ThU
 
 ### ** Examples
 
@@ -453,9 +454,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: weightedmean
 ### Title: Calculate the weighted mean age
 ### Aliases: weightedmean weightedmean.default weightedmean.UPb
-###   weightedmean.PbPb weightedmean.ArAr weightedmean.ReOs
-###   weightedmean.SmNd weightedmean.RbSr weightedmean.LuHf
-###   weightedmean.UThHe weightedmean.fissiontracks
+###   weightedmean.PbPb weightedmean.ThU weightedmean.ArAr
+###   weightedmean.ReOs weightedmean.SmNd weightedmean.RbSr
+###   weightedmean.LuHf weightedmean.UThHe weightedmean.fissiontracks
 
 ### ** Examples
 

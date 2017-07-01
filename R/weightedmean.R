@@ -133,6 +133,17 @@ weightedmean.PbPb <- function(x,detect.outliers=TRUE,plot=TRUE,
 }
 #' @rdname weightedmean
 #' @export
+weightedmean.ThU <- function(x,detect.outliers=TRUE,plot=TRUE,
+                             rect.col=rgb(0,1,0,0.5),
+                             outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                             alpha=0.05,i2i=TRUE,...){
+    weightedmean.helper(x,detect.outliers=detect.outliers,plot=plot,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=FALSE,
+                        i2i=i2i,...)
+}
+#' @rdname weightedmean
+#' @export
 weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5), sigdig=2,
@@ -244,6 +255,8 @@ weightedmean.helper <- function(x,detect.outliers=TRUE,plot=TRUE,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'PbPb')){
         tt <- PbPb.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'ThU')){
+        tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'ReOs')){
@@ -257,7 +270,7 @@ weightedmean.helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     }
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
     if (exterr){
-        fit$mean <- add.exterr(x,fit$mean[1],fit$mean[2],
+        fit$mean <- add.exterr(x,tt=fit$mean[1],st=fit$mean[2],
                                cutoff.76=cutoff.76,type=type)
     }
     if (plot){

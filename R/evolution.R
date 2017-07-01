@@ -96,7 +96,7 @@ U4U8vsTh0U8 <- function(x,project=FALSE,xlim=NA,ylim=NA,alpha=0.05,
 evolution.title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
     rounded.a0 <- roundit(fit$age[3],fit$age[4],sigdig=sigdig)
-    line1 <- substitute('isochron age ='~a%+-%b~'[Ma] (1'~sigma~')',
+    line1 <- substitute('isochron age ='~a%+-%b~'[ka] (1'~sigma~')',
                         list(a=rounded.age[1], b=rounded.age[2]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,2),

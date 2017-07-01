@@ -430,7 +430,7 @@ NULL
 > ### Title: Finite mixture modelling of geochronological datasets
 > ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
 > ###   peakfit.PbPb peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr
-> ###   peakfit.LuHf peakfit.UThHe
+> ###   peakfit.LuHf peakfit.ThU peakfit.UThHe
 > 
 > ### ** Examples
 > 
@@ -471,6 +471,7 @@ $legend
 > ### Aliases: radialplot radialplot.default radialplot.fissiontracks
 > ###   radialplot.UPb radialplot.PbPb radialplot.ArAr radialplot.UThHe
 > ###   radialplot.ReOs radialplot.SmNd radialplot.RbSr radialplot.LuHf
+> ###   radialplot.ThU
 > 
 > ### ** Examples
 > 
@@ -619,9 +620,9 @@ f,X,errX
 > ### Name: weightedmean
 > ### Title: Calculate the weighted mean age
 > ### Aliases: weightedmean weightedmean.default weightedmean.UPb
-> ###   weightedmean.PbPb weightedmean.ArAr weightedmean.ReOs
-> ###   weightedmean.SmNd weightedmean.RbSr weightedmean.LuHf
-> ###   weightedmean.UThHe weightedmean.fissiontracks
+> ###   weightedmean.PbPb weightedmean.ThU weightedmean.ArAr
+> ###   weightedmean.ReOs weightedmean.SmNd weightedmean.RbSr
+> ###   weightedmean.LuHf weightedmean.UThHe weightedmean.fissiontracks
 > 
 > ### ** Examples
 > 
@@ -677,7 +678,7 @@ f,X,errX
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.86 0.368 12.057 0 0 
+Time elapsed:  8.532 0.26 8.553 0 0 
 > grDevices::dev.off()
 pdf 
   2 

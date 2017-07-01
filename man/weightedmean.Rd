@@ -5,6 +5,7 @@
 \alias{weightedmean.default}
 \alias{weightedmean.UPb}
 \alias{weightedmean.PbPb}
+\alias{weightedmean.ThU}
 \alias{weightedmean.ArAr}
 \alias{weightedmean.ReOs}
 \alias{weightedmean.SmNd}
@@ -28,6 +29,10 @@ weightedmean(x, ...)
 \method{weightedmean}{PbPb}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = FALSE, ...)
+
+\method{weightedmean}{ThU}(x, detect.outliers = TRUE, plot = TRUE,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, i2i = TRUE, ...)
 
 \method{weightedmean}{ArAr}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),

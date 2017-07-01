@@ -11,6 +11,7 @@
 \alias{peakfit.SmNd}
 \alias{peakfit.RbSr}
 \alias{peakfit.LuHf}
+\alias{peakfit.ThU}
 \alias{peakfit.UThHe}
 \title{Finite mixture modelling of geochronological datasets}
 \usage{
@@ -40,6 +41,9 @@ peakfit(x, ...)
   i2i = TRUE, ...)
 
 \method{peakfit}{LuHf}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
+  i2i = TRUE, ...)
+
+\method{peakfit}{ThU}(x, k = 1, exterr = FALSE, sigdig = 2, log = TRUE,
   i2i = TRUE, ...)
 
 \method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, ...)

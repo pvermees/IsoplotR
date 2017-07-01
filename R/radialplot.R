@@ -193,6 +193,16 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,
                       show.numbers=show.numbers,pch=pch,bg=bg,
                       markers=markers,k=k,exterr=exterr,i2i=i2i,...)
 }
+#' @rdname radialplot
+#' @export
+radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
+                           transformation='log',show.numbers=FALSE,
+                           pch=21,bg='white',markers=NULL,k=0,i2i=TRUE,...){
+    radialplot.helper(x,from=from,to=to,t0=t0,
+                      transformation=transformation,
+                      show.numbers=show.numbers,pch=pch,bg=bg,
+                      markers=markers,k=k,exterr=FALSE,i2i=i2i,...)
+}
 radialplot.helper <- function(x,from=NA,to=NA,t0=NA,
                              transformation='log',type=4,
                              cutoff.76=1100, cutoff.disc=c(-15,5),
@@ -230,6 +240,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
         tt <- RbSr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'LuHf')){
         tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'ThU')){
+        tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
     }
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,

@@ -12,6 +12,7 @@
 \alias{radialplot.SmNd}
 \alias{radialplot.RbSr}
 \alias{radialplot.LuHf}
+\alias{radialplot.ThU}
 \title{Visualise heteroscedastic data on a radial plot}
 \usage{
 radialplot(x, ...)
@@ -57,6 +58,10 @@ radialplot(x, ...)
 \method{radialplot}{LuHf}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
   markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, ...)
+
+\method{radialplot}{ThU}(x, from = NA, to = NA, t0 = NA,
+  transformation = "log", show.numbers = FALSE, pch = 21, bg = "white",
+  markers = NULL, k = 0, i2i = TRUE, ...)
 }
 \arguments{
 \item{x}{Either an nx2 matix of (transformed) values z and their

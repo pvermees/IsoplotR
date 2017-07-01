@@ -70,6 +70,7 @@ peakfit.PbPb	peakfit
 peakfit.RbSr	peakfit
 peakfit.ReOs	peakfit
 peakfit.SmNd	peakfit
+peakfit.ThU	peakfit
 peakfit.UPb	peakfit
 peakfit.UThHe	peakfit
 radialplot	radialplot
@@ -81,6 +82,7 @@ radialplot.PbPb	radialplot
 radialplot.RbSr	radialplot
 radialplot.ReOs	radialplot
 radialplot.SmNd	radialplot
+radialplot.ThU	radialplot
 radialplot.UPb	radialplot
 radialplot.UThHe	radialplot
 read.data	read.data
@@ -98,6 +100,7 @@ weightedmean.PbPb	weightedmean
 weightedmean.RbSr	weightedmean
 weightedmean.ReOs	weightedmean
 weightedmean.SmNd	weightedmean
+weightedmean.ThU	weightedmean
 weightedmean.UPb	weightedmean
 weightedmean.UThHe	weightedmean
 york	york

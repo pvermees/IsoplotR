@@ -140,6 +140,11 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
 }
 #' @rdname peakfit
 #' @export
+peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2,log=TRUE,i2i=TRUE,...){
+    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+}
+#' @rdname peakfit
+#' @export
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,...){
     peakfit.helper(x,k=k,sigdig=sigdig,log=log,...)
 }
@@ -182,6 +187,8 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
         tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'fissiontracks')){
         tt <- fissiontrack.age(x,exterr=FALSE)
+    } else if (hasClass(x,'ThU')){
+        tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
     }
     peakfit.default(tt,k,log=log)
 }
