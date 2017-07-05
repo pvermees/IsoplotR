@@ -34,11 +34,12 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                       exterr=TRUE,sigdig=2,...){
     if (transform){
         U4U8vst(x,project=project,xlim=xlim,ylim=ylim,alpha=alpha,
-                show.numbers=show.numbers,ellipse.col=ellipse.col,
-                line.col=line.col,...)
+                show.numbers=show.numbers,ellipse.col=ellipse.col,...)
     } else {
-        U4U8vsTh0U8(x,project=project,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.numbers=show.numbers,ellipse.col=ellipse.col,
+        U4U8vsTh0U8(x,isochron=isochron,project=project,xlim=xlim,
+                    ylim=ylim,alpha=alpha,
+                    show.numbers=show.numbers,
+                    ellipse.col=ellipse.col,
                     line.col=line.col,...)
     }
     if (isochron){
@@ -47,8 +48,9 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
     }
 }
 
-U4U8vst <- function(x,project=FALSE,xlim=NA,ylim=NA,alpha=0.05,show.numbers=FALSE,
-                    ellipse.col=rgb(0,1,0,0.5),line.col='darksalmon',...){
+U4U8vst <- function(x,project=FALSE,xlim=NA,ylim=NA,
+                    alpha=0.05,show.numbers=FALSE,
+                    ellipse.col=rgb(0,1,0,0.5),...){
     ns <- length(x)
     ta0 <- ThU.age(x,exterr=FALSE,i2i=project,cor=FALSE)
     nsd <- 3
@@ -69,16 +71,33 @@ U4U8vst <- function(x,project=FALSE,xlim=NA,ylim=NA,alpha=0.05,show.numbers=FALS
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
         graphics::polygon(ell,col=ellipse.col)
         graphics::points(x0,y0,pch=19,cex=0.25)
-        if (show.numbers) { graphics::text(x0,y0,i) }
+        if (show.numbers) graphics::text(x0,y0,i)
     }
 }
 
-U4U8vsTh0U8 <- function(x,project=FALSE,xlim=NA,ylim=NA,alpha=0.05,
-                        show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+U4U8vsTh0U8 <- function(x,isochron=FALSE,project=FALSE,
+                        xlim=NA,ylim=NA,
+                        alpha=0.05,show.numbers=FALSE,
+                        ellipse.col=rgb(0,1,0,0.5),
                         line.col='darksalmon',...){
     ns <- length(x)
     d <- data2evolution(x,project=project)
-    evolution.lines(d,xlim=xlim,ylim=ylim,...)
+    lim <- evolution.lines(d,xlim=xlim,ylim=ylim,...)
+    if (isochron){
+        fit <- isochron(x,type=2,plot=FALSE)
+        b48 <- fit$par['a']
+        b08 <- fit$par['A']
+        e48 <- lim[1,1]
+        e08 <- fit$par['A'] + fit$par['B']*(e48-fit$par['a'])/fit$par['b']
+        lines(c(b08,e08),c(b48,e48))
+        points(b08,b48,pch=19)
+#        sa <- sqrt(fit$cov['a','a'])
+#        sA <- sqrt(fit$cov['A','A'])
+#        ell <- matrix(c(fit$par['A'],sa,fit$par['a'],sA,
+#                        fit$cov['a','A']/(sa*sA)),1,5)
+#        scatterplot(ell,alpha=alpha,ellipse.col='white',
+#                    line.col='black',lwd=lwd,new.plot=FALSE)
+    }
     covmat <- matrix(0,2,2)
     for (i in 1:ns){
         x0 <- d[i,'Th230U238']
@@ -149,9 +168,11 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
         graphics::lines(c(x0,x),c(1,y),col=line.col)
         graphics::text(x[na0],y[na0],tt[i],pos=4,col=line.col)
     }
+    rbind(xlim,ylim)
 }
 
 data2evolution <- function(x,project=FALSE){
+    out <- list()
     labels <- c('Th230U238','errTh230U238',
                 'U234U238','errU234U238','cov')
     if (x$format == 1){

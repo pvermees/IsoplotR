@@ -132,8 +132,8 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
         sA <- d[j,'errTh230U238']
         covAa <- d[j,'cov']
         if (i2i){ # project onto 08-48 plane
-            a0 <- a - fit$par['b']*osmond[j,'X']
-            A0 <- A - fit$par['B']*osmond[j,'X']
+            a0 <- osmond[j,'Y'] - fit$par['b']*osmond[j,'X']
+            A0 <- osmond[j,'Z'] - fit$par['B']*osmond[j,'X']
             out[j,] <- get.ThU.age(a0,sa,A0,sA,covAa,exterr=exterr,cor=cor)
         } else {
             out[j,] <- get.ThU.age(a,sa,A,sA,covAa,exterr=exterr,cor=cor)

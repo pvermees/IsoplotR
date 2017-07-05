@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.17)  1 JUL 2017 18:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.17)  2 JUL 2017 23:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -709,7 +709,7 @@ File: latin1.def 2015/03/17 v1.2c Input encoding file
 
 
 Writing index file Rd2.idx
-(/tmp/Rtmpx8pE0x/Rd2pdf5a181232bb73/Rd2.aux)
+(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -766,8 +766,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/tmp/Rtmpx8pE0x/Rd2pdf5a181232bb73/Rd2.out)
-(/tmp/Rtmpx8pE0x/Rd2pdf5a181232bb73/Rd2.out)
+(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.out)
+(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -798,7 +798,7 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 28.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
-(/tmp/Rtmpx8pE0x/Rd2pdf5a181232bb73/Rd2.toc [1
+(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.toc [1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -1093,14 +1093,14 @@ Overfull \hbox (15.79549pt too wide) in paragraph at lines 2631--2639
 [38] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [39]
-(/tmp/Rtmpx8pE0x/Rd2pdf5a181232bb73/Rd2.ind [40] [41
+(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.ind [40] [41
 
 
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2753.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 2753.
 
-(/tmp/Rtmpx8pE0x/Rd2pdf5a181232bb73/Rd2.aux)
+(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2753.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2753.
 
@@ -1128,7 +1128,7 @@ vr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
 exmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts
 /type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (41 pages, 205430 bytes).
+Output written on Rd2.pdf (41 pages, 205429 bytes).
 PDF statistics:
  686 PDF objects out of 1000 (max. 8388607)
  626 compressed objects within 7 object streams

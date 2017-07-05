@@ -247,11 +247,11 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         y.lab <- expression(paste(""^"230","Th/"^"232","Th"))
     } else if (type == 2){
         osmond <- TRUE
-        ia <- 'a'
-        ib <- 'b'
+        ia <- 'A'
+        ib <- 'B'
         i48 <- 'a'
         i08 <- 'A'
-        id <- c('X','sX','Y','sY','rXY')
+        id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- expression(paste(""^"232","Th/"^"238","U"))
         y.lab <- expression(paste(""^"230","Th/"^"238","U"))
     } else if (type == 3){
@@ -265,11 +265,11 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         y.lab <- expression(paste(""^"234","U/"^"232","Th"))
     } else if (type == 4){
         osmond <- TRUE
-        ia <- 'A'
-        ib <- 'B'
+        ia <- 'a'
+        ib <- 'b'
         i48 <- 'a'
         i08 <- 'A'
-        id <- c('X','sX','Z','sZ','rXZ')
+        id <- c('X','sX','Y','sY','rXY')
         x.lab <- expression(paste(""^"232","Th/"^"238","U"))
         y.lab <- expression(paste(""^"234","U/"^"238","U"))
     }
