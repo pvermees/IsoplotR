@@ -11,7 +11,8 @@
 #' @param alpha confidence cutoff for the error ellipses
 #' @param transform if \code{TRUE}, plots
 #'     \eqn{^{234}}U/\eqn{^{238}}U vs. Th-U age.
-#' @param project project the compositions along the isochron?
+#' @param detrital apply a detrital Th correction and
+#' project the compositions along the isochron?
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
 #' @param ellipse.col background colour of the error ellipses
@@ -28,15 +29,15 @@
 #'     Mineralogy and Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
-                      project=FALSE,show.numbers=FALSE,
+                      detrital=FALSE,show.numbers=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),
                       line.col='darksalmon',isochron=FALSE,
                       exterr=TRUE,sigdig=2,...){
     if (transform){
-        U4U8vst(x,project=project,xlim=xlim,ylim=ylim,alpha=alpha,
+        U4U8vst(x,detrital=detrital,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.numbers=show.numbers,ellipse.col=ellipse.col,...)
     } else {
-        U4U8vsTh0U8(x,isochron=isochron,project=project,xlim=xlim,
+        U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,xlim=xlim,
                     ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,
                     ellipse.col=ellipse.col,
@@ -48,11 +49,11 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
     }
 }
 
-U4U8vst <- function(x,project=FALSE,xlim=NA,ylim=NA,
+U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
                     alpha=0.05,show.numbers=FALSE,
                     ellipse.col=rgb(0,1,0,0.5),...){
     ns <- length(x)
-    ta0 <- ThU.age(x,exterr=FALSE,i2i=project,cor=FALSE)
+    ta0 <- ThU.age(x,exterr=FALSE,i2i=detrital,cor=FALSE)
     nsd <- 3
     if (any(is.na(xlim))) xlim <- range(c(ta0[,'t']-nsd*ta0[,'s[t]'],
                                           ta0[,'t']+nsd*ta0[,'s[t]']))
@@ -75,19 +76,19 @@ U4U8vst <- function(x,project=FALSE,xlim=NA,ylim=NA,
     }
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,project=FALSE,
+U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,
                         xlim=NA,ylim=NA,
                         alpha=0.05,show.numbers=FALSE,
                         ellipse.col=rgb(0,1,0,0.5),
                         line.col='darksalmon',...){
     ns <- length(x)
-    d <- data2evolution(x,project=project)
+    d <- data2evolution(x,detrital=detrital)
     lim <- evolution.lines(d,xlim=xlim,ylim=ylim,...)
     if (isochron){
         fit <- isochron(x,type=2,plot=FALSE)
         b48 <- fit$par['a']
         b08 <- fit$par['A']
-        e48 <- lim[1,1]
+        e48 <- 1
         e08 <- fit$par['A'] + fit$par['B']*(e48-fit$par['a'])/fit$par['b']
         lines(c(b08,e08),c(b48,e48))
         points(b08,b48,pch=19)
@@ -171,7 +172,7 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     rbind(xlim,ylim)
 }
 
-data2evolution <- function(x,project=FALSE){
+data2evolution <- function(x,detrital=FALSE){
     out <- list()
     labels <- c('Th230U238','errTh230U238',
                 'U234U238','errU234U238','cov')
@@ -205,7 +206,7 @@ data2evolution <- function(x,project=FALSE){
         out <- cbind(xy,covariance)
         colnames(out) <- labels
     }
-    if (project){
+    if (detrital){
         osmond <- data2tit.ThU(x,osmond=TRUE)
         fit <- titterington(osmond)
         out[,'U234U238'] <- out[,'U234U238'] - fit$par['b']*osmond[,'X']
