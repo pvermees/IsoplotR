@@ -106,7 +106,7 @@ fisher.tit <- function(abAB,dat){
     b <- abAB[2] # y slope
     A <- abAB[3] # z intercept
     B <- abAB[4] # z slope
-    ns <- length(dat)
+    ns <- length(dat$XYZ)
     out <- matrix(0,ns+4,ns+4)
     d2L.da2 <- 0
     d2L.dadb <- 0

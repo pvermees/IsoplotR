@@ -38,8 +38,7 @@
 #'     detrital age distributions. Chemical Geology, 341, pp.140-146.
 #' @examples
 #' data(examples)
-#' # Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.
-#' mds(examples$DZ,nnlines=TRUE,cex=5,xaxt='n',yaxt='n')
+#' mds(examples$DZ,nnlines=TRUE,cex=5)
 #' dev.new()
 #' mds(examples$DZ,shepard=TRUE)
 #' @rdname mds
@@ -68,8 +67,8 @@ mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
                         col='black',bg='white',xlab="",ylab="",...){
     d <- diss(x)
     out <- mds.default(d,classical=classical,plot=plot,
-                       shepard=shepard, nnlines=nnlines,pch=pch,
-                       pos=pos,cex.symbols=cex.symbols, col=col,bg=bg,
+                       shepard=shepard,nnlines=nnlines,pch=pch,
+                       pos=pos,cex.symbols=cex.symbols,col=col,bg=bg,
                        xlab=xlab,ylab=ylab,...)
     out
 }

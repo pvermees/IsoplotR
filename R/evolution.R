@@ -90,14 +90,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,
         b08 <- fit$par['A']
         e48 <- 1
         e08 <- fit$par['A'] + fit$par['B']*(e48-fit$par['a'])/fit$par['b']
-        lines(c(b08,e08),c(b48,e48))
-        points(b08,b48,pch=19)
-#        sa <- sqrt(fit$cov['a','a'])
-#        sA <- sqrt(fit$cov['A','A'])
-#        ell <- matrix(c(fit$par['A'],sa,fit$par['a'],sA,
-#                        fit$cov['a','A']/(sa*sA)),1,5)
-#        scatterplot(ell,alpha=alpha,ellipse.col='white',
-#                    line.col='black',lwd=lwd,new.plot=FALSE)
+        graphics::lines(c(b08,e08),c(b48,e48))
+        graphics::points(b08,b48,pch=19)
     }
     covmat <- matrix(0,2,2)
     for (i in 1:ns){
@@ -110,6 +104,14 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,
         graphics::polygon(ell,col=ellipse.col)
         graphics::points(x0,y0,pch=19,cex=0.25)
         if (show.numbers) { graphics::text(x0,y0,i) }
+    }
+    if (isochron){
+        sa <- sqrt(fit$cov['a','a'])
+        sA <- sqrt(fit$cov['A','A'])
+        ell <- matrix(c(fit$par['A'],sa,fit$par['a'],sA,
+                        fit$cov['a','A']/(sa*sA)),1,5)
+        scatterplot(ell,alpha=alpha,ellipse.col='white',
+                    line.col='black',lwd=lwd,new.plot=FALSE)
     }
 }
 

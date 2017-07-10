@@ -6,9 +6,9 @@ Description: An R implementation of Ken Ludwig's popular Isoplot add-in to Micro
 Author: Pieter Vermeesch [aut, cre]
 Maintainer: Pieter Vermeesch <p.vermeesch@ucl.ac.uk>
 Depends: R (>= 3.0.0)
-Imports: MASS
+Suggests: MASS
 License: GPL-2
 URL: http://isoplotr.london-geochron.com
 LazyData: true
 RoxygenNote: 6.0.1
-Built: R 3.5.0; ; 2017-07-02 22:20:20 UTC; unix
+Built: R 3.4.1; ; 2017-07-10 13:28:16 UTC; unix

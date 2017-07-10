@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2017-05-16 r72684) -- "Unsuffered Consequences"
+R version 3.4.1 (2017-06-30) -- "Single Candle"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -63,7 +63,7 @@ Type 'q()' to quit R.
  [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.2929
 [10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.0388
       s[t.conc]
- [1,] 0.2460580
+ [1,] 0.2460579
  [2,] 0.2477569
  [3,] 0.6107034
  [4,] 0.3093508
@@ -72,7 +72,7 @@ Type 'q()' to quit R.
  [7,] 0.2479353
  [8,] 0.3694499
  [9,] 0.2466243
-[10,] 0.3097469
+[10,] 0.3097468
 > print(age(examples$UPb,type=1))
           t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
  [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.555230 251.9494
@@ -86,7 +86,7 @@ Type 'q()' to quit R.
  [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.2929
 [10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.0388
       s[t.conc]
- [1,] 0.2460580
+ [1,] 0.2460579
  [2,] 0.2477569
  [3,] 0.6107034
  [4,] 0.3093508
@@ -95,7 +95,7 @@ Type 'q()' to quit R.
  [7,] 0.2479353
  [8,] 0.3694499
  [9,] 0.2466243
-[10,] 0.3097469
+[10,] 0.3097468
 > print(age(examples$UPb,type=2))
 $x
  Pb207U235  Pb206U238 
@@ -108,7 +108,7 @@ Pb206U238 1.609406e-09 2.270769e-10
 
 $age
       t.conc    s[t.conc] 
-249.29386655   0.09299361 
+249.29386667   0.09299364 
 
 $mswd
 $mswd$equivalence
@@ -117,7 +117,7 @@ $mswd$equivalence
 
 $mswd$concordance
          [,1]
-[1,] 84.02125
+[1,] 84.02123
 
 
 $p.value
@@ -385,8 +385,7 @@ attr(,"class")
 > ### ** Examples
 > 
 > data(examples)
-> # Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.
-> mds(examples$DZ,nnlines=TRUE,cex=5,xaxt='n',yaxt='n')
+> mds(examples$DZ,nnlines=TRUE,cex=5)
 initial  value 10.433734 
 iter   5 value 8.523890
 iter  10 value 8.154735
@@ -678,7 +677,7 @@ f,X,errX
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.312 0.268 8.357 0 0 
+Time elapsed:  9.068 4.668 8.347 0 0 
 > grDevices::dev.off()
 pdf 
   2 

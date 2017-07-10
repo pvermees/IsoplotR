@@ -285,8 +285,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
-# Parameters 'xaxt' and 'yaxt' control if the axis is plotted at all.
-mds(examples$DZ,nnlines=TRUE,cex=5,xaxt='n',yaxt='n')
+mds(examples$DZ,nnlines=TRUE,cex=5)
 dev.new()
 mds(examples$DZ,shepard=TRUE)
 

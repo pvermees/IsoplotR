@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.5.17)  2 JUL 2017 23:20
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.8.18)  10 JUL 2017 14:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -22,7 +22,7 @@ File: bk10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(/usr/local/R-devel/share/texmf/tex/latex/Rd.sty
+(/usr/share/R/share/texmf/tex/latex/Rd.sty
 Package: Rd 
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
@@ -709,7 +709,7 @@ File: latin1.def 2015/03/17 v1.2c Input encoding file
 
 
 Writing index file Rd2.idx
-(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.aux)
+(/tmp/Rtmp299mP5/Rd2pdf76566a64588a/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -766,8 +766,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.out)
-(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.out)
+(/tmp/Rtmp299mP5/Rd2pdf76566a64588a/Rd2.out)
+(/tmp/Rtmp299mP5/Rd2pdf76566a64588a/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -798,7 +798,7 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 28.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
-(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.toc [1
+(/tmp/Rtmp299mP5/Rd2pdf76566a64588a/Rd2.toc [1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -899,7 +899,7 @@ File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 )
-Overfull \hbox (3.81812pt too wide) in paragraph at lines 1052--1055
+Overfull \hbox (3.81812pt too wide) in paragraph at lines 1053--1056
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether the data should be shown on
  bi-vari-ate log[He/Th]
  []
@@ -913,7 +913,7 @@ File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [20]
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 1456--1464
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 1457--1465
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
  []
@@ -924,14 +924,14 @@ File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [23]
-Overfull \hbox (4.89603pt too wide) in paragraph at lines 1576--1578
+Overfull \hbox (4.89603pt too wide) in paragraph at lines 1577--1579
 []\T1/ptm/m/n/10 logical flag in-di-cat-ing whether clas-si-cal (\T1/zi4/m/n/10
  TRUE\T1/ptm/m/n/10 ) or non-metric (\T1/zi4/m/n/10 FALSE\T1/ptm/m/n/10 ) MDS s
 hould
  []
 
 
-Overfull \hbox (16.32802pt too wide) in paragraph at lines 1579--1581
+Overfull \hbox (16.32802pt too wide) in paragraph at lines 1580--1582
 []\T1/ptm/m/n/10 show the MDS con-fig-u-ra-tion (if \T1/zi4/m/n/10 shepard=FALS
 E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 0 )
@@ -1093,14 +1093,14 @@ Overfull \hbox (15.79549pt too wide) in paragraph at lines 2631--2639
 [38] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [39]
-(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.ind [40] [41
+(/tmp/Rtmp299mP5/Rd2pdf76566a64588a/Rd2.ind [40] [41
 
 
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2753.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 2753.
 
-(/tmp/RtmpK3Bz7J/Rd2pdf20e54b01c2ca/Rd2.aux)
+(/tmp/Rtmp299mP5/Rd2pdf76566a64588a/Rd2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2753.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2753.
 
@@ -1110,7 +1110,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2753.
  ) 
 Here is how much of TeX's memory you used:
  6809 strings out of 493029
- 97308 string characters out of 6136234
+ 97290 string characters out of 6136234
  174194 words of memory out of 5000000
  9884 multiletter control sequences out of 15000+600000
  38763 words of font info for 50 fonts, out of 8000000 for 9000
@@ -1128,7 +1128,7 @@ vr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
 exmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts
 /type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (41 pages, 205429 bytes).
+Output written on Rd2.pdf (41 pages, 205504 bytes).
 PDF statistics:
  686 PDF objects out of 1000 (max. 8388607)
  626 compressed objects within 7 object streams
