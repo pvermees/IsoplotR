@@ -121,7 +121,7 @@ get.york.xy <- function(x,a,b){
 
 data2york <- function(x,...){ UseMethod("data2york",x) }
 data2york.default <- function(x,...){ stop('default function undefined') }
-data2york.UPb <- function(x,wetherill=TRUE){
+data2york.UPb <- function(x,wetherill=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('X','sX','Y','sY','rXY')
@@ -157,7 +157,7 @@ data2york.UPb <- function(x,wetherill=TRUE){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-data2york.ArAr <- function(x,inverse=TRUE){
+data2york.ArAr <- function(x,inverse=TRUE,...){
     if (inverse)
         out <- ArAr.inverse.ratios(x)
     else
@@ -165,7 +165,7 @@ data2york.ArAr <- function(x,inverse=TRUE){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-data2york.PbPb <- function(x,inverse=TRUE){
+data2york.PbPb <- function(x,inverse=TRUE,...){
     if (inverse)
         out <- PbPb.inverse.ratios(x)
     else
@@ -173,7 +173,7 @@ data2york.PbPb <- function(x,inverse=TRUE){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-data2york.PD <- function(x,exterr=FALSE,common=FALSE){
+data2york.PD <- function(x,exterr=FALSE,common=FALSE,...){
     if (x$format==1){
         out <- x$x
     } else if (x$format==2){

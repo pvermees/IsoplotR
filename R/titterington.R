@@ -260,7 +260,7 @@ data2tit <- function(x,...){ UseMethod("data2tit",x) }
 data2tit.default <- function(x,...){ stop('default function undefined') }
 # osmond = FALSE: 8/2 - 4/2 - 0/2
 # osmond = TRUE : 2/8 - 4/8 - 0/8
-data2tit.ThU <- function(x,osmond=TRUE){
+data2tit.ThU <- function(x,osmond=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,9)
     if ((x$format == 1 & !osmond) | (x$format == 2 & osmond)){

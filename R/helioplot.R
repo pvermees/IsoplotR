@@ -43,30 +43,30 @@ helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                       ylim=NA,fact=NA,...){
     fit <- central.UThHe(x)
     if (logratio) {
-        plot.logratio.contours(x,contour.col=contour.col,...)
-        plot.logratio.ellipses(x,alpha=alpha,ellipse.col=ellipse.col,
+        plot_logratio_contours(x,contour.col=contour.col,...)
+        plot_logratio_ellipses(x,alpha=alpha,ellipse.col=ellipse.col,
                                show.numbers=show.numbers)
     } else {
         if (all(is.na(fact))) fact <- getfact(x,fit)
-        plot.helioplot.contours(x,fact=fact,contour.col=contour.col,
+        plot_helioplot_contours(x,fact=fact,contour.col=contour.col,
                                 xlim=xlim,ylim=ylim)
-        plot.helioplot.ellipses(x,fact=fact,alpha=alpha,
+        plot_helioplot_ellipses(x,fact=fact,alpha=alpha,
                                 ellipse.col=ellipse.col,
                                 show.numbers=show.numbers)
     }
     if (show.central.comp){
-        plot.central.ellipse(fit,fact=fact,logratio=logratio,
+        plot_central_ellipse(fit,fact=fact,logratio=logratio,
                              alpha=alpha,doSm=doSm(x))
-        title(helioplot.title(fit,sigdig=sigdig))
+        title(helioplot_title(fit,sigdig=sigdig))
     }
 }
 
-plot.logratio.frame <- function(lims,...){
+plot_logratio_frame <- function(lims,...){
     graphics::plot(lims[1:2],lims[3:4],type='n',bty='n',
                    xlab='log[U/He]',ylab='log[Th/He]',...)
 }
 
-plot.helioplot.frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
+plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     graphics::plot(c(0,1),c(0,1),type='n',xaxt='n',yaxt='n',
                    xlab='',ylab='',asp=1,bty='n',...)
     corners <- xyz2xy(matrix(c(1,0,0,1,0,1,0,0,0,0,1,0),ncol=3))
@@ -78,7 +78,7 @@ plot.helioplot.frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1))
 }
 
-plot.logratio.ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
+plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
                                    ellipse.col=rgb(0,1,0,0.5)){
     valid <- is.finite(rowSums(x))
     X <- x[valid,]
@@ -102,7 +102,7 @@ plot.logratio.ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
     }
    
 }
-plot.helioplot.ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
+plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
                                     show.numbers=FALSE,
                                     ellipse.col=rgb(0,1,0,0.5)){
     valid <- is.finite(rowSums(x))
@@ -134,8 +134,8 @@ plot.helioplot.ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
     }
 }
 
-plot.central.ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
-                                 alpha=0.05,doSm=TRUE){
+plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
+                                 alpha=0.05,doSm=TRUE,...){
     if (doSm){
         ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
                        covmat=fit$covmat[1:2,1:2],alpha=alpha)
@@ -153,10 +153,10 @@ plot.central.ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
     }
 }
 
-plot.logratio.contours <- function(x,contour.col=c('white','red'),
+plot_logratio_contours <- function(x,contour.col=c('white','red'),
                                    xlim=NA,ylim=NA,...){
     cntrs <- get.logratio.contours(x,xlim=xlim,ylim=ylim)
-    plot.logratio.frame(cntrs$lims,...)
+    plot_logratio_frame(cntrs$lims,...)
     tticks <- cntrs$tticks
     nt <- length(tticks)
     crp <- grDevices::colorRampPalette(contour.col)(nt)
@@ -174,11 +174,11 @@ plot.logratio.contours <- function(x,contour.col=c('white','red'),
     }
 }
 
-plot.helioplot.contours <- function(x,fact=c(1,1,1),
+plot_helioplot_contours <- function(x,fact=c(1,1,1),
                                     contour.col=c('white','red'),
                                     xlim=NA,ylim=NA,...){
     cntrs <- get.helioplot.contours(x,fact=fact)
-    plot.helioplot.frame(cntrs$lims,fact=fact,
+    plot_helioplot_frame(cntrs$lims,fact=fact,
                          fill.col=contour.col[2],...)
     tticks <- cntrs$tticks
     nt <- length(tticks)
@@ -195,7 +195,7 @@ plot.helioplot.contours <- function(x,fact=c(1,1,1),
     }
 }
 
-helioplot.title <- function(fit,sigdig=2){
+helioplot_title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
     line1 <- substitute('central age ='~a%+-%b~'[Ma] (1'~sigma~')',
                         list(a=rounded.age[1], b=rounded.age[2]))

@@ -18,8 +18,8 @@ ludwig <- function(x,covmat){
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
-data2ludwig.UPb <- function(x){
+data2ludwig.UPb <- function(x,...){
 }
-data2ludwig.ThU <- function(x){
+data2ludwig.ThU <- function(x,...){
     
 }

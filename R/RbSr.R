@@ -1,7 +1,7 @@
 # convert isotope dilution derived concentrations to ratios
 # x = matrix with columns 'Rbppm','errRbppm', 'Srppt','errSrppt' 
 # and 'Sr87Sr86','errSr87Sr86'
-ppm2ratios.RbSr <- function(x,exterr=FALSE,common=TRUE){
+ppm2ratios.RbSr <- function(x,exterr=FALSE,common=TRUE,...){
     R57Rb <- iratio('Rb85Rb87')[1]
     R46Sr <- iratio('Sr84Sr86')[1]
     R76Sr0 <- iratio('Sr87Sr86')[1]

@@ -383,17 +383,17 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out <- c(0,0)
     if (hasClass(x,'UPb')){
         if (type==1){
-            R <- age.to.Pb207U235.ratio(tt,st)
+            R <- age_to_Pb207U235_ratio(tt,st)
             out <- get.Pb207U235.age(R[,1],R[,2],exterr=TRUE)
         } else if (type==2 | (type==4 & (tt<cutoff.76)) | (type==5)){
-            R <- age.to.Pb206U238.ratio(tt,st)
+            R <- age_to_Pb206U238_ratio(tt,st)
             out <- get.Pb206U238.age(R[,1],R[,2],exterr=TRUE)
         } else if (type==3 | (type==4 & (tt>=cutoff.76))){
-            R <- age.to.Pb207Pb206.ratio(tt,st)
+            R <- age_to_Pb207Pb206_ratio(tt,st)
             out <- get.Pb207Pb206.age(R[,1],R[,2],exterr=TRUE)
         }
     } else if (hasClass(x,'PbPb')){
-        R <- age.to.Pb207Pb206.ratio(tt,st)
+        R <- age_to_Pb207Pb206_ratio(tt,st)
         out <- get.Pb207Pb206.age(R[,1],R[,2],exterr=TRUE)
     } else if (hasClass(x,'ArAr')){
         R <- get.ArAr.ratio(tt,st,x$J[1],0,exterr=FALSE)

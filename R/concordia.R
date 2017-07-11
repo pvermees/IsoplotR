@@ -92,7 +92,7 @@ concordia.line <- function(x,limits,wetherill,col,alpha=0.05,exterr=TRUE){
     concordia <- matrix(0,nn,2)
     colnames(concordia) <- c('x','y')
     for (i in 1:nn){ # build the concordia line
-        xy <- age.to.concordia.ratios(tt[i],wetherill=wetherill,exterr=exterr)
+        xy <- age_to_concordia_ratios(tt[i],wetherill=wetherill,exterr=exterr)
         if (exterr){ # show decay constant uncertainty
             if (i > 1) oldell <- ell
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
@@ -108,7 +108,7 @@ concordia.line <- function(x,limits,wetherill,col,alpha=0.05,exterr=TRUE){
     # prepare and plot ticks
     ticks <- pretty(tt)
     for (i in 1:length(ticks)){
-        xy <- age.to.concordia.ratios(ticks[i],wetherill=wetherill,exterr=exterr)
+        xy <- age_to_concordia_ratios(ticks[i],wetherill=wetherill,exterr=exterr)
         if (exterr){ # show ticks as ellipse
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
             graphics::polygon(ell,col='white')
@@ -121,9 +121,9 @@ concordia.line <- function(x,limits,wetherill,col,alpha=0.05,exterr=TRUE){
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
 }
-age.to.concordia.ratios <- function(tt,wetherill=TRUE,exterr=FALSE){
-    if (wetherill) return(age.to.wetherill.ratios(tt,exterr=exterr))
-    else return(age.to.terawasserburg.ratios(tt,exterr=exterr))
+age_to_concordia_ratios <- function(tt,wetherill=TRUE,exterr=FALSE){
+    if (wetherill) return(age_to_wetherill_ratios(tt,exterr=exterr))
+    else return(age_to_terawasserburg_ratios(tt,exterr=exterr))
 }
 get.concordia.limits <- function(x,limits=NULL,wetherill=FALSE){
     out <- list()
@@ -133,16 +133,16 @@ get.concordia.limits <- function(x,limits=NULL,wetherill=FALSE){
     else out$t <- limits
     nse <- 3 # number of standard errors used for buffer
     if (!is.null(limits) && wetherill){
-        out$x <- age.to.Pb207U235.ratio(limits)[,'75']
-        out$y <- age.to.Pb206U238.ratio(limits)[,'68']
+        out$x <- age_to_Pb207U235_ratio(limits)[,'75']
+        out$y <- age_to_Pb206U238_ratio(limits)[,'68']
     } else if (!is.null(limits) && !wetherill){
         if (limits[1] <= 0){
             U238Pb206 <- get.U238Pb206.ratios(x)
             maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
             out$t[1] <- get.Pb206U238.age(1/maxx)[1]
         }
-        out$x <- age.to.U238Pb206.ratio(out$t)[,'86']
-        out$y <- age.to.Pb207Pb206.ratio(out$t)[,'76']
+        out$x <- age_to_U238Pb206_ratio(out$t)[,'86']
+        out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
     } else if (is.null(limits) && wetherill) {
         Pb207U235 <- get.Pb207U235.ratios(x)
         out$x[1] <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
@@ -259,9 +259,9 @@ LL.concordia.comp.terawasserburg <- function(mu,x,mswd=FALSE,...){
 
 LL.concordia.age <- function(tt,x,mswd=FALSE,exterr=TRUE){
     if (hasClass(x,'wetherill'))
-        y <- age.to.wetherill.ratios(tt)
+        y <- age_to_wetherill_ratios(tt)
     else if (hasClass(x,'terawasserburg'))
-        y <- age.to.terawasserburg.ratios(tt)
+        y <- age_to_terawasserburg_ratios(tt)
     dx <- matrix(x$x-y$x,1,2)
     covmat <- x$cov
     if (exterr) covmat <- x$cov + y$cov

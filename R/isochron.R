@@ -181,7 +181,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
-        title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -218,7 +218,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
-        title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -290,7 +290,7 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
-        title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -371,7 +371,7 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd)
-        title(isochron.title(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -383,7 +383,7 @@ get.limits <- function(X,sX){
     c(minx,maxx)
 }
 
-isochron.title <- function(fit,sigdig=2){
+isochrontitle <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
     rounded.intercept <- roundit(fit$y0[1],fit$y0[2],sigdig=sigdig)
     line1 <- substitute('age ='~a%+-%b~'(1'~sigma~'), intercept ='~c%+-%d~'(1'~sigma~')',

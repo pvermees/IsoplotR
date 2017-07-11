@@ -71,7 +71,7 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
     out
 }
 
-age.to.wetherill.ratios <- function(tt,st=0,exterr=FALSE){
+age_to_wetherill_ratios <- function(tt,st=0,exterr=FALSE){
     out <- list()
     labels <- c('Pb207U235','Pb206U238')
     l8 <- settings('lambda','U238')[1]
@@ -92,7 +92,7 @@ age.to.wetherill.ratios <- function(tt,st=0,exterr=FALSE){
     colnames(out$cov) <- labels
     out
 }
-age.to.terawasserburg.ratios <- function(tt,st=0,exterr=FALSE){
+age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE){
     if (tt<=0) tt <- 1e-10
     out <- list()
     labels <- c('U238Pb206','Pb207Pb206')
@@ -122,7 +122,7 @@ age.to.terawasserburg.ratios <- function(tt,st=0,exterr=FALSE){
     out
 }
 
-age.to.Pb207U235.ratio <- function(tt,st=0){
+age_to_Pb207U235_ratio <- function(tt,st=0){
     l5 <- lambda('U235')[1]
     R <- exp(l5*tt)-1
     J <- l5*exp(l5*tt)
@@ -131,7 +131,7 @@ age.to.Pb207U235.ratio <- function(tt,st=0){
     colnames(out) <- c('75','s[75]')
     out
 }
-age.to.Pb206U238.ratio <- function(tt,st=0){
+age_to_Pb206U238_ratio <- function(tt,st=0){
     l8 <- lambda('U238')[1]
     R <- exp(l8*tt)-1
     J <- l8*exp(l8*tt)
@@ -140,7 +140,7 @@ age.to.Pb206U238.ratio <- function(tt,st=0){
     colnames(out) <- c('68','s[68]')
     out
 }
-age.to.U238Pb206.ratio <- function(tt,st=0){
+age_to_U238Pb206_ratio <- function(tt,st=0){
     l8 <- lambda('U238')[1]
     R <- 1/(exp(l8*tt)-1)
     J <- -l8*exp(l8*tt)/(exp(l8*tt)-1)^2
@@ -149,7 +149,7 @@ age.to.U238Pb206.ratio <- function(tt,st=0){
     colnames(out) <- c('86','s[86]')
     out
 }
-age.to.Pb207Pb206.ratio <- function(tt,st=0){
+age_to_Pb207Pb206_ratio <- function(tt,st=0){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
@@ -307,7 +307,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,...){
     R <- iratio('U238U235')[1]
     sR <- iratio('U238U235')[2]
     Pb207Pb206.misfit <- function(tt,x) {
-        (age.to.Pb207Pb206.ratio(tt)[,'76']-x)^2
+        (age_to_Pb207Pb206_ratio(tt)[,'76']-x)^2
     }
     if (is.na(x)){
         t.76 <- NA
