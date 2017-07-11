@@ -4,7 +4,7 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘0.15’
+* this is package ‘IsoplotR’ version ‘0.16’
 * checking CRAN incoming feasibility ... Note_to_CRAN_maintainers
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 * checking package namespace information ... OK

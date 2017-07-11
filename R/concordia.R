@@ -145,24 +145,26 @@ get.concordia.limits <- function(x,limits=NULL,wetherill=FALSE){
         out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
     } else if (is.null(limits) && wetherill) {
         Pb207U235 <- get.Pb207U235.ratios(x)
-        out$x[1] <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
-        out$x[2] <- max(Pb207U235[,1]+nse*Pb207U235[,2],na.rm=TRUE)
+        maxx <- max(Pb207U235[,1]+nse*Pb207U235[,2],na.rm=TRUE)
         Pb206U238 <- get.Pb206U238.ratios(x)
-        out$y[1] <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
-        out$y[2] <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
-        out$t[1] <- get.Pb206U238.age(out$y[1])[1]
-        out$t[2] <- get.Pb207U235.age(out$x[2])[1]
+        miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
+        out$t[1] <- get.Pb206U238.age(miny)[1]
+        out$t[2] <- get.Pb207U235.age(maxx)[1]
+        out$x <- age_to_Pb207U235_ratio(out$t)[,'75']
+        out$y <- age_to_Pb206U238_ratio(out$t)[,'68']
     } else if (is.null(limits) && !wetherill){
         U238Pb206 <- get.U238Pb206.ratios(x)
         Pb207Pb206 <- get.Pb207Pb206.ratios(x)
-        out$x[1] <- min(U238Pb206[,1]-nse*U238Pb206[,2],na.rm=TRUE)
-        out$x[2] <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
-        out$y[1] <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
-        out$y[2] <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
-        out$t[1] <- min(get.Pb206U238.age(1/out$x[2])[1],
-                        get.Pb207Pb206.age(out$y[1])[1],na.rm=TRUE)
-        out$t[2] <- max(get.Pb206U238.age(1/out$x[1])[1],
-                        get.Pb207Pb206.age(out$y[2])[1],na.rm=TRUE)
+        minx <- min(U238Pb206[,1]-nse*U238Pb206[,2],na.rm=TRUE)
+        maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
+        miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
+        maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
+        out$t[1] <- min(get.Pb206U238.age(1/maxx)[1],
+                        get.Pb207Pb206.age(miny)[1],na.rm=TRUE)
+        out$t[2] <- max(get.Pb206U238.age(1/minx)[1],
+                        get.Pb207Pb206.age(maxy)[1],na.rm=TRUE)
+        out$x <- age_to_U238Pb206_ratio(out$t)[,'86']
+        out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
     }
     out
 }

@@ -95,7 +95,6 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
         e48 <- 1
         e08 <- fit$par['A'] + fit$par['B']*(e48-fit$par['a'])/fit$par['b']
         graphics::lines(c(b08,e08),c(b48,e48))
-        graphics::points(b08,b48,pch=19)
     }
     covmat <- matrix(0,2,2)
     for (i in 1:ns){
@@ -112,9 +111,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
     if (isochron){
         sa <- sqrt(fit$cov['a','a'])
         sA <- sqrt(fit$cov['A','A'])
-        ell <- matrix(c(fit$par['A'],sa,fit$par['a'],sA,
+        ell <- matrix(c(fit$par['A'],sA,fit$par['a'],sa,
                         fit$cov['a','A']/(sa*sA)),1,5)
-        scatterplot(ell,alpha=alpha,ellipse.col='white',
+        scatterplot(ell,alpha=alpha,ellipse.col=rgb(1,1,1,0.85),
                     line.col='black',new.plot=FALSE)
     }
 }

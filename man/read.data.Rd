@@ -31,6 +31,7 @@ if \code{method='U-Pb'}, then \code{format} is one of either:
 \item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
 \item{\code{8/6, s[8/6], 7/6, s[7/6] (, rho)}}
 \item{\code{X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z] (, rho[X,Y]) (, rho[Y,Z])}}
+\item{\code{X=8/6, s[X], Y=7/6, s[Y], Z=4/6, rho[X,Y], rho[X,Z] , rho[Y,Z]}}
 }
 
 where optional columns are marked in round brackets
@@ -132,7 +133,7 @@ data classes
 IsoplotR provides the following example input files:
 
 \itemize{
-\item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv}}
+\item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv}, \code{UPb4.csv}}
 \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv}}
 \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
 \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}}

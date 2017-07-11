@@ -126,10 +126,10 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
     out <- matrix(0,ns,5)
     colnames(out) <- c('X','sX','Y','sY','rXY')
     if (wetherill){
-        if (x$format==1 | x$format==3){
+        if (x$format %in% c(1,3)){
             out <- x$x[,c('Pb207U235','errPb207U235',
                           'Pb206U238','errPb206U238','rhoXY')]
-        } else if (x$format==2){
+        } else if (x$format %in% c(2,4)){
             for (i in 1:ns){
                 samp <- wetherill(x,i=i,exterr=FALSE)
                 out[i,1] <- samp$x['Pb207U235']
@@ -143,7 +143,7 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
         if (x$format==2){
             out <- x$x[,c('U238Pb206','errU238Pb206',
                           'Pb207Pb206','errPb207Pb206','rhoXY')]
-        } else if (x$format==1 | x$format==3){
+        } else if (x$format %in% c(1,3,4)){
             for (i in 1:ns){
                 samp <- tera.wasserburg(x,i=i,exterr=FALSE)
                 out[i,1] <- samp$x['U238Pb206']
