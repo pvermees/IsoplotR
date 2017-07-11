@@ -1,36 +1,52 @@
 #' Calculate and plot isochrons
 #'
-#' Plots cogenetic Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf data as X-Y
-#' scatterplots, fits an isochron curve through them using the
-#' \code{york} function, and computes the corresponding isochron
+#' Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf or Th-U
+#' data as X-Y scatterplots, fits an isochron curve through them using
+#' the \code{york} function, and computes the corresponding isochron
 #' age, including decay constant uncertainties.
 #'
 #' @param x EITHER a matrix with the following five columns:
 #'
 #' \describe{
+#'
 #' \item{X}{the x-variable}
+#'
 #' \item{sX}{the standard error of \code{X}}
+#'
 #' \item{Y}{the y-variable}
+#'
 #' \item{sY}{the standard error of \code{Y}}
+#'
 #' \item{rXY}{the correlation coefficient of \code{X} and \code{Y}}
+#'
 #' }
 #'
 #' OR
 #'
-#' an object of class \code{ArAr}, \code{ReOs}, \code{RbSr},
-#' \code{SmNd} or \code{LuHf}.
+#' an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
+#' \code{RbSr}, \code{SmNd}, \code{LuHf} or \code{ThU}.
 #'
 #' @param xlim 2-element vector with the plot limits of the x-axis
+#'
 #' @param ylim 2-element vector with the plot limits of the y-axis
+#'
 #' @param alpha confidence cutoff for the error ellipses
+#'
 #' @param show.numbers logical flag (\code{TRUE} to show grain numbers)
+#'
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output
+#'
 #' @param ellipse.col background colour of the error ellipses
+#'
 #' @param line.col colour of the isochron line
+#'
 #' @param lwd line width
+#'
 #' @param title add a title to the plot?
+#'
 #' @param ... optional arguments
+#'
 #' @rdname isochron
 #' @export
 isochron <- function(x,...){ UseMethod("isochron",x) }
@@ -49,24 +65,90 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
         title(regression.title(fit,sigdig=sigdig),xlab='X',ylab='Y')
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
-#' @param inverse if \code{TRUE}, plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
-#'     vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar. If \code{FALSE}, plots
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
+#'
+#' @param inverse if \code{TRUE} and \code{x} has class \code{ArAr},
+#'     plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
+#'     vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
+#'
+#' if \code{TRUE} and \code{x} has class \code{PbPb}, plots
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.
+#'
 #' @param exterr propagate external sources of uncertainty (J, decay constant)?
-#' @return
-#' if \code{plot=FALSE}, returns a list with the following items:
+#'
+#' @return if \code{plot=FALSE}, and \code{x} has class \code{PbPb},
+#'     \code{ArAr}, \code{RbSr}, \code{SmNd}, \code{ReOs} or
+#'     \code{LuHf}, returns a list with the following items:
+#'
 #' \describe{
-#' \item{a}{the intercept of the straight line fit and its standard error} 
-#' \item{b}{the slope of the fit and its standard error}
-#' \item{y0}{this either equals \code{a} or, if \code{x} has class
-#' \code{ArAr}, the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and
-#' its standard error}
-#' \item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar, Re-Os, Rb-Sr or Sm-Nd
-#' age and its standard error}
+#'
+#' \item{a}{the intercept of the straight line fit and its standard
+#' error.}
+#' 
+#' \item{b}{the slope of the fit and its standard error.}
+#'
+#' \item{cov.ab}{the covariance of the slope and intercept}
+#' 
+#' \item{mswd}{the mean square of the residuals (a.k.a
+#'     `reduced Chi-square') statistic}
+#'
+#' \item{p.value}{the p-value of a Chi-square test for linearity}
+#'
+#' \item{y0}{the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
+#' \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{187}}Os/\eqn{^{188}}Os,
+#' \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio and its standard error.}
+#' 
+#' \item{age}{the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
+#' \eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{187}}Os/\eqn{^{187}}Re,
+#' \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf age and its standard error.}
+#'
 #' }
+#'
+#' if \code{plot=FALSE}, and \code{x} has class \code{ThU}:
+#'
+#' \describe{
+#'
+#' \item{par}{if \code{type=1} or \code{type=3}: the best fitting
+#' \eqn{^{230}}Th/\eqn{^{232}}Th intercept,
+#' \eqn{^{230}}Th/\eqn{^{238}}U slope, \eqn{^{234}}U/\eqn{^{232}}Th
+#' intercept and \eqn{^{234}}U/\eqn{^{238}}U slope, OR, if
+#' \code{type=2} or \code{type=4}: the best fitting
+#' \eqn{^{234}}U/\eqn{^{238}}U intercept,
+#' \eqn{^{230}}Th/\eqn{^{232}}Th slope, \eqn{^{234}}U/\eqn{^{238}}U
+#' intercept and \eqn{^{234}}U/\eqn{^{232}}Th slope.  }
+#'
+#' \item{cov}{the covariance matrix of \code{par}.}
+#'
+#' \item{a}{if \code{type=1}: the \eqn{^{230}}Th/\eqn{^{232}}Th
+#' intercept; if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{238}}U
+#' intercept; if \code{type=3}: the \eqn{^{234}}Th/\eqn{^{232}}Th
+#' intercept; if \code{type=4}: the \eqn{^{234}}Th/\eqn{^{238}}U
+#' intercept.}
+#' 
+#' \item{b}{if \code{type=1}: the \eqn{^{230}}Th/\eqn{^{238}}U slope;
+#' if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{232}}Th slope; if
+#' \code{type=3}: the \eqn{^{234}}U/\eqn{^{238}}U slope; if
+#' \code{type=4}: the \eqn{^{234}}U/\eqn{^{232}}Th slope.}
+#'
+#' \item{cov.ab}{the covariance between \code{a} and \code{b}.}
+#' 
+#' \item{mswd}{the mean square of the residuals (a.k.a `reduced
+#'     Chi-square') statistic.}
+#'
+#' \item{p.value}{the p-value of a Chi-square test for linearity.}
+#'
+#' \item{y0}{the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio and its
+#' standard error.}
+#'
+#' \item{age}{the Th-U isochron age and its standard error.}
+#'
+#' }
+#'
 #' @examples
 #' data(examples)
 #' isochron(examples$ArAr)
+#'
 #' @rdname isochron
 #' @export
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
@@ -218,17 +300,17 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
 #' 
 #' \enumerate{
 #' 
-#' \item `Rosholt type-II' isochron setting out
-#' \eqn{^{230}Th/^{232}Th} vs. \eqn{^{238}U/^{232}Th}
+#' \item `Rosholt type-II' isochron, setting out
+#' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
 #' 
-#' \item `Osmond type-II' isochron setting out \eqn{^{230}Th/^{238}U}
-#' vs. \eqn{^{232}Th/^{238}U}
+#' \item `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
+#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #'
-#' \item `Rosholt type-II' isochron setting out \eqn{^{234}U/^{232}Th}
-#' vs. \eqn{^{238}U/^{232}Th}
+#' \item `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
+#' vs. \eqn{^{238}}U/\eqn{^{232}}Th
 #' 
-#' \item `Osmond type-II' isochron setting out \eqn{^{234}U/^{238}U}
-#' vs. \eqn{^{232}Th/^{238}U}
+#' \item `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
+#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #'
 #' }
 #' @rdname isochron
@@ -280,10 +362,11 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
     out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
     out$cov.ab <- fit$cov[ia,ib]
-    out$y0 <- out$a
-    out$age <- get.ThU.age(fit$par[i48],sqrt(fit$cov[i48,i48]),
-                           fit$par[i08],sqrt(fit$cov[i08,i08]),
-                           fit$cov[i48,i08],exterr=exterr)
+    tt <- get.ThU.age(fit$par[i48],sqrt(fit$cov[i48,i48]),
+                      fit$par[i08],sqrt(fit$cov[i08,i08]),
+                      fit$cov[i48,i08],exterr=exterr)
+    out$y0 <- tt[c('48_0','s[48_0]')]
+    out$age <- tt[c('t','s[t]')]
     if (plot){
         scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,

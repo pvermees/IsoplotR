@@ -2,8 +2,8 @@
 #'
 #' Implements the maximum likelihood algorithm of Ludwig and Titterington (1994)
 #'
-#' @param x a \eqn{[9 x n]} matrix with the following columns:
-#'     \code{X, sX, Y, sY, Z, sZ, rhoXY, rhoXZ, rhoYZ}.
+#' @param x a \code{[9 x n]} matrix with the following columns:
+#'     \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.
 #'
 #' @return a four-element list of vectors containing:
 #'     \describe{
@@ -20,9 +20,9 @@
 #'                 Chi-square') statistic} }
 #'
 #' @references
-#' Ludwig, K. R., and D. M. Titterington. "Calculation of \eqn{^{230}}Th/U
-#' isochrons, ages, and errors." Geochimica et Cosmochimica Acta
-#' 58.22 (1994): 5031-5042.
+#' Ludwig, K.R. and Titterington, D.M., 1994. Calculation
+#' of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+#' Cosmochimica Acta, 58(22), pp.5031-5042.
 #'
 titterington <- function(x){
     ns <- nrow(x)
@@ -141,6 +141,7 @@ fisher.tit <- function(abAB,dat){
         d2L.dbdB <- d2L.dbdB - omega[2,3]*x^2
     }
     for (i in 1:ns){
+        omega <- dat$omega[[i]]
         d2L.dadx <- -(omega[1,2] + b*omega[2,2] + B*omega[2,3])
         d2L.dbdx <- -x*(omega[1,2] + b*omega[2,2] + B*omega[2,3])
         d2L.dAdx <- -(omega[1,3] + b*omega[2,3] + B*omega[3,3])

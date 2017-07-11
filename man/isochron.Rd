@@ -52,17 +52,23 @@ isochron(x, ...)
 \item{x}{EITHER a matrix with the following five columns:
 
 \describe{
+
 \item{X}{the x-variable}
+
 \item{sX}{the standard error of \code{X}}
+
 \item{Y}{the y-variable}
+
 \item{sY}{the standard error of \code{Y}}
+
 \item{rXY}{the correlation coefficient of \code{X} and \code{Y}}
+
 }
 
 OR
 
-an object of class \code{ArAr}, \code{ReOs}, \code{RbSr},
-\code{SmNd} or \code{LuHf}.}
+an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
+\code{RbSr}, \code{SmNd}, \code{LuHf} or \code{ThU}.}
 
 \item{...}{optional arguments}
 
@@ -85,9 +91,12 @@ values reported in the title of the graphical output}
 
 \item{title}{add a title to the plot?}
 
-\item{inverse}{if \code{TRUE}, plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
-vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar. If \code{FALSE}, plots
-\eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.}
+\item{inverse}{if \code{TRUE} and \code{x} has class \code{ArAr},
+    plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
+    vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
+
+if \code{TRUE} and \code{x} has class \code{PbPb}, plots
+\eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.}
 
 \item{plot}{if \code{FALSE}, suppresses the graphical output}
 
@@ -98,39 +107,99 @@ Ludwig and Titterington (1994), one of either:
 
 \enumerate{
 
-\item `Rosholt type-II' isochron setting out
-\eqn{^{230}Th/^{232}Th} vs. \eqn{^{238}U/^{232}Th}
+\item `Rosholt type-II' isochron, setting out
+\eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
 
-\item `Osmond type-II' isochron setting out \eqn{^{230}Th/^{238}U}
-vs. \eqn{^{232}Th/^{238}U}
+\item `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
+vs. \eqn{^{232}}Th/\eqn{^{238}}U
 
-\item `Rosholt type-II' isochron setting out \eqn{^{234}U/^{232}Th}
-vs. \eqn{^{238}U/^{232}Th}
+\item `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
+vs. \eqn{^{238}}U/\eqn{^{232}}Th
 
-\item `Osmond type-II' isochron setting out \eqn{^{234}U/^{238}U}
-vs. \eqn{^{232}Th/^{238}U}
+\item `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
+vs. \eqn{^{232}}Th/\eqn{^{238}}U
 
 }}
 }
 \value{
-if \code{plot=FALSE}, returns a list with the following items:
+if \code{plot=FALSE}, and \code{x} has class \code{PbPb},
+    \code{ArAr}, \code{RbSr}, \code{SmNd}, \code{ReOs} or
+    \code{LuHf}, returns a list with the following items:
+
 \describe{
-\item{a}{the intercept of the straight line fit and its standard error} 
-\item{b}{the slope of the fit and its standard error}
-\item{y0}{this either equals \code{a} or, if \code{x} has class
-\code{ArAr}, the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio and
-its standard error}
-\item{age}{the \eqn{^{40}}Ar/\eqn{^{39}}Ar, Re-Os, Rb-Sr or Sm-Nd
-age and its standard error}
+
+\item{a}{the intercept of the straight line fit and its standard
+error.}
+
+\item{b}{the slope of the fit and its standard error.}
+
+\item{cov.ab}{the covariance of the slope and intercept}
+
+\item{mswd}{the mean square of the residuals (a.k.a
+    `reduced Chi-square') statistic}
+
+\item{p.value}{the p-value of a Chi-square test for linearity}
+
+\item{y0}{the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
+\eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{187}}Os/\eqn{^{188}}Os,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio and its standard error.}
+
+\item{age}{the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
+\eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{187}}Os/\eqn{^{187}}Re,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf age and its standard error.}
+
+}
+
+if \code{plot=FALSE}, and \code{x} has class \code{ThU}:
+
+\describe{
+
+\item{par}{if \code{type=1} or \code{type=3}: the best fitting
+\eqn{^{230}}Th/\eqn{^{232}}Th intercept,
+\eqn{^{230}}Th/\eqn{^{238}}U slope, \eqn{^{234}}U/\eqn{^{232}}Th
+intercept and \eqn{^{234}}U/\eqn{^{238}}U slope, OR, if
+\code{type=2} or \code{type=4}: the best fitting
+\eqn{^{234}}U/\eqn{^{238}}U intercept,
+\eqn{^{230}}Th/\eqn{^{232}}Th slope, \eqn{^{234}}U/\eqn{^{238}}U
+intercept and \eqn{^{234}}U/\eqn{^{232}}Th slope.  }
+
+\item{cov}{the covariance matrix of \code{par}.}
+
+\item{a}{if \code{type=1}: the \eqn{^{230}}Th/\eqn{^{232}}Th
+intercept; if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{238}}U
+intercept; if \code{type=3}: the \eqn{^{234}}Th/\eqn{^{232}}Th
+intercept; if \code{type=4}: the \eqn{^{234}}Th/\eqn{^{238}}U
+intercept.}
+
+\item{b}{if \code{type=1}: the \eqn{^{230}}Th/\eqn{^{238}}U slope;
+if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{232}}Th slope; if
+\code{type=3}: the \eqn{^{234}}U/\eqn{^{238}}U slope; if
+\code{type=4}: the \eqn{^{234}}U/\eqn{^{232}}Th slope.}
+
+\item{cov.ab}{the covariance between \code{a} and \code{b}.}
+
+\item{mswd}{the mean square of the residuals (a.k.a `reduced
+    Chi-square') statistic.}
+
+\item{p.value}{the p-value of a Chi-square test for linearity.}
+
+\item{y0}{the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio and its
+standard error.}
+
+\item{age}{the Th-U isochron age and its standard error.}
+
 }
 }
 \description{
-Plots cogenetic Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf data as X-Y
-scatterplots, fits an isochron curve through them using the
-\code{york} function, and computes the corresponding isochron
+Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf or Th-U
+data as X-Y scatterplots, fits an isochron curve through them using
+the \code{york} function, and computes the corresponding isochron
 age, including decay constant uncertainties.
 }
 \examples{
 data(examples)
 isochron(examples$ArAr)
+
 }

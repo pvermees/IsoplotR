@@ -9,24 +9,31 @@
 #' @param xlim x-axis limits
 #' @param ylim y-axis limits
 #' @param alpha confidence cutoff for the error ellipses
-#' @param transform if \code{TRUE}, plots
-#'     \eqn{^{234}}U/\eqn{^{238}}U vs. Th-U age.
-#' @param detrital apply a detrital Th correction and
-#' project the compositions along the isochron?
-#' @param show.numbers logical flag (\code{TRUE} to show grain
-#'     numbers)
+#' @param transform if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
+#'     vs. Th-U age.
+#' @param detrital apply a detrital Th correction by projecting the
+#'     compositions along an isochron?
+#' @param show.numbers label the error ellipses with the grain
+#'     numbers?
 #' @param ellipse.col background colour of the error ellipses
 #' @param line.col colour of the age grid
 #' @param isochron fit a 3D isochron to the data?
-#' @param exterr show decay constant uncertainty?
+#' @param exterr propagate the decay constant uncertainty in the
+#'     isochron age?
 #' @param sigdig number of significant digits for the isochron age
 #' @param ... optional arguments to the generic \code{plot} function
+#'
 #' @examples
 #' data(examples)
 #' evolution(examples$ThU)
-#' @references Ludwig, K.R., 2003. Mathematical-statistical treatment
-#'     of data and errors for 230 Th/U geochronology. Reviews in
-#'     Mineralogy and Geochemistry, 52(1), pp.631-656.
+#'
+#' @references Ludwig, K.R. and Titterington, D.M., 1994. Calculation
+#'     of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+#'     Cosmochimica Acta, 58(22), pp.5031-5042.
+#'
+#' Ludwig, K.R., 2003. Mathematical-statistical treatment of data and
+#'     errors for 230 Th/U geochronology. Reviews in Mineralogy and
+#'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                       detrital=FALSE,show.numbers=FALSE,
@@ -38,10 +45,8 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                 show.numbers=show.numbers,ellipse.col=ellipse.col,...)
     } else {
         U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,xlim=xlim,
-                    ylim=ylim,alpha=alpha,
-                    show.numbers=show.numbers,
-                    ellipse.col=ellipse.col,
-                    line.col=line.col,...)
+                    ylim=ylim,alpha=alpha, show.numbers=show.numbers,
+                    ellipse.col=ellipse.col, line.col=line.col,...)
     }
     if (isochron){
         fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr)
@@ -76,9 +81,8 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
     }
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,
-                        xlim=NA,ylim=NA,
-                        alpha=0.05,show.numbers=FALSE,
+U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
+                        ylim=NA, alpha=0.05,show.numbers=FALSE,
                         ellipse.col=rgb(0,1,0,0.5),
                         line.col='darksalmon',...){
     ns <- length(x)
@@ -111,13 +115,13 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,
         ell <- matrix(c(fit$par['A'],sa,fit$par['a'],sA,
                         fit$cov['a','A']/(sa*sA)),1,5)
         scatterplot(ell,alpha=alpha,ellipse.col='white',
-                    line.col='black',lwd=lwd,new.plot=FALSE)
+                    line.col='black',new.plot=FALSE)
     }
 }
 
 evolution.title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
-    rounded.a0 <- roundit(fit$age[3],fit$age[4],sigdig=sigdig)
+    rounded.a0 <- roundit(fit$y0[1],fit$y0[2],sigdig=sigdig)
     line1 <- substitute('isochron age ='~a%+-%b~'[ka] (1'~sigma~')',
                         list(a=rounded.age[1], b=rounded.age[2]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,

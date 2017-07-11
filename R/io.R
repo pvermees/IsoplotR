@@ -6,7 +6,8 @@
 #' @param x either a file name (\code{.csv} format) OR a matrix
 #' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
 #'     \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os},
-#'     \code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}
+#'     \code{Th-U}, \code{'U-Th-He'}, \code{'fissiontracks'} or
+#'     \code{'other'}
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
 #' 
@@ -72,6 +73,15 @@
 #'
 #' where \code{Lu} and \code{Hf} are in ppm
 #'
+#' if \code{method='Th-U'}, then \code{format} is one of either:
+#'
+#' \enumerate{
+#' \item{\code{X=8/2, s[X], Y=4/2, s[Y], Z=0/2, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=2/8, s[X], Y=4/8, s[Y], Z=0/8, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' }
+#'
+#' where all values are activity ratios
+#'
 #' if \code{method='fissiontracks'}, then \code{format} is one of
 #' either:
 #'
@@ -104,6 +114,7 @@
 #' \item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}}
 #' \item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}}
 #' \item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
+#' \item{Th-U: \code{ThU1.csv}, \code{ThU2.csv}}
 #' \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv}, \code{FT3.csv}}
 #' \item{U-Th-He: \code{UThHe.csv}, \code{UThSmHe.csv}}
 #' \item{detritals: \code{Namib.csv}}
@@ -141,15 +152,19 @@
 #' d5 <- read.data(f5,method="U-Th-He")
 #' helioplot(d5)
 #'
+#' f6 <- system.file("ThU2.csv",package="IsoplotR")
+#' d6 <- read.data(f6,method="Th-U",format=2)
+#' evolution(d6)
+#'
 #' #  one detrital zircon U-Pb file (detritals.csv)
-#' f6 <- system.file("Namib.csv",package="IsoplotR")
-#' d6 <- read.data(f6,method="detritals")
-#' kde(d6)
+#' f7 <- system.file("Namib.csv",package="IsoplotR")
+#' d7 <- read.data(f7,method="detritals")
+#' kde(d7)
 #'
 #' #  three 'other' files (MountTom.csv, spectrum.csv, average.csv)
-#' f7 <- system.file("MountTom.csv",package="IsoplotR")
-#' d7 <- read.data(f7,method="other")
-#' radialplot(d7)
+#' f8 <- system.file("MountTom.csv",package="IsoplotR")
+#' d8 <- read.data(f8,method="other")
+#' radialplot(d8)
 #'
 #' @rdname read.data
 #' @export

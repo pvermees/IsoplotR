@@ -11,7 +11,7 @@
 #'
 #' and object of class \code{fissiontracks}, \code{UThHe},
 #' \code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{LuHf},
-#' \code{PbPb} or \code{UPb}
+#' \code{ThU}, \code{PbPb} or \code{UPb}
 #' @param from minimum age limit of the radial scale
 #' @param to maximum age limit of the radial scale
 #' @param t0 central value
@@ -109,14 +109,15 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                       show.numbers=show.numbers,pch=pch,bg=bg,
                       markers=markers,k=k,exterr=exterr,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka
-#'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in \code{settings('iratio',...)
-#'     or zero (for the Pb-Pb method).}
+#' @param i2i `isochron to intercept': calculates the initial
+#'     (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
+#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
+#'     method). When applied to data of class \code{ThU}, setting
+#'     \code{i2i} to \code{TRUE} applies a detrital Th-correction.
 #' @rdname radialplot
 #' @export
 radialplot.PbPb <- function(x,from=NA,to=NA,t0=NA,

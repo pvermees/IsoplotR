@@ -5,8 +5,8 @@
 #' 
 #' @param x a numerical vector OR an object of class \code{UPb},
 #'     \code{PbPb}, \code{ArAr}, \code{UThHe}, \code{fissiontracks},
-#'     \code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf} or
-#'     \code{detritals}
+#'     \code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{ThU}
+#'     or \code{detritals}
 #' @rdname cad
 #' @export
 cad <- function(x,...){ UseMethod("cad",x) }
@@ -75,14 +75,15 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka
-#'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in \code{settings('iratio',...)
-#'     or zero (for the Pb-Pb method).}
+#' @param i2i `isochron to intercept': calculates the initial
+#'     (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
+#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
+#'     method). When applied to data of class \code{ThU}, setting
+#'     \code{i2i} to \code{TRUE} applies a detrital Th-correction.
 #' @references Vermeesch, P., 2007. Quantitative geomorphology of the
 #'     White Mountains (California) using detrital apatite fission
 #'     track thermochronology. Journal of Geophysical Research: Earth

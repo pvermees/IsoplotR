@@ -66,7 +66,8 @@ weightedmean(x, ...)
 \item{x}{a two column matrix of values (first column) and their
 standard errors (second column) OR an object of class
 \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
-\code{RbSr}, \code{LuHf}, \code{fissiontracks} or \code{UThHe}}
+\code{RbSr}, \code{LuHf}, \code{ThU}, \code{fissiontracks} or
+\code{UThHe}}
 
 \item{...}{optional arguments}
 
@@ -111,14 +112,15 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 
 \item{exterr}{propagate decay constant uncertainty?}
 
-\item{i2i}{`isochron to intercept': calculates the initial (aka
-`inherited', `excess', or `common')
-\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-\eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in \code{settings('iratio',...)
-or zero (for the Pb-Pb method).}}
+\item{i2i}{`isochron to intercept': calculates the initial
+(aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+\eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+\eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+fit. Setting \code{i2i} to \code{FALSE} uses the default values
+stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
+method). When applied to data of class \code{ThU}, setting
+\code{i2i} to \code{TRUE} applies a detrital Th-correction.}
 }
 \value{
 if \code{PLOT=FALSE}, returns a list with the following

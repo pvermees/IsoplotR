@@ -7,8 +7,8 @@
 titterington(x)
 }
 \arguments{
-\item{x}{a \eqn{[9 x n]} matrix with the following columns:
-\code{X, sX, Y, sY, Z, sZ, rhoXY, rhoXZ, rhoYZ}.}
+\item{x}{a \code{[9 x n]} matrix with the following columns:
+\code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.}
 }
 \value{
 a four-element list of vectors containing:
@@ -29,7 +29,7 @@ a four-element list of vectors containing:
 Implements the maximum likelihood algorithm of Ludwig and Titterington (1994)
 }
 \references{
-Ludwig, K. R., and D. M. Titterington. "Calculation of \eqn{^{230}}Th/U
-isochrons, ages, and errors." Geochimica et Cosmochimica Acta
-58.22 (1994): 5031-5042.
+Ludwig, K.R. and Titterington, D.M., 1994. Calculation
+of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+Cosmochimica Acta, 58(22), pp.5031-5042.
 }

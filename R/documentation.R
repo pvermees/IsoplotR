@@ -1,9 +1,9 @@
 #' Example datasets for testing \code{IsoplotR}
 #'
-#' U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, fission track and
-#' detrital datasets
+#' U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, Th-U,
+#' fission track and detrital datasets
 #'
-#' \code{examples} a 17-item list containing:
+#' \code{examples} an 18-item list containing:
 #'
 #' \code{UPb}: an object of class \code{UPb} containing a high
 #' precision U-Pb dataset of Kamo et al. (1996) packaged with Ken
@@ -46,8 +46,11 @@
 #' \code{LuHf}: an object of class \code{LuHf} containing an
 #' \eqn{^{176}}Lu/\eqn{^{177}}Hf-dataset from Barfod et al. (2002).
 #'
+#' \code{ThU}: an object of class \code{ThU} containing a synthetic
+#' `Osmond-type' dataset from Titterington and Ludwig (1994).
+#'
 #' \code{Namib}: an object of class \code{detritals} containing a
-#' detrital zircon U-Pb dataset of Vermeesch and Garzanti (2015)
+#' detrital zircon U-Pb dataset of Vermeesch and Garzanti (2015).
 #'
 #' \code{average}: an object of class \code{other} containing the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U-ages and errors of dataset \code{UPb}.
@@ -78,6 +81,8 @@
 #' radialplot(examples$FT1)
 #'
 #' helioplot(examples$UThHe)
+#'
+#' evolution(examples$ThU)
 #'
 #' kde(examples$Namib)
 #'
@@ -114,6 +119,10 @@
 #' Kamo, S.L., Czamanske, G.K. and Krogh, T.E., 1996. A minimum U-Pb
 #' age for Siberian flood-basalt volcanism. Geochimica et Cosmochimica
 #' Acta, 60(18), 3505-3511.
+#'
+#' Ludwig, K. R., and D. M. Titterington. "Calculation of \eqn{^{230}}Th/U
+#' isochrons, ages, and errors." Geochimica et Cosmochimica Acta
+#' 58.22 (1994): 5031-5042.
 #'
 #' Ludwig, K. R., 2003. User's manual for Isoplot 3.00: a
 #' geochronological toolkit for Microsoft Excel. No. 4.

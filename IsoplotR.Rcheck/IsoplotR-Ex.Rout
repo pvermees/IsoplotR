@@ -1,6 +1,6 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -63,7 +63,7 @@ Type 'q()' to quit R.
  [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.2929
 [10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.0388
       s[t.conc]
- [1,] 0.2460579
+ [1,] 0.2460580
  [2,] 0.2477569
  [3,] 0.6107034
  [4,] 0.3093508
@@ -72,7 +72,7 @@ Type 'q()' to quit R.
  [7,] 0.2479353
  [8,] 0.3694499
  [9,] 0.2466243
-[10,] 0.3097468
+[10,] 0.3097469
 > print(age(examples$UPb,type=1))
           t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
  [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.555230 251.9494
@@ -86,7 +86,7 @@ Type 'q()' to quit R.
  [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.2929
 [10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.0388
       s[t.conc]
- [1,] 0.2460579
+ [1,] 0.2460580
  [2,] 0.2477569
  [3,] 0.6107034
  [4,] 0.3093508
@@ -95,7 +95,7 @@ Type 'q()' to quit R.
  [7,] 0.2479353
  [8,] 0.3694499
  [9,] 0.2466243
-[10,] 0.3097468
+[10,] 0.3097469
 > print(age(examples$UPb,type=2))
 $x
  Pb207U235  Pb206U238 
@@ -108,7 +108,7 @@ Pb206U238 1.609406e-09 2.270769e-10
 
 $age
       t.conc    s[t.conc] 
-249.29386667   0.09299364 
+249.29386655   0.09299361 
 
 $mswd
 $mswd$equivalence
@@ -117,7 +117,7 @@ $mswd$equivalence
 
 $mswd$concordance
          [,1]
-[1,] 84.02123
+[1,] 84.02125
 
 
 $p.value
@@ -265,6 +265,7 @@ attr(,"class")
 > 
 > 
 > 
+> 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("evolution", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
@@ -291,6 +292,8 @@ attr(,"class")
 > radialplot(examples$FT1)
 > 
 > helioplot(examples$UThHe)
+> 
+> evolution(examples$ThU)
 > 
 > kde(examples$Namib)
 > 
@@ -343,6 +346,7 @@ attr(,"class")
 > 
 > data(examples)
 > isochron(examples$ArAr)
+> 
 > 
 > 
 > 
@@ -532,15 +536,19 @@ f,X,errX
 > d5 <- read.data(f5,method="U-Th-He")
 > helioplot(d5)
 > 
+> f6 <- system.file("ThU2.csv",package="IsoplotR")
+> d6 <- read.data(f6,method="Th-U",format=2)
+> evolution(d6)
+> 
 > #  one detrital zircon U-Pb file (detritals.csv)
-> f6 <- system.file("Namib.csv",package="IsoplotR")
-> d6 <- read.data(f6,method="detritals")
-> kde(d6)
+> f7 <- system.file("Namib.csv",package="IsoplotR")
+> d7 <- read.data(f7,method="detritals")
+> kde(d7)
 > 
 > #  three 'other' files (MountTom.csv, spectrum.csv, average.csv)
-> f7 <- system.file("MountTom.csv",package="IsoplotR")
-> d7 <- read.data(f7,method="other")
-> radialplot(d7)
+> f8 <- system.file("MountTom.csv",package="IsoplotR")
+> d8 <- read.data(f8,method="other")
+> radialplot(d8)
 > 
 > 
 > 
@@ -677,7 +685,7 @@ f,X,errX
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  9.068 4.668 8.347 0 0 
+Time elapsed:  10.476 0.068 10.665 0 0 
 > grDevices::dev.off()
 pdf 
   2 

@@ -6,8 +6,8 @@
 #'
 #' @param x either a \code{[2 x n]} matrix with measurements and their
 #'     standard errors, or an object of class \code{fissiontracks},
-#'     \code{UPb}, \code{ArAr}, \code{ReOs}, \code{SmNd}, \code{RbSr},
-#'     \code{LuHf} or \code{UThHe}
+#'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
+#'     \code{RbSr}, \code{LuHf}, \code{ThU} or \code{UThHe}
 #' @param k the number of discrete age components to be
 #'     sought. Setting this parameter to \code{'auto'} automatically
 #'     selects the optimal number of components (up to a maximum of 5)
@@ -100,14 +100,15 @@ peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
                    cutoff.disc=cutoff.disc,exterr=exterr,
                    sigdig=sigdig,log=log,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka
-#'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in \code{settings('iratio',...)
-#'     or zero (for the Pb-Pb method).}
+#' @param i2i `isochron to intercept': calculates the initial
+#'     (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
+#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
+#'     method). When applied to data of class \code{ThU}, setting
+#'     \code{i2i} to \code{TRUE} applies a detrital Th-correction.
 #' @rdname peakfit
 #' @export
 peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){

@@ -165,6 +165,7 @@ evolution(examples$ThU)
 
 
 
+
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("evolution", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
@@ -191,6 +192,8 @@ isochron(examples$ReOs)
 radialplot(examples$FT1)
 
 helioplot(examples$UThHe)
+
+evolution(examples$ThU)
 
 kde(examples$Namib)
 
@@ -243,6 +246,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 data(examples)
 isochron(examples$ArAr)
+
 
 
 
@@ -373,15 +377,19 @@ f5 <- system.file("UThSmHe.csv",package="IsoplotR")
 d5 <- read.data(f5,method="U-Th-He")
 helioplot(d5)
 
+f6 <- system.file("ThU2.csv",package="IsoplotR")
+d6 <- read.data(f6,method="Th-U",format=2)
+evolution(d6)
+
 #  one detrital zircon U-Pb file (detritals.csv)
-f6 <- system.file("Namib.csv",package="IsoplotR")
-d6 <- read.data(f6,method="detritals")
-kde(d6)
+f7 <- system.file("Namib.csv",package="IsoplotR")
+d7 <- read.data(f7,method="detritals")
+kde(d7)
 
 #  three 'other' files (MountTom.csv, spectrum.csv, average.csv)
-f7 <- system.file("MountTom.csv",package="IsoplotR")
-d7 <- read.data(f7,method="other")
-radialplot(d7)
+f8 <- system.file("MountTom.csv",package="IsoplotR")
+d8 <- read.data(f8,method="other")
+radialplot(d8)
 
 
 

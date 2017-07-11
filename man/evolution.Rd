@@ -18,14 +18,14 @@ evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
 
 \item{alpha}{confidence cutoff for the error ellipses}
 
-\item{transform}{if \code{TRUE}, plots
-\eqn{^{234}}U/\eqn{^{238}}U vs. Th-U age.}
+\item{transform}{if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
+vs. Th-U age.}
 
-\item{detrital}{apply a detrital Th correction and
-project the compositions along the isochron?}
+\item{detrital}{apply a detrital Th correction by projecting the
+compositions along an isochron?}
 
-\item{show.numbers}{logical flag (\code{TRUE} to show grain
-numbers)}
+\item{show.numbers}{label the error ellipses with the grain
+numbers?}
 
 \item{ellipse.col}{background colour of the error ellipses}
 
@@ -33,7 +33,8 @@ numbers)}
 
 \item{isochron}{fit a 3D isochron to the data?}
 
-\item{exterr}{show decay constant uncertainty?}
+\item{exterr}{propagate the decay constant uncertainty in the
+isochron age?}
 
 \item{sigdig}{number of significant digits for the isochron age}
 
@@ -48,9 +49,14 @@ isochron ages.
 \examples{
 data(examples)
 evolution(examples$ThU)
+
 }
 \references{
-Ludwig, K.R., 2003. Mathematical-statistical treatment
-    of data and errors for 230 Th/U geochronology. Reviews in
-    Mineralogy and Geochemistry, 52(1), pp.631-656.
+Ludwig, K.R. and Titterington, D.M., 1994. Calculation
+    of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+    Cosmochimica Acta, 58(22), pp.5031-5042.
+
+Ludwig, K.R., 2003. Mathematical-statistical treatment of data and
+    errors for 230 Th/U geochronology. Reviews in Mineralogy and
+    Geochemistry, 52(1), pp.631-656.
 }
