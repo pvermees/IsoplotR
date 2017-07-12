@@ -12,22 +12,31 @@
 # Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
 # ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
 #
-ludwig <- function(x,exterr=FALSE){
-    ns <- length(x)
-    t0 <- discordia.age(x,wetherill=TRUE,exterr=FALSE)
-    fit <- stats::optim(rep(0,ns),fn=S.lud,method="BFGS",
-                        a0=10,b0=10,tt=t0$x[1],x=x,exterr=exterr)
-    SS <- S.lud(fit$par,a0=10,b0=10,tt=t0$x[1],x=x,exterr=exterr)
-    print(SS)
+ludwig <- function(x,...){ UseMethod("ludwig",x) }
+ludwig.default <- function(x,covmat,...){
+}
+ludwig.UPb <- function(x,exterr=FALSE,...){
+    if (exterr){
+        init <- ludwig(x,exterr=FALSE)$par
+    } else {
+        ns <- length(x)
+        t0 <- discordia.age(x,wetherill=TRUE,exterr=FALSE)$x[1]
+        init <- c(10,10,t0)
+    }
+    fit <- stats::optim(init,fn=S.lud,method="BFGS",x=x,exterr=exterr)
+    fit
 }
 
-S.lud <- function(z,a0,b0,tt,x,exterr=FALSE){
+S.lud <- function(a0b0t,x,exterr=FALSE){
     ns <- length(x)
-    d <- data2ludwig(x,a0,b0,tt,z,exterr=exterr)
+    a0 <- a0b0t[1]
+    b0 <- a0b0t[2]
+    tt <- a0b0t[3]
+    d <- data2ludwig(x,a0,b0,tt,exterr=exterr)
+    phi <- d$phi
     R <- d$R
     r <- d$r
     omega <- d$omega
-    phi <- d$phi
     SS <- 0
     for (i in 1:ns){
         i1 <- i
@@ -47,7 +56,7 @@ S.lud <- function(z,a0,b0,tt,x,exterr=FALSE){
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
-data2ludwig.UPb <- function(x,a0,b0,tt,z,exterr=FALSE,...){
+data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
     if (x$format < 4)
         stop('Ludwig regression is not possible for U-Pb data of format < 4.')
     # initialise:
@@ -67,15 +76,16 @@ data2ludwig.UPb <- function(x,a0,b0,tt,z,exterr=FALSE,...){
     }
     for (i in 1:ns){
         d <- wetherill(x,i=i,exterr=FALSE) # will add external errors based on Ludwig (1998)
-        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*z[i]
-        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*z[i]
+        Zi <- d$x['Pb204U238']
+        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Zi
+        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Zi
         E[i,i] <- E[i,i] + d$cov['Pb207U235','Pb207U235'] # A
         E[ns+i,ns+i] <- E[ns+i,ns+i] + d$cov['Pb206U238','Pb206U238'] # B
         E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238'] # C
         E[i,ns+i] <- d$cov['Pb207U235','Pb206U238'] # D
         E[ns+i,i] <- E[i,ns+i]
-        E[ns+i,2*ns+i] <- d$cov['Pb207U235','Pb204U238'] # E
-        E[2*ns+i,ns+i] <- E[ns+i,2*ns+i]
+        E[i,2*ns+i] <- d$cov['Pb207U235','Pb204U238'] # E
+        E[2*ns+i,i] <- E[ns+i,2*ns+i]
         E[ns+i,2*ns+i] <- d$cov['Pb206U238','Pb204U238'] # F
         E[2*ns+i,ns+i] <- E[ns+i,2*ns+i]
     }
