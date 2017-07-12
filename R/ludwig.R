@@ -14,8 +14,6 @@
 #
 ludwig <- function(x){
     ns <- length(x)
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@16@"]]));##:ess-bp-end:##
     tt <- discordia.age(x,wetherill=TRUE,exterr=FALSE)
     fitXY <- york(x[,c(1,2,3,4,7)])
     a <- fitXY$a[1]
