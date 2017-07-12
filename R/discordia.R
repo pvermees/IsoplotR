@@ -35,7 +35,7 @@ LL.concordia.intersection <- function(itt,d,x,wetherill,exterr){
         covmat <- samp$cov
         if (exterr) {
             dcomp <- discordant.composition(disc[i],itt[1],itt[2],wetherill)
-            covmat <- samp$cov + dcomp$cov
+            covmat <- samp$cov[1:2,1:2] + dcomp$cov
         }
         LL <- LL + LL.norm(matrix(mu[i,],1,2),covmat)
     }

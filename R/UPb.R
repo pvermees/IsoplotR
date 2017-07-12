@@ -1,14 +1,15 @@
 wetherill <- function(x,i,exterr=FALSE){
     out <- list()
-    labels <- c('Pb207U235','Pb206U238')
     if (x$format %in% c(1,3)){
+        labels <- c('Pb207U235','Pb206U238')
         out$x <- x$x[i,c('Pb207U235','Pb206U238')]
         out$cov <- matrix(0,2,2)
         diag(out$cov) <-
             x$x[i,c('errPb207U235','errPb206U238')]^2
         out$cov <-
             cor2cov2(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],x$x[i,'rhoXY'])
-    } else if (x$format %in% c(2,4)){
+    } else if (x$format == 2){
+        labels <- c('Pb207U235','Pb206U238')
         U238U235 <- iratio('U238U235')[1]
         Pb207U235 <- U238U235*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
         Pb206U238 <- 1/x$x[i,'U238Pb206']
@@ -23,6 +24,26 @@ wetherill <- function(x,i,exterr=FALSE){
         E[1:2,1:2] <- cor2cov2(x$x[i,'errU238Pb206'],
                               x$x[i,'errPb207Pb206'],x$x[i,'rhoXY'])
         out$cov <- J %*% E %*% t(J)
+    } else if (x$format == 4){
+        labels <- c('Pb207U235','Pb206U238','Pb204U238')
+        U238U235 <- iratio('U238U235')[1]
+        Pb207U235 <- U238U235*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
+        Pb206U238 <- 1/x$x[i,'U238Pb206']
+        Pb204U238 <- x$x[i,'Pb204Pb206']/x$x[i,'U238Pb206']
+        out$x <- c(Pb207U235,Pb206U238,Pb204U238)
+        J <- matrix(0,3,4)
+        E <- matrix(0,4,4)
+        E[4,4] <- iratio('U238U235')[2]^2
+        J[1,1] <- -Pb207U235/x$x[i,'U238Pb206']
+        J[1,2] <- U238U235/x$x[i,'U238Pb206']
+        if (exterr) J[1,4] <- x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
+        J[2,1] <- -1/x$x[i,'U238Pb206']^2
+        J[3,1] <- Pb204U238/x$x[i,'U238Pb206']
+        J[3,3] <- 1/x$x[i,'U238Pb206']
+        E[1:3,1:3] <- cor2cov3(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],
+                               x$x[i,'errPb204Pb206'],x$x[i,'rhoXY'],
+                               x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+        out$cov <- J %*% E %*% t(J)        
     }
     names(out$x) <- labels
     colnames(out$cov) <- labels
@@ -353,7 +374,8 @@ get.Pb207Pb206.age.terawasserburg <- function(x,exterr=TRUE,...){
     get.Pb207Pb206.age(r76,sr76,exterr=exterr,...)
 }
 
-# x an object of class \code{UPb} returns a matrix of 7/5, 6/8, 7/6
+# x is an object of class \code{UPb}
+# returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
 UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,wetherill=TRUE){
     labels <- c('t.75','s[t.75]','t.68','s[t.68]',

@@ -245,8 +245,8 @@ LL.concordia.comp.default <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
     for (i in 1:length(x)){
         if (wetherill) xi <- wetherill(x,i)
         else xi <- tera.wasserburg(x,i)
-        X <- matrix(xi$x-mu,1,2)
-        covmat <- xi$cov
+        X <- matrix(xi$x[1:2]-mu,1,2)
+        covmat <- xi$cov[1:2,1:2]
         if (mswd) out <- out + get.concordia.SS(X,covmat)
         else out <- out + LL.norm(X,covmat)
     }
@@ -264,9 +264,9 @@ LL.concordia.age <- function(tt,x,mswd=FALSE,exterr=TRUE){
         y <- age_to_wetherill_ratios(tt)
     else if (hasClass(x,'terawasserburg'))
         y <- age_to_terawasserburg_ratios(tt)
-    dx <- matrix(x$x-y$x,1,2)
-    covmat <- x$cov
-    if (exterr) covmat <- x$cov + y$cov
+    dx <- matrix(x$x[1:2]-y$x,1,2)
+    covmat <- x$cov[1:2,1:2]
+    if (exterr) covmat <- x$cov[1:2,1:2] + y$cov
     if (mswd) out <- get.concordia.SS(dx,covmat)
     else out <- LL.norm(dx,covmat)
     out

@@ -1,15 +1,18 @@
 * using log directory ‘/home/pvermees/Dropbox/Programming/R/IsoplotR/IsoplotR.Rcheck’
-* using R version 3.2.3 (2015-12-10)
+* using R version 3.4.1 (2017-06-30)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
 * this is package ‘IsoplotR’ version ‘0.16’
-* checking CRAN incoming feasibility ... Note_to_CRAN_maintainers
+* checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
+
+Days since last update: 1
+
+The build time stamp is missing.
 * checking package namespace information ... OK
-* checking package dependencies ... NOTE
-  No repository set, so cyclic dependency check skipped
+* checking package dependencies ... OK
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
 * checking for executable files ... WARNING
@@ -33,10 +36,12 @@ CRAN-pack does not know about
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking DESCRIPTION meta-information ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘README.md~’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -59,7 +64,10 @@ These should not be in a package tarball.
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... OK
+* checking R code for possible problems ... NOTE
+ludwig: no visible binding for global variable ‘.ESSBP.’
+Undefined global functions or variables:
+  .ESSBP.
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
@@ -75,4 +83,4 @@ These should not be in a package tarball.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 3 NOTEs
+Status: 2 WARNINGs, 5 NOTEs
