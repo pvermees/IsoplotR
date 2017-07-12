@@ -40,8 +40,8 @@ CRAN-pack does not know about
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
 Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
-Non-standard files/directories found at top level:
-  ‘IsoplotR.Rcheck’ ‘README.md~’
+Non-standard file/directory found at top level:
+  ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -64,10 +64,7 @@ These should not be in a package tarball.
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... NOTE
-ludwig: no visible binding for global variable ‘.ESSBP.’
-Undefined global functions or variables:
-  .ESSBP.
+* checking R code for possible problems ... OK
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
@@ -83,4 +80,4 @@ Undefined global functions or variables:
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 5 NOTEs
+Status: 2 WARNINGs, 4 NOTEs

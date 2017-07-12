@@ -32,7 +32,7 @@ LL.concordia.intersection <- function(itt,d,x,wetherill,exterr){
     for (i in 1:length(x)){
         if (wetherill) samp <- wetherill(x,i)
         else samp <- tera.wasserburg(x,i)
-        covmat <- samp$cov
+        covmat <- samp$cov[1:2,1:2]
         if (exterr) {
             dcomp <- discordant.composition(disc[i],itt[1],itt[2],wetherill)
             covmat <- samp$cov[1:2,1:2] + dcomp$cov
