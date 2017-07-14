@@ -23,7 +23,7 @@
 #' Ludwig, K.R. and Titterington, D.M., 1994. Calculation
 #' of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 #' Cosmochimica Acta, 58(22), pp.5031-5042.
-#'
+#' @export
 titterington <- function(x){
     ns <- nrow(x)
     fitXY <- york(x[,c(1,2,3,4,7)])
