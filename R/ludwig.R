@@ -26,19 +26,20 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
     if (exterr){
         init <- ludwig(x,exterr=FALSE)$par
     } else {
-        ns <- length(x)
         t0 <- discordia.age(x,wetherill=TRUE,exterr=FALSE)$x[1]
-        init <- c(19,16,t0)
+        init <- c(t0,10,10)
     }
-    fit <- optim(init,fn=S.lud.UPb,method="BFGS",x=x,exterr=exterr)
-#    fish <- fisher.lud(x,a0b0t=fit$par,exterr=exterr)
-#    covmat <- solve(fish)
-    fit <- optim(init,fn=S.lud.UPb,method="BFGS",x=x,exterr=exterr,hessian=TRUE)
-    covmat <- solve(fit$hessian)
+    fit <- optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)
     out <- list()
     out$par <- fit$par
-#    out$cov <- covmat[(ns+1):(ns+3),(ns+1):(ns+3)]
-    out$cov <- covmat
+    out$cov <- tryCatch({ # analytical
+        fish <- fisher.lud(x,ta0b0=fit$par,exterr=exterr)
+        ns <- length(x)
+        solve(fish[(ns+1):(ns+3),(ns+1):(ns+3)])
+    }, error = function(e){ # numerical
+        fit <- optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr,hessian=TRUE)
+        solve(fit$hessian)
+    })
     parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
@@ -197,13 +198,13 @@ fisher_lud_with_decay_err <- function(tt,a0,b0,z,omega){
     out
 }
 
-S.lud.UPb <- function(ta0b0,x,exterr=FALSE){
+LL.lud.UPb <- function(ta0b0,x,exterr=FALSE){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
     d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,exterr=exterr)
-    if (exterr) out <- S.lud.helper(d)
-    else out <- sum(d$S)
+    if (exterr) out <- S.lud.helper(d)/2
+    else out <- sum(d$S)/2
     out
 }
 S.lud.helper <- function(d){
