@@ -4,7 +4,9 @@
 #' Implements the maximum likelihood algorithm of Ludwig (1998)
 #'
 #' @param x an object of class \code{UPb} with \code{x$format > 3}.
-#' 
+#'
+#' @param ... optional arguments
+#'
 # @param x a \eqn{3n}-element vector \eqn{[X Y Z]}, where \eqn{X},
 #     \eqn{Y} and \eqn{Z} are three \eqn{n}-element vectors of
 #     (isotopic ratio) values.
@@ -26,18 +28,18 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
     } else {
         ns <- length(x)
         t0 <- discordia.age(x,wetherill=TRUE,exterr=FALSE)$x[1]
-        init <- c(10,10,t0)
+        init <- c(19,16,t0)
     }
     fit <- optim(init,fn=S.lud.UPb,method="BFGS",x=x,exterr=exterr)
-    fish <- fisher.lud(x,a0b0t=fit$par,exterr=exterr)
-    covmat <- solve(fish)
-    #fit <- optim(init,fn=S.lud.UPb,method="BFGS",x=x,exterr=exterr,hessian=TRUE)
-    #covmat <- solve(fit$hessian)
+#    fish <- fisher.lud(x,a0b0t=fit$par,exterr=exterr)
+#    covmat <- solve(fish)
+    fit <- optim(init,fn=S.lud.UPb,method="BFGS",x=x,exterr=exterr,hessian=TRUE)
+    covmat <- solve(fit$hessian)
     out <- list()
     out$par <- fit$par
-    out$cov <- covmat[(ns+1):(ns+3),(ns+1):(ns+3)]
-    #out$cov <- covmat
-    parnames <- c('64i','74i','t')
+#    out$cov <- covmat[(ns+1):(ns+3),(ns+1):(ns+3)]
+    out$cov <- covmat
+    parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
@@ -46,16 +48,21 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
 fisher.lud.default <- function(x,...){ stop( "No default method available (yet)." ) }
-fisher.lud.UPb <- function(x,a0b0t,exterr=FALSE,...){
-    ns <- length(x)
-    a0 <- a0b0t[1]
-    b0 <- a0b0t[2]
-    tt <- a0b0t[3]
-    d <- data2ludwig(x,a0,b0,tt,exterr=exterr)
-    R <- d$R
-    r <- d$r
-    phi <- d$phi
+fisher.lud.UPb <- function(x,ta0b0,exterr=FALSE,...){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    b0 <- ta0b0[3]
+    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,z=z,exterr=exterr)
+    z <- d$z
     omega <- d$omega
+    if (exterr)
+        out <- fisher_lud_with_decay_err(tt,a0=a0,b0=b0,z=z,omega=omega)
+    else
+        out <- fisher_lud_without_decay_err(tt,a0=a0,b0=b0,z=z,omega=omega)
+    out
+}
+fisher_lud_without_decay_err <- function(tt,a0,b0,z,omega){
+    ns <- length(z)
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
@@ -67,9 +74,55 @@ fisher.lud.UPb <- function(x,a0b0t,exterr=FALSE,...){
     d2L.da0dt <- 0
     d2L.db0dt <- 0
     d2L.da0db0 <- 0
-    z <- rep(0,ns)
-    for (i in 1:ns)
-        z[i] <- wetherill(x,i=i,exterr=FALSE)$x['Pb204U238'] - phi[i]
+    out <- matrix(0,ns+3,ns+3)
+    for (i in 1:ns){
+        O <- omega[[i]]
+        d2L.dt2 <- d2L.dt2 +
+            O[1,1]*Q235^2 + O[2,2]*Q238^2 + 2*Q235*Q238*O[1,2]
+        d2L.da02 <- d2L.da02 + O[2,2]*z[i]^2
+        d2L.db02 <- d2L.db02 + O[1,1]*(U*z[i])^2
+        d2L.da0dt <- d2L.da0dt + z[i]*(Q238*O[2,2] + Q235*O[1,2])
+        d2L.db0dt <- d2L.db0dt + U*z[i]*(Q235*O[1,1] + Q238*O[1,2])
+        d2L.da0db0 <- d2L.da0db0 + U*O[1,2]*z[i]^2
+        d2L.dz2 <- O[1,1]*(U*b0)^2 + O[2,2]*a0^2 + O[3,3] +
+            2*(a0*U*b0*O[1,2] + U*b0*O[1,3] + a0*O[3,3])
+        d2L.dzdt <- Q235*(U*b0*O[1,1] + O[1,3]) +
+            Q238*(a0*O[2,2]+O[2,3]) +
+            (Q238*U*b0 + Q235*a0)*O[1,2]
+        d2L.dzda0 <- z[i]*(a0*O[2,2] + U*b0*O[1,2] + O[2,3])
+        d2L.dzdb0 <- U*z[i]*(a0*O[1,2] + U*b0*O[1,1] + O[1,3])
+        out[i,i] <- d2L.dz2
+        out[i,ns+1] <- d2L.dzdt
+        out[i,ns+2] <- d2L.dzda0
+        out[i,ns+3] <- d2L.dzdb0
+        out[ns+1,i] <- out[i,ns+1]
+        out[ns+2,i] <- out[i,ns+2]
+        out[ns+3,i] <- out[i,ns+3]
+    }
+    out[ns+1,ns+1] <- d2L.dt2
+    out[ns+2,ns+2] <- d2L.da02
+    out[ns+3,ns+3] <- d2L.db02
+    out[ns+1,ns+2] <- d2L.da0dt
+    out[ns+1,ns+3] <- d2L.db0dt
+    out[ns+2,ns+3] <- d2L.da0db0
+    out[ns+2,ns+1] <- out[ns+1,ns+2]
+    out[ns+3,ns+1] <- out[ns+1,ns+3]
+    out[ns+3,ns+2] <- out[ns+2,ns+3]
+    out
+}
+fisher_lud_with_decay_err <- function(tt,a0,b0,z,omega){
+    ns <- length(z)
+    l5 <- settings('lambda','U235')
+    l8 <- settings('lambda','U238')
+    U <- settings('iratio','U238U235')[1]
+    Q235 <- l5[1]*exp(l5[1]*tt)
+    Q238 <- l8[1]*exp(l8[1]*tt)
+    d2L.dt2 <- 0
+    d2L.da02 <- 0
+    d2L.db02 <- 0
+    d2L.da0dt <- 0
+    d2L.db0dt <- 0
+    d2L.da0db0 <- 0
     for (i in 1:ns){
         i1 <- i
         i2 <- i + ns
@@ -125,8 +178,7 @@ fisher.lud.UPb <- function(x,a0b0t,exterr=FALSE,...){
                 z[j]*(a0*omega[i2,j2] + U*b0*omega[i1,j2] * omega[i3,j2])
             d2L.dzdb0 <- d2L.dzdb0 +
                 U*z[j]*(a0*omega[i2,j1] + U*b0*omega[i1,j1] + omega[i3,j1])
-            d2L.dzdz <-  d2L.dzdz +
-                (omega[i1,j1] + omega[i1,j3] + omega[i3,j1])*(U*b0)^2 +
+            d2L.dzdz <-  (omega[i1,j1] + omega[i1,j3] + omega[i3,j1])*(U*b0)^2 +
                 omega[i2,j2]*a0^2 + omega[i3,j3] + a0*(omega[i2,j3]+omega[i3,j2]) +
                 a0*U*b0*(omega[i1,j2]+omega[i2,j1])
             out[i,j] <- d2L.dzdz # dij
@@ -145,14 +197,16 @@ fisher.lud.UPb <- function(x,a0b0t,exterr=FALSE,...){
     out
 }
 
-S.lud.UPb <- function(a0b0t,x,exterr=FALSE){
-    a0 <- a0b0t[1]
-    b0 <- a0b0t[2]
-    tt <- a0b0t[3]
-    d <- data2ludwig(x,a0,b0,tt,exterr=exterr)
-    S.lud.helper(d)
+S.lud.UPb <- function(ta0b0,x,exterr=FALSE){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    b0 <- ta0b0[3]
+    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,exterr=exterr)
+    if (exterr) out <- S.lud.helper(d)
+    else out <- sum(d$S)
+    out
 }
-S.lud.helper <- function(d,...){
+S.lud.helper <- function(d){
     phi <- d$phi
     R <- d$R
     r <- d$r
@@ -180,6 +234,13 @@ data2ludwig.default <- function(x,...){ stop('default function undefined') }
 data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
     if (x$format < 4)
         stop('Ludwig regression is not possible for U-Pb data of format < 4.')
+    if (exterr)
+        out <- data2ludwig_with_decay_err(x,a0=a0,b0=b0,tt=tt)
+    else
+        out <- data2ludwig_without_decay_err(x,a0=a0,b0=b0,tt=tt)
+    out
+}
+data2ludwig_without_decay_err <- function(x,a0,b0,tt){
     # initialise:
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
@@ -187,19 +248,59 @@ data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
     ns <- length(x)
     R <- rep(0,ns)
     r <- rep(0,ns)
-    E <- matrix(0,3*ns,3*ns)
-    # populate R, r, phi and omega
-    if (exterr){
-        P235 <- tt*exp(l5[1]*tt)
-        P238 <- tt*exp(l8[1]*tt)
-        E[1:ns,1:ns] <- (P235*l5[2])^2 # A 
-        E[(ns+1):(2*ns),(ns+1):(2*ns)] <- (P238*l8[2])^2 # B
-    }
+    phi <- rep(0,ns)
+    z <- rep(0,ns)
+    S <- rep(0,ns)
+    omega <- list()
+    E <- matrix(0,3,3)
     for (i in 1:ns){
         d <- wetherill(x,i=i,exterr=FALSE) # will add external errors based on Ludwig (1998)
         Zi <- d$x['Pb204U238']
         R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Zi
         r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Zi
+        E[1,1] <- d$cov['Pb207U235','Pb207U235']
+        E[2,2] <- d$cov['Pb206U238','Pb206U238']
+        E[3,3] <- d$cov['Pb204U238','Pb204U238']
+        E[1,2] <- d$cov['Pb207U235','Pb206U238']
+        E[2,1] <- E[1,2]
+        E[1,3] <- d$cov['Pb207U235','Pb204U238']
+        E[3,1] <- E[1,3]
+        E[2,3] <- d$cov['Pb206U238','Pb204U238']
+        E[3,2] <- E[2,3]
+        O <- solve(E)
+        omega[[i]] <- O
+        # rearrange sum of squares:
+        AA <- O[1,1]*(U*b0)^2 + O[2,2]*a0^2 + O[3,3] +
+            2*(U*a0*b0*O[1,2] + U*b0*O[1,3] + a0*O[2,3])
+        BB <- R[i]*U*b0*O[1,1] + r[i]*a0*O[2,2] +
+            (R[i]*a0 + U*b0*r[i])*O[1,2] +
+            R[i]*O[1,3] + r[i]*O[2,3]
+        CC <- O[1,1]*R[i]^2 + O[2,2]*r[i]^2 + 2*R[i]*r[i]*O[1,2]
+        z[i] <- Zi + BB/AA
+        phi[i] <- Zi - z[i]
+        S[i] <- AA*phi[i]^2 + 2*BB*phi[i] + CC
+    }
+    out <- list(R=R,r=r,phi=phi,z=z,omega=omega,S=S)
+}
+data2ludwig_with_decay_err <- function(x,a0,b0,tt){
+    # initialise:
+    l5 <- settings('lambda','U235')
+    l8 <- settings('lambda','U238')
+    U <- settings('iratio','U238U235')[1]
+    ns <- length(x)
+    R <- rep(0,ns)
+    r <- rep(0,ns)
+    Z <- rep(0,ns)
+    P235 <- tt*exp(l5[1]*tt)
+    P238 <- tt*exp(l8[1]*tt)
+    E <- matrix(0,3*ns,3*ns)
+    E[1:ns,1:ns] <- (P235*l5[2])^2 # A 
+    E[(ns+1):(2*ns),(ns+1):(2*ns)] <- (P238*l8[2])^2 # B
+    for (i in 1:ns){
+        d <- wetherill(x,i=i,exterr=FALSE) # will add external errors based on Ludwig (1998)
+        Z[i] <- d$x['Pb204U238']
+        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i]
+        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i]
         E[i,i] <- E[i,i] + d$cov['Pb207U235','Pb207U235'] # A
         E[ns+i,ns+i] <- E[ns+i,ns+i] + d$cov['Pb206U238','Pb206U238'] # B
         E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238'] # C
@@ -228,5 +329,6 @@ data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
         }
     }
     phi <- solve(V,W)
-    list(R=R,r=r,phi=phi,omega=omega)
+    z <- Z - phi
+    list(R=R,r=r,z=z,phi=phi,omega=omega)
 }

@@ -276,6 +276,28 @@ kde(examples$DZ,from=0,to=3000)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("kde", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("ludwig")
+### * ludwig
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: ludwig
+### Title: Linear regression of X,Y,Z-variables with correlated errors,
+###   taking into account decay constant uncertainties.
+### Aliases: ludwig
+
+### ** Examples
+
+f <- system.file("UPb4.csv",package="IsoplotR")
+d <- read.data(f,method="U-Pb",format=4)
+fit <- ludwig(d)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("ludwig", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("mds")
 ### * mds
 
