@@ -261,7 +261,7 @@ as.UPb <- function(x,format=3){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb204U238','errPb204U238',
-                    'rhoXY','rhoXZ','rhoYZ')        
+                    'rhoXY','rhoXZ','rhoYZ')
         out$x <- X
     } else if (format==5 & nc==9){
         cnames <- c('U238Pb206','errU238Pb206',

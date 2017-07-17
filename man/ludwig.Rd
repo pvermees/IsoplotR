@@ -2,13 +2,23 @@
 % Please edit documentation in R/ludwig.R
 \name{ludwig}
 \alias{ludwig}
+\alias{ludwig.default}
+\alias{ludwig.UPb}
 \title{Linear regression of X,Y,Z-variables with correlated errors, taking
 into account decay constant uncertainties.}
 \usage{
 ludwig(x, ...)
+
+\method{ludwig}{default}(x, ...)
+
+\method{ludwig}{UPb}(x, exterr = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb} with \code{x$format > 3}.}
+
+\item{...}{optional arguments}
+
+\item{exterr}{propagate external sources of uncertainty (e.g., decay constant)?}
 }
 \description{
 Implements the maximum likelihood algorithm of Ludwig (1998)

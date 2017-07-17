@@ -285,7 +285,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: ludwig
 ### Title: Linear regression of X,Y,Z-variables with correlated errors,
 ###   taking into account decay constant uncertainties.
-### Aliases: ludwig
+### Aliases: ludwig ludwig.default ludwig.UPb
 
 ### ** Examples
 

@@ -143,7 +143,7 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
         if (x$format %in% c(2,5)){
             out <- x$x[,c('U238Pb206','errU238Pb206',
                           'Pb207Pb206','errPb207Pb206','rhoXY')]
-        } else if (x$format %in% c(1,3,4)){
+        } else if (x$format %in% c(1,3,4,6)){
             for (i in 1:ns){
                 samp <- tera.wasserburg(x,i=i,exterr=FALSE)
                 out[i,1] <- samp$x['U238Pb206']

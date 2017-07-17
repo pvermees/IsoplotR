@@ -21,7 +21,12 @@
 #' ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
 #' @export
 ludwig <- function(x,...){ UseMethod("ludwig",x) }
-ludwig.default <- function(x,covmat,...){ stop( "No default method available (yet)." ) }
+#' @rdname ludwig
+#' @export
+ludwig.default <- function(x,...){ stop( "No default method available (yet)." ) }
+#' @param exterr propagate external sources of uncertainty (e.g., decay constant)?
+#' @rdname ludwig
+#' @export
 ludwig.UPb <- function(x,exterr=FALSE,...){
     if (exterr){
         init <- ludwig(x,exterr=FALSE)$par
@@ -42,13 +47,29 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
         DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
         solve(DD - CC %*% solve(AA) %*% BB)
     }, error = function(e){ # numerical
-        fit <- optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr,hessian=TRUE)
+        fit <- optim(init,fn=LL.lud.UPb,method="BFGS",
+                     x=x,exterr=exterr,hessian=TRUE)
         solve(fit$hessian)
     })
     parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
+    mswd <- mswd.lud(fit$par,x=x)
+    out <- c(out,mswd)
+    out
+}
+
+mswd.lud <- function(ta0b0,x){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    b0 <- ta0b0[3]
+    ns <- length(x)
+    SS <- 2*LL.lud.UPb(ta0b0,x=x,exterr=FALSE)
+    df <- 2*ns-2
+    out <- list()
+    out$mswd <- SS/df
+    out$p.value <- as.numeric(1-pchisq(SS,df))
     out
 }
 

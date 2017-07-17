@@ -36,8 +36,8 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
 File README.md cannot be checked without ‘pandoc’ being installed.
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -67,39 +67,13 @@ These should not be in a package tarball.
 * checking Rd cross-references ... OK
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... WARNING
-Undocumented arguments in documentation object 'ludwig'
-  ‘...’
-
-Functions with \usage entries need to have the appropriate \alias
-entries, and all their arguments documented.
-The \usage entries must correspond to syntactically valid R code.
-See chapter ‘Writing R documentation files’ in the ‘Writing R
-Extensions’ manual.
+* checking Rd \usage sections ... OK
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... ERROR
-Running examples in ‘IsoplotR-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: ludwig
-> ### Title: Linear regression of X,Y,Z-variables with correlated errors,
-> ###   taking into account decay constant uncertainties.
-> ### Aliases: ludwig
-> 
-> ### ** Examples
-> 
-> f <- system.file("UPb4.csv",package="IsoplotR")
-> d <- read.data(f,method="U-Pb",format=4)
-> fit <- ludwig(d)
-Error in UseMethod("ludwig", x) : 
-  no applicable method for 'ludwig' applied to an object of class "UPb"
-Calls: ludwig
-Execution halted
+* checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 ERROR, 3 WARNINGs, 3 NOTEs
+Status: 2 WARNINGs, 3 NOTEs
