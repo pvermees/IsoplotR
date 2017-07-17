@@ -126,10 +126,10 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
     out <- matrix(0,ns,5)
     colnames(out) <- c('X','sX','Y','sY','rXY')
     if (wetherill){
-        if (x$format %in% c(1,3)){
+        if (x$format %in% c(1,3,4)){
             out <- x$x[,c('Pb207U235','errPb207U235',
                           'Pb206U238','errPb206U238','rhoXY')]
-        } else if (x$format %in% c(2,4)){
+        } else if (x$format %in% c(2,5,6)){
             for (i in 1:ns){
                 samp <- wetherill(x,i=i,exterr=FALSE)
                 out[i,1] <- samp$x['Pb207U235']
@@ -140,7 +140,7 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
             }
         }
     } else {
-        if (x$format==2){
+        if (x$format %in% c(2,5)){
             out <- x$x[,c('U238Pb206','errU238Pb206',
                           'Pb207Pb206','errPb207Pb206','rhoXY')]
         } else if (x$format %in% c(1,3,4)){

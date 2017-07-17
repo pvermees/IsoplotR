@@ -2,7 +2,7 @@ wetherill <- function(x,i,exterr=FALSE){
     out <- list()
     if (x$format %in% c(1,3)){
         labels <- c('Pb207U235','Pb206U238')
-        out$x <- x$x[i,c('Pb207U235','Pb206U238')]
+        out$x <- x$x[i,labels]
         out$cov <- matrix(0,2,2)
         diag(out$cov) <-
             x$x[i,c('errPb207U235','errPb206U238')]^2
@@ -26,6 +26,16 @@ wetherill <- function(x,i,exterr=FALSE){
         out$cov <- J %*% E %*% t(J)
     } else if (x$format == 4){
         labels <- c('Pb207U235','Pb206U238','Pb204U238')
+        out$x <- x$x[i,labels]
+        out$cov <- matrix(0,3,3)
+        diag(out$cov) <-
+            x$x[i,c('errPb207U235','errPb206U238','errPb204U238')]^2
+        out$cov <-
+            cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
+                     x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
+                     x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+    } else if (x$format == 5){
+        labels <- c('Pb207U235','Pb206U238','Pb204U238')
         U238U235 <- iratio('U238U235')[1]
         Pb207U235 <- U238U235*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
         Pb206U238 <- 1/x$x[i,'U238Pb206']
@@ -44,6 +54,27 @@ wetherill <- function(x,i,exterr=FALSE){
                                x$x[i,'errPb204Pb206'],x$x[i,'rhoXY'],
                                x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
         out$cov <- J %*% E %*% t(J)        
+    } else if (x$format == 6){
+        labels <- c('Pb207U235','Pb206U238','Pb204U238')
+        out$x <- x$x[i,labels]
+        out$cov <- matrix(0,3,3)
+        diag(out$cov) <-
+            x$x[i,c('errPb207U235','errPb206U238','errPb204U238')]^2
+        out$cov[1,2] <-
+            get.cov.75.68(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                          x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                          x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
+        out$cov[1,3] <-
+            get.cov.75.48(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                          x$x[i,'Pb204U238'],x$x[i,'errPb204U238'],
+                          x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'])
+        out$cov[2,3] <-
+            get.cov.68.48(x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                          x$x[i,'Pb204U238'],x$x[i,'errPb204U238'],
+                          x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'])
+        out$cov[2,1] <- out$cov[1,2]
+        out$cov[3,1] <- out$cov[1,3]
+        out$cov[3,2] <- out$cov[2,3]
     }
     names(out$x) <- labels
     colnames(out$cov) <- labels
@@ -88,12 +119,54 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
         out$cov <- J %*% E %*% t(J)
     } else if (x$format == 4){
         labels <- c('U238Pb206','Pb207Pb206','Pb204Pb206')
+        U238U235 <- iratio('U238U235')[1]
+        U238Pb206 <- 1/x$x[i,'Pb206U238']
+        Pb207Pb206 <- x$x[i,'Pb207U235']/(x$x[i,'Pb206U238']*U238U235)
+        Pb204Pb206 <- x$x[i,'Pb204U238']/x$x[i,'Pb206U238']
+        J <- matrix(0,3,4)
+        E <- matrix(0,4,4)
+        E[4,4] <- iratio('U238U235')[2]^2
+        J[1,2] <- -1/x$x[i,'Pb206U238']^2
+        J[2,1] <- 1/(x$x[i,'Pb206U238']*U238U235)
+        J[2,2] <- -Pb207Pb206/x$x[i,'Pb206U238']
+        if (exterr) J[2,4] <- -Pb207Pb206/U238U235
+        J[3,2] <- -Pb204Pb206/x$x[i,'Pb206U238']
+        J[3,3] <- 1/x$x[i,'Pb206U238']
+        E[1:3,1:3] <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
+                               x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
+                               x$x[i,'rhoXZ'],x$x[i,'rhoXZ'])
+        out$x <- c(U238Pb206,Pb207Pb206,Pb204Pb206)
+        out$cov <- J %*% E %*% t(J)
+    } else if (x$format == 5){
+        labels <- c('U238Pb206','Pb207Pb206','Pb204Pb206')
         out$x <- x$x[i,c('U238Pb206','Pb207Pb206','Pb204Pb206')]
         out$cov <- matrix(0,3,3)
         diag(out$cov) <- x$x[i,c('errU238Pb206','errPb207Pb206','errPb204Pb206')]^2
         out$cov <-
             cor2cov3(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],x$x[i,'errPb204Pb206'],
                      x$x[i,'rhoXY'],x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+    } else if (x$format == 6){
+        labels <- c('U238Pb206','Pb207Pb206','Pb204Pb206')
+        U238Pb206 <- 1/x$x[i,'Pb206U238']
+        Pb207Pb206 <- x$x[i,'Pb207Pb206']
+        Pb204Pb206 <- x$x[i,'Pb204Pb206']
+        out$x <- c(U238Pb206,Pb207Pb206,Pb204Pb206)
+        out$cov <- matrix(0,3,3)
+        out$cov[1,1] <- (U238Pb206*x$x[i,'errPb206U238']/x$x[i,'Pb206U238'])^2
+        out$cov[2,2] <- x$x[i,'errPb207Pb206']^2
+        out$cov[3,3] <- x$x[i,'errPb204Pb206']^2
+        out$cov[1,2] <- get.cov.76.86(x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                      x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                      x$x[i,'Pb207U235'],x$x[i,'errPb207U235'])
+        out$cov[1,3] <- get.cov.46.86(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                      x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                      x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
+        out$cov[2,3] <- get.cov.46.76(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                      x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                      x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'])
+        out$cov[2,1] <- out$cov[1,2]
+        out$cov[3,1] <- out$cov[1,3]
+        out$cov[3,2] <- out$cov[2,3]
     }
     names(out$x) <- labels
     colnames(out$cov) <- labels
@@ -198,7 +271,7 @@ get.Pb207U235.ratios <- function(x,exterr=FALSE){
     out <- matrix(0,ns,2)
     labels <- c('Pb207U235','errPb207U235')
     colnames(out) <- labels
-    if (x$format %in% c(1,3)){
+    if (x$format %in% c(1,3,6)){
         out <- x$x[,labels]
     } else if (x$format %in% c(2,4)){
         R <- iratio('U238U235')[1]
@@ -221,7 +294,7 @@ get.Pb206U238.ratios <- function(x){
     out <- matrix(0,ns,2)
     labels <- c('Pb206U238','errPb206U238')
     colnames(out) <- labels
-    if (x$format %in% c(1,3)){
+    if (x$format %in% c(1,3,6)){
         out <- x$x[,labels]
     } else if (x$format %in% c(2,4)){
         out[,'Pb206U238'] <- 1/x$x[,'U238Pb206']
@@ -235,7 +308,7 @@ get.U238Pb206.ratios <- function(x){
     out <- matrix(0,ns,2)
     labels <- c('U238Pb206','errU238Pb206')
     colnames(out) <- labels
-    if (x$format %in% c(1,3)){
+    if (x$format %in% c(1,3,6)){
         out[,'U238Pb206'] <- 1/x$x[,'Pb206U238']
         out[,'errU238Pb206'] <- out[,'U238Pb206']*
             x$x[,'errPb206U238']/x$x[,'Pb206U238']
@@ -262,7 +335,7 @@ get.Pb207Pb206.ratios <- function(x,exterr=FALSE){
         relerr2 <- (sX/X)^2 - 2*covXY/(X*Y) + (sY/Y)^2
         if (exterr) relerr2 <- relerr2 + (sR/R)^2
         out[,'errPb207Pb206'] <- sqrt(relerr2)*out[,'Pb207Pb206']
-    } else if (x$format %in% c(2,3,4)){
+    } else if (x$format %in% c(2,3,4,6)){
         out <- x$x[,labels]
     }
     out
