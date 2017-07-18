@@ -44,9 +44,11 @@
 #' @export
 concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                      exterr=TRUE,show.age=1,sigdig=2){
-    concordia.line(x,limits=limits,wetherill=wetherill,
-                   col=concordia.col,alpha=alpha,exterr=exterr)
+                      exterr=TRUE,show.age=1,sigdig=2,common.Pb=FALSE){
+    if (common.Pb) X <- common.Pb.correction(x)
+    else X <- x
+    concordia.line(X,limits=limits,wetherill=wetherill,
+                   col=concordia.col,alpha=alpha)
     if (show.age==3){
         fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
         discordia.plot(fit,wetherill=wetherill)
@@ -54,8 +56,8 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
     }
     ns <- length(x)
     for (i in 1:ns){
-        if (wetherill) xyc <- wetherill(x,i)
-        else xyc <- tera.wasserburg(x,i)
+        if (wetherill) xyc <- wetherill(X,i)
+        else xyc <- tera.wasserburg(X,i)
         x0 <- xyc$x[1]
         y0 <- xyc$x[2]
         covmat <- xyc$cov
@@ -145,11 +147,15 @@ get.concordia.limits <- function(x,limits=NULL,wetherill=FALSE){
         out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
     } else if (is.null(limits) && wetherill) {
         Pb207U235 <- get.Pb207U235.ratios(x)
+        minx <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
         maxx <- max(Pb207U235[,1]+nse*Pb207U235[,2],na.rm=TRUE)
         Pb206U238 <- get.Pb206U238.ratios(x)
         miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
-        out$t[1] <- get.Pb206U238.age(miny)[1]
-        out$t[2] <- get.Pb207U235.age(maxx)[1]
+        maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
+        out$t[1] <- min(get.Pb207U235.age(minx)[1],
+                        get.Pb206U238.age(miny)[1])
+        out$t[2] <- max(get.Pb207U235.age(maxx)[1],
+                        get.Pb206U238.age(maxy)[1])
         out$x <- age_to_Pb207U235_ratio(out$t)[,'75']
         out$y <- age_to_Pb206U238_ratio(out$t)[,'68']
     } else if (is.null(limits) && !wetherill){

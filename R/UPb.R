@@ -541,3 +541,49 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
     colnames(out) <- c('t','s[t]')
     out
 }
+
+common.Pb.correction <- function(x,i64=NULL,i74=NULL){
+    out <- x
+    if (x$format>3){
+        ns <- length(x)
+        lud <- ludwig(x)
+        i64 <- lud$par['64i']
+        i74 <- lud$par['74i']
+        U238U235 <- iratio('U238U235')[1]
+    }
+    if (x$format==4){
+        out$x <- matrix(0,ns,5)
+        colnames(out$x) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
+        out$x[,'Pb207U235'] <- x$x[,'Pb207U235'] - i74*x$x[,'Pb204U238']*U238U235
+        out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
+        out$x[,'Pb206U238'] <- x$x[,'Pb206U238'] - i64*x$x[,'Pb204U238']
+        out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
+        out$x[,'rhoXY'] <- x$x[,'rhoXY']
+        out$format <- 1
+    } else if (x$format==5){
+        out$x <- matrix(0,ns,5)
+        colnames(out$x) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rhoXY')
+        out$x[,'U238Pb206'] <- x$x[,'U238Pb206']/(1 - i64*x$x[,'Pb204Pb206'])
+        out$x[,'errU238Pb206'] <- x$x[,'errU238Pb206']
+        out$x[,'Pb207Pb206'] <-
+            (x$x[,'Pb207Pb206'] - x$x[,'Pb204Pb206']*i74)/(1 - x$x[,'Pb204Pb206']*i64)
+        out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']
+        out$x[,'rhoXY'] <- x$x[,'rhoXY']
+        out$format <- 2
+    } else if (x$format==6){
+        out$x <- matrix(0,ns,9)
+        colnames(out$x) <- c('Pb207Pb206','errPb207Pb206',
+                             'Pb207U235','errPb207U235',
+                             'Pb206U238','errPb206U238',
+                             'rhoXY','rhoXZ','rhoYZ')
+        out$x[,'Pb207Pb206'] <-
+            (x$x[,'Pb207Pb206'] - x$x[,'Pb204Pb206']*i74)/(1 - x$x[,'Pb204Pb206']*i64)
+        out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']
+        out$x[,'Pb207U235'] <- x$x[,'Pb207U235'] - i74*x$x[,'Pb204U238']*U238U235
+        out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
+        out$x[,'Pb206U238'] <- x$x[,'Pb206U238'] - i64*x$x[,'Pb204U238']
+        out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
+        out$format <- 3
+    }
+    out
+}
