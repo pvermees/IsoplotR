@@ -22,12 +22,12 @@ concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
         names(out$x) <- c('t[l]','t[u]')
         out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, range1, 
                                         a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
-        out$x['t[u]'] <- stats::uniroot(intersection.misfit, range2, 
+        out$x['t[u]'] <- stats::uniroot(intersection.misfit.york, range2, 
                                         a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
     } else {
         search.range <- c(1/10000,10000)
         out$x <- c(1,fit$a[1]) # tl, 7/6 intercept
-        names(out$x) <- c('t[l]','Pb207Pb206')
+        names(out$x) <- c('t[l]','76')
         if (fit$b[1]<0) { # negative slope => two intersections with concordia line
             midpoint <- stats::optimize(intersection.misfit.york, search.range,
                                         a=fit$a[1], b=fit$b[1],
@@ -45,6 +45,8 @@ concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
     hess <- stats::optimHess(out$x,LL.concordia.intersection.york,d=d,x=x,
                              wetherill=wetherill,exterr=exterr)
     out$cov <- solve(hess)
+    out$mswd <- fit$mswd
+    out$p.value <- fit$p.value
     out
 }
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
@@ -58,7 +60,12 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
         b0 <- fit$par['74i']
         names(out$x) <- c('t[l]','t[u]')
         buffer <- 1 # start searching 1Ma above or below first intercept age
-        if (fit$par['64i'] > 0){ # positive slope
+        l5 <- lambda('U235')[1]
+        l8 <- lambda('U238')[1]
+        R <- iratio('U238U235')[1]
+        disc.slope <- fit$par['64i']/(fit$par['74i']*R)
+        conc.slope <- (l8*exp(l8*t1))/(l5*exp(l5*t1))
+        if (conc.slope > disc.slope){
             search.range <- c(t1+buffer,10000)
             t1.name <- 't[l]'
             t2.name <- 't[u]'
@@ -75,14 +82,16 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
         J <- J.lud2york(t1,t2,a0,b0)
         out$cov <- J %*% fit$cov %*% t(J)
     } else {
-        names(out$x) <- c('t[l]','Pb207Pb206')
+        names(out$x) <- c('t[l]','76')
         out$x['t[l]'] <- fit$par['t']
-        out$x['Pb207Pb206'] <- fit$par['74i']/fit$par['64i']
+        out$x['76'] <- fit$par['74i']/fit$par['64i']
         J[1,1] <- 1
-        J[2,2] <- -out$x['Pb207Pb206']/fit$par['64i']
+        J[2,2] <- -out$x['76']/fit$par['64i']
         J[2,3] <- 1/fit$par['64i']
         out$cov <- J %*% fit$cov %*% t(J)
     }
+    out$mswd <- fit$mswd
+    out$p.value <- fit$p.value
     out
 }
 J.lud2york <- function(t1,t2,a0,b0){
@@ -233,7 +242,7 @@ discordia.plot <- function(fit,wetherill){
     } else {
         X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'])[,'86']
         Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'])[,'76']
-        Y[2] <- fit$x['Pb207Pb206']
+        Y[2] <- fit$x['76']
     }
     graphics::lines(X,Y)
 }
@@ -254,6 +263,10 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         line2 <- substitute('('^207*'Pb/'^206*'Pb)'[0]~'='~a%+-%b,
                               list(a=intercept[1], b=intercept[2]))
     }
-    graphics::mtext(line1,line=1)
-    graphics::mtext(line2,line=0)
+    line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+                        list(a=signif(fit$mswd,sigdig),
+                             b=signif(fit$p.value,sigdig)))
+    graphics::mtext(line1,line=2)
+    graphics::mtext(line2,line=1)
+    graphics::mtext(line3,line=0)
 }

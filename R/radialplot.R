@@ -100,8 +100,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
-                           cutoff.76=1100, cutoff.disc=c(-15,5),
-                           show.numbers=FALSE, pch=21,bg='white',
+                           cutoff.76=1100,cutoff.disc=c(-15,5),
+                           show.numbers=FALSE,pch=21,bg='white',
                            markers=NULL,k=0,exterr=TRUE,...){
     radialplot_helper(x,from=from,to=to,t0=t0,
                       transformation=transformation,type=type,

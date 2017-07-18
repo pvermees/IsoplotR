@@ -31,7 +31,7 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
     if (exterr){
         init <- ludwig(x,exterr=FALSE)$par
     } else {
-        t0 <- discordia.age(x,wetherill=TRUE,exterr=FALSE)$x[1]
+        t0 <- concordia.intersection.york(x,wetherill=TRUE,exterr=FALSE)$x[1]
         init <- c(t0,10,10)
     }
     fit <- optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)
@@ -243,7 +243,7 @@ LL.lud.UPb <- function(ta0b0,x,exterr=FALSE){
                 r[i]*phi[i]*omega[2,3] )
         }
     }
-    SS
+    SS/2
 }
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
