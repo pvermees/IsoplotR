@@ -48,7 +48,7 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
     concordia.line(x,limits=limits,wetherill=wetherill,
                    col=concordia.col,alpha=alpha,exterr=exterr)
     if (show.age==3){
-        fit <- discordia.age(x,wetherill=wetherill,exterr=exterr)
+        fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
         discordia.plot(fit,wetherill=wetherill)
         title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }
@@ -206,7 +206,7 @@ concordia.age.UPb <- function(x,wetherill=TRUE,exterr=TRUE,...){
 concordia.comp <- function(x,wetherill=TRUE,exterr=TRUE){
     if (wetherill) out <- wetherill(x,1,exterr=exterr)
     else out <- tera.wasserburg(x,1,exterr=exterr)
-    fit.comp <- stats::optim(out$x, LL.concordia.comp.default,
+    fit.comp <- stats::optim(out$x[1:2], LL.concordia.comp.default,
                              x=x, wetherill=wetherill,
                              method="BFGS", hessian=TRUE)
     out$x <- fit.comp$par
@@ -245,7 +245,7 @@ LL.concordia.comp.default <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
     for (i in 1:length(x)){
         if (wetherill) xi <- wetherill(x,i)
         else xi <- tera.wasserburg(x,i)
-        X <- matrix(xi$x[1:2]-mu,1,2)
+        X <- matrix(xi$x[1:2]-mu[1:2],1,2)
         covmat <- xi$cov[1:2,1:2]
         if (mswd) out <- out + get.concordia.SS(X,covmat)
         else out <- out + LL.norm(X,covmat)

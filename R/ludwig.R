@@ -343,7 +343,7 @@ data2ludwig_with_decay_err <- function(x,a0,b0,tt){
             j3 <- j + 2*ns
             W[i] <- W[i] - R[j] * (U*b0*omega[i1,j1] + a0*omega[i2,j1] + omega[i3,j1]) -
                            r[j] * (U*b0*omega[i1,j2] + a0*omega[i2,j2] + omega[i3,j2])
-#            V[i,j] <- U*b0*omega[i1,j3] + a0*omega[i2,j3] + omega[i3,j3]
+            # Ludwig (1998): V[i,j] <- U*b0*omega[i1,j3] + a0*omega[i2,j3] + omega[i3,j3]
             V[i,j] <- omega[i1,j1]*(U*b0)^2 + omega[i2,j2]*a0^2 + omega[i3,j3] +
                       2*(U*a0*b0*omega[i1,j2] + U*b0*omega[i1,j3] + a0*omega[i2,j3])
         }
