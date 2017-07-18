@@ -67,7 +67,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,...){
     }  else if (x$format == 3){
         out <- ages2peaks(x,k,log=log)
     } else {
-        out <- peakfit.helper(x,k=k,sigdig=sigdig,log=log,
+        out <- peakfit_helper(x,k=k,sigdig=sigdig,log=log,
                               exterr=exterr,...)
     }
     out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
@@ -96,7 +96,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,...){
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
                         cutoff.disc=c(-15,5),exterr=TRUE,
                         sigdig=2,log=TRUE,...){
-    peakfit.helper(x,k=k,type=type,cutoff.76=cutoff.76,
+    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,exterr=exterr,
                    sigdig=sigdig,log=log,...)
 }
@@ -112,49 +112,51 @@ peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
 #' @rdname peakfit
 #' @export
 peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
-    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,...){
-    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.ReOs <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
-    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.SmNd <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
-    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.RbSr <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
-    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,log=TRUE,i2i=TRUE,...){
-    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2,log=TRUE,i2i=TRUE,...){
-    peakfit.helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,...){
-    peakfit.helper(x,k=k,sigdig=sigdig,log=log,...)
+    peakfit_helper(x,k=k,sigdig=sigdig,log=log,...)
 }
-peakfit.helper <- function(x,k=1,type=4,cutoff.76=1100,
+peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,
                            cutoff.disc=c(-15,5),exterr=TRUE,sigdig=2,
                            log=TRUE,i2i=FALSE,...){
     if (k<1) return(NULL)
-    if (identical(k,'auto')) k <- BIC_fit(x,5,log=log)
-    fit <- ages2peaks(x,k=k,log=log,i2i=i2i)
+    if (identical(k,'auto'))
+        k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
+    fit <- ages2peaks(x,k=k,log=log,i2i=i2i,type=type,
+                      cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -371,11 +373,13 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
     list(peaks=peaks,peaks.err=peaks.err)
 }
 
-BIC_fit <- function(x,max.k,...){
+BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,
+                    cutoff.disc=c(-15,5),exterr=TRUE,...){
     n <- length(x)
     BIC <- Inf
     for (k in 1:max.k){
-        fit <- peakfit(x,k,...)
+        fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
+                       cutoff.disc=cutoff.disc,exterr=exterr,...)
         p <- 2*k-1
         newBIC <- -2*fit$L+p*log(n)
         if (newBIC<BIC) {

@@ -210,7 +210,8 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,
                              show.numbers=FALSE,pch=21,bg='white',
                              markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
                              ...){
-    peaks <- peakfit(x,k=k,exterr=exterr,i2i=i2i)
+    peaks <- peakfit(x,k=k,exterr=exterr,i2i=i2i,type=type,
+                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
     markers <- c(markers,peaks$peaks)
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
