@@ -44,11 +44,11 @@
 #' @export
 concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                      exterr=TRUE,show.age=1,sigdig=2,common.Pb=FALSE){
-    if (common.Pb) X <- common.Pb.correction(x)
+                      exterr=TRUE,show.age=1,sigdig=2,common.Pb=-1){
+    if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
     concordia.line(X,limits=limits,wetherill=wetherill,
-                   col=concordia.col,alpha=alpha)
+                   col=concordia.col,alpha=alpha,exterr=exterr)
     if (show.age==3){
         fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
         discordia.plot(fit,wetherill=wetherill)

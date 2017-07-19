@@ -542,16 +542,31 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
     out
 }
 
-common.Pb.correction <- function(x,i64=NULL,i74=NULL){
+# option = 1: isochron
+# option = 2: Stacey-Kramers
+common.Pb.correction <- function(x,option=2,i64=NULL,i74=NULL){
+    ns <- length(x)
     out <- x
-    if (x$format>3){
-        ns <- length(x)
+    U238U235 <- settings('iratio','U238U235')[1]
+    if (option == 1){
         lud <- ludwig(x)
         i64 <- lud$par['64i']
         i74 <- lud$par['74i']
-        U238U235 <- iratio('U238U235')[1]
+    } else if (option == 2){
+        # Stacey-Kramers ratios:
+        sk.206.204 <- 18.700
+        sk.207.204 <- 15.628
+        sk.208.204 <- 38.63
+        sk.238.204 <- 9.74
+        sk.232.204 <- 36.84
+        sk.232.238 <- 3.78
+        l5 <- lambda('U235')[1]
+        l8 <- lambda('U238')[1]
+        tt <- age(x)
+        i64 <- sk.206.204 - sk.238.204*(exp(l8*tt[,'t.conc'])-1)
+        i74 <- sk.207.204 - sk.238.204*(exp(l5*tt[,'t.conc'])-1)/U238U235
     }
-    if (x$format==4){
+    if (x$format == 4){
         out$x <- matrix(0,ns,5)
         colnames(out$x) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
         out$x[,'Pb207U235'] <- x$x[,'Pb207U235'] - i74*x$x[,'Pb204U238']*U238U235
@@ -560,7 +575,7 @@ common.Pb.correction <- function(x,i64=NULL,i74=NULL){
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
         out$x[,'rhoXY'] <- x$x[,'rhoXY']
         out$format <- 1
-    } else if (x$format==5){
+    } else if (x$format == 5){
         out$x <- matrix(0,ns,5)
         colnames(out$x) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rhoXY')
         out$x[,'U238Pb206'] <- x$x[,'U238Pb206']/(1 - i64*x$x[,'Pb204Pb206'])
@@ -570,7 +585,7 @@ common.Pb.correction <- function(x,i64=NULL,i74=NULL){
         out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']
         out$x[,'rhoXY'] <- x$x[,'rhoXY']
         out$format <- 2
-    } else if (x$format==6){
+    } else if (x$format == 6){
         out$x <- matrix(0,ns,9)
         colnames(out$x) <- c('Pb207Pb206','errPb207Pb206',
                              'Pb207U235','errPb207U235',
