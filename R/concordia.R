@@ -32,6 +32,14 @@
 #'
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
+#' @param common.Pb apply a common Pb correction using either
+#'
+#' \code{1}: the isochron intercept
+#'
+#' \code{2}: the Stacey-Kramer two-stage model
+#'
+#' \code{3}: the Pb-composition of troilite lead
+#'
 #' @importFrom grDevices rgb
 #' @importFrom graphics polygon title points text
 #' @importFrom stats pchisq

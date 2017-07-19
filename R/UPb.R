@@ -544,7 +544,8 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
 
 # option = 1: isochron
 # option = 2: Stacey-Kramers
-common.Pb.correction <- function(x,option=2,i64=NULL,i74=NULL){
+# option = 3: assumed Pb-composition
+common.Pb.correction <- function(x,option=2){
     ns <- length(x)
     out <- x
     U238U235 <- settings('iratio','U238U235')[1]
@@ -565,6 +566,11 @@ common.Pb.correction <- function(x,option=2,i64=NULL,i74=NULL){
         tt <- age(x)
         i64 <- sk.206.204 - sk.238.204*(exp(l8*tt[,'t.conc'])-1)
         i74 <- sk.207.204 - sk.238.204*(exp(l5*tt[,'t.conc'])-1)/U238U235
+    } else if (option == 3){
+        i64 <- settings('iratio','Pb206Pb204')[1]
+        i74 <- settings('iratio','Pb207Pb204')[1]
+    } else {
+        return(out)
     }
     if (x$format == 4){
         out$x <- matrix(0,ns,5)
