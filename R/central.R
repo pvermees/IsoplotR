@@ -103,21 +103,20 @@ central.UThHe <- function(x,...){
         cc <- uvw2UThHe(out$uvw,out$covmat)
         out$age <- get.UThHe.age(cc['U'],cc['sU'],cc['Th'],cc['sTh'],
                                  cc['He'],cc['sHe'],cc['Sm'],cc['sSm'])
-        SS <- SS.UThHe.uv(out$uvw[1:2],x)
     } else {
         uv <- UThHe2uv(x)
         fit <- stats::optim(c(0,0),SS.UThHe.uv,method='BFGS',
                             hessian=TRUE,x=x)
-        out$uv <- fit$par
+        out$uvw <- fit$par
         out$covmat <- solve(fit$hessian)
         nms <- c('u','v')
         cc <- uv2UThHe(out$uv,out$covmat)
         out$age <- get.UThHe.age(cc['U'],cc['sU'],
                                  cc['Th'],cc['sTh'],
                                  cc['He'],cc['sHe'])
-        SS <- SS.UThHe.uv(out$uv,x)
     }
-    names(out$uv) <- nms
+    SS <- SS.UThHe.uv(out$uvw[1:2],x)
+    names(out$uvw) <- nms
     colnames(out$covmat) <- nms
     rownames(out$covmat) <- nms
     out$mswd <- SS/df

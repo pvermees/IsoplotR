@@ -504,6 +504,7 @@ as.UThHe <- function(x){
     nr <- nrow(x)
     out <- matrix(0,nr-1,nc)
     out[1:(nr-1),1:nc] <- shiny2matrix(x,2,nr,nc)
+    out[out<=0] <- NA
     if (nc==8) {
         colnames(out) <- c('He','errHe','U','errU','Th','errTh','Sm','errSm')
     } else if (nc==6) {

@@ -70,5 +70,5 @@ f147Sm <- function(){
 }
 
 doSm <- function(x){
-    ncol(x) == 8
+    (ncol(x) == 8) && all(is.finite(x[,c(7,8)]) && all(x[,c(7,8)]>0))
 }

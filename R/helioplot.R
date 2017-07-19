@@ -80,49 +80,27 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
 
 plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
                                    ellipse.col=rgb(0,1,0,0.5)){
-    valid <- is.finite(rowSums(x))
-    X <- x[valid,]
-    ns <- nrow(X)
-    doSm <- doSm(X)
+    ns <- nrow(x)
     for (i in 1:ns){
-        if (doSm){
-            uvwc <- UThHe2uvw.covmat(X,i)
-            x0 <- uvwc$uvw[1]
-            y0 <- uvwc$uvw[2]
-            ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
-        } else {
-            uvc <- UThHe2uv.covmat(X,i)
-            x0 <- uvc$uv[1]
-            y0 <- uvc$uv[2]
-            ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
-        }
+        uvc <- UThHe2uv.covmat(x,i)
+        x0 <- uvc$uv[1]
+        y0 <- uvc$uv[2]
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
         graphics::polygon(ell,col=ellipse.col)
         graphics::points(x0,y0,pch=19,cex=0.25)
         if (show.numbers) graphics::text(x0,y0,i)
     }
-   
 }
 plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
                                     show.numbers=FALSE,
                                     ellipse.col=rgb(0,1,0,0.5)){
-    valid <- is.finite(rowSums(x))
-    X <- x[valid,]
-    ns <- nrow(X)
-    doSm <- doSm(X)
+    ns <- nrow(x)
     for (i in 1:ns){
-        if (doSm){
-            uvwc <- UThHe2uvw.covmat(X,i)
-            x0 <- uvwc$uvw[1]
-            y0 <- uvwc$uvw[2]
-            ell <- ellipse(x=x0,y=y0,covmat=uvwc$covmat,alpha=alpha)
-            HeUTh0 <- uv2HeUTh(uvwc$uvw[1:2])
-        } else {
-            uvc <- UThHe2uv.covmat(X,i)
-            x0 <- uvc$uv[1]
-            y0 <- uvc$uv[2]
-            ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
-            HeUTh0 <- uv2HeUTh(uvc$uv)
-        }
+        uvc <- UThHe2uv.covmat(x,i)
+        x0 <- uvc$uv[1]
+        y0 <- uvc$uv[2]
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
+        HeUTh0 <- uv2HeUTh(uvc$uv)
         HeUTh <- uv2HeUTh(ell)
         xyz <- renormalise(HeUTh,fact=fact)
         xy <- xyz2xy(xyz)
@@ -136,13 +114,8 @@ plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
 
 plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
                                  alpha=0.05,doSm=TRUE,...){
-    if (doSm){
-        ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
-                       covmat=fit$covmat[1:2,1:2],alpha=alpha)
-    } else {
-        ell <- ellipse(x=fit$uv[1],y=fit$uv[2],
-                       covmat=fit$covmat,alpha=alpha)
-    }
+    ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
+                   covmat=fit$covmat[1:2,1:2],alpha=alpha)
     if (logratio){
         graphics::polygon(ell,col='white')
     } else {
@@ -241,14 +214,13 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
     L7 <- lambda('Sm147')[1]
     f147 <- f147Sm()[1]
     doSm <- doSm(x)
+    out$lims <- get.logratioplot.limits(x)
     if (doSm){
-        uvw <- UThHe2uvw(x)
-        out$lims <- get.logratioplot.limits(uvw[,c('u','v')])
+        uvw <- UThHe2uvw(x)        
         w <- mean(uvw[,'w'],na.rm=TRUE)
         Sm <- geomean.Sm(x)
     } else {
         uv <- UThHe2uv(x)
-        out$lims <- get.logratioplot.limits(uv)
         w <- 0
         Sm <- 0
     }
@@ -341,15 +313,26 @@ get.tticks <- function(mint,maxt){
     grDevices::axisTicks(usr=c(m,M),log=TRUE)
 }
 
-get.logratioplot.limits <- function(uv,f=1){
-    ru <- range(uv[,1],na.rm=TRUE)
-    rv <- range(uv[,2],na.rm=TRUE)
-    du <- diff(ru)
-    dv <- diff(rv)
-    minu <- ru[1] - f*du
-    maxu <- ru[2] + f*du
-    minv <- rv[1] - f*dv
-    maxv <- rv[2] + f*dv
+get.logratioplot.limits <- function(x,nse=3){
+    ns <- length(x)
+    doSm <- doSm(x)
+    minu <- Inf
+    maxu <- -Inf
+    minv <- Inf
+    maxv <- -Inf
+    for (i in 1:ns){
+        d <- UThHe2uv.covmat(x,i)
+        uv <- d$uv
+        uv.err <- sqrt(diag(d$covmat)[c('u','v')])
+        umin <- uv['u'] - nse*uv.err['u']
+        umax <- uv['u'] + nse*uv.err['u']
+        vmin <- uv['v'] - nse*uv.err['v']
+        vmax <- uv['v'] + nse*uv.err['v']
+        if (umax>maxu) maxu <- umax
+        if (umin<minu) minu <- umin
+        if (vmax>maxv) maxv <- vmax
+        if (vmin<minv) minv <- vmin
+    }
     c(minu,maxu,minv,maxv)
 }
 
@@ -440,7 +423,6 @@ uv2HeUTh <- function(uv){
 }
 
 UThHe2uvw.covmat <- function(x,i){
-    out <- list()
     U <- x[i,'U']
     sU <- x[i,'errU']
     Th <- x[i,'Th']
@@ -449,20 +431,22 @@ UThHe2uvw.covmat <- function(x,i){
     sSm <- x[i,'errSm']
     He <- x[i,'He']
     sHe <- x[i,'errHe']
+    out <- list()
     out$uvw <- UThHe2uvw(x[i,])
     out$covmat <- matrix(0,3,3)
+    J <- matrix(0,3,4)
+    E <- matrix(0,4,4)
+    diag(E) <- c(sU,sTh,sSm,sHe)^2
+    J[1,1] <- 1/U   # du.dU
+    J[1,4] <- -1/He # du.dHe
+    J[2,2] <- 1/Th  # dv.dTh
+    J[2,4] <- -1/He # dv.dHe
+    J[3,3] <- 1/Sm  # dw.dSm
+    J[3,4] <- -1/He # dw.dHe
+    out$covmat <- J %*% E %*% t(J)
     names(out$uvw) <- c("u","v","w")
     rownames(out$covmat) <- c("u","v","w")
     colnames(out$covmat) <- c("u","v","w")
-    out$covmat[1,1] <- (sU/U)^2 + (sHe/(U*He))^2
-    out$covmat[2,2] <- (sTh/Th)^2 + (sHe/(Th*He))^2
-    out$covmat[3,3] <- (sSm/Sm)^2 + (sHe/(Sm*He))^2
-    out$covmat[1,2] <- (sHe^2)/(U*Th*He^2)
-    out$covmat[1,3] <- (sHe^2)/(U*Sm*He^2)
-    out$covmat[2,3] <- (sHe^2)/(Th*Sm*He^2)
-    out$covmat[2,1] <- out$covmat[1,2]
-    out$covmat[3,1] <- out$covmat[1,3]
-    out$covmat[3,2] <- out$covmat[2,3]
     out
 }
 UThHe2uv.covmat <- function(x,i){
@@ -475,13 +459,17 @@ UThHe2uv.covmat <- function(x,i){
     sHe <- x[i,'errHe']
     out$uv <- UThHe2uv(x[i,])
     out$covmat <- matrix(0,2,2)
+    J <- matrix(0,2,3)
+    E <- matrix(0,3,3)
+    diag(E) <- c(sU,sTh,sHe)^2
+    J[1,1] <- 1/U   # du.dU
+    J[1,3] <- -1/He # du.dHe
+    J[2,2] <- 1/Th  # dv.dTh
+    J[2,3] <- -1/He # dv.dHe
+    out$covmat <- J %*% E %*% t(J)
     names(out$uv) <- c("u","v")
     rownames(out$covmat) <- c("u","v")
     colnames(out$covmat) <- c("u","v")
-    out$covmat[1,1] <- (sU/U)^2 + (sHe/(U*He))^2
-    out$covmat[2,2] <- (sTh/Th)^2 + (sHe/(Th*He))^2
-    out$covmat[1,2] <- (sHe^2)/(U*Th*He^2)
-    out$covmat[2,1] <- out$covmat[1,2]
     out
 }
 
@@ -523,7 +511,6 @@ geomean.Sm <- function(x){
 }
 
 getfact <- function(x,fit){
-    if (doSm(x)) HeUTh <- uv2HeUTh(fit$uvw[1:2])
-    else HeUTh <- uv2HeUTh(fit$uv[1:2])
+    HeUTh <- uv2HeUTh(fit$uvw[1:2])
     fact <- signif(1/HeUTh,1)
 }
