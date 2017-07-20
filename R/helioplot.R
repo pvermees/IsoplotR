@@ -43,7 +43,8 @@ helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                       ylim=NA,fact=NA,...){
     fit <- central.UThHe(x)
     if (logratio) {
-        plot_logratio_contours(x,contour.col=contour.col,...)
+        plot_logratio_contours(x,contour.col=contour.col,
+                               xlim=xlim,ylim=ylim,...)
         plot_logratio_ellipses(x,alpha=alpha,ellipse.col=ellipse.col,
                                show.numbers=show.numbers)
     } else {
