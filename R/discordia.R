@@ -49,6 +49,14 @@ concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
     out$p.value <- fit$p.value
     out
 }
+# used by common Pb correction:
+project.concordia <- function(m76,m86,i76){
+    search.range <- c(1/10000,10000)
+    a <- i76
+    b <- (m76-i76)/m86
+    uniroot(intersection.misfit.york, search.range, 
+            a=a, b=b,wetherill=TRUE)$root    
+}
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     out <- list()
     fit <- ludwig(x,exterr=exterr)
