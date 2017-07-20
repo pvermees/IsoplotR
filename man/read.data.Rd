@@ -31,7 +31,9 @@ if \code{method='U-Pb'}, then \code{format} is one of either:
 \item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
 \item{\code{8/6, s[8/6], 7/6, s[7/6] (, rho)}}
 \item{\code{X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z] (, rho[X,Y]) (, rho[Y,Z])}}
-\item{\code{X=8/6, s[X], Y=7/6, s[Y], Z=4/6, rho[X,Y], rho[X,Z] , rho[Y,Z]}}
+\item{\code{X=7/5, s[X], Y=6/8, s[Y], Z=4/8, rho[X,Y], rho[X,Z], rho[Y,Z]}}
+\item{\code{X=8/6, s[X], Y=7/6, s[Y], Z=4/6, rho[X,Y], rho[X,Z], rho[Y,Z]}}
+\item{\code{7/5, s[7/5], 6/8, s[6/8], 4/8, s[4/8], 7/6, s[7/6], 4/7, s[4/7], 4/6, s[4/6]}}
 }
 
 where optional columns are marked in round brackets

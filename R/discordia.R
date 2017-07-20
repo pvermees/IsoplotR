@@ -51,11 +51,15 @@ concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
 }
 # used by common Pb correction:
 project.concordia <- function(m76,m86,i76){
-    search.range <- c(1/10000,10000)
+    if (i76>m76)
+        tend <- get.Pb206U238.age(1/m86)[1]
+    else
+        tend <- get.Pb207Pb206.age(m76)[1]
+    search.range <- c(1/10000,tend)
     a <- i76
     b <- (m76-i76)/m86
     uniroot(intersection.misfit.york, search.range, 
-            a=a, b=b,wetherill=TRUE)$root    
+            a=a,b=b,wetherill=FALSE)$root
 }
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     out <- list()

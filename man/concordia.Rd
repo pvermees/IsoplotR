@@ -6,7 +6,8 @@
 \usage{
 concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  concordia.col = "darksalmon", exterr = TRUE, show.age = 1, sigdig = 2)
+  concordia.col = "darksalmon", exterr = TRUE, show.age = 1, sigdig = 2,
+  common.Pb = 0)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -35,6 +36,14 @@ concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
 
 \item{sigdig}{number of significant digits for the
 concordia/discordia age}
+
+\item{common.Pb}{apply a common Pb correction using either:
+
+\code{1}: the isochron intercept
+
+\code{2}: the Stacey-Kramer two-stage model
+
+\code{3}: the Pb-composition of troilite lead}
 }
 \description{
 Plots U-Pb data on Wetherill and Tera-Wasserburg concordia

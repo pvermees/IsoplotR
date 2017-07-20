@@ -548,29 +548,64 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
 common.Pb.correction <- function(x,option=2){
     ns <- length(x)
     out <- x
-    U238U235 <- settings('iratio','U238U235')[1]
     if (option == 1) out <- common.Pb.isochron(x)
     else if (option == 2) out <- common.Pb.stacey.kramers(x)
     else out <- common.Pb.nominal(x)
     out
 }
 common.Pb.isochron <- function(x){
-    ns <- length(x)
-    out <- x
     if (x$format<4){
         d <- data2york(x,wetherill=FALSE)
         fit <- york(d)
         i76 <- fit$a[1]
-        m76 <- get.Pb207Pb206.ratios(x)[,1]
-        m86 <- get.U238Pb206.ratios(x)[,1]
-        tint <- rep(0,ns) # intercept age
-        for (i in 1:ns)
-            tint[i] <- project.concordia(m76[i],m86[i],i76)
     } else {
         lud <- ludwig(x)
         i64 <- lud$par['64i']
         i74 <- lud$par['74i']
-        U238U235 <- iratio('U238U235')[1]
+    }
+    if (x$format < 4)
+        out <- Pb.correction.without.204(x,i76)
+    else
+        out <- Pb.correction.with.204(x,i64,i74)
+    out
+}
+common.Pb.stacey.kramers <- function(x){
+    sk.206.204 <- 18.700
+    sk.207.204 <- 15.628
+    sk.238.204 <- 9.74
+    U238U235 <- settings('iratio','U238U235')[1]
+    l5 <- lambda('U235')[1]
+    l8 <- lambda('U238')[1]
+    tt <- age(x)
+    i64 <- sk.206.204 - sk.238.204*(exp(l8*tt[,'t.conc'])-1)
+    i74 <- sk.207.204 - sk.238.204*(exp(l5*tt[,'t.conc'])-1)/U238U235
+    if (x$format < 4)
+        out <- Pb.correction.without.204(x,i74/i64)
+    else
+        out <- Pb.correction.with.204(x,i64,i74)
+    out
+}
+common.Pb.nominal <- function(x){
+    i64 <- settings('iratio','Pb206Pb204')[1]
+    i74 <- settings('iratio','Pb207Pb204')[1]
+    if (x$format < 4)
+        out <- Pb.correction.without.204(x,i74/i64)
+    else
+        out <- Pb.correction.with.204(x,i64,i74)
+    out
+}
+Pb.correction.without.204 <- function(x,i76){
+    ns <- length(x)
+    ni <- length(i76)
+    out <- x
+    m76 <- get.Pb207Pb206.ratios(x)[,1]
+    m86 <- get.U238Pb206.ratios(x)[,1]
+    tint <- rep(0,ns) # intercept age
+    for (i in 1:ns){
+        if (ni>1)
+            tint[i] <- project.concordia(m76[i],m86[i],i76[i])
+        else
+            tint[i] <- project.concordia(m76[i],m86[i],i76)
     }
     if (x$format == 1){
         out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint)[,'75']
@@ -591,7 +626,14 @@ common.Pb.isochron <- function(x){
         out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
         out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint)[,'68']
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
-    } else if (x$format == 4){
+    }
+    out
+}
+Pb.correction.with.204 <- function(x,i64,i74){
+    ns <- length(x)
+    out <- x
+    U238U235 <- settings('iratio','U238U235')[1]
+    if (x$format == 4){
         out$x <- matrix(0,ns,5)
         colnames(out$x) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
         out$x[,'Pb207U235'] <- x$x[,'Pb207U235'] - i74*x$x[,'Pb204U238']*U238U235
@@ -625,22 +667,5 @@ common.Pb.isochron <- function(x){
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
         out$format <- 3
     }
-    out    
-}
-common.Pb.stacey.kramers <- function(x){
-    sk.206.204 <- 18.700
-    sk.207.204 <- 15.628
-    sk.208.204 <- 38.63
-    sk.238.204 <- 9.74
-    sk.232.204 <- 36.84
-    sk.232.238 <- 3.78
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    tt <- age(x)
-    i64 <- sk.206.204 - sk.238.204*(exp(l8*tt[,'t.conc'])-1)
-    i74 <- sk.207.204 - sk.238.204*(exp(l5*tt[,'t.conc'])-1)/U238U235
-}
-common.Pb.nominal <- function(x){
-    i64 <- settings('iratio','Pb206Pb204')[1]
-    i74 <- settings('iratio','Pb207Pb204')[1]
+    out
 }
