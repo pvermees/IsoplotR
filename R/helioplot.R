@@ -205,7 +205,7 @@ SS.UThHe.uv <- function(UV,x){
     SS
 }
 
-get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
+get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=50){
     out <- list()
     R <- iratio('U238U235')[1]
     L8 <- lambda('U238')[1]
@@ -223,6 +223,7 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
         uv <- UThHe2uv(x)
         w <- 0
         Sm <- 0
+        cc <- 0
     }
     if (all(is.finite(xlim))) out$lims[1:2] <- xlim
     if (all(is.finite(ylim))) out$lims[3:4] <- ylim
@@ -234,15 +235,19 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
     nt <- 0
     for (i in 1:length(tticks)){
         tt <- tticks[i]
-        aa <- 8*(exp(L8*tt)-1)*R/(1+R) +
-             7*(exp(L5*tt)-1)/(1+R)
+        aa <- 8*(exp(L8*tt)-1)*R/(1+R) + 7*(exp(L5*tt)-1)/(1+R)
         bb <- 6*(exp(L2*tt)-1)
-        if (doSm)
-            cc <- f147*(exp(L7*tt)-1)
-        else
-            cc <- 0
+        if (doSm) cc <- f147*(exp(L7*tt)-1)
         uv.plot <- NULL
-        for (j in 1:res){
+        # evaluate the maximum v value
+        pred.exp.u <- 1-bb*exp(out$lims[4])-cc*exp(w)
+        if (pred.exp.u > 0){
+            u4maxv <- log(pred.exp.u) - log(aa)
+            if (u4maxv > out$lims[1] && u4maxv < out$lims[2])
+                uv.plot <- rbind(uv.plot,c(u4maxv,out$lims[4]))
+        }
+        # evaluate all the whole range of u values
+        for (j in 0:res){
             u <- out$lims[1]+du*j/res
             exp.v <- (1-aa*exp(u)-cc*exp(w))/bb
             if (exp.v > exp(out$lims[3]) & exp.v < exp(out$lims[4])){
@@ -250,6 +255,14 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
                 uv.plot <- rbind(uv.plot,c(u,v))
             }
         }
+        # evaluate the minimum v value
+        pred.exp.u <- 1-bb*exp(out$lims[3])-cc*exp(w)
+        if (pred.exp.u > 0){
+            u4minv <- log(pred.exp.u) - log(aa)
+            if (u4minv > out$lims[1] && u4minv < out$lims[2])
+                uv.plot <- rbind(uv.plot,c(u4minv,out$lims[3]))
+        }
+        # add to the list if any solutions were found
         if (!is.null(uv.plot)){
             nt <- nt + 1
             out$tticks[nt] <- tt
@@ -258,7 +271,7 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=500){
     }
     out
 }
-get.helioplot.contours <- function(x,fact=c(1,1,1),res=100){
+get.helioplot.contours <- function(x,fact=c(1,1,1),res=50){
     out <- list()
     doSm <- doSm(x)
     if (doSm){

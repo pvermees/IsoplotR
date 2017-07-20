@@ -550,11 +550,12 @@ common.Pb.correction <- function(x,option=2){
     out <- x
     U238U235 <- settings('iratio','U238U235')[1]
     if (option == 1){
+        # add option for semi-total Pb!
         lud <- ludwig(x)
         i64 <- lud$par['64i']
         i74 <- lud$par['74i']
     } else if (option == 2){
-        # Stacey-Kramers ratios:
+        # modern U-Pb composition of the crust (Stacey-Kramers):
         sk.206.204 <- 18.700
         sk.207.204 <- 15.628
         sk.208.204 <- 38.63
@@ -572,7 +573,11 @@ common.Pb.correction <- function(x,option=2){
     } else {
         return(out)
     }
-    if (x$format == 4){
+    if (x$format == 1){
+        for (i in 1:ns){
+            # concordia intercept
+        }
+    } else if (x$format == 4){
         out$x <- matrix(0,ns,5)
         colnames(out$x) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
         out$x[,'Pb207U235'] <- x$x[,'Pb207U235'] - i74*x$x[,'Pb204U238']*U238U235
