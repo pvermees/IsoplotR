@@ -21,7 +21,7 @@ age(x, ...)
   NA), zeta = c(NA, NA), rhoD = c(NA, NA), ...)
 
 \method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE, i = NA,
-  sigdig = NA, ...)
+  sigdig = NA, common.Pb = 0, ...)
 
 \method{age}{PbPb}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -127,6 +127,18 @@ be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 \item{sigdig}{number of significant digits for the uncertainty
 estimate (only used if \code{type=1}, \code{isochron=FALSE}
 or \code{central=FALSE}).}
+
+\item{common.Pb}{apply a common lead correction using one of three
+    methods:
+
+\code{1}: use the isochron intercept as the initial Pb-composition
+
+\code{2}: use the Stacey-Kramer two-stage model to infer the initial
+Pb-composition
+
+\code{3}: use the Pb-composition stored in
+\code{settings('iratio','Pb206Pb204')} and
+\code{settings('iratio','Pb207Pb204')}}
 
 \item{isochron}{logical flag indicating whether each Ar-Ar analysis
 should be considered separately (\code{isochron=FALSE}) or an

@@ -104,14 +104,31 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' @param common.Pb apply a common lead correction using one of three
+#'     methods:
+#'
+#' \code{1}: use the isochron intercept as the initial Pb-composition
+#'
+#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' Pb-composition
+#'
+#' \code{3}: use the Pb-composition stored in
+#' \code{settings('iratio','Pb206Pb204')} and
+#' \code{settings('iratio','Pb207Pb204')}
+#'
 #' @rdname kde
 #' @export
 kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,pch=NA,xlab="age [Ma]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                     show.hist=TRUE, bty='n',binwidth=NA,ncol=NA,
-                    type=4,cutoff.76=1100,cutoff.disc=c(-15,5),...){
-    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc)[,1]
+                    type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+                    common.Pb=0,...){
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
+    tt <- filter.UPb.ages(X,type,cutoff.76,cutoff.disc)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col, hist.col=hist.col,

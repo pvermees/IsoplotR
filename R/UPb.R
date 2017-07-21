@@ -547,10 +547,10 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
 # option = 3: assumed Pb-composition
 common.Pb.correction <- function(x,option=2){
     ns <- length(x)
-    out <- x
     if (option == 1) out <- common.Pb.isochron(x)
     else if (option == 2) out <- common.Pb.stacey.kramers(x)
-    else out <- common.Pb.nominal(x)
+    else if (option == 3) out <- common.Pb.nominal(x)
+    else out <- x
     out
 }
 common.Pb.isochron <- function(x){

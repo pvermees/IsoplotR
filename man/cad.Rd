@@ -26,7 +26,7 @@ cad(x, ...)
 
 \method{cad}{UPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
-  ...)
+  common.Pb = 0, ...)
 
 \method{cad}{PbPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", i2i = FALSE, ...)
@@ -100,6 +100,18 @@ the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
+
+\item{common.Pb}{apply a common lead correction using one of three
+    methods:
+
+\code{1}: use the isochron intercept as the initial Pb-composition
+
+\code{2}: use the Stacey-Kramer two-stage model to infer the initial
+Pb-composition
+
+\code{3}: use the Pb-composition stored in
+\code{settings('iratio','Pb206Pb204')} and
+\code{settings('iratio','Pb207Pb204')}}
 
 \item{i2i}{`isochron to intercept': calculates the initial
 (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,

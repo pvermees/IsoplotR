@@ -93,6 +93,18 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
 #' @param exterr propagate decay constant uncertainty?
+#' @param common.Pb apply a common lead correction using one of three
+#'     methods:
+#'
+#' \code{1}: use the isochron intercept as the initial Pb-composition
+#'
+#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' Pb-composition
+#'
+#' \code{3}: use the Pb-composition stored in
+#' \code{settings('iratio','Pb206Pb204')} and
+#' \code{settings('iratio','Pb207Pb204')}
+#'
 #' @examples
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
@@ -106,8 +118,12 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
                              outlier.col=rgb(0,1,1,0.5),
                              sigdig=2,type=4,cutoff.76=1100,
                              cutoff.disc=c(-15,5),alpha=0.05,
-                             exterr=TRUE,...){
-    weightedmean.helper(x,detect.outliers=detect.outliers,plot=plot,
+                             exterr=TRUE,common.Pb=0,...){
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
+    weightedmean.helper(X,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         type=type,cutoff.76=cutoff.76,
                         cutoff.disc=cutoff.disc,sigdig=sigdig,

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.7.9)  20 JUL 2017 23:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.7.9)  21 JUL 2017 12:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -709,7 +709,7 @@ File: latin1.def 2015/03/17 v1.2c Input encoding file
 
 
 Writing index file Rd2.idx
-(/tmp/RtmpeyNHiw/Rd2pdf137f2755e247/Rd2.aux)
+(/tmp/Rtmp4g09uQ/Rd2pdf533c49178600/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -766,8 +766,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/tmp/RtmpeyNHiw/Rd2pdf137f2755e247/Rd2.out)
-(/tmp/RtmpeyNHiw/Rd2pdf137f2755e247/Rd2.out)
+(/tmp/Rtmp4g09uQ/Rd2pdf533c49178600/Rd2.out)
+(/tmp/Rtmp4g09uQ/Rd2pdf533c49178600/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -798,7 +798,7 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 28.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
-(/tmp/RtmpeyNHiw/Rd2pdf137f2755e247/Rd2.toc [1
+(/tmp/Rtmp4g09uQ/Rd2pdf533c49178600/Rd2.toc [1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -846,13 +846,13 @@ n/10 ,
  []
 
 [3]
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 188--197
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 200--209
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
  []
 
 [4]
-Overfull \hbox (30.98386pt too wide) in paragraph at lines 311--314
+Overfull \hbox (30.98386pt too wide) in paragraph at lines 323--326
 []\T1/ptm/m/n/10 the best fit-ting $[]\OML/cmm/m/it/10 U=[]U$ \T1/ptm/m/n/10 in
 -ter-cept, $[]\OML/cmm/m/it/10 U=[]Th$ \T1/ptm/m/n/10 slope, $[]\OML/cmm/m/it/1
 0 Th=[]U$ \T1/ptm/m/n/10 in-ter-cept and $[]\OML/cmm/m/it/10 Th=[]Th$
@@ -860,16 +860,16 @@ Overfull \hbox (30.98386pt too wide) in paragraph at lines 311--314
 
 [5] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-)
-Overfull \hbox (13.88815pt too wide) in paragraph at lines 443--448
+) [6]
+Overfull \hbox (13.88815pt too wide) in paragraph at lines 455--460
 []\T1/ptm/m/n/10 logical flag in-di-cat-ing whether a plateau age should be cal
 -cu-lated. If \T1/zi4/m/n/10 plateau=TRUE\T1/ptm/m/n/10 ,
  []
 
-[6] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [7] [8]
-Overfull \hbox (7.6388pt too wide) in paragraph at lines 579--583
+Overfull \hbox (7.6388pt too wide) in paragraph at lines 591--595
 []\T1/ptm/m/n/10 a nu-mer-i-cal vec-tor OR an ob-ject of class \T1/zi4/m/n/10 U
 Pb\T1/ptm/m/n/10 , \T1/zi4/m/n/10 PbPb\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ArAr\T1/p
 tm/m/n/10 , \T1/zi4/m/n/10 UThHe\T1/ptm/m/n/10 , \T1/zi4/m/n/10 fissiontracks\T
@@ -877,20 +877,20 @@ tm/m/n/10 , \T1/zi4/m/n/10 UThHe\T1/ptm/m/n/10 , \T1/zi4/m/n/10 fissiontracks\T
  []
 
 
-Overfull \hbox (9.08253pt too wide) in paragraph at lines 610--614
+Overfull \hbox (9.08253pt too wide) in paragraph at lines 622--626
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U-age and above wh
 ich the $[]$Pb/$[]$Pb-
  []
 
 
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 624--633
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 648--657
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
  []
 
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+[9] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [9] [10]
+) [10]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [11]
@@ -906,7 +906,7 @@ File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 )
-Overfull \hbox (3.81812pt too wide) in paragraph at lines 1123--1126
+Overfull \hbox (3.81812pt too wide) in paragraph at lines 1151--1154
 []\T1/ptm/m/n/10 Boolean flag in-di-cat-ing whether the data should be shown on
  bi-vari-ate log[He/Th]
  []
@@ -914,36 +914,37 @@ Overfull \hbox (3.81812pt too wide) in paragraph at lines 1123--1126
 [16] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [17] [18]
-Overfull \hbox (25.33423pt too wide) in paragraph at lines 1339--1343
+Overfull \hbox (25.33423pt too wide) in paragraph at lines 1367--1371
 []\T1/ptm/m/n/10 the at-mo-spheric $[]$Ar/$[]$Ar or ini-tial $[]$Pb/$[]$Pb, $[]
 $Os/$[]$Os, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd or $[]$Hf/$[]$Hf
  []
 
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+[19] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [19] [20]
+) [20]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [21]
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 1599--1608
+[22]
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 1639--1648
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
  []
 
-[22] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+[23] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [23]
+)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [24]
-Overfull \hbox (4.89603pt too wide) in paragraph at lines 1735--1737
+Overfull \hbox (4.89603pt too wide) in paragraph at lines 1775--1777
 []\T1/ptm/m/n/10 logical flag in-di-cat-ing whether clas-si-cal (\T1/zi4/m/n/10
  TRUE\T1/ptm/m/n/10 ) or non-metric (\T1/zi4/m/n/10 FALSE\T1/ptm/m/n/10 ) MDS s
 hould
  []
 
 
-Overfull \hbox (16.32802pt too wide) in paragraph at lines 1738--1740
+Overfull \hbox (16.32802pt too wide) in paragraph at lines 1778--1780
 []\T1/ptm/m/n/10 show the MDS con-fig-u-ra-tion (if \T1/zi4/m/n/10 shepard=FALS
 E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 0 )
@@ -951,71 +952,74 @@ E\T1/ptm/m/n/10 ) or Shep-ard plot (if \T1/zi4/m/n/10 shepard=TRUE\T1/ptm/m/n/1
 
 [25] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [26]
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 1909--1918
-\T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
-, $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
- []
-
-[27] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [28] [29]
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 2099--2108
+) [26] [27]
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 1949--1958
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
  []
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [30]
-Overfull \hbox (6.75084pt too wide) in paragraph at lines 2166--2167
+) [28]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [29]
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 2151--2160
+\T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
+, $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
+ []
+
+[30] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
+)
+Overfull \hbox (6.75084pt too wide) in paragraph at lines 2218--2219
 []\T1/zi4/m/n/10 X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z] (, rho[X,Y]) (, rho[Y,Z]
 ) 
  []
 
 
-Overfull \hbox (69.75084pt too wide) in paragraph at lines 2169--2170
+Overfull \hbox (69.75084pt too wide) in paragraph at lines 2221--2222
 []\T1/zi4/m/n/10 7/5, s[7/5], 6/8, s[6/8], 4/8, s[4/8], 7/6, s[7/6], 4/7, s[4/7
 ], 4/6, s[4/6] 
  []
 
-
-Overfull \hbox (15.75084pt too wide) in paragraph at lines 2214--2215
+[31]
+Overfull \hbox (15.75084pt too wide) in paragraph at lines 2266--2267
 []\T1/zi4/m/n/10 Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144] (, rh
 o) 
  []
 
-[31]
-Overfull \hbox (15.75084pt too wide) in paragraph at lines 2226--2227
+
+Overfull \hbox (15.75084pt too wide) in paragraph at lines 2278--2279
 []\T1/zi4/m/n/10 Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188] (, rh
 o) 
  []
 
 
-Overfull \hbox (15.75084pt too wide) in paragraph at lines 2238--2239
+Overfull \hbox (15.75084pt too wide) in paragraph at lines 2290--2291
 []\T1/zi4/m/n/10 Lu176/Hf177, s[Lu176/Hf177], Hf176/Hf177, s[Hf176/Hf177] (, rh
 o) 
  []
 
 
-Overfull \hbox (27.75084pt too wide) in paragraph at lines 2250--2251
+Overfull \hbox (27.75084pt too wide) in paragraph at lines 2302--2303
 []\T1/zi4/m/n/10 X=8/2, s[X], Y=4/2, s[Y], Z=0/2, s[Z], rho[X,Y], rho[X,Z], rho
 [Y,Z] 
  []
 
 
-Overfull \hbox (27.75084pt too wide) in paragraph at lines 2251--2252
+Overfull \hbox (27.75084pt too wide) in paragraph at lines 2303--2304
 []\T1/zi4/m/n/10 X=2/8, s[X], Y=4/8, s[Y], Z=0/8, s[Z], rho[X,Y], rho[X,Z], rho
 [Y,Z] 
  []
 
-[32] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
-File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [33]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+[32] [33] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [34]
-Overfull \hbox (35.85094pt too wide) in paragraph at lines 2455--2469
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
+)
+Overfull \hbox (35.85094pt too wide) in paragraph at lines 2507--2521
 \T1/zi4/m/n/10 "Ar38Ar36"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Rb85Rb87"\T1/ptm/m/n/
 10 , \T1/zi4/m/n/10 "Sr88Sr86"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr87Sr86"\T1/ptm
 /m/n/10 , \T1/zi4/m/n/10 "Sr84Sr86"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Re185Re187"
@@ -1023,42 +1027,42 @@ Overfull \hbox (35.85094pt too wide) in paragraph at lines 2455--2469
  []
 
 
-Overfull \hbox (18.71092pt too wide) in paragraph at lines 2455--2469
+Overfull \hbox (18.71092pt too wide) in paragraph at lines 2507--2521
 \T1/zi4/m/n/10 "Os184Os192" "Os186Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os187O
 s192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os188Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Os189Os192"\T1/ptm/m/n/10 ,
  []
 
 
-Overfull \hbox (11.33092pt too wide) in paragraph at lines 2455--2469
+Overfull \hbox (11.33092pt too wide) in paragraph at lines 2507--2521
 \T1/zi4/m/n/10 "Os190Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "U238U235"\T1/ptm/m/
 n/10 , \T1/zi4/m/n/10 "Sm144Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm147Sm152"\
 T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm148Sm152"\T1/ptm/m/n/10 ,
  []
 
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 2455--2469
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 2507--2521
 \T1/zi4/m/n/10 "Sm149Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm150Sm152"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sm154Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd142Nd144
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd143Nd144"\T1/ptm/m/n/10 ,
  []
 
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 2455--2469
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 2507--2521
 \T1/zi4/m/n/10 "Nd145Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd146Nd144"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Nd148Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd150Nd144
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Lu176Lu175"\T1/ptm/m/n/10 ,
  []
 
 
-Overfull \hbox (22.16087pt too wide) in paragraph at lines 2455--2469
+Overfull \hbox (22.16087pt too wide) in paragraph at lines 2507--2521
 \T1/zi4/m/n/10 "Hf174Hf177"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf176Hf177"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Hf178Hf177"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf179Hf177
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf180Hf177"\T1/ptm/m/n/10 )
  []
 
 
-Overfull \hbox (9.411pt too wide) in paragraph at lines 2470--2479
+Overfull \hbox (9.411pt too wide) in paragraph at lines 2522--2531
 \T1/zi4/m/n/10 "Rb85"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Rb87"\T1/ptm/m/n/10 , \T1
 /zi4/m/n/10 "Sr84"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr86"\T1/ptm/m/n/10 , \T1/zi
 4/m/n/10 "Sr87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88"\T1/ptm/m/n/10 , \T1/zi4/m
@@ -1067,21 +1071,21 @@ Overfull \hbox (9.411pt too wide) in paragraph at lines 2470--2479
  []
 
 
-Overfull \hbox (8.05898pt too wide) in paragraph at lines 2480--2483
+Overfull \hbox (8.05898pt too wide) in paragraph at lines 2532--2535
 []\T1/ptm/m/n/10 for \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 mindens\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 : the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apati
 te" \T1/ptm/m/n/10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
  []
 
 [35]
-Overfull \hbox (14.49904pt too wide) in paragraph at lines 2488--2492
+Overfull \hbox (14.49904pt too wide) in paragraph at lines 2540--2544
 []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 tracklength\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 : 
 the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apatite" \T1/ptm/m/n
 /10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
  []
 
 [36]
-Overfull \hbox (1.38768pt too wide) in paragraph at lines 2599--2603
+Overfull \hbox (1.38768pt too wide) in paragraph at lines 2651--2655
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
  []
@@ -1091,17 +1095,14 @@ File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [37]
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
-) [38]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [39]
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 2797--2801
+) [38] [39]
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 2849--2853
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
  []
 
 
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 2813--2822
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 2877--2886
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
  []
@@ -1109,20 +1110,20 @@ Overfull \hbox (15.79549pt too wide) in paragraph at lines 2813--2822
 [40] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [41]
-(/tmp/RtmpeyNHiw/Rd2pdf137f2755e247/Rd2.ind [42] [43
+(/tmp/Rtmp4g09uQ/Rd2pdf533c49178600/Rd2.ind [42] [43
 
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2936.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2936.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3000.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3000.
 
-(/tmp/RtmpeyNHiw/Rd2pdf137f2755e247/Rd2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2936.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2936.
+(/tmp/Rtmp4g09uQ/Rd2pdf533c49178600/Rd2.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3000.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3000.
 
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
 (rerunfilecheck)             Checksum: FE34E8B3F94A2B1992E4F40D00BDC800;1035.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2936.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3000.
  ) 
 Here is how much of TeX's memory you used:
  6820 strings out of 493029
@@ -1144,7 +1145,7 @@ vr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
 exmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts
 /type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (43 pages, 208771 bytes).
+Output written on Rd2.pdf (43 pages, 211006 bytes).
 PDF statistics:
  706 PDF objects out of 1000 (max. 8388607)
  644 compressed objects within 7 object streams

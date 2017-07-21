@@ -22,27 +22,28 @@
 #' @param ellipse.col background colour of the error ellipses
 #' @param concordia.col colour of the concordia line
 #' @param exterr show decay constant uncertainty?
-#' @param show.age one of either
+#' @param show.age one of either:
 #'
-#' \code{1}: don't show the age
+#' \code{0}: just plot the data but don't calculate the age
 #'
-#' \code{2}: calculate the concordia age
+#' \code{1}: calculate the concordia age
 #'
-#' \code{3}: fit a discordia line
+#' \code{2}: fit a discordia line
 #'
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
-#' @param common.Pb apply a common Pb correction using either:
+#' @param common.Pb apply a common lead correction using one of three
+#'     methods:
 #'
-#' \code{1}: the isochron intercept
+#' \code{1}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{2}: the Stacey-Kramer two-stage model
+#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' Pb-composition
 #'
-#' \code{3}: the Pb-composition of troilite lead
+#' \code{3}: use the Pb-composition stored in
+#' \code{settings('iratio','Pb206Pb204')} and
+#' \code{settings('iratio','Pb207Pb204')}
 #'
-#' @importFrom grDevices rgb
-#' @importFrom graphics polygon title points text
-#' @importFrom stats pchisq
 #' @examples
 #' data(examples) 
 #' concordia(examples$UPb)
@@ -52,12 +53,12 @@
 #' @export
 concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                      exterr=TRUE,show.age=1,sigdig=2,common.Pb=0){
+                      exterr=TRUE,show.age=0,sigdig=2,common.Pb=0){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
     concordia.line(X,limits=limits,wetherill=wetherill,
                    col=concordia.col,alpha=alpha,exterr=exterr)
-    if (show.age==3){
+    if (show.age==2){
         fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
         discordia.plot(fit,wetherill=wetherill)
         title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
@@ -74,7 +75,7 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
         points(x0,y0,pch=19,cex=0.25)
         if (show.numbers) { text(x0,y0,i) }
     }
-    if (show.age==2){
+    if (show.age==1){
         fit <- concordia.age(x,wetherill=wetherill,exterr=exterr)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         polygon(ell,col='white')

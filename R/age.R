@@ -111,6 +111,18 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     estimate (only used if \code{type=1}, \code{isochron=FALSE}
 #'     or \code{central=FALSE}).
 #'
+#' @param common.Pb apply a common lead correction using one of three
+#'     methods:
+#'
+#' \code{1}: use the isochron intercept as the initial Pb-composition
+#'
+#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' Pb-composition
+#'
+#' \code{3}: use the Pb-composition stored in
+#' \code{settings('iratio','Pb206Pb204')} and
+#' \code{settings('iratio','Pb207Pb204')}
+#'
 #' @return 
 #'
 #' \enumerate{
@@ -283,14 +295,18 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' print(age(examples$UPb,type=2))
 #' @rdname age
 #' @export
-age.UPb <- function(x,type=1,wetherill=TRUE,
-                    exterr=TRUE,i=NA,sigdig=NA,...){
+age.UPb <- function(x,type=1,wetherill=TRUE, exterr=TRUE,i=NA,
+                    sigdig=NA,common.Pb=0,...){
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
     if (type==1)
-        out <- UPb.age(x,exterr=exterr,i=i,sigdig=sigdig,...)
+        out <- UPb.age(X,exterr=exterr,i=i,sigdig=sigdig,...)
     else if (type==2)
-        out <- concordia.age(x,wetherill=TRUE,exterr=TRUE,...)
+        out <- concordia.age(X,wetherill=wetherill,exterr=exterr,...)
     else if (type==3)
-        out <- discordia.age(x,wetherill=TRUE,exterr=TRUE,...)
+        out <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
     out
 }
 #' @rdname age

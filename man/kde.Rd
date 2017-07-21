@@ -27,7 +27,7 @@ kde(x, ...)
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
   ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
   show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, type = 4,
-  cutoff.76 = 1100, cutoff.disc = c(-15, 5), ...)
+  cutoff.76 = 1100, cutoff.disc = c(-15, 5), common.Pb = 0, ...)
 
 \method{kde}{detritals}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
@@ -164,6 +164,18 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 \code{cutoff.disc=NA} if you do not want to use this filter.}
+
+\item{common.Pb}{apply a common lead correction using one of three
+    methods:
+
+\code{1}: use the isochron intercept as the initial Pb-composition
+
+\code{2}: use the Stacey-Kramer two-stage model to infer the initial
+Pb-composition
+
+\code{3}: use the Pb-composition stored in
+\code{settings('iratio','Pb206Pb204')} and
+\code{settings('iratio','Pb207Pb204')}}
 
 \item{samebandwidth}{logical flag indicating whether the same
 bandwidth should be used for all samples. If

@@ -53,7 +53,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,transformation='log',
     peaks <- peakfit(x,k=k,sigdig=sigdig)
     markers <- c(markers,peaks$peaks)
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
-    radial.plot(X,show.numbers=show.numbers,pch=pch,bg=bg,markers=markers)
+    radial.plot(X,show.numbers=show.numbers,pch=pch,bg=bg,markers=markers,...)
     if (title) title(radial.title(central(x),sigdig=sigdig))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
@@ -96,14 +96,31 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' @param common.Pb apply a common lead correction using one of three
+#'     methods:
+#'
+#' \code{1}: use the isochron intercept as the initial Pb-composition
+#'
+#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' Pb-composition
+#'
+#' \code{3}: use the Pb-composition stored in
+#' \code{settings('iratio','Pb206Pb204')} and
+#' \code{settings('iratio','Pb207Pb204')}
+#'
 #' @rdname radialplot
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
                            cutoff.76=1100,cutoff.disc=c(-15,5),
                            show.numbers=FALSE,pch=21,bg='white',
-                           markers=NULL,k=0,exterr=TRUE,...){
-    radialplot_helper(x,from=from,to=to,t0=t0,
+                           markers=NULL,k=0,exterr=TRUE,
+                           common.Pb=0,...){
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
+    radialplot_helper(X,from=from,to=to,t0=t0,
                       transformation=transformation,type=type,
                       cutoff.76=cutoff.76, cutoff.disc=cutoff.disc,
                       show.numbers=show.numbers,pch=pch,bg=bg,
