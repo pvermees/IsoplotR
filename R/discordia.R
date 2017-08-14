@@ -58,8 +58,8 @@ project.concordia <- function(m76,m86,i76){
     search.range <- c(1/10000,tend)
     a <- i76
     b <- (m76-i76)/m86
-    uniroot(intersection.misfit.york, search.range, 
-            a=a,b=b,wetherill=FALSE)$root
+    stats::uniroot(intersection.misfit.york, search.range, 
+                   a=a,b=b,wetherill=FALSE)$root
 }
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     out <- list()
@@ -86,9 +86,9 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
             t1.name <- 't[u]'
             t2.name <- 't[l]'
         }
-        t2 <- uniroot(intersection.misfit.ludwig,
-                      interval=search.range,
-                      t1=t1,a0=a0,b0=b0)$root
+        t2 <- stats::uniroot(intersection.misfit.ludwig,
+                             interval=search.range,
+                             t1=t1,a0=a0,b0=b0)$root
         out$x[t1.name] <- t1
         out$x[t2.name] <- t2
         J <- J.lud2york(t1,t2,a0,b0)
@@ -272,7 +272,7 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         intercept <- roundit(fit$x[2],sqrt(fit$cov[2,2]),sigdig=sigdig)
         line1 <- substitute('age ='~a%+-%b~'[Ma]',
                             list(a=lower.age[1], b=lower.age[2]))
-        line2 <- substitute('('^207*'Pb/'^206*'Pb)'[0]~'='~a%+-%b,
+        line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b,
                               list(a=intercept[1], b=intercept[2]))
     }
     line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,

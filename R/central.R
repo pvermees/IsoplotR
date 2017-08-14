@@ -83,7 +83,7 @@ central.default <- function(x,...){
     out$age <- c(tt,st)
     out$disp <- sigma
     out$mswd <- Chi2/df
-    out$p.value <- 1-pchisq(Chi2,df)
+    out$p.value <- 1-stats::pchisq(Chi2,df)
     out
 }
 #' @rdname central
@@ -120,7 +120,7 @@ central.UThHe <- function(x,...){
     colnames(out$covmat) <- nms
     rownames(out$covmat) <- nms
     out$mswd <- SS/df
-    out$p.value <- 1-pchisq(SS,df)
+    out$p.value <- 1-stats::pchisq(SS,df)
     out
 }
 #' @param mineral setting this parameter to either \code{apatite} or
@@ -157,7 +157,7 @@ central.fissiontracks <- function(x,mineral=NA,...){
         out$age <- c(tt,st)
         out$disp <- sigma
         out$mswd <- Chi2/df
-        out$p.value <- 1-pchisq(Chi2,df)
+        out$p.value <- 1-stats::pchisq(Chi2,df)
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         out <- central.default(tst)

@@ -49,7 +49,6 @@ isochron ages.
 \examples{
 data(examples)
 evolution(examples$ThU)
-
 }
 \references{
 Ludwig, K.R. and Titterington, D.M., 1994. Calculation

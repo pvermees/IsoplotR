@@ -61,7 +61,7 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
     if (show.age==2){
         fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
         discordia.plot(fit,wetherill=wetherill)
-        title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
+        graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }
     ns <- length(x)
     for (i in 1:ns){
@@ -71,15 +71,15 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
         y0 <- xyc$x[2]
         covmat <- xyc$cov
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        polygon(ell,col=ellipse.col)
-        points(x0,y0,pch=19,cex=0.25)
-        if (show.numbers) { text(x0,y0,i) }
+        graphics::polygon(ell,col=ellipse.col)
+        graphics::points(x0,y0,pch=19,cex=0.25)
+        if (show.numbers) { graphics::text(x0,y0,i) }
     }
     if (show.age==1){
         fit <- concordia.age(x,wetherill=wetherill,exterr=exterr)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
-        polygon(ell,col='white')
-        title(concordia.title(fit,sigdig=sigdig))
+        graphics::polygon(ell,col='white')
+        graphics::title(concordia.title(fit,sigdig=sigdig))
     }
 }
 
@@ -248,8 +248,8 @@ mswd.concordia <- function(x,cc,tt){
     df.concordance <- 1
     out$mswd <- list(equivalence = SS.equivalence/df.equivalence,
                      concordance = SS.concordance/df.concordance)
-    out$p.value <- list(equivalence = 1-pchisq(SS.equivalence,df.equivalence),
-                        concordance = 1-pchisq(SS.concordance,df.concordance))
+    out$p.value <- list(equivalence = 1-stats::pchisq(SS.equivalence,df.equivalence),
+                        concordance = 1-stats::pchisq(SS.concordance,df.concordance))
     out
 }
 

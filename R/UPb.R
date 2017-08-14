@@ -373,15 +373,19 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,...){
     l8 <- lambda('U238')[1]
     sl8 <- lambda('U238')[2]
     t.68 <- log(1+x)/l8
-    J <- matrix(0,1,2)
-    J[1,1] <- 1/(l8*(1+x))
-    if (exterr) J[1,2] <- log(1+x)/l8^2
-    E <- matrix(0,2,2)
-    E[1,1] <- sx^2
-    E[2,2] <- sl8^2
-    st.68 <- sqrt(J %*% E %*% t(J))
-    out <- c(t.68,st.68)
-    names(out) <- c('t68','s[t68]')
+    if (length(x)>1){
+        out <- t.68
+    } else {
+        J <- matrix(0,1,2)
+        J[1,1] <- 1/(l8*(1+x))
+        if (exterr) J[1,2] <- log(1+x)/l8^2
+        E <- matrix(0,2,2)
+        E[1,1] <- sx^2
+        E[2,2] <- sl8^2
+        st.68 <- sqrt(J %*% E %*% t(J))
+        out <- c(t.68,st.68)
+        names(out) <- c('t68','s[t68]')
+    }
     out
 }
 get.Pb206U238.age.UPb <- function(x,i,exterr=TRUE,...){
@@ -523,7 +527,9 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
         is.concordant <- (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
                          (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
         if (!any(is.concordant))
-            stop('There are no concordant grains in this sample.')
+            stop(paste0('There are no concordant grains in this sample.',
+                        'Try adjusting the discordance limits OR ',
+                        'apply a common-Pb correction.'))
     }
     if (type==1){
         out <- tt[,c('t.75','s[t.75]')]
@@ -542,13 +548,13 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
     out
 }
 
-# option = 1: isochron
-# option = 2: Stacey-Kramers
+# option = 1: Stacey-Kramers
+# option = 2: isochron
 # option = 3: assumed Pb-composition
-common.Pb.correction <- function(x,option=2){
+common.Pb.correction <- function(x,option=1){
     ns <- length(x)
-    if (option == 1) out <- common.Pb.isochron(x)
-    else if (option == 2) out <- common.Pb.stacey.kramers(x)
+    if (option == 1) out <- common.Pb.stacey.kramers(x)
+    else if (option == 2) out <- common.Pb.isochron(x)
     else if (option == 3) out <- common.Pb.nominal(x)
     else out <- x
     out
@@ -576,13 +582,16 @@ common.Pb.stacey.kramers <- function(x){
     U238U235 <- settings('iratio','U238U235')[1]
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
-    tt <- age(x)
-    i64 <- sk.206.204 - sk.238.204*(exp(l8*tt[,'t.conc'])-1)
-    i74 <- sk.207.204 - sk.238.204*(exp(l5*tt[,'t.conc'])-1)/U238U235
-    if (x$format < 4)
-        out <- Pb.correction.without.204(x,i74/i64)
-    else
-        out <- Pb.correction.with.204(x,i64,i74)
+    tt <- 1000
+    for (i in 1:5){
+        i64 <- sk.206.204 - sk.238.204*(exp(l8*tt)-1)
+        i74 <- sk.207.204 - sk.238.204*(exp(l5*tt)-1)/U238U235
+        if (x$format < 4)
+            out <- Pb.correction.without.204(x,i74/i64)
+        else
+            out <- Pb.correction.with.204(x,i64,i74)
+        tt <- age(out)[,'t.conc']
+    }
     out
 }
 common.Pb.nominal <- function(x){

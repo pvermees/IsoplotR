@@ -34,7 +34,7 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
         t0 <- concordia.intersection.york(x,wetherill=TRUE,exterr=FALSE)$x[1]
         init <- c(t0,10,10)
     }
-    fit <- optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)
+    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)
     out <- list()
     out$par <- fit$par
     out$cov <- tryCatch({ # analytical
@@ -47,8 +47,8 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
         DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
         solve(DD - CC %*% solve(AA) %*% BB)
     }, error = function(e){ # numerical
-        fit <- optim(init,fn=LL.lud.UPb,method="BFGS",
-                     x=x,exterr=exterr,hessian=TRUE)
+        fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",
+                            x=x,exterr=exterr,hessian=TRUE)
         solve(fit$hessian)
     })
     parnames <- c('t','64i','74i')
@@ -69,7 +69,7 @@ mswd.lud <- function(ta0b0,x){
     df <- 2*ns-2
     out <- list()
     out$mswd <- SS/df
-    out$p.value <- as.numeric(1-pchisq(SS,df))
+    out$p.value <- as.numeric(1-stats::pchisq(SS,df))
     out
 }
 

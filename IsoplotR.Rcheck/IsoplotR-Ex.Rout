@@ -265,7 +265,6 @@ attr(,"class")
 > 
 > 
 > 
-> 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("evolution", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
@@ -707,7 +706,7 @@ f,X,errX
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  9.46 0.036 9.508 0 0 
+Time elapsed:  8.216 0.028 8.248 0 0 
 > grDevices::dev.off()
 pdf 
   2 

@@ -45,6 +45,16 @@
 #'
 #' @param title add a title to the plot?
 #'
+#' @param model construct the isochron using either:
+#'
+#' \enumerate{
+#'
+#' \item{Error weighted least squares regression}
+#'
+#' \item{Ordinary least squares regression}
+#'
+#' }
+#'
 #' @param ... optional arguments
 #'
 #' @rdname isochron
@@ -52,17 +62,16 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
-                             sigdig=2,show.numbers=FALSE,
-                             ellipse.col=rgb(0,1,0,0.5),
-                             line.col='red',lwd=2,title=TRUE,...){
+isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05, sigdig=2,
+                             show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                             line.col='red',lwd=2,title=TRUE,model=1,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
-    fit <- york(x)
-    scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
+    fit <- regression(x,model=model)
+    scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
                 show.numbers=show.numbers,ellipse.col=ellipse.col,
                 a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
-        title(regression.title(fit,sigdig=sigdig),xlab='X',ylab='Y')
+        graphics::title(isochrontitle(fit,sigdig=sigdig),xlab='X',ylab='Y')
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
 #'
@@ -154,9 +163,9 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
-                          exterr=TRUE,...){
+                          exterr=TRUE,model=1,...){
     d <- data2york(x,inverse=inverse)
-    fit <- york(d)
+    fit <- regression(d,model=model)
     if (inverse){
         x0 <- -fit$b[1]/fit$a[1]
         sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2 -
@@ -177,11 +186,13 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     class(out) <- "isochron"
     out$y0 <- c(y0,sy0)
     out$age <- tt
+    show.ellipses <- (model != 2)
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=show.ellipses,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
-        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -191,22 +202,19 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
-                          exterr=TRUE,...){
+                          exterr=TRUE,model=1,...){
     d <- data2york(x,inverse=inverse)
-    fit <- york(d)
+    fit <- regression(d,model=model)
     if (inverse){
-        x0 <- -fit$b[1]/fit$a[1]
-        sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2 -
-                       2*fit$a[2]*fit$b[2]*fit$cov.ab)
-        y0 <- 1/fit$a[1]
-        sy0 <- fit$a[2]/fit$a[1]^2
+        y0 <- fit$b[1]
+        sy0 <- fit$b[2]
         tt <- get.Pb207Pb206.age(fit$a[1],fit$a[2],exterr=exterr)
         x.lab <- expression(paste(""^"204","Pb/"^"206","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
     } else {
-        y0 <- fit$b[1]
-        sy0 <- fit$b[2]
-        tt <- get.Pb207Pb206.age(y0,sy0,exterr=exterr)
+        y0 <- fit$a[1]
+        sy0 <- fit$a[2]
+        tt <- get.Pb207Pb206.age(fit$b[1],fit$b[2],exterr=exterr)
         x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
     }
@@ -215,10 +223,10 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$y0 <- c(y0,sy0)
     out$age <- tt
     if (plot) {
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
-        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -227,46 +235,46 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @export
 isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     isochron.PD(x,'Rb87',xlim=xlim, ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
-                plot=plot,exterr=exterr,...)
+                plot=plot,exterr=exterr,model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     isochron.PD(x,'Re187',xlim=xlim, ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
-                plot=plot,exterr=exterr,...)
+                plot=plot,exterr=exterr,model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     isochron.PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
-                plot=plot,exterr=exterr,...)
+                plot=plot,exterr=exterr,model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     isochron.PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
-                plot=plot,exterr=exterr,...)
+                plot=plot,exterr=exterr,model=model,...)
 }
 isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
                         sigdig=2,show.numbers=FALSE,
                         ellipse.col=rgb(0,1,0,0.5),line.col='red',
-                        lwd=2,plot=TRUE,exterr=TRUE,...){
+                        lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     if (identical(nuclide,'Sm147')){
         x.lab <- expression(paste(""^"147","Sm/"^"144","Nd"))
         y.lab <- expression(paste(""^"143","Nd/"^"144","Nd"))
@@ -281,16 +289,16 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
     }
     d <- data2york(x,exterr=exterr,common=FALSE)
-    fit <- york(d)
+    fit <- regression(d,model=model)
     out <- fit
     class(out) <- "isochron"
     out$y0 <- c(fit$a[1],fit$a[2])
     out$age <- get.PD.age(fit$b[1],fit$b[2],nuclide,exterr=exterr)
     if (plot){
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
-        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -371,7 +379,7 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd)
-        title(isochrontitle(out,sigdig=sigdig),xlab=x.lab,ylab=y.lab)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='Th-U'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -383,26 +391,38 @@ get.limits <- function(X,sX){
     c(minx,maxx)
 }
 
-isochrontitle <- function(fit,sigdig=2){
-    rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
-    rounded.intercept <- roundit(fit$y0[1],fit$y0[2],sigdig=sigdig)
-    line1 <- substitute('age ='~a%+-%b~'(1'~sigma~'), intercept ='~c%+-%d~'(1'~sigma~')',
-                        list(a=rounded.age[1], b=rounded.age[2],
-                             c=rounded.intercept[1], d=rounded.intercept[2]))
-    line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,sigdig), b=signif(fit$p.value,sigdig)))
-    graphics::mtext(line1,line=1)
-    graphics::mtext(line2,line=0)
-}
-
-regression.title <- function(fit,sigdig=2){
-    intercept <- roundit(fit$a[1],fit$a[2],sigdig=sigdig)
-    slope <- roundit(fit$b[1],fit$b[2],sigdig=sigdig)
-    line1 <- substitute('slope ='~a%+-%b~'(1'~sigma~'), intercept ='~c%+-%d~'(1'~sigma~')',
-                        list(a=slope[1], b=slope[2],
-                             c=intercept[1], d=intercept[2]))
-    line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,sigdig), b=signif(fit$p.value,sigdig)))
-    graphics::mtext(line1,line=1)
-    graphics::mtext(line2,line=0)
+isochrontitle <- function(fit,sigdig=2,type=NA){
+    if (is.na(type)){
+        intercept <- roundit(fit$a[1],fit$a[2],sigdig=sigdig)
+        slope <- roundit(fit$b[1],fit$b[2],sigdig=sigdig)
+        line1 <- substitute('slope ='~a%+-%b~'(1'~sigma~')',
+                            list(a=slope[1], b=slope[2]))
+        line2 <- substitute('intercept ='~c%+-%d~'(1'~sigma~')',
+                            list(c=intercept[1], d=intercept[2]))
+    } else {
+        rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
+        rounded.intercept <- roundit(fit$y0[1],fit$y0[2],sigdig=sigdig)
+        line1 <- substitute('age ='~a%+-%b~'(1'~sigma~')',
+                            list(a=rounded.age[1], b=rounded.age[2]))
+        if (identical(type,'Ar-Ar')) {
+            line2 <- substitute('('^40*'Ar/'^39*'Ar)'[o]~c%+-%d~'(1'~sigma~')',
+                                list(c=rounded.intercept[1], d=rounded.intercept[2]))
+        } else if (identical(type,'Pb-Pb')) {
+            line2 <- substitute('('^207*'Pb/'^204*'Pb)'[o]~c%+-%d~'(1'~sigma~')',
+                                list(c=rounded.intercept[1], d=rounded.intercept[2]))
+        } else {
+            line2 <- substitute('intercept ='~c%+-%d~'(1'~sigma~')',
+                                list(c=rounded.intercept[1], d=rounded.intercept[2]))
+        }
+    }
+    if (fit$model==1){
+        line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+                            list(a=signif(fit$mswd,sigdig), b=signif(fit$p.value,sigdig)))
+        graphics::mtext(line1,line=2)
+        graphics::mtext(line2,line=1)
+        graphics::mtext(line3,line=0)
+    } else {
+        graphics::mtext(line1,line=1)
+        graphics::mtext(line2,line=0)
+    }
 }

@@ -16,33 +16,37 @@ isochron(x, ...)
 
 \method{isochron}{default}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, title = TRUE, ...)
+  line.col = "red", lwd = 2, title = TRUE, model = 1, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
-  exterr = TRUE, ...)
+  exterr = TRUE, model = 1, ...)
 
 \method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
-  exterr = TRUE, ...)
+  exterr = TRUE, model = 1, ...)
 
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{ThU}(x, type = 4, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
@@ -90,6 +94,16 @@ values reported in the title of the graphical output}
 \item{lwd}{line width}
 
 \item{title}{add a title to the plot?}
+
+\item{model}{construct the isochron either using:
+
+\enumerate{
+
+\item{Error weighted least squares regression}
+
+\item{Ordinary least squares regression}
+
+}}
 
 \item{inverse}{if \code{TRUE} and \code{x} has class \code{ArAr},
     plots \eqn{^{36}}Ar/\eqn{^{40}}Ar

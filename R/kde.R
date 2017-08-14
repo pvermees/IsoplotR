@@ -487,7 +487,7 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
                      hist.col=hist.col,binwidth=binwidth,
                      bty=bty,xaxt='n',ylim=ylim,...)
         }
-        title(snames[i])
+        graphics::title(snames[i])
     }
     graphics::par(oldpar)
 }

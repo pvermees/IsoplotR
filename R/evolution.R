@@ -22,11 +22,9 @@
 #'     isochron age?
 #' @param sigdig number of significant digits for the isochron age
 #' @param ... optional arguments to the generic \code{plot} function
-#'
 #' @examples
 #' data(examples)
 #' evolution(examples$ThU)
-#'
 #' @references Ludwig, K.R. and Titterington, D.M., 1994. Calculation
 #'     of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 #'     Cosmochimica Acta, 58(22), pp.5031-5042.
@@ -50,7 +48,7 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
     }
     if (isochron){
         fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr)
-        title(evolution.title(fit,sigdig=sigdig))
+        graphics::title(evolution.title(fit,sigdig=sigdig))
     }
 }
 

@@ -6,7 +6,7 @@ length.SmNd <- function(x){ nrow(x$x) }
 length.ReOs <- function(x){ nrow(x$x) }
 length.LuHf <- function(x){ nrow(x$x) }
 length.ThU <- function(x){ nrow(x$x) }
-length.fissiontracks <- function(x){ nrow(x$x) }
+length.fissiontracks <- function(x){ length(x$Ns) }
 length.UThHe <- function(x){ nrow(x) }
 
 roundit <- function(age,err,sigdig=2){

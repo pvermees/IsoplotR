@@ -72,7 +72,7 @@ mswd.tit <- function(abAB,dat){
     df <- 2*ns-4
     out <- list()
     out$mswd <- S/df
-    out$p.value <- as.numeric(1-pchisq(S,df))
+    out$p.value <- as.numeric(1-stats::pchisq(S,df))
     out
 }
 

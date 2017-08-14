@@ -35,8 +35,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 
 # x = matrix with columns X, sX, Y, sY, rXY
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
-                        show.numbers=FALSE,
-                        ellipse.col=rgb(0,1,0,0.5),
+                        show.numbers=FALSE,show.ellipses=TRUE,
+                        ellipse.col=grDevides::rgb(0,1,0,0.5),
                         a=NA,b=NA,line.col='red',lwd=2,
                         new.plot=TRUE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
@@ -47,15 +47,22 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
         graphics::lines(xlim,a+b*xlim,col=line.col,lwd=lwd)
     }
     ns <- nrow(x)
-    for (i in 1:ns){
-        if (!any(is.na(x[i,]))){
-            x0 <- x[i,'X']
-            y0 <- x[i,'Y']
-            covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
-            ell <- ellipse(x0,y0,covmat,alpha=alpha)
-            graphics::polygon(ell,col=ellipse.col)
-            graphics::points(x0,y0,pch=19,cex=0.25)
-            if (show.numbers) { text(x0,y0,i) }
+    if (show.ellipses){
+        for (i in 1:ns){
+            if (!any(is.na(x[i,]))){
+                x0 <- x[i,'X']
+                y0 <- x[i,'Y']
+                covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
+                ell <- ellipse(x0,y0,covmat,alpha=alpha)
+                graphics::polygon(ell,col=ellipse.col)
+                graphics::points(x0,y0,pch=19,cex=0.25)
+                if (show.numbers) { graphics::text(x0,y0,i) }
+            }
         }
+    } else {
+        x0 <- x[,'X']
+        y0 <- x[,'Y']
+        graphics::points(x0,y0,pch=19,cex=0.25)
+        if (show.numbers) { graphics::text(x0,y0,1:ns) }
     }
 }

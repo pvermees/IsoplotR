@@ -193,7 +193,7 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
     } else if (hasClass(x,'ThU')){
         tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
     }
-    peakfit.default(tt,k,log=log)
+    peakfit.default(tt,k=k,log=log)
 }
 
 get.peakfit.covmat <- function(k,pii,piu,aiu,biu){

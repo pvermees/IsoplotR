@@ -58,7 +58,7 @@ helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
     if (show.central.comp){
         plot_central_ellipse(fit,fact=fact,logratio=logratio,
                              alpha=alpha,doSm=doSm(x))
-        title(helioplot_title(fit,sigdig=sigdig))
+        graphics::title(helioplot_title(fit,sigdig=sigdig))
     }
 }
 

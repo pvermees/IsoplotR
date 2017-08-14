@@ -28,7 +28,6 @@
 #' intercept, and standard errors of the best straight line."
 #' American Journal of Physics 72.3 (2004): 367-375.
 #'
-#' @importFrom stats lm
 #' @examples
 #'    X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
 #'           28.530,50.540,51.595,86.51,106.40,157.35)
@@ -53,7 +52,7 @@
 #' @export
 york <- function(x){
     colnames(x) <- c('X','sX','Y','sY','rXY')
-    ab <- lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
+    ab <- stats::lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]
     b <- ab[2]
     wX <- 1/x[,'sX']^2
@@ -98,7 +97,7 @@ get.york.mswd <- function(x,a,b){
     df <- (2*nn-2)
     out <- list()
     out$mswd <- as.numeric(X2/df)
-    out$p.value <- as.numeric(1-pchisq(X2,df))
+    out$p.value <- as.numeric(1-stats::pchisq(X2,df))
     out
 }
 
