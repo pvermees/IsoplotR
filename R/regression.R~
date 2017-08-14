@@ -1,7 +1,0 @@
-regression <- function(d,model=1){
-    if (model==1){
-        fit <- york(d)
-    } else {
-        
-    }
-}
