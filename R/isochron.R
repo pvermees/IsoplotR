@@ -237,7 +237,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
-    isochron.PD(x,'Rb87',xlim=xlim, ylim=ylim,alpha=alpha,
+    isochron_PD(x,'Rb87',xlim=xlim, ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
                 plot=plot,exterr=exterr,model=model,...)
@@ -247,7 +247,7 @@ isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
-    isochron.PD(x,'Re187',xlim=xlim, ylim=ylim,alpha=alpha,
+    isochron_PD(x,'Re187',xlim=xlim, ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
                 plot=plot,exterr=exterr,model=model,...)
@@ -257,7 +257,7 @@ isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
-    isochron.PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
                 plot=plot,exterr=exterr,model=model,...)
@@ -267,42 +267,10 @@ isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
-    isochron.PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig, show.numbers=show.numbers,
                 ellipse.col=ellipse.col,line.col=line.col, lwd=lwd,
                 plot=plot,exterr=exterr,model=model,...)
-}
-isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
-                        sigdig=2,show.numbers=FALSE,
-                        ellipse.col=grDevices::rgb(0,1,0,0.5),line.col='red',
-                        lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
-    if (identical(nuclide,'Sm147')){
-        x.lab <- expression(paste(""^"147","Sm/"^"144","Nd"))
-        y.lab <- expression(paste(""^"143","Nd/"^"144","Nd"))
-    } else if (identical(nuclide,'Re187')){
-        x.lab <- expression(paste(""^"187","Re/"^"188","Os"))
-        y.lab <- expression(paste(""^"187","Os/"^"188","Os"))
-    } else if (identical(nuclide,'Rb87')){
-        x.lab <- expression(paste(""^"87","Rb/"^"86","Sr"))
-        y.lab <- expression(paste(""^"87","Sr/"^"86","Sr"))
-    } else if (identical(nuclide,'Lu176')){
-        x.lab <- expression(paste(""^"176","Lu/"^"177","Hf"))
-        y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
-    }
-    d <- data2york(x,exterr=exterr,common=FALSE)
-    fit <- regression(d,model=model)
-    out <- fit
-    class(out) <- "isochron"
-    out$y0 <- c(fit$a[1],fit$a[2])
-    out$age <- get.PD.age(fit$b[1],fit$b[2],nuclide,exterr=exterr)
-    if (plot){
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
-                    show.numbers=show.numbers,ellipse.col=ellipse.col,
-                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),xlab=x.lab,ylab=y.lab)
-    } else {
-        return(out)
-    }
 }
 #' @param type following the classification of
 #' Ludwig and Titterington (1994), one of either:
@@ -325,8 +293,8 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,
-                          sigdig=2, show.numbers=FALSE,
-                          ellipse.col=rgb(0,1,0,0.5), line.col='red',
+                          sigdig=2,show.numbers=FALSE,
+                          ellipse.col=rgb(0,1,0,0.5),line.col='red',
                           lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     if (type == 1){
         osmond <- FALSE
@@ -382,6 +350,39 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Th-U'),xlab=x.lab,ylab=y.lab)
+    } else {
+        return(out)
+    }
+}
+
+isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
+                        sigdig=2,show.numbers=FALSE,
+                        ellipse.col=grDevices::rgb(0,1,0,0.5),line.col='red',
+                        lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
+    if (identical(nuclide,'Sm147')){
+        x.lab <- expression(paste(""^"147","Sm/"^"144","Nd"))
+        y.lab <- expression(paste(""^"143","Nd/"^"144","Nd"))
+    } else if (identical(nuclide,'Re187')){
+        x.lab <- expression(paste(""^"187","Re/"^"188","Os"))
+        y.lab <- expression(paste(""^"187","Os/"^"188","Os"))
+    } else if (identical(nuclide,'Rb87')){
+        x.lab <- expression(paste(""^"87","Rb/"^"86","Sr"))
+        y.lab <- expression(paste(""^"87","Sr/"^"86","Sr"))
+    } else if (identical(nuclide,'Lu176')){
+        x.lab <- expression(paste(""^"176","Lu/"^"177","Hf"))
+        y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
+    }
+    d <- data2york(x,exterr=exterr,common=FALSE)
+    fit <- regression(d,model=model)
+    out <- fit
+    class(out) <- "isochron"
+    out$y0 <- c(fit$a[1],fit$a[2])
+    out$age <- get.PD.age(fit$b[1],fit$b[2],nuclide,exterr=exterr)
+    if (plot){
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
+                    show.numbers=show.numbers,ellipse.col=ellipse.col,
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }

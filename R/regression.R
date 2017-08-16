@@ -7,16 +7,16 @@ regression <- function(d,model=1,type='york'){
         out <- ludwig(d)
     } else if (model==2 && identical(type,'york')){
         out <- list()
-        fit <- lm(d[,'Y'] ~ d[,'X'])
-        E <- vcov(fit)
-        out$a <- c(coef(fit)[1],sqrt(E[1,1]))
-        out$b <- c(coef(fit)[2],sqrt(E[2,2]))
+        fit <- stats::lm(d[,'Y'] ~ d[,'X'])
+        E <- stats::vcov(fit)
+        out$a <- c(stats::coef(fit)[1],sqrt(E[1,1]))
+        out$b <- c(stats::coef(fit)[2],sqrt(E[2,2]))
         out$cov.ab <- E[1,2]        
     } else if (model==2 && identical(type,'titterington')){
         out <- list()
-        fit <- lm(d[,c('Y','Z')] ~ d[,'X'])
-        out$par <- c(coef(fit))
-        out$cov <- vcov(fit)
+        fit <- stats::lm(d[,c('Y','Z')] ~ d[,'X'])
+        out$par <- c(stats::coef(fit))
+        out$cov <- stats::vcov(fit)
         parnames <- c('a','b','A','B')
         names(out$par) <- parnames
         colnames(out$cov) <- parnames

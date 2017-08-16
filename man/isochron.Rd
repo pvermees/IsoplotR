@@ -50,7 +50,8 @@ isochron(x, ...)
 
 \method{isochron}{ThU}(x, type = 4, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, ...)
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 }
 \arguments{
 \item{x}{EITHER a matrix with the following five columns:
@@ -74,7 +75,8 @@ OR
 an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
 \code{RbSr}, \code{SmNd}, \code{LuHf} or \code{ThU}.}
 
-\item{...}{optional arguments}
+\item{...}{optional arguments to be passed on to the
+generic plot function if \code{model=2}}
 
 \item{xlim}{2-element vector with the plot limits of the x-axis}
 
@@ -95,7 +97,7 @@ values reported in the title of the graphical output}
 
 \item{title}{add a title to the plot?}
 
-\item{model}{construct the isochron either using:
+\item{model}{construct the isochron using either:
 
 \enumerate{
 

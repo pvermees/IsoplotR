@@ -200,7 +200,7 @@ concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
 concordia.age.default <- function(x,exterr=TRUE,...){
     out <- x
     t.init <- initial.concordia.age(x)
-    fit.age <- stats::optim(par=t.init, fn=LL.concordia.age,
+    fit.age <- stats::optim(par=t.init, fn=LL_concordia_age,
                             x=x, exterr=exterr,
                             method="BFGS", hessian=TRUE)
     tt <- fit.age$par
@@ -244,7 +244,7 @@ initial.concordia.age.terawasserburg <- function(x,...){
 mswd.concordia <- function(x,cc,tt){
     out <- list()
     SS.equivalence <- LL.concordia.comp(cc,x,mswd=TRUE)
-    SS.concordance <- LL.concordia.age(tt,cc,mswd=TRUE)
+    SS.concordance <- LL_concordia_age(tt,cc,mswd=TRUE)
     df.equivalence <- 2*length(x)-1
     df.concordance <- 1
     out$mswd <- list(equivalence = SS.equivalence/df.equivalence,
@@ -254,7 +254,6 @@ mswd.concordia <- function(x,cc,tt){
     out
 }
 
-# cc = two element vector
 LL.concordia.comp <- function(mu,...){ UseMethod("LL.concordia.comp",mu) }
 LL.concordia.comp.default <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
     out <- 0
@@ -275,7 +274,7 @@ LL.concordia.comp.terawasserburg <- function(mu,x,mswd=FALSE,...){
     LL.concordia.comp(mu$x,x,wetherill=FALSE,mswd=mswd)
 }
 
-LL.concordia.age <- function(tt,x,mswd=FALSE,exterr=TRUE){
+LL_concordia_age <- function(tt,x,mswd=FALSE,exterr=TRUE){
     if (hasClass(x,'wetherill'))
         y <- age_to_wetherill_ratios(tt)
     else if (hasClass(x,'terawasserburg'))
