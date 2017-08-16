@@ -181,3 +181,50 @@ data2york.PD <- function(x,exterr=FALSE,common=FALSE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+data2york.UThHe <- function(x,exterr=FALSE,common=FALSE,...){
+    ns <- length(x)
+    out <- matrix(0,ns,5)
+    colnames(out) <- c('X','sX','Y','sY','rXY')
+    R <- iratio('U238U235')
+    L8 <- lambda('U238')
+    L5 <- lambda('U235')
+    L2 <- lambda('Th232')
+    L7 <- lambda('Sm147')
+    f147 <- f147Sm()
+    P <- rep(0,ns)
+    sP <- rep(0,ns)
+    J <- matrix(0,1,9)
+    E <- matrix(0,9,9)
+    for (i in 1:ns){
+        P[i] <- 8*L8[1]*x[i,'U']*R[1]/(1+R[1]) +
+            7*L5[1]*x[i,'U']/(1+R[1]) +
+            6*L2[1]*x[i,'Th']
+        J[1,1] <- 8*L8[1]*R[1]/(1+R[1]) + 7*L5[1]/(1+R[1])  # dP.dU
+        J[1,2] <- 6*L2[1]                                   # dP.dTh
+        J[1,4] <- 8*x[i,'U']*R[1]/(1+R[1])                  # dP.dL8
+        J[1,5] <- 7*x[i,'U']/(1+R[1])                       # dP.dL5
+        J[1,6] <- 6*x[i,'Th']                               # dP.dL2
+        J[1,8] <- (8*L8[1]-7*L5[1])*x[i,'U']/(1+R[1])^2     # dP.dR
+        E[1,1] <- x[i,'errU']^2
+        E[2,2] <- x[i,'errTh']^2
+        E[4,4] <- L8[2]^2
+        E[5,5] <- L5[2]^2
+        E[6,6] <- L2[2]^2
+        E[7,7] <- L7[2]^2
+        E[8,8] <- R[2]^2
+        E[9,9] <- f147[2]^2
+        if (doSm(x)) {
+            P <- P + f147[1]*L7[1]*x[i,'Sm']
+            J[1,3] <- f147[1]*L7[1]       # dP.dSm
+            J[1,7] <- f147[1]*x[i,'Sm']   # dP.dL7
+            J[1,9] <- L7[1]*x[i,'Sm']     # dP.df147
+            E[3,3] <- x[i,'errSm']^2
+        }
+        sP[i] <- sqrt(J %*% E %*% t(J))
+    }
+    out[,'X'] <- P
+    out[,'sX'] <- sP
+    out[,'Y'] <- x[,'He']
+    out[,'sY'] <- x[,'errHe']
+    out
+}

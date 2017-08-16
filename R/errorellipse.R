@@ -35,7 +35,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 
 # x = matrix with columns X, sX, Y, sY, rXY
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
-                        show.numbers=FALSE,show.ellipses=TRUE,
+                        show.numbers=FALSE,show.ellipses=1,
                         ellipse.col=grDevices::rgb(0,1,0,0.5),
                         a=NA,b=NA,line.col='red',lwd=2,
                         new.plot=TRUE,...){
@@ -47,7 +47,11 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
         graphics::lines(xlim,a+b*xlim,col=line.col,lwd=lwd)
     }
     ns <- nrow(x)
-    if (show.ellipses){
+    if (show.ellipses==0){
+        x0 <- x[,'X']
+        y0 <- x[,'Y']
+        graphics::points(x0,y0,...)
+    } else if (show.ellipses==1){
         for (i in 1:ns){
             if (!any(is.na(x[i,]))){
                 x0 <- x[i,'X']
@@ -62,7 +66,14 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
     } else {
         x0 <- x[,'X']
         y0 <- x[,'Y']
-        graphics::points(x0,y0,...)
+        graphics::points(x0,y0,pch=19,cex=0.5)
         if (show.numbers) { graphics::text(x0,y0,1:ns) }
+        if (show.ellipses==2){ # add error bars
+            fact <- qnorm(1-alpha/2)
+            dx <- fact*x[,'sX']
+            dy <- fact*x[,'sY']
+            arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,length=0.05)
+            arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,length=0.05)
+        }
     }
 }

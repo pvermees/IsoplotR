@@ -1,6 +1,6 @@
 #' Calculate and plot isochrons
 #'
-#' Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf or Th-U
+#' Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf, U-Th-He or Th-U
 #' data as X-Y scatterplots, fits an isochron curve through them using
 #' the \code{york} function, and computes the corresponding isochron
 #' age, including decay constant uncertainties.
@@ -24,7 +24,7 @@
 #' OR
 #'
 #' an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
-#' \code{RbSr}, \code{SmNd}, \code{LuHf} or \code{ThU}.
+#' \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or \code{ThU}.
 #'
 #' @param xlim 2-element vector with the plot limits of the x-axis
 #'
@@ -68,7 +68,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05, sigdig=2,
                              line.col='red',lwd=2,title=TRUE,model=1,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     fit <- regression(x,model=model)
-    scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
+    scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=1*(model==1),
                 show.numbers=show.numbers,ellipse.col=ellipse.col,
                 a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
@@ -224,7 +224,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$y0 <- c(y0,sy0)
     out$age <- tt
     if (plot) {
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=1*(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),xlab=x.lab,ylab=y.lab)
@@ -346,10 +346,31 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,
     out$y0 <- tt[c('48_0','s[48_0]')]
     out$age <- tt[c('t','s[t]')]
     if (plot){
-        scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
+        scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=1*(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Th-U'),xlab=x.lab,ylab=y.lab)
+    } else {
+        return(out)
+    }
+}
+#' @rdname isochron
+#' @export
+isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                           show.numbers=FALSE,line.col='red',lwd=2,
+                           plot=TRUE,model=1,...){
+    d <- data2york(x)
+    fit <- regression(d,model=model)
+    out <- fit
+    class(out) <- "isochron"
+    out$y0 <- fit$a
+    out$age <- fit$b
+    if (plot) {
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=2*(model==1),show.numbers=show.numbers,
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
+                        xlab="P",ylab="He")
     } else {
         return(out)
     }
@@ -379,7 +400,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
     out$y0 <- c(fit$a[1],fit$a[2])
     out$age <- get.PD.age(fit$b[1],fit$b[2],nuclide,exterr=exterr)
     if (plot){
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=1*(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),xlab=x.lab,ylab=y.lab)

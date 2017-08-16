@@ -24,9 +24,9 @@ get.UThHe.age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
     L2 <- lambda('Th232')[1]
     L7 <- lambda('Sm147')[1]
     f147 <- f147Sm()[1]
-    P <- 8*L8*U*R/(1+R) + 7*L5*U/(1+R) + 6*L2*Th + f147*L7*Sm;
+    P <- 8*L8*U*R/(1+R) + 7*L5*U/(1+R) + 6*L2*Th + f147*L7*Sm
     L <- ( 8*L8*L8*U*R/(1+R) + 7*L5*L5*U/(1+R) + 
-           6*Th*L2*L2 + f147*Sm*L7*L7 ) / P;
+           6*Th*L2*L2 + f147*Sm*L7*L7 ) / P
     tt <- log(1 + L*He/P)/L;
     D <- 8*(exp(L8*tt)-1)*U*R/(1+R) + 7*(exp(L5*tt)-1)*U/(1+R) +
          6*(exp(L2*tt)-1)*Th + f147*(exp(L7*tt)-1)*Sm - He
