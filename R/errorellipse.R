@@ -36,7 +36,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 # x = matrix with columns X, sX, Y, sY, rXY
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,show.ellipses=TRUE,
-                        ellipse.col=grDevides::rgb(0,1,0,0.5),
+                        ellipse.col=grDevices::rgb(0,1,0,0.5),
                         a=NA,b=NA,line.col='red',lwd=2,
                         new.plot=TRUE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
@@ -62,7 +62,7 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
     } else {
         x0 <- x[,'X']
         y0 <- x[,'Y']
-        graphics::points(x0,y0,pch=19,cex=0.25)
+        graphics::points(x0,y0,...)
         if (show.numbers) { graphics::text(x0,y0,1:ns) }
     }
 }

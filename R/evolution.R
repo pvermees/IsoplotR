@@ -32,6 +32,7 @@
 #' Ludwig, K.R., 2003. Mathematical-statistical treatment of data and
 #'     errors for 230 Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
+#' @importFrom grDevices rgb
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                       detrital=FALSE,show.numbers=FALSE,
@@ -54,7 +55,7 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
 
 U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
                     alpha=0.05,show.numbers=FALSE,
-                    ellipse.col=rgb(0,1,0,0.5),...){
+                    ellipse.col=grDevices::rgb(0,1,0,0.5),...){
     ns <- length(x)
     ta0 <- ThU.age(x,exterr=FALSE,i2i=detrital,cor=FALSE)
     nsd <- 3
@@ -81,7 +82,7 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
                         ylim=NA, alpha=0.05,show.numbers=FALSE,
-                        ellipse.col=rgb(0,1,0,0.5),
+                        ellipse.col=grDevices::rgb(0,1,0,0.5),
                         line.col='darksalmon',...){
     ns <- length(x)
     d <- data2evolution(x,detrital=detrital)
@@ -111,7 +112,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
         sA <- sqrt(fit$cov['A','A'])
         ell <- matrix(c(fit$par['A'],sA,fit$par['a'],sa,
                         fit$cov['a','A']/(sa*sA)),1,5)
-        scatterplot(ell,alpha=alpha,ellipse.col=rgb(1,1,1,0.85),
+        scatterplot(ell,alpha=alpha,
+                    ellipse.col=grDevices::rgb(1,1,1,0.85),
                     line.col='black',new.plot=FALSE)
     }
 }

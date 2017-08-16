@@ -69,6 +69,7 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' @examples
 #' data(examples)
 #' kde(examples$DZ[['N1']],kernel="epanechnikov")
+#' @importFrom grDevices rgb
 #' @rdname kde
 #' @export
 kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
@@ -413,8 +414,8 @@ Abramson <- function(dat,from,to,bw,n=512,...){
 }
 
 plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
-                     kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
-                     hist.col=rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
+                     kde.col=grDevices::rgb(1,0,1,0.6),show.hist=TRUE,
+                     hist.col=grDevices::rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
     m <- x$x[1]
     M <- utils::tail(x$x,n=1)
     inrange <- x$ages >= m & x$ages <= M
@@ -460,8 +461,8 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
 }
 
 plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
-                      kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
-                      hist.col=rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
+                      kde.col=grDevices::rgb(1,0,1,0.6),show.hist=TRUE,
+                      hist.col=grDevices::rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
     if (is.na(ncol)) ncol <- ceiling(sqrt(length(x)/2))
     oldpar <- graphics::par(no.readonly=T)
     snames <- names(x$kdes)

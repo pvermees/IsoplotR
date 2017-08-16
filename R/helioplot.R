@@ -34,6 +34,7 @@
 #' helioplot(examples$UThHe)
 #' dev.new()
 #' helioplot(examples$UThHe,logratio=FALSE)
+#' @importFrom grDevices rgb
 #' @export
 helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                       show.numbers=FALSE,alpha=0.05,
@@ -80,7 +81,7 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
 }
 
 plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
-                                   ellipse.col=rgb(0,1,0,0.5)){
+                                   ellipse.col=grDevices::rgb(0,1,0,0.5)){
     ns <- nrow(x)
     for (i in 1:ns){
         uvc <- UThHe2uv.covmat(x,i)
@@ -94,7 +95,7 @@ plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
 }
 plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
                                     show.numbers=FALSE,
-                                    ellipse.col=rgb(0,1,0,0.5)){
+                                    ellipse.col=grDevices::rgb(0,1,0,0.5)){
     ns <- nrow(x)
     for (i in 1:ns){
         uvc <- UThHe2uv.covmat(x,i)

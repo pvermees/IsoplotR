@@ -50,6 +50,7 @@
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
+#' @importFrom grDevices rgb
 #' @rdname agespectrum
 #' @export
 agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,

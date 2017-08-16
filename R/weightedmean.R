@@ -49,6 +49,7 @@ weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output.
 #' @param alpha the confidence limits of the error bars/rectangles.
+#' @importFrom grDevices rgb
 #' @rdname weightedmean
 #' @export
 weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
@@ -264,9 +265,9 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
     }
 }
 weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
-                                rect.col=rgb(0,1,0,0.5),type=4,
+                                rect.col=grDevices::rgb(0,1,0,0.5),type=4,
                                 cutoff.76=1100,cutoff.disc=c(-15,5),
-                                outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                                outlier.col=grDevices::rgb(0,1,1,0.5), sigdig=2,
                                 alpha=0.05,exterr=TRUE,i2i=FALSE,...){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
@@ -347,8 +348,8 @@ wtdmean.title <- function(fit,sigdig=2){
     }
 }
 
-plot_weightedmean <- function(X,sX,fit,rect.col=rgb(0,1,0,0.5),
-                              outlier.col=rgb(0,1,1,0.5),sigdig=2,
+plot_weightedmean <- function(X,sX,fit,rect.col=grDevices::rgb(0,1,0,0.5),
+                              outlier.col=grDevices::rgb(0,1,1,0.5),sigdig=2,
                               alpha=0.05){
     ns <- length(X)
     fact <- stats::qnorm(1-alpha/2)

@@ -55,8 +55,9 @@
 #'
 #' }
 #'
-#' @param ... optional arguments
-#'
+#' @param ... optional arguments to be passed on to the
+#' generic plot function if \code{model=2}
+#' @importFrom grDevices rgb
 #' @rdname isochron
 #' @export
 isochron <- function(x,...){ UseMethod("isochron",x) }
@@ -191,7 +192,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=show.ellipses,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
-                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
@@ -225,7 +226,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
-                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
@@ -273,7 +274,7 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
                         sigdig=2,show.numbers=FALSE,
-                        ellipse.col=rgb(0,1,0,0.5),line.col='red',
+                        ellipse.col=grDevices::rgb(0,1,0,0.5),line.col='red',
                         lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     if (identical(nuclide,'Sm147')){
         x.lab <- expression(paste(""^"147","Sm/"^"144","Nd"))
@@ -297,7 +298,7 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
     if (plot){
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
-                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
+                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
@@ -323,9 +324,10 @@ isochron.PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
 #' }
 #' @rdname isochron
 #' @export
-isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,...){
+isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,
+                          sigdig=2, show.numbers=FALSE,
+                          ellipse.col=rgb(0,1,0,0.5), line.col='red',
+                          lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
     if (type == 1){
         osmond <- FALSE
         ia <- 'a'
@@ -364,7 +366,7 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         y.lab <- expression(paste(""^"234","U/"^"238","U"))
     }
     d <- data2tit(x,osmond=osmond)
-    fit <- titterington(d)
+    fit <- regression(d,model=model,type="titterington")
     out <- fit
     class(out) <- "isochron"
     out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
@@ -376,9 +378,9 @@ isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$y0 <- tt[c('48_0','s[48_0]')]
     out$age <- tt[c('t','s[t]')]
     if (plot){
-        scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
-                    a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd)
+                    a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Th-U'),xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
