@@ -73,8 +73,8 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
         covmat <- xyc$cov
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
         graphics::polygon(ell,col=ellipse.col)
-        graphics::points(x0,y0,pch=19,cex=0.25)
-        if (show.numbers) { graphics::text(x0,y0,i) }
+        if (show.numbers) graphics::text(x0,y0,i)
+        else graphics::points(x0,y0,pch=19,cex=0.25)
     }
     if (show.age==1){
         fit <- concordia.age(x,wetherill=wetherill,exterr=exterr)

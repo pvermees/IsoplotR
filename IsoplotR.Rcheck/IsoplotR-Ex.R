@@ -240,6 +240,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Title: Calculate and plot isochrons
 ### Aliases: isochron isochron.default isochron.ArAr isochron.PbPb
 ###   isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf isochron.ThU
+###   isochron.UThHe
 
 ### ** Examples
 

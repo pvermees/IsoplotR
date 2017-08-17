@@ -75,8 +75,8 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
         covmat[2,1] <- covmat[1,2]
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
         graphics::polygon(ell,col=ellipse.col)
-        graphics::points(x0,y0,pch=19,cex=0.25)
         if (show.numbers) graphics::text(x0,y0,i)
+        else graphics::points(x0,y0,pch=19,cex=0.25)
     }
 }
 
@@ -104,8 +104,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
         covmat[2,1] <- covmat[1,2]
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
         graphics::polygon(ell,col=ellipse.col)
-        graphics::points(x0,y0,pch=19,cex=0.25)
-        if (show.numbers) { graphics::text(x0,y0,i) }
+        if (show.numbers) graphics::text(x0,y0,i)
+        else graphics::points(x0,y0,pch=19,cex=0.25)
     }
     if (isochron){
         sa <- sqrt(fit$cov['a','a'])

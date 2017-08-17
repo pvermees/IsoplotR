@@ -340,6 +340,7 @@ attr(,"class")
 > ### Title: Calculate and plot isochrons
 > ### Aliases: isochron isochron.default isochron.ArAr isochron.PbPb
 > ###   isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf isochron.ThU
+> ###   isochron.UThHe
 > 
 > ### ** Examples
 > 
@@ -706,7 +707,7 @@ f,X,errX
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.496 0.052 11.575 0 0 
+Time elapsed:  8.34 0.044 8.388 0 0 
 > grDevices::dev.off()
 pdf 
   2 

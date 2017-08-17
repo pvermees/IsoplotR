@@ -89,8 +89,8 @@ plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
         y0 <- uvc$uv[2]
         ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
         graphics::polygon(ell,col=ellipse.col)
-        graphics::points(x0,y0,pch=19,cex=0.25)
         if (show.numbers) graphics::text(x0,y0,i)
+        else graphics::points(x0,y0,pch=19,cex=0.25)
     }
 }
 plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
@@ -109,8 +109,8 @@ plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
         graphics::polygon(xy,col=ellipse.col)
         xyz0 <- renormalise(HeUTh0,fact=fact)
         x0y0 <- xyz2xy(xyz0)
-        graphics::points(x0y0[1],x0y0[2],pch=19,cex=0.25)
         if (show.numbers) graphics::text(x0y0[1],x0y0[2],i)
+        else graphics::points(x0y0[1],x0y0[2],pch=19,cex=0.25)
     }
 }
 

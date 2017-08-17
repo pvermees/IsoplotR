@@ -10,6 +10,7 @@
 \alias{isochron.SmNd}
 \alias{isochron.LuHf}
 \alias{isochron.ThU}
+\alias{isochron.UThHe}
 \title{Calculate and plot isochrons}
 \usage{
 isochron(x, ...)
@@ -52,6 +53,10 @@ isochron(x, ...)
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
   ...)
+
+\method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, line.col = "red", lwd = 2,
+  plot = TRUE, model = 1, ...)
 }
 \arguments{
 \item{x}{EITHER a matrix with the following five columns:
@@ -73,7 +78,7 @@ isochron(x, ...)
 OR
 
 an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
-\code{RbSr}, \code{SmNd}, \code{LuHf} or \code{ThU}.}
+\code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or \code{ThU}.}
 
 \item{...}{optional arguments to be passed on to the
 generic plot function if \code{model=2}}
@@ -209,7 +214,7 @@ standard error.}
 }
 }
 \description{
-Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf or Th-U
+Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf, U-Th-He or Th-U
 data as X-Y scatterplots, fits an isochron curve through them using
 the \code{york} function, and computes the corresponding isochron
 age, including decay constant uncertainties.

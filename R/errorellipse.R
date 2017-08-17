@@ -47,33 +47,28 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
         graphics::lines(xlim,a+b*xlim,col=line.col,lwd=lwd)
     }
     ns <- nrow(x)
+    x0 <- x[,'X']
+    y0 <- x[,'Y']
     if (show.ellipses==0){
-        x0 <- x[,'X']
-        y0 <- x[,'Y']
-        graphics::points(x0,y0,...)
+        if (show.numbers) graphics::text(x0,y0,1:ns,...)
+        else graphics::points(x0,y0,...)
     } else if (show.ellipses==1){
         for (i in 1:ns){
             if (!any(is.na(x[i,]))){
-                x0 <- x[i,'X']
-                y0 <- x[i,'Y']
                 covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
-                ell <- ellipse(x0,y0,covmat,alpha=alpha)
+                ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
                 graphics::polygon(ell,col=ellipse.col)
-                graphics::points(x0,y0,pch=19,cex=0.25)
-                if (show.numbers) { graphics::text(x0,y0,i) }
+                if (show.numbers) graphics::text(x0[i],y0[i],i)
+                else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
             }
         }
     } else {
-        x0 <- x[,'X']
-        y0 <- x[,'Y']
-        graphics::points(x0,y0,pch=19,cex=0.5)
-        if (show.numbers) { graphics::text(x0,y0,1:ns) }
-        if (show.ellipses==2){ # add error bars
-            fact <- qnorm(1-alpha/2)
-            dx <- fact*x[,'sX']
-            dy <- fact*x[,'sY']
-            arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,length=0.05)
-            arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,length=0.05)
-        }
+        if (show.numbers) graphics::text(x0,y0,1:ns,adj=c(0,1))
+        else graphics::points(x0,y0,pch=19,cex=0.5)
+        fact <- qnorm(1-alpha/2)
+        dx <- fact*x[,'sX']
+        dy <- fact*x[,'sY']
+        arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,length=0.05)
+        arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,length=0.05)
     }
 }
