@@ -12,14 +12,10 @@
 #'     Shepard plot with the 'stress' value. This argument is only
 #'     used if \code{plot=TRUE}.
 #' @param nnlines if \code{TRUE}, draws nearest neighbour lines
-#' @param pch plot character (see \code{?plot} for details). May be a
-#'     vector.
 #' @param pos a position specifier for the labels (if
 #'     \code{pch!=NA}). Values of 1, 2, 3 and 4 indicate positions
 #'     below, to the left of, above and to the right of the MDS
 #'     coordinates, respectively.
-#' @param cex.symbols a numerical value giving the amount by which
-#'     plotting symbols should be magnified relative to the default
 #' @param col plot colour (may be a vector)
 #' @param bg background colour (may be a vector)
 #' @param xlab a string with the label of the x axis
@@ -38,7 +34,7 @@
 #'     detrital age distributions. Chemical Geology, 341, pp.140-146.
 #' @examples
 #' data(examples)
-#' mds(examples$DZ,nnlines=TRUE,cex=5)
+#' mds(examples$DZ,nnlines=TRUE,pch=21,cex=5)
 #' dev.new()
 #' mds(examples$DZ,shepard=TRUE)
 #' @rdname mds
@@ -47,29 +43,28 @@ mds <- function(x,...){ UseMethod("mds",x) }
 #' @rdname mds
 #' @export
 mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
-                        nnlines=FALSE,pch=21,pos=NULL,cex.symbols=2.5,
-                        col='black',bg='white',xlab="",ylab="",...){
+                        nnlines=FALSE,pos=NULL,col='black',
+                        bg='white',xlab="",ylab="",...){
     out <- list()
     if (classical) out$points <- stats::cmdscale(x)
     else out <- MASS::isoMDS(d=x)
     out$classical <- classical
     out$diss <- x
     class(out) <- "MDS"
-    if (plot) plot.MDS(out,nnlines=nnlines,pch=pch,pos=pos,
-                       cex.symbols=cex.symbols, shepard=shepard,
-                       col=col,bg=bg,xlab=xlab, ylab=ylab,...)
+    if (plot) plot.MDS(out,nnlines=nnlines,pos=pos,
+                       shepard=shepard,col=col,bg=bg,
+                       xlab=xlab,ylab=ylab,...)
     else return(out)
 }
 #' @rdname mds
 #' @export
 mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
-                        nnlines=FALSE,pch=21,pos=NULL,cex.symbols=2.5,
-                        col='black',bg='white',xlab="",ylab="",...){
+                          nnlines=FALSE,pos=NULL,col='black',
+                          bg='white',xlab="",ylab="",...){
     d <- diss(x)
     out <- mds.default(d,classical=classical,plot=plot,
-                       shepard=shepard,nnlines=nnlines,pch=pch,
-                       pos=pos,cex.symbols=cex.symbols,col=col,bg=bg,
-                       xlab=xlab,ylab=ylab,...)
+                       shepard=shepard,nnlines=nnlines,pos=pos,
+                       col=col,bg=bg,xlab=xlab,ylab=ylab,...)
     out
 }
 
@@ -100,21 +95,40 @@ KS.diss <- function(x,y) {
     return(out)
 }
 
-plot.MDS <- function(x,nnlines=FALSE,pch=21,pos=NULL,cex.symbols=2.5,
-                     shepard=FALSE,col='black',bg='white',xlab="",
-                     ylab="",...){
+# arguments: 
+plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
+                     col='black',bg='white',xlab="",ylab="",...){
+    ellipsis <- list(...)
+    plotchar <- 'pch' %in% names(ellipsis)
+    if (plotchar) pch <- ellipsis$pch
+    ellipsis$pch <- NULL
     if (shepard & !x$classical){
+        if (!plotchar) pch <- 21
         shep <- MASS::Shepard(x$diss,x$points)
-        graphics::plot(shep,pch=pch,col=col,bg=bg,
+        args <- c(list(x=shep,col=col,bg=bg,pch=pch,
                        xlab='dissimilarities',
-                       ylab='distances/disparities',...)
+                       ylab='distances/disparities'),
+                  ellipsis)
+        do.call(graphics::plot,args)
         graphics::lines(shep$x,shep$yf,type="S")
         graphics::title(paste0("Stress = ",x$stress))
     } else {
-        graphics::plot(x$points,type='n',asp=1,xlab=xlab,ylab=ylab,...)
+        if (!plotchar) pch <- NA
+        args <- c(list(x=x$points,type='n',asp=1,xlab=xlab,ylab=ylab),
+                  ellipsis)
+        do.call(graphics::plot,args)
         if (nnlines) plotlines(x$points,x$diss)
-        graphics::points(x$points,pch=pch,cex=cex.symbols,col=col,bg=bg)
-        graphics::text(x$points,labels=labels(x$diss),pos=pos,col=col,bg=bg)
+        if (is.na(pch)) {
+            args <- c(list(x=x$points,labels=labels(x$diss),col=col,bg=bg),
+                      ellipsis)
+            graphics::points(x$points,pch=pch)
+            do.call(graphics::text,args)
+        } else {
+            args <- c(list(x=x$points,pch=pch,pos=pos,col=col,bg=bg),
+                      ellipsis)
+            do.call(graphics::points,args)
+            graphics::text(x$points,labels=labels(x$diss))
+        }
     }
 }
 

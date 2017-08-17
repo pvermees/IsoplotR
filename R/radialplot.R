@@ -288,11 +288,7 @@ plot_points <- function(x,show.numbers=FALSE,pch=21,bg='white',...){
     rx <- rxy[,1]
     ry <- rxy[,2]
     if (show.numbers) {
-        if('cex' %in% names(list(...)))
-            graphics::points(rx,ry,pch=pch,bg=bg,...)
-        else
-            graphics::points(rx,ry,pch=pch,bg=bg,cex=3,...)
-        graphics::text(rx,ry,1:length(rx))
+        graphics::text(rx,ry,1:length(rx),...)
     } else {
         graphics::points(rx,ry,pch=pch,bg=bg,...)
     }
