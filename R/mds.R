@@ -119,15 +119,15 @@ plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
         do.call(graphics::plot,args)
         if (nnlines) plotlines(x$points,x$diss)
         if (is.na(pch)) {
-            args <- c(list(x=x$points,labels=labels(x$diss),col=col,bg=bg),
+            args <- c(list(x=x$points,labels=labels(x$diss),col=col,bg=bg,pos=pos),
                       ellipsis)
             graphics::points(x$points,pch=pch)
             do.call(graphics::text,args)
         } else {
-            args <- c(list(x=x$points,pch=pch,pos=pos,col=col,bg=bg),
+            args <- c(list(x=x$points,pch=pch,col=col,bg=bg),
                       ellipsis)
             do.call(graphics::points,args)
-            graphics::text(x$points,labels=labels(x$diss))
+            graphics::text(x$points,labels=labels(x$diss),pos=pos)
         }
     }
 }
