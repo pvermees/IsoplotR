@@ -58,13 +58,17 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
                                  sigdig=2,alpha=0.05,...){
     X <- x[,1]
     sX <- x[,2]
-    ns <- length(X)
     valid <- !is.na(X) & !is.na(sX)
     if (detect.outliers){
-        prob <- stats::pnorm(X,mean=mean(X,na.rm=TRUE),
-                             sd=stats::sd(X,na.rm=TRUE))
-        cutoff <- 0.5/ns
-        valid <- valid & (prob > cutoff) & ((1-prob) > cutoff)
+        while (TRUE){
+            prob <- 2*(1-stats::pnorm(abs(X-mean(X[valid])),
+                                      sd=stats::sd(X[valid])))
+            minp <- min(prob[valid])
+            imin <- which(minp==prob)[1]
+            ns <- length(valid[valid])
+            if (ns*minp < 0.5) valid[imin] <- FALSE # remove outlier
+            else break # no outliers left
+        }
     }
     fit <- get.weightedmean(X,sX,valid)
     if (plot){
@@ -302,22 +306,24 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
 
 get.weightedmean <- function(X,sX,valid=TRUE){
     out <- list()
-    X <- X[valid]
-    sX <- sX[valid]
-    if (length(X)>1){
-        MZ <- c(mean(X,na.rm=TRUE),stats::sd(X,na.rm=TRUE))
-        fit <- stats::optim(MZ,LL.weightedmean,X=X,sX=sX,
-                            method='BFGS',hessian=TRUE)
-        covmat <- solve(fit$hessian)
+    x <- X[valid]
+    sx <- sX[valid]
+    if (length(x)>1){
+        MZ <- c(mean(x),0)
+        fit <- stats::optim(MZ,LL.weightedmean,gr=gr.weightedmean,
+                            X=x,sX=sx,method='BFGS',hessian=TRUE,
+                            control=list(fnscale=-1))
+        covmat <- solve(-fit$hessian)
         out$mean <- c(fit$par[1],sqrt(covmat[1,1]))
-        out$disp <- c(fit$par[2],sqrt(covmat[2,2]))
-        df <- length(X)-1
-        SS <- sum(((X-out$mean[1])/sX)^2)
+        Z <- fit$par[2]
+        out$disp <- sqrt(exp(Z))
+        df <- length(x)-1
+        SS <- sum(((x-out$mean[1])/sx)^2)
         out$mswd <- SS/df
         out$p.value <- 1-stats::pchisq(SS,df)
         out$valid <- valid
     } else {
-        out$mean <- X
+        out$mean <- x
         out$p.value <- 0
     }
     out
@@ -325,10 +331,17 @@ get.weightedmean <- function(X,sX,valid=TRUE){
 
 LL.weightedmean <- function(MZ,X,sX){
     M <- MZ[1] # Mu (mean)
-    Z <- MZ[2] # Zeta (overdispersion)
-    out <- 0
-    ns <- length(X)
-    -sum(stats::dnorm(X,mean=M,sd=sqrt(sX^2+Z^2),log=TRUE))
+    Z <- MZ[2]  # Zeta (log of squared overdispersion to ensure positivity)
+    LL <- -0.5*log(2*pi) - 0.5*log(sX^2+exp(Z)) - 0.5*((X-M)^2)/(sX^2+exp(Z))
+    sum(LL)
+}
+
+gr.weightedmean <- function(MZ,X,sX){
+    M <- MZ[1]
+    Z <- MZ[2]
+    dLL.dmu <- (X-M)/(sX^2+exp(Z))
+    dLL.dZ <- -0.5*exp(Z)/(sX^2+exp(Z)) + 0.5*(exp(Z)*(X-M)^2)/((sX^2+exp(Z))^2)
+    c(sum(dLL.dmu),sum(dLL.dZ))
 }
 
 wtdmean.title <- function(fit,sigdig=2){
@@ -338,13 +351,14 @@ wtdmean.title <- function(fit,sigdig=2){
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    graphics::mtext(line1,line=2)
-    graphics::mtext(line2,line=1)
     if (fit$p.value < 0.05){ # only show when the data are overdispersed
-        rounded.disp <- roundit(fit$disp[1],fit$disp[2],sigdig=sigdig)
-        line3 <- substitute('overdispersion ='~a%+-%b~' (1'~sigma~')',
-                            list(a=rounded.disp[1], b=rounded.disp[2]))
+        line3 <- paste0('overdispersion = ',signif(fit$disp,sigdig))
+        graphics::mtext(line1,line=2)
+        graphics::mtext(line2,line=1)
         graphics::mtext(line3,line=0)
+    } else {
+        graphics::mtext(line1,line=1)
+        graphics::mtext(line2,line=0)
     }
 }
 
