@@ -120,18 +120,21 @@ plateau <- function(x,alpha=0.05){
     YsY <- x[,c(2,3)]
     ns <- length(X)
     out <- list()
-    out$mean <- c(0,0)
-    out$mswd <- 0
-    out$p.value <- 0
+    out$mean <- YsY[1,1:2]
+    out$mswd <- 1
+    out$p.value <- 1
     out$fract <- 0
-    for (i in 1:(ns-1)){
+    for (i in 1:(ns-1)){ # at least two steps in a plateau
         for (j in (i+1):ns){
             fract <- sum(X[i:j],na.rm=TRUE)
-            avg <- weightedmean(YsY[i:j,],plot=FALSE,
-                                detect.outliers=FALSE)
-            if (avg$p.value < alpha) {
-                break
-            } else if (fract > out$fract) {
+            Y <- YsY[i:j,1]
+            sY <- YsY[i:j,2]
+            valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1))
+            if (any(!valid)){
+                break;
+            } else if (fract > out$fract){
+                avg <- weightedmean(YsY[i:j,],plot=FALSE,
+                                    detect.outliers=FALSE)
                 out$i <- i:j
                 out$mean <- avg$mean
                 out$mswd <- avg$mswd

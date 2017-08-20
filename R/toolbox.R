@@ -19,6 +19,9 @@ roundit <- function(age,err,sigdig=2){
     out
 }
 
+# count the number of TRUEs in x
+count <- function(x){ length(which(x)) }
+
 # set minimum and maximum values of a dataset
 getmM <- function(x,from=NA,to=NA,log=FALSE){
     if (is.na(from)) { from <- min(x,na.rm=TRUE); getm <- TRUE }

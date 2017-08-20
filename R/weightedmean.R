@@ -59,17 +59,14 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     X <- x[,1]
     sX <- x[,2]
     valid <- !is.na(X) & !is.na(sX)
+    nvalid <- count(valid)
     if (detect.outliers){
         while (TRUE){
-            fit <- get.weightedmean(X,sX,valid)
-            mu <- fit$mean[1]
-            sigma <- sqrt(fit$disp^2+sX^2)
-            prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
-            minp <- min(prob[valid])
-            imin <- which(minp==prob)[1]
-            ns <- length(valid[valid])
-            if (ns*minp < 0.5) valid[imin] <- FALSE # remove outlier
-            else break # no outliers left
+            valid <- chauvenet(X,sX,valid)
+            if (count(valid) < nvalid)
+                nvalid <- count(valid)
+            else
+                break
         }
     }
     fit <- get.weightedmean(X,sX,valid)
@@ -306,23 +303,35 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     }
 }
 
-get.weightedmean <- function(X,sX,valid=TRUE){
+get.weightedmean <- function(X,sX,valid=TRUE,overdispersion=TRUE){
     out <- list()
     x <- X[valid]
     sx <- sX[valid]
     if (length(x)>1){
-        MZ <- c(mean(x),0)
-        fit <- stats::optim(MZ,LL.weightedmean,gr=gr.weightedmean,
-                            X=x,sX=sx,method='BFGS',hessian=TRUE,
-                            control=list(fnscale=-1))
-        covmat <- solve(-fit$hessian)
-        out$mean <- c(fit$par[1],sqrt(covmat[1,1]))
-        out$disp <- sqrt(exp(fit$par[2]))
-        df <- length(x)-1
-        SS <- sum(((x-out$mean[1])/sx)^2)
-        out$mswd <- SS/df
-        out$p.value <- 1-stats::pchisq(SS,df)
-        out$valid <- valid
+        tryCatch({
+            MZ <- c(mean(x),0)
+            fit <- stats::optim(MZ,LL.weightedmean.disp,
+                                gr=gr.weightedmean.disp,
+                                X=x,sX=sx,method='BFGS',hessian=TRUE,
+                                control=list(fnscale=-1))
+            covmat <- solve(-fit$hessian)
+            out$mean <- c(fit$par[1],sqrt(covmat[1,1]))
+            out$disp <- sqrt(exp(fit$par[2]))
+        }, error = function(e) {
+            M <- mean(x)
+            fit <- stats::optim(M,LL.weightedmean,
+                                X=x,sX=sx,method='BFGS',hessian=TRUE,
+                                control=list(fnscale=-1))
+            covmat <- solve(-fit$hessian)
+            out$mean <<- c(fit$par,sqrt(covmat))
+            out$disp <<- 0
+        }, finally = {
+            df <- length(x)-1
+            SS <- sum(((x-out$mean[1])/sx)^2)
+            out$mswd <- SS/df
+            out$p.value <- 1-stats::pchisq(SS,df)
+            out$valid <- valid
+        })
     } else {
         out$mean <- x
         out$p.value <- 0
@@ -330,19 +339,24 @@ get.weightedmean <- function(X,sX,valid=TRUE){
     out
 }
 
-LL.weightedmean <- function(MZ,X,sX){
+LL.weightedmean.disp <- function(MZ,X,sX){
     M <- MZ[1] # Mu (mean)
     Z <- MZ[2]  # Zeta (log of squared overdispersion to ensure positivity)
     LL <- -0.5*log(2*pi) - 0.5*log(sX^2+exp(Z)) - 0.5*((X-M)^2)/(sX^2+exp(Z))
     sum(LL)
 }
 
-gr.weightedmean <- function(MZ,X,sX){
+gr.weightedmean.disp <- function(MZ,X,sX){
     M <- MZ[1]
     Z <- MZ[2]
     dLL.dmu <- (X-M)/(sX^2+exp(Z))
     dLL.dZ <- -0.5*exp(Z)/(sX^2+exp(Z)) + 0.5*(exp(Z)*(X-M)^2)/((sX^2+exp(Z))^2)
     c(sum(dLL.dmu),sum(dLL.dZ))
+}
+
+LL.weightedmean <- function(M,X,sX){
+    LL <- -0.5*log(2*pi) - 0.5*log(sX^2) - 0.5*((X-M)^2)/(sX^2)
+    sum(LL)
 }
 
 wtdmean.title <- function(fit,sigdig=2){
@@ -381,4 +395,20 @@ plot_weightedmean <- function(X,sX,fit,rect.col=grDevices::rgb(0,1,0,0.5),
                        xright=i+0.4,ytop=X[i]+fact*sX[i],col=col)
     }
     graphics::title(wtdmean.title(fit,sigdig=sigdig))
+}
+
+# prune the data if necessary
+# X and sX are some measurements and their standard errors
+# valid is a vector of logical flags indicating whether the corresponding
+# measurements have already been rejected or not
+chauvenet <- function(X,sX,valid){
+    fit <- get.weightedmean(X,sX,valid)
+    mu <- fit$mean[1]
+    sigma <- sqrt(fit$disp^2+sX^2)
+    prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
+    minp <- min(prob[valid])
+    imin <- which(minp==prob)[1]
+    ns <- length(valid[valid])
+    if (ns*minp < 0.5) valid[imin] <- FALSE # remove outlier
+    valid
 }
