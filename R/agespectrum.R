@@ -32,6 +32,8 @@
 #' @param lwd line width
 #' @param title add a title to the plot? If \code{FALSE}, returns a
 #'     list with plateau parameters.
+#' @param xlim x-axis label
+#' @param ylim y-axis label
 #' @param ... optional parameters to the generic \code{plot} function
 #' @return if \code{title=FALSE}, returns a list with the following
 #'     items:
@@ -56,8 +58,10 @@ agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 plateau.col=rgb(0,1,0,0.5),
                                 non.plateau.col=rgb(0,1,1,0.5),
-                                sigdig=2,line.col='red',lwd=2,
-                                title=TRUE,...){
+                                sigdig=2,line.col='red',
+                                lwd=2,title=TRUE,
+                                xlab='cumulative fraction',
+                                ylab='age [Ma]',...){
     ns <- nrow(x)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
@@ -66,7 +70,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     fact <- stats::qnorm(1-alpha/2)
     maxY <- max(Y+fact*sY,na.rm=TRUE)
     minY <- min(Y-fact*sY,na.rm=TRUE)
-    graphics::plot(c(0,1),c(minY,maxY),type='n',...)
+    graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
     plat <- plateau(x,alpha=alpha)
     if (plateau) {
         colour <- rep(non.plateau.col,ns)
@@ -79,7 +83,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
         graphics::rect(X[i],Y[i]-fact*sY[i],X[i+1],Y[i]+fact*sY[i],col=colour[i])
         if (i<ns) graphics::lines(rep(X[i+1],2),c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
     }
-    if (plateau & title) graphics::title(plateau.title(plat,sigdig=sigdig))
+    if (plateau & title) graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
     else return(plat)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
@@ -110,7 +114,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     # taking into account decay and J uncertainties
     plat$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
     if (plateau){
-        graphics::title(plateau.title(plat,sigdig=sigdig))
+        graphics::title(plateau.title(plat,sigdig=sigdig,Ar=TRUE))
     }
 }
 
@@ -146,7 +150,7 @@ plateau <- function(x,alpha=0.05){
     out
 }
 
-plateau.title <- function(fit,sigdig=2){
+plateau.title <- function(fit,sigdig=2,Ar=TRUE){
     rounded.mean <- roundit(fit$mean[1],fit$mean[2],sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
                         list(a=rounded.mean[1], b=rounded.mean[2]))
@@ -154,7 +158,10 @@ plateau.title <- function(fit,sigdig=2){
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
     a <- signif(100*fit$fract,sigdig)
-    line3 <- bquote(paste("Includes ",.(a),"% of the",""^"39","Ar"))
+    if (Ar)
+        line3 <- bquote(paste("Includes ",.(a),"% of the",""^"39","Ar"))
+    else
+        line3 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)
