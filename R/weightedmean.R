@@ -61,8 +61,10 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     valid <- !is.na(X) & !is.na(sX)
     if (detect.outliers){
         while (TRUE){
-            prob <- 2*(1-stats::pnorm(abs(X-mean(X[valid])),
-                                      sd=stats::sd(X[valid])))
+            fit <- get.weightedmean(X,sX,valid)
+            mu <- fit$mean[1]
+            sigma <- sqrt(fit$disp^2+sX^2)
+            prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
             minp <- min(prob[valid])
             imin <- which(minp==prob)[1]
             ns <- length(valid[valid])
@@ -315,8 +317,7 @@ get.weightedmean <- function(X,sX,valid=TRUE){
                             control=list(fnscale=-1))
         covmat <- solve(-fit$hessian)
         out$mean <- c(fit$par[1],sqrt(covmat[1,1]))
-        Z <- fit$par[2]
-        out$disp <- sqrt(exp(Z))
+        out$disp <- sqrt(exp(fit$par[2]))
         df <- length(x)-1
         SS <- sum(((x-out$mean[1])/sx)^2)
         out$mswd <- SS/df
