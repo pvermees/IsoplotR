@@ -2,8 +2,10 @@
 #'
 #' Plots Th-U data on a
 #' \eqn{^{234}}U/\eqn{^{238}}U-\eqn{^{230}}Th/\eqn{^{238}}U evolution
-#' diagram or a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, calculates
-#' isochron ages.
+#' diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or
+#' (if \eqn{^{234}}U/\eqn{^{238}}U is assumed to be in secular equilibrium),
+#' a \eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
+#' calculates isochron ages.
 #'
 #' @param x an object of class \code{ThU}
 #' @param xlim x-axis limits
@@ -125,51 +127,43 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
     }
 }
 
-Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA, alpha=0.05,
+Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,exterr=TRUE,
                         ellipse.col=grDevices::rgb(0,1,0,0.5),
-                        sigdig=2, line.col='darksalmon',...){
-    if (isochron){
-        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
-        d <- fit$d
-        Th230Th232_0x <- fit$y0[1]
-    } else {
-        d <- data2york(x,type=1)
-        Th230Th232_0x <- 0
-    }
-    scatterplot(d,xlim=xlim,ylim=ylim,empty=TRUE)
+                        sigdig=2,line.col='darksalmon',...){
+    d <- data2evolution(x,isochron=isochron)
+    scatterplot(d$x,xlim=xlim,ylim=ylim,empty=TRUE)
     ticks <- c(0,1,10,20,50,100,200,300)
     X <- par('usr')[1:2]
     Y <- X
-    lines(X,Y,col=line.col,...)
+    lines(X,Y,col=line.col,...) # equilibrium line
     minY <- par('usr')[3]
     maxY <- par('usr')[4]
-    if (maxY<X[2]){
+    if (maxY<X[2]) # add infinity symbol for equilibrium line
         text(maxY,maxY,'\U221E',pos=1,col=line.col)
-    } else {
+    else
         text(X[2],X[2],'\U221E',pos=2,col=line.col)
-    }
-    for (tick in ticks){
-        Y <- get.Th230Th232(tick,Th230Th232_0x,X)
+    for (tick in ticks){ # plot isolines
+        Y <- get.Th230Th232(tick,d$Th230Th232_0x,X)
         lines(X,Y,col=line.col,...)
         if (Y[2]<minY){
             # do nothing
-        } else if (Y[2]>maxY){
-            xtext <- get.U238Th232(tick,Th230Th232_0x,maxY)
+        } else if (Y[2]>maxY){ # label below upper margin
+            xtext <- get.U238Th232(tick,d$Th230Th232_0x,maxY)
             ytext <- maxY
             text(xtext,ytext,tick,pos=1,col=line.col)
-        } else {
+        } else { # label to the left of the right margin
             xtext <- X[2]
             ytext <- Y[2]
             text(xtext,ytext,tick,pos=2,col=line.col)
         }
     }
-    if (isochron){
+    if (isochron){ # plot the data and isochron line fit
         isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
                      ellipse.col=ellipse.col,line.col='black',
                      exterr=exterr,sigdig=sigdig,new.plot=FALSE)
-    } else {
-        scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+    } else { # plot just the data
+        scatterplot(d$x,alpha=alpha,show.numbers=show.numbers,
                     ellipse.col=ellipse.col,
                     new.plot=FALSE)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
@@ -241,7 +235,7 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     rbind(xlim,ylim)
 }
 
-data2evolution <- function(x,detrital=FALSE){
+data2evolution <- function(x,detrital=FALSE,isochron=FALSE){
     out <- list()
     labels <- c('Th230U238','errTh230U238',
                 'U234U238','errU234U238','cov')
@@ -267,13 +261,27 @@ data2evolution <- function(x,detrital=FALSE){
             out[i,'errU234U238'] <- sqrt(covmat[2,2])
             out[i,'cov'] <- covmat[1,2]
         }
-    } else {
+    } else if (x$format == 2){
         xy <- x$x[,c('Th230U238','errTh230U238',
                       'U234U238','errU234U238')]
         covariance <- x$x[,'errTh230U238']*
             x$x[,'errU234U238']*x$x[,'rhoYZ']
         out <- cbind(xy,covariance)
         colnames(out) <- labels
+    } else if (x$format %in% c(3,4)){
+        if (isochron){ # calculate initio 230Th from isochron intercept
+            fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
+            out$x <- fit$d
+            out$Th230Th232_0x <- fit$y0[1]
+            out$Th230Th232_0 <- fit$a[1]
+        } else { # assume no initial 230Th
+            out$x <- data2york(x,type=1)
+            out$Th230Th232_0x <- 0
+            out$Th230Th232_0 <- 0
+        }
+        colnames(out$x) <- c('U238Th232','errU238Th232',
+                             'Th230Th232','errTh230Th232',
+                             'rho')
     }
     if (detrital){
         osmond <- data2tit.ThU(x,osmond=TRUE)
