@@ -85,9 +85,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05, sigdig=2,
 #'
 #' @param exterr propagate external sources of uncertainty (J, decay constant)?
 #'
-#' @return if \code{plot=FALSE}, and \code{x} has class \code{PbPb},
-#'     \code{ArAr}, \code{RbSr}, \code{SmNd}, \code{ReOs} or
-#'     \code{LuHf}, returns a list with the following items:
+#' @return if \code{x} has class \code{PbPb}, \code{ArAr},
+#'     \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf},
+#'     \code{ThU}, or \code{UThHe}, returns a list with the following
+#'     items:
 #'
 #' \describe{
 #'
@@ -194,9 +195,8 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),xlab=x.lab,ylab=y.lab)
-    } else {
-        return(out)
     }
+    out
 }
 #' @rdname isochron
 #' @export
@@ -228,9 +228,8 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),xlab=x.lab,ylab=y.lab)
-    } else {
-        return(out)
     }
+    out
 }
 #' @rdname isochron
 #' @export
@@ -296,20 +295,22 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                           sigdig=2,show.numbers=FALSE,
                           ellipse.col=rgb(0,1,0,0.5),line.col='red',
                           lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
-    if (x$format %in% c(1,2))
+    if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr)
-    else if (x$format %in% c(3,4))
+        intercept.type <- 'Th-U-3D'
+    } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr)
+        intercept.type <- 'Th-U-2D'
+    }
     if (plot){
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model==1),show.numbers=show.numbers,
                     ellipse.col=ellipse.col,a=out$a[1],b=out$b[1],
                     line.col=line.col,lwd=lwd,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='Th-U'),
+        graphics::title(isochrontitle(out,sigdig=sigdig,type=intercept.type),
                         xlab=out$xlab,ylab=out$ylab)
-    } else {
-        return(out)
     }
+    out
 }
 #' @rdname isochron
 #' @export
@@ -328,9 +329,8 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
                         xlab="P",ylab="He")
-    } else {
-        return(out)
     }
+    out
 }
 
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE){
@@ -388,7 +388,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE){
     out$d <- d[,id]
     out
 }
-
 isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE){
     d <- data2york(x,type=type)
     fit <- regression(d,model=model,type="york")
@@ -405,7 +404,10 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE){
     }
     tt <- get.ThU.age(Th230U238[1],Th230U238[2],exterr=exterr)
     out$age <- tt[c('t','s[t]')]
-    out$y0 <- fit$a
+    if (type==1)
+        out$y0 <- get.Th230Th232_0x(tt,fit$a[1],fit$a[2])
+    else
+        out$y0 <- get.Th230Th232_0x(tt,fit$b[1],fit$b[2])
     out$xlab <- xlab
     out$ylab <- ylab
     out$d <- d
@@ -439,7 +441,8 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=1*(model==1),
                     show.numbers=show.numbers,ellipse.col=ellipse.col,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),xlab=x.lab,ylab=y.lab)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
+                        xlab=x.lab,ylab=y.lab)
     } else {
         return(out)
     }
@@ -465,10 +468,16 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         line1 <- substitute('age ='~a%+-%b~'(1'~sigma~')',
                             list(a=rounded.age[1], b=rounded.age[2]))
         if (identical(type,'Ar-Ar')) {
-            line2 <- substitute('('^40*'Ar/'^39*'Ar)'[o]~c%+-%d~'(1'~sigma~')',
+            line2 <- substitute('('^40*'Ar/'^39*'Ar)'[o]~'='~c%+-%d~'(1'~sigma~')',
                                 list(c=rounded.intercept[1], d=rounded.intercept[2]))
         } else if (identical(type,'Pb-Pb')) {
-            line2 <- substitute('('^207*'Pb/'^204*'Pb)'[o]~c%+-%d~'(1'~sigma~')',
+            line2 <- substitute('('^207*'Pb/'^204*'Pb)'[o]~'='~c%+-%d~'(1'~sigma~')',
+                                list(c=rounded.intercept[1], d=rounded.intercept[2]))
+        } else if (identical(type,'Th-U-3D')) {
+            line2 <- substitute('('^234*'U/'^238*'U)'[o]~'='~c%+-%d~'(1'~sigma~')',
+                                list(c=rounded.intercept[1], d=rounded.intercept[2]))
+        } else if (identical(type,'Th-U-2D')) {
+            line2 <- substitute('('^230*'Th/'^232*'Th)'[o]^x*~'='~c%+-%d~'(1'~sigma~')',
                                 list(c=rounded.intercept[1], d=rounded.intercept[2]))
         } else {
             line2 <- substitute('intercept ='~c%+-%d~'(1'~sigma~')',

@@ -45,15 +45,18 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                     show.numbers=show.numbers,ellipse.col=ellipse.col,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,xlim=xlim,
-                        ylim=ylim,alpha=alpha, show.numbers=show.numbers,
-                        ellipse.col=ellipse.col, line.col=line.col,...)
+                        ylim=ylim,alpha=alpha,show.numbers=show.numbers,
+                        ellipse.col=ellipse.col,line.col=line.col,...)
         }
         if (isochron){
             fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr)
             graphics::title(evolution.title(fit,sigdig=sigdig))
         }
     } else {
-        # TODO
+        Th02vsTh0U8(x,isochron=isochron,xlim=xlim,ylim=ylim,
+                    alpha=alpha,show.numbers=show.numbers,
+                    exterr=exterr,sigdig=sigdig,
+                    ellipse.col=ellipse.col,line.col=line.col,...)
     }
 }
 
@@ -121,6 +124,63 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
                     line.col='black',new.plot=FALSE)
     }
 }
+
+Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA, alpha=0.05,
+                        show.numbers=FALSE,exterr=TRUE,
+                        ellipse.col=grDevices::rgb(0,1,0,0.5),
+                        sigdig=2, line.col='darksalmon',...){
+    if (isochron){
+        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
+        d <- fit$d
+        Th230Th232_0x <- fit$y0[1]
+    } else {
+        d <- data2york(x,type=1)
+        Th230Th232_0x <- 0
+    }
+    scatterplot(d,xlim=xlim,ylim=ylim,empty=TRUE)
+    ticks <- c(0,1,10,20,50,100,200,300)
+    X <- par('usr')[1:2]
+    Y <- X
+    lines(X,Y,col=line.col,...)
+    minY <- par('usr')[3]
+    maxY <- par('usr')[4]
+    if (maxY<X[2]){
+        text(maxY,maxY,'\U221E',pos=1,col=line.col)
+    } else {
+        text(X[2],X[2],'\U221E',pos=2,col=line.col)
+    }
+    for (tick in ticks){
+        Y <- get.Th230Th232(tick,Th230Th232_0x,X)
+        lines(X,Y,col=line.col,...)
+        if (Y[2]<minY){
+            # do nothing
+        } else if (Y[2]>maxY){
+            xtext <- get.U238Th232(tick,Th230Th232_0x,maxY)
+            ytext <- maxY
+            text(xtext,ytext,tick,pos=1,col=line.col)
+        } else {
+            xtext <- X[2]
+            ytext <- Y[2]
+            text(xtext,ytext,tick,pos=2,col=line.col)
+        }
+    }
+    if (isochron){
+        isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
+                     ellipse.col=ellipse.col,line.col='black',
+                     exterr=exterr,sigdig=sigdig,new.plot=FALSE)
+    } else {
+        scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+                    ellipse.col=ellipse.col,
+                    new.plot=FALSE)
+        xlab <- expression(paste(""^"238","U/"^"232","Th"))
+        ylab <- expression(paste(""^"230","Th/"^"232","Th"))
+        title(xlab=xlab,ylab=ylab)
+        tit <- expression(paste("[isochrons assume ("^"230","Th/"^
+                                "232","Th)"[o]^x*" = 0]"))
+        graphics::mtext(tit,line=0)
+    }
+}
+
 
 evolution.title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)

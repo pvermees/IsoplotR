@@ -246,6 +246,7 @@ data2york.ThU <- function(x,type=2,...){
     } else {
         stop('Incorrect data format and/or plot type')
     }
+    colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
 
