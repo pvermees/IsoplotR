@@ -1,4 +1,4 @@
-get.ThU.age <- function(U234U238,sU234U238,Th230U238,sTh230U238,cov4808,
+get.ThU.age <- function(Th230U238,sTh230U238,U234U238=1,sU234U238=0,cov4808=0,
                         exterr=TRUE,cor=FALSE){
     l0 <- lambda('Th230')
     l4 <- lambda('U234')
@@ -134,9 +134,9 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
         if (i2i){ # project onto 08-48 plane
             a0 <- osmond[j,'Y'] - fit$par['b']*osmond[j,'X']
             A0 <- osmond[j,'Z'] - fit$par['B']*osmond[j,'X']
-            out[j,] <- get.ThU.age(a0,sa,A0,sA,covAa,exterr=exterr,cor=cor)
+            out[j,] <- get.ThU.age(A0,sA,a0,sa,covAa,exterr=exterr,cor=cor)
         } else {
-            out[j,] <- get.ThU.age(a,sa,A,sA,covAa,exterr=exterr,cor=cor)
+            out[j,] <- get.ThU.age(A,sA,a,sa,covAa,exterr=exterr,cor=cor)
         }
     }
     if (!is.na(sigdig)){

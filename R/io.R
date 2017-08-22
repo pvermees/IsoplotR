@@ -403,13 +403,14 @@ as.ArAr <- function(x,format=3){
     } else if (nc %in% c(4,5,6)){
         if (nc==6){
             out$x <- X
-        } else {
+        }
+        if (nc==4) {
+            out$x <- cbind(X,0)
+        }
+        if (nc %in% c(4,5)){
             ns <- nr-bi+1 # number of samples
             Ar39 <- rep(1/ns,ns)
             out$x <- cbind(X,Ar39)
-        }
-        if (nc==4) {
-            rho <- 0
         }
         if (format==1) {
             colnames(out$x) <- c('Ar39Ar36','errAr39Ar36',
@@ -494,6 +495,16 @@ as.ThU <- function(x,format=1){
                     'U234U238','errU234U238',
                     'Th230U238','errTh230U238',
                     'rhoXY','rhoXZ','rhoYZ')
+    } else if (format == 3 & nc %in% c(4,5)) {
+        if (nc==4) X <- cbind(X,0)
+        cnames <- c('U238Th232','errU238Th232',
+                    'Th230Th232','errTh230Th232',
+                    'rho')
+    } else if (format == 4 & nc %in% c(4,5)) {
+        if (nc==4) X <- cbind(X,0)
+        cnames <- c('Th232U238','errTh232U238',
+                    'Th230U238','errTh230U238',
+                    'rho')
     }
     out$x <- X
     colnames(out$x) <- cnames

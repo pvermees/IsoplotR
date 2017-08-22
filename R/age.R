@@ -33,8 +33,9 @@
 #' \item a six element vector containing \code{Lu}, \code{s[Lu]},
 #' \code{Hf}, \code{s[Hf]}, \code{Hf176Hf177}, and \code{s[Hf176Hf177]}
 #'
-#' \item a five element vector containing \code{4/8}, \code{s[4/8]},
-#' \code{0/8}, \code{s[0/8]}, and \code{cov[4/8,0/8]}
+#' \item a five element vector containing \code{0/8}, \code{s[0/8]},
+#' \code{4/8}, \code{s[4/8]} and \code{cov[0/8,4/8]}
+#'
 #' }
 #'
 #' OR
@@ -64,35 +65,34 @@ age <- function(x,...){ UseMethod("age",x) }
 #' @export
 age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
                         zeta=c(NA,NA),rhoD=c(NA,NA),...){
-    if (length(x)==1) X <- c(x,0)
-    else X <- x[1:2]
+    if (length(x)==1) x <- c(x,0)
     if (identical(method,'U235-Pb207')){
-        out <- get.Pb207U235.age(X[1],X[2],exterr)
+        out <- get.Pb207U235.age(x[1],x[2],exterr)
     } else if (identical(method,'U238-Pb206')){
-        out <- get.Pb206U238.age(X[1],X[2],exterr)
+        out <- get.Pb206U238.age(x[1],x[2],exterr)
     } else if (identical(method,'Pb206-Pb207')){
-        out <- get.Pb207Pb206.age(X[1],X[2],exterr)
+        out <- get.Pb207Pb206.age(x[1],x[2],exterr)
     } else if (identical(method,'Ar-Ar')){
-        out <- get.ArAr.age(X[1],X[2],X[3],X[4],exterr)
+        out <- get.ArAr.age(x[1],x[2],x[3],x[4],exterr)
     } else if (identical(method,'Re-Os')){
-        out <- get.ReOs.age(X[1],X[2],exterr)
+        out <- get.ReOs.age(x[1],x[2],exterr)
     } else if (identical(method,'Rb-Sr')){
-        out <- get.RbSr.age(X[1],X[2],exterr)
+        out <- get.RbSr.age(x[1],x[2],exterr)
     } else if (identical(method,'Sm-Nd')){
-        out <- get.SmNd.age(X[1],X[2],exterr)
+        out <- get.SmNd.age(x[1],x[2],exterr)
     } else if (identical(method,'Lu-Hf')){
-        out <- get.LuHf.age(X[1],X[2],exterr)
+        out <- get.LuHf.age(x[1],x[2],exterr)
     } else if (identical(method,'Th-U')){
-        out <- get.ThU.age(X[1],X[2],X[3],X[4],X[5],exterr)
+        out <- get.ThU.age(x[1],x[2],x[3],x[4],x[5],exterr)
     } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
-            out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6])
+            out <- get.UThHe.age(x[1],x[2],x[3],x[4],x[5],x[6])
         else if (length(x)==8)
-            out <- get.UThHe.age(X[1],X[2],X[3],X[4],X[5],X[6],X[7],X[8])
+            out <- get.UThHe.age(x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8])
     } else if (identical(method,'fissiontracks')){
-        out <- get.EDM.age(X[1],X[2],zeta,rhoD)
+        out <- get.EDM.age(x[1],x[2],zeta,rhoD)
     } else {
-        out <- x
+        out <- NA
     }
     out
 }

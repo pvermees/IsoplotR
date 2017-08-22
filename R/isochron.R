@@ -292,64 +292,21 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' }
 #' @rdname isochron
 #' @export
-isochron.ThU <- function (x,type=4,xlim=NA,ylim=NA,alpha=0.05,
+isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                           sigdig=2,show.numbers=FALSE,
                           ellipse.col=rgb(0,1,0,0.5),line.col='red',
                           lwd=2,plot=TRUE,exterr=TRUE,model=1,...){
-    if (type == 1){
-        osmond <- FALSE
-        ia <- 'a'
-        ib <- 'b'
-        i48 <- 'b'
-        i08 <- 'B'
-        id <- c('X','sX','Y','sY','rXY')
-        x.lab <- expression(paste(""^"238","U/"^"232","Th"))
-        y.lab <- expression(paste(""^"230","Th/"^"232","Th"))
-    } else if (type == 2){
-        osmond <- TRUE
-        ia <- 'A'
-        ib <- 'B'
-        i48 <- 'a'
-        i08 <- 'A'
-        id <- c('X','sX','Z','sZ','rXZ')
-        x.lab <- expression(paste(""^"232","Th/"^"238","U"))
-        y.lab <- expression(paste(""^"230","Th/"^"238","U"))
-    } else if (type == 3){
-        osmond <- FALSE
-        ia <- 'A'
-        ib <- 'B'
-        i48 <- 'b'
-        i08 <- 'B'
-        id <- c('X','sX','Z','sZ','rXZ')
-        x.lab <- expression(paste(""^"238","U/"^"232","Th"))
-        y.lab <- expression(paste(""^"234","U/"^"232","Th"))
-    } else if (type == 4){
-        osmond <- TRUE
-        ia <- 'a'
-        ib <- 'b'
-        i48 <- 'a'
-        i08 <- 'A'
-        id <- c('X','sX','Y','sY','rXY')
-        x.lab <- expression(paste(""^"232","Th/"^"238","U"))
-        y.lab <- expression(paste(""^"234","U/"^"238","U"))
-    }
-    d <- data2tit(x,osmond=osmond)
-    fit <- regression(d,model=model,type="titterington")
-    out <- fit
-    class(out) <- "isochron"
-    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
-    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
-    out$cov.ab <- fit$cov[ia,ib]
-    tt <- get.ThU.age(fit$par[i48],sqrt(fit$cov[i48,i48]),
-                      fit$par[i08],sqrt(fit$cov[i08,i08]),
-                      fit$cov[i48,i08],exterr=exterr)
-    out$y0 <- tt[c('48_0','s[48_0]')]
-    out$age <- tt[c('t','s[t]')]
+    if (x$format %in% c(1,2))
+        out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr)
+    else if (x$format %in% c(3,4))
+        out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr)
     if (plot){
-        scatterplot(d[,id],xlim=xlim,ylim=ylim,alpha=alpha,show.ellipses=1*(model==1),
-                    show.numbers=show.numbers,ellipse.col=ellipse.col,
-                    a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='Th-U'),xlab=x.lab,ylab=y.lab)
+        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=1*(model==1),show.numbers=show.numbers,
+                    ellipse.col=ellipse.col,a=out$a[1],b=out$b[1],
+                    line.col=line.col,lwd=lwd,...)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='Th-U'),
+                        xlab=out$xlab,ylab=out$ylab)
     } else {
         return(out)
     }
@@ -374,6 +331,85 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     } else {
         return(out)
     }
+}
+
+isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE){
+    if (type == 1){
+        osmond <- FALSE
+        ia <- 'a'
+        ib <- 'b'
+        i48 <- 'b'
+        i08 <- 'B'
+        id <- c('X','sX','Y','sY','rXY')
+        xlab <- expression(paste(""^"238","U/"^"232","Th"))
+        ylab <- expression(paste(""^"230","Th/"^"232","Th"))
+    } else if (type == 2){
+        osmond <- TRUE
+        ia <- 'A'
+        ib <- 'B'
+        i48 <- 'a'
+        i08 <- 'A'
+        id <- c('X','sX','Z','sZ','rXZ')
+        xlab <- expression(paste(""^"232","Th/"^"238","U"))
+        ylab <- expression(paste(""^"230","Th/"^"238","U"))
+    } else if (type == 3){
+        osmond <- FALSE
+        ia <- 'A'
+        ib <- 'B'
+        i48 <- 'b'
+        i08 <- 'B'
+        id <- c('X','sX','Z','sZ','rXZ')
+        xlab <- expression(paste(""^"238","U/"^"232","Th"))
+        ylab <- expression(paste(""^"234","U/"^"232","Th"))
+    } else {
+        osmond <- TRUE
+        ia <- 'a'
+        ib <- 'b'
+        i48 <- 'a'
+        i08 <- 'A'
+        id <- c('X','sX','Y','sY','rXY')
+        xlab <- expression(paste(""^"232","Th/"^"238","U"))
+        ylab <- expression(paste(""^"234","U/"^"238","U"))
+    }
+    d <- data2tit(x,osmond=osmond)
+    fit <- regression(d,model=model,type="titterington")
+    out <- fit
+    class(out) <- "isochron"
+    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
+    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
+    out$cov.ab <- fit$cov[ia,ib]
+    tt <- get.ThU.age(fit$par[i08],sqrt(fit$cov[i08,i08]),
+                      fit$par[i48],sqrt(fit$cov[i48,i48]),
+                      fit$cov[i48,i08],exterr=exterr)
+    out$y0 <- tt[c('48_0','s[48_0]')]
+    out$age <- tt[c('t','s[t]')]
+    out$xlab <- xlab
+    out$ylab <- ylab
+    out$d <- d[,id]
+    out
+}
+
+isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE){
+    d <- data2york(x,type=type)
+    fit <- regression(d,model=model,type="york")
+    out <- fit
+    class(out) <- "isochron"
+    if (type==1){
+        Th230U238 <- fit$b
+        xlab <- expression(paste(""^"238","U/"^"232","Th"))
+        ylab <- expression(paste(""^"230","Th/"^"232","Th"))
+    } else if (type==2) {
+        Th230U238 <- fit$a
+        xlab <- expression(paste(""^"232","Th/"^"238","U"))
+        ylab <- expression(paste(""^"230","Th/"^"238","U"))
+    }
+    tt <- get.ThU.age(Th230U238[1],Th230U238[2],exterr=exterr)
+    out$age <- tt[c('t','s[t]')]
+    out$y0 <- fit$a
+    out$xlab <- xlab
+    out$ylab <- ylab
+    out$d <- d
+    out    
 }
 
 isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,

@@ -39,17 +39,21 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),
                       line.col='darksalmon',isochron=FALSE,
                       exterr=TRUE,sigdig=2,...){
-    if (transform){
-        U4U8vst(x,detrital=detrital,xlim=xlim,ylim=ylim,alpha=alpha,
-                show.numbers=show.numbers,ellipse.col=ellipse.col,...)
+    if (x$format %in% c(1,2)){
+        if (transform){
+            U4U8vst(x,detrital=detrital,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.numbers=show.numbers,ellipse.col=ellipse.col,...)
+        } else {
+            U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,xlim=xlim,
+                        ylim=ylim,alpha=alpha, show.numbers=show.numbers,
+                        ellipse.col=ellipse.col, line.col=line.col,...)
+        }
+        if (isochron){
+            fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr)
+            graphics::title(evolution.title(fit,sigdig=sigdig))
+        }
     } else {
-        U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,xlim=xlim,
-                    ylim=ylim,alpha=alpha, show.numbers=show.numbers,
-                    ellipse.col=ellipse.col, line.col=line.col,...)
-    }
-    if (isochron){
-        fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr)
-        graphics::title(evolution.title(fit,sigdig=sigdig))
+        # TODO
     }
 }
 
@@ -143,7 +147,7 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     else max.dx <- xlim[2] # only used if ylim == NA
     if (any(is.na(ylim))){
         max.dy <- max(d[,'U234U238']+nsd*d[,'errU234U238'])
-        a0max <- get.ThU.age(max.dy,0,max.dx,0,0,exterr=FALSE)['48_0']
+        a0max <- get.ThU.age(max.dx,0,max.dy,0,0,exterr=FALSE)['48_0']
     } else {
         a0max <- ylim[2]
     }    

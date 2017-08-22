@@ -181,7 +181,7 @@ data2york.PD <- function(x,exterr=FALSE,common=FALSE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-data2york.UThHe <- function(x,exterr=FALSE,common=FALSE,...){
+data2york.UThHe <- function(x,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('X','sX','Y','sY','rXY')
@@ -226,5 +226,48 @@ data2york.UThHe <- function(x,exterr=FALSE,common=FALSE,...){
     out[,'sX'] <- sP
     out[,'Y'] <- x[,'He']
     out[,'sY'] <- x[,'errHe']
+    out
+}
+data2york.ThU <- function(x,type=2,...){
+    if (x$format %in% c(1,3) & type==1){
+        out <- x$x[,c('U238Th232','errU238Th232',
+                      'Th230Th232','errTh230Th232','rho')]
+    } else if (x$format %in% c(2,4) & type==2){
+        out <- x$x[,c('Th232U238','errTh232U238',
+                      'Th230U238','errTh230U238','rho')]
+    } else if (x$format %in% c(2,4) & type==1){
+        out <- ThConversionHelper(x)
+        colnames(out) <- c('U238Th232','errU238Th232',
+                           'Th230Th232','errTh230Th232','rho')
+    } else if (x$format %in% c(1,3) & type==2){
+        out <- ThConversionHelper(x)
+        colnames(out) <- c('Th232U238','errTh232U238',
+                           'Th230U238','errTh230U238','rho')
+    } else {
+        stop('Incorrect data format and/or plot type')
+    }
+    out
+}
+
+ThConversionHelper <- function(x){
+    ns <- length(x)
+    J <- matrix(0,2,2)
+    E <- matrix(0,2,2)
+    out <- matrix(0,ns,5)
+    for (i in 1:ns){
+        out[i,1] <- 1/x$x[i,1]
+        out[i,3] <- x$x[i,3]/x$x[i,1]
+        J[1,1] <- -out[i,1]/x$x[i,1]
+        J[2,1] <- -out[i,3]/x$x[i,1]
+        J[2,2] <- 1/x$x[i,1]
+        E[1,1] <- x$x[i,2]^2
+        E[2,2] <- x$x[i,4]^2
+        E[1,2] <- x$x[i,2]*x$x[i,4]*x$x[i,5]
+        E[2,1] <- E[1,2]
+        covmat <- J %*% E %*% t(J)
+        out[i,2] <- sqrt(covmat[1,1])
+        out[i,4] <- sqrt(covmat[2,2])
+        out[i,5] <- covmat[1,2]/(out[i,2]*out[i,4])
+    }
     out
 }
