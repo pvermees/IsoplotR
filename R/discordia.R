@@ -51,14 +51,34 @@ concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
 }
 # used by common Pb correction:
 project.concordia <- function(m76,m86,i76){
-    if (i76>m76)
-        tend <- get.Pb206U238.age(1/m86)[1]
-    else
-        tend <- get.Pb207Pb206.age(m76)[1]
-    search.range <- c(1/10000,tend)
+    t68 <- get.Pb206U238.age(1/m86)[1]
+    t76 <- get.Pb207Pb206.age(m76)[1]
     a <- i76
     b <- (m76-i76)/m86
-    stats::uniroot(intersection.misfit.york, search.range, 
+    neg <- (i76>m76) # negative slope?
+    pos <- !neg
+    above <- (t76>t68) # above concordia?
+    below <- !above
+    search.range <- c(1/10000,t68)
+    if (pos & above){
+        search.range[2] <- t76
+    } else if (pos & below){
+        # don't change
+    } else if (neg & above){
+        # don't change
+    } else if (neg & below){   # it is not clear what to do with samples 
+        tend <- t68            # that plot in the 'forbidden zone' above
+        while (TRUE){          # Wetherill concordia or below T-W concordia
+            misfit <- intersection.misfit.york(tend,a=a,b=b,wetherill=FALSE)
+            if (misfit>0){     # IsoplotR will still project them on
+                tend <- tend+1 # the concordia line.
+            } else {
+                search.range[2] <- tend
+                break
+            }
+        }
+    }
+    stats::uniroot(intersection.misfit.york,search.range, 
                    a=a,b=b,wetherill=FALSE)$root
 }
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
@@ -273,7 +293,7 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         line1 <- substitute('age ='~a%+-%b~'[Ma]',
                             list(a=lower.age[1], b=lower.age[2]))
         line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b,
-                              list(a=intercept[1], b=intercept[2]))
+                              List(a=intercept[1], b=intercept[2]))
     }
     line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
