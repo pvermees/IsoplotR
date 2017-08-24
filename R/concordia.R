@@ -61,7 +61,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.age=0,sigdig=2,common.Pb=0,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
-    concordia.line(X,tlim=tlim,wetherill=wetherill, col=concordia.col,
+    concordia.line(X,tlim=tlim,wetherill=wetherill,col=concordia.col,
                    alpha=alpha,exterr=exterr,...)
     if (show.age==2){
         fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
@@ -85,7 +85,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
     if (show.age==1){
-        fit <- concordia.age(x,wetherill=wetherill,exterr=exterr)
+        fit <- concordia.age(X,wetherill=wetherill,exterr=exterr)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
         graphics::title(concordia.title(fit,sigdig=sigdig))
