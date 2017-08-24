@@ -10,7 +10,8 @@ agespectrum(x, ...)
 
 \method{agespectrum}{default}(x, alpha = 0.05, plateau = TRUE,
   plateau.col = rgb(0, 1, 0, 0.5), non.plateau.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, line.col = "red", lwd = 2, title = TRUE, ...)
+  sigdig = 2, line.col = "red", lwd = 2, title = TRUE,
+  xlab = "cumulative fraction", ylab = "age [Ma]", ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
   plateau.col = rgb(0, 1, 0, 0.5), non.plateau.col = rgb(0, 1, 1, 0.5),
@@ -60,6 +61,10 @@ calibration factor) uncertainties?}
 `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from an
 isochron fit. Setting \code{i2i} to \code{FALSE} uses the
 default values stored in \code{settings('iratio',...)}}
+
+\item{xlim}{x-axis label}
+
+\item{ylim}{y-axis label}
 }
 \value{
 if \code{title=FALSE}, returns a list with the following

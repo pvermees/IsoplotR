@@ -15,7 +15,7 @@
 #' correlations and decay constant uncertainties.
 #'
 #' @param x an object of class \code{UPb}
-#' @param limits age limits of the concordia line
+#' @param tlim age limits of the concordia line
 #' @param alpha confidence cutoff for the error ellipses
 #' @param wetherill logical flag (\code{FALSE} for Tera-Wasserburg)
 #' @param show.numbers logical flag (\code{TRUE} to show grain numbers)
@@ -44,6 +44,7 @@
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
 #'
+#' @param ... optional arguments to the generic \code{plot} function
 #' @examples
 #' data(examples) 
 #' concordia(examples$UPb)
@@ -52,13 +53,13 @@
 #'     pp.665-676.
 #' @importFrom grDevices rgb
 #' @export
-concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
+concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
                       ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                      exterr=TRUE,show.age=0,sigdig=2,common.Pb=0){
+                      exterr=TRUE,show.age=0,sigdig=2,common.Pb=0,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
-    concordia.line(X,limits=limits,wetherill=wetherill,
-                   col=concordia.col,alpha=alpha,exterr=exterr)
+    concordia.line(X,tlim=tlim,wetherill=wetherill, col=concordia.col,
+                   alpha=alpha,exterr=exterr,...)
     if (show.age==2){
         fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
         discordia.plot(fit,wetherill=wetherill)
@@ -85,8 +86,8 @@ concordia <- function(x,limits=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE
 }
 
 # helper function for plot.concordia
-concordia.line <- function(x,limits,wetherill,col,alpha=0.05,exterr=TRUE){
-    lims <- get.concordia.limits(x,limits=limits,wetherill=wetherill)
+concordia.line <- function(x,tlim,wetherill,col,alpha=0.05,exterr=TRUE,...){
+    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
@@ -94,13 +95,12 @@ concordia.line <- function(x,limits,wetherill,col,alpha=0.05,exterr=TRUE){
         x.lab <- expression(paste(""^"238","U/"^"206","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
     }
-    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab)
+    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,...)
     range.t <- range(lims$t)
     m <- max(0.8*lims$t[1],lims$t[1]-range.t/20)
     M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
     nn <- 30 # number of segments into which the concordia line is divided
-    if (wetherill) tt <- seq(from=m,to=M,length.out=nn)
-    else tt <- exp(seq(from=log(m),to=log(M),length.out=nn))
+    tt <- prettier(c(m,M),wetherill=wetherill,n=nn)
     concordia <- matrix(0,nn,2)
     colnames(concordia) <- c('x','y')
     for (i in 1:nn){ # build the concordia line
@@ -133,54 +133,95 @@ concordia.line <- function(x,limits,wetherill,col,alpha=0.05,exterr=TRUE){
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
 }
+prettier <- function(x,wetherill=TRUE,n=20){
+    m <- min(x)
+    M <- max(x)
+    out <- pretty(x,n=n,min.n=n)
+    ntocull <- length(out)-n
+    icull <- seq(from=2,to=2*ntocull,by=2)
+    out <- out[-icull]
+    if (wetherill){
+        out[out<m] <- m
+        out[out<0] <- 0
+    } else {
+        out[1] <- m
+        out[out<=0] <- 1e-10
+    }
+    out[n] <- M
+    out
+}
 age_to_concordia_ratios <- function(tt,wetherill=TRUE,exterr=FALSE){
     if (wetherill) return(age_to_wetherill_ratios(tt,exterr=exterr))
     else return(age_to_terawasserburg_ratios(tt,exterr=exterr))
 }
-get.concordia.limits <- function(x,limits=NULL,wetherill=FALSE){
+get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
     out <- list()
-    out$x <- c(0,0)
-    out$y <- c(0,0)
-    if (is.null(limits)) out$t <- c(0,0)
-    else out$t <- limits
+    args <- list(...)
+    xset <- ('xlim' %in% names(args))
+    yset <- ('ylim' %in% names(args))
+    if (xset) {
+        out$x <- args$xlim
+        minx <- args$xlim[1]
+        maxx <- args$xlim[2]
+    } else {
+        out$x <- c(0,0)
+    }
+    if (yset) {
+        out$y <- args$ylim
+        miny <- args$ylim[1]
+        maxy <- args$ylim[2]
+    } else {
+        out$y <- c(0,0)
+    }
+    if (is.null(tlim)) out$t <- c(0,0)
+    else out$t <- tlim
     nse <- 3 # number of standard errors used for buffer
-    if (!is.null(limits) && wetherill){
-        out$x <- age_to_Pb207U235_ratio(limits)[,'75']
-        out$y <- age_to_Pb206U238_ratio(limits)[,'68']
-    } else if (!is.null(limits) && !wetherill){
-        if (limits[1] <= 0){
+    if (!is.null(tlim) && wetherill){
+        if (!xset) out$x <- age_to_Pb207U235_ratio(tlim)[,'75']
+        if (!yset) out$y <- age_to_Pb206U238_ratio(tlim)[,'68']
+    } else if (!is.null(tlim) && !wetherill){
+        if (tlim[1] <= 0){
             U238Pb206 <- get.U238Pb206.ratios(x)
-            maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
+            if (xset) maxx <- out$x[2]
+            else maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
             out$t[1] <- get.Pb206U238.age(1/maxx)[1]
         }
-        out$x <- age_to_U238Pb206_ratio(out$t)[,'86']
-        out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
-    } else if (is.null(limits) && wetherill) {
-        Pb207U235 <- get.Pb207U235.ratios(x)
-        minx <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
-        maxx <- max(Pb207U235[,1]+nse*Pb207U235[,2],na.rm=TRUE)
-        Pb206U238 <- get.Pb206U238.ratios(x)
-        miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
-        maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
+        if (!xset) out$x <- age_to_U238Pb206_ratio(out$t)[,'86']
+        if (!yset) out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
+    } else if (is.null(tlim) && wetherill) {
+        if (!xset){
+            Pb207U235 <- get.Pb207U235.ratios(x)
+            minx <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
+            maxx <- max(Pb207U235[,1]+nse*Pb207U235[,2],na.rm=TRUE)
+        }
+        if (!yset){
+            Pb206U238 <- get.Pb206U238.ratios(x)
+            miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
+            maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
+        }
         out$t[1] <- min(get.Pb207U235.age(minx)[1],
                         get.Pb206U238.age(miny)[1])
         out$t[2] <- max(get.Pb207U235.age(maxx)[1],
                         get.Pb206U238.age(maxy)[1])
-        out$x <- age_to_Pb207U235_ratio(out$t)[,'75']
-        out$y <- age_to_Pb206U238_ratio(out$t)[,'68']
-    } else if (is.null(limits) && !wetherill){
+        if (!xset) out$x <- age_to_Pb207U235_ratio(out$t)[,'75']
+        if (!yset) out$y <- age_to_Pb206U238_ratio(out$t)[,'68']
+    } else if (is.null(tlim) && !wetherill){
         U238Pb206 <- get.U238Pb206.ratios(x)
         Pb207Pb206 <- get.Pb207Pb206.ratios(x)
-        minx <- min(U238Pb206[,1]-nse*U238Pb206[,2],na.rm=TRUE)
-        maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
-        miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
-        maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
+        if (!xset){
+            minx <- min(U238Pb206[,1]-nse*U238Pb206[,2],na.rm=TRUE)
+            maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
+        }
+        if (!yset){
+            miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
+            maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
+        }
         out$t[1] <- min(get.Pb206U238.age(1/maxx)[1],
                         get.Pb207Pb206.age(miny)[1],na.rm=TRUE)
         out$t[2] <- max(get.Pb206U238.age(1/minx)[1],
                         get.Pb207Pb206.age(maxy)[1],na.rm=TRUE)
-        out$x <- age_to_U238Pb206_ratio(out$t)[,'86']
-        out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
+        if (!xset) out$x <- age_to_U238Pb206_ratio(out$t)[,'86']
+        if (!yset) out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
     }
     out
 }

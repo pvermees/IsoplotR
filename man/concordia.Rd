@@ -7,7 +7,7 @@
 concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   concordia.col = "darksalmon", exterr = TRUE, show.age = 0, sigdig = 2,
-  common.Pb = 0)
+  common.Pb = 0, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}

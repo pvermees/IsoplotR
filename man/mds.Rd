@@ -9,13 +9,12 @@
 mds(x, ...)
 
 \method{mds}{default}(x, classical = FALSE, plot = TRUE, shepard = FALSE,
-  nnlines = FALSE, pch = 21, pos = NULL, cex.symbols = 2.5,
-  col = "black", bg = "white", xlab = "", ylab = "", ...)
+  nnlines = FALSE, pos = NULL, col = "black", bg = "white", xlab = "",
+  ylab = "", ...)
 
 \method{mds}{detritals}(x, classical = FALSE, plot = TRUE,
-  shepard = FALSE, nnlines = FALSE, pch = 21, pos = NULL,
-  cex.symbols = 2.5, col = "black", bg = "white", xlab = "",
-  ylab = "", ...)
+  shepard = FALSE, nnlines = FALSE, pos = NULL, col = "black",
+  bg = "white", xlab = "", ylab = "", ...)
 }
 \arguments{
 \item{x}{a dissimilarity matrix OR an object of class
@@ -36,16 +35,10 @@ used if \code{plot=TRUE}.}
 
 \item{nnlines}{if \code{TRUE}, draws nearest neighbour lines}
 
-\item{pch}{plot character (see \code{?plot} for details). May be a
-vector.}
-
 \item{pos}{a position specifier for the labels (if
 \code{pch!=NA}). Values of 1, 2, 3 and 4 indicate positions
 below, to the left of, above and to the right of the MDS
 coordinates, respectively.}
-
-\item{cex.symbols}{a numerical value giving the amount by which
-plotting symbols should be magnified relative to the default}
 
 \item{col}{plot colour (may be a vector)}
 
@@ -71,7 +64,7 @@ Performs classical or nonmetric Multidimensional Scaling analysis
 }
 \examples{
 data(examples)
-mds(examples$DZ,nnlines=TRUE,cex=5)
+mds(examples$DZ,nnlines=TRUE,pch=21,cex=5)
 dev.new()
 mds(examples$DZ,shepard=TRUE)
 }

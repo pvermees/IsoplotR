@@ -80,8 +80,9 @@ error, or the spontaneous and induced track densities \code{Ns} and
 \item a six element vector containing \code{Lu}, \code{s[Lu]},
 \code{Hf}, \code{s[Hf]}, \code{Hf176Hf177}, and \code{s[Hf176Hf177]}
 
-\item a five element vector containing \code{4/8}, \code{s[4/8]},
-\code{0/8}, \code{s[0/8]}, and \code{cov[4/8,0/8]}
+\item a five element vector containing \code{0/8}, \code{s[0/8]},
+\code{4/8}, \code{s[4/8]} and \code{cov[0/8,4/8]}
+
 }
 
 OR

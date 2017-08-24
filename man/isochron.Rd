@@ -49,7 +49,7 @@ isochron(x, ...)
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
   ...)
 
-\method{isochron}{ThU}(x, type = 4, xlim = NA, ylim = NA, alpha = 0.05,
+\method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
   line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
   ...)
@@ -143,9 +143,10 @@ vs. \eqn{^{232}}Th/\eqn{^{238}}U
 }}
 }
 \value{
-if \code{plot=FALSE}, and \code{x} has class \code{PbPb},
-    \code{ArAr}, \code{RbSr}, \code{SmNd}, \code{ReOs} or
-    \code{LuHf}, returns a list with the following items:
+if \code{x} has class \code{PbPb}, \code{ArAr},
+    \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf},
+    \code{ThU}, or \code{UThHe}, returns a list with the following
+    items:
 
 \describe{
 

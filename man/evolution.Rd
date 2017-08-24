@@ -43,8 +43,10 @@ isochron age?}
 \description{
 Plots Th-U data on a
 \eqn{^{234}}U/\eqn{^{238}}U-\eqn{^{230}}Th/\eqn{^{238}}U evolution
-diagram or a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, calculates
-isochron ages.
+diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or
+(if \eqn{^{234}}U/\eqn{^{238}}U is assumed to be in secular equilibrium),
+a \eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
+calculates isochron ages.
 }
 \examples{
 data(examples)
