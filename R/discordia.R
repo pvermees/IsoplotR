@@ -293,7 +293,7 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         line1 <- substitute('age ='~a%+-%b~'[Ma]',
                             list(a=lower.age[1], b=lower.age[2]))
         line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b,
-                              List(a=intercept[1], b=intercept[2]))
+                            list(a=intercept[1], b=intercept[2]))
     }
     line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
