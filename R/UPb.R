@@ -281,7 +281,7 @@ get.Pb207U235.ratios <- function(x,exterr=FALSE){
         Y <- x$x[,'Pb207Pb206']
         sY <- x$x[,'errPb207Pb206']
         rhoXY <- x$x[,'rhoXY']
-        covXY <- rhoXY/(sX*sY)
+        covXY <- rhoXY*sX*sY
         out[,'Pb207U235'] <- R*Y/X
         relerr2 <- (sX/X)^2 -2*covXY/(X*Y) + (sY/Y)^2
         if (exterr) relerr2 <- relerr2 + (sR/R)^2
