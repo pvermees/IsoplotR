@@ -18,8 +18,10 @@
 #' @param tlim age limits of the concordia line
 #' @param alpha confidence cutoff for the error ellipses
 #' @param wetherill logical flag (\code{FALSE} for Tera-Wasserburg)
-#' @param show.numbers logical flag (\code{TRUE} to show grain numbers)
-#' @param ellipse.col background colour of the error ellipses
+#' @param show.numbers logical flag (\code{TRUE} to show grain
+#'     numbers)
+#' @param ellipse.col background colour of the error ellipses, may be
+#'     a single colour or a vector of colours.
 #' @param concordia.col colour of the concordia line
 #' @param exterr show decay constant uncertainty?
 #' @param show.age one of either:
@@ -53,9 +55,10 @@
 #'     pp.665-676.
 #' @importFrom grDevices rgb
 #' @export
-concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
-                      ellipse.col=rgb(0,1,0,0.5),concordia.col='darksalmon',
-                      exterr=TRUE,show.age=0,sigdig=2,common.Pb=0,...){
+concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
+                      show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                      concordia.col='darksalmon',exterr=TRUE,
+                      show.age=0,sigdig=2,common.Pb=0,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
     concordia.line(X,tlim=tlim,wetherill=wetherill, col=concordia.col,
@@ -66,6 +69,10 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }
     ns <- length(x)
+    if (length(ellipse.col)==ns)
+        ellipse.cols <- ellipse.col
+    else
+        ellipse.cols <- rep(ellipse.col,ns)
     for (i in 1:ns){
         if (wetherill) xyc <- wetherill(X,i)
         else xyc <- tera.wasserburg(X,i)
@@ -73,7 +80,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,show.numbers=FALSE,
         y0 <- xyc$x[2]
         covmat <- xyc$cov
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.col)
+        graphics::polygon(ell,col=ellipse.cols[i])
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }

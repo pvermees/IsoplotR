@@ -96,3 +96,15 @@ LL.norm <- function(x,covmat){
     log(2*pi) + 0.5*determinant(covmat,logarithmic=TRUE)$modulus +
                                 0.5*get.concordia.SS(x,covmat)
 }
+
+levels2colours <- function(levels=c(0,1),colours=c('yellow','red')){
+    n <- length(levels)
+    fn <- colorRamp(colours,alpha=TRUE)
+    normalised.levels <- (levels-min(levels))/(max(levels)-min(levels))
+    col.matrix <- fn(normalised.levels)/255
+    red <- col.matrix[,1]
+    green <- col.matrix[,2]
+    blue <- col.matrix[,3]
+    alpha <- col.matrix[,4]
+    rgb(red,green,blue,alpha)
+}
