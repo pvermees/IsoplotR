@@ -97,8 +97,22 @@ LL.norm <- function(x,covmat){
                                 0.5*get.concordia.SS(x,covmat)
 }
 
+set.ellipse.colours <- function(ns=1,levels=NA,colours=c('yellow','red')){
+    if (any(!is.numeric(levels)) | any(is.na(levels)))
+        levels <- NA
+    nl <- length(levels)
+    out <- rep(colours[1],ns)
+    if (all(is.na(levels))){
+        # do nothing
+    } else if (nl<ns){
+        out[1:nl] <- levels2colours(levels=levels,colours=colours)
+    } else {
+        out <- levels2colours(levels=levels,colours=colours)[1:ns]
+    }
+    out
+}
+
 levels2colours <- function(levels=c(0,1),colours=c('yellow','red')){
-    n <- length(levels)
     fn <- colorRamp(colours,alpha=TRUE)
     normalised.levels <- (levels-min(levels))/(max(levels)-min(levels))
     col.matrix <- fn(normalised.levels)/255

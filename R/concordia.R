@@ -20,8 +20,12 @@
 #' @param wetherill logical flag (\code{FALSE} for Tera-Wasserburg)
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
-#' @param ellipse.col background colour of the error ellipses, may be
-#'     a single colour or a vector of colours.
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours within the error ellipses.
+#' @param ellipse.col a vector of two background colours for the error
+#'     ellipses. If \code{levels=NA}, then only the first colour will
+#'     be used. If \code{levels} is a vector of numbers, then
+#'     \code{ellipse.col} is used to construct a colour ramp.
 #' @param concordia.col colour of the concordia line
 #' @param exterr show decay constant uncertainty?
 #' @param show.age one of either:
@@ -53,10 +57,10 @@
 #' @references Ludwig, K.R., 1998. On the treatment of concordant
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
 #'     pp.665-676.
-#' @importFrom grDevices rgb
 #' @export
 concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
-                      show.numbers=FALSE,ellipse.col=rgb(0,1,0,0.5),
+                      show.numbers=FALSE,levels=NA,
+                      ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=TRUE,
                       show.age=0,sigdig=2,common.Pb=0,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
@@ -69,10 +73,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }
     ns <- length(x)
-    if (length(ellipse.col)==ns)
-        ellipse.cols <- ellipse.col
-    else
-        ellipse.cols <- rep(ellipse.col,ns)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
     for (i in 1:ns){
         if (wetherill) xyc <- wetherill(X,i)
         else xyc <- tera.wasserburg(X,i)
