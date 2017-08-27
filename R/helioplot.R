@@ -14,7 +14,12 @@
 #' @param alpha confidence cutoff for the error ellipses
 #' @param contour.col two-element vector with the fill colours to be
 #'     assigned to the minimum and maximum age contour
-#' @param ellipse.col background colour of the error ellipses
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours within the error ellipses.
+#' @param ellipse.col a vector of two background colours for the error
+#'     ellipses. If \code{levels=NA}, then only the first colour will
+#'     be used. If \code{levels} is a vector of numbers, then
+#'     \code{ellipse.col} is used to construct a colour ramp.
 #' @param sigdig number of significant digits for the central age
 #' @param xlim optional limits of the x-axis (log[U/He]) of the
 #'     logratio plot. If \code{xlim=NA}, the axis limits are
@@ -38,22 +43,22 @@
 #' @export
 helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                       show.numbers=FALSE,alpha=0.05,
-                      contour.col=c('white','red'),
-                      ellipse.col=rgb(0,1,0,0.5),
-                      sigdig=2,xlim=NA,
-                      ylim=NA,fact=NA,...){
+                      contour.col=c('white','red'),levels=NA,
+                      ellipse.col=c("#00FF0080","#0000FF80"),
+                      sigdig=2,xlim=NA,ylim=NA,fact=NA,...){
     fit <- central.UThHe(x)
     if (logratio) {
         plot_logratio_contours(x,contour.col=contour.col,
                                xlim=xlim,ylim=ylim,...)
-        plot_logratio_ellipses(x,alpha=alpha,ellipse.col=ellipse.col,
+        plot_logratio_ellipses(x,alpha=alpha,levels=levels,
+                               ellipse.col=ellipse.col,
                                show.numbers=show.numbers)
     } else {
         if (all(is.na(fact))) fact <- getfact(x,fit)
         plot_helioplot_contours(x,fact=fact,contour.col=contour.col,
                                 xlim=xlim,ylim=ylim)
         plot_helioplot_ellipses(x,fact=fact,alpha=alpha,
-                                ellipse.col=ellipse.col,
+                                levels=levels,ellipse.col=ellipse.col,
                                 show.numbers=show.numbers)
     }
     if (show.central.comp){
@@ -80,23 +85,25 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1))
 }
 
-plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,
-                                   ellipse.col=grDevices::rgb(0,1,0,0.5)){
+plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,levels=NA,
+                                   ellipse.col=c("#00FF0080","#0000FF80")){
     ns <- nrow(x)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
     for (i in 1:ns){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
         ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.col)
+        graphics::polygon(ell,col=ellipse.cols[i])
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
 }
 plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
-                                    show.numbers=FALSE,
-                                    ellipse.col=grDevices::rgb(0,1,0,0.5)){
+                                    show.numbers=FALSE,levels=NA,
+                                    ellipse.col=c("#00FF0080","#0000FF80")){
     ns <- nrow(x)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
     for (i in 1:ns){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
@@ -106,7 +113,7 @@ plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
         HeUTh <- uv2HeUTh(ell)
         xyz <- renormalise(HeUTh,fact=fact)
         xy <- xyz2xy(xyz)
-        graphics::polygon(xy,col=ellipse.col)
+        graphics::polygon(xy,col=ellipse.cols[i])
         xyz0 <- renormalise(HeUTh0,fact=fact)
         x0y0 <- xyz2xy(xyz0)
         if (show.numbers) graphics::text(x0y0[1],x0y0[2],i)

@@ -22,7 +22,12 @@
 #' @param show.numbers boolean flag (\code{TRUE} to show grain
 #'     numbers)
 #' @param pch plot character (default is a filled circle)
-#' @param bg background colour of the plot character
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours of the plot symbols.
+#' @param bg a vector of two background colours for the plot symbols.
+#'     If \code{levels=NA}, then only the first colour will be
+#'     used. If \code{levels} is a vector of numbers, then \code{bg}
+#'     is used to construct a colour ramp.
 #' @param title add a title to the plot?
 #' @param k number of peaks to fit using the finite mixture models of
 #'     Galbraith and Green (1993). Setting \code{k='auto'}

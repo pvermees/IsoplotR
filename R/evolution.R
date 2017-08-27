@@ -17,7 +17,12 @@
 #'     compositions along an isochron?
 #' @param show.numbers label the error ellipses with the grain
 #'     numbers?
-#' @param ellipse.col background colour of the error ellipses
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours within the error ellipses.
+#' @param ellipse.col a vector of two background colours for the error
+#'     ellipses. If \code{levels=NA}, then only the first colour will
+#'     be used. If \code{levels} is a vector of numbers, then
+#'     \code{ellipse.col} is used to construct a colour ramp.
 #' @param line.col colour of the age grid
 #' @param isochron fit a 3D isochron to the data?
 #' @param exterr propagate the decay constant uncertainty in the
@@ -34,20 +39,21 @@
 #' Ludwig, K.R., 2003. Mathematical-statistical treatment of data and
 #'     errors for 230 Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
-#' @importFrom grDevices rgb
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
-                      detrital=FALSE,show.numbers=FALSE,
-                      ellipse.col=rgb(0,1,0,0.5),
+                      detrital=FALSE,show.numbers=FALSE,levels=NA,
+                      ellipse.col=c("#00FF0080","#FF000080"),
                       line.col='darksalmon',isochron=FALSE,
                       exterr=TRUE,sigdig=2,...){
     if (x$format %in% c(1,2)){
         if (transform){
-            U4U8vst(x,detrital=detrital,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.numbers=show.numbers,ellipse.col=ellipse.col,...)
+            U4U8vst(x,detrital=detrital,xlim=xlim,ylim=ylim,
+                    alpha=alpha,show.numbers=show.numbers,
+                    levels=levels,ellipse.col=ellipse.col,...)
         } else {
-            U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,xlim=xlim,
-                        ylim=ylim,alpha=alpha,show.numbers=show.numbers,
+            U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,
+                        xlim=xlim,ylim=ylim,alpha=alpha,
+                        show.numbers=show.numbers,levels=levels,
                         ellipse.col=ellipse.col,line.col=line.col,...)
         }
         if (isochron){
@@ -57,14 +63,14 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
     } else {
         Th02vsTh0U8(x,isochron=isochron,xlim=xlim,ylim=ylim,
                     alpha=alpha,show.numbers=show.numbers,
-                    exterr=exterr,sigdig=sigdig,
+                    exterr=exterr,sigdig=sigdig,levels=levels,
                     ellipse.col=ellipse.col,line.col=line.col,...)
     }
 }
 
-U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
-                    alpha=0.05,show.numbers=FALSE,
-                    ellipse.col=grDevices::rgb(0,1,0,0.5),...){
+U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
+                    show.numbers=FALSE,levels=NA,
+                    ellipse.col=c("#00FF0080","#FF000080"),...){
     ns <- length(x)
     ta0 <- ThU.age(x,exterr=FALSE,i2i=detrital,cor=FALSE)
     nsd <- 3
@@ -76,6 +82,7 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
     y.lab <- expression(paste("("^"234","U/"^"238","U)"[o]))
     graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
     covmat <- matrix(0,2,2)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
     for (i in 1:ns){
         x0 <- ta0[i,'t']
         y0 <- ta0[i,'48_0']
@@ -83,15 +90,15 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,
         covmat[1,2] <- ta0[i,'cov[t,48_0]']
         covmat[2,1] <- covmat[1,2]
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.col)
+        graphics::polygon(ell,col=ellipse.cols[i])
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
-                        ylim=NA, alpha=0.05,show.numbers=FALSE,
-                        ellipse.col=grDevices::rgb(0,1,0,0.5),
+U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
+                        ylim=NA,alpha=0.05,show.numbers=FALSE,
+                        levels=NA,ellipse.col=c("#00FF0080","#FF000080"),
                         line.col='darksalmon',...){
     ns <- length(x)
     d <- data2evolution(x,detrital=detrital)
@@ -104,6 +111,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
         e08 <- fit$par['A'] + fit$par['B']*(e48-fit$par['a'])/fit$par['b']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
     covmat <- matrix(0,2,2)
     for (i in 1:ns){
         x0 <- d[i,'Th230U238']
@@ -112,7 +120,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
         covmat[1,2] <- d[i,'cov']
         covmat[2,1] <- covmat[1,2]
         ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.col)
+        graphics::polygon(ell,col=ellipse.cols[i])
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
@@ -129,7 +137,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE, xlim=NA,
 
 Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,exterr=TRUE,
-                        ellipse.col=grDevices::rgb(0,1,0,0.5),
+                        levels=NA,ellipse.col=c("#00FF0080","#FF000080"),
                         sigdig=2,line.col='darksalmon',...){
     d <- data2evolution(x,isochron=isochron)
     scatterplot(d$x,xlim=xlim,ylim=ylim,empty=TRUE)
@@ -160,11 +168,12 @@ Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
     }
     if (isochron){ # plot the data and isochron line fit
         isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
-                     ellipse.col=ellipse.col,line.col='black',
-                     exterr=exterr,sigdig=sigdig,new.plot=FALSE)
+                     levels=levels,ellipse.col=ellipse.col,
+                     line.col='black', exterr=exterr,sigdig=sigdig,
+                     new.plot=FALSE)
     } else { # plot just the data
         scatterplot(d$x,alpha=alpha,show.numbers=show.numbers,
-                    ellipse.col=ellipse.col,
+                    levels=levels,ellipse.col=ellipse.col,
                     new.plot=FALSE)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
