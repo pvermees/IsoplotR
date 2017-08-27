@@ -4,23 +4,30 @@
 \alias{concordia}
 \title{Concordia diagram}
 \usage{
-concordia(x, limits = NULL, alpha = 0.05, wetherill = TRUE,
-  show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  concordia.col = "darksalmon", exterr = TRUE, show.age = 0, sigdig = 2,
-  common.Pb = 0, ...)
+concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
+  show.numbers = FALSE, levels = NA, ellipse.col = c("#00FF0080",
+  "#FF000080"), concordia.col = "darksalmon", exterr = TRUE, show.age = 0,
+  sigdig = 2, common.Pb = 0, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
 
-\item{limits}{age limits of the concordia line}
+\item{tlim}{age limits of the concordia line}
 
 \item{alpha}{confidence cutoff for the error ellipses}
 
 \item{wetherill}{logical flag (\code{FALSE} for Tera-Wasserburg)}
 
-\item{show.numbers}{logical flag (\code{TRUE} to show grain numbers)}
+\item{show.numbers}{logical flag (\code{TRUE} to show grain
+numbers)}
 
-\item{ellipse.col}{background colour of the error ellipses}
+\item{levels}{a vector with additional values to be displayed as
+different background colours within the error ellipses.}
+
+\item{ellipse.col}{a vector of two background colours for the error
+ellipses. If \code{levels=NA}, then only the first colour will
+be used. If \code{levels} is a vector of numbers, then
+\code{ellipse.col} is used to construct a colour ramp.}
 
 \item{concordia.col}{colour of the concordia line}
 
@@ -48,6 +55,8 @@ Pb-composition
 \code{3}: use the Pb-composition stored in
 \code{settings('iratio','Pb206Pb204')} and
 \code{settings('iratio','Pb207Pb204')}}
+
+\item{...}{optional arguments to the generic \code{plot} function}
 }
 \description{
 Plots U-Pb data on Wetherill and Tera-Wasserburg concordia

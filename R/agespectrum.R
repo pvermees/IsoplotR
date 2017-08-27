@@ -32,8 +32,8 @@
 #' @param lwd line width
 #' @param title add a title to the plot? If \code{FALSE}, returns a
 #'     list with plateau parameters.
-#' @param xlim x-axis label
-#' @param ylim y-axis label
+#' @param xlab x-axis label
+#' @param ylab y-axis label
 #' @param ... optional parameters to the generic \code{plot} function
 #' @return if \code{title=FALSE}, returns a list with the following
 #'     items:

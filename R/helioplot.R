@@ -39,7 +39,6 @@
 #' helioplot(examples$UThHe)
 #' dev.new()
 #' helioplot(examples$UThHe,logratio=FALSE)
-#' @importFrom grDevices rgb
 #' @export
 helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                       show.numbers=FALSE,alpha=0.05,

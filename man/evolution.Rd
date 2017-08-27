@@ -5,9 +5,9 @@
 \title{Th-U evolution diagram}
 \usage{
 evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
-  detrital = FALSE, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "darksalmon", isochron = FALSE, exterr = TRUE, sigdig = 2,
-  ...)
+  detrital = FALSE, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
+  isochron = FALSE, exterr = TRUE, sigdig = 2, ...)
 }
 \arguments{
 \item{x}{an object of class \code{ThU}}
@@ -27,7 +27,13 @@ compositions along an isochron?}
 \item{show.numbers}{label the error ellipses with the grain
 numbers?}
 
-\item{ellipse.col}{background colour of the error ellipses}
+\item{levels}{a vector with additional values to be displayed as
+different background colours within the error ellipses.}
+
+\item{ellipse.col}{a vector of two background colours for the error
+ellipses. If \code{levels=NA}, then only the first colour will
+be used. If \code{levels} is a vector of numbers, then
+\code{ellipse.col} is used to construct a colour ramp.}
 
 \item{line.col}{colour of the age grid}
 

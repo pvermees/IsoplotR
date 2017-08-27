@@ -54,6 +54,10 @@ if \code{plateau=TRUE}).}
 \item{title}{add a title to the plot? If \code{FALSE}, returns a
 list with plateau parameters.}
 
+\item{xlab}{x-axis label}
+
+\item{ylab}{y-axis label}
+
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}
 
@@ -61,10 +65,6 @@ calibration factor) uncertainties?}
 `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from an
 isochron fit. Setting \code{i2i} to \code{FALSE} uses the
 default values stored in \code{settings('iratio',...)}}
-
-\item{xlim}{x-axis label}
-
-\item{ylim}{y-axis label}
 }
 \value{
 if \code{title=FALSE}, returns a list with the following

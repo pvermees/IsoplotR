@@ -16,43 +16,46 @@
 isochron(x, ...)
 
 \method{isochron}{default}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, title = TRUE, model = 1, ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
+  title = TRUE, model = 1, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
-  exterr = TRUE, model = 1, ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  inverse = TRUE, line.col = "red", lwd = 2, plot = TRUE,
-  exterr = TRUE, model = 1, ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
+  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
+  plot = TRUE, exterr = TRUE, model = 1, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
+  plot = TRUE, exterr = TRUE, model = 1, ...)
 
 \method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
+  plot = TRUE, exterr = TRUE, model = 1, ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
+  plot = TRUE, exterr = TRUE, model = 1, ...)
 
 \method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ellipse.col = rgb(0, 1, 0, 0.5),
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  sigdig = 2, show.numbers = FALSE, levels = NA,
+  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
+  plot = TRUE, exterr = TRUE, model = 1, ...)
 
 \method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, line.col = "red", lwd = 2,
@@ -94,7 +97,13 @@ values reported in the title of the graphical output}
 
 \item{show.numbers}{logical flag (\code{TRUE} to show grain numbers)}
 
-\item{ellipse.col}{background colour of the error ellipses}
+\item{levels}{a vector with additional values to be displayed as
+different background colours within the error ellipses.}
+
+\item{ellipse.col}{a vector of two background colours for the error
+ellipses. If \code{levels=NA}, then only the first colour will
+be used. If \code{levels} is a vector of numbers, then
+\code{ellipse.col} is used to construct a colour ramp.}
 
 \item{line.col}{colour of the isochron line}
 

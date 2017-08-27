@@ -63,7 +63,6 @@
 #'
 #' @param ... optional arguments to be passed on to the
 #' generic plot function if \code{model=2}
-#' @importFrom grDevices rgb
 #' @rdname isochron
 #' @export
 isochron <- function(x,...){ UseMethod("isochron",x) }
@@ -77,7 +76,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05, sigdig=2,
     fit <- regression(x,model=model)
     scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model==1),show.numbers=show.numbers,
-                levels=levels,levels=levels,ellipse.col=ellipse.col,
+                levels=levels,ellipse.col=ellipse.col,
                 a=fit$a[1], b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
         graphics::title(isochrontitle(fit,sigdig=sigdig),xlab='X',ylab='Y')

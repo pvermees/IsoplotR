@@ -6,8 +6,8 @@
 \usage{
 helioplot(x, logratio = TRUE, show.central.comp = TRUE,
   show.numbers = FALSE, alpha = 0.05, contour.col = c("white", "red"),
-  ellipse.col = rgb(0, 1, 0, 0.5), sigdig = 2, xlim = NA, ylim = NA,
-  fact = NA, ...)
+  levels = NA, ellipse.col = c("#00FF0080", "#0000FF80"), sigdig = 2,
+  xlim = NA, ylim = NA, fact = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe}}
@@ -27,7 +27,13 @@ ellipses?}
 \item{contour.col}{two-element vector with the fill colours to be
 assigned to the minimum and maximum age contour}
 
-\item{ellipse.col}{background colour of the error ellipses}
+\item{levels}{a vector with additional values to be displayed as
+different background colours within the error ellipses.}
+
+\item{ellipse.col}{a vector of two background colours for the error
+ellipses. If \code{levels=NA}, then only the first colour will
+be used. If \code{levels} is a vector of numbers, then
+\code{ellipse.col} is used to construct a colour ramp.}
 
 \item{sigdig}{number of significant digits for the central age}
 
