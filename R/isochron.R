@@ -37,7 +37,13 @@
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output
 #'
-#' @param ellipse.col background colour of the error ellipses
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours within the error ellipses.
+#'
+#' @param ellipse.col a vector of two background colours for the error
+#'     ellipses. If \code{levels=NA}, then only the first colour will
+#'     be used. If \code{levels} is a vector of numbers, then
+#'     \code{ellipse.col} is used to construct a colour ramp.
 #'
 #' @param line.col colour of the isochron line
 #'
