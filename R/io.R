@@ -394,7 +394,7 @@ as.ArAr <- function(x,format=3){
                              'Ar36Ar40','errAr36Ar40',
                              'Ar39Ar36','errAr39Ar36','Ar39')
     } else if (nc>3){
-        if (nc==6){
+        if (nc>5){
             out$x <- X[,1:6]
         }
         if (nc==4) {
@@ -499,6 +499,7 @@ as.ThU <- function(x,format=1){
         cnames <- c('Th232U238','errTh232U238',
                     'Th230U238','errTh230U238',
                     'rho')
+        out$x <- X[,1:5]
     }
     out$x <- X[,1:length(cnames)]
     colnames(out$x) <- cnames

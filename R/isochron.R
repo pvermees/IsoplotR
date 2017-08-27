@@ -196,7 +196,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
-                    ellipse.col=ellipse.col, a=fit$a[1],b=fit$b[1],
+                    ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                     line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)

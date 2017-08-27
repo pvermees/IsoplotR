@@ -98,12 +98,11 @@ LL.norm <- function(x,covmat){
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,colours=c('yellow','red')){
-    if (any(!is.numeric(levels)) | any(is.na(levels)))
-        levels <- NA
+    if (any(!is.numeric(levels)) | any(is.na(levels))) levels <- NA
     nl <- length(levels)
-    out <- rep(colours[1],ns)
-    if (all(is.na(levels))){
-        # do nothing
+    out <- NULL
+    if (all(is.na(levels)) | (max(levels)==min(levels))){
+        out <- rep(colours[1],ns)
     } else if (nl<ns){
         out[1:nl] <- levels2colours(levels=levels,colours=colours)
     } else {
