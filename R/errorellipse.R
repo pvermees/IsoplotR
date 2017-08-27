@@ -35,10 +35,10 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 
 # x = matrix with columns X, sX, Y, sY, rXY
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
-                        show.numbers=FALSE,show.ellipses=1,
-                        ellipse.col=grDevices::rgb(0,1,0,0.5),
-                        a=NA,b=NA,line.col='red',lwd=2,
-                        new.plot=TRUE,empty=FALSE,...){
+                        show.numbers=FALSE,show.ellipses=1,levels=NA,
+                        ellipse.col=c("#00FF0080","#FF000080"),a=NA,
+                        b=NA,line.col='red',lwd=2, new.plot=TRUE,
+                        empty=FALSE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
     if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
@@ -48,6 +48,7 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
         graphics::lines(xlim,a+b*xlim,col=line.col,lwd=lwd)
     }
     ns <- nrow(x)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
     x0 <- x[,'X']
     y0 <- x[,'Y']
     if (show.ellipses==0){
@@ -58,7 +59,7 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
             if (!any(is.na(x[i,]))){
                 covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
                 ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
-                graphics::polygon(ell,col=ellipse.col)
+                graphics::polygon(ell,col=ellipse.cols[i])
                 if (show.numbers) graphics::text(x0[i],y0[i],i)
                 else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
             }
