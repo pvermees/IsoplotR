@@ -72,12 +72,13 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05, sigdig=2,
                              show.numbers=FALSE,levels=NA,
                              ellipse.col=c("#00FF0080","#FF000080"),
                              line.col='red',lwd=2,title=TRUE,model=1,...){
-    colnames(x) <- c('X','sX','Y','sY','rXY')
-    fit <- regression(x,model=model)
-    scatterplot(x,xlim=xlim,ylim=ylim,alpha=alpha,
+    X <- x[,1:5]
+    colnames(X) <- c('X','sX','Y','sY','rXY')
+    fit <- regression(X,model=model)
+    scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model==1),show.numbers=show.numbers,
                 levels=levels,ellipse.col=ellipse.col,
-                a=fit$a[1], b=fit$b[1],line.col=line.col,lwd=lwd)
+                a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
         graphics::title(isochrontitle(fit,sigdig=sigdig),xlab='X',ylab='Y')
 }
