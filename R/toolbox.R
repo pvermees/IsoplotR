@@ -97,22 +97,22 @@ LL.norm <- function(x,covmat){
                                 0.5*get.concordia.SS(x,covmat)
 }
 
-set.ellipse.colours <- function(ns=1,levels=NA,colours=c('yellow','red')){
+set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red')){
     if (any(!is.numeric(levels)) | any(is.na(levels))) levels <- NA
     nl <- length(levels)
     out <- NULL
     if (all(is.na(levels)) | (max(levels)==min(levels))){
-        out <- rep(colours[1],ns)
+        out <- rep(col[1],ns)
     } else if (nl<ns){
-        out[1:nl] <- levels2colours(levels=levels,colours=colours)
+        out[1:nl] <- levels2colours(levels=levels,col=col)
     } else {
-        out <- levels2colours(levels=levels,colours=colours)[1:ns]
+        out <- levels2colours(levels=levels,col=col)[1:ns]
     }
     out
 }
 
-levels2colours <- function(levels=c(0,1),colours=c('yellow','red')){
-    fn <- colorRamp(colours,alpha=TRUE)
+levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
+    fn <- colorRamp(colors=col,alpha=TRUE)
     normalised.levels <- (levels-min(levels))/(max(levels)-min(levels))
     col.matrix <- fn(normalised.levels)/255
     red <- col.matrix[,1]
@@ -120,4 +120,32 @@ levels2colours <- function(levels=c(0,1),colours=c('yellow','red')){
     blue <- col.matrix[,3]
     alpha <- col.matrix[,4]
     rgb(red,green,blue,alpha)
+}
+
+validLevels <- function(levels){
+    (all(is.numeric(levels)) & !any(is.na(levels)))
+}
+
+colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
+                      strip.width=0.02){
+    if (!validLevels(z)) return()
+    ucoord <- par()$usr
+    plotwidth <- (ucoord[2]-ucoord[1])
+    plotheight <- (ucoord[4]-ucoord[3])
+    xe <- ucoord[2]
+    xb <- xe - strip.width*plotwidth
+    yb <- ucoord[3]
+    ye <- ucoord[4]
+    ndiv <- 50 # number of divisions
+    dx <- (xe-xb)/ndiv
+    dy <- (ye-yb)/ndiv
+    zz <- seq(from=min(z),to=max(z),length.out=ndiv)
+    cc <- levels2colours(levels=zz,col=col)
+    for (i in 1:ndiv){
+        rect(xb,yb+(i-1)*dy,xe,yb+i*dy,col=cc[i],border=NA)
+    }
+    rect(xb,yb,xe,ye)
+    par(new=T)
+    plot(rep(xe,length(z)),z,type='n',axes=F,xlab=NA,ylab=NA)
+    axis(side=4)
 }

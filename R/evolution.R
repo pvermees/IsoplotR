@@ -82,7 +82,7 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
     y.lab <- expression(paste("("^"234","U/"^"238","U)"[o]))
     graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
     covmat <- matrix(0,2,2)
-    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     for (i in 1:ns){
         x0 <- ta0[i,'t']
         y0 <- ta0[i,'48_0']
@@ -94,6 +94,7 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
+    colourbar(z=levels,col=ellipse.col)
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
@@ -111,7 +112,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
         e08 <- fit$par['A'] + fit$par['B']*(e48-fit$par['a'])/fit$par['b']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
-    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     covmat <- matrix(0,2,2)
     for (i in 1:ns){
         x0 <- d[i,'Th230U238']
@@ -124,6 +125,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
+    colourbar(z=levels,col=ellipse.col)
     if (isochron){
         sa <- sqrt(fit$cov['a','a'])
         sA <- sqrt(fit$cov['A','A'])

@@ -73,7 +73,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }
     ns <- length(x)
-    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     for (i in 1:ns){
         if (wetherill) xyc <- wetherill(X,i)
         else xyc <- tera.wasserburg(X,i)
@@ -85,6 +85,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
+    colourbar(z=levels,col=ellipse.col)
     if (show.age==1){
         fit <- concordia.age(X,wetherill=wetherill,exterr=exterr)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)

@@ -298,16 +298,19 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                         bg=c('white','red'),markers=NULL,...){
     exM <- radial.scale(x,zeta,rhoD)
     tticks <- get.radial.tticks(x)
+    labelpos <- 4
+    if (validLevels(levels)) labelpos <- 2
     plot_radial_lines(tticks,l=0.025,x,exM[1],exM[2],
-                      zeta,rhoD,label=TRUE)
+                      zeta,rhoD,label=TRUE,pos=labelpos)
     if (!is.null(markers)){
         plot_radial_lines(markers,x,exM[1],exM[2],
                           zeta,rhoD,label=FALSE)
     }
     plot_radial_axes(x)
     ns <- length(x$z)
-    col <- set.ellipse.colours(ns=ns,levels=levels,colours=bg)
+    col <- set.ellipse.colours(ns=ns,levels=levels,col=bg)
     plot_points(x,show.numbers,pch,col,...)
+    colourbar(z=levels,col=bg)
 }
 
 plot_points <- function(x,show.numbers=FALSE,pch=21,bg='white',...){
@@ -362,7 +365,8 @@ radial.scale <- function(x,zeta=0,rhoD=0){
     c(e,xM)
 }
 
-plot_radial_lines <- function(tt,x,e,xM,zeta=0,rhoD=0,l=1,label=FALSE){
+plot_radial_lines <- function(tt,x,e,xM,zeta=0,rhoD=0,l=1,
+                              label=FALSE,pos=4){
     z <- t2z(tt,x,zeta,rhoD)
     rxyb <- z2rxy(z-x$z0,e,xM)
     rxye <- z2rxy(z-x$z0,e,(1-l)*xM)
@@ -370,8 +374,10 @@ plot_radial_lines <- function(tt,x,e,xM,zeta=0,rhoD=0,l=1,label=FALSE){
         graphics::lines(c(rxyb[i,1],rxye[i,1]),
                         c(rxyb[i,2],rxye[i,2]))
         if (label) {
-            graphics::text(rxyb[i,1],rxyb[i,2],
-                           labels=tt[i],pos=4,xpd=NA)
+            if (pos==2)
+                graphics::text(rxye[i,1],rxye[i,2],labels=tt[i],pos=pos,xpd=NA)
+            else
+                graphics::text(rxyb[i,1],rxyb[i,2],labels=tt[i],pos=4,xpd=NA)
         }
     }
 }

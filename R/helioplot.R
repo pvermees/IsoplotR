@@ -65,6 +65,7 @@ helioplot <- function(x,logratio=TRUE,show.central.comp=TRUE,
                              alpha=alpha,doSm=doSm(x))
         graphics::title(helioplot_title(fit,sigdig=sigdig))
     }
+    colourbar(z=levels,col=ellipse.col)
 }
 
 plot_logratio_frame <- function(lims,...){
@@ -87,7 +88,7 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
 plot_logratio_ellipses <- function(x,alpha=0.05,show.numbers=FALSE,levels=NA,
                                    ellipse.col=c("#00FF0080","#0000FF80")){
     ns <- nrow(x)
-    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     for (i in 1:ns){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
@@ -102,7 +103,7 @@ plot_helioplot_ellipses <- function(x,fact=c(1,1,1),alpha=0.05,
                                     show.numbers=FALSE,levels=NA,
                                     ellipse.col=c("#00FF0080","#0000FF80")){
     ns <- nrow(x)
-    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,colours=ellipse.col)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     for (i in 1:ns){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
