@@ -112,14 +112,14 @@ set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red')){
 }
 
 levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
-    fn <- colorRamp(colors=col,alpha=TRUE)
+    fn <- grDevices::colorRamp(colors=col,alpha=TRUE)
     normalised.levels <- (levels-min(levels))/(max(levels)-min(levels))
     col.matrix <- fn(normalised.levels)/255
     red <- col.matrix[,1]
     green <- col.matrix[,2]
     blue <- col.matrix[,3]
     alpha <- col.matrix[,4]
-    rgb(red,green,blue,alpha)
+    grDevices::rgb(red,green,blue,alpha)
 }
 
 validLevels <- function(levels){
@@ -129,7 +129,7 @@ validLevels <- function(levels){
 colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
                       strip.width=0.02){
     if (!validLevels(z)) return()
-    ucoord <- par()$usr
+    ucoord <- graphics::par()$usr
     plotwidth <- (ucoord[2]-ucoord[1])
     plotheight <- (ucoord[4]-ucoord[3])
     xe <- ucoord[2]
@@ -142,10 +142,10 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     zz <- seq(from=min(z),to=max(z),length.out=ndiv)
     cc <- levels2colours(levels=zz,col=col)
     for (i in 1:ndiv){
-        rect(xb,yb+(i-1)*dy,xe,yb+i*dy,col=cc[i],border=NA)
+        graphics::rect(xb,yb+(i-1)*dy,xe,yb+i*dy,col=cc[i],border=NA)
     }
-    rect(xb,yb,xe,ye)
-    par(new=T)
-    plot(rep(xe,length(z)),z,type='n',axes=F,xlab=NA,ylab=NA)
-    axis(side=4)
+    graphics::rect(xb,yb,xe,ye)
+    graphics::par(new=T)
+    graphics::plot(rep(xe,length(z)),z,type='n',axes=F,xlab=NA,ylab=NA)
+    graphics::axis(side=4)
 }

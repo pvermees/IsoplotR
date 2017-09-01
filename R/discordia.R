@@ -191,10 +191,6 @@ LL.concordia.intersection.york <- function(itt,d,x,wetherill=TRUE,exterr=FALSE){
     }
     LL
 }
-# returns upper intercept for for Wetherill concordia
-LL.concordia.intersection.ludwig <- function(tu,tl,a0,b0){
-    intersection.misfit.ludwig(tu,tl,a0,b0)^2
-}
 
 # returns misfit of a proposed age and the intersection between the
 # discordia and concordia lines

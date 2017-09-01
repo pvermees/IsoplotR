@@ -208,37 +208,21 @@ get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
             miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
             maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
         }
-        out$t[1] <- min(get.Pb207U235.age(minx)[1],
-                        get.Pb206U238.age(miny)[1])
-        out$t[2] <- max(get.Pb207U235.age(maxx)[1],
-                        get.Pb206U238.age(maxy)[1])
+        out$t[1] <- get.Pb206U238.age(miny)[1]
+        out$t[2] <- get.Pb207U235.age(maxx)[1]
         if (!xset) out$x <- age_to_Pb207U235_ratio(out$t)[,'75']
         if (!yset) out$y <- age_to_Pb206U238_ratio(out$t)[,'68']
     } else if (is.null(tlim) && !wetherill){
         U238Pb206 <- get.U238Pb206.ratios(x)
         Pb207Pb206 <- get.Pb207Pb206.ratios(x)
-        if (!xset){
-            minx <- min(U238Pb206[,1]-nse*U238Pb206[,2],na.rm=TRUE)
-            maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
-        }
-        if (!yset){
-            miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
-            maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
-        }
-        if (miny<=0){
-            out$t[1] <- 1
-        } else {
-            out$t[1] <- min(get.Pb206U238.age(1/maxx)[1],
-                            get.Pb207Pb206.age(miny)[1],na.rm=TRUE)
-        }
-        if (minx<=0){
-            out$t[2] <- 5000
-        } else {
-            out$t[2] <- max(get.Pb206U238.age(1/minx)[1],
-                            get.Pb207Pb206.age(maxy)[1],na.rm=TRUE)
-        }
-        if (!xset) out$x <- age_to_U238Pb206_ratio(out$t)[,'86']
-        if (!yset) out$y <- age_to_Pb207Pb206_ratio(out$t)[,'76']
+        if (!xset) maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
+        if (!yset) maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
+        out$t[1] <- get.Pb206U238.age(1/maxx)[1]
+        out$t[2] <- get.Pb207Pb206.age(maxy)[1]
+        if (!xset) minx <- age_to_U238Pb206_ratio(out$t[2])[,'86']
+        if (!yset) miny <- age_to_Pb207Pb206_ratio(out$t[1])[,'76']
+        out$x <- c(minx,maxx)
+        out$y <- c(miny,maxy)
     }
     out
 }

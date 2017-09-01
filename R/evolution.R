@@ -144,28 +144,28 @@ Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
     d <- data2evolution(x,isochron=isochron)
     scatterplot(d$x,xlim=xlim,ylim=ylim,empty=TRUE)
     ticks <- c(0,1,10,20,50,100,200,300)
-    X <- par('usr')[1:2]
+    X <- graphics::par('usr')[1:2]
     Y <- X
-    lines(X,Y,col=line.col,...) # equilibrium line
-    minY <- par('usr')[3]
-    maxY <- par('usr')[4]
+    graphics::lines(X,Y,col=line.col,...) # equilibrium line
+    minY <- graphics::par('usr')[3]
+    maxY <- graphics::par('usr')[4]
     if (maxY<X[2]) # add infinity symbol for equilibrium line
-        text(maxY,maxY,'\U221E',pos=1,col=line.col)
+        graphics::text(maxY,maxY,'\U221E',pos=1,col=line.col)
     else
-        text(X[2],X[2],'\U221E',pos=2,col=line.col)
+        graphics::text(X[2],X[2],'\U221E',pos=2,col=line.col)
     for (tick in ticks){ # plot isolines
         Y <- get.Th230Th232(tick,d$Th230Th232_0x,X)
-        lines(X,Y,col=line.col,...)
+        graphics::lines(X,Y,col=line.col,...)
         if (Y[2]<minY){
             # do nothing
         } else if (Y[2]>maxY){ # label below upper margin
             xtext <- get.U238Th232(tick,d$Th230Th232_0x,maxY)
             ytext <- maxY
-            text(xtext,ytext,tick,pos=1,col=line.col)
+            graphics::text(xtext,ytext,tick,pos=1,col=line.col)
         } else { # label to the left of the right margin
             xtext <- X[2]
             ytext <- Y[2]
-            text(xtext,ytext,tick,pos=2,col=line.col)
+            graphics::text(xtext,ytext,tick,pos=2,col=line.col)
         }
     }
     if (isochron){ # plot the data and isochron line fit
@@ -179,7 +179,7 @@ Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
                     new.plot=FALSE)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
-        title(xlab=xlab,ylab=ylab)
+        graphics::title(xlab=xlab,ylab=ylab)
         tit <- expression(paste("[isochrons assume ("^"230","Th/"^
                                 "232","Th)"[o]^x*" = 0]"))
         graphics::mtext(tit,line=0)

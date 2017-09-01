@@ -68,10 +68,10 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
     } else {
         if (show.numbers) graphics::text(x0,y0,1:ns,adj=c(0,1))
         else graphics::points(x0,y0,pch=19,cex=0.5)
-        fact <- qnorm(1-alpha/2)
+        fact <- stats::qnorm(1-alpha/2)
         dx <- fact*x[,'sX']
         dy <- fact*x[,'sY']
-        arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,length=0.05)
-        arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,length=0.05)
+        graphics::arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,length=0.05)
+        graphics::arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,length=0.05)
     }
 }
