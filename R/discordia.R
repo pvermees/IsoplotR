@@ -88,14 +88,19 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     J <- matrix(0,2,3)
     if (wetherill){
         t1 <- fit$par['t']
-        a0 <- fit$par['64i']
-        b0 <- fit$par['74i']
         names(out$x) <- c('t[l]','t[u]')
         buffer <- 1 # start searching 1Ma above or below first intercept age
         l5 <- lambda('U235')[1]
         l8 <- lambda('U238')[1]
         R <- iratio('U238U235')[1]
-        disc.slope <- fit$par['64i']/(fit$par['74i']*R)
+        if (x$format<4){
+            a0 <- 1/fit$par['76i']
+            b0 <- 1
+        } else {
+            a0 <- fit$par['64i']
+            b0 <- fit$par['74i']
+        }
+        disc.slope <- a0/(b0*R)
         conc.slope <- (l8*exp(l8*t1))/(l5*exp(l5*t1))
         if (conc.slope > disc.slope){
             search.range <- c(t1+buffer,10000)
@@ -109,10 +114,13 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
         t2 <- stats::uniroot(intersection.misfit.ludwig,
                              interval=search.range,
                              t1=t1,a0=a0,b0=b0)$root
+        J <- J.lud2york(t1,t2,a0,b0)
         out$x[t1.name] <- t1
         out$x[t2.name] <- t2
-        J <- J.lud2york(t1,t2,a0,b0)
         out$cov <- J %*% fit$cov %*% t(J)
+    } else if (x$format<4){
+        out$x <- fit$par
+        out$cov <- fit$cov
     } else {
         names(out$x) <- c('t[l]','76')
         out$x['t[l]'] <- fit$par['t']

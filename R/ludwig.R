@@ -3,7 +3,7 @@
 #'
 #' Implements the maximum likelihood algorithm of Ludwig (1998)
 #'
-#' @param x an object of class \code{UPb} with \code{x$format > 3}.
+#' @param x an object of class \code{UPb}
 #'
 #' @param ... optional arguments
 #'
@@ -31,8 +31,9 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
     if (exterr){
         init <- ludwig(x,exterr=FALSE)$par
     } else {
-        t0 <- concordia.intersection.york(x,wetherill=TRUE,exterr=FALSE)$x[1]
-        init <- c(t0,10,10)
+        ta0 <- concordia.intersection.york(x,wetherill=FALSE,exterr=FALSE)$x
+        if (x$format<4) init <- ta0
+        else init <- c(ta0[1],10,10)
     }
     fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)
     out <- list()
@@ -51,7 +52,8 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
                             x=x,exterr=exterr,hessian=TRUE)
         solve(fit$hessian)
     })
-    parnames <- c('t','64i','74i')
+    if (x$format<4) parnames <- c('t[l]','76')
+    else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
@@ -73,9 +75,91 @@ mswd.lud <- function(ta0b0,x){
     out
 }
 
+LL.lud.UPb <- function(pars,x,exterr=FALSE){
+    if (x$format<4) return(LL.lud.2D(pars,x=x,exterr=exterr))
+    else return(LL.lud.3D(pars,x=x,exterr=exterr))
+}
+LL.lud.2D <- function(ta0,x,exterr=FALSE){
+    tt <- ta0[1]
+    a0 <- ta0[2]
+    l5 <- settings('lambda','U235')
+    l8 <- settings('lambda','U238')
+    U <- settings('iratio','U238U235')[1]
+    XY <- data2york(x,wetherill=FALSE)
+    b <- (exp(l5[1]*tt)-1)/U - a0*(exp(l8[1]*tt)-1) # slope
+    xy <- get.york.xy(XY,a0,b) # get adjusted xi, yi
+    ns <- length(x)
+    
+    v <- matrix(0,1,2*ns)
+    v[1:ns] <- XY[,'X']-xy[,1]
+    v[(ns+1):(2*ns)] <- XY[,'Y']-xy[,2]
+    if (exterr){
+        Ex <- matrix(0,2*ns+2,2*ns+2)
+        Jv <- diag(1,2*ns,2*ns+2)
+    } else {
+        Ex <- matrix(0,2*ns,2*ns)
+        Jv <- diag(1,2*ns,2*ns)
+    }
+    Ex[1:ns,1:ns] <- diag(XY[,'sX'])^2
+    Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY'])^2
+    Ex[1:ns,(ns+1):(2*ns)] <- diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
+    Ex[(ns+1):(2*ns),1:ns] <- Ex[1:ns,(ns+1):(2*ns)]
+    if (exterr){
+        Ex[2*ns+1,2*ns+1] <- l5[2]^2
+        Ex[2*ns+2,2*ns+2] <- l8[2]^2
+        Jv[,2*ns+1] <- -tt*exp(l5[1]*tt)*XY[,'X']/U
+        Jv[,2*ns+2] <- a0*tt*exp(l8[1]*tt)*XY[,'X']
+    }
+    E <- Jv %*% Ex %*% t(Jv)
+    S <- v %*% solve(E) %*% t(v)
+    S/2
+}
+LL.lud.3D <- function(ta0b0,x,exterr=FALSE){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    b0 <- ta0b0[3]
+    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,exterr=exterr)
+    phi <- d$phi
+    R <- d$R
+    r <- d$r
+    SS <- 0
+    ns <- length(d$R)
+    if (exterr){
+        omega <- d$omega
+        for (i in 1:ns){
+            i1 <- i
+            i2 <- i + ns
+            i3 <- i + 2*ns
+            for (j in 1:ns){
+                j1 <- j
+                j2 <- j + ns
+                j3 <- j + 2*ns
+                SS <- SS + R[i]*R[j]*omega[i1,j1] + r[i]*r[j]*omega[i2,j2] +
+                    phi[i]*phi[j]*omega[i3,j3] + 2*( R[i]*r[j]*omega[i1,j2] +
+                    R[i]*phi[j]*omega[i1,j3] + r[i]*phi[j]*omega[i2,j3] )
+            }
+        }
+    } else {
+        for (i in 1:ns){
+            omega <- d$omega[[i]]
+            SS <- SS + omega[1,1]*R[i]^2 + omega[2,2]*r[i]^2 + omega[3,3]*phi[i]^2 +
+                2*( R[i]*r[i]*omega[1,2] + R[i]*phi[i]*omega[1,3] +
+                r[i]*phi[i]*omega[2,3] )
+        }
+    }
+    SS/2
+}
+
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
 fisher.lud.default <- function(x,...){ stop( "No default method available (yet)." ) }
-fisher.lud.UPb <- function(x,ta0b0,exterr=FALSE,...){
+fisher.lud.UPb <- function(x,pars,exterr=FALSE,...){
+    if (x$format<4) return(fisher.lud.2D(x,pars,exterr=FALSE,...))
+    else return(fisher.lud.3D(x,pars,exterr=FALSE,...))
+}
+fisher.lud.2D <- function(x,ta0,exterr=FALSE,...){
+    stop('not implemented yet')
+}
+fisher.lud.3D <- function(x,ta0b0,exterr=FALSE,...){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
@@ -210,42 +294,6 @@ fisher_lud_with_decay_err <- function(tt,a0,b0,z,omega){
     out
 }
 
-LL.lud.UPb <- function(ta0b0,x,exterr=FALSE){
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
-    b0 <- ta0b0[3]
-    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,exterr=exterr)
-    phi <- d$phi
-    R <- d$R
-    r <- d$r
-    SS <- 0
-    ns <- length(d$R)
-    if (exterr){
-        omega <- d$omega
-        for (i in 1:ns){
-            i1 <- i
-            i2 <- i + ns
-            i3 <- i + 2*ns
-            for (j in 1:ns){
-                j1 <- j
-                j2 <- j + ns
-                j3 <- j + 2*ns
-                SS <- SS + R[i]*R[j]*omega[i1,j1] + r[i]*r[j]*omega[i2,j2] +
-                    phi[i]*phi[j]*omega[i3,j3] + 2*( R[i]*r[j]*omega[i1,j2] +
-                    R[i]*phi[j]*omega[i1,j3] + r[i]*phi[j]*omega[i2,j3] )
-            }
-        }
-    } else {
-        for (i in 1:ns){
-            omega <- d$omega[[i]]
-            SS <- SS + omega[1,1]*R[i]^2 + omega[2,2]*r[i]^2 + omega[3,3]*phi[i]^2 +
-                2*( R[i]*r[i]*omega[1,2] + R[i]*phi[i]*omega[1,3] +
-                r[i]*phi[i]*omega[2,3] )
-        }
-    }
-    SS/2
-}
-
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
 data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
@@ -290,7 +338,7 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt){
         AA <- O[1,1]*(U*b0)^2 + O[2,2]*a0^2 + O[3,3] +
             2*(U*a0*b0*O[1,2] + U*b0*O[1,3] + a0*O[2,3])
         BB <- R[i]*U*b0*O[1,1] + r[i]*a0*O[2,2] +
-            (R[i]*a0 + U*b0*r[i])*O[1,2] +
+             (R[i]*a0 + U*b0*r[i])*O[1,2] +
             R[i]*O[1,3] + r[i]*O[2,3]
         CC <- O[1,1]*R[i]^2 + O[2,2]*r[i]^2 + 2*R[i]*r[i]*O[1,2]
         z[i] <- Z[i] + BB/AA
