@@ -213,17 +213,31 @@ get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
         }
         out$t[1] <- get.Pb206U238.age(miny)[1]
         out$t[2] <- get.Pb207U235.age(maxx)[1]
-        if (!xset) out$x <- age_to_Pb207U235_ratio(out$t)[,'75']
-        if (!yset) out$y <- age_to_Pb206U238_ratio(out$t)[,'68']
+        if (!xset){
+            minx <- min(minx,age_to_Pb207U235_ratio(out$t[1])[,'75'])
+            maxx <- max(maxx,age_to_Pb207U235_ratio(out$t[2])[,'75'])
+        }
+        if (!yset){
+            miny <- min(miny,age_to_Pb206U238_ratio(out$t[1])[,'68'])
+            maxy <- max(maxy,age_to_Pb206U238_ratio(out$t[2])[,'68'])
+        }
+        out$x <- c(minx,maxx)
+        out$y <- c(miny,maxy)
     } else if (is.null(tlim) && !wetherill){
         U238Pb206 <- get.U238Pb206.ratios(x)
         Pb207Pb206 <- get.Pb207Pb206.ratios(x)
-        if (!xset) maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
-        if (!yset) maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
+        if (!xset){
+            minx <- min(U238Pb206[,1]-nse*U238Pb206[,2],na.rm=TRUE)
+            maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
+        }
+        if (!yset){
+            miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
+            maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
+        }
         out$t[1] <- get.Pb206U238.age(1/maxx)[1]
         out$t[2] <- get.Pb207Pb206.age(maxy)[1]
-        if (!xset) minx <- age_to_U238Pb206_ratio(out$t[2])[,'86']
-        if (!yset) miny <- age_to_Pb207Pb206_ratio(out$t[1])[,'76']
+        if (!xset) minx <- min(minx,age_to_U238Pb206_ratio(out$t[2])[,'86'])
+        if (!yset) miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1])[,'76'])
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
     }
@@ -245,9 +259,9 @@ concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
 concordia.age.default <- function(x,exterr=TRUE,...){
     out <- x
     t.init <- initial.concordia.age(x)
-    fit.age <- stats::optim(par=t.init, fn=LL_concordia_age,
-                            x=x, exterr=exterr,
-                            method="BFGS", hessian=TRUE)
+    fit.age <- stats::optim(par=t.init,fn=LL_concordia_age,
+                            x=x,exterr=exterr,
+                            method="BFGS",hessian=TRUE)
     tt <- fit.age$par
     tt.err <- as.numeric(sqrt(solve(fit.age$hessian)))
     out$age <- c(tt,tt.err)

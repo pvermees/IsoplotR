@@ -420,7 +420,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,...){
     if (is.na(x)){
         t.76 <- NA
     } else {
-        fit <- stats::optimize(Pb207Pb206.misfit,c(0,5000),x=x)
+        fit <- stats::optimize(Pb207Pb206.misfit,c(0,1e4),x=x)
         t.76 <- fit$minimum
     }
     J <- matrix(0,1,4)
