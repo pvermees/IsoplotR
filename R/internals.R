@@ -7,14 +7,14 @@
 #'     ArAr.normal.ratios BIC_fit EDM.age ICP.age J.lud2york KS.diss
 #'     LL.concordia.age LL.concordia.comp LL.concordia.comp.default
 #'     LL.concordia.comp.terawasserburg LL.concordia.comp.wetherill
-#'     LL.concordia.intersection.ludwig LL.concordia.intersection.york
-#'     LL.lud.UPb LL.norm LL.weightedmean LuHf.age PD.age
-#'     Pb.correction.with.204 Pb.correction.without.204 PbPb.age
-#'     PbPb.inverse.ratios PbPb.normal.ratios RbSr.age ReOs.age S.tit
-#'     SS.UThHe.uv SS.UThHe.uvw SmNd.age ThU.age ThU.convert ThU.gr
-#'     ThU.misfit U4U8vsTh0U8 U4U8vst UPb.age UThHe.age UThHe2uv
-#'     UThHe2uv.covmat UThHe2uvw UThHe2uvw.covmat add.exterr age.PD
-#'     age2radial age_to_Pb206U238_ratio age_to_Pb207Pb206_ratio
+#'     LL.concordia.intersection.york LL.lud.UPb LL.norm
+#'     LL.weightedmean LuHf.age PD.age Pb.correction.with.204
+#'     Pb.correction.without.204 PbPb.age PbPb.inverse.ratios
+#'     PbPb.normal.ratios RbSr.age ReOs.age S.tit SS.UThHe.uv
+#'     SS.UThHe.uvw SmNd.age ThU.age ThU.convert ThU.gr ThU.misfit
+#'     U4U8vsTh0U8 U4U8vst UPb.age UThHe.age UThHe2uv UThHe2uv.covmat
+#'     UThHe2uvw UThHe2uvw.covmat add.exterr age.PD age2radial
+#'     age_to_Pb206U238_ratio age_to_Pb207Pb206_ratio
 #'     age_to_Pb207U235_ratio age_to_U238Pb206_ratio
 #'     age_to_concordia_ratios age_to_terawasserburg_ratios
 #'     age_to_wetherill_ratios ages2peaks alpha.beta.gamma as.ArAr

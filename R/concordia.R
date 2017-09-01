@@ -50,6 +50,8 @@
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
 #'
+#' @param ticks an optional vector of age ticks to be added to the
+#'     concordia line.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @examples
 #' data(examples) 
@@ -62,11 +64,11 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.numbers=FALSE,levels=NA,
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=TRUE,
-                      show.age=0,sigdig=2,common.Pb=0,...){
+                      show.age=0,sigdig=2,common.Pb=0,ticks=NULL,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
     concordia.line(X,tlim=tlim,wetherill=wetherill,col=concordia.col,
-                   alpha=alpha,exterr=exterr,...)
+                   alpha=alpha,exterr=exterr,ticks=ticks,...)
     if (show.age==2){
         fit <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
         discordia.plot(fit,wetherill=wetherill)
@@ -95,7 +97,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
 }
 
 # helper function for plot.concordia
-concordia.line <- function(x,tlim,wetherill,col,alpha=0.05,exterr=TRUE,...){
+concordia.line <- function(x,tlim,wetherill,col,alpha=0.05,
+                           exterr=TRUE,ticks=NULL,...){
     lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
@@ -127,7 +130,7 @@ concordia.line <- function(x,tlim,wetherill,col,alpha=0.05,exterr=TRUE,...){
     }
     graphics::lines(concordia[,'x'],concordia[,'y'],col=col,lwd=2)
     # prepare and plot ticks
-    ticks <- pretty(tt)
+    if (is.null(ticks)) ticks <- pretty(tt)
     for (i in 1:length(ticks)){
         xy <- age_to_concordia_ratios(ticks[i],wetherill=wetherill,exterr=exterr)
         if (exterr){ # show ticks as ellipse
