@@ -87,14 +87,14 @@ york <- function(x){
 get.york.mswd <- function(x,a,b){
     xy <- get.york.xy(x,a,b)
     X2 <- 0
-    nn <- length(x[,'X'])
-    for (i in 1:nn){
+    ns <- length(x[,'X'])
+    for (i in 1:ns){
         E <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
         X <- matrix(c(x[i,'X']-xy[i,1],x[i,'Y']-xy[i,2]),1,2)
         if (!any(is.na(X)))
             X2 <- X2 + 0.5*X %*% solve(E) %*% t(X)
     }
-    df <- (2*nn-2)
+    df <- ns-2
     out <- list()
     out$mswd <- as.numeric(X2/df)
     out$p.value <- as.numeric(1-stats::pchisq(X2,df))

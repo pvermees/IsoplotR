@@ -52,7 +52,7 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
                             x=x,exterr=exterr,hessian=TRUE)
         solve(fit$hessian)
     })
-    if (x$format<4) parnames <- c('t[l]','76')
+    if (x$format<4) parnames <- c('t[l]','76i')
     else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
@@ -62,13 +62,11 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
     out
 }
 
-mswd.lud <- function(ta0b0,x){
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
-    b0 <- ta0b0[3]
+mswd.lud <- function(pars,x){
     ns <- length(x)
-    SS <- 2*LL.lud.UPb(ta0b0,x=x,exterr=FALSE)
-    df <- 2*ns-2
+    SS <- 2*LL.lud.UPb(pars,x=x,exterr=FALSE)
+    if (x$format<4) df <- ns-2
+    else df <- 2*ns-2
     out <- list()
     out$mswd <- SS/df
     out$p.value <- as.numeric(1-stats::pchisq(SS,df))
@@ -79,6 +77,8 @@ LL.lud.UPb <- function(pars,x,exterr=FALSE){
     if (x$format<4) return(LL.lud.2D(pars,x=x,exterr=exterr))
     else return(LL.lud.3D(pars,x=x,exterr=exterr))
 }
+# currently not used in IsoplotR, but achieves
+# the same things as concordia.intersection.york
 LL.lud.2D <- function(ta0,x,exterr=FALSE){
     tt <- ta0[1]
     a0 <- ta0[2]
