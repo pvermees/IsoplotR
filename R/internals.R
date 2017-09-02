@@ -4,7 +4,7 @@
 #' waiting for proper documentation to be written ).
 #' @name IsoplotR-internal
 #' @aliases Abramson ArAr.age ArAr.age.ratios ArAr.inverse.ratios
-#'     ArAr.normal.ratios BIC_fit EDM.age ICP.age J.lud2york KS.diss
+#'     ArAr.normal.ratios BIC_fit EDM.age ICP.age KS.diss
 #'     LL.concordia.age LL.concordia.comp LL.concordia.comp.default
 #'     LL.concordia.comp.terawasserburg LL.concordia.comp.wetherill
 #'     LL.concordia.intersection.york LL.lud.UPb LL.norm

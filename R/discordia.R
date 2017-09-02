@@ -1,92 +1,5 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection <- function(x,wetherill=TRUE,exterr=FALSE){
-#    if (x$format<4)
-#        out <- concordia.intersection.york(x,wetherill=wetherill,exterr=exterr)
-#    else
-        out <- concordia.intersection.ludwig(x,wetherill=wetherill,exterr=exterr)
-    out
-}
-concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
-    d <- data2york(x,wetherill=wetherill)
-    fit <- york(d)
-    out <- list()
-    if (wetherill){
-        search.range <- c(0,10000)
-        midpoint <- stats::optimize(intersection.misfit.york, search.range,
-                                    a=fit$a[1], b=fit$b[1],
-                                    wetherill=wetherill)$minimum
-        range1 <- c(-1000,midpoint)
-        range2 <- c(midpoint,10000)
-        out$x <- search.range # tl, tu
-        names(out$x) <- c('t[l]','t[u]')
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, range1, 
-                                        a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
-        out$x['t[u]'] <- stats::uniroot(intersection.misfit.york, range2, 
-                                        a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
-    } else {
-        search.range <- c(1/10000,10000)
-        out$x <- c(1,fit$a[1]) # tl, 7/6 intercept
-        names(out$x) <- c('t[l]','76i')
-        if (fit$b[1]<0) { # negative slope => two intersections with concordia line
-            midpoint <- stats::optimize(intersection.misfit.york, search.range,
-                                        a=fit$a[1], b=fit$b[1],
-                                        wetherill=wetherill)$minimum
-            search.range[2] <- midpoint
-            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, search.range, 
-                                            a=fit$a[1], b=fit$b[1],
-                                            wetherill=wetherill)$root
-        } else {
-            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, search.range,
-                                            a=fit$a[1], b=fit$b[1],
-                                            wetherill=wetherill)$root
-        }
-    }
-    hess <- stats::optimHess(out$x,LL.concordia.intersection.york,d=d,x=x,
-                             wetherill=wetherill,exterr=exterr)
-    out$cov <- solve(hess)
-    out$mswd <- fit$mswd
-    out$p.value <- fit$p.value
-    out
-}
-# used by common Pb correction:
-project.concordia <- function(m76,m86,i76){
-    t68 <- get.Pb206U238.age(1/m86)[1]
-    t76 <- get.Pb207Pb206.age(m76)[1]
-    a <- i76
-    b <- (m76-i76)/m86
-    neg <- (i76>m76) # negative slope?
-    pos <- !neg
-    above <- (t76>t68) # above concordia?
-    below <- !above
-    tend <- t68
-    go.ahead <- FALSE
-    if (pos & above){
-        tend <- t76
-        go.ahead <- TRUE
-    } else if (pos & below){
-        go.ahead <- TRUE
-    } else if (neg & above){
-        go.ahead <- TRUE
-    } else if (neg & below){  # it is not clear what to do with samples
-        for (tt in seq(from=10,to=5000,by=10)){
-            misfit <- intersection.misfit.york(tend,a=a,b=b,wetherill=FALSE)
-            if (misfit<0){    # that plot in the 'forbidden zone' above
-                tend <- tt    # Wetherill concordia or below T-W concordia
-                found <- TRUE # IsoplotR will still project them on
-                break         # the concordia line.
-            }
-        }
-    }
-    if (go.ahead){
-        search.range <- c(1/10000,tend)
-        out <- stats::uniroot(intersection.misfit.york,search.range, 
-                              a=a,b=b,wetherill=FALSE)$root
-    } else {
-        out <- m76
-    }
-    out
-}
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     out <- list()
     fit <- ludwig(x,exterr=exterr)
@@ -173,74 +86,85 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     out
 }
 
-J.lud2york <- function(t1,t2,a0,b0){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    R <- iratio('U238U235')[1]
-    if (t2>t1){
-        X <- exp(l5*t2) - exp(l5*t1)
-        Y <- exp(l8*t2) - exp(l8*t1)
-        dX.dt1 <- -l5*exp(l5*t1)
-        dY.dt1 <- -l8*exp(l8*t1)
-        dX.dt2 <- l5*exp(l8*t2)
-        dY.dt2 <- l8*exp(l8*t2)
-    } else {
-        X <- exp(l5*t1) - exp(l5*t2)
-        Y <- exp(l8*t1) - exp(l8*t2)
-        dX.dt1 <- l5*exp(l5*t1)
-        dY.dt1 <- l8*exp(l8*t1)
-        dX.dt2 <- -l5*exp(l8*t2)
-        dY.dt2 <- -l8*exp(l8*t2)
-    }
-    B <- a0/(b0*R)
-    dB.da0 <- 1/(B*R)
-    dB.db0 <- -B/b0
-    dD.dt1 <- 2*(Y-B*X)*(dY.dt1-B*dX.dt1)
-    dD.dt2 <- 2*(Y-B*X)*(dY.dt2-B*dX.dt2)
-    dD.da0 <- 2*(B*X-Y)*dB.da0*X
-    dD.db0 <- 2*(B*X-Y)*dB.db0*X
-    J <- matrix(0,2,3)
-    J[1,1] <- 1
-    J[2,1] <- -dD.dt1/dD.dt2
-    J[2,2] <- -dD.da0/dD.dt2
-    J[2,3] <- -dD.db0/dD.dt2
-    J
-}
-
-# itt = output of the york function
-# d = output of UPb2york
-# x = U-Pb data
-LL.concordia.intersection.york <- function(itt,d,x,wetherill=TRUE,exterr=FALSE){
-    LL <- 0
+concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
+    d <- data2york(x,wetherill=wetherill)
+    fit <- york(d)
+    out <- list()
     if (wetherill){
-        XYl <- age_to_wetherill_ratios(itt[1])
-        XYu <- age_to_wetherill_ratios(itt[2])
-        b <- (XYu$x[2]-XYl$x[2])/(XYu$x[1]-XYl$x[1])
-        a <- XYu$x[2]-b*XYu$x[1]
+        search.range <- c(0,10000)
+        midpoint <- stats::optimize(intersection.misfit.york, search.range,
+                                    a=fit$a[1], b=fit$b[1],
+                                    wetherill=wetherill)$minimum
+        range1 <- c(-1000,midpoint)
+        range2 <- c(midpoint,10000)
+        out$x <- search.range # tl, tu
+        names(out$x) <- c('t[l]','t[u]')
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, range1, 
+                                        a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
+        out$x['t[u]'] <- stats::uniroot(intersection.misfit.york, range2, 
+                                        a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
     } else {
-        XYl <- age_to_terawasserburg_ratios(itt[1])
-        a <- itt[2]
-        b <- (XYl$x[2]-a)/XYl$x[1]
-    }
-    xy <- get.york.xy(d,a,b)
-    mu <- d[,c('X','Y')]-xy
-    if (wetherill) disc <- (XYu$x[1]-xy[,1])/(XYu$x[1]-XYl$x[1])
-    else disc <- (XYl$x[1]-xy[,1])/XYl$x[1]
-    for (i in 1:length(x)){
-        if (wetherill) samp <- wetherill(x,i)
-        else samp <- tera.wasserburg(x,i)
-        covmat <- samp$cov[1:2,1:2]
-        if (exterr) {
-            dcomp <- discordant.composition(disc[i],itt[1],itt[2],wetherill)
-            covmat <- samp$cov[1:2,1:2] + dcomp$cov
+        search.range <- c(1/10000,10000)
+        out$x <- c(1,fit$a[1]) # tl, 7/6 intercept
+        names(out$x) <- c('t[l]','76i')
+        if (fit$b[1]<0) { # negative slope => two intersections with concordia line
+            midpoint <- stats::optimize(intersection.misfit.york, search.range,
+                                        a=fit$a[1], b=fit$b[1],
+                                        wetherill=wetherill)$minimum
+            search.range[2] <- midpoint
+            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, search.range, 
+                                            a=fit$a[1], b=fit$b[1],
+                                            wetherill=wetherill)$root
+        } else {
+            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, search.range,
+                                            a=fit$a[1], b=fit$b[1],
+                                            wetherill=wetherill)$root
         }
-        LL <- LL + LL.norm(matrix(mu[i,],1,2),covmat)
     }
-    LL
+    out
 }
 
-# returns misfit of a proposed age and the intersection between the
-# discordia and concordia lines
+# used by common Pb correction:
+project.concordia <- function(m76,m86,i76){
+    t68 <- get.Pb206U238.age(1/m86)[1]
+    t76 <- get.Pb207Pb206.age(m76)[1]
+    a <- i76
+    b <- (m76-i76)/m86
+    neg <- (i76>m76) # negative slope?
+    pos <- !neg
+    above <- (t76>t68) # above concordia?
+    below <- !above
+    tend <- t68
+    go.ahead <- FALSE
+    if (pos & above){
+        tend <- t76
+        go.ahead <- TRUE
+    } else if (pos & below){
+        go.ahead <- TRUE
+    } else if (neg & above){
+        go.ahead <- TRUE
+    } else if (neg & below){  # it is not clear what to do with samples
+        for (tt in seq(from=10,to=5000,by=10)){
+            misfit <- intersection.misfit.york(tend,a=a,b=b,wetherill=FALSE)
+            if (misfit<0){    # that plot in the 'forbidden zone' above
+                tend <- tt    # Wetherill concordia or below T-W concordia
+                found <- TRUE # IsoplotR will still project them on
+                break         # the concordia line.
+            }
+        }
+    }
+    if (go.ahead){
+        search.range <- c(1/10000,tend)
+        out <- stats::uniroot(intersection.misfit.york,search.range, 
+                              a=a,b=b,wetherill=FALSE)$root
+    } else {
+        out <- m76
+    }
+    out
+}
+
+# returns misfit of a proposed age and the intersection
+# between the discordia and concordia lines
 intersection.misfit.york <- function(age,a,b,wetherill=TRUE){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]

@@ -388,9 +388,18 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,...){
     }
     out
 }
-get.Pb206U238.age.UPb <- function(x,i,exterr=TRUE,...){
+get.Pb206U238.age.UPb <- function(x,i=NA,exterr=TRUE,...){
     r68 <- get.Pb206U238.ratios(x)
-    get.Pb206U238.age(r68[i,'Pb206U238'],r68[i,'errPb206U238'],exterr=exterr)
+    if (is.na(i)){
+        ns <- length(x)
+        out <- matrix(0,ns,2)
+        for (j in 1:ns){
+            out[j,] <- get.Pb206U238.age.UPb(x,i=j,exterr=exterr,...)
+        }
+    } else {
+        out <- get.Pb206U238.age(r68[i,'Pb206U238'],r68[i,'errPb206U238'],exterr=exterr)
+    }
+    out
 }
 get.Pb206U238.age.wetherill <- function(x,exterr=TRUE,...){
     i <- 'Pb206U238'
@@ -590,7 +599,7 @@ common.Pb.stacey.kramers <- function(x){
             out <- Pb.correction.without.204(x,i74/i64)
         else
             out <- Pb.correction.with.204(x,i64,i74)
-        tt <- age(out)[,'t.conc']
+        tt <- get.Pb206U238.age(out)
     }
     out
 }

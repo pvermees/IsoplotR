@@ -28,13 +28,9 @@ ludwig.default <- function(x,...){ stop( "No default method available (yet)." ) 
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,...){
-    if (exterr){
-        init <- ludwig(x,exterr=FALSE)$par
-    } else {
-        ta0 <- concordia.intersection.york(x,wetherill=FALSE,exterr=FALSE)$x
-        if (x$format<4) init <- ta0
-        else init <- c(ta0[1],10,10)
-    }
+    ta0 <- concordia.intersection.york(x,wetherill=FALSE,exterr=FALSE)$x
+    if (x$format<4) init <- ta0
+    else init <- c(ta0[1],10,10)
     fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)
     out <- list()
     out$par <- fit$par
@@ -77,8 +73,6 @@ LL.lud.UPb <- function(pars,x,exterr=FALSE){
     if (x$format<4) return(LL.lud.2D(pars,x=x,exterr=exterr))
     else return(LL.lud.3D(pars,x=x,exterr=exterr))
 }
-# currently not used in IsoplotR, but achieves
-# the same things as concordia.intersection.york
 LL.lud.2D <- function(ta0,x,exterr=FALSE){
     tt <- ta0[1]
     a0 <- ta0[2]
