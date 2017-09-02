@@ -599,7 +599,7 @@ common.Pb.stacey.kramers <- function(x){
             out <- Pb.correction.without.204(x,i74/i64)
         else
             out <- Pb.correction.with.204(x,i64,i74)
-        tt <- get.Pb206U238.age(out)
+        tt <- get.Pb206U238.age(out)[,1]
     }
     out
 }
