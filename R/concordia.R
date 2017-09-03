@@ -257,7 +257,7 @@ concordia.title <- function(fit,sigdig=2){
 
 concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
 concordia.age.default <- function(x,exterr=TRUE,...){
-    out <- x
+    out <- list()
     t.init <- initial.concordia.age(x)
     if (exterr){
         t.init <- stats::optim(par=t.init,fn=LL_concordia_age,
@@ -274,9 +274,12 @@ concordia.age.default <- function(x,exterr=TRUE,...){
     out
 }
 concordia.age.UPb <- function(x,wetherill=TRUE,exterr=TRUE,...){
-    cc <- concordia.comp(x,wetherill=wetherill)
+    cc <- concordia.comp(x,wetherill=TRUE)
     out <- concordia.age(cc,exterr=FALSE)
     mswd <- mswd.concordia(x,cc,out$age[1],exterr=exterr)
+    if (!wetherill) cc <- concordia.comp(x,wetherill=FALSE)
+    out$x <- cc$x
+    out$cov <- cc$cov
     out$mswd <- mswd$mswd
     out$p.value <- mswd$p.value
     out
