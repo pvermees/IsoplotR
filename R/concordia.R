@@ -256,7 +256,6 @@ concordia.title <- function(fit,sigdig=2){
 }
 
 concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
-# x = wetherill concordia compsition
 concordia.age.default <- function(x,...){
     stop("no default method implemented for concordia.age()")
 }
@@ -319,7 +318,7 @@ initial.concordia.age <- function(x){
     x0 <- x$x['U238Pb206']
     y0 <- x$x['Pb207Pb206']
     a <- y0 - b*x0
-    fit <- concordia.intersection.york.ab(a,b,wetherill=FALSE,exterr=FALSE)
+    fit <- concordia.intersection.york.ab(a,b,exterr=FALSE)
     fit$x[1]
 }
 

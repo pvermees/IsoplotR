@@ -28,7 +28,7 @@ ludwig.default <- function(x,...){ stop( "No default method available (yet)." ) 
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,...){
-    ta0 <- concordia.intersection.york(x,wetherill=FALSE,exterr=FALSE)$x
+    ta0 <- concordia.intersection.york(x,exterr=FALSE)$x
     if (x$format<4) init <- ta0
     else init <- c(ta0[1],10,10)
     fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)

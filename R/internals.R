@@ -31,17 +31,16 @@
 #'     data2ludwig_without_decay_err data2rxry data2tit data2tit.ThU
 #'     data2tit.default data2york data2york.ArAr data2york.PD
 #'     data2york.PbPb data2york.UPb data2york.default dct1d
-#'     discordant.composition discordia.plot discordia.title diss doSm
-#'     eq.6.9 errorprop etchfact evolution.lines evolution.title
-#'     f147Sm filter.UPb.ages fisher.lud fisher.lud.UPb
-#'     fisher.lud.default fisher.tit fisher_lud_with_decay_err
-#'     fisher_lud_without_decay_err fissiontrack.age fixedpoint
-#'     fromJSON geomean.Sm get.ArAr.age get.ArAr.ratio get.EDM.age
-#'     get.He get.ICP.age get.LuHf.age get.LuHf.ratio get.PD.age
-#'     get.PD.ratio get.Pb206U238.age get.Pb206U238.age.UPb
-#'     get.Pb206U238.age.default get.Pb206U238.age.terawasserburg
-#'     get.Pb206U238.age.wetherill get.Pb206U238.ratios
-#'     get.Pb207Pb206.age get.Pb207Pb206.age.UPb
+#'     discordia.plot discordia.title diss doSm eq.6.9 errorprop
+#'     etchfact evolution.lines evolution.title f147Sm filter.UPb.ages
+#'     fisher.lud fisher.lud.UPb fisher.lud.default fisher.tit
+#'     fisher_lud_with_decay_err fisher_lud_without_decay_err
+#'     fissiontrack.age fixedpoint fromJSON geomean.Sm get.ArAr.age
+#'     get.ArAr.ratio get.EDM.age get.He get.ICP.age get.LuHf.age
+#'     get.LuHf.ratio get.PD.age get.PD.ratio get.Pb206U238.age
+#'     get.Pb206U238.age.UPb get.Pb206U238.age.default
+#'     get.Pb206U238.age.terawasserburg get.Pb206U238.age.wetherill
+#'     get.Pb206U238.ratios get.Pb207Pb206.age get.Pb207Pb206.age.UPb
 #'     get.Pb207Pb206.age.default get.Pb207Pb206.age.terawasserburg
 #'     get.Pb207Pb206.age.wetherill get.Pb207Pb206.ratios
 #'     get.Pb207U235.age get.Pb207U235.age.UPb

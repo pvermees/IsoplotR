@@ -85,41 +85,25 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     out$p.value <- fit$p.value
     out
 }
-
-concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
-    d <- data2york(x,wetherill=wetherill)
+concordia.intersection.york <- function(x,exterr=FALSE){
+    d <- data2york(x,wetherill=FALSE)
     fit <- york(d)
-    concordia.intersection.york.ab(fit$a[1],fit$b[1],wetherill=wetherill,exterr=exterr)
+    concordia.intersection.york.ab(fit$a[1],fit$b[1],exterr=exterr)
 }
-concordia.intersection.york.ab <- function(a,b,wetherill=TRUE,exterr=FALSE){
+concordia.intersection.york.ab <- function(a,b,exterr=FALSE){
     out <- list()
-    if (wetherill){
-        search.range <- c(0,10000)
-        midpoint <- stats::optimize(intersection.misfit.york,search.range,
-                                    a=a,b=b,wetherill=wetherill)$minimum
-        range1 <- c(-1000,midpoint)
-        range2 <- c(midpoint,10000)
-        out$x <- search.range # tl, tu
-        names(out$x) <- c('t[l]','t[u]')
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,range1, 
-                                        a=a,b=b,wetherill=wetherill)$root
-        out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,range2, 
-                                        a=a,b=b,wetherill=wetherill)$root
+    search.range <- c(1/10000,10000)
+    out$x <- c(1,a) # tl, 7/6 intercept
+    names(out$x) <- c('t[l]','76i')
+    if (b<0) { # negative slope => two intersections with concordia line
+        midpoint <- stats::optimize(intersection.misfit.york,
+                                    search.range,a=a,b=b)$minimum
+        search.range[2] <- midpoint
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                        search.range,a=a,b=b)$root
     } else {
-        search.range <- c(1/10000,10000)
-        out$x <- c(1,a) # tl, 7/6 intercept
-        names(out$x) <- c('t[l]','76i')
-        if (b<0) { # negative slope => two intersections with concordia line
-            midpoint <- stats::optimize(intersection.misfit.york,
-                                        search.range,a=a,b=b,
-                                        wetherill=wetherill)$minimum
-            search.range[2] <- midpoint
-            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range, 
-                                            a=a,b=b,wetherill=wetherill)$root
-        } else {
-            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
-                                            a=a,b=b,wetherill=wetherill)$root
-        }
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                        search.range,a=a,b=b)$root
     }
     out
 }
@@ -145,7 +129,7 @@ project.concordia <- function(m76,m86,i76){
         go.ahead <- TRUE
     } else if (neg & below){  # it is not clear what to do with samples
         for (tt in seq(from=10,to=5000,by=10)){
-            misfit <- intersection.misfit.york(tend,a=a,b=b,wetherill=FALSE)
+            misfit <- intersection.misfit.york(tend,a=a,b=b)
             if (misfit<0){    # that plot in the 'forbidden zone' above
                 tend <- tt    # Wetherill concordia or below T-W concordia
                 found <- TRUE # IsoplotR will still project them on
@@ -155,8 +139,8 @@ project.concordia <- function(m76,m86,i76){
     }
     if (go.ahead){
         search.range <- c(1/10000,tend)
-        out <- stats::uniroot(intersection.misfit.york,search.range, 
-                              a=a,b=b,wetherill=FALSE)$root
+        out <- stats::uniroot(intersection.misfit.york,search.range,
+                              a=a,b=b)$root
     } else {
         out <- m76
     }
@@ -165,16 +149,6 @@ project.concordia <- function(m76,m86,i76){
 
 # returns misfit of a proposed age and the intersection
 # between the discordia and concordia lines
-intersection.misfit.york <- function(age,a,b,wetherill=TRUE){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    R <- iratio('U238U235')[1]
-    if (wetherill)
-        out <- a-b+1 + b*exp(l5*age) - exp(l8*age)
-    else
-        out <- (exp(l5*age)-1)/(exp(l8*age)-1) - a*R - b*R/(exp(l8*age)-1)
-    out
-}
 intersection.misfit.ludwig <- function(t1,t2,a0,b0){
     tl <- min(t1,t2)
     tu <- max(t1,t2)
@@ -186,50 +160,11 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0){
     BB <- a0/(b0*R)
     YY - BB*XX
 }
-
-# find the composition of a point that is 100d% discordant
-# between upper intercept and lower intercept age
-# (if wetherill=TRUE) or between the 207/206 intercept
-# and the lower intercept age (if wetherill=FALSE)
-discordant.composition <- function(d,tl,itu,wetherill=TRUE){
-    out <- list()
+intersection.misfit.york <- function(age,a,b){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     R <- iratio('U238U235')[1]
-    if (wetherill){
-        X <- d*(exp(l5*tl)-1) + (1-d)*(exp(l5*itu)-1)
-        Y <- d*(exp(l8*tl)-1) + (1-d)*(exp(l8*itu)-1)
-        dXdl5 <- d*tl*exp(l5*tl) + (1-d)*itu*exp(l5*itu)
-        dXdl8 <- 0
-        dXdR <- 0
-        dYdl5 <- 0
-        dYdl8 <- d*tl*exp(l8*tl) + (1-d)*itu*exp(l8*itu)
-        dYdR <- 0
-    } else {
-        X <- (1-d)/(exp(l8*tl)-1)
-        Y <- d*itu + ((1-d)/R)*(exp(l5*tl)-1)/(exp(l8*tl)-1)
-        dXdl5 <- 0
-        dXdl8 <- -(1-d)*tl*exp(l8*tl)/(exp(l8*tl)-1)^2
-        dXdR <- 0
-        dYdl5 <- ((1-d)/R)*tl*exp(l5*tl)/(exp(l8*tl)-1)
-        dYdl8 <- -((1-d)/R)*tl*exp(l8*tl)*(exp(l5*tl)-1)/(exp(l8*tl)-1)^2
-        dYdR <- -((1-d)/R^2)*(exp(l5*tl)-1)/(exp(l8*tl)-1)
-    }
-    J <- matrix(0,2,3)
-    J[1,1] <- dXdl5
-    J[1,2] <- dXdl8
-    J[1,3] <- dXdR
-    J[2,1] <- dYdl5
-    J[2,2] <- dYdl8
-    J[2,3] <- dYdR
-    E <- matrix(0,3,3)
-    E[1,1] <- lambda('U235')[2]^2
-    E[2,2] <- lambda('U238')[2]^2
-    E[3,3] <- iratio('U238U235')[2]^2
-    covmat <- J %*% E %*% t(J)
-    out$x <- c(X,Y)
-    out$cov <- covmat
-    out
+    (exp(l5*age)-1)/(exp(l8*age)-1) - a*R - b*R/(exp(l8*age)-1)
 }
 
 discordia.plot <- function(fit,wetherill){
