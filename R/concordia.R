@@ -256,28 +256,36 @@ concordia.title <- function(fit,sigdig=2){
 }
 
 concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
-concordia.age.default <- function(x,exterr=TRUE,...){
+concordia.age.default <- function(x,t.init,exterr=TRUE,...){
     out <- list()
-    t.init <- initial.concordia.age(x)
-    if (exterr){
-        t.init <- stats::optim(par=t.init,fn=LL_concordia_age,
-                               x=x,exterr=FALSE,
-                               method="BFGS",hessian=TRUE)$par
-    }
-    fit.age <- stats::optim(par=t.init,fn=LL_concordia_age,
+    out$age <- tryCatch({
+        fit <- stats::optim(par=t.init,fn=LL_concordia_age,
                             x=x,exterr=exterr,
                             method="BFGS",hessian=TRUE)
-    tt <- fit.age$par
-    tt.err <- as.numeric(sqrt(solve(fit.age$hessian)))
-    out$age <- c(tt,tt.err)
+        tt <- fit$par
+        tt.err <- as.numeric(sqrt(solve(fit$hessian)))
+        c(tt,tt.err)
+    }, warning = function(w){
+        c(t.init,1)
+    }, error = function(e){
+        c(t.init,1)
+    })
     names(out$age) <- c('t.conc','s[t.conc]')
     out
 }
-concordia.age.UPb <- function(x,wetherill=TRUE,exterr=TRUE,...){
-    cc <- concordia.comp(x,wetherill=TRUE)
-    out <- concordia.age(cc,exterr=FALSE)
-    mswd <- mswd.concordia(x,cc,out$age[1],exterr=exterr)
-    if (!wetherill) cc <- concordia.comp(x,wetherill=FALSE)
+concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,...){
+    if (is.na(i)){
+        ccw <- concordia.comp(x,wetherill=TRUE)
+        cct <- concordia.comp(x,wetherill=FALSE)
+    } else {
+        ccw <- wetherill(x,i)
+        cct <- tera.wasserburg(x,i)
+    }
+    t.init <- initial.concordia.age(cct)
+    out <- concordia.age(ccw,t.init=t.init,exterr=exterr)
+    mswd <- mswd.concordia(x,ccw,out$age[1],exterr=exterr)
+    if (wetherill) cc <- ccw
+    else cc <- cct
     out$x <- cc$x
     out$cov <- cc$cov
     out$mswd <- mswd$mswd
@@ -289,7 +297,7 @@ concordia.age.UPb <- function(x,wetherill=TRUE,exterr=TRUE,...){
 concordia.comp <- function(x,wetherill=TRUE){
     if (wetherill) out <- wetherill(x,1)
     else out <- tera.wasserburg(x,1)
-    fit.comp <- stats::optim(out$x[1:2], LL.concordia.comp.default,
+    fit.comp <- stats::optim(out$x[1:2], LL.concordia.comp,
                              x=x,wetherill=wetherill,
                              method="BFGS",hessian=TRUE)
     out$x <- fit.comp$par
@@ -297,20 +305,23 @@ concordia.comp <- function(x,wetherill=TRUE){
     out
 }
 
-initial.concordia.age <- function(x,...){ UseMethod("initial.concordia.age",x) }
-initial.concordia.age.default <- function(x,...){ stop('No default method.') }
-initial.concordia.age.wetherill <- function(x,...){
-    ages <- c(get.Pb207U235.age(x),get.Pb206U238.age(x))
-    mean(ages)
-}
-initial.concordia.age.terawasserburg <- function(x,...){
-    ages <- c(get.Pb206U238.age(x),get.Pb207Pb206.age(x))
-    mean(ages)
+# x is an object of class "terawasserburg"
+initial.concordia.age <- function(x){
+    e <- eigen(x$cov)
+    v <- e$vectors[,1]
+    if (v[1]==0) return(get.Pb207Pb206.age(x$x['Pb207Pb206'],0)[1])
+    if (v[2]==0) return(get.Pb206U238.age(1/x$x['U238Pb206'],0)[1])
+    b <- v[1]/v[2] # slope of the ellipse
+    x0 <- x$x['U238Pb206']
+    y0 <- x$x['Pb207Pb206']
+    a <- y0 - b*x0
+    fit <- concordia.intersection.york.ab(a,b,wetherill=FALSE,exterr=FALSE)
+    fit$x[1]
 }
 
 mswd.concordia <- function(x,cc,tt,exterr=TRUE){
     out <- list()
-    SS.equivalence <- LL.concordia.comp(cc,x,mswd=TRUE)
+    SS.equivalence <- LL.concordia.comp(cc$x,x,wetheril=TRUE,mswd=TRUE)
     SS.concordance <- LL_concordia_age(tt,cc,mswd=TRUE,exterr=exterr)
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
@@ -321,8 +332,7 @@ mswd.concordia <- function(x,cc,tt,exterr=TRUE){
     out
 }
 
-LL.concordia.comp <- function(mu,...){ UseMethod("LL.concordia.comp",mu) }
-LL.concordia.comp.default <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
+LL.concordia.comp <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
     out <- 0
     for (i in 1:length(x)){
         if (wetherill) xi <- wetherill(x,i)
@@ -333,12 +343,6 @@ LL.concordia.comp.default <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
         else out <- out + LL.norm(X,covmat)
     }
     out
-}
-LL.concordia.comp.wetherill <- function(mu,x,mswd=FALSE,...){
-    LL.concordia.comp(mu$x,x,wetherill=TRUE,mswd=mswd)
-}
-LL.concordia.comp.terawasserburg <- function(mu,x,mswd=FALSE,...){
-    LL.concordia.comp(mu$x,x,wetherill=FALSE,mswd=mswd)
 }
 
 LL_concordia_age <- function(tt,x,mswd=FALSE,exterr=TRUE){

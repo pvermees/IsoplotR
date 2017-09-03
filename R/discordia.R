@@ -89,36 +89,36 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
 concordia.intersection.york <- function(x,wetherill=TRUE,exterr=FALSE){
     d <- data2york(x,wetherill=wetherill)
     fit <- york(d)
+    concordia.intersection.york.ab(fit$a[1],fit$b[1],wetherill=wetherill,exterr=exterr)
+}
+concordia.intersection.york.ab <- function(a,b,wetherill=TRUE,exterr=FALSE){
     out <- list()
     if (wetherill){
         search.range <- c(0,10000)
-        midpoint <- stats::optimize(intersection.misfit.york, search.range,
-                                    a=fit$a[1], b=fit$b[1],
-                                    wetherill=wetherill)$minimum
+        midpoint <- stats::optimize(intersection.misfit.york,search.range,
+                                    a=a,b=b,wetherill=wetherill)$minimum
         range1 <- c(-1000,midpoint)
         range2 <- c(midpoint,10000)
         out$x <- search.range # tl, tu
         names(out$x) <- c('t[l]','t[u]')
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, range1, 
-                                        a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
-        out$x['t[u]'] <- stats::uniroot(intersection.misfit.york, range2, 
-                                        a=fit$a[1], b=fit$b[1], wetherill=wetherill)$root
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,range1, 
+                                        a=a,b=b,wetherill=wetherill)$root
+        out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,range2, 
+                                        a=a,b=b,wetherill=wetherill)$root
     } else {
         search.range <- c(1/10000,10000)
-        out$x <- c(1,fit$a[1]) # tl, 7/6 intercept
+        out$x <- c(1,a) # tl, 7/6 intercept
         names(out$x) <- c('t[l]','76i')
-        if (fit$b[1]<0) { # negative slope => two intersections with concordia line
-            midpoint <- stats::optimize(intersection.misfit.york, search.range,
-                                        a=fit$a[1], b=fit$b[1],
+        if (b<0) { # negative slope => two intersections with concordia line
+            midpoint <- stats::optimize(intersection.misfit.york,
+                                        search.range,a=a,b=b,
                                         wetherill=wetherill)$minimum
             search.range[2] <- midpoint
-            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, search.range, 
-                                            a=fit$a[1], b=fit$b[1],
-                                            wetherill=wetherill)$root
+            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range, 
+                                            a=a,b=b,wetherill=wetherill)$root
         } else {
-            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york, search.range,
-                                            a=fit$a[1], b=fit$b[1],
-                                            wetherill=wetherill)$root
+            out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
+                                            a=a,b=b,wetherill=wetherill)$root
         }
     }
     out

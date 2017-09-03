@@ -11,7 +11,7 @@ length.UThHe <- function(x){ nrow(x) }
 
 roundit <- function(age,err,sigdig=2){
     out <- cbind(age,err)
-    if (!is.na(sigdig)){
+    if (!any(is.na(c(age,err,sigdig)))){
         out[,2] <- signif(err,sigdig)
         nd <- log10(trunc(abs(age)/err))+sigdig
         out[,1] <- signif(age,nd)
@@ -93,8 +93,8 @@ hasClass <- function(x,classname){
 
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){
-    log(2*pi) + 0.5*determinant(covmat,logarithmic=TRUE)$modulus +
-                                0.5*get.concordia.SS(x,covmat)
+    (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus) +
+        get.concordia.SS(x,covmat)/2
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red')){
