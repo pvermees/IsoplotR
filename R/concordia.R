@@ -256,22 +256,9 @@ concordia.title <- function(fit,sigdig=2){
 }
 
 concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
-concordia.age.default <- function(x,t.init,exterr=TRUE,...){
-    out <- list()
-    out$age <- tryCatch({
-        fit <- stats::optim(par=t.init,fn=LL_concordia_age,
-                            x=x,exterr=exterr,
-                            method="BFGS",hessian=TRUE)
-        tt <- fit$par
-        tt.err <- as.numeric(sqrt(solve(fit$hessian)))
-        c(tt,tt.err)
-    }, warning = function(w){
-        c(t.init,1)
-    }, error = function(e){
-        c(t.init,1)
-    })
-    names(out$age) <- c('t.conc','s[t.conc]')
-    out
+# x = wetherill concordia compsition
+concordia.age.default <- function(x,...){
+    stop("no default method implemented for concordia.age()")
 }
 concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,...){
     if (is.na(i)){
@@ -290,6 +277,23 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,...){
     out$cov <- cc$cov
     out$mswd <- mswd$mswd
     out$p.value <- mswd$p.value
+    out
+}
+concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
+    out <- list()
+    out$age <- tryCatch({
+        fit <- stats::optim(par=t.init,fn=LL.concordia.age,
+                            ccw=x,exterr=exterr,
+                            method="BFGS",hessian=TRUE)
+        tt <- fit$par
+        tt.err <- as.numeric(sqrt(solve(fit$hessian)))
+        c(tt,tt.err)
+    }, warning = function(w){
+        c(t.init,1)
+    }, error = function(e){
+        c(t.init,1)
+    })
+    names(out$age) <- c('t.conc','s[t.conc]')
     out
 }
 
@@ -319,10 +323,10 @@ initial.concordia.age <- function(x){
     fit$x[1]
 }
 
-mswd.concordia <- function(x,cc,tt,exterr=TRUE){
+mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
     out <- list()
-    SS.equivalence <- LL.concordia.comp(cc$x,x,wetheril=TRUE,mswd=TRUE)
-    SS.concordance <- LL_concordia_age(tt,cc,mswd=TRUE,exterr=exterr)
+    SS.equivalence <- LL.concordia.comp(mu=ccw$x,x=x,wetheril=TRUE,mswd=TRUE)
+    SS.concordance <- LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr)
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
     out$mswd <- list(equivalence = SS.equivalence/df.equivalence,
@@ -345,20 +349,17 @@ LL.concordia.comp <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
     out
 }
 
-LL_concordia_age <- function(tt,x,mswd=FALSE,exterr=TRUE){
-    if (hasClass(x,'wetherill'))
-        y <- age_to_wetherill_ratios(tt)
-    else if (hasClass(x,'terawasserburg'))
-        y <- age_to_terawasserburg_ratios(tt)
-    dx <- matrix(x$x[1:2]-y$x,1,2)
-    covmat <- x$cov[1:2,1:2]
+LL.concordia.age <- function(tt,ccw,mswd=FALSE,exterr=TRUE){
+    y <- age_to_wetherill_ratios(tt)
+    dx <- matrix(ccw$x[1:2]-y$x,1,2)
+    covmat <- ccw$cov[1:2,1:2]
     if (exterr){
         l8 <- settings('lambda','U238')
         l5 <- settings('lambda','U235')
         P235 <- tt*exp(l5[1]*tt)
         P238 <- tt*exp(l8[1]*tt)
         E <- diag(c(P235*l5[2],P238*l8[2]))^2
-        covmat <- x$cov[1:2,1:2] + E
+        covmat <- ccw$cov[1:2,1:2] + E
     }
     if (mswd) out <- get.concordia.SS(dx,covmat)
     else out <- LL.norm(dx,covmat)
