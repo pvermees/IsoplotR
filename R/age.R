@@ -306,7 +306,7 @@ age.UPb <- function(x,type=1,wetherill=TRUE, exterr=TRUE,i=NA,
     else if (type==2)
         out <- concordia.age(X,wetherill=wetherill,exterr=exterr,...)
     else if (type==3)
-        out <- concordia.intersection(x,wetherill=wetherill,exterr=exterr)
+        out <- concordia.intersection.ludwig(x,wetherill=wetherill,exterr=exterr)
     out
 }
 #' @rdname age

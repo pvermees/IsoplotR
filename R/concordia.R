@@ -324,7 +324,7 @@ initial.concordia.age <- function(x){
 
 mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
     out <- list()
-    SS.equivalence <- LL.concordia.comp(mu=ccw$x,x=x,wetheril=TRUE,mswd=TRUE)
+    SS.equivalence <- LL.concordia.comp(mu=ccw$x,x=x,wetherill=TRUE,mswd=TRUE)
     SS.concordance <- LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr)
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
