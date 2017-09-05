@@ -7,7 +7,7 @@
 concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, levels = NA, ellipse.col = c("#00FF0080",
   "#FF000080"), concordia.col = "darksalmon", exterr = TRUE, show.age = 0,
-  sigdig = 2, common.Pb = 0, ...)
+  sigdig = 2, common.Pb = 0, ticks = NULL, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -55,6 +55,9 @@ Pb-composition
 \code{3}: use the Pb-composition stored in
 \code{settings('iratio','Pb206Pb204')} and
 \code{settings('iratio','Pb207Pb204')}}
+
+\item{ticks}{an optional vector of age ticks to be added to the
+concordia line.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

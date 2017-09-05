@@ -14,7 +14,7 @@ ludwig(x, ...)
 \method{ludwig}{UPb}(x, exterr = FALSE, ...)
 }
 \arguments{
-\item{x}{an object of class \code{UPb} with \code{x$format > 3}.}
+\item{x}{an object of class \code{UPb}}
 
 \item{...}{optional arguments}
 

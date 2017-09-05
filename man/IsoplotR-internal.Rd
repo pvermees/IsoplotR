@@ -10,14 +10,12 @@
 \alias{BIC_fit}
 \alias{EDM.age}
 \alias{ICP.age}
-\alias{J.lud2york}
 \alias{KS.diss}
 \alias{LL.concordia.age}
 \alias{LL.concordia.comp}
 \alias{LL.concordia.comp.default}
 \alias{LL.concordia.comp.terawasserburg}
 \alias{LL.concordia.comp.wetherill}
-\alias{LL.concordia.intersection.ludwig}
 \alias{LL.concordia.intersection.york}
 \alias{LL.lud.UPb}
 \alias{LL.norm}
@@ -112,7 +110,6 @@
 \alias{data2york.UPb}
 \alias{data2york.default}
 \alias{dct1d}
-\alias{discordant.composition}
 \alias{discordia.plot}
 \alias{discordia.title}
 \alias{diss}
