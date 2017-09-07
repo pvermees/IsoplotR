@@ -89,7 +89,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     }
     colourbar(z=levels,col=ellipse.col)
     if (show.age==1){
-        fit <- concordia.age(X,wetherill=wetherill,exterr=exterr)
+        fit <- concordia.age(X,wetherill=wetherill,
+                             exterr=exterr,alpha=alpha)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
         graphics::title(concordia.title(fit,sigdig=sigdig))
@@ -244,13 +245,29 @@ get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
     out
 }
 
-concordia.title <- function(fit,sigdig=2){
-    rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
-    line1 <- substitute('concordia age ='~a%+-%b~'[Ma] (1'~sigma~')',
-                        list(a=rounded.age[1], b=rounded.age[2]))
-    line2 <- substitute('MSWD (concordance) ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd$concordance,2),
-                             b=signif(fit$p.value$concordance,2)))
+concordia.title <- function(fit,sigdig=2,alpha=0.05){
+    if (fit$mswd['combined']<1){
+        rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
+        line1 <- substitute('concordia age ='~a%+-%b~'|'~c,
+                            list(a=rounded.age[1],
+                                 b=rounded.age[2],
+                                 c=rounded.age[3]))
+    } else {
+        rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
+        line1 <- substitute('concordia age ='~a%+-%b~'|'~c~'|'~d,
+                            list(a=rounded.age[1],
+                                 b=rounded.age[2],
+                                 c=rounded.age[3],
+                                 d=rounded.age[4]))
+    }
+    line2 <- substitute('MSWD ='~a~'|'~b~'|'~c~
+                            ', p('~chi^2*')='~d~'|'~e~'|'~f,
+                        list(a=signif(fit$mswd['concordance'],2),
+                             b=signif(fit$mswd['equivalence'],2),
+                             c=signif(fit$mswd['combined'],2),
+                             d=signif(fit$p.value['concordance'],2),
+                             e=signif(fit$p.value['equivalence'],2),
+                             f=signif(fit$p.value['combined'],2)))
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)
 }
@@ -259,7 +276,9 @@ concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
 concordia.age.default <- function(x,...){
     stop("no default method implemented for concordia.age()")
 }
-concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,...){
+concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
+                              exterr=TRUE,alpha=0.05,...){
+    out <- list()
     if (is.na(i)){
         ccw <- concordia.comp(x,wetherill=TRUE)
         cct <- concordia.comp(x,wetherill=FALSE)
@@ -268,19 +287,23 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,...){
         cct <- tera.wasserburg(x,i)
     }
     t.init <- initial.concordia.age(cct)
-    out <- concordia.age(ccw,t.init=t.init,exterr=exterr)
-    mswd <- mswd.concordia(x,ccw,out$age[1],exterr=exterr)
-    if (wetherill) cc <- ccw
-    else cc <- cct
-    out$x <- cc$x
-    out$cov <- cc$cov
-    out$mswd <- mswd$mswd
-    out$p.value <- mswd$p.value
+    out$age <- concordia.age(ccw,t.init=t.init,exterr=exterr)
+    if (is.na(i)){ # these calculations are only relevant to weighted means
+        out <- c(out, mswd.concordia(x,ccw,out$age[1],exterr=exterr))
+        tfact <- qt(1-alpha/2,out$df['combined'])
+        out$age <- c(out$age,
+                     tfact*out$age[2],
+                     tfact*out$mswd['combined']*out$age[2])
+        names(out$age) <- c('t','s[t]','ci[t]','ci.overdisp[t]')
+        if (wetherill) cc <- ccw
+        else cc <- cct
+        out$x <- cc$x
+        out$cov <- cc$cov
+    }
     out
 }
 concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
-    out <- list()
-    out$age <- tryCatch({
+    out <- tryCatch({
         fit <- stats::optim(par=t.init,fn=LL.concordia.age,
                             ccw=x,exterr=exterr,
                             method="BFGS",hessian=TRUE)
@@ -292,7 +315,7 @@ concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
     }, error = function(e){
         c(t.init,1)
     })
-    names(out$age) <- c('t.conc','s[t.conc]')
+    names(out) <- c('t.conc','s[t.conc]')
     out
 }
 
@@ -323,16 +346,30 @@ initial.concordia.age <- function(x){
 }
 
 mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
-    out <- list()
-    SS.equivalence <- LL.concordia.comp(mu=ccw$x,x=x,wetherill=TRUE,mswd=TRUE)
-    SS.concordance <- LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr)
+    SS.equivalence <-
+        LL.concordia.comp(mu=ccw$x,x=x,wetherill=TRUE,mswd=TRUE)
+    SS.concordance <-
+        LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr)
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
-    out$mswd <- list(equivalence = SS.equivalence/df.equivalence,
-                     concordance = SS.concordance/df.concordance)
-    out$p.value <- list(equivalence = 1-stats::pchisq(SS.equivalence,df.equivalence),
-                        concordance = 1-stats::pchisq(SS.concordance,df.concordance))
-    out
+    mswd <- rep(0,3)
+    p <- rep(0,3)
+    df <- rep(0,3)
+    labels <- c('equivalence','concordance','combined')
+    names(mswd) <- labels
+    names(p) <- labels
+    names(df) <- labels
+    mswd['equivalence'] <- SS.equivalence/df.equivalence
+    mswd['concordance'] <- SS.concordance/df.concordance
+    mswd['combined'] <- (SS.equivalence+SS.concordance)/(df.equivalence+df.concordance)
+    p.value['equivalence'] <- 1-stats::pchisq(SS.equivalence,df.equivalence)
+    p.value['concordance'] <- 1-stats::pchisq(SS.concordance,df.concordance)
+    p.value['combined'] <- 1-stats::pchisq(SS.equivalence+SS.concordance,
+                                     df.equivalence+df.concordance)
+    df['equivalence'] <- df.equivalence
+    df['concordance'] <- df.concordance
+    df['combined'] <- df.equivalence + df.concordance
+    list(mswd=mswd,p.value=p.value,df=df)
 }
 
 LL.concordia.comp <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){

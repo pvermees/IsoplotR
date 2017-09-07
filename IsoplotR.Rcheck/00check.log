@@ -36,8 +36,8 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
 File README.md cannot be checked without ‘pandoc’ being installed.
-Non-standard files/directories found at top level:
-  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
+Non-standard file/directory found at top level:
+  ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING

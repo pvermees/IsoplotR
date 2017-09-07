@@ -10,11 +10,18 @@ length.fissiontracks <- function(x){ length(x$Ns) }
 length.UThHe <- function(x){ nrow(x) }
 
 roundit <- function(age,err,sigdig=2){
-    out <- cbind(age,err)
+    if (length(age)==1){
+        min.err <- min(err)
+        dat <- c(age,err)
+    } else {
+        min.err <- err
+        dat <- cbind(age,err)
+    }
     if (!any(is.na(c(age,err,sigdig)))){
-        out[,2] <- signif(err,sigdig)
-        nd <- log10(trunc(abs(age)/err))+sigdig
-        out[,1] <- signif(age,nd)
+        nd <- log10(trunc(abs(dat)/min.err))+sigdig
+        out <- signif(dat,nd)
+    } else {
+        out <- dat
     }
     out
 }

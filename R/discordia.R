@@ -83,6 +83,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
     }
     out$mswd <- fit$mswd
     out$p.value <- fit$p.value
+    out$df <- fit$df
     out
 }
 concordia.intersection.york <- function(x,exterr=FALSE){
@@ -129,10 +130,10 @@ project.concordia <- function(m76,m86,i76){
         go.ahead <- TRUE
     } else if (neg & below){  # it is not clear what to do with samples
         for (tt in seq(from=10,to=5000,by=10)){
-            misfit <- intersection.misfit.york(tend,a=a,b=b)
+            misfit <- intersection.misfit.york(tt,a=a,b=b)
             if (misfit<0){    # that plot in the 'forbidden zone' above
                 tend <- tt    # Wetherill concordia or below T-W concordia
-                found <- TRUE # IsoplotR will still project them on
+                go.ahead <- TRUE # IsoplotR will still project them on
                 break         # the concordia line.
             }
         }

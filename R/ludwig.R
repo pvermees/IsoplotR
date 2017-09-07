@@ -65,6 +65,7 @@ mswd.lud <- function(pars,x){
     else df <- 2*ns-2
     out <- list()
     out$mswd <- SS/df
+    out$df <- df
     out$p.value <- as.numeric(1-stats::pchisq(SS,df))
     out
 }
