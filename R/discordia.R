@@ -1,14 +1,13 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
+concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05){
     out <- list()
     fit <- ludwig(x,exterr=exterr)
-    out$x <- c(0,0)
     J <- matrix(0,2,3)
     E <- matrix(0,3,3)
+    tfact <- qt(1-alpha/2,fit$df)
     if (wetherill){
         tt <- fit$par[1]
-        names(out$x) <- c('t[l]','t[u]')
         buffer <- 1 # start searching 1Ma above or below first intercept age
         l5 <- lambda('U235')[1]
         l8 <- lambda('U238')[1]
@@ -65,21 +64,29 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE){
             J[1,3] <- -dD.db0/dD.dtl
             J[2,1] <- 1
         }
-        out$x['t[l]'] <- tl
-        out$x['t[u]'] <- tu
+        labels <- c('t[l]','t[u]')
+        out$x <- c(tl,tu)
         out$cov <- J %*% E %*% t(J)
     } else if (x$format<4){
+        labels <- c('t[l]','76')
         out$x <- fit$par
-        names(out$x) <- c('t[l]','76')
         out$cov <- fit$cov
     } else {
-        names(out$x) <- c('t[l]','76')
-        out$x['t[l]'] <- fit$par['t']
-        out$x['76'] <- fit$par['74i']/fit$par['64i']
+        labels <- c('t[l]','76')
+        out$x <- c(fit$par['t'],
+                   fit$par['74i']/fit$par['64i'])
         J[1,1] <- 1
-        J[2,2] <- -out$x['76']/fit$par['64i']
+        J[2,2] <- -fit$par['74i']/fit$par['64i']^2
         J[2,3] <- 1/fit$par['64i']
         out$cov <- J %*% fit$cov %*% t(J)
+    }
+    names(out$x) <- labels
+    out$err <- sqrt(diag(out$cov))
+    out$err <- rbind(out$err,tfact*out$err)
+    rownames(out$err) <- c('s','ci')
+    if (fit$mswd>1){
+        out$err <- rbind(out$err,tfact*sqrt(fit$mswd)*out$err['s',])
+        rownames(out$err) <- c('s','ci','ci.overdisp')
     }
     out$mswd <- fit$mswd
     out$p.value <- fit$p.value
@@ -184,19 +191,53 @@ discordia.plot <- function(fit,wetherill){
 
 discordia.title <- function(fit,wetherill,sigdig=2){
     if (wetherill){
-        lower.age <- roundit(fit$x[1],sqrt(fit$cov[1,1]),sigdig=sigdig)
-        upper.age <- roundit(fit$x[2],sqrt(fit$cov[2,2]),sigdig=sigdig)
-        line1 <- substitute('lower intercept ='~a%+-%b~'[Ma]',
-                            list(a=lower.age[1], b=lower.age[2]))
-        line2 <- substitute('upper intercept ='~a%+-%b~'[Ma]',
-                            list(a=upper.age[1], b=upper.age[2]))
+        lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
+        upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
+        if (fit$mswd>1){
+            line1 <- substitute('lower intercept ='~a%+-%b~'|'~c~'|'~d,
+                                list(a=lower.age[1],
+                                     b=lower.age[2],
+                                     c=lower.age[3],
+                                     d=lower.age[4]))
+            line2 <- substitute('upper intercept ='~a%+-%b~'|'~c~'|'~d,
+                                list(a=upper.age[1],
+                                     b=upper.age[2],
+                                     c=upper.age[3],
+                                     d=upper.age[4]))
+        } else {
+            line1 <- substitute('lower intercept ='~a%+-%b~'|'~c,
+                                list(a=lower.age[1],
+                                     b=lower.age[2],
+                                     c=lower.age[3]))
+            line2 <- substitute('upper intercept ='~a%+-%b~'|'~c,
+                                list(a=upper.age[1],
+                                     b=upper.age[2],
+                                     c=upper.age[3]))            
+        }
     } else {
-        lower.age <- roundit(fit$x[1],sqrt(fit$cov[1,1]),sigdig=sigdig)
-        intercept <- roundit(fit$x[2],sqrt(fit$cov[2,2]),sigdig=sigdig)
-        line1 <- substitute('age ='~a%+-%b~'[Ma]',
-                            list(a=lower.age[1], b=lower.age[2]))
-        line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b,
-                            list(a=intercept[1], b=intercept[2]))
+        lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
+        intercept <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
+        if (fit$mswd>1){
+            line1 <- substitute('age ='~a%+-%b~'|'~c~'|'~d,
+                                list(a=lower.age[1],
+                                     b=lower.age[2],
+                                     c=lower.age[3],
+                                     d=lower.age[4]))
+            line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b~'|'~c~'|'~d,
+                                list(a=intercept[1],
+                                     b=intercept[2],
+                                     c=intercept[3],
+                                     d=intercept[4]))
+        } else {
+            line1 <- substitute('age ='~a%+-%b~'|'~c,
+                                list(a=lower.age[1],
+                                     b=lower.age[2],
+                                     c=lower.age[3]))
+            line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b~'|'~c,
+                                list(a=intercept[1],
+                                     b=intercept[2],
+                                     c=intercept[3]))
+        }
     }
     line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),

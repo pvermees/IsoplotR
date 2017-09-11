@@ -60,11 +60,11 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
 
 mswd.lud <- function(pars,x){
     ns <- length(x)
-    SS <- 2*LL.lud.UPb(pars,x=x,exterr=FALSE)
+    SS <- LL.lud.UPb(pars,x=x,exterr=FALSE) # mistake in Ludwig (1998)? multiply by 2?
     if (x$format<4) df <- ns-2
     else df <- 2*ns-2
     out <- list()
-    out$mswd <- SS/df
+    out$mswd <- as.vector(SS/df)
     out$df <- df
     out$p.value <- as.numeric(1-stats::pchisq(SS,df))
     out
