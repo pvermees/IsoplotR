@@ -353,11 +353,11 @@ mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
     mswd <- rep(0,3)
-    p <- rep(0,3)
+    p.value <- rep(0,3)
     df <- rep(0,3)
     labels <- c('equivalence','concordance','combined')
     names(mswd) <- labels
-    names(p) <- labels
+    names(p.value) <- labels
     names(df) <- labels
     mswd['equivalence'] <- SS.equivalence/df.equivalence
     mswd['concordance'] <- SS.concordance/df.concordance

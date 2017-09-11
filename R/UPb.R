@@ -586,16 +586,17 @@ common.Pb.isochron <- function(x){
     out
 }
 common.Pb.stacey.kramers <- function(x){
-    sk.206.204 <- 18.700
-    sk.207.204 <- 15.628
+    sk.206.204 <- 11.152
+    sk.207.204 <- 12.998
     sk.238.204 <- 9.74
     U238U235 <- settings('iratio','U238U235')[1]
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
+    ti <- 3700
     tt <- 1000
     for (i in 1:5){
-        i64 <- sk.206.204 - sk.238.204*(exp(l8*tt)-1)
-        i74 <- sk.207.204 - sk.238.204*(exp(l5*tt)-1)/U238U235
+        i64 <- sk.206.204 + sk.238.204*(exp(l8*(ti-tt))-1)
+        i74 <- sk.207.204 + sk.238.204*(exp(l5*(ti-tt))-1)/U238U235
         if (x$format < 4)
             out <- Pb.correction.without.204(x,i74/i64)
         else
