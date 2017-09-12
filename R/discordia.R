@@ -1,72 +1,13 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05){
+concordia.intersection.ludwig <- function(x,wetherill=TRUE,
+                                          exterr=FALSE,alpha=0.05){
     fit <- ludwig(x,exterr=exterr)
     out <- fit[c('mswd','p.value','df')]
-    J <- matrix(0,2,3)
-    E <- matrix(0,3,3)
     tfact <- qt(1-alpha/2,fit$df)
     if (wetherill){
-        tt <- fit$par[1]
-        buffer <- 1 # start searching 1Ma above or below first intercept age
-        l5 <- lambda('U235')[1]
-        l8 <- lambda('U238')[1]
-        R <- iratio('U238U235')[1]
-        if (x$format<4){
-            a0 <- 1
-            b0 <- fit$par['76i']
-            E[c(1,3),c(1,3)] <- fit$cov
-        } else {
-            a0 <- fit$par['64i']
-            b0 <- fit$par['74i']
-            E <- fit$cov
-        }
-        disc.slope <- a0/(b0*R)
-        conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
-        if (conc.slope > disc.slope){
-            search.range <- c(tt+buffer,10000)
-            tl <- tt
-            tu <- stats::uniroot(intersection.misfit.ludwig,
-                                 interval=search.range,
-                                 t2=tt,a0=a0,b0=b0)$root
-        } else {
-            search.range <- c(-1000,tt-buffer)
-            tl <- stats::uniroot(intersection.misfit.ludwig,
-                                 interval=search.range,
-                                 t2=tt,a0=a0,b0=b0)$root
-            tu <- tt
-        }
-        l5 <- lambda('U235')[1]
-        l8 <- lambda('U238')[1]
-        R <- iratio('U238U235')[1]
-        XX <- exp(l5*tu) - exp(l5*tl)
-        YY <- exp(l8*tu) - exp(l8*tl)
-        BB <- a0/(b0*R)
-        D <- (YY-BB*XX)^2
-        dXX.dtl <- -l5*exp(l5*tl)
-        dXX.dtu <-  l5*exp(l5*tu)
-        dYY.dtl <- -l8*exp(l8*tl)
-        dYY.dtu <-  l8*exp(l8*tu)
-        dBB.da0 <-  1/(b0*R)
-        dBB.db0 <- -BB/b0
-        dD.dtl <- 2*(YY-BB*XX)*(dYY.dtl-BB*dXX.dtl)
-        dD.dtu <- 2*(YY-BB*XX)*(dYY.dtu-BB*dXX.dtu)
-        dD.da0 <- 2*(YY-BB*XX)*(-dBB.da0*XX)
-        dD.db0 <- 2*(YY-BB*XX)*(-dBB.db0*XX)
-        if (conc.slope > disc.slope){
-            J[1,1] <- 1
-            J[2,1] <- -dD.dtl/dD.dtu
-            J[2,2] <- -dD.da0/dD.dtu
-            J[2,3] <- -dD.db0/dD.dtu
-        } else {
-            J[1,1] <- -dD.dtu/dD.dtl
-            J[1,2] <- -dD.da0/dD.dtl
-            J[1,3] <- -dD.db0/dD.dtl
-            J[2,1] <- 1
-        }
         labels <- c('t[l]','t[u]')
-        out$x <- c(tl,tu)
-        out$cov <- J %*% E %*% t(J)
+        out <- c(out,twfit2wfit(fit,x))
     } else if (x$format<4){
         labels <- c('t[l]','76')
         out$x <- fit$par
@@ -75,6 +16,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
         labels <- c('t[l]','76')
         out$x <- c(fit$par['t'],
                    fit$par['74i']/fit$par['64i'])
+        J <- matrix(0,2,3)
         J[1,1] <- 1
         J[2,2] <- -fit$par['74i']/fit$par['64i']^2
         J[2,3] <- 1/fit$par['64i']
@@ -110,6 +52,74 @@ concordia.intersection.york.ab <- function(a,b,exterr=FALSE){
         out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
                                         search.range,a=a,b=b)$root
     }
+    out
+}
+
+# extract the lower and upper discordia intercept from the parameters
+# of a Ludwig fit (initial Pb ratio and lower intercept age)
+twfit2wfit <- function(fit,x){
+    tt <- fit$par[1]
+    buffer <- 1 # start searching 1Ma above or below first intercept age
+    l5 <- lambda('U235')[1]
+    l8 <- lambda('U238')[1]
+    R <- iratio('U238U235')[1]
+    E <- matrix(0,3,3)
+    J <- matrix(0,2,3)
+    if (x$format<4){
+        a0 <- 1
+        b0 <- fit$par['76i']
+        E[c(1,3),c(1,3)] <- fit$cov
+    } else {
+        a0 <- fit$par['64i']
+        b0 <- fit$par['74i']
+        E <- fit$cov
+    }
+    disc.slope <- a0/(b0*R)
+    conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
+    if (conc.slope > disc.slope){
+        search.range <- c(tt+buffer,10000)
+        tl <- tt
+        tu <- stats::uniroot(intersection.misfit.ludwig,
+                             interval=search.range,
+                             t2=tt,a0=a0,b0=b0)$root
+    } else {
+        search.range <- c(-1000,tt-buffer)
+        tl <- stats::uniroot(intersection.misfit.ludwig,
+                             interval=search.range,
+                             t2=tt,a0=a0,b0=b0)$root
+        tu <- tt
+    }
+    l5 <- lambda('U235')[1]
+    l8 <- lambda('U238')[1]
+    R <- iratio('U238U235')[1]
+    XX <- exp(l5*tu) - exp(l5*tl)
+    YY <- exp(l8*tu) - exp(l8*tl)
+    BB <- a0/(b0*R)
+    D <- (YY-BB*XX)^2
+    dXX.dtl <- -l5*exp(l5*tl)
+    dXX.dtu <-  l5*exp(l5*tu)
+    dYY.dtl <- -l8*exp(l8*tl)
+    dYY.dtu <-  l8*exp(l8*tu)
+    dBB.da0 <-  1/(b0*R)
+    dBB.db0 <- -BB/b0
+    dD.dtl <- 2*(YY-BB*XX)*(dYY.dtl-BB*dXX.dtl)
+    dD.dtu <- 2*(YY-BB*XX)*(dYY.dtu-BB*dXX.dtu)
+    dD.da0 <- 2*(YY-BB*XX)*(-dBB.da0*XX)
+    dD.db0 <- 2*(YY-BB*XX)*(-dBB.db0*XX)
+    if (conc.slope > disc.slope){
+        J[1,1] <- 1
+        J[2,1] <- -dD.dtl/dD.dtu
+        J[2,2] <- -dD.da0/dD.dtu
+        J[2,3] <- -dD.db0/dD.dtu
+    } else {
+        J[1,1] <- -dD.dtu/dD.dtl
+        J[1,2] <- -dD.da0/dD.dtl
+        J[1,3] <- -dD.db0/dD.dtl
+        J[2,1] <- 1
+    }
+    out <- list()
+    out$x <- c(tl,tu)
+    out$cov <- J %*% E %*% t(J)
     out
 }
 

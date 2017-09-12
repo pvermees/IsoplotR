@@ -273,7 +273,6 @@ concordia.age.default <- function(x,...){
 }
 concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
                               exterr=TRUE,alpha=0.05,...){
-    out <- list()
     if (is.na(i)){
         ccw <- concordia.comp(x,wetherill=TRUE)
         cct <- concordia.comp(x,wetherill=FALSE)
@@ -282,18 +281,23 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
         cct <- tera.wasserburg(x,i)
     }
     t.init <- initial.concordia.age(cct)
-    out$age <- rep(0,4)
-    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-    out$age[c('t','s[t]')] <- concordia.age(ccw,t.init=t.init,exterr=exterr)
+    tt <- concordia.age(ccw,t.init=t.init,exterr=exterr)
+    out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
-        out <- c(out, mswd.concordia(x,ccw,out$age[1],exterr=exterr))
+        out <- c(out,mswd.concordia(x,ccw,tt[1],exterr=exterr))
+        out$age <- rep(NA,4)
+        names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
         tfact <- qt(1-alpha/2,out$df['combined'])
+        out$age[c('t','s[t]')] <- tt
         out$age['ci[t]'] <- tfact*out$age['s[t]']
-        out$age['disp[t]'] <- tfact*out$mswd['combined']*out$age['s[t]']
+        if (out$mswd['combined']>1)
+            out$age['disp[t]'] <- tfact*out$mswd['combined']*out$age['s[t]']
         if (wetherill) cc <- ccw
         else cc <- cct
         out$x <- cc$x
         out$cov <- cc$cov
+    } else {
+        out$age <- tt
     }
     out
 }

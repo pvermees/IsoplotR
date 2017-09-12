@@ -24,7 +24,7 @@
 #' of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 #' Cosmochimica Acta, 58(22), pp.5031-5042.
 #' @export
-titterington <- function(x){
+titterington <- function(x,alpha=0.05){
     ns <- nrow(x)
     fitXY <- york(x[,c(1,2,3,4,7)])
     a <- fitXY$a[1]
@@ -40,12 +40,20 @@ titterington <- function(x){
     out <- list()
     out$par <- fit$par
     out$cov <- covmat[(ns-3):ns,(ns-3):ns]
+    out$err <- matrix(NA,3,4)
     mswd <- mswd.tit(fit$par,dat)
     out <- c(out,mswd)
     parnames <- c('a','b','A','B')
     names(out$par) <- parnames
+    colnames(out$err) <- parnames
+    rownames(out$err) <- c('s','ci','disp')
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
+    out$err['s',parnames] <- sqrt(diag(out$cov))
+    tfact <- qt(1-alpha/2,out$df)
+    out$err['ci',parnames] <- tfact*out$err['s',parnames]
+    if (out$mswd>1) out$err['disp',parnames] <-
+        tfact*sqrt(out$mswd)*out$err['s',parnames]
     out
 }
 
@@ -69,10 +77,10 @@ mswd.tit <- function(abAB,dat){
         x <- X + beta/alpha
         S <- S + alpha*(X-x)^2 + 2*beta*(X-x) + gamma
     }
-    df <- 2*ns-4
     out <- list()
-    out$mswd <- S/df
-    out$p.value <- as.numeric(1-stats::pchisq(S,df))
+    out$df <- 2*ns-4
+    out$mswd <- S/out$df
+    out$p.value <- as.numeric(1-stats::pchisq(S,out$df))
     out
 }
 

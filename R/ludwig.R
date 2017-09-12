@@ -27,11 +27,12 @@ ludwig.default <- function(x,...){ stop( "No default method available (yet)." ) 
 #' @param exterr propagate external sources of uncertainty (e.g., decay constant)?
 #' @rdname ludwig
 #' @export
-ludwig.UPb <- function(x,exterr=FALSE,...){
+ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,...){
     ta0 <- concordia.intersection.york(x,exterr=FALSE)$x
     if (x$format<4) init <- ta0
     else init <- c(ta0[1],10,10)
-    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,exterr=exterr)
+    fit <- stats::optim(init,fn=LL.lud.UPb,
+                        method="BFGS",x=x,exterr=exterr)
     out <- list()
     out$par <- fit$par
     out$cov <- tryCatch({ # analytical
@@ -48,25 +49,37 @@ ludwig.UPb <- function(x,exterr=FALSE,...){
                             x=x,exterr=exterr,hessian=TRUE)
         solve(fit$hessian)
     })
-    if (x$format<4) parnames <- c('t[l]','76i')
-    else parnames <- c('t','64i','74i')
+    if (x$format<4){
+        parnames <- c('t[l]','76i')
+        out$err <- matrix(NA,3,2)
+    } else {
+        parnames <- c('t','64i','74i')
+        out$err <- matrix(NA,3,3)
+    }
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
+    rownames(out$err) <- c('s','ci','disp')
+    colnames(out$err) <- parnames
     mswd <- mswd.lud(fit$par,x=x)
+    tfact <- qt(1-alpha/2,mswd$df)
     out <- c(out,mswd)
+    out$err['s',parnames] <- sqrt(diag(out$cov))
+    out$err['ci',parnames] <- tfact*out$err['s',parnames]
+    if (out$mswd>1) out$err['disp',parnames] <-
+        tfact*sqrt(out$mswd)*out$err['s',parnames]
     out
 }
 
 mswd.lud <- function(pars,x){
     ns <- length(x)
-    SS <- LL.lud.UPb(pars,x=x,exterr=FALSE) # mistake in Ludwig (1998)? multiply by 2?
-    if (x$format<4) df <- ns-2
-    else df <- 2*ns-2
+    # Mistake in Ludwig (1998)? Multiply the following by 2?
+    SS <- LL.lud.UPb(pars,x=x,exterr=FALSE)
     out <- list()
-    out$mswd <- as.vector(SS/df)
-    out$df <- df
-    out$p.value <- as.numeric(1-stats::pchisq(SS,df))
+    if (x$format<4) out$df <- ns-2
+    else out$df <- 2*ns-2
+    out$mswd <- as.vector(SS/out$df)
+    out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out
 }
 

@@ -2,7 +2,7 @@ regression <- function(d,model=1,type='york',alpha=0.05){
     if (model==1 && identical(type,'york')){
         out <- york(d,alpha=alpha)
     } else if (model==1 && identical(type,'titterington')){
-        out <- titterington(d)
+        out <- titterington(d,alpha=alpha)
     } else if (model==1 && identical(type,'ludwig')){
         out <- ludwig(d)
     } else if (model==2 && identical(type,'york')){

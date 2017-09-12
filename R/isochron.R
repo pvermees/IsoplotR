@@ -177,13 +177,8 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           exterr=TRUE,model=1,...){
     d <- data2york(x,inverse=inverse)
     fit <- regression(d,model=model,alpha=alpha)
-    out <- fit
-    class(out) <- "isochron"
-    out$y0 <- rep(0,4)
-    out$age <- rep(0,4)
+    out <- isochron_init(fit)
     x0 <- rep(0,4)
-    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-    names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
     names(x0) <- c('x','s[x]','ci[x]','disp[x]')
     if (inverse){
         x0['x'] <- -fit$b['b']/fit$a['a']
@@ -245,24 +240,23 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,model=1,...){
     d <- data2york(x,inverse=inverse)
-    fit <- regression(d,model=model)
+    fit <- regression(d,model=model,alpha=alpha)
+    out <- isochron_init(fit)
     if (inverse){
-        y0 <- fit$b[1]
-        sy0 <- fit$b[2]
-        tt <- get.Pb207Pb206.age(fit$a[1],fit$a[2],exterr=exterr)
+        out$y0[c('y','s[y]','ci[y]','disp[y]')] <- fit$b
         x.lab <- expression(paste(""^"204","Pb/"^"206","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
     } else {
-        y0 <- fit$a[1]
-        sy0 <- fit$a[2]
-        tt <- get.Pb207Pb206.age(fit$b[1],fit$b[2],exterr=exterr)
+        out$y0[c('y','s[y]','ci[y]','disp[y]')] <- fit$a
         x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
     }
-    out <- fit
-    class(out) <- "isochron"
-    out$y0 <- c(y0,sy0)
-    out$age <- tt
+    out$age[c('t','s[t]')] <-
+        get.Pb207Pb206.age(out$y0['y'],out$y0['s[y]'],exterr=exterr)
+    out$age['ci[t]'] <-
+        get.Pb207Pb206.age(out$y0['y'],fit$a['ci[y]'],exterr=exterr)[2]
+    out$age['disp[t]'] <-
+        get.Pb207Pb206.age(out$y0['y'],fit$a['disp[y]'],exterr=exterr)[2]
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model==1),
@@ -352,10 +346,12 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                           model=1,...){
     if (x$format %in% c(1,2)){
-        out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr)
+        out <- isochron_ThU_3D(x,type=type,model=model,
+                               exterr=exterr,alpha=alpha)
         intercept.type <- 'Th-U-3D'
     } else if (x$format %in% c(3,4)){
-        out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr)
+        out <- isochron_ThU_2D(x,type=type,model=model,
+                               exterr=exterr,alpha=alpha)
         intercept.type <- 'Th-U-2D'
     }
     if (plot){
@@ -376,10 +372,9 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                            plot=TRUE,model=1,...){
     d <- data2york(x)
     fit <- regression(d,model=model)
-    out <- fit
-    class(out) <- "isochron"
-    out$y0 <- fit$a
-    out$age <- fit$b
+    out <- isochron_init(fit)
+    out$y0[c('y','s[y]','ci[y]','disp[y]')] <- fit$a
+    out$age[c('t','s[t]','ci[t]','disp[t]')] <- fit$b
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=2*(model==1),show.numbers=show.numbers,
@@ -390,7 +385,8 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out
 }
 
-isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE){
+isochron_ThU_3D <- function(x,type=2,model=1,
+                            exterr=TRUE,alpha=0.05){
     if (type == 1){
         osmond <- FALSE
         ia <- 'a'
@@ -429,49 +425,68 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE){
         ylab <- expression(paste(""^"234","U/"^"238","U"))
     }
     d <- data2tit(x,osmond=osmond)
-    fit <- regression(d,model=model,type="titterington")
-    out <- fit
-    class(out) <- "isochron"
-    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
-    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
+    fit <- regression(d,model=model,type="titterington",alpha=alpha)
+    out <- isochron_init(fit)
+    out$a <- c(fit$par[ia],fit$err[,ia])
+    out$b <- c(fit$par[ib],fit$err[,ib])
     out$cov.ab <- fit$cov[ia,ib]
-    tt <- get.ThU.age(fit$par[i08],sqrt(fit$cov[i08,i08]),
-                      fit$par[i48],sqrt(fit$cov[i48,i48]),
+    tst <- get.ThU.age(fit$par[i08],fit$err['s',i08],
+                      fit$par[i48],fit$err['s',i48],
                       fit$cov[i48,i08],exterr=exterr)
-    out$y0 <- tt[c('48_0','s[48_0]')]
-    out$age <- tt[c('t','s[t]')]
+    tcit <- get.ThU.age(fit$par[i08],fit$err['ci',i08],
+                        fit$par[i48],fit$err['ci',i48],
+                        fit$cov[i48,i08],exterr=exterr)
+    tdispt <- get.ThU.age(fit$par[i08],fit$err['disp',i08],
+                          fit$par[i48],fit$err['disp',i48],
+                          fit$cov[i48,i08],exterr=exterr)
+    out$age['t'] <- tst['t']
+    out$age['s[t]'] <- tst['s[t]']
+    out$age['ci[t]'] <- tcit['s[t]']
+    out$age['disp[t]'] <- tdispt['s[t]']
+    out$y0['y'] <- tst['48_0']
+    out$y0['s[y]'] <- tst['s[48_0]']
+    out$y0['ci[y]'] <- tcit['s[48_0]']
+    out$y0['disp[y]'] <- tdispt['s[48_0]']
     out$xlab <- xlab
     out$ylab <- ylab
     out$d <- d[,id]
     out
 }
-isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE){
+isochron_ThU_2D <- function(x,type=2,model=1,
+                            exterr=TRUE,alpha=0.05){
     d <- data2york(x,type=type)
-    fit <- regression(d,model=model,type="york")
-    out <- fit
-    class(out) <- "isochron"
+    fit <- regression(d,model=model,type="york",alpha=alpha)
     if (type==1){
         Th230U238 <- fit$b
+        Th230Th232 <- fit$a
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
     } else if (type==2) {
         Th230U238 <- fit$a
+        Th230Th232 <- fit$b
         xlab <- expression(paste(""^"232","Th/"^"238","U"))
         ylab <- expression(paste(""^"230","Th/"^"238","U"))
     }
-    tt <- get.ThU.age(Th230U238[1],Th230U238[2],exterr=exterr)
-    out$age <- tt[c('t','s[t]')]
-    if (type==1)
-        out$y0 <- get.Th230Th232_0x(tt,fit$a[1],fit$a[2])
-    else
-        out$y0 <- get.Th230Th232_0x(tt,fit$b[1],fit$b[2])
+    out <- isochron_init(fit)
+    out$age[c('t','s[t]')] <-
+        get.ThU.age(Th230U238[1],Th230U238[2],exterr=exterr)[c('t','s[t]')]
+    out$age['ci[t]'] <-
+        get.ThU.age(Th230U238[1],Th230U238[3],exterr=exterr)['s[t]']
+    out$age['disp[t]'] <-
+        get.ThU.age(Th230U238[1],Th230U238[4],exterr=exterr)['s[t]']
+    out$y0[c('y','s[y]')] <-
+        get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
+    out$y0['ci[y]'] <-
+        get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[3])[2]
+    out$y0['disp[y]'] <-
+        get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[4])[2]
     out$xlab <- xlab
     out$ylab <- ylab
     out$d <- d
-    out    
+    out
 }
 
-isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
+isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         sigdig=2,show.numbers=FALSE,levels=NA,
                         ellipse.col=c("#00FF0080","#FF000080"),
                         line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
@@ -490,11 +505,15 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
         y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
     }
     d <- data2york(x,exterr=exterr,common=FALSE)
-    fit <- regression(d,model=model)
-    out <- fit
-    class(out) <- "isochron"
-    out$y0 <- c(fit$a[1],fit$a[2])
-    out$age <- get.PD.age(fit$b[1],fit$b[2],nuclide,exterr=exterr)
+    fit <- regression(d,model=model,alpha=alpha)
+    out <- isochron_init(fit)
+    out$y0[c('y','s[y]','ci[y]','disp[y]')] <- fit$a
+    out$age[c('t','s[t]')] <-
+        get.PD.age(fit$b['b'],fit$b['s[b]'],nuclide,exterr=exterr)
+    out$age['ci[t]'] <-
+        get.PD.age(fit$b['b'],fit$b['ci[b]'],nuclide,exterr=exterr)[2]
+    out$age['disp[t]'] <-
+        get.PD.age(fit$b['b'],fit$b['disp[b]'],nuclide,exterr=exterr)[2]
     if (plot){
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model==1),
@@ -506,6 +525,16 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA, alpha=0.05,
     } else {
         return(out)
     }
+}
+
+isochron_init <- function(fit){
+    out <- fit
+    out$age <- rep(NA,4)
+    out$y0 <- rep(NA,4)
+    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
+    names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
+    class(out) <- "isochron"
+    out
 }
 
 get.limits <- function(X,sX){
