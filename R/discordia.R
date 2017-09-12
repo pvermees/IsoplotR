@@ -1,8 +1,8 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05){
-    out <- list()
     fit <- ludwig(x,exterr=exterr)
+    out <- fit[c('mswd','p.value','df')]
     J <- matrix(0,2,3)
     E <- matrix(0,3,3)
     tfact <- qt(1-alpha/2,fit$df)
@@ -81,16 +81,13 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
         out$cov <- J %*% fit$cov %*% t(J)
     }
     names(out$x) <- labels
-    out$err <- sqrt(diag(out$cov))
-    out$err <- rbind(out$err,tfact*out$err)
-    rownames(out$err) <- c('s','ci')
-    if (fit$mswd>1){
-        out$err <- rbind(out$err,tfact*sqrt(fit$mswd)*out$err['s',])
-        rownames(out$err) <- c('s','ci','ci.overdisp')
-    }
-    out$mswd <- fit$mswd
-    out$p.value <- fit$p.value
-    out$df <- fit$df
+    out$err <- matrix(NA,3,2)
+    colnames(out$err) <- labels
+    rownames(out$err) <- c('s','ci','disp')
+    out$err['s',] <- sqrt(diag(out$cov))
+    out$err['ci',] <- tfact*out$err['s',]
+    if (fit$mswd>1)
+        out$err['disp',] <- tfact*sqrt(fit$mswd)*out$err['s',]
     out
 }
 concordia.intersection.york <- function(x,exterr=FALSE){
@@ -190,55 +187,31 @@ discordia.plot <- function(fit,wetherill){
 }
 
 discordia.title <- function(fit,wetherill,sigdig=2){
+    lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
+    list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3])
+    if (fit$mswd>1) args <- expression(~a%+-%b~'|'~c~'|'~d)
+    else args <- expression(~a%+-%b~'|'~c)
     if (wetherill){
-        lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
         upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
+        expr1 <- expression('lower intercept =')
+        expr2 <- expression('upper intercept =')
+        list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3])
         if (fit$mswd>1){
-            line1 <- substitute('lower intercept ='~a%+-%b~'|'~c~'|'~d,
-                                list(a=lower.age[1],
-                                     b=lower.age[2],
-                                     c=lower.age[3],
-                                     d=lower.age[4]))
-            line2 <- substitute('upper intercept ='~a%+-%b~'|'~c~'|'~d,
-                                list(a=upper.age[1],
-                                     b=upper.age[2],
-                                     c=upper.age[3],
-                                     d=upper.age[4]))
-        } else {
-            line1 <- substitute('lower intercept ='~a%+-%b~'|'~c,
-                                list(a=lower.age[1],
-                                     b=lower.age[2],
-                                     c=lower.age[3]))
-            line2 <- substitute('upper intercept ='~a%+-%b~'|'~c,
-                                list(a=upper.age[1],
-                                     b=upper.age[2],
-                                     c=upper.age[3]))            
+            list1$d <- lower.age[4]
+            list2$d <- upper.age[4]
         }
     } else {
-        lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
         intercept <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
+        expr1 <- expression('age =')
+        expr2 <- expression('('^207*'Pb/'^206*'Pb)'[o]~'=')
+        list2 <- list(a=intercept[1],b=intercept[2],c=intercept[3])
         if (fit$mswd>1){
-            line1 <- substitute('age ='~a%+-%b~'|'~c~'|'~d,
-                                list(a=lower.age[1],
-                                     b=lower.age[2],
-                                     c=lower.age[3],
-                                     d=lower.age[4]))
-            line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b~'|'~c~'|'~d,
-                                list(a=intercept[1],
-                                     b=intercept[2],
-                                     c=intercept[3],
-                                     d=intercept[4]))
-        } else {
-            line1 <- substitute('age ='~a%+-%b~'|'~c,
-                                list(a=lower.age[1],
-                                     b=lower.age[2],
-                                     c=lower.age[3]))
-            line2 <- substitute('('^207*'Pb/'^206*'Pb)'[o]~'='~a%+-%b~'|'~c,
-                                list(a=intercept[1],
-                                     b=intercept[2],
-                                     c=intercept[3]))
+            list1$d <- lower.age[4]
+            list2$d <- intercept[4]
         }
     }
+    line1 <- do.call('substitute',list(eval(c(expr1,args)),list1))
+    line2 <- do.call('substitute',list(eval(c(expr2,args)),list2))
     line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))

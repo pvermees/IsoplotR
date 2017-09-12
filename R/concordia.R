@@ -247,20 +247,14 @@ get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
 }
 
 concordia.title <- function(fit,sigdig=2,alpha=0.05){
-    if (fit$mswd['combined']<1){
-        rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
-        line1 <- substitute('concordia age ='~a%+-%b~'|'~c,
-                            list(a=rounded.age[1],
-                                 b=rounded.age[2],
-                                 c=rounded.age[3]))
-    } else {
-        rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
-        line1 <- substitute('concordia age ='~a%+-%b~'|'~c~'|'~d,
-                            list(a=rounded.age[1],
-                                 b=rounded.age[2],
-                                 c=rounded.age[3],
-                                 d=rounded.age[4]))
+    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
+    expr1 <- expression('concordia age ='~a%+-%b~'|'~c)
+    list1 <- list(a=rounded.age[1],b=rounded.age[2],c=rounded.age[3])
+    if (fit$mswd['combined']>1){
+        expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d)
+        list1$d <- rounded.age[4]
     }
+    line1 <- do.call('substitute',list(eval(expr1),list1))
     line2 <- substitute('MSWD ='~a~'|'~b~'|'~c~
                             ', p('~chi^2*')='~d~'|'~e~'|'~f,
                         list(a=signif(fit$mswd['concordance'],2),
@@ -288,14 +282,14 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
         cct <- tera.wasserburg(x,i)
     }
     t.init <- initial.concordia.age(cct)
-    out$age <- concordia.age(ccw,t.init=t.init,exterr=exterr)
+    out$age <- rep(0,4)
+    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
+    out$age[c('t','s[t]')] <- concordia.age(ccw,t.init=t.init,exterr=exterr)
     if (is.na(i)){ # these calculations are only relevant to weighted means
         out <- c(out, mswd.concordia(x,ccw,out$age[1],exterr=exterr))
         tfact <- qt(1-alpha/2,out$df['combined'])
-        out$age <- c(out$age,
-                     tfact*out$age[2],
-                     tfact*out$mswd['combined']*out$age[2])
-        names(out$age) <- c('t','s[t]','ci[t]','ci.overdisp[t]')
+        out$age['ci[t]'] <- tfact*out$age['s[t]']
+        out$age['disp[t]'] <- tfact*out$mswd['combined']*out$age['s[t]']
         if (wetherill) cc <- ccw
         else cc <- cct
         out$x <- cc$x
