@@ -68,13 +68,13 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05, sigdig=2,
+isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.numbers=FALSE,levels=NA,
                              ellipse.col=c("#00FF0080","#FF000080"),
                              line.col='red',lwd=2,title=TRUE,model=1,...){
     X <- x[,1:5]
     colnames(X) <- c('X','sX','Y','sY','rXY')
-    fit <- regression(X,model=model)
+    fit <- regression(X,model=model,alpha=alpha)
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model==1),show.numbers=show.numbers,
                 levels=levels,ellipse.col=ellipse.col,
@@ -176,27 +176,55 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,model=1,...){
     d <- data2york(x,inverse=inverse)
-    fit <- regression(d,model=model)
+    fit <- regression(d,model=model,alpha=alpha)
+    out <- fit
+    class(out) <- "isochron"
+    out$y0 <- rep(0,4)
+    out$age <- rep(0,4)
+    x0 <- rep(0,4)
+    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
+    names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
+    names(x0) <- c('x','s[x]','ci[x]','disp[x]')
     if (inverse){
-        x0 <- -fit$b[1]/fit$a[1]
-        sx0 <- x0*sqrt((fit$a[2]/fit$a[1])^2 + (fit$b[2]/fit$b[1])^2 -
-                       2*fit$a[2]*fit$b[2]*fit$cov.ab)
-        y0 <- 1/fit$a[1]
-        sy0 <- fit$a[2]/fit$a[1]^2
-        tt <- get.ArAr.age(x0,sx0,x$J[1],x$J[2],exterr=exterr)
+        x0['x'] <- -fit$b['b']/fit$a['a']
+        x0['s[x]'] <- x0['x']*sqrt((fit$a['s[a]']/fit$a['a'])^2 +
+                                   (fit$b['s[b]']/fit$b['b'])^2 -
+                      2*fit$a['s[a]']*fit$b['s[b]']*fit$cov.ab)
+        x0['ci[x]'] <- x0['x']*sqrt((fit$a['ci[a]']/fit$a['a'])^2 +
+                                   (fit$b['ci[b]']/fit$b['b'])^2 -
+                       2*fit$a['ci[a]']*fit$b['ci[b]']*fit$cov.ab)
+        x0['disp[x]'] <- x0['x']*sqrt((fit$a['disp[a]']/fit$a['a'])^2 +
+                                   (fit$b['disp[b]']/fit$b['b'])^2 -
+                         2*fit$a['disp[a]']*fit$b['disp[b]']*fit$cov.ab)
+        out$y0['y'] <- 1/fit$a['a']
+        out$y0['s[y]'] <- fit$a['s[a]']/fit$a['a']^2
+        out$y0['ci[y]'] <- fit$a['ci[a]']/fit$a['a']^2
+        out$y0['disp[y]'] <- fit$a['disp[a]']/fit$a['a']^2
+        out$age[c('t','s[t]')] <- get.ArAr.age(x0['x'],x0['s[x]'],
+                                               x$J[1],x$J[2],
+                                               exterr=exterr)
+        out$age['ci[t]'] <- get.ArAr.age(x0['x'],x0['ci[x]'],
+                                         x$J[1],x$J[2],
+                                         exterr=exterr)[2]
+        out$age['disp[t]'] <- get.ArAr.age(x0['x'],x0['disp[x]'],
+                                           x$J[1],x$J[2],
+                                           exterr=exterr)[2]
         x.lab <- expression(paste(""^"39","Ar/"^"40","Ar"))
         y.lab <- expression(paste(""^"36","Ar/"^"40","Ar"))
     } else {
-        y0 <- fit$a[1]
-        sy0 <- fit$a[2]
-        tt <- get.ArAr.age(fit$b[1],fit$b[2],x$J[1],x$J[2],exterr=exterr)
+        out$y0['y'] <- fit$a['a']
+        out$y0['s[y]'] <- fit$a['s[a]']
+        out$y0['ci[y]'] <- fit$a['ci[a]']
+        out$y0['disp[y]'] <- fit$a['disp[a]']
+        out$age[c('t','s[t]')] <- get.ArAr.age(fit$b['b'],fit$b['s[b]'],
+                                               x$J[1],x$J[2],exterr=exterr)
+        out$age['ci[t]'] <- get.ArAr.age(fit$b['b'],fit$b['ci[b]'],
+                                         x$J[1],x$J[2],exterr=exterr)[2]
+        out$age['disp[t]'] <- get.ArAr.age(fit$b['b'],fit$b['disp[b]'],
+                                           x$J[1],x$J[2],exterr=exterr)[2]
         x.lab <- expression(paste(""^"39","Ar/"^"36","Ar"))
         y.lab <- expression(paste(""^"40","Ar/"^"36","Ar"))
     }
-    out <- fit
-    class(out) <- "isochron"
-    out$y0 <- c(y0,sy0)
-    out$age <- tt
     show.ellipses <- (model != 2)
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,

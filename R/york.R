@@ -50,7 +50,7 @@
 #'        polygon(ell)
 #'    }
 #' @export
-york <- function(x){
+york <- function(x,alpha=0.05){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     ab <- stats::lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]
@@ -59,28 +59,36 @@ york <- function(x){
     wY <- 1/x[,'sY']^2
     for (i in 1:50){ # 50 = maximum number of iterations
         bold <- b
-        alpha <- sqrt(wX*wY)
-        W <- wX*wY/(wX+b*b*wY-2*b*x[,'rXY']*alpha)
+        A <- sqrt(wX*wY)
+        W <- wX*wY/(wX+b*b*wY-2*b*x[,'rXY']*A)
         Xbar <- sum(W*x[,'X'],na.rm=TRUE)/sum(W,na.rm=TRUE)
         Ybar <- sum(W*x[,'Y'],na.rm=TRUE)/sum(W,na.rm=TRUE)
         U <- x[,'X']-Xbar
         V <- x[,'Y']-Ybar
-        beta <- W*(U/wY+b*V/wX-(b*U+V)*x[,'rXY']/alpha)
-        b <- sum(W*beta*V,na.rm=TRUE)/sum(W*beta*U,na.rm=TRUE)
+        B <- W*(U/wY+b*V/wX-(b*U+V)*x[,'rXY']/A)
+        b <- sum(W*B*V,na.rm=TRUE)/sum(W*B*U,na.rm=TRUE)
         if ((bold/b-1)^2 < 1e-15) break # convergence reached
     }
     a <- Ybar-b*Xbar
-    X <- Xbar + beta
+    X <- Xbar + B
     xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
     u <- X-xbar
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
-    out <- list()
-    out$a <- c(a,sa)
-    out$b <- c(b,sb)
+    out <- get.york.mswd(x,a,b)
+    tfact <- qt(1-alpha/2,out$df)
+    out$a <- c(a,sa,tfact*sa)
+    out$b <- c(b,sb,tfact*sb)
     out$cov.ab <- -Xbar*sb^2
-    mswd <- get.york.mswd(x,a,b)
-    out <- c(out,mswd)
+    if (out$mswd>1){
+        out$a <- c(out$a,tfact*sqrt(out$mswd)*sa)
+        out$b <- c(out$b,tfact*sqrt(out$mswd)*sb)
+    } else {
+        out$a <- c(out$a,NA)
+        out$b <- c(out$b,NA)
+    }
+    names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
+    names(out$b) <- c('b','s[b]','ci[b]','disp[b]')
     out
 }
 
@@ -94,10 +102,10 @@ get.york.mswd <- function(x,a,b){
         if (!any(is.na(X)))
             X2 <- X2 + 0.5*X %*% solve(E) %*% t(X)
     }
-    df <- ns-2
     out <- list()
-    out$mswd <- as.numeric(X2/df)
-    out$p.value <- as.numeric(1-stats::pchisq(X2,df))
+    out$df <- ns-2
+    out$mswd <- as.numeric(X2/out$df)
+    out$p.value <- as.numeric(1-stats::pchisq(X2,out$df))
     out
 }
 
@@ -107,14 +115,14 @@ get.york.mswd <- function(x,a,b){
 get.york.xy <- function(x,a,b){
     wX <- 1/x[,'sX']^2
     wY <- 1/x[,'sY']^2
-    alpha <- sqrt(wX*wY)
-    W <- wX*wY/(wX+b*b*wY-2*b*x[,'rXY']*alpha)
+    A <- sqrt(wX*wY)
+    W <- wX*wY/(wX+b*b*wY-2*b*x[,'rXY']*A)
     Xbar <- sum(W*x[,'X'],na.rm=TRUE)/sum(W,na.rm=TRUE)
     Ybar <- a + b*Xbar
     U <- x[,'X']-Xbar
     V <- x[,'Y']-Ybar
-    beta <- W*(U/wY+b*V/wX-(b*U+V)*x[,'rXY']/alpha)
-    out <- cbind(Xbar+beta,Ybar+b*beta)
+    B <- W*(U/wY+b*V/wX-(b*U+V)*x[,'rXY']/A)
+    out <- cbind(Xbar+B,Ybar+b*B)
     out
 }
 
