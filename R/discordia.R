@@ -199,12 +199,12 @@ discordia.plot <- function(fit,wetherill){
 discordia.title <- function(fit,wetherill,sigdig=2){
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
     list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3])
-    if (fit$mswd>1) args <- expression(~a%+-%b~'|'~c~'|'~d)
-    else args <- expression(~a%+-%b~'|'~c)
+    if (fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
+    else args <- quote(a%+-%b~'|'~c)
     if (wetherill){
         upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
-        expr1 <- expression('lower intercept =')
-        expr2 <- expression('upper intercept =')
+        expr1 <- quote('lower intercept =')
+        expr2 <- quote('upper intercept =')
         list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3])
         if (fit$mswd>1){
             list1$d <- lower.age[4]
@@ -212,16 +212,18 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         }
     } else {
         intercept <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
-        expr1 <- expression('age =')
-        expr2 <- expression('('^207*'Pb/'^206*'Pb)'[o]~'=')
+        expr1 <- quote('age =')
+        expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]~'=')
         list2 <- list(a=intercept[1],b=intercept[2],c=intercept[3])
         if (fit$mswd>1){
             list1$d <- lower.age[4]
             list2$d <- intercept[4]
         }
     }
-    line1 <- do.call('substitute',list(eval(c(expr1,args)),list1))
-    line2 <- do.call('substitute',list(eval(c(expr2,args)),list2))
+    call1 <- substitute(e~a,list(e=expr1,a=args))
+    call2 <- substitute(e~a,list(e=expr2,a=args))
+    line1 <- do.call('substitute',list((call1),list1))
+    line2 <- do.call('substitute',list((call2),list2))
     line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))

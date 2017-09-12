@@ -76,19 +76,11 @@ york <- function(x,alpha=0.05){
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- get.york.mswd(x,a,b)
-    tfact <- qt(1-alpha/2,out$df)
-    out$a <- c(a,sa,tfact*sa)
-    out$b <- c(b,sb,tfact*sb)
+    out$a <- c(a,sa)
+    out$b <- c(b,sb)
     out$cov.ab <- -Xbar*sb^2
-    if (out$mswd>1){
-        out$a <- c(out$a,tfact*sqrt(out$mswd)*sa)
-        out$b <- c(out$b,tfact*sqrt(out$mswd)*sb)
-    } else {
-        out$a <- c(out$a,NA)
-        out$b <- c(out$b,NA)
-    }
-    names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
-    names(out$b) <- c('b','s[b]','ci[b]','disp[b]')
+    names(out$a) <- c('a','s[a]')
+    names(out$b) <- c('b','s[b]')
     out
 }
 

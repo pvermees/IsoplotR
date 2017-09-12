@@ -1,5 +1,6 @@
-get.ThU.age <- function(Th230U238,sTh230U238,U234U238=1,sU234U238=0,cov4808=0,
-                        exterr=TRUE,cor=FALSE){
+get.ThU.age <- function(Th230U238,sTh230U238,
+                        U234U238=1,sU234U238=0,
+                        cov4808=0,exterr=TRUE,cor=FALSE){
     l0 <- lambda('Th230')
     l4 <- lambda('U234')
     a <- U234U238
