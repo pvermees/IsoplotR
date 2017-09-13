@@ -78,6 +78,17 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     out$mean[c('x','s[x]')] <- fit$mean[1:2]
     out$mean['disp[x]'] <- out$tfact*out$stotal
     out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
+    out$plotpar <-
+        list(mean=list(x=c(0,nvalid+1),
+                       y=rep(out$mean['x'],2)),
+             rect=list(x=c(0,nvalid+1,nvalid+1,0),
+                       y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
+                           rep(out$mean['x']-out$mean['ci[x]'],2))),
+             dash1=list(x=c(0,nvalid+1),
+                        y=rep(out$mean['x']+out$mean['disp[x]'],2)),
+             dash2=list(x=c(0,nvalid+1),
+                        y=rep(out$mean['x']-out$mean['disp[x]'],2))
+             )
     if (plot){
         plot_weightedmean(X,sX,out,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
@@ -316,6 +327,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
         out$mean[c('x','s[x]')] <-
             add.exterr(x,tt=fit$mean[1],st=fit$mean[2],
                        cutoff.76=cutoff.76,type=type)
+        out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
         out$mean['disp[x]'] <- out$tfact*
             add.exterr(x,tt=fit$mean[1],st=fit$stotal,
                        cutoff.76=cutoff.76,type=type)[2]
@@ -418,16 +430,11 @@ plot_weightedmean <- function(X,sX,fit,
     maxX <- max(X+fact*sX,na.rm=TRUE)
     graphics::plot(c(0,ns+1),c(minX,maxX),type='n',
                    axes=FALSE,xlab='N',ylab='')
-    graphics::polygon(c(0,ns+1,ns+1,0),
-                      c(rep(fit$mean['x']+fit$mean['ci[x]'],2),
-                        rep(fit$mean['x']-fit$mean['ci[x]'],2)),
-                      col='gray80',border=NA)
-    graphics::lines(c(0,ns+1),rep(fit$mean['x'],2))
+    graphics::polygon(fit$plotpar$rect,col='gray80',border=NA)
+    graphics::lines(fit$plotpar$mean)
     if (fit$mswd>1){
-        graphics::lines(c(0,ns+1),
-                        rep(fit$mean['x']+fit$mean['disp[x]'],2),lty=3)
-        graphics::lines(c(0,ns+1),
-                        rep(fit$mean['x']-fit$mean['disp[x]'],2),lty=3)
+        graphics::lines(fit$plotpar$dash1,lty=3)
+        graphics::lines(fit$plotpar$dash2,lty=3)
     }
     graphics::axis(side=1,at=1:ns)
     graphics::axis(side=2)

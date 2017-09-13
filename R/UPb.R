@@ -260,7 +260,8 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0){
     R <- (1/U)*(exp(l5*tt)-1)/(exp(l8*tt)-1)
     N <- l5*exp(l5*tt)*(exp(l8*tt)-1) - l8*exp(l8*tt)*(exp(l5*tt)-1)
     D <- (exp(l8*tt)-1)^2
-    R.err <- (1/U)*(N/D)
+    J <- (1/U)*(N/D)
+    R.err <- abs(J*st)
     out <- cbind(R,R.err)
     colnames(out) <- c('76','s[76]')
     out
