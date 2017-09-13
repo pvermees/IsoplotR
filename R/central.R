@@ -76,23 +76,24 @@ central.default <- function(x,...){
     }
     tt <- exp(mu)
     st <- tt/sqrt(sum(wu,na.rm=TRUE))
-    df <- length(zu)-1
     Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/
         sum(1/su^2,na.rm=TRUE)
     out <- list()
-    out$age <- c(tt,st)
     out$disp <- sigma
-    out$mswd <- Chi2/df
-    out$p.value <- 1-stats::pchisq(Chi2,df)
+    out$df <- length(zu)-1
+    out$mswd <- Chi2/out$df
+    out$p.value <- 1-stats::pchisq(Chi2,out$df)
+    out$age <- c(tt,st)
     out
 }
 #' @rdname central
 #' @export
-central.UThHe <- function(x,...){
+central.UThHe <- function(x,alpha=0.05,...){
     out <- list()
     ns <- nrow(x)
-    df <- 2*(ns-1)
     doSm <- doSm(x)
+    out$age <- rep(NA,4)
+    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
     if (doSm){
         uvw <- UThHe2uvw(x)
         fit <- stats::optim(c(0,0,0),SS.UThHe.uvw,method='BFGS',
@@ -101,26 +102,48 @@ central.UThHe <- function(x,...){
         out$covmat <- solve(fit$hessian)
         nms <- c('u','v','w')
         cc <- uvw2UThHe(out$uvw,out$covmat)
-        out$age <- get.UThHe.age(cc['U'],cc['sU'],cc['Th'],cc['sTh'],
-                                 cc['He'],cc['sHe'],cc['Sm'],cc['sSm'])
+        out$age[c('t','s[t]')] <- get.UThHe.age(cc['U'],cc['sU'],
+                                                cc['Th'],cc['sTh'],
+                                                cc['He'],cc['sHe'],
+                                                cc['Sm'],cc['sSm'])
     } else {
         uv <- UThHe2uv(x)
         fit <- stats::optim(c(0,0),SS.UThHe.uv,method='BFGS',
                             hessian=TRUE,x=x)
         out$uvw <- fit$par
+        SS <- SS.UThHe.uv(out$uv[1:2],x)
         out$covmat <- solve(fit$hessian)
         nms <- c('u','v')
-        cc <- uv2UThHe(out$uv,out$covmat)
-        out$age <- get.UThHe.age(cc['U'],cc['sU'],
-                                 cc['Th'],cc['sTh'],
-                                 cc['He'],cc['sHe'])
+        cc <- uv2UThHe(out$uvw,out$covmat)
+        out$age[c('t','s[t]')] <-
+            get.UThHe.age(cc['U'],cc['sU'],
+                          cc['Th'],cc['sTh'],
+                          cc['He'],cc['sHe'])
     }
+    # the overdispersion calculation does not use Sm
     SS <- SS.UThHe.uv(out$uvw[1:2],x)
+    out$df <- 2*(ns-1)
+    out$mswd <- SS/out$df
+    out$tfact <- qt(1-alpha/2,out$df)
+    if (doSm){
+        cco <- uvw2UThHe(out$uvw,out$mswd*out$covmat)
+        out$age['disp[t]'] <-
+            out$tfact*get.UThHe.age(cco['U'],cco['sU'],
+                                    cco['Th'],cco['sTh'],
+                                    cco['He'],cco['sHe'],
+                                    cco['Sm'],cco['sSm'])[2]
+    } else {
+        cco <- uv2UThHe(out$uvw,out$mswd*out$covmat)
+        out$age['disp[t]'] <-
+            out$tfact*get.UThHe.age(cco['U'],cco['sU'],
+                                    cco['Th'],cco['sTh'],
+                                    cco['He'],cco['sHe'])[2]
+    }
+    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
     names(out$uvw) <- nms
     colnames(out$covmat) <- nms
     rownames(out$covmat) <- nms
-    out$mswd <- SS/df
-    out$p.value <- 1-stats::pchisq(SS,df)
+    out$p.value <- 1-stats::pchisq(SS,out$df)
     out
 }
 #' @param mineral setting this parameter to either \code{apatite} or
@@ -140,7 +163,6 @@ central.fissiontracks <- function(x,mineral=NA,...){
         Ni <- sum(Nij)
         num <- (Nsj*Ni-Nij*Ns)^2
         den <- Nsj+Nij
-        df <- length(Nsj)-1
         Chi2 <- sum(num/den)/(Ns*Ni)
         mj <- Nsj+Nij
         pj <- Nsj/mj
@@ -155,6 +177,7 @@ central.fissiontracks <- function(x,mineral=NA,...){
                          (x$rhoD[2]/x$rhoD[1])^2 +
                          (x$zeta[2]/x$zeta[1])^2 )
         out$age <- c(tt,st)
+        out$df <- length(Nsj)-1
         out$disp <- sigma
         out$mswd <- Chi2/df
         out$p.value <- 1-stats::pchisq(Chi2,df)

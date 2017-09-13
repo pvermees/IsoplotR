@@ -78,15 +78,16 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     out$mean[c('x','s[x]')] <- fit$mean[1:2]
     out$mean['disp[x]'] <- out$tfact*out$stotal
     out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
+    ns <- length(X)
     out$plotpar <-
-        list(mean=list(x=c(0,nvalid+1),
+        list(mean=list(x=c(0,ns+1),
                        y=rep(out$mean['x'],2)),
-             rect=list(x=c(0,nvalid+1,nvalid+1,0),
+             rect=list(x=c(0,ns+1,ns+1,0),
                        y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
                            rep(out$mean['x']-out$mean['ci[x]'],2))),
-             dash1=list(x=c(0,nvalid+1),
+             dash1=list(x=c(0,ns+1),
                         y=rep(out$mean['x']+out$mean['disp[x]'],2)),
-             dash2=list(x=c(0,nvalid+1),
+             dash2=list(x=c(0,ns+1),
                         y=rep(out$mean['x']-out$mean['disp[x]'],2))
              )
     if (plot){

@@ -53,7 +53,7 @@ radialplot <- function(x,...){ UseMethod("radialplot",x) }
 #' @rdname radialplot
 #' @export
 radialplot.default <- function(x,from=NA,to=NA,t0=NA,
-                               transformation='log', sigdig=2,
+                               transformation='log',sigdig=2,
                                show.numbers=FALSE,pch=21,levels=NA,
                                bg=c("white","red"),title=TRUE,k=0,
                                markers=NULL,...){
@@ -375,9 +375,11 @@ plot_radial_lines <- function(tt,x,e,xM,zeta=0,rhoD=0,l=1,
                         c(rxyb[i,2],rxye[i,2]))
         if (label) {
             if (pos==2)
-                graphics::text(rxye[i,1],rxye[i,2],labels=tt[i],pos=pos,xpd=NA)
+                graphics::text(rxye[i,1],rxye[i,2],
+                               labels=tt[i],pos=pos,xpd=NA)
             else
-                graphics::text(rxyb[i,1],rxyb[i,2],labels=tt[i],pos=4,xpd=NA)
+                graphics::text(rxyb[i,1],rxyb[i,2],
+                               labels=tt[i],pos=4,xpd=NA)
         }
     }
 }
@@ -539,7 +541,8 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
     } else {
         tt <- fissiontrack.age(x,exterr=FALSE)
         if (identical(transformation,'arcsin')) transformation <- 'log'
-        out <- x2zs.default(tt,t0=t0,from=from,to=to,transformation=transformation)
+        out <- x2zs.default(tt,t0=t0,from=from,to=to,
+                            transformation=transformation)
     }
     out
 }

@@ -188,15 +188,29 @@ Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
 
 
 evolution.title <- function(fit,sigdig=2){
-    rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
-    rounded.a0 <- roundit(fit$y0[1],fit$y0[2],sigdig=sigdig)
-    line1 <- substitute('isochron age ='~a%+-%b~'[ka] (1'~sigma~')',
-                        list(a=rounded.age[1], b=rounded.age[2]))
-    line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
+    rounded.a0 <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig)
+    expr1 <- quote('isochron age =')
+    list1 <- list(a=rounded.age[1],
+                  b=rounded.age[2],
+                  c=rounded.age[3])
+    expr2 <- quote('(234/238)'[o]*' =')
+    list2 <- list(a=rounded.a0[1],
+                  b=rounded.a0[2],
+                  c=rounded.a0[3])
+    args <- quote(~a%+-%b~'|'~c)    
+    if (fit$mswd>1){
+        args <- quote(~a%+-%b~'|'~c~'|'~d)
+        list1$d <- rounded.age[4]
+        list2$d <- rounded.a0[4]
+    }
+    call1 <- substitute(e~a,list(e=expr1,a=args))
+    line1 <- do.call(substitute,list(eval(call1),list1))
+    call2 <- substitute(e~a,list(e=expr2,a=args))
+    line2 <- do.call(substitute,list(eval(call2),list2))
+    line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,2),
                              b=signif(fit$p.value,2)))
-    line3 <- substitute('(234/238)'[o]*' ='~a%+-%b~'(1'~sigma~')',
-                        list(a=rounded.a0[1], b=rounded.a0[2]))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)
