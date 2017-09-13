@@ -18,6 +18,7 @@ regression <- function(d,model=1,type='york'){
     } else if (model==2 && identical(type,'titterington')){
         out <- list()
         fit <- stats::lm(d[,c('Y','Z')] ~ d[,'X'])
+        out$df <- fit$df.residual
         out$par <- c(stats::coef(fit))
         out$cov <- stats::vcov(fit)
         parnames <- c('a','b','A','B')

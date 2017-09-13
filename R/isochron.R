@@ -197,16 +197,17 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         x.lab <- expression(paste(""^"39","Ar/"^"36","Ar"))
         y.lab <- expression(paste(""^"40","Ar/"^"36","Ar"))
     }
-    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
     out$age[c('t','s[t]')] <-
         get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
-    out$age['ci[t]'] <-
-        out$tfact*out$age['s[t]']
-    out$age['disp[t]'] <-
-        out$tfact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
-                               x$J[1],x$J[2],exterr=exterr)[2]
-    show.ellipses <- (model != 2)
+    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
+    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+    if (model==1){
+        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
+        out$age['disp[t]'] <-
+            out$tfact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
+                                   x$J[1],x$J[2],exterr=exterr)[2]
+    }
+    show.ellipses <- (model!=2)
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=show.ellipses,
@@ -239,15 +240,16 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
     }
-    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
     out$age[c('t','s[t]')] <-
         get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
-    out$age['ci[t]'] <-
-        out$tfact*out$age['s[t]']
-    out$age['disp[t]'] <-
-        out$tfact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
-                                     exterr=exterr)[2]
+    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
+    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+    if (model==1){
+        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
+        out$age['disp[t]'] <-
+            out$tfact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
+                                         exterr=exterr)[2]
+    }
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model==1),
@@ -363,9 +365,15 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                            plot=TRUE,model=1,...){
     d <- data2york(x)
     fit <- regression(d,model=model)
-    out <- isochron_init(fit)
-    out$y0[c('y','s[y]','ci[y]','disp[y]')] <- fit$a
-    out$age[c('t','s[t]','ci[t]','disp[t]')] <- fit$b
+    out <- isochron_init(fit,alpha=alpha)
+    out$y0[c('y','s[y]')] <- fit$a
+    out$age[c('t','s[t]')] <- fit$b
+    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
+    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+    if (model==1){
+        out$y0['disp[y]'] <- out$tfact*sqrt(out$mswd)*out$y0['s[y]']
+        out$age['disp[t]'] <- out$tfact*sqrt(out$mswd)*out$age['s[t]']
+    }
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=2*(model==1),show.numbers=show.numbers,
@@ -418,24 +426,28 @@ isochron_ThU_3D <- function(x,type=2,model=1,
     d <- data2tit(x,osmond=osmond)
     fit <- regression(d,model=model,type="titterington")
     out <- isochron_init(fit,alpha=alpha)
-    out$a <- c(fit$par[ia],fit$err[,ia])
-    out$b <- c(fit$par[ib],fit$err[,ib])
+    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
+    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
     out$cov.ab <- fit$cov[ia,ib]
-    tst <- get.ThU.age(fit$par[i08],fit$err['s',i08],
-                       fit$par[i48],fit$err['s',i48],
+    tst <- get.ThU.age(fit$par[i08],sqrt(fit$cov[i08,i08]),
+                       fit$par[i48],sqrt(fit$cov[i48,i48]),
                        fit$cov[i48,i08],exterr=exterr)
-    tdispt <-
-        get.ThU.age(fit$par[i08],sqrt(out$mswd)*fit$err['s',i08],
-                    fit$par[i48],sqrt(out$mswd)*fit$err['s',i48],
-                    out$mswd*fit$cov[i48,i08],exterr=exterr)
     out$age['t'] <- tst['t']
-    out$age['s[t]'] <- tst['s[t]']
-    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
-    out$age['disp[t]'] <- out$tfact*tdispt['s[t]']
     out$y0['y'] <- tst['48_0']
+    out$age['s[t]'] <- tst['s[t]']
     out$y0['s[y]'] <- tst['s[48_0]']
+    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
     out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$y0['disp[y]'] <- out$tfact*tdispt['s[48_0]']
+    if (model==1 && fit$mswd>1){
+        tdispt <- get.ThU.age(fit$par[i08],
+                              sqrt(out$mswd)*sqrt(fit$cov[i08,i08]),
+                              fit$par[i48],
+                              sqrt(out$mswd)*sqrt(fit$cov[i48,i48]),
+                              out$mswd*fit$cov[i48,i08],
+                              exterr=exterr)
+        out$age['disp[t]'] <- out$tfact*tdispt['s[t]']
+        out$y0['disp[y]'] <- out$tfact*tdispt['s[48_0]']
+    }
     out$xlab <- xlab
     out$ylab <- ylab
     out$d <- d[,id]
@@ -458,22 +470,23 @@ isochron_ThU_2D <- function(x,type=2,model=1,
     }
     out <- isochron_init(fit,alpha=alpha)
     out$age[c('t','s[t]')] <-
-        get.ThU.age(Th230U238[1],
-                    Th230U238[2],
+        get.ThU.age(Th230U238[1],Th230U238[2],
                     exterr=exterr)[c('t','s[t]')]
-    out$age['ci[t]'] <-
-        out$tfact*out$age['s[t]']
-    out$age['disp[t]'] <-
-        out$tfact*get.ThU.age(Th230U238[1],
-                              sqrt(out$mswd)*Th230U238[2],
-                              exterr=exterr)['s[t]']
     out$y0[c('y','s[y]')] <-
         get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
+    out$age['ci[t]'] <-
+        out$tfact*out$age['s[t]']
     out$y0['ci[y]'] <-
         out$tfact*out$y0['s[y]']
-    out$y0['disp[y]'] <-
-        out$tfact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
-                                    sqrt(out$mswd)*Th230Th232[2])[2]
+    if (model==1 && out$mswd>1){
+        out$age['disp[t]'] <-
+            out$tfact*get.ThU.age(Th230U238[1],
+                                  sqrt(outt$mswd)*Th230U238[2],
+                                  exterr=exterr)['s[t]']
+        out$y0['disp[y]'] <-
+            out$tfact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
+                                        sqrt(out$mswd)*Th230Th232[2])[2]
+    }
     out$xlab <- xlab
     out$ylab <- ylab
     out$d <- d
@@ -502,18 +515,16 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
     fit <- regression(d,model=model)
     out <- isochron_init(fit,alpha=alpha)
     out$y0[c('y','s[y]')] <- fit$a
+    out$age[c('t','s[t]')] <- get.PD.age(fit$b['b'],
+                   fit$b['s[b]'],nuclide,exterr=exterr)
     out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$y0['disp[y]'] <- out$tfact*sqrt(out$mswd)*out$y0['s[y]']
-    out$age[c('t','s[t]')] <-
-        get.PD.age(fit$b['b'],
-                   fit$b['s[b]'],
-                   nuclide,exterr=exterr)
-    out$age['ci[t]'] <-
-        out$tfact*out$age['s[t]']
-    out$age['disp[t]'] <-
-        out$tfact*get.PD.age(fit$b['b'],
-                             sqrt(out$mswd)*fit$b['s[b]'],
-                             nuclide,exterr=exterr)[2]
+    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+    if (model==1){
+        out$y0['disp[y]'] <- out$tfact*sqrt(out$mswd)*out$y0['s[y]']
+        out$age['disp[t]'] <- out$tfact*get.PD.age(fit$b['b'],
+                              sqrt(out$mswd)*fit$b['s[b]'],
+                              nuclide,exterr=exterr)[2]
+    }
     if (plot){
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model==1),
@@ -545,7 +556,7 @@ get.limits <- function(X,sX){
 }
 
 isochrontitle <- function(fit,sigdig=2,type=NA){
-    if (fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
+    if (fit$model!=2 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
     else args <- quote(a%+-%b~'|'~c)
     if (is.na(type)){
         intercept <- roundit(fit$a[1],fit$a[2:4],sigdig=sigdig)
@@ -572,7 +583,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         list2 <- list(a=rounded.intercept[1],
                       b=rounded.intercept[2],
                       c=rounded.intercept[3])
-        if (fit$mswd>1){
+        if (fit$model!=2 && fit$mswd>1){
             list1$d <- rounded.age[4]
             list2$d <- rounded.intercept[4]
         }

@@ -40,20 +40,13 @@ titterington <- function(x,alpha=0.05){
     out <- list()
     out$par <- fit$par
     out$cov <- covmat[(ns-3):ns,(ns-3):ns]
-    out$err <- matrix(NA,3,4)
     mswd <- mswd.tit(fit$par,dat)
     out <- c(out,mswd)
     parnames <- c('a','b','A','B')
     names(out$par) <- parnames
-    colnames(out$err) <- parnames
-    rownames(out$err) <- c('s','ci','disp')
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
-    out$err['s',parnames] <- sqrt(diag(out$cov))
     out$tfact <- qt(1-alpha/2,out$df)
-    out$err['ci',parnames] <- out$tfact*out$err['s',parnames]
-    if (out$mswd>1) out$err['disp',parnames] <-
-        out$tfact*sqrt(out$mswd)*out$err['s',parnames]
     out
 }
 

@@ -49,25 +49,13 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,...){
                             x=x,exterr=exterr,hessian=TRUE)
         solve(fit$hessian)
     })
-    if (x$format<4){
-        parnames <- c('t[l]','76i')
-        out$err <- matrix(NA,3,2)
-    } else {
-        parnames <- c('t','64i','74i')
-        out$err <- matrix(NA,3,3)
-    }
+    if (x$format<4) parnames <- c('t[l]','76i')
+    else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
-    rownames(out$err) <- c('s','ci','disp')
-    colnames(out$err) <- parnames
     mswd <- mswd.lud(fit$par,x=x)
-    tfact <- qt(1-alpha/2,mswd$df)
     out <- c(out,mswd)
-    out$err['s',parnames] <- sqrt(diag(out$cov))
-    out$err['ci',parnames] <- tfact*out$err['s',parnames]
-    if (out$mswd>1) out$err['disp',parnames] <-
-        tfact*sqrt(out$mswd)*out$err['s',parnames]
     out
 }
 
