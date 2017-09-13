@@ -1,6 +1,6 @@
 get.PD.ratio <- function(tt,st,nuclide,exterr=TRUE){
     L <- lambda(nuclide)
-    R <- exp(L*tt)-1
+    R <- exp(L[1]*tt)-1
     Jac <- matrix(0,1,2)
     E <- matrix(0,2,2)
     Jac[1,1] <- tt*exp(L[1]*tt)

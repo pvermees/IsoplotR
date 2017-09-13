@@ -362,7 +362,7 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
                                 control=list(fnscale=-1))
             covmat <- solve(-fit$hessian)
             out$mean <<- c(fit$par,sqrt(covmat))
-            out$disp <<- NA
+            out$disp <<- 0
         }, finally = {
             SS <- sum(((x-out$mean[1])/sx)^2)
             out$df <- length(x)-1
