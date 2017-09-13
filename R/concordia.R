@@ -73,7 +73,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         fit <- concordia.intersection.ludwig(x,
                          wetherill=wetherill,exterr=exterr,alpha=alpha)
         discordia.plot(fit,wetherill=wetherill)
-        graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
+        graphics::title(discordia.title(fit,wetherill=wetherill,
+                                        sigdig=sigdig))
     }
     ns <- length(x)
     ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
@@ -88,7 +89,6 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
-    colourbar(z=levels,col=ellipse.col)
     if (show.age==1){
         fit <- concordia.age(X,wetherill=wetherill,
                              exterr=exterr,alpha=alpha)
@@ -96,6 +96,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         graphics::polygon(ell,col='white')
         graphics::title(concordia.title(fit,sigdig=sigdig))
     }
+    colourbar(z=levels,col=ellipse.col)
 }
 
 # helper function for plot.concordia

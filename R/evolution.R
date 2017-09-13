@@ -125,7 +125,6 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
         if (show.numbers) graphics::text(x0,y0,i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
-    colourbar(z=levels,col=ellipse.col)
     if (isochron){
         sa <- sqrt(fit$cov['a','a'])
         sA <- sqrt(fit$cov['A','A'])
@@ -135,6 +134,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
                     ellipse.col=grDevices::rgb(1,1,1,0.85),
                     line.col='black',new.plot=FALSE)
     }
+    colourbar(z=levels,col=ellipse.col)
 }
 
 Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,

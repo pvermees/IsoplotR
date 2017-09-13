@@ -75,12 +75,13 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     X <- x[,1:5]
     colnames(X) <- c('X','sX','Y','sY','rXY')
     fit <- regression(X,model=model)
+    out <- regression_init(fit,alpha=alpha)
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model==1),show.numbers=show.numbers,
-                levels=levels,ellipse.col=ellipse.col,
-                a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
+                levels=levels,ellipse.col=ellipse.col,a=fit$a[1],
+                b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
-        graphics::title(isochrontitle(fit,sigdig=sigdig),xlab='X',ylab='Y')
+        graphics::title(isochrontitle(out,sigdig=sigdig),xlab='X',ylab='Y')
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
 #'
@@ -91,7 +92,8 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' if \code{TRUE} and \code{x} has class \code{PbPb}, plots
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.
 #'
-#' @param exterr propagate external sources of uncertainty (J, decay constant)?
+#' @param exterr propagate external sources of uncertainty
+#' (J, decay constant)?
 #'
 #' @return if \code{x} has class \code{PbPb}, \code{ArAr},
 #'     \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf},
@@ -545,6 +547,22 @@ isochron_init <- function(fit,alpha=0.05){
     out$tfact <- qt(1-alpha/2,out$df)
     names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
     names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
+    class(out) <- "isochron"
+    out
+}
+regression_init <- function(fit,alpha=0.05){
+    out <- fit
+    out$a <- rep(NA,4)
+    out$b <- rep(NA,4)
+    out$tfact <- qt(1-alpha/2,out$df)
+    names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
+    names(out$b) <- c('b','s[b]','ci[b]','disp[b]')
+    out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
+    out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
+    out$a['ci[a]'] <- out$tfact*fit$a['s[a]']
+    out$a['disp[a]'] <- out$tfact*sqrt(fit$mswd)*fit$a['s[a]']
+    out$b['ci[b]'] <- out$tfact*fit$b['s[b]']
+    out$b['disp[b]'] <- out$tfact*sqrt(fit$mswd)*fit$b['s[b]']
     class(out) <- "isochron"
     out
 }
