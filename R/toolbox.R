@@ -17,8 +17,13 @@ roundit <- function(age,err,sigdig=2){
         min.err <- err
         dat <- cbind(age,err)
     }
-    nd <- log10(trunc(abs(dat)/min.err))+sigdig
-    signif(dat,nd)
+    if (is.na(sigdig)) {
+        out <- dat
+    } else {
+        nd <- log10(trunc(abs(dat)/min.err))+sigdig
+        out <- signif(dat,nd)
+    }
+    out
 }
 
 # count the number of TRUEs in x

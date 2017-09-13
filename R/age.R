@@ -389,10 +389,13 @@ age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
 }
 #' @rdname age
 #' @export
-age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
-    age.PD(x,'Lu176',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
+age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,
+                     sigdig=NA,...){
+    age.PD(x,'Lu176',isochron=isochron,i2i=i2i,exterr=exterr,i=i,
+           sigdig=sigdig,...)
 }
-age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,
+                   sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig)
     else out <- PD.age(x,nuclide,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out

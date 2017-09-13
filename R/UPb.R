@@ -567,6 +567,7 @@ common.Pb.correction <- function(x,option=1){
     else if (option == 2) out <- common.Pb.isochron(x)
     else if (option == 3) out <- common.Pb.nominal(x)
     else out <- x
+    out$x.raw <- x$x
     out
 }
 common.Pb.isochron <- function(x){

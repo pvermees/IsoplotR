@@ -69,7 +69,7 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
                 break
         }
     }
-    fit <- get.weightedmean(X,sX,valid)
+    fit <- get.weightedmean(X,sX,valid=valid,alpha=alpha)
     if (plot){
         plot_weightedmean(X,sX,fit,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
@@ -226,7 +226,8 @@ weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
                                outlier.col=rgb(0,1,1,0.5),
                                sigdig=2,alpha=0.05,exterr=TRUE,...){
     tt <- UThHe.age(x)
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
+                                plot=FALSE,...)
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
@@ -243,7 +244,8 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
                                        sigdig=2,alpha=0.05,exterr=TRUE,...){
     tt <- fissiontrack.age(x,exterr=FALSE)
     # calculated weighted mean age ignoring zeta and rhoD uncertainties
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
+                                plot=FALSE,...)
     if (exterr){
         stt2 <- (fit$mean[2]/fit$mean[1])^2
         if (x$format==1) {
@@ -268,10 +270,12 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
     }
 }
 weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
-                                rect.col=grDevices::rgb(0,1,0,0.5),type=4,
-                                cutoff.76=1100,cutoff.disc=c(-15,5),
-                                outlier.col=grDevices::rgb(0,1,1,0.5), sigdig=2,
-                                alpha=0.05,exterr=TRUE,i2i=FALSE,...){
+                                rect.col=grDevices::rgb(0,1,0,0.5),
+                                type=4,cutoff.76=1100,
+                                cutoff.disc=c(-15,5),
+                                outlier.col=grDevices::rgb(0,1,1,0.5),
+                                sigdig=2,alpha=0.05,exterr=TRUE,
+                                i2i=FALSE,...){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
@@ -290,20 +294,34 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     } else if (hasClass(x,'LuHf')){
         tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
     }
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,plot=FALSE,...)
+    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
+                                plot=FALSE,...)
+    out <- fit
+    out$mean <- rep(NA,4)
+    names(out$mean) <- c('x','s[x]','ci[x]','disp[x]')
+    out$tfact <- qt(1-alpha/2,out$df)
+    disp <- sqrt(fit$mean[2]^2+fit$disp^2)
     if (exterr){
-        fit$mean <- add.exterr(x,tt=fit$mean[1],st=fit$mean[2],
-                               cutoff.76=cutoff.76,type=type)
+        out$mean[c('x','s[x]')] <-
+            add.exterr(x,tt=fit$mean[1],st=fit$mean[2],
+                       cutoff.76=cutoff.76,type=type)
+        out$mean['disp[x]'] <- out$tfact*
+            add.exterr(x,tt=fit$mean[1],st=disp,
+                       cutoff.76=cutoff.76,type=type)[2]
+    } else {
+        out$mean['disp[x]'] <- fit$tfact*disp
     }
+    out$mean['ci[x]'] <- out$tfact*fit$mean[2]
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
-                          outlier.col=outlier.col,sigdig=sigdig,alpha=alpha)
+                          outlier.col=outlier.col,sigdig=sigdig,
+                          alpha=alpha)
     } else {
         return(fit)
     }
 }
 
-get.weightedmean <- function(X,sX,valid=TRUE,overdispersion=TRUE){
+get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
     out <- list()
     x <- X[valid]
     sx <- sX[valid]
@@ -324,12 +342,14 @@ get.weightedmean <- function(X,sX,valid=TRUE,overdispersion=TRUE){
                                 control=list(fnscale=-1))
             covmat <- solve(-fit$hessian)
             out$mean <<- c(fit$par,sqrt(covmat))
-            out$disp <<- 0
+            out$disp <<- NA
         }, finally = {
-            df <- length(x)-1
             SS <- sum(((x-out$mean[1])/sx)^2)
-            out$mswd <- SS/df
-            out$p.value <- 1-stats::pchisq(SS,df)
+            out$df <- length(x)-1
+            out$mswd <- SS/out$df
+            if (is.na(out$disp) && out$mswd>1)
+                out$disp <- out$mean['s[x]']*sqrt(out$mswd-1)
+            out$p.value <- 1-stats::pchisq(SS,out$df)
             out$valid <- valid
         })
     } else {
@@ -350,7 +370,8 @@ gr.weightedmean.disp <- function(MZ,X,sX){
     M <- MZ[1]
     Z <- MZ[2]
     dLL.dmu <- (X-M)/(sX^2+exp(Z))
-    dLL.dZ <- -0.5*exp(Z)/(sX^2+exp(Z)) + 0.5*(exp(Z)*(X-M)^2)/((sX^2+exp(Z))^2)
+    dLL.dZ <- -0.5*exp(Z)/(sX^2+exp(Z)) +
+        0.5*(exp(Z)*(X-M)^2)/((sX^2+exp(Z))^2)
     c(sum(dLL.dmu),sum(dLL.dZ))
 }
 
@@ -377,14 +398,16 @@ wtdmean.title <- function(fit,sigdig=2){
     }
 }
 
-plot_weightedmean <- function(X,sX,fit,rect.col=grDevices::rgb(0,1,0,0.5),
-                              outlier.col=grDevices::rgb(0,1,1,0.5),sigdig=2,
-                              alpha=0.05){
+plot_weightedmean <- function(X,sX,fit,
+                              rect.col=grDevices::rgb(0,1,0,0.5),
+                              outlier.col=grDevices::rgb(0,1,1,0.5),
+                              sigdig=2, alpha=0.05){
     ns <- length(X)
     fact <- stats::qnorm(1-alpha/2)
     minX <- min(X-fact*sX,na.rm=TRUE)
     maxX <- max(X+fact*sX,na.rm=TRUE)
-    graphics::plot(c(0,ns+1),c(minX,maxX),type='n',axes=FALSE,xlab='N',ylab='')
+    graphics::plot(c(0,ns+1),c(minX,maxX),type='n',
+                   axes=FALSE,xlab='N',ylab='')
     graphics::lines(c(0,ns+1),c(fit$mean[1],fit$mean[1]))
     graphics::axis(side=1,at=1:ns)
     graphics::axis(side=2)
@@ -402,7 +425,7 @@ plot_weightedmean <- function(X,sX,fit,rect.col=grDevices::rgb(0,1,0,0.5),
 # valid is a vector of logical flags indicating whether the corresponding
 # measurements have already been rejected or not
 chauvenet <- function(X,sX,valid){
-    fit <- get.weightedmean(X,sX,valid)
+    fit <- get.weightedmean(X,sX,valid=valid)
     mu <- fit$mean[1]
     sigma <- sqrt(fit$disp^2+sX^2)
     prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
