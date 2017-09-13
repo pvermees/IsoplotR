@@ -70,13 +70,20 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
         }
     }
     fit <- get.weightedmean(X,sX,valid=valid,alpha=alpha)
+    out <- fit
+    out$mean <- rep(NA,4)
+    names(out$mean) <- c('x','s[x]','ci[x]','disp[x]')
+    out$tfact <- qt(1-alpha/2,out$df)
+    out$stotal <- sqrt(fit$mean[2]^2+fit$disp^2)
+    out$mean[c('x','s[x]')] <- fit$mean[1:2]
+    out$mean['disp[x]'] <- out$tfact*out$stotal
+    out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
     if (plot){
-        plot_weightedmean(X,sX,fit,rect.col=rect.col,
+        plot_weightedmean(X,sX,out,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha,...)
-    } else {
-        return(fit)
     }
+    out
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -161,8 +168,7 @@ weightedmean.ThU <- function(x,detect.outliers=TRUE,plot=TRUE,
                              alpha=0.05,i2i=TRUE,...){
     weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
-                        sigdig=sigdig,alpha=alpha,exterr=FALSE,
-                        i2i=i2i,...)
+                        sigdig=sigdig,alpha=alpha,i2i=i2i,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -224,7 +230,7 @@ weightedmean.LuHf <- function(x,detect.outliers=TRUE,plot=TRUE,
 weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
                                rect.col=rgb(0,1,0,0.5),
                                outlier.col=rgb(0,1,1,0.5),
-                               sigdig=2,alpha=0.05,exterr=TRUE,...){
+                               sigdig=2,alpha=0.05,...){
     tt <- UThHe.age(x)
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
                                 plot=FALSE,...)
@@ -246,8 +252,8 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
     # calculated weighted mean age ignoring zeta and rhoD uncertainties
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
                                 plot=FALSE,...)
+    out <- fit
     if (exterr){
-        stt2 <- (fit$mean[2]/fit$mean[1])^2
         if (x$format==1) {
             rhoD <- x$rhoD
             zeta <- x$zeta
@@ -258,16 +264,24 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
             rhoD <- c(1,0)
             zeta <- c(1,0)
         }
-        fit$mean[2] <- fit$mean[1] *
-            sqrt( stt2 + (rhoD[2]/rhoD[1])^2 + (zeta[2]/zeta[1])^2 )
+        out$mean['s[x]'] <- fit$mean['x']*
+            sqrt( (fit$mean['s[x]']/fit$mean['x'])^2 +
+                  (rhoD[2]/rhoD[1])^2 +
+                  (zeta[2]/zeta[1])^2
+                )
+        out$mean['ci[x]'] <- fit$tfact*out$mean['s[x]']
+        out$mean['disp[x]'] <- fit$tfact*fit$mean['x']*
+            sqrt( (fit$stotal/fit$mean['x'])^2 +
+                  (rhoD[2]/rhoD[1])^2 +
+                  (zeta[2]/zeta[1])^2
+                )
     }
     if (plot){
-        plot_weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
+        plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha)
-    } else {
-        return(fit)
     }
+    out
 }
 weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
                                 rect.col=grDevices::rgb(0,1,0,0.5),
@@ -283,6 +297,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
         tt <- PbPb.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'ThU')){
         tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
+        exterr <- FALSE
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'ReOs')){
@@ -297,28 +312,20 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
                                 plot=FALSE,...)
     out <- fit
-    out$mean <- rep(NA,4)
-    names(out$mean) <- c('x','s[x]','ci[x]','disp[x]')
-    out$tfact <- qt(1-alpha/2,out$df)
-    disp <- sqrt(fit$mean[2]^2+fit$disp^2)
     if (exterr){
         out$mean[c('x','s[x]')] <-
             add.exterr(x,tt=fit$mean[1],st=fit$mean[2],
                        cutoff.76=cutoff.76,type=type)
         out$mean['disp[x]'] <- out$tfact*
-            add.exterr(x,tt=fit$mean[1],st=disp,
+            add.exterr(x,tt=fit$mean[1],st=fit$stotal,
                        cutoff.76=cutoff.76,type=type)[2]
-    } else {
-        out$mean['disp[x]'] <- fit$tfact*disp
     }
-    out$mean['ci[x]'] <- out$tfact*fit$mean[2]
     if (plot){
-        plot_weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
+        plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha)
-    } else {
-        return(fit)
     }
+    out
 }
 
 get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
@@ -381,21 +388,24 @@ LL.weightedmean <- function(M,X,sX){
 }
 
 wtdmean.title <- function(fit,sigdig=2){
-    rounded.mean <- roundit(fit$mean[1],fit$mean[2],sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
-                        list(a=rounded.mean[1], b=rounded.mean[2]))
+    rounded.mean <- roundit(fit$mean[1],fit$mean[2:4],sigdig=sigdig)
+    if (fit$mswd<1){
+        line1 <- substitute('mean ='~a%+-%b~'|'~c,
+                            list(a=rounded.mean[1],
+                                 b=rounded.mean[2],
+                                 c=rounded.mean[3]))
+    } else {
+        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d,
+                            list(a=rounded.mean[1],
+                                 b=rounded.mean[2],
+                                 c=rounded.mean[3],
+                                 d=rounded.mean[4]))
+    }    
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    if (fit$p.value < 0.05){ # only show when the data are overdispersed
-        line3 <- paste0('overdispersion = ',signif(fit$disp,sigdig))
-        graphics::mtext(line1,line=2)
-        graphics::mtext(line2,line=1)
-        graphics::mtext(line3,line=0)
-    } else {
-        graphics::mtext(line1,line=1)
-        graphics::mtext(line2,line=0)
-    }
+    graphics::mtext(line1,line=1)
+    graphics::mtext(line2,line=0)
 }
 
 plot_weightedmean <- function(X,sX,fit,
