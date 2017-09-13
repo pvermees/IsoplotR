@@ -411,14 +411,24 @@ wtdmean.title <- function(fit,sigdig=2){
 plot_weightedmean <- function(X,sX,fit,
                               rect.col=grDevices::rgb(0,1,0,0.5),
                               outlier.col=grDevices::rgb(0,1,1,0.5),
-                              sigdig=2, alpha=0.05){
+                              sigdig=2,alpha=0.05){
     ns <- length(X)
     fact <- stats::qnorm(1-alpha/2)
     minX <- min(X-fact*sX,na.rm=TRUE)
     maxX <- max(X+fact*sX,na.rm=TRUE)
     graphics::plot(c(0,ns+1),c(minX,maxX),type='n',
                    axes=FALSE,xlab='N',ylab='')
-    graphics::lines(c(0,ns+1),c(fit$mean[1],fit$mean[1]))
+    graphics::polygon(c(0,ns+1,ns+1,0),
+                      c(rep(fit$mean['x']+fit$mean['ci[x]'],2),
+                        rep(fit$mean['x']-fit$mean['ci[x]'],2)),
+                      col='gray80',border=NA)
+    graphics::lines(c(0,ns+1),rep(fit$mean['x'],2))
+    if (fit$mswd>1){
+        graphics::lines(c(0,ns+1),
+                        rep(fit$mean['x']+fit$mean['disp[x]'],2),lty=3)
+        graphics::lines(c(0,ns+1),
+                        rep(fit$mean['x']-fit$mean['disp[x]'],2),lty=3)
+    }
     graphics::axis(side=1,at=1:ns)
     graphics::axis(side=2)
     for (i in 1:ns){
