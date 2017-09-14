@@ -179,8 +179,8 @@ central.fissiontracks <- function(x,mineral=NA,...){
         out$age <- c(tt,st)
         out$df <- length(Nsj)-1
         out$disp <- sigma
-        out$mswd <- Chi2/df
-        out$p.value <- 1-stats::pchisq(Chi2,df)
+        out$mswd <- Chi2/out$df
+        out$p.value <- 1-stats::pchisq(Chi2,out$df)
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         out <- central.default(tst)

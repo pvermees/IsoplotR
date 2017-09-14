@@ -80,15 +80,20 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
         colour <- rep(plateau.col,ns)
     }
     for (i in 1:ns){
-        graphics::rect(X[i],Y[i]-fact*sY[i],X[i+1],Y[i]+fact*sY[i],col=colour[i])
-        if (i<ns) graphics::lines(rep(X[i+1],2),c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
+        graphics::rect(X[i],Y[i]-fact*sY[i],
+                       X[i+1],Y[i]+fact*sY[i],
+                       col=colour[i])
+        if (i<ns) graphics::lines(rep(X[i+1],2),
+                                  c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
     }
-    if (plateau & title) graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
+    if (plateau & title)
+        graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
     else return(plat)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka `inherited',
-#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from an
-#'     isochron fit. Setting \code{i2i} to \code{FALSE} uses the
+#' @param i2i `isochron to intercept':
+#'     calculates the initial (aka `inherited',
+#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from
+#'     an isochron fit. Setting \code{i2i} to \code{FALSE} uses the
 #'     default values stored in \code{settings('iratio',...)}
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
@@ -106,7 +111,8 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
-                                plateau=plateau,sigdig=sigdig,line.col=line.col,
+                                plateau=plateau,sigdig=sigdig,
+                                line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
     # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
     R <- get.ArAr.ratio(plat$mean[1],plat$mean[2],x$J[1],0,exterr=FALSE)
@@ -118,7 +124,8 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     }
 }
 
-# x is a three column vector with Ar39 cumulative fractions, ages and uncertainties
+# x is a three column vector with Ar39
+# cumulative fractions, ages and uncertainties
 plateau <- function(x,alpha=0.05){
     X <- x[,1]/sum(x[,1],na.rm=TRUE)
     YsY <- x[,c(2,3)]
