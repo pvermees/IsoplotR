@@ -402,18 +402,13 @@ LL.weightedmean <- function(M,X,sX){
 
 wtdmean.title <- function(fit,sigdig=2){
     rounded.mean <- roundit(fit$mean[1],fit$mean[2:4],sigdig=sigdig)
+    args1 <- quote('mean ='~a%+-%b~'|'~c)
+    list1 <- list(a=rounded.mean[1],b=rounded.mean[2],c=rounded.mean[3])
     if (fit$mswd<1){
-        line1 <- substitute('mean ='~a%+-%b~'|'~c,
-                            list(a=rounded.mean[1],
-                                 b=rounded.mean[2],
-                                 c=rounded.mean[3]))
-    } else {
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d,
-                            list(a=rounded.mean[1],
-                                 b=rounded.mean[2],
-                                 c=rounded.mean[3],
-                                 d=rounded.mean[4]))
-    }    
+        args1 <- quote('mean ='~a%+-%b~'|'~c~'|'~d)
+        list1$d <- c=rounded.mean[4]
+    }
+    line1 <- do.call(substitute,list(eval(args1),list1))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))

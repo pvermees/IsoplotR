@@ -114,11 +114,19 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                                 plateau=plateau,sigdig=sigdig,
                                 line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
+    out <- plat
     # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
-    R <- get.ArAr.ratio(plat$mean[1],plat$mean[2],x$J[1],0,exterr=FALSE)
+    R <- get.ArAr.ratio(plat$mean['x'],plat$mean['s[x]'],x$J[1],0,exterr=FALSE)
     # recalculate the weighted mean age, this time
     # taking into account decay and J uncertainties
-    plat$mean <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
+    out$mean[1:2] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
+    out$mean[3] <- plat$tfact*out$mean[2]
+    if (out$mswd>1){
+        R <- get.ArAr.ratio(plat$mean['x'],
+                            sqrt(plat$mswd)*plat$mean['s[x]'],
+                            x$J[1],0,exterr=FALSE)
+        out$mean[4] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)[2]
+    }
     if (plateau){
         graphics::title(plateau.title(plat,sigdig=sigdig,Ar=TRUE))
     }
@@ -144,12 +152,9 @@ plateau <- function(x,alpha=0.05){
             if (any(!valid)){
                 break;
             } else if (fract > out$fract){
-                avg <- weightedmean(YsY[i:j,],plot=FALSE,
+                out <- weightedmean(YsY[i:j,],plot=FALSE,
                                     detect.outliers=FALSE)
                 out$i <- i:j
-                out$mean <- avg$mean
-                out$mswd <- avg$mswd
-                out$p.value <- avg$p.value
                 out$fract <- fract
             }
         }
@@ -158,15 +163,20 @@ plateau <- function(x,alpha=0.05){
 }
 
 plateau.title <- function(fit,sigdig=2,Ar=TRUE){
-    rounded.mean <- roundit(fit$mean[1],fit$mean[2],sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~' (1'~sigma~')',
-                        list(a=rounded.mean[1], b=rounded.mean[2]))
+    rounded.mean <- roundit(fit$mean[1],fit$mean[2:4],sigdig=sigdig)
+    args1 <- quote('mean ='~a%+-%b~'|'~c)
+    list1 <- list(a=rounded.mean[1],b=rounded.mean[2],c=rounded.mean[3])
+    if (fit$mswd>1){
+        args1 <- quote('mean ='~a%+-%b~'|'~c~'|'~d)
+        list1$d <- rounded.mean[4]
+    }
+    line1 <- do.call(substitute,list(eval(args1),list1))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
     a <- signif(100*fit$fract,sigdig)
     if (Ar)
-        line3 <- bquote(paste("Includes ",.(a),"% of the",""^"39","Ar"))
+        line3 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))
     else
         line3 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
     graphics::mtext(line1,line=2)
