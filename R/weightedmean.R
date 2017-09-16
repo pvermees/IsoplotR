@@ -71,13 +71,15 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     }
     fit <- get.weightedmean(X,sX,valid=valid,alpha=alpha)
     out <- fit
-    out$mean <- rep(NA,4)
-    names(out$mean) <- c('x','s[x]','ci[x]','disp[x]')
+    out$mean <- rep(NA,3)
+    out$disp <- rep(NA,2)
+    names(out$mean) <- c('x','s[x]','ci[x]')
+    names(out$disp) <- c('s','ci')
     out$tfact <- qt(1-alpha/2,out$df)
-    out$stotal <- sqrt(fit$mean[2]^2+fit$disp^2)
     out$mean[c('x','s[x]')] <- fit$mean[1:2]
-    out$mean['disp[x]'] <- out$tfact*out$stotal
     out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
+    out$disp['s'] <- fit$disp
+    out$disp['ci'] <- qnorm(1-alpha/2)*fit$disp
     ns <- length(X)
     out$plotpar <-
         list(mean=list(x=c(0,ns+1),
@@ -86,9 +88,9 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
                        y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
                            rep(out$mean['x']-out$mean['ci[x]'],2))),
              dash1=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']+out$mean['disp[x]'],2)),
+                        y=rep(out$mean['x']+out$disp['ci'],2)),
              dash2=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']-out$mean['disp[x]'],2))
+                        y=rep(out$mean['x']-out$disp['ci'],2))
              )
     if (plot){
         plot_weightedmean(X,sX,out,rect.col=rect.col,
@@ -282,11 +284,6 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
                   (zeta[2]/zeta[1])^2
                 )
         out$mean['ci[x]'] <- fit$tfact*out$mean['s[x]']
-        out$mean['disp[x]'] <- fit$tfact*fit$mean['x']*
-            sqrt( (fit$stotal/fit$mean['x'])^2 +
-                  (rhoD[2]/rhoD[1])^2 +
-                  (zeta[2]/zeta[1])^2
-                )
     }
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
@@ -329,9 +326,6 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
             add.exterr(x,tt=fit$mean[1],st=fit$mean[2],
                        cutoff.76=cutoff.76,type=type)
         out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
-        out$mean['disp[x]'] <- out$tfact*
-            add.exterr(x,tt=fit$mean[1],st=fit$stotal,
-                       cutoff.76=cutoff.76,type=type)[2]
     }
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
@@ -401,19 +395,20 @@ LL.weightedmean <- function(M,X,sX){
 }
 
 wtdmean.title <- function(fit,sigdig=2){
-    rounded.mean <- roundit(fit$mean[1],fit$mean[2:4],sigdig=sigdig)
-    args1 <- quote('mean ='~a%+-%b~'|'~c)
-    list1 <- list(a=rounded.mean[1],b=rounded.mean[2],c=rounded.mean[3])
-    if (fit$mswd>1){
-        args1 <- quote('mean ='~a%+-%b~'|'~c~'|'~d)
-        list1$d <- rounded.mean[4]
-    }
-    line1 <- do.call(substitute,list(eval(args1),list1))
+    rounded.mean <- roundit(fit$mean[1],fit$mean[2:3],sigdig=sigdig)
+    line1 <- substitute('mean ='~a%+-%b~'|'~c,
+                        list(a=rounded.mean[1],
+                             b=rounded.mean[2],
+                             c=rounded.mean[3]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    graphics::mtext(line1,line=1)
-    graphics::mtext(line2,line=0)
+    line3 <- substitute('dispersion ='~a~'|'~b,
+                        list(a=signif(fit$disp['s'],sigdig),
+                             b=signif(fit$disp['ci'],sigdig)))
+    graphics::mtext(line1,line=2)
+    graphics::mtext(line2,line=1)
+    graphics::mtext(line3,line=0)
 }
 
 plot_weightedmean <- function(X,sX,fit,
@@ -428,10 +423,8 @@ plot_weightedmean <- function(X,sX,fit,
                    axes=FALSE,xlab='N',ylab='')
     graphics::polygon(fit$plotpar$rect,col='gray80',border=NA)
     graphics::lines(fit$plotpar$mean)
-    if (fit$mswd>1){
-        graphics::lines(fit$plotpar$dash1,lty=3)
-        graphics::lines(fit$plotpar$dash2,lty=3)
-    }
+    graphics::lines(fit$plotpar$dash1,lty=3)
+    graphics::lines(fit$plotpar$dash2,lty=3)
     graphics::axis(side=1,at=1:ns)
     graphics::axis(side=2)
     for (i in 1:ns){

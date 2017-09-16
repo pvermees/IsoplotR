@@ -163,23 +163,16 @@ plateau <- function(x,alpha=0.05){
 }
 
 plateau.title <- function(fit,sigdig=2,Ar=TRUE){
-    rounded.mean <- roundit(fit$mean[1],fit$mean[2:4],sigdig=sigdig)
-    args1 <- quote('mean ='~a%+-%b~'|'~c)
-    list1 <- list(a=rounded.mean[1],b=rounded.mean[2],c=rounded.mean[3])
-    if (fit$mswd>1){
-        args1 <- quote('mean ='~a%+-%b~'|'~c~'|'~d)
-        list1$d <- rounded.mean[4]
-    }
-    line1 <- do.call(substitute,list(eval(args1),list1))
-    line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,sigdig),
-                             b=signif(fit$p.value,sigdig)))
+    rounded.mean <- roundit(fit$mean[1],fit$mean[2:3],sigdig=sigdig)
+    line1 <- substitute('mean ='~a%+-%b~'|'~c,
+                        list(a=rounded.mean[1],
+                             b=rounded.mean[2],
+                             c=rounded.mean[3]))
     a <- signif(100*fit$fract,sigdig)
     if (Ar)
-        line3 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))
+        line2 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))
     else
-        line3 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
-    graphics::mtext(line1,line=2)
-    graphics::mtext(line2,line=1)
-    graphics::mtext(line3,line=0)
+        line2 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
+    graphics::mtext(line1,line=1)
+    graphics::mtext(line2,line=0)
 }
