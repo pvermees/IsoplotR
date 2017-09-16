@@ -583,14 +583,20 @@ iatt <- function(z,zeta,rhoD){
 }
 
 radial.title <- function(fit,sigdig=2){
-    rounded.age <- roundit(fit$age[1],fit$age[2],sigdig=sigdig)
-    line1 <- substitute('central age ='~a%+-%b~'(1'~sigma~')',
-                        list(a=rounded.age[1], b=rounded.age[2]))
-    line2 <- substitute('dispersion ='~a~'%, p('~chi^2*')='~b,
-                        list(a=signif(100*fit$disp,sigdig),
+    rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
+    line1 <- substitute('mean ='~a%+-%b~'|'~c,
+                        list(a=rounded.age[1],
+                             b=rounded.age[2],
+                             c=rounded.age[3]))
+    line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+                        list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    graphics::mtext(line1,line=1)
-    graphics::mtext(line2,line=0)
+    line3 <- substitute('% dispersion ='~a~'|'~b,
+                        list(a=signif(100*fit$disp['s'],sigdig),
+                             b=signif(100*fit$disp['ci'],sigdig)))
+    graphics::mtext(line1,line=2)
+    graphics::mtext(line2,line=1)
+    graphics::mtext(line3,line=0)
 }
 
 get.offset <- function(x,from=NA){

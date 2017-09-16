@@ -64,7 +64,7 @@
 central <- function(x,...){ UseMethod("central",x) }
 #' @rdname central
 #' @export
-central.default <- function(x,...){
+central.default <- function(x,alpha=0.05,...){
     sigma <- 0.15 # convenient starting value
     zu <- log(x[,1])
     su <- x[,2]/x[,1]
@@ -79,11 +79,15 @@ central.default <- function(x,...){
     Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/
         sum(1/su^2,na.rm=TRUE)
     out <- list()
-    out$disp <- sigma
-    out$df <- length(zu)-1
-    out$mswd <- Chi2/out$df
-    out$p.value <- 1-stats::pchisq(Chi2,out$df)
-    out$age <- c(tt,st)
+    # remove two d.o.f. for mu and sigma
+    out$df <- length(zu)-2
+    # add back one d.o.f. for the homogeneity test
+    out$mswd <- Chi2/(out$df+1)
+    out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
+    out$age <- c(tt,st,qt(1-alpha/2,out$df)*st)
+    out$disp <- c(sigma,qnorm(1-alpha/2)*sigma)
+    names(out$age) <- c('t','s[t]','ci[t]')
+    names(out$disp) <- c('s','ci')
     out
 }
 #' @rdname central
@@ -152,7 +156,7 @@ central.UThHe <- function(x,alpha=0.05,...){
 #'     results if \code{x$format=2}.)
 #' @rdname central
 #' @export
-central.fissiontracks <- function(x,mineral=NA,...){
+central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
     out <- list()
     if (x$format<2){
         L8 <- lambda('U238')[1]
@@ -176,11 +180,15 @@ central.fissiontracks <- function(x,mineral=NA,...){
         st <- tt * sqrt( 1/(sum(wj)*(theta*(1-theta))^2) +
                          (x$rhoD[2]/x$rhoD[1])^2 +
                          (x$zeta[2]/x$zeta[1])^2 )
-        out$age <- c(tt,st)
-        out$df <- length(Nsj)-1
-        out$disp <- sigma
-        out$mswd <- Chi2/out$df
-        out$p.value <- 1-stats::pchisq(Chi2,out$df)
+        # remove two d.o.f. for mu and sigma
+        out$df <- length(Nsj)-2
+        # add back one d.o.f. for homogeneity test
+        out$mswd <- Chi2/(out$df+1)
+        out$p.value <- 1-stats::pchisq(Chi2,df+1)
+        out$age <- c(tt,st,qt(1-alpha/2,out$df)*st)        
+        out$disp <- c(sigma,qnorm(1-alpha/2)*sigma)
+        names(out$age) <- c('t','s[t]','ci[t]')
+        names(out$disp) <- c('s','ci')
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         out <- central.default(tst)

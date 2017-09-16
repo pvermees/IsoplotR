@@ -359,11 +359,11 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
             out$disp <<- 0
         }, finally = {
             SS <- sum(((x-out$mean[1])/sx)^2)
-            out$df <- length(x)-1
-            out$mswd <- SS/out$df
-            if (is.na(out$disp) && out$mswd>1)
-                out$disp <- out$mean['s[x]']*sqrt(out$mswd-1)
-            out$p.value <- 1-stats::pchisq(SS,out$df)
+            # remove two degrees of freedom for mu and disp
+            out$df <- length(x)-2
+            # add one d.o.f. (disp) for homogeneity test
+            out$mswd <- SS/(out$df+1)
+            out$p.value <- 1-stats::pchisq(SS,out$df+1)
             out$valid <- valid
         })
     } else {
