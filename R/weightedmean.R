@@ -247,7 +247,7 @@ weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
                                sigdig=2,alpha=0.05,...){
     tt <- UThHe.age(x)
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
-                                plot=FALSE,...)
+                                alpha=alpha,plot=FALSE,...)
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
@@ -265,7 +265,7 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
     tt <- fissiontrack.age(x,exterr=FALSE)
     # calculated weighted mean age ignoring zeta and rhoD uncertainties
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
-                                plot=FALSE,...)
+                                alpha=alpha,plot=FALSE,...)
     out <- fit
     if (exterr){
         if (x$format==1) {
@@ -319,7 +319,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
         tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
     }
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
-                                plot=FALSE,...)
+                                alpha=alpha,plot=FALSE,...)
     out <- fit
     if (exterr){
         out$mean[c('x','s[x]')] <-

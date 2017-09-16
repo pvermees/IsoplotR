@@ -184,14 +184,14 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
         out$df <- length(Nsj)-2
         # add back one d.o.f. for homogeneity test
         out$mswd <- Chi2/(out$df+1)
-        out$p.value <- 1-stats::pchisq(Chi2,df+1)
+        out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
         out$age <- c(tt,st,qt(1-alpha/2,out$df)*st)        
         out$disp <- c(sigma,qnorm(1-alpha/2)*sigma)
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$disp) <- c('s','ci')
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE,mineral=mineral)
-        out <- central.default(tst)
+        out <- central.default(tst,alpha=alpha)
     }
     out
 }
