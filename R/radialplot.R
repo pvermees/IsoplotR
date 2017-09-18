@@ -58,7 +58,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                bg=c("white","red"),title=TRUE,k=0,
                                markers=NULL,alpha=0.05,...){
     peaks <- peakfit(x,k=k,sigdig=sigdig)
-    markers <- c(markers,peaks$peaks)
+    markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,show.numbers=show.numbers,pch=pch,levels=levels,
                 bg=bg,markers=markers,...)
@@ -78,7 +78,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      markers=NULL,k=0,exterr=TRUE,
                                      alpha=0.05,...){
     peaks <- peakfit(x,k=k,exterr=exterr,sigdig=sigdig)
-    markers <- c(markers,peaks$peaks)
+    markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
                 show.numbers=show.numbers,pch=pch, levels=levels,
@@ -256,7 +256,7 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,
                               exterr=TRUE,i2i=FALSE,alpha=0.05,...){
     peaks <- peakfit(x,k=k,exterr=exterr,i2i=i2i,type=type,
                      cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
-    markers <- c(markers,peaks$peaks)
+    markers <- c(markers,peaks$peaks['t',])
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,levels=levels,bg=bg,
@@ -588,14 +588,14 @@ iatt <- function(z,zeta,rhoD){
 
 radial.title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c,
+    line1 <- substitute('central age ='~a%+-%b~'|'~c,
                         list(a=rounded.age[1],
                              b=rounded.age[2],
                              c=rounded.age[3]))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('% dispersion ='~a~'|'~b,
+    line3 <- substitute('dispersion ='~a~'|'~b~'%',
                         list(a=signif(100*fit$disp['s'],sigdig),
                              b=signif(100*fit$disp['ci'],sigdig)))
     graphics::mtext(line1,line=2)

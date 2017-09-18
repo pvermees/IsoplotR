@@ -179,8 +179,8 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
         for (i in 1:numpeaks){
-            age.with.exterr <- add.exterr(x,fit$peaks['t',i],fit$peaks['s[t]',i])
-            fit$peaks['s[t]',i] <- age.with.exterr[2]
+            age.with.exterr <- add.exterr(x,fit$peaks[i],fit$peaks.err[i])
+            fit$peaks.err[i] <- age.with.exterr[2]
         }
     }
     fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
@@ -267,20 +267,18 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
     out <- NULL
     for (i in 1:ncol(fit$peaks)){
         rounded.age <- roundit(fit$peaks[1,i],fit$peaks[2:3,i],sigdig=sigdig)
+        rounded.prop <- roundit(fit$props[1,i],fit$props[2:3,i],sigdig=sigdig)
         line <- paste0('Peak ',i,': ',rounded.age[1],'\u00B1',
-                       rounded.age[2],'|',rounded.age[3])
-        if (k>1){
-            rounded.prop <- roundit(fit$props[1,i],fit$props[2:3,i],sigdig=sigdig)
-            line <- paste0(line,' (',100*rounded.prop[1],'%)')
-            #,'\u00B1 ', 100*rounded.prop[2],' | ',100*rounded.prop[3],' %)')
-        }
+                       rounded.age[2],'|',rounded.age[3],
+                       ' (',100*rounded.prop[1],'\u00B1',
+                       100*rounded.prop[2],'|',100*rounded.prop[3],'%)')
         out <- c(out,line)
     }
     out
 }
 min_age_to_legend <- function(fit,sigdig=2){
-    rounded.age <- roundit(fit$peaks[1],fit$peaks[2:3],sigdig=sigdig)
-    paste0('Minimum: ',rounded.age[1],'\u00B1',rounded.age[2],' | ',rounded.age[3])
+    rounded.age <- roundit(fit$peaks,fit$peaks.err,sigdig=sigdig)
+    paste0('Minimum: ',rounded.age[1],'+/-',rounded.age[2])
 }
 
 normal.mixtures <- function(x,k,sigdig=2,alpha=0.05,...){
@@ -324,12 +322,21 @@ normal.mixtures <- function(x,k,sigdig=2,alpha=0.05,...){
         biu[,i] <- -(1-(yu-betai[i]*xu)^2)*xu^2
     }
     E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
-    out <- format.peaks(peaks=betai,
-                        peaks.err=sqrt(diag(E)[k:(2*k-1)]),
-                        props=pii,
-                        props.err=get.props.err(E),
-                        df=n-2*k+1,alpha=alpha)
-    out$L <- L
+    peaks <- matrix(0,3,k)
+    colnames(peaks) <- 1:k
+    rownames(peaks) <- c('t','s[t]','ci[t]')
+    peaks['t',] <- betai
+    peaks['s[t]',] <- sqrt(diag(E)[k:(2*k-1)])
+    df <- n-2*k+1
+    tfact <- qt(1-alpha/2,df)
+    peaks['ci[t]',] <- tfact*peaks['s[t]',]
+    props <- matrix(0,3,k)
+    colnames(props) <- 1:k
+    rownames(props) <- c('p','s[p]','ci[p]')
+    props['p',] <- pii
+    props['s[p]',] <- get.props.err(E)
+    props['ci[p]',] <- tfact*props['s[p]',]
+    out <- list(L=L,peaks=peaks,props=props)
     out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
 }
@@ -372,32 +379,9 @@ binomial.mixtures <- function(x,k,exterr=TRUE,alpha=0.05,...){
     E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
     beta.var <- diag(E)[k:(2*k-1)]
     pe <- theta2age(x,thetai,beta.var,exterr)
-    out <- format.peaks(peaks=pe$peaks,
-                        peaks.err=pe$peaks.err,
-                        props=pii,
-                        props.err=get.props.err(E),
-                        df=n-2*k+1,alpha=alpha)
-    out$L <- L
-    out
-}
-
-format.peaks <- function(peaks,peaks.err,props,props.err,df,alpha=0.05){
-    out <- list()
-    k <- length(peaks)
-    tfact <- qt(1-alpha/2,df)
-    out$peaks <- matrix(0,3,k)
-    colnames(out$peaks) <- 1:k
-    rownames(out$peaks) <- c('t','s[t]','ci[t]')
-    out$peaks['t',] <- peaks
-    out$peaks['s[t]',] <- peaks.err
-    out$peaks['ci[t]',] <- tfact*out$peaks['s[t]',]
-    out$props <- matrix(0,3,k)
-    colnames(out$props) <- 1:k
-    rownames(out$props) <- c('p','s[p]','ci[p]')
-    out$props['p',] <- props
-    out$props['s[p]',] <- props.err
-    out$props['ci[p]',] <- tfact*out$props['s[p]',]
-    out
+    props.err <- get.props.err(E)
+    list(L=L,peaks=pe$peaks,props=pii,
+         peaks.err=pe$peaks.err,props.err=props.err)
 }
 
 theta2age <- function(x,theta,beta.var,exterr=TRUE){
@@ -461,15 +445,8 @@ min_age_model <- function(zs,sigdig=2,alpha=0.05){
     }
     H <- stats::optimHess(fit,get.minage.L,zs=zs)
     E <- solve(H)
-    out <- list()
-    out$L <- L
-    out$peaks <- matrix(0,3,1)
-    rownames(out$peaks) <- c('t','s[t]','ci[t]')
-    df <- length(z)-3
-    tfact <- qt(1-alpha/2,df)
-    out$peaks['t',] <- fit[1]
-    out$peaks['s[t]',] <- sqrt(E[1,1])
-    out$peaks['ci[t]',] <- tfact*sqrt(E[1,1])
+    out <- list(L=L,peaks=fit[1],
+                peaks.err=sqrt(E[1,1]),props.err=sqrt(E[3,3]))
     out
 }
 
