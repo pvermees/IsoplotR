@@ -198,35 +198,26 @@ discordia.plot <- function(fit,wetherill){
 
 discordia.title <- function(fit,wetherill,sigdig=2){
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
-    list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3])
-    if (fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
-    else args <- quote(a%+-%b~'|'~c)
+    upper.intercept <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
     if (wetherill){
-        upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
-        expr1 <- quote('lower intercept =')
-        expr2 <- quote('upper intercept =')
-        list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3])
-        if (fit$mswd>1){
-            list1$d <- lower.age[4]
-            list2$d <- upper.age[4]
-        }
+        line1 <- 'lower intercept = '
+        line2 <- 'upper intercept = '
     } else {
-        intercept <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
-        expr1 <- quote('age =')
-        expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]~'=')
-        list2 <- list(a=intercept[1],b=intercept[2],c=intercept[3])
-        if (fit$mswd>1){
-            list1$d <- lower.age[4]
-            list2$d <- intercept[4]
-        }
+        line1 <- 'age = '
+        line2 <- '(\u00B2\u2070\u2077Pb/\u00B2\u2070\u2076Pb)\u2080 = '
     }
-    call1 <- substitute(e~a,list(e=expr1,a=args))
-    call2 <- substitute(e~a,list(e=expr2,a=args))
-    line1 <- do.call('substitute',list((call1),list1))
-    line2 <- do.call('substitute',list((call2),list2))
-    line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,sigdig),
-                             b=signif(fit$p.value,sigdig)))
+    line1 <- paste0(line1, lower.age[1],
+                    ' \u00B1 ', lower.age[2],
+                    '|', lower.age[3])
+    line2 <- paste0(line2, upper.intercept[1],
+                    ' \u00B1 ', upper.intercept[2],
+                    '|', upper.intercept[3])
+    if (fit$mswd>1){
+        line1 <- paste0(line,'|',lower.age[4])
+        line2 <- paste0(line,'|',upper.intercept[4])
+    }
+    line3 <- paste0('MSWD = ', signif(fit$mswd,sigdig),
+                    ', p(\u03A7\u00B2) = ', signif(fit$p.value,sigdig))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)

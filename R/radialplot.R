@@ -588,16 +588,13 @@ iatt <- function(z,zeta,rhoD){
 
 radial.title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
-    line1 <- substitute('central age ='~a%+-%b~'|'~c,
-                        list(a=rounded.age[1],
-                             b=rounded.age[2],
-                             c=rounded.age[3]))
-    line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,sigdig),
-                             b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('dispersion ='~a~'|'~b~'%',
-                        list(a=signif(100*fit$disp['s'],sigdig),
-                             b=signif(100*fit$disp['ci'],sigdig)))
+    line1 <- paste0('central age = ',rounded.age[1],
+                   ' \u00B1 ',rounded.age[2],
+                   '|',rounded.age[3])
+    line2 <- paste0('MSWD = ',signif(fit$mswd,sigdig),
+                    ', p(\u03A7\u00B2) = ',signif(fit$p.value,sigdig))
+    line3 <- paste0('dispersion = ',signif(100*fit$disp['s'],sigdig),
+                    '|',signif(100*fit$disp['ci'],sigdig))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)

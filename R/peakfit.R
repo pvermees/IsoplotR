@@ -181,6 +181,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,
         for (i in 1:numpeaks){
             age.with.exterr <- add.exterr(x,fit$peaks['t',i],fit$peaks['s[t]',i])
             fit$peaks['s[t]',i] <- age.with.exterr[2]
+            fit$peaks['ci[t]',i] <- fit$tfact*fit$peaks['s[t]',i]
         }
     }
     fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
@@ -272,7 +273,6 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
         if (k>1){
             rounded.prop <- roundit(fit$props[1,i],fit$props[2:3,i],sigdig=sigdig)
             line <- paste0(line,' (',100*rounded.prop[1],'%)')
-            #,'\u00B1 ', 100*rounded.prop[2],' | ',100*rounded.prop[3],' %)')
         }
         out <- c(out,line)
     }
@@ -384,19 +384,19 @@ binomial.mixtures <- function(x,k,exterr=TRUE,alpha=0.05,...){
 format.peaks <- function(peaks,peaks.err,props,props.err,df,alpha=0.05){
     out <- list()
     k <- length(peaks)
-    tfact <- qt(1-alpha/2,df)
+    out$tfact <- qt(1-alpha/2,df)
     out$peaks <- matrix(0,3,k)
     colnames(out$peaks) <- 1:k
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
     out$peaks['t',] <- peaks
     out$peaks['s[t]',] <- peaks.err
-    out$peaks['ci[t]',] <- tfact*out$peaks['s[t]',]
+    out$peaks['ci[t]',] <- out$tfact*out$peaks['s[t]',]
     out$props <- matrix(0,3,k)
     colnames(out$props) <- 1:k
     rownames(out$props) <- c('p','s[p]','ci[p]')
     out$props['p',] <- props
     out$props['s[p]',] <- props.err
-    out$props['ci[p]',] <- tfact*out$props['s[p]',]
+    out$props['ci[p]',] <- out$tfact*out$props['s[p]',]
     out
 }
 
@@ -424,19 +424,22 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,
                     cutoff.disc=c(-15,5),exterr=TRUE,...){
     n <- length(x)
     BIC <- Inf
-    for (k in 1:max.k){
-        fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
-                       cutoff.disc=cutoff.disc,exterr=exterr,...)
-        p <- 2*k-1
-        newBIC <- -2*fit$L+p*log(n)
-        if (newBIC<BIC) {
-            BIC <- newBIC
-        } else {
-            k <- k-1
-            break
+    out <- tryCatch({
+        for (k in 1:max.k){
+            fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
+                           cutoff.disc=cutoff.disc,exterr=exterr,...)
+            p <- 2*k-1
+            newBIC <- -2*fit$L+p*log(n)
+            if (newBIC<BIC) {
+                BIC <- newBIC
+            } else {
+                return(k-1)
+            }
         }
-    }
-    k
+    },error = function(e){
+        return(k-1)
+    })
+    out
 }
 
 # Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
@@ -466,10 +469,10 @@ min_age_model <- function(zs,sigdig=2,alpha=0.05){
     out$peaks <- matrix(0,3,1)
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
     df <- length(z)-3
-    tfact <- qt(1-alpha/2,df)
+    out$tfact <- qt(1-alpha/2,df)
     out$peaks['t',] <- fit[1]
     out$peaks['s[t]',] <- sqrt(E[1,1])
-    out$peaks['ci[t]',] <- tfact*sqrt(E[1,1])
+    out$peaks['ci[t]',] <- out$tfact*sqrt(E[1,1])
     out
 }
 
