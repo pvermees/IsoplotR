@@ -970,7 +970,7 @@ $plotpar$dash2$y
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.548 0.052 8.611 0 0 
+Time elapsed:  8.852 0.044 8.909 0 0 
 > grDevices::dev.off()
 pdf 
   2 
