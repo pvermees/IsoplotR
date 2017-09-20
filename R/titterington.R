@@ -4,7 +4,7 @@
 #'
 #' @param x a \code{[9 x n]} matrix with the following columns:
 #'     \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.
-#'
+#' @param alpha cutoff value for confidence intervals
 #' @return a four-element list of vectors containing:
 #'     \describe{
 #' 

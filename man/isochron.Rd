@@ -83,8 +83,8 @@ OR
 an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
 \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or \code{ThU}.}
 
-\item{...}{optional arguments to be passed on to the
-generic plot function if \code{model=2}}
+\item{...}{optional arguments to be passed on to the generic plot
+function if \code{model=2}}
 
 \item{xlim}{2-element vector with the plot limits of the x-axis}
 
@@ -130,7 +130,8 @@ if \code{TRUE} and \code{x} has class \code{PbPb}, plots
 
 \item{plot}{if \code{FALSE}, suppresses the graphical output}
 
-\item{exterr}{propagate external sources of uncertainty (J, decay constant)?}
+\item{exterr}{propagate external sources of uncertainty
+(J, decay constant)?}
 
 \item{type}{following the classification of
 Ludwig and Titterington (1994), one of either:
@@ -233,4 +234,9 @@ age, including decay constant uncertainties.
 data(examples)
 isochron(examples$ArAr)
 
+}
+\references{
+Nicolaysen, L.O., 1961. Graphic interpretation of
+    discordant age measurements on metamorphic rocks. Annals of the
+    New York Academy of Sciences, 91(1), pp.198-206.
 }

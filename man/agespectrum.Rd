@@ -61,9 +61,10 @@ list with plateau parameters.}
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}
 
-\item{i2i}{`isochron to intercept': calculates the initial (aka `inherited',
-`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from an
-isochron fit. Setting \code{i2i} to \code{FALSE} uses the
+\item{i2i}{`isochron to intercept':
+calculates the initial (aka `inherited',
+`excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from
+an isochron fit. Setting \code{i2i} to \code{FALSE} uses the
 default values stored in \code{settings('iratio',...)}}
 }
 \value{

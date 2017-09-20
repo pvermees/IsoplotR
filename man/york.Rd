@@ -4,13 +4,15 @@
 \alias{york}
 \title{Linear regression of X,Y-variables with correlated errors}
 \usage{
-york(x)
+york(x, alpha = 0.05)
 }
 \arguments{
 \item{x}{a 5-column matrix with the X-values, the analytical
 uncertainties of the X-values, the Y-values, the analytical
 uncertainties of the Y-values, and the correlation coefficients
 of the X- and Y-values.}
+
+\item{alpha}{cutoff value for confidence intervals}
 }
 \value{
 a four-element list of vectors containing:

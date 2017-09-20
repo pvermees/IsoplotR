@@ -123,8 +123,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
 #'
-#' @return 
-#'
+#' @return
 #' \enumerate{
 #'
 #' \item if \code{x} is a scalar or a vector, returns the age using
@@ -143,6 +142,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' returns a list with the following items:
 #'
 #' \describe{
+#'
 #' \item{x}{ a named vector with the (weighted mean) U-Pb composition }
 #' 
 #' \item{cov}{ the covariance matrix of the (mean) U-Pb composition }
@@ -160,21 +160,25 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \item{p.value}{ a vector with three items (\code{equivalence},
 #' \code{concordance} and \code{combined}) containing the p-value of
 #' the Chi-square test for isotopic equivalence, age concordance and
-#' combined goodness of fit, respectively. } }
+#' combined goodness of fit, respectively. }
 #' 
 #' \item{df}{ the number of degrees of freedom used for the
 #' \code{mswd} calculation.  This value is useful when expanding the
-#' analytical uncertainties when \code{mswd>1}.} }
+#' analytical uncertainties when \code{mswd>1}.}
+#'
+#' }
 #' 
 #' \item if \code{x} has class \code{UPb} and \code{type=3},
 #' returns a list with the following items:
 #'
 #' \describe{
+#'
 #' \item{x}{ a two element vector with the upper and lower intercept
 #' ages (if \code{wetherill=TRUE}) or the lower intercept age and
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg) }
 #' 
 #' \item{cov}{ the covariance matrix of the elements in \code{x} }
+#'
 #' }
 #'
 #' \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
@@ -289,7 +293,9 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \item{disp}{ the (over)dispersion of the single grain ages beyond
 #' the formal analytical uncertainties. }
+#'
 #' }
+#'
 #' }
 #' 
 #' @examples

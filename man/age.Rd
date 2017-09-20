@@ -180,6 +180,7 @@ concordia age and standard error, respectively.
 returns a list with the following items:
 
 \describe{
+
 \item{x}{ a named vector with the (weighted mean) U-Pb composition }
 
 \item{cov}{ the covariance matrix of the (mean) U-Pb composition }
@@ -188,26 +189,34 @@ returns a list with the following items:
 
 \item{age.err}{ the standard error of the concordia age }
 
-\item{mswd}{ a list with two items (\code{equivalence} and
-\code{concordance}) containing the MSWD (Mean of the Squared
-Weighted Deviates, a.k.a the reduced Chi-squared statistic outside
-of geochronology) of isotopic equivalence and age concordance,
-respectively. }
+\item{mswd}{ a vector with three items (\code{equivalence},
+\code{concordance} and \code{combined}) containing the MSWD (Mean
+of the Squared Weighted Deviates, a.k.a the reduced Chi-squared
+statistic outside of geochronology) of isotopic equivalence, age
+concordance and combined goodness of fit, respectively. }
 
-\item{p.value}{ a list with two items (\code{equivalence} and
-\code{concordance}) containing the p-value of the Chi-square test
-for isotopic equivalence and age concordance, respectively. }
+\item{p.value}{ a vector with three items (\code{equivalence},
+\code{concordance} and \code{combined}) containing the p-value of
+the Chi-square test for isotopic equivalence, age concordance and
+combined goodness of fit, respectively. }
+
+\item{df}{ the number of degrees of freedom used for the
+\code{mswd} calculation.  This value is useful when expanding the
+analytical uncertainties when \code{mswd>1}.}
+
 }
 
 \item if \code{x} has class \code{UPb} and \code{type=3},
 returns a list with the following items:
 
 \describe{
+
 \item{x}{ a two element vector with the upper and lower intercept
 ages (if \code{wetherill=TRUE}) or the lower intercept age and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg) }
 
 \item{cov}{ the covariance matrix of the elements in \code{x} }
+
 }
 
 \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
@@ -322,7 +331,9 @@ standard error. }
 
 \item{disp}{ the (over)dispersion of the single grain ages beyond
 the formal analytical uncertainties. }
+
 }
+
 }
 }
 \description{

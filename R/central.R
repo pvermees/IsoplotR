@@ -7,6 +7,7 @@
 #' @param x an object of class \code{UThHe} or \code{fissiontracks},
 #'     OR a 2-column matrix with (strictly positive) values and
 #'     uncertainties
+#' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments
 #' @return a list containing the following items:
 #'

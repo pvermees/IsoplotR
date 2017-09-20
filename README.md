@@ -41,4 +41,4 @@ See [http://isoplotr.london-geochron.com](http://isoplotr.london-geochron.com)
 
 ## License
 
-This project is licensed under the MIT License
+This project is licensed under the GPL-3 License

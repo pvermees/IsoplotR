@@ -247,19 +247,24 @@ get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
     out
 }
 
+# this would be much easier in unicode but that doesn't render in PDF:
 concordia.title <- function(fit,sigdig=2,alpha=0.05){
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
-    line1 <- paste0('concordia age = ',rounded.age[1],
-                    ' \u00B1 ', rounded.age[2],
-                    '|', rounded.age[3])
-    if (fit$mswd['combined']>1)
-        line1 <- paste0(line1,'|',rounded.age[4])
-    line2 <- paste0('MSWD = ', signif(fit$mswd['concordance'],2),
-                    '|', signif(fit$mswd['equivalence'],2),
-                    '|', signif(fit$mswd['combined'],2),
-                    ', p(\u03A7\u00B2) = ', signif(fit$p.value['concordance'],2),
-                    '|', signif(fit$p.value['equivalence'],2),
-                    '|', signif(fit$p.value['combined'],2))
+    expr1 <- expression('concordia age ='~a%+-%b~'|'~c)
+    list1 <- list(a=rounded.age[1],b=rounded.age[2],c=rounded.age[3])
+    if (fit$mswd['combined']>1){
+        expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d)
+        list1$d <- rounded.age[4]
+    }
+    line1 <- do.call('substitute',list(eval(expr1),list1))
+    line2 <- substitute('MSWD ='~a~'|'~b~'|'~c~
+                            ', p('~chi^2*')='~d~'|'~e~'|'~f,
+                        list(a=signif(fit$mswd['concordance'],2),
+                             b=signif(fit$mswd['equivalence'],2),
+                             c=signif(fit$mswd['combined'],2),
+                             d=signif(fit$p.value['concordance'],2),
+                             e=signif(fit$p.value['equivalence'],2),
+                             f=signif(fit$p.value['combined'],2)))
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)
 }

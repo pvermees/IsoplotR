@@ -9,11 +9,11 @@
 \usage{
 central(x, ...)
 
-\method{central}{default}(x, ...)
+\method{central}{default}(x, alpha = 0.05, ...)
 
-\method{central}{UThHe}(x, ...)
+\method{central}{UThHe}(x, alpha = 0.05, ...)
 
-\method{central}{fissiontracks}(x, mineral = NA, ...)
+\method{central}{fissiontracks}(x, mineral = NA, alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe} or \code{fissiontracks},
@@ -21,6 +21,8 @@ OR a 2-column matrix with (strictly positive) values and
 uncertainties}
 
 \item{...}{optional arguments}
+
+\item{alpha}{cutoff value for confidence intervals}
 
 \item{mineral}{setting this parameter to either \code{apatite} or
 \code{zircon} changes the default efficiency factor, initial

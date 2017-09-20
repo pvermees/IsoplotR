@@ -4,7 +4,7 @@
 #' Implements the maximum likelihood algorithm of Ludwig (1998)
 #'
 #' @param x an object of class \code{UPb}
-#'
+#' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments
 #'
 # @param x a \eqn{3n}-element vector \eqn{[X Y Z]}, where \eqn{X},

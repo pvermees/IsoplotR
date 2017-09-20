@@ -18,6 +18,7 @@
 #'     legend in which the peak fitting results are to be displayed.
 #' @param log take the logs of the data before applying the mixture
 #'     model?
+#' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments (not used)
 #' @return a list with the following items: \describe{ \item{peaks}{a
 #'     vector of peak locations} \item{props}{a vector of peak
@@ -268,8 +269,8 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
     out <- NULL
     for (i in 1:ncol(fit$peaks)){
         rounded.age <- roundit(fit$peaks[1,i],fit$peaks[2:3,i],sigdig=sigdig)
-        line <- paste0('Peak ',i,': ',rounded.age[1],'\u00B1',
-                       rounded.age[2],'|',rounded.age[3])
+        line <- paste0('Peak ',i,': ',rounded.age[1],' \u00B1 ',
+                       rounded.age[2],' | ',rounded.age[3])
         if (k>1){
             rounded.prop <- roundit(fit$props[1,i],fit$props[2:3,i],sigdig=sigdig)
             line <- paste0(line,' (',100*rounded.prop[1],'%)')

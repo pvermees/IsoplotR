@@ -4,9 +4,11 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘0.17’
-* checking CRAN incoming feasibility ... Note_to_CRAN_maintainers
+* this is package ‘IsoplotR’ version ‘0.18’
+* checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
+
+Number of updates in past 6 months: 7
 * checking package namespace information ... OK
 * checking package dependencies ... NOTE
   No repository set, so cyclic dependency check skipped
@@ -76,4 +78,4 @@ These should not be in a package tarball.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 3 NOTEs
+Status: 2 WARNINGs, 4 NOTEs

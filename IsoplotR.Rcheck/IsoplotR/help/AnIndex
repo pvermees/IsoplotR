@@ -1,3 +1,4 @@
+IsoplotR-package	IsoplotR
 Abramson	IsoplotR-internal
 add.exterr	IsoplotR-internal
 age	age
@@ -230,6 +231,7 @@ isochron.ThU	isochron
 isochron.UThHe	isochron
 isochrontitle	IsoplotR-internal
 isochron_PD	IsoplotR-internal
+IsoplotR	IsoplotR
 IsoplotR-internal	IsoplotR-internal
 k1	IsoplotR-internal
 kde	kde
@@ -403,3 +405,4 @@ x2zs.fissiontracks	IsoplotR-internal
 xyz2xy	IsoplotR-internal
 york	york
 z2rxy	IsoplotR-internal
+_PACKAGE	IsoplotR

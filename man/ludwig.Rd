@@ -11,7 +11,7 @@ ludwig(x, ...)
 
 \method{ludwig}{default}(x, ...)
 
-\method{ludwig}{UPb}(x, exterr = FALSE, ...)
+\method{ludwig}{UPb}(x, exterr = FALSE, alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -19,6 +19,8 @@ ludwig(x, ...)
 \item{...}{optional arguments}
 
 \item{exterr}{propagate external sources of uncertainty (e.g., decay constant)?}
+
+\item{alpha}{cutoff value for confidence intervals}
 }
 \description{
 Implements the maximum likelihood algorithm of Ludwig (1998)

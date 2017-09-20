@@ -97,9 +97,21 @@ Type 'q()' to quit R.
  [9,] 0.2724797
 [10,] 0.3243414
 > print(age(examples$UPb,type=2))
+$mswd
+equivalence concordance    combined 
+  274.66486    10.92428   260.78378 
+
+$p.value
+ equivalence  concordance     combined 
+0.0000000000 0.0009491215 0.0000000000 
+
+$df
+equivalence concordance    combined 
+         18           1          19 
+
 $age
-     t.conc   s[t.conc] 
-249.4719549   0.1417081 
+          t        s[t]       ci[t]     disp[t] 
+249.4719549   0.1417081   0.2965984  77.3480589 
 
 $x
  Pb207U235  Pb206U238 
@@ -109,26 +121,6 @@ $cov
              Pb207U235    Pb206U238
 Pb207U235 2.233446e-08 1.609406e-09
 Pb206U238 1.609406e-09 2.270769e-10
-
-$mswd
-$mswd$equivalence
-         [,1]
-[1,] 274.6649
-
-$mswd$concordance
-         [,1]
-[1,] 10.92428
-
-
-$p.value
-$p.value$equivalence
-     [,1]
-[1,]    0
-
-$p.value$concordance
-             [,1]
-[1,] 0.0009491215
-
 
 > 
 > 
@@ -150,6 +142,8 @@ $p.value$concordance
 > 
 > data(examples)
 > agespectrum(examples$ArAr,ylim=c(0,80))
+Warning in qt(1 - alpha/2, out$df) : NaNs produced
+Warning in qt(1 - alpha/2, out$df) : NaNs produced
 > 
 > 
 > 
@@ -193,8 +187,8 @@ $p.value$concordance
 > 
 > data(examples)
 > print(central(examples$UThHe)$age)
-         U            
-6.42248810 0.07890887 
+         t       s[t]      ci[t]    disp[t] 
+6.42248810 0.07890887 0.15820276 0.29769549 
 > 
 > 
 > 
@@ -216,6 +210,7 @@ $p.value$concordance
 > 
 > data(examples) 
 > concordia(examples$UPb)
+NULL
 > 
 > 
 > 
@@ -281,8 +276,11 @@ $p.value$concordance
 > data(examples)
 > 
 > concordia(examples$UPb)
+NULL
 > 
 > agespectrum(examples$ArAr)
+Warning in qt(1 - alpha/2, out$df) : NaNs produced
+Warning in qt(1 - alpha/2, out$df) : NaNs produced
 > 
 > isochron(examples$ReOs)
 > 
@@ -298,8 +296,72 @@ NULL
 > radialplot(examples$MountTom)
 > 
 > agespectrum(examples$spectrum)
+Warning in qt(1 - alpha/2, out$df) : NaNs produced
 > 
 > weightedmean(examples$average)
+$mean
+          x        s[x]       ci[x] 
+250.1525727   0.3525444   0.7260788 
+
+$disp
+        s        ci 
+0.4250016 0.8329879 
+
+$df
+[1] 25
+
+$mswd
+[1] 1.045297
+
+$p.value
+[1] 0.4000607
+
+$valid
+ [1]  TRUE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[13]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[25]  TRUE  TRUE  TRUE  TRUE
+
+$tfact
+[1] 2.059539
+
+$plotpar
+$plotpar$mean
+$plotpar$mean$x
+[1]  0 29
+
+$plotpar$mean$y
+       x        x 
+250.1526 250.1526 
+
+
+$plotpar$rect
+$plotpar$rect$x
+[1]  0 29 29  0
+
+$plotpar$rect$y
+       x        x        x        x 
+250.8787 250.8787 249.4265 249.4265 
+
+
+$plotpar$dash1
+$plotpar$dash1$x
+[1]  0 29
+
+$plotpar$dash1$y
+       x        x 
+250.9856 250.9856 
+
+
+$plotpar$dash2
+$plotpar$dash2$x
+[1]  0 29
+
+$plotpar$dash2$y
+       x        x 
+249.3196 249.3196 
+
+
+
 > 
 > 
 > 
@@ -347,14 +409,8 @@ NULL
 > 
 > data(examples)
 > isochron(examples$ArAr)
-$a
-[1] 3.309029e-03 7.819574e-06
-
-$b
-[1] -1.507141e-02  4.949318e-05
-
-$cov.ab
-[1] -3.804838e-10
+$df
+[1] 9
 
 $mswd
 [1] 5.695801
@@ -362,14 +418,30 @@ $mswd
 $p.value
 [1] 6.230807e-08
 
+$a
+           a         s[a] 
+3.309029e-03 7.819574e-06 
+
+$b
+            b          s[b] 
+-1.507141e-02  4.949318e-05 
+
+$cov.ab
+[1] -3.804838e-10
+
 $model
 [1] 1
 
-$y0
-[1] 302.2034502   0.7141377
-
 $age
-[1] 61.6010915  0.3233058
+         t       s[t]      ci[t]    disp[t] 
+61.6010915  0.3233058  0.7313685  1.4062794 
+
+$y0
+          y        s[y]       ci[y]     disp[y] 
+302.2034502   0.7141377   1.6154916   3.8555123 
+
+$tfact
+[1] 2.262157
 
 attr(,"class")
 [1] "isochron"
@@ -488,23 +560,26 @@ NULL
 > 
 > data(examples)
 > peakfit(examples$FT1,k=2)
+$tfact
+[1] 2.073873
+
+$peaks
+              1         2
+t     103.45852 103.46036
+s[t]   13.65063  11.53875
+ci[t]  28.30967  23.92991
+
+$props
+                 1            2
+p        0.4118593    0.5881407
+s[p]  4143.5647623 4143.5647623
+ci[p] 8593.2273658 8593.2273658
+
 $L
 [1] -71.94616
 
-$peaks
-[1] 103.4585 103.4604
-
-$props
-[1] 0.4118593 0.5881407
-
-$peaks.err
-[1] 13.65063 11.53875
-
-$props.err
-[1] 4143.565 4143.565
-
 $legend
-[1] "Peak 1: 103±14 (40±410000%)" "Peak 2: 103±12 (60±410000%)"
+[1] "Peak 1: 103 ± 14 | 28 (40%)" "Peak 2: 103 ± 12 | 24 (60%)"
 
 > 
 > 
@@ -568,22 +643,19 @@ f,X,errX
 > f1 <- system.file("UPb1.csv",package="IsoplotR")
 > d1 <- read.data(f1,method="U-Pb",format=1)
 > concordia(d1)
+NULL
 > 
 > f2 <- system.file("ArAr1.csv",package="IsoplotR")
 > d2 <- read.data(f2,method="Ar-Ar",format=1)
 > agespectrum(d2)
+Warning in qt(1 - alpha/2, out$df) : NaNs produced
+Warning in qt(1 - alpha/2, out$df) : NaNs produced
 > 
 > f3 <- system.file("ReOs1.csv",package="IsoplotR")
 > d3 <- read.data(f3,method="Re-Os",format=1)
 > isochron(d2)
-$a
-[1] 3.309038e-03 7.819606e-06
-
-$b
-[1] -1.507149e-02  4.949346e-05
-
-$cov.ab
-[1] -3.804875e-10
+$df
+[1] 9
 
 $mswd
 [1] 5.696186
@@ -591,14 +663,30 @@ $mswd
 $p.value
 [1] 6.221424e-08
 
+$a
+           a         s[a] 
+3.309038e-03 7.819606e-06 
+
+$b
+            b          s[b] 
+-1.507149e-02  4.949346e-05 
+
+$cov.ab
+[1] -3.804875e-10
+
 $model
 [1] 1
 
-$y0
-[1] 302.2026275   0.7141367
-
 $age
-[1] 61.6012324  0.3233067
+         t       s[t]      ci[t]    disp[t] 
+61.6012324  0.3233067  0.7313705  1.4063256 
+
+$y0
+          y        s[y]       ci[y]     disp[y] 
+302.2026275   0.7141367   1.6154894   3.8556375 
+
+$tfact
+[1] 2.262157
 
 attr(,"class")
 [1] "isochron"
@@ -650,8 +738,7 @@ NULL
 [1] 350  10
 > FT <- set.zeta(examples$FT1,tst=c(250,5))
 > print(FT$zeta)
-     age err
-[1,] 855  36
+[1] 855  36
 > 
 > 
 > 
@@ -712,8 +799,130 @@ NULL
 > ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 > errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
 > weightedmean(cbind(ages,errs))
+$mean
+          x        s[x]       ci[x] 
+251.2663523   0.1353684   0.3200954 
+
+$disp
+        s        ci 
+0.2200115 0.4312147 
+
+$df
+[1] 7
+
+$mswd
+[1] 1.478011
+
+$p.value
+[1] 0.1592269
+
+$valid
+ [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE
+
+$tfact
+[1] 2.364624
+
+$plotpar
+$plotpar$mean
+$plotpar$mean$x
+[1]  0 11
+
+$plotpar$mean$y
+       x        x 
+251.2664 251.2664 
+
+
+$plotpar$rect
+$plotpar$rect$x
+[1]  0 11 11  0
+
+$plotpar$rect$y
+       x        x        x        x 
+251.5864 251.5864 250.9463 250.9463 
+
+
+$plotpar$dash1
+$plotpar$dash1$x
+[1]  0 11
+
+$plotpar$dash1$y
+       x        x 
+251.6976 251.6976 
+
+
+$plotpar$dash2
+$plotpar$dash2$x
+[1]  0 11
+
+$plotpar$dash2$y
+       x        x 
+250.8351 250.8351 
+
+
+
 > data(examples)
 > weightedmean(examples$ArAr)
+$mean
+         x       s[x]      ci[x] 
+61.9510878  0.2813317  0.6652438 
+
+$disp
+        s        ci 
+0.2920792 0.5724647 
+
+$df
+[1] 7
+
+$mswd
+[1] 6.933519
+
+$p.value
+[1] 3.580106e-09
+
+$valid
+ [1] FALSE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+
+$tfact
+[1] 2.364624
+
+$plotpar
+$plotpar$mean
+$plotpar$mean$x
+[1]  0 12
+
+$plotpar$mean$y
+       x        x 
+61.95109 61.95109 
+
+
+$plotpar$rect
+$plotpar$rect$x
+[1]  0 12 12  0
+
+$plotpar$rect$y
+       x        x        x        x 
+62.21326 62.21326 61.68891 61.68891 
+
+
+$plotpar$dash1
+$plotpar$dash1$x
+[1]  0 12
+
+$plotpar$dash1$y
+       x        x 
+62.52355 62.52355 
+
+
+$plotpar$dash2
+$plotpar$dash2$x
+[1]  0 12
+
+$plotpar$dash2$y
+       x        x 
+61.37862 61.37862 
+
+
+
 > 
 > 
 > 
@@ -761,7 +970,7 @@ NULL
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  9.6 0.036 9.666 0 0 
+Time elapsed:  8.548 0.052 8.611 0 0 
 > grDevices::dev.off()
 pdf 
   2 

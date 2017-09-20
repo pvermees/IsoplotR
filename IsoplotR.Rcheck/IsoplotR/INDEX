@@ -1,3 +1,4 @@
+IsoplotR                library(IsoplotR)
 age                     Calculate isotopic ages
 agespectrum             Plot a (40Ar/39Ar) release spectrum
 cad                     Plot continuous data as cumulative age

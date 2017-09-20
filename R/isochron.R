@@ -61,8 +61,11 @@
 #'
 #' }
 #'
-#' @param ... optional arguments to be passed on to the
-#' generic plot function if \code{model=2}
+#' @param ... optional arguments to be passed on to the generic plot
+#'     function if \code{model=2}
+#' @references Nicolaysen, L.O., 1961. Graphic interpretation of
+#'     discordant age measurements on metamorphic rocks. Annals of the
+#'     New York Academy of Sciences, 91(1), pp.198-206.
 #' @rdname isochron
 #' @export
 isochron <- function(x,...){ UseMethod("isochron",x) }
@@ -483,7 +486,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,
     if (model==1 && out$mswd>1){
         out$age['disp[t]'] <-
             out$tfact*get.ThU.age(Th230U238[1],
-                                  sqrt(outt$mswd)*Th230U238[2],
+                                  sqrt(out$mswd)*Th230U238[2],
                                   exterr=exterr)['s[t]']
         out$y0['disp[y]'] <-
             out$tfact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
@@ -606,7 +609,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
             list2$d <- rounded.intercept[4]
         }
         if (identical(type,'Ar-Ar'))
-            expr2 <- quote('('^40*'Ar/'^39*'Ar)'[o]~'=')
+            expr2 <- quote('('^40*'Ar/'^36*'Ar)'[o]~'=')
         else if (identical(type,'Pb-Pb'))
             expr2 <- quote('('^207*'Pb/'^204*'Pb)'[o]~'=')
         else if (identical(type,'Th-U-3D'))

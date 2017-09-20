@@ -4,11 +4,13 @@
 \alias{titterington}
 \title{Linear regression of X,Y,Z-variables with correlated errors}
 \usage{
-titterington(x)
+titterington(x, alpha = 0.05)
 }
 \arguments{
 \item{x}{a \code{[9 x n]} matrix with the following columns:
 \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.}
+
+\item{alpha}{cutoff value for confidence intervals}
 }
 \value{
 a four-element list of vectors containing:

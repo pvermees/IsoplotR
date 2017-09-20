@@ -56,7 +56,7 @@ weightedmean(x, ...)
 
 \method{weightedmean}{UThHe}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ...)
+  sigdig = 2, alpha = 0.05, ...)
 
 \method{weightedmean}{fissiontracks}(x, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
