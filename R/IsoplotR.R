@@ -3,8 +3,8 @@
 #' \code{IsoplotR} is a toolkit for isotope geochronology. Plots U-Pb
 #' data on Wetherill and Tera-Wasserburg concordia
 #' diagrams. Calculates concordia and discordia ages. Performs linear
-#' regression of measurements with correlated errors using 'York',
-#' 'Titterington' and 'Ludwig' approaches. Generates Kernel Density
+#' regression of measurements with correlated errors using `York',
+#' `Titterington' and `Ludwig' approaches. Generates Kernel Density
 #' Estimates (KDEs) and Cumulative Age Distributions (CADs). Produces
 #' Multidimensional Scaling (MDS) configurations and Shepard plots of
 #' multi-sample detrital datasets using the Kolmogorov-Smirnov

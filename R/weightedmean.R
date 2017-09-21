@@ -75,7 +75,8 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     out$disp <- rep(NA,2)
     names(out$mean) <- c('x','s[x]','ci[x]')
     names(out$disp) <- c('s','ci')
-    out$tfact <- qt(1-alpha/2,out$df)
+    if (out$df>0) out$tfact <- qt(1-alpha/2,out$df)
+    else out$tfact <- NA
     out$mean[c('x','s[x]')] <- fit$mean[1:2]
     out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
     out$disp['s'] <- fit$disp
