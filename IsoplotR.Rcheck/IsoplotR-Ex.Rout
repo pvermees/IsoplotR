@@ -1,6 +1,6 @@
 
-R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
-Copyright (C) 2015 The R Foundation for Statistical Computing
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -72,7 +72,7 @@ Type 'q()' to quit R.
  [7,] 0.2791451
  [8,] 0.3865272
  [9,] 0.2724797
-[10,] 0.3243414
+[10,] 0.3243413
 > print(age(examples$UPb,type=1))
           t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
  [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.555230 251.9814
@@ -95,7 +95,7 @@ Type 'q()' to quit R.
  [7,] 0.2791451
  [8,] 0.3865272
  [9,] 0.2724797
-[10,] 0.3243414
+[10,] 0.3243413
 > print(age(examples$UPb,type=2))
 $mswd
 equivalence concordance    combined 
@@ -103,7 +103,7 @@ equivalence concordance    combined
 
 $p.value
  equivalence  concordance     combined 
-0.0000000000 0.0009491215 0.0000000000 
+0.0000000000 0.0009491221 0.0000000000 
 
 $df
 equivalence concordance    combined 
@@ -111,7 +111,7 @@ equivalence concordance    combined
 
 $age
           t        s[t]       ci[t]     disp[t] 
-249.4719549   0.1417081   0.2965984  77.3480589 
+249.4719540   0.1417081   0.2965984  77.3480584 
 
 $x
  Pb207U235  Pb206U238 
@@ -142,8 +142,70 @@ Pb206U238 1.609406e-09 2.270769e-10
 > 
 > data(examples)
 > agespectrum(examples$ArAr,ylim=c(0,80))
-Warning in qt(1 - alpha/2, out$df) : NaNs produced
-Warning in qt(1 - alpha/2, out$df) : NaNs produced
+$mean
+        x      s[x]     ci[x] 
+61.749746  0.279733  1.203594 
+
+$disp
+        s        ci 
+0.1903444 0.3730681 
+
+$df
+[1] 2
+
+$mswd
+[1] 6.111891
+
+$p.value
+[1] 0.0003750108
+
+$tfact
+[1] 4.302653
+
+$plotpar
+$plotpar$mean
+$plotpar$mean$x
+[1] 0 5
+
+$plotpar$mean$y
+       x        x 
+61.74975 61.74975 
+
+
+$plotpar$rect
+$plotpar$rect$x
+[1] 0 5 5 0
+
+$plotpar$rect$y
+       x        x        x        x 
+62.21768 62.21768 61.28181 61.28181 
+
+
+$plotpar$dash1
+$plotpar$dash1$x
+[1] 0 5
+
+$plotpar$dash1$y
+       x        x 
+62.12281 62.12281 
+
+
+$plotpar$dash2
+$plotpar$dash2$x
+[1] 0 5
+
+$plotpar$dash2$y
+       x        x 
+61.37668 61.37668 
+
+
+
+$i
+[1] 6 7 8 9
+
+$fract
+[1] 0.5572799
+
 > 
 > 
 > 
@@ -279,8 +341,70 @@ NULL
 NULL
 > 
 > agespectrum(examples$ArAr)
-Warning in qt(1 - alpha/2, out$df) : NaNs produced
-Warning in qt(1 - alpha/2, out$df) : NaNs produced
+$mean
+        x      s[x]     ci[x] 
+61.749746  0.279733  1.203594 
+
+$disp
+        s        ci 
+0.1903444 0.3730681 
+
+$df
+[1] 2
+
+$mswd
+[1] 6.111891
+
+$p.value
+[1] 0.0003750108
+
+$tfact
+[1] 4.302653
+
+$plotpar
+$plotpar$mean
+$plotpar$mean$x
+[1] 0 5
+
+$plotpar$mean$y
+       x        x 
+61.74975 61.74975 
+
+
+$plotpar$rect
+$plotpar$rect$x
+[1] 0 5 5 0
+
+$plotpar$rect$y
+       x        x        x        x 
+62.21768 62.21768 61.28181 61.28181 
+
+
+$plotpar$dash1
+$plotpar$dash1$x
+[1] 0 5
+
+$plotpar$dash1$y
+       x        x 
+62.12281 62.12281 
+
+
+$plotpar$dash2
+$plotpar$dash2$x
+[1] 0 5
+
+$plotpar$dash2$y
+       x        x 
+61.37668 61.37668 
+
+
+
+$i
+[1] 6 7 8 9
+
+$fract
+[1] 0.5572799
+
 > 
 > isochron(examples$ReOs)
 > 
@@ -296,7 +420,70 @@ NULL
 > radialplot(examples$MountTom)
 > 
 > agespectrum(examples$spectrum)
-Warning in qt(1 - alpha/2, out$df) : NaNs produced
+$mean
+         x       s[x]      ci[x] 
+4.78521432 0.00941314 0.02097378 
+
+$disp
+           s           ci 
+0.0004372914 0.0008570755 
+
+$df
+[1] 10
+
+$mswd
+[1] 0.6216236
+
+$p.value
+[1] 0.8120578
+
+$tfact
+[1] 2.228139
+
+$plotpar
+$plotpar$mean
+$plotpar$mean$x
+[1]  0 13
+
+$plotpar$mean$y
+       x        x 
+4.785214 4.785214 
+
+
+$plotpar$rect
+$plotpar$rect$x
+[1]  0 13 13  0
+
+$plotpar$rect$y
+       x        x        x        x 
+4.806188 4.806188 4.764241 4.764241 
+
+
+$plotpar$dash1
+$plotpar$dash1$x
+[1]  0 13
+
+$plotpar$dash1$y
+       x        x 
+4.786071 4.786071 
+
+
+$plotpar$dash2
+$plotpar$dash2$x
+[1]  0 13
+
+$plotpar$dash2$y
+       x        x 
+4.784357 4.784357 
+
+
+
+$i
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12
+
+$fract
+[1] 0.912
+
 > 
 > weightedmean(examples$average)
 $mean
@@ -648,8 +835,70 @@ NULL
 > f2 <- system.file("ArAr1.csv",package="IsoplotR")
 > d2 <- read.data(f2,method="Ar-Ar",format=1)
 > agespectrum(d2)
-Warning in qt(1 - alpha/2, out$df) : NaNs produced
-Warning in qt(1 - alpha/2, out$df) : NaNs produced
+$mean
+         x       s[x]      ci[x] 
+61.7498989  0.2797572  1.2036980 
+
+$disp
+        s        ci 
+0.1904821 0.3733380 
+
+$df
+[1] 2
+
+$mswd
+[1] 6.120655
+
+$p.value
+[1] 0.0003703533
+
+$tfact
+[1] 4.302653
+
+$plotpar
+$plotpar$mean
+$plotpar$mean$x
+[1] 0 5
+
+$plotpar$mean$y
+      x       x 
+61.7499 61.7499 
+
+
+$plotpar$rect
+$plotpar$rect$x
+[1] 0 5 5 0
+
+$plotpar$rect$y
+       x        x        x        x 
+62.21809 62.21809 61.28171 61.28171 
+
+
+$plotpar$dash1
+$plotpar$dash1$x
+[1] 0 5
+
+$plotpar$dash1$y
+       x        x 
+62.12324 62.12324 
+
+
+$plotpar$dash2
+$plotpar$dash2$x
+[1] 0 5
+
+$plotpar$dash2$y
+       x        x 
+61.37656 61.37656 
+
+
+
+$i
+[1] 6 7 8 9
+
+$fract
+[1] 0.5572799
+
 > 
 > f3 <- system.file("ReOs1.csv",package="IsoplotR")
 > d3 <- read.data(f3,method="Re-Os",format=1)
@@ -970,7 +1219,7 @@ $plotpar$dash2$y
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.852 0.044 8.909 0 0 
+Time elapsed:  10.8 5.604 10.019 0 0 
 > grDevices::dev.off()
 pdf 
   2 

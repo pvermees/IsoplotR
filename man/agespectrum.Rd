@@ -35,7 +35,8 @@ an object of class \code{ArAr}}
 be calculated. If \code{plateau=TRUE}, the function will
 compute the weighted mean of the largest succession of steps
 that yield values passing the Chi-square test for age
-homogeneity.}
+homogeneity.  If \code{TRUE}, returns a list with plateau
+parameters.}
 
 \item{plateau.col}{the fill colour of the rectangles used to mark
 the steps belonging to the age plateau.}
@@ -51,8 +52,7 @@ if \code{plateau=TRUE}).}
 
 \item{lwd}{line width}
 
-\item{title}{add a title to the plot? If \code{FALSE}, returns a
-list with plateau parameters.}
+\item{title}{add a title to the plot?}
 
 \item{xlab}{x-axis label}
 
@@ -68,20 +68,50 @@ an isochron fit. Setting \code{i2i} to \code{FALSE} uses the
 default values stored in \code{settings('iratio',...)}}
 }
 \value{
-if \code{title=FALSE}, returns a list with the following
+if \code{plateau=TRUE}, returns a list with the following
     items:
 
 \describe{
-\item{mean}{a 2-element vector with the plateau mean and standard error}
+\item{mean}{a 3-element vector with:
+
+\code{x}: the plateau mean
+
+\code{s[x]}: the estimated standard deviation of \code{x}
+
+\code{ci[x]}: the 100(1-\eqn{\alpha})\% confidence interval of
+\code{t} for the appropriate degrees of freedom
+}
+
+\item{disp}{a 2-element vector with:
+
+\code{s}: the standard deviation of the overdispersion
+
+\code{ci}: the 100(1-\eqn{\alpha})\% confidence interval of
+the overdispersion for the appropriate degrees of freedom
+}
+
+\item{df}{the degrees of freedom for the weighted mean plateau fit}
 
 \item{mswd}{the mean square of the weighted deviates of the plateau}
 
-\item{p.value}{the p-value of a Chi-square test with \eqn{n-1}
+\item{p.value}{the p-value of a Chi-square test with \eqn{df=n-2}
 degrees of freedom, where \eqn{n} is the number of steps in the
-plateau.}
+plateau and 2 degrees of freedom have been removed to estimate the
+mean and the dispersion.}
 
 \item{fract}{the fraction of \eqn{^{39}}Ar contained in the
-plateau} }
+plateau}
+
+\item{tfact}{the t-factor for \code{df} degrees of freedom
+evaluated at \eqn{100(1-\alpha/2)}\% confidence}
+
+\item{plotpar}{plot parameters for the weighted mean, which are not
+used in the age spectrum}
+
+\item{i}{indices of the steps that are retained for the plateau age
+calculation}
+
+}
 }
 \description{
 Produces a plot of boxes whose widths correspond to the cumulative

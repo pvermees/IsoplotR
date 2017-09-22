@@ -434,11 +434,11 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,...){
         t.76 <- fit$minimum
     }
     J <- matrix(0,1,4)
-    J[1,1] <- -(-1)/dD76dt(t.76,l5,l8,R)                      # d76/dt
+    J[1,1] <- -(-1)/dD76dt(t.76,l5,l8,R)                      # dt/d76
     if (exterr) {
-        J[1,2] <- -dD76dl5(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R) # d76/dl5
-        J[1,3] <- -dD76dl8(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R) # d76/dl8
-        J[1,4] <- -dD76dR(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R)  # d76/dR
+        J[1,2] <- -dD76dl5(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R) # dt/dl5
+        J[1,3] <- -dD76dl8(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R) # dt/dl8
+        J[1,4] <- -dD76dR(t.76,l5,l8,R)/dD76dt(t.76,l5,l8,R)  # dt/dR
     }
     E <- matrix(0,4,4)
     E[1,1] <- sx^2
@@ -517,7 +517,8 @@ dD76dl5 <- function(t.76,l5,l8,R){
 
 dD76dl8 <- function(t.76,l5,l8,R){
     el8t1 <- exp(l8*t.76)-1
-    t.76*exp(l5*t.76)/(R*el8t1)
+    el5t1 <- exp(l5*t.76)-1
+    -t.76*exp(l8*t.76)*el5t1/(R*el8t1^2)
 }
 
 dD76dR <- function(t.76,l5,l8,R){

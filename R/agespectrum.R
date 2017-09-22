@@ -35,20 +35,50 @@
 #' @param xlab x-axis label
 #' @param ylab y-axis label
 #' @param ... optional parameters to the generic \code{plot} function
-#' @return if \code{title=FALSE}, returns a list with the following
+#' @return if \code{plateau=TRUE}, returns a list with the following
 #'     items:
 #'
 #' \describe{
-#' \item{mean}{a 2-element vector with the plateau mean and standard error}
+#' \item{mean}{a 3-element vector with:
+#'
+#' \code{x}: the plateau mean
+#'
+#' \code{s[x]}: the estimated standard deviation of \code{x}
+#'
+#' \code{ci[x]}: the 100(1-\eqn{\alpha})\% confidence interval of
+#' \code{t} for the appropriate degrees of freedom
+#' }
+#'
+#' \item{disp}{a 2-element vector with:
+#'
+#' \code{s}: the standard deviation of the overdispersion
+#'
+#' \code{ci}: the 100(1-\eqn{\alpha})\% confidence interval of
+#' the overdispersion for the appropriate degrees of freedom
+#' }
+#'
+#' \item{df}{the degrees of freedom for the weighted mean plateau fit}
 #'
 #' \item{mswd}{the mean square of the weighted deviates of the plateau}
 #'
-#' \item{p.value}{the p-value of a Chi-square test with \eqn{n-1}
+#' \item{p.value}{the p-value of a Chi-square test with \eqn{df=n-2}
 #' degrees of freedom, where \eqn{n} is the number of steps in the
-#' plateau.}
+#' plateau and 2 degrees of freedom have been removed to estimate the
+#' mean and the dispersion.}
 #'
 #' \item{fract}{the fraction of \eqn{^{39}}Ar contained in the
-#' plateau} }
+#' plateau}
+#'
+#' \item{tfact}{the t-factor for \code{df} degrees of freedom
+#' evaluated at \eqn{100(1-\alpha/2)}\% confidence}
+#'
+#' \item{plotpar}{plot parameters for the weighted mean, which are not
+#' used in the age spectrum}
+#'
+#' \item{i}{indices of the steps that are retained for the plateau age
+#' calculation}
+#'
+#' }
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
@@ -61,7 +91,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 sigdig=2,line.col='red',
                                 lwd=2,title=TRUE,
                                 xlab='cumulative fraction',
-                                ynlab='age [Ma]',...){
+                                ylab='age [Ma]',...){
     ns <- nrow(x)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
@@ -72,6 +102,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     minY <- min(Y-fact*sY,na.rm=TRUE)
     graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
     plat <- plateau(x,alpha=alpha)
+    plat$valid <- NULL
     if (plateau) {
         colour <- rep(non.plateau.col,ns)
         colour[plat$i] <- plateau.col
@@ -86,8 +117,8 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
         if (i<ns) graphics::lines(rep(X[i+1],2),
                                   c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
     }
-    if (plateau & title){
-        graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
+    if (plateau){
+        if (title) graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
         return(plat)
     }
 }
@@ -115,20 +146,14 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                                 plateau=plateau,sigdig=sigdig,
                                 line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
-    out <- plat
-    # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
-    R <- get.ArAr.ratio(plat$mean['x'],plat$mean['s[x]'],x$J[1],0,exterr=FALSE)
-    # recalculate the weighted mean age, this time
-    # taking into account decay and J uncertainties
-    out$mean[1:2] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
-    out$mean[3] <- plat$tfact*out$mean[2]
-    if (out$mswd>1){
-        R <- get.ArAr.ratio(plat$mean['x'],
-                            sqrt(plat$mswd)*plat$mean['s[x]'],
-                            x$J[1],0,exterr=FALSE)
-        out$mean[4] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)[2]
-    }
     if (plateau){
+        out <- plat
+        # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
+        R <- get.ArAr.ratio(plat$mean['x'],plat$mean['s[x]'],x$J[1],0,exterr=FALSE)
+        # recalculate the weighted mean age, this time
+        # taking into account decay and J uncertainties
+        out$mean[1:2] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
+        out$mean[3] <- plat$tfact*out$mean[2]
         graphics::title(plateau.title(out,sigdig=sigdig,Ar=TRUE))
         return(out)
     }
