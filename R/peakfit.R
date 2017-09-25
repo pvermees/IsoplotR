@@ -20,12 +20,34 @@
 #'     model?
 #' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments (not used)
-#' @return a list with the following items: \describe{ \item{peaks}{a
-#'     vector of peak locations} \item{props}{a vector of peak
-#'     proportions} \item{peaks.err}{the standard errors of the peak
-#'     locations} \item{props.err}{the standard errors of the peak
-#'     proportions} \item{legend}{a vector of text expressions to be
-#'     used in a figure legend} }
+#' @return returns a list with the following items:
+#'
+#' \describe{
+#'
+#' \item{peaks}{a \code{3 x k} matrix with the following rows:
+#'
+#' \code{t}: the ages of the \code{k} peaks
+#'
+#' \code{s[t]}: the estimated uncertainties of \code{t}
+#'
+#' \code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{t}}
+#'
+#' \item{props}{a \code{2 x k} matrix with the following rows:
+#'
+#' \code{p}: the proportions of the \code{k} peaks
+#'
+#' \code{s[p]}: the estimated uncertainties of \code{p}}
+#'
+#' \item{L}{the log-likelihood of the fit}
+#'
+#' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the
+#' t-distribution with \eqn{(n-2k+1)} degrees of freedom}
+#'
+#' \item{legend}{a vector of text expressions to be used in a figure
+#'     legend}
+#'
+#' }
 #' @references Galbraith, R.F. and Laslett, G.M., 1993. Statistical
 #'     models for mixed fission track ages. Nuclear tracks and
 #'     radiation measurements, 21(4), pp.459-470.
@@ -392,12 +414,11 @@ format.peaks <- function(peaks,peaks.err,props,props.err,df,alpha=0.05){
     out$peaks['t',] <- peaks
     out$peaks['s[t]',] <- peaks.err
     out$peaks['ci[t]',] <- out$tfact*out$peaks['s[t]',]
-    out$props <- matrix(0,3,k)
+    out$props <- matrix(0,2,k)
     colnames(out$props) <- 1:k
-    rownames(out$props) <- c('p','s[p]','ci[p]')
+    rownames(out$props) <- c('p','s[p]')
     out$props['p',] <- props
     out$props['s[p]',] <- props.err
-    out$props['ci[p]',] <- out$tfact*out$props['s[p]',]
     out
 }
 

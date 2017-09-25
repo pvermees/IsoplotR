@@ -16,7 +16,8 @@
 #'
 #' @param x an object of class \code{UPb}
 #' @param tlim age limits of the concordia line
-#' @param alpha confidence cutoff for the error ellipses
+#' @param alpha probability cutoff for the error ellipses and
+#'     confidence intervals
 #' @param wetherill logical flag (\code{FALSE} for Tera-Wasserburg)
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)

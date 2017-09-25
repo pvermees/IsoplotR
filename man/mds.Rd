@@ -49,15 +49,14 @@ coordinates, respectively.}
 \item{ylab}{a string with the label of the y axis}
 }
 \value{
-if \code{plot=FALSE}, returns an object of class
-    \code{MDS}, i.e. a list containing the following items:
-    \describe{ \item{points}{a two column vector of the fitted
-    configuration} \item{classical}{a logical flag indicating
-    whether the MDS configuration was obtained by classical
-    (\code{TRUE}) or nonmetric (\code{FALSE}) MDS} \item{diss}{the
-    dissimilarity matrix used for the MDS analysis}
-    \item{stress}{(only if \code{classical=TRUE}) the final stress
-    achieved (in percent)} }
+returns an object of class \code{MDS}, i.e. a list
+    containing the following items: \describe{ \item{points}{a two
+    column vector of the fitted configuration} \item{classical}{a
+    logical flag indicating whether the MDS configuration was
+    obtained by classical (\code{TRUE}) or nonmetric (\code{FALSE})
+    MDS} \item{diss}{the dissimilarity matrix used for the MDS
+    analysis} \item{stress}{(only if \code{classical=TRUE}) the
+    final stress achieved (in percent)} }
 }
 \description{
 Performs classical or nonmetric Multidimensional Scaling analysis

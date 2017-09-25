@@ -107,12 +107,34 @@ method). When applied to data of class \code{ThU}, setting
 \code{i2i} to \code{TRUE} applies a detrital Th-correction.}
 }
 \value{
-a list with the following items: \describe{ \item{peaks}{a
-    vector of peak locations} \item{props}{a vector of peak
-    proportions} \item{peaks.err}{the standard errors of the peak
-    locations} \item{props.err}{the standard errors of the peak
-    proportions} \item{legend}{a vector of text expressions to be
-    used in a figure legend} }
+returns a list with the following items:
+
+\describe{
+
+\item{peaks}{a \code{3 x k} matrix with the following rows:
+
+\code{t}: the ages of the \code{k} peaks
+
+\code{s[t]}: the estimated uncertainties of \code{t}
+
+\code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{t}}
+
+\item{props}{a \code{2 x k} matrix with the following rows:
+
+\code{p}: the proportions of the \code{k} peaks
+
+\code{s[p]}: the estimated uncertainties of \code{p}}
+
+\item{L}{the log-likelihood of the fit}
+
+\item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the
+t-distribution with \eqn{(n-2k+1)} degrees of freedom}
+
+\item{legend}{a vector of text expressions to be used in a figure
+    legend}
+
+}
 }
 \description{
 Implements the discrete mixture modelling algorithms of Galbraith

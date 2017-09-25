@@ -124,8 +124,8 @@ uncertainties.}  }}
 \value{
 an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
     \code{UThHe}, \code{ReOs}, \code{SmNd}, \code{RbSr},
-    \code{LuHf}, \code{detritals}, \code{fissiontracks} or
-    \code{other}
+    \code{LuHf}, \code{detritals}, \code{fissiontracks}, \code{ThU}
+    or \code{other}
 }
 \description{
 Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s

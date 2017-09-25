@@ -14,7 +14,8 @@ concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
 
 \item{tlim}{age limits of the concordia line}
 
-\item{alpha}{confidence cutoff for the error ellipses}
+\item{alpha}{probability cutoff for the error ellipses and
+confidence intervals}
 
 \item{wetherill}{logical flag (\code{FALSE} for Tera-Wasserburg)}
 

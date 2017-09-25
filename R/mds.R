@@ -21,15 +21,14 @@
 #' @param xlab a string with the label of the x axis
 #' @param ylab a string with the label of the y axis
 #' @param ... optional arguments to the generic \code{plot} function
-#' @return if \code{plot=FALSE}, returns an object of class
-#'     \code{MDS}, i.e. a list containing the following items:
-#'     \describe{ \item{points}{a two column vector of the fitted
-#'     configuration} \item{classical}{a logical flag indicating
-#'     whether the MDS configuration was obtained by classical
-#'     (\code{TRUE}) or nonmetric (\code{FALSE}) MDS} \item{diss}{the
-#'     dissimilarity matrix used for the MDS analysis}
-#'     \item{stress}{(only if \code{classical=TRUE}) the final stress
-#'     achieved (in percent)} }
+#' @return returns an object of class \code{MDS}, i.e. a list
+#'     containing the following items: \describe{ \item{points}{a two
+#'     column vector of the fitted configuration} \item{classical}{a
+#'     logical flag indicating whether the MDS configuration was
+#'     obtained by classical (\code{TRUE}) or nonmetric (\code{FALSE})
+#'     MDS} \item{diss}{the dissimilarity matrix used for the MDS
+#'     analysis} \item{stress}{(only if \code{classical=TRUE}) the
+#'     final stress achieved (in percent)} }
 #' @references Vermeesch, P., 2013. Multi-sample comparison of
 #'     detrital age distributions. Chemical Geology, 341, pp.140-146.
 #' @examples
@@ -54,7 +53,7 @@ mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
     if (plot) plot.MDS(out,nnlines=nnlines,pos=pos,
                        shepard=shepard,col=col,bg=bg,
                        xlab=xlab,ylab=ylab,...)
-    else return(out)
+    out
 }
 #' @rdname mds
 #' @export

@@ -29,7 +29,8 @@ an object of class \code{ArAr}}
 
 \item{...}{optional parameters to the generic \code{plot} function}
 
-\item{alpha}{the confidence limits of the error bars/boxes.}
+\item{alpha}{the confidence limits of the error bars/boxes and
+confidence intervals.}
 
 \item{plateau}{logical flag indicating whether a plateau age should
 be calculated. If \code{plateau=TRUE}, the function will

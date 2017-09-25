@@ -11,7 +11,8 @@
 #'     white ellipse?
 #' @param show.numbers show the grain numbers inside the error
 #'     ellipses?
-#' @param alpha confidence cutoff for the error ellipses
+#' @param alpha probability cutoff for the error ellipses and
+#'     confidence intervals
 #' @param contour.col two-element vector with the fill colours to be
 #'     assigned to the minimum and maximum age contour
 #' @param levels a vector with additional values to be displayed as
@@ -31,9 +32,9 @@
 #'     ternary diagram if \code{fact=NA}, these will be determined
 #'     automatically
 #' @param ... optional arguments to the generic \code{plot} function
-#' @references
-#' Vermeesch, P., 2010. HelioPlot, and the treatment of overdispersed
-#' (U-Th-Sm)/He data. Chemical Geology, 271(3), pp.108-111.
+#' @references Vermeesch, P., 2010. HelioPlot, and the treatment of
+#'     overdispersed (U-Th-Sm)/He data. Chemical Geology, 271(3),
+#'     pp.108-111.
 #' @examples
 #' data(examples)
 #' helioplot(examples$UThHe)

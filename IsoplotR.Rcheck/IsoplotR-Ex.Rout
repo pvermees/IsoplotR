@@ -1,6 +1,6 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -52,16 +52,16 @@ Type 'q()' to quit R.
 > data(examples)
 > print(age(examples$UPb))
           t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
- [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.555230 251.9814
- [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4016 7.404241 251.6013
- [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.021362 251.5659
- [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.427487 251.3790
- [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.243669 251.2421
- [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.625510 251.2322
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.241270 250.8575
- [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.622336 250.8894
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.3738
-[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.2815
+ [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.838277 251.9814
+ [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4016 7.506655 251.6013
+ [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.206896 251.5659
+ [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.596692 251.3790
+ [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.470841 251.2421
+ [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.830204 251.2322
+ [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.384759 250.8575
+ [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.827096 250.8894
+ [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.470364 251.3738
+[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.837485 229.2815
       s[t.conc]
  [1,] 0.2693551
  [2,] 0.2799966
@@ -72,19 +72,19 @@ Type 'q()' to quit R.
  [7,] 0.2791451
  [8,] 0.3865272
  [9,] 0.2724797
-[10,] 0.3243413
+[10,] 0.3243414
 > print(age(examples$UPb,type=1))
           t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
- [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.555230 251.9814
- [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4016 7.404241 251.6013
- [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.021362 251.5659
- [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.427487 251.3790
- [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.243669 251.2421
- [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.625510 251.2322
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.241270 250.8575
- [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.622336 250.8894
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.243182 251.3738
-[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.554475 229.2815
+ [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.838277 251.9814
+ [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4016 7.506655 251.6013
+ [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.206896 251.5659
+ [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.596692 251.3790
+ [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.470841 251.2421
+ [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.830204 251.2322
+ [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.384759 250.8575
+ [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.827096 250.8894
+ [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.470364 251.3738
+[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.837485 229.2815
       s[t.conc]
  [1,] 0.2693551
  [2,] 0.2799966
@@ -95,7 +95,7 @@ Type 'q()' to quit R.
  [7,] 0.2791451
  [8,] 0.3865272
  [9,] 0.2724797
-[10,] 0.3243413
+[10,] 0.3243414
 > print(age(examples$UPb,type=2))
 $mswd
 equivalence concordance    combined 
@@ -103,7 +103,7 @@ equivalence concordance    combined
 
 $p.value
  equivalence  concordance     combined 
-0.0000000000 0.0009491221 0.0000000000 
+0.0000000000 0.0009491215 0.0000000000 
 
 $df
 equivalence concordance    combined 
@@ -111,7 +111,7 @@ equivalence concordance    combined
 
 $age
           t        s[t]       ci[t]     disp[t] 
-249.4719540   0.1417081   0.2965984  77.3480584 
+249.4719549   0.1417081   0.2965984  77.3480589 
 
 $x
  Pb207U235  Pb206U238 
@@ -407,6 +407,42 @@ $fract
 
 > 
 > isochron(examples$ReOs)
+$df
+[1] 6
+
+$mswd
+[1] 0.3618688
+
+$p.value
+[1] 0.9032978
+
+$a
+          a        s[a] 
+0.527972178 0.008733409 
+
+$b
+           b         s[b] 
+0.0025591845 0.0000156155 
+
+$cov.ab
+[1] -1.267093e-07
+
+$model
+[1] 1
+
+$age
+          t        s[t]       ci[t]     disp[t] 
+153.1496996   0.9963071   2.4378757   1.6171825 
+
+$y0
+          y        s[y]       ci[y]     disp[y] 
+0.527972178 0.008733409 0.021369882 0.012855166 
+
+$tfact
+[1] 2.446912
+
+attr(,"class")
+[1] "isochron"
 > 
 > radialplot(examples$FT1)
 > 
@@ -709,7 +745,83 @@ iter  25 value 7.640889
 iter  25 value 7.640383
 final  value 7.640383 
 converged
-NULL
+$points
+           [,1]        [,2]
+N1  -0.28573404 -0.13037179
+N2  -0.17143499  0.03128168
+N3   0.17950369 -0.01635334
+N4   0.30680286 -0.01803281
+N5   0.21864596 -0.09725819
+N6   0.20643114 -0.05059452
+N7   0.16961330  0.09432651
+N8  -0.01972579 -0.02512879
+N9   0.15307422  0.02960760
+N10  0.14735247 -0.04644282
+N11 -0.13381086 -0.04474698
+N12 -0.13439235  0.02935787
+N13  0.01491494  0.15440681
+N14 -0.14420492  0.16950713
+T8  -0.31679396  0.01529288
+T13 -0.19024165 -0.09485124
+
+$stress
+[1] 7.640383
+
+$classical
+[1] FALSE
+
+$diss
+            N1         N2         N3         N4         N5         N6
+N2  0.16788908                                                       
+N3  0.35104956 0.26133929                                            
+N4  0.42971624 0.34586886 0.15028777                                 
+N5  0.41014381 0.33042373 0.11379464 0.16346667                      
+N6  0.38848366 0.29296804 0.06024590 0.10757143 0.10503099           
+N7  0.35541637 0.25439878 0.12022654 0.17479586 0.18535649 0.15194175
+N8  0.22482696 0.14449011 0.22174825 0.23461538 0.21480000 0.18588235
+N9  0.34064331 0.26033003 0.10835165 0.15302034 0.12117371 0.12774510
+N10 0.33059313 0.25666164 0.08083402 0.16283945 0.08716855 0.06882353
+N11 0.17571970 0.12996997 0.26414894 0.33538462 0.29259843 0.25890625
+N12 0.19087551 0.10291667 0.24689655 0.32034014 0.30117925 0.27872727
+N13 0.34179256 0.24445851 0.20476395 0.28927039 0.27256000 0.22904000
+N14 0.27616273 0.17032349 0.29167384 0.37454590 0.34536070 0.33131806
+T8  0.15605406 0.21435897 0.37292683 0.46227642 0.42119275 0.41642276
+T13 0.14572033 0.19857180 0.29431188 0.36528302 0.34657168 0.31876249
+            N7         N8         N9        N10        N11        N12
+N2                                                                   
+N3                                                                   
+N4                                                                   
+N5                                                                   
+N6                                                                   
+N7                                                                   
+N8  0.23393939                                                       
+N9  0.11500000 0.16149254                                            
+N10 0.11843137 0.14974991 0.13323355                                 
+N11 0.28002172 0.13174447 0.22214286 0.24103250                      
+N12 0.24059524 0.12148515 0.24240506 0.23678332 0.08498039           
+N13 0.16583333 0.17767494 0.19088000 0.19931835 0.23176072 0.16453608
+N14 0.27423959 0.17460735 0.28602065 0.26764868 0.19891269 0.13111440
+T8  0.36853107 0.25398374 0.36928571 0.35068111 0.18666667 0.15009542
+T13 0.27888042 0.16581793 0.28028857 0.25932297 0.13694444 0.14150818
+           N13        N14         T8
+N2                                  
+N3                                  
+N4                                  
+N5                                  
+N6                                  
+N7                                  
+N8                                  
+N9                                  
+N10                                 
+N11                                 
+N12                                 
+N13                                 
+N14 0.14946085                      
+T8  0.23560976 0.21931539           
+T13 0.22976315 0.23424494 0.13377358
+
+attr(,"class")
+[1] "MDS"
 > dev.new()
 dev.new(): using pdf(file="Rplots1.pdf")
 > mds(examples$DZ,shepard=TRUE)
@@ -724,7 +836,83 @@ iter  25 value 7.640889
 iter  25 value 7.640383
 final  value 7.640383 
 converged
-NULL
+$points
+           [,1]        [,2]
+N1  -0.28573404 -0.13037179
+N2  -0.17143499  0.03128168
+N3   0.17950369 -0.01635334
+N4   0.30680286 -0.01803281
+N5   0.21864596 -0.09725819
+N6   0.20643114 -0.05059452
+N7   0.16961330  0.09432651
+N8  -0.01972579 -0.02512879
+N9   0.15307422  0.02960760
+N10  0.14735247 -0.04644282
+N11 -0.13381086 -0.04474698
+N12 -0.13439235  0.02935787
+N13  0.01491494  0.15440681
+N14 -0.14420492  0.16950713
+T8  -0.31679396  0.01529288
+T13 -0.19024165 -0.09485124
+
+$stress
+[1] 7.640383
+
+$classical
+[1] FALSE
+
+$diss
+            N1         N2         N3         N4         N5         N6
+N2  0.16788908                                                       
+N3  0.35104956 0.26133929                                            
+N4  0.42971624 0.34586886 0.15028777                                 
+N5  0.41014381 0.33042373 0.11379464 0.16346667                      
+N6  0.38848366 0.29296804 0.06024590 0.10757143 0.10503099           
+N7  0.35541637 0.25439878 0.12022654 0.17479586 0.18535649 0.15194175
+N8  0.22482696 0.14449011 0.22174825 0.23461538 0.21480000 0.18588235
+N9  0.34064331 0.26033003 0.10835165 0.15302034 0.12117371 0.12774510
+N10 0.33059313 0.25666164 0.08083402 0.16283945 0.08716855 0.06882353
+N11 0.17571970 0.12996997 0.26414894 0.33538462 0.29259843 0.25890625
+N12 0.19087551 0.10291667 0.24689655 0.32034014 0.30117925 0.27872727
+N13 0.34179256 0.24445851 0.20476395 0.28927039 0.27256000 0.22904000
+N14 0.27616273 0.17032349 0.29167384 0.37454590 0.34536070 0.33131806
+T8  0.15605406 0.21435897 0.37292683 0.46227642 0.42119275 0.41642276
+T13 0.14572033 0.19857180 0.29431188 0.36528302 0.34657168 0.31876249
+            N7         N8         N9        N10        N11        N12
+N2                                                                   
+N3                                                                   
+N4                                                                   
+N5                                                                   
+N6                                                                   
+N7                                                                   
+N8  0.23393939                                                       
+N9  0.11500000 0.16149254                                            
+N10 0.11843137 0.14974991 0.13323355                                 
+N11 0.28002172 0.13174447 0.22214286 0.24103250                      
+N12 0.24059524 0.12148515 0.24240506 0.23678332 0.08498039           
+N13 0.16583333 0.17767494 0.19088000 0.19931835 0.23176072 0.16453608
+N14 0.27423959 0.17460735 0.28602065 0.26764868 0.19891269 0.13111440
+T8  0.36853107 0.25398374 0.36928571 0.35068111 0.18666667 0.15009542
+T13 0.27888042 0.16581793 0.28028857 0.25932297 0.13694444 0.14150818
+           N13        N14         T8
+N2                                  
+N3                                  
+N4                                  
+N5                                  
+N6                                  
+N7                                  
+N8                                  
+N9                                  
+N10                                 
+N11                                 
+N12                                 
+N13                                 
+N14 0.14946085                      
+T8  0.23560976 0.21931539           
+T13 0.22976315 0.23424494 0.13377358
+
+attr(,"class")
+[1] "MDS"
 > 
 > 
 > 
@@ -747,485 +935,6 @@ NULL
 > 
 > data(examples)
 > peakfit(examples$FT1,k=2)
-$tfact
-[1] 2.073873
-
-$peaks
-              1         2
-t     103.45852 103.46036
-s[t]   13.65063  11.53875
-ci[t]  28.30967  23.92991
-
-$props
-                 1            2
-p        0.4118593    0.5881407
-s[p]  4143.5647623 4143.5647623
-ci[p] 8593.2273658 8593.2273658
-
-$L
-[1] -71.94616
-
-$legend
-[1] "Peak 1: 103 ± 14 | 28 (40%)" "Peak 2: 103 ± 12 | 24 (60%)"
-
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("peakfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("radialplot")
-> ### * radialplot
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: radialplot
-> ### Title: Visualise heteroscedastic data on a radial plot
-> ### Aliases: radialplot radialplot.default radialplot.fissiontracks
-> ###   radialplot.UPb radialplot.PbPb radialplot.ArAr radialplot.UThHe
-> ###   radialplot.ReOs radialplot.SmNd radialplot.RbSr radialplot.LuHf
-> ###   radialplot.ThU
-> 
-> ### ** Examples
-> 
-> data(examples)
-> radialplot(examples$FT1)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("radialplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("read.data")
-> ### * read.data
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: read.data
-> ### Title: Read geochronology data
-> ### Aliases: read.data read.data.default read.data.matrix
-> 
-> ### ** Examples
-> 
-> file.show(system.file("spectrum.csv",package="IsoplotR"))
-f,X,errX
-0.021,4.4339,0.935
-0.025,4.6771,0.1225
-0.024,4.6533,0.0964
-0.024,4.7417,0.0861
-0.026,4.7153,0.0776
-0.026,4.708,0.0734
-0.028,4.7417,0.0717
-0.029,4.7855,0.0677
-0.430,4.7863,0.0134
-0.052,4.7709,0.0388
-0.091,4.8116,0.0246
-0.136,4.7947,0.0207
-0.076,4.9116,0.0472
-0.012,4.5317,0.1952
-
-> 
-> f1 <- system.file("UPb1.csv",package="IsoplotR")
-> d1 <- read.data(f1,method="U-Pb",format=1)
-> concordia(d1)
-NULL
-> 
-> f2 <- system.file("ArAr1.csv",package="IsoplotR")
-> d2 <- read.data(f2,method="Ar-Ar",format=1)
-> agespectrum(d2)
-$mean
-         x       s[x]      ci[x] 
-61.7498989  0.2797572  1.2036980 
-
-$disp
-        s        ci 
-0.1904821 0.3733380 
-
-$df
-[1] 2
-
-$mswd
-[1] 6.120655
-
-$p.value
-[1] 0.0003703533
-
-$tfact
-[1] 4.302653
-
-$plotpar
-$plotpar$mean
-$plotpar$mean$x
-[1] 0 5
-
-$plotpar$mean$y
-      x       x 
-61.7499 61.7499 
-
-
-$plotpar$rect
-$plotpar$rect$x
-[1] 0 5 5 0
-
-$plotpar$rect$y
-       x        x        x        x 
-62.21809 62.21809 61.28171 61.28171 
-
-
-$plotpar$dash1
-$plotpar$dash1$x
-[1] 0 5
-
-$plotpar$dash1$y
-       x        x 
-62.12324 62.12324 
-
-
-$plotpar$dash2
-$plotpar$dash2$x
-[1] 0 5
-
-$plotpar$dash2$y
-       x        x 
-61.37656 61.37656 
-
-
-
-$i
-[1] 6 7 8 9
-
-$fract
-[1] 0.5572799
-
-> 
-> f3 <- system.file("ReOs1.csv",package="IsoplotR")
-> d3 <- read.data(f3,method="Re-Os",format=1)
-> isochron(d2)
-$df
-[1] 9
-
-$mswd
-[1] 5.696186
-
-$p.value
-[1] 6.221424e-08
-
-$a
-           a         s[a] 
-3.309038e-03 7.819606e-06 
-
-$b
-            b          s[b] 
--1.507149e-02  4.949346e-05 
-
-$cov.ab
-[1] -3.804875e-10
-
-$model
-[1] 1
-
-$age
-         t       s[t]      ci[t]    disp[t] 
-61.6012324  0.3233067  0.7313705  1.4063256 
-
-$y0
-          y        s[y]       ci[y]     disp[y] 
-302.2026275   0.7141367   1.6154894   3.8556375 
-
-$tfact
-[1] 2.262157
-
-attr(,"class")
-[1] "isochron"
-> 
-> f4 <- system.file("FT1.csv",package="IsoplotR")
-> d4 <- read.data(f4,method="fissiontracks",format=1)
-> radialplot(d4)
-> 
-> f5 <- system.file("UThSmHe.csv",package="IsoplotR")
-> d5 <- read.data(f5,method="U-Th-He")
-> helioplot(d5)
-NULL
-> 
-> f6 <- system.file("ThU2.csv",package="IsoplotR")
-> d6 <- read.data(f6,method="Th-U",format=2)
-> evolution(d6)
-> 
-> #  one detrital zircon U-Pb file (detritals.csv)
-> f7 <- system.file("Namib.csv",package="IsoplotR")
-> d7 <- read.data(f7,method="detritals")
-> kde(d7)
-> 
-> #  three 'other' files (MountTom.csv, spectrum.csv, average.csv)
-> f8 <- system.file("MountTom.csv",package="IsoplotR")
-> d8 <- read.data(f8,method="other")
-> radialplot(d8)
-> 
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("set.zeta")
-> ### * set.zeta
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: set.zeta
-> ### Title: Calculate the zeta calibration coefficient for fission track
-> ###   dating
-> ### Aliases: set.zeta
-> 
-> ### ** Examples
-> 
-> data(examples)
-> print(examples$FT1$zeta)
-[1] 350  10
-> FT <- set.zeta(examples$FT1,tst=c(250,5))
-> print(FT$zeta)
-[1] 855  36
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("set.zeta", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("settings")
-> ### * settings
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: settings
-> ### Title: Load settings to and from json
-> ### Aliases: settings
-> 
-> ### ** Examples
-> 
-> # load and show the default constants that come with IsoplotR
-> json <- system.file("constants.json",package="IsoplotR")
-> settings(fname=json)
-> print(settings())
-[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"U234\":[0.00282206,8e-07],\"Th232\":[4.95e-05,2.5e-06],\"Th230\":[0.0091705,1.6e-06],\"Rb87\":[1.3972e-05,4.5e-07],\"Re187\":[1.6689e-05,3.8e-08],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06],\"Lu176\":[1.867e-05,8e-08]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr\":[87.62,0.01],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06],\"Sm\":[150.36,0.03],\"Nd\":[144.2415,0.0013],\"Lu\":[174.9668,1e-04],\"Hf\":[178.49,0.02]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Rb85Rb87\":[2.59265,0.00085],\"Sr84Sr86\":[0.056549,7.15e-05],\"Sr87Sr86\":[0.710339,0.0001305],\"Sr88Sr86\":[8.37861,0.001624],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0.00045],\"U238U235\":[137.818,0.0225],\"Pb206Pb204\":[9.307,0],\"Pb207Pb204\":[10.294,0],\"Pb208Pb204\":[29.476,0],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484],\"Nd142Nd144\":[1.14101,7e-04],\"Nd143Nd144\":[0.51154,4e-04],\"Nd145Nd144\":[0.34848,0.00015],\"Nd146Nd144\":[0.72228,0.00051],\"Nd148Nd144\":[0.24186,3e-04],\"Nd150Nd144\":[0.23691,0.00042],\"Lu176Lu175\":[0.02668,1.3e-05],\"Hf174Hf177\":[0.00871,5e-05],\"Hf176Hf177\":[0.2829,0.003],\"Hf178Hf177\":[1.4671,1e-04],\"Hf179Hf177\":[0.7325,0],\"Hf180Hf177\":[1.88651,0.00012]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
-> 
-> # use the decay constant of Kovarik and Adams (1932)
-> settings('lambda','U238',0.0001537,0.0000068)
-> print(settings('lambda','U238'))
-[1] 0.0001537 0.0000068
-> 
-> # returns the 238U/235U ratio of Hiess et al. (2012):
-> print(settings('iratio','U238U235'))
-[1] 137.8180   0.0225
-> # use the 238U/235U ratio of Steiger and Jaeger (1977):
-> settings('iratio','U238U235',138.88,0)
-> print(settings('iratio','U238U235'))
-[1] 138.88   0.00
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("settings", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("weightedmean")
-> ### * weightedmean
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: weightedmean
-> ### Title: Calculate the weighted mean age
-> ### Aliases: weightedmean weightedmean.default weightedmean.UPb
-> ###   weightedmean.PbPb weightedmean.ThU weightedmean.ArAr
-> ###   weightedmean.ReOs weightedmean.SmNd weightedmean.RbSr
-> ###   weightedmean.LuHf weightedmean.UThHe weightedmean.fissiontracks
-> 
-> ### ** Examples
-> 
-> ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
-> errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
-> weightedmean(cbind(ages,errs))
-$mean
-          x        s[x]       ci[x] 
-251.2663523   0.1353684   0.3200954 
-
-$disp
-        s        ci 
-0.2200115 0.4312147 
-
-$df
-[1] 7
-
-$mswd
-[1] 1.478011
-
-$p.value
-[1] 0.1592269
-
-$valid
- [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE
-
-$tfact
-[1] 2.364624
-
-$plotpar
-$plotpar$mean
-$plotpar$mean$x
-[1]  0 11
-
-$plotpar$mean$y
-       x        x 
-251.2664 251.2664 
-
-
-$plotpar$rect
-$plotpar$rect$x
-[1]  0 11 11  0
-
-$plotpar$rect$y
-       x        x        x        x 
-251.5864 251.5864 250.9463 250.9463 
-
-
-$plotpar$dash1
-$plotpar$dash1$x
-[1]  0 11
-
-$plotpar$dash1$y
-       x        x 
-251.6976 251.6976 
-
-
-$plotpar$dash2
-$plotpar$dash2$x
-[1]  0 11
-
-$plotpar$dash2$y
-       x        x 
-250.8351 250.8351 
-
-
-
-> data(examples)
-> weightedmean(examples$ArAr)
-$mean
-         x       s[x]      ci[x] 
-61.9510878  0.2813317  0.6652438 
-
-$disp
-        s        ci 
-0.2920792 0.5724647 
-
-$df
-[1] 7
-
-$mswd
-[1] 6.933519
-
-$p.value
-[1] 3.580106e-09
-
-$valid
- [1] FALSE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
-
-$tfact
-[1] 2.364624
-
-$plotpar
-$plotpar$mean
-$plotpar$mean$x
-[1]  0 12
-
-$plotpar$mean$y
-       x        x 
-61.95109 61.95109 
-
-
-$plotpar$rect
-$plotpar$rect$x
-[1]  0 12 12  0
-
-$plotpar$rect$y
-       x        x        x        x 
-62.21326 62.21326 61.68891 61.68891 
-
-
-$plotpar$dash1
-$plotpar$dash1$x
-[1]  0 12
-
-$plotpar$dash1$y
-       x        x 
-62.52355 62.52355 
-
-
-$plotpar$dash2
-$plotpar$dash2$x
-[1]  0 12
-
-$plotpar$dash2$y
-       x        x 
-61.37862 61.37862 
-
-
-
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("weightedmean", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("york")
-> ### * york
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: york
-> ### Title: Linear regression of X,Y-variables with correlated errors
-> ### Aliases: york
-> 
-> ### ** Examples
-> 
->    X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
-+           28.530,50.540,51.595,86.51,106.40,157.35)
->    Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-+           .8642,.9584,.9617,1.135,1.230,1.490)
->    n <- length(X)
->    sX <- X*0.01
->    sY <- Y*0.005
->    rXY <- rep(0.8,n)
->    dat <- cbind(X,sX,Y,sY,rXY)
->    fit <- york(dat)
->    covmat <- matrix(0,2,2)
->    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
->    for (i in 1:n){
-+        covmat[1,1] <- sX[i]^2
-+        covmat[2,2] <- sY[i]^2
-+        covmat[1,2] <- rXY[i]*sX[i]*sY[i]
-+        covmat[2,1] <- covmat[1,2]
-+        ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
-+        polygon(ell)
-+    }
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> ### * <FOOTER>
-> ###
-> options(digits = 7L)
-> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  10.8 5.604 10.019 0 0 
-> grDevices::dev.off()
-pdf 
-  2 
-> ###
-> ### Local variables: ***
-> ### mode: outline-minor ***
-> ### outline-regexp: "\\(> \\)?### [*]+" ***
-> ### End: ***
-> quit('no')
+Error in fit$props[2:3, i] : subscript out of bounds
+Calls: peakfit -> peakfit.fissiontracks -> peaks2legend -> roundit
+Execution halted

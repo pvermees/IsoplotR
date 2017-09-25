@@ -10,7 +10,8 @@
 #' @param x an object of class \code{ThU}
 #' @param xlim x-axis limits
 #' @param ylim y-axis limits
-#' @param alpha confidence cutoff for the error ellipses
+#' @param alpha probability cutoff for the error ellipses and
+#'     confidence intervals
 #' @param transform if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 #'     vs. Th-U age.
 #' @param detrital apply a detrital Th correction by projecting the
@@ -37,7 +38,7 @@
 #'     Cosmochimica Acta, 58(22), pp.5031-5042.
 #'
 #' Ludwig, K.R., 2003. Mathematical-statistical treatment of data and
-#'     errors for 230 Th/U geochronology. Reviews in Mineralogy and
+#'     errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,

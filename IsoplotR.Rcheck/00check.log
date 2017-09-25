@@ -1,5 +1,5 @@
 * using log directory ‘/home/pvermees/Dropbox/Programming/R/IsoplotR/IsoplotR.Rcheck’
-* using R version 3.4.1 (2017-06-30)
+* using R version 3.2.3 (2015-12-10)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * using session charset: UTF-8
 * using option ‘--as-cran’
@@ -9,10 +9,9 @@
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
 Number of updates in past 6 months: 7
-
-The build time stamp is missing.
 * checking package namespace information ... OK
-* checking package dependencies ... OK
+* checking package dependencies ... NOTE
+  No repository set, so cyclic dependency check skipped
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
 * checking for executable files ... WARNING
@@ -36,12 +35,11 @@ CRAN-pack does not know about
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking DESCRIPTION meta-information ... NOTE
-Checking should be performed on sources prepared by ‘R CMD build’.
+* checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
-Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+File README.md cannot be checked without ‘pandoc’ being installed.
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -64,28 +62,7 @@ These should not be in a package tarball.
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... NOTE
-central.UThHe: no visible global function definition for ‘qt’
-central.default: no visible global function definition for ‘qt’
-central.default: no visible global function definition for ‘qnorm’
-central.fissiontracks: no visible global function definition for ‘qt’
-central.fissiontracks: no visible global function definition for
-  ‘qnorm’
-concordia.age.UPb: no visible global function definition for ‘qt’
-concordia.intersection.ludwig: no visible global function definition
-  for ‘qt’
-format.peaks: no visible global function definition for ‘qt’
-isochron_init: no visible global function definition for ‘qt’
-min_age_model: no visible global function definition for ‘qt’
-regression_init: no visible global function definition for ‘qt’
-titterington: no visible global function definition for ‘qt’
-weightedmean.default: no visible global function definition for ‘qt’
-weightedmean.default: no visible global function definition for ‘qnorm’
-Undefined global functions or variables:
-  qnorm qt
-Consider adding
-  importFrom("stats", "qnorm", "qt")
-to your NAMESPACE file.
+* checking R code for possible problems ... OK
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
@@ -98,7 +75,24 @@ to your NAMESPACE file.
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... OK
+* checking examples ... ERROR
+Running examples in ‘IsoplotR-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: peakfit
+> ### Title: Finite mixture modelling of geochronological datasets
+> ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
+> ###   peakfit.PbPb peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr
+> ###   peakfit.LuHf peakfit.ThU peakfit.UThHe
+> 
+> ### ** Examples
+> 
+> data(examples)
+> peakfit(examples$FT1,k=2)
+Error in fit$props[2:3, i] : subscript out of bounds
+Calls: peakfit -> peakfit.fissiontracks -> peaks2legend -> roundit
+Execution halted
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 5 NOTEs
+Status: 1 ERROR, 2 WARNINGs, 4 NOTEs

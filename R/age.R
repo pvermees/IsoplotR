@@ -153,11 +153,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \code{s[t]}: the estimated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{t} for the appropriate degrees of freedom
+#' \code{ci[t]}: the 95\% confidence interval of \code{t} for the
+#' appropriate degrees of freedom
 #'
-#' \code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for \code{t}
-#' augmented by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
+#' \code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+#' by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 #' 
 #' \item{mswd}{ a vector with three items (\code{equivalence},
 #' \code{concordance} and \code{combined}) containing the MSWD (Mean
@@ -191,12 +191,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \code{s}: the estimated standard deviation for \code{x}
 #' 
-#' \code{ci}: the 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{x} for the appropriate degrees of freedom
+#' \code{ci}: the 95\% confidence interval of \code{x} for the
+#' appropriate degrees of freedom
 #'
-#' \code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-#' \code{x} augmented by \eqn{\sqrt{MSWD}} to account for
-#' overdispersed datasets.}
+#' \code{disp[t]}: the 95\% confidence interval for \code{x} augmented
+#' by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 #'
 #' \item{df}{ the degrees of freedom of the concordia fit (concordance
 #' + equivalence)}
@@ -241,12 +240,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \code{s[t]}: the estimated standard deviation of \code{t}
 #'
-#' \code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{t} for the appropriate degrees of freedom
+#' \code{ci[t]}: the 95\% confidence interval of \code{t} for the
+#' appropriate degrees of freedom
 #'
-#' \code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-#' \code{t} augmented by \eqn{\sqrt{MSWD}} to account for
-#' overdispersed datasets.}
+#' \code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+#' by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 #' 
 #' \item{age}{a 4-element vector containing:
 #'
@@ -257,12 +255,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \code{s[y]}: the estimated standard deviation of \code{y}
 #'
-#' \code{ci[y]}: the 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{y} for the appropriate degrees of freedom
+#' \code{ci[y]}: the 95\% confidence interval of \code{y} for the
+#' appropriate degrees of freedom
 #'
-#' \code{disp[y]}: the 100(1-\eqn{\alpha})\% confidence interval for
-#' \code{y} augmented by \eqn{\sqrt{MSWD}} to account for
-#' overdispersed datasets.}
+#' \code{disp[y]}: the 95\% confidence interval for \code{y} augmented
+#' by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 #'
 #' \item{tfact}{ the t-value for \code{df} degrees of freedom, which
 #' is used for the construction of \code{ci[t]} and \code{ci[y]} }
@@ -308,13 +305,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \code{s[y]}: the estimated standard deviation of \code{y}
 #'
-#' \code{ci[y]}: the 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{y} for the appropriate degrees of freedom
+#' \code{ci[y]}: the 95\% confidence interval of \code{y} for the
+#' appropriate degrees of freedom
 #'
-#' \code{disp[y]}: the 100(1-\eqn{\alpha})\% confidence interval for
-#' \code{y} augmented by \eqn{\sqrt{MSWD}} to account for
-#' overdispersed datasets.
-#' }
+#' \code{disp[y]}: the 95\% confidence interval for \code{y} augmented
+#' by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.  }
 #'
 #' \item{age}{a 4-element vector containing:
 #'
@@ -322,13 +317,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \code{s[t]}: the estimated standard deviation of \code{t}
 #'
-#' \code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{t} for the appropriate degrees of freedom
+#' \code{ci[t]}: the 95\% confidence interval of \code{t} for the
+#' appropriate degrees of freedom
 #'
-#' \code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-#' \code{t} augmented by \eqn{\sqrt{MSWD}} to account for
-#' overdispersed datasets.
-#' }
+#' \code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+#' by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.  }
 #'
 #' \item{df}{the degrees of freedom for the isochron fit.}
 #'
@@ -359,13 +352,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'
 #' \code{s[t]}: the estimated standard deviation of \code{t}
 #'
-#' \code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{t} for the appropriate degrees of freedom
+#' \code{ci[t]}: the 95\% confidence interval of \code{t} for the
+#' appropriate degrees of freedom
 #'
-#' \code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-#' \code{t} augmented by \eqn{\sqrt{MSWD}} to account for
-#' overdispersed datasets.
-#' }
+#' \code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+#' by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.  }
 #'
 #'
 #' \item{df}{the degrees of freedom for the data fit.}
@@ -390,8 +381,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' track ages. }
 #'
 #' \item{age}{ a three-element vector with the central age, its
-#' standard error and a 100(1-\eqn{\alpha})\% confidence interval for
-#' the appropriate degrees of freedom. }
+#' standard error and a 95\% confidence interval for the appropriate
+#' degrees of freedom. }
 #'
 #' \item{disp}{ the (over)dispersion of the single grain ages beyond
 #' the formal analytical uncertainties. }
@@ -409,7 +400,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' print(age(examples$UPb,type=2))
 #' @rdname age
 #' @export
-age.UPb <- function(x,type=1,wetherill=TRUE, exterr=TRUE,i=NA,
+age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
                     sigdig=NA,common.Pb=0,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)

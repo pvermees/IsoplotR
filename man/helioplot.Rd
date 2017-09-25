@@ -22,7 +22,8 @@ white ellipse?}
 \item{show.numbers}{show the grain numbers inside the error
 ellipses?}
 
-\item{alpha}{confidence cutoff for the error ellipses}
+\item{alpha}{probability cutoff for the error ellipses and
+confidence intervals}
 
 \item{contour.col}{two-element vector with the fill colours to be
 assigned to the minimum and maximum age contour}
@@ -62,6 +63,7 @@ dev.new()
 helioplot(examples$UThHe,logratio=FALSE)
 }
 \references{
-Vermeesch, P., 2010. HelioPlot, and the treatment of overdispersed
-(U-Th-Sm)/He data. Chemical Geology, 271(3), pp.108-111.
+Vermeesch, P., 2010. HelioPlot, and the treatment of
+    overdispersed (U-Th-Sm)/He data. Chemical Geology, 271(3),
+    pp.108-111.
 }

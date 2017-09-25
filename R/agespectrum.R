@@ -15,7 +15,8 @@
 #' 
 #' an object of class \code{ArAr}
 #' 
-#' @param alpha the confidence limits of the error bars/boxes.
+#' @param alpha the confidence limits of the error bars/boxes and
+#'     confidence intervals.
 #' @param plateau logical flag indicating whether a plateau age should
 #'     be calculated. If \code{plateau=TRUE}, the function will
 #'     compute the weighted mean of the largest succession of steps

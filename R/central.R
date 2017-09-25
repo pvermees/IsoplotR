@@ -9,28 +9,31 @@
 #'     uncertainties
 #' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments
-#' @return a list containing the following items:
+#' @return if \code{x} has class \code{UThHe}, a list containing the
+#'     following items:
 #'
 #' \describe{
+#' \item{age}{a four-element vector with:
 #'
-#' \item{mswd}{the reduced Chi-square statistic of data concordance,
-#' i.e. \eqn{mswd=SS/(2n-2)}, where \eqn{SS} is the sum of squares
-#' of the log[U/He]-log[Th/He] compositions and \eqn{n} is the number
-#' of samples. If \code{x} has class \code{fissiontracks}, then
-#' \eqn{mswd=X^2/(n-1)}, where \eqn{X^2} is a Chi-square statistic of
-#' the EDM data or ICP ages.}
+#' \code{t}: the central age
 #'
-#' \item{p.value}{the p-value of a Chi-square test with \eqn{n-2}
-#' degrees of freedom}
+#' \code{s[t]}: the standard error of \code{s[t]}
 #'
-#' \item{age}{a two-column vector with the central age and its
-#' standard error.}
+#' \code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{t} for the appropriate number of degrees of freedom
 #'
+#' \code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval
+#' enhanced by a factor of \eqn{\sqrt{MSWD}}.
 #' }
 #'
-#' Additionally, if \code{x} has class \code{UThHe}:
+#' \item{mswd}{the reduced Chi-square statistic of data concordance,
+#' i.e. \eqn{mswd=SS/df}, where \eqn{SS} is the sum of squares of
+#' the log[U/He]-log[Th/He] compositions}
 #'
-#' \describe{
+#' \item{df}{the degrees of freedom (\eqn{2n-2})}
+#'
+#' \item{p.value}{the p-value of a Chi-square test with \code{df}
+#' degrees of freedom}
 #'
 #' \item{uvw}{(if the input data table contains Sm) or \strong{uv} (if
 #' it doesn't): the geometric mean log[U/He], log[Th/He] (,
@@ -38,14 +41,37 @@
 #'
 #' \item{covmat}{the covariance matrix of \code{uvw} or \code{uv}}
 #'
+#' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the t-
+#' distribution for \code{df} degrees of freedom}
+#'
 #' }
 #'
-#' OR, if \code{x} has class \code{fissiontracks}:
+#' OR, otherwise:
 #'
 #' \describe{
 #'
-#' \item{disp}{the (over)dispersion of the ages (value between 0 and
-#' 1)}
+#' \item{age}{a three-element vector with:
+#'
+#' \code{t}: the central age
+#'
+#' \code{s[t]}: the standard error of \code{s[t]}
+#'
+#' \code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{t} for the appropriate number of degrees of freedom }
+#'
+#' \item{disp}{a two-element vector with the overdispersion (standard
+#' deviation) of the excess scatter, and the corresponding
+#' \eqn{100(1-\alpha/2)\%} confidence interval for the appropriate
+#' degrees of freedom.}
+#'
+#' \item{mswd}{the reduced Chi-square statistic of data concordance,
+#' i.e. \eqn{mswd=X^2/df}, where \eqn{X^2} is a Chi-square statistic
+#' of the EDM data or ages}
+#'
+#' \item{df}{the degrees of freedom (\eqn{n-2})}
+#'
+#' \item{p.value}{the p-value of a Chi-square test with \code{df}
+#' degrees of freedom}
 #'
 #' }
 #'

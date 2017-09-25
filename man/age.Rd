@@ -191,11 +191,11 @@ returns a list with the following items:
 
 \code{s[t]}: the estimated uncertainty of \code{t}
 
-\code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-\code{t} for the appropriate degrees of freedom
+\code{ci[t]}: the 95\% confidence interval of \code{t} for the
+appropriate degrees of freedom
 
-\code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for \code{t}
-augmented by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
+\code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 
 \item{mswd}{ a vector with three items (\code{equivalence},
 \code{concordance} and \code{combined}) containing the MSWD (Mean
@@ -229,12 +229,11 @@ ages (if \code{wetherill=TRUE}) or the lower intercept age and
 
 \code{s}: the estimated standard deviation for \code{x}
 
-\code{ci}: the 100(1-\eqn{\alpha})\% confidence interval of
-\code{x} for the appropriate degrees of freedom
+\code{ci}: the 95\% confidence interval of \code{x} for the
+appropriate degrees of freedom
 
-\code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-\code{x} augmented by \eqn{\sqrt{MSWD}} to account for
-overdispersed datasets.}
+\code{disp[t]}: the 95\% confidence interval for \code{x} augmented
+by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 
 \item{df}{ the degrees of freedom of the concordia fit (concordance
 + equivalence)}
@@ -279,12 +278,11 @@ error.}
 
 \code{s[t]}: the estimated standard deviation of \code{t}
 
-\code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-\code{t} for the appropriate degrees of freedom
+\code{ci[t]}: the 95\% confidence interval of \code{t} for the
+appropriate degrees of freedom
 
-\code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-\code{t} augmented by \eqn{\sqrt{MSWD}} to account for
-overdispersed datasets.}
+\code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 
 \item{age}{a 4-element vector containing:
 
@@ -295,12 +293,11 @@ overdispersed datasets.}
 
 \code{s[y]}: the estimated standard deviation of \code{y}
 
-\code{ci[y]}: the 100(1-\eqn{\alpha})\% confidence interval of
-\code{y} for the appropriate degrees of freedom
+\code{ci[y]}: the 95\% confidence interval of \code{y} for the
+appropriate degrees of freedom
 
-\code{disp[y]}: the 100(1-\eqn{\alpha})\% confidence interval for
-\code{y} augmented by \eqn{\sqrt{MSWD}} to account for
-overdispersed datasets.}
+\code{disp[y]}: the 95\% confidence interval for \code{y} augmented
+by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.}
 
 \item{tfact}{ the t-value for \code{df} degrees of freedom, which
 is used for the construction of \code{ci[t]} and \code{ci[y]} }
@@ -346,13 +343,11 @@ Th-corrected value) and its standard error.}
 
 \code{s[y]}: the estimated standard deviation of \code{y}
 
-\code{ci[y]}: the 100(1-\eqn{\alpha})\% confidence interval of
-\code{y} for the appropriate degrees of freedom
+\code{ci[y]}: the 95\% confidence interval of \code{y} for the
+appropriate degrees of freedom
 
-\code{disp[y]}: the 100(1-\eqn{\alpha})\% confidence interval for
-\code{y} augmented by \eqn{\sqrt{MSWD}} to account for
-overdispersed datasets.
-}
+\code{disp[y]}: the 95\% confidence interval for \code{y} augmented
+by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.  }
 
 \item{age}{a 4-element vector containing:
 
@@ -360,13 +355,11 @@ overdispersed datasets.
 
 \code{s[t]}: the estimated standard deviation of \code{t}
 
-\code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-\code{t} for the appropriate degrees of freedom
+\code{ci[t]}: the 95\% confidence interval of \code{t} for the
+appropriate degrees of freedom
 
-\code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-\code{t} augmented by \eqn{\sqrt{MSWD}} to account for
-overdispersed datasets.
-}
+\code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.  }
 
 \item{df}{the degrees of freedom for the isochron fit.}
 
@@ -397,13 +390,11 @@ to the composition given by \code{uvw}
 
 \code{s[t]}: the estimated standard deviation of \code{t}
 
-\code{ci[t]}: the 100(1-\eqn{\alpha})\% confidence interval of
-\code{t} for the appropriate degrees of freedom
+\code{ci[t]}: the 95\% confidence interval of \code{t} for the
+appropriate degrees of freedom
 
-\code{disp[t]}: the 100(1-\eqn{\alpha})\% confidence interval for
-\code{t} augmented by \eqn{\sqrt{MSWD}} to account for
-overdispersed datasets.
-}
+\code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+by \eqn{\sqrt{MSWD}} to account for overdispersed datasets.  }
 
 
 \item{df}{the degrees of freedom for the data fit.}
@@ -428,8 +419,8 @@ ages. }
 track ages. }
 
 \item{age}{ a three-element vector with the central age, its
-standard error and a 100(1-\eqn{\alpha})\% confidence interval for
-the appropriate degrees of freedom. }
+standard error and a 95\% confidence interval for the appropriate
+degrees of freedom. }
 
 \item{disp}{ the (over)dispersion of the single grain ages beyond
 the formal analytical uncertainties. }

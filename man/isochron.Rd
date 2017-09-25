@@ -90,7 +90,8 @@ function if \code{model=2}}
 
 \item{ylim}{2-element vector with the plot limits of the y-axis}
 
-\item{alpha}{confidence cutoff for the error ellipses}
+\item{alpha}{confidence cutoff for the error ellipses and
+confidence intervals}
 
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output}
@@ -154,9 +155,8 @@ vs. \eqn{^{232}}Th/\eqn{^{238}}U
 }
 \value{
 if \code{x} has class \code{PbPb}, \code{ArAr},
-    \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf},
-    \code{ThU}, or \code{UThHe}, returns a list with the following
-    items:
+    \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf}, or
+    \code{UThHe}, returns a list with the following items:
 
 \describe{
 
@@ -167,24 +167,58 @@ error.}
 
 \item{cov.ab}{the covariance of the slope and intercept}
 
-\item{mswd}{the mean square of the residuals (a.k.a
-    `reduced Chi-square') statistic}
+\item{df}{the degrees of freedom of the linear fit (\eqn{df=n-2})}
 
-\item{p.value}{the p-value of a Chi-square test for linearity}
+\item{y0}{a four-element list containing:
 
-\item{y0}{the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
+\code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
 \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{187}}Os/\eqn{^{188}}Os,
 \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio and its standard error.}
+\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio.
 
-\item{age}{the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
+\code{s[y]}: the propagated uncertainty of \code{y}
+
+\code{ci[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{y} given the appropriate degrees of freedom.
+
+\code{disp[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{y} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
+model=1}).
+}
+
+\item{age}{a four-element list containing:
+
+\code{t}: the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
 \eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{187}}Os/\eqn{^{187}}Re,
 \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-\eqn{^{176}}Hf/\eqn{^{177}}Hf age and its standard error.}
+\eqn{^{176}}Hf/\eqn{^{177}}Hf age.
+
+\code{s[t]}: the propagated uncertainty of \code{t}
+
+\code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{t} given the appropriate degrees of freedom.
+
+\code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{t} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
+model=1}).  }
+
+\item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
+t-distribution with \code{df} degrees of freedom.}
 
 }
 
-if \code{plot=FALSE}, and \code{x} has class \code{ThU}:
+additionally, if \code{model=1}:
+
+\describe{
+
+\item{mswd}{the mean square of the residuals (a.k.a
+    `reduced Chi-square') statistic (omitted if \code{model=2}).}
+
+\item{p.value}{the p-value of a Chi-square test for linearity}
+
+}
+
+OR, if \code{x} has class \code{ThU}:
 
 \describe{
 
@@ -199,16 +233,21 @@ intercept and \eqn{^{234}}U/\eqn{^{232}}Th slope.  }
 
 \item{cov}{the covariance matrix of \code{par}.}
 
+\item{df}{the degrees of freedom for the linear fit, i.e. \eqn{(3n-3)} if
+\code{x$format=1} or \code{x$format=2}, and \eqn{(2n-2)} if
+\code{x$format=3} or \code{x$format=4}}
+
 \item{a}{if \code{type=1}: the \eqn{^{230}}Th/\eqn{^{232}}Th
 intercept; if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{238}}U
 intercept; if \code{type=3}: the \eqn{^{234}}Th/\eqn{^{232}}Th
 intercept; if \code{type=4}: the \eqn{^{234}}Th/\eqn{^{238}}U
-intercept.}
+intercept and its propagated uncertainty.}
 
 \item{b}{if \code{type=1}: the \eqn{^{230}}Th/\eqn{^{238}}U slope;
 if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{232}}Th slope; if
 \code{type=3}: the \eqn{^{234}}U/\eqn{^{238}}U slope; if
-\code{type=4}: the \eqn{^{234}}U/\eqn{^{232}}Th slope.}
+\code{type=4}: the \eqn{^{234}}U/\eqn{^{232}}Th slope and its
+propagated uncertainty.}
 
 \item{cov.ab}{the covariance between \code{a} and \code{b}.}
 
@@ -217,10 +256,38 @@ if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{232}}Th slope; if
 
 \item{p.value}{the p-value of a Chi-square test for linearity.}
 
-\item{y0}{the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio and its
-standard error.}
+\item{y0}{a four-element vector containing:
 
-\item{age}{the Th-U isochron age and its standard error.}
+\code{y}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
+
+\code{s[y]}: the propagated uncertainty of \code{y}
+
+\code{ci[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{y}
+
+\code{disp[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{y} enhanced by \eqn{\sqrt{mswd}}.}
+
+\item{age}{a four-element vector containing:
+
+\code{t}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
+
+\code{s[t]}: the propagated uncertainty of \code{t}
+
+\code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{t}
+
+\code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{t} enhanced by \eqn{\sqrt{mswd}}.}
+
+\item{d}{a matrix with the following columns: the X-variable for
+the isochron plot, the analytical uncertainty of X, the Y-variable
+for the isochron plot, the analytical uncertainty of Y, and the
+correlation coefficient between X and Y.}
+
+\item{xlab}{the x-label of the isochron plot}
+
+\item{ylab}{the y-label of the isochron plot}
 
 }
 }
@@ -239,4 +306,8 @@ isochron(examples$ArAr)
 Nicolaysen, L.O., 1961. Graphic interpretation of
     discordant age measurements on metamorphic rocks. Annals of the
     New York Academy of Sciences, 91(1), pp.198-206.
+
+Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
+    \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+    Cosmochimica Acta, 58(22), pp.5031-5042.
 }

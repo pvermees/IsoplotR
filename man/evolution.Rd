@@ -16,7 +16,8 @@ evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
 
 \item{ylim}{y-axis limits}
 
-\item{alpha}{confidence cutoff for the error ellipses}
+\item{alpha}{probability cutoff for the error ellipses and
+confidence intervals}
 
 \item{transform}{if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 vs. Th-U age.}
@@ -64,6 +65,6 @@ Ludwig, K.R. and Titterington, D.M., 1994. Calculation
     Cosmochimica Acta, 58(22), pp.5031-5042.
 
 Ludwig, K.R., 2003. Mathematical-statistical treatment of data and
-    errors for 230 Th/U geochronology. Reviews in Mineralogy and
+    errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
     Geochemistry, 52(1), pp.631-656.
 }
