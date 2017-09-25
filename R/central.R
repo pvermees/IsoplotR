@@ -111,7 +111,7 @@ central.default <- function(x,alpha=0.05,...){
     # add back one d.o.f. for the homogeneity test
     out$mswd <- Chi2/(out$df+1)
     out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-    out$age <- c(tt,st,qt(1-alpha/2,out$df)*st)
+    out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)
     out$disp <- c(sigma,qnorm(1-alpha/2)*sigma)
     names(out$age) <- c('t','s[t]','ci[t]')
     names(out$disp) <- c('s','ci')
@@ -155,7 +155,7 @@ central.UThHe <- function(x,alpha=0.05,...){
     SS <- SS.UThHe.uv(out$uvw[1:2],x)
     out$df <- 2*(ns-1)
     out$mswd <- SS/out$df
-    out$tfact <- qt(1-alpha/2,out$df)
+    out$tfact <- stats::qt(1-alpha/2,out$df)
     if (doSm){
         cco <- uvw2UThHe(out$uvw,out$mswd*out$covmat)
         out$age['disp[t]'] <-
@@ -212,7 +212,7 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
         # add back one d.o.f. for homogeneity test
         out$mswd <- Chi2/(out$df+1)
         out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-        out$age <- c(tt,st,qt(1-alpha/2,out$df)*st)        
+        out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)        
         out$disp <- c(sigma,qnorm(1-alpha/2)*sigma)
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$disp) <- c('s','ci')

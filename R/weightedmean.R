@@ -14,15 +14,20 @@
 #'     \code{RbSr}, \code{LuHf}, \code{ThU}, \code{fissiontracks} or
 #'     \code{UThHe}
 #' @param ... optional arguments
-#' @return if \code{PLOT=FALSE}, returns a list with the following
-#'     items:
-#'
+#' @return returns a list with the following items:
 #' \describe{
-#' \item{mean}{a two element vector with the weighted mean and its
-#' standard error.}
+#' \item{mean}{a three element vector with:
 #'
-#' \item{disp}{a two element vector with the (over)dispersion and its
-#' standard error.}
+#' \code{x}: the weighted mean
+#'
+#' \code{s[x]}: the estimated analytical uncertainty of \code{x}
+#'
+#' \code{ci[x]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{x} given the appropriate degrees of freedom
+#' }
+#'
+#' \item{disp}{a two element vector with the (over)dispersion the
+#' corresponding \eqn{100(1-\alpha/2)\%} confidence interval.}
 #'
 #' \item{mswd}{the Mean Square of the Weighted Deviates
 #' (a.k.a. `reduced Chi-square' statistic)}
@@ -31,8 +36,16 @@
 #' of freedom, testing the null hypothesis that the underlying
 #' population is not overdispersed.}
 #'
+#' \item{df}{the degrees of freedom for the Chi-square test}
+#'
+#' \item{tfact}{the \eqn{100(1-\alpha/2)} percentile of a
+#' t-distribution with \code{df} degrees of freedom}
+#'
 #' \item{valid}{vector of logical flags indicating which steps are
 #' included into the weighted mean calculation}
+#'
+#' \item{plotpar}{list of plot parameters for the weighted mean
+#' diagram}
 #' }
 #' @rdname weightedmean
 #' @export
@@ -75,12 +88,12 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
     out$disp <- rep(NA,2)
     names(out$mean) <- c('x','s[x]','ci[x]')
     names(out$disp) <- c('s','ci')
-    if (out$df>0) out$tfact <- qt(1-alpha/2,out$df)
+    if (out$df>0) out$tfact <- stats::qt(1-alpha/2,out$df)
     else out$tfact <- NA
     out$mean[c('x','s[x]')] <- fit$mean[1:2]
     out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
     out$disp['s'] <- fit$disp
-    out$disp['ci'] <- qnorm(1-alpha/2)*fit$disp
+    out$disp['ci'] <- stats::qnorm(1-alpha/2)*fit$disp
     ns <- length(X)
     out$plotpar <-
         list(mean=list(x=c(0,ns+1),

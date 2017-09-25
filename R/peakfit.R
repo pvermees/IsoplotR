@@ -294,7 +294,7 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
         line <- paste0('Peak ',i,': ',rounded.age[1],' \u00B1 ',
                        rounded.age[2],' | ',rounded.age[3])
         if (k>1){
-            rounded.prop <- roundit(fit$props[1,i],fit$props[2:3,i],sigdig=sigdig)
+            rounded.prop <- roundit(fit$props[1,i],fit$props[2,i],sigdig=sigdig)
             line <- paste0(line,' (',100*rounded.prop[1],'%)')
         }
         out <- c(out,line)
@@ -407,7 +407,7 @@ binomial.mixtures <- function(x,k,exterr=TRUE,alpha=0.05,...){
 format.peaks <- function(peaks,peaks.err,props,props.err,df,alpha=0.05){
     out <- list()
     k <- length(peaks)
-    out$tfact <- qt(1-alpha/2,df)
+    out$tfact <- stats::qt(1-alpha/2,df)
     out$peaks <- matrix(0,3,k)
     colnames(out$peaks) <- 1:k
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
@@ -491,7 +491,7 @@ min_age_model <- function(zs,sigdig=2,alpha=0.05){
     out$peaks <- matrix(0,3,1)
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
     df <- length(z)-3
-    out$tfact <- qt(1-alpha/2,df)
+    out$tfact <- stats::qt(1-alpha/2,df)
     out$peaks['t',] <- fit[1]
     out$peaks['s[t]',] <- sqrt(E[1,1])
     out$peaks['ci[t]',] <- out$tfact*sqrt(E[1,1])

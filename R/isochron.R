@@ -617,7 +617,7 @@ isochron_init <- function(fit,alpha=0.05){
     out <- fit
     out$age <- rep(NA,4)
     out$y0 <- rep(NA,4)
-    out$tfact <- qt(1-alpha/2,out$df)
+    out$tfact <- stats::qt(1-alpha/2,out$df)
     names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
     names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
     class(out) <- "isochron"
@@ -627,7 +627,7 @@ regression_init <- function(fit,alpha=0.05){
     out <- fit
     out$a <- rep(NA,4)
     out$b <- rep(NA,4)
-    out$tfact <- qt(1-alpha/2,out$df)
+    out$tfact <- stats::qt(1-alpha/2,out$df)
     names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
     names(out$b) <- c('b','s[b]','ci[b]','disp[b]')
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]

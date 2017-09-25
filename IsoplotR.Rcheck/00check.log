@@ -38,8 +38,8 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
 File README.md cannot be checked without ‘pandoc’ being installed.
-Non-standard files/directories found at top level:
-  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
+Non-standard file/directory found at top level:
+  ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -75,24 +75,7 @@ These should not be in a package tarball.
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... ERROR
-Running examples in ‘IsoplotR-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: peakfit
-> ### Title: Finite mixture modelling of geochronological datasets
-> ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
-> ###   peakfit.PbPb peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr
-> ###   peakfit.LuHf peakfit.ThU peakfit.UThHe
-> 
-> ### ** Examples
-> 
-> data(examples)
-> peakfit(examples$FT1,k=2)
-Error in fit$props[2:3, i] : subscript out of bounds
-Calls: peakfit -> peakfit.fissiontracks -> peaks2legend -> roundit
-Execution halted
+* checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 ERROR, 2 WARNINGs, 4 NOTEs
+Status: 2 WARNINGs, 4 NOTEs

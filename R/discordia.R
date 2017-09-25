@@ -4,7 +4,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
                                           exterr=FALSE,alpha=0.05){
     fit <- ludwig(x,exterr=exterr)
     out <- fit[c('mswd','p.value','df')]
-    tfact <- qt(1-alpha/2,fit$df)
+    tfact <- stats::qt(1-alpha/2,fit$df)
     if (wetherill){
         labels <- c('t[l]','t[u]')
         out <- c(out,twfit2wfit(fit,x))

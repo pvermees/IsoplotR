@@ -135,15 +135,20 @@ method). When applied to data of class \code{ThU}, setting
 \code{i2i} to \code{TRUE} applies a detrital Th-correction.}
 }
 \value{
-if \code{PLOT=FALSE}, returns a list with the following
-    items:
-
+returns a list with the following items:
 \describe{
-\item{mean}{a two element vector with the weighted mean and its
-standard error.}
+\item{mean}{a three element vector with:
 
-\item{disp}{a two element vector with the (over)dispersion and its
-standard error.}
+\code{x}: the weighted mean
+
+\code{s[x]}: the estimated analytical uncertainty of \code{x}
+
+\code{ci[x]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{x} given the appropriate degrees of freedom
+}
+
+\item{disp}{a two element vector with the (over)dispersion the
+corresponding \eqn{100(1-\alpha/2)\%} confidence interval.}
 
 \item{mswd}{the Mean Square of the Weighted Deviates
 (a.k.a. `reduced Chi-square' statistic)}
@@ -152,8 +157,16 @@ standard error.}
 of freedom, testing the null hypothesis that the underlying
 population is not overdispersed.}
 
+\item{df}{the degrees of freedom for the Chi-square test}
+
+\item{tfact}{the \eqn{100(1-\alpha/2)} percentile of a
+t-distribution with \code{df} degrees of freedom}
+
 \item{valid}{vector of logical flags indicating which steps are
 included into the weighted mean calculation}
+
+\item{plotpar}{list of plot parameters for the weighted mean
+diagram}
 }
 }
 \description{

@@ -252,18 +252,17 @@ Overfull \hbox (1.38768pt too wide) in paragraph at lines 3076--3080
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43]
-Underfull \vbox (badness 10000) has occurred while \output is active [44]
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 3276--3280
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43] [44]
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 3297--3301
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 3304--3313
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 3325--3334
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [45] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [46]
 No file Rd2.ind.
-[47] (/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.aux)
+[47] (/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -283,7 +282,7 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (47 pages, 223634 bytes).
+Output written on Rd2.pdf (47 pages, 224903 bytes).
 Transcript written on Rd2.log.
 This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
@@ -344,20 +343,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.aux)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.out)
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.out)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.out)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/u
-pdmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 104--107
 \T1/ptm/m/n/10 the spon-ta-neous and in-duced track den-si-ties \T1/zi4/m/n/10 
@@ -539,18 +538,17 @@ Overfull \hbox (1.38768pt too wide) in paragraph at lines 3076--3080
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44]
-Underfull \vbox (badness 10000) has occurred while \output is active [45]
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 3276--3280
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44] [45]
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 3297--3301
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 3304--3313
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 3325--3334
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
 No file Rd2.ind.
-[48] (/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.aux) )
+[48] (/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
@@ -564,7 +562,7 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (48 pages, 226958 bytes).
+Output written on Rd2.pdf (48 pages, 228266 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (25 entries accepted, 0 rejected).
@@ -631,20 +629,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.aux)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.out)
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.out)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.out)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/u
-pdmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 104--107
 \T1/ptm/m/n/10 the spon-ta-neous and in-duced track den-si-ties \T1/zi4/m/n/10 
@@ -826,22 +824,21 @@ Overfull \hbox (1.38768pt too wide) in paragraph at lines 3076--3080
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44]
-Underfull \vbox (badness 10000) has occurred while \output is active [45]
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 3276--3280
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44] [45]
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 3297--3301
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 3304--3313
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 3325--3334
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.ind [48]
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.ind [48]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
 
-[49]) (/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.aux)
+[49]) (/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -864,7 +861,7 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (49 pages, 229058 bytes).
+Output written on Rd2.pdf (49 pages, 230349 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (25 entries accepted, 0 rejected).
@@ -931,20 +928,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.aux)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.out)
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.out)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.out)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/u
-pdmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 104--107
 \T1/ptm/m/n/10 the spon-ta-neous and in-duced track den-si-ties \T1/zi4/m/n/10 
@@ -1126,22 +1123,21 @@ Overfull \hbox (1.38768pt too wide) in paragraph at lines 3076--3080
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44]
-Underfull \vbox (badness 10000) has occurred while \output is active [45]
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 3276--3280
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44] [45]
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 3297--3301
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (15.79549pt too wide) in paragraph at lines 3304--3313
+Overfull \hbox (15.79549pt too wide) in paragraph at lines 3325--3334
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
-(/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.ind [48]
+(/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.ind [48]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
 
-[49]) (/tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d/Rd2.aux)
+[49]) (/tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf/Rd2.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
@@ -1159,8 +1155,8 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (49 pages, 229818 bytes).
+Output written on Rd2.pdf (49 pages, 231126 bytes).
 Transcript written on Rd2.log.
 Saving output to 'IsoplotR-manual.pdf' ...
 Done
-You may want to clean up by 'rm -rf /tmp/Rtmp8DVg8r/Rd2pdf7ff586e435d'
+You may want to clean up by 'rm -rf /tmp/Rtmpe6tyrM/Rd2pdf47347c75dabf'

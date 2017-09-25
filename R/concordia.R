@@ -290,7 +290,7 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
         out <- c(out,mswd.concordia(x,ccw,tt[1],exterr=exterr))
         out$age <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-        tfact <- qt(1-alpha/2,out$df['combined'])
+        tfact <- stats::qt(1-alpha/2,out$df['combined'])
         out$age[c('t','s[t]')] <- tt
         out$age['ci[t]'] <- tfact*out$age['s[t]']
         if (out$mswd['combined']>1)
