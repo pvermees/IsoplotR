@@ -8,9 +8,8 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     sa <- sU234U238
     sA <- sTh230U238
     covAa <- cov4808
-    fit <- stats::optim(0,fn=ThU.misfit,gr=ThU.gr,method='BFGS',
-                        A=A,a=a,l0=l0,l4=l4)
-    tt <- fit$par
+    fit <- fit <- stats::optimize(ThU.misfit,interval=c(0,2000),A=A,a=a,l0=l0,l4=l4)
+    tt <- fit$minimum
     a0 <- 1+(a-1)*exp(l4[1]*tt)
     l40 <- l4[1]-l0[1]
     el40t <- exp(l40*tt)
@@ -81,7 +80,7 @@ k1 <- function(tt,l0,l4){
 ThU.misfit <- function(tt,A,a,l0,l4){
     (1-exp(-l0[1]*tt)-(a-1)*k1(tt,l0,l4) - A)^2
 }
-
+# not used anymore but kept for possible use in the future
 ThU.gr <- function(tt,A,a,l0,l4){
     dk1.dtt <- l0[1]*exp((l4[1]-l0[1])*tt)
     dmisfit.dtt <- 2*(1-exp(-l0[1]*tt)-(a-1)*k1(tt,l0,l4) - A) *
