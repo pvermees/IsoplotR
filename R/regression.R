@@ -12,8 +12,6 @@ model1regression <- function(d,type='york'){
         out <- york(d)
     } else if (identical(type,'titterington')){
         out <- titterington(d)
-    } else if (identical(type,'ludwig')){
-        out <- ludwig(d)
     } else {
         stop('invalid output type for model 1 regression')
     }
@@ -62,8 +60,6 @@ model3regression <- function(d,type='york'){
                       d=d)$minimum
         dd <- augment_titterington_errors(d,w)
         out <- titterington(dd)
-    } else if (identical(type,'ludwig')){
-        out <- ludwig(d)
     } else {
         stop('invalid output type for model 3 regression')
     }
@@ -78,6 +74,10 @@ titterington_disp_misfit <- function(w2,d){
     dd <- augment_titterington_errors(d,w2)
     abs(titterington(dd)$mswd - 1)
 }
+ludwig_disp_misfit <- function(w2,d){
+    dd <- augment_ludwig_errors(d,w2)
+    abs(ludwig(dd)$mswd - 1)
+}
 
 augment_york_errors <- function(d,w){
     out <- d
@@ -86,6 +86,15 @@ augment_york_errors <- function(d,w){
     out
 }
 augment_titterington_errors <- function(d,w){
+    out <- d
+    out[,'sZ'] <- sqrt(d[,'sZ']^2 + w^2)
+    out[,'rXZ'] <- d[,'rXZ']*d[,'sZ']/out[,'sZ']
+    out[,'rYZ'] <- d[,'rYZ']*d[,'sZ']/out[,'sZ']
+    out
+}
+augment_ludwig_errors <- function(d,w){
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@27@"]]))##:ess-bp-end:##
     out <- d
     out[,'sZ'] <- sqrt(d[,'sZ']^2 + w^2)
     out[,'rXZ'] <- d[,'rXZ']*d[,'sZ']/out[,'sZ']

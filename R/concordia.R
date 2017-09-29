@@ -70,9 +70,10 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     else X <- x
     concordia.line(X,tlim=tlim,wetherill=wetherill,col=concordia.col,
                    alpha=alpha,exterr=exterr,ticks=ticks,...)
-    if (show.age==2){
-        fit <- concordia.intersection.ludwig(x,
-                         wetherill=wetherill,exterr=exterr,alpha=alpha)
+    if (show.age>1){
+        fit <- concordia.intersection(x,wetherill=wetherill,
+                                      exterr=exterr,alpha=alpha,
+                                      model=(show.age-1))
         discordia.plot(fit,wetherill=wetherill)
         graphics::title(discordia.title(fit,wetherill=wetherill,
                                         sigdig=sigdig))
@@ -343,7 +344,7 @@ initial.concordia.age <- function(x){
     x0 <- x$x['U238Pb206']
     y0 <- x$x['Pb207Pb206']
     a <- y0 - b*x0
-    fit <- concordia.intersection.york.ab(a,b,exterr=FALSE)
+    fit <- concordia.intersection.ab(a,b,exterr=FALSE)
     fit$x[1]
 }
 

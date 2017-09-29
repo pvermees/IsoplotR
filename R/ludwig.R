@@ -41,8 +41,11 @@
 ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
-ludwig.default <- function(x,...){ stop( "No default method available (yet)." ) }
-#' @param exterr propagate external sources of uncertainty (e.g., decay constant)?
+ludwig.default <- function(x,...){
+    stop( "No default method available (yet)." )
+}
+#' @param exterr propagate external sources of
+#' uncertainty (e.g., decay constant)?
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,...){
@@ -116,7 +119,8 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE){
     }
     Ex[1:ns,1:ns] <- diag(XY[,'sX'])^2
     Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY'])^2
-    Ex[1:ns,(ns+1):(2*ns)] <- diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
+    Ex[1:ns,(ns+1):(2*ns)] <-
+        diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
     Ex[(ns+1):(2*ns),1:ns] <- Ex[1:ns,(ns+1):(2*ns)]
     if (exterr){
         Ex[2*ns+1,2*ns+1] <- l5[2]^2
@@ -156,16 +160,18 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE){
     } else {
         for (i in 1:ns){
             omega <- d$omega[[i]]
-            SS <- SS + omega[1,1]*R[i]^2 + omega[2,2]*r[i]^2 + omega[3,3]*phi[i]^2 +
-                2*( R[i]*r[i]*omega[1,2] + R[i]*phi[i]*omega[1,3] +
-                r[i]*phi[i]*omega[2,3] )
+            SS <- SS + omega[1,1]*R[i]^2 + omega[2,2]*r[i]^2 +
+                       omega[3,3]*phi[i]^2 + 2*( R[i]*r[i]*omega[1,2] +
+                       R[i]*phi[i]*omega[1,3] + r[i]*phi[i]*omega[2,3] )
         }
     }
     SS/2
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
-fisher.lud.default <- function(x,...){ stop( "No default method available (yet)." ) }
+fisher.lud.default <- function(x,...){
+    stop( "No default method available (yet)." )
+}
 fisher.lud.UPb <- function(x,pars,exterr=FALSE,...){
     if (x$format<4) return(fisher.lud.2D(x,pars,exterr=FALSE,...))
     else return(fisher.lud.3D(x,pars,exterr=FALSE,...))
@@ -312,7 +318,7 @@ data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
 data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
     if (x$format < 4)
-        stop('Ludwig regression is not possible for U-Pb data of format < 4.')
+        stop('Ludwig regression is not possible for U-Pb data of format<4.')
     if (exterr)
         out <- data2ludwig_with_decay_err(x,a0=a0,b0=b0,tt=tt)
     else

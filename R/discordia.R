@@ -1,5 +1,22 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
+concordia.intersection <- function(x,exterr=FALSE,wetherill=TRUE,
+                                   model=1,alpha=0.05){
+    if (model==1){
+        out <- concordia.intersection.ludwig(x,wetherill=wetherill,
+                                             exterr=exterr,alpha=0.05)
+    } else if (model==2){
+        d <- data2york(x,wetherill=FALSE)
+        ab <- stats::lm(d[,'Y'] ~ d[,'X'])$coefficients
+        out <- concordia.intersection.ab(ab[1],ab[2],
+                                         exterr=exterr,
+                                         wetherill=wetherill)
+    } else if (model==3){
+        stop('coming soon')
+    }
+    out$model <- model
+    out
+}
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,
                                           exterr=FALSE,alpha=0.05){
     fit <- ludwig(x,exterr=exterr)
@@ -37,18 +54,27 @@ concordia.intersection.york <- function(x,exterr=FALSE){
     fit <- york(d)
     concordia.intersection.york.ab(fit$a[1],fit$b[1],exterr=exterr)
 }
-concordia.intersection.york.ab <- function(a,b,exterr=FALSE){
+concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE){
     out <- list()
-    search.range <- c(1/10000,10000)
+    m <- 1/10000
+    M <- 10000
     out$x <- c(1,a) # tl, 7/6 intercept
-    names(out$x) <- c('t[l]','76i')
+    if (wetherill) names(out$x) <- c('t[l]','t[u]')
+    else names(out$x) <- c('t[l]','76i')
     if (b<0) { # negative slope => two intersections with concordia line
+        search.range <- c(m,M)
         midpoint <- stats::optimize(intersection.misfit.york,
-                                    search.range,a=a,b=b)$minimum
-        search.range[2] <- midpoint
+                                    serach.range,a=a,b=b)$minimum
+        search.range <- c(m,midpoint)
         out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
                                         search.range,a=a,b=b)$root
+        if (wetherill){
+            search.range <- c(midpoint,M)
+            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,
+                                            search.range,a=a,b=b)$root
+        }   
     } else {
+        search.range <- c(m,M)
         out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
                                         search.range,a=a,b=b)$root
     }
