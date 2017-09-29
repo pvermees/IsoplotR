@@ -65,7 +65,8 @@ york <- function(x,alpha=0.05){
     ab <- stats::lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]
     b <- ab[2]
-    if (is.na(x) | is.na(b)) stop('Cannot fit a straight line through these data')
+    if (any(is.na(x)) | is.na(b))
+        stop('Cannot fit a straight line through these data')
     wX <- 1/x[,'sX']^2
     wY <- 1/x[,'sY']^2
     for (i in 1:50){ # 50 = maximum number of iterations
