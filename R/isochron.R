@@ -56,9 +56,11 @@
 #'
 #' \enumerate{
 #'
-#' \item{Error weighted least squares regression}
+#' \item{Error-weighted least squares regression}
 #'
 #' \item{Ordinary least squares regression}
+#'
+#' \item{Error-weighted least squares with overdispersion term}
 #'
 #' }
 #'
@@ -662,7 +664,7 @@ get.limits <- function(X,sX){
 }
 
 isochrontitle <- function(fit,sigdig=2,type=NA){
-    if (fit$model!=2 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
+    if (fit$model==1 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
     else args <- quote(a%+-%b~'|'~c)
     if (is.na(type)){
         intercept <- roundit(fit$a[1],fit$a[2:4],sigdig=sigdig)
@@ -689,7 +691,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         list2 <- list(a=rounded.intercept[1],
                       b=rounded.intercept[2],
                       c=rounded.intercept[3])
-        if (fit$model!=2 && fit$mswd>1){
+        if (fit$model==1 && fit$mswd>1){
             list1$d <- rounded.age[4]
             list2$d <- rounded.intercept[4]
         }
@@ -715,8 +717,12 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         graphics::mtext(line1,line=2)
         graphics::mtext(line2,line=1)
         graphics::mtext(line3,line=0)
-    } else {
+    } else if (fit$model==2){
         graphics::mtext(line1,line=1)
         graphics::mtext(line2,line=0)
+    } else if (fit$model==3){
+        graphics::mtext(line1,line=2)
+        graphics::mtext(line2,line=1)
+        graphics::mtext('(model-3 fit with overdispersion term)',line=0)
     }
 }
