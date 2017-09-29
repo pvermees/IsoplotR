@@ -49,12 +49,37 @@ model2regression <- function(d,type='york'){
 
 model3regression <- function(d,type='york'){
     if (identical(type,'york')){
-        out <- york(d)
+        init <- york(d)$mswd
+        w <- optimize(york_disp_misfit,interval=c(0,init),d=d)$minimum
+        dd <- augment_errors(d,w)
+        out <- york(dd)
     } else if (identical(type,'titterington')){
         out <- titterington(d)
     } else if (identical(type,'ludwig')){
         out <- ludwig(d)
     } else {
-        stop('invalid output type for model 1 regression')
+        stop('invalid output type for model 3 regression')
     }
+    out
+}
+
+york_disp_misfit <- function(w2,d){
+    dd <- augment_errors(d,w2)
+    abs(york(dd)$mswd - 1)
+}
+
+augment_errors <- function(d,w){
+    out <- d
+    out[,'sY'] <- sqrt(d[,'sY']^2 + w^2)
+    out[,'rXY'] <- d[,'rXY']*d[,'sY']/out[,'sY']
+    out
+}
+
+foo <- function(d,interval){
+    w2 <- seq(from=interval[1],to=interval[2],length.out=100)
+    y <- rep(0,100)
+    for (i in 1:length(w2)){
+        y[i] <- york_disp_misfit(w2[i],d)
+    }
+    plot(w2,y,type='l')
 }

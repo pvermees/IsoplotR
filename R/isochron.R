@@ -85,7 +85,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     fit <- regression(X,model=model)
     out <- regression_init(fit,alpha=alpha)
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
-                show.ellipses=1*(model==1),show.numbers=show.numbers,
+                show.ellipses=1*(model!=2),show.numbers=show.numbers,
                 levels=levels,ellipse.col=ellipse.col,a=fit$a[1],
                 b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
@@ -283,10 +283,9 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
             out$tfact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
                                    x$J[1],x$J[2],exterr=exterr)[2]
     }
-    show.ellipses <- (model!=2)
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
+                    show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                     line.col=line.col,lwd=lwd,...)
@@ -328,7 +327,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=1*(model==1),
+                    show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                     line.col=line.col,lwd=lwd,...)
@@ -425,7 +424,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
     }
     if (plot){
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=1*(model==1),
+                    show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     ellipse.col=ellipse.col,a=out$a[1],b=out$b[1],
                     line.col=line.col,lwd=lwd,...)
@@ -452,7 +451,7 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=2*(model==1),show.numbers=show.numbers,
+                    show.ellipses=2*(model!=2),show.numbers=show.numbers,
                     a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
                         xlab="P",ylab="He")
@@ -603,9 +602,9 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
     }
     if (plot){
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=1*(model==1),
+                    show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    ellipse.col=ellipse.col, a=fit$a[1],b=fit$b[1],
+                    ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
                     line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
                         xlab=x.lab,ylab=y.lab)
@@ -615,27 +614,43 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
 
 isochron_init <- function(fit,alpha=0.05){
     out <- fit
-    out$age <- rep(NA,4)
-    out$y0 <- rep(NA,4)
     out$tfact <- stats::qt(1-alpha/2,out$df)
-    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-    names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
+    if (fit$model==1){
+        out$age <- rep(NA,4)
+        out$y0 <- rep(NA,4)
+        names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
+        names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
+    } else {
+        out$age <- rep(NA,3)
+        out$y0 <- rep(NA,3)
+        names(out$age) <- c('t','s[t]','ci[t]')
+        names(out$y0) <- c('y','s[y]','ci[y]')
+    }
     class(out) <- "isochron"
     out
 }
 regression_init <- function(fit,alpha=0.05){
     out <- fit
-    out$a <- rep(NA,4)
-    out$b <- rep(NA,4)
     out$tfact <- stats::qt(1-alpha/2,out$df)
-    names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
-    names(out$b) <- c('b','s[b]','ci[b]','disp[b]')
+    if (fit$model==1){
+        out$a <- rep(NA,4)
+        out$b <- rep(NA,4)
+        names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
+        names(out$b) <- c('b','s[b]','ci[b]','disp[b]')
+    } else {
+        out$a <- rep(NA,3)
+        out$b <- rep(NA,3)
+        names(out$a) <- c('a','s[a]','ci[a]')
+        names(out$b) <- c('b','s[b]','ci[b]')
+    }
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
     out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
     out$a['ci[a]'] <- out$tfact*fit$a['s[a]']
-    out$a['disp[a]'] <- out$tfact*sqrt(fit$mswd)*fit$a['s[a]']
     out$b['ci[b]'] <- out$tfact*fit$b['s[b]']
-    out$b['disp[b]'] <- out$tfact*sqrt(fit$mswd)*fit$b['s[b]']
+    if (fit$model==1){
+        out$a['disp[a]'] <- out$tfact*sqrt(fit$mswd)*fit$a['s[a]']
+        out$b['disp[b]'] <- out$tfact*sqrt(fit$mswd)*fit$b['s[b]']
+    }
     class(out) <- "isochron"
     out
 }
