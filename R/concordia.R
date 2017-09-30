@@ -71,9 +71,9 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     concordia.line(X,tlim=tlim,wetherill=wetherill,col=concordia.col,
                    alpha=alpha,exterr=exterr,ticks=ticks,...)
     if (show.age>1){
-        fit <- concordia.intersection(x,wetherill=wetherill,
-                                      exterr=exterr,alpha=alpha,
-                                      model=(show.age-1))
+        fit <- concordia.intersection.ludwig(x,wetherill=wetherill,
+                                             exterr=exterr,alpha=alpha,
+                                             model=(show.age-1))
         discordia.plot(fit,wetherill=wetherill)
         graphics::title(discordia.title(fit,wetherill=wetherill,
                                         sigdig=sigdig))

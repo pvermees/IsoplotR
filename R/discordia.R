@@ -1,25 +1,9 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection <- function(x,exterr=FALSE,wetherill=TRUE,
-                                   model=1,alpha=0.05){
-    if (model==1){
-        out <- concordia.intersection.ludwig(x,wetherill=wetherill,
-                                             exterr=exterr,alpha=0.05)
-    } else if (model==2){
-        d <- data2york(x,wetherill=FALSE)
-        ab <- stats::lm(d[,'Y'] ~ d[,'X'])$coefficients
-        out <- concordia.intersection.ab(ab[1],ab[2],
-                                         exterr=exterr,
-                                         wetherill=wetherill)
-    } else if (model==3){
-        stop('coming soon')
-    }
-    out$model <- model
-    out
-}
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,
-                                          exterr=FALSE,alpha=0.05){
-    fit <- ludwig(x,exterr=exterr)
+                                          exterr=FALSE,alpha=0.05,
+                                          model=1){
+    fit <- ludwig(x,exterr=exterr,model=model)
     out <- fit[c('mswd','p.value','df')]
     tfact <- stats::qt(1-alpha/2,fit$df)
     if (wetherill){

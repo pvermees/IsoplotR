@@ -48,35 +48,40 @@ ludwig.default <- function(x,...){
 #' uncertainty (e.g., decay constant)?
 #' @rdname ludwig
 #' @export
-ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,...){
+ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     ta0 <- concordia.intersection.york(x,exterr=FALSE)$x
     if (x$format<4) init <- ta0
     else init <- c(ta0[1],10,10)
     fit <- stats::optim(init,fn=LL.lud.UPb,
-                        method="BFGS",x=x,exterr=exterr)
+                        method="BFGS",x=x,
+                        exterr=exterr,model=model)
     out <- list()
     out$par <- fit$par
-    out$cov <- tryCatch({ # analytical
-        fish <- fisher.lud(x,ta0b0=fit$par,exterr=exterr)
-        ns <- length(x)
-        # block inversion:
-        AA <- fish[1:ns,1:ns]
-        BB <- fish[1:ns,(ns+1):(ns+3)]
-        CC <- fish[(ns+1):(ns+3),1:ns]
-        DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
-        solve(DD - CC %*% solve(AA) %*% BB)
-    }, error = function(e){ # numerical
-        fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",
-                            x=x,exterr=exterr,hessian=TRUE)
-        solve(fit$hessian)
-    })
+    if (model==1){
+        out$cov <- tryCatch({ # analytical
+            fish <- fisher.lud(x,ta0b0=fit$par,exterr=exterr)
+            ns <- length(x)
+            # block inversion:
+            AA <- fish[1:ns,1:ns]
+            BB <- fish[1:ns,(ns+1):(ns+3)]
+            CC <- fish[(ns+1):(ns+3),1:ns]
+            DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
+            solve(DD - CC %*% solve(AA) %*% BB)
+        }, error = function(e){ # numerical
+            fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",
+                                x=x,exterr=exterr,hessian=TRUE)
+            solve(fit$hessian)
+        })
+        mswd <- mswd.lud(fit$par,x=x)
+        out <- c(out,mswd)
+    } else if (model==2){
+        stop('coming soon')
+    }
     if (x$format<4) parnames <- c('t[l]','76i')
     else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
-    mswd <- mswd.lud(fit$par,x=x)
-    out <- c(out,mswd)
     out
 }
 
@@ -92,11 +97,13 @@ mswd.lud <- function(pars,x){
     out
 }
 
-LL.lud.UPb <- function(pars,x,exterr=FALSE){
-    if (x$format<4) return(LL.lud.2D(pars,x=x,exterr=exterr))
-    else return(LL.lud.3D(pars,x=x,exterr=exterr))
+LL.lud.UPb <- function(pars,x,exterr=FALSE,model=1){
+    if (x$format<4)
+        return(LL.lud.2D(pars,x=x,exterr=exterr,model=model))
+    else
+        return(LL.lud.3D(pars,x=x,exterr=exterr,model=model))
 }
-LL.lud.2D <- function(ta0,x,exterr=FALSE){
+LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1){
     tt <- ta0[1]
     a0 <- ta0[2]
     l5 <- settings('lambda','U235')
@@ -106,33 +113,36 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE){
     b <- (exp(l5[1]*tt)-1)/U - a0*(exp(l8[1]*tt)-1) # slope
     xy <- get.york.xy(XY,a0,b) # get adjusted xi, yi
     ns <- length(x)
-    
     v <- matrix(0,1,2*ns)
     v[1:ns] <- XY[,'X']-xy[,1]
     v[(ns+1):(2*ns)] <- XY[,'Y']-xy[,2]
-    if (exterr){
-        Ex <- matrix(0,2*ns+2,2*ns+2)
-        Jv <- diag(1,2*ns,2*ns+2)
+    if (model==2){
+        E <- diag(2*ns)
     } else {
-        Ex <- matrix(0,2*ns,2*ns)
-        Jv <- diag(1,2*ns,2*ns)
+        if (exterr){
+            Ex <- matrix(0,2*ns+2,2*ns+2)
+            Jv <- diag(1,2*ns,2*ns+2)
+        } else {
+            Ex <- matrix(0,2*ns,2*ns)
+            Jv <- diag(1,2*ns,2*ns)
+        }
+        Ex[1:ns,1:ns] <- diag(XY[,'sX'])^2
+        Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY'])^2
+        Ex[1:ns,(ns+1):(2*ns)] <-
+            diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
+        Ex[(ns+1):(2*ns),1:ns] <- Ex[1:ns,(ns+1):(2*ns)]
+        if (exterr){
+            Ex[2*ns+1,2*ns+1] <- l5[2]^2
+            Ex[2*ns+2,2*ns+2] <- l8[2]^2
+            Jv[,2*ns+1] <- -tt*exp(l5[1]*tt)*XY[,'X']/U
+            Jv[,2*ns+2] <- a0*tt*exp(l8[1]*tt)*XY[,'X']
+        }
+        E <- Jv %*% Ex %*% t(Jv)
     }
-    Ex[1:ns,1:ns] <- diag(XY[,'sX'])^2
-    Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY'])^2
-    Ex[1:ns,(ns+1):(2*ns)] <-
-        diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
-    Ex[(ns+1):(2*ns),1:ns] <- Ex[1:ns,(ns+1):(2*ns)]
-    if (exterr){
-        Ex[2*ns+1,2*ns+1] <- l5[2]^2
-        Ex[2*ns+2,2*ns+2] <- l8[2]^2
-        Jv[,2*ns+1] <- -tt*exp(l5[1]*tt)*XY[,'X']/U
-        Jv[,2*ns+2] <- a0*tt*exp(l8[1]*tt)*XY[,'X']
-    }
-    E <- Jv %*% Ex %*% t(Jv)
     S <- v %*% solve(E) %*% t(v)
     S/2
 }
-LL.lud.3D <- function(ta0b0,x,exterr=FALSE){
+LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
@@ -317,8 +327,6 @@ fisher_lud_with_decay_err <- function(tt,a0,b0,z,omega){
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
 data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
-    if (x$format < 4)
-        stop('Ludwig regression is not possible for U-Pb data of format<4.')
     if (exterr)
         out <- data2ludwig_with_decay_err(x,a0=a0,b0=b0,tt=tt)
     else

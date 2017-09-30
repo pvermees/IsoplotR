@@ -74,10 +74,6 @@ titterington_disp_misfit <- function(w2,d){
     dd <- augment_titterington_errors(d,w2)
     abs(titterington(dd)$mswd - 1)
 }
-ludwig_disp_misfit <- function(w2,d){
-    dd <- augment_ludwig_errors(d,w2)
-    abs(ludwig(dd)$mswd - 1)
-}
 
 augment_york_errors <- function(d,w){
     out <- d
@@ -86,15 +82,6 @@ augment_york_errors <- function(d,w){
     out
 }
 augment_titterington_errors <- function(d,w){
-    out <- d
-    out[,'sZ'] <- sqrt(d[,'sZ']^2 + w^2)
-    out[,'rXZ'] <- d[,'rXZ']*d[,'sZ']/out[,'sZ']
-    out[,'rYZ'] <- d[,'rYZ']*d[,'sZ']/out[,'sZ']
-    out
-}
-augment_ludwig_errors <- function(d,w){
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@27@"]]))##:ess-bp-end:##
     out <- d
     out[,'sZ'] <- sqrt(d[,'sZ']^2 + w^2)
     out[,'rXZ'] <- d[,'rXZ']*d[,'sZ']/out[,'sZ']
