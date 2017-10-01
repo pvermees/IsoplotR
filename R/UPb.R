@@ -267,6 +267,21 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0){
     out
 }
 
+get.Pb204U238.ratios <- function(x){
+    labels <- c('Pb204U238','errPb204U238')
+    if (x$format < 4) stop('No 204Pb measurements available!')
+    else if (x$format %in% c(4,6)){
+        out <- x$x[,labels]
+    } else {
+        Pb204U238 <- x$x[,'Pb204Pb206']/x$x[,'U238Pb206']
+        errPb204U238 <-
+            Pb204U238*sqrt( (x$x[,'errPb204Pb206']/x$x[,'Pb204Pb206'])^2 +
+                            (x$x[,'errU238Pb206']/x$x[,'U238Pb206'])^2 )
+        out <- cbind(Pb204U238,errPb204U238)
+    }
+    colnames(out) <- labels
+    out
+}
 get.Pb207U235.ratios <- function(x,exterr=FALSE){
     ns <- length(x)
     out <- matrix(0,ns,2)

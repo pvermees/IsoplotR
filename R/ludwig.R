@@ -74,8 +74,12 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
         })
         mswd <- mswd.lud(fit$par,x=x)
         out <- c(out,mswd)
-    } else if (model==2){
-        stop('coming soon')
+    } else if (model==2 & x$format<4){
+        out$cov <- matrix(0,2,2)
+        out$df <- length(x)-2
+    } else if (model==2 & x$format>3){
+        out$cov <- matrix(0,3,3)
+        out$df <- 2*length(x)-2
     }
     if (x$format<4) parnames <- c('t[l]','76i')
     else parnames <- c('t','64i','74i')
@@ -98,10 +102,13 @@ mswd.lud <- function(pars,x){
 }
 
 LL.lud.UPb <- function(pars,x,exterr=FALSE,model=1){
-    if (x$format<4)
+    if (x$format<4){
         return(LL.lud.2D(pars,x=x,exterr=exterr,model=model))
-    else
-        return(LL.lud.3D(pars,x=x,exterr=exterr,model=model))
+    } else if (x$format>3 & model!=2){
+        return(LL.lud.3D(pars,x=x,exterr=exterr))
+    } else {
+        return(LL.lud.SS(pars,x=x))
+    }
 }
 LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1){
     tt <- ta0[1]
@@ -142,7 +149,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1){
     S <- v %*% solve(E) %*% t(v)
     S/2
 }
-LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1){
+LL.lud.3D <- function(ta0b0,x,exterr=FALSE){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
@@ -176,6 +183,20 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1){
         }
     }
     SS/2
+}
+LL.lud.SS <- function(ta0b0,x){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    b0 <- ta0b0[3]
+    l5 <- settings('lambda','U235')[1]
+    l8 <- settings('lambda','U238')[1]
+    U <- settings('iratio','U238U235')[1]
+    X <- get.Pb207U235.ratios(x)[,'Pb207U235']
+    Y <- get.Pb206U238.ratios(x)[,'Pb206U238']
+    Z <- get.Pb204U238.ratios(x)[,'Pb204U238']
+    R <- X-exp(l5*tt)+1-U*b0*Z
+    r <- Y-exp(l8*tt)+1-a0*Z
+    sum(R^2+r^2)
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
@@ -354,7 +375,7 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt){
         E[1,1] <- d$cov['Pb207U235','Pb207U235']
         E[2,2] <- d$cov['Pb206U238','Pb206U238']
         E[3,3] <- d$cov['Pb204U238','Pb204U238']
-        E[1,2] <- d$cov['Pb207U235','Pb206U238']
+        E[1,2] <- d$cov['Pb207U235','Pb206U238'] 
         E[1,3] <- d$cov['Pb207U235','Pb204U238']
         E[2,3] <- d$cov['Pb206U238','Pb204U238']
         E[2,1] <- E[1,2]

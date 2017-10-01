@@ -4,7 +4,11 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
                                           exterr=FALSE,alpha=0.05,
                                           model=1){
     fit <- ludwig(x,exterr=exterr,model=model)
-    out <- fit[c('mswd','p.value','df')]
+    out <- list()
+    out$model <- model
+    out$mswd <- fit$mswd
+    out$p.value <- fit$p.value
+    out$df <- fit$df
     tfact <- stats::qt(1-alpha/2,fit$df)
     if (wetherill){
         labels <- c('t[l]','t[u]')
@@ -29,7 +33,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     rownames(out$err) <- c('s','ci','disp')
     out$err['s',] <- sqrt(diag(out$cov))
     out$err['ci',] <- tfact*out$err['s',]
-    if (fit$mswd>1)
+    if (model!=2 && fit$mswd>1)
         out$err['disp',] <- tfact*sqrt(fit$mswd)*out$err['s',]
     out
 }
@@ -210,14 +214,14 @@ discordia.plot <- function(fit,wetherill){
 discordia.title <- function(fit,wetherill,sigdig=2){
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
     list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3])
-    if (fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
+    if (fit$model!=2 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
     else args <- quote(a%+-%b~'|'~c)
     if (wetherill){
         upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
         expr1 <- quote('lower intercept =')
         expr2 <- quote('upper intercept =')
         list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3])
-        if (fit$mswd>1){
+        if (fit$model!=2 && fit$mswd>1){
             list1$d <- lower.age[4]
             list2$d <- upper.age[4]
         }
@@ -235,10 +239,12 @@ discordia.title <- function(fit,wetherill,sigdig=2){
     call2 <- substitute(e~a,list(e=expr2,a=args))
     line1 <- do.call('substitute',list((call1),list1))
     line2 <- do.call('substitute',list((call2),list2))
-    line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,sigdig),
-                             b=signif(fit$p.value,sigdig)))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
-    graphics::mtext(line3,line=0)
+    if (fit$model!=2){
+        line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+                            list(a=signif(fit$mswd,sigdig),
+                                 b=signif(fit$p.value,sigdig)))
+        graphics::mtext(line3,line=0)
+    }
 }
