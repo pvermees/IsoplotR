@@ -52,35 +52,25 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     ta0 <- concordia.intersection.york(x,exterr=FALSE)$x
     if (x$format<4) init <- ta0
     else init <- c(ta0[1],10,10)
-    fit <- stats::optim(init,fn=LL.lud.UPb,
-                        method="BFGS",x=x,
-                        exterr=exterr,model=model)
+    fit <- get.ta0b0(x,init=init,exterr=exterr,model=model)
     out <- list()
     out$par <- fit$par
-    if (model==1){
-        out$cov <- tryCatch({ # analytical
-            fish <- fisher.lud(x,ta0b0=fit$par,exterr=exterr)
-            ns <- length(x)
-            # block inversion:
-            AA <- fish[1:ns,1:ns]
-            BB <- fish[1:ns,(ns+1):(ns+3)]
-            CC <- fish[(ns+1):(ns+3),1:ns]
-            DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
-            solve(DD - CC %*% solve(AA) %*% BB)
-        }, error = function(e){ # numerical
-            fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",
-                                x=x,exterr=exterr,hessian=TRUE)
-            solve(fit$hessian)
-        })
-        mswd <- mswd.lud(fit$par,x=x)
-        out <- c(out,mswd)
-    } else if (model==2 & x$format<4){
-        out$cov <- matrix(0,2,2)
-        out$df <- length(x)-2
-    } else if (model==2 & x$format>3){
-        out$cov <- matrix(0,3,3)
-        out$df <- 2*length(x)-2
-    }
+    out$cov <- tryCatch({ # analytical
+        fish <- fisher.lud(x,ta0b0=fit$par,exterr=exterr)
+        ns <- length(x)
+        # block inversion:
+        AA <- fish[1:ns,1:ns]
+        BB <- fish[1:ns,(ns+1):(ns+3)]
+        CC <- fish[(ns+1):(ns+3),1:ns]
+        DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
+        solve(DD - CC %*% solve(AA) %*% BB)
+    }, error = function(e){ # numerical
+        fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",
+                            x=x,exterr=exterr,hessian=TRUE)
+        solve(fit$hessian)
+    })
+    mswd <- mswd.lud(fit$par,x=x)
+    out <- c(out,mswd)
     if (x$format<4) parnames <- c('t[l]','76i')
     else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
@@ -101,16 +91,49 @@ mswd.lud <- function(pars,x){
     out
 }
 
-LL.lud.UPb <- function(pars,x,exterr=FALSE,model=1){
-    if (x$format<4){
-        return(LL.lud.2D(pars,x=x,exterr=exterr,model=model))
-    } else if (x$format>3 & model!=2){
-        return(LL.lud.3D(pars,x=x,exterr=exterr))
+get.ta0b0 <- function(x,init,exterr=FALSE,model=1){
+    if (model==1)
+        out <- get.ta0b0.model1(x,init=init,exterr=exterr)
+    else if (model==2)
+        out <- get.ta0b0.model2(x,init=init)
+    else if (model==3)
+        out <- get.ta0b0.model3(x,init=init,exterr=exterr)
+    out
+}
+get.ta0b0.helper <- function(x,init,exterr=FALSE,model=1,w=0,misfit=FALSE){
+    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
+                        exterr=exterr,model=model,w=w)
+    if (misfit){
+        mswd <- mswd.lud(fit$par,x=x)$mswd
+        out <- (mswd-1)^2
     } else {
-        return(LL.lud.SS(pars,x=x))
+        out <- fit
+        out$w <- w
+    }
+    out
+}
+get.ta0b0.model1 <- function(x,init,exterr=FALSE){
+    get.ta0b0.helper(x,init,exterr=exterr,model=1,w=0)
+}
+get.ta0b0.model2 <- function(x,init){
+    misfit <- get.ta0b0.helper(x,init,model=1,w=0,misfit=TRUE)
+    wrange <- c(0,sqrt(sqrt(misfit)+1))
+    fit <- stats::optimize(f=lud.model2.misfit,interval=wrange,x=x,init=init)
+    stats::optim(init,fn=LL.lud.UPb,method="BFGS",
+                 x=x,model=2,w=fit$minimum)
+}
+lud.model2.misfit <- function(w,x,init){
+    get.ta0b0.helper(x,init=init,model=2,w=w,misfit=TRUE)
+}
+
+LL.lud.UPb <- function(pars,x,exterr=FALSE,model=1,w=0){
+    if (x$format<4){
+        return(LL.lud.2D(pars,x=x,exterr=exterr,model=model,w=w))
+    } else {
+        return(LL.lud.3D(pars,x=x,exterr=exterr,model=model,w=w))
     }
 }
-LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1){
+LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0){
     tt <- ta0[1]
     a0 <- ta0[2]
     l5 <- settings('lambda','U235')
@@ -124,7 +147,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1){
     v[1:ns] <- XY[,'X']-xy[,1]
     v[(ns+1):(2*ns)] <- XY[,'Y']-xy[,2]
     if (model==2){
-        E <- diag(2*ns)
+        E <- diag(2*ns)*(1+w^2)
     } else {
         if (exterr){
             Ex <- matrix(0,2*ns+2,2*ns+2)
@@ -149,7 +172,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1){
     S <- v %*% solve(E) %*% t(v)
     S/2
 }
-LL.lud.3D <- function(ta0b0,x,exterr=FALSE){
+LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
@@ -183,20 +206,6 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE){
         }
     }
     SS/2
-}
-LL.lud.SS <- function(ta0b0,x){
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
-    b0 <- ta0b0[3]
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
-    U <- settings('iratio','U238U235')[1]
-    X <- get.Pb207U235.ratios(x)[,'Pb207U235']
-    Y <- get.Pb206U238.ratios(x)[,'Pb206U238']
-    Z <- get.Pb204U238.ratios(x)[,'Pb204U238']
-    R <- X-exp(l5*tt)+1-U*b0*Z
-    r <- Y-exp(l8*tt)+1-a0*Z
-    sum(R^2+r^2)
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }

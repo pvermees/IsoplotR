@@ -64,7 +64,7 @@
 concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.numbers=FALSE,levels=NA,
                       ellipse.col=c("#00FF0080","#FF000080"),
-                      concordia.col='darksalmon',exterr=TRUE,
+                      concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
@@ -74,7 +74,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         fit <- concordia.intersection.ludwig(x,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1))
-        discordia.plot(fit,wetherill=wetherill)
+        discordia.line(fit,wetherill=wetherill)
         graphics::title(discordia.title(fit,wetherill=wetherill,
                                         sigdig=sigdig))
     }
@@ -85,11 +85,18 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         else xyc <- tera.wasserburg(X,i)
         x0 <- xyc$x[1]
         y0 <- xyc$x[2]
-        covmat <- xyc$cov
-        ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.cols[i])
+        if (show.age==3){
+            pch <- 21
+            cex <- 1
+        } else {
+            covmat <- xyc$cov
+            ell <- ellipse(x0,y0,covmat,alpha=alpha)
+            graphics::polygon(ell,col=ellipse.cols[i])
+            pch <- 19
+            cex <- 0.25
+        }
         if (show.numbers) graphics::text(x0,y0,i)
-        else graphics::points(x0,y0,pch=19,cex=0.25)
+        else graphics::points(x0,y0,pch=pch,cex=cex)
     }
     if (show.age==1){
         fit <- concordia.age(X,wetherill=wetherill,

@@ -196,7 +196,7 @@ intersection.misfit.york <- function(age,a,b){
     (exp(l5*age)-1)/(exp(l8*age)-1) - a*R - b*R/(exp(l8*age)-1)
 }
 
-discordia.plot <- function(fit,wetherill){
+discordia.line <- function(fit,wetherill){
     X <- c(0,0)
     Y <- c(0,0)
     if (wetherill){
@@ -230,7 +230,7 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]~'=')
         list2 <- list(a=intercept[1],b=intercept[2],c=intercept[3])
-        if (fit$mswd>1){
+        if (fit$model!=2 && fit$mswd>1){
             list1$d <- lower.age[4]
             list2$d <- intercept[4]
         }
