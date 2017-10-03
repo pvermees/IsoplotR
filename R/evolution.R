@@ -45,20 +45,23 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                       detrital=FALSE,show.numbers=FALSE,levels=NA,
                       ellipse.col=c("#00FF0080","#FF000080"),
                       line.col='darksalmon',isochron=FALSE,
-                      exterr=TRUE,sigdig=2,...){
+                      model=1,exterr=TRUE,sigdig=2,...){
     if (x$format %in% c(1,2)){
         if (transform){
             U4U8vst(x,detrital=detrital,xlim=xlim,ylim=ylim,
                     alpha=alpha,show.numbers=show.numbers,
-                    levels=levels,ellipse.col=ellipse.col,...)
+                    levels=levels,ellipse.col=ellipse.col,
+                    show.ellipses=(model!=2),...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,
                         xlim=xlim,ylim=ylim,alpha=alpha,
                         show.numbers=show.numbers,levels=levels,
-                        ellipse.col=ellipse.col,line.col=line.col,...)
+                        ellipse.col=ellipse.col,line.col=line.col,
+                        show.ellipses=(model!=2),...)
         }
         if (isochron){
-            fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr)
+            fit <- isochron.ThU(x,type=3,plot=FALSE,
+                                exterr=exterr,model=model)
             graphics::title(evolution.title(fit,sigdig=sigdig))
         }
     } else {
@@ -71,7 +74,8 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
 
 U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
                     show.numbers=FALSE,levels=NA,
-                    ellipse.col=c("#00FF0080","#FF000080"),...){
+                    ellipse.col=c("#00FF0080","#FF000080"),
+                    show.ellipes=TRUE,...){
     ns <- length(x)
     ta0 <- ThU.age(x,exterr=FALSE,i2i=detrital,cor=FALSE)
     nsd <- 3
@@ -84,16 +88,20 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
     graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
     covmat <- matrix(0,2,2)
     ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
-    for (i in 1:ns){
-        x0 <- ta0[i,'t']
-        y0 <- ta0[i,'48_0']
-        diag(covmat) <- ta0[i,c('s[t]','s[48_0]')]^2
-        covmat[1,2] <- ta0[i,'cov[t,48_0]']
-        covmat[2,1] <- covmat[1,2]
-        ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.cols[i])
-        if (show.numbers) graphics::text(x0,y0,i)
-        else graphics::points(x0,y0,pch=19,cex=0.25)
+    x0 <- ta0[,'t']
+    y0 <- ta0[,'48_0']
+    if (show.ellipses){
+        for (i in 1:ns){
+            diag(covmat) <- ta0[i,c('s[t]','s[48_0]')]^2
+            covmat[1,2] <- ta0[i,'cov[t,48_0]']
+            covmat[2,1] <- covmat[1,2]
+            ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
+            graphics::polygon(ell,col=ellipse.cols[i])
+            if (show.numbers) graphics::text(x0[i],y0[i],i)
+            else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
+        }
+    } else {
+        graphics::points(x0,y0,bg=ellipse.cols)
     }
     colourbar(z=levels,col=ellipse.col)
 }
@@ -101,7 +109,7 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
 U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
                         ylim=NA,alpha=0.05,show.numbers=FALSE,
                         levels=NA,ellipse.col=c("#00FF0080","#FF000080"),
-                        line.col='darksalmon',...){
+                        line.col='darksalmon',show.ellipses=TRUE,...){
     ns <- length(x)
     d <- data2evolution(x,detrital=detrital)
     lim <- evolution.lines(d,xlim=xlim,ylim=ylim,...)
@@ -115,16 +123,20 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
     }
     ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     covmat <- matrix(0,2,2)
-    for (i in 1:ns){
-        x0 <- d[i,'Th230U238']
-        y0 <- d[i,'U234U238']
-        diag(covmat) <- d[i,c('errTh230U238','errU234U238')]^2
-        covmat[1,2] <- d[i,'cov']
-        covmat[2,1] <- covmat[1,2]
-        ell <- ellipse(x0,y0,covmat,alpha=alpha)
-        graphics::polygon(ell,col=ellipse.cols[i])
-        if (show.numbers) graphics::text(x0,y0,i)
-        else graphics::points(x0,y0,pch=19,cex=0.25)
+    x0 <- d[,'Th230U238']
+    y0 <- d[,'U234U238']
+    if (show.ellipses){
+        for (i in 1:ns){
+            diag(covmat) <- d[i,c('errTh230U238','errU234U238')]^2
+            covmat[1,2] <- d[i,'cov']
+            covmat[2,1] <- covmat[1,2]
+            ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
+            graphics::polygon(ell,col=ellipse.cols[i])
+            if (show.numbers) graphics::text(x0[i],y0[i],i)
+            else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
+        }
+    } else {
+        graphics::points(x0,y0,bg=ellipse.cols)
     }
     if (isochron){
         sa <- sqrt(fit$cov['a','a'])
@@ -200,21 +212,24 @@ evolution.title <- function(fit,sigdig=2){
                   b=rounded.a0[2],
                   c=rounded.a0[3])
     args <- quote(~a%+-%b~'|'~c)    
-    if (fit$mswd>1){
-        args <- quote(~a%+-%b~'|'~c~'|'~d)
-        list1$d <- rounded.age[4]
-        list2$d <- rounded.a0[4]
-    }
     call1 <- substitute(e~a,list(e=expr1,a=args))
     line1 <- do.call(substitute,list(eval(call1),list1))
     call2 <- substitute(e~a,list(e=expr2,a=args))
     line2 <- do.call(substitute,list(eval(call2),list2))
-    line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,2),
-                             b=signif(fit$p.value,2)))
-    graphics::mtext(line1,line=2)
-    graphics::mtext(line2,line=1)
-    graphics::mtext(line3,line=0)
+    if (fit$model==1 && fit$mswd>1){
+        args <- quote(~a%+-%b~'|'~c~'|'~d)
+        list1$d <- rounded.age[4]
+        list2$d <- rounded.a0[4]
+        line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+                            list(a=signif(fit$mswd,2),
+                                 b=signif(fit$p.value,2)))
+        graphics::mtext(line1,line=2)
+        graphics::mtext(line2,line=1)
+        graphics::mtext(line3,line=0)
+    } else {
+        graphics::mtext(line1,line=1)
+        graphics::mtext(line2,line=0)
+    }
 }
 
 evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
