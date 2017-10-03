@@ -40,7 +40,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
 concordia.intersection.york <- function(x,exterr=FALSE){
     d <- data2york(x,wetherill=FALSE)
     fit <- york(d)
-    concordia.intersection.york.ab(fit$a[1],fit$b[1],exterr=exterr)
+    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr)
 }
 concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE){
     out <- list()
@@ -52,7 +52,7 @@ concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE){
     if (b<0) { # negative slope => two intersections with concordia line
         search.range <- c(m,M)
         midpoint <- stats::optimize(intersection.misfit.york,
-                                    serach.range,a=a,b=b)$minimum
+                                    search.range,a=a,b=b)$minimum
         search.range <- c(m,midpoint)
         out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
                                         search.range,a=a,b=b)$root

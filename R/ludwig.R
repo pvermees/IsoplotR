@@ -100,6 +100,17 @@ get.ta0b0 <- function(x,init,exterr=FALSE,model=1){
         out <- get.ta0b0.model3(x,init=init,exterr=exterr)
     out
 }
+get.ta0b0.model1 <- function(x,init,exterr=FALSE){
+    get.ta0b0.helper(x,init,exterr=exterr,model=1,w=0)
+}
+get.ta0b0.model2 <- function(x,init){
+    misfit <- get.ta0b0.helper(x,init,model=1,w=0,misfit=TRUE)
+    wrange <- c(0,sqrt(sqrt(misfit)+1))
+    fit <- stats::optimize(f=lud.model2.misfit,interval=wrange,
+                           x=x,init=init,tol=0.01)
+    stats::optim(init,fn=LL.lud.UPb,method="BFGS",
+                 x=x,model=2,w=fit$minimum)
+}
 get.ta0b0.helper <- function(x,init,exterr=FALSE,model=1,w=0,misfit=FALSE){
     fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
                         exterr=exterr,model=model,w=w)
@@ -111,16 +122,6 @@ get.ta0b0.helper <- function(x,init,exterr=FALSE,model=1,w=0,misfit=FALSE){
         out$w <- w
     }
     out
-}
-get.ta0b0.model1 <- function(x,init,exterr=FALSE){
-    get.ta0b0.helper(x,init,exterr=exterr,model=1,w=0)
-}
-get.ta0b0.model2 <- function(x,init){
-    misfit <- get.ta0b0.helper(x,init,model=1,w=0,misfit=TRUE)
-    wrange <- c(0,sqrt(sqrt(misfit)+1))
-    fit <- stats::optimize(f=lud.model2.misfit,interval=wrange,x=x,init=init)
-    stats::optim(init,fn=LL.lud.UPb,method="BFGS",
-                 x=x,model=2,w=fit$minimum)
 }
 lud.model2.misfit <- function(w,x,init){
     get.ta0b0.helper(x,init=init,model=2,w=w,misfit=TRUE)
@@ -147,7 +148,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0){
     v[1:ns] <- XY[,'X']-xy[,1]
     v[(ns+1):(2*ns)] <- XY[,'Y']-xy[,2]
     if (model==2){
-        E <- diag(2*ns)*(1+w^2)
+        E <- diag(2*ns)*w^2
     } else {
         if (exterr){
             Ex <- matrix(0,2*ns+2,2*ns+2)
@@ -176,7 +177,8 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
-    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,exterr=exterr)
+    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,
+                     exterr=exterr,model=model,w=w)
     phi <- d$phi
     R <- d$R
     r <- d$r
@@ -249,17 +251,17 @@ fisher_lud_without_decay_err <- function(tt,a0,b0,z,omega){
     for (i in 1:ns){
         O <- omega[[i]]
         d2L.dt2 <- d2L.dt2 +
-            O[1,1]*Q235^2 + O[2,2]*Q238^2 + 2*Q235*Q238*O[1,2]
+                   O[1,1]*Q235^2 + O[2,2]*Q238^2 + 2*Q235*Q238*O[1,2]
         d2L.da02 <- d2L.da02 + O[2,2]*z[i]^2
         d2L.db02 <- d2L.db02 + O[1,1]*(U*z[i])^2
         d2L.da0dt <- d2L.da0dt + z[i]*(Q238*O[2,2] + Q235*O[1,2])
         d2L.db0dt <- d2L.db0dt + U*z[i]*(Q235*O[1,1] + Q238*O[1,2])
         d2L.da0db0 <- d2L.da0db0 + U*O[1,2]*z[i]^2
         d2L.dz2 <- O[1,1]*(U*b0)^2 + O[2,2]*a0^2 + O[3,3] +
-            2*(a0*U*b0*O[1,2] + U*b0*O[1,3] + a0*O[3,3])
+                   2*(a0*U*b0*O[1,2] + U*b0*O[1,3] + a0*O[3,3])
         d2L.dzdt <- Q235*(U*b0*O[1,1] + O[1,3]) +
-            Q238*(a0*O[2,2]+O[2,3]) +
-            (Q238*U*b0 + Q235*a0)*O[1,2]
+                    Q238*(a0*O[2,2]+O[2,3]) +
+                   (Q238*U*b0 + Q235*a0)*O[1,2]
         d2L.dzda0 <- z[i]*(a0*O[2,2] + U*b0*O[1,2] + O[2,3])
         d2L.dzdb0 <- U*z[i]*(a0*O[1,2] + U*b0*O[1,1] + O[1,3])
         out[i,i] <- d2L.dz2
@@ -326,14 +328,17 @@ fisher_lud_with_decay_err <- function(tt,a0,b0,z,omega){
                 z[j]*(a0*omega[i2,j2] + U*b0*omega[i1,j2] + omega[i3,j2])
             d2L.dzdb0 <- d2L.dzdb0 +
                 U*z[j]*(a0*omega[i2,j1] + U*b0*omega[i1,j1] + omega[i3,j1])
-            d2L.dzdz <-  (omega[i1,j1] + omega[i1,j3] + omega[i3,j1])*(U*b0)^2 +
-                omega[i2,j2]*a0^2 + omega[i3,j3] + a0*(omega[i2,j3]+omega[i3,j2]) +
-                                    a0*U*b0*(omega[i1,j2]+omega[i2,j1])
+            d2L.dzdz <- (omega[i1,j1] + omega[i1,j3] +
+                         omega[i3,j1])*(U*b0)^2 +
+                         omega[i2,j2]*a0^2 + omega[i3,j3] +
+                         a0*(omega[i2,j3]+omega[i3,j2]) +
+                         a0*U*b0*(omega[i1,j2]+omega[i2,j1])
             out[i,j] <- d2L.dzdz # dij
             out[j,i] <- d2L.dzdz # dij
         }
-        d2L.dz2 <- omega[i1,i1]*(U*b0)^2 + omega[i2,i2]*a0^2 + omega[i3,i3] +
-                   2*(a0*U*b0*omega[i1,i2] + U*b0*omega[i1,i3] + a0*omega[i3,i3])
+        d2L.dz2 <- omega[i1,i1]*(U*b0)^2 + omega[i2,i2]*a0^2 +
+                   omega[i3,i3] + 2*(a0*U*b0*omega[i1,i2] +
+                   U*b0*omega[i1,i3] + a0*omega[i3,i3])
         out[i,i] <- d2L.dz2 # dii
         out[i,ns+1] <- d2L.dzdt # ni1
         out[i,ns+2] <- d2L.dzda0 # ni2
@@ -356,14 +361,15 @@ fisher_lud_with_decay_err <- function(tt,a0,b0,z,omega){
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
-data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,...){
+data2ludwig.UPb <- function(x,a0,b0,tt,exterr=FALSE,model=1,w=0,...){
     if (exterr)
         out <- data2ludwig_with_decay_err(x,a0=a0,b0=b0,tt=tt)
     else
-        out <- data2ludwig_without_decay_err(x,a0=a0,b0=b0,tt=tt)
+        out <- data2ludwig_without_decay_err(x,a0=a0,b0=b0,tt=tt,
+                                             model=model,w=w)
     out
 }
-data2ludwig_without_decay_err <- function(x,a0,b0,tt){
+data2ludwig_without_decay_err <- function(x,a0,b0,tt,model=1,w=0){
     # initialise:
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
@@ -381,16 +387,20 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt){
         Z[i] <- d$x['Pb204U238']
         R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i]
         r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i]
-        E[1,1] <- d$cov['Pb207U235','Pb207U235']
-        E[2,2] <- d$cov['Pb206U238','Pb206U238']
-        E[3,3] <- d$cov['Pb204U238','Pb204U238']
-        E[1,2] <- d$cov['Pb207U235','Pb206U238'] 
-        E[1,3] <- d$cov['Pb207U235','Pb204U238']
-        E[2,3] <- d$cov['Pb206U238','Pb204U238']
-        E[2,1] <- E[1,2]
-        E[3,1] <- E[1,3]
-        E[3,2] <- E[2,3]
-        O <- solve(E)
+        if (model==2){
+            O <- diag(2*ns)/w^2
+        } else {
+            E[1,1] <- d$cov['Pb207U235','Pb207U235']
+            E[2,2] <- d$cov['Pb206U238','Pb206U238']
+            E[3,3] <- d$cov['Pb204U238','Pb204U238']
+            E[1,2] <- d$cov['Pb207U235','Pb206U238'] 
+            E[1,3] <- d$cov['Pb207U235','Pb204U238']
+            E[2,3] <- d$cov['Pb206U238','Pb204U238']
+            E[2,1] <- E[1,2]
+            E[3,1] <- E[1,3]
+            E[3,2] <- E[2,3]
+            O <- solve(E)
+        }
         omega[[i]] <- O
         # rearrange sum of squares:
         AA <- O[1,1]*(U*b0)^2 + O[2,2]*a0^2 + O[3,3] +
