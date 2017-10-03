@@ -53,10 +53,9 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     if (x$format<4) init <- ta0
     else init <- c(ta0[1],10,10)
     fit <- get.ta0b0(x,init=init,exterr=exterr,model=model)
-    out <- list()
-    out$par <- fit$par
+    out <- fit[c('par','w','model')]
     out$cov <- tryCatch({ # analytical
-        fish <- fisher.lud(x,ta0b0=fit$par,exterr=exterr)
+        fish <- fisher.lud(x,fit=fit)
         ns <- length(x)
         # block inversion:
         AA <- fish[1:ns,1:ns]
@@ -69,7 +68,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
                             x=x,exterr=exterr,hessian=TRUE)
         solve(fit$hessian)
     })
-    mswd <- mswd.lud(fit$par,x=x)
+    mswd <- mswd.lud(fit$par,x=x,model=fit$model,w=fit$w)
     out <- c(out,mswd)
     if (x$format<4) parnames <- c('t[l]','76i')
     else parnames <- c('t','64i','74i')
@@ -79,10 +78,10 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     out
 }
 
-mswd.lud <- function(pars,x){
+mswd.lud <- function(pars,x,model=1,w=0){
     ns <- length(x)
     # Mistake in Ludwig (1998)? Multiply the following by 2?
-    SS <- LL.lud.UPb(pars,x=x,exterr=FALSE)
+    SS <- LL.lud.UPb(pars,x=x,exterr=FALSE,model=model,w=w)
     out <- list()
     if (x$format<4) out$df <- ns-2
     else out$df <- 2*ns-2
@@ -98,33 +97,40 @@ get.ta0b0 <- function(x,init,exterr=FALSE,model=1){
         out <- get.ta0b0.model2(x,init=init)
     else if (model==3)
         out <- get.ta0b0.model3(x,init=init,exterr=exterr)
+    out$model <- model
+    out$exterr <- exterr
     out
 }
 get.ta0b0.model1 <- function(x,init,exterr=FALSE){
-    get.ta0b0.helper(x,init,exterr=exterr,model=1,w=0)
-}
-get.ta0b0.model2 <- function(x,init){
-    misfit <- get.ta0b0.helper(x,init,model=1,w=0,misfit=TRUE)
-    wrange <- c(0,sqrt(sqrt(misfit)+1))
-    fit <- stats::optimize(f=lud.model2.misfit,interval=wrange,
-                           x=x,init=init,tol=0.01)
-    stats::optim(init,fn=LL.lud.UPb,method="BFGS",
-                 x=x,model=2,w=fit$minimum)
-}
-get.ta0b0.helper <- function(x,init,exterr=FALSE,model=1,w=0,misfit=FALSE){
-    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
-                        exterr=exterr,model=model,w=w)
-    if (misfit){
-        mswd <- mswd.lud(fit$par,x=x)$mswd
-        out <- (mswd-1)^2
-    } else {
-        out <- fit
-        out$w <- w
-    }
+    out <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
+                        exterr=exterr,model=1,w=0)
+    out$w <- 0
     out
 }
-lud.model2.misfit <- function(w,x,init){
-    get.ta0b0.helper(x,init=init,model=2,w=w,misfit=TRUE)
+get.ta0b0.model2 <- function(x,init){
+    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
+                        exterr=FALSE,model=2,w=1)
+    mswd <- mswd.lud(fit$par,x=x,model=2,w=1)$mswd
+    w <- sqrt(mswd)
+    out <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",
+                        x=x,model=2,w=w)
+    out$w <- w
+    out
+}
+get.ta0b0.model3 <- function(x,init,exterr=FALSE){
+    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
+                        exterr=exterr,model=1,w=0)
+    mswd <- mswd.lud(fit$par,x=x,model=1,w=0)$mswd
+    wrange <- c(0,sqrt(mswd))
+    w <- stats::optimize(model3.misfit,interval=wrange,
+                         ta0b0=fit$par,x=x)$minimum
+    out <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
+                        exterr=exterr,model=3,w=w)
+    out$w <- w
+    out
+}
+model3.misfit <- function(w,ta0b0,x){
+    abs(mswd.lud(ta0b0,x=x,model=3,w=w)$mswd-1)
 }
 
 LL.lud.UPb <- function(pars,x,exterr=FALSE,model=1,w=0){
@@ -158,7 +164,8 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0){
             Jv <- diag(1,2*ns,2*ns)
         }
         Ex[1:ns,1:ns] <- diag(XY[,'sX'])^2
-        Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY'])^2
+        # overdispersion added to the Pb207/Pb206-ratio:
+        Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY'])^2 + w^2
         Ex[1:ns,(ns+1):(2*ns)] <-
             diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
         Ex[(ns+1):(2*ns),1:ns] <- Ex[1:ns,(ns+1):(2*ns)]
@@ -214,18 +221,19 @@ fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
 fisher.lud.default <- function(x,...){
     stop( "No default method available (yet)." )
 }
-fisher.lud.UPb <- function(x,pars,exterr=FALSE,...){
-    if (x$format<4) return(fisher.lud.2D(x,pars,exterr=FALSE,...))
-    else return(fisher.lud.3D(x,pars,exterr=FALSE,...))
+fisher.lud.UPb <- function(x,fit,...){
+    if (x$format<4) return(fisher.lud.2D(x,fit,...))
+    else return(fisher.lud.3D(x,fit,...))
 }
-fisher.lud.2D <- function(x,ta0,exterr=FALSE,...){
+fisher.lud.2D <- function(x,fit,...){
     stop('not implemented yet')
 }
-fisher.lud.3D <- function(x,ta0b0,exterr=FALSE,...){
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
-    b0 <- ta0b0[3]
-    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,z=z,exterr=exterr)
+fisher.lud.3D <- function(x,fit,...){
+    tt <- fit$par[1]
+    a0 <- fit$par[2]
+    b0 <- fit$par[3]
+    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,z=z,exterr=fit$exterr,
+                     model=fit$model,w=fit$w)
     z <- d$z
     omega <- d$omega
     if (exterr)
@@ -382,6 +390,9 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt,model=1,w=0){
     z <- rep(0,ns)
     omega <- list()
     E <- matrix(0,3,3)
+    Xbar <- mean(get.Pb207U235.ratios(x))
+    Ybar <- mean(get.Pb206U238.ratios(x))
+    Zbar <- mean(get.Pb204U238.ratios(x))
     for (i in 1:ns){
         d <- wetherill(x,i=i,exterr=FALSE)
         Z[i] <- d$x['Pb204U238']
@@ -389,13 +400,13 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt,model=1,w=0){
         r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i]
         if (model==2){
             O <- diag(2*ns)/w^2
-        } else {
-            E[1,1] <- d$cov['Pb207U235','Pb207U235']
-            E[2,2] <- d$cov['Pb206U238','Pb206U238']
-            E[3,3] <- d$cov['Pb204U238','Pb204U238']
-            E[1,2] <- d$cov['Pb207U235','Pb206U238'] 
-            E[1,3] <- d$cov['Pb207U235','Pb204U238']
-            E[2,3] <- d$cov['Pb206U238','Pb204U238']
+        } else { # overdispersion applied proportional to average composition
+            E[1,1] <- d$cov['Pb207U235','Pb207U235'] + Xbar*w^2
+            E[2,2] <- d$cov['Pb206U238','Pb206U238'] + Ybar*w^2
+            E[3,3] <- d$cov['Pb204U238','Pb204U238'] + Zbar*w^2
+            E[1,2] <- d$cov['Pb207U235','Pb206U238'] + Xbar*Ybar*w^2
+            E[1,3] <- d$cov['Pb207U235','Pb204U238'] + Xbar*Zbar*w^2
+            E[2,3] <- d$cov['Pb206U238','Pb204U238'] + Ybar*Zbar*w^2
             E[2,1] <- E[1,2]
             E[3,1] <- E[1,3]
             E[3,2] <- E[2,3]
@@ -414,7 +425,7 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt,model=1,w=0){
     }
     out <- list(R=R,r=r,phi=phi,z=z,omega=omega)
 }
-data2ludwig_with_decay_err <- function(x,a0,b0,tt){
+data2ludwig_with_decay_err <- function(x,a0,b0,tt,w=0){
     # initialise:
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
@@ -424,6 +435,9 @@ data2ludwig_with_decay_err <- function(x,a0,b0,tt){
     r <- rep(0,ns)
     Z <- rep(0,ns)
     E <- matrix(0,3*ns,3*ns)
+    Xbar <- mean(get.Pb207U235.ratios(x))
+    Ybar <- mean(get.Pb206U238.ratios(x))
+    Zbar <- mean(get.Pb204U238.ratios(x))
     if (TRUE){ # TRUE if propagating decay errors
         P235 <- tt*exp(l5[1]*tt)
         P238 <- tt*exp(l8[1]*tt)
@@ -435,14 +449,14 @@ data2ludwig_with_decay_err <- function(x,a0,b0,tt){
         Z[i] <- d$x['Pb204U238']
         R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i]
         r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i]
-        E[i,i] <- E[i,i] + d$cov['Pb207U235','Pb207U235'] # A
-        E[ns+i,ns+i] <- E[ns+i,ns+i] + d$cov['Pb206U238','Pb206U238'] # B
-        E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238'] # C
-        E[i,ns+i] <- d$cov['Pb207U235','Pb206U238'] # D
+        E[i,i] <- E[i,i]+d$cov['Pb207U235','Pb207U235']+Xbar*w^2 # A
+        E[ns+i,ns+i] <- E[ns+i,ns+i]+d$cov['Pb206U238','Pb206U238']+Ybar*w^2 # B
+        E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238']+Zbar*w^2 # C
+        E[i,ns+i] <- d$cov['Pb207U235','Pb206U238']+Xbar*Ybar*w^2 # D
         E[ns+i,i] <- E[i,ns+i]
-        E[i,2*ns+i] <- d$cov['Pb207U235','Pb204U238'] # E
+        E[i,2*ns+i] <- d$cov['Pb207U235','Pb204U238']+Xbar*Zbar*w^2 # E
         E[2*ns+i,i] <- E[i,2*ns+i]
-        E[ns+i,2*ns+i] <- d$cov['Pb206U238','Pb204U238'] # F
+        E[ns+i,2*ns+i] <- d$cov['Pb206U238','Pb204U238']+Ybar*Zbar*w^2 # F
         E[2*ns+i,ns+i] <- E[ns+i,2*ns+i]
     }
     omega <- solve(E)
@@ -457,11 +471,11 @@ data2ludwig_with_decay_err <- function(x,a0,b0,tt){
             j1 <- j
             j2 <- j + ns
             j3 <- j + 2*ns
-            W[i] <- W[i] - R[j] * (U*b0*omega[i1,j1] + a0*omega[i2,j1] + omega[i3,j1]) -
-                           r[j] * (U*b0*omega[i1,j2] + a0*omega[i2,j2] + omega[i3,j2])
-            # Ludwig (1998): V[i,j] <- U*b0*omega[i1,j3] + a0*omega[i2,j3] + omega[i3,j3]
-            V[i,j] <- omega[i1,j1]*(U*b0)^2 + omega[i2,j2]*a0^2 + omega[i3,j3] +
-                      2*(U*a0*b0*omega[i1,j2] + U*b0*omega[i1,j3] + a0*omega[i2,j3])
+            W[i] <- W[i]-R[j]*(U*b0*omega[i1,j1]+a0*omega[i2,j1]+omega[i3,j1])-
+                    r[j]*(U*b0*omega[i1,j2]+a0*omega[i2,j2]+omega[i3,j2])
+            # Ludwig (1998): V[i,j]<-U*b0*omega[i1,j3]+a0*omega[i2,j3]+omega[i3,j3]
+            V[i,j] <- omega[i1,j1]*(U*b0)^2+omega[i2,j2]*a0^2+omega[i3,j3] +
+                      2*(U*a0*b0*omega[i1,j2]+U*b0*omega[i1,j3]+a0*omega[i2,j3])
         }
     }
     phi <- solve(V,W)
