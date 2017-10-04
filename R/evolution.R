@@ -53,11 +53,12 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                     levels=levels,ellipse.col=ellipse.col,
                     show.ellipses=(model!=2),...)
         } else {
-            U4U8vsTh0U8(x,isochron=isochron,detrital=detrital,
-                        xlim=xlim,ylim=ylim,alpha=alpha,
-                        show.numbers=show.numbers,levels=levels,
-                        ellipse.col=ellipse.col,line.col=line.col,
-                        show.ellipses=(model!=2),...)
+            U4U8vsTh0U8(x,isochron=isochron,model=model,
+                        detrital=detrital, xlim=xlim,ylim=ylim,
+                        alpha=alpha, show.numbers=show.numbers,
+                        levels=levels, ellipse.col=ellipse.col,
+                        line.col=line.col, show.ellipses=(model!=2),
+                        ...)
         }
         if (isochron){
             fit <- isochron.ThU(x,type=3,plot=FALSE,
@@ -75,7 +76,7 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
 U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
                     show.numbers=FALSE,levels=NA,
                     ellipse.col=c("#00FF0080","#FF000080"),
-                    show.ellipes=TRUE,...){
+                    show.ellipses=TRUE,...){
     ns <- length(x)
     ta0 <- ThU.age(x,exterr=FALSE,i2i=detrital,cor=FALSE)
     nsd <- 3
@@ -106,15 +107,16 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
     colourbar(z=levels,col=ellipse.col)
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,detrital=FALSE,xlim=NA,
-                        ylim=NA,alpha=0.05,show.numbers=FALSE,
-                        levels=NA,ellipse.col=c("#00FF0080","#FF000080"),
+U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detrital=FALSE,
+                        xlim=NA, ylim=NA,alpha=0.05,
+                        show.numbers=FALSE, levels=NA,
+                        ellipse.col=c("#00FF0080","#FF000080"),
                         line.col='darksalmon',show.ellipses=TRUE,...){
     ns <- length(x)
     d <- data2evolution(x,detrital=detrital)
     lim <- evolution.lines(d,xlim=xlim,ylim=ylim,...)
     if (isochron){
-        fit <- isochron(x,type=2,plot=FALSE)
+        fit <- isochron(x,type=2,plot=FALSE,model=model)
         b48 <- fit$par['a']
         b08 <- fit$par['A']
         e48 <- 1
