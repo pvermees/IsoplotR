@@ -649,10 +649,6 @@ regression_init <- function(fit,alpha=0.05){
         names(out$a) <- c('a','s[a]','ci[a]')
         names(out$b) <- c('b','s[b]','ci[b]')
     }
-    if (fit$model==3){
-        out$w <- c(fit$w,stats::qnorm(1-alpha/2))
-        names(out$w) <- c('s','ci')
-    }
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
     out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
     out$a['ci[a]'] <- out$tfact*fit$a['s[a]']
@@ -660,6 +656,9 @@ regression_init <- function(fit,alpha=0.05){
     if (fit$model==1){
         out$a['disp[a]'] <- out$tfact*sqrt(fit$mswd)*fit$a['s[a]']
         out$b['disp[b]'] <- out$tfact*sqrt(fit$mswd)*fit$b['s[b]']
+    } else if (fit$model==3){
+        out$w <- c(fit$w,stats::qnorm(1-alpha/2))
+        names(out$w) <- c('s','ci')
     }
     class(out) <- "isochron"
     out

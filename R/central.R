@@ -134,6 +134,8 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     } else {
         w <- get.UThHe.w(x,fit)
         out <- UThHe_logratio_mean(x,model=model,w=w)
+        out$w <- c(w,w*stats::qnorm(1-alpha/2))
+        names(out$w) <- c('s','ci')
         out$tfact <- fit$tfact
     }
     out$age['ci[t]'] <- out$tfact*out$age['s[t]']

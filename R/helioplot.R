@@ -200,8 +200,17 @@ helioplot_title <- function(fit,sigdig=2){
                                  b=signif(fit$p.value,2)))
         graphics::mtext(line1,line=1)
         graphics::mtext(line2,line=0)
-    } else {
+    } else if (fit$model==2){
         graphics::mtext(line1,line=0)
+    } else if (fit$model==3){
+        rounded.disp <- signif(100*fit$w,sigdig)
+        list2 <- list(a=rounded.disp[1],b=rounded.disp[2])
+        expr2 <- quote('dispersion =')
+        args2 <- quote(a~'|'~b~'%')
+        call2 <- substitute(e~a,list(e=expr2,a=args2))
+        line2 <- do.call(substitute,list(eval(call2),list2))
+        graphics::mtext(line1,line=1)
+        graphics::mtext(line2,line=0)
     }
 }
 

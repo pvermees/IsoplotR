@@ -66,14 +66,14 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
             graphics::title(evolution.title(fit,sigdig=sigdig))
         }
     } else {
-        Th02vsTh0U8(x,isochron=isochron,xlim=xlim,ylim=ylim,
-                    alpha=alpha,show.numbers=show.numbers,
+        Th02vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
+                    ylim=ylim, alpha=alpha,show.numbers=show.numbers,
                     exterr=exterr,sigdig=sigdig,levels=levels,
                     ellipse.col=ellipse.col,line.col=line.col,...)
     }
 }
 
-U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
+U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,alpha=0.05,
                     show.numbers=FALSE,levels=NA,
                     ellipse.col=c("#00FF0080","#FF000080"),
                     show.ellipses=TRUE,...){
@@ -152,8 +152,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detrital=FALSE,
     colourbar(z=levels,col=ellipse.col)
 }
 
-Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
-                        show.numbers=FALSE,exterr=TRUE,
+Th02vsTh0U8 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
+                        alpha=0.05,show.numbers=FALSE,exterr=TRUE,
                         levels=NA,ellipse.col=c("#00FF0080","#FF000080"),
                         sigdig=2,line.col='darksalmon',...){
     d <- data2evolution(x,isochron=isochron)
@@ -186,8 +186,8 @@ Th02vsTh0U8 <- function(x,isochron=FALSE,xlim=NA,ylim=NA,alpha=0.05,
     if (isochron){ # plot the data and isochron line fit
         isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
                      levels=levels,ellipse.col=ellipse.col,
-                     line.col='black', exterr=exterr,sigdig=sigdig,
-                     new.plot=FALSE)
+                     line.col='black',exterr=exterr,sigdig=sigdig,
+                     new.plot=FALSE,model=model)
     } else { # plot just the data
         scatterplot(d$x,alpha=alpha,show.numbers=show.numbers,
                     levels=levels,ellipse.col=ellipse.col,
@@ -209,7 +209,7 @@ evolution.title <- function(fit,sigdig=2){
     list1 <- list(a=rounded.age[1],
                   b=rounded.age[2],
                   c=rounded.age[3])
-    expr2 <- quote('(234/238)'[o]*' =')
+    expr2 <- quote('('^234*'U/'^238*'U)'[o]*~'=')
     list2 <- list(a=rounded.a0[1],
                   b=rounded.a0[2],
                   c=rounded.a0[3])
@@ -228,9 +228,19 @@ evolution.title <- function(fit,sigdig=2){
         graphics::mtext(line1,line=2)
         graphics::mtext(line2,line=1)
         graphics::mtext(line3,line=0)
-    } else {
+    } else if (fit$model==2) {
         graphics::mtext(line1,line=1)
         graphics::mtext(line2,line=0)
+    } else if (fit$model==3) {
+        rounded.disp <- signif(fit$w,sigdig)
+        list3 <- list(a=rounded.disp[1],b=rounded.disp[2])
+        expr3 <- quote('('^232*'Th/'^238*'U)'-dispersion~'=')
+        args3 <- quote(a~'|'~b)
+        call3 <- substitute(e~a,list(e=expr3,a=args3))
+        line3 <- do.call(substitute,list(eval(call3),list3))
+        graphics::mtext(line1,line=2)
+        graphics::mtext(line2,line=1)
+        graphics::mtext(line3,line=0)
     }
 }
 
@@ -240,7 +250,8 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     maxt <- 400
     tt <- seq(from=0,to=maxt,by=50)
     nsd <- 3
-    if (any(is.na(xlim))) max.dx <- max(d[,'Th230U238']+nsd*d[,'errTh230U238'])
+    if (any(is.na(xlim)))
+        max.dx <- max(d[,'Th230U238']+nsd*d[,'errTh230U238'])
     else max.dx <- xlim[2] # only used if ylim == NA
     if (any(is.na(ylim))){
         max.dy <- max(d[,'U234U238']+nsd*d[,'errU234U238'])
