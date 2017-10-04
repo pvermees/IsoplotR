@@ -122,15 +122,20 @@ central.default <- function(x,alpha=0.05,...){
 central.UThHe <- function(x,alpha=0.05,model=1,...){
     out <- list()
     ns <- nrow(x)
-    out <- UThHe_logratio_mean(x,model=model,w=0)
-    mswd <- mswd_UThHe(x,out)
-    out$tfact <- stats::qt(1-alpha/2,mswd$df)
+    doSm <- doSm(x)
+    fit <- UThHe_logratio_mean(x,model=model,w=0)
+    mswd <- mswd_UThHe(x,fit,doSm=doSm)
     if (model==1){
-        out <- c(out,mswd)
-        out$age['disp[t]'] <- augment_UThHe_err(out,doSm(x))
+        out <- c(fit,mswd)
+        out$age['disp[t]'] <- augment_UThHe_err(out,doSm)
+    } else if (model==2){
+        out <- fit
+    } else {
+        w <- get.UThHe.w(x,fit)
+        out <- UThHe_logratio_mean(x,model=model,w=w)
     }
+    out$tfact <- stats::qt(1-alpha/2,mswd$df)
     out$age['ci[t]'] <- out$tfact*out$age['s[t]']
-    out$model <- model
     out
 }
 #' @param mineral setting this parameter to either \code{apatite} or
@@ -179,52 +184,54 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
     out
 }
 
+get.UThHe.w <- function(x,fit){
+    mswd <- mswd_UThHe(x,fit,doSm=doSm(x))$mswd
+    wrange <- c(0,sqrt(mswd))
+    stats::optimize(UThHe_misfit,interval=wrange,x=x,model=3)$minimum
+}
+
 UThHe_logratio_mean <- function(x,model=1,w=0){
-    out <- list()
+    out <- average_uvw(x,model=model,w=w)
+    out$model <- model
+    out$w <- w
     out$age <- rep(NA,3)
     names(out$age) <- c('t','s[t]','ci[t]')
-    doSm <- doSm(x)
-    if (doSm){
-        nms <- c('u','v','w')
-        uvw <- UThHe2uvw(x)
-        if (model==2){
-            out$uvw <- apply(uvw,2,mean)
-            out$covmat <- cov(uvw)/(nrow(uvw)-1)
-        } else {
-            fit <- stats::optim(c(0,0,0),SS.UThHe.uvw,method='BFGS',
-                                hessian=TRUE,x=x)
-            out$uvw <- fit$par
-            out$covmat <- solve(fit$hessian)
-        }
-        if (model==3){
-            
-        }
+    if (doSm(x)){
         cc <- uvw2UThHe(out$uvw,out$covmat)
         out$age[c('t','s[t]')] <- get.UThHe.age(cc['U'],cc['sU'],
                                                 cc['Th'],cc['sTh'],
                                                 cc['He'],cc['sHe'],
                                                 cc['Sm'],cc['sSm'])
-    } else {p
-        nms <- c('u','v')
-        uv <- UThHe2uv(x)
-        if (model==2){
-            out$uvw <- apply(uv,2,mean)
-            out$covmat <- cov(uv)/(nrow(uv)-1)
-        } else {
-            fit <- stats::optim(c(0,0),SS.UThHe.uv,method='BFGS',
-                                hessian=TRUE,x=x)
-            out$uvw <- fit$par
-            SS <- SS.UThHe.uv(out$uv[1:2],x)
-            out$covmat <- solve(fit$hessian)
-        }
-        if (model==3){
-            
-        }
+    } else {
         cc <- uv2UThHe(out$uvw,out$covmat)
         out$age[c('t','s[t]')] <-
             get.UThHe.age(cc['U'],cc['sU'],
                           cc['Th'],cc['sTh'],
                           cc['He'],cc['sHe'])
+    }
+    out
+}
+
+average_uvw <- function(x,model=1,w=0){
+    out <- list()
+    doSm <- doSm(x)
+    if (doSm(x)){
+        nms <- c('u','v','w')
+        uvw <- UThHe2uvw(x)
+        init <- rep(0,3)
+    } else {
+        nms <- c('u','v')
+        uvw <- UThHe2uv(x)
+        init <- rep(0,2)
+    }
+    if (model==2){
+        out$uvw <- apply(uvw,2,mean)
+        out$covmat <- cov(uvw)/(nrow(uvw)-1)
+    } else {
+        fit <- stats::optim(init,SS.UThHe.uvw,method='BFGS',
+                            hessian=TRUE,x=x,w=w)
+        out$uvw <- fit$par
+        out$covmat <- solve(fit$hessian)
     }
     names(out$uvw) <- nms
     colnames(out$covmat) <- nms
@@ -233,13 +240,19 @@ UThHe_logratio_mean <- function(x,model=1,w=0){
 }
 
 # the MSWD calculation does not use Sm
-mswd_UThHe <- function(x,fit){
+mswd_UThHe <- function(x,fit,doSm=FALSE){
     out <- list()
-    SS <- SS.UThHe.uv(fit$uvw[1:2],x)
-    out$df <- 2*(length(x)-1)
+    if (doSm) nd <- 3
+    else nd <- 2
+    SS <- SS.UThHe.uvw(fit$uvw[1:nd],x,w=fit$w)
+    out$df <- nd*(length(x)-1)
     out$mswd <- SS/out$df
     out$p.value <- 1-stats::pchisq(SS,out$df)
     out
+}
+UThHe_misfit <- function(w,x,model=1){
+    fit <- UThHe_logratio_mean(x,model=model,w=w)
+    abs(mswd_UThHe(x,fit,doSm=doSm(x))$mswd-1)
 }
 
 augment_UThHe_err <- function(fit,doSm){
