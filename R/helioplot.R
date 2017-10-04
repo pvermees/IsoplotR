@@ -73,9 +73,12 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     if (model==2){
         if ('pch' %in% names(list(...))) pch <- par()$pch
         else pch <- 21
+        if ('cex' %in% names(list(...))) cex <- par()$cex
+        else cex <- 2
         u <- log(x[,'U']/x[,'He'])
         v <- log(x[,'Th']/x[,'He'])
-        graphics::points(u,v,bg=ellipse.cols,pch=pch)
+        if (show.numbers) graphics::text(u,v,1:length(x))
+        else graphics::points(u,v,bg=ellipse.cols,pch=pch,cex=cex)
     }
     colourbar(z=levels,col=ellipse.col)
 }
@@ -134,12 +137,12 @@ plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
     ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
                    covmat=fit$covmat[1:2,1:2],alpha=alpha)
     if (logratio){
-        graphics::polygon(ell,col='white')
+        graphics::polygon(ell,col="#FFFFFFBF")
     } else {
         HeUTh <- uv2HeUTh(ell)
         xyz <- renormalise(HeUTh,fact=fact)
         xy <- xyz2xy(xyz)
-        graphics::polygon(xy,col='white')            
+        graphics::polygon(xy,col="#FFFFFFBF")
     }
 }
 
@@ -447,7 +450,7 @@ SS.UThHe.uvw <- function(UVW,x,w=0){
             X <- UVW-uvwc$uvw
         } else {
             uvwc <- UThHe2uv.covmat(x,i,w=w)
-            X <- UV-uvwc$uv
+            X <- UVW-uvwc$uv
         }
         Ei <- solve(uvwc$covmat)
         SSi <- X %*% Ei %*% t(X)

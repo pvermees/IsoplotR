@@ -125,6 +125,7 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
     mswd <- mswd_UThHe(x,fit,doSm=doSm)
+    fit$tfact <- stats::qt(1-alpha/2,mswd$df)
     if (model==1){
         out <- c(fit,mswd)
         out$age['disp[t]'] <- augment_UThHe_err(out,doSm)
@@ -133,8 +134,8 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     } else {
         w <- get.UThHe.w(x,fit)
         out <- UThHe_logratio_mean(x,model=model,w=w)
+        out$tfact <- fit$tfact
     }
-    out$tfact <- stats::qt(1-alpha/2,mswd$df)
     out$age['ci[t]'] <- out$tfact*out$age['s[t]']
     out
 }
