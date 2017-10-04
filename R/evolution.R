@@ -102,7 +102,7 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA, alpha=0.05,
             else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
         }
     } else {
-        graphics::points(x0,y0,bg=ellipse.cols)
+        plot_points(x0,y0,bg=ellipse.cols,show.numbers=show.numbers,...)
     }
     colourbar(z=levels,col=ellipse.col)
 }
@@ -137,8 +137,6 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detrital=FALSE,
             if (show.numbers) graphics::text(x0[i],y0[i],i)
             else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
         }
-    } else {
-        graphics::points(x0,y0,bg=ellipse.cols)
     }
     if (isochron){
         sa <- sqrt(fit$cov['a','a'])
@@ -149,6 +147,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detrital=FALSE,
                     ellipse.col=grDevices::rgb(1,1,1,0.85),
                     line.col='black',new.plot=FALSE)
     }
+    if (!show.ellipses)
+        plot_points(x0,y0,bg=ellipse.cols,show.numbers=show.numbers,...)
     colourbar(z=levels,col=ellipse.col)
 }
 

@@ -628,6 +628,10 @@ isochron_init <- function(fit,alpha=0.05){
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$y0) <- c('y','s[y]','ci[y]')
     }
+    if (fit$model==3){
+        out$w <- c(fit$w,fit$w*stats::qnorm(1-alpha/2))
+        names(out$w) <- c('s','ci')
+    }
     class(out) <- "isochron"
     out
 }
@@ -644,6 +648,10 @@ regression_init <- function(fit,alpha=0.05){
         out$b <- rep(NA,3)
         names(out$a) <- c('a','s[a]','ci[a]')
         names(out$b) <- c('b','s[b]','ci[b]')
+    }
+    if (fit$model==3){
+        out$w <- c(fit$w,stats::qnorm(1-alpha/2))
+        names(out$w) <- c('s','ci')
     }
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
     out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
@@ -695,16 +703,17 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
             list1$d <- rounded.age[4]
             list2$d <- rounded.intercept[4]
         }
-        if (identical(type,'Ar-Ar'))
+        if (identical(type,'Ar-Ar')){
             expr2 <- quote('('^40*'Ar/'^36*'Ar)'[o]~'=')
-        else if (identical(type,'Pb-Pb'))
+        } else if (identical(type,'Pb-Pb')) {
             expr2 <- quote('('^207*'Pb/'^204*'Pb)'[o]~'=')
-        else if (identical(type,'Th-U-3D'))
+        } else if (identical(type,'Th-U-3D')) {
             expr2 <- quote('('^234*'U/'^238*'U)'[o]~'=')
-        else if (identical(type,'Th-U-2D'))
+        } else if (identical(type,'Th-U-2D')) {
             expr2 <- quote('('^230*'Th/'^232*'Th)'[o]^x*~'=')
-        else
-            expr2 <- quote('intercept =')
+        } else {
+            expr2 <- quote('y-intercept =')
+        }
     }
     call1 <- substitute(e~a,list(e=expr1,a=args))
     call2 <- substitute(e~a,list(e=expr2,a=args))
@@ -721,8 +730,14 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         graphics::mtext(line1,line=1)
         graphics::mtext(line2,line=0)
     } else if (fit$model==3){
+        rounded.disp <- signif(fit$w,sigdig)
+        list3 <- list(a=rounded.disp[1],b=rounded.disp[2])
+        expr3 <- quote('y-dispersion =')
+        args3 <- quote(a~'|'~b)
+        call3 <- substitute(e~a,list(e=expr3,a=args3))
+        line3 <- do.call(substitute,list(eval(call3),list3))
         graphics::mtext(line1,line=2)
         graphics::mtext(line2,line=1)
-        graphics::mtext('(model-3 fit with overdispersion term)',line=0)
+        graphics::mtext(line3,line=0)
     }
 }

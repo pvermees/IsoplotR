@@ -156,3 +156,12 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     graphics::plot(rep(xe,length(z)),z,type='n',axes=F,xlab=NA,ylab=NA)
     graphics::axis(side=4)
 }
+
+plot_points <- function(x,y,bg='white',show.numbers=FALSE,...){
+    if ('pch' %in% par(list(...))) pch <- par()$pch
+    else pch <- 21
+    if ('cex' %in% par(list(...))) pch <- par()$cex
+    else cex <- 1.5
+    if (show.numbers) graphics::text(x,y,1:length(x),cex=cex,...)
+    else graphics::points(x,y,bg=bg,pch=pch,cex=cex,...)    
+}

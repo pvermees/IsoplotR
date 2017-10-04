@@ -71,14 +71,9 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
         graphics::title(helioplot_title(fit,sigdig=sigdig))
     }
     if (model==2){
-        if ('pch' %in% names(list(...))) pch <- par()$pch
-        else pch <- 21
-        if ('cex' %in% names(list(...))) cex <- par()$cex
-        else cex <- 2
         u <- log(x[,'U']/x[,'He'])
         v <- log(x[,'Th']/x[,'He'])
-        if (show.numbers) graphics::text(u,v,1:length(x))
-        else graphics::points(u,v,bg=ellipse.cols,pch=pch,cex=cex)
+        plot_points(u,v,bg=ellipse.cols,show.numbers=show.numbers,...)
     }
     colourbar(z=levels,col=ellipse.col)
 }

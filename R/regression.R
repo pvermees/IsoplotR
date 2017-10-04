@@ -46,20 +46,21 @@ model2regression <- function(d,type='york'){
 }
 
 model3regression <- function(d,type='york'){
+    out <- list()
     if (identical(type,'york')){
         init <- york(d)
-        w <- optimize(york_disp_misfit,
-                      interval=c(0,init$mswd),
-                      d=d)$minimum
-        dd <- augment_york_errors(d,w)
-        out <- york(dd)
+        out$w <- optimize(york_disp_misfit,
+                          interval=c(0,init$mswd),
+                          d=d)$minimum
+        dd <- augment_york_errors(d,out$w)
+        out <- c(out,york(dd))
     } else if (identical(type,'titterington')){
         init <- titterington(d)
-        w <- optimize(titterington_disp_misfit,
-                      interval=c(0,init$mswd),
-                      d=d)$minimum
-        dd <- augment_titterington_errors(d,w)
-        out <- titterington(dd)
+        out$w <- optimize(titterington_disp_misfit,
+                          interval=c(0,init$mswd),
+                          d=d)$minimum
+        dd <- augment_titterington_errors(d,out$w)
+        out <- c(out,titterington(dd))
     } else {
         stop('invalid output type for model 3 regression')
     }
