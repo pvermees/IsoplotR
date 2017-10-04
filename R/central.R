@@ -119,62 +119,18 @@ central.default <- function(x,alpha=0.05,...){
 }
 #' @rdname central
 #' @export
-central.UThHe <- function(x,alpha=0.05,...){
+central.UThHe <- function(x,alpha=0.05,model=1,...){
     out <- list()
     ns <- nrow(x)
-    doSm <- doSm(x)
-    out$age <- rep(NA,4)
-    names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-    if (doSm){
-        uvw <- UThHe2uvw(x)
-        fit <- stats::optim(c(0,0,0),SS.UThHe.uvw,method='BFGS',
-                            hessian=TRUE,x=x)
-        out$uvw <- fit$par
-        out$covmat <- solve(fit$hessian)
-        nms <- c('u','v','w')
-        cc <- uvw2UThHe(out$uvw,out$covmat)
-        out$age[c('t','s[t]')] <- get.UThHe.age(cc['U'],cc['sU'],
-                                                cc['Th'],cc['sTh'],
-                                                cc['He'],cc['sHe'],
-                                                cc['Sm'],cc['sSm'])
-    } else {
-        uv <- UThHe2uv(x)
-        fit <- stats::optim(c(0,0),SS.UThHe.uv,method='BFGS',
-                            hessian=TRUE,x=x)
-        out$uvw <- fit$par
-        SS <- SS.UThHe.uv(out$uv[1:2],x)
-        out$covmat <- solve(fit$hessian)
-        nms <- c('u','v')
-        cc <- uv2UThHe(out$uvw,out$covmat)
-        out$age[c('t','s[t]')] <-
-            get.UThHe.age(cc['U'],cc['sU'],
-                          cc['Th'],cc['sTh'],
-                          cc['He'],cc['sHe'])
-    }
-    # the overdispersion calculation does not use Sm
-    SS <- SS.UThHe.uv(out$uvw[1:2],x)
-    out$df <- 2*(ns-1)
-    out$mswd <- SS/out$df
-    out$tfact <- stats::qt(1-alpha/2,out$df)
-    if (doSm){
-        cco <- uvw2UThHe(out$uvw,out$mswd*out$covmat)
-        out$age['disp[t]'] <-
-            out$tfact*get.UThHe.age(cco['U'],cco['sU'],
-                                    cco['Th'],cco['sTh'],
-                                    cco['He'],cco['sHe'],
-                                    cco['Sm'],cco['sSm'])[2]
-    } else {
-        cco <- uv2UThHe(out$uvw,out$mswd*out$covmat)
-        out$age['disp[t]'] <-
-            out$tfact*get.UThHe.age(cco['U'],cco['sU'],
-                                    cco['Th'],cco['sTh'],
-                                    cco['He'],cco['sHe'])[2]
+    out <- UThHe_logratio_mean(x,model=model,w=0)
+    mswd <- mswd_UThHe(x,out)
+    out$tfact <- stats::qt(1-alpha/2,mswd$df)
+    if (model==1){
+        out <- c(out,mswd)
+        out$age['disp[t]'] <- augment_UThHe_err(out,doSm(x))
     }
     out$age['ci[t]'] <- out$tfact*out$age['s[t]']
-    names(out$uvw) <- nms
-    colnames(out$covmat) <- nms
-    rownames(out$covmat) <- nms
-    out$p.value <- 1-stats::pchisq(SS,out$df)
+    out$model <- model
     out
 }
 #' @param mineral setting this parameter to either \code{apatite} or
@@ -219,6 +175,85 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         out <- central.default(tst,alpha=alpha)
+    }
+    out
+}
+
+UThHe_logratio_mean <- function(x,model=1,w=0){
+    out <- list()
+    out$age <- rep(NA,3)
+    names(out$age) <- c('t','s[t]','ci[t]')
+    doSm <- doSm(x)
+    if (doSm){
+        nms <- c('u','v','w')
+        uvw <- UThHe2uvw(x)
+        if (model==2){
+            out$uvw <- apply(uvw,2,mean)
+            out$covmat <- cov(uvw)/(nrow(uvw)-1)
+        } else {
+            fit <- stats::optim(c(0,0,0),SS.UThHe.uvw,method='BFGS',
+                                hessian=TRUE,x=x)
+            out$uvw <- fit$par
+            out$covmat <- solve(fit$hessian)
+        }
+        if (model==3){
+            
+        }
+        cc <- uvw2UThHe(out$uvw,out$covmat)
+        out$age[c('t','s[t]')] <- get.UThHe.age(cc['U'],cc['sU'],
+                                                cc['Th'],cc['sTh'],
+                                                cc['He'],cc['sHe'],
+                                                cc['Sm'],cc['sSm'])
+    } else {p
+        nms <- c('u','v')
+        uv <- UThHe2uv(x)
+        if (model==2){
+            out$uvw <- apply(uv,2,mean)
+            out$covmat <- cov(uv)/(nrow(uv)-1)
+        } else {
+            fit <- stats::optim(c(0,0),SS.UThHe.uv,method='BFGS',
+                                hessian=TRUE,x=x)
+            out$uvw <- fit$par
+            SS <- SS.UThHe.uv(out$uv[1:2],x)
+            out$covmat <- solve(fit$hessian)
+        }
+        if (model==3){
+            
+        }
+        cc <- uv2UThHe(out$uvw,out$covmat)
+        out$age[c('t','s[t]')] <-
+            get.UThHe.age(cc['U'],cc['sU'],
+                          cc['Th'],cc['sTh'],
+                          cc['He'],cc['sHe'])
+    }
+    names(out$uvw) <- nms
+    colnames(out$covmat) <- nms
+    rownames(out$covmat) <- nms
+    out
+}
+
+# the MSWD calculation does not use Sm
+mswd_UThHe <- function(x,fit){
+    out <- list()
+    SS <- SS.UThHe.uv(fit$uvw[1:2],x)
+    out$df <- 2*(length(x)-1)
+    out$mswd <- SS/out$df
+    out$p.value <- 1-stats::pchisq(SS,out$df)
+    out
+}
+
+augment_UThHe_err <- function(fit,doSm){
+    if (doSm){
+        cco <- uvw2UThHe(fit$uvw,fit$mswd*fit$covmat)
+        out <- fit$tfact*get.UThHe.age(cco['U'],cco['sU'],
+                                       cco['Th'],cco['sTh'],
+                                       cco['He'],cco['sHe'],
+                                       cco['Sm'],cco['sSm'])[2]
+    } else {
+        cco <- uv2UThHe(fit$uvw,fit$mswd*fit$covmat)
+        out <- fit$tfact*get.UThHe.age(cco['U'],cco['sU'],
+                                       cco['Th'],cco['sTh'],
+                                       cco['He'],cco['sHe'])[2]
     }
     out
 }
