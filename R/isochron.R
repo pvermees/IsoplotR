@@ -684,7 +684,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         list2 <- list(a=intercept[1],
                       b=intercept[2],
                       c=intercept[3])
-        if (fit$mswd>1){
+        if (fit$model==1 && fit$mswd>1){
             list1$d <- slope[4]
             list2$d <- intercept[4]
         }

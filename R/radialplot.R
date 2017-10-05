@@ -314,11 +314,11 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
     plot_radial_axes(x)
     ns <- length(x$z)
     cols <- set.ellipse.colours(ns=ns,levels=levels,col=bg)
-    .plot_points(x,show.numbers=show.numbers,bg=cols,...)
+    plot_radial_points(x,show.numbers=show.numbers,bg=cols,...)
     colourbar(z=levels,col=bg)
 }
 
-.plot_points <- function(x,show.numbers=FALSE,bg='white',...){
+plot_radial_points <- function(x,show.numbers=FALSE,bg='white',...){
     rxy <- data2rxry(x)
     rx <- rxy[,1]
     ry <- rxy[,2]
