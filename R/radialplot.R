@@ -299,7 +299,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 }
 
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
-                        show.numbers=FALSE,pch=21,levels=NA,
+                        show.numbers=FALSE,levels=NA,
                         bg=c('white','red'),markers=NULL,...){
     exM <- radial.scale(x,zeta,rhoD)
     tticks <- get.radial.tticks(x)
@@ -313,19 +313,21 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
     }
     plot_radial_axes(x)
     ns <- length(x$z)
-    col <- set.ellipse.colours(ns=ns,levels=levels,col=bg)
-    plot_points(x,show.numbers,pch,col,...)
+    cols <- set.ellipse.colours(ns=ns,levels=levels,col=bg)
+    .plot_points(x,show.numbers=show.numbers,bg=cols,...)
     colourbar(z=levels,col=bg)
 }
 
-plot_points <- function(x,show.numbers=FALSE,pch=21,bg='white',...){
+.plot_points <- function(x,show.numbers=FALSE,bg='white',...){
     rxy <- data2rxry(x)
     rx <- rxy[,1]
     ry <- rxy[,2]
     if (show.numbers) {
         graphics::text(rx,ry,1:length(rx),...)
+    } else if ('pch' %in% names(list(...))){
+        graphics::points(rx,ry,bg=bg,...)
     } else {
-        graphics::points(rx,ry,pch=pch,bg=bg,...)
+        graphics::points(rx,ry,bg=bg,pch=21,...)
     }
 }
 
