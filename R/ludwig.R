@@ -70,6 +70,8 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     })
     mswd <- mswd.lud(fit$par,x=x,model=fit$model,w=fit$w)
     out <- c(out,mswd)
+    out$w <- c(fit$w,fit$w*stats::qnorm(1-alpha/2))
+    names(out$w) <- c('s','ci')
     if (x$format<4) parnames <- c('t[l]','76i')
     else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
@@ -121,7 +123,7 @@ get.ta0b0.model3 <- function(x,init,exterr=FALSE){
     fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
                         exterr=exterr,model=1,w=0)
     mswd <- mswd.lud(fit$par,x=x,model=1,w=0)$mswd
-    wrange <- c(0,sqrt(mswd))
+    wrange <- c(0,sqrt(mswd)*9,74) # 9.74 = current 204/238-ratio
     w <- stats::optimize(model3.misfit,interval=wrange,
                          ta0b0=fit$par,x=x)$minimum
     out <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
@@ -390,9 +392,9 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt,model=1,w=0){
     z <- rep(0,ns)
     omega <- list()
     E <- matrix(0,3,3)
-    Xbar <- mean(get.Pb207U235.ratios(x))
-    Ybar <- mean(get.Pb206U238.ratios(x))
     Zbar <- mean(get.Pb204U238.ratios(x))
+    Ybar <- a0*Zbar
+    Xbar <- U*b0*Zbar
     for (i in 1:ns){
         d <- wetherill(x,i=i,exterr=FALSE)
         Z[i] <- d$x['Pb204U238']
@@ -401,12 +403,12 @@ data2ludwig_without_decay_err <- function(x,a0,b0,tt,model=1,w=0){
         if (model==2){
             O <- diag(2*ns)/w^2
         } else { # overdispersion applied proportional to average composition
-            E[1,1] <- d$cov['Pb207U235','Pb207U235'] + Xbar*w^2
-            E[2,2] <- d$cov['Pb206U238','Pb206U238'] + Ybar*w^2
-            E[3,3] <- d$cov['Pb204U238','Pb204U238'] + Zbar*w^2
-            E[1,2] <- d$cov['Pb207U235','Pb206U238'] + Xbar*Ybar*w^2
-            E[1,3] <- d$cov['Pb207U235','Pb204U238'] + Xbar*Zbar*w^2
-            E[2,3] <- d$cov['Pb206U238','Pb204U238'] + Ybar*Zbar*w^2
+            E[1,1] <- d$cov['Pb207U235','Pb207U235'] + (Xbar*w)^2
+            E[2,2] <- d$cov['Pb206U238','Pb206U238'] + (Ybar*w)^2
+            E[3,3] <- d$cov['Pb204U238','Pb204U238'] + (Zbar*w)^2
+            E[1,2] <- d$cov['Pb207U235','Pb206U238']
+            E[1,3] <- d$cov['Pb207U235','Pb204U238']
+            E[2,3] <- d$cov['Pb206U238','Pb204U238']
             E[2,1] <- E[1,2]
             E[3,1] <- E[1,3]
             E[3,2] <- E[2,3]
@@ -435,9 +437,9 @@ data2ludwig_with_decay_err <- function(x,a0,b0,tt,w=0){
     r <- rep(0,ns)
     Z <- rep(0,ns)
     E <- matrix(0,3*ns,3*ns)
-    Xbar <- mean(get.Pb207U235.ratios(x))
-    Ybar <- mean(get.Pb206U238.ratios(x))
     Zbar <- mean(get.Pb204U238.ratios(x))
+    Ybar <- a0*Zbar
+    Xbar <- U*b0*Zbar
     if (TRUE){ # TRUE if propagating decay errors
         P235 <- tt*exp(l5[1]*tt)
         P238 <- tt*exp(l8[1]*tt)
@@ -449,14 +451,14 @@ data2ludwig_with_decay_err <- function(x,a0,b0,tt,w=0){
         Z[i] <- d$x['Pb204U238']
         R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i]
         r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i]
-        E[i,i] <- E[i,i]+d$cov['Pb207U235','Pb207U235']+Xbar*w^2 # A
-        E[ns+i,ns+i] <- E[ns+i,ns+i]+d$cov['Pb206U238','Pb206U238']+Ybar*w^2 # B
-        E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238']+Zbar*w^2 # C
-        E[i,ns+i] <- d$cov['Pb207U235','Pb206U238']+Xbar*Ybar*w^2 # D
+        E[i,i] <- E[i,i] + d$cov['Pb207U235','Pb207U235'] + (Xbar*w)^2 # A
+        E[ns+i,ns+i] <- E[ns+i,ns+i] + d$cov['Pb206U238','Pb206U238'] + (Ybar*w)^2 # B
+        E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238'] + (Zbar*w)^2 # C
+        E[i,ns+i] <- d$cov['Pb207U235','Pb206U238'] # D
         E[ns+i,i] <- E[i,ns+i]
-        E[i,2*ns+i] <- d$cov['Pb207U235','Pb204U238']+Xbar*Zbar*w^2 # E
+        E[i,2*ns+i] <- d$cov['Pb207U235','Pb204U238'] # E
         E[2*ns+i,i] <- E[i,2*ns+i]
-        E[ns+i,2*ns+i] <- d$cov['Pb206U238','Pb204U238']+Ybar*Zbar*w^2 # F
+        E[ns+i,2*ns+i] <- d$cov['Pb206U238','Pb204U238'] # F
         E[2*ns+i,ns+i] <- E[ns+i,2*ns+i]
     }
     omega <- solve(E)

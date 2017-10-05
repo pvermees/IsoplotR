@@ -7,6 +7,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     out <- list()
     out$model <- model
     out$mswd <- fit$mswd
+    out$w <- fit$w
     out$p.value <- fit$p.value
     out$df <- fit$df
     tfact <- stats::qt(1-alpha/2,fit$df)
@@ -28,13 +29,17 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
         out$cov <- J %*% fit$cov %*% t(J)
     }
     names(out$x) <- labels
-    out$err <- matrix(NA,3,2)
-    colnames(out$err) <- labels
-    rownames(out$err) <- c('s','ci','disp')
+    if (model==1 && fit$mswd>1){
+        out$err <- matrix(NA,3,2)
+        rownames(out$err) <- c('s','ci','disp')
+        out$err['disp',] <- tfact*sqrt(fit$mswd)*out$err['s',]
+    } else {
+        out$err <- matrix(NA,2,2)
+        rownames(out$err) <- c('s','ci')
+    }
     out$err['s',] <- sqrt(diag(out$cov))
     out$err['ci',] <- tfact*out$err['s',]
-    if (model!=2 && fit$mswd>1)
-        out$err['disp',] <- tfact*sqrt(fit$mswd)*out$err['s',]
+    colnames(out$err) <- labels
     out
 }
 concordia.intersection.york <- function(x,exterr=FALSE){
@@ -239,12 +244,23 @@ discordia.title <- function(fit,wetherill,sigdig=2){
     call2 <- substitute(e~a,list(e=expr2,a=args))
     line1 <- do.call('substitute',list((call1),list1))
     line2 <- do.call('substitute',list((call2),list2))
-    graphics::mtext(line1,line=2)
-    graphics::mtext(line2,line=1)
-    if (fit$model!=2){
+    if (fit$model==1){
         line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
+        graphics::mtext(line1,line=2)
+        graphics::mtext(line2,line=1)
+        graphics::mtext(line3,line=0)
+    } else if (fit$model==2){
+        graphics::mtext(line1,line=1)
+        graphics::mtext(line2,line=0)        
+    } else {
+        line3 <- substitute('overdispersion ='~a~'|'~b~
+                            '% of the initial Pb',
+                            list(a=signif(100*fit$w['s'],sigdig),
+                                 b=signif(100*fit$w['ci'],sigdig)))
+        graphics::mtext(line1,line=2)
+        graphics::mtext(line2,line=1)
         graphics::mtext(line3,line=0)
     }
 }
