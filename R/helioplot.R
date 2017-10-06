@@ -360,18 +360,27 @@ get.logratioplot.limits <- function(x,nse=3){
 
 # x is an object of class UThHe
 UThHe2uvw <- function(x){
-    if (hasClass(x,'UThHe'))
-        out <- log(x[,c('U','Th','Sm')])-log(x[,'He'])
-    else
+    if (hasClass(x,'UThHe')){
+        logHe <- log(x[,'He'])
+        u <- log(x[,'U']) - logHe
+        v <- log(x[,'Th']) - logHe
+        w <- log(x[,'Sm']) - logHe
+        out <- cbind(u,v,w)
+    } else {
         out <- matrix(log(x[c('U','Th','Sm')])-log(x['He']),1,3)
+    }
     colnames(out) <- c('u','v','w')
     out
 }
 UThHe2uv <- function(x){
-    if (hasClass(x,'UThHe'))
-        out <- log(x[,c('U','Th')])-log(x[,'He'])
-    else
+    if (hasClass(x,'UThHe')){
+        logHe <- log(x[,'He'])
+        u <- log(x[,'U']) - logHe
+        v <- log(x[,'Th']) - logHe
+        out <- cbind(u,v)
+    } else {
         out <- matrix(log(x[c('U','Th')])-log(x['He']),1,2)
+    }
     colnames(out) <- c('u','v')
     out
 }

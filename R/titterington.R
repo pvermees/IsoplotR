@@ -42,10 +42,10 @@
 #' @export
 titterington <- function(x,alpha=0.05){
     ns <- nrow(x)
-    fitXY <- york(x[,c(1,2,3,4,7)])
+    fitXY <- york(subset(x,select=c(1,2,3,4,7)))
     a <- fitXY$a[1]
     b <- fitXY$b[1]
-    fitXZ <- york(x[,c(1,2,5,6,8)])
+    fitXZ <- york(subset(x,select=c(1,2,5,6,8)))
     A <- fitXZ$a[1]
     B <- fitXZ$b[1]
     init <- c(a,b,A,B)

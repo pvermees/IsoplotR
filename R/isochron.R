@@ -82,7 +82,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.numbers=FALSE,levels=NA,
                              ellipse.col=c("#00FF0080","#FF000080"),
                              line.col='red',lwd=2,title=TRUE,model=1,...){
-    X <- x[,1:5]
+    X <- subset(x,select=1:5)
     colnames(X) <- c('X','sX','Y','sY','rXY')
     fit <- regression(X,model=model)
     out <- regression_init(fit,alpha=alpha)
@@ -527,7 +527,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,
     }
     out$xlab <- xlab
     out$ylab <- ylab
-    out$d <- d[,id]
+    out$d <- subset(d,select=id)
     out
 }
 isochron_ThU_2D <- function(x,type=2,model=1,

@@ -138,8 +138,8 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     if (wetherill){
         if (x$format %in% c(1,3,4)){
-            out <- x$x[,c('Pb207U235','errPb207U235',
-                          'Pb206U238','errPb206U238','rhoXY')]
+            out <- subset(x$x,select=c('Pb207U235','errPb207U235',
+                                       'Pb206U238','errPb206U238','rhoXY'))
         } else if (x$format %in% c(2,5,6)){
             for (i in 1:ns){
                 samp <- wetherill(x,i=i,exterr=FALSE)
@@ -152,8 +152,8 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
         }
     } else {
         if (x$format %in% c(2,5)){
-            out <- x$x[,c('U238Pb206','errU238Pb206',
-                          'Pb207Pb206','errPb207Pb206','rhoXY')]
+            out <- subset(x$x,select=c('U238Pb206','errU238Pb206',
+                                       'Pb207Pb206','errPb207Pb206','rhoXY'))
         } else if (x$format %in% c(1,3,4,6)){
             for (i in 1:ns){
                 samp <- tera.wasserburg(x,i=i,exterr=FALSE)
@@ -242,11 +242,11 @@ data2york.UThHe <- function(x,...){
 }
 data2york.ThU <- function(x,type=2,...){
     if (x$format %in% c(1,3) & type==1){
-        out <- x$x[,c('U238Th232','errU238Th232',
-                      'Th230Th232','errTh230Th232','rho')]
+        out <- subset(x$x,select=c('U238Th232','errU238Th232',
+                                   'Th230Th232','errTh230Th232','rho'))
     } else if (x$format %in% c(2,4) & type==2){
-        out <- x$x[,c('Th232U238','errTh232U238',
-                      'Th230U238','errTh230U238','rho')]
+        out <- subset(x$x,select=c('Th232U238','errTh232U238',
+                                   'Th230U238','errTh230U238','rho'))
     } else if (x$format %in% c(2,4) & type==1){
         out <- ThConversionHelper(x)
         colnames(out) <- c('U238Th232','errU238Th232',

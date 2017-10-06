@@ -271,7 +271,7 @@ get.Pb204U238.ratios <- function(x){
     labels <- c('Pb204U238','errPb204U238')
     if (x$format < 4) stop('No 204Pb measurements available!')
     else if (x$format %in% c(4,6)){
-        out <- x$x[,labels]
+        out <- subset(x$x,select=labels)
     } else {
         Pb204U238 <- x$x[,'Pb204Pb206']/x$x[,'U238Pb206']
         errPb204U238 <-
@@ -288,7 +288,7 @@ get.Pb207U235.ratios <- function(x,exterr=FALSE){
     labels <- c('Pb207U235','errPb207U235')
     colnames(out) <- labels
     if (x$format %in% c(1,3,4,6)){
-        out <- x$x[,labels]
+        out <- subset(x$x,select=labels)
     } else if (x$format %in% c(2,5)){
         R <- iratio('U238U235')[1]
         sR <- iratio('U238U235')[2]
@@ -311,7 +311,7 @@ get.Pb206U238.ratios <- function(x){
     labels <- c('Pb206U238','errPb206U238')
     colnames(out) <- labels
     if (x$format %in% c(1,3,4,6)){
-        out <- x$x[,labels]
+        out <- subset(x$x,select=labels)
     } else if (x$format %in% c(2,5)){
         out[,'Pb206U238'] <- 1/x$x[,'U238Pb206']
         out[,'errPb206U238'] <- out[,'Pb206U238']*
@@ -329,7 +329,7 @@ get.U238Pb206.ratios <- function(x){
         out[,'errU238Pb206'] <- out[,'U238Pb206']*
             x$x[,'errPb206U238']/x$x[,'Pb206U238']
     } else if (x$format %in% c(2,5)){
-        out <- x$x[,labels]
+        out <- subset(x$x,select=labels)
     }
     out
 }
@@ -352,7 +352,7 @@ get.Pb207Pb206.ratios <- function(x,exterr=FALSE){
         if (exterr) relerr2 <- relerr2 + (sR/R)^2
         out[,'errPb207Pb206'] <- sqrt(relerr2)*out[,'Pb207Pb206']
     } else if (x$format %in% c(2,3,5,6)){
-        out <- x$x[,labels]
+        out <- subset(x$x,select=labels)
     }
     out
 }

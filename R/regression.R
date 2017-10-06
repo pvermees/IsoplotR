@@ -31,7 +31,7 @@ model2regression <- function(d,type='york'){
         out$cov.ab <- E[1,2]        
     } else if (identical(type,'titterington')){
         out <- list()
-        fit <- stats::lm(d[,c('Y','Z')] ~ d[,'X'])
+        fit <- stats::lm(subset(d,select=c('Y','Z')) ~ d[,'X'])
         out$df <- fit$df.residual
         out$par <- c(stats::coef(fit))
         out$cov <- stats::vcov(fit)

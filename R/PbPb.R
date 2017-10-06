@@ -93,6 +93,7 @@ PbPb.inverse.ratios <- function(x){
 
 PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
     ns <- length(x)
+    if (ns<2) i2i <- FALSE
     dat <- data2york(x,inverse=FALSE)
     if (i2i){
         fit <- isochron(x,plot=FALSE,exterr=exterr)        

@@ -27,6 +27,7 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE){
 # i2i = isochron to intercept
 PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
     ns <- length(x)
+    if (ns<2) i2i <- FALSE
     dat <- data2york(x,exterr=exterr,common=FALSE)
     if (i2i){
         fit <- isochron(x,plot=FALSE,exterr=exterr)        

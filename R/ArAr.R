@@ -156,6 +156,7 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
 # and their uncertainties. jcu = J-constant uncertainties.
 ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     ns <- length(x)
+    if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     if (!jcu) x$J[2] <- 0

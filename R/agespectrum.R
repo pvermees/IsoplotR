@@ -164,7 +164,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
 # cumulative fractions, ages and uncertainties
 plateau <- function(x,alpha=0.05){
     X <- x[,1]/sum(x[,1],na.rm=TRUE)
-    YsY <- x[,c(2,3)]
+    YsY <- subset(x,select=c(2,3))
     ns <- length(X)
     out <- list()
     out$mean <- YsY[1,1:2]

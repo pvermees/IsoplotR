@@ -141,6 +141,7 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
 
 get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     ns <- length(x)
+    if (ns<2) i2i <- FALSE
     d <- data2evolution(x)
     if (i2i){
         osmond <- data2tit.ThU(x,osmond=TRUE)

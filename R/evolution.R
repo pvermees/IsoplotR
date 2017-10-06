@@ -316,8 +316,8 @@ data2evolution <- function(x,detrital=FALSE,isochron=FALSE){
             out[i,'cov'] <- covmat[1,2]
         }
     } else if (x$format == 2){
-        xy <- x$x[,c('Th230U238','errTh230U238',
-                      'U234U238','errU234U238')]
+        xy <- subset(x$x,select=c('Th230U238','errTh230U238',
+                                  'U234U238','errU234U238'))
         covariance <- x$x[,'errTh230U238']*
             x$x[,'errU234U238']*x$x[,'rhoYZ']
         out <- cbind(xy,covariance)
