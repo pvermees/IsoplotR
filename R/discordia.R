@@ -32,7 +32,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     if (model==1 && fit$mswd>1){
         out$err <- matrix(NA,3,2)
         rownames(out$err) <- c('s','ci','disp')
-        out$err['disp',] <- tfact*sqrt(fit$mswd)*out$err['s',]
+        out$err['disp',] <- tfact*sqrt(fit$mswd)*sqrt(diag(out$cov))
     } else {
         out$err <- matrix(NA,2,2)
         rownames(out$err) <- c('s','ci')
