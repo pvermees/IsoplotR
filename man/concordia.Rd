@@ -6,8 +6,8 @@
 \usage{
 concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, levels = NA, ellipse.col = c("#00FF0080",
-  "#FF000080"), concordia.col = "darksalmon", exterr = TRUE, show.age = 0,
-  sigdig = 2, common.Pb = 0, ticks = NULL, ...)
+  "#FF000080"), concordia.col = "darksalmon", exterr = FALSE,
+  show.age = 0, sigdig = 2, common.Pb = 0, ticks = NULL, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}

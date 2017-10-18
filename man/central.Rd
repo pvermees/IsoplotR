@@ -11,7 +11,7 @@ central(x, ...)
 
 \method{central}{default}(x, alpha = 0.05, ...)
 
-\method{central}{UThHe}(x, alpha = 0.05, ...)
+\method{central}{UThHe}(x, alpha = 0.05, model = 1, ...)
 
 \method{central}{fissiontracks}(x, mineral = NA, alpha = 0.05, ...)
 }

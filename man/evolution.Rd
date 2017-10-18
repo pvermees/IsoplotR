@@ -7,7 +7,7 @@
 evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
   detrital = FALSE, show.numbers = FALSE, levels = NA,
   ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
-  isochron = FALSE, exterr = TRUE, sigdig = 2, ...)
+  isochron = FALSE, model = 1, exterr = TRUE, sigdig = 2, ...)
 }
 \arguments{
 \item{x}{an object of class \code{ThU}}

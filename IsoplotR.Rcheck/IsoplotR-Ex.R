@@ -194,13 +194,13 @@ helioplot(examples$UThHe)
 
 evolution(examples$ThU)
 
-kde(examples$Namib)
+kde(examples$DZ)
 
-radialplot(examples$MountTom)
+radialplot(examples$LudwigMixture)
 
-agespectrum(examples$spectrum)
+agespectrum(examples$LudwigSpectrum)
 
-weightedmean(examples$average)
+weightedmean(examples$LudwigMean)
 
 
 
@@ -404,12 +404,13 @@ d6 <- read.data(f6,method="Th-U",format=2)
 evolution(d6)
 
 #  one detrital zircon U-Pb file (detritals.csv)
-f7 <- system.file("Namib.csv",package="IsoplotR")
+f7 <- system.file("DZ.csv",package="IsoplotR")
 d7 <- read.data(f7,method="detritals")
 kde(d7)
 
-#  three 'other' files (MountTom.csv, spectrum.csv, average.csv)
-f8 <- system.file("MountTom.csv",package="IsoplotR")
+#  four 'other' files (LudwigMixture.csv, LudwigSpectrum.csv,
+#  LudwigMean.csv, LudwigKDE.csv)
+f8 <- system.file("LudwigMixture.csv",package="IsoplotR")
 d8 <- read.data(f8,method="other")
 radialplot(d8)
 

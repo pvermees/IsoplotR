@@ -120,7 +120,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     }
     if (plateau){
         if (title) graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
-        return(plat)
+        return(invisible(plat))
     }
 }
 #' @param i2i `isochron to intercept':
@@ -156,7 +156,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
         out$mean[1:2] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
         out$mean[3] <- plat$tfact*out$mean[2]
         graphics::title(plateau.title(out,sigdig=sigdig,Ar=TRUE))
-        return(out)
+        return(invisible(out))
     }
 }
 

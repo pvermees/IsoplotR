@@ -116,9 +116,11 @@ be used. If \code{levels} is a vector of numbers, then
 
 \enumerate{
 
-\item{Error weighted least squares regression}
+\item{Error-weighted least squares regression}
 
 \item{Ordinary least squares regression}
+
+\item{Error-weighted least squares with overdispersion term}
 
 }}
 

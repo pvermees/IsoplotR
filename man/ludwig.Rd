@@ -11,14 +11,15 @@ ludwig(x, ...)
 
 \method{ludwig}{default}(x, ...)
 
-\method{ludwig}{UPb}(x, exterr = FALSE, alpha = 0.05, ...)
+\method{ludwig}{UPb}(x, exterr = FALSE, alpha = 0.05, model = 1, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
 
 \item{...}{optional arguments}
 
-\item{exterr}{propagate external sources of uncertainty (e.g., decay constant)?}
+\item{exterr}{propagate external sources of
+uncertainty (e.g., decay constant)?}
 
 \item{alpha}{cutoff value for confidence intervals}
 }
