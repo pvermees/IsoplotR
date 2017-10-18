@@ -1,5 +1,5 @@
 * using log directory ‘/home/pvermees/Dropbox/Programming/R/IsoplotR/IsoplotR.Rcheck’
-* using R version 3.4.1 (2017-06-30)
+* using R version 3.2.3 (2015-12-10)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * using session charset: UTF-8
 * using option ‘--as-cran’
@@ -9,10 +9,9 @@
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
 Number of updates in past 6 months: 7
-
-The build time stamp is missing.
 * checking package namespace information ... OK
-* checking package dependencies ... OK
+* checking package dependencies ... NOTE
+  No repository set, so cyclic dependency check skipped
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
 * checking for executable files ... WARNING
@@ -36,10 +35,9 @@ CRAN-pack does not know about
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking DESCRIPTION meta-information ... NOTE
-Checking should be performed on sources prepared by ‘R CMD build’.
+* checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
-Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
+File README.md cannot be checked without ‘pandoc’ being installed.
 Non-standard file/directory found at top level:
   ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
@@ -65,40 +63,14 @@ These should not be in a package tarball.
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
 * checking R code for possible problems ... NOTE
-average_uvw: no visible global function definition for ‘cov’
 fisher.lud.3D: no visible binding for global variable ‘exterr’
-model3regression: no visible global function definition for ‘optimize’
-plot_points: no visible global function definition for ‘par’
-Undefined global functions or variables:
-  cov exterr optimize par
-Consider adding
-  importFrom("graphics", "par")
-  importFrom("stats", "cov", "optimize")
-to your NAMESPACE file.
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
 * checking Rd cross-references ... OK
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... WARNING
-Undocumented arguments in documentation object 'central'
-  ‘model’
-
-Undocumented arguments in documentation object 'evolution'
-  ‘model’
-
-Undocumented arguments in documentation object 'helioplot'
-  ‘model’
-
-Undocumented arguments in documentation object 'ludwig'
-  ‘model’
-
-Functions with \usage entries need to have the appropriate \alias
-entries, and all their arguments documented.
-The \usage entries must correspond to syntactically valid R code.
-See chapter ‘Writing R documentation files’ in the ‘Writing R
-Extensions’ manual.
+* checking Rd \usage sections ... OK
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
 * checking contents of ‘data’ directory ... OK
@@ -107,4 +79,4 @@ Extensions’ manual.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 3 WARNINGs, 5 NOTEs
+Status: 2 WARNINGs, 5 NOTEs

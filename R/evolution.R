@@ -29,6 +29,33 @@
 #' @param exterr propagate the decay constant uncertainty in the
 #'     isochron age?
 #' @param sigdig number of significant digits for the isochron age
+#'
+#' @param model if \code{isochron=TRUE}, choose one of three
+#'     regression models:
+#'
+#' \code{1}: maximum likelihood regression, using either the modified
+#' error weighted least squares algorithm of York et al. (2004) for
+#' 2-dimensional data, or the Maximum Likelihood formulation of Ludwig
+#' and Titterington (1994) for 3-dimensional data. These algorithms
+#' take into account the analytical uncertainties and error
+#' correlations, under the assumption that the scatter between the
+#' data points is solely caused by the analytical uncertainty. If the
+#' assumption is correct, then the MSWD value should be approximately
+#' equal to one. There are three strategies to deal with the case
+#' where MSWD>1. The first of these is to assume that the analytical
+#' uncertainties have been underestimated by a factor
+#' \eqn{\sqrt{MSWD}}. Alternative approaches are described below.
+#'
+#' \code{2}: ordinary least squares regression: a second way to deal
+#' with over- or underdispersed datasets is to simply ignore the
+#' analytical uncertainties.
+#'
+#' \code{3}: maximum likelihood regression with overdispersion:
+#' instead of attributing any overdispersion (MSWD > 1) to
+#' underestimated analytical uncertainties (model 1), one can also
+#' attribute it to the presence of geological uncertainty, which
+#' manifests itself as an added (co)variance term.
+#'
 #' @param ... optional arguments to the generic \code{plot} function
 #' @examples
 #' data(examples)

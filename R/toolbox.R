@@ -89,7 +89,7 @@ errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
     out <- matrix(0,length(J11),3)
     colnames(out) <- c('varX','varY','cov')
     out[,'varX'] <- J11*J11*E11 + J11*J12*E12 + J11*J12*E12 + J12*J12*E22
-    out[,'varY'] <- E11*J21*J21 + J21*J22*E12 + J21*J22*E12 + J22*J22*E22
+    out[,'varY'] <- J21*J21*E11 + J21*J22*E12 + J21*J22*E12 + J22*J22*E22
     out[,'cov'] <- J11*J21*E11 + J12*J21*E12 + J11*J22*E12 + J12*J22*E22
     out
 }

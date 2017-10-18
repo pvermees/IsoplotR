@@ -31,6 +31,27 @@
 #' @param fact three-element vector with the scaling factors of the
 #'     ternary diagram if \code{fact=NA}, these will be determined
 #'     automatically
+#'
+#' @param model choose one of the following statistical models:
+#'
+#' \code{1}: weighted mean. This model assumes that the scatter between
+#' the data points is solely caused by the analytical uncertainty. If
+#' the assumption is correct, then the MSWD value should be
+#' approximately equal to one. There are three strategies to deal with
+#' the case where MSWD>1. The first of these is to assume that the
+#' analytical uncertainties have been underestimated by a factor
+#' \eqn{\sqrt{MSWD}}. Alternative approaches are described below.
+#'
+#' \code{2}: unweighted mean. A second way to deal with over- or
+#' underdispersed datasets is to simply ignore the analytical
+#' uncertainties.
+#'
+#' \code{3}: weighted mean with overdispersion: instead of attributing
+#' any overdispersion (MSWD > 1) to underestimated analytical
+#' uncertainties (model 1), one could also attribute it to the
+#' presence of geological uncertainty, which manifests itself as an
+#' added (co)variance term.
+#'
 #' @param ... optional arguments to the generic \code{plot} function
 #' @references Vermeesch, P., 2010. HelioPlot, and the treatment of
 #'     overdispersed (U-Th-Sm)/He data. Chemical Geology, 271(3),
@@ -75,7 +96,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
         v <- log(x[,'Th']/x[,'He'])
         plot_points(u,v,bg=ellipse.cols,show.numbers=show.numbers,...)
     }
-    colourbar(z=levels,col=ellipse.col)
+    invisible(colourbar(z=levels,col=ellipse.col))
 }
 
 plot_logratio_frame <- function(lims,...){

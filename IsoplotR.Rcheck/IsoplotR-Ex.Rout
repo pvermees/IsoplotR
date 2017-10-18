@@ -1,6 +1,6 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -72,7 +72,7 @@ Type 'q()' to quit R.
  [7,] 0.2791451
  [8,] 0.3865272
  [9,] 0.2724797
-[10,] 0.3243413
+[10,] 0.3243414
 > print(age(examples$UPb,type=1))
           t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
  [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.838277 251.9814
@@ -95,7 +95,7 @@ Type 'q()' to quit R.
  [7,] 0.2791451
  [8,] 0.3865272
  [9,] 0.2724797
-[10,] 0.3243413
+[10,] 0.3243414
 > print(age(examples$UPb,type=2))
 $mswd
 equivalence concordance    combined 
@@ -103,7 +103,7 @@ equivalence concordance    combined
 
 $p.value
  equivalence  concordance     combined 
-0.0000000000 0.0009491221 0.0000000000 
+0.0000000000 0.0009491215 0.0000000000 
 
 $df
 equivalence concordance    combined 
@@ -111,7 +111,7 @@ equivalence concordance    combined
 
 $age
           t        s[t]       ci[t]     disp[t] 
-249.4719540   0.1417081   0.2965984  77.3480584 
+249.4719549   0.1417081   0.2965984  77.3480589 
 
 $x
  Pb207U235  Pb206U238 
@@ -895,7 +895,7 @@ $tfact
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  10.496 6.228 9.567 0 0 
+Time elapsed:  9.5 0.036 9.549 0 0 
 > grDevices::dev.off()
 pdf 
   2 

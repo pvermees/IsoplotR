@@ -118,9 +118,9 @@ Kamo, S.L., Czamanske, G.K. and Krogh, T.E., 1996. A minimum U-Pb
 age for Siberian flood-basalt volcanism. Geochimica et Cosmochimica
 Acta, 60(18), 3505-3511.
 
-Ludwig, K. R., and D. M. Titterington. "Calculation of \eqn{^{230}}Th/U
-isochrons, ages, and errors." Geochimica et Cosmochimica Acta
-58.22 (1994): 5031-5042.
+Ludwig, K. R., and D. M. Titterington., 1994.
+"Calculation of \eqn{^{230}}Th/U isochrons, ages, and errors."
+Geochimica et Cosmochimica Acta 58.22, 5031-5042.
 
 Ludwig, K. R., 2003. User's manual for Isoplot 3.00: a
 geochronological toolkit for Microsoft Excel. No. 4.

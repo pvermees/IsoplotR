@@ -31,21 +31,35 @@
 #' @param exterr show decay constant uncertainty?
 #' @param show.age one of either:
 #'
-#' \code{0}: just plot the data but don't calculate the age
+#' \code{0}: plot the data without calculating an age
 #'
-#' \code{1}: calculate the concordia age
+#' \code{1}: fit a concordia composition and age
 #'
-#' \code{2}: fit a discordia line
+#' \code{2}: fit a discordia line through the data using the maximum
+#' likelihood algorithm of Ludwig (1998), which assumes that the
+#' scatter of the data is solely due to the analytical
+#' uncertainties. In this case, IsoplotR will either calculate an
+#' upper and lower intercept age (for Wetherill concordia), or a lower
+#' intercept age and common (207Pb/206Pb)o-ratio intercept (for
+#' Tera-Wasserburg). If MSWD>0, then the analytical uncertainties are
+#' augmented by a factor \eqn{\sqrt{MSWD}}.
+#'
+#' \code{3}: fit a discordia line ignoring the analytical uncertainties
+#'
+#' \code{4}: fit a discordia line using a modified maximum likelihood
+#' algorithm that includes accounts for any overdispersion by adding a
+#' geological (co)variance term.just plot the data but don't calculate
+#' the age
 #'
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
-#' \code{1}: use the isochron intercept as the initial Pb-composition
-#'
-#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' \code{1}: use the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
+#'
+#' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
 #' \code{3}: use the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and

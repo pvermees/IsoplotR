@@ -46,6 +46,23 @@ ludwig.default <- function(x,...){
 }
 #' @param exterr propagate external sources of
 #' uncertainty (e.g., decay constant)?
+#' @param model one of three regression models:
+#'
+#' \code{1}: fit a discordia line through the data using the maximum
+#' likelihood algorithm of Ludwig (1998), which assumes that the
+#' scatter of the data is solely due to the analytical
+#' uncertainties. In this case, IsoplotR will either calculate an
+#' upper and lower intercept age (for Wetherill concordia), or a lower
+#' intercept age and common (207Pb/206Pb)o-ratio intercept (for
+#' Tera-Wasserburg). If MSWD>0, then the analytical uncertainties are
+#' augmented by a factor \eqn{\sqrt{MSWD}}.
+#'
+#' \code{2}: fit a discordia line ignoring the analytical uncertainties
+#'
+#' \code{3}: fit a discordia line using a modified maximum likelihood
+#' algorithm that includes accounts for any overdispersion by adding a
+#' geological (co)variance term.
+#'
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){

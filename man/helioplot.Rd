@@ -16,6 +16,26 @@ helioplot(x, logratio = TRUE, model = 1, show.central.comp = TRUE,
 shown on bivariate log[He/Th] vs. log[U/He] diagramme, or a
 U-Th-He ternary diagramme.}
 
+\item{model}{choose one of the following statistical models:
+
+\code{1}: weighted mean. This model assumes that the scatter between
+the data points is solely caused by the analytical uncertainty. If
+the assumption is correct, then the MSWD value should be
+approximately equal to one. There are three strategies to deal with
+the case where MSWD>1. The first of these is to assume that the
+analytical uncertainties have been underestimated by a factor
+\eqn{\sqrt{MSWD}}. Alternative approaches are described below.
+
+\code{2}: unweighted mean. A second way to deal with over- or
+underdispersed datasets is to simply ignore the analytical
+uncertainties.
+
+\code{3}: weighted mean with overdispersion: instead of attributing
+any overdispersion (MSWD > 1) to underestimated analytical
+uncertainties (model 1), one could also attribute it to the
+presence of geological uncertainty, which manifests itself as an
+added (co)variance term.}
+
 \item{show.central.comp}{show the geometric mean composition as a
 white ellipse?}
 
