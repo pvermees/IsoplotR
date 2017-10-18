@@ -352,23 +352,6 @@ as.PbPb <- function(x,format=1){
         cnames <- c('Pb206Pb204','errPb206Pb204',
                     'Pb207Pb204','errPb207Pb204',
                     'Pb207Pb206','errPb207Pb206')
-    } else if (format==4 & nc>8){
-        cnames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238',
-                    'Pb204U238','errPb204U238',
-                    'rhoXY','rhoXZ','rhoYZ')        
-    } else if (format==5 & nc>8){
-        cnames <- c('U238Pb206','errU238Pb206',
-                    'Pb207Pb206','errPb207Pb206',
-                    'Pb204Pb206','errPb204Pb206',
-                    'rhoXY','rhoXZ','rhoYZ')
-    } else if (format==5 & nc>8){
-        cnames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238',
-                    'Pb204U238','errPb204U238',
-                    'Pb207Pb206','errPb207Pb206',
-                    'Pb204Pb207','errPb204Pb207',
-                    'Pb204Pb206','errPb204Pb206')
     }
     out$x <- subset(X,select=1:length(cnames))
     colnames(out$x) <- cnames

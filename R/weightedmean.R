@@ -111,7 +111,7 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha,...)
     }
-    out
+    invisible(out)
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -266,9 +266,8 @@ weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
         plot_weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha)
-    } else {
-        return(fit)
     }
+    invisible(fit)
 }
 #' @rdname weightedmean
 #' @export
@@ -304,7 +303,7 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha)
     }
-    out
+    invisible(out)
 }
 weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
                                 rect.col=grDevices::rgb(0,1,0,0.5),
@@ -346,7 +345,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
                           outlier.col=outlier.col,sigdig=sigdig,
                           alpha=alpha)
     }
-    out
+    invisible(out)
 }
 
 get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){

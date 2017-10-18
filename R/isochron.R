@@ -294,7 +294,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
     }
-    out
+    invisible(out)
 }
 #' @rdname isochron
 #' @export
@@ -336,7 +336,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
                         xlab=x.lab,ylab=y.lab)
     }
-    out
+    invisible(out)
 }
 #' @rdname isochron
 #' @export
@@ -433,7 +433,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
         graphics::title(isochrontitle(out,sigdig=sigdig,type=intercept.type),
                         xlab=out$xlab,ylab=out$ylab)
     }
-    out
+    invisible(out)
 }
 #' @rdname isochron
 #' @export
@@ -458,7 +458,7 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
                         xlab="P",ylab="He")
     }
-    out
+    invisible(out)
 }
 
 isochron_ThU_3D <- function(x,type=2,model=1,
@@ -611,7 +611,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
                         xlab=x.lab,ylab=y.lab)
     }
-    out
+    invisible(out)
 }
 
 isochron_init <- function(fit,alpha=0.05){

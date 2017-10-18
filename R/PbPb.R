@@ -18,7 +18,7 @@ PbPb.normal.ratios <- function(x){
         E11 <- x$x[,'errPb204Pb206']^2
         E22 <- x$x[,'errPb207Pb206']^2
         E12 <- x$x[,'rho']*x$x[,'errPb204Pb206']*x$x[,'errPb207Pb206']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         errPb206Pb204 <- sqrt(covmat[,'varX'])
         errPb207Pb204 <- sqrt(covmat[,'varY'])
         rho <- covmat[,'cov']/(errPb206Pb204*errPb207Pb204)
@@ -34,7 +34,7 @@ PbPb.normal.ratios <- function(x){
         E12 <- get.cov.div(x$x[,'Pb207Pb204'],x$x[,'errPb207Pb204'],
                            x$x[,'Pb206Pb204'],x$x[,'errPb206Pb204'],
                            x$x[,'Pb207Pb206'],x$x[,'errPb207Pb206'])
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         errPb206Pb204 <- x$x[,'errPb206Pb204']
         errPb207Pb204 <- x$x[,'errPb207Pb204']
         rho <- covmat[,'cov']/(errPb206Pb204*errPb207Pb204)
@@ -58,7 +58,7 @@ PbPb.inverse.ratios <- function(x){
         E11 <- x$x[,'errPb206Pb204']^2
         E22 <- x$x[,'errPb207Pb204']^2
         E12 <- x$x[,'rho']*x$x[,'errPb206Pb204']*x$x[,'errPb207Pb204']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         errPb204Pb206 <- sqrt(covmat[,'varX'])
         errPb207Pb206 <- sqrt(covmat[,'varY'])
         rho <- covmat[,'cov']/(errPb204Pb206*errPb207Pb206)
@@ -80,7 +80,7 @@ PbPb.inverse.ratios <- function(x){
         E12 <- get.cov.mult(x$x[,'Pb206Pb204'],x$x[,'errPb206Pb204'],
                             x$x[,'Pb207Pb206'],x$x[,'errPb207Pb206'],
                             x$x[,'Pb207Pb204'],x$x[,'errPb207Pb204'])
-        covmat <- errorprop(J11,J12,J21,J22,E11,E12,E22)
+        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         errPb204Pb206 <- sqrt(covmat[,'varX'])
         errPb207Pb206 <- x$x[,'errPb207Pb206']
         rho <- covmat[,'cov']/(errPb204Pb206*errPb207Pb206)
