@@ -211,18 +211,16 @@ helioplot_title <- function(fit,sigdig=2){
     list1 <- list(a=rounded.age[1],
                   b=rounded.age[2],
                   c=rounded.age[3])
-    call1 <- substitute(e~a,list(e=expr,a=args))
-    line1 <- do.call(substitute,list(eval(call1),list1))
     if (fit$model==1 && fit$mswd>1){
         args <- quote(~a%+-%b~'|'~c~'|'~d)
         list1$d <- rounded.age[4]
         line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
                                  b=signif(fit$p.value,2)))
-        graphics::mtext(line1,line=1)
+        line1line <- 1
         graphics::mtext(line2,line=0)
     } else if (fit$model==2){
-        graphics::mtext(line1,line=0)
+        line1line <- 0
     } else if (fit$model==3){
         rounded.disp <- signif(100*fit$w,sigdig)
         list2 <- list(a=rounded.disp[1],b=rounded.disp[2])
@@ -233,6 +231,9 @@ helioplot_title <- function(fit,sigdig=2){
         graphics::mtext(line1,line=1)
         graphics::mtext(line2,line=0)
     }
+    call1 <- substitute(e~a,list(e=expr,a=args))
+    line1 <- do.call(substitute,list(eval(call1),list1))
+    graphics::mtext(line1,line=line1line)
 }
 
 get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=50){

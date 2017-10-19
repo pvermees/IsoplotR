@@ -272,7 +272,7 @@ Overfull \hbox (15.79549pt too wide) in paragraph at lines 3421--3430
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
 No file Rd2.ind.
-[48] (/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.aux)
+[48] (/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -292,7 +292,7 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (48 pages, 228875 bytes).
+Output written on Rd2.pdf (48 pages, 228879 bytes).
 Transcript written on Rd2.log.
 This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
@@ -353,20 +353,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.aux)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.out)
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.out)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.out)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/u
-pdmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 104--107
 \T1/ptm/m/n/10 the spon-ta-neous and in-duced track den-si-ties \T1/zi4/m/n/10 
@@ -568,7 +568,7 @@ Overfull \hbox (15.79549pt too wide) in paragraph at lines 3421--3430
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [47] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [48]
 No file Rd2.ind.
-[49] (/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.aux) )
+[49] (/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
@@ -582,7 +582,7 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (49 pages, 232194 bytes).
+Output written on Rd2.pdf (49 pages, 232192 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (25 entries accepted, 0 rejected).
@@ -649,20 +649,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.aux)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.out)
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.out)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.out)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/u
-pdmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 104--107
 \T1/ptm/m/n/10 the spon-ta-neous and in-duced track den-si-ties \T1/zi4/m/n/10 
@@ -863,12 +863,12 @@ Overfull \hbox (15.79549pt too wide) in paragraph at lines 3421--3430
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [47] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [48]
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.ind [49]
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.ind [49]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
 
-[50]) (/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.aux)
+[50]) (/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -891,7 +891,7 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (50 pages, 234241 bytes).
+Output written on Rd2.pdf (50 pages, 234243 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (25 entries accepted, 0 rejected).
@@ -958,20 +958,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
 (/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
 Writing index file Rd2.idx
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.aux)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.out)
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.out)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.out)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/u
-pdmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 104--107
 \T1/ptm/m/n/10 the spon-ta-neous and in-duced track den-si-ties \T1/zi4/m/n/10 
@@ -1172,12 +1172,12 @@ Overfull \hbox (15.79549pt too wide) in paragraph at lines 3421--3430
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
 [47] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [48]
-(/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.ind [49]
+(/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.ind [49]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
 
-[50]) (/tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c/Rd2.aux)
+[50]) (/tmp/Rtmp8QhQIw/Rd2pdf3064346f596c/Rd2.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
@@ -1195,8 +1195,8 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on Rd2.pdf (50 pages, 234436 bytes).
+Output written on Rd2.pdf (50 pages, 234433 bytes).
 Transcript written on Rd2.log.
 Saving output to 'IsoplotR-manual.pdf' ...
 Done
-You may want to clean up by 'rm -rf /tmp/RtmpGUMLHu/Rd2pdf1bb2d23924c'
+You may want to clean up by 'rm -rf /tmp/Rtmp8QhQIw/Rd2pdf3064346f596c'

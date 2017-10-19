@@ -53,7 +53,7 @@ mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
     if (plot) plot.MDS(out,nnlines=nnlines,pos=pos,
                        shepard=shepard,col=col,bg=bg,
                        xlab=xlab,ylab=ylab,...)
-    out
+    invisible(out)
 }
 #' @rdname mds
 #' @export
@@ -64,7 +64,7 @@ mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
     out <- mds.default(d,classical=classical,plot=plot,
                        shepard=shepard,nnlines=nnlines,pos=pos,
                        col=col,bg=bg,xlab=xlab,ylab=ylab,...)
-    out
+    invisible(out)
 }
 
 # x is an object of class detrital
