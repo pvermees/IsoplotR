@@ -55,36 +55,47 @@ if \code{x} has class \code{UThHe}, a list containing the
     following items:
 
 \describe{
-\item{age}{a four-element vector with:
+\item{uvw}{(if the input data table contains Sm) or \strong{uv} (if
+it doesn't): the geometric mean log[U/He], log[Th/He] (, and
+log[Sm/He]) composition.}
 
-\code{t}: the central age
-
-\code{s[t]}: the standard error of \code{s[t]}
-
-\code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
-\code{t} for the appropriate number of degrees of freedom
-
-\code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval
-enhanced by a factor of \eqn{\sqrt{MSWD}}.
-}
+\item{covmat}{the covariance matrix of \code{uvw} or \code{uv}.}
 
 \item{mswd}{the reduced Chi-square statistic of data concordance,
-i.e. \eqn{mswd=SS/df}, where \eqn{SS} is the sum of squares of
-the log[U/He]-log[Th/He] compositions}
+i.e. \eqn{mswd=SS/df}, where \eqn{SS} is the sum of squares of the
+log[U/He]-log[Th/He] compositions.}
 
-\item{df}{the degrees of freedom (\eqn{2n-2})}
+\item{model}{the fitting model.}
+
+\item{df}{the degrees of freedom (\eqn{2n-2}) of the fit (only
+reported if \code{model=1}).}
 
 \item{p.value}{the p-value of a Chi-square test with \code{df}
-degrees of freedom}
-
-\item{uvw}{(if the input data table contains Sm) or \strong{uv} (if
-it doesn't): the geometric mean log[U/He], log[Th/He] (,
-log[Sm/He]) and log[Sm/He] composition}
-
-\item{covmat}{the covariance matrix of \code{uvw} or \code{uv}}
+degrees of freedom (only reported if \code{model=1}.}
 
 \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the t-
-distribution for \code{df} degrees of freedom}
+distribution for \code{df} degrees of freedom (not reported if
+\code{model=2}.}
+
+\item{age}{a three- or four-element vector with:
+
+\code{t}: the central age.
+
+\code{s[t]}: the standard error of \code{s[t]}.
+
+\code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{t} for the appropriate number of degrees of freedom.
+
+\code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval
+enhanced by a factor of \eqn{\sqrt{mswd}} (only reported if
+\code{model=1}).
+
+\code{w}: the geological overdispersion term. If \code{model=3},
+this is a two-element vector with the standard deviation of the
+(assumedly) Normal dispersion and the corresponding
+\eqn{100(1-\alpha/2)\%} confidence interval. If code{model<3}
+\code{w=0}.
+}
 
 }
 
@@ -114,13 +125,28 @@ of the EDM data or ages}
 
 \item{p.value}{the p-value of a Chi-square test with \code{df}
 degrees of freedom}
-
 }
 }
 \description{
 Computes the geometric mean composition of a set of fission track
-or U-Th-He data and returns the corresponding age and fitting
-parameters.
+or U-Th-He data or any other kind of heteroscedastic data, and
+returns the corresponding age and fitting parameters.
+The central age assumes that the observed age distribution is the
+combination of two sources of scatter: analytical uncertainty and
+true geological dispersion.
+\enumerate{
+\item For fission track data, the analytical uncertainty is assumed
+to obey Poisson counting statistics and the geological dispersion
+is assumed to follow a lognormal distribution.
+\item For U-Th-He data, the U-Th-(Sm)-He compositions are assumed
+to follow a logistic normal normal distribution with lognormal
+measurement  uncertainties.
+\item For all other data types, both the analytical uncertainties
+and the true ages are assumed to follow lognormal distributions.
+}
+The difference between the central age and the weighted mean age is
+usually small unless the data are imprecise and/or strongly
+overdispersed.
 }
 \examples{
 data(examples)
@@ -134,4 +160,8 @@ Galbraith, R.F. and Laslett, G.M., 1993. Statistical
 
 Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
     ages. Chemical Geology, 249(3), pp.339-347.
+}
+\seealso{
+\code{\link{weightedmean}}, \code{\link{radialplot}},
+    \code{\link{helioplot}}
 }

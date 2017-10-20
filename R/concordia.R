@@ -1,10 +1,24 @@
 #' Concordia diagram
 #'
-#' Plots U-Pb data on Wetherill and Tera-Wasserburg concordia
-#' diagrams, calculate concordia ages and compositions, evaluates the
-#' equivalence of multiple
-#' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
+#' The concordia diagram is a graphical means of assessing the
+#' internal consistency of U-Pb data. It sets out the measured
+#' \eqn{^{206}}Pb/\eqn{^{238}}U- and
+#' \eqn{^{207}}Pb/\eqn{^{235}}U-ratios against each other (`Wetherill'
+#' diagram) or, equivalently, the \eqn{^{207}}Pb/\eqn{^{206}}Pb- and
+#' \eqn{^{206}}Pb/\eqn{^{238}}U-ratios (`Tera-Wasserburg'
+#' diagram). The space of concordant isotopic compositions is marked
+#' by a curve, the `concordia line'. Isotopic ratio measurements are
+#' shown as 100(1-\code{alpha})\% confidence ellipses. Concordant
+#' samples plot near to, or overlap with, the concordia line. They
+#' represent the pinnacle of geochronological robustness. Samples that
+#' plot away from the concordia line but are aligned along a linear
+#' trend form an isochron (or `discordia' line) that can be used
+#' to infer the composition of the non-radiogenic
+#' (`common') lead or to constrain the timing of prior lead loss.
+#' \cr\cr
+#' The \code{concordia} function plots U-Pb data on Wetherill and
+#' Tera-Wasserburg concordia diagrams, calculates concordia ages and
+#' compositions, evaluates the equivalence of multiple U-Pb
 #' compositions, computes the weighted mean isotopic composition and
 #' the corresponding concordia age using the method of maximum
 #' likelihood, computes the MSWD of equivalence and concordance and
@@ -40,16 +54,15 @@
 #' scatter of the data is solely due to the analytical
 #' uncertainties. In this case, IsoplotR will either calculate an
 #' upper and lower intercept age (for Wetherill concordia), or a lower
-#' intercept age and common (207Pb/206Pb)o-ratio intercept (for
-#' Tera-Wasserburg). If MSWD>0, then the analytical uncertainties are
-#' augmented by a factor \eqn{\sqrt{MSWD}}.
+#' intercept age and common (\eqn{^{207}}Pb/\eqn{^{206}}Pb)-ratio intercept
+#' (for Tera-Wasserburg). If \code{mswd}>0, then the analytical uncertainties are
+#' augmented by a factor \eqn{\sqrt{mswd}}.
 #'
 #' \code{3}: fit a discordia line ignoring the analytical uncertainties
 #'
 #' \code{4}: fit a discordia line using a modified maximum likelihood
 #' algorithm that includes accounts for any overdispersion by adding a
-#' geological (co)variance term.just plot the data but don't calculate
-#' the age
+#' geological (co)variance term.
 #'
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
@@ -64,6 +77,89 @@
 #' \code{3}: use the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
+#'
+#' @return
+#'
+#' if \code{show.age=1}, returns a list with the following items:
+#'
+#' \describe{
+#'
+#' \item{x}{ a named vector with the (weighted mean) U-Pb composition }
+#' 
+#' \item{cov}{ the covariance matrix of the (weighted mean) U-Pb composition }
+#' 
+#' \item{mswd}{ a vector with three items (\code{equivalence},
+#' \code{concordance} and \code{combined}) containing the MSWD (Mean
+#' of the Squared Weighted Deviates, a.k.a the reduced Chi-squared
+#' statistic outside of geochronology) of isotopic equivalence, age
+#' concordance and combined goodness of fit, respectively. }
+#' 
+#' \item{p.value}{ a vector with three items (\code{equivalence},
+#' \code{concordance} and \code{combined}) containing the p-value of
+#' the Chi-square test for isotopic equivalence, age concordance and
+#' combined goodness of fit, respectively. }
+#' 
+#' \item{df}{ a three-element vector with the number of degrees of
+#' freedom used for the \code{mswd} calculation.  These values are
+#' useful when expanding the analytical uncertainties when
+#' \code{mswd>1}.}
+#'
+#' \item{age}{a 4-element vector with:
+#'
+#' \code{t}: the concordia age (in Ma)
+#'
+#' \code{s[t]}: the estimated uncertainty of \code{t}
+#'
+#' \code{ci[t]}: the 95\% confidence interval of \code{t} for the
+#' appropriate degrees of freedom
+#'
+#' \code{disp[t]}: the 95\% confidence interval for \code{t} augmented
+#' by \eqn{\sqrt{mswd}} to account for overdispersed datasets.}
+#' 
+#' }
+#' 
+#' if \code{show.age=2}, \code{3} or \code{4}, returns a list with the
+#' following items:
+#'
+#' \describe{
+#'
+#' \item{model}{ the fitting model (\code{model=show.age-1}).}
+#'
+#' \item{x}{ a two element vector with the upper and lower intercept
+#' ages (if \code{wetherill=TRUE}) or the lower intercept age and
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg).}
+#' 
+#' \item{cov}{ the covariance matrix of the elements in \code{x}.}
+#'
+#' \item{err}{ a \code{[2 x 2]} or \code{[3 x 2]} matrix with the
+#' following rows:
+#'
+#' \code{s}: the estimated standard deviation for \code{x}
+#' 
+#' \code{ci}: the 95\% confidence interval of \code{x} for the
+#' appropriate degrees of freedom
+#'
+#' \code{disp[t]}: the 95\% confidence interval for \code{x} augmented
+#' by \eqn{\sqrt{mswd}} to account for overdispersed datasets (only
+#' reported if \code{type=3}).
+#' }
+#'
+#' \item{df}{ the degrees of freedom of the concordia fit (concordance
+#' + equivalence)}
+#'
+#' \item{p.value}{ p-value of a Chi-square test for age homogeneity
+#' (only reported if \code{ type=3}).}
+#'
+#' \item{mswd}{ mean square of the weighted deviates -- a
+#' goodness-of-fit measure. \code{mswd > 1} indicates overdispersion
+#' w.r.t the analytical uncertainties (not reported if \code{type=4}).}
+#'
+#' \item{w}{ two-element vector with the standard deviation of the
+#' (assumedly) Normal overdispersion term and the corresponding
+#' \eqn{100(1-\alpha)\%} confidence interval (only important if
+#' \code{type=5}).}
+#'
+#' }
 #'
 #' @param ticks an optional vector of age ticks to be added to the
 #'     concordia line.
@@ -84,6 +180,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     else X <- x
     concordia.line(X,tlim=tlim,wetherill=wetherill,col=concordia.col,
                    alpha=alpha,exterr=exterr,ticks=ticks,...)
+    fit <- NULL
     if (show.age>1){
         fit <- concordia.intersection.ludwig(x,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
@@ -120,6 +217,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         graphics::title(concordia.title(fit,sigdig=sigdig))
     }
     colourbar(z=levels,col=ellipse.col)
+    invisible(fit)
 }
 
 # helper function for plot.concordia

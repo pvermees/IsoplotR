@@ -4,7 +4,15 @@
 #' amount of \eqn{^{39}}Ar (or any other volume proxy), and whose
 #' heights express the analytical uncertainties.  Only propagates the
 #' analytical uncertainty associated with decay constants and
-#' J-factors after computing the plateau composition.
+#' J-factors after computing the plateau composition. \code{IsoplotR}
+#' defines the `plateau age' as the weighted mean age of the longest
+#' sequence (in terms of cumulative \eqn{^{39}}Ar content) of
+#' consecutive heating steps that pass the modified Chauvenet
+#' criterion (see \code{\link{weightedmean}}.  Note that this
+#' definition is different (and simpler) than the one used by
+#' \code{Isoplot} (Ludwig, 2003). However, it is important to mention
+#' that all definitions of an age plateau are heuristic by nature and
+#' should not be used for quantitative inference.
 #'
 #' @param x
 #' a three-column matrix whose first column gives the amount
@@ -73,13 +81,19 @@
 #' \item{tfact}{the t-factor for \code{df} degrees of freedom
 #' evaluated at \eqn{100(1-\alpha/2)}\% confidence}
 #'
-#' \item{plotpar}{plot parameters for the weighted mean, which are not
-#' used in the age spectrum}
+#' \item{plotpar}{plot parameters for the weighted mean (see
+#' \code{\link{weightedmean}}), which are not used in the age
+#' spectrum}
 #'
 #' \item{i}{indices of the steps that are retained for the plateau age
 #' calculation}
 #'
 #' }
+#'
+#' @seealso \code{\link{weightedmean}}
+#' @references Ludwig, K. R. User's manual for Isoplot 3.00: a
+#'     geochronological toolkit for Microsoft Excel. Berkeley
+#'     Geochronology Center Special Pulication, 2003.
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }

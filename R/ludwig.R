@@ -241,13 +241,13 @@ fisher.lud.default <- function(x,...){
     stop( "No default method available (yet)." )
 }
 fisher.lud.UPb <- function(x,fit,...){
-    if (x$format<4) return(fisher.lud.2D(x,fit,...))
-    else return(fisher.lud.3D(x,fit,...))
+    if (x$format<4) return(fisher_lud_2D(x,fit))
+    else return(fisher_lud_3D(x,fit))
 }
-fisher.lud.2D <- function(x,fit,...){
+fisher_lud_2D <- function(x,fit){
     stop('not implemented yet')
 }
-fisher.lud.3D <- function(x,fit,...){
+fisher_lud_3D <- function(x,fit){
     tt <- fit$par[1]
     a0 <- fit$par[2]
     b0 <- fit$par[3]
@@ -255,7 +255,7 @@ fisher.lud.3D <- function(x,fit,...){
                      model=fit$model,w=fit$w)
     z <- d$z
     omega <- d$omega
-    if (exterr)
+    if (fit$exterr)
         out <- fisher_lud_with_decay_err(tt,a0=a0,b0=b0,z=z,omega=omega)
     else
         out <- fisher_lud_without_decay_err(tt,a0=a0,b0=b0,z=z,omega=omega)

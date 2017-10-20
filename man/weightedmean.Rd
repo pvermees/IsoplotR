@@ -185,3 +185,6 @@ weightedmean(cbind(ages,errs))
 data(examples)
 weightedmean(examples$ArAr)
 }
+\seealso{
+\code{\link{central}}
+}

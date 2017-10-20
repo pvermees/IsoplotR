@@ -124,8 +124,30 @@ method). When applied to data of class \code{ThU}, setting
 \code{i2i} to \code{TRUE} applies a detrital Th-correction.}
 }
 \description{
-Plot a dataset as a Cumulative Age Distribution (CAD), also known
-as a `empirical cumulative distribution function'.
+Empirical cumulative distribution functions or cumulative age
+distributions CADs (Vermeesch, 2007) are the most straightforward
+way to visualise the probability distribution of multiple dates.
+Suppose that we have a set of \eqn{n} dates \eqn{t_i}. The the
+CAD is a step function that sets out the rank order of the dates
+against their numerical value:
+\cr\cr
+\eqn{CAD(t) = \sum_i 1(t<t_i)/n}
+\cr\cr
+where 1(\eqn{\ast}) = 1 if \eqn{\ast} is true and 1(\eqn{\ast}) = 0
+if \eqn{\ast} is false. CADs have two desirable properties. First,
+they do not require any pre-treatment or smoothing of the
+data. This is not the case for histograms or kernel density
+estimates. Second, it is easy to superimpose several CADs on the
+same plot. This facilitates the intercomparison of multiple
+samples. The interpretation of CADs is straightforward but not very
+intuitive. The prominence of individual age components is
+proportional to the steepness of the CAD. This is different from
+probability density estimates such as histograms, in which such
+components stand out as peaks. It is arguably easier to identify
+peaks than inflection points and this probably why CADs are not as
+widely used as probability density estimates. But the ease of
+interpretation of density estimates comes at a cost, as they
+require smoothing and cannot as easily be combined as CADs.
 }
 \examples{
 data(examples)
@@ -136,4 +158,7 @@ Vermeesch, P., 2007. Quantitative geomorphology of the
     White Mountains (California) using detrital apatite fission
     track thermochronology. Journal of Geophysical Research: Earth
     Surface, 112(F3).
+}
+\seealso{
+\code{\link{kde}}, \code{\link{radialplot}}
 }

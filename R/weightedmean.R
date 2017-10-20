@@ -47,6 +47,7 @@
 #' \item{plotpar}{list of plot parameters for the weighted mean
 #' diagram}
 #' }
+#' @seealso \code{\link{central}}
 #' @rdname weightedmean
 #' @export
 weightedmean <- function(x,...){ UseMethod("weightedmean",x) }

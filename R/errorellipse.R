@@ -1,7 +1,7 @@
 #' Get coordinates of error ellipse for plotting
 #'
-#' Construct an error ellipse age a given confidence level from its
-#' centre and covariance matrix
+#' Constructs an error ellipse age at a given confidence level from
+#' its centre and covariance matrix
 #'
 #' @param x x-coordinate (scalar) for the centre of the ellipse
 #' @param y y-coordinate (scalar) for the centre of the ellipse

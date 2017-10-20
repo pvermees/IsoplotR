@@ -38,8 +38,8 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
 File README.md cannot be checked without ‘pandoc’ being installed.
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -62,8 +62,7 @@ These should not be in a package tarball.
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... NOTE
-fisher.lud.3D: no visible binding for global variable ‘exterr’
+* checking R code for possible problems ... OK
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
@@ -79,4 +78,4 @@ fisher.lud.3D: no visible binding for global variable ‘exterr’
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 5 NOTEs
+Status: 2 WARNINGs, 4 NOTEs

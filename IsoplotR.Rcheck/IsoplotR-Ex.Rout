@@ -208,7 +208,6 @@ Pb206U238 1.609406e-09 2.270769e-10
 > 
 > data(examples) 
 > concordia(examples$UPb)
-NULL
 > 
 > 
 > 
@@ -274,7 +273,6 @@ NULL
 > data(examples)
 > 
 > concordia(examples$UPb)
-NULL
 > 
 > agespectrum(examples$ArAr)
 > 
@@ -519,7 +517,6 @@ Cannot open file '': No such file or directory
 > f1 <- system.file("UPb1.csv",package="IsoplotR")
 > d1 <- read.data(f1,method="U-Pb",format=1)
 > concordia(d1)
-NULL
 > 
 > f2 <- system.file("ArAr1.csv",package="IsoplotR")
 > d2 <- read.data(f2,method="Ar-Ar",format=1)
@@ -737,7 +734,7 @@ $tfact
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.628 0.04 8.678 0 0 
+Time elapsed:  9.312 0.048 9.379 0 0 
 > grDevices::dev.off()
 pdf 
   2 
