@@ -169,6 +169,20 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
                         cutoff.disc=cutoff.disc,sigdig=sigdig,
                         alpha=alpha,exterr=exterr,...)
 }
+#' @rdname weightedmean
+#' @export
+weightedmean.PbPb <- function(x,detect.outliers=TRUE,plot=TRUE,
+                              rect.col=rgb(0,1,0,0.5),
+                              outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                              alpha=0.05,exterr=TRUE,common.Pb=1,...){
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
+    weightedmean_helper(X,detect.outliers=detect.outliers,plot=plot,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=exterr,...)
+}
 #' @param i2i `isochron to intercept': calculates the initial
 #'     (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
 #'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
@@ -178,17 +192,6 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
 #'     stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
 #'     method). When applied to data of class \code{ThU}, setting
 #'     \code{i2i} to \code{TRUE} applies a detrital Th-correction.
-#' @rdname weightedmean
-#' @export
-weightedmean.PbPb <- function(x,detect.outliers=TRUE,plot=TRUE,
-                              rect.col=rgb(0,1,0,0.5),
-                              outlier.col=rgb(0,1,1,0.5), sigdig=2,
-                              alpha=0.05,exterr=TRUE,i2i=FALSE,...){
-    weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
-                        rect.col=rect.col,outlier.col=outlier.col,
-                        sigdig=sigdig,alpha=alpha,exterr=exterr,
-                        i2i=i2i,...)
-}
 #' @rdname weightedmean
 #' @export
 weightedmean.ThU <- function(x,detect.outliers=TRUE,plot=TRUE,
@@ -312,12 +315,12 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
                                 cutoff.disc=c(-15,5),
                                 outlier.col=grDevices::rgb(0,1,1,0.5),
                                 sigdig=2,alpha=0.05,exterr=TRUE,
-                                i2i=FALSE,...){
+                                i2i=FALSE,common.Pb=1,...){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'PbPb')){
-        tt <- PbPb.age(x,exterr=FALSE,i2i=i2i)
+        tt <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb)
     } else if (hasClass(x,'ThU')){
         tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
         exterr <- FALSE
@@ -460,7 +463,7 @@ chauvenet <- function(X,sX,valid){
     sigma <- sqrt(fit$disp^2+sX^2)
     prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
     minp <- min(prob[valid])
-    imin <- which(minp==prob)[1]
+    imin <- which.min(sX/abs(X-mu))
     ns <- length(valid[valid])
     if (ns*minp < 0.5) valid[imin] <- FALSE # remove outlier
     valid

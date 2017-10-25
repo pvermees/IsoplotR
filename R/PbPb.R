@@ -42,6 +42,7 @@ PbPb.normal.ratios <- function(x){
     out <- cbind(Pb206Pb204,errPb206Pb204,Pb207Pb204,errPb207Pb204,rho)
     colnames(out) <- c('Pb206Pb204','errPb206Pb204',
                        'Pb207Pb204','errPb207Pb204','rho')
+    out[abs(out[,'rho'])>1,'rho'] <- 0.99 # protect against rounding errors
     out
 }
 # returns ratios, errors and correlations
@@ -88,18 +89,13 @@ PbPb.inverse.ratios <- function(x){
     out <- cbind(Pb204Pb206,errPb204Pb206,Pb207Pb206,errPb207Pb206,rho)
     colnames(out) <- c('Pb204Pb206','errPb204Pb206',
                        'Pb207Pb206','errPb207Pb206','rho')
+    out[abs(out[,'rho'])>1,'rho'] <- 0.99 # protect against rounding errors
     out
 }
 
-PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
+PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,...){
     ns <- length(x)
-    if (ns<2) i2i <- FALSE
     dat <- data2york(x,inverse=FALSE)
-    if (i2i){
-        fit <- isochron(x,plot=FALSE,exterr=exterr)        
-        dat[,'Y'] <- dat[,'Y'] - fit$a[1]
-        if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + fit$a[2]^2)
-    }
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     E <- matrix(0,2,2)

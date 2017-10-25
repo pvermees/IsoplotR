@@ -152,13 +152,17 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
 radialplot.PbPb <- function(x,from=NA,to=NA,t0=NA,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,bg=c("white","red"),
-                            markers=NULL,k=0,exterr=TRUE,i2i=TRUE,
+                            markers=NULL,k=0,exterr=TRUE,common.Pb=1,
                             alpha=0.05,...){
-    radialplot_helper(x,from=from,to=to,t0=t0,
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
+    radialplot_helper(X,from=from,to=to,t0=t0,
                       transformation=transformation,
                       show.numbers=show.numbers,pch=pch,levels=levels,
                       bg=bg,markers=markers,k=k,exterr=exterr,
-                      i2i=i2i,alpha=alpha,...)
+                      alpha=alpha,...)
 }
 #' @rdname radialplot
 #' @export

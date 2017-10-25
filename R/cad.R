@@ -129,9 +129,13 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     Surface, 112(F3). 
 #' @rdname cad
 #' @export
-cad.PbPb <- function(x,pch=NA,verticals=TRUE,
-                     xlab='age [Ma]',col='black',i2i=FALSE,...){
-    tt <- PbPb.age(x,i2i=i2i)[,1]
+cad.PbPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
+                     col='black',common.Pb=1,...){
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
+    tt <- PbPb.age(X)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
 #' @rdname cad

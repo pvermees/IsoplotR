@@ -203,9 +203,13 @@ age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
 }
 #' @rdname age
 #' @export
-age.PbPb <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
-    if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- PbPb.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
+age.PbPb <- function(x,isochron=TRUE,common.Pb=1,exterr=TRUE,i=NA,sigdig=NA,...){
+    if (common.Pb %in% c(1,2,3))
+        X <- common.Pb.correction(x,option=common.Pb)
+    else
+        X <- x
+    if (isochron) out <- isochron(X,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
+    else out <- PbPb.age(X,exterr=exterr,i=i,sigdig=sigdig,common.Pb=common.Pb,...)
     out
 }
 #' @param J two-element vector with the J-factor and its standard
