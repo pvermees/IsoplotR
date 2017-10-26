@@ -65,7 +65,7 @@
 helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                       show.numbers=FALSE,alpha=0.05,
                       contour.col=c('white','red'),levels=NA,
-                      ellipse.col=c("#00FF0080","#0000FF80"),
+                      clabel="",ellipse.col=c("#00FF0080","#0000FF80"),
                       sigdig=2,xlim=NA,ylim=NA,fact=NA,...){
     fit <- central.UThHe(x,alpha=alpha,model=model)
     ellipse.cols <- set.ellipse.colours(ns=length(x),levels=levels,
@@ -96,7 +96,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
         v <- log(x[,'Th']/x[,'He'])
         plot_points(u,v,bg=ellipse.cols,show.numbers=show.numbers,...)
     }
-    invisible(colourbar(z=levels,col=ellipse.col))
+    invisible(colourbar(z=levels,col=ellipse.col,clabel=clabel))
 }
 
 plot_logratio_frame <- function(lims,...){

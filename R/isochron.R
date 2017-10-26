@@ -79,7 +79,7 @@ isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
 isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                             show.numbers=FALSE,levels=NA,
+                             show.numbers=FALSE,levels=NA,clabel="",
                              ellipse.col=c("#00FF0080","#FF000080"),
                              line.col='red',lwd=2,title=TRUE,model=1,...){
     X <- subset(x,select=1:5)
@@ -88,8 +88,8 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out <- regression_init(fit,alpha=alpha)
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model!=2),show.numbers=show.numbers,
-                levels=levels,ellipse.col=ellipse.col,a=fit$a[1],
-                b=fit$b[1],line.col=line.col,lwd=lwd)
+                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
+                a=fit$a[1], b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
         graphics::title(isochrontitle(out,sigdig=sigdig),xlab='X',ylab='Y')
 }
@@ -249,7 +249,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @rdname isochron
 #' @export
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,
+                          show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,model=1,...){
@@ -289,8 +289,8 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
-                    line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,a=fit$a[1],
+                    b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -299,7 +299,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @rdname isochron
 #' @export
 isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,
+                          show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,model=1,...){
@@ -331,8 +331,8 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
-                    line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,a=fit$a[1],
+                    b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -341,52 +341,52 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @rdname isochron
 #' @export
 isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,
+                          show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                           model=1,...){
     isochron_PD(x,'Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,ellipse.col=ellipse.col,
+                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
                 model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,
+                          show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                           model=1,...){
     isochron_PD(x,'Re187',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,ellipse.col=ellipse.col,
+                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
                 model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,
+                          show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                           model=1,...){
     isochron_PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,ellipse.col=ellipse.col,
+                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
                 model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,
+                          show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                           model=1,...){
     isochron_PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,ellipse.col=ellipse.col,
+                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
                 model=model,...)
 }
@@ -412,7 +412,7 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @export
 isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                           sigdig=2,show.numbers=FALSE,levels=NA,
-                          ellipse.col=c("#00FF0080","#FF000080"),
+                          clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                           line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                           model=1,...){
     if (x$format %in% c(1,2)){
@@ -428,8 +428,8 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    ellipse.col=ellipse.col,a=out$a[1],b=out$b[1],
-                    line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
+                    b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type=intercept.type),
                         xlab=out$xlab,ylab=out$ylab)
     }
@@ -572,7 +572,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,
 
 isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         sigdig=2,show.numbers=FALSE,levels=NA,
-                        ellipse.col=c("#00FF0080","#FF000080"),
+                        clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                         model=1,...){
     if (identical(nuclide,'Sm147')){
@@ -606,8 +606,8 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    ellipse.col=ellipse.col,a=fit$a[1],b=fit$b[1],
-                    line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,a=fit$a[1],
+                    b=fit$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
                         xlab=x.lab,ylab=y.lab)
     }

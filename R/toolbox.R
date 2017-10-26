@@ -134,7 +134,7 @@ validLevels <- function(levels){
 }
 
 colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
-                      strip.width=0.02){
+                      strip.width=0.02,clabel=""){
     if (!validLevels(z)) return()
     ucoord <- graphics::par()$usr
     plotwidth <- (ucoord[2]-ucoord[1])
@@ -155,6 +155,7 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     graphics::par(new=T)
     graphics::plot(rep(xe,length(z)),z,type='n',axes=F,xlab=NA,ylab=NA)
     graphics::axis(side=4)
+    graphics::mtext(text=clabel,side=3,adj=1)
 }
 
 plot_points <- function(x,y,bg='white',show.numbers=FALSE,...){

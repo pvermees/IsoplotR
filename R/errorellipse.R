@@ -36,8 +36,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 # x = matrix with columns X, sX, Y, sY, rXY
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,show.ellipses=1,levels=NA,
-                        ellipse.col=c("#00FF0080","#FF000080"),a=NA,
-                        b=NA,line.col='red',lwd=2, new.plot=TRUE,
+                        clabel="",ellipse.col=c("#00FF0080","#FF000080"),a=NA,
+                        b=NA,line.col='red',lwd=2,new.plot=TRUE,
                         empty=FALSE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
@@ -64,7 +64,7 @@ scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                 else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
             }
         }
-        colourbar(z=levels,col=ellipse.col)
+        colourbar(z=levels,col=ellipse.col,clabel=clabel)
     } else {
         if (show.numbers) graphics::text(x0,y0,1:ns,adj=c(0,1))
         else graphics::points(x0,y0,pch=19,cex=0.5)
