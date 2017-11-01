@@ -129,8 +129,10 @@ degrees of freedom}
 }
 \description{
 Computes the geometric mean composition of a set of fission track
-or U-Th-He data or any other kind of heteroscedastic data, and
-returns the corresponding age and fitting parameters.
+or U-Th-He data and returns the corresponding age and fitting
+parameters.
+}
+\details{
 The central age assumes that the observed age distribution is the
 combination of two sources of scatter: analytical uncertainty and
 true geological dispersion.
@@ -138,9 +140,8 @@ true geological dispersion.
 \item For fission track data, the analytical uncertainty is assumed
 to obey Poisson counting statistics and the geological dispersion
 is assumed to follow a lognormal distribution.
-\item For U-Th-He data, the U-Th-(Sm)-He compositions are assumed
-to follow a logistic normal normal distribution with lognormal
-measurement  uncertainties.
+\item For U-Th-He data, the U-Th-(Sm)-He compositions and
+uncertainties are assumed to follow a logistic normal distribution.
 \item For all other data types, both the analytical uncertainties
 and the true ages are assumed to follow lognormal distributions.
 }

@@ -4,12 +4,14 @@
 #' amount of \eqn{^{39}}Ar (or any other volume proxy), and whose
 #' heights express the analytical uncertainties.  Only propagates the
 #' analytical uncertainty associated with decay constants and
-#' J-factors after computing the plateau composition. \code{IsoplotR}
-#' defines the `plateau age' as the weighted mean age of the longest
-#' sequence (in terms of cumulative \eqn{^{39}}Ar content) of
-#' consecutive heating steps that pass the modified Chauvenet
-#' criterion (see \code{\link{weightedmean}}.  Note that this
-#' definition is different (and simpler) than the one used by
+#' J-factors after computing the plateau composition.
+#'
+#' @details
+#' \code{IsoplotR} defines the `plateau age' as the weighted mean age
+#' of the longest sequence (in terms of cumulative \eqn{^{39}}Ar
+#' content) of consecutive heating steps that pass the modified
+#' Chauvenet criterion (see \code{\link{weightedmean}}).  Note that
+#' this definition is different (and simpler) than the one used by
 #' \code{Isoplot} (Ludwig, 2003). However, it is important to mention
 #' that all definitions of an age plateau are heuristic by nature and
 #' should not be used for quantitative inference.
@@ -18,11 +20,11 @@
 #' a three-column matrix whose first column gives the amount
 #'     of \eqn{^{39}}Ar in each aliquot, and whose second and third
 #'     columns give the age and its uncertainty.
-#' 
+#'
 #' OR
-#' 
+#'
 #' an object of class \code{ArAr}
-#' 
+#'
 #' @param alpha the confidence limits of the error bars/boxes and
 #'     confidence intervals.
 #' @param plateau logical flag indicating whether a plateau age should
@@ -93,7 +95,7 @@
 #' @seealso \code{\link{weightedmean}}
 #' @references Ludwig, K. R. User's manual for Isoplot 3.00: a
 #'     geochronological toolkit for Microsoft Excel. Berkeley
-#'     Geochronology Center Special Pulication, 2003.
+#'     Geochronology Center Special Publication, 2003.
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }

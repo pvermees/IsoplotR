@@ -1,7 +1,20 @@
-#' Linear regression of X,Y,Z-variables with correlated errors, taking
+#' Linear regression of U-Pb data with correlated errors, taking
 #' into account decay constant uncertainties.
 #'
-#' Implements the maximum likelihood algorithm of Ludwig (1998)
+#' Implements the maximum likelihood algorithm for Total-Pb/U isochron
+#' regression of Ludwig (1998)
+#'
+#' @details
+#' The 3-dimensional regression algorithm of Ludwig and Titterington
+#' (1994) was modified by Ludwig (1998) to fit so-called `Total Pb-U
+#' isochrons'. These are constrained to a radiogenic endmember
+#' composition that falls on the \code{\link{concordia}} line. In its
+#' most sophisticated form, this algorithm does not only allow for
+#' correlated errors between variables, but also between
+#' aliquots. \code{IsoplotR} currently uses this algorithm to
+#' propagate decay constant uncertainties in the total Pb-U isochron
+#' ages. Future versions of the program will generalise this approach
+#' to other chronometers as well.
 #'
 #' @param x an object of class \code{UPb}
 #' @param alpha cutoff value for confidence intervals
@@ -28,6 +41,12 @@
 #'
 #' \item{p.value}{p-value of a Chi-square test for the linear fit}
 #'
+#' \item{w}{the overdispersion, i.e., a two-element vector with the
+#' estimated standard deviation of the (assumedly) Normal distribution
+#' that underlies the true isochron; and the studentised
+#' \eqn{100(1-\alpha)\%} confidence interval (only relevant if
+#' \code{model = 3}.}
+#'
 #' }
 #'
 #' @examples
@@ -37,6 +56,11 @@
 #' @references
 #' Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
 #' ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
+#'
+#' Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
+#' \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+#' Cosmochimica Acta, 58(22), pp.5031-5042.
+#'
 #' @export
 ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
@@ -53,8 +77,9 @@ ludwig.default <- function(x,...){
 #' scatter of the data is solely due to the analytical
 #' uncertainties. In this case, IsoplotR will either calculate an
 #' upper and lower intercept age (for Wetherill concordia), or a lower
-#' intercept age and common (207Pb/206Pb)o-ratio intercept (for
-#' Tera-Wasserburg). If MSWD>0, then the analytical uncertainties are
+#' intercept age and common
+#' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
+#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical uncertainties are
 #' augmented by a factor \eqn{\sqrt{MSWD}}.
 #'
 #' \code{2}: fit a discordia line ignoring the analytical uncertainties
@@ -62,7 +87,10 @@ ludwig.default <- function(x,...){
 #' \code{3}: fit a discordia line using a modified maximum likelihood
 #' algorithm that includes accounts for any overdispersion by adding a
 #' geological (co)variance term.
-#'
+#' @seealso
+#' \code{\link{concordia}},
+#' \code{\link{titterington}},
+#' \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
@@ -460,7 +488,7 @@ data2ludwig_with_decay_err <- function(x,a0,b0,tt,w=0){
     if (TRUE){ # TRUE if propagating decay errors
         P235 <- tt*exp(l5[1]*tt)
         P238 <- tt*exp(l8[1]*tt)
-        E[1:ns,1:ns] <- (P235*l5[2])^2 # A 
+        E[1:ns,1:ns] <- (P235*l5[2])^2 # A
         E[(ns+1):(2*ns),(ns+1):(2*ns)] <- (P238*l8[2])^2 # B
     }
     for (i in 1:ns){

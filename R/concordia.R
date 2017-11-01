@@ -1,5 +1,20 @@
 #' Concordia diagram
 #'
+#' Plots U-Pb data on Wetherill and Tera-Wasserburg concordia
+#' diagrams, calculate concordia ages and compositions, evaluates the
+#' equivalence of multiple
+#' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
+#' compositions, computes the weighted mean isotopic composition and
+#' the corresponding concordia age using the method of maximum
+#' likelihood, computes the MSWD of equivalence and concordance and
+#' their respective Chi-squared p-values. Performs linear regression
+#' and computes the upper and lower intercept ages (for Wetherill) or
+#' the lower intercept age and the \eqn{^{207}}Pb/\eqn{^{206}}Pb
+#' intercept (for Tera-Wasserburg), taking into account error
+#' correlations and decay constant uncertainties.
+#'
+#' @details
 #' The concordia diagram is a graphical means of assessing the
 #' internal consistency of U-Pb data. It sets out the measured
 #' \eqn{^{206}}Pb/\eqn{^{238}}U- and
@@ -15,18 +30,6 @@
 #' trend form an isochron (or `discordia' line) that can be used
 #' to infer the composition of the non-radiogenic
 #' (`common') lead or to constrain the timing of prior lead loss.
-#' \cr\cr
-#' The \code{concordia} function plots U-Pb data on Wetherill and
-#' Tera-Wasserburg concordia diagrams, calculates concordia ages and
-#' compositions, evaluates the equivalence of multiple U-Pb
-#' compositions, computes the weighted mean isotopic composition and
-#' the corresponding concordia age using the method of maximum
-#' likelihood, computes the MSWD of equivalence and concordance and
-#' their respective Chi-squared p-values. Performs linear regression
-#' and computes the upper and lower intercept ages (for Wetherill) or
-#' the lower intercept age and the \eqn{^{207}}Pb/\eqn{^{206}}Pb
-#' intercept (for Tera-Wasserburg), taking into account error
-#' correlations and decay constant uncertainties.
 #'
 #' @param x an object of class \code{UPb}
 #' @param tlim age limits of the concordia line
@@ -37,6 +40,7 @@
 #'     numbers)
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
+#' @param clabel colour label
 #' @param ellipse.col a vector of two background colours for the error
 #'     ellipses. If \code{levels=NA}, then only the first colour will
 #'     be used. If \code{levels} is a vector of numbers, then
@@ -85,20 +89,20 @@
 #' \describe{
 #'
 #' \item{x}{ a named vector with the (weighted mean) U-Pb composition }
-#' 
+#'
 #' \item{cov}{ the covariance matrix of the (weighted mean) U-Pb composition }
-#' 
+#'
 #' \item{mswd}{ a vector with three items (\code{equivalence},
 #' \code{concordance} and \code{combined}) containing the MSWD (Mean
 #' of the Squared Weighted Deviates, a.k.a the reduced Chi-squared
 #' statistic outside of geochronology) of isotopic equivalence, age
 #' concordance and combined goodness of fit, respectively. }
-#' 
+#'
 #' \item{p.value}{ a vector with three items (\code{equivalence},
 #' \code{concordance} and \code{combined}) containing the p-value of
 #' the Chi-square test for isotopic equivalence, age concordance and
 #' combined goodness of fit, respectively. }
-#' 
+#'
 #' \item{df}{ a three-element vector with the number of degrees of
 #' freedom used for the \code{mswd} calculation.  These values are
 #' useful when expanding the analytical uncertainties when
@@ -115,27 +119,27 @@
 #'
 #' \code{disp[t]}: the 95\% confidence interval for \code{t} augmented
 #' by \eqn{\sqrt{mswd}} to account for overdispersed datasets.}
-#' 
+#'
 #' }
-#' 
+#'
 #' if \code{show.age=2}, \code{3} or \code{4}, returns a list with the
 #' following items:
 #'
 #' \describe{
 #'
-#' \item{model}{ the fitting model (\code{model=show.age-1}).}
+#' \item{model}{ the fitting model (\code{=show.age-1}).}
 #'
 #' \item{x}{ a two element vector with the upper and lower intercept
 #' ages (if \code{wetherill=TRUE}) or the lower intercept age and
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg).}
-#' 
+#'
 #' \item{cov}{ the covariance matrix of the elements in \code{x}.}
 #'
 #' \item{err}{ a \code{[2 x 2]} or \code{[3 x 2]} matrix with the
 #' following rows:
 #'
 #' \code{s}: the estimated standard deviation for \code{x}
-#' 
+#'
 #' \code{ci}: the 95\% confidence interval of \code{x} for the
 #' appropriate degrees of freedom
 #'
@@ -165,7 +169,7 @@
 #'     concordia line.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @examples
-#' data(examples) 
+#' data(examples)
 #' concordia(examples$UPb)
 #' @references Ludwig, K.R., 1998. On the treatment of concordant
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),

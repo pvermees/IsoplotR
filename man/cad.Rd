@@ -29,7 +29,7 @@ cad(x, ...)
   common.Pb = 0, ...)
 
 \method{cad}{PbPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = FALSE, ...)
+  col = "black", common.Pb = 1, ...)
 
 \method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", i2i = FALSE, ...)
@@ -124,6 +124,10 @@ method). When applied to data of class \code{ThU}, setting
 \code{i2i} to \code{TRUE} applies a detrital Th-correction.}
 }
 \description{
+Plot a dataset as a Cumulative Age Distribution (CAD), also known
+as a `empirical cumulative distribution function'.
+}
+\details{
 Empirical cumulative distribution functions or cumulative age
 distributions CADs (Vermeesch, 2007) are the most straightforward
 way to visualise the probability distribution of multiple dates.

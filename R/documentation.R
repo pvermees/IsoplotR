@@ -64,14 +64,14 @@
 #' \code{LudwigMixture}: an object of class \code{'other'} containing
 #' a dataset of dispersed zircon fission track ages of the example
 #' dataset by Ludwig (2003).
-#' 
+#'
 #' @name examples
 #' @docType data
 #' @examples
 #' data(examples)
-#' 
+#'
 #' concordia(examples$UPb)
-#' 
+#'
 #' agespectrum(examples$ArAr)
 #'
 #' isochron(examples$ReOs)
@@ -104,7 +104,7 @@
 #' Connelly, J.N., Bollard, J. and Bizzarro, M., 2017. Pb-Pb
 #' chronometry and the early Solar System. Geochimica et Cosmochimica
 #' Acta, 201, pp.345-363.
-#' 
+#'
 #' Galbraith, R. F. and Green, P. F., 1990: Estimating the component
 #' ages in a finite mixture, Nuclear Tracks and Radiation
 #' Measurements, 17, 197-206.

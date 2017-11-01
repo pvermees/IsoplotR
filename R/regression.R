@@ -28,7 +28,7 @@ model2regression <- function(d,type='york'){
         out$b <- c(stats::coef(fit)[2],sqrt(E[2,2]))
         names(out$a) <- c('a','s[a]')
         names(out$b) <- c('b','s[b]')
-        out$cov.ab <- E[1,2]        
+        out$cov.ab <- E[1,2]
     } else if (identical(type,'titterington')){
         out <- list()
         fit <- stats::lm(subset(d,select=c('Y','Z')) ~ d[,'X'])
@@ -49,16 +49,16 @@ model3regression <- function(d,type='york'){
     out <- list()
     if (identical(type,'york')){
         init <- york(d)
-        out$w <- optimize(york_disp_misfit,
-                          interval=c(0,init$mswd),
-                          d=d)$minimum
+        out$w <- stats::optimize(york_disp_misfit,
+                                 interval=c(0,init$mswd),
+                                 d=d)$minimum
         dd <- augment_york_errors(d,out$w)
         out <- c(out,york(dd))
     } else if (identical(type,'titterington')){
         init <- titterington(d)
-        out$w <- optimize(titterington_disp_misfit,
-                          interval=c(0,init$mswd),
-                          d=d)$minimum
+        out$w <- stats::optimize(titterington_disp_misfit,
+                                 interval=c(0,init$mswd),
+                                 d=d)$minimum
         dd <- augment_titterington_errors(d,out$w)
         out <- c(out,titterington(dd))
     } else {

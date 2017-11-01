@@ -1,8 +1,10 @@
 #' Calculate U-Th-He and fission track central ages and compositions
 #'
 #' Computes the geometric mean composition of a set of fission track
-#' or U-Th-He data or any other kind of heteroscedastic data, and
-#' returns the corresponding age and fitting parameters.
+#' or U-Th-He data and returns the corresponding age and fitting
+#' parameters.
+#'
+#' @details
 #' The central age assumes that the observed age distribution is the
 #' combination of two sources of scatter: analytical uncertainty and
 #' true geological dispersion.
@@ -10,9 +12,8 @@
 #' \item For fission track data, the analytical uncertainty is assumed
 #' to obey Poisson counting statistics and the geological dispersion
 #' is assumed to follow a lognormal distribution.
-#' \item For U-Th-He data, the U-Th-(Sm)-He compositions are assumed
-#' to follow a logistic normal normal distribution with lognormal
-#' measurement  uncertainties.
+#' \item For U-Th-He data, the U-Th-(Sm)-He compositions and
+#' uncertainties are assumed to follow a logistic normal distribution.
 #' \item For all other data types, both the analytical uncertainties
 #' and the true ages are assumed to follow lognormal distributions.
 #' }
@@ -108,14 +109,14 @@
 #' @examples
 #' data(examples)
 #' print(central(examples$UThHe)$age)
-#' 
+#'
 #' @references Galbraith, R.F. and Laslett, G.M., 1993. Statistical
 #'     models for mixed fission track ages. Nuclear tracks and
 #'     radiation measurements, 21(4), pp.459-470.
 #'
 #' Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
 #'     ages. Chemical Geology, 249(3), pp.339-347.
-#' 
+#'
 #' @rdname central
 #' @export
 central <- function(x,...){ UseMethod("central",x) }
@@ -167,7 +168,7 @@ central.default <- function(x,alpha=0.05,...){
 #' uncertainties (model 1), one could also attribute it to the
 #' presence of geological uncertainty, which manifests itself as an
 #' added (co)variance term.
-#' 
+#'
 #' @rdname central
 #' @export
 central.UThHe <- function(x,alpha=0.05,model=1,...){
@@ -227,7 +228,7 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
         # add back one d.o.f. for homogeneity test
         out$mswd <- Chi2/(out$df+1)
         out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-        out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)        
+        out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)
         out$disp <- c(sigma,stats::qnorm(1-alpha/2)*sigma)
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$disp) <- c('s','ci')
@@ -280,7 +281,7 @@ average_uvw <- function(x,model=1,w=0){
     }
     if (model==2){
         out$uvw <- apply(uvw,2,mean)
-        out$covmat <- cov(uvw)/(nrow(uvw)-1)
+        out$covmat <- stats::cov(uvw)/(nrow(uvw)-1)
     } else {
         fit <- stats::optim(init,SS.UThHe.uvw,method='BFGS',
                             hessian=TRUE,x=x,w=w)

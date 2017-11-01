@@ -1,9 +1,72 @@
 #' Calculate and plot isochrons
 #'
-#' Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf, U-Th-He or Th-U
-#' data as X-Y scatterplots, fits an isochron curve through them using
-#' the \code{york} function, and computes the corresponding isochron
-#' age, including decay constant uncertainties.
+#' Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf, U-Th-He
+#' or Th-U data as X-Y scatterplots, fits an isochron curve through
+#' them using the \code{york} function, and computes the corresponding
+#' isochron age, including decay constant uncertainties.
+#'
+#' @details
+#' Given several aliquots from a single sample, isochrons allow the
+#' non-radiogenic component of the daughter nuclide to be quantified
+#' and separated from the radiogenic component. In its simplest form,
+#' an isochron is obtained by setting out the amount of radiogenic
+#' daughter against the amount of radioactive parent, both normalised
+#' to a non-radiogenic isotope of the daughter element, and fitting a
+#' straight line through these points by least squares regression
+#' (Nicolaysen, 1961). The slope and intercept then yield the
+#' radiogenic daughter-parent ratio and the non-radiogenic daughter
+#' composition, respectively. There are several ways to fit an
+#' isochron.  The easiest of these is ordinary least squares
+#' regression, which weighs all data points equally. In the presence
+#' of quantifiable analytical uncertainty, it is equally
+#' straightforward to use the inverse of the y-errors as weights.  It
+#' is significantly more difficult to take into account uncertainties
+#' in both the x- and the y-variable (York, 1966). \code{IsoplotR}
+#' does so for its U-Th-He isochron calculations. The York (1966)
+#' method assumes that the analytical uncertainties of the x- and
+#' y-variables are independent from each other. This assumption is
+#' rarely met in geochronology.  York (1969) addresses this issue with
+#' a bivariate error weighted linear least squares algorithm that
+#' accounts for covariant errors in both variables. This algorithm was
+#' further improved by York et al. (2004) to ensure consistency with
+#' the maximum likelihood approach of Titterington and Halliday
+#' (1979).
+#' \cr\cr
+#' \code{IsoplotR} uses the York et al. (2004) algorithm for its
+#' \eqn{^{40}}Ar/\eqn{^{39}}Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf
+#' isochrons. The maximum likelihood algorithm of Titterington and
+#' Halliday (1979) was generalised from two to three dimensions by
+#' Ludwig and Titterington (1994) for U-series disequilibrium dating.
+#' Also this algorithm is implemented in \code{IsoplotR}.  The extent
+#' to which the observed scatter in the data can be explained by the
+#' analytical uncertainties can be assessed using the Mean Square of
+#' the Weighted Deviates (MSWD, McIntyre et al., 1966), which is
+#' defined as:
+#' \cr\cr
+#' \eqn{MSWD = ([X - \hat{X}] \Sigma_{X}^{-1} [X - \hat{X}]^T)/df}
+#' \cr\cr
+#' where \eqn{X} are the data, \eqn{\hat{X}} are the fitted values,
+#' and \eqn{\Sigma_X} is the covariance matrix of \eqn{X}, and \eqn{df
+#' = k(n-1)} are the degrees of freedom, where \eqn{k} is the
+#' dimensionality of the linear fit. MSWD values that are far smaller or
+#' greater than 1 indicate under- or overdispersed measurements,
+#' respectively. The former can be attributed to overestimated analytical
+#' uncertainties. The latter are more common than the former, but their
+#' interpretation is less straightforward.  \code{IsoplotR} provides
+#' three alternative strategies to deal with overdispersed data:
+#' \enumerate{
+#' \item Attribute the overdispersion to an underestimation of the
+#' analytical uncertainties. In this case, the excess scatter can be
+#' accounted for by inflating those uncertainties by a \emph{factor}
+#' \eqn{\sqrt{MSWD}}.
+#' \item Ignore the analytical uncertainties and perform an ordinary
+#' least squares regression. The third and final option is to
+#' attribute
+#' \item Attribute the overdispersion to the presence of `geological
+#' scatter'.  In this case, the excess scatter can be accounted for by
+#' increasing the analytical uncertainties by adding an overdispersion
+#' \emph{term} that lowers the MSWD to unity.
+#' }
 #'
 #' @param x EITHER a matrix with the following five columns:
 #'
@@ -41,6 +104,8 @@
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
 #'
+#' @param clabel colour label
+#'
 #' @param ellipse.col a vector of two background colours for the error
 #'     ellipses. If \code{levels=NA}, then only the first colour will
 #'     be used. If \code{levels} is a vector of numbers, then
@@ -63,16 +128,37 @@
 #' \item{Error-weighted least squares with overdispersion term}
 #'
 #' }
-#'
+#' @seealso
+#' \code{\link{york}},
+#' \code{\link{titterington}},
+#' \code{\link{ludwig}}
 #' @param ... optional arguments to be passed on to the generic plot
 #'     function if \code{model=2}
-#' @references Nicolaysen, L.O., 1961. Graphic interpretation of
-#'     discordant age measurements on metamorphic rocks. Annals of the
-#'     New York Academy of Sciences, 91(1), pp.198-206.
-#'
+#' @references
 #' Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
-#'     \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
-#'     Cosmochimica Acta, 58(22), pp.5031-5042.
+#' \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+#' Cosmochimica Acta, 58(22), pp.5031-5042.
+#'
+#' Nicolaysen, L.O., 1961. Graphic interpretation of discordant age
+#' measurements on metamorphic rocks. Annals of the New York Academy
+#' of Sciences, 91(1), pp.198-206.
+#'
+#' Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
+#' parallel isochrons and the method of maximum likelihood. Chemical
+#' Geology, 26(3), pp.183-195.
+#'
+#' York, D., 1966. Least-squares fitting of a straight line. Canadian
+#' Journal of Physics, 44(5), pp.1079-1086.
+#'
+#' York, D., 1968. Least squares fitting of a straight line with
+#' correlated errors. Earth and Planetary Science Letters, 5,
+#' pp.320-324.
+#'
+#' York, D., Evensen, N.M., Martinez, M.L. and De Basebe Delgado, J., 2004.
+#' Unified equations for the slope, intercept, and standard
+#' errors of the best straight line. American Journal of Physics,
+#' 72(3), pp.367-375.
+#'
 #' @rdname isochron
 #' @export
 isochron <- function(x,...){ UseMethod("isochron",x) }
@@ -113,7 +199,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \item{a}{the intercept of the straight line fit and its standard
 #' error.}
-#' 
+#'
 #' \item{b}{the slope of the fit and its standard error.}
 #'
 #' \item{cov.ab}{the covariance of the slope and intercept}
@@ -124,7 +210,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
 #' \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{187}}Os/\eqn{^{188}}Os,
-#' \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+#' \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
 #' \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio.
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
@@ -136,12 +222,12 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' \code{y} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
 #' model=1}).
 #' }
-#' 
+#'
 #' \item{age}{a four-element list containing:
 #'
 #' \code{t}: the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
 #' \eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{187}}Os/\eqn{^{187}}Re,
-#' \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+#' \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
 #' \eqn{^{176}}Hf/\eqn{^{177}}Hf age.
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
@@ -156,16 +242,17 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
 #' t-distribution with \code{df} degrees of freedom.}
 #'
-#' }
+#' \item{mswd}{the mean square of the residuals (a.k.a `reduced
+#'     Chi-square') statistic (omitted if \code{model=2}).}
 #'
-#' additionally, if \code{model=1}:
+#' \item{p.value}{the p-value of a Chi-square test for linearity
+#' (omitted if \code{model=2})}
 #'
-#' \describe{
-#'
-#' \item{mswd}{the mean square of the residuals (a.k.a
-#'     `reduced Chi-square') statistic (omitted if \code{model=2}).}
-#'
-#' \item{p.value}{the p-value of a Chi-square test for linearity}
+#' \item{w}{the overdispersion term, i.e. a two-element vector with
+#' the standard deviation of the (assumedly) Normally distributed
+#' geological scatter that underlies the measurements, and the
+#' corresponding studentised \eqn{100(1-\alpha)\%} confidence interval
+#' (only returned if \code{model=3}).}
 #'
 #' }
 #'
@@ -173,11 +260,11 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \describe{
 #'
-#' \item{par}{if \code{type=1} or \code{type=3}: the best fitting
+#' \item{par}{if \code{x$type=1} or \code{x$type=3}: the best fitting
 #' \eqn{^{230}}Th/\eqn{^{232}}Th intercept,
 #' \eqn{^{230}}Th/\eqn{^{238}}U slope, \eqn{^{234}}U/\eqn{^{232}}Th
 #' intercept and \eqn{^{234}}U/\eqn{^{238}}U slope, OR, if
-#' \code{type=2} or \code{type=4}: the best fitting
+#' \code{x$type=2} or \code{x$type=4}: the best fitting
 #' \eqn{^{234}}U/\eqn{^{238}}U intercept,
 #' \eqn{^{230}}Th/\eqn{^{232}}Th slope, \eqn{^{234}}U/\eqn{^{238}}U
 #' intercept and \eqn{^{234}}U/\eqn{^{232}}Th slope.  }
@@ -193,7 +280,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' intercept; if \code{type=3}: the \eqn{^{234}}Th/\eqn{^{232}}Th
 #' intercept; if \code{type=4}: the \eqn{^{234}}Th/\eqn{^{238}}U
 #' intercept and its propagated uncertainty.}
-#' 
+#'
 #' \item{b}{if \code{type=1}: the \eqn{^{230}}Th/\eqn{^{238}}U slope;
 #' if \code{type=2}: the \eqn{^{230}}Th/\eqn{^{232}}Th slope; if
 #' \code{type=3}: the \eqn{^{234}}U/\eqn{^{238}}U slope; if
@@ -201,11 +288,14 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' propagated uncertainty.}
 #'
 #' \item{cov.ab}{the covariance between \code{a} and \code{b}.}
-#' 
+#'
 #' \item{mswd}{the mean square of the residuals (a.k.a `reduced
 #'     Chi-square') statistic.}
 #'
 #' \item{p.value}{the p-value of a Chi-square test for linearity.}
+#'
+#' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
+#' t-distribution with \code{df} degrees of freedom.}
 #'
 #' \item{y0}{a four-element vector containing:
 #'
@@ -219,7 +309,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' \code{disp[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
 #' \code{y} enhanced by \eqn{\sqrt{mswd}}.}
 #'
-#' \item{age}{a four-element vector containing:
+#' \item{age}{a three (or four) element vector containing:
 #'
 #' \code{t}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
 #'
@@ -229,7 +319,14 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' \code{t}
 #'
 #' \code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
-#' \code{t} enhanced by \eqn{\sqrt{mswd}}.}
+#' \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported if
+#' \code{model=1}).}
+#'
+#' \item{w}{the overdispersion term, i.e. a two-element vector with
+#' the standard deviation of the (assumedly) Normally distributed
+#' geological scatter that underlies the measurements, and the
+#' corresponding studentised \eqn{100(1-\alpha)\%} confidence interval
+#' (only returned if \code{model=3}).}
 #'
 #' \item{d}{a matrix with the following columns: the X-variable for
 #' the isochron plot, the analytical uncertainty of X, the Y-variable
@@ -392,18 +489,18 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @param type following the classification of
 #' Ludwig and Titterington (1994), one of either:
-#' 
+#'
 #' \enumerate{
-#' 
+#'
 #' \item `Rosholt type-II' isochron, setting out
 #' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
-#' 
+#'
 #' \item `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
 #' vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #'
 #' \item `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
 #' vs. \eqn{^{238}}U/\eqn{^{232}}Th
-#' 
+#'
 #' \item `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
 #' vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #'
@@ -666,7 +763,7 @@ regression_init <- function(fit,alpha=0.05){
 
 get.limits <- function(X,sX){
     minx <- min(X-3*sX,na.rm=TRUE)
-    maxx <- max(X+3*sX,na.rm=TRUE)    
+    maxx <- max(X+3*sX,na.rm=TRUE)
     c(minx,maxx)
 }
 

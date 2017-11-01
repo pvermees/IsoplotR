@@ -116,7 +116,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(examples) 
+data(examples)
 concordia(examples$UPb)
 
 
@@ -283,8 +283,8 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: ludwig
-### Title: Linear regression of X,Y,Z-variables with correlated errors,
-###   taking into account decay constant uncertainties.
+### Title: Linear regression of U-Pb data with correlated errors, taking
+###   into account decay constant uncertainties.
 ### Aliases: ludwig ludwig.default ludwig.UPb
 
 ### ** Examples

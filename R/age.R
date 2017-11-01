@@ -1,7 +1,9 @@
 #' Calculate isotopic ages
-#'
-#' Calculates  ages and propagates their analytical
-#' uncertainties.
+#' 
+#' Calculates U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He,
+#' Th-U and fission track ages and propagates their analytical
+#' uncertainties. Includes options for single grain, isochron and
+#' concordia ages.
 #'
 #' @param x can be:
 #' \itemize{
@@ -50,14 +52,14 @@
 #'     \code{'Pb207-Pb206'}, \code{'Ar-Ar'}, \code{'Th-U'}, \code{'Re-Os'},
 #'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{'Lu-Hf'}, \code{'U-Th-He'} or
 #'     \code{'fissiontracks'}
-#' 
+#'
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
-#' 
+#'
 #' @param i (optional) index of a particular aliquot
-#' 
+#'
 #' @param ... additional arguments
-#' 
+#'
 #' @rdname age
 #' @export
 age <- function(x,...){ UseMethod("age",x) }
@@ -107,19 +109,19 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     analyses using the maximum likelihood algorithm of Ludwig
 #'     (1998), which assumes that the scatter of the data is solely
 #'     due to the analytical uncertainties.
-#' 
+#'
 #' \code{4}: a discordia line should be fitignoring the analytical
 #' uncertainties.
 #'
 #' \code{5}: a discordia line should be fit using a modified maximum likelihood
 #' algorithm that includes accounts for any overdispersion by adding a
 #' geological (co)variance term.
-#' 
+#'
 #' @param wetherill logical flag to indicate whether the data should
 #'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 #'     (\code{FALSE}) space.  This option is only used when
 #'     \code{type=2}
-#' 
+#'
 #' @param sigdig number of significant digits for the uncertainty
 #'     estimate (only used if \code{type=1}, \code{isochron=FALSE}
 #'     or \code{central=FALSE}).
@@ -150,7 +152,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, and the
 #' single grain concordia age and standard error, respectively.
-#'  
+#'
 #' \item if \code{x} has class \code{UPb} and \code{type=1}, \code{2},
 #' \code{3} or \code{4}, returns the output of the
 #' \code{\link{concordia}} function.
@@ -159,7 +161,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{SmNd}, \code{ReOs}, \code{LuHf} and \code{isochron=FALSE},
 #' returns a table of Pb-Pb, Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf ages
 #' and their standard errors.
-#' 
+#'
 #' \item if \code{x} has class \code{ThU} and \code{isochron=FALSE},
 #' returns a 5-column table with the Th-U ages, their standard errors,
 #' the initial \eqn{^{234}}U/\eqn{^{238}}U-ratios, their standard errors,
@@ -174,7 +176,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \item if \code{x} has class \code{fissiontracks} and
 #' \code{central=FALSE}, returns a table of fission track ages and
 #' standard errors.
-#' 
+#'
 #' \item if \code{x} has class \code{fissiontracks} or \code{UThHe}
 #' and \code{central=TRUE}, returns the output of the
 #' \code{\link{central}} function.

@@ -7,6 +7,31 @@
 #' a \eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
 #' calculates isochron ages.
 #'
+#' @details
+#' Similar to the \code{\link{concordia}} diagram (for U-Pb data) and
+#' the \code{\link{helioplot}} (for U-Th-He), the evolution diagram
+#' simultaneously displays the isotopic composition and age of
+#' U-series data. For carbonate data (Th-U formats 1 and 2), the Th-U
+#' evolution diagram consists of a scatter plot that sets out the
+#' \eqn{^{234}}U/\eqn{^{238}}U-activity ratios against the
+#' \eqn{^{230}}Th/\eqn{^{238}}U-activity ratios as error ellipses, and
+#' displays the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratios
+#' and ages as a set of intersecting lines.  Alternatively, the
+#' \eqn{^{234}}U/\eqn{^{238}}U-ratios can also be set out against the
+#' \eqn{^{230}}Th-\eqn{^{234}}U-\eqn{^{238}}U-ages.  In both types of
+#' evolution diagrams, \code{IsoplotR} provides the option to project
+#' the raw measurements along the best fitting isochron line and
+#' thereby remove the detrital \eqn{^{230}}Th-component. This
+#' procedure allows a visual assessment of the degree of homogeneity
+#' within a dataset, as is quantified by the MSWD.
+#' \cr\cr
+#' Neither the U-series evolution diagram, nor the
+#' \eqn{^{234}}U/\eqn{^{238}}U vs. age plot is applicable to igneous
+#' datasets (Th-U formats 2 and 3), in which \eqn{^{234}}U and
+#' \eqn{^{238}}U are in secular equilibrium.  For such datasets,
+#' \code{IsoplotR} produces an Osmond-style regression plot that is
+#' decorated with a fanning set of \code{\link{isochron}} lines.
+#'
 #' @param x an object of class \code{ThU}
 #' @param xlim x-axis limits
 #' @param ylim y-axis limits
@@ -20,6 +45,7 @@
 #'     numbers?
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
+#' @param clabel colour label
 #' @param ellipse.col a vector of two background colours for the error
 #'     ellipses. If \code{levels=NA}, then only the first colour will
 #'     be used. If \code{levels} is a vector of numbers, then
@@ -57,6 +83,7 @@
 #' manifests itself as an added (co)variance term.
 #'
 #' @param ... optional arguments to the generic \code{plot} function
+#' @seealso \code{\link{isochron}}
 #' @examples
 #' data(examples)
 #' evolution(examples$ThU)
@@ -242,7 +269,7 @@ evolution.title <- function(fit,sigdig=2){
     list2 <- list(a=rounded.a0[1],
                   b=rounded.a0[2],
                   c=rounded.a0[3])
-    args <- quote(~a%+-%b~'|'~c)    
+    args <- quote(~a%+-%b~'|'~c)
     call1 <- substitute(e~a,list(e=expr1,a=args))
     line1 <- do.call(substitute,list(eval(call1),list1))
     call2 <- substitute(e~a,list(e=expr2,a=args))
@@ -287,7 +314,7 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
         a0max <- get.ThU.age(max.dx,0,max.dy,0,0,exterr=FALSE)['48_0']
     } else {
         a0max <- ylim[2]
-    }    
+    }
     if (any(is.na(xlim)))
         xlim <- range(pretty(c(0,max(get.Th230U238(tt,a0max)))))
     a0 <- pretty(c(1,a0max))

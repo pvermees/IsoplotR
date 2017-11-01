@@ -5,9 +5,10 @@
 \title{Concordia diagram}
 \usage{
 concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
-  show.numbers = FALSE, levels = NA, ellipse.col = c("#00FF0080",
-  "#FF000080"), concordia.col = "darksalmon", exterr = FALSE,
-  show.age = 0, sigdig = 2, common.Pb = 0, ticks = NULL, ...)
+  show.numbers = FALSE, levels = NA, clabel = clabel,
+  ellipse.col = c("#00FF0080", "#FF000080"), concordia.col = "darksalmon",
+  exterr = FALSE, show.age = 0, sigdig = 2, common.Pb = 0,
+  ticks = NULL, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -24,6 +25,8 @@ numbers)}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
+
+\item{clabel}{colour label}
 
 \item{ellipse.col}{a vector of two background colours for the error
 ellipses. If \code{levels=NA}, then only the first colour will
@@ -82,7 +85,7 @@ if \code{show.age=1}, returns a list with the following items:
 
 \item{x}{ a named vector with the (weighted mean) U-Pb composition }
 
-\item{cov}{ the covariance matrix of the (mean) U-Pb composition }
+\item{cov}{ the covariance matrix of the (weighted mean) U-Pb composition }
 
 \item{mswd}{ a vector with three items (\code{equivalence},
 \code{concordance} and \code{combined}) containing the MSWD (Mean
@@ -95,9 +98,10 @@ concordance and combined goodness of fit, respectively. }
 the Chi-square test for isotopic equivalence, age concordance and
 combined goodness of fit, respectively. }
 
-\item{df}{ the number of degrees of freedom used for the
-\code{mswd} calculation.  These values are useful when expanding
-the analytical uncertainties when \code{mswd>1}.}
+\item{df}{ a three-element vector with the number of degrees of
+freedom used for the \code{mswd} calculation.  These values are
+useful when expanding the analytical uncertainties when
+\code{mswd>1}.}
 
 \item{age}{a 4-element vector with:
 
@@ -118,7 +122,7 @@ following items:
 
 \describe{
 
-\item{model}{ the fitting model (\code{model=type-2}).}
+\item{model}{ the fitting model (\code{=show.age-1}).}
 
 \item{x}{ a two element vector with the upper and lower intercept
 ages (if \code{wetherill=TRUE}) or the lower intercept age and
@@ -126,7 +130,7 @@ ages (if \code{wetherill=TRUE}) or the lower intercept age and
 
 \item{cov}{ the covariance matrix of the elements in \code{x}.}
 
-\item{err}{ a \code{2 x 2} or \code{3 x 2} matrix with the
+\item{err}{ a \code{[2 x 2]} or \code{[3 x 2]} matrix with the
 following rows:
 
 \code{s}: the estimated standard deviation for \code{x}
@@ -157,6 +161,21 @@ w.r.t the analytical uncertainties (not reported if \code{type=4}).}
 }
 }
 \description{
+Plots U-Pb data on Wetherill and Tera-Wasserburg concordia
+diagrams, calculate concordia ages and compositions, evaluates the
+equivalence of multiple
+(\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
+\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
+compositions, computes the weighted mean isotopic composition and
+the corresponding concordia age using the method of maximum
+likelihood, computes the MSWD of equivalence and concordance and
+their respective Chi-squared p-values. Performs linear regression
+and computes the upper and lower intercept ages (for Wetherill) or
+the lower intercept age and the \eqn{^{207}}Pb/\eqn{^{206}}Pb
+intercept (for Tera-Wasserburg), taking into account error
+correlations and decay constant uncertainties.
+}
+\details{
 The concordia diagram is a graphical means of assessing the
 internal consistency of U-Pb data. It sets out the measured
 \eqn{^{206}}Pb/\eqn{^{238}}U- and
@@ -172,21 +191,9 @@ plot away from the concordia line but are aligned along a linear
 trend form an isochron (or `discordia' line) that can be used
 to infer the composition of the non-radiogenic
 (`common') lead or to constrain the timing of prior lead loss.
-\cr\cr
-The \code{concordia} function plots U-Pb data on Wetherill and
-Tera-Wasserburg concordia diagrams, calculates concordia ages and
-compositions, evaluates the equivalence of multiple U-Pb
-compositions, computes the weighted mean isotopic composition and
-the corresponding concordia age using the method of maximum
-likelihood, computes the MSWD of equivalence and concordance and
-their respective Chi-squared p-values. Performs linear regression
-and computes the upper and lower intercept ages (for Wetherill) or
-the lower intercept age and the \eqn{^{207}}Pb/\eqn{^{206}}Pb
-intercept (for Tera-Wasserburg), taking into account error
-correlations and decay constant uncertainties.
 }
 \examples{
-data(examples) 
+data(examples)
 concordia(examples$UPb)
 }
 \references{

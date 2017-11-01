@@ -38,8 +38,8 @@ kde(x, ...)
 \method{kde}{PbPb}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
   ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA, i2i = FALSE,
-  ...)
+  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA,
+  common.Pb = 1, ...)
 
 \method{kde}{ArAr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
@@ -96,14 +96,14 @@ kde(x, ...)
 
 \item{...}{optional arguments to be passed on to \code{density}}
 
-\item{from}{minimum age of the time axis. If \code{NULL}, this is set
-automatically}
+\item{from}{minimum age of the time axis. If \code{NULL}, this is
+set automatically}
 
 \item{to}{maximum age of the time axis. If \code{NULL}, this is set
 automatically}
 
-\item{bw}{the bandwidth of the KDE. If \code{NULL}, \code{bw} will be calculated
-automatically using \code{botev()}}
+\item{bw}{the bandwidth of the KDE. If \code{NULL}, \code{bw} will
+be calculated automatically using \code{botev()}}
 
 \item{adaptive}{logical flag controlling if the adaptive KDE
 modifier of Abramson (1982) is used}
@@ -135,9 +135,9 @@ be added to the KDE}
 around the plot}
 
 \item{binwidth}{scalar width of the histogram bins, in Myr if
-\code{x$log = FALSE}, or as a fractional value if
-\code{x$log = TRUE}. Sturges' Rule is used if
-\code{binwidth = NA}}
+\code{x$log = FALSE}, or as a fractional value if \code{x$log =
+TRUE}. Sturges' Rule (\eqn{\log_2[n]+1}, where \eqn{n} is the
+number of data points) is used if \code{binwidth = NA}}
 
 \item{ncol}{scalar value indicating the number of columns over
 which the KDEs should be divided. This option is only used if
@@ -185,9 +185,9 @@ function will use the median bandwidth of all the samples.}
 \item{normalise}{logical flag indicating whether or not the KDEs
 should all integrate to the same value.}
 
-\item{i2i}{`isochron to intercept': calculates the initial
-(aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-\eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+\item{i2i}{`isochron to intercept': calculates the initial (aka
+`inherited', `excess', or `common')
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
 \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
 \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
 fit. Setting \code{i2i} to \code{FALSE} uses the default values
@@ -196,14 +196,31 @@ method). When applied to data of class \code{ThU}, setting
 \code{i2i} to \code{TRUE} applies a detrital Th-correction.}
 }
 \value{
-if \code{plot = TRUE}, returns an object of class \code{KDE}, i.e. a
-    list containing the following items:
+if \code{x} has class \code{UPb}, \code{PbPb}, \code{ArAr},
+\code{ReOs}, \code{SmNd}, \code{RbSr}, \code{UThHe},
+\code{fissiontracks} or \code{ThU}, returns an object of class
+\code{KDE}, i.e. a list containing the following items:
 
 \describe{
 \item{x}{ horizontal plot coordinates}
 \item{y}{ vertical plot coordinates}
 \item{bw}{ the base bandwidth of the density estimate}
-\item{ages}{ the data values from the input to the \code{kde} function}
+\item{ages}{ the data values from the input to
+the \code{kde} function}
+\item{log}{ copied from the input}
+}
+
+if \code{x} has class \code{detrital}, \code{PbPb}, \code{ArAr},
+\code{ReOs}, \code{SmNd}, \code{RbSr} returns an object of class
+\code{KDEs}, i.e. a list containing the following items:
+
+\describe{
+\item{kdes}{ a list of size \code{length(x)} with the
+individual KDEs of each of the samples in \code{x}}
+\item{from}{ the minimum value of the horizontal (time) axis}
+\item{to}{ the maximum valu of the horizontal (time) axis}
+\item{themax}{ the maximum value of the vertical (density) axis}
+\item{log}{ copied from the input}
 }
 
 or, if \code{x} has class \code{=detritals}, an object of class
@@ -222,6 +239,31 @@ Creates one or more kernel density estimates using a combination of
 the Botev (2010) bandwidth selector and the Abramson (1982)
 adaptive kernel bandwidth modifier.
 }
+\details{
+Given a set of \eqn{n} age estimates \eqn{x=\{t_1, t_2, ...,
+t_n\}}, histograms and KDEs are probability density estimators that
+display age distributions by smoothing.  Histograms do this by
+grouping the data into a number of regularly spaced bins.
+Alternatively, kernel density estimates (KDEs; Vermeesch, 2012)
+smooth data by applying a (Gaussian) kernel:
+\cr\cr
+\eqn{KDE(t) = \sum_{i=1}^{n}N(t|\mu=t_i,\sigma=h[t])/n}
+\cr\cr
+where \eqn{N(t|\mu,\sigma)} is the probability of observing a
+value \eqn{t} under a Normal distribution with mean \eqn{\mu} and
+standard deviation \eqn{\sigma}.  \eqn{h[t]} is the smoothing
+parameter or `bandwidth' of the kernel density estimate, which may
+or may not depend on the age \eqn{t}. If \eqn{h[t]} depends on
+\eqn{t}, then \eqn{KDE(t)} is known as an `adaptive' KDE.  The
+default bandwidth used by \code{IsoplotR} is calculated using the
+algorithm of Botev et al. (2010) and modulated by the adaptive
+smoothing approach of Abramson (1982).  The rationale behind
+adaptive kernel density estimation is to use a narrower bandwidth
+near the peaks of the sampling distribution (where the ordered
+dates are closely spaced in time), and a wider bandwidth in the
+distribution's sparsely sampled troughs. Thus, the resolution of
+the density estimate is optimised according to data availability.
+}
 \examples{
 data(examples)
 kde(examples$DZ[['N1']],kernel="epanechnikov")
@@ -237,4 +279,7 @@ of Statistics 38.5 (2010): 2916-2957.
 
 Vermeesch, P., 2012. On the visualisation of detrital age
 distributions. Chemical Geology, 312, pp.190-194.
+}
+\seealso{
+\code{\link{radialplot}}, \code{\link{cad}}
 }

@@ -159,10 +159,10 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
 }
 
 plot_points <- function(x,y,bg='white',show.numbers=FALSE,...){
-    if ('pch' %in% par(list(...))) pch <- par()$pch
+    if ('pch' %in% graphics::par(list(...))) pch <- graphics::par()$pch
     else pch <- 21
-    if ('cex' %in% par(list(...))) pch <- par()$cex
+    if ('cex' %in% graphics::par(list(...))) pch <- graphics::par()$cex
     else cex <- 1.5
     if (show.numbers) graphics::text(x,y,1:length(x),cex=cex,...)
-    else graphics::points(x,y,bg=bg,pch=pch,cex=cex,...)    
+    else graphics::points(x,y,bg=bg,pch=pch,cex=cex,...)
 }

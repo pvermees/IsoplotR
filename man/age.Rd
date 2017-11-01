@@ -23,7 +23,7 @@ age(x, ...)
 \method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE, i = NA,
   sigdig = NA, common.Pb = 0, ...)
 
-\method{age}{PbPb}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
+\method{age}{PbPb}(x, isochron = TRUE, common.Pb = 1, exterr = TRUE,
   i = NA, sigdig = NA, ...)
 
 \method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
@@ -188,7 +188,7 @@ table with the following columns: \code{t.75}, \code{err[t.75]},
 \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, and the
 single grain concordia age and standard error, respectively.
- 
+
 \item if \code{x} has class \code{UPb} and \code{type=1}, \code{2},
 \code{3} or \code{4}, returns the output of the
 \code{\link{concordia}} function.
@@ -220,8 +220,10 @@ and \code{central=TRUE}, returns the output of the
 }
 }
 \description{
-Calculates  ages and propagates their analytical
-uncertainties.
+Calculates U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He,
+Th-U and fission track ages and propagates their analytical
+uncertainties. Includes options for single grain, isochron and
+concordia ages.
 }
 \examples{
 data(examples)

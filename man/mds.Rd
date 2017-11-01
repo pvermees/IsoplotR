@@ -50,16 +50,61 @@ coordinates, respectively.}
 }
 \value{
 returns an object of class \code{MDS}, i.e. a list
-    containing the following items: \describe{ \item{points}{a two
-    column vector of the fitted configuration} \item{classical}{a
-    logical flag indicating whether the MDS configuration was
-    obtained by classical (\code{TRUE}) or nonmetric (\code{FALSE})
-    MDS} \item{diss}{the dissimilarity matrix used for the MDS
-    analysis} \item{stress}{(only if \code{classical=TRUE}) the
-    final stress achieved (in percent)} }
+    containing the following items:
+
+\describe{
+\item{points}{a two-column vector of the fitted configuration}
+\item{classical}{a logical flag indicating whether the MDS
+    configuration was obtained by classical (\code{TRUE}) or
+    nonmetric (\code{FALSE}) MDS}
+\item{diss}{the dissimilarity matrix used for the MDS analysis}
+\item{stress}{(only if \code{classical=TRUE}) the final stress
+    achieved (in percent)}
+}
 }
 \description{
 Performs classical or nonmetric Multidimensional Scaling analysis
+}
+\details{
+Multidimensional Scaling (MDS) is a dimension-reducting technique
+that takes a matrix of pairwise `dissimilarities' between objects
+(e.g., age distributions) as input and produces a configuration of
+two (or higher-) dimensional coordinates as output, so that the
+Euclidean distances between these coordinates approximate the
+dissimilarities of the input matrix. Thus, an MDS-configuration
+serves as a `map' in which similar samples cluster closely together
+and dissimilar samples plot far apart. In the context of detrital
+geochronology, the dissimilarity between samples is given by the
+statistical distance between age distributions. There are many ways
+to define this statistical distance. \code{IsoplotR} uses the
+Kolmogorov-Smirnov (KS) statistic due to its simplicity and the
+fact that it behaves like a true distance in the mathematical sense
+of the word (Vermeesch, 2013). The KS-distance is given by the
+maximum vertical distance between two \code{\link{cad}} step
+functions. Thus, the KS-distance takes on values between zero
+(perfect match between two age distributions) and one (no overlap
+between two distributions).  Calculating the KS-distance between
+samples two at a time populates a symmetric dissimilarity matrix
+with positive values and a zero diagonal. \code{IsoplotR}
+implements two algorithms to convert this matrix into a
+configuration. The first (`classical') approach uses a sequence of
+basic matrix manipulations developed by Young and Householder
+(1938) and Torgerson (1952) to achieve a linear fit between the
+KS-distances and the fitted distances on the MDS configuration. The
+second, more sophisticated (`nonmetric') approach subjects the
+input distances to a transformation \eqn{f} prior to fitting a
+configuration:
+\cr\cr
+\eqn{\delta_{i,j} = f(KS_{i,j})}
+\cr\cr
+where \eqn{KS_{i,j}} is the KS-distance between samples \eqn{i} and
+\eqn{j} (for \eqn{1 \leq i \neq j \leq n}) and \eqn{\delta_{i,j}}
+is the `disparity' (Kruskal, 1964).  Fitting an MDS
+configuration then involves finding the disparity transformation
+that maximises the goodness of fit (or minimises the `stress')
+between the disparities and the fitted distances. The latter two
+quantities can also be plotted against each other as a `Shepard
+plot'.
 }
 \examples{
 data(examples)
@@ -68,6 +113,18 @@ dev.new()
 mds(examples$DZ,shepard=TRUE)
 }
 \references{
-Vermeesch, P., 2013. Multi-sample comparison of
-    detrital age distributions. Chemical Geology, 341, pp.140-146.
+Kruskal, J., 1964. Multidimensional scaling by optimizing goodness
+of fit to a nonmetric hypothesis. Psychometrika 29 (1), 1-27.
+
+Torgerson, W. S. Multidimensional scaling: I. Theory and
+method. Psychometrika, 17(4): 401-419, 1952.
+
+Vermeesch, P., 2013. Multi-sample comparison of detrital age
+distributions. Chemical Geology, 341, pp.140-146.
+
+Young, G. and Householder, A. S. Discussion of a set of points in
+terms of their mutual distances. Psychometrika, 3(1):19-22, 1938.
+}
+\seealso{
+\code{\link{cad}}, \code{\link{kde}}
 }

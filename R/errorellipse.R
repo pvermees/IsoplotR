@@ -1,11 +1,11 @@
 #' Get coordinates of error ellipse for plotting
 #'
-#' Constructs an error ellipse age at a given confidence level from
-#' its centre and covariance matrix
+#' Constructs an error ellipse at a given confidence level from its
+#' centre and covariance matrix
 #'
 #' @param x x-coordinate (scalar) for the centre of the ellipse
 #' @param y y-coordinate (scalar) for the centre of the ellipse
-#' @param covmat covariance matrix of the x-y coordinates
+#' @param covmat the [\code{2 x 2}] covariance matrix of the x-y coordinates
 #' @param alpha the probability cutoff for the error ellipses
 #' @param n the resolution of the error ellipses
 #' @return an [\code{n x 2}] matrix of plot coordinates

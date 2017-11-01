@@ -5,7 +5,7 @@
 \title{Th-U evolution diagram}
 \usage{
 evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
-  detrital = FALSE, show.numbers = FALSE, levels = NA,
+  detrital = FALSE, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
   isochron = FALSE, model = 1, exterr = TRUE, sigdig = 2, ...)
 }
@@ -30,6 +30,8 @@ numbers?}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
+
+\item{clabel}{colour label}
 
 \item{ellipse.col}{a vector of two background colours for the error
 ellipses. If \code{levels=NA}, then only the first colour will
@@ -81,6 +83,31 @@ diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or
 a \eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
 calculates isochron ages.
 }
+\details{
+Similar to the \code{\link{concordia}} diagram (for U-Pb data) and
+the \code{\link{helioplot}} (for U-Th-He), the evolution diagram
+simultaneously displays the isotopic composition and age of
+U-series data. For carbonate data (Th-U formats 1 and 2), the Th-U
+evolution diagram consists of a scatter plot that sets out the
+\eqn{^{234}}U/\eqn{^{238}}U-activity ratios against the
+\eqn{^{230}}Th/\eqn{^{238}}U-activity ratios as error ellipses, and
+displays the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratios
+and ages as a set of intersecting lines.  Alternatively, the
+\eqn{^{234}}U/\eqn{^{238}}U-ratios can also be set out against the
+\eqn{^{230}}Th-\eqn{^{234}}U-\eqn{^{238}}U-ages.  In both types of
+evolution diagrams, \code{IsoplotR} provides the option to project
+the raw measurements along the best fitting isochron line and
+thereby remove the detrital \eqn{^{230}}Th-component. This
+procedure allows a visual assessment of the degree of homogeneity
+within a dataset, as is quantified by the MSWD.
+\cr\cr
+Neither the U-series evolution diagram, nor the
+\eqn{^{234}}U/\eqn{^{238}}U vs. age plot is applicable to igneous
+datasets (Th-U formats 2 and 3), in which \eqn{^{234}}U and
+\eqn{^{238}}U are in secular equilibrium.  For such datasets,
+\code{IsoplotR} produces an Osmond-style regression plot that is
+decorated with a fanning set of \code{\link{isochron}} lines.
+}
 \examples{
 data(examples)
 evolution(examples$ThU)
@@ -93,4 +120,7 @@ Ludwig, K.R. and Titterington, D.M., 1994. Calculation
 Ludwig, K.R., 2003. Mathematical-statistical treatment of data and
     errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
     Geochemistry, 52(1), pp.631-656.
+}
+\seealso{
+\code{\link{isochron}}
 }

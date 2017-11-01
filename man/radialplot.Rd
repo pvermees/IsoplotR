@@ -19,58 +19,59 @@ radialplot(x, ...)
 
 \method{radialplot}{default}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
-  levels = NA, bg = c("white", "red"), title = TRUE, k = 0,
-  markers = NULL, alpha = 0.05, ...)
+  levels = NA, clabel = "", bg = c("white", "red"), title = TRUE,
+  k = 0, markers = NULL, alpha = 0.05, ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
   transformation = "arcsin", sigdig = 2, show.numbers = FALSE, pch = 21,
-  levels = NA, bg = c("white", "red"), title = TRUE, markers = NULL,
-  k = 0, exterr = TRUE, alpha = 0.05, ...)
+  levels = NA, clabel = "", bg = c("white", "red"), title = TRUE,
+  markers = NULL, k = 0, exterr = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{UPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", type = 4, cutoff.76 = 1100,
   cutoff.disc = c(-15, 5), show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, exterr = TRUE,
-  common.Pb = 0, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, common.Pb = 0, alpha = 0.05, ...)
 
 \method{radialplot}{PbPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, exterr = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, common.Pb = 1, alpha = 0.05, ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, exterr = TRUE,
-  i2i = FALSE, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, i2i = FALSE, alpha = 0.05, ...)
 
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  alpha = 0.05, ...)
 
 \method{radialplot}{ReOs}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, exterr = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{SmNd}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, exterr = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{RbSr}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, exterr = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{LuHf}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, exterr = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{ThU}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  bg = c("white", "red"), markers = NULL, k = 0, i2i = TRUE,
-  alpha = 0.05, ...)
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  i2i = TRUE, alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{Either an nx2 matix of (transformed) values z and their
@@ -104,6 +105,8 @@ numbers)}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours of the plot symbols.}
+
+\item{clabel}{colour label}
 
 \item{bg}{a vector of two background colours for the plot symbols.
 If \code{levels=NA}, then only the first colour will be
@@ -177,13 +180,43 @@ Implementation of a graphical device developed by Rex Galbraith to
 display several estimates of the same quantity that have different
 standard errors.
 }
+\details{
+The radial plot (Galbraith, 1988, 1990) is a graphical device that
+was specifically designed to display heteroscedastic data, and is
+constructed as follows.  Consider the usual set of dates \eqn{t_i}
+and uncertainties \eqn{s[t_i]} (for \eqn{1 \leq i \leq n}). Define
+\eqn{z_i = z[t_i]} to be a transformation of \eqn{t_i} (e.g.,
+\eqn{z_i = log[t_i]}), and let \eqn{s[z_i]} be its propagated
+analytical uncertainty (i.e., \eqn{s[z_i] = s[t_i]/t_i} in the case
+of a logarithmic transformation). Create a scatterplot of
+\eqn{(x_i,y_i)} values, where \eqn{x_i = 1/s[z_i]} and \eqn{y_i =
+(z_i-z_\circ)/s[z_i]}, where \eqn{z_\circ} is some reference value
+such as the mean. The slope of a line connecting the origin of this
+scatterplot with any of the \eqn{(x_i,y_i)}s is proportional to
+\eqn{z_i} and, hence, the date \eqn{t_i}.  These dates can be more
+easily visualised by drawing a radial scale at some convenient
+distance from the origin and annotating it with labelled ticks at
+the appropriate angles. While the angular position of each data
+point represents the date, its horizontal distance from the origin
+is proportional to the precision. Imprecise measurements plot on
+the left hand side of the radial plot, whereas precise age
+determinations are found further towards the right. Thus, radial
+plots allow the observer to assess both the magnitude and the
+precision of quantitative data in one glance.
+}
 \examples{
 data(examples)
 radialplot(examples$FT1)
 }
 \references{
-Galbraith, R.F., 1990. The radial plot: graphical
-    assessment of spread in ages. International Journal of
-    Radiation Applications and Instrumentation. Part D. Nuclear
-    Tracks and Radiation Measurements, 17(3), pp.207-214.
+Galbraith, R.F., 1988. Graphical display of estimates having
+differing standard errors. Technometrics, 30(3), pp.271-281.
+
+Galbraith, R.F., 1990. The radial plot: graphical assessment of
+spread in ages. International Journal of Radiation Applications and
+Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
+17(3), pp.207-214.
+}
+\seealso{
+\code{link{peakfit}}, \code{link{central}}
 }

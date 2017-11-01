@@ -138,15 +138,50 @@ t-distribution with \eqn{(n-2k+1)} degrees of freedom}
 }
 \description{
 Implements the discrete mixture modelling algorithms of Galbraith
-and Green (1993) and applies them to fission track and other
+and Laslett (1993) and applies them to fission track and other
 geochronological datasets.
+}
+\details{
+Consider a dataset of \eqn{n} dates \eqn{\{t_1, t_2, ..., t_n\}}
+with analytical uncertainties \eqn{\{s[t_1], s[t_2], ..., s[t_n]\}}.
+Define \eqn{z_i = \log(t_i)} and \eqn{s[z_i] = s[t_i]/t_i}.
+Suppose that these \eqn{n} values are are derived
+from a mixture of \eqn{k>2} populations with means
+\eqn{\{\mu_1,...,\mu_k\}}. Such a \emph{discrete mixture} may be
+mathematically described by:
+\cr\cr
+\eqn{Prob(z_i|\mu,\omega) = \sum_{j=1}^k \pi_j N(z_i | \mu_j, s[z_j]^2 )}
+\cr\cr
+where \eqn{\pi_j} is the proportion of the population that belongs
+to the \eqn{j^{th}} component, and
+\eqn{\pi_k=1-\sum_{j=1}^{k-1}\pi_j}. This equation can be solved by
+the method of maximum likelihood (Galbraith and Laslett, 1993).
+\code{IsoplotR} implements the Bayes Information Criterion (BIC) as
+a means of automatically choosing \eqn{k}. This option should be
+used with caution, as the number of peaks steadily rises with
+sample size (\eqn{n}).  If one is mainly interested in the youngest
+age component, then it is more productive to use an alternative
+parameterisation, in which all grains are assumed to come from one
+of two components, whereby the first component is a single discrete
+age peak (\eqn{\exp(m)}, say) and the second component is a
+continuous distribution (as descibed by the \code{\link{central}}
+age model), but truncated at this discrete value (Van der Touw et
+al., 1997).
 }
 \examples{
 data(examples)
 peakfit(examples$FT1,k=2)
 }
 \references{
-Galbraith, R.F. and Laslett, G.M., 1993. Statistical
-    models for mixed fission track ages. Nuclear tracks and
-    radiation measurements, 21(4), pp.459-470.
+Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
+mixed fission track ages. Nuclear tracks and radiation
+measurements, 21(4), pp.459-470.
+
+van der Touw, J., Galbraith, R., and Laslett, G. A logistic
+truncated normal mixture model for overdispersed binomial
+data. Journal of Statistical Computation and Simulation,
+59(4):349-373, 1997.
+}
+\seealso{
+\code{\link{radialplot}}, \code{\link{central}}
 }

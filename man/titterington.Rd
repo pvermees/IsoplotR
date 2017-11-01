@@ -35,7 +35,24 @@ a four-element list of vectors containing:
     }
 }
 \description{
-Implements the maximum likelihood algorithm of Ludwig and Titterington (1994)
+Implements the maximum likelihood algorithm of Ludwig and
+Titterington (1994) for linear regression of three dimensional data
+with correlated uncertainties.
+}
+\details{
+Ludwig and Titterington (1994)'s 3-dimensional linear regression
+algorithm for data with correlated uncertainties is an extension of
+the 2-dimensional algorithm by Titterington and Halliday (1979),
+which itself is equivalent to the algorithm of York et al. (2004).
+Given n triplets of (approximately) collinear measurements
+\eqn{X_i}, \eqn{Y_i} and {Z_i} (for \eqn{1 \leq i \leq n}), their
+uncertainties \eqn{s[X_i]}, \eqn{s[Y_i]} and \eqn{s[Z_i]}, and their
+covariances cov[\eqn{X_i,Y_i}], cov[\eqn{X_i,Z_i}] and
+cov[\eqn{Y_i,Z_i}], the \code{titterington} function fits two slopes
+and intercepts with their uncertainties. It computes the MSWD as a
+measure of under/overdispersion.  Overdispersed datasets (MSWD>1)
+can be dealt with in the same three ways that are described in the
+documentation of the \code{\link{isochron}} function.
 }
 \examples{
 d <- matrix(c(0.1677,0.0047,1.105,0.014,0.782,0.015,0.24,0.51,0.33,
@@ -52,4 +69,13 @@ titterington(d)
 Ludwig, K.R. and Titterington, D.M., 1994. Calculation
 of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 Cosmochimica Acta, 58(22), pp.5031-5042.
+
+Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
+parallel isochrons and the method of maximum likelihood. Chemical
+Geology, 26(3), pp.183-195.
+
+York, D., Evensen, N.M., Martinez, M.L. and De Basebe Delgado, J., 2004.
+Unified equations for the slope, intercept, and standard
+errors of the best straight line. American Journal of Physics,
+72(3), pp.367-375.
 }

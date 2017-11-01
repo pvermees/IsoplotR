@@ -1,5 +1,5 @@
 * using log directory ‘/home/pvermees/Dropbox/Programming/R/IsoplotR/IsoplotR.Rcheck’
-* using R version 3.2.3 (2015-12-10)
+* using R version 3.4.1 (2017-06-30)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * using session charset: UTF-8
 * using option ‘--as-cran’
@@ -9,9 +9,10 @@
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
 Number of updates in past 6 months: 7
+
+The build time stamp is missing.
 * checking package namespace information ... OK
-* checking package dependencies ... NOTE
-  No repository set, so cyclic dependency check skipped
+* checking package dependencies ... OK
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
 * checking for executable files ... WARNING
@@ -35,9 +36,10 @@ CRAN-pack does not know about
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking DESCRIPTION meta-information ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-File README.md cannot be checked without ‘pandoc’ being installed.
+Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
 Non-standard files/directories found at top level:
   ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK

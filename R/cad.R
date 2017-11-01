@@ -1,5 +1,9 @@
 #' Plot continuous data as cumulative age distributions
 #'
+#' Plot a dataset as a Cumulative Age Distribution (CAD), also known
+#' as a `empirical cumulative distribution function'.
+#'
+#' @details
 #' Empirical cumulative distribution functions or cumulative age
 #' distributions CADs (Vermeesch, 2007) are the most straightforward
 #' way to visualise the probability distribution of multiple dates.
@@ -24,7 +28,7 @@
 #' widely used as probability density estimates. But the ease of
 #' interpretation of density estimates comes at a cost, as they
 #' require smoothing and cannot as easily be combined as CADs.
-#' 
+#'
 #' @param x a numerical vector OR an object of class \code{UPb},
 #'     \code{PbPb}, \code{ArAr}, \code{UThHe}, \code{fissiontracks},
 #'     \code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{ThU}
@@ -126,7 +130,7 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @references Vermeesch, P., 2007. Quantitative geomorphology of the
 #'     White Mountains (California) using detrital apatite fission
 #'     track thermochronology. Journal of Geophysical Research: Earth
-#'     Surface, 112(F3). 
+#'     Surface, 112(F3).
 #' @rdname cad
 #' @export
 cad.PbPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',

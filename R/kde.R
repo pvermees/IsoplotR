@@ -4,6 +4,31 @@
 #' the Botev (2010) bandwidth selector and the Abramson (1982)
 #' adaptive kernel bandwidth modifier.
 #'
+#' @details
+#' Given a set of \eqn{n} age estimates \eqn{x=\{t_1, t_2, ...,
+#' t_n\}}, histograms and KDEs are probability density estimators that
+#' display age distributions by smoothing.  Histograms do this by
+#' grouping the data into a number of regularly spaced bins.
+#' Alternatively, kernel density estimates (KDEs; Vermeesch, 2012)
+#' smooth data by applying a (Gaussian) kernel:
+#' \cr\cr
+#' \eqn{KDE(t) = \sum_{i=1}^{n}N(t|\mu=t_i,\sigma=h[t])/n}
+#' \cr\cr
+#' where \eqn{N(t|\mu,\sigma)} is the probability of observing a
+#' value \eqn{t} under a Normal distribution with mean \eqn{\mu} and
+#' standard deviation \eqn{\sigma}.  \eqn{h[t]} is the smoothing
+#' parameter or `bandwidth' of the kernel density estimate, which may
+#' or may not depend on the age \eqn{t}. If \eqn{h[t]} depends on
+#' \eqn{t}, then \eqn{KDE(t)} is known as an `adaptive' KDE.  The
+#' default bandwidth used by \code{IsoplotR} is calculated using the
+#' algorithm of Botev et al. (2010) and modulated by the adaptive
+#' smoothing approach of Abramson (1982).  The rationale behind
+#' adaptive kernel density estimation is to use a narrower bandwidth
+#' near the peaks of the sampling distribution (where the ordered
+#' dates are closely spaced in time), and a wider bandwidth in the
+#' distribution's sparsely sampled troughs. Thus, the resolution of
+#' the density estimate is optimised according to data availability.
+#'
 #' @param x a vector of numbers OR an object of class \code{UPb},
 #'     \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
 #'     \code{RbSr}, \code{UThHe}, \code{fissiontracks}, \code{ThU} or
@@ -11,12 +36,12 @@
 #' @rdname kde
 #' @export
 kde <- function(x,...){ UseMethod("kde",x) }
-#' @param from minimum age of the time axis. If \code{NULL}, this is set
-#'     automatically
+#' @param from minimum age of the time axis. If \code{NULL}, this is
+#'     set automatically
 #' @param to maximum age of the time axis. If \code{NULL}, this is set
 #'     automatically
-#' @param bw the bandwidth of the KDE. If \code{NULL}, \code{bw} will be calculated
-#'     automatically using \code{botev()}
+#' @param bw the bandwidth of the KDE. If \code{NULL}, \code{bw} will
+#'     be calculated automatically using \code{botev()}
 #' @param adaptive logical flag controlling if the adaptive KDE
 #'     modifier of Abramson (1982) is used
 #' @param log transform the ages to a log scale if \code{TRUE}
@@ -33,9 +58,9 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' @param hist.col the fill colour of the histogram specified as a
 #'     four element vector of r, g, b, alpha values
 #' @param binwidth scalar width of the histogram bins, in Myr if
-#'     \code{x$log = FALSE}, or as a fractional value if
-#'     \code{x$log = TRUE}. Sturges' Rule is used if
-#'     \code{binwidth = NA}
+#'     \code{x$log = FALSE}, or as a fractional value if \code{x$log =
+#'     TRUE}. Sturges' Rule (\eqn{\log_2[n]+1}, where \eqn{n} is the
+#'     number of data points) is used if \code{binwidth = NA}
 #' @param bty change to \code{"o"}, \code{"l"}, \code{"7"},
 #'     \code{"c"}, \code{"u"}, or \code{"]"} if you want to draw a box
 #'     around the plot
@@ -43,16 +68,34 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #'     which the KDEs should be divided. This option is only used if
 #'     \code{x} has class \code{detritals}.
 #' @param ... optional arguments to be passed on to \code{density}
+#' @seealso \code{\link{radialplot}}, \code{\link{cad}}
 #' @return
 #'
-#' if \code{plot = TRUE}, returns an object of class \code{KDE}, i.e. a
-#'     list containing the following items:
-#' 
+#' if \code{x} has class \code{UPb}, \code{PbPb}, \code{ArAr},
+#' \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{UThHe},
+#' \code{fissiontracks} or \code{ThU}, returns an object of class
+#' \code{KDE}, i.e. a list containing the following items:
+#'
 #' \describe{
 #' \item{x}{ horizontal plot coordinates}
 #' \item{y}{ vertical plot coordinates}
 #' \item{bw}{ the base bandwidth of the density estimate}
-#' \item{ages}{ the data values from the input to the \code{kde} function}
+#' \item{ages}{ the data values from the input to
+#' the \code{kde} function}
+#' \item{log}{ copied from the input}
+#' }
+#'
+#' if \code{x} has class \code{detrital}, \code{PbPb}, \code{ArAr},
+#' \code{ReOs}, \code{SmNd}, \code{RbSr} returns an object of class
+#' \code{KDEs}, i.e. a list containing the following items:
+#'
+#' \describe{
+#' \item{kdes}{ a list of size \code{length(x)} with the
+#' individual KDEs of each of the samples in \code{x}}
+#' \item{from}{ the minimum value of the horizontal (time) axis}
+#' \item{to}{ the maximum valu of the horizontal (time) axis}
+#' \item{themax}{ the maximum value of the vertical (density) axis}
+#' \item{log}{ copied from the input}
 #' }
 #'
 #' @references
@@ -82,9 +125,8 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
         plot.KDE(X,pch=pch,xlab=xlab,ylab=ylab,kde.col=kde.col,
                  hist.col=hist.col,show.hist=show.hist,bty=bty,
                  binwidth=binwidth)
-    } else {
-        return(X)
     }
+    invisible(X)
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -154,7 +196,7 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #' \item{themax}{the maximum probability density of all the KDEs}
 #' \item{xlabel}{the x-axis label to be used by \code{plot.KDEs}}
 #' }
-#' 
+#'
 #' @examples
 #' kde(examples$DZ,from=0,to=3000)
 #' @rdname kde
@@ -172,13 +214,12 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
         plot.KDEs(X,pch=pch,xlab=xlab,ylab=ylab,kde.col=kde.col,
                   hist.col=hist.col,show.hist=show.hist,bty=bty,
                   binwidth=binwidth,ncol=ncol)
-    } else {
-        return(X)
     }
+    invisible(X)
 }
-#' @param i2i `isochron to intercept': calculates the initial
-#'     (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#' @param i2i `isochron to intercept': calculates the initial (aka
+#'     `inherited', `excess', or `common')
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
 #'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
 #'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
 #'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
