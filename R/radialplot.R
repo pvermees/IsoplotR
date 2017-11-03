@@ -66,7 +66,7 @@
 #' @param alpha cutoff value for confidence intervals
 #' @param ... additional arguments to the generic \code{points}
 #'     function
-#' @seealso \code{link{peakfit}}, \code{link{central}}
+#' @seealso \code{\link{peakfit}}, \code{\link{central}}
 #' @references
 #' Galbraith, R.F., 1988. Graphical display of estimates having
 #' differing standard errors. Technometrics, 30(3), pp.271-281.

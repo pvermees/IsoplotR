@@ -41,6 +41,20 @@ which, although based on least squares, yields results that are
 consistent with maximum likelihood estimates of Titterington and
 Halliday (1979)
 }
+\details{
+Given n pairs of (approximately) collinear measurements \eqn{X_i}
+and \eqn{Y_i} (for \eqn{1 \leq i \leq n}), their uncertainties
+\eqn{s[X_i]} and \eqn{s[Y_i]}, and their covariances
+cov[\eqn{X_i,Y_i}], the \code{york} function finds the best fitting
+straight line using the least-squares algorithm of York et
+al. (2004). This algorithm is modified from an earlier method
+developed by York (1968) to be consistent with the maximum
+likelihood approach of Titterington and Halliday (1979). It
+computes the MSWD as a measure of under/overdispersion.
+Overdispersed datasets (MSWD>1) can be dealt with in the same three
+ways that are described in the documentation of the
+\code{\link{isochron}} function.
+}
 \examples{
    X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
           28.530,50.540,51.595,86.51,106.40,157.35)
@@ -71,4 +85,7 @@ Geology, 26(3), pp.183-195.
 York, Derek, et al. "Unified equations for the slope,
 intercept, and standard errors of the best straight line."
 American Journal of Physics 72.3 (2004): 367-375.
+}
+\seealso{
+\code{\link{york}}, \code{\link{isochron}}, \code{\link{ludwig}}
 }

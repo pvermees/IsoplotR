@@ -122,6 +122,11 @@ or more U/Ca- or U-concentration measurements and their analytical
 uncertainties.}  }}
 }
 \value{
+an object of class \code{UPb}, \code{PbPb}, \code{RbSr},
+\code{SmNd}, \code{LuHf}, \code{ReOs}, \code{ThU},
+\code{fissiontracks}, \code{UThHe}, \code{detritals} or
+\code{other}
+
 an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
     \code{UThHe}, \code{ReOs}, \code{SmNd}, \code{RbSr},
     \code{LuHf}, \code{detritals}, \code{fissiontracks}, \code{ThU}
@@ -153,7 +158,12 @@ IsoplotR provides the following example input files:
 }
 
 The contents of these files can be viewed using the
-\code{system.file(...)} function.
+\code{system.file(...)} function. For example, to read the
+\code{ArAr1.csv} file:
+
+\code{fname <- system.file('ArAr1.csv',package='IsoplotR')}
+
+\code{ArAr <- read.data(fname,method='Ar-Ar',format=1)}
 }
 \examples{
 file.show(system.file("spectrum.csv",package="IsoplotR"))
@@ -193,4 +203,7 @@ f8 <- system.file("LudwigMixture.csv",package="IsoplotR")
 d8 <- read.data(f8,method="other")
 radialplot(d8)
 
+}
+\seealso{
+\code{\link{examples}}, \code{\link{settings}}
 }

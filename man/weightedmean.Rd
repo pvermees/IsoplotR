@@ -143,24 +143,25 @@ returns a list with the following items:
 
 \code{s[x]}: the estimated analytical uncertainty of \code{x}
 
-\code{ci[x]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+\code{ci[x]}: the \eqn{100(1-\alpha)\%} confidence interval for
 \code{x} given the appropriate degrees of freedom
 }
 
 \item{disp}{a two element vector with the (over)dispersion the
-corresponding \eqn{100(1-\alpha/2)\%} confidence interval.}
+corresponding \eqn{100(1-\alpha)\%} confidence interval.}
+
+\item{df}{the degrees of freedom for the Chi-square test
+(\eqn{n-1})}
+
+\item{tfact}{the \eqn{100(1-\alpha/2)} percentile of a
+t-distribution with \code{df} degrees of freedom}
 
 \item{mswd}{the Mean Square of the Weighted Deviates
 (a.k.a. `reduced Chi-square' statistic)}
 
-\item{p.value}{the p-value of a Chi-square test with n-1 degrees
-of freedom, testing the null hypothesis that the underlying
+\item{p.value}{the p-value of a Chi-square test with \eqn{df}
+degrees of freedom, testing the null hypothesis that the underlying
 population is not overdispersed.}
-
-\item{df}{the degrees of freedom for the Chi-square test}
-
-\item{tfact}{the \eqn{100(1-\alpha/2)} percentile of a
-t-distribution with \code{df} degrees of freedom}
 
 \item{valid}{vector of logical flags indicating which steps are
 included into the weighted mean calculation}
@@ -185,9 +186,9 @@ determined on different aliquots of the same sample, and let
 uncertainties. \code{IsoplotR} then calculates the weighted mean of
 these data assuming a Normal distribution with two sources of
 variance:
-\cr\cr
+
 \eqn{t_i \sim N(\mu, \sigma^2 = s[t_i]^2 + \omega^2 )}
-\cr\cr
+
 where \eqn{\mu} is the mean, \eqn{\sigma^2} is the total variance
 and \eqn{\omega} is the `overdispersion'. Equation 1 can be solved
 for \eqn{\mu} and \eqn{\omega} by the method of maximum
@@ -200,10 +201,10 @@ determinations \eqn{t_i} using their analytical uncertainties
 \item For each \eqn{t_i}, compute the probability \eqn{\pi} that
 that \eqn{|t-\mu|>|t_i-\mu|} for
 \eqn{t \sim N(0,\sqrt{s[t_i]^2+\omega^2) }}
-\item Let \eqn{p_j \equiv \min(p_1, ..., p_n)}. If \eqn{p_j<0.05/n},
-then reject the j\textsuperscript{th} date, reduce n by one (i.e.,
-\eqn{n \rightarrow n-1}) and repeat steps 1 through 3 until the
-surviving dates pass the third step.
+\item Let \eqn{p_j \equiv \min(p_1, ..., p_n)}. If
+\eqn{p_j<0.05/n}, then reject the j\eqn{^{th}} date, reduce n by
+one (i.e., \eqn{n \rightarrow n-1}) and repeat steps 1 through 3
+until the surviving dates pass the third step.
 }
 If the analtyical uncertainties are small compared to the scatter
 between the dates (i.e. if \eqn{\omega \gg s[t]} for all \eqn{i}),

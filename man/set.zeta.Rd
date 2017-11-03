@@ -32,13 +32,81 @@ an object of class \code{fissiontracks} with an updated
 Determines the zeta calibration constant of a fission track dataset
 (EDM or LA-ICP-MS) given its true age and analytical uncertainty.
 }
+\details{
+The fundamental fission track age is given by:
+
+\eqn{t = \frac{1}{\lambda_{238}}
+\ln\left(1 + \frac{\lambda_{238}}{\lambda_f} \frac{2 N_s}{[^{238}U]A_sL}\right)
+} (eq.1)
+
+where \eqn{N_s} is the number of spontaneous fission tracks
+measured over an area \eqn{A_s}, \eqn{[^{238}U]} is the
+\eqn{^{238}}U-concentration in atoms per unit volume,
+\eqn{\lambda_f} is the fission decay constant, \eqn{L} is the
+etchable fission track length, and the factor 2 is a geometric
+factor accounting for the fact that etching reveals tracks from
+both above and below the internal crystal surface.  Two analytical
+approaches are used to measure \eqn{[^{238}U]}: neutron activation
+and LAICPMS. The first approach estimates the
+\eqn{^{238}}U-concentration indirectly, using the induced fission
+of neutron-irradiated \eqn{^{235}}U as a proxy for the
+\eqn{^{238}}U. In the most common implementation of this approach,
+the induced fission tracks are recorded by an external detector
+made of mica or plastic that is attached to the polished grain
+surface (Fleischer and Hart, 1972; Hurford and Green, 1983). The
+fission track age equation then becomes:
+
+\eqn{t = \frac{1}{\lambda_{238}}
+\ln\left(1 + \frac{\lambda_{238}\zeta\rho_d}{2}\frac{N_s}{N_i}\right)
+} (eq.2)
+
+where \eqn{N_i} is the number of induced fission tracks counted in
+the external detector over the same area as the spontaneous tracks,
+\eqn{\zeta} is a `zeta'-calibration factor that incorporates both
+the fission decay constant and the etchable fission track length,
+and \eqn{\rho_d} is the number of induced fission tracks per unit
+area counted in a co-irradiated glass of known
+U-concentration. \eqn{\rho_d} allows the \eqn{\zeta}-factor to be
+`recycled' between irradiations.
+
+LAICPMS is an alternative means of determining the
+\eqn{^{238}}U-content of fission track samples without the need for
+neutron irradiation. The resulting U-concentrations can be plugged
+directly into the fundamental age equation (eq.1). but this is
+limited by the accuracy of the U-concentration measurements, the
+fission track decay constant and the etching and counting
+efficiencies. Alternatively, these sources of bias may be removed
+by normalising to a standard of known fission track age and
+defining a new `zeta' calibration constant \eqn{\zeta_{icp}}:
+
+\eqn{
+t = \frac{1}{\lambda_{238}}
+\ln\left( 1 + \frac{\lambda_{238}\zeta_{icp}}{2} \frac{N_s}{[{}^{238}U] A_s} \right)
+}(eq.3)
+
+where \eqn{[{}^{238}U]} may either stand for the
+\eqn{^{238}}U-concentration (in ppm) \emph{or} for the U/Ca (for
+apatite) or U/Si (for zircon) ratio measurement (Vermeesch, 2017).
+}
 \examples{
 data(examples)
 print(examples$FT1$zeta)
 FT <- set.zeta(examples$FT1,tst=c(250,5))
 print(FT$zeta)
+
 }
 \references{
-Vermeesch, P., 2017. Statistics for LA-ICP-MS based
-    fission track dating. Chemical Geology, 456, pp.19-27.
+Fleischer, R. and Hart, H. Fission track dating: techniques and
+problems. In Bishop, W., Miller, J., and Cole, S., editors,
+Calibration of Hominoid Evolution, pages 135-170. Scottish Academic
+Press Edinburgh, 1972.
+
+Hurford, A. J. and Green, P. F. The zeta age calibration of
+fission-track dating. Chemical Geology, 41:285-317, 1983.
+
+Vermeesch, P., 2017. Statistics for LA-ICP-MS based fission track
+dating. Chemical Geology, 456, pp.19-27.
+}
+\seealso{
+\code{\link{age}}
 }

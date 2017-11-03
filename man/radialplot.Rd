@@ -218,5 +218,5 @@ Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
 17(3), pp.207-214.
 }
 \seealso{
-\code{link{peakfit}}, \code{link{central}}
+\code{\link{peakfit}}, \code{\link{central}}
 }

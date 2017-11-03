@@ -58,8 +58,8 @@
 #'
 #' \code{s[t]}: the estimated uncertainties of \code{t}
 #'
-#' \code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
-#' \code{t}}
+#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t}}
 #'
 #' \item{props}{a \code{2 x k} matrix with the following rows:
 #'

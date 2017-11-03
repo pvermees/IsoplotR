@@ -25,13 +25,13 @@
 #' does so for its U-Th-He isochron calculations. The York (1966)
 #' method assumes that the analytical uncertainties of the x- and
 #' y-variables are independent from each other. This assumption is
-#' rarely met in geochronology.  York (1969) addresses this issue with
+#' rarely met in geochronology.  York (1968) addresses this issue with
 #' a bivariate error weighted linear least squares algorithm that
 #' accounts for covariant errors in both variables. This algorithm was
 #' further improved by York et al. (2004) to ensure consistency with
 #' the maximum likelihood approach of Titterington and Halliday
 #' (1979).
-#' \cr\cr
+#' 
 #' \code{IsoplotR} uses the York et al. (2004) algorithm for its
 #' \eqn{^{40}}Ar/\eqn{^{39}}Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf
 #' isochrons. The maximum likelihood algorithm of Titterington and
@@ -42,9 +42,9 @@
 #' analytical uncertainties can be assessed using the Mean Square of
 #' the Weighted Deviates (MSWD, McIntyre et al., 1966), which is
 #' defined as:
-#' \cr\cr
+#' 
 #' \eqn{MSWD = ([X - \hat{X}] \Sigma_{X}^{-1} [X - \hat{X}]^T)/df}
-#' \cr\cr
+#' 
 #' where \eqn{X} are the data, \eqn{\hat{X}} are the fitted values,
 #' and \eqn{\Sigma_X} is the covariance matrix of \eqn{X}, and \eqn{df
 #' = k(n-1)} are the degrees of freedom, where \eqn{k} is the
@@ -215,10 +215,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{y} given the appropriate degrees of freedom.
 #'
-#' \code{disp[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{disp[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{y} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
 #' model=1}).
 #' }
@@ -232,10 +232,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{t} given the appropriate degrees of freedom.
 #'
-#' \code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{disp[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{t} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
 #' model=1}).  }
 #'
@@ -303,10 +303,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{y}
 #'
-#' \code{disp[y]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{disp[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{y} enhanced by \eqn{\sqrt{mswd}}.}
 #'
 #' \item{age}{a three (or four) element vector containing:
@@ -315,10 +315,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{t}
 #'
-#' \code{disp[t]}: the \eqn{100(1-\alpha/2)\%} confidence interval for
+#' \code{disp[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported if
 #' \code{model=1}).}
 #'

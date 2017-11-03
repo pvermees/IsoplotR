@@ -199,6 +199,7 @@ mindens <- function(mineral,x=NULL){
 #' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 #' }
 #' }
+#' @seealso \code{\link{read.data}}
 #' @examples
 #' # load and show the default constants that come with IsoplotR
 #' json <- system.file("constants.json",package="IsoplotR")

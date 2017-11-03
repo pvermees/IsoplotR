@@ -199,3 +199,6 @@ uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 }
 }
 }
+\seealso{
+\code{\link{read.data}}
+}

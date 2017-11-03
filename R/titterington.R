@@ -24,7 +24,6 @@
 #' @param alpha cutoff value for confidence intervals
 #' @return a four-element list of vectors containing:
 #'     \describe{
-#' 
 #'     \item{par}{4-element vector \code{c(a,b,A,B)} where \code{a} is
 #'               the intercept of the \code{X-Y} regression, \code{b}
 #'               is the slope of the \code{X-Y} regression, \code{A}
@@ -38,10 +37,12 @@
 #'
 #'     \item{p.value}{p-value of a Chi-square test for linearity}
 #'
-#'     \item{df}{the number of degrees of freedom for the Chi-square
-#'     test (3\eqn{n}-3)}
+#'     \item{df}{the number of degrees of freedom for the
+#'               Chi-square test (3\eqn{n}-3)}
 #'
-#'     }
+#'     \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the
+#'                  t-distribution with \eqn{(n-2k+1)} degrees of freedom}
+#' }
 #' @examples
 #' d <- matrix(c(0.1677,0.0047,1.105,0.014,0.782,0.015,0.24,0.51,0.33,
 #'               0.2820,0.0064,1.081,0.013,0.798,0.015,0.26,0.63,0.32,
@@ -52,6 +53,7 @@
 #'             nrow=6,ncol=9)
 #' colnames(d) <- c('X','sX','Y','sY','Z','sZ','rXY','rXZ','rYZ')
 #' titterington(d)
+#' @seealso \code{\link{york}}, \code{\link{isochron}}, \code{\link{ludwig}}
 #' @references
 #' Ludwig, K.R. and Titterington, D.M., 1994. Calculation
 #' of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
