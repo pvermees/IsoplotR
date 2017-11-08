@@ -1,7 +1,7 @@
 
-R version 3.4.2 (2017-09-28) -- "Short Summer"
+R version 3.4.1 (2017-06-30) -- "Single Candle"
 Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -50,78 +50,12 @@ Type 'q()' to quit R.
 > ### ** Examples
 > 
 > data(examples)
-> print(age(examples$UPb))
-          t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
- [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.838277 251.9814
- [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4016 7.506655 251.6013
- [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.206896 251.5659
- [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.596692 251.3790
- [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.470841 251.2421
- [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.830204 251.2322
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.384759 250.8575
- [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.827096 250.8894
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.470364 251.3738
-[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.837485 229.2815
-      s[t.conc]
- [1,] 0.2693551
- [2,] 0.2799966
- [3,] 0.6199130
- [4,] 0.3329430
- [5,] 0.2724836
- [6,] 0.6164084
- [7,] 0.2791451
- [8,] 0.3865272
- [9,] 0.2724797
-[10,] 0.3243414
-> print(age(examples$UPb,type=1))
-          t.75   s[t.75]     t.68   s[t.68]     t.76  s[t.76]   t.conc
- [1,] 252.1636 0.3327781 251.9031 0.2822366 253.7468 2.838277 251.9814
- [2,] 251.7675 0.7488598 251.5931 0.2821679 252.4016 7.506655 251.6013
- [3,] 251.7675 0.6796299 251.4692 0.6344108 253.7468 4.206896 251.5659
- [4,] 251.6090 0.5128490 251.3452 0.3379093 252.8502 4.596692 251.3790
- [5,] 251.7675 0.3813597 251.0972 0.2820582 257.3284 3.470841 251.2421
- [6,] 251.5298 0.6567536 251.0352 0.6344024 255.0908 3.830204 251.2322
- [7,] 251.6883 0.5578766 250.7871 0.2819897 259.1163 5.384759 250.8575
- [8,] 251.4505 0.4831095 250.7251 0.3954781 257.3284 3.827096 250.8894
- [9,] 251.9260 0.3813606 251.2212 0.2820856 257.7756 3.470364 251.3738
-[10,] 230.9532 0.3669518 228.4268 0.3342463 255.5386 2.837485 229.2815
-      s[t.conc]
- [1,] 0.2693551
- [2,] 0.2799966
- [3,] 0.6199130
- [4,] 0.3329430
- [5,] 0.2724836
- [6,] 0.6164084
- [7,] 0.2791451
- [8,] 0.3865272
- [9,] 0.2724797
-[10,] 0.3243414
-> print(age(examples$UPb,type=2))
-$mswd
-equivalence concordance    combined 
-  274.66486    10.92428   260.78378 
-
-$p.value
- equivalence  concordance     combined 
-0.0000000000 0.0009491215 0.0000000000 
-
-$df
-equivalence concordance    combined 
-         18           1          19 
-
-$age
-          t        s[t]       ci[t]     disp[t] 
-249.4719549   0.1417081   0.2965984  77.3480589 
-
-$x
- Pb207U235  Pb206U238 
-0.27913410 0.03941493 
-
-$cov
-             Pb207U235    Pb206U238
-Pb207U235 2.233446e-08 1.609406e-09
-Pb206U238 1.609406e-09 2.270769e-10
-
+> tUPb <- age(examples$UPb,type=1)
+> tconc <- age(examples$UPb,type=2)
+> tdisc <- age(examples$UPb,type=3)
+> tArAr <- age(examples$ArAr)
+> tiso <- age(examples$ArAr,isochron=TRUE,i2i=TRUE)
+> tcentral <- age(examples$FT1,central=TRUE)
 > 
 > 
 > 
@@ -207,7 +141,13 @@ Pb206U238 1.609406e-09 2.270769e-10
 > ### ** Examples
 > 
 > data(examples)
-> concordia(examples$UPb)
+> concordia(examples$UPb,show.age=2)
+> 
+> dev.new()
+> concordia(examples$UPb,wetherill=FALSE,
++           xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
++           ticks=249:254,exterr=TRUE)#' data(examples)
+> 
 > 
 > 
 > 
@@ -253,6 +193,12 @@ Pb206U238 1.609406e-09 2.270769e-10
 > data(examples)
 > evolution(examples$ThU)
 > 
+> dev.new()
+dev.new(): using pdf(file="Rplots1.pdf")
+> evolution(examples$ThU,transform=TRUE,
++           isochron=TRUE,model=1)
+> 
+> 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
@@ -281,6 +227,38 @@ Pb206U238 1.609406e-09 2.270769e-10
 > radialplot(examples$FT1)
 > 
 > helioplot(examples$UThHe)
+$uvw
+       u        v        w 
+3.964309 5.558184 9.332227 
+
+$covmat
+             u            v            w
+u 1.302800e-04 6.597582e-05 6.597585e-05
+v 6.597582e-05 1.302602e-04 6.597633e-05
+w 6.597585e-05 6.597633e-05 1.302620e-04
+
+$model
+[1] 1
+
+$w
+[1] 0
+
+$age
+         t       s[t]      ci[t]    disp[t] 
+6.42248810 0.07890887 0.15700390 0.64921685 
+
+$tfact
+[1] 1.989686
+
+$df
+[1] 81
+
+$mswd
+[1] 17.09853
+
+$p.value
+[1] 0
+
 > 
 > evolution(examples$ThU)
 > 
@@ -312,8 +290,73 @@ Pb206U238 1.609406e-09 2.270769e-10
 > 
 > data(examples)
 > helioplot(examples$UThHe)
+$uvw
+       u        v        w 
+3.964309 5.558184 9.332227 
+
+$covmat
+             u            v            w
+u 1.302800e-04 6.597582e-05 6.597585e-05
+v 6.597582e-05 1.302602e-04 6.597633e-05
+w 6.597585e-05 6.597633e-05 1.302620e-04
+
+$model
+[1] 1
+
+$w
+[1] 0
+
+$age
+         t       s[t]      ci[t]    disp[t] 
+6.42248810 0.07890887 0.15700390 0.64921685 
+
+$tfact
+[1] 1.989686
+
+$df
+[1] 81
+
+$mswd
+[1] 17.09853
+
+$p.value
+[1] 0
+
 > dev.new()
+dev.new(): using pdf(file="Rplots2.pdf")
 > helioplot(examples$UThHe,logratio=FALSE)
+$uvw
+       u        v        w 
+3.964309 5.558184 9.332227 
+
+$covmat
+             u            v            w
+u 1.302800e-04 6.597582e-05 6.597585e-05
+v 6.597582e-05 1.302602e-04 6.597633e-05
+w 6.597585e-05 6.597633e-05 1.302620e-04
+
+$model
+[1] 1
+
+$w
+[1] 0
+
+$age
+         t       s[t]      ci[t]    disp[t] 
+6.42248810 0.07890887 0.15700390 0.64921685 
+
+$tfact
+[1] 1.989686
+
+$df
+[1] 81
+
+$mswd
+[1] 17.09853
+
+$p.value
+[1] 0
+
 > 
 > 
 > 
@@ -337,6 +380,11 @@ Pb206U238 1.609406e-09 2.270769e-10
 > data(examples)
 > isochron(examples$ArAr)
 > 
+> fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots3.pdf")
+> isochron(examples$ThU,type=4)
 > 
 > 
 > 
@@ -357,9 +405,15 @@ Pb206U238 1.609406e-09 2.270769e-10
 > 
 > ### ** Examples
 > 
-> data(examples)
-> kde(examples$DZ[['N1']],kernel="epanechnikov")
-> kde(examples$DZ,from=0,to=3000)
+> kde(examples$UPb)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots4.pdf")
+> kde(examples$FT1,log=TRUE)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots5.pdf")
+> kde(examples$DZ,from=1,to=3000,kernel="epanechnikov")
 > 
 > 
 > 
@@ -414,7 +468,7 @@ iter  25 value 7.640383
 final  value 7.640383 
 converged
 > dev.new()
-dev.new(): using pdf(file="Rplots1.pdf")
+dev.new(): using pdf(file="Rplots6.pdf")
 > mds(examples$DZ,shepard=TRUE)
 initial  value 10.433734 
 iter   5 value 8.523890
@@ -470,6 +524,23 @@ $legend
 [1] "Peak 1: 103 ± 14 | 28 (40%)" "Peak 2: 103 ± 12 | 24 (60%)"
 
 > 
+> peakfit(examples$LudwigMixture,k='min')
+$L
+[1] -194.9785
+
+$peaks
+             [,1]
+t     259.7309363
+s[t]    0.2723890
+ci[t]   0.5609957
+
+$tfact
+[1] 2.059539
+
+$legend
+[1] "Minimum: 259.73±0.27 | 0.56"
+
+> 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
@@ -493,6 +564,11 @@ $legend
 > data(examples)
 > radialplot(examples$FT1)
 > 
+> dev.new()
+dev.new(): using pdf(file="Rplots7.pdf")
+> radialplot(examples$LudwigMixture,k='min')
+> 
+> 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
@@ -510,11 +586,21 @@ $legend
 > 
 > ### ** Examples
 > 
-> file.show(system.file("spectrum.csv",package="IsoplotR"))
-Cannot open file '': No such file or directory
-
 > 
 > f1 <- system.file("UPb1.csv",package="IsoplotR")
+> file.show(f1) # inspect the contents of 'UPb1.csv'
+Pb207U235,sePb207U235,Pb206U238,sePb206U238,rho
+.2819,.00036,.03985,.000040,0.79
+.2814,.00092,.03980,.000040,0.31
+.2814,.00083,.03978,.000100,0.85
+.2812,.00061,.03976,.000050,0.58
+.2814,.00043,.03972,.000040,0.65
+.2811,.00080,.03971,.000100,0.88
+.2813,.00067,.03967,.000040,0.43
+.2810,.00057,.03966,.000060,0.74
+.2816,.00043,.03974,.000040,0.65
+.2554,.00041,.03607,.000050,0.87
+
 > d1 <- read.data(f1,method="U-Pb",format=1)
 > concordia(d1)
 > 
@@ -533,6 +619,38 @@ Cannot open file '': No such file or directory
 > f5 <- system.file("UThSmHe.csv",package="IsoplotR")
 > d5 <- read.data(f5,method="U-Th-He")
 > helioplot(d5)
+$uvw
+       u        v        w 
+3.964309 5.558184 9.332227 
+
+$covmat
+             u            v            w
+u 1.302800e-04 6.597582e-05 6.597585e-05
+v 6.597582e-05 1.302602e-04 6.597633e-05
+w 6.597585e-05 6.597633e-05 1.302620e-04
+
+$model
+[1] 1
+
+$w
+[1] 0
+
+$age
+         t       s[t]      ci[t]    disp[t] 
+6.42248810 0.07890887 0.15700390 0.64921685 
+
+$tfact
+[1] 1.989686
+
+$df
+[1] 81
+
+$mswd
+[1] 17.09853
+
+$p.value
+[1] 0
+
 > 
 > f6 <- system.file("ThU2.csv",package="IsoplotR")
 > d6 <- read.data(f6,method="Th-U",format=2)
@@ -686,8 +804,9 @@ $tfact
 > ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 > errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
 > weightedmean(cbind(ages,errs))
+> 
 > data(examples)
-> weightedmean(examples$ArAr)
+> weightedmean(examples$LudwigMean)
 > 
 > 
 > 
@@ -735,7 +854,7 @@ $tfact
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  11.619 0.269 12.248 0.004 0.001 
+Time elapsed:  13.188 10.576 11.65 0 0 
 > grDevices::dev.off()
 pdf 
   2 

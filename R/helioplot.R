@@ -16,22 +16,22 @@
 #' analysis (Aitchison, 1986).  In the case of the U-Th-He-(Sm)-He
 #' system, this is achieved by first defining two (or three) new
 #' variables:
-#' \cr\cr
+#'
 #' \eqn{u \equiv \ln[U/He]}
 #' \eqn{v \equiv \ln[Th/He]}
 #' \eqn{(, w \equiv \ln[Sm/He] )}
-#' \cr\cr
+#'
 #' and then performing the desired statistical analysis (averaging,
 #' uncertainty propagation, ...) on the transformed data. Upon
 #' completion of the mathematical operations, the results can then be
 #' mapped back to U-Th-(Sm)-He space using an inverse logratio
 #' transformation:
-#' \cr\cr
+#'
 #' \eqn{[He] = 1/[e^{u}+e^{v}+(e^{w})+1]},
 #' \eqn{[U] = e^{u}/[e^{u}+e^{v}+(e^{w})+1]}\cr
 #' \eqn{[Th] = e^{v}/[e^{u}+e^{v}+(e^{w})+1]},
 #' \eqn{([Sm] = e^{w}/[e^{u}+e^{v}+(e^{w})+1])}.
-#' \cr\cr
+#'
 #' where \eqn{[He] + [U] + [Th] (+ [Sm]) = 1}. In the context of
 #' U-Th-(Sm)-He dating, the \emph{central} age is defined as the age
 #' that corresponds to the arithmetic mean composition in logratio
@@ -55,8 +55,8 @@
 #'
 #' @param x an object of class \code{UThHe}
 #' @param logratio Boolean flag indicating whether the data should be
-#'     shown on bivariate log[He/Th] vs. log[U/He] diagramme, or a
-#'     U-Th-He ternary diagramme.
+#'     shown on bivariate log[He/Th] vs. log[U/He] diagram, or a
+#'     U-Th-He ternary diagram.
 #' @param show.central.comp show the geometric mean composition as a
 #'     white ellipse?
 #' @param show.numbers show the grain numbers inside the error
@@ -67,7 +67,7 @@
 #'     assigned to the minimum and maximum age contour
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
-#' @param clabel colour label
+#' @param clabel label of the colour scale
 #' @param ellipse.col a vector of two background colours for the error
 #'     ellipses. If \code{levels=NA}, then only the first colour will
 #'     be used. If \code{levels} is a vector of numbers, then
@@ -79,7 +79,7 @@
 #' @param ylim optional limits of the y-axis (log[Th/He]) of the
 #'     logratio plot. If \code{ylim=NA}, the axis limits are
 #'     determined automatically.
-#' @param fact three-element vector with the scaling factors of the
+#' @param fact three-element vector with scaling factors of the
 #'     ternary diagram if \code{fact=NA}, these will be determined
 #'     automatically
 #' @param model choose one of the following statistical models:
@@ -90,7 +90,7 @@
 #' approximately equal to one. There are three strategies to deal with
 #' the case where MSWD>1. The first of these is to assume that the
 #' analytical uncertainties have been underestimated by a factor
-#' \eqn{\sqrt{MSWD}}. Alternative approaches are described below.
+#' \eqn{\sqrt{MSWD}}.
 #'
 #' \code{2}: unweighted mean. A second way to deal with over- or
 #' underdispersed datasets is to simply ignore the analytical
@@ -98,10 +98,9 @@
 #'
 #' \code{3}: weighted mean with overdispersion: instead of attributing
 #' any overdispersion (MSWD > 1) to underestimated analytical
-#' uncertainties (model 1), one could also attribute it to the
-#' presence of geological uncertainty, which manifests itself as an
-#' added (co)variance term.
-#'
+#' uncertainties (model 1), it can also be attributed to the presence
+#' of geological uncertainty, which manifests itself as an added
+#' (co)variance term.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
 #' @references
@@ -125,6 +124,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                       clabel="",ellipse.col=c("#00FF0080","#0000FF80"),
                       sigdig=2,xlim=NA,ylim=NA,fact=NA,...){
     fit <- central.UThHe(x,alpha=alpha,model=model)
+    print(fit)
     ellipse.cols <- set.ellipse.colours(ns=length(x),levels=levels,
                                         col=ellipse.col)
     if (logratio) {
@@ -285,7 +285,7 @@ helioplot_title <- function(fit,sigdig=2){
         args2 <- quote(a~'|'~b~'%')
         call2 <- substitute(e~a,list(e=expr2,a=args2))
         line2 <- do.call(substitute,list(eval(call2),list2))
-        graphics::mtext(line1,line=1)
+        line1line <- 1
         graphics::mtext(line2,line=0)
     }
     call1 <- substitute(e~a,list(e=expr,a=args))

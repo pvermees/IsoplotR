@@ -3,6 +3,34 @@
 #' Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s
 #' data classes
 #'
+#' @details IsoplotR provides the following example input files:
+#'
+#' \itemize{
+#' \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv},
+#' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv} }
+#' \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv} }
+#' \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
+#' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}} \item{Sm-Nd:
+#' \code{SmNd1.csv}, \code{SmNd2.csv}} \item{Rb-Sr: \code{RbSr1.csv},
+#' \code{RbSr2.csv}} \item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
+#' \item{Th-U: \code{ThU1.csv}, \code{ThU2.csv}, \code{ThU3.csv},
+#' \code{ThU4.csv}}
+#' \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv},
+#' \code{FT3.csv}}
+#' \item{U-Th-He: \code{UThHe.csv}, \code{UThSmHe.csv}}
+#' \item{detritals: \code{DZ.csv}}
+#' \item{other: \code{LudwigMixture.csv}, \code{LudwigMean.csv},
+#' \code{LudwigKDE.csv} \code{LudwigSpectrum.csv}}
+#' }
+#'
+#' The contents of these files can be viewed using the
+#' \code{system.file(...)} function. For example, to read the
+#' \code{ArAr1.csv} file:
+#'
+#' \code{fname <- system.file('ArAr1.csv',package='IsoplotR')}
+#'
+#' \code{ArAr <- read.data(fname,method='Ar-Ar',format=1)}
+#'
 #' @param x either a file name (\code{.csv} format) OR a matrix
 #' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
 #'     \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os},
@@ -10,7 +38,7 @@
 #'     \code{'other'}
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
-#' 
+#'
 #' if \code{method='U-Pb'}, then \code{format} is one of either:
 #'
 #' \enumerate{
@@ -104,42 +132,8 @@
 #' \item{LA-ICP-MS-based fission track data using the 'absolute
 #' dating' method, which only requires a table with the the number of
 #' spontaneous tracks, the area over which these were counted and one
-#' or more U/Ca- or U-concentration measurements and their analytical
-#' uncertainties.}  }
-#'
-#' @return
-#' an object of class \code{UPb}, \code{PbPb}, \code{RbSr},
-#' \code{SmNd}, \code{LuHf}, \code{ReOs}, \code{ThU},
-#' \code{fissiontracks}, \code{UThHe}, \code{detritals} or
-#' \code{other}
-#' 
-#' @details IsoplotR provides the following example input files:
-#'
-#' \itemize{
-#' \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv},
-#' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv} }
-#' \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv} }
-#' \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
-#' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}} \item{Sm-Nd:
-#' \code{SmNd1.csv}, \code{SmNd2.csv}} \item{Rb-Sr: \code{RbSr1.csv},
-#' \code{RbSr2.csv}} \item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
-#' \item{Th-U: \code{ThU1.csv}, \code{ThU2.csv}, \code{ThU3.csv},
-#' \code{ThU4.csv}}
-#' \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv},
-#' \code{FT3.csv}}
-#' \item{U-Th-He: \code{UThHe.csv}, \code{UThSmHe.csv}}
-#' \item{detritals: \code{DZ.csv}}
-#' \item{other: \code{LudwigMixture.csv}, \code{LudwigMean.csv},
-#' \code{LudwigKDE.csv} \code{LudwigSpectrum.csv}}
-#' }
-#' 
-#' The contents of these files can be viewed using the
-#' \code{system.file(...)} function. For example, to read the
-#' \code{ArAr1.csv} file:
-#'
-#' \code{fname <- system.file('ArAr1.csv',package='IsoplotR')}
-#' 
-#' \code{ArAr <- read.data(fname,method='Ar-Ar',format=1)}
+#' or more U/Ca-ratios or U-concentration measurements (in ppm) and
+#' their analytical uncertainties.}  }
 #'
 #' @param ... optional arguments to the \code{read.csv} function
 #' @seealso \code{\link{examples}}, \code{\link{settings}}
@@ -148,9 +142,9 @@
 #'     \code{LuHf}, \code{detritals}, \code{fissiontracks}, \code{ThU}
 #'     or \code{other}
 #' @examples
-#' file.show(system.file("spectrum.csv",package="IsoplotR"))
 #'
 #' f1 <- system.file("UPb1.csv",package="IsoplotR")
+#' file.show(f1) # inspect the contents of 'UPb1.csv'
 #' d1 <- read.data(f1,method="U-Pb",format=1)
 #' concordia(d1)
 #'

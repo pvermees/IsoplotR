@@ -36,7 +36,7 @@ used if \code{plot=TRUE}.}
 \item{nnlines}{if \code{TRUE}, draws nearest neighbour lines}
 
 \item{pos}{a position specifier for the labels (if
-\code{pch!=NA}). Values of 1, 2, 3 and 4 indicate positions
+\code{par('pch')!=NA}). Values of 1, 2, 3 and 4 indicate positions
 below, to the left of, above and to the right of the MDS
 coordinates, respectively.}
 
@@ -49,7 +49,7 @@ coordinates, respectively.}
 \item{ylab}{a string with the label of the y axis}
 }
 \value{
-returns an object of class \code{MDS}, i.e. a list
+Returns an object of class \code{MDS}, i.e. a list
     containing the following items:
 
 \describe{

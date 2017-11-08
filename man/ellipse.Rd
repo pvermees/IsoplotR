@@ -15,7 +15,7 @@ ellipse(x, y, covmat, alpha = 0.05, n = 50)
 
 \item{alpha}{the probability cutoff for the error ellipses}
 
-\item{n}{the resolution of the error ellipses}
+\item{n}{the resolution (number of segments) of the error ellipses}
 }
 \value{
 an [\code{n x 2}] matrix of plot coordinates

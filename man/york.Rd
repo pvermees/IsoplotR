@@ -15,7 +15,8 @@ of the X- and Y-values.}
 \item{alpha}{cutoff value for confidence intervals}
 }
 \value{
-a four-element list of vectors containing:
+A four-element list of vectors containing:
+
     \describe{
 
     \item{a}{the intercept of the straight line fit and its

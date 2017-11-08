@@ -13,8 +13,8 @@ helioplot(x, logratio = TRUE, model = 1, show.central.comp = TRUE,
 \item{x}{an object of class \code{UThHe}}
 
 \item{logratio}{Boolean flag indicating whether the data should be
-shown on bivariate log[He/Th] vs. log[U/He] diagramme, or a
-U-Th-He ternary diagramme.}
+shown on bivariate log[He/Th] vs. log[U/He] diagram, or a
+U-Th-He ternary diagram.}
 
 \item{model}{choose one of the following statistical models:
 
@@ -24,7 +24,7 @@ the assumption is correct, then the MSWD value should be
 approximately equal to one. There are three strategies to deal with
 the case where MSWD>1. The first of these is to assume that the
 analytical uncertainties have been underestimated by a factor
-\eqn{\sqrt{MSWD}}. Alternative approaches are described below.
+\eqn{\sqrt{MSWD}}.
 
 \code{2}: unweighted mean. A second way to deal with over- or
 underdispersed datasets is to simply ignore the analytical
@@ -32,9 +32,9 @@ uncertainties.
 
 \code{3}: weighted mean with overdispersion: instead of attributing
 any overdispersion (MSWD > 1) to underestimated analytical
-uncertainties (model 1), one could also attribute it to the
-presence of geological uncertainty, which manifests itself as an
-added (co)variance term.}
+uncertainties (model 1), it can also be attributed to the presence
+of geological uncertainty, which manifests itself as an added
+(co)variance term.}
 
 \item{show.central.comp}{show the geometric mean composition as a
 white ellipse?}
@@ -51,7 +51,7 @@ assigned to the minimum and maximum age contour}
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
 
-\item{clabel}{colour label}
+\item{clabel}{label of the colour scale}
 
 \item{ellipse.col}{a vector of two background colours for the error
 ellipses. If \code{levels=NA}, then only the first colour will
@@ -68,7 +68,7 @@ determined automatically.}
 logratio plot. If \code{ylim=NA}, the axis limits are
 determined automatically.}
 
-\item{fact}{three-element vector with the scaling factors of the
+\item{fact}{three-element vector with scaling factors of the
 ternary diagram if \code{fact=NA}, these will be determined
 automatically}
 
@@ -91,22 +91,22 @@ subjected to a logratio transformation prior to statistical
 analysis (Aitchison, 1986).  In the case of the U-Th-He-(Sm)-He
 system, this is achieved by first defining two (or three) new
 variables:
-\cr\cr
+
 \eqn{u \equiv \ln[U/He]}
 \eqn{v \equiv \ln[Th/He]}
 \eqn{(, w \equiv \ln[Sm/He] )}
-\cr\cr
+
 and then performing the desired statistical analysis (averaging,
 uncertainty propagation, ...) on the transformed data. Upon
 completion of the mathematical operations, the results can then be
 mapped back to U-Th-(Sm)-He space using an inverse logratio
 transformation:
-\cr\cr
+
 \eqn{[He] = 1/[e^{u}+e^{v}+(e^{w})+1]},
 \eqn{[U] = e^{u}/[e^{u}+e^{v}+(e^{w})+1]}\cr
 \eqn{[Th] = e^{v}/[e^{u}+e^{v}+(e^{w})+1]},
 \eqn{([Sm] = e^{w}/[e^{u}+e^{v}+(e^{w})+1])}.
-\cr\cr
+
 where \eqn{[He] + [U] + [Th] (+ [Sm]) = 1}. In the context of
 U-Th-(Sm)-He dating, the \emph{central} age is defined as the age
 that corresponds to the arithmetic mean composition in logratio

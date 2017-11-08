@@ -30,7 +30,7 @@ get.absolute.zeta <- function(mineral){
 #'
 #' @details
 #' The fundamental fission track age is given by:
-#' 
+#'
 #' \eqn{t = \frac{1}{\lambda_{238}}
 #' \ln\left(1 + \frac{\lambda_{238}}{\lambda_f} \frac{2 N_s}{[^{238}U]A_sL}\right)
 #' } (eq.1)
@@ -55,7 +55,7 @@ get.absolute.zeta <- function(mineral){
 #' \eqn{t = \frac{1}{\lambda_{238}}
 #' \ln\left(1 + \frac{\lambda_{238}\zeta\rho_d}{2}\frac{N_s}{N_i}\right)
 #' } (eq.2)
-#' 
+#'
 #' where \eqn{N_i} is the number of induced fission tracks counted in
 #' the external detector over the same area as the spontaneous tracks,
 #' \eqn{\zeta} is a `zeta'-calibration factor that incorporates both
@@ -83,7 +83,7 @@ get.absolute.zeta <- function(mineral){
 #' where \eqn{[{}^{238}U]} may either stand for the
 #' \eqn{^{238}}U-concentration (in ppm) \emph{or} for the U/Ca (for
 #' apatite) or U/Si (for zircon) ratio measurement (Vermeesch, 2017).
-#' 
+#'
 #' @param x an object of class \code{fissiontracks}
 #' @param tst a two-element vector with the true age and its standard
 #'     error
@@ -104,20 +104,20 @@ get.absolute.zeta <- function(mineral){
 #' print(examples$FT1$zeta)
 #' FT <- set.zeta(examples$FT1,tst=c(250,5))
 #' print(FT$zeta)
-#' 
+#'
 #' @references
 #' Fleischer, R. and Hart, H. Fission track dating: techniques and
 #' problems. In Bishop, W., Miller, J., and Cole, S., editors,
 #' Calibration of Hominoid Evolution, pages 135-170. Scottish Academic
 #' Press Edinburgh, 1972.
-#' 
+#'
 #' Hurford, A. J. and Green, P. F. The zeta age calibration of
 #' fission-track dating. Chemical Geology, 41:285-317, 1983.
 #'
 #' Vermeesch, P., 2017. Statistics for LA-ICP-MS based fission track
 #' dating. Chemical Geology, 456, pp.19-27.
 #' @export
-set.zeta <- function(x,tst=c(0,0),exterr=TRUE,update=TRUE,sigdig=2){
+set.zeta <- function(x,tst,exterr=TRUE,update=TRUE,sigdig=2){
     N <- length(x$Ns)
     L8 <- lambda('U238')[1]
     tt <- tst[1]

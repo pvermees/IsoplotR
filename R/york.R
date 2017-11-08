@@ -24,7 +24,8 @@
 #'     uncertainties of the Y-values, and the correlation coefficients
 #'     of the X- and Y-values.
 #' @param alpha cutoff value for confidence intervals
-#' @return a four-element list of vectors containing:
+#' @return A four-element list of vectors containing:
+#'
 #'     \describe{
 #'
 #'     \item{a}{the intercept of the straight line fit and its

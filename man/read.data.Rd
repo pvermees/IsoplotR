@@ -118,15 +118,10 @@ uncertainties.}
 \item{LA-ICP-MS-based fission track data using the 'absolute
 dating' method, which only requires a table with the the number of
 spontaneous tracks, the area over which these were counted and one
-or more U/Ca- or U-concentration measurements and their analytical
-uncertainties.}  }}
+or more U/Ca-ratios or U-concentration measurements (in ppm) and
+their analytical uncertainties.}  }}
 }
 \value{
-an object of class \code{UPb}, \code{PbPb}, \code{RbSr},
-\code{SmNd}, \code{LuHf}, \code{ReOs}, \code{ThU},
-\code{fissiontracks}, \code{UThHe}, \code{detritals} or
-\code{other}
-
 an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
     \code{UThHe}, \code{ReOs}, \code{SmNd}, \code{RbSr},
     \code{LuHf}, \code{detritals}, \code{fissiontracks}, \code{ThU}
@@ -166,9 +161,9 @@ The contents of these files can be viewed using the
 \code{ArAr <- read.data(fname,method='Ar-Ar',format=1)}
 }
 \examples{
-file.show(system.file("spectrum.csv",package="IsoplotR"))
 
 f1 <- system.file("UPb1.csv",package="IsoplotR")
+file.show(f1) # inspect the contents of 'UPb1.csv'
 d1 <- read.data(f1,method="U-Pb",format=1)
 concordia(d1)
 

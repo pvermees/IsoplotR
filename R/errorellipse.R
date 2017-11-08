@@ -7,7 +7,8 @@
 #' @param y y-coordinate (scalar) for the centre of the ellipse
 #' @param covmat the [\code{2 x 2}] covariance matrix of the x-y coordinates
 #' @param alpha the probability cutoff for the error ellipses
-#' @param n the resolution of the error ellipses
+#' @param n the resolution (number of segments) of the error ellipses
+#'
 #' @return an [\code{n x 2}] matrix of plot coordinates
 #' @examples
 #' x = 99; y = 101;

@@ -30,8 +30,8 @@ settings(setting = NA, ..., fname = NA)
 \code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"U234"},
 \code{"Th232"}, \code{"Th230"}, \code{"Re187"}, \code{"Sm147"},
 \code{"Rb87"}, \code{"Lu176"}, or \code{"K40"}) PLUS (optionally)
-the decay constant value and its analytical error.  Omitting these
-two numbers simply returns the existing values.
+the decay constant value and its analytical error.  Omitting the
+latter two numbers simply returns the existing values.
 
 \item for \code{'iratio'}: the isotopic ratio of interest (one of
 either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
@@ -45,7 +45,7 @@ either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
 \code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
 \code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
 \code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS (optionally) the
-isotopic ratio and its analytical error.  Omitting these two
+isotopic ratio and its analytical error.  Omitting the latter two
 numbers simply returns the existing values.
 
 \item for \code{'imass'}: the (isotopic) molar mass of interest
@@ -55,12 +55,13 @@ numbers simply returns the existing values.
 \code{"Os"}, \code{"Os184"}, \code{"Os186"}, \code{"Os187"},
 \code{"Os188"}, \code{"Os189"}, \code{"Os190"}, \code{"Os192"},
 \code{"Sm"}, \code{"Nd"}, \code{"Lu"}, \code{"Hf"}) PLUS
-(optionally) the molar mass and its analytical error.  Omitting
-these two numbers simply returns the existing values.
+(optionally) the molar mass and its analytical error.  Omitting the
+latter two numbers simply returns the existing values.
 
 \item for \code{'mindens'}: the mineral of interest (one of either
 \code{"apatite"} or \code{"zircon"}) PLUS the mineral
-density. Omitting this number simply returns the existing value.
+density. Omitting the latter number simply returns the existing
+value.
 
 \item \code{'etchfact'}: the mineral of interest (one of either
 \code{"apatite"} or \code{"zircon"}) PLUS the etch efficiency
@@ -79,7 +80,7 @@ if \code{setting=NA} and \code{fname=NA}, returns a
     \code{.json} string
 
 if \code{...} contains only the name of an isotope, isotopic ratio,
-element, or mineral and no new value, \code{settings} returns
+element, or mineral and no new value, then \code{settings} returns
 either a scalar with the existing value, or a two-element vector
 with the value and its uncertainty.
 }
@@ -111,11 +112,12 @@ print(settings('iratio','U238U235'))
 \itemize{
 
 \item \eqn{^{238}}U, \eqn{^{235}}U: Jaffey, A. H., et
-al. "Precision measurement of half-lives and specific activities of U\eqn{^{235}} and U\eqn{^{238}}."
+al. "Precision measurement of half-lives and specific
+activities of U\eqn{^{235}} and U\eqn{^{238}}."
 Physical Review C 4.5 (1971): 1889.
 
 \item \eqn{^{232}}Th: Le Roux, L. J., and
-L. E. Glendenin. "Half-life of \eqn{^{232}}Th.  "Proceedings of the
+L. E. Glendenin. "Half-life of \eqn{^{232}}Th.", Proceedings of the
 National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
 
 \item \eqn{^{234}}U, \eqn{^{230}}Th: Cheng, H., Edwards, R.L.,
@@ -170,7 +172,7 @@ atomic weight of terrestrial rubidium." J. Res. Natl. Bur. Stand. A 73
 (1969): 511-516.
 
 \item Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
-weight of a reference sample of strontium." J. Res. Natl.Bur. Stand.
+weight of a reference sample of strontium." J. Res. Natl. Bur. Stand.
 87.1 (1982): 1-8.
 
 \item Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic

@@ -9,29 +9,31 @@
 #' algorithm for data with correlated uncertainties is an extension of
 #' the 2-dimensional algorithm by Titterington and Halliday (1979),
 #' which itself is equivalent to the algorithm of York et al. (2004).
-#' Given n triplets of (approximately) collinear measurements
-#' \eqn{X_i}, \eqn{Y_i} and {Z_i} (for \eqn{1 \leq i \leq n}), their
-#' uncertainties \eqn{s[X_i]}, \eqn{s[Y_i]} and \eqn{s[Z_i]}, and their
-#' covariances cov[\eqn{X_i,Y_i}], cov[\eqn{X_i,Z_i}] and
-#' cov[\eqn{Y_i,Z_i}], the \code{titterington} function fits two slopes
-#' and intercepts with their uncertainties. It computes the MSWD as a
-#' measure of under/overdispersion.  Overdispersed datasets (MSWD>1)
-#' can be dealt with in the same three ways that are described in the
-#' documentation of the \code{\link{isochron}} function.
+#' Given \eqn{n} triplets of (approximately) collinear measurements
+#' \eqn{X_i}, \eqn{Y_i} and \eqn{Z_i} (for \eqn{1 \leq i \leq n}),
+#' their uncertainties \eqn{s[X_i]}, \eqn{s[Y_i]} and \eqn{s[Z_i]},
+#' and their covariances cov[\eqn{X_i,Y_i}], cov[\eqn{X_i,Z_i}] and
+#' cov[\eqn{Y_i,Z_i}], the \code{titterington} function fits two
+#' slopes and intercepts with their uncertainties. It computes the
+#' MSWD as a measure of under/overdispersion.  Overdispersed datasets
+#' (MSWD>1) can be dealt with in the same three ways that are
+#' described in the documentation of the \code{\link{isochron}}
+#' function.
 #'
-#' @param x a \code{[9 x n]} matrix with the following columns:
+#' @param x an \code{[n x 9]} matrix with the following columns:
 #'     \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.
 #' @param alpha cutoff value for confidence intervals
-#' @return a four-element list of vectors containing:
+#' @return A four-element list of vectors containing:
+#'
 #'     \describe{
 #'     \item{par}{4-element vector \code{c(a,b,A,B)} where \code{a} is
 #'               the intercept of the \code{X-Y} regression, \code{b}
 #'               is the slope of the \code{X-Y} regression, \code{A}
 #'               is the intercept of the \code{X-Z} regression, and
 #'               \code{B} is the slope of the \code{X-Z} regression.}
-#' 
+#'
 #'     \item{cov}{\code{[4 x 4]}-element covariance matrix of \code{par}}
-#' 
+#'
 #'     \item{mswd}{the mean square of the residuals (a.k.a `reduced
 #'                 Chi-square') statistic}
 #'
@@ -62,7 +64,7 @@
 #' Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
 #' parallel isochrons and the method of maximum likelihood. Chemical
 #' Geology, 26(3), pp.183-195.
-#' 
+#'
 #' York, D., Evensen, N.M., Martinez, M.L. and De Basebe Delgado, J., 2004.
 #' Unified equations for the slope, intercept, and standard
 #' errors of the best straight line. American Journal of Physics,

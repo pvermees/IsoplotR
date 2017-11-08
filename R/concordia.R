@@ -38,12 +38,13 @@
 #' @param wetherill logical flag (\code{FALSE} for Tera-Wasserburg)
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
-#' @param levels a vector with additional values to be displayed as
-#'     different background colours within the error ellipses.
-#' @param clabel colour label
+#' @param levels a vector with \code{length(x)} values to be displayed
+#'     as different background colours within the error ellipses.
+#' @param clabel label for the colour legend (only used if
+#'     \code{levels} is not \code{NA}.
 #' @param ellipse.col a vector of two background colours for the error
-#'     ellipses. If \code{levels=NA}, then only the first colour will
-#'     be used. If \code{levels} is a vector of numbers, then
+#'     ellipses. If \code{levels=NA}, then only the first colour is
+#'     used. If \code{levels} is a vector of numbers, then
 #'     \code{ellipse.col} is used to construct a colour ramp.
 #' @param concordia.col colour of the concordia line
 #' @param exterr show decay constant uncertainty?
@@ -56,11 +57,12 @@
 #' \code{2}: fit a discordia line through the data using the maximum
 #' likelihood algorithm of Ludwig (1998), which assumes that the
 #' scatter of the data is solely due to the analytical
-#' uncertainties. In this case, IsoplotR will either calculate an
-#' upper and lower intercept age (for Wetherill concordia), or a lower
-#' intercept age and common (\eqn{^{207}}Pb/\eqn{^{206}}Pb)-ratio intercept
-#' (for Tera-Wasserburg). If \code{mswd}>0, then the analytical uncertainties are
-#' augmented by a factor \eqn{\sqrt{mswd}}.
+#' uncertainties. In this case, \code{IsoplotR} will either calculate
+#' an upper and lower intercept age (for Wetherill concordia), or a
+#' lower intercept age and common
+#' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)-ratio intercept (for
+#' Tera-Wasserburg). If \code{mswd}>0, then the analytical
+#' uncertainties are augmented by a factor \eqn{\sqrt{mswd}}.
 #'
 #' \code{3}: fit a discordia line ignoring the analytical uncertainties
 #'
@@ -95,8 +97,8 @@
 #' \item{mswd}{ a vector with three items (\code{equivalence},
 #' \code{concordance} and \code{combined}) containing the MSWD (Mean
 #' of the Squared Weighted Deviates, a.k.a the reduced Chi-squared
-#' statistic outside of geochronology) of isotopic equivalence, age
-#' concordance and combined goodness of fit, respectively. }
+#' statistic) of isotopic equivalence, age concordance and combined
+#' goodness of fit, respectively. }
 #'
 #' \item{p.value}{ a vector with three items (\code{equivalence},
 #' \code{concordance} and \code{combined}) containing the p-value of
@@ -105,8 +107,10 @@
 #'
 #' \item{df}{ a three-element vector with the number of degrees of
 #' freedom used for the \code{mswd} calculation.  These values are
-#' useful when expanding the analytical uncertainties when
-#' \code{mswd>1}.}
+#' useful when expanding the analytical uncertainties if
+#' \code{mswd>1}.
+#'
+#' }
 #'
 #' \item{age}{a 4-element vector with:
 #'
@@ -114,11 +118,12 @@
 #'
 #' \code{s[t]}: the estimated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the 95\% confidence interval of \code{t} for the
-#' appropriate degrees of freedom
+#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval of \code{t} for the appropriate degrees of freedom
 #'
-#' \code{disp[t]}: the 95\% confidence interval for \code{t} augmented
-#' by \eqn{\sqrt{mswd}} to account for overdispersed datasets.}
+#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t} augmented by \eqn{\sqrt{mswd}} to account for
+#' overdispersed datasets.}
 #'
 #' }
 #'
@@ -131,7 +136,8 @@
 #'
 #' \item{x}{ a two element vector with the upper and lower intercept
 #' ages (if \code{wetherill=TRUE}) or the lower intercept age and
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (for Tera-Wasserburg).}
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (if
+#' \code{wetherill=FALSE}).}
 #'
 #' \item{cov}{ the covariance matrix of the elements in \code{x}.}
 #'
@@ -140,13 +146,12 @@
 #'
 #' \code{s}: the estimated standard deviation for \code{x}
 #'
-#' \code{ci}: the 95\% confidence interval of \code{x} for the
-#' appropriate degrees of freedom
+#' \code{ci}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval of \code{x} for the appropriate degrees of freedom
 #'
-#' \code{disp[t]}: the 95\% confidence interval for \code{x} augmented
-#' by \eqn{\sqrt{mswd}} to account for overdispersed datasets (only
-#' reported if \code{type=3}).
-#' }
+#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{x} augmented by \eqn{\sqrt{mswd}} to account for
+#' overdispersed datasets (only reported if \code{show.age=2}).  }
 #'
 #' \item{df}{ the degrees of freedom of the concordia fit (concordance
 #' + equivalence)}
@@ -156,21 +161,29 @@
 #'
 #' \item{mswd}{ mean square of the weighted deviates -- a
 #' goodness-of-fit measure. \code{mswd > 1} indicates overdispersion
-#' w.r.t the analytical uncertainties (not reported if \code{type=4}).}
+#' w.r.t the analytical uncertainties (not reported if
+#' \code{show.age=3}).}
 #'
 #' \item{w}{ two-element vector with the standard deviation of the
 #' (assumedly) Normal overdispersion term and the corresponding
 #' \eqn{100(1-\alpha)\%} confidence interval (only important if
-#' \code{type=5}).}
+#' \code{show.age=4}).}
 #'
 #' }
-#'
 #' @param ticks an optional vector of age ticks to be added to the
-#'     concordia line.
+#'     concordia line to override \code{IsoplotR}'s default spacing,
+#'     which is based on \code{R}'s \code{pretty} function.
 #' @param ... optional arguments to the generic \code{plot} function
+#'
 #' @examples
 #' data(examples)
-#' concordia(examples$UPb)
+#' concordia(examples$UPb,show.age=2)
+#'
+#' dev.new()
+#' concordia(examples$UPb,wetherill=FALSE,
+#'           xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
+#'           ticks=249:254,exterr=TRUE)#' data(examples)
+#'
 #' @references Ludwig, K.R., 1998. On the treatment of concordant
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
 #'     pp.665-676.

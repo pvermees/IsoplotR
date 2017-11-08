@@ -13,7 +13,7 @@ fission track and detrital datasets
 
 \code{UPb}: an object of class \code{UPb} containing a high
 precision U-Pb dataset of Kamo et al. (1996) packaged with Ken
-Ludwig's \code{Isoplot} program.
+Ludwig (2003)'s \code{Isoplot} program.
 
 \code{PbPb}: an object of class \code{PbPb} containing a Pb-Pb
 dataset from Connelley et al. (2017).

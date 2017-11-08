@@ -25,14 +25,13 @@
 #'
 #' an object of class \code{ArAr}
 #'
-#' @param alpha the confidence limits of the error bars/boxes and
+#' @param alpha the confidence level of the error bars/boxes and
 #'     confidence intervals.
 #' @param plateau logical flag indicating whether a plateau age should
 #'     be calculated. If \code{plateau=TRUE}, the function will
 #'     compute the weighted mean of the largest succession of steps
-#'     that yield values passing the Chi-square test for age
-#'     homogeneity.  If \code{TRUE}, returns a list with plateau
-#'     parameters.
+#'     that pass the Chi-square test for age homogeneity.  If
+#'     \code{TRUE}, returns a list with plateau parameters.
 #' @param plateau.col the fill colour of the rectangles used to mark
 #'     the steps belonging to the age plateau.
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
@@ -40,13 +39,14 @@
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output (only used
 #'     if \code{plateau=TRUE}).
-#' @param line.col colour of the isochron line
-#' @param lwd line width
+#' @param line.col colour of the average age line
+#' @param lwd width of the average age line
 #' @param title add a title to the plot?
 #' @param xlab x-axis label
 #' @param ylab y-axis label
 #' @param ... optional parameters to the generic \code{plot} function
-#' @return if \code{plateau=TRUE}, returns a list with the following
+#'
+#' @return If \code{plateau=TRUE}, returns a list with the following
 #'     items:
 #'
 #' \describe{
@@ -80,7 +80,7 @@
 #' \item{fract}{the fraction of \eqn{^{39}}Ar contained in the
 #' plateau}
 #'
-#' \item{tfact}{the t-factor for \code{df} degrees of freedom
+#' \item{tfact}{the Student t-factor for \code{df} degrees of freedom
 #' evaluated at \eqn{100(1-\alpha/2)}\% confidence}
 #'
 #' \item{plotpar}{plot parameters for the weighted mean (see

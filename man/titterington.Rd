@@ -7,13 +7,14 @@
 titterington(x, alpha = 0.05)
 }
 \arguments{
-\item{x}{a \code{[9 x n]} matrix with the following columns:
+\item{x}{an \code{[n x 9]} matrix with the following columns:
 \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.}
 
 \item{alpha}{cutoff value for confidence intervals}
 }
 \value{
-a four-element list of vectors containing:
+A four-element list of vectors containing:
+
     \describe{
     \item{par}{4-element vector \code{c(a,b,A,B)} where \code{a} is
               the intercept of the \code{X-Y} regression, \code{b}
@@ -45,15 +46,16 @@ Ludwig and Titterington (1994)'s 3-dimensional linear regression
 algorithm for data with correlated uncertainties is an extension of
 the 2-dimensional algorithm by Titterington and Halliday (1979),
 which itself is equivalent to the algorithm of York et al. (2004).
-Given n triplets of (approximately) collinear measurements
-\eqn{X_i}, \eqn{Y_i} and {Z_i} (for \eqn{1 \leq i \leq n}), their
-uncertainties \eqn{s[X_i]}, \eqn{s[Y_i]} and \eqn{s[Z_i]}, and their
-covariances cov[\eqn{X_i,Y_i}], cov[\eqn{X_i,Z_i}] and
-cov[\eqn{Y_i,Z_i}], the \code{titterington} function fits two slopes
-and intercepts with their uncertainties. It computes the MSWD as a
-measure of under/overdispersion.  Overdispersed datasets (MSWD>1)
-can be dealt with in the same three ways that are described in the
-documentation of the \code{\link{isochron}} function.
+Given \eqn{n} triplets of (approximately) collinear measurements
+\eqn{X_i}, \eqn{Y_i} and \eqn{Z_i} (for \eqn{1 \leq i \leq n}),
+their uncertainties \eqn{s[X_i]}, \eqn{s[Y_i]} and \eqn{s[Z_i]},
+and their covariances cov[\eqn{X_i,Y_i}], cov[\eqn{X_i,Z_i}] and
+cov[\eqn{Y_i,Z_i}], the \code{titterington} function fits two
+slopes and intercepts with their uncertainties. It computes the
+MSWD as a measure of under/overdispersion.  Overdispersed datasets
+(MSWD>1) can be dealt with in the same three ways that are
+described in the documentation of the \code{\link{isochron}}
+function.
 }
 \examples{
 d <- matrix(c(0.1677,0.0047,1.105,0.014,0.782,0.015,0.24,0.51,0.33,

@@ -74,8 +74,8 @@ radialplot(x, ...)
   i2i = TRUE, alpha = 0.05, ...)
 }
 \arguments{
-\item{x}{Either an nx2 matix of (transformed) values z and their
-    standard errors s
+\item{x}{Either an \code{[n x 2]} matix of (transformed) values z
+    and their standard errors s
 
 OR
 
@@ -93,7 +93,7 @@ function}
 \item{t0}{central value}
 
 \item{transformation}{one of either \code{log}, \code{linear} or
-(if \code{x} has class \code{fissiontracks})}
+(if \code{x} has class \code{fissiontracks}), \code{arcsin}.}
 
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output.}
@@ -106,17 +106,17 @@ numbers)}
 \item{levels}{a vector with additional values to be displayed as
 different background colours of the plot symbols.}
 
-\item{clabel}{colour label}
+\item{clabel}{label of the colour legend}
 
 \item{bg}{a vector of two background colours for the plot symbols.
-If \code{levels=NA}, then only the first colour will be
-used. If \code{levels} is a vector of numbers, then \code{bg}
-is used to construct a colour ramp.}
+If \code{levels=NA}, then only the first colour is used. If
+\code{levels} is a vector of numbers, then \code{bg} is used to
+construct a colour ramp.}
 
 \item{title}{add a title to the plot?}
 
 \item{k}{number of peaks to fit using the finite mixture models of
-Galbraith and Green (1993). Setting \code{k='auto'}
+Galbraith and Laslett (1993). Setting \code{k='auto'}
 automatically selects an optimal number of components based on
 the Bayes Information Criterion (BIC). Setting \code{k='min'}
 estimates the minimum value using a three parameter model
@@ -165,15 +165,16 @@ Pb-composition
 \code{settings('iratio','Pb206Pb204')} and
 \code{settings('iratio','Pb207Pb204')}}
 
-\item{i2i}{`isochron to intercept': calculates the initial
-(aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-\eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-\eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
-\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
-fit. Setting \code{i2i} to \code{FALSE} uses the default values
-stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
-method). When applied to data of class \code{ThU}, setting
-\code{i2i} to \code{TRUE} applies a detrital Th-correction.}
+\item{i2i}{`isochron to intercept': calculates the initial (aka
+`inherited', `excess', or `common')
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+\eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+uses the default values stored in
+\code{settings('iratio',...)}. When applied to data of class
+\code{ThU}, setting \code{i2i} to \code{TRUE} applies a
+detrital Th-correction.}
 }
 \description{
 Implementation of a graphical device developed by Rex Galbraith to
@@ -183,30 +184,35 @@ standard errors.
 \details{
 The radial plot (Galbraith, 1988, 1990) is a graphical device that
 was specifically designed to display heteroscedastic data, and is
-constructed as follows.  Consider the usual set of dates \eqn{t_i}
-and uncertainties \eqn{s[t_i]} (for \eqn{1 \leq i \leq n}). Define
-\eqn{z_i = z[t_i]} to be a transformation of \eqn{t_i} (e.g.,
-\eqn{z_i = log[t_i]}), and let \eqn{s[z_i]} be its propagated
-analytical uncertainty (i.e., \eqn{s[z_i] = s[t_i]/t_i} in the case
-of a logarithmic transformation). Create a scatterplot of
-\eqn{(x_i,y_i)} values, where \eqn{x_i = 1/s[z_i]} and \eqn{y_i =
-(z_i-z_\circ)/s[z_i]}, where \eqn{z_\circ} is some reference value
-such as the mean. The slope of a line connecting the origin of this
-scatterplot with any of the \eqn{(x_i,y_i)}s is proportional to
-\eqn{z_i} and, hence, the date \eqn{t_i}.  These dates can be more
-easily visualised by drawing a radial scale at some convenient
-distance from the origin and annotating it with labelled ticks at
-the appropriate angles. While the angular position of each data
-point represents the date, its horizontal distance from the origin
-is proportional to the precision. Imprecise measurements plot on
-the left hand side of the radial plot, whereas precise age
-determinations are found further towards the right. Thus, radial
-plots allow the observer to assess both the magnitude and the
-precision of quantitative data in one glance.
+constructed as follows.  Consider a set of dates
+\eqn{\{t_1,...,t_i,...,t_n\}} and uncertainties
+\eqn{\{s[t_1],...,s[t_i],...,s[t_n]\}}. Define \eqn{z_i = z[t_i]}
+to be a transformation of \eqn{t_i} (e.g., \eqn{z_i = log[t_i]}),
+and let \eqn{s[z_i]} be its propagated analytical uncertainty
+(i.e., \eqn{s[z_i] = s[t_i]/t_i} in the case of a logarithmic
+transformation). Create a scatterplot of \eqn{(x_i,y_i)} values,
+where \eqn{x_i = 1/s[z_i]} and \eqn{y_i = (z_i-z_\circ)/s[z_i]},
+where \eqn{z_\circ} is some reference value such as the mean. The
+slope of a line connecting the origin of this scatterplot with any
+of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
+the date \eqn{t_i}.  These dates can be more easily visualised by
+drawing a radial scale at some convenient distance from the origin
+and annotating it with labelled ticks at the appropriate
+angles. While the angular position of each data point represents
+the date, its horizontal distance from the origin is proportional
+to the precision. Imprecise measurements plot on the left hand side
+of the radial plot, whereas precise age determinations are found
+further towards the right. Thus, radial plots allow the observer to
+assess both the magnitude and the precision of quantitative data in
+one glance.
 }
 \examples{
 data(examples)
 radialplot(examples$FT1)
+
+dev.new()
+radialplot(examples$LudwigMixture,k='min')
+
 }
 \references{
 Galbraith, R.F., 1988. Graphical display of estimates having
@@ -216,6 +222,10 @@ Galbraith, R.F., 1990. The radial plot: graphical assessment of
 spread in ages. International Journal of Radiation Applications and
 Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
 17(3), pp.207-214.
+
+Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
+mixed fission track ages. Nuclear Tracks and Radiation
+Measurements, 21(4), pp.459-470.
 }
 \seealso{
 \code{\link{peakfit}}, \code{\link{central}}

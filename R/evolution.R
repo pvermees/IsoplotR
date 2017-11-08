@@ -8,12 +8,13 @@
 #' calculates isochron ages.
 #'
 #' @details
+#'
 #' Similar to the \code{\link{concordia}} diagram (for U-Pb data) and
-#' the \code{\link{helioplot}} (for U-Th-He), the evolution diagram
-#' simultaneously displays the isotopic composition and age of
-#' U-series data. For carbonate data (Th-U formats 1 and 2), the Th-U
-#' evolution diagram consists of a scatter plot that sets out the
-#' \eqn{^{234}}U/\eqn{^{238}}U-activity ratios against the
+#' the \code{\link{helioplot}} diagram (for U-Th-He data), the
+#' evolution diagram simultaneously displays the isotopic composition
+#' and age of U-series data. For carbonate data (Th-U formats 1 and
+#' 2), the Th-U evolution diagram consists of a scatter plot that sets
+#' out the \eqn{^{234}}U/\eqn{^{238}}U-activity ratios against the
 #' \eqn{^{230}}Th/\eqn{^{238}}U-activity ratios as error ellipses, and
 #' displays the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratios
 #' and ages as a set of intersecting lines.  Alternatively, the
@@ -24,10 +25,10 @@
 #' thereby remove the detrital \eqn{^{230}}Th-component. This
 #' procedure allows a visual assessment of the degree of homogeneity
 #' within a dataset, as is quantified by the MSWD.
-#' \cr\cr
+#'
 #' Neither the U-series evolution diagram, nor the
 #' \eqn{^{234}}U/\eqn{^{238}}U vs. age plot is applicable to igneous
-#' datasets (Th-U formats 2 and 3), in which \eqn{^{234}}U and
+#' datasets (Th-U formats 3 and 4), in which \eqn{^{234}}U and
 #' \eqn{^{238}}U are in secular equilibrium.  For such datasets,
 #' \code{IsoplotR} produces an Osmond-style regression plot that is
 #' decorated with a fanning set of \code{\link{isochron}} lines.
@@ -45,7 +46,7 @@
 #'     numbers?
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
-#' @param clabel colour label
+#' @param clabel label of the colour legend.
 #' @param ellipse.col a vector of two background colours for the error
 #'     ellipses. If \code{levels=NA}, then only the first colour will
 #'     be used. If \code{levels} is a vector of numbers, then
@@ -55,7 +56,6 @@
 #' @param exterr propagate the decay constant uncertainty in the
 #'     isochron age?
 #' @param sigdig number of significant digits for the isochron age
-#'
 #' @param model if \code{isochron=TRUE}, choose one of three
 #'     regression models:
 #'
@@ -65,12 +65,12 @@
 #' and Titterington (1994) for 3-dimensional data. These algorithms
 #' take into account the analytical uncertainties and error
 #' correlations, under the assumption that the scatter between the
-#' data points is solely caused by the analytical uncertainty. If the
+#' data points is solely caused by the analytical uncertainty. If this
 #' assumption is correct, then the MSWD value should be approximately
 #' equal to one. There are three strategies to deal with the case
 #' where MSWD>1. The first of these is to assume that the analytical
 #' uncertainties have been underestimated by a factor
-#' \eqn{\sqrt{MSWD}}. Alternative approaches are described below.
+#' \eqn{\sqrt{MSWD}}.
 #'
 #' \code{2}: ordinary least squares regression: a second way to deal
 #' with over- or underdispersed datasets is to simply ignore the
@@ -84,9 +84,15 @@
 #'
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{isochron}}
+#'
 #' @examples
 #' data(examples)
 #' evolution(examples$ThU)
+#'
+#' dev.new()
+#' evolution(examples$ThU,transform=TRUE,
+#'           isochron=TRUE,model=1)
+#'
 #' @references Ludwig, K.R. and Titterington, D.M., 1994. Calculation
 #'     of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 #'     Cosmochimica Acta, 58(22), pp.5031-5042.

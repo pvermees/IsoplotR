@@ -31,7 +31,7 @@
 #' further improved by York et al. (2004) to ensure consistency with
 #' the maximum likelihood approach of Titterington and Halliday
 #' (1979).
-#' 
+#'
 #' \code{IsoplotR} uses the York et al. (2004) algorithm for its
 #' \eqn{^{40}}Ar/\eqn{^{39}}Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf
 #' isochrons. The maximum likelihood algorithm of Titterington and
@@ -42,30 +42,32 @@
 #' analytical uncertainties can be assessed using the Mean Square of
 #' the Weighted Deviates (MSWD, McIntyre et al., 1966), which is
 #' defined as:
-#' 
+#'
 #' \eqn{MSWD = ([X - \hat{X}] \Sigma_{X}^{-1} [X - \hat{X}]^T)/df}
-#' 
+#'
 #' where \eqn{X} are the data, \eqn{\hat{X}} are the fitted values,
 #' and \eqn{\Sigma_X} is the covariance matrix of \eqn{X}, and \eqn{df
 #' = k(n-1)} are the degrees of freedom, where \eqn{k} is the
-#' dimensionality of the linear fit. MSWD values that are far smaller or
-#' greater than 1 indicate under- or overdispersed measurements,
-#' respectively. The former can be attributed to overestimated analytical
-#' uncertainties. The latter are more common than the former, but their
-#' interpretation is less straightforward.  \code{IsoplotR} provides
-#' three alternative strategies to deal with overdispersed data:
+#' dimensionality of the linear fit. MSWD values that are far smaller
+#' or greater than 1 indicate under- or overdispersed measurements,
+#' respectively. Underdispersion can be attributed to overestimated
+#' analytical uncertainties. \code{IsoplotR} provides three
+#' alternative strategies to deal with overdispersed data:
+#'
 #' \enumerate{
+#'
 #' \item Attribute the overdispersion to an underestimation of the
 #' analytical uncertainties. In this case, the excess scatter can be
 #' accounted for by inflating those uncertainties by a \emph{factor}
 #' \eqn{\sqrt{MSWD}}.
+#'
 #' \item Ignore the analytical uncertainties and perform an ordinary
-#' least squares regression. The third and final option is to
-#' attribute
+#' least squares regression.
+#'
 #' \item Attribute the overdispersion to the presence of `geological
 #' scatter'.  In this case, the excess scatter can be accounted for by
-#' increasing the analytical uncertainties by adding an overdispersion
-#' \emph{term} that lowers the MSWD to unity.
+#' adding an overdispersion \emph{term} that lowers the MSWD to unity.
+#'
 #' }
 #'
 #' @param x EITHER a matrix with the following five columns:
@@ -89,9 +91,9 @@
 #' an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
 #' \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or \code{ThU}.
 #'
-#' @param xlim 2-element vector with the plot limits of the x-axis
+#' @param xlim 2-element vector with the x-axis limits
 #'
-#' @param ylim 2-element vector with the plot limits of the y-axis
+#' @param ylim 2-element vector with the y-axis limits
 #'
 #' @param alpha confidence cutoff for the error ellipses and
 #'     confidence intervals
@@ -104,7 +106,7 @@
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
 #'
-#' @param clabel colour label
+#' @param clabel label for the colour scale
 #'
 #' @param ellipse.col a vector of two background colours for the error
 #'     ellipses. If \code{levels=NA}, then only the first colour will
@@ -181,9 +183,15 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
 #'
-#' @param inverse if \code{TRUE} and \code{x} has class \code{ArAr},
-#'     plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
-#'     vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
+#' @param inverse
+#' if \code{FALSE} and \code{x} has class \code{ArAr}, plots
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
+#'
+#' if \code{FALSE} and \code{x} has class \code{PbPb}, plots
+#' \eqn{^{207}}Pb/\eqn{^{204}}Pb vs. \eqn{^{206}}Pb/\eqn{^{204}}Pb.
+#'
+#' if \code{TRUE} and \code{x} has class \code{ArAr}, plots
+#'     \eqn{^{36}}Ar/\eqn{^{40}}Ar vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
 #'
 #' if \code{TRUE} and \code{x} has class \code{PbPb}, plots
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.
@@ -191,9 +199,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @param exterr propagate external sources of uncertainty
 #' (J, decay constant)?
 #'
-#' @return if \code{x} has class \code{PbPb}, \code{ArAr},
-#'     \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf}, or
-#'     \code{UThHe}, returns a list with the following items:
+#' @return
+#' If \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
+#' \code{SmNd}, \code{ReOs} or \code{LuHf}, or \code{UThHe}, returns a
+#' list with the following items:
 #'
 #' \describe{
 #'
@@ -215,13 +224,12 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{y} given the appropriate degrees of freedom.
+#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{y}.
 #'
-#' \code{disp[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{y} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
-#' model=1}).
-#' }
+#' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only
+#' applicable if \code{ model=1}).  }
 #'
 #' \item{age}{a four-element list containing:
 #'
@@ -232,12 +240,12 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{t} given the appropriate degrees of freedom.
+#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t}.
 #'
-#' \code{disp[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{t} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
-#' model=1}).  }
+#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
+#' applicable if \code{ model=1}).  }
 #'
 #' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
 #' t-distribution with \code{df} degrees of freedom.}
@@ -303,11 +311,11 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{y}
+#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{y}.
 #'
-#' \code{disp[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{y} enhanced by \eqn{\sqrt{mswd}}.}
+#' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
 #'
 #' \item{age}{a three (or four) element vector containing:
 #'
@@ -315,18 +323,18 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{t}
+#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t}
 #'
-#' \code{disp[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported if
-#' \code{model=1}).}
+#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
+#' if \code{model=1}).}
 #'
 #' \item{w}{the overdispersion term, i.e. a two-element vector with
 #' the standard deviation of the (assumedly) Normally distributed
 #' geological scatter that underlies the measurements, and the
-#' corresponding studentised \eqn{100(1-\alpha)\%} confidence interval
-#' (only returned if \code{model=3}).}
+#' corresponding \eqn{100(1-\alpha)\%} confidence interval (only
+#' returned if \code{model=3}).}
 #'
 #' \item{d}{a matrix with the following columns: the X-variable for
 #' the isochron plot, the analytical uncertainty of X, the Y-variable
@@ -343,6 +351,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' data(examples)
 #' isochron(examples$ArAr)
 #'
+#' fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+#'
+#' dev.new()
+#' isochron(examples$ThU,type=4)
 #' @rdname isochron
 #' @export
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,

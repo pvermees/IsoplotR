@@ -57,8 +57,8 @@ mindens <- function(mineral,x=NULL){
 #' \code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"U234"},
 #' \code{"Th232"}, \code{"Th230"}, \code{"Re187"}, \code{"Sm147"},
 #' \code{"Rb87"}, \code{"Lu176"}, or \code{"K40"}) PLUS (optionally)
-#' the decay constant value and its analytical error.  Omitting these
-#' two numbers simply returns the existing values.
+#' the decay constant value and its analytical error.  Omitting the
+#' latter two numbers simply returns the existing values.
 #'
 #' \item for \code{'iratio'}: the isotopic ratio of interest (one of
 #' either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
@@ -72,7 +72,7 @@ mindens <- function(mineral,x=NULL){
 #' \code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
 #' \code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
 #' \code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS (optionally) the
-#' isotopic ratio and its analytical error.  Omitting these two
+#' isotopic ratio and its analytical error.  Omitting the latter two
 #' numbers simply returns the existing values.
 #'
 #' \item for \code{'imass'}: the (isotopic) molar mass of interest
@@ -82,12 +82,13 @@ mindens <- function(mineral,x=NULL){
 #' \code{"Os"}, \code{"Os184"}, \code{"Os186"}, \code{"Os187"},
 #' \code{"Os188"}, \code{"Os189"}, \code{"Os190"}, \code{"Os192"},
 #' \code{"Sm"}, \code{"Nd"}, \code{"Lu"}, \code{"Hf"}) PLUS
-#' (optionally) the molar mass and its analytical error.  Omitting
-#' these two numbers simply returns the existing values.
+#' (optionally) the molar mass and its analytical error.  Omitting the
+#' latter two numbers simply returns the existing values.
 #'
 #' \item for \code{'mindens'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the mineral
-#' density. Omitting this number simply returns the existing value.
+#' density. Omitting the latter number simply returns the existing
+#' value.
 #'
 #' \item \code{'etchfact'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the etch efficiency
@@ -103,20 +104,22 @@ mindens <- function(mineral,x=NULL){
 #'     \code{.json} string
 #'
 #' if \code{...} contains only the name of an isotope, isotopic ratio,
-#' element, or mineral and no new value, \code{settings} returns
+#' element, or mineral and no new value, then \code{settings} returns
 #' either a scalar with the existing value, or a two-element vector
 #' with the value and its uncertainty.
+#'
 #' @references
 #' \enumerate{
 #' \item Decay constants:
 #' \itemize{
-#' 
+#'
 #' \item \eqn{^{238}}U, \eqn{^{235}}U: Jaffey, A. H., et
-#' al. "Precision measurement of half-lives and specific activities of U\eqn{^{235}} and U\eqn{^{238}}."
+#' al. "Precision measurement of half-lives and specific
+#' activities of U\eqn{^{235}} and U\eqn{^{238}}."
 #' Physical Review C 4.5 (1971): 1889.
 #'
 #' \item \eqn{^{232}}Th: Le Roux, L. J., and
-#' L. E. Glendenin. "Half-life of \eqn{^{232}}Th.  "Proceedings of the
+#' L. E. Glendenin. "Half-life of \eqn{^{232}}Th.", Proceedings of the
 #' National Meeting on Nuclear Energy, Pretoria, South Africa. 1963.
 #'
 #' \item \eqn{^{234}}U, \eqn{^{230}}Th: Cheng, H., Edwards, R.L.,
@@ -136,7 +139,7 @@ mindens <- function(mineral,x=NULL){
 #' al. "Absolute measurements of neodymium isotopic abundances and atomic
 #' weight by MC-ICPMS." International Journal of Mass Spectrometry 245.1
 #' (2005): 36-40.
-#' 
+#'
 #' \item Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and Hannah,
 #' J.L., 2007.  Assessment of the 187Re decay constant by cross
 #' calibration of Re-Os molybdenite and U-Pb zircon chronometers in
@@ -158,7 +161,7 @@ mindens <- function(mineral,x=NULL){
 #' \item Lu: Soederlund, Ulf, et al. "The \eqn{^{176}}Lu decay constant
 #' determined by Lu-Hf and U-Pb isotope systematics of Precambrian
 #' mafic intrusions." Earth and Planetary Science Letters 219.3 (2004): 311-324.
-#' 
+#'
 #' }
 #' \item Isotopic ratios:
 #' \itemize{
@@ -171,7 +174,7 @@ mindens <- function(mineral,x=NULL){
 #' (1969): 511-516.
 #'
 #' \item Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
-#' weight of a reference sample of strontium." J. Res. Natl.Bur. Stand.
+#' weight of a reference sample of strontium." J. Res. Natl. Bur. Stand.
 #' 87.1 (1982): 1-8.
 #'
 #' \item Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic
@@ -194,7 +197,7 @@ mindens <- function(mineral,x=NULL){
 #' "Importance of the Lu-Hf isotopic system in studies of planetary
 #' chronology and chemical evolution." Geochimica et Cosmochimica
 #' Acta 47.1 (1983): 81-91.
-#' 
+#'
 #' \item U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
 #' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
 #' }

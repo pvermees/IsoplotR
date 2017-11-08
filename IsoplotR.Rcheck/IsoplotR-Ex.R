@@ -31,9 +31,12 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
-print(age(examples$UPb))
-print(age(examples$UPb,type=1))
-print(age(examples$UPb,type=2))
+tUPb <- age(examples$UPb,type=1)
+tconc <- age(examples$UPb,type=2)
+tdisc <- age(examples$UPb,type=3)
+tArAr <- age(examples$ArAr)
+tiso <- age(examples$ArAr,isochron=TRUE,i2i=TRUE)
+tcentral <- age(examples$FT1,central=TRUE)
 
 
 
@@ -117,7 +120,13 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
-concordia(examples$UPb)
+concordia(examples$UPb,show.age=2)
+
+dev.new()
+concordia(examples$UPb,wetherill=FALSE,
+          xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
+          ticks=249:254,exterr=TRUE)#' data(examples)
+
 
 
 
@@ -162,6 +171,11 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 data(examples)
 evolution(examples$ThU)
+
+dev.new()
+evolution(examples$ThU,transform=TRUE,
+          isochron=TRUE,model=1)
+
 
 
 
@@ -247,6 +261,10 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 data(examples)
 isochron(examples$ArAr)
 
+fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+
+dev.new()
+isochron(examples$ThU,type=4)
 
 
 
@@ -267,9 +285,13 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-data(examples)
-kde(examples$DZ[['N1']],kernel="epanechnikov")
-kde(examples$DZ,from=0,to=3000)
+kde(examples$UPb)
+
+dev.new()
+kde(examples$FT1,log=TRUE)
+
+dev.new()
+kde(examples$DZ,from=1,to=3000,kernel="epanechnikov")
 
 
 
@@ -337,6 +359,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 data(examples)
 peakfit(examples$FT1,k=2)
 
+peakfit(examples$LudwigMixture,k='min')
+
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
@@ -360,6 +384,10 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 data(examples)
 radialplot(examples$FT1)
 
+dev.new()
+radialplot(examples$LudwigMixture,k='min')
+
+
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
@@ -377,9 +405,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-file.show(system.file("spectrum.csv",package="IsoplotR"))
 
 f1 <- system.file("UPb1.csv",package="IsoplotR")
+file.show(f1) # inspect the contents of 'UPb1.csv'
 d1 <- read.data(f1,method="U-Pb",format=1)
 concordia(d1)
 
@@ -521,8 +549,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
 weightedmean(cbind(ages,errs))
+
 data(examples)
-weightedmean(examples$ArAr)
+weightedmean(examples$LudwigMean)
 
 
 

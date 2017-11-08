@@ -1,5 +1,5 @@
 #' Calculate isotopic ages
-#' 
+#'
 #' Calculates U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He,
 #' Th-U and fission track ages and propagates their analytical
 #' uncertainties. Includes options for single grain, isochron and
@@ -52,12 +52,9 @@
 #'     \code{'Pb207-Pb206'}, \code{'Ar-Ar'}, \code{'Th-U'}, \code{'Re-Os'},
 #'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{'Lu-Hf'}, \code{'U-Th-He'} or
 #'     \code{'fissiontracks'}
-#'
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
-#'
 #' @param i (optional) index of a particular aliquot
-#'
 #' @param ... additional arguments
 #'
 #' @rdname age
@@ -105,27 +102,25 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{2}: all the measurements should be combined to calculate a
 #' concordia age,
 #'
-#' \code{3}: a discordia line should be fit through all the U-Pb
+#' \code{3}: a discordia line should be fitted through all the U-Pb
 #'     analyses using the maximum likelihood algorithm of Ludwig
 #'     (1998), which assumes that the scatter of the data is solely
 #'     due to the analytical uncertainties.
 #'
-#' \code{4}: a discordia line should be fitignoring the analytical
+#' \code{4}: a discordia line should be fitted ignoring the analytical
 #' uncertainties.
 #'
-#' \code{5}: a discordia line should be fit using a modified maximum likelihood
-#' algorithm that includes accounts for any overdispersion by adding a
-#' geological (co)variance term.
+#' \code{5}: a discordia line should be fitted using a modified
+#' maximum likelihood algorithm that accounts for overdispersion by
+#' adding a geological (co)variance term.
 #'
 #' @param wetherill logical flag to indicate whether the data should
 #'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 #'     (\code{FALSE}) space.  This option is only used when
 #'     \code{type=2}
-#'
 #' @param sigdig number of significant digits for the uncertainty
-#'     estimate (only used if \code{type=1}, \code{isochron=FALSE}
-#'     or \code{central=FALSE}).
-#'
+#'     estimate (only used if \code{type=1}, \code{isochron=FALSE} and
+#'     \code{central=FALSE}).
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -153,14 +148,15 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, and the
 #' single grain concordia age and standard error, respectively.
 #'
-#' \item if \code{x} has class \code{UPb} and \code{type=1}, \code{2},
-#' \code{3} or \code{4}, returns the output of the
-#' \code{\link{concordia}} function.
+#' \item if \code{x} has class \code{UPb} and \code{type=2, 3, 4} or
+#' \code{5}, returns the output of the \code{\link{concordia}}
+#' function.
 #'
 #' \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
-#' \code{SmNd}, \code{ReOs}, \code{LuHf} and \code{isochron=FALSE},
-#' returns a table of Pb-Pb, Ar-Ar, Rb-Sr, Sm-Nd, Re-Os or Lu-Hf ages
-#' and their standard errors.
+#' \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{ThU} or \code{UThHe}
+#' and \code{isochron=FALSE}, returns a table of Pb-Pb, Ar-Ar, Rb-Sr,
+#' Sm-Nd, Re-Os, Lu-Hf, Th-U or U-Th-He ages and their standard
+#' errors.
 #'
 #' \item if \code{x} has class \code{ThU} and \code{isochron=FALSE},
 #' returns a 5-column table with the Th-U ages, their standard errors,
@@ -169,8 +165,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' ratios.
 #'
 #' \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
-#' \code{SmNd}, \code{ReOs}, \code{LuHf} or \code{ThU} and
-#' \code{isochron=TRUE}, returns the output of the
+#' \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{UThHe} or \code{ThU}
+#' and \code{isochron=TRUE}, returns the output of the
 #' \code{\link{isochron}} function.
 #'
 #' \item if \code{x} has class \code{fissiontracks} and
@@ -186,9 +182,12 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     \code{\link{central}}
 #' @examples
 #' data(examples)
-#' print(age(examples$UPb))
-#' print(age(examples$UPb,type=1))
-#' print(age(examples$UPb,type=2))
+#' tUPb <- age(examples$UPb,type=1)
+#' tconc <- age(examples$UPb,type=2)
+#' tdisc <- age(examples$UPb,type=3)
+#' tArAr <- age(examples$ArAr)
+#' tiso <- age(examples$ArAr,isochron=TRUE,i2i=TRUE)
+#' tcentral <- age(examples$FT1,central=TRUE)
 #' @rdname age
 #' @export
 age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
@@ -220,16 +219,17 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=1,exterr=TRUE,i=NA,sigdig=NA,...)
 #'     should be considered separately (\code{isochron=FALSE}) or an
 #'     isochron age should be calculated from all Ar-Ar analyses
 #'     together (\code{isochron=TRUE}).
-#' @param i2i
-#'     `isochron to intercept': calculates the initial (aka `inherited',
-#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
-#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
-#'     method). When applied to data of class \code{ThU}, setting
-#'     \code{i2i} to \code{TRUE} applies a detrital Th-correction.
+#' @param i2i `isochron to intercept': calculates the initial (aka
+#'     `inherited', `excess', or `common')
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in
+#'     \code{settings('iratio',...)}. When applied to data of class
+#'     \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
+#'     detrital Th-correction.
+#'
 #' @rdname age
 #' @export
 age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
@@ -237,14 +237,15 @@ age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }
-#' @param central logical flag indicating whether each U-Th-He analysis
-#'     should be considered separately (\code{central=FALSE}) or a
-#'     central age should be calculated from all U-Th-He analyses
-#'     together (\code{central=TRUE}).
+#' @param central logical flag indicating whether each analysis should
+#'     be considered separately (\code{central=FALSE}) or a central
+#'     age should be calculated from all analyses together
+#'     (\code{central=TRUE}).
 #' @rdname age
 #' @export
-age.UThHe <- function(x,central=FALSE,i=NA,sigdig=NA,...){
-    if (central) out <- central(x)
+age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NA,sigdig=NA,...){
+    if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig,...)
+    else if (central) out <- central(x)
     else out <- UThHe.age(x,i=i,sigdig=sigdig)
     out
 }

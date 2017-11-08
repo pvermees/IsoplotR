@@ -55,7 +55,7 @@
 #'     used if \code{plot=TRUE}.
 #' @param nnlines if \code{TRUE}, draws nearest neighbour lines
 #' @param pos a position specifier for the labels (if
-#'     \code{pch!=NA}). Values of 1, 2, 3 and 4 indicate positions
+#'     \code{par('pch')!=NA}). Values of 1, 2, 3 and 4 indicate positions
 #'     below, to the left of, above and to the right of the MDS
 #'     coordinates, respectively.
 #' @param col plot colour (may be a vector)
@@ -64,7 +64,7 @@
 #' @param ylab a string with the label of the y axis
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{cad}}, \code{\link{kde}}
-#' @return returns an object of class \code{MDS}, i.e. a list
+#' @return Returns an object of class \code{MDS}, i.e. a list
 #'     containing the following items:
 #'
 #' \describe{

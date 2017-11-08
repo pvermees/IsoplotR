@@ -86,9 +86,9 @@ an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
 \item{...}{optional arguments to be passed on to the generic plot
 function if \code{model=2}}
 
-\item{xlim}{2-element vector with the plot limits of the x-axis}
+\item{xlim}{2-element vector with the x-axis limits}
 
-\item{ylim}{2-element vector with the plot limits of the y-axis}
+\item{ylim}{2-element vector with the y-axis limits}
 
 \item{alpha}{confidence cutoff for the error ellipses and
 confidence intervals}
@@ -101,7 +101,7 @@ values reported in the title of the graphical output}
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
 
-\item{clabel}{colour label}
+\item{clabel}{label for the colour scale}
 
 \item{ellipse.col}{a vector of two background colours for the error
 ellipses. If \code{levels=NA}, then only the first colour will
@@ -126,9 +126,14 @@ be used. If \code{levels} is a vector of numbers, then
 
 }}
 
-\item{inverse}{if \code{TRUE} and \code{x} has class \code{ArAr},
-    plots \eqn{^{36}}Ar/\eqn{^{40}}Ar
-    vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
+\item{inverse}{if \code{FALSE} and \code{x} has class \code{ArAr}, plots
+    \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
+
+if \code{FALSE} and \code{x} has class \code{PbPb}, plots
+\eqn{^{207}}Pb/\eqn{^{204}}Pb vs. \eqn{^{206}}Pb/\eqn{^{204}}Pb.
+
+if \code{TRUE} and \code{x} has class \code{ArAr}, plots
+    \eqn{^{36}}Ar/\eqn{^{40}}Ar vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
 
 if \code{TRUE} and \code{x} has class \code{PbPb}, plots
 \eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.}
@@ -158,9 +163,9 @@ vs. \eqn{^{232}}Th/\eqn{^{238}}U
 }}
 }
 \value{
-if \code{x} has class \code{PbPb}, \code{ArAr},
-    \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf}, or
-    \code{UThHe}, returns a list with the following items:
+If \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
+\code{SmNd}, \code{ReOs} or \code{LuHf}, or \code{UThHe}, returns a
+list with the following items:
 
 \describe{
 
@@ -182,13 +187,12 @@ error.}
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y} given the appropriate degrees of freedom.
+\code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{y}.
 
-\code{disp[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
-model=1}).
-}
+\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only
+applicable if \code{ model=1}).  }
 
 \item{age}{a four-element list containing:
 
@@ -199,12 +203,12 @@ model=1}).
 
 \code{s[t]}: the propagated uncertainty of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t} given the appropriate degrees of freedom.
+\code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{t}.
 
-\code{disp[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t} enhanced by \eqn{\sqrt{mswd}} (only applicable if \code{
-model=1}).  }
+\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
+applicable if \code{ model=1}).  }
 
 \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
 t-distribution with \code{df} degrees of freedom.}
@@ -270,11 +274,11 @@ t-distribution with \code{df} degrees of freedom.}
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y}
+\code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{y}.
 
-\code{disp[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y} enhanced by \eqn{\sqrt{mswd}}.}
+\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
 
 \item{age}{a three (or four) element vector containing:
 
@@ -282,18 +286,18 @@ t-distribution with \code{df} degrees of freedom.}
 
 \code{s[t]}: the propagated uncertainty of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}
+\code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{t}
 
-\code{disp[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t} enhanced by \eqn{\sqrt{mswd}} (only reported if
-\code{model=1}).}
+\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
+if \code{model=1}).}
 
 \item{w}{the overdispersion term, i.e. a two-element vector with
 the standard deviation of the (assumedly) Normally distributed
 geological scatter that underlies the measurements, and the
-corresponding studentised \eqn{100(1-\alpha)\%} confidence interval
-(only returned if \code{model=3}).}
+corresponding \eqn{100(1-\alpha)\%} confidence interval (only
+returned if \code{model=3}).}
 
 \item{d}{a matrix with the following columns: the X-variable for
 the isochron plot, the analytical uncertainty of X, the Y-variable
@@ -355,30 +359,36 @@ defined as:
 where \eqn{X} are the data, \eqn{\hat{X}} are the fitted values,
 and \eqn{\Sigma_X} is the covariance matrix of \eqn{X}, and \eqn{df
 = k(n-1)} are the degrees of freedom, where \eqn{k} is the
-dimensionality of the linear fit. MSWD values that are far smaller or
-greater than 1 indicate under- or overdispersed measurements,
-respectively. The former can be attributed to overestimated analytical
-uncertainties. The latter are more common than the former, but their
-interpretation is less straightforward.  \code{IsoplotR} provides
-three alternative strategies to deal with overdispersed data:
+dimensionality of the linear fit. MSWD values that are far smaller
+or greater than 1 indicate under- or overdispersed measurements,
+respectively. Underdispersion can be attributed to overestimated
+analytical uncertainties. \code{IsoplotR} provides three
+alternative strategies to deal with overdispersed data:
+
 \enumerate{
+
 \item Attribute the overdispersion to an underestimation of the
 analytical uncertainties. In this case, the excess scatter can be
 accounted for by inflating those uncertainties by a \emph{factor}
 \eqn{\sqrt{MSWD}}.
+
 \item Ignore the analytical uncertainties and perform an ordinary
-least squares regression. The third and final option is to
-attribute
+least squares regression.
+
 \item Attribute the overdispersion to the presence of `geological
 scatter'.  In this case, the excess scatter can be accounted for by
-increasing the analytical uncertainties by adding an overdispersion
-\emph{term} that lowers the MSWD to unity.
+adding an overdispersion \emph{term} that lowers the MSWD to unity.
+
 }
 }
 \examples{
 data(examples)
 isochron(examples$ArAr)
 
+fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+
+dev.new()
+isochron(examples$ThU,type=4)
 }
 \references{
 Ludwig, K.R. and Titterington, D.M., 1994. Calculation of

@@ -6,15 +6,15 @@
 #'
 #' @details
 #' Consider a dataset of \eqn{n} dates \eqn{\{t_1, t_2, ..., t_n\}}
-#' with analytical uncertainties \eqn{\{s[t_1], s[t_2], ..., s[t_n]\}}.
-#' Define \eqn{z_i = \log(t_i)} and \eqn{s[z_i] = s[t_i]/t_i}.
-#' Suppose that these \eqn{n} values are are derived
-#' from a mixture of \eqn{k>2} populations with means
+#' with analytical uncertainties \eqn{\{s[t_1], s[t_2], ...,
+#' s[t_n]\}}.  Define \eqn{z_i = \log(t_i)} and \eqn{s[z_i] =
+#' s[t_i]/t_i}.  Suppose that these \eqn{n} values are derived from a
+#' mixture of \eqn{k>2} populations with means
 #' \eqn{\{\mu_1,...,\mu_k\}}. Such a \emph{discrete mixture} may be
 #' mathematically described by:
-#' \cr\cr
-#' \eqn{Prob(z_i|\mu,\omega) = \sum_{j=1}^k \pi_j N(z_i | \mu_j, s[z_j]^2 )}
-#' \cr\cr
+#'
+#' \eqn{P(z_i|\mu,\omega) = \sum_{j=1}^k \pi_j N(z_i | \mu_j, s[z_j]^2 )}
+#'
 #' where \eqn{\pi_j} is the proportion of the population that belongs
 #' to the \eqn{j^{th}} component, and
 #' \eqn{\pi_k=1-\sum_{j=1}^{k-1}\pi_j}. This equation can be solved by
@@ -31,7 +31,7 @@
 #' age model), but truncated at this discrete value (Van der Touw et
 #' al., 1997).
 #'
-#' @param x either a \code{[2 x n]} matrix with measurements and their
+#' @param x either an \code{[n x 2]} matrix with measurements and their
 #'     standard errors, or an object of class \code{fissiontracks},
 #'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
 #'     \code{RbSr}, \code{LuHf}, \code{ThU} or \code{UThHe}
@@ -48,7 +48,7 @@
 #' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments (not used)
 #' @seealso \code{\link{radialplot}}, \code{\link{central}}
-#' @return returns a list with the following items:
+#' @return Returns a list with the following items:
 #'
 #' \describe{
 #'
@@ -78,8 +78,8 @@
 #' }
 #' @references
 #' Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
-#' mixed fission track ages. Nuclear tracks and radiation
-#' measurements, 21(4), pp.459-470.
+#' mixed fission track ages. Nuclear Tracks and Radiation
+#' Measurements, 21(4), pp.459-470.
 #'
 #' van der Touw, J., Galbraith, R., and Laslett, G. A logistic
 #' truncated normal mixture model for overdispersed binomial
@@ -88,6 +88,8 @@
 #' @examples
 #' data(examples)
 #' peakfit(examples$FT1,k=2)
+#'
+#' peakfit(examples$LudwigMixture,k='min')
 #' @rdname peakfit
 #' @export
 peakfit <- function(x,...){ UseMethod("peakfit",x) }
@@ -132,12 +134,13 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
     out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
 }
-#' @param type scalar indicating whether to plot the
+#' @param type scalar valueindicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), or the (Wetherill) concordia age (\code{type}=5)
+#'     (\code{type}=4), or the (Wetherill) concordia age
+#'     (\code{type}=5)
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
@@ -159,15 +162,16 @@ peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
                    cutoff.disc=cutoff.disc,exterr=exterr,
                    sigdig=sigdig,log=log,alpha=alpha,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial
-#'     (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
-#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}  or zero (for the Pb-Pb
-#'     method). When applied to data of class \code{ThU}, setting
-#'     \code{i2i} to \code{TRUE} applies a detrital Th-correction.
+#' @param i2i `isochron to intercept': calculates the initial (aka
+#'     `inherited', `excess', or `common')
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in
+#'     \code{settings('iratio',...)}. When applied to data of class
+#'     \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
+#'     detrital Th-correction.
 #' @rdname peakfit
 #' @export
 peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,

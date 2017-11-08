@@ -1,8 +1,8 @@
 #' Calculate U-Th-He and fission track central ages and compositions
 #'
-#' Computes the geometric mean composition of a set of fission track
-#' or U-Th-He data and returns the corresponding age and fitting
-#' parameters.
+#' Computes the geometric mean composition of a continuous mixture of
+#' fission track or U-Th-He data and returns the corresponding age and
+#' fitting parameters.
 #'
 #' @details
 #' The central age assumes that the observed age distribution is the
@@ -27,14 +27,14 @@
 #' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments
 #' @return
-#'
-#' if \code{x} has class \code{UThHe}, a list containing the
+#' If \code{x} has class \code{UThHe}, returns a list containing the
 #'     following items:
 #'
 #' \describe{
+#'
 #' \item{uvw}{(if the input data table contains Sm) or \strong{uv} (if
-#' it doesn't): the geometric mean log[U/He], log[Th/He] (, and
-#' log[Sm/He]) composition.}
+#' it does not): the mean log[U/He], log[Th/He] (, and log[Sm/He])
+#' composition.}
 #'
 #' \item{covmat}{the covariance matrix of \code{uvw} or \code{uv}.}
 #'
@@ -48,17 +48,19 @@
 #' reported if \code{model=1}).}
 #'
 #' \item{p.value}{the p-value of a Chi-square test with \code{df}
-#' degrees of freedom (only reported if \code{model=1}.}
+#' degrees of freedom (only reported if \code{model=1}.)}
+#'
+#' }
 #'
 #' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the t-
 #' distribution for \code{df} degrees of freedom (not reported if
-#' \code{model=2}.}
+#' \code{model=2}).}
 #'
 #' \item{age}{a three- or four-element vector with:
 #'
 #' \code{t}: the central age.
 #'
-#' \code{s[t]}: the standard error of \code{s[t]}.
+#' \code{s[t]}: the standard error of \code{t}.
 #'
 #' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{t} for the appropriate number of degrees of freedom.
@@ -67,14 +69,13 @@
 #' interval enhanced by a factor of \eqn{\sqrt{mswd}} (only reported
 #' if \code{model=1}).
 #'
-#' \code{w}: the geological overdispersion term. If \code{model=3},
-#' this is a two-element vector with the standard deviation of the
-#' (assumedly) Normal dispersion and the corresponding
-#' \eqn{100(1-\alpha)\%} confidence interval. If code{model<3}
-#' \code{w=0}.
 #' }
 #'
-#' }
+#' \item{w}{the geological overdispersion term. If \code{model=3},
+#' this is a two-element vector with the standard deviation of the
+#' (assumedly) Normal dispersion and the corresponding
+#' \eqn{100(1-\alpha)\%} confidence interval. \code{w=0} if
+#' code{model<3}.}
 #'
 #' OR, otherwise:
 #'
@@ -82,12 +83,12 @@
 #'
 #' \item{age}{a three-element vector with:
 #'
-#' \code{t}: the central age
+#' \code{t}: the central age.
 #'
-#' \code{s[t]}: the standard error of \code{s[t]}
+#' \code{s[t]}: the standard error of \code{t}.
 #'
 #' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{t} for the appropriate number of degrees of freedom }
+#' \code{t} for the appropriate number of degrees of freedom.}
 #'
 #' \item{disp}{a two-element vector with the overdispersion (standard
 #' deviation) of the excess scatter, and the corresponding
@@ -111,8 +112,8 @@
 #' print(central(examples$UThHe)$age)
 #'
 #' @references Galbraith, R.F. and Laslett, G.M., 1993. Statistical
-#'     models for mixed fission track ages. Nuclear tracks and
-#'     radiation measurements, 21(4), pp.459-470.
+#'     models for mixed fission track ages. Nuclear Tracks and
+#'     Radiation Measurements, 21(4), pp.459-470.
 #'
 #' Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
 #'     ages. Chemical Geology, 249(3), pp.339-347.
@@ -156,8 +157,7 @@ central.default <- function(x,alpha=0.05,...){
 #' should be approximately equal to one. There are three strategies to
 #' deal with the case where MSWD>1. The first of these is to assume
 #' that the analytical uncertainties have been underestimated by a
-#' factor \eqn{\sqrt{MSWD}}. Alternative approaches are described
-#' below.
+#' factor \eqn{\sqrt{MSWD}}.
 #'
 #' \code{2}: unweighted mean. A second way to deal with over- or
 #' underdispersed datasets is to simply ignore the analytical
@@ -196,7 +196,7 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
 #' @param mineral setting this parameter to either \code{apatite} or
 #'     \code{zircon} changes the default efficiency factor, initial
 #'     fission track length and density to preset values (only affects
-#'     results if \code{x$format=2}.)
+#'     results if \code{x$format=2})
 #' @rdname central
 #' @export
 central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){

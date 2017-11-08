@@ -29,15 +29,14 @@ an object of class \code{ArAr}}
 
 \item{...}{optional parameters to the generic \code{plot} function}
 
-\item{alpha}{the confidence limits of the error bars/boxes and
+\item{alpha}{the confidence level of the error bars/boxes and
 confidence intervals.}
 
 \item{plateau}{logical flag indicating whether a plateau age should
 be calculated. If \code{plateau=TRUE}, the function will
 compute the weighted mean of the largest succession of steps
-that yield values passing the Chi-square test for age
-homogeneity.  If \code{TRUE}, returns a list with plateau
-parameters.}
+that pass the Chi-square test for age homogeneity.  If
+\code{TRUE}, returns a list with plateau parameters.}
 
 \item{plateau.col}{the fill colour of the rectangles used to mark
 the steps belonging to the age plateau.}
@@ -49,9 +48,9 @@ NOT belong to the plateau are given a different colour.}
 values reported in the title of the graphical output (only used
 if \code{plateau=TRUE}).}
 
-\item{line.col}{colour of the isochron line}
+\item{line.col}{colour of the average age line}
 
-\item{lwd}{line width}
+\item{lwd}{width of the average age line}
 
 \item{title}{add a title to the plot?}
 
@@ -69,7 +68,7 @@ an isochron fit. Setting \code{i2i} to \code{FALSE} uses the
 default values stored in \code{settings('iratio',...)}}
 }
 \value{
-if \code{plateau=TRUE}, returns a list with the following
+If \code{plateau=TRUE}, returns a list with the following
     items:
 
 \describe{
@@ -103,7 +102,7 @@ mean and the dispersion.}
 \item{fract}{the fraction of \eqn{^{39}}Ar contained in the
 plateau}
 
-\item{tfact}{the t-factor for \code{df} degrees of freedom
+\item{tfact}{the Student t-factor for \code{df} degrees of freedom
 evaluated at \eqn{100(1-\alpha/2)}\% confidence}
 
 \item{plotpar}{plot parameters for the weighted mean (see
