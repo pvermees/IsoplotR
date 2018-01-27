@@ -41,8 +41,9 @@
 #' @param from minimum age limit of the radial scale
 #' @param to maximum age limit of the radial scale
 #' @param t0 central value
-#' @param transformation one of either \code{log}, \code{linear} or
-#'     (if \code{x} has class \code{fissiontracks}), \code{arcsin}.
+#' @param transformation one of either \code{log}, \code{linear},
+#'     \code{sqrt} or (if \code{x} has class \code{fissiontracks} and
+#'     \code{fissiontracks$type} \eqn{\neq 1}) \code{arcsin}.
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output.
 #' @param show.numbers boolean flag (\code{TRUE} to show grain
@@ -69,9 +70,9 @@
 #' @param ... additional arguments to the generic \code{points}
 #'     function
 #' @seealso \code{\link{peakfit}}, \code{\link{central}}
-#' @references
-#' Galbraith, R.F., 1988. Graphical display of estimates having
-#' differing standard errors. Technometrics, 30(3), pp.271-281.
+#' @references Galbraith, R.F., 1988. Graphical display of estimates
+#'     having differing standard errors. Technometrics, 30(3),
+#'     pp.271-281.
 #'
 #' Galbraith, R.F., 1990. The radial plot: graphical assessment of
 #' spread in ages. International Journal of Radiation Applications and
@@ -502,7 +503,11 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
         } else {
             out$xlab <- expression(t/sigma)
         }
-    } else {
+    } else if (identical(transformation,'sqrt')){
+        out$z <- sqrt(x[,1])
+        out$s <- 0.5*x[,2]/out$z
+        out$xlab <- 'precision'
+    } else  if (identical(transformation,'linear')){
         out$z <- x[,1]
         out$s <- x[,2]
         out$xlab <- expression(1/sigma)
@@ -511,11 +516,12 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
     # reset limits if necessary
     if (is.na(from)){
         min.z <- get.min.z(out)
-        if (identical(transformation,'log')){
+        if (identical(transformation,'log'))
             out$from <- exp(min.z)-out$offset
-        } else {
+        else if (identical(transformation,'sqrt'))
+            out$from <- min.z^2
+        else if (identical(transformation,'linear'))
             out$from <- min.z
-        }
     } else {
         out$from <- from
     }
@@ -525,6 +531,8 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
             out$to <- exp(max.z)-out$offset
         else if (identical(transformation,'linear'))
             out$to <- max.z
+        else if (identical(transformation,'sqrt'))
+            out$to <- max.z^2
     } else {
         out$to <- to
     }
@@ -532,11 +540,11 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
 }
 x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
     out <- list()
-    if (is.na(transformation)){
+    if (transformation %in% c('linear','log','arcsin','sqrt')){
+        out$transformation <- transformation
+    } else {
         if (x$format==1) out$transformation <- 'arcsin'
         else out$transformation <- 'log'
-    } else {
-        out$transformation <- transformation
     }
     if (x$format==1){
         Ns <- x$x[,'Ns']
@@ -547,6 +555,13 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
             out$s <- tt[,'s[t]']
             out$z0 <- get.z0(out,t0,from,to)
             out$xlab <- expression(1/sigma)
+        }
+        if (identical(transformation,'sqrt')){
+            tt <- fissiontrack.age(x,exterr=FALSE)
+            out$z <- sqrt(tt[,'t'])
+            out$s <- 0.5*tt[,'s[t]']/out$z
+            out$z0 <- get.z0(out,t0,from,to)
+            out$xlab <- 'precision'
         }
         if (identical(transformation,'log')){
             tt <- fissiontrack.age(x,exterr=FALSE)
@@ -586,6 +601,8 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
                                  x$zeta[1],x$rhoD[1])
             else if (identical(transformation,'linear'))
                 out$from <- min(out$z,na.rm=TRUE)
+            else if (identical(transformation,'sqrt'))
+                out$from <- min(out$z,na.rm=TRUE)^2
         } else {
             out$from <- from
         }
@@ -597,6 +614,8 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
                                x$zeta[1],x$rhoD[1])
             else if (identical(transformation,'linear'))
                 out$to <- max(out$z,na.rm=TRUE)
+            else if (identical(transformation,'sqrt'))
+                out$to <- max(out$z,na.rm=TRUE)^2
         } else {
             out$to <- to
         }
@@ -620,6 +639,8 @@ get.z0 <- function(x,t0=NA,from=NA,to=NA){
             z0 <- mean(log(c(from,to)+x$offset),na.rm=TRUE)
         } else if (identical(x$transformation,'linear')) {
             z0 <- mean(c(from,to),na.rm=TRUE)
+        } else if (identical(x$transformation,'sqrt')) {
+            z0 <- mean(sqrt(c(from,to)),na.rm=TRUE)
         } else {
             stop('illegal input')
         }
@@ -627,6 +648,8 @@ get.z0 <- function(x,t0=NA,from=NA,to=NA){
         z0 <- log(t0+x$offset)
     } else if (identical(x$transformation,'linear')){
         z0 <- t0
+    } else if (identical(x$transformation,'sqrt')){
+        z0 <- sqrt(t0)
     } else {
         stop('illegal input')
     }
