@@ -476,15 +476,22 @@ get.radial.tticks <- function(x){
         out <- pretty(sqrt(c(x$from,x$to)))^2
     }
     nt <- length(out)
-    reldiff <- (x$to-out[nt])/(out[nt]-out[nt-1])
-    if (reldiff > 0.25) {
-        sigdig <- ceiling(1-log10(1-out[nt]/x$to))
-        out <- c(out,signif(x$to,sigdig))
+    reldiff <- (out[1]-x$from)/(out[nt]-out[1])
+    sigdig <- ceiling(1-log10(abs(1-x$from/out[1])))
+    firsttick <- signif(x$from,sigdig)
+    if (out[1] < x$from) {
+        out[1] <- firsttick
+    } else if (reldiff > 0.2) {
+        out <- c(firsttick,out)
+        nt <- nt+1
     }
-    reldiff <- (out[1]-x$from)/(out[2]-out[1])
-    if (reldiff > 0.25) {
-        sigdig <- ceiling(1-log10(abs(1-x$from/out[1])))
-        out <- c(signif(x$from,sigdig),out)
+    reldiff <- (x$to-out[nt])/(out[nt]-out[1])
+    sigdig <- ceiling(1-log10(abs(1-out[nt]/x$to)))
+    lasttick <- signif(x$to,sigdig)
+    if (out[nt] > x$to) {
+        out[nt] <- lasttick
+    } else if (reldiff > 0.2) {
+        out <- c(out,lasttick)
     }
     out
 }
