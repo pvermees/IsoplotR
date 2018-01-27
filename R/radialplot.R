@@ -456,6 +456,8 @@ t2z <- function(tt,x,zeta,rhoD){
         out <- att(tt,zeta,rhoD)
     } else if (identical(x$transformation,'linear')){
         out <- tt
+    } else if (identical(x$transformation,'sqrt')){
+        out <- sqrt(tt)
     }
     out
 }
@@ -466,9 +468,11 @@ get.radial.tticks <- function(x){
     } else if (identical(x$transformation,'log')){
         logrange <- log10(c(x$from,x$to)+x$offset)
         out <- grDevices::axisTicks(usr=logrange,log=TRUE)-x$offset
-    } else {
+    } else if (identical(x$transformation,'arcsin')){
         logrange <- log10(c(x$from,x$to))
         out <- grDevices::axisTicks(usr=logrange,log=TRUE)
+    }  else if (identical(x$transformation,'sqrt')){
+        out <- pretty(sqrt(c(x$from,x$to)))^2
     }
     nt <- length(out)
     reldiff <- (x$to-out[nt])/(out[nt]-out[nt-1])

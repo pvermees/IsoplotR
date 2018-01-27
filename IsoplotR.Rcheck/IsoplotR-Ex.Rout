@@ -854,7 +854,7 @@ $tfact
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  13.188 10.576 11.65 0 0 
+Time elapsed:  12.744 10.832 11.289 0 0 
 > grDevices::dev.off()
 pdf 
   2 
