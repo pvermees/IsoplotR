@@ -76,16 +76,10 @@
 #' \item{disp}{a two element vector with the (over)dispersion and its
 #' corresponding \eqn{100(1-\alpha)\%} confidence interval.}
 #'
-#' \item{df}{the degrees of freedom for the Chi-square test
-#' (\eqn{n-2})}
-#'
-#' \item{tfact}{the \eqn{100(1-\alpha/2)} percentile of a
-#' t-distribution with \code{df+1} degrees of freedom}
-#'
 #' \item{mswd}{the Mean Square of the Weighted Deviates
 #' (a.k.a. `reduced Chi-square' statistic)}
 #'
-#' \item{p.value}{the p-value of a Chi-square test with \eqn{df}
+#' \item{p.value}{the p-value of a Chi-square test with \eqn{length(x)-1}
 #' degrees of freedom, testing the null hypothesis that the underlying
 #' population is not overdispersed.}
 #'
@@ -130,18 +124,7 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
                 break
         }
     }
-    fit <- get.weightedmean(X,sX,valid=valid,alpha=alpha)
-    out <- fit
-    out$mean <- rep(NA,3)
-    out$disp <- rep(NA,2)
-    names(out$mean) <- c('x','s[x]','ci[x]')
-    names(out$disp) <- c('s','ci')
-    if (out$df>0) out$tfact <- stats::qt(1-alpha/2,out$df)
-    else out$tfact <- NA
-    out$mean[c('x','s[x]')] <- fit$mean[1:2]
-    out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
-    out$disp['s'] <- fit$disp
-    out$disp['ci'] <- stats::qnorm(1-alpha/2)*fit$disp
+    out <- get.weightedmean(X,sX,valid=valid,alpha=alpha)
     ns <- length(X)
     out$plotpar <-
         list(mean=list(x=c(0,ns+1),
@@ -389,9 +372,12 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     out <- fit
     if (exterr){
         out$mean[c('x','s[x]')] <-
-            add.exterr(x,tt=fit$mean[1],st=fit$mean[2],
+            add.exterr(x,tt=fit$mean['x'],st=fit$mean['s[x]'],
                        cutoff.76=cutoff.76,type=type)
-        out$mean['ci[x]'] <- out$tfact*out$mean['s[x]']
+        if (out$model==3)
+            out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
+        else
+            out$mean['ci[x]'] <- tfact(alpha,out$df)*out$mean['s[x]']
     }
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
@@ -402,34 +388,43 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
 }
 
 get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
-    out <- list()
     x <- X[valid]
     sx <- sX[valid]
+    out <- list()
+    out$mean <- rep(NA,3)
+    out$disp <- rep(NA,2)
+    names(out$mean) <- c('x','s[x]','ci[x]')
+    names(out$disp) <- c('s','ci')
+    df <- length(x)-1 # degrees of freedom for the homogeneity test
     if (length(x)>1){
         tryCatch({
-            MZ <- c(mean(x),0)
-            fit <- stats::optim(MZ,LL.weightedmean.disp,
+            fit <- stats::optim(c(mean(x),0),LL.weightedmean.disp,
                                 gr=gr.weightedmean.disp,
                                 X=x,sX=sx,method='BFGS',hessian=TRUE,
                                 control=list(fnscale=-1))
             covmat <- solve(-fit$hessian)
-            out$mean <- c(fit$par[1],sqrt(covmat[1,1]))
-            out$disp <- sqrt(exp(fit$par[2]))
+            out$mean['x'] <- fit$par[1]
+            out$mean['s[x]'] <- sqrt(covmat[1,1])
+            out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
+            out$disp['s'] <- sqrt(exp(fit$par[2]))
+            out$disp['ci'] <- nfact(alpha)*out$disp['s']
+            out$model <- 3
         }, error = function(e) {
             M <- mean(x)
             fit <- stats::optim(M,LL.weightedmean,
                                 X=x,sX=sx,method='BFGS',hessian=TRUE,
                                 control=list(fnscale=-1))
             covmat <- solve(-fit$hessian)
-            out$mean <<- c(fit$par,sqrt(covmat))
-            out$disp <<- 0
+            out$mean['x'] <<- fit$par
+            out$mean['s[x]'] <<- sqrt(covmat)
+            out$mean['ci[x]'] <<- tfact(alpha,df)*out$mean['s[x]']
+            out$disp['s'] <<- 0
+            out$disp['ci'] <<- 0
+            out$model <- 1
         }, finally = {
             SS <- sum(((x-out$mean[1])/sx)^2)
-            # remove two degrees of freedom for mu and disp
-            out$df <- length(x)-2
-            # add one d.o.f. (disp) for homogeneity test
-            out$mswd <- SS/(out$df+1)
-            out$p.value <- 1-stats::pchisq(SS,out$df+1)
+            out$mswd <- SS/df
+            out$p.value <- 1-stats::pchisq(SS,df)
             out$valid <- valid
         })
     } else {
@@ -441,11 +436,10 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
 
 LL.weightedmean.disp <- function(MZ,X,sX){
     M <- MZ[1] # Mu (mean)
-    Z <- MZ[2]  # Zeta (log of squared overdispersion to ensure positivity)
+    Z <- MZ[2] # Zeta (log of squared overdispersion to ensure positivity)
     LL <- -0.5*log(2*pi) - 0.5*log(sX^2+exp(Z)) - 0.5*((X-M)^2)/(sX^2+exp(Z))
     sum(LL)
 }
-
 gr.weightedmean.disp <- function(MZ,X,sX){
     M <- MZ[1]
     Z <- MZ[2]
@@ -461,11 +455,13 @@ LL.weightedmean <- function(M,X,sX){
 }
 
 wtdmean.title <- function(fit,sigdig=2){
-    rounded.mean <- roundit(fit$mean[1],fit$mean[2:3],sigdig=sigdig)
+    rounded.mean <- roundit(fit$mean['x'],
+                            fit$mean[c('s[x]','ci[x]')],
+                            sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~'|'~c,
-                        list(a=rounded.mean[1],
-                             b=rounded.mean[2],
-                             c=rounded.mean[3]))
+                        list(a=rounded.mean['x'],
+                             b=rounded.mean['s[x]'],
+                             c=rounded.mean['ci[x]']))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
@@ -509,7 +505,7 @@ plot_weightedmean <- function(X,sX,fit,
 chauvenet <- function(X,sX,valid){
     fit <- get.weightedmean(X,sX,valid=valid)
     mu <- fit$mean[1]
-    sigma <- sqrt(fit$disp^2+sX^2)
+    sigma <- sqrt(fit$disp[1]^2+sX^2)
     prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
     minp <- min(prob[valid])
     imin <- which.min(sX/abs(X-mu))

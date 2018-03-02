@@ -20,8 +20,12 @@ roundit <- function(age,err,sigdig=2){
     if (is.na(sigdig)) {
         out <- dat
     } else {
-        nd <- log10(trunc(abs(dat)/min.err))+sigdig
-        out <- signif(dat,nd)
+        nd <- trunc(log10(abs(dat)/min.err))+sigdig
+        rounded <- signif(dat,nd)
+        decimals <- trunc(log10(min.err))+1-sigdig
+        if (decimals<0) nsmall <- abs(decimals)
+        else nsmall <- 0
+        out <- format(rounded,nsmall=nsmall,trim=TRUE)
     }
     out
 }
@@ -165,4 +169,11 @@ plot_points <- function(x,y,bg='white',show.numbers=FALSE,...){
     else cex <- 1.5
     if (show.numbers) graphics::text(x,y,1:length(x),cex=cex,...)
     else graphics::points(x,y,bg=bg,pch=pch,cex=cex,...)
+}
+
+nfact <- function(alpha){
+    stats::qnorm(1-alpha/2)
+}
+tfact <- function(alpha,df){
+    stats::qt(1-alpha/2,df=df)
 }
