@@ -124,17 +124,13 @@ central <- function(x,...){ UseMethod("central",x) }
 #' @rdname central
 #' @export
 central.default <- function(x,alpha=0.05,...){
-    sigma <- 0.15 # convenient starting value
     zu <- log(x[,1])
     su <- x[,2]/x[,1]
-    for (i in 1:30){ # page 100 of Galbraith (2005)
-        wu <- 1/(sigma^2+su^2)
-        mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
-        fit <- stats::optimize(eq.6.9,c(0,10),mu=mu,zu=zu,su=su)
-        sigma <- fit$minimum
-    }
-    tt <- exp(mu)
-    st <- tt/sqrt(sum(wu,na.rm=TRUE))
+    fit <- continuous_mixture(zu,su)
+    mu <- fit$mu[1]
+    sigma <- fit$sigma
+    tt <- exp(mu)    
+    st <- tt*fit$mu[2]
     Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/
         sum(1/su^2,na.rm=TRUE)
     out <- list()
@@ -323,6 +319,21 @@ augment_UThHe_err <- function(fit,doSm){
                                        cco['Th'],cco['sTh'],
                                        cco['He'],cco['sHe'])[2]
     }
+    out
+}
+
+continuous_mixture <- function(zu,su){
+    sigma <- sd(zu)
+    for (i in 1:30){ # page 100 of Galbraith (2005)
+        wu <- 1/(sigma^2+su^2)
+        mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
+        fit <- stats::optimize(eq.6.9,c(0,10*sd(zu)),mu=mu,zu=zu,su=su)
+        sigma <- fit$minimum
+    }
+    smu <- 1/sqrt(sum(wu,na.rm=TRUE))
+    out <- list()
+    out$mu <- c(mu,smu)
+    out$sigma <- sigma
     out
 }
 

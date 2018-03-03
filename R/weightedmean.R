@@ -137,9 +137,9 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
                        y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
                            rep(out$mean['x']-out$mean['ci[x]'],2))),
              dash1=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']+nfact(alpha)*out$disp['s'],2)),
+                        y=rep(out$mean['x']+nfact(alpha)*out$disp['w'],2)),
              dash2=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']-nfact(alpha)*out$disp['s'],2))
+                        y=rep(out$mean['x']-nfact(alpha)*out$disp['w'],2))
              )
     if (plot){
         plot_weightedmean(X,sX,out,rect.col=rect.col,
@@ -378,10 +378,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
         out$mean[c('x','s[x]')] <-
             add.exterr(x,tt=fit$mean['x'],st=fit$mean['s[x]'],
                        cutoff.76=cutoff.76,type=type)
-        if (out$model==3)
-            out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
-        else
-            out$mean['ci[x]'] <- tfact(alpha,out$df)*out$mean['s[x]']
+        out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
     }
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
@@ -396,41 +393,22 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
     sx <- sX[valid]
     out <- list()
     out$mean <- rep(NA,3)
-    out$disp <- rep(NA,2)
+    out$disp <- rep(NA,3)
     out$df <- length(x)-1 # degrees of freedom for the homogeneity test
     names(out$mean) <- c('x','s[x]','ci[x]')
-    names(out$disp) <- c('s','ci')
+    names(out$disp) <- c('w','cl','cu')    
     if (length(x)>1){
-        tryCatch({
-            fit <- stats::optim(c(mean(x),0),LL.weightedmean.disp,
-                                gr=gr.weightedmean.disp,
-                                X=x,sX=sx,method='BFGS',hessian=TRUE,
-                                control=list(fnscale=-1))
-            covmat <- solve(-fit$hessian)
-            out$mean['x'] <- fit$par[1]
-            out$mean['s[x]'] <- sqrt(covmat[1,1])
-            out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
-            out$disp['s'] <- sqrt(exp(fit$par[2]))
-            out$disp['ci'] <- nfact(alpha)*out$disp['s']
-            out$model <- 3
-        }, error = function(e) {
-            M <- mean(x)
-            fit <- stats::optim(M,LL.weightedmean,
-                                X=x,sX=sx,method='BFGS',hessian=TRUE,
-                                control=list(fnscale=-1))
-            covmat <- solve(-fit$hessian)
-            out$mean['x'] <<- fit$par
-            out$mean['s[x]'] <<- sqrt(covmat)
-            out$mean['ci[x]'] <<- tfact(alpha,out$df)*out$mean['s[x]']
-            out$disp['s'] <<- 0
-            out$disp['ci'] <<- 0
-            out$model <- 1
-        }, finally = {
-            SS <- sum(((x-out$mean[1])/sx)^2)
-            out$mswd <- SS/out$df
-            out$p.value <- 1-stats::pchisq(SS,out$df)
-            out$valid <- valid
-        })
+        fit <- continuous_mixture(x,sx)
+        out$mean['x'] <- fit$mu[1]
+        out$mean['s[x]'] <- fit$mu[2]
+        out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
+        out$disp['w'] <- fit$sigma
+        out$disp[c('cl','cu')] <-
+            profile_LL_weightedmean_disp(fit,x,sx,alpha)
+        SS <- sum(((x-out$mean['x'])/sx)^2)
+        out$mswd <- SS/out$df
+        out$p.value <- 1-stats::pchisq(SS,out$df)
+        out$valid <- valid
     } else {
         out$mean <- x
         out$p.value <- 0
@@ -438,29 +416,12 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
     out
 }
 
-LL.weightedmean.disp <- function(MZ,X,sX){
-    M <- MZ[1] # Mu (mean)
-    Z <- MZ[2] # Zeta (log of squared overdispersion to ensure positivity)
-    LL <- -0.5*log(2*pi) - 0.5*log(sX^2+exp(Z)) - 0.5*((X-M)^2)/(sX^2+exp(Z))
-    sum(LL)
-}
-gr.weightedmean.disp <- function(MZ,X,sX){
-    M <- MZ[1]
-    Z <- MZ[2]
-    dLL.dmu <- (X-M)/(sX^2+exp(Z))
-    dLL.dZ <- -0.5*exp(Z)/(sX^2+exp(Z)) +
-        0.5*(exp(Z)*(X-M)^2)/((sX^2+exp(Z))^2)
-    c(sum(dLL.dmu),sum(dLL.dZ))
-}
-
-LL.weightedmean <- function(M,X,sX){
-    LL <- -0.5*log(2*pi) - 0.5*log(sX^2) - 0.5*((X-M)^2)/(sX^2)
-    sum(LL)
-}
-
 wtdmean.title <- function(fit,sigdig=2){
     rounded.mean <- roundit(fit$mean['x'],
                             fit$mean[c('s[x]','ci[x]')],
+                            sigdig=sigdig)
+    rounded.disp <- roundit(fit$disp['w'],
+                            fit$disp[c('cl','cu')],
                             sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~'|'~c,
                         list(a=rounded.mean['x'],
@@ -469,9 +430,10 @@ wtdmean.title <- function(fit,sigdig=2){
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('dispersion ='~a~'|'~b,
-                        list(a=signif(fit$disp['s'],sigdig),
-                             b=signif(fit$disp['ci'],sigdig)))
+    line3 <- substitute('dispersion ='~a~'+'~b~'/-'~c,
+                        list(a=rounded.disp['w'],
+                             b=rounded.disp['cu'],
+                             c=rounded.disp['cl']))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)
@@ -483,8 +445,8 @@ plot_weightedmean <- function(X,sX,fit,
                               sigdig=2,alpha=0.05){
     ns <- length(X)
     fact <- nfact(alpha)
-    minX <- min(c(X-fact*sX,X-fact*fit$disp['s']),na.rm=TRUE)
-    maxX <- max(c(X+fact*sX,X+fact*fit$disp['s']),na.rm=TRUE)
+    minX <- min(c(X-fact*sX,X-fact*fit$disp['w']),na.rm=TRUE)
+    maxX <- max(c(X+fact*sX,X+fact*fit$disp['w']),na.rm=TRUE)
     graphics::plot(c(0,ns+1),c(minX,maxX),type='n',
                    axes=FALSE,xlab='N',ylab='')
     graphics::polygon(fit$plotpar$rect,col='gray80',border=NA)
