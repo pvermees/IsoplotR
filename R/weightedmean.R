@@ -66,10 +66,10 @@
 #'
 #' \code{x}: the weighted mean
 #'
-#' \code{s[x]}: the estimated analytical uncertainty of \code{x}
+#' \code{s[x]}: the standard error of the weighted mean
 #'
-#' \code{ci[x]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{x}.
+#' \code{ci[x]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{x}
 #'
 #' }
 #'
@@ -79,7 +79,11 @@
 #' \item{mswd}{the Mean Square of the Weighted Deviates
 #' (a.k.a. `reduced Chi-square' statistic)}
 #'
-#' \item{p.value}{the p-value of a Chi-square test with \eqn{length(x)-1}
+#' \item{df}{the number of degrees of freedom of the Chi-square test
+#' for homogeneity (\eqn{df=n-1}, where \eqn{n} is the number of
+#' samples).}
+#'
+#' \item{p.value}{the p-value of a Chi-square test with \eqn{df}
 #' degrees of freedom, testing the null hypothesis that the underlying
 #' population is not overdispersed.}
 #'
@@ -133,9 +137,9 @@ weightedmean.default <- function(x,detect.outliers=TRUE,plot=TRUE,
                        y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
                            rep(out$mean['x']-out$mean['ci[x]'],2))),
              dash1=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']+out$disp['ci'],2)),
+                        y=rep(out$mean['x']+nfact(alpha)*out$disp['s'],2)),
              dash2=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']-out$disp['ci'],2))
+                        y=rep(out$mean['x']-nfact(alpha)*out$disp['s'],2))
              )
     if (plot){
         plot_weightedmean(X,sX,out,rect.col=rect.col,
@@ -393,9 +397,9 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
     out <- list()
     out$mean <- rep(NA,3)
     out$disp <- rep(NA,2)
+    out$df <- length(x)-1 # degrees of freedom for the homogeneity test
     names(out$mean) <- c('x','s[x]','ci[x]')
     names(out$disp) <- c('s','ci')
-    df <- length(x)-1 # degrees of freedom for the homogeneity test
     if (length(x)>1){
         tryCatch({
             fit <- stats::optim(c(mean(x),0),LL.weightedmean.disp,
@@ -417,14 +421,14 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
             covmat <- solve(-fit$hessian)
             out$mean['x'] <<- fit$par
             out$mean['s[x]'] <<- sqrt(covmat)
-            out$mean['ci[x]'] <<- tfact(alpha,df)*out$mean['s[x]']
+            out$mean['ci[x]'] <<- tfact(alpha,out$df)*out$mean['s[x]']
             out$disp['s'] <<- 0
             out$disp['ci'] <<- 0
             out$model <- 1
         }, finally = {
             SS <- sum(((x-out$mean[1])/sx)^2)
-            out$mswd <- SS/df
-            out$p.value <- 1-stats::pchisq(SS,df)
+            out$mswd <- SS/out$df
+            out$p.value <- 1-stats::pchisq(SS,out$df)
             out$valid <- valid
         })
     } else {
@@ -478,9 +482,9 @@ plot_weightedmean <- function(X,sX,fit,
                               outlier.col=grDevices::rgb(0,1,1,0.5),
                               sigdig=2,alpha=0.05){
     ns <- length(X)
-    fact <- stats::qnorm(1-alpha/2)
-    minX <- min(X-fact*sX,na.rm=TRUE)
-    maxX <- max(X+fact*sX,na.rm=TRUE)
+    fact <- nfact(alpha)
+    minX <- min(c(X-fact*sX,X-fact*fit$disp['s']),na.rm=TRUE)
+    maxX <- max(c(X+fact*sX,X+fact*fit$disp['s']),na.rm=TRUE)
     graphics::plot(c(0,ns+1),c(minX,maxX),type='n',
                    axes=FALSE,xlab='N',ylab='')
     graphics::polygon(fit$plotpar$rect,col='gray80',border=NA)

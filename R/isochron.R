@@ -177,7 +177,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model!=2),show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                a=fit$a[1], b=fit$b[1],line.col=line.col,lwd=lwd)
+                a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
         graphics::title(isochrontitle(out,sigdig=sigdig),xlab='X',ylab='Y')
 }
@@ -385,14 +385,16 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         y.lab <- expression(paste(""^"40","Ar/"^"36","Ar"))
     }
     out$age[c('t','s[t]')] <-
-        get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
-    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+        get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)    
+    if (model < 3) fact <- tfact(alpha,out$df)
+    else fact <- nfact(alpha)
+    out$y0['ci[y]'] <- fact*out$y0['s[y]']
+    out$age['ci[t]'] <- fact*out$age['s[t]']
     if (model==1){
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
         out$age['disp[t]'] <-
-            out$tfact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
-                                   x$J[1],x$J[2],exterr=exterr)[2]
+            fact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
+                              x$J[1],x$J[2],exterr=exterr)[2]
     }
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
