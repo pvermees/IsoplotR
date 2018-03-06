@@ -4,6 +4,7 @@ regression <- function(d,model=1,type='york'){
     else if (model==3) out <- model3regression(d,type=type)
     else stop('invalid regression model')
     out$model <- model
+    out$d <- d
     out
 }
 
@@ -48,16 +49,14 @@ model2regression <- function(d,type='york'){
 model3regression <- function(d,type='york'){
     out <- list()
     if (identical(type,'york')){
-        init <- york(d)
         out$w <- stats::optimize(york_disp_misfit,
-                                 interval=c(0,init$mswd),
+                                 interval=c(0,sd(d[,'Y'])),
                                  d=d)$minimum
         dd <- augment_york_errors(d,out$w)
         out <- c(out,york(dd))
     } else if (identical(type,'titterington')){
-        init <- titterington(d)
         out$w <- stats::optimize(titterington_disp_misfit,
-                                 interval=c(0,init$mswd),
+                                 interval=c(0,sd(d[,'Y'])),
                                  d=d)$minimum
         dd <- augment_titterington_errors(d,out$w)
         out <- c(out,titterington(dd))
@@ -67,12 +66,12 @@ model3regression <- function(d,type='york'){
     out
 }
 
-york_disp_misfit <- function(w2,d){
-    dd <- augment_york_errors(d,w2)
+york_disp_misfit <- function(w,d){
+    dd <- augment_york_errors(d,w)
     abs(york(dd)$mswd - 1)
 }
-titterington_disp_misfit <- function(w2,d){
-    dd <- augment_titterington_errors(d,w2)
+titterington_disp_misfit <- function(w,d){
+    dd <- augment_titterington_errors(d,w)
     abs(titterington(dd)$mswd - 1)
 }
 

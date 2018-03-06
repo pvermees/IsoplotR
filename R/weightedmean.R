@@ -396,14 +396,14 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
     out$disp <- rep(NA,3)
     out$df <- length(x)-1 # degrees of freedom for the homogeneity test
     names(out$mean) <- c('x','s[x]','ci[x]')
-    names(out$disp) <- c('w','cl','cu')    
+    names(out$disp) <- c('w','ll','ul')    
     if (length(x)>1){
         fit <- continuous_mixture(x,sx)
         out$mean['x'] <- fit$mu[1]
         out$mean['s[x]'] <- fit$mu[2]
         out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
         out$disp['w'] <- fit$sigma
-        out$disp[c('cl','cu')] <-
+        out$disp[c('ll','ul')] <-
             profile_LL_weightedmean_disp(fit,x,sx,alpha)
         SS <- sum(((x-out$mean['x'])/sx)^2)
         out$mswd <- SS/out$df
@@ -421,7 +421,7 @@ wtdmean.title <- function(fit,sigdig=2){
                             fit$mean[c('s[x]','ci[x]')],
                             sigdig=sigdig)
     rounded.disp <- roundit(fit$disp['w'],
-                            fit$disp[c('cl','cu')],
+                            fit$disp[c('ll','ul')],
                             sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~'|'~c,
                         list(a=rounded.mean['x'],
@@ -430,10 +430,10 @@ wtdmean.title <- function(fit,sigdig=2){
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('dispersion ='~a~'+'~b~'/-'~c,
+    line3 <- substitute('dispersion ='~a+b/-c,
                         list(a=rounded.disp['w'],
-                             b=rounded.disp['cu'],
-                             c=rounded.disp['cl']))
+                             b=rounded.disp['ll'],
+                             c=rounded.disp['ul']))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)

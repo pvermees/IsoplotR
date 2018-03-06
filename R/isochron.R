@@ -172,14 +172,13 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              line.col='red',lwd=2,title=TRUE,model=1,...){
     X <- subset(x,select=1:5)
     colnames(X) <- c('X','sX','Y','sY','rXY')
-    fit <- regression(X,model=model)
-    out <- regression_init(fit,alpha=alpha)
+    fit <- regression_init(X,model=model,alpha=alpha)
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model!=2),show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
-        graphics::title(isochrontitle(out,sigdig=sigdig),xlab='X',ylab='Y')
+        graphics::title(isochrontitle(fit,sigdig=sigdig),xlab='X',ylab='Y')
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
 #'
@@ -362,16 +361,14 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,model=1,...){
-    d <- data2york(x,inverse=inverse)
-    fit <- regression(d,model=model)
-    out <- isochron_init(fit,alpha=alpha)
-    a <- fit$a['a']
-    sa <- fit$a['s[a]']
-    b <- fit$b['b']
-    sb <- fit$b['s[b]']
+    out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
+    a <- out$a['a']
+    sa <- out$a['s[a]']
+    b <- out$b['b']
+    sb <- out$b['s[b]']
     if (inverse) {
         R09 <- -b/a
-        sR09 <- R09*sqrt((sa/a)^2+(sb/b)^2-2*sa*sb*fit$cov.ab)
+        sR09 <- R09*sqrt((sa/a)^2+(sb/b)^2-2*sa*sb*out$cov.ab)
         out$y0['y'] <- 1/a
         out$y0['s[y]'] <- sa/a^2
         x.lab <- expression(paste(""^"39","Ar/"^"40","Ar"))
@@ -385,23 +382,19 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         y.lab <- expression(paste(""^"40","Ar/"^"36","Ar"))
     }
     out$age[c('t','s[t]')] <-
-        get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)    
-    if (model < 3) fact <- tfact(alpha,out$df)
-    else fact <- nfact(alpha)
-    out$y0['ci[y]'] <- fact*out$y0['s[y]']
-    out$age['ci[t]'] <- fact*out$age['s[t]']
+        get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
+    out <- ci_isochron(out,model=model,alpha=alpha)
     if (model==1){
-        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
         out$age['disp[t]'] <-
-            fact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
-                              x$J[1],x$J[2],exterr=exterr)[2]
+            out$fact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
+                                  x$J[1],x$J[2],exterr=exterr)[2]
     }
     if (plot) {
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,a=fit$a[1],
-                    b=fit$b[1],line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
+                    b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -414,36 +407,32 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
                           exterr=TRUE,model=1,...){
-    d <- data2york(x,inverse=inverse)
-    fit <- regression(d,model=model)
-    out <- isochron_init(fit,alpha=alpha)
+    out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
     if (inverse){
-        R76 <- fit$a
-        out$y0[c('y','s[y]')] <- fit$b
+        R76 <- out$a
+        out$y0[c('y','s[y]')] <- out$b
         x.lab <- expression(paste(""^"204","Pb/"^"206","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
     } else {
-        R76 <- fit$b
-        out$y0[c('y','s[y]')] <- fit$a
+        R76 <- out$b
+        out$y0[c('y','s[y]')] <- out$a
         x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
     }
     out$age[c('t','s[t]')] <-
         get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
-    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+    out <- ci_isochron(out,model=model,alpha=alpha)
     if (model==1){
-        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
         out$age['disp[t]'] <-
-            out$tfact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
-                                         exterr=exterr)[2]
+            out$fact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
+                                        exterr=exterr)[2]
     }
     if (plot) {
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,a=fit$a[1],
-                    b=fit$b[1],line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
+                    b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -551,21 +540,16 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
 isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                            show.numbers=FALSE,line.col='red',lwd=2,
                            plot=TRUE,model=1,...){
-    d <- data2york(x)
-    fit <- regression(d,model=model)
-    out <- isochron_init(fit,alpha=alpha)
-    out$y0[c('y','s[y]')] <- fit$a
-    out$age[c('t','s[t]')] <- fit$b
-    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
-    if (model==1){
-        out$y0['disp[y]'] <- out$tfact*sqrt(out$mswd)*out$y0['s[y]']
-        out$age['disp[t]'] <- out$tfact*sqrt(out$mswd)*out$age['s[t]']
-    }
+    out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
+    out$y0[c('y','s[y]')] <- out$a
+    out$age[c('t','s[t]')] <- out$b
+    out <- ci_isochron(out,model=model,alpha=alpha)
+    if (model==1)
+        out$age['disp[t]'] <- out$fact*sqrt(out$mswd)*out$age['s[t]']
     if (plot) {
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=2*(model!=2),show.numbers=show.numbers,
-                    a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd,...)
+                    a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
                         xlab="P",ylab="He")
     }
@@ -611,68 +595,60 @@ isochron_ThU_3D <- function(x,type=2,model=1,
         xlab <- expression(paste(""^"232","Th/"^"238","U"))
         ylab <- expression(paste(""^"234","U/"^"238","U"))
     }
-    d <- data2tit(x,osmond=osmond)
-    fit <- regression(d,model=model,type="titterington")
-    out <- isochron_init(fit,alpha=alpha)
-    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
-    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
-    out$cov.ab <- fit$cov[ia,ib]
-    tst <- get.ThU.age(fit$par[i08],sqrt(fit$cov[i08,i08]),
-                       fit$par[i48],sqrt(fit$cov[i48,i48]),
-                       fit$cov[i48,i08],exterr=exterr)
+    out <- isochron_init(x,model=model,alpha=alpha,osmond=osmond)
+    out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
+    out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
+    out$cov.ab <- out$cov[ia,ib]
+    tst <- get.ThU.age(out$par[i08],sqrt(out$cov[i08,i08]),
+                       out$par[i48],sqrt(out$cov[i48,i48]),
+                       out$cov[i48,i08],exterr=exterr)
     out$age['t'] <- tst['t']
     out$y0['y'] <- tst['48_0']
     out$age['s[t]'] <- tst['s[t]']
     out$y0['s[y]'] <- tst['s[48_0]']
-    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
-    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    if (model==1 && fit$mswd>1){
-        tdispt <- get.ThU.age(fit$par[i08],
-                              sqrt(out$mswd)*sqrt(fit$cov[i08,i08]),
-                              fit$par[i48],
-                              sqrt(out$mswd)*sqrt(fit$cov[i48,i48]),
-                              out$mswd*fit$cov[i48,i08],
+    out <- ci_isochron(out,model=model,alpha=alpha,disp=FALSE)
+    if (model==1 && out$mswd>1){
+        tdispt <- get.ThU.age(out$par[i08],
+                              sqrt(out$mswd)*sqrt(out$cov[i08,i08]),
+                              out$par[i48],
+                              sqrt(out$mswd)*sqrt(out$cov[i48,i48]),
+                              out$mswd*out$cov[i48,i08],
                               exterr=exterr)
-        out$age['disp[t]'] <- out$tfact*tdispt['s[t]']
-        out$y0['disp[y]'] <- out$tfact*tdispt['s[48_0]']
+        out$age['disp[t]'] <- out$fact*tdispt['s[t]']
+        out$y0['disp[y]'] <- out$fact*tdispt['s[48_0]']
     }
     out$xlab <- xlab
     out$ylab <- ylab
-    out$d <- subset(d,select=id)
+    out$d <- subset(out$d,select=id)
     out
 }
 isochron_ThU_2D <- function(x,type=2,model=1,
                             exterr=TRUE,alpha=0.05){
-    d <- data2york(x,type=type)
-    fit <- regression(d,model=model,type="york")
+    out <- isochron_init(x,model=model,type=type,alpha=alpha)
     if (type==1){
-        Th230U238 <- fit$b
-        Th230Th232 <- fit$a
+        Th230U238 <- out$b
+        Th230Th232 <- out$a
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
     } else if (type==2) {
-        Th230U238 <- fit$a
-        Th230Th232 <- fit$b
+        Th230U238 <- out$a
+        Th230Th232 <- out$b
         xlab <- expression(paste(""^"232","Th/"^"238","U"))
         ylab <- expression(paste(""^"230","Th/"^"238","U"))
     }
-    out <- isochron_init(fit,alpha=alpha)
     out$age[c('t','s[t]')] <-
         get.ThU.age(Th230U238[1],Th230U238[2],
                     exterr=exterr)[c('t','s[t]')]
     out$y0[c('y','s[y]')] <-
         get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
-    out$age['ci[t]'] <-
-        out$tfact*out$age['s[t]']
-    out$y0['ci[y]'] <-
-        out$tfact*out$y0['s[y]']
+    out <- ci_isochron(out,model=model,alpha=alpha,disp=FALSE)
     if (model==1 && out$mswd>1){
         out$age['disp[t]'] <-
-            out$tfact*get.ThU.age(Th230U238[1],
+            out$fact*get.ThU.age(Th230U238[1],
                                   sqrt(out$mswd)*Th230U238[2],
                                   exterr=exterr)['s[t]']
         out$y0['disp[y]'] <-
-            out$tfact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
+            out$fact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
                                         sqrt(out$mswd)*Th230Th232[2])[2]
     }
     out$xlab <- xlab
@@ -699,36 +675,44 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
         x.lab <- expression(paste(""^"176","Lu/"^"177","Hf"))
         y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
     }
-    d <- data2york(x,exterr=exterr,common=FALSE)
-    fit <- regression(d,model=model)
-    out <- isochron_init(fit,alpha=alpha)
-    out$y0[c('y','s[y]')] <- fit$a
-    out$age[c('t','s[t]')] <- get.PD.age(fit$b['b'],
-                   fit$b['s[b]'],nuclide,exterr=exterr)
-    out$y0['ci[y]'] <- out$tfact*out$y0['s[y]']
-    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+    out <- isochron_init(x,model=model,exterr=exterr,alpha=alpha)
+    out$y0[c('y','s[y]')] <- out$a
+    out$age[c('t','s[t]')] <- get.PD.age(out$b['b'],out$b['s[b]'],
+                                         nuclide,exterr=exterr)
+    out <- ci_isochron(out,model=model,alpha=alpha)
     if (model==1){
-        out$y0['disp[y]'] <- out$tfact*sqrt(out$mswd)*out$y0['s[y]']
-        out$age['disp[t]'] <- out$tfact*get.PD.age(fit$b['b'],
-                              sqrt(out$mswd)*fit$b['s[b]'],
-                              nuclide,exterr=exterr)[2]
+        out$age['disp[t]'] <- out$fact*get.PD.age(out$b['b'],
+                              sqrt(out$mswd)*out$b['s[b]'],
+                              nuclide,exterr=exterr)[2]        
     }
     if (plot){
-        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,a=fit$a[1],
-                    b=fit$b[1],line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
+                    b=out$b[1],line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
                         xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
 }
 
-isochron_init <- function(fit,alpha=0.05){
-    out <- fit
-    out$tfact <- stats::qt(1-alpha/2,out$df)
-    if (fit$model==1){
+isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
+                          osmond=NA,type=2,exterr=TRUE){
+    if (hasClass(x,'ThU') & !is.na(osmond)){ # 3D regression 
+        d <- data2tit(x,osmond=osmond)
+        out <- regression(d,model=model,type="titterington")
+    } else if (hasClass(x,'ThU') & is.na(osmond)){ # 2D regression
+        d <- data2york(x,type=type)
+        out <- regression(model=model,type="york")
+    } else if (hasClass(x,'PD')){
+        d <- data2york(x,exterr=exterr,common=FALSE)
+        out <- regression(d,model=model)
+    } else {
+        d <- data2york(x,inverse=inverse)
+        out <- regression(d,model=model)
+    }
+    if (model==1){
         out$age <- rep(NA,4)
         out$y0 <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
@@ -739,17 +723,19 @@ isochron_init <- function(fit,alpha=0.05){
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$y0) <- c('y','s[y]','ci[y]')
     }
-    if (fit$model==3){
-        out$w <- c(fit$w,fit$w*stats::qnorm(1-alpha/2))
-        names(out$w) <- c('s','ci')
+    if (out$model < 3){
+        out$fact <- tfact(alpha,out$df)
+    } else {
+        out$fact <- nfact(alpha)
+        out$w <- c(out$w,NA,NA)
+        names(out$w) <- c('s','ll','ul')
     }
     class(out) <- "isochron"
     out
 }
-regression_init <- function(fit,alpha=0.05){
-    out <- fit
-    out$tfact <- stats::qt(1-alpha/2,out$df)
-    if (fit$model==1){
+regression_init <- function(X,model=model,alpha=0.05){
+    out <- regression(X,model=model)
+    if (model==1){
         out$a <- rep(NA,4)
         out$b <- rep(NA,4)
         names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
@@ -760,16 +746,13 @@ regression_init <- function(fit,alpha=0.05){
         names(out$a) <- c('a','s[a]','ci[a]')
         names(out$b) <- c('b','s[b]','ci[b]')
     }
-    out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
-    out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
-    out$a['ci[a]'] <- out$tfact*fit$a['s[a]']
-    out$b['ci[b]'] <- out$tfact*fit$b['s[b]']
-    if (fit$model==1){
-        out$a['disp[a]'] <- out$tfact*sqrt(fit$mswd)*fit$a['s[a]']
-        out$b['disp[b]'] <- out$tfact*sqrt(fit$mswd)*fit$b['s[b]']
-    } else if (fit$model==3){
-        out$w <- c(fit$w,stats::qnorm(1-alpha/2))
-        names(out$w) <- c('s','ci')
+    out$a[c('a','s[a]')] <- out$a[c('a','s[a]')]
+    out$b[c('b','s[b]')] <- out$b[c('b','s[b]')]
+    out$a['ci[a]'] <- out$tfact*out$a['s[a]']
+    out$b['ci[b]'] <- out$tfact*out$b['s[b]']
+    if (out$model==1){
+        out$a['disp[a]'] <- out$tfact*sqrt(out$mswd)*out$a['s[a]']
+        out$b['disp[b]'] <- out$tfact*sqrt(out$mswd)*out$b['s[b]']
     }
     class(out) <- "isochron"
     out
@@ -841,9 +824,9 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         graphics::mtext(line2,line=0)
     } else if (fit$model==3){
         rounded.disp <- signif(fit$w,sigdig)
-        list3 <- list(a=rounded.disp[1],b=rounded.disp[2])
+        list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
         expr3 <- quote('y-dispersion =')
-        args3 <- quote(a~'|'~b)
+        args3 <- quote(a+b/-c)
         call3 <- substitute(e~a,list(e=expr3,a=args3))
         line3 <- do.call(substitute,list(eval(call3),list3))
         graphics::mtext(line1,line=2)
