@@ -371,16 +371,19 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         sR09 <- R09*sqrt((sa/a)^2+(sb/b)^2-2*sa*sb*out$cov.ab)
         out$y0['y'] <- 1/a
         out$y0['s[y]'] <- sa/a^2
-        x.lab <- expression(paste(""^"39","Ar/"^"40","Ar"))
-        y.lab <- expression(paste(""^"36","Ar/"^"40","Ar"))
+        x.lab <- quote(''^39*'Ar/'^40*'Ar')
+        y.lab <- quote(''^36*'Ar/'^40*'Ar')
     } else {
         R09 <- b
         sR09 <- sb
         out$y0['y'] <- a
         out$y0['s[y]'] <- sa
-        x.lab <- expression(paste(""^"39","Ar/"^"36","Ar"))
-        y.lab <- expression(paste(""^"40","Ar/"^"36","Ar"))
+        x.lab <- quote(''^39*'Ar/'^36*'Ar')
+        y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
+    out$displabel <-
+        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
+    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[o]*' = ')
     out$age[c('t','s[t]')] <-
         get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     out <- ci_isochron(out,model=model,alpha=alpha)
@@ -411,14 +414,17 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     if (inverse){
         R76 <- out$a
         out$y0[c('y','s[y]')] <- out$b
-        x.lab <- expression(paste(""^"204","Pb/"^"206","Pb"))
-        y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
+        x.lab <- quote(''^204*'Pb/'^206*'Pb')
+        y.lab <- quote(''^207*'Pb/'^206*'Pb')
     } else {
         R76 <- out$b
         out$y0[c('y','s[y]')] <- out$a
-        x.lab <- expression(paste(""^"206","Pb/"^"204","Pb"))
-        y.lab <- expression(paste(""^"207","Pb/"^"204","Pb"))
+        x.lab <- quote(''^206*'Pb/'^204*'Pb')
+        y.lab <- quote(''^207*'Pb/'^204*'Pb')
     }
+    out$displabel <-
+        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
+    out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*' = ')
     out$age[c('t','s[t]')] <-
         get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
     out <- ci_isochron(out,model=model,alpha=alpha)
@@ -524,6 +530,11 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                                exterr=exterr,alpha=alpha)
         intercept.type <- 'Th-U-2D'
     }
+    if (type %in% c(1,3)){
+        out$displabel <- quote('('^234*'U/'^232*'Th)-dispersion = ')
+    } else if (type %in% c(2,4)){
+        out$displabel <- quote('('^234*'U/'^238*'U)-dispersion = ')
+    }
     if (plot){
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
@@ -546,6 +557,8 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out <- ci_isochron(out,model=model,alpha=alpha)
     if (model==1)
         out$age['disp[t]'] <- out$fact*sqrt(out$mswd)*out$age['s[t]']
+    out$displabel <- quote('He-dispersion = ')
+    out$y0label <- quote('He'[o]*' = ')
     if (plot) {
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=2*(model!=2),show.numbers=show.numbers,
@@ -565,8 +578,8 @@ isochron_ThU_3D <- function(x,type=2,model=1,
         i48 <- 'b'
         i08 <- 'B'
         id <- c('X','sX','Y','sY','rXY')
-        xlab <- expression(paste(""^"238","U/"^"232","Th"))
-        ylab <- expression(paste(""^"230","Th/"^"232","Th"))
+        x.lab <- quote(''^238*'U/'^232*'Th')
+        y.lab <- quote(''^230*'Th/'^232*'Th')
     } else if (type == 2){
         osmond <- TRUE
         ia <- 'A'
@@ -574,8 +587,8 @@ isochron_ThU_3D <- function(x,type=2,model=1,
         i48 <- 'a'
         i08 <- 'A'
         id <- c('X','sX','Z','sZ','rXZ')
-        xlab <- expression(paste(""^"232","Th/"^"238","U"))
-        ylab <- expression(paste(""^"230","Th/"^"238","U"))
+        x.lab <- quote(''^232*'Th/'^238*'U')
+        y.lab <- quote(''^230*'Th/'^238*'U')
     } else if (type == 3){
         osmond <- FALSE
         ia <- 'A'
@@ -583,8 +596,8 @@ isochron_ThU_3D <- function(x,type=2,model=1,
         i48 <- 'b'
         i08 <- 'B'
         id <- c('X','sX','Z','sZ','rXZ')
-        xlab <- expression(paste(""^"238","U/"^"232","Th"))
-        ylab <- expression(paste(""^"234","U/"^"232","Th"))
+        x.lab <- quote(''^238*'U/'^232*'Th')
+        y.lab <- quote(''^234*'U/'^232*'Th')
     } else {
         osmond <- TRUE
         ia <- 'a'
@@ -592,8 +605,8 @@ isochron_ThU_3D <- function(x,type=2,model=1,
         i48 <- 'a'
         i08 <- 'A'
         id <- c('X','sX','Y','sY','rXY')
-        xlab <- expression(paste(""^"232","Th/"^"238","U"))
-        ylab <- expression(paste(""^"234","U/"^"238","U"))
+        x.lab <- quote(''^232*'Th/'^238*'U')
+        y.lab <- quote(''^234*'U/'^238*'U')
     }
     out <- isochron_init(x,model=model,alpha=alpha,osmond=osmond)
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
@@ -606,6 +619,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,
     out$y0['y'] <- tst['48_0']
     out$age['s[t]'] <- tst['s[t]']
     out$y0['s[y]'] <- tst['s[48_0]']
+    out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
     out <- ci_isochron(out,model=model,alpha=alpha,disp=FALSE)
     if (model==1 && out$mswd>1){
         tdispt <- get.ThU.age(out$par[i08],
@@ -617,8 +631,8 @@ isochron_ThU_3D <- function(x,type=2,model=1,
         out$age['disp[t]'] <- out$fact*tdispt['s[t]']
         out$y0['disp[y]'] <- out$fact*tdispt['s[48_0]']
     }
-    out$xlab <- xlab
-    out$ylab <- ylab
+    out$xlab <- x.lab
+    out$ylab <- y.lab
     out$d <- subset(out$d,select=id)
     out
 }
@@ -628,13 +642,13 @@ isochron_ThU_2D <- function(x,type=2,model=1,
     if (type==1){
         Th230U238 <- out$b
         Th230Th232 <- out$a
-        xlab <- expression(paste(""^"238","U/"^"232","Th"))
-        ylab <- expression(paste(""^"230","Th/"^"232","Th"))
+        x.lab <- quote(''^238*'U/'^232*'Th')
+        y.lab <- quote(''^230*'Th/'^232*'Th')
     } else if (type==2) {
         Th230U238 <- out$a
         Th230Th232 <- out$b
-        xlab <- expression(paste(""^"232","Th/"^"238","U"))
-        ylab <- expression(paste(""^"230","Th/"^"238","U"))
+        x.lab <- quote(''^232*'Th/'^238*'U')
+        y.lab <- quote(''^230*'Th/'^238*'U')
     }
     out$age[c('t','s[t]')] <-
         get.ThU.age(Th230U238[1],Th230U238[2],
@@ -651,9 +665,8 @@ isochron_ThU_2D <- function(x,type=2,model=1,
             out$fact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
                                         sqrt(out$mswd)*Th230Th232[2])[2]
     }
-    out$xlab <- xlab
-    out$ylab <- ylab
-    out$d <- d
+    out$xlab <- x.lab
+    out$ylab <- y.lab
     out
 }
 
@@ -662,19 +675,6 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
                         model=1,...){
-    if (identical(nuclide,'Sm147')){
-        x.lab <- expression(paste(""^"147","Sm/"^"144","Nd"))
-        y.lab <- expression(paste(""^"143","Nd/"^"144","Nd"))
-    } else if (identical(nuclide,'Re187')){
-        x.lab <- expression(paste(""^"187","Re/"^"188","Os"))
-        y.lab <- expression(paste(""^"187","Os/"^"188","Os"))
-    } else if (identical(nuclide,'Rb87')){
-        x.lab <- expression(paste(""^"87","Rb/"^"86","Sr"))
-        y.lab <- expression(paste(""^"87","Sr/"^"86","Sr"))
-    } else if (identical(nuclide,'Lu176')){
-        x.lab <- expression(paste(""^"176","Lu/"^"177","Hf"))
-        y.lab <- expression(paste(""^"176","Hf/"^"177","Hf"))
-    }
     out <- isochron_init(x,model=model,exterr=exterr,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- get.PD.age(out$b['b'],out$b['s[b]'],
@@ -685,6 +685,23 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                               sqrt(out$mswd)*out$b['s[b]'],
                               nuclide,exterr=exterr)[2]        
     }
+    if (identical(nuclide,'Sm147')){
+        x.lab <- quote(''^147*'Sm/'^144*'Nd')
+        y.lab <- quote(''^143*'Sm/'^144*'Nd')
+    } else if (identical(nuclide,'Re187')){
+        x.lab <- quote(''^187*'Re/'^188*'Os')
+        y.lab <- quote(''^187*'Os/'^188*'Os')
+    } else if (identical(nuclide,'Rb87')){
+        x.lab <- quote(''^87*'Rb/'^86*'Sr')
+        y.lab <- quote(''^87*'Sr/'^86*'Sr')
+    } else if (identical(nuclide,'Lu176')){
+        x.lab <- quote(''^176*'Lu/'^177*'Hf')
+        y.lab <- quote(''^176*'Lu/'^177*'Hf')
+    }
+    out$displabel <-
+        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
+    out$y0label <-
+        substitute(a*b*c,list(a='(',b=y.lab,c=quote(')'[o]*' = ')))
     if (plot){
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
@@ -704,7 +721,7 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
         out <- regression(d,model=model,type="titterington")
     } else if (hasClass(x,'ThU') & is.na(osmond)){ # 2D regression
         d <- data2york(x,type=type)
-        out <- regression(model=model,type="york")
+        out <- regression(d,model=model,type="york")
     } else if (hasClass(x,'PD')){
         d <- data2york(x,exterr=exterr,common=FALSE)
         out <- regression(d,model=model)
@@ -735,6 +752,8 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
 }
 regression_init <- function(X,model=model,alpha=0.05){
     out <- regression(X,model=model)
+    out$displabel <- quote('y-dispersion = ')
+    fit$y0label <- quote('y-intercept = ')
     if (model==1){
         out$a <- rep(NA,4)
         out$b <- rep(NA,4)
@@ -796,17 +815,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
             list1$d <- rounded.age[4]
             list2$d <- rounded.intercept[4]
         }
-        if (identical(type,'Ar-Ar')){
-            expr2 <- quote('('^40*'Ar/'^36*'Ar)'[o]~'=')
-        } else if (identical(type,'Pb-Pb')) {
-            expr2 <- quote('('^207*'Pb/'^204*'Pb)'[o]~'=')
-        } else if (identical(type,'Th-U-3D')) {
-            expr2 <- quote('('^234*'U/'^238*'U)'[o]~'=')
-        } else if (identical(type,'Th-U-2D')) {
-            expr2 <- quote('('^230*'Th/'^232*'Th)'[o]^x*~'=')
-        } else {
-            expr2 <- quote('y-intercept =')
-        }
+        expr2 <- fit$y0label
     }
     call1 <- substitute(e~a,list(e=expr1,a=args))
     call2 <- substitute(e~a,list(e=expr2,a=args))
@@ -823,10 +832,10 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
         graphics::mtext(line1,line=1)
         graphics::mtext(line2,line=0)
     } else if (fit$model==3){
-        rounded.disp <- signif(fit$w,sigdig)
+        rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
         list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
-        expr3 <- quote('y-dispersion =')
         args3 <- quote(a+b/-c)
+        expr3 <- fit$displabel
         call3 <- substitute(e~a,list(e=expr3,a=args3))
         line3 <- do.call(substitute,list(eval(call3),list3))
         graphics::mtext(line1,line=2)

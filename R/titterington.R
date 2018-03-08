@@ -92,7 +92,7 @@ titterington <- function(x,alpha=0.05){
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
-    out$tfact <- stats::qt(1-alpha/2,out$df)
+    out$type <- 'titterington'
     out
 }
 
@@ -285,7 +285,6 @@ gr.tit <- function(abAB,dat){
     c(dS.da,dS.db,dS.dA,dS.dB)
 }
 
-# returns negative likelihood
 S.tit <- function(abAB,dat){
     ns <- length(dat)
     a <- abAB[1] # y intercept
@@ -301,6 +300,21 @@ S.tit <- function(abAB,dat){
         S <- S + gamma - (beta^2)/alpha
     }
     S
+}
+
+# dat is the output of matrix2covlist
+get.titterington.xy <- function(dat,abAB){
+    ns <- length(dat$omega)
+    out <- matrix(NA,ns,3)
+    colnames(out) <- c('X','Y','Z')
+    for (i in 1:ns){
+        abg <- alpha.beta.gamma(a,b,A,B,dat$XYZ[[i]],dat$omega[[i]])
+        XYZ <- dat$XYZ[[i]]
+        out[i,1] <- XYZ[1] + abg[2]/abg[1]
+        out[i,2] <- XYZ[2] + abAB[1] + abAB[2]*X[1,1]
+        out[i,2] <- XYZ[3] + abAB[3] + abAB[4]*X[1,1]
+    }
+    out
 }
 
 data2tit <- function(x,...){ UseMethod("data2tit",x) }

@@ -109,6 +109,7 @@ york <- function(x,alpha=0.05){
     out$cov.ab <- -Xbar*sb^2
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
+    out$type <- 'york'
     out
 }
 

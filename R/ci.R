@@ -36,8 +36,8 @@ LL.sigma <- function(sigma,X,sX){
 
 ci_isochron <- function(fit,model,alpha=0.05,disp=TRUE){
     out <- fit
-    if (fit$model==1) out$fact <- nfact(1-alpha/2)
-    else out$fact <- tfact(1-alpha/2,fit$df)
+    if (fit$model==1) out$fact <- nfact(alpha)
+    else out$fact <- tfact(alpha,fit$df)
     out$y0['ci[y]'] <- out$fact*fit$y0['s[y]']
     out$age['ci[t]'] <- out$fact*fit$age['s[t]']
     if (model==1 & disp){
@@ -52,40 +52,28 @@ profile_LL_isochron_disp <- function(fit,alpha=0.05){
     cutoff <- qchisq(1-alpha,1)
     d <- fit$d
     w <- fit$w['s']
-    LLmax <- LL.w(w,d)
-    if (abs(LL.w(0,d)-LLmax) < cutoff/2){
+    LLmax <- LL.isochron(w,d,type=fit$type)
+    if (abs(LL.isochron(0,d,type=fit$type)-LLmax) < cutoff/2){
         wl <- 0
     } else {
         wl <- optimize(profile_isochron_helper,
                        interval=c(0,w),d=d,
-                       LLmax=LLmax,cutoff=cutoff)$minimum
+                       LLmax=LLmax,cutoff=cutoff,
+                       type=fit$type)$minimum
     }
-    if (abs(LL.w(sd(d[,'Y']),d)-LLmax) < cutoff/2){
+    if (abs(LL.isochron(sd(d[,'Y']),d,type=fit$type)-LLmax) < cutoff/2){
         wu <- Inf
     } else {
         wu <- optimize(profile_isochron_helper,
                        interval=c(w,sd(d[,'Y'])),
-                       d=d,LLmax=LLmax,cutoff=cutoff)$minimum
+                       d=d,LLmax=LLmax,cutoff=cutoff,
+                       type=fit$type)$minimum
     }
     ll <- w - wl
     ul <- wu - w
     c(ll,ul)
 }
-profile_isochron_helper <- function(w,d,LLmax,cutoff){
-    LL <- LL.w(w,d)
+profile_isochron_helper <- function(w,d,LLmax,cutoff,type='york'){
+    LL <- LL.isochron(w,d,type=type)
     abs(LLmax-LL-cutoff/2)
-}
-LL.w <- function(w,d){
-    out <- 0
-    D <- augment_york_errors(d,w)
-    X <- matrix(0,1,2)
-    fit <- york(D)
-    P <- get.york.xy(D,fit$a[1],fit$b[1])
-    for (i in 1:nrow(D)){
-        E <- cor2cov2(D[i,'sX'],D[i,'sY'],D[i,'rXY'])
-        X[1,1] <- D[i,'X']-P[i,1]
-        X[1,2] <- D[i,'Y']-P[i,2]
-        out <- out - 0.5*log(det(2*pi*E)) - 0.5 * X %*% solve(E) %*% t(X)
-    }
-    out
 }
