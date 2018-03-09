@@ -173,12 +173,14 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     X <- subset(x,select=1:5)
     colnames(X) <- c('X','sX','Y','sY','rXY')
     fit <- regression_init(X,model=model,alpha=alpha)
+    fit <- ci_isochron(fit,model=model,alpha=alpha)
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model!=2),show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
     if (title)
-        graphics::title(isochrontitle(fit,sigdig=sigdig),xlab='X',ylab='Y')
+        graphics::title(isochrontitle(fit,sigdig=sigdig),
+                        xlab='X',ylab='Y')
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
 #'
@@ -541,7 +543,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
                     b=out$b[1],line.col=line.col,lwd=lwd,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type=intercept.type),
+        graphics::title(isochrontitle(out,sigdig=sigdig,type=intercept.type,units='ka'),
                         xlab=out$xlab,ylab=out$ylab)
     }
     invisible(out)
@@ -751,9 +753,10 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
     out
 }
 regression_init <- function(X,model=model,alpha=0.05){
-    out <- regression(X,model=model)
+    fit <- regression(X,model=model)
+    out <- fit
     out$displabel <- quote('y-dispersion = ')
-    fit$y0label <- quote('y-intercept = ')
+    out$y0label <- quote('y-intercept = ')
     if (model==1){
         out$a <- rep(NA,4)
         out$b <- rep(NA,4)
@@ -765,13 +768,20 @@ regression_init <- function(X,model=model,alpha=0.05){
         names(out$a) <- c('a','s[a]','ci[a]')
         names(out$b) <- c('b','s[b]','ci[b]')
     }
-    out$a[c('a','s[a]')] <- out$a[c('a','s[a]')]
-    out$b[c('b','s[b]')] <- out$b[c('b','s[b]')]
-    out$a['ci[a]'] <- out$tfact*out$a['s[a]']
-    out$b['ci[b]'] <- out$tfact*out$b['s[b]']
+    if (out$model < 3){
+        out$fact <- tfact(alpha,out$df)
+    } else {
+        out$fact <- nfact(alpha)
+        out$w <- c(out$w,NA,NA)
+        names(out$w) <- c('s','ll','ul')
+    }
+    out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
+    out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
+    out$a['ci[a]'] <- out$fact*out$a['s[a]']
+    out$b['ci[b]'] <- out$fact*out$b['s[b]']
     if (out$model==1){
-        out$a['disp[a]'] <- out$tfact*sqrt(out$mswd)*out$a['s[a]']
-        out$b['disp[b]'] <- out$tfact*sqrt(out$mswd)*out$b['s[b]']
+        out$a['disp[a]'] <- out$fact*sqrt(out$mswd)*out$a['s[a]']
+        out$b['disp[b]'] <- out$fact*sqrt(out$mswd)*out$b['s[b]']
     }
     class(out) <- "isochron"
     out
@@ -783,20 +793,22 @@ get.limits <- function(X,sX){
     c(minx,maxx)
 }
 
-isochrontitle <- function(fit,sigdig=2,type=NA){
-    if (fit$model==1 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
-    else args <- quote(a%+-%b~'|'~c)
+isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
+    if (fit$model==1 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d~u)
+    else args <- quote(a%+-%b~'|'~c~u)
     if (is.na(type)){
         intercept <- roundit(fit$a[1],fit$a[2:4],sigdig=sigdig)
         slope <- roundit(fit$b[1],fit$b[2:4],sigdig=sigdig)
-        expr1 <- quote('slope =')
-        expr2 <- quote('intercept =')
+        expr1 <- 'slope ='
+        expr2 <- 'intercept ='
         list1 <- list(a=slope[1],
                       b=slope[2],
-                      c=slope[3])
+                      c=slope[3],
+                      u='')
         list2 <- list(a=intercept[1],
                       b=intercept[2],
-                      c=intercept[3])
+                      c=intercept[3],
+                      u='')
         if (fit$model==1 && fit$mswd>1){
             list1$d <- slope[4]
             list2$d <- intercept[4]
@@ -804,13 +816,15 @@ isochrontitle <- function(fit,sigdig=2,type=NA){
     } else {
         rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
         rounded.intercept <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig)
-        expr1 <- quote('age =')
+        expr1 <- 'age ='
         list1 <- list(a=rounded.age[1],
                       b=rounded.age[2],
-                      c=rounded.age[3])
+                      c=rounded.age[3],
+                      u=units)
         list2 <- list(a=rounded.intercept[1],
                       b=rounded.intercept[2],
-                      c=rounded.intercept[3])
+                      c=rounded.intercept[3],
+                      u='')
         if (fit$model==1 && fit$mswd>1){
             list1$d <- rounded.age[4]
             list2$d <- rounded.intercept[4]
