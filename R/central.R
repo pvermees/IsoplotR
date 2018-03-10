@@ -52,10 +52,6 @@
 #'
 #' }
 #'
-#' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the t-
-#' distribution for \code{df} degrees of freedom (not reported if
-#' \code{model=2}).}
-#'
 #' \item{age}{a three- or four-element vector with:
 #'
 #' \code{t}: the central age.
@@ -127,9 +123,7 @@ central.default <- function(x,alpha=0.05,...){
     zu <- log(x[,1])
     su <- x[,2]/x[,1]
     fit <- continuous_mixture(zu,su)
-    mu <- fit$mu[1]
-    sigma <- fit$sigma
-    tt <- exp(mu)    
+    tt <- exp(fit$mu[1])
     st <- tt*fit$mu[2]
     Chi2 <- sum((zu/su)^2,na.rm=TRUE)-(sum(zu/su^2,na.rm=TRUE)^2)/
         sum(1/su^2,na.rm=TRUE)
@@ -139,10 +133,11 @@ central.default <- function(x,alpha=0.05,...){
     # add back one d.o.f. for the homogeneity test
     out$mswd <- Chi2/(out$df+1)
     out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-    out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)
-    out$disp <- c(sigma,stats::qnorm(1-alpha/2)*sigma)
+    out$age <- c(tt,st,nfact(alpha)*st)
+    out$disp <- c(fit$sigma,
+                  profile_LL_weightedmean_disp(fit,zu,su,alpha))
     names(out$age) <- c('t','s[t]','ci[t]')
-    names(out$disp) <- c('s','ci')
+    names(out$disp) <- c('s','ll','ul')
     out
 }
 #' @param model choose one of the following statistical models:
@@ -173,20 +168,21 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
     mswd <- mswd_UThHe(x,fit,doSm=doSm)
-    fit$tfact <- stats::qt(1-alpha/2,mswd$df)
+    fact <- nfact(alpha)
     if (model==1){
         out <- c(fit,mswd)
-        out$age['disp[t]'] <- augment_UThHe_err(out,doSm)
+        fact <- tfact(alpha,mswd$df)
+        out$age['disp[t]'] <-
+            uvw2age(out,doSm(x),fact*sqrt(mswd$mswd))[2]
     } else if (model==2){
         out <- fit
     } else {
         w <- get.UThHe.w(x,fit)
         out <- UThHe_logratio_mean(x,model=model,w=w)
-        out$w <- c(w,w*stats::qnorm(1-alpha/2))
+        out$w <- c(w,nfact(alpha)*w) # TODO
         names(out$w) <- c('s','ci')
-        out$tfact <- fit$tfact
     }
-    out$age['ci[t]'] <- out$tfact*out$age['s[t]']
+    out$age['ci[t]'] <- fact*out$age['s[t]']
     out
 }
 #' @param mineral setting this parameter to either \code{apatite} or
@@ -219,15 +215,17 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
         st <- tt * sqrt( 1/(sum(wj)*(theta*(1-theta))^2) +
                          (x$rhoD[2]/x$rhoD[1])^2 +
                          (x$zeta[2]/x$zeta[1])^2 )
+        mu <- log(theta/(1-theta))
         # remove two d.o.f. for mu and sigma
         out$df <- length(Nsj)-2
         # add back one d.o.f. for homogeneity test
         out$mswd <- Chi2/(out$df+1)
         out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
         out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)
-        out$disp <- c(sigma,stats::qnorm(1-alpha/2)*sigma)
+        out$disp <- c(sigma,profile_LL_central_disp_FT(
+                                mu,sigma,Nsj,mj,alpha))
         names(out$age) <- c('t','s[t]','ci[t]')
-        names(out$disp) <- c('s','ci')
+        names(out$disp) <- c('s','ll','ul')
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE,mineral=mineral)
         out <- central.default(tst,alpha=alpha)
@@ -241,24 +239,28 @@ get.UThHe.w <- function(x,fit){
     stats::optimize(UThHe_misfit,interval=wrange,x=x,model=3)$minimum
 }
 
-UThHe_logratio_mean <- function(x,model=1,w=0){
+UThHe_logratio_mean <- function(x,model=1,w=0,fact=1){
     out <- average_uvw(x,model=model,w=w)
     out$model <- model
     out$w <- w
     out$age <- rep(NA,3)
     names(out$age) <- c('t','s[t]','ci[t]')
-    if (doSm(x)){
-        cc <- uvw2UThHe(out$uvw,out$covmat)
-        out$age[c('t','s[t]')] <- get.UThHe.age(cc['U'],cc['sU'],
-                                                cc['Th'],cc['sTh'],
-                                                cc['He'],cc['sHe'],
-                                                cc['Sm'],cc['sSm'])
+    out$age[c('t','s[t]')] <- uvw2age(out,doSm(x))
+    out
+}
+
+uvw2age <- function(fit,doSm,fact=1){
+    if (doSm){
+        cc <- uvw2UThHe(fit$uvw,fact*fit$covmat)
+        out <- get.UThHe.age(cc['U'],cc['sU'],
+                             cc['Th'],cc['sTh'],
+                             cc['He'],cc['sHe'],
+                             cc['Sm'],cc['sSm'])
     } else {
-        cc <- uv2UThHe(out$uvw,out$covmat)
-        out$age[c('t','s[t]')] <-
-            get.UThHe.age(cc['U'],cc['sU'],
-                          cc['Th'],cc['sTh'],
-                          cc['He'],cc['sHe'])
+        cc <- uv2UThHe(fit$uvw,fact*fit$covmat)
+        out <- get.UThHe.age(cc['U'],cc['sU'],
+                             cc['Th'],cc['sTh'],
+                             cc['He'],cc['sHe'])
     }
     out
 }
@@ -304,22 +306,6 @@ mswd_UThHe <- function(x,fit,doSm=FALSE){
 UThHe_misfit <- function(w,x,model=1){
     fit <- UThHe_logratio_mean(x,model=model,w=w)
     abs(mswd_UThHe(x,fit,doSm=doSm(x))$mswd-1)
-}
-
-augment_UThHe_err <- function(fit,doSm){
-    if (doSm){
-        cco <- uvw2UThHe(fit$uvw,fit$mswd*fit$covmat)
-        out <- fit$tfact*get.UThHe.age(cco['U'],cco['sU'],
-                                       cco['Th'],cco['sTh'],
-                                       cco['He'],cco['sHe'],
-                                       cco['Sm'],cco['sSm'])[2]
-    } else {
-        cco <- uv2UThHe(fit$uvw,fit$mswd*fit$covmat)
-        out <- fit$tfact*get.UThHe.age(cco['U'],cco['sU'],
-                                       cco['Th'],cco['sTh'],
-                                       cco['He'],cco['sHe'])[2]
-    }
-    out
 }
 
 continuous_mixture <- function(zu,su){

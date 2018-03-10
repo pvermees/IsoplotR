@@ -1,3 +1,31 @@
+# based on equation 6.5 of Galbraith (2005)
+profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
+    LLmax <- LL.FT(sigma,mu,y,m)
+    cutoff <- qchisq(1-alpha,1)
+    if (abs(LL.FT(exp(-10),mu,y,m)-LLmax) < cutoff/2){
+        sigmal <- 0
+    } else {
+        sigmal <- optimize(profile_central_FT_helper,
+                       interval=c(0,sigma),
+                       mu=mu,y=y,m=m,LLmax=LLmax,
+                       cutoff=cutoff)$minimum
+    }
+    sigmalinit <- 2*sd(log(y)-log(m-y))
+    if (abs(LL.FT(sigmalinit,mu,y,m)-LLmax) < cutoff/2){
+        sigmau <- Inf
+    } else {
+        sigmau <- optimize(profile_central_FT_helper,
+                           interval=c(sigma,sigmalinit),
+                           mu=mu,y=y,m=m,LLmax=LLmax,
+                           cutoff=cutoff)$minimum
+    }    
+    ll <- sigma - sigmal
+    ul <- sigmau - sigma
+    c(ll,ul)
+}
+profile_LL_central_disp <- function(fit,X,sX,alpha=0.05){
+    profile_LL_weightedmean_disp(fit,X=X,sX=sX,alpha=alpha)
+}
 profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     mu <- fit$mu[1]
     sigma <- fit$sigma
@@ -23,10 +51,30 @@ profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     ul <- sigmau - sigma
     c(ll,ul)
 }
+profile_central_FT_helper <- function(sigma,mu,y,m,LLmax,cutoff){
+    LL <- LL.FT(sigma,mu,y,m)
+    abs(LLmax-LL-cutoff/2)
+}
 profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     LL <- LL.sigma(sigma,X,sX)
     abs(LLmax-LL-cutoff/2)
 }
+
+LL.FT <- function(sigma,mu,y,m){
+    LL <- 0
+    ns <- length(y)
+    for (i in 1:ns){
+        LL <- LL + log(integrate(pyumu,
+                                 lower=mu-10*sigma,upper=mu+10*sigma,
+                                 mu=mu,sigma=sigma,m=m[i],y=y[i])$value)
+    }
+    LL
+}
+pyumu <- function(B,mu,sigma,m,y){
+    theta <- exp(B)/(1+exp(B))
+    dbinom(y,m,theta)*dnorm(B,mean=mu,sd=sigma)
+}
+
 # Equation 18 of Galbraith and Roberts (2012)
 LL.sigma <- function(sigma,X,sX){
     wi <- 1/(sigma^2+sX^2)

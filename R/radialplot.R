@@ -99,13 +99,14 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                show.numbers=FALSE,pch=21,levels=NA,
                                clabel="",bg=c("white","red"),
                                title=TRUE,k=0,markers=NULL,
-                               alpha=0.05,...){
+                               alpha=0.05,units='',...){
     peaks <- peakfit(x,k=k,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,show.numbers=show.numbers,pch=pch,levels=levels,
                 clabel=clabel,bg=bg,markers=markers,...)
-    if (title) title(radial.title(central(x,alpha=alpha),sigdig=sigdig))
+    if (title) title(radial.title(central(x,alpha=alpha),
+                                  sigdig=sigdig,units=units))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -126,7 +127,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
                 show.numbers=show.numbers,pch=pch,levels=levels,
                 clabel=clabel,bg=bg,markers=markers,...)
-    if (title) title(radial.title(central(x,alpha=alpha),sigdig=sigdig))
+    if (title) title(radial.title(central(x,alpha=alpha),
+                                  sigdig=sigdig,units='Ma'))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -297,7 +299,7 @@ radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
                       transformation=transformation,
                       show.numbers=show.numbers,pch=pch,levels=levels,
                       clabel=clabel,bg=bg,markers=markers,k=k,
-                      exterr=FALSE,i2i=i2i,alpha=alpha,...)
+                      exterr=FALSE,i2i=i2i,alpha=alpha,units='ka',...)
 }
 radialplot_helper <- function(x,from=NA,to=NA,t0=NA,
                               transformation='log',type=4,
@@ -305,7 +307,7 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,
                               show.numbers=FALSE,pch=21,levels=NA,
                               clabel="",bg=c("white","red"),
                               markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
-                              alpha=0.05,...){
+                              alpha=0.05,units='Ma',...){
     peaks <- peakfit(x,k=k,exterr=exterr,i2i=i2i,type=type,
                      cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
     markers <- c(markers,peaks$peaks['t',])
@@ -313,7 +315,7 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,markers=markers,i2i=i2i,
-               alpha=alpha,...)
+               alpha=alpha,units=units,...)
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -322,7 +324,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                        type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
                        show.numbers=FALSE,pch=21,levels=NA,clabel="",
                        bg=c("white","red"),markers=NULL,k=0,
-                       i2i=FALSE,alpha=0.05,...){
+                       i2i=FALSE,alpha=0.05,units='MA',...){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
@@ -347,7 +349,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                        transformation=transformation,
                        show.numbers=show.numbers,pch=pch,
                        levels=levels,clabel=clabel,bg=bg,
-                       markers=markers,alpha=alpha,...)
+                       markers=markers,alpha=alpha,
+                       units=units,...)
 }
 
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
@@ -677,18 +680,21 @@ iatt <- function(z,zeta,rhoD){
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
-radial.title <- function(fit,sigdig=2){
+radial.title <- function(fit,sigdig=2,units=''){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
-    line1 <- substitute('central age ='~a%+-%b~'|'~c,
+    rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
+    line1 <- substitute('central age ='~a%+-%b~'|'~c~d,
                         list(a=rounded.age[1],
                              b=rounded.age[2],
-                             c=rounded.age[3]))
+                             c=rounded.age[3],
+                             d=units))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('dispersion ='~a~'|'~b~'%',
-                        list(a=signif(100*fit$disp['s'],sigdig),
-                             b=signif(100*fit$disp['ci'],sigdig)))
+    line3 <- substitute('dispersion ='~a+b/-c~'%',
+                        list(a=rounded.disp[1],
+                             b=rounded.disp[3],
+                             c=rounded.disp[2]))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)
