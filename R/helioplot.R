@@ -544,24 +544,6 @@ uv2HeUTh <- function(uv){
     cbind(He,U,Th)
 }
 
-# UVW = central composition
-SS.UThHe.uvw <- function(UVW,x,w=0){
-    doSm <- (length(UVW)>2)
-    SS <- 0
-    for (i in 1:length(x)){
-        if (doSm){
-            uvwc <- UThHe2uvw.covmat(x,i,w=w)
-            X <- UVW-uvwc$uvw
-        } else {
-            uvwc <- UThHe2uv.covmat(x,i,w=w)
-            X <- UVW-uvwc$uv
-        }
-        Ei <- solve(uvwc$covmat)
-        SSi <- X %*% Ei %*% t(X)
-        if (is.finite(SSi)) SS <- SS + SSi
-    }
-    as.numeric(SS)
-}
 UThHe2uvw.covmat <- function(x,i,w=0){
     U <- x[i,'U']
     sU <- x[i,'errU']

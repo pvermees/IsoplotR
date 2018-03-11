@@ -202,7 +202,7 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
                         rect.col=rect.col,outlier.col=outlier.col,
                         type=type,cutoff.76=cutoff.76,
                         cutoff.disc=cutoff.disc,sigdig=sigdig,
-                        alpha=alpha,exterr=exterr,...)
+                        alpha=alpha,exterr=exterr,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
@@ -216,7 +216,8 @@ weightedmean.PbPb <- function(x,detect.outliers=TRUE,plot=TRUE,
         X <- x
     weightedmean_helper(X,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
-                        sigdig=sigdig,alpha=alpha,exterr=exterr,...)
+                        sigdig=sigdig,alpha=alpha,exterr=exterr,
+                        units='Ma',...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
@@ -236,7 +237,7 @@ weightedmean.ThU <- function(x,detect.outliers=TRUE,plot=TRUE,
                              alpha=0.05,i2i=TRUE,...){
     weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
-                        sigdig=sigdig,alpha=alpha,i2i=i2i,...)
+                        sigdig=sigdig,alpha=alpha,i2i=i2i,units='ka',...)
 }
 #' @rdname weightedmean
 #' @export
@@ -247,7 +248,7 @@ weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
     weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
-                        i2i=i2i,...)
+                        i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
@@ -258,7 +259,7 @@ weightedmean.ReOs <- function(x,detect.outliers=TRUE,plot=TRUE,
     weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
-                        i2i=i2i,...)
+                        i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
@@ -269,7 +270,7 @@ weightedmean.SmNd <- function(x,detect.outliers=TRUE,plot=TRUE,
     weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
-                        i2i=i2i,...)
+                        i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
@@ -280,7 +281,7 @@ weightedmean.RbSr <- function(x,detect.outliers=TRUE,plot=TRUE,
     weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
-                        i2i=i2i,...)
+                        i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
@@ -291,21 +292,21 @@ weightedmean.LuHf <- function(x,detect.outliers=TRUE,plot=TRUE,
     weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
-                        i2i=i2i,...)
+                        i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
 weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
                                rect.col=rgb(0,1,0,0.5),
-                               outlier.col=rgb(0,1,1,0.5),
-                               sigdig=2,alpha=0.05,...){
+                               outlier.col=rgb(0,1,1,0.5),sigdig=2,
+                               alpha=0.05,units='Ma',...){
     tt <- UThHe.age(x)
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,...)
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],fit,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
-                          alpha=alpha)
+                          alpha=alpha,units='Ma')
     }
     invisible(fit)
 }
@@ -341,7 +342,7 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
-                          alpha=alpha)
+                          alpha=alpha,units='Ma')
     }
     invisible(out)
 }
@@ -351,7 +352,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
                                 cutoff.disc=c(-15,5),
                                 outlier.col=grDevices::rgb(0,1,1,0.5),
                                 sigdig=2,alpha=0.05,exterr=TRUE,
-                                i2i=FALSE,common.Pb=1,...){
+                                i2i=FALSE,common.Pb=1,units='',...){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
@@ -383,7 +384,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
-                          alpha=alpha)
+                          alpha=alpha,units=units)
     }
     invisible(out)
 }
@@ -416,24 +417,26 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
     out
 }
 
-wtdmean.title <- function(fit,sigdig=2){
+wtdmean.title <- function(fit,sigdig=2,units=''){
     rounded.mean <- roundit(fit$mean['x'],
                             fit$mean[c('s[x]','ci[x]')],
                             sigdig=sigdig)
     rounded.disp <- roundit(fit$disp['w'],
                             fit$disp[c('ll','ul')],
                             sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c,
+    line1 <- substitute('mean ='~a%+-%b~'|'~c~u,
                         list(a=rounded.mean['x'],
                              b=rounded.mean['s[x]'],
-                             c=rounded.mean['ci[x]']))
+                             c=rounded.mean['ci[x]'],
+                             u=units))
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('dispersion ='~a+b/-c,
+    line3 <- substitute('dispersion ='~a+b/-c~u,
                         list(a=rounded.disp['w'],
-                             b=rounded.disp['ll'],
-                             c=rounded.disp['ul']))
+                             b=rounded.disp['ul'],
+                             c=rounded.disp['ll'],
+                             u=units))
     graphics::mtext(line1,line=2)
     graphics::mtext(line2,line=1)
     graphics::mtext(line3,line=0)
@@ -442,7 +445,7 @@ wtdmean.title <- function(fit,sigdig=2){
 plot_weightedmean <- function(X,sX,fit,
                               rect.col=grDevices::rgb(0,1,0,0.5),
                               outlier.col=grDevices::rgb(0,1,1,0.5),
-                              sigdig=2,alpha=0.05){
+                              sigdig=2,alpha=0.05,units=''){
     ns <- length(X)
     fact <- nfact(alpha)
     minX <- min(c(X-fact*sX,X-fact*fit$disp['w']),na.rm=TRUE)
@@ -461,7 +464,7 @@ plot_weightedmean <- function(X,sX,fit,
         graphics::rect(xleft=i-0.4,ybottom=X[i]-fact*sX[i],
                        xright=i+0.4,ytop=X[i]+fact*sX[i],col=col)
     }
-    graphics::title(wtdmean.title(fit,sigdig=sigdig))
+    graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units))
 }
 
 # prune the data if necessary

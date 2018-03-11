@@ -1,4 +1,4 @@
-wetherill <- function(x,i,exterr=FALSE){
+wetherill <- function(x,i=NA,exterr=FALSE){
     out <- list()
     if (x$format %in% c(1,3)){
         labels <- c('Pb207U235','Pb206U238')
@@ -172,6 +172,31 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
     colnames(out$cov) <- labels
     rownames(out$cov) <- labels
     class(out) <- "terawasserburg"
+    out
+}
+
+# convert data to a 5-column table for concordia analysis
+data2weterwas <- function(x,wetherill=TRUE){
+    ns <- length(x)
+    out <- matrix(0,ns,5)
+    for (i in 1:ns){
+        if (wetherill) xi <- wetherill(x,i)
+        else xi <- tera.wasserburg(x,i)
+        out[i,1] <- xi$x[1]
+        out[i,3] <- xi$x[2]
+        out[i,2] <- sqrt(xi$cov[1,1])
+        out[i,4] <- sqrt(xi$cov[2,2])
+        out[i,5] <- xi$cov[1,2]/(out[i,2]*out[i,4])
+    }
+    if (wetherill){
+        colnames(out) <- c('Pb207U235','errPb207U235',
+                           'Pb206U238','errPb206U238','rhoXY')
+        class(out) <- 'wetherill'
+    } else {
+        colnames(out) <- c('U238Pb206','errU238Pb206',
+                           'Pb207Pb206','errPb207Pb206','rhoXY')
+        class(out) <- 'terawasserburg'
+    }
     out
 }
 

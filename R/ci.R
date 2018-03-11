@@ -23,8 +23,49 @@ profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
     ul <- sigmau - sigma
     c(ll,ul)
 }
-profile_LL_central_disp <- function(fit,X,sX,alpha=0.05){
-    profile_LL_weightedmean_disp(fit,X=X,sX=sX,alpha=alpha)
+profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
+    c(0,0) # TODO
+}
+profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
+    w <- fit$w
+    ta0b0 <- fit$par
+    wrange <- get_lud_wrange(ta0b0,x)
+    LLmax <- LL.lud.UPb.disp(w,x,ta0b0)
+    cutoff <- qchisq(1-alpha,1)    
+    if (abs(LL.lud.UPb.disp(wrange[1],x,ta0b0)-LLmax) < cutoff/2){
+        wl <- 0
+    } else {
+        wl <- optimize(profile_discordia_helper,
+                       interval=c(0,w),x=x,ta0b0=ta0b0,
+                       LLmax=LLmax,cutoff=cutoff)$minimum
+    }
+    if (abs(LL.lud.UPb.disp(wrange[2],x,ta0b0)-LLmax) < cutoff/2){
+        wu <- Inf
+    } else {
+        wu <- optimize(profile_discordia_helper,
+                       interval=c(w,wrange[2]),x=x,ta0b0=ta0b0,
+                       LLmax=LLmax,cutoff=cutoff)$minimum
+    }
+    ll <- w - wl
+    ul <- wu - w
+    c(ll,ul)
+}
+LL.uvw <- function(w,UVW,x){
+    doSm <- (length(UVW)>2)
+    LL <- 0
+    for (i in 1:length(x)){
+        if (doSm){
+            uvwc <- UThHe2uvw.covmat(x,i,w=w)
+            X <- UVW-uvwc$uvw
+        } else {
+            uvwc <- UThHe2uv.covmat(x,i,w=w)
+            X <- UVW-uvwc$uv
+        }
+        E <- uvwc$covmat
+        O <- solve(uvwc$covmat)
+        LL <- LL - 0.5*log(det(E)) - 0.5 * X %*% O %*% t(X)
+    }
+    LL
 }
 profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     mu <- fit$mu[1]
@@ -59,6 +100,10 @@ profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     LL <- LL.sigma(sigma,X,sX)
     abs(LLmax-LL-cutoff/2)
 }
+profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff){
+    LL <- LL.lud.UPb.disp(w,x,ta0b0)
+    abs(LLmax-LL-cutoff/2)
+}
 
 LL.FT <- function(sigma,mu,y,m){
     LL <- 0
@@ -82,10 +127,10 @@ LL.sigma <- function(sigma,X,sX){
     sum(log(wi) - wi*(X-mu)^2)/2
 }
 
-ci_regression <- function(fit,model,alpha=0.05,
+ci_regression <- function(fit,model=1,alpha=0.05,
                           disp=TRUE,i1='b',i2='a'){
     out <- fit
-    if (fit$model==1) out$fact <- nfact(alpha)
+    if (fit$model==3) out$fact <- nfact(alpha)
     else out$fact <- tfact(alpha,fit$df)
     out[[i1]]['ci[t]'] <- out$fact*fit[[i1]]['s[t]']
     out[[i2]]['ci[y]'] <- out$fact*fit[[i2]]['s[y]']
@@ -98,8 +143,8 @@ ci_regression <- function(fit,model,alpha=0.05,
     out
     
 }
-ci_isochron <- function(fit,model,alpha=0.05,disp=TRUE){
-    ci_regression(fit,model,alpha=alpha,disp=disp,i1='age',i2='y0')
+ci_isochron <- function(fit,model=1,alpha=0.05,disp=TRUE){
+    ci_regression(fit,model=model,alpha=alpha,disp=disp,i1='age',i2='y0')
 }
 profile_LL_isochron_disp <- function(fit,alpha=0.05){
     cutoff <- qchisq(1-alpha,1)

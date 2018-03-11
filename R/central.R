@@ -177,10 +177,13 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     } else if (model==2){
         out <- fit
     } else {
+        ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@36@"]]))##:ess-bp-end:##
         w <- get.UThHe.w(x,fit)
+        # REPLACE WITH DIRECT SOLUTION FROM LUDWIG!
         out <- UThHe_logratio_mean(x,model=model,w=w)
-        out$w <- c(w,nfact(alpha)*w) # TODO
-        names(out$w) <- c('s','ci')
+        out$w <- c(w,profile_LL_central_disp_UThHe(fit=out,x=x,alpha=alpha))
+        names(out$w) <- c('s','ll','ul')
     }
     out$age['ci[t]'] <- fact*out$age['s[t]']
     out
@@ -223,7 +226,7 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
         out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
         out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)
         out$disp <- c(sigma,profile_LL_central_disp_FT(
-                                mu,sigma,Nsj,mj,alpha))
+                                mu=mu,sigma=sigma,y=Nsj,m=mj,alpha=alpha))
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$disp) <- c('s','ll','ul')
     } else if (x$format>1){
@@ -292,7 +295,6 @@ average_uvw <- function(x,model=1,w=0){
     out
 }
 
-# the MSWD calculation does not use Sm
 mswd_UThHe <- function(x,fit,doSm=FALSE){
     out <- list()
     if (doSm) nd <- 3
@@ -302,6 +304,24 @@ mswd_UThHe <- function(x,fit,doSm=FALSE){
     out$mswd <- SS/out$df
     out$p.value <- 1-stats::pchisq(SS,out$df)
     out
+}
+# UVW = central composition
+SS.UThHe.uvw <- function(UVW,x,w=0){
+    doSm <- (length(UVW)>2)
+    SS <- 0
+    for (i in 1:length(x)){
+        if (doSm){
+            uvwc <- UThHe2uvw.covmat(x,i,w=w)
+            X <- UVW-uvwc$uvw
+        } else {
+            uvwc <- UThHe2uv.covmat(x,i,w=w)
+            X <- UVW-uvwc$uv
+        }
+        Ei <- solve(uvwc$covmat)
+        SSi <- X %*% Ei %*% t(X)
+        if (is.finite(SSi)) SS <- SS + SSi
+    }
+    as.numeric(SS)
 }
 UThHe_misfit <- function(w,x,model=1){
     fit <- UThHe_logratio_mean(x,model=model,w=w)

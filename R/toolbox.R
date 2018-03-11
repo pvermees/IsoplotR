@@ -88,6 +88,38 @@ get.cor.mult <- function(A,err.A,B,err.B,AB,err.AB){
     get.cov.mult(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
 }
 
+# Implements Equations 6 & 7 of Ludwig (1998)
+# x is an [n x 5] matrix with columns X, sX, Y, sY, rhoXY
+wtdmean2D <- function(x){
+    ns <- nrow(x)
+    X <- x[,1]
+    Y <- x[,3]
+    O11 <- rep(0,ns)
+    O22 <- rep(0,ns)
+    O12 <- rep(0,ns)
+    for (i in 1:ns){
+        E <- cor2cov2(x[i,2],x[i,4],x[i,5])
+        O <- solve(E)
+        O11[i] <- O[1,1]
+        O22[i] <- O[2,2]
+        O12[i] <- O[1,2]
+    }
+    numx <- sum(O22)*sum(X*O11+Y*O12)-sum(O12)*sum(Y*O22+X*O12)
+    den <- sum(O11)*sum(O22)-sum(O12)^2
+    numy <- sum(O11)*sum(Y*O22+X*O12)-sum(O12)*sum(X*O11+Y*O12)
+    xbar <- numx/den
+    ybar <- numy/den
+    out <- list()
+    out$x <- c(xbar,ybar)
+    Obar <- matrix(0,2,2)
+    Obar[1,1] <- sum(O11)
+    Obar[2,2] <- sum(O22)
+    Obar[1,2] <- sum(O12)
+    Obar[2,1] <- Obar[1,2]
+    out$cov <- solve(Obar)
+    out
+}
+
 # simultaneously performs error propagation for multiple samples
 errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
     out <- matrix(0,length(J11),3)

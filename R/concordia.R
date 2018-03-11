@@ -388,10 +388,10 @@ get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
 # this would be much easier in unicode but that doesn't render in PDF:
 concordia.title <- function(fit,sigdig=2,alpha=0.05){
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
-    expr1 <- expression('concordia age ='~a%+-%b~'|'~c)
+    expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'Ma')
     list1 <- list(a=rounded.age[1],b=rounded.age[2],c=rounded.age[3])
     if (fit$mswd['combined']>1){
-        expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d)
+        expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d~'Ma')
         list1$d <- rounded.age[4]
     }
     line1 <- do.call('substitute',list(eval(expr1),list1))
@@ -460,13 +460,13 @@ concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
 
 # x has class 'UPb'
 concordia.comp <- function(x,wetherill=TRUE){
-    if (wetherill) out <- wetherill(x,1)
-    else out <- tera.wasserburg(x,1)
-    fit.comp <- stats::optim(out$x[1:2], LL.concordia.comp,
-                             x=x,wetherill=wetherill,
-                             method="BFGS",hessian=TRUE)
-    out$x <- fit.comp$par
-    out$cov <- solve(fit.comp$hessian)
+    X <- data2weterwas(x,wetherill=wetherill)
+    out <- wtdmean2D(X)
+    cnames <- colnames(X)[c(1,3)]
+    names(out$x) <- cnames
+    colnames(out$cov) <- cnames
+    if (wetherill) class(out) <- 'wetherill'
+    else class(out) <- 'terawasserburg'
     out
 }
 

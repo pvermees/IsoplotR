@@ -83,7 +83,7 @@ LL.york <- function(w,d){
         E <- cor2cov2(D[i,'sX'],D[i,'sY'],D[i,'rXY'])
         X[1,1] <- D[i,'X']-P[i,1]
         X[1,2] <- D[i,'Y']-P[i,2]
-        out <- out - 0.5*log(det(2*pi*E)) - 0.5 * X %*% solve(E) %*% t(X)
+        out <- out - 0.5*log(det(E)) - 0.5 * X %*% solve(E) %*% t(X)
     }
     out
 }

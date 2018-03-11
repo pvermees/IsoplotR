@@ -114,8 +114,11 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     })
     mswd <- mswd.lud(fit$par,x=x,model=fit$model,w=fit$w)
     out <- c(out,mswd)
-    out$w <- c(fit$w,fit$w*stats::qnorm(1-alpha/2))
-    names(out$w) <- c('s','ci')
+    if (model==3){
+        out$w <- c(fit$w,
+                   profile_LL_discordia_disp(fit,x=x,alpha=alpha))
+        names(out$w) <- c('s','ll','ul')
+    }
     if (x$format<4) parnames <- c('t[l]','76i')
     else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
@@ -124,10 +127,10 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     out
 }
 
-mswd.lud <- function(pars,x,model=1,w=0){
+mswd.lud <- function(ta0b0,x,model=1,w=0){
     ns <- length(x)
     # Mistake in Ludwig (1998)? Multiply the following by 2?
-    SS <- LL.lud.UPb(pars,x=x,exterr=FALSE,model=model,w=w)
+    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,model=model,w=w,LL=FALSE)
     out <- list()
     if (x$format<4) out$df <- ns-2
     else out$df <- 2*ns-2
@@ -148,14 +151,13 @@ get.ta0b0 <- function(x,init,exterr=FALSE,model=1){
     out
 }
 get.ta0b0.model1 <- function(x,init,exterr=FALSE){
-    out <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
-                        exterr=exterr,model=1,w=0)
+    out <- fit_ludwig_discordia(x,init=init,w=0,model=1,exterr=exterr)
     out$w <- 0
     out
 }
+# tricks the weighted regression algorithm into doing ordinary least squares
 get.ta0b0.model2 <- function(x,init){
-    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
-                        exterr=FALSE,model=2,w=1)
+    fit <- fit_ludwig_discordia(x,init=init,w=1,model=2,exterr=FALSE)
     mswd <- mswd.lud(fit$par,x=x,model=2,w=1)$mswd
     w <- sqrt(mswd)
     out <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",
@@ -164,29 +166,37 @@ get.ta0b0.model2 <- function(x,init){
     out
 }
 get.ta0b0.model3 <- function(x,init,exterr=FALSE){
-    fit <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
-                        exterr=exterr,model=1,w=0)
-    mswd <- mswd.lud(fit$par,x=x,model=1,w=0)$mswd
-    wrange <- c(0,sqrt(mswd)*9,74) # 9.74 = current 204/238-ratio
-    w <- stats::optimize(model3.misfit,interval=wrange,
-                         ta0b0=fit$par,x=x)$minimum
-    out <- stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
-                        exterr=exterr,model=3,w=w)
+    fit <- fit_ludwig_discordia(x,init=init,w=0,model=1,exterr=exterr)
+    ta0b0 <- fit$par
+    w <- get_ludwig_disp(ta0b0,x,interval=get_lud_wrange(ta0b0,x))
+    out <- fit_ludwig_discordia(x,init=ta0b0,w=w,model=3,exterr=exterr)
     out$w <- w
     out
 }
-model3.misfit <- function(w,ta0b0,x){
-    abs(mswd.lud(ta0b0,x=x,model=3,w=w)$mswd-1)
+fit_ludwig_discordia <- function(x,init,w=0,model=1,exterr=FALSE){
+    stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
+                 model=model,w=w,exterr=exterr)
 }
+get_ludwig_disp <- function(ta0b0,x,interval){
+    stats::optimize(LL.lud.UPb.disp,interval=interval,
+                    x=x,ta0b0=ta0b0,maximum=TRUE)$maximum
+}
+get_lud_wrange <- function(ta0b0,x){
+    mswd <- mswd.lud(ta0b0,x=x,model=1,w=0)$mswd
+    c(0,sqrt(mswd)*9.74) # 9.74 = current 204/238-rati0
+}    
 
-LL.lud.UPb <- function(pars,x,exterr=FALSE,model=1,w=0){
+LL.lud.UPb.disp <- function(w,x,ta0b0){
+    LL.lud.UPb(ta0b0,x=x,exterr=FALSE,model=3,w=w,LL=TRUE)
+}
+LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     if (x$format<4){
-        return(LL.lud.2D(pars,x=x,exterr=exterr,model=model,w=w))
+        return(LL.lud.2D(ta0b0,x=x,exterr=exterr,model=model,w=w,LL=LL))
     } else {
-        return(LL.lud.3D(pars,x=x,exterr=exterr,model=model,w=w))
+        return(LL.lud.3D(ta0b0,x=x,exterr=exterr,model=model,w=w,LL=LL))
     }
 }
-LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0){
+LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     tt <- ta0[1]
     a0 <- ta0[2]
     l5 <- settings('lambda','U235')
@@ -223,10 +233,12 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0){
         }
         E <- Jv %*% Ex %*% t(Jv)
     }
-    S <- v %*% solve(E) %*% t(v)
-    S/2
+    SS <- v %*% solve(E) %*% t(v)
+    if (LL) out <- -(log(det(E))+SS)/2
+    else out <- SS
+    out
 }
-LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0){
+LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
@@ -235,7 +247,7 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0){
     phi <- d$phi
     R <- d$R
     r <- d$r
-    SS <- 0
+    out <- 0
     ns <- length(d$R)
     if (exterr){
         omega <- d$omega
@@ -247,20 +259,23 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0){
                 j1 <- j
                 j2 <- j + ns
                 j3 <- j + 2*ns
-                SS <- SS + R[i]*R[j]*omega[i1,j1] + r[i]*r[j]*omega[i2,j2] +
+                out <- out + R[i]*R[j]*omega[i1,j1] + r[i]*r[j]*omega[i2,j2] +
                     phi[i]*phi[j]*omega[i3,j3] + 2*( R[i]*r[j]*omega[i1,j2] +
                     R[i]*phi[j]*omega[i1,j3] + r[i]*phi[j]*omega[i2,j3] )
+                if (LL) out <- out + log(det(solve(omega)))
             }
         }
     } else {
         for (i in 1:ns){
             omega <- d$omega[[i]]
-            SS <- SS + omega[1,1]*R[i]^2 + omega[2,2]*r[i]^2 +
-                       omega[3,3]*phi[i]^2 + 2*( R[i]*r[i]*omega[1,2] +
-                       R[i]*phi[i]*omega[1,3] + r[i]*phi[i]*omega[2,3] )
+            out <- out + omega[1,1]*R[i]^2 + omega[2,2]*r[i]^2 +
+                         omega[3,3]*phi[i]^2 + 2*( R[i]*r[i]*omega[1,2] +
+                         R[i]*phi[i]*omega[1,3] + r[i]*phi[i]*omega[2,3] )
+            if (LL) out <- out + log(det(solve(omega)))
         }
     }
-    SS/2
+    if (LL) out <- -out/2
+    out
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }

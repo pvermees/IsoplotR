@@ -10,7 +10,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     out$w <- fit$w
     out$p.value <- fit$p.value
     out$df <- fit$df
-    tfact <- stats::qt(1-alpha/2,fit$df)
+    fact <- tfact(alpha,fit$df)
     if (wetherill){
         labels <- c('t[l]','t[u]')
         out <- c(out,twfit2wfit(fit,x))
@@ -32,13 +32,14 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     if (model==1 && fit$mswd>1){
         out$err <- matrix(NA,3,2)
         rownames(out$err) <- c('s','ci','disp')
-        out$err['disp',] <- tfact*sqrt(fit$mswd)*sqrt(diag(out$cov))
+        out$err['disp',] <- fact*sqrt(fit$mswd)*sqrt(diag(out$cov))
     } else {
         out$err <- matrix(NA,2,2)
         rownames(out$err) <- c('s','ci')
     }
+    if (model==3) fact <- nfact(alpha)
     out$err['s',] <- sqrt(diag(out$cov))
-    out$err['ci',] <- tfact*out$err['s',]
+    out$err['ci',] <- fact*out$err['s',]
     colnames(out$err) <- labels
     out
 }
@@ -218,15 +219,15 @@ discordia.line <- function(fit,wetherill){
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2){
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
-    list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3])
-    if (fit$model!=2 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d)
-    else args <- quote(a%+-%b~'|'~c)
+    if (fit$model==1 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d~u)
+    else args <- quote(a%+-%b~'|'~c~u)
+    list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3],u='Ma')
     if (wetherill){
         upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
         expr1 <- quote('lower intercept =')
         expr2 <- quote('upper intercept =')
-        list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3])
-        if (fit$model!=2 && fit$mswd>1){
+        list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3],u='Ma')
+        if (fit$model==1 && fit$mswd>1){
             list1$d <- lower.age[4]
             list2$d <- upper.age[4]
         }
@@ -234,8 +235,8 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         intercept <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]~'=')
-        list2 <- list(a=intercept[1],b=intercept[2],c=intercept[3])
-        if (fit$model!=2 && fit$mswd>1){
+        list2 <- list(a=intercept[1],b=intercept[2],c=intercept[3],u='')
+        if (fit$model==1 && fit$mswd>1){
             list1$d <- lower.age[4]
             list2$d <- intercept[4]
         }
@@ -255,10 +256,12 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         graphics::mtext(line1,line=1)
         graphics::mtext(line2,line=0)        
     } else {
-        line3 <- substitute('overdispersion ='~a~'|'~b~
-                            '% of the initial Pb',
-                            list(a=signif(100*fit$w['s'],sigdig),
-                                 b=signif(100*fit$w['ci'],sigdig)))
+        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
+        line3 <- substitute('overdispersion ='~a+c/-b~
+                            '% of Pb'[o],
+                            list(a=rounded.disp[1],
+                                 b=rounded.disp[2],
+                                 c=rounded.disp[3]))
         graphics::mtext(line1,line=2)
         graphics::mtext(line2,line=1)
         graphics::mtext(line3,line=0)
