@@ -50,6 +50,37 @@ get.UThHe.age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
     c(tt,st)
 }
 
+flat.uv.table <- function(x,w=0){
+    ns <- length(x)
+    out <- matrix(0,ns,5)
+    for (i in 1:ns){
+        uvc <- UThHe2uv.covmat(x,i,w=w)
+        out[i,c(1,3)] <- uvc$uv
+        out[i,2] <- sqrt(uvc$covmat[1,1])
+        out[i,4] <- sqrt(uvc$covmat[2,2])
+        out[i,5] <- uvc$covmat[1,2]/(out[i,2]*out[i,4])
+    }
+    colnames(out) <- c('u','s[u]','v','s[v]','cor[u,v]')
+    out
+}
+flat.uvw.table <- function(x,w=0){
+    ns <- length(x)
+    out <- matrix(0,ns,9)
+    for (i in 1:ns){
+        uvwc <- UThHe2uvw.covmat(x,i,w=w)
+        out[i,c(1,3,5)] <- uvwc$uvw
+        out[i,2] <- sqrt(uvwc$covmat[1,1])
+        out[i,4] <- sqrt(uvwc$covmat[2,2])
+        out[i,6] <- sqrt(uvwc$covmat[3,3])
+        out[i,7] <- uvwc$covmat[1,2]/(out[i,2]*out[i,4])
+        out[i,8] <- uvwc$covmat[1,3]/(out[i,2]*out[i,6])
+        out[i,9] <- uvwc$covmat[2,3]/(out[i,4]*out[i,6])
+    }
+    colnames(out) <- c('u','s[u]','v','s[v]','w','s[w]',
+                       'rho[u,v]','rho[u,w]','rho[v,w]')
+    out
+}
+
 get.He <- function(tt,U,Th,Sm=0){
     R <- iratio('U238U235')[1]
     L8 <- lambda('U238')[1]

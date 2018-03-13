@@ -170,8 +170,8 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
         # recalculate the weighted mean age, this time
         # taking into account decay and J uncertainties
         out$mean[1:2] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
-        out$mean[3] <- plat$tfact*out$mean[2]
-        graphics::title(plateau.title(out,sigdig=sigdig,Ar=TRUE))
+        out$mean[3] <- nfact(alpha)*out$mean[2]
+        graphics::title(plateau.title(out,sigdig=sigdig,Ar=TRUE,units='Ma'))
         return(invisible(out))
     }
 }
@@ -206,12 +206,13 @@ plateau <- function(x,alpha=0.05){
     out
 }
 
-plateau.title <- function(fit,sigdig=2,Ar=TRUE){
+plateau.title <- function(fit,sigdig=2,Ar=TRUE,units=''){
     rounded.mean <- roundit(fit$mean[1],fit$mean[2:3],sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c,
+    line1 <- substitute('mean ='~a%+-%b~'|'~c~u,
                         list(a=rounded.mean[1],
                              b=rounded.mean[2],
-                             c=rounded.mean[3]))
+                             c=rounded.mean[3],
+                             u=units))
     a <- signif(100*fit$fract,sigdig)
     if (Ar)
         line2 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))

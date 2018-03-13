@@ -176,7 +176,7 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
 }
 
 # convert data to a 5-column table for concordia analysis
-data2weterwas <- function(x,wetherill=TRUE){
+flat.UPb.table <- function(x,wetherill=TRUE){
     ns <- length(x)
     out <- matrix(0,ns,5)
     for (i in 1:ns){

@@ -218,6 +218,7 @@ discordia.line <- function(fit,wetherill){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2){
+    print(fit)
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
     if (fit$model==1 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d~u)
     else args <- quote(a%+-%b~'|'~c~u)
@@ -257,11 +258,11 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         graphics::mtext(line2,line=0)        
     } else {
         rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
-        line3 <- substitute('overdispersion ='~a+c/-b~
+        line3 <- substitute('overdispersion ='~a+b/-c~
                             '% of Pb'[o],
                             list(a=rounded.disp[1],
-                                 b=rounded.disp[2],
-                                 c=rounded.disp[3]))
+                                 b=rounded.disp[3],
+                                 c=rounded.disp[2]))
         graphics::mtext(line1,line=2)
         graphics::mtext(line2,line=1)
         graphics::mtext(line3,line=0)

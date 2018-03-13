@@ -93,7 +93,7 @@ PbPb.inverse.ratios <- function(x){
     out
 }
 
-PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,...){
+PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA){
     ns <- length(x)
     dat <- data2york(x,inverse=FALSE)
     out <- matrix(0,ns,2)

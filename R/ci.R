@@ -10,12 +10,12 @@ profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
                        mu=mu,y=y,m=m,LLmax=LLmax,
                        cutoff=cutoff)$minimum
     }
-    sigmalinit <- 2*sd(log(y)-log(m-y))
-    if (abs(LL.FT(sigmalinit,mu,y,m)-LLmax) < cutoff/2){
+    sigmauinit <- 2*sd(log(y)-log(m-y))
+    if (abs(LL.FT(sigmauinit,mu,y,m)-LLmax) < cutoff/2){
         sigmau <- Inf
     } else {
         sigmau <- optimize(profile_central_FT_helper,
-                           interval=c(sigma,sigmalinit),
+                           interval=c(sigma,sigmauinit),
                            mu=mu,y=y,m=m,LLmax=LLmax,
                            cutoff=cutoff)$minimum
     }    
@@ -24,7 +24,26 @@ profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
     c(ll,ul)
 }
 profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
-    c(0,0) # TODO
+    LLmax <- LL.uvw(fit$w,fit$uvw,x=x,doSm=doSm(x))
+    cutoff <- qchisq(1-alpha,1)
+    doSm <- doSm(x)
+    if (abs(LL.uvw(0,UVW=fit$uvw,x=x,doSm=doSm)-LLmax) < cutoff/2){
+        wl <- 0
+    } else {
+        wl <- optimize(profile_UThHe_disp_helper,
+                           interval=c(0,fit$w),x=x,UVW=fit$uvw,
+                           doSm=doSm,LLmax=LLmax,cutoff=cutoff)$minimum
+    }
+    if (abs(LL.uvw(100,UVW=fit$uvw,x=x,doSm=doSm)-LLmax) < cutoff/2){
+        wu <- Inf
+    } else {
+        wu <- optimize(profile_UThHe_disp_helper,
+                           interval=c(fit$w,10),x=x,UVW=fit$uvw,
+                           doSm=doSm,LLmax=LLmax,cutoff=cutoff)$minimum
+    }
+    ll <- fit$w - wl
+    ul <- wu - fit$w
+    c(ll,ul)
 }
 profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
     w <- fit$w
@@ -50,23 +69,7 @@ profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
     ul <- wu - w
     c(ll,ul)
 }
-LL.uvw <- function(w,UVW,x){
-    doSm <- (length(UVW)>2)
-    LL <- 0
-    for (i in 1:length(x)){
-        if (doSm){
-            uvwc <- UThHe2uvw.covmat(x,i,w=w)
-            X <- UVW-uvwc$uvw
-        } else {
-            uvwc <- UThHe2uv.covmat(x,i,w=w)
-            X <- UVW-uvwc$uv
-        }
-        E <- uvwc$covmat
-        O <- solve(uvwc$covmat)
-        LL <- LL - 0.5*log(det(E)) - 0.5 * X %*% O %*% t(X)
-    }
-    LL
-}
+
 profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     mu <- fit$mu[1]
     sigma <- fit$sigma
@@ -102,6 +105,10 @@ profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
 }
 profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff){
     LL <- LL.lud.UPb.disp(w,x,ta0b0)
+    abs(LLmax-LL-cutoff/2)
+}
+profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
+    LL <- LL.uvw(w,UVW=UVW,x=x,doSm=doSm)
     abs(LLmax-LL-cutoff/2)
 }
 

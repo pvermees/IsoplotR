@@ -357,7 +357,7 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'PbPb')){
-        tt <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb)
+        tt <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ThU')){
         tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
         exterr <- FALSE

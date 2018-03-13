@@ -168,24 +168,21 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
     mswd <- mswd_UThHe(x,fit,doSm=doSm)
-    fact <- nfact(alpha)
+    f <- tfact(alpha,mswd$df)
     if (model==1){
         out <- c(fit,mswd)
-        fact <- tfact(alpha,mswd$df)
         out$age['disp[t]'] <-
-            uvw2age(out,doSm(x),fact*sqrt(mswd$mswd))[2]
+            uvw2age(out,doSm=doSm(x),fact=f*sqrt(mswd$mswd))[2]
     } else if (model==2){
         out <- fit
     } else {
-        ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@36@"]]))##:ess-bp-end:##
+        f <- nfact(alpha)
         w <- get.UThHe.w(x,fit)
-        # REPLACE WITH DIRECT SOLUTION FROM LUDWIG!
         out <- UThHe_logratio_mean(x,model=model,w=w)
         out$w <- c(w,profile_LL_central_disp_UThHe(fit=out,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
-    out$age['ci[t]'] <- fact*out$age['s[t]']
+    out$age['ci[t]'] <- f*out$age['s[t]']
     out
 }
 #' @param mineral setting this parameter to either \code{apatite} or
@@ -236,12 +233,6 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,...){
     out
 }
 
-get.UThHe.w <- function(x,fit){
-    mswd <- mswd_UThHe(x,fit,doSm=doSm(x))$mswd
-    wrange <- c(0,sqrt(mswd))
-    stats::optimize(UThHe_misfit,interval=wrange,x=x,model=3)$minimum
-}
-
 UThHe_logratio_mean <- function(x,model=1,w=0,fact=1){
     out <- average_uvw(x,model=model,w=w)
     out$model <- model
@@ -273,21 +264,21 @@ average_uvw <- function(x,model=1,w=0){
     doSm <- doSm(x)
     if (doSm(x)){
         nms <- c('u','v','w')
-        uvw <- UThHe2uvw(x)
-        init <- rep(0,3)
+        logratios <- flat.uvw.table(x,w=w)
+        fit <- wtdmean3D(logratios)
+        uvw <- logratios[,c(1,3,5)]
     } else {
         nms <- c('u','v')
-        uvw <- UThHe2uv(x)
-        init <- rep(0,2)
+        logratios <- flat.uv.table(x,w=w)
+        fit <- wtdmean2D(logratios)
+        uvw <- logratios[,c(1,3)]
     }
     if (model==2){
         out$uvw <- apply(uvw,2,mean)
         out$covmat <- stats::cov(uvw)/(nrow(uvw)-1)
     } else {
-        fit <- stats::optim(init,SS.UThHe.uvw,method='BFGS',
-                            hessian=TRUE,x=x,w=w)
-        out$uvw <- fit$par
-        out$covmat <- solve(fit$hessian)
+        out$uvw <- fit$x
+        out$covmat <- fit$cov
     }
     names(out$uvw) <- nms
     colnames(out$covmat) <- nms
@@ -295,20 +286,14 @@ average_uvw <- function(x,model=1,w=0){
     out
 }
 
-mswd_UThHe <- function(x,fit,doSm=FALSE){
-    out <- list()
-    if (doSm) nd <- 3
-    else nd <- 2
-    SS <- SS.UThHe.uvw(fit$uvw[1:nd],x,w=fit$w)
-    out$df <- nd*(length(x)-1)
-    out$mswd <- SS/out$df
-    out$p.value <- 1-stats::pchisq(SS,out$df)
-    out
+get.UThHe.w <- function(x,fit){
+    stats::optimize(LL.uvw,interval=c(0,100),
+                    UVW=fit$uvw,x=x,doSm=doSm(x),
+                    maximum=TRUE)$maximum
 }
-# UVW = central composition
-SS.UThHe.uvw <- function(UVW,x,w=0){
-    doSm <- (length(UVW)>2)
-    SS <- 0
+
+LL.uvw <- function(w,UVW,x,doSm=TRUE,LL=TRUE){
+    out <- 0
     for (i in 1:length(x)){
         if (doSm){
             uvwc <- UThHe2uvw.covmat(x,i,w=w)
@@ -317,15 +302,25 @@ SS.UThHe.uvw <- function(UVW,x,w=0){
             uvwc <- UThHe2uv.covmat(x,i,w=w)
             X <- UVW-uvwc$uv
         }
-        Ei <- solve(uvwc$covmat)
-        SSi <- X %*% Ei %*% t(X)
-        if (is.finite(SSi)) SS <- SS + SSi
+        E <- uvwc$covmat
+        SS <- X %*% solve(E) %*% t(X)
+        if (LL) {
+            out <- out - ( log(det(E)) + SS )/2
+        } else {
+            out <- out + SS
+        }
     }
-    as.numeric(SS)
+    out
 }
-UThHe_misfit <- function(w,x,model=1){
-    fit <- UThHe_logratio_mean(x,model=model,w=w)
-    abs(mswd_UThHe(x,fit,doSm=doSm(x))$mswd-1)
+mswd_UThHe <- function(x,fit,doSm=FALSE){
+    out <- list()
+    if (doSm) nd <- 3
+    else nd <- 2
+    SS <- LL.uvw(w=fit$w,fit$uvw[1:nd],x,doSm=doSm,LL=FALSE)
+    out$df <- nd*(length(x)-1)
+    out$mswd <- as.numeric(SS/out$df)
+    out$p.value <- 1-stats::pchisq(SS,out$df)
+    out
 }
 
 continuous_mixture <- function(zu,su){

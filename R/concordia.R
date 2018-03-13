@@ -460,7 +460,7 @@ concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
 
 # x has class 'UPb'
 concordia.comp <- function(x,wetherill=TRUE){
-    X <- data2weterwas(x,wetherill=wetherill)
+    X <- flat.UPb.table(x,wetherill=wetherill)
     out <- wtdmean2D(X)
     cnames <- colnames(X)[c(1,3)]
     names(out$x) <- cnames

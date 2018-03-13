@@ -329,7 +329,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'PbPb')){
-        tt <- PbPb.age(x,exterr=FALSE,i2i=i2i)
+        tt <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){

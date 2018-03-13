@@ -276,12 +276,12 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
 helioplot_title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
     expr <- quote('central age =')
-    args <- quote(~a%+-%b~'|'~c)
+    args <- quote(~a%+-%b~'|'~c~'Ma')
     list1 <- list(a=rounded.age[1],
                   b=rounded.age[2],
                   c=rounded.age[3])
     if (fit$model==1 && fit$mswd>1){
-        args <- quote(~a%+-%b~'|'~c~'|'~d)
+        args <- quote(~a%+-%b~'|'~c~'|'~d~'Ma')
         list1$d <- rounded.age[4]
         line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
@@ -291,10 +291,10 @@ helioplot_title <- function(fit,sigdig=2){
     } else if (fit$model==2){
         line1line <- 0
     } else if (fit$model==3){
-        rounded.disp <- signif(100*fit$w,sigdig)
-        list2 <- list(a=rounded.disp[1],b=rounded.disp[2])
+        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig)
+        list2 <- list(a=rounded.disp[1],b=rounded.disp[2],c=rounded.disp[3])
         expr2 <- quote('dispersion =')
-        args2 <- quote(a~'|'~b~'%')
+        args2 <- quote(a+c-b~'%')
         call2 <- substitute(e~a,list(e=expr2,a=args2))
         line2 <- do.call(substitute,list(eval(call2),list2))
         line1line <- 1
