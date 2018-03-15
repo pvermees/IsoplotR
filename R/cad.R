@@ -53,6 +53,7 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     graphics::plot(range(x,na.rm=TRUE),c(0,1),type='n',
                    ylab='cumulative probability',xlab=xlab,...)
     graphics::lines(stats::ecdf(x),pch=pch,verticals=verticals,col=col)
+    graphics::mtext(paste0('n=',length(x)),line=0,adj=1)
 }
 #' @param col colour to give to single sample datasets (not applicable
 #'     if \code{x} has class \code{detritals})

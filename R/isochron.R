@@ -754,7 +754,7 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
 }
 regression_init <- function(X,model=model,alpha=0.05){
     fit <- regression(X,model=model)
-    out <- fit
+    out$n <- length(X)
     out$displabel <- quote('y-dispersion = ')
     out$y0label <- quote('y-intercept = ')
     if (model==1){
@@ -794,8 +794,13 @@ get.limits <- function(X,sX){
 }
 
 isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
-    if (fit$model==1 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d~u)
-    else args <- quote(a%+-%b~'|'~c~u)
+    if (fit$model==1 && fit$mswd>1){
+        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='~n~')')
+        args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
+    } else {
+        args1 <- quote(a%+-%b~'|'~c~u~'(n='~n~')')
+        args2 <- quote(a%+-%b~'|'~c~u)
+    }
     if (is.na(type)){
         intercept <- roundit(fit$a[1],fit$a[2:4],sigdig=sigdig)
         slope <- roundit(fit$b[1],fit$b[2:4],sigdig=sigdig)
@@ -804,7 +809,8 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
         list1 <- list(a=slope[1],
                       b=slope[2],
                       c=slope[3],
-                      u='')
+                      u='',
+                      n=fit$n)
         list2 <- list(a=intercept[1],
                       b=intercept[2],
                       c=intercept[3],
@@ -820,7 +826,8 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
         list1 <- list(a=rounded.age[1],
                       b=rounded.age[2],
                       c=rounded.age[3],
-                      u=units)
+                      u=units,
+                      n=fit$n)
         list2 <- list(a=rounded.intercept[1],
                       b=rounded.intercept[2],
                       c=rounded.intercept[3],
@@ -831,8 +838,8 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
         }
         expr2 <- fit$y0label
     }
-    call1 <- substitute(e~a,list(e=expr1,a=args))
-    call2 <- substitute(e~a,list(e=expr2,a=args))
+    call1 <- substitute(e~a,list(e=expr1,a=args1))
+    call2 <- substitute(e~a,list(e=expr2,a=args2))
     line1 <- do.call(substitute,list(eval(call1),list1))
     line2 <- do.call(substitute,list(eval(call2),list2))
     if (fit$model==1){

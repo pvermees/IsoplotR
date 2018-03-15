@@ -155,6 +155,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     if (show.central.comp){
         plot_central_ellipse(fit,fact=fact,logratio=logratio,
                              alpha=alpha,doSm=doSm(x))
+        fit$n <- length(x)
         graphics::title(helioplot_title(fit,sigdig=sigdig))
     }
     invisible(colourbar(z=levels,col=ellipse.col,clabel=clabel))
@@ -276,12 +277,13 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
 helioplot_title <- function(fit,sigdig=2){
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
     expr <- quote('central age =')
-    args <- quote(~a%+-%b~'|'~c~'Ma')
+    args1 <- quote(~a%+-%b~'|'~c~'Ma'~'(n='~n~')')
     list1 <- list(a=rounded.age[1],
                   b=rounded.age[2],
-                  c=rounded.age[3])
+                  c=rounded.age[3],
+                  n=fit$n)
     if (fit$model==1 && fit$mswd>1){
-        args <- quote(~a%+-%b~'|'~c~'|'~d~'Ma')
+        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'Ma'~'(n='~n~')')
         list1$d <- rounded.age[4]
         line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
@@ -300,7 +302,7 @@ helioplot_title <- function(fit,sigdig=2){
         line1line <- 1
         graphics::mtext(line2,line=0)
     }
-    call1 <- substitute(e~a,list(e=expr,a=args))
+    call1 <- substitute(e~a,list(e=expr,a=args1))
     line1 <- do.call(substitute,list(eval(call1),list1))
     graphics::mtext(line1,line=line1line)
 }

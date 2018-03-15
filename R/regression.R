@@ -5,6 +5,7 @@ regression <- function(d,model=1,type='york'){
     else stop('invalid regression model')
     out$model <- model
     out$d <- d
+    out$n <- nrow(d)
     out
 }
 

@@ -135,6 +135,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                   c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
     }
     if (plateau){
+        plat$n <- nrow(x)
         if (title) graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
         return(invisible(plat))
     }
@@ -208,11 +209,13 @@ plateau <- function(x,alpha=0.05){
 
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units=''){
     rounded.mean <- roundit(fit$mean[1],fit$mean[2:3],sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c~u,
+    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='~n/N~')',
                         list(a=rounded.mean[1],
                              b=rounded.mean[2],
                              c=rounded.mean[3],
-                             u=units))
+                             u=units,
+                             n=length(fit$i),
+                             N=fit$n))
     a <- signif(100*fit$fract,sigdig)
     if (Ar)
         line2 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))

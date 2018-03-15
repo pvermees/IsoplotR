@@ -203,6 +203,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1))
         discordia.line(fit,wetherill=wetherill)
+        fit$n <- length(x)
         graphics::title(discordia.title(fit,wetherill=wetherill,
                                         sigdig=sigdig))
     }
@@ -231,6 +232,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                              exterr=exterr,alpha=alpha)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
+        fit$n <- length(x)
         graphics::title(concordia.title(fit,sigdig=sigdig))
     }
     colourbar(z=levels,col=ellipse.col,clabel=clabel)
@@ -388,10 +390,10 @@ get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
 # this would be much easier in unicode but that doesn't render in PDF:
 concordia.title <- function(fit,sigdig=2,alpha=0.05){
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
-    expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'Ma')
-    list1 <- list(a=rounded.age[1],b=rounded.age[2],c=rounded.age[3])
+    expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'Ma (n='~n~')')
+    list1 <- list(a=rounded.age[1],b=rounded.age[2],c=rounded.age[3],n=fit$n)
     if (fit$mswd['combined']>1){
-        expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d~'Ma')
+        expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d~'Ma (n='~n~')')
         list1$d <- rounded.age[4]
     }
     line1 <- do.call('substitute',list(eval(expr1),list1))

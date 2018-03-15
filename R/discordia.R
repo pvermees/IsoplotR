@@ -218,11 +218,15 @@ discordia.line <- function(fit,wetherill){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2){
-    print(fit)
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
-    if (fit$model==1 && fit$mswd>1) args <- quote(a%+-%b~'|'~c~'|'~d~u)
-    else args <- quote(a%+-%b~'|'~c~u)
-    list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3],u='Ma')
+    if (fit$model==1 && fit$mswd>1){
+        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='~n~')')
+        args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
+    } else {
+        args1 <- quote(a%+-%b~'|'~c~u~'(n='~n~')')
+        args2 <- quote(a%+-%b~'|'~c~u)
+    }
+    list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3],u='Ma',n=fit$n)
     if (wetherill){
         upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
         expr1 <- quote('lower intercept =')
@@ -242,8 +246,8 @@ discordia.title <- function(fit,wetherill,sigdig=2){
             list2$d <- intercept[4]
         }
     }
-    call1 <- substitute(e~a,list(e=expr1,a=args))
-    call2 <- substitute(e~a,list(e=expr2,a=args))
+    call1 <- substitute(e~a,list(e=expr1,a=args1))
+    call2 <- substitute(e~a,list(e=expr2,a=args2))
     line1 <- do.call('substitute',list((call1),list1))
     line2 <- do.call('substitute',list((call2),list2))
     if (fit$model==1){
