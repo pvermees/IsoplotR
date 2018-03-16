@@ -20,7 +20,7 @@ radialplot(x, ...)
 \method{radialplot}{default}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("white", "red"), title = TRUE,
-  k = 0, markers = NULL, alpha = 0.05, ...)
+  k = 0, markers = NULL, alpha = 0.05, units = "", ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
   transformation = "arcsin", sigdig = 2, show.numbers = FALSE, pch = 21,
@@ -128,6 +128,8 @@ component.}
 plot.}
 
 \item{alpha}{cutoff value for confidence intervals}
+
+\item{units}{measurement units to be displayed in the legend.}
 
 \item{exterr}{propagate the external sources of uncertainty into
 the mixture model errors?}

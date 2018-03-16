@@ -308,11 +308,12 @@ get.titterington.xy <- function(dat,abAB){
     out <- matrix(NA,ns,3)
     colnames(out) <- c('X','Y','Z')
     for (i in 1:ns){
-        abg <- alpha.beta.gamma(a,b,A,B,dat$XYZ[[i]],dat$omega[[i]])
+        abg <- alpha.beta.gamma(abAB[1],abAB[2],abAB[3],abAB[4],
+                                dat$XYZ[[i]],dat$omega[[i]])
         XYZ <- dat$XYZ[[i]]
         out[i,1] <- XYZ[1] + abg[2]/abg[1]
-        out[i,2] <- XYZ[2] + abAB[1] + abAB[2]*X[1,1]
-        out[i,2] <- XYZ[3] + abAB[3] + abAB[4]*X[1,1]
+        out[i,2] <- XYZ[2] + abAB[1] + abAB[2]*XYZ[1]
+        out[i,2] <- XYZ[3] + abAB[3] + abAB[4]*XYZ[1]
     }
     out
 }

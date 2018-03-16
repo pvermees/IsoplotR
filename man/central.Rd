@@ -75,10 +75,6 @@ degrees of freedom (only reported if \code{model=1}.)}
 
 }
 
-\item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the t-
-distribution for \code{df} degrees of freedom (not reported if
-\code{model=2}).}
-
 \item{age}{a three- or four-element vector with:
 
 \code{t}: the central age.

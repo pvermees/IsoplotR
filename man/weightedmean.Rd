@@ -144,24 +144,22 @@ Returns a list with the following items:
 
 \code{x}: the weighted mean
 
-\code{s[x]}: the estimated analytical uncertainty of \code{x}
+\code{s[x]}: the standard error of the weighted mean
 
-\code{ci[x]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{x}.
+\code{ci[x]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{x}
 
 }
 
 \item{disp}{a two element vector with the (over)dispersion and its
 corresponding \eqn{100(1-\alpha)\%} confidence interval.}
 
-\item{df}{the degrees of freedom for the Chi-square test
-(\eqn{n-2})}
-
-\item{tfact}{the \eqn{100(1-\alpha/2)} percentile of a
-t-distribution with \code{df+1} degrees of freedom}
-
 \item{mswd}{the Mean Square of the Weighted Deviates
 (a.k.a. `reduced Chi-square' statistic)}
+
+\item{df}{the number of degrees of freedom of the Chi-square test
+for homogeneity (\eqn{df=n-1}, where \eqn{n} is the number of
+samples).}
 
 \item{p.value}{the p-value of a Chi-square test with \eqn{df}
 degrees of freedom, testing the null hypothesis that the underlying

@@ -67,6 +67,7 @@
 #' @param markers vector of ages of radial marker lines to add to the
 #'     plot.
 #' @param alpha cutoff value for confidence intervals
+#' @param units measurement units to be displayed in the legend.
 #' @param ... additional arguments to the generic \code{points}
 #'     function
 #' @seealso \code{\link{peakfit}}, \code{\link{central}}

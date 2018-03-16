@@ -1,6 +1,6 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -119,8 +119,8 @@ Type 'q()' to quit R.
 > 
 > data(examples)
 > print(central(examples$UThHe)$age)
-         t       s[t]      ci[t]    disp[t] 
-6.42248810 0.07890887 0.15700390 0.64921685 
+        t      s[t]     ci[t]   disp[t] 
+6.4224881 0.1115940 0.2220370 0.3200905 
 > 
 > 
 > 
@@ -227,38 +227,6 @@ dev.new(): using pdf(file="Rplots1.pdf")
 > radialplot(examples$FT1)
 > 
 > helioplot(examples$UThHe)
-$uvw
-       u        v        w 
-3.964309 5.558184 9.332227 
-
-$covmat
-             u            v            w
-u 1.302800e-04 6.597582e-05 6.597585e-05
-v 6.597582e-05 1.302602e-04 6.597633e-05
-w 6.597585e-05 6.597633e-05 1.302620e-04
-
-$model
-[1] 1
-
-$w
-[1] 0
-
-$age
-         t       s[t]      ci[t]    disp[t] 
-6.42248810 0.07890887 0.15700390 0.64921685 
-
-$tfact
-[1] 1.989686
-
-$df
-[1] 81
-
-$mswd
-[1] 17.09853
-
-$p.value
-[1] 0
-
 > 
 > evolution(examples$ThU)
 > 
@@ -290,73 +258,9 @@ $p.value
 > 
 > data(examples)
 > helioplot(examples$UThHe)
-$uvw
-       u        v        w 
-3.964309 5.558184 9.332227 
-
-$covmat
-             u            v            w
-u 1.302800e-04 6.597582e-05 6.597585e-05
-v 6.597582e-05 1.302602e-04 6.597633e-05
-w 6.597585e-05 6.597633e-05 1.302620e-04
-
-$model
-[1] 1
-
-$w
-[1] 0
-
-$age
-         t       s[t]      ci[t]    disp[t] 
-6.42248810 0.07890887 0.15700390 0.64921685 
-
-$tfact
-[1] 1.989686
-
-$df
-[1] 81
-
-$mswd
-[1] 17.09853
-
-$p.value
-[1] 0
-
 > dev.new()
 dev.new(): using pdf(file="Rplots2.pdf")
 > helioplot(examples$UThHe,logratio=FALSE)
-$uvw
-       u        v        w 
-3.964309 5.558184 9.332227 
-
-$covmat
-             u            v            w
-u 1.302800e-04 6.597582e-05 6.597585e-05
-v 6.597582e-05 1.302602e-04 6.597633e-05
-w 6.597585e-05 6.597633e-05 1.302620e-04
-
-$model
-[1] 1
-
-$w
-[1] 0
-
-$age
-         t       s[t]      ci[t]    disp[t] 
-6.42248810 0.07890887 0.15700390 0.64921685 
-
-$tfact
-[1] 1.989686
-
-$df
-[1] 81
-
-$mswd
-[1] 17.09853
-
-$p.value
-[1] 0
-
 > 
 > 
 > 
@@ -521,7 +425,7 @@ $L
 [1] -71.94616
 
 $legend
-[1] "Peak 1: 103 ± 14 | 28 (40%)" "Peak 2: 103 ± 12 | 24 (60%)"
+[1] "Peak 1: 103 ± 14 | 28 (41%)" "Peak 2: 103 ± 12 | 24 (59%)"
 
 > 
 > peakfit(examples$LudwigMixture,k='min')
@@ -619,38 +523,6 @@ Pb207U235,sePb207U235,Pb206U238,sePb206U238,rho
 > f5 <- system.file("UThSmHe.csv",package="IsoplotR")
 > d5 <- read.data(f5,method="U-Th-He")
 > helioplot(d5)
-$uvw
-       u        v        w 
-3.964309 5.558184 9.332227 
-
-$covmat
-             u            v            w
-u 1.302800e-04 6.597582e-05 6.597585e-05
-v 6.597582e-05 1.302602e-04 6.597633e-05
-w 6.597585e-05 6.597633e-05 1.302620e-04
-
-$model
-[1] 1
-
-$w
-[1] 0
-
-$age
-         t       s[t]      ci[t]    disp[t] 
-6.42248810 0.07890887 0.15700390 0.64921685 
-
-$tfact
-[1] 1.989686
-
-$df
-[1] 81
-
-$mswd
-[1] 17.09853
-
-$p.value
-[1] 0
-
 > 
 > f6 <- system.file("ThU2.csv",package="IsoplotR")
 > d6 <- read.data(f6,method="Th-U",format=2)
@@ -691,7 +563,7 @@ $p.value
 [1] 350  10
 > FT <- set.zeta(examples$FT1,tst=c(250,5))
 > print(FT$zeta)
-[1] 855  36
+[1] "855" "36" 
 > 
 > 
 > 
@@ -777,8 +649,8 @@ $mswd
 $p.value
 [1] 1
 
-$tfact
-[1] 2.306004
+$type
+[1] "titterington"
 
 > 
 > 
@@ -854,7 +726,7 @@ $tfact
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.744 10.832 11.289 0 0 
+Time elapsed:  11.629 4.057 10.526 0.004 0 
 > grDevices::dev.off()
 pdf 
   2 

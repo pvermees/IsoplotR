@@ -553,7 +553,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
 isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                            show.numbers=FALSE,line.col='red',lwd=2,
                            plot=TRUE,model=1,...){
-    out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
+    out <- isochron_init(x,model=model,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
     out <- ci_isochron(out,model=model,alpha=alpha)

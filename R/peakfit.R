@@ -256,7 +256,7 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
         tt <- filter.UPb.ages(x,type,cutoff.76,
                               cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'PbPb')){
-        tt <- PbPb.age(x,exterr=FALSE,i2i=i2i)
+        tt <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){
@@ -332,8 +332,8 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
         line <- paste0('Peak ',i,': ',rounded.age[1],' \u00B1 ',
                        rounded.age[2],' | ',rounded.age[3])
         if (k>1){
-            rounded.prop <- roundit(fit$props[1,i],fit$props[2,i],sigdig=sigdig)
-            line <- paste0(line,' (',100*rounded.prop[1],'%)')
+            rounded.prop <- roundit(100*fit$props[1,i],100*fit$props[2,i],sigdig=sigdig)
+            line <- paste0(line,' (',rounded.prop[1],'%)')
         }
         out <- c(out,line)
     }

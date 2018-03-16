@@ -209,8 +209,10 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=1,exterr=TRUE,i=NA,sigdig=NA,...)
         X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
-    if (isochron) out <- isochron(X,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- PbPb.age(X,exterr=exterr,i=i,sigdig=sigdig,common.Pb=common.Pb,...)
+    if (isochron)
+        out <- isochron(X,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
+    else
+        out <- PbPb.age(X,exterr=exterr,i=i,sigdig=sigdig)
     out
 }
 #' @param J two-element vector with the J-factor and its standard

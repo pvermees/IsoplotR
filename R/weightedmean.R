@@ -299,7 +299,7 @@ weightedmean.LuHf <- function(x,detect.outliers=TRUE,plot=TRUE,
 weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
                                rect.col=rgb(0,1,0,0.5),
                                outlier.col=rgb(0,1,1,0.5),sigdig=2,
-                               alpha=0.05,units='Ma',...){
+                               alpha=0.05,...){
     tt <- UThHe.age(x)
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,...)
