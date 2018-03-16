@@ -754,6 +754,7 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
 }
 regression_init <- function(X,model=model,alpha=0.05){
     fit <- regression(X,model=model)
+    out <- fit
     out$n <- length(X)
     out$displabel <- quote('y-dispersion = ')
     out$y0label <- quote('y-intercept = ')
