@@ -119,19 +119,17 @@ Returns a list with the following items:
 
 \code{s[t]}: the estimated uncertainties of \code{t}
 
-\code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t}}
+\code{ci[t]}: the widths of approximate \eqn{100(1-\alpha)\%}
+confidence intervals for \code{t}}
 
 \item{props}{a \code{2 x k} matrix with the following rows:
 
 \code{p}: the proportions of the \code{k} peaks
 
-\code{s[p]}: the estimated uncertainties of \code{p}}
+\code{s[p]}: the estimated uncertainties (standard errors) of
+\code{p}}
 
 \item{L}{the log-likelihood of the fit}
-
-\item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the
-t-distribution with \eqn{(n-2k+1)} degrees of freedom}
 
 \item{legend}{a vector of text expressions to be used in a figure
     legend}

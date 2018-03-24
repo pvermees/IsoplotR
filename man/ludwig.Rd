@@ -57,10 +57,11 @@ Chi-square statistic) for the fit.}
 
 \item{p.value}{p-value of a Chi-square test for the linear fit}
 
-\item{w}{the overdispersion, i.e., a two-element vector with the
+\item{w}{the overdispersion, i.e., a three-element vector with the
 estimated standard deviation of the (assumedly) Normal distribution
-that underlies the true isochron; and the \eqn{100(1-\alpha)\%}
-confidence interval (only relevant if \code{model = 3}).}
+that underlies the true isochron; and the lower and upper
+half-widths of its \eqn{100(1-\alpha)\%} confidence interval (only
+relevant if \code{model = 3}).}
 
 }
 }

@@ -205,14 +205,49 @@ intersection.misfit.york <- function(age,a,b){
 discordia.line <- function(fit,wetherill){
     X <- c(0,0)
     Y <- c(0,0)
+    l5 <- lambda('U235')[1]
+    l8 <- lambda('U238')[1]
+    J <- matrix(0,1,2)
     if (wetherill){
+        tl <- fit$x[1]
+        tu <- fit$x[2]
         X <- age_to_Pb207U235_ratio(fit$x)[,'75']
         Y <- age_to_Pb206U238_ratio(fit$x)[,'68']
+        usr <- par('usr')
+        x <- seq(from=max(usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
+        aa <- exp(l8*tu)-exp(l8*tl)
+        bb <- (x-exp(l5*tl)+1)
+        cc <- exp(l5*tu)-exp(l5*tl)
+        dd <- exp(l8*tl)-1
+        y <- aa*bb/cc + dd
+        dadtl <- -l8*exp(l8*tl)
+        dbdtl <- -l5*exp(l5*tl)
+        dcdtl <- -l5*exp(l5*tl)
+        dddtl <-  l8*exp(l8*tl)
+        dadtu <- l8*exp(l8*tu)
+        dbdtu <- 0
+        dcdtu <- l5*exp(l5*tu)
+        dddtu <- 0
+        J1 <- dadtl*bb/cc + dbdtl*aa/cc - dcdtl*aa*bb/cc^2 + dddtl # dydtl
+        J2 <- dadtu*bb/cc + dbdtu*aa/cc - dcdtu*aa*bb/cc^2 + dddtu # dydtu
+        E11 <- fit$cov[1,1]
+        E12 <- fit$cov[1,2]
+        E22 <- fit$cov[2,2]
+        sy <- sqrt(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
+        ul <- y + sy
+        ll <- y - sy
+        t5 <- log(1+x)/l5
+        yconc <- exp(l8*t5)-1
+        overshot <- ul>yconc
+        ul[overshot] <- yconc[overshot]
+        cix <- c(x,rev(x))
+        ciy <- c(ll,rev(ul))
     } else {
         X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'])[,'86']
         Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'])[,'76']
         Y[2] <- fit$x['76']
     }
+    graphics::polygon(cix,ciy,col='gray80',border=NA)
     graphics::lines(X,Y)
 }
 

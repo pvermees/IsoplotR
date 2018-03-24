@@ -130,7 +130,7 @@ following items:
 
 \item{model}{ the fitting model (\code{=show.age-1}).}
 
-\item{x}{ a two element vector with the upper and lower intercept
+\item{x}{ a two-element vector with the upper and lower intercept
 ages (if \code{wetherill=TRUE}) or the lower intercept age and
 \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (if
 \code{wetherill=FALSE}).}
@@ -160,10 +160,12 @@ goodness-of-fit measure. \code{mswd > 1} indicates overdispersion
 w.r.t the analytical uncertainties (not reported if
 \code{show.age=3}).}
 
-\item{w}{ two-element vector with the standard deviation of the
-(assumedly) Normal overdispersion term and the corresponding
-\eqn{100(1-\alpha)\%} confidence interval (only important if
-\code{show.age=4}).}
+\item{w}{ three-element vector with the standard deviation of the
+(assumedly) Normal overdispersion term and the lower and upper
+half-widths of its \eqn{100(1-\alpha)\%} confidence interval (only
+important if \code{show.age=4}).}
+
+\item{n}{ the number of aliquots in the dataset }
 
 }
 }

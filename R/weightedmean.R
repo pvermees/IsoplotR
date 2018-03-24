@@ -53,10 +53,6 @@
 #'     \code{RbSr}, \code{LuHf}, \code{ThU}, \code{fissiontracks} or
 #'     \code{UThHe}
 #' @param ... optional arguments
-#' @references
-#' Ludwig, K. R. User's manual for Isoplot 3.00: a geochronological
-#' toolkit for Microsoft Excel. Berkeley Geochronology Center Special
-#' Publication, 2003.
 #' @seealso \code{\link{central}}
 #' @return Returns a list with the following items:
 #'
@@ -73,8 +69,9 @@
 #'
 #' }
 #'
-#' \item{disp}{a two element vector with the (over)dispersion and its
-#' corresponding \eqn{100(1-\alpha)\%} confidence interval.}
+#' \item{disp}{a three-element vector with the (over)dispersion and
+#' the lower and upper half-widths of its \eqn{100(1-\alpha)\%}
+#' confidence interval.}
 #'
 #' \item{mswd}{the Mean Square of the Weighted Deviates
 #' (a.k.a. `reduced Chi-square' statistic)}
@@ -337,7 +334,7 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
                   (rhoD[2]/rhoD[1])^2 +
                   (zeta[2]/zeta[1])^2
                 )
-        out$mean['ci[x]'] <- fit$tfact*out$mean['s[x]']
+        out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
     }
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],out,rect.col=rect.col,

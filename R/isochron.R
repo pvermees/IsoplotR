@@ -113,6 +113,9 @@
 #'     be used. If \code{levels} is a vector of numbers, then
 #'     \code{ellipse.col} is used to construct a colour ramp.
 #'
+#' @param ci.col the fill colour for the confidence interval of the
+#'     intercept and slope.
+#'
 #' @param line.col colour of the isochron line
 #'
 #' @param lwd line width
@@ -169,7 +172,8 @@ isochron <- function(x,...){ UseMethod("isochron",x) }
 isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.numbers=FALSE,levels=NA,clabel="",
                              ellipse.col=c("#00FF0080","#FF000080"),
-                             line.col='red',lwd=2,title=TRUE,model=1,...){
+                             ci.col='gray80',line.col='black',lwd=1,
+                             title=TRUE,model=1,...){
     X <- subset(x,select=1:5)
     colnames(X) <- c('X','sX','Y','sY','rXY')
     fit <- regression_init(X,model=model,alpha=alpha)
@@ -177,7 +181,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model!=2),show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                a=fit$a[1],b=fit$b[1],line.col=line.col,lwd=lwd)
+                fit=fit,ci.col=ci.col,line.col=line.col,lwd=lwd)
     if (title)
         graphics::title(isochrontitle(fit,sigdig=sigdig),
                         xlab='X',ylab='Y')
@@ -248,20 +252,17 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
 #' applicable if \code{ model=1}).  }
 #'
-#' \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
-#' t-distribution with \code{df} degrees of freedom.}
-#'
 #' \item{mswd}{the mean square of the residuals (a.k.a `reduced
 #'     Chi-square') statistic (omitted if \code{model=2}).}
 #'
 #' \item{p.value}{the p-value of a Chi-square test for linearity
 #' (omitted if \code{model=2})}
 #'
-#' \item{w}{the overdispersion term, i.e. a two-element vector with
+#' \item{w}{the overdispersion term, i.e. a three-element vector with
 #' the standard deviation of the (assumedly) Normally distributed
-#' geological scatter that underlies the measurements, and the
-#' corresponding studentised \eqn{100(1-\alpha)\%} confidence interval
-#' (only returned if \code{model=3}).}
+#' geological scatter that underlies the measurements, and the lower
+#' and upper half-widths of its \eqn{100(1-\alpha)\%} confidence
+#' interval (only returned if \code{model=3}).}
 #'
 #' }
 #'
@@ -331,11 +332,11 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
 #' if \code{model=1}).}
 #'
-#' \item{w}{the overdispersion term, i.e. a two-element vector with
+#' \item{w}{the overdispersion term, i.e. a three-element vector with
 #' the standard deviation of the (assumedly) Normally distributed
-#' geological scatter that underlies the measurements, and the
-#' corresponding \eqn{100(1-\alpha)\%} confidence interval (only
-#' returned if \code{model=3}).}
+#' geological scatter that underlies the measurements, and the lower
+#' and upper half-width of its \eqn{100(1-\alpha)\%} confidence
+#' interval (only returned if \code{model=3}).}
 #'
 #' \item{d}{a matrix with the following columns: the X-variable for
 #' the isochron plot, the analytical uncertainty of X, the Y-variable
@@ -361,8 +362,8 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
-                          exterr=TRUE,model=1,...){
+                          inverse=TRUE,ci.col='gray80',line.col='black',
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,...){
     out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
     a <- out$a['a']
     sa <- out$a['s[a]']
@@ -398,8 +399,8 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
-                    b=out$b[1],line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,
+                    fit=out,ci.col=ci.col,line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -410,8 +411,8 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          inverse=TRUE,line.col='red',lwd=2,plot=TRUE,
-                          exterr=TRUE,model=1,...){
+                          inverse=TRUE,ci.col='gray80',line.col='black',
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,...){
     out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
     if (inverse){
         R76 <- out$a
@@ -439,8 +440,8 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
-                    b=out$b[1],line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -451,12 +452,12 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
-                          model=1,...){
+                          ci.col='gray80',line.col='black',lwd=1,
+                          plot=TRUE,exterr=TRUE,model=1,...){
     isochron_PD(x,'Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
+                ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
                 model=model,...)
 }
 #' @rdname isochron
@@ -464,39 +465,39 @@ isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
-                          model=1,...){
+                          ci.col='gray80',line.col='black',lwd=1,
+                          plot=TRUE,exterr=TRUE,model=1,...){
     isochron_PD(x,'Re187',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
-                model=model,...)
+                ci.col=ci.col,line.col=line.col,lwd=lwd,
+                plot=plot,exterr=exterr,model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
-                          model=1,...){
+                          ci.col='gray80',line.col='black',lwd=1,
+                          plot=TRUE,exterr=TRUE,model=1,...){
     isochron_PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
-                model=model,...)
+                ci.col=ci.col,line.col=line.col,lwd=lwd,
+                plot=plot,exterr=exterr,model=model,...)
 }
 #' @rdname isochron
 #' @export
 isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
-                          model=1,...){
+                          ci.col='gray80',line.col='black',lwd=1,
+                          plot=TRUE,exterr=TRUE,model=1,...){
     isochron_PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                line.col=line.col,lwd=lwd,plot=plot,exterr=exterr,
-                model=model,...)
+                ci.col=ci.col,line.col=line.col,lwd=lwd,
+                plot=plot,exterr=exterr,model=model,...)
 }
 #' @param type following the classification of
 #' Ludwig and Titterington (1994), one of either:
@@ -521,8 +522,8 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                           sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                          line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
-                          model=1,...){
+                          ci.col='gray80',line.col='black',lwd=1,
+                          plot=TRUE,exterr=TRUE,model=1,...){
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,
                                exterr=exterr,alpha=alpha)
@@ -541,9 +542,10 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
-                    b=out$b[1],line.col=line.col,lwd=lwd,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type=intercept.type,units='ka'),
+                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,...)
+        graphics::title(isochrontitle(out,sigdig=sigdig,
+                        type=intercept.type,units='ka'),
                         xlab=out$xlab,ylab=out$ylab)
     }
     invisible(out)
@@ -551,8 +553,8 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
 #' @rdname isochron
 #' @export
 isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                           show.numbers=FALSE,line.col='red',lwd=2,
-                           plot=TRUE,model=1,...){
+                           show.numbers=FALSE,ci.col='gray80',
+                           line.col='black',lwd=1,plot=TRUE,model=1,...){
     out <- isochron_init(x,model=model,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
@@ -564,7 +566,7 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     if (plot) {
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=2*(model!=2),show.numbers=show.numbers,
-                    a=out$a[1],b=out$b[1],line.col=line.col,lwd=lwd,...)
+                    fit=out,ci.col=ci.col,line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
                         xlab="P",ylab="He")
     }
@@ -675,8 +677,8 @@ isochron_ThU_2D <- function(x,type=2,model=1,
 isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         sigdig=2,show.numbers=FALSE,levels=NA,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                        line.col='red',lwd=2,plot=TRUE,exterr=TRUE,
-                        model=1,...){
+                        ci.col='gray80',line.col='black',lwd=1,
+                        plot=TRUE,exterr=TRUE,model=1,...){
     out <- isochron_init(x,model=model,exterr=exterr,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- get.PD.age(out$b['b'],out$b['s[b]'],
@@ -708,8 +710,8 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
         scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,a=out$a[1],
-                    b=out$b[1],line.col=line.col,lwd=lwd,...)
+                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -792,6 +794,15 @@ get.limits <- function(X,sX){
     minx <- min(X-3*sX,na.rm=TRUE)
     maxx <- max(X+3*sX,na.rm=TRUE)
     c(minx,maxx)
+}
+
+plot_isochron_line <- function(fit,x,ci.col='gray80',...){
+    y <- fit$a[1]+fit$b[1]*x
+    e <- fit$fact*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
+    cix <- c(x,rev(x))
+    ciy <- c(y+e,rev(y-e))
+    graphics::polygon(cix,ciy,col=ci.col,border=NA)
+    graphics::lines(x,y,...)
 }
 
 isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){

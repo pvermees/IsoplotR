@@ -58,8 +58,8 @@
 #'
 #' \code{s[t]}: the standard error of \code{t}.
 #'
-#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{t} for the appropriate number of degrees of freedom.
+#' \code{ci[t]}: the width of a \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t}.
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval enhanced by a factor of \eqn{\sqrt{mswd}} (only reported
@@ -68,9 +68,9 @@
 #' }
 #'
 #' \item{w}{the geological overdispersion term. If \code{model=3},
-#' this is a two-element vector with the standard deviation of the
-#' (assumedly) Normal dispersion and the corresponding
-#' \eqn{100(1-\alpha)\%} confidence interval. \code{w=0} if
+#' this is a three-element vector with the standard deviation of the
+#' (assumedly) Normal dispersion and the lower and upper half-widths
+#' of its \eqn{100(1-\alpha)\%} confidence interval. \code{w=0} if
 #' code{model<3}.}
 #'
 #' OR, otherwise:
@@ -83,13 +83,12 @@
 #'
 #' \code{s[t]}: the standard error of \code{t}.
 #'
-#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-#' \code{t} for the appropriate number of degrees of freedom.}
+#' \code{ci[t]}: the width of a \eqn{100(1-\alpha)\%} confidence
+#' interval for \code{t}.}
 #'
-#' \item{disp}{a two-element vector with the overdispersion (standard
-#' deviation) of the excess scatter, and the corresponding
-#' \eqn{100(1-\alpha)\%} confidence interval for the appropriate
-#' degrees of freedom.}
+#' \item{disp}{a three-element vector with the overdispersion
+#' (standard deviation) of the excess scatter, and the upper and lower
+#' half-widths of its \eqn{100(1-\alpha)\%} confidence interval.}
 #'
 #' \item{mswd}{the reduced Chi-square statistic of data concordance,
 #' i.e. \eqn{mswd=X^2/df}, where \eqn{X^2} is a Chi-square statistic

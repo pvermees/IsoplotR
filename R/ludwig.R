@@ -19,12 +19,13 @@
 #' @param x an object of class \code{UPb}
 #' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments
-#'
+#
 # @param x a \eqn{3n}-element vector \eqn{[X Y Z]}, where \eqn{X},
 #     \eqn{Y} and \eqn{Z} are three \eqn{n}-element vectors of
 #     (isotopic ratio) values.
 # @param covmat a \eqn{[3n x 3n]}-element covariance matrix of
 #     \code{x}
+#
 #' @return
 #' \describe{
 #'
@@ -41,10 +42,11 @@
 #'
 #' \item{p.value}{p-value of a Chi-square test for the linear fit}
 #'
-#' \item{w}{the overdispersion, i.e., a two-element vector with the
+#' \item{w}{the overdispersion, i.e., a three-element vector with the
 #' estimated standard deviation of the (assumedly) Normal distribution
-#' that underlies the true isochron; and the \eqn{100(1-\alpha)\%}
-#' confidence interval (only relevant if \code{model = 3}).}
+#' that underlies the true isochron; and the lower and upper
+#' half-widths of its \eqn{100(1-\alpha)\%} confidence interval (only
+#' relevant if \code{model = 3}).}
 #'
 #' }
 #'
@@ -206,12 +208,13 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     b <- (exp(l5[1]*tt)-1)/U - a0*(exp(l8[1]*tt)-1) # slope
     xy <- get.york.xy(XY,a0,b) # get adjusted xi, yi
     ns <- length(x)
-    v <- matrix(0,1,2*ns)
-    v[1:ns] <- XY[,'X']-xy[,1]
-    v[(ns+1):(2*ns)] <- XY[,'Y']-xy[,2]
     if (model==2){
-        E <- diag(2*ns)*w^2
+        E <- diag(ns) # only add error to y variable
+        v <- matrix(XY[,'Y']-xy[,2],1,ns)
     } else {
+        v <- matrix(0,1,2*ns)
+        v[1:ns] <- XY[,'X']-xy[,1]
+        v[(ns+1):(2*ns)] <- XY[,'Y']-xy[,2]
         if (exterr){
             Ex <- matrix(0,2*ns+2,2*ns+2)
             Jv <- diag(1,2*ns,2*ns+2)

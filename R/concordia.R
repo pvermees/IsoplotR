@@ -134,7 +134,7 @@
 #'
 #' \item{model}{ the fitting model (\code{=show.age-1}).}
 #'
-#' \item{x}{ a two element vector with the upper and lower intercept
+#' \item{x}{ a two-element vector with the upper and lower intercept
 #' ages (if \code{wetherill=TRUE}) or the lower intercept age and
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (if
 #' \code{wetherill=FALSE}).}
@@ -164,10 +164,12 @@
 #' w.r.t the analytical uncertainties (not reported if
 #' \code{show.age=3}).}
 #'
-#' \item{w}{ two-element vector with the standard deviation of the
-#' (assumedly) Normal overdispersion term and the corresponding
-#' \eqn{100(1-\alpha)\%} confidence interval (only important if
-#' \code{show.age=4}).}
+#' \item{w}{ three-element vector with the standard deviation of the
+#' (assumedly) Normal overdispersion term and the lower and upper
+#' half-widths of its \eqn{100(1-\alpha)\%} confidence interval (only
+#' important if \code{show.age=4}).}
+#'
+#' \item{n}{ the number of aliquots in the dataset }
 #'
 #' }
 #' @param ticks an optional vector of age ticks to be added to the
@@ -195,8 +197,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
-    concordia.line(X,tlim=tlim,wetherill=wetherill,col=concordia.col,
-                   alpha=alpha,exterr=exterr,ticks=ticks,...)
+    lims <- prepare.concordia.line(X,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
     if (show.age>1){
         fit <- concordia.intersection.ludwig(x,wetherill=wetherill,
@@ -207,6 +208,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         graphics::title(discordia.title(fit,wetherill=wetherill,
                                         sigdig=sigdig))
     }
+    plot.concordia.line(X,lims=lims,wetherill=wetherill,col=concordia.col,
+                        alpha=alpha,exterr=exterr,ticks=ticks,...)
     ns <- length(x)
     ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     for (i in 1:ns){
@@ -240,17 +243,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
 }
 
 # helper function for plot.concordia
-concordia.line <- function(x,tlim,wetherill,col,alpha=0.05,
-                           exterr=TRUE,ticks=NULL,...){
-    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
-    if (wetherill){
-        x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
-        y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
-    } else {
-        x.lab <- expression(paste(""^"238","U/"^"206","Pb"))
-        y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
-    }
-    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,...)
+plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
+                                alpha=0.05,exterr=TRUE,ticks=NULL,...){
     range.t <- range(lims$t)
     m <- max(0.8*lims$t[1],lims$t[1]-range.t/20)
     M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
@@ -271,9 +265,8 @@ concordia.line <- function(x,tlim,wetherill,col,alpha=0.05,
         }
         concordia[i,] <- xy$x
     }
-    graphics::lines(concordia[,'x'],concordia[,'y'],col=col,lwd=2)
-    # prepare and plot ticks
     if (is.null(ticks)) ticks <- pretty(tt)
+    graphics::lines(concordia[,'x'],concordia[,'y'],col=col,lwd=2)
     for (i in 1:length(ticks)){
         xy <- age_to_concordia_ratios(ticks[i],wetherill=wetherill,exterr=exterr)
         if (exterr){ # show ticks as ellipse
@@ -287,6 +280,20 @@ concordia.line <- function(x,tlim,wetherill,col,alpha=0.05,
             (!wetherill & diff(range(concordia[,'x']))<2.5) & exterr){ pos <- NULL }
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
+    graphics::box()
+}
+# helper function for plot.concordia
+prepare.concordia.line <- function(x,tlim,wetherill=TRUE,...){
+    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
+    if (wetherill){
+        x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
+        y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
+    } else {
+        x.lab <- expression(paste(""^"238","U/"^"206","Pb"))
+        y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
+    }
+    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n')
+    lims
 }
 prettier <- function(x,wetherill=TRUE,n=20){
     m <- min(x)

@@ -37,17 +37,18 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 # x = matrix with columns X, sX, Y, sY, rXY
 scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,show.ellipses=1,levels=NA,
-                        clabel="",ellipse.col=c("#00FF0080","#FF000080"),a=NA,
-                        b=NA,line.col='red',lwd=2,new.plot=TRUE,
-                        empty=FALSE,...){
+                        clabel="",ellipse.col=c("#00FF0080","#FF000080"),
+                        fit='none',new.plot=TRUE,ci.col='gray80',
+                        line.col='black',lwd=1,empty=FALSE,...){
     colnames(x) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
     if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
-    if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='')
+    if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
     if (new.plot & empty) return()
-    if (!is.na(a) & !is.na(b)){
-        graphics::lines(xlim,a+b*xlim,col=line.col,lwd=lwd)
-    }
+    if (!identical(fit,'none'))
+        plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
+                           ci.col=ci.col,col=line.col,lwd=lwd)
+    graphics::box()
     ns <- nrow(x)
     x0 <- x[,'X']
     y0 <- x[,'Y']

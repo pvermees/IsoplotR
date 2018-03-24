@@ -151,8 +151,9 @@ Returns a list with the following items:
 
 }
 
-\item{disp}{a two element vector with the (over)dispersion and its
-corresponding \eqn{100(1-\alpha)\%} confidence interval.}
+\item{disp}{a three-element vector with the (over)dispersion and
+the lower and upper half-widths of its \eqn{100(1-\alpha)\%}
+confidence interval.}
 
 \item{mswd}{the Mean Square of the Weighted Deviates
 (a.k.a. `reduced Chi-square' statistic)}
@@ -227,11 +228,6 @@ weightedmean(cbind(ages,errs))
 
 data(examples)
 weightedmean(examples$LudwigMean)
-}
-\references{
-Ludwig, K. R. User's manual for Isoplot 3.00: a geochronological
-toolkit for Microsoft Excel. Berkeley Geochronology Center Special
-Publication, 2003.
 }
 \seealso{
 \code{\link{central}}

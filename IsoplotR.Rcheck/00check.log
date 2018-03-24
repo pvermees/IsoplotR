@@ -29,8 +29,9 @@ structure’ in the ‘Writing R Extensions’ manual.
 CRAN-pack does not know about
   .git
 * checking for portable file names ... WARNING
-Found the following file with a non-portable file name:
+Found the following files with non-portable file names:
   .git/index (pieter-laptop's conflicted copy 2018-02-26)
+  .git/index (pieter-laptop's conflicted copy 2018-03-24)
 These are not fully portable file names.
 See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking for sufficient/correct file permissions ... OK
@@ -39,8 +40,8 @@ See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking package directory ... OK
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING

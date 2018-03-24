@@ -17,49 +17,54 @@ isochron(x, ...)
 
 \method{isochron}{default}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
-  title = TRUE, model = 1, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
+  line.col = "black", lwd = 1, title = TRUE, model = 1, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, ...)
 
 \method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
-  line.col = "red", lwd = 2, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, ...)
 
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
-  plot = TRUE, exterr = TRUE, model = 1, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
-  plot = TRUE, exterr = TRUE, model = 1, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
-  plot = TRUE, exterr = TRUE, model = 1, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
-  plot = TRUE, exterr = TRUE, model = 1, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "red", lwd = 2,
-  plot = TRUE, exterr = TRUE, model = 1, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
+  ...)
 
 \method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, line.col = "red", lwd = 2,
-  plot = TRUE, model = 1, ...)
+  sigdig = 2, show.numbers = FALSE, ci.col = "gray80",
+  line.col = "black", lwd = 1, plot = TRUE, model = 1, ...)
 }
 \arguments{
 \item{x}{EITHER a matrix with the following five columns:
@@ -107,6 +112,9 @@ different background colours within the error ellipses.}
 ellipses. If \code{levels=NA}, then only the first colour will
 be used. If \code{levels} is a vector of numbers, then
 \code{ellipse.col} is used to construct a colour ramp.}
+
+\item{ci.col}{the fill colour for the confidence interval of the
+intercept and slope.}
 
 \item{line.col}{colour of the isochron line}
 
@@ -210,20 +218,17 @@ interval for \code{t}.
 interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
 applicable if \code{ model=1}).  }
 
-\item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
-t-distribution with \code{df} degrees of freedom.}
-
 \item{mswd}{the mean square of the residuals (a.k.a `reduced
     Chi-square') statistic (omitted if \code{model=2}).}
 
 \item{p.value}{the p-value of a Chi-square test for linearity
 (omitted if \code{model=2})}
 
-\item{w}{the overdispersion term, i.e. a two-element vector with
+\item{w}{the overdispersion term, i.e. a three-element vector with
 the standard deviation of the (assumedly) Normally distributed
-geological scatter that underlies the measurements, and the
-corresponding studentised \eqn{100(1-\alpha)\%} confidence interval
-(only returned if \code{model=3}).}
+geological scatter that underlies the measurements, and the lower
+and upper half-widths of its \eqn{100(1-\alpha)\%} confidence
+interval (only returned if \code{model=3}).}
 
 }
 
@@ -293,11 +298,11 @@ interval for \code{t}
 interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
 if \code{model=1}).}
 
-\item{w}{the overdispersion term, i.e. a two-element vector with
+\item{w}{the overdispersion term, i.e. a three-element vector with
 the standard deviation of the (assumedly) Normally distributed
-geological scatter that underlies the measurements, and the
-corresponding \eqn{100(1-\alpha)\%} confidence interval (only
-returned if \code{model=3}).}
+geological scatter that underlies the measurements, and the lower
+and upper half-width of its \eqn{100(1-\alpha)\%} confidence
+interval (only returned if \code{model=3}).}
 
 \item{d}{a matrix with the following columns: the X-variable for
 the isochron plot, the analytical uncertainty of X, the Y-variable

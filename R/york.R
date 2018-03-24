@@ -130,6 +130,23 @@ get.york.mswd <- function(x,a,b){
     out
 }
 
+york.1966.zero.intercept <- function(x,alpha=0.05){
+    colnames(x)[1:4] <- c('X','sX','Y','sY')
+    b <- stats::lm(x[,'Y'] ~ 0 + x[,'X'])$coefficients # initial guess
+    wX <- 1/x[,'sX']^2
+    wY <- 1/x[,'sY']^2
+    for (i in 1:10){
+        W <- wX*wY/(wX+wY*b^2)
+        Xbar <- sum(W*x[,'X'])/sum(W)
+        Ybar <- sum(W*x[,'Y'])/sum(W)
+        b <- Ybar/Xbar
+    }
+    U <- x[,'X']-Xbar
+    V <- x[,'Y']-Ybar
+    sb <- (sum(W*(b*U-V)^2)/sum(W*U^2))/(nrow(x)-1)
+    c(b,sb)
+}
+
 # get fitted X and X given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
