@@ -9,8 +9,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     out$mswd <- fit$mswd
     out$w <- fit$w
     out$p.value <- fit$p.value
-    out$df <- fit$df
-    fact <- tfact(alpha,fit$df)
+    out$fact <- tfact(alpha,fit$df)
     if (wetherill){
         labels <- c('t[l]','t[u]')
         out <- c(out,twfit2wfit(fit,x))
@@ -37,9 +36,9 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
         out$err <- matrix(NA,2,2)
         rownames(out$err) <- c('s','ci')
     }
-    if (model==3) fact <- nfact(alpha)
+    if (model==3) out$fact <- nfact(alpha)
     out$err['s',] <- sqrt(diag(out$cov))
-    out$err['ci',] <- fact*out$err['s',]
+    out$err['ci',] <- out$fact*out$err['s',]
     colnames(out$err) <- labels
     out
 }
@@ -234,8 +233,8 @@ discordia.line <- function(fit,wetherill){
         E12 <- fit$cov[1,2]
         E22 <- fit$cov[2,2]
         sy <- sqrt(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
-        ul <- y + sy
-        ll <- y - sy
+        ul <- y + fit$fact*sy
+        ll <- y - fit$fact*sy
         t5 <- log(1+x)/l5
         yconc <- exp(l8*t5)-1
         overshot <- ul>yconc
@@ -246,6 +245,8 @@ discordia.line <- function(fit,wetherill){
         X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'])[,'86']
         Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'])[,'76']
         Y[2] <- fit$x['76']
+        cix <- c(0,0)
+        ciy <- c(0,0)
     }
     graphics::polygon(cix,ciy,col='gray80',border=NA)
     graphics::lines(X,Y)
