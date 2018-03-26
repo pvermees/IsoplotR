@@ -31,7 +31,8 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     if (model==1 && fit$mswd>1){
         out$err <- matrix(NA,3,2)
         rownames(out$err) <- c('s','ci','disp')
-        out$err['disp',] <- fact*sqrt(fit$mswd)*sqrt(diag(out$cov))
+        out$err['disp',] <-
+            out$fact*sqrt(fit$mswd)*sqrt(diag(out$cov))
     } else {
         out$err <- matrix(NA,2,2)
         rownames(out$err) <- c('s','ci')
@@ -207,12 +208,12 @@ discordia.line <- function(fit,wetherill){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     J <- matrix(0,1,2)
+    usr <- par('usr')
     if (wetherill){
         tl <- fit$x[1]
         tu <- fit$x[2]
         X <- age_to_Pb207U235_ratio(fit$x)[,'75']
         Y <- age_to_Pb206U238_ratio(fit$x)[,'68']
-        usr <- par('usr')
         x <- seq(from=max(usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
         aa <- exp(l8*tu)-exp(l8*tl)
         bb <- (x-exp(l5*tl)+1)
@@ -232,11 +233,11 @@ discordia.line <- function(fit,wetherill){
         E11 <- fit$cov[1,1]
         E12 <- fit$cov[1,2]
         E22 <- fit$cov[2,2]
-        sy <- sqrt(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
+        sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
-        t5 <- log(1+x)/l5
-        yconc <- exp(l8*t5)-1
+        t75 <- log(1+x)/l5
+        yconc <- exp(l8*t75)-1
         overshot <- ul>yconc
         ul[overshot] <- yconc[overshot]
         cix <- c(x,rev(x))
@@ -245,8 +246,39 @@ discordia.line <- function(fit,wetherill){
         X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'])[,'86']
         Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'])[,'76']
         Y[2] <- fit$x['76']
-        cix <- c(0,0)
-        ciy <- c(0,0)
+        xl <- X[1]
+        yl <- Y[1]
+        y0 <- Y[2]
+        tl <- fit$x['t[l]']
+        U85 <- settings('iratio','U238U235')[1]
+        x <- seq(from=usr[1],to=usr[2],length.out=100)
+        y <- yl + (y0-yl)*(1-x/xl)
+        dyldtl <- (1/U85)*
+            (l5*exp(l5*tl)*(exp(l8*tl)-1)-
+             l8*exp(l8*tl)*(exp(l5*tl)-1))/
+            (exp(l8*tl)-1)^2
+        dxldtl <- -l8*exp(l8*tl)/(exp(l8*tl)-1)^2
+        J1 <- dyldtl - dyldtl*(1-x/xl) - (y0-yl)*dxldtl*x/xl^2
+        J2 <- 1-x/xl
+        sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
+        ul <- y + fit$fact*sy
+        ll <- y - fit$fact*sy
+        t68 <- log(1+1/x)/l8
+        yconc <- (1/U85)*(exp(l5*t68)-1)/(exp(l8*t68)-1)
+        # correct overshot confidence intervals:
+        if (y0>yl){ # negative slope
+            overshot <- ll<yconc
+            ll[overshot] <- yconc[overshot]
+            overshot <- ul<yconc
+            ul[overshot] <- yconc[overshot]
+        } else {    # positive slope
+            overshot <- ul>yconc
+            ul[overshot] <- yconc[overshot]
+            overshot <- ll>yconc
+            ll[overshot] <- yconc[overshot]
+        }        
+        cix <- c(x,rev(x))
+        ciy <- c(ll,rev(ul))
     }
     graphics::polygon(cix,ciy,col='gray80',border=NA)
     graphics::lines(X,Y)
@@ -262,7 +294,8 @@ discordia.title <- function(fit,wetherill,sigdig=2){
         args1 <- quote(a%+-%b~'|'~c~u~'(n='~n~')')
         args2 <- quote(a%+-%b~'|'~c~u)
     }
-    list1 <- list(a=lower.age[1],b=lower.age[2],c=lower.age[3],u='Ma',n=fit$n)
+    list1 <- list(a=lower.age[1],b=lower.age[2],
+                  c=lower.age[3],u='Ma',n=fit$n)
     if (wetherill){
         upper.age <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
         expr1 <- quote('lower intercept =')

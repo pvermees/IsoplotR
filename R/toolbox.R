@@ -177,6 +177,9 @@ errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
     out[,'cov'] <- J11*J21*E11 + J12*J21*E12 + J11*J22*E12 + J12*J22*E22
     out
 }
+errorprop1x2 <- function(J1,J2,E11,E22,E12){
+    sqrt(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
+}
 
 hasClass <- function(x,classname){
     classname %in% class(x)
