@@ -84,7 +84,8 @@ LL.york <- function(w,d){
         E <- cor2cov2(D[i,'sX'],D[i,'sY'],D[i,'rXY'])
         X[1,1] <- D[i,'X']-P[i,1]
         X[1,2] <- D[i,'Y']-P[i,2]
-        out <- out - 0.5*log(det(E)) - 0.5 * X %*% solve(E) %*% t(X)
+        out <- out - 0.5*determinant(E,logarithm=TRUE)$modulus
+                   - 0.5 * X %*% solve(E) %*% t(X)
     }
     out
 }
@@ -107,7 +108,8 @@ LL.titterington <- function(w,d){
         X[1,1] <- -abg[2]/abg[1]
         X[1,2] <- XYZ[2] - a - b*XYZ[1]
         X[1,3] <- XYZ[3] - A - B*XYZ[1]
-        out <- out - 0.5*log(det(E)) - 0.5 * X %*% O %*% t(X)
+        out <- out - 0.5*determinant(E,logarithm=TRUE)$modulus
+                   - 0.5 * X %*% O %*% t(X)
     }
     out
 }

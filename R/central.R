@@ -304,7 +304,7 @@ LL.uvw <- function(w,UVW,x,doSm=TRUE,LL=TRUE){
         E <- uvwc$covmat
         SS <- X %*% solve(E) %*% t(X)
         if (LL) {
-            out <- out - ( log(det(E)) + SS )/2
+            out <- out - ( determinant(E,logarithm=TRUE)$modulus + SS )/2
         } else {
             out <- out + SS
         }

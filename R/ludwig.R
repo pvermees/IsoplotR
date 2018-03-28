@@ -237,7 +237,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     }
     E <- Jv %*% Ex %*% t(Jv)
     SS <- v %*% solve(E) %*% t(v)
-    if (LL) out <- -(log(det(E))+SS)/2
+    if (LL) out <- -(determinant(E,logarithm=TRUE)$modulus+SS)/2
     else out <- SS
     out
 }
@@ -266,7 +266,8 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
                     r[i]*r[j]*omega[i2,j2] + phi[i]*phi[j]*omega[i3,j3] +
                     2*( R[i]*r[j]*omega[i1,j2] +
                     R[i]*phi[j]*omega[i1,j3] + r[i]*phi[j]*omega[i2,j3] )
-                if (LL) out <- out + log(det(solve(omega)))
+                if (LL) out <- out +
+                    determinant(solve(omega),logarithm=TRUE)$modulus
             }
         }
     } else {
@@ -275,7 +276,8 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
             out <- out + omega[1,1]*R[i]^2 + omega[2,2]*r[i]^2 +
                          omega[3,3]*phi[i]^2 + 2*( R[i]*r[i]*omega[1,2] +
                          R[i]*phi[i]*omega[1,3] + r[i]*phi[i]*omega[2,3] )
-            if (LL) out <- out + log(det(solve(omega)))
+            if (LL) out <- out +
+                determinant(solve(omega),logarithm=TRUE)$modulus
         }
     }
     if (LL) out <- -out/2
