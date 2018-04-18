@@ -40,8 +40,8 @@ See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking package directory ... OK
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
-Non-standard files/directories found at top level:
-  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
+Non-standard file/directory found at top level:
+  ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING

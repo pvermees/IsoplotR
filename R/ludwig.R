@@ -166,7 +166,7 @@ get.ta0b0.model2 <- function(x){
         Pb204U238 <- subset(get.Pb204U238.ratios(x),select='Pb204U238')
         Pb207Pb206 <- subset(get.Pb207Pb206.ratios(x),select='Pb207Pb206')
         Pb204Pb206 <- Pb204U238/Pb206U238
-        lmfit <- lm(Pb204Pb206 ~ U238Pb206)
+        lmfit <- stats::lm(Pb204Pb206 ~ U238Pb206)
         ta0b0[3] <- ta0b0[2]/lmfit$coef[1] # 7/4
         ta0b0[2] <- 1/lmfit$coef[1] # 6/4
     }

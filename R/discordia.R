@@ -208,7 +208,7 @@ discordia.line <- function(fit,wetherill){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     J <- matrix(0,1,2)
-    usr <- par('usr')
+    usr <- graphics::par('usr')
     if (wetherill){
         tl <- fit$x[1]
         tu <- fit$x[2]
