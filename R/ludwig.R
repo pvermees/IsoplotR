@@ -107,9 +107,9 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
         DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
         solve(DD - CC %*% solve(AA) %*% BB)
     }, error = function(e){ # numerical
-        fit <- stats::optim(fit$par,fn=LL.lud.UPb,method="BFGS",
-                            x=x,exterr=exterr,hessian=TRUE)
-        solve(fit$hessian)
+        hessian <- stats::optimHess(fit$par,fn=LL.lud.UPb,
+                                    x=x,exterr=exterr,LL=TRUE)
+        solve(hessian)
     })
     mswd <- mswd.lud(fit$par,x=x,model=fit$model,w=fit$w)
     out <- c(out,mswd)
@@ -237,7 +237,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     }
     E <- Jv %*% Ex %*% t(Jv)
     SS <- v %*% solve(E) %*% t(v)
-    if (LL) out <- -(determinant(E,logarithm=TRUE)$modulus+SS)/2
+    if (LL) out <- (determinant(E,logarithm=TRUE)$modulus+SS)/2
     else out <- SS
     out
 }
