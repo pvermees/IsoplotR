@@ -4,7 +4,7 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘1.1’
+* this is package ‘IsoplotR’ version ‘1.2’
 * checking CRAN incoming feasibility ... Note_to_CRAN_maintainers
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 * checking package namespace information ... OK
@@ -28,12 +28,7 @@ structure’ in the ‘Writing R Extensions’ manual.
 
 CRAN-pack does not know about
   .git
-* checking for portable file names ... WARNING
-Found the following files with non-portable file names:
-  .git/index (pieter-laptop's conflicted copy 2018-02-26)
-  .git/index (pieter-laptop's conflicted copy 2018-03-24)
-These are not fully portable file names.
-See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
@@ -80,4 +75,4 @@ These should not be in a package tarball.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 3 WARNINGs, 3 NOTEs
+Status: 2 WARNINGs, 3 NOTEs

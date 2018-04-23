@@ -35,6 +35,10 @@ install_github('pvermees/IsoplotR')
 
 See [http://isoplotr.london-geochron.com](http://isoplotr.london-geochron.com)
 
+[Vermeesch, P., 2018, IsoplotR: a free and open toolbox for
+geochronology. Geoscience Frontiers, doi: 10.1016/j.gsf.2018.04.001
+(in press).](http://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/)
+
 ## Author
 
 [Pieter Vermeesch](http://pieter.london-geochron.com)

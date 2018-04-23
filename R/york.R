@@ -121,7 +121,7 @@ get.york.mswd <- function(x,a,b){
         E <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
         X <- matrix(c(x[i,'X']-xy[i,1],x[i,'Y']-xy[i,2]),1,2)
         if (!any(is.na(X)))
-            X2 <- X2 + 0.5*X %*% solve(E) %*% t(X)
+            X2 <- X2 + X %*% solve(E) %*% t(X)
     }
     out <- list()
     out$df <- ns-2
