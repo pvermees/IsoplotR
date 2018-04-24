@@ -214,7 +214,7 @@ discordia.line <- function(fit,wetherill){
         tu <- fit$x[2]
         X <- age_to_Pb207U235_ratio(fit$x)[,'75']
         Y <- age_to_Pb206U238_ratio(fit$x)[,'68']
-        x <- seq(from=max(usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
+        x <- seq(from=max(0,usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
         aa <- exp(l8*tu)-exp(l8*tl)
         bb <- (x-exp(l5*tl)+1)
         cc <- exp(l5*tu)-exp(l5*tl)
@@ -251,7 +251,7 @@ discordia.line <- function(fit,wetherill){
         y0 <- Y[2]
         tl <- fit$x['t[l]']
         U85 <- settings('iratio','U238U235')[1]
-        x <- seq(from=usr[1],to=usr[2],length.out=100)
+        x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=100)
         y <- yl + (y0-yl)*(1-x/xl)
         dyldtl <- (1/U85)*
             (l5*exp(l5*tl)*(exp(l8*tl)-1)-
@@ -267,9 +267,9 @@ discordia.line <- function(fit,wetherill){
         yconc <- (1/U85)*(exp(l5*t68)-1)/(exp(l8*t68)-1)
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope
-            overshot <- ll<yconc
+            overshot <- (t68<fit$x['t[l]'] & ll<yconc)
             ll[overshot] <- yconc[overshot]
-            overshot <- ul<yconc
+            overshot <- (t68<fit$x['t[l]'] & ul<yconc)
             ul[overshot] <- yconc[overshot]
         } else {    # positive slope
             overshot <- ul>yconc

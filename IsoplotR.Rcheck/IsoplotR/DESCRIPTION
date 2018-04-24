@@ -11,4 +11,4 @@ License: GPL-3
 URL: http://isoplotr.london-geochron.com
 LazyData: true
 RoxygenNote: 6.0.1
-Built: R 3.2.3; ; 2018-04-23 12:22:38 UTC; unix
+Built: R 3.4.4; ; 2018-04-24 13:30:33 UTC; unix
