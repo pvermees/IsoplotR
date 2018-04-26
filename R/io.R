@@ -190,6 +190,11 @@ read.data.default <- function(x,method='U-Pb',format=1,...){
 }
 #' @rdname read.data
 #' @export
+read.data.data.frame <- function(x,method='U-Pb',format=1,...){
+    read.data.matrix(as.matrix(x),method=method,format=format,...)
+}
+#' @rdname read.data
+#' @export
 read.data.matrix <- function(x,method='U-Pb',format=1,...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format)
@@ -226,7 +231,8 @@ as.UPb <- function(x,format=3){
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
-    X <- shiny2matrix(x,2,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     cnames <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb207U235','errPb207U235',
@@ -348,7 +354,8 @@ as.PbPb <- function(x,format=1){
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
-    X <- shiny2matrix(x,2,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     cnames <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb206Pb204','errPb206Pb204',
@@ -442,7 +449,8 @@ as.PD <- function(x,classname,colnames1,colnames2,format){
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
-    X <- shiny2matrix(x,2,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     if (format==1 & nc>3){
         if (nc == 4){
             out$x <- cbind(subset(X,select=1:4),0)
@@ -465,7 +473,8 @@ as.ThU <- function(x,format=1){
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
-    X <- shiny2matrix(x,2,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     cnames <- NULL
     if (format==1 & nc>8){
         cnames <- c('U238Th232','errU238Th232',
@@ -499,7 +508,8 @@ as.ThU <- function(x,format=1){
 as.UThHe <- function(x){
     nc <- ncol(x)
     nr <- nrow(x)
-    X <- shiny2matrix(x,2,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     X[X<=0] <- NA
     if (nc>5) cnames <- c('He','errHe','U','errU','Th','errTh')
     if (nc>7) cnames <- c(cnames,'Sm','errSm')
@@ -552,7 +562,8 @@ as.detritals <- function(x){
     nr <- nrow(x)
     nc <- ncol(x)
     snames <- x[1,]
-    X <- shiny2matrix(x,2,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     colnames(X) <- snames
     for (sname in snames){
         out[[sname]] = X[!is.na(X[,sname]),sname]
