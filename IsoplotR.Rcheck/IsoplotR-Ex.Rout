@@ -1,6 +1,6 @@
 
-R version 3.4.4 (2018-03-15) -- "Someone to Lean On"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -480,7 +480,8 @@ dev.new(): using pdf(file="Rplots7.pdf")
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: read.data
 > ### Title: Read geochronology data
-> ### Aliases: read.data read.data.default read.data.matrix
+> ### Aliases: read.data read.data.default read.data.data.frame
+> ###   read.data.matrix
 > 
 > ### ** Examples
 > 
@@ -720,7 +721,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.468 6.396 11.129 0 0 
+Time elapsed:  11.326 3.842 10.364 0.003 0 
 > grDevices::dev.off()
 pdf 
   2 

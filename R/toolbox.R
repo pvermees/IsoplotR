@@ -6,8 +6,11 @@ length.SmNd <- function(x){ nrow(x$x) }
 length.ReOs <- function(x){ nrow(x$x) }
 length.LuHf <- function(x){ nrow(x$x) }
 length.ThU <- function(x){ nrow(x$x) }
-length.fissiontracks <- function(x){ length(x$Ns) }
 length.UThHe <- function(x){ nrow(x) }
+length.fissiontracks <- function(x){
+    if (x$format==1) return(nrow(x$x))
+    else return(length(x$Ns))
+}
 
 roundit <- function(age,err,sigdig=2){
     if (length(age)==1) dat <- c(age,err)

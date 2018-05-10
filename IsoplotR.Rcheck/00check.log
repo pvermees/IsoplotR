@@ -1,16 +1,19 @@
 * using log directory ‘/home/pvermees/Dropbox/Programming/R/IsoplotR/IsoplotR.Rcheck’
-* using R version 3.4.4 (2018-03-15)
+* using R version 3.2.3 (2015-12-10)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
 * this is package ‘IsoplotR’ version ‘1.2’
-* checking CRAN incoming feasibility ... NOTE
+* checking CRAN incoming feasibility ... WARNING
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-The build time stamp is missing.
+Insufficient package version (submitted: 1.2, existing: 1.2)
+
+Days since last update: 4
 * checking package namespace information ... OK
-* checking package dependencies ... OK
+* checking package dependencies ... NOTE
+  No repository set, so cyclic dependency check skipped
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
 * checking for executable files ... WARNING
@@ -34,10 +37,8 @@ CRAN-pack does not know about
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking DESCRIPTION meta-information ... NOTE
-Checking should be performed on sources prepared by ‘R CMD build’.
+* checking DESCRIPTION meta-information ... OK
 * checking top-level files ... NOTE
-Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
 Non-standard file/directory found at top level:
   ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK
@@ -49,6 +50,9 @@ Most likely, these were included erroneously.
 Found the following directory with the name of a version control directory:
   ./.git
 These should not be in a package tarball.
+Found the following CITATION file in a non-standard place:
+  IsoplotR.Rcheck/IsoplotR/CITATION
+Most likely ‘inst/CITATION’ should be used instead.
 * checking R files for non-ASCII characters ... OK
 * checking R files for syntax errors ... OK
 * checking whether the package can be loaded ... OK
@@ -78,4 +82,4 @@ These should not be in a package tarball.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 4 NOTEs
+Status: 3 WARNINGs, 3 NOTEs

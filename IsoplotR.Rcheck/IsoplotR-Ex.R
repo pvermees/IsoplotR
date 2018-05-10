@@ -401,7 +401,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: read.data
 ### Title: Read geochronology data
-### Aliases: read.data read.data.default read.data.matrix
+### Aliases: read.data read.data.default read.data.data.frame
+###   read.data.matrix
 
 ### ** Examples
 

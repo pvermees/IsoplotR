@@ -136,7 +136,7 @@ set.zeta <- function(x,tst,exterr=TRUE,update=TRUE,sigdig=2){
         UsU <- get.UsU(x)
         UA <- sum(UsU[,1]*x$A)
         UAerr <- sqrt( sum(UsU[,2]*x$A)^2 )
-        zeta <- (exp(L8*tt)-1)/(L8*Ns/(2*UA))
+        zeta <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
         zetaErr <- zeta * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
                                 1/Ns + (UAerr/UA)^2 )
     }

@@ -3,12 +3,15 @@
 \name{read.data}
 \alias{read.data}
 \alias{read.data.default}
+\alias{read.data.data.frame}
 \alias{read.data.matrix}
 \title{Read geochronology data}
 \usage{
 read.data(x, ...)
 
 \method{read.data}{default}(x, method = "U-Pb", format = 1, ...)
+
+\method{read.data}{data.frame}(x, method = "U-Pb", format = 1, ...)
 
 \method{read.data}{matrix}(x, method = "U-Pb", format = 1, ...)
 }

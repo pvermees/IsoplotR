@@ -92,6 +92,7 @@ radialplot.ThU	radialplot
 radialplot.UPb	radialplot
 radialplot.UThHe	radialplot
 read.data	read.data
+read.data.data.frame	read.data
 read.data.default	read.data
 read.data.matrix	read.data
 set.zeta	set.zeta
