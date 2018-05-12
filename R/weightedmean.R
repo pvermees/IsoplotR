@@ -52,6 +52,14 @@
 #'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
 #'     \code{RbSr}, \code{LuHf}, \code{ThU}, \code{fissiontracks} or
 #'     \code{UThHe}
+#' @param random.effects if \code{TRUE}, computes the weighted mean
+#'     using a random effects model with two parameters: the mean and
+#'     the dispersion. This is akin to a
+#'     `model-3' isochron regression.
+#' 
+#'     if \code{FALSE}, attributes any excess dispersion to an
+#'     underestimation of the analytical uncertainties. This akin to a
+#'     `model-1' isochron regression.
 #' @param ... optional arguments
 #' @seealso \code{\link{central}}
 #' @return Returns a list with the following items:
@@ -108,8 +116,9 @@ weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
 #' @importFrom grDevices rgb
 #' @rdname weightedmean
 #' @export
-weightedmean.default <- function(x,detect.outliers=TRUE,
-                                 plot=TRUE,rect.col=rgb(0,1,0,0.5),
+weightedmean.default <- function(x,random.effects=TRUE,
+                                 detect.outliers=TRUE, plot=TRUE,
+                                 rect.col=rgb(0,1,0,0.5),
                                  outlier.col=rgb(0,1,1,0.5), sigdig=2,
                                  alpha=0.05,...){
     X <- x[,1]
@@ -118,26 +127,16 @@ weightedmean.default <- function(x,detect.outliers=TRUE,
     nvalid <- count(valid)
     if (detect.outliers){
         while (TRUE){
-            valid <- chauvenet(X,sX,valid)
+            valid <- chauvenet(X,sX,valid=valid,
+                               random.effects=random.effects)
             if (count(valid) < nvalid)
                 nvalid <- count(valid)
             else
                 break
         }
     }
-    out <- get.weightedmean(X,sX,valid=valid,alpha=alpha)
-    ns <- length(X)
-    out$plotpar <-
-        list(mean=list(x=c(0,ns+1),
-                       y=rep(out$mean['x'],2)),
-             rect=list(x=c(0,ns+1,ns+1,0),
-                       y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
-                           rep(out$mean['x']-out$mean['ci[x]'],2))),
-             dash1=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']+nfact(alpha)*out$disp['w'],2)),
-             dash2=list(x=c(0,ns+1),
-                        y=rep(out$mean['x']-nfact(alpha)*out$disp['w'],2))
-             )
+    out <- get.weightedmean(X,sX,random.effects=random.effects,
+                            valid=valid,alpha=alpha)
     if (plot){
         plot_weightedmean(X,sX,out,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
@@ -185,17 +184,19 @@ weightedmean.default <- function(x,detect.outliers=TRUE,
 #' weightedmean(examples$LudwigMean)
 #' @rdname weightedmean
 #' @export
-weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.UPb <- function(x,random.effects=TRUE,
+                             detect.outliers=TRUE,plot=TRUE,
                              rect.col=rgb(0,1,0,0.5),
-                             outlier.col=rgb(0,1,1,0.5),
-                             sigdig=2,type=4,cutoff.76=1100,
+                             outlier.col=rgb(0,1,1,0.5), sigdig=2,
+                             type=4,cutoff.76=1100,
                              cutoff.disc=c(-15,5),alpha=0.05,
                              exterr=TRUE,common.Pb=0,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
-    weightedmean_helper(X,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(X,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         type=type,cutoff.76=cutoff.76,
                         cutoff.disc=cutoff.disc,sigdig=sigdig,
@@ -203,7 +204,8 @@ weightedmean.UPb <- function(x,detect.outliers=TRUE,plot=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.PbPb <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.PbPb <- function(x,random.effects=TRUE,
+                              detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5), sigdig=2,
                               alpha=0.05,exterr=TRUE,common.Pb=1,...){
@@ -211,7 +213,8 @@ weightedmean.PbPb <- function(x,detect.outliers=TRUE,plot=TRUE,
         X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
-    weightedmean_helper(X,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(X,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
                         units='Ma',...)
@@ -228,72 +231,86 @@ weightedmean.PbPb <- function(x,detect.outliers=TRUE,plot=TRUE,
 #'     detrital Th-correction.
 #' @rdname weightedmean
 #' @export
-weightedmean.ThU <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.ThU <- function(x,random.effects=TRUE,
+                             detect.outliers=TRUE,plot=TRUE,
                              rect.col=rgb(0,1,0,0.5),
                              outlier.col=rgb(0,1,1,0.5), sigdig=2,
                              alpha=0.05,i2i=TRUE,...){
-    weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
-                        sigdig=sigdig,alpha=alpha,i2i=i2i,units='ka',...)
+                        sigdig=sigdig,alpha=alpha,i2i=i2i,units='ka',
+                        ...)
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.ArAr <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.ArAr <- function(x,random.effects=TRUE,
+                              detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5), sigdig=2,
                               alpha=0.05,exterr=TRUE,i2i=FALSE,...){
-    weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
                         i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.ReOs <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.ReOs <- function(x,random.effects=TRUE,
+                              detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5), sigdig=2,
                               alpha=0.05,exterr=TRUE,i2i=TRUE,...){
-    weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
                         i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.SmNd <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.SmNd <- function(x,random.effects=TRUE,
+                              detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5), sigdig=2,
                               alpha=0.05,exterr=TRUE,i2i=TRUE,...){
-    weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
                         i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.RbSr <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.RbSr <- function(x,random.effects=TRUE,
+                              detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5), sigdig=2,
                               alpha=0.05,exterr=TRUE,i2i=TRUE,...){
-    weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
                         i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.LuHf <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.LuHf <- function(x,random.effects=TRUE,
+                              detect.outliers=TRUE,plot=TRUE,
                               rect.col=rgb(0,1,0,0.5),
                               outlier.col=rgb(0,1,1,0.5), sigdig=2,
                               alpha=0.05,exterr=TRUE,i2i=TRUE,...){
-    weightedmean_helper(x,detect.outliers=detect.outliers,plot=plot,
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
                         i2i=i2i,units='Ma',...)
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.UThHe <- function(x,random.effects=TRUE,
+                               detect.outliers=TRUE,plot=TRUE,
                                rect.col=rgb(0,1,0,0.5),
                                outlier.col=rgb(0,1,1,0.5),sigdig=2,
                                alpha=0.05,...){
@@ -309,10 +326,12 @@ weightedmean.UThHe <- function(x,detect.outliers=TRUE,plot=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean.fissiontracks <- function(x,random.effects=TRUE,
+                                       detect.outliers=TRUE,plot=TRUE,
                                        rect.col=rgb(0,1,0,0.5),
                                        outlier.col=rgb(0,1,1,0.5),
-                                       sigdig=2,alpha=0.05,exterr=TRUE,...){
+                                       sigdig=2,alpha=0.05,
+                                       exterr=TRUE,...){
     tt <- fissiontrack.age(x,exterr=FALSE)
     # calculated weighted mean age ignoring zeta and rhoD uncertainties
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
@@ -343,7 +362,8 @@ weightedmean.fissiontracks <- function(x,detect.outliers=TRUE,plot=TRUE,
     }
     invisible(out)
 }
-weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
+weightedmean_helper <- function(x,random.effects=TRUE,
+                                detect.outliers=TRUE,plot=TRUE,
                                 rect.col=grDevices::rgb(0,1,0,0.5),
                                 type=4,cutoff.76=1100,
                                 cutoff.disc=c(-15,5),
@@ -369,7 +389,8 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     } else if (hasClass(x,'LuHf')){
         tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
     }
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
+    fit <- weightedmean.default(tt,random.effects=random.effects,
+                                detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,...)
     out <- fit
     if (exterr){
@@ -386,16 +407,25 @@ weightedmean_helper <- function(x,detect.outliers=TRUE,plot=TRUE,
     invisible(out)
 }
 
-get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
+get.weightedmean <- function(X,sX,random.effects=TRUE,
+                             valid=TRUE,alpha=0.05){
+    ns <- length(X)
     x <- X[valid]
     sx <- sX[valid]
+    if (length(x)<=1){
+        out$mean <- c(x,sx,nfact(alpha)*sx)
+        out$mswd <- 0
+        out$p.value <- 1
+        return(out)
+    }
     out <- list()
-    out$mean <- rep(NA,3)
-    out$disp <- rep(NA,3)
+    out$random.effects <- random.effects
     out$df <- length(x)-1 # degrees of freedom for the homogeneity test
-    names(out$mean) <- c('x','s[x]','ci[x]')
-    names(out$disp) <- c('w','ll','ul')    
-    if (length(x)>1){
+    if (random.effects){ # random effects model:
+        out$mean <- rep(NA,3)
+        out$disp <- rep(NA,3)
+        names(out$mean) <- c('x','s[x]','ci[x]')
+        names(out$disp) <- c('w','ll','ul')    
         fit <- continuous_mixture(x,sx)
         out$mean['x'] <- fit$mu[1]
         out$mean['s[x]'] <- fit$mu[2]
@@ -403,40 +433,79 @@ get.weightedmean <- function(X,sX,valid=TRUE,alpha=0.05){
         out$disp['w'] <- fit$sigma
         out$disp[c('ll','ul')] <-
             profile_LL_weightedmean_disp(fit,x,sx,alpha)
+    } else { # Ludwig's Isoplot approach:
+        out$mean <- rep(NA,4)
+        names(out$mean) <- c('x','s[x]','ci[x]','disp[x]')
+        w <- 1/sx^2
+        out$mean['x'] <- sum(w*x)/sum(w)
+        out$mean['s[x]'] <- 1/sqrt(sum(w))
         SS <- sum(((x-out$mean['x'])/sx)^2)
         out$mswd <- SS/out$df
         out$p.value <- 1-stats::pchisq(SS,out$df)
+        out$mean['ci[x]'] <- tfact(alpha,out$df)*out$mean['s[x]']
+        out$mean['disp[x]'] <- sqrt(out$mswd)*out$mean['ci[x]']
         out$valid <- valid
-    } else {
-        out$mean <- x
-        out$p.value <- 0
     }
+    out$plotpar <-
+        list(mean=list(x=c(0,ns+1),
+                       y=rep(out$mean['x'],2)),
+             rect=list(x=c(0,ns+1,ns+1,0),
+                       y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
+                           rep(out$mean['x']-out$mean['ci[x]'],2)))
+             )
+    if (random.effects){
+        out$plotpar$dash1=list(x=c(0,ns+1),y=rep(out$mean['x']+
+                               nfact(alpha)*out$disp['w'],2))
+        out$plotpar$dash2=list(x=c(0,ns+1),y=rep(out$mean['x']-
+                               nfact(alpha)*out$disp['w'],2))
+    }
+    SS <- sum(((x-out$mean['x'])/sx)^2)
+    out$mswd <- SS/out$df
+    out$p.value <- 1-stats::pchisq(SS,out$df)
+    out$valid <- valid
     out
 }
 
 wtdmean.title <- function(fit,sigdig=2,units=''){
-    rounded.mean <- roundit(fit$mean['x'],
-                            fit$mean[c('s[x]','ci[x]')],
-                            sigdig=sigdig)
-    rounded.disp <- roundit(fit$disp['w'],
-                            fit$disp[c('ll','ul')],
-                            sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c~u,
-                        list(a=rounded.mean['x'],
-                             b=rounded.mean['s[x]'],
-                             c=rounded.mean['ci[x]'],
-                             u=units))
+    if (fit$random.effects){
+        rounded.mean <- roundit(fit$mean['x'],
+                                fit$mean[c('s[x]','ci[x]')],
+                                sigdig=sigdig)
+        line1 <- substitute('mean ='~a%+-%b~'|'~c~u,
+                            list(a=rounded.mean['x'],
+                                 b=rounded.mean['s[x]'],
+                                 c=rounded.mean['ci[x]'],
+                                 u=units))
+        rounded.disp <- roundit(fit$disp['w'],
+                                fit$disp[c('ll','ul')],
+                                sigdig=sigdig)
+        line3 <- substitute('dispersion ='~a+b/-c~u,
+                            list(a=rounded.disp['w'],
+                                 b=rounded.disp['ul'],
+                                 c=rounded.disp['ll'],
+                                 u=units))
+        graphics::mtext(line3,line=0)
+        line1line <- 2
+        line2line <- 1
+    } else {
+        rounded.mean <- roundit(fit$mean['x'],
+                                fit$mean[c('s[x]','ci[x]','disp[x]')],
+                                sigdig=sigdig)
+        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u,
+                            list(a=rounded.mean['x'],
+                                 b=rounded.mean['s[x]'],
+                                 c=rounded.mean['ci[x]'],
+                                 d=rounded.mean['disp[x]'],
+                                 u=units))
+        line1line <- 1
+        line2line <- 0
+    }
     line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
-                        list(a=signif(fit$mswd,sigdig),
-                             b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('dispersion ='~a+b/-c~u,
-                        list(a=rounded.disp['w'],
-                             b=rounded.disp['ul'],
-                             c=rounded.disp['ll'],
-                             u=units))
-    graphics::mtext(line1,line=2)
-    graphics::mtext(line2,line=1)
-    graphics::mtext(line3,line=0)
+                        list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig),
+                             b=roundit(fit$p.value,fit$p.value,
+                                       sigdig=sigdig)))
+    graphics::mtext(line1,line=line1line)
+    graphics::mtext(line2,line=line2line)
 }
 
 plot_weightedmean <- function(X,sX,fit,
@@ -451,8 +520,10 @@ plot_weightedmean <- function(X,sX,fit,
                    axes=FALSE,xlab='N',ylab='')
     graphics::polygon(fit$plotpar$rect,col='gray80',border=NA)
     graphics::lines(fit$plotpar$mean)
-    graphics::lines(fit$plotpar$dash1,lty=3)
-    graphics::lines(fit$plotpar$dash2,lty=3)
+    if (fit$random.effects){
+        graphics::lines(fit$plotpar$dash1,lty=3)
+        graphics::lines(fit$plotpar$dash2,lty=3)
+    }
     graphics::axis(side=1,at=1:ns)
     graphics::axis(side=2)
     for (i in 1:ns){
@@ -468,10 +539,12 @@ plot_weightedmean <- function(X,sX,fit,
 # X and sX are some measurements and their standard errors
 # valid is a vector of logical flags indicating whether the corresponding
 # measurements have already been rejected or not
-chauvenet <- function(X,sX,valid){
-    fit <- get.weightedmean(X,sX,valid=valid)
+chauvenet <- function(X,sX,valid,random.effects=TRUE){
+    fit <- get.weightedmean(X,sX,random.effects=random.effects,
+                            valid=valid)
     mu <- fit$mean[1]
-    sigma <- sqrt(fit$disp[1]^2+sX^2)
+    if (random.effects) sigma <- sqrt(fit$disp[1]^2+sX^2)
+    else sigma <- sqrt(fit$mswd)*sX
     prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
     minp <- min(prob[valid])
     imin <- which.min(sX/abs(X-mu))

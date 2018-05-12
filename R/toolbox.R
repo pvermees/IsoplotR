@@ -21,10 +21,10 @@ roundit <- function(age,err,sigdig=2){
     } else {
         nd <- ceiling(log10(abs(dat)))-ceiling(log10(min.err))+sigdig
         rounded <- signif(dat,nd)
-        decimals <- trunc(log10(min.err))+1-sigdig
+        decimals <- trunc(log10(min.err))-sigdig
         if (decimals<0) nsmall <- abs(decimals)
         else nsmall <- 0
-        out <- format(rounded,nsmall=nsmall,trim=TRUE)
+        out <- format(rounded,digits=nsmall-1,nsmall=nsmall,trim=TRUE)
     }
     out
 }
