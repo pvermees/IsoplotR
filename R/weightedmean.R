@@ -54,8 +54,7 @@
 #'     \code{UThHe}
 #' @param random.effects if \code{TRUE}, computes the weighted mean
 #'     using a random effects model with two parameters: the mean and
-#'     the dispersion. This is akin to a
-#'     `model-3' isochron regression.
+#'     the dispersion. This is akin to a `model-3' isochron regression.
 #' 
 #'     if \code{FALSE}, attributes any excess dispersion to an
 #'     underestimation of the analytical uncertainties. This akin to a
@@ -471,11 +470,13 @@ wtdmean.title <- function(fit,sigdig=2,units=''){
         rounded.mean <- roundit(fit$mean['x'],
                                 fit$mean[c('s[x]','ci[x]')],
                                 sigdig=sigdig)
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~u,
+        line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='~n/N~')',
                             list(a=rounded.mean['x'],
                                  b=rounded.mean['s[x]'],
                                  c=rounded.mean['ci[x]'],
-                                 u=units))
+                                 u=units,
+                                 n=sum(fit$valid),
+                                 N=length(fit$valid)))
         rounded.disp <- roundit(fit$disp['w'],
                                 fit$disp[c('ll','ul')],
                                 sigdig=sigdig)
@@ -491,12 +492,14 @@ wtdmean.title <- function(fit,sigdig=2,units=''){
         rounded.mean <- roundit(fit$mean['x'],
                                 fit$mean[c('s[x]','ci[x]','disp[x]')],
                                 sigdig=sigdig)
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u,
+        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='~n/N~')',
                             list(a=rounded.mean['x'],
                                  b=rounded.mean['s[x]'],
                                  c=rounded.mean['ci[x]'],
                                  d=rounded.mean['disp[x]'],
-                                 u=units))
+                                 u=units,
+                                 n=sum(fit$valid),
+                                 N=length(fit$valid)))
         line1line <- 1
         line2line <- 0
     }

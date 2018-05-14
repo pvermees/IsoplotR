@@ -46,6 +46,13 @@
 #' @param ylab y-axis label
 #' @param show.ci show a 100(1-\eqn{\alpha})\% confidence interval for
 #'     the plateau age as a grey band
+#' @param random.effects if \code{TRUE}, computes the weighted mean
+#'     using a random effects model with two parameters: the mean and
+#'     the dispersion. This is akin to a `model-3' isochron regression.
+#' 
+#'     if \code{FALSE}, attributes any excess dispersion to an
+#'     underestimation of the analytical uncertainties. This akin to a
+#'     `model-1' isochron regression.
 #' @param ... optional parameters to the generic \code{plot} function
 #'
 #' @return If \code{plateau=TRUE}, returns a list with the following
@@ -101,6 +108,7 @@ agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 #' @rdname agespectrum
 #' @export
 agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
+                                random.effects=TRUE,
                                 plateau.col=rgb(0,1,0,0.5),
                                 non.plateau.col=rgb(0,1,1,0.5),
                                 sigdig=2,line.col='red', lwd=2,
@@ -116,7 +124,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     maxY <- max(Y+fact*sY,na.rm=TRUE)
     minY <- min(Y-fact*sY,na.rm=TRUE)
     graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
-    plat <- plateau(x,alpha=alpha)
+    plat <- plateau(x,alpha=alpha,random.effects=random.effects)
     plat$valid <- NULL
     if (plateau) {
         colour <- rep(non.plateau.col,ns)
@@ -156,6 +164,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 #' @rdname agespectrum
 #' @export
 agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
+                             random.effects=TRUE,
                              plateau.col=rgb(0,1,0,0.5),
                              non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
                              exterr=TRUE,line.col='red',lwd=2,
@@ -164,8 +173,8 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
-                                plateau=plateau,sigdig=sigdig,
-                                line.col=line.col,
+                                plateau=plateau,random.effects=random.effects,
+                                sigdig=sigdig,line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
     if (plateau){
         out <- plat
@@ -182,7 +191,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
 
 # x is a three column vector with Ar39
 # cumulative fractions, ages and uncertainties
-plateau <- function(x,alpha=0.05){
+plateau <- function(x,alpha=0.05,random.effects=TRUE){
     X <- x[,1]/sum(x[,1],na.rm=TRUE)
     YsY <- subset(x,select=c(2,3))
     ns <- length(X)
@@ -196,12 +205,13 @@ plateau <- function(x,alpha=0.05){
             fract <- sum(X[i:j],na.rm=TRUE)
             Y <- YsY[i:j,1]
             sY <- YsY[i:j,2]
-            valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1))
+            valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1),
+                               random.effects=random.effects)
             if (any(!valid)){
                 break;
             } else if (fract > out$fract){
-                out <- weightedmean(YsY[i:j,],plot=FALSE,
-                                    detect.outliers=FALSE)
+                out <- weightedmean(YsY[i:j,],random.effects=random.effects,
+                                    plot=FALSE,detect.outliers=FALSE)
                 out$i <- i:j
                 out$fract <- fract
             }
@@ -211,7 +221,9 @@ plateau <- function(x,alpha=0.05){
 }
 
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units=''){
-    rounded.mean <- roundit(fit$mean[1],fit$mean[2:3],sigdig=sigdig)
+    rounded.mean <- roundit(fit$mean['x'],
+                            fit$mean[c('s[x]','ci[x]')],
+                            sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='~n/N~')',
                         list(a=rounded.mean[1],
                              b=rounded.mean[2],
