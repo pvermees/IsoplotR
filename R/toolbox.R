@@ -18,7 +18,7 @@ roundit <- function(age,err,sigdig=2){
     min.err <- min(abs(dat),na.rm=TRUE)
     if (is.na(sigdig)) {
         out <- dat
-    } else if (any(dat<=0)){
+    } else if (any(dat<=0, na.rm=TRUE)){
         out <- signif(dat,sigdig)
     } else {
         nd <- ceiling(log10(abs(dat)))-ceiling(log10(min.err))+sigdig
