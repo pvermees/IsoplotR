@@ -233,14 +233,21 @@ Pb.correction.for.PbPb <- function(x,i64,i74){
 }
 
 stacey.kramers <- function(tt){
-    sk.206.204 <- 11.152
-    sk.207.204 <- 12.998
-    sk.238.204 <- 9.74
+    if (tt < 3700){
+        sk.206.204 <- 11.152
+        sk.207.204 <- 12.998
+        sk.238.204 <- 9.74
+        ti <- 3700
+    } else {
+        sk.206.204 <- 9.307
+        sk.207.204 <- 10.294
+        sk.238.204 <- 7.19
+        ti <- 4570
+    }
     U238U235 <- settings('iratio','U238U235')[1]
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
-    ti <- 3700
-    i64 <- sk.206.204 + sk.238.204*(exp(l8*(ti-tt))-1)
-    i74 <- sk.207.204 + sk.238.204*(exp(l5*(ti-tt))-1)/U238U235
+    i64 <- sk.206.204 + sk.238.204*(exp(l8*ti)-exp(l8*tt))
+    i74 <- sk.207.204 + sk.238.204*(exp(l5*ti)-exp(l5*tt))/U238U235
     c(i64,i74)
 }
