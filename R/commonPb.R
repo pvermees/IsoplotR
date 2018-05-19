@@ -232,22 +232,28 @@ Pb.correction.for.PbPb <- function(x,i64,i74){
     out
 }
 
-stacey.kramers <- function(tt){
-    if (tt < 3700){
-        sk.206.204 <- 11.152
-        sk.207.204 <- 12.998
-        sk.238.204 <- 9.74
-        ti <- 3700
-    } else {
-        sk.206.204 <- 9.307
-        sk.207.204 <- 10.294
-        sk.238.204 <- 7.19
-        ti <- 4570
-    }
+stacey.kramers <- function(tt,inverse=FALSE){
+    nt <- length(tt)
+    sk.206.204 <- rep(0,nt)
+    sk.207.204 <- rep(0,nt)
+    sk.238.204 <- rep(0,nt)
+    ti <- rep(0,nt)
+    young <- which(tt < 3700)
+    old <- which(tt >= 3700)
+    sk.206.204[young] <- 11.152
+    sk.207.204[young] <- 12.998
+    sk.238.204[young] <- 9.74
+    ti[young] <- 3700
+    sk.206.204[old] <- 9.307
+    sk.207.204[old] <- 10.294
+    sk.238.204[old] <- 7.19
+    ti[old] <- 4570
     U238U235 <- settings('iratio','U238U235')[1]
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     i64 <- sk.206.204 + sk.238.204*(exp(l8*ti)-exp(l8*tt))
     i74 <- sk.207.204 + sk.238.204*(exp(l5*ti)-exp(l5*tt))/U238U235
-    c(i64,i74)
+    if (inverse) out <- cbind(1/i64,i74/i64)
+    else out <- cbind(i64,i74)
+    out
 }

@@ -406,13 +406,15 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     invisible(out)
 }
+#' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
 #' @rdname isochron
 #' @export
 isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          inverse=TRUE,ci.col='gray80',line.col='black',
-                          lwd=1,plot=TRUE,exterr=TRUE,model=1,...){
+                          inverse=TRUE,ci.col='gray80',
+                          line.col='black', lwd=1,plot=TRUE,
+                          exterr=TRUE,model=1,growth=FALSE,...){
     out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
     if (inverse){
         R76 <- out$a
@@ -442,6 +444,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,...)
+        if (growth) plot_PbPb_evolution(out$age['t'],inverse=inverse)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -803,6 +806,19 @@ plot_isochron_line <- function(fit,x,ci.col='gray80',...){
     ciy <- c(y+e,rev(y-e))
     graphics::polygon(cix,ciy,col=ci.col,border=NA)
     graphics::lines(x,y,...)
+}
+
+plot_PbPb_evolution <- function(tt,inverse=TRUE){
+    nn <- 50
+    tijd <- seq(0,tt,length.out=nn)
+    ticks <- pretty(tijd)
+    tijd[nn] <- max(ticks)
+    xy <- stacey.kramers(tijd,inverse=inverse)
+    lines(xy[,1],xy[,2])
+    xy <- stacey.kramers(ticks,inverse=inverse)
+    points(xy[,1],xy[,2],pch=20)
+    text(xy[,1],xy[,2],labels=ticks,pos=3)
+
 }
 
 isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
