@@ -17,50 +17,57 @@
 \usage{
 weightedmean(x, ...)
 
-\method{weightedmean}{default}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ...)
+\method{weightedmean}{default}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05, ...)
 
-\method{weightedmean}{UPb}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
+\method{weightedmean}{UPb}(x, random.effects = TRUE, detect.outliers = TRUE,
+  plot = TRUE, rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1,
+  0.5), sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
   alpha = 0.05, exterr = TRUE, common.Pb = 0, ...)
 
-\method{weightedmean}{PbPb}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, common.Pb = 1, ...)
+\method{weightedmean}{PbPb}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, common.Pb = 1, ...)
 
-\method{weightedmean}{ThU}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, i2i = TRUE, ...)
+\method{weightedmean}{ThU}(x, random.effects = TRUE, detect.outliers = TRUE,
+  plot = TRUE, rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1,
+  0.5), sigdig = 2, alpha = 0.05, i2i = TRUE, ...)
 
-\method{weightedmean}{ArAr}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = FALSE, ...)
+\method{weightedmean}{ArAr}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, i2i = FALSE, ...)
 
-\method{weightedmean}{ReOs}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ...)
+\method{weightedmean}{ReOs}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, i2i = TRUE, ...)
 
-\method{weightedmean}{SmNd}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ...)
+\method{weightedmean}{SmNd}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, i2i = TRUE, ...)
 
-\method{weightedmean}{RbSr}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ...)
+\method{weightedmean}{RbSr}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, i2i = TRUE, ...)
 
-\method{weightedmean}{LuHf}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ...)
+\method{weightedmean}{LuHf}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, i2i = TRUE, ...)
 
-\method{weightedmean}{UThHe}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ...)
+\method{weightedmean}{UThHe}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05, ...)
 
-\method{weightedmean}{fissiontracks}(x, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ...)
+\method{weightedmean}{fissiontracks}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, ...)
 }
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
@@ -70,6 +77,14 @@ standard errors (second column) OR an object of class
 \code{UThHe}}
 
 \item{...}{optional arguments}
+
+\item{random.effects}{if \code{TRUE}, computes the weighted mean
+    using a random effects model with two parameters: the mean and
+    the dispersion. This is akin to a `model-3' isochron regression.
+
+    if \code{FALSE}, attributes any excess dispersion to an
+    underestimation of the analytical uncertainties. This akin to a
+    `model-1' isochron regression.}
 
 \item{detect.outliers}{logical flag indicating whether outliers
 should be detected and rejected using Chauvenet's Criterion.}

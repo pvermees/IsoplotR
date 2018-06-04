@@ -106,7 +106,7 @@ york <- function(x,alpha=0.05){
     out <- get.york.mswd(x,a,b)
     out$a <- c(a,sa)
     out$b <- c(b,sb)
-    out$cov.ab <- -Xbar*sb^2
+    out$cov.ab <- -xbar*sb^2
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
     out$type <- 'york'

@@ -9,14 +9,15 @@
 agespectrum(x, ...)
 
 \method{agespectrum}{default}(x, alpha = 0.05, plateau = TRUE,
-  plateau.col = rgb(0, 1, 0, 0.5), non.plateau.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, line.col = "red", lwd = 2, title = TRUE, show.ci = TRUE,
-  xlab = "cumulative fraction", ylab = "age [Ma]", ...)
+  random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),
+  non.plateau.col = rgb(0, 1, 1, 0.5), sigdig = 2, line.col = "red",
+  lwd = 2, title = TRUE, show.ci = TRUE, xlab = "cumulative fraction",
+  ylab = "age [Ma]", ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
-  plateau.col = rgb(0, 1, 0, 0.5), non.plateau.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, exterr = TRUE, line.col = "red", lwd = 2, i2i = FALSE,
-  ...)
+  random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),
+  non.plateau.col = rgb(0, 1, 1, 0.5), sigdig = 2, exterr = TRUE,
+  line.col = "red", lwd = 2, i2i = FALSE, ...)
 }
 \arguments{
 \item{x}{a three-column matrix whose first column gives the amount
@@ -37,6 +38,14 @@ be calculated. If \code{plateau=TRUE}, the function will
 compute the weighted mean of the largest succession of steps
 that pass the Chi-square test for age homogeneity.  If
 \code{TRUE}, returns a list with plateau parameters.}
+
+\item{random.effects}{if \code{TRUE}, computes the weighted mean
+    using a random effects model with two parameters: the mean and
+    the dispersion. This is akin to a `model-3' isochron regression.
+
+    if \code{FALSE}, attributes any excess dispersion to an
+    underestimation of the analytical uncertainties. This akin to a
+    `model-1' isochron regression.}
 
 \item{plateau.col}{the fill colour of the rectangles used to mark
 the steps belonging to the age plateau.}

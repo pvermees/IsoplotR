@@ -30,7 +30,7 @@ isochron(x, ...)
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, ...)
+  exterr = TRUE, model = 1, growth = FALSE, ...)
 
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
@@ -150,6 +150,8 @@ if \code{TRUE} and \code{x} has class \code{PbPb}, plots
 
 \item{exterr}{propagate external sources of uncertainty
 (J, decay constant)?}
+
+\item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 
 \item{type}{following the classification of
 Ludwig and Titterington (1994), one of either:
