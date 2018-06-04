@@ -814,10 +814,10 @@ plot_PbPb_evolution <- function(tt,inverse=TRUE){
     ticks <- pretty(tijd)
     tijd[nn] <- max(ticks)
     xy <- stacey.kramers(tijd,inverse=inverse)
-    lines(xy[,1],xy[,2])
+    graphics::lines(xy[,1],xy[,2])
     xy <- stacey.kramers(ticks,inverse=inverse)
-    points(xy[,1],xy[,2],pch=20)
-    text(xy[,1],xy[,2],labels=ticks,pos=3)
+    graphics::points(xy[,1],xy[,2],pch=20)
+    graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 
 }
 
