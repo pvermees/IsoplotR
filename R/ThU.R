@@ -142,27 +142,49 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
 get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     ns <- length(x)
     if (ns<2) i2i <- FALSE
-    d <- data2evolution(x)
-    if (i2i){
-        osmond <- data2tit.ThU(x,osmond=TRUE)
-        fit <- titterington(osmond)
-    }
+    osmond <- data2tit.ThU(x,osmond=TRUE)
+    if (i2i) fit <- titterington(osmond)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     if (cor) colnames(out)[5] <- 'cor[t,48_0]'
+    Th0Th2_d<- settings('iratio','Th230Th232')[1]
+    sTh0Th2_d <- settings('iratio','Th230Th232')[2]
+    U4U8_d <- settings('iratio','U234U238')[1]
+    sU4U8_d <- settings('iratio','U234U238')[2]
+    cov4808 <- data2evolution(x)[,'cov']
     for (j in 1:ns){
-        a <- d[j,'U234U238']
-        sa <- d[j,'errU234U238']
-        A <- d[j,'Th230U238']
-        sA <- d[j,'errTh230U238']
-        covAa <- d[j,'cov']
+        Th2U8 <- osmond[j,'X']
+        sTh2U8 <- osmond[j,'sX']
+        U4U8 <- osmond[j,'Y']
+        sU4U8 <- osmond[j,'sY']
+        Th0U8 <- osmond[j,'Z']
+        sTh0U8 <- osmond[j,'sZ']
         if (i2i){ # project onto 08-48 plane
-            a0 <- osmond[j,'Y'] - fit$par['b']*osmond[j,'X']
-            A0 <- osmond[j,'Z'] - fit$par['B']*osmond[j,'X']
-            out[j,] <- get.ThU.age(A0,sA,a0,sa,covAa,exterr=exterr,cor=cor)
+            U4Th2 <- fit$par['b']
+            U4U8_d <- U4Th2 * Th2U8
+            sU4U8_d <- 0 # don't propagate projection error
+            Th0Th2 <- fit$par['B']
+            Th0U8_d <- Th0Th2 * Th2U8
+            sTh0U8_d <- 0 # don't propagate projection error
         } else {
-            out[j,] <- get.ThU.age(A,sA,a,sa,covAa,exterr=exterr,cor=cor)
+            Th0U8_d <- Th0Th2_d * Th2U8
+            if (Th0U8_d > 0)
+                sTh0U8_d <- Th0U8_d * sqrt( (sTh0Th2_d/Th0Th2_d)^2 + (sTh2U8/Th2U8)^2 )
+            else
+                sTh0U8_d <- 0
         }
+        U4U8_0 <- U4U8 - U4U8_d
+        if (U4U8_d > 0)
+            sU4U8_0 <- U4U8_0 * sqrt( (sU4U8/U4U8)^2 + (sU4U8_d/U4U8_d)^2 )
+        else
+            sU4U8_0 <- sU4U8
+        Th0U8_0 <- Th0U8 - Th0U8_d
+        if (Th0U8_d > 0)
+            sTh0U8_0 <- Th0U8_0 * sqrt( (sTh0U8/Th0U8)^2 + (sTh0U8_d/Th0U8_d)^2 )
+        else
+            sTh0U8_0 <- sTh0U8
+        out[j,] <- get.ThU.age(Th0U8_0,sTh0U8_0,U4U8_0,sU4U8_0,
+                               cov4808[j],exterr=exterr,cor=cor)
     }
     if (!is.na(sigdig)){
         temp <- out # store numerical values because roundit creates text
