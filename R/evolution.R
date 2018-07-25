@@ -217,7 +217,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detrital=FALSE,
 
 Th02vsTh0U8 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
                         alpha=0.05,show.numbers=FALSE,exterr=TRUE,
-                        levels=NA,ellipse.col=c("#00FF0080","#FF000080"),
+                        clabel="",levels=NA,
+                        ellipse.col=c("#00FF0080","#FF000080"),
                         sigdig=2,line.col='darksalmon',...){
     d <- data2evolution(x,isochron=isochron)
     scatterplot(d$x,xlim=xlim,ylim=ylim,empty=TRUE)
@@ -262,6 +263,7 @@ Th02vsTh0U8 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
                                 "232","Th)"[o]^x*" = 0]"))
         graphics::mtext(tit,line=0)
     }
+    colourbar(z=levels,col=ellipse.col,clabel=clabel)
 }
 
 
@@ -392,7 +394,7 @@ data2evolution <- function(x,detrital=FALSE,isochron=FALSE){
         out <- cbind(xy,covariance)
         colnames(out) <- labels
     } else if (x$format %in% c(3,4)){
-        if (isochron){ # calculate initio 230Th from isochron intercept
+        if (isochron){ # calculate initial 230Th from isochron intercept
             fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
             out$x <- fit$d
             out$Th230Th232_0x <- fit$y0[1]
