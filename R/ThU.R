@@ -132,59 +132,28 @@ get.U234U238 <- function(tt,U234U238_0){
 }
 
 ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
-    if (x$format %in% c(1,2))
-        out <- get.ThU.age.corals(x,exterr=exterr,i=i,i2i=i2i,sigdig=sigdig,cor=cor)
-    else
-        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,i2i=i2i,sigdig=sigdig)
+    if (x$format %in% c(1,2)){
+        ns <- length(x)
+        if (ns<2) ThCorr <- 1
+        else ThCorr <- 1+1*i2i
+        out <- get.ThU.age.corals(x,exterr=exterr,i=i,ThCorr=ThCorr,
+                                  sigdig=sigdig,cor=cor)
+    } else {
+        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
+                                     i2i=i2i,sigdig=sigdig)
+    }
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,ThCorr=0,sigdig=NA,cor=TRUE){
     ns <- length(x)
-    if (ns<2) i2i <- FALSE
-    osmond <- data2tit.ThU(x,osmond=TRUE)
-    if (i2i) fit <- titterington(osmond)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
-    if (cor) colnames(out)[5] <- 'cor[t,48_0]'
-    Th0Th2_d<- settings('iratio','Th230Th232')[1]
-    sTh0Th2_d <- settings('iratio','Th230Th232')[2]
-    U4U8_d <- settings('iratio','U234U238')[1]
-    sU4U8_d <- settings('iratio','U234U238')[2]
-    cov4808 <- data2evolution(x)[,'cov']
+    d <- data2evolution(x,ThCorr=ThCorr)
     for (j in 1:ns){
-        Th2U8 <- osmond[j,'X']
-        sTh2U8 <- osmond[j,'sX']
-        U4U8 <- osmond[j,'Y']
-        sU4U8 <- osmond[j,'sY']
-        Th0U8 <- osmond[j,'Z']
-        sTh0U8 <- osmond[j,'sZ']
-        if (i2i){ # project onto 08-48 plane
-            U4Th2 <- fit$par['b']
-            U4U8_d <- U4Th2 * Th2U8
-            sU4U8_d <- 0 # don't propagate projection error
-            Th0Th2 <- fit$par['B']
-            Th0U8_d <- Th0Th2 * Th2U8
-            sTh0U8_d <- 0 # don't propagate projection error
-        } else {
-            Th0U8_d <- Th0Th2_d * Th2U8
-            if (Th0U8_d > 0)
-                sTh0U8_d <- Th0U8_d * sqrt( (sTh0Th2_d/Th0Th2_d)^2 + (sTh2U8/Th2U8)^2 )
-            else
-                sTh0U8_d <- 0
-        }
-        U4U8_0 <- U4U8 - U4U8_d
-        if (U4U8_d > 0)
-            sU4U8_0 <- U4U8_0 * sqrt( (sU4U8/U4U8)^2 + (sU4U8_d/U4U8_d)^2 )
-        else
-            sU4U8_0 <- sU4U8
-        Th0U8_0 <- Th0U8 - Th0U8_d
-        if (Th0U8_d > 0)
-            sTh0U8_0 <- Th0U8_0 * sqrt( (sTh0U8/Th0U8)^2 + (sTh0U8_d/Th0U8_d)^2 )
-        else
-            sTh0U8_0 <- sTh0U8
-        out[j,] <- get.ThU.age(Th0U8_0,sTh0U8_0,U4U8_0,sU4U8_0,
-                               cov4808[j],exterr=exterr,cor=cor)
+        out[j,] <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],
+                               d[j,'U234U238'],d[j,'errU234U238'],
+                               d[j,'cov'],exterr=exterr,cor=cor)
     }
     if (!is.na(sigdig)){
         temp <- out # store numerical values because roundit creates text
@@ -199,12 +168,19 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE)
 
 get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
     ns <- length(x)
-    d <- data2evolution(x,isochron=i2i)
-    Th230U238 <- (d$x[,'Th230Th232'] - d$Th230Th232_0)/d$x[,'U238Th232']
-    d08.d02 <- 1/d$x[,'U238Th232']
-    d08.d82 <- -(d$x[,'Th230Th232'] - d$Th230Th232_0)/d$x[,'U238Th232']^2
-    sTh230U238 <- sqrt( (d08.d02*d$x[,'errTh230Th232'])^2 +
-                        (d08.d82*d$x[,'errU238Th232'])^2 )
+    d <- data2evolution(x)
+    if (i2i){
+        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
+        d[,'Th230Th232'] <- d[,'Th230Th232'] - fit$a[1]
+    } else {
+        d[,'Th230Th232'] <- d[,'Th230Th232'] -
+            settings('iratio','Th230Th232')[1]
+    }
+    Th230U238 <- d[,'Th230Th232']/d[,'U238Th232']
+    d08.d02 <- 1/d[,'U238Th232']
+    d08.d82 <- -d[,'Th230Th232']/d[,'U238Th232']^2
+    sTh230U238 <- sqrt( (d08.d02*d[,'errTh230Th232'])^2 +
+                        (d08.d82*d[,'errU238Th232'])^2 )
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
