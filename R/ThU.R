@@ -177,10 +177,11 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
             settings('iratio','Th230Th232')[1]
     }
     Th230U238 <- d[,'Th230Th232']/d[,'U238Th232']
-    d08.d02 <- 1/d[,'U238Th232']
-    d08.d82 <- -d[,'Th230Th232']/d[,'U238Th232']^2
-    sTh230U238 <- sqrt( (d08.d02*d[,'errTh230Th232'])^2 +
-                        (d08.d82*d[,'errU238Th232'])^2 )
+    sTh230U238 <- errorprop1x2(J1=1/d[,'U238Th232'],
+                               J2=-d[,'Th230Th232']/d[,'U238Th232']^2,
+                               E11=d[,'errTh230Th232']^2,
+                               E22=d[,'errU238Th232']^2,
+                               E12=d[,'cov'])
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
@@ -189,5 +190,55 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
     }
     if (!is.na(sigdig)) out <- roundit(out[,1],out[,2],sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
+    out
+}
+
+# algorithm from Ludwig and Titterington (1994)'s 
+# SIMPLE CORRECTION OF INITIAL THORIUM AND URANIUM USING 232Th
+# section. This currently is not used in IsoplotR!
+Th230correction.carbonates <- function(x,Th02U48=rep(0,3),
+                                       covTh02U48=matrix(0,3,3)){
+    osmond <- data2tit.ThU(x,osmond=TRUE) # 2/8 - 4/8 - 0/8
+    X1 <- osmond[,'X']
+    sX1 <- osmond[,'sX']
+    Y1 <- osmond[,'Y']
+    sY1 <- osmond[,'sY']
+    Z1 <- osmond[,'Z']
+    sZ1 <- osmond[,'sZ']
+    rX1Y1 <- osmond[,'rXY']
+    rX1Z1 <- osmond[,'rXZ']
+    rY1Z1 <- osmond[,'rYZ']
+    covX1Y1 <- rX1Y1*sX1*sY1
+    covX1Z1 <- rX1Z1*sX1*sZ1
+    covY1Z1 <- rY1Z1*sY1*sZ1
+    X2 <- Th02U48[1]
+    Y2 <- Th02U48[2]
+    Z2 <- Th02U48[3]
+    sX2 <- sqrt(covTh02U48[1,1])
+    sY2 <- sqrt(covTh02U48[2,2])
+    sZ2 <- sqrt(covTh02U48[3,3])
+    covX2Y2 <- covTh02U48[1,2]
+    covX2Z2 <- covTh02U48[1,3]
+    covY2Z2 <- covTh02U48[2,3]
+    b <- (Y2-Y1)/(X2-X1)
+    B <- (Z2-Z1)/(X2-X1)
+    r1 <- X1/(X2-X1)
+    r2 <- X2/(X2-X1)
+    a <- Y1 - b * X1
+    A <- Z1 - B * X1
+    sa <- sqrt( (b^2)*((r2*sX1)^2+(r1*sX2)^2) +
+                (r2*sY1)^2 + (r1*sY2)^2 -
+                2*r2*b*covX1Y1 - 2*(r1^2)*covX2Y2
+               )
+    sA <- sqrt( (B^2)*((r2*sX1)^2+(r1*sX2)^2) +
+                (r2*sZ1)^2 + (r1*sZ2)^2 -
+                2*r2*B*covX1Z1 - 2*(r1^2)*covX2Z2
+               )
+    covaA <- b*B*((r2*sX1)^2+(r1*sX2)^2) +
+        (r2^2)*(covY1Z1-B*covX1Y1-b*covX1Z1) +
+        (r1^2)*(covY2Z2-B*covX2Y2-b*covX2Z2)
+    out <- cbind(A,sA,a,sa,covaA)
+    colnames(out) <- c('Th230U238','errTh230U238',
+                       'U234U238','errU234U238','cov')
     out
 }

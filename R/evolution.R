@@ -401,9 +401,11 @@ data2evolution <- function(x,ThCorr=0){
         out <- cbind(xy,covariance)
     } else if (x$format %in% c(3,4)){
         out <- data2york(x,type=1)
+        covariance <- out[,'sX']*out[,'sY']*out[,'rXY']
+        out[,5] <- covariance
         cnames <- c('U238Th232','errU238Th232',
                     'Th230Th232','errTh230Th232',
-                    'rho')
+                    'cov')
     }
     colnames(out) <- cnames
     if (x$format %in% c(1,2)){
