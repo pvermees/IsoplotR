@@ -134,9 +134,7 @@ get.U234U238 <- function(tt,U234U238_0){
 ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     if (x$format %in% c(1,2)){
         ns <- length(x)
-        if (ns<2) ThCorr <- 1
-        else ThCorr <- 1+1*i2i
-        out <- get.ThU.age.corals(x,exterr=exterr,i=i,ThCorr=ThCorr,
+        out <- get.ThU.age.corals(x,exterr=exterr,i=i,i2i=i2i,
                                   sigdig=sigdig,cor=cor)
     } else {
         out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
@@ -145,11 +143,11 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,ThCorr=0,sigdig=NA,cor=TRUE){
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
-    d <- data2evolution(x,ThCorr=ThCorr)
+    d <- data2evolution(x,project=i2i)
     for (j in 1:ns){
         out[j,] <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],
                                d[j,'U234U238'],d[j,'errU234U238'],

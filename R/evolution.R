@@ -40,8 +40,8 @@
 #'     confidence intervals
 #' @param transform if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 #'     vs. Th-U age.
-#' @param detrital apply a detrital Th correction by projecting the
-#'     compositions along an isochron?
+#' @param project project the composition along an isochron to remove
+#'     the detrital Th component?
 #' @param show.numbers label the error ellipses with the grain
 #'     numbers?
 #' @param levels a vector with additional values to be displayed as
@@ -102,19 +102,19 @@
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
-                      detrital=FALSE,show.numbers=FALSE,levels=NA,
+                      project=FALSE,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                       line.col='darksalmon',isochron=FALSE, model=1,
                       exterr=TRUE,sigdig=2,...){
     if (x$format %in% c(1,2)){
         if (transform){
-            U4U8vst(x,detrital=detrital,xlim=xlim,ylim=ylim,alpha=alpha,
+            U4U8vst(x,project=project,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel, ellipse.col=ellipse.col,
                     show.ellipses=(model!=2), ...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
-                        ylim=ylim,alpha=alpha,detrital=detrital,
+                        ylim=ylim,alpha=alpha,project=project,
                         show.numbers=show.numbers,levels=levels,
                         clabel=clabel, ellipse.col=ellipse.col,
                         line.col=line.col, show.ellipses=(model!=2),
@@ -135,12 +135,12 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
     }
 }
 
-U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,alpha=0.05,
+U4U8vst <- function(x,project=FALSE,xlim=NA,ylim=NA,alpha=0.05,
                     show.numbers=FALSE,levels=NA,clabel="",
                     ellipse.col=c("#00FF0080","#FF000080"),
                     show.ellipses=TRUE,...){
     ns <- length(x)
-    ta0 <- get.ThU.age.corals(x,exterr=FALSE,ThCorr=2*detrital,cor=FALSE)
+    ta0 <- get.ThU.age.corals(x,exterr=FALSE,i2i=project,cor=FALSE)
     nsd <- 3
     if (any(is.na(xlim))) xlim <- range(c(ta0[,'t']-nsd*ta0[,'s[t]'],
                                           ta0[,'t']+nsd*ta0[,'s[t]']))
@@ -169,13 +169,13 @@ U4U8vst <- function(x,detrital=FALSE,xlim=NA,ylim=NA,alpha=0.05,
     colourbar(z=levels,col=ellipse.col,clabel=clabel)
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detrital=FALSE,
+U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,project=FALSE,
                         xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.col=c("#00FF0080","#FF000080"),
                         line.col='darksalmon',show.ellipses=TRUE,...){
     ns <- length(x)
-    d <- data2evolution(x,ThCorr=2*detrital)
+    d <- data2evolution(x,project=project)
     lim <- evolution.lines(d,xlim=xlim,ylim=ylim,...)
     if (isochron){
         fit <- isochron(x,type=2,plot=FALSE,model=model)
@@ -365,10 +365,7 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     rbind(xlim,ylim)
 }
 
-# ThCorr == 0: no detrital 230Th correction
-# ThCorr == 1: nominal correction
-# ThCorr == 2: isochron correction
-data2evolution <- function(x,ThCorr=0){
+data2evolution <- function(x,project=FALSE){
     ns <- length(x)
     out <- matrix(0,ns,5)
     cnames <- c('Th230U238','errTh230U238',
@@ -408,20 +405,13 @@ data2evolution <- function(x,ThCorr=0){
                     'cov')
     }
     colnames(out) <- cnames
-    if (x$format %in% c(1,2)){
+    if (project){
         osmond <- data2tit.ThU(x,osmond=TRUE)
-        if (ThCorr==1){
-            out[,'U234U238'] <- out[,'U234U238'] -
-                settings('iratio','U234U238')[1]
-            out[,'Th230U238'] <- out[,'Th230U238'] -
-                settings('iratio','Th230Th232')[1] / osmond[,'X']
-        } else if (ThCorr==2){
-            fit <- titterington(osmond)
-            out[,'U234U238'] <- out[,'U234U238'] -
-                fit$par['b']*osmond[,'X']
-            out[,'Th230U238'] <- out[,'Th230U238'] -
-                fit$par['B']*osmond[,'X']
-        }
+        fit <- titterington(osmond)
+        out[,'U234U238'] <- out[,'U234U238'] -
+            fit$par['b']*osmond[,'X']
+        out[,'Th230U238'] <- out[,'Th230U238'] -
+            fit$par['B']*osmond[,'X']
     }
     out
 }
