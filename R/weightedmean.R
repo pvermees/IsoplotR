@@ -549,9 +549,11 @@ chauvenet <- function(X,sX,valid,random.effects=TRUE){
     if (random.effects) sigma <- sqrt(fit$disp[1]^2+sX^2)
     else sigma <- sqrt(fit$mswd)*sX
     prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
-    minp <- min(prob[valid])
-    imin <- which.min(sX/abs(X-mu))
-    ns <- length(valid[valid])
+    iprob <- order(prob)
+    npruned <- length(which(!valid))
+    imin <- iprob[npruned+1]
+    minp <- prob[imin]
+    ns <- length(which(valid))
     if (ns*minp < 0.5) valid[imin] <- FALSE # remove outlier
     valid
 }

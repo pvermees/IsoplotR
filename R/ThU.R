@@ -194,8 +194,9 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
 # algorithm from Ludwig and Titterington (1994)'s 
 # SIMPLE CORRECTION OF INITIAL THORIUM AND URANIUM USING 232Th
 # section. This currently is not used in IsoplotR!
-Th230correction.carbonates <- function(x,Th02U48=rep(0,3),
-                                       covTh02U48=matrix(0,3,3)){
+# Th02U48: X=Th230/U238, sX, Y=Th232/U238, sY,
+#          Z=U234/U238, sZ, rXY, rXZ, rYZ 
+Th230correction.carbonates <- function(x,Th02U48=rep(0,9)){
     osmond <- data2tit.ThU(x,osmond=TRUE) # 2/8 - 4/8 - 0/8
     X1 <- osmond[,'X']
     sX1 <- osmond[,'sX']
@@ -210,8 +211,8 @@ Th230correction.carbonates <- function(x,Th02U48=rep(0,3),
     covX1Z1 <- rX1Z1*sX1*sZ1
     covY1Z1 <- rY1Z1*sY1*sZ1
     X2 <- Th02U48[1]
-    Y2 <- Th02U48[2]
-    Z2 <- Th02U48[3]
+    Y2 <- Th02U48[3]
+    Z2 <- Th02U48[5]
     sX2 <- sqrt(covTh02U48[1,1])
     sY2 <- sqrt(covTh02U48[2,2])
     sZ2 <- sqrt(covTh02U48[3,3])
