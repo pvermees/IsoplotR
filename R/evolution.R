@@ -370,34 +370,13 @@ data2evolution <- function(x,project=FALSE){
     out <- matrix(0,ns,5)
     cnames <- c('Th230U238','errTh230U238',
                 'U234U238','errU234U238','cov')
-    if (x$format == 1){
-        ns <- length(x)
-        out[,1] <- x$x[,'Th230Th232']/x$x[,'U238Th232'] # Th230U238
-        out[,3] <- x$x[,'U234Th232']/x$x[,'U238Th232']  # U234U238
-        J <- matrix(0,2,3)
-        for (i in 1:ns){
-            J[1,1] <- -out[i,1]/x$x[i,'U238Th232'] # d/d82
-            J[1,2] <- 0                            # d/d42
-            J[1,3] <- 1/x$x[i,'U238Th232']         # d/d02
-            J[2,1] <- -out[i,3]/x$x[i,'U238Th232']
-            J[2,2] <- 1/x$x[i,'U238Th232']
-            J[2,3] <- 0
-            E <- cor2cov3(x$x[i,'errU238Th232'],x$x[i,'errU234Th232'],
-                          x$x[i,'errTh230Th232'],x$x[i,'rhoXY'],
-                          x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
-            covmat <- J %*% E %*% t(J)
-            out[i,2] <- sqrt(covmat[1,1]) # errTh230U238
-            out[i,4] <- sqrt(covmat[2,2]) # errU234U238
-            out[i,5] <- covmat[1,2]       # cov
-        }
-    } else if (x$format == 2){
-        xy <- subset(x$x,select=c('Th230U238','errTh230U238',
-                                  'U234U238','errU234U238'))
-        covariance <- x$x[,'errTh230U238']*
-            x$x[,'errU234U238']*x$x[,'rhoYZ']
+    if (x$format %in% c(1,2)){
+        d <- data2tit(x) # 2/8 - 4/8 - 0/8
+        xy <- subset(d,select=c('Z','sZ','Y','sY'))
+        covariance <- d[,'sZ']*d[,'sY']*d[,'rYZ']
         out <- cbind(xy,covariance)
     } else if (x$format %in% c(3,4)){
-        out <- data2york(x,type=1)
+        out <- data2york(x,type=1) # 8/2 - 0/2
         covariance <- out[,'sX']*out[,'sY']*out[,'rXY']
         out[,5] <- covariance
         cnames <- c('U238Th232','errU238Th232',
@@ -405,13 +384,34 @@ data2evolution <- function(x,project=FALSE){
                     'cov')
     }
     colnames(out) <- cnames
-    if (project){
-        osmond <- data2tit.ThU(x,osmond=TRUE)
-        fit <- titterington(osmond)
-        out[,'U234U238'] <- out[,'U234U238'] -
-            fit$par['b']*osmond[,'X']
-        out[,'Th230U238'] <- out[,'Th230U238'] -
-            fit$par['B']*osmond[,'X']
-    }
+    if (project) out <- Th230correction.isochron(out,x)
     out
+}
+
+# x = for corals: a table with 08,s08,48,s48,cov
+#     volcanics : a table with 82, s82, 02, s02, cov
+# option = 0: no 230Th correction
+#          1: isochron correction
+#          2: assumed initial 230Th/232Th ratio
+#          3: measured X=08, s08, Y=28, s28, 
+#                      Z=48, s48, rXY, rXZ, rYZ of detritus
+# control = NA if option == 0
+#           the Th-U data if option == 1
+#           a 2-element vector c(02,s02) if option == 2
+#           a 9-element vector if option == 3
+Th230correction.isochron <- function(x,dat){
+    osmond <- data2tit.ThU(dat,osmond=TRUE)
+    fit <- titterington(osmond)
+    out <- x
+    out[,'U234U238'] <- x[,'U234U238'] - fit$par['b']*osmond[,'X']
+    out[,'Th230U238'] <- x[,'Th230U238'] - fit$par['B']*osmond[,'X']
+    out
+}
+Th230correction.assumed.detritus <- function(x,Th02=c(0,0)){
+    out <- x
+    out[,'Th230U238'] <- x[,'Th230U238'] - x[,'Th230U238']*
+    out
+}
+Th230correction.measured.detritus <- function(x,Th02U48=rep(0,9)){
+    
 }

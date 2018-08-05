@@ -1,6 +1,8 @@
 get.ThU.age <- function(Th230U238,sTh230U238,
                         U234U238=1,sU234U238=0,
-                        cov4808=0,exterr=TRUE,cor=FALSE){
+                        cov4808=0,
+                        Th230Th232d=0,sTh230Th232d=0,
+                        exterr=TRUE,cor=FALSE){
     l0 <- lambda('Th230')
     l4 <- lambda('U234')
     a <- U234U238
@@ -8,7 +10,8 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     sa <- sU234U238
     sA <- sTh230U238
     covAa <- cov4808
-    fit <- fit <- stats::optimize(ThU.misfit,interval=c(0,2000),A=A,a=a,l0=l0,l4=l4)
+    fit <- stats::optimize(ThU.misfit,interval=c(0,2000),
+                           A=A,a=a,l0=l0,l4=l4)
     tt <- fit$minimum
     a0 <- 1+(a-1)*exp(l4[1]*tt)
     l40 <- l4[1]-l0[1]
@@ -143,7 +146,8 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,
+                               i2i=FALSE,sigdig=NA,cor=TRUE){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
