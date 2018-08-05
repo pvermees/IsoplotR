@@ -175,7 +175,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,project=FALSE,
                         ellipse.col=c("#00FF0080","#FF000080"),
                         line.col='darksalmon',show.ellipses=TRUE,...){
     ns <- length(x)
-    d <- data2evolution(x,project=project)
+    d <- data2evolution(x)
+    if (project) d <- Th230correction(d,option=1,control=x)
     lim <- evolution.lines(d,xlim=xlim,ylim=ylim,...)
     if (isochron){
         fit <- isochron(x,type=2,plot=FALSE,model=model)
@@ -365,16 +366,16 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     rbind(xlim,ylim)
 }
 
-data2evolution <- function(x,project=FALSE){
+data2evolution <- function(x){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    cnames <- c('Th230U238','errTh230U238',
-                'U234U238','errU234U238','cov')
     if (x$format %in% c(1,2)){
         d <- data2tit(x) # 2/8 - 4/8 - 0/8
         xy <- subset(d,select=c('Z','sZ','Y','sY'))
         covariance <- d[,'sZ']*d[,'sY']*d[,'rYZ']
         out <- cbind(xy,covariance)
+        cnames <- c('Th230U238','errTh230U238',
+                    'U234U238','errU234U238','cov')
     } else if (x$format %in% c(3,4)){
         out <- data2york(x,type=1) # 8/2 - 0/2
         covariance <- out[,'sX']*out[,'sY']*out[,'rXY']
@@ -384,7 +385,6 @@ data2evolution <- function(x,project=FALSE){
                     'cov')
     }
     colnames(out) <- cnames
-    if (project) out <- Th230correction.isochron(out,x)
     out
 }
 
@@ -399,6 +399,16 @@ data2evolution <- function(x,project=FALSE){
 #           the Th-U data if option == 1
 #           a 2-element vector c(02,s02) if option == 2
 #           a 9-element vector if option == 3
+Th230correction <- function(x,option=0,control=NA){
+    out <- x
+    if (option==1)
+        out <- Th230correction.isochron(out,control)
+    else if (option==2)
+        out <- Th230correction.assumed.detritus(out,Th02=control)
+    else if (option==3)
+        out <- Th230correction.measured.detritus(out,Th02U48=control)
+    out
+}
 Th230correction.isochron <- function(x,dat){
     osmond <- data2tit.ThU(dat,osmond=TRUE)
     fit <- titterington(osmond)
@@ -414,4 +424,54 @@ Th230correction.assumed.detritus <- function(x,Th02=c(0,0)){
 }
 Th230correction.measured.detritus <- function(x,Th02U48=rep(0,9)){
     
+}
+# algorithm from Ludwig and Titterington (1994)'s 
+# SIMPLE CORRECTION OF INITIAL THORIUM AND URANIUM USING 232Th
+# section. This currently is not used in IsoplotR!
+# Th02U48: X=Th230/U238, sX, Y=Th232/U238, sY,
+#          Z=U234/U238, sZ, rXY, rXZ, rYZ 
+Th230correction.carbonates <- function(x,Th02U48=rep(0,9)){
+    osmond <- data2tit.ThU(x,osmond=TRUE) # 2/8 - 4/8 - 0/8
+    X1 <- osmond[,'X']
+    sX1 <- osmond[,'sX']
+    Y1 <- osmond[,'Y']
+    sY1 <- osmond[,'sY']
+    Z1 <- osmond[,'Z']
+    sZ1 <- osmond[,'sZ']
+    rX1Y1 <- osmond[,'rXY']
+    rX1Z1 <- osmond[,'rXZ']
+    rY1Z1 <- osmond[,'rYZ']
+    covX1Y1 <- rX1Y1*sX1*sY1
+    covX1Z1 <- rX1Z1*sX1*sZ1
+    covY1Z1 <- rY1Z1*sY1*sZ1
+    X2 <- Th02U48[1]
+    Y2 <- Th02U48[3]
+    Z2 <- Th02U48[5]
+    sX2 <- sqrt(covTh02U48[1,1])
+    sY2 <- sqrt(covTh02U48[2,2])
+    sZ2 <- sqrt(covTh02U48[3,3])
+    covX2Y2 <- covTh02U48[1,2]
+    covX2Z2 <- covTh02U48[1,3]
+    covY2Z2 <- covTh02U48[2,3]
+    b <- (Y2-Y1)/(X2-X1)
+    B <- (Z2-Z1)/(X2-X1)
+    r1 <- X1/(X2-X1)
+    r2 <- X2/(X2-X1)
+    a <- Y1 - b * X1
+    A <- Z1 - B * X1
+    sa <- sqrt( (b^2)*((r2*sX1)^2+(r1*sX2)^2) +
+                (r2*sY1)^2 + (r1*sY2)^2 -
+                2*r2*b*covX1Y1 - 2*(r1^2)*covX2Y2
+               )
+    sA <- sqrt( (B^2)*((r2*sX1)^2+(r1*sX2)^2) +
+                (r2*sZ1)^2 + (r1*sZ2)^2 -
+                2*r2*B*covX1Z1 - 2*(r1^2)*covX2Z2
+               )
+    covaA <- b*B*((r2*sX1)^2+(r1*sX2)^2) +
+        (r2^2)*(covY1Z1-B*covX1Y1-b*covX1Z1) +
+        (r1^2)*(covY2Z2-B*covX2Y2-b*covX2Z2)
+    out <- cbind(A,sA,a,sa,covaA)
+    colnames(out) <- c('Th230U238','errTh230U238',
+                       'U234U238','errU234U238','cov')
+    out
 }
