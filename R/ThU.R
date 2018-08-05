@@ -1,6 +1,8 @@
 get.ThU.age <- function(Th230U238,sTh230U238,
                         U234U238=1,sU234U238=0,
-                        cov4808=0,exterr=TRUE,cor=FALSE){
+                        cov4808=0,
+                        Th230Th232d=0,sTh230Th232d=0,
+                        exterr=TRUE,cor=FALSE){
     l0 <- lambda('Th230')
     l4 <- lambda('U234')
     a <- U234U238
@@ -8,7 +10,8 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     sa <- sU234U238
     sA <- sTh230U238
     covAa <- cov4808
-    fit <- fit <- stats::optimize(ThU.misfit,interval=c(0,2000),A=A,a=a,l0=l0,l4=l4)
+    fit <- stats::optimize(ThU.misfit,interval=c(0,2000),
+                           A=A,a=a,l0=l0,l4=l4)
     tt <- fit$minimum
     a0 <- 1+(a-1)*exp(l4[1]*tt)
     l40 <- l4[1]-l0[1]
@@ -132,59 +135,27 @@ get.U234U238 <- function(tt,U234U238_0){
 }
 
 ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
-    if (x$format %in% c(1,2))
-        out <- get.ThU.age.corals(x,exterr=exterr,i=i,i2i=i2i,sigdig=sigdig,cor=cor)
-    else
-        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,i2i=i2i,sigdig=sigdig)
+    if (x$format %in% c(1,2)){
+        ns <- length(x)
+        out <- get.ThU.age.corals(x,exterr=exterr,i=i,i2i=i2i,
+                                  sigdig=sigdig,cor=cor)
+    } else {
+        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
+                                     i2i=i2i,sigdig=sigdig)
+    }
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,
+                               i2i=FALSE,sigdig=NA,cor=TRUE){
     ns <- length(x)
-    if (ns<2) i2i <- FALSE
-    osmond <- data2tit.ThU(x,osmond=TRUE)
-    if (i2i) fit <- titterington(osmond)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
-    if (cor) colnames(out)[5] <- 'cor[t,48_0]'
-    Th0Th2_d<- settings('iratio','Th230Th232')[1]
-    sTh0Th2_d <- settings('iratio','Th230Th232')[2]
-    U4U8_d <- settings('iratio','U234U238')[1]
-    sU4U8_d <- settings('iratio','U234U238')[2]
-    cov4808 <- data2evolution(x)[,'cov']
+    d <- data2evolution(x,project=i2i)
     for (j in 1:ns){
-        Th2U8 <- osmond[j,'X']
-        sTh2U8 <- osmond[j,'sX']
-        U4U8 <- osmond[j,'Y']
-        sU4U8 <- osmond[j,'sY']
-        Th0U8 <- osmond[j,'Z']
-        sTh0U8 <- osmond[j,'sZ']
-        if (i2i){ # project onto 08-48 plane
-            U4Th2 <- fit$par['b']
-            U4U8_d <- U4Th2 * Th2U8
-            sU4U8_d <- 0 # don't propagate projection error
-            Th0Th2 <- fit$par['B']
-            Th0U8_d <- Th0Th2 * Th2U8
-            sTh0U8_d <- 0 # don't propagate projection error
-        } else {
-            Th0U8_d <- Th0Th2_d * Th2U8
-            if (Th0U8_d > 0)
-                sTh0U8_d <- Th0U8_d * sqrt( (sTh0Th2_d/Th0Th2_d)^2 + (sTh2U8/Th2U8)^2 )
-            else
-                sTh0U8_d <- 0
-        }
-        U4U8_0 <- U4U8 - U4U8_d
-        if (U4U8_d > 0)
-            sU4U8_0 <- U4U8_0 * sqrt( (sU4U8/U4U8)^2 + (sU4U8_d/U4U8_d)^2 )
-        else
-            sU4U8_0 <- sU4U8
-        Th0U8_0 <- Th0U8 - Th0U8_d
-        if (Th0U8_d > 0)
-            sTh0U8_0 <- Th0U8_0 * sqrt( (sTh0U8/Th0U8)^2 + (sTh0U8_d/Th0U8_d)^2 )
-        else
-            sTh0U8_0 <- sTh0U8
-        out[j,] <- get.ThU.age(Th0U8_0,sTh0U8_0,U4U8_0,sU4U8_0,
-                               cov4808[j],exterr=exterr,cor=cor)
+        out[j,] <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],
+                               d[j,'U234U238'],d[j,'errU234U238'],
+                               d[j,'cov'],exterr=exterr,cor=cor)
     }
     if (!is.na(sigdig)){
         temp <- out # store numerical values because roundit creates text
@@ -199,12 +170,20 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE)
 
 get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
     ns <- length(x)
-    d <- data2evolution(x,isochron=i2i)
-    Th230U238 <- (d$x[,'Th230Th232'] - d$Th230Th232_0)/d$x[,'U238Th232']
-    d08.d02 <- 1/d$x[,'U238Th232']
-    d08.d82 <- -(d$x[,'Th230Th232'] - d$Th230Th232_0)/d$x[,'U238Th232']^2
-    sTh230U238 <- sqrt( (d08.d02*d$x[,'errTh230Th232'])^2 +
-                        (d08.d82*d$x[,'errU238Th232'])^2 )
+    d <- data2evolution(x)
+    if (i2i){
+        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
+        d[,'Th230Th232'] <- d[,'Th230Th232'] - fit$a[1]
+    } else {
+        d[,'Th230Th232'] <- d[,'Th230Th232'] -
+            settings('iratio','Th230Th232')[1]
+    }
+    Th230U238 <- d[,'Th230Th232']/d[,'U238Th232']
+    sTh230U238 <- errorprop1x2(J1=1/d[,'U238Th232'],
+                               J2=-d[,'Th230Th232']/d[,'U238Th232']^2,
+                               E11=d[,'errTh230Th232']^2,
+                               E22=d[,'errU238Th232']^2,
+                               E12=d[,'cov'])
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
@@ -213,5 +192,56 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
     }
     if (!is.na(sigdig)) out <- roundit(out[,1],out[,2],sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
+    out
+}
+
+# algorithm from Ludwig and Titterington (1994)'s 
+# SIMPLE CORRECTION OF INITIAL THORIUM AND URANIUM USING 232Th
+# section. This currently is not used in IsoplotR!
+# Th02U48: X=Th230/U238, sX, Y=Th232/U238, sY,
+#          Z=U234/U238, sZ, rXY, rXZ, rYZ 
+Th230correction.carbonates <- function(x,Th02U48=rep(0,9)){
+    osmond <- data2tit.ThU(x,osmond=TRUE) # 2/8 - 4/8 - 0/8
+    X1 <- osmond[,'X']
+    sX1 <- osmond[,'sX']
+    Y1 <- osmond[,'Y']
+    sY1 <- osmond[,'sY']
+    Z1 <- osmond[,'Z']
+    sZ1 <- osmond[,'sZ']
+    rX1Y1 <- osmond[,'rXY']
+    rX1Z1 <- osmond[,'rXZ']
+    rY1Z1 <- osmond[,'rYZ']
+    covX1Y1 <- rX1Y1*sX1*sY1
+    covX1Z1 <- rX1Z1*sX1*sZ1
+    covY1Z1 <- rY1Z1*sY1*sZ1
+    X2 <- Th02U48[1]
+    Y2 <- Th02U48[3]
+    Z2 <- Th02U48[5]
+    sX2 <- sqrt(covTh02U48[1,1])
+    sY2 <- sqrt(covTh02U48[2,2])
+    sZ2 <- sqrt(covTh02U48[3,3])
+    covX2Y2 <- covTh02U48[1,2]
+    covX2Z2 <- covTh02U48[1,3]
+    covY2Z2 <- covTh02U48[2,3]
+    b <- (Y2-Y1)/(X2-X1)
+    B <- (Z2-Z1)/(X2-X1)
+    r1 <- X1/(X2-X1)
+    r2 <- X2/(X2-X1)
+    a <- Y1 - b * X1
+    A <- Z1 - B * X1
+    sa <- sqrt( (b^2)*((r2*sX1)^2+(r1*sX2)^2) +
+                (r2*sY1)^2 + (r1*sY2)^2 -
+                2*r2*b*covX1Y1 - 2*(r1^2)*covX2Y2
+               )
+    sA <- sqrt( (B^2)*((r2*sX1)^2+(r1*sX2)^2) +
+                (r2*sZ1)^2 + (r1*sZ2)^2 -
+                2*r2*B*covX1Z1 - 2*(r1^2)*covX2Z2
+               )
+    covaA <- b*B*((r2*sX1)^2+(r1*sX2)^2) +
+        (r2^2)*(covY1Z1-B*covX1Y1-b*covX1Z1) +
+        (r1^2)*(covY2Z2-B*covX2Y2-b*covX2Z2)
+    out <- cbind(A,sA,a,sa,covaA)
+    colnames(out) <- c('Th230U238','errTh230U238',
+                       'U234U238','errU234U238','cov')
     out
 }
