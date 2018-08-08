@@ -214,10 +214,11 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
 }
 #' @rdname peakfit
 #' @export
-peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2,
-                        log=TRUE,i2i=TRUE,alpha=0.05,...){
-    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2, log=TRUE,
+                        i2i=TRUE,alpha=0.05,detritus=0,Th02=c(0,0),
+                        Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,
+                   alpha=alpha,detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
 }
 #' @rdname peakfit
 #' @export
@@ -226,14 +227,16 @@ peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,
                            cutoff.disc=c(-15,5),exterr=TRUE,sigdig=2,
-                           log=TRUE,i2i=FALSE,alpha=0.05,...){
+                           log=TRUE,i2i=FALSE,alpha=0.05,detritus=0,
+                           Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (k<1) return(NULL)
     if (identical(k,'auto'))
         k <- BIC_fit(x,5,log=log,type=type, cutoff.76=cutoff.76,
-                     cutoff.disc=cutoff.disc)
+                     cutoff.disc=cutoff.disc,detritus=detritus,
+                     Th02=Th02,Th02U48=Th02U48)
     fit <- ages2peaks(x,k=k,log=log,i2i=i2i,type=type,
                       cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                      alpha=alpha)
+                      alpha=alpha,detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -249,7 +252,8 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,
 
 ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
                        cutoff.disc=c(-15,5),log=TRUE,i2i=FALSE,
-                       alpha=0.05){
+                       alpha=0.05,detritus=0,Th02=c(0,0),
+                       Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type,cutoff.76,
                               cutoff.disc,exterr=FALSE)
@@ -270,7 +274,8 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
     } else if (hasClass(x,'fissiontracks')){
         tt <- fissiontrack.age(x,exterr=FALSE)
     } else if (hasClass(x,'ThU')){
-        tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
+        tt <- ThU.age(x,exterr=FALSE,i2i=i2i,detritus=detritus,
+                      Th02=Th02,Th02U48=Th02U48)
     }
     peakfit.default(tt,k=k,log=log,alpha=alpha)
 }
@@ -478,13 +483,15 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
 }
 
 BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,
-                    cutoff.disc=c(-15,5),exterr=TRUE,...){
+                    cutoff.disc=c(-15,5),exterr=TRUE,
+                    detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     n <- length(x)
     BIC <- Inf
     out <- tryCatch({
         for (k in 1:max.k){
             fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
-                           cutoff.disc=cutoff.disc,exterr=exterr,...)
+                           cutoff.disc=cutoff.disc,exterr=exterr,
+                           detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
             p <- 2*k-1
             newBIC <- -2*fit$L+p*log(n)
             if (newBIC<BIC) {

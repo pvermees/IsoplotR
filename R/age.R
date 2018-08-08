@@ -287,10 +287,10 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
 #' @rdname age
 #' @export
 age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,
-                    detritus=0,Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0),...){
+                    detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
     else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,
-                        detritus=0,Th02=Th02,Th02U48=Th02U48,...)
+                        detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
     out
 }
 #' @rdname age

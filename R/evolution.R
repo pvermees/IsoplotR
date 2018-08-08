@@ -114,7 +114,7 @@
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
-                      detritus=0,Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0),
+                      detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                       show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                       line.col='darksalmon',isochron=FALSE, model=1,
@@ -151,7 +151,7 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
 }
 
 U4U8vst <- function(x,detritus=0,Th02=c(0,0),
-                    Th02U48=c(0,1e6,0,0,0,0,0,0,0),
+                    Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                     xlim=NA,ylim=NA,alpha=0.05,
                     show.numbers=FALSE,levels=NA,clabel="",
                     ellipse.col=c("#00FF0080","#FF000080"),
@@ -189,7 +189,7 @@ U4U8vst <- function(x,detritus=0,Th02=c(0,0),
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
-                        Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0),
+                        Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                         xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.col=c("#00FF0080","#FF000080"),
@@ -402,7 +402,7 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
 }
 
 data2evolution <- function(x,detritus=0,Th02=c(0,0),
-                           Th02U48=c(0,1e6,0,0,0,0,0,0,0)){
+                           Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     ns <- length(x)
     out <- matrix(0,ns,5)
     if (x$format %in% c(1,2)){
@@ -422,7 +422,7 @@ data2evolution <- function(x,detritus=0,Th02=c(0,0),
 
 # x = table with 'Th230U238','errTh230U238', 'U234U238','errU234U238','cov'
 Th230correction <- function(x,option=0,dat=NA,Th02=c(0,0),
-                            Th02U48=c(0,1e6,0,0,0,0,0,0,0)){
+                            Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     out <- x
     if (option==1){
         out <- Th230correction.isochron(x,dat=dat)
@@ -454,7 +454,7 @@ Th230correction.assumed.detritus <- function(x,age=Inf,Th02=c(0,0)){
     out[,'sTh230U238'] <- sqrt(x[,'sTh230U238']^2 + sA^2)         
     out
 }
-Th230correction.measured.detritus <- function(x,Th02U48=c(0,1e6,0,0,0,0,0,0,0)){
+Th230correction.measured.detritus <- function(x,Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     osmond <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
     X1 <- osmond[,'Th232U238']
     sX1 <- osmond[,'sTh232U238']

@@ -1,5 +1,5 @@
 ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE,
-                    detritus=0,Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0)){
+                    detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     if (x$format %in% c(1,2)){
         ns <- length(x)
         out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
@@ -13,7 +13,7 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE,
 }
 
 get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0,
-                               Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0)){
+                               Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
