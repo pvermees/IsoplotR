@@ -262,11 +262,35 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
     else out <- fissiontrack.age(x,i=i,sigdig=sigdig,exterr=exterr)
     out
 }
+#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
+#'     when \code{x$format == 1} or \code{2}.
+#'
+#' \code{0}: no correction
+#'
+#' \code{1}: project the data along an isochron fit
+#'
+#' \code{2}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#'
+#' \code{3}: correct the data using the measured present day
+#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
+#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#'
+#' @param Th02 2-element vector with the assumed initial
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+#'     standard error. Only used if \code{isochron==FALSE} and
+#'     \code{detritus==2}
+#' @param Th02U48 9-element vector with the measured composition of
+#'     the detritus, containing \code{X=0/8, sX, Y=2/8, sY, Z=4/8, sZ,
+#'     rXY, rXZ, rYZ}. Only used if \code{isochron==FALSE} and
+#'     \code{detritus==3}
 #' @rdname age
 #' @export
-age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,
+                    detritus=0,Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0),...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
+    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,
+                        detritus=0,Th02=Th02,Th02U48=Th02U48,...)
     out
 }
 #' @rdname age

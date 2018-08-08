@@ -1,6 +1,82 @@
+ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE,
+                    detritus=0,Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0)){
+    if (x$format %in% c(1,2)){
+        ns <- length(x)
+        out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
+                                  cor=cor,detritus=detritus,
+                                  Th02=Th02,Th02U48=Th02U48)
+    } else {
+        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
+                                     i2i=i2i,sigdig=sigdig)
+    }
+    out
+}
+
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0,
+                               Th02=c(0,0),Th02U48=c(0,1e6,0,0,0,0,0,0,0)){
+    ns <- length(x)
+    out <- matrix(0,ns,5)
+    colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
+    d <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
+    if (detritus==1){
+        d <- Th230correction.isochron(d,dat=x)
+    } else if (detritus==3){
+        d <- Th230correction.measured.detritus(x,Th02U48=Th02U48)
+    }
+    for (j in 1:ns){
+        out[j,] <- get.ThU.age(Th230U238=d[j,'Th230U238'],
+                               sTh230U238=d[j,'sTh230U238'],
+                               U234U238=d[j,'U234U238'],
+                               sU234U238=d[j,'sU234U238'],
+                               cov4808=d[j,'rYZ']*
+                                   d[j,'sU234U238']*d[j,'sTh230U238'],
+                               Th232U238=d[j,'Th232U238'],
+                               sTh232U238=d[j,'sTh232U238'],
+                               Th230Th232=Th02[1],
+                               sTh230Th232=Th02[2],
+                               exterr=exterr,cor=cor)
+    }
+    if (!is.na(sigdig)){
+        temp <- out # store numerical values because roundit creates text
+        temp[,c(1,2)] <- roundit(out[,1],out[,2],sigdig=sigdig)
+        temp[,c(3,4)] <- roundit(out[,3],out[,4],sigdig=sigdig)
+        temp[,5] <- signif(out[,5],sigdig)
+        out <- temp
+    }
+    if (!is.na(i)) out <- out[i,]
+    out
+}
+
+get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
+    ns <- length(x)
+    d <- data2evolution(x)
+    if (i2i){
+        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
+        d[,'Th230Th232'] <- d[,'Th230Th232'] - fit$a[1]
+    } else {
+        d[,'Th230Th232'] <- d[,'Th230Th232'] -
+            settings('iratio','Th230Th232')[1]
+    }
+    Th230U238 <- d[,'Th230Th232']/d[,'U238Th232']
+    sTh230U238 <- errorprop1x2(J1=1/d[,'U238Th232'],
+                               J2=-d[,'Th230Th232']/d[,'U238Th232']^2,
+                               E11=d[,'errTh230Th232']^2,
+                               E22=d[,'errU238Th232']^2,
+                               E12=d[,'cov'])
+    out <- matrix(0,ns,2)
+    colnames(out) <- c('t','s[t]')
+    for (j in 1:ns){
+        tst <- get.ThU.age(Th230U238[j],sTh230U238[j],exterr=exterr)
+        out[j,] <- tst[c('t','s[t]')]
+    }
+    if (!is.na(sigdig)) out <- roundit(out[,1],out[,2],sigdig=sigdig)
+    if (!is.na(i)) out <- out[i,]
+    out
+}
+
 get.ThU.age <- function(Th230U238,sTh230U238,
-                        U234U238=1,sU234U238=0,
-                        cov4808=0,
+                        U234U238=1,sU234U238=0,cov4808=0,
+                        Th232U238=0,sTh232U238=0,
                         Th230Th232d=0,sTh230Th232d=0,
                         exterr=TRUE,cor=FALSE){
     l0 <- lambda('Th230')
@@ -11,7 +87,8 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     sA <- sTh230U238
     covAa <- cov4808
     fit <- stats::optimize(ThU.misfit,interval=c(0,2000),
-                           A=A,a=a,l0=l0,l4=l4)
+                           A=A,a=a,l0=l0,l4=l4,
+                           Th2U8=Th232U238,Th02d=Th230Th232d)
     tt <- fit$minimum
     a0 <- 1+(a-1)*exp(l4[1]*tt)
     l40 <- l4[1]-l0[1]
@@ -25,15 +102,19 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     dD.dl0 <- (a-1)*dk1.dl0 - tt*exp(-l0[1]*tt)
     dD.dl4 <- (a-1)*dk1.dl4
     dD.dt <- (a-1)*dk1.dt - l0[1]*exp(-l0[1]*tt)
+    dD.dTh2U8 <- -exp(-l0[1]*tt)*Th230Th232d
+    dD.dTh02d <- -exp(-l0[1]*tt)*Th232U238
     dt.da <- -dD.da/dD.dt
     dt.dA <- -dD.dA/dD.dt
     dt.dl0 <- -dD.dl0/dD.dt
     dt.dl4 <- -dD.dl4/dD.dt
+    dt.dTh2U8 <- -dD.dTh2U8/dD.dt
+    dt.dTh02d <- -dD.dTh02d/dD.dt
     da0.da <- el4t + (a-1)*l4[1]*dt.da*el4t
     da0.dA <- (a-1)*l4[1]*dt.dA*el4t
     da0.dl0 <- (a-1)*l4[1]*dt.dl0*el4t
     da0.dl4 <- (a-1)*tt*el4t + (a-1)*l4[1]*dt.dl4*el4t
-    J <- matrix(0,2,4)
+    J <- matrix(0,2,6)
     J[1,1] <- dt.da
     J[1,2] <- dt.dA
     J[2,1] <- da0.da
@@ -41,11 +122,13 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     if (exterr){
         J[1,3] <- dt.dl0
         J[1,4] <- dt.dl4
+        J[1,5] <- dt.dTh2U8
+        J[1,6] <- dt.dTh02d
         J[2,3] <- da0.dl0
         J[2,4] <- da0.dl4
     }
-    E <- matrix(0,4,4)
-    diag(E) <- c(sa,sA,l0[2],l4[2])^2
+    E <- matrix(0,6,6)
+    diag(E) <- c(sa,sA,l0[2],l4[2],sTh232U238,sTh230Th232d)^2
     E[1,2] <- covAa
     E[2,1] <- E[1,2]
     covmat <- J %*% E %*% t(J)
@@ -80,15 +163,8 @@ get.U238Th232 <- function(tt,Th230Th232_0x,Th230Th232){
 k1 <- function(tt,l0,l4){
     (1-exp((l4[1]-l0[1])*tt))*l0[1]/(l4[1]-l0[1])
 }
-ThU.misfit <- function(tt,A,a,l0,l4){
-    (1-exp(-l0[1]*tt)-(a-1)*k1(tt,l0,l4) - A)^2
-}
-# not used anymore but kept for possible use in the future
-ThU.gr <- function(tt,A,a,l0,l4){
-    dk1.dtt <- l0[1]*exp((l4[1]-l0[1])*tt)
-    dmisfit.dtt <- 2*(1-exp(-l0[1]*tt)-(a-1)*k1(tt,l0,l4) - A) *
-        (l0[1]*exp(-l0[1]*tt) - (a-1)*dk1.dtt)
-    dmisfit.dtt
+ThU.misfit <- function(tt,A,a,l0,l4,Th2U8=0,Th02d=0){
+    ( 1 - exp(-l0[1]*tt)*(1-Th2U8*Th02d) - (a-1)*k1(tt,l0,l4) - A )^2
 }
 
 # converts format 1 to format 2 and vice versa
@@ -132,66 +208,4 @@ get.Th230U238 <- function(tt,U234U238_0){
 get.U234U238 <- function(tt,U234U238_0){
     l4 <- lambda('U234')
     1 + (U234U238_0-1)*exp(-l4[1]*tt)
-}
-
-ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE){
-    if (x$format %in% c(1,2)){
-        ns <- length(x)
-        out <- get.ThU.age.corals(x,exterr=exterr,i=i,i2i=i2i,
-                                  sigdig=sigdig,cor=cor)
-    } else {
-        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
-                                     i2i=i2i,sigdig=sigdig)
-    }
-    out
-}
-
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,i2i=FALSE,
-                               sigdig=NA,cor=TRUE){
-    ns <- length(x)
-    out <- matrix(0,ns,5)
-    colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
-    d <- data2evolution(x)
-    if (i2i) d <- Th230correction(d,option=1,control=x)
-    for (j in 1:ns){
-        out[j,] <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],
-                               d[j,'U234U238'],d[j,'errU234U238'],
-                               d[j,'cov'],exterr=exterr,cor=cor)
-    }
-    if (!is.na(sigdig)){
-        temp <- out # store numerical values because roundit creates text
-        temp[,c(1,2)] <- roundit(out[,1],out[,2],sigdig=sigdig)
-        temp[,c(3,4)] <- roundit(out[,3],out[,4],sigdig=sigdig)
-        temp[,5] <- signif(out[,5],sigdig)
-        out <- temp
-    }
-    if (!is.na(i)) out <- out[i,]
-    out
-}
-
-get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
-    ns <- length(x)
-    d <- data2evolution(x)
-    if (i2i){
-        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE)
-        d[,'Th230Th232'] <- d[,'Th230Th232'] - fit$a[1]
-    } else {
-        d[,'Th230Th232'] <- d[,'Th230Th232'] -
-            settings('iratio','Th230Th232')[1]
-    }
-    Th230U238 <- d[,'Th230Th232']/d[,'U238Th232']
-    sTh230U238 <- errorprop1x2(J1=1/d[,'U238Th232'],
-                               J2=-d[,'Th230Th232']/d[,'U238Th232']^2,
-                               E11=d[,'errTh230Th232']^2,
-                               E22=d[,'errU238Th232']^2,
-                               E12=d[,'cov'])
-    out <- matrix(0,ns,2)
-    colnames(out) <- c('t','s[t]')
-    for (j in 1:ns){
-        tst <- get.ThU.age(Th230U238[j],sTh230U238[j],exterr=exterr)
-        out[j,] <- tst[c('t','s[t]')]
-    }
-    if (!is.na(sigdig)) out <- roundit(out[,1],out[,2],sigdig=sigdig)
-    if (!is.na(i)) out <- out[i,]
-    out
 }

@@ -322,7 +322,7 @@ data2tit <- function(x,...){ UseMethod("data2tit",x) }
 data2tit.default <- function(x,...){ stop('default function undefined') }
 # osmond = FALSE: 8/2 - 4/2 - 0/2
 # osmond = TRUE : 2/8 - 4/8 - 0/8
-data2tit.ThU <- function(x,osmond=TRUE,...){
+data2tit.ThU <- function(x,osmond=TRUE,generic=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,9)
     if ((x$format == 1 & !osmond) | (x$format == 2 & osmond)){
@@ -332,7 +332,15 @@ data2tit.ThU <- function(x,osmond=TRUE,...){
             out[i,] <- ThU.convert(x$x[i,])
         }
     }
-    colnames(out) <- c('X','sX','Y','sY','Z','sZ','rXY','rXZ','rYZ')
+    if (generic){
+        colnames(out) <- c('X','sX','Y','sY','Z','sZ','rXY','rXZ','rYZ')
+    } else if (osmond){
+        colnames(out) <- c('Th232U238','sTh232U238','U234U238','sU234U238',
+                           'Th230U238','sTh230U238','rXY','rXZ','rYZ')
+    } else {
+        colnames(out) <- c('U238Th232','sU238Th232','U234Th232','su234Th232',
+                           'Th230Th232','sTh230Th232','rXY','rXZ','rYZ')
+    }
     out
 }
 
