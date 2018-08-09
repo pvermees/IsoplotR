@@ -18,11 +18,11 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     d <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
-    if (detritus==1){
+    if (detritus==1)
         d <- Th230correction.isochron(d,dat=x)
-    } else if (detritus==3){
+    else if (detritus==3)
         d <- Th230correction.measured.detritus(x,Th02U48=Th02U48)
-    }
+    if (detritus!=2) Th02 <- c(0,0)
     for (j in 1:ns){
         out[j,] <- get.ThU.age(Th230U238=d[j,'Th230U238'],
                                sTh230U238=d[j,'sTh230U238'],
