@@ -52,10 +52,6 @@
 #'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
 #'     \code{RbSr}, \code{LuHf}, \code{ThU}, \code{fissiontracks} or
 #'     \code{UThHe}
-#' @param from minimum y-axis limit. Setting \code{from=NA} scales the
-#'     plot automatically.
-#' @param to maximum y-axis limit. Setting \code{to=NA} scales the
-#'     plot automatically.
 #' @param random.effects if \code{TRUE}, computes the weighted mean
 #'     using a random effects model with two parameters: the mean and
 #'     the dispersion. This is akin to a `model-3' isochron regression.
@@ -109,6 +105,10 @@ weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
 #' @param plot logical flag indicating whether the function should
 #'     produce graphical output or return numerical values to the
 #'     user.
+#' @param from minimum y-axis limit. Setting \code{from=NA} scales the
+#'     plot automatically.
+#' @param to maximum y-axis limit. Setting \code{to=NA} scales the
+#'     plot automatically.
 #' @param rect.col the fill colour of the rectangles used to show the
 #'     measurements or age estimates.
 #' @param outlier.col if \code{detect.outliers=TRUE}, the outliers are
