@@ -420,7 +420,8 @@ data2evolution <- function(x,detritus=0,Th02=c(0,0),
     out
 }
 
-# x = table with 'Th230U238','errTh230U238', 'U234U238','errU234U238','cov'
+# x = table with 'Th230U238','errTh230U238', 'U234U238','errU234U238'
+#                (and 'Th232U238','errTh232U238' if option==2)
 Th230correction <- function(x,option=0,dat=NA,Th02=c(0,0),
                             Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     out <- x
