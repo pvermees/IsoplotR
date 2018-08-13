@@ -28,7 +28,7 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0
                                U234U238=d[j,'U234U238'],sU234U238=d[j,'sU234U238'],
                                cov4808=d[j,'rYZ']*d[j,'sU234U238']*d[j,'sTh230U238'],
                                Th232U238=d[j,'Th232U238'],sTh232U238=d[j,'sTh232U238'],
-                               Th230Th232=Th02[1],sTh230Th232=Th02[2],
+                               Th230Th232d=Th02[1],sTh230Th232d=Th02[2],
                                exterr=exterr,cor=cor)
     }
     if (!is.na(sigdig)){

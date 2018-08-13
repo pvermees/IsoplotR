@@ -303,11 +303,12 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,
 #'
 #' @param Th02 2-element vector with the assumed initial
 #'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-#'     standard error. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==2}
+#'     standard error. Only used if \code{detritus==2}
 #' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8, sX, Y=2/8, sY, Z=4/8, sZ,
-#'     rXY, rXZ, rYZ}. Only used if \code{detritus==3}
+#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
+#'     \code{detritus==3}
 #' @rdname radialplot
 #' @export
 radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
