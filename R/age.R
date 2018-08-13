@@ -82,7 +82,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
     } else if (identical(method,'Lu-Hf')){
         out <- get.LuHf.age(x[1],x[2],exterr)
     } else if (identical(method,'Th-U')){
-        out <- get.ThU.age(x[1],x[2],x[3],x[4],x[5],exterr)
+        out <- get.ThU.age(x[1],x[2],x[3],x[4],x[5],exterr=exterr)
     } else if (identical(method,'U-Th-He')){
         if (length(x)==6)
             out <- get.UThHe.age(x[1],x[2],x[3],x[4],x[5],x[6])
@@ -281,8 +281,9 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
 #'     standard error. Only used if \code{isochron==FALSE} and
 #'     \code{detritus==2}
 #' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8, sX, Y=2/8, sY, Z=4/8, sZ,
-#'     rXY, rXZ, rYZ}. Only used if \code{isochron==FALSE} and
+#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
 #'     \code{detritus==3}
 #' @rdname age
 #' @export

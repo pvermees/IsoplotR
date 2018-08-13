@@ -54,6 +54,14 @@
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #' 
+#' @param Th02 2-element vector with the assumed initial
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+#'     standard error. Only used if \code{detritus==2}
+#' @param Th02U48 9-element vector with the measured composition of
+#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
+#'     \code{detritus==3}
 #' @param show.numbers label the error ellipses with the grain
 #'     numbers?
 #' @param levels a vector with additional values to be displayed as
