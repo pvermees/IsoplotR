@@ -207,12 +207,11 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
-#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}. When applied to data
-#'     of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
-#'     a detrital Th-correction.
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in
+#'     \code{settings('iratio',...)}.
 #' @rdname kde
 #' @export
 kde.PbPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
@@ -242,13 +241,35 @@ kde.ArAr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,...)
 }
+#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
+#'     when \code{x$format == 1} or \code{2}.
+#'
+#' \code{0}: no correction
+#'
+#' \code{1}: project the data along an isochron fit
+#'
+#' \code{2}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#'
+#' \code{3}: correct the data using the measured present day
+#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
+#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#'
+#' @param Th02 2-element vector with the assumed initial
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+#'     standard error. Only used if \code{isochron==FALSE} and
+#'     \code{detritus==2}
+#' @param Th02U48 9-element vector with the measured composition of
+#'     the detritus, containing \code{X=0/8, sX, Y=2/8, sY, Z=4/8, sZ,
+#'     rXY, rXZ, rYZ}. Only used if \code{detritus==3}
 #' @rdname kde
 #' @export
 kde.ThU <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,pch=NA,xlab="age [ka]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                    show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,...){
-    tt <- ThU.age(x,i2i=i2i)[,1]
+                    show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,detritus=0,
+                    Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+    tt <- ThU.age(x,i2i=i2i,detritus=detritus,Th02=Th02,Th02U48=Th02U48)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,

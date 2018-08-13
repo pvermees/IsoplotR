@@ -274,7 +274,7 @@ data2york.UThHe <- function(x,...){
     out[,'sY'] <- x[,'errHe']
     out
 }
-data2york.ThU <- function(x,type=2,...){
+data2york.ThU <- function(x,type=2,generic=TRUE,...){
     if (x$format %in% c(1,3) & type==1){
         out <- subset(x$x,select=c('U238Th232','errU238Th232',
                                    'Th230Th232','errTh230Th232','rho'))
@@ -292,7 +292,7 @@ data2york.ThU <- function(x,type=2,...){
     } else {
         stop('Incorrect data format and/or plot type')
     }
-    colnames(out) <- c('X','sX','Y','sY','rXY')
+    if (generic) colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
 

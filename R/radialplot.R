@@ -188,12 +188,10 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
 #'     `inherited', `excess', or `common')
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
 #'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in
-#'     \code{settings('iratio',...)}. When applied to data of class
-#'     \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
-#'     detrital Th-correction.
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
+#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}.
 #' @rdname radialplot
 #' @export
 radialplot.PbPb <- function(x,from=NA,to=NA,t0=NA,
@@ -289,18 +287,41 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,
                       clabel=clabel,bg=bg,markers=markers,k=k,
                       exterr=exterr,i2i=i2i,alpha=alpha,...)
 }
+#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
+#'     when \code{x$format == 1} or \code{2}.
+#'
+#' \code{0}: no correction
+#'
+#' \code{1}: project the data along an isochron fit
+#'
+#' \code{2}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#'
+#' \code{3}: correct the data using the measured present day
+#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
+#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#'
+#' @param Th02 2-element vector with the assumed initial
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+#'     standard error. Only used if \code{isochron==FALSE} and
+#'     \code{detritus==2}
+#' @param Th02U48 9-element vector with the measured composition of
+#'     the detritus, containing \code{X=0/8, sX, Y=2/8, sY, Z=4/8, sZ,
+#'     rXY, rXZ, rYZ}. Only used if \code{detritus==3}
 #' @rdname radialplot
 #' @export
 radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',show.numbers=FALSE,
                            pch=21,levels=NA,clabel="",
                            bg=c("white","red"),markers=NULL,k=0,
-                           i2i=TRUE,alpha=0.05,...){
+                           i2i=TRUE,alpha=0.05,detritus=0,Th02=c(0,0),
+                           Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     radialplot_helper(x,from=from,to=to,t0=t0,
                       transformation=transformation,
                       show.numbers=show.numbers,pch=pch,levels=levels,
                       clabel=clabel,bg=bg,markers=markers,k=k,
-                      exterr=FALSE,i2i=i2i,alpha=alpha,units='ka',...)
+                      exterr=FALSE,i2i=i2i,alpha=alpha,units='ka',
+                      detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
 }
 radialplot_helper <- function(x,from=NA,to=NA,t0=NA,
                               transformation='log',type=4,
@@ -308,15 +329,18 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,
                               show.numbers=FALSE,pch=21,levels=NA,
                               clabel="",bg=c("white","red"),
                               markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
-                              alpha=0.05,units='Ma',...){
+                              alpha=0.05,units='Ma',detritus=0,Th02=c(0,0),
+                              Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     peaks <- peakfit(x,k=k,exterr=exterr,i2i=i2i,type=type,
-                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
+                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+                     detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     markers <- c(markers,peaks$peaks['t',])
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,markers=markers,i2i=i2i,
-               alpha=alpha,units=units,...)
+               alpha=alpha,units=units,detritus=detritus,Th02=Th02,
+               Th02U48=Th02U48,...)
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -325,7 +349,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                        type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
                        show.numbers=FALSE,pch=21,levels=NA,clabel="",
                        bg=c("white","red"),markers=NULL,k=0,
-                       i2i=FALSE,alpha=0.05,units='MA',...){
+                       i2i=FALSE,alpha=0.05,units='MA',detritus=0,
+                       Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (hasClass(x,'UPb')){
         tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                               cutoff.disc=cutoff.disc,exterr=FALSE)
@@ -344,7 +369,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
     } else if (hasClass(x,'LuHf')){
         tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'ThU')){
-        tt <- ThU.age(x,exterr=FALSE,i2i=i2i)
+        tt <- ThU.age(x,exterr=FALSE,i2i=i2i,
+                      detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     }
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,
