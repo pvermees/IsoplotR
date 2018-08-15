@@ -142,11 +142,12 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \item if \code{x} has class \code{UPb} and \code{type=1}, returns a
 #' table with the following columns: \code{t.75}, \code{err[t.75]},
 #' \code{t.68}, \code{err[t.68]}, \code{t.76}, \code{err[t.76]},
-#' \code{t.conc}, \code{err[t.conc]}, containing the
-#' \eqn{^{207}}Pb/\eqn{^{235}}U-age and standard error, the
+#' \code{t.conc}, \code{err[t.conc]}, \code{err[p.conc]}, containing
+#' the \eqn{^{207}}Pb/\eqn{^{235}}U-age and standard error, the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, and the
-#' single grain concordia age and standard error, respectively.
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, the single
+#' grain concordia age and standard error, and the p-value for
+#' concordance, respectively.
 #'
 #' \item if \code{x} has class \code{UPb} and \code{type=2, 3, 4} or
 #' \code{5}, returns the output of the \code{\link{concordia}}

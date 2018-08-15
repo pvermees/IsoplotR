@@ -5,7 +5,8 @@
 \title{Th-U evolution diagram}
 \usage{
 evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
-  detrital = FALSE, show.numbers = FALSE, levels = NA, clabel = "",
+  detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0,
+  0), show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
   isochron = FALSE, model = 1, exterr = TRUE, sigdig = 2, ...)
 }
@@ -22,8 +23,29 @@ confidence intervals}
 \item{transform}{if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 vs. Th-U age.}
 
-\item{detrital}{apply a detrital Th correction by projecting the
-compositions along an isochron?}
+\item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
+    when \code{x$format} is \code{2} or \code{3}.
+
+\code{0}: no correction
+
+\code{1}: project the data along an isochron fit
+
+\code{2}: correct the data using an assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+
+\code{3}: correct the data using the measured present day
+\eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
+\eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
+
+\item{Th02}{2-element vector with the assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+standard error. Only used if \code{detritus==2}}
+
+\item{Th02U48}{9-element vector with the measured composition of
+the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+\code{rYZ}. Only used if \code{isochron==FALSE} and
+\code{detritus==3}}
 
 \item{show.numbers}{label the error ellipses with the grain
 numbers?}
@@ -55,7 +77,7 @@ data points is solely caused by the analytical uncertainty. If this
 assumption is correct, then the MSWD value should be approximately
 equal to one. There are three strategies to deal with the case
 where MSWD>1. The first of these is to assume that the analytical
-uncertainties have been underestimated by a factor
+uncertainties have been underestipmated by a factor
 \eqn{\sqrt{MSWD}}.
 
 \code{2}: ordinary least squares regression: a second way to deal

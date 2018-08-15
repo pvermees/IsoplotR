@@ -46,7 +46,8 @@ peakfit(x, ...)
   i2i = TRUE, alpha = 0.05, ...)
 
 \method{peakfit}{ThU}(x, k = 1, exterr = FALSE, sigdig = 2, log = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+  i2i = TRUE, alpha = 0.05, detritus = 0, Th02 = c(0, 0),
+  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
 
 \method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, alpha = 0.05,
   ...)
@@ -107,6 +108,30 @@ uses the default values stored in
 \code{settings('iratio',...)}. When applied to data of class
 \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
 detrital Th-correction.}
+
+\item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
+    when \code{x$format == 1} or \code{2}.
+
+\code{0}: no correction
+
+\code{1}: project the data along an isochron fit
+
+\code{2}: correct the data using an assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+
+\code{3}: correct the data using the measured present day
+\eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
+\eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
+
+\item{Th02}{2-element vector with the assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+standard error. Only used if \code{detritus==2}}
+
+\item{Th02U48}{9-element vector with the measured composition of
+the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+\code{rYZ}. Only used if \code{isochron==FALSE} and
+\code{detritus==3}}
 }
 \value{
 Returns a list with the following items:
