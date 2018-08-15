@@ -516,7 +516,7 @@ get.Pb207Pb206.age.terawasserburg <- function(x,exterr=TRUE,...){
 # and concordia ages and their uncertainties.
 UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE){
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
-    if (conc) labels <- c(labels,'t.conc','s[t.conc]')
+    if (conc) labels <- c(labels,'t.conc','s[t.conc]','p[conc]')
     if (!is.na(i)){
         t.75 <- get.Pb207U235.age(x,i,exterr=exterr)
         t.68 <- get.Pb206U238.age(x,i,exterr=exterr)
@@ -528,7 +528,12 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE){
         if (conc){
             t.conc <- concordia.age(x,i,exterr=exterr)
             t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
-            out <- c(out,t.conc.out)
+            SS.concordance <-
+                LL.concordia.age(tt=t.conc$age[1],ccw=wetherill(x,i),
+                                 mswd=TRUE,exterr=exterr)
+            p.value <- 1-stats::pchisq(SS.concordance,1)
+            if (!is.na(sigdig)) p.value <- signif(p.value,sigdig)
+            out <- c(out,t.conc.out,p.value)
         }
         names(out) <- labels
     } else {

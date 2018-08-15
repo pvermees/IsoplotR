@@ -17,57 +17,68 @@
 \usage{
 weightedmean(x, ...)
 
-\method{weightedmean}{default}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05, ...)
+\method{weightedmean}{default}(x, from = NA, to = NA,
+  random.effects = TRUE, detect.outliers = TRUE, plot = TRUE,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, ranked = FALSE, ...)
 
 \method{weightedmean}{UPb}(x, random.effects = TRUE, detect.outliers = TRUE,
-  plot = TRUE, rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1,
-  0.5), sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
-  alpha = 0.05, exterr = TRUE, common.Pb = 0, ...)
+  plot = TRUE, from = NA, to = NA, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, type = 4,
+  cutoff.76 = 1100, cutoff.disc = c(-15, 5), alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, common.Pb = 0, ...)
 
 \method{weightedmean}{PbPb}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, common.Pb = 1, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, common.Pb = 1,
+  ranked = FALSE, ...)
 
 \method{weightedmean}{ThU}(x, random.effects = TRUE, detect.outliers = TRUE,
-  plot = TRUE, rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1,
-  0.5), sigdig = 2, alpha = 0.05, i2i = TRUE, ...)
+  plot = TRUE, from = NA, to = NA, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  ranked = FALSE, i2i = TRUE, detritus = 0, Th02 = c(0, 0),
+  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
 
 \method{weightedmean}{ArAr}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, i2i = FALSE, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
+  i2i = FALSE, ...)
 
 \method{weightedmean}{ReOs}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, i2i = TRUE, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE, i2i = TRUE,
+  ...)
 
 \method{weightedmean}{SmNd}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, i2i = TRUE, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE, i2i = TRUE,
+  ...)
 
 \method{weightedmean}{RbSr}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, i2i = TRUE, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ranked = FALSE,
+  ...)
 
 \method{weightedmean}{LuHf}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, i2i = TRUE, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ranked = FALSE,
+  ...)
 
 \method{weightedmean}{UThHe}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, ranked = FALSE, ...)
 
 \method{weightedmean}{fissiontracks}(x, random.effects = TRUE,
-  detect.outliers = TRUE, plot = TRUE, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, ...)
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE, ...)
 }
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
@@ -77,6 +88,12 @@ standard errors (second column) OR an object of class
 \code{UThHe}}
 
 \item{...}{optional arguments}
+
+\item{from}{minimum y-axis limit. Setting \code{from=NA} scales the
+plot automatically.}
+
+\item{to}{maximum y-axis limit. Setting \code{to=NA} scales the
+plot automatically.}
 
 \item{random.effects}{if \code{TRUE}, computes the weighted mean
     using a random effects model with two parameters: the mean and
@@ -103,6 +120,8 @@ given a different colour.}
 values reported in the title of the graphical output.}
 
 \item{alpha}{the confidence limits of the error bars/rectangles.}
+
+\item{ranked}{plot the aliquots in order of increasing age?}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -143,12 +162,34 @@ Pb-composition
 `inherited', `excess', or `common')
 \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
 \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-\eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in
-\code{settings('iratio',...)}. When applied to data of class
-\code{ThU}, setting \code{i2i} to \code{TRUE} applies a
-detrital Th-correction.}
+\eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+fit. Setting \code{i2i} to \code{FALSE} uses the default values
+stored in \code{settings('iratio',...)}.}
+
+\item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
+    when \code{x$format == 1} or \code{2}.
+
+\code{0}: no correction
+
+\code{1}: project the data along an isochron fit
+
+\code{2}: correct the data using an assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+
+\code{3}: correct the data using the measured present day
+\eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
+\eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
+
+\item{Th02}{2-element vector with the assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+standard error. Only used if \code{detritus==2}}
+
+\item{Th02U48}{9-element vector with the measured composition of
+the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+\code{rYZ}. Only used if \code{isochron==FALSE} and
+\code{detritus==3}}
 }
 \value{
 Returns a list with the following items:
