@@ -581,7 +581,9 @@ isochron.linear <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                             show.numbers=FALSE,levels=NA,clabel="",
                             ellipse.col=c("#00FF0080","#FF000080"),
                             inverse=TRUE,ci.col='gray80',line.col='black',
-                            lwd=1,plot=TRUE,exterr=TRUE,model=1,...){
+                            lwd=1,plot=TRUE,exterr=TRUE,model=1,xyz=1,...){
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@5@"]]));##:ess-bp-end:##
     out <- isochron_init(x,model=model,alpha=alpha)
     out <- ci_isochron(fit,model=model,alpha=alpha)
     scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
@@ -740,10 +742,10 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
 
 isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
                           osmond=NA,type=2,exterr=TRUE){
-    if (hasClass(x,'ThU') & !is.na(osmond)){ # 3D regression 
+    if (hasClass(x,'ThU') & x$format<3){ # 3D regression 
         d <- data2tit(x,osmond=osmond)
         out <- regression(d,model=model,type="titterington")
-    } else if (hasClass(x,'ThU') & is.na(osmond)){ # 2D regression
+    } else if (hasClass(x,'ThU') & x$format>2){ # 2D regression
         d <- data2york(x,type=type)
         out <- regression(d,model=model,type="york")
     } else if (hasClass(x,'PD')){

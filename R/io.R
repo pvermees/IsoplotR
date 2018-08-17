@@ -574,7 +574,7 @@ as.linear <- function(x,format=1){
         colnames(out$x) <- c('X','sX','Y','sY','rXY')
     } else if (format==2 & nc>5){
         out$x <- subset(X,select=1:6)
-        colnames(out$x) <- c('X','sXZ','YZ','sYZ','XY','rXY')
+        colnames(out$x) <- c('XZ','sXZ','YZ','sYZ','XY','rXY')
     } else if (format==3 & nc>8){
         out$x <- subset(X,select=1:9)
         colnames(out$x) <- c('X','sX','Y','sY','Z','sZ','rXY','rXZ','rYZ')
