@@ -240,13 +240,7 @@ as.UPb <- function(x,format=3){
     } else if (format==2 & nc>3){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206','rhoXY')
-        if (nc == 4){
-            X <- cbind(X,0)
-        } else {
-            i <- which(is.na(X[,5]))
-            X[i,5] <- 0
-            out$x <- subset(X,select=1:5)
-        }
+        X <- read.XsXYsYrXY(X)
     } else if (format==3 & nc>5){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
@@ -452,13 +446,7 @@ as.PD <- function(x,classname,colnames1,colnames2,format){
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     if (format==1 & nc>3){
-        if (nc == 4){
-            out$x <- cbind(subset(X,select=1:4),0)
-        } else {
-            i <- which(is.na(X[,5]))
-            X[i,5] <- 0
-            out$x <- subset(X,select=1:5)
-        }
+        out$x <- read.XsXYsYrXY(X)
         colnames(out$x) <- colnames1
     } else if (format==2 & nc>5){
         out$x <- subset(X,select=1:6)
@@ -583,4 +571,17 @@ shiny2matrix <- function(x,br,nr,nc){
     suppressWarnings(
         return(matrix(as.numeric(x[(br:nr),]),nr-br+1,nc))
     )
+}
+
+# for data of class UPb, PbPb, PD (including LuHf, SmNd, RbSr, and ReOs) 
+read.XsXYsYrXY <- function(x){
+    nc <- ncol(x)
+    if (nc == 4){
+        out <- cbind(x,0)
+    } else {
+        i <- which(is.na(x[,5]))
+        x[i,5] <- 0
+        out <- subset(x,select=1:5)
+    }
+    out
 }
