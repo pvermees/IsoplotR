@@ -602,7 +602,7 @@ chauvenet <- function(X,sX,valid,random.effects=TRUE){
                             valid=valid)
     mu <- fit$mean[1]
     if (random.effects) sigma <- sqrt(fit$disp[1]^2+sX^2)
-    else sigma <- sqrt(fit$mswd*fit$mean[2]^2 + sX^2)
+    else sigma <- sqrt(fit$mean[2]^2 + fit$mswd*sX^2)
     prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
     iprob <- order(prob)
     npruned <- length(which(!valid))
