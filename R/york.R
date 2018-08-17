@@ -165,7 +165,16 @@ get.york.xy <- function(x,a,b){
 }
 
 data2york <- function(x,...){ UseMethod("data2york",x) }
-data2york.default <- function(x,...){ stop('default function undefined') }
+data2york.default <- function(x,rr=FALSE,...){
+    if (rr){
+        out <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
+                                         x[,4],x[,5],x[,6]))
+    } else {
+        out <- read.XsXYsYrXY(x)
+    }
+    colnames(out) <- c('X','sX','Y','sY','rXY')
+    out
+}
 data2york.UPb <- function(x,wetherill=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,5)

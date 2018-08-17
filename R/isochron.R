@@ -133,6 +133,7 @@
 #' \item{Error-weighted least squares with overdispersion term}
 #'
 #' }
+#' 
 #' @seealso
 #' \code{\link{york}},
 #' \code{\link{titterington}},
@@ -169,16 +170,14 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.default <- function(x,rr=FALSE,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.numbers=FALSE,levels=NA,clabel="",
                              ellipse.col=c("#00FF0080","#FF000080"),
                              ci.col='gray80',line.col='black',
                              lwd=1,title=TRUE,model=1,...){
-    X <- subset(x,select=1:5)
-    colnames(X) <- c('X','sX','Y','sY','rXY')
-    fit <- regression_init(X,model=model,alpha=alpha)
+    fit <- regression_init(x,model=model,alpha=alpha)
     fit <- ci_isochron(fit,model=model,alpha=alpha)
-    scatterplot(X,xlim=xlim,ylim=ylim,alpha=alpha,
+    scatterplot(fit$d,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model!=2),show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 fit=fit,ci.col=ci.col,line.col=line.col,lwd=lwd)
@@ -575,25 +574,6 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     invisible(out)
 }
-#' @rdname isochron
-#' @export
-isochron.linear <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                            show.numbers=FALSE,levels=NA,clabel="",
-                            ellipse.col=c("#00FF0080","#FF000080"),
-                            inverse=TRUE,ci.col='gray80',line.col='black',
-                            lwd=1,plot=TRUE,exterr=TRUE,model=1,xyz=1,...){
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@5@"]]));##:ess-bp-end:##
-    out <- isochron_init(x,model=model,alpha=alpha)
-    out <- ci_isochron(fit,model=model,alpha=alpha)
-    scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
-                show.ellipses=1*(model!=2),show.numbers=show.numbers,
-                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                fit=fit,ci.col=ci.col,line.col=line.col,lwd=lwd)
-    if (title)
-        graphics::title(isochrontitle(fit,sigdig=sigdig),
-                        xlab='X',ylab='Y')
-}
     
 isochron_ThU_3D <- function(x,type=2,model=1,
                             exterr=TRUE,alpha=0.05){
@@ -741,7 +721,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
 }
 
 isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
-                          osmond=NA,type=2,exterr=TRUE){
+                          osmond=TRUE,type=2,exterr=TRUE){
     if (hasClass(x,'ThU') & x$format<3){ # 3D regression 
         d <- data2tit(x,osmond=osmond)
         out <- regression(d,model=model,type="titterington")

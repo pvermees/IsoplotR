@@ -218,8 +218,6 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.fissiontracks(x,format)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
-    } else if (identical(method,'linear')){
-        out <- as.linear(x,format)
     } else if (identical(method,'other')){
         out <- as.other(x)
     }
@@ -557,27 +555,6 @@ as.detritals <- function(x){
     colnames(X) <- snames
     for (sname in snames){
         out[[sname]] = X[!is.na(X[,sname]),sname]
-    }
-    out
-}
-as.linear <- function(x,format=1){
-    out <- list()
-    class(out) <- "linear"
-    out$x <- NA
-    out$format <- format
-    nc <- ncol(x)
-    nr <- nrow(x)
-    if (is.numeric(x)) X <- x
-    else X <- shiny2matrix(x,2,nr,nc)
-    if (format==1 & nc>3){
-        out$x <- read.XsXYsYrXY(X)
-        colnames(out$x) <- c('X','sX','Y','sY','rXY')
-    } else if (format==2 & nc>5){
-        out$x <- subset(X,select=1:6)
-        colnames(out$x) <- c('XZ','sXZ','YZ','sYZ','XY','rXY')
-    } else if (format==3 & nc>8){
-        out$x <- subset(X,select=1:9)
-        colnames(out$x) <- c('X','sX','Y','sY','Z','sZ','rXY','rXZ','rYZ')
     }
     out
 }
