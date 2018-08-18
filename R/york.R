@@ -165,12 +165,12 @@ get.york.xy <- function(x,a,b){
 }
 
 data2york <- function(x,...){ UseMethod("data2york",x) }
-data2york.default <- function(x,rr=FALSE,...){
-    if (rr){
+data2york.default <- function(x,format=1,...){
+    if (format==1){
+        out <- read.XsXYsYrXY(x)
+    } else {
         out <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
                                          x[,4],x[,5],x[,6]))
-    } else {
-        out <- read.XsXYsYrXY(x)
     }
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
