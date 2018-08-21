@@ -38,7 +38,7 @@ CRAN-pack does not know about
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
 Non-standard files/directories found at top level:
-  ‘IsoplotR.Rcheck’ ‘IsoplotR_1.4.tar.gz’ ‘IsoplotR_1.5.tar.gz’
+  ‘IsoplotR.Rcheck’ ‘IsoplotR_1.5.tar.gz’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -72,8 +72,8 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
 * checking Rd \usage sections ... WARNING
-Documented arguments not in \usage in documentation object 'data2york':
-  ‘format’ ‘wetherill’ ‘inverse’ ‘exterr’ ‘common’
+Undocumented arguments in documentation object 'data2york'
+  ‘type’ ‘generic’
 
 Functions with \usage entries need to have the appropriate \alias
 entries, and all their arguments documented.

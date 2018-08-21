@@ -2,9 +2,30 @@
 % Please edit documentation in R/york.R
 \name{data2york}
 \alias{data2york}
+\alias{data2york.default}
+\alias{data2york.UPb}
+\alias{data2york.ArAr}
+\alias{data2york.PbPb}
+\alias{data2york.PD}
+\alias{data2york.UThHe}
+\alias{data2york.ThU}
 \title{Prepare geochronology data for York regression}
 \usage{
 data2york(x, ...)
+
+\method{data2york}{default}(x, format = 1, ...)
+
+\method{data2york}{UPb}(x, wetherill = TRUE, ...)
+
+\method{data2york}{ArAr}(x, inverse = TRUE, ...)
+
+\method{data2york}{PbPb}(x, inverse = TRUE, ...)
+
+\method{data2york}{PD}(x, exterr = FALSE, common = FALSE, ...)
+
+\method{data2york}{UThHe}(x, ...)
+
+\method{data2york}{ThU}(x, type = 2, generic = TRUE, ...)
 }
 \arguments{
 \item{x}{TODO}

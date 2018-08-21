@@ -33,6 +33,13 @@ central.fissiontracks	central
 central.UThHe	central
 concordia	concordia
 data2york	data2york
+data2york.ArAr	data2york
+data2york.default	data2york
+data2york.PbPb	data2york
+data2york.PD	data2york
+data2york.ThU	data2york
+data2york.UPb	data2york
+data2york.UThHe	data2york
 ellipse	ellipse
 evolution	evolution
 examples	examples

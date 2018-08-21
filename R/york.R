@@ -187,8 +187,11 @@ get.york.xy <- function(x,a,b){
 #' @param ... TODO
 #' @return TODO
 #' @examples
+#' @rdname data2york
 #' @export
 data2york <- function(x,...){ UseMethod("data2york",x) }
+#' @rdname data2york
+#' @export
 data2york.default <- function(x,format=1,...){
     if (format==1){
         out <- read.XsXYsYrXY(x)
@@ -199,6 +202,8 @@ data2york.default <- function(x,format=1,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+#' @rdname data2york
+#' @export
 data2york.UPb <- function(x,wetherill=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
@@ -235,6 +240,8 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+#' @rdname data2york
+#' @export
 data2york.ArAr <- function(x,inverse=TRUE,...){
     if (inverse)
         out <- ArAr.inverse.ratios(x)
@@ -243,6 +250,8 @@ data2york.ArAr <- function(x,inverse=TRUE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+#' @rdname data2york
+#' @export
 data2york.PbPb <- function(x,inverse=TRUE,...){
     if (inverse)
         out <- PbPb.inverse.ratios(x)
@@ -251,6 +260,8 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+#' @rdname data2york
+#' @export
 data2york.PD <- function(x,exterr=FALSE,common=FALSE,...){
     if (x$format==1){
         out <- x$x
@@ -260,6 +271,8 @@ data2york.PD <- function(x,exterr=FALSE,common=FALSE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+#' @rdname data2york
+#' @export
 data2york.UThHe <- function(x,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
@@ -307,6 +320,8 @@ data2york.UThHe <- function(x,...){
     out[,'sY'] <- x[,'errHe']
     out
 }
+#' @rdname data2york
+#' @export
 data2york.ThU <- function(x,type=2,generic=TRUE,...){
     if (x$format %in% c(1,3) & type==1){
         out <- subset(x$x,select=c('U238Th232','errU238Th232',
