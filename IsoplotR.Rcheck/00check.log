@@ -4,7 +4,7 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘1.4’
+* this is package ‘IsoplotR’ version ‘1.5’
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
@@ -37,8 +37,8 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... NOTE
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR_1.4.tar.gz’ ‘IsoplotR_1.5.tar.gz’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -71,7 +71,15 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking Rd cross-references ... OK
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... OK
+* checking Rd \usage sections ... WARNING
+Documented arguments not in \usage in documentation object 'data2york':
+  ‘format’ ‘wetherill’ ‘inverse’ ‘exterr’ ‘common’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
 * checking contents of ‘data’ directory ... OK
@@ -80,4 +88,4 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 4 NOTEs
+Status: 3 WARNINGs, 4 NOTEs

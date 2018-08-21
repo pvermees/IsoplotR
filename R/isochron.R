@@ -170,7 +170,7 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,rr=FALSE,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.numbers=FALSE,levels=NA,clabel="",
                              ellipse.col=c("#00FF0080","#FF000080"),
                              ci.col='gray80',line.col='black',

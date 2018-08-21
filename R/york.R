@@ -164,6 +164,30 @@ get.york.xy <- function(x,a,b){
     out
 }
 
+#' Prepare geochronology data for York regression
+#'
+#' Takes geochronology data as input and produces a
+#' five-column table as output, which can be used
+#' for York regression.
+#'
+#' @param x TODO
+#' @param format one of
+#'
+#' 1. \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]}, \code{rho}
+#'
+#' or
+#'
+#' 2. \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
+#' \code{X/Y}, \code{s[X/Y]}
+#'
+#' @param wetherill TODO
+#' @param inverse TODO
+#' @param exterr TODO
+#' @param common TODO
+#' @param ... TODO
+#' @return TODO
+#' @examples
+#' @export
 data2york <- function(x,...){ UseMethod("data2york",x) }
 data2york.default <- function(x,format=1,...){
     if (format==1){
