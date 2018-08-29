@@ -133,6 +133,10 @@
 #' \item{Error-weighted least squares with overdispersion term}
 #'
 #' }
+#'
+#' @param xlab text label for the horizontal plot axis
+#' 
+#' @param ylab text label for the vertical plot axis
 #' 
 #' @seealso
 #' \code{\link{york}},
@@ -173,17 +177,17 @@ isochron <- function(x,...){ UseMethod("isochron",x) }
 isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.numbers=FALSE,levels=NA,clabel="",
                              ellipse.col=c("#00FF0080","#FF000080"),
-                             ci.col='gray80',line.col='black',
-                             lwd=1,title=TRUE,model=1,...){
+                             ci.col='gray80',line.col='black', lwd=1,
+                             title=TRUE,model=1,xlab='x',ylab='y',...){
     fit <- regression_init(x,model=model,alpha=alpha)
     fit <- ci_isochron(fit,model=model,alpha=alpha)
     scatterplot(fit$d,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=1*(model!=2),show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                fit=fit,ci.col=ci.col,line.col=line.col,lwd=lwd)
+                fit=fit,ci.col=ci.col,line.col=line.col,lwd=lwd,...)
     if (title)
         graphics::title(isochrontitle(fit,sigdig=sigdig),
-                        xlab='X',ylab='Y')
+                        xlab=xlab,ylab=ylab)
 }
 #' @param plot if \code{FALSE}, suppresses the graphical output
 #'

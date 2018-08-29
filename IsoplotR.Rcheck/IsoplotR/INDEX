@@ -6,7 +6,8 @@ cad                     Plot continuous data as cumulative age
 central                 Calculate U-Th-He and fission track central
                         ages and compositions
 concordia               Concordia diagram
-data2york               Prepare geochronology data for York regression
+data2york               Prepare geochronological data for York
+                        regression
 ellipse                 Get coordinates of error ellipse for plotting
 evolution               Th-U evolution diagram
 examples                Example datasets for testing 'IsoplotR'

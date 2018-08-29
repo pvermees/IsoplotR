@@ -18,7 +18,8 @@ isochron(x, ...)
 \method{isochron}{default}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, title = TRUE, model = 1, ...)
+  line.col = "black", lwd = 1, title = TRUE, model = 1, xlab = "x",
+  ylab = "y", ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
@@ -133,6 +134,10 @@ intercept and slope.}
 \item{Error-weighted least squares with overdispersion term}
 
 }}
+
+\item{xlab}{text label for the horizontal plot axis}
+
+\item{ylab}{text label for the vertical plot axis}
 
 \item{inverse}{if \code{FALSE} and \code{x} has class \code{ArAr}, plots
     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
