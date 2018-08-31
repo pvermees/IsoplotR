@@ -424,10 +424,10 @@ as.KCa <- function(x,format=1){
     } else if (format==1 & nc>4){
         out$x <- subset(X,select=1:5)
     } else if (format==2 & nc>5){
-        out$x <- subset(X,select=1:5)
+        out$x <- subset(X,select=1:6)
         cnames <- c('K40Ca44','errK40Ca44',
                     'Ca40Ca44','errCa40Ca44',
-                    'Ca40K40','errCa40K40')
+                    'K40Ca40','errK40Ca40')
     }
     colnames(out$x) <- cnames
     out

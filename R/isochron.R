@@ -120,6 +120,8 @@
 #'
 #' @param lwd line width
 #'
+#' @param plot if \code{FALSE}, suppresses the graphical output
+#'
 #' @param title add a title to the plot?
 #'
 #' @param model construct the isochron using either:
@@ -177,20 +179,22 @@ isochron <- function(x,...){ UseMethod("isochron",x) }
 isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.numbers=FALSE,levels=NA,clabel="",
                              ellipse.col=c("#00FF0080","#FF000080"),
-                             ci.col='gray80',line.col='black', lwd=1,
-                             title=TRUE,model=1,xlab='x',ylab='y',...){
+                             ci.col='gray80',line.col='black',lwd=1,
+                             plot=TRUE,title=TRUE,model=1,
+                             xlab='x',ylab='y',...){
     fit <- regression_init(x,model=model,alpha=alpha)
     fit <- ci_isochron(fit,model=model,alpha=alpha)
-    scatterplot(fit$d,xlim=xlim,ylim=ylim,alpha=alpha,
-                show.ellipses=1*(model!=2),show.numbers=show.numbers,
-                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                fit=fit,ci.col=ci.col,line.col=line.col,lwd=lwd,...)
-    if (title)
-        graphics::title(isochrontitle(fit,sigdig=sigdig),
-                        xlab=xlab,ylab=ylab)
+    if (plot){
+        scatterplot(fit$d,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=1*(model!=2),
+                    show.numbers=show.numbers, levels=levels,
+                    clabel=clabel,ellipse.col=ellipse.col, fit=fit,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,...)
+        if (title) graphics::title(isochrontitle(fit,sigdig=sigdig),
+                                   xlab=xlab,ylab=ylab)
+    }
+    invisible(fit)
 }
-#' @param plot if \code{FALSE}, suppresses the graphical output
-#'
 #' @param inverse
 #' if \code{FALSE} and \code{x} has class \code{ArAr}, plots
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
@@ -409,6 +413,26 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     invisible(out)
 }
+#' @rdname isochron
+#' @export
+isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                         show.numbers=FALSE,levels=NA,clabel="",
+                         ellipse.col=c("#00FF0080","#FF000080"),
+                         ci.col='gray80',line.col='black',
+                         lwd=1,plot=TRUE,exterr=TRUE,model=1,...){
+    yorkdat <- data2york(x$x,format=x$format)
+    fit <- isochron(yorkdat,xlim=xlim,ylim=ylim,alpha=alpha,sigdig=sigdig,
+                    show.numbers=show.numbers,levels=levels,clabel=clabel,
+                    ellipse.col=ellipse.col,ci.col=ci.col,line.col=line.col,
+                    lwd=lwd,plot=plot,title=FALSE,model=model,xlab='',ylab='',...)
+    if (plot){
+        x.lab <- quote(''^40*'K/'^44*'Ca')
+        y.lab <- quote(''^40*'Ca/'^44*'Ca')
+        graphics::title(isochrontitle(fit,sigdig=sigdig),
+                        xlab=x.lab,ylab=y.lab)
+    }
+    invisible(fit)
+}
 #' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
 #' @rdname isochron
 #' @export
@@ -416,7 +440,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,ci.col='gray80',
-                          line.col='black', lwd=1,plot=TRUE,
+                          line.col='black',lwd=1,plot=TRUE,
                           exterr=TRUE,model=1,growth=FALSE,...){
     out <- isochron_init(x,model=model,inverse=inverse,alpha=alpha)
     if (inverse){
