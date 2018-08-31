@@ -726,10 +726,10 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
 
 isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
                           osmond=TRUE,type=2,exterr=TRUE){
-    if (hasClass(x,'ThU') & x$format<3){ # 3D regression 
+    if (hasClass(x,'ThU') && x$format<3){ # 3D regression 
         d <- data2tit(x,osmond=osmond)
         out <- regression(d,model=model,type="titterington")
-    } else if (hasClass(x,'ThU') & x$format>2){ # 2D regression
+    } else if (hasClass(x,'ThU') && x$format>2){ # 2D regression
         d <- data2york(x,type=type)
         out <- regression(d,model=model,type="york")
     } else if (hasClass(x,'PD')){
