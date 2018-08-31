@@ -186,6 +186,13 @@ errorprop1x2 <- function(J1,J2,E11,E22,E12){
     sqrt(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
 }
 
+quotient <- function(X,sX,Y,sY,rXY){
+    YX <- Y/X
+    sYX <- errorprop1x2(J1=(-Y/X^2),J2=(1/X),
+                        E11=(sX^2),E22=(sY^2),E12=(rXY*sX*sY))
+    cbind(YX,sYX)
+}
+
 hasClass <- function(x,classname){
     classname %in% class(x)
 }

@@ -98,18 +98,9 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA){
     dat <- data2york(x,inverse=FALSE)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
-    E <- matrix(0,2,2)
-    J <- matrix(0,1,2)
-    for (j in 1:ns) {
-        E[1,1] <- dat[j,'sX']^2
-        E[2,2] <- dat[j,'sY']^2
-        E[1,2] <- dat[j,'rXY']*dat[j,'sX']*dat[j,'sY']
-        E[2,1] <- E[1,2]
-        J[1,1] <- -dat[j,'Y']/dat[j,'X']^2
-        J[1,2] <- 1/dat[j,'X']        
-        DP <- dat[j,'Y']/dat[j,'X']
-        sDP <- sqrt(J%*%E%*%t(J))
-        tt <- get.Pb207Pb206.age(DP,sDP,exterr=exterr)
+    DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
+    for (j in 1:ns){
+        tt <- get.Pb207Pb206.age(DP[j,1],DP[j,2],exterr=exterr)
         out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
     }
     if (!is.na(i)) out <- out[i,]
