@@ -187,8 +187,8 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     if (plot){
         scatterplot(fit$d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
-                    show.numbers=show.numbers, levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col, fit=fit,
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.col=ellipse.col,fit=fit,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,...)
         if (title) graphics::title(isochrontitle(fit,sigdig=sigdig),
                                    xlab=xlab,ylab=ylab)
@@ -421,17 +421,31 @@ isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          ci.col='gray80',line.col='black',
                          lwd=1,plot=TRUE,exterr=TRUE,model=1,...){
     yorkdat <- data2york(x$x,format=x$format)
-    fit <- isochron(yorkdat,xlim=xlim,ylim=ylim,alpha=alpha,sigdig=sigdig,
+    out <- isochron(yorkdat,xlim=xlim,ylim=ylim,alpha=alpha,sigdig=sigdig,
                     show.numbers=show.numbers,levels=levels,clabel=clabel,
                     ellipse.col=ellipse.col,ci.col=ci.col,line.col=line.col,
                     lwd=lwd,plot=plot,title=FALSE,model=model,xlab='',ylab='',...)
+    
+    DP <- out$b
+    out$y0 <- out$a
+    x.lab <- quote(''^40*'K/'^44*'Ca')
+    y.lab <- quote(''^40*'Ca/'^44*'Ca')
+    out$displabel <-
+        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
+    out$y0label <- quote('('^40*'Ca/'^44*'Ca)'[o]*' = ')
+    out$age[c('t','s[t]')] <- get.KCa.age(DP[1],DP[2],exterr=exterr)
+    out <- ci_isochron(out,model=model,alpha=alpha)
+    if (model==1){
+        out$age['disp[t]'] <-
+            out$fact*get.KCa.age(DP[1],sqrt(out$mswd)*DP[2],exterr=exterr)[2]
+    }
     if (plot){
         x.lab <- quote(''^40*'K/'^44*'Ca')
         y.lab <- quote(''^40*'Ca/'^44*'Ca')
-        graphics::title(isochrontitle(fit,sigdig=sigdig),
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='K-Ca'),
                         xlab=x.lab,ylab=y.lab)
     }
-    invisible(fit)
+    invisible(out)
 }
 #' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
 #' @rdname isochron

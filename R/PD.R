@@ -1,31 +1,33 @@
-get.PD.ratio <- function(tt,st,nuclide,exterr=TRUE){
+get.PD.ratio <- function(tt,st,nuclide,exterr=TRUE,bratio=1){
     L <- lambda(nuclide)
-    R <- exp(L[1]*tt)-1
+    R <- bratio*(exp(L[1]*tt)-1)
     Jac <- matrix(0,1,2)
     E <- matrix(0,2,2)
     Jac[1,1] <- tt*exp(L[1]*tt)
     Jac[1,2] <- L[1]*exp(L[1]*tt)
     E[1,1] <- L[2]^2
     E[2,2] <- st^2
-    sR <- sqrt(Jac %*% E %*% t(Jac))
+    sR <- bratio*sqrt(Jac %*% E %*% t(Jac))
     out <- c(R,sR)
 }
 
-get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE){
+get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
     L <- lambda(nuclide)
-    tt <- log(1 + DP)/L[1]
+    tt <- log(1 + DP/bratio)/L[1]
     E <- matrix(0,2,2)
     J <- matrix(0,1,2)
     E[1,1] <- sDP^2
     if (exterr) E[2,2] <- L[2]^2
-    J[1,1] <- 1/(L[1]*(1 + DP))
-    J[1,2] <- -tt/L[1]
+    J[1,1] <- 1/(L[1]*(bratio + DP)) # dt.dDP
+    J[1,2] <- -tt/L[1]               # dt.dL
     st <- sqrt(J %*% E %*% t(J))
     c(tt,st)
 }
 
 # i2i = isochron to intercept
-PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
+# bratio = branching ratio
+PD.age <- function(x,nuclide,exterr=TRUE,i=NA,
+                   sigdig=NA,i2i=TRUE,bratio=1,...){
     ns <- length(x)
     if (ns<2) i2i <- FALSE
     dat <- data2york(x,exterr=exterr,common=FALSE)
@@ -47,7 +49,7 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
         J[1,2] <- 1/dat[j,'X']        
         DP <- dat[j,'Y']/dat[j,'X']
         sDP <- sqrt(J%*%E%*%t(J))
-        tt <- get.PD.age(DP,sDP,nuclide,exterr=exterr)
+        tt <- get.PD.age(DP,sDP,nuclide,exterr=exterr,bratio=bratio)
         out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
     }
     if (!is.na(i)) out <- out[i,]
