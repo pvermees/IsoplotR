@@ -420,32 +420,11 @@ isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          ellipse.col=c("#00FF0080","#FF000080"),
                          ci.col='gray80',line.col='black',
                          lwd=1,plot=TRUE,exterr=TRUE,model=1,...){
-    yorkdat <- data2york(x$x,format=x$format)
-    out <- isochron(yorkdat,xlim=xlim,ylim=ylim,alpha=alpha,sigdig=sigdig,
-                    show.numbers=show.numbers,levels=levels,clabel=clabel,
-                    ellipse.col=ellipse.col,ci.col=ci.col,line.col=line.col,
-                    lwd=lwd,plot=plot,title=FALSE,model=model,xlab='',ylab='',...)
-    
-    DP <- out$b
-    out$y0 <- out$a
-    x.lab <- quote(''^40*'K/'^44*'Ca')
-    y.lab <- quote(''^40*'Ca/'^44*'Ca')
-    out$displabel <-
-        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
-    out$y0label <- quote('('^40*'Ca/'^44*'Ca)'[o]*' = ')
-    out$age[c('t','s[t]')] <- get.KCa.age(DP[1],DP[2],exterr=exterr)
-    out <- ci_isochron(out,model=model,alpha=alpha)
-    if (model==1){
-        out$age['disp[t]'] <-
-            out$fact*get.KCa.age(DP[1],sqrt(out$mswd)*DP[2],exterr=exterr)[2]
-    }
-    if (plot){
-        x.lab <- quote(''^40*'K/'^44*'Ca')
-        y.lab <- quote(''^40*'Ca/'^44*'Ca')
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='K-Ca'),
-                        xlab=x.lab,ylab=y.lab)
-    }
-    invisible(out)
+    isochron_PD(x,'K40',xlim=xlim,ylim=ylim,alpha=alpha,
+                sigdig=sigdig,show.numbers=show.numbers,
+                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
+                ci.col=ci.col,line.col=line.col,lwd=lwd,
+                plot=plot,exterr=exterr,model=model,bratio=0.895,...)
 }
 #' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
 #' @rdname isochron
@@ -722,16 +701,17 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         sigdig=2,show.numbers=FALSE,levels=NA,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         ci.col='gray80',line.col='black',lwd=1,
-                        plot=TRUE,exterr=TRUE,model=1,...){
+                        plot=TRUE,exterr=TRUE,model=1,bratio=1,...){
     out <- isochron_init(x,model=model,exterr=exterr,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- get.PD.age(out$b['b'],out$b['s[b]'],
-                                         nuclide,exterr=exterr)
+                                         nuclide,exterr=exterr,
+                                         bratio=bratio)
     out <- ci_isochron(out,model=model,alpha=alpha)
     if (model==1){
         out$age['disp[t]'] <- out$fact*get.PD.age(out$b['b'],
                               sqrt(out$mswd)*out$b['s[b]'],
-                              nuclide,exterr=exterr)[2]        
+                              nuclide,exterr=exterr,bratio=bratio)[2]
     }
     if (identical(nuclide,'Sm147')){
         x.lab <- quote(''^147*'Sm/'^144*'Nd')
@@ -745,6 +725,9 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
     } else if (identical(nuclide,'Lu176')){
         x.lab <- quote(''^176*'Lu/'^177*'Hf')
         y.lab <- quote(''^176*'Lu/'^177*'Hf')
+    } else if (identical(nuclide,'K40')){
+        x.lab <- quote(''^40*'K/'^44*'Ca')
+        y.lab <- quote(''^40*'Ca/'^44*'Ca')
     }
     out$displabel <-
         substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
@@ -763,7 +746,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
 }
 
 isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
-                          osmond=TRUE,type=2,exterr=TRUE){
+                          osmond=TRUE,type=2,exterr=TRUE,format=1){
     if (hasClass(x,'ThU') && x$format<3){ # 3D regression 
         d <- data2tit(x,osmond=osmond)
         out <- regression(d,model=model,type="titterington")
@@ -772,6 +755,9 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
         out <- regression(d,model=model,type="york")
     } else if (hasClass(x,'PD')){
         d <- data2york(x,exterr=exterr,common=FALSE)
+        out <- regression(d,model=model)
+    } else if (hasClass(x,'KCa')){
+        d <- data2york(x)
         out <- regression(d,model=model)
     } else {
         d <- data2york(x,inverse=inverse)

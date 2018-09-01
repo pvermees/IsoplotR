@@ -283,6 +283,11 @@ data2york.ArAr <- function(x,inverse=TRUE,...){
 }
 #' @rdname data2york
 #' @export
+data2york.KCa <- function(x,...){
+    data2york(x$x,format=x$format)
+}
+#' @rdname data2york
+#' @export
 data2york.PbPb <- function(x,inverse=TRUE,...){
     if (inverse)
         out <- PbPb.inverse.ratios(x)
