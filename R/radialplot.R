@@ -365,29 +365,9 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                        bg=c("white","red"),markers=NULL,k=0,
                        i2i=FALSE,alpha=0.05,units='MA',detritus=0,
                        Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
-    if (hasClass(x,'UPb')){
-        tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                              cutoff.disc=cutoff.disc,exterr=FALSE)
-    } else if (hasClass(x,'PbPb')){
-        tt <- PbPb.age(x,exterr=FALSE)
-    } else if (hasClass(x,'ArAr')){
-        tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'KCa')){
-        tt <- KCa.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'UThHe')){
-        tt <- UThHe.age(x)
-    } else if (hasClass(x,'ReOs')){
-        tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'SmNd')){
-        tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'RbSr')){
-        tt <- RbSr.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'LuHf')){
-        tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'ThU')){
-        tt <- ThU.age(x,exterr=FALSE,i2i=i2i,
-                      detritus=detritus,Th02=Th02,Th02U48=Th02U48)
-    }
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
+                   cutoff.disc=cutoff.disc,i2i=i2i,
+                   detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,
                        show.numbers=show.numbers,pch=pch,
