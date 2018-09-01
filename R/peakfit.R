@@ -186,6 +186,13 @@ peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,
 }
 #' @rdname peakfit
 #' @export
+peakfit.KCa <- function(x,k=1,exterr=TRUE,sigdig=2,
+                         log=TRUE,i2i=FALSE,alpha=0.05,...){
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
+                   log=log,i2i=i2i,alpha=alpha,...)
+}
+#' @rdname peakfit
+#' @export
 peakfit.ReOs <- function(x,k=1,exterr=TRUE,sigdig=2,
                          log=TRUE,i2i=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
@@ -283,6 +290,8 @@ ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
         tt <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'KCa')){
+        tt <- KCa.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){
         tt <- UThHe.age(x)
     } else if (hasClass(x,'ReOs')){

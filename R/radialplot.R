@@ -224,6 +224,19 @@ radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,
 }
 #' @rdname radialplot
 #' @export
+radialplot.KCa <- function(x,from=NA,to=NA,t0=NA,
+                           transformation='log',show.numbers=FALSE,
+                           pch=21,levels=NA,clabel="",
+                           bg=c("white","red"),markers=NULL,k=0,
+                           exterr=TRUE,i2i=FALSE,alpha=0.05,...){
+    radialplot_helper(x,from=from,to=to,t0=t0,
+                      transformation=transformation,
+                      show.numbers=show.numbers,pch=pch,levels=levels,
+                      clabel=clabel,bg=bg,markers=markers,k=k,
+                      exterr=exterr,i2i=i2i,alpha=alpha,...)
+}
+#' @rdname radialplot
+#' @export
 radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,
                              transformation='log',show.numbers=FALSE,
                              pch=21,levels=NA,clabel="",
@@ -359,6 +372,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
         tt <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'KCa')){
+        tt <- KCa.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){
         tt <- UThHe.age(x)
     } else if (hasClass(x,'ReOs')){

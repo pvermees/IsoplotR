@@ -289,6 +289,21 @@ weightedmean.ArAr <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
+weightedmean.KCa <- function(x,random.effects=TRUE,
+                             detect.outliers=TRUE,plot=TRUE,
+                             from=NA,to=NA,rect.col=rgb(0,1,0,0.5),
+                             outlier.col=rgb(0,1,1,0.5),sigdig=2,
+                             alpha=0.05,exterr=TRUE,ranked=FALSE,
+                             i2i=FALSE,...){
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
+                        from=from,to=to,rect.col=rect.col,
+                        outlier.col=outlier.col,sigdig=sigdig,
+                        alpha=alpha,exterr=exterr,i2i=i2i,
+                        units='Ma',ranked=ranked,...)
+}
+#' @rdname weightedmean
+#' @export
 weightedmean.ReOs <- function(x,random.effects=TRUE,
                               detect.outliers=TRUE,plot=TRUE,
                               from=NA,to=NA,rect.col=rgb(0,1,0,0.5),
@@ -422,6 +437,8 @@ weightedmean_helper <- function(x,random.effects=TRUE,detect.outliers=TRUE,
         exterr <- FALSE
     } else if (hasClass(x,'ArAr')){
         tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'KCa')){
+        tt <- KCa.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'ReOs')){
         tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'SmNd')){
