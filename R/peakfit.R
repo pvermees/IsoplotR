@@ -124,7 +124,8 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
     if (x$format == 1 & !identical(k,'min')){
         out <- binomial.mixtures(x,k,exterr=exterr,alpha=alpha,...)
     }  else if (x$format == 3){
-        out <- ages2peaks(x,k,log=log,alpha=alpha)
+        tt <- get.ages(x)
+        out <- peakfit.default(tt,k=k,log=log,alpha=alpha)
     } else {
         out <- peakfit_helper(x,k=k,sigdig=sigdig,log=log,
                               exterr=exterr,alpha=alpha,...)
@@ -260,12 +261,13 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,
                            Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (k<1) return(NULL)
     if (identical(k,'auto'))
-        k <- BIC_fit(x,5,log=log,type=type, cutoff.76=cutoff.76,
+        k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,
                      cutoff.disc=cutoff.disc,detritus=detritus,
                      Th02=Th02,Th02U48=Th02U48)
-    fit <- ages2peaks(x,k=k,log=log,i2i=i2i,type=type,
-                      cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                      alpha=alpha,detritus=detritus,Th02=Th02,Th02U48=Th02U48)
+    tt <- get.ages(x,i2i=i2i,type=type,cutoff.76=cutoff.76,
+                   cutoff.disc=cutoff.disc,detritus=detritus,
+                   Th02=Th02,Th02U48=Th02U48)
+    fit <- peakfit.default(tt,k=k,sigdig=sigdig,log=log,alpha=alpha)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -277,38 +279,6 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,
     }
     fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
     fit
-}
-
-ages2peaks <- function(x,k=1,type=4,cutoff.76=1100,
-                       cutoff.disc=c(-15,5),log=TRUE,i2i=FALSE,
-                       alpha=0.05,detritus=0,Th02=c(0,0),
-                       Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
-    if (hasClass(x,'UPb')){
-        tt <- filter.UPb.ages(x,type,cutoff.76,
-                              cutoff.disc,exterr=FALSE)
-    } else if (hasClass(x,'PbPb')){
-        tt <- PbPb.age(x,exterr=FALSE)
-    } else if (hasClass(x,'ArAr')){
-        tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'KCa')){
-        tt <- KCa.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'UThHe')){
-        tt <- UThHe.age(x)
-    } else if (hasClass(x,'ReOs')){
-        tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'SmNd')){
-        tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'RbSr')){
-        tt <- RbSr.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'LuHf')){
-        tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'fissiontracks')){
-        tt <- fissiontrack.age(x,exterr=FALSE)
-    } else if (hasClass(x,'ThU')){
-        tt <- ThU.age(x,exterr=FALSE,i2i=i2i,detritus=detritus,
-                      Th02=Th02,Th02U48=Th02U48)
-    }
-    peakfit.default(tt,k=k,log=log,alpha=alpha)
 }
 
 get.peakfit.covmat <- function(k,pii,piu,aiu,biu){
