@@ -23,7 +23,9 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
     J1 <- 1/(L[1]*(bratio + DP)) # dt.dDP
     J2 <- -tt/L[1]               # dt.dL
     st <- errorprop1x2(J1,J2,E11,E22,E12)
-    cbind(tt,st)
+    out <- cbind(tt,st)
+    colnames(out) <- c('t','s[t]')
+    out
 }
 
 # i2i = isochron to intercept
