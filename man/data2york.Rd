@@ -5,6 +5,7 @@
 \alias{data2york.default}
 \alias{data2york.UPb}
 \alias{data2york.ArAr}
+\alias{data2york.KCa}
 \alias{data2york.PbPb}
 \alias{data2york.PD}
 \alias{data2york.UThHe}
@@ -19,9 +20,11 @@ data2york(x, ...)
 
 \method{data2york}{ArAr}(x, inverse = TRUE, ...)
 
+\method{data2york}{KCa}(x, ...)
+
 \method{data2york}{PbPb}(x, inverse = TRUE, ...)
 
-\method{data2york}{PD}(x, exterr = FALSE, common = FALSE, ...)
+\method{data2york}{PD}(x, exterr = FALSE, ...)
 
 \method{data2york}{UThHe}(x, ...)
 
@@ -74,8 +77,6 @@ If \code{x} has class \code{PbPb} and \code{inverse=TRUE}, returns
 \item{exterr}{If \code{TRUE}, propagates the external uncertainties
 (e.g. decay constants) into the output errors.}
 
-\item{common}{Applies a common lead correction to the data.}
-
 \item{type}{Return `Rosholt' or `Osmond' ratios?
 
 Rosholt (\code{type=1}) returns \code{X=8/2}, \code{sX=s[8/2]},
@@ -96,13 +97,17 @@ or if \code{FALSE} and \code{type=2}, uses \code{Th232U238},
     \code{rho}.}
 }
 \value{
-f <- system.file("RbSr.csv",package="IsoplotR")
-dat <- read.csv(f)
-yorkdat <- data2york(dat)
-isochron(yorkdat)
+a five-column table that can be used as input for
+    York-regression.
 }
 \description{
 Takes geochronology data as input and produces a
 five-column table as output, which can be used
 for York regression.
+}
+\examples{
+f <- system.file("RbSr1.csv",package="IsoplotR")
+dat <- read.csv(f)
+yorkdat <- data2york(dat)
+isochron(yorkdat)
 }

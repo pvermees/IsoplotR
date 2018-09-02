@@ -25,7 +25,7 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: age
 ### Title: Calculate isotopic ages
-### Aliases: age age.default age.UPb age.PbPb age.ArAr age.UThHe
+### Aliases: age age.default age.UPb age.PbPb age.ArAr age.KCa age.UThHe
 ###   age.fissiontracks age.ThU age.ReOs age.SmNd age.RbSr age.LuHf
 
 ### ** Examples
@@ -72,7 +72,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: cad
 ### Title: Plot continuous data as cumulative age distributions
 ### Aliases: cad cad.default cad.detritals cad.UPb cad.PbPb cad.ArAr
-###   cad.ThU cad.ReOs cad.SmNd cad.RbSr cad.LuHf cad.UThHe
+###   cad.KCa cad.ThU cad.ReOs cad.SmNd cad.RbSr cad.LuHf cad.UThHe
 ###   cad.fissiontracks
 
 ### ** Examples
@@ -132,6 +132,30 @@ concordia(examples$UPb,wetherill=FALSE,
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("concordia", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("data2york")
+### * data2york
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: data2york
+### Title: Prepare geochronological data for York regression
+### Aliases: data2york data2york.default data2york.UPb data2york.ArAr
+###   data2york.KCa data2york.PbPb data2york.PD data2york.UThHe
+###   data2york.ThU
+
+### ** Examples
+
+f <- system.file("RbSr1.csv",package="IsoplotR")
+dat <- read.csv(f)
+yorkdat <- data2york(dat)
+isochron(yorkdat)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("data2york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("ellipse")
 ### * ellipse
@@ -252,9 +276,9 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: isochron
 ### Title: Calculate and plot isochrons
-### Aliases: isochron isochron.default isochron.ArAr isochron.PbPb
-###   isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf isochron.ThU
-###   isochron.UThHe
+### Aliases: isochron isochron.default isochron.ArAr isochron.KCa
+###   isochron.PbPb isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf
+###   isochron.ThU isochron.UThHe
 
 ### ** Examples
 
@@ -280,7 +304,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: kde
 ### Title: Create (a) kernel density estimate(s)
 ### Aliases: kde kde.default kde.UPb kde.detritals kde.PbPb kde.ArAr
-###   kde.ThU kde.ReOs kde.SmNd kde.RbSr kde.LuHf kde.UThHe
+###   kde.KCa kde.ThU kde.ReOs kde.SmNd kde.RbSr kde.LuHf kde.UThHe
 ###   kde.fissiontracks
 
 ### ** Examples
@@ -351,8 +375,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: peakfit
 ### Title: Finite mixture modelling of geochronological datasets
 ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
-###   peakfit.PbPb peakfit.ArAr peakfit.ReOs peakfit.SmNd peakfit.RbSr
-###   peakfit.LuHf peakfit.ThU peakfit.UThHe
+###   peakfit.PbPb peakfit.ArAr peakfit.KCa peakfit.ReOs peakfit.SmNd
+###   peakfit.RbSr peakfit.LuHf peakfit.ThU peakfit.UThHe
 
 ### ** Examples
 
@@ -375,9 +399,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: radialplot
 ### Title: Visualise heteroscedastic data on a radial plot
 ### Aliases: radialplot radialplot.default radialplot.fissiontracks
-###   radialplot.UPb radialplot.PbPb radialplot.ArAr radialplot.UThHe
-###   radialplot.ReOs radialplot.SmNd radialplot.RbSr radialplot.LuHf
-###   radialplot.ThU
+###   radialplot.UPb radialplot.PbPb radialplot.ArAr radialplot.KCa
+###   radialplot.UThHe radialplot.ReOs radialplot.SmNd radialplot.RbSr
+###   radialplot.LuHf radialplot.ThU
 
 ### ** Examples
 
@@ -541,7 +565,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: weightedmean
 ### Title: Calculate the weighted mean age
 ### Aliases: weightedmean weightedmean.default weightedmean.UPb
-###   weightedmean.PbPb weightedmean.ThU weightedmean.ArAr
+###   weightedmean.PbPb weightedmean.ThU weightedmean.ArAr weightedmean.KCa
 ###   weightedmean.ReOs weightedmean.SmNd weightedmean.RbSr
 ###   weightedmean.LuHf weightedmean.UThHe weightedmean.fissiontracks
 

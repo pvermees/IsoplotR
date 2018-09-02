@@ -7,6 +7,7 @@
 \alias{weightedmean.PbPb}
 \alias{weightedmean.ThU}
 \alias{weightedmean.ArAr}
+\alias{weightedmean.KCa}
 \alias{weightedmean.ReOs}
 \alias{weightedmean.SmNd}
 \alias{weightedmean.RbSr}
@@ -45,6 +46,11 @@ weightedmean(x, ...)
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
   i2i = FALSE, ...)
+
+\method{weightedmean}{KCa}(x, random.effects = TRUE, detect.outliers = TRUE,
+  plot = TRUE, from = NA, to = NA, rect.col = rgb(0, 1, 0, 0.5),
+  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, i2i = FALSE, ...)
 
 \method{weightedmean}{ReOs}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,

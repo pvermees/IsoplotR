@@ -7,6 +7,7 @@
 \alias{peakfit.UPb}
 \alias{peakfit.PbPb}
 \alias{peakfit.ArAr}
+\alias{peakfit.KCa}
 \alias{peakfit.ReOs}
 \alias{peakfit.SmNd}
 \alias{peakfit.RbSr}
@@ -31,6 +32,9 @@ peakfit(x, ...)
   i2i = TRUE, alpha = 0.05, ...)
 
 \method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
+  i2i = FALSE, alpha = 0.05, ...)
+
+\method{peakfit}{KCa}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
   i2i = FALSE, alpha = 0.05, ...)
 
 \method{peakfit}{ReOs}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,

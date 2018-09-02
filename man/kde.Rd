@@ -7,6 +7,7 @@
 \alias{kde.detritals}
 \alias{kde.PbPb}
 \alias{kde.ArAr}
+\alias{kde.KCa}
 \alias{kde.ThU}
 \alias{kde.ReOs}
 \alias{kde.SmNd}
@@ -41,6 +42,11 @@ kde(x, ...)
   show.hist = TRUE, bty = "n", binwidth = NA, common.Pb = 1, ...)
 
 \method{kde}{ArAr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
+  show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE, ...)
+
+\method{kde}{KCa}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
   ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
   show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE, ...)

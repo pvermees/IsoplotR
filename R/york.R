@@ -185,12 +185,13 @@ get.york.xy <- function(x,a,b){
 #' automatically computed from the redundancy of the three ratios.
 #'
 #' @param ... optional arguments
-#' @return
-#' f <- system.file("RbSr.csv",package="IsoplotR")
+#' @return a five-column table that can be used as input for
+#'     York-regression.
+#' @examples
+#' f <- system.file("RbSr1.csv",package="IsoplotR")
 #' dat <- read.csv(f)
 #' yorkdat <- data2york(dat)
 #' isochron(yorkdat)
-#' @examples
 #' @rdname data2york
 #' @export
 data2york <- function(x,...){ UseMethod("data2york",x) }

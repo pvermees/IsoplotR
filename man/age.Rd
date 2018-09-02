@@ -6,6 +6,7 @@
 \alias{age.UPb}
 \alias{age.PbPb}
 \alias{age.ArAr}
+\alias{age.KCa}
 \alias{age.UThHe}
 \alias{age.fissiontracks}
 \alias{age.ThU}
@@ -27,6 +28,9 @@ age(x, ...)
   i = NA, sigdig = NA, ...)
 
 \method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, ...)
+
+\method{age}{KCa}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
 
 \method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NA,

@@ -7,6 +7,7 @@
 \alias{radialplot.UPb}
 \alias{radialplot.PbPb}
 \alias{radialplot.ArAr}
+\alias{radialplot.KCa}
 \alias{radialplot.UThHe}
 \alias{radialplot.ReOs}
 \alias{radialplot.SmNd}
@@ -39,6 +40,11 @@ radialplot(x, ...)
   exterr = TRUE, common.Pb = 1, alpha = 0.05, ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
+  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
+  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
+  exterr = TRUE, i2i = FALSE, alpha = 0.05, ...)
+
+\method{radialplot}{KCa}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
   clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
   exterr = TRUE, i2i = FALSE, alpha = 0.05, ...)

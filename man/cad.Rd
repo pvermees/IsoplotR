@@ -7,6 +7,7 @@
 \alias{cad.UPb}
 \alias{cad.PbPb}
 \alias{cad.ArAr}
+\alias{cad.KCa}
 \alias{cad.ThU}
 \alias{cad.ReOs}
 \alias{cad.SmNd}
@@ -32,6 +33,9 @@ cad(x, ...)
   col = "black", common.Pb = 1, ...)
 
 \method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
+  col = "black", i2i = FALSE, ...)
+
+\method{cad}{KCa}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", i2i = FALSE, ...)
 
 \method{cad}{ThU}(x, pch = NA, verticals = TRUE, xlab = "age [ka]",

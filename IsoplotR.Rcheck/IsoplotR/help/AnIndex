@@ -3,6 +3,7 @@ age	age
 age.ArAr	age
 age.default	age
 age.fissiontracks	age
+age.KCa	age
 age.LuHf	age
 age.PbPb	age
 age.RbSr	age
@@ -19,6 +20,7 @@ cad.ArAr	cad
 cad.default	cad
 cad.detritals	cad
 cad.fissiontracks	cad
+cad.KCa	cad
 cad.LuHf	cad
 cad.PbPb	cad
 cad.RbSr	cad
@@ -35,6 +37,7 @@ concordia	concordia
 data2york	data2york
 data2york.ArAr	data2york
 data2york.default	data2york
+data2york.KCa	data2york
 data2york.PbPb	data2york
 data2york.PD	data2york
 data2york.ThU	data2york
@@ -47,6 +50,7 @@ helioplot	helioplot
 isochron	isochron
 isochron.ArAr	isochron
 isochron.default	isochron
+isochron.KCa	isochron
 isochron.LuHf	isochron
 isochron.PbPb	isochron
 isochron.RbSr	isochron
@@ -61,6 +65,7 @@ kde.ArAr	kde
 kde.default	kde
 kde.detritals	kde
 kde.fissiontracks	kde
+kde.KCa	kde
 kde.LuHf	kde
 kde.PbPb	kde
 kde.RbSr	kde
@@ -79,6 +84,7 @@ peakfit	peakfit
 peakfit.ArAr	peakfit
 peakfit.default	peakfit
 peakfit.fissiontracks	peakfit
+peakfit.KCa	peakfit
 peakfit.LuHf	peakfit
 peakfit.PbPb	peakfit
 peakfit.RbSr	peakfit
@@ -91,6 +97,7 @@ radialplot	radialplot
 radialplot.ArAr	radialplot
 radialplot.default	radialplot
 radialplot.fissiontracks	radialplot
+radialplot.KCa	radialplot
 radialplot.LuHf	radialplot
 radialplot.PbPb	radialplot
 radialplot.RbSr	radialplot
@@ -110,6 +117,7 @@ weightedmean	weightedmean
 weightedmean.ArAr	weightedmean
 weightedmean.default	weightedmean
 weightedmean.fissiontracks	weightedmean
+weightedmean.KCa	weightedmean
 weightedmean.LuHf	weightedmean
 weightedmean.PbPb	weightedmean
 weightedmean.RbSr	weightedmean
