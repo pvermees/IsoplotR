@@ -60,7 +60,7 @@ get.initial <- function(x){
     } else if (hasClass(x,'ReOs')){
         Os72 <- settings('iratio','Os187Os192')
         Os82 <- settings('iratio','Os188Os192')
-        out <- quotient(Os72[1],Os72[2],Os82[1],Os82[2],0)
+        out <- quotient(Os82[1],Os82[2],Os72[1],Os72[2],0)
     } else if (hasClass(x,'LuHf')){
         out <- settings('iratio','Hf176Hf177')
     } else if (hasClass(x,'KCa')){
