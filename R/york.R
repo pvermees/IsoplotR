@@ -298,15 +298,13 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
 }
 #' @param exterr If \code{TRUE}, propagates the external uncertainties
 #'     (e.g. decay constants) into the output errors.
-#'
-#' @param common Applies a common lead correction to the data.
 #' @rdname data2york
 #' @export
-data2york.PD <- function(x,exterr=FALSE,common=FALSE,...){
+data2york.PD <- function(x,exterr=FALSE,...){
     if (x$format==1){
         out <- x$x
     } else if (x$format==2){
-        out <- ppm2ratios(x,exterr=exterr,common=common)
+        out <- ppm2ratios(x,exterr=exterr)
     }
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out

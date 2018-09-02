@@ -754,7 +754,7 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
         d <- data2york(x,type=type)
         out <- regression(d,model=model,type="york")
     } else if (hasClass(x,'PD')){
-        d <- data2york(x,exterr=exterr,common=FALSE)
+        d <- data2york(x,exterr=exterr)
         out <- regression(d,model=model)
     } else if (hasClass(x,'KCa')){
         d <- data2york(x)

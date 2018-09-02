@@ -30,7 +30,7 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,
                    sigdig=NA,i2i=TRUE,bratio=1,...){
     ns <- length(x)
     if (ns<2) i2i <- FALSE
-    dat <- data2york(x,exterr=exterr,common=FALSE)
+    dat <- data2york(x,exterr=exterr)
     if (i2i){
         fit <- isochron(x,plot=FALSE,exterr=exterr)        
         dat[,'Y'] <- dat[,'Y'] - fit$a[1]
