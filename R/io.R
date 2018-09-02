@@ -416,7 +416,7 @@ as.KCa <- function(x,format=1){
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
-    bi <- 4 # begin index
+    bi <- 2 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
     cnames <- c('K40Ca44','errK40Ca44','Ca40Ca44','errCa40Ca44','rho')
     if (format==1 & nc==4){
