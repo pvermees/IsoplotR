@@ -147,6 +147,13 @@ cad.ArAr <- function(x,pch=NA,verticals=TRUE,
     tt <- ArAr.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
 }
+#' @rdname cad
+#' @export
+cad.KCa <- function(x,pch=NA,verticals=TRUE,
+                    xlab='age [Ma]',col='black',i2i=FALSE,...){
+    tt <- KCa.age(x,i2i=i2i)[,1]
+    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,col=col,...)
+}
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format == 1} or \code{2}.
 #'

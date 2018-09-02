@@ -289,6 +289,21 @@ weightedmean.ArAr <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
+weightedmean.KCa <- function(x,random.effects=TRUE,
+                             detect.outliers=TRUE,plot=TRUE,
+                             from=NA,to=NA,rect.col=rgb(0,1,0,0.5),
+                             outlier.col=rgb(0,1,1,0.5),sigdig=2,
+                             alpha=0.05,exterr=TRUE,ranked=FALSE,
+                             i2i=FALSE,...){
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
+                        from=from,to=to,rect.col=rect.col,
+                        outlier.col=outlier.col,sigdig=sigdig,
+                        alpha=alpha,exterr=exterr,i2i=i2i,
+                        units='Ma',ranked=ranked,...)
+}
+#' @rdname weightedmean
+#' @export
 weightedmean.ReOs <- function(x,random.effects=TRUE,
                               detect.outliers=TRUE,plot=TRUE,
                               from=NA,to=NA,rect.col=rgb(0,1,0,0.5),
@@ -411,26 +426,9 @@ weightedmean_helper <- function(x,random.effects=TRUE,detect.outliers=TRUE,
                                 ranked=FALSE,i2i=FALSE,common.Pb=1,
                                 units='',detritus=0,Th02=c(0,0),
                                 Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
-    if (hasClass(x,'UPb')){
-        tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                              cutoff.disc=cutoff.disc,exterr=FALSE)
-    } else if (hasClass(x,'PbPb')){
-        tt <- PbPb.age(x,exterr=FALSE)
-    } else if (hasClass(x,'ThU')){
-        tt <- ThU.age(x,exterr=FALSE,i2i=i2i,detritus=detritus,
-                      Th02=Th02,Th02U48=Th02U48)
-        exterr <- FALSE
-    } else if (hasClass(x,'ArAr')){
-        tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'ReOs')){
-        tt <- ReOs.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'SmNd')){
-        tt <- SmNd.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'RbSr')){
-        tt <- RbSr.age(x,exterr=FALSE,i2i=i2i)
-    } else if (hasClass(x,'LuHf')){
-        tt <- LuHf.age(x,exterr=FALSE,i2i=i2i)
-    }
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
+                   cutoff.disc=cutoff.disc,i2i=i2i,
+                   detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,...)

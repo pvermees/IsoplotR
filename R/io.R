@@ -202,6 +202,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,...){
         out <- as.PbPb(x,format)
     } else if (identical(method,'Ar-Ar')){
         out <- as.ArAr(x,format)
+    } else if (identical(method,'K-Ca')){
+        out <- as.KCa(x,format)
     } else if (identical(method,'Re-Os')){
         out <- as.ReOs(x,format)
     } else if (identical(method,'Rb-Sr')){
@@ -406,6 +408,28 @@ as.ArAr <- function(x,format=3){
                                  'rho','Ar39')
         }
     }
+    out
+}
+as.KCa <- function(x,format=1){
+    out <- list()
+    class(out) <- "KCa"
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    bi <- 4 # begin index
+    X <- shiny2matrix(x,bi,nr,nc)
+    cnames <- c('K40Ca44','errK40Ca44','Ca40Ca44','errCa40Ca44','rho')
+    if (format==1 & nc==4){
+        out$x <- cbind(X,0)
+    } else if (format==1 & nc>4){
+        out$x <- subset(X,select=1:5)
+    } else if (format==2 & nc>5){
+        out$x <- subset(X,select=1:6)
+        cnames <- c('K40Ca44','errK40Ca44',
+                    'Ca40Ca44','errCa40Ca44',
+                    'K40Ca40','errK40Ca40')
+    }
+    colnames(out$x) <- cnames
     out
 }
 as.RbSr <- function(x,format=2){
