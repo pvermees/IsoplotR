@@ -93,8 +93,9 @@ isochron(x, ...)
 
 OR
 
-an object of class \code{ArAr}, \code{PbPb}, \code{ReOs},
-\code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or \code{ThU}.}
+an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
+\code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or
+\code{ThU}.}
 
 \item{...}{optional arguments to be passed on to the generic plot
 function if \code{model=2}}
@@ -185,9 +186,9 @@ vs. \eqn{^{232}}Th/\eqn{^{238}}U
 }}
 }
 \value{
-If \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
-\code{SmNd}, \code{ReOs} or \code{LuHf}, or \code{UThHe}, returns a
-list with the following items:
+If \code{x} has class \code{PbPb}, \code{ArAr}, \code{KCa},
+    \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf}, or
+    \code{UThHe}, returns a list with the following items:
 
 \describe{
 
@@ -203,9 +204,10 @@ error.}
 \item{y0}{a four-element list containing:
 
 \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
-\eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{187}}Os/\eqn{^{188}}Os,
-\eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio.
+\eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+\eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{87}}Sr/\eqn{^{87}}Rb,
+\eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+ratio.
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
@@ -219,9 +221,9 @@ applicable if \code{ model=1}).  }
 \item{age}{a four-element list containing:
 
 \code{t}: the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
-\eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{187}}Os/\eqn{^{187}}Re,
-\eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-\eqn{^{176}}Hf/\eqn{^{177}}Hf age.
+\eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{40}}K/\eqn{^{40}}Ca,
+\eqn{^{187}}Os/\eqn{^{187}}Re, \eqn{^{87}}Sr/\eqn{^{87}}Rb,
+\eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf age.
 
 \code{s[t]}: the propagated uncertainty of \code{t}
 
@@ -330,10 +332,10 @@ correlation coefficient between X and Y.}
 }
 }
 \description{
-Plots cogenetic Ar-Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf, U-Th-He
-or Th-U data as X-Y scatterplots, fits an isochron curve through
-them using the \code{york} function, and computes the corresponding
-isochron age, including decay constant uncertainties.
+Plots cogenetic Ar-Ar, K-Ca, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf,
+U-Th-He or Th-U data as X-Y scatterplots, fits an isochron curve
+through them using the \code{york} function, and computes the
+corresponding isochron age, including decay constant uncertainties.
 }
 \details{
 Given several aliquots from a single sample, isochrons allow the
@@ -363,15 +365,14 @@ the maximum likelihood approach of Titterington and Halliday
 (1979).
 
 \code{IsoplotR} uses the York et al. (2004) algorithm for its
-\eqn{^{40}}Ar/\eqn{^{39}}Ar, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf
-isochrons. The maximum likelihood algorithm of Titterington and
-Halliday (1979) was generalised from two to three dimensions by
-Ludwig and Titterington (1994) for U-series disequilibrium dating.
-Also this algorithm is implemented in \code{IsoplotR}.  The extent
-to which the observed scatter in the data can be explained by the
-analytical uncertainties can be assessed using the Mean Square of
-the Weighted Deviates (MSWD, McIntyre et al., 1966), which is
-defined as:
+Ar-Ar, K-Ca, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf isochrons. The
+maximum likelihood algorithm of Titterington and Halliday (1979)
+was generalised from two to three dimensions by Ludwig and
+Titterington (1994) for U-series disequilibrium dating.  Also this
+algorithm is implemented in \code{IsoplotR}.  The extent to which
+the observed scatter in the data can be explained by the analytical
+uncertainties can be assessed using the Mean Square of the Weighted
+Deviates (MSWD, McIntyre et al., 1966), which is defined as:
 
 \eqn{MSWD = ([X - \hat{X}] \Sigma_{X}^{-1} [X - \hat{X}]^T)/df}
 

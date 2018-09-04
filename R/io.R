@@ -10,9 +10,11 @@
 #' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv} }
 #' \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv} }
 #' \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
-#' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}} \item{Sm-Nd:
-#' \code{SmNd1.csv}, \code{SmNd2.csv}} \item{Rb-Sr: \code{RbSr1.csv},
-#' \code{RbSr2.csv}} \item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
+#' \item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}}, 
+#' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}}
+#' \item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}}
+#' \item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}}
+#' \item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
 #' \item{Th-U: \code{ThU1.csv}, \code{ThU2.csv}, \code{ThU3.csv},
 #' \code{ThU4.csv}}
 #' \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv},
@@ -66,6 +68,14 @@
 #' \item{\code{9/6, s[9/6], 0/6, s[0/6], rho (, 39)}}
 #' \item{\code{6/0, s[6/0], 9/0, s[9/0] (, rho) (, 39)}}
 #' \item{\code{9/0, s[9/0], 6/0, s[6/0], 9/6, s[9/6] (, 39)}}
+#' }
+#'
+#' if \code{method='K-Ca'}, then \code{format} is one of either:
+#'
+#' \enumerate{
+#' \item{\code{K40/Ca44, s[K40/Ca44], Ca40/Ca44, s[Ca40/Ca44], rho}}
+#' \item{\code{K40/Ca44, s[K40/Ca44], Ca40/Ca44,
+#'             s[Ca40/Ca44], K40/Ca40, s[K40/Ca40]}}
 #' }
 #'
 #' if \code{method='Rb-Sr'}, then \code{format} is one of either:
@@ -138,9 +148,9 @@
 #' @param ... optional arguments to the \code{read.csv} function
 #' @seealso \code{\link{examples}}, \code{\link{settings}}
 #' @return an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
-#'     \code{UThHe}, \code{ReOs}, \code{SmNd}, \code{RbSr},
-#'     \code{LuHf}, \code{detritals}, \code{fissiontracks}, \code{ThU}
-#'     or \code{other}
+#'     \code{KCa}, \code{UThHe}, \code{ReOs}, \code{SmNd},
+#'     \code{RbSr}, \code{LuHf}, \code{detritals},
+#'     \code{fissiontracks}, \code{ThU} or \code{other}
 #' @examples
 #'
 #' f1 <- system.file("UPb1.csv",package="IsoplotR")

@@ -5,8 +5,8 @@ citEntry(entry = "Article",
   author       = person("Pieter", "Vermeesch"),
   journal      = "Geoscience Frontiers",
   year         = "2018",
-  volume       = "",
-  pages        = "",
+  volume       = "9",
+  pages        = "1479-1493",
   url          = "https://doi.org/10.1016/j.gsf.2018.04.001",
 
   textVersion  =

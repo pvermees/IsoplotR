@@ -1,6 +1,6 @@
 #' Calculate isotopic ages
 #'
-#' Calculates U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He,
+#' Calculates U-Pb, Pb-Pb, Ar-Ar, K-Ca, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He,
 #' Th-U and fission track ages and propagates their analytical
 #' uncertainties. Includes options for single grain, isochron and
 #' concordia ages.
@@ -15,6 +15,9 @@
 #'
 #' \item a four element vector containing \code{Ar40Ar39},
 #' \code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
+#'
+#' \item a two element vector containing \code{K40Ca40} and
+#' \code{s[K40Ca40]},
 #'
 #' \item a six element vector containing \code{U}, \code{s[U]}, \code{Th},
 #' \code{s[Th]}, \code{He} and \code{s[He]},
@@ -42,15 +45,14 @@
 #'
 #' OR
 #'
-#' \itemize{
-#' \item an object of class \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ThU},
-#' \code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{UThHe} or
-#' \code{fissiontracks}.
-#' }
+#' \itemize{ \item an object of class \code{UPb}, \code{PbPb},
+#' \code{ArAr}, \code{KCa}, \code{ThU}, \code{RbSr}, \code{SmNd},
+#' \code{ReOs}, \code{LuHf}, \code{UThHe} or \code{fissiontracks}.  }
 #'
-#' @param method one of either \code{'U238-Pb206'}, \code{'U235-Pb207'},
-#'     \code{'Pb207-Pb206'}, \code{'Ar-Ar'}, \code{'Th-U'}, \code{'Re-Os'},
-#'     \code{'Sm-Nd'}, \code{'Rb-Sr'}, \code{'Lu-Hf'}, \code{'U-Th-He'} or
+#' @param method one of either \code{'U238-Pb206'},
+#'     \code{'U235-Pb207'}, \code{'Pb207-Pb206'}, \code{'Ar-Ar'},
+#'     \code{'K-Ca'}, \code{'Th-U'}, \code{'Re-Os'}, \code{'Sm-Nd'},
+#'     \code{'Rb-Sr'}, \code{'Lu-Hf'}, \code{'U-Th-He'} or
 #'     \code{'fissiontracks'}
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
@@ -73,6 +75,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
         out <- get.Pb207Pb206.age(x[1],x[2],exterr)
     } else if (identical(method,'Ar-Ar')){
         out <- get.ArAr.age(x[1],x[2],x[3],x[4],exterr)
+    } else if (identical(method,'K-Ca')){
+        out <- get.KCa.age(x[1],x[2],exterr)
     } else if (identical(method,'Re-Os')){
         out <- get.ReOs.age(x[1],x[2],exterr)
     } else if (identical(method,'Rb-Sr')){
@@ -153,11 +157,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{5}, returns the output of the \code{\link{concordia}}
 #' function.
 #'
-#' \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
-#' \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{ThU} or \code{UThHe}
-#' and \code{isochron=FALSE}, returns a table of Pb-Pb, Ar-Ar, Rb-Sr,
-#' Sm-Nd, Re-Os, Lu-Hf, Th-U or U-Th-He ages and their standard
-#' errors.
+#' \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{KCa},
+#' \code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{ThU} or
+#' \code{UThHe} and \code{isochron=FALSE}, returns a table of Pb-Pb,
+#' Ar-Ar, K-Ca, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf, Th-U or U-Th-He ages and
+#' their standard errors.
 #'
 #' \item if \code{x} has class \code{ThU} and \code{isochron=FALSE},
 #' returns a 5-column table with the Th-U ages, their standard errors,
@@ -165,9 +169,9 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' and the correlation coefficient between the ages and the initial
 #' ratios.
 #'
-#' \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{RbSr},
-#' \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{UThHe} or \code{ThU}
-#' and \code{isochron=TRUE}, returns the output of the
+#' \item if \code{x} has class \code{PbPb}, \code{ArAr}, \code{KCa},
+#' \code{RbSr}, \code{SmNd}, \code{ReOs}, \code{LuHf}, \code{UThHe} or
+#' \code{ThU} and \code{isochron=TRUE}, returns the output of the
 #' \code{\link{isochron}} function.
 #'
 #' \item if \code{x} has class \code{fissiontracks} and
@@ -218,20 +222,22 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=1,exterr=TRUE,i=NA,sigdig=NA,...)
 }
 #' @param J two-element vector with the J-factor and its standard
 #'     error.
+#' 
 #' @param isochron logical flag indicating whether each Ar-Ar analysis
 #'     should be considered separately (\code{isochron=FALSE}) or an
 #'     isochron age should be calculated from all Ar-Ar analyses
 #'     together (\code{isochron=TRUE}).
+#' 
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in
-#'     \code{settings('iratio',...)}. When applied to data of class
-#'     \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
-#'     detrital Th-correction.
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
+#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
+#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}. When applied to data
+#'     of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
+#'     a detrital Th-correction.
 #'
 #' @rdname age
 #' @export
@@ -271,7 +277,7 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
     out
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}.
+#'     when \code{x$format = 1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'

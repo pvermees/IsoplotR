@@ -34,19 +34,19 @@ the decay constant value and its analytical error.  Omitting the
 latter two numbers simply returns the existing values.
 
 \item for \code{'iratio'}: the isotopic ratio of interest (one of
-either \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Rb85Rb87"},
-\code{"Sr88Sr86"}, \code{"Sr87Sr86"}, \code{"Sr84Sr86"},
-\code{"Re185Re187"}, \code{"Os184Os192"} \code{"Os186Os192"},
-\code{"Os187Os192"}, \code{"Os188Os192"}, \code{"Os189Os192"},
-\code{"Os190Os192"}, \code{"U238U235"}, \code{"Sm144Sm152"},
-\code{"Sm147Sm152"}, \code{"Sm148Sm152"}, \code{"Sm149Sm152"},
-\code{"Sm150Sm152"}, \code{"Sm154Sm152"}, \code{"Nd142Nd144"},
-\code{"Nd143Nd144"}, \code{"Nd145Nd144"}, \code{"Nd146Nd144"},
-\code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
-\code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
-\code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS (optionally) the
-isotopic ratio and its analytical error.  Omitting the latter two
-numbers simply returns the existing values.
+either \code{"Ar40Ar36"}, \code{"Ar38Ar36"},\code{"Ca40Ca44"},
+\code{"Rb85Rb87"}, \code{"Sr88Sr86"}, \code{"Sr87Sr86"},
+\code{"Sr84Sr86"}, \code{"Re185Re187"}, \code{"Os184Os192"}
+\code{"Os186Os192"}, \code{"Os187Os192"}, \code{"Os188Os192"},
+\code{"Os189Os192"}, \code{"Os190Os192"}, \code{"U238U235"},
+\code{"Sm144Sm152"}, \code{"Sm147Sm152"}, \code{"Sm148Sm152"},
+\code{"Sm149Sm152"}, \code{"Sm150Sm152"}, \code{"Sm154Sm152"},
+\code{"Nd142Nd144"}, \code{"Nd143Nd144"}, \code{"Nd145Nd144"},
+\code{"Nd146Nd144"}, \code{"Nd148Nd144"}, \code{"Nd150Nd144"},
+\code{"Lu176Lu175"}, \code{"Hf174Hf177"}, \code{"Hf176Hf177"},
+\code{"Hf178Hf177"}, \code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS
+(optionally) the isotopic ratio and its analytical error.  Omitting
+the latter two numbers simply returns the existing values.
 
 \item for \code{'imass'}: the (isotopic) molar mass of interest
 (one of either \code{"U"}, \code{"Rb"}, \code{"Rb85"},
@@ -167,6 +167,10 @@ mafic intrusions." Earth and Planetary Science Letters 219.3 (2004): 311-324.
 al. "A redetermination of the isotopic abundances of atmospheric Ar."
 Geochimica et Cosmochimica Acta 70.17 (2006): 4507-4512.
 
+\item Ca: Moore, L.J. and Machlan, L.A., 1972. High-accuracy
+determination of calcium in blood serum by isotope dilution mass
+spectrometry. Analytical chemistry, 44(14), pp.2291-2296.
+
 \item Rb: Catanzaro, E. J., et al. "Absolute isotopic abundance ratio and
 atomic weight of terrestrial rubidium." J. Res. Natl. Bur. Stand. A 73
 (1969): 511-516.
@@ -174,6 +178,13 @@ atomic weight of terrestrial rubidium." J. Res. Natl. Bur. Stand. A 73
 \item Sr: Moore, L. J., et al. "Absolute isotopic abundance ratios and atomic
 weight of a reference sample of strontium." J. Res. Natl. Bur. Stand.
 87.1 (1982): 1-8.
+
+and (for \eqn{^{87}}Sr\eqn{^{86}}Sr):
+
+Compston, W., Berry, H., Vernon, M.J., Chappell, B.W. and Kaye,
+M.J., 1971. Rubidium-strontium chronology and chemistry of lunar
+material from the Ocean of Storms. In Lunar and Planetary Science
+Conference Proceedings (Vol. 2, p. 1471).
 
 \item Sm: Chang, Tsing-Lien, et al. "Absolute isotopic composition and atomic
 weight of samarium." International Journal of Mass Spectrometry 218.2

@@ -49,12 +49,13 @@
 #'
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
-#'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
-#'     \code{RbSr}, \code{LuHf}, \code{ThU}, \code{fissiontracks} or
-#'     \code{UThHe}
+#'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs},
+#'     \code{SmNd}, \code{RbSr}, \code{LuHf}, \code{ThU},
+#'     \code{fissiontracks} or \code{UThHe}
 #' @param random.effects if \code{TRUE}, computes the weighted mean
 #'     using a random effects model with two parameters: the mean and
-#'     the dispersion. This is akin to a `model-3' isochron regression.
+#'     the dispersion. This is akin to a `model-3' isochron
+#'     regression.
 #' 
 #'     if \code{FALSE}, attributes any excess dispersion to an
 #'     underestimation of the analytical uncertainties. This akin to a
@@ -228,12 +229,13 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
-#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}.
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
+#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in
+#'     \code{settings('iratio',...)}.
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format == 1} or \code{2}.
 #'

@@ -30,7 +30,7 @@
 #' the density estimate is optimised according to data availability.
 #'
 #' @param x a vector of numbers OR an object of class \code{UPb},
-#'     \code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
+#'     \code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd},
 #'     \code{RbSr}, \code{UThHe}, \code{fissiontracks}, \code{ThU} or
 #'     \code{detrital}
 #' @rdname kde
@@ -71,11 +71,11 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' @param ... optional arguments to be passed on to \code{R}'s
 #'     \code{density} function.
 #' @seealso \code{\link{radialplot}}, \code{\link{cad}}
-#' @return
-#' If \code{x} has class \code{UPb}, \code{PbPb}, \code{ArAr},
-#' \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{UThHe},
-#' \code{fissiontracks} or \code{ThU}, returns an object of class
-#' \code{KDE}, i.e. a list containing the following items:
+#' @return If \code{x} has class \code{UPb}, \code{PbPb}, \code{ArAr},
+#'     \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr},
+#'     \code{UThHe}, \code{fissiontracks} or \code{ThU}, returns an
+#'     object of class \code{KDE}, i.e. a list containing the
+#'     following items:
 #'
 #' \describe{
 #' \item{x}{ horizontal plot coordinates}
@@ -206,12 +206,12 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in
-#'     \code{settings('iratio',...)}.
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
+#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}.
 #' @rdname kde
 #' @export
 kde.PbPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,

@@ -91,7 +91,7 @@ kde(x, ...)
 }
 \arguments{
 \item{x}{a vector of numbers OR an object of class \code{UPb},
-\code{PbPb}, \code{ArAr}, \code{ReOs}, \code{SmNd},
+\code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd},
 \code{RbSr}, \code{UThHe}, \code{fissiontracks}, \code{ThU} or
 \code{detrital}}
 
@@ -190,12 +190,12 @@ should all integrate to the same value.}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka
 `inherited', `excess', or `common')
-\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-\eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-\eqn{^{230}}Th/\eqn{^{232}}Th or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in
-\code{settings('iratio',...)}.}
+\eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
+\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+\eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+fit. Setting \code{i2i} to \code{FALSE} uses the default values
+stored in \code{settings('iratio',...)}.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
     when \code{x$format == 1} or \code{2}.
@@ -223,9 +223,10 @@ the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
 }
 \value{
 If \code{x} has class \code{UPb}, \code{PbPb}, \code{ArAr},
-\code{ReOs}, \code{SmNd}, \code{RbSr}, \code{UThHe},
-\code{fissiontracks} or \code{ThU}, returns an object of class
-\code{KDE}, i.e. a list containing the following items:
+    \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr},
+    \code{UThHe}, \code{fissiontracks} or \code{ThU}, returns an
+    object of class \code{KDE}, i.e. a list containing the
+    following items:
 
 \describe{
 \item{x}{ horizontal plot coordinates}

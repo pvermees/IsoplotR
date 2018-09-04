@@ -150,7 +150,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 f <- system.file("RbSr1.csv",package="IsoplotR")
 dat <- read.csv(f)
 yorkdat <- data2york(dat)
-isochron(yorkdat)
+fit <- york(yorkdat)
 
 
 

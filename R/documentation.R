@@ -1,6 +1,6 @@
 #' Example datasets for testing \code{IsoplotR}
 #'
-#' U-Pb, Pb-Pb, Ar-Ar, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, Th-U,
+#' U-Pb, Pb-Pb, Ar-Ar, K-Ca, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, Th-U,
 #' fission track and detrital datasets
 #'
 #' \code{examples} an 18-item list containing:
@@ -18,6 +18,10 @@
 #' \code{ArAr}: an object of class \code{ArAr} containing a
 #' \eqn{^{40}}Ar/\eqn{^{39}}Ar spectrum of Skye basalt produced by Sarah
 #' Sherlock (Open University).
+#'
+#' \code{KCa}: an object of class \code{KCa} containing a
+#' \eqn{^{40}}K/\eqn{^{40}}Ca dataset for sample 140025 grain h spot 5
+#' of Harrison et al. (2010).
 #'
 #' \code{UThHe}: an object of class \code{UThHe} containing a
 #' U-Th-Sm-He dataset of Fish Lake apatite produced by Daniel Stockli
@@ -108,6 +112,11 @@
 #' Galbraith, R. F. and Green, P. F., 1990: Estimating the component
 #' ages in a finite mixture, Nuclear Tracks and Radiation
 #' Measurements, 17, 197-206.
+#'
+#' Harrison, T.M., Heizler, M.T., McKeegan, K.D. and Schmitt, A.K.,
+#' 2010. In situ \eqn{^{40}}K-\eqn{^{40}}Ca `double-plus' SIMS dating
+#' resolves Klokken feldspar \eqn{^{40}}K-\eqn{^{40}}Ar paradox. Earth
+#' and Planetary Science Letters, 299(3-4), pp.426-433.
 #'
 #' Kamo, S.L., Czamanske, G.K. and Krogh, T.E., 1996. A minimum U-Pb
 #' age for Siberian flood-basalt volcanism. Geochimica et Cosmochimica
