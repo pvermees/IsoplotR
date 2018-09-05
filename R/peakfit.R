@@ -486,10 +486,11 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
 
 BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,
                     cutoff.disc=c(-15,5),exterr=TRUE,
-                    detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                    detritus=0,Th02=c(0,0),
+                    Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     n <- length(x)
     BIC <- Inf
-    out <- tryCatch({
+    tryCatch({
         for (k in 1:max.k){
             fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
                            cutoff.disc=cutoff.disc,exterr=exterr,
@@ -502,10 +503,10 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,
                 return(k-1)
             }
         }
+        return(k)
     },error = function(e){
         return(k-1)
-    })
-    out
+    }) 
 }
 
 # Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
