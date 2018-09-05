@@ -446,8 +446,7 @@ $L
 [1] -71.94616
 
 $legend
-[1] "Peak 1: 103.0 ± 14.0 | 27.0 (%#0.0-1e%)"
-[2] "Peak 2: 103.0 ± 12.0 | 23.0 (%#0.0-1e%)"
+[1] "Peak 1: 103.5 ± 13.7 | 26.8 (41.2%)" "Peak 2: 103.5 ± 11.5 | 22.6 (58.8%)"
 
 > 
 > peakfit(examples$LudwigMixture,k='min')
@@ -583,7 +582,7 @@ Pb207U235,sePb207U235,Pb206U238,sePb206U238,rho
 [1] 350  10
 > FT <- set.zeta(examples$FT1,tst=c(250,5))
 > print(FT$zeta)
-[1] "855.0" "36.0" 
+[1] "855.5" "35.9" 
 > 
 > 
 > 
@@ -746,7 +745,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.998 4.989 11.455 0.002 0.003 
+Time elapsed:  14.469 5.553 12.908 0.005 0 
 > grDevices::dev.off()
 pdf 
   2 
