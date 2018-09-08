@@ -227,7 +227,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     # overdispersion added to the Pb207/Pb206-ratio:
     Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY']+w)^2
     Ex[1:ns,(ns+1):(2*ns)] <-
-        diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
+        diag(XY[,'rXY'])*diag(XY[,'sX'])*diag(XY[,'sY'])
     Ex[(ns+1):(2*ns),1:ns] <- Ex[1:ns,(ns+1):(2*ns)]
     if (exterr){
         Ex[2*ns+1,2*ns+1] <- l5[2]^2
