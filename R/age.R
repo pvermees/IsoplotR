@@ -201,10 +201,14 @@ age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
         X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
-    if (type==1)
+    if (type==1){
         out <- UPb.age(X,exterr=exterr,i=i,sigdig=sigdig,...)
-    else if (type %in% c(2,3,4))
-        out <- concordia(X,wetherill=wetherill,exterr=exterr,show.age=type-1)
+    } else if (type==2){
+        out <- concordia.age(X,wetherill=wetherill,exterr=exterr)
+    } else if (type %in% c(3,4,5)){
+        out <- concordia.intersection.ludwig(x,wetherill=wetherill,
+                                             exterr=exterr,model=type-2)
+    }
     out
 }
 #' @rdname age

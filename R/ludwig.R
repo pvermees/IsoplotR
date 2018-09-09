@@ -186,7 +186,7 @@ fit_ludwig_discordia <- function(x,init,w=0,model=1,exterr=FALSE){
 }
 get_ludwig_disp <- function(ta0b0,x,interval){
     stats::optimize(LL.lud.UPb.disp,interval=interval,
-                    x=x,ta0b0=ta0b0,maximum=TRUE)$maximum
+                    x=x,ta0b0=ta0b0)$minimum
 }
 get_lud_wrange <- function(ta0b0,x){
     mswd <- mswd.lud(ta0b0,x=x,model=1,w=0)$mswd
@@ -227,13 +227,16 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     # overdispersion added to the Pb207/Pb206-ratio:
     Ex[(ns+1):(2*ns),(ns+1):(2*ns)] <- diag(XY[,'sY']+w)^2
     Ex[1:ns,(ns+1):(2*ns)] <-
-        diag(XY[,'rXY'])*diag(XY[,'sY'])*diag(XY[,'sY'])
+        diag(XY[,'rXY'])*diag(XY[,'sX'])*diag(XY[,'sY'])
     Ex[(ns+1):(2*ns),1:ns] <- Ex[1:ns,(ns+1):(2*ns)]
     if (exterr){
         Ex[2*ns+1,2*ns+1] <- l5[2]^2
         Ex[2*ns+2,2*ns+2] <- l8[2]^2
-        Jv[,2*ns+1] <- -tt*exp(l5[1]*tt)*XY[,'X']/U
-        Jv[,2*ns+2] <- a0*tt*exp(l8[1]*tt)*XY[,'X']
+        Jv[1:ns,2*ns+1] <- 0
+        Jv[1:ns,2*ns+2] <- -tt*exp(l8[1]*tt)/(exp(l8[1]*tt)-1)^2
+        Jv[(ns+1):(2*ns),2*ns+1] <- tt*exp(l5[1]*tt)/(U*exp(l8[1]*tt)-1)
+        Jv[(ns+1):(2*ns),2*ns+2] <- -(exp(l5[1]*tt)-1)*tt*exp(l8[1]*tt)/
+                            (U*(exp(l8[1]*tt)-1)^2)
     }
     E <- Jv %*% Ex %*% t(Jv)
     SS <- v %*% solve(E) %*% t(v)
