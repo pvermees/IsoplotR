@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.7.30)  7 SEP 2018 14:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.7.29)  10 SEP 2018 21:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -709,7 +709,7 @@ File: latin1.def 2015/03/17 v1.2c Input encoding file
 
 
 Writing index file Rd2.idx
-(/tmp/RtmpOZToPX/Rd2pdf4f995abda924/Rd2.aux)
+(/tmp/RtmpPEkR5L/Rd2pdf386948189075/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -766,8 +766,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/tmp/RtmpOZToPX/Rd2pdf4f995abda924/Rd2.out)
-(/tmp/RtmpOZToPX/Rd2pdf4f995abda924/Rd2.out)
+(/tmp/RtmpPEkR5L/Rd2pdf386948189075/Rd2.out)
+(/tmp/RtmpPEkR5L/Rd2pdf386948189075/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -798,7 +798,7 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 29.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
-(/tmp/RtmpOZToPX/Rd2pdf4f995abda924/Rd2.toc [1
+(/tmp/RtmpPEkR5L/Rd2pdf386948189075/Rd2.toc [1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -1252,7 +1252,7 @@ tri-tus, con-tain-ing \T1/zi4/m/n/10 X=0/8\T1/ptm/m/n/10 ,
 [61] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2015/12/03 v1.1r UTF-8 support for inputenc
 ) [62]
-(/tmp/RtmpOZToPX/Rd2pdf4f995abda924/Rd2.ind [63]
+(/tmp/RtmpPEkR5L/Rd2pdf386948189075/Rd2.ind [63]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
@@ -1263,7 +1263,7 @@ LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 4602.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 4602.
- (/tmp/RtmpOZToPX/Rd2pdf4f995abda924/Rd2.aux)
+ (/tmp/RtmpPEkR5L/Rd2pdf386948189075/Rd2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 4602.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 4602.
 
@@ -1278,7 +1278,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 4602.
 Here is how much of TeX's memory you used:
  6931 strings out of 493029
  98843 string characters out of 6136234
- 176195 words of memory out of 5000000
+ 176194 words of memory out of 5000000
  9888 multiletter control sequences out of 15000+600000
  38763 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1299,7 +1299,7 @@ xlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utm
 r8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (64 pages, 336674 bytes).
+Output written on Rd2.pdf (64 pages, 336668 bytes).
 PDF statistics:
  1037 PDF objects out of 1200 (max. 8388607)
  946 compressed objects within 10 object streams
