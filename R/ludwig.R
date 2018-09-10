@@ -157,9 +157,9 @@ get.ta0b0.model1 <- function(x,init,exterr=FALSE){
 }
 # tricks the weighted regression algorithm into doing ordinary least squares
 get.ta0b0.model2 <- function(x){
-    yfit <- york(data2york(x,wetherill=FALSE))
-    ta0b0 <-
-        concordia.intersection.ab(yfit$a[1],yfit$b[1],wetherill=FALSE)$x
+    xy <- data2york(x,wetherill=FALSE)[,c('X','Y')]
+    xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+    ta0b0 <- concordia.intersection.ab(xyfit$coef[1],xyfit$coef[2],wetherill=FALSE)$x
     if (x$format>3){
         U238Pb206 <- subset(get.U238Pb206.ratios(x),select='U238Pb206')
         Pb206U238 <- subset(get.Pb206U238.ratios(x),select='Pb206U238')
@@ -232,11 +232,14 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     if (exterr){
         Ex[2*ns+1,2*ns+1] <- l5[2]^2
         Ex[2*ns+2,2*ns+2] <- l8[2]^2
-        Jv[1:ns,2*ns+1] <- 0
-        Jv[1:ns,2*ns+2] <- -tt*exp(l8[1]*tt)/(exp(l8[1]*tt)-1)^2
-        Jv[(ns+1):(2*ns),2*ns+1] <- tt*exp(l5[1]*tt)/(U*exp(l8[1]*tt)-1)
-        Jv[(ns+1):(2*ns),2*ns+2] <- -(exp(l5[1]*tt)-1)*tt*exp(l8[1]*tt)/
-                            (U*(exp(l8[1]*tt)-1)^2)
+        Jv[1:ns,2*ns+1] <- 0 # dX/dl5
+        Jv[1:ns,2*ns+2] <-
+            -tt*exp(l8[1]*tt)/(exp(l8[1]*tt)-1)^2 # dX/dl8
+        Jv[(ns+1):(2*ns),2*ns+1] <-
+            tt*exp(l5[1]*tt)/(U*exp(l8[1]*tt)-1) # dY/dl5
+        Jv[(ns+1):(2*ns),2*ns+2] <-
+            -(exp(l5[1]*tt)-1)*tt*exp(l8[1]*tt)/ # dY/dl8
+            (U*(exp(l8[1]*tt)-1)^2)
     }
     E <- Jv %*% Ex %*% t(Jv)
     SS <- v %*% solve(E) %*% t(v)

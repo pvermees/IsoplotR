@@ -209,7 +209,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                                         sigdig=sigdig))
     }
     plot.concordia.line(X,lims=lims,wetherill=wetherill,col=concordia.col,
-                        alpha=alpha,exterr=exterr,ticks=ticks,...)
+                        alpha=alpha,exterr=exterr,ticks=ticks)
     ns <- length(x)
     ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
     for (i in 1:ns){
@@ -244,7 +244,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
 
 # helper function for plot.concordia
 plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
-                                alpha=0.05,exterr=TRUE,ticks=NULL,...){
+                                alpha=0.05,exterr=TRUE,ticks=NULL){
     range.t <- range(lims$t)
     m <- max(0.8*lims$t[1],lims$t[1]-range.t/20)
     M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
