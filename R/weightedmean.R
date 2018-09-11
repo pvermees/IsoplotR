@@ -601,7 +601,7 @@ chauvenet <- function(X,sX,valid,random.effects=TRUE){
     fit <- get.weightedmean(X,sX,random.effects=random.effects,
                             valid=valid)
     mu <- fit$mean[1]
-    if (random.effects) sigma <- sqrt(fit$disp[1]^2+sX^2)
+    if (random.effects) sigma <- sqrt(fit$disp[1]^2 + sX^2)
     else sigma <- sqrt(fit$mean[2]^2 + fit$mswd*sX^2)
     prob <- 2*(1-stats::pnorm(abs(X-mu),sd=sigma))
     iprob <- order(prob)
@@ -609,6 +609,8 @@ chauvenet <- function(X,sX,valid,random.effects=TRUE){
     imin <- iprob[npruned+1]
     minp <- prob[imin]
     ns <- length(which(valid))
-    if (ns*minp < 0.5) valid[imin] <- FALSE # remove outlier
+    if (ns*minp < 0.5) {
+        valid[imin] <- FALSE # remove outlier
+    } 
     valid
 }

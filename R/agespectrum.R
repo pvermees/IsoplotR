@@ -232,10 +232,8 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units=''){
                              n=length(fit$i),
                              N=fit$n))
     a <- signif(100*fit$fract,sigdig)
-    if (Ar)
-        line2 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))
-    else
-        line2 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
+    if (Ar) line2 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))
+    else line2 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
     graphics::mtext(line1,line=1)
     graphics::mtext(line2,line=0)
 }
