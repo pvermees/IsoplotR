@@ -294,13 +294,13 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
         graphics::title(xlab=xlab,ylab=ylab)
         tit <- expression(paste("[isochrons assume ("^"230","Th/"^
                                 "232","Th)"[o]^x*" = 0]"))
-        graphics::mtext(tit,line=0)
+        mymtext(tit,line=0,...)
     }
     colourbar(z=levels,col=ellipse.col,clabel=clabel)
 }
 
 
-evolution.title <- function(fit,sigdig=2){
+evolution.title <- function(fit,sigdig=2,...){
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
     rounded.a0 <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig)
     expr1 <- quote('isochron age =')
@@ -329,12 +329,12 @@ evolution.title <- function(fit,sigdig=2){
         line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
                                  b=signif(fit$p.value,2)))
-        graphics::mtext(line1,line=2)
-        graphics::mtext(line2,line=1)
-        graphics::mtext(line3,line=0)
+        mymtext(line1,line=2,...)
+        mymtext(line2,line=1,...)
+        mymtext(line3,line=0,...)
     } else if (fit$model==2) {
-        graphics::mtext(line1,line=1)
-        graphics::mtext(line2,line=0)
+        mymtext(line1,line=1,...)
+        mymtext(line2,line=0,...)
     } else if (fit$model==3) {
         rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
         expr3 <- quote('('^232*'Th/'^238*'U)'-dispersion~'=')
@@ -342,9 +342,9 @@ evolution.title <- function(fit,sigdig=2){
         list3 <- list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2])
         call3 <- substitute(e~a,list(e=expr3,a=args3))
         line3 <- do.call(substitute,list(eval(call3),list3))
-        graphics::mtext(line1,line=2)
-        graphics::mtext(line2,line=1)
-        graphics::mtext(line3,line=0)
+        mymtext(line1,line=2,...)
+        mymtext(line2,line=1,...)
+        mymtext(line3,line=0,...)
     }
 }
 

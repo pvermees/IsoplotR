@@ -220,7 +220,7 @@ plateau <- function(x,alpha=0.05,random.effects=TRUE){
     out
 }
 
-plateau.title <- function(fit,sigdig=2,Ar=TRUE,units=''){
+plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     rounded.mean <- roundit(fit$mean['x'],
                             fit$mean[c('s[x]','ci[x]')],
                             sigdig=sigdig)
@@ -234,6 +234,6 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units=''){
     a <- signif(100*fit$fract,sigdig)
     if (Ar) line2 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))
     else line2 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
-    graphics::mtext(line1,line=1)
-    graphics::mtext(line2,line=0)
+    mymtext(line1,line=1,...)
+    mymtext(line2,line=0,...)
 }
