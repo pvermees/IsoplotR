@@ -850,7 +850,7 @@ plot_PbPb_evolution <- function(tt,inverse=TRUE){
 
 }
 
-isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
+isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
     if (fit$model==1 && fit$mswd>1){
         args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='~n~')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
@@ -903,12 +903,12 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
         line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
-        graphics::mtext(line1,line=2)
-        graphics::mtext(line2,line=1)
-        graphics::mtext(line3,line=0)
+        mymtext(line1,line=2,...)
+        mymtext(line2,line=1,...)
+        mymtext(line3,line=0,...)
     } else if (fit$model==2){
-        graphics::mtext(line1,line=1)
-        graphics::mtext(line2,line=0)
+        mymtext(line1,line=1,...)
+        mymtext(line2,line=0,...)
     } else if (fit$model==3){
         rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
         list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
@@ -916,8 +916,8 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma"){
         expr3 <- fit$displabel
         call3 <- substitute(e~a,list(e=expr3,a=args3))
         line3 <- do.call(substitute,list(eval(call3),list3))
-        graphics::mtext(line1,line=2)
-        graphics::mtext(line2,line=1)
-        graphics::mtext(line3,line=0)
+        mymtext(line1,line=2,...)
+        mymtext(line2,line=1,...)
+        mymtext(line3,line=0,...)
     }
 }

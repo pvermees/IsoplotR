@@ -323,12 +323,12 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
-        graphics::mtext(line1,line=2,...)
-        graphics::mtext(line2,line=1,...)
-        graphics::mtext(line3,line=0,...)
+        mymtext(line1,line=2,...)
+        mymtext(line2,line=1,...)
+        mymtext(line3,line=0,...)
     } else if (fit$model==2){
-        graphics::mtext(line1,line=1,...)
-        graphics::mtext(line2,line=0,...)
+        mymtext(line1,line=1,...)
+        mymtext(line2,line=0,...)
     } else {
         rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
         line3 <- substitute('overdispersion ='~a+b/-c~
@@ -336,8 +336,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                             list(a=rounded.disp[1],
                                  b=rounded.disp[3],
                                  c=rounded.disp[2]))
-        graphics::mtext(line1,line=2,...)
-        graphics::mtext(line2,line=1,...)
-        graphics::mtext(line3,line=0,...)
+        mymtext(line1,line=2,...)
+        mymtext(line2,line=1,...)
+        mymtext(line3,line=0,...)
     }
 }

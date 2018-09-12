@@ -272,7 +272,7 @@ weightedmean.ThU <- function(x,random.effects=TRUE,
                         from=from,to=to,rect.col=rect.col,
                         outlier.col=outlier.col,sigdig=sigdig,alpha=alpha,
                         ranked=ranked,i2i=i2i,units='ka',detritus=detritus,
-                        Th02=Th02,Th02U48=Th02U48, ...)
+                        Th02=Th02,Th02U48=Th02U48,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -373,11 +373,12 @@ weightedmean.UThHe <- function(x,random.effects=TRUE,
                                alpha=0.05,ranked=FALSE,...){
     tt <- UThHe.age(x)
     fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
-                                alpha=alpha,plot=FALSE,...)
+                                alpha=alpha,plot=FALSE)
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],fit=fit,from=from,to=to,
                           rect.col=rect.col,outlier.col=outlier.col,
-                          sigdig=sigdig,alpha=alpha,units='Ma',ranked=ranked)
+                          sigdig=sigdig,alpha=alpha,units='Ma',
+                          ranked=ranked,...)
     }
     invisible(fit)
 }
@@ -415,7 +416,8 @@ weightedmean.fissiontracks <- function(x,random.effects=TRUE,
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],fit=out,from=from,to=to,
                           rect.col=rect.col,outlier.col=outlier.col,
-                          sigdig=sigdig,alpha=alpha,units='Ma',ranked=ranked)
+                          sigdig=sigdig,alpha=alpha,units='Ma',
+                          ranked=ranked,...)
     }
     invisible(out)
 }
@@ -433,7 +435,7 @@ weightedmean_helper <- function(x,random.effects=TRUE,detect.outliers=TRUE,
                    detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
-                                alpha=alpha,plot=FALSE,...)
+                                alpha=alpha,plot=FALSE)
     out <- fit
     if (exterr){
         out$mean[c('x','s[x]')] <-
@@ -444,7 +446,8 @@ weightedmean_helper <- function(x,random.effects=TRUE,detect.outliers=TRUE,
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,
                           rect.col=rect.col,outlier.col=outlier.col,
-                          sigdig=sigdig,alpha=alpha,units=units,ranked=ranked)
+                          sigdig=sigdig,alpha=alpha,units=units,
+                          ranked=ranked,...)
     }
     invisible(out)
 }
@@ -508,7 +511,7 @@ get.weightedmean <- function(X,sX,random.effects=TRUE,
     out
 }
 
-wtdmean.title <- function(fit,sigdig=2,units=''){
+wtdmean.title <- function(fit,sigdig=2,units='',...){
     if (fit$random.effects){
         rounded.mean <- roundit(fit$mean['x'],
                                 fit$mean[c('s[x]','ci[x]')],
@@ -528,7 +531,7 @@ wtdmean.title <- function(fit,sigdig=2,units=''){
                                  b=rounded.disp['ul'],
                                  c=rounded.disp['ll'],
                                  u=units))
-        graphics::mtext(line3,line=0)
+        mymtext(line3,line=0,...)
         line1line <- 2
         line2line <- 1
     } else {
@@ -550,14 +553,15 @@ wtdmean.title <- function(fit,sigdig=2,units=''){
                         list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig),
                              b=roundit(fit$p.value,fit$p.value,
                                        sigdig=sigdig)))
-    graphics::mtext(line1,line=line1line)
-    graphics::mtext(line2,line=line2line)
+    mymtext(line1,line=line1line,...)
+    mymtext(line2,line=line2line,...)
 }
 
 plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,
                               rect.col=grDevices::rgb(0,1,0,0.5),
                               outlier.col=grDevices::rgb(0,1,1,0.5),
-                              sigdig=2,alpha=0.05,units='',ranked=FALSE){
+                              sigdig=2,alpha=0.05,units='',
+                              ranked=FALSE,...){
     if (ranked){
         i <- order(X)
         x <- X[i]
@@ -575,7 +579,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,
     if (is.na(to)) maxx <- max(c(x+fact*sx,x+fact*fit$disp['w']),na.rm=TRUE)
     else maxx <- to
     graphics::plot(c(0,ns+1),c(minx,maxx),type='n',
-                   axes=FALSE,xlab='N',ylab='')
+                   axes=FALSE,xlab='N',ylab='',...)
     graphics::polygon(fit$plotpar$rect,col='gray80',border=NA)
     graphics::lines(fit$plotpar$mean)
     if (fit$random.effects){
