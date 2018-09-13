@@ -7,6 +7,8 @@ length.ReOs <- function(x){ nrow(x$x) }
 length.LuHf <- function(x){ nrow(x$x) }
 length.ThU <- function(x){ nrow(x$x) }
 length.UThHe <- function(x){ nrow(x) }
+length.KDE <- function(x){ length(x$ages) }
+length.KDEs <- function(x){ length(x$kdes) }
 length.fissiontracks <- function(x){
     if (x$format==1) return(nrow(x$x))
     else return(length(x$Ns))
