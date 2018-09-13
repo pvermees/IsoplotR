@@ -514,7 +514,7 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
 plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
                       kde.col=grDevices::rgb(1,0,1,0.6),show.hist=TRUE,
                       hist.col=grDevices::rgb(0,1,0,0.2),binwidth=NA,bty='n',...){
-    if (is.na(ncol)) ncol <- ceiling(sqrt(length(x)/2))
+    if (is.na(ncol)) ncol <- ceiling(sqrt(length(x$kdes)/2))
     oldpar <- graphics::par(no.readonly=T)
     snames <- names(x$kdes)
     ns <- length(snames)
