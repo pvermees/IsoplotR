@@ -508,7 +508,7 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
     graphics::polygon(x$x,x$y,col=kde.col)
     graphics::lines(x$x,x$y,col='black')
     graphics::points(ages,rep(graphics::par("usr")[3]/2,length(ages)),pch=pch)
-    graphics::text(M,maxy,paste0("n=",length(ages)),pos=2)
+    mymtext(paste0('n=',length(x)),line=0,adj=1)
 }
 
 plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
@@ -532,7 +532,7 @@ plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
                      kde.col=kde.col,show.hist=show.hist,
                      hist.col=hist.col,binwidth=binwidth,
                      bty=bty,ann=FALSE,ylim=ylim,...)
-            graphics::mtext(side=1,text=xlab,line=2,cex=0.8)
+            graphics::mtext(side=1,text=xlab,line=2)
         } else {
             plot.KDE(x$kdes[[i]],pch=pch,xlab=xlab,ylab=ylab,
                      kde.col=kde.col,show.hist=show.hist,
