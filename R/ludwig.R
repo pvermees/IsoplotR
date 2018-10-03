@@ -95,7 +95,7 @@ ludwig.default <- function(x,...){
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
-    fit <- get.ta0b0(x,exterr=exterr,model=model)
+    fit <- get.ta0b0.anchored(x,exterr=exterr,model=model,age=100)
     out <- fit[c('par','w','model')]
     out$cov <- tryCatch({ # analytical
         fish <- fisher.lud(x,fit=fit)
@@ -150,12 +150,29 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1){
     out$exterr <- exterr
     out
 }
+get.ta0b0.anchored <- function(x,exterr=FALSE,model=1,age=NA){
+    init <- get.ta0b0.model2.anchored(x)
+    if (model==1)
+        out <- get.ta0b0.model1.anchored(x,init=init,exterr=exterr,age=age)
+    else if (model==2)
+        out <- list(par=init,w=0)
+    else if (model==3)
+        out <- get.ta0b0.model3(x,init=init,exterr=exterr)
+    out$model <- model
+    out$exterr <- exterr
+    out
+}
 get.ta0b0.model1 <- function(x,init,exterr=FALSE){
     out <- fit_ludwig_discordia(x,init=init,w=0,model=1,exterr=exterr)
     out$w <- 0
     out
 }
-# tricks the weighted regression algorithm into doing ordinary least squares
+get.ta0b0.model1.anchored <- function(x,init,exterr=FALSE,age=NA){
+    out <- fit_ludwig_discordia_anchored(x,init=init,w=0,model=1,
+                                         exterr=exterr,age=age)
+    out$w <- 0
+    out
+}
 get.ta0b0.model2 <- function(x){
     xy <- data2york(x,wetherill=FALSE)[,c('X','Y')]
     xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
@@ -172,6 +189,12 @@ get.ta0b0.model2 <- function(x){
     }
     ta0b0
 }
+get.ta0b0.model2.anchored <- function(x,age=NA){
+    ta0b0 <- get.ta0b0.model2(x)
+    if (is.na(age)) out <- ta0b0[-1]
+    else out <- ta0b0[1]
+    out
+}
 get.ta0b0.model3 <- function(x,init,exterr=FALSE){
     fit <- fit_ludwig_discordia(x,init=init,w=0,model=1,exterr=exterr)
     ta0b0 <- fit$par
@@ -184,13 +207,18 @@ fit_ludwig_discordia <- function(x,init,w=0,model=1,exterr=FALSE){
     stats::optim(init,fn=LL.lud.UPb,method="BFGS",x=x,
                  model=model,w=w,exterr=exterr)
 }
+fit_ludwig_discordia_anchored <- function(x,init,w=0,model=1,
+                                          exterr=FALSE,age=NA){
+    stats::optim(init,fn=LL.lud.UPb.anchored,method="BFGS",x=x,
+                 model=model,w=w,exterr=exterr,age=age)
+}
 get_ludwig_disp <- function(ta0b0,x,interval){
     stats::optimize(LL.lud.UPb.disp,interval=interval,
                     x=x,ta0b0=ta0b0)$minimum
 }
 get_lud_wrange <- function(ta0b0,x){
     mswd <- mswd.lud(ta0b0,x=x,model=1,w=0)$mswd
-    c(0,sqrt(mswd)*9.74) # 9.74 = current 204/238-rati0
+    c(0,sqrt(mswd)*9.74) # 9.74 = current 204/238-ratio
 }    
 
 LL.lud.UPb.disp <- function(w,x,ta0b0){
@@ -202,6 +230,22 @@ LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     } else {
         return(LL.lud.3D(ta0b0,x=x,exterr=exterr,model=model,w=w,LL=LL))
     }
+}
+LL.lud.UPb.anchored <- function(ta0b0,x,exterr=FALSE,model=1,w=0,LL=FALSE,age=NA){
+    if (x$format<4){
+        return(LL.lud.2D.anchored(ta0b0,x=x,exterr=exterr,model=model,w=w,LL=LL,age=age))
+    } else {
+        return(LL.lud.3D(ta0b0,x=x,exterr=exterr,model=model,w=w,LL=LL))
+    }
+}
+LL.lud.2D.anchored <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE,age=NA){
+    if (is.na(age)){
+        ta0 <- c(ta0,settings('iratio','Pb207Pb204')[1]/
+                     settings('iratio','Pb206Pb204')[1])
+    } else {
+        ta0 <- c(age,ta0)
+    }
+    LL.lud.2D(ta0,x,exterr=exterr,model=model,w=w,LL=LL)
 }
 LL.lud.2D <- function(ta0,x,exterr=FALSE,model=1,w=0,LL=FALSE){
     tt <- ta0[1]
