@@ -94,8 +94,9 @@ ludwig.default <- function(x,...){
 #' \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
-ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
-    fit <- get.ta0b0(x,exterr=exterr,model=model)
+ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
+                       anchor=list(TRUE,NA),...){
+    fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
     out$cov <- tryCatch({ # analytical
         fish <- fisher.lud(x,fit=fit)
@@ -138,8 +139,9 @@ mswd.lud <- function(ta0b0,x,model=1,w=0){
     out
 }
 
-get.ta0b0 <- function(x,exterr=FALSE,model=1){
-    init <- get.ta0b0.model2(x)
+get.ta0b0 <- function(x,exterr=FALSE,model=1,
+                       anchor=list(FALSE,NA)){
+    init <- get.ta0b0.model2(x,anchor=anchor)
     if (model==1)
         out <- get.ta0b0.model1(x,init=init,exterr=exterr)
     else if (model==2)
@@ -150,15 +152,35 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1){
     out$exterr <- exterr
     out
 }
-get.ta0b0.model1 <- function(x,init,exterr=FALSE){
+get.ta0b0.model1 <- function(x,init,exterr=FALSE,
+                       anchor=list(FALSE,NA)){
     out <- fit_ludwig_discordia(x,init=init,w=0,model=1,exterr=exterr)
     out$w <- 0
     out
 }
-get.ta0b0.model2 <- function(x){
+get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
     xy <- data2york(x,wetherill=FALSE)[,c('X','Y')]
-    xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-    ta0b0 <- concordia.intersection.ab(xyfit$coef[1],xyfit$coef[2],wetherill=FALSE)$x
+    if (is.na(anchor[[2]])){
+        if (anchor[[1]]){
+            a0 <- settings('iratio','Pb206Pb204')[1]
+            b0 <- settings('iratio','Pb207Pb204')[1]
+            xyfit <- stats::lm(I(xy[,'Y']-a0/b0) ~ 0 + xy[,'X'])
+            intercept <- a0/b0
+            slope <- xyfit$coef
+        } else {
+            xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+            intercept <- xyfit$coef[1]
+            slope <- xyfit$coef[2]            
+        }
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE)$x
+    } else if (anchor[[1]] && is.numeric(anchor[[2]])){
+        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE)
+        xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
+                           0 + I(xy[,'X']--TW$x['U238Pb206']))
+        slope <- xyfit$coef
+        intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
+        ta0b0 <- c(anchor[[2]],intercept)
+    }
     if (x$format>3){
         U238Pb206 <- subset(get.U238Pb206.ratios(x),select='U238Pb206')
         Pb206U238 <- subset(get.Pb206U238.ratios(x),select='Pb206U238')
@@ -168,8 +190,11 @@ get.ta0b0.model2 <- function(x){
         lmfit <- stats::lm(Pb204Pb206 ~ U238Pb206)
         ta0b0[3] <- ta0b0[2]/lmfit$coef[1] # 7/4
         ta0b0[2] <- 1/lmfit$coef[1] # 6/4
-    }
+    }    
     ta0b0
+}
+get.ta0b0.model2.anchored <- function(x,age=NA){
+    
 }
 get.ta0b0.model3 <- function(x,init,exterr=FALSE){
     fit <- fit_ludwig_discordia(x,init=init,w=0,model=1,exterr=exterr)
