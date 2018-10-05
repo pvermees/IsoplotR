@@ -2,8 +2,8 @@
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,
                                           exterr=FALSE,alpha=0.05,
-                                          model=1){
-    fit <- ludwig(x,exterr=exterr,model=model)
+                                          model=1,anchor=list(FALSE,NA)){
+    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
     out <- list()
     out$model <- model
     out$mswd <- fit$mswd

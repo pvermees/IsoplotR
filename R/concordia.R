@@ -194,7 +194,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.numbers=FALSE,levels=NA,clabel="",
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=FALSE,
-                      show.age=0,sigdig=2,common.Pb=0,ticks=NULL,...){
+                      show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
+                      anchor=list(FALSE,NA),...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
     lims <- prepare.concordia.line(X,tlim=tlim,wetherill=wetherill,...)
@@ -202,7 +203,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     if (show.age>1){
         fit <- concordia.intersection.ludwig(x,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
-                                             model=(show.age-1))
+                                             model=(show.age-1),anchor=anchor)
         discordia.line(fit,wetherill=wetherill)
         fit$n <- length(x)
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))

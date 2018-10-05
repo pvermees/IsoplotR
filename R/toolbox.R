@@ -281,7 +281,7 @@ mymtext <- function(text,line=0,...){
 # fixed: A vector of TRUE/FALSE values indicating which parameters in
 # parms to hold constant (not optimize). If TRUE, the corresponding
 # parameter in fn() is fixed. Otherwise it's variable and optimised over.
-# Originally written by Barry Rowlingson"  
+# Originally written by Barry Rowlingson, modified by PV
 optifix <- function(parms, fixed, fn, gr = NULL, ...,
                     method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), 
                     lower = -Inf, upper = Inf, control = list(), hessian = FALSE){ 
@@ -321,6 +321,10 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     .opt$fullpars[!fixed]=.opt$par 
     names(.opt$fullpars)=names(parms)
     .opt$fixed = fixed
+
+    # remove fullpars (PV)
+    .opt$par <- .opt$fullpars
+    .opt$fullpars <- NULL
     
     return(.opt)
 }
