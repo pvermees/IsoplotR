@@ -275,6 +275,41 @@ mymtext <- function(text,line=0,...){
     graphics::mtext(text,line=line,cex=par('cex'),...)
 }
 
+blockinverse <- function(...){
+    blocks <- list(...)
+    AA <- blocks[[1]]
+    BB <- blocks[[2]]
+    CC <- blocks[[3]]
+    DD <- blocks[[4]]
+    out <- list()
+    if (length(blocks)==4){
+        invAA <- solve(AA)
+        invBB <- solve(BB)
+        invCC <- solve(CC)
+        invDD <- solve(DD)
+        invDCAB <- solve(DD-CC%*%invAA%*%BB)
+        out$AA <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
+        out$BB <- - invAA %*% BB %*% invDCAB
+        out$CC <- - invDCAB %*% CC %*% invAA
+        out$DD <- invDCAB
+        AB <- cbind(out$AA,out$BB)
+        CD <- cbind(out$CC,out$DD)
+        out$inv <- rbind(AB,CD)
+    } else if (length(blocks)==9){
+        EE <- blocks[[5]]
+        FF <- blocks[[6]]
+        GG <- blocks[[7]]
+        HH <- blocks[[8]]
+        II <- blocks[[9]]
+        ABDE <- blockinverse(AA,BB,CC,DD)$ABCD
+        CF <- rbind(CC,FF)
+        GH <- rbind(GG,HH)
+        ABCDEFGHI <- blockinverse(ABDE,CF,GH,II)
+        out$inv <- ABCDEFGHI$inv
+    }
+    out
+}
+
 # Optimise with some fixed parameters 
 # Like optim, but with option to fix some parameters.
 # parms: Parameters to potentially optimize in fn
