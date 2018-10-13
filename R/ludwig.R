@@ -97,8 +97,6 @@ ludwig.default <- function(x,...){
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
                        anchor=list(TRUE,NA),...){
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@15@"]]));##:ess-bp-end:##
     out <- fit[c('par','w','model')]
     out$cov <- tryCatch({ # analytical
         fish <- fisher.lud(x,fit=fit)
@@ -243,14 +241,10 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
     tt <- ta0[1]
     a0 <- ta0[2]
     d <- data2ludwig(x,a0=a0,tt=tt,exterr=exterr,w=w)
-    out <- t(d$x) %*% ( d$omega11 + d$B*(d$omega12+d$omega21) + d$omega22*d$B^2 ) %*% d$x
-         - 2*( t(d$X)%*%d$omega11 + t(d$X)%*%d$omega21*d$B +
-               (t(d$Y)-d$A)%*%d$omega12 + (t(d$Y)-d$A)%*%d$omega22*d$B ) %*% d$x
-         + ( t(d$X)%*%d$omega11%*%d$X + 2*t(d$X)%*%d$omega21%*%(d$Y-d$A) +
-             (t(d$Y)-d$A)%*%d$omega22%*%(d$Y-d$A) )
+    R <- rbind(d$rx,d$ry)
+    out <- t(R) %*% d$omega %*% R
     if (LL){
-        omegainv <- blockinverse(d$omega11,d$omega12,d$omega21,d$omega22)$inv
-        out <- -0.5*(out + determinant(omegainv,logarithm=TRUE)$modulus)
+        out <- -0.5*(out + determinant(d$omegainv,logarithm=TRUE)$modulus)
     }
     out
 }
@@ -278,11 +272,9 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
                 r[i]*r[j]*omega[i2,j2] + phi[i]*phi[j]*omega[i3,j3] +
                 2*( R[i]*r[j]*omega[i1,j2] +
                     R[i]*phi[j]*omega[i1,j3] + r[i]*phi[j]*omega[i2,j3] )
-            if (LL) out <- out +
-                        determinant(solve(omega),logarithm=TRUE)$modulus
         }
     }
-    if (LL) out <- -out/2
+    if (LL) out <- -0.5*(out+determinant(d$omegainv,logarithm=TRUE)$modulus)
     out
 }
 
@@ -394,12 +386,9 @@ data2ludwig_2D <- function(x,a0,tt,w=0,exterr=FALSE){
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    A <- U*(exp(l5[1]*tt)-1)/(exp(l8[1]*tt)-1)
-    B <- a0*(exp(l8[1]*tt)-1)-U*(exp(l5[1]*tt)-1)
-    dAdl5 <- U*tt*exp(l5[1]*tt)/(exp(l5[1]*tt)-1)
-    dBdl5 <- -U*tt*exp(l5[1]*tt)
-    dAdl8 <- -tt*exp(l8[1]*tt)/(exp(l8[1]*tt)-1)^2
-    dBdl8 <- a0*tt*exp(l8[1]*tt)
+    B <-  (exp(l5[1]*tt)-1)/U - a0*(exp(l8[1]*tt)-1)
+    dBdl5 <- -tt*exp(l5[1]*tt)/U
+    dBdl8 <- -a0*tt*exp(l8[1]*tt)
     E <- matrix(0,2*ns+2,2*ns+2)
     J <- matrix(0,2*ns,2*ns+2)
     X <- matrix(0,ns,1)
@@ -412,29 +401,24 @@ data2ludwig_2D <- function(x,a0,tt,w=0,exterr=FALSE){
         J[i,2*i-1] <- 1 # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
         if (exterr){
-            J[ns+i,2*ns+1] <- -dAdl5 - dBdl5*X[i]
-            J[ns+i,2*ns+2] <- -dAdl8 - dBdl8*X[i]
+            J[ns+i,2*ns+1] <- -dBdl5*X[i]
+            J[ns+i,2*ns+2] <- -dBdl8*X[i]
         }
     }
     E[2*ns+1,2*ns+1] <- l5[2]^2
     E[2*ns+2,2*ns+2] <- l8[2]^2
     ER <- J %*% E %*% t(J)
     out <- list()
-    omega <- solve(ER)
-    omega11 <- omega[1:ns,1:ns]
-    omega12 <- omega[1:ns,(ns+1):(2*ns)]
-    omega21 <- omega[(ns+1):(2*ns),1:ns]
-    omega22 <- omega[(ns+1):(2*ns),(ns+1):(2*ns)]
+    out$omega <- solve(ER)
+    out$omegainv <- ER
+    omega11 <- out$omega[1:ns,1:ns]
+    omega12 <- out$omega[1:ns,(ns+1):(2*ns)]
+    omega21 <- out$omega[(ns+1):(2*ns),1:ns]
+    omega22 <- out$omega[(ns+1):(2*ns),(ns+1):(2*ns)]
     out$x <- solve(omega11 + B*(omega12+omega21) + omega22*B^2) %*%
-        (omega11%*%X + B*omega12%*%X + omega21%*%(Y-A) + B*omega22%*%(Y-A))
-    out$omega11 <- omega11
-    out$omega12 <- omega12
-    out$omega21 <- omega21
-    out$omega22 <- omega22
-    out$A <- A
-    out$B <- B
-    out$X <- X
-    out$Y <- Y
+        (omega11%*%X + B*omega12%*%X + omega21%*%(Y-a0) + B*omega22%*%(Y-a0))
+    out$rx <- X - out$x
+    out$ry <- Y - a0 - B*out$x
     out
 }
 data2ludwig_3D <- function(x,a0,b0,tt,w=0,exterr=FALSE){
@@ -491,7 +475,7 @@ data2ludwig_3D <- function(x,a0,b0,tt,w=0,exterr=FALSE){
     }
     phi <- solve(V,W)
     z <- Z - phi
-    out <- list(R=R,r=r,phi=phi,z=z,omega=omega)
+    out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)
 }
 
 fixit <- function(x,anchor=list(FALSE,NA)){
