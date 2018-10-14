@@ -98,20 +98,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
                        anchor=list(TRUE,NA),...){
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
-    out$cov <- tryCatch({ # analytical
-        fish <- fisher.lud(x,fit=fit)
-        ns <- length(x)
-        # block inversion:
-        AA <- fish[1:ns,1:ns]
-        BB <- fish[1:ns,(ns+1):(ns+3)]
-        CC <- fish[(ns+1):(ns+3),1:ns]
-        DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
-        solve(DD - CC %*% solve(AA) %*% BB)
-    }, error = function(e){ # numerical
-        hessian <- stats::optimHess(fit$par,fn=LL.lud.UPb,
-                                    x=x,exterr=exterr,LL=TRUE)
-        solve(hessian)
-    })
+    out$cov <- fisher.lud(x,fit=fit)
     mswd <- mswd.lud(fit$par,x=x,w=fit$w)
     out <- c(out,mswd)
     if (model==3){
@@ -240,7 +227,7 @@ LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
 LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
     tt <- ta0[1]
     a0 <- ta0[2]
-    d <- data2ludwig(x,a0=a0,tt=tt,exterr=exterr,w=w)
+    d <- data2ludwig(x,tt=tt,a0=a0,exterr=exterr,w=w)
     R <- rbind(d$rx,d$ry)
     out <- t(R) %*% d$omega %*% R
     if (LL){
@@ -252,8 +239,7 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
-    d <- data2ludwig(x,a0=a0,b0=b0,tt=tt,
-                     exterr=exterr,w=w)
+    d <- data2ludwig(x,tt=tt,a0=a0,b0=b0,exterr=exterr,w=w)
     phi <- d$phi
     R <- d$R
     r <- d$r
@@ -282,18 +268,78 @@ fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
 fisher.lud.default <- function(x,...){
     stop( "No default method available (yet)." )
 }
-fisher.lud.UPb <- function(x,fit,...){
-    if (x$format<4) return(fisher_lud_2D(x,fit))
-    else return(fisher_lud_3D(x,fit))
+fisher.lud.UPb <- function(x,fit,exterr=TRUE,...){
+    ns <- length(x)
+    if (x$format<4){
+        fish <- fisher_lud_2D(x,fit)
+        AA <- fish[1:ns,1:ns]
+        BB <- fish[1:ns,(ns+1):(ns+2)]
+        CC <- fish[(ns+1):(ns+2),1:ns]
+        DD <- fish[(ns+1):(ns+2),(ns+1):(ns+2)]
+        out <- blockinverse(AA,BB,CC,DD)
+    } else {
+        fish <- fisher_lud_3D(x,fit)
+        AA <- fish[1:ns,1:ns]
+        BB <- fish[1:ns,(ns+1):(ns+3)]
+        CC <- fish[(ns+1):(ns+3),1:ns]
+        DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
+        out <- blockinverse(AA,BB,CC,DD)
+    }
+    out
 }
 fisher_lud_2D <- function(x,fit){
-    stop('not implemented yet')
+    tt <- fit$par[1]
+    a0 <- fit$par[2]
+    d <- data2ludwig_2D(x,tt=tt,a0=a0,w=0,exterr=fit$exterr)
+    l5 <- settings('lambda','U235')[1]
+    l8 <- settings('lambda','U238')[1]
+    U <- settings('iratio','U238U235')[1]
+    ns <- length(x)
+    ones <- matrix(1,ns,1)
+    B <-  (exp(l5*tt)-1)/U - a0*(exp(l8*tt)-1)
+    dBdt <- l5*exp(l5*tt)/U - a0*exp(l8*tt)*l8
+    dBda0 <- (exp(l8*tt)-1)
+    d2Bdtda0 <- exp(l8*tt)*l8
+    d2Bda0dt <- exp(l8*tt)*l8
+    d2Bdt2 <- (l5^2)*exp(l5*tt)/U - a0*exp(l8*tt)*l8^2
+    d2Bda02 <- 0
+    ns <- length(x)
+    out <- matrix(0,ns+2,ns+2)
+    out[1:ns,1:ns] <- # d2S/dx2
+        2*(d$omega11+B*d$omega12+B*d$omega21+d$omega22*B^2)
+    out[ns+1,1:ns] <- # d2S/dxdt
+        2*t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)*dBdt -
+        2*t(d$X)%*%d$omega21*dBdt + 2*(t(d$Y)-a0)%*%d$omega22*dBdt
+    out[ns+2,1:ns] <- # d2S/dxda0
+        2*t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)*dBda0 -
+        2*t(d$X)%*%d$omega21*dBda0 + 2*t(ones)%*%d$omega12 -
+        2*(t(d$Y)-a0)%*%d$omega22*dBda0 + 2*t(ones)%*%d$omega22*B
+    out[1:ns,ns+1] <- t(out[ns+1,1:ns]) # d2S/dtdx
+    out[1:ns,ns+2] <- t(out[ns+2,1:ns]) # d2S/da0dx
+    out[ns+1,ns+1] <- # d2S/dt2
+        t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)%*%d$x*d2Bdt2 +
+        2*t(d$x)%*%d$omega22%*%d$x*dBdt^2 -
+        (t(d$X)%*%d$omega21+(t(d$Y)-a0)%*%d$omega22)%*%d$x*d2Bdt2 -
+        t(d$x)%*%(d$omega12%*%d$X+d$omega22%*%(d$Y-a0))*d2Bdt2
+    out[ns+2,ns+2] <- # d2S/da02
+        2*(t(d$x)%*%d$omega22%*%d$x)*dBda0^2 +
+        2*(t(ones)%*%d$omega22%*%d$x +
+           t(d$x)%*%d$omega22%*%ones)*dBda0 +
+        2*t(ones)%*%d$omega22%*%ones
+    out[ns+1,ns+2] <- # d2S/dt0da0
+        t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)%*%d$x*d2Bdtda0 +
+        2*t(d$x)%*%d$omega22%*%d$x*dBda0*dBdt -
+        (t(d$X)%*%d$omega21+(t(d$Y)-a0)%*%d$omega22)%*%d$x*d2Bdtda0 +
+        t(ones)%*%d$omega22%*%d$x*dBdt + t(d$x)%*%d$omega22%*%ones*dBdt -
+        t(d$x)%*%(d$omega12%*%d$X+d$omega22%*%(d$Y-a0))*d2Bdtda0
+    out[ns+2,ns+1] <- out[ns+1,ns+2]
+    out/2
 }
 fisher_lud_3D <- function(x,fit){
     tt <- fit$par[1]
     a0 <- fit$par[2]
     b0 <- fit$par[3]
-    d <- data2ludwig_3D(x,a0=a0,b0=b0,tt=tt,w=0,exterr=fit$exterr)
+    d <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=0,exterr=fit$exterr)
     z <- d$z
     omega <- d$omega
     ns <- length(z)
@@ -373,15 +419,15 @@ fisher_lud_3D <- function(x,fit){
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
-data2ludwig.UPb <- function(x,a0,b0=0,tt,exterr=FALSE,w=0,...){
+data2ludwig.UPb <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
     if (x$format<4){
-        out <- data2ludwig_2D(x,a0=a0,tt=tt,w=w,exterr=exterr)        
+        out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)        
     } else {
-        out <- data2ludwig_3D(x,a0=a0,b0=b0,tt=tt,w=w,exterr=exterr)
+        out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
     }
     out
 }
-data2ludwig_2D <- function(x,a0,tt,w=0,exterr=FALSE){
+data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
@@ -409,19 +455,26 @@ data2ludwig_2D <- function(x,a0,tt,w=0,exterr=FALSE){
     E[2*ns+2,2*ns+2] <- l8[2]^2
     ER <- J %*% E %*% t(J)
     out <- list()
-    out$omega <- solve(ER)
-    out$omegainv <- ER
-    omega11 <- out$omega[1:ns,1:ns]
-    omega12 <- out$omega[1:ns,(ns+1):(2*ns)]
-    omega21 <- out$omega[(ns+1):(2*ns),1:ns]
-    omega22 <- out$omega[(ns+1):(2*ns),(ns+1):(2*ns)]
+    omega <- solve(ER)
+    omega11 <- omega[1:ns,1:ns]
+    omega12 <- omega[1:ns,(ns+1):(2*ns)]
+    omega21 <- omega[(ns+1):(2*ns),1:ns]
+    omega22 <- omega[(ns+1):(2*ns),(ns+1):(2*ns)]
     out$x <- solve(omega11 + B*(omega12+omega21) + omega22*B^2) %*%
         (omega11%*%X + B*omega12%*%X + omega21%*%(Y-a0) + B*omega22%*%(Y-a0))
+    out$omegainv <- ER
+    out$omega <- omega
+    out$omega11 <- omega11
+    out$omega12 <- omega12
+    out$omega21 <- omega21
+    out$omega22 <- omega22
+    out$X <- X
+    out$Y <- Y
     out$rx <- X - out$x
     out$ry <- Y - a0 - B*out$x
     out
 }
-data2ludwig_3D <- function(x,a0,b0,tt,w=0,exterr=FALSE){
+data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]

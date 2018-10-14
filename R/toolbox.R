@@ -275,37 +275,24 @@ mymtext <- function(text,line=0,...){
     graphics::mtext(text,line=line,cex=par('cex'),...)
 }
 
-blockinverse <- function(...){
-    blocks <- list(...)
-    AA <- blocks[[1]]
-    BB <- blocks[[2]]
-    CC <- blocks[[3]]
-    DD <- blocks[[4]]
+# if doall==FALSE, only returns the lower right submatrix
+blockinverse <- function(AA,BB,CC,DD,doall=FALSE){
     out <- list()
-    if (length(blocks)==4){
-        invAA <- solve(AA)
+    invAA <- solve(AA)
+    invDCAB <- solve(DD-CC%*%invAA%*%BB)
+    if (doall){
         invBB <- solve(BB)
         invCC <- solve(CC)
         invDD <- solve(DD)
-        invDCAB <- solve(DD-CC%*%invAA%*%BB)
-        out$AA <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
-        out$BB <- - invAA %*% BB %*% invDCAB
-        out$CC <- - invDCAB %*% CC %*% invAA
-        out$DD <- invDCAB
-        AB <- cbind(out$AA,out$BB)
-        CD <- cbind(out$CC,out$DD)
-        out$inv <- rbind(AB,CD)
-    } else if (length(blocks)==9){
-        EE <- blocks[[5]]
-        FF <- blocks[[6]]
-        GG <- blocks[[7]]
-        HH <- blocks[[8]]
-        II <- blocks[[9]]
-        ABDE <- blockinverse(AA,BB,CC,DD)$ABCD
-        CF <- rbind(CC,FF)
-        GH <- rbind(GG,HH)
-        ABCDEFGHI <- blockinverse(ABDE,CF,GH,II)
-        out$inv <- ABCDEFGHI$inv
+        ul <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
+        ur <- - invAA %*% BB %*% invDCAB
+        ll <- - invDCAB %*% CC %*% invAA
+        lr <- invDCAB
+        toprow <- cbind(ul,ur)
+        botrow <- cbind(ll,lr)
+        out <- rbind(toprow,botrow)
+    } else {
+        out <- invDCAB
     }
     out
 }
