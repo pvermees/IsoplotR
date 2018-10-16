@@ -210,8 +210,8 @@ get_ludwig_disp <- function(ta0b0,x,interval){
                     x=x,ta0b0=ta0b0,maximum=TRUE)$maximum
 }
 get_lud_wrange <- function(ta0b0,x){
-    mswd <- mswd.lud(ta0b0,x=x,w=0)$mswd
-    c(0,sqrt(mswd)*9.74) # 9.74 = current 204/238-ratio
+    # mswd <- mswd.lud(ta0b0,x=x,w=0)$mswd
+    c(0,1) # placeholder
 }    
 
 LL.lud.UPb.disp <- function(w,x,ta0b0){
@@ -236,7 +236,8 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
     out
 }
 LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
-    d <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
+    d <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],
+                     b0=ta0b0[3],exterr=exterr,w=w)
     phi <- d$phi
     R <- d$R
     r <- d$r
@@ -438,7 +439,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     for (i in 1:ns){
         XY <- tera.wasserburg(x,i,exterr=FALSE)
         X[i] <- XY$x['U238Pb206']
-        Y[i] <- XY$x['Pb207Pb206'] + w^2
+        Y[i] <- XY$x['Pb207Pb206'] + (a0*w)^2
         E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov
         J[i,2*i-1] <- 1 # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
@@ -479,9 +480,6 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     r <- rep(0,ns)
     Z <- rep(0,ns)
     E <- matrix(0,3*ns,3*ns)
-    Zbar <- mean(get.Pb204U238.ratios(x))
-    Ybar <- a0*Zbar
-    Xbar <- U*b0*Zbar
     if (exterr){
         P235 <- tt*exp(l5[1]*tt)
         P238 <- tt*exp(l8[1]*tt)
@@ -493,11 +491,12 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         Z[i] <- d$x['Pb204U238']
         R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i]
         r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i]
-        E[i,i] <- E[i,i] + d$cov['Pb207U235','Pb207U235'] + (Xbar*w)^2 # A
-        E[ns+i,ns+i] <- E[ns+i,ns+i] + d$cov['Pb206U238','Pb206U238'] + (Ybar*w)^2 # B
-        E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238'] + (Zbar*w)^2 # C
-        E[i,ns+i] <- d$cov['Pb207U235','Pb206U238'] # D
-        E[ns+i,i] <- E[i,ns+i]
+        Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
+        E[i,i] <- E[i,i] + d$cov['Pb207U235','Pb207U235'] + Ew[1,1] # A
+        E[ns+i,ns+i] <- E[ns+i,ns+i] + d$cov['Pb206U238','Pb206U238'] + Ew[2,2] # B
+        E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238'] # C
+        E[i,ns+i] <- d$cov['Pb207U235','Pb206U238'] + Ew[1,2] # D
+        E[ns+i,i] <- E[i,ns+i] + Ew[2,1]
         E[i,2*ns+i] <- d$cov['Pb207U235','Pb204U238'] # E
         E[2*ns+i,i] <- E[i,2*ns+i]
         E[ns+i,2*ns+i] <- d$cov['Pb206U238','Pb204U238'] # F
@@ -525,6 +524,18 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     phi <- solve(V,W)
     z <- Z - phi
     out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)
+}
+get.Ew <- function(w,Z,a0,b0,U){
+    J <- matrix(0,2,4)
+    J[1,1] <- Z*U
+    J[1,3] <- a0*U
+    J[1,4] <- a0*Z
+    J[2,2] <- Z
+    J[2,3] <- b0
+    E <- matrix(0,4,4)
+    E[1,1] <- w^2
+    E[2,2] <- w^2
+    J %*% E %*% t(J)
 }
 
 fixit <- function(x,anchor=list(FALSE,NA)){
