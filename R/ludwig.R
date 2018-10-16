@@ -270,12 +270,19 @@ fisher.lud.default <- function(x,...){
 }
 fisher.lud.UPb <- function(x,fit,exterr=TRUE,...){
     ns <- length(x)
-    if (x$format<4) fish <- fisher_lud_2D(x,fit)
-    else fish <- fisher_lud_3D(x,fit)
-    AA <- fish[1:ns,1:ns]
-    BB <- fish[1:ns,(ns+1):(ns+2)]
-    CC <- fish[(ns+1):(ns+2),1:ns]
-    DD <- fish[(ns+1):(ns+2),(ns+1):(ns+2)]
+    if (x$format<4){
+        fish <- fisher_lud_2D(x,fit)
+        AA <- fish[1:ns,1:ns]
+        BB <- fish[1:ns,(ns+1):(ns+2)]
+        CC <- fish[(ns+1):(ns+2),1:ns]
+        DD <- fish[(ns+1):(ns+2),(ns+1):(ns+2)]
+    } else {
+        fish <- fisher_lud_3D(x,fit)
+        AA <- fish[1:ns,1:ns]
+        BB <- fish[1:ns,(ns+1):(ns+3)]
+        CC <- fish[(ns+1):(ns+3),1:ns]
+        DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
+    }
     blockinverse(AA,BB,CC,DD)
 }
 fisher_lud_2D <- function(x,fit){
@@ -287,73 +294,41 @@ fisher_lud_2D <- function(x,fit){
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     ones <- matrix(1,ns,1)
-    A <- matrix(a0,ns,1)
     B <-  (exp(l5*tt)-1)/U - a0*(exp(l8*tt)-1)
     C <- -t(d$X)%*%d$omega12 + t(d$x)%*%d$omega12 + t(d$x)%*%d$omega21 -
-        t(d$Y)%*%d$omega22 + t(A)%*%d$omega22 + 2*t(d$x)%*%d$omega22*B
+        t(d$Y)%*%d$omega22 + t(ones)%*%d$omega22*a0 + 2*t(d$x)%*%d$omega22*B
     D <- -t(d$X)%*%d$omega12%*%d$x + t(d$x)%*%d$omega12%*%d$x -
-        t(d$Y)%*%d$omega22%*%d$x + t(A)%*%d$omega22%*%d$x -
+        t(d$Y)%*%d$omega22%*%d$x + t(ones)%*%d$omega22%*%d$x*a0 -
         t(d$x)%*%d$omega21%*%d$X + t(d$x)%*%d$omega21%*%d$x -
-        t(d$x)%*%d$omega22%*%d$Y + t(d$x)%*%d$omega22%*%A +
+        t(d$x)%*%d$omega22%*%d$Y + t(d$x)%*%d$omega22%*%ones*a0 +
         2*t(d$x)%*%d$omega22%*%d$x*B
     dBdt <- l5*exp(l5*tt)/U - a0*exp(l8*tt)*l8
-    dBda0 <- (exp(l8*tt)-1)
+    dBda0 <- -(exp(l8*tt)-1)
     d2Bdtda0 <- exp(l8*tt)*l8
     d2Bda0dt <- exp(l8*tt)*l8
-    d2Bdt2 <- (l5^2)*exp(l5*tt)/U - a0*exp(l8*tt)*l8^2
+    d2Bdt2 <- (l5^2)*exp(l5*tt)/U - a0*exp(l8*tt)*(l8^2)
     d2Bda02 <- 0
     dDda0 <- t(ones)%*%d$omega22%*%d$x +
         t(d$x)%*%d$omega22%*%ones + 2*t(d$x)%*%d$omega22%*%d$x*dBda0
     ns <- length(x)
     out <- matrix(0,ns+2,ns+2)
-    if (TRUE){
-        out[1:ns,1:ns] <- # d2S/dx2
-            2*(d$omega11 + d$omega21*B + d$omega12*B + d$omega22*B^2)
-        out[ns+1,1:ns] <- 2*C*dBdt # d2S/dxdt
-        out[ns+2,1:ns] <- # d2S/dxda0
-            2*(C*dBda0 + t(ones)%*%d$omega21 + t(ones)%*%d$omega22*B) 
-        out[1:ns,ns+1] <- t(out[ns+1,1:ns]) # d2S/dtdx
-        out[1:ns,ns+2] <- t(out[ns+2,1:ns]) # d2S/da0dx
-        out[ns+1,ns+1] <- # d2S/dt2
-            D*d2Bdt2 + 2*t(d$x)%*%d$omega22%*%d$x*dBdt^2
-        out[ns+2,ns+2] <- # d2S/da02
-            2*(t(ones)%*%d$omega22%*%ones +
-               t(ones)%*%d$omega22%*%d$x*dBda0 +
-               t(d$x)%*%d$omega22%*%ones*dBda0 +
-               t(d$x)%*%d$omega22%*%d$x*dBda0^2)
-        out[ns+1,ns+2] <- # d2S/dt0da0
-            D*d2Bdtda0 + dDda0*dBdt
-        out[ns+2,ns+1] <- out[ns+1,ns+2]
-    } else {
-        out[1:ns,1:ns] <- # d2S/dx2
-            2*(d$omega11+B*d$omega12+B*d$omega21+d$omega22*B^2)
-        out[ns+1,1:ns] <- # d2S/dxdt
-            2*t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)*dBdt -
-            2*t(d$X)%*%d$omega21*dBdt + 2*(t(d$Y)-a0)%*%d$omega22*dBdt
-        out[ns+2,1:ns] <- # d2S/dxda0
-            2*t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)*dBda0 -
-            2*t(d$X)%*%d$omega21*dBda0 + 2*t(ones)%*%d$omega12 -
-            2*(t(d$Y)-a0)%*%d$omega22*dBda0 + 2*t(ones)%*%d$omega22*B
-        out[1:ns,ns+1] <- t(out[ns+1,1:ns]) # d2S/dtdx
-        out[1:ns,ns+2] <- t(out[ns+2,1:ns]) # d2S/da0dx
-        out[ns+1,ns+1] <- # d2S/dt2
-            t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)%*%d$x*d2Bdt2 +
-            2*t(d$x)%*%d$omega22%*%d$x*dBdt^2 -
-            (t(d$X)%*%d$omega21+(t(d$Y)-a0)%*%d$omega22)%*%d$x*d2Bdt2 -
-            t(d$x)%*%(d$omega12%*%d$X+d$omega22%*%(d$Y-a0))*d2Bdt2
-        out[ns+2,ns+2] <- # d2S/da02
-            2*(t(d$x)%*%d$omega22%*%d$x)*dBda0^2 +
-            2*(t(ones)%*%d$omega22%*%d$x +
-               t(d$x)%*%d$omega22%*%ones)*dBda0 +
-              2*t(ones)%*%d$omega22%*%ones
-        out[ns+1,ns+2] <- # d2S/dt0da0
-            t(d$x)%*%(d$omega21+d$omega12+2*B*d$omega22)%*%d$x*d2Bdtda0 +
-            2*t(d$x)%*%d$omega22%*%d$x*dBda0*dBdt -
-            (t(d$X)%*%d$omega21+(t(d$Y)-a0)%*%d$omega22)%*%d$x*d2Bdtda0 +
-            t(ones)%*%d$omega22%*%d$x*dBdt + t(d$x)%*%d$omega22%*%ones*dBdt -
-            t(d$x)%*%(d$omega12%*%d$X+d$omega22%*%(d$Y-a0))*d2Bdtda0
-        out[ns+2,ns+1] <- out[ns+1,ns+2]
-    }
+    out[1:ns,1:ns] <- # d2S/dx2
+        2*(d$omega11 + d$omega21*B + d$omega12*B + d$omega22*B^2)
+    out[ns+1,1:ns] <- 2*C*dBdt # d2S/dxdt
+    out[ns+2,1:ns] <- # d2S/dxda0
+        2*(C*dBda0 + t(ones)%*%d$omega21 + t(ones)%*%d$omega22*B) 
+    out[1:ns,ns+1] <- 2*C*dBdt # d2S/dtdx
+    out[1:ns,ns+2] <- t(out[ns+2,1:ns]) # d2S/da0dx
+    out[ns+1,ns+1] <- # d2S/dt2
+        D*d2Bdt2 + 2*t(d$x)%*%d$omega22%*%d$x*(dBdt^2)
+    out[ns+2,ns+2] <- # d2S/da02
+        2*(t(ones)%*%d$omega22%*%ones +
+           t(ones)%*%d$omega22%*%d$x*dBda0 +
+           t(d$x)%*%d$omega22%*%ones*dBda0 +
+           t(d$x)%*%d$omega22%*%d$x*(dBda0^2))
+    out[ns+1,ns+2] <- # d2S/dt0da0
+        D*d2Bdtda0 + dDda0*dBdt
+    out[ns+2,ns+1] <- out[ns+1,ns+2]
     out/2
 }
 fisher_lud_3D <- function(x,fit){
@@ -441,11 +416,10 @@ fisher_lud_3D <- function(x,fit){
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
 data2ludwig.UPb <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
-    if (x$format<4){
-        out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)        
-    } else {
+    if (x$format<4)
+        out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)  
+    else
         out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-    }
     out
 }
 data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
