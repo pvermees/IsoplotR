@@ -207,7 +207,7 @@ fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,...){
 }
 get_ludwig_disp <- function(ta0b0,x,interval){
     stats::optimize(LL.lud.UPb.disp,interval=interval,
-                    x=x,ta0b0=ta0b0)$minimum
+                    x=x,ta0b0=ta0b0,maximum=TRUE)$maximum
 }
 get_lud_wrange <- function(ta0b0,x){
     mswd <- mswd.lud(ta0b0,x=x,w=0)$mswd
@@ -229,7 +229,9 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
     R <- rbind(d$rx,d$ry)
     out <- t(R) %*% d$omega %*% R
     if (LL){
-        out <- -0.5*(out + determinant(d$omegainv,logarithm=TRUE)$modulus)
+        k <- length(R)
+        out <- -0.5*(out + k*log(2*pi) +
+                     determinant(2*pi*d$omegainv,logarithm=TRUE)$modulus)
     }
     out
 }
@@ -255,7 +257,11 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
                     R[i]*phi[j]*omega[i1,j3] + r[i]*phi[j]*omega[i2,j3] )
         }
     }
-    if (LL) out <- -0.5*(out+determinant(d$omegainv,logarithm=TRUE)$modulus)
+    if (LL){
+        k <- 2*ns
+        out <- -0.5*(out + k*log(2*pi) +
+                     determinant(d$omegainv,logarithm=TRUE)$modulus)
+    }
     out
 }
 
@@ -432,7 +438,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     for (i in 1:ns){
         XY <- tera.wasserburg(x,i,exterr=FALSE)
         X[i] <- XY$x['U238Pb206']
-        Y[i] <- XY$x['Pb207Pb206']
+        Y[i] <- XY$x['Pb207Pb206'] + w^2
         E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov
         J[i,2*i-1] <- 1 # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
