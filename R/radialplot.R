@@ -709,7 +709,7 @@ radial.title <- function(x,sigdig=2,alpha=0.05,units='',n=length(x),...){
     fit <- central(x,alpha=alpha)
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
-    line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'(n='~n~')',
+    line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'(n='*n*')',
                         list(a=rounded.age[1],
                              b=rounded.age[2],
                              c=rounded.age[3],

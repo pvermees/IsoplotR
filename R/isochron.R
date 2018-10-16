@@ -852,10 +852,10 @@ plot_PbPb_evolution <- function(tt,inverse=TRUE){
 
 isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
     if (fit$model==1 && fit$mswd>1){
-        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='~n~')')
+        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
     } else {
-        args1 <- quote(a%+-%b~'|'~c~u~'(n='~n~')')
+        args1 <- quote(a%+-%b~'|'~c~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~u)
     }
     if (is.na(type)){

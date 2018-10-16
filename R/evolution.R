@@ -313,7 +313,7 @@ evolution.title <- function(fit,sigdig=2,...){
                   b=rounded.a0[2],
                   c=rounded.a0[3])
     if (fit$model==1 && fit$mswd>1){
-        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'ka'~'(n='~n~')')
+        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'ka'~'(n='*n*')')
         args2 <- quote(~a%+-%b~'|'~c~'|'~d)
         list1$d <- rounded.age[4]
         list2$d <- rounded.a0[4]

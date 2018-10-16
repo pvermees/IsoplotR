@@ -288,10 +288,10 @@ discordia.line <- function(fit,wetherill){
 discordia.title <- function(fit,wetherill,sigdig=2,...){
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
     if (fit$model==1 && fit$mswd>1){
-        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='~n~')')
+        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
     } else {
-        args1 <- quote(a%+-%b~'|'~c~u~'(n='~n~')')
+        args1 <- quote(a%+-%b~'|'~c~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~u)
     }
     list1 <- list(a=lower.age[1],b=lower.age[2],

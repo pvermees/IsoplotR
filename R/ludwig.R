@@ -194,7 +194,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
 get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     fit <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,
                                 fixed=fixit(x,anchor))
-    ta0b0 <- fit$pars
+    ta0b0 <- fit$par
     w <- get_ludwig_disp(ta0b0,x,interval=get_lud_wrange(ta0b0,x))
     out <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,
                                 fixed=fixit(x,anchor))
@@ -206,7 +206,7 @@ fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,...){
             w=w,exterr=exterr,...)
 }
 get_ludwig_disp <- function(ta0b0,x,interval){
-    stats::optImize(LL.lud.UPb.disp,interval=interval,
+    stats::optimize(LL.lud.UPb.disp,interval=interval,
                     x=x,ta0b0=ta0b0)$minimum
 }
 get_lud_wrange <- function(ta0b0,x){
@@ -225,9 +225,7 @@ LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     }
 }
 LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
-    tt <- ta0[1]
-    a0 <- ta0[2]
-    d <- data2ludwig(x,tt=tt,a0=a0,exterr=exterr,w=w)
+    d <- data2ludwig(x,tt=ta0[1],a0=ta0[2],exterr=exterr,w=w)
     R <- rbind(d$rx,d$ry)
     out <- t(R) %*% d$omega %*% R
     if (LL){
@@ -236,10 +234,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
     out
 }
 LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
-    b0 <- ta0b0[3]
-    d <- data2ludwig(x,tt=tt,a0=a0,b0=b0,exterr=exterr,w=w)
+    d <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
     phi <- d$phi
     R <- d$R
     r <- d$r
