@@ -19,65 +19,67 @@
 radialplot(x, ...)
 
 \method{radialplot}{default}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", sigdig = 2, show.numbers = FALSE, pch = 21,
-  levels = NA, clabel = "", bg = c("white", "red"), title = TRUE,
-  k = 0, markers = NULL, alpha = 0.05, units = "", ...)
+  transformation = "log", sigdig = 2, show.numbers = FALSE,
+  pch = 21, levels = NA, clabel = "", bg = c("white", "red"),
+  title = TRUE, k = 0, markers = NULL, alpha = 0.05, units = "",
+  ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
-  transformation = "arcsin", sigdig = 2, show.numbers = FALSE, pch = 21,
-  levels = NA, clabel = "", bg = c("white", "red"), title = TRUE,
-  markers = NULL, k = 0, exterr = TRUE, alpha = 0.05, ...)
+  transformation = "arcsin", sigdig = 2, show.numbers = FALSE,
+  pch = 21, levels = NA, clabel = "", bg = c("white", "red"),
+  title = TRUE, markers = NULL, k = 0, exterr = TRUE,
+  alpha = 0.05, ...)
 
 \method{radialplot}{UPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", type = 4, cutoff.76 = 1100,
-  cutoff.disc = c(-15, 5), show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, common.Pb = 0, alpha = 0.05, ...)
+  cutoff.disc = c(-15, 5), show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, common.Pb = 0, alpha = 0.05, ...)
 
 \method{radialplot}{PbPb}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, common.Pb = 1, alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, common.Pb = 1, alpha = 0.05, ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, i2i = FALSE, alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, i2i = FALSE, alpha = 0.05, ...)
 
 \method{radialplot}{KCa}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, i2i = FALSE, alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, i2i = FALSE, alpha = 0.05, ...)
 
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, alpha = 0.05, ...)
 
 \method{radialplot}{ReOs}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{SmNd}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{RbSr}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{LuHf}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
 \method{radialplot}{ThU}(x, from = NA, to = NA, t0 = NA,
-  transformation = "log", show.numbers = FALSE, pch = 21, levels = NA,
-  clabel = "", bg = c("white", "red"), markers = NULL, k = 0,
-  i2i = TRUE, alpha = 0.05, detritus = 0, Th02 = c(0, 0),
+  transformation = "log", show.numbers = FALSE, pch = 21,
+  levels = NA, clabel = "", bg = c("white", "red"), markers = NULL,
+  k = 0, i2i = TRUE, alpha = 0.05, detritus = 0, Th02 = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
 }
 \arguments{

@@ -28,33 +28,33 @@ peakfit(x, ...)
   cutoff.disc = c(-15, 5), exterr = TRUE, sigdig = 2, log = TRUE,
   alpha = 0.05, ...)
 
-\method{peakfit}{PbPb}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{PbPb}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  i2i = FALSE, alpha = 0.05, ...)
+\method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, i2i = FALSE, alpha = 0.05, ...)
 
-\method{peakfit}{KCa}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  i2i = FALSE, alpha = 0.05, ...)
+\method{peakfit}{KCa}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, i2i = FALSE, alpha = 0.05, ...)
 
-\method{peakfit}{ReOs}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{ReOs}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{SmNd}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{SmNd}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{RbSr}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{RbSr}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{LuHf}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE,
-  i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{LuHf}(x, k = 1, exterr = TRUE, sigdig = 2,
+  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{ThU}(x, k = 1, exterr = FALSE, sigdig = 2, log = TRUE,
-  i2i = TRUE, alpha = 0.05, detritus = 0, Th02 = c(0, 0),
-  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
+\method{peakfit}{ThU}(x, k = 1, exterr = FALSE, sigdig = 2,
+  log = TRUE, i2i = TRUE, alpha = 0.05, detritus = 0, Th02 = c(0,
+  0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
 
-\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, alpha = 0.05,
-  ...)
+\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE,
+  alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{either an \code{[n x 2]} matrix with measurements and

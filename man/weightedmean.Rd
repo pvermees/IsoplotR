@@ -23,11 +23,11 @@ weightedmean(x, ...)
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, ranked = FALSE, ...)
 
-\method{weightedmean}{UPb}(x, random.effects = TRUE, detect.outliers = TRUE,
-  plot = TRUE, from = NA, to = NA, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, type = 4,
-  cutoff.76 = 1100, cutoff.disc = c(-15, 5), alpha = 0.05,
-  exterr = TRUE, ranked = FALSE, common.Pb = 0, ...)
+\method{weightedmean}{UPb}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
+  alpha = 0.05, exterr = TRUE, ranked = FALSE, common.Pb = 0, ...)
 
 \method{weightedmean}{PbPb}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
@@ -35,11 +35,12 @@ weightedmean(x, ...)
   sigdig = 2, alpha = 0.05, exterr = TRUE, common.Pb = 1,
   ranked = FALSE, ...)
 
-\method{weightedmean}{ThU}(x, random.effects = TRUE, detect.outliers = TRUE,
-  plot = TRUE, from = NA, to = NA, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  ranked = FALSE, i2i = TRUE, detritus = 0, Th02 = c(0, 0),
-  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
+\method{weightedmean}{ThU}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, ranked = FALSE, i2i = TRUE,
+  detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0,
+  0, 0), ...)
 
 \method{weightedmean}{ArAr}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
@@ -47,34 +48,35 @@ weightedmean(x, ...)
   sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
   i2i = FALSE, ...)
 
-\method{weightedmean}{KCa}(x, random.effects = TRUE, detect.outliers = TRUE,
-  plot = TRUE, from = NA, to = NA, rect.col = rgb(0, 1, 0, 0.5),
-  outlier.col = rgb(0, 1, 1, 0.5), sigdig = 2, alpha = 0.05,
-  exterr = TRUE, ranked = FALSE, i2i = FALSE, ...)
+\method{weightedmean}{KCa}(x, random.effects = TRUE,
+  detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
+  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
+  i2i = FALSE, ...)
 
 \method{weightedmean}{ReOs}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE, i2i = TRUE,
-  ...)
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
+  i2i = TRUE, ...)
 
 \method{weightedmean}{SmNd}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE, i2i = TRUE,
-  ...)
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
+  i2i = TRUE, ...)
 
 \method{weightedmean}{RbSr}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ranked = FALSE,
-  ...)
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE,
+  ranked = FALSE, ...)
 
 \method{weightedmean}{LuHf}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE, ranked = FALSE,
-  ...)
+  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE,
+  ranked = FALSE, ...)
 
 \method{weightedmean}{UThHe}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,

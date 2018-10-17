@@ -72,6 +72,7 @@
 #'
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
+#' 
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -83,6 +84,22 @@
 #' \code{3}: use the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
+#' @param anchor control parameters to fix the intercept age or common
+#'     Pb composition of the discordia fit. This is a two-element list.
+#'
+#' The first element is a boolean flag indicating whether the
+#' discordia line should be anchored. If this is \code{FALSE}, then
+#' the second item is ignored and both the common Pb composition and
+#' age are estimated.
+#'
+#' If the first element is \code{TRUE} and the second element is
+#' \code{NA}, then the common Pb composition is fixed at the values
+#' stored in \code{settings('iratio','Pb206Pb204')} and
+#' \code{settings('iratio','Pb207Pb204')}.
+#'
+#' If the first element is \code{TRUE} and the second element is a
+#' number, then the discordia line is forced to intersect the
+#' concordia line at an age equal to that number.
 #'
 #' @return
 #'
@@ -228,7 +245,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
             pcex <- 0.25
         }
         if (show.numbers) graphics::text(x0,y0,i)
-        else graphics::points(x0,y0,pch=pch,cex=pcex*par('cex'))
+        else graphics::points(x0,y0,pch=pch,cex=pcex*graphics::par('cex'))
     }
     if (show.age==1){
         fit <- concordia.age(X,wetherill=wetherill,

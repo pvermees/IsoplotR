@@ -11,7 +11,8 @@ ludwig(x, ...)
 
 \method{ludwig}{default}(x, ...)
 
-\method{ludwig}{UPb}(x, exterr = FALSE, alpha = 0.05, model = 1, ...)
+\method{ludwig}{UPb}(x, exterr = FALSE, alpha = 0.05, model = 1,
+  anchor = list(FALSE, NA), ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -40,6 +41,23 @@ uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
 \code{3}: fit a discordia line using a modified maximum likelihood
 algorithm that includes accounts for any overdispersion by adding a
 geological (co)variance term.}
+
+\item{anchor}{control parameters to fix the intercept age or common
+    Pb composition of the discordia fit. This is a two-element list.
+
+The first element is a boolean flag indicating whether the
+discordia line should be anchored. If this is \code{FALSE}, then
+the second item is ignored and both the common Pb composition and
+age are estimated.
+
+If the first element is \code{TRUE} and the second element is
+\code{NA}, then the common Pb composition is fixed at the values
+stored in \code{settings('iratio','Pb206Pb204')} and
+\code{settings('iratio','Pb207Pb204')}.
+
+If the first element is \code{TRUE} and the second element is a
+number, then the discordia line is forced to intersect the
+concordia line at an age equal to that number.}
 }
 \value{
 \describe{
@@ -95,7 +113,6 @@ Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
 Cosmochimica Acta, 58(22), pp.5031-5042.
 }
 \seealso{
-\code{\link{concordia}},
-\code{\link{titterington}},
-\code{\link{isochron}}
+\code{\link{concordia}}, \code{\link{titterington}},
+    \code{\link{isochron}}
 }

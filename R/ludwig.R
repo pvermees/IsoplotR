@@ -88,10 +88,25 @@ ludwig.default <- function(x,...){
 #' \code{3}: fit a discordia line using a modified maximum likelihood
 #' algorithm that includes accounts for any overdispersion by adding a
 #' geological (co)variance term.
-#' @seealso
-#' \code{\link{concordia}},
-#' \code{\link{titterington}},
-#' \code{\link{isochron}}
+#' @param anchor control parameters to fix the intercept age or common
+#'     Pb composition of the discordia fit. This is a two-element list.
+#'
+#' The first element is a boolean flag indicating whether the
+#' discordia line should be anchored. If this is \code{FALSE}, then
+#' the second item is ignored and both the common Pb composition and
+#' age are estimated.
+#'
+#' If the first element is \code{TRUE} and the second element is
+#' \code{NA}, then the common Pb composition is fixed at the values
+#' stored in \code{settings('iratio','Pb206Pb204')} and
+#' \code{settings('iratio','Pb207Pb204')}.
+#'
+#' If the first element is \code{TRUE} and the second element is a
+#' number, then the discordia line is forced to intersect the
+#' concordia line at an age equal to that number.
+#'
+#' @seealso \code{\link{concordia}}, \code{\link{titterington}},
+#'     \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,

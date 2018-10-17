@@ -272,7 +272,7 @@ tfact <- function(alpha,df){
 }
 
 mymtext <- function(text,line=0,...){
-    graphics::mtext(text,line=line,cex=par('cex'),...)
+    graphics::mtext(text,line=line,cex=graphics::par('cex'),...)
 }
 
 # if doall==FALSE, only returns the lower right submatrix
