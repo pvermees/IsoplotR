@@ -25,19 +25,15 @@ common.Pb.correction.PbPb <- function(x,option=1){
 }
 
 common.Pb.isochron.UPb <- function(x){
+    lud <- ludwig(x)
     if (x$format<4){
-        d <- data2york(x,wetherill=FALSE)
-        fit <- york(d)
-        i76 <- fit$a[1]
+        i76 <- lud$par['76i']
+        out <- Pb.correction.without.204(x,i76)
     } else {
-        lud <- ludwig(x)
         i64 <- lud$par['64i']
         i74 <- lud$par['74i']
-    }
-    if (x$format < 4)
-        out <- Pb.correction.without.204(x,i76)
-    else
         out <- Pb.correction.with.204(x,i64,i74)
+    }
     out
 }
 common.Pb.isochron.PbPb <- function(x){
@@ -131,7 +127,8 @@ Pb.correction.with.204 <- function(x,i64,i74){
     U238U235 <- settings('iratio','U238U235')[1]
     if (x$format == 4){
         out$x <- matrix(0,ns,5)
-        colnames(out$x) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
+        colnames(out$x) <-
+            c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
         out$x[,'Pb207U235'] <- x$x[,'Pb207U235'] - i74*x$x[,'Pb204U238']*U238U235
         out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
         out$x[,'Pb206U238'] <- x$x[,'Pb206U238'] - i64*x$x[,'Pb204U238']
@@ -140,7 +137,8 @@ Pb.correction.with.204 <- function(x,i64,i74){
         out$format <- 1
     } else if (x$format == 5){
         out$x <- matrix(0,ns,5)
-        colnames(out$x) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rhoXY')
+        colnames(out$x) <-
+            c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rhoXY')
         out$x[,'U238Pb206'] <- x$x[,'U238Pb206']/(1 - i64*x$x[,'Pb204Pb206'])
         out$x[,'errU238Pb206'] <- x$x[,'errU238Pb206']
         out$x[,'Pb207Pb206'] <-

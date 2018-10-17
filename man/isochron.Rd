@@ -19,8 +19,8 @@ isochron(x, ...)
 \method{isochron}{default}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, title = TRUE, model = 1,
-  xlab = "x", ylab = "y", ...)
+  line.col = "black", lwd = 1, plot = TRUE, title = TRUE,
+  model = 1, xlab = "x", ylab = "y", ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
@@ -31,8 +31,8 @@ isochron(x, ...)
 \method{isochron}{KCa}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
+  model = 1, ...)
 
 \method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
@@ -43,32 +43,32 @@ isochron(x, ...)
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
+  model = 1, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
+  model = 1, ...)
 
 \method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
+  model = 1, ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
+  model = 1, ...)
 
-\method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE, model = 1,
-  ...)
+\method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA,
+  alpha = 0.05, sigdig = 2, show.numbers = FALSE, levels = NA,
+  clabel = "", ellipse.col = c("#00FF0080", "#FF000080"),
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, ...)
 
 \method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ci.col = "gray80",

@@ -8,9 +8,9 @@
 \usage{
 mds(x, ...)
 
-\method{mds}{default}(x, classical = FALSE, plot = TRUE, shepard = FALSE,
-  nnlines = FALSE, pos = NULL, col = "black", bg = "white", xlab = "",
-  ylab = "", ...)
+\method{mds}{default}(x, classical = FALSE, plot = TRUE,
+  shepard = FALSE, nnlines = FALSE, pos = NULL, col = "black",
+  bg = "white", xlab = "", ylab = "", ...)
 
 \method{mds}{detritals}(x, classical = FALSE, plot = TRUE,
   shepard = FALSE, nnlines = FALSE, pos = NULL, col = "black",

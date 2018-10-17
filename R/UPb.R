@@ -222,11 +222,11 @@ age_to_wetherill_ratios <- function(tt,st=0,exterr=FALSE){
     out
 }
 age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE){
-    if (tt<=0) tt <- 1e-10
     out <- list()
     labels <- c('U238Pb206','Pb207Pb206')
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
+    tt <- check.zero.UPb(tt)
     R <- iratio('U238U235')[1]
     Pb207U235 <- exp(l5*tt)-1
     Pb206U238 <- exp(l8*tt)-1
@@ -271,6 +271,7 @@ age_to_Pb206U238_ratio <- function(tt,st=0){
 }
 age_to_U238Pb206_ratio <- function(tt,st=0){
     l8 <- lambda('U238')[1]
+    tt <- check.zero.UPb(tt)
     R <- 1/(exp(l8*tt)-1)
     J <- -l8*exp(l8*tt)/(exp(l8*tt)-1)^2
     R.err <- abs(J*st)
@@ -281,6 +282,7 @@ age_to_U238Pb206_ratio <- function(tt,st=0){
 age_to_Pb207Pb206_ratio <- function(tt,st=0){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
+    tt <- check.zero.UPb(tt)
     U <- iratio('U238U235')[1]
     R <- (1/U)*(exp(l5*tt)-1)/(exp(l8*tt)-1)
     N <- l5*exp(l5*tt)*(exp(l8*tt)-1) - l8*exp(l8*tt)*(exp(l5*tt)-1)
@@ -290,6 +292,9 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0){
     out <- cbind(R,R.err)
     colnames(out) <- c('76','s[76]')
     out
+}
+check.zero.UPb <- function(tt){
+    max(tt,2*.Machine$double.neg.eps/lambda('U238')[1])
 }
 
 get.Pb204U238.ratios <- function(x){

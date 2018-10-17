@@ -18,11 +18,11 @@
 \usage{
 age(x, ...)
 
-\method{age}{default}(x, method = "U238-Pb206", exterr = TRUE, J = c(NA,
-  NA), zeta = c(NA, NA), rhoD = c(NA, NA), ...)
+\method{age}{default}(x, method = "U238-Pb206", exterr = TRUE,
+  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), ...)
 
-\method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE, i = NA,
-  sigdig = NA, common.Pb = 0, ...)
+\method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE,
+  i = NA, sigdig = NA, common.Pb = 0, ...)
 
 \method{age}{PbPb}(x, isochron = TRUE, common.Pb = 1, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -40,8 +40,8 @@ age(x, ...)
   exterr = TRUE, ...)
 
 \method{age}{ThU}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0,
-  1e+06, 0, 0, 0, 0, 0, 0), ...)
+  i = NA, sigdig = NA, detritus = 0, Th02 = c(0, 0),
+  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
 
 \method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)

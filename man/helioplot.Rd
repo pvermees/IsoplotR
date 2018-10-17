@@ -5,9 +5,9 @@
 \title{Visualise U-Th-He data on a logratio plot or ternary diagram}
 \usage{
 helioplot(x, logratio = TRUE, model = 1, show.central.comp = TRUE,
-  show.numbers = FALSE, alpha = 0.05, contour.col = c("white", "red"),
-  levels = NA, clabel = "", ellipse.col = c("#00FF0080", "#0000FF80"),
-  sigdig = 2, xlim = NA, ylim = NA, fact = NA, ...)
+  show.numbers = FALSE, alpha = 0.05, contour.col = c("white",
+  "red"), levels = NA, clabel = "", ellipse.col = c("#00FF0080",
+  "#0000FF80"), sigdig = 2, xlim = NA, ylim = NA, fact = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe}}

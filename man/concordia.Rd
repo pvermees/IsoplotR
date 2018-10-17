@@ -6,9 +6,10 @@
 \usage{
 concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), concordia.col = "darksalmon",
-  exterr = FALSE, show.age = 0, sigdig = 2, common.Pb = 0,
-  ticks = NULL, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"),
+  concordia.col = "darksalmon", exterr = FALSE, show.age = 0,
+  sigdig = 2, common.Pb = 0, ticks = NULL, anchor = list(FALSE,
+  NA), ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -78,6 +79,23 @@ Pb-composition
 \item{ticks}{an optional vector of age ticks to be added to the
 concordia line to override \code{IsoplotR}'s default spacing,
 which is based on \code{R}'s \code{pretty} function.}
+
+\item{anchor}{control parameters to fix the intercept age or common
+    Pb composition of the discordia fit. This is a two-element list.
+
+The first element is a boolean flag indicating whether the
+discordia line should be anchored. If this is \code{FALSE}, then
+the second item is ignored and both the common Pb composition and
+age are estimated.
+
+If the first element is \code{TRUE} and the second element is
+\code{NA}, then the common Pb composition is fixed at the values
+stored in \code{settings('iratio','Pb206Pb204')} and
+\code{settings('iratio','Pb207Pb204')}.
+
+If the first element is \code{TRUE} and the second element is a
+number, then the discordia line is forced to intersect the
+concordia line at an age equal to that number.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }
@@ -208,7 +226,7 @@ concordia(examples$UPb,show.age=2)
 dev.new()
 concordia(examples$UPb,wetherill=FALSE,
           xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
-          ticks=249:254,exterr=TRUE)#' data(examples)
+          ticks=249:254,exterr=TRUE)
 
 }
 \references{

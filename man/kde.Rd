@@ -19,69 +19,79 @@
 \usage{
 kde(x, ...)
 
-\method{kde}{default}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
-  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, ...)
+\method{kde}{default}(x, from = NA, to = NA, bw = NA,
+  adaptive = TRUE, log = FALSE, n = 512, plot = TRUE, pch = NA,
+  xlab = "age [Ma]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
+  hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
+  binwidth = NA, ...)
 
 \method{kde}{UPb}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, type = 4,
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, type = 4,
   cutoff.76 = 1100, cutoff.disc = c(-15, 5), common.Pb = 0, ...)
 
-\method{kde}{detritals}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
-  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, ncol = NA,
-  samebandwidth = TRUE, normalise = TRUE, ...)
+\method{kde}{detritals}(x, from = NA, to = NA, bw = NA,
+  adaptive = TRUE, log = FALSE, n = 512, plot = TRUE, pch = NA,
+  xlab = "age [Ma]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
+  hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
+  binwidth = NA, ncol = NA, samebandwidth = TRUE, normalise = TRUE,
+  ...)
 
 \method{kde}{PbPb}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, common.Pb = 1, ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, common.Pb = 1,
+  ...)
 
 \method{kde}{ArAr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE, ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE,
+  ...)
 
 \method{kde}{KCa}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE, ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE,
+  ...)
 
 \method{kde}{ThU}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [ka]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE,
-  detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0,
-  0), ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, i2i = FALSE,
+  detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0,
+  0, 0), ...)
 
 \method{kde}{ReOs}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE, ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE,
+  ...)
 
 \method{kde}{SmNd}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE, ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE,
+  ...)
 
 \method{kde}{RbSr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE, ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE,
+  ...)
 
 \method{kde}{LuHf}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE, ...)
+  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0,
+  0.2), show.hist = TRUE, bty = "n", binwidth = NA, i2i = TRUE,
+  ...)
 
-\method{kde}{UThHe}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
-  log = FALSE, n = 512, plot = TRUE, pch = NA, xlab = "age [Ma]",
-  ylab = "", kde.col = rgb(1, 0, 1, 0.6), hist.col = rgb(0, 1, 0, 0.2),
-  show.hist = TRUE, bty = "n", binwidth = NA, ...)
+\method{kde}{UThHe}(x, from = NA, to = NA, bw = NA,
+  adaptive = TRUE, log = FALSE, n = 512, plot = TRUE, pch = NA,
+  xlab = "age [Ma]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
+  hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
+  binwidth = NA, ...)
 
 \method{kde}{fissiontracks}(x, from = NA, to = NA, bw = NA,
   adaptive = TRUE, log = FALSE, n = 512, plot = TRUE, pch = NA,

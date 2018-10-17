@@ -5,7 +5,6 @@
 \alias{IsoplotR}
 \alias{_PACKAGE}
 \alias{IsoplotR-package}
-\alias{IsoplotR-package}
 \title{library(IsoplotR)}
 \description{
 A list of documented functions may be viewed by typing

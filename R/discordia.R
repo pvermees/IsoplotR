@@ -2,8 +2,8 @@
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,
                                           exterr=FALSE,alpha=0.05,
-                                          model=1){
-    fit <- ludwig(x,exterr=exterr,model=model)
+                                          model=1,anchor=list(FALSE,NA)){
+    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
     out <- list()
     out$model <- model
     out$mswd <- fit$mswd
@@ -249,7 +249,7 @@ discordia.line <- function(fit,wetherill){
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
-        tl <- fit$x['t[l]']
+        tl <- check.zero.UPb(fit$x['t[l]'])
         U85 <- settings('iratio','U238U235')[1]
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=100)
         y <- yl + (y0-yl)*(1-x/xl)
@@ -288,10 +288,10 @@ discordia.line <- function(fit,wetherill){
 discordia.title <- function(fit,wetherill,sigdig=2,...){
     lower.age <- roundit(fit$x[1],fit$err[,1],sigdig=sigdig)
     if (fit$model==1 && fit$mswd>1){
-        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='~n~')')
+        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
     } else {
-        args1 <- quote(a%+-%b~'|'~c~u~'(n='~n~')')
+        args1 <- quote(a%+-%b~'|'~c~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~u)
     }
     list1 <- list(a=lower.age[1],b=lower.age[2],

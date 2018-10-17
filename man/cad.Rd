@@ -19,15 +19,15 @@
 \usage{
 cad(x, ...)
 
-\method{cad}{default}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  colmap = "heat.colors", col = "black", ...)
+\method{cad}{default}(x, pch = NA, verticals = TRUE,
+  xlab = "age [Ma]", colmap = "heat.colors", col = "black", ...)
 
-\method{cad}{detritals}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  colmap = "heat.colors", ...)
+\method{cad}{detritals}(x, pch = NA, verticals = TRUE,
+  xlab = "age [Ma]", colmap = "heat.colors", ...)
 
 \method{cad}{UPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
-  common.Pb = 0, ...)
+  col = "black", type = 4, cutoff.76 = 1100, cutoff.disc = c(-15,
+  5), common.Pb = 0, ...)
 
 \method{cad}{PbPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", common.Pb = 1, ...)

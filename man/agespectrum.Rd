@@ -11,8 +11,8 @@ agespectrum(x, ...)
 \method{agespectrum}{default}(x, alpha = 0.05, plateau = TRUE,
   random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),
   non.plateau.col = rgb(0, 1, 1, 0.5), sigdig = 2, line.col = "red",
-  lwd = 2, title = TRUE, show.ci = TRUE, xlab = "cumulative fraction",
-  ylab = "age [Ma]", ...)
+  lwd = 2, title = TRUE, show.ci = TRUE,
+  xlab = "cumulative fraction", ylab = "age [Ma]", ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
   random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),

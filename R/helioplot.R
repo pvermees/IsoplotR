@@ -277,13 +277,13 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
 helioplot_title <- function(fit,sigdig=2,...){
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
     expr <- quote('central age =')
-    args1 <- quote(~a%+-%b~'|'~c~'Ma'~'(n='~n~')')
+    args1 <- quote(~a%+-%b~'|'~c~'Ma'~'(n='*n*')')
     list1 <- list(a=rounded.age[1],
                   b=rounded.age[2],
                   c=rounded.age[3],
                   n=fit$n)
     if (fit$model==1 && fit$mswd>1){
-        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'Ma'~'(n='~n~')')
+        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'Ma'~'(n='*n*')')
         list1$d <- rounded.age[4]
         line2 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
