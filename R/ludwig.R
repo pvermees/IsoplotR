@@ -98,8 +98,8 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
                        anchor=list(FALSE,NA),...){
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
-    out$cov <- fisher.lud(x,fit=fit)
-    mswd <- mswd.lud(fit$par,x=x,w=fit$w)
+    out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+    mswd <- mswd.lud(fit$par,x=x)
     out <- c(out,mswd)
     if (model==3){
         out$w <- c(fit$w,
@@ -114,10 +114,10 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
     out
 }
 
-mswd.lud <- function(ta0b0,x,w=0){
+mswd.lud <- function(ta0b0,x){
     ns <- length(x)
     # Mistake in Ludwig (1998)? Multiply the following by 2?
-    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=w,LL=FALSE)
+    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE)
     out <- list()
     if (x$format<4) out$df <- ns-2
     else out$df <- 2*ns-2
@@ -156,7 +156,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         a0 <- settings('iratio','Pb206Pb204')[1]
         b0 <- settings('iratio','Pb207Pb204')[1]
         xyfit <- stats::lm(I(xy[,'Y']-a0/b0) ~ 0 + xy[,'X'])
-        intercept <- a0/b0
+        intercept <- b0/a0
         slope <- xyfit$coef
         ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE)$x
     } else if (is.numeric(anchor[[2]])){
@@ -210,8 +210,7 @@ get_ludwig_disp <- function(ta0b0,x,interval){
                     x=x,ta0b0=ta0b0,maximum=TRUE)$maximum
 }
 get_lud_wrange <- function(ta0b0,x){
-    # mswd <- mswd.lud(ta0b0,x=x,w=0)$mswd
-    c(0,1) # placeholder
+    c(0,1)
 }    
 
 LL.lud.UPb.disp <- function(w,x,ta0b0){
@@ -270,7 +269,8 @@ fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
 fisher.lud.default <- function(x,...){
     stop( "No default method available (yet)." )
 }
-fisher.lud.UPb <- function(x,fit,exterr=TRUE,...){
+fisher.lud.UPb <- function(x,fit,exterr=TRUE,
+                           anchor=list(FALSE,NA),...){
     ns <- length(x)
     if (x$format<4){
         fish <- fisher_lud_2D(x,fit)
@@ -285,7 +285,25 @@ fisher.lud.UPb <- function(x,fit,exterr=TRUE,...){
         CC <- fish[(ns+1):(ns+3),1:ns]
         DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
     }
-    blockinverse(AA,BB,CC,DD)
+    anchorfish(AA,BB,CC,DD,anchor=anchor)
+}
+anchorfish <- function(AA,BB,CC,DD,anchor){
+    npar <- nrow(DD)
+    out <- matrix(0,npar,npar)
+    if (anchor[[1]] && is.numeric(anchor[[2]])){
+        bb <- subset(BB,select=-1)
+        cc <- t(subset(t(CC),select=-1))
+        dd <- DD[-1,-1]
+        out[2:npar,2:npar] <- blockinverse(AA,bb,cc,dd)
+    } else if (anchor[[1]]){
+        bb <- subset(BB,select=1)
+        cc <- t(subset(t(CC),select=1))
+        dd <- DD[1,1]
+        out[1,1] <- blockinverse(AA,bb,cc,dd)
+    } else {
+        out <- blockinverse(AA,BB,CC,DD)
+    }
+    out
 }
 fisher_lud_2D <- function(x,fit){
     tt <- fit$par[1]
@@ -316,20 +334,21 @@ fisher_lud_2D <- function(x,fit){
     out <- matrix(0,ns+2,ns+2)
     out[1:ns,1:ns] <- # d2S/dx2
         2*(d$omega11 + d$omega21*B + d$omega12*B + d$omega22*B^2)
-    out[ns+1,1:ns] <- 2*C*dBdt # d2S/dxdt
-    out[ns+2,1:ns] <- # d2S/dxda0
-        2*(C*dBda0 + t(ones)%*%d$omega21 + t(ones)%*%d$omega22*B) 
-    out[1:ns,ns+1] <- 2*C*dBdt # d2S/dtdx
-    out[1:ns,ns+2] <- t(out[ns+2,1:ns]) # d2S/da0dx
-    out[ns+1,ns+1] <- # d2S/dt2
-        D*d2Bdt2 + 2*t(d$x)%*%d$omega22%*%d$x*(dBdt^2)
+
+    out[ns+2,1:ns] <-   # d2S/dxda0
+        2*(C*dBda0 + t(ones)%*%d$omega21 + t(ones)%*%d$omega22*B)
     out[ns+2,ns+2] <- # d2S/da02
         2*(t(ones)%*%d$omega22%*%ones +
            t(ones)%*%d$omega22%*%d$x*dBda0 +
            t(d$x)%*%d$omega22%*%ones*dBda0 +
            t(d$x)%*%d$omega22%*%d$x*(dBda0^2))
+    out[ns+1,1:ns] <- 2*C*dBdt # d2S/dxdt
+    out[ns+1,ns+1] <- # d2S/dt2
+        D*d2Bdt2 + 2*t(d$x)%*%d$omega22%*%d$x*(dBdt^2)
     out[ns+1,ns+2] <- # d2S/dt0da0
         D*d2Bdtda0 + dDda0*dBdt
+    out[1:ns,ns+1] <- t(out[ns+1,1:ns]) # d2S/dtdx
+    out[1:ns,ns+2] <- t(out[ns+2,1:ns]) # d2S/da0dx
     out[ns+2,ns+1] <- out[ns+1,ns+2]
     out/2
 }
@@ -439,8 +458,9 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     for (i in 1:ns){
         XY <- tera.wasserburg(x,i,exterr=FALSE)
         X[i] <- XY$x['U238Pb206']
-        Y[i] <- XY$x['Pb207Pb206'] + (a0*w)^2
+        Y[i] <- XY$x['Pb207Pb206']
         E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov
+        E[2*i,2*i] <- E[2*i,2*i] + (a0*w)^2
         J[i,2*i-1] <- 1 # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
         if (exterr){
@@ -533,8 +553,8 @@ get.Ew <- function(w,Z,a0,b0,U){
     J[2,2] <- Z
     J[2,3] <- b0
     E <- matrix(0,4,4)
-    E[1,1] <- w^2
-    E[2,2] <- w^2
+    E[1,1] <- (a0*w)^2
+    E[2,2] <- (b0*w)^2
     J %*% E %*% t(J)
 }
 
