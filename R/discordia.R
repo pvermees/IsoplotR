@@ -249,7 +249,7 @@ discordia.line <- function(fit,wetherill){
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
-        tl <- fit$x['t[l]']
+        tl <- check.zero.UPb(fit$x['t[l]'])
         U85 <- settings('iratio','U238U235')[1]
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=100)
         y <- yl + (y0-yl)*(1-x/xl)
