@@ -137,15 +137,15 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
     if (x$format<4 && anchored){
-        out$df <- 2*ns-1
+        out$df <- ns-1
     } else if (x$format<4) {
-        out$df <- 2*ns-2
+        out$df <- ns-2
     } else if (anchored && tanchored){
-        out$df <- 3*ns-2
+        out$df <- ns-2
     } else if (anchored){
-        out$df <- 3*ns-1
+        out$df <- ns-1
     } else {
-        out$df <- 3*ns-3
+        out$df <- ns-3
     }
     out$mswd <- as.vector(SS/out$df)
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
