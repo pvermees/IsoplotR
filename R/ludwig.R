@@ -114,7 +114,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
     out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
-    mswd <- mswd.lud(fit$par,x=x)
+    mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
     out <- c(out,mswd)
     if (model==3){
         out$w <- c(fit$w,
@@ -129,13 +129,24 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
     out
 }
 
-mswd.lud <- function(ta0b0,x){
+mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     ns <- length(x)
     # Mistake in Ludwig (1998)? Multiply the following by 2?
     SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE)
     out <- list()
-    if (x$format<4) out$df <- ns-2
-    else out$df <- 2*ns-2
+    anchored <- anchor[[1]]
+    tanchored <- is.numeric(anchor[[2]])
+    if (x$format<4 && anchored){
+        out$df <- 2*ns-1
+    } else if (x$format<4) {
+        out$df <- 2*ns-2
+    } else if (anchored && tanchored){
+        out$df <- 3*ns-2
+    } else if (anchored){
+        out$df <- 3*ns-1
+    } else {
+        out$df <- 3*ns-3
+    }
     out$mswd <- as.vector(SS/out$df)
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out
