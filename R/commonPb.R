@@ -65,18 +65,20 @@ common.Pb.stacey.kramers.PbPb <- function(x){
         i64 <- i6474[1]
         i74 <- i6474[2]
         out <- Pb.correction.for.PbPb(x,i64,i74)
-        tt <- PbPb.age(out)[,1]        
+        tt <- PbPb.age(out)[,1]
     }
     out
 }
 
 common.Pb.nominal.UPb <- function(x){
-    i64 <- settings('iratio','Pb206Pb204')[1]
-    i74 <- settings('iratio','Pb207Pb204')[1]
-    if (x$format < 4)
-        out <- Pb.correction.without.204(x,i74/i64)
-    else
+    if (x$format < 4){
+        i76 <- settings('iratio','Pb207Pb206')[1]
+        out <- Pb.correction.without.204(x,i76)
+    } else {
+        i64 <- settings('iratio','Pb206Pb204')[1]
+        i74 <- settings('iratio','Pb207Pb204')[1]
         out <- Pb.correction.with.204(x,i64,i74)
+    }
     out
 }
 common.Pb.nominal.PbPb <- function(x){
