@@ -141,11 +141,11 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     } else if (x$format<4) {
         out$df <- ns-2
     } else if (anchored && tanchored){
-        out$df <- ns-2
+        out$df <- 2*ns-2
     } else if (anchored){
-        out$df <- ns-1
+        out$df <- 2*ns-1
     } else {
-        out$df <- ns-3
+        out$df <- 2*ns-3
     }
     out$mswd <- as.vector(SS/out$df)
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
