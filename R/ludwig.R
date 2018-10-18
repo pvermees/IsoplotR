@@ -137,15 +137,15 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
     if (x$format<4 && anchored){
-        out$df <- 2*ns-1
+        out$df <- ns-1
     } else if (x$format<4) {
-        out$df <- 2*ns-2
+        out$df <- ns-2
     } else if (anchored && tanchored){
-        out$df <- 3*ns-2
+        out$df <- ns-2
     } else if (anchored){
-        out$df <- 3*ns-1
+        out$df <- ns-1
     } else {
-        out$df <- 3*ns-3
+        out$df <- ns-3
     }
     out$mswd <- as.vector(SS/out$df)
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
@@ -179,10 +179,15 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         slope <- xyfit$coef[2]
         ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE)$x
     } else if (is.na(anchor[[2]])){
-        a0 <- settings('iratio','Pb206Pb204')[1]
-        b0 <- settings('iratio','Pb207Pb204')[1]
-        xyfit <- stats::lm(I(xy[,'Y']-a0/b0) ~ 0 + xy[,'X'])
-        intercept <- b0/a0
+        if (x$format < 4){
+            b0a0 <- settings('iratio','Pb207Pb206')[1]
+        } else {
+            a0 <- settings('iratio','Pb206Pb204')[1]
+            b0 <- settings('iratio','Pb207Pb204')[1]
+            b0a0 <- b0/a0
+        }
+        intercept <- b0a0
+        xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
         slope <- xyfit$coef
         ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE)$x
     } else if (is.numeric(anchor[[2]])){
