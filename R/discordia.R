@@ -253,13 +253,8 @@ discordia.line <- function(fit,wetherill){
         U85 <- settings('iratio','U238U235')[1]
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=100)
         y <- yl + (y0-yl)*(1-x/xl)
-        dyldtl <- (1/U85)*
-            (l5*exp(l5*tl)*(exp(l8*tl)-1)-
-             l8*exp(l8*tl)*(exp(l5*tl)-1))/
-            (exp(l8*tl)-1)^2
-        dxldtl <- -l8*exp(l8*tl)/(exp(l8*tl)-1)^2
-        J1 <- dyldtl - dyldtl*(1-x/xl) - (y0-yl)*dxldtl*x/xl^2
-        J2 <- 1-x/xl
+        J1 <- (1/U85)*l5*exp(l5*tl)*x - l8*exp(l8*tl)*x*y0 # dy/dtl
+        J2 <- 1 + x - exp(l8*tl)*x                         # dy/dy0
         sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
@@ -267,9 +262,9 @@ discordia.line <- function(fit,wetherill){
         yconc <- (1/U85)*(exp(l5*t68)-1)/(exp(l8*t68)-1)
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope
-            overshot <- (t68<fit$x['t[l]'] & ll<yconc)
+            overshot <- (ll<yconc & ll<y0/2)
             ll[overshot] <- yconc[overshot]
-            overshot <- (t68<fit$x['t[l]'] & ul<yconc)
+            overshot <- (ul<yconc & ul<y0/2)
             ul[overshot] <- yconc[overshot]
         } else {    # positive slope
             overshot <- ul>yconc
