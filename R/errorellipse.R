@@ -40,7 +40,7 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
-                        omit=rep(0,nrow(d)),omit.col=rgb(0,1,1,0.5),...){
+                        omit=rep(0,nrow(d)),omit.col=NA,...){
     x <- d[which(omit %ni% 1), ]
     omit <- omit[which(omit %ni% 1)]
     colnames(x) <- c('X','sX','Y','sY','rXY')
@@ -73,12 +73,18 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
         }
         colourbar(z=levels,col=ellipse.col,clabel=clabel)
     } else {
-        if (show.numbers) graphics::text(x0,y0,1:ns,adj=c(0,1))
-        else graphics::points(x0,y0,pch=19,cex=0.5)
+        colour <- rep('black',nrow(x))
+        colour[which(omit==2)] <- omit.col
+        if (show.numbers)
+            graphics::text(x0,y0,1:ns,adj=c(0,1),col=colour)
+        else
+            graphics::points(x0,y0,pch=19,cex=0.5)
         fact <- stats::qnorm(1-alpha/2)
         dx <- fact*x[,'sX']
         dy <- fact*x[,'sY']
-        graphics::arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,length=0.05)
-        graphics::arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,length=0.05)
+        graphics::arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,
+                         length=0.05,col=colour)
+        graphics::arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,
+                         length=0.05,col=colour)
     }
 }
