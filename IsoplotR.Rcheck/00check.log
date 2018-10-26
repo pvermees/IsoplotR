@@ -9,19 +9,6 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-Found the following (possibly) invalid URLs:
-  URL: http://isoplotr.london-geochron.com
-    From: DESCRIPTION
-          man/IsoplotR.Rd
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: isoplotr.london-geochron.com
-  URL: https://doi.org/10.1016/j.gsf.2018.04.001
-    From: inst/CITATION
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: doi.org
-
 The build time stamp is missing.
 * checking package namespace information ... OK
 * checking package dependencies ... OK
@@ -52,8 +39,8 @@ CRAN-pack does not know about
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
 Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING

@@ -294,7 +294,15 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0){
     out
 }
 check.zero.UPb <- function(tt){
-    max(tt,2*.Machine$double.neg.eps/lambda('U238')[1])
+    smallnum <- 2*.Machine$double.neg.eps/lambda('U238')[1]
+    if (length(tt)>1){
+        pos <- which(tt>0)
+        out <- tt
+        out[!pos] <- smallnum
+    } else {
+        out <- max(tt,smallnum)
+    }
+    out
 }
 
 get.Pb204U238.ratios <- function(x){
