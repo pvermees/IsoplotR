@@ -41,7 +41,9 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
                         omit=rep(0,nrow(d)),omit.col=NA,...){
-    x <- d[which(omit %ni% 1), ]
+    keep <- which(omit %ni% 1)
+    x <- d[keep, ]
+    sn <- (1:nrow(d))[keep] # sample numbers
     omit <- omit[which(omit %ni% 1)]
     colnames(x) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
@@ -56,7 +58,7 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
     x0 <- x[,'X']
     y0 <- x[,'Y']
     if (show.ellipses==0){
-        if (show.numbers) graphics::text(x0,y0,1:ns,...)
+        if (show.numbers) graphics::text(x0,y0,sn,...)
         else graphics::points(x0,y0,...)
     } else if (show.ellipses==1){
         ellipse.cols <-
@@ -67,7 +69,7 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                 covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
                 ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
                 graphics::polygon(ell,col=ellipse.cols[i])
-                if (show.numbers) graphics::text(x0[i],y0[i],i)
+                if (show.numbers) graphics::text(x0[i],y0[i],sn[i])
                 else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
             }
         }
@@ -76,7 +78,7 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
         colour <- rep('black',nrow(x))
         colour[which(omit==2)] <- omit.col
         if (show.numbers)
-            graphics::text(x0,y0,1:ns,adj=c(0,1),col=colour)
+            graphics::text(x0,y0,sn,adj=c(0,1),col=colour)
         else
             graphics::points(x0,y0,pch=19,cex=0.5)
         fact <- stats::qnorm(1-alpha/2)
