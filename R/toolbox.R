@@ -201,7 +201,8 @@ LL.norm <- function(x,covmat){
         get.concordia.SS(x,covmat)/2
 }
 
-set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red')){
+set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
+                                omit=rep(0,ns),omit.col=rgb(0,1,1,0.5)){
     if (any(!is.numeric(levels)) | any(is.na(levels))) levels <- NA
     nl <- length(levels)
     out <- NULL
@@ -212,6 +213,7 @@ set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red')){
     } else {
         out <- levels2colours(levels=levels,col=col)[1:ns]
     }
+    out[which(omit==2)] <- omit.col
     out
 }
 
@@ -350,3 +352,5 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     
     return(.opt)
 }
+
+'%ni%' <- Negate('%in%')
