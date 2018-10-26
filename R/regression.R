@@ -1,5 +1,5 @@
 regression <- function(d,model=1,type='york',omit=rep(0,length(x))){
-    D <- d[which(omit %ni% c(1,2)), ]
+    D <- subset(d,omit%ni%c(1,2))
     if (model==1) out <- model1regression(D,type=type)
     else if (model==2) out <- model2regression(D,type=type)
     else if (model==3) out <- model3regression(D,type=type)

@@ -41,10 +41,10 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
                         omit=rep(0,nrow(d)),omit.col=NA,...){
-    keep <- which(omit %ni% 1)
-    x <- d[keep, ]
+    keep <- omit%ni%1
+    x <- subset(d,keep)
     sn <- (1:nrow(d))[keep] # sample numbers
-    omit <- omit[which(omit %ni% 1)]
+    omit <- omit[keep]
     colnames(x) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
     if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])

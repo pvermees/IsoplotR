@@ -14,6 +14,33 @@ length.fissiontracks <- function(x){
     else return(length(x$Ns))
 }
 
+subset.UPb  <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.PbPb <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.RbSr <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.LuHf <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.UThHe <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.fissiontracks <- function(x,subset,...){
+    if (x$format==1){
+        out <- subset_helper(x,subset,...)
+    } else {
+        out <- x
+        out$Ns <- x$Ns[subset]
+        out$A <- x$A[subset]
+        out$U <- x$U[subset]
+        out$sU <- x$sU[subset]
+    }
+    out
+}
+subset_helper <- function(x,subset){
+    out <- x
+    out$x <- x$x[subset,]
+    out
+}
+
 roundit <- function(age,err,sigdig=2){
     if (length(age)==1) dat <- c(age,err)
     else dat <- cbind(age,err)
@@ -354,3 +381,13 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
 }
 
 '%ni%' <- Negate('%in%')
+
+verwijder <- function(x,...){ UseMethod("verwijder",x) }
+verwijder.default <- function(x,omit=rep(0,nrow(x)),...){
+    keep <- 
+    subset(x,subset=keep)
+}
+
+verwijder <- function(x,omit=rep(0,length(x))){
+    
+}

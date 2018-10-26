@@ -218,10 +218,11 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
-                      anchor=list(FALSE,NA),...){
+                      anchor=list(FALSE,NA),omit=rep(0,length(x)),
+                      omit.col=NA,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
-    lims <- prepare.concordia.line(X,tlim=tlim,wetherill=wetherill,...)
+    lims <- prepare.concordia.line(X,tlim=tlim,wetherill=wetherill,omit=omit,...)
     fit <- NULL
     if (show.age>1){
         fit <- concordia.intersection.ludwig(x,wetherill=wetherill,
@@ -306,8 +307,8 @@ plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
     graphics::box()
 }
 # helper function for plot.concordia
-prepare.concordia.line <- function(x,tlim,wetherill=TRUE,...){
-    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
+prepare.concordia.line <- function(x,tlim,wetherill=TRUE,omit=rep(0,length(x)),...){
+    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,omit=omit,...)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
@@ -339,7 +340,9 @@ age_to_concordia_ratios <- function(tt,wetherill=TRUE,exterr=FALSE){
     if (wetherill) return(age_to_wetherill_ratios(tt,exterr=exterr))
     else return(age_to_terawasserburg_ratios(tt,exterr=exterr))
 }
-get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
+get.concordia.limits <- function(X,tlim=NULL,wetherill=FALSE,
+                                 omit=rep(0,length(x)),...){
+    x <- subset(X,subset=omit!=1)
     out <- list()
     args <- list(...)
     xset <- ('xlim' %in% names(args))
