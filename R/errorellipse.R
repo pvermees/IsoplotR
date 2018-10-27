@@ -41,45 +41,51 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
                         omit=rep('k',nrow(d)),omit.col=NA,...){
-    x <- remove(d,omit=omit)
-    colnames(x$xp) <- c('X','sX','Y','sY','rXY')
-    if (any(is.na(xlim))) xlim <- get.limits(x$xp[,'X'],x$xp[,'sX'])
-    if (any(is.na(ylim))) ylim <- get.limits(x$xp[,'Y'],x$xp[,'sY'])
+    keep <- omit%ni%'X'
+    x <- subset(d,subset=keep)
+    sn <- which(keep)
+    ns <- length(sn)
+    colnames(x) <- c('X','sX','Y','sY','rXY')
+    if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
     if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
     if (new.plot & empty) return()
     if (!identical(fit,'none'))
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
-    x0 <- x$xp[,'X']
-    y0 <- x$xp[,'Y']
+    x0 <- x[,'X']
+    y0 <- x[,'Y']
+    if (show.ellipses!=1){
+        colour <- rep('black',ns)
+        if (is.na(omit.col)) colour[which(omit%in%'x')] <- 'grey'
+        else colour[which(omit%in%'x')] <- omit.col
+    }
     if (show.ellipses==0){
-        if (show.numbers) graphics::text(x0,y0,sn,...)
-        else graphics::points(x0,y0,...)
-    } else if (show.ellipses==1){
+        if (show.numbers) graphics::text(x0,y0,sn,col=colour,...)
+        else graphics::points(x0,y0,col=colour,...)
+    } else if (show.ellipses==1){ # error ellipse
         ellipse.cols <-
             set.ellipse.colours(ns=nrow(d),levels=levels,col=ellipse.col,
                                 omit=omit,omit.col=omit.col)
-        for (i in 1:x$nsp){
-            if (!any(is.na(x$xp[i,]))){
-                covmat <- cor2cov2(x$xp[i,'sX'],x$xp[i,'sY'],x$xp[i,'rXY'])
+        for (i in 1:ns){
+            if (!any(is.na(x[i,]))){
+                covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
                 ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
                 graphics::polygon(ell,col=ellipse.cols[i])
-                if (show.numbers) graphics::text(x0[i],y0[i],x$snp[i])
+                if (show.numbers) graphics::text(x0[i],y0[i],sn[i])
                 else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
             }
         }
         colourbar(z=levels,col=ellipse.col,clabel=clabel)
-    } else {
-        colour <- rep('black',x$nsp)
-        colour[which(omit=='x')] <- omit.col
+    } else { # error cross
         if (show.numbers)
-            graphics::text(x0,y0,x$snp,adj=c(0,1),col=colour)
+            graphics::text(x0,y0,sn,adj=c(0,1),col=colour)
         else
-            graphics::points(x0,y0,pch=19,cex=0.5)
+            graphics::points(x0,y0,pch=19,cex=0.5,col=colour)
         fact <- stats::qnorm(1-alpha/2)
-        dx <- fact*x$xp[,'sX']
-        dy <- fact*x$xp[,'sY']
+        dx <- fact*x[,'sX']
+        dy <- fact*x[,'sY']
         graphics::arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,
                          length=0.05,col=colour)
         graphics::arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,

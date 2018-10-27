@@ -1,13 +1,10 @@
-regression <- function(d,model=1,type='york',omit=rep('k',length(x))){
-    D <- subset(d,omit%ni%c('x','X'))
-    if (model==1) out <- model1regression(D,type=type)
-    else if (model==2) out <- model2regression(D,type=type)
-    else if (model==3) out <- model3regression(D,type=type)
+regression <- function(d,model=1,type='york'){
+    if (model==1) out <- model1regression(d,type=type)
+    else if (model==2) out <- model2regression(d,type=type)
+    else if (model==3) out <- model3regression(d,type=type)
     else stop('invalid regression model')
     out$model <- model
-    out$d <- d
-    out$omit <- omit
-    out$n <- nrow(D)
+    out$n <- nrow(d)
     out
 }
 

@@ -777,20 +777,25 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
                           omit=rep('k',length(x))){
     if (hasClass(x,'ThU') && x$format<3){ # 3D regression 
         d <- data2tit(x,osmond=osmond)
-        out <- regression(d,model=model,type="titterington",omit=omit)
     } else if (hasClass(x,'ThU') && x$format>2){ # 2D regression
         d <- data2york(x,type=type)
-        out <- regression(d,model=model,type="york",omit=omit)
     } else if (hasClass(x,'PD')){
         d <- data2york(x,exterr=exterr)
-        out <- regression(d,model=model,omit=omit)
     } else if (hasClass(x,'KCa')){
         d <- data2york(x)
-        out <- regression(d,model=model,omit=omit)
     } else {
         d <- data2york(x,inverse=inverse)
-        out <- regression(d,model=model,omit=omit)
     }
+    d2calc <- subset(d,subset=(omit%ni%c('x','X')))
+    if (hasClass(x,'ThU') && x$format<3){ # 3D regression 
+        out <- regression(d2calc,model=model,type="titterington")
+    } else if (hasClass(x,'ThU') && x$format>2){ # 2D regression
+        out <- regression(d2calc,model=model,type="york")
+    } else {
+        out <- regression(d2calc,model=model)
+    }
+    out$d <- d
+    out$omit <- omit
     out$alpha <- alpha
     if (hasClass(x,'linear')){
         # do nothing
@@ -817,8 +822,10 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
 }
 regression_init <- function(x,model=model,alpha=0.05,
                             omit=rep('k',length(x))){
-    fit <- regression(x,model=model,omit=omit)
-    out <- fit
+    x2calc <- subset(x,subset=(omit%ni%c('x','X')))
+    out <- regression(x2calc,model=model,omit=omit)
+    out$d <- x
+    out$omit <- omit
     out$alpha <- alpha
     out$displabel <- quote('y-dispersion = ')
     out$y0label <- quote('y-intercept = ')
