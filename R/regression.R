@@ -3,6 +3,7 @@ regression <- function(d,model=1,type='york'){
     else if (model==2) out <- model2regression(d,type=type)
     else if (model==3) out <- model3regression(d,type=type)
     else stop('invalid regression model')
+    out$d <- d
     out$model <- model
     out$n <- nrow(d)
     out

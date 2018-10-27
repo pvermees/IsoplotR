@@ -374,8 +374,11 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           inverse=TRUE,ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           omit=rep('k',length(x)),omit.col=NA,...){
-    out <- isochron_init(x,model=model,inverse=inverse,
-                         alpha=alpha,omit=omit)
+    d <- data2york(x,inverse=inverse)
+    tocalc <- omit%ni%c('x','X')
+    d2calc <- subset(d,subset=tocalc)
+    fit <- regression(d2calc,model=model)
+    out <- isochron_init(fit,alpha=alpha)
     a <- out$a['a']
     sa <- out$a['s[a]']
     b <- out$b['b']
@@ -407,7 +410,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                                   x$J[1],x$J[2],exterr=exterr)[2]
     }
     if (plot) {
-        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,
@@ -443,8 +446,11 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           line.col='black',lwd=1,plot=TRUE,
                           exterr=TRUE,model=1,growth=FALSE,
                           omit=rep('k',length(x)),omit.col=NA,...){
-    out <- isochron_init(x,model=model,inverse=inverse,
-                         alpha=alpha,omit=omit)
+    d <- data2york(x,inverse=inverse)
+    tocalc <- omit%ni%c('x','X')
+    d2calc <- subset(d,subset=tocalc)
+    fit <- regression(d2calc,model=model)
+    out <- isochron_init(fit,alpha=alpha)
     if (inverse){
         R76 <- out$a
         out$y0[c('y','s[y]')] <- out$b
@@ -468,7 +474,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                                         exterr=exterr)[2]
     }
     if (plot) {
-        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
@@ -599,7 +605,11 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                            show.numbers=FALSE,ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,model=1,
                            omit=rep('k',length(x)),omit.col='grey',...){
-    out <- isochron_init(x,model=model,alpha=alpha,omit=omit)
+    d <- data2york(x,inverse=inverse)
+    tocalc <- omit%ni%c('x','X')
+    d2calc <- subset(d,subset=tocalc)
+    fit <- regression(d2calc,model=model)
+    out <- isochron_init(fit,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
     out <- ci_isochron(out)
@@ -608,7 +618,7 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$displabel <- quote('He-dispersion = ')
     out$y0label <- quote('He'[o]*' = ')
     if (plot) {
-        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=2*(model!=2),show.numbers=show.numbers,
                     fit=out,ci.col=ci.col,line.col=line.col,lwd=lwd,
                     omit=omit,omit.col=omit.col,...)
@@ -657,8 +667,12 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^234*'U/'^238*'U')
     }
-    out <- isochron_init(x,model=model,alpha=alpha,
-                         osmond=osmond,omit=omit)
+    d <- data2tit(x,osmond=osmond)
+    tocalc <- omit%ni%c('x','X')
+    d2calc <- subset(d,subset=tocalc)
+    fit <- regression(d2calc,model=model,type="titterington")
+    out <- isochron_init(fit,alpha=alpha)
+    out$d <- d
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
     out$cov.ab <- out$cov[ia,ib]
@@ -688,8 +702,12 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
 }
 isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
                             alpha=0.05,omit=rep('k',length(x))){
-    out <- isochron_init(x,model=model,type=type,
-                         alpha=alpha,omit=omit)
+    d <- data2york(x,type=type)
+    tocalc <- omit%ni%c('x','X')
+    d2calc <- subset(d,subset=tocalc)
+    fit <- regression(d2calc,model=model,type="york")
+    out <- isochron_init(fit,alpha=alpha)
+    out$d <- d
     if (type==1){
         Th230U238 <- out$b
         Th230Th232 <- out$a
@@ -727,8 +745,11 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         ci.col='gray80',line.col='black',lwd=1,
                         plot=TRUE,exterr=TRUE,model=1,bratio=1,
                         omit=rep('k',length(x)),...){
-    out <- isochron_init(x,model=model,exterr=exterr,
-                         alpha=alpha,omit=omit)
+    d <- data2york(x)
+    tocalc <- omit%ni%c('x','X')
+    d2calc <- subset(d,subset=tocalc)
+    fit <- regression(d2calc,model=model)
+    out <- isochron_init(fit,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- get.PD.age(out$b['b'],out$b['s[b]'],
                                          nuclide,exterr=exterr,
@@ -760,7 +781,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
     out$y0label <-
         substitute(a*b*c,list(a='(',b=y.lab,c=quote(')'[o]*' = ')))
     if (plot){
-        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
@@ -772,34 +793,9 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
     invisible(out)
 }
 
-isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
-                          osmond=TRUE,type=2,exterr=TRUE,format=1,
-                          omit=rep('k',length(x))){
-    if (hasClass(x,'ThU') && x$format<3){ # 3D regression 
-        d <- data2tit(x,osmond=osmond)
-    } else if (hasClass(x,'ThU') && x$format>2){ # 2D regression
-        d <- data2york(x,type=type)
-    } else if (hasClass(x,'PD')){
-        d <- data2york(x,exterr=exterr)
-    } else if (hasClass(x,'KCa')){
-        d <- data2york(x)
-    } else {
-        d <- data2york(x,inverse=inverse)
-    }
-    d2calc <- subset(d,subset=(omit%ni%c('x','X')))
-    if (hasClass(x,'ThU') && x$format<3){ # 3D regression 
-        out <- regression(d2calc,model=model,type="titterington")
-    } else if (hasClass(x,'ThU') && x$format>2){ # 2D regression
-        out <- regression(d2calc,model=model,type="york")
-    } else {
-        out <- regression(d2calc,model=model)
-    }
-    out$d <- d
-    out$omit <- omit
-    out$alpha <- alpha
-    if (hasClass(x,'linear')){
-        # do nothing
-    } else if (model==1){
+isochron_init <- function(fit,alpha=0.05){
+    out <- fit
+    if (fit$model==1){
         out$age <- rep(NA,4)
         out$y0 <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
@@ -810,13 +806,14 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$y0) <- c('y','s[y]','ci[y]')
     }
-    if (out$model < 3){
-        out$fact <- tfact(out$alpha,out$df)
+    if (fit$model < 3){
+        out$fact <- tfact(alpha,fit$df)
     } else {
-        out$fact <- nfact(out$alpha)
+        out$fact <- nfact(alpha)
         out$w <- c(out$w,NA,NA)
         names(out$w) <- c('s','ll','ul')
     }
+    out$alpha <- alpha
     class(out) <- "isochron"
     out
 }

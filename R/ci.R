@@ -154,8 +154,8 @@ ci_isochron <- function(fit,disp=TRUE){
 }
 profile_LL_isochron_disp <- function(fit){
     cutoff <- stats::qchisq(1-fit$alpha,1)
-    d <- subset(d,fit$omit%ni%c('x','X'))
     w <- fit$w['s']
+    d <- fit$d
     LLmax <- LL.isochron(w,d,type=fit$type)
     if (abs(LL.isochron(0,d,type=fit$type)-LLmax) < cutoff/2){
         wl <- 0
