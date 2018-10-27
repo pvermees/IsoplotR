@@ -104,20 +104,22 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                units='',omit=rep('k',length(x)),
                                omit.col=NA,...){
     ns <- nrow(x)
-    x2calc <- subset(x,subset=(omit%ni%c('x','X')))
-    peaks <- peakfit(x2calc,k=k,sigdig=sigdig)
+    tocalc <- omit%ni%c('x','X')
+    toplot <- omit%ni%'X'
+    x2calc <- subset(x,subset=tocalc)
+    x2plot <- subset(x,subset=toplot)
+    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
-    keep <- (omit%ni%'X')
-    x2plot <- subset(x,subset=keep)
     X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
     bg <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
                               omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
-    tcol[omit%in%c('x','X')] <- 'grey'
+    tcol[!tocalc] <- 'grey'
     radial.plot(X,show.numbers=show.numbers,pch=pch,
-                levels=levels[keep],clabel=clabel,
-                markers=markers,bg=bg[keep],col=tcol[keep],
-                sn=(1:ns)[keep],...)
+                levels=levels[toplot],clabel=clabel,
+                markers=markers,bg=bg[toplot],col=tcol[toplot],
+                sn=(1:ns)[toplot],...)
+    colourbar(z=levels[tocalc],col=bg[tocalc],clabel=clabel)
     if (title)
         title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
                            units=units,n=nrow(x2calc)))
@@ -138,20 +140,23 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      alpha=0.05,omit=rep('k',length(x)),
                                      omit.col=NA,...){
     ns <- length(x)
-    x2calc <- subset(x,subset=(omit%ni%c('x','X')))
+    tocalc <- omit%ni%c('x','X')
+    toplot <- omit%ni%'X'
+    x2calc <- subset(x,subset=tocalc)
+    x2plot <- subset(x,subset=toplot)
     peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
-    keep <- omit%ni%'X'
-    x2plot <- subset(x,subset=keep)
     X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
     bg <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
                               omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
-    tcol[omit%in%c('x','X')] <- omit.col
+    tcol[!tocalc] <- 'grey'
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
                 show.numbers=show.numbers,pch=pch,
-                levels=levels[keep],clabel=clabel,
-                bg=bg[keep],col=tcol[keep],sn=(1:ns)[keep],...)
+                levels=levels[toplot],clabel=clabel,
+                bg=bg[toplot],col=tcol[toplot],
+                sn=(1:ns)[toplot],...)
+    colourbar(z=levels[tocalc],col=bg[tocalc],clabel=clabel)
     if (title)
         title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
                            units='Ma',n=length(x2calc)))
@@ -424,7 +429,6 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
     plot_radial_axes(x)
     plot_radial_points(x,show.numbers=show.numbers,
                        pch=pch,bg=bg,col=col,sn=sn,...)
-    colourbar(z=levels,col=bg,clabel=clabel)
 }
 
 plot_radial_points <- function(x,show.numbers=FALSE,bg='yellow',pch=21,
