@@ -222,11 +222,13 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       omit.col=NA,...){
     if (common.Pb<1) X <- x
     else X <- common.Pb.correction(x,option=common.Pb)
-    X2plot <- subset(X,subset=(omit%ni%'X'))
+    toplot <- omit%ni%'X'
+    X2plot <- subset(X,subset=toplot)
     lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
     if (show.age>1){
-        x2calc <- subset(x,subset=(omit%ni%c('x','X')))
+        tocalc <- omit%ni%c('x','X')
+        x2calc <- subset(x,subset=tocalc)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)

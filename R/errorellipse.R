@@ -41,56 +41,61 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
                         omit=rep('k',nrow(d)),omit.col=NA,...){
-    keep <- omit%ni%'X'
-    x <- subset(d,subset=keep)
-    sn <- which(keep)
-    ns <- length(sn)
-    colnames(x) <- c('X','sX','Y','sY','rXY')
-    if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
-    if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
+    toplot <- omit%ni%'X'
+    tocalc <- omit%ni%c('x','X')
+    ns <- nrow(d)
+    sn <- 1:ns
+    colnames(d) <- c('X','sX','Y','sY','rXY')
+    if (any(is.na(xlim))) xlim <- get.limits(d[toplot,'X'],d[toplot,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(d[toplot,'Y'],d[toplot,'sY'])
     if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
     if (new.plot & empty) return()
     if (!identical(fit,'none'))
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
-    x0 <- x[,'X']
-    y0 <- x[,'Y']
     if (show.ellipses!=1){
         colour <- rep('black',ns)
-        if (is.na(omit.col)) colour[which(omit%in%'x')] <- 'grey'
-        else colour[which(omit%in%'x')] <- omit.col
+        if (is.na(omit.col)) colour[!tocalc] <- 'grey'
+        else colour[!tocalc] <- omit.col
     }
     if (show.ellipses==0){
-        if (show.numbers) graphics::text(x0,y0,sn,col=colour,...)
-        else graphics::points(x0,y0,col=colour,...)
+        if (show.numbers)
+            graphics::text(d[toplot,'X'],d[toplot,'Y'],
+                           sn[toplot],col=colour[toplot],...)
+        else graphics::points(d[toplot,'X'],d[toplot,'Y'],
+                              col=colour[toplot],...)
     } else if (show.ellipses==1){ # error ellipse
         ellipse.cols <-
-            set.ellipse.colours(ns=ns,levels=levels[keep],
-                                col=ellipse.col,
-                                omit=omit[keep],omit.col=omit.col)
-        for (i in 1:ns){
-            if (!any(is.na(x[i,]))){
-                covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
-                ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
+            set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
+                                omit=omit,omit.col=omit.col)
+        for (i in sn[toplot]){
+            if (!any(is.na(d[i,]))){
+                covmat <- cor2cov2(d[i,'sX'],d[i,'sY'],d[i,'rXY'])
+                ell <- ellipse(d[i,'X'],d[i,'Y'],covmat,alpha=alpha)
                 graphics::polygon(ell,col=ellipse.cols[i])
-                if (show.numbers) graphics::text(x0[i],y0[i],sn[i])
-                else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
+                if (show.numbers) graphics::text(d[i,'X'],d[i,'Y'],i)
+                else graphics::points(d[i,'X'],d[i,'Y'],pch=19,cex=0.25)
             }
         }
-        colourbar(z=levels[omit%ni%c('x','X')],
-                  col=ellipse.col,clabel=clabel)
+        colourbar(z=levels[tocalc],col=ellipse.col,clabel=clabel)
     } else { # error cross
         if (show.numbers)
-            graphics::text(x0,y0,sn,adj=c(0,1),col=colour)
+            graphics::text(d[toplot,'X'],d[toplot,'Y'],
+                           sn[toplot],adj=c(0,1),col=colour)
         else
-            graphics::points(x0,y0,pch=19,cex=0.5,col=colour)
+            graphics::points(d[toplot,'X'],d[toplot,'Y'],
+                             pch=19,cex=0.5,col=colour)
         fact <- stats::qnorm(1-alpha/2)
-        dx <- fact*x[,'sX']
-        dy <- fact*x[,'sY']
-        graphics::arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,
+        dx <- fact*d[toplot,'sX']
+        dy <- fact*d[toplot,'sY']
+        graphics::arrows(d[toplot,'X'],d[toplot,'Y']-dy,
+                         d[toplot,'X'],d[toplot,'Y']+dy,
+                         code=3,angle=90,
                          length=0.05,col=colour)
-        graphics::arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,
+        graphics::arrows(d[toplot,'X']-dx,d[toplot,'Y'],
+                         d[toplot,'X']+dx,d[toplot,'Y'],
+                         code=3,angle=90,
                          length=0.05,col=colour)
     }
 }
