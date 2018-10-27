@@ -183,10 +183,14 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              plot=TRUE,title=TRUE,model=1,xlab='x',
                              ylab='y',omit=rep('k',length(x)),
                              omit.col=NA,...){
-    fit <- regression_init(x,model=model,alpha=alpha,omit=omit)
+    d <- data2york(x)
+    tocalc <- omit%ni%c('x','X')
+    d2calc <- subset(d,subset=tocalc)
+    fit <- regression(d2calc,model=model)
+    fit <- regression_init(fit,alpha=alpha)
     fit <- ci_isochron(fit)
     if (plot){
-        scatterplot(fit$d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=fit,
@@ -817,16 +821,11 @@ isochron_init <- function(fit,alpha=0.05){
     class(out) <- "isochron"
     out
 }
-regression_init <- function(x,model=model,alpha=0.05,
-                            omit=rep('k',length(x))){
-    x2calc <- subset(x,subset=(omit%ni%c('x','X')))
-    out <- regression(x2calc,model=model,omit=omit)
-    out$d <- x
-    out$omit <- omit
-    out$alpha <- alpha
+regression_init <- function(fit,alpha=0.05){
+    out <- fit
     out$displabel <- quote('y-dispersion = ')
     out$y0label <- quote('y-intercept = ')
-    if (model==1){
+    if (fit$model==1){
         out$a <- rep(NA,4)
         out$b <- rep(NA,4)
         names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
@@ -837,21 +836,22 @@ regression_init <- function(x,model=model,alpha=0.05,
         names(out$a) <- c('a','s[a]','ci[a]')
         names(out$b) <- c('b','s[b]','ci[b]')
     }
-    if (out$model < 3){
-        out$fact <- tfact(out$alpha,out$df)
+    if (fit$model < 3){
+        out$fact <- tfact(alpha,fit$df)
     } else {
-        out$fact <- nfact(out$alpha)
-        out$w <- c(out$w,NA,NA)
+        out$fact <- nfact(alpha)
+        out$w <- c(fit$w,NA,NA)
         names(out$w) <- c('s','ll','ul')
     }
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
     out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
-    out$a['ci[a]'] <- out$fact*out$a['s[a]']
-    out$b['ci[b]'] <- out$fact*out$b['s[b]']
+    out$a['ci[a]'] <- out$fact*fit$a['s[a]']
+    out$b['ci[b]'] <- out$fact*fit$b['s[b]']
     if (out$model==1){
-        out$a['disp[a]'] <- out$fact*sqrt(out$mswd)*out$a['s[a]']
-        out$b['disp[b]'] <- out$fact*sqrt(out$mswd)*out$b['s[b]']
+        out$a['disp[a]'] <- out$fact*sqrt(fit$mswd)*fit$a['s[a]']
+        out$b['disp[b]'] <- out$fact*sqrt(fit$mswd)*fit$b['s[b]']
     }
+    out$alpha <- alpha
     class(out) <- "isochron"
     out
 }
@@ -860,15 +860,6 @@ get.limits <- function(x,sx){
     minx <- min(x-3*sx,na.rm=TRUE)
     maxx <- max(x+3*sx,na.rm=TRUE)
     c(minx,maxx)
-}
-
-plot_isochron_line <- function(fit,x,ci.col='gray80',...){
-    y <- fit$a[1]+fit$b[1]*x
-    e <- fit$fact*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
-    cix <- c(x,rev(x))
-    ciy <- c(y+e,rev(y-e))
-    graphics::polygon(cix,ciy,col=ci.col,border=NA)
-    graphics::lines(x,y,...)
 }
 
 plot_PbPb_evolution <- function(tt,inverse=TRUE){

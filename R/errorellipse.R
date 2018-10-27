@@ -94,3 +94,12 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                          length=0.05,col=colour)
     }
 }
+
+plot_isochron_line <- function(fit,x,ci.col='gray80',...){
+    y <- fit$a[1]+fit$b[1]*x
+    e <- fit$fact*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
+    cix <- c(x,rev(x))
+    ciy <- c(y+e,rev(y-e))
+    graphics::polygon(cix,ciy,col=ci.col,border=NA)
+    graphics::lines(x,y,...)
+}
