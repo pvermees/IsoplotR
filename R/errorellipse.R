@@ -66,8 +66,9 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
         else graphics::points(x0,y0,col=colour,...)
     } else if (show.ellipses==1){ # error ellipse
         ellipse.cols <-
-            set.ellipse.colours(ns=nrow(d),levels=levels,col=ellipse.col,
-                                omit=omit,omit.col=omit.col)
+            set.ellipse.colours(ns=ns,levels=levels[keep],
+                                col=ellipse.col,
+                                omit=omit[keep],omit.col=omit.col)
         for (i in 1:ns){
             if (!any(is.na(x[i,]))){
                 covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
@@ -77,7 +78,8 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                 else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
             }
         }
-        colourbar(z=levels,col=ellipse.col,clabel=clabel)
+        colourbar(z=levels[omit%ni%c('x','X')],
+                  col=ellipse.col,clabel=clabel)
     } else { # error cross
         if (show.numbers)
             graphics::text(x0,y0,sn,adj=c(0,1),col=colour)

@@ -230,23 +230,30 @@ LL.norm <- function(x,covmat){
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
                                 omit=rep('k',ns),omit.col=NA){
-    if (any(!is.numeric(levels)) | any(is.na(levels))) levels <- NA
+    keep <- omit%ni%c('x','X')
+    levels[!keep] <- NA
+    levels[!is.numeric(levels)] <- NA
     nl <- length(levels)
     out <- NULL
-    if (all(is.na(levels)) | (max(levels)==min(levels))){
+    if (all(is.na(levels)) ||
+        (min(levels,na.rm=TRUE)==max(levels,na.rm=TRUE))){
         out <- rep(col[1],ns)
     } else if (nl<ns){
         out[1:nl] <- levels2colours(levels=levels,col=col)
     } else {
         out <- levels2colours(levels=levels,col=col)[1:ns]
     }
-    out[which(omit%in%'x')] <- omit.col
+    out[!keep] <- omit.col
     out
 }
 
 levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
+    m <- min(levels,na.rm=TRUE)
+    M <- max(levels,na.rm=TRUE)
     fn <- grDevices::colorRamp(colors=col,alpha=TRUE)
-    normalised.levels <- (levels-min(levels))/(max(levels)-min(levels))
+    normalised.levels <- (levels-m)/(M-m)
+    nan <- is.na(normalised.levels)
+    normalised.levels[nan] <- 0
     col.matrix <- fn(normalised.levels)/255
     red <- col.matrix[,1]
     green <- col.matrix[,2]
@@ -260,7 +267,8 @@ validLevels <- function(levels){
 }
 
 colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
-                      strip.width=0.02,clabel="",...){
+                      strip.width=0.02,clabel="",
+                      omit=rep('k',length(z)),...){
     if (!validLevels(z)) return()
     ucoord <- graphics::par()$usr
     plotwidth <- (ucoord[2]-ucoord[1])
@@ -381,17 +389,3 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
 }
 
 '%ni%' <- Negate('%in%')
-
-# x is a matrix
-remove <- function(d,omit=rep('k',nrow(d))){
-    out <- list()
-    toplot <- omit%ni%'X'
-    out$xp <- subset(d,subset=toplot)
-    out$snp <- which(toplot)
-    out$nsp <- length(out$snp)
-    tocalc <- omit%ni%c('x','X')
-    out$xc <- subset(d,subset=tocalc)
-    out$snc <- which(tocalc)
-    out$nsc <- length(out$nsc)
-    out
-}

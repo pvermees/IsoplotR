@@ -100,15 +100,19 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                transformation='log',sigdig=2,
                                show.numbers=FALSE,pch=21,levels=NA,
                                clabel="",bg=c("white","red"),
-                               title=TRUE,k=0,markers=NULL,
-                               alpha=0.05,units='',...){
-    peaks <- peakfit(x,k=k,sigdig=sigdig)
+                               title=TRUE,k=0,markers=NULL,alpha=0.05,
+                               units='',omit=rep('k',length(x)),
+                               omit.col=NA,...){
+    x2calc <- subset(x,subset=(omit%ni%c('x','X')))
+    peaks <- peakfit(x2calc,k=k,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
     radial.plot(X,show.numbers=show.numbers,pch=pch,levels=levels,
-                clabel=clabel,bg=bg,markers=markers,...)
+                clabel=clabel,bg=bg,markers=markers,
+                omit=omit,omit.col=omit.col,...)
     if (title)
-        title(radial.title(x,sigdig=sigdig,alpha=alpha,units=units,n=nrow(x)))
+        title(radial.title(x,sigdig=sigdig,alpha=alpha,
+                           units=units,n=nrow(x)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -130,7 +134,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                 show.numbers=show.numbers,pch=pch,levels=levels,
                 clabel=clabel,bg=bg,markers=markers,...)
     if (title)
-        title(radial.title(x,sigdig=sigdig,alpha=alpha,units='Ma',n=length(x)))
+        title(radial.title(x,sigdig=sigdig,alpha=alpha,
+                           units='Ma',n=length(x)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -380,7 +385,9 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                         show.numbers=FALSE,levels=NA,clabel="",
-                        bg=c('white','red'),markers=NULL,...){
+                        bg=c('white','red'),markers=NULL,
+                        omit=rep('k',length(x)),omit.col=NA,...){
+    x2plot <- subset(x,subset=(omit%ni%'X'))
     exM <- radial.scale(x,zeta,rhoD)
     tticks <- get.radial.tticks(x)
     labelpos <- 4
