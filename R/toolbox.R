@@ -37,7 +37,7 @@ subset.fissiontracks <- function(x,subset,...){
 }
 subset_helper <- function(x,subset){
     out <- x
-    out$x <- x$x[subset,]
+    out$x <- subset(x$x,subset=subset)
     out
 }
 

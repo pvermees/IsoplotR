@@ -102,17 +102,22 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                clabel="",bg=c("white","red"),
                                title=TRUE,k=0,markers=NULL,alpha=0.05,
                                units='',omit=rep('k',length(x)),
-                               omit.col=NA,...){
+                               omit.col='grey',...){
+    ns <- nrow(x)
     x2calc <- subset(x,subset=(omit%ni%c('x','X')))
     peaks <- peakfit(x2calc,k=k,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
-    X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
-    radial.plot(X,show.numbers=show.numbers,pch=pch,levels=levels,
-                clabel=clabel,bg=bg,markers=markers,
-                omit=omit,omit.col=omit.col,...)
+    keep <- (omit%ni%'X')
+    x2plot <- subset(x,subset=keep)
+    X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
+    cols <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
+                                omit.col=omit.col)[keep]
+    radial.plot(X,show.numbers=show.numbers,pch=pch,
+                levels=levels[keep],clabel=clabel,
+                markers=markers,cols=cols,sn=(1:ns)[keep],...)
     if (title)
-        title(radial.title(x,sigdig=sigdig,alpha=alpha,
-                           units=units,n=nrow(x)))
+        title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
+                           units=units,n=nrow(x2calc)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -126,16 +131,23 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      pch=21,levels=NA,clabel="",
                                      bg=c("white","red"),title=TRUE,
                                      markers=NULL,k=0,exterr=TRUE,
-                                     alpha=0.05,...){
-    peaks <- peakfit(x,k=k,exterr=exterr,sigdig=sigdig)
+                                     alpha=0.05,omit=rep('k',length(x)),
+                                     omit.col='grey',...){
+    ns <- length(x)
+    x2calc <- subset(x,subset=(omit%ni%c('x','X')))
+    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
-    X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
-    radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
-                show.numbers=show.numbers,pch=pch,levels=levels,
-                clabel=clabel,bg=bg,markers=markers,...)
+    keep <- omit%ni%'X'
+    x2plot <- subset(x,subset=keep)
+    X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
+    cols <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
+                                omit.col=omit.col)[keep]
+    radial.plot(X,show.numbers=show.numbers,pch=pch,
+                levels=levels[keep],clabel=clabel,
+                markers=markers,cols=cols,sn=(1:ns)[keep],...)
     if (title)
-        title(radial.title(x,sigdig=sigdig,alpha=alpha,
-                           units='Ma',n=length(x)))
+        title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
+                           units='Ma',n=length(x2calc)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -385,9 +397,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                         show.numbers=FALSE,levels=NA,clabel="",
-                        bg=c('white','red'),markers=NULL,
-                        omit=rep('k',length(x)),omit.col=NA,...){
-    x2plot <- subset(x,subset=(omit%ni%'X'))
+                        markers=NULL,cols=rep('white',length(x$z)),
+                        sn=1:length(x$z),...){
     exM <- radial.scale(x,zeta,rhoD)
     tticks <- get.radial.tticks(x)
     labelpos <- 4
@@ -395,12 +406,10 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
     plot_radial_lines(tticks,l=0.025,x,exM[1],exM[2],
                       zeta,rhoD,label=TRUE,pos=labelpos)
     if (!is.null(markers)){
-        plot_radial_lines(markers,x,exM[1],exM[2],
+        plot_radial_lines(markers,x2plot,exM[1],exM[2],
                           zeta,rhoD,label=FALSE)
     }
     plot_radial_axes(x)
-    ns <- length(x$z)
-    cols <- set.ellipse.colours(ns=ns,levels=levels,col=bg)
     plot_radial_points(x,show.numbers=show.numbers,bg=cols,...)
     colourbar(z=levels,col=bg,clabel=clabel)
 }
