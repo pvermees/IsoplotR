@@ -218,7 +218,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
-                      anchor=list(FALSE,NA),omit=rep(0,length(x)),
+                      anchor=list(FALSE,NA),omit=rep('k',length(x)),
                       omit.col=NA,...){
     if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x

@@ -181,7 +181,7 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              ellipse.col=c("#00FF0080","#FF000080"),
                              ci.col='gray80',line.col='black',lwd=1,
                              plot=TRUE,title=TRUE,model=1,xlab='x',
-                             ylab='y',omit=rep(0,length(x)),
+                             ylab='y',omit=rep('k',length(x)),
                              omit.col=NA,...){
     fit <- regression_init(x,model=model,alpha=alpha,omit=omit)
     fit <- ci_isochron(fit)
@@ -373,7 +373,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep(0,length(x)),omit.col=NA,...){
+                          omit=rep('k',length(x)),omit.col=NA,...){
     out <- isochron_init(x,model=model,inverse=inverse,
                          alpha=alpha,omit=omit)
     a <- out$a['a']
@@ -425,7 +425,7 @@ isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          ellipse.col=c("#00FF0080","#FF000080"),
                          ci.col='gray80',line.col='black',
                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                         omit=rep(0,length(x)),omit.col=NA,...){
+                         omit=rep('k',length(x)),omit.col=NA,...){
     isochron_PD(x,'K40',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -442,7 +442,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           inverse=TRUE,ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
                           exterr=TRUE,model=1,growth=FALSE,
-                          omit=rep(0,length(x)),omit.col=NA,...){
+                          omit=rep('k',length(x)),omit.col=NA,...){
     out <- isochron_init(x,model=model,inverse=inverse,
                          alpha=alpha,omit=omit)
     if (inverse){
@@ -487,7 +487,7 @@ isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep(0,length(x)),omit.col=NA,...){
+                          omit=rep('k',length(x)),omit.col=NA,...){
     isochron_PD(x,'Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -502,7 +502,7 @@ isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep(0,length(x)),omit.col=NA,...){
+                          omit=rep('k',length(x)),omit.col=NA,...){
     isochron_PD(x,'Re187',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -517,7 +517,7 @@ isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep(0,length(x)),omit.col=NA,...){
+                          omit=rep('k',length(x)),omit.col=NA,...){
     isochron_PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -532,7 +532,7 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep(0,length(x)),omit.col=NA,...){
+                          omit=rep('k',length(x)),omit.col=NA,...){
     isochron_PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -565,7 +565,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                           clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep(0,length(x)),omit.col=NA,...){
+                          omit=rep('k',length(x)),omit.col=NA,...){
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,
                                exterr=exterr,alpha=alpha,omit=omit)
@@ -598,7 +598,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
 isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                            show.numbers=FALSE,ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,model=1,
-                           omit=rep(0,length(x)),omit.col='grey',...){
+                           omit=rep('k',length(x)),omit.col='grey',...){
     out <- isochron_init(x,model=model,alpha=alpha,omit=omit)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
@@ -617,9 +617,9 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     invisible(out)
 }
-    
+
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
-                            alpha=0.05,omit=rep(0,length(x))){
+                            alpha=0.05,omit=rep('k',length(x))){
     if (type == 1){
         osmond <- FALSE
         ia <- 'a'
@@ -687,7 +687,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out
 }
 isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
-                            alpha=0.05,omit=rep(0,length(x))){
+                            alpha=0.05,omit=rep('k',length(x))){
     out <- isochron_init(x,model=model,type=type,
                          alpha=alpha,omit=omit)
     if (type==1){
@@ -726,7 +726,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         ci.col='gray80',line.col='black',lwd=1,
                         plot=TRUE,exterr=TRUE,model=1,bratio=1,
-                        omit=rep(0,length(x)),...){
+                        omit=rep('k',length(x)),...){
     out <- isochron_init(x,model=model,exterr=exterr,
                          alpha=alpha,omit=omit)
     out$y0[c('y','s[y]')] <- out$a
@@ -774,7 +774,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
 
 isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
                           osmond=TRUE,type=2,exterr=TRUE,format=1,
-                          omit=rep(0,length(x))){
+                          omit=rep('k',length(x))){
     if (hasClass(x,'ThU') && x$format<3){ # 3D regression 
         d <- data2tit(x,osmond=osmond)
         out <- regression(d,model=model,type="titterington",omit=omit)
@@ -816,7 +816,7 @@ isochron_init <- function(x,model=1,inverse=FALSE,alpha=0.05,
     out
 }
 regression_init <- function(x,model=model,alpha=0.05,
-                            omit=rep(0,length(x))){
+                            omit=rep('k',length(x))){
     fit <- regression(x,model=model,omit=omit)
     out <- fit
     out$alpha <- alpha
