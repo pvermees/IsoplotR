@@ -220,46 +220,52 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
                       anchor=list(FALSE,NA),omit=rep('k',length(x)),
                       omit.col=NA,...){
-    if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
-    else X <- x
-    lims <- prepare.concordia.line(X,tlim=tlim,wetherill=wetherill,omit=omit,...)
+    if (common.Pb<1) X <- x
+    else X <- common.Pb.correction(x,option=common.Pb)
+    X2plot <- subset(X,subset=(omit%ni%'X'))
+    lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
     if (show.age>1){
-        fit <- concordia.intersection.ludwig(x,wetherill=wetherill,
+        x2calc <- subset(x,subset=(omit%ni%c('x','X')))
+        fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
         discordia.line(fit,wetherill=wetherill)
-        fit$n <- length(x)
+        fit$n <- length(x2calc)
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }
-    plot.concordia.line(X,lims=lims,wetherill=wetherill,col=concordia.col,
+    plot.concordia.line(X2plot,lims=lims,wetherill=wetherill,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
     ns <- length(x)
-    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
+                                        omit=omit,omit.col=omit.col)
     for (i in 1:ns){
-        if (wetherill) xyc <- wetherill(X,i)
-        else xyc <- tera.wasserburg(X,i)
-        x0 <- xyc$x[1]
-        y0 <- xyc$x[2]
-        if (show.age==3){
-            pch <- 21
-            pcex <- 1
-        } else {
-            covmat <- xyc$cov
-            ell <- ellipse(x0,y0,covmat,alpha=alpha)
-            graphics::polygon(ell,col=ellipse.cols[i])
-            pch <- 19
-            pcex <- 0.25
+        if (omit[i]%ni%'X'){
+            if (wetherill) xyc <- wetherill(X,i)
+            else xyc <- tera.wasserburg(X,i)
+            x0 <- xyc$x[1]
+            y0 <- xyc$x[2]
+            if (show.age==3){
+                pch <- 21
+                pcex <- 1
+            } else {
+                covmat <- xyc$cov
+                ell <- ellipse(x0,y0,covmat,alpha=alpha)
+                graphics::polygon(ell,col=ellipse.cols[i])
+                pch <- 19
+                pcex <- 0.25
+            }
+            if (show.numbers) graphics::text(x0,y0,i)
+            else graphics::points(x0,y0,pch=pch,cex=pcex*graphics::par('cex'))
         }
-        if (show.numbers) graphics::text(x0,y0,i)
-        else graphics::points(x0,y0,pch=pch,cex=pcex*graphics::par('cex'))
     }
-    if (show.age==1){
-        fit <- concordia.age(X,wetherill=wetherill,
+if (show.age==1){
+        X2calc <- subset(X,subset=(omit%ni%c('x','X')))
+        fit <- concordia.age(X2calc,wetherill=wetherill,
                              exterr=exterr,alpha=alpha)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
-        fit$n <- length(x)
+        fit$n <- length(X2calc)
         graphics::title(concordia.title(fit,sigdig=sigdig))
     }
     colourbar(z=levels,col=ellipse.col,clabel=clabel)
@@ -307,8 +313,8 @@ plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
     graphics::box()
 }
 # helper function for plot.concordia
-prepare.concordia.line <- function(x,tlim,wetherill=TRUE,omit=rep(0,length(x)),...){
-    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,omit=omit,...)
+prepare.concordia.line <- function(x,tlim,wetherill=TRUE,...){
+    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
@@ -340,9 +346,7 @@ age_to_concordia_ratios <- function(tt,wetherill=TRUE,exterr=FALSE){
     if (wetherill) return(age_to_wetherill_ratios(tt,exterr=exterr))
     else return(age_to_terawasserburg_ratios(tt,exterr=exterr))
 }
-get.concordia.limits <- function(X,tlim=NULL,wetherill=FALSE,
-                                 omit=rep(0,length(x)),...){
-    x <- subset(X,subset=omit!=1)
+get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
     out <- list()
     args <- list(...)
     xset <- ('xlim' %in% names(args))

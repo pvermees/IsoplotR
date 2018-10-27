@@ -229,7 +229,7 @@ LL.norm <- function(x,covmat){
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
-                                omit=rep('k',ns),omit.col=rgb(0,1,1,0.5)){
+                                omit=rep('k',ns),omit.col=NA){
     if (any(!is.numeric(levels)) | any(is.na(levels))) levels <- NA
     nl <- length(levels)
     out <- NULL
@@ -240,7 +240,7 @@ set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
     } else {
         out <- levels2colours(levels=levels,col=col)[1:ns]
     }
-    out[which(omit=='x')] <- omit.col
+    out[which(omit%in%'x')] <- omit.col
     out
 }
 
@@ -385,10 +385,13 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
 # x is a matrix
 remove <- function(d,omit=rep('k',nrow(d))){
     out <- list()
-    keep <- omit%ni%'X'
-    out$x <- subset(d,keep)
-    out$ns <- nrow(out$x)
-    out$sn <- (1:nrow(d))[keep] # sample numbers
-    out$omit <- omit[keep]
+    toplot <- omit%ni%'X'
+    out$xp <- subset(d,subset=toplot)
+    out$snp <- which(toplot)
+    out$nsp <- length(out$snp)
+    tocalc <- omit%ni%c('x','X')
+    out$xc <- subset(d,subset=tocalc)
+    out$snc <- which(tocalc)
+    out$nsc <- length(out$nsc)
     out
 }
