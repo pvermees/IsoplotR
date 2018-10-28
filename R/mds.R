@@ -146,7 +146,7 @@ KS.diss <- function(x,y) {
     xy = sort(y)
     cdftmp = stats::ecdf(xy)
     cdfEstim = cdftmp(xy)
-    cdfRef = stats::approx(xx, cdf1, xy, yleft = 0, yright = 1, ties = "mean")
+    cdfRef = stats::approx(xx,cdf1,xy,yleft=0,yright=1,ties="mean")
     dif = cdfRef$y - cdfEstim
     dif = abs(dif)
     out = max(dif)
@@ -177,7 +177,8 @@ plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
         do.call(graphics::plot,args)
         if (nnlines) plotlines(x$points,x$diss)
         if (is.na(pch)) {
-            args <- c(list(x=x$points,labels=labels(x$diss),col=col,bg=bg,pos=pos),
+            args <- c(list(x=x$points,labels=labels(x$diss),
+                           col=col,bg=bg,pos=pos),
                       ellipsis)
             graphics::points(x$points,pch=pch)
             do.call(graphics::text,args)

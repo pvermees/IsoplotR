@@ -537,7 +537,7 @@ as.UThHe <- function(x){
     if (nc>7) cnames <- c(cnames,'Sm','errSm')
     out <- subset(X,select=1:length(cnames))
     colnames(out) <- cnames
-    class(out) <- append(class(out),"UThHe")
+    class(out) <- append("UThHe",class(out))
     out
 }
 as.fissiontracks <- function(x,format=1){

@@ -22,7 +22,11 @@ subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.LuHf <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
-subset.UThHe <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.UThHe <- function(x,subset,...){
+    out <- x[subset,]
+    class(out) <- class(x)
+    out
+}
 subset.fissiontracks <- function(x,subset,...){
     if (x$format==1){
         out <- subset_helper(x,subset,...)
@@ -291,13 +295,49 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     mymtext(text=clabel,side=3,adj=1)
 }
 
-plot_points <- function(x,y,bg='white',show.numbers=FALSE,...){
-    if ('pch' %in% graphics::par(list(...))) pch <- graphics::par()$pch
-    else pch <- 21
-    if ('cex' %in% graphics::par(list(...))) pch <- graphics::par()$cex
-    else cex <- 1.5
-    if (show.numbers) graphics::text(x,y,1:length(x),cex=cex,...)
-    else graphics::points(x,y,bg=bg,pch=pch,cex=cex,...)
+plot_points <- function(x,y,show.numbers=FALSE,
+                        omit=rep(0,length(x)),omit.col=NA,...){
+    calcit <- tocalc(omit)
+    plotit <- toplot(omit)
+    sn <- (1:length(x))[plotit]
+    ns <- length(sn)
+    xp <- x[plotit]
+    yp <- y[plotit]
+    args <- get_points_pars(...)
+    args$x <- xp
+    args$y <- yp
+    if (show.numbers){
+        tcol <- rep('black',ns)
+        tcol[!calcit] <- 'grey'
+        args$col <- tcol
+        args$labels <- sn
+        do.call(graphics::text,args)
+    } else {
+        args$bg[!calcit] <- omit.col
+        do.call(graphics::points,args)
+    }
+}
+get_points_pars <- function(...){
+    ellipsis <- list(...)
+    pars <- names(ellipsis)
+    out <- ellipsis
+    if ('pch' %in% pars)
+        out$pch <- graphics::par()$pch
+    else
+        out$pch <- 21
+    if ('col' %in% pars)
+        out$col <- graphics::par()$col
+    else
+        out$col <- 'black'
+    if ('bg' %in% pars)
+        out$bg <- graphics::par()$bg
+    else
+        out$bg <- 'yellow'
+    if ('cex' %in% pars)
+        out$cex <- graphics::par()$cex
+    else
+        out$cex <- 1.5
+    out
 }
 
 nfact <- function(alpha){
