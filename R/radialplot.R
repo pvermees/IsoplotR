@@ -111,14 +111,14 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
     peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
-    bg <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
-                              omit=omit,omit.col=omit.col)
+    pcol <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
+                                omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
     tcol[!calcit] <- 'grey'
     radial.plot(X,show.numbers=show.numbers,pch=pch,
                 levels=levels[plotit],clabel=clabel,markers=markers,
-                bg=bg[plotit],col=tcol[plotit],sn=(1:ns)[plotit],...)
-    colourbar(z=levels[calcit],col=bg[calcit],clabel=clabel)
+                bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],...)
+    colourbar(z=levels[calcit],col=bg,clabel=clabel)
     if (title)
         title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
                            units=units,n=nrow(x2calc)))
@@ -146,15 +146,15 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
     peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
-    bg <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
-                              omit=omit,omit.col=omit.col)
+    pcol <- set.ellipse.colours(ns=ns,levels=levels,col=bg,
+                                omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
     tcol[!calcit] <- 'grey'
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
                 show.numbers=show.numbers,pch=pch,
-                levels=levels[plotit],clabel=clabel,bg=bg[plotit],
-                col=tcol[plotit], sn=(1:ns)[plotit],...)
-    colourbar(z=levels[calcit],col=bg[calcit],clabel=clabel)
+                levels=levels[plotit],clabel=clabel,bg=pcol[plotit],
+                col=tcol[plotit],sn=(1:ns)[plotit],...)
+    colourbar(z=levels[calcit],col=bg,clabel=clabel)
     if (title)
         title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
                            units='Ma',n=length(x2calc)))

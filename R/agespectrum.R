@@ -115,7 +115,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 title=TRUE,show.ci=TRUE,
                                 xlab='cumulative fraction',
                                 ylab='age [Ma]',omit=rep(0,nrow(x)),...){
-    x <- subset(x,subset=toplot(omit))
+    x <- subset(x,subset=tocalc(omit))
     ns <- nrow(x)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
