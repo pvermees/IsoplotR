@@ -129,12 +129,15 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
 #'     the mixture model errors?
 #' @rdname radialplot
 #' @export
-radialplot.fissiontracks <-
-    function(x,from=NA,to=NA,t0=NA,transformation='arcsin',sigdig=2,
-             show.numbers=FALSE, pch=21,levels=NA,clabel="",
-             bg=c("yellow","red"),col='black',title=TRUE,
-             markers=NULL,k=0,exterr=TRUE, alpha=0.05,
-             omit=rep(0,length(x)),omit.col=NA,...){
+radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
+                                     transformation='arcsin',sigdig=2,
+                                     show.numbers=FALSE,pch=21,
+                                     levels=NA,clabel="",
+                                     bg=c("yellow","red"),col='black',
+                                     title=TRUE,markers=NULL,k=0,
+                                     exterr=TRUE,alpha=0.05,
+                                     omit=rep(0,length(x)),
+                                     omit.col=NA,...){
     ns <- length(x)
     calcit <- tocalc(omit)
     plotit <- toplot(omit)
