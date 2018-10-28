@@ -372,7 +372,8 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     }
 
     .opt = stats::optim(.parStart,.fn,.gr,...,method=method,
-                        lower=lower,upper=upper,control=control,hessian=hessian) 
+                        lower=lower,upper=upper,
+                        control=control,hessian=hessian) 
     
     .opt$fullpars = rep(NA,sum(!fixed)) 
     .opt$fullpars[fixed]=.fixValues 
