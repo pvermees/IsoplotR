@@ -40,14 +40,14 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
-                        omit=rep('k',nrow(d)),omit.col=NA,...){
-    toplot <- omit%ni%'X'
-    tocalc <- omit%ni%c('x','X')
+                        omit=rep(0,nrow(d)),omit.col=NA,...){
+    plotit <- toplot(omit)
+    calcit <- tocalc(omit)
     ns <- nrow(d)
     sn <- 1:ns
     colnames(d) <- c('X','sX','Y','sY','rXY')
-    if (any(is.na(xlim))) xlim <- get.limits(d[toplot,'X'],d[toplot,'sX'])
-    if (any(is.na(ylim))) ylim <- get.limits(d[toplot,'Y'],d[toplot,'sY'])
+    if (any(is.na(xlim))) xlim <- get.limits(d[plotit,'X'],d[plotit,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(d[plotit,'Y'],d[plotit,'sY'])
     if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
     if (new.plot & empty) return()
     if (!identical(fit,'none'))
@@ -56,20 +56,20 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
     graphics::box()
     if (show.ellipses!=1){
         colour <- rep('black',ns)
-        if (is.na(omit.col)) colour[!tocalc] <- 'grey'
-        else colour[!tocalc] <- omit.col
+        if (is.na(omit.col)) colour[!calcit] <- 'grey'
+        else colour[!calcit] <- omit.col
     }
     if (show.ellipses==0){
         if (show.numbers)
-            graphics::text(d[toplot,'X'],d[toplot,'Y'],
-                           sn[toplot],col=colour[toplot],...)
-        else graphics::points(d[toplot,'X'],d[toplot,'Y'],
-                              col=colour[toplot],...)
+            graphics::text(d[plotit,'X'],d[plotit,'Y'],
+                           sn[plotit],col=colour[plotit],...)
+        else graphics::points(d[plotit,'X'],d[plotit,'Y'],
+                              col=colour[plotit],...)
     } else if (show.ellipses==1){ # error ellipse
         ellipse.cols <-
             set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
                                 omit=omit,omit.col=omit.col)
-        for (i in sn[toplot]){
+        for (i in sn[plotit]){
             if (!any(is.na(d[i,]))){
                 covmat <- cor2cov2(d[i,'sX'],d[i,'sY'],d[i,'rXY'])
                 ell <- ellipse(d[i,'X'],d[i,'Y'],covmat,alpha=alpha)
@@ -78,23 +78,23 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                 else graphics::points(d[i,'X'],d[i,'Y'],pch=19,cex=0.25)
             }
         }
-        colourbar(z=levels[tocalc],col=ellipse.col,clabel=clabel)
+        colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     } else { # error cross
         if (show.numbers)
-            graphics::text(d[toplot,'X'],d[toplot,'Y'],
-                           sn[toplot],adj=c(0,1),col=colour)
+            graphics::text(d[plotit,'X'],d[plotit,'Y'],
+                           sn[plotit],adj=c(0,1),col=colour)
         else
-            graphics::points(d[toplot,'X'],d[toplot,'Y'],
+            graphics::points(d[plotit,'X'],d[plotit,'Y'],
                              pch=19,cex=0.5,col=colour)
         fact <- stats::qnorm(1-alpha/2)
-        dx <- fact*d[toplot,'sX']
-        dy <- fact*d[toplot,'sY']
-        graphics::arrows(d[toplot,'X'],d[toplot,'Y']-dy,
-                         d[toplot,'X'],d[toplot,'Y']+dy,
+        dx <- fact*d[plotit,'sX']
+        dy <- fact*d[plotit,'sY']
+        graphics::arrows(d[plotit,'X'],d[plotit,'Y']-dy,
+                         d[plotit,'X'],d[plotit,'Y']+dy,
                          code=3,angle=90,
                          length=0.05,col=colour)
-        graphics::arrows(d[toplot,'X']-dx,d[toplot,'Y'],
-                         d[toplot,'X']+dx,d[toplot,'Y'],
+        graphics::arrows(d[plotit,'X']-dx,d[plotit,'Y'],
+                         d[plotit,'X']+dx,d[plotit,'Y'],
                          code=3,angle=90,
                          length=0.05,col=colour)
     }

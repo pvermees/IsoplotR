@@ -229,9 +229,9 @@ LL.norm <- function(x,covmat){
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
-                                omit=rep('k',ns),omit.col=NA){
-    keep <- omit%ni%c('x','X')
-    levels[!keep] <- NA
+                                omit=rep(0,ns),omit.col=NA){
+    remove <- !tocalc(omit)
+    levels[remove] <- NA
     levels[!is.numeric(levels)] <- NA
     nl <- length(levels)
     out <- NULL
@@ -243,7 +243,7 @@ set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
     } else {
         out <- levels2colours(levels=levels,col=col)[1:ns]
     }
-    out[!keep] <- omit.col
+    out[remove] <- omit.col
     out
 }
 
@@ -267,8 +267,7 @@ validLevels <- function(levels){
 }
 
 colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
-                      strip.width=0.02,clabel="",
-                      omit=rep('k',length(z)),...){
+                      strip.width=0.02,clabel="",...){
     if (!validLevels(z)) return()
     ucoord <- graphics::par()$usr
     plotwidth <- (ucoord[2]-ucoord[1])
@@ -388,4 +387,10 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     return(.opt)
 }
 
-'%ni%' <- Negate('%in%')
+tocalc <- function(omit){
+    !(omit%in%c(1,2,'x','X'))
+}
+
+toplot <- function(omit){
+    !(omit%in%c(2,'X'))
+}

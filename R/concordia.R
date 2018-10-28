@@ -218,17 +218,15 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
-                      anchor=list(FALSE,NA),omit=rep('k',length(x)),
+                      anchor=list(FALSE,NA),omit=rep(0,length(x)),
                       omit.col=NA,...){
     if (common.Pb<1) X <- x
     else X <- common.Pb.correction(x,option=common.Pb)
-    toplot <- omit%ni%'X'
-    X2plot <- subset(X,subset=toplot)
+    X2plot <- subset(X,subset=toplot(omit))
     lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
     if (show.age>1){
-        tocalc <- omit%ni%c('x','X')
-        x2calc <- subset(x,subset=tocalc)
+        x2calc <- subset(x,subset=tocalc(omit))
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
@@ -242,7 +240,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
                                         omit=omit,omit.col=omit.col)
     for (i in 1:ns){
-        if (omit[i]%ni%'X'){
+        if (toplot(omit[i])){
             if (wetherill) xyc <- wetherill(X,i)
             else xyc <- tera.wasserburg(X,i)
             x0 <- xyc$x[1]
@@ -262,7 +260,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
         }
     }
 if (show.age==1){
-        X2calc <- subset(X,subset=(omit%ni%c('x','X')))
+        X2calc <- subset(X,subset=tocalc(omit))
         fit <- concordia.age(X2calc,wetherill=wetherill,
                              exterr=exterr,alpha=alpha)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)

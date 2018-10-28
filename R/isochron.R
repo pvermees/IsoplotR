@@ -181,11 +181,10 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              ellipse.col=c("#00FF0080","#FF000080"),
                              ci.col='gray80',line.col='black',lwd=1,
                              plot=TRUE,title=TRUE,model=1,xlab='x',
-                             ylab='y',omit=rep('k',length(x)),
+                             ylab='y',omit=rep(0,length(x)),
                              omit.col=NA,...){
     d <- data2york(x)
-    tocalc <- omit%ni%c('x','X')
-    d2calc <- subset(d,subset=tocalc)
+    d2calc <- subset(d,subset=tocalc(omit))
     fit <- regression(d2calc,model=model)
     fit <- regression_init(fit,alpha=alpha)
     fit <- ci_isochron(fit)
@@ -377,10 +376,9 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep('k',length(x)),omit.col=NA,...){
+                          omit=rep(0,length(x)),omit.col=NA,...){
     d <- data2york(x,inverse=inverse)
-    tocalc <- omit%ni%c('x','X')
-    d2calc <- subset(d,subset=tocalc)
+    d2calc <- subset(d,subset=tocalc(omit))
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
     a <- out$a['a']
@@ -432,7 +430,7 @@ isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          ellipse.col=c("#00FF0080","#FF000080"),
                          ci.col='gray80',line.col='black',
                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                         omit=rep('k',length(x)),omit.col=NA,...){
+                         omit=rep(0,length(x)),omit.col=NA,...){
     isochron_PD(x,'K40',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -449,10 +447,9 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           inverse=TRUE,ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
                           exterr=TRUE,model=1,growth=FALSE,
-                          omit=rep('k',length(x)),omit.col=NA,...){
+                          omit=rep(0,length(x)),omit.col=NA,...){
     d <- data2york(x,inverse=inverse)
-    tocalc <- omit%ni%c('x','X')
-    d2calc <- subset(d,subset=tocalc)
+    d2calc <- subset(d,subset=tocalc(omit))
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
     if (inverse){
@@ -497,7 +494,7 @@ isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep('k',length(x)),omit.col=NA,...){
+                          omit=rep(0,length(x)),omit.col=NA,...){
     isochron_PD(x,'Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -512,7 +509,7 @@ isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep('k',length(x)),omit.col=NA,...){
+                          omit=rep(0,length(x)),omit.col=NA,...){
     isochron_PD(x,'Re187',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -527,7 +524,7 @@ isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep('k',length(x)),omit.col=NA,...){
+                          omit=rep(0,length(x)),omit.col=NA,...){
     isochron_PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -542,7 +539,7 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep('k',length(x)),omit.col=NA,...){
+                          omit=rep(0,length(x)),omit.col=NA,...){
     isochron_PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
@@ -575,7 +572,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
                           clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
-                          omit=rep('k',length(x)),omit.col=NA,...){
+                          omit=rep(0,length(x)),omit.col=NA,...){
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,
                                exterr=exterr,alpha=alpha,omit=omit)
@@ -608,10 +605,9 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
 isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                            show.numbers=FALSE,ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,model=1,
-                           omit=rep('k',length(x)),omit.col='grey',...){
+                           omit=rep(0,length(x)),omit.col='grey',...){
     d <- data2york(x,inverse=inverse)
-    tocalc <- omit%ni%c('x','X')
-    d2calc <- subset(d,subset=tocalc)
+    d2calc <- subset(d,subset=tocalc(omit))
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
@@ -633,7 +629,7 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
-                            alpha=0.05,omit=rep('k',length(x))){
+                            alpha=0.05,omit=rep(0,length(x))){
     if (type == 1){
         osmond <- FALSE
         ia <- 'a'
@@ -672,8 +668,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         y.lab <- quote(''^234*'U/'^238*'U')
     }
     d <- data2tit(x,osmond=osmond)
-    tocalc <- omit%ni%c('x','X')
-    d2calc <- subset(d,subset=tocalc)
+    d2calc <- subset(d,subset=tocalc(omit))
     fit <- regression(d2calc,model=model,type="titterington")
     out <- isochron_init(fit,alpha=alpha)
     out$d <- d
@@ -705,10 +700,9 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out
 }
 isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
-                            alpha=0.05,omit=rep('k',length(x))){
+                            alpha=0.05,omit=rep(0,length(x))){
     d <- data2york(x,type=type)
-    tocalc <- omit%ni%c('x','X')
-    d2calc <- subset(d,subset=tocalc)
+    d2calc <- subset(d,subset=tocalc(omit))
     fit <- regression(d2calc,model=model,type="york")
     out <- isochron_init(fit,alpha=alpha)
     out$d <- d
@@ -748,10 +742,9 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         ci.col='gray80',line.col='black',lwd=1,
                         plot=TRUE,exterr=TRUE,model=1,bratio=1,
-                        omit=rep('k',length(x)),...){
+                        omit=rep(0,length(x)),...){
     d <- data2york(x)
-    tocalc <- omit%ni%c('x','X')
-    d2calc <- subset(d,subset=tocalc)
+    d2calc <- subset(d,subset=tocalc(omit))
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
