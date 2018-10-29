@@ -116,8 +116,9 @@ LL.FT <- function(sigma,mu,y,m){
     LL <- 0
     ns <- length(y)
     for (i in 1:ns){
-        LL <- LL + log(stats::integrate(pyumu,lower=mu-10*sigma,upper=mu+10*sigma,
-                                        mu=mu,sigma=sigma,m=m[i],y=y[i])$value)
+        LL <- LL + log(stats::integrate(pyumu,lower=mu-10*sigma,
+                                        upper=mu+10*sigma,mu=mu,
+                                        sigma=sigma,m=m[i],y=y[i])$value)
     }
     LL
 }
@@ -133,37 +134,34 @@ LL.sigma <- function(sigma,X,sX){
     sum(log(wi) - wi*(X-mu)^2)/2
 }
 
-ci_regression <- function(fit,model=1,alpha=0.05,
-                          disp=TRUE,i1='b',i2='a'){
+ci_regression <- function(fit,disp=TRUE,i1='b',i2='a'){
     out <- fit
-    if (fit$model==3) out$fact <- nfact(alpha)
-    else out$fact <- tfact(alpha,fit$df)
+    if (fit$model==3) out$fact <- nfact(fit$alpha)
+    else out$fact <- tfact(fit$alpha,fit$df)
     out[[i1]]['ci[t]'] <- out$fact*fit[[i1]]['s[t]']
     out[[i2]]['ci[y]'] <- out$fact*fit[[i2]]['s[y]']
-    if (model==1 & disp){
+    if (fit$model==1 & disp){
         out[[i2]]['disp[y]'] <- sqrt(fit$mswd)*out[[i2]]['ci[y]']
-    } else if (model==3) {
+    } else if (fit$model==3) {
         out$w[c('ll','ul')] <-
-            profile_LL_isochron_disp(fit,alpha=alpha)
+            profile_LL_isochron_disp(fit)
     }
     out
     
 }
-ci_isochron <- function(fit,model=1,alpha=0.05,disp=TRUE){
-    ci_regression(fit,model=model,alpha=alpha,disp=disp,i1='age',i2='y0')
+ci_isochron <- function(fit,disp=TRUE){
+    ci_regression(fit,disp=disp,i1='age',i2='y0')
 }
-profile_LL_isochron_disp <- function(fit,alpha=0.05){
-    cutoff <- stats::qchisq(1-alpha,1)
-    d <- fit$d
+profile_LL_isochron_disp <- function(fit){
+    cutoff <- stats::qchisq(1-fit$alpha,1)
     w <- fit$w['s']
+    d <- fit$d
     LLmax <- LL.isochron(w,d,type=fit$type)
     if (abs(LL.isochron(0,d,type=fit$type)-LLmax) < cutoff/2){
         wl <- 0
     } else {
-        wl <- stats::optimize(profile_isochron_helper,
-                              interval=c(0,w),d=d,
-                              LLmax=LLmax,cutoff=cutoff,
-                              type=fit$type)$minimum
+        wl <- stats::optimize(profile_isochron_helper,interval=c(0,w),d=d,
+                              LLmax=LLmax,cutoff=cutoff,type=fit$type)$minimum
     }
     if (abs(LL.isochron(stats::sd(d[,'Y']),d,type=fit$type)-LLmax) < cutoff/2){
         wu <- Inf

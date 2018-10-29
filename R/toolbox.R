@@ -14,6 +14,37 @@ length.fissiontracks <- function(x){
     else return(length(x$Ns))
 }
 
+subset.UPb  <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.PbPb <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.RbSr <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.LuHf <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.UThHe <- function(x,subset,...){
+    out <- x[subset,]
+    class(out) <- class(x)
+    out
+}
+subset.fissiontracks <- function(x,subset,...){
+    if (x$format==1){
+        out <- subset_helper(x,subset,...)
+    } else {
+        out <- x
+        out$Ns <- x$Ns[subset]
+        out$A <- x$A[subset]
+        out$U <- x$U[subset]
+        out$sU <- x$sU[subset]
+    }
+    out
+}
+subset_helper <- function(x,subset){
+    out <- x
+    out$x <- subset(x$x,subset=subset)
+    out
+}
+
 roundit <- function(age,err,sigdig=2){
     if (length(age)==1) dat <- c(age,err)
     else dat <- cbind(age,err)
@@ -201,23 +232,32 @@ LL.norm <- function(x,covmat){
         get.concordia.SS(x,covmat)/2
 }
 
-set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red')){
-    if (any(!is.numeric(levels)) | any(is.na(levels))) levels <- NA
+set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
+                                omit=rep(0,ns),omit.col=NA){
+    remove <- !tocalc(omit)
+    levels[remove] <- NA
+    levels[!is.numeric(levels)] <- NA
     nl <- length(levels)
     out <- NULL
-    if (all(is.na(levels)) | (max(levels)==min(levels))){
+    if (all(is.na(levels)) ||
+        (min(levels,na.rm=TRUE)==max(levels,na.rm=TRUE))){
         out <- rep(col[1],ns)
     } else if (nl<ns){
         out[1:nl] <- levels2colours(levels=levels,col=col)
     } else {
         out <- levels2colours(levels=levels,col=col)[1:ns]
     }
+    out[remove] <- omit.col
     out
 }
 
 levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
+    m <- min(levels,na.rm=TRUE)
+    M <- max(levels,na.rm=TRUE)
     fn <- grDevices::colorRamp(colors=col,alpha=TRUE)
-    normalised.levels <- (levels-min(levels))/(max(levels)-min(levels))
+    normalised.levels <- (levels-m)/(M-m)
+    nan <- is.na(normalised.levels)
+    normalised.levels[nan] <- 0
     col.matrix <- fn(normalised.levels)/255
     red <- col.matrix[,1]
     green <- col.matrix[,2]
@@ -255,13 +295,49 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     mymtext(text=clabel,side=3,adj=1)
 }
 
-plot_points <- function(x,y,bg='white',show.numbers=FALSE,...){
-    if ('pch' %in% graphics::par(list(...))) pch <- graphics::par()$pch
-    else pch <- 21
-    if ('cex' %in% graphics::par(list(...))) pch <- graphics::par()$cex
-    else cex <- 1.5
-    if (show.numbers) graphics::text(x,y,1:length(x),cex=cex,...)
-    else graphics::points(x,y,bg=bg,pch=pch,cex=cex,...)
+plot_points <- function(x,y,show.numbers=FALSE,
+                        omit=rep(0,length(x)),omit.col=NA,...){
+    calcit <- tocalc(omit)
+    plotit <- toplot(omit)
+    sn <- (1:length(x))[plotit]
+    ns <- length(sn)
+    xp <- x[plotit]
+    yp <- y[plotit]
+    args <- get_points_pars(...)
+    args$x <- xp
+    args$y <- yp
+    if (show.numbers){
+        tcol <- rep('black',ns)
+        tcol[!calcit] <- 'grey'
+        args$col <- tcol
+        args$labels <- sn
+        do.call(graphics::text,args)
+    } else {
+        args$bg[!calcit] <- omit.col
+        do.call(graphics::points,args)
+    }
+}
+get_points_pars <- function(...){
+    ellipsis <- list(...)
+    pars <- names(ellipsis)
+    out <- ellipsis
+    if ('pch' %in% pars)
+        out$pch <- graphics::par()$pch
+    else
+        out$pch <- 21
+    if ('col' %in% pars)
+        out$col <- graphics::par()$col
+    else
+        out$col <- 'black'
+    if ('bg' %in% pars)
+        out$bg <- graphics::par()$bg
+    else
+        out$bg <- 'yellow'
+    if ('cex' %in% pars)
+        out$cex <- graphics::par()$cex
+    else
+        out$cex <- 1.5
+    out
 }
 
 nfact <- function(alpha){
@@ -336,7 +412,8 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     }
 
     .opt = stats::optim(.parStart,.fn,.gr,...,method=method,
-                        lower=lower,upper=upper,control=control,hessian=hessian) 
+                        lower=lower,upper=upper,
+                        control=control,hessian=hessian) 
     
     .opt$fullpars = rep(NA,sum(!fixed)) 
     .opt$fullpars[fixed]=.fixValues 
@@ -349,4 +426,12 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     .opt$fullpars <- NULL
     
     return(.opt)
+}
+
+tocalc <- function(omit){
+    !(omit%in%c(1,2,'x','X'))
+}
+
+toplot <- function(omit){
+    !(omit%in%c(2,'X'))
 }

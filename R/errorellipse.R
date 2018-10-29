@@ -34,46 +34,77 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
     out
 }
 
-# x = matrix with columns X, sX, Y, sY, rXY
-scatterplot <- function(x,xlim=NA,ylim=NA,alpha=0.05,
+# d = matrix with columns X, sX, Y, sY, rXY
+scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,show.ellipses=1,levels=NA,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         fit='none',new.plot=TRUE,ci.col='gray80',
-                        line.col='black',lwd=1,empty=FALSE,...){
-    colnames(x) <- c('X','sX','Y','sY','rXY')
-    if (any(is.na(xlim))) xlim <- get.limits(x[,'X'],x[,'sX'])
-    if (any(is.na(ylim))) ylim <- get.limits(x[,'Y'],x[,'sY'])
+                        line.col='black',lwd=1,empty=FALSE,
+                        omit=rep(0,nrow(d)),omit.col=NA,...){
+    plotit <- toplot(omit)
+    calcit <- tocalc(omit)
+    ns <- nrow(d)
+    sn <- 1:ns
+    colnames(d) <- c('X','sX','Y','sY','rXY')
+    if (any(is.na(xlim))) xlim <- get.limits(d[plotit,'X'],d[plotit,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(d[plotit,'Y'],d[plotit,'sY'])
     if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
     if (new.plot & empty) return()
     if (!identical(fit,'none'))
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
-    ns <- nrow(x)
-    x0 <- x[,'X']
-    y0 <- x[,'Y']
+    if (show.ellipses!=1){
+        colour <- rep('black',ns)
+        if (is.na(omit.col)) colour[!calcit] <- 'grey'
+        else colour[!calcit] <- omit.col
+    }
     if (show.ellipses==0){
-        if (show.numbers) graphics::text(x0,y0,1:ns,...)
-        else graphics::points(x0,y0,...)
-    } else if (show.ellipses==1){
-        ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col)
-        for (i in 1:ns){
-            if (!any(is.na(x[i,]))){
-                covmat <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
-                ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
+        if (show.numbers)
+            graphics::text(d[plotit,'X'],d[plotit,'Y'],
+                           sn[plotit],col=colour[plotit],...)
+        else graphics::points(d[plotit,'X'],d[plotit,'Y'],
+                              col=colour[plotit],...)
+    } else if (show.ellipses==1){ # error ellipse
+        ellipse.cols <-
+            set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
+                                omit=omit,omit.col=omit.col)
+        for (i in sn[plotit]){
+            if (!any(is.na(d[i,]))){
+                covmat <- cor2cov2(d[i,'sX'],d[i,'sY'],d[i,'rXY'])
+                ell <- ellipse(d[i,'X'],d[i,'Y'],covmat,alpha=alpha)
                 graphics::polygon(ell,col=ellipse.cols[i])
-                if (show.numbers) graphics::text(x0[i],y0[i],i)
-                else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
+                if (show.numbers) graphics::text(d[i,'X'],d[i,'Y'],i)
+                else graphics::points(d[i,'X'],d[i,'Y'],pch=19,cex=0.25)
             }
         }
-        colourbar(z=levels,col=ellipse.col,clabel=clabel)
-    } else {
-        if (show.numbers) graphics::text(x0,y0,1:ns,adj=c(0,1))
-        else graphics::points(x0,y0,pch=19,cex=0.5)
+        colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
+    } else { # error cross
+        if (show.numbers)
+            graphics::text(d[plotit,'X'],d[plotit,'Y'],
+                           sn[plotit],adj=c(0,1),col=colour)
+        else
+            graphics::points(d[plotit,'X'],d[plotit,'Y'],
+                             pch=19,cex=0.5,col=colour)
         fact <- stats::qnorm(1-alpha/2)
-        dx <- fact*x[,'sX']
-        dy <- fact*x[,'sY']
-        graphics::arrows(x0,y0-dy,x0,y0+dy,code=3,angle=90,length=0.05)
-        graphics::arrows(x0-dx,y0,x0+dx,y0,code=3,angle=90,length=0.05)
+        dx <- fact*d[plotit,'sX']
+        dy <- fact*d[plotit,'sY']
+        graphics::arrows(d[plotit,'X'],d[plotit,'Y']-dy,
+                         d[plotit,'X'],d[plotit,'Y']+dy,
+                         code=3,angle=90,
+                         length=0.05,col=colour)
+        graphics::arrows(d[plotit,'X']-dx,d[plotit,'Y'],
+                         d[plotit,'X']+dx,d[plotit,'Y'],
+                         code=3,angle=90,
+                         length=0.05,col=colour)
     }
+}
+
+plot_isochron_line <- function(fit,x,ci.col='gray80',...){
+    y <- fit$a[1]+fit$b[1]*x
+    e <- fit$fact*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
+    cix <- c(x,rev(x))
+    ciy <- c(y+e,rev(y-e))
+    graphics::polygon(cix,ciy,col=ci.col,border=NA)
+    graphics::lines(x,y,...)
 }
