@@ -118,6 +118,23 @@ weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
 #'     values reported in the title of the graphical output.
 #' @param alpha the confidence limits of the error bars/rectangles.
 #' @param ranked plot the aliquots in order of increasing age?
+#' @param omit vector of numbers or characters, one for each aliquot
+#'     of \code{x}:
+#' 
+#' \itemize{
+#' 
+#' \item{Aliquots marked as \code{1} or \code{x} are plotted but
+#' ignored in the weighted mean age calculation.}
+#' 
+#' \item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
+#'     are removed from both plots and calculations.}
+#' 
+#' \item{All other flags are ignored and the corresponding aliquots
+#' are plotted and processed as normal.}
+#' 
+#' }
+#' @param omit.col colour that should be used for the samples that are
+#'     marked as \code{2} or \code{x} in \code{omit}.
 #' @importFrom grDevices rgb
 #' @rdname weightedmean
 #' @export

@@ -42,6 +42,14 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #'     \code{terrain.colors}, \code{topo.colors}, \code{cm.colors}),
 #'     which are to be used for plotting data of class
 #'     \code{detritals}.
+#' @param omit vector of numbers or characters, one for each aliquot
+#'     of \code{x}:
+#'     \itemize{
+#'     \item{Aliquots marked as \code{1}, \code{2}, \code{x} or \code{X}
+#'           are removed from the plot.}
+#'     \item{All other flags are ignored and the corresponding aliquots
+#'           are plotted as normal.}
+#'     }
 #' @param ... optional arguments to the generic \code{plot} function
 #' @examples
 #' data(examples)

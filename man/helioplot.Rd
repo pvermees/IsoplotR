@@ -7,7 +7,8 @@
 helioplot(x, logratio = TRUE, model = 1, show.central.comp = TRUE,
   show.numbers = FALSE, alpha = 0.05, contour.col = c("white",
   "red"), levels = NA, clabel = "", ellipse.col = c("#00FF0080",
-  "#0000FF80"), sigdig = 2, xlim = NA, ylim = NA, fact = NA, ...)
+  "#0000FF80"), sigdig = 2, xlim = NA, ylim = NA, fact = NA,
+  omit = rep(0, length(x)), omit.col = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe}}
@@ -71,6 +72,25 @@ determined automatically.}
 \item{fact}{three-element vector with scaling factors of the
 ternary diagram if \code{fact=NA}, these will be determined
 automatically}
+
+\item{omit}{vector of numbers or characters, one for each aliquot
+    of \code{x}:
+
+\itemize{
+
+\item{Aliquots marked as \code{1} or \code{x} are plotted but
+ignored in the central age calculation.}
+
+\item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
+    are removed from both plots and calculations.}
+
+\item{All other flags are ignored and the corresponding aliquots
+are plotted and processed as normal.}
+
+}}
+
+\item{omit.col}{colour that should be used for the samples that are
+marked as \code{2} or \code{x} in \code{omit}.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }
