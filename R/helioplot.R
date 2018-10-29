@@ -101,6 +101,23 @@
 #' uncertainties (model 1), it can also be attributed to the presence
 #' of geological uncertainty, which manifests itself as an added
 #' (co)variance term.
+#' @param omit vector of numbers or characters, one for each aliquot
+#'     of \code{x}:
+#' 
+#' \itemize{
+#' 
+#' \item{Aliquots marked as \code{1} or \code{x} are plotted but
+#' ignored in the central age calculation.}
+#' 
+#' \item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
+#'     are removed from both plots and calculations.}
+#' 
+#' \item{All other flags are ignored and the corresponding aliquots
+#' are plotted and processed as normal.}
+#' 
+#' }
+#' @param omit.col colour that should be used for the samples that are
+#'     marked as \code{2} or \code{x} in \code{omit}.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
 #' @references

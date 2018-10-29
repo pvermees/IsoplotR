@@ -195,6 +195,23 @@
 #' @param ticks an optional vector of age ticks to be added to the
 #'     concordia line to override \code{IsoplotR}'s default spacing,
 #'     which is based on \code{R}'s \code{pretty} function.
+#' @param omit vector of numbers or characters, one for each aliquot
+#'     of \code{x}:
+#' 
+#' \itemize{
+#' 
+#' \item{Aliquots marked as \code{1} or \code{x} are plotted but
+#' ignored in the concordia or discordia age calculation.}
+#' 
+#' \item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
+#'     are removed from both plots and calculations.}
+#' 
+#' \item{All other flags are ignored and the corresponding aliquots
+#' are plotted and processed as normal.}
+#' 
+#' }
+#' @param omit.col colour that should be used for the samples that are
+#'     marked as \code{2} or \code{x} in \code{omit}.
 #' @param ... optional arguments to the generic \code{plot} function
 #'
 #' @examples

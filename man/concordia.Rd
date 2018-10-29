@@ -9,7 +9,7 @@ concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
   ellipse.col = c("#00FF0080", "#FF000080"),
   concordia.col = "darksalmon", exterr = FALSE, show.age = 0,
   sigdig = 2, common.Pb = 0, ticks = NULL, anchor = list(FALSE,
-  NA), ...)
+  NA), omit = rep(0, length(x)), omit.col = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -99,6 +99,25 @@ item If the first element is \code{TRUE} and the second element is a
 number, then the discordia line is forced to intersect the
 concordia line at an age equal to that number.
 }}
+
+\item{omit}{vector of numbers or characters, one for each aliquot
+    of \code{x}:
+
+\itemize{
+
+\item{Aliquots marked as \code{1} or \code{x} are plotted but
+ignored in the concordia or discordia age calculation.}
+
+\item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
+    are removed from both plots and calculations.}
+
+\item{All other flags are ignored and the corresponding aliquots
+are plotted and processed as normal.}
+
+}}
+
+\item{omit.col}{colour that should be used for the samples that are
+marked as \code{2} or \code{x} in \code{omit}.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

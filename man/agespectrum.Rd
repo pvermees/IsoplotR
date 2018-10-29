@@ -12,12 +12,14 @@ agespectrum(x, ...)
   random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),
   non.plateau.col = rgb(0, 1, 1, 0.5), sigdig = 2, line.col = "red",
   lwd = 2, title = TRUE, show.ci = TRUE,
-  xlab = "cumulative fraction", ylab = "age [Ma]", ...)
+  xlab = "cumulative fraction", ylab = "age [Ma]", omit = rep(0,
+  nrow(x)), ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
   random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),
   non.plateau.col = rgb(0, 1, 1, 0.5), sigdig = 2, exterr = TRUE,
-  line.col = "red", lwd = 2, i2i = FALSE, ...)
+  line.col = "red", lwd = 2, i2i = FALSE, omit = rep(0, length(x)),
+  ...)
 }
 \arguments{
 \item{x}{a three-column matrix whose first column gives the amount
@@ -69,6 +71,15 @@ the plateau age as a grey band}
 \item{xlab}{x-axis label}
 
 \item{ylab}{y-axis label}
+
+\item{omit}{vector of numbers or characters, one for each aliquot
+of \code{x}:
+\itemize{
+\item{Aliquots marked as \code{1}, \code{2}, \code{x} or
+      \code{X} are removed from the plot.}
+\item{All other flags are ignored and the corresponding aliquots
+      are plotted as normal.}
+}}
 
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}

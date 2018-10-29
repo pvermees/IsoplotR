@@ -119,8 +119,9 @@ central <- function(x,...){ UseMethod("central",x) }
 #' @rdname central
 #' @export
 central.default <- function(x,alpha=0.05,...){
-    zu <- log(x[,1])
-    su <- x[,2]/x[,1]
+    good <- !is.na(rowSums(x))
+    zu <- log(x[good,1])
+    su <- x[good,2]/x[good,1]
     fit <- continuous_mixture(zu,su)
     tt <- exp(fit$mu[1])
     st <- tt*fit$mu[2]

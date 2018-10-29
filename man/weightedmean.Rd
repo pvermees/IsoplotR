@@ -21,72 +21,76 @@ weightedmean(x, ...)
 \method{weightedmean}{default}(x, from = NA, to = NA,
   random.effects = TRUE, detect.outliers = TRUE, plot = TRUE,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ranked = FALSE, ...)
+  sigdig = 2, alpha = 0.05, ranked = FALSE, omit = rep(0, nrow(x)),
+  omit.col = NA, ...)
 
 \method{weightedmean}{UPb}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
-  alpha = 0.05, exterr = TRUE, ranked = FALSE, common.Pb = 0, ...)
+  alpha = 0.05, exterr = TRUE, ranked = FALSE, common.Pb = 0,
+  omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{PbPb}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, common.Pb = 1,
-  ranked = FALSE, ...)
+  ranked = FALSE, omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{ThU}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, ranked = FALSE, i2i = TRUE,
   detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0,
-  0, 0), ...)
+  0, 0), omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{ArAr}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = FALSE, ...)
+  i2i = FALSE, omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{KCa}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = FALSE, ...)
+  i2i = FALSE, omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{ReOs}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = TRUE, ...)
+  i2i = TRUE, omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{SmNd}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = TRUE, ...)
+  i2i = TRUE, omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{RbSr}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE,
-  ranked = FALSE, ...)
+  ranked = FALSE, omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{LuHf}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
   sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE,
-  ranked = FALSE, ...)
+  ranked = FALSE, omit = rep(0, nrow(x)), omit.col = NA, ...)
 
 \method{weightedmean}{UThHe}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ranked = FALSE, ...)
+  sigdig = 2, alpha = 0.05, ranked = FALSE, omit = rep(0, nrow(x)),
+  omit.col = NA, ...)
 
 \method{weightedmean}{fissiontracks}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE, ...)
+  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
+  omit = rep(0, nrow(x)), omit.col = NA, ...)
 }
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
@@ -131,6 +135,25 @@ values reported in the title of the graphical output.}
 \item{alpha}{the confidence limits of the error bars/rectangles.}
 
 \item{ranked}{plot the aliquots in order of increasing age?}
+
+\item{omit}{vector of numbers or characters, one for each aliquot
+    of \code{x}:
+
+\itemize{
+
+\item{Aliquots marked as \code{1} or \code{x} are plotted but
+ignored in the weighted mean age calculation.}
+
+\item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
+    are removed from both plots and calculations.}
+
+\item{All other flags are ignored and the corresponding aliquots
+are plotted and processed as normal.}
+
+}}
+
+\item{omit.col}{colour that should be used for the samples that are
+marked as \code{2} or \code{x} in \code{omit}.}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the

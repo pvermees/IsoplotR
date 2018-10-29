@@ -68,6 +68,14 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #'     around the plot
 #' @param ncol scalar value indicating the number of columns over
 #'     which the KDEs should be divided.
+#' @param omit vector of numbers or characters, one for each aliquot
+#'     of \code{x}:
+#'     \itemize{
+#'     \item{Aliquots marked as \code{1}, \code{2}, \code{x} or \code{X}
+#'           are removed from the plot.}
+#'     \item{All other flags are ignored and the corresponding aliquots
+#'           are plotted as normal.}
+#'     }
 #' @param ... optional arguments to be passed on to \code{R}'s
 #'     \code{density} function.
 #' @seealso \code{\link{radialplot}}, \code{\link{cad}}

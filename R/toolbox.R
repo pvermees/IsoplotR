@@ -1,6 +1,7 @@
 length.UPb  <- function(x){ nrow(x$x) }
 length.PbPb <- function(x){ nrow(x$x) }
 length.ArAr <- function(x){ nrow(x$x) }
+length.KCa <- function(x){ nrow(x$x) }
 length.RbSr <- function(x){ nrow(x$x) }
 length.SmNd <- function(x){ nrow(x$x) }
 length.ReOs <- function(x){ nrow(x$x) }
@@ -17,6 +18,7 @@ length.fissiontracks <- function(x){
 subset.UPb  <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.PbPb <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.KCa <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.RbSr <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }

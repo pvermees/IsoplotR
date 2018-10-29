@@ -95,6 +95,8 @@ peakfit <- function(x,...){ UseMethod("peakfit",x) }
 #' @rdname peakfit
 #' @export
 peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,alpha=0.05,...){
+    good <- !is.na(x[,1]+x[,2])
+    x <- subset(x,subset=good)
     if (k<1) return(NULL)
     if (log) {
         x[,2] <- x[,2]/x[,1]
@@ -350,8 +352,9 @@ min_age_to_legend <- function(fit,sigdig=2){
 }
 
 normal.mixtures <- function(x,k,sigdig=2,alpha=0.05,...){
-    zu <- x[,1]
-    su <- x[,2]
+    good <- !is.na(x[,1]+x[,2])
+    zu <- x[good,1]
+    su <- x[good,2]
     xu <- 1/su
     yu <- zu/su
     n <- length(yu)
@@ -537,8 +540,9 @@ min_age_model <- function(zs,sigdig=2,alpha=0.05){
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
     df <- length(z)-3
     out$peaks['t',] <- fit[1]
-    out$peaks['s[t]',] <- sqrt(E[1,1])
-    out$peaks['ci[t]',] <- nfact(alpha)*sqrt(E[1,1])
+    if (E[1,1]<0) out$peaks['s[t]',] <- NA
+    else out$peaks['s[t]',] <- sqrt(E[1,1])
+    out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
     out
 }
 
