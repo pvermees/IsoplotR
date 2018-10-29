@@ -171,7 +171,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
                              exterr=TRUE,line.col='red',lwd=2,
                              i2i=FALSE,omit=rep(0,nrow(x)),...){
-    x <- subset(x,subset=toplot(omit))
+    x <- subset(x,subset=tocalc(omit))
     tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))

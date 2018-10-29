@@ -220,13 +220,15 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
                       anchor=list(FALSE,NA),omit=rep(0,length(x)),
                       omit.col=NA,...){
+    plotit <- toplot(omit)
+    calcit <- tocalc(omit)
     if (common.Pb<1) X <- x
     else X <- common.Pb.correction(x,option=common.Pb)
-    X2plot <- subset(X,subset=toplot(omit))
+    X2plot <- subset(X,subset=plotit)
     lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
     if (show.age>1){
-        x2calc <- subset(x,subset=tocalc(omit))
+        x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
@@ -259,8 +261,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
             else graphics::points(x0,y0,pch=pch,cex=pcex*graphics::par('cex'))
         }
     }
-if (show.age==1){
-        X2calc <- subset(X,subset=tocalc(omit))
+    if (show.age==1){
+        X2calc <- subset(X,subset=calcit)
         fit <- concordia.age(X2calc,wetherill=wetherill,
                              exterr=exterr,alpha=alpha)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
@@ -268,7 +270,7 @@ if (show.age==1){
         fit$n <- length(X2calc)
         graphics::title(concordia.title(fit,sigdig=sigdig))
     }
-    colourbar(z=levels,col=ellipse.col,clabel=clabel)
+    colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     invisible(fit)
 }
 
