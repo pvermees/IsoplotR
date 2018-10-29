@@ -430,8 +430,10 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                         show.numbers=FALSE,levels=NA,clabel="",
-                        markers=NULL,pch=21,bg='yellow',
-                        col='black',sn=1:length(x$z),...){
+                        markers=NULL,pch=21,bg='yellow',col='black',
+                        sn=1:length(x$z),...){
+    if (show.numbers & all(is.na(levels))) show.points <- FALSE
+    else show.points <- TRUE
     exM <- radial.scale(x,zeta,rhoD)
     tticks <- get.radial.tticks(x)
     labelpos <- 4
@@ -443,20 +445,26 @@ radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                           zeta,rhoD,label=FALSE)
     }
     plot_radial_axes(x)
-    plot_radial_points(x,show.numbers=show.numbers,
+    plot_radial_points(x,show.points=show.points,
+                       show.numbers=show.numbers,
                        pch=pch,bg=bg,col=col,sn=sn,...)
 }
 
-plot_radial_points <- function(x,show.numbers=FALSE,bg='yellow',pch=21,
-                               col='black',sn=1:length(x$z),...){
+plot_radial_points <- function(x,show.points=TRUE,show.numbers=FALSE,
+                               bg='yellow',pch=21,col='black',
+                               sn=1:length(x$z),...){
     rxy <- data2rxry(x)
     rx <- rxy[,1]
     ry <- rxy[,2]
-    if (show.numbers) {
-        graphics::text(rx,ry,sn,col=col,...)
-    } else {
+    if (show.numbers & show.points){
+        graphics::text(rx,ry,labels=sn,pos=1)
+    } else if (show.numbers){
+        graphics::text(rx,ry,labels=sn,col=col)
+    }
+    if (show.points){
         graphics::points(rx,ry,bg=bg,pch=pch,...)
     }
+
 }
 
 plot_radial_axes <- function(x,...){
@@ -763,7 +771,7 @@ radial.title <- function(x,sigdig=2,alpha=0.05,units='',n=length(x),...){
                              c=rounded.age[3],
                              d=units,
                              n=n))
-    line2 <- substitute('MSWD ='~a*', p('*chi^2*')='~b,
+    line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
     line3 <- substitute('dispersion ='~a+b/-c*'%',
