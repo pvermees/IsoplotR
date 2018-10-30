@@ -102,23 +102,12 @@
 #' attribute it to the presence of geological uncertainty, which
 #' manifests itself as an added (co)variance term.
 #'
-#' @param omit vector of numbers or characters, one for each aliquot
-#'     of \code{x}:
-#' 
-#' \itemize{
-#' 
-#' \item{Aliquots marked as \code{1} or \code{x} are plotted but
-#' ignored in the isochron age calculation.}
-#' 
-#' \item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
-#'     are removed from both plots and calculations.}
-#' 
-#' \item{All other flags are ignored and the corresponding aliquots
-#' are plotted and processed as normal.}
-#' 
-#' }
-#' @param omit.col colour that should be used for the samples that are
-#'     marked as \code{2} or \code{x} in \code{omit}.
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the plot.
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from the isochron age calculation.
+#' @param omit.col colour that should be used for the omitted
+#'     aliquots.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{isochron}}
 #'
@@ -290,7 +279,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
                         hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
-    plotit <- (1:ns)%ni%c(hide,omit)
+    calcit <- (1:ns)%ni%c(hide,omit)
     d <- data2evolution(x)
     d2plot <- subset(d,subset=plotit)
     scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)

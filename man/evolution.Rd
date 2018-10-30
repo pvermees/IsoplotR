@@ -9,7 +9,7 @@ evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
   0, 0), show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
   isochron = FALSE, model = 1, exterr = TRUE, sigdig = 2,
-  omit = rep(0, length(x)), omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{ThU}}
@@ -96,24 +96,14 @@ isochron age?}
 
 \item{sigdig}{number of significant digits for the isochron age}
 
-\item{omit}{vector of numbers or characters, one for each aliquot
-    of \code{x}:
+\item{hide}{vector with indices of aliquots that should be removed
+from the plot.}
 
-\itemize{
+\item{omit}{vector with indices of aliquots that should be plotted
+but omitted from the isochron age calculation.}
 
-\item{Aliquots marked as \code{1} or \code{x} are plotted but
-ignored in the isochron age calculation.}
-
-\item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
-    are removed from both plots and calculations.}
-
-\item{All other flags are ignored and the corresponding aliquots
-are plotted and processed as normal.}
-
-}}
-
-\item{omit.col}{colour that should be used for the samples that are
-marked as \code{2} or \code{x} in \code{omit}.}
+\item{omit.col}{colour that should be used for the omitted
+aliquots.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

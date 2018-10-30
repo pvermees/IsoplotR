@@ -70,23 +70,12 @@
 #'     plot.
 #' @param alpha cutoff value for confidence intervals
 #' @param units measurement units to be displayed in the legend.
-#' @param omit vector of numbers or characters, one for each aliquot
-#'     of \code{x}:
-#' 
-#' \itemize{
-#' 
-#' \item{Aliquots marked as \code{1} or \code{x} are plotted but
-#' ignored in the central age calculation and mixture models.}
-#' 
-#' \item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
-#'     are removed from both plots and calculations.}
-#' 
-#' \item{All other flags are ignored and the corresponding aliquots
-#' are plotted and processed as normal.}
-#' 
-#' }
-#' @param omit.col colour that should be used for the samples that are
-#'     marked as \code{2} or \code{x} in \code{omit}.
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the radial plot.
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from the central age calculation or mixture models.
+#' @param omit.col colour that should be used for the omitted
+#'     aliquots.
 #' @param ... additional arguments to the generic \code{points}
 #'     function
 #' @seealso \code{\link{peakfit}}, \code{\link{central}}
