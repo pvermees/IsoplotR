@@ -101,23 +101,12 @@
 #' uncertainties (model 1), it can also be attributed to the presence
 #' of geological uncertainty, which manifests itself as an added
 #' (co)variance term.
-#' @param omit vector of numbers or characters, one for each aliquot
-#'     of \code{x}:
-#' 
-#' \itemize{
-#' 
-#' \item{Aliquots marked as \code{1} or \code{x} are plotted but
-#' ignored in the central age calculation.}
-#' 
-#' \item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
-#'     are removed from both plots and calculations.}
-#' 
-#' \item{All other flags are ignored and the corresponding aliquots
-#' are plotted and processed as normal.}
-#' 
-#' }
-#' @param omit.col colour that should be used for the samples that are
-#'     marked as \code{2} or \code{x} in \code{omit}.
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the plot.
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from the central age calculation.
+#' @param omit.col colour that should be used for the omitted
+#'     aliquots.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
 #' @references
@@ -137,45 +126,46 @@
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                       show.numbers=FALSE,alpha=0.05,
-                      contour.col=c('white','red'),levels=NA,
-                      clabel="",ellipse.col=c("#00FF0080","#0000FF80"),
-                      sigdig=2,xlim=NA,ylim=NA,fact=NA,
-                      omit=rep(0,length(x)),omit.col=NA,...){
-    calcit <- tocalc(omit)
-    plotit <- toplot(omit)
-    x2calc <- subset(x,calcit)
-    x2plot <- subset(x,plotit)
+                      contour.col=c('white','red'),levels=NA,clabel="",
+                      ellipse.col=c("#00FF0080","#0000FF80"),
+                      sigdig=2,xlim=NA,ylim=NA,fact=NA,hide=NULL,
+                      omit=NULL,omit.col=NA,...){
+    ns <- length(x)
+    calcit <- (1:ns)%ni%c(hide,omit)
+    plotit <- (1:ns)%ni%hide
+    x2calc <- clear(x,hide,omit)
+    x2plot <- clear(x,hide)
     fit <- central.UThHe(x2calc,alpha=alpha,model=model)
-    ellipse.cols <- set.ellipse.colours(ns=length(x),levels=levels,
-                                        col=ellipse.col,omit=omit,
-                                        omit.col=omit.col)
+    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,
+                                        col=ellipse.col,hide=hide,
+                                        omit=omit,omit.col=omit.col)
     if (logratio) {
         plot_logratio_contours(x2plot,contour.col=contour.col,
                                xlim=xlim,ylim=ylim,...)
         if (model==2){
             u <- log(x[,'U']/x[,'He'])
             v <- log(x[,'Th']/x[,'He'])
-            plot_points(u,v,bg=ellipse.cols,show.numbers=show.numbers,
-                        omit=omit,omit.col=omit.col,...)
+            plot_points(u,v,pcol=ellipse.cols,
+                        show.numbers=show.numbers,
+                        hide=hide,omit=omit,...)
         } else {
             plot_logratio_ellipses(x,ellipse.cols=ellipse.cols,
                                    alpha=alpha,levels=levels,
-                                   show.numbers=show.numbers,
-                                   omit=omit,omit.col=omit.col)
+                                   show.numbers=show.numbers,hide=hide)
         }
     } else {
         if (all(is.na(fact))) fact <- getfact(x2plot,fit)
-        plot_helioplot_contours(x2plot,fact=fact,contour.col=contour.col,
+        plot_helioplot_contours(x2plot,fact=fact,
+                                contour.col=contour.col,
                                 xlim=xlim,ylim=ylim)
         if (model==2){
             plot_helioplot_points(x,show.numbers=show.numbers,
-                                  alpha=alpha,fact=fact,bg=ellipse.cols,
-                                  omit=omit,omit.col=omit.col)
+                                  fact=fact,pcol=ellipse.cols,
+                                  hide=hide,omit=omit)
         } else {
             plot_helioplot_ellipses(x,ellipse.cols=ellipse.cols,
                                     fact=fact,alpha=alpha,levels=levels,
-                                    show.numbers=show.numbers,
-                                    omit=omit,omit.col=omit.col)
+                                    show.numbers=show.numbers,hide=hide)
         }
     }
     if (show.central.comp){
@@ -206,8 +196,8 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
 
 plot_logratio_ellipses <- function(x,ellipse.cols,alpha=0.05,
                                    show.numbers=FALSE,levels=NA,
-                                   omit=rep(0,nrow(x)),omit.col=NA){
-    sn <- (1:length(x))[toplot(omit)]
+                                   hide=NULL){
+    sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
@@ -220,9 +210,8 @@ plot_logratio_ellipses <- function(x,ellipse.cols,alpha=0.05,
 }
 plot_helioplot_ellipses <- function(x,ellipse.cols,fact=c(1,1,1),
                                     alpha=0.05,show.numbers=FALSE,
-                                    levels=NA,omit=rep(0,nrow(x)),
-                                    omit.col=NA){
-    sn <- (1:length(x))[toplot(omit)]
+                                    levels=NA,hide=NULL){
+    sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
@@ -239,13 +228,14 @@ plot_helioplot_ellipses <- function(x,ellipse.cols,fact=c(1,1,1),
         else graphics::points(x0y0[1],x0y0[2],pch=19,cex=0.25)
     }
 }
-plot_helioplot_points <- function(x,fact=c(1,1,1),alpha=0.05,
-                                  show.numbers=FALSE,omit=rep(0,nrow(x)),
-                                  omit.col=NA,...){
+plot_helioplot_points <- function(x,fact=c(1,1,1),pcol=NA,
+                                  show.numbers=FALSE,hide=NULL,
+                                  omit=NULL,...){
     xyz <- renormalise(x[,c('He','U','Th')],fact=fact)
     xy <- xyz2xy(xyz)
-    plot_points(xy[,1],xy[,2],show.numbers=show.numbers,
-                omit=omit,omit.col=omit.col,...)
+    plot_points(xy[,1],xy[,2],pcol=pcol,
+                show.numbers=show.numbers,
+                hide=hide,omit=omit,...)
 }
 
 plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,

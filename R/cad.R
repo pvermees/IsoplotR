@@ -42,14 +42,8 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #'     \code{terrain.colors}, \code{topo.colors}, \code{cm.colors}),
 #'     which are to be used for plotting data of class
 #'     \code{detritals}.
-#' @param omit vector of numbers or characters, one for each aliquot
-#'     of \code{x}:
-#'     \itemize{
-#'     \item{Aliquots marked as \code{1}, \code{2}, \code{x} or \code{X}
-#'           are removed from the plot.}
-#'     \item{All other flags are ignored and the corresponding aliquots
-#'           are plotted as normal.}
-#'     }
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the plot.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @examples
 #' data(examples)
@@ -58,8 +52,9 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' @export
 cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                         colmap='heat.colors',col='black',
-                        omit=rep(0,length(x)),...){
-    d <- x[tocalc(omit)]
+                        hide=NULL,...){
+    calcit <- (1:length(x))%ni%hide
+    d <- x[calcit]
     graphics::plot(range(d,na.rm=TRUE),c(0,1),type='n',
                    ylab='cumulative probability',xlab=xlab,...)
     graphics::lines(stats::ecdf(d),pch=pch,verticals=verticals,col=col)
@@ -118,14 +113,14 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     col='black',type=4,cutoff.76=1100,
                     cutoff.disc=c(-15,5),common.Pb=0,
-                    omit=rep(0,length(x)),...){
+                    hide=NULL,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
     tt <- filter.UPb.ages(X,type,cutoff.76,cutoff.disc)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
@@ -146,30 +141,30 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @rdname cad
 #' @export
 cad.PbPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                     col='black',common.Pb=1,omit=rep(0,length(x)),...){
+                     col='black',common.Pb=1,hide=NULL,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
     tt <- PbPb.age(X)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.ArAr <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                     col='black',i2i=FALSE,omit=rep(0,length(x)),...){
+                     col='black',i2i=FALSE,hide=NULL,...){
     tt <- ArAr.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.KCa <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                    col='black',i2i=FALSE,omit=rep(0,length(x)),...){
+                    col='black',i2i=FALSE,hide=NULL,...){
     tt <- KCa.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format == 1} or \code{2}.
@@ -197,58 +192,57 @@ cad.KCa <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @export
 cad.ThU <- function(x,pch=NA,verticals=TRUE, xlab='age [ka]',
                     col='black',i2i=FALSE,detritus=0,Th02=c(0,0),
-                    Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                    omit=rep(0,length(x)),...){
+                    Th02U48=c(0,0,1e6,0,0,0,0,0,0),hide=NULL,...){
     tt <- ThU.age(x,i2i=i2i,detritus=detritus,
                   Th02=Th02,Th02U48=Th02U48)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.ReOs <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                     col='black',i2i=TRUE,omit=rep(0,length(x)),...){
+                     col='black',i2i=TRUE,hide=NULL,...){
     tt <- ReOs.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.SmNd <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                     col='black',i2i=TRUE,omit=rep(0,length(x)),...){
+                     col='black',i2i=TRUE,hide=NULL,...){
     tt <- SmNd.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.RbSr <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                     col='black',i2i=TRUE,omit=rep(0,length(x)),...){
+                     col='black',i2i=TRUE,hide=NULL,...){
     tt <- RbSr.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.LuHf <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                     col='black',i2i=TRUE,omit=rep(0,length(x)),...){
+                     col='black',i2i=TRUE,hide=NULL,...){
     tt <- LuHf.age(x,i2i=i2i)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.UThHe <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                      col='black',omit=rep(0,length(x)),...){
+                      col='black',hide=NULL,...){
     tt <- UThHe.age(x)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.fissiontracks <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                              col='black',omit=rep(0,length(x)),...){
+                              col='black',hide=NULL,...){
     tt <- fissiontrack.age(x)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,omit=omit,...)
+                col=col,hide=hide,...)
 }

@@ -20,64 +20,64 @@ isochron(x, ...)
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, title = TRUE,
-  model = 1, xlab = "x", ylab = "y", omit = rep(0, length(x)),
+  model = 1, xlab = "x", ylab = "y", hide = NULL, omit = NULL,
   omit.col = NA, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, omit = rep(0, length(x)),
+  exterr = TRUE, model = 1, hide = NULL, omit = NULL,
   omit.col = NA, ...)
 
 \method{isochron}{KCa}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, omit = rep(0, length(x)), omit.col = NA, ...)
+  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, growth = FALSE, omit = rep(0,
-  length(x)), omit.col = NA, ...)
+  exterr = TRUE, model = 1, growth = FALSE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, omit = rep(0, length(x)), omit.col = NA, ...)
+  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, omit = rep(0, length(x)), omit.col = NA, ...)
+  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, omit = rep(0, length(x)), omit.col = NA, ...)
+  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, omit = rep(0, length(x)), omit.col = NA, ...)
+  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA,
   alpha = 0.05, sigdig = 2, show.numbers = FALSE, levels = NA,
   clabel = "", ellipse.col = c("#00FF0080", "#FF000080"),
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, omit = rep(0, length(x)),
+  exterr = TRUE, model = 1, hide = NULL, omit = NULL,
   omit.col = NA, ...)
 
 \method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, model = 1,
-  omit = rep(0, length(x)), omit.col = "grey", ...)
+  hide = NULL, omit = NULL, omit.col = "grey", ...)
 }
 \arguments{
 \item{x}{EITHER a matrix with the following five columns:
@@ -154,24 +154,14 @@ intercept and slope.}
 
 \item{ylab}{text label for the vertical plot axis}
 
-\item{omit}{vector of numbers or characters, one for each aliquot
-    of \code{x}:
+\item{hide}{vector with indices of aliquots that should be removed
+from the plot.}
 
-\itemize{
+\item{omit}{vector with indices of aliquots that should be plotted
+but omitted from the isochron age calculation.}
 
-\item{Aliquots marked as \code{1} or \code{x} are plotted but
-ignored in the isochron age calculation.}
-
-\item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
-    are removed from both plots and calculations.}
-
-\item{All other flags are ignored and the corresponding aliquots
-are plotted and processed as normal.}
-
-}}
-
-\item{omit.col}{colour that should be used for the samples that are
-marked as \code{2} or \code{x} in \code{omit}.}
+\item{omit.col}{colour that should be used for the omitted
+aliquots.}
 
 \item{inverse}{if \code{FALSE} and \code{x} has class \code{ArAr}, plots
     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.

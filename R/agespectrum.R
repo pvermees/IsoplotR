@@ -53,14 +53,8 @@
 #'     if \code{FALSE}, attributes any excess dispersion to an
 #'     underestimation of the analytical uncertainties. This akin to a
 #'     `model-1' isochron regression.
-#' @param omit vector of numbers or characters, one for each aliquot
-#'     of \code{x}:
-#'     \itemize{
-#'     \item{Aliquots marked as \code{1}, \code{2}, \code{x} or
-#'           \code{X} are removed from the plot.}
-#'     \item{All other flags are ignored and the corresponding aliquots
-#'           are plotted as normal.}
-#'     }
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the plot.
 #' @param ... optional parameters to the generic \code{plot} function
 #'
 #' @return If \code{plateau=TRUE}, returns a list with the following
@@ -119,12 +113,12 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 random.effects=TRUE,
                                 plateau.col=rgb(0,1,0,0.5),
                                 non.plateau.col=rgb(0,1,1,0.5),
-                                sigdig=2,line.col='red', lwd=2,
+                                sigdig=2,line.col='red',lwd=2,
                                 title=TRUE,show.ci=TRUE,
                                 xlab='cumulative fraction',
-                                ylab='age [Ma]',omit=rep(0,nrow(x)),...){
-    x <- subset(x,subset=tocalc(omit))
+                                ylab='age [Ma]',hide=NULL,...){
     ns <- nrow(x)
+    x <- clear(x,hide)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
@@ -178,19 +172,21 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              plateau.col=rgb(0,1,0,0.5),
                              non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
                              exterr=TRUE,line.col='red',lwd=2,
-                             i2i=FALSE,omit=rep(0,length(x)),...){
-    x <- subset(x,subset=tocalc(omit))
+                             i2i=FALSE,hide=NULL,...){
+    x <- clear(x,hide)
     tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
-                                plateau=plateau,random.effects=random.effects,
+                                plateau=plateau,
+                                random.effects=random.effects,
                                 sigdig=sigdig,line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
     if (plateau){
         out <- plat
-        # calculate the weighted mean Ar40Ar39 ratio from the weighted mean age
-        R <- get.ArAr.ratio(plat$mean['x'],plat$mean['s[x]'],x$J[1],0,exterr=FALSE)
+        # calculate the Ar40Ar39 ratio from the weighted mean age
+        R <- get.ArAr.ratio(plat$mean['x'],plat$mean['s[x]'],
+                            x$J[1],0,exterr=FALSE)
         # recalculate the weighted mean age, this time
         # taking into account decay and J uncertainties
         out$mean[1:2] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)

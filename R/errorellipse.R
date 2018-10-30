@@ -40,11 +40,11 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
-                        omit=rep(0,nrow(d)),omit.col=NA,...){
-    plotit <- toplot(omit)
-    calcit <- tocalc(omit)
+                        hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- nrow(d)
     sn <- 1:ns
+    plotit <- sn%ni%hide
+    calcit <- sn%ni%c(hide,omit)
     colnames(d) <- c('X','sX','Y','sY','rXY')
     if (any(is.na(xlim))) xlim <- get.limits(d[plotit,'X'],d[plotit,'sX'])
     if (any(is.na(ylim))) ylim <- get.limits(d[plotit,'Y'],d[plotit,'sY'])
@@ -56,8 +56,8 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
     graphics::box()
     if (show.ellipses!=1){
         colour <- rep('black',ns)
-        if (is.na(omit.col)) colour[!calcit] <- 'grey'
-        else colour[!calcit] <- omit.col
+        if (is.na(omit.col)) colour[omit] <- 'grey'
+        else colour[omit] <- omit.col
     }
     if (show.ellipses==0){
         if (show.numbers)
@@ -68,7 +68,7 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
     } else if (show.ellipses==1){ # error ellipse
         ellipse.cols <-
             set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                                omit=omit,omit.col=omit.col)
+                                hide=hide,omit=omit,omit.col=omit.col)
         for (i in sn[plotit]){
             if (!any(is.na(d[i,]))){
                 covmat <- cor2cov2(d[i,'sX'],d[i,'sY'],d[i,'rXY'])

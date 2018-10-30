@@ -22,14 +22,14 @@ radialplot(x, ...)
   transformation = "log", sigdig = 2, show.numbers = FALSE,
   pch = 21, levels = NA, clabel = "", bg = c("yellow", "red"),
   col = "black", title = TRUE, k = 0, markers = NULL,
-  alpha = 0.05, units = "", omit = rep(0, nrow(x)), omit.col = NA,
+  alpha = 0.05, units = "", hide = NA, omit = NA, omit.col = NA,
   ...)
 
 \method{radialplot}{fissiontracks}(x, from = NA, to = NA, t0 = NA,
   transformation = "arcsin", sigdig = 2, show.numbers = FALSE,
   pch = 21, levels = NA, clabel = "", bg = c("yellow", "red"),
   col = "black", title = TRUE, markers = NULL, k = 0,
-  exterr = TRUE, alpha = 0.05, omit = rep(0, length(x)),
+  exterr = TRUE, alpha = 0.05, hide = NULL, omit = NULL,
   omit.col = NA, ...)
 
 \method{radialplot}{UPb}(x, from = NA, to = NA, t0 = NA,
@@ -37,62 +37,62 @@ radialplot(x, ...)
   cutoff.disc = c(-15, 5), show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, common.Pb = 0,
-  alpha = 0.05, omit = rep(0, length(x)), omit.col = NA, ...)
+  alpha = 0.05, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{PbPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, common.Pb = 1,
-  alpha = 0.05, omit = rep(0, length(x)), omit.col = NA, ...)
+  alpha = 0.05, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{ArAr}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, i2i = FALSE,
-  alpha = 0.05, omit = rep(0, length(x)), omit.col = NA, ...)
+  alpha = 0.05, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{KCa}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, i2i = FALSE,
-  alpha = 0.05, omit = rep(0, length(x)), omit.col = NA, ...)
+  alpha = 0.05, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
-  markers = NULL, k = 0, alpha = 0.05, omit = rep(0, length(x)),
+  markers = NULL, k = 0, alpha = 0.05, hide = NULL, omit = NULL,
   omit.col = NA, ...)
 
 \method{radialplot}{ReOs}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05,
-  omit = rep(0, length(x)), omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{SmNd}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05,
-  omit = rep(0, length(x)), omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{RbSr}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05,
-  omit = rep(0, length(x)), omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{LuHf}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, i2i = TRUE, alpha = 0.05,
-  omit = rep(0, length(x)), omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{radialplot}{ThU}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", show.numbers = FALSE, pch = 21,
-  levels = NA, clabel = "", bg = c("yellow", "red"), col = col,
+  levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, i2i = TRUE, alpha = 0.05, detritus = 0,
   Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
-  omit = rep(0, length(x)), omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 }
 \arguments{
 \item{x}{Either an \code{[n x 2]} matix of (transformed) values z
@@ -155,24 +155,14 @@ plot.}
 
 \item{units}{measurement units to be displayed in the legend.}
 
-\item{omit}{vector of numbers or characters, one for each aliquot
-    of \code{x}:
+\item{hide}{vector with indices of aliquots that should be removed
+from the radial plot.}
 
-\itemize{
+\item{omit}{vector with indices of aliquots that should be plotted
+but omitted from the central age calculation or mixture models.}
 
-\item{Aliquots marked as \code{1} or \code{x} are plotted but
-ignored in the central age calculation and mixture models.}
-
-\item{Aliquots marked as \code{2} or \code{X} (uppercase \code{x})
-    are removed from both plots and calculations.}
-
-\item{All other flags are ignored and the corresponding aliquots
-are plotted and processed as normal.}
-
-}}
-
-\item{omit.col}{colour that should be used for the samples that are
-marked as \code{2} or \code{x} in \code{omit}.}
+\item{omit.col}{colour that should be used for the omitted
+aliquots.}
 
 \item{exterr}{propagate the external sources of uncertainty into
 the mixture model errors?}
