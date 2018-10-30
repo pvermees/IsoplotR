@@ -235,10 +235,11 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
-                      anchor=list(FALSE,NA),omit=rep(0,length(x)),
+                      anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
-    plotit <- toplot(omit)
-    calcit <- tocalc(omit)
+    ns <- length(x)
+    plotit <- (1:ns)%ni%hide
+    calcit <- (1:ns)%ni%c(hide,omit)
     if (common.Pb<1) X <- x
     else X <- common.Pb.correction(x,option=common.Pb)
     X2plot <- subset(X,subset=plotit)
@@ -255,11 +256,10 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     }
     plot.concordia.line(X2plot,lims=lims,wetherill=wetherill,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
-    ns <- length(x)
     ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                                        omit=omit,omit.col=omit.col)
+                                        hide=hide,omit=omit,omit.col=omit.col)
     for (i in 1:ns){
-        if (toplot(omit[i])){
+        if (plotit[i]){
             if (wetherill) xyc <- wetherill(X,i)
             else xyc <- tera.wasserburg(X,i)
             x0 <- xyc$x[1]

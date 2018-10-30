@@ -130,8 +130,9 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                         n=512,plot=TRUE,pch='|',xlab="age [Ma]",
                         ylab="",kde.col=rgb(1,0,1,0.6),
                         hist.col=rgb(0,1,0,0.2),show.hist=TRUE,
-                        bty='n',binwidth=NA,omit=rep(0,length(x)),...){
-    X <- getkde(x[tocalc(omit)],from=from,to=to,bw=bw,
+                        bty='n',binwidth=NA,hide=NULL,omit=NULL,...){
+    x2calc <- clear(x,hide,omit)
+    X <- getkde(x2calc,from=from,to=to,bw=bw,
                 adaptive=adaptive,log=log,n=n,...)
     if (plot) {
         plot.KDE(X,pch=pch,xlab=xlab,ylab=ylab,kde.col=kde.col,
@@ -178,7 +179,7 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                     show.hist=TRUE, bty='n',binwidth=NA,type=4,
                     cutoff.76=1100,cutoff.disc=c(-15,5),common.Pb=0,
-                    omit=rep(0,length(x)),...){
+                    hide=NULL,omit=NULL,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)
     else
@@ -188,7 +189,7 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @param samebandwidth logical flag indicating whether the same
 #'     bandwidth should be used for all samples. If
@@ -228,7 +229,7 @@ kde.PbPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA,common.Pb=1,
-                     omit=rep(0,length(x)),...){
+                     hide=NULL,omit=NULL,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)
     else
@@ -238,7 +239,7 @@ kde.PbPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -246,13 +247,13 @@ kde.ArAr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,
-                     omit=rep(0,length(x)),...){
+                     hide=NULL,omit=NULL,...){
     tt <- ArAr.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -260,13 +261,13 @@ kde.KCa <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                     show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,
-                    omit=rep(0,length(x)),...){
+                    hide=NULL,omit=NULL,...){
     tt <- KCa.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format == 1} or \code{2}.
@@ -297,13 +298,13 @@ kde.ThU <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                     show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,detritus=0,
                     Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                    omit=rep(0,length(x)),...){
+                    hide=NULL,omit=NULL,...){
     tt <- ThU.age(x,i2i=i2i,detritus=detritus,Th02=Th02,Th02U48=Th02U48)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -311,13 +312,13 @@ kde.ReOs <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA,i2i=TRUE,
-                     omit=rep(0,length(x)),...){
+                     hide=NULL,omit=NULL,...){
     tt <- ReOs.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -325,13 +326,13 @@ kde.SmNd <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA,i2i=TRUE,
-                     omit=rep(0,length(x)),...){
+                     hide=NULL,omit=NULL,...){
     tt <- SmNd.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -339,13 +340,13 @@ kde.RbSr <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA,i2i=TRUE,
-                     omit=rep(0,length(x)),...){
+                     hide=NULL,omit=NULL,...){
     tt <- RbSr.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -353,13 +354,13 @@ kde.LuHf <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA,i2i=TRUE,
-                     omit=rep(0,length(x)),...){
+                     hide=NULL,omit=NULL,...){
     tt <- LuHf.age(x,i2i=i2i)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -367,13 +368,13 @@ kde.UThHe <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                       n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                       kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                       show.hist=TRUE,bty='n',binwidth=NA,
-                      omit=rep(0,length(x)),...){
+                      hide=NULL,omit=NULL,...){
     tt <- UThHe.age(x)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col, hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 #' @rdname kde
 #' @export
@@ -382,14 +383,14 @@ kde.fissiontracks <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                               xlab="age [Ma]",ylab="",
                               kde.col=rgb(1,0,1,0.6),
                               hist.col=rgb(0,1,0,0.2),show.hist=TRUE,
-                              bty='n',binwidth=NA,
-                              omit=rep(0,length(x)),...){
+                              bty='n',binwidth=NA,hide=NULL,
+                              omit=NULL,...){
     tt <- fissiontrack.age(x)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col, hist.col=hist.col,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
-                omit=omit,...)
+                hide=hide,omit=omit,...)
 }
 
 

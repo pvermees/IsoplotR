@@ -119,12 +119,13 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 random.effects=TRUE,
                                 plateau.col=rgb(0,1,0,0.5),
                                 non.plateau.col=rgb(0,1,1,0.5),
-                                sigdig=2,line.col='red', lwd=2,
+                                sigdig=2,line.col='red',lwd=2,
                                 title=TRUE,show.ci=TRUE,
                                 xlab='cumulative fraction',
-                                ylab='age [Ma]',omit=rep(0,nrow(x)),...){
-    x <- subset(x,subset=tocalc(omit))
+                                ylab='age [Ma]',hide=NULL,
+                                omit=NULL,...){
     ns <- nrow(x)
+    x <- clear(x,hide,omit)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
@@ -178,8 +179,8 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              plateau.col=rgb(0,1,0,0.5),
                              non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
                              exterr=TRUE,line.col='red',lwd=2,
-                             i2i=FALSE,omit=rep(0,length(x)),...){
-    x <- subset(x,subset=tocalc(omit))
+                             i2i=FALSE,hide=NULL,omit=NULL,...){
+    x <- clear(x,hide,omit)
     tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))

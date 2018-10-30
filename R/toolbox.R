@@ -235,9 +235,8 @@ LL.norm <- function(x,covmat){
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
-                                omit=rep(0,ns),omit.col=NA){
-    remove <- !tocalc(omit)
-    levels[remove] <- NA
+                                hide=NULL,omit=NULL,omit.col=NA){
+    levels[c(hide,omit)] <- NA
     levels[!is.numeric(levels)] <- NA
     nl <- length(levels)
     out <- NULL
@@ -249,7 +248,7 @@ set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
     } else {
         out <- levels2colours(levels=levels,col=col)[1:ns]
     }
-    out[remove] <- omit.col
+    out[omit] <- omit.col
     out
 }
 
@@ -292,30 +291,27 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     }
     graphics::rect(xb,yb,xe,ye)
     graphics::par(new=T)
-    graphics::plot(rep(xe,length(z)),z,type='n',axes=F,xlab=NA,ylab=NA,...)
+    graphics::plot(rep(xe,length(z)),z,type='n',
+                   axes=F,xlab=NA,ylab=NA,...)
     graphics::axis(side=4)
     mymtext(text=clabel,side=3,adj=1)
 }
 
-plot_points <- function(x,y,show.numbers=FALSE,
-                        omit=rep(0,length(x)),omit.col=NA,...){
-    calcit <- tocalc(omit)
-    plotit <- toplot(omit)
-    sn <- (1:length(x))[plotit]
-    ns <- length(sn)
-    xp <- x[plotit]
-    yp <- y[plotit]
+plot_points <- function(x,y,pcol=NA,show.numbers=FALSE,
+                        hide=NULL,omit=NULL,...){
+    ns <- length(x)
+    sn <- clear(1:ns,hide)
     args <- get_points_pars(...)
-    args$x <- xp
-    args$y <- yp
+    args$x <- x[sn]
+    args$y <- y[sn]
     if (show.numbers){
         tcol <- rep('black',ns)
-        tcol[!calcit] <- 'grey'
-        args$col <- tcol
+        tcol[omit] <- 'grey'
+        args$col <- tcol[sn]
         args$labels <- sn
         do.call(graphics::text,args)
     } else {
-        args$bg[!calcit] <- omit.col
+        if (!any(is.na(pcol))) args$bg <- pcol
         do.call(graphics::points,args)
     }
 }
@@ -430,10 +426,13 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     return(.opt)
 }
 
-tocalc <- function(omit){
-    !(omit%in%c(1,2,'x','X'))
-}
+'%ni%' <- function(x,y)!('%in%'(x,y))
 
-toplot <- function(omit){
-    !(omit%in%c(2,'X'))
+clear <- function(x,...){
+    i <- unlist(list(...))
+    if (hasClass(x,'matrix')) sn <- 1:nrow(x)
+    else sn <- 1:length(x)
+    if (is.numeric(i)) out <- subset(x,subset=sn%ni%i)
+    else out <- x
+    out
 }
