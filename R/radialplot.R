@@ -159,14 +159,15 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
-    x2plot <- clear(x,omit)
+    x2plot <- clear(x,hide)
     peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
-    pcol <- set.ellipse.colours(ns=ns,levels=levels,col=bg,hide=hide,
-                                omit=omit,omit.col=omit.col)
+    pcol <- set.ellipse.colours(ns=ns,levels=levels[plotit],
+                                col=bg,hide=hide,omit=omit,
+                                omit.col=omit.col)
     tcol <- rep(col,ns)
-    tcol[!calcit] <- 'grey'
+    tcol[omit] <- 'grey'
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
                 show.numbers=show.numbers,pch=pch,
                 levels=levels[plotit],clabel=clabel,
@@ -398,7 +399,7 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,
 radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',show.numbers=FALSE,
                            pch=21,levels=NA,clabel="",
-                           bg=c("yellow","red"),col=col,markers=NULL,
+                           bg=c("yellow","red"),col='black',markers=NULL,
                            k=0,i2i=TRUE,alpha=0.05,detritus=0,
                            Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                            hide=NULL,omit=NULL,omit.col=NA,...){

@@ -144,7 +144,7 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
                                  outlier.col=rgb(0,1,1,0.5),sigdig=2,
                                  alpha=0.05,ranked=FALSE,hide=NULL,
                                  omit=NULL,omit.col=NA,...){
-    ns <- length(x)
+    ns <- nrow(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     X <- x[plotit,1]
