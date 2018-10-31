@@ -190,29 +190,13 @@ U4U8vst <- function(x,detritus=0,Th02=c(0,0),
     x.lab <- 'Age [ka]'
     y.lab <- expression(paste("("^"234","U/"^"238","U)"[o]))
     graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
-    covmat <- matrix(0,2,2)
-    ellipse.cols <-
-        set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                            hide=hide,omit=omit,omit.col=omit.col)
-    x0 <- ta0[,'t']
-    y0 <- ta0[,'48_0']
-    sn <- (1:ns)[plotit]
-    if (show.ellipses){
-        for (i in sn){
-            diag(covmat) <- ta0[i,c('s[t]','s[48_0]')]^2
-            covmat[1,2] <- ta0[i,'cov[t,48_0]']
-            covmat[2,1] <- covmat[1,2]
-            ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
-            graphics::polygon(ell,col=ellipse.cols[i])
-            if (show.numbers) graphics::text(x0[i],y0[i],i)
-            else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
-        }
-    } else {
-        plot_points(x0,y0,mybg=ellipse.cols,
-                    show.numbers=show.numbers,
-                    hide=hide,omit=omit,...)
-    }
-    colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
+    d <- ta0
+    colnames(d) <- c('X','sX','Y','sY','rXY')
+    d[,'rXY'] <- ta0[,'cov[t,48_0]']/(ta0[,'s[t]']*ta0[,'s[48_0]'])
+    scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+                show.ellipses=show.ellipses,levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
+                hide=hide,omit=omit,omit.col=omit.col,...)
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
@@ -233,41 +217,24 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
                         model=model,hide=hide,omit=omit)
         b48 <- fit$par['a']
         b08 <- fit$par['A']
-        e48 <- 1
-        e08 <- fit$par['A'] + fit$par['B']*(e48-fit$par['a'])/fit$par['b']
-        graphics::lines(c(b08,e08),c(b48,e48))
-    }
-    ellipse.cols <-
-        set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                            hide=hide,omit=omit,omit.col=omit.col)
-    covmat <- matrix(0,2,2)
-    x0 <- d[,'Th230U238']
-    y0 <- d[,'U234U238']
-    sn <- (1:ns)[plotit]
-    if (show.ellipses){
-        for (i in sn){
-            covmat <- cor2cov2(sX=d[i,'sTh230U238'],
-                               sY=d[i,'sU234U238'],
-                               rXY=d[i,'rYZ'])
-            ell <- ellipse(x0[i],y0[i],covmat,alpha=alpha)
-            graphics::polygon(ell,col=ellipse.cols[i])
-            if (show.numbers) graphics::text(x0[i],y0[i],i)
-            else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
-        }
-    }
-    if (isochron){
-        sa <- sqrt(fit$cov['a','a'])
-        sA <- sqrt(fit$cov['A','A'])
-        ell <- matrix(c(fit$par['A'],sA,fit$par['a'],sa,
-                        fit$cov['a','A']/(sa*sA)),1,5)
-        scatterplot(ell,alpha=alpha,
+        initial <- matrix(0,1,5)
+        initial[1] <- b08
+        initial[2] <- sqrt(fit$cov['a','a'])
+        initial[3] <- b48
+        initial[4] <- sqrt(fit$cov['A','A'])
+        initial[5] <- fit$cov['a','A']/(initial[2]*initial[4])
+        scatterplot(initial,alpha=alpha,
                     ellipse.col=grDevices::rgb(1,1,1,0.85),
                     line.col='black',new.plot=FALSE)
+        e48 <- 1
+        e08 <- b08 + fit$par['B']*(e48-b48)/fit$par['b']
+        graphics::lines(c(b08,e08),c(b48,e48))
     }
-    if (!show.ellipses)
-        plot_points(x0,y0,mybg=ellipse.cols,
-                    show.numbers=show.numbers,
-                    hide=hide,omit=omit,...)
+    pdat <- d[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
+    scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
+                show.ellipses=show.ellipses,levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
+                hide=hide,omit=omit,omit.col=omit.col,...)
     colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
 }
 
