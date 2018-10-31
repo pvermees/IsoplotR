@@ -208,7 +208,7 @@ U4U8vst <- function(x,detritus=0,Th02=c(0,0),
             else graphics::points(x0[i],y0[i],pch=19,cex=0.25)
         }
     } else {
-        plot_points(x0,y0,pcol=ellipse.cols,
+        plot_points(x0,y0,mybg=ellipse.cols,
                     show.numbers=show.numbers,
                     hide=hide,omit=omit,...)
     }

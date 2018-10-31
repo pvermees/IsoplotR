@@ -54,31 +54,26 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
-    if (show.ellipses!=1){
-        colour <- rep('black',ns)
-        if (is.na(omit.col)) colour[omit] <- 'grey'
-        else colour[omit] <- omit.col
+    haslevels <- !all(is.na(levels))
+    if (haslevels){ # ellipses or points with levels
+        colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
+                                      hide=hide,omit=omit,omit.col=omit.col)
+    } else {
+        colour <- NA
     }
-    if (show.ellipses==0){
-        if (show.numbers)
-            graphics::text(d[plotit,'X'],d[plotit,'Y'],
-                           sn[plotit],col=colour[plotit],...)
-        else graphics::points(d[plotit,'X'],d[plotit,'Y'],
-                              col=colour[plotit],...)
+    if (show.ellipses==0){ # text
+        plot_points(d[,'X'],d[,'Y'],mybg=colour,mycex=1,
+                    show.numbers=TRUE,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
-        ellipse.cols <-
-            set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                                hide=hide,omit=omit,omit.col=omit.col)
         for (i in sn[plotit]){
             if (!any(is.na(d[i,]))){
                 covmat <- cor2cov2(d[i,'sX'],d[i,'sY'],d[i,'rXY'])
                 ell <- ellipse(d[i,'X'],d[i,'Y'],covmat,alpha=alpha)
-                graphics::polygon(ell,col=ellipse.cols[i])
+                graphics::polygon(ell,col=colour[i])
                 if (show.numbers) graphics::text(d[i,'X'],d[i,'Y'],i)
                 else graphics::points(d[i,'X'],d[i,'Y'],pch=19,cex=0.25)
             }
         }
-        colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     } else { # error cross
         if (show.numbers)
             graphics::text(d[plotit,'X'],d[plotit,'Y'],
@@ -97,6 +92,9 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                          d[plotit,'X']+dx,d[plotit,'Y'],
                          code=3,angle=90,
                          length=0.05,col=colour)
+    }
+    if (haslevels){
+        colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     }
 }
 

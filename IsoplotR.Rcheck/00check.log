@@ -38,7 +38,6 @@ CRAN-pack does not know about
 * checking DESCRIPTION meta-information ... NOTE
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
 Non-standard file/directory found at top level:
   ‘IsoplotR.Rcheck’
 * checking for left-over files ... OK

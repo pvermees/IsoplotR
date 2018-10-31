@@ -145,7 +145,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
         if (model==2){
             u <- log(x[,'U']/x[,'He'])
             v <- log(x[,'Th']/x[,'He'])
-            plot_points(u,v,pcol=ellipse.cols,
+            plot_points(u,v,mybg=ellipse.cols,
                         show.numbers=show.numbers,
                         hide=hide,omit=omit,...)
         } else {
@@ -160,7 +160,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                 xlim=xlim,ylim=ylim)
         if (model==2){
             plot_helioplot_points(x,show.numbers=show.numbers,
-                                  fact=fact,pcol=ellipse.cols,
+                                  fact=fact,mybg=ellipse.cols,
                                   hide=hide,omit=omit)
         } else {
             plot_helioplot_ellipses(x,ellipse.cols=ellipse.cols,
@@ -228,12 +228,12 @@ plot_helioplot_ellipses <- function(x,ellipse.cols,fact=c(1,1,1),
         else graphics::points(x0y0[1],x0y0[2],pch=19,cex=0.25)
     }
 }
-plot_helioplot_points <- function(x,fact=c(1,1,1),pcol=NA,
+plot_helioplot_points <- function(x,fact=c(1,1,1),mybg=NA,
                                   show.numbers=FALSE,hide=NULL,
                                   omit=NULL,...){
     xyz <- renormalise(x[,c('He','U','Th')],fact=fact)
     xy <- xyz2xy(xyz)
-    plot_points(xy[,1],xy[,2],pcol=pcol,
+    plot_points(xy[,1],xy[,2],mybg=mybg,
                 show.numbers=show.numbers,
                 hide=hide,omit=omit,...)
 }
