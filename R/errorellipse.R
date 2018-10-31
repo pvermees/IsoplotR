@@ -40,7 +40,8 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
-                        hide=NULL,omit=NULL,omit.col=NA,...){
+                        hide=NULL,omit=NULL,omit.col=NA,
+                        addcolourbar=TRUE,...){
     ns <- nrow(d)
     sn <- 1:ns
     plotit <- sn%ni%hide
@@ -58,8 +59,10 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
     if (haslevels){ # ellipses or points with levels
         colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
                                       hide=hide,omit=omit,omit.col=omit.col)
+    } else if (show.ellipses!=1){
+        colour <- rep(NA,ns)
     } else {
-        colour <- NA
+        colour <- rep(ellipse.col[1],ns)
     }
     if (show.ellipses==0){ # text
         plot_points(d[,'X'],d[,'Y'],mybg=colour,mycex=1,
@@ -93,7 +96,7 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                          code=3,angle=90,
                          length=0.05,col=colour)
     }
-    if (haslevels){
+    if (haslevels & addcolourbar){
         colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     }
 }

@@ -265,7 +265,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
                     line.col='black',new.plot=FALSE)
     }
     if (!show.ellipses)
-        plot_points(x0,y0,pcol=ellipse.cols,
+        plot_points(x0,y0,mybg=ellipse.cols,
                     show.numbers=show.numbers,
                     hide=hide,omit=omit,...)
     colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
