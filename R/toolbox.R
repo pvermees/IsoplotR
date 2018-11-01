@@ -315,7 +315,6 @@ plot_points <- function(x,y,mybg='yellow',mypch=21,mycol='black',mycex=1.5,mypos
         do.call(graphics::points,pargs)
     }
     if (show.numbers & show.points){
-        targs$pos <- 1
         targs$labels <- sn
         do.call(graphics::text,targs)
     } else if (show.numbers & !show.points){
@@ -323,6 +322,7 @@ plot_points <- function(x,y,mybg='yellow',mypch=21,mycol='black',mycex=1.5,mypos
         tcol[omit] <- 'grey'
         targs$col <- tcol[sn]
         targs$labels <- sn
+        targs$pos <- NULL
         do.call(graphics::text,targs)
     }
 }

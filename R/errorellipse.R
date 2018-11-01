@@ -59,14 +59,16 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
     if (haslevels){ # ellipses or points with levels
         colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
                                       hide=hide,omit=omit,omit.col=omit.col)
-    } else if (show.ellipses!=1){
-        colour <- rep(NA,ns)
+    } else if (show.ellipses==0 & show.numbers){
+        colour <- NA
+    } else if (show.ellipses==2){
+        colour <- rep('black',ns)
     } else {
         colour <- rep(ellipse.col[1],ns)
     }
-    if (show.ellipses==0){ # text
+    if (show.ellipses==0){ # points and or text
         plot_points(d[,'X'],d[,'Y'],mybg=colour,mycex=1,
-                    show.numbers=TRUE,hide=hide,omit=omit,...)
+                    show.numbers=show.numbers,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
         for (i in sn[plotit]){
             if (!any(is.na(d[i,]))){
