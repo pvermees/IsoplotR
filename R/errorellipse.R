@@ -40,7 +40,8 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
-                        hide=NULL,omit=NULL,omit.col=NA,...){
+                        hide=NULL,omit=NULL,omit.col=NA,
+                        addcolourbar=TRUE,...){
     ns <- nrow(d)
     sn <- 1:ns
     plotit <- sn%ni%hide
@@ -54,31 +55,30 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
-    if (show.ellipses!=1){
+    haslevels <- !all(is.na(levels))
+    if (haslevels){ # ellipses or points with levels
+        colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
+                                      hide=hide,omit=omit,omit.col=omit.col)
+    } else if (show.ellipses==0 & show.numbers){
+        colour <- NA
+    } else if (show.ellipses==2){
         colour <- rep('black',ns)
-        if (is.na(omit.col)) colour[omit] <- 'grey'
-        else colour[omit] <- omit.col
+    } else {
+        colour <- rep(ellipse.col[1],ns)
     }
-    if (show.ellipses==0){
-        if (show.numbers)
-            graphics::text(d[plotit,'X'],d[plotit,'Y'],
-                           sn[plotit],col=colour[plotit],...)
-        else graphics::points(d[plotit,'X'],d[plotit,'Y'],
-                              col=colour[plotit],...)
+    if (show.ellipses==0){ # points and or text
+        plot_points(d[,'X'],d[,'Y'],mybg=colour,mycex=1,
+                    show.numbers=show.numbers,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
-        ellipse.cols <-
-            set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                                hide=hide,omit=omit,omit.col=omit.col)
         for (i in sn[plotit]){
             if (!any(is.na(d[i,]))){
                 covmat <- cor2cov2(d[i,'sX'],d[i,'sY'],d[i,'rXY'])
                 ell <- ellipse(d[i,'X'],d[i,'Y'],covmat,alpha=alpha)
-                graphics::polygon(ell,col=ellipse.cols[i])
+                graphics::polygon(ell,col=colour[i])
                 if (show.numbers) graphics::text(d[i,'X'],d[i,'Y'],i)
                 else graphics::points(d[i,'X'],d[i,'Y'],pch=19,cex=0.25)
             }
         }
-        colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     } else { # error cross
         if (show.numbers)
             graphics::text(d[plotit,'X'],d[plotit,'Y'],
@@ -97,6 +97,9 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                          d[plotit,'X']+dx,d[plotit,'Y'],
                          code=3,angle=90,
                          length=0.05,col=colour)
+    }
+    if (haslevels & addcolourbar){
+        colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     }
 }
 

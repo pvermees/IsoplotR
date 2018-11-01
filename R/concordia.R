@@ -245,28 +245,11 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     }
     plot.concordia.line(X2plot,lims=lims,wetherill=wetherill,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
-    ellipse.cols <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                                        hide=hide,omit=omit,omit.col=omit.col)
-    for (i in 1:ns){
-        if (plotit[i]){
-            if (wetherill) xyc <- wetherill(X,i)
-            else xyc <- tera.wasserburg(X,i)
-            x0 <- xyc$x[1]
-            y0 <- xyc$x[2]
-            if (show.age==3){
-                pch <- 21
-                pcex <- 1
-            } else {
-                covmat <- xyc$cov
-                ell <- ellipse(x0,y0,covmat,alpha=alpha)
-                graphics::polygon(ell,col=ellipse.cols[i])
-                pch <- 19
-                pcex <- 0.25
-            }
-            if (show.numbers) graphics::text(x0,y0,i)
-            else graphics::points(x0,y0,pch=pch,cex=pcex*graphics::par('cex'))
-        }
-    }
+    d <- data2york(x,wetherill=wetherill)
+    scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+                show.ellipses=1*(show.age!=3),levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
+                hide=hide,omit=omit,omit.col=omit.col,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
         fit <- concordia.age(X2calc,wetherill=wetherill,
