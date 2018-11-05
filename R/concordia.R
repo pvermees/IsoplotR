@@ -245,7 +245,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     }
     plot.concordia.line(X2plot,lims=lims,wetherill=wetherill,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
-    d <- data2york(x,wetherill=wetherill)
+    d <- data2york(X,wetherill=wetherill)
     scatterplot(d,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
