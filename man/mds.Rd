@@ -14,7 +14,7 @@ mds(x, ...)
 
 \method{mds}{detritals}(x, classical = FALSE, plot = TRUE,
   shepard = FALSE, nnlines = FALSE, pos = NULL, col = "black",
-  bg = "white", xlab = "", ylab = "", ...)
+  bg = "white", xlab = "", ylab = "", hide = NULL, ...)
 }
 \arguments{
 \item{x}{a dissimilarity matrix OR an object of class
@@ -47,6 +47,9 @@ coordinates, respectively.}
 \item{xlab}{a string with the label of the x axis}
 
 \item{ylab}{a string with the label of the y axis}
+
+\item{hide}{vector with indices of aliquots that should be removed
+from the plot.}
 }
 \value{
 Returns an object of class \code{MDS}, i.e. a list

@@ -199,8 +199,11 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                           kde.col=rgb(1,0,1,0.6),
                           hist.col=rgb(0,1,0,0.2),show.hist=TRUE,
                           bty='n',binwidth=NA,ncol=NA,
-                          samebandwidth=TRUE,normalise=TRUE,...){
-    X <- getkde(x,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,
+                          samebandwidth=TRUE,normalise=TRUE,
+                          hide=NULL,...){
+    if (is.character(hide)) hide <- which(names(x)%in%hide)
+    x2plot <- clear(x,hide)
+    X <- getkde(x2plot,from=from,to=to,bw=bw,adaptive=adaptive,log=log,n=n,
                 samebandwidth=samebandwidth,normalise=normalise,...)
     if (plot){
         plot.KDEs(X,pch=pch,xlab=xlab,ylab=ylab,kde.col=kde.col,

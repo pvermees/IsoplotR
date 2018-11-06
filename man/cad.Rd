@@ -24,7 +24,7 @@ cad(x, ...)
   hide = NULL, ...)
 
 \method{cad}{detritals}(x, pch = NA, verticals = TRUE,
-  xlab = "age [Ma]", colmap = "heat.colors", ...)
+  xlab = "age [Ma]", colmap = "heat.colors", hide = NULL, ...)
 
 \method{cad}{UPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", type = 4, cutoff.76 = 1100, cutoff.disc = c(-15,

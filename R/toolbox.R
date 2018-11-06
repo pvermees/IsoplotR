@@ -24,6 +24,11 @@ subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.LuHf <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.detritals <- function(x,subset,...){
+    out <- x[subset]
+    class(out) <- class(x)
+    out
+}
 subset.UThHe <- function(x,subset,...){
     out <- x[subset,]
     class(out) <- class(x)
