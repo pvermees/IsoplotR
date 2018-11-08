@@ -56,15 +56,13 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
     haslevels <- !all(is.na(levels))
-    if (haslevels){ # ellipses or points with levels
-        colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
-                                      hide=hide,omit=omit,omit.col=omit.col)
-    } else if (show.ellipses==0 & show.numbers){
+    if (show.ellipses==0 & show.numbers){
         colour <- NA
     } else if (show.ellipses==2){
         colour <- rep('black',ns)
     } else {
-        colour <- rep(ellipse.col[1],ns)
+        colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
+                                      hide=hide,omit=omit,omit.col=omit.col)
     }
     if (show.ellipses==0){ # points and or text
         plot_points(d[,'X'],d[,'Y'],mybg=colour,mycex=1,

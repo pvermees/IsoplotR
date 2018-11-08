@@ -241,9 +241,11 @@ LL.norm <- function(x,covmat){
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
-    levels[c(hide,omit)] <- NA
-    levels[!is.numeric(levels)] <- NA
     nl <- length(levels)
+    if (nl > 1){
+        levels[c(hide,omit)] <- NA
+        levels[!is.numeric(levels)] <- NA
+    }
     out <- NULL
     if (all(is.na(levels)) ||
         (min(levels,na.rm=TRUE)==max(levels,na.rm=TRUE))){
