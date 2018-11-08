@@ -24,6 +24,11 @@ subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.LuHf <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.detritals <- function(x,subset,...){
+    out <- x[subset]
+    class(out) <- class(x)
+    out
+}
 subset.UThHe <- function(x,subset,...){
     out <- x[subset,]
     class(out) <- class(x)
@@ -236,9 +241,11 @@ LL.norm <- function(x,covmat){
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
-    levels[c(hide,omit)] <- NA
-    levels[!is.numeric(levels)] <- NA
     nl <- length(levels)
+    if (nl > 1){
+        levels[c(hide,omit)] <- NA
+        levels[!is.numeric(levels)] <- NA
+    }
     out <- NULL
     if (all(is.na(levels)) ||
         (min(levels,na.rm=TRUE)==max(levels,na.rm=TRUE))){

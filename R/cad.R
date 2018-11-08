@@ -65,17 +65,18 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @rdname cad
 #' @export
 cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                          colmap='heat.colors',...){
-    ns <- length(x)
-    snames <- names(x)
+                          colmap='heat.colors',hide=NULL,...){
+    if (is.character(hide)) hide <- which(names(x)%in%hide)
+    x2plot <- clear(x,hide)
+    ns <- length(x2plot)
     col <- do.call(colmap,list(ns))
-    graphics::plot(range(x,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
+    graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
                    ylab='cumulative probability',...)
     for (i in 1:ns){
-        graphics::lines(stats::ecdf(x[[i]]),pch=pch,
+        graphics::lines(stats::ecdf(x2plot[[i]]),pch=pch,
                         verticals=verticals,col=col[i])
     }
-    graphics::legend("bottomright",legend=snames,lwd=1,col=col)
+    graphics::legend("bottomright",legend=names(x2plot),lwd=1,col=col)
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
