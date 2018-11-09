@@ -12,6 +12,6 @@ citEntry(entry = "Article",
   textVersion  =
   paste("Vermeesch, Pieter (2018).",
         "IsoplotR: a free and open toolbox for geochronology.",
-        "Geoscience Frontiers.",
+        "Geoscience Frontiers, 9, 1479-1493.",
         "URL https://doi.org/10.1016/j.gsf.2018.04.001")
 )
