@@ -30,7 +30,11 @@ structure’ in the ‘Writing R Extensions’ manual.
 
 CRAN-pack does not know about
   .git
-* checking for portable file names ... OK
+* checking for portable file names ... WARNING
+Found the following file with a non-portable file name:
+  .git/index (pieter-laptop's conflicted copy 2018-11-08)
+These are not fully portable file names.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
@@ -82,4 +86,4 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 2 WARNINGs, 4 NOTEs
+Status: 3 WARNINGs, 4 NOTEs

@@ -160,8 +160,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
     radial.plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],
                 show.numbers=show.numbers,pch=pch,
                 levels=levels[plotit],clabel=clabel,
-                bg=pcol[plotit],col=tcol[plotit],
-                sn=(1:ns)[plotit],...)
+                markers=markers,bg=pcol[plotit],
+                col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],col=bg,clabel=clabel)
     if (title)
         title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
