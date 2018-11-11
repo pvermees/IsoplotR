@@ -22,7 +22,7 @@ age(x, ...)
   J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), ...)
 
 \method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, common.Pb = 0, ...)
+  i = NA, sigdig = NA, common.Pb = 0, show.p = FALSE, ...)
 
 \method{age}{PbPb}(x, isochron = TRUE, common.Pb = 1, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -161,6 +161,13 @@ Pb-composition
 \code{3}: use the Pb-composition stored in
 \code{settings('iratio','Pb206Pb204')} and
 \code{settings('iratio','Pb207Pb204')}}
+
+\item{show.p}{Show the p-value for concordance for each aliquot to
+the output table. Note: it would be unwise to use the p-value
+value as a concordance filter. Doing so would 'punish' high
+precision measurements, which are more likely to fail the
+Chi-square test than low precision measurements. The latter
+would therefore be 'rewarded' by such a criterion.}
 
 \item{isochron}{logical flag indicating whether each Ar-Ar analysis
 should be considered separately (\code{isochron=FALSE}) or an
