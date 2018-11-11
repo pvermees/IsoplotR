@@ -119,6 +119,8 @@
 #' \enumerate{
 #' \item{\code{X=8/2, s[X], Y=4/2, s[Y], Z=0/2, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
 #' \item{\code{X=2/8, s[X], Y=4/8, s[Y], Z=0/8, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=8/2, s[X], Y=0/2, s[Y], rho[X,Y]}}
+#' \item{\code{X=2/8, s[X], Y=0/8, s[Y], rho[X,Y]}}
 #' }
 #'
 #' where all values are activity ratios

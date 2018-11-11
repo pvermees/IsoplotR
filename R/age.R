@@ -137,6 +137,13 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
 #'
+#' @param show.p Show the p-value for concordance for each aliquot to
+#'     the output table. Note: it would be unwise to use the p-value
+#'     value as a concordance filter. Doing so would 'punish' high
+#'     precision measurements, which are more likely to fail the
+#'     Chi-square test than low precision measurements. The latter
+#'     would therefore be 'rewarded' by such a criterion.
+#'
 #' @return
 #' \enumerate{
 #'
@@ -196,13 +203,13 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @rdname age
 #' @export
 age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
-                    sigdig=NA,common.Pb=0,...){
+                    sigdig=NA,common.Pb=0,show.p=FALSE,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
     if (type==1){
-        out <- UPb.age(X,exterr=exterr,i=i,sigdig=sigdig,...)
+        out <- UPb.age(X,exterr=exterr,i=i,sigdig=sigdig,show.p=show.p,...)
     } else if (type==2){
         out <- concordia.age(X,wetherill=wetherill,exterr=exterr)
     } else if (type %in% c(3,4,5)){
