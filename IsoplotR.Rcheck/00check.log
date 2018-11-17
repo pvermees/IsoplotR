@@ -15,33 +15,13 @@ Found the following (possibly) invalid URLs:
           man/IsoplotR.Rd
           README.md
     Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: isoplotr.london-geochron.com
+    Message: libcurl error code 47:
+    	Maximum (20) redirects followed
   URL: http://pieter.london-geochron.com
     From: README.md
     Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: pieter.london-geochron.com
-  URL: http://r-project.org
-    From: README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: r-project.org
-  URL: http://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/
-    From: README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: www.ucl.ac.uk
-  URL: https://doi.org/10.1016/j.gsf.2018.04.001
-    From: inst/CITATION
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: doi.org
-  URL: https://github.com/pvermees/IsoplotRgui
-    From: README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: github.com
+    Message: libcurl error code 56:
+    	Recv failure: Connection timed out
 
 The build time stamp is missing.
 * checking package namespace information ... OK

@@ -619,7 +619,7 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,
         out[i.76,] <- tt[i.76,c('t.76','s[t.76]')]
         out[i.68,] <- tt[i.68,c('t.68','s[t.68]')]
     } else if (type==5){
-        outout[is.concordant,] <- tt[is.concordant,c('t.conc','s[t.conc]')]
+        out[is.concordant,] <- tt[is.concordant,c('t.conc','s[t.conc]')]
     }
     colnames(out) <- c('t','s[t]')
     out
