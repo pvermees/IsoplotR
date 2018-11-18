@@ -482,7 +482,12 @@ weightedmean_helper <- function(x,random.effects=TRUE,
         out$mean[c('x','s[x]')] <-
             add.exterr(x,tt=fit$mean['x'],st=fit$mean['s[x]'],
                        cutoff.76=cutoff.76,type=type)
-        out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
+        if (random.effects){
+            out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
+        } else {
+            out$mean['ci[x]'] <- tfact(alpha,out$df)*out$mean['s[x]']
+            out$mean['disp[x]'] <- sqrt(out$mswd)*out$mean['ci[x]']
+        }
     }
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,

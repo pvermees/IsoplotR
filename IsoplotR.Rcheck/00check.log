@@ -6,22 +6,10 @@
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
 * this is package ‘IsoplotR’ version ‘2.2’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... NOTE
+* checking CRAN incoming feasibility ... WARNING
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-Found the following (possibly) invalid URLs:
-  URL: http://isoplotr.london-geochron.com
-    From: DESCRIPTION
-          man/IsoplotR.Rd
-          README.md
-    Status: Error
-    Message: libcurl error code 47:
-    	Maximum (20) redirects followed
-  URL: http://pieter.london-geochron.com
-    From: README.md
-    Status: Error
-    Message: libcurl error code 56:
-    	Recv failure: Connection timed out
+Insufficient package version (submitted: 2.2, existing: 2.2)
 
 The build time stamp is missing.
 * checking package namespace information ... OK
@@ -99,4 +87,4 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 3 WARNINGs, 4 NOTEs
+Status: 4 WARNINGs, 3 NOTEs
