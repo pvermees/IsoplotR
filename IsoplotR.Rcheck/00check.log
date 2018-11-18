@@ -6,42 +6,10 @@
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
 * this is package ‘IsoplotR’ version ‘2.2’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... NOTE
+* checking CRAN incoming feasibility ... WARNING
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-Found the following (possibly) invalid URLs:
-  URL: http://isoplotr.london-geochron.com
-    From: DESCRIPTION
-          man/IsoplotR.Rd
-          README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: isoplotr.london-geochron.com
-  URL: http://pieter.london-geochron.com
-    From: README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: pieter.london-geochron.com
-  URL: http://r-project.org
-    From: README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: r-project.org
-  URL: http://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/
-    From: README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: www.ucl.ac.uk
-  URL: https://doi.org/10.1016/j.gsf.2018.04.001
-    From: inst/CITATION
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: doi.org
-  URL: https://github.com/pvermees/IsoplotRgui
-    From: README.md
-    Status: Error
-    Message: libcurl error code 6:
-    	Could not resolve host: github.com
+Insufficient package version (submitted: 2.2, existing: 2.2)
 
 The build time stamp is missing.
 * checking package namespace information ... OK
@@ -119,4 +87,4 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 3 WARNINGs, 4 NOTEs
+Status: 4 WARNINGs, 3 NOTEs
