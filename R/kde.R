@@ -461,8 +461,8 @@ getkde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
 getG <- function(pdens) {
     fpos <- pdens[pdens>0]
     N <- length(fpos)
-    out <- exp(sum(log(fpos))/N)
-    out
+    logmean <- mean(log(fpos))
+    exp(logmean)
 }
 
 # Abramson
@@ -472,8 +472,7 @@ pilotdensity <- function(dat,bw){
     n <- length(d)
     dens <- rep(0,n)
     for (i in 1:n){
-        dens[i] <- mean(stats::density(d,bw,from=(d[i]-1e-10),
-                                       to=(d[i]+1e-10),n=2)$y)
+        dens <- dens + stats::dnorm(d,mean=d[i],sd=bw)
     }
     dens
 }

@@ -21,7 +21,7 @@ botev <- function(x){
     II <- (1:(n-1))^2
     a2 <- (a[2:n]/2)^2
     tstar <- tryCatch(stats::uniroot(fixedpoint,c(0,.1),
-                      N=N,II=II,a2=a2,tol=10^(-14))$root,
+                      N=N,II=II,a2=a2,tol=10^(-22))$root,
                       error=function(e).28*N^(-2/5))
     bandwidth <- sqrt(tstar)*R
     return(bandwidth)
@@ -30,13 +30,13 @@ botev <- function(x){
 # Botev:
 # computes the discrete cosine transform of the column vector data
 dct1d <- function(dat){
-    n <- length(dat);
+    n <- length(dat)
     # Compute weights to multiply DFT coefficients
-    weight <- c(1,2*exp(-1i*(1:(n-1))*pi/(2*n)));
+    weight <- c(1,2*exp(-1i*(1:(n-1))*pi/(2*n)))
     # Re-order the elements of the columns of x
-    dat <- c(dat[seq(1,n-1,2)], dat[seq(n,2,-2)]);
+    dat <- c(dat[seq(1,n-1,2)], dat[seq(n,2,-2)])
     # Multiply FFT by weights:
-    out <- Re(weight*stats::fft(dat));
+    out <- Re(weight*stats::fft(dat))
     return(out)
 }
 
