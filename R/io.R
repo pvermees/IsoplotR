@@ -386,7 +386,7 @@ as.ArAr <- function(x,format=3,ierr=1){
     out <- list()
     class(out) <- "ArAr"
     out$format <- format
-    out$J <- as.numeric(x[2,1:2])
+    out$J <- errAdjust(x=as.numeric(x[2,1:2]),ierr=ierr)
     nc <- ncol(x)
     nr <- nrow(x)
     bi <- 4 # begin index
@@ -556,14 +556,14 @@ as.fissiontracks <- function(x,format=1,ierr=1){
     class(out) <- "fissiontracks"
     out$format <- format
     if (format==1){
-        out$zeta <- as.numeric(x[2,1:2])
-        out$rhoD <- as.numeric(x[4,1:2])
+        out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
+        out$rhoD <- errAdjust(as.numeric(x[4,1:2]),ierr=ierr)
         X <- shiny2matrix(x,6,nr,nc)
         out$x <- subset(X,select=1:2)
         colnames(out$x) <- c('Ns','Ni')
     } else {
         if (format==2){
-            out$zeta <- as.numeric(x[2,1:2])
+            out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
             out$spotSize <- as.numeric(x[4,1])
             si <- 6 # start index
         } else {
@@ -577,15 +577,14 @@ as.fissiontracks <- function(x,format=1,ierr=1){
         out$A <- A
         out$U <- list()
         out$sU <- list()
-        j <- seq(from=3,to=nc-1,by=2)
+        errcols <- seq(from=4,to=nc,by=2)-3
         for (i in 1:ns){
-            U <- as.numeric(x[i+si-1,j])
-            out$U[[i]] <- U
-            sU <- as.numeric(x[i+si-1,j+1])
-            out$sU[[i]] <- sU
+            UsU <- as.numeric(x[i+si-1,3:nc])
+            UsU <- errAdjust(UsU,i=errcols,ierr=ierr)
+            out$U[[i]] <- UsU[1]
+            out$sU[[i]] <- UsU[2]
         }
     }
-    out <- errconvert(out,gc='fissiontracks',format=format,ierr=ierr)
     out
 }
 as.detritals <- function(x){
@@ -602,11 +601,12 @@ as.detritals <- function(x){
     }
     out
 }
-as.other <- function(x,format=0,ierr=1){
+as.other <- function(x,format='generic',ierr=1){
     nc <- ncol(x)
     has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
     if (has.header) x <- x[-1,]
-    matrix(as.numeric(x),ncol=nc)
+    X <- matrix(as.numeric(x),ncol=nc)
+    errconvert(X,'other',format,ierr)
 }
 
 # x = a numerical vector, br = length of the preamble with parameters
@@ -634,12 +634,27 @@ errconvert <- function(x,gc='U-Pb',format=1,ierr=1){
     if (ierr==1){ return(x) }
     else { out <- x }
     i <- getErrCols(gc,format,ierr)
-    if (ierr==2){
-        out[,i] <- x[,i]/2
-    } else if (ierr==3){
-        out[,i] <- x[,i]*x[,i-1]/100
-    } else if (ierr==4){
-        out[,i] <- x[,i]*x[,i-1]/200
+    errAdjust(x,i,ierr)
+}
+
+errAdjust <- function(x,i=2,ierr=1){
+    out <- x
+    if (is.vector(x)){
+        if (ierr==2){
+            out[i] <- x[i]/2
+        } else if (ierr==3){
+            out[i] <- x[i]*x[i-1]/100
+        } else if (ierr==4){
+            out[i] <- x[i]*x[i-1]/200
+        }
+    } else {
+        if (ierr==2){
+            out[,i] <- x[,i]/2
+        } else if (ierr==3){
+            out[,i] <- x[,i]*x[,i-1]/100
+        } else if (ierr==4){
+            out[,i] <- x[,i]*x[,i-1]/200
+        }
     }
     out
 }
@@ -654,32 +669,21 @@ getErrCols <- function(gc,format=NA,ierr=1){
     ArAr3 = (gc=='Ar-Ar' && format==3)
     KCa1 = (gc=='K-Ca' && format==1)
     KCa2 = (gc=='K-Ca' && format==2)
-    RbSr1 = (gc=='Rb-Sr' && format==1)
-    RbSr2 = (gc=='Rb-Sr' && format==2)
-    SmNd1 = (gc=='Sm-Nd' && format==1)
-    SmNd2 = (gc=='Sm-Nd' && format==2)
-    ReOs1 = (gc=='Re-Os' && format==1)
-    ReOs2 = (gc=='Re-Os' && format==2)
-    LuHf1 = (gc=='Lu-Hf' && format==1)
-    LuHf2 = (gc=='Lu-Hf' && format==2)
+    PD1 = (gc=='PD' && format==1)
+    PD2 = (gc=='PD' && format==2)
     UThHe = (gc=='U-Th-He')
-    FT23 = (gc=='fissiontracks' && format>1)
     ThU12 = (gc=='Th-U' && format<3)
     ThU34 = (gc=='Th-U' && format>2)
-    radial = (gc=='other' && format=='radial')
-    regression = (gc=='other' && format=='regression')
-    spectrum = (gc=='other' && format=='spectrum')
-    average = (gc=='other' && format=='average')
-    if (UPb12 | PbPb12 | ArAr12 | KCa1 | RbSr1 |
-        SmNd1 | ReOs1  | LuHf1 | ThU34 | regression){
+    radial = (gc=='other' && identical(format,'radial'))
+    regression = (gc=='other' && identical(format,'regression'))
+    spectrum = (gc=='other' && identical(format,'spectrum'))
+    average = (gc=='other' && identical(format,'average'))
+    if (UPb12 | PbPb12 | ArAr12 | KCa1 | PD1 | ThU34 | regression){
         cols = c(2,4)
-    } else if (UPb345 | PbPb3 | ArAr3 | KCa2 | RbSr2 |
-               SmNd2  | ReOs2 | LuHf2 | UThHe | ThU12){
+    } else if (UPb345 | PbPb3 | ArAr3 | KCa2 | PD2 | UThHe | ThU12){
         cols = c(2,4,6)
     } else if (UPb6){
         cols = c(from=2,to=12,by=2)
-    } else if (FT23){
-        cols = c(from=4,to=12,by=2)
     } else if (radial || average){
         cols = 2
     } else if (spectrum){
