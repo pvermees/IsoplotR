@@ -196,49 +196,49 @@
 read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
-read.data.default <- function(x,method='U-Pb',format=1,...){
+read.data.default <- function(x,method='U-Pb',format=1,ierr=1,...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
-    read.data.matrix(X,method=method,format=format)
+    read.data.matrix(X,method=method,format=format,ierr=ierr)
 }
 #' @rdname read.data
 #' @export
-read.data.data.frame <- function(x,method='U-Pb',format=1,...){
-    read.data.matrix(as.matrix(x),method=method,format=format,...)
+read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,...){
+    read.data.matrix(as.matrix(x),method=method,format=format,ierr=ierr,...)
 }
 #' @rdname read.data
 #' @export
-read.data.matrix <- function(x,method='U-Pb',format=1,...){
+read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,...){
     if (identical(method,'U-Pb')){
-        out <- as.UPb(x,format)
+        out <- as.UPb(x,format,ierr)
     } else if (identical(method,'Pb-Pb')){
-        out <- as.PbPb(x,format)
+        out <- as.PbPb(x,format,ierr)
     } else if (identical(method,'Ar-Ar')){
-        out <- as.ArAr(x,format)
+        out <- as.ArAr(x,format,ierr)
     } else if (identical(method,'K-Ca')){
-        out <- as.KCa(x,format)
+        out <- as.KCa(x,format,ierr)
     } else if (identical(method,'Re-Os')){
-        out <- as.ReOs(x,format)
+        out <- as.ReOs(x,format,ierr)
     } else if (identical(method,'Rb-Sr')){
-        out <- as.RbSr(x,format)
+        out <- as.RbSr(x,format,ierr)
     } else if (identical(method,'Sm-Nd')){
-        out <- as.SmNd(x,format)
+        out <- as.SmNd(x,format,ierr)
     } else if (identical(method,'Lu-Hf')){
-        out <- as.LuHf(x,format)
+        out <- as.LuHf(x,format,ierr)
     } else if (identical(method,'Th-U')){
-        out <- as.ThU(x,format)
+        out <- as.ThU(x,format,ierr)
     } else if (identical(method,'U-Th-He')){
-        out <- as.UThHe(x)
+        out <- as.UThHe(x,ierr)
     } else if (identical(method,'fissiontracks')){
-        out <- as.fissiontracks(x,format)
+        out <- as.fissiontracks(x,format,ierr)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     } else if (identical(method,'other')){
-        out <- as.other(x)
+        out <- as.other(x,format,ierr)
     }
     out
 }
 
-as.UPb <- function(x,format=3){
+as.UPb <- function(x,format=3,ierr=1){
     out <- list()
     class(out) <- "UPb"
     out$x <- NA
@@ -247,6 +247,7 @@ as.UPb <- function(x,format=3){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
     cnames <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb207U235','errPb207U235',
@@ -355,7 +356,7 @@ get.cov.46.76 <- function(Pb204Pb206,errPb204Pb206,
                 Pb207Pb206,errPb207Pb206,
                 Pb204Pb207,errPb204Pb207)
 }
-as.PbPb <- function(x,format=1){
+as.PbPb <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "PbPb"
     out$x <- NA
@@ -364,6 +365,7 @@ as.PbPb <- function(x,format=1){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='Pb-Pb',format=format,ierr=ierr)
     cnames <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb206Pb204','errPb206Pb204',
@@ -380,7 +382,7 @@ as.PbPb <- function(x,format=1){
     colnames(out$x) <- cnames
     out
 }
-as.ArAr <- function(x,format=3){
+as.ArAr <- function(x,format=3,ierr=1){
     out <- list()
     class(out) <- "ArAr"
     out$format <- format
@@ -389,6 +391,7 @@ as.ArAr <- function(x,format=3){
     nr <- nrow(x)
     bi <- 4 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
+    X <- errconvert(X,gc='Ar-Ar',format=format,ierr=ierr)
     if (format==3 & nc>5){
         if (nc==8){
             out$x <- subset(X,select=1:7)
@@ -422,7 +425,7 @@ as.ArAr <- function(x,format=3){
     }
     out
 }
-as.KCa <- function(x,format=1){
+as.KCa <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "KCa"
     out$format <- format
@@ -430,6 +433,7 @@ as.KCa <- function(x,format=1){
     nr <- nrow(x)
     bi <- 2 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
+    X <- errconvert(X,gc='K-Ca',format=format,ierr=ierr)
     cnames <- c('K40Ca44','errK40Ca44','Ca40Ca44','errCa40Ca44','rho')
     if (format==1 & nc==4){
         out$x <- cbind(X,0)
@@ -444,35 +448,35 @@ as.KCa <- function(x,format=1){
     colnames(out$x) <- cnames
     out
 }
-as.RbSr <- function(x,format=2){
+as.RbSr <- function(x,format=2,ierr=1){
     cnames1 <- c('Rb87Sr86','errRb87Sr86',
                  'Sr87Sr86','errSr87Sr86','rho')
     cnames2 <- c('Rbppm','errRbppm','Srppm','errSrppm',
                  'Sr87Sr86','errSr87Sr86')
-    as.PD(x,"RbSr",cnames1,cnames2,format)
+    as.PD(x,"RbSr",cnames1,cnames2,format,ierr)
 }
-as.ReOs <- function(x,format=2){
+as.ReOs <- function(x,format=2,ierr=1){
     cnames1 <- c('Re187Os188','errRe187Os188',
                  'Os187Os188','errOs187Os188','rho')
     cnames2 <- c('Reppm','errReppm','Osppm','errOsppm',
                  'Os187Os188','errOs187Os188')
-    as.PD(x,"ReOs",cnames1,cnames2,format)
+    as.PD(x,"ReOs",cnames1,cnames2,format,ierr)
 }
-as.SmNd <- function(x,format=2){
+as.SmNd <- function(x,format=2,ierr=1){
     cnames1 <- c('Sm143Nd144','errSm143Nd144',
                  'Nd143Nd144','errNd143Nd144','rho')
     cnames2 <- c('Smppm','errSmppm','Ndppm','errNdppm',
                  'Nd143Nd144','errNd143Nd144')
-    as.PD(x,"SmNd",cnames1,cnames2,format)
+    as.PD(x,"SmNd",cnames1,cnames2,format,ierr)
 }
-as.LuHf <- function(x,format=2){
+as.LuHf <- function(x,format=2,ierr=1){
     cnames1 <- c('Lu176Hf177','errLu176Hf177',
                  'Hf176Hf177','errHf176Hf177','rho')
     cnames2 <- c('Luppm','errLuppm','Hfppm','errHfppm',
                  'Hf176Hf177','errHf176Hf177')
-    as.PD(x,"LuHf",cnames1,cnames2,format)
+    as.PD(x,"LuHf",cnames1,cnames2,format,ierr)
 }
-as.PD <- function(x,classname,colnames1,colnames2,format){
+as.PD <- function(x,classname,colnames1,colnames2,format,ierr){
     out <- list()
     class(out) <- c(classname,'PD')
     out$x <- NA
@@ -481,6 +485,7 @@ as.PD <- function(x,classname,colnames1,colnames2,format){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='PD',format=format,ierr=ierr)
     if (format==1 & nc>3){
         out$x <- read.XsXYsYrXY(X)
         colnames(out$x) <- colnames1
@@ -490,7 +495,7 @@ as.PD <- function(x,classname,colnames1,colnames2,format){
     }
     out
 }
-as.ThU <- function(x,format=1){
+as.ThU <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "ThU"
     out$x <- NA
@@ -499,6 +504,7 @@ as.ThU <- function(x,format=1){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='Th-U',format=format,ierr=ierr)
     cnames <- NULL
     if (format==1 & nc>8){
         cnames <- c('U238Th232','errU238Th232',
@@ -529,12 +535,13 @@ as.ThU <- function(x,format=1){
     colnames(out$x) <- cnames
     out
 }
-as.UThHe <- function(x){
+as.UThHe <- function(x,ierr=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     X[X<=0] <- NA
+    X <- errconvert(X,gc='U-Th-He',ierr=ierr)
     if (nc>5) cnames <- c('He','errHe','U','errU','Th','errTh')
     if (nc>7) cnames <- c(cnames,'Sm','errSm')
     out <- subset(X,select=1:length(cnames))
@@ -542,7 +549,7 @@ as.UThHe <- function(x){
     class(out) <- append("UThHe",class(out))
     out
 }
-as.fissiontracks <- function(x,format=1){
+as.fissiontracks <- function(x,format=1,ierr=1){
     nr <- nrow(x)
     nc <- ncol(x)
     out <- list()
@@ -578,6 +585,7 @@ as.fissiontracks <- function(x,format=1){
             out$sU[[i]] <- sU
         }
     }
+    out <- errconvert(out,gc='fissiontracks',format=format,ierr=ierr)
     out
 }
 as.detritals <- function(x){
@@ -594,7 +602,7 @@ as.detritals <- function(x){
     }
     out
 }
-as.other <- function(x){
+as.other <- function(x,format=0,ierr=1){
     nc <- ncol(x)
     has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
     if (has.header) x <- x[-1,]
@@ -620,4 +628,64 @@ read.XsXYsYrXY <- function(x){
         out <- subset(x,select=1:5)
     }
     out
+}
+
+errconvert <- function(x,gc='U-Pb',format=1,ierr=1){
+    if (ierr==1){ return(x) }
+    else { out <- x }
+    i <- getErrCols(gc,format,ierr)
+    if (ierr==2){
+        out[,i] <- x[,i]/2
+    } else if (ierr==3){
+        out[,i] <- x[,i]*x[,i-1]/100
+    } else if (ierr==4){
+        out[,i] <- x[,i]*x[,i-1]/200
+    }
+    out
+}
+
+getErrCols <- function(gc,format=NA,ierr=1){
+    UPb12 = (gc=='U-Pb' && format%in%(1:2))
+    UPb345 = (gc=='U-Pb' && format%in%(3:5))
+    UPb6 = (gc=='U-Pb' && format==6)
+    PbPb12 = (gc=='Pb-Pb' && format%in%(1:2))
+    PbPb3 = (gc=='Pb-Pb' && format==3)
+    ArAr12 = (gc=='Ar-Ar' && format%in%(1:2))
+    ArAr3 = (gc=='Ar-Ar' && format==3)
+    KCa1 = (gc=='K-Ca' && format==1)
+    KCa2 = (gc=='K-Ca' && format==2)
+    RbSr1 = (gc=='Rb-Sr' && format==1)
+    RbSr2 = (gc=='Rb-Sr' && format==2)
+    SmNd1 = (gc=='Sm-Nd' && format==1)
+    SmNd2 = (gc=='Sm-Nd' && format==2)
+    ReOs1 = (gc=='Re-Os' && format==1)
+    ReOs2 = (gc=='Re-Os' && format==2)
+    LuHf1 = (gc=='Lu-Hf' && format==1)
+    LuHf2 = (gc=='Lu-Hf' && format==2)
+    UThHe = (gc=='U-Th-He')
+    FT23 = (gc=='fissiontracks' && format>1)
+    ThU12 = (gc=='Th-U' && format<3)
+    ThU34 = (gc=='Th-U' && format>2)
+    radial = (gc=='other' && format=='radial')
+    regression = (gc=='other' && format=='regression')
+    spectrum = (gc=='other' && format=='spectrum')
+    average = (gc=='other' && format=='average')
+    if (UPb12 | PbPb12 | ArAr12 | KCa1 | RbSr1 |
+        SmNd1 | ReOs1  | LuHf1 | ThU34 | regression){
+        cols = c(2,4)
+    } else if (UPb345 | PbPb3 | ArAr3 | KCa2 | RbSr2 |
+               SmNd2  | ReOs2 | LuHf2 | UThHe | ThU12){
+        cols = c(2,4,6)
+    } else if (UPb6){
+        cols = c(from=2,to=12,by=2)
+    } else if (FT23){
+        cols = c(from=4,to=12,by=2)
+    } else if (radial || average){
+        cols = 2
+    } else if (spectrum){
+        cols = 3
+    } else {
+        cols = NULL
+    }
+    cols
 }
