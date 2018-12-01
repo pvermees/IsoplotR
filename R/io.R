@@ -601,7 +601,7 @@ as.fissiontracks <- function(x,format=1,ierr=1){
         out$A <- A
         out$U <- list()
         out$sU <- list()
-        errcols <- seq(from=4,to=nc,by=2)-3
+        errcols <- seq(from=4,to=nc,by=2)-2
         for (i in 1:ns){
             UsU <- as.numeric(x[i+si-1,3:nc])
             UsU <- errAdjust(UsU,i=errcols,ierr=ierr)
@@ -707,7 +707,7 @@ getErrCols <- function(gc,format=NA,ierr=1){
     } else if (UPb345 | PbPb3 | ArAr3 | KCa2 | PD2 | UThHe | ThU12){
         cols = c(2,4,6)
     } else if (UPb6){
-        cols = c(from=2,to=12,by=2)
+        cols = seq(from=2,to=12,by=2)
     } else if (radial || average){
         cols = 2
     } else if (spectrum){
