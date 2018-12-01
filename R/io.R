@@ -44,12 +44,16 @@
 #' if \code{method='U-Pb'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
-#' \item{\code{8/6, s[8/6], 7/6, s[7/6] (, rho)}}
-#' \item{\code{X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z] (, rho[X,Y]) (, rho[Y,Z])}}
-#' \item{\code{X=7/5, s[X], Y=6/8, s[Y], Z=4/8, rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=8/6, s[X], Y=7/6, s[Y], Z=4/6, rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{7/5, s[7/5], 6/8, s[6/8], 4/8, s[4/8], 7/6, s[7/6], 4/7, s[4/7], 4/6, s[4/6]}}
+#' \item{\code{7/5, err[7/5], 6/8, err[6/8], rho}}
+#' \item{\code{8/6, err[8/6], 7/6, err[7/6] (, rho)}}
+#' \item{\code{X=7/6, err[X], Y=7/5, err[Y], Z=6/8, err[Z]}
+#' \code{(, rho[X,Y]) (, rho[Y,Z])}}
+#' \item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }
+#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }
+#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }
+#' \code{7/6, err[7/6], 4/7, err[4/7], 4/6, err[4/6]}}
 #' }
 #'
 #' where optional columns are marked in round brackets
@@ -57,32 +61,32 @@
 #' if \code{method='Pb-Pb'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{6/4, s[6/4], 7/4, s[7/4], rho}}
-#' \item{\code{4/6, s[4/6], 7/6, s[7/6], rho}}
-#' \item{\code{6/4, s[6/4], 7/4, s[7/4], 7/6, s[7/6]}}
+#' \item{\code{6/4, err[6/4], 7/4, err[7/4], rho}}
+#' \item{\code{4/6, err[4/6], 7/6, err[7/6], rho}}
+#' \item{\code{6/4, err[6/4], 7/4, err[7/4], 7/6, err[7/6]}}
 #' }
 #'
 #' if \code{method='Ar-Ar'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{9/6, s[9/6], 0/6, s[0/6], rho (, 39)}}
-#' \item{\code{6/0, s[6/0], 9/0, s[9/0] (, rho) (, 39)}}
-#' \item{\code{9/0, s[9/0], 6/0, s[6/0], 9/6, s[9/6] (, 39)}}
+#' \item{\code{9/6, err[9/6], 0/6, err[0/6], rho (, 39)}}
+#' \item{\code{6/0, err[6/0], 9/0, err[9/0] (, rho) (, 39)}}
+#' \item{\code{9/0, err[9/0], 6/0, err[6/0], 9/6, err[9/6] (, 39)}}
 #' }
 #'
 #' if \code{method='K-Ca'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{K40/Ca44, s[K40/Ca44], Ca40/Ca44, s[Ca40/Ca44], rho}}
-#' \item{\code{K40/Ca44, s[K40/Ca44], Ca40/Ca44,
-#'             s[Ca40/Ca44], K40/Ca40, s[K40/Ca40]}}
+#' \item{\code{K40/Ca44, err[K40/Ca44], Ca40/Ca44, err[Ca40/Ca44], rho}}
+#' \item{\code{K40/Ca44, err[K40/Ca44], Ca40/Ca44, }
+#'       \code{err[Ca40/Ca44], K40/Ca40, err[K40/Ca40]}}
 #' }
 #'
 #' if \code{method='Rb-Sr'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Rb87/Sr86, s[Rb87/Sr86], Sr87/Sr86, s[Sr87/Sr86] (, rho)}}
-#' \item{\code{Rb, s[Rb], Sr, s[Sr], Sr87/Sr86, s[Sr87/Sr86]}}
+#' \item{\code{Rb87/Sr86, err[Rb87/Sr86], Sr87/Sr86, err[Sr87/Sr86] (, rho)}}
+#' \item{\code{Rb, err[Rb], Sr, err[Sr], Sr87/Sr86, err[Sr87/Sr86]}}
 #' }
 #'
 #' where \code{Rb} and \code{Sr} are in ppm
@@ -90,8 +94,8 @@
 #' if \code{method='Sm-Nd'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144] (, rho)}}
-#' \item{\code{Sm, s[Sm], Nd, s[Nd], Nd143/Nd144, s[Nd143/Nd144]}}
+#' \item{\code{Sm147/Nd144, err[Sm147/Nd144], Nd143/Nd144, err[Nd143/Nd144] (, rho)}}
+#' \item{\code{Sm, err[Sm], Nd, err[Nd], Nd143/Nd144, err[Nd143/Nd144]}}
 #' }
 #'
 #' where \code{Sm} and \code{Nd} are in ppm
@@ -99,8 +103,8 @@
 #' if \code{method='Re-Os'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188] (, rho)}}
-#' \item{\code{Re, s[Re], Os, s[Os], Os187/Os188, s[Os187/Os188]}}
+#' \item{\code{Re187/Os188, err[Re187/Os188], Os187/Os188, err[Os187/Os188] (, rho)}}
+#' \item{\code{Re, err[Re], Os, err[Os], Os187/Os188, err[Os187/Os188]}}
 #' }
 #'
 #' where \code{Re} and \code{Os} are in ppm
@@ -108,8 +112,8 @@
 #' if \code{method='Lu-Hf'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Lu176/Hf177, s[Lu176/Hf177], Hf176/Hf177, s[Hf176/Hf177] (, rho)}}
-#' \item{\code{Lu, s[Lu], Hf, s[Hf], Hf176/Hf177, s[Hf176/Hf177]}}
+#' \item{\code{Lu176/Hf177, err[Lu176/Hf177], Hf176/Hf177, err[Hf176/Hf177] (, rho)}}
+#' \item{\code{Lu, err[Lu], Hf, err[Hf], Hf176/Hf177, err[Hf176/Hf177]}}
 #' }
 #'
 #' where \code{Lu} and \code{Hf} are in ppm
@@ -117,10 +121,10 @@
 #' if \code{method='Th-U'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{X=8/2, s[X], Y=4/2, s[Y], Z=0/2, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=2/8, s[X], Y=4/8, s[Y], Z=0/8, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=8/2, s[X], Y=0/2, s[Y], rho[X,Y]}}
-#' \item{\code{X=2/8, s[X], Y=0/8, s[Y], rho[X,Y]}}
+#' \item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=8/2, err[X], Y=0/2, err[Y], rho[X,Y]}}
+#' \item{\code{X=2/8, err[X], Y=0/8, err[Y], rho[X,Y]}}
 #' }
 #'
 #' where all values are activity ratios
@@ -147,6 +151,26 @@
 #' or more U/Ca-ratios or U-concentration measurements (in ppm) and
 #' their analytical uncertainties.}  }
 #'
+#' if \code{method='other'}, \code{x} is read as a table, unless
+#' \code{format} is one of either:
+#'
+#' \describe{
+#' \item{\code{radial} or \code{'average'}:}{\code{X, err[X]}}
+#' \item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho} \cr
+#'       OR \code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
+#' \item{\code{spectrum}:}{\code{f, X, err[X]}} 
+#' }
+#' 
+#' @param ierr indicates whether the analytical uncertainties are
+#'     reported as: \enumerate{
+#' 
+#' \item{1\eqn{\sigma} absolute uncertainties.}
+#' \item{2\eqn{\sigma} absolute uncertainties.}
+#' \item{1\eqn{\sigma} relative uncertainties (\%).}
+#' \item{2\eqn{\sigma} relative uncertainties (\%).}
+#' 
+#' }
+#' 
 #' @param ... optional arguments to the \code{read.csv} function
 #' @seealso \code{\link{examples}}, \code{\link{settings}}
 #' @return an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
