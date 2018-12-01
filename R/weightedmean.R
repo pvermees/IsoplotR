@@ -585,7 +585,7 @@ wtdmean.title <- function(fit,sigdig=2,units='',...){
         rounded.mean <- roundit(fit$mean['x'],
                                 fit$mean[c('s[x]','ci[x]','disp[x]')],
                                 sigdig=sigdig)
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='~n/N~')',
+        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
                             list(a=rounded.mean['x'],
                                  b=rounded.mean['s[x]'],
                                  c=rounded.mean['ci[x]'],

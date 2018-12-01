@@ -4,12 +4,10 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘2.2’
+* this is package ‘IsoplotR’ version ‘2.3’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... WARNING
+* checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
-
-Insufficient package version (submitted: 2.2, existing: 2.2)
 
 The build time stamp is missing.
 * checking package namespace information ... OK
@@ -44,8 +42,8 @@ See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking DESCRIPTION meta-information ... NOTE
 Checking should be performed on sources prepared by ‘R CMD build’.
 * checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘IsoplotR.Rcheck’
+Non-standard files/directories found at top level:
+  ‘IsoplotR.Rcheck’ ‘IsoplotR.pdf’
 * checking for left-over files ... OK
 * checking index information ... OK
 * checking package subdirectories ... WARNING
@@ -87,4 +85,4 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 4 WARNINGs, 3 NOTEs
+Status: 3 WARNINGs, 4 NOTEs

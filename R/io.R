@@ -44,12 +44,16 @@
 #' if \code{method='U-Pb'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{7/5, s[7/5], 6/8, s[6/8], rho}}
-#' \item{\code{8/6, s[8/6], 7/6, s[7/6] (, rho)}}
-#' \item{\code{X=7/6, s[X], Y=7/5, s[Y], Z=6/8, s[Z] (, rho[X,Y]) (, rho[Y,Z])}}
-#' \item{\code{X=7/5, s[X], Y=6/8, s[Y], Z=4/8, rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=8/6, s[X], Y=7/6, s[Y], Z=4/6, rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{7/5, s[7/5], 6/8, s[6/8], 4/8, s[4/8], 7/6, s[7/6], 4/7, s[4/7], 4/6, s[4/6]}}
+#' \item{\code{7/5, err[7/5], 6/8, err[6/8], rho}}
+#' \item{\code{8/6, err[8/6], 7/6, err[7/6] (, rho)}}
+#' \item{\code{X=7/6, err[X], Y=7/5, err[Y], Z=6/8, err[Z]}
+#' \code{(, rho[X,Y]) (, rho[Y,Z])}}
+#' \item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }
+#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }
+#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }
+#' \code{7/6, err[7/6], 4/7, err[4/7], 4/6, err[4/6]}}
 #' }
 #'
 #' where optional columns are marked in round brackets
@@ -57,32 +61,32 @@
 #' if \code{method='Pb-Pb'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{6/4, s[6/4], 7/4, s[7/4], rho}}
-#' \item{\code{4/6, s[4/6], 7/6, s[7/6], rho}}
-#' \item{\code{6/4, s[6/4], 7/4, s[7/4], 7/6, s[7/6]}}
+#' \item{\code{6/4, err[6/4], 7/4, err[7/4], rho}}
+#' \item{\code{4/6, err[4/6], 7/6, err[7/6], rho}}
+#' \item{\code{6/4, err[6/4], 7/4, err[7/4], 7/6, err[7/6]}}
 #' }
 #'
 #' if \code{method='Ar-Ar'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{9/6, s[9/6], 0/6, s[0/6], rho (, 39)}}
-#' \item{\code{6/0, s[6/0], 9/0, s[9/0] (, rho) (, 39)}}
-#' \item{\code{9/0, s[9/0], 6/0, s[6/0], 9/6, s[9/6] (, 39)}}
+#' \item{\code{9/6, err[9/6], 0/6, err[0/6], rho (, 39)}}
+#' \item{\code{6/0, err[6/0], 9/0, err[9/0] (, rho) (, 39)}}
+#' \item{\code{9/0, err[9/0], 6/0, err[6/0], 9/6, err[9/6] (, 39)}}
 #' }
 #'
 #' if \code{method='K-Ca'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{K40/Ca44, s[K40/Ca44], Ca40/Ca44, s[Ca40/Ca44], rho}}
-#' \item{\code{K40/Ca44, s[K40/Ca44], Ca40/Ca44,
-#'             s[Ca40/Ca44], K40/Ca40, s[K40/Ca40]}}
+#' \item{\code{K40/Ca44, err[K40/Ca44], Ca40/Ca44, err[Ca40/Ca44], rho}}
+#' \item{\code{K40/Ca44, err[K40/Ca44], Ca40/Ca44, }
+#'       \code{err[Ca40/Ca44], K40/Ca40, err[K40/Ca40]}}
 #' }
 #'
 #' if \code{method='Rb-Sr'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Rb87/Sr86, s[Rb87/Sr86], Sr87/Sr86, s[Sr87/Sr86] (, rho)}}
-#' \item{\code{Rb, s[Rb], Sr, s[Sr], Sr87/Sr86, s[Sr87/Sr86]}}
+#' \item{\code{Rb87/Sr86, err[Rb87/Sr86], Sr87/Sr86, err[Sr87/Sr86] (, rho)}}
+#' \item{\code{Rb, err[Rb], Sr, err[Sr], Sr87/Sr86, err[Sr87/Sr86]}}
 #' }
 #'
 #' where \code{Rb} and \code{Sr} are in ppm
@@ -90,8 +94,8 @@
 #' if \code{method='Sm-Nd'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Sm147/Nd144, s[Sm147/Nd144], Nd143/Nd144, s[Nd143/Nd144] (, rho)}}
-#' \item{\code{Sm, s[Sm], Nd, s[Nd], Nd143/Nd144, s[Nd143/Nd144]}}
+#' \item{\code{Sm147/Nd144, err[Sm147/Nd144], Nd143/Nd144, err[Nd143/Nd144] (, rho)}}
+#' \item{\code{Sm, err[Sm], Nd, err[Nd], Nd143/Nd144, err[Nd143/Nd144]}}
 #' }
 #'
 #' where \code{Sm} and \code{Nd} are in ppm
@@ -99,8 +103,8 @@
 #' if \code{method='Re-Os'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Re187/Os188, s[Re187/Os188], Os187/Os188, s[Os187/Os188] (, rho)}}
-#' \item{\code{Re, s[Re], Os, s[Os], Os187/Os188, s[Os187/Os188]}}
+#' \item{\code{Re187/Os188, err[Re187/Os188], Os187/Os188, err[Os187/Os188] (, rho)}}
+#' \item{\code{Re, err[Re], Os, err[Os], Os187/Os188, err[Os187/Os188]}}
 #' }
 #'
 #' where \code{Re} and \code{Os} are in ppm
@@ -108,8 +112,8 @@
 #' if \code{method='Lu-Hf'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{Lu176/Hf177, s[Lu176/Hf177], Hf176/Hf177, s[Hf176/Hf177] (, rho)}}
-#' \item{\code{Lu, s[Lu], Hf, s[Hf], Hf176/Hf177, s[Hf176/Hf177]}}
+#' \item{\code{Lu176/Hf177, err[Lu176/Hf177], Hf176/Hf177, err[Hf176/Hf177] (, rho)}}
+#' \item{\code{Lu, err[Lu], Hf, err[Hf], Hf176/Hf177, err[Hf176/Hf177]}}
 #' }
 #'
 #' where \code{Lu} and \code{Hf} are in ppm
@@ -117,10 +121,10 @@
 #' if \code{method='Th-U'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{X=8/2, s[X], Y=4/2, s[Y], Z=0/2, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=2/8, s[X], Y=4/8, s[Y], Z=0/8, s[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=8/2, s[X], Y=0/2, s[Y], rho[X,Y]}}
-#' \item{\code{X=2/8, s[X], Y=0/8, s[Y], rho[X,Y]}}
+#' \item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=8/2, err[X], Y=0/2, err[Y], rho[X,Y]}}
+#' \item{\code{X=2/8, err[X], Y=0/8, err[Y], rho[X,Y]}}
 #' }
 #'
 #' where all values are activity ratios
@@ -147,6 +151,26 @@
 #' or more U/Ca-ratios or U-concentration measurements (in ppm) and
 #' their analytical uncertainties.}  }
 #'
+#' if \code{method='other'}, \code{x} is read as a table, unless
+#' \code{format} is one of either:
+#'
+#' \describe{
+#' \item{\code{radial} or \code{'average'}:}{\code{X, err[X]}}
+#' \item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho} \cr
+#'       OR \code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
+#' \item{\code{spectrum}:}{\code{f, X, err[X]}} 
+#' }
+#' 
+#' @param ierr indicates whether the analytical uncertainties are
+#'     reported as: \enumerate{
+#' 
+#' \item{1\eqn{\sigma} absolute uncertainties.}
+#' \item{2\eqn{\sigma} absolute uncertainties.}
+#' \item{1\eqn{\sigma} relative uncertainties (\%).}
+#' \item{2\eqn{\sigma} relative uncertainties (\%).}
+#' 
+#' }
+#' 
 #' @param ... optional arguments to the \code{read.csv} function
 #' @seealso \code{\link{examples}}, \code{\link{settings}}
 #' @return an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
@@ -196,49 +220,49 @@
 read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
-read.data.default <- function(x,method='U-Pb',format=1,...){
+read.data.default <- function(x,method='U-Pb',format=1,ierr=1,...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
-    read.data.matrix(X,method=method,format=format)
+    read.data.matrix(X,method=method,format=format,ierr=ierr)
 }
 #' @rdname read.data
 #' @export
-read.data.data.frame <- function(x,method='U-Pb',format=1,...){
-    read.data.matrix(as.matrix(x),method=method,format=format,...)
+read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,...){
+    read.data.matrix(as.matrix(x),method=method,format=format,ierr=ierr,...)
 }
 #' @rdname read.data
 #' @export
-read.data.matrix <- function(x,method='U-Pb',format=1,...){
+read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,...){
     if (identical(method,'U-Pb')){
-        out <- as.UPb(x,format)
+        out <- as.UPb(x,format,ierr)
     } else if (identical(method,'Pb-Pb')){
-        out <- as.PbPb(x,format)
+        out <- as.PbPb(x,format,ierr)
     } else if (identical(method,'Ar-Ar')){
-        out <- as.ArAr(x,format)
+        out <- as.ArAr(x,format,ierr)
     } else if (identical(method,'K-Ca')){
-        out <- as.KCa(x,format)
+        out <- as.KCa(x,format,ierr)
     } else if (identical(method,'Re-Os')){
-        out <- as.ReOs(x,format)
+        out <- as.ReOs(x,format,ierr)
     } else if (identical(method,'Rb-Sr')){
-        out <- as.RbSr(x,format)
+        out <- as.RbSr(x,format,ierr)
     } else if (identical(method,'Sm-Nd')){
-        out <- as.SmNd(x,format)
+        out <- as.SmNd(x,format,ierr)
     } else if (identical(method,'Lu-Hf')){
-        out <- as.LuHf(x,format)
+        out <- as.LuHf(x,format,ierr)
     } else if (identical(method,'Th-U')){
-        out <- as.ThU(x,format)
+        out <- as.ThU(x,format,ierr)
     } else if (identical(method,'U-Th-He')){
-        out <- as.UThHe(x)
+        out <- as.UThHe(x,ierr)
     } else if (identical(method,'fissiontracks')){
-        out <- as.fissiontracks(x,format)
+        out <- as.fissiontracks(x,format,ierr)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     } else if (identical(method,'other')){
-        out <- as.other(x)
+        out <- as.other(x,format,ierr)
     }
     out
 }
 
-as.UPb <- function(x,format=3){
+as.UPb <- function(x,format=3,ierr=1){
     out <- list()
     class(out) <- "UPb"
     out$x <- NA
@@ -247,6 +271,7 @@ as.UPb <- function(x,format=3){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
     cnames <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb207U235','errPb207U235',
@@ -355,7 +380,7 @@ get.cov.46.76 <- function(Pb204Pb206,errPb204Pb206,
                 Pb207Pb206,errPb207Pb206,
                 Pb204Pb207,errPb204Pb207)
 }
-as.PbPb <- function(x,format=1){
+as.PbPb <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "PbPb"
     out$x <- NA
@@ -364,6 +389,7 @@ as.PbPb <- function(x,format=1){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='Pb-Pb',format=format,ierr=ierr)
     cnames <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb206Pb204','errPb206Pb204',
@@ -380,15 +406,16 @@ as.PbPb <- function(x,format=1){
     colnames(out$x) <- cnames
     out
 }
-as.ArAr <- function(x,format=3){
+as.ArAr <- function(x,format=3,ierr=1){
     out <- list()
     class(out) <- "ArAr"
     out$format <- format
-    out$J <- as.numeric(x[2,1:2])
+    out$J <- errAdjust(x=as.numeric(x[2,1:2]),ierr=ierr)
     nc <- ncol(x)
     nr <- nrow(x)
     bi <- 4 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
+    X <- errconvert(X,gc='Ar-Ar',format=format,ierr=ierr)
     if (format==3 & nc>5){
         if (nc==8){
             out$x <- subset(X,select=1:7)
@@ -422,7 +449,7 @@ as.ArAr <- function(x,format=3){
     }
     out
 }
-as.KCa <- function(x,format=1){
+as.KCa <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "KCa"
     out$format <- format
@@ -430,6 +457,7 @@ as.KCa <- function(x,format=1){
     nr <- nrow(x)
     bi <- 2 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
+    X <- errconvert(X,gc='K-Ca',format=format,ierr=ierr)
     cnames <- c('K40Ca44','errK40Ca44','Ca40Ca44','errCa40Ca44','rho')
     if (format==1 & nc==4){
         out$x <- cbind(X,0)
@@ -444,35 +472,35 @@ as.KCa <- function(x,format=1){
     colnames(out$x) <- cnames
     out
 }
-as.RbSr <- function(x,format=2){
+as.RbSr <- function(x,format=2,ierr=1){
     cnames1 <- c('Rb87Sr86','errRb87Sr86',
                  'Sr87Sr86','errSr87Sr86','rho')
     cnames2 <- c('Rbppm','errRbppm','Srppm','errSrppm',
                  'Sr87Sr86','errSr87Sr86')
-    as.PD(x,"RbSr",cnames1,cnames2,format)
+    as.PD(x,"RbSr",cnames1,cnames2,format,ierr)
 }
-as.ReOs <- function(x,format=2){
+as.ReOs <- function(x,format=2,ierr=1){
     cnames1 <- c('Re187Os188','errRe187Os188',
                  'Os187Os188','errOs187Os188','rho')
     cnames2 <- c('Reppm','errReppm','Osppm','errOsppm',
                  'Os187Os188','errOs187Os188')
-    as.PD(x,"ReOs",cnames1,cnames2,format)
+    as.PD(x,"ReOs",cnames1,cnames2,format,ierr)
 }
-as.SmNd <- function(x,format=2){
+as.SmNd <- function(x,format=2,ierr=1){
     cnames1 <- c('Sm143Nd144','errSm143Nd144',
                  'Nd143Nd144','errNd143Nd144','rho')
     cnames2 <- c('Smppm','errSmppm','Ndppm','errNdppm',
                  'Nd143Nd144','errNd143Nd144')
-    as.PD(x,"SmNd",cnames1,cnames2,format)
+    as.PD(x,"SmNd",cnames1,cnames2,format,ierr)
 }
-as.LuHf <- function(x,format=2){
+as.LuHf <- function(x,format=2,ierr=1){
     cnames1 <- c('Lu176Hf177','errLu176Hf177',
                  'Hf176Hf177','errHf176Hf177','rho')
     cnames2 <- c('Luppm','errLuppm','Hfppm','errHfppm',
                  'Hf176Hf177','errHf176Hf177')
-    as.PD(x,"LuHf",cnames1,cnames2,format)
+    as.PD(x,"LuHf",cnames1,cnames2,format,ierr)
 }
-as.PD <- function(x,classname,colnames1,colnames2,format){
+as.PD <- function(x,classname,colnames1,colnames2,format,ierr){
     out <- list()
     class(out) <- c(classname,'PD')
     out$x <- NA
@@ -481,6 +509,7 @@ as.PD <- function(x,classname,colnames1,colnames2,format){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='PD',format=format,ierr=ierr)
     if (format==1 & nc>3){
         out$x <- read.XsXYsYrXY(X)
         colnames(out$x) <- colnames1
@@ -490,7 +519,7 @@ as.PD <- function(x,classname,colnames1,colnames2,format){
     }
     out
 }
-as.ThU <- function(x,format=1){
+as.ThU <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "ThU"
     out$x <- NA
@@ -499,6 +528,7 @@ as.ThU <- function(x,format=1){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
+    X <- errconvert(X,gc='Th-U',format=format,ierr=ierr)
     cnames <- NULL
     if (format==1 & nc>8){
         cnames <- c('U238Th232','errU238Th232',
@@ -529,12 +559,13 @@ as.ThU <- function(x,format=1){
     colnames(out$x) <- cnames
     out
 }
-as.UThHe <- function(x){
+as.UThHe <- function(x,ierr=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     X[X<=0] <- NA
+    X <- errconvert(X,gc='U-Th-He',ierr=ierr)
     if (nc>5) cnames <- c('He','errHe','U','errU','Th','errTh')
     if (nc>7) cnames <- c(cnames,'Sm','errSm')
     out <- subset(X,select=1:length(cnames))
@@ -542,21 +573,21 @@ as.UThHe <- function(x){
     class(out) <- append("UThHe",class(out))
     out
 }
-as.fissiontracks <- function(x,format=1){
+as.fissiontracks <- function(x,format=1,ierr=1){
     nr <- nrow(x)
     nc <- ncol(x)
     out <- list()
     class(out) <- "fissiontracks"
     out$format <- format
     if (format==1){
-        out$zeta <- as.numeric(x[2,1:2])
-        out$rhoD <- as.numeric(x[4,1:2])
+        out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
+        out$rhoD <- errAdjust(as.numeric(x[4,1:2]),ierr=ierr)
         X <- shiny2matrix(x,6,nr,nc)
         out$x <- subset(X,select=1:2)
         colnames(out$x) <- c('Ns','Ni')
     } else {
         if (format==2){
-            out$zeta <- as.numeric(x[2,1:2])
+            out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
             out$spotSize <- as.numeric(x[4,1])
             si <- 6 # start index
         } else {
@@ -570,12 +601,12 @@ as.fissiontracks <- function(x,format=1){
         out$A <- A
         out$U <- list()
         out$sU <- list()
-        j <- seq(from=3,to=nc-1,by=2)
+        errcols <- seq(from=4,to=nc,by=2)-3
         for (i in 1:ns){
-            U <- as.numeric(x[i+si-1,j])
-            out$U[[i]] <- U
-            sU <- as.numeric(x[i+si-1,j+1])
-            out$sU[[i]] <- sU
+            UsU <- as.numeric(x[i+si-1,3:nc])
+            UsU <- errAdjust(UsU,i=errcols,ierr=ierr)
+            out$U[[i]] <- UsU[1]
+            out$sU[[i]] <- UsU[2]
         }
     }
     out
@@ -594,11 +625,12 @@ as.detritals <- function(x){
     }
     out
 }
-as.other <- function(x){
+as.other <- function(x,format='generic',ierr=1){
     nc <- ncol(x)
     has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
     if (has.header) x <- x[-1,]
-    matrix(as.numeric(x),ncol=nc)
+    X <- matrix(as.numeric(x),ncol=nc)
+    errconvert(X,'other',format,ierr)
 }
 
 # x = a numerical vector, br = length of the preamble with parameters
@@ -620,4 +652,68 @@ read.XsXYsYrXY <- function(x){
         out <- subset(x,select=1:5)
     }
     out
+}
+
+errconvert <- function(x,gc='U-Pb',format=1,ierr=1){
+    if (ierr==1){ return(x) }
+    else { out <- x }
+    i <- getErrCols(gc,format,ierr)
+    errAdjust(x,i,ierr)
+}
+
+errAdjust <- function(x,i=2,ierr=1){
+    out <- x
+    if (is.vector(x)){
+        if (ierr==2){
+            out[i] <- x[i]/2
+        } else if (ierr==3){
+            out[i] <- x[i]*x[i-1]/100
+        } else if (ierr==4){
+            out[i] <- x[i]*x[i-1]/200
+        }
+    } else {
+        if (ierr==2){
+            out[,i] <- x[,i]/2
+        } else if (ierr==3){
+            out[,i] <- x[,i]*x[,i-1]/100
+        } else if (ierr==4){
+            out[,i] <- x[,i]*x[,i-1]/200
+        }
+    }
+    out
+}
+
+getErrCols <- function(gc,format=NA,ierr=1){
+    UPb12 = (gc=='U-Pb' && format%in%(1:2))
+    UPb345 = (gc=='U-Pb' && format%in%(3:5))
+    UPb6 = (gc=='U-Pb' && format==6)
+    PbPb12 = (gc=='Pb-Pb' && format%in%(1:2))
+    PbPb3 = (gc=='Pb-Pb' && format==3)
+    ArAr12 = (gc=='Ar-Ar' && format%in%(1:2))
+    ArAr3 = (gc=='Ar-Ar' && format==3)
+    KCa1 = (gc=='K-Ca' && format==1)
+    KCa2 = (gc=='K-Ca' && format==2)
+    PD1 = (gc=='PD' && format==1)
+    PD2 = (gc=='PD' && format==2)
+    UThHe = (gc=='U-Th-He')
+    ThU12 = (gc=='Th-U' && format<3)
+    ThU34 = (gc=='Th-U' && format>2)
+    radial = (gc=='other' && identical(format,'radial'))
+    regression = (gc=='other' && identical(format,'regression'))
+    spectrum = (gc=='other' && identical(format,'spectrum'))
+    average = (gc=='other' && identical(format,'average'))
+    if (UPb12 | PbPb12 | ArAr12 | KCa1 | PD1 | ThU34 | regression){
+        cols = c(2,4)
+    } else if (UPb345 | PbPb3 | ArAr3 | KCa2 | PD2 | UThHe | ThU12){
+        cols = c(2,4,6)
+    } else if (UPb6){
+        cols = c(from=2,to=12,by=2)
+    } else if (radial || average){
+        cols = 2
+    } else if (spectrum){
+        cols = 3
+    } else {
+        cols = NULL
+    }
+    cols
 }
