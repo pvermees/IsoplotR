@@ -37,7 +37,6 @@ common.Pb.isochron.UPb <- function(x){
     out
 }
 common.Pb.isochron.PbPb <- function(x){
-    out <- x
     fit <- isochron(x,inverse=FALSE,plot=FALSE)
     i74 <- fit$a[1]
     i64 <- fit$a[1]/fit$b[1]
