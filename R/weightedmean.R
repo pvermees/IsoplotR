@@ -632,6 +632,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
     sx <- sX[plotit]
     valid <- fit$valid[plotit]
     calcit <- calcit[plotit]
+    colour <- colour[plotit]
     ns <- length(x)
     if (ranked){
         i <- order(x)
