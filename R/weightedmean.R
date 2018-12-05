@@ -96,11 +96,12 @@
 #' included into the weighted mean calculation}
 #'
 #' \item{plotpar}{list of plot parameters for the weighted mean
-#' diagram}
-#' }
+#' diagram} }
 #' @rdname weightedmean
 #' @export
-weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
+weightedmean <- function(x,...){
+    UseMethod("weightedmean",x)
+}
 #' @param detect.outliers logical flag indicating whether outliers
 #'     should be detected and rejected using Chauvenet's Criterion.
 #' @param plot logical flag indicating whether the function should
@@ -110,8 +111,13 @@ weightedmean <- function(x,...){ UseMethod("weightedmean",x) }
 #'     plot automatically.
 #' @param to maximum y-axis limit. Setting \code{to=NA} scales the
 #'     plot automatically.
-#' @param rect.col the fill colour of the rectangles used to show the
-#'     measurements or age estimates.
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours of the plot symbols.
+#' @param clabel label of the colour legend
+#' @param rect.col a vector of two fill colours used to show the
+#'     measurements or age estimates.  If \code{levels=NA}, then only
+#'     the first colour is used. If \code{levels} is a vector of
+#'     numbers, then \code{bg} is used to construct a colour ramp.
 #' @param outlier.col if \code{detect.outliers=TRUE}, the outliers are
 #'     given a different colour.
 #' @param sigdig the number of significant digits of the numerical

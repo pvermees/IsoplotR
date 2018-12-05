@@ -20,77 +20,87 @@ weightedmean(x, ...)
 
 \method{weightedmean}{default}(x, from = NA, to = NA,
   random.effects = TRUE, detect.outliers = TRUE, plot = TRUE,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ranked = FALSE, hide = NULL,
-  omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  ranked = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{UPb}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15, 5),
-  alpha = 0.05, exterr = TRUE, ranked = FALSE, common.Pb = 0,
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, type = 4,
+  cutoff.76 = 1100, cutoff.disc = c(-15, 5), alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, common.Pb = 0, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{PbPb}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, common.Pb = 1,
-  ranked = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, common.Pb = 1, ranked = FALSE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{ThU}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ranked = FALSE, i2i = TRUE,
-  detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0,
-  0, 0), hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  ranked = FALSE, i2i = TRUE, detritus = 0, Th02 = c(0, 0),
+  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{ArAr}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, i2i = FALSE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{KCa}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, i2i = FALSE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{ReOs}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = TRUE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, i2i = TRUE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{SmNd}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  i2i = TRUE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, i2i = TRUE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{RbSr}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE,
-  ranked = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, i2i = TRUE, ranked = FALSE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{LuHf}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, i2i = TRUE,
-  ranked = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, i2i = TRUE, ranked = FALSE, hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{UThHe}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, ranked = FALSE, hide = NULL,
-  omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  ranked = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{fissiontracks}(x, random.effects = TRUE,
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
-  rect.col = rgb(0, 1, 0, 0.5), outlier.col = rgb(0, 1, 1, 0.5),
-  sigdig = 2, alpha = 0.05, exterr = TRUE, ranked = FALSE,
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+  levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
+  exterr = TRUE, ranked = FALSE, hide = NULL, omit = NULL,
+  omit.col = NA, ...)
 }
 \arguments{
 \item{x}{a two column matrix of values (first column) and their
@@ -123,8 +133,15 @@ should be detected and rejected using Chauvenet's Criterion.}
 produce graphical output or return numerical values to the
 user.}
 
-\item{rect.col}{the fill colour of the rectangles used to show the
-measurements or age estimates.}
+\item{levels}{a vector with additional values to be displayed as
+different background colours of the plot symbols.}
+
+\item{clabel}{label of the colour legend}
+
+\item{rect.col}{a vector of two fill colours used to show the
+measurements or age estimates.  If \code{levels=NA}, then only
+the first colour is used. If \code{levels} is a vector of
+numbers, then \code{bg} is used to construct a colour ramp.}
 
 \item{outlier.col}{if \code{detect.outliers=TRUE}, the outliers are
 given a different colour.}
@@ -249,8 +266,7 @@ population is not overdispersed.}
 included into the weighted mean calculation}
 
 \item{plotpar}{list of plot parameters for the weighted mean
-diagram}
-}
+diagram} }
 }
 \description{
 Models the data as a Normal distribution with two sources of
