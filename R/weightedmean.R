@@ -622,16 +622,17 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                               outlier.col="#00FFFF80",sigdig=2,
                               alpha=0.05,units='',ranked=FALSE,
                               hide=NULL,omit=NULL,omit.col=NA,...){
-    ns <- length(X)
-    plotit <- (1:ns)%ni%hide
-    calcit <- (1:ns)%ni%c(hide,omit)
-    colour <- set.ellipse.colours(ns=ns,levels=levels,col=rect.col,
+    NS <- length(X)
+    plotit <- (1:NS)%ni%hide
+    calcit <- (1:NS)%ni%c(hide,omit)
+    colour <- set.ellipse.colours(ns=NS,levels=levels,col=rect.col,
                                   hide=hide,omit=which(!fit$valid),
                                   omit.col=omit.col)
     x <- X[plotit]
     sx <- sX[plotit]
     valid <- fit$valid[plotit]
     calcit <- calcit[plotit]
+    ns <- length(x)
     if (ranked){
         i <- order(x)
         x <- x[i]
