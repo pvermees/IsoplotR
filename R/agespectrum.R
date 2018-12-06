@@ -110,9 +110,9 @@ agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 #' @rdname agespectrum
 #' @export
 agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
-                                random.effects=TRUE,
-                                plateau.col=rgb(0,1,0,0.5),
-                                non.plateau.col=rgb(0,1,1,0.5),
+                                random.effects=TRUE,levels=NA,clabel="",
+                                plateau.col=c("#00FF0080","#FF000080"),
+                                non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
                                 title=TRUE,show.ci=TRUE,
                                 xlab='cumulative fraction',
@@ -131,7 +131,10 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     plat$valid <- NULL
     if (plateau) {
         colour <- rep(non.plateau.col,ns)
-        colour[plat$i] <- plateau.col
+        np <- length(plat$i)
+        levels <- levels[plat$i]
+        cols <- set.ellipse.colours(ns=np,levels=levels,col=plateau.col)
+        colour[plat$i] <- cols            
         if (show.ci){
             ci <- plat$plotpar$rect
             ci$x <- c(0,1,1,0)
@@ -139,7 +142,8 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
         }
         graphics::lines(c(0,1),rep(plat$mean[1],2),col=line.col,lwd=lwd)
     } else {
-        colour <- rep(plateau.col,ns)
+        colour <-
+            set.ellipse.colours(ns=ns,levels=levels,hide=hide,col=plateau.col)
     }
     for (i in 1:ns){
         graphics::rect(X[i],Y[i]-fact*sY[i],
@@ -148,6 +152,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
         if (i<ns) graphics::lines(rep(X[i+1],2),
                                   c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
     }
+    colourbar(z=levels,col=plateau.col,clabel=clabel)
     if (plateau){
         plat$n <- nrow(x)
         if (title)
@@ -168,17 +173,18 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 #' @rdname agespectrum
 #' @export
 agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
-                             random.effects=TRUE,
-                             plateau.col=rgb(0,1,0,0.5),
-                             non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
+                             random.effects=TRUE,levels=NA,clabel="",
+                             plateau.col=c("#00FF0080","#FF000080"),
+                             non.plateau.col="#00FFFF80",sigdig=2,
                              exterr=TRUE,line.col='red',lwd=2,
                              i2i=FALSE,hide=NULL,...){
     x <- clear(x,hide)
     tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
-    plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
-                                plateau=plateau,
+    plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,
+                                ylab='age [Ma]',plateau=plateau,
+                                levels=levels,clabel=clabel,
                                 random.effects=random.effects,
                                 sigdig=sigdig,line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
