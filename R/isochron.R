@@ -614,9 +614,11 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
 #' @rdname isochron
 #' @export
 isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                           show.numbers=FALSE,ci.col='gray80',
-                           line.col='black',lwd=1,plot=TRUE,model=1,
-                           hide=NULL,omit=NULL,omit.col='grey',...){
+                           show.numbers=FALSE,levels=NA,clabel="",
+                           ellipse.col=c("#00FF0080","#FF000080"),
+                           ci.col='gray80',line.col='black',lwd=1,
+                           plot=TRUE,model=1,hide=NULL,omit=NULL,
+                           omit.col='grey',...){
     d <- data2york(x)
     d2calc <- clear(d,hide,omit)
     fit <- regression(d2calc,model=model)
@@ -630,8 +632,10 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$y0label <- quote('He'[o]*' = ')
     if (plot) {
         scatterplot(d,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=2*(model!=2),show.numbers=show.numbers,
-                    fit=out,ci.col=ci.col,line.col=line.col,lwd=lwd,
+                    show.ellipses=2*(model!=2),
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.col=omit.col,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
                         xlab="P",ylab="He")
