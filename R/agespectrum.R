@@ -32,10 +32,16 @@
 #'     compute the weighted mean of the largest succession of steps
 #'     that pass the Chi-square test for age homogeneity.  If
 #'     \code{TRUE}, returns a list with plateau parameters.
-#' @param plateau.col the fill colour of the rectangles used to mark
-#'     the steps belonging to the age plateau.
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours of the plot symbols.
+#' @param plateau.col a vector of two fill colours of the rectangles
+#'     used to mark the steps belonging to the age plateau.  If
+#'     \code{levels=NA}, then only the first colour is used. If
+#'     \code{levels} is a vector of numbers, then \code{bg} is used to
+#'     construct a colour ramp.
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
 #'     NOT belong to the plateau are given a different colour.
+#' @param clabel label of the colour legend
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output (only used
 #'     if \code{plateau=TRUE}).
@@ -48,7 +54,8 @@
 #'     the plateau age as a grey band
 #' @param random.effects if \code{TRUE}, computes the weighted mean
 #'     using a random effects model with two parameters: the mean and
-#'     the dispersion. This is akin to a `model-3' isochron regression.
+#'     the dispersion. This is akin to a `model-3' isochron
+#'     regression.
 #' 
 #'     if \code{FALSE}, attributes any excess dispersion to an
 #'     underestimation of the analytical uncertainties. This akin to a
@@ -237,7 +244,7 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     rounded.mean <- roundit(fit$mean['x'],
                             fit$mean[c('s[x]','ci[x]')],
                             sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='~n/N~')',
+    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
                         list(a=rounded.mean[1],
                              b=rounded.mean[2],
                              c=rounded.mean[3],

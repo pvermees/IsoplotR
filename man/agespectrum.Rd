@@ -9,14 +9,16 @@
 agespectrum(x, ...)
 
 \method{agespectrum}{default}(x, alpha = 0.05, plateau = TRUE,
-  random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),
-  non.plateau.col = rgb(0, 1, 1, 0.5), sigdig = 2, line.col = "red",
+  random.effects = TRUE, levels = NA, clabel = "",
+  plateau.col = c("#00FF0080", "#FF000080"),
+  non.plateau.col = "#00FFFF80", sigdig = 2, line.col = "red",
   lwd = 2, title = TRUE, show.ci = TRUE,
   xlab = "cumulative fraction", ylab = "age [Ma]", hide = NULL, ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
-  random.effects = TRUE, plateau.col = rgb(0, 1, 0, 0.5),
-  non.plateau.col = rgb(0, 1, 1, 0.5), sigdig = 2, exterr = TRUE,
+  random.effects = TRUE, levels = NA, clabel = "",
+  plateau.col = c("#00FF0080", "#FF000080"),
+  non.plateau.col = "#00FFFF80", sigdig = 2, exterr = TRUE,
   line.col = "red", lwd = 2, i2i = FALSE, hide = NULL, ...)
 }
 \arguments{
@@ -41,14 +43,23 @@ that pass the Chi-square test for age homogeneity.  If
 
 \item{random.effects}{if \code{TRUE}, computes the weighted mean
     using a random effects model with two parameters: the mean and
-    the dispersion. This is akin to a `model-3' isochron regression.
+    the dispersion. This is akin to a `model-3' isochron
+    regression.
 
     if \code{FALSE}, attributes any excess dispersion to an
     underestimation of the analytical uncertainties. This akin to a
     `model-1' isochron regression.}
 
-\item{plateau.col}{the fill colour of the rectangles used to mark
-the steps belonging to the age plateau.}
+\item{levels}{a vector with additional values to be displayed as
+different background colours of the plot symbols.}
+
+\item{clabel}{label of the colour legend}
+
+\item{plateau.col}{a vector of two fill colours of the rectangles
+used to mark the steps belonging to the age plateau.  If
+\code{levels=NA}, then only the first colour is used. If
+\code{levels} is a vector of numbers, then \code{bg} is used to
+construct a colour ramp.}
 
 \item{non.plateau.col}{if \code{plateau=TRUE}, the steps that do
 NOT belong to the plateau are given a different colour.}
