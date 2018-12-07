@@ -32,10 +32,16 @@
 #'     compute the weighted mean of the largest succession of steps
 #'     that pass the Chi-square test for age homogeneity.  If
 #'     \code{TRUE}, returns a list with plateau parameters.
-#' @param plateau.col the fill colour of the rectangles used to mark
-#'     the steps belonging to the age plateau.
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours of the plot symbols.
+#' @param plateau.col a vector of two fill colours of the rectangles
+#'     used to mark the steps belonging to the age plateau.  If
+#'     \code{levels=NA}, then only the first colour is used. If
+#'     \code{levels} is a vector of numbers, then \code{bg} is used to
+#'     construct a colour ramp.
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
 #'     NOT belong to the plateau are given a different colour.
+#' @param clabel label of the colour legend
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output (only used
 #'     if \code{plateau=TRUE}).
@@ -48,7 +54,8 @@
 #'     the plateau age as a grey band
 #' @param random.effects if \code{TRUE}, computes the weighted mean
 #'     using a random effects model with two parameters: the mean and
-#'     the dispersion. This is akin to a `model-3' isochron regression.
+#'     the dispersion. This is akin to a `model-3' isochron
+#'     regression.
 #' 
 #'     if \code{FALSE}, attributes any excess dispersion to an
 #'     underestimation of the analytical uncertainties. This akin to a
@@ -110,15 +117,16 @@ agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 #' @rdname agespectrum
 #' @export
 agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
-                                random.effects=TRUE,
-                                plateau.col=rgb(0,1,0,0.5),
-                                non.plateau.col=rgb(0,1,1,0.5),
+                                random.effects=TRUE,levels=NA,clabel="",
+                                plateau.col=c("#00FF0080","#FF000080"),
+                                non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
                                 title=TRUE,show.ci=TRUE,
                                 xlab='cumulative fraction',
                                 ylab='age [Ma]',hide=NULL,...){
     ns <- nrow(x)
-    x <- clear(x,hide)
+    x <- clear(x[,1:3],hide)
+    if (!all(is.na(levels))) levels <- clear(levels,hide)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
@@ -131,7 +139,10 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     plat$valid <- NULL
     if (plateau) {
         colour <- rep(non.plateau.col,ns)
-        colour[plat$i] <- plateau.col
+        np <- length(plat$i)
+        levels <- levels[plat$i]
+        cols <- set.ellipse.colours(ns=np,levels=levels,col=plateau.col)
+        colour[plat$i] <- cols            
         if (show.ci){
             ci <- plat$plotpar$rect
             ci$x <- c(0,1,1,0)
@@ -139,7 +150,8 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
         }
         graphics::lines(c(0,1),rep(plat$mean[1],2),col=line.col,lwd=lwd)
     } else {
-        colour <- rep(plateau.col,ns)
+        colour <-
+            set.ellipse.colours(ns=ns,levels=levels,hide=hide,col=plateau.col)
     }
     for (i in 1:ns){
         graphics::rect(X[i],Y[i]-fact*sY[i],
@@ -148,6 +160,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
         if (i<ns) graphics::lines(rep(X[i+1],2),
                                   c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
     }
+    colourbar(z=levels,col=plateau.col,clabel=clabel)
     if (plateau){
         plat$n <- nrow(x)
         if (title)
@@ -168,17 +181,18 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 #' @rdname agespectrum
 #' @export
 agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
-                             random.effects=TRUE,
-                             plateau.col=rgb(0,1,0,0.5),
-                             non.plateau.col=rgb(0,1,1,0.5),sigdig=2,
+                             random.effects=TRUE,levels=NA,clabel="",
+                             plateau.col=c("#00FF0080","#FF000080"),
+                             non.plateau.col="#00FFFF80",sigdig=2,
                              exterr=TRUE,line.col='red',lwd=2,
                              i2i=FALSE,hide=NULL,...){
     x <- clear(x,hide)
     tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
-    plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,ylab='age [Ma]',
-                                plateau=plateau,
+    plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,
+                                ylab='age [Ma]',plateau=plateau,
+                                levels=levels,clabel=clabel,
                                 random.effects=random.effects,
                                 sigdig=sigdig,line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
@@ -231,7 +245,7 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     rounded.mean <- roundit(fit$mean['x'],
                             fit$mean[c('s[x]','ci[x]')],
                             sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='~n/N~')',
+    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
                         list(a=rounded.mean[1],
                              b=rounded.mean[2],
                              c=rounded.mean[3],

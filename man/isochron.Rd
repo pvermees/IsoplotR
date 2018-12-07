@@ -75,7 +75,8 @@ isochron(x, ...)
   omit.col = NA, ...)
 
 \method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, ci.col = "gray80",
+  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
+  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, model = 1,
   hide = NULL, omit = NULL, omit.col = "grey", ...)
 }

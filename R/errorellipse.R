@@ -56,9 +56,7 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
     haslevels <- !all(is.na(levels))
-    if (show.ellipses==0 & show.numbers){
-        colour <- NA
-    } else if (show.ellipses==2){
+    if (show.ellipses==2 && all(is.na(levels))){
         colour <- rep('black',ns)
     } else {
         colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,

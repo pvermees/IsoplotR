@@ -220,7 +220,8 @@ age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
 }
 #' @rdname age
 #' @export
-age.PbPb <- function(x,isochron=TRUE,common.Pb=1,exterr=TRUE,i=NA,sigdig=NA,...){
+age.PbPb <- function(x,isochron=TRUE,common.Pb=1,
+                     exterr=TRUE,i=NA,sigdig=NA,...){
     if (common.Pb %in% c(1,2,3))
         X <- common.Pb.correction(x,option=common.Pb)
     else
