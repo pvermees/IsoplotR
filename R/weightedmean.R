@@ -349,10 +349,10 @@ weightedmean.ReOs <- function(x,random.effects=TRUE,
                               omit.col=NA,...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
-                        from=from,to=to,rect.col=rect.col,
-                        outlier.col=outlier.col,sigdig=sigdig,
-                        alpha=alpha,exterr=exterr,i2i=i2i,
-                        units='Ma',ranked=ranked,hide=hide,
+                        from=from,to=to,levels=levels,clabel=clabel,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig, alpha=alpha,exterr=exterr,
+                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
