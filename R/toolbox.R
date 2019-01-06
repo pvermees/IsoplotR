@@ -1,39 +1,64 @@
+#' @export
 length.UPb  <- function(x){ nrow(x$x) }
+#' @export
 length.PbPb <- function(x){ nrow(x$x) }
+#' @export
 length.ArAr <- function(x){ nrow(x$x) }
+#' @export
 length.KCa <- function(x){ nrow(x$x) }
+#' @export
 length.RbSr <- function(x){ nrow(x$x) }
+#' @export
 length.SmNd <- function(x){ nrow(x$x) }
+#' @export
 length.ReOs <- function(x){ nrow(x$x) }
+#' @export
 length.LuHf <- function(x){ nrow(x$x) }
+#' @export
 length.ThU <- function(x){ nrow(x$x) }
+#' @export
 length.UThHe <- function(x){ nrow(x) }
+#' @export
 length.KDE <- function(x){ length(x$ages) }
+#' @export
 length.KDEs <- function(x){ length(x$kdes) }
+#' @export
 length.fissiontracks <- function(x){
     if (x$format==1) return(nrow(x$x))
     else return(length(x$Ns))
 }
 
+#' @export
 subset.UPb  <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.PbPb <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.KCa <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.RbSr <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.LuHf <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
 subset.detritals <- function(x,subset,...){
     out <- x[subset]
     class(out) <- class(x)
     out
 }
+#' @export
 subset.UThHe <- function(x,subset,...){
     out <- x[subset,]
     class(out) <- class(x)
     out
 }
+#' @export
 subset.fissiontracks <- function(x,subset,...){
     if (x$format==1){
         out <- subset_helper(x,subset,...)
