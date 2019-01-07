@@ -85,7 +85,7 @@ titterington <- function(x,alpha=0.05){
     covmat <- solve(fish)
     out <- list()
     out$par <- fit$par
-    out$cov <- covmat[(ns-3):ns,(ns-3):ns]
+    out$cov <- covmat[(ns+1):(ns+4),(ns+1):(ns+4)]
     mswd <- mswd.tit(fit$par,dat)
     out <- c(out,mswd)
     parnames <- c('a','b','A','B')

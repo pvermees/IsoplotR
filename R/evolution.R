@@ -213,21 +213,21 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
     d2plot <- subset(d,subset=plotit)
     lim <- evolution.lines(d2plot,xlim=xlim,ylim=ylim,...)
     if (isochron){
-        fit <- isochron(x,type=2,plot=FALSE,
+        fit <- isochron(x,type=3,plot=FALSE,
                         model=model,hide=hide,omit=omit)
-        b48 <- fit$par['a']
-        b08 <- fit$par['A']
+        b48 <- fit$par['b']
+        b08 <- fit$par['B']
         initial <- matrix(0,1,5)
         initial[1] <- b08
-        initial[2] <- sqrt(fit$cov['a','a'])
+        initial[2] <- sqrt(fit$cov['b','b'])
         initial[3] <- b48
-        initial[4] <- sqrt(fit$cov['A','A'])
-        initial[5] <- fit$cov['a','A']/(initial[2]*initial[4])
+        initial[4] <- sqrt(fit$cov['B','B'])
+        initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
         scatterplot(initial,alpha=alpha,
                     ellipse.col=grDevices::rgb(1,1,1,0.85),
                     line.col='black',new.plot=FALSE)
         e48 <- 1
-        e08 <- b08 + fit$par['B']*(e48-b48)/fit$par['b']
+        e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
     pdat <- d[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
@@ -329,7 +329,7 @@ evolution.title <- function(fit,sigdig=2,...){
     call2 <- substitute(e~a,list(e=expr2,a=args2))
     line2 <- do.call(substitute,list(eval(call2),list2))
     if (fit$model==1 && fit$mswd>1){
-        line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+        line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
                                  b=signif(fit$p.value,2)))
         mymtext(line1,line=2,...)
