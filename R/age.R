@@ -71,7 +71,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
         out <- get.Pb207U235.age(x[1],x[2],exterr)
     } else if (identical(method,'U238-Pb206')){
         out <- get.Pb206U238.age(x[1],x[2],exterr)
-    } else if (identical(method,'Pb206-Pb207')){
+    } else if (identical(method,'Pb207-Pb206')){
         out <- get.Pb207Pb206.age(x[1],x[2],exterr)
     } else if (identical(method,'Ar-Ar')){
         out <- get.ArAr.age(x[1],x[2],x[3],x[4],exterr)
