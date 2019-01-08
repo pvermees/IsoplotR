@@ -645,16 +645,16 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
                             alpha=0.05,hide=NULL,omit=NULL){
-    if (type == 1){
+    if (type == 1){ # 0/2 vs 8/2
         osmond <- FALSE
-        ia <- 'a'
-        ib <- 'b'
+        ia <- 'A'
+        ib <- 'B'
         i48 <- 'b'
         i08 <- 'B'
-        id <- c('X','sX','Y','sY','rXY')
+        id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^230*'Th/'^232*'Th')
-    } else if (type == 2){
+    } else if (type == 2){ # 0/8 vs 2/8
         osmond <- TRUE
         ia <- 'A'
         ib <- 'B'
@@ -663,16 +663,16 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^230*'Th/'^238*'U')
-    } else if (type == 3){
+    } else if (type == 3){ # 4/2 vs 8/2
         osmond <- FALSE
-        ia <- 'A'
-        ib <- 'B'
+        ia <- 'a'
+        ib <- 'b'
         i48 <- 'b'
         i08 <- 'B'
-        id <- c('X','sX','Z','sZ','rXZ')
+        id <- c('X','sX','Y','sY','rXY')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^234*'U/'^232*'Th')
-    } else {
+    } else if (type == 4){ # 4/8 vs 2/8
         osmond <- TRUE
         ia <- 'a'
         ib <- 'b'
