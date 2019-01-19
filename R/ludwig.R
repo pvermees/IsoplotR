@@ -477,14 +477,24 @@ data2ludwig.UPb <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
         out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
     out
 }
-data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
+data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
+                           diseq=list(corr=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0)){
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    B <-  (exp(l5[1]*tt)-1)/U - a0*(exp(l8[1]*tt)-1)
-    dBdl5 <- tt*exp(l5[1]*tt)/U
-    dBdl8 <- -a0*tt*exp(l8[1]*tt)
+    if (diseq$corr){
+        D1 <- d1(tt=tt,D0=diseq$U48)
+        D2 <- d2(tt=tt,A0=diseq$Th0U8,B0=diseq$Ra6U0,C0=diseq$Pa1U5)
+    } else {
+        D1 <- 0
+        D2 <- 0
+    }
+    f1 <- exp(l5[1]*tt)-1 + D1
+    f2 <- exp(l8[1]*tt)-1 + D2
+    B <-  f1/U - a0*f2
+    dBdl5 <- tt*exp(l5[1]*tt)/U + D1*(tt-1/l5[1])/U
+    dBdl8 <- -a0*tt*exp(l8[1]*tt) + D2*(tt-1/l8[1])/U
     E <- matrix(0,2*ns+2,2*ns+2)
     J <- matrix(0,2*ns,2*ns+2)
     X <- matrix(0,ns,1)
@@ -504,28 +514,85 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     }
     E[2*ns+1,2*ns+1] <- l5[2]^2
     E[2*ns+2,2*ns+2] <- l8[2]^2
-    ER <- J %*% E %*% t(J)
     out <- list()
-    omega <- solve(ER)
-    omega11 <- omega[1:ns,1:ns]
-    omega12 <- omega[1:ns,(ns+1):(2*ns)]
-    omega21 <- omega[(ns+1):(2*ns),1:ns]
-    omega22 <- omega[(ns+1):(2*ns),(ns+1):(2*ns)]
-    out$x <- solve(omega11 + B*(omega12+omega21) + omega22*B^2) %*%
-        (omega11%*%X + B*omega12%*%X + omega21%*%(Y-a0) + B*omega22%*%(Y-a0))
-    out$omegainv <- ER
-    out$omega <- omega
-    out$omega11 <- omega11
-    out$omega12 <- omega12
-    out$omega21 <- omega21
-    out$omega22 <- omega22
+    out$omegainv <- J %*% E %*% t(J)
+    out$omega <- solve(out$omegainv)
+    out$omega11 <- out$omega[1:ns,1:ns]
+    out$omega12 <- out$omega[1:ns,(ns+1):(2*ns)]
+    out$omega21 <- out$omega[(ns+1):(2*ns),1:ns]
+    out$omega22 <- out$omega[(ns+1):(2*ns),(ns+1):(2*ns)]
+    left <- out$omega11 + B*(out$omega12+out$omega21) + out$omega22*B^2
+    right <- out$omega11%*%X + B*out$omega12%*%X +
+        out$omega21%*%(Y-a0) + B*out$omega22%*%(Y-a0)
+    out$x <- solve(left) %*% right
     out$X <- X
     out$Y <- Y
     out$rx <- X - out$x
     out$ry <- Y - a0 - B*out$x
     out
 }
-data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
+data2ludwig_3D.new <- function(x,tt,a0,b0,w=0,exterr=FALSE,
+                           diseq=list(corr=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0)){
+    l5 <- settings('lambda','U235')
+    l8 <- settings('lambda','U238')
+    U <- settings('iratio','U238U235')[1]
+    ns <- length(x)
+    E <- matrix(0,3*ns+2,3*ns+2)
+    J <- matrix(0,3*ns,3*ns+2)
+    R <- rep(0,ns)
+    r <- rep(0,ns)
+    Z <- rep(0,ns)
+    if (diseq$corr){
+        D1 <- d1(tt=tt,D0=diseq$U48)
+        D2 <- d2(tt=tt,A0=diseq$Th0U8,B0=diseq$Ra6U0,C0=diseq$Pa1U5)
+    } else {
+        D1 <- 0
+        D2 <- 0
+    }
+    for (i in 1:ns){
+        d <- wetherill(x,i=i,exterr=FALSE)
+        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - D1
+        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - D2
+        Z[i] <- d$x['Pb204U238']
+        Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
+        E[(3*i-2):(3*i),(3*i-2):(3*i)] <- d$cov + Ew
+        J[i,3*i-2] <- 1                                           # dRdX
+        J[i,3*i] <- -U*b0                                         # dRdZ
+        J[ns+i,3*i-1] <- 1                                        # drdY
+        J[ns+i,3*i] <- -a0                                        # drdZ
+        J[2*ns+i,3*i] <- 1                                        # dphidZ
+        if (exterr){
+            J[i,3*ns+1] <- -tt*exp(l5[1]*tt) - D1*(tt+1/l5[1])    # dRdl5
+            J[ns+i,3*ns+2] <- -tt*exp(l8[1]*tt) - D2*(tt+1/l8[1]) # drdl8
+        }
+    }
+    E[3*ns+1,3*ns+1] <- l5[2]^2
+    E[3*ns+2,3*ns+2] <- l8[2]^2
+    omega <- solve(J %*% E %*% t(J))
+    # rearrange sum of squares:
+    V <- matrix(0,ns,ns)
+    W <- rep(0,ns)
+    for (i in 1:ns){
+        i1 <- i
+        i2 <- i + ns
+        i3 <- i + 2*ns
+        for (j in 1:ns){
+            j1 <- j
+            j2 <- j + ns
+            j3 <- j + 2*ns
+            W[i] <- W[i]-R[j]*(U*b0*omega[i1,j1]+a0*omega[i2,j1]+omega[i3,j1])-
+                    r[j]*(U*b0*omega[i1,j2]+a0*omega[i2,j2]+omega[i3,j2])
+            # Ludwig (1998): V[i,j]<-U*b0*omega[i1,j3]+a0*omega[i2,j3]+omega[i3,j3]
+            V[i,j] <- omega[i1,j1]*(U*b0)^2+omega[i2,j2]*a0^2+omega[i3,j3] +
+                      2*(U*a0*b0*omega[i1,j2]+U*b0*omega[i1,j3]+a0*omega[i2,j3])
+        }
+    }
+    phi <- solve(V,W)
+    z <- Z - phi
+    out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)    
+}
+data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,
+                           diseq=list(corr=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0)){
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
@@ -580,16 +647,28 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)
 }
 get.Ew <- function(w,Z,a0,b0,U){
-    J <- matrix(0,2,4)
-    J[1,1] <- Z*U
-    J[1,3] <- a0*U
-    J[1,4] <- a0*Z
-    J[2,2] <- Z
-    J[2,3] <- b0
-    E <- matrix(0,4,4)
-    E[1,1] <- (a0*w)^2
-    E[2,2] <- (b0*w)^2
+    E <- diag(c(a0,b0)*w)^2
+    J <- matrix(0,3,2)
+    J[1,2] <- -U*Z # dRda0
+    J[2,1] <- -Z   # dRdb0
     J %*% E %*% t(J)
+}
+
+d1 <- function(tt,D0){
+    l1 <- settings('lambda','Pa231')[1]
+    l5 <- settings('lambda','U235')[1]
+    D0*(l5/l1)*exp(l5*tt)*(1-exp(-l1*tt))
+}
+d2 <- function(tt,A0,B0,C0){
+    l6 <- settings('lambda','Ra226')[1]
+    l0 <- settings('lambda','Th230')[1]
+    l4 <- settings('lambda','U234')[1]
+    l8 <- settings('lambda','U238')[1]
+    K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
+    K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
+    K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
+    K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
+    exp(l8*tt)*(K1*exp(-l4*tt)+K2*exp(-l0*tt)+K3*exp(-l6*tt)+K4)
 }
 
 fixit <- function(x,anchor=list(FALSE,NA)){
