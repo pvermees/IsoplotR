@@ -49,7 +49,7 @@ concordia.intersection.york <- function(x,exterr=FALSE){
     concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr)
 }
 concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,
-                                      diseq=list(corr=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0)){
+                                      diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     out <- list()
     m <- 1/10000
     M <- 10000
