@@ -531,7 +531,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    d <- wendt(diseq=diseq,tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8,D0=Pa1U5)
+    d <- wendt(diseq=diseq,tt=tt,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     f1 <- exp(l5[1]*tt)-1 + d$d1
     f2 <- exp(l8[1]*tt)-1 + d$d2
     B <-  f1/U - a0*f2
@@ -557,16 +557,22 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     E[2*ns+1,2*ns+1] <- l5[2]^2
     E[2*ns+2,2*ns+2] <- l8[2]^2
     out <- list()
-    out$omegainv <- J %*% E %*% t(J)
-    out$omega <- solve(out$omegainv)
-    out$omega11 <- out$omega[1:ns,1:ns]
-    out$omega12 <- out$omega[1:ns,(ns+1):(2*ns)]
-    out$omega21 <- out$omega[(ns+1):(2*ns),1:ns]
-    out$omega22 <- out$omega[(ns+1):(2*ns),(ns+1):(2*ns)]
+    OI <- J %*% E %*% t(J)
+    O <- blockinverse(AA=OI[1:ns,1:ns],
+                      BB=OI[1:ns,(ns+1):(2*ns)],
+                      CC=OI[(ns+1):(2*ns),1:ns],
+                      DD=OI[(ns+1):(2*ns),(ns+1):(2*ns)],
+                      doall=TRUE)
+    out$omegainv <- OI
+    out$omega <- O
+    out$omega11 <- O[1:ns,1:ns]
+    out$omega12 <- O[1:ns,(ns+1):(2*ns)]
+    out$omega21 <- O[(ns+1):(2*ns),1:ns]
+    out$omega22 <- O[(ns+1):(2*ns),(ns+1):(2*ns)]
     left <- out$omega11 + B*(out$omega12+out$omega21) + out$omega22*B^2
     right <- out$omega11%*%X + B*out$omega12%*%X +
         out$omega21%*%(Y-a0) + B*out$omega22%*%(Y-a0)
-    out$x <- solve(left) %*% right
+    out$x <- solve(left,right)
     out$X <- X
     out$Y <- Y
     out$rx <- X - out$x
@@ -584,7 +590,7 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,diseq=FALSE,
     R <- rep(0,ns)
     r <- rep(0,ns)
     Z <- rep(0,ns)
-    d <- wendt(diseq=diseq,tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8,D0=Pa1U5)
+    d <- wendt(diseq=diseq,tt=tt,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     for (i in 1:ns){
         d <- wetherill(x,i=i,exterr=FALSE)
         Z[i] <- d$x['Pb204U238']
