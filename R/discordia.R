@@ -1,9 +1,10 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,
-                                          exterr=FALSE,alpha=0.05,
-                                          model=1,anchor=list(FALSE,NA)){
-    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
+                                          alpha=0.05,model=1,anchor=list(FALSE,NA),
+                                          diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor,diseq=diseq,
+                  U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     out <- list()
     out$model <- model
     out$mswd <- fit$mswd
@@ -43,10 +44,12 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,
     colnames(out$err) <- labels
     out
 }
-concordia.intersection.york <- function(x,exterr=FALSE){
+concordia.intersection.york <- function(x,exterr=FALSE,diseq=FALSE,
+                                        U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     d <- data2york(x,wetherill=FALSE)
     fit <- york(d)
-    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr)
+    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr,diseq=diseq,
+                              U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
 }
 concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,
                                       diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
@@ -58,32 +61,36 @@ concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,
     else names(out$x) <- c('t[l]','76i')
     if (b<0) { # negative slope => two intersections with concordia line
         search.range <- c(m,M)
-        midpoint <- stats::optimize(intersection.misfit.york,
-                                    search.range,a=a,b=b)$minimum
+        midpoint <- stats::optimize(intersection.misfit.york,search.range,
+                                    a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                    Ra6U8=Ra6U8,Pa1U5=Pa1U5)$minimum
         search.range <- c(m,midpoint)
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                        search.range,a=a,b=b)$root
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
+                                        a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
         if (wetherill){
             search.range <- c(midpoint,M)
-            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,
-                                            search.range,a=a,b=b)$root
+            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,search.range,
+                                            a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                            Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
         }   
     } else {
         search.range <- c(m,M)
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                        search.range,a=a,b=b)$root
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
+                                        a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
     }
     out
 }
 
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
-twfit2wfit <- function(fit,x){
+twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     tt <- fit$par[1]
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
-    R <- iratio('U238U235')[1]
+    U <- iratio('U238U235')[1]
     E <- matrix(0,3,3)
     J <- matrix(0,2,3)
     if (x$format<4){
@@ -95,7 +102,7 @@ twfit2wfit <- function(fit,x){
         b0 <- fit$par['74i']
         E <- fit$cov
     }
-    disc.slope <- a0/(b0*R)
+    disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
     if (conc.slope > disc.slope){
         search.range <- c(tt+buffer,10000)
@@ -110,18 +117,15 @@ twfit2wfit <- function(fit,x){
                              t2=tt,a0=a0,b0=b0)$root
         tu <- tt
     }
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    R <- iratio('U238U235')[1]
     XX <- exp(l5*tu) - exp(l5*tl)
     YY <- exp(l8*tu) - exp(l8*tl)
-    BB <- a0/(b0*R)
+    BB <- a0/(b0*U)
     D <- (YY-BB*XX)^2
     dXX.dtl <- -l5*exp(l5*tl)
     dXX.dtu <-  l5*exp(l5*tu)
     dYY.dtl <- -l8*exp(l8*tl)
     dYY.dtu <-  l8*exp(l8*tu)
-    dBB.da0 <-  1/(b0*R)
+    dBB.da0 <-  1/(b0*U)
     dBB.db0 <- -BB/b0
     dD.dtl <- 2*(YY-BB*XX)*(dYY.dtl-BB*dXX.dtl)
     dD.dtu <- 2*(YY-BB*XX)*(dYY.dtu-BB*dXX.dtu)
@@ -185,22 +189,24 @@ project.concordia <- function(m76,m86,i76){
 
 # returns misfit of a proposed age and the intersection
 # between the discordia and concordia lines
-intersection.misfit.ludwig <- function(t1,t2,a0,b0){
+intersection.misfit.ludwig <- function(t1,t2,a0,b0,diseq=FALSE,U48=1,
+                                       Th0U8=0,Ra6U8=0,Pa1U5=0){
     tl <- min(t1,t2)
     tu <- max(t1,t2)
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
-    R <- iratio('U238U235')[1]
+    U <- iratio('U238U235')[1]
     XX <- exp(l5*tu) - exp(l5*tl)
     YY <- exp(l8*tu) - exp(l8*tl)
-    BB <- a0/(b0*R)
+    BB <- a0/(b0*U)
     YY - BB*XX
 }
-intersection.misfit.york <- function(age,a,b){
+intersection.misfit.york <- function(age,a,b,diseq=FALSE,U48=1,
+                                     Th0U8=0,Ra6U8=0,Pa1U5=0){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
-    R <- iratio('U238U235')[1]
-    (exp(l5*age)-1)/(exp(l8*age)-1) - a*R - b*R/(exp(l8*age)-1)
+    U <- iratio('U238U235')[1]
+    (exp(l5*age)-1)/(exp(l8*age)-1) - a*U - b*U/(exp(l8*age)-1)
 }
 
 discordia.line <- function(fit,wetherill){

@@ -532,13 +532,8 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    if (diseq){
-        D1 <- d1(tt=tt,D0=Pa1U8)
-        D2 <- d2(tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8)
-    } else {
-        D1 <- 0
-        D2 <- 0
-    }
+    D1 <- d1(tt=tt,D0=Pa1U5)
+    D2 <- d2(tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8)
     f1 <- exp(l5[1]*tt)-1 + D1
     f2 <- exp(l8[1]*tt)-1 + D2
     B <-  f1/U - a0*f2
@@ -591,22 +586,12 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,diseq=FALSE,
     R <- rep(0,ns)
     r <- rep(0,ns)
     Z <- rep(0,ns)
-    if (diseq){
-        D1 <- d1(tt=tt,D0=Pa1U8)
-        D2 <- d2(tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8)
-        dD1dl5 <- dd1dl5(tt=tt,D0=Pa1U5)
-        dD2dl8 <- dd1dl5(tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8)
-    } else {
-        D1 <- 0
-        D2 <- 0
-        dD1dl5 <- 0
-        dD2dl8 <- 0
-    }
+    d <- wendt(diseq=diseq,tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8,D0=Pa1U5)
     for (i in 1:ns){
         d <- wetherill(x,i=i,exterr=FALSE)
         Z[i] <- d$x['Pb204U238']
-        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - D1
-        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - D2
+        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - d$d1
+        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - d$d2
         Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
         E[(3*i-2):(3*i),(3*i-2):(3*i)] <- d$cov + Ew
         J[i,3*i-2] <- 1                                  # dRdX
@@ -615,8 +600,8 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,diseq=FALSE,
         J[ns+i,3*i] <- -a0                               # drdZ
         J[2*ns+i,3*i] <- 1                               # dphidZ
         if (exterr){
-            J[i,3*ns+1] <- -tt*exp(l5[1]*tt) - dD1dl5    # dRdl5
-            J[ns+i,3*ns+2] <- -tt*exp(l8[1]*tt) - dD2dl8 # drdl8
+            J[i,3*ns+1] <- -tt*exp(l5[1]*tt) - d$dd1dl5    # dRdl5
+            J[ns+i,3*ns+2] <- -tt*exp(l8[1]*tt) - d$dd2dl8 # drdl8
         }
     }
     E[3*ns+1,3*ns+1] <- l5[2]^2
@@ -644,8 +629,7 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,diseq=FALSE,
     z <- Z - phi
     out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)    
 }
-data2ludwig_3D.old <- function(x,tt,a0,b0,w=0,exterr=FALSE,
-                           diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+data2ludwig_3D.old <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]

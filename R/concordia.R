@@ -225,14 +225,17 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=NULL,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
-                      omit.col=NA,...){
+                      omit.col=NA,diseq=FALSE,U48=1,Th0U8=0,
+                      Ra6U8=0,Pa1U5=0,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     if (common.Pb<1) X <- x
     else X <- common.Pb.correction(x,option=common.Pb)
     X2plot <- subset(X,subset=plotit)
-    lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
+    lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,
+                                   diseq=FALSE,U48=U48,Th0U8=Th0U8,
+                                   Ra6U8=Ra6U8,Pa1U5=Pa1U5,...)
     fit <- NULL
     if (show.age>1){
         x2calc <- subset(x,subset=calcit)
@@ -304,8 +307,11 @@ plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
     graphics::box()
 }
 # helper function for plot.concordia
-prepare.concordia.line <- function(x,tlim,wetherill=TRUE,...){
-    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
+prepare.concordia.line <- function(x,tlim,wetherill=TRUE,diseq=FALSE,
+                                   U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0,...){
+    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,
+                                 diseq=FALSE,U48=U48,Th0U8=Th0U8,
+                                 Ra6U8=Ra6U8,Pa1U5=Pa1U5,...)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
@@ -337,7 +343,9 @@ age_to_concordia_ratios <- function(tt,wetherill=TRUE,exterr=FALSE){
     if (wetherill) return(age_to_wetherill_ratios(tt,exterr=exterr))
     else return(age_to_terawasserburg_ratios(tt,exterr=exterr))
 }
-get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
+get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,
+                                 diseq=FALSE,U48=1,Th0U8=0,
+                                 Ra6U8=0,Pa1U5=0,...){
     out <- list()
     args <- list(...)
     xset <- ('xlim' %in% names(args))
