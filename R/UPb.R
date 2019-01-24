@@ -422,8 +422,9 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,diseq=FALSE,Pa1U5=0,...
     t.75 <- log(1+x)/l5
     J <- matrix(0,1,2)
     if (diseq){
+        t.75 <- stats::optimize(diseq.75.misfit,interval=c(0,t.75),
+                                x=x,Pa1U5=Pa1U5)$minimum
         d <- wendt(diseq=diseq,tt=t.75,Pa1U5=Pa1U5)
-        t.75 <- optim(t.75,diseq.75.misfit,x=x,Pa1U5=Pa1U5)$par
         xe1d <- x-exp(l5*t.75)+1-d$d1 # misfit = f = xe1d^2
         dfdx <- 2*xe1d
         dfdt <- 2*xe1d*(-l5*exp(l5*t.75)-d$dd1dt)
@@ -465,14 +466,15 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,diseq=FALSE,
     t.68 <- log(1+x)/l8
     J <- matrix(0,1,2)
     if (diseq){
-        t.68 <- optim(t.68,diseq.68.misfit,x=x,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)$par
+        t.68 <- stats::optimize(diseq.68.misfit,interval=c(0,t.68),x=x,
+                                U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)$minimum
         d <- wendt(diseq=diseq,tt=t.68,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
-        xe1d <- x-exp(l8*t.68)+1-d$d2 # misfit = f = xe1d^2
+        xe2d <- x-exp(l8*t.68)+1-d$d2 # misfit = f = xe2d^2
         dfdx <- 2*xe2d
         dfdt <- 2*xe2d*(-l8*exp(l8*t.68)-d$dd2dt)
         J[1,1] <- -dfdx/dfdt        # dt/dx
         if (exterr){
-            dfdl8 <- 2*xe1d*(-t.68*exp(l8*t.68)-d$dd2dl8)
+            dfdl8 <- 2*xe2d*(-t.68*exp(l8*t.68)-d$dd2dl8)
             J[1,2] <- -dfdx/dfdl8   # dt/dl8
         }
     } else {
@@ -530,7 +532,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,diseq=FALSE,
     if (is.na(x)){
         t.76 <- NA
     } else {
-        search.range <- c(0,1/lambda('U238')[1])
+        search.range <- c(0,2/lambda('U238')[1])
         t.76 <- stats::optimize(Pb207Pb206.misfit,interval=search.range,
                                 x=x,diseq=diseq,U48=U48,Th0U8=Th0U8,
                                 Ra6U8=Ra6U8,Pa1U5=Pa1U5)$minimum
@@ -682,7 +684,7 @@ wendt <- function(diseq,tt,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
 }
 d1 <- function(tt,Pa1U5=0){
     l1 <- settings('lambda','Pa231')[1]*1000
-    l5 <- settings('lambda','U235')[1]*1000
+    l5 <- settings('lambda','U235')[1]
     D0 <- Pa1U5 - 1
     D0*(l5/l1)*exp(l5*tt)*(1-exp(-l1*tt))
 }
