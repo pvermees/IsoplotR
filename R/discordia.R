@@ -48,11 +48,11 @@ concordia.intersection.york <- function(x,exterr=FALSE,diseq=FALSE,
                                         U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     d <- data2york(x,wetherill=FALSE)
     fit <- york(d)
-    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr,diseq=diseq,
-                              U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr)
 }
 concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,
-                                      diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+                                      diseq=FALSE,U48=1,Th0U8=0,
+                                      Ra6U8=0,Pa1U5=0){
     out <- list()
     m <- 1/10000
     M <- 10000
@@ -61,31 +61,27 @@ concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,
     else names(out$x) <- c('t[l]','76i')
     if (b<0) { # negative slope => two intersections with concordia line
         search.range <- c(m,M)
-        midpoint <- stats::optimize(intersection.misfit.york,search.range,
-                                    a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                    Ra6U8=Ra6U8,Pa1U5=Pa1U5)$minimum
+        midpoint <- stats::optimize(intersection.misfit.york,
+                                    search.range,a=a,b=b)$minimum
         search.range <- c(m,midpoint)
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
-                                        a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                        search.range,a=a,b=b)$root
         if (wetherill){
             search.range <- c(midpoint,M)
-            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,search.range,
-                                            a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                            Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,
+                                            search.range,a=a,b=b)$root
         }   
     } else {
         search.range <- c(m,M)
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
-                                        a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                        search.range,a=a,b=b)$root
     }
     out
 }
 
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
-twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+twfit2wfit <- function(fit,x){
     tt <- fit$par[1]
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
@@ -108,13 +104,11 @@ twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
         search.range <- c(tt+buffer,10000)
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,
-                             interval=search.range,
-                             t2=tt,a0=a0,b0=b0)$root
+                             interval=search.range,t2=tt,a0=a0,b0=b0)$root
     } else {
         search.range <- c(-1000,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,
-                             interval=search.range,
-                             t2=tt,a0=a0,b0=b0)$root
+                             interval=search.range,t2=tt,a0=a0,b0=b0)$root
         tu <- tt
     }
     XX <- exp(l5*tu) - exp(l5*tl)
@@ -189,8 +183,7 @@ project.concordia <- function(m76,m86,i76){
 
 # returns misfit of a proposed age and the intersection
 # between the discordia and concordia lines
-intersection.misfit.ludwig <- function(t1,t2,a0,b0,diseq=FALSE,U48=1,
-                                       Th0U8=0,Ra6U8=0,Pa1U5=0){
+intersection.misfit.ludwig <- function(t1,t2,a0,b0){
     tl <- min(t1,t2)
     tu <- max(t1,t2)
     l5 <- lambda('U235')[1]
@@ -201,8 +194,7 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0,diseq=FALSE,U48=1,
     BB <- a0/(b0*U)
     YY - BB*XX
 }
-intersection.misfit.york <- function(age,a,b,diseq=FALSE,U48=1,
-                                     Th0U8=0,Ra6U8=0,Pa1U5=0){
+intersection.misfit.york <- function(age,a,b){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]

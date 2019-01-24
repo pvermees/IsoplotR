@@ -119,9 +119,8 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
                      diseq=diseq,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,
                      Pa1U5=Pa1U5)
     out <- fit[c('par','w','model')]
-    out$cov <- fisher.lud(x,fit=fit,anchor=anchor,
-                          diseq=diseq,U48=U48,Th0U8=Th0U8,
-                          Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    out$cov <- fisher.lud(x,fit=fit,anchor=anchor,diseq=diseq,
+                          U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     mswd <- mswd.lud(fit$par,x=x,anchor=anchor,diseq=diseq,
                      U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     out <- c(out,mswd)
@@ -143,9 +142,8 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA),
                      diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     ns <- length(x)
     # Mistake in Ludwig (1998)? Multiply the following by 2?
-    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE,
-                     diseq=FALSE,U48=U48,Th0U8=Th0U8,
-                     Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE,diseq=FALSE,
+                     U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     out <- list()
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
@@ -186,7 +184,7 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),
 get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),
                              diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,
-                                fixed=fixit(x,anchor),diseq=diseq,U48=U48,
+                                anchor=anchor,diseq=diseq,U48=U48,
                                 Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     out$w <- 0
     out
@@ -252,22 +250,23 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),diseq=FALSE,
 get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),
                              diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     fit <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,
-                                fixed=fixit(x,anchor),diseq=diseq,U48=U48,
+                                anchor=anchor,diseq=diseq,U48=U48,
                                 Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     ta0b0 <- fit$par
     w <- get_ludwig_disp(ta0b0,x,interval=get_lud_wrange(ta0b0,x),
                          diseq=diseq,U48=U48,Th0U8=Th0U8,
                          Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     out <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,
-                                fixed=fixit(x,anchor),diseq=diseq,U48=U48,
+                                anchor=anchor,diseq=diseq,U48=U48,
                                 Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     out$w <- w
     out
 }
-fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,
+fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),
                                  diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0,...){
-    optifix(parms=init,fn=LL.lud.UPb,method="BFGS",x=x,w=w,exterr=exterr,
-            diseq=diseq,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,...)
+    optifix(parms=init,fn=LL.lud.UPb,method="BFGS",x=x,w=w,
+            exterr=exterr,fixed=fixit(x,anchor),diseq=diseq,
+            U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
 }
 get_ludwig_disp <- function(ta0b0,x,interval,
                             diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
@@ -532,13 +531,12 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    D1 <- d1(tt=tt,D0=Pa1U5)
-    D2 <- d2(tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8)
-    f1 <- exp(l5[1]*tt)-1 + D1
-    f2 <- exp(l8[1]*tt)-1 + D2
+    d <- wendt(diseq=diseq,tt=tt,A0=U48,B0=Th0U8,C0=Ra6U8,D0=Pa1U5)
+    f1 <- exp(l5[1]*tt)-1 + d$d1
+    f2 <- exp(l8[1]*tt)-1 + d$d2
     B <-  f1/U - a0*f2
-    dBdl5 <- tt*exp(l5[1]*tt)/U + D1*(tt-1/l5[1])/U
-    dBdl8 <- -a0*tt*exp(l8[1]*tt) + D2*(tt-1/l8[1])/U
+    dBdl5 <- tt*exp(l5[1]*tt)/U + d$d1*(tt-1/l5[1])/U
+    dBdl8 <- -a0*tt*exp(l8[1]*tt) + d$d2*(tt-1/l8[1])/U
     E <- matrix(0,2*ns+2,2*ns+2)
     J <- matrix(0,2*ns,2*ns+2)
     X <- matrix(0,ns,1)
