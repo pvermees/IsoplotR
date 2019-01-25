@@ -153,9 +153,11 @@ twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
 }
 
 # used by common Pb correction:
-project.concordia <- function(m76,m86,i76){
-    t68 <- get.Pb206U238.age(1/m86)[1]
-    t76 <- get.Pb207Pb206.age(m76)[1]
+project.concordia <- function(m76,m86,i76,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+    t68 <- get.Pb206U238.age(1/m86,diseq=diseq,U48=U48,
+                             Th0U8=Th0U8,Ra6U8=Ra6U8)[1]
+    t76 <- get.Pb207Pb206.age(m76,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                              Ra6U8=Ra6U8,Pa1U5=Pa1U5)[1]
     a <- i76
     b <- (m76-i76)/m86
     neg <- (i76>m76) # negative slope?
@@ -173,7 +175,8 @@ project.concordia <- function(m76,m86,i76){
         go.ahead <- TRUE
     } else if (neg & below){  # it is not clear what to do with samples
         for (tt in seq(from=10,to=5000,by=10)){
-            misfit <- intersection.misfit.york(tt,a=a,b=b)
+            misfit <- intersection.misfit.york(tt,a=a,b=b,diseq=diseq,U48=U48,
+                                               Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
             if (misfit<0){    # that plot in the 'forbidden zone' above
                 tend <- tt    # Wetherill concordia or below T-W concordia
                 go.ahead <- TRUE # IsoplotR will still project them on
@@ -183,8 +186,8 @@ project.concordia <- function(m76,m86,i76){
     }
     if (go.ahead){
         search.range <- c(1/10000,tend)
-        out <- stats::uniroot(intersection.misfit.york,search.range,
-                              a=a,b=b)$root
+        out <- stats::uniroot(intersection.misfit.york,search.range,a=a,b=b,diseq=diseq,
+                              U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
     } else {
         out <- m76
     }
@@ -218,7 +221,7 @@ intersection.misfit.york <- function(tt,a,b,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa
     (exp(l5*tt)-1+D1)/(exp(l8*tt)-1+D2) - a*U - b*U/(exp(l8*tt)-1+D2)
 }
 
-discordia.line <- function(fit,wetherill){
+discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     X <- c(0,0)
     Y <- c(0,0)
     l5 <- lambda('U235')[1]
@@ -228,21 +231,23 @@ discordia.line <- function(fit,wetherill){
     if (wetherill){
         tl <- fit$x[1]
         tu <- fit$x[2]
-        X <- age_to_Pb207U235_ratio(fit$x)[,'75']
-        Y <- age_to_Pb206U238_ratio(fit$x)[,'68']
+        X <- age_to_Pb207U235_ratio(fit$x,diseq=diseq,Pa1U5=Pa1U5)[,'75']
+        Y <- age_to_Pb206U238_ratio(fit$x,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)[,'68']
         x <- seq(from=max(0,usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
-        aa <- exp(l8*tu)-exp(l8*tl)
-        bb <- (x-exp(l5*tl)+1)
-        cc <- exp(l5*tu)-exp(l5*tl)
-        dd <- exp(l8*tl)-1
+        du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+        dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+        aa <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
+        bb <- x - exp(l5*tl) + 1 - dl$d1
+        cc <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
+        dd <- exp(l8*tl) - 1 + dl$d2
         y <- aa*bb/cc + dd
-        dadtl <- -l8*exp(l8*tl)
-        dbdtl <- -l5*exp(l5*tl)
-        dcdtl <- -l5*exp(l5*tl)
-        dddtl <-  l8*exp(l8*tl)
-        dadtu <- l8*exp(l8*tu)
+        dadtl <- - l8*exp(l8*tl) - dl$dd2dt
+        dbdtl <- - l5*exp(l5*tl) - dl$dd1dt
+        dcdtl <- - l5*exp(l5*tl) - dl$dd1dt
+        dddtl <- l8*exp(l8*tl) + dl$dd2dt
+        dadtu <- l8*exp(l8*tu) + du$dd2dt
         dbdtu <- 0
-        dcdtu <- l5*exp(l5*tu)
+        dcdtu <- l5*exp(l5*tu) + du$dd1dt
         dddtu <- 0
         J1 <- dadtl*bb/cc + dbdtl*aa/cc - dcdtl*aa*bb/cc^2 + dddtl # dydtl
         J2 <- dadtu*bb/cc + dbdtu*aa/cc - dcdtu*aa*bb/cc^2 + dddtu # dydtu
@@ -252,30 +257,45 @@ discordia.line <- function(fit,wetherill){
         sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
-        t75 <- log(1+x)/l5
-        yconc <- exp(l8*t75)-1
+        t75 <- get.Pb207U235.age(x,diseq=diseq,Pa1U5=Pa1U5)
+        yconc <- age_to_Pb206U238_ratio(t75,diseq=diseq,U48=U48,
+                                        Th0U8=Th0U8,Pa1U5=Pa1U5)['68']
         overshot <- ul>yconc
         ul[overshot] <- yconc[overshot]
         cix <- c(x,rev(x))
         ciy <- c(ll,rev(ul))
     } else {
-        X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'])[,'86']
-        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'])[,'76']
+        X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'],diseq=diseq,
+                                       U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)[,'86']
+        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'],diseq=diseq,U48=U48,
+                                        Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)[,'76']
+        r75 <- age_to_Pb207U235_ratio(fit$x['t[l]'],diseq=diseq,Pa1U5=Pa1U5)[,'75']
+        r68 <- 1/X[1]
         Y[2] <- fit$x['76']
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
         tl <- check.zero.UPb(fit$x['t[l]'])
-        U85 <- settings('iratio','U238U235')[1]
-        x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=100)
-        y <- yl + (y0-yl)*(1-x/xl)
-        J1 <- (1/U85)*l5*exp(l5*tl)*x - l8*exp(l8*tl)*x*y0 # dy/dtl
-        J2 <- 1 + x - exp(l8*tl)*x                         # dy/dy0
+        U <- settings('iratio','U238U235')[1]
+        nsteps <- 100
+        x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
+        y <- yl + (y0-yl)*(1-x*r68) # = y0 + yl*x*r68 - y0*x*r68
+        d <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+        d75dtl <- l5*exp(l5*tl) + d$dd1dt
+        d68dtl <- l8*exp(l8*tl) + d$dd2dt
+        dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
+        J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
+        J2 <- 1 - x*r68                                # dy/dy0
         sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
-        t68 <- log(1+1/x)/l8
-        yconc <- (1/U85)*(exp(l5*t68)-1)/(exp(l8*t68)-1)
+        yconc <- rep(0,nsteps)
+        for (i in 1:nsteps){
+            t68 <- get.Pb206U238.age(1/x[i],diseq=diseq,U48=U48,
+                                     Th0U8=Th0U8,Ra6U8=Ra6U8)[1]
+            yconc[i] <- age_to_Pb207Pb206_ratio(t68,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                                Ra6U8=Ra6U8,Pa1U5=Pa1U5)[1]
+        }
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope
             overshot <- (ll<yconc & ll<y0/2)

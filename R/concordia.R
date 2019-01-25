@@ -234,7 +234,7 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     else X <- common.Pb.correction(x,option=common.Pb)
     X2plot <- subset(X,subset=plotit)
     lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,
-                                   diseq=FALSE,U48=U48,Th0U8=Th0U8,
+                                   diseq=diseq,U48=U48,Th0U8=Th0U8,
                                    Ra6U8=Ra6U8,Pa1U5=Pa1U5,...)
     fit <- NULL
     if (show.age>1){
@@ -310,7 +310,7 @@ plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
 prepare.concordia.line <- function(x,tlim,wetherill=TRUE,diseq=FALSE,
                                    U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0,...){
     lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,
-                                 diseq=FALSE,U48=U48,Th0U8=Th0U8,
+                                 diseq=diseq,U48=U48,Th0U8=Th0U8,
                                  Ra6U8=Ra6U8,Pa1U5=Pa1U5,...)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
