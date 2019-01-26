@@ -463,11 +463,15 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,diseq=FALSE,
                                       U48=1,Th0U8=0,Ra6U8=0,...){
     l8 <- lambda('U238')[1]
     sl8 <- lambda('U238')[2]
-    t.68 <- log(1+x)/l8
+    t.init <- log(1+x)/l8
     J <- matrix(0,1,2)
     if (diseq){
-        t.68 <- stats::optimize(diseq.68.misfit,interval=c(0,t.68),x=x,
-                                U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)$minimum
+        t.68 <- tryCatch({
+            stats::optimize(diseq.68.misfit,interval=c(0,t.init),x=x,
+                            U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)$minimum
+        }, error = function(error_condition) {
+            t.init
+        })
         d <- wendt(diseq=diseq,tt=t.68,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
         xe2d <- x-exp(l8*t.68)+1-d$d2 # misfit = f = xe2d^2
         dfdx <- 2*xe2d
@@ -478,6 +482,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,diseq=FALSE,
             J[1,2] <- -dfdx/dfdl8   # dt/dl8
         }
     } else {
+        t.68 <- t.init
         J[1,1] <- 1/(l8*(1+x))                # dt/dx
         if (exterr) J[1,2] <- log(1+x)/l8^2   # dt/dl8
     }
