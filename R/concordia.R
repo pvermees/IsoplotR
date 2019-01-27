@@ -278,7 +278,7 @@ plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
     m <- max(0.8*lims$t[1],lims$t[1]-range.t/20)
     M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
     nn <- 30 # number of segments into which the concordia line is divided
-    tt <- prettier(c(m,M),wetherill=wetherill,n=nn)
+    tt <- cseq(m,M,wetherill=wetherill,n=nn)
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
     for (i in 1:nn){ # build the concordia line
@@ -330,24 +330,37 @@ prepare.concordia.line <- function(x,tlim,wetherill=TRUE,diseq=FALSE,
     graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
     lims
 }
+cseq <- function(m,M,wetherill=TRUE,n=50){
+    if (wetherill){
+        return(seq(m,M,length.out=n))
+    }
+    if (m>0){
+        out <- exp(seq(0,log(M/m),length.out=n))*m
+    } else {
+        out <- exp(seq(0,log(M+1-m),length.out=n))+1-m
+    }
+    out[out<=0] <- min(out[out>0])/10
+    out
+}
 prettier <- function(x,wetherill=TRUE,n=5){
+    pilot <- pretty(x,n=n)
+    if (wetherill){
+        return(pilot)
+    }
     m <- min(x)
     M <- max(x)
-    if (m>0){
-        lseq <- exp(seq(0,log(M/m),length.out=n))*m
-    } else {
-        lseq <- exp(seq(0,log(M+1-m),length.out=n))+1-m
+    if (M/m < 50){ # linear spacing if spanning less than 1 order of magnitude
+        out <- pilot
+    } else { # log spaced if spanning more than 1 order of magnitude
+        out <- cseq(m,M,wetherill=wetherill,n=n)
+        init <- out
+        out[1] <- pilot[1]
+        out[n] <- tail(pilot,1)
+        for (i in 2:(n-1)){ # prettify
+            out[i] <- pretty(init[(i-1):i],n=2)[2]
+        }
     }
-    init <- pretty(x)
-    out <- lseq
-    out[1] <- init[1]
-    out[n] <- tail(init,1)
-    for (i in 2:(n-1)){
-        out[i] <- pretty(lseq[(i-1):i],n=2)[2]
-    }
-    if (!wetherill){
-        out[out<=0] <- min(out[out>0])/10
-    }
+    out[out<=0] <- min(out[out>0])/2
     out
 }
 age_to_concordia_ratios <- function(tt,wetherill=TRUE,exterr=FALSE,diseq=FALSE,
@@ -474,8 +487,9 @@ concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
 concordia.age.default <- function(x,...){
     stop("no default method implemented for concordia.age()")
 }
-concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
-                              exterr=TRUE,alpha=0.05,...){
+concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,
+                              alpha=0.05,diseq=FALSE,U48=1,Th0U8=0,
+                              Ra6U8=0,Pa1U5=0,...){
     if (is.na(i)){
         ccw <- concordia.comp(x,wetherill=TRUE)
         cct <- concordia.comp(x,wetherill=FALSE)
@@ -483,7 +497,8 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
         ccw <- wetherill(x,i)
         cct <- tera.wasserburg(x,i)
     }
-    t.init <- initial.concordia.age(cct)
+    t.init <- initial.concordia.age(cct,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                    Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     tt <- concordia.age(ccw,t.init=t.init,exterr=exterr)
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
@@ -504,7 +519,8 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,
     }
     out
 }
-concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
+concordia.age.wetherill <- function(x,t.init,exterr=TRUE,diseq=FALSE,
+                                    U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0,...){
     out <- tryCatch({
         fit <- stats::optim(par=t.init,fn=LL.concordia.age,
                             ccw=x,exterr=exterr,
@@ -534,16 +550,20 @@ concordia.comp <- function(x,wetherill=TRUE){
 }
 
 # x is an object of class "terawasserburg"
-initial.concordia.age <- function(x){
+initial.concordia.age <- function(x,diseq=FALSE,U48=1,Th0U8=0,
+                                  Ra6U8=0,Pa1U5=0){
     e <- eigen(x$cov)
     v <- e$vectors[,1]
-    if (v[1]==0) return(get.Pb207Pb206.age(x$x['Pb207Pb206'],0)[1])
-    if (v[2]==0) return(get.Pb206U238.age(1/x$x['U238Pb206'],0)[1])
+    if (v[1]==0) return(get.Pb207Pb206.age(x$x['Pb207Pb206'],0,diseq=diseq,U48=U48,
+                                           Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)[1])
+    if (v[2]==0) return(get.Pb206U238.age(1/x$x['U238Pb206'],0,diseq=diseq,
+                                          U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)[1])
     b <- v[1]/v[2] # slope of the ellipse
     x0 <- x$x['U238Pb206']
     y0 <- x$x['Pb207Pb206']
     a <- y0 - b*x0
-    fit <- concordia.intersection.ab(a,b,exterr=FALSE)
+    fit <- concordia.intersection.ab(a,b,exterr=FALSE,diseq=diseq,U48=U48,
+                                     Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     fit$x[1]
 }
 
