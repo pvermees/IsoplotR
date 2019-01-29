@@ -232,7 +232,7 @@ plateau <- function(x,alpha=0.05,random.effects=TRUE){
                 break;
             } else if (fract > out$fract){
                 out <- weightedmean(YsY[i:j,],random.effects=random.effects,
-                                    plot=FALSE,detect.outliers=FALSE)
+                                    plot=FALSE,detect.outliers=FALSE,alpha=alpha)
                 out$i <- i:j
                 out$fract <- fract
             }
