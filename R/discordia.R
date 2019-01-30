@@ -125,10 +125,10 @@ twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     YY <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
     BB <- a0/(b0*U)
     D <- (YY-BB*XX)^2 # misfit
-    dXX.dtl <- -l5*exp(l5*tl) - dl$d1dt
-    dXX.dtu <-  l5*exp(l5*tu) + du$d1dt
-    dYY.dtl <- -l8*exp(l8*tl) - dl$d2dt
-    dYY.dtu <-  l8*exp(l8*tu) + du$d2dt
+    dXX.dtl <- -l5*exp(l5*tl) - dl$dd1dt
+    dXX.dtu <-  l5*exp(l5*tu) + du$dd1dt
+    dYY.dtl <- -l8*exp(l8*tl) - dl$dd2dt
+    dYY.dtu <-  l8*exp(l8*tu) + du$dd2dt
     dBB.da0 <-  1/(b0*U)
     dBB.db0 <- -BB/b0
     dD.dtl <- 2*(YY-BB*XX)*(dYY.dtl-BB*dXX.dtl)
@@ -234,8 +234,8 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
         X <- age_to_Pb207U235_ratio(fit$x,diseq=diseq,Pa1U5=Pa1U5)[,'75']
         Y <- age_to_Pb206U238_ratio(fit$x,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)[,'68']
         x <- seq(from=max(0,usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
-        du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
-        dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+        du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+        dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
         aa <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
         bb <- x - exp(l5*tl) + 1 - dl$d1
         cc <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
@@ -257,9 +257,9 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
         sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
-        t75 <- get.Pb207U235.age(x,diseq=diseq,Pa1U5=Pa1U5)
+        t75 <- get.Pb207U235.age(x,diseq=diseq,Pa1U5=Pa1U5)[,'t75']
         yconc <- age_to_Pb206U238_ratio(t75,diseq=diseq,U48=U48,
-                                        Th0U8=Th0U8,Pa1U5=Pa1U5)['68']
+                                        Th0U8=Th0U8,Ra6U8=Ra6U8)[,'68']
         overshot <- ul>yconc
         ul[overshot] <- yconc[overshot]
         cix <- c(x,rev(x))
@@ -290,12 +290,10 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
         yconc <- rep(0,nsteps)
-        for (i in 1:nsteps){
-            t68 <- get.Pb206U238.age(1/x[i],diseq=diseq,U48=U48,
-                                     Th0U8=Th0U8,Ra6U8=Ra6U8)[1]
-            yconc[i] <- age_to_Pb207Pb206_ratio(t68,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                                Ra6U8=Ra6U8,Pa1U5=Pa1U5)[1]
-        }
+        t68 <- get.Pb206U238.age(1/x[i],diseq=diseq,U48=U48,
+                                 Th0U8=Th0U8,Ra6U8=Ra6U8)[,'t68']
+        yconc <- age_to_Pb207Pb206_ratio(t68,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                         Ra6U8=Ra6U8,Pa1U5=Pa1U5)[,'76']
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope
             overshot <- (ll<yconc & ll<y0/2)
