@@ -17,7 +17,23 @@
 #' to other chronometers as well.
 #'
 #' @param x an object of class \code{UPb}
+#' 
 #' @param alpha cutoff value for confidence intervals
+#' 
+#' @param diseq apply an initial U-series disequilibrium correction?
+#'
+#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Th0U8 the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#'
 #' @param ... optional arguments
 #
 # @param x a \eqn{3n}-element vector \eqn{[X Y Z]}, where \eqn{X},

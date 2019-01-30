@@ -173,14 +173,14 @@ project.concordia <- function(m76,m86,i76,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U
         go.ahead <- TRUE
     } else if (neg & above){
         go.ahead <- TRUE
-    } else if (neg & below){  # it is not clear what to do with samples
+    } else if (neg & below){     # it is not clear what to do with samples
         for (tt in seq(from=10,to=5000,by=10)){
             misfit <- intersection.misfit.york(tt,a=a,b=b,diseq=diseq,U48=U48,
                                                Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
-            if (misfit<0){    # that plot in the 'forbidden zone' above
-                tend <- tt    # Wetherill concordia or below T-W concordia
+            if (misfit<0){       # that plot in the 'forbidden zone' above
+                tend <- tt       # Wetherill concordia or below T-W concordia
                 go.ahead <- TRUE # IsoplotR will still project them on
-                break         # the concordia line.
+                break            # the concordia line.
             }
         }
     }
@@ -215,10 +215,9 @@ intersection.misfit.york <- function(tt,a,b,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    D1 <- d1(tt=tt,Pa1U5=Pa1U5)
-    D2 <- d2(tt=tt,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+    d <- wendt(diseq=diseq,tt,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     # misfit is expressed as the distance in 7/6 space
-    (exp(l5*tt)-1+D1)/(exp(l8*tt)-1+D2) - a*U - b*U/(exp(l8*tt)-1+D2)
+    (exp(l5*tt)-1+d$d1)/(exp(l8*tt)-1+d$d2) - a*U - b*U/(exp(l8*tt)-1+d$d2)
 }
 
 discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
@@ -290,7 +289,7 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
         yconc <- rep(0,nsteps)
-        t68 <- get.Pb206U238.age(1/x[i],diseq=diseq,U48=U48,
+        t68 <- get.Pb206U238.age(1/x,diseq=diseq,U48=U48,
                                  Th0U8=Th0U8,Ra6U8=Ra6U8)[,'t68']
         yconc <- age_to_Pb207Pb206_ratio(t68,diseq=diseq,U48=U48,Th0U8=Th0U8,
                                          Ra6U8=Ra6U8,Pa1U5=Pa1U5)[,'76']
@@ -349,7 +348,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
     line1 <- do.call('substitute',list((call1),list1))
     line2 <- do.call('substitute',list((call2),list2))
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+        line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
         mymtext(line1,line=2,...)

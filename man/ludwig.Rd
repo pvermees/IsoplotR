@@ -12,7 +12,8 @@ ludwig(x, ...)
 \method{ludwig}{default}(x, ...)
 
 \method{ludwig}{UPb}(x, exterr = FALSE, alpha = 0.05, model = 1,
-  anchor = list(FALSE, NA), ...)
+  anchor = list(FALSE, NA), diseq = FALSE, U48 = 1, Th0U8 = 0,
+  Ra6U8 = 0, Pa1U5 = 0, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -61,6 +62,20 @@ item If the first element is \code{TRUE} and the second element is a
 number, then the discordia line is forced to intersect the
 concordia line at an age equal to that number.
 }}
+
+\item{diseq}{apply an initial U-series disequilibrium correction?}
+
+\item{U48}{the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Th0U8}{the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Ra6U8}{the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Pa1U5}{the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
 }
 \value{
 \describe{

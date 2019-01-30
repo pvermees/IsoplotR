@@ -661,8 +661,8 @@ get.Pb207Pb206.age.wetherill <- function(x,exterr=TRUE,diseq=FALSE,
     get.Pb207Pb206.age(r76,sr76,exterr=exterr,diseq=diseq,
                        U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
 }
-get.Pb207Pb206.age.terawasserburg <- function(x,exterr=TRUE,diseq=FALSE,
-                                              U48=1,Th0U8=0,Ra6U8=0,...){
+get.Pb207Pb206.age.terawasserburg <- function(x,exterr=TRUE,diseq=FALSE, U48=1,
+                                              Th0U8=0,Ra6U8=0,Pa1U5=0,...){
     r76 <- x$x['Pb207Pb206']
     sr76 <- x$cov['Pb207Pb206','Pb207Pb206']
     get.Pb207Pb206.age(r76,sr76,exterr=exterr,diseq=diseq,

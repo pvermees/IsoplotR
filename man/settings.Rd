@@ -128,6 +128,14 @@ values, and U-Th isotopic measurements by multi-collector
 inductively coupled plasma mass spectrometry. Earth and Planetary
 Science Letters, 371, pp.82-91.
 
+\item \eqn{^{231}}Pa: Audi, G., Bersillon, O., Blachot, J. and
+Wapstra, A.H., 2003. The NUBASE evaluation of nuclear and decay
+properties. Nuclear Physics A, 729(1), pp.3-128.
+
+\item \eqn{^{226}}Ra: Audi, G., Bersillon, O., Blachot, J. and
+Wapstra, A.H., 2003. The NUBASE evaluation of nuclear and decay
+properties. Nuclear Physics A, 729(1), pp.3-128.
+
 \item Sm: Lugmair, G. W., and
 K. Marti. "Lunar initial \eqn{^{143}}Nd/\eqn{^{144}}Nd: differential
 evolution of the lunar crust and mantle."

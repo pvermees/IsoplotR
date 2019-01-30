@@ -144,6 +144,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     Chi-square test than low precision measurements. The latter
 #'     would therefore be 'rewarded' by such a criterion.
 #'
+#' @param jcu Propagate the J-constant uncertainty?
+#'
 #' @return
 #' \enumerate{
 #'
@@ -395,7 +397,7 @@ get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
                      Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     if (hasClass(x,'UPb')){
         out <- filter.UPb.ages(x,type,cutoff.76,
-                               cutoff.disc,exterr=exterr)
+                               cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'PbPb')){
         out <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){

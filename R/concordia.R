@@ -32,22 +32,46 @@
 #' (`common') lead or to constrain the timing of prior lead loss.
 #'
 #' @param x an object of class \code{UPb}
+#' 
 #' @param tlim age limits of the concordia line
+#' 
 #' @param alpha probability cutoff for the error ellipses and
 #'     confidence intervals
+#' 
 #' @param wetherill logical flag (\code{FALSE} for Tera-Wasserburg)
+#' 
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
+#' 
 #' @param levels a vector with \code{length(x)} values to be displayed
 #'     as different background colours within the error ellipses.
+#' 
 #' @param clabel label for the colour legend (only used if
 #'     \code{levels} is not \code{NA}.
+#' 
 #' @param ellipse.col a vector of two background colours for the error
 #'     ellipses. If \code{levels=NA}, then only the first colour is
 #'     used. If \code{levels} is a vector of numbers, then
 #'     \code{ellipse.col} is used to construct a colour ramp.
+#' 
 #' @param concordia.col colour of the concordia line
+#' 
 #' @param exterr show decay constant uncertainty?
+#' 
+#' @param diseq apply an initial U-series disequilibrium correction?
+#'
+#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Th0U8 the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
 #' @param show.age one of either:
 #'
 #' \code{0}: plot the data without calculating an age
@@ -103,6 +127,17 @@
 #' number, then the discordia line is forced to intersect the
 #' concordia line at an age equal to that number.
 #' }
+#'
+#' @param ticks either a scalar indicating the desired number of age
+#'     ticks to be placed along the concordia line, OR a vector of
+#'     tick ages.
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the concordia diagram
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from concordia or discordia age calculation
+#' @param omit.col colour that should be used for the omitted
+#'     aliquots.
+#' @param ... optional arguments to the generic \code{plot} function
 #'
 #' @return
 #'
@@ -192,16 +227,6 @@
 #' \item{n}{ the number of aliquots in the dataset }
 #'
 #' }
-#' @param ticks either a scalar indicating the desired number of age
-#'     ticks to be placed along the concordia line, OR a vector of
-#'     tick ages.
-#' @param hide vector with indices of aliquots that should be removed
-#'     from the concordia diagram
-#' @param omit vector with indices of aliquots that should be plotted
-#'     but omitted from concordia or discordia age calculation
-#' @param omit.col colour that should be used for the omitted
-#'     aliquots.
-#' @param ... optional arguments to the generic \code{plot} function
 #'
 #' @examples
 #' data(examples)
@@ -355,7 +380,7 @@ prettier <- function(x,wetherill=TRUE,n=5){
         out <- cseq(m,M,wetherill=wetherill,n=n)
         init <- out
         out[1] <- pilot[1]
-        out[n] <- tail(pilot,1)
+        out[n] <- utils::tail(pilot,1)
         for (i in 2:(n-1)){ # prettify
             out[i] <- pretty(init[(i-1):i],n=2)[2]
         }

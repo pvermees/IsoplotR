@@ -27,8 +27,8 @@ age(x, ...)
 \method{age}{PbPb}(x, isochron = TRUE, common.Pb = 1, exterr = TRUE,
   i = NA, sigdig = NA, ...)
 
-\method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, jcu = TRUE,
+  exterr = TRUE, i = NA, sigdig = NA, ...)
 
 \method{age}{KCa}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -184,6 +184,8 @@ fit. Setting \code{i2i} to \code{FALSE} uses the default values
 stored in \code{settings('iratio',...)}. When applied to data
 of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
 a detrital Th-correction.}
+
+\item{jcu}{Propagate the J-constant uncertainty?}
 
 \item{central}{logical flag indicating whether each analysis should
 be considered separately (\code{central=FALSE}) or a central
