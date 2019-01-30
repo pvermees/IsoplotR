@@ -222,19 +222,18 @@ plateau <- function(x,alpha=0.05,random.effects=TRUE){
     out$p.value <- 1
     out$fract <- 0
     for (i in 1:(ns-1)){ # at least two steps in a plateau
-        for (j in (i+1):ns){
+        for (j in ns:(i+1)){
             fract <- sum(X[i:j],na.rm=TRUE)
             Y <- YsY[i:j,1]
             sY <- YsY[i:j,2]
             valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1),
                                random.effects=random.effects)
-            if (any(!valid)){
-                break;
-            } else if (fract > out$fract){
+            if (all(valid) & (fract > out$fract)){
                 out <- weightedmean(YsY[i:j,],random.effects=random.effects,
                                     plot=FALSE,detect.outliers=FALSE,alpha=alpha)
                 out$i <- i:j
                 out$fract <- fract
+                break
             }
         }
     }

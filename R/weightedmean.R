@@ -488,9 +488,9 @@ weightedmean_helper <- function(x,random.effects=TRUE,
                                 units='',detritus=0,Th02=c(0,0),
                                 Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                                 hide=NULL,omit=NULL,omit.col=NA,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,i2i=i2i,
-                   detritus=detritus,Th02=Th02,Th02U48=Th02U48)
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,i2i=i2i,
+                   cutoff.disc=cutoff.disc,detritus=detritus,
+                   Th02=Th02,Th02U48=Th02U48)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,hide=hide,
@@ -687,8 +687,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 # valid is a vector of logical flags indicating whether the corresponding
 # measurements have already been rejected or not
 chauvenet <- function(X,sX,valid,random.effects=TRUE){
-    fit <- get.weightedmean(X,sX,random.effects=random.effects,
-                            valid=valid)
+    fit <- get.weightedmean(X,sX,random.effects=random.effects,valid=valid)
     mu <- fit$mean[1]
     if (random.effects) sigma <- sqrt(fit$disp[1]^2 + sX^2)
     else sigma <- sqrt(fit$mean[2]^2 + max(1,fit$mswd)*sX^2)

@@ -8,8 +8,9 @@ concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
   show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"),
   concordia.col = "darksalmon", exterr = FALSE, show.age = 0,
-  sigdig = 2, common.Pb = 0, ticks = NULL, anchor = list(FALSE,
-  NA), hide = NULL, omit = NULL, omit.col = NA, ...)
+  sigdig = 2, common.Pb = 0, ticks = 5, anchor = list(FALSE, NA),
+  hide = NULL, omit = NULL, omit.col = NA, diseq = FALSE,
+  U48 = 1, Th0U8 = 0, Ra6U8 = 0, Pa1U5 = 0, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -76,9 +77,9 @@ Pb-composition
 \code{settings('iratio','Pb206Pb204')} and
 \code{settings('iratio','Pb207Pb204')}}
 
-\item{ticks}{an optional vector of age ticks to be added to the
-concordia line to override \code{IsoplotR}'s default spacing,
-which is based on \code{R}'s \code{pretty} function.}
+\item{ticks}{either a scalar indicating the desired number of age
+ticks to be placed along the concordia line, OR a vector of
+tick ages.}
 
 \item{anchor}{control parameters to fix the intercept age or common
     Pb composition of the discordia fit. This is a two-element
@@ -108,6 +109,20 @@ but omitted from concordia or discordia age calculation}
 
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
+
+\item{diseq}{apply an initial U-series disequilibrium correction?}
+
+\item{U48}{the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Th0U8}{the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Ra6U8}{the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Pa1U5}{the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

@@ -45,25 +45,32 @@ profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
     ul <- wu - fit$w
     c(ll,ul)
 }
-profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
+profile_LL_discordia_disp <- function(fit,x,alpha=0.05,diseq=FALSE,U48=1,
+                                      Th0U8=0,Ra6U8=0,Pa1U5=0){
     w <- fit$w
     ta0b0 <- fit$par
     wrange <- get_lud_wrange(ta0b0,x)
-    LLmax <- LL.lud.UPb.disp(w,x,ta0b0)
+    LLmax <- LL.lud.UPb.disp(w,x,ta0b0,diseq=diseq,U48=U48,
+                             Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     cutoff <- stats::qchisq(1-alpha,1)    
-    if (abs(LL.lud.UPb.disp(wrange[1],x,ta0b0)-LLmax) < cutoff/2){
+    if (abs(LL.lud.UPb.disp(wrange[1],x,ta0b0,diseq=diseq,U48=U48,
+                            Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)-LLmax) < cutoff/2){
         wl <- 0
     } else {
         wl <- stats::optimize(profile_discordia_helper,
                               interval=c(0,w),x=x,ta0b0=ta0b0,
-                              LLmax=LLmax,cutoff=cutoff)$minimum
+                              LLmax=LLmax,cutoff=cutoff,diseq=diseq,
+                              U48=U48, Th0U8=Th0U8,Ra6U8=Ra6U8,
+                              Pa1U5=Pa1U5)$minimum
     }
-    if (abs(LL.lud.UPb.disp(wrange[2],x,ta0b0)-LLmax) < cutoff/2){
+    if (abs(LL.lud.UPb.disp(wrange[2],x,ta0b0,diseq=diseq,U48=U48,
+                            Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)-LLmax) < cutoff/2){
         wu <- Inf
     } else {
         wu <- stats::optimize(profile_discordia_helper,
                               interval=c(w,wrange[2]),x=x,ta0b0=ta0b0,
-                              LLmax=LLmax,cutoff=cutoff)$minimum
+                              LLmax=LLmax,cutoff=cutoff,diseq=diseq,U48=U48,
+                              Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)$minimum
     }
     ll <- w - wl
     ul <- wu - w
@@ -103,8 +110,10 @@ profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     LL <- LL.sigma(sigma,X,sX)
     abs(LLmax-LL-cutoff/2)
 }
-profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff){
-    LL <- LL.lud.UPb.disp(w,x,ta0b0)
+profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff,diseq=FALSE,U48=1,
+                                     Th0U8=0,Ra6U8=0,Pa1U5=0){
+    LL <- LL.lud.UPb.disp(w,x,ta0b0,diseq=diseq,U48=U48,
+                          Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     abs(LLmax-LL-cutoff/2)
 }
 profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){

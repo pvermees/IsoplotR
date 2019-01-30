@@ -46,7 +46,7 @@
 #' \enumerate{
 #' \item{\code{7/5, err[7/5], 6/8, err[6/8], rho}}
 #' \item{\code{8/6, err[8/6], 7/6, err[7/6] (, rho)}}
-#' \item{\code{X=7/6, err[X], Y=7/5, err[Y], Z=6/8, err[Z]}
+#' \item{\code{X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z]}
 #' \code{(, rho[X,Y]) (, rho[Y,Z])}}
 #' \item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }
 #' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}

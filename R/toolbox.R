@@ -412,20 +412,14 @@ mymtext <- function(text,line=0,...){
 
 # if doall==FALSE, only returns the lower right submatrix
 blockinverse <- function(AA,BB,CC,DD,doall=FALSE){
-    out <- list()
     invAA <- solve(AA)
     invDCAB <- solve(DD-CC%*%invAA%*%BB)
     if (doall){
-        invBB <- solve(BB)
-        invCC <- solve(CC)
-        invDD <- solve(DD)
         ul <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
         ur <- - invAA %*% BB %*% invDCAB
         ll <- - invDCAB %*% CC %*% invAA
         lr <- invDCAB
-        toprow <- cbind(ul,ur)
-        botrow <- cbind(ll,lr)
-        out <- rbind(toprow,botrow)
+        out <- rbind(cbind(ul,ur),cbind(ll,lr))
     } else {
         out <- invDCAB
     }
