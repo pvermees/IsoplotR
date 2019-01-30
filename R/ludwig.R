@@ -592,16 +592,14 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,diseq=FALSE,
     Z <- rep(0,ns)
     d <- wendt(diseq=diseq,tt=tt,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     for (i in 1:ns){
-        d <- wetherill(x,i=i,exterr=FALSE)
-        Z[i] <- d$x['Pb204U238']
-        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - d$d1
-        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - d$d2
+        wd <- wetherill(x,i=i,exterr=FALSE)
+        Z[i] <- wd$x['Pb204U238']
+        R[i] <- wd$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - d$d1
+        r[i] <- wd$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - d$d2
         Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
-        E[(3*i-2):(3*i),(3*i-2):(3*i)] <- d$cov + Ew
+        E[(3*i-2):(3*i),(3*i-2):(3*i)] <- wd$cov + Ew
         J[i,3*i-2] <- 1                                  # dRdX
-        J[i,3*i] <- -U*b0                                # dRdZ
         J[ns+i,3*i-1] <- 1                               # drdY
-        J[ns+i,3*i] <- -a0                               # drdZ
         J[2*ns+i,3*i] <- 1                               # dphidZ
         if (exterr){
             J[i,3*ns+1] <- -tt*exp(l5[1]*tt) - d$dd1dl5    # dRdl5
@@ -632,60 +630,6 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,diseq=FALSE,
     phi <- solve(V,W)
     z <- Z - phi
     out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)    
-}
-data2ludwig_3D.old <- function(x,tt,a0,b0,w=0,exterr=FALSE){
-    l5 <- settings('lambda','U235')
-    l8 <- settings('lambda','U238')
-    U <- settings('iratio','U238U235')[1]
-    ns <- length(x)
-    R <- rep(0,ns)
-    r <- rep(0,ns)
-    Z <- rep(0,ns)
-    E <- matrix(0,3*ns,3*ns)
-    if (exterr){
-        P235 <- tt*exp(l5[1]*tt)
-        P238 <- tt*exp(l8[1]*tt)
-        E[1:ns,1:ns] <- (P235*l5[2])^2 # A
-        E[(ns+1):(2*ns),(ns+1):(2*ns)] <- (P238*l8[2])^2 # B
-    }
-    for (i in 1:ns){
-        d <- wetherill(x,i=i,exterr=FALSE)
-        Z[i] <- d$x['Pb204U238']
-        R[i] <- d$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i]
-        r[i] <- d$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i]
-        Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
-        E[i,i] <- E[i,i] + d$cov['Pb207U235','Pb207U235'] + Ew[1,1] # A
-        E[ns+i,ns+i] <- E[ns+i,ns+i] + d$cov['Pb206U238','Pb206U238'] + Ew[2,2] # B
-        E[2*ns+i,2*ns+i] <- d$cov['Pb204U238','Pb204U238'] # C
-        E[i,ns+i] <- d$cov['Pb207U235','Pb206U238'] + Ew[1,2] # D
-        E[ns+i,i] <- E[i,ns+i] + Ew[2,1]
-        E[i,2*ns+i] <- d$cov['Pb207U235','Pb204U238'] # E
-        E[2*ns+i,i] <- E[i,2*ns+i]
-        E[ns+i,2*ns+i] <- d$cov['Pb206U238','Pb204U238'] # F
-        E[2*ns+i,ns+i] <- E[ns+i,2*ns+i]
-    }
-    omega <- solve(E)
-    # rearrange sum of squares:
-    V <- matrix(0,ns,ns)
-    W <- rep(0,ns)
-    for (i in 1:ns){
-        i1 <- i
-        i2 <- i + ns
-        i3 <- i + 2*ns
-        for (j in 1:ns){
-            j1 <- j
-            j2 <- j + ns
-            j3 <- j + 2*ns
-            W[i] <- W[i]-R[j]*(U*b0*omega[i1,j1]+a0*omega[i2,j1]+omega[i3,j1])-
-                    r[j]*(U*b0*omega[i1,j2]+a0*omega[i2,j2]+omega[i3,j2])
-            # Ludwig (1998): V[i,j]<-U*b0*omega[i1,j3]+a0*omega[i2,j3]+omega[i3,j3]
-            V[i,j] <- omega[i1,j1]*(U*b0)^2+omega[i2,j2]*a0^2+omega[i3,j3] +
-                      2*(U*a0*b0*omega[i1,j2]+U*b0*omega[i1,j3]+a0*omega[i2,j3])
-        }
-    }
-    phi <- solve(V,W)
-    z <- Z - phi
-    out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)
 }
 get.Ew <- function(w,Z,a0,b0,U){
     E <- diag(c(a0,b0)*w)^2
