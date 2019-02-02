@@ -102,7 +102,7 @@ If \code{plateau=TRUE}, returns a list with the following
 
 \code{x}: the plateau mean
 
-\code{s[x]}: the estimated standard deviation of \code{x}
+\code{s[x]}: the standard error of \code{x}
 
 \code{ci[x]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
 \code{t} }
@@ -131,8 +131,7 @@ mean and the dispersion.}
 plateau}
 
 \item{plotpar}{plot parameters for the weighted mean (see
-\code{\link{weightedmean}}), which are not used in the age
-spectrum}
+\code{\link{weightedmean}})}
 
 \item{i}{indices of the steps that are retained for the plateau age
 calculation}

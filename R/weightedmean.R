@@ -96,7 +96,10 @@
 #' included into the weighted mean calculation}
 #'
 #' \item{plotpar}{list of plot parameters for the weighted mean
-#' diagram} }
+#' diagram, including \code{mean} (the mean value), \code{rect} (a
+#' grey rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
+#' ignoring systematic errors), \code{dash1} and \code{dash2} (lines
+#' marking the overdispersion if \code{random.effects=TRUE}).} }
 #' @rdname weightedmean
 #' @export
 weightedmean <- function(x,...){
@@ -495,18 +498,8 @@ weightedmean_helper <- function(x,random.effects=TRUE,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,hide=hide,
                                 omit=omit)
-    out <- fit
-    if (exterr){
-        out$mean[c('x','s[x]')] <-
-            add.exterr(x,tt=fit$mean['x'],st=fit$mean['s[x]'],
-                       cutoff.76=cutoff.76,type=type)
-        if (random.effects){
-            out$mean['ci[x]'] <- nfact(alpha)*out$mean['s[x]']
-        } else {
-            out$mean['ci[x]'] <- tfact(alpha,out$df)*out$mean['s[x]']
-            out$mean['disp[x]'] <- sqrt(out$mswd)*out$mean['ci[x]']
-        }
-    }
+    if (exterr) out <- add.exterr.to.wtdmean(x,fit,cutoff.76=cutoff.76,type=type)
+    else out <- fit
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,
                           levels=levels,clabel=clabel,
@@ -531,6 +524,7 @@ get.weightedmean <- function(X,sX,random.effects=TRUE,
     }
     out <- list()
     out$random.effects <- random.effects
+    out$alpha <- alpha
     out$df <- length(x)-1 # degrees of freedom for the homogeneity test
     if (random.effects){ # random effects model:
         out$mean <- rep(NA,3)
@@ -702,4 +696,18 @@ chauvenet <- function(X,sX,valid,random.effects=TRUE){
         valid[imin] <- FALSE # remove outlier
     } 
     valid
+}
+
+add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
+    out <- fit
+    out$mean[c('x','s[x]')] <-
+        add.exterr(x,tt=fit$mean['x'],st=fit$mean['s[x]'],
+                   cutoff.76=cutoff.76,type=type)
+    if (fit$random.effects){
+        out$mean['ci[x]'] <- nfact(fit$alpha)*out$mean['s[x]']
+    } else {
+        out$mean['ci[x]'] <- tfact(fit$alpha,fit$df)*out$mean['s[x]']
+        out$mean['disp[x]'] <- sqrt(fit$mswd)*out$mean['ci[x]']
+    }
+    out
 }

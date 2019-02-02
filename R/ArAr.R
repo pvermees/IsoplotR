@@ -126,8 +126,10 @@ get.ArAr.ratio <- function(tt,st,J,sJ,exterr=TRUE){
     R <- (exp(L*tt)-1)/J
     Jac <- matrix(0,1,3)
     E <- matrix(0,3,3)
-    Jac[1,1] <- (1-exp(L*tt))/J^2
-    Jac[1,2] <- tt*exp(L*tt)/J
+    if (exterr){
+        Jac[1,1] <- (1-exp(L*tt))/J^2
+        Jac[1,2] <- tt*exp(L*tt)/J
+    }
     Jac[1,3] <- L*exp(L*tt)/J
     E[1,1] <- sJ^2
     E[2,2] <- sL^2
@@ -142,8 +144,10 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
     tt <- log(J*Ar40Ar39+1)/L
     Jac <- matrix(0,1,3)
     Jac[1,1] <- J/(L*(J*Ar40Ar39+1))
-    Jac[1,2] <- Ar40Ar39/(L*(J*Ar40Ar39+1))
-    if (exterr) Jac[1,3] <- -tt/L
+    if (exterr){
+        Jac[1,2] <- Ar40Ar39/(L*(J*Ar40Ar39+1))
+        Jac[1,3] <- -tt/L
+    }
     E <- matrix(0,3,3)
     E[1,1] <- sAr40Ar39^2
     E[2,2] <- sJ^2
@@ -152,14 +156,13 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
     c(tt,st)
 }
 
-# x an object of class \code{ArAr} returns a matrix of 40Ar/39Ar-ages
-# and their uncertainties. jcu = J-constant uncertainties.
-ArAr.age <- function(x,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
+# x an object of class \code{ArAr} returns a matrix 
+# of 40Ar/39Ar-ages and their uncertainties.
+ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     ns <- length(x)
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
-    if (!jcu) x$J[2] <- 0
     rat <- ArAr.age.ratios(x)
     if (i2i){
         fit <- isochron.ArAr(x,plot=FALSE,exterr=exterr,inverse=FALSE)
