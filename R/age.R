@@ -144,8 +144,6 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     Chi-square test than low precision measurements. The latter
 #'     would therefore be 'rewarded' by such a criterion.
 #'
-#' @param jcu Propagate the J-constant uncertainty?
-#'
 #' @return
 #' \enumerate{
 #'
@@ -255,9 +253,9 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=1,
 #'
 #' @rdname age
 #' @export
-age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,jcu=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- ArAr.age(x,jcu=jcu,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
+    else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }
 #' @rdname age
@@ -401,7 +399,7 @@ get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
     } else if (hasClass(x,'PbPb')){
         out <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){
-        out <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
+        out <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'KCa')){
         out <- KCa.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){

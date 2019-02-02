@@ -121,8 +121,8 @@ set.zeta <- function(x,tst,exterr=TRUE,update=TRUE,sigdig=2){
     N <- length(x$Ns)
     L8 <- lambda('U238')[1]
     tt <- tst[1]
-    st <- tst[2]
-    if (!exterr) st <- 0
+    if (exterr) st <- tst[2]
+    else st <- 0
     if (x$format==1){
         Ns <- sum(x$x[,'Ns'])
         Ni <- sum(x$x[,'Ni'])

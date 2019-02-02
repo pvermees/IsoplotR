@@ -72,7 +72,7 @@
 #'
 #' \code{x}: the plateau mean
 #'
-#' \code{s[x]}: the estimated standard deviation of \code{x}
+#' \code{s[x]}: the standard error of \code{x}
 #'
 #' \code{ci[x]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
 #' \code{t} }
@@ -101,8 +101,7 @@
 #' plateau}
 #'
 #' \item{plotpar}{plot parameters for the weighted mean (see
-#' \code{\link{weightedmean}}), which are not used in the age
-#' spectrum}
+#' \code{\link{weightedmean}})}
 #'
 #' \item{i}{indices of the steps that are retained for the plateau age
 #' calculation}
@@ -187,7 +186,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              exterr=TRUE,line.col='red',lwd=2,
                              i2i=FALSE,hide=NULL,...){
     x <- clear(x,hide)
-    tt <- ArAr.age(x,jcu=FALSE,exterr=FALSE,i2i=i2i)
+    tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,
@@ -197,14 +196,8 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                                 sigdig=sigdig,line.col=line.col,
                                 lwd=lwd,title=FALSE,...)
     if (plateau){
-        out <- plat
-        # calculate the Ar40Ar39 ratio from the weighted mean age
-        R <- get.ArAr.ratio(plat$mean['x'],plat$mean['s[x]'],
-                            x$J[1],0,exterr=FALSE)
-        # recalculate the weighted mean age, this time
-        # taking into account decay and J uncertainties
-        out$mean[1:2] <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=exterr)
-        out$mean[3] <- nfact(alpha)*out$mean[2]
+        if (exterr) out <- add.exterr.to.wtdmean(x,plat)
+        else out <- plat
         graphics::title(plateau.title(out,sigdig=sigdig,Ar=TRUE,units='Ma'))
         return(invisible(out))
     }
