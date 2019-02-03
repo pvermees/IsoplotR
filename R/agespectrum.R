@@ -50,8 +50,6 @@
 #' @param title add a title to the plot?
 #' @param xlab x-axis label
 #' @param ylab y-axis label
-#' @param show.ci show a 100(1-\eqn{\alpha})\% confidence interval for
-#'     the plateau age as a grey band
 #' @param random.effects if \code{TRUE}, computes the weighted mean
 #'     using a random effects model with two parameters: the mean and
 #'     the dispersion. This is akin to a `model-3' isochron
@@ -120,15 +118,19 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
-                                title=TRUE,show.ci=TRUE,
-                                xlab='cumulative fraction',
+                                title=TRUE,xlab='cumulative fraction',
                                 ylab='age [Ma]',hide=NULL,...){
-    agespectrum_helper(x,alpha=alpha,plateau=plateau,
-                       random.effects=random.effects,levels=levels,
-                       clabel=clabel,plateau.col=plateau.col,
-                       non.plateau.col=non.plateau.col,sigdig=sigdig,
-                       line.col=line.col,lwd=lwd,title=title,
-                       show.ci=show.ci,xlab=xlab,ylab=ylab,hide=hide,...)
+    XY <- plot.spectrum.axes(x=x,alpha=alpha,xlab=xlab,
+                             ylab=ylab,hide=hide,levels=levels,
+                             plateau.col=plateau.col,clabel=clabel,...)
+    pc <- get.plateau.colours(x=x,levels=levels,plateau=plateau,
+                              hide=hide,plateau.col=plateau.col,
+                              non.plateau.col=non.plateau.col,
+                              random.effects=random.effects,alpha=alpha)
+    if (plateau) plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd,
+                              title=title,Ar=FALSE)
+    plot.spectrum(XY=XY,col=pc$col)
+    invisible(pc$plat)
 }
 #' @param i2i `isochron to intercept':
 #'     calculates the initial (aka `inherited',
@@ -165,95 +167,67 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
         return(invisible(out))
     }
 }
-agespectrum_helper <- function(x,alpha=0.05,plateau=TRUE,
-                               random.effects=TRUE,levels=NA,clabel="",
+
+plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
+                               ylab='age [Ma]',hide=NULL,levels=NA,
                                plateau.col=c("#00FF0080","#FF000080"),
-                               non.plateau.col="#00FFFF80",sigdig=2,
-                               line.col='red',lwd=2,title=TRUE,
-                               show.ci=TRUE,xlab='cumulative fraction',
-                               ylab='age [Ma]',hide=NULL,...){
+                               clabel="",...){
     ns <- nrow(x)
     x <- clear(x[,1:3],hide)
-    if (!all(is.na(levels))) levels <- clear(levels,hide)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
     sY <- x[valid,3]
     fact <- stats::qnorm(1-alpha/2)
-    maxY <- max(Y+fact*sY,na.rm=TRUE)
-    minY <- min(Y-fact*sY,na.rm=TRUE)
+    Yl <- Y-fact*sY
+    Yu <- Y+fact*sY
+    minY <- min(Yl,na.rm=TRUE)
+    maxY <- max(Yu,na.rm=TRUE)
     graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
+    colourbar(z=levels,col=plateau.col,clabel=clabel)
+    list(X=X,Yl=Yl,Yu=Yu,ylim=c(minY,maxY))
+}
+get.plateau.colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,
+                                plateau.col=c("#00FF0080","#FF000080"),
+                                non.plateau.col="#00FFFF80",
+                                random.effects=TRUE,alpha=0.05){
+    ns <- nrow(x)
+    if (!all(is.na(levels))) levels <- clear(levels,hide)
     if (plateau){
-        plat <- plateau(x,alpha=alpha,random.effects=random.effects)
+        plat <- get.plateau(x,alpha=alpha,random.effects=random.effects)
         plat$valid <- NULL
         colour <- rep(non.plateau.col,ns)
         np <- length(plat$i)
         levels <- levels[plat$i]
         cols <- set.ellipse.colours(ns=np,levels=levels,col=plateau.col)
         colour[plat$i] <- cols
-        plot.plateau(plat,show.ci=show.ci,line.col=line.col,lwd=lwd)
+        plat$n <- ns
     } else {
+        plat <- NA
         colour <- set.ellipse.colours(ns=ns,levels=levels,
                                       hide=hide,col=plateau.col)
     }
+    list(col=colour,plat=plat)
+}
+plot.spectrum <- function(XY,col){
+    ns <- length(XY$X)
     for (i in 1:ns){
-        graphics::rect(X[i],Y[i]-fact*sY[i],
-                       X[i+1],Y[i]+fact*sY[i],
-                       col=colour[i])
-        if (i<ns) graphics::lines(rep(X[i+1],2),
-                                  c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
-    }
-    colourbar(z=levels,col=plateau.col,clabel=clabel)
-    if (plateau){
-        plat$n <- nrow(x)
-        if (title)
-            graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
-        return(invisible(plat))
+        graphics::rect(XY$X[i],XY$Yl[i],XY$X[i+1],XY$Yu[i],col=col[i])
+        if (i<ns) graphics::lines(rep(XY$X[i+1],2),c(XY$Yl[i],XY$Yu[i+1]))
     }
 }
-
-# x is a three column vector with Ar39
-# cumulative fractions, ages and uncertainties
-plateau <- function(x,alpha=0.05,random.effects=TRUE){
-    X <- x[,1]/sum(x[,1],na.rm=TRUE)
-    YsY <- subset(x,select=c(2,3))
-    ns <- length(X)
-    out <- list()
-    out$mean <- YsY[1,1:2]
-    out$mswd <- 1
-    out$p.value <- 1
-    out$fract <- 0
-    for (i in 1:(ns-1)){ # at least two steps in a plateau
-        for (j in ns:(i+1)){
-            fract <- sum(X[i:j],na.rm=TRUE)
-            Y <- YsY[i:j,1]
-            sY <- YsY[i:j,2]
-            valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1),
-                               random.effects=random.effects)
-            if (all(valid) & (fract > out$fract)){
-                out <- weightedmean(YsY[i:j,],random.effects=random.effects,
-                                    plot=FALSE,detect.outliers=FALSE,alpha=alpha)
-                out$i <- i:j
-                out$fract <- fract
-                break
-            }
-        }
+plot.plateau <- function(fit,line.col='red',lwd=2,sigdig=2,
+                         title=TRUE,Ar=FALSE){
+    ci.exterr <- fit$plotpar$ci.exterr
+    if (!is.na(ci.exterr)){
+        ci.exterr$x <- c(0,1,1,0)
+        graphics::polygon(ci.exterr,col='gray40',border=NA)
     }
-    out
-}
-
-plot.plateau <- function(fit,show.ci=TRUE,line.col='red',lwd=2){
-    if (show.ci){
-        ci.exterr <- fit$plotpar$ci.exterr
-        if (!is.na(ci.exterr)){
-            ci.exterr$x <- c(0,1,1,0)
-            graphics::polygon(ci.exterr,col='gray40',border=NA)
-        }
-        ci <- fit$plotpar$ci
-        ci$x <- c(0,1,1,0)
-        graphics::polygon(ci,col='gray80',border=NA)
-    }
+    ci <- fit$plotpar$ci
+    ci$x <- c(0,1,1,0)
+    graphics::polygon(ci,col='gray80',border=NA)
     graphics::lines(c(0,1),rep(fit$mean[1],2),col=line.col,lwd=lwd)
+    if (title) graphics::title(plateau.title(fit,sigdig=sigdig,Ar=Ar))
 }
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     rounded.mean <- roundit(fit$mean['x'],
@@ -271,4 +245,34 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     else line2 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
     mymtext(line1,line=1,...)
     mymtext(line2,line=0,...)
+}
+# x is a three column vector with Ar39
+# cumulative fractions, ages and uncertainties
+get.plateau <- function(x,alpha=0.05,random.effects=TRUE){
+    X <- x[,1]/sum(x[,1],na.rm=TRUE)
+    YsY <- subset(x,select=c(2,3))
+    ns <- length(X)
+    out <- list()
+    out$mean <- YsY[1,1:2]
+    out$mswd <- 1
+    out$p.value <- 1
+    out$fract <- 0
+    for (i in 1:(ns-1)){ # at least two steps in a plateau
+        for (j in ns:(i+1)){
+            fract <- sum(X[i:j],na.rm=TRUE)
+            Y <- YsY[i:j,1]
+            sY <- YsY[i:j,2]
+            valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1),
+                               random.effects=random.effects)
+            if (all(valid) & (fract > out$fract)){
+                out <- weightedmean(YsY[i:j,],random.effects=random.effects,
+                                    plot=FALSE,detect.outliers=FALSE,
+                                    alpha=alpha)
+                out$i <- i:j
+                out$fract <- fract
+                break
+            }
+        }
+    }
+    out
 }
