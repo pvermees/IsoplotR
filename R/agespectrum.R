@@ -123,49 +123,12 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 title=TRUE,show.ci=TRUE,
                                 xlab='cumulative fraction',
                                 ylab='age [Ma]',hide=NULL,...){
-    ns <- nrow(x)
-    x <- clear(x[,1:3],hide)
-    if (!all(is.na(levels))) levels <- clear(levels,hide)
-    valid <- !is.na(rowSums(x))
-    X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
-    Y <- x[valid,2]
-    sY <- x[valid,3]
-    fact <- stats::qnorm(1-alpha/2)
-    maxY <- max(Y+fact*sY,na.rm=TRUE)
-    minY <- min(Y-fact*sY,na.rm=TRUE)
-    graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
-    plat <- plateau(x,alpha=alpha,random.effects=random.effects)
-    plat$valid <- NULL
-    if (plateau) {
-        colour <- rep(non.plateau.col,ns)
-        np <- length(plat$i)
-        levels <- levels[plat$i]
-        cols <- set.ellipse.colours(ns=np,levels=levels,col=plateau.col)
-        colour[plat$i] <- cols            
-        if (show.ci){
-            ci <- plat$plotpar$rect
-            ci$x <- c(0,1,1,0)
-            graphics::polygon(ci,col='gray80',border=NA)
-        }
-        graphics::lines(c(0,1),rep(plat$mean[1],2),col=line.col,lwd=lwd)
-    } else {
-        colour <-
-            set.ellipse.colours(ns=ns,levels=levels,hide=hide,col=plateau.col)
-    }
-    for (i in 1:ns){
-        graphics::rect(X[i],Y[i]-fact*sY[i],
-                       X[i+1],Y[i]+fact*sY[i],
-                       col=colour[i])
-        if (i<ns) graphics::lines(rep(X[i+1],2),
-                                  c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
-    }
-    colourbar(z=levels,col=plateau.col,clabel=clabel)
-    if (plateau){
-        plat$n <- nrow(x)
-        if (title)
-            graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
-        return(invisible(plat))
-    }
+    agespectrum_helper(x,alpha=alpha,plateau=plateau,
+                       random.effects=random.effects,levels=levels,
+                       clabel=clabel,plateau.col=plateau.col,
+                       non.plateau.col=non.plateau.col,sigdig=sigdig,
+                       line.col=line.col,lwd=lwd,title=title,
+                       show.ci=show.ci,xlab=xlab,ylab=ylab,hide=hide,...)
 }
 #' @param i2i `isochron to intercept':
 #'     calculates the initial (aka `inherited',
@@ -202,6 +165,52 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
         return(invisible(out))
     }
 }
+agespectrum_helper <- function(x,alpha=0.05,plateau=TRUE,
+                               random.effects=TRUE,levels=NA,clabel="",
+                               plateau.col=c("#00FF0080","#FF000080"),
+                               non.plateau.col="#00FFFF80",sigdig=2,
+                               line.col='red',lwd=2,title=TRUE,
+                               show.ci=TRUE,xlab='cumulative fraction',
+                               ylab='age [Ma]',hide=NULL,...){
+    ns <- nrow(x)
+    x <- clear(x[,1:3],hide)
+    if (!all(is.na(levels))) levels <- clear(levels,hide)
+    valid <- !is.na(rowSums(x))
+    X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
+    Y <- x[valid,2]
+    sY <- x[valid,3]
+    fact <- stats::qnorm(1-alpha/2)
+    maxY <- max(Y+fact*sY,na.rm=TRUE)
+    minY <- min(Y-fact*sY,na.rm=TRUE)
+    graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
+    if (plateau){
+        plat <- plateau(x,alpha=alpha,random.effects=random.effects)
+        plat$valid <- NULL
+        colour <- rep(non.plateau.col,ns)
+        np <- length(plat$i)
+        levels <- levels[plat$i]
+        cols <- set.ellipse.colours(ns=np,levels=levels,col=plateau.col)
+        colour[plat$i] <- cols
+        plot.plateau(plat,show.ci=show.ci,line.col=line.col,lwd=lwd)
+    } else {
+        colour <- set.ellipse.colours(ns=ns,levels=levels,
+                                      hide=hide,col=plateau.col)
+    }
+    for (i in 1:ns){
+        graphics::rect(X[i],Y[i]-fact*sY[i],
+                       X[i+1],Y[i]+fact*sY[i],
+                       col=colour[i])
+        if (i<ns) graphics::lines(rep(X[i+1],2),
+                                  c(Y[i]-fact*sY[i],Y[i+1]+fact*sY[i+1]))
+    }
+    colourbar(z=levels,col=plateau.col,clabel=clabel)
+    if (plateau){
+        plat$n <- nrow(x)
+        if (title)
+            graphics::title(plateau.title(plat,sigdig=sigdig,Ar=FALSE))
+        return(invisible(plat))
+    }
+}
 
 # x is a three column vector with Ar39
 # cumulative fractions, ages and uncertainties
@@ -233,6 +242,19 @@ plateau <- function(x,alpha=0.05,random.effects=TRUE){
     out
 }
 
+plot.plateau <- function(fit,show.ci=TRUE,line.col='red',lwd=2){
+    if (show.ci){
+        ci.exterr <- fit$plotpar$ci.exterr
+        if (!is.na(ci.exterr)){
+            ci.exterr$x <- c(0,1,1,0)
+            graphics::polygon(ci.exterr,col='gray40',border=NA)
+        }
+        ci <- fit$plotpar$ci
+        ci$x <- c(0,1,1,0)
+        graphics::polygon(ci,col='gray80',border=NA)
+    }
+    graphics::lines(c(0,1),rep(fit$mean[1],2),col=line.col,lwd=lwd)
+}
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     rounded.mean <- roundit(fit$mean['x'],
                             fit$mean[c('s[x]','ci[x]')],

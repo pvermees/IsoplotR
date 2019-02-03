@@ -498,7 +498,8 @@ weightedmean_helper <- function(x,random.effects=TRUE,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,hide=hide,
                                 omit=omit)
-    if (exterr) out <- add.exterr.to.wtdmean(x,fit,cutoff.76=cutoff.76,type=type)
+    if (exterr)
+        out <- add.exterr.to.wtdmean(x,fit,cutoff.76=cutoff.76,type=type)
     else out <- fit
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,
@@ -551,19 +552,17 @@ get.weightedmean <- function(X,sX,random.effects=TRUE,
         out$mean['disp[x]'] <- sqrt(out$mswd)*out$mean['ci[x]']
         out$valid <- valid
     }
-    out$plotpar <-
-        list(mean=list(x=c(0,ns+1),
-                       y=rep(out$mean['x'],2)),
-             rect=list(x=c(0,ns+1,ns+1,0),
+    plotpar <- list()
+    plotpar$mean <- list(x=c(0,ns+1),y=rep(out$mean['x'],2))
+    plotpar$ci <- list(x=c(0,ns+1,ns+1,0),
                        y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
                            rep(out$mean['x']-out$mean['ci[x]'],2)))
-             )
+    plotpar$ci.exterr <- NA # to be defined later
     if (random.effects){
-        out$plotpar$dash1=list(x=c(0,ns+1),y=rep(out$mean['x']+
-                               nfact(alpha)*out$disp['w'],2))
-        out$plotpar$dash2=list(x=c(0,ns+1),y=rep(out$mean['x']-
-                               nfact(alpha)*out$disp['w'],2))
+        plotpar$dash1 <- list(x=c(0,ns+1),y=rep(out$mean['x']+nfact(alpha)*out$disp['w'],2))
+        plotpar$dash2 <- list(x=c(0,ns+1),y=rep(out$mean['x']-nfact(alpha)*out$disp['w'],2))
     }
+    out$plotpar <- plotpar
     SS <- sum(((x-out$mean['x'])/sx)^2)
     out$mswd <- SS/out$df
     out$p.value <- 1-stats::pchisq(SS,out$df)
@@ -653,7 +652,9 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
         maxx <- to
     graphics::plot(c(0,ns+1),c(minx,maxx),type='n',
                    axes=FALSE,xlab='N',ylab='',...)
-    graphics::polygon(fit$plotpar$rect,col='gray80',border=NA)
+    if (!any(is.na(fit$plotpar$ci.exterr)))
+        graphics::polygon(fit$plotpar$ci.exterr,col='gray90',border=NA)
+    graphics::polygon(fit$plotpar$ci,col='gray60',border=NA)
     graphics::lines(fit$plotpar$mean)
     if (fit$random.effects){
         graphics::lines(fit$plotpar$dash1,lty=3)
@@ -709,5 +710,10 @@ add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
         out$mean['ci[x]'] <- tfact(fit$alpha,fit$df)*out$mean['s[x]']
         out$mean['disp[x]'] <- sqrt(fit$mswd)*out$mean['ci[x]']
     }
+    ns <- length(x)
+    ci.exterr <- list(x=c(0,ns+1,ns+1,0),
+                      y=c(rep(out$mean['x']+out$mean['ci[x]'],2),
+                          rep(out$mean['x']-out$mean['ci[x]'],2)))
+    out$plotpar$ci.exterr <- ci.exterr
     out
 }
