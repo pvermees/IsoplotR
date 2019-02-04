@@ -96,10 +96,12 @@
 #' included into the weighted mean calculation}
 #'
 #' \item{plotpar}{list of plot parameters for the weighted mean
-#' diagram, including \code{mean} (the mean value), \code{rect} (a
-#' grey rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
-#' ignoring systematic errors), \code{dash1} and \code{dash2} (lines
-#' marking the overdispersion if \code{random.effects=TRUE}).} }
+#' diagram, including \code{mean} (the mean value), \code{ci} (a grey
+#' rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
+#' ignoring systematic errors), \code{ci.exterr} (a grey rectangle
+#' with the 100[1-\eqn{\alpha}]\% confidence interval including
+#' systematic errors), \code{dash1} and \code{dash2} (lines marking
+#' the overdispersion if \code{random.effects=TRUE}).} }
 #' @rdname weightedmean
 #' @export
 weightedmean <- function(x,...){
@@ -654,7 +656,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                    axes=FALSE,xlab='N',ylab='',...)
     if (!any(is.na(fit$plotpar$ci.exterr)))
         graphics::polygon(fit$plotpar$ci.exterr,col='gray90',border=NA)
-    graphics::polygon(fit$plotpar$ci,col='gray60',border=NA)
+    graphics::polygon(fit$plotpar$ci,col='gray75',border=NA)
     graphics::lines(fit$plotpar$mean)
     if (fit$random.effects){
         graphics::lines(fit$plotpar$dash1,lty=3)

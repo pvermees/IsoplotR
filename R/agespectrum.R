@@ -228,7 +228,7 @@ plot.plateau <- function(fit,line.col='red',lwd=2){
     }
     ci <- fit$plotpar$ci
     ci$x <- c(0,1,1,0)
-    graphics::polygon(ci,col='gray60',border=NA)
+    graphics::polygon(ci,col='gray75',border=NA)
     graphics::lines(c(0,1),rep(fit$mean[1],2),col=line.col,lwd=lwd)
 }
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
