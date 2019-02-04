@@ -654,7 +654,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                    axes=FALSE,xlab='N',ylab='',...)
     if (!any(is.na(fit$plotpar$ci.exterr)))
         graphics::polygon(fit$plotpar$ci.exterr,col='gray90',border=NA)
-    graphics::polygon(fit$plotpar$ci,col='gray60',border=NA)
+    graphics::polygon(fit$plotpar$ci,col='gray75',border=NA)
     graphics::lines(fit$plotpar$mean)
     if (fit$random.effects){
         graphics::lines(fit$plotpar$dash1,lty=3)
