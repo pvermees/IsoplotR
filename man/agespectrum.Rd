@@ -12,8 +12,8 @@ agespectrum(x, ...)
   random.effects = TRUE, levels = NA, clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80", sigdig = 2, line.col = "red",
-  lwd = 2, title = TRUE, show.ci = TRUE,
-  xlab = "cumulative fraction", ylab = "age [Ma]", hide = NULL, ...)
+  lwd = 2, xlab = "cumulative fraction", ylab = "age [Ma]",
+  hide = NULL, ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
   random.effects = TRUE, levels = NA, clabel = "",
@@ -65,17 +65,11 @@ construct a colour ramp.}
 NOT belong to the plateau are given a different colour.}
 
 \item{sigdig}{the number of significant digits of the numerical
-values reported in the title of the graphical output (only used
-if \code{plateau=TRUE}).}
+values reported in the title of the graphical output.}
 
 \item{line.col}{colour of the average age line}
 
 \item{lwd}{width of the average age line}
-
-\item{title}{add a title to the plot?}
-
-\item{show.ci}{show a 100(1-\eqn{\alpha})\% confidence interval for
-the plateau age as a grey band}
 
 \item{xlab}{x-axis label}
 
