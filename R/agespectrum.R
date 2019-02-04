@@ -43,11 +43,9 @@
 #'     NOT belong to the plateau are given a different colour.
 #' @param clabel label of the colour legend
 #' @param sigdig the number of significant digits of the numerical
-#'     values reported in the title of the graphical output (only used
-#'     if \code{plateau=TRUE}).
+#'     values reported in the title of the graphical output.
 #' @param line.col colour of the average age line
 #' @param lwd width of the average age line
-#' @param title add a title to the plot?
 #' @param xlab x-axis label
 #' @param ylab y-axis label
 #' @param random.effects if \code{TRUE}, computes the weighted mean
@@ -118,7 +116,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
-                                title=TRUE,xlab='cumulative fraction',
+                                xlab='cumulative fraction',
                                 ylab='age [Ma]',hide=NULL,...){
     XY <- plot.spectrum.axes(x=x,alpha=alpha,xlab=xlab,
                              ylab=ylab,hide=hide,levels=levels,
@@ -127,10 +125,12 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                               hide=hide,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
                               random.effects=random.effects,alpha=alpha)
-    if (plateau) plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd,
-                              title=title,Ar=FALSE)
+    if (plateau){
+        plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
+        graphics::title(plateau.title(pc$plat,sigdig=sigdig,Ar=FALSE))
+    }
     plot.spectrum(XY=XY,col=pc$col)
-    invisible(pc$plat)
+    if (plateau) return(invisible(pc$plat))
 }
 #' @param i2i `isochron to intercept':
 #'     calculates the initial (aka `inherited',
@@ -154,18 +154,22 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39'],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
-    plat <- agespectrum.default(X,alpha=alpha,xlab=x.lab,
-                                ylab='age [Ma]',plateau=plateau,
-                                levels=levels,clabel=clabel,
-                                random.effects=random.effects,
-                                sigdig=sigdig,line.col=line.col,
-                                lwd=lwd,title=FALSE,...)
+    y.lab='age [Ma]'
+    XY <- plot.spectrum.axes(x=X,alpha=alpha,xlab=x.lab,
+                             ylab=y.lab,hide=hide,levels=levels,
+                             plateau.col=plateau.col,clabel=clabel,...)
+    pc <- get.plateau.colours(x=X,levels=levels,plateau=plateau,
+                              hide=hide,plateau.col=plateau.col,
+                              non.plateau.col=non.plateau.col,
+                              random.effects=random.effects,alpha=alpha)
     if (plateau){
-        if (exterr) out <- add.exterr.to.wtdmean(x,plat)
-        else out <- plat
-        graphics::title(plateau.title(out,sigdig=sigdig,Ar=TRUE,units='Ma'))
-        return(invisible(out))
+        if (exterr) pc$plat <- add.exterr.to.wtdmean(x,pc$plat)
+        plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
+        graphics::title(plateau.title(pc$plat,sigdig=sigdig,
+                                      Ar=TRUE,units='Ma'))
     }
+    plot.spectrum(XY=XY,col=pc$col)
+    if (plateau) return(invisible(pc$plat))
 }
 
 plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
@@ -216,18 +220,16 @@ plot.spectrum <- function(XY,col){
         if (i<ns) graphics::lines(rep(XY$X[i+1],2),c(XY$Yl[i],XY$Yu[i+1]))
     }
 }
-plot.plateau <- function(fit,line.col='red',lwd=2,sigdig=2,
-                         title=TRUE,Ar=FALSE){
+plot.plateau <- function(fit,line.col='red',lwd=2){
     ci.exterr <- fit$plotpar$ci.exterr
-    if (!is.na(ci.exterr)){
+    if (!all(is.na(ci.exterr))){
         ci.exterr$x <- c(0,1,1,0)
-        graphics::polygon(ci.exterr,col='gray40',border=NA)
+        graphics::polygon(ci.exterr,col='gray90',border=NA)
     }
     ci <- fit$plotpar$ci
     ci$x <- c(0,1,1,0)
-    graphics::polygon(ci,col='gray80',border=NA)
+    graphics::polygon(ci,col='gray60',border=NA)
     graphics::lines(c(0,1),rep(fit$mean[1],2),col=line.col,lwd=lwd)
-    if (title) graphics::title(plateau.title(fit,sigdig=sigdig,Ar=Ar))
 }
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     rounded.mean <- roundit(fit$mean['x'],
