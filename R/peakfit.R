@@ -365,14 +365,14 @@ normal.mixtures <- function(x,k,sigdig=2,alpha=0.05,...){
     pii <- rep(1,k)/k
     L <- -Inf
     for (j in 1:100){
-        fiu <- matrix(0,n,k)
-        for (i in 1:k){
-            fiu[,i] <- stats::dnorm(yu,betai[i]*xu,1)
+        lpfiu <- matrix(0,n,k) # log(pii x fiu) taking logs enhances stability 
+        for (i in 1:k){        # compared to Galbraiths orignal formulation
+            lpfiu[,i] <- log(pii[i]) + stats::dnorm(yu,betai[i]*xu,1,log=TRUE)
         }
         piu <- matrix(0,n,k)
-        for (u in 1:n){
-            den <- sum(pii*fiu[u,])
-            if (den>0) piu[u,] <- pii*fiu[u,]/den
+        for (i in 1:k){
+            lden <- apply(lpfiu,2,'-',lpfiu[,i])
+            piu[,i] <- 1/rowSums(exp(lden))
         }
         fiu <- matrix(0,n,k)
         fu <- rep(0,n)
