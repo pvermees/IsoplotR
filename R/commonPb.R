@@ -5,11 +5,18 @@ common.Pb.correction <- function(x,...){ UseMethod("common.Pb.correction",x) }
 common.Pb.correction.default <- function(x,method='common.Pb.correction',...){
     stop('No default method for common.Pb.correction function')
 }
-common.Pb.correction.UPb <- function(x,option=1){
+common.Pb.correction.UPb <- function(x,option=1,diseq=FALSE,U48=1,
+                                     Th0U8=0,Ra6U8=0,Pa1U5=0){
     ns <- length(x)
-    if (option == 1) out <- common.Pb.stacey.kramers.UPb(x)
-    else if (option == 2) out <- common.Pb.isochron.UPb(x)
-    else if (option == 3) out <- common.Pb.nominal.UPb(x)
+    if (option == 1)
+        out <- common.Pb.stacey.kramers.UPb(x,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                            Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    else if (option == 2)
+        out <- common.Pb.isochron.UPb(x,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                      Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    else if (option == 3)
+        out <- common.Pb.nominal.UPb(x,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                     Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     else out <- x
     out$x.raw <- x$x
     out
@@ -24,11 +31,13 @@ common.Pb.correction.PbPb <- function(x,option=1){
     out
 }
 
-common.Pb.isochron.UPb <- function(x){
-    lud <- ludwig(x)
+common.Pb.isochron.UPb <- function(x,diseq=FALSE,U48=1,
+                                   Th0U8=0,Ra6U8=0,Pa1U5=0){
+    lud <- ludwig(x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0)
     if (x$format<4){
         i76 <- lud$par['76i']
-        out <- Pb.correction.without.204(x,i76)
+        out <- Pb.correction.without.204(x,i76,diseq=diseq,U48=U48,
+                                         Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     } else {
         i64 <- lud$par['64i']
         i74 <- lud$par['74i']
@@ -43,17 +52,20 @@ common.Pb.isochron.PbPb <- function(x){
     Pb.correction.for.PbPb(x,i64,i74)
 }
 
-common.Pb.stacey.kramers.UPb <- function(x){
+common.Pb.stacey.kramers.UPb <- function(x,diseq=FALSE,U48=1,
+                                         Th0U8=0,Ra6U8=0,Pa1U5=0){
     tt <- 1000
     for (i in 1:5){
         i6474 <- stacey.kramers(tt)
         i64 <- i6474[1]
         i74 <- i6474[2]
         if (x$format < 4)
-            out <- Pb.correction.without.204(x,i74/i64)
+            out <- Pb.correction.without.204(x,i74/i64,diseq=diseq,U48=U48,
+                                             Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
         else
             out <- Pb.correction.with.204(x,i64,i74)
-        tt <- get.Pb206U238.age(out)[,1]
+        tt <- get.Pb206U238.age(out,diseq=diseq,U48=U48,
+                                Th0U8=Th0U8,Ra6U8=Ra6U8)[,1]
     }
     out
 }
@@ -69,10 +81,11 @@ common.Pb.stacey.kramers.PbPb <- function(x){
     out
 }
 
-common.Pb.nominal.UPb <- function(x){
+common.Pb.nominal.UPb <- function(x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     if (x$format < 4){
         i76 <- settings('iratio','Pb207Pb206')[1]
-        out <- Pb.correction.without.204(x,i76)
+        out <- Pb.correction.without.204(x,i76,diseq=diseq,U48=U48,
+                                         Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     } else {
         i64 <- settings('iratio','Pb206Pb204')[1]
         i74 <- settings('iratio','Pb207Pb204')[1]
@@ -87,37 +100,43 @@ common.Pb.nominal.PbPb <- function(x){
     Pb.correction.for.PbPb(x,i74,i64)
 }
 
-Pb.correction.without.204 <- function(x,i76){
+Pb.correction.without.204 <- function(x,i76,diseq=FALSE,U48=1,
+                                      Th0U8=0,Ra6U8=0,Pa1U5=0){
     ns <- length(x)
     ni <- length(i76)
     out <- x
     m76 <- get.Pb207Pb206.ratios(x)[,1]
     m86 <- get.U238Pb206.ratios(x)[,1]
     tint <- rep(0,ns) # intercept age
+    i76i <- i76[1]
     for (i in 1:ns){
-        if (ni>1)
-            tint[i] <- project.concordia(m76[i],m86[i],i76[i])
-        else
-            tint[i] <- project.concordia(m76[i],m86[i],i76)
+        if (ni>1) i76i <- i76[i]
+        tint[i] <- project.concordia(m76[i],m86[i],i76i,diseq=diseq,U48=U48,
+                                     Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     }
     if (x$format == 1){
-        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint)[,'75']
+        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint,diseq=diseq,Pa1U5=Pa1U5)[,'75']
         out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
-        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint)[,'68']
+        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint,diseq=diseq,U48=U48,
+                                                      Th0U8=Th0U8,Ra6U8=Ra6U8)[,'68']
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
         out$x[,'rhoXY'] <- x$x[,'rhoXY']        
     } else if (x$format == 2){
-        out$x[,'U238Pb206'] <- age_to_U238Pb206_ratio(tint)[,'86']
+        out$x[,'U238Pb206'] <- age_to_U238Pb206_ratio(tint,diseq=diseq,U48=U48,
+                                                      Th0U8=Th0U8,Ra6U8=Ra6U8)[,'86']
         out$x[,'errU238Pb206'] <- x$x[,'errU238Pb206']
-        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint)[,'76']
+        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)[,'76']
         out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']
         out$x[,'rhoXY'] <- x$x[,'rhoXY']
     } else if (x$format == 3){
-        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint)[,'76']
+        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)[,'76']
         out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']
-        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint)[,'75']
+        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint,diseq=diseq,Pa1U5=Pa1U5)[,'75']
         out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
-        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint)[,'68']
+        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint,diseq=diseq,U48=U48,
+                                                      Th0U8=Th0U8,Ra6U8=Ra6U8)[,'68']
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
     }
     out
@@ -149,10 +168,8 @@ Pb.correction.with.204 <- function(x,i64,i74){
         out$format <- 2
     } else if (x$format == 6){
         out$x <- matrix(0,ns,9)
-        colnames(out$x) <- c('Pb207Pb206','errPb207Pb206',
-                             'Pb207U235','errPb207U235',
-                             'Pb206U238','errPb206U238',
-                             'rhoXY','rhoXZ','rhoYZ')
+        colnames(out$x) <- c('Pb207Pb206','errPb207Pb206','Pb207U235','errPb207U235',
+                             'Pb206U238','errPb206U238','rhoXY','rhoXZ','rhoYZ')
         out$x[,'Pb207Pb206'] <-
             (x$x[,'Pb207Pb206'] - x$x[,'Pb204Pb206']*i74)/(1 - x$x[,'Pb204Pb206']*i64)
         out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']

@@ -266,10 +266,12 @@ population is not overdispersed.}
 included into the weighted mean calculation}
 
 \item{plotpar}{list of plot parameters for the weighted mean
-diagram, including \code{mean} (the mean value), \code{rect} (a
-grey rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
-ignoring systematic errors), \code{dash1} and \code{dash2} (lines
-marking the overdispersion if \code{random.effects=TRUE}).} }
+diagram, including \code{mean} (the mean value), \code{ci} (a grey
+rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
+ignoring systematic errors), \code{ci.exterr} (a grey rectangle
+with the 100[1-\eqn{\alpha}]\% confidence interval including
+systematic errors), \code{dash1} and \code{dash2} (lines marking
+the overdispersion if \code{random.effects=TRUE}).} }
 }
 \description{
 Models the data as a Normal distribution with two sources of

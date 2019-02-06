@@ -112,6 +112,7 @@
 #'     Pb composition of the discordia fit. This is a two-element
 #'     list.
 #'
+
 #' \itemize{
 #'
 #' \item The first element is a boolean flag indicating whether the
@@ -256,7 +257,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     if (common.Pb<1) X <- x
-    else X <- common.Pb.correction(x,option=common.Pb)
+    else X <- common.Pb.correction(x,option=common.Pb,diseq=diseq,U48=U48,
+                                   Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     X2plot <- subset(X,subset=plotit)
     lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,
                                    diseq=diseq,U48=U48,Th0U8=Th0U8,
@@ -284,8 +286,8 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
-        fit <- concordia.age(X2calc,wetherill=wetherill,
-                             exterr=exterr,alpha=alpha)
+        fit <- concordia.age(X2calc,wetherill=wetherill,exterr=exterr,alpha=alpha,
+                             diseq=diseq,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
         fit$n <- length(X2calc)
@@ -524,10 +526,12 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,
     }
     t.init <- initial.concordia.age(cct,diseq=diseq,U48=U48,Th0U8=Th0U8,
                                     Ra6U8=Ra6U8,Pa1U5=Pa1U5)
-    tt <- concordia.age(ccw,t.init=t.init,exterr=exterr)
+    tt <- concordia.age(ccw,t.init=t.init,exterr=exterr,diseq=diseq,
+                        U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
-        out <- c(out,mswd.concordia(x,ccw,tt[1],exterr=exterr))
+        out <- c(out,mswd.concordia(x,ccw,tt[1],exterr=exterr,diseq=diseq,
+                                    U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5))
         out$age <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
         tfact <- stats::qt(1-alpha/2,out$df['combined'])
@@ -547,9 +551,9 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,
 concordia.age.wetherill <- function(x,t.init,exterr=TRUE,diseq=FALSE,
                                     U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0,...){
     out <- tryCatch({
-        fit <- stats::optim(par=t.init,fn=LL.concordia.age,
-                            ccw=x,exterr=exterr,
-                            method="BFGS",hessian=TRUE)
+        fit <- stats::optim(par=t.init,fn=LL.concordia.age,ccw=x,exterr=exterr,
+                            diseq=diseq,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,
+                            Pa1U5=Pa1U5,method="BFGS",hessian=TRUE)
         tt <- fit$par
         tt.err <- as.numeric(sqrt(solve(fit$hessian)))
         c(tt,tt.err)
@@ -592,11 +596,13 @@ initial.concordia.age <- function(x,diseq=FALSE,U48=1,Th0U8=0,
     fit$x[1]
 }
 
-mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
+mswd.concordia <- function(x,ccw,tt,exterr=TRUE,diseq=FALSE,
+                           U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
     SS.equivalence <-
         LL.concordia.comp(mu=ccw$x,x=x,wetherill=TRUE,mswd=TRUE)
     SS.concordance <-
-        LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr)
+        LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr,diseq=diseq,
+                         U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
     mswd <- rep(0,3)
@@ -638,8 +644,10 @@ LL.concordia.comp <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
     out
 }
 
-LL.concordia.age <- function(tt,ccw,mswd=FALSE,exterr=TRUE){
-    y <- age_to_wetherill_ratios(tt)
+LL.concordia.age <- function(tt,ccw,mswd=FALSE,exterr=TRUE,
+                             diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+    y <- age_to_wetherill_ratios(tt,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                                 Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     dx <- matrix(ccw$x[1:2]-y$x,1,2)
     covmat <- ccw$cov[1:2,1:2]
     if (exterr){
