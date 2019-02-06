@@ -54,9 +54,26 @@
 #'     \code{'K-Ca'}, \code{'Th-U'}, \code{'Re-Os'}, \code{'Sm-Nd'},
 #'     \code{'Rb-Sr'}, \code{'Lu-Hf'}, \code{'U-Th-He'} or
 #'     \code{'fissiontracks'}
+#' 
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
+#' 
 #' @param i (optional) index of a particular aliquot
+#' 
+#' @param diseq apply an initial U-series disequilibrium correction?
+#'
+#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Th0U8 the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#' 
+#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
+#'     ratio. Is only used if \code{diseq=TRUE}.
+#'
 #' @param ... additional arguments
 #'
 #' @rdname age
@@ -65,35 +82,42 @@ age <- function(x,...){ UseMethod("age",x) }
 #' @rdname age
 #' @export
 age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
-                        zeta=c(NA,NA),rhoD=c(NA,NA),...){
+                        zeta=c(NA,NA),rhoD=c(NA,NA),diseq=FALSE,
+                        U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0,...){
     if (length(x)==1) x <- c(x,0)
     if (identical(method,'U235-Pb207')){
-        out <- get.Pb207U235.age(x[1],x[2],exterr)
+        out <- get.Pb207U235.age(x=x[1],sx=x[2],exterr=exterr,
+                                 diseq=diseq,Pa1U5=Pa1U5)
     } else if (identical(method,'U238-Pb206')){
-        out <- get.Pb206U238.age(x[1],x[2],exterr)
+        out <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,diseq=diseq,
+                                 U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
     } else if (identical(method,'Pb207-Pb206')){
-        out <- get.Pb207Pb206.age(x[1],x[2],exterr)
+        out <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,diseq=diseq,U48=U48,
+                                  Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     } else if (identical(method,'Ar-Ar')){
-        out <- get.ArAr.age(x[1],x[2],x[3],x[4],exterr)
+        out <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
+                            J=x[3],sJ=x[4],exterr=exterr)
     } else if (identical(method,'K-Ca')){
-        out <- get.KCa.age(x[1],x[2],exterr)
+        out <- get.KCa.age(K40Ca40=x[1],sK40Ca40=x[2],exterr=exterr)
     } else if (identical(method,'Re-Os')){
-        out <- get.ReOs.age(x[1],x[2],exterr)
+        out <- get.ReOs.age(Os187Re187=x[1],sOs187Re187=x[2],exterr=exterr)
     } else if (identical(method,'Rb-Sr')){
-        out <- get.RbSr.age(x[1],x[2],exterr)
+        out <- get.RbSr.age(Rb87Sr86=x[1],sRb87Sr86=x[2],exterr)
     } else if (identical(method,'Sm-Nd')){
-        out <- get.SmNd.age(x[1],x[2],exterr)
+        out <- get.SmNd.age(Nd143Sm147=x[1],sNd143Sm147=x[2],exterr)
     } else if (identical(method,'Lu-Hf')){
-        out <- get.LuHf.age(x[1],x[2],exterr)
+        out <- get.LuHf.age(Hf176Lu176=x[1],sHf176Lu176=x[2],exterr)
     } else if (identical(method,'Th-U')){
-        out <- get.ThU.age(x[1],x[2],x[3],x[4],x[5],exterr=exterr)
-    } else if (identical(method,'U-Th-He')){
-        if (length(x)==6)
-            out <- get.UThHe.age(x[1],x[2],x[3],x[4],x[5],x[6])
-        else if (length(x)==8)
-            out <- get.UThHe.age(x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8])
+        out <- get.ThU.age(Th230U238=x[1],sTh230U238=x[2],U234U238=x[3],
+                           sU234U238=x[4],cov4808=x[5],exterr=exterr)
+    } else if (identical(method,'U-Th-He') && length(x)==6){
+        out <- get.UThHe.age(U=x[1],sU=x[2],Th=x[3],
+                             sTh=x[4],He=x[5],sHe=x[6])
+    } else if (identical(method,'U-Th-He') && length(x)==8){
+        out <- get.UThHe.age(U=x[1],sU=x[2],Th=x[3],sTh=x[4],
+                             He=x[5],sHe=x[6],Sm=x[7],sSm=x[8])
     } else if (identical(method,'fissiontracks')){
-        out <- get.EDM.age(x[1],x[2],zeta,rhoD)
+        out <- get.EDM.age(Ns=x[1],Ni=x[2],zeta=zeta,rhoD=rhoD)
     } else {
         out <- NA
     }

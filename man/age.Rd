@@ -19,7 +19,8 @@
 age(x, ...)
 
 \method{age}{default}(x, method = "U238-Pb206", exterr = TRUE,
-  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), ...)
+  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), diseq = FALSE,
+  U48 = 1, Th0U8 = 0, Ra6U8 = 0, Pa1U5 = 0, ...)
 
 \method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, common.Pb = 0, show.p = FALSE, ...)
@@ -119,6 +120,20 @@ error.}
 
 \item{rhoD}{two-element vector with the track density of the
 dosimeter glass and its standard error.}
+
+\item{diseq}{apply an initial U-series disequilibrium correction?}
+
+\item{U48}{the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Th0U8}{the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Ra6U8}{the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
+
+\item{Pa1U5}{the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
+ratio. Is only used if \code{diseq=TRUE}.}
 
 \item{type}{scalar flag indicating whether
 
