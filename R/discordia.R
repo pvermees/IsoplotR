@@ -1,10 +1,8 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
-                                          alpha=0.05,model=1,anchor=list(FALSE,NA),
-                                          diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
-    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor,diseq=diseq,
-                  U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05,
+                                          model=1,anchor=list(FALSE,NA),d=diseq()){
+    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor,d=d)
     out <- list()
     out$model <- model
     out$mswd <- fit$mswd
@@ -13,8 +11,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
     out$fact <- tfact(alpha,fit$df)
     if (wetherill){
         labels <- c('t[l]','t[u]')
-        out <- c(out,twfit2wfit(fit,x,diseq=diseq,U48=U48,
-                                Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5))
+        out <- c(out,twfit2wfit(fit,x,d=d))
     } else if (x$format<4){
         labels <- c('t[l]','76')
         out$x <- fit$par
@@ -45,15 +42,12 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
     colnames(out$err) <- labels
     out
 }
-concordia.intersection.york <- function(x,exterr=FALSE,diseq=FALSE,
-                                        U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
-    d <- data2york(x,wetherill=FALSE)
-    fit <- york(d)
-    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr,diseq=diseq,
-                              U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+concordia.intersection.york <- function(x,exterr=FALSE,d=diseq()){
+    y <- data2york(x,wetherill=FALSE)
+    fit <- york(y)
+    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr,d=d)
 }
-concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,
-                                      diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,d=diseq()){
     out <- list()
     l8 <- lambda('U238')[1]
     m <- l8/2
@@ -63,31 +57,27 @@ concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,
     else names(out$x) <- c('t[l]','76i')
     if (b<0) { # negative slope => two intersections with concordia line
         search.range <- c(m,M)
-        midpoint <- stats::optimize(intersection.misfit.york,search.range,
-                                    a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                    Ra6U8=Ra6U8,Pa1U5=Pa1U5)$minimum
+        midpoint <- stats::optimize(intersection.misfit.york,
+                                    search.range,a=a,b=b,d=d)$minimum
         search.range <- c(m,midpoint)
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
-                                        a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                        search.range,a=a,b=b,d=d)$root
         if (wetherill){
             search.range <- c(midpoint,M)
-            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,search.range,
-                                            a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                            Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,
+                                            search.range,a=a,b=b,d=d)$root
         }   
     } else {
         search.range <- c(m,M)
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,search.range,
-                                        a=a,b=b,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                        Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                        search.range,a=a,b=b,d=d)$root
     }
     out
 }
 
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
-twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+twfit2wfit <- function(fit,x,d=diseq()){
     tt <- fit$par[1]
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
@@ -110,17 +100,15 @@ twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
         search.range <- c(tt+buffer,10000)
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                             Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+                             t2=tt,a0=a0,b0=b0,d=d)$root
     } else {
         search.range <- c(-1000,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                             Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+                             t2=tt,a0=a0,b0=b0,d=d)$root
         tu <- tt
     }
-    du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
-    dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+    du <- wendt(tt=tu,d=diseq())
+    dl <- wendt(tt=tl,d=diseq())
     XX <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
     YY <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
     BB <- a0/(b0*U)
@@ -153,11 +141,9 @@ twfit2wfit <- function(fit,x,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
 }
 
 # used by common Pb correction:
-project.concordia <- function(m76,m86,i76,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
-    t68 <- get.Pb206U238.age(1/m86,diseq=diseq,U48=U48,
-                             Th0U8=Th0U8,Ra6U8=Ra6U8)[1]
-    t76 <- get.Pb207Pb206.age(m76,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                              Ra6U8=Ra6U8,Pa1U5=Pa1U5)[1]
+project.concordia <- function(m76,m86,i76,d=diseq()){
+    t68 <- get.Pb206U238.age(1/m86,d=d)[1]
+    t76 <- get.Pb207Pb206.age(m76,d=d)[1]
     a <- i76
     b <- (m76-i76)/m86
     neg <- (i76>m76) # negative slope?
@@ -175,8 +161,7 @@ project.concordia <- function(m76,m86,i76,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U
         go.ahead <- TRUE
     } else if (neg & below){     # it is not clear what to do with samples
         for (tt in seq(from=10,to=5000,by=10)){
-            misfit <- intersection.misfit.york(tt,a=a,b=b,diseq=diseq,U48=U48,
-                                               Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+            misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
             if (misfit<0){       # that plot in the 'forbidden zone' above
                 tend <- tt       # Wetherill concordia or below T-W concordia
                 go.ahead <- TRUE # IsoplotR will still project them on
@@ -186,8 +171,8 @@ project.concordia <- function(m76,m86,i76,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U
     }
     if (go.ahead){
         search.range <- c(1/10000,tend)
-        out <- stats::uniroot(intersection.misfit.york,search.range,a=a,b=b,diseq=diseq,
-                              U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+        out <- stats::uniroot(intersection.misfit.york,
+                              search.range,a=a,b=b,d=d)$root
     } else {
         out <- m76
     }
@@ -195,15 +180,14 @@ project.concordia <- function(m76,m86,i76,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U
 }
 
 # a0 = 64i, b0 = 74i on TW concordia
-intersection.misfit.ludwig <- function(t1,t2,a0,b0,diseq=FALSE,
-                                       U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+intersection.misfit.ludwig <- function(t1,t2,a0,b0,d=diseq()){
     tl <- min(t1,t2)
     tu <- max(t1,t2)
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
-    dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+    du <- wendt(tt=tu,d=d)
+    dl <- wendt(tt=tl,d=d)
     XX <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
     YY <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
     BB <- a0/(b0*U)
@@ -211,16 +195,16 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0,diseq=FALSE,
     YY - BB*XX
 }
 # a = intercept, b = slope on TW concordia
-intersection.misfit.york <- function(tt,a,b,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+intersection.misfit.york <- function(tt,a,b,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    d <- wendt(diseq=diseq,tt,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    D <- wendt(tt=tt,d=d)
     # misfit is expressed as the distance in 7/6 space
-    (exp(l5*tt)-1+d$d1)/(exp(l8*tt)-1+d$d2) - a*U - b*U/(exp(l8*tt)-1+d$d2)
+    (exp(l5*tt)-1+D$d1)/(exp(l8*tt)-1+D$d2) - a*U - b*U/(exp(l8*tt)-1+D$d2)
 }
 
-discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+discordia.line <- function(fit,wetherill,d=diseq()){
     X <- c(0,0)
     Y <- c(0,0)
     l5 <- lambda('U235')[1]
@@ -230,11 +214,11 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
     if (wetherill){
         tl <- fit$x[1]
         tu <- fit$x[2]
-        X <- age_to_Pb207U235_ratio(fit$x,diseq=diseq,Pa1U5=Pa1U5)[,'75']
-        Y <- age_to_Pb206U238_ratio(fit$x,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)[,'68']
+        X <- age_to_Pb207U235_ratio(fit$x,d=d)[,'75']
+        Y <- age_to_Pb206U238_ratio(fit$x,d=d)[,'68']
         x <- seq(from=max(0,usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
-        du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
-        dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+        du <- wendt(tt=tu,d=d)
+        dl <- wendt(tt=tl,d=d)
         aa <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
         bb <- x - exp(l5*tl) + 1 - dl$d1
         cc <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
@@ -256,19 +240,16 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
         sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
-        t75 <- get.Pb207U235.age(x,diseq=diseq,Pa1U5=Pa1U5)[,'t75']
-        yconc <- age_to_Pb206U238_ratio(t75,diseq=diseq,U48=U48,
-                                        Th0U8=Th0U8,Ra6U8=Ra6U8)[,'68']
+        t75 <- get.Pb207U235.age(x,d=d)[,'t75']
+        yconc <- age_to_Pb206U238_ratio(t75,d=d)[,'68']
         overshot <- ul>yconc
         ul[overshot] <- yconc[overshot]
         cix <- c(x,rev(x))
         ciy <- c(ll,rev(ul))
     } else {
-        X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'],diseq=diseq,
-                                       U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)[,'86']
-        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'],diseq=diseq,U48=U48,
-                                        Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)[,'76']
-        r75 <- age_to_Pb207U235_ratio(fit$x['t[l]'],diseq=diseq,Pa1U5=Pa1U5)[,'75']
+        X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'],d=diseq())[,'86']
+        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'],d=diseq())[,'76']
+        r75 <- age_to_Pb207U235_ratio(fit$x['t[l]'],d=diseq())[,'75']
         r68 <- 1/X[1]
         Y[2] <- fit$x['76']
         xl <- X[1]
@@ -279,9 +260,9 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
         nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
         y <- yl + (y0-yl)*(1-x*r68) # = y0 + yl*x*r68 - y0*x*r68
-        d <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
-        d75dtl <- l5*exp(l5*tl) + d$dd1dt
-        d68dtl <- l8*exp(l8*tl) + d$dd2dt
+        D <- wendt(tt=tl,d=d)
+        d75dtl <- l5*exp(l5*tl) + D$dd1dt
+        d68dtl <- l8*exp(l8*tl) + D$dd2dt
         dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
         J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
         J2 <- 1 - x*r68                                # dy/dy0
@@ -289,10 +270,8 @@ discordia.line <- function(fit,wetherill,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5
         ul <- y + fit$fact*sy
         ll <- y - fit$fact*sy
         yconc <- rep(0,nsteps)
-        t68 <- get.Pb206U238.age(1/x,diseq=diseq,U48=U48,
-                                 Th0U8=Th0U8,Ra6U8=Ra6U8)[,'t68']
-        yconc <- age_to_Pb207Pb206_ratio(t68,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                                         Ra6U8=Ra6U8,Pa1U5=Pa1U5)[,'76']
+        t68 <- get.Pb206U238.age(1/x,d=d)[,'t68']
+        yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope
             overshot <- (ll<yconc & ll<y0/2)
@@ -348,7 +327,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
     line1 <- do.call('substitute',list((call1),list1))
     line2 <- do.call('substitute',list((call2),list2))
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
+        line3 <- substitute('MSWD ='~a~', p('*chi^2*') ='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
         mymtext(line1,line=2,...)

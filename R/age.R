@@ -60,19 +60,8 @@
 #' 
 #' @param i (optional) index of a particular aliquot
 #' 
-#' @param diseq apply an initial U-series disequilibrium correction?
-#'
-#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
-#'     ratio. Is only used if \code{diseq=TRUE}.
-#' 
-#' @param Th0U8 the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
-#'     ratio. Is only used if \code{diseq=TRUE}.
-#' 
-#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
-#'     ratio. Is only used if \code{diseq=TRUE}.
-#' 
-#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
-#'     ratio. Is only used if \code{diseq=TRUE}.
+#' @param d secular disequilibrium correction. See \link{diseq} for
+#'     further details.
 #'
 #' @param ... additional arguments
 #'
@@ -82,18 +71,14 @@ age <- function(x,...){ UseMethod("age",x) }
 #' @rdname age
 #' @export
 age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
-                        zeta=c(NA,NA),rhoD=c(NA,NA),diseq=FALSE,
-                        U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0,...){
+                        zeta=c(NA,NA),rhoD=c(NA,NA),d=diseq(),...){
     if (length(x)==1) x <- c(x,0)
     if (identical(method,'U235-Pb207')){
-        out <- get.Pb207U235.age(x=x[1],sx=x[2],exterr=exterr,
-                                 diseq=diseq,Pa1U5=Pa1U5)
+        out <- get.Pb207U235.age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'U238-Pb206')){
-        out <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,diseq=diseq,
-                                 U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+        out <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'Pb207-Pb206')){
-        out <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,diseq=diseq,U48=U48,
-                                  Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+        out <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Ar-Ar')){
         out <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
                             J=x[3],sJ=x[4],exterr=exterr)

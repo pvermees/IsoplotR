@@ -209,8 +209,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    d <- data2evolution(x,detritus=detritus,Th02=Th02,Th02U48=Th02U48)
-    d2plot <- subset(d,subset=plotit)
+    y <- data2evolution(x,detritus=detritus,Th02=Th02,Th02U48=Th02U48)
+    d2plot <- subset(y,subset=plotit)
     lim <- evolution.lines(d2plot,xlim=xlim,ylim=ylim,...)
     if (isochron){
         fit <- isochron(x,type=3,plot=FALSE,
@@ -230,7 +230,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
-    pdat <- d[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
+    pdat <- y[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
     scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
