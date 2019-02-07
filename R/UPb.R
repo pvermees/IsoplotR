@@ -586,7 +586,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=diseq())
+            out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=d)
         }
     } else {
         search.range <- c(0,2/lambda('U238')[1])

@@ -15,7 +15,7 @@ do.diseq <- function(d=diseq()){
 wendt <- function(tt,d=diseq()){
     out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,dd1dl5=0,dd2dl8=0)
     if (do.diseq(d)){
-        out$d1 <- d1(tt,Pa1U5=d$Pa1U5)
+        gout$d1 <- d1(tt,Pa1U5=d$Pa1U5)
         out$d2 <- d2(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
         out$dd1dt <- dd1dt(tt,Pa1U5=d$Pa1U5)
         out$dd2dt <- dd2dt(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
@@ -86,7 +86,7 @@ Pb207Pb206.misfit <- function(tt,x,d=diseq()){
     (x - age_to_Pb207Pb206_ratio(tt,d=d)[,'76'])^2
 }
 # derivative of the 7/6 misfit function w.r.t. time
-dmf76dt <- function(x,t.76,diseq=FALSE,U48=1,Th0U8=0,Ra6U8=0,Pa1U5=0){
+dmf76dt <- function(x,t.76,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
