@@ -19,6 +19,8 @@ wendt <- function(tt,d=diseq()){
         out$d2 <- d2(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
         out$dd1dt <- dd1dt(tt,Pa1U5=d$Pa1U5)
         out$dd2dt <- dd2dt(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
+        out$d2d1dt2 <- d2d1dt2(tt,Pa1U5=d$Pa1U5)
+        out$d2d2dt2 <- d2d2dt2(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
         out$dd1dl5 <- dd1dl5(tt,Pa1U5=d$Pa1U5)
         out$dd2dl8 <- dd2dl8(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
     }
@@ -58,6 +60,12 @@ dd1dt <- function(tt,Pa1U5=0){
     l1 <- settings('lambda','Pa231')[1]*1000
     l5*d1(tt,Pa1U5=Pa1U5) + D0*l5*exp((l5-l1)*tt)
 }
+d2d1dt2 <- function(tt,Pa1U5=0){
+    D0 <- Pa1U5 - 1
+    l5 <- settings('lambda','U235')[1]
+    l1 <- settings('lambda','Pa231')[1]*1000
+    l5*l5*d1(tt,Pa1U5=Pa1U5) + D0*l5*(l5-l1)*exp((l5-l1)*tt)
+}
 dd2dt <- function(tt,U48=1,Th0U8=0,Ra6U8=0){
     A0 <- U48 - 1
     B0 <- Th0U8 - 1
@@ -72,6 +80,23 @@ dd2dt <- function(tt,U48=1,Th0U8=0,Ra6U8=0){
     K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
     out <- (l8-l4)*K1*exp((l8-l4)*tt) + (l8-l0)*K2*exp((l8-l0)*tt) +
            (l8-l6)*K3*exp((l8-l6)*tt) + K4*exp(l8*tt)
+    out
+}
+d2d2dt2 <- function(tt,U48=1,Th0U8=0,Ra6U8=0){
+    A0 <- U48 - 1
+    B0 <- Th0U8 - 1
+    C0 <- Ra6U8 - 1    
+    l6 <- settings('lambda','Ra226')[1]*1000
+    l0 <- settings('lambda','Th230')[1]*1000
+    l4 <- settings('lambda','U234')[1]*1000
+    l8 <- settings('lambda','U238')[1]
+    K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
+    K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
+    K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
+    K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
+    out <- (l8-l4)*(l8-l4)*K1*exp((l8-l4)*tt) +
+        (l8-l0)*(l8-l0)*K2*exp((l8-l0)*tt) +
+        (l8-l6)*(l8-l6)*K3*exp((l8-l6)*tt) + K4*l8*exp(l8*tt)
     out
 }
 diseq.75.misfit <- function(x,tt,d){

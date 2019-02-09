@@ -230,7 +230,7 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
                                        'Pb206U238','errPb206U238','rhoXY'))
         } else if (x$format %in% c(2,5,6)){
             for (i in 1:ns){
-                samp <- wetherill(x,i=i,exterr=FALSE)
+                samp <- wetherill(x,i=i)
                 out[i,1] <- samp$x['Pb207U235']
                 out[i,2] <- sqrt(samp$cov['Pb207U235','Pb207U235'])
                 out[i,3] <- samp$x['Pb206U238']
@@ -244,7 +244,7 @@ data2york.UPb <- function(x,wetherill=TRUE,...){
                                        'Pb207Pb206','errPb207Pb206','rhoXY'))
         } else if (x$format %in% c(1,3,4,6)){
             for (i in 1:ns){
-                samp <- tera.wasserburg(x,i=i,exterr=FALSE)
+                samp <- tera.wasserburg(x,i=i)
                 out[i,1] <- samp$x['U238Pb206']
                 out[i,2] <- sqrt(samp$cov['U238Pb206','U238Pb206'])
                 out[i,3] <- samp$x['Pb207Pb206']

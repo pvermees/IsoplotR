@@ -42,35 +42,29 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     colnames(out$err) <- labels
     out
 }
-concordia.intersection.york <- function(x,exterr=FALSE,d=diseq()){
-    y <- data2york(x,wetherill=FALSE)
-    fit <- york(y)
-    concordia.intersection.ab(fit$a[1],fit$b[1],exterr=exterr,d=d)
-}
 concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,d=diseq()){
-    out <- list()
     l8 <- lambda('U238')[1]
     ta <- get.Pb207Pb206.age(a,d=d)[1]
-    out$x <- c(1,a) # tl, 7/6 intercept
-    if (wetherill) names(out$x) <- c('t[l]','t[u]')
-    else names(out$x) <- c('t[l]','76i')
+    out <- c(1,a) # tl, 7/6 intercept
+    if (wetherill) names(out) <- c('t[l]','t[u]')
+    else names(out) <- c('t[l]','76i')
     if (b<0) { # negative slope => two intersections with concordia line
         tb <- get.Pb206U238.age(-b/a,d=d)[1]
         search.range <- c(tb,ta)
         midpoint <- stats::optimize(intersection.misfit.york,
                                     search.range,a=a,b=b,d=d)$minimum
         search.range[2] <- midpoint
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                        interval=search.range,a=a,b=b,d=d)$root
+        out['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                      interval=search.range,a=a,b=b,d=d)$root
         if (wetherill){
             search.range <- c(midpoint,ta)
-            out$x['t[u]'] <- stats::uniroot(intersection.misfit.york,
-                                            interval=search.range,a=a,b=b,d=d)$root
+            out['t[u]'] <- stats::uniroot(intersection.misfit.york,
+                                          interval=search.range,a=a,b=b,d=d)$root
         }   
     } else {
         search.range <- c(ta,2/l8)
-        out$x['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                        interval=search.range,a=a,b=b,d=d)$root
+        out['t[l]'] <- stats::uniroot(intersection.misfit.york,
+                                      interval=search.range,a=a,b=b,d=d)$root
     }
     out
 }
@@ -88,29 +82,29 @@ twfit2wfit <- function(fit,x,d=diseq()){
     if (x$format<4){
         a0 <- 1
         b0 <- fit$par['76i']
-        ttt <- get.Pb207Pb206.age(b0,d=d)
         E[c(1,3),c(1,3)] <- fit$cov
     } else {
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
-        ttt <- get.Pb207Pb206.age(b0/a0,d=d)
         E <- fit$cov
     }
     disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
     if (conc.slope > disc.slope){
-        search.range <- c(tt+buffer,ttt)
+        search.range <- c(tt+buffer,10000)
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,d=d)$root
+                             t2=tt,a0=a0,b0=b0,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                             Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
     } else {
-        search.range <- c(ttt,tt-buffer)
+        search.range <- c(-1000,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,d=d)$root
+                             t2=tt,a0=a0,b0=b0,diseq=diseq,U48=U48,Th0U8=Th0U8,
+                             Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
         tu <- tt
     }
-    du <- wendt(tt=tu,d=diseq())
-    dl <- wendt(tt=tl,d=diseq())
+    du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+    dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
     XX <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
     YY <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
     BB <- a0/(b0*U)

@@ -1,4 +1,4 @@
-wetherill <- function(x,i=NA,exterr=FALSE){
+wetherill <- function(x,i){
     out <- list()
     if (x$format %in% c(1,3)){
         labels <- c('Pb207U235','Pb206U238')
@@ -14,15 +14,12 @@ wetherill <- function(x,i=NA,exterr=FALSE){
         Pb207U235 <- U238U235*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
         Pb206U238 <- 1/x$x[i,'U238Pb206']
         out$x <- c(Pb207U235,Pb206U238)
-        J <- matrix(0,2,3)
-        E <- matrix(0,3,3)
-        E[3,3] <- iratio('U238U235')[2]^2
+        J <- matrix(0,2,2)
+        E <- matrix(0,2,2)
         J[1,1] <- -Pb207U235/x$x[i,'U238Pb206']
         J[1,2] <- U238U235/x$x[i,'U238Pb206']
-        if (exterr) J[1,3] <- x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
         J[2,1] <- -1/x$x[i,'U238Pb206']^2
-        E[1:2,1:2] <- cor2cov2(x$x[i,'errU238Pb206'],
-                              x$x[i,'errPb207Pb206'],x$x[i,'rhoXY'])
+        E <- cor2cov2(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],x$x[i,'rhoXY'])
         out$cov <- J %*% E %*% t(J)
     } else if (x$format == 4){
         labels <- c('Pb207U235','Pb206U238','Pb204U238')
@@ -41,18 +38,16 @@ wetherill <- function(x,i=NA,exterr=FALSE){
         Pb206U238 <- 1/x$x[i,'U238Pb206']
         Pb204U238 <- x$x[i,'Pb204Pb206']/x$x[i,'U238Pb206']
         out$x <- c(Pb207U235,Pb206U238,Pb204U238)
-        J <- matrix(0,3,4)
-        E <- matrix(0,4,4)
-        E[4,4] <- iratio('U238U235')[2]^2
+        J <- matrix(0,3,3)
+        E <- matrix(0,3,3)
         J[1,1] <- -Pb207U235/x$x[i,'U238Pb206']
         J[1,2] <- U238U235/x$x[i,'U238Pb206']
-        if (exterr) J[1,4] <- x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
         J[2,1] <- -1/x$x[i,'U238Pb206']^2
         J[3,1] <- Pb204U238/x$x[i,'U238Pb206']
         J[3,3] <- 1/x$x[i,'U238Pb206']
-        E[1:3,1:3] <- cor2cov3(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],
-                               x$x[i,'errPb204Pb206'],x$x[i,'rhoXY'],
-                               x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+        E <- cor2cov3(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],
+                      x$x[i,'errPb204Pb206'],x$x[i,'rhoXY'],
+                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
         out$cov <- J %*% E %*% t(J)        
     } else if (x$format == 6){
         labels <- c('Pb207U235','Pb206U238','Pb204U238')
@@ -82,22 +77,19 @@ wetherill <- function(x,i=NA,exterr=FALSE){
     class(out) <- "wetherill"
     out
 }
-tera.wasserburg <- function(x,i,exterr=FALSE){
+tera.wasserburg <- function(x,i){
     out <- list()
     if (x$format==1){
         labels <- c('U238Pb206','Pb207Pb206')
         U238U235 <- iratio('U238U235')[1]
         U238Pb206 <- 1/x$x[i,'Pb206U238']
         Pb207Pb206 <- x$x[i,'Pb207U235']/(x$x[i,'Pb206U238']*U238U235)
-        J <- matrix(0,2,3)
-        E <- matrix(0,3,3)
-        E[3,3] <- iratio('U238U235')[2]^2
+        J <- matrix(0,2,2)
+        E <- matrix(0,2,2)
         J[1,2] <- -1/x$x[i,'Pb206U238']^2
         J[2,1] <- 1/(x$x[i,'Pb206U238']*U238U235)
         J[2,2] <- -Pb207Pb206/x$x[i,'Pb206U238']
-        if (exterr) J[2,3] <- -Pb207Pb206/U238U235
-        E[1:2,1:2] <- cor2cov2(x$x[i,'errPb207U235'],
-                              x$x[i,'errPb206U238'],x$x[i,'rhoXY'])
+        E <- cor2cov2(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],x$x[i,'rhoXY'])
         out$x <- c(U238Pb206,Pb207Pb206)
         out$cov <- J %*% E %*% t(J)
     } else if (x$format == 2){
@@ -123,18 +115,16 @@ tera.wasserburg <- function(x,i,exterr=FALSE){
         U238Pb206 <- 1/x$x[i,'Pb206U238']
         Pb207Pb206 <- x$x[i,'Pb207U235']/(x$x[i,'Pb206U238']*U238U235)
         Pb204Pb206 <- x$x[i,'Pb204U238']/x$x[i,'Pb206U238']
-        J <- matrix(0,3,4)
-        E <- matrix(0,4,4)
-        E[4,4] <- iratio('U238U235')[2]^2
+        J <- matrix(0,3,3)
+        E <- matrix(0,3,3)
         J[1,2] <- -1/x$x[i,'Pb206U238']^2
         J[2,1] <- 1/(x$x[i,'Pb206U238']*U238U235)
         J[2,2] <- -Pb207Pb206/x$x[i,'Pb206U238']
-        if (exterr) J[2,4] <- -Pb207Pb206/U238U235
         J[3,2] <- -Pb204Pb206/x$x[i,'Pb206U238']
         J[3,3] <- 1/x$x[i,'Pb206U238']
-        E[1:3,1:3] <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
-                               x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
-                               x$x[i,'rhoXZ'],x$x[i,'rhoXZ'])
+        E <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
+                      x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
+                      x$x[i,'rhoXZ'],x$x[i,'rhoXZ'])
         out$x <- c(U238Pb206,Pb207Pb206,Pb204Pb206)
         out$cov <- J %*% E %*% t(J)
     } else if (x$format == 5){

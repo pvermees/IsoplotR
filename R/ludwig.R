@@ -182,7 +182,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),d=diseq()){
         xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         intercept <- xyfit$coef[1]
         slope <- xyfit$coef[2]
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=d)$x
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=d)
     } else if (is.na(anchor[[2]])){
         if (x$format < 4){
             b0a0 <- settings('iratio','Pb207Pb206')[1]
@@ -194,7 +194,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),d=diseq()){
         intercept <- b0a0
         xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
         slope <- xyfit$coef
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=d)$x
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=d)
     } else if (is.numeric(anchor[[2]])){
         TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=d)
         xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
@@ -348,39 +348,38 @@ fisher_lud_2D <- function(x,fit,d=diseq()){
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     ones <- matrix(1,ns,1)
-    B <-  (exp(l5*tt)-1)/U - a0*(exp(l8*tt)-1)
-    C <- -t(l$X)%*%l$omega12 + t(l$x)%*%l$omega12 + t(l$x)%*%l$omega21 -
-        t(l$Y)%*%l$omega22 + t(ones)%*%l$omega22*a0 + 2*t(l$x)%*%l$omega22*B
-    D <- -t(l$X)%*%l$omega12%*%l$x + t(l$x)%*%l$omega12%*%l$x -
+    D <- wendt(tt,d=d)
+    BB <-  (exp(l5*tt)-1+D$d1)/U - a0*(exp(l8*tt)-1+D$d2)
+    CC <- -t(l$X)%*%l$omega12 + t(l$x)%*%l$omega12 + t(l$x)%*%l$omega21 -
+        t(l$Y)%*%l$omega22 + t(ones)%*%l$omega22*a0 + 2*t(l$x)%*%l$omega22*BB
+    DD <- -t(l$X)%*%l$omega12%*%l$x + t(l$x)%*%l$omega12%*%l$x -
         t(l$Y)%*%l$omega22%*%l$x + t(ones)%*%l$omega22%*%l$x*a0 -
         t(l$x)%*%l$omega21%*%l$X + t(l$x)%*%l$omega21%*%l$x -
         t(l$x)%*%l$omega22%*%l$Y + t(l$x)%*%l$omega22%*%ones*a0 +
-        2*t(l$x)%*%l$omega22%*%l$x*B
-    dBdt <- l5*exp(l5*tt)/U - a0*exp(l8*tt)*l8
-    dBda0 <- -(exp(l8*tt)-1)
-    d2Bdtda0 <- exp(l8*tt)*l8
-    d2Bda0dt <- exp(l8*tt)*l8
-    d2Bdt2 <- (l5^2)*exp(l5*tt)/U - a0*exp(l8*tt)*(l8^2)
+        2*t(l$x)%*%l$omega22%*%l$x*BB
+    dBdt <- (l5*exp(l5*tt)+D$dd1dt)/U - a0*(l8*exp(l8*tt)+D$dd2dt)
+    dBda0 <- -(exp(l8*tt)-1+D$d2)
+    d2Bda0dt <- -(l8*exp(l8*tt)+D$dd2dt)
+    d2Bdtda0 <- d2Bda0dt
+    d2Bdt2 <- ((l5^2)*exp(l5*tt)+D$d2d1dt2)/U - a0*(exp(l8*tt)*(l8^2)+D$d2d2dt2)
     d2Bda02 <- 0
     dDda0 <- t(ones)%*%l$omega22%*%l$x +
         t(l$x)%*%l$omega22%*%ones + 2*t(l$x)%*%l$omega22%*%l$x*dBda0
     ns <- length(x)
     out <- matrix(0,ns+2,ns+2)
     out[1:ns,1:ns] <- # d2S/dx2
-        2*(l$omega11 + l$omega21*B + l$omega12*B + l$omega22*B^2)
+        2*(l$omega11 + l$omega21*BB + l$omega12*BB + l$omega22*BB^2)
 
     out[ns+2,1:ns] <-   # d2S/dxda0
-        2*(C*dBda0 + t(ones)%*%l$omega21 + t(ones)%*%l$omega22*B)
+        2*(CC*dBda0 + t(ones)%*%l$omega21 + t(ones)%*%l$omega22*BB)
     out[ns+2,ns+2] <- # d2S/da02
-        2*(t(ones)%*%l$omega22%*%ones +
-           t(ones)%*%l$omega22%*%l$x*dBda0 +
-           t(l$x)%*%l$omega22%*%ones*dBda0 +
-           t(l$x)%*%l$omega22%*%l$x*(dBda0^2))
-    out[ns+1,1:ns] <- 2*C*dBdt # d2S/dxdt
+        2*(t(ones)%*%l$omega22%*%ones + t(ones)%*%l$omega22%*%l$x*dBda0 +
+           t(l$x)%*%l$omega22%*%ones*dBda0 + t(l$x)%*%l$omega22%*%l$x*(dBda0^2))
+    out[ns+1,1:ns] <- 2*CC*dBdt # d2S/dxdt
     out[ns+1,ns+1] <- # d2S/dt2
-        D*d2Bdt2 + 2*t(l$x)%*%l$omega22%*%l$x*(dBdt^2)
+        DD*d2Bdt2 + 2*t(l$x)%*%l$omega22%*%l$x*(dBdt^2)
     out[ns+1,ns+2] <- # d2S/dt0da0
-        D*d2Bdtda0 + dDda0*dBdt
+        DD*d2Bdtda0 + dDda0*dBdt
     out[1:ns,ns+1] <- t(out[ns+1,1:ns]) # d2S/dtdx
     out[1:ns,ns+2] <- t(out[ns+2,1:ns]) # d2S/da0dx
     out[ns+2,ns+1] <- out[ns+1,ns+2]
@@ -486,14 +485,14 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,d=diseq()){
     f1 <- exp(l5[1]*tt)-1 + D$d1
     f2 <- exp(l8[1]*tt)-1 + D$d2
     B <-  f1/U - a0*f2
-    dBdl5 <- tt*exp(l5[1]*tt)/U + D$d1*(tt-1/l5[1])/U
-    dBdl8 <- -a0*tt*exp(l8[1]*tt) + D$d2*(tt-1/l8[1])/U
+    dBdl5 <- (tt*exp(l5[1]*tt)+D$dd1dl5)/U
+    dBdl8 <- -a0*(tt*exp(l8[1]*tt)+D$dd2dl8)
     E <- matrix(0,2*ns+2,2*ns+2)
     J <- matrix(0,2*ns,2*ns+2)
     X <- matrix(0,ns,1)
     Y <- matrix(0,ns,1)
     for (i in 1:ns){
-        XY <- tera.wasserburg(x,i,exterr=FALSE)
+        XY <- tera.wasserburg(x,i)
         X[i] <- XY$x['U238Pb206']
         Y[i] <- XY$x['Pb207Pb206']
         E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov
@@ -542,7 +541,7 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,d=diseq()){
     Z <- rep(0,ns)
     D <- wendt(tt=tt,d=d)
     for (i in 1:ns){
-        wd <- wetherill(x,i=i,exterr=FALSE)
+        wd <- wetherill(x,i=i)
         Z[i] <- wd$x['Pb204U238']
         R[i] <- wd$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - D$d1
         r[i] <- wd$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - D$d2
