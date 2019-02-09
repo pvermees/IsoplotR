@@ -672,7 +672,8 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,d=diseq(
     out
 }
 
-filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),exterr=TRUE,d=diseq()){
+filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+                            exterr=TRUE,d=diseq()){
     tt <- UPb.age(x,exterr=exterr,conc=(type==5),d=d)
     do.76 <- tt[,'t.68'] > cutoff.76
     if (any(is.na(cutoff.disc))) {

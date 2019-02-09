@@ -15,7 +15,7 @@ do.diseq <- function(d=diseq()){
 wendt <- function(tt,d=diseq()){
     out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,dd1dl5=0,dd2dl8=0)
     if (do.diseq(d)){
-        gout$d1 <- d1(tt,Pa1U5=d$Pa1U5)
+        out$d1 <- d1(tt,Pa1U5=d$Pa1U5)
         out$d2 <- d2(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
         out$dd1dt <- dd1dt(tt,Pa1U5=d$Pa1U5)
         out$dd2dt <- dd2dt(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
