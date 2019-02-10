@@ -536,7 +536,7 @@ initial.concordia.age <- function(x,d=diseq()){
     y0 <- x$x['Pb207Pb206']
     a <- y0 - b*x0
     fit <- concordia.intersection.ab(a,b,exterr=FALSE,d=d)
-    fit$x[1]
+    fit[1]
 }
 
 mswd.concordia <- function(x,ccw,tt,exterr=TRUE){

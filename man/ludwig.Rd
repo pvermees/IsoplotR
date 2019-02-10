@@ -61,9 +61,6 @@ item If the first element is \code{TRUE} and the second element is a
 number, then the discordia line is forced to intersect the
 concordia line at an age equal to that number.
 }}
-
-\item{d}{secular disequilibrium correction. See \link{diseq} for
-further details.}
 }
 \value{
 \describe{

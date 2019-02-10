@@ -1,5 +1,31 @@
+#' Data object for secular disequilibrium correction of U-Pb data
+#'
+#' @details Returns a list of U-series activity ratios for the initial
+#'     disequilibrium correction of U-Pb data that are very young
+#'     and/or very precise.
+#'
+#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratio
+#' @param Th0U8 the initial \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
+#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
+#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
+#' @return an object of class \code{diseq}, i.e. a list with the above
+#'     items.  If any of the four input arguments are not \code{NULL},
+#'     then the omitted arguments are replaced with zero values.
+#' 
+#' @examples
+#' f <- system.file("UPb5.csv",package="IsoplotR")
+#' UPb <- read.data('../inst/UPb5.csv',method='U-Pb',format=5,d=diseq(U48=10))
+#' concordia(UPb,wetherill=FALSE,show.age=2,xlim=c(-5,30),ylim=c(0,1))
+#' 
+#' @references
+#' Wendt, I. and Carl, C., 1985. U/Pb dating of discordant 0.1 Ma old
+#' secondary U minerals. Earth and Planetary Science Letters, 73(2-4),
+#' pp.278-284.
+#' 
+#' @export
 diseq <- function(U48=NULL,Th0U8=NULL,Ra6U8=NULL,Pa1U5=NULL){
     out <- list(U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    class(out) <- 'diseq'
     isnull <- c(is.null(U48),is.null(Th0U8),is.null(Ra6U8),is.null(Pa1U5))
     for (i in 1:4){
         if (isnull[i] & any(!isnull[-i])) out[[i]] <- 0

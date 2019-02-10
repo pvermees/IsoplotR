@@ -51,6 +51,807 @@ Type 'q()' to quit R.
 > 
 > data(examples)
 > tUPb <- age(examples$UPb,type=1)
-Error in fit$x : $ operator is invalid for atomic vectors
-Calls: age ... concordia.age -> concordia.age.UPb -> initial.concordia.age
-Execution halted
+> tconc <- age(examples$UPb,type=2)
+> tdisc <- age(examples$UPb,type=3)
+> tArAr <- age(examples$ArAr)
+> tiso <- age(examples$ArAr,isochron=TRUE,i2i=TRUE)
+> tcentral <- age(examples$FT1,central=TRUE)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("age", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("agespectrum")
+> ### * agespectrum
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: agespectrum
+> ### Title: Plot a (40Ar/39Ar) release spectrum
+> ### Aliases: agespectrum agespectrum.default agespectrum.ArAr
+> 
+> ### ** Examples
+> 
+> data(examples)
+> agespectrum(examples$ArAr,ylim=c(0,80))
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("agespectrum", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("cad")
+> ### * cad
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: cad
+> ### Title: Plot continuous data as cumulative age distributions
+> ### Aliases: cad cad.default cad.detritals cad.UPb cad.PbPb cad.ArAr
+> ###   cad.KCa cad.ThU cad.ReOs cad.SmNd cad.RbSr cad.LuHf cad.UThHe
+> ###   cad.fissiontracks
+> 
+> ### ** Examples
+> 
+> data(examples)
+> cad(examples$DZ,verticals=FALSE,pch=20)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("cad", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("central")
+> ### * central
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: central
+> ### Title: Calculate U-Th-He and fission track central ages and
+> ###   compositions
+> ### Aliases: central central.default central.UThHe central.fissiontracks
+> 
+> ### ** Examples
+> 
+> data(examples)
+> print(central(examples$UThHe)$age)
+        t      s[t]     ci[t]   disp[t] 
+6.4224881 0.1115940 0.2220370 0.3200905 
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("concordia")
+> ### * concordia
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: concordia
+> ### Title: Concordia diagram
+> ### Aliases: concordia
+> 
+> ### ** Examples
+> 
+> data(examples)
+> concordia(examples$UPb,show.age=2)
+> 
+> dev.new()
+> concordia(examples$UPb,wetherill=FALSE,
++           xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
++           ticks=249:254,exterr=TRUE)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots1.pdf")
+> concordia(examples$UPb,wetherill=FALSE,show.age=2,anchor=list(TRUE,0))
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("concordia", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("data2york")
+> ### * data2york
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: data2york
+> ### Title: Prepare geochronological data for York regression
+> ### Aliases: data2york data2york.default data2york.UPb data2york.ArAr
+> ###   data2york.KCa data2york.PbPb data2york.PD data2york.UThHe
+> ###   data2york.ThU
+> 
+> ### ** Examples
+> 
+> f <- system.file("RbSr1.csv",package="IsoplotR")
+> dat <- read.csv(f)
+> yorkdat <- data2york(dat)
+> fit <- york(yorkdat)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("data2york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("diseq")
+> ### * diseq
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: diseq
+> ### Title: Data object for secular disequilibrium correction of U-Pb data
+> ### Aliases: diseq
+> 
+> ### ** Examples
+> 
+> f <- system.file("UPb5.csv",package="IsoplotR")
+> UPb <- read.data('../inst/UPb5.csv',method='U-Pb',format=5,d=diseq(U48=10))
+> concordia(UPb,wetherill=FALSE,show.age=2,xlim=c(-5,30),ylim=c(0,1))
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
+  NA/Inf replaced by maximum positive value
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("diseq", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("ellipse")
+> ### * ellipse
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: ellipse
+> ### Title: Get coordinates of error ellipse for plotting
+> ### Aliases: ellipse
+> 
+> ### ** Examples
+> 
+> x = 99; y = 101;
+> covmat <- matrix(c(1,0.9,0.9,1),nrow=2)
+> ell <- ellipse(x,y,covmat)
+> plot(c(90,110),c(90,110),type='l')
+> polygon(ell,col=rgb(0,1,0,0.5))
+> points(x,y,pch=21,bg='black')
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("ellipse", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("evolution")
+> ### * evolution
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: evolution
+> ### Title: Th-U evolution diagram
+> ### Aliases: evolution
+> 
+> ### ** Examples
+> 
+> data(examples)
+> evolution(examples$ThU)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots2.pdf")
+> evolution(examples$ThU,transform=TRUE,
++           isochron=TRUE,model=1)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("evolution", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("examples")
+> ### * examples
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: examples
+> ### Title: Example datasets for testing 'IsoplotR'
+> ### Aliases: examples
+> 
+> ### ** Examples
+> 
+> data(examples)
+> 
+> concordia(examples$UPb)
+> 
+> agespectrum(examples$ArAr)
+> 
+> isochron(examples$ReOs)
+> 
+> radialplot(examples$FT1)
+> 
+> helioplot(examples$UThHe)
+> 
+> evolution(examples$ThU)
+> 
+> kde(examples$DZ)
+> 
+> radialplot(examples$LudwigMixture)
+> 
+> agespectrum(examples$LudwigSpectrum)
+> 
+> weightedmean(examples$LudwigMean)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("examples", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("helioplot")
+> ### * helioplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: helioplot
+> ### Title: Visualise U-Th-He data on a logratio plot or ternary diagram
+> ### Aliases: helioplot
+> 
+> ### ** Examples
+> 
+> data(examples)
+> helioplot(examples$UThHe)
+> dev.new()
+dev.new(): using pdf(file="Rplots3.pdf")
+> helioplot(examples$UThHe,logratio=FALSE)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("helioplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("isochron")
+> ### * isochron
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: isochron
+> ### Title: Calculate and plot isochrons
+> ### Aliases: isochron isochron.default isochron.ArAr isochron.KCa
+> ###   isochron.PbPb isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf
+> ###   isochron.ThU isochron.UThHe
+> 
+> ### ** Examples
+> 
+> data(examples)
+> isochron(examples$ArAr)
+> 
+> fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots4.pdf")
+> isochron(examples$ThU,type=4)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("isochron", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("kde")
+> ### * kde
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: kde
+> ### Title: Create (a) kernel density estimate(s)
+> ### Aliases: kde kde.default kde.UPb kde.detritals kde.PbPb kde.ArAr
+> ###   kde.KCa kde.ThU kde.ReOs kde.SmNd kde.RbSr kde.LuHf kde.UThHe
+> ###   kde.fissiontracks
+> 
+> ### ** Examples
+> 
+> kde(examples$UPb)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots5.pdf")
+> kde(examples$FT1,log=TRUE)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots6.pdf")
+> kde(examples$DZ,from=1,to=3000,kernel="epanechnikov")
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("kde", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("ludwig")
+> ### * ludwig
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: ludwig
+> ### Title: Linear regression of U-Pb data with correlated errors, taking
+> ###   into account decay constant uncertainties.
+> ### Aliases: ludwig ludwig.default ludwig.UPb
+> 
+> ### ** Examples
+> 
+> f <- system.file("UPb4.csv",package="IsoplotR")
+> d <- read.data(f,method="U-Pb",format=4)
+> fit <- ludwig(d)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("ludwig", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("mds")
+> ### * mds
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: mds
+> ### Title: Multidimensional Scaling
+> ### Aliases: mds mds.default mds.detritals
+> 
+> ### ** Examples
+> 
+> data(examples)
+> mds(examples$DZ,nnlines=TRUE,pch=21,cex=5)
+initial  value 10.433734 
+iter   5 value 8.523890
+iter  10 value 8.154735
+iter  15 value 8.048099
+iter  20 value 7.871811
+iter  20 value 7.868858
+iter  25 value 7.642453
+iter  25 value 7.640889
+iter  25 value 7.640383
+final  value 7.640383 
+converged
+> dev.new()
+dev.new(): using pdf(file="Rplots7.pdf")
+> mds(examples$DZ,shepard=TRUE)
+initial  value 10.433734 
+iter   5 value 8.523890
+iter  10 value 8.154735
+iter  15 value 8.048099
+iter  20 value 7.871811
+iter  20 value 7.868858
+iter  25 value 7.642453
+iter  25 value 7.640889
+iter  25 value 7.640383
+final  value 7.640383 
+converged
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("mds", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("peakfit")
+> ### * peakfit
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: peakfit
+> ### Title: Finite mixture modelling of geochronological datasets
+> ### Aliases: peakfit peakfit.default peakfit.fissiontracks peakfit.UPb
+> ###   peakfit.PbPb peakfit.ArAr peakfit.KCa peakfit.ReOs peakfit.SmNd
+> ###   peakfit.RbSr peakfit.LuHf peakfit.ThU peakfit.UThHe
+> 
+> ### ** Examples
+> 
+> data(examples)
+> peakfit(examples$FT1,k=2)
+$peaks
+              1         2
+t     103.45852 103.46036
+s[t]   13.65063  11.53875
+ci[t]  26.75474  22.61554
+
+$props
+                1            2
+p       0.4118593    0.5881407
+s[p] 4143.5647623 4143.5647623
+
+$L
+[1] -71.94616
+
+$legend
+[1] "Peak 1: 103.5 ± 13.7 | 26.8 (41.2%)" "Peak 2: 103.5 ± 11.5 | 22.6 (58.8%)"
+
+> 
+> peakfit(examples$LudwigMixture,k='min')
+$L
+[1] -194.9785
+
+$peaks
+             [,1]
+t     259.7309363
+s[t]    0.2723890
+ci[t]   0.5338727
+
+$legend
+[1] "Minimum: 259.73±0.27 | 0.53"
+
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("peakfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("radialplot")
+> ### * radialplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: radialplot
+> ### Title: Visualise heteroscedastic data on a radial plot
+> ### Aliases: radialplot radialplot.default radialplot.fissiontracks
+> ###   radialplot.UPb radialplot.PbPb radialplot.ArAr radialplot.KCa
+> ###   radialplot.UThHe radialplot.ReOs radialplot.SmNd radialplot.RbSr
+> ###   radialplot.LuHf radialplot.ThU
+> 
+> ### ** Examples
+> 
+> data(examples)
+> radialplot(examples$FT1)
+> 
+> dev.new()
+dev.new(): using pdf(file="Rplots8.pdf")
+> radialplot(examples$LudwigMixture,k='min')
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("radialplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("read.data")
+> ### * read.data
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: read.data
+> ### Title: Read geochronology data
+> ### Aliases: read.data read.data.default read.data.data.frame
+> ###   read.data.matrix
+> 
+> ### ** Examples
+> 
+> 
+> f1 <- system.file("UPb1.csv",package="IsoplotR")
+> file.show(f1) # inspect the contents of 'UPb1.csv'
+Pb207U235,sePb207U235,Pb206U238,sePb206U238,rho
+.2819,.00036,.03985,.000040,0.79
+.2814,.00092,.03980,.000040,0.31
+.2814,.00083,.03978,.000100,0.85
+.2812,.00061,.03976,.000050,0.58
+.2814,.00043,.03972,.000040,0.65
+.2811,.00080,.03971,.000100,0.88
+.2813,.00067,.03967,.000040,0.43
+.2810,.00057,.03966,.000060,0.74
+.2816,.00043,.03974,.000040,0.65
+.2554,.00041,.03607,.000050,0.87
+
+> d1 <- read.data(f1,method="U-Pb",format=1)
+> concordia(d1)
+> 
+> f2 <- system.file("ArAr1.csv",package="IsoplotR")
+> d2 <- read.data(f2,method="Ar-Ar",format=1)
+> agespectrum(d2)
+> 
+> f3 <- system.file("ReOs1.csv",package="IsoplotR")
+> d3 <- read.data(f3,method="Re-Os",format=1)
+> isochron(d2)
+> 
+> f4 <- system.file("FT1.csv",package="IsoplotR")
+> d4 <- read.data(f4,method="fissiontracks",format=1)
+> radialplot(d4)
+> 
+> f5 <- system.file("UThSmHe.csv",package="IsoplotR")
+> d5 <- read.data(f5,method="U-Th-He")
+> helioplot(d5)
+> 
+> f6 <- system.file("ThU2.csv",package="IsoplotR")
+> d6 <- read.data(f6,method="Th-U",format=2)
+> evolution(d6)
+> 
+> #  one detrital zircon U-Pb file (detritals.csv)
+> f7 <- system.file("DZ.csv",package="IsoplotR")
+> d7 <- read.data(f7,method="detritals")
+> kde(d7)
+> 
+> #  four 'other' files (LudwigMixture.csv, LudwigSpectrum.csv,
+> #  LudwigMean.csv, LudwigKDE.csv)
+> f8 <- system.file("LudwigMixture.csv",package="IsoplotR")
+> d8 <- read.data(f8,method="other")
+> radialplot(d8)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("set.zeta")
+> ### * set.zeta
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: set.zeta
+> ### Title: Calculate the zeta calibration coefficient for fission track
+> ###   dating
+> ### Aliases: set.zeta
+> 
+> ### ** Examples
+> 
+> data(examples)
+> print(examples$FT1$zeta)
+[1] 350  10
+> FT <- set.zeta(examples$FT1,tst=c(250,5))
+> print(FT$zeta)
+[1] "855.5" "35.9" 
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("set.zeta", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("settings")
+> ### * settings
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: settings
+> ### Title: Load settings to and from json
+> ### Aliases: settings
+> 
+> ### ** Examples
+> 
+> # load and show the default constants that come with IsoplotR
+> json <- system.file("constants.json",package="IsoplotR")
+> settings(fname=json)
+> print(settings())
+[1] "{\"lambda\":{\"fission\":[8.5e-11,1e-12],\"U238\":[0.000155125,8.3e-08],\"U235\":[0.00098485,6.7e-07],\"U234\":[0.00282206,8e-07],\"Th232\":[4.95e-05,2.5e-06],\"Th230\":[0.0091705,1.6e-06],\"Pa231\":[0.021158,0.00071],\"Ra226\":[0.4332,0.0019],\"Rb87\":[1.3972e-05,4.5e-07],\"Re187\":[1.6689e-05,3.8e-08],\"Sm147\":[6.54e-06,4.9e-08],\"K40\":[0.00055305,1.32e-06],\"Lu176\":[1.867e-05,8e-08]},\"etchfact\":{\"apatite\":0.93,\"zircon\":1},\"imass\":{\"U\":[238.02891,3e-05],\"Rb\":[85.46776,0.00026],\"Rb85\":[84.9117924,2.7e-06],\"Rb87\":[86.9091828,2.8e-06],\"Sr\":[87.62,0.01],\"Sr84\":[83.913426,4e-06],\"Sr86\":[85.9092647,2.5e-06],\"Sr87\":[86.9088816,2.5e-06],\"Sr88\":[87.9056167,2.5e-06],\"Re\":[186.20679,0.00031],\"Re185\":[184.952955,3e-06],\"Re187\":[186.9557505,3e-06],\"Os\":[190.23,0.003],\"Os184\":[183.952491,3e-06],\"Os186\":[185.953838,3e-06],\"Os187\":[186.9557476,3e-06],\"Os188\":[187.9558357,3e-06],\"Os189\":[188.958145,3e-06],\"Os190\":[189.958445,3e-06],\"Os192\":[191.961479,4e-06],\"Sm\":[150.36,0.03],\"Nd\":[144.2415,0.0013],\"Lu\":[174.9668,1e-04],\"Hf\":[178.49,0.02]},\"iratio\":{\"Ar40Ar36\":[298.56,0.31],\"Ar38Ar36\":[0.1885,3e-04],\"Ca40Ca44\":[46.48,0.044],\"Rb85Rb87\":[2.59265,0.00085],\"Sr84Sr86\":[0.056549,7.15e-05],\"Sr87Sr86\":[0.69938,6e-05],\"Sr88Sr86\":[8.37861,0.001624],\"Re185Re187\":[0.59738,0.000195],\"Os184Os192\":[0.000485,0.00011],\"Os186Os192\":[0.03889,0.00011],\"Os187Os192\":[0.04817,3e-05],\"Os188Os192\":[0.32474,5e-05],\"Os189Os192\":[0.39593,4e-05],\"Os190Os192\":[0.64388,0.00045],\"Th230Th232\":[0,0],\"U234U238\":[0,0],\"U238U235\":[137.818,0.0225],\"Pb206Pb204\":[9.307,0],\"Pb207Pb204\":[10.294,0],\"Pb207Pb206\":[1.106,0],\"Pb208Pb204\":[29.476,0],\"Sm144Sm152\":[0.115117,0.000189],\"Sm147Sm152\":[0.561134,0.000622],\"Sm148Sm152\":[0.420634,0.000392],\"Sm149Sm152\":[0.516973,0.000393],\"Sm150Sm152\":[0.275438,0.000459],\"Sm154Sm152\":[0.850468,0.000484],\"Nd142Nd144\":[1.14101,7e-04],\"Nd143Nd144\":[0.51154,4e-04],\"Nd145Nd144\":[0.34848,0.00015],\"Nd146Nd144\":[0.72228,0.00051],\"Nd148Nd144\":[0.24186,3e-04],\"Nd150Nd144\":[0.23691,0.00042],\"Lu176Lu175\":[0.02668,1.3e-05],\"Hf174Hf177\":[0.00871,5e-05],\"Hf176Hf177\":[0.2829,0.003],\"Hf178Hf177\":[1.4671,1e-04],\"Hf179Hf177\":[0.7325,0],\"Hf180Hf177\":[1.88651,0.00012]},\"mindens\":{\"apatite\":3.22,\"zircon\":4.7},\"tracklength\":{\"apatite\":16.2,\"zircon\":10.6}}"
+> 
+> # use the decay constant of Kovarik and Adams (1932)
+> settings('lambda','U238',0.0001537,0.0000068)
+> print(settings('lambda','U238'))
+[1] 0.0001537 0.0000068
+> 
+> # returns the 238U/235U ratio of Hiess et al. (2012):
+> print(settings('iratio','U238U235'))
+[1] 137.8180   0.0225
+> # use the 238U/235U ratio of Steiger and Jaeger (1977):
+> settings('iratio','U238U235',138.88,0)
+> print(settings('iratio','U238U235'))
+[1] 138.88   0.00
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("settings", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("titterington")
+> ### * titterington
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: titterington
+> ### Title: Linear regression of X,Y,Z-variables with correlated errors
+> ### Aliases: titterington
+> 
+> ### ** Examples
+> 
+> d <- matrix(c(0.1677,0.0047,1.105,0.014,0.782,0.015,0.24,0.51,0.33,
++               0.2820,0.0064,1.081,0.013,0.798,0.015,0.26,0.63,0.32,
++               0.3699,0.0076,1.038,0.011,0.819,0.015,0.27,0.69,0.30,
++               0.4473,0.0087,1.051,0.011,0.812,0.015,0.27,0.73,0.30,
++               0.5065,0.0095,1.049,0.010,0.842,0.015,0.27,0.76,0.29,
++               0.5520,0.0100,1.039,0.010,0.862,0.015,0.27,0.78,0.28),
++             nrow=6,ncol=9)
+> colnames(d) <- c('X','sX','Y','sY','Z','sZ','rXY','rXZ','rYZ')
+> titterington(d)
+$par
+         a          b          A          B 
+ 0.6523258 -1.1448293  0.6287848 -0.8317666 
+
+$cov
+              a            b             A            B
+a -0.0014659472  0.002534783 -0.0002053377  0.000577532
+b  0.0025347834 -0.029356631 -0.0025913430  0.006835091
+A -0.0002053377 -0.002591343  0.0015645768 -0.003932355
+B  0.0005775320  0.006835091 -0.0039323548  0.010804817
+
+$df
+[1] 8
+
+$mswd
+        b 
+-19.35144 
+
+$p.value
+[1] 1
+
+$type
+[1] "titterington"
+
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("titterington", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("weightedmean")
+> ### * weightedmean
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: weightedmean
+> ### Title: Calculate the weighted mean age
+> ### Aliases: weightedmean weightedmean.default weightedmean.UPb
+> ###   weightedmean.PbPb weightedmean.ThU weightedmean.ArAr weightedmean.KCa
+> ###   weightedmean.ReOs weightedmean.SmNd weightedmean.RbSr
+> ###   weightedmean.LuHf weightedmean.UThHe weightedmean.fissiontracks
+> 
+> ### ** Examples
+> 
+> ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
+> errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
+> weightedmean(cbind(ages,errs))
+> 
+> data(examples)
+> weightedmean(examples$LudwigMean)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("weightedmean", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("york")
+> ### * york
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: york
+> ### Title: Linear regression of X,Y-variables with correlated errors
+> ### Aliases: york
+> 
+> ### ** Examples
+> 
+>    X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
++           28.530,50.540,51.595,86.51,106.40,157.35)
+>    Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
++           .8642,.9584,.9617,1.135,1.230,1.490)
+>    n <- length(X)
+>    sX <- X*0.01
+>    sY <- Y*0.005
+>    rXY <- rep(0.8,n)
+>    dat <- cbind(X,sX,Y,sY,rXY)
+>    fit <- york(dat)
+>    covmat <- matrix(0,2,2)
+>    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
+>    for (i in 1:n){
++        covmat[1,1] <- sX[i]^2
++        covmat[2,2] <- sY[i]^2
++        covmat[1,2] <- rXY[i]*sX[i]*sY[i]
++        covmat[2,1] <- covmat[1,2]
++        ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
++        polygon(ell)
++    }
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  14.915 6.659 12.602 0 0.005 
+> grDevices::dev.off()
+pdf 
+  2 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')
