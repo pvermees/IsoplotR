@@ -244,9 +244,9 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         cix <- c(x,rev(x))
         ciy <- c(ll,rev(ul))
     } else {
-        X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'],d=diseq())[,'86']
-        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'],d=diseq())[,'76']
-        r75 <- age_to_Pb207U235_ratio(fit$x['t[l]'],d=diseq())[,'75']
+        X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'],d=d)[,'86']
+        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'],d=d)[,'76']
+        r75 <- age_to_Pb207U235_ratio(fit$x['t[l]'],d=d)[,'75']
         r68 <- 1/X[1]
         Y[2] <- fit$x['76']
         xl <- X[1]
