@@ -158,9 +158,9 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @rdname peakfit
 #' @export
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
-                        cutoff.disc=c(-15,5),d=diseq(),exterr=TRUE,
+                        cutoff.disc=c(-15,5),exterr=TRUE,
                         sigdig=2,log=TRUE,alpha=0.05,...){
-    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,d=d,
+    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,exterr=exterr,
                    sigdig=sigdig,log=log,alpha=alpha,...)
 }
@@ -259,16 +259,15 @@ peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,sigdig=sigdig,log=log,alpha=alpha,...)
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                           d=diseq(),exterr=TRUE,sigdig=2,log=TRUE,
-                           i2i=FALSE,alpha=0.05,detritus=0,Th02=c(0,0),
-                           Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                           exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,alpha=0.05,
+                           detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (k<1) return(NULL)
     if (identical(k,'auto'))
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,
-                     cutoff.disc=cutoff.disc,d=d,detritus=detritus,
+                     cutoff.disc=cutoff.disc,detritus=detritus,
                      Th02=Th02,Th02U48=Th02U48)
     tt <- get.ages(x,i2i=i2i,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,d=d,detritus=detritus,
+                   cutoff.disc=cutoff.disc,detritus=detritus,
                    Th02=Th02,Th02U48=Th02U48)
     fit <- peakfit.default(tt,k=k,sigdig=sigdig,log=log,alpha=alpha)
     if (exterr){
@@ -499,13 +498,13 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
 }
 
 BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                    d=diseq(),exterr=TRUE,detritus=0,Th02=c(0,0),
+                    exterr=TRUE,detritus=0,Th02=c(0,0),
                     Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     n <- length(x)
     BIC <- Inf
     tryCatch({
         for (k in 1:max.k){
-            fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,d=d,
+            fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
                            cutoff.disc=cutoff.disc,exterr=exterr,
                            detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
             p <- 2*k-1

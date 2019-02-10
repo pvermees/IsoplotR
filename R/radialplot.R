@@ -205,18 +205,18 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
                            cutoff.76=1100,cutoff.disc=c(-15,5),
-                           d=diseq(),show.numbers=FALSE,pch=21,
+                           show.numbers=FALSE,pch=21,
                            levels=NA,clabel="",bg=c("yellow","red"),
                            col='black',markers=NULL,k=0,exterr=TRUE,
                            common.Pb=0,alpha=0.05,hide=NULL,
                            omit=NULL,omit.col=NA,...){
     if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb,d=d)
+        X <- common.Pb.correction(x,option=common.Pb)
     else
         X <- x
     radialplot_helper(X,from=from,to=to,t0=t0,
                       transformation=transformation,type=type,
-                      cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,d=d,
+                      cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                       show.numbers=show.numbers,pch=pch,levels=levels,
                       clabel=clabel,bg=bg,col=col,markers=markers,
                       k=k,exterr=exterr,alpha=alpha,hide=hide,
@@ -402,7 +402,7 @@ radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
 }
 radialplot_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                               type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                              d=diseq(),show.numbers=FALSE,pch=21,levels=NA,
+                              show.numbers=FALSE,pch=21,levels=NA,
                               clabel="",bg=c("yellow","red"),col='black',
                               markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
                               alpha=0.05,units='Ma',detritus=0,Th02=c(0,0),
@@ -410,12 +410,12 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                               hide=NULL,omit=NULL,omit.col=NA,...){
     x2calc <- clear(x,hide,omit)
     peaks <- peakfit(x2calc,k=k,exterr=exterr,i2i=i2i,type=type,
-                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,d=d,
+                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                      detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     markers <- c(markers,peaks$peaks['t',])
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-               d=d,show.numbers=show.numbers,pch=pch,levels=levels,
+               show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,i2i=i2i,
                alpha=alpha,units=units,detritus=detritus,Th02=Th02,
                Th02U48=Th02U48,hide=hide,omit=omit,omit.col=omit.col,...)
@@ -425,13 +425,12 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 
 age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                        type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                       d=diseq(),show.numbers=FALSE,pch=21,levels=NA,
-                       clabel="",bg=c("yellow","red"),col='black',
-                       markers=NULL,k=0,i2i=FALSE,alpha=0.05,
-                       units='MA',detritus=0, Th02=c(0,0),
-                       Th02U48=c(0,0,1e6,0,0,0,0,0,0),hide=NULL,
-                       omit=NULL,omit.col=NA,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,d=d,
+                       show.numbers=FALSE,pch=21,levels=NA,clabel="",
+                       bg=c("yellow","red"),col='black',markers=NULL,
+                       k=0,i2i=FALSE,alpha=0.05,units='MA',detritus=0,
+                       Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
+                       hide=NULL,omit=NULL,omit.col=NA,...){
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,i2i=i2i,
                    detritus=detritus,Th02=Th02,Th02U48=Th02U48)
     radialplot.default(tt,from=from,to=to,t0=t0,
@@ -780,18 +779,13 @@ radial.title <- function(x,sigdig=2,alpha=0.05,units='',n=length(x),...){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
     line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'(n='*n*')',
-                        list(a=rounded.age[1],
-                             b=rounded.age[2],
-                             c=rounded.age[3],
-                             d=units,
-                             n=n))
+                        list(a=rounded.age[1],b=rounded.age[2],
+                             c=rounded.age[3],d=units,n=n))
     line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
     line3 <- substitute('dispersion ='~a+b/-c*'%',
-                        list(a=rounded.disp[1],
-                             b=rounded.disp[3],
-                             c=rounded.disp[2]))
+                        list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2]))
     mymtext(line1,line=2,...)
     mymtext(line2,line=1,...)
     mymtext(line3,line=0,...)
