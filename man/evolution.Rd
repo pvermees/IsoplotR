@@ -5,8 +5,7 @@
 \title{Th-U evolution diagram}
 \usage{
 evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
-  detritus = 0, Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0,
-  0, 0), show.numbers = FALSE, levels = NA, clabel = "",
+  detritus = 0, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
   isochron = FALSE, model = 1, exterr = TRUE, sigdig = 2,
   hide = NULL, omit = NULL, omit.col = NA, ...)
@@ -37,16 +36,6 @@ vs. Th-U age.}
 \code{3}: correct the data using the measured present day
 \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
-
-\item{Th02}{2-element vector with the assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{detritus==2}}
-
-\item{Th02U48}{9-element vector with the measured composition of
-the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-\code{rYZ}. Only used if \code{isochron==FALSE} and
-\code{detritus==3}}
 
 \item{show.numbers}{label the error ellipses with the grain
 numbers?}

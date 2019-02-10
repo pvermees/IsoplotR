@@ -9,8 +9,7 @@ concordia(x, tlim = NULL, alpha = 0.05, wetherill = TRUE,
   ellipse.col = c("#00FF0080", "#FF000080"),
   concordia.col = "darksalmon", exterr = FALSE, show.age = 0,
   sigdig = 2, common.Pb = 0, ticks = 5, anchor = list(FALSE, NA),
-  hide = NULL, omit = NULL, omit.col = NA, diseq = FALSE,
-  U48 = 1, Th0U8 = 0, Ra6U8 = 0, Pa1U5 = 0, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -74,8 +73,9 @@ Pb-composition
 \code{2}: use the isochron intercept as the initial Pb-composition
 
 \code{3}: use the Pb-composition stored in
+\code{settings('iratio','Pb207Pb206')} (if \code{x$format}<4) or
 \code{settings('iratio','Pb206Pb204')} and
-\code{settings('iratio','Pb207Pb204')}}
+\code{settings('iratio','Pb207Pb204')} (if \code{x$format}>3)}
 
 \item{ticks}{either a scalar indicating the desired number of age
 ticks to be placed along the concordia line, OR a vector of
@@ -109,20 +109,6 @@ but omitted from concordia or discordia age calculation}
 
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
-
-\item{diseq}{apply an initial U-series disequilibrium correction?}
-
-\item{U48}{the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
-
-\item{Th0U8}{the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
-
-\item{Ra6U8}{the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
-
-\item{Pa1U5}{the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

@@ -19,8 +19,8 @@
 age(x, ...)
 
 \method{age}{default}(x, method = "U238-Pb206", exterr = TRUE,
-  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), diseq = FALSE,
-  U48 = 1, Th0U8 = 0, Ra6U8 = 0, Pa1U5 = 0, ...)
+  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), d = diseq(),
+  ...)
 
 \method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, common.Pb = 0, show.p = FALSE, ...)
@@ -41,8 +41,7 @@ age(x, ...)
   exterr = TRUE, ...)
 
 \method{age}{ThU}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, detritus = 0, Th02 = c(0, 0),
-  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), ...)
+  i = NA, sigdig = NA, detritus = 0, ...)
 
 \method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -121,19 +120,8 @@ error.}
 \item{rhoD}{two-element vector with the track density of the
 dosimeter glass and its standard error.}
 
-\item{diseq}{apply an initial U-series disequilibrium correction?}
-
-\item{U48}{the initial \eqn{^{234}}U/\eqn{^{238}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
-
-\item{Th0U8}{the initial \eqn{^{232}}Th/\eqn{^{238}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
-
-\item{Ra6U8}{the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
-
-\item{Pa1U5}{the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
-ratio. Is only used if \code{diseq=TRUE}.}
+\item{d}{secular disequilibrium correction. See \link{diseq} for
+further details.}
 
 \item{type}{scalar flag indicating whether
 
@@ -218,17 +206,6 @@ age should be calculated from all analyses together
 \code{3}: correct the data using the measured present day
 \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
-
-\item{Th02}{2-element vector with the assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{isochron==FALSE} and
-\code{detritus==2}}
-
-\item{Th02U48}{9-element vector with the measured composition of
-the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-\code{rYZ}. Only used if \code{isochron==FALSE} and
-\code{detritus==3}}
 }
 \value{
 \enumerate{

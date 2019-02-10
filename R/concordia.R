@@ -58,9 +58,6 @@
 #' 
 #' @param exterr show decay constant uncertainty?
 #' 
-#' @param d secular disequilibrium correction. See \link{diseq} for
-#'     further details.
-#' 
 #' @param show.age one of either:
 #'
 #' \code{0}: plot the data without calculating an age

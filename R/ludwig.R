@@ -20,9 +20,6 @@
 #' 
 #' @param alpha cutoff value for confidence intervals
 #' 
-#' @param d secular disequilibrium correction. See \link{diseq} for
-#'     further details.
-#'
 #' @param ... optional arguments
 #
 # @param x a \eqn{3n}-element vector \eqn{[X Y Z]}, where \eqn{X},

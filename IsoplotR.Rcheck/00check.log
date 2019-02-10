@@ -9,6 +9,8 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
+The Date field is over a month old.
+
 The build time stamp is missing.
 * checking package namespace information ... OK
 * checking package dependencies ... OK
@@ -73,16 +75,51 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
-* checking Rd cross-references ... OK
+* checking Rd cross-references ... WARNING
+Missing link or links in documentation object 'age.Rd':
+  ‘diseq’
+
+Missing link or links in documentation object 'ludwig.Rd':
+  ‘diseq’
+
+Missing link or links in documentation object 'read.data.Rd':
+  ‘diseq’
+
+See section 'Cross-references' in the 'Writing R Extensions' manual.
+
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... OK
+* checking Rd \usage sections ... WARNING
+Documented arguments not in \usage in documentation object 'ludwig':
+  ‘d’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... OK
+* checking examples ... ERROR
+Running examples in ‘IsoplotR-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: age
+> ### Title: Calculate isotopic ages
+> ### Aliases: age age.default age.UPb age.PbPb age.ArAr age.KCa age.UThHe
+> ###   age.fissiontracks age.ThU age.ReOs age.SmNd age.RbSr age.LuHf
+> 
+> ### ** Examples
+> 
+> data(examples)
+> tUPb <- age(examples$UPb,type=1)
+Error in fit$x : $ operator is invalid for atomic vectors
+Calls: age ... concordia.age -> concordia.age.UPb -> initial.concordia.age
+Execution halted
 * checking PDF version of manual ... OK
 * DONE
-Status: 3 WARNINGs, 4 NOTEs
+Status: 1 ERROR, 5 WARNINGs, 4 NOTEs

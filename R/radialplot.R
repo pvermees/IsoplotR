@@ -362,7 +362,7 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,
                       omit=omit,omit.col=omit.col,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}.
+#'     when \code{x$format == 1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'
@@ -375,14 +375,6 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #'
-#' @param Th02 2-element vector with the assumed initial
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-#'     standard error. Only used if \code{detritus==2}
-#' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==3}
 #' @rdname radialplot
 #' @export
 radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
@@ -390,35 +382,31 @@ radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,
                            pch=21,levels=NA,clabel="",
                            bg=c("yellow","red"),col='black',markers=NULL,
                            k=0,i2i=TRUE,alpha=0.05,detritus=0,
-                           Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                            hide=NULL,omit=NULL,omit.col=NA,...){
     radialplot_helper(x,from=from,to=to,t0=t0,
                       transformation=transformation,
                       show.numbers=show.numbers,pch=pch,levels=levels,
                       clabel=clabel,bg=bg,col=col,markers=markers,k=k,
                       exterr=FALSE,i2i=i2i,alpha=alpha,units='ka',
-                      detritus=detritus,Th02=Th02,Th02U48=Th02U48,
-                      hide=hide,omit=omit,omit.col=omit.col,...)
+                      detritus=detritus,hide=hide,omit=omit,omit.col=omit.col,...)
 }
 radialplot_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                               type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
                               show.numbers=FALSE,pch=21,levels=NA,
                               clabel="",bg=c("yellow","red"),col='black',
                               markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
-                              alpha=0.05,units='Ma',detritus=0,Th02=c(0,0),
-                              Th02U48=c(0,0,1e6,0,0,0,0,0,0),
+                              alpha=0.05,units='Ma',detritus=0,
                               hide=NULL,omit=NULL,omit.col=NA,...){
     x2calc <- clear(x,hide,omit)
     peaks <- peakfit(x2calc,k=k,exterr=exterr,i2i=i2i,type=type,
-                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                     detritus=detritus,Th02=Th02,Th02U48=Th02U48)
+                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,detritus=detritus)
     markers <- c(markers,peaks$peaks['t',])
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,i2i=i2i,
-               alpha=alpha,units=units,detritus=detritus,Th02=Th02,
-               Th02U48=Th02U48,hide=hide,omit=omit,omit.col=omit.col,...)
+               alpha=alpha,units=units,detritus=detritus,hide=hide,
+               omit=omit,omit.col=omit.col,...)
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -428,11 +416,9 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                        show.numbers=FALSE,pch=21,levels=NA,clabel="",
                        bg=c("yellow","red"),col='black',markers=NULL,
                        k=0,i2i=FALSE,alpha=0.05,units='MA',detritus=0,
-                       Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                        hide=NULL,omit=NULL,omit.col=NA,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,i2i=i2i,
-                   detritus=detritus,Th02=Th02,Th02U48=Th02U48)
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+                   i2i=i2i,detritus=detritus)
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,
                        show.numbers=show.numbers,pch=pch,

@@ -10,13 +10,16 @@
 read.data(x, ...)
 
 \method{read.data}{default}(x, method = "U-Pb", format = 1, ierr = 1,
-  ...)
+  d = diseq(), Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0,
+  0, 0), ...)
 
 \method{read.data}{data.frame}(x, method = "U-Pb", format = 1,
-  ierr = 1, ...)
+  ierr = 1, d = diseq(), Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06,
+  0, 0, 0, 0, 0, 0), ...)
 
 \method{read.data}{matrix}(x, method = "U-Pb", format = 1, ierr = 1,
-  ...)
+  d = diseq(), Th02 = c(0, 0), Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0,
+  0, 0), ...)
 }
 \arguments{
 \item{x}{either a file name (\code{.csv} format) OR a matrix}
@@ -160,6 +163,19 @@ if \code{method='other'}, \code{x} is read as a table, unless
 \item{2\eqn{\sigma} relative uncertainties (\%).}
 
 }}
+
+\item{d}{secular disequilibrium correction. See \link{diseq} for
+further details.}
+
+\item{Th02}{2-element vector with the assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
+standard error. Only used if \code{isochron==FALSE} and
+\code{detritus==2}}
+
+\item{Th02U48}{9-element vector with the measured composition of
+the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+\code{rYZ}.}
 }
 \value{
 an object of class \code{UPb}, \code{PbPb}, \code{ArAr},

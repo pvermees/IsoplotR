@@ -310,23 +310,12 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
 #' \code{3}: correct the data using the measured present day
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
-#'
-#' @param Th02 2-element vector with the assumed initial
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-#'     standard error. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==2}
-#' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==3}
+#' 
 #' @rdname age
 #' @export
-age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,
-                    detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,detritus=0,...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,
-                        detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
+    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,detritus=detritus,...)
     out
 }
 #' @rdname age
@@ -399,9 +388,7 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out
 }
 
-get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                     i2i=FALSE,detritus=0,Th02=c(0,0),
-                     Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),i2i=FALSE,detritus=0){
     if (hasClass(x,'UPb')){
         out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                                cutoff.disc=cutoff.disc,exterr=FALSE)
@@ -424,8 +411,7 @@ get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
     } else if (hasClass(x,'fissiontracks')){
         out <- fissiontrack.age(x,exterr=FALSE)
     } else if (hasClass(x,'ThU')){
-        out <- ThU.age(x,exterr=FALSE,i2i=i2i,detritus=detritus,
-                       Th02=Th02,Th02U48=Th02U48)
+        out <- ThU.age(x,exterr=FALSE,i2i=i2i,detritus=detritus)
     }
     out
 }

@@ -237,21 +237,12 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #'
-#' @param Th02 2-element vector with the assumed initial
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-#'     standard error. Only used if \code{detritus==2}
-#' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==3}
 #' @rdname peakfit
 #' @export
 peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2, log=TRUE,
-                        i2i=TRUE,alpha=0.05,detritus=0,Th02=c(0,0),
-                        Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                        i2i=TRUE,alpha=0.05,detritus=0,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,
-                   alpha=alpha,detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
+                   alpha=alpha,detritus=detritus,...)
 }
 #' @rdname peakfit
 #' @export
@@ -260,15 +251,13 @@ peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
                            exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,alpha=0.05,
-                           detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                           detritus=0,...){
     if (k<1) return(NULL)
     if (identical(k,'auto'))
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,
-                     cutoff.disc=cutoff.disc,detritus=detritus,
-                     Th02=Th02,Th02U48=Th02U48)
+                     cutoff.disc=cutoff.disc,detritus=detritus)
     tt <- get.ages(x,i2i=i2i,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,detritus=detritus,
-                   Th02=Th02,Th02U48=Th02U48)
+                   cutoff.disc=cutoff.disc,detritus=detritus)
     fit <- peakfit.default(tt,k=k,sigdig=sigdig,log=log,alpha=alpha)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
@@ -498,15 +487,14 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
 }
 
 BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                    exterr=TRUE,detritus=0,Th02=c(0,0),
-                    Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                    exterr=TRUE,detritus=0,...){
     n <- length(x)
     BIC <- Inf
     tryCatch({
         for (k in 1:max.k){
             fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
                            cutoff.disc=cutoff.disc,exterr=exterr,
-                           detritus=detritus,Th02=Th02,Th02U48=Th02U48,...)
+                           detritus=detritus,...)
             p <- 2*k-1
             newBIC <- -2*fit$L+p*log(n)
             if (newBIC<BIC) {

@@ -100,7 +100,7 @@ Pb.correction.without.204 <- function(x,i76){
     i76i <- i76[1]
     for (i in 1:ns){
         if (ni>1) i76i <- i76[i]
-        tint[i] <- project.concordia(m76[i],m86[i],i76i)
+        tint[i] <- project.concordia(m76[i],m86[i],i76i,d=x$d)
     }
     if (x$format == 1){
         out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint,d=x$d)[,'75']
