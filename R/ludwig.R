@@ -139,7 +139,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
 mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA),d=diseq()){
     ns <- length(x)
     # Mistake in Ludwig (1998)? Multiply the following by 2?
-    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE,d=diseq())
+    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE,d=d)
     out <- list()
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
@@ -172,7 +172,7 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),d=diseq()){
     out
 }
 get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),d=diseq()){
-    out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor,d=diseq())
+    out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor,d=d)
     out$w <- 0
     out
 }
