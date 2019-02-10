@@ -117,15 +117,14 @@ ludwig.default <- function(x,...){
 #'     \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
-ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
-                       anchor=list(FALSE,NA),d=diseq(),...){
-    fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor,d=d)
+ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
+    fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
-    out$cov <- fisher.lud(x,fit=fit,anchor=anchor,d=d)
-    mswd <- mswd.lud(fit$par,x=x,anchor=anchor,d=d)
+    out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+    mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
     out <- c(out,mswd)
     if (model==3){
-        out$w <- c(fit$w,profile_LL_discordia_disp(fit,x=x,alpha=alpha,d=d))
+        out$w <- c(fit$w,profile_LL_discordia_disp(fit,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
     if (x$format<4) parnames <- c('t[l]','76i')
@@ -136,10 +135,10 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
     out
 }
 
-mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA),d=diseq()){
+mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     ns <- length(x)
     # Mistake in Ludwig (1998)? Multiply the following by 2?
-    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE,d=d)
+    SS <- LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=0,LL=FALSE)
     out <- list()
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
@@ -159,30 +158,30 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA),d=diseq()){
     out
 }
 
-get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),d=diseq()){
-    init <- get.ta0b0.model2(x,anchor=anchor,d=d)
+get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA)){
+    init <- get.ta0b0.model2(x,anchor=anchor)
     if (model==1)
-        out <- get.ta0b0.model1(x,init=init,exterr=exterr,anchor=anchor,d=d)
+        out <- get.ta0b0.model1(x,init=init,exterr=exterr,anchor=anchor)
     else if (model==2)
         out <- list(par=init,w=0)
     else if (model==3)
-        out <- get.ta0b0.model3(x,init=init,exterr=exterr,anchor=anchor,d=d)
+        out <- get.ta0b0.model3(x,init=init,exterr=exterr,anchor=anchor)
     out$model <- model
     out$exterr <- exterr
     out
 }
-get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),d=diseq()){
-    out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor,d=d)
+get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
+    out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor)
     out$w <- 0
     out
 }
-get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),d=diseq()){
+get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
     xy <- data2york(x,wetherill=FALSE)[,c('X','Y')]
     if (!anchor[[1]]) {
         xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         intercept <- xyfit$coef[1]
         slope <- xyfit$coef[2]
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=d)
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
     } else if (is.na(anchor[[2]])){
         if (x$format < 4){
             b0a0 <- settings('iratio','Pb207Pb206')[1]
@@ -194,9 +193,9 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),d=diseq()){
         intercept <- b0a0
         xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
         slope <- xyfit$coef
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=d)
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
     } else if (is.numeric(anchor[[2]])){
-        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=d)
+        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
         xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
                            0 + I(xy[,'X']-TW$x['U238Pb206']))
         slope <- xyfit$coef
@@ -227,39 +226,38 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),d=diseq()){
     }    
     ta0b0
 }
-get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),d=diseq()){
-    fit <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor,d=d)
+get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
+    fit <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor)
     ta0b0 <- fit$par
-    w <- get_ludwig_disp(ta0b0,x,interval=get_lud_wrange(ta0b0,x),d=d)
-    out <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,anchor=anchor,d=d)
+    w <- get_ludwig_disp(ta0b0,x,interval=get_lud_wrange(ta0b0,x))
+    out <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,anchor=anchor)
     out$w <- w
     out
 }
-fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,
-                                 anchor=list(FALSE,NA),d=diseq(),...){
+fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
     optifix(parms=init,fn=LL.lud.UPb,method="BFGS",x=x,w=w,
-            exterr=exterr,fixed=fixit(x,anchor),d=d)
+            exterr=exterr,fixed=fixit(x,anchor))
 }
-get_ludwig_disp <- function(ta0b0,x,interval,d=diseq()){
+get_ludwig_disp <- function(ta0b0,x,interval){
     stats::optimize(LL.lud.UPb.disp,interval=interval,x=x,
-                    ta0b0=ta0b0,maximum=TRUE,d=d)$maximum
+                    ta0b0=ta0b0,maximum=TRUE)$maximum
 }
 get_lud_wrange <- function(ta0b0,x){
     c(0,1)
 }    
 
-LL.lud.UPb.disp <- function(w,x,ta0b0,d=diseq()){
-    LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=w,LL=TRUE,d=d)
+LL.lud.UPb.disp <- function(w,x,ta0b0){
+    LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=w,LL=TRUE)
 }
-LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE,d=diseq()){
+LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     if (x$format<4){
-        return(LL.lud.2D(ta0b0,x=x,exterr=exterr,w=w,LL=LL,d=d))
+        return(LL.lud.2D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
     } else {
-        return(LL.lud.3D(ta0b0,x=x,exterr=exterr,w=w,LL=LL,d=d))
+        return(LL.lud.3D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
     }
 }
-LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE,d=diseq()){
-    l <- data2ludwig(x,tt=ta0[1],a0=ta0[2],exterr=exterr,w=w,d=d)
+LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
+    l <- data2ludwig(x,tt=ta0[1],a0=ta0[2],exterr=exterr,w=w)
     R <- rbind(l$rx,l$ry)
     out <- t(R) %*% l$omega %*% R
     if (LL){
@@ -269,9 +267,8 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE,d=diseq()){
     }
     out
 }
-LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE,d=diseq()){
-    l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],
-                     b0=ta0b0[3],exterr=exterr,w=w,d=d)
+LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
+    l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
     phi <- l$phi
     R <- l$R
     r <- l$r
@@ -304,16 +301,16 @@ fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
 fisher.lud.default <- function(x,...){
     stop( "No default method available (yet)." )
 }
-fisher.lud.UPb <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),d=diseq(),...){
+fisher.lud.UPb <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
     ns <- length(x)
     if (x$format<4){
-        fish <- fisher_lud_2D(x,fit,d=d)
+        fish <- fisher_lud_2D(x,fit)
         AA <- fish[1:ns,1:ns]
         BB <- fish[1:ns,(ns+1):(ns+2)]
         CC <- fish[(ns+1):(ns+2),1:ns]
         DD <- fish[(ns+1):(ns+2),(ns+1):(ns+2)]
     } else {
-        fish <- fisher_lud_3D(x,fit,d=d)
+        fish <- fisher_lud_3D(x,fit)
         AA <- fish[1:ns,1:ns]
         BB <- fish[1:ns,(ns+1):(ns+3)]
         CC <- fish[(ns+1):(ns+3),1:ns]
@@ -339,16 +336,16 @@ anchorfish <- function(AA,BB,CC,DD,anchor){
     }
     out
 }
-fisher_lud_2D <- function(x,fit,d=diseq()){
+fisher_lud_2D <- function(x,fit){
     tt <- fit$par[1]
     a0 <- fit$par[2]
-    l <- data2ludwig_2D(x,tt=tt,a0=a0,w=0,exterr=fit$exterr,d=d)
+    l <- data2ludwig_2D(x,tt=tt,a0=a0,w=0,exterr=fit$exterr)
     l5 <- settings('lambda','U235')[1]
     l8 <- settings('lambda','U238')[1]
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     ones <- matrix(1,ns,1)
-    D <- wendt(tt,d=d)
+    D <- wendt(tt,d=x$d)
     BB <- (exp(l5*tt)-1+D$d1)/U - a0*(exp(l8*tt)-1+D$d2)
     CC <- -t(l$X)%*%l$omega12 + t(l$x)%*%l$omega12 + t(l$x)%*%l$omega21 -
         t(l$Y)%*%l$omega22 + t(ones)%*%l$omega22*a0 + 2*t(l$x)%*%l$omega22*BB
@@ -384,11 +381,11 @@ fisher_lud_2D <- function(x,fit,d=diseq()){
     out[ns+2,ns+1] <- out[ns+1,ns+2]
     out/2
 }
-fisher_lud_3D <- function(x,fit,d=diseq()){
+fisher_lud_3D <- function(x,fit){
     tt <- fit$par[1]
     a0 <- fit$par[2]
     b0 <- fit$par[3]
-    l <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=0,exterr=fit$exterr,d=d)
+    l <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=0,exterr=fit$exterr)
     z <- l$z
     omega <- l$omega
     ns <- length(z)
@@ -468,19 +465,19 @@ fisher_lud_3D <- function(x,fit,d=diseq()){
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
-data2ludwig.UPb <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,d=diseq(),...){
+data2ludwig.UPb <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
     if (x$format<4)
-        out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr,d=d)
+        out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)
     else
-        out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr,d=d)
+        out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
     out
 }
-data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,d=diseq()){
+data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    D <- wendt(tt=tt,d=d)
+    D <- wendt(tt=tt,d=x$d)
     f1 <- exp(l5[1]*tt)-1 + D$d1
     f2 <- exp(l8[1]*tt)-1 + D$d2
     B <-  f1/U - a0*f2
@@ -528,7 +525,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,d=diseq()){
     out$ry <- Y - a0 - B*out$x
     out
 }
-data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,d=diseq()){
+data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
@@ -538,7 +535,7 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,d=diseq()){
     R <- rep(0,ns)
     r <- rep(0,ns)
     Z <- rep(0,ns)
-    D <- wendt(tt=tt,d=d)
+    D <- wendt(tt=tt,d=x$d)
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
         Z[i] <- wd$x['Pb204U238']

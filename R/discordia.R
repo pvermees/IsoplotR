@@ -1,8 +1,8 @@
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
 # returns the lower and upper intercept age (for Wetherill concordia)
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05,
-                                          model=1,anchor=list(FALSE,NA),d=diseq()){
-    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor,d=d)
+                                          model=1,anchor=list(FALSE,NA)){
+    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
     out <- list()
     out$model <- model
     out$mswd <- fit$mswd
@@ -11,7 +11,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     out$fact <- tfact(alpha,fit$df)
     if (wetherill){
         labels <- c('t[l]','t[u]')
-        out <- c(out,twfit2wfit(fit,x,d=d))
+        out <- c(out,twfit2wfit(fit,x))
     } else if (x$format<4){
         labels <- c('t[l]','76')
         out$x <- fit$par
@@ -71,7 +71,7 @@ concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,d=diseq()
 
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
-twfit2wfit <- function(fit,x,d=diseq()){
+twfit2wfit <- function(fit,x){
     tt <- fit$par[1]
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
@@ -94,17 +94,15 @@ twfit2wfit <- function(fit,x,d=diseq()){
         search.range <- c(tt+buffer,10000)
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                             Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+                             t2=tt,a0=a0,b0=b0,d=x$d)$root
     } else {
         search.range <- c(-1000,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,diseq=diseq,U48=U48,Th0U8=Th0U8,
-                             Ra6U8=Ra6U8,Pa1U5=Pa1U5)$root
+                             t2=tt,a0=a0,b0=b0,d=x$d)$root
         tu <- tt
     }
-    du <- wendt(diseq=diseq,tt=tu,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
-    dl <- wendt(diseq=diseq,tt=tl,U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8)
+    du <- wendt(tt=tu,d=x$d)
+    dl <- wendt(tt=tl,d=x$d)
     XX <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
     YY <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
     BB <- a0/(b0*U)

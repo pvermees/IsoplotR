@@ -599,7 +599,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
         out$displabel <- quote('('^234*'U/'^238*'U)-dispersion = ')
     }
     if (plot){
-        scatterplot(out$d,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(out$xyz,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=1*(model!=2),
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
@@ -686,7 +686,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     d2calc <- clear(tit,hide,omit)
     fit <- regression(d2calc,model=model,type="titterington")
     out <- isochron_init(fit,alpha=alpha)
-    out$d <- tit
+    out$xyz <- tit
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
     out$cov.ab <- out$cov[ia,ib]
@@ -711,7 +711,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
-    out$d <- subset(out$d,select=id)
+    out$xyz <- subset(out$xyz,select=id)
     out
 }
 isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
@@ -720,7 +720,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
     d2calc <- clear(y,hide,omit)
     fit <- regression(d2calc,model=model,type="york")
     out <- isochron_init(fit,alpha=alpha)
-    out$d <- y
+    out$xyz <- y
     if (type==1){
         Th230U238 <- out$b
         Th230Th232 <- out$a
@@ -932,7 +932,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
     line1 <- do.call(substitute,list(eval(call1),list1))
     line2 <- do.call(substitute,list(eval(call2),list2))
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a~', p('~chi^2*')='~b,
+        line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
         mymtext(line1,line=2,...)

@@ -220,53 +220,54 @@
 read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
-read.data.default <- function(x,method='U-Pb',format=1,ierr=1,...){
+read.data.default <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
-    read.data.matrix(X,method=method,format=format,ierr=ierr)
+    read.data.matrix(X,method=method,format=format,ierr=ierr,d=d)
 }
 #' @rdname read.data
 #' @export
-read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,...){
-    read.data.matrix(as.matrix(x),method=method,format=format,ierr=ierr,...)
+read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),...){
+    read.data.matrix(as.matrix(x),method=method,format=format,ierr=ierr,d=d,...)
 }
 #' @rdname read.data
 #' @export
-read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,...){
+read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),...){
     if (identical(method,'U-Pb')){
-        out <- as.UPb(x,format,ierr)
+        out <- as.UPb(x,format=format,ierr=ierr,d=d)
     } else if (identical(method,'Pb-Pb')){
-        out <- as.PbPb(x,format,ierr)
+        out <- as.PbPb(x,format=format,ierr=ierr)
     } else if (identical(method,'Ar-Ar')){
-        out <- as.ArAr(x,format,ierr)
+        out <- as.ArAr(x,format=format,ierr=ierr)
     } else if (identical(method,'K-Ca')){
-        out <- as.KCa(x,format,ierr)
+        out <- as.KCa(x,format=format,ierr=ierr)
     } else if (identical(method,'Re-Os')){
-        out <- as.ReOs(x,format,ierr)
+        out <- as.ReOs(x,format=format,ierr=ierr)
     } else if (identical(method,'Rb-Sr')){
-        out <- as.RbSr(x,format,ierr)
+        out <- as.RbSr(x,format=format,ierr=ierr)
     } else if (identical(method,'Sm-Nd')){
-        out <- as.SmNd(x,format,ierr)
+        out <- as.SmNd(x,format=format,ierr=ierr)
     } else if (identical(method,'Lu-Hf')){
-        out <- as.LuHf(x,format,ierr)
+        out <- as.LuHf(x,format=format,ierr=ierr)
     } else if (identical(method,'Th-U')){
-        out <- as.ThU(x,format,ierr)
+        out <- as.ThU(x,format=format,ierr=ierr)
     } else if (identical(method,'U-Th-He')){
-        out <- as.UThHe(x,ierr)
+        out <- as.UThHe(x,ierr=ierr)
     } else if (identical(method,'fissiontracks')){
-        out <- as.fissiontracks(x,format,ierr)
+        out <- as.fissiontracks(x,format=format,ierr=ierr)
     } else if (identical(method,'detritals')){
         out <- as.detritals(x)
     } else if (identical(method,'other')){
-        out <- as.other(x,format,ierr)
+        out <- as.other(x,format=format,ierr=ierr)
     }
     out
 }
 
-as.UPb <- function(x,format=3,ierr=1){
+as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     out <- list()
     class(out) <- "UPb"
     out$x <- NA
     out$format <- format
+    out$d <- d
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x

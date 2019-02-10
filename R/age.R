@@ -400,10 +400,11 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
 }
 
 get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                     d=diseq(),i2i=FALSE,detritus=0,Th02=c(0,0),
+                     i2i=FALSE,detritus=0,Th02=c(0,0),
                      Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     if (hasClass(x,'UPb')){
-        out <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc,d=d,exterr=FALSE)
+        out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
+                               cutoff.disc=cutoff.disc,exterr=FALSE)
     } else if (hasClass(x,'PbPb')){
         out <- PbPb.age(x,exterr=FALSE)
     } else if (hasClass(x,'ArAr')){

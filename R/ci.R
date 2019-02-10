@@ -45,23 +45,23 @@ profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
     ul <- wu - fit$w
     c(ll,ul)
 }
-profile_LL_discordia_disp <- function(fit,x,alpha=0.05,d=diseq()){
+profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
     w <- fit$w
     ta0b0 <- fit$par
     wrange <- get_lud_wrange(ta0b0,x)
-    LLmax <- LL.lud.UPb.disp(w,x,ta0b0,d=d)
+    LLmax <- LL.lud.UPb.disp(w,x,ta0b0)
     cutoff <- stats::qchisq(1-alpha,1)    
-    if (abs(LL.lud.UPb.disp(wrange[1],x,ta0b0,d=d)-LLmax) < cutoff/2){
+    if (abs(LL.lud.UPb.disp(wrange[1],x,ta0b0)-LLmax) < cutoff/2){
         wl <- 0
     } else {
         wl <- stats::optimize(profile_discordia_helper,interval=c(0,w),x=x,
-                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff,d=d)$minimum
+                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
     }
-    if (abs(LL.lud.UPb.disp(wrange[2],x,ta0b0,d=d)-LLmax) < cutoff/2){
+    if (abs(LL.lud.UPb.disp(wrange[2],x,ta0b0)-LLmax) < cutoff/2){
         wu <- Inf
     } else {
         wu <- stats::optimize(profile_discordia_helper,interval=c(w,wrange[2]),x=x,
-                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff,d=d)$minimum
+                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
     }
     ll <- w - wl
     ul <- wu - w
@@ -101,8 +101,8 @@ profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     LL <- LL.sigma(sigma,X,sX)
     abs(LLmax-LL-cutoff/2)
 }
-profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff,d=diseq()){
-    LL <- LL.lud.UPb.disp(w,x,ta0b0,d=d)
+profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff){
+    LL <- LL.lud.UPb.disp(w,x,ta0b0)
     abs(LLmax-LL-cutoff/2)
 }
 profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
@@ -173,7 +173,7 @@ profile_LL_isochron_disp <- function(fit){
     ul <- wu - w
     c(ll,ul)
 }
-profile_isochron_helper <- function(w,d,LLmax,cutoff,type='york'){
-    LL <- LL.isochron(w,d,type=type)
+profile_isochron_helper <- function(w,dat,LLmax,cutoff,type='york'){
+    LL <- LL.isochron(w,dat,type=type)
     abs(LLmax-LL-cutoff/2)
 }
