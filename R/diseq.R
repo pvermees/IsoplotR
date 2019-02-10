@@ -13,7 +13,8 @@ do.diseq <- function(d=diseq()){
 
 # from Wendt & Carl (1985, EPSL):
 wendt <- function(tt,d=diseq()){
-    out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,dd1dl5=0,dd2dl8=0)
+    out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,
+                d2d1dt2=0,d2d2dt2=0,dd1dl5=0,dd2dl8=0)
     if (do.diseq(d)){
         out$d1 <- d1(tt,Pa1U5=d$Pa1U5)
         out$d2 <- d2(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
@@ -79,7 +80,7 @@ dd2dt <- function(tt,U48=1,Th0U8=0,Ra6U8=0){
     K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
     K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
     out <- (l8-l4)*K1*exp((l8-l4)*tt) + (l8-l0)*K2*exp((l8-l0)*tt) +
-           (l8-l6)*K3*exp((l8-l6)*tt) + K4*exp(l8*tt)
+           (l8-l6)*K3*exp((l8-l6)*tt) + l8*K4*exp(l8*tt)
     out
 }
 d2d2dt2 <- function(tt,U48=1,Th0U8=0,Ra6U8=0){

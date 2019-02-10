@@ -349,7 +349,7 @@ fisher_lud_2D <- function(x,fit,d=diseq()){
     ns <- length(x)
     ones <- matrix(1,ns,1)
     D <- wendt(tt,d=d)
-    BB <-  (exp(l5*tt)-1+D$d1)/U - a0*(exp(l8*tt)-1+D$d2)
+    BB <- (exp(l5*tt)-1+D$d1)/U - a0*(exp(l8*tt)-1+D$d2)
     CC <- -t(l$X)%*%l$omega12 + t(l$x)%*%l$omega12 + t(l$x)%*%l$omega21 -
         t(l$Y)%*%l$omega22 + t(ones)%*%l$omega22*a0 + 2*t(l$x)%*%l$omega22*BB
     DD <- -t(l$X)%*%l$omega12%*%l$x + t(l$x)%*%l$omega12%*%l$x -
@@ -361,7 +361,7 @@ fisher_lud_2D <- function(x,fit,d=diseq()){
     dBda0 <- -(exp(l8*tt)-1+D$d2)
     d2Bda0dt <- -(l8*exp(l8*tt)+D$dd2dt)
     d2Bdtda0 <- d2Bda0dt
-    d2Bdt2 <- ((l5^2)*exp(l5*tt)+D$d2d1dt2)/U - a0*(exp(l8*tt)*(l8^2)+D$d2d2dt2)
+    d2Bdt2 <- (l5*l5*exp(l5*tt)+D$d2d1dt2)/U - a0*(l8*l8*exp(l8*tt)+D$d2d2dt2)
     d2Bda02 <- 0
     dDda0 <- t(ones)%*%l$omega22%*%l$x +
         t(l$x)%*%l$omega22%*%ones + 2*t(l$x)%*%l$omega22%*%l$x*dBda0
@@ -369,7 +369,6 @@ fisher_lud_2D <- function(x,fit,d=diseq()){
     out <- matrix(0,ns+2,ns+2)
     out[1:ns,1:ns] <- # d2S/dx2
         2*(l$omega11 + l$omega21*BB + l$omega12*BB + l$omega22*BB^2)
-
     out[ns+2,1:ns] <-   # d2S/dxda0
         2*(CC*dBda0 + t(ones)%*%l$omega21 + t(ones)%*%l$omega22*BB)
     out[ns+2,ns+2] <- # d2S/da02

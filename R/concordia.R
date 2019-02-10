@@ -95,8 +95,9 @@
 #' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
 #' \code{3}: use the Pb-composition stored in
+#' \code{settings('iratio','Pb207Pb206')} (if \code{x$format}<4) or
 #' \code{settings('iratio','Pb206Pb204')} and
-#' \code{settings('iratio','Pb207Pb204')}
+#' \code{settings('iratio','Pb207Pb204')} (if \code{x$format}>3)
 #' @param anchor control parameters to fix the intercept age or common
 #'     Pb composition of the discordia fit. This is a two-element
 #'     list.
