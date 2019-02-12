@@ -459,7 +459,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         sl5 <- lambda('U235')[2]
         t.75 <- log(1+x)/l5
         J <- matrix(0,1,2)
-        if (do.diseq(d)){
+        if (d$corr){
             t.75 <- stats::optimize(diseq.75.misfit,interval=c(0,t.75),x=x,d=d)$minimum
             D <- wendt(tt=t.75,d=d)
             xe1d <- x-exp(l5*t.75)+1-D$d1 # misfit = f = xe1d^2
@@ -510,7 +510,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         sl8 <- lambda('U238')[2]
         t.init <- log(1+x)/l8
         J <- matrix(0,1,2)
-        if (do.diseq(d)){
+        if (d$corr){
             t.68 <- tryCatch({
                 stats::optimize(diseq.68.misfit,interval=c(0,t.init),x=x,d=d)$minimum
             }, error = function(error_condition) {
@@ -641,7 +641,7 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,...){
             t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
             SS.concordance <-
                 LL.concordia.age(tt=t.conc$age[1],ccw=wetherill(x,i),
-                                 mswd=TRUE,exterr=exterr)
+                                 mswd=TRUE,exterr=exterr,d=x$d)
             out <- c(out,t.conc.out)
         }
         if (conc & show.p){

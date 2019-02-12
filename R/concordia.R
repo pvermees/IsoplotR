@@ -316,7 +316,7 @@ plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
     graphics::box()
 }
 # helper function for plot.concordia
-prepare.concordia.line <- function(x,tlim,wetherill=TRUE,d=diseq(),...){
+prepare.concordia.line <- function(x,tlim,wetherill=TRUE,...){
     lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
     if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))

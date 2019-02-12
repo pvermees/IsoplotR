@@ -1,47 +1,15 @@
-#' Data object for secular disequilibrium correction of U-Pb data
-#'
-#' @details Returns a list of U-series activity ratios for the initial
-#'     disequilibrium correction of U-Pb data that are very young
-#'     and/or very precise.
-#'
-#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratio
-#' @param Th0U8 the initial \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
-#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
-#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
-#' @return an object of class \code{diseq}, i.e. a list with the above
-#'     items.  If any of the four input arguments are not \code{NULL},
-#'     then the omitted arguments are replaced with zero values.
-#' 
-#' @examples
-#' f <- system.file("UPb5.csv",package="IsoplotR")
-#' UPb <- read.data('../inst/UPb5.csv',method='U-Pb',format=5,d=diseq(U48=10))
-#' concordia(UPb,wetherill=FALSE,show.age=2,xlim=c(-5,30),ylim=c(0,1))
-#' 
-#' @references
-#' Wendt, I. and Carl, C., 1985. U/Pb dating of discordant 0.1 Ma old
-#' secondary U minerals. Earth and Planetary Science Letters, 73(2-4),
-#' pp.278-284.
-#' 
-#' @export
-diseq <- function(U48=NULL,Th0U8=NULL,Ra6U8=NULL,Pa1U5=NULL){
-    out <- list(U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+diseq <- function(U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1){
+    out <- list(U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,corr=FALSE)
+    if (U48!=1 | Th0U8!=1 | Ra6U8!=1 | Pa1U5!=1) out$corr <- TRUE
     class(out) <- 'diseq'
-    isnull <- c(is.null(U48),is.null(Th0U8),is.null(Ra6U8),is.null(Pa1U5))
-    for (i in 1:4){
-        if (isnull[i] & any(!isnull[-i])) out[[i]] <- 0
-    }
     out
-}
-
-do.diseq <- function(d=diseq()){
-    !is.null(unlist(d))
 }
 
 # from Wendt & Carl (1985, EPSL):
 wendt <- function(tt,d=diseq()){
     out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,
                 d2d1dt2=0,d2d2dt2=0,dd1dl5=0,dd2dl8=0)
-    if (do.diseq(d)){
+    if (d$corr){
         out$d1 <- d1(tt,Pa1U5=d$Pa1U5)
         out$d2 <- d2(tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8)
         out$dd1dt <- dd1dt(tt,Pa1U5=d$Pa1U5)
@@ -142,39 +110,39 @@ dmf76dt <- function(x,t.76,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    d <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+d$d1
-    r68 <- exp(l8*t.76)-1+d$d2
-    dr75dt <- l5*exp(l5*t.76)+d$dd1dt
-    dr68dt <- l8*exp(l8*t.76)+d$dd2dt
+    D <- wendt(tt=t.76,d=d)
+    r75 <- exp(l5*t.76)-1+D$d1
+    r68 <- exp(l8*t.76)-1+D$d2
+    dr75dt <- l5*exp(l5*t.76)+D$dd1dt
+    dr68dt <- l8*exp(l8*t.76)+D$dd2dt
     2*(r75/(U*r68)-x)*(dr75dt*r68-r75*dr68dt)/(U*r68^2)
 }
 dmf76dl5 <- function(x,t.76,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    d <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+d$d1
-    r68 <- exp(l8*t.76)-1+d$d2
-    dr75dl5 <- t.76*exp(l5*t.76)+d$dd1dl5
+    D <- wendt(tt=t.76,d=d)
+    r75 <- exp(l5*t.76)-1+D$d1
+    r68 <- exp(l8*t.76)-1+D$d2
+    dr75dl5 <- t.76*exp(l5*t.76)+D$dd1dl5
     2*(r75/(U*r68)-x)/(U*r68)
 }
 dmf76dl8 <- function(x,t.76,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    d <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+d$d1
-    r68 <- exp(l8*t.76)-1+d$d2
-    dr68dl8 <- l8*exp(l8*t.76)+d$dd2dt
+    D <- wendt(tt=t.76,d=d)
+    r75 <- exp(l5*t.76)-1+D$d1
+    r68 <- exp(l8*t.76)-1+D$d2
+    dr68dl8 <- l8*exp(l8*t.76)+D$dd2dt
     2*(r75/(U*r68)-x)*(-r75*dr68dl8)/(U*r68^2)
 }
 dmf76dU <- function(x,t.76,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    d <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+d$d1
-    r68 <- exp(l8*t.76)-1+d$d2
+    D <- wendt(tt=t.76,d=d)
+    r75 <- exp(l5*t.76)-1+D$d1
+    r68 <- exp(l8*t.76)-1+D$d2
     -2*(r75/(U*r68)-x)*r75/(r68*U^2)
 }

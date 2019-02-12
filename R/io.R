@@ -171,8 +171,10 @@
 #' 
 #' }
 #'
-#' @param d secular disequilibrium correction. See \link{diseq} for
-#'     further details.
+#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratio
+#' @param Th0U8 the initial \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
+#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
+#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
 #' 
 #' @param Th02 2-element vector with the assumed initial
 #'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
@@ -235,24 +237,30 @@
 read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
-read.data.default <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
+read.data.default <- function(x,method='U-Pb',format=1,ierr=1,
+                              U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
                               Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
-    read.data.matrix(X,method=method,format=format,ierr=ierr,d=d,
+    read.data.matrix(X,method=method,format=format,ierr=ierr,
+                     U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,
                      Th02=Th02,Th02U48=Th02U48)}
 #' @rdname read.data
 #' @export
-read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
+read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,
+                                 U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
                                  Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
-    read.data.matrix(as.matrix(x),method=method,format=format,
-                     ierr=ierr,d=d,Th02=Th02,Th02U48=Th02U48,...)
+    read.data.matrix(as.matrix(x),method=method,format=format,ierr=ierr,
+                     U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,
+                     Th02=Th02,Th02U48=Th02U48,...)
 }
 #' @rdname read.data
 #' @export
-read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
+read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,
+                             U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
                              Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (identical(method,'U-Pb')){
-        out <- as.UPb(x,format=format,ierr=ierr,d=d)
+        out <- as.UPb(x,format=format,ierr=ierr,
+                      U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     } else if (identical(method,'Pb-Pb')){
         out <- as.PbPb(x,format=format,ierr=ierr)
     } else if (identical(method,'Ar-Ar')){
@@ -281,12 +289,12 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
     out
 }
 
-as.UPb <- function(x,format=3,ierr=1,d=diseq()){
+as.UPb <- function(x,format=3,ierr=1,U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1){
     out <- list()
     class(out) <- "UPb"
     out$x <- NA
     out$format <- format
-    out$d <- d
+    out$d <- diseq(U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
