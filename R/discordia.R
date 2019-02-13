@@ -42,6 +42,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     colnames(out$err) <- labels
     out
 }
+# extracts concordia intersection parameters from an ordinary York fit
 concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,d=diseq()){
     l8 <- lambda('U238')[1]
     ta <- get.Pb207Pb206.age(a,d=d)[1]
@@ -96,7 +97,7 @@ twfit2wfit <- function(fit,x){
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
     } else {
-        search.range <- c(-1000,tt-buffer)
+        search.range <- c(-1,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
         tu <- tt

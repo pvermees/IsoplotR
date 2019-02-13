@@ -232,13 +232,18 @@
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
 #'     pp.665-676.
 #' @export
-concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
+concordia <- function(x=NULL,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.numbers=FALSE,levels=NA,clabel="",
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
+    if (all(is.null(x))){
+        emptyconcordia(tlim=tlim,alpha=alpha,wetherill=wetherill,exterr=exterr,
+                       concordia.col=concordia.col,ticks=ticks,...)
+        return(invisible(NULL))
+    }
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -277,9 +282,14 @@ concordia <- function(x,tlim=NULL,alpha=0.05,wetherill=TRUE,
 # helper function for plot.concordia
 plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
                                 alpha=0.05,exterr=TRUE,ticks=5){
-    range.t <- range(lims$t)
-    m <- max(0.8*lims$t[1],lims$t[1]-range.t/20)
-    M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
+    if (all(is.null(x$x))){
+        m <- 0
+        M <- 4500
+    } else {
+        range.t <- range(lims$t)
+        m <- max(0.8*lims$t[1],lims$t[1]-range.t/20)
+        M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
+    }
     nn <- 30 # number of segments into which the concordia line is divided
     tt <- cseq(m,M,wetherill=wetherill,n=nn)
     conc <- matrix(0,nn,2)
@@ -604,4 +614,25 @@ LL.concordia.age <- function(tt,ccw,mswd=FALSE,exterr=TRUE,d=diseq()){
 
 get.concordia.SS <- function(x,covmat){
     x %*% solve(covmat) %*% t(x)
+}
+
+emptyconcordia <- function(tlim=NULL,alpha=0.05,wetherill=TRUE,exterr=TRUE,
+                           concordia.col='darksalmon',ticks=5,...){
+    if (is.null(tlim) && wetherill) tlim <- c(1,3500)
+    else if (is.null(tlim)) tlim <- c(100,3500)
+    dat <- list()
+    class(dat) <- 'UPb'
+    dat$d <- diseq()
+    if (wetherill){
+        dat$x <- rbind(c(age_to_Pb207U235_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1]),0),
+                       c(age_to_Pb207U235_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1]),0))
+        dat$format <- 1
+    } else {
+        dat$x <- rbind(c(age_to_U238Pb206_ratio(tlim[1]),age_to_Pb207Pb206_ratio(tlim[1])),
+                       c(age_to_U238Pb206_ratio(tlim[1]),age_to_Pb207Pb206_ratio(tlim[1])))
+        dat$format <- 2
+    }
+    lims <- prepare.concordia.line(x=dat,tlim=tlim,wetherill=wetherill,...)
+    plot.concordia.line(x=dat,lims=lims,wetherill=wetherill,
+                        col=concordia.col,alpha=alpha,exterr=exterr,ticks=ticks)
 }
