@@ -239,7 +239,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
-    if (all(is.null(x))){
+    if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,wetherill=wetherill,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
         return(invisible(NULL))
