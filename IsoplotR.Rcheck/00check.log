@@ -16,14 +16,7 @@ The build time stamp is missing.
 * checking package dependencies ... OK
 * checking if this is a source package ... OK
 * checking if there is a namespace ... OK
-* checking for executable files ... WARNING
-Found the following executable files:
-  .git/objects/1b/4718fa8df55f440a807300a3098ba2c506fb05
-  .git/objects/23/6c3a49f1accb74bd37ce442663ec5b7aa32344
-  .git/objects/2d/a810ebbbabccc9c17f1c63956fe449d22a0cb7
-  .git/objects/7f/23851bd0d47fba6eb16df661c70175d27dce9f
-Source packages should not contain undeclared executable files.
-See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for executable files ... OK
 * checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
   .git
@@ -32,11 +25,7 @@ structure’ in the ‘Writing R Extensions’ manual.
 
 CRAN-pack does not know about
   .git
-* checking for portable file names ... WARNING
-Found the following file with a non-portable file name:
-  .git/index (pieter-laptop's conflicted copy 2018-11-08)
-These are not fully portable file names.
-See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
@@ -87,4 +76,4 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 3 WARNINGs, 4 NOTEs
+Status: 1 WARNING, 4 NOTEs

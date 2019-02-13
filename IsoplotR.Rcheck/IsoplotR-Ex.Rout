@@ -182,102 +182,6 @@ dev.new(): using pdf(file="Rplots1.pdf")
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("data2york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-> nameEx("diseq")
-> ### * diseq
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: diseq
-> ### Title: Data object for secular disequilibrium correction of U-Pb data
-> ### Aliases: diseq
-> 
-> ### ** Examples
-> 
-> f <- system.file("UPb5.csv",package="IsoplotR")
-> UPb <- read.data('../inst/UPb5.csv',method='U-Pb',format=5,d=diseq(U48=10))
-> concordia(UPb,wetherill=FALSE,show.age=2,xlim=c(-5,30),ylim=c(0,1))
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-Warning in stats::optimize(diseq.68.misfit, interval = c(0, t.init), x = x,  :
-  NA/Inf replaced by maximum positive value
-> 
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("diseq", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
 > nameEx("ellipse")
 > ### * ellipse
 > 
@@ -845,7 +749,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.915 6.659 12.602 0 0.005 
+Time elapsed:  13.893 5.551 11.603 0.002 0.003 
 > grDevices::dev.off()
 pdf 
   2 

@@ -160,28 +160,6 @@ fit <- york(yorkdat)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("data2york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("diseq")
-### * diseq
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: diseq
-### Title: Data object for secular disequilibrium correction of U-Pb data
-### Aliases: diseq
-
-### ** Examples
-
-f <- system.file("UPb5.csv",package="IsoplotR")
-UPb <- read.data('../inst/UPb5.csv',method='U-Pb',format=5,d=diseq(U48=10))
-concordia(UPb,wetherill=FALSE,show.age=2,xlim=c(-5,30),ylim=c(0,1))
-
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("diseq", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
 nameEx("ellipse")
 ### * ellipse
 

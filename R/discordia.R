@@ -146,27 +146,27 @@ project.concordia <- function(m76,m86,i76,d=diseq()){
     pos <- !neg
     above <- (t76>t68) # above concordia?
     below <- !above
-    tend <- t68
+    search.range <- c(t68,t76)
     go.ahead <- FALSE
     if (pos & above){
-        tend <- t76
         go.ahead <- TRUE
     } else if (pos & below){
         go.ahead <- TRUE
     } else if (neg & above){
+        if (d$corr) search.range[1] <- -0.5
+        else search.range[1] <- -1000
         go.ahead <- TRUE
-    } else if (neg & below){     # it is not clear what to do with samples
+    } else if (neg & below){           # it is not clear what to do with samples
         for (tt in seq(from=10,to=5000,by=10)){
             misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
-            if (misfit<0){       # that plot in the 'forbidden zone' above
-                tend <- tt       # Wetherill concordia or below T-W concordia
-                go.ahead <- TRUE # IsoplotR will still project them on
-                break            # the concordia line.
+            if (misfit<0){             # that plot in the 'forbidden zone' above
+                search.range[2] <- tt  # Wetherill concordia or below T-W concordia
+                go.ahead <- TRUE       # IsoplotR will still project them on
+                break                  # the concordia line.
             }
         }
     }
     if (go.ahead){
-        search.range <- c(1/10000,tend)
         out <- stats::uniroot(intersection.misfit.york,
                               search.range,a=a,b=b,d=d)$root
     } else {

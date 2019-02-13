@@ -60,8 +60,18 @@
 #' 
 #' @param i (optional) index of a particular aliquot
 #' 
-#' @param d secular disequilibrium correction. See \link{diseq} for
-#'     further details.
+#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratio
+#'     (only used if \code{method='U238-Pb206'}, \code{'U238-Pb206'}
+#'     or \code{'Pb207-Pb206'}).
+#' @param Th0U8 the initial \eqn{^{230}}Th/\eqn{^{238}}U-activity
+#'     ratio (only used if \code{method='U238-Pb206'},
+#'     \code{'U238-Pb206'} or \code{'Pb207-Pb206'}).
+#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
+#'     ratio (only used if \code{method='U238-Pb206'},
+#'     \code{'U238-Pb206'} or \code{'Pb207-Pb206'}).
+#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
+#'     ratio (only used if \code{method='U238-Pb206'},
+#'     \code{'U238-Pb206'} or \code{'Pb207-Pb206'}).
 #'
 #' @param ... additional arguments
 #'
@@ -71,7 +81,8 @@ age <- function(x,...){ UseMethod("age",x) }
 #' @rdname age
 #' @export
 age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
-                        zeta=c(NA,NA),rhoD=c(NA,NA),d=diseq(),...){
+                        zeta=c(NA,NA),rhoD=c(NA,NA),U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,...){
+    d <- diseq(U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
     if (length(x)==1) x <- c(x,0)
     if (identical(method,'U235-Pb207')){
         out <- get.Pb207U235.age(x=x[1],sx=x[2],exterr=exterr,d=d)
