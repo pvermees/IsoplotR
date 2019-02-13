@@ -40,8 +40,7 @@ cad(x, ...)
   col = "black", i2i = FALSE, hide = NULL, ...)
 
 \method{cad}{ThU}(x, pch = NA, verticals = TRUE, xlab = "age [ka]",
-  col = "black", i2i = FALSE, detritus = 0, Th02 = c(0, 0),
-  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), hide = NULL, ...)
+  col = "black", i2i = FALSE, detritus = 0, hide = NULL, ...)
 
 \method{cad}{ReOs}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", i2i = TRUE, hide = NULL, ...)
@@ -135,7 +134,7 @@ or zero (for the Pb-Pb method). When applied to data of class
 detrital Th-correction.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format == 1} or \code{2}.
+    when \code{x$format == 1} or \code{2}).
 
 \code{0}: no correction
 
@@ -147,16 +146,6 @@ detrital Th-correction.}
 \code{3}: correct the data using the measured present day
 \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
-
-\item{Th02}{2-element vector with the assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{detritus==2}}
-
-\item{Th02U48}{9-element vector with the measured composition of
-the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-\code{rYZ}. Only used if \code{isochron==FALSE} and
-\code{detritus==3}}
 }
 \description{
 Plot a dataset as a Cumulative Age Distribution (CAD), also known

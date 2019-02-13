@@ -61,8 +61,7 @@ kde(x, ...)
   log = FALSE, n = 512, plot = TRUE, pch = "|",
   xlab = "age [ka]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
   hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
-  binwidth = NA, i2i = FALSE, detritus = 0, Th02 = c(0, 0),
-  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), hide = NULL, ...)
+  binwidth = NA, i2i = FALSE, detritus = 0, hide = NULL, ...)
 
 \method{kde}{ReOs}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = "|",
@@ -212,7 +211,7 @@ fit. Setting \code{i2i} to \code{FALSE} uses the default values
 stored in \code{settings('iratio',...)}.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format == 1} or \code{2}.
+    when \code{x$format == 1} or \code{2}).
 
 \code{0}: no correction
 
@@ -224,16 +223,6 @@ stored in \code{settings('iratio',...)}.}
 \code{3}: correct the data using the measured present day
 \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
-
-\item{Th02}{2-element vector with the assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{detritus==2}}
-
-\item{Th02U48}{9-element vector with the measured composition of
-the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-\code{rYZ}. Only used if \code{isochron==FALSE} and
-\code{detritus==3}}
 }
 \value{
 If \code{x} has class \code{UPb}, \code{PbPb}, \code{ArAr},

@@ -265,7 +265,7 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
 #'     uses the default values stored in
 #'     \code{settings('iratio',...)}.
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}.
+#'     when \code{x$format == 1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'
@@ -278,14 +278,6 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #'
-#' @param Th02 2-element vector with the assumed initial
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-#'     standard error. Only used if \code{detritus==2}
-#' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==3}
 #' @rdname weightedmean
 #' @export
 weightedmean.ThU <- function(x,random.effects=TRUE,
@@ -294,16 +286,13 @@ weightedmean.ThU <- function(x,random.effects=TRUE,
                              rect.col=c("#00FF0080","#FF000080"),
                              outlier.col="#00FFFF80",sigdig=2,
                              alpha=0.05,ranked=FALSE,i2i=TRUE,
-                             detritus=0,Th02=c(0,0),
-                             Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                             hide=NULL,omit=NULL,omit.col=NA,...){
+                             detritus=0,hide=NULL,omit=NULL,omit.col=NA,...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,ranked=ranked,
-                        i2i=i2i,units='ka',detritus=detritus,
-                        Th02=Th02,Th02U48=Th02U48,hide=hide,
+                        i2i=i2i,units='ka',detritus=detritus,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -490,12 +479,10 @@ weightedmean_helper <- function(x,random.effects=TRUE,
                                 cutoff.76=1100,cutoff.disc=c(-15,5),
                                 sigdig=2,alpha=0.05,exterr=TRUE,
                                 ranked=FALSE,i2i=FALSE,common.Pb=1,
-                                units='',detritus=0,Th02=c(0,0),
-                                Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                                hide=NULL,omit=NULL,omit.col=NA,...){
+                                units='',detritus=0,hide=NULL,
+                                omit=NULL,omit.col=NA,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,i2i=i2i,
-                   cutoff.disc=cutoff.disc,detritus=detritus,
-                   Th02=Th02,Th02U48=Th02U48)
+                   cutoff.disc=cutoff.disc,detritus=detritus)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,hide=hide,

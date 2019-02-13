@@ -267,7 +267,7 @@ kde.KCa <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 hide=hide,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}.
+#'     when \code{x$format == 1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'
@@ -280,23 +280,14 @@ kde.KCa <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #'
-#' @param Th02 2-element vector with the assumed initial
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-#'     standard error. Only used if \code{detritus==2}
-#' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==3}
 #' @rdname kde
 #' @export
 kde.ThU <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,pch='|',xlab="age [ka]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                    show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,detritus=0,
-                    Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                    hide=NULL,...){
-    tt <- ThU.age(x,i2i=i2i,detritus=detritus,Th02=Th02,Th02U48=Th02U48)[,1]
+                    show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,
+                    detritus=0,hide=NULL,...){
+    tt <- ThU.age(x,i2i=i2i,detritus=detritus)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,

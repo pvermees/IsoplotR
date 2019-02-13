@@ -7,9 +7,12 @@ common.Pb.correction.default <- function(x,method='common.Pb.correction',...){
 }
 common.Pb.correction.UPb <- function(x,option=1){
     ns <- length(x)
-    if (option == 1) out <- common.Pb.stacey.kramers.UPb(x)
-    else if (option == 2) out <- common.Pb.isochron.UPb(x)
-    else if (option == 3) out <- common.Pb.nominal.UPb(x)
+    if (option == 1)
+        out <- common.Pb.stacey.kramers.UPb(x)
+    else if (option == 2)
+        out <- common.Pb.isochron.UPb(x)
+    else if (option == 3)
+        out <- common.Pb.nominal.UPb(x)
     else out <- x
     out$x.raw <- x$x
     out
@@ -94,30 +97,29 @@ Pb.correction.without.204 <- function(x,i76){
     m76 <- get.Pb207Pb206.ratios(x)[,1]
     m86 <- get.U238Pb206.ratios(x)[,1]
     tint <- rep(0,ns) # intercept age
+    i76i <- i76[1]
     for (i in 1:ns){
-        if (ni>1)
-            tint[i] <- project.concordia(m76[i],m86[i],i76[i])
-        else
-            tint[i] <- project.concordia(m76[i],m86[i],i76)
+        if (ni>1) i76i <- i76[i]
+        tint[i] <- project.concordia(m76[i],m86[i],i76i,d=x$d)
     }
     if (x$format == 1){
-        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint)[,'75']
+        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint,d=x$d)[,'75']
         out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
-        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint)[,'68']
+        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint,d=x$d)[,'68']
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
         out$x[,'rhoXY'] <- x$x[,'rhoXY']        
     } else if (x$format == 2){
-        out$x[,'U238Pb206'] <- age_to_U238Pb206_ratio(tint)[,'86']
+        out$x[,'U238Pb206'] <- age_to_U238Pb206_ratio(tint,d=x$d)[,'86']
         out$x[,'errU238Pb206'] <- x$x[,'errU238Pb206']
-        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint)[,'76']
+        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint,d=x$d)[,'76']
         out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']
         out$x[,'rhoXY'] <- x$x[,'rhoXY']
     } else if (x$format == 3){
-        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint)[,'76']
+        out$x[,'Pb207Pb206'] <- age_to_Pb207Pb206_ratio(tint,d=x$d)[,'76']
         out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']
-        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint)[,'75']
+        out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint,d=x$d)[,'75']
         out$x[,'errPb207U235'] <- x$x[,'errPb207U235']
-        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint)[,'68']
+        out$x[,'Pb206U238'] <- age_to_Pb206U238_ratio(tint,d=x$d)[,'68']
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
     }
     out
@@ -149,10 +151,8 @@ Pb.correction.with.204 <- function(x,i64,i74){
         out$format <- 2
     } else if (x$format == 6){
         out$x <- matrix(0,ns,9)
-        colnames(out$x) <- c('Pb207Pb206','errPb207Pb206',
-                             'Pb207U235','errPb207U235',
-                             'Pb206U238','errPb206U238',
-                             'rhoXY','rhoXZ','rhoYZ')
+        colnames(out$x) <- c('Pb207Pb206','errPb207Pb206','Pb207U235','errPb207U235',
+                             'Pb206U238','errPb206U238','rhoXY','rhoXZ','rhoYZ')
         out$x[,'Pb207Pb206'] <-
             (x$x[,'Pb207Pb206'] - x$x[,'Pb204Pb206']*i74)/(1 - x$x[,'Pb204Pb206']*i64)
         out$x[,'errPb207Pb206'] <- x$x[,'errPb207Pb206']

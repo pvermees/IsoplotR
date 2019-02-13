@@ -1,29 +1,29 @@
-regression <- function(d,model=1,type='york'){
-    if (model==1) out <- model1regression(d,type=type)
-    else if (model==2) out <- model2regression(d,type=type)
-    else if (model==3) out <- model3regression(d,type=type)
+regression <- function(xyz,model=1,type='york'){
+    if (model==1) out <- model1regression(xyz,type=type)
+    else if (model==2) out <- model2regression(xyz,type=type)
+    else if (model==3) out <- model3regression(xyz,type=type)
     else stop('invalid regression model')
-    out$d <- d
+    out$xyz <- xyz
     out$model <- model
-    out$n <- nrow(d)
+    out$n <- nrow(xyz)
     out
 }
 
-model1regression <- function(d,type='york'){
+model1regression <- function(xyz,type='york'){
     if (identical(type,'york')){
-        out <- york(d)
+        out <- york(xyz)
     } else if (identical(type,'titterington')){
-        out <- titterington(d)
+        out <- titterington(xyz)
     } else {
         stop('invalid output type for model 1 regression')
     }
     out
 }
 
-model2regression <- function(d,type='york'){
+model2regression <- function(xyz,type='york'){
     if (identical(type,'york')){
         out <- list()
-        fit <- stats::lm(d[,'Y'] ~ d[,'X'])
+        fit <- stats::lm(xyz[,'Y'] ~ xyz[,'X'])
         E <- stats::vcov(fit)
         out$df <- fit$df.residual
         out$a <- c(stats::coef(fit)[1],sqrt(E[1,1]))
@@ -33,7 +33,7 @@ model2regression <- function(d,type='york'){
         out$cov.ab <- E[1,2]
     } else if (identical(type,'titterington')){
         out <- list()
-        fit <- stats::lm(subset(d,select=c('Y','Z')) ~ d[,'X'])
+        fit <- stats::lm(subset(xyz,select=c('Y','Z')) ~ xyz[,'X'])
         out$df <- fit$df.residual
         out$par <- c(stats::coef(fit))
         out$cov <- stats::vcov(fit)
@@ -47,19 +47,19 @@ model2regression <- function(d,type='york'){
     out
 }
 
-model3regression <- function(d,type='york'){
+model3regression <- function(xyz,type='york'){
     out <- list()
     if (identical(type,'york')){
         out$w <- stats::optimize(LL.york,
-                                 interval=c(0,stats::sd(d[,'Y'])),
-                                 d=d,maximum=TRUE)$maximum
-        dd <- augment_york_errors(d,out$w)
+                                 interval=c(0,stats::sd(xyz[,'Y'])),
+                                 xyz=xyz,maximum=TRUE)$maximum
+        dd <- augment_york_errors(xyz,out$w)
         out <- c(out,york(dd))
     } else if (identical(type,'titterington')){
         out$w <- stats::optimize(LL.titterington,
-                                 interval=c(0,stats::sd(d[,'Y'])),
-                                 d=d,maximum=TRUE)$maximum
-        dd <- augment_titterington_errors(d,out$w)
+                                 interval=c(0,stats::sd(xyz[,'Y'])),
+                                 xyz=xyz,maximum=TRUE)$maximum
+        dd <- augment_titterington_errors(xyz,out$w)
         out <- c(out,titterington(dd))
     } else {
         stop('invalid output type for model 3 regression')
@@ -67,16 +67,16 @@ model3regression <- function(d,type='york'){
     out
 }
 
-LL.isochron <- function(w,d,type='york'){
+LL.isochron <- function(w,xyz,type='york'){
     if (identical(type,'york'))
-        out <- LL.york(w,d)
+        out <- LL.york(w,xyz)
     else
-        out <- LL.titterington(w,d)
+        out <- LL.titterington(w,xyz)
     out
 }
-LL.york <- function(w,d){
+LL.york <- function(w,xy){
     out <- 0
-    D <- augment_york_errors(d,w)
+    D <- augment_york_errors(xy,w)
     X <- matrix(0,1,2)
     fit <- york(D)
     P <- get.york.xy(D,fit$a[1],fit$b[1])
@@ -89,9 +89,9 @@ LL.york <- function(w,d){
     }
     out
 }
-LL.titterington <- function(w,d){
+LL.titterington <- function(w,xyz){
     out <- 0
-    D <- augment_titterington_errors(d,w)
+    D <- augment_titterington_errors(xyz,w)
     fit <- titterington(D)
     dat <- matrix2covlist(D)
     X <- matrix(0,1,3)
@@ -114,16 +114,16 @@ LL.titterington <- function(w,d){
     out
 }
 
-augment_york_errors <- function(d,w){
-    out <- d
-    out[,'sY'] <- sqrt(d[,'sY']^2 + w^2)
-    out[,'rXY'] <- d[,'rXY']*d[,'sY']/out[,'sY']
+augment_york_errors <- function(xy,w){
+    out <- xy
+    out[,'sY'] <- sqrt(xy[,'sY']^2 + w^2)
+    out[,'rXY'] <- xy[,'rXY']*xy[,'sY']/out[,'sY']
     out
 }
-augment_titterington_errors <- function(d,w){
-    out <- d
-    out[,'sY'] <- sqrt(d[,'sY']^2 + w^2)
-    out[,'rXY'] <- d[,'rXY']*d[,'sY']/out[,'sY']
-    out[,'rYZ'] <- d[,'rYZ']*d[,'sY']/out[,'sY']
+augment_titterington_errors <- function(xyz,w){
+    out <- xyz
+    out[,'sY'] <- sqrt(xyz[,'sY']^2 + w^2)
+    out[,'rXY'] <- xyz[,'rXY']*xyz[,'sY']/out[,'sY']
+    out[,'rYZ'] <- xyz[,'rYZ']*xyz[,'sY']/out[,'sY']
     out
 }

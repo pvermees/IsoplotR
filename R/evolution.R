@@ -54,14 +54,6 @@
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #' 
-#' @param Th02 2-element vector with the assumed initial
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-#'     standard error. Only used if \code{detritus==2}
-#' @param Th02U48 9-element vector with the measured composition of
-#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-#'     \code{rYZ}. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==3}
 #' @param show.numbers label the error ellipses with the grain
 #'     numbers?
 #' @param levels a vector with additional values to be displayed as
@@ -128,25 +120,21 @@
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
-                      detritus=0,Th02=c(0,0),
-                      Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                      show.numbers=FALSE,levels=NA,clabel="",
-                      ellipse.col=c("#00FF0080","#FF000080"),
+                      detritus=0,show.numbers=FALSE,levels=NA,
+                      clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                       line.col='darksalmon',isochron=FALSE,model=1,
                       exterr=TRUE,sigdig=2,hide=NULL,omit=NULL,
                       omit.col=NA,...){
     if (x$format %in% c(1,2)){
         if (transform){
-            U4U8vst(x,detritus=detritus,Th02=Th02,Th02U48=Th02U48,
-                    xlim=xlim,ylim=ylim,alpha=alpha,
+            U4U8vst(x,detritus=detritus,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,
                     show.ellipses=(model!=2),hide=hide,omit=omit,
                     omit.col=omit.col,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
-                        ylim=ylim,alpha=alpha,
-                        detritus=detritus,Th02=Th02,Th02U48=Th02U48,
+                        ylim=ylim,alpha=alpha,detritus=detritus,
                         show.numbers=show.numbers,levels=levels,
                         clabel=clabel,ellipse.col=ellipse.col,
                         line.col=line.col,show.ellipses=(model!=2),
@@ -168,18 +156,14 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
     }
 }
 
-U4U8vst <- function(x,detritus=0,Th02=c(0,0),
-                    Th02U48=c(0,0,1e6,0,0,0,0,0,0),xlim=NA,ylim=NA,
-                    alpha=0.05,show.numbers=FALSE,levels=NA,
-                    clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                    show.ellipses=TRUE,hide=NULL,omit=NULL,
-                    omit.col=NA,...){
+U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
+                    show.numbers=FALSE,levels=NA,clabel="",
+                    ellipse.col=c("#00FF0080","#FF000080"),
+                    show.ellipses=TRUE,hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,
-                              detritus=detritus,Th02=Th02,
-                              Th02U48=Th02U48)
+    ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,detritus=detritus)
     nsd <- 3
     if (any(is.na(xlim)))
         xlim <- range(c(ta0[plotit,'t']-nsd*ta0[plotit,'s[t]'],
@@ -200,7 +184,6 @@ U4U8vst <- function(x,detritus=0,Th02=c(0,0),
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
-                        Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
                         xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.col=c("#00FF0080","#FF000080"),
@@ -209,8 +192,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    d <- data2evolution(x,detritus=detritus,Th02=Th02,Th02U48=Th02U48)
-    d2plot <- subset(d,subset=plotit)
+    y <- data2evolution(x,detritus=detritus)
+    d2plot <- subset(y,subset=plotit)
     lim <- evolution.lines(d2plot,xlim=xlim,ylim=ylim,...)
     if (isochron){
         fit <- isochron(x,type=3,plot=FALSE,
@@ -230,7 +213,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
-    pdat <- d[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
+    pdat <- y[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
     scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
@@ -412,14 +395,12 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     rbind(xlim,ylim)
 }
 
-data2evolution <- function(x,detritus=0,Th02=c(0,0),
-                           Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+data2evolution <- function(x,detritus=0){
     ns <- length(x)
     out <- matrix(0,ns,5)
     if (x$format %in% c(1,2)){
-        d <- data2tit(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
-        out <- Th230correction(d,option=detritus,
-                               dat=x,Th02=Th02,Th02U48=Th02U48)
+        td <- data2tit(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
+        out <- Th230correction(td,option=detritus,dat=x)
     } else if (x$format %in% c(3,4)){
         out <- data2york(x,type=1) # 8/2 - 0/2
         covariance <- out[,'sX']*out[,'sY']*out[,'rXY']
@@ -433,16 +414,15 @@ data2evolution <- function(x,detritus=0,Th02=c(0,0),
 
 # x = table with 'Th230U238','errTh230U238', 'U234U238','errU234U238'
 #                (and 'Th232U238','errTh232U238' if option==2)
-Th230correction <- function(x,option=0,dat=NA,Th02=c(0,0),
-                            Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+Th230correction <- function(x,option=0,dat=NA){
     out <- x
     if (option==1){
         out <- Th230correction.isochron(x,dat=dat)
     } else if (option==2){
-        tt <- get.ThU.age.corals(dat,detritus=2,Th02=Th02)[,'t']
-        out <- Th230correction.assumed.detritus(x,age=tt,Th02=Th02)
+        tt <- get.ThU.age.corals(dat,detritus=2)[,'t']
+        out <- Th230correction.assumed.detritus(x,age=tt,Th02=dat$Th02)
     } else if (option==3){
-        out <- Th230correction.measured.detritus(dat,Th02U48=Th02U48)
+        out <- Th230correction.measured.detritus(dat)
     }
     out
 }
@@ -466,7 +446,8 @@ Th230correction.assumed.detritus <- function(x,age=Inf,Th02=c(0,0)){
     out[,'sTh230U238'] <- sqrt(x[,'sTh230U238']^2 + sA^2)         
     out
 }
-Th230correction.measured.detritus <- function(x,Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+Th230correction.measured.detritus <- function(x){
+    Th02U48 <- x$Th02U48
     osmond <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
     X1 <- osmond[,'Th232U238']
     sX1 <- osmond[,'sTh232U238']

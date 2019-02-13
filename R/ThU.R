@@ -1,10 +1,8 @@
-ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE,
-                    detritus=0,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE,detritus=0){
     if (x$format %in% c(1,2)){
         ns <- length(x)
         out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
-                                  cor=cor,detritus=detritus,
-                                  Th02=Th02,Th02U48=Th02U48)
+                                  cor=cor,detritus=detritus)
     } else {
         out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
                                      i2i=i2i,sigdig=sigdig)
@@ -12,8 +10,7 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE,
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0,
-                               Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
@@ -21,8 +18,9 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0
     if (detritus==1)
         d <- Th230correction.isochron(d,dat=x)
     else if (detritus==3)
-        d <- Th230correction.measured.detritus(x,Th02U48=Th02U48)
+        d <- Th230correction.measured.detritus(x)
     if (detritus!=2) Th02 <- c(0,0)
+    else Th02 <- x$Th02
     for (j in 1:ns){
         out[j,] <- get.ThU.age(Th230U238=d[j,'Th230U238'],sTh230U238=d[j,'sTh230U238'],
                                U234U238=d[j,'U234U238'],sU234U238=d[j,'sU234U238'],

@@ -43,8 +43,7 @@ weightedmean(x, ...)
   detect.outliers = TRUE, plot = TRUE, from = NA, to = NA,
   levels = NA, clabel = "", rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80", sigdig = 2, alpha = 0.05,
-  ranked = FALSE, i2i = TRUE, detritus = 0, Th02 = c(0, 0),
-  Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0), hide = NULL,
+  ranked = FALSE, i2i = TRUE, detritus = 0, hide = NULL,
   omit = NULL, omit.col = NA, ...)
 
 \method{weightedmean}{ArAr}(x, random.effects = TRUE,
@@ -208,7 +207,7 @@ uses the default values stored in
 \code{settings('iratio',...)}.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format == 1} or \code{2}.
+    when \code{x$format == 1} or \code{2}).
 
 \code{0}: no correction
 
@@ -220,16 +219,6 @@ uses the default values stored in
 \code{3}: correct the data using the measured present day
 \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
-
-\item{Th02}{2-element vector with the assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{detritus==2}}
-
-\item{Th02U48}{9-element vector with the measured composition of
-the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
-\code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
-\code{rYZ}. Only used if \code{isochron==FALSE} and
-\code{detritus==3}}
 }
 \value{
 Returns a list with the following items:
@@ -266,10 +255,12 @@ population is not overdispersed.}
 included into the weighted mean calculation}
 
 \item{plotpar}{list of plot parameters for the weighted mean
-diagram, including \code{mean} (the mean value), \code{rect} (a
-grey rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
-ignoring systematic errors), \code{dash1} and \code{dash2} (lines
-marking the overdispersion if \code{random.effects=TRUE}).} }
+diagram, including \code{mean} (the mean value), \code{ci} (a grey
+rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
+ignoring systematic errors), \code{ci.exterr} (a grey rectangle
+with the 100[1-\eqn{\alpha}]\% confidence interval including
+systematic errors), \code{dash1} and \code{dash2} (lines marking
+the overdispersion if \code{random.effects=TRUE}).} }
 }
 \description{
 Models the data as a Normal distribution with two sources of

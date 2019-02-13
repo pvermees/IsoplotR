@@ -35,20 +35,20 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 }
 
 # d = matrix with columns X, sX, Y, sY, rXY
-scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
+scatterplot <- function(xyz,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,show.ellipses=1,levels=NA,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
                         fit='none',new.plot=TRUE,ci.col='gray80',
                         line.col='black',lwd=1,empty=FALSE,
                         hide=NULL,omit=NULL,omit.col=NA,
                         addcolourbar=TRUE,...){
-    ns <- nrow(d)
+    ns <- nrow(xyz)
     sn <- 1:ns
     plotit <- sn%ni%hide
     calcit <- sn%ni%c(hide,omit)
-    colnames(d) <- c('X','sX','Y','sY','rXY')
-    if (any(is.na(xlim))) xlim <- get.limits(d[plotit,'X'],d[plotit,'sX'])
-    if (any(is.na(ylim))) ylim <- get.limits(d[plotit,'Y'],d[plotit,'sY'])
+    colnames(xyz) <- c('X','sX','Y','sY','rXY')
+    if (any(is.na(xlim))) xlim <- get.limits(xyz[plotit,'X'],xyz[plotit,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(xyz[plotit,'Y'],xyz[plotit,'sY'])
     if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
     if (new.plot & empty) return()
     if (!identical(fit,'none'))
@@ -63,34 +63,34 @@ scatterplot <- function(d,xlim=NA,ylim=NA,alpha=0.05,
                                       hide=hide,omit=omit,omit.col=omit.col)
     }
     if (show.ellipses==0){ # points and or text
-        plot_points(d[,'X'],d[,'Y'],mybg=colour,mycex=1,
+        plot_points(xyz[,'X'],xyz[,'Y'],mybg=colour,mycex=1,
                     show.numbers=show.numbers,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
         for (i in sn[plotit]){
-            if (!any(is.na(d[i,]))){
-                covmat <- cor2cov2(d[i,'sX'],d[i,'sY'],d[i,'rXY'])
-                ell <- ellipse(d[i,'X'],d[i,'Y'],covmat,alpha=alpha)
+            if (!any(is.na(xyz[i,]))){
+                covmat <- cor2cov2(xyz[i,'sX'],xyz[i,'sY'],xyz[i,'rXY'])
+                ell <- ellipse(xyz[i,'X'],xyz[i,'Y'],covmat,alpha=alpha)
                 graphics::polygon(ell,col=colour[i])
-                if (show.numbers) graphics::text(d[i,'X'],d[i,'Y'],i)
-                else graphics::points(d[i,'X'],d[i,'Y'],pch=19,cex=0.25)
+                if (show.numbers) graphics::text(xyz[i,'X'],xyz[i,'Y'],i)
+                else graphics::points(xyz[i,'X'],xyz[i,'Y'],pch=19,cex=0.25)
             }
         }
     } else { # error cross
         if (show.numbers)
-            graphics::text(d[plotit,'X'],d[plotit,'Y'],
+            graphics::text(xyz[plotit,'X'],xyz[plotit,'Y'],
                            sn[plotit],adj=c(0,1),col=colour)
         else
-            graphics::points(d[plotit,'X'],d[plotit,'Y'],
+            graphics::points(xyz[plotit,'X'],xyz[plotit,'Y'],
                              pch=19,cex=0.5,col=colour)
         fact <- stats::qnorm(1-alpha/2)
-        dx <- fact*d[plotit,'sX']
-        dy <- fact*d[plotit,'sY']
-        graphics::arrows(d[plotit,'X'],d[plotit,'Y']-dy,
-                         d[plotit,'X'],d[plotit,'Y']+dy,
+        dx <- fact*xyz[plotit,'sX']
+        dy <- fact*xyz[plotit,'sY']
+        graphics::arrows(xyz[plotit,'X'],xyz[plotit,'Y']-dy,
+                         xyz[plotit,'X'],xyz[plotit,'Y']+dy,
                          code=3,angle=90,
                          length=0.05,col=colour)
-        graphics::arrows(d[plotit,'X']-dx,d[plotit,'Y'],
-                         d[plotit,'X']+dx,d[plotit,'Y'],
+        graphics::arrows(xyz[plotit,'X']-dx,xyz[plotit,'Y'],
+                         xyz[plotit,'X']+dx,xyz[plotit,'Y'],
                          code=3,angle=90,
                          length=0.05,col=colour)
     }
