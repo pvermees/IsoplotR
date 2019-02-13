@@ -9,8 +9,6 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-The Date field is over a month old.
-
 The build time stamp is missing.
 * checking package namespace information ... OK
 * checking package dependencies ... OK
