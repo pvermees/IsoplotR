@@ -94,11 +94,11 @@ d2d2dt2 <- function(tt,U48=1,Th0U8=0,Ra6U8=0){
         (l8-l6)*(l8-l6)*K3*exp((l8-l6)*tt) + K4*l8*exp(l8*tt)
     out
 }
-diseq.75.misfit <- function(x,tt,d){
+diseq.75.misfit <- function(tt,x,d){
     l5 <- settings('lambda','U235')[1]
     (x - exp(l5*tt) + 1 - d1(tt=tt,Pa1U5=d$Pa1U5))^2
 }
-diseq.68.misfit <- function(x,tt,d){
+diseq.68.misfit <- function(tt,x,d){
     l8 <- settings('lambda','U238')[1]
     (x - exp(l8*tt) + 1 - d2(tt=tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8))^2
 }

@@ -1,0 +1,22 @@
+tic <- 1
+class(tic) <- "tic"
+
+toc <- 1
+class(toc) <- "toc"
+
+print.tic <- function(x,...) {
+    if (!exists("proc.time"))
+        stop("cannot measure time")
+    gc(FALSE)
+    assign(".temp.tictime", proc.time(), envir = .GlobalEnv)
+}
+
+print.toc <- function(x,...) {
+    if (!exists(".temp.tictime", envir = .GlobalEnv))
+        stop("Did you tic?")
+    time <- get(".temp.tictime", envir = .GlobalEnv)
+    rm(".temp.tictime", envir = .GlobalEnv)
+    print(res <- structure(proc.time() - time,
+                           class = "proc_time"), ...)
+    invisible(res)
+}

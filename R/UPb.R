@@ -460,7 +460,9 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         t.75 <- log(1+x)/l5
         J <- matrix(0,1,2)
         if (d$corr){
-            t.75 <- stats::optimize(diseq.75.misfit,interval=c(0,t.75),x=x,d=d)$minimum
+            dt <- 0.01/settings('lambda','U234')[1]
+            search.range <- c(t.75-dt,t.75+dt)
+            t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
             D <- wendt(tt=t.75,d=d)
             xe1d <- x-exp(l5*t.75)+1-D$d1 # misfit = f = xe1d^2
             dfdx <- 2*xe1d
@@ -512,6 +514,8 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         J <- matrix(0,1,2)
         if (d$corr){
             t.68 <- tryCatch({
+                dt <- 0.01/settings('lambda','U234')[1]
+                search.range <- c(t.init-dt,t.init+dt)
                 stats::optimize(diseq.68.misfit,interval=c(0,t.init),x=x,d=d)$minimum
             }, error = function(error_condition) {
                 t.init
