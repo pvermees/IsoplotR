@@ -92,12 +92,13 @@ twfit2wfit <- function(fit,x){
     disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
     if (conc.slope > disc.slope){
-        search.range <- c(tt+buffer,10000)
+        search.range <- c(tt,get.Pb207Pb206.age(b0/a0,d=x$d)[1])+buffer
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
     } else {
-        search.range <- c(-1,tt-buffer)
+        search.range <- c(-1000,tt-buffer)
+        if (x$d$corr) search.range[1] <- -0.001/settings('lambda','U234')[1]
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
         tu <- tt
