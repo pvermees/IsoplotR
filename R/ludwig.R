@@ -224,27 +224,24 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
     ta0b0
 }
 get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
-    fit <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor)
-    ta0b0 <- fit$par
-    w <- get_ludwig_disp(ta0b0,x,interval=get_lud_wrange(ta0b0,x))
-    out <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,anchor=anchor)
-    out$w <- w
+    out <- list(w=0,par=init)
+    for (i in 1:5){
+        out <- fit_ludwig_discordia(x,init=out$par,w=out$w,exterr=exterr,anchor=anchor)
+        out$w <- stats::optimize(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
+                                 exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
+    }
     out
 }
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
     optifix(parms=init,fn=LL.lud.UPb,method="BFGS",x=x,w=w,
             exterr=exterr,fixed=fixit(x,anchor))
 }
-get_ludwig_disp <- function(ta0b0,x,interval){
-    stats::optimize(LL.lud.UPb.disp,interval=interval,x=x,
-                    ta0b0=ta0b0,maximum=TRUE)$maximum
-}
-get_lud_wrange <- function(ta0b0,x){
-    c(0,1)
-}    
 
-LL.lud.UPb.disp <- function(w,x,ta0b0){
-    LL.lud.UPb(ta0b0,x=x,exterr=FALSE,w=w,LL=TRUE)
+LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
+    # slightly more accurate but much slower results from these two lines:
+    # fit <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,anchor=anchor)
+    # LL.lud.UPb(ta0b0=fit$par,x=x,exterr=exterr,w=w,LL=TRUE)
+    LL.lud.UPb(ta0b0=ta0b0,x=x,exterr=exterr,w=w,LL=TRUE)
 }
 LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     if (x$format<4){

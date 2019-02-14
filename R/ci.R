@@ -48,20 +48,20 @@ profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
 profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
     w <- fit$w
     ta0b0 <- fit$par
-    wrange <- get_lud_wrange(ta0b0,x)
-    LLmax <- LL.lud.UPb.disp(w,x,ta0b0)
+    wrange <- c(0,1)
+    LLmax <- LL.lud.disp(w=w,x=x,ta0b0=ta0b0)
     cutoff <- stats::qchisq(1-alpha,1)    
-    if (abs(LL.lud.UPb.disp(wrange[1],x,ta0b0)-LLmax) < cutoff/2){
+    if (abs(LL.lud.disp(w=wrange[1],x=x,ta0b0=ta0b0)-LLmax) < cutoff/2){
         wl <- 0
     } else {
-        wl <- stats::optimize(profile_discordia_helper,interval=c(0,w),x=x,
-                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
+        wl <- stats::optimize(profile_discordia_helper,interval=c(wrange[1],w),
+                              x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
     }
-    if (abs(LL.lud.UPb.disp(wrange[2],x,ta0b0)-LLmax) < cutoff/2){
+    if (abs(LL.lud.disp(w=wrange[2],x=x,ta0b0=ta0b0)-LLmax) < cutoff/2){
         wu <- Inf
     } else {
-        wu <- stats::optimize(profile_discordia_helper,interval=c(w,wrange[2]),x=x,
-                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
+        wu <- stats::optimize(profile_discordia_helper,interval=c(w,wrange[2]),
+                              x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
     }
     ll <- w - wl
     ul <- wu - w
@@ -94,9 +94,11 @@ profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     c(ll,ul)
 }
 profile_central_FT_helper <- function(sigma,mu,y,m,LLmax,cutoff){
-#    search.range <- c(mu-2*sigma,mu+2*sigma)
-#    LL <- stats::optimize(LL.FT,interval=search.range,
-#                          sigma=sigma,y=y,m=m,maximum=TRUE)$objective
+    # update mu from sigma using section 3.9.1 from Galbraith (2005)
+    theta <- 1/(1+exp(-mu))
+    wj <- m/(theta*(1-theta) + (m-1)*(theta^2)*((1-theta)^2)*(sigma^2))
+    theta <- sum(wj*y/m)/sum(wj)
+    mu <- log(theta)-log(1-theta)
     LL <- LL.FT(mu=mu,sigma=sigma,y=y,m=m)
     abs(LLmax-LL-cutoff/2)
 }
@@ -105,7 +107,7 @@ profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     abs(LLmax-LL-cutoff/2)
 }
 profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff){
-    LL <- LL.lud.UPb.disp(w,x,ta0b0)
+    LL <- LL.lud.disp(w=w,x=x,ta0b0=ta0b0)
     abs(LLmax-LL-cutoff/2)
 }
 profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
