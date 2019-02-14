@@ -1,8 +1,8 @@
 # based on equation 6.5 of Galbraith (2005)
 profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
-    LLmax <- LL.FT(sigma,mu,y,m)
+    LLmax <- LL.FT(mu=mu,sigma=sigma,y=y,m=m)
     cutoff <- stats::qchisq(1-alpha,1)
-    if (abs(LL.FT(exp(-10),mu,y,m)-LLmax) < cutoff/2){
+    if (abs(LL.FT(mu=mu,sigma=exp(-10),y=y,m=m)-LLmax) < cutoff/2){
         sigmal <- 0
     } else {
         sigmal <- stats::optimize(profile_central_FT_helper,
@@ -11,7 +11,7 @@ profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
                                   cutoff=cutoff)$minimum
     }
     sigmauinit <- 2*stats::sd(log(y)-log(m-y))
-    if (abs(LL.FT(sigmauinit,mu,y,m)-LLmax) < cutoff/2){
+    if (abs(LL.FT(mu=mu,sigma=sigmauinit,y=y,m=m)-LLmax) < cutoff/2){
         sigmau <- Inf
     } else {
         sigmau <- stats::optimize(profile_central_FT_helper,
@@ -48,20 +48,20 @@ profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
 profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
     w <- fit$w
     ta0b0 <- fit$par
-    wrange <- get_lud_wrange(ta0b0,x)
-    LLmax <- LL.lud.UPb.disp(w,x,ta0b0)
+    wrange <- c(0,1)
+    LLmax <- LL.lud.disp(w=w,x=x,ta0b0=ta0b0)
     cutoff <- stats::qchisq(1-alpha,1)    
-    if (abs(LL.lud.UPb.disp(wrange[1],x,ta0b0)-LLmax) < cutoff/2){
+    if (abs(LL.lud.disp(w=wrange[1],x=x,ta0b0=ta0b0)-LLmax) < cutoff/2){
         wl <- 0
     } else {
-        wl <- stats::optimize(profile_discordia_helper,interval=c(0,w),x=x,
-                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
+        wl <- stats::optimize(profile_discordia_helper,interval=c(wrange[1],w),
+                              x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
     }
-    if (abs(LL.lud.UPb.disp(wrange[2],x,ta0b0)-LLmax) < cutoff/2){
+    if (abs(LL.lud.disp(w=wrange[2],x=x,ta0b0=ta0b0)-LLmax) < cutoff/2){
         wu <- Inf
     } else {
-        wu <- stats::optimize(profile_discordia_helper,interval=c(w,wrange[2]),x=x,
-                              ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
+        wu <- stats::optimize(profile_discordia_helper,interval=c(w,wrange[2]),
+                              x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
     }
     ll <- w - wl
     ul <- wu - w
@@ -94,7 +94,12 @@ profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     c(ll,ul)
 }
 profile_central_FT_helper <- function(sigma,mu,y,m,LLmax,cutoff){
-    LL <- LL.FT(sigma,mu,y,m)
+    # update mu from sigma using section 3.9.1 from Galbraith (2005)
+    theta <- 1/(1+exp(-mu))
+    wj <- m/(theta*(1-theta) + (m-1)*(theta^2)*((1-theta)^2)*(sigma^2))
+    theta <- sum(wj*y/m)/sum(wj)
+    mu <- log(theta)-log(1-theta)
+    LL <- LL.FT(mu=mu,sigma=sigma,y=y,m=m)
     abs(LLmax-LL-cutoff/2)
 }
 profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
@@ -102,7 +107,7 @@ profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     abs(LLmax-LL-cutoff/2)
 }
 profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff){
-    LL <- LL.lud.UPb.disp(w,x,ta0b0)
+    LL <- LL.lud.disp(w=w,x=x,ta0b0=ta0b0)
     abs(LLmax-LL-cutoff/2)
 }
 profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
@@ -110,7 +115,7 @@ profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
     abs(LLmax-LL-cutoff/2)
 }
 
-LL.FT <- function(sigma,mu,y,m){
+LL.FT <- function(mu,sigma,y,m){
     LL <- 0
     ns <- length(y)
     for (i in 1:ns){
@@ -153,27 +158,27 @@ ci_isochron <- function(fit,disp=TRUE){
 profile_LL_isochron_disp <- function(fit){
     cutoff <- stats::qchisq(1-fit$alpha,1)
     w <- fit$w['s']
-    d <- fit$d
-    LLmax <- LL.isochron(w,d,type=fit$type)
-    if (abs(LL.isochron(0,d,type=fit$type)-LLmax) < cutoff/2){
+    xyz <- fit$xyz
+    LLmax <- LL.isochron(w,xyz,type=fit$type)
+    if (abs(LL.isochron(0,xyz,type=fit$type)-LLmax) < cutoff/2){
         wl <- 0
     } else {
-        wl <- stats::optimize(profile_isochron_helper,interval=c(0,w),d=d,
+        wl <- stats::optimize(profile_isochron_helper,interval=c(0,w),xyz=xyz,
                               LLmax=LLmax,cutoff=cutoff,type=fit$type)$minimum
     }
-    if (abs(LL.isochron(stats::sd(d[,'Y']),d,type=fit$type)-LLmax) < cutoff/2){
+    if (abs(LL.isochron(stats::sd(xyz[,'Y']),xyz=xyz,type=fit$type)-LLmax) < cutoff/2){
         wu <- Inf
     } else {
         wu <- stats::optimize(profile_isochron_helper,
-                              interval=c(w,stats::sd(d[,'Y'])),
-                              d=d,LLmax=LLmax,cutoff=cutoff,
+                              interval=c(w,stats::sd(xyz[,'Y'])),
+                              xyz=xyz,LLmax=LLmax,cutoff=cutoff,
                               type=fit$type)$minimum
     }
     ll <- w - wl
     ul <- wu - w
     c(ll,ul)
 }
-profile_isochron_helper <- function(w,dat,LLmax,cutoff,type='york'){
-    LL <- LL.isochron(w,dat,type=type)
+profile_isochron_helper <- function(w,xyz,LLmax,cutoff,type='york'){
+    LL <- LL.isochron(w,xyz,type=type)
     abs(LLmax-LL-cutoff/2)
 }

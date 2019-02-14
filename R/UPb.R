@@ -516,7 +516,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             t.68 <- tryCatch({
                 dt <- 0.01/settings('lambda','U234')[1]
                 search.range <- c(t.init-dt,t.init+dt)
-                stats::optimize(diseq.68.misfit,interval=c(0,t.init),x=x,d=d)$minimum
+                stats::optimize(diseq.68.misfit,interval=search.range,x=x,d=d)$minimum
             }, error = function(error_condition) {
                 t.init
             })

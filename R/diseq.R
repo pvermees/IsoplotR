@@ -95,15 +95,13 @@ d2d2dt2 <- function(tt,U48=1,Th0U8=0,Ra6U8=0){
     out
 }
 diseq.75.misfit <- function(tt,x,d){
-    l5 <- settings('lambda','U235')[1]
-    (x - exp(l5*tt) + 1 - d1(tt=tt,Pa1U5=d$Pa1U5))^2
+    abs(log(x) - log(subset(age_to_Pb207U235_ratio(tt,d=d),select='75')))
 }
 diseq.68.misfit <- function(tt,x,d){
-    l8 <- settings('lambda','U238')[1]
-    (x - exp(l8*tt) + 1 - d2(tt=tt,U48=d$U48,Th0U8=d$Th0U8,Ra6U8=d$Ra6U8))^2
+    abs(log(x) - log(subset(age_to_Pb206U238_ratio(tt,d=d),select='68')))
 }
 Pb207Pb206.misfit <- function(tt,x,d=diseq()){
-    (x - age_to_Pb207Pb206_ratio(tt,d=d)[,'76'])^2
+    abs(x - subset(age_to_Pb207Pb206_ratio(tt,d=d),select='76'))
 }
 # derivative of the 7/6 misfit function w.r.t. time
 dmf76dt <- function(x,t.76,d=diseq()){
