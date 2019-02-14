@@ -225,11 +225,11 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
 }
 get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out <- list(w=0,par=init)
-    for (i in 1:5){
+#    for (i in 1:5){ # loop for more accurate but slower and more unstable results
         out <- fit_ludwig_discordia(x,init=out$par,w=out$w,exterr=exterr,anchor=anchor)
         out$w <- stats::optimize(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
                                  exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
-    }
+#    }
     out
 }
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
@@ -238,7 +238,7 @@ fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),.
 }
 
 LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
-    # slightly more accurate but much slower results from these two lines:
+    # these two lines produce slightly more accurate but much slower results:
     # fit <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,anchor=anchor)
     # LL.lud.UPb(ta0b0=fit$par,x=x,exterr=exterr,w=w,LL=TRUE)
     LL.lud.UPb(ta0b0=ta0b0,x=x,exterr=exterr,w=w,LL=TRUE)
