@@ -1,0 +1,9 @@
+get.initial.ratio.UPb <- function(){
+    lud <- ludwig(x)
+    if (x$format<4){
+        out <- lud$par['76i']
+    } else {
+        out <- lud$par[c('64i','74i')]
+    }
+    out
+}

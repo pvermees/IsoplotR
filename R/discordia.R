@@ -153,11 +153,10 @@ project.concordia <- function(m76,m86,i76,d=diseq()){
     } else if (pos & below){
         go.ahead <- TRUE
     } else if (neg & above){
-        if (d$corr) search.range[1] <- -0.5
-        else search.range[1] <- -1000
+        search.range <- c(0,t68)
         go.ahead <- TRUE
     } else if (neg & below){           # it is not clear what to do with samples
-        for (tt in seq(from=10,to=5000,by=10)){
+        for (tt in seq(from=0,to=5000,by=10)){
             misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
             if (misfit<0){             # that plot in the 'forbidden zone' above
                 search.range[2] <- tt  # Wetherill concordia or below T-W concordia
