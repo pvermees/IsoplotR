@@ -22,7 +22,7 @@ get.initial.ratio.UPb <- function(x){
         yp <- y0 - X*y0/x0     # predicted 6/4-value
         Y <- X*get.Pb204U238.ratios(x)[,1]          # 4/6 measurement
         dy <- Y - yp           # 6/4 misfit
-        out[,1] <- 1/(y0 + dy)     # initial 6/4-ratio
+        out[,1] <- 1/(y0 + dy) # initial 6/4-ratio
         # then determine 7/4-intercepts:
         y0 <- 1/lud$par['74i'] # 4/7-intercept
         x0 <- 1/age_to_Pb207U235_ratio(tt,d=x$d)[1] # 5/7-intercept
@@ -31,7 +31,7 @@ get.initial.ratio.UPb <- function(x){
         U <- settings('iratio','U238U235')[1]
         Y <- X*U*get.Pb204U238.ratios(x)[,1]        # 4/7 measurement
         dy <- Y - yp           # 7/4 misfit
-        out[,2] <- 1/(y0 + dy)     # initial 7/4-ratio
+        out[,2] <- 1/(y0 + dy) # initial 7/4-ratio
     }
     out
 }

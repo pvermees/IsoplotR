@@ -32,7 +32,7 @@ common.Pb.isochron.UPb <- function(x){
     if (x$format<4)
         out <- Pb.correction.without.204(x,i76=y0)
     else
-        out <- Pb.correction.with.204(x,i64=y0[1],i74=y0[2])
+        out <- Pb.correction.with.204(x,i64=y0[,1],i74=y0[,2])
     out
 }
 common.Pb.isochron.PbPb <- function(x){
