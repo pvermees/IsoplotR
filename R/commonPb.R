@@ -28,15 +28,11 @@ common.Pb.correction.PbPb <- function(x,option=1){
 }
 
 common.Pb.isochron.UPb <- function(x){
-    lud <- ludwig(x)
-    if (x$format<4){
-        i76 <- lud$par['76i']
-        out <- Pb.correction.without.204(x,i76)
-    } else {
-        i64 <- lud$par['64i']
-        i74 <- lud$par['74i']
-        out <- Pb.correction.with.204(x,i64,i74)
-    }
+    y0 <- get.initial.ratio(x)
+    if (x$format<4)
+        out <- Pb.correction.without.204(x,i76=y0)
+    else
+        out <- Pb.correction.with.204(x,i64=y0[,1],i74=y0[,2])
     out
 }
 common.Pb.isochron.PbPb <- function(x){
