@@ -38,9 +38,6 @@ get.initial.ratio.UPb <- function(x){
 get.initial.ratio.ArAr <- function(x){
     get.initial.ratio_helper(x)
 }
-get.initial.ratio.PbPb <- function(x){
-    get.initial.ratio_helper(x)
-}
 get.initial.ratio_helper <- function(x){
     y <- data2york(x,inverse=TRUE)
     fit <- regression(y,model=1)
