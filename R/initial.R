@@ -35,3 +35,13 @@ get.initial.ratio.UPb <- function(x){
     }
     out
 }
+get.initial.ratio.ArAr <- function(x){
+    get.initial.ratio_helper(x)
+}
+get.initial.ratio_helper <- function(x){
+    y <- data2york(x,inverse=TRUE)
+    fit <- regression(y,model=1)
+    yi <- 1/(y[,'Y'] - fit$b[1]*y[,'X'])
+    syi <- fit$b[2]*y[,'X']*yi^2
+    cbind(yi,syi)
+}

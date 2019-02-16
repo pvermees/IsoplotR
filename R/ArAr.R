@@ -165,8 +165,8 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     colnames(out) <- c('t','s[t]')
     rat <- ArAr.age.ratios(x)
     if (i2i){
-        fit <- isochron.ArAr(x,plot=FALSE,exterr=exterr,inverse=FALSE)
-        Ar4039x <- rat[,'Ar40Ar39'] - fit$a[1]/rat[,"Ar39Ar36"]
+        Ar4036i <- get.initial.ratio(x)
+        Ar4039x <- rat[,'Ar40Ar39'] - Ar4036i[,1]/rat[,"Ar39Ar36"]
     } else {
         Ar4039x <- rat[,'Ar40Ar39'] - iratio("Ar40Ar36")[1]/rat[,"Ar39Ar36"]
     }
@@ -180,8 +180,8 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
         E[1,2] <- rat[j,'cov']
         E[2,1] <- E[1,2]
         if (i2i){
-            J[1,2] <- fit$a[1]/rat[j,"Ar39Ar36"]^2
-            if (exterr) E[3,3] <- fit$a[2]^2
+            J[1,2] <- Ar4036i[j,1]/rat[j,"Ar39Ar36"]^2
+            if (exterr) E[3,3] <- Ar4036i[j,2]^2
         } else {
             J[1,2] <- iratio("Ar40Ar36")[1]/rat[j,"Ar39Ar36"]^2
             if (exterr) E[3,3] <- iratio("Ar40Ar36")[2]^2
