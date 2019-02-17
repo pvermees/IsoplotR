@@ -108,7 +108,7 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
         X <- x
     } else if (common.Pb == 1){
         X <- common.Pb.stacey.kramers.PbPb(x)
-    } else if (option == 3){
+    } else if (common.Pb == 3){
         X <- common.Pb.nominal.PbPb(x)
     }
     if (common.Pb != 2){
