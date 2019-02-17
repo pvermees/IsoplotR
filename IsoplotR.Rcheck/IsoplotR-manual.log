@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  17 FEB 2019 22:20
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  17 FEB 2019 23:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -712,7 +712,7 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
-(/tmp/RtmpK0EYtV/Rd2pdf5cc34172b43f/Rd2.aux)
+(/tmp/RtmpQvPXTJ/Rd2pdf6b506f373b12/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -769,8 +769,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/tmp/RtmpK0EYtV/Rd2pdf5cc34172b43f/Rd2.out)
-(/tmp/RtmpK0EYtV/Rd2pdf5cc34172b43f/Rd2.out)
+(/tmp/RtmpQvPXTJ/Rd2pdf6b506f373b12/Rd2.out)
+(/tmp/RtmpQvPXTJ/Rd2pdf6b506f373b12/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -807,7 +807,7 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 31.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
-(/tmp/RtmpK0EYtV/Rd2pdf5cc34172b43f/Rd2.toc [1
+(/tmp/RtmpQvPXTJ/Rd2pdf6b506f373b12/Rd2.toc [1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -1305,7 +1305,7 @@ Overfull \hbox (3.83311pt too wide) in paragraph at lines 4572--4581
 [63] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2017/01/28 v1.1t UTF-8 support for inputenc
 ) [64] [65]
-(/tmp/RtmpK0EYtV/Rd2pdf5cc34172b43f/Rd2.ind [66]
+(/tmp/RtmpQvPXTJ/Rd2pdf6b506f373b12/Rd2.ind [66]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
@@ -1318,7 +1318,7 @@ LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 4809.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 4809.
- (/tmp/RtmpK0EYtV/Rd2pdf5cc34172b43f/Rd2.aux)
+ (/tmp/RtmpQvPXTJ/Rd2pdf6b506f373b12/Rd2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 4809.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 4809.
 

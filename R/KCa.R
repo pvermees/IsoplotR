@@ -1,5 +1,5 @@
 get.KCa.ratio <- function(tt,st,exterr=TRUE){
-    get.PD.ratio(tt,st,'K40',exterr)
+    get.PD.ratio(tt,st,'K40',exterr,bratio=0.895)
 }
 
 get.KCa.age <- function(K40Ca40,sK40Ca40,exterr=TRUE){

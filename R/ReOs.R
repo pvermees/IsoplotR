@@ -87,7 +87,7 @@ get.ReOs.ratio <- function(tt,st,exterr=TRUE){
 }
 
 get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=TRUE){
-    get.PD.age(Os187Re187,sOs187Re187,'Re187',exterr)
+    get.PD.age(Os187Re187,sOs187Re187,'Re187',exterr=exterr)
 }
 
 ReOs.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
