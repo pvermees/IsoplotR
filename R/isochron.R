@@ -243,10 +243,9 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' \item{y0}{a four-element list containing:
 #'
 #' \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
-#' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-#' \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{87}}Sr/\eqn{^{87}}Rb,
-#' \eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#' ratio.
+#' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
+#' \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio.
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
@@ -372,9 +371,9 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' @examples
 #' data(examples)
-#' isochron(examples$ArAr)
+#' isochron(examples$RbSr)
 #'
-#' fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+#' fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
 #'
 #' dev.new()
 #' isochron(examples$ThU,type=4)
@@ -461,20 +460,19 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     d2calc <- clear(y,hide,omit)
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
+    out$y0[c('y','s[y]')] <- out$a
     if (inverse){
         R76 <- out$a
-        out$y0[c('y','s[y]')] <- out$b
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
         y.lab <- quote(''^207*'Pb/'^206*'Pb')
+        out$y0label <- quote(''^207*'Pb/'^206*'Pb = ')
     } else {
         R76 <- out$b
-        out$y0[c('y','s[y]')] <- out$a
         x.lab <- quote(''^206*'Pb/'^204*'Pb')
         y.lab <- quote(''^207*'Pb/'^204*'Pb')
+        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*' = ')
     }
-    out$displabel <-
-        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
-    out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*' = ')
+    out$displabel <- quote('dispersion = ')
     out$age[c('t','s[t]')] <-
         get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
     out <- ci_isochron(out)
