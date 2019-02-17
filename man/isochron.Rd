@@ -219,10 +219,9 @@ error.}
 \item{y0}{a four-element list containing:
 
 \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
-\eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
-\eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{87}}Sr/\eqn{^{87}}Rb,
-\eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-ratio.
+\eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
+\eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio.
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
@@ -418,9 +417,9 @@ adding an overdispersion \emph{term} that lowers the MSWD to unity.
 }
 \examples{
 data(examples)
-isochron(examples$ArAr)
+isochron(examples$RbSr)
 
-fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
 
 dev.new()
 isochron(examples$ThU,type=4)

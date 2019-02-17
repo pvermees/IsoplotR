@@ -287,16 +287,16 @@ data2york.ArAr <- function(x,inverse=TRUE,...){
 }
 #' @rdname data2york
 #' @export
-data2york.KCa <- function(x,...){
-    data2york(x$x,format=x$format,...)
+data2york.KCa <- function(x,inverse=FALSE,...){
+    out <- data2york(x$x,format=x$format,...)
+    if (inverse) out <- normal2inverse(out)
+    out
 }
 #' @rdname data2york
 #' @export
 data2york.PbPb <- function(x,inverse=TRUE,...){
-    if (inverse)
-        out <- PbPb.inverse.ratios(x)
-    else
-        out <- PbPb.normal.ratios(x)
+    if (inverse) out <- PbPb.inverse.ratios(x)
+    else out <- PbPb.normal.ratios(x)
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
@@ -304,12 +304,9 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
 #'     (e.g. decay constants) into the output errors.
 #' @rdname data2york
 #' @export
-data2york.PD <- function(x,exterr=FALSE,...){
-    if (x$format==1){
-        out <- x$x
-    } else if (x$format==2){
-        out <- ppm2ratios(x,exterr=exterr)
-    }
+data2york.PD <- function(x,exterr=FALSE,inverse=FALSE,...){
+    if (inverse) out <- PD.inverse.ratios(x,exterr=exterr)
+    else out <- PD.normal.ratios(x,exterr=exterr)
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
@@ -426,3 +423,22 @@ ThConversionHelper <- function(x){
     }
     out
 }
+
+normal2inverse <- function(x){
+    out <- x
+    out[,'X'] <- x[,'X']/x[,'Y']
+    out[,'Y'] <- 1/x[,'Y']
+    E11 <- x[,'sX']^2
+    E22 <- x[,'sY']^2
+    E12 <- x[,'rXY']*x[,'sX']*x[,'sY']
+    J11 <- 1/x[,'Y']
+    J12 <- -out[,'X']/x[,'Y']
+    J21 <- rep(0,nrow(x))
+    J22 <- -out[,'Y']/x[,'Y']
+    err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
+    out[,'sX'] <- sqrt(err[,'varX'])
+    out[,'sY'] <- sqrt(err[,'varY'])
+    out[,'rXY'] <- err[,'cov']/(out[,'sX']*out[,'sY'])
+    out
+}
+

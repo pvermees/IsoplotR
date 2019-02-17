@@ -146,8 +146,7 @@ ci_regression <- function(fit,disp=TRUE,i1='b',i2='a'){
     if (fit$model==1 & disp){
         out[[i2]]['disp[y]'] <- sqrt(fit$mswd)*out[[i2]]['ci[y]']
     } else if (fit$model==3) {
-        out$w[c('ll','ul')] <-
-            profile_LL_isochron_disp(fit)
+        out$w[c('ll','ul')] <- profile_LL_isochron_disp(fit)
     }
     out
     

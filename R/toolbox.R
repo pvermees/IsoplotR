@@ -5,15 +5,9 @@ length.PbPb <- function(x){ nrow(x$x) }
 #' @export
 length.ArAr <- function(x){ nrow(x$x) }
 #' @export
+length.PD <- function(x){ nrow(x$x) }
+#' @export
 length.KCa <- function(x){ nrow(x$x) }
-#' @export
-length.RbSr <- function(x){ nrow(x$x) }
-#' @export
-length.SmNd <- function(x){ nrow(x$x) }
-#' @export
-length.ReOs <- function(x){ nrow(x$x) }
-#' @export
-length.LuHf <- function(x){ nrow(x$x) }
 #' @export
 length.ThU <- function(x){ nrow(x$x) }
 #' @export
@@ -37,13 +31,7 @@ subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
 #' @export
 subset.KCa <- function(x,subset,...){ subset_helper(x,subset,...) }
 #' @export
-subset.RbSr <- function(x,subset,...){ subset_helper(x,subset,...) }
-#' @export
-subset.SmNd <- function(x,subset,...){ subset_helper(x,subset,...) }
-#' @export
-subset.ReOs <- function(x,subset,...){ subset_helper(x,subset,...) }
-#' @export
-subset.LuHf <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.PD <- function(x,subset,...){ subset_helper(x,subset,...) }
 #' @export
 subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
 #' @export

@@ -193,7 +193,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #'
 #' \code{1}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' \code{2}: use the Stacey-Kramers two-stage model to infer the initial
 #' Pb-composition
 #'
 #' \code{3}: use the Pb-composition stored in
@@ -210,17 +210,13 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            col='black',markers=NULL,k=0,exterr=TRUE,
                            common.Pb=0,alpha=0.05,hide=NULL,
                            omit=NULL,omit.col=NA,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    radialplot_helper(X,from=from,to=to,t0=t0,
+    radialplot_helper(x,from=from,to=to,t0=t0,
                       transformation=transformation,type=type,
                       cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                       show.numbers=show.numbers,pch=pch,levels=levels,
                       clabel=clabel,bg=bg,col=col,markers=markers,
                       k=k,exterr=exterr,alpha=alpha,hide=hide,
-                      omit=omit,omit.col=omit.col,...)
+                      omit=omit,omit.col=omit.col,common.Pb=common.Pb,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
@@ -239,16 +235,12 @@ radialplot.PbPb <- function(x,from=NA,to=NA,t0=NA,
                             col='black',markers=NULL,k=0,
                             exterr=TRUE,common.Pb=1,alpha=0.05,
                             hide=NULL,omit=NULL,omit.col=NA,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    radialplot_helper(X,from=from,to=to,t0=t0,
+    radialplot_helper(x,from=from,to=to,t0=t0,
                       transformation=transformation,
                       show.numbers=show.numbers,pch=pch,levels=levels,
                       clabel=clabel,bg=bg,col=col,markers=markers,k=k,
                       exterr=exterr,alpha=alpha,hide=hide,omit=omit,
-                      omit.col=omit.col,...)
+                      omit.col=omit.col,common.Pb=common.Pb,...)
 }
 #' @rdname radialplot
 #' @export
@@ -395,18 +387,19 @@ radialplot_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                               show.numbers=FALSE,pch=21,levels=NA,
                               clabel="",bg=c("yellow","red"),col='black',
                               markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
-                              alpha=0.05,units='Ma',detritus=0,
+                              common.Pb=0,alpha=0.05,units='Ma',detritus=0,
                               hide=NULL,omit=NULL,omit.col=NA,...){
     x2calc <- clear(x,hide,omit)
     peaks <- peakfit(x2calc,k=k,exterr=exterr,i2i=i2i,type=type,
-                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,detritus=detritus)
+                     cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+                     common.Pb=common.Pb,detritus=detritus)
     markers <- c(markers,peaks$peaks['t',])
     age2radial(x,from=from,to=to,t0=t0,transformation=transformation,
                type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,i2i=i2i,
                alpha=alpha,units=units,detritus=detritus,hide=hide,
-               omit=omit,omit.col=omit.col,...)
+               omit=omit,omit.col=omit.col,common.Pb=common.Pb,...)
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -416,9 +409,9 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                        show.numbers=FALSE,pch=21,levels=NA,clabel="",
                        bg=c("yellow","red"),col='black',markers=NULL,
                        k=0,i2i=FALSE,alpha=0.05,units='MA',detritus=0,
-                       hide=NULL,omit=NULL,omit.col=NA,...){
+                       hide=NULL,omit=NULL,omit.col=NA,common.Pb=0,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   i2i=i2i,detritus=detritus)
+                   i2i=i2i,detritus=detritus,common.Pb=common.Pb)
     radialplot.default(tt,from=from,to=to,t0=t0,
                        transformation=transformation,
                        show.numbers=show.numbers,pch=pch,

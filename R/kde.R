@@ -159,7 +159,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'
 #' \code{1}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' \code{2}: use the Stacey-Kramers two-stage model to infer the initial
 #' Pb-composition
 #'
 #' \code{3}: use the Pb-composition stored in
@@ -174,11 +174,7 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     show.hist=TRUE, bty='n',binwidth=NA,type=4,
                     cutoff.76=1100,cutoff.disc=c(-15,5),common.Pb=0,
                     hide=NULL,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    tt <- filter.UPb.ages(X,type,cutoff.76,cutoff.disc)[,1]
+    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc,common.Pb=common.Pb)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,
@@ -227,11 +223,7 @@ kde.PbPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      show.hist=TRUE,bty='n',binwidth=NA,common.Pb=1,
                      hide=NULL,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    tt <- PbPb.age(X)[,1]
+    tt <- PbPb.age(x,common.Pb=common.Pb)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
                 n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,

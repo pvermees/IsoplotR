@@ -286,9 +286,9 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### ** Examples
 
 data(examples)
-isochron(examples$ArAr)
+isochron(examples$RbSr)
 
-fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
 
 dev.new()
 isochron(examples$ThU,type=4)

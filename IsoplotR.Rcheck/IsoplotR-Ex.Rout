@@ -310,9 +310,9 @@ dev.new(): using pdf(file="Rplots3.pdf")
 > ### ** Examples
 > 
 > data(examples)
-> isochron(examples$ArAr)
+> isochron(examples$RbSr)
 > 
-> fit <- isochron(examples$PbPb,inverse=FALSE,plot=FALSE)
+> fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
 > 
 > dev.new()
 dev.new(): using pdf(file="Rplots4.pdf")
@@ -749,7 +749,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  13.293 8.452 10.052 0.002 0.002 
+Time elapsed:  14.7 5.512 13.024 0.002 0.003 
 > grDevices::dev.off()
 pdf 
   2 

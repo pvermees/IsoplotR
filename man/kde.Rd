@@ -183,7 +183,7 @@ age (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 
 \code{1}: use the isochron intercept as the initial Pb-composition
 
-\code{2}: use the Stacey-Kramer two-stage model to infer the initial
+\code{2}: use the Stacey-Kramers two-stage model to infer the initial
 Pb-composition
 
 \code{3}: use the Pb-composition stored in

@@ -70,7 +70,7 @@ get.RbSr.ratio <- function(tt,st,exterr=TRUE){
 }
 
 get.RbSr.age <- function(Rb87Sr86,sRb87Sr86,exterr=TRUE){
-    get.PD.age(Rb87Sr86,sRb87Sr86,'Rb87',exterr=TRUE)
+    get.PD.age(Rb87Sr86,sRb87Sr86,'Rb87',exterr=exterr)
 }
 
 RbSr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,...){
