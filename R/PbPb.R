@@ -93,12 +93,28 @@ PbPb.inverse.ratios <- function(x){
     out
 }
 
-PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA){
+PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
     ns <- length(x)
-    dat <- data2york(x,inverse=FALSE)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
-    DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
+    if (common.Pb == 2){
+        y <- data2york(x,inverse=TRUE)
+        fit <- regression(y,model=1)
+        yp <- fit$a[1] + fit$b[1]*y[,'X']
+        DP <- matrix(0,ns,2)
+        DP[,1] <- fit$a[1] + yp - y[,'Y']
+        DP[,2] <- y[,'sY']
+    } else if (common.Pb == 0){
+        X <- x
+    } else if (common.Pb == 1){
+        X <- common.Pb.stacey.kramers.PbPb(x)
+    } else if (option == 3){
+        X <- common.Pb.nominal.PbPb(x)
+    }
+    if (common.Pb != 2){
+        dat <- data2york(X,inverse=FALSE)
+        DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])   
+    }
     for (j in 1:ns){
         tt <- get.Pb207Pb206.age(DP[j,1],DP[j,2],exterr=exterr)
         out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)

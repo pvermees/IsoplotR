@@ -157,30 +157,30 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
 #' @rdname peakfit
 #' @export
-peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
-                        cutoff.disc=c(-15,5),exterr=TRUE,
-                        sigdig=2,log=TRUE,alpha=0.05,...){
-    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,exterr=exterr,
-                   sigdig=sigdig,log=log,alpha=alpha,...)
+peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+                        common.Pb=0,exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
+    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+                   exterr=exterr,sigdig=sigdig,log=log,alpha=alpha,common.Pb=common.Pb,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka
-#'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
-#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}. When applied to data
-#'     of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
-#'     a detrital Th-correction.
 #' @rdname peakfit
 #' @export
 peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,alpha=0.05,...){
+                         log=TRUE,common.Pb=0,alpha=0.05,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,common.Pb=common.Pb,alpha=alpha,...)
 }
+#'
+#' @param i2i `isochron to intercept': calculates the initial (aka
+#'     `inherited', `excess', or `common')
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in
+#'     \code{settings('iratio',...)}. When applied to data of class
+#'     \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
+#'     detrital Th-correction.
+#' 
 #' @rdname peakfit
 #' @export
 peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,
@@ -250,13 +250,13 @@ peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,sigdig=sigdig,log=log,alpha=alpha,...)
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                           exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,alpha=0.05,
-                           detritus=0,...){
+                           exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
+                           common.Pb=0,alpha=0.05,detritus=0,...){
     if (k<1) return(NULL)
     if (identical(k,'auto'))
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,
-                     cutoff.disc=cutoff.disc,detritus=detritus)
-    tt <- get.ages(x,i2i=i2i,type=type,cutoff.76=cutoff.76,
+                     cutoff.disc=cutoff.disc,detritus=detritus,commonPb=common.Pb)
+    tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,detritus=detritus)
     fit <- peakfit.default(tt,k=k,sigdig=sigdig,log=log,alpha=alpha)
     if (exterr){
@@ -487,14 +487,14 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
 }
 
 BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
-                    exterr=TRUE,detritus=0,...){
+                    exterr=TRUE,detritus=0,common.Pb=0,...){
     n <- length(x)
     BIC <- Inf
     tryCatch({
         for (k in 1:max.k){
             fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
                            cutoff.disc=cutoff.disc,exterr=exterr,
-                           detritus=detritus,...)
+                           detritus=detritus,common.Pb=commmon.Pb,...)
             p <- 2*k-1
             newBIC <- -2*fit$L+p*log(n)
             if (newBIC<BIC) {

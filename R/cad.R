@@ -115,11 +115,7 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     col='black',type=4,cutoff.76=1100,
                     cutoff.disc=c(-15,5),common.Pb=0,
                     hide=NULL,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    tt <- filter.UPb.ages(X,type,cutoff.76,cutoff.disc)[,1]
+    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc,common.Pb=common.Pb)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
                 col=col,hide=hide,...)
 }
@@ -143,11 +139,7 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @export
 cad.PbPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',common.Pb=1,hide=NULL,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    tt <- PbPb.age(X)[,1]
+    tt <- PbPb.age(x,common.Pb=common.Pb)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
                 col=col,hide=hide,...)
 }

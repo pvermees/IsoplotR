@@ -399,12 +399,14 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out
 }
 
-get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),i2i=FALSE,detritus=0){
+get.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+                     i2i=FALSE,common.Pb=0,detritus=0){
     if (hasClass(x,'UPb')){
         out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                               cutoff.disc=cutoff.disc,exterr=FALSE)
+                               cutoff.disc=cutoff.disc,
+                               exterr=FALSE,common.Pb=common.Pb)
     } else if (hasClass(x,'PbPb')){
-        out <- PbPb.age(x,exterr=FALSE)
+        out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb)
     } else if (hasClass(x,'ArAr')){
         out <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'KCa')){

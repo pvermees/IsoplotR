@@ -17,15 +17,6 @@ common.Pb.correction.UPb <- function(x,option=1){
     out$x.raw <- x$x
     out
 }
-common.Pb.correction.PbPb <- function(x,option=1){
-    ns <- length(x)
-    if (option == 1) out <- common.Pb.stacey.kramers.PbPb(x)
-    else if (option == 2) out <- common.Pb.isochron.PbPb(x)
-    else if (option == 3) out <- common.Pb.nominal.PbPb(x)
-    else out <- x
-    out$x.raw <- x$x
-    out
-}
 
 common.Pb.isochron.UPb <- function(x){
     y0 <- get.initial.ratio(x)
@@ -34,12 +25,6 @@ common.Pb.isochron.UPb <- function(x){
     else
         out <- Pb.correction.with.204(x,i64=y0[,1],i74=y0[,2])
     out
-}
-common.Pb.isochron.PbPb <- function(x){
-    fit <- isochron(x,inverse=FALSE,plot=FALSE)
-    i74 <- fit$a[1]
-    i64 <- fit$a[1]/fit$b[1]
-    Pb.correction.for.PbPb(x,i64,i74)
 }
 
 common.Pb.stacey.kramers.UPb <- function(x){

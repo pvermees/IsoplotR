@@ -219,19 +219,15 @@ weightedmean.UPb <- function(x,random.effects=TRUE,
                              cutoff.disc=c(-15,5),alpha=0.05,
                              exterr=TRUE,ranked=FALSE,common.Pb=0,
                              hide=NULL,omit=NULL,omit.col=NA,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    weightedmean_helper(X,random.effects=random.effects,
+    weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         type=type,cutoff.76=cutoff.76,
                         cutoff.disc=cutoff.disc,sigdig=sigdig,
                         alpha=alpha,exterr=exterr,units='Ma',
-                        ranked=ranked,hide=hide, omit=omit,
-                        omit.col=omit.col,...)
+                        ranked=ranked,hide=hide,omit=omit,
+                        omit.col=omit.col,common.Pb=common.Pb,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -243,17 +239,13 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
                               alpha=0.05,exterr=TRUE,common.Pb=1,
                               ranked=FALSE,hide=NULL,omit=NULL,
                               omit.col=NA,...){
-    if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
-    else
-        X <- x
-    weightedmean_helper(X,random.effects=random.effects,
+    weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig, alpha=alpha,exterr=exterr,
-                        units='Ma', ranked=ranked,hide=hide,omit=omit,
-                        omit.col=omit.col,...)
+                        units='Ma',ranked=ranked,hide=hide,omit=omit,
+                        omit.col=omit.col,common.Pb=common.Pb,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
@@ -481,8 +473,8 @@ weightedmean_helper <- function(x,random.effects=TRUE,
                                 ranked=FALSE,i2i=FALSE,common.Pb=1,
                                 units='',detritus=0,hide=NULL,
                                 omit=NULL,omit.col=NA,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,i2i=i2i,
-                   cutoff.disc=cutoff.disc,detritus=detritus)
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+                   i2i=i2i,common.Pb=common.Pb,detritus=detritus)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,hide=hide,
