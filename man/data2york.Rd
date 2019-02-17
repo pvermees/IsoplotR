@@ -20,11 +20,11 @@ data2york(x, ...)
 
 \method{data2york}{ArAr}(x, inverse = TRUE, ...)
 
-\method{data2york}{KCa}(x, ...)
+\method{data2york}{KCa}(x, inverse = FALSE, ...)
 
 \method{data2york}{PbPb}(x, inverse = TRUE, ...)
 
-\method{data2york}{PD}(x, exterr = FALSE, ...)
+\method{data2york}{PD}(x, exterr = FALSE, inverse = FALSE, ...)
 
 \method{data2york}{UThHe}(x, ...)
 

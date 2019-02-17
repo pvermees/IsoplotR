@@ -193,7 +193,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #'
 #' \code{1}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' \code{2}: use the Stacey-Kramers two-stage model to infer the initial
 #' Pb-composition
 #'
 #' \code{3}: use the Pb-composition stored in
