@@ -37,16 +37,16 @@ common.Pb.isochron.UPb <- function(x){
         fit <- ludwig(x)
         r46i <- 1/fit$par['64i']
         r86i <- age_to_U238Pb206_ratio(fit$par['t'],d=x$d)[1]
-        y <- data2york(x,option=3) # 4/6 vs. 8/6
-        r86 <- y[,'X'] + y[,'Y']*r86i/r46i
+        y86 <- data2york(x,option=3) # 4/6 vs. 8/6
+        r86 <- y86[,'X'] + y86[,'Y']*r86i/r46i
         r47i <- 1/fit$par['74i']
         r57i <- 1/age_to_Pb207U235_ratio(fit$par['t'],d=x$d)[1]
-        y <- data2york(x,option=4) # 4/7 vs. 5/7
-        r57 <- y[,'X'] + y[,'Y']*r57i/r47i
+        y57 <- data2york(x,option=4) # 4/7 vs. 5/7
+        r57 <- y57[,'X'] + y57[,'Y']*r57i/r47i
         out <- x
         ns <- length(x)
         U <- iratio('U238U235')[1]
-        if (x$format==4){ # not propagating correction errors (yet)
+        if (x$format==4){
             out$x[,1] <- 1/r57 # 7/5
             out$x[,3] <- 1/r86 # 6/8
             out$x[,5] <- rep(0,ns) # 4/8
@@ -57,7 +57,7 @@ common.Pb.isochron.UPb <- function(x){
         } else if (x$format==6){
             out$x[,1] <- 1/r57 # 7/5
             out$x[,3] <- 1/r86 # 6/8
-            out$x[,5:6] <- rep(0,ns) # 4/8
+            out$x[,5] <- rep(0,ns) # 4/8
             out$x[,7] <- r86/(r57*U) # 7/6
             out$x[,c(9,11)] <- rep(0,ns) # 4/7, 4/6
         }

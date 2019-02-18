@@ -246,7 +246,7 @@ data2york.UPb <- function(x,option=1,...){
             out[i,2] <- sqrt(samp$cov['Pb207U235','Pb207U235'])
             out[i,3] <- samp$x['Pb206U238']
             out[i,4] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
-            out[i,5] <- stats::cov2cor(samp$cov)[1,2]
+            out[i,5] <- stats::cov2cor(samp$cov[1:2,1:2])[1,2]
         }
     } else if (option==2 && x$format %in% c(2,5)){
         out <- subset(x$x,select=c('U238Pb206','errU238Pb206',
@@ -258,7 +258,7 @@ data2york.UPb <- function(x,option=1,...){
             out[i,2] <- sqrt(samp$cov['U238Pb206','U238Pb206'])
             out[i,3] <- samp$x['Pb207Pb206']
             out[i,4] <- sqrt(samp$cov['Pb207Pb206','Pb207Pb206'])
-            out[i,5] <- stats::cov2cor(samp$cov)[1,2]
+            out[i,5] <- stats::cov2cor(samp$cov[1:2,1:2])[1,2]
         }
     } else if (option==3 && x$format==4){ # 4/6 vs 8/6
         out[,1] <- 1/x$x[,'Pb206U238']
@@ -291,7 +291,7 @@ data2york.UPb <- function(x,option=1,...){
         J21 <- 0
         err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         out[,2] <- sqrt(err[,1])
-        out[,4] <- x$x[,'errPb204Pb206']
+        out[,4] <- sqrt(err[,2])
         out[,5] <- err[,3]/(out[,2]*out[,4])        
     } else if (option==4 && x$format==4){ # 4/7 vs. 5/7
         U <- iratio('U238U235')[1]
@@ -334,14 +334,14 @@ data2york.UPb <- function(x,option=1,...){
         E22 <- x$x[,'errPb204Pb207']^2
         E12 <- get.cov.47.75(x$x[,'Pb204Pb207'],x$x[,'errPb204Pb207'],
                              x$x[,'Pb207U235'],x$x[,'errPb207U235'],
-                             x$x[,'Pb204Pb207'],x$x[,'errPb204Pb207'])
+                             x$x[,'Pb204U238'],x$x[,'errPb204U238'])
         J11 <- -out[,1]^2
         J12 <- 0
-        J21 <- 0
         J22 <- 1
+        J21 <- 0
         err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         out[,2] <- sqrt(err[,1])
-        out[,4] <- x$x[,'errPb204Pb207']^2
+        out[,4] <- sqrt(err[,2])
         out[,5] <- err[,3]/(out[,2]*out[,4])        
     }
     colnames(out) <- c('X','sX','Y','sY','rXY')

@@ -390,8 +390,8 @@ get.cov.76.86 <- function(Pb207Pb206,errPb207Pb206,
                           U238Pb206,errU238Pb206,
                           Pb207U235,errPb207U235){
     get.cov.div(Pb207Pb206,errPb207Pb206,
-                          U238Pb206,errU238Pb206,
-                          Pb207U235,errPb207U235)
+                U238Pb206,errU238Pb206,
+                Pb207U235,errPb207U235)
 }
 get.cov.46.86 <- function(Pb204Pb206,errPb204Pb206,
                           U238Pb206,errU238Pb206,
