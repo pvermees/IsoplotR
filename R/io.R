@@ -414,10 +414,10 @@ get.cov.46.76 <- function(Pb204Pb206,errPb204Pb206,
                 Pb207Pb206,errPb207Pb206,
                 Pb204Pb207,errPb204Pb207)
 }
-get.cor.47.75 <- function(Pb204Pb207,errPb204Pb207,
+get.cov.47.75 <- function(Pb204Pb207,errPb204Pb207,
                           Pb207U235,errPb207U235,
                           Pb204U238,errPb204U238){
-    get.cor.mult(Pb204Pb207,errPb204Pb207,
+    get.cov.mult(Pb204Pb207,errPb204Pb207,
                  Pb207U235,errPb207U235,
                  Pb204U238,errPb204U238)
 }

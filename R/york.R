@@ -332,7 +332,7 @@ data2york.UPb <- function(x,option=1,...){
         out[,3] <- x$x[,'Pb204Pb207']
         E11 <- x$x[,'errPb207U235']^2
         E22 <- x$x[,'errPb204Pb207']^2
-        E12 <- get.cor.47.75(x$x[,'Pb204Pb207'],x$x[,'errPb204Pb207'],
+        E12 <- get.cov.47.75(x$x[,'Pb204Pb207'],x$x[,'errPb204Pb207'],
                              x$x[,'Pb207U235'],x$x[,'errPb207U235'],
                              x$x[,'Pb204Pb207'],x$x[,'errPb204Pb207'])
         J11 <- -out[,1]^2
