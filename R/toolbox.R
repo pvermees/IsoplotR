@@ -231,8 +231,12 @@ errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
     out[,'cov'] <- J11*J21*E11 + J12*J21*E12 + J11*J22*E12 + J12*J22*E22
     out
 }
+# returns standard error
 errorprop1x2 <- function(J1,J2,E11,E22,E12){
     sqrt(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
+}
+errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){
+    sqrt(E11*J1^2 + E22*J2^2 + E33*J3^2 + 2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23)
 }
 
 quotient <- function(X,sX,Y,sY,rXY){

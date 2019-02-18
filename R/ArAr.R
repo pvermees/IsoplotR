@@ -138,22 +138,24 @@ get.ArAr.ratio <- function(tt,st,J,sJ,exterr=TRUE){
     out <- c(R,sR)
 }
 
-# get a single Ar-Ar age
 get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
     L <- lambda("K40")[1]
     tt <- log(J*Ar40Ar39+1)/L
-    Jac <- matrix(0,1,3)
-    Jac[1,1] <- J/(L*(J*Ar40Ar39+1))
+    J1 <- J/(L*(J*Ar40Ar39+1))
     if (exterr){
-        Jac[1,2] <- Ar40Ar39/(L*(J*Ar40Ar39+1))
-        Jac[1,3] <- -tt/L
+        J2 <- Ar40Ar39/(L*(J*Ar40Ar39+1))
+        J3 <- -tt/L
+    } else {
+        J2 <- 0
+        J3 <- 0
     }
-    E <- matrix(0,3,3)
-    E[1,1] <- sAr40Ar39^2
-    E[2,2] <- sJ^2
-    E[3,3] <- lambda("K40")[2]^2
-    st <- sqrt(Jac %*% E %*% t(Jac))
-    c(tt,st)
+    E11 <- sAr40Ar39^2
+    E22 <- sJ^2
+    E33 <- lambda("K40")[2]^2
+    st <- errorprop1x3(J1,J2,J3,E11,E22,E33)
+    out <- cbind(tt,st)
+    colnames(out) <- c('t','st')
+    out
 }
 
 # x an object of class \code{ArAr} returns a matrix 
@@ -163,33 +165,30 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
-    rat <- ArAr.age.ratios(x)
+    y <- data2york(x,inverse=TRUE)
     if (i2i){
-        Ar4036i <- get.initial.ratio(x)
-        Ar4039x <- rat[,'Ar40Ar39'] - Ar4036i[,1]/rat[,"Ar39Ar36"]
+        fit <- york(y)
+        b <- fit$b[1]
     } else {
-        Ar4039x <- rat[,'Ar40Ar39'] - iratio("Ar40Ar36")[1]/rat[,"Ar39Ar36"]
+        b <- iratio("Ar40Ar36")[1]
     }
-    J <- matrix(0,1,3)
-    E <- matrix(0,3,3)
-    for (j in 1:ns) {
-        J[1,1] <- 1
-        J[1,3] <- -1/rat[j,'Ar39Ar36']
-        E[1,1] <- rat[j,'varAr40Ar39']
-        E[2,2] <- rat[j,'varAr39Ar36']
-        E[1,2] <- rat[j,'cov']
-        E[2,1] <- E[1,2]
-        if (i2i){
-            J[1,2] <- Ar4036i[j,1]/rat[j,"Ar39Ar36"]^2
-            if (exterr) E[3,3] <- Ar4036i[j,2]^2
-        } else {
-            J[1,2] <- iratio("Ar40Ar36")[1]/rat[j,"Ar39Ar36"]^2
-            if (exterr) E[3,3] <- iratio("Ar40Ar36")[2]^2
-        }
-        sAr4039x <- sqrt(J %*% E %*% t(J))
-        tt <- get.ArAr.age(Ar4039x[j],sAr4039x,x$J[1],x$J[2],exterr=exterr)
-        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
+    DP <- 1/(y[,'X'] - y[,'Y']/b)
+    J1 <- -(DP^2)
+    J2 <- (DP^2)/b
+    E11 <- y[,'sX']^2
+    E22 <- y[,'sY']^2
+    E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
+    if (exterr){
+        J3 <- -(DP^2)*y[,'sY']/b^2
+        E13 <- 0
+        E23 <- 0
+        E33 <- iratio("Ar40Ar36")[2]^2
+        sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23)
+    } else {
+        sDP <- errorprop1x2(J1,J2,E11,E22,E12)
     }
+    tt <- get.ArAr.age(DP,sDP,x$J[1],x$J[2],exterr=exterr)
+    out <- roundit(tt[,1],tt[,2],sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
     out
 }
