@@ -180,10 +180,8 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
     if (exterr){
         J3 <- -(DP^2)*y[,'sY']/b^2
-        E13 <- 0
-        E23 <- 0
         E33 <- iratio("Ar40Ar36")[2]^2
-        sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23)
+        sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
     } else {
         sDP <- errorprop1x2(J1,J2,E11,E22,E12)
     }

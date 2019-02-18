@@ -17,13 +17,48 @@ common.Pb.correction.UPb <- function(x,option=1){
     out$x.raw <- x$x
     out
 }
+# does not handle option = 2 (isochron correction)
+common.Pb.correction.PbPb <- function(x,option=1){
+    ns <- length(x)
+    if (option == 1)
+        out <- common.Pb.stacey.kramers.PbPb(x)
+    else if (option == 3)
+        out <- common.Pb.nominal.UPb(x)
+    else out <- x
+    out$x.raw <- x$x
+    out
+}
 
 common.Pb.isochron.UPb <- function(x){
-    y0 <- get.initial.ratio(x)
-    if (x$format<4)
+    if (x$format<4){
+        y0 <- get.initial.ratio(x)
         out <- Pb.correction.without.204(x,i76=y0)
-    else
-        out <- Pb.correction.with.204(x,i64=y0[,1],i74=y0[,2])
+    } else {
+        y <- data2york(x,option=3) # 4/6 vs. 8/6
+        fit <- york(y)
+        r86 <- y[,'X'] - y[,'Y']/fit$b[1]
+        y <- data2york(x,option=4) # 4/7 vs. 5/7
+        fit <- york(y)
+        r57 <- y[,'X'] - y[,'Y']/fit$b[1]
+        out <- x
+        ns <- length(x)
+        if (x$format==4){ # not propagating correction errors (yet)
+            out$x[,1] <- 1/r57 # 7/5
+            out$x[,3] <- 1/r86 # 6/8
+            out$x[,5] <- rep(0,ns) # 4/8
+        } else if (x$format==5){
+            out$x[,1] <- r86 # 8/6
+            out$x[,3] <- r86/(r57*iratio('U238U235')[1]) # 7/6
+            out$x[,5] <- rep(0,ns) # 4/6
+        } else if (x$format==6){
+            out$x[,1] <- 1/r57 # 7/5
+            out$x[,3] <- 1/r86 # 6/8
+            out$x[,5] <- rep(0,ns) # 4/8
+            out$x[,7] <- r86/r57 # 7/6
+            out$x[,9] <- rep(0,ns) # 4/7
+            out$x[,11] <- rep(0,ns) # 4/6
+        }
+    }
     out
 }
 
