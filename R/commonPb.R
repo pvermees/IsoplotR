@@ -35,31 +35,63 @@ common.Pb.isochron.UPb <- function(x){
         out <- Pb.correction.without.204(x,i76=y0)
     } else {
         fit <- ludwig(x)
-        r46i <- 1/fit$par['64i']
-        r86i <- age_to_U238Pb206_ratio(fit$par['t'],d=x$d)[1]
+        w <- wendt(fit$par['t'],d=x$d)
+        r68i <- age_to_Pb206U238_ratio(fit$par['t'],d=x$d)[1]
         y86 <- data2york(x,option=3) # 4/6 vs. 8/6
-        r86 <- y86[,'X'] + y86[,'Y']*r86i/r46i
-        r47i <- 1/fit$par['74i']
-        r57i <- 1/age_to_Pb207U235_ratio(fit$par['t'],d=x$d)[1]
+        r86 <- y86[,'X'] + y86[,'Y']*fit$par['64i']/r68i
+        r75i <- age_to_Pb207U235_ratio(fit$par['t'],d=x$d)[1]
         y57 <- data2york(x,option=4) # 4/7 vs. 5/7
-        r57 <- y57[,'X'] + y57[,'Y']*r57i/r47i
+        r57 <- y57[,'X'] + y57[,'Y']*fit$par['74i']/r75i
         out <- x
         ns <- length(x)
         U <- iratio('U238U235')[1]
-        if (x$format==4){
-            out$x[,1] <- 1/r57 # 7/5
-            out$x[,3] <- 1/r86 # 6/8
-            out$x[,5] <- rep(0,ns) # 4/8
-        } else if (x$format==5){
-            out$x[,1] <- r86 # 8/6
-            out$x[,3] <- r86/(r57*U) # 7/6
-            out$x[,5] <- rep(0,ns) # 4/6
-        } else if (x$format==6){
-            out$x[,1] <- 1/r57 # 7/5
-            out$x[,3] <- 1/r86 # 6/8
-            out$x[,5] <- rep(0,ns) # 4/8
-            out$x[,7] <- r86/(r57*U) # 7/6
-            out$x[,c(9,11)] <- rep(0,ns) # 4/7, 4/6
+        J1 <- matrix(0,3,3)
+        J1[1,1] <- 1
+        J1[1,3] <- fit$par['64i']/r68i
+        J1[3,3] <- 1
+        J2 <- matrix(0,3,3)
+        J3 <- matrix(0,6,6)
+        for (i in 1:ns){
+            tw <- tera.wasserburg(x,i=i)
+            E1 <- tw$cov
+            J1[2,1] <- (tw$x['Pb207Pb206']/U)
+            J1[2,2] <- (tw$x['U238Pb206']/U) + tw$x['Pb204Pb206']*fit$par['74i']/r75i
+            J1[2,3] <- tw$x['pb207Pb206']*fit$par['74i']/r75i
+            E2 <- J1 %*% E1 %*% t(J1)
+            if (x$format==4){
+                out$x[i,1] <- 1/r57[i] # 7/5
+                out$x[i,3] <- 1/r86[i] # 6/8
+                out$x[i,5] <- 0 # 4/8
+                J2[1,2] <- -1/(r57[i]^2)
+                J2[2,1] <- -1/(r86[i]^2)
+                J2[3,3] <- 1/r86[i]
+                E3 <- J2 %*% E2 %*% t(J2)
+                out$x[i,c(2,4,6)] <- sqrt(diag(E3))
+            } else if (x$format==5){
+                out$x[i,1] <- r86[i] # 8/6
+                out$x[i,3] <- r86[i]/(r57[i]*U) # 7/6
+                out$x[i,5] <- 0 # 4/6
+                J2[1,1] <- 1
+                J2[2,1] <- 1/(r57[i]*U)
+                J2[2,2] <- -r86[i]/(r57[i]*U^2)
+                J2[3,3] <- 1
+                E3 <- J2 %*% E2 %*% t(J2)
+                out$x[i,c(2,4,6)] <- sqrt(diag(E3))
+            } else if (x$format==6){
+                out$x[i,1] <- 1/r57[i] # 7/5
+                out$x[i,3] <- 1/r86[i] # 6/8
+                out$x[i,5] <- 0 # 4/8
+                out$x[i,7] <- r86[i]/(r57[i]*U) # 7/6
+                out$x[i,c(9,11)] <- 0 # 4/7, 4/6
+                J3[1,2] <- -1/(r57[i]^2)
+                J3[2,1] <- -1/(r86[i]^2)
+                J3[3,3] <- 1/r86[i]
+                J3[4,1] <- 1/(r57[i]*U)
+                J3[4,2] <- -r86[i]/(r57[i]*U^2)
+                J3[6,1] <- 1
+                E3 <- J2 %*% E2 %*% t(J2)
+                out$x[i,c(2,4,6,8,10)] <- sqrt(diag(E3))
+            }
         }
     }
     out
