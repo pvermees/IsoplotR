@@ -50,47 +50,61 @@ common.Pb.isochron.UPb <- function(x){
         J1[1,3] <- fit$par['64i']/r68i
         J1[3,3] <- 1
         J2 <- matrix(0,3,3)
-        J3 <- matrix(0,6,6)
+        J3 <- matrix(0,6,3)
         for (i in 1:ns){
             tw <- tera.wasserburg(x,i=i)
             E1 <- tw$cov
-            J1[2,1] <- (tw$x['Pb207Pb206']/U)
-            J1[2,2] <- (tw$x['U238Pb206']/U) + tw$x['Pb204Pb206']*fit$par['74i']/r75i
-            J1[2,3] <- tw$x['pb207Pb206']*fit$par['74i']/r75i
-            E2 <- J1 %*% E1 %*% t(J1)
+            J1[2,1] <- 1/(tw$x['Pb207Pb206']*U)
+            J1[2,2] <- -r57[i]/tw$x['Pb207Pb206']
+            J1[2,3] <- fit$par['74i']/(r75i*tw$x['Pb207Pb206'])
+            E2 <- J1 %*% E1 %*% t(J1)            
             if (x$format==4){
-                out$x[i,1] <- 1/r57[i] # 7/5
-                out$x[i,3] <- 1/r86[i] # 6/8
-                out$x[i,5] <- 0 # 4/8
-                J2[1,2] <- -1/(r57[i]^2)
-                J2[2,1] <- -1/(r86[i]^2)
-                J2[3,3] <- 1/r86[i]
+                out$x[i,'Pb207U235'] <- 1/r57[i]
+                out$x[i,'Pb206U238'] <- 1/r86[i]
+                out$x[i,'Pb204U238'] <- 0
+                J2[1,2] <- -1/(r57[i]^2) # d75d57
+                J2[2,1] <- -1/(r86[i]^2) # d68d86
+                J2[3,3] <- 1/r86[i]      # d48d46
                 E3 <- J2 %*% E2 %*% t(J2)
-                out$x[i,c(2,4,6)] <- sqrt(diag(E3))
+                out$x[i,'errPb207U235'] <- sqrt(E3[1,1])
+                out$x[i,'errPb206U238'] <- sqrt(E3[2,2])
+                out$x[i,'errPb204U238'] <- sqrt(E3[3,3])
+                cormat <- cov2cor(E3)
+                out$x[i,'rhoXY'] <- cormat[1,2]
+                out$x[i,'rhoXZ'] <- cormat[1,3]
+                out$x[i,'rhoYZ'] <- cormat[2,3]
             } else if (x$format==5){
-                out$x[i,1] <- r86[i] # 8/6
-                out$x[i,3] <- r86[i]/(r57[i]*U) # 7/6
-                out$x[i,5] <- 0 # 4/6
+                out$x[i,'U238Pb206'] <- r86[i]
+                out$x[i,'Pb207Pb206'] <- r86[i]/(r57[i]*U) 
+                out$x[i,'Pb204Pb206'] <- 0
                 J2[1,1] <- 1
                 J2[2,1] <- 1/(r57[i]*U)
                 J2[2,2] <- -r86[i]/(r57[i]*U^2)
                 J2[3,3] <- 1
                 E3 <- J2 %*% E2 %*% t(J2)
-                out$x[i,c(2,4,6)] <- sqrt(diag(E3))
+                out$x[i,'errU238Pb206'] <- sqrt(E3[1,1])
+                out$x[i,'errPb207Pb206'] <- sqrt(E3[2,2])
+                out$x[i,'errPb204Pb206'] <- sqrt(E3[3,3])
+                cormat <- cov2cor(E3)
+                out$x[i,'rhoXY'] <- cormat[1,2]
+                out$x[i,'rhoXZ'] <- cormat[1,3]
+                out$x[i,'rhoYZ'] <- cormat[2,3]
             } else if (x$format==6){
-                out$x[i,1] <- 1/r57[i] # 7/5
-                out$x[i,3] <- 1/r86[i] # 6/8
-                out$x[i,5] <- 0 # 4/8
-                out$x[i,7] <- r86[i]/(r57[i]*U) # 7/6
-                out$x[i,c(9,11)] <- 0 # 4/7, 4/6
-                J3[1,2] <- -1/(r57[i]^2)
-                J3[2,1] <- -1/(r86[i]^2)
-                J3[3,3] <- 1/r86[i]
-                J3[4,1] <- 1/(r57[i]*U)
-                J3[4,2] <- -r86[i]/(r57[i]*U^2)
-                J3[6,1] <- 1
-                E3 <- J2 %*% E2 %*% t(J2)
-                out$x[i,c(2,4,6,8,10)] <- sqrt(diag(E3))
+                out$x[i,'Pb207U235'] <- 1/r57[i]
+                out$x[i,'Pb206U238'] <- 1/r86[i]
+                out$x[i,'Pb204U238'] <- 0
+                out$x[i,'Pb207Pb206'] <- r86[i]/(r57[i]*U)
+                out$x[i,'Pb204Pb207'] <- 0
+                out$x[i,'Pb204Pb206'] <- 0
+                J3[1,2] <- -1/(r57[i]^2)        # d75d57
+                J3[2,1] <- -1/(r86[i]^2)        # d68d86
+                J3[3,3] <- 1/r86[i]             # d48d46
+                J3[4,1] <- 1/(r57[i]*U)         # d76d86
+                J3[4,2] <- -r86[i]/(r57[i]*U^2) # d76d57
+                J3[5,3] <- r57[i]*U/r86[i]      # d47d46
+                J3[6,3] <- 1                    # d46d48
+                E3 <- J3 %*% E2 %*% t(J3)
+                out$x[i,c(2,4,6,8,10,12)] <- sqrt(diag(E3))
             }
         }
     }

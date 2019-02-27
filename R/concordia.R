@@ -464,7 +464,7 @@ concordia.title <- function(fit,sigdig=2,alpha=0.05,...){
     }
     line1 <- do.call('substitute',list(eval(expr1),list1))
     line2 <- substitute('MSWD ='~a~'|'~b~'|'~c~
-                            ', p('~chi^2*') ='~d~'|'~e~'|'~f,
+                            ', p('*chi^2*') ='~d~'|'~e~'|'~f,
                         list(a=signif(fit$mswd['concordance'],2),
                              b=signif(fit$mswd['equivalence'],2),
                              c=signif(fit$mswd['combined'],2),

@@ -115,16 +115,15 @@ tera.wasserburg <- function(x,i){
         U238Pb206 <- 1/x$x[i,'Pb206U238']
         Pb207Pb206 <- x$x[i,'Pb207U235']/(x$x[i,'Pb206U238']*U238U235)
         Pb204Pb206 <- x$x[i,'Pb204U238']/x$x[i,'Pb206U238']
+        E <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
+                      x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
+                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
         J <- matrix(0,3,3)
-        E <- matrix(0,3,3)
-        J[1,2] <- -1/x$x[i,'Pb206U238']^2
+        J[1,2] <- -U238Pb206/x$x[i,'Pb206U238']
         J[2,1] <- 1/(x$x[i,'Pb206U238']*U238U235)
         J[2,2] <- -Pb207Pb206/x$x[i,'Pb206U238']
         J[3,2] <- -Pb204Pb206/x$x[i,'Pb206U238']
         J[3,3] <- 1/x$x[i,'Pb206U238']
-        E <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
-                      x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
-                      x$x[i,'rhoXZ'],x$x[i,'rhoXZ'])
         out$x <- c(U238Pb206,Pb207Pb206,Pb204Pb206)
         out$cov <- J %*% E %*% t(J)
     } else if (x$format == 5){
