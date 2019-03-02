@@ -30,11 +30,14 @@ common.Pb.correction.PbPb <- function(x,option=1){
 }
 
 common.Pb.isochron.UPb <- function(x){
+    fit <- ludwig(x)
     if (x$format<4){
-        y0 <- get.initial.ratio(x)
+        rr <- age_to_terawasserburg_ratios(fit$par[1],d=x$d)$x
+        slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
+        y0 <- get.Pb207Pb206.ratios(x)[,1] -
+            slope*get.U238Pb206.ratios(x)[,1]
         out <- Pb.correction.without.204(x,i76=y0)
     } else {
-        fit <- ludwig(x)
         w <- wendt(fit$par['t'],d=x$d)
         r68i <- age_to_Pb206U238_ratio(fit$par['t'],d=x$d)[1]
         y86 <- data2york(x,option=3) # 4/6 vs. 8/6
@@ -48,6 +51,7 @@ common.Pb.isochron.UPb <- function(x){
         J1 <- matrix(0,3,3)
         J1[1,1] <- 1
         J1[1,3] <- fit$par['64i']/r68i
+        J1[2,3] <- fit$par['74i']/r75i
         J1[3,3] <- 1
         J2 <- matrix(0,3,3)
         J3 <- matrix(0,6,3)
@@ -56,7 +60,6 @@ common.Pb.isochron.UPb <- function(x){
             E1 <- tw$cov
             J1[2,1] <- 1/(tw$x['Pb207Pb206']*U)
             J1[2,2] <- -r57[i]/tw$x['Pb207Pb206']
-            J1[2,3] <- fit$par['74i']/(r75i*tw$x['Pb207Pb206'])
             E2 <- J1 %*% E1 %*% t(J1)            
             if (x$format==4){
                 out$x[i,'Pb207U235'] <- 1/r57[i]
@@ -79,7 +82,7 @@ common.Pb.isochron.UPb <- function(x){
                 out$x[i,'Pb204Pb206'] <- 0
                 J2[1,1] <- 1
                 J2[2,1] <- 1/(r57[i]*U)
-                J2[2,2] <- -r86[i]/(r57[i]*U^2)
+                J2[2,2] <- -r86[i]/(U*r57[i]^2)
                 J2[3,3] <- 1
                 E3 <- J2 %*% E2 %*% t(J2)
                 out$x[i,'errU238Pb206'] <- sqrt(E3[1,1])
@@ -100,7 +103,7 @@ common.Pb.isochron.UPb <- function(x){
                 J3[2,1] <- -1/(r86[i]^2)        # d68d86
                 J3[3,3] <- 1/r86[i]             # d48d46
                 J3[4,1] <- 1/(r57[i]*U)         # d76d86
-                J3[4,2] <- -r86[i]/(r57[i]*U^2) # d76d57
+                J3[4,2] <- -r86[i]/(U*r57[i]^2) # d76d57
                 J3[5,3] <- r57[i]*U/r86[i]      # d47d46
                 J3[6,3] <- 1                    # d46d48
                 E3 <- J3 %*% E2 %*% t(J3)
@@ -125,6 +128,30 @@ common.Pb.stacey.kramers.UPb <- function(x){
     }
     out
 }
+common.Pb.stacey.kramers.new.UPb <- function(x){
+    tt <- 1000 # initial guess
+    if (x$format <- 4){
+        for (i in 1:5){
+            i6474 <- stacey.kramers(tt)
+            out <- Pb.correction.without.204(x,i6474[2]/i6474[1])
+            tt <- get.Pb206U238.age(out)[,1]
+        }
+    } else {
+        ns <- length(x)
+        for (i in 1:ns){
+            fit <- optimise('SS.stacey.kramers.UPb',
+                            interval=c(0,5000),x=x,i=i)
+            wi <- wetherill(x,i=i)
+            i6474 <- stacey.kramers(fit$par)
+            r68 <- (wi$x[,'Pb206Pb204'] - i6474[1])/wi$x[,'U238Pb204']
+            r75 <- (wi$x[,'Pb207Pb204'] - i6474[2])/wi$x[,'U238Pb204']
+        }
+    }
+    out
+}
+
+
+
 common.Pb.stacey.kramers.PbPb <- function(x){
     tt <- 1000
     for (i in 1:5){
