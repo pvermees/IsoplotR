@@ -114,7 +114,7 @@ common.Pb.isochron.UPb <- function(x){
     out
 }
 
-common.Pb.stacey.kramers.UPb <- function(x){
+common.Pb.stacey.kramers.old.UPb <- function(x){
     tt <- 1000
     for (i in 1:5){
         i6474 <- stacey.kramers(tt)
@@ -128,29 +128,54 @@ common.Pb.stacey.kramers.UPb <- function(x){
     }
     out
 }
-common.Pb.stacey.kramers.new.UPb <- function(x){
-    tt <- 1000 # initial guess
-    if (x$format <- 4){
+
+common.Pb.stacey.kramers.UPb <- function(x){
+    if (x$format < 4){
+        tinit <- 1000 # initial guess
         for (i in 1:5){
-            i6474 <- stacey.kramers(tt)
+            i6474 <- stacey.kramers(tinit)
             out <- Pb.correction.without.204(x,i6474[2]/i6474[1])
-            tt <- get.Pb206U238.age(out)[,1]
+            tinit <- get.Pb206U238.age(out)[,1]
         }
     } else {
         ns <- length(x)
+        out <- x
+        out$x.raw <- x$x
+        out$x <- matrix(0,ns,5)
         for (i in 1:ns){
-            fit <- optimise('SS.stacey.kramers.UPb',
-                            interval=c(0,5000),x=x,i=i)
-            wi <- wetherill(x,i=i)
-            i6474 <- stacey.kramers(fit$par)
-            r68 <- (wi$x[,'Pb206Pb204'] - i6474[1])/wi$x[,'U238Pb204']
-            r75 <- (wi$x[,'Pb207Pb204'] - i6474[2])/wi$x[,'U238Pb204']
+            fit <- optimise(SS.SK.UPb,interval=c(0,5000),x=x,i=i)
+            ccw <- sk2w(x,i,tt=fit$minimum)
+            out$x[i,c(1,3)] <- ccw$x
+            out$x[i,c(2,4)] <- sqrt(diag(ccw$cov))
+            out$x[i,5] <- cov2cor(ccw$cov)[1,2]
         }
+        colnames(out$x) <- c('Pb207U235','errPb207U235',
+                             'Pb206U238','errPb206U238','rhoXY')
+        out$format <- 1
     }
     out
 }
-
-
+SS.SK.UPb <- function(tt,x,i){
+    ccw <- sk2w(x,i,tt)
+    LL.concordia.age(tt,ccw,mswd=FALSE,exterr=FALSE,d=x$d)
+}
+sk2w <- function(x,i,tt){
+    wi <- wetherill(x,i=i)
+    i6474 <- stacey.kramers(tt)
+    i64 <- i6474[1]
+    i74 <- i6474[2]
+    U <- iratio('U238U235')[1]
+    out <- list(x=rep(0,2),cov=matrix(0,2,2))
+    out$x[1] <- wi$x['Pb207U235'] - i74*wi$x['Pb204U238']*U
+    out$x[2] <- wi$x['Pb206U238'] - i64*wi$x['Pb204U238']
+    J <- matrix(0,2,3)
+    J[1,1] <- 1
+    J[1,3] <- -i74*U
+    J[2,2] <- 1
+    J[2,3] <- -i64
+    out$cov <- J %*% wi$cov %*% t(J)
+    out
+}
 
 common.Pb.stacey.kramers.PbPb <- function(x){
     tt <- 1000
