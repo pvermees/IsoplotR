@@ -673,7 +673,7 @@ as.other <- function(x,format='generic',ierr=1){
     has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
     if (has.header) x <- x[-1,]
     X <- matrix(as.numeric(x),ncol=nc)
-    errconvert(X,'other',format,ierr)
+    errconvert(X,gc='other',format=format,ierr=ierr)
 }
 
 # x = a numerical vector, br = length of the preamble with parameters

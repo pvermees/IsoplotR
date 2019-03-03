@@ -72,7 +72,7 @@ common.Pb.isochron.UPb <- function(x){
             E3 <- J2 %*% E2 %*% t(J2)
             out$x[i,'errU238Pb206'] <- sqrt(E3[1,1])
             out$x[i,'errPb207Pb206'] <- sqrt(E3[2,2])
-            out$x[i,'rhoXY'] <- cov2cor(E3)[1,2]
+            out$x[i,'rhoXY'] <- stats::cov2cor(E3)[1,2]
         }
     }
     out
@@ -92,11 +92,11 @@ common.Pb.stacey.kramers.UPb <- function(x){
         out$x.raw <- x$x
         out$x <- matrix(0,ns,5)
         for (i in 1:ns){
-            fit <- optimise(SS.SK.UPb,interval=c(0,5000),x=x,i=i)
+            fit <- stats::optimise(SS.SK.UPb,interval=c(0,5000),x=x,i=i)
             ccw <- sk2w(x,i,tt=fit$minimum)
             out$x[i,c(1,3)] <- ccw$x
             out$x[i,c(2,4)] <- sqrt(diag(ccw$cov))
-            out$x[i,5] <- cov2cor(ccw$cov)[1,2]
+            out$x[i,5] <- stats::cov2cor(ccw$cov)[1,2]
         }
         colnames(out$x) <- c('Pb207U235','errPb207U235',
                              'Pb206U238','errPb206U238','rhoXY')
