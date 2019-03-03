@@ -10,7 +10,7 @@
 #' Ludwig (2003)'s \code{Isoplot} program.
 #'
 #' \code{PbPb}: an object of class \code{PbPb} containing a Pb-Pb
-#' dataset from Connelley et al. (2017).
+#' dataset from Connelly et al. (2017).
 #'
 #' \code{DZ}: an object of class \code{detrital} containing a detrital
 #' zircon U-Pb dataset from Namibia (Vermeesch et al., 2015).

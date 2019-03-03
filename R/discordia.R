@@ -1,5 +1,5 @@
-# or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
 # returns the lower and upper intercept age (for Wetherill concordia)
+# or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05,
                                           model=1,anchor=list(FALSE,NA)){
     fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)

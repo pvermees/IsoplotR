@@ -104,12 +104,10 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
         DP <- matrix(0,ns,2)
         DP[,1] <- fit$a[1] + yp - y[,'Y']
         DP[,2] <- y[,'sY']
-    } else if (common.Pb == 0){
+    } else if (common.Pb %in% c(1,3)){
+        X <- common.Pb.correction(x)
+    } else { # no common Pb correction
         X <- x
-    } else if (common.Pb == 1){
-        X <- common.Pb.stacey.kramers.PbPb(x)
-    } else if (common.Pb == 3){
-        X <- common.Pb.nominal.PbPb(x)
     }
     if (common.Pb != 2){
         dat <- data2york(X,inverse=FALSE)

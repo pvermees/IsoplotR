@@ -390,8 +390,8 @@ get.cov.76.86 <- function(Pb207Pb206,errPb207Pb206,
                           U238Pb206,errU238Pb206,
                           Pb207U235,errPb207U235){
     get.cov.div(Pb207Pb206,errPb207Pb206,
-                          U238Pb206,errU238Pb206,
-                          Pb207U235,errPb207U235)
+                U238Pb206,errU238Pb206,
+                Pb207U235,errPb207U235)
 }
 get.cov.46.86 <- function(Pb204Pb206,errPb204Pb206,
                           U238Pb206,errU238Pb206,
@@ -400,12 +400,26 @@ get.cov.46.86 <- function(Pb204Pb206,errPb204Pb206,
                 U238Pb206,errU238Pb206,
                 Pb204U238,errPb204U238)
 }
+get.cov.46.68 <- function(Pb204Pb206,errPb204Pb206,
+                          Pb206U238,errPb206U238,
+                          Pb204U238,errPb204U238){
+    get.cov.mult(Pb204Pb206,errPb204Pb206,
+                 Pb206U238,errPb206U238,
+                 Pb204U238,errPb204U238)
+}
 get.cov.46.76 <- function(Pb204Pb206,errPb204Pb206,
                           Pb207Pb206,errPb207Pb206,
                           Pb204Pb207,errPb204Pb207){
     get.cov.div(Pb204Pb206,errPb204Pb206,
                 Pb207Pb206,errPb207Pb206,
                 Pb204Pb207,errPb204Pb207)
+}
+get.cov.47.75 <- function(Pb204Pb207,errPb204Pb207,
+                          Pb207U235,errPb207U235,
+                          Pb204U238,errPb204U238){
+    get.cov.mult(Pb204Pb207,errPb204Pb207,
+                 Pb207U235,errPb207U235,
+                 Pb204U238,errPb204U238)
 }
 as.PbPb <- function(x,format=1,ierr=1){
     out <- list()
@@ -659,7 +673,7 @@ as.other <- function(x,format='generic',ierr=1){
     has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
     if (has.header) x <- x[-1,]
     X <- matrix(as.numeric(x),ncol=nc)
-    errconvert(X,'other',format,ierr)
+    errconvert(X,gc='other',format=format,ierr=ierr)
 }
 
 # x = a numerical vector, br = length of the preamble with parameters

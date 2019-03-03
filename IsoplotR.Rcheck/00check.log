@@ -18,7 +18,6 @@ The build time stamp is missing.
 * checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
   .Rhistory
-  R/.Rhistory
   .git
 These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.

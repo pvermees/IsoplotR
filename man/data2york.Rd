@@ -16,7 +16,7 @@ data2york(x, ...)
 
 \method{data2york}{default}(x, format = 1, ...)
 
-\method{data2york}{UPb}(x, wetherill = TRUE, ...)
+\method{data2york}{UPb}(x, option = 1, ...)
 
 \method{data2york}{ArAr}(x, inverse = TRUE, ...)
 
@@ -50,13 +50,25 @@ where \code{rho} is the error correlation between \code{X} and
 \code{X/Y}, \code{s[X/Y]} for which the error correlations are
 automatically computed from the redundancy of the three ratios.}
 
-\item{wetherill}{If \code{TRUE}, returns a table with \code{X=7/5},
-    \code{sX=s[7/5]}, \code{Y=6/8}, \code{sY=s[6/8]},
-    \code{rXY}
+\item{option}{one of
 
-If \code{FALSE}, returns a table with \code{X=8/6},
-    \code{sX=s[8/6]}, \code{Y=7/6}, \code{sY=s[7/6]},
-    \code{rho=rXY}}
+\enumerate{
+
+\item Wetherill concordia ratios: \code{X=7/5}, \code{sX=s[7/5]},
+    \code{Y=6/8}, \code{sY=s[6/8]}, \code{rXY}.
+
+\item Tera-Wasserburg ratios: \code{X=8/6}, \code{sX=s[8/6]},
+    \code{Y=7/6}, \code{sY=s[7/6]}, \code{rho=rXY}.
+
+\item \code{X=4/6}, \code{sX=s[4/6]}, \code{Y=8/6},
+    \code{sY=s[8/6]}, \code{rho=rXY} (only valid if \code{format >
+    3}).
+
+\item \code{X=4/7}, \code{sX=s[4/7]}, \code{Y=5/7},
+    \code{sY=s[5/7]}, \code{rho=rXY} (only valid if \code{format >
+    3}).
+
+}}
 
 \item{inverse}{If \code{x} has class \code{ArAr} and
     \code{inverse=FALSE}, returns a table with columns
