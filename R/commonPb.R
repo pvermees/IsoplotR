@@ -53,78 +53,28 @@ common.Pb.isochron.UPb <- function(x){
         J1[1,3] <- fit$par['64i']/r68i
         J1[2,3] <- fit$par['74i']/r75i
         J1[3,3] <- 1
-        J2 <- matrix(0,3,3)
-        J3 <- matrix(0,6,3)
+        J2 <- matrix(0,2,3)
+        out$x.raw <- out$x
+        out$x <- matrix(0,ns,5)
+        colnames(out$x) <- c('U238Pb206','errU238Pb206',
+                             'Pb207Pb206','errPb207Pb206','rhoXY')
+        out$format <- 2
         for (i in 1:ns){
             tw <- tera.wasserburg(x,i=i)
             E1 <- tw$cov
             J1[2,1] <- 1/(tw$x['Pb207Pb206']*U)
             J1[2,2] <- -r57[i]/tw$x['Pb207Pb206']
-            E2 <- J1 %*% E1 %*% t(J1)            
-            if (x$format==4){
-                out$x[i,'Pb207U235'] <- 1/r57[i]
-                out$x[i,'Pb206U238'] <- 1/r86[i]
-                out$x[i,'Pb204U238'] <- 0
-                J2[1,2] <- -1/(r57[i]^2) # d75d57
-                J2[2,1] <- -1/(r86[i]^2) # d68d86
-                J2[3,3] <- 1/r86[i]      # d48d46
-                E3 <- J2 %*% E2 %*% t(J2)
-                out$x[i,'errPb207U235'] <- sqrt(E3[1,1])
-                out$x[i,'errPb206U238'] <- sqrt(E3[2,2])
-                out$x[i,'errPb204U238'] <- sqrt(E3[3,3])
-                cormat <- cov2cor(E3)
-                out$x[i,'rhoXY'] <- cormat[1,2]
-                out$x[i,'rhoXZ'] <- cormat[1,3]
-                out$x[i,'rhoYZ'] <- cormat[2,3]
-            } else if (x$format==5){
-                out$x[i,'U238Pb206'] <- r86[i]
-                out$x[i,'Pb207Pb206'] <- r86[i]/(r57[i]*U) 
-                out$x[i,'Pb204Pb206'] <- 0
-                J2[1,1] <- 1
-                J2[2,1] <- 1/(r57[i]*U)
-                J2[2,2] <- -r86[i]/(U*r57[i]^2)
-                J2[3,3] <- 1
-                E3 <- J2 %*% E2 %*% t(J2)
-                out$x[i,'errU238Pb206'] <- sqrt(E3[1,1])
-                out$x[i,'errPb207Pb206'] <- sqrt(E3[2,2])
-                out$x[i,'errPb204Pb206'] <- sqrt(E3[3,3])
-                cormat <- cov2cor(E3)
-                out$x[i,'rhoXY'] <- cormat[1,2]
-                out$x[i,'rhoXZ'] <- cormat[1,3]
-                out$x[i,'rhoYZ'] <- cormat[2,3]
-            } else if (x$format==6){
-                out$x[i,'Pb207U235'] <- 1/r57[i]
-                out$x[i,'Pb206U238'] <- 1/r86[i]
-                out$x[i,'Pb204U238'] <- 0
-                out$x[i,'Pb207Pb206'] <- r86[i]/(r57[i]*U)
-                out$x[i,'Pb204Pb207'] <- 0
-                out$x[i,'Pb204Pb206'] <- 0
-                J3[1,2] <- -1/(r57[i]^2)        # d75d57
-                J3[2,1] <- -1/(r86[i]^2)        # d68d86
-                J3[3,3] <- 1/r86[i]             # d48d46
-                J3[4,1] <- 1/(r57[i]*U)         # d76d86
-                J3[4,2] <- -r86[i]/(U*r57[i]^2) # d76d57
-                J3[5,3] <- r57[i]*U/r86[i]      # d47d46
-                J3[6,3] <- 1                    # d46d48
-                E3 <- J3 %*% E2 %*% t(J3)
-                out$x[i,c(2,4,6,8,10,12)] <- sqrt(diag(E3))
-            }
+            E2 <- J1 %*% E1 %*% t(J1)
+            out$x[i,'U238Pb206'] <- r86[i]
+            out$x[i,'Pb207Pb206'] <- r86[i]/(r57[i]*U)
+            J2[1,1] <- 1
+            J2[2,1] <- 1/(r57[i]*U)
+            J2[2,2] <- -r86[i]/(U*r57[i]^2)
+            E3 <- J2 %*% E2 %*% t(J2)
+            out$x[i,'errU238Pb206'] <- sqrt(E3[1,1])
+            out$x[i,'errPb207Pb206'] <- sqrt(E3[2,2])
+            out$x[i,'rhoXY'] <- cov2cor(E3)[1,2]
         }
-    }
-    out
-}
-
-common.Pb.stacey.kramers.old.UPb <- function(x){
-    tt <- 1000
-    for (i in 1:5){
-        i6474 <- stacey.kramers(tt)
-        i64 <- i6474[1]
-        i74 <- i6474[2]
-        if (x$format < 4)
-            out <- Pb.correction.without.204(x,i74/i64)
-        else
-            out <- Pb.correction.with.204(x,i64,i74)
-        tt <- get.Pb206U238.age(out)[,1]
     }
     out
 }
