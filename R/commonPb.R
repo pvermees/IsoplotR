@@ -48,12 +48,11 @@ common.Pb.isochron.UPb <- function(x){
         out <- x
         ns <- length(x)
         U <- iratio('U238U235')[1]
-        J1 <- matrix(0,3,3)
-        J1[1,1] <- 1
-        J1[1,3] <- fit$par['64i']/r68i
-        J1[2,3] <- fit$par['74i']/r75i
-        J1[3,3] <- 1
-        J2 <- matrix(0,2,3)
+        J1 <- matrix(0,2,3)
+        J1[1,1] <- 1                   # dr86d86
+        J1[1,3] <- fit$par['64i']/r68i # dr86d46
+        J1[2,3] <- fit$par['74i']/r75i # dr57d46
+        J2 <- matrix(0,2,2)
         out$x.raw <- out$x
         out$x <- matrix(0,ns,5)
         colnames(out$x) <- c('U238Pb206','errU238Pb206',
@@ -62,14 +61,14 @@ common.Pb.isochron.UPb <- function(x){
         for (i in 1:ns){
             tw <- tera.wasserburg(x,i=i)
             E1 <- tw$cov
-            J1[2,1] <- 1/(tw$x['Pb207Pb206']*U)
-            J1[2,2] <- -r57[i]/tw$x['Pb207Pb206']
+            J1[2,1] <- 1/(tw$x['Pb207Pb206']*U)   # dr57d86
+            J1[2,2] <- -r57[i]/tw$x['Pb207Pb206'] # dr57d57
             E2 <- J1 %*% E1 %*% t(J1)
             out$x[i,'U238Pb206'] <- r86[i]
             out$x[i,'Pb207Pb206'] <- r86[i]/(r57[i]*U)
-            J2[1,1] <- 1
-            J2[2,1] <- 1/(r57[i]*U)
-            J2[2,2] <- -r86[i]/(U*r57[i]^2)
+            J2[1,1] <- 1                          # dr86dr86
+            J2[2,1] <- 1/(r57[i]*U)               # dr76dr86
+            J2[2,2] <- -r86[i]/(U*r57[i]^2)       # dr76dr57
             E3 <- J2 %*% E2 %*% t(J2)
             out$x[i,'errU238Pb206'] <- sqrt(E3[1,1])
             out$x[i,'errPb207Pb206'] <- sqrt(E3[2,2])
