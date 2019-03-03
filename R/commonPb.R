@@ -1,35 +1,20 @@
 # option = 1: Stacey-Kramers
 # option = 2: isochron
 # option = 3: assumed Pb-composition
-common.Pb.correction <- function(x,...){ UseMethod("common.Pb.correction",x) }
-common.Pb.correction.default <- function(x,method='common.Pb.correction',...){
-    stop('No default method for common.Pb.correction function')
-}
-common.Pb.correction.UPb <- function(x,option=1){
+common.Pb.correction <- function(x,option=1){
     ns <- length(x)
     if (option == 1)
-        out <- common.Pb.stacey.kramers.UPb(x)
+        out <- common.Pb.stacey.kramers(x)
     else if (option == 2)
-        out <- common.Pb.isochron.UPb(x)
+        out <- common.Pb.isochron(x)
     else if (option == 3)
-        out <- common.Pb.nominal.UPb(x)
-    else out <- x
-    out$x.raw <- x$x
-    out
-}
-# does not handle option = 2 (isochron correction)
-common.Pb.correction.PbPb <- function(x,option=1){
-    ns <- length(x)
-    if (option == 1)
-        out <- common.Pb.stacey.kramers.PbPb(x)
-    else if (option == 3)
-        out <- common.Pb.nominal.UPb(x)
+        out <- common.Pb.nominal(x)
     else out <- x
     out$x.raw <- x$x
     out
 }
 
-common.Pb.isochron.UPb <- function(x){
+common.Pb.isochron <- function(x){
     fit <- ludwig(x)
     if (x$format<4){
         rr <- age_to_terawasserburg_ratios(fit$par[1],d=x$d)$x
@@ -78,7 +63,7 @@ common.Pb.isochron.UPb <- function(x){
     out
 }
 
-common.Pb.stacey.kramers.UPb <- function(x){
+common.Pb.stacey.kramers <- function(x){
     if (x$format < 4){
         tinit <- 1000 # initial guess
         for (i in 1:5){
@@ -92,7 +77,7 @@ common.Pb.stacey.kramers.UPb <- function(x){
         out$x.raw <- x$x
         out$x <- matrix(0,ns,5)
         for (i in 1:ns){
-            fit <- stats::optimise(SS.SK.UPb,interval=c(0,5000),x=x,i=i)
+            fit <- stats::optimise(SS.SK,interval=c(0,5000),x=x,i=i)
             ccw <- sk2w(x,i,tt=fit$minimum)
             out$x[i,c(1,3)] <- ccw$x
             out$x[i,c(2,4)] <- sqrt(diag(ccw$cov))
@@ -104,7 +89,7 @@ common.Pb.stacey.kramers.UPb <- function(x){
     }
     out
 }
-SS.SK.UPb <- function(tt,x,i){
+SS.SK <- function(tt,x,i){
     ccw <- sk2w(x,i,tt)
     LL.concordia.age(tt,ccw,mswd=FALSE,exterr=FALSE,d=x$d)
 }
@@ -126,19 +111,7 @@ sk2w <- function(x,i,tt){
     out
 }
 
-common.Pb.stacey.kramers.PbPb <- function(x){
-    tt <- 1000
-    for (i in 1:5){
-        i6474 <- stacey.kramers(tt)
-        i64 <- i6474[1]
-        i74 <- i6474[2]
-        out <- Pb.correction.for.PbPb(x,i64,i74)
-        tt <- PbPb.age(out)[,1]
-    }
-    out
-}
-
-common.Pb.nominal.UPb <- function(x){
+common.Pb.nominal <- function(x){
     if (x$format < 4){
         i76 <- settings('iratio','Pb207Pb206')[1]
         out <- Pb.correction.without.204(x,i76)
@@ -148,12 +121,6 @@ common.Pb.nominal.UPb <- function(x){
         out <- Pb.correction.with.204(x,i64,i74)
     }
     out
-}
-common.Pb.nominal.PbPb <- function(x){
-    out <- x
-    i64 <- settings('iratio','Pb206Pb204')[1]
-    i74 <- settings('iratio','Pb207Pb204')[1]
-    Pb.correction.for.PbPb(x,i74,i64)
 }
 
 Pb.correction.without.204 <- function(x,i76){
@@ -227,72 +194,6 @@ Pb.correction.with.204 <- function(x,i64,i74){
         out$x[,'Pb206U238'] <- x$x[,'Pb206U238'] - i64*x$x[,'Pb204U238']
         out$x[,'errPb206U238'] <- x$x[,'errPb206U238']
         out$format <- 3
-    }
-    out
-}
-Pb.correction.for.PbPb <- function(x,i64,i74){
-    out <- x
-    if (x$format %in% c(1,3)){
-        m64 <- x$x[,'Pb206Pb204']
-        m74 <- x$x[,'Pb207Pb204']
-        r64 <- m64 - i64
-        r74 <- m74 - i74
-        out$x[,'Pb206Pb204'] <- r64
-        out$x[,'Pb207Pb204'] <- r74
-    }
-    if (x$format == 2){
-        m46 <- x$x[,'Pb204Pb206']
-        m76 <- x$x[,'Pb207Pb206']
-        r64 <- 1/m46 - i64
-        r46 <- 1/r64
-        r74 <- m76/m46 - i74
-        r76 <- r74*r46
-        out$x[,'Pb204Pb206'] <- r46
-        out$x[,'Pb207Pb206'] <- r76
-        if (FALSE){
-            dr46.dr64 <- -1/r64^2
-            dr64.dm46 <- -1/m46^2
-            dr74.dm46 <- -m76/m46^2
-            dr74.dm76 <- 1/m46
-            dr46.dm46 <- dr46.dr64*dr64.dm46
-            dr46.dm76 <- 0
-            J11 <- dr46.dm46                     # dr46.dm46
-            J12 <- dr46.dm76                     # dr46.dm76
-            J21 <- dr74.dm46*r46 + r74*dr46.dm46 # dr76.dm46
-            J22 <- dr74.dm76*r46 + r74*dr46.dm76 # dr76.dm76
-            E11 <- x$x[,'errPb204Pb206']^2
-            E22 <- x$x[,'errPb207Pb206']^2
-            E12 <- x$x[,'rho']*
-                x$x[,'errPb204Pb206']*x$x[,'errPb207Pb206']
-            covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-            out$x[,'errPb204Pb206'] <- sqrt(covmat[,'varX'])
-            out$x[,'errPb207Pb206'] <- sqrt(covmat[,'varY'])
-            out$x[,'rho'] <- covmat[,'cov']/
-                sqrt(covmat[,'varX']*covmat[,'varY'])
-        }
-    } else if (x$format == 3){
-        dat <- PbPb.normal.ratios(x)
-        r76 <- r74/r64
-        dr74.dm74 <- 1
-        dr64.dm74 <- 0
-        dr74.dm64 <- 0
-        dr64.dm64 <- 1
-        dr76.dm64 <- (r64*dr74.dm64 - r74*dr64.dm64)/r64^2
-        dr76.dm74 <- (r64*dr74.dm74 - r74*dr64.dm74)/r64^2
-        if (FALSE){
-            J <- matrix(0,1,2)
-            E <- matrix(0,2,2)
-            for (i in 1:length(x)){
-                J[1,1] <- dr76.dm64[i]
-                J[1,2] <- dr76.dm74[i]
-                E[1,1] <- dat[i,'errPb206Pb204']^2
-                E[2,2] <- dat[i,'errPb207Pb204']^2
-                E[1,2] <- dat[i,'rho']*dat[i,'errPb206Pb204']*dat[i,'errPb207Pb204']
-                E[2,1] <- E[1,2]
-                out$x[i,'errPb207Pb206'] <- sqrt(J %*% E %*% t(J))
-            }
-        }
-        out$x[,'Pb207Pb206'] <- r76
     }
     out
 }
