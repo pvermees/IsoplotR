@@ -617,7 +617,7 @@ get.Pb207Pb206.age.terawasserburg <- function(x,exterr=TRUE,...){
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
 UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.Pb=0,...){
-    if (common.Pb>0) X <- common.Pb.correction.UPb(x,option=common.Pb)
+    if (common.Pb>0) X <- common.Pb.correction(x,option=common.Pb)
     else X <- x
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
     if (conc) labels <- c(labels,'t.conc','s[t.conc]')
