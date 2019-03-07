@@ -165,25 +165,33 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
-    y <- data2york(x,inverse=TRUE)
     if (i2i){
+        y <- data2york(x,inverse=TRUE)
         fit <- york(y)
         b <- fit$b[1]
-    } else {
-        b <- iratio("Ar40Ar36")[1]
-    }
-    DP <- 1/(y[,'X'] - y[,'Y']/b)
-    J1 <- -(DP^2)
-    J2 <- (DP^2)/b
-    E11 <- y[,'sX']^2
-    E22 <- y[,'sY']^2
-    E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
-    if (exterr){
-        J3 <- -(DP^2)*y[,'sY']/b^2
-        E33 <- iratio("Ar40Ar36")[2]^2
-        sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
-    } else {
+        DP <- 1/(y[,'X'] - y[,'Y']/b)
+        E11 <- y[,'sX']^2
+        E22 <- y[,'sY']^2
+        E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
+        J1 <- -(DP^2)
+        J2 <- (DP^2)/b
         sDP <- errorprop1x2(J1,J2,E11,E22,E12)
+    } else {
+        rat <- ArAr.age.ratios(x)
+        b <- iratio("Ar40Ar36")[1]
+        DP <- rat[,'Ar40Ar39'] - b/rat[,"Ar39Ar36"]
+        E11 <- rat[,'varAr40Ar39']
+        E22 <- rat[,'varAr39Ar36']
+        E12 <- rat[,'cov']
+        J1 <- 1
+        J2 <- b/rat[,"Ar39Ar36"]^2
+        if (exterr){
+            J3 <- -1/rat[,"Ar39Ar36"]
+            E33 <- iratio("Ar40Ar36")[2]^2
+            sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
+        } else {
+            sDP <- errorprop1x2(J1,J2,E11,E22,E12)
+        }
     }
     tt <- get.ArAr.age(DP,sDP,x$J[1],x$J[2],exterr=exterr)
     out <- roundit(tt[,1],tt[,2],sigdig=sigdig)
