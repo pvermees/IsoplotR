@@ -4,10 +4,12 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘2.4’
+* this is package ‘IsoplotR’ version ‘2.5’
 * package encoding: UTF-8
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
+
+Days since last update: 4
 
 The build time stamp is missing.
 * checking package namespace information ... OK
