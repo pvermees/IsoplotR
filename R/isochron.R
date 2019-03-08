@@ -772,7 +772,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
     }
     if (identical(nuclide,'Sm147')){
         x.lab <- quote(''^147*'Sm/'^144*'Nd')
-        y.lab <- quote(''^143*'Sm/'^144*'Nd')
+        y.lab <- quote(''^143*'Nd/'^144*'Nd')
     } else if (identical(nuclide,'Re187')){
         x.lab <- quote(''^187*'Re/'^188*'Os')
         y.lab <- quote(''^187*'Os/'^188*'Os')
@@ -781,7 +781,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
         y.lab <- quote(''^87*'Sr/'^86*'Sr')
     } else if (identical(nuclide,'Lu176')){
         x.lab <- quote(''^176*'Lu/'^177*'Hf')
-        y.lab <- quote(''^176*'Lu/'^177*'Hf')
+        y.lab <- quote(''^176*'Hf/'^177*'Hf')
     } else if (identical(nuclide,'K40')){
         x.lab <- quote(''^40*'K/'^44*'Ca')
         y.lab <- quote(''^40*'Ca/'^44*'Ca')
