@@ -74,51 +74,6 @@ ArAr.inverse.ratios <- function(x){
                        'Ar36Ar40','errAr36Ar40','rho')
     out
 }
-# returns ratios, variances and covariances
-ArAr.age.ratios <- function(x){
-    ns <- length(x)
-    out <- matrix(0,ns,5)
-    if (x$format==1){
-        Ar40Ar39 <- x$x[,'Ar40Ar36']/x$x[,'Ar39Ar36']
-        Ar39Ar36 <- x$x[,'Ar39Ar36']
-        J11 <- -x$x[,'Ar40Ar36']/x$x[,'Ar39Ar36']^2
-        J22 <- 0
-        J12 <- 1/x$x[,'Ar39Ar36']
-        J21 <- 1
-        E11 <- x$x[,'errAr39Ar36']^2
-        E22 <- x$x[,'errAr40Ar36']^2
-        E12 <- x$x[,'rho']*x$x[,'errAr39Ar36']*x$x[,'errAr40Ar36']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-    } else if (x$format==2){
-        Ar40Ar39 <- 1/x$x[,'Ar39Ar40']
-        Ar39Ar36 <- x$x[,'Ar39Ar40']/x$x[,'Ar36Ar40']
-        J11 <- -1/x$x[,'Ar39Ar40']^2
-        J22 <- -x$x[,'Ar39Ar40']/x$x[,'Ar36Ar40']^2
-        J12 <- 0
-        J21 <- 1/x$x[,'Ar36Ar40']
-        E11 <- x$x[,'errAr39Ar40']^2
-        E22 <- x$x[,'errAr36Ar40']^2
-        E12 <- x$x[,'rho']*x$x[,'errAr39Ar40']*x$x[,'errAr36Ar40']
-        covmat <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-    } else if (x$format==3){
-        Ar40Ar39 <- 1/x$x[,'Ar39Ar40']
-        Ar39Ar36 <- x$x[,'Ar39Ar36']
-        errAr40Ar39 <- x$x[,'errAr39Ar40']/x$x[,'Ar39Ar40']^2
-        errAr39Ar36 <- x$x[,'errAr39Ar36']
-        errAr40Ar36 <- x$x[,'errAr36Ar40']/x$x[,'Ar36Ar40']^2
-        covmat <- matrix(0,ns,3)
-        colnames(covmat) <- c('varX','varY','cov')
-        covmat[,'varX'] <- errAr40Ar39^2
-        covmat[,'varY'] <- errAr39Ar36^2
-        covmat[,'cov'] <- get.cov.mult(Ar40Ar39,errAr40Ar39,
-                                       Ar39Ar36,errAr39Ar36,
-                                       Ar40Ar39*Ar39Ar36,errAr40Ar36)
-    }
-    out <- cbind(Ar40Ar39,covmat[,'varX'],Ar39Ar36,covmat[,'varY'],covmat[,'cov'])
-    colnames(out) <- c('Ar40Ar39','varAr40Ar39',
-                       'Ar39Ar36','varAr39Ar36','cov')
-    out
-}
 
 get.ArAr.ratio <- function(tt,st,J,sJ,exterr=TRUE){
     L <- lambda("K40")[1]
@@ -165,34 +120,31 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
+    y <- data2york(x,inverse=TRUE)
     if (i2i){
-        y <- data2york(x,inverse=TRUE)
         fit <- york(y)
         b <- fit$b[1]
-        DP <- 1/(y[,'X'] - y[,'Y']/b)
-        E11 <- y[,'sX']^2
-        E22 <- y[,'sY']^2
-        E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
-        J1 <- -(DP^2)
-        J2 <- (DP^2)/b
-        sDP <- errorprop1x2(J1,J2,E11,E22,E12)
     } else {
-        rat <- ArAr.age.ratios(x)
-        b <- iratio("Ar40Ar36")[1]
-        DP <- rat[,'Ar40Ar39'] - b/rat[,"Ar39Ar36"]
-        E11 <- rat[,'varAr40Ar39']
-        E22 <- rat[,'varAr39Ar36']
-        E12 <- rat[,'cov']
-        J1 <- 1
-        J2 <- b/rat[,"Ar39Ar36"]^2
-        if (exterr){
-            J3 <- -1/rat[,"Ar39Ar36"]
-            E33 <- iratio("Ar40Ar36")[2]^2
-            sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
-        } else {
-            sDP <- errorprop1x2(J1,J2,E11,E22,E12)
-        }
+        atm <- iratio("Ar40Ar36")[1]
+        b <- (y[,'Y']-1/atm)/y[,'X']
     }
+    DP <- 1/(y[,'X'] - y[,'Y']/b)
+    E11 <- y[,'sX']^2
+    E22 <- y[,'sY']^2
+    E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
+    if (i2i){
+        J1 <- -DP^2
+        J2 <- (DP^2)/b
+        J3 <- -y[,'Y']*DP^2
+        E33 <- rep(fit$b[2]^2,ns)
+    } else {
+        J1 <- -DP/y[,'X']
+        J2 <- -atm/y[,'X']
+        J3 <- -y[,'Y']/y[,'X']
+        E33 <- rep(iratio("Ar40Ar36")[2]^2,ns)
+    }
+    if (exterr) sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
+    else sDP <- errorprop1x2(J1,J2,E11,E22,E12)
     tt <- get.ArAr.age(DP,sDP,x$J[1],x$J[2],exterr=exterr)
     out <- roundit(tt[,1],tt[,2],sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
