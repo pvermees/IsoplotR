@@ -107,6 +107,27 @@ print(central(examples$UThHe)$age)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("concordant")
+### * concordant
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: concordant
+### Title: Test whether the U-Pb compositions are concordant
+### Aliases: concordant
+
+### ** Examples
+
+data(examples)
+conc <- concordant(examples$UPb,cutoff.disc=c(-1,1))
+radialplot(examples$UPb,omit=which(!conc))
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("concordant", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("concordia")
 ### * concordia
 

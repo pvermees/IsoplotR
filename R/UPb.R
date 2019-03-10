@@ -660,18 +660,15 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
                             exterr=TRUE,common.Pb=0){
     tt <- UPb.age(x,exterr=exterr,conc=(type==5),common.Pb=common.Pb)
     do.76 <- tt[,'t.68'] > cutoff.76
-    if (any(is.na(cutoff.disc))) {
+    if (any(is.na(cutoff.disc))){
         is.concordant <- rep(TRUE,nrow(x))
     } else {
-        disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
-        disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
-        is.concordant <-
-            (disc.75.68>cutoff.disc[1] & disc.75.68<cutoff.disc[2]) |
-            (disc.68.76>cutoff.disc[1] & disc.68.76<cutoff.disc[2])
-        if (!any(is.concordant))
+        is.concordant <- concordant(x,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
+        if (!any(is.concordant)){
             stop(paste0('There are no concordant grains in this sample.',
                         'Try adjusting the discordance limits OR ',
                         'apply a common-Pb correction.'))
+        }
     }
     out <- matrix(NA,length(x),2)
     if (type==1){
@@ -690,4 +687,52 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
     }
     colnames(out) <- c('t','s[t]')
     out
+}
+
+#' Test whether the U-Pb compositions are concordant
+#'
+#' Assess whether U-Pb \eqn{{}^{206}}Pb/\eqn{{}^{238}}U- and
+#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb-ages, or the
+#' \eqn{{}^{206}}Pb/\eqn{{}^{238}}U- and
+#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U ages are concordant.
+#'
+#' @details Returns \code{TRUE} if the
+#'     \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{235}}U-ages agree within the limits
+#'     specified in \code{cutoff.disc} (if
+#'     t[\eqn{{}^{206}}Pb/\eqn{{}^{238}}U] < \code{cutoff.76}, OR if
+#'     the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb-ages agree within the limits
+#'     specified in \code{cutoff.disc} (if
+#'     t[\eqn{{}^{206}}Pb/\eqn{{}^{238}}U] > \code{cutoff.76}.
+#'     Returns \code{FALSE} otherwise.
+#'
+#' @param x an object of class \code{UPb}
+#' @param cutoff.76 the age (in Ma) below which the concordance
+#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     \eqn{^{207}}Pb/\eqn{^{238}}U ages are tested, and above which
+#'     the concordance between the \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb ages is tested.
+#' @param cutoff.disc two element vector with the minimum (negative)
+#'     and maximum (positive) percentage discordance allowed between
+#'     the \eqn{^{207}}Pb/\eqn{^{235}}U and
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (if
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
+#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+#' @return A vector of boolean flags marking the concordant
+#'     aliquots.
+#' @examples
+#' data(examples)
+#' conc <- concordant(examples$UPb,cutoff.disc=c(-1,1))
+#' radialplot(examples$UPb,omit=which(!conc))
+#' @export
+concordant <- function(x,cutoff.76=1100,cutoff.disc=c(-15,5)){
+    tt <- UPb.age(x,conc=FALSE,common.Pb=FALSE)
+    do.76 <- (tt[,'t.68'] > cutoff.76)
+    disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
+    disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
+    conc.75.68 <- !do.76 & (disc.75.68>cutoff.disc[1]) & (disc.75.68<cutoff.disc[2])
+    conc.68.76 <- do.76 & (disc.75.68>cutoff.disc[1]) & (disc.75.68<cutoff.disc[2])
+    conc.75.68 | conc.75.68
 }

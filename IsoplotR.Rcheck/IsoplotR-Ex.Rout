@@ -128,6 +128,27 @@ Type 'q()' to quit R.
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("concordant")
+> ### * concordant
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: concordant
+> ### Title: Test whether the U-Pb compositions are concordant
+> ### Aliases: concordant
+> 
+> ### ** Examples
+> 
+> data(examples)
+> conc <- concordant(examples$UPb,cutoff.disc=c(-1,1))
+> radialplot(examples$UPb,omit=which(!conc))
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("concordant", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("concordia")
 > ### * concordia
 > 
@@ -749,7 +770,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  13.695 8.541 10.77 0.004 0 
+Time elapsed:  13.087 5.319 10.977 0.002 0.003 
 > grDevices::dev.off()
 pdf 
   2 

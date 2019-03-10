@@ -104,6 +104,7 @@ york <- function(x,alpha=0.05){
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- get.york.mswd(x,a,b)
+    out$fact <- 1
     out$a <- c(a,sa)
     out$b <- c(b,sb)
     out$cov.ab <- -xbar*sb^2

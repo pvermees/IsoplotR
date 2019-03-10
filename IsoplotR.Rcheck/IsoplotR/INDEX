@@ -5,6 +5,8 @@ cad                     Plot continuous data as cumulative age
                         distributions
 central                 Calculate U-Th-He and fission track central
                         ages and compositions
+concordant              Test whether the U-Pb compositions are
+                        concordant
 concordia               Concordia diagram
 data2york               Prepare geochronological data for York
                         regression
