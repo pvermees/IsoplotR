@@ -7,10 +7,10 @@
 york(x, alpha = 0.05)
 }
 \arguments{
-\item{x}{a 5-column matrix with the X-values, the analytical
+\item{x}{a 4 or 5-column matrix with the X-values, the analytical
 uncertainties of the X-values, the Y-values, the analytical
-uncertainties of the Y-values, and the correlation coefficients
-of the X- and Y-values.}
+uncertainties of the Y-values, and (optionally) the correlation
+coefficients of the X- and Y-values.}
 
 \item{alpha}{cutoff value for confidence intervals}
 }
@@ -66,7 +66,8 @@ sX <- X*0.01
 sY <- Y*0.005
 rXY <- rep(0.8,n)
 dat <- cbind(X,sX,Y,sY,rXY)
-scatterplot(xyz=dat,fit=york(dat),show.ellipses=1)
+fit <- york(dat)
+scatterplot(dat,fit=fit)
 }
 \references{
 Titterington, D.M. and Halliday, A.N., 1979. On the

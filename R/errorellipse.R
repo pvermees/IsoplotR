@@ -73,17 +73,17 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     aliquots.
 #' @param addcolourbar add a colour bar to display the colours used to
 #'     \code{levels}
+#' @param ... optional arguments to format the points and text.
+#' 
 #' @examples
 #' X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
 #'        28.530,50.540,51.595,86.51,106.40,157.35)
-#' Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-#'        .8642,.9584,.9617,1.135,1.230,1.490)
-#' n <- length(X)
-#' sX <- X*0.01
-#' sY <- Y*0.005
-#' rXY <- rep(0.8,n)
-#' dat <- cbind(X,sX,Y,sY,rXY)
-#' scatterplot(dat,fit=york(dat))
+#' Y <- c(.7268,.7809,.8200,.8116,.8160,.8302,
+#'        .8642,.9534,.9617,1.105,1.230,1.440)
+#' sX <- X*0.02
+#' sY <- Y*0.01
+#' dat <- cbind(X,sX,Y,sY)
+#' scatterplot(dat,fit=york(dat),show.ellipses=2)
 #' @export
 scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,show.ellipses=1,levels=NA,
@@ -93,16 +93,14 @@ scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                         hide=NULL,omit=NULL,omit.col=NA,
                         addcolourbar=TRUE,...){
     ns <- nrow(xy)
+    if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
     plotit <- sn%ni%hide
     calcit <- sn%ni%c(hide,omit)
     colnames(xy) <- c('X','sX','Y','sY','rXY')
-    if (any(is.na(xlim)))
-        xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
-    if (any(is.na(ylim)))
-        ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
-    if (!add)
-        graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
+    if (any(is.na(xlim))) xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
+    if (!add) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
     if (!add & empty) return()
     if (!identical(fit,'none'))
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),

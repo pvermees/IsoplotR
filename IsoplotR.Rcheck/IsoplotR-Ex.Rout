@@ -603,14 +603,12 @@ Pb207U235,sePb207U235,Pb206U238,sePb206U238,rho
 > 
 > X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
 +        28.530,50.540,51.595,86.51,106.40,157.35)
-> Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-+        .8642,.9584,.9617,1.135,1.230,1.490)
-> n <- length(X)
-> sX <- X*0.01
-> sY <- Y*0.005
-> rXY <- rep(0.8,n)
-> dat <- cbind(X,sX,Y,sY,rXY)
-> scatterplot(dat,fit=york(dat),show.ellipses=1)
+> Y <- c(.7268,.7809,.8200,.8116,.8160,.8302,
++        .8642,.9534,.9617,1.105,1.230,1.440)
+> sX <- X*0.02
+> sY <- Y*0.01
+> dat <- cbind(X,sX,Y,sY)
+> scatterplot(dat,fit=york(dat),show.ellipses=2)
 > 
 > 
 > 
@@ -778,7 +776,24 @@ $type
 > sY <- Y*0.005
 > rXY <- rep(0.8,n)
 > dat <- cbind(X,sX,Y,sY,rXY)
-> scatterplot(xyz=dat,fit=york(dat),show.ellipses=1)
-Error in nrow(xy) : argument "xy" is missing, with no default
-Calls: scatterplot -> nrow
-Execution halted
+> fit <- york(dat)
+> scatterplot(dat,fit=fit)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  13.284 6.049 11.301 0.003 0.002 
+> grDevices::dev.off()
+pdf 
+  2 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

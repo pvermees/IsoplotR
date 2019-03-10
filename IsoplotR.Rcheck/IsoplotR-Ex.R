@@ -511,14 +511,12 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
        28.530,50.540,51.595,86.51,106.40,157.35)
-Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-       .8642,.9584,.9617,1.135,1.230,1.490)
-n <- length(X)
-sX <- X*0.01
-sY <- Y*0.005
-rXY <- rep(0.8,n)
-dat <- cbind(X,sX,Y,sY,rXY)
-scatterplot(dat,fit=york(dat),show.ellipses=1)
+Y <- c(.7268,.7809,.8200,.8116,.8160,.8302,
+       .8642,.9534,.9617,1.105,1.230,1.440)
+sX <- X*0.02
+sY <- Y*0.01
+dat <- cbind(X,sX,Y,sY)
+scatterplot(dat,fit=york(dat),show.ellipses=2)
 
 
 
@@ -656,7 +654,8 @@ sX <- X*0.01
 sY <- Y*0.005
 rXY <- rep(0.8,n)
 dat <- cbind(X,sX,Y,sY,rXY)
-scatterplot(xyz=dat,fit=york(dat),show.ellipses=1)
+fit <- york(dat)
+scatterplot(dat,fit=fit)
 
 
 

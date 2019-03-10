@@ -19,10 +19,10 @@
 #' ways that are described in the documentation of the
 #' \code{\link{isochron}} function.
 #'
-#' @param x a 5-column matrix with the X-values, the analytical
+#' @param x a 4 or 5-column matrix with the X-values, the analytical
 #'     uncertainties of the X-values, the Y-values, the analytical
-#'     uncertainties of the Y-values, and the correlation coefficients
-#'     of the X- and Y-values.
+#'     uncertainties of the Y-values, and (optionally) the correlation
+#'     coefficients of the X- and Y-values.
 #' @param alpha cutoff value for confidence intervals
 #' @return A four-element list of vectors containing:
 #'
@@ -64,9 +64,11 @@
 #' sY <- Y*0.005
 #' rXY <- rep(0.8,n)
 #' dat <- cbind(X,sX,Y,sY,rXY)
-#' scatterplot(xyz=dat,fit=york(dat),show.ellipses=1)
+#' fit <- york(dat)
+#' scatterplot(dat,fit=fit)
 #' @export
 york <- function(x,alpha=0.05){
+    if (ncol(x)==4) x <- cbind(x,0)
     colnames(x) <- c('X','sX','Y','sY','rXY')
     ab <- stats::lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]
