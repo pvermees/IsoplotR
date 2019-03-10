@@ -20,65 +20,71 @@ isochron(x, ...)
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, title = TRUE,
-  model = 1, xlab = "x", ylab = "y", hide = NULL, omit = NULL,
-  omit.col = NA, ...)
+  model = 1, show.ellipses = 1 * (model != 2), xlab = "x",
+  ylab = "y", hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, hide = NULL, omit = NULL,
-  omit.col = NA, ...)
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{KCa}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
+  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, growth = FALSE, hide = NULL,
-  omit = NULL, omit.col = NA, ...)
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  growth = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
+  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
+  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
+  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, hide = NULL, omit = NULL, omit.col = NA, ...)
+  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
+  omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA,
   alpha = 0.05, sigdig = 2, show.numbers = FALSE, levels = NA,
   clabel = "", ellipse.col = c("#00FF0080", "#FF000080"),
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, hide = NULL, omit = NULL,
-  omit.col = NA, ...)
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
   line.col = "black", lwd = 1, plot = TRUE, model = 1,
-  hide = NULL, omit = NULL, omit.col = "grey", ...)
+  show.ellipses = 2 * (model != 2), hide = NULL, omit = NULL,
+  omit.col = "grey", ...)
 }
 \arguments{
 \item{x}{EITHER a matrix with the following five columns:
@@ -148,6 +154,18 @@ intercept and slope.}
 \item{Ordinary least squares regression}
 
 \item{Error-weighted least squares with overdispersion term}
+
+}}
+
+\item{show.ellipses}{show the data as:
+
+\enumerate{
+
+\item points
+
+\item error ellipses
+
+\item error crosses
 
 }}
 
