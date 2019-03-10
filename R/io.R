@@ -435,15 +435,17 @@ as.PbPb <- function(x,format=1,ierr=1){
     if (format==1 & nc>4){
         cnames <- c('Pb206Pb204','errPb206Pb204',
                     'Pb207Pb204','errPb207Pb204','rho')
+        out$x <- read.XsXYsYrXY(X)
     } else if (format==2 & nc>4) {
         cnames <- c('Pb204Pb206','errPb204Pb206',
                     'Pb207Pb206','errPb207Pb206','rho')
+        out$x <- read.XsXYsYrXY(X)
     } else if (format==3 & nc>5){
         cnames <- c('Pb206Pb204','errPb206Pb204',
                     'Pb207Pb204','errPb207Pb204',
                     'Pb207Pb206','errPb207Pb206')
+        out$x <- subset(X,select=1:length(cnames))
     }
-    out$x <- subset(X,select=1:length(cnames))
     colnames(out$x) <- cnames
     out
 }
