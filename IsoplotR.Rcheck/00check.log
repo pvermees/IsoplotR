@@ -59,14 +59,7 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... NOTE
-concordia.age.wetherill: no visible global function definition for
-  ‘optimHess’
-Undefined global functions or variables:
-  optimHess
-Consider adding
-  importFrom("stats", "optimHess")
-to your NAMESPACE file.
+* checking R code for possible problems ... OK
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
@@ -82,4 +75,4 @@ to your NAMESPACE file.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 WARNING, 5 NOTEs
+Status: 1 WARNING, 4 NOTEs
