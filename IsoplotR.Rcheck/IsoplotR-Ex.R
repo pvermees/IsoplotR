@@ -497,6 +497,34 @@ radialplot(d8)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("scatterplot")
+### * scatterplot
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: scatterplot
+### Title: Create a scatter plot with error ellipses or crosses
+### Aliases: scatterplot
+
+### ** Examples
+
+X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
+       28.530,50.540,51.595,86.51,106.40,157.35)
+Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
+       .8642,.9584,.9617,1.135,1.230,1.490)
+n <- length(X)
+sX <- X*0.01
+sY <- Y*0.005
+rXY <- rep(0.8,n)
+dat <- cbind(X,sX,Y,sY,rXY)
+scatterplot(dat,fit=york(dat),show.ellipses=1)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("scatterplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("set.zeta")
 ### * set.zeta
 
@@ -619,26 +647,16 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-   X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
-          28.530,50.540,51.595,86.51,106.40,157.35)
-   Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-          .8642,.9584,.9617,1.135,1.230,1.490)
-   n <- length(X)
-   sX <- X*0.01
-   sY <- Y*0.005
-   rXY <- rep(0.8,n)
-   dat <- cbind(X,sX,Y,sY,rXY)
-   fit <- york(dat)
-   covmat <- matrix(0,2,2)
-   plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
-   for (i in 1:n){
-       covmat[1,1] <- sX[i]^2
-       covmat[2,2] <- sY[i]^2
-       covmat[1,2] <- rXY[i]*sX[i]*sY[i]
-       covmat[2,1] <- covmat[1,2]
-       ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
-       polygon(ell)
-   }
+X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
+       28.530,50.540,51.595,86.51,106.40,157.35)
+Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
+       .8642,.9584,.9617,1.135,1.230,1.490)
+n <- length(X)
+sX <- X*0.01
+sY <- Y*0.005
+rXY <- rep(0.8,n)
+dat <- cbind(X,sX,Y,sY,rXY)
+scatterplot(xyz=dat,fit=york(dat),show.ellipses=1)
 
 
 

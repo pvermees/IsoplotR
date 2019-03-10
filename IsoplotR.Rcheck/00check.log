@@ -9,8 +9,6 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-Days since last update: 6
-
 The build time stamp is missing.
 * checking package namespace information ... OK
 * checking package dependencies ... OK
@@ -68,13 +66,44 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking Rd cross-references ... OK
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... OK
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in documentation object 'scatterplot'
+  ‘...’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... OK
+* checking examples ... ERROR
+Running examples in ‘IsoplotR-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: york
+> ### Title: Linear regression of X,Y-variables with correlated errors
+> ### Aliases: york
+> 
+> ### ** Examples
+> 
+> X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
++        28.530,50.540,51.595,86.51,106.40,157.35)
+> Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
++        .8642,.9584,.9617,1.135,1.230,1.490)
+> n <- length(X)
+> sX <- X*0.01
+> sY <- Y*0.005
+> rXY <- rep(0.8,n)
+> dat <- cbind(X,sX,Y,sY,rXY)
+> scatterplot(xyz=dat,fit=york(dat),show.ellipses=1)
+Error in nrow(xy) : argument "xy" is missing, with no default
+Calls: scatterplot -> nrow
+Execution halted
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 WARNING, 4 NOTEs
+Status: 1 ERROR, 2 WARNINGs, 4 NOTEs

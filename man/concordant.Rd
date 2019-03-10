@@ -24,7 +24,8 @@ the \eqn{^{207}}Pb/\eqn{^{235}}U and
 age (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).}
 }
 \value{
-a vector of boolean flags marking the concordant aliquots.
+A vector of boolean flags marking the concordant
+    aliquots.
 }
 \description{
 Assess whether U-Pb \eqn{{}^{206}}Pb/\eqn{{}^{238}}U- and
@@ -41,7 +42,8 @@ Returns \code{TRUE} if the
     the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and
     \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb-ages agree within the limits
     specified in \code{cutoff.disc} (if
-    t[\eqn{{}^{206}}Pb/\eqn{{}^{238}}U] > \code{cutoff.76}
+    t[\eqn{{}^{206}}Pb/\eqn{{}^{238}}U] > \code{cutoff.76}.
+    Returns \code{FALSE} otherwise.
 }
 \examples{
 data(examples)

@@ -111,6 +111,7 @@ read.data	read.data
 read.data.data.frame	read.data
 read.data.default	read.data
 read.data.matrix	read.data
+scatterplot	scatterplot
 set.zeta	set.zeta
 settings	settings
 titterington	titterington
