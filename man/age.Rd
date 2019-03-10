@@ -169,10 +169,10 @@ estimate (only used if \code{type=1}, \code{isochron=FALSE} and
 \item{common.Pb}{apply a common lead correction using one of three
     methods:
 
-\code{1}: use the isochron intercept as the initial Pb-composition
-
-\code{2}: use the Stacey-Kramer two-stage model to infer the initial
+\code{1}: use the Stacey-Kramer two-stage model to infer the initial
 Pb-composition
+
+\code{2}: use the isochron intercept as the initial Pb-composition
 
 \code{3}: use the Pb-composition stored in
 \code{settings('iratio','Pb206Pb204')} and

@@ -787,7 +787,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  12.95 5.637 10.915 0 0.004 
+Time elapsed:  13.799 5.538 11.565 0.003 0.003 
 > grDevices::dev.off()
 pdf 
   2 
