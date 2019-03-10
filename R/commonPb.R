@@ -1,7 +1,7 @@
 # option = 1: Stacey-Kramers
 # option = 2: isochron
 # option = 3: assumed Pb-composition
-common.Pb.correction <- function(x,option=1,calcit=calcit){
+common.Pb.correction <- function(x,option=1,calcit=rep(TRUE,length(x))){
     ns <- length(x)
     if (option == 1)
         out <- common.Pb.stacey.kramers(x)
@@ -14,7 +14,7 @@ common.Pb.correction <- function(x,option=1,calcit=calcit){
     out
 }
 
-common.Pb.isochron <- function(x,calcit=calcit){
+common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
     fit <- ludwig(subset(x,subset=calcit))
     if (x$format<4){
         rr <- age_to_terawasserburg_ratios(fit$par[1],d=x$d)$x
