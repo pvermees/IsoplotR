@@ -487,8 +487,7 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
         ccw <- wetherill(x,i)
         cct <- tera.wasserburg(x,i)
     }
-    t.init <- initial.concordia.age(cct,d=x$d)
-    tt <- concordia.age(ccw,t.init=t.init,exterr=exterr,d=x$d)
+    tt <- concordia.age(ccw,exterr=exterr,d=x$d)
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
         out <- c(out,mswd.concordia(x,ccw,tt[1],exterr=exterr))
@@ -508,17 +507,14 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
     }
     out
 }
-concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
-    out <- tryCatch({
-        fit <- stats::optim(par=t.init,fn=LL.concordia.age,ccw=x,exterr=exterr,d=x$d)
-        tt <- fit$par
-        tt.err <- as.numeric(sqrt(solve(fit$hessian)))
-        c(tt,tt.err)
-    }, warning = function(w){
-        c(t.init,1)
-    }, error = function(e){
-        c(t.init,1)
-    })
+concordia.age.wetherill <- function(x,exterr=TRUE,d=diseq(),...){
+    fit <- stats::optimise(LL.concordia.age,interval=c(0,5000),
+                           ccw=x,exterr=exterr,d=d)
+    tt <- fit$minimum
+    hess <- optimHess(tt,fn=LL.concordia.age,
+                      ccw=x,exterr=exterr,d=d)
+    tt.err <- as.numeric(sqrt(solve(hess)))
+    out <- c(tt,tt.err)
     names(out) <- c('t.conc','s[t.conc]')
     out
 }

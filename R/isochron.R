@@ -136,6 +136,18 @@
 #'
 #' }
 #'
+#' @param show.ellipses show the data as:
+#'
+#' \enumerate{
+#'
+#' \item points
+#'
+#' \item error ellipses
+#'
+#' \item error crosses
+#'
+#' }
+#'
 #' @param xlab text label for the horizontal plot axis
 #' 
 #' @param hide vector with indices of aliquots that should be removed
