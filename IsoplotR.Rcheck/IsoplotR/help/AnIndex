@@ -33,6 +33,7 @@ central	central
 central.default	central
 central.fissiontracks	central
 central.UThHe	central
+concordant	concordant
 concordia	concordia
 data2york	data2york
 data2york.ArAr	data2york
@@ -110,6 +111,7 @@ read.data	read.data
 read.data.data.frame	read.data
 read.data.default	read.data
 read.data.matrix	read.data
+scatterplot	scatterplot
 set.zeta	set.zeta
 settings	settings
 titterington	titterington

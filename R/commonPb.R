@@ -1,12 +1,12 @@
 # option = 1: Stacey-Kramers
 # option = 2: isochron
 # option = 3: assumed Pb-composition
-common.Pb.correction <- function(x,option=1){
+common.Pb.correction <- function(x,option=1,calcit=calcit){
     ns <- length(x)
     if (option == 1)
         out <- common.Pb.stacey.kramers(x)
     else if (option == 2)
-        out <- common.Pb.isochron(x)
+        out <- common.Pb.isochron(x,calcit=calcit)
     else if (option == 3)
         out <- common.Pb.nominal(x)
     else out <- x
@@ -14,8 +14,8 @@ common.Pb.correction <- function(x,option=1){
     out
 }
 
-common.Pb.isochron <- function(x){
-    fit <- ludwig(x)
+common.Pb.isochron <- function(x,calcit=calcit){
+    fit <- ludwig(subset(x,subset=calcit))
     if (x$format<4){
         rr <- age_to_terawasserburg_ratios(fit$par[1],d=x$d)$x
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']

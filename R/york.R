@@ -19,10 +19,10 @@
 #' ways that are described in the documentation of the
 #' \code{\link{isochron}} function.
 #'
-#' @param x a 5-column matrix with the X-values, the analytical
+#' @param x a 4 or 5-column matrix with the X-values, the analytical
 #'     uncertainties of the X-values, the Y-values, the analytical
-#'     uncertainties of the Y-values, and the correlation coefficients
-#'     of the X- and Y-values.
+#'     uncertainties of the Y-values, and (optionally) the correlation
+#'     coefficients of the X- and Y-values.
 #' @param alpha cutoff value for confidence intervals
 #' @return A four-element list of vectors containing:
 #'
@@ -55,28 +55,20 @@
 #' Journal of Physics 72.3, pp.367-375.
 #'
 #' @examples
-#'    X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
-#'           28.530,50.540,51.595,86.51,106.40,157.35)
-#'    Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-#'           .8642,.9584,.9617,1.135,1.230,1.490)
-#'    n <- length(X)
-#'    sX <- X*0.01
-#'    sY <- Y*0.005
-#'    rXY <- rep(0.8,n)
-#'    dat <- cbind(X,sX,Y,sY,rXY)
-#'    fit <- york(dat)
-#'    covmat <- matrix(0,2,2)
-#'    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
-#'    for (i in 1:n){
-#'        covmat[1,1] <- sX[i]^2
-#'        covmat[2,2] <- sY[i]^2
-#'        covmat[1,2] <- rXY[i]*sX[i]*sY[i]
-#'        covmat[2,1] <- covmat[1,2]
-#'        ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
-#'        polygon(ell)
-#'    }
+#' X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
+#'        28.530,50.540,51.595,86.51,106.40,157.35)
+#' Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
+#'        .8642,.9584,.9617,1.135,1.230,1.490)
+#' n <- length(X)
+#' sX <- X*0.01
+#' sY <- Y*0.005
+#' rXY <- rep(0.8,n)
+#' dat <- cbind(X,sX,Y,sY,rXY)
+#' fit <- york(dat)
+#' scatterplot(dat,fit=fit)
 #' @export
 york <- function(x,alpha=0.05){
+    if (ncol(x)==4) x <- cbind(x,0)
     colnames(x) <- c('X','sX','Y','sY','rXY')
     ab <- stats::lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
     a <- ab[1]
@@ -104,6 +96,7 @@ york <- function(x,alpha=0.05){
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- get.york.mswd(x,a,b)
+    out$fact <- 1
     out$a <- c(a,sa)
     out$b <- c(b,sb)
     out$cov.ab <- -xbar*sb^2

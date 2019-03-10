@@ -7,10 +7,10 @@
 york(x, alpha = 0.05)
 }
 \arguments{
-\item{x}{a 5-column matrix with the X-values, the analytical
+\item{x}{a 4 or 5-column matrix with the X-values, the analytical
 uncertainties of the X-values, the Y-values, the analytical
-uncertainties of the Y-values, and the correlation coefficients
-of the X- and Y-values.}
+uncertainties of the Y-values, and (optionally) the correlation
+coefficients of the X- and Y-values.}
 
 \item{alpha}{cutoff value for confidence intervals}
 }
@@ -57,26 +57,17 @@ ways that are described in the documentation of the
 \code{\link{isochron}} function.
 }
 \examples{
-   X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
-          28.530,50.540,51.595,86.51,106.40,157.35)
-   Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-          .8642,.9584,.9617,1.135,1.230,1.490)
-   n <- length(X)
-   sX <- X*0.01
-   sY <- Y*0.005
-   rXY <- rep(0.8,n)
-   dat <- cbind(X,sX,Y,sY,rXY)
-   fit <- york(dat)
-   covmat <- matrix(0,2,2)
-   plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
-   for (i in 1:n){
-       covmat[1,1] <- sX[i]^2
-       covmat[2,2] <- sY[i]^2
-       covmat[1,2] <- rXY[i]*sX[i]*sY[i]
-       covmat[2,1] <- covmat[1,2]
-       ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
-       polygon(ell)
-   }
+X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
+       28.530,50.540,51.595,86.51,106.40,157.35)
+Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
+       .8642,.9584,.9617,1.135,1.230,1.490)
+n <- length(X)
+sX <- X*0.01
+sY <- Y*0.005
+rXY <- rep(0.8,n)
+dat <- cbind(X,sX,Y,sY,rXY)
+fit <- york(dat)
+scatterplot(dat,fit=fit)
 }
 \references{
 Titterington, D.M. and Halliday, A.N., 1979. On the

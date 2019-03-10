@@ -179,7 +179,7 @@ U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
     d[,'rXY'] <- ta0[,'cov[t,48_0]']/(ta0[,'s[t]']*ta0[,'s[48_0]'])
     scatterplot(d,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
-                clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
+                clabel=clabel,ellipse.col=ellipse.col,add=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,...)
 }
 
@@ -208,7 +208,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
         scatterplot(initial,alpha=alpha,
                     ellipse.col=grDevices::rgb(1,1,1,0.85),
-                    line.col='black',new.plot=FALSE)
+                    line.col='black',add=TRUE)
         e48 <- 1
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
@@ -216,7 +216,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
     pdat <- y[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
     scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
-                clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
+                clabel=clabel,ellipse.col=ellipse.col,add=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,...)
     colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
 }
@@ -269,12 +269,12 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
         isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
                      levels=levels,ellipse.col=ellipse.col,
                      line.col='black',exterr=exterr,sigdig=sigdig,
-                     new.plot=FALSE,model=model,hide=hide,
+                     add=TRUE,model=model,hide=hide,
                      omit=omit,omit.col=omit.col)
     } else { # plot just the data
         scatterplot(d,alpha=alpha,show.numbers=show.numbers,
                     levels=levels,ellipse.col=ellipse.col,
-                    new.plot=FALSE,hide=hide,omit=omit,
+                    add=TRUE,hide=hide,omit=omit,
                     omit.col=omit.col)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))

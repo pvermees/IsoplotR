@@ -248,7 +248,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,wetherill=TRUE,
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     if (common.Pb<1) X <- x
-    else X <- common.Pb.correction(x,option=common.Pb)
+    else X <- common.Pb.correction(x,option=common.Pb,calcit=calcit)
     X2plot <- subset(X,subset=plotit)
     lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
@@ -265,7 +265,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,wetherill=TRUE,
     y <- data2york(X,option=(2-1*wetherill))
     scatterplot(y,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
-                clabel=clabel,ellipse.col=ellipse.col,new.plot=FALSE,
+                clabel=clabel,ellipse.col=ellipse.col,add=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
@@ -487,8 +487,7 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
         ccw <- wetherill(x,i)
         cct <- tera.wasserburg(x,i)
     }
-    t.init <- initial.concordia.age(cct,d=x$d)
-    tt <- concordia.age(ccw,t.init=t.init,exterr=exterr,d=x$d)
+    tt <- concordia.age(ccw,d=x$d)
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
         out <- c(out,mswd.concordia(x,ccw,tt[1],exterr=exterr))
@@ -508,17 +507,14 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
     }
     out
 }
-concordia.age.wetherill <- function(x,t.init,exterr=TRUE,...){
-    out <- tryCatch({
-        fit <- stats::optim(par=t.init,fn=LL.concordia.age,ccw=x,exterr=exterr,d=x$d)
-        tt <- fit$par
-        tt.err <- as.numeric(sqrt(solve(fit$hessian)))
-        c(tt,tt.err)
-    }, warning = function(w){
-        c(t.init,1)
-    }, error = function(e){
-        c(t.init,1)
-    })
+concordia.age.wetherill <- function(x,d=diseq(),...){
+    fit <- stats::optimise(LL.concordia.age,interval=c(0,5000),
+                           exterr=FALSE,ccw=x,d=d)
+    tt <- fit$minimum
+    hess <- optimHess(tt,fn=LL.concordia.age,
+                      ccw=x,exterr=FALSE,d=d)
+    tt.err <- as.numeric(sqrt(solve(hess)))
+    out <- c(tt,tt.err)
     names(out) <- c('t.conc','s[t.conc]')
     out
 }

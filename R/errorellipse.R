@@ -34,23 +34,74 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
     out
 }
 
-# d = matrix with columns X, sX, Y, sY, rXY
-scatterplot <- function(xyz,xlim=NA,ylim=NA,alpha=0.05,
+#' Create a scatter plot with error ellipses or crosses
+#'
+#' Takes bivariate data with (correlated) uncertainties as input and
+#' produces a scatter plot with error ellipses or crosses as output.
+#' (optionally) displays the linear fit on this diagram, and can show
+#' a third variable as a colour scale.
+#'
+#' @param xy matrix with columns X, sX, Y, sY(, rXY)
+#' @param xlim (optional) two-element vector with the x-axis limits
+#' @param ylim (optional) two-element vector with the y-axis limits
+#' @param alpha the probability cutoff for the error ellipses
+#' @param show.numbers logical flag (\code{TRUE} to show grain
+#'     numbers)
+#' @param show.ellipses show the data as: \enumerate{ \item points
+#'     \item error ellipses \item error crosses }
+#' @param levels a vector with additional values to be displayed as
+#'     different background colours within the error ellipses.
+#' @param clabel label for the colour scale
+#' @param ellipse.col a vector of two background colours for the error
+#'     ellipses. If \code{levels=NA}, then only the first colour will
+#'     be used. If \code{levels} is a vector of numbers, then
+#'     \code{ellipse.col} is used to construct a colour ramp.
+#' @param fit the output of \code{york()} (optional).
+#' @param add if \code{TRUE}, adds the points and lines to the
+#'     existing plot.
+#' @param empty set up an empty plot with the right axis limits to fit
+#'     the data
+#' @param ci.col the fill colour for the confidence interval of the
+#'     intercept and slope.
+#' @param line.col colour of the regression line
+#' @param lwd line width of the regression line
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the plot.
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from the isochron age calculation.
+#' @param omit.col colour that should be used for the omitted
+#'     aliquots.
+#' @param addcolourbar add a colour bar to display the colours used to
+#'     \code{levels}
+#' @param ... optional arguments to format the points and text.
+#' 
+#' @examples
+#' X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
+#'        28.530,50.540,51.595,86.51,106.40,157.35)
+#' Y <- c(.7268,.7809,.8200,.8116,.8160,.8302,
+#'        .8642,.9534,.9617,1.105,1.230,1.440)
+#' sX <- X*0.02
+#' sY <- Y*0.01
+#' dat <- cbind(X,sX,Y,sY)
+#' scatterplot(dat,fit=york(dat),show.ellipses=2)
+#' @export
+scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                         show.numbers=FALSE,show.ellipses=1,levels=NA,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                        fit='none',new.plot=TRUE,ci.col='gray80',
-                        line.col='black',lwd=1,empty=FALSE,
+                        fit='none',add=FALSE,empty=FALSE,
+                        ci.col='gray80',line.col='black',lwd=1,
                         hide=NULL,omit=NULL,omit.col=NA,
                         addcolourbar=TRUE,...){
-    ns <- nrow(xyz)
+    ns <- nrow(xy)
+    if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
     plotit <- sn%ni%hide
     calcit <- sn%ni%c(hide,omit)
-    colnames(xyz) <- c('X','sX','Y','sY','rXY')
-    if (any(is.na(xlim))) xlim <- get.limits(xyz[plotit,'X'],xyz[plotit,'sX'])
-    if (any(is.na(ylim))) ylim <- get.limits(xyz[plotit,'Y'],xyz[plotit,'sY'])
-    if (new.plot) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
-    if (new.plot & empty) return()
+    colnames(xy) <- c('X','sX','Y','sY','rXY')
+    if (any(is.na(xlim))) xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
+    if (any(is.na(ylim))) ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
+    if (!add) graphics::plot(xlim,ylim,type='n',xlab='',ylab='',bty='n')
+    if (!add & empty) return()
     if (!identical(fit,'none'))
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
@@ -63,34 +114,34 @@ scatterplot <- function(xyz,xlim=NA,ylim=NA,alpha=0.05,
                                       hide=hide,omit=omit,omit.col=omit.col)
     }
     if (show.ellipses==0){ # points and or text
-        plot_points(xyz[,'X'],xyz[,'Y'],mybg=colour,mycex=1,
+        plot_points(xy[,'X'],xy[,'Y'],mybg=colour,mycex=1,
                     show.numbers=show.numbers,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
         for (i in sn[plotit]){
-            if (!any(is.na(xyz[i,]))){
-                covmat <- cor2cov2(xyz[i,'sX'],xyz[i,'sY'],xyz[i,'rXY'])
-                ell <- ellipse(xyz[i,'X'],xyz[i,'Y'],covmat,alpha=alpha)
+            if (!any(is.na(xy[i,]))){
+                covmat <- cor2cov2(xy[i,'sX'],xy[i,'sY'],xy[i,'rXY'])
+                ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=alpha)
                 graphics::polygon(ell,col=colour[i])
-                if (show.numbers) graphics::text(xyz[i,'X'],xyz[i,'Y'],i)
-                else graphics::points(xyz[i,'X'],xyz[i,'Y'],pch=19,cex=0.25)
+                if (show.numbers) graphics::text(xy[i,'X'],xy[i,'Y'],i)
+                else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=0.25)
             }
         }
     } else { # error cross
         if (show.numbers)
-            graphics::text(xyz[plotit,'X'],xyz[plotit,'Y'],
+            graphics::text(xy[plotit,'X'],xy[plotit,'Y'],
                            sn[plotit],adj=c(0,1),col=colour)
         else
-            graphics::points(xyz[plotit,'X'],xyz[plotit,'Y'],
+            graphics::points(xy[plotit,'X'],xy[plotit,'Y'],
                              pch=19,cex=0.5,col=colour)
         fact <- stats::qnorm(1-alpha/2)
-        dx <- fact*xyz[plotit,'sX']
-        dy <- fact*xyz[plotit,'sY']
-        graphics::arrows(xyz[plotit,'X'],xyz[plotit,'Y']-dy,
-                         xyz[plotit,'X'],xyz[plotit,'Y']+dy,
+        dx <- fact*xy[plotit,'sX']
+        dy <- fact*xy[plotit,'sY']
+        graphics::arrows(xy[plotit,'X'],xy[plotit,'Y']-dy,
+                         xy[plotit,'X'],xy[plotit,'Y']+dy,
                          code=3,angle=90,
                          length=0.05,col=colour)
-        graphics::arrows(xyz[plotit,'X']-dx,xyz[plotit,'Y'],
-                         xyz[plotit,'X']+dx,xyz[plotit,'Y'],
+        graphics::arrows(xy[plotit,'X']-dx,xy[plotit,'Y'],
+                         xy[plotit,'X']+dx,xy[plotit,'Y'],
                          code=3,angle=90,
                          length=0.05,col=colour)
     }

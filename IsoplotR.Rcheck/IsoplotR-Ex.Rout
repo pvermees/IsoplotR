@@ -128,6 +128,27 @@ Type 'q()' to quit R.
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("concordant")
+> ### * concordant
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: concordant
+> ### Title: Test whether the U-Pb compositions are concordant
+> ### Aliases: concordant
+> 
+> ### ** Examples
+> 
+> data(examples)
+> conc <- concordant(examples$UPb,cutoff.disc=c(-1,1))
+> radialplot(examples$UPb,omit=which(!conc))
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("concordant", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("concordia")
 > ### * concordia
 > 
@@ -568,6 +589,32 @@ Pb207U235,sePb207U235,Pb206U238,sePb206U238,rho
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("read.data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("scatterplot")
+> ### * scatterplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: scatterplot
+> ### Title: Create a scatter plot with error ellipses or crosses
+> ### Aliases: scatterplot
+> 
+> ### ** Examples
+> 
+> X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
++        28.530,50.540,51.595,86.51,106.40,157.35)
+> Y <- c(.7268,.7809,.8200,.8116,.8160,.8302,
++        .8642,.9534,.9617,1.105,1.230,1.440)
+> sX <- X*0.02
+> sY <- Y*0.01
+> dat <- cbind(X,sX,Y,sY)
+> scatterplot(dat,fit=york(dat),show.ellipses=2)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("scatterplot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("set.zeta")
 > ### * set.zeta
 > 
@@ -720,26 +767,17 @@ $type
 > 
 > ### ** Examples
 > 
->    X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
-+           28.530,50.540,51.595,86.51,106.40,157.35)
->    Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
-+           .8642,.9584,.9617,1.135,1.230,1.490)
->    n <- length(X)
->    sX <- X*0.01
->    sY <- Y*0.005
->    rXY <- rep(0.8,n)
->    dat <- cbind(X,sX,Y,sY,rXY)
->    fit <- york(dat)
->    covmat <- matrix(0,2,2)
->    plot(range(X),fit$a[1]+fit$b[1]*range(X),type='l',ylim=range(Y))
->    for (i in 1:n){
-+        covmat[1,1] <- sX[i]^2
-+        covmat[2,2] <- sY[i]^2
-+        covmat[1,2] <- rXY[i]*sX[i]*sY[i]
-+        covmat[2,1] <- covmat[1,2]
-+        ell <- ellipse(X[i],Y[i],covmat,alpha=0.05)
-+        polygon(ell)
-+    }
+> X <- c(1.550,12.395,20.445,20.435,20.610,24.900,
++        28.530,50.540,51.595,86.51,106.40,157.35)
+> Y <- c(.7268,.7849,.8200,.8156,.8160,.8322,
++        .8642,.9584,.9617,1.135,1.230,1.490)
+> n <- length(X)
+> sX <- X*0.01
+> sY <- Y*0.005
+> rXY <- rep(0.8,n)
+> dat <- cbind(X,sX,Y,sY,rXY)
+> fit <- york(dat)
+> scatterplot(dat,fit=fit)
 > 
 > 
 > 
@@ -749,7 +787,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  13.695 8.541 10.77 0.004 0 
+Time elapsed:  12.95 5.637 10.915 0 0.004 
 > grDevices::dev.off()
 pdf 
   2 
