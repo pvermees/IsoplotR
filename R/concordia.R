@@ -248,7 +248,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,wetherill=TRUE,
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     if (common.Pb<1) X <- x
-    else X <- common.Pb.correction(x,option=common.Pb)
+    else X <- common.Pb.correction(x,option=common.Pb,calcit=calcit)
     X2plot <- subset(X,subset=plotit)
     lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
