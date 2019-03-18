@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  10 MAR 2019 16:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  18 MAR 2019 06:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -712,7 +712,7 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
-(/tmp/RtmpXCBT3m/Rd2pdf6e2e5af78ffe/Rd2.aux)
+(/tmp/Rtmpl8FEdG/Rd2pdfc886c1c31de/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -769,8 +769,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/tmp/RtmpXCBT3m/Rd2pdf6e2e5af78ffe/Rd2.out)
-(/tmp/RtmpXCBT3m/Rd2pdf6e2e5af78ffe/Rd2.out)
+(/tmp/Rtmpl8FEdG/Rd2pdfc886c1c31de/Rd2.out)
+(/tmp/Rtmpl8FEdG/Rd2pdfc886c1c31de/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -807,7 +807,7 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 31.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
-(/tmp/RtmpXCBT3m/Rd2pdf6e2e5af78ffe/Rd2.toc [1
+(/tmp/Rtmpl8FEdG/Rd2pdfc886c1c31de/Rd2.toc [1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -1326,7 +1326,7 @@ Overfull \hbox (3.83311pt too wide) in paragraph at lines 4762--4771
 [66] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2017/01/28 v1.1t UTF-8 support for inputenc
 ) [67] [68]
-(/tmp/RtmpXCBT3m/Rd2pdf6e2e5af78ffe/Rd2.ind [69]
+(/tmp/Rtmpl8FEdG/Rd2pdfc886c1c31de/Rd2.ind [69]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
@@ -1339,7 +1339,7 @@ LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 4990.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 4990.
- (/tmp/RtmpXCBT3m/Rd2pdf6e2e5af78ffe/Rd2.aux)
+ (/tmp/Rtmpl8FEdG/Rd2pdfc886c1c31de/Rd2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 4990.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 4990.
 
@@ -1353,7 +1353,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 4990.
  ) 
 Here is how much of TeX's memory you used:
  7142 strings out of 492982
- 101986 string characters out of 6134895
+ 101973 string characters out of 6134895
  178289 words of memory out of 5000000
  10085 multiletter control sequences out of 15000+600000
  38763 words of font info for 50 fonts, out of 8000000 for 9000
