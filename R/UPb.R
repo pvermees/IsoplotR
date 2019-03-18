@@ -445,7 +445,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
     } else {
         l5 <- lambda('U235')[1]
         sl5 <- lambda('U235')[2]
-        t.75 <- log(1+x)/l5
+        if (x>-1) t.75 <- log(1+x)/l5 else t.75 <- -Inf
         J <- matrix(0,1,2)
         if (d$corr){
             dt <- 0.01/settings('lambda','U234')[1]
@@ -462,7 +462,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             }
         } else {
             J[1,1] <- 1/(l5*(1+x))                # dt/dx
-            if (exterr) J[1,2] <- log(1+x)/l5^2   # dt/dl5
+            if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
@@ -498,7 +498,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
     } else {
         l8 <- lambda('U238')[1]
         sl8 <- lambda('U238')[2]
-        t.init <- log(1+x)/l8
+        if (x>-1) t.init <- log(1+x)/l8 else t.init <- -Inf
         J <- matrix(0,1,2)
         if (d$corr){
             t.68 <- tryCatch({
@@ -520,7 +520,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         } else {
             t.68 <- t.init
             J[1,1] <- 1/(l8*(1+x))                # dt/dx
-            if (exterr) J[1,2] <- log(1+x)/l8^2   # dt/dl8
+            if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl8
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
