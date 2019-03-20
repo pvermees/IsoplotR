@@ -155,13 +155,14 @@ project.concordia <- function(m76,m86,i76,d=diseq()){
     } else if (neg & above){
         search.range <- c(0,t68)
         go.ahead <- TRUE
-    } else if (neg & below){           # it is not clear what to do with samples
-        for (tt in seq(from=0,to=5000,by=10)){
+    } else if (neg & below){
+        search.range <- c(0,t76)
+        for (tt in seq(from=0,to=t76,length.out=100)){
             misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
-            if (misfit<0){             # that plot in the 'forbidden zone' above
-                search.range[2] <- tt  # Wetherill concordia or below T-W concordia
-                go.ahead <- TRUE       # IsoplotR will still project them on
-                break                  # the concordia line.
+            if (misfit<0){
+                search.range[2] <- tt
+                go.ahead <- TRUE
+                break
             }
         }
     }
