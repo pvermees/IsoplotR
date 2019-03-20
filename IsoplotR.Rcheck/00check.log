@@ -18,13 +18,19 @@ The build time stamp is missing.
 * checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
   .Rhistory
+  inst/.~lock.ArAr3.csv#
   .git
 These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
 
 CRAN-pack does not know about
+  inst/.~lock.ArAr3.csv#
   .git
-* checking for portable file names ... OK
+* checking for portable file names ... WARNING
+Found the following file with a non-portable file name:
+  inst/.~lock.ArAr3.csv#
+These are not fully portable file names.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
@@ -75,4 +81,4 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking examples ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 WARNING, 4 NOTEs
+Status: 2 WARNINGs, 4 NOTEs

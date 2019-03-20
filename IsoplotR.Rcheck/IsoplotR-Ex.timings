@@ -1,4 +1,5 @@
 name	user	system	elapsed
+<<<<<<< HEAD
 age	1.334	0.944	1.009	
 agespectrum	0.348	0.002	0.347	
 cad	0.044	0.003	0.047	
@@ -23,3 +24,29 @@ settings	0.069	0.033	0.051
 titterington	0.022	0.007	0.012	
 weightedmean	0.184	0.222	0.111	
 york	0.022	0.003	0.014	
+=======
+age	1.472	0.844	1.127	
+agespectrum	0.395	0.001	0.395	
+cad	0.03	0.00	0.03	
+central	0.189	0.180	0.144	
+concordant	0.096	0.024	0.096	
+concordia	1.697	1.357	1.272	
+data2york	0.011	0.002	0.011	
+ellipse	0.002	0.006	0.004	
+evolution	0.381	0.277	0.245	
+examples	2.594	0.359	2.442	
+helioplot	0.489	0.266	0.388	
+isochron	0.515	0.387	0.346	
+kde	1.317	0.123	1.255	
+ludwig	0.468	0.617	0.302	
+mds	0.642	0.456	0.510	
+peakfit	0.680	0.134	0.594	
+radialplot	0.738	0.152	0.681	
+read.data	1.544	0.392	1.400	
+scatterplot	0.009	0.003	0.008	
+set.zeta	0.001	0.009	0.005	
+settings	0.066	0.035	0.051	
+titterington	0.024	0.016	0.016	
+weightedmean	0.179	0.143	0.141	
+york	0.022	0.016	0.021	
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026

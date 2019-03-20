@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  20 MAR 2019 10:51
+=======
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.14)  20 MAR 2019 10:58
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -712,7 +716,11 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
+<<<<<<< HEAD
 (/tmp/RtmpYzFwv9/Rd2pdf162927df6c0/Rd2.aux)
+=======
+(/tmp/Rtmp1oXoEv/Rd2pdf1a99788427f6/Rd2.aux)
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -769,8 +777,13 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
+<<<<<<< HEAD
 (/tmp/RtmpYzFwv9/Rd2pdf162927df6c0/Rd2.out)
 (/tmp/RtmpYzFwv9/Rd2pdf162927df6c0/Rd2.out)
+=======
+(/tmp/Rtmp1oXoEv/Rd2pdf1a99788427f6/Rd2.out)
+(/tmp/Rtmp1oXoEv/Rd2pdf1a99788427f6/Rd2.out)
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -807,7 +820,11 @@ LaTeX Font Info:    Try loading font information for T1+phv on input line 31.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
+<<<<<<< HEAD
 (/tmp/RtmpYzFwv9/Rd2pdf162927df6c0/Rd2.toc [1
+=======
+(/tmp/Rtmp1oXoEv/Rd2pdf1a99788427f6/Rd2.toc [1
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
@@ -1326,7 +1343,11 @@ Overfull \hbox (3.83311pt too wide) in paragraph at lines 4762--4771
 [66] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
 File: utf8.def 2017/01/28 v1.1t UTF-8 support for inputenc
 ) [67] [68]
+<<<<<<< HEAD
 (/tmp/RtmpYzFwv9/Rd2pdf162927df6c0/Rd2.ind [69]
+=======
+(/tmp/Rtmp1oXoEv/Rd2pdf1a99788427f6/Rd2.ind [69]
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
@@ -1339,7 +1360,11 @@ LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 4990.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 4990.
+<<<<<<< HEAD
  (/tmp/RtmpYzFwv9/Rd2pdf162927df6c0/Rd2.aux)
+=======
+ (/tmp/Rtmp1oXoEv/Rd2pdf1a99788427f6/Rd2.aux)
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 4990.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 4990.
 

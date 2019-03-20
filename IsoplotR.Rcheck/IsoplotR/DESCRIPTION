@@ -13,4 +13,8 @@ URL: http://isoplotr.london-geochron.com
 LazyData: true
 RoxygenNote: 6.1.0
 Encoding: UTF-8
+<<<<<<< HEAD
 Built: R 3.4.4; ; 2019-03-20 10:50:47 UTC; unix
+=======
+Built: R 3.4.4; ; 2019-03-20 10:57:42 UTC; unix
+>>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026

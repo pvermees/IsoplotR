@@ -459,8 +459,8 @@ as.ArAr <- function(x,format=3,ierr=1){
     bi <- 4 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
     X <- errconvert(X,gc='Ar-Ar',format=format,ierr=ierr)
-    if (format==3 & nc>5){
-        if (nc==8){
+    if (format==3 & nc>6){
+        if (nc==7){
             out$x <- subset(X,select=1:7)
         } else {
             ns <- nr-bi+1 # number of samples
