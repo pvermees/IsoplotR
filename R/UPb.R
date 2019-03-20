@@ -519,11 +519,8 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             }
         } else {
             t.68 <- t.init
-<<<<<<< HEAD
             J[1,1] <- 1/(l8*(1+x))                       # dt/dx
-=======
             J[1,1] <- 1/(l8*(1+x))                # dt/dx
->>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
             if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl8
         }
         E <- matrix(0,2,2)
