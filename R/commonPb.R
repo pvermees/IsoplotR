@@ -21,7 +21,7 @@ common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
         y0 <- get.Pb207Pb206.ratios(x)[,1] -
             slope*get.U238Pb206.ratios(x)[,1]
-        out <- Pb.correction.without.204(x,i76=y0)
+        out <- Pb.correction.without.204(x,i76=y0,lower=TRUE)
     } else {
         w <- wendt(fit$par['t'],d=x$d)
         r68i <- age_to_Pb206U238_ratio(fit$par['t'],d=x$d)[1]
@@ -68,7 +68,7 @@ common.Pb.stacey.kramers <- function(x){
         tinit <- 1000 # initial guess
         for (i in 1:5){
             i6474 <- stacey.kramers(tinit)
-            out <- Pb.correction.without.204(x,i6474[2]/i6474[1])
+            out <- Pb.correction.without.204(x,i6474[2]/i6474[1],lower=FALSE)
             tinit <- get.Pb206U238.age(out)[,1]
         }
     } else {
@@ -114,7 +114,7 @@ sk2w <- function(x,i,tt){
 common.Pb.nominal <- function(x){
     if (x$format < 4){
         i76 <- settings('iratio','Pb207Pb206')[1]
-        out <- Pb.correction.without.204(x,i76)
+        out <- Pb.correction.without.204(x,i76,lower=TRUE)
     } else {
         i64 <- settings('iratio','Pb206Pb204')[1]
         i74 <- settings('iratio','Pb207Pb204')[1]
@@ -123,7 +123,7 @@ common.Pb.nominal <- function(x){
     out
 }
 
-Pb.correction.without.204 <- function(x,i76){
+Pb.correction.without.204 <- function(x,i76,lower=TRUE){
     ns <- length(x)
     ni <- length(i76)
     out <- x
@@ -133,7 +133,7 @@ Pb.correction.without.204 <- function(x,i76){
     i76i <- i76[1]
     for (i in 1:ns){
         if (ni>1) i76i <- i76[i]
-        tint[i] <- project.concordia(m76[i],m86[i],i76i,d=x$d)
+        tint[i] <- project.concordia(m76[i],m86[i],i76i,d=x$d,lower=lower)
     }
     if (x$format == 1){
         out$x[,'Pb207U235'] <- age_to_Pb207U235_ratio(tint,d=x$d)[,'75']
