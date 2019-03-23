@@ -137,7 +137,7 @@ twfit2wfit <- function(fit,x){
 }
 
 # used by common Pb correction:
-project.concordia <- function(m76,m86,i76,d=diseq()){
+project.concordia <- function(m76,m86,i76,d=diseq(),lower=TRUE){
     t68 <- get.Pb206U238.age(1/m86,d=d)[1]
     t76 <- get.Pb207Pb206.age(m76,d=d)[1]
     a <- i76
@@ -155,12 +155,14 @@ project.concordia <- function(m76,m86,i76,d=diseq()){
     } else if (neg & above){
         search.range <- c(0,t68)
         go.ahead <- TRUE
-    } else if (neg & below){
-        search.range <- c(0,t76)
-        for (tt in seq(from=0,to=t76,length.out=100)){
+    } else if (neg & below){        
+        if (lower) { m <- 0; M <- t76 }
+        else { m <- 5000; M <- t68 }
+        for (tt in seq(m,M,length.out=100)){
             misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
             if (misfit<0){
-                search.range[2] <- tt
+                if (lower) search.range <- c(0,tt)
+                else search.range <- c(t68,tt)
                 go.ahead <- TRUE
                 break
             }
