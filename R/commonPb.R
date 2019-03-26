@@ -64,20 +64,25 @@ common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
 }
 
 common.Pb.stacey.kramers <- function(x){
+    ns <- length(x)
+    out <- x
+    out$x.raw <- x$x
+    out$x <- matrix(0,ns,5)
     if (x$format < 4){
-        tinit <- 1000 # initial guess
-        for (i in 1:5){
-            i6474 <- stacey.kramers(tinit)
-            out <- Pb.correction.without.204(x,i6474[2]/i6474[1],lower=FALSE)
-            tinit <- get.Pb206U238.age(out)[,1]
-        }
-    } else {
-        ns <- length(x)
-        out <- x
-        out$x.raw <- x$x
-        out$x <- matrix(0,ns,5)
         for (i in 1:ns){
-            fit <- stats::optimise(SS.SK,interval=c(0,5000),x=x,i=i)
+            fit <- stats::optimise(SS.SK.without.204,interval=c(0,5000),x=x,i=i)
+            st <- stats::optimHess(fit$minimum,SS.SK.without.204,x=x,i=i)
+            cctw <- age_to_terawasserburg_ratios(tt=fit$minimum,st=st,d=x$d)
+            out$x[i,c(1,3)] <- cctw$x
+            out$x[i,c(2,4)] <- sqrt(diag(cctw$cov))
+            out$x[i,5] <- stats::cov2cor(cctw$cov)[1,2]
+        }
+        colnames(out$x) <- c('U238Pb206','errU238Pb206',
+                             'Pb207Pb206','errPb207Pb206','rhoXY')
+        out$format <- 2
+    } else {
+        for (i in 1:ns){
+            fit <- stats::optimise(SS.SK.with.204,interval=c(0,5000),x=x,i=i)
             ccw <- sk2w(x,i,tt=fit$minimum)
             out$x[i,c(1,3)] <- ccw$x
             out$x[i,c(2,4)] <- sqrt(diag(ccw$cov))
@@ -89,7 +94,21 @@ common.Pb.stacey.kramers <- function(x){
     }
     out
 }
-SS.SK <- function(tt,x,i){
+SS.SK.without.204 <- function(tt,x,i){
+    tw <- tera.wasserburg(x,i)
+    X <- tw$x['U238Pb206']
+    Y <- tw$x['Pb207Pb206']
+    i6474 <- stacey.kramers(tt)
+    cct <- age_to_terawasserburg_ratios(tt,st=0,d=x$d)
+    a <- i6474[2]/i6474[1] # intercept
+    b <- (cct$x['Pb207Pb206']-a)/cct$x['U238Pb206'] # slope
+    omega <- solve(tw$cov)
+    x.fitted <- (X*omega[1,1]+Y*omega[1,2]-a*omega[1,2])/(omega[1,1]+b*omega[1,2])
+    y.fitted <- a + b*x.fitted
+    d <- cbind(X-x.fitted,Y-y.fitted)
+    d %*% omega %*% t(d)
+}
+SS.SK.with.204 <- function(tt,x,i){
     ccw <- sk2w(x,i,tt)
     LL.concordia.age(tt,ccw,mswd=FALSE,exterr=FALSE,d=x$d)
 }
