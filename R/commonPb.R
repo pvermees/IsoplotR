@@ -3,45 +3,49 @@
 # option = 3: assumed Pb-composition
 common.Pb.correction <- function(x,option=1,calcit=rep(TRUE,length(x))){
     ns <- length(x)
+    out <- x
+    out$x.raw <- out$x
+    out$x <- matrix(0,ns,5)
+    out$format <- 2
     if (option == 1)
-        out <- common.Pb.stacey.kramers(x)
+        out$x <- common.Pb.stacey.kramers(x)
     else if (option == 2)
-        out <- common.Pb.isochron(x,calcit=calcit)
+        out$x <- common.Pb.isochron(x,calcit=calcit)
     else if (option == 3)
-        out <- common.Pb.nominal(x)
-    else out <- x
-    out$x.raw <- x$x
+        out$x <- common.Pb.nominal(x)
+    else out$x <- x
+    colnames(out$x) <- c('U238Pb206','errU238Pb206',
+                         'Pb207Pb206','errPb207Pb206','rhoXY')
     out
+}
+
+correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE){
+    tw <- tera.wasserburg(x,i)
+    m86 <- tw$x['U238Pb206']
+    m76 <- tw$x['Pb207Pb206']
+    tint <- project.concordia(m86,m76,c76,d=x$d,lower=lower)
+    cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d)
+    r86 <- cctw$x['U238Pb206']
+    r76 <- cctw$x['Pb207Pb206']
+    f <- (m76-r76)/(m76-c76)
+    E <- tw$cov/((1-f)^2)
+    sr86 <- sqrt(E[1,1])
+    sr76 <- sqrt(E[2,2])
+    rho <- stats::cov2cor(E)[1,2]
+    c(r86,sr86,r76,sr76,rho)
 }
 
 common.Pb.stacey.kramers <- function(x){
     ns <- length(x)
-    out <- x
-    out$x.raw <- x$x
-    out$x <- matrix(0,ns,5)
+    out <- matrix(0,ns,5)
     if (x$format < 4){
         for (i in 1:ns){
-            tt <- stats::optimise(SS.SK.without.204,
+            tint <- stats::optimise(SS.SK.without.204,
                                   interval=c(0,5000),x=x,i=i)$minimum
-            i6474 <- stacey.kramers(tt)
-            cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d)
-            tw <- tera.wasserburg(x,i)
-            xm <- tw$x['U238Pb206']
-            ym <- tw$x['Pb207Pb206']
-            xr <- cctw$x['U238Pb206']
-            yr <- cctw$x['Pb207Pb206']
-            y0 <- i6474[2]/i6474[1]
-            f <- (ym-yr)/(y0-yr)
-            mswd <- SS.SK.without.204(tt,x=x,i=i)
-            if (mswd<1) E <- tw$cov/((1-f)^2)
-            else E <- mswd*tw$cov/((1-f)^2)
-            out$x[i,c(1,3)] <- cctw$x
-            out$x[i,c(2,4)] <- sqrt(diag(E))
-            out$x[i,5] <- stats::cov2cor(E)[1,2]
+            i6474 <- stacey.kramers(tint)
+            c76 <- i6474[2]/i6474[1]
+            out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=FALSE)
         }
-        colnames(out$x) <- c('U238Pb206','errU238Pb206',
-                             'Pb207Pb206','errPb207Pb206','rhoXY')
-        out$format <- 2
     } else {
         for (i in 1:ns){
             fit <- stats::optimise(SS.SK.with.204,interval=c(0,5000),x=x,i=i)
@@ -60,29 +64,15 @@ common.Pb.stacey.kramers <- function(x){
 common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
     fit <- ludwig(subset(x,subset=calcit))
     ns <- length(x)
-    out <- x
-    out$x.raw <- out$x
-    out$x <- matrix(0,ns,5)
-    colnames(out$x) <- c('U238Pb206','errU238Pb206',
-                         'Pb207Pb206','errPb207Pb206','rhoXY')
-    out$format <- 2
+    out <- matrix(0,ns,5)
     if (x$format<4){
         rr <- age_to_terawasserburg_ratios(fit$par[1],d=x$d)$x
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
-        ym <- get.Pb207Pb206.ratios(x)[,1]
-        xm <- get.U238Pb206.ratios(x)[,1]
-        y0 <- ym - slope*xm
+        m76 <- get.Pb207Pb206.ratios(x)[,1]
+        m86 <- get.U238Pb206.ratios(x)[,1]
+        c76 <- m76 - slope*m86
         for (i in 1:ns){
-            tw <- tera.wasserburg(x,i)
-            tt <- project.concordia(ym[i],xm[i],y0[i],d=x$d,lower=TRUE)
-            cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d)
-            xri <- cctw$x['U238Pb206']
-            yri <- cctw$x['Pb207Pb206']
-            f <- (ym[i]-yri)/(y0[i]-yri)
-            E <- tw$cov/((1-f)^2)
-            out$x[i,c(1,3)] <- cctw$x
-            out$x[i,c(2,4)] <- sqrt(diag(E))
-            out$x[i,5] <- stats::cov2cor(E)[1,2]
+            out[i,] <- correct.common.Pb.without.204(x,i,c76[i],lower=TRUE)
         }
     } else {
         w <- wendt(fit$par['t'],d=x$d)
@@ -114,6 +104,22 @@ common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
             out$x[i,'errPb207Pb206'] <- sqrt(E3[2,2])
             out$x[i,'rhoXY'] <- stats::cov2cor(E3)[1,2]
         }
+    }
+    out
+}
+
+common.Pb.nominal <- function(x){
+    ns <- length(x)
+    out <- matrix(0,ns,5)
+    if (x$format < 4){
+        c76 <- settings('iratio','Pb207Pb206')[1]
+        for (i in 1:ns){
+            out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=TRUE)
+        }
+    } else {
+        i64 <- settings('iratio','Pb206Pb204')[1]
+        i74 <- settings('iratio','Pb207Pb204')[1]
+        out <- Pb.correction.with.204(x,i64,i74)
     }
     out
 }
@@ -151,18 +157,6 @@ sk2w <- function(x,i,tt){
     J[2,2] <- 1
     J[2,3] <- -i64
     out$cov <- J %*% wi$cov %*% t(J)
-    out
-}
-
-common.Pb.nominal <- function(x){
-    if (x$format < 4){
-        i76 <- settings('iratio','Pb207Pb206')[1]
-        out <- Pb.correction.without.204(x,i76,lower=TRUE)
-    } else {
-        i64 <- settings('iratio','Pb206Pb204')[1]
-        i74 <- settings('iratio','Pb207Pb204')[1]
-        out <- Pb.correction.with.204(x,i64,i74)
-    }
     out
 }
 

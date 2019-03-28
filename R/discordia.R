@@ -137,7 +137,7 @@ twfit2wfit <- function(fit,x){
 }
 
 # used by common Pb correction:
-project.concordia <- function(m76,m86,i76,d=diseq(),lower=TRUE){
+project.concordia <- function(m86,m76,i76,d=diseq(),lower=TRUE){
     t68 <- get.Pb206U238.age(1/m86,d=d)[1]
     t76 <- get.Pb207Pb206.age(m76,d=d)[1]
     a <- i76
