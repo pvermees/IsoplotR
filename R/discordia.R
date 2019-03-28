@@ -137,12 +137,12 @@ twfit2wfit <- function(fit,x){
 }
 
 # used by common Pb correction:
-project.concordia <- function(m86,m76,i76,d=diseq(),lower=TRUE){
+project.concordia <- function(m86,m76,c76,d=diseq(),lower=TRUE){
     t68 <- get.Pb206U238.age(1/m86,d=d)[1]
     t76 <- get.Pb207Pb206.age(m76,d=d)[1]
-    a <- i76
-    b <- (m76-i76)/m86
-    neg <- (i76>m76) # negative slope?
+    a <- c76
+    b <- (m76-c76)/m86
+    neg <- (c76>m76) # negative slope?
     pos <- !neg
     above <- (t76>t68) # above concordia?
     below <- !above

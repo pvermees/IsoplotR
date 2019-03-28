@@ -152,6 +152,91 @@ tera.wasserburg <- function(x,i){
     class(out) <- "terawasserburg"
     out
 }
+get.UPb.isochron.ratios <- function(x,i){
+    out <- list()
+    U <- iratio('U238U235')[1]
+    if (x$format==4){ # 75, 68, 48
+        Pb206U238 <- x$x[i,'Pb206U238']
+        Pb204Pb206 <- x$x[i,'Pb204U238']/x$x[i,'Pb206U238']
+        Pb207U235 <- x$x[i,'Pb207U235']
+        Pb204Pb207 <- U*x$x[i,'Pb204U238']/x$x[i,'Pb207U235']
+        E <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
+                      x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
+                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+        J <- matrix(0,4,3)
+        J[1,2] <- 1
+        J[2,2] <- -Pb204Pb206/x$x[i,'Pb206U238']
+        J[2,3] <- 1/x$x[i,'Pb206U238']
+        J[3,1] <- 1
+        J[4,1] <- -Pb204Pb207/x$x[i,'Pb207U235']
+        J[4,3] <- U/x$x[i,'Pb207U235']
+    } else if (x$format==5){ # 86, 76, 46
+        Pb206U238 <- 1/x$x[i,'U238Pb206']
+        Pb204Pb206 <- x$x[i,'Pb204Pb206']
+        Pb207U235 <- U*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
+        Pb204Pb207 <- x$x[i,'Pb204Pb206']/x$x[i,'Pb207Pb206']
+        E <- cor2cov3(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],
+                      x$x[i,'errPb204Pb206'],x$x[i,'rhoXY'],
+                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+        J <- matrix(0,4,3)
+        J[1,1] <- -Pb206U238/x$x[i,'U238Pb206']
+        J[2,3] <- 1
+        J[3,1] <- -Pb207U235/x$x[i,'U238Pb206']
+        J[3,2] <- U/x$x[i,'U238Pb206']
+        J[4,2] <- -Pb204Pb207/x$x[i,'Pb207Pb206']
+        J[4,3] <- 1/x$x[i,'Pb207Pb206']
+    } else if (x$format==6){ # 75, 68, 48, 76, 47, 46
+        Pb206U238 <- x$x[i,'Pb206U238']
+        Pb204Pb206 <- x$x[i,'Pb204Pb206']
+        Pb207U235 <- x$x[i,'Pb207U235']
+        Pb204Pb207 <- x$x[i,'Pb204Pb207']
+        cov.68.46 <- get.cov.mult(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                  x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                  x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
+        cov.68.75 <- get.cov.div(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                                 x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
+        cov.75.47 <- get.cov.mult(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                                  x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
+                                  x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
+        cov.47.46 <- get.cov.div(x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
+                                 x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
+        cov.75.46 <- 0
+        cov.68.47 <- 0
+        J <- matrix(0,4,4)
+        J[1,2] <- 1
+        J[2,4] <- 1
+        J[3,1] <- 1
+        J[4,3] <- 1
+        E <- matrix(0,4,4)
+        E[1,1] <- x$x[i,'errPb207U235']^2
+        E[2,2] <- x$x[i,'errPb206U238']^2
+        E[3,3] <- x$x[i,'errPb204Pb207']^2
+        E[4,4] <- x$x[i,'errPb204Pb206']^2
+        E[1,2] <- cov.68.75
+        E[1,3] <- cov.75.47
+        E[1,4] <- cov.75.46
+        E[2,1] <- E[2,1]
+        E[2,3] <- cov.68.47
+        E[2,4] <- cov.68.46
+        E[3,1] <- E[1,3]
+        E[3,2] <- E[2,3]
+        E[3,4] <- cov.47.46
+        E[4,1] <- E[1,4]
+        E[4,2] <- E[2,4]
+        E[4,3] <- E[3,4]
+    } else {
+        stop("Can't form isochron ratios without 204Pb!")
+    }
+    labels <- c('Pb206U238','Pb204Pb206','Pb207U235','Pb204Pb207')
+    out$x <- c(Pb206U238,Pb204Pb206,Pb207U235,Pb204Pb207)
+    out$cov <- J %*% E %*% t(J)
+    names(out$x) <- labels
+    colnames(out$cov) <- labels
+    rownames(out$cov) <- labels
+    out
+}
 
 # convert data to a 5-column table for concordia analysis
 flat.UPb.table <- function(x,wetherill=TRUE){
