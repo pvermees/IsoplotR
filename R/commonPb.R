@@ -70,12 +70,22 @@ common.Pb.stacey.kramers <- function(x){
     out$x <- matrix(0,ns,5)
     if (x$format < 4){
         for (i in 1:ns){
-            fit <- stats::optimise(SS.SK.without.204,interval=c(0,5000),x=x,i=i)
-            st <- stats::optimHess(fit$minimum,SS.SK.without.204,x=x,i=i)
-            cctw <- age_to_terawasserburg_ratios(tt=fit$minimum,st=st,d=x$d)
+            tt <- stats::optimise(SS.SK.without.204,interval=c(0,5000),x=x,i=i)$minimum
+            i6474 <- stacey.kramers(tt)
+            cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d)
+            tw <- tera.wasserburg(x,i)
+            xm <- tw$x['U238Pb206']
+            ym <- tw$x['Pb207Pb206']
+            xr <- cctw$x['U238Pb206']
+            yr <- cctw$x['Pb207Pb206']
+            yc <- r76i <- i6474[2]/i6474[1]
+            f <- (ym-yr)/(yc-yr)
+            mswd <- SS.SK.without.204(tt,x=x,i=i)
+            if (mswd<1) E <- tw$cov
+            else E <- mswd*tw$cov
             out$x[i,c(1,3)] <- cctw$x
-            out$x[i,c(2,4)] <- sqrt(diag(cctw$cov))
-            out$x[i,5] <- stats::cov2cor(cctw$cov)[1,2]
+            out$x[i,c(2,4)] <- sqrt(diag(E))
+            out$x[i,5] <- stats::cov2cor(E)[1,2]
         }
         colnames(out$x) <- c('U238Pb206','errU238Pb206',
                              'Pb207Pb206','errPb207Pb206','rhoXY')
@@ -106,7 +116,7 @@ SS.SK.without.204 <- function(tt,x,i){
     x.fitted <- (X*omega[1,1]+Y*omega[1,2]-a*omega[1,2])/(omega[1,1]+b*omega[1,2])
     y.fitted <- a + b*x.fitted
     d <- cbind(X-x.fitted,Y-y.fitted)
-    d %*% omega %*% t(d)
+    as.numeric(d %*% omega %*% t(d))
 }
 SS.SK.with.204 <- function(tt,x,i){
     ccw <- sk2w(x,i,tt)
