@@ -16,12 +16,31 @@ common.Pb.correction <- function(x,option=1,calcit=rep(TRUE,length(x))){
 
 common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
     fit <- ludwig(subset(x,subset=calcit))
+    ns <- length(x)
+    out <- x
+    out$x.raw <- out$x
+    out$x <- matrix(0,ns,5)
+    colnames(out$x) <- c('U238Pb206','errU238Pb206',
+                         'Pb207Pb206','errPb207Pb206','rhoXY')
+    out$format <- 2
     if (x$format<4){
         rr <- age_to_terawasserburg_ratios(fit$par[1],d=x$d)$x
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
-        y0 <- get.Pb207Pb206.ratios(x)[,1] -
-            slope*get.U238Pb206.ratios(x)[,1]
-        out <- Pb.correction.without.204(x,i76=y0,lower=TRUE)
+        ym <- get.Pb207Pb206.ratios(x)[,1]
+        xm <- get.U238Pb206.ratios(x)[,1]
+        y0 <- ym - slope*xm
+        for (i in 1:ns){
+            tw <- tera.wasserburg(x,i)
+            tt <- project.concordia(ym[i],xm[i],y0[i],d=x$d,lower=TRUE)
+            cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d)
+            xri <- cctw$x['U238Pb206']
+            yri <- cctw$x['Pb207Pb206']
+            f <- (ym[i]-yri)/(y0[i]-yri)
+            E <- tw$cov/((1-f)^2)
+            out$x[i,c(1,3)] <- cctw$x
+            out$x[i,c(2,4)] <- sqrt(diag(E))
+            out$x[i,5] <- stats::cov2cor(E)[1,2]
+        }
     } else {
         w <- wendt(fit$par['t'],d=x$d)
         r68i <- age_to_Pb206U238_ratio(fit$par['t'],d=x$d)[1]
@@ -30,19 +49,12 @@ common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
         r75i <- age_to_Pb207U235_ratio(fit$par['t'],d=x$d)[1]
         y57 <- data2york(x,option=4) # 4/7 vs. 5/7
         r57 <- y57[,'X'] + y57[,'Y']*fit$par['74i']/r75i
-        out <- x
-        ns <- length(x)
         U <- iratio('U238U235')[1]
         J1 <- matrix(0,2,3)
         J1[1,1] <- 1                   # dr86d86
         J1[1,3] <- fit$par['64i']/r68i # dr86d46
         J1[2,3] <- fit$par['74i']/r75i # dr57d46
         J2 <- matrix(0,2,2)
-        out$x.raw <- out$x
-        out$x <- matrix(0,ns,5)
-        colnames(out$x) <- c('U238Pb206','errU238Pb206',
-                             'Pb207Pb206','errPb207Pb206','rhoXY')
-        out$format <- 2
         for (i in 1:ns){
             tw <- tera.wasserburg(x,i=i)
             E1 <- tw$cov
@@ -70,7 +82,8 @@ common.Pb.stacey.kramers <- function(x){
     out$x <- matrix(0,ns,5)
     if (x$format < 4){
         for (i in 1:ns){
-            tt <- stats::optimise(SS.SK.without.204,interval=c(0,5000),x=x,i=i)$minimum
+            tt <- stats::optimise(SS.SK.without.204,
+                                  interval=c(0,5000),x=x,i=i)$minimum
             i6474 <- stacey.kramers(tt)
             cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d)
             tw <- tera.wasserburg(x,i)
@@ -78,11 +91,11 @@ common.Pb.stacey.kramers <- function(x){
             ym <- tw$x['Pb207Pb206']
             xr <- cctw$x['U238Pb206']
             yr <- cctw$x['Pb207Pb206']
-            yc <- r76i <- i6474[2]/i6474[1]
-            f <- (ym-yr)/(yc-yr)
+            y0 <- i6474[2]/i6474[1]
+            f <- (ym-yr)/(y0-yr)
             mswd <- SS.SK.without.204(tt,x=x,i=i)
-            if (mswd<1) E <- tw$cov
-            else E <- mswd*tw$cov
+            if (mswd<1) E <- tw$cov/((1-f)^2)
+            else E <- mswd*tw$cov/((1-f)^2)
             out$x[i,c(1,3)] <- cctw$x
             out$x[i,c(2,4)] <- sqrt(diag(E))
             out$x[i,5] <- stats::cov2cor(E)[1,2]
