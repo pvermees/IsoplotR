@@ -266,6 +266,57 @@ get.UPb.isochron.ratios <- function(x,i){
     out
 }
 
+w2tw <- function(w){
+    U <- iratio('U238U235')[1]
+    Pb207U235 <- w[,1]
+    errPb207U235 <- w[,2]
+    Pb206U238 <- w[,3]
+    errPb206U238 <- w[,4]
+    rho <- w[,5]
+    U238Pb206 <- 1/Pb206U238
+    Pb207Pb206 <- Pb207U235/(U*Pb206U238)
+    J11 <- 0*U238Pb206
+    J12 <- -U238Pb206/Pb206U238
+    J21 <- 1/(U*Pb206U238)
+    J22 <- -Pb207Pb206/Pb206U238
+    E11 <- errPb207U235^2
+    E22 <- errPb206U238^2
+    E12 <- rho*errPb207U235*errPb206U238
+    err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
+    errU238Pb206 <- sqrt(err[,'varX'])
+    errPb207Pb206 <- sqrt(err[,'varY'])
+    rho <- err[,'cov']/(errU238Pb206*errPb207Pb206)
+    out <- cbind(U238Pb206,errU238Pb206,Pb207Pb206,errPb207Pb206,rho)
+    colnames(out) <- c('U238Pb206','errU238Pb206',
+                       'Pb207Pb206','errPb207Pb206','rhoXY')
+    out
+}
+tw2w <- function(tw){
+    U <- iratio('U238U235')[1]
+    U238Pb206 <- tw[,1]
+    errU238Pb206 <- tw[,2]
+    Pb207Pb206 <- tw[,3]
+    errPb207Pb206 <- tw[,4]
+    rho <- tw[,5]
+    Pb207U235 <- U*Pb207Pb206/U238Pb206
+    Pb206U238 <- 1/U238Pb206
+    J11 <- -Pb207U235/U238Pb206
+    J12 <- U/U238Pb206
+    J21 <- -1/U238Pb206^2
+    J22 <- 0*Pb206U238
+    E11 <- errU238Pb206^2
+    E22 <- errPb207Pb206^2
+    E12 <- rho*errU238Pb206*errPb207Pb206
+    err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
+    errPb207U235 <- sqrt(err[,'varX'])
+    errPb206U238 <- sqrt(err[,'varY'])
+    rho <- err[,'cov']/(errPb207U235*errPb206U238)
+    out <- cbind(Pb207U235,errPb207U235,Pb206U238,errPb206U238,rho)
+    colnames(out) <- c('Pb207U235','errPb207U235',
+                       'Pb206U238','errPb206U238','rhoXY')
+    out
+}
+
 # convert data to a 5-column table for concordia analysis
 flat.UPb.table <- function(x,wetherill=TRUE){
     ns <- length(x)

@@ -4,23 +4,44 @@
 common.Pb.correction <- function(x,option=1,calcit=rep(TRUE,length(x))){
     ns <- length(x)
     out <- x
-    out$x.raw <- out$x
-    out$x <- matrix(0,ns,5)
+    out$x.raw <- x$x
     if (option == 1)
-        out$x <- common.Pb.stacey.kramers(x)
+        x.corr <- common.Pb.stacey.kramers(x)
     else if (option == 2)
-        out$x <- common.Pb.isochron(x,calcit=calcit)
+        x.corr <- common.Pb.isochron(x,calcit=calcit)
     else if (option == 3)
-        out$x <- common.Pb.nominal(x)
-    else out$x <- x
-    if (x$format<4){
-        out$format <- 2
-        colnames(out$x) <- c('U238Pb206','errU238Pb206',
-                             'Pb207Pb206','errPb207Pb206','rhoXY')
-    } else {
-        out$format <- 1
-        colnames(out$x) <- c('Pb207U235','errPb207U235',
-                             'Pb206U238','errPb206U238','rhoXY')
+        x.corr <- common.Pb.nominal(x)
+    else
+        return
+    if (x$format==1){
+        out$x[,c('Pb207U235','errPb207U235',
+                 'Pb206U238','errPb206U238','rhoXY')] <- tw2w(x.corr)
+    } else if (x$format==2){
+        out$x[,c('U238Pb206','errU238Pb206',
+                 'Pb207Pb206','errPb207Pb206','rhoXY')] <- x.corr
+    } else if (x$format==3){
+        out$x[,c('Pb207U235','errPb207U235',
+                 'Pb206U238','errPb206U238')] <- tw2w(x.corr)[,1:4]
+        out$x[,c('Pb207Pb206','errPb207Pb206')] <- x.corr[,3:4]
+    } else if (x$format==4){
+        out$x[,c('Pb207U235','errPb207U235',
+                 'Pb206U238','errPb206U238')] <- x.corr[,1:4]
+        out$x[,'rhoXY'] <- x.corr[,5]
+        out$x[,c('Pb204U238','errPb204U238','rhoXZ','rhoYZ')] <- 0
+    } else if (x$format==5){
+        tw <- w2tw(x.corr)
+        out$x[,c('U238Pb206','errU238Pb206',
+                 'Pb207Pb206','errPb207Pb206')] <- tw[,1:4]
+        out$x[,'rhoXY'] <- tw[,5]
+        out$x[,c('Pb204Pb206','errPb204Pb206','rhoXZ','rhoYZ')] <- 0
+    } else if (x$format==6){
+        tw <- w2tw(x.corr)
+        out$x[,c('Pb207U235','errPb207U235',
+                 'Pb206U238','errPb206U238')] <- x.corr[,1:4]
+        out$x[,c('Pb204U238','errPb204U238')] <- 0
+        out$x[,c('Pb207Pb206','errPb207Pb206')] <- tw[,3:4]
+        out$x[,c('Pb204Pb207','errPb204Pb207',
+                 'Pb204Pb206','errPb204Pb206')] <- 0
     }
     out
 }
