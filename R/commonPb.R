@@ -146,7 +146,8 @@ SS.SK.without.204 <- function(tt,x,i){
     a <- i6474[2]/i6474[1] # intercept
     b <- (cct$x['Pb207Pb206']-a)/cct$x['U238Pb206'] # slope
     omega <- solve(tw$cov)
-    x.fitted <- (X*omega[1,1]+Y*omega[1,2]-a*omega[1,2])/(omega[1,1]+b*omega[1,2])
+    x.fitted <- (X*omega[1,1]+Y*omega[1,2]-a*omega[1,2])/
+                (omega[1,1]+b*omega[1,2])
     y.fitted <- a + b*x.fitted
     d <- cbind(X-x.fitted,Y-y.fitted)
     as.numeric(d %*% omega %*% t(d))

@@ -199,11 +199,39 @@ get.UPb.isochron.ratios <- function(x,i){
         cov.75.47 <- get.cov.mult(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
                                   x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
                                   x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
-        cov.47.46 <- get.cov.div(x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
-                                 x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+        cov.47.46 <- get.cov.div(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                 x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
                                  x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
-        cov.75.46 <- 0
-        cov.68.47 <- 0
+        cov.47.76 <- get.cov.mult(x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
+                                  x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                  x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'])
+        cov.68.76 <- get.cov.mult(x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                  x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                  x$x[i,'Pb207U235'],x$x[i,'errPb207U235'])
+        cov.75.76 <- get.cov.div(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                 x$x[i,'Pb206U238'],x$x[i,'errPb206U238'])
+        cov.46.76 <- get.cov.div(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                 x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'])
+        Pb207Pb206 <- x$x[i,'Pb207Pb206']
+        J1 <- Pb204Pb207*Pb206U238
+        J2 <- Pb207Pb206*Pb206U238
+        J3 <- Pb207Pb206*Pb204Pb207
+        cov.68.47 <- ( x$x[i,'errPb204U238']^2 -
+                       (J1*x$x[i,'errPb207Pb206'])^2 -
+                       (J2*x$x[i,'errPb204Pb207'])^2 -
+                       (J3*x$x[i,'errPb206U238'])^2 -
+                       2*J1*J2*cov.47.76 - 2*J1*J3*cov.68.76 )/(2*J2*J3)
+        Pb204U238 <- x$x[i,'Pb204U238']
+        J1 <- -Pb204U238*Pb207Pb206
+        J2 <- Pb207U235/(U*Pb206U238)
+        J3 <- Pb204Pb206/(U*Pb206U238)
+        cov.75.46 <- ( x$x[i,'errPb204U238']^2 -
+                       (J1*x$x[i,'errPb207Pb206'])^2 -
+                       (J2*x$x[i,'errPb204Pb206'])^2 -
+                       (J3*x$x[i,'errPb207U235'])^2 -
+                       2*J1*J2*cov.46.76 - 2*J1*J3*cov.75.76 )/(2*J2*J3)
         J <- matrix(0,4,4)
         J[1,2] <- 1
         J[2,4] <- 1
