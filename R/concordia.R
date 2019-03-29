@@ -513,7 +513,10 @@ concordia.age.wetherill <- function(x,d=diseq(),exterr=FALSE,...){
     tt <- fit$minimum
     hess <- stats::optimHess(tt,fn=LL.concordia.age,
                              ccw=x,exterr=exterr,d=d)
-    tt.err <- as.numeric(sqrt(solve(hess)))
+    if (det(hess)>1e-15)
+        tt.err <- as.numeric(sqrt(solve(hess)))
+    else
+        tt.err <- .Machine$double.ulp.digits
     out <- c(tt,tt.err)
     names(out) <- c('t.conc','s[t.conc]')
     out
@@ -546,9 +549,9 @@ initial.concordia.age <- function(x,d=diseq()){
 }
 
 mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
-    SS.equivalence <-
+    SS.equivalence <- 
         LL.concordia.comp(mu=ccw$x,x=x,wetherill=TRUE,mswd=TRUE)
-    SS.concordance <-
+    SS.concordance <- 
         LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr,d=x$d)
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
@@ -603,7 +606,10 @@ LL.concordia.age <- function(tt,ccw,mswd=FALSE,exterr=TRUE,d=diseq()){
         E <- diag(c(P235*l5[2],P238*l8[2]))^2
         covmat <- ccw$cov[1:2,1:2] + E
     }
-    if (mswd) out <- get.concordia.SS(dx,covmat)
+    singular <- (det(covmat)<1e-15)
+    if (mswd & singular) out <- .Machine$double.xmax
+    else if (singular) out <- .Machine$double.ulp.digits
+    else if (mswd) out <- get.concordia.SS(dx,covmat)
     else out <- LL.norm(dx,covmat)
     out
 }

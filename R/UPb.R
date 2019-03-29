@@ -152,6 +152,170 @@ tera.wasserburg <- function(x,i){
     class(out) <- "terawasserburg"
     out
 }
+get.UPb.isochron.ratios <- function(x,i){
+    out <- list()
+    U <- iratio('U238U235')[1]
+    if (x$format==4){ # 75, 68, 48
+        Pb206U238 <- x$x[i,'Pb206U238']
+        Pb204Pb206 <- x$x[i,'Pb204U238']/x$x[i,'Pb206U238']
+        Pb207U235 <- x$x[i,'Pb207U235']
+        Pb204Pb207 <- U*x$x[i,'Pb204U238']/x$x[i,'Pb207U235']
+        E <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
+                      x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
+                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+        J <- matrix(0,4,3)
+        J[1,2] <- 1
+        J[2,2] <- -Pb204Pb206/x$x[i,'Pb206U238']
+        J[2,3] <- 1/x$x[i,'Pb206U238']
+        J[3,1] <- 1
+        J[4,1] <- -Pb204Pb207/x$x[i,'Pb207U235']
+        J[4,3] <- U/x$x[i,'Pb207U235']
+    } else if (x$format==5){ # 86, 76, 46
+        Pb206U238 <- 1/x$x[i,'U238Pb206']
+        Pb204Pb206 <- x$x[i,'Pb204Pb206']
+        Pb207U235 <- U*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
+        Pb204Pb207 <- x$x[i,'Pb204Pb206']/x$x[i,'Pb207Pb206']
+        E <- cor2cov3(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],
+                      x$x[i,'errPb204Pb206'],x$x[i,'rhoXY'],
+                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
+        J <- matrix(0,4,3)
+        J[1,1] <- -Pb206U238/x$x[i,'U238Pb206']
+        J[2,3] <- 1
+        J[3,1] <- -Pb207U235/x$x[i,'U238Pb206']
+        J[3,2] <- U/x$x[i,'U238Pb206']
+        J[4,2] <- -Pb204Pb207/x$x[i,'Pb207Pb206']
+        J[4,3] <- 1/x$x[i,'Pb207Pb206']
+    } else if (x$format==6){ # 75, 68, 48, 76, 47, 46
+        Pb206U238 <- x$x[i,'Pb206U238']
+        Pb204Pb206 <- x$x[i,'Pb204Pb206']
+        Pb207U235 <- x$x[i,'Pb207U235']
+        Pb204Pb207 <- x$x[i,'Pb204Pb207']
+        cov.68.46 <- get.cov.mult(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                  x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                  x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
+        cov.68.75 <- get.cov.div(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                                 x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
+        cov.75.47 <- get.cov.mult(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                                  x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
+                                  x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
+        cov.47.46 <- get.cov.div(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                 x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
+        cov.47.76 <- get.cov.mult(x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
+                                  x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                  x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'])
+        cov.68.76 <- get.cov.mult(x$x[i,'Pb206U238'],x$x[i,'errPb206U238'],
+                                  x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                  x$x[i,'Pb207U235'],x$x[i,'errPb207U235'])
+        cov.75.76 <- get.cov.div(x$x[i,'Pb207U235'],x$x[i,'errPb207U235'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                 x$x[i,'Pb206U238'],x$x[i,'errPb206U238'])
+        cov.46.76 <- get.cov.div(x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'],
+                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
+                                 x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'])
+        Pb207Pb206 <- x$x[i,'Pb207Pb206']
+        J1 <- Pb204Pb207*Pb206U238
+        J2 <- Pb207Pb206*Pb206U238
+        J3 <- Pb207Pb206*Pb204Pb207
+        cov.68.47 <- ( x$x[i,'errPb204U238']^2 -
+                       (J1*x$x[i,'errPb207Pb206'])^2 -
+                       (J2*x$x[i,'errPb204Pb207'])^2 -
+                       (J3*x$x[i,'errPb206U238'])^2 -
+                       2*J1*J2*cov.47.76 - 2*J1*J3*cov.68.76 )/(2*J2*J3)
+        Pb204U238 <- x$x[i,'Pb204U238']
+        J1 <- -Pb204U238*Pb207Pb206
+        J2 <- Pb207U235/(U*Pb206U238)
+        J3 <- Pb204Pb206/(U*Pb206U238)
+        cov.75.46 <- ( x$x[i,'errPb204U238']^2 -
+                       (J1*x$x[i,'errPb207Pb206'])^2 -
+                       (J2*x$x[i,'errPb204Pb206'])^2 -
+                       (J3*x$x[i,'errPb207U235'])^2 -
+                       2*J1*J2*cov.46.76 - 2*J1*J3*cov.75.76 )/(2*J2*J3)
+        J <- matrix(0,4,4)
+        J[1,2] <- 1
+        J[2,4] <- 1
+        J[3,1] <- 1
+        J[4,3] <- 1
+        E <- matrix(0,4,4)
+        E[1,1] <- x$x[i,'errPb207U235']^2
+        E[2,2] <- x$x[i,'errPb206U238']^2
+        E[3,3] <- x$x[i,'errPb204Pb207']^2
+        E[4,4] <- x$x[i,'errPb204Pb206']^2
+        E[1,2] <- cov.68.75
+        E[1,3] <- cov.75.47
+        E[1,4] <- cov.75.46
+        E[2,1] <- E[2,1]
+        E[2,3] <- cov.68.47
+        E[2,4] <- cov.68.46
+        E[3,1] <- E[1,3]
+        E[3,2] <- E[2,3]
+        E[3,4] <- cov.47.46
+        E[4,1] <- E[1,4]
+        E[4,2] <- E[2,4]
+        E[4,3] <- E[3,4]
+    } else {
+        stop("Can't form isochron ratios without 204Pb!")
+    }
+    labels <- c('Pb206U238','Pb204Pb206','Pb207U235','Pb204Pb207')
+    out$x <- c(Pb206U238,Pb204Pb206,Pb207U235,Pb204Pb207)
+    out$cov <- J %*% E %*% t(J)
+    names(out$x) <- labels
+    colnames(out$cov) <- labels
+    rownames(out$cov) <- labels
+    out
+}
+
+w2tw <- function(w){
+    U <- iratio('U238U235')[1]
+    Pb207U235 <- w[,1]
+    errPb207U235 <- w[,2]
+    Pb206U238 <- w[,3]
+    errPb206U238 <- w[,4]
+    rho <- w[,5]
+    U238Pb206 <- 1/Pb206U238
+    Pb207Pb206 <- Pb207U235/(U*Pb206U238)
+    J11 <- 0*U238Pb206
+    J12 <- -U238Pb206/Pb206U238
+    J21 <- 1/(U*Pb206U238)
+    J22 <- -Pb207Pb206/Pb206U238
+    E11 <- errPb207U235^2
+    E22 <- errPb206U238^2
+    E12 <- rho*errPb207U235*errPb206U238
+    err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
+    errU238Pb206 <- sqrt(err[,'varX'])
+    errPb207Pb206 <- sqrt(err[,'varY'])
+    rho <- err[,'cov']/(errU238Pb206*errPb207Pb206)
+    out <- cbind(U238Pb206,errU238Pb206,Pb207Pb206,errPb207Pb206,rho)
+    colnames(out) <- c('U238Pb206','errU238Pb206',
+                       'Pb207Pb206','errPb207Pb206','rhoXY')
+    out
+}
+tw2w <- function(tw){
+    U <- iratio('U238U235')[1]
+    U238Pb206 <- tw[,1]
+    errU238Pb206 <- tw[,2]
+    Pb207Pb206 <- tw[,3]
+    errPb207Pb206 <- tw[,4]
+    rho <- tw[,5]
+    Pb207U235 <- U*Pb207Pb206/U238Pb206
+    Pb206U238 <- 1/U238Pb206
+    J11 <- -Pb207U235/U238Pb206
+    J12 <- U/U238Pb206
+    J21 <- -1/U238Pb206^2
+    J22 <- 0*Pb206U238
+    E11 <- errU238Pb206^2
+    E22 <- errPb207Pb206^2
+    E12 <- rho*errU238Pb206*errPb207Pb206
+    err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
+    errPb207U235 <- sqrt(err[,'varX'])
+    errPb206U238 <- sqrt(err[,'varY'])
+    rho <- err[,'cov']/(errPb207U235*errPb206U238)
+    out <- cbind(Pb207U235,errPb207U235,Pb206U238,errPb206U238,rho)
+    colnames(out) <- c('Pb207U235','errPb207U235',
+                       'Pb206U238','errPb206U238','rhoXY')
+    out
+}
 
 # convert data to a 5-column table for concordia analysis
 flat.UPb.table <- function(x,wetherill=TRUE){
@@ -634,12 +798,12 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
         if (conc){
             t.conc <- concordia.age(X,i,exterr=exterr)
             t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
-            SS.concordance <-
-                LL.concordia.age(tt=t.conc$age[1],ccw=wetherill(X,i),
-                                 mswd=TRUE,exterr=exterr,d=x$d)
             out <- c(out,t.conc.out)
         }
         if (conc & show.p){
+            SS.concordance <-
+                LL.concordia.age(tt=t.conc$age[1],ccw=wetherill(X,i),
+                                 mswd=TRUE,exterr=exterr,d=x$d)
             p.value <- 1-stats::pchisq(SS.concordance,1)
             if (!is.na(sigdig)) p.value <- signif(p.value,sigdig)
             out <- c(out,p.value)
@@ -664,7 +828,7 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
     if (any(is.na(cutoff.disc))){
         is.concordant <- rep(TRUE,nrow(x))
     } else {
-        is.concordant <- concordant(x,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
+        is.concordant <- concordant(tt,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
         if (!any(is.concordant)){
             stop(paste0('There are no concordant grains in this sample.',
                         'Try adjusting the discordance limits OR ',
@@ -690,46 +854,7 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
     out
 }
 
-#' Test whether the U-Pb compositions are concordant
-#'
-#' Assess whether U-Pb \eqn{{}^{206}}Pb/\eqn{{}^{238}}U- and
-#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb-ages, or the
-#' \eqn{{}^{206}}Pb/\eqn{{}^{238}}U- and
-#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U ages are concordant.
-#'
-#' @details Returns \code{TRUE} if the
-#'     \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and
-#'     \eqn{{}^{207}}Pb/\eqn{{}^{235}}U-ages agree within the limits
-#'     specified in \code{cutoff.disc} (if
-#'     t[\eqn{{}^{206}}Pb/\eqn{{}^{238}}U] < \code{cutoff.76}, OR if
-#'     the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and
-#'     \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb-ages agree within the limits
-#'     specified in \code{cutoff.disc} (if
-#'     t[\eqn{{}^{206}}Pb/\eqn{{}^{238}}U] > \code{cutoff.76}.
-#'     Returns \code{FALSE} otherwise.
-#'
-#' @param x an object of class \code{UPb}
-#' @param cutoff.76 the age (in Ma) below which the concordance
-#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
-#'     \eqn{^{207}}Pb/\eqn{^{238}}U ages are tested, and above which
-#'     the concordance between the \eqn{^{206}}Pb/\eqn{^{238}}U and
-#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb ages is tested.
-#' @param cutoff.disc two element vector with the minimum (negative)
-#'     and maximum (positive) percentage discordance allowed between
-#'     the \eqn{^{207}}Pb/\eqn{^{235}}U and
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
-#' @return A vector of boolean flags marking the concordant
-#'     aliquots.
-#' @examples
-#' data(examples)
-#' conc <- concordant(examples$UPb,cutoff.disc=c(-1,1))
-#' radialplot(examples$UPb,omit=which(!conc))
-#' @export
-concordant <- function(x,cutoff.76=1100,cutoff.disc=c(-15,5)){
-    tt <- UPb.age(x,conc=FALSE,common.Pb=FALSE)
+concordant <- function(tt,cutoff.76=1100,cutoff.disc=c(-15,5)){
     do.76 <- (tt[,'t.68'] > cutoff.76)
     disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
     disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
