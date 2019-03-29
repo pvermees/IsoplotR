@@ -798,12 +798,12 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
         if (conc){
             t.conc <- concordia.age(X,i,exterr=exterr)
             t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
-            SS.concordance <-
-                LL.concordia.age(tt=t.conc$age[1],ccw=wetherill(X,i),
-                                 mswd=TRUE,exterr=exterr,d=x$d)
             out <- c(out,t.conc.out)
         }
         if (conc & show.p){
+            SS.concordance <-
+                LL.concordia.age(tt=t.conc$age[1],ccw=wetherill(X,i),
+                                 mswd=TRUE,exterr=exterr,d=x$d)
             p.value <- 1-stats::pchisq(SS.concordance,1)
             if (!is.na(sigdig)) p.value <- signif(p.value,sigdig)
             out <- c(out,p.value)

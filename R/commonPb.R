@@ -54,7 +54,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE){
     cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d)
     r86 <- cctw$x['U238Pb206']
     r76 <- cctw$x['Pb207Pb206']
-    f <- (m76-r76)/(m76-c76)
+    f <- (m76-r76)/(c76-r76)
     E <- tw$cov/((1-f)^2)
     sr86 <- sqrt(E[1,1])
     sr76 <- sqrt(E[2,2])
@@ -214,5 +214,45 @@ stacey.kramers <- function(tt,inverse=FALSE){
     i74 <- sk.207.204 + sk.238.204*(exp(l5*ti)-exp(l5*tt))/U238U235
     if (inverse) out <- cbind(1/i64,i74/i64)
     else out <- cbind(i64,i74)
+    out
+}
+
+project.concordia <- function(m86,m76,c76,d=diseq(),lower=TRUE){
+    t68 <- get.Pb206U238.age(1/m86,d=d)[1]
+    t76 <- get.Pb207Pb206.age(m76,d=d)[1]
+    a <- c76
+    b <- (m76-c76)/m86
+    neg <- (c76>m76) # negative slope?
+    pos <- !neg
+    above <- (t76>t68) # above concordia?
+    below <- !above
+    search.range <- c(t68,t76)
+    go.ahead <- FALSE
+    if (pos & above){
+        go.ahead <- TRUE
+    } else if (pos & below){
+        go.ahead <- TRUE
+    } else if (neg & above){
+        search.range <- c(0,t68)
+        go.ahead <- TRUE
+    } else if (neg & below){        
+        if (lower) { m <- 0; M <- t76 }
+        else { m <- 5000; M <- t68 }
+        for (tt in seq(m,M,length.out=100)){
+            misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
+            if (misfit<0){
+                if (lower) search.range <- c(0,tt)
+                else search.range <- c(t68,tt)
+                go.ahead <- TRUE
+                break
+            }
+        }
+    }
+    if (go.ahead){
+        out <- stats::uniroot(intersection.misfit.york,
+                              search.range,a=a,b=b,d=d)$root
+    } else {
+        out <- m76
+    }
     out
 }
