@@ -268,24 +268,45 @@ project.concordia <- function(m86,m76,c76,d=diseq(),lower=TRUE){
     } else if (neg & above){
         search.range <- c(0,t68)
         go.ahead <- TRUE
-    } else if (neg & below){        
-        if (lower) { m <- 0; M <- t76 }
-        else { m <- 5000; M <- t68 }
-        for (tt in seq(m,M,length.out=100)){
-            misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
-            if (misfit<0){
-                if (lower) search.range <- c(0,tt)
-                else search.range <- c(t68,tt)
+    } else if (neg & below){
+        if (lower){
+            search.range[1] <- 0
+            search.range[2] <- get.search.limit(a=a,b=b,d=d,m=0,M=5000)
+            if (!is.na(search.range[2])) go.ahead <- TRUE
+        } else {
+            tm <- get.search.limit(a=a,b=b,d=d,m=0,M=5000)
+            tM <- get.search.limit(a=a,b=b,d=d,m=5000,M=0)
+            if (!is.na(tm) | !is.na(tM))
                 go.ahead <- TRUE
-                break
-            }
-        }
+            if (is.na(tm) & !is.na(tM))
+                search.range <- c(tM,5000)
+            else if (is.na(tM) & !is.na(tm))
+                search.range <- c(0,tm)
+            else if (!is.na(tm) & !is.na(tM) & (t68<tm))
+                search.range <- c(0,tm)
+            else if (!is.na(tm) & !is.na(tM) & (t68>tM))
+                search.range <- c(tM,5000)
+        }                
     }
     if (go.ahead){
         out <- stats::uniroot(intersection.misfit.york,
                               search.range,a=a,b=b,d=d)$root
     } else {
-        out <- m76
+        out <- t68
     }
     out
+}
+get.search.limit <- function(a,b,d,m,M){
+    ttt <- seq(from=m,to=M,length.out=100)
+    for (tt in ttt){
+        misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
+        if (misfit<0) return(tt)
+    }
+    return(NA)
+}
+project.concordia.new <- function(m86,m76,c76,d=diseq(),lower=TRUE){
+    a <- 1/m86 - m76/(m86*c76)
+    b <- 1/(c76*iratio('U238U235')[1])
+    fit <- concordia.intersection.ab(a,b,wetherill=TRUE,d=d)
+    fit['t[u]']
 }
