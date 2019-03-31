@@ -181,9 +181,7 @@ s[t_i]/t_i}.  Suppose that these \eqn{n} values are derived from a
 mixture of \eqn{k>2} populations with means
 \eqn{\{\mu_1,...,\mu_k\}}. Such a \emph{discrete mixture} may be
 mathematically described by:
-
 \eqn{P(z_i|\mu,\omega) = \sum_{j=1}^k \pi_j N(z_i | \mu_j, s[z_j]^2 )}
-
 where \eqn{\pi_j} is the proportion of the population that belongs
 to the \eqn{j^{th}} component, and
 \eqn{\pi_k=1-\sum_{j=1}^{k-1}\pi_j}. This equation can be solved by

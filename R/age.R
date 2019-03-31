@@ -225,7 +225,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
                     sigdig=NA,common.Pb=0,show.p=FALSE,...){
     if (common.Pb %in% c(1,2,3))
-        X <- common.Pb.correction(x,option=common.Pb)
+        X <- Pb0corr(x,option=common.Pb)
     else
         X <- x
     if (type==1){

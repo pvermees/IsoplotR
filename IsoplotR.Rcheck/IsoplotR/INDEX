@@ -1,12 +1,11 @@
 IsoplotR                library(IsoplotR)
+Pb0corr                 Common Pb correction
 age                     Calculate isotopic ages
 agespectrum             Plot a (40Ar/39Ar) release spectrum
 cad                     Plot continuous data as cumulative age
                         distributions
 central                 Calculate U-Th-He and fission track central
                         ages and compositions
-concordant              Test whether the U-Pb compositions are
-                        concordant
 concordia               Concordia diagram
 data2york               Prepare geochronological data for York
                         regression
