@@ -17,6 +17,30 @@ library('IsoplotR')
 
 base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 cleanEx()
+nameEx("Pb0corr")
+### * Pb0corr
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: Pb0corr
+### Title: Common Pb correction
+### Aliases: Pb0corr
+
+### ** Examples
+
+data(examples)
+UPb <- Pb0corr(examples$UPb,option=1)
+concordia(UPb)
+# produces identical results as:
+dev.new()
+concordia(examples$UPb,common.Pb=1)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("Pb0corr", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("age")
 ### * age
 
@@ -106,27 +130,6 @@ print(central(examples$UThHe)$age)
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
-nameEx("concordant")
-### * concordant
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: concordant
-### Title: Test whether the U-Pb compositions are concordant
-### Aliases: concordant
-
-### ** Examples
-
-data(examples)
-conc <- concordant(examples$UPb,cutoff.disc=c(-1,1))
-radialplot(examples$UPb,omit=which(!conc))
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("concordant", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("concordia")
 ### * concordia

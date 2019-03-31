@@ -36,6 +36,30 @@ Type 'q()' to quit R.
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > cleanEx()
+> nameEx("Pb0corr")
+> ### * Pb0corr
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: Pb0corr
+> ### Title: Common Pb correction
+> ### Aliases: Pb0corr
+> 
+> ### ** Examples
+> 
+> data(examples)
+> UPb <- Pb0corr(examples$UPb,option=1)
+> concordia(UPb)
+> # produces identical results as:
+> dev.new()
+> concordia(examples$UPb,common.Pb=1)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("Pb0corr", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("age")
 > ### * age
 > 
@@ -128,27 +152,6 @@ Type 'q()' to quit R.
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("central", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-> nameEx("concordant")
-> ### * concordant
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: concordant
-> ### Title: Test whether the U-Pb compositions are concordant
-> ### Aliases: concordant
-> 
-> ### ** Examples
-> 
-> data(examples)
-> conc <- concordant(examples$UPb,cutoff.disc=c(-1,1))
-> radialplot(examples$UPb,omit=which(!conc))
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("concordant", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
 > nameEx("concordia")
 > ### * concordia
 > 
@@ -165,12 +168,13 @@ Type 'q()' to quit R.
 > concordia(examples$UPb,show.age=2)
 > 
 > dev.new()
+dev.new(): using pdf(file="Rplots1.pdf")
 > concordia(examples$UPb,wetherill=FALSE,
 +           xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
 +           ticks=249:254,exterr=TRUE)
 > 
 > dev.new()
-dev.new(): using pdf(file="Rplots1.pdf")
+dev.new(): using pdf(file="Rplots2.pdf")
 > concordia(examples$UPb,wetherill=FALSE,show.age=2,anchor=list(TRUE,0))
 > 
 > 
@@ -243,7 +247,7 @@ dev.new(): using pdf(file="Rplots1.pdf")
 > evolution(examples$ThU)
 > 
 > dev.new()
-dev.new(): using pdf(file="Rplots2.pdf")
+dev.new(): using pdf(file="Rplots3.pdf")
 > evolution(examples$ThU,transform=TRUE,
 +           isochron=TRUE,model=1)
 > 
@@ -308,7 +312,7 @@ dev.new(): using pdf(file="Rplots2.pdf")
 > data(examples)
 > helioplot(examples$UThHe)
 > dev.new()
-dev.new(): using pdf(file="Rplots3.pdf")
+dev.new(): using pdf(file="Rplots4.pdf")
 > helioplot(examples$UThHe,logratio=FALSE)
 > 
 > 
@@ -336,7 +340,7 @@ dev.new(): using pdf(file="Rplots3.pdf")
 > fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
 > 
 > dev.new()
-dev.new(): using pdf(file="Rplots4.pdf")
+dev.new(): using pdf(file="Rplots5.pdf")
 > isochron(examples$ThU,type=4)
 > 
 > 
@@ -361,11 +365,11 @@ dev.new(): using pdf(file="Rplots4.pdf")
 > kde(examples$UPb)
 > 
 > dev.new()
-dev.new(): using pdf(file="Rplots5.pdf")
+dev.new(): using pdf(file="Rplots6.pdf")
 > kde(examples$FT1,log=TRUE)
 > 
 > dev.new()
-dev.new(): using pdf(file="Rplots6.pdf")
+dev.new(): using pdf(file="Rplots7.pdf")
 > kde(examples$DZ,from=1,to=3000,kernel="epanechnikov")
 > 
 > 
@@ -421,7 +425,7 @@ iter  25 value 7.640383
 final  value 7.640383 
 converged
 > dev.new()
-dev.new(): using pdf(file="Rplots7.pdf")
+dev.new(): using pdf(file="Rplots8.pdf")
 > mds(examples$DZ,shepard=TRUE)
 initial  value 10.433734 
 iter   5 value 8.523890
@@ -512,7 +516,7 @@ $legend
 > radialplot(examples$FT1)
 > 
 > dev.new()
-dev.new(): using pdf(file="Rplots8.pdf")
+dev.new(): using pdf(file="Rplots9.pdf")
 > radialplot(examples$LudwigMixture,k='min')
 > 
 > 
@@ -787,11 +791,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-<<<<<<< HEAD
-Time elapsed:  13.652 5.893 11.591 0.002 0.003 
-=======
-Time elapsed:  13.984 5.84 11.918 0.002 0.002 
->>>>>>> 3e6b2c84904e4541949d80425338c3eb03750026
+Time elapsed:  13.964 6.331 11.869 0.003 0.001 
 > grDevices::dev.off()
 pdf 
   2 

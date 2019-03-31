@@ -33,7 +33,6 @@ central	central
 central.default	central
 central.fissiontracks	central
 central.UThHe	central
-concordant	concordant
 concordia	concordia
 data2york	data2york
 data2york.ArAr	data2york
@@ -81,6 +80,7 @@ ludwig.UPb	ludwig
 mds	mds
 mds.default	mds
 mds.detritals	mds
+Pb0corr	Pb0corr
 peakfit	peakfit
 peakfit.ArAr	peakfit
 peakfit.default	peakfit

@@ -1,18 +1,50 @@
-# option = 1: Stacey-Kramers
-# option = 2: isochron
-# option = 3: assumed Pb-composition
-common.Pb.correction <- function(x,option=1,calcit=rep(TRUE,length(x))){
+#' Common Pb correction
+#'
+#' Applies a common-Pb correction to a U-Pb dataset using either the
+#' Stacey-Kramers mantle evolution model, isochron regression, or any
+#' nominal inital Pb isotope composition.
+#'
+#' @details ...
+#'
+#' @param x an object of class \code{UPb}
+#'
+#' @param option one of either
+#'
+#' \enumerate{
+#'    \item Stacey-Kramers
+#'    \item isochron
+#'    \item nominal
+#' }
+#'
+#' @param omit vector with indices of aliquots that should be omitted
+#'     from the isochron regression (only used if \code{option==2})
+#'
+#' @return
+#' Returns a list in which \code{x.raw} contains the original data and
+#' \code{x} the common Pb-corrected compositions. All other items in
+#' the list are inherited from the input data.
+#'
+#' @examples
+#' data(examples)
+#' UPb <- Pb0corr(examples$UPb,option=1)
+#' concordia(UPb)
+#' # produces identical results as:
+#' dev.new()
+#' concordia(examples$UPb,common.Pb=1)
+#' @export
+Pb0corr <- function(x,option=1,omit=NULL){
     ns <- length(x)
     out <- x
     out$x.raw <- x$x
-    if (option == 1)
+    if (option == 1){
         x.corr <- common.Pb.stacey.kramers(x)
-    else if (option == 2)
-        x.corr <- common.Pb.isochron(x,calcit=calcit)
-    else if (option == 3)
+    } else if (option == 2){
+        x.corr <- common.Pb.isochron(x,omit=omit)
+    } else if (option == 3){
         x.corr <- common.Pb.nominal(x)
-    else
+    } else {
         return
+    }
     if (x$format==1){
         out$x[,c('Pb207U235','errPb207U235',
                  'Pb206U238','errPb206U238','rhoXY')] <- tw2w(x.corr)
@@ -107,9 +139,10 @@ common.Pb.stacey.kramers <- function(x){
     out
 }
 
-common.Pb.isochron <- function(x,calcit=rep(TRUE,length(x))){
-    fit <- ludwig(subset(x,subset=calcit))
+common.Pb.isochron <- function(x,omit=NULL){
     ns <- length(x)
+    calcit <- (1:ns)%ni%omit
+    fit <- ludwig(subset(x,subset=calcit))
     out <- matrix(0,ns,5)
     tt <- fit$par[1]
     if (x$format<4){
