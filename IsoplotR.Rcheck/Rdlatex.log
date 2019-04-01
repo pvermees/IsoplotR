@@ -232,13 +232,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
 Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
-[40] [41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42] [43]
-Overfull \hbox (10.5212pt too wide) in paragraph at lines 3203--3210
+[40] [41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43] [44]
+Overfull \hbox (10.5212pt too wide) in paragraph at lines 3285--3292
 []\T1/ptm/m/n/10 scalar val-ueindi-cat-ing whether to plot the $[]$Pb/$[]$U age
  (\T1/zi4/m/n/10 type\T1/ptm/m/n/10 =1), the $[]$Pb/$[]$U
 
-Overfull \hbox (76.39072pt too wide) in paragraph at lines 3233--3237
+Overfull \hbox (76.39072pt too wide) in paragraph at lines 3315--3319
 \T1/zi4/m/n/10 x$format\T1/ptm/m/n/10 <4) or \T1/zi4/m/n/10 settings(\TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 iratio\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\
 T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
@@ -246,142 +246,142 @@ T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
 1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207Pb204\TS1/zi4/m/n/10 '\T1/zi
 4/m/n/10 )
 
-Overfull \hbox (8.92308pt too wide) in paragraph at lines 3238--3248
+Overfull \hbox (8.92308pt too wide) in paragraph at lines 3320--3330
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
-[44] [45] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [46]
-Underfull \vbox (badness 10000) has occurred while \output is active [47]
-[48]
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 3568--3577
+[45] [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
+Underfull \vbox (badness 10000) has occurred while \output is active [48]
+[49]
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 3650--3659
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[49] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [50]
-Overfull \hbox (29.28967pt too wide) in paragraph at lines 3701--3703
+[50] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [51]
+Overfull \hbox (29.28967pt too wide) in paragraph at lines 3783--3785
 []\T1/zi4/m/n/10 X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z] (, rho[X,Y]) (, rh
 o[Y,Z]) 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3703--3705
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3785--3787
 []\T1/zi4/m/n/10 X=7/5, err[X], Y=6/8, err[Y], Z=4/8,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3705--3707
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3787--3789
 []\T1/zi4/m/n/10 X=8/6, err[X], Y=7/6, err[Y], Z=4/6,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (124.40004pt too wide) in paragraph at lines 3707--3709
+Overfull \hbox (124.40004pt too wide) in paragraph at lines 3789--3791
 []\T1/zi4/m/n/10 7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8],  7/6, err[7/6], 4
 /7, err[4/7], 4/6, err[4/6] 
 
-Overfull \hbox (69.42049pt too wide) in paragraph at lines 3742--3744
+Overfull \hbox (69.42049pt too wide) in paragraph at lines 3824--3826
 []\T1/zi4/m/n/10 K40/Ca44, err[K40/Ca44], Ca40/Ca44,  err[Ca40/Ca44], K40/Ca40,
  err[K40/Ca40] 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3764--3765
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3846--3847
 []\T1/zi4/m/n/10 Sm147/Nd144, err[Sm147/Nd144], Nd143/Nd144, err[Nd143/Nd144] (
 , rho) 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3776--3777
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3858--3859
 []\T1/zi4/m/n/10 Re187/Os188, err[Re187/Os188], Os187/Os188, err[Os187/Os188] (
 , rho) 
-[51]
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3788--3789
+[52]
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3870--3871
 []\T1/zi4/m/n/10 Lu176/Hf177, err[Lu176/Hf177], Hf176/Hf177, err[Hf176/Hf177] (
 , rho) 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3800--3801
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3882--3883
 []\T1/zi4/m/n/10 X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3801--3802
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3883--3884
 []\T1/zi4/m/n/10 X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
 
-Overfull \hbox (6.53777pt too wide) in paragraph at lines 3874--3878
+Overfull \hbox (6.53777pt too wide) in paragraph at lines 3956--3960
 []\T1/ptm/m/n/10 9-element vec-tor with the mea-sured com-po-si-tion of the de-
 tri-tus, con-tain-ing \T1/zi4/m/n/10 X=0/8\T1/ptm/m/n/10 ,
-[52]
-Overfull \hbox (6.7303pt too wide) in paragraph at lines 3917--3921
+[53]
+Overfull \hbox (6.7303pt too wide) in paragraph at lines 3999--4003
 []\T1/ptm/m/n/10 an ob-ject of class \T1/zi4/m/n/10 UPb\T1/ptm/m/n/10 , \T1/zi4
 /m/n/10 PbPb\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ArAr\T1/ptm/m/n/10 , \T1/zi4/m/n/10
  KCa\T1/ptm/m/n/10 , \T1/zi4/m/n/10 UThHe\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ReOs\T
 1/ptm/m/n/10 , \T1/zi4/m/n/10 SmNd\T1/ptm/m/n/10 , \T1/zi4/m/n/10 RbSr\T1/ptm/m
 /n/10 , \T1/zi4/m/n/10 LuHf\T1/ptm/m/n/10 , \T1/zi4/m/n/10 detritals\T1/ptm/m/n
 /10 , \T1/zi4/m/n/10 fissiontracks\T1/ptm/m/n/10 ,
-[53] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [54]
-Overfull \hbox (5.82764pt too wide) in paragraph at lines 4036--4038
+[54] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [55]
+Overfull \hbox (5.82764pt too wide) in paragraph at lines 4118--4120
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the isochron
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [55] [56]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [57]
-Overfull \hbox (23.83092pt too wide) in paragraph at lines 4229--4243
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [56] [57]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [58]
+Overfull \hbox (23.83092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Ar38Ar36"\T1/ptm/m/n/10 ,\T1/zi4/m/n/10 "Ca40Ca44"\T1/ptm/m/n/1
 0 , \T1/zi4/m/n/10 "Rb85Rb87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88Sr86"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sr87Sr86"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr84Sr86"\T1
 /ptm/m/n/10 ,
 
-Overfull \hbox (18.71092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (18.71092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Re185Re187"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os184Os192" "Os186O
 s192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os187Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Os188Os192"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (11.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (11.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Os189Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os190Os192"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "U238U235"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm144Sm152"\
 T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm147Sm152"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Sm148Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm149Sm152"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sm150Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm154Sm152
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd142Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Nd143Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd145Nd144"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Nd146Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd148Nd144
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd150Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Lu176Lu175"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf174Hf177"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Hf176Hf177"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf178Hf177
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf179Hf177"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (9.411pt too wide) in paragraph at lines 4244--4253
+Overfull \hbox (9.411pt too wide) in paragraph at lines 4326--4335
 \T1/zi4/m/n/10 "Rb85"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Rb87"\T1/ptm/m/n/10 , \T1
 /zi4/m/n/10 "Sr84"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr86"\T1/ptm/m/n/10 , \T1/zi
 4/m/n/10 "Sr87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88"\T1/ptm/m/n/10 , \T1/zi4/m
 /n/10 "Re"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Re185"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Re187"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (8.05898pt too wide) in paragraph at lines 4254--4258
+Overfull \hbox (8.05898pt too wide) in paragraph at lines 4336--4340
 []\T1/ptm/m/n/10 for \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 mindens\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 : the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apati
 te" \T1/ptm/m/n/10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
 
-Overfull \hbox (14.49904pt too wide) in paragraph at lines 4263--4267
+Overfull \hbox (14.49904pt too wide) in paragraph at lines 4345--4349
 []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 tracklength\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 : 
 the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apatite" \T1/ptm/m/n
 /10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
-[58] [59]
-Overfull \hbox (1.38768pt too wide) in paragraph at lines 4394--4398
+[59] [60]
+Overfull \hbox (1.38768pt too wide) in paragraph at lines 4476--4480
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [60] [61]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [62]
-Underfull \vbox (badness 10000) has occurred while \output is active [63]
-[64]
-Overfull \hbox (8.04759pt too wide) in paragraph at lines 4713--4715
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [61] [62]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [63]
+Underfull \vbox (badness 10000) has occurred while \output is active [64]
+[65]
+Overfull \hbox (8.04759pt too wide) in paragraph at lines 4795--4797
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the weighted
 
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 4726--4730
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 4808--4812
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 4754--4763
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 4836--4845
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[65] [66] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [67]
+[66] [67] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [68]
 No file Rd2.ind.
-[68] (/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.aux)
+[69] (/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -400,12 +400,13 @@ hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/ut
-mb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/
-share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (68 pages, 339281 bytes).
+/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/hel
+vetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (69 pages, 354828 bytes).
 Transcript written on Rd2.log.
 This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
@@ -463,20 +464,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.aux)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.out)
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.out)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.out)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
 updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 116--119
@@ -639,13 +640,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
 Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
-[41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43] [44]
-Overfull \hbox (10.5212pt too wide) in paragraph at lines 3203--3210
+[41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42] [43]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44] [45]
+Overfull \hbox (10.5212pt too wide) in paragraph at lines 3285--3292
 []\T1/ptm/m/n/10 scalar val-ueindi-cat-ing whether to plot the $[]$Pb/$[]$U age
  (\T1/zi4/m/n/10 type\T1/ptm/m/n/10 =1), the $[]$Pb/$[]$U
 
-Overfull \hbox (76.39072pt too wide) in paragraph at lines 3233--3237
+Overfull \hbox (76.39072pt too wide) in paragraph at lines 3315--3319
 \T1/zi4/m/n/10 x$format\T1/ptm/m/n/10 <4) or \T1/zi4/m/n/10 settings(\TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 iratio\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\
 T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
@@ -653,142 +654,142 @@ T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
 1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207Pb204\TS1/zi4/m/n/10 '\T1/zi
 4/m/n/10 )
 
-Overfull \hbox (8.92308pt too wide) in paragraph at lines 3238--3248
+Overfull \hbox (8.92308pt too wide) in paragraph at lines 3320--3330
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
-[45] [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
-Underfull \vbox (badness 10000) has occurred while \output is active [48]
-[49]
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 3568--3577
+[46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47] [48]
+Underfull \vbox (badness 10000) has occurred while \output is active [49]
+[50]
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 3650--3659
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[50] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [51]
-Overfull \hbox (29.28967pt too wide) in paragraph at lines 3701--3703
+[51] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [52]
+Overfull \hbox (29.28967pt too wide) in paragraph at lines 3783--3785
 []\T1/zi4/m/n/10 X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z] (, rho[X,Y]) (, rh
 o[Y,Z]) 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3703--3705
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3785--3787
 []\T1/zi4/m/n/10 X=7/5, err[X], Y=6/8, err[Y], Z=4/8,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3705--3707
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3787--3789
 []\T1/zi4/m/n/10 X=8/6, err[X], Y=7/6, err[Y], Z=4/6,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (124.40004pt too wide) in paragraph at lines 3707--3709
+Overfull \hbox (124.40004pt too wide) in paragraph at lines 3789--3791
 []\T1/zi4/m/n/10 7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8],  7/6, err[7/6], 4
 /7, err[4/7], 4/6, err[4/6] 
 
-Overfull \hbox (69.42049pt too wide) in paragraph at lines 3742--3744
+Overfull \hbox (69.42049pt too wide) in paragraph at lines 3824--3826
 []\T1/zi4/m/n/10 K40/Ca44, err[K40/Ca44], Ca40/Ca44,  err[Ca40/Ca44], K40/Ca40,
  err[K40/Ca40] 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3764--3765
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3846--3847
 []\T1/zi4/m/n/10 Sm147/Nd144, err[Sm147/Nd144], Nd143/Nd144, err[Nd143/Nd144] (
 , rho) 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3776--3777
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3858--3859
 []\T1/zi4/m/n/10 Re187/Os188, err[Re187/Os188], Os187/Os188, err[Os187/Os188] (
 , rho) 
-[52]
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3788--3789
+
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3870--3871
 []\T1/zi4/m/n/10 Lu176/Hf177, err[Lu176/Hf177], Hf176/Hf177, err[Hf176/Hf177] (
 , rho) 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3800--3801
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3882--3883
 []\T1/zi4/m/n/10 X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3801--3802
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3883--3884
 []\T1/zi4/m/n/10 X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
-
-Overfull \hbox (6.53777pt too wide) in paragraph at lines 3874--3878
+[53]
+Overfull \hbox (6.53777pt too wide) in paragraph at lines 3956--3960
 []\T1/ptm/m/n/10 9-element vec-tor with the mea-sured com-po-si-tion of the de-
 tri-tus, con-tain-ing \T1/zi4/m/n/10 X=0/8\T1/ptm/m/n/10 ,
-[53]
-Overfull \hbox (6.7303pt too wide) in paragraph at lines 3917--3921
+[54]
+Overfull \hbox (6.7303pt too wide) in paragraph at lines 3999--4003
 []\T1/ptm/m/n/10 an ob-ject of class \T1/zi4/m/n/10 UPb\T1/ptm/m/n/10 , \T1/zi4
 /m/n/10 PbPb\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ArAr\T1/ptm/m/n/10 , \T1/zi4/m/n/10
  KCa\T1/ptm/m/n/10 , \T1/zi4/m/n/10 UThHe\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ReOs\T
 1/ptm/m/n/10 , \T1/zi4/m/n/10 SmNd\T1/ptm/m/n/10 , \T1/zi4/m/n/10 RbSr\T1/ptm/m
 /n/10 , \T1/zi4/m/n/10 LuHf\T1/ptm/m/n/10 , \T1/zi4/m/n/10 detritals\T1/ptm/m/n
 /10 , \T1/zi4/m/n/10 fissiontracks\T1/ptm/m/n/10 ,
-[54] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [55]
-Overfull \hbox (5.82764pt too wide) in paragraph at lines 4036--4038
+[55] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [56]
+Overfull \hbox (5.82764pt too wide) in paragraph at lines 4118--4120
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the isochron
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [56] [57]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [58]
-Overfull \hbox (23.83092pt too wide) in paragraph at lines 4229--4243
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [57] [58]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [59]
+Overfull \hbox (23.83092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Ar38Ar36"\T1/ptm/m/n/10 ,\T1/zi4/m/n/10 "Ca40Ca44"\T1/ptm/m/n/1
 0 , \T1/zi4/m/n/10 "Rb85Rb87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88Sr86"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sr87Sr86"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr84Sr86"\T1
 /ptm/m/n/10 ,
 
-Overfull \hbox (18.71092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (18.71092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Re185Re187"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os184Os192" "Os186O
 s192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os187Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Os188Os192"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (11.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (11.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Os189Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os190Os192"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "U238U235"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm144Sm152"\
 T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm147Sm152"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Sm148Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm149Sm152"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sm150Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm154Sm152
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd142Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Nd143Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd145Nd144"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Nd146Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd148Nd144
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd150Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Lu176Lu175"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf174Hf177"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Hf176Hf177"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf178Hf177
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf179Hf177"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (9.411pt too wide) in paragraph at lines 4244--4253
+Overfull \hbox (9.411pt too wide) in paragraph at lines 4326--4335
 \T1/zi4/m/n/10 "Rb85"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Rb87"\T1/ptm/m/n/10 , \T1
 /zi4/m/n/10 "Sr84"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr86"\T1/ptm/m/n/10 , \T1/zi
 4/m/n/10 "Sr87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88"\T1/ptm/m/n/10 , \T1/zi4/m
 /n/10 "Re"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Re185"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Re187"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (8.05898pt too wide) in paragraph at lines 4254--4258
+Overfull \hbox (8.05898pt too wide) in paragraph at lines 4336--4340
 []\T1/ptm/m/n/10 for \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 mindens\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 : the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apati
 te" \T1/ptm/m/n/10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
 
-Overfull \hbox (14.49904pt too wide) in paragraph at lines 4263--4267
+Overfull \hbox (14.49904pt too wide) in paragraph at lines 4345--4349
 []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 tracklength\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 : 
 the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apatite" \T1/ptm/m/n
 /10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
-[59] [60]
-Overfull \hbox (1.38768pt too wide) in paragraph at lines 4394--4398
+[60] [61]
+Overfull \hbox (1.38768pt too wide) in paragraph at lines 4476--4480
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [61] [62]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [63]
-Underfull \vbox (badness 10000) has occurred while \output is active [64]
-[65]
-Overfull \hbox (8.04759pt too wide) in paragraph at lines 4713--4715
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [62] [63]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [64]
+Underfull \vbox (badness 10000) has occurred while \output is active [65]
+[66]
+Overfull \hbox (8.04759pt too wide) in paragraph at lines 4795--4797
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the weighted
 
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 4726--4730
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 4808--4812
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 4754--4763
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 4836--4845
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[66] [67] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [68]
+[67] [68] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [69]
 No file Rd2.ind.
-[69] (/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.aux) )
+[70] (/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dist/fonts
 /enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsola
@@ -801,17 +802,18 @@ hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/ut
-mb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/
-share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (69 pages, 342353 bytes).
+/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/hel
+vetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (70 pages, 357055 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2017] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (83 entries accepted, 0 rejected).
 Sorting entries....done (598 comparisons).
-Generating output file Rd2.ind....done (109 lines written, 1 warning).
+Generating output file Rd2.ind....done (109 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex)
@@ -870,20 +872,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.aux)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.out)
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.out)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.out)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
 updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 116--119
@@ -1046,13 +1048,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
 Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
-[41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43] [44]
-Overfull \hbox (10.5212pt too wide) in paragraph at lines 3203--3210
+[41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42] [43]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44] [45]
+Overfull \hbox (10.5212pt too wide) in paragraph at lines 3285--3292
 []\T1/ptm/m/n/10 scalar val-ueindi-cat-ing whether to plot the $[]$Pb/$[]$U age
  (\T1/zi4/m/n/10 type\T1/ptm/m/n/10 =1), the $[]$Pb/$[]$U
 
-Overfull \hbox (76.39072pt too wide) in paragraph at lines 3233--3237
+Overfull \hbox (76.39072pt too wide) in paragraph at lines 3315--3319
 \T1/zi4/m/n/10 x$format\T1/ptm/m/n/10 <4) or \T1/zi4/m/n/10 settings(\TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 iratio\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\
 T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
@@ -1060,146 +1062,146 @@ T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
 1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207Pb204\TS1/zi4/m/n/10 '\T1/zi
 4/m/n/10 )
 
-Overfull \hbox (8.92308pt too wide) in paragraph at lines 3238--3248
+Overfull \hbox (8.92308pt too wide) in paragraph at lines 3320--3330
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
-[45] [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
-Underfull \vbox (badness 10000) has occurred while \output is active [48]
-[49]
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 3568--3577
+[46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47] [48]
+Underfull \vbox (badness 10000) has occurred while \output is active [49]
+[50]
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 3650--3659
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[50] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [51]
-Overfull \hbox (29.28967pt too wide) in paragraph at lines 3701--3703
+[51] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [52]
+Overfull \hbox (29.28967pt too wide) in paragraph at lines 3783--3785
 []\T1/zi4/m/n/10 X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z] (, rho[X,Y]) (, rh
 o[Y,Z]) 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3703--3705
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3785--3787
 []\T1/zi4/m/n/10 X=7/5, err[X], Y=6/8, err[Y], Z=4/8,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3705--3707
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3787--3789
 []\T1/zi4/m/n/10 X=8/6, err[X], Y=7/6, err[Y], Z=4/6,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (124.40004pt too wide) in paragraph at lines 3707--3709
+Overfull \hbox (124.40004pt too wide) in paragraph at lines 3789--3791
 []\T1/zi4/m/n/10 7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8],  7/6, err[7/6], 4
 /7, err[4/7], 4/6, err[4/6] 
 
-Overfull \hbox (69.42049pt too wide) in paragraph at lines 3742--3744
+Overfull \hbox (69.42049pt too wide) in paragraph at lines 3824--3826
 []\T1/zi4/m/n/10 K40/Ca44, err[K40/Ca44], Ca40/Ca44,  err[Ca40/Ca44], K40/Ca40,
  err[K40/Ca40] 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3764--3765
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3846--3847
 []\T1/zi4/m/n/10 Sm147/Nd144, err[Sm147/Nd144], Nd143/Nd144, err[Nd143/Nd144] (
 , rho) 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3776--3777
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3858--3859
 []\T1/zi4/m/n/10 Re187/Os188, err[Re187/Os188], Os187/Os188, err[Os187/Os188] (
 , rho) 
-[52]
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3788--3789
+
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3870--3871
 []\T1/zi4/m/n/10 Lu176/Hf177, err[Lu176/Hf177], Hf176/Hf177, err[Hf176/Hf177] (
 , rho) 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3800--3801
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3882--3883
 []\T1/zi4/m/n/10 X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3801--3802
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3883--3884
 []\T1/zi4/m/n/10 X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
-
-Overfull \hbox (6.53777pt too wide) in paragraph at lines 3874--3878
+[53]
+Overfull \hbox (6.53777pt too wide) in paragraph at lines 3956--3960
 []\T1/ptm/m/n/10 9-element vec-tor with the mea-sured com-po-si-tion of the de-
 tri-tus, con-tain-ing \T1/zi4/m/n/10 X=0/8\T1/ptm/m/n/10 ,
-[53]
-Overfull \hbox (6.7303pt too wide) in paragraph at lines 3917--3921
+[54]
+Overfull \hbox (6.7303pt too wide) in paragraph at lines 3999--4003
 []\T1/ptm/m/n/10 an ob-ject of class \T1/zi4/m/n/10 UPb\T1/ptm/m/n/10 , \T1/zi4
 /m/n/10 PbPb\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ArAr\T1/ptm/m/n/10 , \T1/zi4/m/n/10
  KCa\T1/ptm/m/n/10 , \T1/zi4/m/n/10 UThHe\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ReOs\T
 1/ptm/m/n/10 , \T1/zi4/m/n/10 SmNd\T1/ptm/m/n/10 , \T1/zi4/m/n/10 RbSr\T1/ptm/m
 /n/10 , \T1/zi4/m/n/10 LuHf\T1/ptm/m/n/10 , \T1/zi4/m/n/10 detritals\T1/ptm/m/n
 /10 , \T1/zi4/m/n/10 fissiontracks\T1/ptm/m/n/10 ,
-[54] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [55]
-Overfull \hbox (5.82764pt too wide) in paragraph at lines 4036--4038
+[55] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [56]
+Overfull \hbox (5.82764pt too wide) in paragraph at lines 4118--4120
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the isochron
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [56] [57]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [58]
-Overfull \hbox (23.83092pt too wide) in paragraph at lines 4229--4243
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [57] [58]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [59]
+Overfull \hbox (23.83092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Ar38Ar36"\T1/ptm/m/n/10 ,\T1/zi4/m/n/10 "Ca40Ca44"\T1/ptm/m/n/1
 0 , \T1/zi4/m/n/10 "Rb85Rb87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88Sr86"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sr87Sr86"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr84Sr86"\T1
 /ptm/m/n/10 ,
 
-Overfull \hbox (18.71092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (18.71092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Re185Re187"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os184Os192" "Os186O
 s192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os187Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Os188Os192"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (11.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (11.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Os189Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os190Os192"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "U238U235"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm144Sm152"\
 T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm147Sm152"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Sm148Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm149Sm152"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sm150Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm154Sm152
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd142Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Nd143Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd145Nd144"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Nd146Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd148Nd144
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd150Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Lu176Lu175"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf174Hf177"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Hf176Hf177"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf178Hf177
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf179Hf177"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (9.411pt too wide) in paragraph at lines 4244--4253
+Overfull \hbox (9.411pt too wide) in paragraph at lines 4326--4335
 \T1/zi4/m/n/10 "Rb85"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Rb87"\T1/ptm/m/n/10 , \T1
 /zi4/m/n/10 "Sr84"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr86"\T1/ptm/m/n/10 , \T1/zi
 4/m/n/10 "Sr87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88"\T1/ptm/m/n/10 , \T1/zi4/m
 /n/10 "Re"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Re185"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Re187"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (8.05898pt too wide) in paragraph at lines 4254--4258
+Overfull \hbox (8.05898pt too wide) in paragraph at lines 4336--4340
 []\T1/ptm/m/n/10 for \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 mindens\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 : the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apati
 te" \T1/ptm/m/n/10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
 
-Overfull \hbox (14.49904pt too wide) in paragraph at lines 4263--4267
+Overfull \hbox (14.49904pt too wide) in paragraph at lines 4345--4349
 []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 tracklength\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 : 
 the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apatite" \T1/ptm/m/n
 /10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
-[59] [60]
-Overfull \hbox (1.38768pt too wide) in paragraph at lines 4394--4398
+[60] [61]
+Overfull \hbox (1.38768pt too wide) in paragraph at lines 4476--4480
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [61] [62]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [63]
-Underfull \vbox (badness 10000) has occurred while \output is active [64]
-[65]
-Overfull \hbox (8.04759pt too wide) in paragraph at lines 4713--4715
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [62] [63]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [64]
+Underfull \vbox (badness 10000) has occurred while \output is active [65]
+[66]
+Overfull \hbox (8.04759pt too wide) in paragraph at lines 4795--4797
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the weighted
 
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 4726--4730
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 4808--4812
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 4754--4763
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 4836--4845
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[66] [67] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [68]
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.ind [69]
+[67] [68] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [69]
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.ind [70]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
 
-[70]) (/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.aux)
+[71]) (/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -1221,17 +1223,18 @@ hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/ut
-mb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/
-share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (70 pages, 346864 bytes).
+/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/hel
+vetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (71 pages, 361592 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2017] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (83 entries accepted, 0 rejected).
 Sorting entries....done (598 comparisons).
-Generating output file Rd2.ind....done (109 lines written, 1 warning).
+Generating output file Rd2.ind....done (109 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex)
@@ -1290,20 +1293,20 @@ Package hyperref Warning: Option `pagebackref' has already been used,
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.aux)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.out)
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.out)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.out)
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex/
 updmap/pdftex.map}]) (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def)
 (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2]
 Overfull \hbox (42.20897pt too wide) in paragraph at lines 116--119
@@ -1466,13 +1469,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
 Underfull \hbox (badness 10000) in paragraph at lines 2961--3000
 
-[41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [43] [44]
-Overfull \hbox (10.5212pt too wide) in paragraph at lines 3203--3210
+[41] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [42] [43]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [44] [45]
+Overfull \hbox (10.5212pt too wide) in paragraph at lines 3285--3292
 []\T1/ptm/m/n/10 scalar val-ueindi-cat-ing whether to plot the $[]$Pb/$[]$U age
  (\T1/zi4/m/n/10 type\T1/ptm/m/n/10 =1), the $[]$Pb/$[]$U
 
-Overfull \hbox (76.39072pt too wide) in paragraph at lines 3233--3237
+Overfull \hbox (76.39072pt too wide) in paragraph at lines 3315--3319
 \T1/zi4/m/n/10 x$format\T1/ptm/m/n/10 <4) or \T1/zi4/m/n/10 settings(\TS1/zi4/m
 /n/10 '\T1/zi4/m/n/10 iratio\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\
 T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
@@ -1480,146 +1483,146 @@ T1/zi4/m/n/10 Pb206Pb204\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 ) \T1/ptm/m/n/10 and \T
 1/zi4/m/n/10 ,\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 Pb207Pb204\TS1/zi4/m/n/10 '\T1/zi
 4/m/n/10 )
 
-Overfull \hbox (8.92308pt too wide) in paragraph at lines 3238--3248
+Overfull \hbox (8.92308pt too wide) in paragraph at lines 3320--3330
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Sr/$[]$Sr, $[]$Nd/$[]$Nd
 , $[]$Os/$[]$Os or $[]$Hf/$[]$Hf
-[45] [46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47]
-Underfull \vbox (badness 10000) has occurred while \output is active [48]
-[49]
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 3568--3577
+[46] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [47] [48]
+Underfull \vbox (badness 10000) has occurred while \output is active [49]
+[50]
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 3650--3659
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[50] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [51]
-Overfull \hbox (29.28967pt too wide) in paragraph at lines 3701--3703
+[51] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [52]
+Overfull \hbox (29.28967pt too wide) in paragraph at lines 3783--3785
 []\T1/zi4/m/n/10 X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z] (, rho[X,Y]) (, rh
 o[Y,Z]) 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3703--3705
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3785--3787
 []\T1/zi4/m/n/10 X=7/5, err[X], Y=6/8, err[Y], Z=4/8,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (16.08034pt too wide) in paragraph at lines 3705--3707
+Overfull \hbox (16.08034pt too wide) in paragraph at lines 3787--3789
 []\T1/zi4/m/n/10 X=8/6, err[X], Y=7/6, err[Y], Z=4/6,  rho[X,Y], rho[X,Z], rho[
 Y,Z] 
 
-Overfull \hbox (124.40004pt too wide) in paragraph at lines 3707--3709
+Overfull \hbox (124.40004pt too wide) in paragraph at lines 3789--3791
 []\T1/zi4/m/n/10 7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8],  7/6, err[7/6], 4
 /7, err[4/7], 4/6, err[4/6] 
 
-Overfull \hbox (69.42049pt too wide) in paragraph at lines 3742--3744
+Overfull \hbox (69.42049pt too wide) in paragraph at lines 3824--3826
 []\T1/zi4/m/n/10 K40/Ca44, err[K40/Ca44], Ca40/Ca44,  err[Ca40/Ca44], K40/Ca40,
  err[K40/Ca40] 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3764--3765
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3846--3847
 []\T1/zi4/m/n/10 Sm147/Nd144, err[Sm147/Nd144], Nd143/Nd144, err[Nd143/Nd144] (
 , rho) 
 
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3776--3777
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3858--3859
 []\T1/zi4/m/n/10 Re187/Os188, err[Re187/Os188], Os187/Os188, err[Os187/Os188] (
 , rho) 
-[52]
-Overfull \hbox (32.40047pt too wide) in paragraph at lines 3788--3789
+
+Overfull \hbox (32.40047pt too wide) in paragraph at lines 3870--3871
 []\T1/zi4/m/n/10 Lu176/Hf177, err[Lu176/Hf177], Hf176/Hf177, err[Hf176/Hf177] (
 , rho) 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3800--3801
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3882--3883
 []\T1/zi4/m/n/10 X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
 
-Overfull \hbox (52.39024pt too wide) in paragraph at lines 3801--3802
+Overfull \hbox (52.39024pt too wide) in paragraph at lines 3883--3884
 []\T1/zi4/m/n/10 X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z
 ], rho[Y,Z] 
-
-Overfull \hbox (6.53777pt too wide) in paragraph at lines 3874--3878
+[53]
+Overfull \hbox (6.53777pt too wide) in paragraph at lines 3956--3960
 []\T1/ptm/m/n/10 9-element vec-tor with the mea-sured com-po-si-tion of the de-
 tri-tus, con-tain-ing \T1/zi4/m/n/10 X=0/8\T1/ptm/m/n/10 ,
-[53]
-Overfull \hbox (6.7303pt too wide) in paragraph at lines 3917--3921
+[54]
+Overfull \hbox (6.7303pt too wide) in paragraph at lines 3999--4003
 []\T1/ptm/m/n/10 an ob-ject of class \T1/zi4/m/n/10 UPb\T1/ptm/m/n/10 , \T1/zi4
 /m/n/10 PbPb\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ArAr\T1/ptm/m/n/10 , \T1/zi4/m/n/10
  KCa\T1/ptm/m/n/10 , \T1/zi4/m/n/10 UThHe\T1/ptm/m/n/10 , \T1/zi4/m/n/10 ReOs\T
 1/ptm/m/n/10 , \T1/zi4/m/n/10 SmNd\T1/ptm/m/n/10 , \T1/zi4/m/n/10 RbSr\T1/ptm/m
 /n/10 , \T1/zi4/m/n/10 LuHf\T1/ptm/m/n/10 , \T1/zi4/m/n/10 detritals\T1/ptm/m/n
 /10 , \T1/zi4/m/n/10 fissiontracks\T1/ptm/m/n/10 ,
-[54] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [55]
-Overfull \hbox (5.82764pt too wide) in paragraph at lines 4036--4038
+[55] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [56]
+Overfull \hbox (5.82764pt too wide) in paragraph at lines 4118--4120
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the isochron
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [56] [57]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [58]
-Overfull \hbox (23.83092pt too wide) in paragraph at lines 4229--4243
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [57] [58]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [59]
+Overfull \hbox (23.83092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Ar38Ar36"\T1/ptm/m/n/10 ,\T1/zi4/m/n/10 "Ca40Ca44"\T1/ptm/m/n/1
 0 , \T1/zi4/m/n/10 "Rb85Rb87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88Sr86"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sr87Sr86"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr84Sr86"\T1
 /ptm/m/n/10 ,
 
-Overfull \hbox (18.71092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (18.71092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Re185Re187"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os184Os192" "Os186O
 s192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os187Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Os188Os192"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (11.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (11.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Os189Os192"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Os190Os192"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "U238U235"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm144Sm152"\
 T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm147Sm152"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Sm148Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm149Sm152"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Sm150Sm152"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sm154Sm152
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd142Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Nd143Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd145Nd144"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Nd146Nd144"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd148Nd144
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Nd150Nd144"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (21.33092pt too wide) in paragraph at lines 4229--4243
+Overfull \hbox (21.33092pt too wide) in paragraph at lines 4311--4325
 \T1/zi4/m/n/10 "Lu176Lu175"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf174Hf177"\T1/ptm/
 m/n/10 , \T1/zi4/m/n/10 "Hf176Hf177"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf178Hf177
 "\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Hf179Hf177"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (9.411pt too wide) in paragraph at lines 4244--4253
+Overfull \hbox (9.411pt too wide) in paragraph at lines 4326--4335
 \T1/zi4/m/n/10 "Rb85"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Rb87"\T1/ptm/m/n/10 , \T1
 /zi4/m/n/10 "Sr84"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr86"\T1/ptm/m/n/10 , \T1/zi
 4/m/n/10 "Sr87"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Sr88"\T1/ptm/m/n/10 , \T1/zi4/m
 /n/10 "Re"\T1/ptm/m/n/10 , \T1/zi4/m/n/10 "Re185"\T1/ptm/m/n/10 , \T1/zi4/m/n/1
 0 "Re187"\T1/ptm/m/n/10 ,
 
-Overfull \hbox (8.05898pt too wide) in paragraph at lines 4254--4258
+Overfull \hbox (8.05898pt too wide) in paragraph at lines 4336--4340
 []\T1/ptm/m/n/10 for \TS1/zi4/m/n/10 '\T1/zi4/m/n/10 mindens\TS1/zi4/m/n/10 '\T
 1/ptm/m/n/10 : the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apati
 te" \T1/ptm/m/n/10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
 
-Overfull \hbox (14.49904pt too wide) in paragraph at lines 4263--4267
+Overfull \hbox (14.49904pt too wide) in paragraph at lines 4345--4349
 []\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 tracklength\TS1/zi4/m/n/10 '\T1/ptm/m/n/10 : 
 the min-eral of in-ter-est (one of ei-ther \T1/zi4/m/n/10 "apatite" \T1/ptm/m/n
 /10 or \T1/zi4/m/n/10 "zircon"\T1/ptm/m/n/10 )
-[59] [60]
-Overfull \hbox (1.38768pt too wide) in paragraph at lines 4394--4398
+[60] [61]
+Overfull \hbox (1.38768pt too wide) in paragraph at lines 4476--4480
 \T1/ptm/m/n/10 tary chronol-ogy and chem-i-cal evo-lu-tion." Geochim-ica et Cos
 -mochim-ica Acta 47.1 (1983):
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [61] [62]
-(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [63]
-Underfull \vbox (badness 10000) has occurred while \output is active [64]
-[65]
-Overfull \hbox (8.04759pt too wide) in paragraph at lines 4713--4715
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [62] [63]
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [64]
+Underfull \vbox (badness 10000) has occurred while \output is active [65]
+[66]
+Overfull \hbox (8.04759pt too wide) in paragraph at lines 4795--4797
 []\T1/ptm/m/n/10 vector with in-dices of aliquots that should be plot-ted but o
 mit-ted from the weighted
 
-Overfull \hbox (4.32205pt too wide) in paragraph at lines 4726--4730
+Overfull \hbox (4.32205pt too wide) in paragraph at lines 4808--4812
 []\T1/ptm/m/n/10 the age (in Ma) be-low which the $[]$Pb/$[]$U age and above wh
 ich the $[]$Pb/$[]$Pb
 
-Overfull \hbox (3.83311pt too wide) in paragraph at lines 4754--4763
+Overfull \hbox (3.83311pt too wide) in paragraph at lines 4836--4845
 \T1/ptm/m/n/10 mon') $[]$Ar/$[]$Ar, $[]$Ca/$[]$Ca, $[]$Pb/$[]$Pb, $[]$Sr/$[]$Sr
 , $[]$Nd/$[]$Nd, $[]$Os/$[]$Os,
-[66] [67] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [68]
-(/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.ind [69]
+[67] [68] (/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [69]
+(/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.ind [70]
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
 (Font)              using `T1/zi4/m/n' instead on input line 3.
 
-[70]) (/tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d/Rd2.aux)
+[71]) (/tmp/Rtmp7aEZxu/Rd2pdf1194167725d6/Rd2.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
@@ -1636,13 +1639,14 @@ hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/ut
-mb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/
-share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (70 pages, 347021 bytes).
+/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/hel
+vetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (71 pages, 361801 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘IsoplotR-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -rf /tmp/RtmpDdmQ4F/Rd2pdf5c5a1ed03a4d'
+You may want to clean up by 'rm -rf /tmp/Rtmp7aEZxu/Rd2pdf1194167725d6'

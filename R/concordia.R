@@ -606,10 +606,7 @@ LL.concordia.age <- function(tt,ccw,mswd=FALSE,exterr=TRUE,d=diseq()){
         E <- diag(c(P235*l5[2],P238*l8[2]))^2
         covmat <- ccw$cov[1:2,1:2] + E
     }
-    singular <- (det(covmat)<1e-15)
-    if (mswd & singular) out <- .Machine$double.xmax
-    else if (singular) out <- .Machine$double.ulp.digits
-    else if (mswd) out <- get.concordia.SS(dx,covmat)
+    if (mswd) out <- get.concordia.SS(dx,covmat)
     else out <- LL.norm(dx,covmat)
     out
 }
