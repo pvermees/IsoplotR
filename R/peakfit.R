@@ -1,5 +1,7 @@
+#' @title
 #' Finite mixture modelling of geochronological datasets
 #'
+#' @description
 #' Implements the discrete mixture modelling algorithms of Galbraith
 #' and Laslett (1993) and applies them to fission track and other
 #' geochronological datasets.

@@ -72,7 +72,10 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... OK
+* checking examples ... NOTE
+Examples with CPU or elapsed time > 5s
+           user system elapsed
+concordia 2.116  3.123   0.968
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 WARNING, 4 NOTEs
+Status: 1 WARNING, 5 NOTEs

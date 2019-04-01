@@ -4,16 +4,90 @@
 #' Stacey-Kramers mantle evolution model, isochron regression, or any
 #' nominal inital Pb isotope composition.
 #'
-#' @details ...
+#' @details \code{IsoplotR} implements six different methods to
+#'     correct for the presence of non-radiogenic (`common')
+#'     lead. This includes three strategies tailored to datasets that
+#'     include \eqn{^{204}}Pb measurements and a further three
+#'     strategies for datasets that do not. \eqn{^{204}}Pb is the only
+#'     one of lead's four stable isotopes that does not have a
+#'     naturally occurring radioactive parent. This makes it very
+#'     useful for common-Pb correction:
+#' 
+#' \eqn{\left[\frac{{}^{206|7}Pb}{{}^{204}Pb}\right]_r =
+#' \left[\frac{{}^{206|7}Pb}{{}^{204}Pb}\right]_m -
+#' \left[\frac{{}^{206|7}Pb}{{}^{204}Pb}\right]_\circ}
 #'
+#' where \eqn{[{}^{206|7}Pb/^{204}Pb]_r} marks the radiogenic
+#' \eqn{{}^{206}}Pb or \eqn{{}^{207}}Pb component;
+#' \eqn{[{}^{206|7}Pb/^{204}Pb]_m} is the measured ratio; and
+#' \eqn{[{}^{206|7}Pb/^{204}Pb]_\circ} is the non-radiogenic component.
+#' 
+#' \code{IsoplotR} offers three different ways to determine
+#' \eqn{[{}^{206|7}Pb/^{204}Pb]_\circ}. The first and easiest option
+#' is to simply use a nominal value such as the
+#' \eqn{{}^{206|7}}Pb/\eqn{^{204}}Pb-ratio of a cogenetic feldspar,
+#' assuming that this is representative for the common-Pb composition
+#' of the entire sample. A second method is to determine the
+#' non-radiogenic isotope composition by fitting an isochron line
+#' through multiple aliquots of the same sample, using the
+#' 3-dimensional regression algorithm of Ludwig (1998).
+#'
+#' Unfortunately, neither of these two methods is applicable to
+#' detrital samples, which generally lack identifiable cogenetic
+#' minerals and aliquots. For such samples, \code{IsoplotR} infers the
+#' common-Pb composition from the two-stage crustal evolution model of
+#' Stacey and Kramers (1975). The second stage of this model is
+#' described by:
+#'
+#' \eqn{\left[\frac{{}^{206}Pb}{{}^{204}Pb}\right]_\circ =
+#' \left[\frac{{}^{206}Pb}{{}^{204}Pb}\right]_{3.7Ga} +
+#' \left[\frac{{}^{238}U}{{}^{204}Pb}\right]_{sk}
+#' \left(e^{\lambda_{238}3.7Ga}-e^{\lambda_{238}t}\right)}
+#'
+#' where \eqn{\left[{}^{206}Pb/{}^{204}Pb\right]_{3.7Ga} = 11.152} and
+#' \eqn{\left[{}^{238}U/{}^{204}Pb\right]_{sk} = 9.74}. These
+#' Equations can be solved iteratively for \eqn{t} and
+#' \eqn{\left[{}^{206}Pb/{}^{204}Pb\right]_\circ}. The
+#' \eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb-ratio is corrected in exactly the
+#' same way, using \eqn{\left[{}^{207}Pb/{}^{204}Pb\right]_{3.7Ga} =
+#' 12.998}.
+#'
+#' In the absence of \eqn{^{204}}Pb measurements, a \eqn{^{207}}
+#' Pb-based common lead correction can be used:
+#'
+#' \eqn{ \left[\frac{{}^{207}Pb}{{}^{206}Pb}\right]_m = f
+#' \left[\frac{{}^{207}Pb}{{}^{206}Pb}\right]_\circ + (1-f)
+#' \left[\frac{{}^{207}Pb}{{}^{204}Pb}\right]_r}
+#'
+#' where \eqn{f} is the fraction of common lead, and
+#' \eqn{[{}^{207}Pb/{}^{206}Pb]_r} is obtained by projecting the U-Pb
+#' measurements on the concordia line in Tera-Wasserburg space.  Like
+#' before, the initial lead composition
+#' \eqn{[{}^{207}Pb/{}^{206}Pb]_\circ} can be obtained in three
+#' possible ways: by analysing a cogenetic mineral, by isochron
+#' regression through multiple aliquots, or from the Stacey and
+#' Kramers (1975) model.
+#'
+#' Besides the common-Pb problem, a second reason for U-Pb discordance
+#' is radiogenic Pb-loss during igneous and metamorphic activity.
+#' This moves the data away from the concordia line along a linear
+#' array, forming an isochron or `discordia' line.  \code{IsoplotR}
+#' fits this line using the Ludwig (1998) algorithm. If the data are
+#' plotted on a Wetherill concordia diagram, the program will not only
+#' report the usual lower intercept with the concordia line, but the
+#' upper intercept as well. Both values are geologically meaningful as
+#' they constrain both the initial igneous age as well as the timing
+#' of the partial resetting event.
+#'
+#' 
 #' @param x an object of class \code{UPb}
 #'
 #' @param option one of either
 #'
 #' \enumerate{
-#'    \item Stacey-Kramers
-#'    \item isochron
-#'    \item nominal
+#'    \item Stacey-Kramers correction
+#'    \item isochron regression
+#'    \item nominal common Pb isotope composition
 #' }
 #'
 #' @param omit vector with indices of aliquots that should be omitted
@@ -24,6 +98,13 @@
 #' \code{x} the common Pb-corrected compositions. All other items in
 #' the list are inherited from the input data.
 #'
+#' @references
+#' Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
+#' ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
+#' 
+#' Stacey, J.T. and Kramers, 1., 1975. Approximation of terrestrial
+#' lead isotope evolution by a two-stage model. Earth and planetary
+#' science letters, 26(2), pp.207-221.
 #' @examples
 #' data(examples)
 #' UPb <- Pb0corr(examples$UPb,option=1)
