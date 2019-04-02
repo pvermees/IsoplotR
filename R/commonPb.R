@@ -169,7 +169,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     r76 <- cctw$x['Pb207Pb206']
     if (project.err){
         f <- (m76-r76)/(c76-r76)
-        E <- E/((1-f)^2)
+        E <- tw$cov/((1-f)^2)
     } else {
         E <- tw$cov
     }
