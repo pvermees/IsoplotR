@@ -159,7 +159,7 @@ Pb0corr <- function(x,option=1,omit=NULL){
     out
 }
 
-correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE){
+correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     tw <- tera.wasserburg(x,i)
     m86 <- tw$x['U238Pb206']
     m76 <- tw$x['Pb207Pb206']
@@ -167,8 +167,12 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE){
     cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d)
     r86 <- cctw$x['U238Pb206']
     r76 <- cctw$x['Pb207Pb206']
-    f <- (m76-r76)/(c76-r76)
-    E <- tw$cov/((1-f)^2)
+    if (project.err){
+        f <- (m76-r76)/(c76-r76)
+        E <- E/((1-f)^2)
+    } else {
+        E <- tw$cov
+    }
     sr86 <- sqrt(E[1,1])
     sr76 <- sqrt(E[2,2])
     rho <- stats::cov2cor(E)[1,2]
@@ -233,7 +237,8 @@ common.Pb.isochron <- function(x,omit=NULL){
         m86 <- get.U238Pb206.ratios(x)[,1]
         c76 <- m76 - slope*m86
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.without.204(x,i,c76[i],lower=TRUE)
+            out[i,] <- correct.common.Pb.without.204(x,i,c76[i],lower=TRUE,
+                                                     project.err=FALSE)
         }
     } else {
         r68 <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)
