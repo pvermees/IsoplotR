@@ -152,11 +152,11 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
     valid <- !is.na(X) & !is.na(sX) & calcit
     nvalid <- count(valid)
     if (detect.outliers){
-        while (TRUE){
+        while (TRUE & nvalid>2){
             valid <- chauvenet(X,sX,valid=valid,
                                random.effects=random.effects)
-            if (count(valid) < nvalid){ nvalid <- count(valid) }
-            else{ break }
+            if (count(valid) < nvalid) { nvalid <- count(valid) }
+            else { break }
         }
     }
     out <- get.weightedmean(X,sX,random.effects=random.effects,
@@ -498,13 +498,13 @@ get.weightedmean <- function(X,sX,random.effects=TRUE,
     ns <- length(X)
     x <- X[valid]
     sx <- sX[valid]
+    out <- list()
     if (length(x)<=1){
         out$mean <- c(x,sx,nfact(alpha)*sx)
         out$mswd <- 0
         out$p.value <- 1
         return(out)
     }
-    out <- list()
     out$random.effects <- random.effects
     out$alpha <- alpha
     out$df <- length(x)-1 # degrees of freedom for the homogeneity test
