@@ -395,7 +395,9 @@ nfact <- function(alpha){
     stats::qnorm(1-alpha/2)
 }
 tfact <- function(alpha,df){
-    stats::qt(1-alpha/2,df=df)
+    if (df>0) out <- stats::qt(1-alpha/2,df=df)
+    else out <- 1.96
+    out
 }
 
 mymtext <- function(text,line=0,...){

@@ -118,8 +118,13 @@ get.york.mswd <- function(x,a,b){
     }
     out <- list()
     out$df <- ns-2
-    out$mswd <- as.numeric(X2/out$df)
-    out$p.value <- as.numeric(1-stats::pchisq(X2,out$df))
+    if (out$df>0){
+        out$mswd <- as.numeric(X2/out$df)
+        out$p.value <- as.numeric(1-stats::pchisq(X2,out$df))
+    } else {
+        out$mswd <- 1
+        out$p.value <- 1
+    }
     out
 }
 

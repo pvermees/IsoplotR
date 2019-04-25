@@ -118,8 +118,13 @@ mswd.tit <- function(abAB,dat){
     }
     out <- list()
     out$df <- 2*ns-4
-    out$mswd <- S/out$df
-    out$p.value <- as.numeric(1-stats::pchisq(S,out$df))
+    if (out$df>0){
+        out$mswd <- S/out$df
+        out$p.value <- as.numeric(1-stats::pchisq(S,out$df))
+    } else {
+        out$mswd <- 1
+        out$p.value <- 1
+    }
     out
 }
 

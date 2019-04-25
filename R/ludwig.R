@@ -150,8 +150,13 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     } else {
         out$df <- 2*ns-3
     }
-    out$mswd <- as.vector(SS/out$df)
-    out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
+    if (out$df>0){
+        out$mswd <- as.vector(SS/out$df)
+        out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
+    } else {
+        out$mswd <- 1
+        out$p.value <- 1
+    }
     out
 }
 
