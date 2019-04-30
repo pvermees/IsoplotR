@@ -75,18 +75,29 @@ LL.isochron <- function(w,xyz,type='york'){
     out
 }
 LL.york <- function(w,xy){
-    out <- 0
     D <- augment_york_errors(xy,w)
     X <- matrix(0,1,2)
     fit <- york(D)
     P <- get.york.xy(D,fit$a[1],fit$b[1])
-    for (i in 1:nrow(D)){
-        E <- cor2cov2(D[i,'sX'],D[i,'sY'],D[i,'rXY'])
-        X[1,1] <- D[i,'X']-P[i,1]
-        X[1,2] <- D[i,'Y']-P[i,2]
-        out <- out - 0.5*determinant(E,logarithm=TRUE)$modulus
-                   - 0.5 * X %*% solve(E) %*% t(X)
-    }
+    x1 <- D[,'X']
+    x2 <- D[,'Y']
+    s1 <- D[,'sX']
+    s2 <- D[,'sY']
+    rho <- D[,'rXY']
+    m1 <- P[,1]
+    m2 <- P[,2]
+    z <- ((x1-m1)/s1)^2 + ((x2-m2)/s2)^2 - 2*rho*(x1-m1)*(x2-m2)/(s1*s2)
+    L1 <- - log(s1) - log(s2) - 0.5*log(1-rho^2) - 0.5*z/(1-rho^2)
+    out <- sum(L1)
+#    out <- 0
+#    for (i in 1:nrow(D)){
+#        E <- cor2cov2(D[i,'sX'],D[i,'sY'],D[i,'rXY'])
+#        X[1,1] <- D[i,'X']-P[i,1]
+#        X[1,2] <- D[i,'Y']-P[i,2]
+#        SS <- X %*% solve(E) %*% t(X)
+#        detE <- determinant(E,logarithm=TRUE)$modulus
+#        out <- out - 0.5*detE - 0.5*SS
+#    }
     out
 }
 LL.titterington <- function(w,xyz){
@@ -108,8 +119,9 @@ LL.titterington <- function(w,xyz){
         X[1,1] <- -abg[2]/abg[1]
         X[1,2] <- XYZ[2] - a - b*XYZ[1]
         X[1,3] <- XYZ[3] - A - B*XYZ[1]
-        out <- out - 0.5*determinant(E,logarithm=TRUE)$modulus
-                   - 0.5 * X %*% O %*% t(X)
+        SS <- X %*% O %*% t(X)
+        detE <- determinant(E,logarithm=TRUE)$modulus
+        out <- out - 1.5*log(2*pi) - 0.5*detE - 0.5*SS
     }
     out
 }
