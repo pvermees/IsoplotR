@@ -161,82 +161,8 @@
 #' 
 #' @param ylab text label for the vertical plot axis
 #' 
-#' @seealso
-#' \code{\link{york}},
-#' \code{\link{titterington}},
-#' \code{\link{ludwig}}
 #' @param ... optional arguments to be passed on to the generic plot
 #'     function if \code{model=2}
-#' @references
-#' Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
-#' \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
-#' Cosmochimica Acta, 58(22), pp.5031-5042.
-#'
-#' Nicolaysen, L.O., 1961. Graphic interpretation of discordant age
-#' measurements on metamorphic rocks. Annals of the New York Academy
-#' of Sciences, 91(1), pp.198-206.
-#'
-#' Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
-#' parallel isochrons and the method of maximum likelihood. Chemical
-#' Geology, 26(3), pp.183-195.
-#'
-#' York, D., 1966. Least-squares fitting of a straight line. Canadian
-#' Journal of Physics, 44(5), pp.1079-1086.
-#'
-#' York, D., 1968. Least squares fitting of a straight line with
-#' correlated errors. Earth and Planetary Science Letters, 5,
-#' pp.320-324.
-#'
-#' York, D., Evensen, N.M., Martinez, M.L. and De Basebe Delgado, J., 2004.
-#' Unified equations for the slope, intercept, and standard
-#' errors of the best straight line. American Journal of Physics,
-#' 72(3), pp.367-375.
-#'
-#' @rdname isochron
-#' @export
-isochron <- function(x,...){ UseMethod("isochron",x) }
-#' @rdname isochron
-#' @export
-isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                             show.numbers=FALSE,levels=NA,clabel="",
-                             ellipse.col=c("#00FF0080","#FF000080"),
-                             ci.col='gray80',line.col='black',lwd=1,
-                             plot=TRUE,title=TRUE,model=1,
-                             show.ellipses=1*(model!=2),xlab='x',
-                             ylab='y',hide=NULL,omit=NULL,
-                             omit.col=NA,...){
-    y <- data2york(x)
-    d2calc <- clear(x,hide,omit)
-    fit <- regression(d2calc,model=model)
-    fit <- regression_init(fit,alpha=alpha)
-    fit <- ci_isochron(fit)
-    if (plot){
-        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
-                    show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,fit=fit,
-                    ci.col=ci.col,line.col=line.col,lwd=lwd,
-                    hide=hide,omit=omit,omit.col=omit.col,...)
-        if (title) graphics::title(isochrontitle(fit,sigdig=sigdig),
-                                   xlab=xlab,ylab=ylab)
-    }
-    invisible(fit)
-}
-#' @param inverse
-#' if \code{FALSE} and \code{x} has class \code{ArAr}, plots
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
-#'
-#' if \code{FALSE} and \code{x} has class \code{PbPb}, plots
-#' \eqn{^{207}}Pb/\eqn{^{204}}Pb vs. \eqn{^{206}}Pb/\eqn{^{204}}Pb.
-#'
-#' if \code{TRUE} and \code{x} has class \code{ArAr}, plots
-#'     \eqn{^{36}}Ar/\eqn{^{40}}Ar vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
-#'
-#' if \code{TRUE} and \code{x} has class \code{PbPb}, plots
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.
-#'
-#' @param exterr propagate external sources of uncertainty
-#' (J, decay constant)?
 #'
 #' @return If \code{x} has class \code{PbPb}, \code{ArAr}, \code{KCa},
 #'     \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf}, or
@@ -390,6 +316,131 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' dev.new()
 #' isochron(examples$ThU,type=4)
+#'
+#' @seealso
+#' \code{\link{york}},
+#' \code{\link{titterington}},
+#' \code{\link{ludwig}}
+#'
+#' @references
+#' Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
+#' \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
+#' Cosmochimica Acta, 58(22), pp.5031-5042.
+#'
+#' Nicolaysen, L.O., 1961. Graphic interpretation of discordant age
+#' measurements on metamorphic rocks. Annals of the New York Academy
+#' of Sciences, 91(1), pp.198-206.
+#'
+#' Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
+#' parallel isochrons and the method of maximum likelihood. Chemical
+#' Geology, 26(3), pp.183-195.
+#'
+#' York, D., 1966. Least-squares fitting of a straight line. Canadian
+#' Journal of Physics, 44(5), pp.1079-1086.
+#'
+#' York, D., 1968. Least squares fitting of a straight line with
+#' correlated errors. Earth and Planetary Science Letters, 5,
+#' pp.320-324.
+#'
+#' York, D., Evensen, N.M., Martinez, M.L. and De Basebe Delgado, J., 2004.
+#' Unified equations for the slope, intercept, and standard
+#' errors of the best straight line. American Journal of Physics,
+#' 72(3), pp.367-375.
+#'
+#' @rdname isochron
+#' @export
+isochron <- function(x,...){ UseMethod("isochron",x) }
+#' @rdname isochron
+#' @export
+isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                             show.numbers=FALSE,levels=NA,clabel="",
+                             ellipse.col=c("#00FF0080","#FF000080"),
+                             ci.col='gray80',line.col='black',lwd=1,
+                             plot=TRUE,title=TRUE,model=1,
+                             show.ellipses=1*(model!=2),xlab='x',
+                             ylab='y',hide=NULL,omit=NULL,
+                             omit.col=NA,...){
+    y <- data2york(x)
+    d2calc <- clear(x,hide,omit)
+    fit <- regression(d2calc,model=model)
+    fit <- regression_init(fit,alpha=alpha)
+    fit <- ci_isochron(fit)
+    if (plot){
+        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=show.ellipses,
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.col=ellipse.col,fit=fit,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,
+                    hide=hide,omit=omit,omit.col=omit.col,...)
+        if (title) graphics::title(isochrontitle(fit,sigdig=sigdig),
+                                   xlab=xlab,ylab=ylab)
+    }
+    invisible(fit)
+}
+#' @param inverse
+#' if \code{FALSE} and \code{x} has class \code{ArAr}, plots
+#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
+#'
+#' if \code{FALSE} and \code{x} has class \code{PbPb}, plots
+#' \eqn{^{207}}Pb/\eqn{^{204}}Pb vs. \eqn{^{206}}Pb/\eqn{^{204}}Pb.
+#'
+#' if \code{TRUE} and \code{x} has class \code{ArAr}, plots
+#'     \eqn{^{36}}Ar/\eqn{^{40}}Ar vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
+#'
+#' if \code{TRUE} and \code{x} has class \code{PbPb}, plots
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.
+#'
+#' @param exterr propagate external sources of uncertainty
+#' (J, decay constant)?
+#' 
+#' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
+#' @rdname isochron
+#' @export
+isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,levels=NA,clabel="",
+                          ellipse.col=c("#00FF0080","#FF000080"),
+                          inverse=TRUE,ci.col='gray80',
+                          line.col='black',lwd=1,plot=TRUE,
+                          exterr=TRUE,model=1,show.ellipses=1*(model!=2),
+                          growth=FALSE,hide=NULL,omit=NULL,omit.col=NA,...){
+    y <- data2york(x,inverse=inverse)
+    d2calc <- clear(y,hide,omit)
+    fit <- regression(d2calc,model=model)
+    out <- isochron_init(fit,alpha=alpha)
+    out$y0[c('y','s[y]')] <- out$a
+    if (inverse){
+        R76 <- out$a
+        x.lab <- quote(''^204*'Pb/'^206*'Pb')
+        y.lab <- quote(''^207*'Pb/'^206*'Pb')
+        out$y0label <- quote(''^207*'Pb/'^206*'Pb = ')
+    } else {
+        R76 <- out$b
+        x.lab <- quote(''^206*'Pb/'^204*'Pb')
+        y.lab <- quote(''^207*'Pb/'^204*'Pb')
+        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*' = ')
+    }
+    out$displabel <- quote('dispersion = ')
+    out$age[c('t','s[t]')] <-
+        get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
+    out <- ci_isochron(out)
+    if (model==1){
+        out$age['disp[t]'] <-
+            out$fact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
+                                        exterr=exterr)[2]
+    }
+    if (plot) {
+        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=show.ellipses,
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,
+                    hide=hide,omit=omit,omit.col=omit.col,...)
+        if (growth) plot_PbPb_evolution(out$age['t'],inverse=inverse)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
+                        xlab=x.lab,ylab=y.lab)
+    }
+    invisible(out)
+}
 #' @rdname isochron
 #' @export
 isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
@@ -450,78 +501,30 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          show.numbers=FALSE,levels=NA,clabel="",
                          ellipse.col=c("#00FF0080","#FF000080"),
-                         ci.col='gray80',line.col='black',
+                         inverse=FALSE,ci.col='gray80',line.col='black',
                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
                          show.ellipses=1*(model!=2),
                          hide=NULL,omit=NULL,omit.col=NA,...){
     isochron_PD(x,'K40',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                ci.col=ci.col,line.col=line.col,lwd=lwd,
-                plot=plot,exterr=exterr,model=model,
+                inverse=inverse,ci.col=ci.col,line.col=line.col,
+                lwd=lwd,plot=plot,exterr=exterr,model=model,
                 show.ellipses=show.ellipses,bratio=0.895,
                 hide=hide,omit=omit,omit.col=omit.col,...)
-}
-#' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
-#' @rdname isochron
-#' @export
-isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,clabel="",
-                          ellipse.col=c("#00FF0080","#FF000080"),
-                          inverse=TRUE,ci.col='gray80',
-                          line.col='black',lwd=1,plot=TRUE,
-                          exterr=TRUE,model=1,show.ellipses=1*(model!=2),
-                          growth=FALSE,hide=NULL,omit=NULL,omit.col=NA,...){
-    y <- data2york(x,inverse=inverse)
-    d2calc <- clear(y,hide,omit)
-    fit <- regression(d2calc,model=model)
-    out <- isochron_init(fit,alpha=alpha)
-    out$y0[c('y','s[y]')] <- out$a
-    if (inverse){
-        R76 <- out$a
-        x.lab <- quote(''^204*'Pb/'^206*'Pb')
-        y.lab <- quote(''^207*'Pb/'^206*'Pb')
-        out$y0label <- quote(''^207*'Pb/'^206*'Pb = ')
-    } else {
-        R76 <- out$b
-        x.lab <- quote(''^206*'Pb/'^204*'Pb')
-        y.lab <- quote(''^207*'Pb/'^204*'Pb')
-        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*' = ')
-    }
-    out$displabel <- quote('dispersion = ')
-    out$age[c('t','s[t]')] <-
-        get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
-    out <- ci_isochron(out)
-    if (model==1){
-        out$age['disp[t]'] <-
-            out$fact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
-                                        exterr=exterr)[2]
-    }
-    if (plot) {
-        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
-                    show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
-                    ci.col=ci.col,line.col=line.col,lwd=lwd,
-                    hide=hide,omit=omit,omit.col=omit.col,...)
-        if (growth) plot_PbPb_evolution(out$age['t'],inverse=inverse)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
-                        xlab=x.lab,ylab=y.lab)
-    }
-    invisible(out)
 }
 #' @rdname isochron
 #' @export
 isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          inverse=FALSE,ci.col='gray80',line.col='black',
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
     isochron_PD(x,'Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
-                sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
+                sigdig=sigdig,show.numbers=show.numbers,levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
                 exterr=exterr,model=model,show.ellipses=show.ellipses,
                 hide=hide,omit=omit,omit.col=omit.col,...)
@@ -531,15 +534,15 @@ isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          inverse=FALSE,ci.col='gray80',line.col='black',
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
     isochron_PD(x,'Re187',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,show.ellipses=show.ellipses,
+                inverse=inverse,ci.col=ci.col,line.col=line.col,lwd=lwd,
+                plot=plot,exterr=exterr,model=model,show.ellipses=show.ellipses,
                 hide=hide,omit=omit,omit.col=omit.col,...)
 }
 #' @rdname isochron
@@ -547,15 +550,15 @@ isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          inverse=FALSE,ci.col='gray80',line.col='black',
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
     isochron_PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                ci.col=ci.col,line.col=line.col,lwd=lwd,
-                plot=plot,exterr=exterr,model=model,
+                inverse=inverse,ci.col=ci.col,line.col=line.col,
+                lwd=lwd,plot=plot,exterr=exterr,model=model,
                 show.ellipses=show.ellipses,hide=hide,
                 omit=omit,omit.col=omit.col,...)
 }
@@ -564,15 +567,15 @@ isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          inverse=FALSE,ci.col='gray80',line.col='black',
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
     isochron_PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                ci.col=ci.col,line.col=line.col,lwd=lwd,
-                plot=plot,exterr=exterr,model=model,
+                inverse=inverse,ci.col=ci.col,line.col=line.col,
+                lwd=lwd,plot=plot,exterr=exterr,model=model,
                 show.ellipses=show.ellipses,hide=hide,
                 omit=omit,omit.col=omit.col,...)
 }
@@ -776,8 +779,8 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
 isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         sigdig=2,show.numbers=FALSE,levels=NA,
                         clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                        ci.col='gray80',line.col='black',lwd=1,
-                        plot=TRUE,exterr=TRUE,model=1,
+                        inverse=FALSE,ci.col='gray80',line.col='black',
+                        lwd=1,plot=TRUE,exterr=TRUE,model=1,
                         show.ellipses=1*(model!=2),bratio=1,
                         hide=NULL,omit=NULL,...){
     y <- data2york(x)
