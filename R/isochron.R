@@ -460,7 +460,8 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     sb <- out$b['s[b]']
     if (inverse) {
         R09 <- -b/a
-        sR09 <- R09*sqrt((sa/a)^2+(sb/b)^2-2*sa*sb*out$cov.ab)
+        sR09 <- R09*sqrt((sa/a)^2 + (sb/b)^2 -
+                         2*out$cov.ab/(a*b))
         out$y0['y'] <- 1/a
         out$y0['s[y]'] <- sa/a^2
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
@@ -783,40 +784,32 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                         lwd=1,plot=TRUE,exterr=TRUE,model=1,
                         show.ellipses=1*(model!=2),bratio=1,
                         hide=NULL,omit=NULL,...){
-    y <- data2york(x)
+    y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
     out$y0[c('y','s[y]')] <- out$a
-    out$age[c('t','s[t]')] <- get.PD.age(out$b['b'],out$b['s[b]'],
-                                         nuclide,exterr=exterr,
-                                         bratio=bratio)
+    if (inverse){
+        DP <- -out$b[1]/out$a[1]
+        sDP <- DP*sqrt((out$a[2]/out$a[1])^2 + (out$b[2]/out$b[1])^2 -
+                       2*out$cov.ab/(out$a[1]*out$b[1]))
+    } else {
+        DP <- out$b[1]
+        sDP <- out$b[2]
+    }
+    print(c(DP,sDP))
+    out$age[c('t','s[t]')] <- get.PD.age(DP,sDP,nuclide,
+                                         exterr=exterr,bratio=bratio)
     out <- ci_isochron(out)
     if (model==1){
-        out$age['disp[t]'] <- out$fact*get.PD.age(out$b['b'],
-                              sqrt(out$mswd)*out$b['s[b]'],
+        out$age['disp[t]'] <- out$fact*get.PD.age(DP,sqrt(out$mswd)*sDP,
                               nuclide,exterr=exterr,bratio=bratio)[2]
     }
-    if (identical(nuclide,'Sm147')){
-        x.lab <- quote(''^147*'Sm/'^144*'Nd')
-        y.lab <- quote(''^143*'Nd/'^144*'Nd')
-    } else if (identical(nuclide,'Re187')){
-        x.lab <- quote(''^187*'Re/'^188*'Os')
-        y.lab <- quote(''^187*'Os/'^188*'Os')
-    } else if (identical(nuclide,'Rb87')){
-        x.lab <- quote(''^87*'Rb/'^86*'Sr')
-        y.lab <- quote(''^87*'Sr/'^86*'Sr')
-    } else if (identical(nuclide,'Lu176')){
-        x.lab <- quote(''^176*'Lu/'^177*'Hf')
-        y.lab <- quote(''^176*'Hf/'^177*'Hf')
-    } else if (identical(nuclide,'K40')){
-        x.lab <- quote(''^40*'K/'^44*'Ca')
-        y.lab <- quote(''^40*'Ca/'^44*'Ca')
-    }
+    lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$displabel <-
-        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
+        substitute(a*b*c,list(a='(',b=lab$y,c=')-dispersion = '))
     out$y0label <-
-        substitute(a*b*c,list(a='(',b=y.lab,c=quote(')'[o]*' = ')))
+        substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*' = ')))
     if (plot){
         scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=show.ellipses,
@@ -825,9 +818,55 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
-                        xlab=x.lab,ylab=y.lab)
+                        xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
+}
+
+get.isochron.labels <- function(nuclide,inverse=FALSE){
+    out <- list()
+    if (identical(nuclide,'Sm147')){
+        if (inverse){
+            out$x <- quote(''^147*'Sm/'^143*'Nd')
+            out$y <- quote(''^144*'Nd/'^143*'Nd')
+        } else {
+            out$x <- quote(''^147*'Sm/'^144*'Nd')
+            out$y <- quote(''^143*'Nd/'^144*'Nd')
+        }
+    } else if (identical(nuclide,'Re187')){
+        if (inverse){
+            out$x <- quote(''^187*'Re/'^187*'Os')
+            out$y <- quote(''^188*'Os/'^187*'Os')
+        } else {
+            out$x <- quote(''^187*'Re/'^188*'Os')
+            out$y <- quote(''^187*'Os/'^188*'Os')
+        }
+    } else if (identical(nuclide,'Rb87')){
+        if (inverse){
+            out$x <- quote(''^87*'Rb/'^87*'Sr')
+            out$y <- quote(''^86*'Sr/'^87*'Sr')
+        } else {
+            out$x <- quote(''^87*'Rb/'^86*'Sr')
+            out$y <- quote(''^87*'Sr/'^86*'Sr')
+        }
+    } else if (identical(nuclide,'Lu176')){
+        if (inverse){
+            out$x <- quote(''^176*'Lu/'^176*'Hf')
+            out$y <- quote(''^177*'Hf/'^176*'Hf')
+        } else {
+            out$x <- quote(''^176*'Lu/'^177*'Hf')
+            out$y <- quote(''^176*'Hf/'^177*'Hf')
+        }
+    } else if (identical(nuclide,'K40')){
+        if (inverse){
+            out$x <- quote(''^40*'K/'^40*'Ca')
+            out$y <- quote(''^44*'Ca/'^40*'Ca')
+        } else {
+            out$x <- quote(''^40*'K/'^44*'Ca')
+            out$y <- quote(''^40*'Ca/'^44*'Ca')
+        }
+    }
+    out
 }
 
 isochron_init <- function(fit,alpha=0.05){

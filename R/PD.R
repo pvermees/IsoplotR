@@ -89,9 +89,8 @@ PD.inverse.ratios <- function(x,exterr=FALSE){
     normal2inverse(X)
 }
 PD.normal.ratios <- function(x,exterr=FALSE){
-    if (x$format==1)
-        out <- x$x
-    else if (x$format==2)
-        out <- ppm2ratios(x,exterr=exterr)
+    if (x$format==1) out <- ppm2ratios(x,exterr=exterr)
+    else out <- x$x
+    colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }

@@ -243,7 +243,7 @@ read.data <- function(x,...){ UseMethod("read.data",x) }
 read.data.default <- function(x,method='U-Pb',format=1,ierr=1,
                               U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
                               Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
-    X <- as.matrix(utils::read.table(x,sep=',',...))
+    X <- data.matrix(utils::read.table(x,sep=',',header=TRUE,check.names=FALSE,...))
     read.data.matrix(X,method=method,format=format,ierr=ierr,
                      U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,
                      Th02=Th02,Th02U48=Th02U48)}
@@ -252,7 +252,7 @@ read.data.default <- function(x,method='U-Pb',format=1,ierr=1,
 read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,
                                  U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
                                  Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
-    read.data.matrix(as.matrix(x),method=method,format=format,ierr=ierr,
+    read.data.matrix(data.matrix(x),method=method,format=format,ierr=ierr,
                      U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,
                      Th02=Th02,Th02U48=Th02U48,...)
 }
@@ -777,9 +777,9 @@ getErrCols <- function(gc,format=NA,ierr=1){
     ArAr12 = (gc=='Ar-Ar' && format%in%(1:2))
     ArAr3 = (gc=='Ar-Ar' && format==3)
     KCa1 = (gc=='K-Ca' && format==1)
-    KCa2 = (gc=='K-Ca' && format==2)
+    KCa23 = (gc=='K-Ca' && format%in%(1:2))
     PD1 = (gc=='PD' && format==1)
-    PD2 = (gc=='PD' && format==2)
+    PD23 = (gc=='PD' && format%in%(2:3))
     UThHe = (gc=='U-Th-He')
     ThU12 = (gc=='Th-U' && format<3)
     ThU34 = (gc=='Th-U' && format>2)
@@ -787,9 +787,9 @@ getErrCols <- function(gc,format=NA,ierr=1){
     regression = (gc=='other' && identical(format,'regression'))
     spectrum = (gc=='other' && identical(format,'spectrum'))
     average = (gc=='other' && identical(format,'average'))
-    if (UPb12 | PbPb12 | ArAr12 | KCa1 | PD1 | ThU34 | regression){
+    if (UPb12 | PbPb12 | ArAr12 | KCa23 | PD23 | ThU34 | regression){
         cols = c(2,4)
-    } else if (UPb345 | PbPb3 | ArAr3 | KCa2 | PD2 | UThHe | ThU12){
+    } else if (UPb345 | PbPb3 | ArAr3 | KCa1 | PD1 | UThHe | ThU12){
         cols = c(2,4,6)
     } else if (UPb6){
         cols = seq(from=2,to=12,by=2)

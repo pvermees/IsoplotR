@@ -396,7 +396,6 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
 data2york.PD <- function(x,exterr=FALSE,inverse=FALSE,...){
     if (inverse) out <- PD.inverse.ratios(x,exterr=exterr)
     else out <- PD.normal.ratios(x,exterr=exterr)
-    colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
 #' @rdname data2york
