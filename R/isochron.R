@@ -797,7 +797,6 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
         DP <- out$b[1]
         sDP <- out$b[2]
     }
-    print(c(DP,sDP))
     out$age[c('t','s[t]')] <- get.PD.age(DP,sDP,nuclide,
                                          exterr=exterr,bratio=bratio)
     out <- ci_isochron(out)

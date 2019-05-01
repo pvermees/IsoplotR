@@ -199,7 +199,7 @@ data2york <- function(x,...){ UseMethod("data2york",x) }
 #' @rdname data2york
 #' @export
 data2york.default <- function(x,format=1,...){
-    if (format==1){
+    if (format==3){
         out <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
                                          x[,4],x[,5],x[,6]))
     } else {
