@@ -75,7 +75,8 @@ roundit <- function(age,err,sigdig=2){
         out <- signif(dat,sigdig)
     } else {
         nsmall <- max(0,-(trunc(log10(min.err))-sigdig))
-        out <- format(dat,digits=sigdig,nsmall=nsmall,trim=TRUE)
+        out <- format(dat,digits=sigdig,nsmall=nsmall,
+                      trim=TRUE,scientific=FALSE)
     }
     out
 }
