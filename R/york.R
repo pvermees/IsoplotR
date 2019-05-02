@@ -377,7 +377,10 @@ data2york.ArAr <- function(x,inverse=TRUE,...){
 #' @rdname data2york
 #' @export
 data2york.KCa <- function(x,inverse=FALSE,...){
-    data2york.PD(x,inverse=inverse,...)
+    out <- data2york(x$x,format=x$format,...)
+    invert <- (inverse & x$format%in%c(1,3)) | (!inverse & x$format==2)
+    if (invert) out <- normal2inverse(out)
+    out
 }
 #' @rdname data2york
 #' @export
@@ -392,8 +395,15 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
 #' @rdname data2york
 #' @export
 data2york.PD <- function(x,exterr=FALSE,inverse=FALSE,...){
-    out <- data2york(x$x,format=x$format,...)
-    invert <- (inverse & x$format==1) | (!inverse & x$format==2)
+    if (x$format<3){
+        X <- x$x
+        format <- x$format
+    } else {
+        X <- ppm2ratios(x,exterr=exterr)
+        format <- 1
+    }
+    out <- data2york(X,format=format,...)
+    invert <- (inverse & format==1) | (!inverse & format==2)
     if (invert) out <- normal2inverse(out)
     out
 }
