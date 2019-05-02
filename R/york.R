@@ -377,9 +377,7 @@ data2york.ArAr <- function(x,inverse=TRUE,...){
 #' @rdname data2york
 #' @export
 data2york.KCa <- function(x,inverse=FALSE,...){
-    out <- data2york(x$x,format=x$format,...)
-    if (inverse) out <- normal2inverse(out)
-    out
+    data2york.PD(x,inverse=inverse,...)
 }
 #' @rdname data2york
 #' @export
@@ -394,8 +392,9 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
 #' @rdname data2york
 #' @export
 data2york.PD <- function(x,exterr=FALSE,inverse=FALSE,...){
-    if (inverse) out <- PD.inverse.ratios(x,exterr=exterr)
-    else out <- PD.normal.ratios(x,exterr=exterr)
+    out <- data2york(x$x,format=x$format,...)
+    invert <- (inverse & x$format==1) | (!inverse & x$format==2)
+    if (invert) out <- normal2inverse(out)
     out
 }
 #' @rdname data2york
@@ -514,19 +513,23 @@ ThConversionHelper <- function(x){
 
 normal2inverse <- function(x){
     out <- x
-    out[,'X'] <- x[,'X']/x[,'Y']
-    out[,'Y'] <- 1/x[,'Y']
-    E11 <- x[,'sX']^2
-    E22 <- x[,'sY']^2
-    E12 <- x[,'rXY']*x[,'sX']*x[,'sY']
-    J11 <- 1/x[,'Y']
-    J12 <- -out[,'X']/x[,'Y']
+    iX <- 1
+    isX <- 2
+    iY <- 3
+    isY <- 4
+    irXY <- 5
+    out[,iX] <- x[,iX]/x[,iY]
+    out[,iY] <- 1/x[,iY]
+    E11 <- x[,isX]^2
+    E22 <- x[,isY]^2
+    E12 <- x[,irXY]*x[,isX]*x[,isY]
+    J11 <- 1/x[,iY]
+    J12 <- -out[,iX]/x[,iY]
     J21 <- rep(0,nrow(x))
-    J22 <- -out[,'Y']/x[,'Y']
+    J22 <- -out[,iY]/x[,iY]
     err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-    out[,'sX'] <- sqrt(err[,'varX'])
-    out[,'sY'] <- sqrt(err[,'varY'])
-    out[,'rXY'] <- err[,'cov']/(out[,'sX']*out[,'sY'])
+    out[,isX] <- sqrt(err[,'varX'])
+    out[,isY] <- sqrt(err[,'varY'])
+    out[,irXY] <- err[,'cov']/(out[,isX]*out[,isY])
     out
 }
-
