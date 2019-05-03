@@ -2,7 +2,7 @@
 % Please edit documentation in R/errorellipse.R
 \name{ellipse}
 \alias{ellipse}
-\title{Get coordinates of error ellipse for plotting}
+\title{Get error ellipse coordinates for plotting}
 \usage{
 ellipse(x, y, covmat, alpha = 0.05, n = 50)
 }

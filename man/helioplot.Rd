@@ -115,7 +115,7 @@ transformation:
 \eqn{[He] = 1/[e^{u}+e^{v}+(e^{w})+1]},
 \eqn{[U] = e^{u}/[e^{u}+e^{v}+(e^{w})+1]}\cr
 \eqn{[Th] = e^{v}/[e^{u}+e^{v}+(e^{w})+1]},
-\eqn{([Sm] = e^{w}/[e^{u}+e^{v}+(e^{w})+1])}.
+\eqn{([Sm] = e^{w}/[e^{u}+e^{v}+(e^{w})+1])}
 
 where \eqn{[He] + [U] + [Th] (+ [Sm]) = 1}. In the context of
 U-Th-(Sm)-He dating, the \emph{central} age is defined as the age

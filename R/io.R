@@ -46,13 +46,13 @@
 #' \enumerate{
 #' \item{\code{7/5, err[7/5], 6/8, err[6/8], rho}}
 #' \item{\code{8/6, err[8/6], 7/6, err[7/6] (, rho)}}
-#' \item{\code{X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z]}
+#' \item{\code{X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z]}\cr
 #' \code{(, rho[X,Y]) (, rho[Y,Z])}}
-#' \item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }
+#' \item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }\cr
 #' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }
+#' \item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }\cr
 #' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }
+#' \item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }\cr
 #' \code{7/6, err[7/6], 4/7, err[4/7], 4/6, err[4/6]}}
 #' }
 #'
@@ -126,8 +126,8 @@
 #' if \code{method='Th-U'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z],}\cr\code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z],}\cr\code{ rho[X,Y], rho[X,Z], rho[Y,Z]}}
 #' \item{\code{X=8/2, err[X], Y=0/2, err[Y], rho[X,Y]}}
 #' \item{\code{X=2/8, err[X], Y=0/8, err[Y], rho[X,Y]}}
 #' }
@@ -160,7 +160,7 @@
 #' \code{format} is one of either:
 #'
 #' \describe{
-#' \item{\code{radial} or \code{'average'}:}{\code{X, err[X]}}
+#' \item{\code{radial} or \code{average}:}{\code{X, err[X]}}
 #' \item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho} \cr
 #'       OR \code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
 #' \item{\code{spectrum}:}{\code{f, X, err[X]}} 

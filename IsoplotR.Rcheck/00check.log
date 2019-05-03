@@ -4,7 +4,7 @@
 * using session charset: UTF-8
 * using option ‘--as-cran’
 * checking for file ‘IsoplotR/DESCRIPTION’ ... OK
-* this is package ‘IsoplotR’ version ‘2.5’
+* this is package ‘IsoplotR’ version ‘2.6’
 * package encoding: UTF-8
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
@@ -18,13 +18,24 @@ The build time stamp is missing.
 * checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
   .Rhistory
+  R/.Rhistory
   .git
 These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
 
 CRAN-pack does not know about
   .git
-* checking for portable file names ... OK
+* checking for portable file names ... WARNING
+Found the following files with non-portable file names:
+  .git/COMMIT_EDITMSG (pieter-laptop's conflicted copy 2019-05-01)
+  .git/index (pieter-laptop's conflicted copy 2019-05-01)
+  .git/logs/HEAD (pieter-laptop's conflicted copy 2019-05-01)
+  .git/logs/refs/heads/beta (pieter-laptop's conflicted copy 2019-05-01)
+  .git/logs/refs/remotes/origin/beta (pieter-laptop's conflicted copy 2019-05-01)
+  .git/refs/heads/beta (pieter-laptop's conflicted copy 2019-05-01)
+  .git/refs/remotes/origin/beta (pieter-laptop's conflicted copy 2019-05-01)
+These are not fully portable file names.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘IsoplotR’ can be installed ... OK
 * checking installed package size ... OK
@@ -72,7 +83,10 @@ Most likely ‘inst/CITATION’ should be used instead.
 * checking contents of ‘data’ directory ... OK
 * checking data for non-ASCII characters ... OK
 * checking data for ASCII and uncompressed saves ... OK
-* checking examples ... OK
+* checking examples ... NOTE
+Examples with CPU or elapsed time > 5s
+           user system elapsed
+concordia 2.091  3.069   0.945
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 WARNING, 4 NOTEs
+Status: 2 WARNINGs, 5 NOTEs

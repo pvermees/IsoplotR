@@ -9,7 +9,7 @@ central                 Calculate U-Th-He and fission track central
 concordia               Concordia diagram
 data2york               Prepare geochronological data for York
                         regression
-ellipse                 Get coordinates of error ellipse for plotting
+ellipse                 Get error ellipse coordinates for plotting
 evolution               Th-U evolution diagram
 examples                Example datasets for testing 'IsoplotR'
 helioplot               Visualise U-Th-He data on a logratio plot or

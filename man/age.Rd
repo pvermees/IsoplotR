@@ -77,20 +77,20 @@ error, or the spontaneous and induced track densities \code{Ns} and
 \code{Th}, \code{s[Th]}, \code{He}, \code{s[He]}, \code{Sm} and
 \code{s[Sm]}
 
-\item a six element vector containing \code{Rb}, \code{s[Rb]},
-\code{Sr}, \code{s[Sr]}, \code{Sr87Sr86}, and \code{s[Sr87Sr86]}
+\item a two element vector containing \code{Sr87Rb87} and
+\code{s[Sr87Rb87]}
 
-\item a six element vector containing \code{Re}, \code{s[Re]},
-\code{Os}, \code{s[Os]}, \code{Os187Os188}, and \code{s[Os187Os188]}
+\item a two element vector containing \code{Os187Re187} and
+\code{s[Os187Re187]}
 
-\item a six element vector containing \code{Sm}, \code{s[Sm]},
-\code{Nd}, \code{s[Nd]}, \code{Nd143Nd144}, and \code{s[Nd144Nd143]}
+\item a two element vector containing \code{Nd143Sm147} and
+\code{s[Nd144Sm147]}
 
-\item a six element vector containing \code{Lu}, \code{s[Lu]},
-\code{Hf}, \code{s[Hf]}, \code{Hf176Hf177}, and \code{s[Hf176Hf177]}
+\item a two element vector containing \code{Hf176Lu176} and
+\code{s[Hf176Lu176]}
 
-\item a five element vector containing \code{0/8}, \code{s[0/8]},
-\code{4/8}, \code{s[4/8]} and \code{cov[0/8,4/8]}
+\item a five element vector containing \code{Th230U238}, \code{s[Th230/U238]},
+\code{U234U238}, \code{s[U234U238]} and \code{cov[Th230U238,U234U238]}
 
 }
 
@@ -185,10 +185,10 @@ precision measurements, which are more likely to fail the
 Chi-square test than low precision measurements. The latter
 would therefore be 'rewarded' by such a criterion.}
 
-\item{isochron}{logical flag indicating whether each Ar-Ar analysis
+\item{isochron}{logical flag indicating whether each analysis
 should be considered separately (\code{isochron=FALSE}) or an
-isochron age should be calculated from all Ar-Ar analyses
-together (\code{isochron=TRUE}).}
+isochron age should be calculated from all analyses together
+(\code{isochron=TRUE}).}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka
 `inherited', `excess', or `common')

@@ -191,7 +191,7 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: ellipse
-### Title: Get coordinates of error ellipse for plotting
+### Title: Get error ellipse coordinates for plotting
 ### Aliases: ellipse
 
 ### ** Examples
@@ -303,8 +303,8 @@ flush(stderr()); flush(stdout())
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: isochron
 ### Title: Calculate and plot isochrons
-### Aliases: isochron isochron.default isochron.ArAr isochron.KCa
-###   isochron.PbPb isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf
+### Aliases: isochron isochron.default isochron.PbPb isochron.ArAr
+###   isochron.KCa isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf
 ###   isochron.ThU isochron.UThHe
 
 ### ** Examples
@@ -316,6 +316,7 @@ fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
 
 dev.new()
 isochron(examples$ThU,type=4)
+
 
 
 
