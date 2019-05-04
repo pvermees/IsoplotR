@@ -214,7 +214,7 @@ dev.new(): using pdf(file="Rplots2.pdf")
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: ellipse
-> ### Title: Get coordinates of error ellipse for plotting
+> ### Title: Get error ellipse coordinates for plotting
 > ### Aliases: ellipse
 > 
 > ### ** Examples
@@ -328,8 +328,8 @@ dev.new(): using pdf(file="Rplots4.pdf")
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: isochron
 > ### Title: Calculate and plot isochrons
-> ### Aliases: isochron isochron.default isochron.ArAr isochron.KCa
-> ###   isochron.PbPb isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf
+> ### Aliases: isochron isochron.default isochron.PbPb isochron.ArAr
+> ###   isochron.KCa isochron.RbSr isochron.ReOs isochron.SmNd isochron.LuHf
 > ###   isochron.ThU isochron.UThHe
 > 
 > ### ** Examples
@@ -342,6 +342,7 @@ dev.new(): using pdf(file="Rplots4.pdf")
 > dev.new()
 dev.new(): using pdf(file="Rplots5.pdf")
 > isochron(examples$ThU,type=4)
+> 
 > 
 > 
 > 
@@ -791,7 +792,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  14.849 6.349 12.758 0 0.006 
+Time elapsed:  13.894 9.401 10.321 0.002 0.002 
 > grDevices::dev.off()
 pdf 
   2 

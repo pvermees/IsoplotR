@@ -3,9 +3,9 @@
 \name{isochron}
 \alias{isochron}
 \alias{isochron.default}
+\alias{isochron.PbPb}
 \alias{isochron.ArAr}
 \alias{isochron.KCa}
-\alias{isochron.PbPb}
 \alias{isochron.RbSr}
 \alias{isochron.ReOs}
 \alias{isochron.SmNd}
@@ -23,6 +23,13 @@ isochron(x, ...)
   model = 1, show.ellipses = 1 * (model != 2), xlab = "x",
   ylab = "y", hide = NULL, omit = NULL, omit.col = NA, ...)
 
+\method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  growth = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
@@ -32,45 +39,38 @@ isochron(x, ...)
 
 \method{isochron}{KCa}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
-  omit = NULL, omit.col = NA, ...)
-
-\method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
   exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  growth = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
-  omit = NULL, omit.col = NA, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
-  omit = NULL, omit.col = NA, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
-  omit = NULL, omit.col = NA, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, exterr = TRUE,
-  model = 1, show.ellipses = 1 * (model != 2), hide = NULL,
-  omit = NULL, omit.col = NA, ...)
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  hide = NULL, omit = NULL, omit.col = NA, ...)
 
 \method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA,
   alpha = 0.05, sigdig = 2, show.numbers = FALSE, levels = NA,
@@ -182,17 +182,48 @@ but omitted from the isochron age calculation.}
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
 
-\item{inverse}{if \code{FALSE} and \code{x} has class \code{ArAr}, plots
-    \eqn{^{40}}Ar/\eqn{^{36}}Ar vs. \eqn{^{39}}Ar/\eqn{^{36}}Ar.
+\item{inverse}{toggles between normal and inverse isochrons. If the
+    isochron plots \code{Y} against \code{X}, and
 
-if \code{FALSE} and \code{x} has class \code{PbPb}, plots
-\eqn{^{207}}Pb/\eqn{^{204}}Pb vs. \eqn{^{206}}Pb/\eqn{^{204}}Pb.
+if \code{inverse=FALSE}, then \code{X} =
+    \eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
+    \eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
+    \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{36}}Ar and
+    \code{Y} = \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar (if \code{x} has
+    class \code{ArAr}), or \code{X} =
+    \eqn{{}^{40}}K/\eqn{{}^{44}}Ca and \code{Y} =
+    \eqn{{}^{40}}Ca/\eqn{{}^{44}}Ca (if \code{x} has class
+    \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{86}}Sr and
+    \code{Y} = \eqn{{}^{87}}Sr/\eqn{{}^{86}}Sr (if \code{x} has
+    class \code{RbSr}), or \code{X} =
+    \eqn{{}^{147}}Sm/\eqn{{}^{144}}Nd and \code{Y} =
+    \eqn{{}^{143}}Nd/\eqn{{}^{144}}Nd (if \code{x} has class
+    \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{188}}Os
+    and \code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x}
+    has class \code{ReOs}), or \code{X} =
+    \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and \code{Y} =
+    \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
+    \code{LuHf}).
 
-if \code{TRUE} and \code{x} has class \code{ArAr}, plots
-    \eqn{^{36}}Ar/\eqn{^{40}}Ar vs. \eqn{^{39}}Ar/\eqn{^{40}}Ar.
-
-if \code{TRUE} and \code{x} has class \code{PbPb}, plots
-\eqn{^{207}}Pb/\eqn{^{206}}Pb vs. \eqn{^{204}}Pb/\eqn{^{206}}Pb.}
+if \code{inverse=TRUE}, then \code{X} =
+    \eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb and \code{Y} =
+    \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb (if \code{x} has class
+    \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{40}}Ar and
+    \code{Y} = \eqn{{}^{36}}Ar/\eqn{{}^{40}}Ar (if \code{x} has
+    class \code{ArAr}), or \code{X} =
+    \eqn{{}^{40}}K/\eqn{{}^{40}}Ca and \code{Y} =
+    \eqn{{}^{44}}Ca/\eqn{{}^{40}}Ca (if \code{x} has class
+    \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{87}}Sr and
+    \code{Y} = \eqn{{}^{86}}Sr/\eqn{{}^{87}}Sr (if \code{x} has
+    class \code{RbSr}), or \code{X} =
+    \eqn{{}^{147}}Sm/\eqn{{}^{143}}Nd and \code{Y} =
+    \eqn{{}^{144}}Nd/\eqn{{}^{143}}Nd (if \code{x} has class
+    \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{187}}Os
+    and \code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x}
+    has class \code{ReOs}), or \code{X} =
+    \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and \code{Y} =
+    \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
+    \code{LuHf}).}
 
 \item{exterr}{propagate external sources of uncertainty
 (J, decay constant)?}
@@ -441,6 +472,7 @@ fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
 
 dev.new()
 isochron(examples$ThU,type=4)
+
 }
 \references{
 Ludwig, K.R. and Titterington, D.M., 1994. Calculation of

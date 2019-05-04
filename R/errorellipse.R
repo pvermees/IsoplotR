@@ -1,4 +1,4 @@
-#' Get coordinates of error ellipse for plotting
+#' Get error ellipse coordinates for plotting
 #'
 #' Constructs an error ellipse at a given confidence level from its
 #' centre and covariance matrix

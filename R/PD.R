@@ -83,15 +83,3 @@ ppm2ratios <- function(x,...){ UseMethod("ppm2ratios",x) }
 ppm2ratios.default <- function(x,...){
     stop('Method ppm2ratios not available for this class.')
 }
-
-PD.inverse.ratios <- function(x,exterr=FALSE){
-    X <- PD.normal.ratios(x,exterr=exterr)
-    normal2inverse(X)
-}
-PD.normal.ratios <- function(x,exterr=FALSE){
-    if (x$format==1)
-        out <- x$x
-    else if (x$format==2)
-        out <- ppm2ratios(x,exterr=exterr)
-    out
-}

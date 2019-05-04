@@ -175,12 +175,12 @@ get.york.xy <- function(x,a,b){
 #'     \code{read.data(...)} function
 #' @param format one of
 #'
-#' 1. \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]}, \code{rho}
+#' 1,2. \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]}, \code{rho}
 #'
 #' where \code{rho} is the error correlation between \code{X} and
 #' \code{Y}, or
 #'
-#' 2. \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
+#' 3. \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
 #' \code{X/Y}, \code{s[X/Y]} for which the error correlations are
 #' automatically computed from the redundancy of the three ratios.
 #'
@@ -199,16 +199,16 @@ data2york <- function(x,...){ UseMethod("data2york",x) }
 #' @rdname data2york
 #' @export
 data2york.default <- function(x,format=1,...){
-    if (format==1){
-        out <- read.XsXYsYrXY(x)
-    } else {
+    if (format==3){
         out <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
                                          x[,4],x[,5],x[,6]))
+    } else {
+        out <- read.XsXYsYrXY(x)
     }
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-#' @param option one of
+#' @param option returns one of
 #'
 #' \enumerate{
 #'
@@ -346,24 +346,50 @@ data2york.UPb <- function(x,option=1,...){
     out
 }
 
-#' @param inverse If \code{x} has class \code{ArAr} and
-#'     \code{inverse=FALSE}, returns a table with columns
-#'     \code{X=9/6}, \code{sX=s[9/6]}, \code{Y=0/6}, code{sY=s[0/6]},
-#'     \code{rXY}
+#' @param inverse toggles between normal and inverse isochron
+#'     ratios. \code{data2york} returns five columns \code{X},
+#'     \code{s[X]}, \code{Y}, \code{s[Y]} and \code{r[X,Y]}.
 #'
-#' If \code{x} has class \code{ArAr} and \code{inverse=TRUE}, returns
-#'     a table with columns \code{X=9/0}, \code{sX=s[9/0]},
-#'     \code{Y=6/0}, code{sY=s[6/0]}, \code{rXY}
-#' 
-#' If \code{x} has class \code{PbPb} and
-#'     \code{inverse=FALSE}, returns a table with columns
-#'     \code{X=6/4}, \code{sX=s[6/4]}, \code{Y=7/4}, code{sY=s[7/4]},
-#'     \code{rXY}
+#' If \code{inverse=FALSE}, then \code{X} =
+#'     \eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
+#'     \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{36}}Ar and
+#'     \code{Y} = \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar (if \code{x} has
+#'     class \code{ArAr}), or \code{X} =
+#'     \eqn{{}^{40}}K/\eqn{{}^{44}}Ca and \code{Y} =
+#'     \eqn{{}^{40}}Ca/\eqn{{}^{44}}Ca (if \code{x} has class
+#'     \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{86}}Sr and
+#'     \code{Y} = \eqn{{}^{87}}Sr/\eqn{{}^{86}}Sr (if \code{x} has
+#'     class \code{RbSr}), or \code{X} =
+#'     \eqn{{}^{147}}Sm/\eqn{{}^{144}}Nd and \code{Y} =
+#'     \eqn{{}^{143}}Nd/\eqn{{}^{144}}Nd (if \code{x} has class
+#'     \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{188}}Os
+#'     and \code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x}
+#'     has class \code{ReOs}), or \code{X} =
+#'     \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and \code{Y} =
+#'     \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
+#'     \code{LuHf}).
 #'
-#' If \code{x} has class \code{PbPb} and \code{inverse=TRUE}, returns
-#'     a table with columns \code{X=4/6}, \code{sX=s[4/6]},
-#'     \code{Y=7/6}, \code{sY=s[7/6]}, \code{rXY}
-#' 
+#' If \code{inverse=TRUE}, then \code{X} =
+#'     \eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb and \code{Y} =
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb (if \code{x} has class
+#'     \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{40}}Ar and
+#'     \code{Y} = \eqn{{}^{36}}Ar/\eqn{{}^{40}}Ar (if \code{x} has
+#'     class \code{ArAr}), or \code{X} =
+#'     \eqn{{}^{40}}K/\eqn{{}^{40}}Ca and \code{Y} =
+#'     \eqn{{}^{44}}Ca/\eqn{{}^{40}}Ca (if \code{x} has class
+#'     \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{87}}Sr and
+#'     \code{Y} = \eqn{{}^{86}}Sr/\eqn{{}^{87}}Sr (if \code{x} has
+#'     class \code{RbSr}), or \code{X} =
+#'     \eqn{{}^{147}}Sm/\eqn{{}^{143}}Nd and \code{Y} =
+#'     \eqn{{}^{144}}Nd/\eqn{{}^{143}}Nd (if \code{x} has class
+#'     \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{187}}Os
+#'     and \code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x}
+#'     has class \code{ReOs}), or \code{X} =
+#'     \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and \code{Y} =
+#'     \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
+#'     \code{LuHf}).
+#'
 #' @rdname data2york
 #' @export
 data2york.ArAr <- function(x,inverse=TRUE,...){
@@ -378,7 +404,8 @@ data2york.ArAr <- function(x,inverse=TRUE,...){
 #' @export
 data2york.KCa <- function(x,inverse=FALSE,...){
     out <- data2york(x$x,format=x$format,...)
-    if (inverse) out <- normal2inverse(out)
+    invert <- (inverse & x$format%in%c(1,3)) | (!inverse & x$format==2)
+    if (invert) out <- normal2inverse(out)
     out
 }
 #' @rdname data2york
@@ -394,9 +421,16 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
 #' @rdname data2york
 #' @export
 data2york.PD <- function(x,exterr=FALSE,inverse=FALSE,...){
-    if (inverse) out <- PD.inverse.ratios(x,exterr=exterr)
-    else out <- PD.normal.ratios(x,exterr=exterr)
-    colnames(out) <- c('X','sX','Y','sY','rXY')
+    if (x$format<3){
+        X <- x$x
+        format <- x$format
+    } else {
+        X <- ppm2ratios(x,exterr=exterr)
+        format <- 1
+    }
+    out <- data2york(X,format=format,...)
+    invert <- (inverse & format==1) | (!inverse & format==2)
+    if (invert) out <- normal2inverse(out)
     out
 }
 #' @rdname data2york
@@ -515,19 +549,23 @@ ThConversionHelper <- function(x){
 
 normal2inverse <- function(x){
     out <- x
-    out[,'X'] <- x[,'X']/x[,'Y']
-    out[,'Y'] <- 1/x[,'Y']
-    E11 <- x[,'sX']^2
-    E22 <- x[,'sY']^2
-    E12 <- x[,'rXY']*x[,'sX']*x[,'sY']
-    J11 <- 1/x[,'Y']
-    J12 <- -out[,'X']/x[,'Y']
+    iX <- 1
+    isX <- 2
+    iY <- 3
+    isY <- 4
+    irXY <- 5
+    out[,iX] <- x[,iX]/x[,iY]
+    out[,iY] <- 1/x[,iY]
+    E11 <- x[,isX]^2
+    E22 <- x[,isY]^2
+    E12 <- x[,irXY]*x[,isX]*x[,isY]
+    J11 <- 1/x[,iY]
+    J12 <- -out[,iX]/x[,iY]
     J21 <- rep(0,nrow(x))
-    J22 <- -out[,'Y']/x[,'Y']
+    J22 <- -out[,iY]/x[,iY]
     err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-    out[,'sX'] <- sqrt(err[,'varX'])
-    out[,'sY'] <- sqrt(err[,'varY'])
-    out[,'rXY'] <- err[,'cov']/(out[,'sX']*out[,'sY'])
+    out[,isX] <- sqrt(err[,'varX'])
+    out[,isY] <- sqrt(err[,'varY'])
+    out[,irXY] <- err[,'cov']/(out[,isX]*out[,isY])
     out
 }
-

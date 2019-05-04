@@ -41,16 +41,16 @@ or \code{PD} (which includes objects of class \code{RbSr},
 
 \item{format}{one of
 
-1. \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]}, \code{rho}
+1,2. \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]}, \code{rho}
 
 where \code{rho} is the error correlation between \code{X} and
 \code{Y}, or
 
-2. \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
+3. \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
 \code{X/Y}, \code{s[X/Y]} for which the error correlations are
 automatically computed from the redundancy of the three ratios.}
 
-\item{option}{one of
+\item{option}{returns one of
 
 \enumerate{
 
@@ -70,23 +70,49 @@ automatically computed from the redundancy of the three ratios.}
 
 }}
 
-\item{inverse}{If \code{x} has class \code{ArAr} and
-    \code{inverse=FALSE}, returns a table with columns
-    \code{X=9/6}, \code{sX=s[9/6]}, \code{Y=0/6}, code{sY=s[0/6]},
-    \code{rXY}
+\item{inverse}{toggles between normal and inverse isochron
+    ratios. \code{data2york} returns five columns \code{X},
+    \code{s[X]}, \code{Y}, \code{s[Y]} and \code{r[X,Y]}.
 
-If \code{x} has class \code{ArAr} and \code{inverse=TRUE}, returns
-    a table with columns \code{X=9/0}, \code{sX=s[9/0]},
-    \code{Y=6/0}, code{sY=s[6/0]}, \code{rXY}
+If \code{inverse=FALSE}, then \code{X} =
+    \eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
+    \eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
+    \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{36}}Ar and
+    \code{Y} = \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar (if \code{x} has
+    class \code{ArAr}), or \code{X} =
+    \eqn{{}^{40}}K/\eqn{{}^{44}}Ca and \code{Y} =
+    \eqn{{}^{40}}Ca/\eqn{{}^{44}}Ca (if \code{x} has class
+    \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{86}}Sr and
+    \code{Y} = \eqn{{}^{87}}Sr/\eqn{{}^{86}}Sr (if \code{x} has
+    class \code{RbSr}), or \code{X} =
+    \eqn{{}^{147}}Sm/\eqn{{}^{144}}Nd and \code{Y} =
+    \eqn{{}^{143}}Nd/\eqn{{}^{144}}Nd (if \code{x} has class
+    \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{188}}Os
+    and \code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x}
+    has class \code{ReOs}), or \code{X} =
+    \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and \code{Y} =
+    \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
+    \code{LuHf}).
 
-If \code{x} has class \code{PbPb} and
-    \code{inverse=FALSE}, returns a table with columns
-    \code{X=6/4}, \code{sX=s[6/4]}, \code{Y=7/4}, code{sY=s[7/4]},
-    \code{rXY}
-
-If \code{x} has class \code{PbPb} and \code{inverse=TRUE}, returns
-    a table with columns \code{X=4/6}, \code{sX=s[4/6]},
-    \code{Y=7/6}, \code{sY=s[7/6]}, \code{rXY}}
+If \code{inverse=TRUE}, then \code{X} =
+    \eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb and \code{Y} =
+    \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb (if \code{x} has class
+    \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{40}}Ar and
+    \code{Y} = \eqn{{}^{36}}Ar/\eqn{{}^{40}}Ar (if \code{x} has
+    class \code{ArAr}), or \code{X} =
+    \eqn{{}^{40}}K/\eqn{{}^{40}}Ca and \code{Y} =
+    \eqn{{}^{44}}Ca/\eqn{{}^{40}}Ca (if \code{x} has class
+    \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{87}}Sr and
+    \code{Y} = \eqn{{}^{86}}Sr/\eqn{{}^{87}}Sr (if \code{x} has
+    class \code{RbSr}), or \code{X} =
+    \eqn{{}^{147}}Sm/\eqn{{}^{143}}Nd and \code{Y} =
+    \eqn{{}^{144}}Nd/\eqn{{}^{143}}Nd (if \code{x} has class
+    \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{187}}Os
+    and \code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x}
+    has class \code{ReOs}), or \code{X} =
+    \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and \code{Y} =
+    \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
+    \code{LuHf}).}
 
 \item{exterr}{If \code{TRUE}, propagates the external uncertainties
 (e.g. decay constants) into the output errors.}

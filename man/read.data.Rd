@@ -39,13 +39,13 @@ if \code{method='U-Pb'}, then \code{format} is one of either:
 \enumerate{
 \item{\code{7/5, err[7/5], 6/8, err[6/8], rho}}
 \item{\code{8/6, err[8/6], 7/6, err[7/6] (, rho)}}
-\item{\code{X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z]}
+\item{\code{X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z]}\cr
 \code{(, rho[X,Y]) (, rho[Y,Z])}}
-\item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }
+\item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }\cr
 \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-\item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }
+\item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }\cr
 \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-\item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }
+\item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }\cr
 \code{7/6, err[7/6], 4/7, err[4/7], 4/6, err[4/6]}}
 }
 
@@ -71,6 +71,7 @@ if \code{method='K-Ca'}, then \code{format} is one of either:
 
 \enumerate{
 \item{\code{K40/Ca44, err[K40/Ca44], Ca40/Ca44, err[Ca40/Ca44], rho}}
+\item{\code{K40/Ca40, err[K40/Ca40], Ca44/Ca40, err[Ca44/Ca40], rho}}
 \item{\code{K40/Ca44, err[K40/Ca44], Ca40/Ca44, }
       \code{err[Ca40/Ca44], K40/Ca40, err[K40/Ca40]}}
 }
@@ -79,6 +80,7 @@ if \code{method='Rb-Sr'}, then \code{format} is one of either:
 
 \enumerate{
 \item{\code{Rb87/Sr86, err[Rb87/Sr86], Sr87/Sr86, err[Sr87/Sr86] (, rho)}}
+\item{\code{Rb87/Sr87, err[Rb87/Sr87], Sr86/Sr87, err[Sr86/Sr87] (, rho)}}
 \item{\code{Rb, err[Rb], Sr, err[Sr], Sr87/Sr86, err[Sr87/Sr86]}}
 }
 
@@ -88,6 +90,7 @@ if \code{method='Sm-Nd'}, then \code{format} is one of either:
 
 \enumerate{
 \item{\code{Sm147/Nd144, err[Sm147/Nd144], Nd143/Nd144, err[Nd143/Nd144] (, rho)}}
+\item{\code{Sm147/Nd143, err[Sm147/Nd143], Nd144/Nd143, err[Nd144/Nd143] (, rho)}}
 \item{\code{Sm, err[Sm], Nd, err[Nd], Nd143/Nd144, err[Nd143/Nd144]}}
 }
 
@@ -97,6 +100,7 @@ if \code{method='Re-Os'}, then \code{format} is one of either:
 
 \enumerate{
 \item{\code{Re187/Os188, err[Re187/Os188], Os187/Os188, err[Os187/Os188] (, rho)}}
+\item{\code{Re187/Os187, err[Re187/Os187], Os188/Os187, err[Os188/Os187] (, rho)}}
 \item{\code{Re, err[Re], Os, err[Os], Os187/Os188, err[Os187/Os188]}}
 }
 
@@ -106,6 +110,7 @@ if \code{method='Lu-Hf'}, then \code{format} is one of either:
 
 \enumerate{
 \item{\code{Lu176/Hf177, err[Lu176/Hf177], Hf176/Hf177, err[Hf176/Hf177] (, rho)}}
+\item{\code{Lu176/Hf176, err[Lu176/Hf176], Hf177/Hf176, err[Hf177/Hf176] (, rho)}}
 \item{\code{Lu, err[Lu], Hf, err[Hf], Hf176/Hf177, err[Hf176/Hf177]}}
 }
 
@@ -114,8 +119,8 @@ where \code{Lu} and \code{Hf} are in ppm
 if \code{method='Th-U'}, then \code{format} is one of either:
 
 \enumerate{
-\item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
-\item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z], rho[X,Y], rho[X,Z], rho[Y,Z]}}
+\item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z],}\cr\code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+\item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z],}\cr\code{ rho[X,Y], rho[X,Z], rho[Y,Z]}}
 \item{\code{X=8/2, err[X], Y=0/2, err[Y], rho[X,Y]}}
 \item{\code{X=2/8, err[X], Y=0/8, err[Y], rho[X,Y]}}
 }
@@ -148,7 +153,7 @@ if \code{method='other'}, \code{x} is read as a table, unless
 \code{format} is one of either:
 
 \describe{
-\item{\code{radial} or \code{'average'}:}{\code{X, err[X]}}
+\item{\code{radial} or \code{average}:}{\code{X, err[X]}}
 \item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho} \cr
       OR \code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
 \item{\code{spectrum}:}{\code{f, X, err[X]}} 
@@ -200,11 +205,11 @@ IsoplotR provides the following example input files:
 \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv} }
 \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv} }
 \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
-\item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}}, 
-\item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}}
-\item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}}
-\item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}}
-\item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}}
+\item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}, \code{KCa3.csv}}, 
+\item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}, \code{ReOs3.csv}}
+\item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}, \code{SmNd3.csv}}
+\item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}, \code{RbSr3.csv}}
+\item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}, \code{LuHf3.csv}}
 \item{Th-U: \code{ThU1.csv}, \code{ThU2.csv}, \code{ThU3.csv},
 \code{ThU4.csv}}
 \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv},
