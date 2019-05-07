@@ -486,3 +486,11 @@ clear <- function(x,...){
     else out <- x
     out
 }
+
+get.ntit <- function(x){
+    ns <- length(x)
+    nisnan <- length(which(is.na(x)))
+    out <- 'n='
+    if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
+    paste0(out,ns)
+}

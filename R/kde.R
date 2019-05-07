@@ -522,7 +522,7 @@ plot.KDE <- function(x,pch='|',xlab="age [Ma]",ylab="",
     graphics::lines(x$x,x$y,col='black')
     graphics::points(ages,rep(graphics::par("usr")[3]/2,
                               length(ages)),pch=pch)
-    mymtext(paste0('n=',length(x)),line=0,adj=1)
+    mymtext(get.ntit(x$ages),line=0,adj=1)
 }
 
 plot.KDEs <- function(x,ncol=NA,pch=NA,xlab="age [Ma]",ylab="",
