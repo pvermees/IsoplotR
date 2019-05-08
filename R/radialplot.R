@@ -128,7 +128,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
     colourbar(z=levels[calcit],col=bg,clabel=clabel)
     if (title)
         title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
-                           units=units,n=nrow(x2calc)))
+                           units=units,ntit=get.ntit(x2calc[,1])))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -165,7 +165,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
     colourbar(z=levels[calcit],col=bg,clabel=clabel)
     if (title)
         title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
-                           units='Ma',n=length(x2calc)))
+                           units='Ma',ntit=get.ntit(x2calc$x[,1])))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -753,13 +753,14 @@ iatt <- function(z,zeta,rhoD){
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
-radial.title <- function(x,sigdig=2,alpha=0.05,units='',n=length(x),...){
+radial.title <- function(x,sigdig=2,alpha=0.05,units='',
+                         ntit=paste0('n=',length(x)),...){
     fit <- central(x,alpha=alpha)
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
-    line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'(n='*n*')',
+    line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'('*n*')',
                         list(a=rounded.age[1],b=rounded.age[2],
-                             c=rounded.age[3],d=units,n=n))
+                             c=rounded.age[3],d=units,n=ntit))
     line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                         list(a=signif(fit$mswd,sigdig),
                              b=signif(fit$p.value,sigdig)))
