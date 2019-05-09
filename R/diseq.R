@@ -101,17 +101,17 @@ wendt <- function(tt,d=diseq()){
         l0 <- settings('lambda','Th230')[1]*1000
         l6 <- settings('lambda','Ra226')[1]*1000
         l1 <- settings('lambda','Pa231')[1]*1000
-        if (tt > 10/l4){ # too old => ignore diseq corr
-            dd$U48 <- 1
-            dd$Th0U8 <- 1
-            dd$Ra6U8 <- 1
-            dd$Pa1U5 <- 1
-        } else { # infer original activity ratios
-            dd$U48 <- 1 + (d$U48-1)*exp(l4*tt)
-            dd$Th0U8 <- 1 + (d$Th0U8-1)*exp(l0*tt)
-            dd$Ra6U8 <- 1 + (d$Ra6U8-1)*exp(l6*tt)
-            dd$Pa1U5 <- 1 + (d$Pa1U5-1)*exp(l1*tt)
-        }
+        # the next 6 lines are safety measures against bad input
+        fact <- 20
+        if (tt>(fact/l6) & d$Ra6U8!=1) ttt <- fact/l6
+        else if (tt>(fact/l1) & d$Pa1U5!=1) ttt <- fact/l1
+        else if (tt>(fact/l0) & d$Th0U8!=1) ttt <- fact/l0
+        else if (tt>(fact/l4) & d$U48!=1) ttt <- fact/l4
+        else ttt <- tt
+        if (d$U48!=1) dd$U48 <- max(0, 1 + (d$U48-1)*exp(l4*ttt))
+        if (d$Th0U8!=1) dd$Th0U8 <- max(0, 1 + (d$Th0U8-1)*exp(l0*ttt))
+        if (d$Ra6U8!=1) dd$Ra6U8 <- max(0, 1 + (d$Ra6U8-1)*exp(l6*ttt))
+        if (d$Pa1U5!=1) dd$Pa1U5 <- max(0, 1 + (d$Pa1U5-1)*exp(l1*ttt))
     }
     out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,
                 d2d1dt2=0,d2d2dt2=0,dd1dl5=0,dd2dl8=0)
