@@ -97,14 +97,21 @@ diseq <- function(option=0,
 wendt <- function(tt,d=diseq()){
     dd <- d
     if (d$option==2){
-        l4 <- settings('lambda','U234')[1]
-        l0 <- settings('lambda','Th230')[1]
-        l6 <- settings('lambda','Ra226')[1]
-        l1 <- settings('lambda','Pa231')[1]
-        D$U48 <- 1 + (d$U48-1)*exp(l4*tt)
-        D$Th0U8 <- 1 + (d$Th0U8-1)*exp(l0*tt)
-        D$Ra6U8 <- 1 + (d$Ra6U8-1)*exp(l6*tt)
-        D$Pa1U8 <- 1 + (d$Pa1U8-1)*exp(l1*tt)
+        l4 <- settings('lambda','U234')[1]*1000
+        l0 <- settings('lambda','Th230')[1]*1000
+        l6 <- settings('lambda','Ra226')[1]*1000
+        l1 <- settings('lambda','Pa231')[1]*1000
+        if (tt > 10/l4){ # too old => ignore diseq corr
+            dd$U48 <- 1
+            dd$Th0U8 <- 1
+            dd$Ra6U8 <- 1
+            dd$Pa1U5 <- 1
+        } else { # infer original activity ratios
+            dd$U48 <- 1 + (d$U48-1)*exp(l4*tt)
+            dd$Th0U8 <- 1 + (d$Th0U8-1)*exp(l0*tt)
+            dd$Ra6U8 <- 1 + (d$Ra6U8-1)*exp(l6*tt)
+            dd$Pa1U5 <- 1 + (d$Pa1U5-1)*exp(l1*tt)
+        }
     }
     out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,
                 d2d1dt2=0,d2d2dt2=0,dd1dl5=0,dd2dl8=0)
@@ -151,19 +158,22 @@ d2 <- function(tt,dd=diseq()){
     out
 }
 dd1dl5 <- function(tt,dd=diseq()){
-    l5 <- settings('lambda','U235')[1]
     if (dd$option<3){
+        l5 <- settings('lambda','U235')[1]
         out <- d1(tt,dd=dd)*(tt+1/l5)
     } else {
+        l1 <- settings('lambda','Pa231')[1]*1000
         out <- (dd$fPaU-1)/l1
     }
     out
 }
 dd2dl8 <- function(tt,dd=diseq()){
-    l8 <- settings('lambda','U238')[1]
     if (dd$option<3){
+        l8 <- settings('lambda','U238')[1]
         out <- d2(tt,dd=dd)*(tt+1/l8)
     } else {
+        l0 <- settings('lambda','Th230')[1]*1000
+        l6 <- settings('lambda','Ra226')[1]*1000
         out <- (dd$fThU-1)/l0 + (dd$fRaU-1)/l6
     }
     out
@@ -214,7 +224,7 @@ d2d2dt2 <- function(tt,dd=diseq()){
     if (dd$option<3){
         A0 <- dd$U48 - 1
         B0 <- dd$Th0U8 - 1
-        C0 <- dd$Ra6U8 - 1    
+        C0 <- dd$Ra6U8 - 1
         l6 <- settings('lambda','Ra226')[1]*1000
         l0 <- settings('lambda','Th230')[1]*1000
         l4 <- settings('lambda','U234')[1]*1000
