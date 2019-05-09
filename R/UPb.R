@@ -611,7 +611,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         sl5 <- lambda('U235')[2]
         if (x>-1) t.75 <- log(1+x)/l5 else t.75 <- 0
         J <- matrix(0,1,2)
-        if (d$corr){
+        if (d$option%in%c(1,2)){
             dt <- 0.01/settings('lambda','U234')[1]
             search.range <- c(t.75-dt,t.75+dt)
             t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
@@ -664,7 +664,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         sl8 <- lambda('U238')[2]
         if (x>-1) t.init <- log(1+x)/l8 else t.init <- 0
         J <- matrix(0,1,2)
-        if (d$corr){
+        if (d$option%in%c(1,2)){
             t.68 <- tryCatch({
                 dt <- 0.01/settings('lambda','U234')[1]
                 search.range <- c(t.init-dt,t.init+dt)
