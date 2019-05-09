@@ -55,6 +55,10 @@ concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,d=diseq()
         midpoint <- stats::optimize(intersection.misfit.york,
                                     search.range,a=a,b=b,d=d)$minimum
         search.range[2] <- midpoint
+        if (intersection.misfit.york(search.range[1],a=a,b=b,d=d)*
+            intersection.misfit.york(search.range[2],a=a,b=b,d=d)>0)
+            stop("Can't find the lower intercept age. ",
+                 "Check your disequilibrium settings.")
         out['t[l]'] <- stats::uniroot(intersection.misfit.york,
                                       interval=search.range,a=a,b=b,d=d)$root
         if (wetherill){
