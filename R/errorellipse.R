@@ -106,8 +106,8 @@ scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
         plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
     graphics::box()
-    haslevels <- !all(is.na(levels))
-    if (show.ellipses==2 && all(is.na(levels))){
+    nolevels <- all(is.na(levels))
+    if (show.ellipses==2 && nolevels){
         colour <- rep('black',ns)
     } else {
         colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
@@ -145,7 +145,7 @@ scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                          code=3,angle=90,
                          length=0.05,col=colour)
     }
-    if (haslevels & addcolourbar){
+    if (!nolevels & addcolourbar){
         colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
     }
 }
