@@ -8,10 +8,11 @@
 #' that are subsequently passed on to the \code{read.data} function
 #' for incorporation in other functions.
 #'
-#' @details There are three ways to correct for the initial
-#'     disequilibrium between the activity of \eqn{{}^{238}}U,
-#'     \eqn{{}^{234}}Th, \eqn{{}^{230}}Th, and \eqn{{}^{226}}Ra; or
-#'     between \eqn{{}^{235}}U and \eqn{{}^{231}}Pa:
+#' @details
+#' There are three ways to correct for the initial disequilibrium
+#' between the activity of \eqn{{}^{238}}U, \eqn{{}^{234}}Th,
+#' \eqn{{}^{230}}Th, and \eqn{{}^{226}}Ra; or between \eqn{{}^{235}}U
+#' and \eqn{{}^{231}}Pa:
 #'
 #' \enumerate{
 #' 
@@ -30,7 +31,7 @@
 #'
 #' }
 #' 
-#' @param option of four options:
+#' @param option one of four options:
 #'
 #' \describe{
 #' 
@@ -49,31 +50,42 @@
 #' 
 #' @param Th0U8 the \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
 #'     (initial if \code{option=1} or measured if \code{option=2}).
+#' 
 #' @param Ra6U8 the \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
 #'     (initial if \code{option=1} or measured if \code{option=2}).
+#' 
 #' @param Pa1U5 the \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
 #'     (initial if \code{option=1} or measured if \code{option=2}).
+#' 
 #' @param fThU the Th/U fractionation factor between the mineral (m)
 #'     and the magma (M): \code{fThU} = (Th/U)\eqn{_m}/(Th/U)\eqn{_M}.
+#' 
 #' @param fRaU the Ra/U fractionation factor between the mineral (m)
 #'     and the magma (M): \code{fRaU} = (Ra/U)\eqn{_m}/(Ra/U)\eqn{_M}.
+#' 
 #' @param fPaU the Pa/U fractionation factor between the mineral (m)
 #'     and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.
 #' 
-#' @return an object of class \code{diseq}, i.e. a list with the
-#'     following items: \code{option} and (\code{U48}, \code{Th08},
-#'     \code{Ra6U8}, \code{Pa1U8}) [if \code{option == 1} or
-#'     \code{option == 2}] and (\code{fThU}, \code{RaU}, \code{PaU})
-#'     [if \code{option == 3}].
-#' @references Sch\"{a}rer, U., 1984. The effect of initial
-#'     \eqn{{}^{230}}Th disequilibrium on young UPb ages: the Makalu
-#'     case, Himalaya. Earth and Planetary Science Letters, 67(2),
-#'     pp.191-204.
+#' @return
+#' a list with the following items: \code{option} and (\code{U48},
+#' \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option == 1} or
+#' \code{option == 2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
+#' \code{option == 3}].
+#' 
+#' @examples
+#' d <- diseq(option=3,fThU=2)
+#' fn <- system.file("UPb1.csv",package="IsoplotR")
+#' UPb <- read.data(fn,method='U-Pb',format=1,d=d)
+#' concordia(UPb)
+#' 
+#' @references
+#' Sch\"{a}rer, U., 1984. The effect of initial \eqn{{}^{230}}Th
+#' disequilibrium on young UPb ages: the Makalu case, Himalaya. Earth
+#' and Planetary Science Letters, 67(2), pp.191-204.
 #' 
 #' Wendt, I. and Carl, C., 1985. U/Pb dating of discordant 0.1 Ma old
 #' secondary U minerals. Earth and Planetary Science Letters, 73(2-4),
 #' pp.278-284.
-#' @examples
 #' @export
 diseq <- function(option=0,
                   U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
@@ -89,7 +101,6 @@ diseq <- function(option=0,
         out$fRaU = fRaU
         out$fPaU = fPaU
     }
-    class(out) <- 'diseq'
     out
 }
 

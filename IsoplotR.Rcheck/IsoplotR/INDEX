@@ -9,6 +9,8 @@ central                 Calculate U-Th-He and fission track central
 concordia               Concordia diagram
 data2york               Prepare geochronological data for York
                         regression
+diseq                   Set up U-series disequilibrium correction for
+                        U-Pb geochronology
 ellipse                 Get error ellipse coordinates for plotting
 evolution               Th-U evolution diagram
 examples                Example datasets for testing 'IsoplotR'

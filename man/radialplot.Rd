@@ -130,10 +130,26 @@ different background colours of the plot symbols.}
 
 \item{clabel}{label of the colour legend}
 
-\item{bg}{a vector of two background colours for the plot symbols.
-If \code{levels=NA}, then only the first colour is used. If
-\code{levels} is a vector of numbers, then \code{bg} is used to
-construct a colour ramp.}
+\item{bg}{Fill colour for the plot symbols. This can
+    either be a single colour or multiple colours to form a colour
+    ramp (to be used if \code{levels!=NA}):
+
+\itemize{
+
+\item{a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
+\code{'white'}, etc.}
+
+\item{multiple colours: \code{c(rbg(1,0,0,0.5)},
+\code{rgb(0,1,0,0.5))}, \code{c('#FF000080','#00FF0080')},
+\code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.}
+
+\item{a colour palette: \code{rainbow(n=100)},
+\code{topo.colors(n=100,alpha=0.5)}, etc.}
+
+\item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
+etc.}
+
+}}
 
 \item{col}{text colour to be used if \code{show.numbers=TRUE}}
 

@@ -184,6 +184,29 @@ fit <- york(yorkdat)
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("data2york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("diseq")
+### * diseq
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: diseq
+### Title: Set up U-series disequilibrium correction for U-Pb geochronology
+### Aliases: diseq
+
+### ** Examples
+
+d <- diseq(option=3,fThU=2)
+fn <- system.file("UPb1.csv",package="IsoplotR")
+UPb <- read.data(fn,method='U-Pb',format=1,d=d)
+concordia(UPb)
+
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("diseq", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("ellipse")
 ### * ellipse
 
@@ -412,6 +435,7 @@ data(examples)
 peakfit(examples$FT1,k=2)
 
 peakfit(examples$LudwigMixture,k='min')
+
 
 
 

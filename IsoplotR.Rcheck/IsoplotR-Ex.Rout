@@ -207,6 +207,29 @@ dev.new(): using pdf(file="Rplots2.pdf")
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("data2york", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+> nameEx("diseq")
+> ### * diseq
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: diseq
+> ### Title: Set up U-series disequilibrium correction for U-Pb geochronology
+> ### Aliases: diseq
+> 
+> ### ** Examples
+> 
+> d <- diseq(option=3,fThU=2)
+> fn <- system.file("UPb1.csv",package="IsoplotR")
+> UPb <- read.data(fn,method='U-Pb',format=1,d=d)
+> concordia(UPb)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("diseq", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
 > nameEx("ellipse")
 > ### * ellipse
 > 
@@ -492,6 +515,7 @@ ci[t]   0.5338727
 $legend
 [1] "Minimum: 259.73±0.27 | 0.53"
 
+> 
 > 
 > 
 > 
@@ -792,7 +816,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  13.894 9.401 10.321 0.002 0.002 
+Time elapsed:  19.064 6.097 17.241 0.004 0.003 
 > grDevices::dev.off()
 pdf 
   2 
