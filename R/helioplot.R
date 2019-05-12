@@ -87,6 +87,8 @@
 #' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.}
 #'
+#' \item{for empty ellipses, set \code{ellipse.col=NA}}
+#'
 #' }
 #' @param sigdig number of significant digits for the central age
 #' @param xlim optional limits of the x-axis (log[U/He]) of the

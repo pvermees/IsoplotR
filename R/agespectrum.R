@@ -54,6 +54,8 @@
 #' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.}
 #'
+#' \item{for plot symbols, set \code{plateau.col=NA}}
+#'
 #' }
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
 #'     NOT belong to the plateau are given a different colour.

@@ -138,6 +138,8 @@ weightedmean <- function(x,...){
 #' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.}
 #'
+#' \item{for plot symbols, set \code{rect.col=NA}}
+#'
 #' }
 #' @param outlier.col if \code{detect.outliers=TRUE}, the outliers are
 #'     given a different colour.

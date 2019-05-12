@@ -78,6 +78,8 @@
 #' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.}
 #'
+#' \item{for empty ellipses, set \code{ellipse.col=NA}}
+#'
 #' }
 #' @param line.col colour of the age grid
 #' @param isochron fit a 3D isochron to the data?

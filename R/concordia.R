@@ -68,6 +68,8 @@
 #' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.}
 #'
+#' \item{for empty ellipses, set \code{ellipse.col=NA}}
+#'
 #' }
 #' 
 #' @param concordia.col colour of the concordia line

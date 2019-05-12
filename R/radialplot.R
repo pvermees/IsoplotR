@@ -72,6 +72,8 @@
 #' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.}
 #'
+#' \item{for plot symbols, set \code{bg=NA}}
+#'
 #' }
 #' @param col text colour to be used if \code{show.numbers=TRUE}
 #' @param title add a title to the plot?
