@@ -1,7 +1,5 @@
-#' @title
 #' Finite mixture modelling of geochronological datasets
 #'
-#' @description
 #' Implements the discrete mixture modelling algorithms of Galbraith
 #' and Laslett (1993) and applies them to fission track and other
 #' geochronological datasets.
@@ -13,43 +11,51 @@
 #' s[t_i]/t_i}.  Suppose that these \eqn{n} values are derived from a
 #' mixture of \eqn{k>2} populations with means
 #' \eqn{\{\mu_1,...,\mu_k\}}. Such a \emph{discrete mixture} may be
-#' mathematically described by:
-#' \eqn{P(z_i|\mu,\omega) = \sum_{j=1}^k \pi_j N(z_i | \mu_j, s[z_j]^2 )}
-#' where \eqn{\pi_j} is the proportion of the population that belongs
-#' to the \eqn{j^{th}} component, and
-#' \eqn{\pi_k=1-\sum_{j=1}^{k-1}\pi_j}. This equation can be solved by
-#' the method of maximum likelihood (Galbraith and Laslett, 1993).
-#' \code{IsoplotR} implements the Bayes Information Criterion (BIC) as
-#' a means of automatically choosing \eqn{k}. This option should be
-#' used with caution, as the number of peaks steadily rises with
-#' sample size (\eqn{n}).  If one is mainly interested in the youngest
-#' age component, then it is more productive to use an alternative
-#' parameterisation, in which all grains are assumed to come from one
-#' of two components, whereby the first component is a single discrete
-#' age peak (\eqn{\exp(m)}, say) and the second component is a
-#' continuous distribution (as descibed by the \code{\link{central}}
-#' age model), but truncated at this discrete value (Van der Touw et
-#' al., 1997).
+#' mathematically described by: \eqn{P(z_i|\mu,\omega) = \sum_{j=1}^k
+#' \pi_j N(z_i | \mu_j, s[z_j]^2 )} where \eqn{\pi_j} is the
+#' proportion of the population that belongs to the \eqn{j^{th}}
+#' component, and \eqn{\pi_k=1-\sum_{j=1}^{k-1}\pi_j}. This equation
+#' can be solved by the method of maximum likelihood (Galbraith and
+#' Laslett, 1993).  \code{IsoplotR} implements the Bayes Information
+#' Criterion (BIC) as a means of automatically choosing \eqn{k}. This
+#' option should be used with caution, as the number of peaks steadily
+#' rises with sample size (\eqn{n}).  If one is mainly interested in
+#' the youngest age component, then it is more productive to use an
+#' alternative parameterisation, in which all grains are assumed to
+#' come from one of two components, whereby the first component is a
+#' single discrete age peak (\eqn{\exp(m)}, say) and the second
+#' component is a continuous distribution (as descibed by the
+#' \code{\link{central}} age model), but truncated at this discrete
+#' value (Van der Touw et al., 1997).
 #'
 #' @param x either an \code{[n x 2]} matrix with measurements and
 #'     their standard errors, or an object of class
 #'     \code{fissiontracks}, \code{UPb}, \code{PbPb}, \code{ArAr},
 #'     \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{LuHf},
 #'     \code{ThU} or \code{UThHe}
+#' 
 #' @param k the number of discrete age components to be
 #'     sought. Setting this parameter to \code{'auto'} automatically
 #'     selects the optimal number of components (up to a maximum of 5)
 #'     using the Bayes Information Criterion (BIC).
+#' 
 #' @param exterr propagate the external sources of uncertainty into
 #'     the component age errors?
+#' 
 #' @param sigdig number of significant digits to be used for any
 #'     legend in which the peak fitting results are to be displayed.
+#' 
 #' @param log take the logs of the data before applying the mixture
 #'     model?
+#' 
 #' @param alpha cutoff value for confidence intervals
+#' 
 #' @param ... optional arguments (not used)
+#' 
 #' @seealso \code{\link{radialplot}}, \code{\link{central}}
-#' @return Returns a list with the following items:
+#' 
+#' @return
+#' Returns a list with the following items:
 #'
 #' \describe{
 #'
@@ -75,6 +81,13 @@
 #'     legend}
 #'
 #' }
+#' 
+#' @examples
+#' data(examples)
+#' peakfit(examples$FT1,k=2)
+#'
+#' peakfit(examples$LudwigMixture,k='min')
+#' 
 #' @references
 #' Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
 #' mixed fission track ages. Nuclear Tracks and Radiation
@@ -84,11 +97,7 @@
 #' truncated normal mixture model for overdispersed binomial
 #' data. Journal of Statistical Computation and Simulation,
 #' 59(4):349-373, 1997.
-#' @examples
-#' data(examples)
-#' peakfit(examples$FT1,k=2)
-#'
-#' peakfit(examples$LudwigMixture,k='min')
+#' 
 #' @rdname peakfit
 #' @export
 peakfit <- function(x,...){ UseMethod("peakfit",x) }

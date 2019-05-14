@@ -19,8 +19,8 @@
 age(x, ...)
 
 \method{age}{default}(x, method = "U238-Pb206", exterr = TRUE,
-  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), U48 = 1,
-  Th0U8 = 1, Ra6U8 = 1, Pa1U5 = 1, ...)
+  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), d = diseq(),
+  ...)
 
 \method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE,
   i = NA, sigdig = NA, common.Pb = 0, show.p = FALSE, ...)
@@ -120,21 +120,7 @@ error.}
 \item{rhoD}{two-element vector with the track density of the
 dosimeter glass and its standard error.}
 
-\item{U48}{the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratio
-(only used if \code{method='U238-Pb206'}, \code{'U238-Pb206'}
-or \code{'Pb207-Pb206'}).}
-
-\item{Th0U8}{the initial \eqn{^{230}}Th/\eqn{^{238}}U-activity
-ratio (only used if \code{method='U238-Pb206'},
-\code{'U238-Pb206'} or \code{'Pb207-Pb206'}).}
-
-\item{Ra6U8}{the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity
-ratio (only used if \code{method='U238-Pb206'},
-\code{'U238-Pb206'} or \code{'Pb207-Pb206'}).}
-
-\item{Pa1U5}{the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity
-ratio (only used if \code{method='U238-Pb206'},
-\code{'U238-Pb206'} or \code{'Pb207-Pb206'}).}
+\item{d}{an object of class \code{\link{diseq}}.}
 
 \item{type}{scalar flag indicating whether
 

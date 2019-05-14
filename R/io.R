@@ -176,15 +176,13 @@
 #' 
 #' }
 #'
-#' @param U48 the initial \eqn{^{234}}U/\eqn{^{238}}U-activity ratio
-#' @param Th0U8 the initial \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
-#' @param Ra6U8 the initial \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
-#' @param Pa1U5 the initial \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
+#' @param d an object of class \code{\link{diseq}}.
 #' 
 #' @param Th02 2-element vector with the assumed initial
 #'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
 #'     standard error. Only used if \code{isochron==FALSE} and
-#'     \code{detritus==2} 
+#'     \code{detritus==2}
+#' 
 #' @param Th02U48 9-element vector with the measured composition of
 #'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
 #'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
@@ -241,31 +239,25 @@
 read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
-read.data.default <- function(x,method='U-Pb',format=1,ierr=1,
-                              U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
+read.data.default <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                               Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
-    read.data.matrix(X,method=method,format=format,ierr=ierr,
-                     U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,
+    read.data.matrix(X,method=method,format=format,ierr=ierr,d=d,
                      Th02=Th02,Th02U48=Th02U48)
 }
 #' @rdname read.data
 #' @export
-read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,
-                                 U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
+read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                                  Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
-    read.data.matrix(as.matrix(x),method=method,format=format,ierr=ierr,
-                     U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5,
-                     Th02=Th02,Th02U48=Th02U48,...)
+    read.data.matrix(as.matrix(x),method=method,format=format,
+                     ierr=ierr,d=d,Th02=Th02,Th02U48=Th02U48,...)
 }
 #' @rdname read.data
 #' @export
-read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,
-                             U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
+read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                              Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (identical(method,'U-Pb')){
-        out <- as.UPb(x,format=format,ierr=ierr,
-                      U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+        out <- as.UPb(x,format=format,ierr=ierr,d=d)
     } else if (identical(method,'Pb-Pb')){
         out <- as.PbPb(x,format=format,ierr=ierr)
     } else if (identical(method,'Ar-Ar')){
@@ -294,12 +286,12 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,
     out
 }
 
-as.UPb <- function(x,format=3,ierr=1,U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1){
+as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     out <- list()
     class(out) <- "UPb"
     out$x <- NA
     out$format <- format
-    out$d <- diseq(U48=U48,Th0U8=Th0U8,Ra6U8=Ra6U8,Pa1U5=Pa1U5)
+    out$d <- d
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
