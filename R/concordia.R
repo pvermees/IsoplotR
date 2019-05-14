@@ -38,19 +38,7 @@
 #' @param alpha probability cutoff for the error ellipses and
 #'     confidence intervals
 #' 
-#' @param type one of either: \enumerate{
-#'
-#' \item{\code{'wetherill'}: \eqn{{}^{206}}Pb/\eqn{{}^{238}}U
-#' vs. \eqn{{}^{207}}Pb/\eqn{{}^{235}}U.}
-#'
-#' \item{\code{'tera-wasserburg'}: \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb
-#' vs. \eqn{{}^{238}}U/\eqn{{}^{206}}Pb.}
-#'
-#' \item{\code{'U-Th-Pb'}: \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th
-#' vs. \eqn{{}^{206}}Pb/\eqn{{}^{238}}U (only available if
-#' \code{x$format>6}).}
-#' 
-#' }
+#' @param wetherill logical flag (\code{FALSE} for Tera-Wasserburg)
 #' 
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
@@ -208,8 +196,9 @@
 #' \item{model}{ the fitting model (\code{=show.age-1}).}
 #'
 #' \item{x}{ a two-element vector with the upper and lower intercept
-#' ages (if \code{type=1}) or the lower intercept age and
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (if \code{type=2}).}
+#' ages (if \code{wetherill=TRUE}) or the lower intercept age and
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (if
+#' \code{wetherill=FALSE}).}
 #'
 #' \item{cov}{ the covariance matrix of the elements in \code{x}.}
 #'
@@ -250,18 +239,18 @@
 #' concordia(examples$UPb,show.age=2)
 #'
 #' dev.new()
-#' concordia(examples$UPb,type=2,
+#' concordia(examples$UPb,wetherill=FALSE,
 #'           xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
 #'           ticks=249:254,exterr=TRUE)
 #'
 #' dev.new()
-#' concordia(examples$UPb,type=2,show.age=2,anchor=list(TRUE,0))
+#' concordia(examples$UPb,wetherill=FALSE,show.age=2,anchor=list(TRUE,0))
 #'
 #' @references Ludwig, K.R., 1998. On the treatment of concordant
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
 #'     pp.665-676.
 #' @export
-concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
+concordia <- function(x=NULL,tlim=NULL,alpha=0.05,wetherill=TRUE,
                       show.numbers=FALSE,levels=NA,clabel="",
                       ellipse.col=c("#00FF0080","#FF000080"),
                       concordia.col='darksalmon',exterr=FALSE,
@@ -269,7 +258,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
     if (is.null(x)){
-        emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
+        emptyconcordia(tlim=tlim,alpha=alpha,wetherill=wetherill,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
         return(invisible(NULL))
     }
@@ -279,27 +268,26 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     if (common.Pb<1) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
-    lims <- prepare.concordia.line(X2plot,tlim=tlim,type=type,...)
+    lims <- prepare.concordia.line(X2plot,tlim=tlim,wetherill=wetherill,...)
     fit <- NULL
     if (show.age>1){
         x2calc <- subset(x,subset=calcit)
-        fit <- concordia.intersection.ludwig(x2calc,type=type,exterr=exterr,
-                                             alpha=alpha,model=(show.age-1),
-                                             anchor=anchor)
-        discordia.line(fit,type=type,d=x$d)
+        fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,exterr=exterr,
+                                             alpha=alpha,model=(show.age-1),anchor=anchor)
+        discordia.line(fit,wetherill=wetherill,d=x$d)
         fit$n <- length(x2calc)
-        graphics::title(discordia.title(fit,type=type,sigdig=sigdig))
+        graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }
-    plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
+    plot.concordia.line(X2plot,lims=lims,wetherill=wetherill,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
-    y <- data2york(X,option=type)
+    y <- data2york(X,option=(2-1*wetherill))
     scatterplot(y,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,add=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
-        fit <- concordia.age(X2calc,type=type,exterr=exterr,alpha=alpha)
+        fit <- concordia.age(X2calc,wetherill=wetherill,exterr=exterr,alpha=alpha)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
         fit$n <- length(X2calc)
@@ -310,7 +298,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
 }
 
 # helper function for plot.concordia
-plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
+plot.concordia.line <- function(x,lims,wetherill=TRUE,col='darksalmon',
                                 alpha=0.05,exterr=TRUE,ticks=5){
     if (all(is.null(x$x))){
         m <- 0
@@ -321,11 +309,11 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
     }
     nn <- 30 # number of segments into which the concordia line is divided
-    tt <- cseq(m,M,type=type,n=nn)
+    tt <- cseq(m,M,wetherill=wetherill,n=nn)
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
     for (i in 1:nn){ # build the concordia line
-        xy <- age_to_concordia_ratios(tt[i],type=type,exterr=exterr,d=x$d)
+        xy <- age_to_concordia_ratios(tt[i],wetherill=wetherill,exterr=exterr,d=x$d)
         if (exterr){ # show decay constant uncertainty
             if (i > 1) oldell <- ell
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
@@ -338,10 +326,10 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         conc[i,] <- xy$x
     }
     if (length(ticks)<2)
-        ticks <- prettier(lims$t,type=type,n=ticks)
+        ticks <- prettier(lims$t,wetherill=wetherill,n=ticks)
     graphics::lines(conc[,'x'],conc[,'y'],col=col,lwd=2)
     for (i in 1:length(ticks)){
-        xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=x$d)
+        xy <- age_to_concordia_ratios(ticks[i],wetherill=wetherill,exterr=exterr,d=x$d)
         if (exterr){ # show ticks as ellipse
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
             graphics::polygon(ell,col='white')
@@ -349,30 +337,27 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
             graphics::points(xy$x[1],xy$x[2],pch=21,bg='white')
         }
         pos <- 2
-        if ((type!=2  & diff(range(conc[,'x']))<0.05) |
-            (type==2 & diff(range(conc[,'x']))<2.5) & exterr){ pos <- NULL }
+        if ((wetherill  & diff(range(conc[,'x']))<0.05) |
+            (!wetherill & diff(range(conc[,'x']))<2.5) & exterr){ pos <- NULL }
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
     graphics::box()
 }
 # helper function for plot.concordia
-prepare.concordia.line <- function(x,tlim,type=1,...){
-    lims <- get.concordia.limits(x,tlim=tlim,type=type,...)
-    if (type==1){
+prepare.concordia.line <- function(x,tlim,wetherill=TRUE,...){
+    lims <- get.concordia.limits(x,tlim=tlim,wetherill=wetherill,...)
+    if (wetherill){
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
-    } else if (type==2){
+    } else {
         x.lab <- expression(paste(""^"238","U/"^"206","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
-    } else if (type==3){
-        x.lab <- expression(paste(""^"206","Pb/"^"238","U"))
-        y.lab <- expression(paste(""^"208","Pb/"^"232","Th"))
     }
     graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
     lims
 }
-cseq <- function(m,M,type=1,n=50){
-    if (type==1){
+cseq <- function(m,M,wetherill=TRUE,n=50){
+    if (wetherill){
         return(seq(m,M,length.out=n))
     }
     if (m>0){
@@ -383,9 +368,9 @@ cseq <- function(m,M,type=1,n=50){
     out[out<=0] <- min(out[out>0])/10
     out
 }
-prettier <- function(x,type=1,n=5){
+prettier <- function(x,wetherill=TRUE,n=5){
     pilot <- pretty(x,n=n)
-    if (type==1){
+    if (wetherill){
         return(pilot)
     }
     m <- min(x)
@@ -393,7 +378,7 @@ prettier <- function(x,type=1,n=5){
     if (M/m < 50){ # linear spacing if spanning less than 1 order of magnitude
         out <- pilot
     } else { # log spaced if spanning more than 1 order of magnitude
-        out <- cseq(m,M,type=type,n=n)
+        out <- cseq(m,M,wetherill=wetherill,n=n)
         init <- out
         out[1] <- pilot[1]
         out[n] <- utils::tail(pilot,1)
@@ -404,13 +389,11 @@ prettier <- function(x,type=1,n=5){
     out[out<=0] <- min(out[out>0])/2
     out
 }
-age_to_concordia_ratios <- function(tt,type=1,exterr=FALSE,d=diseq()){
-    if (type==1)
-        return(age_to_wetherill_ratios(tt,exterr=exterr,d=d))
-    else if (type==2)
-        return(age_to_terawasserburg_ratios(tt,exterr=exterr,d=d))
+age_to_concordia_ratios <- function(tt,wetherill=TRUE,exterr=FALSE,d=diseq()){
+    if (wetherill) return(age_to_wetherill_ratios(tt,exterr=exterr,d=d))
+    else return(age_to_terawasserburg_ratios(tt,exterr=exterr,d=d))
 }
-get.concordia.limits <- function(x,tlim=NULL,type=1,...){
+get.concordia.limits <- function(x,tlim=NULL,wetherill=FALSE,...){
     out <- list()
     args <- list(...)
     xset <- ('xlim' %in% names(args))
@@ -432,10 +415,10 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
     if (is.null(tlim)) out$t <- c(0,0)
     else out$t <- tlim
     nse <- 3 # number of standard errors used for buffer
-    if (!is.null(tlim) && type==1){
+    if (!is.null(tlim) && wetherill){
         if (!xset) out$x <- age_to_Pb207U235_ratio(tlim,d=x$d)[,'75']
         if (!yset) out$y <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
-    } else if (!is.null(tlim) && type==2){
+    } else if (!is.null(tlim) && !wetherill){
         if (tlim[1] <= 0){
             U238Pb206 <- get.U238Pb206.ratios(x)
             if (xset) maxx <- out$x[2]
@@ -444,7 +427,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
         }
         if (!xset) out$x <- age_to_U238Pb206_ratio(out$t,d=x$d)[,'86']
         if (!yset) out$y <- age_to_Pb207Pb206_ratio(out$t,d=x$d)[,'76']
-    } else if (is.null(tlim) && type==1) {
+    } else if (is.null(tlim) && wetherill) {
         if (!xset){
             Pb207U235 <- get.Pb207U235.ratios(x)
             minx <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
@@ -467,7 +450,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
         }
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
-    } else if (is.null(tlim) && type==2){
+    } else if (is.null(tlim) && !wetherill){
         U238Pb206 <- get.U238Pb206.ratios(x)
         Pb207Pb206 <- get.Pb207Pb206.ratios(x)
         if (!xset){
@@ -514,10 +497,10 @@ concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
 concordia.age.default <- function(x,...){
     stop("no default method implemented for concordia.age()")
 }
-concordia.age.UPb <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
+concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
     if (is.na(i)){
-        ccw <- concordia.comp(x,type=1)
-        cct <- concordia.comp(x,type=2)
+        ccw <- concordia.comp(x,wetherill=TRUE)
+        cct <- concordia.comp(x,wetherill=FALSE)
     } else {
         ccw <- wetherill(x,i)
         cct <- tera.wasserburg(x,i)
@@ -533,8 +516,8 @@ concordia.age.UPb <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
         out$age['ci[t]'] <- tfact*out$age['s[t]']
         if (out$mswd['combined']>1)
             out$age['disp[t]'] <- tfact*out$mswd['combined']*out$age['s[t]']
-        if (type==1) cc <- ccw
-        else if (type==2) cc <- cct
+        if (wetherill) cc <- ccw
+        else cc <- cct
         out$x <- cc$x
         out$cov <- cc$cov
     } else {
@@ -558,16 +541,14 @@ concordia.age.wetherill <- function(x,d=diseq(),exterr=FALSE,...){
 }
 
 # x has class 'UPb'
-concordia.comp <- function(x,type=1){
-    X <- flat.UPb.table(x,type=type)
+concordia.comp <- function(x,wetherill=TRUE){
+    X <- flat.UPb.table(x,wetherill=wetherill)
     out <- wtdmean2D(X)
     cnames <- colnames(X)[c(1,3)]
     names(out$x) <- cnames
     colnames(out$cov) <- cnames
-    if (type==1)
-        class(out) <- 'wetherill'
-    else if (type==2)
-        class(out) <- 'terawasserburg'
+    if (wetherill) class(out) <- 'wetherill'
+    else class(out) <- 'terawasserburg'
     out
 }
 
@@ -587,7 +568,7 @@ initial.concordia.age <- function(x,d=diseq()){
 
 mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
     SS.equivalence <- 
-        LL.concordia.comp(mu=ccw$x,x=x,type=1,mswd=TRUE)
+        LL.concordia.comp(mu=ccw$x,x=x,wetherill=TRUE,mswd=TRUE)
     SS.concordance <- 
         LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr,d=x$d)
     df.equivalence <- 2*length(x)-2
@@ -618,13 +599,11 @@ mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
     list(mswd=mswd,p.value=p.value,df=df)
 }
 
-LL.concordia.comp <- function(mu,x,type=1,mswd=FALSE,...){
+LL.concordia.comp <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
     out <- 0
     for (i in 1:length(x)){
-        if (type==1)
-            xi <- wetherill(x,i)
-        else if (type==2)
-            xi <- tera.wasserburg(x,i)
+        if (wetherill) xi <- wetherill(x,i)
+        else xi <- tera.wasserburg(x,i)
         X <- matrix(xi$x[1:2]-mu[1:2],1,2)
         covmat <- xi$cov[1:2,1:2]
         if (mswd) out <- out + get.concordia.SS(X,covmat)
@@ -654,28 +633,23 @@ get.concordia.SS <- function(x,covmat){
     x %*% solve(covmat) %*% t(x)
 }
 
-emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
+emptyconcordia <- function(tlim=NULL,alpha=0.05,wetherill=TRUE,exterr=TRUE,
                            concordia.col='darksalmon',ticks=5,...){
-    if (is.null(tlim) && type==1) tlim <- c(1,3500)
+    if (is.null(tlim) && wetherill) tlim <- c(1,3500)
     else if (is.null(tlim)) tlim <- c(100,3500)
     dat <- list()
     class(dat) <- 'UPb'
     dat$d <- diseq()
-    if (type==1){
-        dat$x <- rbind(c(age_to_Pb207U235_ratio(tlim[1]),
-                         age_to_Pb206U238_ratio(tlim[1]),0),
-                       c(age_to_Pb207U235_ratio(tlim[1]),
-                         age_to_Pb206U238_ratio(tlim[1]),0))
+    if (wetherill){
+        dat$x <- rbind(c(age_to_Pb207U235_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1]),0),
+                       c(age_to_Pb207U235_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1]),0))
         dat$format <- 1
-    } else if (type==2){
-        dat$x <- rbind(c(age_to_U238Pb206_ratio(tlim[1]),
-                         age_to_Pb207Pb206_ratio(tlim[1])),
-                       c(age_to_U238Pb206_ratio(tlim[1]),
-                         age_to_Pb207Pb206_ratio(tlim[1])))
+    } else {
+        dat$x <- rbind(c(age_to_U238Pb206_ratio(tlim[1]),age_to_Pb207Pb206_ratio(tlim[1])),
+                       c(age_to_U238Pb206_ratio(tlim[1]),age_to_Pb207Pb206_ratio(tlim[1])))
         dat$format <- 2
     }
-    lims <- prepare.concordia.line(x=dat,tlim=tlim,type=type,...)
-    plot.concordia.line(x=dat,lims=lims,type=type,
-                        col=concordia.col,alpha=alpha,
-                        exterr=exterr,ticks=ticks)
+    lims <- prepare.concordia.line(x=dat,tlim=tlim,wetherill=wetherill,...)
+    plot.concordia.line(x=dat,lims=lims,wetherill=wetherill,
+                        col=concordia.col,alpha=alpha,exterr=exterr,ticks=ticks)
 }

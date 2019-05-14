@@ -129,7 +129,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @param wetherill logical flag to indicate whether the data should
 #'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
 #'     (\code{FALSE}) space.  This option is only used when
-#'     \code{type=2}
+#'     \code{type>1}
 #' @param sigdig number of significant digits for the uncertainty
 #'     estimate (only used if \code{type=1}, \code{isochron=FALSE} and
 #'     \code{central=FALSE}).
