@@ -234,10 +234,10 @@ data2york.UPb <- function(x,option=1,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('X','sX','Y','sY','rXY')
-    if (option==1 && x$format %in% c(1,3,4)){
+    if (option==1 && x$format %in% c(1,3,4,7)){
         out <- subset(x$x,select=c('Pb207U235','errPb207U235',
                                    'Pb206U238','errPb206U238','rhoXY'))
-    } else if (option==1 && x$format %in% c(2,5,6)){
+    } else if (option==1 && x$format %in% c(2,5,6,8)){
         for (i in 1:ns){
             samp <- wetherill(x,i=i)
             out[i,1] <- samp$x['Pb207U235']
@@ -246,10 +246,10 @@ data2york.UPb <- function(x,option=1,...){
             out[i,4] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
             out[i,5] <- stats::cov2cor(samp$cov[1:2,1:2])[1,2]
         }
-    } else if (option==2 && x$format %in% c(2,5)){
+    } else if (option==2 && x$format %in% c(2,5,8)){
         out <- subset(x$x,select=c('U238Pb206','errU238Pb206',
                                    'Pb207Pb206','errPb207Pb206','rhoXY'))
-    } else if (option==2 && x$format %in% c(1,3,4,6)){
+    } else if (option==2 && x$format %in% c(1,3,4,6,7)){
         for (i in 1:ns){
             samp <- tera.wasserburg(x,i=i)
             out[i,1] <- samp$x['U238Pb206']

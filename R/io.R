@@ -349,8 +349,8 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb206U238','errPb206U238',
                     'Pb208Th232','errPb208Th232',
                     'Th232U238','errTh232U238',
-                    'rhoWX','rhoWY','rhoWZ',
-                    'rhoXY','rhoXZ','rhoYZ')
+                    'rhoXY','rhoXZ','rhoXW',
+                    'rhoYZ','rhoYW','rhoZW')
         if (nc < 14) # pad with zeros as necessary
             X <- cbind(X,matrix(0,nr-1,14-nc))
     } else if (format==8 & nc>7){
@@ -358,8 +358,8 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb207Pb206','errPb207Pb206',
                     'Pb208Pb206','errPb208Pb206',
                     'Th232U238','errTh232U238',
-                    'rhoWX','rhoWY','rhoWZ',
-                    'rhoXY','rhoXZ','rhoYZ')
+                    'rhoXY','rhoXZ','rhoXW',
+                    'rhoYZ','rhoYW','rhoZW')
         if (nc < 14) # pad with zeros as necessary
             X <- cbind(X,matrix(0,nr-1,14-nc))        
     }
