@@ -212,19 +212,22 @@ data2york.default <- function(x,format=1,...){
 #'
 #' \enumerate{
 #'
-#' \item Wetherill concordia ratios: \code{X=7/5}, \code{sX=s[7/5]},
-#'     \code{Y=6/8}, \code{sY=s[6/8]}, \code{rXY}.
+#' \item Wetherill concordia ratios: \code{X=07/35}, \code{sX=s[07/35]},
+#'     \code{Y=06/38}, \code{sY=s[06/38]}, \code{rXY}.
 #'
-#' \item Tera-Wasserburg ratios: \code{X=8/6}, \code{sX=s[8/6]},
-#'     \code{Y=7/6}, \code{sY=s[7/6]}, \code{rho=rXY}.
+#' \item Tera-Wasserburg ratios: \code{X=08/06}, \code{sX=s[08/06]},
+#'     \code{Y=07/06}, \code{sY=s[07/06]}, \code{rho=rXY}.
 #'
-#' \item \code{X=4/6}, \code{sX=s[4/6]}, \code{Y=8/6},
-#'     \code{sY=s[8/6]}, \code{rho=rXY} (only valid if \code{format >
-#'     3}).
+#' \item \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=08/06},
+#'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{format=4,5,6}).
 #'
-#' \item \code{X=4/7}, \code{sX=s[4/7]}, \code{Y=5/7},
-#'     \code{sY=s[5/7]}, \code{rho=rXY} (only valid if \code{format >
-#'     3}).
+#' \item \code{X=04/07}, \code{sX=s[04/07]}, \code{Y=05/07},
+#'     \code{sY=s[05/07]}, \code{rho=rXY} (only valid if
+#'     \code{format=4,5,6}).
+#'
+#' \item \code{X=08/32}, \code{sX=s[08/32]}, \code{Y=06/38},
+#'     \code{sY=s[06/38]}, \code{rho=rXY} (only valid if
+#'     \code{format=8,9}). 
 #' 
 #' }
 #'
@@ -340,7 +343,21 @@ data2york.UPb <- function(x,option=1,...){
         err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
         out[,2] <- sqrt(err[,1])
         out[,4] <- sqrt(err[,2])
-        out[,5] <- err[,3]/(out[,2]*out[,4])        
+        out[,5] <- err[,3]/(out[,2]*out[,4])
+    } else if (option==5 && x$format==7){
+        out <- subset(x$x,select=c('Pb208Th232','errPb208Th232',
+                                   'Pb206U238','errPb206U238','rhoYZ'))
+    } else if (option==5 && x$format==8){
+        for (i in 1:ns){
+            samp <- wetherill(x,i=i)
+            out[i,1] <- samp$x['Pb208Th232']
+            out[i,2] <- sqrt(samp$cov['Pb208Th232','Pb208Th232'])
+            out[i,3] <- samp$x['Pb206U238']
+            out[i,4] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
+            out[i,5] <- stats::cov2cor(samp$cov[1:2,1:2])[1,2]
+        }
+    } else {
+        stop('Incompatible input format and concordia type.')
     }
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out

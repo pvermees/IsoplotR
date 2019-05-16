@@ -447,6 +447,30 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     colnames(out$cov) <- labels
     out
 }
+age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
+    out <- list()
+    labels <- c('Pb208Th232','Pb206U238')
+    l8 <- settings('lambda','U238')[1]
+    l2 <- settings('lambda','Th232')[1]
+    D <- wendt(tt=tt,d=d)
+    Pb8Th2 <- exp(l2*tt)-1
+    Pb6U8 <- exp(l8*tt)-1 + D$d2
+    out$x <- c(Pb8Th2,Pb6U8)
+    E <- matrix(0,3,3)
+    diag(E) <- c(st,lambda('Th232')[2],lambda('U238')[2])^2
+    J <- matrix(0,2,3)
+    J[1,1] <- l2*exp(l2*tt)
+    J[2,1] <- l8*exp(l8*tt) + D$dd2dt
+    if (exterr){
+        J[1,2] <- tt*exp(l2*tt)
+        J[2,3] <- tt*exp(l8*tt) + D$dd2dl8
+    }
+    out$cov <- J %*% E %*% t(J)
+    names(out$x) <- labels
+    rownames(out$cov) <- labels
+    colnames(out$cov) <- labels
+    out
+}
 
 age_to_Pb207U235_ratio <- function(tt,st=0,d=diseq()){
     ns <- length(tt)
@@ -540,6 +564,27 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0,d=diseq()){
     }
     out
 }
+age_to_Pb208Th232_ratio <- function(tt,st=0){
+    ns <- length(tt)
+    if (ns>1){
+        out <- matrix(0,ns,2)
+        colnames(out) <- c('82','s[82]')
+        for (i in 1:ns){
+            if (length(st)<ns) sti <- st[1]
+            else sti <- st[i]
+            out[i,] <- age_to_Pb208Th232_ratio(tt[i],st=sti)
+        }
+    } else {
+        l2 <- lambda('Th232')[1]
+        R <- exp(l2*tt)-1
+        J <- l2*exp(l2*tt)
+        R.err <- abs(J*st)
+        out <- cbind(R,R.err)
+        colnames(out) <- c('82','s[82]')
+    }
+    out    
+}
+
 check.zero.UPb <- function(tt){
     smallnum <- 2*.Machine$double.neg.eps/lambda('U238')[1]
     if (length(tt)>1){
@@ -638,6 +683,28 @@ get.Pb207Pb206.ratios <- function(x,exterr=FALSE){
         out[,'errPb207Pb206'] <- sqrt(relerr2)*out[,'Pb207Pb206']
     } else if (x$format %in% c(2,3,5,6,8)){
         out <- subset(x$x,select=labels)
+    }
+    out
+}
+get.Pb208Th232.ratios <- function(x){
+    ns <- length(x)
+    out <- matrix(0,ns,2)
+    labels <- c('Pb208Th232','errPb208Th232')
+    colnames(out) <- labels
+    if (x$format == 7){
+        out <- subset(x$x,select=labels)
+    } else if (x$format == 8){
+        out[,'Pb208Th232'] <- x$x[,'Pb208Pb206']/(x$x[,'U238Pb206']*x$x[,'Th232U238'])
+        J1 <- -out[,'Pb208Th232']/x$x[,'U238Pb206']
+        J2 <- 1/(x$x[,'U238Pb206']*x$x[,'Th232U238'])
+        J3 <- -out[,'Pb208Th232']/x$x[,'Th232U238']
+        E <- cor2cov3(sX=x$x[,'U238Pb206'],sY=x$x[,'Pb208Pb206'],
+                      sZ=x$x[,'Th232U238'],rXY=x$x[,'rXZ'],
+                      rXZ=x$x[,'rXW'],rYZ=x$x[,'rZW'])
+        out[,'errPb206U238'] <- errorprop1x3(J1,J2,J3,E[1,1],E[2,2],E[3,3],
+                                             E[1,2],E[1,3],E[2,3])
+    } else {
+        stop('Wrong input format: no Pb208 or Th232 present in this dataset.')
     }
     out
 }
@@ -823,6 +890,49 @@ get.Pb207Pb206.age.terawasserburg <- function(x,exterr=TRUE,...){
     r76 <- x$x['Pb207Pb206']
     sr76 <- x$cov['Pb207Pb206','Pb207Pb206']
     get.Pb207Pb206.age(r76,sr76,exterr=exterr,d=x$d)
+}
+
+get.Pb208Th232.age <- function(x,...){ UseMethod("get.Pb208Th232.age",x) }
+get.Pb208Th232.age.default <- function(x,sx=0,exterr=TRUE,...){
+    ns <- length(x)
+    if (ns>1){
+        out <- matrix(0,ns,2)
+        colnames(out) <- c('t82','s[t82]')
+        for (i in 1:ns){
+            if (length(sx) < ns) sxi <- sx[1]
+            else sxi <- sx[i]
+            out[i,] <- get.Pb208Th232.age(x[i],sxi,exterr=exterr)
+        }
+    } else {
+        l2 <- lambda('Th232')[1]
+        sl2 <- lambda('Th232')[2]
+        if (x>-1) t.init <- log(1+x)/l2 else t.init <- 0
+        J <- matrix(0,1,2)
+        t.82 <- t.init
+        J[1,1] <- 1/(l2*(1+x))                       # dt/dx
+        if (exterr & x>-1) J[1,2] <- log(1+x)/l2^2   # dt/dl2
+        E <- matrix(0,2,2)
+        E[1,1] <- sx^2
+        E[2,2] <- sl2^2
+        st.82 <- sqrt(J %*% E %*% t(J))
+        out <- c(t.82,st.82)
+        names(out) <- c('t82','s[t82]')
+    }
+    out
+}
+get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=TRUE,...){
+    r82 <- get.Pb208Th232.ratios(x)
+    if (is.na(i)){
+        ns <- length(x)
+        out <- matrix(0,ns,2)
+        for (j in 1:ns){
+            out[j,] <- get.Pb208Th232.age.UPb(x,i=j,exterr=exterr,...)
+        }
+    } else {
+        out <- get.Pb208Th232.age(r82[i,'Pb208Th232'],r82[i,'errPb208Th232'],
+                                 exterr=exterr,...)
+    }
+    out
 }
 
 # x is an object of class \code{UPb}
