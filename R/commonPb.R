@@ -203,7 +203,7 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47){
 common.Pb.stacey.kramers <- function(x){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    if (x$format < 4){
+    if (x$format %in% c(1,2,3,7,8)){
         for (i in 1:ns){
             tint <- stats::optimise(SS.SK.without.204,
                                     interval=c(0,5000),x=x,i=i)$minimum
@@ -230,7 +230,7 @@ common.Pb.isochron <- function(x,omit=NULL){
     fit <- ludwig(subset(x,subset=calcit))
     out <- matrix(0,ns,5)
     tt <- fit$par[1]
-    if (x$format<4){
+    if (x$format %in% c(1,2,3,7,8)){
         rr <- age_to_terawasserburg_ratios(tt,d=x$d)$x
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
         m76 <- get.Pb207Pb206.ratios(x)[,1]

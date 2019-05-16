@@ -12,11 +12,11 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     if (wetherill){
         labels <- c('t[l]','t[u]')
         out <- c(out,twfit2wfit(fit,x))
-    } else if (x$format<4){
+    } else if (x$format %in% c(1,2,3,7,8)){
         labels <- c('t[l]','76')
         out$x <- fit$par
         out$cov <- fit$cov
-    } else {
+    } else if (x$format %in% c(4,5,6)){
         labels <- c('t[l]','76')
         out$x <- c(fit$par['t'],
                    fit$par['74i']/fit$par['64i'])
@@ -25,6 +25,8 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
         J[2,2] <- -fit$par['74i']/fit$par['64i']^2
         J[2,3] <- 1/fit$par['64i']
         out$cov <- J %*% fit$cov %*% t(J)
+    } else {
+        stop('Incorrect input format')
     }
     names(out$x) <- labels
     if (model==1 && fit$mswd>1){
@@ -84,14 +86,16 @@ twfit2wfit <- function(fit,x){
     U <- iratio('U238U235')[1]
     E <- matrix(0,3,3)
     J <- matrix(0,2,3)
-    if (x$format<4){
+    if (x$format %in% c(1,2,3,7,8)){
         a0 <- 1
         b0 <- fit$par['76i']
         E[c(1,3),c(1,3)] <- fit$cov
-    } else {
+    } else if (x$format %in% c(4,5,6)){
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
         E <- fit$cov
+    } else {
+        stop('Incorrect input format')
     }
     disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
