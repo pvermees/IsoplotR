@@ -345,16 +345,16 @@ data2york.UPb <- function(x,option=1,...){
         out[,4] <- sqrt(err[,2])
         out[,5] <- err[,3]/(out[,2]*out[,4])
     } else if (option==5 && x$format==7){
-        out <- subset(x$x,select=c('Pb208Th232','errPb208Th232',
-                                   'Pb206U238','errPb206U238','rhoYZ'))
+        out <- subset(x$x,select=c('Pb206U238','errPb206U238',
+                                   'Pb208Th232','errPb208Th232','rhoYZ'))
     } else if (option==5 && x$format==8){
         for (i in 1:ns){
             samp <- wetherill(x,i=i)
-            out[i,1] <- samp$x['Pb208Th232']
-            out[i,2] <- sqrt(samp$cov['Pb208Th232','Pb208Th232'])
-            out[i,3] <- samp$x['Pb206U238']
-            out[i,4] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
-            out[i,5] <- stats::cov2cor(samp$cov[1:2,1:2])[1,2]
+            out[i,1] <- samp$x['Pb206U238']
+            out[i,2] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
+            out[i,3] <- samp$x['Pb208Th232']
+            out[i,4] <- sqrt(samp$cov['Pb208Th232','Pb208Th232'])
+            out[i,5] <- stats::cov2cor(samp$cov[2:3,2:3])[1,2]
         }
     } else {
         stop('Incompatible input format and concordia type.')

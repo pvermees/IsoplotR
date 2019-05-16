@@ -264,7 +264,6 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
-    wetherill <- (type==1)
     if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -364,8 +363,8 @@ prepare.concordia.line <- function(x,tlim,type=1,...){
         x.lab <- expression(paste(""^"238","U/"^"206","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
     } else if (x$format>6 & type==3){
-        x.lab <- expression(paste(""^"208","Pb/"^"232","Th"))
-        y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
+        x.lab <- expression(paste(""^"206","Pb/"^"238","U"))
+        y.lab <- expression(paste(""^"208","Pb/"^"232","Th"))
     } else {
         stop('Incorrect input format.')
     }
@@ -386,14 +385,14 @@ cseq <- function(m,M,type=1,n=50){
 }
 prettier <- function(x,type=1,n=5){
     pilot <- pretty(x,n=n)
-    if (type%in%c(1,2)){
+    if (type%in%c(1,3)){
         return(pilot)
     }
     m <- min(x)
     M <- max(x)
-    if (M/m < 50){ # linear spacing if spanning less than 1 order of magnitude
+    if (M/m<50){ # linear spacing if TW spans less than 1 order of magnitude
         out <- pilot
-    } else { # log spaced if spanning more than 1 order of magnitude
+    } else { # log spacing if TW spans more than 1 order of magnitude
         out <- cseq(m,M,type=type,n=n)
         init <- out
         out[1] <- pilot[1]
@@ -450,8 +449,8 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
         if (!xset) out$x <- age_to_U238Pb206_ratio(out$t,d=x$d)[,'86']
         if (!yset) out$y <- age_to_Pb207Pb206_ratio(out$t,d=x$d)[,'76']
     } else if (!is.null(tlim) && type==3){
-        if (!xset) out$x <- age_to_Pb208Th232_ratio(tlim)[,'0832']
-        if (!yset) out$y <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
+        if (!xset) out$x <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
+        if (!yset) out$y <- age_to_Pb208Th232_ratio(tlim)[,'82']
     } else if (is.null(tlim) && type==1) {
         if (!xset){
             Pb207U235 <- get.Pb207U235.ratios(x)
@@ -488,30 +487,32 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
         }
         out$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
         out$t[2] <- get.Pb207Pb206.age(maxy,d=x$d)[1]
-        if (!xset) minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=x$d)[,'86'])
-        if (!yset) miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=x$d)[,'76'])
+        if (!xset)
+            minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=x$d)[,'86'])
+        if (!yset)
+            miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=x$d)[,'76'])
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
     } else if (is.null(tlim) && type==3) {
         if (!xset){
-            Pb208Th232 <- get.Pb208Th232.ratios(x)
-            minx <- min(Pb208Th232[,1]-nse*Pb208Th232[,2],na.rm=TRUE)
-            maxx <- max(Pb208Th232[,1]+nse*Pb208Th232[,2],na.rm=TRUE)
-        }
-        if (!yset){
             Pb206U238 <- get.Pb206U238.ratios(x)
-            miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
-            maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
-        }
-        out$t[1] <- get.Pb206U238.age(miny,d=x$d)[1]
-        out$t[2] <- get.Pb208Th232.age(maxx)[1]
-        if (!xset){
-            minx <- min(minx,age_to_Pb208Th232_ratio(out$t[1])[,'82'])
-            maxx <- max(maxx,age_to_Pb208Th232_ratio(out$t[2])[,'82'])
+            minx <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
+            maxx <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
         }
         if (!yset){
-            miny <- min(miny,age_to_Pb206U238_ratio(out$t[1],d=x$d)[,'68'])
-            maxy <- max(maxy,age_to_Pb206U238_ratio(out$t[2],d=x$d)[,'68'])
+            Pb208Th232 <- get.Pb208Th232.ratios(x)
+            miny <- min(Pb208Th232[,1]-nse*Pb208Th232[,2],na.rm=TRUE)
+            maxy <- max(Pb208Th232[,1]+nse*Pb208Th232[,2],na.rm=TRUE)
+        }        
+        out$t[1] <- get.Pb206U238.age(minx,d=x$d)[1]
+        out$t[2] <- get.Pb208Th232.age(maxy)[1]
+        if (!xset){
+            minx <- min(minx,age_to_Pb206U238_ratio(out$t[1],d=x$d)[,'68'])
+            maxx <- max(maxx,age_to_Pb206U238_ratio(out$t[2],d=x$d)[,'68'])
+        }
+        if (!yset){
+            miny <- min(miny,age_to_Pb208Th232_ratio(out$t[1])[,'82'])
+            maxy <- max(maxy,age_to_Pb208Th232_ratio(out$t[2])[,'82'])
         }
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
@@ -689,17 +690,23 @@ emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
     class(dat) <- 'UPb'
     dat$d <- diseq()
     if (type==1){
-        dat$x <- rbind(c(age_to_Pb207U235_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1]),0),
-                       c(age_to_Pb207U235_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1]),0))
+        dat$x <- rbind(c(age_to_Pb207U235_ratio(tlim[1]),0,
+                         age_to_Pb206U238_ratio(tlim[1]),0,0),
+                       c(age_to_Pb207U235_ratio(tlim[2]),0,
+                         age_to_Pb206U238_ratio(tlim[2]),0,0))
         dat$format <- 1
     } else if (type==2){
-        dat$x <- rbind(c(age_to_U238Pb206_ratio(tlim[1]),age_to_Pb207Pb206_ratio(tlim[1])),
-                       c(age_to_U238Pb206_ratio(tlim[1]),age_to_Pb207Pb206_ratio(tlim[1])))
+        dat$x <- rbind(c(age_to_U238Pb206_ratio(tlim[1]),0,
+                         age_to_Pb207Pb206_ratio(tlim[1]),0,0),
+                       c(age_to_U238Pb206_ratio(tlim[2]),0,
+                         age_to_Pb207Pb206_ratio(tlim[2]),0,0))
         dat$format <- 2
     } else if (type==3){
-        dat$x <- rbind(c(age_to_Pb208Th232_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1])),
-                       c(age_to_Pb208Th232_ratio(tlim[1]),age_to_Pb206U238_ratio(tlim[1])))
-        dat$format <- 3
+        dat$x <- rbind(c(0,0,age_to_Pb206U238_ratio(tlim[1]),0,
+                         age_to_Pb208Th232_ratio(tlim[1]),0,rep(0,8)),
+                       c(0,0,age_to_Pb206U238_ratio(tlim[2]),0,
+                         age_to_Pb208Th232_ratio(tlim[2]),0,rep(0,8)))
+        dat$format <- 7
     } else {
         stop('Invalid concordia type.')
     }

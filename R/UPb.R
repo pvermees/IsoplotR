@@ -449,21 +449,21 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
 }
 age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     out <- list()
-    labels <- c('Pb208Th232','Pb206U238')
+    labels <- c('Pb206U238','Pb208Th232')
     l8 <- settings('lambda','U238')[1]
     l2 <- settings('lambda','Th232')[1]
     D <- wendt(tt=tt,d=d)
-    Pb8Th2 <- exp(l2*tt)-1
     Pb6U8 <- exp(l8*tt)-1 + D$d2
-    out$x <- c(Pb8Th2,Pb6U8)
+    Pb8Th2 <- exp(l2*tt)-1
+    out$x <- c(Pb6U8,Pb8Th2)
     E <- matrix(0,3,3)
-    diag(E) <- c(st,lambda('Th232')[2],lambda('U238')[2])^2
+    diag(E) <- c(st,lambda('U238')[2],lambda('Th232')[2])^2
     J <- matrix(0,2,3)
-    J[1,1] <- l2*exp(l2*tt)
-    J[2,1] <- l8*exp(l8*tt) + D$dd2dt
+    J[1,1] <- l8*exp(l8*tt) + D$dd2dt
+    J[2,1] <- l2*exp(l2*tt)
     if (exterr){
-        J[1,2] <- tt*exp(l2*tt)
-        J[2,3] <- tt*exp(l8*tt) + D$dd2dl8
+        J[1,2] <- tt*exp(l8*tt) + D$dd2dl8
+        J[2,3] <- tt*exp(l2*tt)
     }
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
