@@ -78,6 +78,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
         out <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'Pb207-Pb206')){
         out <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,d=d)
+    } else if (identical(method,'Pb208-Th238')){
+        out <- get.Pb208Th232.age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Ar-Ar')){
         out <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
                             J=x[3],sJ=x[4],exterr=exterr)
@@ -126,13 +128,10 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' maximum likelihood algorithm that accounts for overdispersion by
 #' adding a geological (co)variance term.
 #'
-#' @param wetherill logical flag to indicate whether the data should
-#'     be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
-#'     (\code{FALSE}) space.  This option is only used when
-#'     \code{type>1}
 #' @param sigdig number of significant digits for the uncertainty
 #'     estimate (only used if \code{type=1}, \code{isochron=FALSE} and
 #'     \code{central=FALSE}).
+#' 
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -210,19 +209,19 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' tcentral <- age(examples$FT1,central=TRUE)
 #' @rdname age
 #' @export
-age.UPb <- function(x,type=1,wetherill=TRUE,exterr=TRUE,i=NA,
+age.UPb <- function(x,type=1,exterr=TRUE,i=NA,
                     sigdig=NA,common.Pb=0,show.p=FALSE,...){
-    if (common.Pb %in% c(1,2,3))
+    if (common.Pb %in% c(1,2,3)){
         X <- Pb0corr(x,option=common.Pb)
-    else
+    } else {
         X <- x
+    }
     if (type==1){
         out <- UPb.age(X,exterr=exterr,i=i,sigdig=sigdig,show.p=show.p,...)
     } else if (type==2){
-        out <- concordia.age(X,wetherill=wetherill,exterr=exterr)
+        out <- concordia.age(X,wetherill=TRUE,exterr=exterr)
     } else if (type %in% c(3,4,5)){
-        out <- concordia.intersection.ludwig(x,wetherill=wetherill,
-                                             exterr=exterr,model=type-2)
+        out <- concordia.intersection.ludwig(x,wetherill=FALSE,exterr=exterr,model=type-2)
     }
     out
 }

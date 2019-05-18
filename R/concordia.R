@@ -264,6 +264,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
+    wetherill <- (type==1) # TO BE REMOVED!
     if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -281,7 +282,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
         x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,exterr=exterr,
                                              alpha=alpha,model=(show.age-1),anchor=anchor)
-        discordia.line(fit,wetherill=wetherill,d=x$d)
+        discordia.line(fit,wetherill=(type==1),d=x$d)
         fit$n <- length(x2calc)
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }

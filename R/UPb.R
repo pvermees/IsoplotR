@@ -942,6 +942,8 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
     if (common.Pb>0) X <- Pb0corr(x,option=common.Pb)
     else X <- x
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
+    hasTh <- x$format%in%c(7,8)
+    if (hasTh) labels <- c(labels,'t.82','s[t.82]')
     if (conc) labels <- c(labels,'t.conc','s[t.conc]')
     if (conc & show.p) labels <- c(labels,'p[conc]')
     if (!is.na(i)){
@@ -952,6 +954,11 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
         t.68.out <- roundit(t.68[1],t.68[2],sigdig=sigdig)
         t.76.out <- roundit(t.76[1],t.76[2],sigdig=sigdig)
         out <- c(t.75.out,t.68.out,t.76.out)
+        if (hasTh){
+            t.82 <- get.Pb208Th232.age(X,i,exterr=exterr)
+            t.82.out <- roundit(t.82[1],t.82[2],sigdig=sigdig)
+            out <- c(out,t.82.out)
+        }
         if (conc){
             t.conc <- concordia.age(X,i,exterr=exterr)
             t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
@@ -983,7 +990,7 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
     tt <- UPb.age(x,exterr=exterr,conc=(type==5),common.Pb=common.Pb)
     do.76 <- tt[,'t.68'] > cutoff.76
     if (any(is.na(cutoff.disc))){
-        is.concordant <- rep(TRUE,nrow(x))
+        is.concordant <- rep(TRUE,length(x))
     } else {
         is.concordant <- concordant(tt,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
         if (!any(is.concordant)){
@@ -1006,6 +1013,8 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
         out[i.68,] <- tt[i.68,c('t.68','s[t.68]')]
     } else if (type==5){
         out[is.concordant,] <- tt[is.concordant,c('t.conc','s[t.conc]')]
+    } else if (type==6){
+        out[is.concordant,] <- tt[is.concordant,c('t.82','s[t.82]')]
     }
     colnames(out) <- c('t','s[t]')
     out

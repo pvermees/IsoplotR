@@ -135,17 +135,21 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
     }
     invisible(X)
 }
+#'
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), or the (Wetherill) concordia age
-#'     (\code{type}=5)
+#'     (\code{type}=4), or the concordia age (\code{type}=5), or
+#'     \eqn{^{208}}/\eqn{^{232}}Th age (\code{type}=6, only available
+#'     if \code{x$format}=7 or 8).
+#'
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
+#' 
 #' @param cutoff.disc two element vector with the minimum (negative)
 #'     and maximum (positive) percentage discordance allowed between
 #'     the \eqn{^{207}}Pb/\eqn{^{235}}U and
@@ -154,6 +158,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
 #'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
 #'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' 
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -181,12 +186,15 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
                 hide=hide,...)
 }
+#'
 #' @param samebandwidth logical flag indicating whether the same
 #'     bandwidth should be used for all samples. If
 #'     \code{samebandwidth = TRUE} and \code{bw = NULL}, then the
 #'     function will use the median bandwidth of all the samples.
+#' 
 #' @param normalise logical flag indicating whether or not the KDEs
 #'     should all integrate to the same value.
+#' 
 #' @rdname kde
 #' @export
 kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
