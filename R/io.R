@@ -351,8 +351,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
-        if (nc < 14) # pad with zeros as necessary
-            X <- cbind(X,matrix(0,nr-1,14-nc))
     } else if (format==8 & nc>7){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
@@ -360,8 +358,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
-        if (nc < 14) # pad with zeros as necessary
-            X <- cbind(X,matrix(0,nr-1,14-nc))        
     }
     out$x <- subset(X,select=1:length(cnames))
     colnames(out$x) <- cnames
