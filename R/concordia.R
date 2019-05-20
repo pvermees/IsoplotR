@@ -494,7 +494,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
             miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=x$d)[,'76'])
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
-    } else if (is.null(tlim) && type==3) {
+    } else if (is.null(tlim) && type==3){
         if (!xset){
             Pb206U238 <- get.Pb206U238.ratios(x)
             minx <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
@@ -504,7 +504,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
             Pb208Th232 <- get.Pb208Th232.ratios(x)
             miny <- min(Pb208Th232[,1]-nse*Pb208Th232[,2],na.rm=TRUE)
             maxy <- max(Pb208Th232[,1]+nse*Pb208Th232[,2],na.rm=TRUE)
-        }        
+        }
         out$t[1] <- get.Pb206U238.age(minx,d=x$d)[1]
         out$t[2] <- get.Pb208Th232.age(maxy)[1]
         if (!xset){

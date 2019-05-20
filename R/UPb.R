@@ -698,11 +698,13 @@ get.Pb208Th232.ratios <- function(x){
         J1 <- -out[,'Pb208Th232']/x$x[,'U238Pb206']
         J2 <- 1/(x$x[,'U238Pb206']*x$x[,'Th232U238'])
         J3 <- -out[,'Pb208Th232']/x$x[,'Th232U238']
-        E <- cor2cov3(sX=x$x[,'U238Pb206'],sY=x$x[,'Pb208Pb206'],
-                      sZ=x$x[,'Th232U238'],rXY=x$x[,'rXZ'],
-                      rXZ=x$x[,'rXW'],rYZ=x$x[,'rZW'])
-        out[,'errPb206U238'] <- errorprop1x3(J1,J2,J3,E[1,1],E[2,2],E[3,3],
-                                             E[1,2],E[1,3],E[2,3])
+        E11 <- x$x[,'errU238Pb206']^2
+        E22 <- x$x[,'errPb208Pb206']^2
+        E33 <- x$x[,'errTh232U238']^2
+        E12 <- x$x[,'rhoXZ']*x$x[,'errU238Pb206']*x$x[,'errPb208Pb206']
+        E13 <- x$x[,'rhoXW']*x$x[,'errU238Pb206']*x$x[,'errTh232U238']
+        E23 <- x$x[,'rhoZW']*x$x[,'errPb208Pb206']*x$x[,'errTh232U238']
+        out[,'errPb208Th232'] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23)
     } else {
         stop('Wrong input format: no Pb208 or Th232 present in this dataset.')
     }
