@@ -167,15 +167,17 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d)
     r86 <- cctw$x['U238Pb206']
     r76 <- cctw$x['Pb207Pb206']
+    cnames <- c('U238Pb206','Pb207Pb206')
+    covmat <- tw$cov[cnames,cnames]
     if (project.err){
         f <- (m76-r76)/(c76-r76)
-        E <- tw$cov/((1-f)^2)
+        E <- covmat/((1-f)^2)
     } else {
-        E <- tw$cov
+        E <- covmat
     }
     sr86 <- sqrt(E[1,1])
     sr76 <- sqrt(E[2,2])
-    rho <- stats::cov2cor(E)[1,2]
+    rho <- stats::cov2cor(E)
     out <- c(r86,sr86,r76,sr76,rho)
     out
 }
@@ -285,7 +287,9 @@ SS.SK.without.204 <- function(tt,x,i){
     cct <- age_to_terawasserburg_ratios(tt,st=0,d=x$d)
     a <- i6474[2]/i6474[1] # intercept
     b <- (cct$x['Pb207Pb206']-a)/cct$x['U238Pb206'] # slope
-    omega <- solve(tw$cov)
+    cnames <- c('U238Pb206','Pb207Pb206')
+    covmat <- tw$cov[cnames,cnames]
+    omega <- solve(covmat)
     x.fitted <- (X*omega[1,1]+Y*omega[1,2]-a*omega[1,2])/
                 (omega[1,1]+b*omega[1,2])
     y.fitted <- a + b*x.fitted
