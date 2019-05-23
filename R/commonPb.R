@@ -155,6 +155,14 @@ Pb0corr <- function(x,option=1,omit=NULL){
         out$x[,c('Pb207Pb206','errPb207Pb206')] <- tw[,3:4]
         out$x[,c('Pb204Pb207','errPb204Pb207',
                  'Pb204Pb206','errPb204Pb206')] <- 0
+    } else if (x$format==7){ # TODO: correct Pb208 as well.
+        out$x[,c('Pb207U235','errPb207U235',
+                 'Pb206U238','errPb206U238','rhoXY')] <- tw2w(x.corr)
+    } else if (x$format==8){ # TODO: correct Pb208 as well.
+        out$x[,c('U238Pb206','errU238Pb206',
+                 'Pb207Pb206','errPb207Pb206','rhoXY')] <- x.corr
+    } else {
+        stop('Incorrect input format.')
     }
     out
 }
@@ -177,7 +185,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     }
     sr86 <- sqrt(E[1,1])
     sr76 <- sqrt(E[2,2])
-    rho <- stats::cov2cor(E)
+    rho <- stats::cov2cor(E)[1,2]
     out <- c(r86,sr86,r76,sr76,rho)
     out
 }
