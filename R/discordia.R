@@ -202,16 +202,16 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         cix <- c(x,rev(x))
         ciy <- c(ll,rev(ul))
     } else {
-        X[1] <- age_to_U238Pb206_ratio(fit$x['t'],d=d)[,'86']
-        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t'],d=d)[,'76']
-        r75 <- age_to_Pb207U235_ratio(fit$x['t'],d=d)[,'75']
+        fit2d <- tw3d2d(fit)
+        X[1] <- age_to_U238Pb206_ratio(fit2d$x['t'],d=d)[,'86']
+        Y[1] <- age_to_Pb207Pb206_ratio(fit2d$x['t'],d=d)[,'76']
+        r75 <- age_to_Pb207U235_ratio(fit2d$x['t'],d=d)[,'75']
         r68 <- 1/X[1]
-        if (fit$format%in%c(1,2,3,7,8)) Y[2] <- fit$x['76i']
-        else Y[2] <- fit$x['74i']/fit$x['64i']
+        Y[2] <- fit2d$x['76i']
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
-        tl <- check.zero.UPb(fit$x['t'])
+        tl <- check.zero.UPb(fit2d$x['t'])
         U <- settings('iratio','U238U235')[1]
         nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
@@ -222,9 +222,9 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
         J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
         J2 <- 1 - x*r68                                # dy/dy0
-        sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
-        ul <- y + fit$fact*sy
-        ll <- y - fit$fact*sy
+        sy <- errorprop1x2(J1,J2,fit2d$cov[1,1],fit2d$cov[2,2],fit2d$cov[1,2])
+        ul <- y + fit2d$fact*sy
+        ll <- y - fit2d$fact*sy
         yconc <- rep(0,nsteps)
         t68 <- get.Pb206U238.age(1/x,d=d)[,'t68']
         yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
@@ -245,6 +245,22 @@ discordia.line <- function(fit,wetherill,d=diseq()){
     }
     graphics::polygon(cix,ciy,col='gray80',border=NA)
     graphics::lines(X,Y)
+}
+
+tw3d2d <- function(fit){
+    out <- list(x=fit$x,cov=fit$cov,fact=fit$fact)
+    if (fit$format %in% c(4,5,6)){
+        labels <- c('t','76i')
+        out$x <- c(fit$x['t'],fit$x['74i']/fit$x['64i'])
+        J <- matrix(0,2,3)
+        J[1,1] <- 1
+        J[2,2] <- -fit$x['74i']/fit$x['64i']^2
+        J[2,3] <- 1/fit$x['64i']
+        out$cov <- J %*% fit$cov %*% t(J)
+        names(out$x) <- labels
+        colnames(out$cov) <- labels
+    }
+    out
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
