@@ -124,7 +124,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),.
         out$w <- c(fit$w,profile_LL_discordia_disp(fit,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
-    if (x$format %in% c(1,2,3,7,8)) parnames <- c('t[l]','76i')
+    if (x$format %in% c(1,2,3,7,8)) parnames <- c('t','76i')
     else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames

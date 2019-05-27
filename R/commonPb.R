@@ -272,12 +272,12 @@ common.Pb.isochron <- function(x,omit=NULL){
 common.Pb.nominal <- function(x){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    if (x$format < 4){
+    if (x$format %in% c(1,2,3,7,8)){
         c76 <- settings('iratio','Pb207Pb206')[1]
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=TRUE)
         }
-    } else {
+    } else if (x$format %in% c(4,5,6)){
         c46 <- 1/settings('iratio','Pb206Pb204')[1]
         c47 <- 1/settings('iratio','Pb207Pb204')[1]
         for (i in 1:ns){
