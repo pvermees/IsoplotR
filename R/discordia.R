@@ -9,37 +9,27 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     out$w <- fit$w
     out$p.value <- fit$p.value
     out$fact <- tfact(alpha,fit$df)
+    out$format <- x$format
     if (wetherill){
-        labels <- c('t[l]','t[u]')
         out <- c(out,twfit2wfit(fit,x))
-    } else if (x$format<4){
-        labels <- c('t[l]','76')
+        names(out$x) <- c('t[l]','t[u]')
+    } else {
         out$x <- fit$par
         out$cov <- fit$cov
-    } else {
-        labels <- c('t[l]','76')
-        out$x <- c(fit$par['t'],
-                   fit$par['74i']/fit$par['64i'])
-        J <- matrix(0,2,3)
-        J[1,1] <- 1
-        J[2,2] <- -fit$par['74i']/fit$par['64i']^2
-        J[2,3] <- 1/fit$par['64i']
-        out$cov <- J %*% fit$cov %*% t(J)
     }
-    names(out$x) <- labels
     if (model==1 && fit$mswd>1){
-        out$err <- matrix(NA,3,2)
+        out$err <- matrix(NA,3,length(out$x))
         rownames(out$err) <- c('s','ci','disp')
         out$err['disp',] <-
             out$fact*sqrt(fit$mswd)*sqrt(diag(out$cov))
     } else {
-        out$err <- matrix(NA,2,2)
+        out$err <- matrix(NA,2,length(out$x))
         rownames(out$err) <- c('s','ci')
     }
     if (model==3) out$fact <- nfact(alpha)
     out$err['s',] <- sqrt(diag(out$cov))
     out$err['ci',] <- out$fact*out$err['s',]
-    colnames(out$err) <- labels
+    colnames(out$err) <- names(out$x)
     out
 }
 # extracts concordia intersection parameters from an ordinary York fit
@@ -84,14 +74,16 @@ twfit2wfit <- function(fit,x){
     U <- iratio('U238U235')[1]
     E <- matrix(0,3,3)
     J <- matrix(0,2,3)
-    if (x$format<4){
+    if (x$format %in% c(1,2,3,7,8)){
         a0 <- 1
         b0 <- fit$par['76i']
         E[c(1,3),c(1,3)] <- fit$cov
-    } else {
+    } else if (x$format %in% c(4,5,6)){
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
         E <- fit$cov
+    } else {
+        stop('Incorrect input format')
     }
     disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
@@ -210,15 +202,16 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         cix <- c(x,rev(x))
         ciy <- c(ll,rev(ul))
     } else {
-        X[1] <- age_to_U238Pb206_ratio(fit$x['t[l]'],d=d)[,'86']
-        Y[1] <- age_to_Pb207Pb206_ratio(fit$x['t[l]'],d=d)[,'76']
-        r75 <- age_to_Pb207U235_ratio(fit$x['t[l]'],d=d)[,'75']
+        fit2d <- tw3d2d(fit)
+        X[1] <- age_to_U238Pb206_ratio(fit2d$x['t'],d=d)[,'86']
+        Y[1] <- age_to_Pb207Pb206_ratio(fit2d$x['t'],d=d)[,'76']
+        r75 <- age_to_Pb207U235_ratio(fit2d$x['t'],d=d)[,'75']
         r68 <- 1/X[1]
-        Y[2] <- fit$x['76']
+        Y[2] <- fit2d$x['76i']
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
-        tl <- check.zero.UPb(fit$x['t[l]'])
+        tl <- check.zero.UPb(fit2d$x['t'])
         U <- settings('iratio','U238U235')[1]
         nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
@@ -229,9 +222,9 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
         J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
         J2 <- 1 - x*r68                                # dy/dy0
-        sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
-        ul <- y + fit$fact*sy
-        ll <- y - fit$fact*sy
+        sy <- errorprop1x2(J1,J2,fit2d$cov[1,1],fit2d$cov[2,2],fit2d$cov[1,2])
+        ul <- y + fit2d$fact*sy
+        ll <- y - fit2d$fact*sy
         yconc <- rep(0,nsteps)
         t68 <- get.Pb206U238.age(1/x,d=d)[,'t68']
         yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
@@ -252,6 +245,22 @@ discordia.line <- function(fit,wetherill,d=diseq()){
     }
     graphics::polygon(cix,ciy,col='gray80',border=NA)
     graphics::lines(X,Y)
+}
+
+tw3d2d <- function(fit){
+    out <- list(x=fit$x,cov=fit$cov,fact=fit$fact)
+    if (fit$format %in% c(4,5,6)){
+        labels <- c('t','76i')
+        out$x <- c(fit$x['t'],fit$x['74i']/fit$x['64i'])
+        J <- matrix(0,2,3)
+        J[1,1] <- 1
+        J[2,2] <- -fit$x['74i']/fit$x['64i']^2
+        J[2,3] <- 1/fit$x['64i']
+        out$cov <- J %*% fit$cov %*% t(J)
+        names(out$x) <- labels
+        colnames(out$cov) <- labels
+    }
+    out
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
@@ -275,39 +284,71 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list1$d <- lower.age[4]
             list2$d <- upper.age[4]
         }
-    } else {
-        intercept <- roundit(fit$x[2],fit$err[,2],sigdig=sigdig)
+    } else if (fit$format%in%c(1,2,3,7,8)){
+        i76 <- roundit(fit$x['76i'],fit$err[,'76i'],sigdig=sigdig)
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]~'=')
-        list2 <- list(a=intercept[1],b=intercept[2],c=intercept[3],u='')
+        list2 <- list(a=i76[1],b=i76[2],c=i76[3],u='')
         if (fit$model==1 && fit$mswd>1){
             list1$d <- lower.age[4]
-            list2$d <- intercept[4]
+            list2$d <- i76[4]
         }
+    } else {
+        i64 <- roundit(fit$x['64i'],fit$err[,'64i'],sigdig=sigdig)
+        i74 <- roundit(fit$x['74i'],fit$err[,'74i'],sigdig=sigdig)
+        expr1 <- quote('age =')
+        expr2 <- quote('('^206*'Pb/'^204*'Pb)'[o]~'=')
+        expr3 <- quote('('^207*'Pb/'^204*'Pb)'[o]~'=')
+        list2 <- list(a=i64[1],b=i64[2],c=i64[3],u='')
+        list3 <- list(a=i74[1],b=i74[2],c=i74[3],u='')
+        if (fit$model==1 && fit$mswd>1){
+            list1$d <- lower.age[4]
+            list2$d <- i64[4]
+            list3$d <- i74[4]
+        }
+        call3 <- substitute(e~a,list(e=expr3,a=args2))
+        line3 <- do.call('substitute',list(call3,list3))
     }
     call1 <- substitute(e~a,list(e=expr1,a=args1))
     call2 <- substitute(e~a,list(e=expr2,a=args2))
-    line1 <- do.call('substitute',list((call1),list1))
-    line2 <- do.call('substitute',list((call2),list2))
+    line1 <- do.call('substitute',list(call1,list1))
+    line2 <- do.call('substitute',list(call2,list2))
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a~', p('*chi^2*') ='~b,
+        line4 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
+    } else if (fit$model==3){
+        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
+        line4 <- substitute('overdispersion ='~a+b/-c~'% of Pb'[o],
+                            list(a=rounded.disp[1],
+                                 b=rounded.disp[3],
+                                 c=rounded.disp[2]))        
+    }
+    extrarow <- fit$format%in%c(4,5,6) & !wetherill
+    if (fit$model==1 & extrarow){
+        mymtext(line1,line=3,...)
+        mymtext(line2,line=2,...)
+        mymtext(line3,line=1,...)
+        mymtext(line4,line=0,...)
+    } else if (fit$model==2 & extrarow){
         mymtext(line1,line=2,...)
         mymtext(line2,line=1,...)
         mymtext(line3,line=0,...)
+    } else if (fit$model==3 & extrarow){
+        mymtext(line1,line=3,...)
+        mymtext(line2,line=2,...)
+        mymtext(line3,line=1,...)
+        mymtext(line4,line=0,...)
+    } else if (fit$model==1){
+        mymtext(line1,line=2,...)
+        mymtext(line2,line=1,...)
+        mymtext(line4,line=0,...)
     } else if (fit$model==2){
         mymtext(line1,line=1,...)
         mymtext(line2,line=0,...)
-    } else {
-        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
-        line3 <- substitute('overdispersion ='~a+b/-c~
-                            '% of Pb'[o],
-                            list(a=rounded.disp[1],
-                                 b=rounded.disp[3],
-                                 c=rounded.disp[2]))
+    } else if (fit$model==3){
         mymtext(line1,line=2,...)
         mymtext(line2,line=1,...)
-        mymtext(line3,line=0,...)
+        mymtext(line4,line=0,...)
     }
 }

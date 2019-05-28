@@ -607,7 +607,7 @@ wtdmean.title <- function(fit,sigdig=2,units='',...){
         line1line <- 1
         line2line <- 0
     }
-    line2 <- substitute('MSWD ='~a~', p('*chi^2*') ='~b,
+    line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                         list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig),
                              b=roundit(fit$p.value,fit$p.value,
                                        sigdig=sigdig)))

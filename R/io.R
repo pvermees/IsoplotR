@@ -344,6 +344,20 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb207Pb206','errPb207Pb206',
                     'Pb204Pb207','errPb204Pb207',
                     'Pb204Pb206','errPb204Pb206')
+    } else if (format==7 & nc>7){
+        cnames <- c('Pb207U235','errPb207U235',
+                    'Pb206U238','errPb206U238',
+                    'Pb208Th232','errPb208Th232',
+                    'Th232U238','errTh232U238',
+                    'rhoXY','rhoXZ','rhoXW',
+                    'rhoYZ','rhoYW','rhoZW')
+    } else if (format==8 & nc>7){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb207Pb206','errPb207Pb206',
+                    'Pb208Pb206','errPb208Pb206',
+                    'Th232U238','errTh232U238',
+                    'rhoXY','rhoXZ','rhoXW',
+                    'rhoYZ','rhoYW','rhoZW')
     }
     out$x <- subset(X,select=1:length(cnames))
     colnames(out$x) <- cnames
@@ -766,6 +780,7 @@ getErrCols <- function(gc,format=NA,ierr=1){
     UPb12 = (gc=='U-Pb' && format%in%(1:2))
     UPb345 = (gc=='U-Pb' && format%in%(3:5))
     UPb6 = (gc=='U-Pb' && format==6)
+    UPb78 = (gc=='U-Pb' && format%in%(7:8))
     PbPb12 = (gc=='Pb-Pb' && format%in%(1:2))
     PbPb3 = (gc=='Pb-Pb' && format==3)
     ArAr12 = (gc=='Ar-Ar' && format%in%(1:2))
@@ -785,6 +800,8 @@ getErrCols <- function(gc,format=NA,ierr=1){
         cols = c(2,4)
     } else if (UPb345 | PbPb3 | ArAr3 | KCa1 | PD1 | UThHe | ThU12){
         cols = c(2,4,6)
+    } else if (UPb78){
+        cols = seq(from=2,to=8,by=2)
     } else if (UPb6){
         cols = seq(from=2,to=12,by=2)
     } else if (radial || average){

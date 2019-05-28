@@ -124,7 +124,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),.
         out$w <- c(fit$w,profile_LL_discordia_disp(fit,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
-    if (x$format<4) parnames <- c('t[l]','76i')
+    if (x$format %in% c(1,2,3,7,8)) parnames <- c('t','76i')
     else parnames <- c('t','64i','74i')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
@@ -139,9 +139,9 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     out <- list()
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
-    if (x$format<4 && anchored){
+    if (x$format %in% c(1,2,3,7,8) && anchored){
         out$df <- ns-1
-    } else if (x$format<4) {
+    } else if (x$format %in% c(1,2,3,7,8)) {
         out$df <- ns-2
     } else if (anchored && tanchored){
         out$df <- 2*ns-2
@@ -185,7 +185,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         slope <- xyfit$coef[2]
         ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
     } else if (is.na(anchor[[2]])){
-        if (x$format < 4){
+        if (x$format %in% c(1,2,3,7,8)){
             b0a0 <- settings('iratio','Pb207Pb206')[1]
         } else {
             a0 <- settings('iratio','Pb206Pb204')[1]
@@ -204,7 +204,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
         ta0b0 <- c(anchor[[2]],intercept)
     }
-    if (x$format>3){
+    if (x$format %in% c(4,5,6)){
         U238Pb206 <- subset(get.U238Pb206.ratios(x),select='U238Pb206')
         Pb206U238 <- subset(get.Pb206U238.ratios(x),select='Pb206U238')
         Pb204U238 <- subset(get.Pb204U238.ratios(x),select='Pb204U238')
@@ -249,7 +249,7 @@ LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
     LL.lud.UPb(ta0b0=ta0b0,x=x,exterr=exterr,w=w,LL=TRUE)
 }
 LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
-    if (x$format<4){
+    if (x$format %in% c(1,2,3,7,8)){
         return(LL.lud.2D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
     } else {
         return(LL.lud.3D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
@@ -302,7 +302,7 @@ fisher.lud.default <- function(x,...){
 }
 fisher.lud.UPb <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
     ns <- length(x)
-    if (x$format<4){
+    if (x$format %in% c(1,2,3,7,8)){
         fish <- fisher_lud_2D(x,fit)
         AA <- fish[1:ns,1:ns]
         BB <- fish[1:ns,(ns+1):(ns+2)]
@@ -465,7 +465,7 @@ fisher_lud_3D <- function(x,fit){
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
 data2ludwig.UPb <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
-    if (x$format<4)
+    if (x$format %in% c(1,2,3,7,8))
         out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)
     else
         out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
@@ -490,7 +490,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         XY <- tera.wasserburg(x,i)
         X[i] <- XY$x['U238Pb206']
         Y[i] <- XY$x['Pb207Pb206']
-        E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov
+        E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov[1:2,1:2]
         E[2*i,2*i] <- E[2*i,2*i] + (a0*w)^2
         J[i,2*i-1] <- 1 # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
@@ -584,7 +584,7 @@ get.Ew <- function(w,Z,a0,b0,U){
 }
 
 fixit <- function(x,anchor=list(FALSE,NA)){
-    if (x$format<4){
+    if (x$format %in% c(1,2,3,7,8)){
         if (!anchor[[1]]) out <- rep(FALSE,2)
         else if (is.numeric(anchor[[2]])) out <- c(TRUE,FALSE)
         else out <- c(FALSE,TRUE)
