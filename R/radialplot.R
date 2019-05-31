@@ -222,7 +222,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
-                           cutoff.76=1100,cutoff.disc=c(-15,5),
+                           cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
                            show.numbers=FALSE,pch=21,
                            levels=NA,clabel="",bg=c("yellow","red"),
                            col='black',markers=NULL,k=0,exterr=TRUE,

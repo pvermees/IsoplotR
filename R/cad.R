@@ -113,9 +113,10 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @export
 cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     col='black',type=4,cutoff.76=1100,
-                    cutoff.disc=c(-15,5),common.Pb=0,
+                    cutoff.disc=list(-15,5,TRUE),common.Pb=0,
                     hide=NULL,...){
-    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc,common.Pb=common.Pb)[,1]
+    tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
+                          cutoff.disc=cutoff.disc,common.Pb=common.Pb)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
                 col=col,hide=hide,...)
 }
