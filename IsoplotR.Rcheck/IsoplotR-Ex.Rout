@@ -169,13 +169,12 @@ Type 'q()' to quit R.
 > 
 > dev.new()
 dev.new(): using pdf(file="Rplots1.pdf")
-> concordia(examples$UPb,wetherill=FALSE,
-+           xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
-+           ticks=249:254,exterr=TRUE)
+> concordia(examples$UPb,type=1,xlim=c(24.9,25.4),
++           ylim=c(0.0508,0.0518),ticks=249:254,exterr=TRUE)
 > 
 > dev.new()
 dev.new(): using pdf(file="Rplots2.pdf")
-> concordia(examples$UPb,wetherill=FALSE,show.age=2,anchor=list(TRUE,0))
+> concordia(examples$UPb,type=2,show.age=2,anchor=list(TRUE,0))
 > 
 > 
 > 
@@ -518,7 +517,6 @@ $legend
 > 
 > 
 > 
-> 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("peakfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
@@ -543,7 +541,6 @@ $legend
 > dev.new()
 dev.new(): using pdf(file="Rplots9.pdf")
 > radialplot(examples$LudwigMixture,k='min')
-> 
 > 
 > 
 > 
@@ -816,7 +813,7 @@ $type
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  19.064 6.097 17.241 0.004 0.003 
+Time elapsed:  16.948 4.845 12.321 0.002 0.001 
 > grDevices::dev.off()
 pdf 
   2 

@@ -22,8 +22,8 @@ age(x, ...)
   J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), d = diseq(),
   ...)
 
-\method{age}{UPb}(x, type = 1, wetherill = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, common.Pb = 0, show.p = FALSE, ...)
+\method{age}{UPb}(x, type = 1, exterr = TRUE, i = NA, sigdig = NA,
+  common.Pb = 0, show.p = FALSE, ...)
 
 \method{age}{PbPb}(x, isochron = TRUE, common.Pb = 1, exterr = TRUE,
   i = NA, sigdig = NA, ...)
@@ -140,11 +140,6 @@ uncertainties.
 \code{5}: a discordia line should be fitted using a modified
 maximum likelihood algorithm that accounts for overdispersion by
 adding a geological (co)variance term.}
-
-\item{wetherill}{logical flag to indicate whether the data should
-be evaluated in Wetherill (\code{TRUE}) or Tera-Wasserburg
-(\code{FALSE}) space.  This option is only used when
-\code{type=2}}
 
 \item{i}{(optional) index of a particular aliquot}
 

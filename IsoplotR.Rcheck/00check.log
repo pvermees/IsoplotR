@@ -9,25 +9,6 @@
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: ‘Pieter Vermeesch <p.vermeesch@ucl.ac.uk>’
 
-Found the following (possibly) invalid URLs:
-  URL: http://isoplotr.london-geochron.com (moved to https://www.ucl.ac.uk/~ucfbpve/isoplotr)
-    From: DESCRIPTION
-          man/IsoplotR.Rd
-    Status: 502
-    Message: Bad Gateway
-  URL: http://ucl.ac.uk/~ucfbpve (moved to https://www.ucl.ac.uk/~ucfbpve)
-    From: README.md
-    Status: 502
-    Message: Bad Gateway
-  URL: http://ucl.ac.uk/~ucfbpve/isoplotr (moved to https://www.ucl.ac.uk/~ucfbpve/isoplotr)
-    From: README.md
-    Status: 502
-    Message: Bad Gateway
-  URL: http://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/ (moved to https://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/)
-    From: README.md
-    Status: 502
-    Message: Bad Gateway
-
 The build time stamp is missing.
 * checking package namespace information ... OK
 * checking package dependencies ... OK
@@ -36,6 +17,8 @@ The build time stamp is missing.
 * checking for executable files ... OK
 * checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
+  .Rhistory
+  R/.Rhistory
   .git
 These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
@@ -49,7 +32,6 @@ Found the following files with non-portable file names:
   .git/logs/HEAD (pieter-laptop's conflicted copy 2019-05-01)
   .git/logs/refs/heads/beta (pieter-laptop's conflicted copy 2019-05-01)
   .git/logs/refs/remotes/origin/beta (pieter-laptop's conflicted copy 2019-05-01)
-  .git/refs/heads/beta (pieter-laptop's conflicted copy 2019-05-01)
   .git/refs/remotes/origin/beta (pieter-laptop's conflicted copy 2019-05-01)
 These are not fully portable file names.
 See section ‘Package structure’ in the ‘Writing R Extensions’ manual.

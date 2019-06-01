@@ -147,12 +147,11 @@ data(examples)
 concordia(examples$UPb,show.age=2)
 
 dev.new()
-concordia(examples$UPb,wetherill=FALSE,
-          xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
-          ticks=249:254,exterr=TRUE)
+concordia(examples$UPb,type=1,xlim=c(24.9,25.4),
+          ylim=c(0.0508,0.0518),ticks=249:254,exterr=TRUE)
 
 dev.new()
-concordia(examples$UPb,wetherill=FALSE,show.age=2,anchor=list(TRUE,0))
+concordia(examples$UPb,type=2,show.age=2,anchor=list(TRUE,0))
 
 
 
@@ -438,7 +437,6 @@ peakfit(examples$LudwigMixture,k='min')
 
 
 
-
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("peakfit", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
@@ -462,7 +460,6 @@ radialplot(examples$FT1)
 
 dev.new()
 radialplot(examples$LudwigMixture,k='min')
-
 
 
 

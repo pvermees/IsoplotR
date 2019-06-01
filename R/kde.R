@@ -1,9 +1,9 @@
+#' @title
 #' Create (a) kernel density estimate(s)
-#'
+#' @description
 #' Creates one or more kernel density estimates using a combination of
 #' the Botev (2010) bandwidth selector and the Abramson (1982)
 #' adaptive kernel bandwidth modifier.
-#'
 #' @details
 #' Given a set of \eqn{n} age estimates \eqn{\{t_1, t_2, ..., t_n\}},
 #' histograms and KDEs are probability density estimators that display
@@ -28,7 +28,6 @@
 #' dates are closely spaced in time), and a wider bandwidth in the
 #' distribution's sparsely sampled troughs. Thus, the resolution of
 #' the density estimate is optimised according to data availability.
-#'
 #' @param x a vector of numbers OR an object of class \code{UPb},
 #'     \code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd},
 #'     \code{RbSr}, \code{UThHe}, \code{fissiontracks}, \code{ThU} or
@@ -108,7 +107,6 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #'
 #' Vermeesch, P., 2012. On the visualisation of detrital age
 #' distributions. Chemical Geology, 312, pp.190-194.
-#'
 #' @examples
 #' kde(examples$UPb)
 #'
@@ -135,7 +133,6 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
     }
     invisible(X)
 }
-#'
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
@@ -144,21 +141,25 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'     (\code{type}=4), or the concordia age (\code{type}=5), or
 #'     \eqn{^{208}}/\eqn{^{232}}Th age (\code{type}=6, only available
 #'     if \code{x$format}=7 or 8).
-#'
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
-#' 
-#' @param cutoff.disc two element vector with the minimum (negative)
-#'     and maximum (positive) percentage discordance allowed between
-#'     the \eqn{^{207}}Pb/\eqn{^{235}}U and
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
-#'     \code{cutoff.disc=NA} if you do not want to use this filter.
-#' 
+#' @param cutoff.disc discordance cutoff filter. This is a three
+#'     element list.
+#'
+#' The first two items contain the minimum (negative) and maximum
+#' (positive) percentage discordance allowed between the
+#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+#'
+#' The third item is a boolean flag that controls whether the
+#' discordance filter should be applied before (\code{TRUE}) or after
+#' (\code{FALSE}) the common-Pb correction.
+#'
+#' Set \code{cutoff.disc=NA} to turn off this filter.
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -187,7 +188,6 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
                 hide=hide,...)
 }
-#'
 #' @param samebandwidth logical flag indicating whether the same
 #'     bandwidth should be used for all samples. If
 #'     \code{samebandwidth = TRUE} and \code{bw = NULL}, then the

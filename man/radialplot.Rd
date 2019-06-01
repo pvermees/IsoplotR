@@ -34,7 +34,7 @@ radialplot(x, ...)
 
 \method{radialplot}{UPb}(x, from = NA, to = NA, t0 = NA,
   transformation = "log", type = 4, cutoff.76 = 1100,
-  cutoff.disc = c(-15, 5), show.numbers = FALSE, pch = 21,
+  cutoff.disc = list(-15, 5, TRUE), show.numbers = FALSE, pch = 21,
   levels = NA, clabel = "", bg = c("yellow", "red"), col = "black",
   markers = NULL, k = 0, exterr = TRUE, common.Pb = 0,
   alpha = 0.05, hide = NULL, omit = NULL, omit.col = NA, ...)
@@ -149,6 +149,8 @@ different background colours of the plot symbols.}
 \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.}
 
+\item{for plot symbols, set \code{bg=NA}}
+
 }}
 
 \item{col}{text colour to be used if \code{show.numbers=TRUE}}
@@ -195,14 +197,21 @@ the mixture model errors?}
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 only used if \code{type=4}.}
 
-\item{cutoff.disc}{two element vector with the maximum and minimum
-percentage discordance allowed between the
-\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
-between the \eqn{^{206}}Pb/\eqn{^{238}}U and
-\eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-\eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
-\code{cutoff.disc=NA} if you do not want to use this filter.}
+\item{cutoff.disc}{discordance cutoff filter. This is a three
+    element list.
+
+The first two items contain the minimum (negative) and maximum
+(positive) percentage discordance allowed between the
+\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
+(if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+\eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
+(if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+
+The third item is a boolean flag that controls whether the
+discordance filter should be applied before (\code{TRUE}) or after
+(\code{FALSE}) the common-Pb correction.
+
+Set \code{cutoff.disc=NA} to turn off this filter.}
 
 \item{common.Pb}{apply a common lead correction using one of three
     methods:
@@ -276,7 +285,6 @@ radialplot(examples$FT1)
 
 dev.new()
 radialplot(examples$LudwigMixture,k='min')
-
 }
 \references{
 Galbraith, R.F., 1988. Graphical display of estimates

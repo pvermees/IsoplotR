@@ -202,7 +202,6 @@ data(examples)
 peakfit(examples$FT1,k=2)
 
 peakfit(examples$LudwigMixture,k='min')
-
 }
 \references{
 Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for

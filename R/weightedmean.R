@@ -1,5 +1,6 @@
+#' @title
 #' Calculate the weighted mean age
-#'
+#' @description
 #' Models the data as a Normal distribution with two sources of
 #' variance.  Estimates the mean and `overdispersion' using the method
 #' of Maximum Likelihood. Computes the MSWD of a Normal fit without
@@ -7,7 +8,6 @@
 #' and reject outliers. Only propagates the analytical uncertainty
 #' associated with decay constants and \eqn{\zeta} and J-factors after
 #' computing the weighted mean isotopic composition.
-#'
 #' @details
 #' Let \eqn{\{t_1, ..., t_n\}} be a set of n age estimates
 #' determined on different aliquots of the same sample, and let
@@ -46,7 +46,6 @@
 #' the data do not exhibit any overdispersion, then the heuristic
 #' outlier detection method is equivalent to Ludwig (2003)'s `2-sigma'
 #' method.
-#'
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
 #'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs},
@@ -193,19 +192,26 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), or the (Wetherill) concordia age (\code{type}=5)
+#'     (\code{type}=4), or the (Wetherill) concordia age (\code{type}=5) 
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc two element vector with the maximum and minimum
-#'     percentage discordance allowed between the
-#'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
-#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
-#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
-#'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' @param cutoff.disc discordance cutoff filter. This is a three
+#'     element list.
+#'
+#' The first two items contain the minimum (negative) and maximum
+#' (positive) percentage discordance allowed between the
+#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+#'
+#' The third item is a boolean flag that controls whether the
+#' discordance filter should be applied before (\code{TRUE}) or after
+#' (\code{FALSE}) the common-Pb correction.
+#'
+#' Set \code{cutoff.disc=NA} to turn off this filter.
 #' @param exterr propagate decay constant uncertainties?
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
@@ -218,7 +224,6 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #' \code{3}: use the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
-#'
 #' @examples
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
@@ -287,7 +292,6 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
 #' \code{3}: correct the data using the measured present day
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
-#'
 #' @rdname weightedmean
 #' @export
 weightedmean.ThU <- function(x,random.effects=TRUE,
