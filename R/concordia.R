@@ -122,6 +122,7 @@
 #' \code{settings('iratio','Pb207Pb206')} (if \code{x$format}<4) or
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')} (if \code{x$format}>3)
+#' 
 #' @param anchor control parameters to fix the intercept age or common
 #'     Pb composition of the discordia fit. This is a two-element
 #'     list.
@@ -204,14 +205,13 @@
 #'
 #' \item{model}{ the fitting model (\code{=show.age-1}).}
 #'
-#' \item{x}{ a two-element vector with the upper and lower intercept
+#' \item{x}{ a vector with the upper and lower intercept
 #' ages (if \code{type=1}) or the lower intercept age and
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (if \code{type=2}).}
+#' common Pb intercept(s) (if \code{type=2}).}
 #'
 #' \item{cov}{ the covariance matrix of the elements in \code{x}.}
 #'
-#' \item{err}{ a \code{[2 x 2]} or \code{[3 x 2]} matrix with the
-#' following rows:
+#' \item{err}{ a matrix with the following rows:
 #'
 #' \code{s}: the estimated standard deviation for \code{x}
 #'

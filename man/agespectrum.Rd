@@ -75,6 +75,8 @@ different background colours of the plot symbols.}
 \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.}
 
+\item{for plot symbols, set \code{plateau.col=NA}}
+
 }}
 
 \item{non.plateau.col}{if \code{plateau=TRUE}, the steps that do

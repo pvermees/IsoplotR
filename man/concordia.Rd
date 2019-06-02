@@ -4,7 +4,7 @@
 \alias{concordia}
 \title{Concordia diagram}
 \usage{
-concordia(x = NULL, tlim = NULL, alpha = 0.05, wetherill = TRUE,
+concordia(x = NULL, tlim = NULL, alpha = 0.05, type = 1,
   show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"),
   concordia.col = "darksalmon", exterr = FALSE, show.age = 0,
@@ -19,7 +19,16 @@ concordia(x = NULL, tlim = NULL, alpha = 0.05, wetherill = TRUE,
 \item{alpha}{probability cutoff for the error ellipses and
 confidence intervals}
 
-\item{wetherill}{logical flag (\code{FALSE} for Tera-Wasserburg)}
+\item{type}{one of \enumerate{
+
+\item{Wetherill: 206Pb/238U vs. 207Pb/235U}
+
+\item{Tera-Wasserburg: 207Pb/206Pb vs. 238U/206Pb}
+
+\item{U-Th-Pb concordia: 208Pb/232Th vs. 206Pb/238U (only available
+if \code{x$format=7} or \code{x$format=8}}
+
+}}
 
 \item{show.numbers}{logical flag (\code{TRUE} to show grain
 numbers)}
@@ -48,6 +57,8 @@ as different background colours within the error ellipses.}
 
 \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.}
+
+\item{for empty ellipses, set \code{ellipse.col=NA}}
 
 }}
 
@@ -177,15 +188,13 @@ following items:
 
 \item{model}{ the fitting model (\code{=show.age-1}).}
 
-\item{x}{ a two-element vector with the upper and lower intercept
-ages (if \code{wetherill=TRUE}) or the lower intercept age and
-\eqn{^{207}}Pb/\eqn{^{206}}Pb intercept (if
-\code{wetherill=FALSE}).}
+\item{x}{ a vector with the upper and lower intercept
+ages (if \code{type=1}) or the lower intercept age and
+common Pb intercept(s) (if \code{type=2}).}
 
 \item{cov}{ the covariance matrix of the elements in \code{x}.}
 
-\item{err}{ a \code{[2 x 2]} or \code{[3 x 2]} matrix with the
-following rows:
+\item{err}{ a matrix with the following rows:
 
 \code{s}: the estimated standard deviation for \code{x}
 
@@ -253,12 +262,11 @@ data(examples)
 concordia(examples$UPb,show.age=2)
 
 dev.new()
-concordia(examples$UPb,wetherill=FALSE,
-          xlim=c(24.9,25.4),ylim=c(0.0508,0.0518),
-          ticks=249:254,exterr=TRUE)
+concordia(examples$UPb,type=1,xlim=c(24.9,25.4),
+          ylim=c(0.0508,0.0518),ticks=249:254,exterr=TRUE)
 
 dev.new()
-concordia(examples$UPb,wetherill=FALSE,show.age=2,anchor=list(TRUE,0))
+concordia(examples$UPb,type=2,show.age=2,anchor=list(TRUE,0))
 
 }
 \references{

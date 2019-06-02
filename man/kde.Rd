@@ -29,8 +29,8 @@ kde(x, ...)
   log = FALSE, n = 512, plot = TRUE, pch = "|",
   xlab = "age [Ma]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
   hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
-  binwidth = NA, type = 4, cutoff.76 = 1100, cutoff.disc = c(-15,
-  5), common.Pb = 0, hide = NULL, ...)
+  binwidth = NA, type = 4, cutoff.76 = 1100,
+  cutoff.disc = list(-15, 5, TRUE), common.Pb = 0, hide = NULL, ...)
 
 \method{kde}{detritals}(x, from = NA, to = NA, bw = NA,
   adaptive = TRUE, log = FALSE, n = 512, plot = TRUE, pch = NA,
@@ -161,22 +161,30 @@ from the plot.}
 \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-(\code{type}=4), or the (Wetherill) concordia age
-(\code{type}=5)}
+(\code{type}=4), or the concordia age (\code{type}=5), or
+\eqn{^{208}}/\eqn{^{232}}Th age (\code{type}=6, only available
+if \code{x$format}=7 or 8).}
 
 \item{cutoff.76}{the age (in Ma) below which the
 \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 only used if \code{type=4}.}
 
-\item{cutoff.disc}{two element vector with the minimum (negative)
-and maximum (positive) percentage discordance allowed between
-the \eqn{^{207}}Pb/\eqn{^{235}}U and
-\eqn{^{206}}Pb/\eqn{^{238}}U age (if
-\eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-\eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
-age (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
-\code{cutoff.disc=NA} if you do not want to use this filter.}
+\item{cutoff.disc}{discordance cutoff filter. This is a three
+    element list.
+
+The first two items contain the minimum (negative) and maximum
+(positive) percentage discordance allowed between the
+\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
+(if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+\eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
+(if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+
+The third item is a boolean flag that controls whether the
+discordance filter should be applied before (\code{TRUE}) or after
+(\code{FALSE}) the common-Pb correction.
+
+Set \code{cutoff.disc=NA} to turn off this filter.}
 
 \item{common.Pb}{apply a common lead correction using one of three
     methods:

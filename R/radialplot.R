@@ -1,11 +1,10 @@
+#' @title
 #' Visualise heteroscedastic data on a radial plot
-#'
+#' @description
 #' Implementation of a graphical device developed by Rex Galbraith to
 #' display several estimates of the same quantity that have different
 #' standard errors.
-#'
 #' @details
-#'
 #' The radial plot (Galbraith, 1988, 1990) is a graphical device that
 #' was specifically designed to display heteroscedastic data, and is
 #' constructed as follows.  Consider a set of dates
@@ -29,7 +28,6 @@
 #' further towards the right. Thus, radial plots allow the observer to
 #' assess both the magnitude and the precision of quantitative data in
 #' one glance.
-#'
 #' @param x Either an \code{[n x 2]} matix of (transformed) values z
 #'     and their standard errors s
 #'
@@ -115,7 +113,6 @@
 #'
 #' dev.new()
 #' radialplot(examples$LudwigMixture,k='min')
-#'
 #' @rdname radialplot
 #' @export
 radialplot <- function(x,...){ UseMethod("radialplot",x) }
@@ -198,14 +195,21 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc two element vector with the maximum and minimum
-#'     percentage discordance allowed between the
-#'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
-#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
-#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
-#'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' @param cutoff.disc discordance cutoff filter. This is a three
+#'     element list.
+#'
+#' The first two items contain the minimum (negative) and maximum
+#' (positive) percentage discordance allowed between the
+#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+#'
+#' The third item is a boolean flag that controls whether the
+#' discordance filter should be applied before (\code{TRUE}) or after
+#' (\code{FALSE}) the common-Pb correction.
+#'
+#' Set \code{cutoff.disc=NA} to turn off this filter.
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -222,7 +226,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
-                           cutoff.76=1100,cutoff.disc=c(-15,5),
+                           cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
                            show.numbers=FALSE,pch=21,
                            levels=NA,clabel="",bg=c("yellow","red"),
                            col='black',markers=NULL,k=0,exterr=TRUE,
@@ -384,7 +388,6 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,
 #' \code{3}: correct the data using the measured present day
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
-#'
 #' @rdname radialplot
 #' @export
 radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,

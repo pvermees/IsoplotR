@@ -1,8 +1,8 @@
+#' @title
 #' Plot continuous data as cumulative age distributions
-#'
+#' @description
 #' Plot a dataset as a Cumulative Age Distribution (CAD), also known
 #' as a `empirical cumulative distribution function'.
-#'
 #' @details
 #' Empirical cumulative distribution functions or cumulative age
 #' distributions CADs are the most straightforward way to visualise
@@ -24,7 +24,6 @@
 #' proportional to the steepness of the CAD. This is different from
 #' probability density estimates such as histograms, in which such
 #' components stand out as peaks.
-#'
 #' @param x a numerical vector OR an object of class \code{UPb},
 #'     \code{PbPb}, \code{ArAr}, \code{KCa}, \code{UThHe},
 #'     \code{fissiontracks}, \code{ReOs}, \code{RbSr}, \code{SmNd},
@@ -89,14 +88,21 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U-age and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc two element vector with the maximum and minimum
-#'     percentage discordance allowed between the
-#'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < cutoff.76) or between
-#'     the \eqn{^{206}}Pb/\eqn{^{238}}U and
-#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U > cutoff.76).  Set
-#'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' @param cutoff.disc discordance cutoff filter. This is a three
+#'     element list.
+#'
+#' The first two items contain the minimum (negative) and maximum
+#' (positive) percentage discordance allowed between the
+#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+#'
+#' The third item is a boolean flag that controls whether the
+#' discordance filter should be applied before (\code{TRUE}) or after
+#' (\code{FALSE}) the common-Pb correction.
+#'
+#' Set \code{cutoff.disc=NA} to turn off this filter.
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -108,14 +114,14 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' \code{3}: use the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
-#'
 #' @rdname cad
 #' @export
 cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     col='black',type=4,cutoff.76=1100,
-                    cutoff.disc=c(-15,5),common.Pb=0,
+                    cutoff.disc=list(-15,5,TRUE),common.Pb=0,
                     hide=NULL,...){
-    tt <- filter.UPb.ages(x,type,cutoff.76,cutoff.disc,common.Pb=common.Pb)[,1]
+    tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
+                          cutoff.disc=cutoff.disc,common.Pb=common.Pb)[,1]
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
                 col=col,hide=hide,...)
 }
