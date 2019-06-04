@@ -8,10 +8,10 @@
 \title{library(IsoplotR)}
 \description{
 A list of documented functions may be viewed by typing
-\code{help(package='IsoplotR')}.  Detailed instructions are
-provided at \url{http://isoplotr.london-geochron.com}. Further
-details about the theoretical background are provided by Vermeesch
-(2018).
+    \code{help(package='IsoplotR')}.  Detailed instructions are
+    provided at \url{http://isoplotr.london-geochron.com}. Further
+    details about the theoretical background are provided by
+    Vermeesch (2018).
 }
 \references{
 Vermeesch, P., 2018, IsoplotR: a free and open toolbox

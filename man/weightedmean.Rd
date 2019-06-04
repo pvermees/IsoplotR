@@ -232,7 +232,7 @@ uses the default values stored in
 \code{settings('iratio',...)}.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format == 1} or \code{2}).
+    when \code{x$format=1} or \code{2}).
 
 \code{0}: no correction
 

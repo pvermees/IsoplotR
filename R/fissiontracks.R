@@ -23,8 +23,9 @@ get.absolute.zeta <- function(mineral){
     c(zeta,0)
 }
 
-#' Calculate the zeta calibration coefficient for fission track dating
+#' @title Calculate the zeta calibration coefficient for fission track dating
 #'
+#' @description
 #' Determines the zeta calibration constant of a fission track dataset
 #' (EDM or LA-ICP-MS) given its true age and analytical uncertainty.
 #'

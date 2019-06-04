@@ -20,11 +20,10 @@
 cad(x, ...)
 
 \method{cad}{default}(x, pch = NA, verticals = TRUE,
-  xlab = "age [Ma]", colmap = "heat.colors", col = "black",
-  hide = NULL, ...)
+  xlab = "age [Ma]", col = "black", hide = NULL, ...)
 
 \method{cad}{detritals}(x, pch = NA, verticals = TRUE,
-  xlab = "age [Ma]", colmap = "heat.colors", hide = NULL, ...)
+  xlab = "age [Ma]", col = "heat.colors", hide = NULL, ...)
 
 \method{cad}{UPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
   col = "black", type = 4, cutoff.76 = 1100,
@@ -75,14 +74,11 @@ the CAD should be connected by vertical lines}
 
 \item{xlab}{x-axis label}
 
-\item{colmap}{an optional string with the name of one of \code{R}'s
-built-in colour palettes (e.g., \code{heat.colors},
-\code{terrain.colors}, \code{topo.colors}, \code{cm.colors}),
-which are to be used for plotting data of class
-\code{detritals}.}
-
-\item{col}{colour to give to single sample datasets (not applicable
-if \code{x} has class \code{detritals})}
+\item{col}{either the name of one of \code{R}'s built-in colour
+palettes (e.g., \code{'heat.colors'}, \code{'terrain.colors'},
+\code{'topo.colors'}, \code{'cm.colors'}) (if \code{x} has
+class \code{detritals}) OR the name or code for a colour to
+give to single sample datasets (otherwise).}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}
@@ -141,7 +137,7 @@ or zero (for the Pb-Pb method). When applied to data of class
 detrital Th-correction.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format == 1} or \code{2}).
+    when \code{x$format=1} or \code{2}).
 
 \code{0}: no correction
 
@@ -160,11 +156,10 @@ as a `empirical cumulative distribution function'.
 }
 \details{
 Empirical cumulative distribution functions or cumulative age
-distributions CADs are the most straightforward way to visualise
-the probability distribution of multiple dates.  Suppose that we
-have a set of \eqn{n} dates \eqn{t_i}. The the CAD is a step
-function that sets out the rank order of the dates against their
-numerical value:
+distributions are the most straightforward way to visualise the
+probability distribution of multiple dates.  Suppose that we have a
+set of \eqn{n} dates \eqn{t_i}. The the CAD is a step function that
+sets out the rank order of the dates against their numerical value:
 
 \eqn{CAD(t) = \sum_i 1(t<t_i)/n}
 

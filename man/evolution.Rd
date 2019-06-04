@@ -117,9 +117,10 @@ aliquots.}
 \description{
 Plots Th-U data on a
 \eqn{^{234}}U/\eqn{^{238}}U-\eqn{^{230}}Th/\eqn{^{238}}U evolution
-diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or
-(if \eqn{^{234}}U/\eqn{^{238}}U is assumed to be in secular equilibrium),
-a \eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
+diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or (if
+\eqn{^{234}}U/\eqn{^{238}}U is assumed to be in secular
+equilibrium), a
+\eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
 calculates isochron ages.
 }
 \details{

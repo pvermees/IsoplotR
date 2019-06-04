@@ -18,7 +18,7 @@ Pb0corr(x, option = 1, omit = NULL)
 }}
 
 \item{omit}{vector with indices of aliquots that should be omitted
-from the isochron regression (only used if \code{option==2})}
+from the isochron regression (only used if \code{option=2})}
 }
 \value{
 Returns a list in which \code{x.raw} contains the original data and

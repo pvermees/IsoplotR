@@ -1,5 +1,6 @@
 #' @title
 #' Calculate the weighted mean age
+#' 
 #' @description
 #' Models the data as a Normal distribution with two sources of
 #' variance.  Estimates the mean and `overdispersion' using the method
@@ -8,6 +9,7 @@
 #' and reject outliers. Only propagates the analytical uncertainty
 #' associated with decay constants and \eqn{\zeta} and J-factors after
 #' computing the weighted mean isotopic composition.
+#' 
 #' @details
 #' Let \eqn{\{t_1, ..., t_n\}} be a set of n age estimates
 #' determined on different aliquots of the same sample, and let
@@ -46,6 +48,7 @@
 #' the data do not exhibit any overdispersion, then the heuristic
 #' outlier detection method is equivalent to Ludwig (2003)'s `2-sigma'
 #' method.
+#' 
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
 #'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs},
@@ -61,6 +64,7 @@
 #'     `model-1' isochron regression.
 #' @param ... optional arguments
 #' @seealso \code{\link{central}}
+#' 
 #' @return Returns a list with the following items:
 #'
 #' \describe{
@@ -280,7 +284,7 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
 #'     uses the default values stored in
 #'     \code{settings('iratio',...)}.
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}).
+#'     when \code{x$format=1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'

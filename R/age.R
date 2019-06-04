@@ -1,12 +1,16 @@
+#' @title
 #' Calculate isotopic ages
-#'
-#' Calculates U-Pb, Pb-Pb, Ar-Ar, K-Ca, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He,
-#' Th-U and fission track ages and propagates their analytical
-#' uncertainties. Includes options for single grain, isochron and
-#' concordia ages.
+#' 
+#' @description
+#' Calculates U-Pb, Pb-Pb, Ar-Ar, K-Ca, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf,
+#' U-Th-He, Th-U and fission track ages and propagates their
+#' analytical uncertainties. Includes options for single grain,
+#' isochron and concordia ages.
 #'
 #' @param x can be:
+#' 
 #' \itemize{
+#'
 #' \item a scalar containing an isotopic ratio,
 #'
 #' \item a two element vector containing an isotopic ratio and its standard
@@ -109,6 +113,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
     }
     out
 }
+
 #' @param type scalar flag indicating whether
 #'
 #' \code{1}: each U-Pb analysis should be considered separately,
@@ -143,13 +148,13 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{3}: use the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
-#'
+#' 
 #' @param show.p Show the p-value for concordance for each aliquot to
 #'     the output table. Note: it would be unwise to use the p-value
-#'     value as a concordance filter. Doing so would 'punish' high
+#'     value as a concordance filter. Doing so would `punish' high
 #'     precision measurements, which are more likely to fail the
 #'     Chi-square test than low precision measurements. The latter
-#'     would therefore be 'rewarded' by such a criterion.
+#'     would therefore be `rewarded' by such a criterion.
 #'
 #' @return
 #' \enumerate{
@@ -160,12 +165,14 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \item if \code{x} has class \code{UPb} and \code{type=1}, returns a
 #' table with the following columns: \code{t.75}, \code{err[t.75]},
 #' \code{t.68}, \code{err[t.68]}, \code{t.76}, \code{err[t.76]},
-#' \code{t.conc}, \code{err[t.conc]}, \code{err[p.conc]}, containing
-#' the \eqn{^{207}}Pb/\eqn{^{235}}U-age and standard error, the
+#' (\code{t.82}, \code{err[t.82]},) \code{t.conc}, \code{err[t.conc]},
+#' (\code{err[p.conc]},) containing the
+#' \eqn{^{207}}Pb/\eqn{^{235}}U-age and standard error, the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
-#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, the single
-#' grain concordia age and standard error, and the p-value for
-#' concordance, respectively.
+#' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, (the
+#' \eqn{^{208}}Pb/\eqn{^{232}}Th-age and standard error,) the single
+#' grain concordia age and standard error, (and the p-value for
+#' concordance,) respectively.
 #'
 #' \item if \code{x} has class \code{UPb} and \code{type=2, 3, 4} or
 #' \code{5}, returns the output of the \code{\link{concordia}}
@@ -235,6 +242,7 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=1,
         out <- PbPb.age(x,exterr=exterr,i=i,sigdig=sigdig,common.Pb=common.Pb)
     out
 }
+
 #' @param J two-element vector with the J-factor and its standard
 #'     error.
 #' 
@@ -268,6 +276,7 @@ age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     else out <- KCa.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }
+
 #' @param central logical flag indicating whether each analysis should
 #'     be considered separately (\code{central=FALSE}) or a central
 #'     age should be calculated from all analyses together
@@ -280,6 +289,7 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NA,sigdig=NA,...){
     else out <- UThHe.age(x,i=i,sigdig=sigdig)
     out
 }
+
 #' @param zeta two-element vector with the zeta-factor and its standard
 #'     error.
 #' @param rhoD two-element vector with the track density of the
@@ -291,6 +301,7 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
     else out <- fissiontrack.age(x,i=i,sigdig=sigdig,exterr=exterr)
     out
 }
+
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format = 1} or \code{2}).
 #'

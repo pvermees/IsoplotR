@@ -1,15 +1,15 @@
-#' Get error ellipse coordinates for plotting
+#' @title Get error ellipse coordinates for plotting
 #'
-#' Constructs an error ellipse at a given confidence level from its
-#' centre and covariance matrix
+#' @description Constructs an error ellipse at a given confidence level
+#' from its centre and covariance matrix
 #'
 #' @param x x-coordinate (scalar) for the centre of the ellipse
 #' @param y y-coordinate (scalar) for the centre of the ellipse
-#' @param covmat the [\code{2 x 2}] covariance matrix of the x-y coordinates
+#' @param covmat the [\code{2x2}] covariance matrix of the x-y coordinates
 #' @param alpha the probability cutoff for the error ellipses
 #' @param n the resolution (number of segments) of the error ellipses
 #'
-#' @return an [\code{n x 2}] matrix of plot coordinates
+#' @return an [\code{nx2}] matrix of plot coordinates
 #' @examples
 #' x = 99; y = 101;
 #' covmat <- matrix(c(1,0.9,0.9,1),nrow=2)
@@ -34,8 +34,9 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
     out
 }
 
-#' Create a scatter plot with error ellipses or crosses
+#' @title Create a scatter plot with error ellipses or crosses
 #'
+#' @description
 #' Takes bivariate data with (correlated) uncertainties as input and
 #' produces a scatter plot with error ellipses or crosses as output.
 #' (optionally) displays the linear fit on this diagram, and can show

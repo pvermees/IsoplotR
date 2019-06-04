@@ -173,8 +173,8 @@ if \code{method='other'}, \code{x} is read as a table, unless
 
 \item{Th02}{2-element vector with the assumed initial
 \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{isochron==FALSE} and
-\code{detritus==2}}
+standard error. Only used if \code{isochron=FALSE} and
+\code{detritus=2}}
 
 \item{Th02U48}{9-element vector with the measured composition of
 the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},

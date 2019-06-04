@@ -94,7 +94,7 @@ radialplot(x, ...)
   hide = NULL, omit = NULL, omit.col = NA, ...)
 }
 \arguments{
-\item{x}{Either an \code{[n x 2]} matix of (transformed) values z
+\item{x}{Either an \code{[nx2]} matix of (transformed) values z
     and their standard errors s
 
 OR

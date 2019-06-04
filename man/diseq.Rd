@@ -2,7 +2,8 @@
 % Please edit documentation in R/diseq.R
 \name{diseq}
 \alias{diseq}
-\title{Set up U-series disequilibrium correction for U-Pb geochronology}
+\title{Set up U-series disequilibrium correction for U-Pb
+    geochronology}
 \usage{
 diseq(option = 0, U48 = 1, Th0U8 = 1, Ra6U8 = 1, Pa1U5 = 1,
   fThU = 1, fRaU = 1, fPaU = 1)
@@ -10,17 +11,13 @@ diseq(option = 0, U48 = 1, Th0U8 = 1, Ra6U8 = 1, Pa1U5 = 1,
 \arguments{
 \item{option}{one of four options:
 
-\describe{
+\code{0}: no disequilibrium correction
 
-\item{0}{no disequilibrium correction}
+\code{1}: use assumed initial activity ratios
 
-\item{1}{use assumed initial activity ratios}
+\code{2}: use measured current activity ratios
 
-\item{2}{use measured current activity ratios}
-
-\item{3}{use partition coefficients between the mineral and magma}
-
-}}
+\code{3}: use partition coefficients between the mineral and magma}
 
 \item{U48}{the \eqn{^{234}}U/\eqn{^{238}}U-activity ratio (initial
 if \code{option=1} or measured if \code{option=2}).}
@@ -45,18 +42,19 @@ and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.}
 }
 \value{
 a list with the following items: \code{option} and (\code{U48},
-\code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option == 1} or
-\code{option == 2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
-\code{option == 3}].
+\code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option=1} or
+\code{option=2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
+\code{option=3}].
 }
 \description{
-The U-Pb method conventionally assumes initial secular equilibrium
-of all the intermediate daughters of the \eqn{{}^{238}}U -
-\eqn{{}^{206}}Pb and \eqn{{}^{235}}U - \eqn{{}^{207}}Pb decay
-chains.  Violation of this assumption may produce inaccurate
-results.  \code{diseq} sets up initial disequilibrium parameters
-that are subsequently passed on to the \code{read.data} function
-for incorporation in other functions.
+The U-Pb method conventionally assumes initial secular
+    equilibrium of all the intermediate daughters of the
+    \eqn{{}^{238}}U-\eqn{{}^{206}}Pb and
+    \eqn{{}^{235}}U-\eqn{{}^{207}}Pb decay chains.  Violation of
+    this assumption may produce inaccurate results.  \code{diseq}
+    sets up initial disequilibrium parameters that are subsequently
+    passed on to the \code{read.data} function for incorporation in
+    other functions.
 }
 \details{
 There are three ways to correct for the initial disequilibrium
@@ -74,7 +72,7 @@ produced. (Wendt and Carl, 1985).}
 ratios.  This approach only works for young samples (< 5Ma, say).}
 
 \item{Specify the elemental fractionation factor between Th and U
-in the magma chamber and the mineral (Sch\"{a}rer,
+in the magma chamber and the mineral (Schaerer,
 1984). \code{IsoplotR} generalises this approach to Ra/U and Pa/U
 as well. However, it still assumes secular equilibrium between
 \eqn{{}^{234}}U and \eqn{{}^{238}}Th.}
@@ -89,7 +87,7 @@ concordia(UPb)
 
 }
 \references{
-Sch\"{a}rer, U., 1984. The effect of initial \eqn{{}^{230}}Th
+Schaerer, U., 1984. The effect of initial \eqn{{}^{230}}Th
 disequilibrium on young UPb ages: the Makalu case, Himalaya. Earth
 and Planetary Science Letters, 67(2), pp.191-204.
 

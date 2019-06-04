@@ -1,6 +1,8 @@
+#' @title
 #' Multidimensional Scaling
 #'
-#' Performs classical or nonmetric Multidimensional Scaling analysis
+#' @description Performs classical or nonmetric Multidimensional
+#'     Scaling analysis
 #'
 #' @details
 #' Multidimensional Scaling (MDS) is a dimension-reducting technique
