@@ -41,13 +41,12 @@ or \code{PD} (which includes objects of class \code{RbSr},
 
 \item{format}{one of
 
-1,2. \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]}, \code{rho}
+\code{1} or \code{2}: \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]},
+\code{rho}; where \code{rho} is the error correlation between
+\code{X} and \code{Y}; or
 
-where \code{rho} is the error correlation between \code{X} and
-\code{Y}, or
-
-3. \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
-\code{X/Y}, \code{s[X/Y]} for which the error correlations are
+\code{3}: \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
+\code{X/Y}, \code{s[X/Y]}; for which the error correlations are
 automatically computed from the redundancy of the three ratios.}
 
 \item{option}{returns one of
@@ -144,15 +143,16 @@ a five-column table that can be used as input for
     \code{\link{york}}-regression.
 }
 \description{
-Takes geochronology data as input and produces a
-five-column table as output, which can be used
-for York regression.
+Takes geochronology data as input and produces a five-column table
+with the variables, their uncertainties and error correlations as
+output. These can subsequently be used for York regression.
 }
 \examples{
 f <- system.file("RbSr1.csv",package="IsoplotR")
 dat <- read.csv(f)
 yorkdat <- data2york(dat)
 fit <- york(yorkdat)
+
 }
 \seealso{
 \code{\link{york}}

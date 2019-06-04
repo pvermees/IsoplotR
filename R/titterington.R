@@ -1,5 +1,6 @@
-#' Linear regression of X,Y,Z-variables with correlated errors
+#' @title Linear regression of X,Y,Z-variables with correlated errors
 #'
+#' @description
 #' Implements the maximum likelihood algorithm of Ludwig and
 #' Titterington (1994) for linear regression of three dimensional data
 #' with correlated uncertainties.
@@ -20,7 +21,7 @@
 #' described in the documentation of the \code{\link{isochron}}
 #' function.
 #'
-#' @param x an \code{[n x 9]} matrix with the following columns:
+#' @param x an \code{[nx9]} matrix with the following columns:
 #'     \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.
 #' @param alpha cutoff value for confidence intervals
 #' @return A four-element list of vectors containing:
@@ -32,7 +33,7 @@
 #'               is the intercept of the \code{X-Z} regression, and
 #'               \code{B} is the slope of the \code{X-Z} regression.}
 #'
-#'     \item{cov}{\code{[4 x 4]}-element covariance matrix of \code{par}}
+#'     \item{cov}{\code{[4x4]}-element covariance matrix of \code{par}}
 #'
 #'     \item{mswd}{the mean square of the residuals (a.k.a `reduced
 #'                 Chi-square') statistic}

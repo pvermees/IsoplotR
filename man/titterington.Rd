@@ -7,7 +7,7 @@
 titterington(x, alpha = 0.05)
 }
 \arguments{
-\item{x}{an \code{[n x 9]} matrix with the following columns:
+\item{x}{an \code{[nx9]} matrix with the following columns:
 \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.}
 
 \item{alpha}{cutoff value for confidence intervals}
@@ -22,7 +22,7 @@ A four-element list of vectors containing:
               is the intercept of the \code{X-Z} regression, and
               \code{B} is the slope of the \code{X-Z} regression.}
 
-    \item{cov}{\code{[4 x 4]}-element covariance matrix of \code{par}}
+    \item{cov}{\code{[4x4]}-element covariance matrix of \code{par}}
 
     \item{mswd}{the mean square of the residuals (a.k.a `reduced
                 Chi-square') statistic}

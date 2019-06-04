@@ -28,8 +28,9 @@ mindens <- function(mineral,x=NULL){
     if (is.numeric(x)) .IsoplotR$mindens[[mineral]] <- x
 }
 
-#' Load settings to and from json
+#' @title Load settings to and from json
 #'
+#' @description
 #' Get and set preferred values for decay constants, isotopic
 #' abundances, molar masses, fission track etch efficiences, and
 #' etchable lengths, and mineral densities, either individually or via

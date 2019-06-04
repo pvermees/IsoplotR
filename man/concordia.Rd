@@ -19,14 +19,19 @@ concordia(x = NULL, tlim = NULL, alpha = 0.05, type = 1,
 \item{alpha}{probability cutoff for the error ellipses and
 confidence intervals}
 
-\item{type}{one of \enumerate{
+\item{type}{one of
 
-\item{Wetherill: 206Pb/238U vs. 207Pb/235U}
+\enumerate{
 
-\item{Tera-Wasserburg: 207Pb/206Pb vs. 238U/206Pb}
+\item{Wetherill: \eqn{{}^{206}}Pb/\eqn{{}^{238}}U
+vs. \eqn{{}^{207}}Pb/\eqn{{}^{235}}U}
 
-\item{U-Th-Pb concordia: 208Pb/232Th vs. 206Pb/238U (only available
-if \code{x$format=7} or \code{x$format=8}}
+\item{Tera-Wasserburg: \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb
+vs. \eqn{{}^{238}}U/\eqn{{}^{206}}Pb}
+
+\item{U-Th-Pb concordia: \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th
+vs. \eqn{{}^{206}}Pb/\eqn{{}^{238}}U (only available if
+\code{x$format=7} or \code{x$format=8}})
 
 }}
 
@@ -37,11 +42,10 @@ numbers)}
 as different background colours within the error ellipses.}
 
 \item{clabel}{label for the colour legend (only used if
-\code{levels} is not \code{NA}.}
+\code{levels} is not \code{NA}).}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can
-    either be a single colour or multiple colours to form a colour
-    ramp (to be used if \code{levels!=NA}):
+\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+colour or multiple colours to form a colour ramp. Examples:
 
 \itemize{
 
@@ -91,8 +95,7 @@ geological (co)variance term.}
 \item{sigdig}{number of significant digits for the
 concordia/discordia age}
 
-\item{common.Pb}{apply a common lead correction using one of three
-    methods:
+\item{common.Pb}{apply a common lead correction using one of three methods:
 
 \code{1}: use the Stacey-Kramers two-stage model to infer the initial
 Pb-composition
@@ -108,9 +111,8 @@ Pb-composition
 ticks to be placed along the concordia line, OR a vector of
 tick ages.}
 
-\item{anchor}{control parameters to fix the intercept age or common
-    Pb composition of the discordia fit. This is a two-element
-    list.
+\item{anchor}{control parameters to fix the intercept age or common Pb
+composition of the discordia fit. This is a two-element list.
 
 \itemize{
 
@@ -123,9 +125,10 @@ age are estimated.
 \code{NA}, then the common Pb composition is fixed at the values
 stored in \code{settings('iratio',...)}.
 
-item If the first element is \code{TRUE} and the second element is a
-number, then the discordia line is forced to intersect the
+\item If the first element is \code{TRUE} and the second element is
+a number, then the discordia line is forced to intersect the
 concordia line at an age equal to that number.
+
 }}
 
 \item{hide}{vector with indices of aliquots that should be removed
@@ -253,9 +256,9 @@ shown as 100(1-\code{alpha})\% confidence ellipses. Concordant
 samples plot near to, or overlap with, the concordia line. They
 represent the pinnacle of geochronological robustness. Samples that
 plot away from the concordia line but are aligned along a linear
-trend form an isochron (or `discordia' line) that can be used
-to infer the composition of the non-radiogenic
-(`common') lead or to constrain the timing of prior lead loss.
+trend form an isochron (or `discordia' line) that can be used to
+infer the composition of the non-radiogenic (`common') lead or to
+constrain the timing of prior lead loss.
 }
 \examples{
 data(examples)

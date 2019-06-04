@@ -1,5 +1,6 @@
-#' Common Pb correction
+#' @title Common Pb correction
 #'
+#' @description
 #' Applies a common-Pb correction to a U-Pb dataset using either the
 #' Stacey-Kramers mantle evolution model, isochron regression, or any
 #' nominal inital Pb isotope composition.
@@ -91,7 +92,7 @@
 #' }
 #'
 #' @param omit vector with indices of aliquots that should be omitted
-#'     from the isochron regression (only used if \code{option==2})
+#'     from the isochron regression (only used if \code{option=2})
 #'
 #' @return
 #' Returns a list in which \code{x.raw} contains the original data and
@@ -105,6 +106,7 @@
 #' Stacey, J.T. and Kramers, 1., 1975. Approximation of terrestrial
 #' lead isotope evolution by a two-stage model. Earth and planetary
 #' science letters, 26(2), pp.207-221.
+#' 
 #' @examples
 #' data(examples)
 #' UPb <- Pb0corr(examples$UPb,option=1)

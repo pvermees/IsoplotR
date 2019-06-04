@@ -70,9 +70,9 @@ fit <- york(dat)
 scatterplot(dat,fit=fit)
 }
 \references{
-Titterington, D.M. and Halliday, A.N., 1979. On the
-    fitting of parallel isochrons and the method of maximum
-    likelihood. Chemical Geology, 26(3), pp.183-195.
+Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
+parallel isochrons and the method of maximum likelihood. Chemical
+Geology, 26(3), pp.183-195.
 
 York, Derek, et al., 2004. Unified equations for the slope,
 intercept, and standard errors of the best straight line.  American

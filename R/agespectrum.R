@@ -1,8 +1,9 @@
-#' Plot a (40Ar/39Ar) release spectrum
-#'
+#' @title Plot a (40Ar/39Ar) release spectrum
+#' 
+#' @description
 #' Produces a plot of boxes whose widths correspond to the cumulative
-#' amount of \eqn{^{39}}Ar (or any other variable), and whose
-#' heights express the analytical uncertainties.  Only propagates the
+#' amount of \eqn{^{39}}Ar (or any other variable), and whose heights
+#' express the analytical uncertainties.  Only propagates the
 #' analytical uncertainty associated with decay constants and
 #' J-factors \emph{after} computing the plateau composition.
 #'
@@ -17,9 +18,9 @@
 #' should not be used for quantitative inference.
 #'
 #' @param x
-#' a three-column matrix whose first column gives the amount
-#'     of \eqn{^{39}}Ar in each aliquot, and whose second and third
-#'     columns give the age and its uncertainty.
+#' a three-column matrix whose first column gives the amount of
+#' \eqn{^{39}}Ar in each aliquot, and whose second and third columns
+#' give the age and its uncertainty.
 #'
 #' OR
 #'
@@ -27,17 +28,20 @@
 #'
 #' @param alpha the confidence level of the error bars/boxes and
 #'     confidence intervals.
+#' 
 #' @param plateau logical flag indicating whether a plateau age should
 #'     be calculated. If \code{plateau=TRUE}, the function will
 #'     compute the weighted mean of the largest succession of steps
 #'     that pass the Chi-square test for age homogeneity.  If
 #'     \code{TRUE}, returns a list with plateau parameters.
+#' 
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours of the plot symbols.
-#' @param plateau.col Fill colours of the rectangles used to mark the
-#'     steps belonging to the age plateau. This can either be a single
-#'     colour or multiple colours to form a colour ramp (to be used if
-#'     \code{levels!=NA}):
+#' 
+#' @param plateau.col
+#' Fill colours of the rectangles used to mark the steps belonging to
+#' the age plateau. This can either be a single colour or multiple
+#' colours to form a colour ramp (to be used if \code{levels!=NA}):
 #'
 #' \itemize{
 #'
@@ -57,6 +61,7 @@
 #' \item{for plot symbols, set \code{plateau.col=NA}}
 #'
 #' }
+#' 
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
 #'     NOT belong to the plateau are given a different colour.
 #' @param clabel label of the colour legend
@@ -78,11 +83,10 @@
 #'     from the plot.
 #' @param ... optional parameters to the generic \code{plot} function
 #'
-#' @return If \code{plateau=TRUE}, returns a list with the following
-#'     items:
+#' @return
+#' If \code{plateau=TRUE}, returns a list with the following items:
 #'
-#' \describe{
-#' \item{mean}{a 3-element vector with:
+#' \describe{ \item{mean}{a 3-element vector with:
 #'
 #' \code{x}: the plateau mean
 #'
@@ -104,7 +108,8 @@
 #'
 #' \item{df}{the degrees of freedom for the weighted mean plateau fit}
 #'
-#' \item{mswd}{the mean square of the weighted deviates of the plateau}
+#' \item{mswd}{the mean square of the weighted deviates of the
+#' plateau}
 #'
 #' \item{p.value}{the p-value of a Chi-square test with \eqn{df=n-2}
 #' degrees of freedom, where \eqn{n} is the number of steps in the
@@ -126,7 +131,7 @@
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
-#' @importFrom grDevices rgb
+
 #' @rdname agespectrum
 #' @export
 agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
@@ -135,7 +140,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
                                 xlab='cumulative fraction',
-                                ylab='age [Ma]',hide=NULL,...){
+                                ylab='age [Ma]',hide=NULL,...){    
     XY <- plot.spectrum.axes(x=x,alpha=alpha,xlab=xlab,
                              ylab=ylab,hide=hide,...)
     pc <- get.plateau.colours(x=x,levels=levels,plateau=plateau,
@@ -150,11 +155,11 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
     colourbar(z=levels,col=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
-#' @param i2i `isochron to intercept':
-#'     calculates the initial (aka `inherited',
-#'     `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar ratio from
-#'     an isochron fit. Setting \code{i2i} to \code{FALSE} uses the
-#'     default values stored in \code{settings('iratio',...)}
+
+#' @param i2i `isochron to intercept': calculates the initial (aka
+#'     `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in \code{settings('iratio',...)}
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
 #' @examples

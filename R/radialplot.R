@@ -1,9 +1,11 @@
 #' @title
 #' Visualise heteroscedastic data on a radial plot
+#' 
 #' @description
 #' Implementation of a graphical device developed by Rex Galbraith to
 #' display several estimates of the same quantity that have different
 #' standard errors.
+#' 
 #' @details
 #' The radial plot (Galbraith, 1988, 1990) is a graphical device that
 #' was specifically designed to display heteroscedastic data, and is
@@ -28,7 +30,8 @@
 #' further towards the right. Thus, radial plots allow the observer to
 #' assess both the magnitude and the precision of quantitative data in
 #' one glance.
-#' @param x Either an \code{[n x 2]} matix of (transformed) values z
+#' 
+#' @param x Either an \code{[nx2]} matix of (transformed) values z
 #'     and their standard errors s
 #'
 #' OR

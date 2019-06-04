@@ -66,7 +66,8 @@ Returns an object of class \code{MDS}, i.e. a list
 }
 }
 \description{
-Performs classical or nonmetric Multidimensional Scaling analysis
+Performs classical or nonmetric Multidimensional
+    Scaling analysis
 }
 \details{
 Multidimensional Scaling (MDS) is a dimension-reducting technique

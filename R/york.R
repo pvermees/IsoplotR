@@ -1,5 +1,7 @@
+#' @title
 #' Linear regression of X,Y-variables with correlated errors
 #'
+#' @description
 #' Implements the unified regression algorithm of York et al. (2004)
 #' which, although based on least squares, yields results that are
 #' consistent with maximum likelihood estimates of Titterington and
@@ -44,11 +46,14 @@
 #'     degrees of freedom}
 #'
 #'     }
+#' 
 #' @seealso \code{\link{data2york}}, \code{\link{titterington}},
 #'     \code{\link{isochron}}, \code{\link{ludwig}}
-#' @references Titterington, D.M. and Halliday, A.N., 1979. On the
-#'     fitting of parallel isochrons and the method of maximum
-#'     likelihood. Chemical Geology, 26(3), pp.183-195.
+#' 
+#' @references
+#' Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
+#' parallel isochrons and the method of maximum likelihood. Chemical
+#' Geology, 26(3), pp.183-195.
 #'
 #' York, Derek, et al., 2004. Unified equations for the slope,
 #' intercept, and standard errors of the best straight line.  American
@@ -162,11 +167,12 @@ get.york.xy <- function(x,a,b){
     out
 }
 
-#' Prepare geochronological data for York regression
+#' @title Prepare geochronological data for York regression
 #'
-#' Takes geochronology data as input and produces a
-#' five-column table as output, which can be used
-#' for York regression.
+#' @description
+#' Takes geochronology data as input and produces a five-column table
+#' with the variables, their uncertainties and error correlations as
+#' output. These can subsequently be used for York regression.
 #'
 #' @param x a five or six column matrix OR an object of class
 #'     \code{UPb}, \code{PbPb}, \code{ArAr}, \code{ThU}, \code{UThHe},
@@ -175,23 +181,25 @@ get.york.xy <- function(x,a,b){
 #'     \code{read.data(...)} function
 #' @param format one of
 #'
-#' 1,2. \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]}, \code{rho}
+#' \code{1} or \code{2}: \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]},
+#' \code{rho}; where \code{rho} is the error correlation between
+#' \code{X} and \code{Y}; or
 #'
-#' where \code{rho} is the error correlation between \code{X} and
-#' \code{Y}, or
-#'
-#' 3. \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
-#' \code{X/Y}, \code{s[X/Y]} for which the error correlations are
+#' \code{3}: \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
+#' \code{X/Y}, \code{s[X/Y]}; for which the error correlations are
 #' automatically computed from the redundancy of the three ratios.
 #'
 #' @param ... optional arguments
+#' 
 #' @return a five-column table that can be used as input for
 #'     \code{\link{york}}-regression.
+#' 
 #' @examples
 #' f <- system.file("RbSr1.csv",package="IsoplotR")
 #' dat <- read.csv(f)
 #' yorkdat <- data2york(dat)
 #' fit <- york(yorkdat)
+#' 
 #' @seealso \code{\link{york}}
 #' @rdname data2york
 #' @export
@@ -208,6 +216,7 @@ data2york.default <- function(x,format=1,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+
 #' @param option returns one of
 #'
 #' \enumerate{
@@ -433,6 +442,7 @@ data2york.PbPb <- function(x,inverse=TRUE,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
+
 #' @param exterr If \code{TRUE}, propagates the external uncertainties
 #'     (e.g. decay constants) into the output errors.
 #' @rdname data2york

@@ -89,19 +89,15 @@ isochron(x, ...)
 \arguments{
 \item{x}{EITHER a matrix with the following five columns:
 
-\describe{
+\code{X}: the x-variable
 
-\item{X}{the x-variable}
+\code{sX}: the standard error of \code{X}
 
-\item{sX}{the standard error of \code{X}}
+\code{Y}: the y-variable
 
-\item{Y}{the y-variable}
+\code{sY}: the standard error of \code{Y}
 
-\item{sY}{the standard error of \code{Y}}
-
-\item{rXY}{the correlation coefficient of \code{X} and \code{Y}}
-
-}
+\code{rXY}: the correlation coefficient of \code{X} and \code{Y}
 
 OR
 

@@ -1,5 +1,7 @@
+#' @title
 #' Visualise U-Th-He data on a logratio plot or ternary diagram
 #'
+#' @description
 #' Plot U-Th(-Sm)-He data on a (log[He/Th] vs. log[U/He]) logratio
 #' plot or U-Th-He ternary diagram
 #'

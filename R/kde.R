@@ -1,9 +1,11 @@
 #' @title
 #' Create (a) kernel density estimate(s)
+#' 
 #' @description
 #' Creates one or more kernel density estimates using a combination of
 #' the Botev (2010) bandwidth selector and the Abramson (1982)
 #' adaptive kernel bandwidth modifier.
+#' 
 #' @details
 #' Given a set of \eqn{n} age estimates \eqn{\{t_1, t_2, ..., t_n\}},
 #' histograms and KDEs are probability density estimators that display
@@ -139,7 +141,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
 #'     (\code{type}=4), or the concordia age (\code{type}=5), or
-#'     \eqn{^{208}}/\eqn{^{232}}Th age (\code{type}=6, only available
+#'     \eqn{^{208}Pb}/\eqn{^{232}}Th age (\code{type}=6, only available
 #'     if \code{x$format}=7 or 8).
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
@@ -268,7 +270,7 @@ kde.KCa <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 hide=hide,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}).
+#'     when \code{x$format=1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'

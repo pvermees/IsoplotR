@@ -162,7 +162,7 @@ from the plot.}
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
 (\code{type}=4), or the concordia age (\code{type}=5), or
-\eqn{^{208}}/\eqn{^{232}}Th age (\code{type}=6, only available
+\eqn{^{208}Pb}/\eqn{^{232}}Th age (\code{type}=6, only available
 if \code{x$format}=7 or 8).}
 
 \item{cutoff.76}{the age (in Ma) below which the
@@ -219,7 +219,7 @@ fit. Setting \code{i2i} to \code{FALSE} uses the default values
 stored in \code{settings('iratio',...)}.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format == 1} or \code{2}).
+    when \code{x$format=1} or \code{2}).
 
 \code{0}: no correction
 

@@ -1,15 +1,15 @@
-#' @title
-#' Plot continuous data as cumulative age distributions
+#' @title Plot continuous data as cumulative age distributions
+#' 
 #' @description
 #' Plot a dataset as a Cumulative Age Distribution (CAD), also known
 #' as a `empirical cumulative distribution function'.
+#' 
 #' @details
 #' Empirical cumulative distribution functions or cumulative age
-#' distributions CADs are the most straightforward way to visualise
-#' the probability distribution of multiple dates.  Suppose that we
-#' have a set of \eqn{n} dates \eqn{t_i}. The the CAD is a step
-#' function that sets out the rank order of the dates against their
-#' numerical value:
+#' distributions are the most straightforward way to visualise the
+#' probability distribution of multiple dates.  Suppose that we have a
+#' set of \eqn{n} dates \eqn{t_i}. The the CAD is a step function that
+#' sets out the rank order of the dates against their numerical value:
 #'
 #' \eqn{CAD(t) = \sum_i 1(t<t_i)/n}
 #'
@@ -24,6 +24,7 @@
 #' proportional to the steepness of the CAD. This is different from
 #' probability density estimates such as histograms, in which such
 #' components stand out as peaks.
+#' 
 #' @param x a numerical vector OR an object of class \code{UPb},
 #'     \code{PbPb}, \code{ArAr}, \code{KCa}, \code{UThHe},
 #'     \code{fissiontracks}, \code{ReOs}, \code{RbSr}, \code{SmNd},
@@ -32,26 +33,27 @@
 #' @rdname cad
 #' @export
 cad <- function(x,...){ UseMethod("cad",x) }
+
 #' @param pch plot character to mark the beginning of each CAD step
 #' @param verticals logical flag indicating if the horizontal lines of
 #'     the CAD should be connected by vertical lines
 #' @param xlab x-axis label
-#' @param colmap an optional string with the name of one of \code{R}'s
-#'     built-in colour palettes (e.g., \code{heat.colors},
-#'     \code{terrain.colors}, \code{topo.colors}, \code{cm.colors}),
-#'     which are to be used for plotting data of class
-#'     \code{detritals}.
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
+#' @param col either the name of one of \code{R}'s built-in colour
+#'     palettes (e.g., \code{'heat.colors'}, \code{'terrain.colors'},
+#'     \code{'topo.colors'}, \code{'cm.colors'}) (if \code{x} has
+#'     class \code{detritals}) OR the name or code for a colour to
+#'     give to single sample datasets (otherwise).
 #' @param ... optional arguments to the generic \code{plot} function
+#' 
 #' @examples
 #' data(examples)
 #' cad(examples$DZ,verticals=FALSE,pch=20)
 #' @rdname cad
 #' @export
 cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                        colmap='heat.colors',col='black',
-                        hide=NULL,...){
+                        col='black',hide=NULL,...){
     calcit <- (1:length(x))%ni%hide
     d <- x[calcit]
     graphics::plot(range(d,na.rm=TRUE),c(0,1),type='n',
@@ -59,24 +61,24 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     graphics::lines(stats::ecdf(d),pch=pch,verticals=verticals,col=col)
     mymtext(get.ntit(d),line=0,adj=1)
 }
-#' @param col colour to give to single sample datasets (not applicable
-#'     if \code{x} has class \code{detritals})
+
 #' @rdname cad
 #' @export
 cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                          colmap='heat.colors',hide=NULL,...){
+                          col='heat.colors',hide=NULL,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     ns <- length(x2plot)
-    col <- do.call(colmap,list(ns))
+    colour <- do.call(col,list(ns))
     graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
                    ylab='cumulative probability',...)
     for (i in 1:ns){
         graphics::lines(stats::ecdf(x2plot[[i]]),pch=pch,
-                        verticals=verticals,col=col[i])
+                        verticals=verticals,col=colour[i])
     }
-    graphics::legend("bottomright",legend=names(x2plot),lwd=1,col=col)
+    graphics::legend("bottomright",legend=names(x2plot),lwd=1,col=colour)
 }
+
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
@@ -103,6 +105,7 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' (\code{FALSE}) the common-Pb correction.
 #'
 #' Set \code{cutoff.disc=NA} to turn off this filter.
+#' 
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
@@ -114,6 +117,7 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' \code{3}: use the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
+#' 
 #' @rdname cad
 #' @export
 cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
@@ -125,6 +129,7 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
                 col=col,hide=hide,...)
 }
+
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
@@ -141,6 +146,7 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     White Mountains (California) using detrital apatite fission
 #'     track thermochronology. Journal of Geophysical Research: Earth
 #'     Surface, 112(F3).
+#' 
 #' @rdname cad
 #' @export
 cad.PbPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
@@ -165,8 +171,9 @@ cad.KCa <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
                 col=col,hide=hide,...)
 }
+
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}).
+#'     when \code{x$format=1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'

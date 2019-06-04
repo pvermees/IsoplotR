@@ -1,12 +1,14 @@
-#' Set up U-series disequilibrium correction for U-Pb geochronology
-#'
-#' The U-Pb method conventionally assumes initial secular equilibrium
-#' of all the intermediate daughters of the \eqn{{}^{238}}U -
-#' \eqn{{}^{206}}Pb and \eqn{{}^{235}}U - \eqn{{}^{207}}Pb decay
-#' chains.  Violation of this assumption may produce inaccurate
-#' results.  \code{diseq} sets up initial disequilibrium parameters
-#' that are subsequently passed on to the \code{read.data} function
-#' for incorporation in other functions.
+#' @title Set up U-series disequilibrium correction for U-Pb
+#'     geochronology
+#' 
+#' @description The U-Pb method conventionally assumes initial secular
+#'     equilibrium of all the intermediate daughters of the
+#'     \eqn{{}^{238}}U-\eqn{{}^{206}}Pb and
+#'     \eqn{{}^{235}}U-\eqn{{}^{207}}Pb decay chains.  Violation of
+#'     this assumption may produce inaccurate results.  \code{diseq}
+#'     sets up initial disequilibrium parameters that are subsequently
+#'     passed on to the \code{read.data} function for incorporation in
+#'     other functions.
 #'
 #' @details
 #' There are three ways to correct for the initial disequilibrium
@@ -24,7 +26,7 @@
 #' ratios.  This approach only works for young samples (< 5Ma, say).}
 #' 
 #' \item{Specify the elemental fractionation factor between Th and U
-#' in the magma chamber and the mineral (Sch\"{a}rer,
+#' in the magma chamber and the mineral (Schaerer,
 #' 1984). \code{IsoplotR} generalises this approach to Ra/U and Pa/U
 #' as well. However, it still assumes secular equilibrium between
 #' \eqn{{}^{234}}U and \eqn{{}^{238}}Th.}
@@ -33,17 +35,13 @@
 #' 
 #' @param option one of four options:
 #'
-#' \describe{
-#' 
-#' \item{0}{no disequilibrium correction}
+#' \code{0}: no disequilibrium correction
 #'
-#' \item{1}{use assumed initial activity ratios}
+#' \code{1}: use assumed initial activity ratios
 #'
-#' \item{2}{use measured current activity ratios}
+#' \code{2}: use measured current activity ratios
 #'
-#' \item{3}{use partition coefficients between the mineral and magma}
-#'
-#' }
+#' \code{3}: use partition coefficients between the mineral and magma
 #'
 #' @param U48 the \eqn{^{234}}U/\eqn{^{238}}U-activity ratio (initial
 #'     if \code{option=1} or measured if \code{option=2}).
@@ -68,9 +66,9 @@
 #' 
 #' @return
 #' a list with the following items: \code{option} and (\code{U48},
-#' \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option == 1} or
-#' \code{option == 2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
-#' \code{option == 3}].
+#' \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option=1} or
+#' \code{option=2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
+#' \code{option=3}].
 #' 
 #' @examples
 #' d <- diseq(option=3,fThU=2)
@@ -79,7 +77,7 @@
 #' concordia(UPb)
 #' 
 #' @references
-#' Sch\"{a}rer, U., 1984. The effect of initial \eqn{{}^{230}}Th
+#' Schaerer, U., 1984. The effect of initial \eqn{{}^{230}}Th
 #' disequilibrium on young UPb ages: the Makalu case, Himalaya. Earth
 #' and Planetary Science Letters, 67(2), pp.191-204.
 #' 

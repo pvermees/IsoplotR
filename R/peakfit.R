@@ -1,9 +1,11 @@
 #' @title
 #' Finite mixture modelling of geochronological datasets
+#' 
 #' @description
 #' Implements the discrete mixture modelling algorithms of Galbraith
 #' and Laslett (1993) and applies them to fission track and other
 #' geochronological datasets.
+#' 
 #' @details
 #' Consider a dataset of \eqn{n} dates \eqn{\{t_1, t_2, ..., t_n\}}
 #' with analytical uncertainties \eqn{\{s[t_1], s[t_2], ...,
@@ -27,7 +29,8 @@
 #' component is a continuous distribution (as descibed by the
 #' \code{\link{central}} age model), but truncated at this discrete
 #' value (Van der Touw et al., 1997).
-#' @param x either an \code{[n x 2]} matrix with measurements and
+#' 
+#' @param x either an \code{[nx2]} matrix with measurements and
 #'     their standard errors, or an object of class
 #'     \code{fissiontracks}, \code{UPb}, \code{PbPb}, \code{ArAr},
 #'     \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{LuHf},
@@ -231,7 +234,7 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
                    log=log,i2i=i2i,alpha=alpha,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}.
+#'     when \code{x$format=1} or \code{2}.
 #'
 #' \code{0}: no correction
 #'

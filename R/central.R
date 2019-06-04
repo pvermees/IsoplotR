@@ -1,5 +1,7 @@
+#' @title
 #' Calculate U-Th-He and fission track central ages and compositions
 #'
+#' @description
 #' Computes the geometric mean composition of a continuous mixture of
 #' fission track or U-Th-He data and returns the corresponding age and
 #' fitting parameters.
@@ -102,6 +104,7 @@
 #'
 #' @seealso \code{\link{weightedmean}}, \code{\link{radialplot}},
 #'     \code{\link{helioplot}}
+#' 
 #' @examples
 #' data(examples)
 #' print(central(examples$UThHe)$age)
@@ -140,6 +143,7 @@ central.default <- function(x,alpha=0.05,...){
     names(out$disp) <- c('s','ll','ul')
     out
 }
+
 #' @param model choose one of the following statistical models:
 #'
 #' \code{1}: weighted mean. This model assumes that the scatter
@@ -185,6 +189,7 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     out$age['ci[t]'] <- f*out$age['s[t]']
     out
 }
+
 #' @param mineral setting this parameter to either \code{apatite} or
 #'     \code{zircon} changes the default efficiency factor, initial
 #'     fission track length and density to preset values (only affects

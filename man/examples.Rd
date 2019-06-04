@@ -5,11 +5,11 @@
 \alias{examples}
 \title{Example datasets for testing \code{IsoplotR}}
 \description{
-U-Pb, Pb-Pb, Ar-Ar, K-Ca, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, Th-U,
-fission track and detrital datasets
-}
-\details{
-\code{examples} an 18-item list containing:
+Built-in datasets for U-Pb, Pb-Pb, Ar-Ar, K-Ca, Re-Os,
+    Sm-Nd, Rb-Sr, Lu-Hf, U-Th-He, Th-U, fission track and detrital
+    geochronology.
+
+\code{examples} is an 18-item list containing:
 
 \code{UPb}: an object of class \code{UPb} containing a high
 precision U-Pb dataset of Kamo et al. (1996) packaged with Ken

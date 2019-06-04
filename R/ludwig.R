@@ -1,6 +1,8 @@
+#' @title
 #' Linear regression of U-Pb data with correlated errors, taking
 #' into account decay constant uncertainties.
 #'
+#' @description
 #' Implements the maximum likelihood algorithm for Total-Pb/U isochron
 #' regression of Ludwig (1998)
 #'

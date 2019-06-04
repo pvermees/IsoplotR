@@ -56,7 +56,7 @@ peakfit(x, ...)
   alpha = 0.05, ...)
 }
 \arguments{
-\item{x}{either an \code{[n x 2]} matrix with measurements and
+\item{x}{either an \code{[nx2]} matrix with measurements and
 their standard errors, or an object of class
 \code{fissiontracks}, \code{UPb}, \code{PbPb}, \code{ArAr},
 \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{LuHf},
@@ -127,7 +127,7 @@ uses the default values stored in
 detrital Th-correction.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format == 1} or \code{2}.
+    when \code{x$format=1} or \code{2}.
 
 \code{0}: no correction
 
