@@ -42,7 +42,7 @@ subset.detritals <- function(x,subset,...){
 }
 #' @export
 subset.UThHe <- function(x,subset,...){
-    out <- x[subset,]
+    out <- x[subset,,drop=FALSE]
     class(out) <- class(x)
     out
 }

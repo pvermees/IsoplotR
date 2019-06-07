@@ -180,7 +180,7 @@ get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out
 }
 get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
-    xy <- data2york(x,option=2)[,c('X','Y')]
+    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
     if (!anchor[[1]]) {
         xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         intercept <- xyfit$coef[1]

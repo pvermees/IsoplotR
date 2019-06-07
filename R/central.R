@@ -271,12 +271,12 @@ average_uvw <- function(x,model=1,w=0){
         nms <- c('u','v','w')
         logratios <- flat.uvw.table(x,w=w)
         fit <- wtdmean3D(logratios)
-        uvw <- logratios[,c(1,3,5)]
+        uvw <- logratios[,c(1,3,5),drop=FALSE]
     } else {
         nms <- c('u','v')
         logratios <- flat.uv.table(x,w=w)
         fit <- wtdmean2D(logratios)
-        uvw <- logratios[,c(1,3)]
+        uvw <- logratios[,c(1,3),drop=FALSE]
     }
     if (model==2){
         out$uvw <- apply(uvw,2,mean)

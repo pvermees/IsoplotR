@@ -136,25 +136,25 @@ Pb0corr <- function(x,option=1,omit=NULL){
                  'Pb207Pb206','errPb207Pb206','rhoXY')] <- x.corr
     } else if (x$format==3){
         out$x[,c('Pb207U235','errPb207U235',
-                 'Pb206U238','errPb206U238')] <- tw2w(x.corr)[,1:4]
-        out$x[,c('Pb207Pb206','errPb207Pb206')] <- x.corr[,3:4]
+                 'Pb206U238','errPb206U238')] <- tw2w(x.corr)[,1:4,drop=FALSE]
+        out$x[,c('Pb207Pb206','errPb207Pb206')] <- x.corr[,3:4,drop=FALSE]
     } else if (x$format==4){
         out$x[,c('Pb207U235','errPb207U235',
-                 'Pb206U238','errPb206U238')] <- x.corr[,1:4]
+                 'Pb206U238','errPb206U238')] <- x.corr[,1:4,drop=FALSE]
         out$x[,'rhoXY'] <- x.corr[,5]
         out$x[,c('Pb204U238','errPb204U238','rhoXZ','rhoYZ')] <- 0
     } else if (x$format==5){
         tw <- w2tw(x.corr)
         out$x[,c('U238Pb206','errU238Pb206',
-                 'Pb207Pb206','errPb207Pb206')] <- tw[,1:4]
+                 'Pb207Pb206','errPb207Pb206')] <- tw[,1:4,drop=FALSE]
         out$x[,'rhoXY'] <- tw[,5]
         out$x[,c('Pb204Pb206','errPb204Pb206','rhoXZ','rhoYZ')] <- 0
     } else if (x$format==6){
         tw <- w2tw(x.corr)
         out$x[,c('Pb207U235','errPb207U235',
-                 'Pb206U238','errPb206U238')] <- x.corr[,1:4]
+                 'Pb206U238','errPb206U238')] <- x.corr[,1:4,drop=FALSE]
         out$x[,c('Pb204U238','errPb204U238')] <- 0
-        out$x[,c('Pb207Pb206','errPb207Pb206')] <- tw[,3:4]
+        out$x[,c('Pb207Pb206','errPb207Pb206')] <- tw[,3:4,drop=FALSE]
         out$x[,c('Pb204Pb207','errPb204Pb207',
                  'Pb204Pb206','errPb204Pb206')] <- 0
     } else if (x$format==7){ # TODO: correct Pb208 as well.

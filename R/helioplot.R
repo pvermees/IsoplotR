@@ -251,7 +251,7 @@ plot_helioplot_ellipses <- function(x,ellipse.cols,fact=c(1,1,1),
 plot_helioplot_points <- function(x,fact=c(1,1,1),mybg=NA,
                                   show.numbers=FALSE,hide=NULL,
                                   omit=NULL,...){
-    xyz <- renormalise(x[,c('He','U','Th')],fact=fact)
+    xyz <- renormalise(x[,c('He','U','Th'),drop=FALSE],fact=fact)
     xy <- xyz2xy(xyz)
     plot_points(xy[,1],xy[,2],mybg=mybg,
                 show.numbers=show.numbers,

@@ -200,7 +200,7 @@ plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
 # a function to plot the nearest neighbour lines
 plotlines <- function(conf,diss) {
     # rank the samples according to their pairwise proximity
-    i = t(apply(as.matrix(diss),1,function(x) order(x))[2:3,])
+    i = t(apply(as.matrix(diss),1,function(x) order(x))[2:3,,drop=FALSE])
     # coordinates for the lines
     x1 = as.vector(conf[i[,1],1]) # calculate (x,y)-coordinates ...
     y1 = as.vector(conf[i[,1],2]) # ... of nearest neighbours

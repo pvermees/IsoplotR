@@ -1011,21 +1011,21 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,exterr=TRUE,
     }
     out <- matrix(NA,length(x),2)
     if (type==1){
-        out[is.concordant,] <- tout[is.concordant,c('t.75','s[t.75]')]
+        out[is.concordant,] <- tout[is.concordant,c('t.75','s[t.75]'),drop=FALSE]
     } else if (type==2){
-        out[is.concordant,] <- tout[is.concordant,c('t.68','s[t.68]')]
+        out[is.concordant,] <- tout[is.concordant,c('t.68','s[t.68]'),drop=FALSE]
     } else if (type==3){
-        out[is.concordant,] <- tout[is.concordant,c('t.76','s[t.76]')]
+        out[is.concordant,] <- tout[is.concordant,c('t.76','s[t.76]'),drop=FALSE]
     } else if (type==4){
         do.76 <- (tout[,'t.68']>cutoff.76)
         i.76 <- as.vector(which(do.76 & is.concordant))
         i.68 <- as.vector(which(!do.76 & is.concordant))
-        out[i.76,] <- tout[i.76,c('t.76','s[t.76]')]
-        out[i.68,] <- tout[i.68,c('t.68','s[t.68]')]
+        out[i.76,] <- tout[i.76,c('t.76','s[t.76]'),drop=FALSE]
+        out[i.68,] <- tout[i.68,c('t.68','s[t.68]'),drop=FALSE]
     } else if (type==5){
-        out[is.concordant,] <- tout[is.concordant,c('t.conc','s[t.conc]')]
+        out[is.concordant,] <- tout[is.concordant,c('t.conc','s[t.conc]'),drop=FALSE]
     } else if (type==6){
-        out[is.concordant,] <- tout[is.concordant,c('t.82','s[t.82]')]
+        out[is.concordant,] <- tout[is.concordant,c('t.82','s[t.82]'),drop=FALSE]
     }
     colnames(out) <- c('t','s[t]')
     out

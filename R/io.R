@@ -741,9 +741,9 @@ read.XsXYsYrXY <- function(x){
     if (nc == 4){
         out <- cbind(x,0)
     } else {
+        out <- x[,1:5,drop=FALSE]
         i <- which(is.na(x[,5]))
-        x[i,5] <- 0
-        out <- subset(x,select=1:5)
+        out[i,5] <- 0
     }
     out
 }

@@ -127,7 +127,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                clabel="",bg=c("yellow","red"),col='black',
                                title=TRUE,k=0,markers=NULL,alpha=0.05,
                                units='',hide=NA,omit=NA,omit.col=NA,...){
-    x <- x[,c(1,2)]
+    x <- x[,c(1,2),drop=FALSE]
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
