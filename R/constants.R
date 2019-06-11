@@ -100,7 +100,9 @@ mindens <- function(mineral,x=NULL){
 #' fission track length. Omitting this number simply returns the
 #' existing value.
 #' }
+#' 
 #' @param fname the path of a \code{.json} file
+#' 
 #' @return if \code{setting=NA} and \code{fname=NA}, returns a
 #'     \code{.json} string
 #'
