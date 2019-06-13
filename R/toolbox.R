@@ -515,9 +515,7 @@ get.ntit <- function(x){
     paste0(out,ns)
 }
 
-#' @export
 geomean <- function(x,...){ UseMethod("geomean",x) }
-#' @export
 geomean.default <- function(x,...){
     exp(mean(log(x),na.rm=TRUE))
 }

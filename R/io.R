@@ -292,7 +292,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     class(out) <- "UPb"
     out$x <- NA
     out$format <- format
-    out$d <- d
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
@@ -362,6 +361,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     }
     out$x <- subset(X,select=1:length(cnames))
     colnames(out$x) <- cnames
+    out$d <- copy_diseq(x=out,d=d)
     out
 }
 get.cor.75.68 <- function(Pb207U235,errPb207U235,

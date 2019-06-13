@@ -43,6 +43,10 @@
 #'
 #' \code{3}: use partition coefficients between the mineral and magma
 #'
+#' \code{4}: use the measured Th/U ratio of the magma to compute the
+#' Th/U partition coefficient. This option only works for U-Pb
+#' datasets of format 7 or 8.
+#'
 #' @param U48 the \eqn{^{234}}U/\eqn{^{238}}U-activity ratio (initial
 #'     if \code{option=1} or measured if \code{option=2}).
 #' 
@@ -63,6 +67,10 @@
 #' 
 #' @param fPaU the Pa/U fractionation factor between the mineral (m)
 #'     and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.
+#'  
+#' @param ThU the measured Th/U ratio of the magma, which is to be
+#'     combined with the Th/U ratios of the minerals to compute the
+#'     Th/U fractionation factor.
 #'  
 #' @return a list with the following items: \code{option} and
 #'     (\code{U48}, \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if
@@ -86,18 +94,21 @@
 #' @export
 diseq <- function(option=0,
                   U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
-                  fThU=1,fRaU=1,fPaU=1){
+                  fThU=1,fRaU=1,fPaU=1,ThU=1){
     out <- list(option=option)
     class(out) <- 'diseq'
-    if (option%in%c(1,2)){
+    if (option<3){
         out$U48=U48
         out$Th0U8=Th0U8
         out$Ra6U8=Ra6U8
-        out$Pa1U5=Pa1U5        
-    } else if (option==3){
+        out$Pa1U5=Pa1U5
+    } else if (option>3){
         out$fThU = fThU
         out$fRaU = fRaU
         out$fPaU = fPaU
+    }
+    if (option==4){
+        out$ThU = ThU
     }
     out
 }
@@ -114,7 +125,16 @@ diseq <- function(option=0,
     out
 }
 
-#' @export
+copy_diseq <- function(x,d=diseq){
+    out <- d
+    if (d$option==4){
+        if (x$format>6)
+            out$fThU <- x$x[,'Th232U238']/d$ThU
+        out$option <- 3
+    }
+    out
+}
+
 geomean.diseq <- function(x,...){
     lapply(x, 'geomean')
 }
