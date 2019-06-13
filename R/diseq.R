@@ -102,13 +102,11 @@ diseq <- function(option=0,
         out$Th0U8=Th0U8
         out$Ra6U8=Ra6U8
         out$Pa1U5=Pa1U5
-    } else if (option>3){
+    } else {
         out$fThU = fThU
         out$fRaU = fRaU
         out$fPaU = fPaU
-    }
-    if (option==4){
-        out$ThU = ThU
+        if (option==4) out$ThU = ThU
     }
     out
 }
@@ -128,8 +126,10 @@ diseq <- function(option=0,
 copy_diseq <- function(x,d=diseq){
     out <- d
     if (d$option==4){
-        if (x$format>6)
-            out$fThU <- x$x[,'Th232U238']/d$ThU
+        if (x$format>6){
+            U <- settings('iratio','U238U235')[1]
+            out$fThU <- (x$x[,'Th232U238']/d$ThU)*U/(1+U)
+        }
         out$option <- 3
     }
     out
