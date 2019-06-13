@@ -11,7 +11,7 @@
 #'     other functions.
 #'
 #' @details
-#' There are three ways to correct for the initial disequilibrium
+#' There are four ways to correct for the initial disequilibrium
 #' between the activity of \eqn{{}^{238}}U, \eqn{{}^{234}}Th,
 #' \eqn{{}^{230}}Th, and \eqn{{}^{226}}Ra; or between \eqn{{}^{235}}U
 #' and \eqn{{}^{231}}Pa:
@@ -30,7 +30,7 @@
 #' 1984). \code{IsoplotR} generalises this approach to Ra/U and Pa/U
 #' as well. However, it still assumes secular equilibrium between
 #' \eqn{{}^{234}}U and \eqn{{}^{238}}Th.}
-#'
+#' 
 #' }
 #' 
 #' @param option one of four options:
@@ -63,12 +63,11 @@
 #' 
 #' @param fPaU the Pa/U fractionation factor between the mineral (m)
 #'     and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.
-#' 
-#' @return
-#' a list with the following items: \code{option} and (\code{U48},
-#' \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option=1} or
-#' \code{option=2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
-#' \code{option=3}].
+#'  
+#' @return a list with the following items: \code{option} and
+#'     (\code{U48}, \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if
+#'     \code{option=1} or \code{option=2}] and (\code{fThU},
+#'     \code{RaU}, \code{PaU}) [if \code{option=3}].
 #' 
 #' @examples
 #' d <- diseq(option=3,fThU=2)
@@ -89,6 +88,7 @@ diseq <- function(option=0,
                   U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
                   fThU=1,fRaU=1,fPaU=1){
     out <- list(option=option)
+    class(out) <- 'diseq'
     if (option%in%c(1,2)){
         out$U48=U48
         out$Th0U8=Th0U8
@@ -98,6 +98,18 @@ diseq <- function(option=0,
         out$fThU = fThU
         out$fRaU = fRaU
         out$fPaU = fPaU
+    }
+    out
+}
+
+#' @export
+`[.diseq` <- function(x,i){
+    out <- x
+    for (j in 1:length(x)){
+        if (length(x[[j]])<i)
+            out[[j]] <- x[[j]][1]
+        else
+            out[[j]] <- x[[j]][i]
     }
     out
 }
@@ -139,7 +151,7 @@ wendt <- function(tt,d=diseq()){
 d1 <- function(tt,dd=diseq()){
     l1 <- settings('lambda','Pa231')[1]*1000
     l5 <- settings('lambda','U235')[1]
-    if (dd$option<3){
+    if (dd$option < 3){
         D0 <- dd$Pa1U5 - 1
         out <- D0*(l5/l1)*exp(l5*tt)*(1-exp(-l1*tt))
     } else {

@@ -1030,12 +1030,3 @@ filter.UPb.ages <- function(x,type=4,cutoff.76=1100,exterr=TRUE,
     colnames(out) <- c('t','s[t]')
     out
 }
-
-concordant <- function(tt,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE)){
-    do.76 <- (tt[,'t.68'] > cutoff.76)
-    disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
-    disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
-    conc.75.68 <- !do.76 & (disc.75.68>cutoff.disc[[1]]) & (disc.75.68<cutoff.disc[[2]])
-    conc.68.76 <- do.76 & (disc.68.76>cutoff.disc[[1]]) & (disc.68.76<cutoff.disc[[2]])
-    conc.75.68 | conc.68.76
-}
