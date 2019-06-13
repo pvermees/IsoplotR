@@ -116,7 +116,7 @@ diseq <- function(option=0,
 
 # from Wendt & Carl (1985, EPSL):
 wendt <- function(tt,d=diseq()){
-    dd <- d
+    dd <- d[1]
     if (d$option==2){
         l4 <- settings('lambda','U234')[1]*1000
         l0 <- settings('lambda','Th230')[1]*1000

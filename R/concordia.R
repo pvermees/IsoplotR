@@ -330,7 +330,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
     for (i in 1:nn){ # build the concordia line
-        xy <- age_to_concordia_ratios(tt[i],type=type,exterr=exterr,d=x$d)
+        xy <- age_to_concordia_ratios(tt[i],type=type,exterr=exterr,d=x$d[i])
         if (exterr){ # show decay constant uncertainty
             if (i > 1) oldell <- ell
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
@@ -346,7 +346,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         ticks <- prettier(lims$t,type=type,n=ticks)
     graphics::lines(conc[,'x'],conc[,'y'],col=col,lwd=2)
     for (i in 1:length(ticks)){
-        xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=x$d)
+        xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=x$d[i])
         if (exterr){ # show ticks as ellipse
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
             graphics::polygon(ell,col='white')

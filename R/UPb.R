@@ -480,7 +480,7 @@ age_to_Pb207U235_ratio <- function(tt,st=0,d=diseq()){
         for (i in 1:ns){
             if (length(st)<ns) sti <- st[1]
             else sti <- st[i]
-            out[i,] <- age_to_Pb207U235_ratio(tt[i],st=sti,d=d)
+            out[i,] <- age_to_Pb207U235_ratio(tt[i],st=sti,d=d[i])
         }
     } else {
         l5 <- lambda('U235')[1]
@@ -501,7 +501,7 @@ age_to_Pb206U238_ratio <- function(tt,st=0,d=diseq()){
         for (i in 1:ns){
             if (length(st)<ns) sti <- st[1]
             else sti <- st[i]
-            out[i,] <- age_to_Pb206U238_ratio(tt[i],st=sti,d=d)
+            out[i,] <- age_to_Pb206U238_ratio(tt[i],st=sti,d=d[i])
         }
     } else {
         l8 <- lambda('U238')[1]
@@ -522,7 +522,7 @@ age_to_U238Pb206_ratio <- function(tt,st=0,d=diseq()){
         for (i in 1:ns){
             if (length(st)<ns) sti <- st[1]
             else sti <- st[i]
-            out[i,] <- age_to_U238Pb206_ratio(tt[i],st=sti,d=d)
+            out[i,] <- age_to_U238Pb206_ratio(tt[i],st=sti,d=d[i])
         }
     } else {
         l8 <- lambda('U238')[1]
@@ -544,7 +544,7 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0,d=diseq()){
         for (i in 1:ns){
             if (length(st)<ns) sti <- st[1]
             else sti <- st[i]
-            out[i,] <- age_to_Pb207Pb206_ratio(tt[i],st=sti,d=d)
+            out[i,] <- age_to_Pb207Pb206_ratio(tt[i],st=sti,d=d[i])
         }
     } else {
         l5 <- lambda('U235')[1]
@@ -720,7 +720,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb207U235.age(x[i],sxi,exterr=exterr,d=d)
+            out[i,] <- get.Pb207U235.age(x[i],sxi,exterr=exterr,d=d[i])
         }
     } else {
         l5 <- lambda('U235')[1]
@@ -773,7 +773,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb206U238.age(x[i],sxi,exterr=exterr,d=d)
+            out[i,] <- get.Pb206U238.age(x[i],sxi,exterr=exterr,d=d[i])
         }
     } else {
         l8 <- lambda('U238')[1]
@@ -822,7 +822,7 @@ get.Pb206U238.age.UPb <- function(x,i=NA,exterr=TRUE,...){
         }
     } else {
         out <- get.Pb206U238.age(r68[i,'Pb206U238'],r68[i,'errPb206U238'],
-                                 exterr=exterr,d=x$d,...)
+                                 exterr=exterr,d=x$d[i],...)
     }
     out
 }
@@ -849,7 +849,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=d)
+            out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=d[i])
         }
     } else {
         search.range <- c(0,2/lambda('U238')[1])
@@ -876,7 +876,8 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
 }
 get.Pb207Pb206.age.UPb <- function(x,i,exterr=TRUE,...){
     r76 <- get.Pb207Pb206.ratios(x)
-    get.Pb207Pb206.age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],exterr=exterr,d=x$d)
+    get.Pb207Pb206.age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],
+                       exterr=exterr,d=x$d[i])
 }
 get.Pb207Pb206.age.wetherill <- function(x,exterr=TRUE,...){
     U <- iratio('U238U235')[1]
