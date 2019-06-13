@@ -114,9 +114,14 @@ diseq <- function(option=0,
     out
 }
 
+#' @export
+geomean.diseq <- function(x,...){
+    lapply(x, 'geomean')
+}
+
 # from Wendt & Carl (1985, EPSL):
 wendt <- function(tt,d=diseq()){
-    dd <- d[1]
+    dd <- geomean(d)
     if (d$option==2){
         l4 <- settings('lambda','U234')[1]*1000
         l0 <- settings('lambda','Th230')[1]*1000
