@@ -577,6 +577,22 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     z <- Z - phi
     out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)    
 }
+data2ludwig_4D <- function(x,tt,a0,b0,c0,w=0,exterr=FALSE){
+    l2 <- settings('lambda','Th232')
+    l5 <- settings('lambda','U235')
+    l8 <- settings('lambda','U238')
+    U <- settings('iratio','U238U235')[1]
+    ns <- length(x)
+    W <- x$x[,'Th232U238']
+    X <- x$x[,'Pb208Th232']
+    Y <- x$x[,'Pb207Pb208']
+    Z <- x$x[,'Pb206Pb208']
+    E1 <- matrix(0,4*ns,4*ns)
+    J1 <- matrix(0,3*ns,4*ns)
+    E <- matrix(0,4,4)
+    for (i in 1:ns){
+    }
+}
 get.Ew <- function(w,Z,a0,b0,U){
     E <- diag(c(a0,b0)*w)^2
     J <- matrix(0,3,2)
