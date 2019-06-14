@@ -478,17 +478,17 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    D <- wendt(tt=tt,d=x$d)
-    f1 <- exp(l5[1]*tt)-1 + D$d1
-    f2 <- exp(l8[1]*tt)-1 + D$d2
-    B <-  f1/U - a0*f2
-    dBdl5 <- (tt*exp(l5[1]*tt)+D$dd1dl5)/U
-    dBdl8 <- -a0*(tt*exp(l8[1]*tt)+D$dd2dl8)
     E <- matrix(0,2*ns+2,2*ns+2)
     J <- matrix(0,2*ns,2*ns+2)
     X <- matrix(0,ns,1)
     Y <- matrix(0,ns,1)
     for (i in 1:ns){
+        D <- wendt(tt=tt,d=x$d[i])
+        f1 <- exp(l5[1]*tt)-1 + D$d1
+        f2 <- exp(l8[1]*tt)-1 + D$d2
+        B <-  f1/U - a0*f2
+        dBdl5 <- (tt*exp(l5[1]*tt)+D$dd1dl5)/U
+        dBdl8 <- -a0*(tt*exp(l8[1]*tt)+D$dd2dl8)
         XY <- tera.wasserburg(x,i)
         X[i] <- XY$x['U238Pb206']
         Y[i] <- XY$x['Pb207Pb206']
@@ -536,9 +536,9 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     R <- rep(0,ns)
     r <- rep(0,ns)
     Z <- rep(0,ns)
-    D <- wendt(tt=tt,d=x$d)
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
+        D <- wendt(tt=tt,d=x$d[i])
         Z[i] <- wd$x['Pb204U238']
         R[i] <- wd$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - D$d1
         r[i] <- wd$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - D$d2
@@ -583,14 +583,15 @@ data2ludwig_4D <- function(x,tt,a0,b0,c0,w=0,exterr=FALSE){
     l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
-    W <- x$x[,'Th232U238']
-    X <- x$x[,'Pb208Th232']
-    Y <- x$x[,'Pb207Pb208']
-    Z <- x$x[,'Pb206Pb208']
     E1 <- matrix(0,4*ns,4*ns)
     J1 <- matrix(0,3*ns,4*ns)
     E <- matrix(0,4,4)
     for (i in 1:ns){
+        D <- wendt(tt,d=x$d[i])
+        wd <- wetherill(x,i)
+        xi <- c0[i] + exp(l2*tt) - 1
+        yi <- U*b0*wd['Th232U238']*c0[i] + exp(l5*tt) - 1 + D$d1
+        zi <- a0*wd['Th232U238']*c0[i] + exp(l5*tt) - 1 + D$d2
     }
 }
 get.Ew <- function(w,Z,a0,b0,U){
