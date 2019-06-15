@@ -426,8 +426,8 @@ mymtext <- function(text,line=0,...){
 }
 
 # if doall==FALSE, only returns the lower right submatrix
-blockinverse <- function(AA,BB,CC,DD,doall=FALSE){
-    invAA <- solve(AA)
+blockinverse <- function(AA,BB,CC,DD,invAA=NA,doall=FALSE){
+    if (all(is.na(invAA))) invAA <- solve(AA)
     invDCAB <- solve(DD-CC%*%invAA%*%BB)
     if (doall){
         ul <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
@@ -439,6 +439,13 @@ blockinverse <- function(AA,BB,CC,DD,doall=FALSE){
         out <- invDCAB
     }
     out
+}
+blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
+    ABDE <- rbind(cbind(AA,BB),cbind(DD,EE))
+    invABDE <- blockinverse(AA=AA,BB=BB,CC=DD,DD=EE,doall=TRUE)
+    CF <- rbind(CC,FF)
+    GH <- cbind(GG,HH)
+    blockinverse(AA=ABDE,BB=CF,CC=GH,DD=DD,invAA=invABDE,doall=TRUE)
 }
 
 # Optimise with some fixed parameters 

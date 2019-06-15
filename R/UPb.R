@@ -62,8 +62,8 @@ wetherill <- function(x,i){
         out$x <- x$x[i,labels]
         out$cov <- cor2cov4(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
                             x$x[i,'errPb208Th232'],x$x[i,'errTh232U238'],
-                            x$x[i,'rhoXY'],x$x[i,'rhoXZ'],x$x[i,'rhoWX'],
-                            x$x[i,'rhoYZ'],x$x[i,'rhoWY'],x$x[i,'rhoWZ'])
+                            x$x[i,'rhoXY'],x$x[i,'rhoXZ'],x$x[i,'rhoXW'],
+                            x$x[i,'rhoYZ'],x$x[i,'rhoYW'],x$x[i,'rhoZW'])
     } else if (x$format == 8){
         U238U235 <- iratio('U238U235')[1]
         Pb207U235 <- U238U235*x$x[i,'Pb207Pb206']/x$x[i,'U238Pb206']
@@ -188,8 +188,8 @@ tera.wasserburg <- function(x,i){
         out$x <- x$x[i,labels]
         out$cov <- cor2cov4(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],
                             x$x[i,'errPb208Pb206'],x$x[i,'errTh232U238'],
-                            x$x[i,'rhoXY'],x$x[i,'rhoXZ'],x$x[i,'rhoWX'],
-                            x$x[i,'rhoYZ'],x$x[i,'rhoWY'],x$x[i,'rhoWZ'])
+                            x$x[i,'rhoXY'],x$x[i,'rhoXZ'],x$x[i,'rhoXW'],
+                            x$x[i,'rhoYZ'],x$x[i,'rhoYW'],x$x[i,'rhoZW'])
     }
     names(out$x) <- labels
     colnames(out$cov) <- labels
