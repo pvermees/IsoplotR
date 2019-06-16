@@ -253,8 +253,10 @@ LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
 LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     if (x$format %in% c(1,2,3,7,8)){
         return(LL.lud.2D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
-    } else {
+    } else if (x$format %in% c(4,5,6)){
         return(LL.lud.3D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
+    } else {
+        stop('Incorrect input format.')
     }
 }
 LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
@@ -296,6 +298,9 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
         out <- -0.5*(out + k*log(2*pi) + detE)
     }
     out
+}
+LL.lud.Th <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
+    l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
@@ -466,11 +471,12 @@ fisher_lud_3D <- function(x,fit){
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
-data2ludwig.UPb <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
+data2ludwig.UPb <- function(x,tt,a0,b0=0,g0=rep(0,length(x)),exterr=FALSE,w=0,...){
     if (x$format %in% c(1,2,3,7,8))
         out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)
-    else
+    else if (x$format %in% c(4,5,6))
         out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
+    else stop('Incorrect input format.')
     out
 }
 data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
@@ -577,7 +583,7 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     z <- Z - phi
     out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)    
 }
-data2ludwig_4D <- function(x,tt,a0,b0,c0,w=0,exterr=FALSE){
+data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     l2 <- settings('lambda','Th232')
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
@@ -585,50 +591,43 @@ data2ludwig_4D <- function(x,tt,a0,b0,c0,w=0,exterr=FALSE){
     ns <- length(x)
     K <- rep(0,ns)
     L <- rep(0,ns)
-    M <- rep(0,ns)
     E <- matrix(0,4*ns+3,4*ns+3)
+    J <- matrix(0,2*ns,4*ns+3)
+    for (i in 1:ns){
+        D <- wendt(tt,d=x$d[i])
+        wd <- wetherill(x,i)
+        ii <- 4*i-3
+        W <- x$x[i,'Th232U238']
+        c0 <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1
+        K[i] <- wd$x['Pb207U235'] - c0*U*b0*W - exp(l5[1]*tt) + 1 - D$d1
+        L[i] <- wd$x['Pb206U238'] - c0*a0*W - exp(l8[1]*tt) + 1 - D$d2
+        E[ii:(ii+3),ii:(ii+3)] <- wd$cov
+        J[i,ii] <- 1 # dKi/dPb7U5
+        J[i,ii+2] <- -U*b0*W # dKi/dPb8Th2
+        J[i,ii+3] <- -c0*U*b0 # dKi/dTh2U8
+        J[ns+i,ii+1] <- 1 # dLi/dPb6U8
+        J[ns+i,ii+2] <- -a0*W # dLi/dPb8Th2
+        J[ns+i,ii+3] <- -c0*a0 # dLi/dTh2U8
+        if (exterr){
+            J[i,3*ns+1] <- - tt*exp(l5[1]*tt) - D$dd1dl5 # dKi/dl5
+            J[i,3*ns+3] <- tt*exp(l2[1]*tt)*U*b0*W # dKi/dl2
+            J[ns+i,3*ns+2] <- - tt*exp(l5[1]*tt) - D$dd2dl8 # dLi/dl8
+            J[ns+i,3*ns+3] <- tt*exp(l2[1]*tt)*a0*W # dKi/dl2
+        }
+    }
     if (exterr){ # decay constant uncertainties
         E[4*ns+1,4*ns+1] <- l5[2]^2
         E[4*ns+2,4*ns+2] <- l8[2]^2
         E[4*ns+3,4*ns+3] <- l2[2]^2
     }
-    J <- matrix(0,3*ns,4*ns+3)
-    out <- list()
-    out$x <- rep(0,3*ns)
-    for (i in 1:ns){
-        D <- wendt(tt,d=x$d[i])
-        wd <- wetherill(x,i)
-        xi <- U*b0*wd$x['Th232U238']*c0[i] + exp(l5[1]*tt) - 1 + D$d1
-        yi <- a0*wd$x['Th232U238']*c0[i] + exp(l8[1]*tt) - 1 + D$d2
-        zi <- c0[i] + exp(l2[1]*tt) - 1
-        out$x[i] <- wd$x['Pb207U235'] - xi
-        out$x[ns+i] <- wd$x['Pb206U238'] - yi
-        out$x[2*ns+i] <- wd$x['Pb208Th232'] - zi
-        ii <- 3*i-2
-        E[ii:(ii+3),ii:(ii+3)] <- wd$cov
-        J[i,ii] <- 1 # dKi/dPb7U5
-        J[i,ii+3] <- -U*b0*c0[i] # dKi/dTh2U8
-        J[ns+i,ii+1] <- 1 # dLi/dPb6U8
-        J[ns+i,ii+3] <- -a0*c0[i] # dLi/dTh2U8
-        J[2*ns+i,ii+2] <- 1 # dMi/dPb8Th2
-        if (exterr){
-            J[i,4*ns+1] <- -tt*exp(l5[1]*tt) - D$dd1dl5 # dKi/dl5
-            J[ns+i,4*ns+2] <- -tt*exp(l5[1]*tt) - D$dd2dl8 # dLi/dl8
-            J[2*ns+i,4*ns+3] <- -tt*exp(l2[1]*tt) # dMi/dl2
-        }
-    }
     EE <- J %*% E %*% t(J)
-    out$omega <- blockinverse3x3(AA=EE[1:ns,1:ns],
-                                 BB=E[1:ns,(ns+1):(2*ns)],
-                                 CC=EE[1:ns,(2*ns+1):(3*ns)],
-                                 DD=EE[(ns+1):(2*ns),1:ns],
-                                 EE=EE[(ns+1):(2*ns),(ns+1):(2*ns)],
-                                 FF=EE[(ns+1):(2*ns),(2*ns+1):(3*ns)],
-                                 GG=EE[(2*ns+1):(3*ns),1:ns],
-                                 HH=EE[(2*ns+1):(3*ns),(ns+1):(2*ns)],
-                                 II=EE[(2*ns+1):(3*ns),(2*ns+1):(3*ns)])
-    out
+    omega <- blockinverse(AA=EE[1:ns,1:ns],
+                          BB=EE[1:ns,(ns+1):(2*ns)],
+                          CC=EE[(ns+1):(2*ns),1:ns],
+                          DD=EE[(ns+1):(2*ns),(ns+1):(2*ns)])
+    list(K=K,L=L,omega=omega)
 }
+
 get.Ew <- function(w,Z,a0,b0,U){
     E <- diag(c(a0,b0)*w)^2
     J <- matrix(0,3,2)

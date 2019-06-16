@@ -445,7 +445,7 @@ blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
     invABDE <- blockinverse(AA=AA,BB=BB,CC=DD,DD=EE,doall=TRUE)
     CF <- rbind(CC,FF)
     GH <- cbind(GG,HH)
-    blockinverse(AA=ABDE,BB=CF,CC=GH,DD=DD,invAA=invABDE,doall=TRUE)
+    blockinverse(AA=ABDE,BB=CF,CC=GH,DD=II,invAA=invABDE,doall=TRUE)
 }
 
 # Optimise with some fixed parameters 
