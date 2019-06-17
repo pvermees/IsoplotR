@@ -591,6 +591,7 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     ns <- length(x)
     K <- rep(0,ns)
     L <- rep(0,ns)
+    c0 <- rep(0,ns)
     E <- matrix(0,4*ns+3,4*ns+3)
     J <- matrix(0,2*ns,4*ns+3)
     for (i in 1:ns){
@@ -598,16 +599,16 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         wd <- wetherill(x,i)
         ii <- 4*i-3
         W <- x$x[i,'Th232U238']
-        c0 <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1
-        K[i] <- wd$x['Pb207U235'] - c0*U*b0*W - exp(l5[1]*tt) + 1 - D$d1
-        L[i] <- wd$x['Pb206U238'] - c0*a0*W - exp(l8[1]*tt) + 1 - D$d2
+        c0[i] <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1
+        K[i] <- wd$x['Pb207U235'] - c0[i]*U*b0*W - exp(l5[1]*tt) + 1 - D$d1
+        L[i] <- wd$x['Pb206U238'] - c0[i]*a0*W - exp(l8[1]*tt) + 1 - D$d2
         E[ii:(ii+3),ii:(ii+3)] <- wd$cov
         J[i,ii] <- 1 # dKi/dPb7U5
         J[i,ii+2] <- -U*b0*W # dKi/dPb8Th2
-        J[i,ii+3] <- -c0*U*b0 # dKi/dTh2U8
+        J[i,ii+3] <- -c0[i]*U*b0 # dKi/dTh2U8
         J[ns+i,ii+1] <- 1 # dLi/dPb6U8
         J[ns+i,ii+2] <- -a0*W # dLi/dPb8Th2
-        J[ns+i,ii+3] <- -c0*a0 # dLi/dTh2U8
+        J[ns+i,ii+3] <- -c0[i]*a0 # dLi/dTh2U8
         if (exterr){
             J[i,3*ns+1] <- - tt*exp(l5[1]*tt) - D$dd1dl5 # dKi/dl5
             J[i,3*ns+3] <- tt*exp(l2[1]*tt)*U*b0*W # dKi/dl2
@@ -621,6 +622,7 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         E[4*ns+3,4*ns+3] <- l2[2]^2
     }
     EE <- J %*% E %*% t(J)
+    if (w>0) EE <- EE + get.Ew_Th(w=w,W=x$x[,'Th232U238'],a0=a0,b0=b0,c0=c0)
     omega <- blockinverse(AA=EE[1:ns,1:ns],
                           BB=EE[1:ns,(ns+1):(2*ns)],
                           CC=EE[(ns+1):(2*ns),1:ns],
@@ -633,6 +635,16 @@ get.Ew <- function(w,Z,a0,b0,U){
     J <- matrix(0,3,2)
     J[1,2] <- -U*Z # dRda0
     J[2,1] <- -Z   # dRdb0
+    J %*% E %*% t(J)
+}
+
+get.Ew_Th <- function(w,W,a0,b0,c0){
+    ns <- length(W)
+    U <- settings('iratio','U238U235')[1]
+    E <- diag(c(a0,b0)*w)^2
+    J <- matrix(0,2*ns,2)
+    J[1:ns,1] <- c0*U*W         # dKda0
+    J[(ns+1):(2*ns),2] <- c0*W  # dLdb0
     J %*% E %*% t(J)
 }
 
