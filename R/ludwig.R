@@ -187,11 +187,15 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         slope <- xyfit$coef[2]
         ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
     } else if (is.na(anchor[[2]])){
-        if (x$format %in% c(1,2,3,7,8)){
+        if (x$format %in% c(1,2,3)){
             b0a0 <- settings('iratio','Pb207Pb206')[1]
-        } else {
+        } else if (x$format %in% c(4,5,6)){
             a0 <- settings('iratio','Pb206Pb204')[1]
             b0 <- settings('iratio','Pb207Pb204')[1]
+            b0a0 <- b0/a0
+        } else if (x$format %in% c(7,8)){
+            a0 <- settings('iratio','Pb206Pb208')[1]
+            b0 <- settings('iratio','Pb207Pb208')[1]
             b0a0 <- b0/a0
         }
         intercept <- b0a0
@@ -207,25 +211,52 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         ta0b0 <- c(anchor[[2]],intercept)
     }
     if (x$format %in% c(4,5,6)){
-        U238Pb206 <- subset(get.U238Pb206.ratios(x),select='U238Pb206')
-        Pb206U238 <- subset(get.Pb206U238.ratios(x),select='Pb206U238')
-        Pb204U238 <- subset(get.Pb204U238.ratios(x),select='Pb204U238')
-        Pb207Pb206 <- subset(get.Pb207Pb206.ratios(x),select='Pb207Pb206')
-        Pb204Pb206 <- Pb204U238/Pb206U238
+        U238Pb206 <- get.U238Pb206.ratios(x)[,'U238Pb206',drop=FALSE]
+        Pb204U238 <- get.Pb204U238.ratios(x)[,'Pb204U238',drop=FALSE]
+        Pb204Pb206 <- Pb204U238*U238Pb206
         if (!anchor[[1]]){
             lmfit <- stats::lm(Pb204Pb206 ~ U238Pb206)
-            ta0b0[3] <- ta0b0[2]/lmfit$coef[1]    # 7/4
-            ta0b0[2] <- 1/lmfit$coef[1]           # 6/4
+            ta0b0[3] <- ta0b0[2]/lmfit$coef[1]    # 07/04
+            ta0b0[2] <- 1/lmfit$coef[1]           # 06/04
         } else if (is.na(anchor[[2]])){
             ta0b0[2] <- a0
             ta0b0[3] <- b0
         } else if (is.numeric(anchor[[2]])){
-            lmfit <- stats::lm(Pb204Pb206 ~
+            # 1. fit the Pb204/Pb206-intercept anchored to the concordia age
+            fit06 <- stats::lm(Pb204Pb206 ~ 0 + I(U238Pb206-TW$x['U238Pb206']))
+            d46d86 <- fit06$coef
+            ta0b0[2] <- -1/(TW$x['U238Pb206']*d46d86) # 06/04
+            # 2. fit the Pb204/Pb207-intercept anchored to the concordia age
+            U <- settings('iratio','U238U235')[1]
+            Pb207U235 <- get.Pb207U235.ratios(x)[,'Pb207U235',drop=FALSE]
+            Pb204Pb207 <- U*Pb204U238/Pb207U235
+            U238Pb207 <- U/Pb207U235
+            TW87 <- TW$x['U238Pb206']/TW$x['Pb207Pb206']
+            fit07 <- stats::lm(Pb204Pb207 ~ 0 + I(U238Pb207-TW87))
+            d47d87 <- fit07$coef
+            ta0b0[3] <- -TW$x['Pb207Pb206']/(d47d87*TW$x['U238Pb206']) # 07/04
+        }
+    }    
+    if (x$format %in% c(7,8)){
+        Pb208Pb206 <- get.Pb208Pb206.ratios(x)[,'Pb208Pb206',drop=FALSE]
+        U238Pb206 <- get.U238Pb206.ratios(x)[,'U238Pb206',drop=FALSE]
+        Th232U238 <- x$x[,'Th232U238',drop=FALSE]
+        l2 <- settings('lambda','Th232')[1]
+        if (!anchor[[1]]){
+            Pb208cPb206 <- Pb208Pb206 - Th232U238*U238Pb206*(exp(l2*ta0b0[1])-1)
+            lmfit <- stats::lm(Pb208cPb206 ~ U238Pb206)
+            ta0b0[3] <- ta0b0[2]/lmfit$coef[1]    # 07/08c
+            ta0b0[2] <- 1/lmfit$coef[1]           # 06/08c
+        } else if (is.na(anchor[[2]])){
+            ta0b0[2] <- a0
+            ta0b0[3] <- b0
+        } else if (is.numeric(anchor[[2]])){
+            lmfit <- stats::lm(Pb208cPb206 ~
                                0 + I(U238Pb206-TW$x['U238Pb206']))
-            slope <- lmfit$coef                   # 4/8
-            Pb46 <- -TW$x['U238Pb206']*slope
-            ta0b0[2] <- 1/Pb46                    # 6/4
-            ta0b0[3] <- Pb46 * TW$x['Pb207Pb206'] # 7/4
+            slope <- lmfit$coef                   # d08c/d38
+            Pb8c6 <- -TW$x['U238Pb206']*slope
+            ta0b0[2] <- 1/Pb8c6                   # 06/08c
+            ta0b0[3] <- TW$x['Pb207Pb206']/Pb8c6  # 07/08c
         }
     }    
     ta0b0
@@ -251,10 +282,12 @@ LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
     LL.lud.UPb(ta0b0=ta0b0,x=x,exterr=exterr,w=w,LL=TRUE)
 }
 LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
-    if (x$format %in% c(1,2,3,7,8)){
+    if (x$format %in% c(1,2,3)){
         return(LL.lud.2D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
     } else if (x$format %in% c(4,5,6)){
         return(LL.lud.3D(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
+    } else if (x$format %in% c(7,8)){
+        return(LL.lud.Th(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
     } else {
         stop('Incorrect input format.')
     }
@@ -301,6 +334,15 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 LL.lud.Th <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
+    KL <- matrix(c(l$K,l$L),nrow=1)
+    out <- KL %*% l$omega %*% t(KL)
+    if (LL){
+        k <- length(KL)
+        detE <- determinant(l$omegainv,logarithm=TRUE)$modulus
+        out <- -0.5*(out + k*log(2*pi) + detE)
+    }
+    out
+    
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
@@ -472,10 +514,12 @@ fisher_lud_3D <- function(x,fit){
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
 data2ludwig.UPb <- function(x,tt,a0,b0=0,g0=rep(0,length(x)),exterr=FALSE,w=0,...){
-    if (x$format %in% c(1,2,3,7,8))
+    if (x$format %in% c(1,2,3))
         out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)
     else if (x$format %in% c(4,5,6))
         out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
+    else if (x$format %in% c(7,8))
+        out <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
     else stop('Incorrect input format.')
     out
 }
@@ -626,8 +670,8 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     omega <- blockinverse(AA=EE[1:ns,1:ns],
                           BB=EE[1:ns,(ns+1):(2*ns)],
                           CC=EE[(ns+1):(2*ns),1:ns],
-                          DD=EE[(ns+1):(2*ns),(ns+1):(2*ns)])
-    list(K=K,L=L,omega=omega)
+                          DD=EE[(ns+1):(2*ns),(ns+1):(2*ns)],doall=TRUE)
+    list(K=K,L=L,omega=omega,omegainv=EE)
 }
 
 get.Ew <- function(w,Z,a0,b0,U){

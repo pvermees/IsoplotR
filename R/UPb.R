@@ -708,6 +708,32 @@ get.Pb208Th232.ratios <- function(x){
     }
     out
 }
+get.Pb208Pb206.ratios <- function(x){
+    ns <- length(x)
+    out <- matrix(0,ns,2)
+    labels <- c('Pb208Pb206','errPb208Pb206')
+    colnames(out) <- labels
+    if (x$format == 7){
+        out[,'Pb208Pb206'] <- x$x[,'Pb208Th232']*x$x[,'Th232U238']/x$x[,'Pb206U238']
+        J1 <- -out[,'Pb208Pb206']/x$x[,'Pb206U238']
+        J2 <- x$x[,'Pb208Th232']/x$x[,'Pb206U238']
+        J3 <- x$x[,'Th232U238']/x$x[,'Pb206U238']
+        sX <- x$x[,'errPb206U238']
+        sY <- x$x[,'errPb208Th232']
+        sZ <- x$x[,'errTh232U238']
+        rXY <- x$x[,'rYZ']
+        rXZ <- x$x[,'rYW']
+        rYZ <- x$x[,'rZW']
+        E <- cor2cov3(sX,sY,sZ,rXY,rXZ,rYZ)
+        out[,'errU238Pb206'] <- errorprop1x3(J1,J2,J3,E[1,1],E[2,2],E[3,3],
+                                             E[1,2],E[1,3],E[2,3])
+    } else if (x$format == 8){
+        out <- x$x[,labels]
+    } else {
+        stop('Wrong input format: no Pb208 present in this dataset.')
+    }
+    out
+}
 
 get.Pb207U235.age <- function(x,...){ UseMethod("get.Pb207U235.age",x) }
 get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){

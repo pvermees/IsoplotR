@@ -192,7 +192,7 @@ mindens <- function(mineral,x=NULL){
 #' weight of a reference sample of strontium." J. Res. Natl. Bur. Stand.
 #' 87.1 (1982): 1-8.
 #'
-#' and (for \eqn{^{87}}Sr\eqn{^{86}}Sr):
+#' and (for \eqn{^{87}}Sr/\eqn{^{86}}Sr):
 #'
 #' Compston, W., Berry, H., Vernon, M.J., Chappell, B.W. and Kaye,
 #' M.J., 1971. Rubidium-strontium chronology and chemistry of lunar
@@ -220,8 +220,14 @@ mindens <- function(mineral,x=NULL){
 #' chronology and chemical evolution." Geochimica et Cosmochimica
 #' Acta 47.1 (1983): 81-91.
 #'
-#' \item U: Hiess, Joe, et al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial
-#' uranium-bearing minerals." Science 335.6076 (2012): 1610-1614.
+#' \item Pb: Stacey, J.T. and Kramers,
+#' J. "Approximation of terrestrial lead isotope evolution by a two-stage model."
+#' Earth and Planetary Science Letters, 26(2) (1975): 207-221.
+#'
+#' \item U: Hiess, Joe, et
+#' al. "\eqn{^{238}}U/\eqn{^{235}}U systematics in terrestrial uranium-bearing minerals."
+#' Science 335.6076 (2012): 1610-1614.
+#' 
 #' }
 #' }
 #' @seealso \code{\link{read.data}}
