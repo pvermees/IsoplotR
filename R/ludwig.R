@@ -272,9 +272,9 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
 get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out <- list(w=0,par=init)
 #    for (i in 1:5){ # loop for more accurate but slower and more unstable results
-        out <- fit_ludwig_discordia(x,init=out$par,w=out$w,exterr=exterr,anchor=anchor)
-        out$w <- stats::optimize(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
-                                 exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
+    out <- fit_ludwig_discordia(x,init=out$par,w=out$w,exterr=exterr,anchor=anchor)
+    out$w <- stats::optimize(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
+                             exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
 #    }
     out
 }
@@ -701,14 +701,16 @@ get.Ew_Th <- function(w,W,a0,b0,c0){
 }
 
 fixit <- function(x,anchor=list(FALSE,NA)){
-    if (x$format %in% c(1,2,3,7,8)){
+    if (x$format %in% c(1,2,3)){
         if (!anchor[[1]]) out <- rep(FALSE,2)
         else if (is.numeric(anchor[[2]])) out <- c(TRUE,FALSE)
         else out <- c(FALSE,TRUE)
-    } else {
+    } else if (x$format %in% c(4,5,6,7,8)){
         if (!anchor[[1]]) out <- rep(FALSE,3)
         else if (is.numeric(anchor[[2]])) out <- c(TRUE,FALSE,FALSE)
         else out <- c(FALSE,TRUE,TRUE)
+    } else {
+        stop('Illegal input format.')
     }
     out
 }
