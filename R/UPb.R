@@ -721,12 +721,13 @@ get.Pb208Pb206.ratios <- function(x){
         sX <- x$x[,'errPb206U238']
         sY <- x$x[,'errPb208Th232']
         sZ <- x$x[,'errTh232U238']
-        rXY <- x$x[,'rYZ']
-        rXZ <- x$x[,'rYW']
-        rYZ <- x$x[,'rZW']
-        E <- cor2cov3(sX,sY,sZ,rXY,rXZ,rYZ)
-        out[,'errU238Pb206'] <- errorprop1x3(J1,J2,J3,E[1,1],E[2,2],E[3,3],
-                                             E[1,2],E[1,3],E[2,3])
+        rXY <- x$x[,'rhoYZ']
+        rXZ <- x$x[,'rhoYW']
+        rYZ <- x$x[,'rhoZW']
+        E12 <- rXY/(sX*sY)
+        E13 <- rXZ/(sX*sZ)
+        E23 <- rYZ/(sY*sZ)
+        out[,'errPb208Pb206'] <- errorprop1x3(J1,J2,J3,sX^2,sY^2,sZ^2,E12,E13,E23)
     } else if (x$format == 8){
         out <- x$x[,labels]
     } else {

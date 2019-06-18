@@ -225,7 +225,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
             # 1. fit the Pb204/Pb206-intercept anchored to the concordia age
             fit06 <- stats::lm(Pb204Pb206 ~ 0 + I(U238Pb206-TW$x['U238Pb206']))
             d46d86 <- fit06$coef
-            ta0b0[2] <- -1/(TW$x['U238Pb206']*d46d86) # 06/04
+            ta0b0[2] <- -1/(TW$x['U238Pb206']*d46d86)                  # 06/04
             # 2. fit the Pb204/Pb207-intercept anchored to the concordia age
             U <- settings('iratio','U238U235')[1]
             Pb207U235 <- get.Pb207U235.ratios(x)[,'Pb207U235',drop=FALSE]
@@ -238,8 +238,8 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         }
     }    
     if (x$format %in% c(7,8)){
-        Pb208Pb206 <- get.Pb208Pb206.ratios(x)[,'Pb208Pb206',drop=FALSE]
         U238Pb206 <- get.U238Pb206.ratios(x)[,'U238Pb206',drop=FALSE]
+        Pb208Pb206 <- get.Pb208Pb206.ratios(x)[,'Pb208Pb206',drop=FALSE]
         Th232U238 <- x$x[,'Th232U238',drop=FALSE]
         l2 <- settings('lambda','Th232')[1]
         if (!anchor[[1]]){
@@ -251,12 +251,20 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
             ta0b0[2] <- a0
             ta0b0[3] <- b0
         } else if (is.numeric(anchor[[2]])){
-            lmfit <- stats::lm(Pb208cPb206 ~
-                               0 + I(U238Pb206-TW$x['U238Pb206']))
-            slope <- lmfit$coef                   # d08c/d38
-            Pb8c6 <- -TW$x['U238Pb206']*slope
-            ta0b0[2] <- 1/Pb8c6                   # 06/08c
-            ta0b0[3] <- TW$x['Pb207Pb206']/Pb8c6  # 07/08c
+            Pb208cPb206 <- Pb208Pb206 - Th232U238*U238Pb206*(exp(l2*anchor[[2]])-1)
+            # 1. fit the Pb208/Pb206-intercept anchored to the concordia age
+            fit06 <- stats::lm(Pb208cPb206 ~ 0 + I(U238Pb206-TW$x['U238Pb206']))
+            d8c6d86 <- fit06$coef
+            ta0b0[2] <- -1/(TW$x['U238Pb206']*d8c6d86)                  # 06/08c
+            # 2. fit the Pb208/Pb207-intercept anchored to the concordia age
+            U <- settings('iratio','U238U235')[1]
+            Pb207Pb206 <- get.Pb207Pb206.ratios(x)[,'Pb207Pb206',drop=FALSE]
+            Pb208cPb207 <- Pb208cPb206/Pb207Pb206
+            U238Pb207 <- U238Pb206/Pb207Pb206
+            TW87 <- TW$x['U238Pb206']/TW$x['Pb207Pb206']
+            fit07 <- stats::lm(Pb208cPb207 ~ 0 + I(U238Pb207-TW87))
+            d8c7d87 <- fit07$coef
+            ta0b0[3] <- -TW$x['Pb207Pb206']/(d8c7d87*TW$x['U238Pb206']) # 07/08c
         }
     }    
     ta0b0
