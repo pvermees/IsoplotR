@@ -126,8 +126,10 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),.
         out$w <- c(fit$w,profile_LL_discordia_disp(fit,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
-    if (x$format %in% c(1,2,3,7,8)) parnames <- c('t','76i')
-    else parnames <- c('t','64i','74i')
+    if (x$format %in% c(1,2,3)) parnames <- c('t','76i')
+    else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i')
+    else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i')
+    else stop("Illegal input format.")
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
@@ -197,6 +199,8 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
             a0 <- settings('iratio','Pb206Pb208')[1]
             b0 <- settings('iratio','Pb207Pb208')[1]
             b0a0 <- b0/a0
+        } else {
+            stop("Illegal input format.")
         }
         intercept <- b0a0
         xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
@@ -236,7 +240,7 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
             d47d87 <- fit07$coef
             ta0b0[3] <- -TW$x['Pb207Pb206']/(d47d87*TW$x['U238Pb206']) # 07/04
         }
-    }    
+    }
     if (x$format %in% c(7,8)){
         U238Pb206 <- get.U238Pb206.ratios(x)[,'U238Pb206',drop=FALSE]
         Pb208Pb206 <- get.Pb208Pb206.ratios(x)[,'Pb208Pb206',drop=FALSE]
@@ -359,18 +363,26 @@ fisher.lud.default <- function(x,...){
 }
 fisher.lud.UPb <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
     ns <- length(x)
-    if (x$format %in% c(1,2,3,7,8)){
+    if (x$format %in% c(1,2,3)){
         fish <- fisher_lud_2D(x,fit)
         AA <- fish[1:ns,1:ns]
         BB <- fish[1:ns,(ns+1):(ns+2)]
         CC <- fish[(ns+1):(ns+2),1:ns]
         DD <- fish[(ns+1):(ns+2),(ns+1):(ns+2)]
-    } else {
+    } else if (x$format %in% c(4,5,6)){
         fish <- fisher_lud_3D(x,fit)
         AA <- fish[1:ns,1:ns]
         BB <- fish[1:ns,(ns+1):(ns+3)]
         CC <- fish[(ns+1):(ns+3),1:ns]
         DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
+    } else if (x$format %in% c(7,8)){
+        fish <- fisher_lud_Th(x,fit)
+        AA <- fish[1:ns,1:ns]
+        BB <- fish[1:ns,(ns+1):(ns+3)]
+        CC <- fish[(ns+1):(ns+3),1:ns]
+        DD <- fish[(ns+1):(ns+3),(ns+1):(ns+3)]
+    } else {
+        stop("Illegal data format.")
     }
     anchorfish(AA,BB,CC,DD,anchor=anchor)
 }
@@ -518,6 +530,18 @@ fisher_lud_3D <- function(x,fit){
     out[ns+3,ns+2] <- d2L.da0db0 # m23
     out
 }
+fisher_lud_Th <- function(x,fit){
+    tt <- fit$par[1]
+    a0 <- fit$par[2]
+    b0 <- fit$par[3]
+    l <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=0,exterr=fit$exterr)
+    ns <- length(l$K)
+    l5 <- settings('lambda','U235')
+    l8 <- settings('lambda','U238')
+    U <- settings('iratio','U238U235')[1]
+    out <- matrix(0,3,3)
+    out
+}
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
 data2ludwig.default <- function(x,...){ stop('default function undefined') }
@@ -552,7 +576,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         Y[i] <- XY$x['Pb207Pb206']
         E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov[1:2,1:2]
         E[2*i,2*i] <- E[2*i,2*i] + (a0*w)^2
-        J[i,2*i-1] <- 1 # drx/dX
+        J[i,2*i-1] <- 1  # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
         if (exterr){
             J[ns+i,2*ns+1] <- -dBdl5*X[i]
