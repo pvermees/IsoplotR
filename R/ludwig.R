@@ -538,7 +538,41 @@ fisher_lud_Th <- function(x,fit){
     ns <- length(l$K)
     l5 <- settings('lambda','U235')
     l8 <- settings('lambda','U238')
+    l2 <- settings('lambda','Th232')
     U <- settings('iratio','U238U235')[1]
+    K <- matrix(l$K,nrow=ns)
+    L <- matrix(l$L,nrow=ns)
+    M <- matrix(l$M,nrow=ns)
+    W <- x$x[,'Th232U238',drop=FALSE]
+    dKdb0 <- -U*c0*W
+    dKdc0 <- -U*b0*W
+    d2Kdc0db0 <- -U*W
+    dLda0 <- -c0*W
+    dLdc0 <- -a0*W
+    d2Ldc0da0 <- -W
+    dMdc0 <- -1
+    dSdc0 <- 2*t(K)%*%l$omega11%*%dKdc0 + t(K)%*%l$omega12%*%dLdc0 +
+        t(L)%*%t(l$omega12)%*%dKdc0 + t(K)%*%l$omega13%*%dMdc0 +
+        t(M)%*%t(l$omega13)%*%dKdc0 + t(L)%*%l$omega21%*%dKdc0 +
+        t(K)%*%t(l$omega21)%*%dLdc0 + 2*t(L)%*%l$omega22%*%dLdc0 +
+        t(L)%*%l$omega23%*%dMdc0 + t(M)%*%t(l$omega23)%*%dLdc0 +
+        t(M)%*%l$omega31%*%dKdc0 + t(K)%*%t(l$omega31)%*%dMdc0 +
+        t(M)%*%l$omega32%*%dLdc0 + t(L)%*%t(l$omega32)%*%dMdc0 +
+        2*t(M)%*%l$omega33
+    d2Sdc02 <- 2*t(dKdc0)%*%l$omega11%*%dKdc0 + t(dLdc0)%*%l$omega12%*%dKdc0 +
+        t(dKdc0)%*%t(l$omega12)%*%dLdc0 + t(dMdc0)%*%l$omega13%*%dKdc0 +
+        t(dKdc0)%*%t(l$omega13)%*%dMdc0 + t(dKdc0)%*%l$omega21%*%dLdc0 +
+        t(dLdc0)%*%t(l$omega21)%*%dKdc0 + 2*t(dLdc0)%*%l$omega22%*%dLdc0 +
+        t(dMdc0)%*%l$omega23%*%dLdc0 + t(dLdc0)%*%t(l$omega23)%*%dMdc0 +
+        t(dKdc0)%*%l$omega31%*%dMdc0 + t(dMdc0)%*%t(l$omega31)%*%dKdc0 +
+        t(dLdc0)%*%l$omega32%*%dMdc0 + t(dMdc0)%*%t(l$omega32)%*%dLdc0 +
+        2*%*%l$omega33%*%dMdc0
+    d2Sdc0db0 <- 2*t(K)%*%l$omega11%*%d2Kdc0db0 + 2*t(dKdc0)%*%l$omega11%*%dKdb0 +
+        t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 + t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 +
+        t(dMdc0)%*%t(l$omega13)%*%d2Kdc0db0 + t(dMdc0)%*%t(l$omega13)%*%d2Kdc0cb0 +
+        t(dLdc0)%*%l$omega21%*%d2Kdc0db0 + t(dLdc0)%*%l$omega21%*%d2Kdc0db0 +
+        t(dMdc0)%*%l$omega31%*%d2Kdc0db0 <-  t(dMdc0)%*%l$omega31%*%d2Kdc0db0
+    d2Sdc0da0 <- 111111111
     out <- matrix(0,3,3)
     out
 }
@@ -723,7 +757,8 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     CC <- U*b0*t(K)%*%right(omega11,W) + a0*t(K)%*%right(omega12,W) +
         t(K)%*%omega13 + U*b0*t(L)%*%right(omega21,W) + t(L)%*%omega21
     M <- -solve(t(AA), BB + t(CC))/2
-    list(K=K,L=L,M=M,omega=omega,omegainv=E2)
+    list(K=K,L=L,M=M,omega11,omega12,omega13,omega21,omega22,omega23,
+         omega31,omega32,omega33,omega=omega,omegainv=E2)
 }
 
 get.Ew <- function(w,Z,a0,b0,U){
