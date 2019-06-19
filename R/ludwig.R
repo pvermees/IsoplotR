@@ -536,14 +536,20 @@ fisher_lud_Th <- function(x,fit){
     b0 <- fit$par[3]
     l <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=0,exterr=fit$exterr)
     ns <- length(l$K)
-    l5 <- settings('lambda','U235')
-    l8 <- settings('lambda','U238')
-    l2 <- settings('lambda','Th232')
+    l5 <- settings('lambda','U235')[1]
+    l8 <- settings('lambda','U238')[1]
+    l2 <- settings('lambda','Th232')[1]
     U <- settings('iratio','U238U235')[1]
     K <- matrix(l$K,nrow=ns)
     L <- matrix(l$L,nrow=ns)
     M <- matrix(l$M,nrow=ns)
     W <- x$x[,'Th232U238',drop=FALSE]
+    dKdt <- -l5*exp(l5*tt) # TODO add disequilibrium correction, do the same for the other two Fisher functions!
+    d2Kdt2 <- l5*dKdt
+    dLdt <- -l8*exp(l8*tt)
+    d2Ldt2 <- l8*dLdt
+    dMdt <- -l2*exp(l2*tt)
+    d2Mdt2 <- l2*dMdt
     dKdb0 <- -U*c0*W
     dKdc0 <- -U*b0*W
     d2Kdc0db0 <- -U*W
@@ -559,6 +565,24 @@ fisher_lud_Th <- function(x,fit){
         t(M)%*%l$omega31%*%dKdc0 + t(K)%*%t(l$omega31)%*%dMdc0 +
         t(M)%*%l$omega32%*%dLdc0 + t(L)%*%t(l$omega32)%*%dMdc0 +
         2*t(M)%*%l$omega33
+    d2Sdc0dt <- 2*t(dKdc0)%*%l$omega11%*%dKdt + t(dLdc0)%*%l$omega12%*%dKdt +
+        t(dKdc0)%*%t(l$omega12)%*%dLdt + t(dMdc0)%*%l$omega13%*%dKdt +
+        t(dKdc0)%*%t(l$omega13)%*%dMdt + t(dKdc0)%*%l$omega21%*%dLdt +
+        t(dLdc0)%*%t(l$omega21)%*%dKdt + 2*t(dLdc0)%*%l$omega22%*%dLdt +
+        t(dMdc0)%*%l$omega23%*%dLdt + t(dLdc0)%*%t(l$omega23)%*%dMdt +
+        t(dKdc0)%*%l$omega31%*%dMdt + t(dMdc0)%*%t(l$omega31)%*%dKdt +
+        t(dLdc0)%*%l$omega32%*%dMdt + t(dMdc0)%*%t(l$omega32)%*%dLdt +
+        2*l$omega33%*%dMdt
+    d2Sdc0da0 <- t(K)%*%l$omega12%*%d2Ldc0da0 + t(dKdc0)%*%l$omega12%*%dLda0 +
+        t(dKdc0)%*%t(l$omega21)%*%dLda0 + t(K)%*%t(l$omega21)%*%d2Ldc0da0 +
+        2*t(L)%*%d2Ldc0da0 + 2*t(dLdc0)%*%l$omega22%*%dLda0 +
+        t(dMdc0)%*%t(l$omega23)%*%dLda0 + t(M)%*%t(l$omega23)%*%d2Ldc0da0 +
+        t(M)%*%l$omega32%*%l2Ldc0da0 + t(dMdc0)%*%l$omega32%*%dLda0
+    d2Sdc0db0 <- 2*t(K)%*%l$omega11%*%d2Kdc0db0 + 2*t(dKdc0)%*%l$omega11%*%dKdb0 +
+        t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 + t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 +
+        t(dMdc0)%*%t(l$omega13)%*%d2Kdc0db0 + t(dMdc0)%*%t(l$omega13)%*%d2Kdc0cb0 +
+        t(dLdc0)%*%l$omega21%*%d2Kdc0db0 + t(dLdc0)%*%l$omega21%*%d2Kdc0db0 +
+        t(dMdc0)%*%l$omega31%*%d2Kdc0db0 <-  t(dMdc0)%*%l$omega31%*%d2Kdc0db0
     d2Sdc02 <- 2*t(dKdc0)%*%l$omega11%*%dKdc0 + t(dLdc0)%*%l$omega12%*%dKdc0 +
         t(dKdc0)%*%t(l$omega12)%*%dLdc0 + t(dMdc0)%*%l$omega13%*%dKdc0 +
         t(dKdc0)%*%t(l$omega13)%*%dMdc0 + t(dKdc0)%*%l$omega21%*%dLdc0 +
@@ -566,14 +590,44 @@ fisher_lud_Th <- function(x,fit){
         t(dMdc0)%*%l$omega23%*%dLdc0 + t(dLdc0)%*%t(l$omega23)%*%dMdc0 +
         t(dKdc0)%*%l$omega31%*%dMdc0 + t(dMdc0)%*%t(l$omega31)%*%dKdc0 +
         t(dLdc0)%*%l$omega32%*%dMdc0 + t(dMdc0)%*%t(l$omega32)%*%dLdc0 +
-        2*%*%l$omega33%*%dMdc0
-    d2Sdc0db0 <- 2*t(K)%*%l$omega11%*%d2Kdc0db0 + 2*t(dKdc0)%*%l$omega11%*%dKdb0 +
-        t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 + t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 +
-        t(dMdc0)%*%t(l$omega13)%*%d2Kdc0db0 + t(dMdc0)%*%t(l$omega13)%*%d2Kdc0cb0 +
-        t(dLdc0)%*%l$omega21%*%d2Kdc0db0 + t(dLdc0)%*%l$omega21%*%d2Kdc0db0 +
-        t(dMdc0)%*%l$omega31%*%d2Kdc0db0 <-  t(dMdc0)%*%l$omega31%*%d2Kdc0db0
-    d2Sdc0da0 <- 111111111
-    out <- matrix(0,3,3)
+        2*l$omega33%*%dMdc0
+    d2Sdt2 <- 2*t(K)%*%l$omega11%*%d2Kdt2 + 2*t(dKdt)%*%t(l$omega11)%*%dKdt +
+        t(K)%*%l$omega12%*%d2Ldt2 + t(dLdt)%*%t(l$omega12)%*%dKdt +
+        t(L)%*%t(l$omega12)%*%d2Kdt2 + t(dKdt)%*%l$omega12%*%dLdt +
+        t(K)%*%l$omega13%*%d2Mdt2 + t(dMdt)%*%t(l$omega13)%*%dKdt +
+        t(M)%*%t(l$omega13)%*%d2Kdt2 + t(dKdt)%*%l$omega13%*%dMdt +
+        t(L)%*%l$omega21%*%d2Kdt2 + t(dKdt)%*%t(l$omega21)%*%dLdt +
+        t(K)%*%t(l$omega21)%*%d2Ldt2 + t(dLdt)%*%l$omega21%*%dKdt +
+        2*t(L)%*%l$omega22%*%d2Ldt2 + 2*t(dLdt)%*%t(l$omega22)%*%dLdt +
+        t(L)%*%l$omega23%*%d2Mdt2 + t(dMdt)%*%t(l$omega23)%*%dLdt +
+        t(M)%*%t(l$omega23)%*%d2Ldt2 + t(dLdt)%*%l$omega23%*%dMdt +
+        t(M)%*%l$omega31%*%d2Kdt2 + t(dKdt)%*%t(l$omega31)%*%dMdt +
+        t(K)%*%t(l$omega31)%*%d2Mdt2 + t(dMdt)%*%l$omega31%*%dKdt +
+        t(M)%*%l$omega32%*%d2Ldt2 + t(dLdt)%*%t(l$omega32)%*%dMdt +
+        t(L)%*%t(l$omega32)%*%d2Mdt2 + t(dMdt)%*%l$omega32%*%dLdt +
+        2*l$omega33%*%dMdt
+    d2Sdtda0 <- 0
+    d2Sdtdb0 <- 0
+    d2Sda02 <- 2*t(dLda0)%*%l$omega22%*%dLda0
+    d2Sdb02 <- 2*t(dKdb0)%*%l$omega11%*%dKdb0
+    d2Sda0db0 <- t(dLda0)%*%l$omega12%*%dKdb0 + t(dLda0)%*%l$omega21%*%dKdb0
+    out <- matrix(0,ns+2,ns+2)
+    out[1:ns,1:ns] <- d2Sdc02
+    out[1:ns,ns+1] <- d2Sdc0dt
+    out[1:ns,ns+2] <- d2Sdc0da0
+    out[1:ns,ns+3] <- d2Sdc0db0
+    out[ns+1,ns+1] <- d2Sdt2
+    out[ns+2,ns+2] <- d2Sda02
+    out[ns+3,ns+3] <- d2Sdb02
+    out[ns+1,ns+2] <- d2Sdtda0
+    out[ns+1,ns+3] <- d2Sdtdb0
+    out[ns+2,ns+3] <- d2Sda0db0
+    out[ns+1,1:ns] <- out[1:ns,ns+1]
+    out[ns+2,1:ns] <- out[1:ns,ns+2]
+    out[ns+3,1:ns] <- out[1:ns,ns+3]
+    out[ns+1,ns+2] <- out[ns+2,ns+1]
+    out[ns+1,ns+3] <- out[ns+3,ns+1]
+    out[ns+2,ns+3] <- out[ns+3,ns+2]
     out
 }
 
@@ -702,14 +756,15 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     K <- rep(0,ns)
     L <- rep(0,ns)
     M <- rep(0,ns)
+    c0 <- rep(0,ns)
     W <- x$x[,'Th232U238']
-    c0 <- x$x[,'Pb208Th232'] - exp(l2[1]*tt) + 1
     E <- matrix(0,4*ns+3,4*ns+3)
     J <- matrix(0,3*ns,4*ns+3)
     for (i in 1:ns){
         D <- wendt(tt,d=x$d[i])
         wd <- wetherill(x,i)
         ii <- 4*i-3
+        c0[i] <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1
         K[i] <- wd$x['Pb207U235'] - c0[i]*U*b0*W[i] - exp(l5[1]*tt) + 1 - D$d1
         L[i] <- wd$x['Pb206U238'] - c0[i]*a0*W[i] - exp(l8[1]*tt) + 1 - D$d2
         E[ii:(ii+3),ii:(ii+3)] <- wd$cov
