@@ -543,12 +543,14 @@ fisher_lud_Th <- function(x,fit){
     K <- matrix(l$K,nrow=ns)
     L <- matrix(l$L,nrow=ns)
     M <- matrix(l$M,nrow=ns)
+    Z <- get.Pb208Th232.ratios(x)[,1,drop=FALSE]
+    c0 <- Z - exp(l2*tt) + 1 - M
     W <- x$x[,'Th232U238',drop=FALSE]
-    dKdt <- -l5*exp(l5*tt) # TODO add disequilibrium correction, do the same for the other two Fisher functions!
+    dKdt <- matrix(-l5*exp(l5*tt),nrow=ns,ncol=1) # TODO add disequilibrium correction, do the same for the other two Fisher functions!
+    dLdt <- matrix(-l8*exp(l8*tt),nrow=ns,ncol=1)
+    dMdt <- matrix(-l2*exp(l2*tt),nrow=ns,ncol=1)
     d2Kdt2 <- l5*dKdt
-    dLdt <- -l8*exp(l8*tt)
     d2Ldt2 <- l8*dLdt
-    dMdt <- -l2*exp(l2*tt)
     d2Mdt2 <- l2*dMdt
     dKdb0 <- -U*c0*W
     dKdc0 <- -U*b0*W
@@ -556,56 +558,51 @@ fisher_lud_Th <- function(x,fit){
     dLda0 <- -c0*W
     dLdc0 <- -a0*W
     d2Ldc0da0 <- -W
-    dMdc0 <- -1
-    dSdc0 <- 2*t(K)%*%l$omega11%*%dKdc0 + t(K)%*%l$omega12%*%dLdc0 +
-        t(L)%*%t(l$omega12)%*%dKdc0 + t(K)%*%l$omega13%*%dMdc0 +
-        t(M)%*%t(l$omega13)%*%dKdc0 + t(L)%*%l$omega21%*%dKdc0 +
-        t(K)%*%t(l$omega21)%*%dLdc0 + 2*t(L)%*%l$omega22%*%dLdc0 +
-        t(L)%*%l$omega23%*%dMdc0 + t(M)%*%t(l$omega23)%*%dLdc0 +
-        t(M)%*%l$omega31%*%dKdc0 + t(K)%*%t(l$omega31)%*%dMdc0 +
-        t(M)%*%l$omega32%*%dLdc0 + t(L)%*%t(l$omega32)%*%dMdc0 +
-        2*t(M)%*%l$omega33
-    d2Sdc0dt <- 2*t(dKdc0)%*%l$omega11%*%dKdt + t(dLdc0)%*%l$omega12%*%dKdt +
-        t(dKdc0)%*%t(l$omega12)%*%dLdt + t(dMdc0)%*%l$omega13%*%dKdt +
-        t(dKdc0)%*%t(l$omega13)%*%dMdt + t(dKdc0)%*%l$omega21%*%dLdt +
-        t(dLdc0)%*%t(l$omega21)%*%dKdt + 2*t(dLdc0)%*%l$omega22%*%dLdt +
-        t(dMdc0)%*%l$omega23%*%dLdt + t(dLdc0)%*%t(l$omega23)%*%dMdt +
-        t(dKdc0)%*%l$omega31%*%dMdt + t(dMdc0)%*%t(l$omega31)%*%dKdt +
-        t(dLdc0)%*%l$omega32%*%dMdt + t(dMdc0)%*%t(l$omega32)%*%dLdt +
-        2*l$omega33%*%dMdt
-    d2Sdc0da0 <- t(K)%*%l$omega12%*%d2Ldc0da0 + t(dKdc0)%*%l$omega12%*%dLda0 +
+    dMdc0 <- matrix(-1,nrow=ns,ncol=1)
+    S <- t(K)%*%l$omega11%*%K + t(K)%*%l$omega12%*%L + t(K)%*%l$omega13%*%M +
+        t(L)%*%l$omega21%*%K + t(L)%*%l$omega22%*%L + t(L)%*%l$omega23%*%M +
+        t(M)%*%l$omega31%*%K + t(M)%*%l$omega32%*%L + t(M)%*%l$omega33%*%M
+    dSdc0 <- 2*t(K)%*%l$omega11%*%dKdc0 +
+        t(K)%*%l$omega12%*%dLdc0 + t(dKdc0)%*%l$omega12%*%L +
+        t(K)%*%l$omega13%*%dMdc0 + t(dKdc0)%*%l$omega13%*%M +
+        t(L)%*%l$omega21%*%dKdc0 + t(dLdc0)%*%l$omega21%*%K +
+        t(L)%*%l$omega22%*%dLdc0 + t(dLdc0)%*%l$omega22%*%L +
+        t(L)%*%l$omega23%*%dMdc0 + t(dLdc0)%*%l$omega23%*%M +
+        t(M)%*%l$omega31%*%dKdc0 + t(dMdc0)%*%l$omega31%*%K +
+        t(M)%*%l$omega32%*%dLdc0 + t(dMdc0)%*%l$omega32%*%L +
+        2*t(M)%*%l$omega33%*%dMdc0
+    d2Sdc02 <- 2*t(dKdc0)%*%l$omega11%*%dKdc0 +
+        t(dKdc0)%*%l$omega12%*%dLdc0 + t(dKdc0)%*%l$omega12%*%dLdc0 +
+        t(dKdc0)%*%l$omega13%*%dMdc0 + t(dKdc0)%*%l$omega13%*%dMdc0 +
+        t(dLdc0)%*%l$omega21%*%dKdc0 + t(dLdc0)%*%l$omega21%*%dKdc0 +
+        t(dLdc0)%*%l$omega22%*%dLdc0 + t(dLdc0)%*%l$omega22%*%dLdc0 +
+        t(dLdc0)%*%l$omega23%*%dMdc0 + t(dLdc0)%*%l$omega23%*%dMdc0 +
+        t(dMdc0)%*%l$omega31%*%dKdc0 + t(dMdc0)%*%l$omega31%*%dKdc0 +
+        t(dMdc0)%*%l$omega32%*%dLdc0 + t(dMdc0)%*%l$omega32%*%dLdc0 +
+        2*t(dMdc0)%*%l$omega33%*%dMdc0
+    dSdc0dt <- 2*t(dKdt)%*%l$omega11%*%dKdc0 +
+        t(dKdt)%*%l$omega12%*%dLdc0 + t(dKdc0)%*%l$omega12%*%dLdt +
+        t(dKdt)%*%l$omega13%*%dMdc0 + t(dKdc0)%*%l$omega13%*%dMdt +
+        t(dLdt)%*%l$omega21%*%dKdc0 + t(dLdc0)%*%l$omega21%*%dKdt +
+        t(dLdt)%*%l$omega22%*%dLdc0 + t(dLdc0)%*%l$omega22%*%dLdt +
+        t(dLdt)%*%l$omega23%*%dMdc0 + t(dLdc0)%*%l$omega23%*%dMdt +
+        t(dMdt)%*%l$omega31%*%dKdc0 + t(dMdc0)%*%l$omega31%*%dKdt +
+        t(dMdt)%*%l$omega32%*%dLdc0 + t(dMdc0)%*%l$omega32%*%dLdt +
+        2*t(dMdt)%*%l$omega33%*%dMdc0
+    d2Sdc0da0 <- t(K)%*%l$omega12%*%d2Ldc0da0 +
+        t(dKdc0)%*%l$omega12%*%dLda0 +
         t(dKdc0)%*%t(l$omega21)%*%dLda0 + t(K)%*%t(l$omega21)%*%d2Ldc0da0 +
-        2*t(L)%*%d2Ldc0da0 + 2*t(dLdc0)%*%l$omega22%*%dLda0 +
+        t(L)%*%l$omega22%*%d2Ldc0da0 + t(dLdc0)%*%t(l$omega22)%*%dLda0 +
+        t(dLdc0)%*%l$omega22%*%dLda0 + t(L)%*%t(l$omega22)%*%d2Ldc0da0 +
         t(dMdc0)%*%t(l$omega23)%*%dLda0 + t(M)%*%t(l$omega23)%*%d2Ldc0da0 +
-        t(M)%*%l$omega32%*%l2Ldc0da0 + t(dMdc0)%*%l$omega32%*%dLda0
-    d2Sdc0db0 <- 2*t(K)%*%l$omega11%*%d2Kdc0db0 + 2*t(dKdc0)%*%l$omega11%*%dKdb0 +
-        t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 + t(dLdc0)%*%t(l$omega12)%*%d2Kdc0db0 +
-        t(dMdc0)%*%t(l$omega13)%*%d2Kdc0db0 + t(dMdc0)%*%t(l$omega13)%*%d2Kdc0cb0 +
-        t(dLdc0)%*%l$omega21%*%d2Kdc0db0 + t(dLdc0)%*%l$omega21%*%d2Kdc0db0 +
-        t(dMdc0)%*%l$omega31%*%d2Kdc0db0 <-  t(dMdc0)%*%l$omega31%*%d2Kdc0db0
-    d2Sdc02 <- 2*t(dKdc0)%*%l$omega11%*%dKdc0 + t(dLdc0)%*%l$omega12%*%dKdc0 +
-        t(dKdc0)%*%t(l$omega12)%*%dLdc0 + t(dMdc0)%*%l$omega13%*%dKdc0 +
-        t(dKdc0)%*%t(l$omega13)%*%dMdc0 + t(dKdc0)%*%l$omega21%*%dLdc0 +
-        t(dLdc0)%*%t(l$omega21)%*%dKdc0 + 2*t(dLdc0)%*%l$omega22%*%dLdc0 +
-        t(dMdc0)%*%l$omega23%*%dLdc0 + t(dLdc0)%*%t(l$omega23)%*%dMdc0 +
-        t(dKdc0)%*%l$omega31%*%dMdc0 + t(dMdc0)%*%t(l$omega31)%*%dKdc0 +
-        t(dLdc0)%*%l$omega32%*%dMdc0 + t(dMdc0)%*%t(l$omega32)%*%dLdc0 +
-        2*l$omega33%*%dMdc0
-    d2Sdt2 <- 2*t(K)%*%l$omega11%*%d2Kdt2 + 2*t(dKdt)%*%t(l$omega11)%*%dKdt +
-        t(K)%*%l$omega12%*%d2Ldt2 + t(dLdt)%*%t(l$omega12)%*%dKdt +
-        t(L)%*%t(l$omega12)%*%d2Kdt2 + t(dKdt)%*%l$omega12%*%dLdt +
-        t(K)%*%l$omega13%*%d2Mdt2 + t(dMdt)%*%t(l$omega13)%*%dKdt +
-        t(M)%*%t(l$omega13)%*%d2Kdt2 + t(dKdt)%*%l$omega13%*%dMdt +
-        t(L)%*%l$omega21%*%d2Kdt2 + t(dKdt)%*%t(l$omega21)%*%dLdt +
-        t(K)%*%t(l$omega21)%*%d2Ldt2 + t(dLdt)%*%l$omega21%*%dKdt +
-        2*t(L)%*%l$omega22%*%d2Ldt2 + 2*t(dLdt)%*%t(l$omega22)%*%dLdt +
-        t(L)%*%l$omega23%*%d2Mdt2 + t(dMdt)%*%t(l$omega23)%*%dLdt +
-        t(M)%*%t(l$omega23)%*%d2Ldt2 + t(dLdt)%*%l$omega23%*%dMdt +
-        t(M)%*%l$omega31%*%d2Kdt2 + t(dKdt)%*%t(l$omega31)%*%dMdt +
-        t(K)%*%t(l$omega31)%*%d2Mdt2 + t(dMdt)%*%l$omega31%*%dKdt +
-        t(M)%*%l$omega32%*%d2Ldt2 + t(dLdt)%*%t(l$omega32)%*%dMdt +
-        t(L)%*%t(l$omega32)%*%d2Mdt2 + t(dMdt)%*%l$omega32%*%dLdt +
-        2*l$omega33%*%dMdt
+        t(M)%*%l$omega32%*%d2Ldc0da0 + t(dMdc0)%*%l$omega32%*%dLda0
+    d2Sdc0db0 <- 2*t(K)%*%l$omega11%*%d2Kdc0db0 +
+        2*t(dKdc0)%*%t(l$omega11)%*%dKdb0 +
+        t(dLdc0)%*%t(l$omega12)%*%dKdb0 +
+        t(L)%*%t(l$omega12)%*%dKdc0 +
+        t(dMdc0)%*%t(l$omega13)%*%dKdb0 + t(M)%*%t(l$omega13)%*%dKdc0 +
+        t(L)%*%l$omega21%*%d2Kdc0db0 + t(dLdc0)%*%l$omega21%*%dKdb0 +
+        t(M)%*%l$omega31%*%d2Kdc0db0 + t(dMdc0)%*%l$omega31%*%dKdb0
     d2Sdtda0 <- 0
     d2Sdtdb0 <- 0
     d2Sda02 <- 2*t(dLda0)%*%l$omega22%*%dLda0
@@ -628,6 +625,8 @@ fisher_lud_Th <- function(x,fit){
     out[ns+1,ns+2] <- out[ns+2,ns+1]
     out[ns+1,ns+3] <- out[ns+3,ns+1]
     out[ns+2,ns+3] <- out[ns+3,ns+2]
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@3@"]]));##:ess-bp-end:##
     out
 }
 
@@ -812,8 +811,9 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     CC <- U*b0*t(K)%*%right(omega11,W) + a0*t(K)%*%right(omega12,W) +
         t(K)%*%omega13 + U*b0*t(L)%*%right(omega21,W) + t(L)%*%omega21
     M <- -solve(t(AA), BB + t(CC))/2
-    list(K=K,L=L,M=M,omega11,omega12,omega13,omega21,omega22,omega23,
-         omega31,omega32,omega33,omega=omega,omegainv=E2)
+    list(K=K,L=L,M=M,omega11=omega11,omega12=omega12,omega13=omega13,
+         omega21=omega21,omega22=omega22,omega23=omega23,omega31=omega31,
+         omega32=omega32,omega33=omega33,omega=omega,omegainv=E2)
 }
 
 get.Ew <- function(w,Z,a0,b0,U){
