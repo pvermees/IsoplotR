@@ -526,3 +526,12 @@ geomean <- function(x,...){ UseMethod("geomean",x) }
 geomean.default <- function(x,...){
     exp(mean(log(x),na.rm=TRUE))
 }
+
+# multiply each row of mat with vec
+left <- function(vec,mat){
+    vec*mat
+}
+# multiply each column of mat with vec
+right <- function(mat,vec){
+    t(t(mat)*vec)
+}
