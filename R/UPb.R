@@ -715,18 +715,18 @@ get.Pb208Pb206.ratios <- function(x){
     colnames(out) <- labels
     if (x$format == 7){
         out[,'Pb208Pb206'] <- x$x[,'Pb208Th232']*x$x[,'Th232U238']/x$x[,'Pb206U238']
-        J1 <- -out[,'Pb208Pb206']/x$x[,'Pb206U238']
-        J2 <- x$x[,'Pb208Th232']/x$x[,'Pb206U238']
-        J3 <- x$x[,'Th232U238']/x$x[,'Pb206U238']
+        J1 <- -out[,'Pb208Pb206']/x$x[,'Pb206U238'] # d/dPb6U8 = d/dY
+        J2 <- x$x[,'Th232U238']/x$x[,'Pb206U238']   # d/dPb8Th2 = d/dZ
+        J3 <- x$x[,'Pb208Th232']/x$x[,'Pb206U238']  # d/dTh2U8 = d/dW
         sX <- x$x[,'errPb206U238']
         sY <- x$x[,'errPb208Th232']
         sZ <- x$x[,'errTh232U238']
         rXY <- x$x[,'rhoYZ']
         rXZ <- x$x[,'rhoYW']
         rYZ <- x$x[,'rhoZW']
-        E12 <- rXY/(sX*sY)
-        E13 <- rXZ/(sX*sZ)
-        E23 <- rYZ/(sY*sZ)
+        E12 <- rXY*sX*sY
+        E13 <- rXZ*sX*sZ
+        E23 <- rYZ*sY*sZ
         out[,'errPb208Pb206'] <- errorprop1x3(J1,J2,J3,sX^2,sY^2,sZ^2,E12,E13,E23)
     } else if (x$format == 8){
         out <- x$x[,labels]
