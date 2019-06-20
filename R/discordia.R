@@ -74,13 +74,17 @@ twfit2wfit <- function(fit,x){
     U <- iratio('U238U235')[1]
     E <- matrix(0,3,3)
     J <- matrix(0,2,3)
-    if (x$format %in% c(1,2,3,7,8)){
+    if (x$format %in% c(1,2,3)){
         a0 <- 1
         b0 <- fit$par['76i']
         E[c(1,3),c(1,3)] <- fit$cov
     } else if (x$format %in% c(4,5,6)){
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
+        E <- fit$cov
+    } else if (x$format %in% c(7,8)){
+        a0 <- fit$par['68i']
+        b0 <- fit$par['78i']
         E <- fit$cov
     } else {
         stop('Incorrect input format')
@@ -249,13 +253,13 @@ discordia.line <- function(fit,wetherill,d=diseq()){
 
 tw3d2d <- function(fit){
     out <- list(x=fit$x,cov=fit$cov,fact=fit$fact)
-    if (fit$format %in% c(4,5,6)){
+    if (fit$format > 3){
         labels <- c('t','76i')
-        out$x <- c(fit$x['t'],fit$x['74i']/fit$x['64i'])
+        out$x <- c(fit$x['t'],fit$x[3]/fit$x[2]) # x[2] = Pb206i, x[3] = Pb207i
         J <- matrix(0,2,3)
         J[1,1] <- 1
-        J[2,2] <- -fit$x['74i']/fit$x['64i']^2
-        J[2,3] <- 1/fit$x['64i']
+        J[2,2] <- -fit$x[3]/fit$x[2]^2
+        J[2,3] <- 1/fit$x[2]
         out$cov <- J %*% fit$cov %*% t(J)
         names(out$x) <- labels
         colnames(out$cov) <- labels
@@ -284,7 +288,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list1$d <- lower.age[4]
             list2$d <- upper.age[4]
         }
-    } else if (fit$format%in%c(1,2,3,7,8)){
+    } else if (fit$format%in%c(1,2,3)){
         i76 <- roundit(fit$x['76i'],fit$err[,'76i'],sigdig=sigdig)
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]~'=')
@@ -293,7 +297,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list1$d <- lower.age[4]
             list2$d <- i76[4]
         }
-    } else {
+    } else if (fit$format%in%c(4,5,6)){
         i64 <- roundit(fit$x['64i'],fit$err[,'64i'],sigdig=sigdig)
         i74 <- roundit(fit$x['74i'],fit$err[,'74i'],sigdig=sigdig)
         expr1 <- quote('age =')
@@ -305,6 +309,21 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list1$d <- lower.age[4]
             list2$d <- i64[4]
             list3$d <- i74[4]
+        }
+        call3 <- substitute(e~a,list(e=expr3,a=args2))
+        line3 <- do.call('substitute',list(call3,list3))        
+    } else if (fit$format%in%c(7,8)){
+        i68 <- roundit(fit$x['68i'],fit$err[,'68i'],sigdig=sigdig)
+        i78 <- roundit(fit$x['78i'],fit$err[,'78i'],sigdig=sigdig)
+        expr1 <- quote('age =')
+        expr2 <- quote('('^206*'Pb/'^208*'Pb)'[o]~'=')
+        expr3 <- quote('('^207*'Pb/'^208*'Pb)'[o]~'=')
+        list2 <- list(a=i68[1],b=i68[2],c=i68[3],u='')
+        list3 <- list(a=i78[1],b=i78[2],c=i78[3],u='')
+        if (fit$model==1 && fit$mswd>1){
+            list1$d <- lower.age[4]
+            list2$d <- i68[4]
+            list3$d <- i78[4]
         }
         call3 <- substitute(e~a,list(e=expr3,a=args2))
         line3 <- do.call('substitute',list(call3,list3))
