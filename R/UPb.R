@@ -752,7 +752,10 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         sl5 <- lambda('U235')[2]
         if (x>-1) t.75 <- log(1+x)/l5 else t.75 <- 0
         J <- matrix(0,1,2)
-        if (d$option%in%c(1,2)){
+        if (d$option==0){
+            J[1,1] <- 1/(l5*(1+x))                       # dt/dx
+            if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
+        } else { # apply a disequilibrium correction
             dt <- 0.01/settings('lambda','U234')[1]
             search.range <- c(t.75-dt,t.75+dt)
             t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
@@ -760,14 +763,11 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             xe1d <- x-exp(l5*t.75)+1-D$d1 # misfit = f = xe1d^2
             dfdx <- 2*xe1d
             dfdt <- 2*xe1d*(-l5*exp(l5*t.75)-D$dd1dt)
-            J[1,1] <- -dfdx/dfdt        # dt/dx
+            J[1,1] <- -dfdx/dfdt                         # dt/dx
             if (exterr){
                 dfdl5 <- 2*xe1d*(-t.75*exp(l5*t.75)-D$dd1dl5)
-                J[1,2] <- -dfdx/dfdl5   # dt/dl5
+                J[1,2] <- -dfdx/dfdl5                    # dt/dl5
             }
-        } else {
-            J[1,1] <- 1/(l5*(1+x))                # dt/dx
-            if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
@@ -801,10 +801,15 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             out[i,] <- get.Pb206U238.age(x[i],sxi,exterr=exterr,d=d[i])
         }
     } else {
-        l8 <- lambda('U238')
+        l8 <- lambda('U238')[1]
+        sl8 <- lambda('U238')[2]
+        if (x>-1) t.init <- log(1+x)/l8 else t.init <- 0
         J <- matrix(0,1,2)
-        if (d$option%in%c(1,2)){
-            if (x>-1) t.init <- log(1+x)/l8[1] else t.init <- 0
+        if (d$option==0){
+            t.68 <- t.init
+            J[1,1] <- 1/(l8*(1+x))                       # dt/dx
+            if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl8
+        } else { # apply a disequilibrium correction
             t.68 <- tryCatch({
                 dt <- 0.01/settings('lambda','U234')[1]
                 search.range <- c(t.init-dt,t.init+dt)
@@ -813,24 +818,18 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
                 t.init
             })
             D <- wendt(tt=t.68,d=d)
-            xe2d <- x-exp(l8[1]*t.68)+1-D$d2 # misfit = f = xe2d^2
+            xe2d <- x-exp(l8*t.68)+1-D$d2 # misfit = f = xe2d^2
             dfdx <- 2*xe2d
-            dfdt <- 2*xe2d*(-l8[1]*exp(l8[1]*t.68)-D$dd2dt)
+            dfdt <- 2*xe2d*(-l8*exp(l8*t.68)-D$dd2dt)
             J[1,1] <- -dfdx/dfdt        # dt/dx
             if (exterr){
-                dfdl8 <- 2*xe2d*(-t.68*exp(l8[1]*t.68)-D$dd2dl8)
+                dfdl8 <- 2*xe2d*(-t.68*exp(l8*t.68)-D$dd2dl8)
                 J[1,2] <- -dfdx/dfdl8   # dt/dl8
             }
-        } else {
-            l0 <- lambda('Th230')
-            R <- x - d$fThU*l8[1]/l0[1]
-            t.68 <- log(1+R)/l8[1]
-            J[1,1] <- 1/(l8[1]*(1+R))                       # dt/dx
-            if (exterr & x>-1) J[1,2] <- log(1+R)/l8[1]^2   # dt/dl8
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
-        E[2,2] <- l8[2]^2
+        E[2,2] <- sl8^2
         st.68 <- sqrt(J %*% E %*% t(J))
         out <- c(t.68,st.68)
         names(out) <- c('t68','s[t68]')
