@@ -134,7 +134,7 @@ cor2cov4 <- function(sW,sX,sY,sZ,rWX,rWY,rWZ,rXY,rXZ,rYZ){
     covmat[1,2] <- rWX*sW*sX
     covmat[1,3] <- rWY*sW*sY
     covmat[1,4] <- rWZ*sW*sZ
-    covmat[2,3] <- rXY*sX*sZ
+    covmat[2,3] <- rXY*sX*sY
     covmat[2,4] <- rXZ*sX*sZ
     covmat[3,4] <- rYZ*sY*sZ
     covmat[2,1] <- covmat[1,2]
