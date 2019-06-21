@@ -343,7 +343,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                                  b=rounded.disp[3],
                                  c=rounded.disp[2]))        
     }
-    extrarow <- fit$format%in%c(4,5,6) & !wetherill
+    extrarow <- fit$format>3 & !wetherill
     if (fit$model==1 & extrarow){
         mymtext(line1,line=3,...)
         mymtext(line2,line=2,...)

@@ -188,27 +188,30 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     sr86 <- sqrt(E[1,1])
     sr76 <- sqrt(E[2,2])
     rho <- stats::cov2cor(E)[1,2]
+    names(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
     out <- c(r86,sr86,r76,sr76,rho)
     out
 }
 correct.common.Pb.with.204 <- function(x,i,c46,c47){
-    ir <- get.UPb.isochron.ratios(x,i) # 68, 46, 75, 47
-    m68 <- ir$x['Pb206U238']
+    U <- settings('iratio','U238U235')[1]
+    ir <- get.UPb.isochron.ratios(x,i) # 86, 46, 57, 47
+    m86 <- ir$x['U238Pb206']
     m46 <- ir$x['Pb204Pb206']
-    m75 <- ir$x['Pb207U235']
-    m47 <- ir$x['Pb204Pb207']    
-    r75 <- m75*(1-m47/c47)
-    r68 <- m68*(1-m46/c46)
+    m57 <- ir$x['U235Pb207']
+    m47 <- ir$x['Pb204Pb207']
+    r75 <- 1/m57 - m47/(m57*c47)
+    r68 <- 1/m86 - m46/(m86*c46)
     J <- matrix(0,2,4)
-    J[1,3] <- 1-m47/c47
-    J[1,4] <- -m75/c47
-    J[2,1] <- 1-m46/c46
-    J[2,2] <- -m68/c46
+    J[1,3] <- -r75/m57
+    J[1,4] <- -1/(m57*c47)
+    J[2,1] <- -r68/m86
+    J[2,2] <- -1/(m86*c46)
     E <- J %*% ir$cov %*% t(J)
     sr75 <- sqrt(E[1,1])
     sr68 <- sqrt(E[2,2])
     rho <- stats::cov2cor(E)[1,2]
     out <- c(r75,sr75,r68,sr68,rho)
+    names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
     out
 }
 
@@ -253,18 +256,20 @@ common.Pb.isochron <- function(x,omit=NULL){
                                                      project.err=FALSE)
         }
     } else {
-        r68 <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)
-        slope.68 <- -r68[1]/fit$par['64i']
-        r75 <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)
-        slope.75 <- -r75[1]/fit$par['74i']
+        r86 <- age_to_U238Pb206_ratio(tt=tt,st=0,d=x$d)[1]
+        i46 <- 1/fit$par['64i']
+        d46d86 <- -i46/r86
+        r57 <- age_to_U235Pb207_ratio(tt=tt,st=0,d=x$d)[1]
+        i47 <- 1/fit$par['74i']
+        d47d57 <- -i47/r57
         for (i in 1:ns){
             rr <- get.UPb.isochron.ratios(x,i)
             m46 <- rr$x['Pb204Pb206']
-            m68 <- rr$x['Pb206U238']
-            c46 <- m46 - slope.68/m68
+            m86 <- rr$x['U238Pb206']
+            c46 <- m46 - d46d86*m86
             m47 <- rr$x['Pb204Pb207']
-            m75 <- rr$x['Pb207U235']
-            c47 <- m47 - slope.75/m75
+            m57 <- rr$x['U235Pb207']
+            c47 <- m47 - d47d57*m57
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
         }
     }

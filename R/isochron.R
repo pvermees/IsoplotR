@@ -393,6 +393,28 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     invisible(fit)
 }
+isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                         show.numbers=FALSE,levels=NA,clabel="",
+                         ellipse.col=c("#00FF0080","#FF000080"),
+                         type=1,ci.col='gray80',line.col='black',
+                         lwd=1,plot=TRUE, exterr=TRUE,model=1,
+                         show.ellipses=1*(model!=2),
+                         anchor=list(FALSE,NA),hide=NULL,omit=NULL,
+                         omit.col=NA,...){
+    R <- get.UPb.isochron.ratios(x)
+    if (type==1){
+        
+    } else {
+        
+    }
+    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+    scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
+                show.ellipses=show.ellipses,
+                show.numbers=show.numbers,levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,fit=fit,
+                ci.col=ci.col,line.col=line.col,lwd=lwd,
+                hide=hide,omit=omit,omit.col=omit.col,...)
+}
 #' @param inverse toggles between normal and inverse isochrons. If the
 #'     isochron plots \code{Y} against \code{X}, and
 #'

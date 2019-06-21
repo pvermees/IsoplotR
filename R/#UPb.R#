@@ -306,8 +306,6 @@ get.UPb.isochron.ratios <- function(x,i){
     }
     labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
     out$x <- c(U238Pb206,Pb204Pb206,U235Pb207,Pb204Pb207)
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@14@"]]));##:ess-bp-end:##
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
     colnames(out$cov) <- labels
