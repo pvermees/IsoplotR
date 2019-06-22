@@ -188,8 +188,8 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     sr86 <- sqrt(E[1,1])
     sr76 <- sqrt(E[2,2])
     rho <- stats::cov2cor(E)[1,2]
-    names(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
     out <- c(r86,sr86,r76,sr76,rho)
+    names(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
     out
 }
 correct.common.Pb.with.204 <- function(x,i,c46,c47){

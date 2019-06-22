@@ -6,7 +6,7 @@
     geochronology}
 \usage{
 diseq(option = 0, U48 = 1, Th0U8 = 1, Ra6U8 = 1, Pa1U5 = 1,
-  fThU = 1, fRaU = 1, fPaU = 1)
+  fThU = 1, fRaU = 1, fPaU = 1, ThU = 1)
 }
 \arguments{
 \item{option}{one of four options:
@@ -17,7 +17,11 @@ diseq(option = 0, U48 = 1, Th0U8 = 1, Ra6U8 = 1, Pa1U5 = 1,
 
 \code{2}: use measured current activity ratios
 
-\code{3}: use partition coefficients between the mineral and magma}
+\code{3}: use partition coefficients between the mineral and magma
+
+\code{4}: use the measured Th/U ratio of the magma to compute the
+Th/U partition coefficient. This option only works for U-Pb
+datasets of format 7 or 8.}
 
 \item{U48}{the \eqn{^{234}}U/\eqn{^{238}}U-activity ratio (initial
 if \code{option=1} or measured if \code{option=2}).}
@@ -39,12 +43,16 @@ and the magma (M): \code{fRaU} = (Ra/U)\eqn{_m}/(Ra/U)\eqn{_M}.}
 
 \item{fPaU}{the Pa/U fractionation factor between the mineral (m)
 and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.}
+
+\item{ThU}{the measured Th/U ratio of the magma, which is to be
+combined with the Th/U ratios of the minerals to compute the
+Th/U fractionation factor.}
 }
 \value{
-a list with the following items: \code{option} and (\code{U48},
-\code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option=1} or
-\code{option=2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
-\code{option=3}].
+a list with the following items: \code{option} and
+    (\code{U48}, \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if
+    \code{option=1} or \code{option=2}] and (\code{fThU},
+    \code{RaU}, \code{PaU}) [if \code{option=3}].
 }
 \description{
 The U-Pb method conventionally assumes initial secular
@@ -57,7 +65,7 @@ The U-Pb method conventionally assumes initial secular
     other functions.
 }
 \details{
-There are three ways to correct for the initial disequilibrium
+There are four ways to correct for the initial disequilibrium
 between the activity of \eqn{{}^{238}}U, \eqn{{}^{234}}Th,
 \eqn{{}^{230}}Th, and \eqn{{}^{226}}Ra; or between \eqn{{}^{235}}U
 and \eqn{{}^{231}}Pa:

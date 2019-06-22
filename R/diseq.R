@@ -136,7 +136,7 @@ copy_diseq <- function(x,d=diseq){
 }
 
 geomean.diseq <- function(x,...){
-    lapply(x, 'geomean')
+    lapply(x, 'geomean.default')
 }
 
 # from Wendt & Carl (1985, EPSL):
