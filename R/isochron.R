@@ -401,14 +401,30 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          show.ellipses=1*(model!=2),
                          anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                          omit.col=NA,...){
-    R <- get.UPb.isochron.ratios(x)
-    if (type==1){
-        
-    } else {
-        
+    lud <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+    fit <- list(fact=1) # TODO: update fact!
+    ns <- length(x)
+    XY <- matrix(0,ns,5)
+    for (i in 1:ns){
+        ir <- get.UPb.isochron.ratios(x,i)
+        if (x$format%in%c(4,5,6) & type==1){ # 04/06 vs. 38/06
+            XY[i,c(1,3)] <- ir$x[1:2]
+            XY[i,c(2,4)] <- sqrt(diag(ir$cov)[1:2])
+            XY[i,5] <- ir$cov[1,2]/sqrt(ir$cov[1,1]*ir$cov[2,2])
+            y0 <- 1/lud$par['64i']
+            x0 <- age_to_U238Pb206_ratio(tt=lud$par['t'],st=0,d=x$d)[1]
+            fit$a <- y0
+            fit$b <- -y0/x0
+            fit$cov.ab <- 0 # TODO: compute cov.ab from fit$par and fit$cov
+        } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
+            XY[i,c(1,3)] <- ir$x[3:4]
+            XY[i,c(2,4)] <- sqrt(diag(ir$cov)[3:4])
+            XY[i,5] <- ir$cov[3,4]/sqrt(ir$cov[3,3]*ir$cov[4,4])
+        } else if (x$format%in%c(7,8) & type==1){ # 08c/06 vs. 38/06
+        } else if (x$format%in%c(7,8) & type==2){ # 08c/07 vs. 38/07
+        }
     }
-    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
-    scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
+    scatterplot(XY,xlim=xlim,ylim=ylim,alpha=alpha,
                 show.ellipses=show.ellipses,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,fit=fit,
