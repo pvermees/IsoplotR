@@ -459,7 +459,7 @@ blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
 # Originally written by Barry Rowlingson, modified by PV
 optifix <- function(parms, fixed, fn, gr = NULL, ...,
                     method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), 
-                    lower = -Inf, upper = Inf, control = list(), hessian = FALSE){ 
+                    lower = -Inf, upper = Inf, control = list(), hessian = FALSE){
     force(fn)
     force(fixed) 
     .npar=length(parms) 
@@ -468,20 +468,20 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     .parStart = parms[!fixed]
     names(.parStart)=names(parms)[!fixed]
   
-    .fn <- function(par,pnames=names(parms),...){
+    .fn <- function(parms,pnames=names(parms),...){
         .par = rep(NA,sum(!fixed))
-        .par[!fixed] = par
+        .par[!fixed] = parms
         .par[fixed] = .fixValues
         names(.par)=pnames
         fn(.par,...)
     }
 
     if(!is.null(gr)){
-        .gr <- function(par,pnames=names(parms),...){
+        .gr <- function(parms,pnames=names(parms),...){
             .gpar = rep(NA,sum(!fixed))
-            .gpar[!fixed] = par
+            .gpar[!fixed] = parms
             .gpar[fixed] = .fixValues
-            names(.par)=pnames
+            names(.gpar)=pnames
             gr(.gpar,...)[!fixed]
         }
     } else {
@@ -494,7 +494,7 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
     
     .opt$fullpars = rep(NA,sum(!fixed)) 
     .opt$fullpars[fixed]=.fixValues 
-    .opt$fullpars[!fixed]=.opt$par 
+    .opt$fullpars[!fixed]=.opt$par
     names(.opt$fullpars)=names(parms)
     .opt$fixed = fixed
 

@@ -284,7 +284,9 @@ get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out
 }
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
-    optifix(parms=init,fn=LL.lud.UPb,method="L-BFGS-B",x=x,w=w,
+#    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",x=x,w=w,
+#            exterr=exterr,lower=c(0,0,0),upper=c(10000,100,100))
+    optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",x=x,w=w,
             exterr=exterr,fixed=fixit(x,anchor),lower=c(0,0,0),upper=c(10000,100,100))
 }
 
@@ -355,7 +357,56 @@ LL.lud.Th <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
         out <- -0.5*(out + k*log(2*pi) + detE)
     }
     out
-    
+}
+
+LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
+    if (x$format %in% c(1,2,3)){
+        return(NULL)
+    } else if (x$format %in% c(4,5,6)){
+        return(NULL)
+    } else if (x$format %in% c(7,8)){
+        return(LL.lud.Th.gr(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
+    } else {
+        stop('Incorrect input format.')
+    }
+}
+LL.lud.Th.gr <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    b0 <- ta0b0[3]
+    l <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
+    ns <- length(l$K)
+    l5 <- settings('lambda','U235')[1]
+    l8 <- settings('lambda','U238')[1]
+    l2 <- settings('lambda','Th232')[1]
+    U <- settings('iratio','U238U235')[1]
+    K <- matrix(l$K,nrow=ns)
+    L <- matrix(l$L,nrow=ns)
+    M <- matrix(l$M,nrow=ns)
+    Z <- get.Pb208Th232.ratios(x)[,1,drop=FALSE]
+    c0 <- Z - exp(l2*tt) + 1 - M
+    W <- x$x[,'Th232U238']
+    dKdt <- matrix(rep(-l5*exp(l5*tt),ns),nrow=ns)
+    dLdt <- matrix(rep(-l8*exp(l8*tt),ns),nrow=ns)
+    dMdt <- matrix(rep(-l2*exp(l2*tt),ns),nrow=ns)
+    dKdb0 <- -U*c0*W
+    dLda0 <- -c0*W
+    dSdt <- 2*t(K)%*%l$omega11%*%dKdt +
+        t(K)%*%l$omega12%*%dLdt + t(dLdt)%*%t(l$omega12)%*%dKdt +
+        t(K)%*%l$omega13%*%dMdt + t(dMdt)%*%t(l$omega13)%*%dKdt +
+        t(L)%*%l$omega21%*%dKdt + t(dKdt)%*%t(l$omega21)%*%dLdt +
+        2*t(L)%*%l$omega22%*%dLdt +
+        t(L)%*%l$omega23%*%dMdt + t(dMdt)%*%t(l$omega23)%*%dLdt +
+        t(M)%*%l$omega31%*%dKdt + t(dKdt)%*%t(l$omega31)%*%dMdt +
+        t(M)%*%l$omega32%*%dLdt + t(dLdt)%*%t(l$omega32)%*%dMdt +
+        2*t(M)%*%l$omega33%*%dMdt
+    dSda0 <- 2*t(L)%*%l$omega22%*%dLda0 +
+        t(K)%*%l$omega12%*%dLda0 + t(K)%*%t(l$omega21)%*%dLda0 +
+        t(M)%*%l$omega32%*%dLda0 + t(M)%*%t(l$omega23)%*%dLda0        
+    dSdb0 <- 2*t(K)%*%l$omega11%*%dKdb0 +
+        t(L)%*%l$omega21%*%dKdb0 + t(L)%*%t(l$omega12)%*%dKdb0 + 
+        t(M)%*%l$omega31%*%dKdb0 + t(M)%*%t(l$omega13)%*%dKdb0
+    c(dSdt,dSda0,dSdb0)/2
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
@@ -560,18 +611,6 @@ fisher_lud_Th <- function(x,fit){
     dLdc0 <- diag(-a0*W)
     d2Ldc0da0 <- diag(-W)
     dMdc0 <- diag(rep(-1,ns))
-    S <- t(K)%*%l$omega11%*%K + t(K)%*%l$omega12%*%L + t(K)%*%l$omega13%*%M +
-        t(L)%*%l$omega21%*%K + t(L)%*%l$omega22%*%L + t(L)%*%l$omega23%*%M +
-        t(M)%*%l$omega31%*%K + t(M)%*%l$omega32%*%L + t(M)%*%l$omega33%*%M
-    dSdc0 <- 2*t(K)%*%l$omega11%*%dKdc0 +
-        t(K)%*%l$omega12%*%dLdc0 + t(L)%*%t(l$omega12)%*%dKdc0 +
-        t(K)%*%l$omega13%*%dMdc0 + t(M)%*%t(l$omega13)%*%dKdc0 +
-        t(L)%*%l$omega21%*%dKdc0 + t(K)%*%t(l$omega21)%*%dLdc0 +
-        2*t(L)%*%l$omega22%*%dLdc0 +
-        t(L)%*%l$omega23%*%dMdc0 + t(M)%*%t(l$omega23)%*%dLdc0 +
-        t(M)%*%l$omega31%*%dKdc0 + t(K)%*%t(l$omega31)%*%dMdc0 +
-        t(M)%*%l$omega32%*%dLdc0 + t(L)%*%t(l$omega32)%*%dMdc0 +
-        2*t(M)%*%l$omega33%*%dMdc0
     d2Sdc0dt <- 2*t(dKdc0)%*%l$omega11%*%dKdt +
         t(dLdc0)%*%t(l$omega12)%*%dKdt + t(dKdc0)%*%l$omega12%*%dLdt +
         t(dMdc0)%*%t(l$omega13)%*%dKdt + t(dKdc0)%*%l$omega13%*%dMdt +
@@ -600,15 +639,6 @@ fisher_lud_Th <- function(x,fit){
         t(dKdc0)%*%t(l$omega31)%*%dMdc0 + t(dMdc0)%*%l$omega31%*%dKdc0 +
         t(dLdc0)%*%t(l$omega32)%*%dMdc0 + t(dMdc0)%*%l$omega32%*%dLdc0 +
         2*t(dMdc0)%*%l$omega33%*%dMdc0
-    dSdt <- 2*t(K)%*%l$omega11%*%dKdt +
-        t(K)%*%l$omega12%*%dLdt + t(dLdt)%*%t(l$omega12)%*%dKdt +
-        t(K)%*%l$omega13%*%dMdt + t(dMdt)%*%t(l$omega13)%*%dKdt +
-        t(L)%*%l$omega21%*%dKdt + t(dKdt)%*%t(l$omega21)%*%dLdt +
-        2*t(L)%*%l$omega22%*%dLdt +
-        t(L)%*%l$omega23%*%dMdt + t(dMdt)%*%t(l$omega23)%*%dLdt +
-        t(M)%*%l$omega31%*%dKdt + t(dKdt)%*%t(l$omega31)%*%dMdt +
-        t(M)%*%l$omega32%*%dLdt + t(dLdt)%*%t(l$omega32)%*%dMdt +
-        2*t(M)%*%l$omega33%*%dMdt
     d2Sdt2 <- 2*t(K)%*%l$omega11%*%d2Kdt2 + 2*t(dKdt)%*%l$omega11%*%dKdt +
         t(K)%*%l$omega12%*%d2Ldt2 + t(dLdt)%*%t(l$omega12)%*%dKdt +
         t(dLdt)%*%t(l$omega12)%*%d2Kdt2 + t(dKdt)%*%l$omega12%*%dLdt +

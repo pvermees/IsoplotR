@@ -403,6 +403,8 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          omit.col=NA,...){
     lud <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
     D <- wendt(lud$par['t'],d=x$d)
+    l8 <- settings('lambda','U238')[1]
+    l5 <- settings('lambda','U235')[1]
     tt <- lud$par['t']
     ns <- length(x)
     XY <- matrix(0,ns,5)
@@ -413,7 +415,6 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     for (i in 1:ns){
         ir <- get.UPb.isochron.ratios(x,i)
         if (x$format%in%c(4,5,6) & type==1){ # 04/06 vs. 38/06
-            l8 <- settings('lambda','U238')[1]
             XY[i,c(1,3)] <- ir$x[1:2]
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[1:2])
             XY[i,5] <- ir$cov[1,2]/sqrt(ir$cov[1,1]*ir$cov[2,2])
@@ -428,7 +429,6 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
             y.lab <- quote(''^204*'Pb/'^206*'Pb')
             out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
         } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
-            l5 <- settings('lambda','U235')[1]
             XY[i,c(1,3)] <- ir$x[3:4]
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[3:4])
             XY[i,5] <- ir$cov[3,4]/sqrt(ir$cov[3,3]*ir$cov[4,4])
@@ -444,6 +444,21 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
             y.lab <- quote(''^204*'Pb/'^207*'Pb')
             out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
         } else if (x$format%in%c(7,8) & type==1){ # 08c/06 vs. 38/06
+            ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@16@"]]));##:ess-bp-end:##
+            XY[i,c(1,3)] <- ir$x[1:2]
+            XY[i,c(2,4)] <- sqrt(diag(ir$cov)[1:2])
+            XY[i,5] <- ir$cov[1,2]/sqrt(ir$cov[1,1]*ir$cov[2,2])
+            i64 <- lud$par['64i']
+            E <- ir$cov[1:2,1:2]
+            a <- 1/lud$par['64i']
+            b <- -a/age_to_U238Pb206_ratio(tt=tt,st=0,d=x$d)[1]
+            J[1,1] <- -b/i64
+            J[1,2] <- (l8*exp(l8*tt)+D$dd2dt)/(i64*(exp(l8*tt)-1+D$d2)^2)
+            J[2,2] <- -a/i64
+            x.lab <- quote(''^238*'U/'^206*'Pb')
+            y.lab <- quote(''^204*'Pb/'^206*'Pb')
+            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')            
         } else if (x$format%in%c(7,8) & type==2){ # 08c/07 vs. 38/07
         }
     }
