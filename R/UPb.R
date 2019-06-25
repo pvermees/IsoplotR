@@ -198,111 +198,29 @@ tera.wasserburg <- function(x,i){
     out
 }
 get.UPb.isochron.ratios <- function(x,i){
-    out <- list()
-    U <- iratio('U238U235')[1]
-    if (x$format==4){ # 75, 68, 48
-        U238Pb206 <- 1/x$x[i,'Pb206U238']
-        Pb204Pb206 <- x$x[i,'Pb204U238']/x$x[i,'Pb206U238']
-        U235Pb207 <- 1/x$x[i,'Pb207U235']
-        Pb204Pb207 <- U*x$x[i,'Pb204U238']/x$x[i,'Pb207U235']
-        E <- cor2cov3(x$x[i,'errPb207U235'],x$x[i,'errPb206U238'],
-                      x$x[i,'errPb204U238'],x$x[i,'rhoXY'],
-                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
-        J <- matrix(0,4,3)
-        J[1,2] <- -U238Pb206/x$x[i,'Pb206U238']
-        J[2,2] <- -Pb204Pb206/x$x[i,'Pb206U238']
-        J[2,3] <- 1/x$x[i,'Pb206U238']
-        J[3,1] <- -U235Pb207/x$x[i,'Pb207U235']
-        J[4,1] <- -Pb204Pb207/x$x[i,'Pb207U235']
-        J[4,3] <- U/x$x[i,'Pb207U235']
-    } else if (x$format==5){ # 86, 76, 46
-        U238Pb206 <- x$x[i,'U238Pb206']
-        Pb204Pb206 <- x$x[i,'Pb204Pb206']
-        U235Pb207 <- x$x[i,'U238Pb206']/(U*x$x[i,'Pb207Pb206'])
-        Pb204Pb207 <- x$x[i,'Pb204Pb206']/x$x[i,'Pb207Pb206']
-        E <- cor2cov3(x$x[i,'errU238Pb206'],x$x[i,'errPb207Pb206'],
-                      x$x[i,'errPb204Pb206'],x$x[i,'rhoXY'],
-                      x$x[i,'rhoXZ'],x$x[i,'rhoYZ'])
-        J <- matrix(0,4,3)
-        J[1,1] <- 1
-        J[2,3] <- 1
-        J[3,1] <- 1/(U*x$x[i,'Pb207Pb206'])
-        J[3,2] <- -U235Pb207/x$x[i,'Pb207Pb206']
-        J[4,2] <- -Pb204Pb207/x$x[i,'Pb207Pb206']
-        J[4,3] <- 1/x$x[i,'Pb207Pb206']
-    } else if (x$format==6){ # 75, 68, 48, 76, 47, 46
-        U238Pb206 <- 1/x$x[i,'Pb206U238']
-        Pb204Pb206 <- x$x[i,'Pb204Pb206']
-        U235Pb207 <- 1/x$x[i,'Pb207U235']
-        Pb204Pb207 <- x$x[i,'Pb204Pb207']
-        errU238Pb206 <- U238Pb206*x$x[i,'errPb206U238']/x$x[i,'Pb206U238']
-        errPb204Pb206 <- x$x[i,'errPb204Pb206']
-        errU235Pb207 <- U235Pb207*x$x[i,'errPb207U235']/x$x[i,'Pb207U235']
-        errPb204Pb207 <- x$x[i,'errPb204Pb207']
-        cov.86.46 <- get.cov.div(Pb204Pb206,errPb204Pb206,
-                                 U238Pb206,errU238Pb206,
-                                 x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
-        cov.86.57 <- get.cov.div(U238Pb206,errU238Pb206,
-                                 U235Pb207,errU235Pb207,
-                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
-        cov.57.47 <- get.cov.mult(Pb204Pb207,errPb204Pb207,
-                                  U235Pb207,errU235Pb207,
-                                  x$x[i,'Pb204U238'],x$x[i,'errPb204U238'])
-        cov.46.47 <- get.cov.div(Pb204Pb206,errPb204Pb206,
-                                 Pb204Pb207,errPb204Pb207,
-                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'])
-        cov.47.76 <- get.cov.mult(x$x[i,'Pb204Pb207'],x$x[i,'errPb204Pb207'],
-                                  x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
-                                  x$x[i,'Pb204Pb206'],x$x[i,'errPb204Pb206'])
-        cov.86.76 <- get.cov.div(x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
-                                 U238Pb206,errU238Pb206, 
-                                 x$x[i,'Pb207U235'],x$x[i,'errPb207U235'])
-        cov.57.76 <- get.cov.mult(x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
-                                  U235Pb207,errU235Pb207,
-                                  U238Pb206,errU238Pb206)
-        cov.46.76 <- get.cov.div(Pb204Pb206,errPb204Pb206,
-                                 x$x[i,'Pb207Pb206'],x$x[i,'errPb207Pb206'],
-                                 Pb204Pb207,errPb204Pb207)
-        J1 <- Pb204Pb207/U238Pb206
-        J2 <- x$x[i,'Pb207Pb206']/U238Pb206
-        J3 <- -x$x[i,'Pb204U238']*Pb204Pb207
-        cov.86.47 <- ( x$x[i,'errPb204U238']^2 -
-                       (J1*x$x[i,'errPb207Pb206'])^2 -
-                       (J2*errPb204Pb207)^2 -
-                       (J3*errU238Pb206)^2 -
-                       2*J1*J2*cov.47.76 - 2*J1*J3*cov.86.76 )/(2*J2*J3)
-        J1 <- -x$x[i,'Pb204U238']/x$x[i,'Pb207Pb206']
-        J2 <- x$x[i,'Pb204U238']/Pb204Pb206
-        J3 <- -x$x[i,'Pb204U238']/U235Pb207
-        cov.46.57 <- ( x$x[i,'errPb204U238']^2 -
-                       (J1*x$x[i,'errPb207Pb206'])^2 -
-                       (J2*errPb204Pb206)^2 -
-                       (J3*errU235Pb207)^2 -
-                       2*J1*J2*cov.46.76 - 2*J1*J3*cov.57.76 )/(2*J2*J3)
-        E <- matrix(0,4,4)
-        E[1,1] <- errU238Pb206^2
-        E[2,2] <- errPb204Pb206^2
-        E[3,3] <- errU235Pb207^2
-        E[4,4] <- errPb204Pb207^2
-        E[1,2] <- cov.86.46
-        E[1,3] <- cov.86.57
-        E[1,4] <- cov.86.47
-        E[2,1] <- E[1,2]
-        E[2,3] <- cov.46.57
-        E[2,4] <- cov.46.47
-        E[3,1] <- E[1,3]
-        E[3,2] <- E[2,3]
-        E[3,4] <- cov.57.47
-        E[4,1] <- E[1,4]
-        E[4,2] <- E[2,4]
-        E[4,3] <- E[3,4]
-        J <- diag(1,4,4)
+    if (x$format%in%c(4,5,6)){
+        labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
+    } else if (x$format%in%c(7,8)){
+        labels <- c('U238Pb206','Pb208Pb206','U235Pb207','Pb208Pb207')
     } else {
-        stop("Can't form isochron ratios without 204Pb!")
+        stop('Incorrect input format for the get.UPb.isochron.ratios function.')
     }
-    labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
-    out$x <- c(U238Pb206,Pb204Pb206,U235Pb207,Pb204Pb207)
-    out$cov <- J %*% E %*% t(J)
+    U <- iratio('U238U235')[1]
+    tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06 OR 08/06
+    U238Pb6 <- tw$x[1]
+    Pb48Pb6 <- tw$x[3]
+    U235Pb7 <- tw$x[1]/(U*tw$x[2])
+    Pb48Pb7 <- tw$x[3]/tw$x[2]
+    J <- matrix(0,4,3)
+    J[1,1] <- 1
+    J[2,2] <- 1
+    J[3,1] <- 1/(U*tw$x[2])
+    J[3,2] <- -U235Pb7/tw$x[2]
+    J[4,2] <- -Pb48Pb7/tw$x[2]
+    J[4,3] <- 1/tw$x[2]
+    out <- list()
+    out$x <- c(U238Pb6,Pb48Pb6,U235Pb7,Pb48Pb7)
+    out$cov <- J %*% tw$cov[1:3,1:3] %*% t(J)
     names(out$x) <- labels
     colnames(out$cov) <- labels
     rownames(out$cov) <- labels

@@ -286,7 +286,7 @@ get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
 }
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
 #    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="BFGS",x=x,w=w, exterr=exterr)
-    optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",x=x,w=w,
+    optifix(parms=init,fn=LL.lud.UPb,gr=NULL,method="L-BFGS-B",x=x,w=w,
             exterr=exterr,fixed=fixit(x,anchor),lower=c(0,0,0),upper=c(10000,100,100))
 }
 
