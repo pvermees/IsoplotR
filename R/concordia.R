@@ -288,7 +288,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
         x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,exterr=exterr,
                                              alpha=alpha,model=(show.age-1),anchor=anchor)
-        discordia.line(fit,wetherill=(type==1),d=x$d)
+        discordia.line(fit,wetherill=wetherill,d=x$d)
         fit$n <- length(x2calc)
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     }

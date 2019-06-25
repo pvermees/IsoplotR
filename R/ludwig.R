@@ -119,6 +119,7 @@ ludwig.default <- function(x,...){
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
+    #out$cov <- solve(optimHess(fit$par,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,x=x))
     out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
     out$n <- length(x)
     mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
@@ -284,8 +285,7 @@ get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out
 }
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
-#    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",x=x,w=w,
-#            exterr=exterr,lower=c(0,0,0),upper=c(10000,100,100))
+#    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="BFGS",x=x,w=w, exterr=exterr)
     optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",x=x,w=w,
             exterr=exterr,fixed=fixit(x,anchor),lower=c(0,0,0),upper=c(10000,100,100))
 }

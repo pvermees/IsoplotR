@@ -397,16 +397,19 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          show.numbers=FALSE,levels=NA,clabel="",
                          ellipse.col=c("#00FF0080","#FF000080"),
                          type=1,ci.col='gray80',line.col='black',
-                         lwd=1,plot=TRUE, exterr=TRUE,model=1,
+                         lwd=1,plot=TRUE,exterr=TRUE,model=1,
                          show.ellipses=1*(model!=2),
                          anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                          omit.col=NA,...){
-    lud <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+    ns <- length(x)
+    plotit <- (1:ns)%ni%hide
+    calcit <- (1:ns)%ni%c(hide,omit)
+    x2calc <- subset(x,subset=calcit)
+    lud <- ludwig(x2calc,exterr=exterr,model=model,anchor=anchor)
     D <- wendt(lud$par['t'],d=x$d)
     l8 <- settings('lambda','U238')[1]
     l5 <- settings('lambda','U235')[1]
     tt <- lud$par['t']
-    ns <- length(x)
     XY <- matrix(0,ns,5)
     J <- matrix(0,2,2)
     out <- isochron_init(lud,alpha=0.05)

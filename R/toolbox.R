@@ -462,41 +462,41 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
                     lower = -Inf, upper = Inf, control = list(), hessian = FALSE){
     force(fn)
     force(fixed) 
-    .npar=length(parms) 
-    .fixValues = parms[fixed]
-    names(.fixValues)=names(parms)[fixed]
-    .parStart = parms[!fixed]
-    names(.parStart)=names(parms)[!fixed]
+    .npar <- length(parms) 
+    .fixValues <- parms[fixed]
+    names(.fixValues) <- names(parms)[fixed]
+    .parStart <- parms[!fixed]
+    names(.parStart) <- names(parms)[!fixed]
   
     .fn <- function(parms,pnames=names(parms),...){
-        .par = rep(NA,sum(!fixed))
-        .par[!fixed] = parms
-        .par[fixed] = .fixValues
-        names(.par)=pnames
+        .par <- rep(NA,sum(!fixed))
+        .par[!fixed] <- parms
+        .par[fixed] <- .fixValues
+        names(.par) <- pnames
         fn(.par,...)
     }
 
     if(!is.null(gr)){
         .gr <- function(parms,pnames=names(parms),...){
-            .gpar = rep(NA,sum(!fixed))
-            .gpar[!fixed] = parms
-            .gpar[fixed] = .fixValues
-            names(.gpar)=pnames
+            .gpar <- rep(NA,sum(!fixed))
+            .gpar[!fixed] <- parms
+            .gpar[fixed] <- .fixValues
+            names(.gpar) <- pnames
             gr(.gpar,...)[!fixed]
         }
     } else {
         .gr <- NULL
     }
 
-    .opt = stats::optim(.parStart,.fn,.gr,...,method=method,
+    .opt <- stats::optim(.parStart,.fn,.gr,...,method=method,
                         lower=lower,upper=upper,
                         control=control,hessian=hessian) 
     
-    .opt$fullpars = rep(NA,sum(!fixed)) 
-    .opt$fullpars[fixed]=.fixValues 
-    .opt$fullpars[!fixed]=.opt$par
-    names(.opt$fullpars)=names(parms)
-    .opt$fixed = fixed
+    .opt$fullpars <- rep(NA,sum(!fixed)) 
+    .opt$fullpars[fixed] <- .fixValues 
+    .opt$fullpars[!fixed] <- .opt$par
+    names(.opt$fullpars) <- names(parms)
+    .opt$fixed <- fixed
 
     # remove fullpars (PV)
     .opt$par <- .opt$fullpars
