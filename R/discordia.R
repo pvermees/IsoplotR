@@ -291,7 +291,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
     } else if (fit$format%in%c(1,2,3)){
         i76 <- roundit(fit$x['76i'],fit$err[,'76i'],sigdig=sigdig)
         expr1 <- quote('age =')
-        expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]~'=')
+        expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
         list2 <- list(a=i76[1],b=i76[2],c=i76[3],u='')
         if (fit$model==1 && fit$mswd>1){
             list1$d <- lower.age[4]
@@ -301,8 +301,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         i64 <- roundit(fit$x['64i'],fit$err[,'64i'],sigdig=sigdig)
         i74 <- roundit(fit$x['74i'],fit$err[,'74i'],sigdig=sigdig)
         expr1 <- quote('age =')
-        expr2 <- quote('('^206*'Pb/'^204*'Pb)'[o]~'=')
-        expr3 <- quote('('^207*'Pb/'^204*'Pb)'[o]~'=')
+        expr2 <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
+        expr3 <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
         list2 <- list(a=i64[1],b=i64[2],c=i64[3],u='')
         list3 <- list(a=i74[1],b=i74[2],c=i74[3],u='')
         if (fit$model==1 && fit$mswd>1){
@@ -316,8 +316,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         i68 <- roundit(fit$x['68i'],fit$err[,'68i'],sigdig=sigdig)
         i78 <- roundit(fit$x['78i'],fit$err[,'78i'],sigdig=sigdig)
         expr1 <- quote('age =')
-        expr2 <- quote('('^206*'Pb/'^208*'Pb)'[o]~'=')
-        expr3 <- quote('('^207*'Pb/'^208*'Pb)'[o]~'=')
+        expr2 <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
+        expr3 <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
         list2 <- list(a=i68[1],b=i68[2],c=i68[3],u='')
         list3 <- list(a=i78[1],b=i78[2],c=i78[3],u='')
         if (fit$model==1 && fit$mswd>1){

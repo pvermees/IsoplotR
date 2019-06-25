@@ -402,34 +402,75 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                          omit.col=NA,...){
     lud <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
-    fit <- list(fact=1) # TODO: update fact!
+    D <- wendt(lud$par['t'],d=x$d)
+    tt <- lud$par['t']
     ns <- length(x)
     XY <- matrix(0,ns,5)
+    J <- matrix(0,2,2)
+    out <- isochron_init(lud,alpha=0.05)
+    out$age[1] <- tt
+    out$age[2] <- sqrt(lud$cov[1,1])
     for (i in 1:ns){
         ir <- get.UPb.isochron.ratios(x,i)
         if (x$format%in%c(4,5,6) & type==1){ # 04/06 vs. 38/06
+            l8 <- settings('lambda','U238')[1]
             XY[i,c(1,3)] <- ir$x[1:2]
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[1:2])
             XY[i,5] <- ir$cov[1,2]/sqrt(ir$cov[1,1]*ir$cov[2,2])
-            y0 <- 1/lud$par['64i']
-            x0 <- age_to_U238Pb206_ratio(tt=lud$par['t'],st=0,d=x$d)[1]
-            fit$a <- y0
-            fit$b <- -y0/x0
-            fit$cov.ab <- 0 # TODO: compute cov.ab from fit$par and fit$cov
+            i64 <- lud$par['64i']
+            E <- ir$cov[1:2,1:2]
+            a <- 1/lud$par['64i']
+            b <- -a/age_to_U238Pb206_ratio(tt=tt,st=0,d=x$d)[1]
+            J[1,1] <- -b/i64
+            J[1,2] <- (l8*exp(l8*tt)+D$dd2dt)/(i64*(exp(l8*tt)-1+D$d2)^2)
+            J[2,2] <- -a/i64
+            x.lab <- quote(''^238*'U/'^206*'Pb')
+            y.lab <- quote(''^204*'Pb/'^206*'Pb')
+            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
         } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
+            l5 <- settings('lambda','U235')[1]
             XY[i,c(1,3)] <- ir$x[3:4]
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[3:4])
             XY[i,5] <- ir$cov[3,4]/sqrt(ir$cov[3,3]*ir$cov[4,4])
+            i74 <- lud$par['74i']
+            E <- ir$cov[c(1,3),c(1,3)]
+            a <- 1/lud$par['74i']
+            b <- -a/age_to_U235Pb207_ratio(tt=tt,st=0,d=x$d)[1]
+            J <- matrix(0,2,2)
+            J[1,1] <- -b/i74
+            J[1,2] <- (l5*exp(l5*tt)+D$dd1dt)/(i74*(exp(l5*tt)-1+D$d1)^2)
+            J[2,2] <- -a/i74
+            x.lab <- quote(''^235*'U/'^207*'Pb')
+            y.lab <- quote(''^204*'Pb/'^207*'Pb')
+            out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
         } else if (x$format%in%c(7,8) & type==1){ # 08c/06 vs. 38/06
         } else if (x$format%in%c(7,8) & type==2){ # 08c/07 vs. 38/07
         }
     }
-    scatterplot(XY,xlim=xlim,ylim=ylim,alpha=alpha,
-                show.ellipses=show.ellipses,
-                show.numbers=show.numbers,levels=levels,
-                clabel=clabel,ellipse.col=ellipse.col,fit=fit,
-                ci.col=ci.col,line.col=line.col,lwd=lwd,
-                hide=hide,omit=omit,omit.col=omit.col,...)
+    cov.ab <- J%*%E%*%t(J)
+    out$a <- c(a,sqrt(cov.ab[1,1]))
+    out$b <- c(b,sqrt(cov.ab[2,2]))
+    out$cov.ab <- cov.ab[1,2]
+    out$y0[1] <- 1/out$a[1]
+    out$y0[2] <- out$y0[1]*out$a[2]/out$a[1]
+    out <- ci_isochron(out)
+    if (model==1){
+        R76 <- age_to_Pb207Pb206_ratio(tt=out$age[1],st=out$age[2],d=x$d)
+        out$age['disp[t]'] <-
+            out$fact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
+                                        exterr=exterr)[2]
+    }
+    if (plot){
+        scatterplot(XY,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=show.ellipses,
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,
+                    hide=hide,omit=omit,omit.col=omit.col,...)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
+                        xlab=x.lab,ylab=y.lab)
+    }
+    invisible(out)
 }
 #' @param inverse toggles between normal and inverse isochrons. If the
 #'     isochron plots \code{Y} against \code{X}, and
@@ -491,7 +532,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     d2calc <- clear(y,hide,omit)
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
-    out$y0[c('y','s[y]')] <- out$a
+    out$y0[c('y','s[y]')] <- out$a 
     if (inverse){
         R76 <- out$a
         x.lab <- quote(''^204*'Pb/'^206*'Pb')

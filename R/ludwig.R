@@ -120,6 +120,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),.
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
     out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+    out$n <- length(x)
     mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
     out <- c(out,mswd)
     if (model==3){
