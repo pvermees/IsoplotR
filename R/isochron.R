@@ -406,30 +406,29 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     calcit <- (1:ns)%ni%c(hide,omit)
     x2calc <- subset(x,subset=calcit)
     lud <- ludwig(x2calc,exterr=exterr,model=model,anchor=anchor)
-    l8 <- settings('lambda','U238')[1]
-    l5 <- settings('lambda','U235')[1]
-    l2 <- settings('lambda','Th232')[1]
     tt <- lud$par['t']
     a0 <- lud$par['a0']
     b0 <- lud$par['b0']
-    XY <- matrix(0,ns,5)
-    out <- isochron_init(lud,alpha=0.05)
-    out$age[1] <- tt
-    out$age[2] <- sqrt(lud$cov[1,1])
+    l8 <- settings('lambda','U238')[1]
+    l5 <- settings('lambda','U235')[1]
+    l2 <- settings('lambda','Th232')[1]
     D <- wendt(tt,d=x$d)
     # The calculations that only need to be done once
-    if (type==1){
+    if (type==1){                               # 38/06
         x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)[1]
         dx0invdt <- l8*exp(l8*tt) + D$dd2dt
         E <- lud$cov[1:2,1:2]
         x.lab <- quote(''^238*'U/'^206*'Pb')
-    } else {
+    } else {                                    # 35/07
         x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)[1]
         dx0invdt <- l5*exp(l5*tt) + D$dd1dt
         E <- lud$cov[c(1,3),c(1,3)]
         x.lab <- quote(''^235*'U/'^207*'Pb')
     }
-    if (x$format%in%c(4,5,6) & type==1){ # 04/06 vs. 38/06
+    out <- isochron_init(lud,alpha=0.05)
+    out$age[1] <- tt
+    out$age[2] <- sqrt(lud$cov[1,1])
+    if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
         a <- 1/lud$par['64i']
         y.lab <- quote(''^204*'Pb/'^206*'Pb')
         out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
@@ -437,40 +436,41 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         a <- 1/lud$par['74i']
         y.lab <- quote(''^204*'Pb/'^207*'Pb')
         out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
-    } else if (x$format%in%c(7,8) & type==1){
+    } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
         a <- 1/lud$par['68i']
         y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
         out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
-    } else if (x$format%in%c(7,8) & type==2){
+    } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
         U <- settings('iratio','U238U235')[1]
         a <- 1/lud$par['78i']
         y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
         out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
     }
     # The calculations that must be done multiple times
+    XY <- matrix(0,ns,5)
     for (i in 1:ns){
-        if (x$format%in%c(4,5,6) & type==1){ # 04/06 vs. 38/06
-            ir <- get.UPb.isochron.ratios(x,i)
-            XY[i,c(1,3)] <- ir$x[1:2]
+        ir <- get.UPb.isochron.ratios(x,i)
+        if (type==1){                           # 04/06 or 08/06 vs. 38/06
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[1:2])
-            XY[i,5] <- ir$cov[1,2]/sqrt(ir$cov[1,1]*ir$cov[2,2])
-        } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
-            ir <- get.UPb.isochron.ratios(x,i)
-            XY[i,c(1,3)] <- ir$x[3:4]
+            XY[i,5] <- stats::cov2cor(ir$cov)[1,2]
+        } else if (type==2){                    # 04/07 or 08/07 vs. 35/07
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[3:4])
-            XY[i,5] <- ir$cov[3,4]/sqrt(ir$cov[3,3]*ir$cov[4,4])
-        } else if (x$format%in%c(7,8) & type==1){ # 08c/06 vs. 38/06
-            ir <- get.UPb.isochron.ratios(x,i)
+            XY[i,5] <- stats::cov2cor(ir$cov)[3,4]
+        } else {
+            stop("Incorrect isochron type.")
+        }
+        if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06            
+            XY[i,c(1,3)] <- ir$x[1:2]
+        } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
+            XY[i,c(1,3)] <- ir$x[3:4]
+        } else if (x$format%in%c(7,8) & type==1){   # 08c/06 vs. 38/06
             XY[i,1] <- ir$x[1]
             XY[i,3] <- ir$x[2] - ir$x[1]*x$x[i,'Th232U238']*(exp(l2*tt)-1)
-            XY[i,c(2,4)] <- sqrt(diag(ir$cov)[1:2])
-            XY[i,5] <- ir$cov[1,2]/sqrt(ir$cov[1,1]*ir$cov[2,2])
-        } else if (x$format%in%c(7,8) & type==2){ # 08c/07 vs. 38/07
-            ir <- get.UPb.isochron.ratios(x,i)
+        } else if (x$format%in%c(7,8) & type==2){   # 08c/07 vs. 38/07
             XY[i,1] <- ir$x[3]
             XY[i,3] <- ir$x[4] - ir$x[3]*U*x$x[i,'Th232U238']*(exp(l2*tt)-1)
-            XY[i,c(2,4)] <- sqrt(diag(ir$cov)[3:4])
-            XY[i,5] <- ir$cov[3,4]/sqrt(ir$cov[3,3]*ir$cov[4,4])
+        } else {
+            stop("Incorrect data format.")
         }
     }
     b <- -a*x0inv
@@ -1041,7 +1041,7 @@ isochron_init <- function(fit,alpha=0.05){
         out$fact <- tfact(alpha,fit$df)
     } else {
         out$fact <- nfact(alpha)
-        out$w <- c(out$w,NA,NA)
+        if (length(out$w)==1) out$w <- c(out$w,NA,NA)
         names(out$w) <- c('s','ll','ul')
     }
     out$alpha <- alpha
