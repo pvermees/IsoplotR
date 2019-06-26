@@ -252,8 +252,8 @@ get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     out
 }
 get.ta0b0.model2.Th <- function(x,anchor=list(FALSE,NA)){
-    xy1 <- data2york(x,option=5)[,c('X','Y'),drop=FALSE] # 08/06 vs 38/06
-    xy2 <- data2york(x,option=6)[,c('X','Y'),drop=FALSE] # 08/07 vs. 35/07
+    xy1 <- data2york(x,option=6)[,c('X','Y'),drop=FALSE] # 08/06 vs 38/06
+    xy2 <- data2york(x,option=7)[,c('X','Y'),drop=FALSE] # 08/07 vs. 35/07
     z <- x$x[,'Th232U238']
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
     if (!anchor[[1]]){

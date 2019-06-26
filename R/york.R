@@ -227,13 +227,21 @@ data2york.default <- function(x,format=1,...){
 #' \item Tera-Wasserburg ratios: \code{X=08/06}, \code{sX=s[08/06]},
 #'     \code{Y=07/06}, \code{sY=s[07/06]}, \code{rho=rXY}.
 #'
-#' \item \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=08/06},
-#'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{format=4,5,6}).
+#' \item \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=38/06},
+#'     \code{sY=s[38/06]}, \code{rho=rXY} (only valid if \code{format=4,5,6}).
 #'
 #' \item \code{X=04/07}, \code{sX=s[04/07]}, \code{Y=05/07},
-#'     \code{sY=s[05/07]}, \code{rho=rXY} (only valid if
+#'     \code{sY=s[35/07]}, \code{rho=rXY} (only valid if
 #'     \code{format=4,5,6}).
 #'
+#' \item U-Th-Pb concordia ratios: \code{X=08/32}, \code{sX=s[08/32]},
+#'     \code{Y=06/38}, \code{sY=s[06/38]}, \code{rho=rXY} (only valid
+#'     if \code{format=7,8}).
+#'
+#' \item \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
+#'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
+#'     \code{format=7,8}).
+#' 
 #' \item \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
 #'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
 #'     \code{format=7,8}). 
@@ -265,12 +273,17 @@ data2york.UPb <- function(x,option=1,...){
             ir <- get.UPb.isochron.ratios(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
         }
-    } else if (option==5 && x$format%in%c(7,8)){ # 08/06 vs. 38/06
+    } else if (option==5 && x$format%in%c(7,8)){ # 08/32 vs. 06/38
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb206U238',i2='Pb208Th232')
+        }        
+    } else if (option==6 && x$format%in%c(7,8)){ # 08/06 vs. 38/06
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208Pb206')
         }
-    } else if (option==6 && x$format%in%c(7,8)){ # 08/07 vs. 35/07
+    } else if (option==7 && x$format%in%c(7,8)){ # 08/07 vs. 35/07
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208Pb207')
