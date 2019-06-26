@@ -234,9 +234,9 @@ data2york.default <- function(x,format=1,...){
 #'     \code{sY=s[05/07]}, \code{rho=rXY} (only valid if
 #'     \code{format=4,5,6}).
 #'
-#' \item \code{X=08/32}, \code{sX=s[08/32]}, \code{Y=06/38},
-#'     \code{sY=s[06/38]}, \code{rho=rXY} (only valid if
-#'     \code{format=8,9}). 
+#' \item \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
+#'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
+#'     \code{format=7,8}). 
 #' 
 #' }
 #'
@@ -245,125 +245,35 @@ data2york.default <- function(x,format=1,...){
 data2york.UPb <- function(x,option=1,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    colnames(out) <- c('X','sX','Y','sY','rXY')
-    if (option==1 && x$format %in% c(1,3,4,7)){
-        out <- subset(x$x,select=c('Pb207U235','errPb207U235',
-                                   'Pb206U238','errPb206U238','rhoXY'))
-    } else if (option==1 && x$format %in% c(2,5,6,8)){
+    if (option==1){ # 06/38 vs. 07/35
         for (i in 1:ns){
-            samp <- wetherill(x,i=i)
-            out[i,1] <- samp$x['Pb207U235']
-            out[i,2] <- sqrt(samp$cov['Pb207U235','Pb207U235'])
-            out[i,3] <- samp$x['Pb206U238']
-            out[i,4] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
-            out[i,5] <- stats::cov2cor(samp$cov[1:2,1:2])[1,2]
+            wd <- wetherill(x,i=i)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb206U238')
         }
-    } else if (option==2 && x$format %in% c(2,5,8)){
-        out <- subset(x$x,select=c('U238Pb206','errU238Pb206',
-                                   'Pb207Pb206','errPb207Pb206','rhoXY'))
-    } else if (option==2 && x$format %in% c(1,3,4,6,7)){
+    } else if (option==2){ # 38/06 vs. 07/06
         for (i in 1:ns){
-            samp <- tera.wasserburg(x,i=i)
-            out[i,1] <- samp$x['U238Pb206']
-            out[i,2] <- sqrt(samp$cov['U238Pb206','U238Pb206'])
-            out[i,3] <- samp$x['Pb207Pb206']
-            out[i,4] <- sqrt(samp$cov['Pb207Pb206','Pb207Pb206'])
-            out[i,5] <- stats::cov2cor(samp$cov[1:2,1:2])[1,2]
+            td <- tera.wasserburg(x,i=i)
+            out[i,] <- data2york_UPb_helper(td,i1='U238Pb206',i2='Pb207Pb206')
         }
-    } else if (option==3 && x$format==4){ # 4/6 vs 8/6
-        out[,1] <- 1/x$x[,'Pb206U238']
-        out[,3] <- x$x[,'Pb204U238']/x$x[,'Pb206U238']
-        E11 <- x$x[,'errPb206U238']^2
-        E22 <- x$x[,'errPb204U238']^2
-        E12 <- x$x[,'rhoXY']*x$x[,'errPb206U238']*x$x[,'errPb204U238']
-        J11 <- -out[,1]^2
-        J12 <- 0
-        J22 <- 1/x$x[,'Pb206U238']
-        J21 <- out[,3]/x$x[,'Pb206U238']
-        err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-        out[,2] <- sqrt(err[,1])
-        out[,4] <- sqrt(err[,2])
-        out[,5] <- err[,3]/(out[,2]*out[,4])
-    } else if (option==3 && x$format == 5){
-        out <- subset(x$x,select=c('U238Pb206','errU238Pb206',
-                                   'Pb204Pb206','errPb204Pb206','rhoXZ'))
-    } else if (option==3 && x$format==6){
-        out[,1] <- 1/x$x[,'Pb206U238']
-        out[,3] <- x$x[,'Pb204Pb206']
-        E11 <- x$x[,'errPb206U238']^2
-        E22 <- x$x[,'errPb204Pb206']^2
-        E12 <- get.cov.46.68(x$x[,'Pb204Pb206'],x$x[,'errPb204Pb206'],
-                             x$x[,'Pb206U238'],x$x[,'errPb206U238'],
-                             x$x[,'Pb204U238'],x$x[,'errPb204U238'])
-        J11 <- -out[,1]^2
-        J12 <- 0
-        J22 <- 1
-        J21 <- 0
-        err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-        out[,2] <- sqrt(err[,1])
-        out[,4] <- sqrt(err[,2])
-        out[,5] <- err[,3]/(out[,2]*out[,4])        
-    } else if (option==4 && x$format==4){ # 4/7 vs. 5/7
-        U <- iratio('U238U235')[1]
-        out[,1] <- 1/x$x[,'Pb207U235']
-        out[,3] <- x$x[,'Pb204U238']*U/x$x[,'Pb207U235']
-        E11 <- x$x[,'errPb207U235']^2
-        E22 <- x$x[,'errPb204U238']^2
-        E12 <- x$x[,'rhoXZ']*x$x[,'errPb207U235']*x$x[,'errPb204U238']
-        J11 <- -out[,1]^2
-        J12 <- 0
-        J21 <- -out[,3]/x$x[,'Pb207U235']
-        J22 <- U/x$x[,'Pb207U235']
-        err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-        out[,2] <- sqrt(err[,1])
-        out[,4] <- sqrt(err[,2])
-        out[,5] <- err[,3]/(out[,2]*out[,4])
-    } else if (option==4 && x$format==5){
-        U <- iratio('U238U235')[1]
-        out[,1] <- x$x[,'U238Pb206']/(U*x$x[,'Pb207Pb206'])
-        out[,3] <- x$x[,'Pb204Pb206']/x$x[,'Pb207Pb206']
-        J <- matrix(0,2,3)
-        E <- matrix(0,3,3)
-        for (i in 1:length(x)){
-            E <- cor2cov3(sX=x$x[i,'errU238Pb206'],sY=x$x[i,'errPb207Pb206'],
-                          sZ=x$x[i,'errPb204Pb206'],rXY=x$x[i,'rhoXY'],
-                          rXZ=x$x[i,'rhoXZ'],rYZ=x$x[i,'rhoYZ'])
-            J[1,1] <- 1/(U*x$x[i,'Pb207Pb206'])
-            J[1,2] <- -out[i,1]/x$x[i,'Pb207Pb206']
-            J[2,2] <- -out[i,3]/x$x[i,'Pb207Pb206']
-            J[2,3] <- 1/x$x[i,'Pb207Pb206']
-            covmat <- J %*% E %*% t(J)
-            out[i,2] <- sqrt(covmat[1,1])
-            out[i,4] <- sqrt(covmat[2,2])
-            out[i,5] <- covmat[1,2]/(out[i,2]*out[i,4])
-        }
-    } else if (option==4 && x$format==6){
-        out[,1] <- 1/x$x[,'Pb207U235']
-        out[,3] <- x$x[,'Pb204Pb207']
-        E11 <- x$x[,'errPb207U235']^2
-        E22 <- x$x[,'errPb204Pb207']^2
-        E12 <- get.cov.47.75(x$x[,'Pb204Pb207'],x$x[,'errPb204Pb207'],
-                             x$x[,'Pb207U235'],x$x[,'errPb207U235'],
-                             x$x[,'Pb204U238'],x$x[,'errPb204U238'])
-        J11 <- -out[,1]^2
-        J12 <- 0
-        J22 <- 1
-        J21 <- 0
-        err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
-        out[,2] <- sqrt(err[,1])
-        out[,4] <- sqrt(err[,2])
-        out[,5] <- err[,3]/(out[,2]*out[,4])
-    } else if (option==5 && x$format==7){
-        out <- subset(x$x,select=c('Pb206U238','errPb206U238',
-                                   'Pb208Th232','errPb208Th232','rhoYZ'))
-    } else if (option==5 && x$format==8){
+    } else if (option==3 && x$format%in%c(4,5,6)){ # 04/06 vs 38/06
         for (i in 1:ns){
-            samp <- wetherill(x,i=i)
-            out[i,1] <- samp$x['Pb206U238']
-            out[i,2] <- sqrt(samp$cov['Pb206U238','Pb206U238'])
-            out[i,3] <- samp$x['Pb208Th232']
-            out[i,4] <- sqrt(samp$cov['Pb208Th232','Pb208Th232'])
-            out[i,5] <- stats::cov2cor(samp$cov[2:3,2:3])[1,2]
+            ir <- get.UPb.isochron.ratios(x,i)
+            out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb204Pb206')
+        }
+    } else if (option==4 && x$format%in%c(4,5,6)){ # 04/07 vs. 35/07
+        for (i in 1:ns){
+            ir <- get.UPb.isochron.ratios(x,i)
+            out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
+        }
+    } else if (option==5 && x$format%in%c(7,8)){ # 08/06 vs. 38/206
+        for (i in 1:ns){
+            ir <- get.UPb.isochron.ratios(x,i)
+            out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208Pb206')
+        }
+    } else if (option==6 && x$format%in%c(7,8)){ # 08/07 vs. 35/07
+        for (i in 1:ns){
+            ir <- get.UPb.isochron.ratios(x,i)
+            out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208Pb207')
         }
     } else {
         stop('Incompatible input format and concordia type.')
@@ -371,7 +281,14 @@ data2york.UPb <- function(x,option=1,...){
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-
+data2york_UPb_helper <- function(x,i1=1,i2=2){
+    X <- samp$x[i1]
+    sX <- sqrt(samp$cov[i1,i1])
+    Y <- samp$x[i2]
+    sY <- sqrt(samp$cov[i2,i2])
+    rXY <- stats::cov2cor(samp$cov[i1,i2])
+    c(X,sX,Y,sY,rXY)
+}
 #' @param inverse toggles between normal and inverse isochron
 #'     ratios. \code{data2york} returns five columns \code{X},
 #'     \code{s[X]}, \code{Y}, \code{s[Y]} and \code{r[X,Y]}.

@@ -168,8 +168,6 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 
 get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA)){
     init <- get.ta0b0.model2(x,anchor=anchor)
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@3@"]]));##:ess-bp-end:##
     if (model==1)
         out <- get.ta0b0.model1(x,init=init,exterr=exterr,anchor=anchor)
     else if (model==2)
@@ -186,6 +184,42 @@ get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out
 }
 get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
+    if (x$format %in% c(1,2,3))
+        out <- get.ta0b0.model2.2D(x,anchor=anchor)
+    else if (x$format %in% c(4,5,6))
+        out <- get.ta0b0.model2.3D(x,anchor=anchor)
+    else if (x$format %in% c(7,8))
+        out <- get.ta0b0.model2.Th(x,anchor=anchor)
+    else
+        stop("Illegal input format.")
+    out
+}
+get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
+    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
+    if (!anchor[[1]]) {
+        xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+        intercept <- xyfit$coef[1]
+        slope <- xyfit$coef[2]
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+    } else if (is.na(anchor[[2]])){
+        intercept <- settings('iratio','Pb207Pb206')[1]
+        xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
+        slope <- xyfit$coef
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+    } else if (is.numeric(anchor[[2]])){
+        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
+        xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
+                           0 + I(xy[,'X']-TW$x['U238Pb206']))
+        slope <- xyfit$coef
+        intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
+        ta0b0 <- c(anchor[[2]],intercept)
+    }
+    ta0b0
+}
+get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
+    xy <- data2titterington(x,option=2)[,c('X','Y'),drop=FALSE]
+}
+get.ta0b0.model2.old <- function(x,anchor=list(FALSE,NA)){
     xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
     if (!anchor[[1]]) {
         xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
