@@ -219,11 +219,11 @@ get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     xy1 <- data2york(x,option=3)[,c('X','Y'),drop=FALSE] # 04/06 vs 38/06
     xy2 <- data2york(x,option=4)[,c('X','Y'),drop=FALSE] # 04/07 vs. 35/07
+    tlim <- c(1e-5,10000)
+    pilotfit <- lm(xy1[,'Y'] ~ xy1[,'X'])
+    if (pilotfit$coef[2]<0) tlim[2] <- max(get.Pb206U238.age(x)[,1])
+    else tlim[1] <- min(get.Pb206U238.age(x)[,1])
     if (!anchor[[1]]){
-        tlim <- c(1e-5,10000)
-        pilotfit <- lm(xy1[,'Y'] ~ xy1[,'X'])
-        if (pilotfit$coef[2]<0) tlim[2] <- max(get.Pb206U238.age(x)[,1])
-        else tlim[1] <- min(get.Pb206U238.age(x)[,1])
         tt <- optimise(SS.lud.model2,interval=tlim,xy1=xy1,xy2=xy2)$minimum
         fits <- model2fit(tt,xy1,xy2)
         a0 <- fits$y0[1]
@@ -231,6 +231,8 @@ get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     } else if (is.na(anchor[[2]])){
         a0 <- settings('iratio','Pb206Pb204')[1]
         b0 <- settings('iratio','Pb207Pb204')[1]
+        tt <- optimise(SS.lud.model2,interval=tlim,
+                       xy1=xy1,xy2=xy2,a0=a0,b0=b0)$minimum
     } else if (is.numeric(anchor[[2]])){
         tt <- anchor[[2]]
         fits <- model2fit(tt,xy1,xy2)
@@ -241,20 +243,34 @@ get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     names(out) <- c('t','64i','74i')
     out
 }
-SS.lud.model2 <- function(tt,xy1,xy2,d=diseq()){
-    fits <- model2fit(tt,xy1,xy2)
+SS.lud.model2 <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
+    fits <- model2fit(tt=tt,xy1=xy1,xy2=xy2,a0=a0,b0=b0,d=d)
     fits$SS
 }
 model2fit <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
-    pred86 <- age_to_U238Pb206_ratio(tt,st=0,d=d)[1]
-    pred57 <- age_to_U235Pb207_ratio(tt,st=0,d=d)[1]
-    fit06 <- stats::lm(xy1[,'Y'] ~ I(xy1[,'X']-pred86) + 0)
-    fit07 <- stats::lm(xy2[,'Y'] ~ I(xy2[,'X']-pred57) + 0)
-    i46 <- -fit06$coef/pred86
-    i47 <- -fit07$coef/pred57
+    x1 <- age_to_U238Pb206_ratio(tt,st=0,d=d)[1]
     out <- list()
-    out$y0 <- c(1/46,1/47)
-    out$SS <- sum(fit06$residuals^2) + sum(fit07$residuals^2)
+    out$y0 <- c(0,0) # (06/04)i, (07/04)i
+    if (is.na(a0)){
+        fit06 <- stats::lm(xy1[,'Y'] ~ I(xy1[,'X']-x1) + 0)
+        out$y0[1] <- -1/(x1*fit06$coef)
+        SS06 <- sum(fit06$residuals^2)
+    } else {
+        out$y0[1] <- a0
+        yp <- (xy1[,'X']-x1)*a0/x1
+        SS06 <- sum((yp-xy1[,'Y'])^2)
+    }
+    x2 <- age_to_U235Pb207_ratio(tt,st=0,d=d)[1]
+    if (is.na(b0)){
+        fit07 <- stats::lm(xy2[,'Y'] ~ I(xy2[,'X']-x2) + 0)
+        out$y0[2] <- -1/(x2*fit07$coef)
+        SS07 <- sum(fit07$residuals^2)
+    } else {
+        out$y0[2] <- b0
+        yp <- (xy2[,'X']-x2)*b0/x2
+        SS07 <- sum((yp-xy2[,'Y'])^2)
+    }
+    out$SS <- SS06 + SS07
     out
 }
 get.ta0b0.model2.Th <- function(x,anchor=list(FALSE,NA)){
