@@ -168,6 +168,8 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 
 get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA)){
     init <- get.ta0b0.model2(x,anchor=anchor)
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@3@"]]));##:ess-bp-end:##
     if (model==1)
         out <- get.ta0b0.model1(x,init=init,exterr=exterr,anchor=anchor)
     else if (model==2)
@@ -287,7 +289,8 @@ get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
 #    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="BFGS",x=x,w=w, exterr=exterr)
     optifix(parms=init,fn=LL.lud.UPb,gr=NULL,method="L-BFGS-B",x=x,w=w,
-            exterr=exterr,fixed=fixit(x,anchor),lower=c(0,0,0),upper=c(10000,100,100))
+            exterr=exterr,fixed=fixit(x,anchor),lower=c(0,0,0),upper=c(10000,100,100),
+            control=list(factr=1e8))
 }
 
 LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
