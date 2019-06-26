@@ -265,7 +265,7 @@ data2york.UPb <- function(x,option=1,...){
             ir <- get.UPb.isochron.ratios(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
         }
-    } else if (option==5 && x$format%in%c(7,8)){ # 08/06 vs. 38/206
+    } else if (option==5 && x$format%in%c(7,8)){ # 08/06 vs. 38/06
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208Pb206')
@@ -282,11 +282,11 @@ data2york.UPb <- function(x,option=1,...){
     out
 }
 data2york_UPb_helper <- function(x,i1=1,i2=2){
-    X <- samp$x[i1]
-    sX <- sqrt(samp$cov[i1,i1])
-    Y <- samp$x[i2]
-    sY <- sqrt(samp$cov[i2,i2])
-    rXY <- stats::cov2cor(samp$cov[i1,i2])
+    X <- x$x[i1]
+    sX <- sqrt(x$cov[i1,i1])
+    Y <- x$x[i2]
+    sY <- sqrt(x$cov[i2,i2])
+    rXY <- stats::cov2cor(x$cov)[i1,i2]
     c(X,sX,Y,sY,rXY)
 }
 #' @param inverse toggles between normal and inverse isochron

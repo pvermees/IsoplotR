@@ -217,41 +217,50 @@ get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
     ta0b0
 }
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
-    xy <- data2titterington(x,option=2)[,c('X','Y'),drop=FALSE]
-}
-get.ta0b0.model2.old <- function(x,anchor=list(FALSE,NA)){
-    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-    if (!anchor[[1]]) {
-        xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-        intercept <- xyfit$coef[1]
-        slope <- xyfit$coef[2]
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+    xy1 <- data2york(x,option=3)[,c('X','Y'),drop=FALSE] # 04/06 vs 38/06
+    xy2 <- data2york(x,option=4)[,c('X','Y'),drop=FALSE] # 04/07 vs. 35/07
+    if (!anchor[[1]]){
+        tlim <- c(1e-5,10000)
+        pilotfit <- lm(xy1[,'Y'] ~ xy1[,'X'])
+        if (pilotfit$coef[2]<0) tlim[2] <- max(get.Pb206U238.age(x)[,1])
+        else tlim[1] <- min(get.Pb206U238.age(x)[,1])
+        tt <- optimise(SS.lud.model2,interval=tlim,xy1=xy1,xy2=xy2)$minimum
+        fits <- model2fit(tt,xy1,xy2)
+        a0 <- fits$y0[1]
+        b0 <- fits$y0[2]
     } else if (is.na(anchor[[2]])){
-        if (x$format %in% c(1,2,3)){
-            b0a0 <- settings('iratio','Pb207Pb206')[1]
-        } else if (x$format %in% c(4,5,6)){
-            a0 <- settings('iratio','Pb206Pb204')[1]
-            b0 <- settings('iratio','Pb207Pb204')[1]
-            b0a0 <- b0/a0
-        } else if (x$format %in% c(7,8)){
-            a0 <- settings('iratio','Pb206Pb208')[1]
-            b0 <- settings('iratio','Pb207Pb208')[1]
-            b0a0 <- b0/a0
-        } else {
-            stop("Illegal input format.")
-        }
-        intercept <- b0a0
-        xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
-        slope <- xyfit$coef
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+        a0 <- settings('iratio','Pb206Pb204')[1]
+        b0 <- settings('iratio','Pb207Pb204')[1]
     } else if (is.numeric(anchor[[2]])){
-        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
-        xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
-                           0 + I(xy[,'X']-TW$x['U238Pb206']))
-        slope <- xyfit$coef
-        intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
-        ta0b0 <- c(anchor[[2]],intercept)
+        tt <- anchor[[2]]
+        fits <- model2fit(tt,xy1,xy2)
+        a0 <- fits$y0[1]
+        b0 <- fits$y0[2]
     }
+    out <- c(tt,a0,b0)
+    names(out) <- c('t','64i','74i')
+    out
+}
+SS.lud.model2 <- function(tt,xy1,xy2,d=diseq()){
+    fits <- model2fit(tt,xy1,xy2)
+    fits$SS
+}
+model2fit <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
+    pred86 <- age_to_U238Pb206_ratio(tt,st=0,d=d)[1]
+    pred57 <- age_to_U235Pb207_ratio(tt,st=0,d=d)[1]
+    fit06 <- stats::lm(xy1[,'Y'] ~ I(xy1[,'X']-pred86) + 0)
+    fit07 <- stats::lm(xy2[,'Y'] ~ I(xy2[,'X']-pred57) + 0)
+    i46 <- -fit06$coef/pred86
+    i47 <- -fit07$coef/pred57
+    out <- list()
+    out$y0 <- c(1/46,1/47)
+    out$SS <- sum(fit06$residuals^2) + sum(fit07$residuals^2)
+    out
+}
+get.ta0b0.model2.Th <- function(x,anchor=list(FALSE,NA)){
+}
+
+get.ta0b0.model2.old <- function(x,anchor=list(FALSE,NA)){
     if (x$format %in% c(4,5,6)){
         U238Pb206 <- get.U238Pb206.ratios(x)[,'U238Pb206',drop=FALSE]
         Pb204U238 <- get.Pb204U238.ratios(x)[,'Pb204U238',drop=FALSE]
