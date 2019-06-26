@@ -119,7 +119,7 @@ ludwig.default <- function(x,...){
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
-    #out$cov <- solve(optimHess(fit$par,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,x=x))
+    #out$cov <- solve(optimHess(fit$par,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,x=x,exterr=exterr))
     out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
     out$n <- length(x)
     mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
