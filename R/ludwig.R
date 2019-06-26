@@ -178,6 +178,7 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA)){
     out$exterr <- exterr
     out
 }
+
 get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor)
     out$w <- 0
@@ -194,6 +195,16 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         stop("Illegal input format.")
     out
 }
+get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
+    out <- list(w=0,par=init)
+#    for (i in 1:5){ # loop for more accurate but slower and more unstable results
+    out <- fit_ludwig_discordia(x,init=out$par,w=out$w,exterr=exterr,anchor=anchor)
+    out$w <- stats::optimize(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
+                             exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
+#    }
+    out
+}
+
 get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
     xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
     if (!anchor[[1]]) {
@@ -219,23 +230,20 @@ get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     xy1 <- data2york(x,option=3)[,c('X','Y'),drop=FALSE] # 04/06 vs 38/06
     xy2 <- data2york(x,option=4)[,c('X','Y'),drop=FALSE] # 04/07 vs. 35/07
-    tlim <- c(1e-5,10000)
-    pilotfit <- lm(xy1[,'Y'] ~ xy1[,'X'])
-    if (pilotfit$coef[2]<0) tlim[2] <- max(get.Pb206U238.age(x)[,1])
-    else tlim[1] <- min(get.Pb206U238.age(x)[,1])
+    tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
     if (!anchor[[1]]){
-        tt <- optimise(SS.lud.model2,interval=tlim,xy1=xy1,xy2=xy2)$minimum
-        fits <- model2fit(tt,xy1,xy2)
+        tt <- optimise(SS.model2.3D,interval=tlim,xy1=xy1,xy2=xy2)$minimum
+        fits <- model2fit.3D(tt,xy1,xy2)
         a0 <- fits$y0[1]
         b0 <- fits$y0[2]
     } else if (is.na(anchor[[2]])){
         a0 <- settings('iratio','Pb206Pb204')[1]
         b0 <- settings('iratio','Pb207Pb204')[1]
-        tt <- optimise(SS.lud.model2,interval=tlim,
+        tt <- optimise(SS.model2.3D,interval=tlim,
                        xy1=xy1,xy2=xy2,a0=a0,b0=b0)$minimum
     } else if (is.numeric(anchor[[2]])){
         tt <- anchor[[2]]
-        fits <- model2fit(tt,xy1,xy2)
+        fits <- model2fit.3D(tt,xy1,xy2)
         a0 <- fits$y0[1]
         b0 <- fits$y0[2]
     }
@@ -243,11 +251,40 @@ get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     names(out) <- c('t','64i','74i')
     out
 }
-SS.lud.model2 <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
-    fits <- model2fit(tt=tt,xy1=xy1,xy2=xy2,a0=a0,b0=b0,d=d)
+get.ta0b0.model2.Th <- function(x,anchor=list(FALSE,NA)){
+    xy1 <- data2york(x,option=5)[,c('X','Y'),drop=FALSE] # 08/06 vs 38/06
+    xy2 <- data2york(x,option=6)[,c('X','Y'),drop=FALSE] # 08/07 vs. 35/07
+    z <- x$x[,'Th232U238']
+    tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
+    if (!anchor[[1]]){
+        tt <- optimise(SS.model2.Th,interval=tlim,xy1=xy1,xy2=xy2,z=z)$minimum
+        fits <- model2fit.Th(tt=tt,xy1=xy1,xy2=xy2,z=z)
+        a0 <- fits$y0[1]
+        b0 <- fits$y0[2]
+    } else if (is.na(anchor[[2]])){
+        a0 <- settings('iratio','Pb206Pb204')[1]
+        b0 <- settings('iratio','Pb207Pb204')[1]
+        tt <- optimise(SS.model2.Th,interval=tlim,
+                       xy1=xy1,xy2=xy2,a0=a0,b0=b0,z=z)$minimum
+    } else if (is.numeric(anchor[[2]])){
+        tt <- anchor[[2]]
+        fits <- model2fit.Th(tt=tt,xy1=xy1,xy2=xy2,z=z)
+        a0 <- fits$y0[1]
+        b0 <- fits$y0[2]
+    }
+    out <- c(tt,a0,b0)
+    names(out) <- c('t','68i','78i')
+    out
+}
+SS.model2.3D <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
+    fits <- model2fit.3D(tt=tt,xy1=xy1,xy2=xy2,a0=a0,b0=b0,d=d)
     fits$SS
 }
-model2fit <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
+SS.model2.Th <- function(tt,xy1,xy2,z,a0=NA,b0=NA,d=diseq()){
+    fits <- model2fit.Th(tt=tt,xy1=xy1,xy2=xy2,z=z,a0=a0,b0=b0,d=d)
+    fits$SS
+}
+model2fit.3D <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
     x1 <- age_to_U238Pb206_ratio(tt,st=0,d=d)[1]
     out <- list()
     out$y0 <- c(0,0) # (06/04)i, (07/04)i
@@ -273,78 +310,37 @@ model2fit <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
     out$SS <- SS06 + SS07
     out
 }
-get.ta0b0.model2.Th <- function(x,anchor=list(FALSE,NA)){
-}
-
-get.ta0b0.model2.old <- function(x,anchor=list(FALSE,NA)){
-    if (x$format %in% c(4,5,6)){
-        U238Pb206 <- get.U238Pb206.ratios(x)[,'U238Pb206',drop=FALSE]
-        Pb204U238 <- get.Pb204U238.ratios(x)[,'Pb204U238',drop=FALSE]
-        Pb204Pb206 <- Pb204U238*U238Pb206
-        if (!anchor[[1]]){
-            lmfit <- stats::lm(Pb204Pb206 ~ U238Pb206)
-            ta0b0[3] <- ta0b0[2]/lmfit$coef[1]    # 07/04
-            ta0b0[2] <- 1/lmfit$coef[1]           # 06/04
-        } else if (is.na(anchor[[2]])){
-            ta0b0[2] <- a0
-            ta0b0[3] <- b0
-        } else if (is.numeric(anchor[[2]])){
-            # 1. fit the Pb204/Pb206-intercept anchored to the concordia age
-            fit06 <- stats::lm(Pb204Pb206 ~ 0 + I(U238Pb206-TW$x['U238Pb206']))
-            d46d86 <- fit06$coef
-            ta0b0[2] <- -1/(TW$x['U238Pb206']*d46d86)                  # 06/04
-            # 2. fit the Pb204/Pb207-intercept anchored to the concordia age
-            U <- settings('iratio','U238U235')[1]
-            Pb207U235 <- get.Pb207U235.ratios(x)[,'Pb207U235',drop=FALSE]
-            Pb204Pb207 <- U*Pb204U238/Pb207U235
-            U238Pb207 <- U/Pb207U235
-            TW87 <- TW$x['U238Pb206']/TW$x['Pb207Pb206']
-            fit07 <- stats::lm(Pb204Pb207 ~ 0 + I(U238Pb207-TW87))
-            d47d87 <- fit07$coef
-            ta0b0[3] <- -TW$x['Pb207Pb206']/(d47d87*TW$x['U238Pb206']) # 07/04
-        }
+model2fit.Th <- function(tt,xy1,xy2,z,a0=NA,b0=NA,d=diseq()){
+    U <- settings('iratio','U238U235')[1]
+    l2 <- settings('lambda','Th232')[1]
+    x1 <- age_to_U238Pb206_ratio(tt,st=0,d=d)[1]
+    y1 <- xy1[,'Y'] - z*xy1[,'X']*(exp(l2*tt)-1)
+    out <- list()
+    out$y0 <- c(0,0) # (06/08)i, (07/08)i
+    if (is.na(a0)){
+        fit06 <- stats::lm(y1 ~ I(xy1[,'X']-x1) + 0)
+        out$y0[1] <- -1/(x1*fit06$coef)
+        SS06 <- sum(fit06$residuals^2)
+    } else {
+        out$y0[1] <- a0
+        yp <- (xy1[,'X']-x1)*a0/x1
+        SS06 <- sum((yp-y1)^2)
     }
-    if (x$format %in% c(7,8)){
-        U238Pb206 <- get.U238Pb206.ratios(x)[,'U238Pb206',drop=FALSE]
-        Pb208Pb206 <- get.Pb208Pb206.ratios(x)[,'Pb208Pb206',drop=FALSE]
-        Th232U238 <- x$x[,'Th232U238',drop=FALSE]
-        l2 <- settings('lambda','Th232')[1]
-        if (!anchor[[1]]){
-            Pb208cPb206 <- Pb208Pb206 - Th232U238*U238Pb206*(exp(l2*ta0b0[1])-1)
-            lmfit <- stats::lm(Pb208cPb206 ~ U238Pb206)
-            ta0b0[3] <- ta0b0[2]/lmfit$coef[1]    # 07/08c
-            ta0b0[2] <- 1/lmfit$coef[1]           # 06/08c
-        } else if (is.na(anchor[[2]])){
-            ta0b0[2] <- a0
-            ta0b0[3] <- b0
-        } else if (is.numeric(anchor[[2]])){
-            Pb208cPb206 <- Pb208Pb206 - Th232U238*U238Pb206*(exp(l2*anchor[[2]])-1)
-            # 1. fit the Pb208/Pb206-intercept anchored to the concordia age
-            fit06 <- stats::lm(Pb208cPb206 ~ 0 + I(U238Pb206-TW$x['U238Pb206']))
-            d8c6d86 <- fit06$coef
-            ta0b0[2] <- -1/(TW$x['U238Pb206']*d8c6d86)                  # 06/08c
-            # 2. fit the Pb208/Pb207-intercept anchored to the concordia age
-            U <- settings('iratio','U238U235')[1]
-            Pb207Pb206 <- get.Pb207Pb206.ratios(x)[,'Pb207Pb206',drop=FALSE]
-            Pb208cPb207 <- Pb208cPb206/Pb207Pb206
-            U238Pb207 <- U238Pb206/Pb207Pb206
-            TW87 <- TW$x['U238Pb206']/TW$x['Pb207Pb206']
-            fit07 <- stats::lm(Pb208cPb207 ~ 0 + I(U238Pb207-TW87))
-            d8c7d87 <- fit07$coef
-            ta0b0[3] <- -TW$x['Pb207Pb206']/(d8c7d87*TW$x['U238Pb206']) # 07/08c
-        }
-    }    
-    ta0b0
-}
-get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
-    out <- list(w=0,par=init)
-#    for (i in 1:5){ # loop for more accurate but slower and more unstable results
-    out <- fit_ludwig_discordia(x,init=out$par,w=out$w,exterr=exterr,anchor=anchor)
-    out$w <- stats::optimize(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
-                             exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
-#    }
+    x2 <- age_to_U235Pb207_ratio(tt,st=0,d=d)[1]
+    y2 <- xy2[,'Y'] - z*xy2[,'X']*U*(exp(l2*tt)-1)
+    if (is.na(b0)){
+        fit07 <- stats::lm(y2 ~ I(xy2[,'X']-x2) + 0)
+        out$y0[2] <- -1/(x2*fit07$coef)
+        SS07 <- sum(fit07$residuals^2)
+    } else {
+        out$y0[2] <- b0
+        yp <- (xy2[,'X']-x2)*b0/x2
+        SS07 <- sum((yp-y2)^2)
+    }
+    out$SS <- SS06 + SS07
     out
 }
+
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
 #    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="BFGS",x=x,w=w, exterr=exterr)
     optifix(parms=init,fn=LL.lud.UPb,gr=NULL,method="L-BFGS-B",x=x,w=w,
