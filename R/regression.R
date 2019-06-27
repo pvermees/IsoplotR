@@ -72,8 +72,6 @@ LL.isochron <- function(w,xyz,type='york'){
         out <- LL.york(w,xyz)
     else if (identical(type,'titterington'))
         out <- LL.titterington(w,xyz)
-    else if (identical(type,'ludwig'))
-        out <- LL.ludwig(w,xyz)
     out
 }
 LL.york <- function(w,xy){

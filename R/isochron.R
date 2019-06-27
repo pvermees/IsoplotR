@@ -484,12 +484,11 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$cov.ab <- cov.ab[1,2]
     out$y0[1] <- 1/out$a[1]
     out$y0[2] <- out$y0[1]*out$a[2]/out$a[1]
-    out <- ci_isochron(out)
+    out$age['ci[t]'] <- out$fact*out$age['s[t]']
+    out$y0['ci[y]'] <- out$fact*out$y0['s[y]']
     if (model==1){
-        R76 <- age_to_Pb207Pb206_ratio(tt=out$age[1],st=out$age[2],d=x$d)
-        out$age['disp[t]'] <-
-            out$fact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
-                                        exterr=exterr)[2]
+        out$age['disp[t]'] <- sqrt(out$mswd)*out$age['ci[t]']
+        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
     }
     if (plot){
         scatterplot(XY,xlim=xlim,ylim=ylim,alpha=alpha,
@@ -498,7 +497,7 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.col=omit.col,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Pb'),
                         xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
@@ -1161,12 +1160,20 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
         mymtext(line1,line=1,...)
         mymtext(line2,line=0,...)
     } else if (fit$model==3){
-        rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
-        list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
-        args3 <- quote(a+b/-c)
-        expr3 <- fit$displabel
-        call3 <- substitute(e~a,list(e=expr3,a=args3))
-        line3 <- do.call(substitute,list(eval(call3),list3))
+        if (type=='U-Pb'){
+            rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
+            line3 <- substitute('overdispersion ='~a+b/-c~'% of Pb'[o],
+                                list(a=rounded.disp[1],
+                                     b=rounded.disp[3],
+                                     c=rounded.disp[2]))
+        } else {
+            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
+            list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
+            args3 <- quote(a+b/-c)
+            expr3 <- fit$displabel
+            call3 <- substitute(e~a,list(e=expr3,a=args3))
+            line3 <- do.call(substitute,list(eval(call3),list3))
+        }
         mymtext(line1,line=2,...)
         mymtext(line2,line=1,...)
         mymtext(line3,line=0,...)
