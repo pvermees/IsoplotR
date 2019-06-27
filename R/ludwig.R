@@ -877,6 +877,7 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         c0[i] <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1
         K[i] <- wd$x['Pb207U235'] - c0[i]*U*b0*W[i] - exp(l5[1]*tt) + 1 - D$d1
         L[i] <- wd$x['Pb206U238'] - c0[i]*a0*W[i] - exp(l8[1]*tt) + 1 - D$d2
+        # M[i] <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1 - c0[i]
         E[ii:(ii+3),ii:(ii+3)] <- wd$cov
         J[i,ii] <- 1 # dKi/dPb7U5
         J[i,ii+3] <- -c0[i]*U*b0 # dKi/dTh2U8
@@ -884,9 +885,9 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         J[ns+i,ii+3] <- -c0[i]*a0 # dLi/dTh2U8
         J[2*ns+i,ii+2] <- 1 # dMi/dPb8Th2
         if (exterr){
-            J[i,3*ns+1] <- - tt*exp(l5[1]*tt) - D$dd1dl5 # dKi/dl5
-            J[ns+i,3*ns+2] <- - tt*exp(l5[1]*tt) - D$dd2dl8 # dLi/dl8
-            J[2*ns+i,3*ns+3] <- - tt*exp(l2[1]*tt) # dMi/dl2
+            J[i,4*ns+1] <- - tt*exp(l5[1]*tt) - D$dd1dl5 # dKi/dl5
+            J[ns+i,4*ns+2] <- - tt*exp(l8[1]*tt) - D$dd2dl8 # dLi/dl8
+            J[2*ns+i,4*ns+3] <- - tt*exp(l2[1]*tt) # dMi/dl2
         }
     }
     if (exterr){ # decay constant uncertainties
