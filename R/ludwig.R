@@ -119,8 +119,8 @@ ludwig.default <- function(x,...){
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
-    #out$cov <- solve(optimHess(fit$par,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,x=x,exterr=exterr))
-    out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+    out$cov <- solve(optimHess(fit$par,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,x=x,exterr=exterr))
+    #out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
     out$n <- length(x)
     mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
     out <- c(out,mswd)
@@ -342,8 +342,8 @@ model2fit.Th <- function(tt,xy1,xy2,z,a0=NA,b0=NA,d=diseq()){
 }
 
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
-#    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="BFGS",x=x,w=w, exterr=exterr)
-    optifix(parms=init,fn=LL.lud.UPb,gr=NULL,method="L-BFGS-B",x=x,w=w,
+#    optim(par=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="BFGS",x=x,w=w,exterr=exterr)
+    optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",x=x,w=w,
             exterr=exterr,fixed=fixit(x,anchor),lower=c(0,0,0),upper=c(10000,100,100),
             control=list(factr=1e8))
 }
@@ -417,18 +417,86 @@ LL.lud.Th <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     out
 }
 
-LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
+LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     if (x$format %in% c(1,2,3)){
-        return(NULL)
+        return(LL.lud.2D.gr(ta0b0,x,exterr=exterr,w=w))
     } else if (x$format %in% c(4,5,6)){
-        return(NULL)
+        return(LL.lud.3D.gr(ta0b0,x=x,exterr=exterr,w=w))
     } else if (x$format %in% c(7,8)){
-        return(LL.lud.Th.gr(ta0b0,x=x,exterr=exterr,w=w,LL=LL))
+        return(LL.lud.Th.gr(ta0b0,x=x,exterr=exterr,w=w))
     } else {
         stop('Incorrect input format.')
     }
 }
-LL.lud.Th.gr <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
+LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
+    tt <- ta0[1]
+    a0 <- ta0[2]
+    l5 <- settings('lambda','U235')
+    l8 <- settings('lambda','U238')
+    U <- settings('iratio','U238U235')[1]
+    l <- data2ludwig(x,tt=tt,a0=a0,exterr=exterr,w=w)
+    rx <- l$rx
+    X <- get.U238Pb206.ratios(x)[,1]
+    ry <- l$ry # ry = Y - a - bx
+    ns <- length(x)
+    dRdt <- matrix(0,2*ns,1)
+    dRda0 <- matrix(0,2*ns,1)
+    D <- wendt(tt,d=x$d)
+    # b = a0*(exp(l8*tt)-1+d2) - (exp(l5*tt)-1+d1)*(exp(l8*tt)-1+d2)/U
+    dbdt <- a0*l8*exp(l8*tt) + a0*D$dd2dt - l5*exp(l5*tt)*exp(l8*tt)/U -
+        l8*exp(l5*tt)*exp(l8*tt)/U - exp(l5*tt)*D$dd2dt/U - exp(l8*tt)*D$dd1dt/U
+    drydt <- -dbdt*(X-rx)
+    dryda0 <- (exp(l8*tt)-1+D$d2) - (exp(l5*tt)-1+D$d1)*(exp(l8*tt)-1+D$d2)/U
+    dRdt[(ns+1):(2*ns),1] <- drydt
+    dRda0[(ns+1):(2*ns),1] <- dryda0
+    dSdt <- 2*t(dRdt) %*% l$omega %*% dRdt
+    dSda0 <- 2*t(dRda0) %*% l$omega %*% dRda0
+    c(dSdt,dSda0)
+}
+LL.lud.3D.gr <- function(ta0b0,x,exterr=FALSE,w=0){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    b0 <- ta0b0[3]
+    l2 <- settings('lambda','Th232')[1]
+    l5 <- settings('lambda','U235')[1]
+    l8 <- settings('lambda','U238')[1]
+    U <- settings('iratio','U238U235')
+    l <- data2ludwig(x,tt=tt,a0=0,b0=b0,exterr=exterr,w=w)
+    phi <- l$phi
+    R <- l$R
+    r <- l$r
+    omega <- l$omega
+    Z <- get.Pb204U238.ratios(x)[,1]
+    z <- Z - phi
+    dRdt <- -l5*exp(l5*tt)
+    drdt <- -l8*exp(l8*tt)
+    drda0 <- -z
+    dRdb0 <- -U*z
+    dSdt <- 0
+    dSda0 <- 0
+    dSdb0 <- 0
+    ns <- length(x)
+    for (i in 1:ns){
+        i1 <- i
+        i2 <- i + ns
+        i3 <- i + 2*ns
+        for (j in 1:ns){
+            j1 <- j
+            j2 <- j + ns
+            j3 <- j + 2*ns
+            dSdt <- dSdt + dRdt*R[j]*omega[i1,j1] + R[i]*dRdt*omega[i1,j1] +
+                drdt*r[j]*omega[i2,j2] + r[i]*drdt*omega[i2,j2] +
+                2*( dRdt*r[j]*omega[i1,j2] + R[i]*drdt*omega[i1,j2] +
+                    dRdt*phi[j]*omega[i1,j3] + drdt*phi[j]*omega[i2,j3] )
+            dSda0 <- out + drda0*r[j]*omega[i2,j2] + r[i]*drda0*omega[i2,j2] +
+                2*( R[i]*drda0*omega[i1,j2] + drda0*phi[j]*omega[i2,j3] )
+            dSdb0 <- out + dRdb0*R[j]*omega[i1,j1] + R[i]*dRdb0*omega[i1,j1] +
+                2*( dRdb0*r[j]*omega[i1,j2] + dRdb0*phi[j]*omega[i1,j3] )
+        }
+    }
+    c(dSdt,dSda0,dSdb0)
+}
+LL.lud.Th.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
