@@ -207,19 +207,19 @@ get.UPb.isochron.ratios <- function(x,i){
     }
     U <- iratio('U238U235')[1]
     tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06 OR 08/06
-    U238Pb6 <- tw$x[1]
+    U8Pb6 <- tw$x[1]
     Pb48Pb6 <- tw$x[3]
-    U235Pb7 <- tw$x[1]/(U*tw$x[2])
+    U5Pb7 <- tw$x[1]/(U*tw$x[2])
     Pb48Pb7 <- tw$x[3]/tw$x[2]
     J <- matrix(0,4,3)
     J[1,1] <- 1
     J[2,2] <- 1
     J[3,1] <- 1/(U*tw$x[2])
-    J[3,2] <- -U235Pb7/tw$x[2]
+    J[3,2] <- -U5Pb7/tw$x[2]
     J[4,2] <- -Pb48Pb7/tw$x[2]
     J[4,3] <- 1/tw$x[2]
     out <- list()
-    out$x <- c(U238Pb6,Pb48Pb6,U235Pb7,Pb48Pb7)
+    out$x <- c(U8Pb6,Pb48Pb6,U5Pb7,Pb48Pb7)
     out$cov <- J %*% tw$cov[1:3,1:3] %*% t(J)
     names(out$x) <- labels
     colnames(out$cov) <- labels

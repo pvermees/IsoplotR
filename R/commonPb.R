@@ -177,7 +177,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d)
     r86 <- cctw$x['U238Pb206']
     r76 <- cctw$x['Pb207Pb206']
-    cnames <- c('U238Pb206','Pb207Pb206')
+    cnames <- c('U238Pb206','Pb207Pb206') 
     covmat <- tw$cov[cnames,cnames]
     if (project.err){
         f <- (m76-r76)/(c76-r76)
@@ -192,9 +192,9 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     names(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
     out
 }
-correct.common.Pb.with.204 <- function(x,i,c46,c47){
-    U <- settings('iratio','U238U235')[1]
+correct.common.Pb.with.204 <- function(x,i,c46,c47,project.err=TRUE){
     ir <- get.UPb.isochron.ratios(x,i) # 86, 46, 57, 47
+    U <- settings('iratio','U238U235')[1]
     m86 <- ir$x['U238Pb206']
     m46 <- ir$x['Pb204Pb206']
     m57 <- ir$x['U235Pb207']
@@ -202,10 +202,12 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47){
     r75 <- 1/m57 - m47/(m57*c47)
     r68 <- 1/m86 - m46/(m86*c46)
     J <- matrix(0,2,4)
-    J[1,3] <- -r75/m57
-    J[1,4] <- -1/(m57*c47)
-    J[2,1] <- -r68/m86
-    J[2,2] <- -1/(m86*c46)
+    J[1,3] <- -r75/m57       # d75/d57
+    J[2,1] <- -r68/m86       # d68/d86
+    if (project.err){ # don't evaluate for concordia projections
+        J[1,4] <- -1/(m57*c47)   # d75/d47
+        J[2,2] <- -1/(m86*c46)   # d68/d46
+    }
     E <- J %*% ir$cov %*% t(J)
     sr75 <- sqrt(E[1,1])
     sr68 <- sqrt(E[2,2])
@@ -252,8 +254,8 @@ common.Pb.isochron <- function(x,omit=NULL){
         m86 <- get.U238Pb206.ratios(x)[,1]
         c76 <- m76 - slope*m86
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.without.204(x,i,c76[i],lower=TRUE,
-                                                     project.err=FALSE)
+            out[i,] <- correct.common.Pb.without.204(x,i,c76[i],
+                                                     lower=TRUE,project.err=FALSE)
         }
     } else {
         r86 <- age_to_U238Pb206_ratio(tt=tt,st=0,d=x$d)[1]
@@ -270,7 +272,7 @@ common.Pb.isochron <- function(x,omit=NULL){
             m47 <- rr$x['Pb204Pb207']
             m57 <- rr$x['U235Pb207']
             c47 <- m47 - d47d57*m57
-            out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
+            out[i,] <- correct.common.Pb.with.204(x,i,c46,c47,project.err=FALSE)
         }
     }
     out

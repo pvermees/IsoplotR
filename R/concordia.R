@@ -270,6 +270,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
+    wetherill <- (type==1)
     if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -284,7 +285,6 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     lims <- prepare.concordia.line(X2plot,tlim=tlim,type=type,...)
     fit <- NULL
     if (show.age>1){
-        wetherill <- (type==1)
         x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,exterr=exterr,
                                              alpha=alpha,model=(show.age-1),anchor=anchor)
