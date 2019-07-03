@@ -299,7 +299,7 @@ data2york_UPb_helper <- function(x,i1=1,i2=2){
     sX <- sqrt(x$cov[i1,i1])
     Y <- x$x[i2]
     sY <- sqrt(x$cov[i2,i2])
-    rXY <- stats::cov2cor(x$cov)[i1,i2]
+    rXY <- x$cov[i1,i2]/(sX*sY)
     c(X,sX,Y,sY,rXY)
 }
 #' @param inverse toggles between normal and inverse isochron
