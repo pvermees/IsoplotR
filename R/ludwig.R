@@ -119,8 +119,7 @@ ludwig.default <- function(x,...){
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
     fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit[c('par','w','model')]
-    out$cov <- solve(optimHess(fit$par,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,x=x,exterr=exterr))
-    #out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+    out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
     out$n <- length(x)
     mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
     out <- c(out,mswd)
@@ -431,8 +430,8 @@ LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
 LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
     tt <- ta0[1]
     a0 <- ta0[2]
-    l5 <- settings('lambda','U235')
-    l8 <- settings('lambda','U238')
+    l5 <- settings('lambda','U235')[1]
+    l8 <- settings('lambda','U238')[1]
     U <- settings('iratio','U238U235')[1]
     l <- data2ludwig(x,tt=tt,a0=a0,exterr=exterr,w=w)
     rx <- l$rx
@@ -460,7 +459,7 @@ LL.lud.3D.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     l2 <- settings('lambda','Th232')[1]
     l5 <- settings('lambda','U235')[1]
     l8 <- settings('lambda','U238')[1]
-    U <- settings('iratio','U238U235')
+    U <- settings('iratio','U238U235')[1]
     l <- data2ludwig(x,tt=tt,a0=0,b0=b0,exterr=exterr,w=w)
     phi <- l$phi
     R <- l$R
@@ -488,10 +487,10 @@ LL.lud.3D.gr <- function(ta0b0,x,exterr=FALSE,w=0){
                 drdt*r[j]*omega[i2,j2] + r[i]*drdt*omega[i2,j2] +
                 2*( dRdt*r[j]*omega[i1,j2] + R[i]*drdt*omega[i1,j2] +
                     dRdt*phi[j]*omega[i1,j3] + drdt*phi[j]*omega[i2,j3] )
-            dSda0 <- out + drda0*r[j]*omega[i2,j2] + r[i]*drda0*omega[i2,j2] +
-                2*( R[i]*drda0*omega[i1,j2] + drda0*phi[j]*omega[i2,j3] )
-            dSdb0 <- out + dRdb0*R[j]*omega[i1,j1] + R[i]*dRdb0*omega[i1,j1] +
-                2*( dRdb0*r[j]*omega[i1,j2] + dRdb0*phi[j]*omega[i1,j3] )
+            dSda0 <- dSda0 + drda0[i]*r[j]*omega[i2,j2] + r[i]*drda0[j]*omega[i2,j2] +
+                2*( R[i]*drda0[j]*omega[i1,j2] + drda0[i]*phi[j]*omega[i2,j3] )
+            dSdb0 <- dSdb0 + dRdb0[i]*R[j]*omega[i1,j1] + R[i]*dRdb0[j]*omega[i1,j1] +
+                2*( dRdb0[i]*r[j]*omega[i1,j2] + dRdb0[i]*phi[j]*omega[i1,j3] )
         }
     }
     c(dSdt,dSda0,dSdb0)
