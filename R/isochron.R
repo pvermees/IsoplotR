@@ -449,28 +449,18 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     # The calculations that must be done multiple times
     XY <- matrix(0,ns,5)
     for (i in 1:ns){
-        ir <- get.UPb.isochron.ratios(x,i)
+        if (x$format%in%c(4,5,6)) ir <- get.UPb.isochron.ratios.204(x,i)
+        else if (x$format%in%c(7,8)) ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
         if (type==1){                           # 04/06 or 08/06 vs. 38/06
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[1:2])
             XY[i,5] <- stats::cov2cor(ir$cov)[1,2]
+            XY[i,c(1,3)] <- ir$x[1:2]
         } else if (type==2){                    # 04/07 or 08/07 vs. 35/07
             XY[i,c(2,4)] <- sqrt(diag(ir$cov)[3:4])
             XY[i,5] <- stats::cov2cor(ir$cov)[3,4]
+            XY[i,c(1,3)] <- ir$x[3:4]
         } else {
             stop("Incorrect isochron type.")
-        }
-        if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06            
-            XY[i,c(1,3)] <- ir$x[1:2]
-        } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
-            XY[i,c(1,3)] <- ir$x[3:4]
-        } else if (x$format%in%c(7,8) & type==1){   # 08c/06 vs. 38/06
-            XY[i,1] <- ir$x[1]
-            XY[i,3] <- ir$x[2] - ir$x[1]*x$x[i,'Th232U238']*(exp(l2*tt)-1)
-        } else if (x$format%in%c(7,8) & type==2){   # 08c/07 vs. 38/07
-            XY[i,1] <- ir$x[3]
-            XY[i,3] <- ir$x[4] - ir$x[3]*U*x$x[i,'Th232U238']*(exp(l2*tt)-1)
-        } else {
-            stop("Incorrect data format.")
         }
     }
     b <- -a*x0inv

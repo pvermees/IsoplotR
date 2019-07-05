@@ -250,7 +250,7 @@ data2york.default <- function(x,format=1,...){
 #'
 #' @rdname data2york
 #' @export
-data2york.UPb <- function(x,option=1,...){
+data2york.UPb <- function(x,option=1,tt=0,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
     if (option==1){ # 06/38 vs. 07/35
@@ -265,12 +265,12 @@ data2york.UPb <- function(x,option=1,...){
         }
     } else if (option==3 && x$format%in%c(4,5,6)){ # 04/06 vs 38/06
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios(x,i)
+            ir <- get.UPb.isochron.ratios.204(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb204Pb206')
         }
     } else if (option==4 && x$format%in%c(4,5,6)){ # 04/07 vs. 35/07
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios(x,i)
+            ir <- get.UPb.isochron.ratios.204(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
         }
     } else if (option==5 && x$format%in%c(7,8)){ # 08/32 vs. 06/38
@@ -280,12 +280,12 @@ data2york.UPb <- function(x,option=1,...){
         }        
     } else if (option==6 && x$format%in%c(7,8)){ # 08/06 vs. 38/06
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios(x,i)
+            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208Pb206')
         }
     } else if (option==7 && x$format%in%c(7,8)){ # 08/07 vs. 35/07
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios(x,i)
+            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208Pb207')
         }
     } else {

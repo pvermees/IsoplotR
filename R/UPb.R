@@ -197,30 +197,60 @@ tera.wasserburg <- function(x,i){
     class(out) <- "terawasserburg"
     out
 }
-get.UPb.isochron.ratios <- function(x,i){
+get.UPb.isochron.ratios.204 <- function(x,i){
     if (x$format%in%c(4,5,6)){
         labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
-    } else if (x$format%in%c(7,8)){
-        labels <- c('U238Pb206','Pb208Pb206','U235Pb207','Pb208Pb207')
     } else {
         stop('Incorrect input format for the get.UPb.isochron.ratios function.')
     }
     U <- iratio('U238U235')[1]
-    tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06 OR 08/06
-    U8Pb6 <- tw$x[1]
-    Pb48Pb6 <- tw$x[3]
-    U5Pb7 <- tw$x[1]/(U*tw$x[2])
-    Pb48Pb7 <- tw$x[3]/tw$x[2]
+    tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06
+    U8Pb6 <- tw$x['U238Pb206']
+    Pb46 <- tw$x['Pb204Pb206']
+    U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
+    Pb47 <- tw$x['Pb204Pb206']/tw$x['Pb207Pb206']
     J <- matrix(0,4,3)
     J[1,1] <- 1
     J[2,2] <- 1
-    J[3,1] <- 1/(U*tw$x[2])
-    J[3,2] <- -U5Pb7/tw$x[2]
-    J[4,2] <- -Pb48Pb7/tw$x[2]
-    J[4,3] <- 1/tw$x[2]
+    J[3,1] <- 1/(U*tw$x['Pb207Pb206'])
+    J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']
+    J[4,2] <- -Pb47/tw$x['Pb207Pb206']
+    J[4,3] <- 1/tw$x['Pb207Pb206']
     out <- list()
-    out$x <- c(U8Pb6,Pb48Pb6,U5Pb7,Pb48Pb7)
-    out$cov <- J %*% tw$cov[1:3,1:3] %*% t(J)
+    out$x <- c(U8Pb6,Pb46,U5Pb7,Pb47)
+    out$cov <- J %*% tw$cov %*% t(J)
+    names(out$x) <- labels
+    colnames(out$cov) <- labels
+    rownames(out$cov) <- labels
+    out
+}
+get.UPb.isochron.ratios.208 <- function(x,i,tt=0){
+    if (x$format%in%c(7,8)){
+        labels <- c('U238Pb206','Pb208Pb206','U235Pb207','Pb208Pb207')
+    } else {
+        stop('Incorrect input format for the get.UPb.isochron.ratios function.')
+    }
+    l2 <- settings('lambda','Th232')[1]
+    U <- iratio('U238U235')[1]
+    tw <- tera.wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
+    U8Pb6 <- tw$x['U238Pb206']
+    Pb8c6 <- tw$x['Pb208Pb206'] - tw$x['Th232U238']*tw$x['U238Pb206']*(exp(l2*tt)-1)
+    U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
+    Pb8c7 <- Pb8c6/tw$x['Pb207Pb206']
+    J <- matrix(0,4,4)
+    J[1,1] <- 1
+    J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
+    J[2,3] <- 1
+    J[2,4] <- -tw$x['U238Pb206']*(exp(l2*tt)-1)
+    J[3,1] <- 1/(U*tw$x['Pb207Pb206'])
+    J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']
+    J[4,1] <- J[2,1]/tw$x['Pb207Pb206']
+    J[4,2] <- -Pb8c7/tw$x['Pb207Pb206']
+    J[4,3] <- J[2,3]/tw$x['Pb207Pb206']
+    J[4,4] <- J[2,4]/tw$x['Pb207Pb206']
+    out <- list()
+    out$x <- c(U8Pb6,Pb8c6,U5Pb7,Pb8c7)
+    out$cov <- J %*% tw$cov %*% t(J)
     names(out$x) <- labels
     colnames(out$cov) <- labels
     rownames(out$cov) <- labels
