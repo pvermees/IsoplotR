@@ -144,16 +144,15 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     out <- list()
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
-    if (x$format %in% c(1,2,3,7,8) && anchored){
-        out$df <- ns-1
-    } else if (x$format %in% c(1,2,3,7,8)) {
-        out$df <- ns-2
-    } else if (anchored && tanchored){
-        out$df <- 2*ns-2
-    } else if (anchored){
-        out$df <- 2*ns-1
+    if (x$format<4){
+        if (anchored) out$df <- ns-1
+        else out$df <- ns-2
+    } else if (x$format>3){
+        if (anchored && tanchored) out$df <- 2*ns-1
+        else if (tanchored) out$df <- 2*ns-2
+        else out$df <- 2*ns-3
     } else {
-        out$df <- 2*ns-3
+        stop('Incorrect input format')
     }
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)

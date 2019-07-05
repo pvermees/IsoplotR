@@ -418,7 +418,7 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         E <- lud$cov[1:2,1:2]
         x.lab <- quote(''^238*'U/'^206*'Pb')
     } else {                                    # 35/07
-        x0inv <- age_to_U235Pb207_ratio(tt=tt,st=0,d=x$d)[1]
+        x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)[1]
         dx0invdt <- l5*exp(l5*tt) + D$dd1dt
         E <- lud$cov[c(1,3),c(1,3)]
         x.lab <- quote(''^235*'U/'^207*'Pb')
@@ -440,18 +440,18 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         XY <- data2york(x,option=6,tt=tt)
         a <- 1/lud$par['68i']
         y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
-        out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+        out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
     } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
         XY <- data2york(x,option=7,tt=tt)
         U <- settings('iratio','U238U235')[1]
         a <- 1/lud$par['78i']
         y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
-        out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
+        out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
     }
     b <- -a*x0inv
     J <- matrix(0,2,2)
     J[1,2] <- -a^2
-    J[2,1] <- -a*dx0dt
+    J[2,1] <- -a*dx0invdt
     J[2,2] <- x0inv*a^2
     cov.ab <- J%*%E%*%t(J)
     out$a <- c(a,sqrt(cov.ab[1,1]))
