@@ -251,23 +251,19 @@ get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     out
 }
 get.ta0b0.model2.Th <- function(x,anchor=list(FALSE,NA)){
-    xy1 <- data2york(x,option=6)[,c('X','Y'),drop=FALSE] # 08/06 vs 38/06
-    xy2 <- data2york(x,option=7)[,c('X','Y'),drop=FALSE] # 08/07 vs. 35/07
-    z <- x$x[,'Th232U238']
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
     if (!anchor[[1]]){
-        tt <- optimise(SS.model2.Th,interval=tlim,xy1=xy1,xy2=xy2,z=z)$minimum
-        fits <- model2fit.Th(tt=tt,xy1=xy1,xy2=xy2,z=z)
+        tt <- optimise(SS.model2.Th,interval=tlim,x=x)$minimum
+        fits <- model2fit.Th(tt=tt,x=x)
         a0 <- fits$y0[1]
         b0 <- fits$y0[2]
     } else if (is.na(anchor[[2]])){
         a0 <- settings('iratio','Pb206Pb204')[1]
         b0 <- settings('iratio','Pb207Pb204')[1]
-        tt <- optimise(SS.model2.Th,interval=tlim,
-                       xy1=xy1,xy2=xy2,a0=a0,b0=b0,z=z)$minimum
+        tt <- optimise(SS.model2.Th,interval=tlim,x=x,a0=a0,b0=b0)$minimum
     } else if (is.numeric(anchor[[2]])){
         tt <- anchor[[2]]
-        fits <- model2fit.Th(tt=tt,xy1=xy1,xy2=xy2,z=z)
+        fits <- model2fit.Th(tt=tt,x=x)
         a0 <- fits$y0[1]
         b0 <- fits$y0[2]
     }
@@ -279,8 +275,8 @@ SS.model2.3D <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
     fits <- model2fit.3D(tt=tt,xy1=xy1,xy2=xy2,a0=a0,b0=b0,d=d)
     fits$SS
 }
-SS.model2.Th <- function(tt,xy1,xy2,z,a0=NA,b0=NA,d=diseq()){
-    fits <- model2fit.Th(tt=tt,xy1=xy1,xy2=xy2,z=z,a0=a0,b0=b0,d=d)
+SS.model2.Th <- function(tt,x,a0=NA,b0=NA){
+    fits <- model2fit.Th(tt=tt,x=x,a0=a0,b0=b0)
     fits$SS
 }
 model2fit.3D <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
@@ -309,32 +305,39 @@ model2fit.3D <- function(tt,xy1,xy2,a0=NA,b0=NA,d=diseq()){
     out$SS <- SS06 + SS07
     out
 }
-model2fit.Th <- function(tt,xy1,xy2,z,a0=NA,b0=NA,d=diseq()){
-    U <- settings('iratio','U238U235')[1]
-    l2 <- settings('lambda','Th232')[1]
-    x1 <- age_to_U238Pb206_ratio(tt,st=0,d=d)[1]
-    y1 <- xy1[,'Y'] - z*xy1[,'X']*(exp(l2*tt)-1)
+model2fit.Th <- function(tt,x,a0=NA,b0=NA){
+    ns <- length(x)
+    xy <- matrix(0,ns,4)
+    colnames(xy) <- c('U238Pb206','Pb208cPb206','U235Pb207','Pb208cPb207')
+    for (i in 1:ns){
+        xy[i,] <- get.UPb.isochron.ratios.208(x,i,tt=tt)$x
+    }
+    x6 <- xy[,'U238Pb206']
+    y6 <- xy[,'Pb208cPb206']
+    z <- x$x[,'Th232U238']
+    xr6 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
     out <- list()
     out$y0 <- c(0,0) # (06/08)i, (07/08)i
     if (is.na(a0)){
-        fit06 <- stats::lm(y1 ~ I(xy1[,'X']-x1) + 0)
-        out$y0[1] <- -1/(x1*fit06$coef)
+        fit06 <- stats::lm(y6 ~ I(x6-xr6) + 0)
+        out$y0[1] <- -1/(xr6*fit06$coef)
         SS06 <- sum(fit06$residuals^2)
     } else {
         out$y0[1] <- a0
-        yp <- (xy1[,'X']-x1)*a0/x1
-        SS06 <- sum((yp-y1)^2)
+        yp <- (x6-xr6)*a0/xr6
+        SS06 <- sum((yp-y6)^2)
     }
-    x2 <- age_to_U235Pb207_ratio(tt,st=0,d=d)[1]
-    y2 <- xy2[,'Y'] - z*xy2[,'X']*U*(exp(l2*tt)-1)
+    x7 <- xy[,'U235Pb207']
+    y7 <- xy[,'Pb208cPb207']
+    xr7 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
     if (is.na(b0)){
-        fit07 <- stats::lm(y2 ~ I(xy2[,'X']-x2) + 0)
-        out$y0[2] <- -1/(x2*fit07$coef)
+        fit07 <- stats::lm(y7 ~ I(x7-xr7) + 0)
+        out$y0[2] <- -1/(xr7*fit07$coef)
         SS07 <- sum(fit07$residuals^2)
     } else {
         out$y0[2] <- b0
-        yp <- (xy2[,'X']-x2)*b0/x2
-        SS07 <- sum((yp-y2)^2)
+        yp <- (x7-xr7)*b0/xr7
+        SS07 <- sum((yp-y7)^2)
     }
     out$SS <- SS06 + SS07
     out
