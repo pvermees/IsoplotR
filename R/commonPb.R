@@ -376,36 +376,20 @@ SS.SK.with.204 <- function(tt,x,i){
 SS.detrital.with.208 <- function(t8c6,x,i){
     tt <- t8c6[1]
     i8c6 <- t8c6[2] # Pb208c/Pb206
-    l2 <- settings('lambda','Th232')[1]
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
-    U <- settings('iratio','U238U235')[1]
-    tw <- tera.wasserburg(x,i) # 'U238Pb206','Pb207Pb206','Pb208Pb206','Th232U238'
-    E <- tw$cov
-    J <- matrix(0,4,4)
-    X6 <- tw$x['U238Pb206']
-    X7 <- tw$x['U238Pb206']/(tw$x['Pb207Pb206']*U)
-    A6 <- tw$x['Pb208Pb206'] - tw$x['Th232U238']*tw$x['U238Pb206']*(exp(l2*tt)-1)
+    xy <- get.UPb.isochron.ratios.208(x,i,tt=tt) # U8Pb6, Pb8c6, U5Pb7, Pb8c7
+    O <- MASS::ginv(xy$cov)
+    X6 <- xy$x['U238Pb206']
+    A6 <- xy$x['Pb208cPb206'] - i8c6
     B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d)[1]*i8c6
     r76 <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
-    A7 <- A6/tw$x['Pb207Pb206'] - i8c6/r76
-    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d)[1]*i8c6/r76
-    J[1,1] <- 1
-    J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
-    J[2,3] <- 1
-    J[2,4] <- -tw$x['U238Pb206']*(exp(l2*tt)-1)
-    J[3,1] <- 1/(tw$x['Pb207Pb206']*U)
-    J[3,2] <- -X7/tw$x['Pb207Pb206']
-    J[4,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)/tw$x['Pb207Pb206']
-    J[4,3] <- -A6/tw$x['Pb207Pb206']
-    J[4,4] <- -tw$x['U238Pb206']*(exp(l2*tt)-1)/tw$x['Pb207Pb206']
-    ED <- J %*% E %*% t(J)
-    O <- solve(ED)
+    X7 <- xy$x['U235Pb207']
+    A7 <- xy$x['Pb208cPb207'] - i8c6/r76
+    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d)[1]
     # 1. fit 08c/06
     X6.fitted <- (X6*O[1,1] + (A6-i8c6)*O[1,2] + (A6-i8c6)*B6*O[1,2] + (A6-i8c6)*B6*O[2,2])/
         (O[1,1] - 2*B6*O[1,2] + O[2,2]*B6^2)
     K <- X6 - X6.fitted
-    L <- (A6-i8c6) + B6*X6.fitted
+    L <- A6 + B6*X6.fitted
     # 2. fit 08c/07
     X7.fitted <- (X7*O[3,3] + A7*O[3,4] + A7*B7*O[3,4] + A7*B7*O[4,4])/
         (O[3,3] - 2*B7*O[3,4] + O[4,4]*B7^2)
