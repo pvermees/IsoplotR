@@ -263,7 +263,7 @@ model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
         if (x$format %in% c(4,5,6))
             xy[i,] <- get.UPb.isochron.ratios.204(x,i)$x
         else
-            xy[i,] <- get.UPb.isochron.ratios.208(x,i,tt=tt)$x
+            xy[i,] <- get.UPb.isochron.ratios.208(x,i,tt=tt)$x[1:4]
     }
     x6 <- xy[,1] # U238Pb206
     y6 <- xy[,2] # Pb204Pb206 or Pb208cPb206

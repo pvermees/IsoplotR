@@ -226,7 +226,7 @@ get.UPb.isochron.ratios.204 <- function(x,i){
 }
 get.UPb.isochron.ratios.208 <- function(x,i,tt=0){
     if (x$format%in%c(7,8)){
-        labels <- c('U238Pb206','Pb208cPb206','U235Pb207','Pb208cPb207')
+        labels <- c('U238Pb206','Pb208cPb206','U235Pb207','Pb208cPb207','Th232U238')
     } else {
         stop('Incorrect input format for the get.UPb.isochron.ratios function.')
     }
@@ -234,11 +234,10 @@ get.UPb.isochron.ratios.208 <- function(x,i,tt=0){
     U <- iratio('U238U235')[1]
     tw <- tera.wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
     U8Pb6 <- tw$x['U238Pb206']
-    Pb8c6 <- tw$x['Pb208Pb206'] -
-        tw$x['Th232U238']*tw$x['U238Pb206']*(exp(l2*tt)-1)
+    Pb8c6 <- tw$x['Pb208Pb206'] - tw$x['Th232U238']*tw$x['U238Pb206']*(exp(l2*tt)-1)
     U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
     Pb8c7 <- Pb8c6/tw$x['Pb207Pb206']
-    J <- matrix(0,4,4)
+    J <- matrix(0,5,4)
     J[1,1] <- 1
     J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
     J[2,3] <- 1
@@ -249,8 +248,9 @@ get.UPb.isochron.ratios.208 <- function(x,i,tt=0){
     J[4,2] <- -Pb8c7/tw$x['Pb207Pb206']
     J[4,3] <- J[2,3]/tw$x['Pb207Pb206']
     J[4,4] <- J[2,4]/tw$x['Pb207Pb206']
+    J[5,4] <- 1
     out <- list()
-    out$x <- c(U8Pb6,Pb8c6,U5Pb7,Pb8c7)
+    out$x <- c(U8Pb6,Pb8c6,U5Pb7,Pb8c7,tw$x['Th232U238'])
     out$cov <- J %*% tw$cov %*% t(J)
     names(out$x) <- labels
     colnames(out$cov) <- labels
