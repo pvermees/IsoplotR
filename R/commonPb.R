@@ -157,12 +157,67 @@ Pb0corr <- function(x,option=1,omit=NULL){
         out$x[,c('Pb207Pb206','errPb207Pb206')] <- tw[,3:4,drop=FALSE]
         out$x[,c('Pb204Pb207','errPb204Pb207',
                  'Pb204Pb206','errPb204Pb206')] <- 0
-    } else if (x$format==7){ # TODO: correct Pb208 as well.
-        out$x[,c('Pb207U235','errPb207U235',
-                 'Pb206U238','errPb206U238','rhoXY')] <- tw2w(x.corr)
-    } else if (x$format==8){ # TODO: correct Pb208 as well.
-        out$x[,c('U238Pb206','errU238Pb206',
-                 'Pb207Pb206','errPb207Pb206','rhoXY')] <- x.corr
+    } else if (x$format==7){
+        out$x[,'Pb207U235'] <- 1/x.corr[,'U235Pb207']
+        out$x[,'Pb206U238'] <- 1/x.corr[,'U238Pb206']
+        out$x[,'Pb208Th232'] <- 1/x.corr[,'Th232Pb208']
+        out$x[,'Th232U238'] <- x.corr[,'Th232U238']
+        J <- matrix(0,4,4)
+        J[4,4] <- 1
+        for (i in 1:ns){
+            covmat <- cor2cov4(sW=x.corr[i,'errU235Pb207'],sX=x.corr[i,'errU238Pb206'],
+                               sY=x.corr[i,'errTh232Pb208'],sZ=x.corr[i,'errTh232U238'],
+                               rWX=x.corr[i,'rhoXY'],rWY=x.corr[i,'rhoXZ'],
+                               rWZ=x.corr[i,'rhoXW'],rXY=x.corr[i,'rhoYZ'],
+                               rXZ=x.corr[i,'rhoYW'],rYZ=x.corr[i,'rhoZW'])
+            J[1,1] <- -out$x[i,'Pb207U235']/x.corr[i,'U235Pb207']
+            J[2,2] <- -out$x[i,'Pb206U238']/x.corr[i,'U238Pb206']
+            J[3,3] <- -out$x[i,'Pb208Th232']/x.corr[i,'Th232Pb208']
+            E <- J %*% covmat %*% t(J)
+            out$x[i,'errPb207U235'] <- sqrt(E[1,1])
+            out$x[i,'errPb206U238'] <- sqrt(E[2,2])
+            out$x[i,'errPb208Th232'] <- sqrt(E[3,3])
+            out$x[i,'errTh232U238'] <- sqrt(E[4,4])
+            out$x[i,'rhoXY'] <- E[1,2]/sqrt(E[1,1]*E[2,2])
+            out$x[i,'rhoXZ'] <- E[1,3]/sqrt(E[1,1]*E[3,3])
+            out$x[i,'rhoXW'] <- E[1,4]/sqrt(E[1,1]*E[4,4])
+            out$x[i,'rhoYZ'] <- E[2,3]/sqrt(E[2,2]*E[3,3])
+            out$x[i,'rhoYW'] <- E[2,4]/sqrt(E[2,2]*E[4,4])
+            out$x[i,'rhoZW'] <- E[3,4]/sqrt(E[3,3]*E[4,4])
+        }
+    } else if (x$format==8){
+        U <- settings('iratio','U238U235')[1]
+        out$x[,'U238Pb206'] <- x.corr[,'U238Pb206']
+        out$x[,'Pb207Pb206'] <- x.corr[,'U238Pb206']/(U*x.corr[,'U235Pb207'])
+        out$x[,'Pb208Pb206'] <-
+            x.corr[,'U238Pb206']*x.corr[,'Th232U238']/x.corr[,'Th232Pb208']
+        out$x[,'Th232U238'] <- x.corr[,'Th232U238']
+        J <- matrix(0,4,4)
+        J[1,2] <- 1
+        J[4,4] <- 1
+        for (i in 1:ns){
+            covmat <- cor2cov4(sW=x.corr[i,'errU235Pb207'],sX=x.corr[i,'errU238Pb206'],
+                               sY=x.corr[i,'errTh232Pb208'],sZ=x.corr[i,'errTh232U238'],
+                               rWX=x.corr[i,'rhoXY'],rWY=x.corr[i,'rhoXZ'],
+                               rWZ=x.corr[i,'rhoXW'],rXY=x.corr[i,'rhoYZ'],
+                               rXZ=x.corr[i,'rhoYW'],rYZ=x.corr[i,'rhoZW'])
+            J[2,1] <- -out$x[i,'Pb207Pb206']/x.corr[i,'U235Pb207']
+            J[2,2] <- 1/(U*x.corr[i,'U235Pb207'])
+            J[3,2] <- x.corr[i,'Th232U238']/x.corr[i,'Th232Pb208']
+            J[3,3] <- -out$x[i,'Pb208Pb206']/x.corr[i,'Th232Pb208']
+            J[3,4] <- x.corr[i,'U238Pb206']/x.corr[i,'Th232Pb208']
+            E <- J %*% covmat %*% t(J)
+            out$x[i,'errU238Pb206'] <- sqrt(E[1,1])
+            out$x[i,'errPb207Pb206'] <- sqrt(E[2,2])
+            out$x[i,'errPb208Pb206'] <- sqrt(E[3,3])
+            out$x[i,'errTh232U238'] <- sqrt(E[4,4])
+            out$x[i,'rhoXY'] <- E[1,2]/sqrt(E[1,1]*E[2,2])
+            out$x[i,'rhoXZ'] <- E[1,3]/sqrt(E[1,1]*E[3,3])
+            out$x[i,'rhoXW'] <- E[1,4]/sqrt(E[1,1]*E[4,4])
+            out$x[i,'rhoYZ'] <- E[2,3]/sqrt(E[2,2]*E[3,3])
+            out$x[i,'rhoYW'] <- E[2,4]/sqrt(E[2,2]*E[4,4])
+            out$x[i,'rhoZW'] <- E[3,4]/sqrt(E[3,3]*E[4,4])
+        }
     } else {
         stop('Incorrect input format.')
     }
@@ -223,23 +278,29 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
     x3806 <- ir$x['U238Pb206'] + ir$x['Pb208cPb206']*r3806/c0806
     x3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507/c0807
     x3208 <- x3806*ir$x['Th232U238']/ir$x['Pb208cPb206']
-    J <- matrix(0,3,5)
+    x3238 <- ir$x['Th232U238']
+    J <- matrix(0,4,5)
     J[1,1] <- 1
     J[1,2] <- r3806/c0806
     J[2,3] <- 1
     J[2,4] <- r3507/c0807
     J[3,2] <- ir$x['Th232U238']/ir$x['Pb208cPb206']
     J[3,5] <- ir$x['U238Pb206']/ir$x['Pb208cPb206'] + r3806/c0806
+    J[4,5] <- 1
     E <- J %*% ir$cov %*% t(J)
-    out <- rep(0,9)
+    out <- rep(0,14)
     names(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
-                    'Th232Pb208','errTh232Pb208','rhoXY','rhoXZ','rhoYZ')
-    out[c(1,3,5)] <- c(x3806,x3507,x3208)
-    out[c(2,4,6)] <- sqrt(diag(E))
+                    'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
+                    'rhoXY','rhoYZ','rhoYW','rhoYZ','rhoYW','rhoZW')
+    out[c(1,3,5,7)] <- c(x3806,x3507,x3208,x3238)
+    out[c(2,4,6,8)] <- sqrt(diag(E))
     cormat <- stats::cov2cor(E)
-    out[7] <- cormat[1,2]
-    out[8] <- cormat[1,3]
-    out[9] <- cormat[2,3]
+    out[9] <- cormat[1,2]
+    out[10] <- cormat[1,3]
+    out[11] <- cormat[1,4]
+    out[12] <- cormat[2,3]
+    out[13] <- cormat[2,4]
+    out[14] <- cormat[3,4]
     out
 }
 
@@ -267,9 +328,10 @@ common.Pb.stacey.kramers <- function(x){
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
         }
     } else if (x$format %in% c(7,8)){
-        out <- matrix(0,ns,9)
+        out <- matrix(0,ns,14)
         colnames(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
-                           'Th232Pb208','errTh232Pb208','rhoXY','rhoXZ','rhoYZ')
+                           'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
+                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
         for (i in 1:ns){
             tint <- stats::optimise(SS.SK.with.208,
                                     interval=c(0,5000),x=x,i=i)$minimum
