@@ -440,13 +440,13 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         XY <- data2york(x,option=6,tt=tt)
         a <- 1/lud$par['68i']
         y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
-        out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
+        out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
     } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
         XY <- data2york(x,option=7,tt=tt)
         U <- settings('iratio','U238U235')[1]
         a <- 1/lud$par['78i']
         y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
-        out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
+        out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
     }
     b <- -a*x0inv
     J <- matrix(0,2,2)
@@ -457,8 +457,8 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$a <- c(a,sqrt(cov.ab[1,1]))
     out$b <- c(b,sqrt(cov.ab[2,2]))
     out$cov.ab <- cov.ab[1,2]
-    out$y0[1] <- 1/out$a[1]
-    out$y0[2] <- out$y0[1]*out$a[2]/out$a[1]
+    out$y0[1] <- out$a[1]
+    out$y0[2] <- out$a[2]
     out$age['ci[t]'] <- out$fact*out$age['s[t]']
     out$y0['ci[y]'] <- out$fact*out$y0['s[y]']
     if (model==1){

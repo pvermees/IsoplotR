@@ -397,20 +397,31 @@ common.Pb.isochron <- function(x,omit=NULL){
 
 common.Pb.nominal <- function(x){
     ns <- length(x)
-    out <- matrix(0,ns,5)
     if (x$format %in% c(1,2,3)){
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
         c76 <- settings('iratio','Pb207Pb206')[1]
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=TRUE)
         }
     } else if (x$format %in% c(4,5,6)){
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
         c46 <- 1/settings('iratio','Pb206Pb204')[1]
         c47 <- 1/settings('iratio','Pb207Pb204')[1]
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
         }
     } else if (x$format %in% c(7,8)){
-        # TODO
+        out <- matrix(0,ns,14)
+        colnames(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
+                           'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
+                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
+        c0806 <- settings('iratio','Pb208Pb206')[1]
+        c0807 <- settings('iratio','Pb208Pb207')[1]
+        for (i in 1:ns){
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,c0807=c0807)
+        }
     }
     out
 }
