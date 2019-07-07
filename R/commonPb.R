@@ -417,10 +417,12 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
                            'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
                            'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
-        c0806 <- settings('iratio','Pb208Pb206')[1]
-        c0807 <- settings('iratio','Pb208Pb207')[1]
+        c86 <- settings('iratio','Pb208Pb206')[1]
+        c87 <- settings('iratio','Pb208Pb207')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,c0807=c0807)
+            tint <- stats::optimise(SS.with.208,interval=c(0,5000),
+                                    c86=c86,c87=c87,x=x,i=i)$minimum
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0806=c86,c0807=c87)
         }
     }
     out
@@ -460,15 +462,18 @@ SS.SK.with.204 <- function(tt,x,i){
     ccw$cov <- J %*% wi$cov %*% t(J)
     LL.concordia.age(tt,ccw,mswd=FALSE,exterr=FALSE,d=x$d)
 }
-SS.SK.with.208 <- function(x,i,tt,c86,c87){
-    xy <- get.UPb.isochron.ratios.208(x,i,tt=tt) # U8Pb6, Pb8c6, U5Pb7, Pb8c7
+SS.SK.with.208 <- function(tt,x,i){
     i678 <- stacey.kramers(tt)
-    i86 <- i678['i84']/i678['i64']
-    i87 <- i678['i84']/i678['i74']
+    c86 <- i678['i84']/i678['i64']
+    c87 <- i678['i84']/i678['i74']
+    SS.with.208(tt,x,i,c86,c87)
+}
+SS.with.208 <- function(tt,x,i,c86,c87){
+    xy <- get.UPb.isochron.ratios.208(x,i,tt=tt) # U8Pb6, Pb8c6, U5Pb7, Pb8c7
     O6 <- solve(xy$cov[1:2,1:2])
     X6 <- xy$x['U238Pb206']
-    A6 <- xy$x['Pb208cPb206'] - i86
-    B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d)[1]*i86
+    A6 <- xy$x['Pb208cPb206'] - c86
+    B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d)[1]*c86
     # 1. fit 08c/06
     X6.fitted <- (X6*O6[1,1] + A6*O6[1,2] + A6*B6*O6[1,2] +
                   A6*B6*O6[2,2]) / (O6[1,1] - 2*B6*O6[1,2] + O6[2,2]*B6^2)
@@ -479,8 +484,8 @@ SS.SK.with.208 <- function(x,i,tt,c86,c87){
     # 2. fit 08c/07
     O7 <- solve(xy$cov[3:4,3:4])
     X7 <- xy$x['U235Pb207']
-    A7 <- xy$x['Pb208cPb207'] - i87
-    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d)[1]*i87
+    A7 <- xy$x['Pb208cPb207'] - c87
+    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d)[1]*c87
     X7.fitted <- (X7*O7[1,1] + A7*O7[1,2] + A7*B7*O7[1,2] +
                   A7*B7*O7[2,2]) / (O7[1,1] - 2*B7*O7[1,2] + O7[2,2]*B7^2)
     K7 <- X7 - X7.fitted
