@@ -291,7 +291,7 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
     out <- rep(0,14)
     names(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
                     'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
-                    'rhoXY','rhoYZ','rhoYW','rhoYZ','rhoYW','rhoZW')
+                    'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
     out[c(1,3,5,7)] <- c(x3507,x3806,x3208,x3238)
     out[c(2,4,6,8)] <- sqrt(diag(E))
     cormat <- stats::cov2cor(E)
@@ -348,9 +348,10 @@ common.Pb.isochron <- function(x,omit=NULL){
     ns <- length(x)
     calcit <- (1:ns)%ni%omit
     fit <- ludwig(subset(x,subset=calcit))
-    out <- matrix(0,ns,5)
     tt <- fit$par[1]
     if (x$format %in% c(1,2,3)){
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
         rr <- age_to_terawasserburg_ratios(tt,d=x$d)$x
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
         m76 <- get.Pb207Pb206.ratios(x)[,1]
@@ -361,6 +362,8 @@ common.Pb.isochron <- function(x,omit=NULL){
                                                      lower=TRUE,project.err=FALSE)
         }
     } else if (x$format %in% c(4,5,6)){
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
         r86 <- age_to_U238Pb206_ratio(tt=tt,st=0,d=x$d)[1]
         i46 <- 1/fit$par['64i']
         d46d86 <- -i46/r86
@@ -378,7 +381,16 @@ common.Pb.isochron <- function(x,omit=NULL){
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47,project.err=FALSE)
         }
     } else if (x$format %in% c(7,8)){
-        # TODO
+        out <- matrix(0,ns,14)
+        colnames(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
+                           'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
+                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
+        c0806 <- 1/fit$par['68i']
+        c0807 <- 1/fit$par['78i']
+        for (i in 1:ns){
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,
+                                                  c0807=c0807,project.err=FALSE)
+        }
     }
     out
 }
@@ -560,10 +572,4 @@ get.search.limit <- function(a,b,d,m,M){
         if (misfit<0) return(tt)
     }
     return(NA)
-}
-project.concordia.new <- function(m86,m76,c76,d=diseq(),lower=TRUE){
-    a <- 1/m86 - m76/(m86*c76)
-    b <- 1/(c76*iratio('U238U235')[1])
-    fit <- concordia.intersection.ab(a,b,wetherill=TRUE,d=d)
-    fit['t[u]']
 }
