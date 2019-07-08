@@ -154,18 +154,19 @@ wendt <- function(tt,d=diseq()){
         else if (tt>(fact/l0) & d$Th0U8!=1) ttt <- fact/l0
         else if (tt>(fact/l4) & d$U48!=1) ttt <- fact/l4
         else ttt <- tt
-        if (d$Ra6U8!=1){
-            Ra6U8u <- (d$Ra6U8-1)*exp(l6*ttt)
-            Ra6U8x <- (d$Th0U8-1)*(exp(l6*ttt)-exp(l0*ttt))*l6/(l6-l0)
-            dd$Ra6U8 <- max(0, 1 + Ra6U8u + Ra6U8x)
-        }
-        if (d$Th0U8!=1){
-            Th0U8u <- (d$Th0U8-1)*exp(l0*ttt)
-            Th0U8x <- (d$U48-1)*(exp(l0*ttt)-exp(l4*ttt))*l0/(l0-l4)
-            dd$Th0U8 <- max(0, 1 + Th0U8u + Th0U8x)
-        }
         if (d$U48!=1){
             dd$U48 <- max(0, 1 + (d$U48-1)*exp(l4*ttt))
+        }
+        if (d$Th0U8!=1){
+            Th0U8x <- (d$Th0U8-1)*exp(l0*ttt)
+            Th0U8u <- (dd$U48-1)*(exp(-l0*ttt)-exp(-l4*ttt))*l0/(l0-l4)
+            dd$Th0U8 <- max(0, 1 + Th0U8u + Th0U8x)
+        }
+        if (d$Ra6U8!=1){
+            Ra6U8x <- (d$Ra6U8-1)*exp(l6*ttt)
+            Ra6U8th <- (dd$Th0U8-1)*(1-exp((l6-l0)*ttt))*l6/(l6-l0)
+            Ra6U8u <- (dd$U48-1)*(1-exp((l6-l0-l4)*ttt))*l6/(l6-l4)
+            dd$Ra6U8 <- max(0, 1 + Ra6U8u + Ra6U8th + Ra6U8x)
         }
         if (d$Pa1U5!=1){
             dd$Pa1U5 <- max(0, 1 + (d$Pa1U5-1)*exp(l1*ttt))
