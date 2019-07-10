@@ -143,6 +143,7 @@ geomean.diseq <- function(x,...){
 wendt <- function(tt,d=diseq()){
     dd <- geomean(d)
     if (d$option==2){
+        l8 <- settings('lambda','U238')[1]
         l4 <- settings('lambda','U234')[1]*1000
         l0 <- settings('lambda','Th230')[1]*1000
         l6 <- settings('lambda','Ra226')[1]*1000
@@ -154,6 +155,10 @@ wendt <- function(tt,d=diseq()){
         else if (tt>(fact/l0) & d$Th0U8!=1) ttt <- fact/l0
         else if (tt>(fact/l4) & d$U48!=1) ttt <- fact/l4
         else ttt <- tt
+        if (ttt!=tt){
+            warning('The measured degree of disequilibrium is impossible for a ',
+                   'sample of this age, so I used a different activity ratio instead.')
+        }
         if (d$U48!=1){
             dd$U48 <- max(0, 1 + (d$U48-1)*exp(l4*ttt))
         }
