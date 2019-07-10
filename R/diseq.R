@@ -92,217 +92,177 @@
 #' secondary U minerals. Earth and Planetary Science Letters, 73(2-4),
 #' pp.278-284.
 #' @export
-diseq <- function(option=0,
-                  U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
-                  fThU=1,fRaU=1,fPaU=1,ThU=1){
-    out <- list(option=option)
+diseq <- function(U48=list(x=1,sx=0,option=0),
+                  ThU=list(x=1,sx=0,option=0),
+                  RaU=list(x=1,sx=0,option=0),
+                  PaU=list(x=1,sx=0,option=0)){
+    out <- list()
     class(out) <- 'diseq'
-    if (option<3){
-        out$U48=U48
-        out$Th0U8=Th0U8
-        out$Ra6U8=Ra6U8
-        out$Pa1U5=Pa1U5
-    } else {
-        out$fThU = fThU
-        out$fRaU = fRaU
-        out$fPaU = fPaU
-        if (option==4) out$ThU = ThU
-    }
+    out$U48 <- U48
+    out$ThU <- ThU
+    out$RaU <- RaU
+    out$PaU <- PaU
     out
+}
+
+equilibrium <- function(d){
+    d$U48$option==0 & d$ThU$option==0 & d$RaU$option==0 & d$PaU$option==0
 }
 
 #' @export
 `[.diseq` <- function(x,i){
     out <- x
     for (j in 1:length(x)){
-        if (length(x[[j]])<i)
-            out[[j]] <- x[[j]][1]
+        if (length(x[[j]]$x)<i)
+            out[[j]]$x <- x[[j]]$x[1]
         else
-            out[[j]] <- x[[j]][i]
+            out[[j]]$x <- x[[j]]$x[i]
     }
     out
 }
 
 copy_diseq <- function(x,d=diseq){
     out <- d
-    if (d$option==4){
+    if (d$ThU$option==3){
         if (x$format>6){
             U <- settings('iratio','U238U235')[1]
-            out$fThU <- (x$x[,'Th232U238']/d$ThU)*U/(1+U)
+            out$ThU$x <- (x$x[,'Th232U238']/d$ThU$x)*U/(1+U)
         }
-        out$option <- 3
+        out$ThU$option <- 1
     }
     out
 }
 
 geomean.diseq <- function(x,...){
-    lapply(x, 'geomean.default')
+    out <- x
+    if (x$U48$option>0) out$U48$x <- geomean(x$U48$x)
+    if (x$ThU$option>0) out$ThU$x <- geomean(x$ThU$x)
+    if (x$RaU$option>0) out$RaU$x <- geomean(x$RaU$x)
+    if (x$PaU$option>0) out$PaU$x <- geomean(x$PaU$x)
+    out
 }
 
 # from Wendt & Carl (1985, EPSL):
 wendt <- function(tt,d=diseq()){
     dd <- geomean(d)
-    if (d$option==2){
-        l8 <- settings('lambda','U238')[1]
-        l4 <- settings('lambda','U234')[1]*1000
-        l0 <- settings('lambda','Th230')[1]*1000
-        l6 <- settings('lambda','Ra226')[1]*1000
-        l1 <- settings('lambda','Pa231')[1]*1000
-        # the next 6 lines are safety measures against bad input
-        fact <- 20
-        if (tt>(fact/l6) & d$Ra6U8!=1) ttt <- fact/l6
-        else if (tt>(fact/l1) & d$Pa1U5!=1) ttt <- fact/l1
-        else if (tt>(fact/l0) & d$Th0U8!=1) ttt <- fact/l0
-        else if (tt>(fact/l4) & d$U48!=1) ttt <- fact/l4
-        else ttt <- tt
-        if (ttt!=tt){
-            warning('The measured degree of disequilibrium is impossible for a ',
-                   'sample of this age, so I used a different activity ratio instead.')
-        }
-        if (d$U48!=1){
-            dd$U48 <- max(0, 1 + (d$U48-1)*exp(l4*ttt))
-        }
-        if (d$Th0U8!=1){
-            Th0U8x <- (d$Th0U8-1)*exp(l0*ttt)
-            Th0U8u <- (dd$U48-1)*(exp(-l0*ttt)-exp(-l4*ttt))*l0/(l0-l4)
-            dd$Th0U8 <- max(0, 1 + Th0U8u + Th0U8x)
-        }
-        if (d$Ra6U8!=1){
-            Ra6U8x <- (d$Ra6U8-1)*exp(l6*ttt)
-            Ra6U8th <- (dd$Th0U8-1)*(1-exp((l6-l0)*ttt))*l6/(l6-l0)
-            Ra6U8u <- (dd$U48-1)*(1-exp((l6-l0-l4)*ttt))*l6/(l6-l4)
-            dd$Ra6U8 <- max(0, 1 + Ra6U8u + Ra6U8th + Ra6U8x)
-        }
-        if (d$Pa1U5!=1){
-            dd$Pa1U5 <- max(0, 1 + (d$Pa1U5-1)*exp(l1*ttt))
-        }
+    fact <- 20
+    err <- FALSE
+    l4 <- settings('lambda','U234')[1]*1000
+    l0 <- settings('lambda','Th230')[1]*1000
+    l6 <- settings('lambda','Ra226')[1]*1000
+    # calculate A0, B0, C0 and D0 (Wendt and Carl, 1985)
+    # 1. A0
+    if (dd$U48$option==0){
+        dd$U48$A0 <- 0
+    } else if (tt>(fact/l4)){ # expired
+        if (dd$U48$option==2) err <- TRUE
+        dd$U48$A0 <- dd$U48$x-1
+    } else if (dd$U48$option==2){ # back-calculate
+        dd$U48$A0 <- max(-1, (dd$U48$x-1)*exp(l4*tt))
+    } else { # option 1
+        dd$U48$A0 <- dd$U48$x-1
     }
-    out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,
-                d2d1dt2=0,d2d2dt2=0,dd1dl5=0,dd2dl8=0)
-    if (d$option>0){
-        out$d1 <- d1(tt,dd=dd)
-        out$d2 <- d2(tt,dd=dd)
-        out$dd1dt <- dd1dt(tt,dd=dd)
-        out$dd2dt <- dd2dt(tt,dd=dd)
-        out$d2d1dt2 <- d2d1dt2(tt,dd=dd)
-        out$d2d2dt2 <- d2d2dt2(tt,dd=dd)
-        out$dd1dl5 <- dd1dl5(tt,dd=dd)
-        out$dd2dl8 <- dd2dl8(tt,dd=dd)
+    # 2. B0
+    if (dd$ThU$option==0){
+        dd$ThU$B0 <- 0
+    } else if (tt>(fact/l0)){ # expired
+        if (dd$ThU$option==2) err <- TRUE
+        dd$ThU$B0 <- dd$ThU$x-1
+    } else if (dd$ThU$option==2){
+        ThUx <- (dd$ThU$x-1)*exp(l0*tt)
+        ThUu <- dd$U48$A0*(1-exp((l0-l4)*tt))*l0/(l0-l4)
+        dd$ThU$B0 <- max(-1, ThUu + ThUx)
+    } else { # option 1
+        dd$ThU$B0 <- dd$ThU$x-1
     }
+    # 3. C0
+    if (dd$RaU$option==0){
+        dd$RaU$C0 <- 0
+    } else if (tt>(fact/l6)){ # expired
+        if (dd$RaU$option==2) err <- TRUE
+        dd$RaU$C0 <- dd$RaU$x-1
+    } else if (dd$RaU$option==2){
+        RaUx <- (dd$RaU$x-1)*exp(l6*tt)
+        RaUth <- dd$ThU$B0*(1-exp((l6-l0)*tt))*l6/(l6-l0)
+        RaUu <- dd$U48$A0*(1-exp((l6-l0-l4)*tt))*l6/(l6-l4)
+        dd$RaU$C0 <- max(-1, RaUu + RaUth + RaUx)
+    } else {
+        dd$RaU$C0 <- dd$RaU$x-1
+    }
+    # 4. D0
+    if (dd$PaU$option==0){
+        dd$PaU$D0 <- 0
+    } else if (tt>(fact/l1)){
+        if (dd$PaU$option==2) err <- TRUE
+        dd$PaU$D0 <- dd$PaU$x-1
+    } else if (dd$PaU$option==2){
+        dd$PaU$D0 <- max(-1, (dd$PaU$x-1)*exp(l1*tt))
+    } else {
+        dd$D0 <- dd$PaU$x-1
+    }
+    if (err){
+        warning('The measured degree of disequilibrium is ',
+                'impossible for a sample of this age.')
+    }
+    out <- list()
+    out$d1 <- d1(tt,dd=dd)
+    out$d2 <- d2(tt,dd=dd)
+    out$dd1dt <- dd1dt(tt,dd=dd)
+    out$dd2dt <- dd2dt(tt,dd=dd)
+    out$d2d1dt2 <- d2d1dt2(tt,dd=dd)
+    out$d2d2dt2 <- d2d2dt2(tt,dd=dd)
+    out$dd1dl5 <- dd1dl5(tt,dd=dd)
+    out$dd2dl8 <- dd2dl8(tt,dd=dd)
     out
 }
 d1 <- function(tt,dd=diseq()){
     l1 <- settings('lambda','Pa231')[1]*1000
     l5 <- settings('lambda','U235')[1]
-    if (dd$option < 3){
-        D0 <- dd$Pa1U5 - 1
-        out <- D0*(l5/l1)*exp(l5*tt)*(1-exp(-l1*tt))
-    } else {
-        out <- (l5/l1)*(dd$fPaU-1)
-    }
-    out
+    dd$PaU$D0*(l5/l1)*(1-exp(-l1*tt))
 }
 d2 <- function(tt,dd=diseq()){
-    l4 <- settings('lambda','U234')[1]*1000
-    l6 <- settings('lambda','Ra226')[1]*1000
-    l0 <- settings('lambda','Th230')[1]*1000
+    K <- K1234(dd)
+    K$K1*exp(-K$l4*tt) + K$K2*exp(-K$l0*tt) + K$K3*exp(-K$l6*tt) + K$K4
+}
+K1234 <- function(dd=diseq()){
     l8 <- settings('lambda','U238')[1]
-    if (dd$option<3){
-        A0 <- dd$U48 - 1
-        B0 <- dd$Th0U8 - 1
-        C0 <- dd$Ra6U8 - 1
-        K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
-        K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
-        K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
-        K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
-        out <- exp(l8*tt)*(K1*exp(-l4*tt)+K2*exp(-l0*tt)+K3*exp(-l6*tt)+K4)
-    } else {
-        out <- (l8/l0)*(dd$fThU-1) + (l8/l6)*(dd$fRaU-1)
-    }
+    l4 <- settings('lambda','U234')[1]*1000
+    l0 <- settings('lambda','Th230')[1]*1000
+    l6 <- settings('lambda','Ra226')[1]*1000
+    out <- list(l8=l8,l4=l4,l0=l0,l6=l6)
+    out$K1 <- -dd$U48$A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
+    out$K2 <- (l8*l6/(l6-l0))*(dd$U48$A0/(l0-l4)-dd$ThU$B0/l0)
+    out$K3 <- (l8/(l6-l0))*(dd$ThU$B0-l0*dd$U48$A0/(l6-l4))-dd$RaU$C0*l8/l6
+    out$K4 <- dd$U48$A0*l8/l4 + dd$ThU$B0*l8/l0 + dd$RaU$C0*l8/l6
     out
 }
 dd1dl5 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        l5 <- settings('lambda','U235')[1]
-        out <- d1(tt,dd=dd)*(tt+1/l5)
-    } else {
-        l1 <- settings('lambda','Pa231')[1]*1000
-        out <- (dd$fPaU-1)/l1
-    }
-    out
+    l5 <- settings('lambda','U235')[1]
+    d1(tt,dd=dd)/l5
 }
 dd2dl8 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        l8 <- settings('lambda','U238')[1]
-        out <- d2(tt,dd=dd)*(tt+1/l8)
-    } else {
-        l0 <- settings('lambda','Th230')[1]*1000
-        l6 <- settings('lambda','Ra226')[1]*1000
-        out <- (dd$fThU-1)/l0 + (dd$fRaU-1)/l6
-    }
-    out
+    l8 <- settings('lambda','U238')[1]
+    d2(tt,dd=dd)/l8
 }
 dd1dt <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        l5 <- settings('lambda','U235')[1]
-        l1 <- settings('lambda','Pa231')[1]*1000
-        D0 <- dd$Pa1U5 - 1
-        out <- l5*d1(tt,dd=dd) + D0*l5*exp((l5-l1)*tt)
-    } else {
-        out <- 0
-    }
-    out
+    l5 <- settings('lambda','U235')[1]
+    l1 <- settings('lambda','Pa231')[1]*1000
+    l5*dd$PaU$D0*exp(-l1*tt)
 }
 d2d1dt2 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        D0 <- dd$Pa1U5 - 1
-        l5 <- settings('lambda','U235')[1]
-        l1 <- settings('lambda','Pa231')[1]*1000
-        out <- l5*l5*d1(tt,dd=dd) + D0*l5*(l5-l1)*exp((l5-l1)*tt)
-    } else {
-        out <- 0
-    }
-    out
+    l1 <- settings('lambda','Pa231')[1]*1000
+    -l1*dd1dt(tt,dd=dd)
 }
 dd2dt <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        A0 <- dd$U48 - 1
-        B0 <- dd$Th0U8 - 1
-        C0 <- dd$Ra6U8 - 1    
-        l6 <- settings('lambda','Ra226')[1]*1000
-        l0 <- settings('lambda','Th230')[1]*1000
-        l4 <- settings('lambda','U234')[1]*1000
-        l8 <- settings('lambda','U238')[1]
-        K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
-        K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
-        K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
-        K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
-        out <- (l8-l4)*K1*exp((l8-l4)*tt) + (l8-l0)*K2*exp((l8-l0)*tt) +
-            (l8-l6)*K3*exp((l8-l6)*tt) + l8*K4*exp(l8*tt)
-    } else {
-        out <- 0
-    }
+    K <- K1234(dd)
+    out <- - K$l4*K$K1*exp(-K$l4*tt) - K$l0*K$K2*exp(-K$l0*tt) -
+        K$l6*K$K3*exp(-K$l6*tt)
     out
 }
 d2d2dt2 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        A0 <- dd$U48 - 1
-        B0 <- dd$Th0U8 - 1
-        C0 <- dd$Ra6U8 - 1
-        l6 <- settings('lambda','Ra226')[1]*1000
-        l0 <- settings('lambda','Th230')[1]*1000
-        l4 <- settings('lambda','U234')[1]*1000
-        l8 <- settings('lambda','U238')[1]
-        K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
-        K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
-        K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
-        K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
-        out <- (l8-l4)*(l8-l4)*K1*exp((l8-l4)*tt) +
-            (l8-l0)*(l8-l0)*K2*exp((l8-l0)*tt) +
-            (l8-l6)*(l8-l6)*K3*exp((l8-l6)*tt) + K4*l8*exp(l8*tt)
-    } else {
-        out <- 0
-    }
+    K <- K1234(dd)
+    out <- K$K1*exp(-K$l4*tt)*K$l4^2 + K$K2*exp(-K$l0*tt)*K$l0^2 +
+        K$K3*exp(-K$l6*tt)*K$l6^2
     out
 }
 diseq.75.misfit <- function(tt,x,d){

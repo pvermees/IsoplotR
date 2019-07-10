@@ -744,7 +744,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         sl5 <- lambda('U235')[2]
         if (x>-1) t.75 <- log(1+x)/l5 else t.75 <- 0
         J <- matrix(0,1,2)
-        if (d$option==0){
+        if (equilibrium(d)){
             J[1,1] <- 1/(l5*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         } else { # apply a disequilibrium correction
@@ -797,7 +797,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         sl8 <- lambda('U238')[2]
         if (x>-1) t.init <- log(1+x)/l8 else t.init <- 0
         J <- matrix(0,1,2)
-        if (d$option==0){
+        if (equilibrium(d)){
             t.68 <- t.init
             J[1,1] <- 1/(l8*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl8
