@@ -272,22 +272,22 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47,project.err=TRUE){
     out
 }
 correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
-    ir <- get.UPb.isochron.ratios.208(x,i,tt=tt) # 38/06, 08/06, 35/07, 08/07, 32/38
+    ir <- get.UPb.isochron.ratios.208(x,i,tt=tt) # 38/06 08c/06 35/07 08c/07 32/38 32/08
     r3507 <- age_to_U235Pb207_ratio(tt=tt,d=x$d)[1]
     r3806 <- age_to_U238Pb206_ratio(tt=tt,d=x$d)[1]
     x3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507/c0807
     x3806 <- ir$x['U238Pb206'] + ir$x['Pb208cPb206']*r3806/c0806
-    x3208 <- x3806*ir$x['Th232U238']/ir$x['Pb208cPb206']
+    x3208 <- 1/(exp(lambda('Th232')[1]*tt) - 1)
     x3238 <- ir$x['Th232U238']
-    J <- matrix(0,4,5)
+    J <- matrix(0,4,6)
     J[1,3] <- 1
     J[1,4] <- r3507/c0807
     J[2,1] <- 1
     J[2,2] <- r3806/c0806
-    J[3,2] <- ir$x['Th232U238']/ir$x['Pb208cPb206']
-    J[3,5] <- ir$x['U238Pb206']/ir$x['Pb208cPb206'] + r3806/c0806
+    J[3,6] <- 1
     J[4,5] <- 1
     E <- J %*% ir$cov %*% t(J)
+    wr <- wetherill(x,i)
     out <- rep(0,14)
     names(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
                     'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',

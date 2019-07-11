@@ -150,6 +150,7 @@ wendt <- function(tt,d=diseq()){
     l4 <- settings('lambda','U234')[1]*1000
     l0 <- settings('lambda','Th230')[1]*1000
     l6 <- settings('lambda','Ra226')[1]*1000
+    l1 <- settings('lambda','Pa231')[1]*1000
     # calculate A0, B0, C0 and D0 (Wendt and Carl, 1985)
     # 1. A0
     if (dd$U48$option==0){
@@ -198,7 +199,7 @@ wendt <- function(tt,d=diseq()){
     } else if (dd$PaU$option==2){
         dd$PaU$D0 <- max(-1, (dd$PaU$x-1)*exp(l1*tt))
     } else {
-        dd$D0 <- dd$PaU$x-1
+        dd$PaU$D0 <- dd$PaU$x-1
     }
     if (err){
         warning('The measured degree of disequilibrium is ',
