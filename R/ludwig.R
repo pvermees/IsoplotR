@@ -787,8 +787,6 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         f1 <- exp(l5[1]*tt)-1 + D$d1
         f2 <- exp(l8[1]*tt)-1 + D$d2
         B <-  f1/U - a0*f2
-        dBdl5 <- (tt*exp(l5[1]*tt)+D$dd1dl5)/U
-        dBdl8 <- -a0*(tt*exp(l8[1]*tt)+D$dd2dl8)
         XY <- tera.wasserburg(x,i)
         X[i] <- XY$x['U238Pb206']
         Y[i] <- XY$x['Pb207Pb206']
@@ -797,6 +795,8 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         J[i,2*i-1] <- 1  # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
         if (exterr){
+            dBdl5 <- (tt*exp(l5[1]*tt)+D$dd1dl5)/U
+            dBdl8 <- -a0*(tt*exp(l8[1]*tt)+D$dd2dl8)
             J[ns+i,2*ns+1] <- -dBdl5*X[i]
             J[ns+i,2*ns+2] <- -dBdl8*X[i]
         }
@@ -840,8 +840,8 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         wd <- wetherill(x,i=i)
         D <- wendt(tt=tt,d=x$d[i])
         Z[i] <- wd$x['Pb204U238']
-        R[i] <- wd$x['Pb207U235'] - exp(l5[1]*tt) + 1 - U*b0*Z[i] - D$d1
-        r[i] <- wd$x['Pb206U238'] - exp(l8[1]*tt) + 1 - a0*Z[i] - D$d2
+        R[i] <- wd$x['Pb207U235'] - U*b0*Z[i] - exp(l5[1]*tt) + 1 - D$d1
+        r[i] <- wd$x['Pb206U238'] - a0*Z[i] - exp(l8[1]*tt) + 1 - D$d2
         Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
         E[(3*i-2):(3*i),(3*i-2):(3*i)] <- wd$cov + Ew
         J[i,3*i-2] <- 1                                  # dRdX

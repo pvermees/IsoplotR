@@ -104,6 +104,75 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$PaU <- PaU
     out
 }
+diseq.new <- function(U48=list(x=1,sx=0,option=0),
+                      ThU=list(x=1,sx=0,option=0),
+                      RaU=list(x=1,sx=0,option=0),
+                      PaU=list(x=1,sx=0,option=0)){
+    out <- list()
+    class(out) <- 'diseq'
+    out$U48 <- U48
+    out$ThU <- ThU
+    out$RaU <- RaU
+    out$PaU <- PaU
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l26 <- settings('lambda','Ra226')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    l31 <- settings('lambda','Pa231')[1]*1000
+    out$Q <- matrix(0,8,8)
+    out$Q[1,1] <- -((l26-l38)*(l30-l38)*(l34-l38))/(l26*l30*l34)
+    out$Q[2,1] <- -(l38*(l26-l38)*(l30-l38))/(l26*l30*l34)
+    out$Q[2,2] <- -((l26-l34)*(l30-l34))/(l26*l30)
+    out$Q[3,1] <- -(l38*(l26-l38))/(l26*l30)
+    out$Q[3,2] <- -(l34*(l26-l34))/(l26*l30)
+    out$Q[3,3] <- -(l26-l30)/l26
+    out$Q[4,1] <- -l38/l26
+    out$Q[4,2] <- -l34/l26
+    out$Q[4,3] <- -l30/l26
+    out$Q[4,4] <- -1
+    out$Q[5,1:5] <- 1
+    out$Q[6,6] <- -(l31-l35)/l31
+    out$Q[7,6] <- -l35/l31
+    out$Q[7,7] <- -1
+    out$Q[8,6:8] <- 1
+    out$Qinv <- matrix(0,8,8)
+    out$Qinv[1,1] <- -(l26*l30*l34)/((l26-l38)*(l30-l38)*(l34-l38))
+    out$Qinv[2,1] <- (l26*l30*l38)/((l26-l34)*(l30-l34)*(l34-l38))
+    out$Qinv[2,2] <- -(l26*l30)/((l26-l34)*(l30-l34))
+    out$Qinv[3,1] <- -(l26*l34*l38)/((l26-l30)*(l30-l34)*(l30-l38))
+    out$Qinv[3,2] <- (l26*l34)/((l26-l30)*(l30-l34))
+    out$Qinv[3,3] <- -l26/(l26-l30)
+    out$Qinv[4,1] <- (l30*l34*l38)/((l26-l30)*(l26-l34)*(l26-l38))
+    out$Qinv[4,2] <- -(l30*l34)/((l26-l30)*(l26-l34))
+    out$Qinv[4,3] <- l30/(l26-l30)
+    out$Qinv[4,4] <- -1
+    out$Qinv[5,1:5] <- 1
+    out$Qinv[6,6] <- -l31/(l31-l35)
+    out$Qinv[7,6] <- l35 /(l31-l35)
+    out$Qinv[7,7] <- -1
+    out$Qinv[8,6:8] <-1
+    out$E <- -c(l38,l34,l30,l26,0,l35,l31,0)
+    out$atoms <- rep(0,8)
+    names(out$atoms) <- c('U238','U234','Th230','Ra226',
+                          'Pb206','U235','Pa231','Pb207')
+    out$atoms[1] <- 1/l38
+    out$atoms[2] <- U48[[1]]/l34 
+    out$atoms[3] <- ThU[[1]]/l30
+    out$atoms[4] <- RaU[[1]]/l26
+    out$atoms[6] <- 1/l35
+    out$atoms[7] <- PaU[[1]]/l31
+    out
+}
+coerce_diseq <- function(x){
+    out <- list(x=1,sx=0,option=0)
+    if (length(x)==1){
+        out$x[[1]] <- x
+    } else if (length(x)==2){
+        out$x[[1]] <- x[[1]]
+        out$x[[3]] <- x[[3]]
+    }
+}
 
 equilibrium <- function(d){
     d$U48$option==0 & d$ThU$option==0 & d$RaU$option==0 & d$PaU$option==0
@@ -142,6 +211,34 @@ geomean.diseq <- function(x,...){
     out
 }
 
+mclean <- function(tt=0,d=diseq()){
+    if (d$U48$option>1)
+        d$atoms['U234'] <- reverse(tt=tt,d=d)['U234']
+    if (d$ThU$option>1)
+        d$atoms['Th230'] <- reverse(tt=tt,d=d)['Th230']
+    if (d$RaU$option>1)
+        d$atoms['Ra226'] <- reverse(tt=tt,d=d)['Ra225']
+    if (d$PaU$option>1)
+        d$atoms['Pa231'] <- reverse(tt=tt,d=d)['Pa231']
+    nt <- forward(tt,d=d)
+    out <- c(nt['Pb206']/nt['U238'],nt['Pb207']/nt['U235'])
+    names(out) <- c('Pb206U238','Pb207U235')
+    out
+}
+
+forward <- function(tt,d=diseq()){
+    nt <- d$Q %*% diag(exp(d$E*tt)) %*% d$Qinv %*% d$atoms
+    out <- as.vector(nt)
+    names(out) <- names(d$atoms)
+    out
+}
+reverse <- function(tt,d=diseq()){
+    n0 <- d$Q %*% diag(exp(-d$E*tt)) %*% d$Qinv %*% d$atoms
+    out <- as.vector(n0)
+    names(out) <- names(d$atoms)
+    out
+}
+
 # from Wendt & Carl (1985, EPSL):
 wendt <- function(tt,d=diseq()){
     dd <- geomean(d)
@@ -150,7 +247,7 @@ wendt <- function(tt,d=diseq()){
     l4 <- settings('lambda','U234')[1]*1000
     l0 <- settings('lambda','Th230')[1]*1000
     l6 <- settings('lambda','Ra226')[1]*1000
-    l1 <- settings('lambda','Pa231')[1]*1000
+    l1 <- settings('lambda','Pa231')[1]*1000    
     # calculate A0, B0, C0 and D0 (Wendt and Carl, 1985)
     # 1. A0
     if (dd$U48$option==0){
