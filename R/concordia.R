@@ -282,7 +282,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     if (common.Pb<1) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
-    lims <- prepare.concordia.line(X2plot,tlim=tlim,type=type,...)
+    lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     fit <- NULL
     if (show.age>1){
         x2calc <- subset(x,subset=calcit)
@@ -375,7 +375,7 @@ prepare.concordia.line <- function(x,tlim,type=1,...){
     } else {
         stop('Incorrect input format.')
     }
-    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
+    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n')
     lims
 }
 cseq <- function(m,M,type=1,n=50){
