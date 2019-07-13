@@ -495,7 +495,7 @@ age_to_U238Pb206_ratio <- function(tt,st=0,d=diseq()){
         l8 <- lambda('U238')[1]
         tt <- check.zero.UPb(tt)
         D <- mclean(tt=tt,d=d)
-        R <- D$Pb206U238
+        R <- 1/D$Pb206U238
         J <- -D$dPb206U238dt/D$Pb206U238^2
         R.err <- abs(J*st)
         out <- cbind(R,R.err)
@@ -750,7 +750,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             search.range <- c(t.75-dt,t.75+dt)
             t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
             D <- mclean(tt=t.75,d=d)
-            xe1d <- x-D$Pb207U238 # misfit = f = xe1d^2
+            xe1d <- x-D$Pb207U235 # misfit = f = xe1d^2
             dfdx <- 2*xe1d
             dfdt <- -2*xe1d*D$dPb207U235dt
             J[1,1] <- -dfdx/dfdt                         # dt/dx
@@ -808,7 +808,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
                 t.init
             })
             D <- mclean(tt=t.68,d=d)
-            xe2d <- x-D$dPb206U238 # misfit = f = xe2d^2
+            xe2d <- x-D$Pb206U238 # misfit = f = xe2d^2
             dfdx <- 2*xe2d
             dfdt <- -2*xe2d*D$dPb206U238dt
             J[1,1] <- -dfdx/dfdt        # dt/dx

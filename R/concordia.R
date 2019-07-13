@@ -364,8 +364,8 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
 prepare.concordia.line <- function(x,tlim,type=1,...){
     lims <- get.concordia.limits(x,tlim=tlim,type=type,...)
     if (type==1){
-        x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
+        x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
     } else if (type==2){
         x.lab <- expression(paste(""^"238","U/"^"206","Pb"))
         y.lab <- expression(paste(""^"207","Pb/"^"206","Pb"))
@@ -375,7 +375,7 @@ prepare.concordia.line <- function(x,tlim,type=1,...){
     } else {
         stop('Incorrect input format.')
     }
-    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n')
+    graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
     lims
 }
 cseq <- function(m,M,type=1,n=50){

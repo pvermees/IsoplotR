@@ -214,15 +214,15 @@ mclean <- function(tt=0,d=diseq()){
         out$Pb207U235 <- nt['Pb207']/nt['U235']
         out$dPb206U238dt <- dntdt['Pb206']/nt['U238'] -
             out$Pb206U238*dntdt['U238']/nt['U238']
-        out$d2Pb206U238dt2 <- d2ndt2['Pb206']/nt['U238'] -
+        out$d2Pb206U238dt2 <- d2ntdt2['Pb206']/nt['U238'] -
             2*dntdt['Pb206']*dntdt['U238']/nt['U238']^2 -
-            out$Pb206U238*d2ndt2['U238']/nt['U238'] +
+            out$Pb206U238*d2ntdt2['U238']/nt['U238'] +
             2*out$Pb206U238*(dntdt['U238']/nt['U238'])^2
         out$dPb207U235dt <- dntdt['Pb207']/nt['U235'] -
             out$Pb207U235*dntdt['U235']/nt['U235']
-        out$d2Pb207U235dt2 <- d2ndt2['Pb207']/nt['U235'] -
+        out$d2Pb207U235dt2 <- d2ntdt2['Pb207']/nt['U235'] -
             2*dntdt['Pb207']*dntdt['U235']/nt['U235']^2 -
-            out$Pb207U235*d2ndt2['U235']/nt['U235'] +
+            out$Pb207U235*d2ntdt2['U235']/nt['U235'] +
             2*out$Pb207U235*(dntdt['U235']/nt['U235'])^2
         out$dPb206U238dl8 <- 0 # TODO
         out$dPb207U235dl5 <- 0 # TODO
