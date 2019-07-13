@@ -104,16 +104,16 @@ twfit2wfit <- function(fit,x){
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
         tu <- tt
     }
-    du <- wendt(tt=tu,d=x$d)
-    dl <- wendt(tt=tl,d=x$d)
-    XX <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
-    YY <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
+    du <- mclean(tt=tu,d=x$d)
+    dl <- mclean(tt=tl,d=x$d)
+    XX <- du$Pb207U235 - dl$Pb207U235
+    YY <- du$Pb206U238 - dl$Pb206U238
     BB <- a0/(b0*U)
     D <- (YY-BB*XX)^2 # misfit
-    dXX.dtl <- -l5*exp(l5*tl) - dl$dd1dt
-    dXX.dtu <-  l5*exp(l5*tu) + du$dd1dt
-    dYY.dtl <- -l8*exp(l8*tl) - dl$dd2dt
-    dYY.dtu <-  l8*exp(l8*tu) + du$dd2dt
+    dXX.dtu <-  du$dPb207U235dt
+    dXX.dtl <- -dl$dPb207U235dt
+    dYY.dtu <-  du$dPb206U238dt
+    dYY.dtl <- -dl$dPb206U238dt
     dBB.da0 <-  1/(b0*U)
     dBB.db0 <- -BB/b0
     dD.dtl <- 2*(YY-BB*XX)*(dYY.dtl-BB*dXX.dtl)
@@ -145,10 +145,10 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    du <- wendt(tt=tu,d=d)
-    dl <- wendt(tt=tl,d=d)
-    XX <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
-    YY <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
+    du <- mclean(tt=tu,d=d)
+    dl <- mclean(tt=tl,d=d)
+    XX <- du$Pb207U235 - dl$Pb207U235
+    YY <- du$Pb206U238 - dl$Pb206U238
     BB <- a0/(b0*U)
     # misfit is based on difference in slope in Wetherill space
     YY - BB*XX
@@ -158,9 +158,9 @@ intersection.misfit.york <- function(tt,a,b,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    D <- wendt(tt=tt,d=d)
+    D <- mclean(tt=tt,d=d)
     # misfit is based on difference in slope in TW space
-    (exp(l5*tt)-1+D$d1)/U - a*(exp(l8*tt)-1+D$d2) - b
+    D$Pb207U235/U - a*D$Pb206U238 - b
 }
 
 discordia.line <- function(fit,wetherill,d=diseq()){
@@ -176,20 +176,20 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         X <- age_to_Pb207U235_ratio(fit$x,d=d)[,'75']
         Y <- age_to_Pb206U238_ratio(fit$x,d=d)[,'68']
         x <- seq(from=max(0,usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
-        du <- wendt(tt=tu,d=d)
-        dl <- wendt(tt=tl,d=d)
-        aa <- exp(l8*tu) + du$d2 - exp(l8*tl) - dl$d2
-        bb <- x - exp(l5*tl) + 1 - dl$d1
-        cc <- exp(l5*tu) + du$d1 - exp(l5*tl) - dl$d1
-        dd <- exp(l8*tl) - 1 + dl$d2
+        du <- mclean(tt=tu,d=d)
+        dl <- mclean(tt=tl,d=d)
+        aa <- du$Pb206U238 - dl$Pb206U238
+        bb <- x - dl$Pb207U235
+        cc <- du$Pb207U235 - dl$Pb207U235
+        dd <- dl$Pb206U238
         y <- aa*bb/cc + dd
-        dadtl <- - l8*exp(l8*tl) - dl$dd2dt
-        dbdtl <- - l5*exp(l5*tl) - dl$dd1dt
-        dcdtl <- - l5*exp(l5*tl) - dl$dd1dt
-        dddtl <- l8*exp(l8*tl) + dl$dd2dt
-        dadtu <- l8*exp(l8*tu) + du$dd2dt
+        dadtl <- -dl$dPb206U238dt
+        dbdtl <- -dl$dPb207U235dt
+        dcdtl <- -dl$dPb207U235dt
+        dddtl <- dl$dPb206U238dt
+        dadtu <- du$dPb206U238dt
         dbdtu <- 0
-        dcdtu <- l5*exp(l5*tu) + du$dd1dt
+        dcdtu <- du$dPb207U235dt
         dddtu <- 0
         J1 <- dadtl*bb/cc + dbdtl*aa/cc - dcdtl*aa*bb/cc^2 + dddtl # dydtl
         J2 <- dadtu*bb/cc + dbdtu*aa/cc - dcdtu*aa*bb/cc^2 + dddtu # dydtu
@@ -220,9 +220,9 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
         y <- yl + (y0-yl)*(1-x*r68) # = y0 + yl*x*r68 - y0*x*r68
-        D <- wendt(tt=tl,d=d)
-        d75dtl <- l5*exp(l5*tl) + D$dd1dt
-        d68dtl <- l8*exp(l8*tl) + D$dd2dt
+        D <- mclean(tt=tl,d=d)
+        d75dtl <- D$dPb207U235dt
+        d68dtl <- D$dPb206U238dt
         dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
         J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
         J2 <- 1 - x*r68                                # dy/dy0

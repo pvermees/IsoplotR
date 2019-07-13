@@ -393,12 +393,11 @@ LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
     ns <- length(x)
     dRdt <- matrix(0,2*ns,1)
     dRda0 <- matrix(0,2*ns,1)
-    D <- wendt(tt,d=x$d)
-    # b = a0*(exp(l8*tt)-1+d2) - (exp(l5*tt)-1+d1)*(exp(l8*tt)-1+d2)/U
-    dbdt <- a0*l8*exp(l8*tt) + a0*D$dd2dt - l5*exp(l5*tt)*exp(l8*tt)/U -
-        l8*exp(l5*tt)*exp(l8*tt)/U - exp(l5*tt)*D$dd2dt/U - exp(l8*tt)*D$dd1dt/U
-    drydt <- -dbdt*(X-rx)
-    dryda0 <- (exp(l8*tt)-1+D$d2) - (exp(l5*tt)-1+D$d1)*(exp(l8*tt)-1+D$d2)/U
+    D <- mclean(tt,d=x$d)
+    # b = D$Pb207U235/U - a0*D$Pb206U238
+    dbdt <- D$dPb207U235dt/U - a0*D$dPb206U238dt
+    drydt <- -dbdt*(X-rx) # x = X - rX
+    dryda0 <- D$Pb206U238 - 1
     dRdt[(ns+1):(2*ns),1] <- drydt
     dRda0[(ns+1):(2*ns),1] <- dryda0
     dSdt <- 2*t(dRdt) %*% l$omega %*% dRdt
@@ -543,8 +542,8 @@ fisher_lud_2D <- function(x,fit){
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     ones <- matrix(1,ns,1)
-    D <- wendt(tt,d=x$d)
-    BB <- (exp(l5*tt)-1+D$d1)/U - a0*(exp(l8*tt)-1+D$d2)
+    D <- mclean(tt,d=x$d)
+    BB <- D$Pb207U235/U - a0*D$Pb206U238
     CC <- -t(l$X)%*%l$omega12 + t(l$x)%*%l$omega12 + t(l$x)%*%l$omega21 -
         t(l$Y)%*%l$omega22 + t(ones)%*%l$omega22*a0 + 2*t(l$x)%*%l$omega22*BB
     DD <- -t(l$X)%*%l$omega12%*%l$x + t(l$x)%*%l$omega12%*%l$x -
@@ -552,11 +551,11 @@ fisher_lud_2D <- function(x,fit){
         t(l$x)%*%l$omega21%*%l$X + t(l$x)%*%l$omega21%*%l$x -
         t(l$x)%*%l$omega22%*%l$Y + t(l$x)%*%l$omega22%*%ones*a0 +
         2*t(l$x)%*%l$omega22%*%l$x*BB
-    dBdt <- (l5*exp(l5*tt)+D$dd1dt)/U - a0*(l8*exp(l8*tt)+D$dd2dt)
-    dBda0 <- -(exp(l8*tt)-1+D$d2)
-    d2Bda0dt <- -(l8*exp(l8*tt)+D$dd2dt)
+    dBdt <- D$dPb207U235dt/U - a0*D$Pb206U238dt
+    dBda0 <- -D$Pb206U238
+    d2Bda0dt <- -D$Pb206U238dt
     d2Bdtda0 <- d2Bda0dt
-    d2Bdt2 <- (l5*l5*exp(l5*tt)+D$d2d1dt2)/U - a0*(l8*l8*exp(l8*tt)+D$d2d2dt2)
+    d2Bdt2 <- D$d2Pb207U235dt2/U - a0*D$d2dPb206U238dt2
     d2Bda02 <- 0
     dDda0 <- t(ones)%*%l$omega22%*%l$x +
         t(l$x)%*%l$omega22%*%ones + 2*t(l$x)%*%l$omega22%*%l$x*dBda0
@@ -783,10 +782,8 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     X <- matrix(0,ns,1)
     Y <- matrix(0,ns,1)
     for (i in 1:ns){
-        D <- wendt(tt=tt,d=x$d[i])
-        f1 <- exp(l5[1]*tt)-1 + D$d1
-        f2 <- exp(l8[1]*tt)-1 + D$d2
-        B <-  f1/U - a0*f2
+        D <- mclean(tt=tt,d=x$d[i])
+        B <-  D$Pb207U235/U - a0*D$Pb206U238
         XY <- tera.wasserburg(x,i)
         X[i] <- XY$x['U238Pb206']
         Y[i] <- XY$x['Pb207Pb206']
@@ -795,8 +792,8 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         J[i,2*i-1] <- 1  # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
         if (exterr){
-            dBdl5 <- (tt*exp(l5[1]*tt)+D$dd1dl5)/U
-            dBdl8 <- -a0*(tt*exp(l8[1]*tt)+D$dd2dl8)
+            dBdl5 <- D$dPb207U235dl5/U
+            dBdl8 <- -a0*D$dPb206U238dl8
             J[ns+i,2*ns+1] <- -dBdl5*X[i]
             J[ns+i,2*ns+2] <- -dBdl8*X[i]
         }
@@ -838,18 +835,18 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     Z <- rep(0,ns)
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
-        D <- wendt(tt=tt,d=x$d[i])
+        D <- mclean(tt=tt,d=x$d[i])
         Z[i] <- wd$x['Pb204U238']
-        R[i] <- wd$x['Pb207U235'] - U*b0*Z[i] - exp(l5[1]*tt) + 1 - D$d1
-        r[i] <- wd$x['Pb206U238'] - a0*Z[i] - exp(l8[1]*tt) + 1 - D$d2
+        R[i] <- wd$x['Pb207U235'] - U*b0*Z[i] - D$Pb207U235
+        r[i] <- wd$x['Pb206U238'] - a0*Z[i] - D$Pb206U238
         Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
         E[(3*i-2):(3*i),(3*i-2):(3*i)] <- wd$cov + Ew
         J[i,3*i-2] <- 1                                  # dRdX
         J[ns+i,3*i-1] <- 1                               # drdY
         J[2*ns+i,3*i] <- 1                               # dphidZ
         if (exterr){
-            J[i,3*ns+1] <- -tt*exp(l5[1]*tt) - D$dd1dl5    # dRdl5
-            J[ns+i,3*ns+2] <- -tt*exp(l8[1]*tt) - D$dd2dl8 # drdl8
+            J[i,3*ns+1] <- -D$dPb207U235dt    # dRdl5
+            J[ns+i,3*ns+2] <- -D$dPb206U238dt # drdl8
         }
     }
     E[3*ns+1,3*ns+1] <- l5[2]^2
@@ -891,12 +888,12 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     E <- matrix(0,4*ns+3,4*ns+3)
     J <- matrix(0,3*ns,4*ns+3)
     for (i in 1:ns){
-        D <- wendt(tt,d=x$d[i])
+        D <- mclean(tt,d=x$d[i])
         wd <- wetherill(x,i)
         ii <- 4*i-3
         c0[i] <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1
-        K[i] <- wd$x['Pb207U235'] - c0[i]*U*b0*W[i] - exp(l5[1]*tt) + 1 - D$d1
-        L[i] <- wd$x['Pb206U238'] - c0[i]*a0*W[i] - exp(l8[1]*tt) + 1 - D$d2
+        K[i] <- wd$x['Pb207U235'] - c0[i]*U*b0*W[i] - D$Pb207U235
+        L[i] <- wd$x['Pb206U238'] - c0[i]*a0*W[i] - D$Pb206U238
         # M[i] <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1 - c0[i]
         E[ii:(ii+3),ii:(ii+3)] <- wd$cov
         J[i,ii] <- 1 # dKi/dPb7U5
@@ -905,8 +902,8 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         J[ns+i,ii+3] <- -c0[i]*a0 # dLi/dTh2U8
         J[2*ns+i,ii+2] <- 1 # dMi/dPb8Th2
         if (exterr){
-            J[i,4*ns+1] <- - tt*exp(l5[1]*tt) - D$dd1dl5 # dKi/dl5
-            J[ns+i,4*ns+2] <- - tt*exp(l8[1]*tt) - D$dd2dl8 # dLi/dl8
+            J[i,4*ns+1] <- -D$dPb207U235dl5 # dKi/dl5
+            J[ns+i,4*ns+2] <- -D$dPb206U238dl8 # dLi/dl8
             J[2*ns+i,4*ns+3] <- - tt*exp(l2[1]*tt) # dMi/dl2
         }
     }

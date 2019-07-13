@@ -411,15 +411,15 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     b0 <- lud$par['b0']
     l8 <- settings('lambda','U238')[1]
     l5 <- settings('lambda','U235')[1]
-    D <- wendt(tt,d=x$d)
+    D <- mclean(tt,d=x$d)
     if (type==1){                               # 38/06
         x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)[1]
-        dx0invdt <- l8*exp(l8*tt) + D$dd2dt
+        dx0invdt <- D$dPb206U238dt
         E <- lud$cov[1:2,1:2]
         x.lab <- quote(''^238*'U/'^206*'Pb')
     } else {                                    # 35/07
         x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)[1]
-        dx0invdt <- l5*exp(l5*tt) + D$dd1dt
+        dx0invdt <- D$dPb207U235dt
         E <- lud$cov[c(1,3),c(1,3)]
         x.lab <- quote(''^235*'U/'^207*'Pb')
     }

@@ -344,18 +344,16 @@ age_to_wetherill_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     labels <- c('Pb207U235','Pb206U238')
     l8 <- settings('lambda','U238')[1]
     l5 <- settings('lambda','U235')[1]
-    D <- wendt(tt=tt,d=d)
-    Pb7U5 <- exp(l5*tt)-1 + D$d1
-    Pb6U8 <- exp(l8*tt)-1 + D$d2
-    out$x <- c(Pb7U5,Pb6U8)
+    D <- mclean(tt=tt,d=d)
+    out$x <- c(D$Pb207U235,D$Pb206U238)
     E <- matrix(0,3,3)
     diag(E) <- c(st,lambda('U235')[2],lambda('U238')[2])^2
     J <- matrix(0,2,3)
-    J[1,1] <- l5*exp(l5*tt) + D$dd1dt
-    J[2,1] <- l8*exp(l8*tt) + D$dd2dt
+    J[1,1] <- D$dPb207U235dt
+    J[2,1] <- D$dPb206U238dt
     if (exterr){
-        J[1,2] <- tt*exp(l5*tt) + D$dd1dl5
-        J[2,3] <- tt*exp(l8*tt) + D$dd2dl8
+        J[1,2] <- D$dPb207U235dl5
+        J[2,3] <- D$dPb206U238dl8
     }
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
@@ -370,25 +368,23 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
     tt <- check.zero.UPb(tt)
-    D <- wendt(tt=tt,d=d)
-    Pb207U235 <- exp(l5*tt)-1 + D$d1
-    Pb206U238 <- exp(l8*tt)-1 + D$d2
-    U238Pb206 <- 1/Pb206U238
-    Pb207Pb206 <- (1/U)*Pb207U235/Pb206U238
-    d75dt <- l5*exp(l5*tt) + D$dd1dt
-    d68dt <- l8*exp(l8*tt) + D$dd2dt
-    d75dl5 <- tt*exp(l5*tt) + D$dd1dl5
-    d68dl8 <- tt*exp(l8*tt) + D$dd2dl8   
+    D <- mclean(tt=tt,d=d)
+    U238Pb206 <- 1/D$Pb206U238
+    Pb207Pb206 <- (1/U)*D$Pb207U235/D$Pb206U238
+    d75dt <- D$dPb207U235dt
+    d68dt <- D$dPb206U238dt
+    d75dl5 <- D$dPb207U235dl5
+    d68dl8 <- D$dPb206U238dl8
     out$x <- c(U238Pb206,Pb207Pb206)
     E <- matrix(0,4,4)
     diag(E) <- c(st,lambda('U235')[2],lambda('U238')[2],iratio('U238U235')[2])^2
     J <- matrix(0,2,4)
-    J[1,1] <- -d68dt/Pb206U238^2
-    J[2,1] <- (1/U)*(d75dt*Pb206U238-Pb207U235*d68dt)/Pb206U238^2
+    J[1,1] <- -d68dt/D$Pb206U238^2
+    J[2,1] <- (1/U)*(d75dt*D$Pb206U238-D$Pb207U235*d68dt)/D$Pb206U238^2
     if (exterr){
-        J[1,3] <- -d68dl8/Pb206U238^2
-        J[2,2] <- (1/U)*d75dl5/Pb206U238
-        J[2,3] <- -Pb207Pb206*d68dl8/Pb206U238
+        J[1,3] <- -d68dl8/D$Pb206U238^2
+        J[2,2] <- (1/U)*d75dl5/D$Pb206U238
+        J[2,3] <- -Pb207Pb206*d68dl8/D$Pb206U238
         J[2,4] <- -Pb207Pb206/U
     }
     out$cov <- J %*% E %*% t(J)
@@ -402,17 +398,17 @@ age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     labels <- c('Pb206U238','Pb208Th232')
     l8 <- settings('lambda','U238')[1]
     l2 <- settings('lambda','Th232')[1]
-    D <- wendt(tt=tt,d=d)
-    Pb6U8 <- exp(l8*tt)-1 + D$d2
+    D <- mclean(tt=tt,d=d)
+    Pb6U8 <- D$Pb206U238
     Pb8Th2 <- exp(l2*tt)-1
     out$x <- c(Pb6U8,Pb8Th2)
     E <- matrix(0,3,3)
     diag(E) <- c(st,lambda('U238')[2],lambda('Th232')[2])^2
     J <- matrix(0,2,3)
-    J[1,1] <- l8*exp(l8*tt) + D$dd2dt
+    J[1,1] <- D$dPb206U238dt
     J[2,1] <- l2*exp(l2*tt)
     if (exterr){
-        J[1,2] <- tt*exp(l8*tt) + D$dd2dl8
+        J[1,2] <- D$dPb206U238dl8
         J[2,3] <- tt*exp(l2*tt)
     }
     out$cov <- J %*% E %*% t(J)
@@ -434,9 +430,9 @@ age_to_Pb207U235_ratio <- function(tt,st=0,d=diseq()){
         }
     } else {
         l5 <- lambda('U235')[1]
-        D <- wendt(tt=tt,d=d)
-        R <- exp(l5*tt)-1 + D$d1
-        J <- l5*exp(l5*tt) + D$dd1dt
+        D <- mclean(tt=tt,d=d)
+        R <- D$Pb207U235
+        J <- D$dPb207U235dt
         R.err <- abs(J*st)
         out <- cbind(R,R.err)
         colnames(out) <- c('75','s[75]')
@@ -455,9 +451,9 @@ age_to_U235Pb207_ratio <- function(tt,st=0,d=diseq()){
         }
     } else {
         l5 <- lambda('U235')[1]
-        D <- wendt(tt=tt,d=d)
-        R <- 1/(exp(l5*tt)-1 + D$d1)
-        J <- -R*(l5*exp(l5*tt) + D$dd1dt)/(exp(l5*tt)-1 + D$d1)
+        D <- mclean(tt=tt,d=d)
+        R <- 1/D$Pb207U235
+        J <- -R*D$dPb207U235dt/D$Pb207U235
         R.err <- abs(J*st)
         out <- cbind(R,R.err)
         colnames(out) <- c('57','s[57]')
@@ -476,9 +472,9 @@ age_to_Pb206U238_ratio <- function(tt,st=0,d=diseq()){
         }
     } else {
         l8 <- lambda('U238')[1]
-        D <- wendt(tt=tt,d=d)
-        R <- exp(l8*tt)-1 + D$d2
-        J <- l8*exp(l8*tt) + D$dd2dt
+        D <- mclean(tt=tt,d=d)
+        R <- D$Pb206U238
+        J <- D$dPb206U238dt
         R.err <- abs(J*st)
         out <- cbind(R,R.err)
         colnames(out) <- c('68','s[68]')
@@ -498,9 +494,9 @@ age_to_U238Pb206_ratio <- function(tt,st=0,d=diseq()){
     } else {
         l8 <- lambda('U238')[1]
         tt <- check.zero.UPb(tt)
-        D <- wendt(tt=tt,d=d)
-        R <- 1/(exp(l8*tt)-1 + D$d2)
-        J <- -(l8*exp(l8*tt) + D$dd2dt)/(exp(l8*tt)-1 + D$d2)^2
+        D <- mclean(tt=tt,d=d)
+        R <- D$Pb206U238
+        J <- -D$dPb206U238dt/D$Pb206U238^2
         R.err <- abs(J*st)
         out <- cbind(R,R.err)
         colnames(out) <- c('86','s[86]')
@@ -522,13 +518,10 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0,d=diseq()){
         l8 <- lambda('U238')[1]
         tt <- check.zero.UPb(tt)
         U <- iratio('U238U235')[1]
-        D <- wendt(tt=tt,d=d)
-        Pb207U235 <- exp(l5*tt)-1 + D$d1
-        Pb206U238 <- exp(l8*tt)-1 + D$d2
-        d75dt <- l5*exp(l5*tt) + D$dd1dt
-        d68dt <- l8*exp(l8*tt) + D$dd2dt
-        R <- (1/U)*Pb207U235/Pb206U238
-        J <- (1/U)*(d75dt*Pb206U238-Pb207U235*d68dt)/Pb206U238^2
+        D <- mclean(tt=tt,d=d)
+        R <- (1/U)*D$Pb207U235/D$Pb206U238
+        J <- (1/U)*(D$dPb207U235dt*D$Pb206U238 -
+                    D$Pb207U235*D$dPb206U238dt)/D$Pb206U238^2
         R.err <- abs(J*st)
         out <- cbind(R,R.err)
         colnames(out) <- c('76','s[76]')
@@ -756,13 +749,13 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             dt <- 0.01/settings('lambda','U234')[1]
             search.range <- c(t.75-dt,t.75+dt)
             t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
-            D <- wendt(tt=t.75,d=d)
-            xe1d <- x-exp(l5*t.75)+1-D$d1 # misfit = f = xe1d^2
+            D <- mclean(tt=t.75,d=d)
+            xe1d <- x-D$Pb207U238 # misfit = f = xe1d^2
             dfdx <- 2*xe1d
-            dfdt <- 2*xe1d*(-l5*exp(l5*t.75)-D$dd1dt)
+            dfdt <- -2*xe1d*D$dPb207U235dt
             J[1,1] <- -dfdx/dfdt                         # dt/dx
             if (exterr){
-                dfdl5 <- 2*xe1d*(-t.75*exp(l5*t.75)-D$dd1dl5)
+                dfdl5 <- -2*xe1d*D$dPb207U235dl5
                 J[1,2] <- -dfdx/dfdl5                    # dt/dl5
             }
         }
@@ -814,13 +807,13 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             }, error = function(error_condition) {
                 t.init
             })
-            D <- wendt(tt=t.68,d=d)
-            xe2d <- x-exp(l8*t.68)+1-D$d2 # misfit = f = xe2d^2
+            D <- mclean(tt=t.68,d=d)
+            xe2d <- x-D$dPb206U238 # misfit = f = xe2d^2
             dfdx <- 2*xe2d
-            dfdt <- 2*xe2d*(-l8*exp(l8*t.68)-D$dd2dt)
+            dfdt <- -2*xe2d*D$dPb206U238dt
             J[1,1] <- -dfdx/dfdt        # dt/dx
             if (exterr){
-                dfdl8 <- 2*xe2d*(-t.68*exp(l8*t.68)-D$dd2dl8)
+                dfdl8 <- -2*xe2d*D$dPb206U238dl8
                 J[1,2] <- -dfdx/dfdl8   # dt/dl8
             }
         }
