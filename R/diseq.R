@@ -110,6 +110,7 @@ diseq.new <- function(U48=list(x=1,sx=0,option=0),
                       PaU=list(x=1,sx=0,option=0)){
     out <- list()
     class(out) <- 'diseq'
+    out$equilibrium <- U48$option==0 & ThU$option==0 & RaU$option==0 & PaU$option==0
     out$U48 <- U48
     out$ThU <- ThU
     out$RaU <- RaU
@@ -152,7 +153,6 @@ diseq.new <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[7,6] <- l35 /(l31-l35)
     out$Qinv[7,7] <- -1
     out$Qinv[8,6:8] <-1
-    out$E <- -c(l38,l34,l30,l26,0,l35,l31,0)
     out$atoms <- rep(0,8)
     names(out$atoms) <- c('U238','U234','Th230','Ra226',
                           'Pb206','U235','Pa231','Pb207')
@@ -162,6 +162,8 @@ diseq.new <- function(U48=list(x=1,sx=0,option=0),
     out$atoms[4] <- RaU[[1]]/l26
     out$atoms[6] <- 1/l35
     out$atoms[7] <- PaU[[1]]/l31
+    out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
+    names(out$L) <- names(out$atoms)
     out
 }
 coerce_diseq <- function(x){
@@ -172,10 +174,6 @@ coerce_diseq <- function(x){
         out$x[[1]] <- x[[1]]
         out$x[[3]] <- x[[3]]
     }
-}
-
-equilibrium <- function(d){
-    d$U48$option==0 & d$ThU$option==0 & d$RaU$option==0 & d$PaU$option==0
 }
 
 #' @export
@@ -212,29 +210,52 @@ geomean.diseq <- function(x,...){
 }
 
 mclean <- function(tt=0,d=diseq()){
-    if (d$U48$option>1)
-        d$atoms['U234'] <- reverse(tt=tt,d=d)['U234']
-    if (d$ThU$option>1)
-        d$atoms['Th230'] <- reverse(tt=tt,d=d)['Th230']
-    if (d$RaU$option>1)
-        d$atoms['Ra226'] <- reverse(tt=tt,d=d)['Ra225']
-    if (d$PaU$option>1)
-        d$atoms['Pa231'] <- reverse(tt=tt,d=d)['Pa231']
-    nt <- forward(tt,d=d)
-    out <- c(nt['Pb206']/nt['U238'],nt['Pb207']/nt['U235'])
-    names(out) <- c('Pb206U238','Pb207U235')
+    out <- list()
+    if (d$equilibrium){
+        out$Pb206U238 <- exp(d$L['U238']*tt) - 1
+        out$Pb207U235 <- exp(d$L['U235']*tt) - 1
+        out$dPb206U238dt <- d$L['U238']*exp(d$L['U238']*tt)
+        out$dPb207U235dt <- d$L['U235']*exp(d$L['U235']*tt)
+    } else {
+        factor <- 20
+        if (d$U48$option>1 & tt*d$L['U234']<factor)
+            d$atoms['U234'] <- reverse(tt=tt,d=d)['U234']
+        if (d$ThU$option>1 & tt*d$L['Th230']<factor)
+            d$atoms['Th230'] <- reverse(tt=tt,d=d)['Th230']
+        if (d$RaU$option>1 & tt*d$L['Ra226']<factor)
+            d$atoms['Ra226'] <- reverse(tt=tt,d=d)['Ra226']
+        if (d$PaU$option>1 & tt*d$L['Pa231']<factor)
+            d$atoms['Pa231'] <- reverse(tt=tt,d=d)['Pa231']
+        nt <- forward(tt,d=d)
+        dntdt <- forward(tt,d=d,derivative=TRUE)
+        out$Pb206U238 <- nt['Pb206']/nt['U238']
+        out$dPb206U238dt <- dntdt['Pb206']/nt['U238'] -
+            out$Pb206U238*dntdt['U238']/nt['U238']
+        out$Pb207U235 <- nt['Pb207']/nt['U235']
+        out$dPb207U235dt <- dntdt['Pb207']/nt['U235'] -
+            out$Pb207U235*dntdt['U235']/nt['U235']
+    }
     out
 }
-
-forward <- function(tt,d=diseq()){
-    nt <- d$Q %*% diag(exp(d$E*tt)) %*% d$Qinv %*% d$atoms
-    out <- as.vector(nt)
+forward <- function(tt,d=diseq(),derivative=FALSE){
+    if (derivative){
+        dndt <- d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$atoms
+        out <- as.vector(dndt)
+    } else {
+        nt <- d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$atoms
+        out <- as.vector(nt)
+    }
     names(out) <- names(d$atoms)
     out
 }
-reverse <- function(tt,d=diseq()){
-    n0 <- d$Q %*% diag(exp(-d$E*tt)) %*% d$Qinv %*% d$atoms
-    out <- as.vector(n0)
+reverse <- function(tt,d=diseq(),derivative=FALSE){
+    if (derivative){
+        n0dt <- d$Q %*% diag(exp(d$L*tt)) %*% d$Qinv %*% d$atoms
+        out <- as.vector(d0dt)
+    } else {
+        n0 <- d$Q %*% diag(exp(d$L)) %*% diag(exp(d$L*tt)) %*% d$Qinv %*% d$atoms
+        out <- as.vector(n0)
+    }
     names(out) <- names(d$atoms)
     out
 }
