@@ -370,7 +370,7 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     tt <- check.zero.UPb(tt)
     D <- mclean(tt=tt,d=d)
     U238Pb206 <- 1/D$Pb206U238
-    Pb207Pb206 <- (1/U)*D$Pb207U235/D$Pb206U238
+    Pb207Pb206 <- D$Pb207U235/(U*D$Pb206U238)
     d75dt <- D$dPb207U235dt
     d68dt <- D$dPb206U238dt
     d75dl5 <- D$dPb207U235dl5
@@ -380,10 +380,10 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     diag(E) <- c(st,lambda('U235')[2],lambda('U238')[2],iratio('U238U235')[2])^2
     J <- matrix(0,2,4)
     J[1,1] <- -d68dt/D$Pb206U238^2
-    J[2,1] <- (1/U)*(d75dt*D$Pb206U238-D$Pb207U235*d68dt)/D$Pb206U238^2
+    J[2,1] <- (d75dt*D$Pb206U238-D$Pb207U235*d68dt)/(U*D$Pb206U238^2)
     if (exterr){
         J[1,3] <- -d68dl8/D$Pb206U238^2
-        J[2,2] <- (1/U)*d75dl5/D$Pb206U238
+        J[2,2] <- d75dl5/(U*D$Pb206U238)
         J[2,3] <- -Pb207Pb206*d68dl8/D$Pb206U238
         J[2,4] <- -Pb207Pb206/U
     }

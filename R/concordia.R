@@ -378,11 +378,11 @@ prepare.concordia.line <- function(x,tlim,type=1,...){
     graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
     lims
 }
+# concordia sequence
 cseq <- function(m,M,type=1,n=50){
-    if (type%in%c(1,2)){
-        return(seq(m,M,length.out=n))
-    }
-    if (m>0){
+    if (type==1){
+        out <- seq(m,M,length.out=n)
+    } else if (m>0){
         out <- exp(seq(0,log(M/m),length.out=n))*m
     } else {
         out <- exp(seq(0,log(M+1-m),length.out=n))+1-m
@@ -417,7 +417,7 @@ age_to_concordia_ratios <- function(tt,type=1,exterr=FALSE,d=diseq()){
     else if (type==2)
         return(age_to_terawasserburg_ratios(tt,exterr=exterr,d=d))
     else if (type==3)
-        return(age_to_cottle_ratios(tt,exterr=exterr))
+        return(age_to_cottle_ratios(tt,exterr=exterr,d=d))
     else
         stop('Invalid concordia type.')
 }
