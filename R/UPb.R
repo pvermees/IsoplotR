@@ -315,26 +315,40 @@ tw2w <- function(tw){
 }
 
 # convert data to a 5-column table for concordia analysis
-flat.UPb.table <- function(x,wetherill=TRUE){
+flat.UPb.table <- function(x,type=1){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    for (i in 1:ns){
-        if (wetherill) xi <- wetherill(x,i)
-        else xi <- tera.wasserburg(x,i)
-        out[i,1] <- xi$x[1]
-        out[i,3] <- xi$x[2]
-        out[i,2] <- sqrt(xi$cov[1,1])
-        out[i,4] <- sqrt(xi$cov[2,2])
-        out[i,5] <- xi$cov[1,2]/(out[i,2]*out[i,4])
-    }
-    if (wetherill){
+    if (type==1){
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb206U238','errPb206U238','rhoXY')
-        class(out) <- 'wetherill'
-    } else {
+    } else if (type==2){
         colnames(out) <- c('U238Pb206','errU238Pb206',
                            'Pb207Pb206','errPb207Pb206','rhoXY')
-        class(out) <- 'terawasserburg'
+    } else if (type==3){
+        colnames(out) <- c('Pb206U238','errPb206U238',
+                           'Pb208Th232','errPb208Th232','rhoXY')
+    } else {
+        stop('Incorrect concordia type.')
+    }
+    for (i in 1:ns){
+        if (type==1){
+            xi <- wetherill(x,i)
+            j1 <- 'Pb207U235'
+            j2 <- 'Pb206U238'
+        } else if (type==2){
+            xi <- tera.wasserburg(x,i)
+            j1 <- 'U238Pb206'
+            j2 <- 'Pb207Pb206'
+        } else if (type==3){
+            xi <- wetherill(x,i)
+            j1 <- 'Pb206U238'
+            j2 <- 'Pb208Th232'
+        }
+        out[i,1] <- xi$x[j1]
+        out[i,3] <- xi$x[j2]
+        out[i,2] <- sqrt(xi$cov[j1,j1])
+        out[i,4] <- sqrt(xi$cov[j2,j2])
+        out[i,5] <- xi$cov[j1,j2]/(out[i,2]*out[i,4])
     }
     out
 }

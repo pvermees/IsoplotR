@@ -270,7 +270,6 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                       omit.col=NA,...){
-    wetherill <- (type==1)
     if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -285,6 +284,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     fit <- NULL
     if (show.age>1){
+        wetherill <- (type==1)
         x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,exterr=exterr,
                                              alpha=alpha,model=(show.age-1),anchor=anchor)
@@ -304,7 +304,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                 hide=hide,omit=omit,omit.col=omit.col,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
-        fit <- concordia.age(X2calc,wetherill=wetherill,exterr=exterr,alpha=alpha)
+        fit <- concordia.age(X2calc,type=type,exterr=exterr,alpha=alpha)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
         fit$n <- length(X2calc)
@@ -549,22 +549,13 @@ concordia.title <- function(fit,sigdig=2,alpha=0.05,...){
     mymtext(line2,line=0,...)
 }
 
-concordia.age <- function(x,...){ UseMethod("concordia.age",x) }
-concordia.age.default <- function(x,...){
-    stop("no default method implemented for concordia.age()")
-}
-concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
-    if (is.na(i)){
-        ccw <- concordia.comp(x,wetherill=TRUE)
-        cct <- concordia.comp(x,wetherill=FALSE)
-    } else {
-        ccw <- wetherill(x,i)
-        cct <- tera.wasserburg(x,i)
-    }
-    tt <- concordia.age(ccw,d=x$d,exterr=exterr)
+concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
+    if (is.na(i)) cc <- concordia.comp(x,type=type)
+    else cc <- wetherill(x,i)
+    tt <- concordia_age_helper(cc,type=type,d=x$d,exterr=exterr)
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
-        out <- c(out,mswd.concordia(x,ccw,tt[1],exterr=exterr))
+        out <- c(out,mswd.concordia(x,cc,type=type,tt=tt[1],exterr=exterr))
         out$age <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
         tfact <- stats::qt(1-alpha/2,out$df['combined'])
@@ -572,8 +563,6 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
         out$age['ci[t]'] <- tfact*out$age['s[t]']
         if (out$mswd['combined']>1)
             out$age['disp[t]'] <- tfact*out$mswd['combined']*out$age['s[t]']
-        if (wetherill) cc <- ccw
-        else cc <- cct
         out$x <- cc$x
         out$cov <- cc$cov
     } else {
@@ -581,12 +570,12 @@ concordia.age.UPb <- function(x,i=NA,wetherill=TRUE,exterr=TRUE,alpha=0.05,...){
     }
     out
 }
-concordia.age.wetherill <- function(x,d=diseq(),exterr=FALSE,...){
+concordia_age_helper <- function(cc,type=1,d=diseq(),exterr=FALSE,...){
     fit <- stats::optimise(LL.concordia.age,interval=c(0,5000),
-                           exterr=FALSE,ccw=x,d=d)
+                           exterr=FALSE,cc=cc,type=type,d=d)
     tt <- fit$minimum
     hess <- stats::optimHess(tt,fn=LL.concordia.age,
-                             ccw=x,exterr=exterr,d=d)
+                             cc=cc,exterr=exterr,d=d)
     if (det(hess)>1e-15)
         tt.err <- as.numeric(sqrt(solve(hess)))
     else
@@ -597,14 +586,12 @@ concordia.age.wetherill <- function(x,d=diseq(),exterr=FALSE,...){
 }
 
 # x has class 'UPb'
-concordia.comp <- function(x,wetherill=TRUE){
-    X <- flat.UPb.table(x,wetherill=wetherill)
+concordia.comp <- function(x,type=1){
+    X <- flat.UPb.table(x,type=type)
     out <- wtdmean2D(X)
     cnames <- colnames(X)[c(1,3)]
     names(out$x) <- cnames
     colnames(out$cov) <- cnames
-    if (wetherill) class(out) <- 'wetherill'
-    else class(out) <- 'terawasserburg'
     out
 }
 
@@ -622,11 +609,11 @@ initial.concordia.age <- function(x,d=diseq()){
     fit[1]
 }
 
-mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
+mswd.concordia <- function(x,cc,type=1,tt=0,exterr=TRUE){
     SS.equivalence <- 
-        LL.concordia.comp(mu=ccw$x,x=x,wetherill=TRUE,mswd=TRUE)
+        LL.concordia.comp(mu=cc$x,x=x,type=type,mswd=TRUE)
     SS.concordance <- 
-        LL.concordia.age(tt=tt,ccw=ccw,mswd=TRUE,exterr=exterr,d=x$d)
+        LL.concordia.age(tt=tt,cc=cc,type=type,exterr=exterr,d=x$d,mswd=TRUE)
     df.equivalence <- 2*length(x)-2
     df.concordance <- 1
     mswd <- rep(0,3)
@@ -655,30 +642,57 @@ mswd.concordia <- function(x,ccw,tt,exterr=TRUE){
     list(mswd=mswd,p.value=p.value,df=df)
 }
 
-LL.concordia.comp <- function(mu,x,wetherill=TRUE,mswd=FALSE,...){
+LL.concordia.comp <- function(mu,x,type=1,mswd=FALSE,...){
     out <- 0
     for (i in 1:length(x)){
-        if (wetherill) xi <- wetherill(x,i)
-        else xi <- tera.wasserburg(x,i)
-        X <- matrix(xi$x[1:2]-mu[1:2],1,2)
-        covmat <- xi$cov[1:2,1:2]
+        if (type==1){
+            xi <- wetherill(x,i)
+            j <- c(1,2)
+        } else if (type==2){
+            xi <- tera.wasserburg(x,i)
+            j <- c(1,2)
+        } else if (type==3){
+            xi <- wetherill(x,i)
+            j <- c(2,3)
+        } else {
+            stop('Incorrect concordia type.')
+        }
+        X <- matrix(xi$x[j]-mu,1,2)
+        covmat <- xi$cov[j,j]
         if (mswd) out <- out + get.concordia.SS(X,covmat)
         else out <- out + LL.norm(X,covmat)
     }
     out
 }
 
-LL.concordia.age <- function(tt,ccw,mswd=FALSE,exterr=TRUE,d=diseq()){
-    y <- age_to_wetherill_ratios(tt,d=d)
-    dx <- matrix(ccw$x[1:2]-y$x,1,2)
-    covmat <- ccw$cov[1:2,1:2]
+LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
+    if (type==1) y <- age_to_wetherill_ratios(tt,d=d)
+    else if (type==2) y <- age_to_terawasserburg_ratios(tt,d=d)
+    else if (type==3) y <- age_to_cottle_ratios(tt,d=d)
+    else stop('Incorrect concordia type.')
+    dx <- matrix(cc$x-y$x,1,2)
+    covmat <- cc$cov
     if (exterr){
-        l8 <- settings('lambda','U238')
         l5 <- settings('lambda','U235')
-        P235 <- tt*exp(l5[1]*tt)
-        P238 <- tt*exp(l8[1]*tt)
-        E <- diag(c(P235*l5[2],P238*l8[2]))^2
-        covmat <- ccw$cov[1:2,1:2] + E
+        l8 <- settings('lambda','U238')
+        l2 <- settings('lambda','Th232')
+        U <- settings('iratio','U238U235')
+        Lcov <- diag(c(l5[2],l8[2],l2[2]))^2
+        J <- matrix(0,2,2)
+        D <- mclean(tt=tt,d=d)
+        if (type==1){
+            J[1,1] <- D$dPb207U235dl5
+            J[2,2] <- D$dPb206U238dl8
+        } else if (type==2){
+            J[1,2] <- -D$dPb206U238dl8/D$Pb206U238^2
+            J[2,1] <- D$dPb207U235dl5/(U*Pb206U238)
+            J[2,2] <- -D$dPb206U238dl8/(U*Pb206U238^2)
+        } else { # type == 3
+            J[1,2] <- D$dPb206U238dl8
+            J[2,3] <- tt*exp(l2[1]*tt)
+        }
+        E <- J %*% Lcov %*% t(J)
+        covmat <- cc$cov + E
     }
     if (mswd) out <- get.concordia.SS(dx,covmat)
     else out <- LL.norm(dx,covmat)
