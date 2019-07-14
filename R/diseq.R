@@ -11,7 +11,7 @@
 #'     other functions.
 #'
 #' @details
-#' There are four ways to correct for the initial disequilibrium
+#' There are three ways to correct for the initial disequilibrium
 #' between the activity of \eqn{{}^{238}}U, \eqn{{}^{234}}Th,
 #' \eqn{{}^{230}}Th, and \eqn{{}^{226}}Ra; or between \eqn{{}^{235}}U
 #' and \eqn{{}^{231}}Pa:
@@ -20,77 +20,83 @@
 #' 
 #' \item{Specify the assumed initial activity ratios and calculate how
 #' much excess \eqn{{}^{206}}Pb and \eqn{{}^{207}}Pb these would have
-#' produced. (Wendt and Carl, 1985).}
+#' produced.}
 #' 
 #' \item{Measure the current activity ratios to infer the initial
-#' ratios.  This approach only works for young samples (< 5Ma, say).}
+#' ratios.  This approach only works for young samples.}
 #' 
-#' \item{Specify the elemental fractionation factor between Th and U
-#' in the magma chamber and the mineral (Schaerer,
-#' 1984). \code{IsoplotR} generalises this approach to Ra/U and Pa/U
-#' as well. However, it still assumes secular equilibrium between
-#' \eqn{{}^{234}}U and \eqn{{}^{238}}Th.}
+#' \item{The initial \eqn{{}^{230}}Th/\eqn{{}^{238}}U activity ratio
+#' can also be estimated by providing the Th/U-ratio of the magma.}
 #' 
 #' }
-#' 
-#' @param option one of four options:
 #'
-#' \code{0}: no disequilibrium correction
+#' @param U48 a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{234}}U/\eqn{{}^{238}}U
+#'     disequilibrium.
 #'
-#' \code{1}: use assumed initial activity ratios
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
 #'
-#' \code{2}: use measured current activity ratios
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
 #'
-#' \code{3}: use partition coefficients between the mineral and magma
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
 #'
-#' \code{4}: use the measured Th/U ratio of the magma to compute the
-#' Th/U partition coefficient. This option only works for U-Pb
-#' datasets of format 7 or 8.
+#' @param ThU a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U
+#'     disequilibrium.
 #'
-#' @param U48 the \eqn{^{234}}U/\eqn{^{238}}U-activity ratio (initial
-#'     if \code{option=1} or measured if \code{option=2}).
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
+#'
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+#'
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+#'
+#' If \code{option=3}, then \code{x} contains the measured Th/U ratio
+#'     of the magma (assumed or determined from the whole rock or
+#'     volcanic glass). This only applies for Th-bearing U-Pb data
+#'     formats 7 and 8.
+#'
+#' @param RaU a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U
+#'     disequilibrium.
+#'
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
+#'
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
+#'
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
 #' 
-#' @param Th0U8 the \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
-#'     (initial if \code{option=1} or measured if \code{option=2}).
+#' @param PaU a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U
+#'     disequilibrium.
+#'
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
+#'
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio.
+#'
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{231}}Ra/\eqn{{}^{235}}U ratio.
 #' 
-#' @param Ra6U8 the \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
-#'     (initial if \code{option=1} or measured if \code{option=2}).
-#' 
-#' @param Pa1U5 the \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
-#'     (initial if \code{option=1} or measured if \code{option=2}).
-#' 
-#' @param fThU the Th/U fractionation factor between the mineral (m)
-#'     and the magma (M): \code{fThU} = (Th/U)\eqn{_m}/(Th/U)\eqn{_M}.
-#' 
-#' @param fRaU the Ra/U fractionation factor between the mineral (m)
-#'     and the magma (M): \code{fRaU} = (Ra/U)\eqn{_m}/(Ra/U)\eqn{_M}.
-#' 
-#' @param fPaU the Pa/U fractionation factor between the mineral (m)
-#'     and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.
-#'  
-#' @param ThU the measured Th/U ratio of the magma, which is to be
-#'     combined with the Th/U ratios of the minerals to compute the
-#'     Th/U fractionation factor.
-#'  
-#' @return a list with the following items: \code{option} and
-#'     (\code{U48}, \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if
-#'     \code{option=1} or \code{option=2}] and (\code{fThU},
-#'     \code{RaU}, \code{PaU}) [if \code{option=3}].
+#' @return a list with the activity ratios, an eigen composition of
+#'     the decay contant matrix and the atomic abundances of the
+#'     parent and (intermediate) daughter nuclides
 #' 
 #' @examples
-#' d <- diseq(option=3,fThU=2)
-#' fn <- system.file("UPb1.csv",package="IsoplotR")
-#' UPb <- read.data(fn,method='U-Pb',format=1,d=d)
-#' concordia(UPb)
-#' 
-#' @references
-#' Schaerer, U., 1984. The effect of initial \eqn{{}^{230}}Th
-#' disequilibrium on young UPb ages: the Makalu case, Himalaya. Earth
-#' and Planetary Science Letters, 67(2), pp.191-204.
-#' 
-#' Wendt, I. and Carl, C., 1985. U/Pb dating of discordant 0.1 Ma old
-#' secondary U minerals. Earth and Planetary Science Letters, 73(2-4),
-#' pp.278-284.
+#' d <- diseq(U48=list(x=0,option=1),ThU=list(x=2,option=1),
+#'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
+#' fn <- system.file("diseq.csv",package="IsoplotR")
+#' UPb <- read.data(fn,method='U-Pb',format=2)
+#' concordia(UPb,type=2,show.age=1)
 #' @export
 diseq <- function(U48=list(x=1,sx=0,option=0),
                   ThU=list(x=1,sx=0,option=0),

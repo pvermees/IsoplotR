@@ -16,7 +16,7 @@ data2york(x, ...)
 
 \method{data2york}{default}(x, format = 1, ...)
 
-\method{data2york}{UPb}(x, option = 1, ...)
+\method{data2york}{UPb}(x, option = 1, tt = 0, ...)
 
 \method{data2york}{ArAr}(x, inverse = TRUE, ...)
 
@@ -59,18 +59,30 @@ automatically computed from the redundancy of the three ratios.}
 \item Tera-Wasserburg ratios: \code{X=08/06}, \code{sX=s[08/06]},
     \code{Y=07/06}, \code{sY=s[07/06]}, \code{rho=rXY}.
 
-\item \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=08/06},
-    \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{format=4,5,6}).
+\item \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=38/06},
+    \code{sY=s[38/06]}, \code{rho=rXY} (only valid if \code{format=4,5,6}).
 
 \item \code{X=04/07}, \code{sX=s[04/07]}, \code{Y=05/07},
-    \code{sY=s[05/07]}, \code{rho=rXY} (only valid if
+    \code{sY=s[35/07]}, \code{rho=rXY} (only valid if
     \code{format=4,5,6}).
 
-\item \code{X=08/32}, \code{sX=s[08/32]}, \code{Y=06/38},
-    \code{sY=s[06/38]}, \code{rho=rXY} (only valid if
-    \code{format=8,9}). 
+\item U-Th-Pb concordia ratios: \code{X=08/32}, \code{sX=s[08/32]},
+    \code{Y=06/38}, \code{sY=s[06/38]}, \code{rho=rXY} (only valid
+    if \code{format=7,8}).
+
+\item \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
+    \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
+    \code{format=7,8}).
+
+\item \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
+    \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
+    \code{format=7,8}). 
 
 }}
+
+\item{tt}{the age of the sample. This is only used if \code{x} has
+class 7 or 8, in order to calculate the inherited
+\eqn{{}^{208}}Pb/\eqn{{}^{232}}Th ratio.}
 
 \item{inverse}{toggles between normal and inverse isochron
     ratios. \code{data2york} returns five columns \code{X},

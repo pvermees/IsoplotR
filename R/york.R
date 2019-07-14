@@ -248,6 +248,10 @@ data2york.default <- function(x,format=1,...){
 #' 
 #' }
 #'
+#' @param tt the age of the sample. This is only used if \code{x} has
+#'     class 7 or 8, in order to calculate the inherited
+#'     \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th ratio.
+#'
 #' @rdname data2york
 #' @export
 data2york.UPb <- function(x,option=1,tt=0,...){

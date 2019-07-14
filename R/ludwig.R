@@ -195,7 +195,7 @@ get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out <- list(w=0,par=init)
 #    for (i in 1:5){ # loop for more accurate but slower and more unstable results
     out <- fit_ludwig_discordia(x,init=out$par,w=out$w,exterr=exterr,anchor=anchor)
-    out$w <- stats::optimize(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
+    out$w <- stats::optimise(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
                              exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
 #    }
     out
@@ -226,7 +226,7 @@ get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
     if (!anchor[[1]]){
-        tt <- optimise(SS.model2.3D,interval=tlim,x=x)$minimum
+        tt <- stats::optimise(SS.model2.3D,interval=tlim,x=x)$minimum
         fits <- model2fit.3D(tt,x=x)
         a0 <- fits$y0[1]
         b0 <- fits$y0[2]
@@ -238,7 +238,7 @@ get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
             a0 <- settings('iratio','Pb206Pb208')[1]
             b0 <- settings('iratio','Pb207Pb208')[1]
         }
-        tt <- optimise(SS.model2.3D,interval=tlim,x=x,a0=a0,b0=b0)$minimum
+        tt <- stats::optimise(SS.model2.3D,interval=tlim,x=x,a0=a0,b0=b0)$minimum
     } else if (is.numeric(anchor[[2]])){
         tt <- anchor[[2]]
         fits <- model2fit.3D(tt,x=x)
@@ -551,11 +551,11 @@ fisher_lud_2D <- function(x,fit){
         t(l$x)%*%l$omega21%*%l$X + t(l$x)%*%l$omega21%*%l$x -
         t(l$x)%*%l$omega22%*%l$Y + t(l$x)%*%l$omega22%*%ones*a0 +
         2*t(l$x)%*%l$omega22%*%l$x*BB
-    dBdt <- D$dPb207U235dt/U - a0*D$Pb206U238dt
+    dBdt <- D$dPb207U235dt/U - a0*D$dPb206U238dt
     dBda0 <- -D$Pb206U238
-    d2Bda0dt <- -D$Pb206U238dt
+    d2Bda0dt <- -D$dPb206U238dt
     d2Bdtda0 <- d2Bda0dt
-    d2Bdt2 <- D$d2Pb207U235dt2/U - a0*D$d2dPb206U238dt2
+    d2Bdt2 <- D$d2Pb207U235dt2/U - a0*D$d2Pb206U238dt2
     d2Bda02 <- 0
     dDda0 <- t(ones)%*%l$omega22%*%l$x +
         t(l$x)%*%l$omega22%*%ones + 2*t(l$x)%*%l$omega22%*%l$x*dBda0
