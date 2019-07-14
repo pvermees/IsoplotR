@@ -98,7 +98,8 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
                   PaU=list(x=1,sx=0,option=0)){
     out <- list()
     class(out) <- 'diseq'
-    out$equilibrium <- (U48$option==0 & ThU$option==0 & RaU$option==0 & PaU$option==0)
+    out$equilibrium <- (U48$option==0 & ThU$option==0 & RaU$option==0 & PaU$option==0) |
+        (U48$x==1 & ThU$x==0 & RaU$x==0 & PaU$x==0)
     out$U48 <- U48
     out$ThU <- ThU
     out$RaU <- RaU
@@ -239,9 +240,6 @@ mclean <- function(tt=0,d=diseq()){
             2*out$Pb207U235*(dntdt['U235']/nt['U235'])^2
         out$dPb206U238dl8 <- 0 # TODO
         out$dPb207U235dl5 <- 0 # TODO
-    }
-    if (is.na(out$Pb206U238)){
-        print('break')
     }
     out
 }
