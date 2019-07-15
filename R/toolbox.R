@@ -170,14 +170,14 @@ wtdmean2D <- function(x){
     O12 <- rep(0,ns)
     for (i in 1:ns){
         E <- cor2cov2(x[i,2],x[i,4],x[i,5])
-        O <- solve(E)
-        O11[i] <- O[1,1]
-        O22[i] <- O[2,2]
-        O12[i] <- O[1,2]
+        DET <- E[1,1]*E[2,2]-E[1,2]*E[2,1]
+        O11[i] <- E[2,2]/DET
+        O22[i] <- E[1,1]/DET
+        O12[i] <- -E[1,2]/DET
     }
     numx <- sum(O22)*sum(X*O11+Y*O12)-sum(O12)*sum(Y*O22+X*O12)
-    den <- sum(O11)*sum(O22)-sum(O12)^2
     numy <- sum(O11)*sum(Y*O22+X*O12)-sum(O12)*sum(X*O11+Y*O12)
+    den <- sum(O11)*sum(O22)-sum(O12)^2
     xbar <- numx/den
     ybar <- numy/den
     out <- list()

@@ -996,7 +996,7 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
         }
         if (conc & show.p){
             SS.concordance <-
-                LL.concordia.age(tt=t.conc$age[1],ccw=wetherill(X,i),
+                LL.concordia.age(tt=t.conc$age[1],cc=wetherill(X,i),
                                  mswd=TRUE,exterr=exterr,d=x$d)
             p.value <- 1-stats::pchisq(SS.concordance,1)
             if (!is.na(sigdig)) p.value <- signif(p.value,sigdig)

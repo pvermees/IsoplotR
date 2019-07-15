@@ -709,8 +709,8 @@ LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
             J[2,2] <- D$dPb206U238dl8
         } else if (type==2){
             J[1,2] <- -D$dPb206U238dl8/D$Pb206U238^2
-            J[2,1] <- D$dPb207U235dl5/(U*Pb206U238)
-            J[2,2] <- -D$dPb206U238dl8/(U*Pb206U238^2)
+            J[2,1] <- D$dPb207U235dl5/(U*D$Pb206U238)
+            J[2,2] <- -D$dPb206U238dl8/(U*D$Pb206U238^2)
         } else { # type == 3
             J[1,2] <- D$dPb206U238dl8
             J[2,3] <- tt*exp(l2[1]*tt)
