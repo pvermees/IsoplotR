@@ -493,7 +493,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
             maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
         }
         out$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
-        out$t[2] <- get.Pb207Pb206.age(maxy,d=x$d)[1]
+        out$t[2] <- get.Pb207Pb206.age(maxy,d=x$d,interval=c(out$t[1],10000))[1]
         if (!xset)
             minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=x$d)[,'86'])
         if (!yset)
@@ -553,21 +553,21 @@ concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
     if (is.na(i)){
         cc <- concordia.comp(x,type=type)
         if (type==3){
-            ccw <- cc
-            agetype <- 3
-        } else {
-            ccw <- concordia.comp(x,type=1)
-            agetype <- 1
+            cc4age <- cc
+            type4age <- 3
+        } else { # use wetherill
+            cc4age <- concordia.comp(x,type=1)
+            type4age <- 1
         }
     } else {
         cc <- wetherill(x,i)
-        ccw <- cc
-        agetype <- 1
+        cc4age <- cc
+        type4age <- 1
     }
-    tt <- concordia_age_helper(ccw,d=x$d,type=agetype,exterr=exterr)
+    tt <- concordia_age_helper(cc4age,d=x$d,type=type4age,exterr=exterr)
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
-        out <- c(out,mswd.concordia(x,ccw,type=agetype,tt=tt[1],exterr=exterr))
+        out <- c(out,mswd.concordia(x,cc4age,type=type4age,tt=tt[1],exterr=exterr))
         out$age <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
         tfact <- stats::qt(1-alpha/2,out$df['combined'])
@@ -702,7 +702,7 @@ LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
         l2 <- settings('lambda','Th232')
         U <- settings('iratio','U238U235')
         Lcov <- diag(c(l5[2],l8[2],l2[2]))^2
-        J <- matrix(0,2,2)
+        J <- matrix(0,2,3)
         D <- mclean(tt=tt,d=d)
         if (type==1){
             J[1,1] <- D$dPb207U235dl5

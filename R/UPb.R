@@ -770,7 +770,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             J[1,1] <- -dfdx/dfdt                         # dt/dx
             if (exterr){
                 dfdl5 <- -2*xe1d*D$dPb207U235dl5
-                J[1,2] <- -dfdx/dfdl5                    # dt/dl5
+                J[1,2] <- -dfdl5/dfdt                    # dt/dl5
             }
         }
         E <- matrix(0,2,2)
@@ -817,7 +817,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             t.68 <- tryCatch({
                 dt <- 0.01/settings('lambda','U234')[1]
                 search.range <- c(t.init-dt,t.init+dt)
-                stats::optimize(diseq.68.misfit,interval=search.range,x=x,d=d)$minimum
+                stats::optimise(diseq.68.misfit,interval=search.range,x=x,d=d)$minimum
             }, error = function(error_condition) {
                 t.init
             })
@@ -828,7 +828,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             J[1,1] <- -dfdx/dfdt        # dt/dx
             if (exterr){
                 dfdl8 <- -2*xe2d*D$dPb206U238dl8
-                J[1,2] <- -dfdx/dfdl8   # dt/dl8
+                J[1,2] <- -dfdl8/dfdt   # dt/dl8
             }
         }
         E <- matrix(0,2,2)
@@ -880,8 +880,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=d[i])
         }
     } else {
-        search.range <- c(0,2/lambda('U238')[1])
-        t.76 <- stats::optimize(Pb207Pb206.misfit,interval=search.range,x=x,d=d)$minimum
+        t.76 <- stats::optimise(Pb207Pb206.misfit,x=x,d=d,interval=c(0,10000))$minimum
         J <- matrix(0,1,4)
         dmfdt <- dmf76dt(x,t.76,d=d)
         dmfdx <- 2*(x - age_to_Pb207Pb206_ratio(t.76,d=d)[,'76'])
@@ -905,7 +904,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
 get.Pb207Pb206.age.UPb <- function(x,i,exterr=TRUE,...){
     r76 <- get.Pb207Pb206.ratios(x)
     get.Pb207Pb206.age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],
-                       exterr=exterr,d=x$d[i])
+                       exterr=exterr,d=x$d[i],...)
 }
 get.Pb207Pb206.age.wetherill <- function(x,exterr=TRUE,...){
     U <- iratio('U238U235')[1]
