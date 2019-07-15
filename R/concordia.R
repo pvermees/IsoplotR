@@ -550,12 +550,24 @@ concordia.title <- function(fit,sigdig=2,alpha=0.05,...){
 }
 
 concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
-    if (is.na(i)) cc <- concordia.comp(x,type=type)
-    else cc <- wetherill(x,i)
-    tt <- concordia_age_helper(cc,d=x$d,type=type,exterr=exterr)
+    if (is.na(i)){
+        cc <- concordia.comp(x,type=type)
+        if (type==3){
+            ccw <- cc
+            agetype <- 3
+        } else {
+            ccw <- concordia.comp(x,type=1)
+            agetype <- 1
+        }
+    } else {
+        cc <- wetherill(x,i)
+        ccw <- cc
+        agetype <- 1
+    }
+    tt <- concordia_age_helper(ccw,d=x$d,type=agetype,exterr=exterr)
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
-        out <- c(out,mswd.concordia(x,cc,type=type,tt=tt[1],exterr=exterr))
+        out <- c(out,mswd.concordia(x,ccw,type=agetype,tt=tt[1],exterr=exterr))
         out$age <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
         tfact <- stats::qt(1-alpha/2,out$df['combined'])
