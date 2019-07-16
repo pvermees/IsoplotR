@@ -144,8 +144,8 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
-#' @param exterr propagate the external sources of uncertainty into
-#'     the mixture model errors?
+#' @param exterr include the external sources of uncertainty into
+#'     the error propagation for the central age and mixture models?
 #' @rdname radialplot
 #' @export
 radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
@@ -153,9 +153,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                                      show.numbers=FALSE,pch=21,
                                      levels=NA,clabel="",
                                      bg=c("yellow","red"),col='black',
-                                     title=TRUE,markers=NULL,k=0,
-                                     exterr=TRUE,alpha=0.05,hide=NULL,
-                                     omit=NULL,omit.col=NA,...){
+                                     markers=NULL,k=0,exterr=TRUE,alpha=0.05,
+                                     hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
@@ -175,9 +174,9 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                 markers=markers,bg=pcol[plotit],
                 col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],col=bg,clabel=clabel)
-    if (title)
-        title(radial.title(x2calc,sigdig=sigdig,alpha=alpha,
-                           units='Ma',ntit=get.ntit(x2calc$x[,1])))
+    fit <- central(x2calc,alpha=alpha,exterr=exterr)
+    title(radial.title(fit,sigdig=sigdig,alpha=alpha,
+                       units='Ma',ntit=get.ntit(x2calc)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }

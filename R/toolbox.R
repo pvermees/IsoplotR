@@ -516,12 +516,21 @@ clear <- function(x,...){
     out
 }
 
-get.ntit <- function(x){
+get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
+get.ntit.default <- function(x,...){
     ns <- length(x)
     nisnan <- length(which(is.na(x)))
     out <- 'n='
     if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
     paste0(out,ns)
+}
+get.ntit.fissiontracks <- function(x,...){
+    if (x$format<2){
+        out <- get.ntit.default(x$x[,'Ns'])
+    } else {
+        out <- get.ntit.default(x$Ns)
+    }
+    out    
 }
 
 geomean <- function(x,...){ UseMethod("geomean",x) }

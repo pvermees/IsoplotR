@@ -387,7 +387,7 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     } else if (hasClass(x,'LuHf')){
         R <- get.LuHf.ratio(tt,st,exterr=FALSE)
         out <- get.LuHf.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'fissiontracks')){
+    } else if (hasClass(x,'fissiontracks') & x$format<3){
         out[2] <- tt * sqrt( (x$zeta[2]/x$zeta[1])^2 + (st/tt)^2 )
     }
     out
