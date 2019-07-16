@@ -792,8 +792,8 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         J[i,2*i-1] <- 1  # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
         if (exterr){
-            dBdl5 <- D$dPb207U235dl5/U
-            dBdl8 <- -a0*D$dPb206U238dl8
+            dBdl5 <- D$dPb207U235dl35/U
+            dBdl8 <- -a0*D$dPb206U238dl38
             J[ns+i,2*ns+1] <- -dBdl5*X[i]
             J[ns+i,2*ns+2] <- -dBdl8*X[i]
         }
@@ -902,8 +902,8 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         J[ns+i,ii+3] <- -c0[i]*a0 # dLi/dTh2U8
         J[2*ns+i,ii+2] <- 1 # dMi/dPb8Th2
         if (exterr){
-            J[i,4*ns+1] <- -D$dPb207U235dl5 # dKi/dl5
-            J[ns+i,4*ns+2] <- -D$dPb206U238dl8 # dLi/dl8
+            J[i,4*ns+1] <- -D$dPb207U235dl35 # dKi/dl5
+            J[ns+i,4*ns+2] <- -D$dPb206U238dl38 # dLi/dl8
             J[2*ns+i,4*ns+3] <- - tt*exp(l2[1]*tt) # dMi/dl2
         }
     }

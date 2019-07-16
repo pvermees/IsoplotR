@@ -209,17 +209,26 @@ get_atoms <- function(tt=0,d=diseq(),nuclide='Th230',ratio='ThU',parent=FALSE){
 }
 
 # d only contains one sample
-mclean <- function(tt=0,d=diseq()){
+mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out <- list()
+    U <- iratio('U238U235')[1]
+    out$dPb206U238dl38 <- 0
+    out$dPb206U238dl34 <- 0
+    out$dPb206U238dl30 <- 0
+    out$dPb206U238dl26 <- 0
+    out$dPb207U235dl35 <- 0
+    out$dPb207U235dl31 <- 0
     if (d$equilibrium){
-        out$Pb206U238 <- exp(d$L['U238']*tt) - 1
-        out$Pb207U235 <- exp(d$L['U235']*tt) - 1
+        out$Pb206U238 <- exp(d$L['U238']*tt)-1
+        out$Pb207U235 <- exp(d$L['U235']*tt)-1
         out$dPb206U238dt <- exp(d$L['U238']*tt)*d$L['U238']
         out$dPb207U235dt <- exp(d$L['U235']*tt)*d$L['U235']
         out$d2Pb206U238dt2 <- exp(d$L['U238']*tt)*d$L['U238']^2
         out$d2Pb207U235dt2 <- exp(d$L['U235']*tt)*d$L['U235']^2
-        out$dPb206U238dl8 <- tt*exp(d$L['U238']*tt)
-        out$dPb207U235dl5 <- tt*exp(d$L['U235']*tt)
+        if (exterr){
+            out$dPb206U238dl38 <- tt*exp(d$L['U238']*tt)
+            out$dPb207U235dl35 <- tt*exp(d$L['U235']*tt)
+        }
     } else {
         d <- get_atoms(tt=tt,d=d,nuclide='U238',ratio='U48',parent=TRUE)
         d <- get_atoms(tt=tt,d=d,nuclide='U234',ratio='U48')
@@ -244,8 +253,35 @@ mclean <- function(tt=0,d=diseq()){
             2*dntdt['Pb207']*dntdt['U235']/nt['U235']^2 -
             out$Pb207U235*d2ntdt2['U235']/nt['U235'] +
             2*out$Pb207U235*(dntdt['U235']/nt['U235'])^2
-        out$dPb206U238dl8 <- 0 # TODO
-        out$dPb207U235dl5 <- 0 # TODO
+        if (exterr){
+            K <- get.diseq.K(tt=tt,d=d)
+            out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
+            out$dPb206U238dl34 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U234')
+            out$dPb206U238dl30 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='Th230')
+            out$dPb206U238dl26 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='Ra226')
+            out$dPb207U235dl35 <- drdl(d=d,K=K,den='U235',num='Pb207',parent='U235')
+            out$dPb207U235dl31 <- drdl(d=d,K=K,den='U235',num='Pb207',parent='Pa231')
+        }
+    }
+    out$Pb207Pb206 <- out$Pb207U235/(U*out$Pb206U238)
+    out$dPb207Pb206dt <- (out$dPb207U235dt*out$Pb206U238 -
+                          out$dPb206U238dt*out$Pb207U235)/(U*out$Pb206U238^2)
+    if (exterr){
+        out$dPb207Pb206dl38 <- -out$dPb206U238dl38*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl34 <- -out$dPb206U238dl34*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl30 <- -out$dPb206U238dl30*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl26 <- -out$dPb206U238dl26*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl35 <- out$dPb207U235dl35*out$Pb206U238/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl31 <- out$dPb207U235dl31*out$Pb206U238/(U*out$Pb206U238^2)
+        out$dPb207Pb206dU <- -out$Pb207Pb206/U
+    } else {
+        out$dPb207Pb206dl38 <- 0
+        out$dPb207Pb206dl34 <- 0
+        out$dPb207Pb206dl30 <- 0
+        out$dPb207Pb206dl26 <- 0
+        out$dPb207Pb206dl35 <- 0
+        out$dPb207Pb206dl31 <- 0
+        out$dPb207Pb206dU <- 0
     }
     out
 }
@@ -276,53 +312,47 @@ reverse <- function(tt,d=diseq(),derivative=FALSE){
     out
 }
 
+get.diseq.K <- function(tt=0,d=diseq()){
+    nl <- length(d$L)
+    out <- matrix(0,nl,nl)
+    colnames(out) <- names(d$L)
+    rownames(out) <- names(d$L)
+    for (i in 1:nl){
+        for (j in 1:nl){
+            if (i==j){
+                out[i,j] <- tt*exp(-d$L[i]*tt)
+            } else if (d$L[i]==d$L[j]){
+                # do nothing
+            } else {
+                out[i,j] <- (exp(-d$L[i]*tt)-exp(-d$L[j]*tt))/(d$L[j]-d$L[i])
+            }
+        }
+    }
+    out
+}
+drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
+                 num='Pb206',den='U238',parent='Th230'){
+    # 1. create matrix derivative
+    i <- which(names(d$L)%in%parent)
+    nl <- length(d$L)
+    dAdl <- matrix(0,nl,nl)
+    dAdl[c(i,i+1),1] <- c(-1,1)
+    H <- d$Qinv %*% dAdl %*% d$Q
+    P <- H * K
+    dntdl <- as.vector(d$Q %*% P %*% d$Qinv %*% d$nt)
+    names(dntdl) <- names(d$L)
+    # 2. derivative of the ratio
+    out <- (d$nt[den]*dntdl[num]-
+            d$nt[num]*dntdl[den])/d$nt[den]^2
+    out
+}
+
 diseq.75.misfit <- function(tt,x,d){
-    abs(log(x) - log(subset(age_to_Pb207U235_ratio(tt,d=d),select='75')))
+    (x - subset(age_to_Pb207U235_ratio(tt,d=d),select='75'))^2
 }
 diseq.68.misfit <- function(tt,x,d){
-    abs(log(x) - log(subset(age_to_Pb206U238_ratio(tt,d=d),select='68')))
+    (x - subset(age_to_Pb206U238_ratio(tt,d=d),select='68'))^2
 }
-Pb207Pb206.misfit <- function(tt,x,d=diseq()){
-    abs(x - subset(age_to_Pb207Pb206_ratio(tt,d=d),select='76'))
-}
-# derivative of the 7/6 misfit function w.r.t. time
-dmf76dt <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- mclean(tt=t.76,d=d)
-    r75 <- D$Pb207U235
-    r68 <- D$Pb206U238
-    dr75dt <- D$dPb207U235dt
-    dr68dt <- D$dPb206U238dt
-    2*(r75/(U*r68)-x)*(dr75dt*r68-r75*dr68dt)/(U*r68^2)
-}
-dmf76dl5 <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- mclean(tt=t.76,d=d)
-    r75 <- D$Pb207U235
-    r68 <- D$Pb206U238
-    dr75dl5 <- D$dPb207U235dl5
-    2*(r75/(U*r68)-x)/(U*r68)
-}
-dmf76dl8 <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- mclean(tt=t.76,d=d)
-    r75 <- D$Pb207U235
-    r68 <- D$Pb206U238
-    dr68dl8 <- D$dPb206U238dl8
-    2*(r75/(U*r68)-x)*(-r75*dr68dl8)/(U*r68^2)
-}
-dmf76dU <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- mclean(tt=t.76,d=d)
-    r75 <- D$Pb207U235
-    r68 <- D$Pb206U238
-    -2*(r75/(U*r68)-x)*r75/(r68*U^2)
+get.76.misfit <- function(tt,x,d=diseq()){
+    (x - subset(age_to_Pb207Pb206_ratio(tt,d=d),select='76'))^2
 }

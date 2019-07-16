@@ -711,16 +711,16 @@ LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
         U <- settings('iratio','U238U235')
         Lcov <- diag(c(l5[2],l8[2],l2[2]))^2
         J <- matrix(0,2,3)
-        D <- mclean(tt=tt,d=d)
+        D <- mclean(tt=tt,d=d,exterr=TRUE)
         if (type==1){
-            J[1,1] <- D$dPb207U235dl5
-            J[2,2] <- D$dPb206U238dl8
+            J[1,1] <- D$dPb207U235dl35
+            J[2,2] <- D$dPb206U238dl38
         } else if (type==2){
-            J[1,2] <- -D$dPb206U238dl8/D$Pb206U238^2
-            J[2,1] <- D$dPb207U235dl5/(U*D$Pb206U238)
-            J[2,2] <- -D$dPb206U238dl8/(U*D$Pb206U238^2)
+            J[1,2] <- -D$dPb206U238dl38/D$Pb206U238^2
+            J[2,1] <- D$dPb207U235dl35/(U*D$Pb206U238)
+            J[2,2] <- -D$dPb206U238dl38/(U*D$Pb206U238^2)
         } else { # type == 3
-            J[1,2] <- D$dPb206U238dl8
+            J[1,2] <- D$dPb206U238dl38
             J[2,3] <- tt*exp(l2[1]*tt)
         }
         E <- J %*% Lcov %*% t(J)

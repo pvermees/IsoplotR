@@ -358,17 +358,15 @@ age_to_wetherill_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     labels <- c('Pb207U235','Pb206U238')
     l8 <- settings('lambda','U238')[1]
     l5 <- settings('lambda','U235')[1]
-    D <- mclean(tt=tt,d=d)
+    D <- mclean(tt=tt,d=d,exterr=exterr)
     out$x <- c(D$Pb207U235,D$Pb206U238)
     E <- matrix(0,3,3)
     diag(E) <- c(st,lambda('U235')[2],lambda('U238')[2])^2
     J <- matrix(0,2,3)
     J[1,1] <- D$dPb207U235dt
     J[2,1] <- D$dPb206U238dt
-    if (exterr){
-        J[1,2] <- D$dPb207U235dl5
-        J[2,3] <- D$dPb206U238dl8
-    }
+    J[1,2] <- D$dPb207U235dl35
+    J[2,3] <- D$dPb206U238dl38
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
     rownames(out$cov) <- labels
@@ -382,25 +380,23 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
     tt <- check.zero.UPb(tt)
-    D <- mclean(tt=tt,d=d)
+    D <- mclean(tt=tt,d=d,exterr=exterr)
     U238Pb206 <- 1/D$Pb206U238
     Pb207Pb206 <- D$Pb207U235/(U*D$Pb206U238)
     d75dt <- D$dPb207U235dt
     d68dt <- D$dPb206U238dt
-    d75dl5 <- D$dPb207U235dl5
-    d68dl8 <- D$dPb206U238dl8
+    d75dl35 <- D$dPb207U235dl35
+    d68dl38 <- D$dPb206U238dl38
     out$x <- c(U238Pb206,Pb207Pb206)
     E <- matrix(0,4,4)
     diag(E) <- c(st,lambda('U235')[2],lambda('U238')[2],iratio('U238U235')[2])^2
     J <- matrix(0,2,4)
     J[1,1] <- -d68dt/D$Pb206U238^2
     J[2,1] <- (d75dt*D$Pb206U238-D$Pb207U235*d68dt)/(U*D$Pb206U238^2)
-    if (exterr){
-        J[1,3] <- -d68dl8/D$Pb206U238^2
-        J[2,2] <- d75dl5/(U*D$Pb206U238)
-        J[2,3] <- -Pb207Pb206*d68dl8/D$Pb206U238
-        J[2,4] <- -Pb207Pb206/U
-    }
+    J[1,3] <- -d68dl38/D$Pb206U238^2
+    J[2,2] <- d75dl35/(U*D$Pb206U238)
+    J[2,3] <- -Pb207Pb206*d68dl38/D$Pb206U238
+    J[2,4] <- -Pb207Pb206/U
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
     rownames(out$cov) <- labels
@@ -412,7 +408,7 @@ age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     labels <- c('Pb206U238','Pb208Th232')
     l8 <- settings('lambda','U238')[1]
     l2 <- settings('lambda','Th232')[1]
-    D <- mclean(tt=tt,d=d)
+    D <- mclean(tt=tt,d=d,exterr=exterr)
     Pb6U8 <- D$Pb206U238
     Pb8Th2 <- exp(l2*tt)-1
     out$x <- c(Pb6U8,Pb8Th2)
@@ -421,10 +417,8 @@ age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     J <- matrix(0,2,3)
     J[1,1] <- D$dPb206U238dt
     J[2,1] <- l2*exp(l2*tt)
-    if (exterr){
-        J[1,2] <- D$dPb206U238dl8
-        J[2,3] <- tt*exp(l2*tt)
-    }
+    J[1,2] <- D$dPb206U238dl38
+    J[2,3] <- tt*exp(l2*tt)
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
     rownames(out$cov) <- labels
@@ -763,15 +757,9 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             dt <- 0.01/settings('lambda','U234')[1]
             search.range <- c(t.75-dt,t.75+dt)
             t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
-            D <- mclean(tt=t.75,d=d)
-            xe1d <- x-D$Pb207U235 # misfit = f = xe1d^2
-            dfdx <- 2*xe1d
-            dfdt <- -2*xe1d*D$dPb207U235dt
-            J[1,1] <- -dfdx/dfdt                         # dt/dx
-            if (exterr){
-                dfdl5 <- -2*xe1d*D$dPb207U235dl5
-                J[1,2] <- -dfdl5/dfdt                    # dt/dl5
-            }
+            D <- mclean(tt=t.75,d=d,exterr=exterr)    # implicit differentiation of 
+            J[1,1] <- -1/D$dPb207U235dt               # mf=(x-Pb7U5)^2 => dt/dx
+            J[1,2] <- D$dPb207U235dl35/D$dPb207U235dt  # and dt/dl35
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
@@ -812,7 +800,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         if (d$equilibrium){
             t.68 <- t.init
             J[1,1] <- 1/(l8*(1+x))                       # dt/dx
-            if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl8
+            if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl38
         } else { # apply a disequilibrium correction
             t.68 <- tryCatch({
                 dt <- 0.01/settings('lambda','U234')[1]
@@ -821,15 +809,9 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
             }, error = function(error_condition) {
                 t.init
             })
-            D <- mclean(tt=t.68,d=d)
-            xe2d <- x-D$Pb206U238 # misfit = f = xe2d^2
-            dfdx <- 2*xe2d
-            dfdt <- -2*xe2d*D$dPb206U238dt
-            J[1,1] <- -dfdx/dfdt        # dt/dx
-            if (exterr){
-                dfdl8 <- -2*xe2d*D$dPb206U238dl8
-                J[1,2] <- -dfdl8/dfdt   # dt/dl8
-            }
+            D <- mclean(tt=t.68,d=d,exterr=exterr)    # implicit differentiation of 
+            J[1,1] <- -1/D$dPb206U238dt               # mf=(x-Pb6U8)^2 => dt/dx
+            J[1,2] <- D$dPb206U238dl38/D$dPb206U238dt  # and dt/dl38
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
@@ -894,16 +876,13 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),t.68=NA,...)
                 interval[1] <- midpoint
             }
         }
-        t.76 <- stats::optimise(Pb207Pb206.misfit,x=x,d=d,interval=interval)$minimum
+        t.76 <- stats::optimise(get.76.misfit,x=x,d=d,interval=interval)$minimum
+        D <- mclean(tt=t.76,d=d,exterr=exterr)
         J <- matrix(0,1,4)
-        dmfdt <- dmf76dt(x,t.76,d=d)
-        dmfdx <- 2*(x - age_to_Pb207Pb206_ratio(t.76,d=d)[,'76'])
-        J[1,1] <- -dmfdx/dmfdt
-        if (exterr){
-            J[1,2] <- -dmf76dl5(x,t.76,d=d)/dmfdt
-            J[1,3] <- -dmf76dl8(x,t.76,d=d)/dmfdt
-            J[1,4] <- -dmf76dU(x,t.76,d=d)/dmfdt
-        }
+        J[1,1] <- -1/D$dPb207Pb206dt # dt/dx
+        J[1,2] <- D$dPb207Pb206dl35/D$dPb207Pb206dt # dt/dl35
+        J[1,3] <- D$dPb207Pb206dl38/D$dPb207Pb206dt # dt/dl38
+        J[1,4] <- D$dPb207Pb206dU/D$dPb207Pb206dt # dt/dU
         E <- matrix(0,4,4)
         E[1,1] <- sx^2
         E[2,2] <- lambda('U235')[2]^2
