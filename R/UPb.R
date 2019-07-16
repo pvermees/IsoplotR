@@ -868,8 +868,13 @@ get.Pb206U238.age.terawasserburg <- function(x,exterr=TRUE,...){
     get.Pb206U238.age(r68,sr68,exterr=exterr,d=x$d,...)
 }
 
+twslope <- function(tt=0,d=diseq()){
+    D <- mclean(tt=tt,d=d)
+    D$dPb207U235dt/D$dPb206U238dt
+}
+
 get.Pb207Pb206.age <- function(x,...){ UseMethod("get.Pb207Pb206.age",x) }
-get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
+get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),t.68=NA,...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -877,10 +882,19 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=d[i])
+            out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=d[i],t.68=t.68)
         }
     } else {
-        t.76 <- stats::optimise(Pb207Pb206.misfit,x=x,d=d,interval=c(0,10000))$minimum
+        interval <- c(1/10000,10000)
+        if (!d$equilibrium & !any(is.na(t.68))){
+            midpoint <- stats::optimise(twslope,d=d,interval=interval)$minimum
+            if (t.68<midpoint){
+                interval[2] <- midpoint
+            } else {
+                interval[1] <- midpoint
+            }
+        }
+        t.76 <- stats::optimise(Pb207Pb206.misfit,x=x,d=d,interval=interval)$minimum
         J <- matrix(0,1,4)
         dmfdt <- dmf76dt(x,t.76,d=d)
         dmfdx <- 2*(x - age_to_Pb207Pb206_ratio(t.76,d=d)[,'76'])
@@ -979,7 +993,7 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
     if (!is.na(i)){
         t.75 <- get.Pb207U235.age(X,i,exterr=exterr)
         t.68 <- get.Pb206U238.age(X,i,exterr=exterr)
-        t.76 <- get.Pb207Pb206.age(X,i,exterr=exterr)
+        t.76 <- get.Pb207Pb206.age(X,i,exterr=exterr,t.68=t.68[1])
         t.75.out <- roundit(t.75[1],t.75[2],sigdig=sigdig)
         t.68.out <- roundit(t.68[1],t.68[2],sigdig=sigdig)
         t.76.out <- roundit(t.76[1],t.76[2],sigdig=sigdig)
@@ -990,7 +1004,7 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
             out <- c(out,t.82.out)
         }
         if (conc){
-            t.conc <- concordia.age(X,i,exterr=exterr)
+            t.conc <- concordia.age(x=X,i=i,exterr=exterr)
             t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
             out <- c(out,t.conc.out)
         }

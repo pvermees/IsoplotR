@@ -690,12 +690,20 @@ LL.concordia.comp <- function(mu,x,type=1,mswd=FALSE,...){
 }
 
 LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
-    if (type==1) y <- age_to_wetherill_ratios(tt,d=d)
-    else if (type==2) y <- age_to_terawasserburg_ratios(tt,d=d)
-    else if (type==3) y <- age_to_cottle_ratios(tt,d=d)
-    else stop('Incorrect concordia type.')
-    dx <- matrix(cc$x-y$x,1,2)
-    covmat <- cc$cov
+    if (type==1){
+        y <- age_to_wetherill_ratios(tt,d=d)
+        cols <- c('Pb207U235','Pb206U238')
+    } else if (type==2){
+        y <- age_to_terawasserburg_ratios(tt,d=d)
+        cols <- c('U238Pb206','Pb207Pb206')
+    } else if (type==3){
+        y <- age_to_cottle_ratios(tt,d=d)
+        cols <- c('Pb206U238','Pb208Th232')
+    } else {
+        stop('Incorrect concordia type.')
+    }
+    dx <- matrix(cc$x[cols]-y$x[cols],1,2)
+    covmat <- cc$cov[cols,cols]
     if (exterr){
         l5 <- settings('lambda','U235')
         l8 <- settings('lambda','U238')
@@ -716,7 +724,7 @@ LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
             J[2,3] <- tt*exp(l2[1]*tt)
         }
         E <- J %*% Lcov %*% t(J)
-        covmat <- cc$cov + E
+        covmat <- covmat + E
     }
     if (mswd) out <- get.concordia.SS(dx,covmat)
     else out <- LL.norm(dx,covmat)
