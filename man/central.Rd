@@ -13,7 +13,8 @@ central(x, ...)
 
 \method{central}{UThHe}(x, alpha = 0.05, model = 1, ...)
 
-\method{central}{fissiontracks}(x, mineral = NA, alpha = 0.05, ...)
+\method{central}{fissiontracks}(x, mineral = NA, alpha = 0.05,
+  exterr = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe} or \code{fissiontracks},
@@ -48,6 +49,9 @@ added (co)variance term.}
 \code{zircon} changes the default efficiency factor, initial
 fission track length and density to preset values (only affects
 results if \code{x$format=2})}
+
+\item{exterr}{include the zeta or decay constant uncertainty into
+the error propagation for the central age?}
 }
 \value{
 If \code{x} has class \code{UThHe}, returns a list containing the

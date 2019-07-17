@@ -139,8 +139,8 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                   alpha=alpha,units=units,hide=hide,omit=omit,
                   omit.col=omit.col,...)
     fit <- central(x,alpha=alpha)
-    title(radial.title(fit,sigdig=sigdig,alpha=alpha,
-                       units=units,ntit=get.ntit(x2calc[,1])))
+    graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
+                                 units=units,ntit=get.ntit(x2calc[,1])))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -175,8 +175,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                 col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],col=bg,clabel=clabel)
     fit <- central(x2calc,alpha=alpha,exterr=exterr)
-    title(radial.title(fit,sigdig=sigdig,alpha=alpha,
-                       units='Ma',ntit=get.ntit(x2calc)))
+    graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
+                                 units='Ma',ntit=get.ntit(x2calc)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -426,8 +426,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                                    cutoff.76=cutoff.76,type=type)
         fit$age[3] <- fit$age[2]*nfact(alpha)
     }
-    title(radial.title(fit,sigdig=sigdig,alpha=alpha,
-                       units=units,ntit=get.ntit(tt[,1])))
+    graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
+                                 units=units,ntit=get.ntit(tt[,1])))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -789,7 +789,7 @@ iatt <- function(z,zeta,rhoD){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
-                         ntit=paste0('n=',length(x)),...){
+                         ntit=paste0('n=',fit$df+2),...){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
     line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'('*n*')',
