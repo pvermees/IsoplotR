@@ -452,9 +452,12 @@ SS.SK.with.204 <- function(tt,x,i){
     i74 <- i6474['i74']
     U <- iratio('U238U235')[1]
     ccw <- list(x=rep(0,2),cov=matrix(0,2,2))
+    cnames <- c('Pb207U235','Pb206U238')
+    names(ccw$x) <- cnames
     ccw$x[1] <- wi$x['Pb207U235'] - i74*wi$x['Pb204U238']*U
     ccw$x[2] <- wi$x['Pb206U238'] - i64*wi$x['Pb204U238']
     J <- matrix(0,2,3)
+    rownames(J) <- cnames
     J[1,1] <- 1
     J[1,3] <- -i74*U
     J[2,2] <- 1

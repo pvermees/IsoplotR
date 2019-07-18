@@ -200,7 +200,9 @@ get_atoms <- function(tt=0,d=diseq(),nuclide='Th230',ratio='ThU',parent=FALSE){
         out$nt[nuclide] <- forward(tt=tt,d=out)[nuclide]
     } else if (tt*d$L[nuclide]<10){
         out$nt[nuclide] <- init/d$L[nuclide]
-        out$n0[nuclide] <- reverse(tt=tt,d=out)[nuclide]        
+        dtemp <- out
+        dtemp$L[tt*d$L>10] <- 0 # expired
+        out$n0[nuclide] <- reverse(tt=tt,d=dtemp)[nuclide]
     } else { # measured and expired
         out$n0[nuclide] <- 1/d$L[nuclide]
         out$nt[nuclide] <- forward(tt=tt,d=out)[nuclide]        
@@ -298,7 +300,7 @@ forward <- function(tt,d=diseq(),derivative=0){
     names(out) <- names(d$n0)
     out
 }
-reverse <- function(tt,d=diseq(),derivative=FALSE){
+reverse <- function(tt,d=diseq(),derivative=0){
     if (derivative==0){
         out <- as.vector(d$Q %*% diag(exp(d$L*tt)) %*% d$Qinv %*% d$nt)
     } else if (derivative==1){
@@ -354,5 +356,5 @@ diseq.68.misfit <- function(tt,x,d){
     (x - subset(age_to_Pb206U238_ratio(tt,d=d),select='68'))^2
 }
 get.76.misfit <- function(tt,x,d=diseq()){
-    (x - subset(age_to_Pb207Pb206_ratio(tt,d=d),select='76'))^2
+    (x - subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76'))^2
 }
