@@ -333,23 +333,23 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         else d$n0['Ra226'] <- d$RaU$x/l26
         if (d$PaU$option==0) d$n0['Pa231'] <- 1/l31
         else d$n0['Pa231'] <- d$PaU$x/l31
-        nt <- forward(tt=tt,d=d)
+        d$nt <- forward(tt=tt,d=d)
         dntdt <- forward(tt,d=d,derivative=1)
         d2ntdt2 <- forward(tt,d=d,derivative=2)
-        out$Pb206U238 <- nt['Pb206']/nt['U238']
-        out$Pb207U235 <- nt['Pb207']/nt['U235']
-        out$dPb206U238dt <- dntdt['Pb206']/nt['U238'] -
-            out$Pb206U238*dntdt['U238']/nt['U238']
-        out$d2Pb206U238dt2 <- d2ntdt2['Pb206']/nt['U238'] -
-            2*dntdt['Pb206']*dntdt['U238']/nt['U238']^2 -
-            out$Pb206U238*d2ntdt2['U238']/nt['U238'] +
-            2*out$Pb206U238*(dntdt['U238']/nt['U238'])^2
-        out$dPb207U235dt <- dntdt['Pb207']/nt['U235'] -
-            out$Pb207U235*dntdt['U235']/nt['U235']
-        out$d2Pb207U235dt2 <- d2ntdt2['Pb207']/nt['U235'] -
-            2*dntdt['Pb207']*dntdt['U235']/nt['U235']^2 -
-            out$Pb207U235*d2ntdt2['U235']/nt['U235'] +
-            2*out$Pb207U235*(dntdt['U235']/nt['U235'])^2
+        out$Pb206U238 <- d$nt['Pb206']/d$nt['U238']
+        out$Pb207U235 <- d$nt['Pb207']/d$nt['U235']
+        out$dPb206U238dt <- dntdt['Pb206']/d$nt['U238'] -
+            out$Pb206U238*dntdt['U238']/d$nt['U238']
+        out$d2Pb206U238dt2 <- d2ntdt2['Pb206']/d$nt['U238'] -
+            2*dntdt['Pb206']*dntdt['U238']/d$nt['U238']^2 -
+            out$Pb206U238*d2ntdt2['U238']/d$nt['U238'] +
+            2*out$Pb206U238*(dntdt['U238']/d$nt['U238'])^2
+        out$dPb207U235dt <- dntdt['Pb207']/d$nt['U235'] -
+            out$Pb207U235*dntdt['U235']/d$nt['U235']
+        out$d2Pb207U235dt2 <- d2ntdt2['Pb207']/d$nt['U235'] -
+            2*dntdt['Pb207']*dntdt['U235']/d$nt['U235']^2 -
+            out$Pb207U235*d2ntdt2['U235']/d$nt['U235'] +
+            2*out$Pb207U235*(dntdt['U235']/d$nt['U235'])^2
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')

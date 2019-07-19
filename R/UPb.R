@@ -867,7 +867,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...
     } else {
         interval <- c(1/10000,10000)
         if (!d$equilibrium & !any(is.na(t.68))){
-            midpoint <- stats::optimise(twslope(),d=d,interval=interval)$minimum
+            midpoint <- stats::optimise(twslope,d=d,interval=interval)$minimum
             if (t.68<midpoint){
                 interval[2] <- midpoint
             } else {
