@@ -104,13 +104,11 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
                   PaU=list(x=1,sx=0,option=0)){
     out <- list()
     class(out) <- 'diseq'
-    out$equilibrium <- (U48$option==0 & ThU$option==0 & RaU$option==0 & PaU$option==0) |
-        (U48$x==1 & ThU$x==0 & RaU$x==0 & PaU$x==0)
     out$U48 <- U48
     out$ThU <- ThU
     out$RaU <- RaU
     out$PaU <- PaU
-    out$n0 <- rep(0,8)
+    out$equilibrium <- check.equilibrium(d=out)
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000
     l30 <- settings('lambda','Th230')[1]*1000
@@ -150,6 +148,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[7,7] <- -1
     out$Qinv[8,6:8] <-1
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
+    out$n0 <- rep(0,8)
     nuclides <- c('U238','U234','Th230','Ra226',
                   'Pb206','U235','Pa231','Pb207')
     names(out$L) <- nuclides
@@ -254,22 +253,30 @@ check.diseq <- function(d=diseq(),tt=0){
     factor <- 10
     ratios <- c('U48','ThU','RaU','PaU')
     nuclides <- c('U234','Th230','Ra226','Pa231')
-    for (i in 1:4){
+    for (i in 1:length(nuclides)){
         ratio <- ratios[i]
-        if (d[[ratio]]$x == 1){
-            out[[ratio]]$option <- 0
-        }
         nuclide <- nuclides[i]
         measured <- d[[ratio]]$option>1
         expired <- tt*d$L[nuclide]>10
+        equilibrium <- d[[ratio]]$x==1
         deficit <- d[[ratio]]$x<1
-        if (measured & expired){
+        if (equilibrium){
+            out[[ratio]]$option <- 0
+        } else if (measured & expired){
             if (deficit) out[[ratio]]$x <- 0
-            else out[[ratio]]$x <- 10 # impose maximum disequilibrium
+            else out[[ratio]]$x <- 10 # impose maximum initial disequilibrium
             out[[ratio]]$option <- 1
         }        
     }
     out
+}
+
+check.equilibrium <- function(d=diseq()){
+    U48 <- (d$U48$option==0 | d$U48$x==1)
+    ThU <- (d$ThU$option==0 | d$ThU$x==1)
+    RaU <- (d$RaU$option==0 | d$RaU$x==1)
+    PaU <- (d$PaU$option==0 | d$PaU$x==1)
+    U48 & ThU & RaU & PaU
 }
 
 # d only contains one sample
@@ -288,7 +295,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out$dPb206U238dl26 <- 0
     out$dPb207U235dl35 <- 0
     out$dPb207U235dl31 <- 0
-    if (d$equilibrium){
+    d <- check.diseq(d=d,tt=tt)
+    if (check.equilibrium(d=d)){
         out$Pb206U238 <- exp(l38*tt)-1
         out$Pb207U235 <- exp(l35*tt)-1
         out$dPb206U238dt <- exp(l38*tt)*l38
@@ -300,7 +308,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$dPb207U235dl35 <- tt*exp(l35*tt)
         }
     } else {
-        d <- check.diseq(d=d,tt=tt)
         d$n0['U238'] <- 1/l38
         d$n0['U235'] <- 1/l35
         if (d$U48$option<2){     # initial 234U

@@ -22,14 +22,8 @@
 #' 
 #' @param alpha cutoff value for confidence intervals
 #' 
-#' @param ... optional arguments
-#
-# @param x a \eqn{3n}-element vector \eqn{[X Y Z]}, where \eqn{X},
-#     \eqn{Y} and \eqn{Z} are three \eqn{n}-element vectors of
-#     (isotopic ratio) values.
-# @param covmat a \eqn{[3n x 3n]}-element covariance matrix of
-#     \code{x}
-#
+#' @param ... optional
+#' 
 #' @return
 #' \describe{
 #'

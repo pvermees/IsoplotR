@@ -397,7 +397,7 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          show.numbers=FALSE,levels=NA,clabel="",
                          ellipse.col=c("#00FF0080","#FF000080"),
                          type=1,ci.col='gray80',line.col='black',
-                         lwd=1,plot=TRUE,exterr=TRUE,model=1,
+                         lwd=1,plot=TRUE,exterr=FALSE,model=1,
                          show.ellipses=1*(model!=2),
                          anchor=list(FALSE,NA),hide=NULL,omit=NULL,
                          omit.col=NA,...){
