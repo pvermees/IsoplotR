@@ -359,8 +359,8 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
             graphics::points(xy$x[1],xy$x[2],pch=21,bg='white')
         }
         pos <- 2
-        if ((type%in%c(1,2)  & diff(range(conc[,'x']))<0.05) |
-            (type==2 & diff(range(conc[,'x']))<2.5) & exterr){ pos <- NULL }
+        if ((type%in%c(1,2)  & diff(range(conc[,'x'],na.rm=TRUE))<0.05) |
+            (type==2 & diff(range(conc[,'x'],na.rm=TRUE))<2.5) & exterr){ pos <- NULL }
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
     graphics::box()

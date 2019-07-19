@@ -754,8 +754,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             J[1,1] <- 1/(l5*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         } else { # apply a disequilibrium correction
-            dt <- 0.01/settings('lambda','U234')[1]
-            search.range <- c(t.75-dt,t.75+dt)
+            search.range <- c(t.75/1000,t.75+100)
             t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
             D <- mclean(tt=t.75,d=d,exterr=exterr)    # implicit differentiation of 
             J[1,1] <- -1/D$dPb207U235dt               # mf=(x-Pb7U5)^2 => dt/dx
@@ -803,8 +802,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl38
         } else { # apply a disequilibrium correction
             t.68 <- tryCatch({
-                dt <- 0.01/settings('lambda','U234')[1]
-                search.range <- c(t.init-dt,t.init+dt)
+                search.range <- c(t.init/1000,t.init+100)
                 stats::optimise(diseq.68.misfit,interval=search.range,x=x,d=d)$minimum
             }, error = function(error_condition) {
                 t.init
@@ -869,7 +867,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...
     } else {
         interval <- c(1/10000,10000)
         if (!d$equilibrium & !any(is.na(t.68))){
-            midpoint <- stats::optimise(twslope,d=d,interval=interval)$minimum
+            midpoint <- stats::optimise(twslope(),d=d,interval=interval)$minimum
             if (t.68<midpoint){
                 interval[2] <- midpoint
             } else {

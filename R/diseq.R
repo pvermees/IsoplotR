@@ -231,7 +231,9 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    names(out) <- names(nt)
+    out
 }
 forward <- function(tt,d=diseq(),derivative=0){
     if (derivative==0){
@@ -302,11 +304,11 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         d$n0['U238'] <- 1/l38
         d$n0['U235'] <- 1/l35
         if (d$U48$option<2){     # initial 234U
-            if (d$U48$option==0) d$n0['U234'] <- 1/l34
+            if (d$U48$option==0) out$n0['U234'] <- 1/l34
             else d$n0['U234'] <- d$U48$x/l34
             if (d$ThU$option<2){ # initial 230Th
                 if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
-                else d$n0['Th230'] <- d$U48$x/l30
+                else d$n0['Th230'] <- d$ThU$x/l30
             } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
                 nt['Th230'] <- d$ThU$x*nt['U238']*l30/l38 # overwrite
@@ -318,7 +320,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 nt['U234'] <- d$U48$x*nt['U238']*l34/l38 # overwrite
                 d$n0['U234'] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234']
                 if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
-                else d$n0['Th230'] <- d$U48$x/l30
+                else d$n0['Th230'] <- d$ThU$x/l30
             } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
                 nt['U234'] <- d$U48$x*nt['U238']*l34/l38 # overwrite
@@ -350,8 +352,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             2*out$Pb207U235*(dntdt['U235']/nt['U235'])^2
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
-            ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@8@"]]));##:ess-bp-end:##
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
             out$dPb206U238dl34 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U234')
             out$dPb206U238dl30 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='Th230')
@@ -360,9 +360,14 @@ browser(expr=is.null(.ESSBP.[["@8@"]]));##:ess-bp-end:##
             out$dPb207U235dl31 <- drdl(d=d,K=K,den='U235',num='Pb207',parent='Pa231')
         }
     }
-    out$Pb207Pb206 <- out$Pb207U235/(U*out$Pb206U238)
-    out$dPb207Pb206dt <- (out$dPb207U235dt*out$Pb206U238 -
-                          out$dPb206U238dt*out$Pb207U235)/(U*out$Pb206U238^2)
+    if (tt>0){
+        out$Pb207Pb206 <- out$Pb207U235/(U*out$Pb206U238)
+        out$dPb207Pb206dt <- (out$dPb207U235dt*out$Pb206U238 -
+                              out$dPb206U238dt*out$Pb207U235)/(U*out$Pb206U238^2)
+    } else {
+        out$Pb207Pb206 <- 0
+        out$dPb207Pb206dt <- 0
+    }
     if (exterr){
         out$dPb207Pb206dl38 <- -out$dPb206U238dl38*out$Pb207U235/(U*out$Pb206U238^2)
         out$dPb207Pb206dl34 <- -out$dPb206U238dl34*out$Pb207U235/(U*out$Pb206U238^2)
