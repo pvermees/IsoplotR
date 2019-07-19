@@ -350,8 +350,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             2*out$Pb207U235*(dntdt['U235']/nt['U235'])^2
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
-            ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@8@"]]));##:ess-bp-end:##
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
             out$dPb206U238dl34 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U234')
             out$dPb206U238dl30 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='Th230')

@@ -735,7 +735,7 @@ get.Pb208Pb206.ratios <- function(x){
 }
 
 get.Pb207U235.age <- function(x,...){ UseMethod("get.Pb207U235.age",x) }
-get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
+get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -770,11 +770,11 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
     }
     out
 }
-get.Pb207U235.age.UPb <- function(x,i,exterr=TRUE,...){
+get.Pb207U235.age.UPb <- function(x,i,exterr=FALSE,...){
     r75 <- get.Pb207U235.ratios(x)
     get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],exterr=exterr,d=x$d)
 }
-get.Pb207U235.age.wetherill <- function(x,exterr=TRUE,...){
+get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb207U235'
     r75 <- x$x[i]
     sr75 <- sqrt(x$cov[i,i])
@@ -782,7 +782,7 @@ get.Pb207U235.age.wetherill <- function(x,exterr=TRUE,...){
 }
 
 get.Pb206U238.age <- function(x,...){ UseMethod("get.Pb206U238.age",x) }
-get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
+get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -822,7 +822,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),...){
     }
     out
 }
-get.Pb206U238.age.UPb <- function(x,i=NA,exterr=TRUE,...){
+get.Pb206U238.age.UPb <- function(x,i=NA,exterr=FALSE,...){
     r68 <- get.Pb206U238.ratios(x)
     if (is.na(i)){
         ns <- length(x)
@@ -836,13 +836,13 @@ get.Pb206U238.age.UPb <- function(x,i=NA,exterr=TRUE,...){
     }
     out
 }
-get.Pb206U238.age.wetherill <- function(x,exterr=TRUE,...){
+get.Pb206U238.age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb206U238'
     r68 <- x$x[i]
     sr68 <- sqrt(x$cov[i,i])
     get.Pb206U238.age(r68,sr68,exterr=exterr,d=x$d,...)
 }
-get.Pb206U238.age.terawasserburg <- function(x,exterr=TRUE,...){
+get.Pb206U238.age.terawasserburg <- function(x,exterr=FALSE,...){
     i <- 'U238Pb206'
     r86 <- x$x[i]
     r68 <- 1/r86
@@ -856,7 +856,7 @@ twslope <- function(tt=0,d=diseq()){
 }
 
 get.Pb207Pb206.age <- function(x,...){ UseMethod("get.Pb207Pb206.age",x) }
-get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),t.68=NA,...){
+get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -894,12 +894,12 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=TRUE,d=diseq(),t.68=NA,...)
     }
     out    
 }
-get.Pb207Pb206.age.UPb <- function(x,i,exterr=TRUE,...){
+get.Pb207Pb206.age.UPb <- function(x,i,exterr=FALSE,...){
     r76 <- get.Pb207Pb206.ratios(x)
     get.Pb207Pb206.age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],
                        exterr=exterr,d=x$d[i],...)
 }
-get.Pb207Pb206.age.wetherill <- function(x,exterr=TRUE,...){
+get.Pb207Pb206.age.wetherill <- function(x,exterr=FALSE,...){
     U <- iratio('U238U235')[1]
     r76 <- x$x['Pb207U235']/(U*x$x['Pb206U238'])
     J <- matrix(0,1,2)
@@ -909,14 +909,14 @@ get.Pb207Pb206.age.wetherill <- function(x,exterr=TRUE,...){
     sr76 <- J %*% E %*% t(J)
     get.Pb207Pb206.age(r76,sr76,exterr=exterr,d=x$d)
 }
-get.Pb207Pb206.age.terawasserburg <- function(x,exterr=TRUE,...){
+get.Pb207Pb206.age.terawasserburg <- function(x,exterr=FALSE,...){
     r76 <- x$x['Pb207Pb206']
     sr76 <- x$cov['Pb207Pb206','Pb207Pb206']
     get.Pb207Pb206.age(r76,sr76,exterr=exterr,d=x$d)
 }
 
 get.Pb208Th232.age <- function(x,...){ UseMethod("get.Pb208Th232.age",x) }
-get.Pb208Th232.age.default <- function(x,sx=0,exterr=TRUE,...){
+get.Pb208Th232.age.default <- function(x,sx=0,exterr=FALSE,...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -943,7 +943,7 @@ get.Pb208Th232.age.default <- function(x,sx=0,exterr=TRUE,...){
     }
     out
 }
-get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=TRUE,...){
+get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
     r82 <- get.Pb208Th232.ratios(x)
     if (is.na(i)){
         ns <- length(x)
@@ -961,7 +961,7 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=TRUE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.Pb=0,...){
+UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.Pb=0,...){
     if (common.Pb>0) X <- Pb0corr(x,option=common.Pb)
     else X <- x
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
@@ -1008,7 +1008,7 @@ UPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.P
     out
 }
 
-filter.UPb.ages <- function(x,type=4,cutoff.76=1100,exterr=TRUE,
+filter.UPb.ages <- function(x,type=4,cutoff.76=1100,exterr=FALSE,
                             cutoff.disc=list(-15,5,TRUE),common.Pb=0){
     tout <- UPb.age(x,exterr=exterr,conc=(type==5),common.Pb=common.Pb)
     if (any(is.na(cutoff.disc))){
