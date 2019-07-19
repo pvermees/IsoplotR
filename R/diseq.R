@@ -110,6 +110,8 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$ThU <- ThU
     out$RaU <- RaU
     out$PaU <- PaU
+    out$n0 <- rep(0,8)
+    out$nt <- rep(0,8)
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000
     l30 <- settings('lambda','Th230')[1]*1000
@@ -148,13 +150,12 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[7,6] <- l35 /(l31-l35)
     out$Qinv[7,7] <- -1
     out$Qinv[8,6:8] <-1
-    nuclides <- c('U238','U234','Th230','Ra226','Pb206','U235','Pa231','Pb207')
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
-    out$n0 <- rep(0,8)
-    out$nt <- rep(0,8)
+    nuclides <- c('U238','U234','Th230','Ra226',
+                  'Pb206','U235','Pa231','Pb207')
+    names(out$L) <- nuclides
     names(out$n0) <- nuclides
     names(out$nt) <- nuclides
-    names(out$L) <- nuclides
     out
 }
 
@@ -168,6 +169,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out
 }
 
+# infer initial activity ratios from Th/U measurements
 copy_diseq <- function(x,d=diseq()){
     out <- d
     if (d$ThU$option==3){
@@ -188,24 +190,84 @@ geomean.diseq <- function(x,...){
     out
 }
 
-get_atoms <- function(tt=0,d=diseq(),nuclide='Th230',ratio='ThU',parent=FALSE){
+# to infer initial 38,34,30,35 from measured 34/38 and 30/38
+mexp.8405 <- function(){
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    out <- list()
+    out$L <- c(l38,l34,l30,l35)
+    names(out$L) <- c('U238','U234','Th230','U235')
+    out$Q <- diag(1,4,4)
+    out$Q[1,1] <- (l30-l38)*(l34-l38)/(l34*l38)
+    out$Q[2,1] <- (l30-l38)/l34
+    out$Q[2,2] <- (l30-l34)/l34
+    out$Q[3,1:2] <- 1
+    out$Qinv <- diag(1,4,4)
+    out$Qinv[1,1] <- (l34*l38)/((l30-l38)*(l34-l38))
+    out$Qinv[2,1] <- -(l34*l38)/((l30-l34)*(l34-l38))
+    out$Qinv[2,2] <- l34/(l30-l34)
+    out$Qinv[3,1] <- (l34*l38)/((l30-l34)*(l30-l38))
+    out$Qinv[3,2] <- -l34/(l30-l34)
+    out
+}
+
+# to infer initial 38,34,35 from measured 34/38
+mexp.845 <- function(nratios=3){
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l26 <- settings('lambda','Ra226')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    out <- list()
+    out$L <- c(l38,l34,l35)
+    names(out$L) <- c('U238','U234','U235')
+    out$Q <- diag(1,3,3)
+    out$Q[1,1] <- (l34-l38)/l38
+    out$Q[2,1] <- 1
+    out$Qinv <- diag(1,3,3)
+    out$Qinv[1,1] <- l38/(l34-l38)
+    out$Qinv[2,1] <- -l38/(l34-l38)
+    out
+}
+
+reverse <- function(tt,mexp,nt){
+    as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+}
+forward <- function(tt,d=diseq(),derivative=0){
+    if (derivative==0){
+        out <- as.vector(d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    } else if (derivative==1){
+        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*%
+                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    } else if (derivative==2){
+        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
+                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    }
+    names(out) <- names(d$L)
+    out
+}
+
+check.diseq <- function(d=diseq(),tt=0){
     out <- d
-    if (parent) init <- 1
-    else init <- d[[ratio]]$x
-    if (d[[ratio]]$option==0){
-        out$n0[nuclide] <- 1/d$L[nuclide]
-        out$nt[nuclide] <- forward(tt=tt,d=out)[nuclide]
-    } else if (d[[ratio]]$option==1){
-        out$n0[nuclide] <- init/d$L[nuclide]
-        out$nt[nuclide] <- forward(tt=tt,d=out)[nuclide]
-    } else if (tt*d$L[nuclide]<10){
-        out$nt[nuclide] <- init/d$L[nuclide]
-        dtemp <- out
-        dtemp$L[tt*d$L>10] <- 0 # expired
-        out$n0[nuclide] <- reverse(tt=tt,d=dtemp)[nuclide]
-    } else { # measured and expired
-        out$n0[nuclide] <- 1/d$L[nuclide]
-        out$nt[nuclide] <- forward(tt=tt,d=out)[nuclide]        
+    factor <- 10
+    ratios <- c('U48','ThU','RaU','PaU')
+    nuclides <- c('U234','Th230','Ra226','Pa231')
+    for (i in 1:4){
+        ratio <- ratios[i]
+        if (d[[ratio]]$x == 1){
+            out[[ratio]]$option <- 0
+        }
+        nuclide <- nuclides[i]
+        measured <- d[[ratio]]$option>1
+        expired <- tt*d$L[nuclide]>10
+        deficit <- d[[ratio]]$x<1
+        if (measured & expired){
+            if (deficit) out[[ratio]]$x <- 0
+            else out[[ratio]]$x <- 10 # impose maximum disequilibrium
+            out[[ratio]]$option <- 1
+        }        
     }
     out
 }
@@ -213,6 +275,12 @@ get_atoms <- function(tt=0,d=diseq(),nuclide='Th230',ratio='ThU',parent=FALSE){
 # d only contains one sample
 mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out <- list()
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l26 <- settings('lambda','Ra226')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    l31 <- settings('lambda','Pa231')[1]*1000
     U <- iratio('U238U235')[1]
     out$dPb206U238dl38 <- 0
     out$dPb206U238dl34 <- 0
@@ -221,23 +289,55 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out$dPb207U235dl35 <- 0
     out$dPb207U235dl31 <- 0
     if (d$equilibrium){
-        out$Pb206U238 <- exp(d$L['U238']*tt)-1
-        out$Pb207U235 <- exp(d$L['U235']*tt)-1
-        out$dPb206U238dt <- exp(d$L['U238']*tt)*d$L['U238']
-        out$dPb207U235dt <- exp(d$L['U235']*tt)*d$L['U235']
-        out$d2Pb206U238dt2 <- exp(d$L['U238']*tt)*d$L['U238']^2
-        out$d2Pb207U235dt2 <- exp(d$L['U235']*tt)*d$L['U235']^2
+        out$Pb206U238 <- exp(l38*tt)-1
+        out$Pb207U235 <- exp(l35*tt)-1
+        out$dPb206U238dt <- exp(l38*tt)*l38
+        out$dPb207U235dt <- exp(l35*tt)*l35
+        out$d2Pb206U238dt2 <- exp(l38*tt)*l38^2
+        out$d2Pb207U235dt2 <- exp(l35*tt)*l35^2
         if (exterr){
-            out$dPb206U238dl38 <- tt*exp(d$L['U238']*tt)
-            out$dPb207U235dl35 <- tt*exp(d$L['U235']*tt)
+            out$dPb206U238dl38 <- tt*exp(l38*tt)
+            out$dPb207U235dl35 <- tt*exp(l35*tt)
         }
     } else {
-        d <- get_atoms(tt=tt,d=d,nuclide='U238',ratio='U48',parent=TRUE)
-        d <- get_atoms(tt=tt,d=d,nuclide='U234',ratio='U48')
-        d <- get_atoms(tt=tt,d=d,nuclide='Th230',ratio='ThU')
-        d <- get_atoms(tt=tt,d=d,nuclide='Ra226',ratio='RaU')
-        d <- get_atoms(tt=tt,d=d,nuclide='U235',ratio='PaU',parent=TRUE)
-        d <- get_atoms(tt=tt,d=d,nuclide='Pa231',ratio='PaU')
+        d <- check.diseq(d=d,tt=tt)
+        factor <- 10
+        d$n0['U238'] <- 1/l38
+        d$n0['U235'] <- 1/l35
+        if (d$U48$option<2){
+            if (d$U48$option==0) d$n0['U234'] <- 1/l34
+            else d$n0['U234'] <- d$U48$x/l34
+            if (d$ThU$option<2){
+                if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
+                else d$n0['Th230'] <- d$U48$x/l30
+            } else {
+                selection <- c('U238','U234','U235')
+                mexp <- mexp.8405()
+                d$nt[selection] <- forward(tt=tt,d=d)[selection]
+                if (tt*l30>factor) mexp$L['Th230'] <- factor/tt
+                selection <- c('U238','U234','Th230','U235')
+                d$n0[selection] <- reverse(tt=tt,mexp=mexp,nt=d$nt[selection])
+            }
+        } else {
+            if (d$ThU$option<2){
+                if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
+                else d$n0['Th230'] <- d$U48$x/l30
+                mexp <- mexp.845()
+                if (tt*l34>factor) mexp$L['U234'] <- factor/tt
+                selection <- c('U238','U234','U235')
+                d$n0[selection] <- reverse(tt=tt,mexp=mexp,nt=d$nt[selection])
+            } else {
+                mexp <- mexp.8405()
+                if (tt*l30>factor) mexp$L['Th230'] <- factor/tt
+                if (tt*l34>factor) mexp$L['U234'] <- factor/tt
+                selection <- c('U238','U234','Th230','U235')
+                d$n0[selection] <- reverse(tt=tt,mexp=mexp,nt=d$nt[selection])
+            }
+        }
+        if (d$RaU$option==0) d$n0['Ra226'] <- 1/l26
+        else d$n0['Ra226'] <- d$RaU$x/l26
+        if (d$PaU$option==0) d$n0['Pa231'] <- 1/l31
+        else d$n0['Pa231'] <- d$PaU$x/l31
         nt <- forward(tt=tt,d=d)
         dntdt <- forward(tt,d=d,derivative=1)
         d2ntdt2 <- forward(tt,d=d,derivative=2)
@@ -285,32 +385,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$dPb207Pb206dl31 <- 0
         out$dPb207Pb206dU <- 0
     }
-    out
-}
-forward <- function(tt,d=diseq(),derivative=0){
-    if (derivative==0){
-        out <- as.vector(d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
-    } else if (derivative==1){
-        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*%
-                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
-    } else if (derivative==2){
-        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
-                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
-    }
-    names(out) <- names(d$n0)
-    out
-}
-reverse <- function(tt,d=diseq(),derivative=0){
-    if (derivative==0){
-        out <- as.vector(d$Q %*% diag(exp(d$L*tt)) %*% d$Qinv %*% d$nt)
-    } else if (derivative==1){
-        out <- as.vector(d$Q %*% diag(exp(d$L)) %*%
-                         diag(exp(d$L*tt)) %*% d$Qinv %*% d$nt)
-    } else if (derivative==2){
-        out <- as.vector(d$Q %*% diag(exp(d$L)) %*% diag(exp(d$L)) %*%
-                         diag(exp(d$L*tt)) %*% d$Qinv %*% d$nt)        
-    }
-    names(out) <- names(d$nt)
     out
 }
 
