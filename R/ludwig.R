@@ -387,11 +387,11 @@ LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
     ns <- length(x)
     dRdt <- matrix(0,2*ns,1)
     dRda0 <- matrix(0,2*ns,1)
-    D <- mclean(tt,d=x$d)
+    D <- mclean(tt=tt,d=x$d)
     # b = D$Pb207U235/U - a0*D$Pb206U238
     dbdt <- D$dPb207U235dt/U - a0*D$dPb206U238dt
     drydt <- -dbdt*(X-rx) # x = X - rX
-    dryda0 <- D$Pb206U238 - 1
+    dryda0 <- D$Pb206U238*(X-rx) - 1
     dRdt[(ns+1):(2*ns),1] <- drydt
     dRda0[(ns+1):(2*ns),1] <- dryda0
     dSdt <- 2*t(dRdt) %*% l$omega %*% dRdt
