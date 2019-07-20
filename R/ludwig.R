@@ -776,7 +776,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     X <- matrix(0,ns,1)
     Y <- matrix(0,ns,1)
     for (i in 1:ns){
-        D <- mclean(tt=tt,d=x$d[i])
+        D <- mclean(tt=tt,d=x$d[i],exterr=exterr)
         B <-  D$Pb207U235/U - a0*D$Pb206U238
         XY <- tera.wasserburg(x,i)
         X[i] <- XY$x['U238Pb206']
@@ -785,12 +785,10 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         E[2*i,2*i] <- E[2*i,2*i] + (a0*w)^2
         J[i,2*i-1] <- 1  # drx/dX
         J[ns+i,2*i] <- 1 # dry/dY
-        if (exterr){
-            dBdl5 <- D$dPb207U235dl35/U
-            dBdl8 <- -a0*D$dPb206U238dl38
-            J[ns+i,2*ns+1] <- -dBdl5*X[i]
-            J[ns+i,2*ns+2] <- -dBdl8*X[i]
-        }
+        dBdl5 <- D$dPb207U235dl35/U
+        dBdl8 <- -a0*D$dPb206U238dl38
+        J[ns+i,2*ns+1] <- -dBdl5*X[i]
+        J[ns+i,2*ns+2] <- -dBdl8*X[i]
     }
     E[2*ns+1,2*ns+1] <- l5[2]^2
     E[2*ns+2,2*ns+2] <- l8[2]^2
@@ -829,19 +827,17 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     Z <- rep(0,ns)
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
-        D <- mclean(tt=tt,d=x$d[i])
+        D <- mclean(tt=tt,d=x$d[i],exterr=exterr)
         Z[i] <- wd$x['Pb204U238']
         R[i] <- wd$x['Pb207U235'] - U*b0*Z[i] - D$Pb207U235
         r[i] <- wd$x['Pb206U238'] - a0*Z[i] - D$Pb206U238
         Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
         E[(3*i-2):(3*i),(3*i-2):(3*i)] <- wd$cov + Ew
-        J[i,3*i-2] <- 1                                  # dRdX
-        J[ns+i,3*i-1] <- 1                               # drdY
-        J[2*ns+i,3*i] <- 1                               # dphidZ
-        if (exterr){
-            J[i,3*ns+1] <- -D$dPb207U235dt    # dRdl5
-            J[ns+i,3*ns+2] <- -D$dPb206U238dt # drdl8
-        }
+        J[i,3*i-2] <- 1                     # dRdX
+        J[ns+i,3*i-1] <- 1                  # drdY
+        J[2*ns+i,3*i] <- 1                  # dphidZ
+        J[i,3*ns+1] <- -D$dPb207U235dl35    # dRdl5
+        J[ns+i,3*ns+2] <- -D$dPb206U238dl38 # drdl8
     }
     E[3*ns+1,3*ns+1] <- l5[2]^2
     E[3*ns+2,3*ns+2] <- l8[2]^2
@@ -882,7 +878,7 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     E <- matrix(0,4*ns+3,4*ns+3)
     J <- matrix(0,3*ns,4*ns+3)
     for (i in 1:ns){
-        D <- mclean(tt,d=x$d[i])
+        D <- mclean(tt,d=x$d[i],exterr=exterr)
         wd <- wetherill(x,i)
         ii <- 4*i-3
         c0[i] <- wd$x['Pb208Th232'] - exp(l2[1]*tt) + 1
@@ -895,17 +891,13 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         J[ns+i,ii+1] <- 1 # dLi/dPb6U8
         J[ns+i,ii+3] <- -c0[i]*a0 # dLi/dTh2U8
         J[2*ns+i,ii+2] <- 1 # dMi/dPb8Th2
-        if (exterr){
-            J[i,4*ns+1] <- -D$dPb207U235dl35 # dKi/dl5
-            J[ns+i,4*ns+2] <- -D$dPb206U238dl38 # dLi/dl8
-            J[2*ns+i,4*ns+3] <- - tt*exp(l2[1]*tt) # dMi/dl2
-        }
+        J[i,4*ns+1] <- -D$dPb207U235dl35 # dKi/dl5
+        J[ns+i,4*ns+2] <- -D$dPb206U238dl38 # dLi/dl8
+        J[2*ns+i,4*ns+3] <- - tt*exp(l2[1]*tt) # dMi/dl2
     }
-    if (exterr){ # decay constant uncertainties
-        E[4*ns+1,4*ns+1] <- l5[2]^2
-        E[4*ns+2,4*ns+2] <- l8[2]^2
-        E[4*ns+3,4*ns+3] <- l2[2]^2
-    }
+    E[4*ns+1,4*ns+1] <- l5[2]^2
+    E[4*ns+2,4*ns+2] <- l8[2]^2
+    E[4*ns+3,4*ns+3] <- l2[2]^2
     E2 <- J %*% E %*% t(J)
     if (w>0) E2 <- E2 + get.Ew_Th(w=w,W=x$x[,'Th232U238'],a0=a0,b0=b0,c0=c0)
     omega <- blockinverse3x3(AA=E2[1:ns,1:ns],
