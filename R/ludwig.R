@@ -377,8 +377,6 @@ LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
 LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
     tt <- ta0[1]
     a0 <- ta0[2]
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
     U <- settings('iratio','U238U235')[1]
     l <- data2ludwig(x,tt=tt,a0=a0,exterr=exterr,w=w)
     rx <- l$rx
@@ -394,8 +392,9 @@ LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
     dryda0 <- D$Pb206U238*(X-rx) - 1
     dRdt[(ns+1):(2*ns),1] <- drydt
     dRda0[(ns+1):(2*ns),1] <- dryda0
-    dSdt <- 2*t(dRdt) %*% l$omega %*% dRdt
-    dSda0 <- 2*t(dRda0) %*% l$omega %*% dRda0
+    R <- rbind(rx,ry)
+    dSdt <- 2 * t(R) %*% l$omega %*% dRdt
+    dSda0 <- 2 * t(R) %*% l$omega %*% dRda0
     c(dSdt,dSda0)
 }
 LL.lud.3D.gr <- function(ta0b0,x,exterr=FALSE,w=0){
@@ -403,18 +402,17 @@ LL.lud.3D.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
     l2 <- settings('lambda','Th232')[1]
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
     U <- settings('iratio','U238U235')[1]
     l <- data2ludwig(x,tt=tt,a0=0,b0=b0,exterr=exterr,w=w)
     phi <- l$phi
-    R <- l$R
-    r <- l$r
     omega <- l$omega
+    D <- mclean(tt=tt,d=x$d)
     Z <- get.Pb204U238.ratios(x)[,1]
     z <- Z - phi
-    dRdt <- -l5*exp(l5*tt)
-    drdt <- -l8*exp(l8*tt)
+    R <- l$R # R <- X - U*b0*z - D$Pb207U235
+    r <- l$r # r <- Y - a0*z - D$Pb206U238
+    dRdt <- -D$dPb207U235dt
+    drdt <- -D$dPb206U238dt
     drda0 <- -z
     dRdb0 <- -U*z
     dSdt <- 0
@@ -447,8 +445,6 @@ LL.lud.Th.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     b0 <- ta0b0[3]
     l <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
     ns <- length(l$K)
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
     l2 <- settings('lambda','Th232')[1]
     U <- settings('iratio','U238U235')[1]
     K <- matrix(l$K,nrow=ns)
@@ -457,8 +453,9 @@ LL.lud.Th.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     Z <- get.Pb208Th232.ratios(x)[,1,drop=FALSE]
     c0 <- Z - exp(l2*tt) + 1 - M
     W <- x$x[,'Th232U238']
-    dKdt <- matrix(rep(-l5*exp(l5*tt),ns),nrow=ns)
-    dLdt <- matrix(rep(-l8*exp(l8*tt),ns),nrow=ns)
+    D <- mclean(tt=tt,d=x$d)
+    dKdt <- matrix(rep(-D$dPb207U235dt,ns),nrow=ns)
+    dLdt <- matrix(rep(-D$dPb206U238dt,ns),nrow=ns)
     dMdt <- matrix(rep(-l2*exp(l2*tt),ns),nrow=ns)
     dKdb0 <- -U*c0*W
     dLda0 <- -c0*W
@@ -531,8 +528,6 @@ fisher_lud_2D <- function(x,fit){
     tt <- fit$par[1]
     a0 <- fit$par[2]
     l <- data2ludwig_2D(x,tt=tt,a0=a0,w=0,exterr=fit$exterr)
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     ones <- matrix(1,ns,1)
@@ -580,11 +575,10 @@ fisher_lud_3D <- function(x,fit){
     z <- l$z
     omega <- l$omega
     ns <- length(z)
-    l5 <- settings('lambda','U235')
-    l8 <- settings('lambda','U238')
+    D <- mclean(tt=tt,d=x$d)
     U <- settings('iratio','U238U235')[1]
-    Q235 <- l5[1]*exp(l5[1]*tt)
-    Q238 <- l8[1]*exp(l8[1]*tt)
+    Q235 <- D$dPb207U235dt
+    Q238 <- D$dPb206U238dt
     d2L.dt2 <- 0
     d2L.da02 <- 0
     d2L.db02 <- 0
@@ -659,8 +653,6 @@ fisher_lud_Th <- function(x,fit){
     b0 <- fit$par[3]
     l <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=0,exterr=fit$exterr)
     ns <- length(l$K)
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
     l2 <- settings('lambda','Th232')[1]
     U <- settings('iratio','U238U235')[1]
     K <- matrix(l$K,nrow=ns)
@@ -669,11 +661,12 @@ fisher_lud_Th <- function(x,fit){
     Z <- get.Pb208Th232.ratios(x)[,1,drop=FALSE]
     c0 <- Z - exp(l2*tt) + 1 - M
     W <- x$x[,'Th232U238']
-    dKdt <- matrix(rep(-l5*exp(l5*tt),ns),nrow=ns) # TODO add disequilibrium correction, do the same for the other two Fisher functions!
-    dLdt <- matrix(rep(-l8*exp(l8*tt),ns),nrow=ns)
+    D <- mclean(tt=tt,d=x$d)
+    dKdt <- matrix(rep(-D$dPb207U235dt,ns),nrow=ns)
+    dLdt <- matrix(rep(-D$dPb206U238dt,nrow=ns),nrow=ns)
     dMdt <- matrix(rep(-l2*exp(l2*tt),ns),nrow=ns)
-    d2Kdt2 <- l5*dKdt
-    d2Ldt2 <- l8*dLdt
+    d2Kdt2 <- matrix(rep(-D$d2Pb207U235dt2,ns),nrow=ns)
+    d2Ldt2 <- matrix(rep(-D$d2Pb206U238dt2,ns),nrow=ns)
     d2Mdt2 <- l2*dMdt
     dKdb0 <- -U*c0*W
     dKdc0 <- diag(-U*b0*W)
@@ -767,8 +760,6 @@ data2ludwig.UPb <- function(x,tt,a0,b0=0,g0=rep(0,length(x)),exterr=FALSE,w=0,..
     out
 }
 data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
-    l5 <- settings('lambda','U235')
-    l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     E <- matrix(0,2*ns+2,2*ns+2)
@@ -790,8 +781,8 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
         J[ns+i,2*ns+1] <- -dBdl5*X[i]
         J[ns+i,2*ns+2] <- -dBdl8*X[i]
     }
-    E[2*ns+1,2*ns+1] <- l5[2]^2
-    E[2*ns+2,2*ns+2] <- l8[2]^2
+    E[2*ns+1,2*ns+1] <- settings('lambda','U235')[2]^2
+    E[2*ns+2,2*ns+2] <- settings('lambda','U238')[2]^2
     out <- list()
     OI <- J %*% E %*% t(J)
     O <- blockinverse(AA=OI[1:ns,1:ns],
@@ -816,8 +807,6 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     out
 }
 data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
-    l5 <- settings('lambda','U235')
-    l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     E <- matrix(0,3*ns+2,3*ns+2)
@@ -839,8 +828,8 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         J[i,3*ns+1] <- -D$dPb207U235dl35    # dRdl5
         J[ns+i,3*ns+2] <- -D$dPb206U238dl38 # drdl8
     }
-    E[3*ns+1,3*ns+1] <- l5[2]^2
-    E[3*ns+2,3*ns+2] <- l8[2]^2
+    E[3*ns+1,3*ns+1] <- settings('lambda','U235')[2]^2
+    E[3*ns+2,3*ns+2] <- settings('lambda','U238')[2]^2
     omega <- solve(J %*% E %*% t(J))
     # rearrange sum of squares:
     V <- matrix(0,ns,ns)
@@ -866,8 +855,6 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
 }
 data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     l2 <- settings('lambda','Th232')
-    l5 <- settings('lambda','U235')
-    l8 <- settings('lambda','U238')
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
     K <- rep(0,ns)
@@ -895,8 +882,8 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         J[ns+i,4*ns+2] <- -D$dPb206U238dl38 # dLi/dl8
         J[2*ns+i,4*ns+3] <- - tt*exp(l2[1]*tt) # dMi/dl2
     }
-    E[4*ns+1,4*ns+1] <- l5[2]^2
-    E[4*ns+2,4*ns+2] <- l8[2]^2
+    E[4*ns+1,4*ns+1] <- settings('lambda','U235')[2]^2
+    E[4*ns+2,4*ns+2] <- settings('lambda','U238')[2]^2
     E[4*ns+3,4*ns+3] <- l2[2]^2
     E2 <- J %*% E %*% t(J)
     if (w>0) E2 <- E2 + get.Ew_Th(w=w,W=x$x[,'Th232U238'],a0=a0,b0=b0,c0=c0)
