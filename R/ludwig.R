@@ -328,23 +328,8 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     phi <- l$phi
     R <- l$R
     r <- l$r
-    out <- 0
-    ns <- length(l$R)
-    omega <- l$omega
-    for (i in 1:ns){
-        i1 <- i
-        i2 <- i + ns
-        i3 <- i + 2*ns
-        for (j in 1:ns){
-            j1 <- j
-            j2 <- j + ns
-            j3 <- j + 2*ns
-            out <- out + R[i]*R[j]*omega[i1,j1] +
-                r[i]*r[j]*omega[i2,j2] + phi[i]*phi[j]*omega[i3,j3] +
-                2*( R[i]*r[j]*omega[i1,j2] +
-                    R[i]*phi[j]*omega[i1,j3] + r[i]*phi[j]*omega[i2,j3] )
-        }
-    }
+    D <- c(l$R,l$r,l$phi)
+    out <- t(D) %*% l$omega %*% D
     if (LL){
         k <- 3*ns
         detE <- determinant(l$omegainv,logarithm=TRUE)$modulus
