@@ -68,7 +68,7 @@ ludwig.default <- function(x,...){
     stop( "No default method available (yet)." )
 }
 #' @param exterr propagate external sources of
-#' uncertainty (e.g., decay constants)?
+#' uncertainty (i.e. decay constants)?
 #' @param model one of three regression models:
 #'
 #' \code{1}: fit a discordia line through the data using the maximum
@@ -314,10 +314,10 @@ LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
     l <- data2ludwig(x,tt=ta0[1],a0=ta0[2],exterr=exterr,w=w)
-    R <- rbind(l$rx,l$ry)
-    out <- t(R) %*% l$omega %*% R
+    D <- c(l$rx,l$ry)
+    out <- D %*% l$omega %*% D
     if (LL){
-        k <- length(R)
+        k <- length(D)
         detE <- determinant(2*pi*l$omegainv,logarithm=TRUE)$modulus
         out <- -0.5*(out + k*log(2*pi) + detE)
     }
@@ -329,7 +329,7 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     R <- l$R
     r <- l$r
     D <- c(l$R,l$r,l$phi)
-    out <- t(D) %*% l$omega %*% D
+    out <- D %*% l$omega %*% D
     if (LL){
         k <- 3*ns
         detE <- determinant(l$omegainv,logarithm=TRUE)$modulus
@@ -339,10 +339,10 @@ LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 LL.lud.Th <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
-    KLM <- matrix(c(l$K,l$L,l$M),nrow=1)
-    out <- KLM %*% l$omega %*% t(KLM)
+    D <- c(l$K,l$L,l$M)
+    out <- D %*% l$omega %*% D
     if (LL){
-        k <- length(KLM)
+        k <- length(D)
         detE <- determinant(l$omegainv,logarithm=TRUE)$modulus
         out <- -0.5*(out + k*log(2*pi) + detE)
     }
@@ -846,8 +846,8 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     out <- list()
     out$phi <- solve(W,V)
     out$z <- Z - out$phi
-    out$R <- X - U*b0*out$z - D$Pb207U235
-    out$r <- Y - a0*out$z - D$Pb206U238
+    out$R <- X - U*b0*out$z - x75
+    out$r <- Y - a0*out$z - x68
     out$omega <- omega
     out$omegainv <- ED
     out
@@ -916,9 +916,9 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
            U*b0*(o12+t(o21))*a0*W + a0*W*(o12+t(o21))*U*b0*W + U*b0*W*(o13+t(o31)) +
            (o13+t(o31))*U*b0*W + a0*W*(o23+t(o32)) )
     M <- solve(B,A)
-    c0 <- Z - M - exp(l2*tt) + 1
-    K <- X - c0*b0*U*W - D$Pb207U235
-    L <- Y - c0*a0*W - D$Pb206U238
+    c0 <- Z - M - x82
+    K <- X - c0*b0*U*W - x75
+    L <- Y - c0*a0*W - x68
     list(K=K,L=L,M=M,omega11=o11,omega12=o12,omega13=o13,
          omega21=o21,omega22=o22,omega23=o23,omega31=o31,
          omega32=o32,omega33=o33,omega=omega,omegainv=ED)
