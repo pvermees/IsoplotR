@@ -792,52 +792,63 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     out$ry <- Y - a0 - B*out$x
     out
 }
+# rederived from Ludwig (1998):
 data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
-    U <- settings('iratio','U238U235')[1]
+    U <- iratio('U238U235')[1]
     ns <- length(x)
-    E <- matrix(0,3*ns+2,3*ns+2)
-    J <- matrix(0,3*ns,3*ns+2)
-    R <- rep(0,ns)
-    r <- rep(0,ns)
+    E <- matrix(0,3*ns+6,3*ns+6)
+    J <- matrix(0,3*ns,3*ns+6)
+    J[1:(3*ns),1:(3*ns)] <- diag(3*ns)
+    X <- rep(0,ns)
+    Y <- rep(0,ns)
     Z <- rep(0,ns)
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
-        D <- mclean(tt=tt,d=x$d[i],exterr=exterr)
+        E[c(i,ns+i,2*ns+i),c(i,ns+i,2*ns+i)] <- wd$cov
+        X[i] <- wd$x['Pb207U235']
+        Y[i] <- wd$x['Pb206U238']
         Z[i] <- wd$x['Pb204U238']
-        R[i] <- wd$x['Pb207U235'] - U*b0*Z[i] - D$Pb207U235
-        r[i] <- wd$x['Pb206U238'] - a0*Z[i] - D$Pb206U238
-        Ew <- get.Ew(w=w,Z=Z[i],a0=a0,b0=b0,U=U)
-        E[(3*i-2):(3*i),(3*i-2):(3*i)] <- wd$cov + Ew
-        J[i,3*i-2] <- 1                     # dRdX
-        J[ns+i,3*i-1] <- 1                  # drdY
-        J[2*ns+i,3*i] <- 1                  # dphidZ
-        J[i,3*ns+1] <- -D$dPb207U235dl35    # dRdl5
-        J[ns+i,3*ns+2] <- -D$dPb206U238dl38 # drdl8
     }
-    E[3*ns+1,3*ns+1] <- settings('lambda','U235')[2]^2
-    E[3*ns+2,3*ns+2] <- settings('lambda','U238')[2]^2
-    omega <- solve(J %*% E %*% t(J))
-    # rearrange sum of squares:
-    V <- matrix(0,ns,ns)
-    W <- rep(0,ns)
-    for (i in 1:ns){
-        i1 <- i
-        i2 <- i + ns
-        i3 <- i + 2*ns
-        for (j in 1:ns){
-            j1 <- j
-            j2 <- j + ns
-            j3 <- j + 2*ns
-            W[i] <- W[i]-R[j]*(U*b0*omega[i1,j1]+a0*omega[i2,j1]+omega[i3,j1])-
-                    r[j]*(U*b0*omega[i1,j2]+a0*omega[i2,j2]+omega[i3,j2])
-            # Ludwig (1998): V[i,j]<-U*b0*omega[i1,j3]+a0*omega[i2,j3]+omega[i3,j3]
-            V[i,j] <- omega[i1,j1]*(U*b0)^2+omega[i2,j2]*a0^2+omega[i3,j3] +
-                      2*(U*a0*b0*omega[i1,j2]+U*b0*omega[i1,j3]+a0*omega[i2,j3])
-        }
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    i3 <- (2*ns+1):(3*ns)
+    D <- mclean(tt=tt,d=geomean(x$d),exterr=exterr)
+    if (exterr){
+        E[3*ns+1,3*ns+1] <- lambda('U238')[2]^2
+        E[3*ns+2,3*ns+2] <- lambda('U235')[2]^2
+        E[3*ns+3,3*ns+3] <- (lambda('U234')[2]*1000)^2
+        E[3*ns+4,3*ns+4] <- (lambda('Pa231')[2]*1000)^2
+        E[3*ns+5,3*ns+5] <- (lambda('Th230')[2]*1000)^2
+        E[3*ns+6,3*ns+6] <- (lambda('Ra226')[2]*1000)^2
+        J[i1,3*ns+2] <- -D$dPb207U235dl35
+        J[i1,3*ns+4] <- -D$dPb207U235dl31
+        J[i2,3*ns+1] <- -D$dPb206U238dl38
+        J[i2,3*ns+3] <- -D$dPb206U238dl34
+        J[i2,3*ns+5] <- -D$dPb206U238dl30
+        J[i2,3*ns+6] <- -D$dPb206U238dl26
     }
-    phi <- solve(V,W)
-    z <- Z - phi
-    out <- list(R=R,r=r,phi=phi,z=z,omega=omega,omegainv=E)    
+    ED <- J %*% E %*% t(J)
+    omega <- blockinverse3x3(AA=ED[i1,i1],BB=ED[i1,i2],CC=ED[i1,i3],
+                             DD=ED[i2,i1],EE=ED[i2,i2],FF=ED[i2,i3],
+                             GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
+    o11 <- omega[i1,i1]; o12 <- omega[i1,i2]; o13 <- omega[i1,i3]
+    o21 <- omega[i2,i1]; o22 <- omega[i2,i2]; o23 <- omega[i2,i3]
+    o31 <- omega[i3,i1]; o32 <- omega[i3,i2]; o33 <- omega[i3,i3]
+    R0 <- X - U*b0*Z - D$Pb207U235
+    r0 <- Y - a0*Z - D$Pb206U238
+    V <- t(R0%*%(o11+t(o11))*U*b0 + r0%*%(o21+t(o21))*U*b0 + R0%*%(o12+t(o21))*a0 +
+           r0%*%(o22+t(o22))*a0 + R0%*%(o31+t(o13)) + r0%*%(o23+t(o32)))
+    W <- -(U*b0*(o11+t(o11))*U*b0 + U*b0*(o12+t(o21))*a0 + U*b0*(o13+t(o31)) +
+           a0*(o21+t(o12))*U*b0 + a0*(o22+t(o22))*a0 + a0*(o23+t(o32)) +
+           (o31+t(o13))*U*b0 + (o32+t(o23))*a0 + (o33+t(o33)))
+    out <- list()
+    out$phi <- solve(W,V)
+    out$z <- Z - out$phi
+    out$R <- X - U*b0*out$z - D$Pb207U235
+    out$r <- Y - a0*out$z - D$Pb206U238
+    out$omega <- omega
+    out$omegainv <- ED
+    out
 }
 data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     l2 <- settings('lambda','Th232')
@@ -907,8 +918,8 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
 get.Ew <- function(w,Z,a0,b0,U){
     E <- diag(c(a0,b0)*w)^2
     J <- matrix(0,3,2)
-    J[1,2] <- -U*Z # dRda0
-    J[2,1] <- -Z   # dRdb0
+    J[1,2] <- -Z   # dRdb0
+    J[2,1] <- -U*Z # drda0
     J %*% E %*% t(J)
 }
 
