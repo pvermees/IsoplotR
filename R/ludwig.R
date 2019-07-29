@@ -813,12 +813,14 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         D <- mclean(tt=tt,d=x$d[i],exterr=exterr)
         x75[i] <- D$Pb207U235
         x68[i] <- D$Pb206U238
-        J[i,3*ns+2] <- -D$dPb207U235dl35
-        J[i,3*ns+4] <- -D$dPb207U235dl31
-        J[ns+i,3*ns+1] <- -D$dPb206U238dl38
-        J[ns+i,3*ns+3] <- -D$dPb206U238dl34
-        J[ns+i,3*ns+5] <- -D$dPb206U238dl30
-        J[ns+i,3*ns+6] <- -D$dPb206U238dl26
+        J[i,2*ns+i] <- -U*b0                 #dRdZ
+        J[i,3*ns+2] <- -D$dPb207U235dl35     #dRdl35
+        J[i,3*ns+4] <- -D$dPb207U235dl31     #dRdl31
+        J[ns+i,2*ns+i] <- -a0                #drdZ
+        J[ns+i,3*ns+1] <- -D$dPb206U238dl38  #drdl38
+        J[ns+i,3*ns+3] <- -D$dPb206U238dl34  #drdl34
+        J[ns+i,3*ns+5] <- -D$dPb206U238dl30  #drdl30
+        J[ns+i,3*ns+6] <- -D$dPb206U238dl26  #drdl26
     }
     E[3*ns+1,3*ns+1] <- lambda('U238')[2]^2
     E[3*ns+2,3*ns+2] <- lambda('U235')[2]^2
@@ -882,16 +884,14 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         L0[i] <- Y[i] - (Z[i]-x82[i])*a0*W[i] - x68[i]
         E[c(i,ns+i,2*ns+i,3*ns+i),c(i,ns+i,2*ns+i,3*ns+i)] <- wd$cov
         J[i,2*ns+i] <- -b0*U*W[i]             # dKdZ
-        J[i,3*ns+i] <- -(Z[i]-x82[i])*b0*U    # dKdW
         J[i,4*ns+2] <- -D$dPb207U235dl35      # dKdl35
         J[i,4*ns+5] <- -D$dPb207U235dl31      # dKdl31
         J[ns+i,2*ns+i] <- -a0*W[i]            # dLdZ
-        J[ns+i,3*ns+i] <- -(Z[i]-x82[i])*a0   # dLdW        
-        J[ns+i,4*ns+1] <- -D$dPb206U238dl38   # dLd38
-        J[ns+i,4*ns+3] <- -D$dPb206U238dl34   # dLd34
-        J[ns+i,4*ns+6] <- -D$dPb206U238dl30   # dLd30
-        J[ns+i,4*ns+7] <- -D$dPb206U238dl26   # dLd26
-        J[2*ns+i,4*ns+4] <- -tt*exp(l2*tt)    # dMd32
+        J[ns+i,4*ns+1] <- -D$dPb206U238dl38   # dLdl38
+        J[ns+i,4*ns+3] <- -D$dPb206U238dl34   # dLdl34
+        J[ns+i,4*ns+6] <- -D$dPb206U238dl30   # dLdl30
+        J[ns+i,4*ns+7] <- -D$dPb206U238dl26   # dLdl26
+        J[2*ns+i,4*ns+4] <- -tt*exp(l2*tt)    # dMdl32
     }
     E[4*ns+1,4*ns+1] <- lambda('U238')[2]^2
     E[4*ns+2,4*ns+2] <- lambda('U235')[2]^2
