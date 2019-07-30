@@ -568,12 +568,12 @@ fisher_lud_3D <- function(x,fit){
     ns <- length(x)
     out <- matrix(0,ns+3,ns+3)
     for (i in 1:ns){
-        for (j in 1:ns){
-            out[i,j] <- d2Sdxdy_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='z',y='z',i=i,j=j)
-        }
         out[i,ns+1] <- d2Sdxdy_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='z',y='t',i=i)
         out[i,ns+2] <- d2Sdxdy_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='z',y='a0',i=i)
         out[i,ns+3] <- d2Sdxdy_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='z',y='b0',i=i)        
+        for (j in 1:ns){
+            out[i,j] <- d2Sdxdy_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='z',y='z',i=i,j=j)
+        }
     }
     out[ns+1,ns+1] <- d2Sdxdy_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='t',y='t')
     out[ns+2,ns+2] <- d2Sdxdy_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='a0',y='a0')
@@ -594,98 +594,29 @@ fisher_lud_Th <- function(x,fit){
     a0 <- fit$par[2]
     b0 <- fit$par[3]
     l <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=0,exterr=fit$exterr)
-    ns <- length(l$K)
-    l2 <- settings('lambda','Th232')[1]
-    U <- settings('iratio','U238U235')[1]
-    K <- matrix(l$K,nrow=ns)
-    L <- matrix(l$L,nrow=ns)
-    M <- matrix(l$M,nrow=ns)
-    Z <- get.Pb208Th232.ratios(x)[,1,drop=FALSE]
-    c0 <- Z - exp(l2*tt) + 1 - M
-    W <- x$x[,'Th232U238']
     D <- mclean(tt=tt,d=x$d)
-    dKdt <- matrix(rep(-D$dPb207U235dt,ns),nrow=ns)
-    dLdt <- matrix(rep(-D$dPb206U238dt,nrow=ns),nrow=ns)
-    dMdt <- matrix(rep(-l2*exp(l2*tt),ns),nrow=ns)
-    d2Kdt2 <- matrix(rep(-D$d2Pb207U235dt2,ns),nrow=ns)
-    d2Ldt2 <- matrix(rep(-D$d2Pb206U238dt2,ns),nrow=ns)
-    d2Mdt2 <- l2*dMdt
-    dKdb0 <- -U*c0*W
-    dKdc0 <- diag(-U*b0*W)
-    d2Kdc0db0 <- diag(-U*W)
-    dLda0 <- -c0*W
-    dLdc0 <- diag(-a0*W)
-    d2Ldc0da0 <- diag(-W)
-    dMdc0 <- diag(rep(-1,ns))
-    d2Sdc0dt <- 2*t(dKdc0)%*%l$omega11%*%dKdt +
-        t(dLdc0)%*%t(l$omega12)%*%dKdt + t(dKdc0)%*%l$omega12%*%dLdt +
-        t(dMdc0)%*%t(l$omega13)%*%dKdt + t(dKdc0)%*%l$omega13%*%dMdt +
-        t(dKdc0)%*%t(l$omega21)%*%dLdt + t(dLdc0)%*%l$omega21%*%dKdt +
-        2*t(dLdc0)%*%t(l$omega22)%*%dLdt +
-        t(dMdc0)%*%t(l$omega23)%*%dLdt + t(dLdc0)%*%l$omega23%*%dMdt +
-        t(dKdc0)%*%t(l$omega31)%*%dMdt + t(dMdc0)%*%l$omega31%*%dKdt +
-        t(dLdc0)%*%t(l$omega32)%*%dMdt + t(dMdc0)%*%l$omega32%*%dLdt +
-        2*t(dMdc0)%*%t(l$omega33)%*%dMdt
-    d2Sdc0da0 <- t(dKdc0)%*%l$omega12%*%dLda0 +
-        t(dKdc0)%*%t(l$omega21)%*%dLda0 + 
-        2*t(dLdc0)%*%t(l$omega22)%*%dLda0 +
-        t(dMdc0)%*%t(l$omega23)%*%dLda0 +
-        t(dMdc0)%*%l$omega32%*%dLda0
-    d2Sdc0db0 <- 2*t(dKdc0)%*%l$omega11%*%dKdb0 +
-        t(dLdc0)%*%t(l$omega12)%*%dKdb0 + 
-        t(dMdc0)%*%t(l$omega13)%*%dKdb0 +
-        t(dLdc0)%*%l$omega21%*%dKdb0 +
-        t(dMdc0)%*%l$omega31%*%dKdb0
-    d2Sdc02 <- 2*t(dKdc0)%*%l$omega11%*%dKdc0 +
-        t(dLdc0)%*%t(l$omega12)%*%dKdc0 + t(dKdc0)%*%l$omega12%*%dLdc0 +
-        t(dMdc0)%*%t(l$omega13)%*%dKdc0 + t(dKdc0)%*%l$omega13%*%dMdc0 +
-        t(dKdc0)%*%t(l$omega21)%*%dLdc0 + t(dLdc0)%*%l$omega21%*%dKdc0 +
-        2*t(dLdc0)%*%l$omega22%*%dLdc0 +
-        t(dMdc0)%*%t(l$omega23)%*%dLdc0 + t(dLdc0)%*%l$omega23%*%dMdc0 +
-        t(dKdc0)%*%t(l$omega31)%*%dMdc0 + t(dMdc0)%*%l$omega31%*%dKdc0 +
-        t(dLdc0)%*%t(l$omega32)%*%dMdc0 + t(dMdc0)%*%l$omega32%*%dLdc0 +
-        2*t(dMdc0)%*%l$omega33%*%dMdc0
-    d2Sdt2 <- 2*t(K)%*%l$omega11%*%d2Kdt2 + 2*t(dKdt)%*%l$omega11%*%dKdt +
-        t(K)%*%l$omega12%*%d2Ldt2 + t(dLdt)%*%t(l$omega12)%*%dKdt +
-        t(dLdt)%*%t(l$omega12)%*%d2Kdt2 + t(dKdt)%*%l$omega12%*%dLdt +
-        t(K)%*%l$omega13%*%d2Mdt2 + t(dMdt)%*%t(l$omega13)%*%dKdt +
-        t(dMdt)%*%t(l$omega13)%*%d2Kdt2 + t(dKdt)%*%l$omega13%*%dMdt +
-        t(L)%*%l$omega21%*%d2Kdt2 + t(dKdt)%*%t(l$omega21)%*%dLdt +
-        t(dKdt)%*%t(l$omega21)%*%d2Ldt2 + t(dLdt)%*%l$omega21%*%dKdt +
-        2*t(L)%*%l$omega22%*%d2Ldt2 + 2*t(dLdt)%*%l$omega22%*%dLdt +
-        t(L)%*%l$omega23%*%d2Mdt2 + t(dMdt)%*%t(l$omega23)%*%dLdt +
-        t(dMdt)%*%t(l$omega23)%*%d2Ldt2 + t(dLdt)%*%l$omega23%*%dMdt +
-        t(M)%*%l$omega31%*%d2Kdt2 + t(dKdt)%*%t(l$omega31)%*%dMdt +
-        t(dKdt)%*%t(l$omega31)%*%d2Mdt2 + t(dMdt)%*%l$omega31%*%dKdt +
-        t(M)%*%l$omega32%*%d2Ldt2 + t(dLdt)%*%t(l$omega32)%*%dMdt +
-        t(dLdt)%*%t(l$omega32)%*%d2Mdt2 + t(dMdt)%*%l$omega32%*%dLdt +
-        2*t(M)%*%l$omega33%*%d2Mdt2 + 2*t(dMdt)%*%l$omega33%*%dMdt
-    d2Sdtda0 <- t(dKdt)%*%t(l$omega21)%*%dLda0 + 
-        2*t(dLdt)%*%l$omega22%*%dLda0 +
-        t(dMdt)%*%t(l$omega23)%*%dLda0 
-    d2Sdtdb0 <- 2*t(dKdt)%*%l$omega11%*%dKdb0 +
-        t(dLdt)%*%t(l$omega12)%*%dKdb0 + 
-        t(dMdt)%*%t(l$omega13)%*%dKdb0
-    d2Sda02 <- 2*t(dLda0)%*%l$omega22%*%dLda0
-    d2Sdb02 <- 2*t(dKdb0)%*%l$omega11%*%dKdb0
-    d2Sda0db0 <- t(dLda0)%*%l$omega12%*%dKdb0 + t(dLda0)%*%l$omega21%*%dKdb0
+    ns <- length(l$K)
     out <- matrix(0,ns+3,ns+3)
-    out[1:ns,1:ns] <- d2Sdc02
-    out[1:ns,ns+1] <- d2Sdc0dt
-    out[1:ns,ns+2] <- d2Sdc0da0
-    out[1:ns,ns+3] <- d2Sdc0db0
-    out[ns+1,ns+1] <- d2Sdt2
-    out[ns+2,ns+2] <- d2Sda02
-    out[ns+3,ns+3] <- d2Sdb02
-    out[ns+1,ns+2] <- d2Sdtda0
-    out[ns+1,ns+3] <- d2Sdtdb0
-    out[ns+2,ns+3] <- d2Sda0db0
+    for (i in 1:ns){
+        out[i,ns+1] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='c0',y='t',i=i)
+        out[i,ns+2] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='c0',y='a0',i=i)
+        out[i,ns+3] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='c0',y='b0',i=i)        
+        for (j in 1:ns){
+            out[i,j] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='c0',y='c0',i=i,j=j)
+        }
+    }
+    out[ns+1,ns+1] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='t',y='t')
+    out[ns+2,ns+2] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='a0',y='a0')
+    out[ns+3,ns+3] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='b0',y='b0')
+    out[ns+1,ns+2] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='t',y='a0')
+    out[ns+1,ns+3] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='t',y='b0')
+    out[ns+2,ns+3] <- d2Sdxdy_Th(l=l,tt=tt,a0=a0,b0=b0,D=D,x='a0',y='b0')
     out[ns+1,1:ns] <- out[1:ns,ns+1]
     out[ns+2,1:ns] <- out[1:ns,ns+2]
     out[ns+3,1:ns] <- out[1:ns,ns+3]
-    out[ns+1,ns+2] <- out[ns+2,ns+1]
-    out[ns+1,ns+3] <- out[ns+3,ns+1]
-    out[ns+2,ns+3] <- out[ns+3,ns+2]
+    out[(ns+2),(ns+1)] <- out[(ns+1),(ns+2)]
+    out[(ns+3),(ns+1)] <- out[(ns+1),(ns+3)]
+    out[(ns+3),(ns+2)] <- out[(ns+2),(ns+3)]
     out/2
 }
 
@@ -780,6 +711,72 @@ d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,U=iratio('U238U235')[1],
            dphidx%*%l$omega32%*%drdy + d2phidxdy%*%l$omega32%*%l$r +
            l$phi%*%l$omega33%*%d2phidxdy + dphidy%*%l$omega33%*%dphidx +
            dphidx%*%l$omega33%*%dphidy + d2phidxdy%*%l$omega33%*%l$phi)
+}
+d2Sdxdy_Th <- function(l,tt=0,a0=0,b0=0,D=mclean(tt=tt,d=diseq()),x='a0',y='c0',i=1,j=1){
+    U <- iratio('U238U235')[1]
+    l32 <- lambda('Th232')[1]
+    ns <- length(l$K)
+    dKdx <- rep(0,ns); dLdx <- rep(0,ns); dMdx <- rep(0,ns);
+    dKdy <- rep(0,ns); dLdy <- rep(0,ns); dMdy <- rep(0,ns);
+    d2Kdxdy <- rep(0,ns); d2Ldxdy <- rep(0,ns); d2Mdxdy <- rep(0,ns);
+    if (identical(x,'t')){
+        dKdx <- rep(-D$dPb207U235dt,ns)
+        dLdx <- rep(-D$dPb206U238dt,ns)
+        dMdx <- rep(-exp(l32*tt)*l32,ns)
+        if (identical(y,'t')){
+            d2Kdxdy <- rep(-D$d2Pb207U235dt2,ns)
+            d2Ldxdy <- rep(-D$d2Pb206U238dt2,ns)
+            d2Mdxdy <- rep(-exp(l32*tt)*l32^2,ns)
+        }
+    } else if (identical(x,'a0')){
+        dLdx <- -l$c0*l$W
+    } else if (identical(x,'b0')){
+        dKdx <- -U*l$c0*l$W
+    } else if (identical(x,'c0')){
+        dKdx[i] <- -U*b0*l$W[i]
+        dLdx[i] <- -a0*l$W[i]
+        dMdx[i] <- -1
+        if (identical(y,'a0')) d2Ldxdy[j] <- -l$W[j]
+        else if (identical(y,'b0')) d2Kdxdy[j] <- -U*l$W[j]
+    }
+    if (identical(y,'t')){
+        dKdy <- rep(-D$dPb207U235dt,ns)
+        dLdy <- rep(-D$dPb206U238dt,ns)
+        dMdy <- rep(-exp(l32*tt)*l32,ns)
+        if (identical(x,'t')){
+            d2Kdxdy <- rep(-D$d2Pb207U235dt2,ns)
+            d2Ldxdy <- rep(-D$d2Pb206U238dt2,ns)
+            d2Mdxdy <- rep(-exp(l32*tt)*l32^2,ns)
+        }
+    } else if (identical(y,'a0')){
+        dLdy <- -l$c0*l$W
+    } else if (identical(y,'b0')){
+        dKdy <- -U*l$c0*l$W
+    } else if (identical(y,'c0')){
+        dKdy[j] <- -U*b0*l$W[i]
+        dLdy[j] <- -a0*l$W[i]
+        dMdy[j] <- -1
+        if (identical(x,'a0')) d2Ldxdy[i] <- -l$W[i]
+        else if (identical(x,'b0')) d2Kdxdy[i] <- -U*l$W[i]
+    }
+    return(l$K%*%l$omega11%*%d2Kdxdy + dKdy%*%l$omega11%*%dKdx +
+           dKdx%*%l$omega11%*%dKdy + d2Kdxdy%*%l$omega11%*%l$K +
+           l$K%*%l$omega12%*%d2Ldxdy + dKdy%*%l$omega12%*%dLdx +
+           dKdx%*%l$omega12%*%dLdy + d2Kdxdy%*%l$omega12%*%l$L +
+           l$K%*%l$omega13%*%d2Mdxdy + dKdy%*%l$omega13%*%dMdx +
+           dKdx%*%l$omega13%*%dMdy + d2Kdxdy%*%l$omega13%*%l$M +
+           l$L%*%l$omega21%*%d2Kdxdy + dLdy%*%l$omega21%*%dKdx +
+           dLdx%*%l$omega21%*%dKdy + d2Ldxdy%*%l$omega21%*%l$K +
+           l$L%*%l$omega22%*%d2Ldxdy + dLdy%*%l$omega22%*%dLdx +
+           dLdx%*%l$omega22%*%dLdy + d2Ldxdy%*%l$omega22%*%l$L +
+           l$L%*%l$omega23%*%d2Mdxdy + dLdy%*%l$omega23%*%dMdx +
+           dLdx%*%l$omega23%*%dMdy + d2Ldxdy%*%l$omega23%*%l$M +
+           l$M%*%l$omega31%*%d2Kdxdy + dMdy%*%l$omega31%*%dKdx +
+           dMdx%*%l$omega31%*%dKdy + d2Mdxdy%*%l$omega31%*%l$K +
+           l$M%*%l$omega32%*%d2Ldxdy + dMdy%*%l$omega32%*%dLdx +
+           dMdx%*%l$omega32%*%dLdy + d2Mdxdy%*%l$omega32%*%l$L +
+           l$M%*%l$omega33%*%d2Mdxdy + dMdy%*%l$omega33%*%dMdx +
+           dMdx%*%l$omega33%*%dMdy + d2Mdxdy%*%l$omega33%*%l$M)
 }
 
 data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
@@ -981,11 +978,11 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     B <- -(U*b0*(o11+t(o11))*U*b0 + a0*W*(o22+t(o22))*a0*W + (o33+t(o33)) +
            U*b0*(o12+t(o21))*a0*W + a0*W*(o12+t(o21))*U*b0*W + U*b0*W*(o13+t(o31)) +
            (o13+t(o31))*U*b0*W + a0*W*(o23+t(o32)) )
-    M <- solve(B,A)
-    c0 <- Z - M - x82
-    K <- X - c0*b0*U*W - x75
-    L <- Y - c0*a0*W - x68
-    list(K=K,L=L,M=M,omega11=o11,omega12=o12,omega13=o13,
+    M <- as.vector(solve(B,A))
+    c0 <- as.vector(Z - M - x82)
+    K <- as.vector(X - c0*b0*U*W - x75)
+    L <- as.vector(Y - c0*a0*W - x68)
+    list(K=K,L=L,M=M,W=W,c0=c0,omega11=o11,omega12=o12,omega13=o13,
          omega21=o21,omega22=o22,omega23=o23,omega31=o31,
          omega32=o32,omega33=o33,omega=omega,omegainv=ED)
 }
