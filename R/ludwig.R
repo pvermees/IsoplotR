@@ -170,7 +170,6 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA)){
     out$exterr <- exterr
     out
 }
-
 get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA)){
     out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor)
     out$w <- 0
@@ -314,7 +313,7 @@ LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
     l <- data2ludwig(x,tt=ta0[1],a0=ta0[2],exterr=exterr,w=w)
-    D <- c(l$rx,l$ry)
+    D <- c(l$K,l$L)
     out <- D %*% l$omega %*% D
     if (LL){
         k <- length(D)
@@ -325,9 +324,6 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
-    phi <- l$phi
-    R <- l$R
-    r <- l$r
     D <- c(l$R,l$r,l$phi)
     out <- D %*% l$omega %*% D
     if (LL){
@@ -365,20 +361,18 @@ LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
     a0 <- ta0[2]
     U <- settings('iratio','U238U235')[1]
     l <- data2ludwig(x,tt=tt,a0=a0,exterr=exterr,w=w)
-    rx <- l$rx
     X <- get.U238Pb206.ratios(x)[,1]
-    ry <- l$ry # ry = Y - a - bx
     ns <- length(x)
     dRdt <- matrix(0,2*ns,1)
     dRda0 <- matrix(0,2*ns,1)
     D <- mclean(tt=tt,d=x$d)
     # b = D$Pb207U235/U - a0*D$Pb206U238
     dbdt <- D$dPb207U235dt/U - a0*D$dPb206U238dt
-    drydt <- -dbdt*(X-rx) # x = X - rX
-    dryda0 <- D$Pb206U238*(X-rx) - 1
+    drydt <- -dbdt*(X-l$R) # x = X - R
+    dryda0 <- D$Pb206U238*(X-l$R) - 1
     dRdt[(ns+1):(2*ns),1] <- drydt
     dRda0[(ns+1):(2*ns),1] <- dryda0
-    R <- rbind(rx,ry)
+    Rr <- rbind(R,r)
     dSdt <- 2 * t(R) %*% l$omega %*% dRdt
     dSda0 <- 2 * t(R) %*% l$omega %*% dRda0
     c(dSdt,dSda0)
@@ -521,6 +515,29 @@ fisher_lud_2D <- function(x,fit){
     l <- data2ludwig_2D(x,tt=tt,a0=a0,w=0,exterr=fit$exterr)
     U <- settings('iratio','U238U235')[1]
     ns <- length(x)
+    D <- mclean(tt,d=x$d)
+    out <- matrix(0,ns+2,ns+2)
+    for (i in 1:ns){
+        out[i,ns+1] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,D=D,x='y',y='t',i=i)
+        out[i,ns+2] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,D=D,x='y',y='a0',i=i)
+        for (j in 1:ns){
+            out[i,j] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,D=D,x='y',y='y',i=i,j=j)
+        }
+    }
+    out[ns+1,ns+1] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,D=D,x='t',y='t')
+    out[ns+2,ns+2] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,D=D,x='a0',y='a0')
+    out[ns+1,ns+2] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,D=D,x='t',y='a0')
+    out[ns+1,1:ns] <- out[1:ns,ns+1]
+    out[ns+2,1:ns] <- out[1:ns,ns+2]
+    out[(ns+2),(ns+1)] <- out[(ns+1),(ns+2)]
+    out/2    
+}
+fisher_lud_2D.old <- function(x,fit){
+    tt <- fit$par[1]
+    a0 <- fit$par[2]
+    l <- data2ludwig_2D(x,tt=tt,a0=a0,w=0,exterr=fit$exterr)
+    U <- settings('iratio','U238U235')[1]
+    ns <- length(x)
     ones <- matrix(1,ns,1)
     D <- mclean(tt,d=x$d)
     BB <- D$Pb207U235/U - a0*D$Pb206U238
@@ -651,6 +668,39 @@ dSdx.lud_3D <- function(l,tt=0,a0=0,b0=0,U=iratio('U238U235')[1],
            l$phi%*%l$omega32%*%drdx + dphidx%*%l$omega32%*%l$r +
            l$phi%*%l$omega33%*%dphidx + dphidx%*%l$omega33%*%l$phi)
 }
+d2Sdxdy_2D <- function(l,tt=0,a0=0,U=iratio('U238U235')[1],
+                       D=mclean(tt=tt,d=diseq()),x='a0',y='y',i=1,j=1){
+    ns <- length(l$y)
+    zeros <- rep(0,ns)
+    dKdx <- zeros; dLdx <- zeros
+    dKdy <- zeros; dLdy <- zeros
+    d2Kdxdy <- zeros; d2Ldxdy <- zeros;
+    if (identical(x,'t')){
+        dKdx <- rep(-D$dPb207U235dt,ns)
+        if (identical(y,'t')) d2Kdxdy <- rep(-D$d2Pb207U235dt2,ns)
+    } else if (identical(x,'a0')){
+        dKdx <- -U*l$y
+    } else if (identical(x,'y')){
+        dKdx[i] <- -U*a0
+        dLdx[i] <- -1
+        if (identical(y,'a0')) d2Kdxdy[j] <- -U
+    }
+    if (identical(y,'t')){
+        dKdy <- rep(-D$dPb207U235dt,ns)
+        if (identical(x,'t')){
+            d2Kdxdy <- rep(-D$d2Pb207U235dt2,ns)
+        }
+    } else if (identical(y,'a0')){
+        dKdy <- -U*l$y
+    } else if (identical(y,'y')){
+        dKdy[i] <- -U*a0
+        dLdy[i] <- -1
+        if (identical(x,'a0')) d2Kdxdy[j] <- -U
+    }
+    d2Sdxdy(K=l$K,dKdx=dKdx,dKdy=dKdy,d2Kdxdy=d2Kdxdy,
+            L=l$L,dLdx=dLdx,dLdy=dLdy,d2Ldxdy=d2Ldxdy,
+            M=zeros,dMdx=zeros,dMdy=zeros,d2Mdxdy=zeros,l=l)
+}
 d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,U=iratio('U238U235')[1],
                        D=mclean(tt=tt,d=diseq()),x='a0',y='z',i=1,j=1){
     ns <- length(l$z)
@@ -693,9 +743,9 @@ d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,U=iratio('U238U235')[1],
         if (identical(x,'a0')) d2rdxdy[i] <- -1
         else if (identical(x,'b0')) d2Rdxdy[i] <- -U
     }
-    d2Sdxdy(K=R,dKdx=dRdx,dKdy=dRdy,d2Kdxdy=d2Rdxdy,
-            L=r,dLdx=drdx,dLdy=drdy,d2Ldxdy=d2rdxdy,
-            M=phi,dMdx=dphidx,dMdy=dphidy,d2Mdxdy=d2phidxdy,l=l)
+    d2Sdxdy(K=l$R,dKdx=dRdx,dKdy=dRdy,d2Kdxdy=d2Rdxdy,
+            L=l$r,dLdx=drdx,dLdy=drdy,d2Ldxdy=d2rdxdy,
+            M=l$phi,dMdx=dphidx,dMdy=dphidy,d2Mdxdy=d2phidxdy,l=l)
 }
 d2Sdxdy_Th <- function(l,tt=0,a0=0,b0=0,D=mclean(tt=tt,d=diseq()),x='a0',y='c0',i=1,j=1){
     U <- iratio('U238U235')[1]
@@ -748,7 +798,9 @@ d2Sdxdy_Th <- function(l,tt=0,a0=0,b0=0,D=mclean(tt=tt,d=diseq()),x='a0',y='c0',
             L=l$L,dLdx=dLdx,dLdy=dLdy,d2Ldxdy=d2Ldxdy,
             M=l$M,dMdx=dMdx,dMdy=dMdy,d2Mdxdy=d2Mdxdy,l=l)
 }
-d2Sdxdy <- function(K,dKdx,dKdy,d2Kdxdy,L,dLdx,dLdy,d2Ldxdy,M,dMdx,dMdy,d2Mdxdy,l){
+d2Sdxdy <- function(K,dKdx,dKdy,d2Kdxdy,
+                    L,dLdx,dLdy,d2Ldxdy,
+                    M,dMdx,dMdy,d2Mdxdy,l){
     return(K%*%l$omega11%*%d2Kdxdy + dKdy%*%l$omega11%*%dKdx +
            dKdx%*%l$omega11%*%dKdy + d2Kdxdy%*%l$omega11%*%K +
            K%*%l$omega12%*%d2Ldxdy + dKdy%*%l$omega12%*%dLdx +
@@ -781,85 +833,48 @@ data2ludwig.UPb <- function(x,tt,a0,b0=0,g0=rep(0,length(x)),exterr=FALSE,w=0,..
     else stop('Incorrect input format.')
     out
 }
-data2ludwig_2D.new <- function(x,tt,a0,w=0,exterr=FALSE){
-    U <- settings('iratio','U238U235')[1]
+data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
+    U <- iratio('U238U235')[1]
     ns <- length(x)
-    E <- matrix(0,2*ns+2,2*ns+2)
-    J <- matrix(0,2*ns,2*ns+2)
+    E <- matrix(0,2*ns+6,2*ns+6)
+    J <- matrix(0,2*ns,2*ns+6)
     J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
-    X <- matrix(0,ns,1)
-    Y <- matrix(0,ns,1)
+    X <- rep(0,ns)
+    Y <- rep(0,ns)
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
     for (i in 1:ns){
-        D <- mclean(tt=tt,d=x$d[i],exterr=exterr)
         wd <- wetherill(x,i)
         X[i] <- wd$x['Pb207U235']
         Y[i] <- wd$x['Pb206U238']
         E[c(i,ns+i),c(i,ns+i)] <- wd$cov
-        J[i,2*ns+1] <- -D$dPb207U235dl35
-        J[i,2*ns+2] <- -D$dPb207U235dl31
+        J[i,ns+i] <- -a0*U                   # dKdY
+        J[i,2*ns+2] <- -D$dPb207U235dl35     # dKdl35
+        J[i,2*ns+4] <- -D$dPb207U235dl31     # dKdl31
+        J[ns+i,2*ns+1] <- -D$dPb206U238dl38  # dLdl31
+        J[ns+i,2*ns+3] <- -D$dPb206U238dl34  # dLdl34
+        J[ns+i,2*ns+5] <- -D$dPb206U238dl30  # dLdl30
+        J[ns+i,2*ns+6] <- -D$dPb206U238dl26  # dLdl26
     }
-    E[2*ns+1,2*ns+1] <- lambda('U235')[2]^2
-    E[2*ns+2,2*ns+2] <- lambda('Pa231')[2]^2
+    E[2*ns+1,2*ns+1] <- lambda('U238')[2]^2
+    E[2*ns+2,2*ns+2] <- lambda('U235')[2]^2
+    E[2*ns+3,2*ns+3] <- lambda('U234')[2]^2
+    E[2*ns+4,2*ns+4] <- lambda('Pa231')[2]^2
+    E[2*ns+5,2*ns+5] <- lambda('Th230')[2]^2
+    E[2*ns+6,2*ns+6] <- lambda('Ra226')[2]^2
     OI <- J%*%E%*%t(J) + get.Ew_2D(w=w,Y=Y,a0=a0)
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     O <- blockinverse(AA=OI[i1,i1],BB=OI[i1,i2],
                       CC=OI[i2,i1],DD=OI[i2,i2],doall=TRUE)
-    K0 <- as.vector(Y - D$Pb207U235 - a0*U*Y)
-    A <- as.vector(K0%*%(O[i1,i2] + O[i1,i1]*a0*U))
-    B <- -(a0*U*O[i1,i1]*a0*U + 2*a0*U*O[i1,i2] + O[i2,i2])
+    K0 <- X - D$Pb207U235 - a0*U*Y + a0*U*D$Pb206U238
+    A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U + K0%*%(O[i1,i2]+t(O[i2,i1])))
+    B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U + (O[i2,i2]+t(O[i2,i2])) +
+           a0*U*(O[i1,i2]+t(O[i1,i2])) + (O[i2,i1]+t(O[i2,i1]))*a0*U)
     out <- list(omega11=O[i1,i1],omega12=O[i1,i2],omega21=O[i2,i1],
                 omega22=O[i2,i2],omega=O,omegainv=OI)
-    out$y <- solve(B,A)
-    out$rx <- X - D$Pb207U235 - a0*U*out$y
-    out$ry <- Y - out$y
-    out    
-}
-data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
-    U <- settings('iratio','U238U235')[1]
-    ns <- length(x)
-    E <- matrix(0,2*ns+2,2*ns+2)
-    J <- matrix(0,2*ns,2*ns+2)
-    X <- matrix(0,ns,1)
-    Y <- matrix(0,ns,1)
-    for (i in 1:ns){
-        D <- mclean(tt=tt,d=x$d[i],exterr=exterr)
-        B <-  D$Pb207U235/U - a0*D$Pb206U238
-        XY <- tera.wasserburg(x,i)
-        X[i] <- XY$x['U238Pb206']
-        Y[i] <- XY$x['Pb207Pb206']
-        E[(2*i-1):(2*i),(2*i-1):(2*i)] <- XY$cov[1:2,1:2]
-        E[2*i,2*i] <- E[2*i,2*i] + (a0*w)^2
-        J[i,2*i-1] <- 1  # drx/dX
-        J[ns+i,2*i] <- 1 # dry/dY
-        dBdl5 <- D$dPb207U235dl35/U
-        dBdl8 <- -a0*D$dPb206U238dl38
-        J[ns+i,2*ns+1] <- -dBdl5*X[i]
-        J[ns+i,2*ns+2] <- -dBdl8*X[i]
-    }
-    E[2*ns+1,2*ns+1] <- settings('lambda','U235')[2]^2
-    E[2*ns+2,2*ns+2] <- settings('lambda','U238')[2]^2
-    out <- list()
-    OI <- J %*% E %*% t(J)
-    O <- blockinverse(AA=OI[1:ns,1:ns],
-                      BB=OI[1:ns,(ns+1):(2*ns)],
-                      CC=OI[(ns+1):(2*ns),1:ns],
-                      DD=OI[(ns+1):(2*ns),(ns+1):(2*ns)],
-                      doall=TRUE)
-    out$omegainv <- OI
-    out$omega <- O
-    out$omega11 <- O[1:ns,1:ns]
-    out$omega12 <- O[1:ns,(ns+1):(2*ns)]
-    out$omega21 <- O[(ns+1):(2*ns),1:ns]
-    out$omega22 <- O[(ns+1):(2*ns),(ns+1):(2*ns)]
-    left <- out$omega11 + B*(out$omega12+out$omega21) + out$omega22*B^2
-    right <- out$omega11%*%X + B*out$omega12%*%X +
-        out$omega21%*%(Y-a0) + B*out$omega22%*%(Y-a0)
-    out$x <- solve(left,right)
-    out$X <- X
-    out$Y <- Y
-    out$rx <- X - out$x
-    out$ry <- Y - a0 - B*out$x
+    out$L <- as.vector(solve(B,A))
+    out$y <- Y - D$Pb206U238 - out$L
+    out$K <- X - D$Pb207U235 - a0*U*out$y
     out
 }
 # rederived from Ludwig (1998):
