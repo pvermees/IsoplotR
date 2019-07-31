@@ -324,7 +324,7 @@ LL.lud.2D <- function(ta0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 LL.lud.3D <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
-    D <- c(l$R,l$r,l$phi)
+    D <- c(l$K,l$L,l$M)
     out <- D %*% l$omega %*% D
     if (LL){
         k <- 3*ns
@@ -381,47 +381,13 @@ LL.lud.3D.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     b0 <- ta0b0[3]
-    l2 <- lambda('Th232')[1]
     U <- iratio('U238U235')[1]
-    l <- data2ludwig(x,tt=tt,a0=0,b0=b0,exterr=exterr,w=w)
+    l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,exterr=exterr,w=w)
     D <- mclean(tt=tt,d=x$d)
     ns <- length(x)
-    dphida0 <- as.vector(-l$Winv%*%l$dWda0%*%l$Winv%*%l$V + l$Winv%*%l$dVda0)
-    dphidb0 <- as.vector(-l$Winv%*%l$dWdb0%*%l$Winv%*%l$V + l$Winv%*%l$dVdb0)
-    dphidt <- as.vector(l$Winv%*%l$dVdt)
-    dRda0 <- U*b0*dphida0
-    dRdb0 <- -U*l$z + U*b0*dphidb0
-    dRdt <- -D$dPb207U235dt + U*b0*dphidt
-    drda0 <- -l$z + a0*dphida0
-    drdb0 <- a0*dphidb0
-    drdt <- -D$dPb206U238dt + a0*dphidt
-    dSdt <- dRdt%*%l$omega11%*%l$R + l$R%*%l$omega11%*%dRdt +
-        dRdt%*%l$omega12%*%l$r + l$R%*%l$omega12%*%drdt +
-        dRdt%*%l$omega13%*%l$phi + l$R%*%l$omega13%*%dphidt +
-        drdt%*%l$omega21%*%l$R + l$r%*%l$omega21%*%dRdt +
-        drdt%*%l$omega22%*%l$r + l$r%*%l$omega22%*%drdt +
-        drdt%*%l$omega23%*%l$phi + l$r%*%l$omega23%*%dphidt +
-        dphidt%*%l$omega31%*%l$R + l$phi%*%l$omega31%*%dRdt +
-        dphidt%*%l$omega32%*%l$r + l$phi%*%l$omega32%*%drdt +
-        dphidt%*%l$omega33%*%l$phi + l$phi%*%l$omega33%*%dphidt
-    dSda0 <- dRda0%*%l$omega11%*%l$R + l$R%*%l$omega11%*%dRda0 +
-        dRda0%*%l$omega12%*%l$r + l$R%*%l$omega12%*%drda0 +
-        dRda0%*%l$omega13%*%l$phi + l$R%*%l$omega13%*%dphida0 +
-        drda0%*%l$omega21%*%l$R + l$r%*%l$omega21%*%dRda0 +
-        drda0%*%l$omega22%*%l$r + l$r%*%l$omega22%*%drda0 +
-        drda0%*%l$omega23%*%l$phi + l$r%*%l$omega23%*%dphida0 +
-        dphida0%*%l$omega31%*%l$R + l$phi%*%l$omega31%*%dRda0 +
-        dphida0%*%l$omega32%*%l$r + l$phi%*%l$omega32%*%drda0 +
-        dphida0%*%l$omega33%*%l$phi + l$phi%*%l$omega33%*%dphida0
-    dSdb0 <- dRdb0%*%l$omega11%*%l$R + l$R%*%l$omega11%*%dRdb0 +
-        dRdb0%*%l$omega12%*%l$r + l$R%*%l$omega12%*%drdb0 +
-        dRdb0%*%l$omega13%*%l$phi + l$R%*%l$omega13%*%dphidb0 +
-        drdb0%*%l$omega21%*%l$R + l$r%*%l$omega21%*%dRdb0 +
-        drdb0%*%l$omega22%*%l$r + l$r%*%l$omega22%*%drdb0 +
-        drdb0%*%l$omega23%*%l$phi + l$r%*%l$omega23%*%dphidb0 +
-        dphidb0%*%l$omega31%*%l$R + l$phi%*%l$omega31%*%dRdb0 +
-        dphidb0%*%l$omega32%*%l$r + l$phi%*%l$omega32%*%drdb0 +
-        dphidb0%*%l$omega33%*%l$phi + l$phi%*%l$omega33%*%dphidb0
+    dSdt <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='t')
+    dSda0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='a0')
+    dSdb0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='b0')
     c(dSdt,dSda0,dSdb0)
 }
 LL.lud.Th.gr <- function(ta0b0,x,exterr=FALSE,w=0){
@@ -638,35 +604,39 @@ fisher_lud_Th <- function(x,fit){
 }
 
 S.lud <- function(l){
-    return(l$R%*%l$omega11%*%l$R + l$R%*%l$omega12%*%l$r + l$R%*%l$omega13%*%l$phi +
-           l$r%*%l$omega21%*%l$R + l$r%*%l$omega22%*%l$r + l$r%*%l$omega23%*%l$phi +
-           l$phi%*%l$omega31%*%l$R + l$phi%*%l$omega32%*%l$r + l$phi%*%l$omega33%*%l$phi)
+    return(l$K%*%l$omega11%*%l$K + l$K%*%l$omega12%*%l$L + l$K%*%l$omega13%*%l$M +
+           l$L%*%l$omega21%*%l$K + l$L%*%l$omega22%*%l$L + l$L%*%l$omega23%*%l$M +
+           l$M%*%l$omega31%*%l$K + l$M%*%l$omega32%*%l$L + l$M%*%l$omega33%*%l$M)
 }
-dSdx.lud_3D <- function(l,tt=0,a0=0,b0=0,U=iratio('U238U235')[1],
-                     D=mclean(tt=tt,d=diseq()),x='a0',i=1){
+dSdx_3D <- function(l,tt=0,a0=0,b0=0,U=iratio('U238U235')[1],
+                    D=mclean(tt=tt,d=diseq()),x='a0',i=1){
     ns <- length(l$z)
-    dRdx <- rep(0,ns); drdx <- rep(0,ns); dphidx <- rep(0,ns);
+    zeros <- rep(0,ns)
+    dKdx <- zeros; dLdx <- zeros; dMdx <- zeros
     if (identical(x,'t')){
-        dRdx <- rep(-D$dPb207U235dt,ns)
-        drdx <- rep(-D$dPb206U238dt,ns)
+        dKdx <- rep(-D$dPb207U235dt,ns)
+        dLdx <- rep(-D$dPb206U238dt,ns)
     } else if (identical(x,'a0')){
-        drdx <- -l$z
+        dLdx <- -l$z
     } else if (identical(x,'b0')){
-        dRdx <- -U*l$z
+        dKdx <- -U*l$z
     } else if (identical(x,'z')){
-        dRdx[i] <- -U*b0
-        drdx[i] <- -a0
-        dphidx[i] <- -1
+        dKdx[i] <- -U*b0
+        dLdx[i] <- -a0
+        dMdx[i] <- -1
     }
-    return(l$R%*%l$omega11%*%dRdx + dRdx%*%l$omega11%*%l$R +
-           l$R%*%l$omega12%*%drdx + dRdx%*%l$omega12%*%l$r +
-           l$R%*%l$omega13%*%dphidx + dRdx%*%l$omega13%*%l$phi +
-           l$r%*%l$omega21%*%dRdx + drdx%*%l$omega21%*%l$R +
-           l$r%*%l$omega22%*%drdx + drdx%*%l$omega22%*%l$r +
-           l$r%*%l$omega23%*%dphidx + drdx%*%l$omega23%*%l$phi +
-           l$phi%*%l$omega31%*%dRdx + dphidx%*%l$omega31%*%l$R +
-           l$phi%*%l$omega32%*%drdx + dphidx%*%l$omega32%*%l$r +
-           l$phi%*%l$omega33%*%dphidx + dphidx%*%l$omega33%*%l$phi)
+    dSdx(l$K,dKdx,dKdy,l$L,dLdx,dLdy,l$M,dMdx,dMdy,l)
+}
+dSdx <- function(K,dKdx,dKdy,L,dLdx,dLdy,M,dMdx,dMdy,l){
+    return(K%*%l$omega11%*%dKdx + dKdx%*%l$omega11%*%l$K +
+           K%*%l$omega12%*%dLdx + dKdx%*%l$omega12%*%l$L +
+           K%*%l$omega13%*%dMdx + dKdx%*%l$omega13%*%l$M +
+           L%*%l$omega21%*%dKdx + dLdx%*%l$omega21%*%l$K +
+           L%*%l$omega22%*%dLdx + dLdx%*%l$omega22%*%l$L +
+           L%*%l$omega23%*%dMdx + dLdx%*%l$omega23%*%l$M +
+           M%*%l$omega31%*%dKdx + dMdx%*%l$omega31%*%l$K +
+           M%*%l$omega32%*%dLdx + dMdx%*%l$omega32%*%l$L +
+           M%*%l$omega33%*%dMdx + dMdx%*%l$omega33%*%l$M)
 }
 d2Sdxdy_2D <- function(l,tt=0,a0=0,U=iratio('U238U235')[1],
                        D=mclean(tt=tt,d=diseq()),x='a0',y='y',i=1,j=1){
@@ -704,48 +674,49 @@ d2Sdxdy_2D <- function(l,tt=0,a0=0,U=iratio('U238U235')[1],
 d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,U=iratio('U238U235')[1],
                        D=mclean(tt=tt,d=diseq()),x='a0',y='z',i=1,j=1){
     ns <- length(l$z)
-    dRdx <- rep(0,ns); drdx <- rep(0,ns); dphidx <- rep(0,ns);
-    dRdy <- rep(0,ns); drdy <- rep(0,ns); dphidy <- rep(0,ns);
-    d2Rdxdy <- rep(0,ns); d2rdxdy <- rep(0,ns); d2phidxdy <- rep(0,ns);
+    zeros <- rep(0,ns)
+    dKdx <- zeros; dLdx <- zeros; dMdx <- zeros;
+    dKdy <- zeros; dLdy <- zeros; dMdy <- zeros;
+    d2Kdxdy <- zeros; d2Ldxdy <- zeros; d2Mdxdy <- zeros;
     if (identical(x,'t')){
-        dRdx <- rep(-D$dPb207U235dt,ns)
-        drdx <- rep(-D$dPb206U238dt,ns)
+        dKdx <- rep(-D$dPb207U235dt,ns)
+        dLdx <- rep(-D$dPb206U238dt,ns)
         if (identical(y,'t')){
-            d2Rdxdy <- rep(-D$d2Pb207U235dt2,ns)
-            d2rdxdy <- rep(-D$d2Pb206U238dt2,ns)
+            d2Kdxdy <- rep(-D$d2Pb207U235dt2,ns)
+            d2Ldxdy <- rep(-D$d2Pb206U238dt2,ns)
         }
     } else if (identical(x,'a0')){
-        drdx <- -l$z
+        dLdx <- -l$z
     } else if (identical(x,'b0')){
-        dRdx <- -U*l$z
+        dKdx <- -U*l$z
     } else if (identical(x,'z')){
-        dRdx[i] <- -U*b0
-        drdx[i] <- -a0
-        dphidx[i] <- -1
-        if (identical(y,'a0')) d2rdxdy[j] <- -1
-        else if (identical(y,'b0')) d2Rdxdy[j] <- -U
+        dKdx[i] <- -U*b0
+        dLdx[i] <- -a0
+        dMdx[i] <- -1
+        if (identical(y,'a0')) d2Ldxdy[j] <- -1
+        else if (identical(y,'b0')) d2Kdxdy[j] <- -U
     }
     if (identical(y,'t')){
-        dRdy <- rep(-D$dPb207U235dt,ns)
-        drdy <- rep(-D$dPb206U238dt,ns)
+        dKdy <- rep(-D$dPb207U235dt,ns)
+        dLdy <- rep(-D$dPb206U238dt,ns)
         if (identical(x,'t')){
-            d2Rdxdy <- rep(-D$d2Pb207U235dt2,ns)
-            d2rdxdy <- rep(-D$d2Pb206U238dt2,ns)
+            d2Kdxdy <- rep(-D$d2Pb207U235dt2,ns)
+            d2Ldxdy <- rep(-D$d2Pb206U238dt2,ns)
         }
     } else if (identical(y,'a0')){
-        drdy <- -l$z
+        dLdy <- -l$z
     } else if (identical(y,'b0')){
-        dRdy <- -U*l$z
+        dKdy <- -U*l$z
     } else if (identical(y,'z')){
-        dRdy[j] <- -U*b0
-        drdy[j] <- -a0
-        dphidy[j] <- -1
-        if (identical(x,'a0')) d2rdxdy[i] <- -1
-        else if (identical(x,'b0')) d2Rdxdy[i] <- -U
+        dKdy[j] <- -U*b0
+        dLdy[j] <- -a0
+        dMdy[j] <- -1
+        if (identical(x,'a0')) d2Ldxdy[i] <- -1
+        else if (identical(x,'b0')) d2Kdxdy[i] <- -U
     }
-    d2Sdxdy(K=l$R,dKdx=dRdx,dKdy=dRdy,d2Kdxdy=d2Rdxdy,
-            L=l$r,dLdx=drdx,dLdy=drdy,d2Ldxdy=d2rdxdy,
-            M=l$phi,dMdx=dphidx,dMdy=dphidy,d2Mdxdy=d2phidxdy,l=l)
+    d2Sdxdy(l$K,dKdx,dKdy,d2Kdxdy,
+            l$L,dLdx,dLdy,d2Ldxdy,
+            l$M,dMdx,dMdy,d2Mdxdy,l=l)
 }
 d2Sdxdy_Th <- function(l,tt=0,a0=0,b0=0,D=mclean(tt=tt,d=diseq()),x='a0',y='c0',i=1,j=1){
     U <- iratio('U238U235')[1]
@@ -794,9 +765,9 @@ d2Sdxdy_Th <- function(l,tt=0,a0=0,b0=0,D=mclean(tt=tt,d=diseq()),x='a0',y='c0',
         if (identical(x,'a0')) d2Ldxdy[i] <- -l$W[i]
         else if (identical(x,'b0')) d2Kdxdy[i] <- -U*l$W[i]
     }
-    d2Sdxdy(K=l$K,dKdx=dKdx,dKdy=dKdy,d2Kdxdy=d2Kdxdy,
-            L=l$L,dLdx=dLdx,dLdy=dLdy,d2Ldxdy=d2Ldxdy,
-            M=l$M,dMdx=dMdx,dMdy=dMdy,d2Mdxdy=d2Mdxdy,l=l)
+    d2Sdxdy(l$K,dKdx,dKdy,d2Kdxdy,
+            l$L,dLdx,dLdy,d2Ldxdy,
+            l$M,dMdx,dMdy,d2Mdxdy,l)
 }
 d2Sdxdy <- function(K,dKdx,dKdy,d2Kdxdy,
                     L,dLdx,dLdy,d2Ldxdy,
@@ -898,14 +869,14 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         Y[i] <- wd$x['Pb206U238']
         Z[i] <- wd$x['Pb204U238']
         E[c(i,ns+i,2*ns+i),c(i,ns+i,2*ns+i)] <- wd$cov
-        J[i,2*ns+i] <- -U*b0                 #dRdZ
-        J[i,3*ns+2] <- -D$dPb207U235dl35     #dRdl35
-        J[i,3*ns+4] <- -D$dPb207U235dl31     #dRdl31
-        J[ns+i,2*ns+i] <- -a0                #drdZ
-        J[ns+i,3*ns+1] <- -D$dPb206U238dl38  #drdl38
-        J[ns+i,3*ns+3] <- -D$dPb206U238dl34  #drdl34
-        J[ns+i,3*ns+5] <- -D$dPb206U238dl30  #drdl30
-        J[ns+i,3*ns+6] <- -D$dPb206U238dl26  #drdl26
+        J[i,2*ns+i] <- -U*b0                 #dKdZ
+        J[i,3*ns+2] <- -D$dPb207U235dl35     #dKdl35
+        J[i,3*ns+4] <- -D$dPb207U235dl31     #dKdl31
+        J[ns+i,2*ns+i] <- -a0                #dLdZ
+        J[ns+i,3*ns+1] <- -D$dPb206U238dl38  #dLdl38
+        J[ns+i,3*ns+3] <- -D$dPb206U238dl34  #dLdl34
+        J[ns+i,3*ns+5] <- -D$dPb206U238dl30  #dLdl30
+        J[ns+i,3*ns+6] <- -D$dPb206U238dl26  #dLdl26
     }
     E[3*ns+1,3*ns+1] <- lambda('U238')[2]^2
     E[3*ns+2,3*ns+2] <- lambda('U235')[2]^2
@@ -923,32 +894,32 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     o11 <- omega[i1,i1]; o12 <- omega[i1,i2]; o13 <- omega[i1,i3]
     o21 <- omega[i2,i1]; o22 <- omega[i2,i2]; o23 <- omega[i2,i3]
     o31 <- omega[i3,i1]; o32 <- omega[i3,i2]; o33 <- omega[i3,i3]
-    R0 <- X - U*b0*Z - D$Pb207U235
-    r0 <- Y - a0*Z - D$Pb206U238
+    K0 <- X - U*b0*Z - D$Pb207U235
+    L0 <- Y - a0*Z - D$Pb206U238
     out <- list(omega=omega,omegainv=ED,omega11=o11,omega12=o12,
                 omega13=o13,omega21=o21,omega22=o22,omega23=o23,
                 omega31=o31,omega32=o32,omega33=o33)
-    out$V <- t(R0%*%(o11+t(o11))*U*b0 + r0%*%(o21+t(o21))*U*b0 + R0%*%(o12+t(o21))*a0 +
-               r0%*%(o22+t(o22))*a0 + R0%*%(o31+t(o13)) + r0%*%(o23+t(o32)))
+    out$V <- t(K0%*%(o11+t(o11))*U*b0 + L0%*%(o21+t(o21))*U*b0 + K0%*%(o12+t(o21))*a0 +
+               L0%*%(o22+t(o22))*a0 + K0%*%(o31+t(o13)) + L0%*%(o23+t(o32)))
     out$W <- -(U*b0*(o11+t(o11))*U*b0 + U*b0*(o12+t(o21))*a0 + U*b0*(o13+t(o31)) +
                a0*(o21+t(o12))*U*b0 + a0*(o22+t(o22))*a0 + a0*(o23+t(o32)) +
                (o31+t(o13))*U*b0 + (o32+t(o23))*a0 + (o33+t(o33)))
     out$Winv <- solve(out$W)
-    out$phi <- as.vector(out$Winv%*%out$V)
-    out$z <- as.vector(Z - out$phi)
-    out$R <- as.vector(X - U*b0*out$z - x75)
-    out$r <- as.vector(Y - a0*out$z - x68)
-    dR0db0 <- as.vector(-U*Z)
-    dR0dt <- rep(-D$dPb207U235dt,ns)
-    dr0da0 <- as.vector(-Z)
-    dr0dt <- rep(-D$dPb206U238dt,ns)
-    out$dVda0 <- t(dr0da0%*%(o21+t(o21))*U*b0 + R0%*%(o12+t(o21)) +
-                   r0%*%(o22+t(o22)) + dr0da0%*%(o22+t(o22))*a0 + dr0da0%*%(o23+t(o32)))
-    out$dVdb0 <- t(R0%*%(o11+t(o11))*U + dR0db0%*%(o11+t(o11))*U*b0 +
-                   r0%*%(o21+t(o21))*U + dR0db0%*%(o12+t(o21))*a0 + dR0db0%*%(o31+t(o13)))
-    out$dVdt <- t(dR0dt%*%(o11+t(o11))*U*b0 + dr0dt%*%(o21+t(o21))*U*b0 +
-                  dR0dt%*%(o12+t(o21))*a0 + dr0dt%*%(o22+t(o22))*a0 +
-                  dR0dt%*%(o31+t(o13)) + dr0dt%*%(o23+t(o32)))
+    out$M <- as.vector(out$Winv%*%out$V)
+    out$z <- as.vector(Z - out$M)
+    out$K <- as.vector(X - U*b0*out$z - x75)
+    out$L <- as.vector(Y - a0*out$z - x68)
+    dK0db0 <- as.vector(-U*Z)
+    dK0dt <- rep(-D$dPb207U235dt,ns)
+    dL0da0 <- as.vector(-Z)
+    dL0dt <- rep(-D$dPb206U238dt,ns)
+    out$dVda0 <- t(dL0da0%*%(o21+t(o21))*U*b0 + K0%*%(o12+t(o21)) +
+                   L0%*%(o22+t(o22)) + dL0da0%*%(o22+t(o22))*a0 + dL0da0%*%(o23+t(o32)))
+    out$dVdb0 <- t(K0%*%(o11+t(o11))*U + dK0db0%*%(o11+t(o11))*U*b0 +
+                   L0%*%(o21+t(o21))*U + dK0db0%*%(o12+t(o21))*a0 + dK0db0%*%(o31+t(o13)))
+    out$dVdt <- t(dK0dt%*%(o11+t(o11))*U*b0 + dL0dt%*%(o21+t(o21))*U*b0 +
+                  dK0dt%*%(o12+t(o21))*a0 + dL0dt%*%(o22+t(o22))*a0 +
+                  dK0dt%*%(o31+t(o13)) + dL0dt%*%(o23+t(o32)))
     out$dWda0 <- -(U*b0*(o12+t(o21)) + (o21+t(o12))*U*b0 +
                    2*(o22+t(o22))*a0 + (o23+t(o32)) + (o32+t(o23)))
     out$dWdb0 <- -(2*U*(o11+t(o11))*U*b0 + U*(o12+t(o21))*a0 +
