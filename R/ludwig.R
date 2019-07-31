@@ -335,11 +335,7 @@ LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     out
 }
 
-fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
-fisher.lud.default <- function(x,...){
-    stop( "No default method available." )
-}
-fisher.lud.UPb <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
+fisher.lud <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
     ns <- length(x)
     if (x$format < 4){
         fish <- fisher_lud_2D(x,fit)
@@ -381,10 +377,10 @@ fisher_lud_2D <- function(x,fit){
     ns <- length(x)
     out <- matrix(0,ns+2,ns+2)
     for (i in 1:ns){
-        out[i,ns+1] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,x='y',y='t',i=i)
-        out[i,ns+2] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,x='y',y='a0',i=i)
+        out[i,ns+1] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,x='c0',y='t',i=i)
+        out[i,ns+2] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,x='c0',y='a0',i=i)
         for (j in 1:ns){
-            out[i,j] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,x='y',y='y',i=i,j=j)
+            out[i,j] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,x='c0',y='c0',i=i,j=j)
         }
     }
     out[ns+1,ns+1] <- d2Sdxdy_2D(l=l,tt=tt,a0=a0,x='t',y='t')
@@ -468,8 +464,8 @@ dSdx_3D <- function(l,tt=0,a0=0,b0=0,x='a0'){
            l$M%*%l$omega32%*%dLdx + dMdx%*%l$omega32%*%l$L +
            l$M%*%l$omega33%*%dMdx + dMdx%*%l$omega33%*%l$M)
 }
-d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='y',i=1,j=1){
-    ns <- length(l$y)
+d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
+    ns <- length(l$c0)
     zeros <- rep(0,ns)
     dKdx <- zeros; dLdx <- zeros
     dKdy <- zeros; dLdy <- zeros
@@ -479,10 +475,10 @@ d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='y',i=1,j=1){
         if (identical(y,'t')) d2Kdxdy <- l$d2Kdt2
     } else if (identical(x,'a0')){
         dKdx <- l$dKda0
-    } else if (identical(x,'y')){
-        dKdx[i] <- l$dKdy[i]
-        dLdx[i] <- l$dLdy[i]
-        if (identical(y,'a0')) d2Kdxdy[j] <- l$d2Kdyda0[j]
+    } else if (identical(x,'c0')){
+        dKdx[i] <- l$dKdc0[i]
+        dLdx[i] <- l$dLdc0[i]
+        if (identical(y,'a0')) d2Kdxdy[j] <- l$d2Kdc0da0[j]
     } else {
         stop('Invalid option.')
     }
@@ -490,10 +486,10 @@ d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='y',i=1,j=1){
         dKdy <- l$dKdt
     } else if (identical(y,'a0')){
         dKdy <- l$dKda0
-    } else if (identical(y,'y')){
-        dKdy[i] <- l$dKdy[i]
-        dLdy[i] <- l$dLdy[i]
-        if (identical(x,'a0')) d2Kdxdy[j] <- l$d2Kdyda0[j]
+    } else if (identical(y,'c0')){
+        dKdy[j] <- l$dKdc0[j]
+        dLdy[j] <- l$dLdc0[j]
+        if (identical(x,'a0')) d2Kdxdy[i] <- l$d2Kdc0da0[i]
     } else {
         stop('Invalid option.')
     }
@@ -571,9 +567,7 @@ d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,x='a0',y='c0',i=1,j=1){
            dMdx%*%l$omega33%*%dMdy + d2Mdxdy%*%l$omega33%*%l$M)
 }
 
-data2ludwig <- function(x,...){ UseMethod("data2ludwig",x) }
-data2ludwig.default <- function(x,...){ stop('default function undefined') }
-data2ludwig.UPb <- function(x,tt,a0,b0=0,g0=rep(0,length(x)),exterr=FALSE,w=0,...){
+data2ludwig <- function(x,tt,a0,b0=0,g0=rep(0,length(x)),exterr=FALSE,w=0,...){
     if (x$format %in% c(1,2,3))
         out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)
     else if (x$format %in% c(4,5,6))
@@ -623,16 +617,16 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     out <- list(omega11=O[i1,i1],omega12=O[i1,i2],omega21=O[i2,i1],
                 omega22=O[i2,i2],omega=O,omegainv=OI)
     out$L <- as.vector(solve(B,A))
-    out$y <- Y - D$Pb206U238 - out$L
-    out$K <- X - D$Pb207U235 - a0*U*out$y
+    out$c0 <- Y - D$Pb206U238 - out$L
+    out$K <- X - D$Pb207U235 - a0*U*out$c0
     out$dKdt <- rep(-D$dPb207U235dt,ns)
     out$dLdt <- rep(-D$dPb206U238dt,ns)
-    out$dKda0 <- -U*out$y
-    out$dKdy <- rep(-U*a0,ns)
-    out$dLdy <- rep(-1,ns)
+    out$dKda0 <- -U*out$c0
+    out$dKdc0 <- rep(-U*a0,ns)
+    out$dLdc0 <- rep(-1,ns)
     out$d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
     out$d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
-    out$d2Kdyda0 <- rep(-U,ns)
+    out$d2Kdc0da0 <- rep(-U,ns)
     out
 }
 # rederived from Ludwig (1998):
