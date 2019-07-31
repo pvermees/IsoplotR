@@ -288,7 +288,6 @@ model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
     out
 }
 
-# TODO: 
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
     optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",x=x,w=w,
             exterr=exterr,fixed=fixit(x,anchor),lower=c(0,0,0),upper=c(1000,100,100))
@@ -346,14 +345,10 @@ LL.lud.Th <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 
 LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
-    if (x$format %in% c(1,2,3)){
+    if (x$format<4){
         return(LL.lud.2D.gr(ta0b0,x,exterr=exterr,w=w))
-    } else if (x$format %in% c(4,5,6)){
-        return(LL.lud.3D.gr(ta0b0,x=x,exterr=exterr,w=w))
-    } else if (x$format %in% c(7,8)){
-        return(LL.lud.Th.gr(ta0b0,x=x,exterr=exterr,w=w))
     } else {
-        stop('Incorrect input format.')
+        return(LL.lud.3D.gr(ta0b0,x=x,exterr=exterr,w=w))
     }
 }
 LL.lud.2D.gr <- function(ta0,x,exterr=FALSE,w=0){
@@ -388,43 +383,6 @@ LL.lud.3D.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     dSda0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='a0')
     dSdb0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,U=U,D=D,x='b0')
     c(dSdt,dSda0,dSdb0)
-}
-LL.lud.Th.gr <- function(ta0b0,x,exterr=FALSE,w=0){
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
-    b0 <- ta0b0[3]
-    l <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-    ns <- length(l$K)
-    l2 <- settings('lambda','Th232')[1]
-    U <- settings('iratio','U238U235')[1]
-    K <- matrix(l$K,nrow=ns)
-    L <- matrix(l$L,nrow=ns)
-    M <- matrix(l$M,nrow=ns)
-    Z <- get.Pb208Th232.ratios(x)[,1,drop=FALSE]
-    c0 <- Z - exp(l2*tt) + 1 - M
-    W <- x$x[,'Th232U238']
-    D <- mclean(tt=tt,d=x$d)
-    dKdt <- matrix(rep(-D$dPb207U235dt,ns),nrow=ns)
-    dLdt <- matrix(rep(-D$dPb206U238dt,ns),nrow=ns)
-    dMdt <- matrix(rep(-l2*exp(l2*tt),ns),nrow=ns)
-    dKdb0 <- -U*c0*W
-    dLda0 <- -c0*W
-    dSdt <- 2*t(K)%*%l$omega11%*%dKdt +
-        t(K)%*%l$omega12%*%dLdt + t(dLdt)%*%t(l$omega12)%*%dKdt +
-        t(K)%*%l$omega13%*%dMdt + t(dMdt)%*%t(l$omega13)%*%dKdt +
-        t(L)%*%l$omega21%*%dKdt + t(dKdt)%*%t(l$omega21)%*%dLdt +
-        2*t(L)%*%l$omega22%*%dLdt +
-        t(L)%*%l$omega23%*%dMdt + t(dMdt)%*%t(l$omega23)%*%dLdt +
-        t(M)%*%l$omega31%*%dKdt + t(dKdt)%*%t(l$omega31)%*%dMdt +
-        t(M)%*%l$omega32%*%dLdt + t(dLdt)%*%t(l$omega32)%*%dMdt +
-        2*t(M)%*%l$omega33%*%dMdt
-    dSda0 <- 2*t(L)%*%l$omega22%*%dLda0 +
-        t(K)%*%l$omega12%*%dLda0 + t(K)%*%t(l$omega21)%*%dLda0 +
-        t(M)%*%l$omega32%*%dLda0 + t(M)%*%t(l$omega23)%*%dLda0        
-    dSdb0 <- 2*t(K)%*%l$omega11%*%dKdb0 +
-        t(L)%*%l$omega21%*%dKdb0 + t(L)%*%t(l$omega12)%*%dKdb0 + 
-        t(M)%*%l$omega31%*%dKdb0 + t(M)%*%t(l$omega13)%*%dKdb0
-    c(dSdt,dSda0,dSdb0)/2
 }
 
 fisher.lud <- function(x,...){ UseMethod("fisher.lud",x) }
@@ -858,8 +816,6 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     X <- rep(0,ns)
     Y <- rep(0,ns)
     Z <- rep(0,ns)
-    x75 <- rep(0,ns)
-    x68 <- rep(0,ns)
     D <- mclean(tt=tt,d=x$d,exterr=exterr)
     x75 <- D$Pb207U235
     x68 <- D$Pb206U238
@@ -921,14 +877,15 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
 data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     l2 <- lambda('Th232')[1]
     U <- iratio('U238U235')[1]
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    x75 <- D$Pb207U235
+    x68 <- D$Pb206U238
+    x82 <- exp(l2*tt)-1
     ns <- length(x)
     X <- rep(0,ns)
     Y <- rep(0,ns)
     Z <- rep(0,ns)
     W <- rep(0,ns)
-    x75 <- rep(0,ns)
-    x68 <- rep(0,ns)
-    x82 <- rep(0,ns)
     K0 <- rep(0,ns)
     L0 <- rep(0,ns)
     E <- matrix(0,4*ns+7,4*ns+7)
@@ -940,17 +897,11 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         Y[i] <- wd$x['Pb206U238']
         Z[i] <- wd$x['Pb208Th232']
         W[i] <- wd$x['Th232U238']
-        D <- mclean(tt=tt,d=x$d[i],exterr=exterr)
-        x75[i] <- D$Pb207U235
-        x68[i] <- D$Pb206U238
-        x82[i] <- exp(l2*tt)-1
-        K0[i] <- X[i] - (Z[i]-x82[i])*b0*U*W[i] - x75[i]
-        L0[i] <- Y[i] - (Z[i]-x82[i])*a0*W[i] - x68[i]
+        K0[i] <- X[i] - (Z[i]-x82)*b0*U*W[i] - x75
+        L0[i] <- Y[i] - (Z[i]-x82)*a0*W[i] - x68
         E[c(i,ns+i,2*ns+i,3*ns+i),c(i,ns+i,2*ns+i,3*ns+i)] <- wd$cov
-        J[i,2*ns+i] <- -b0*U*W[i]             # dKdZ
         J[i,4*ns+2] <- -D$dPb207U235dl35      # dKdl35
         J[i,4*ns+5] <- -D$dPb207U235dl31      # dKdl31
-        J[ns+i,2*ns+i] <- -a0*W[i]            # dLdZ
         J[ns+i,4*ns+1] <- -D$dPb206U238dl38   # dLdl38
         J[ns+i,4*ns+3] <- -D$dPb206U238dl34   # dLdl34
         J[ns+i,4*ns+6] <- -D$dPb206U238dl30   # dLdl30
@@ -974,18 +925,28 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     o11 <- omega[i1,i1]; o12 <- omega[i1,i2]; o13 <- omega[i1,i3]
     o21 <- omega[i2,i1]; o22 <- omega[i2,i2]; o23 <- omega[i2,i3]
     o31 <- omega[i3,i1]; o32 <- omega[i3,i2]; o33 <- omega[i3,i3]
-    A <- t(K0%*%(o11+t(o11))*U*b0*W + K0%*%(o12+t(o21))*a0*W + K0%*%(o12+t(o21)) +
+    A <- t(K0%*%(o11+t(o11))*U*b0*W + K0%*%(o12+t(o21))*a0*W + K0%*%(o13+t(o31)) +
            L0%*%(o21+t(o12))*U*b0*W + L0%*%(o22+t(o22))*a0*W + L0%*%(o23+t(o32)))
-    B <- -(U*b0*(o11+t(o11))*U*b0 + a0*W*(o22+t(o22))*a0*W + (o33+t(o33)) +
-           U*b0*(o12+t(o21))*a0*W + a0*W*(o12+t(o21))*U*b0*W + U*b0*W*(o13+t(o31)) +
+    B <- -(U*b0*W*(o11+t(o11))*U*b0*W + a0*W*(o22+t(o22))*a0*W + (o33+t(o33)) +
+           U*b0*W*(o12+t(o21))*a0*W + a0*W*(o12+t(o21))*U*b0*W + U*b0*W*(o13+t(o31)) +
            (o13+t(o31))*U*b0*W + a0*W*(o23+t(o32)) )
-    M <- as.vector(solve(B,A))
-    c0 <- as.vector(Z - M - x82)
-    K <- as.vector(X - c0*b0*U*W - x75)
-    L <- as.vector(Y - c0*a0*W - x68)
-    list(K=K,L=L,M=M,W=W,c0=c0,omega11=o11,omega12=o12,omega13=o13,
-         omega21=o21,omega22=o22,omega23=o23,omega31=o31,
-         omega32=o32,omega33=o33,omega=omega,omegainv=ED)
+    out <- list(omega11=o11,omega12=o12,omega13=o13,
+                omega21=o21,omega22=o22,omega23=o23,omega31=o31,
+                omega32=o32,omega33=o33,omega=omega,omegainv=ED)
+    out$M <- as.vector(solve(B,A))
+    out$c0 <- as.vector(Z - out$M - x82)
+    out$K <- as.vector(X - out$c0*b0*U*W - x75)
+    out$L <- as.vector(Y - out$c0*a0*W - x68)
+    out$dKdt <- rep(-D$Pb207U235,ns)
+    out$dLdt <- rep(-D$Pb206U238,ns)
+    out$dMdt <- rep(-l2*exp(l2*tt),ns)
+    out$dKda0 <- rep(0,ns)
+    out$dLda0 <- -out$c0*W
+    out$dMda0 <- rep(0,ns)
+    out$dKdb0 <- -out$c0*U*W
+    out$dLdb0 <- rep(0,ns)
+    out$dMdb0 <- rep(0,ns)
+    out
 }
 
 get.Ew_2D <- function(w,Y,a0){
