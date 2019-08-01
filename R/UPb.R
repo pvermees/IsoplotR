@@ -758,7 +758,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
             D <- mclean(tt=t.75,d=d,exterr=exterr)    # implicit differentiation of 
             J[1,1] <- -1/D$dPb207U235dt               # mf=(x-Pb7U5)^2 => dt/dx
-            J[1,2] <- D$dPb207U235dl35/D$dPb207U235dt  # and dt/dl35
+            J[1,2] <- D$dPb207U235dl35/D$dPb207U235dt # and dt/dl35
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
@@ -809,7 +809,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             })
             D <- mclean(tt=t.68,d=d,exterr=exterr)    # implicit differentiation of 
             J[1,1] <- -1/D$dPb206U238dt               # mf=(x-Pb6U8)^2 => dt/dx
-            J[1,2] <- D$dPb206U238dl38/D$dPb206U238dt  # and dt/dl38
+            J[1,2] <- D$dPb206U238dl38/D$dPb206U238dt # and dt/dl38
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2
@@ -877,10 +877,10 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...
         t.76 <- stats::optimise(get.76.misfit,x=x,d=d,interval=interval)$minimum
         D <- mclean(tt=t.76,d=d,exterr=exterr)
         J <- matrix(0,1,4)
-        J[1,1] <- -1/D$dPb207Pb206dt # dt/dx
+        J[1,1] <- -1/D$dPb207Pb206dt                # dt/dx
         J[1,2] <- D$dPb207Pb206dl35/D$dPb207Pb206dt # dt/dl35
         J[1,3] <- D$dPb207Pb206dl38/D$dPb207Pb206dt # dt/dl38
-        J[1,4] <- D$dPb207Pb206dU/D$dPb207Pb206dt # dt/dU
+        J[1,4] <- D$dPb207Pb206dU/D$dPb207Pb206dt   # dt/dU
         E <- matrix(0,4,4)
         E[1,1] <- sx^2
         E[2,2] <- lambda('U235')[2]^2

@@ -182,7 +182,7 @@ copy_diseq <- function(x,d=diseq()){
 geomean.diseq <- function(x,...){
     out <- x
     for (ratio in c('U48','ThU','RaU','PaU')){
-        out[[ratio]]$x <- geomean(x[[ratio]]$x)
+        out[[ratio]]$x <- geomean(x[[ratio]]$x,...)
     }
     out
 }
@@ -248,34 +248,34 @@ forward <- function(tt,d=diseq(),derivative=0){
     out
 }
 
-check.diseq <- function(d=diseq(),tt=0){
-    out <- d
+fix.diseq <- function(d=diseq(),tt=0){
+    out <- geomean(d)
     factor <- 10
     ratios <- c('U48','ThU','RaU','PaU')
     nuclides <- c('U234','Th230','Ra226','Pa231')
     for (i in 1:length(nuclides)){
         ratio <- ratios[i]
         nuclide <- nuclides[i]
-        measured <- d[[ratio]]$option>1
-        expired <- tt*d$L[nuclide]>10
-        equilibrium <- d[[ratio]]$x==1
-        deficit <- d[[ratio]]$x<1
+        measured <- out[[ratio]]$option>1
+        expired <- tt*out$L[nuclide]>10
+        equilibrium <- out[[ratio]]$x==1
+        deficit <- out[[ratio]]$x<1
         if (equilibrium){
             out[[ratio]]$option <- 0
         } else if (measured & expired){
-            if (deficit) out[[ratio]]$x <- 0
-            else out[[ratio]]$x <- 10 # impose maximum initial disequilibrium
             out[[ratio]]$option <- 1
+            if (deficit) out[[ratio]]$x <- 0
+            else out[[ratio]]$x <- 10
         }        
     }
     out
 }
 
 check.equilibrium <- function(d=diseq()){
-    U48 <- (d$U48$option==0 | d$U48$x==1)
-    ThU <- (d$ThU$option==0 | d$ThU$x==1)
-    RaU <- (d$RaU$option==0 | d$RaU$x==1)
-    PaU <- (d$PaU$option==0 | d$PaU$x==1)
+    U48 <- (d$U48$option==0 | all(d$U48$x==1))
+    ThU <- (d$ThU$option==0 | all(d$ThU$x==1))
+    RaU <- (d$RaU$option==0 | all(d$RaU$x==1))
+    PaU <- (d$PaU$option==0 | all(d$PaU$x==1))
     U48 & ThU & RaU & PaU
 }
 
@@ -295,7 +295,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out$dPb206U238dl26 <- 0
     out$dPb207U235dl35 <- 0
     out$dPb207U235dl31 <- 0
-    d <- check.diseq(d=d,tt=tt)
+    d <- fix.diseq(d=d,tt=tt)
     if (check.equilibrium(d=d)){
         out$Pb206U238 <- exp(l38*tt)-1
         out$Pb207U235 <- exp(l35*tt)-1

@@ -476,7 +476,7 @@ d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
     } else if (identical(x,'c0')){
         dKdx[i] <- l$dKdc0[i]
         dLdx[i] <- l$dLdc0[i]
-        if (identical(y,'a0')) d2Kdxdy[j] <- l$d2Kdc0da0[j]
+        if (identical(y,'a0')) d2Kdxdy[i] <- l$d2Kdc0da0[i]
     } else {
         stop('Invalid option.')
     }
@@ -487,7 +487,7 @@ d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
     } else if (identical(y,'c0')){
         dKdy[j] <- l$dKdc0[j]
         dLdy[j] <- l$dLdc0[j]
-        if (identical(x,'a0')) d2Kdxdy[i] <- l$d2Kdc0da0[i]
+        if (identical(x,'a0')) d2Kdxdy[j] <- l$d2Kdc0da0[j]
     } else {
         stop('Invalid option.')
     }
