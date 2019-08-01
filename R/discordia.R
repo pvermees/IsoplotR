@@ -313,17 +313,21 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         call3 <- substitute(e~a,list(e=expr3,a=args2))
         line3 <- do.call('substitute',list(call3,list3))        
     } else if (fit$format%in%c(7,8)){
-        i68 <- roundit(fit$x['68i'],fit$err[,'68i'],sigdig=sigdig)
-        i78 <- roundit(fit$x['78i'],fit$err[,'78i'],sigdig=sigdig)
+        i86 <- 1/fit$x['68i']
+        i87 <- 1/fit$x['78i']
+        i86err <- i86*fit$err[,'68i']/fit$x['68i']
+        i87err <- i87*fit$err[,'78i']/fit$x['78i']
+        ri86 <- roundit(i86,i86err,sigdig=sigdig)
+        ri87 <- roundit(i87,i87err,sigdig=sigdig)
         expr1 <- quote('age =')
-        expr2 <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
-        expr3 <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
-        list2 <- list(a=i68[1],b=i68[2],c=i68[3],u='')
-        list3 <- list(a=i78[1],b=i78[2],c=i78[3],u='')
+        expr2 <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+        expr3 <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
+        list2 <- list(a=ri86[1],b=ri86[2],c=ri86[3],u='')
+        list3 <- list(a=ri87[1],b=ri87[2],c=ri87[3],u='')
         if (fit$model==1 && fit$mswd>1){
             list1$d <- lower.age[4]
-            list2$d <- i68[4]
-            list3$d <- i78[4]
+            list2$d <- ri86[4]
+            list3$d <- ri87[4]
         }
         call3 <- substitute(e~a,list(e=expr3,a=args2))
         line3 <- do.call('substitute',list(call3,list3))
