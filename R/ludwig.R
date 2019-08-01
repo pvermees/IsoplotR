@@ -463,13 +463,14 @@ dSdx_3D <- function(l,tt=0,a0=0,b0=0,x='a0'){
            l$M%*%l$omega33%*%dMdx + dMdx%*%l$omega33%*%l$M)
 }
 d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
-    ns <- length(l$c0)
+    ns <- length(l$K)
     zeros <- rep(0,ns)
     dKdx <- zeros; dLdx <- zeros
     dKdy <- zeros; dLdy <- zeros
     d2Kdxdy <- zeros; d2Ldxdy <- zeros;
     if (identical(x,'t')){
         dKdx <- l$dKdt
+        dLdx <- l$dLdt
         if (identical(y,'t')) d2Kdxdy <- l$d2Kdt2
     } else if (identical(x,'a0')){
         dKdx <- l$dKda0
@@ -482,6 +483,7 @@ d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
     }
     if (identical(y,'t')){
         dKdy <- l$dKdt
+        dLdy <- l$dLdt
     } else if (identical(y,'a0')){
         dKdy <- l$dKda0
     } else if (identical(y,'c0')){
