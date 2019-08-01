@@ -1,12 +1,12 @@
 fissiontrack.age <- function(x,i=NA,sigdig=NA,exterr=TRUE,mineral=NA){
     if (x$format < 2){
-        out <- EDM.age(x,i,sigdig,exterr)
+        out <- EDM.age(x,i,sigdig=sigdig,exterr=exterr)
     } else if (x$format > 1){
         if (x$format == 3) {
             if (is.na(mineral)) mineral <- 'apatite'
             x$zeta <- get.absolute.zeta(mineral);
         }
-        out <- ICP.age(x,i,sigdig,exterr)
+        out <- ICP.age(x,i,sigdig=sigdig,exterr=exterr)
     }
     out
 }

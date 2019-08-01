@@ -70,7 +70,7 @@ model3regression <- function(xyz,type='york'){
 LL.isochron <- function(w,xyz,type='york'){
     if (identical(type,'york'))
         out <- LL.york(w,xyz)
-    else
+    else if (identical(type,'titterington'))
         out <- LL.titterington(w,xyz)
     out
 }
@@ -124,6 +124,8 @@ LL.titterington <- function(w,xyz){
         out <- out - 1.5*log(2*pi) - 0.5*detE - 0.5*SS
     }
     out
+}
+LL.ludwig <- function(w,xyz){
 }
 
 augment_york_errors <- function(xy,w){

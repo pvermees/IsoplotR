@@ -393,6 +393,90 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     invisible(fit)
 }
+isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                         show.numbers=FALSE,levels=NA,clabel="",
+                         ellipse.col=c("#00FF0080","#FF000080"),
+                         type=1,ci.col='gray80',line.col='black',
+                         lwd=1,plot=TRUE,exterr=FALSE,model=1,
+                         show.ellipses=1*(model!=2),
+                         anchor=list(FALSE,NA),hide=NULL,omit=NULL,
+                         omit.col=NA,...){
+    ns <- length(x)
+    plotit <- (1:ns)%ni%hide
+    calcit <- (1:ns)%ni%c(hide,omit)
+    x2calc <- subset(x,subset=calcit)
+    lud <- ludwig(x2calc,exterr=exterr,model=model,anchor=anchor)
+    tt <- lud$par['t']
+    a0 <- lud$par['a0']
+    b0 <- lud$par['b0']
+    l8 <- settings('lambda','U238')[1]
+    l5 <- settings('lambda','U235')[1]
+    D <- mclean(tt,d=x$d)
+    if (type==1){                               # 38/06
+        x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)[1]
+        dx0invdt <- D$dPb206U238dt
+        E <- lud$cov[1:2,1:2]
+        x.lab <- quote(''^238*'U/'^206*'Pb')
+    } else {                                    # 35/07
+        x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)[1]
+        dx0invdt <- D$dPb207U235dt
+        E <- lud$cov[c(1,3),c(1,3)]
+        x.lab <- quote(''^235*'U/'^207*'Pb')
+    }
+    out <- isochron_init(lud,alpha=0.05)
+    out$age[1] <- tt
+    out$age[2] <- sqrt(lud$cov[1,1])
+    if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
+        XY <- data2york(x,option=3)
+        a <- 1/lud$par['64i']
+        y.lab <- quote(''^204*'Pb/'^206*'Pb')
+        out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
+    } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
+        XY <- data2york(x,option=4)
+        a <- 1/lud$par['74i']
+        y.lab <- quote(''^204*'Pb/'^207*'Pb')
+        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
+    } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
+        XY <- data2york(x,option=6,tt=tt)
+        a <- 1/lud$par['68i']
+        y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
+        out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+    } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
+        XY <- data2york(x,option=7,tt=tt)
+        U <- settings('iratio','U238U235')[1]
+        a <- 1/lud$par['78i']
+        y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
+        out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
+    }
+    b <- -a*x0inv
+    J <- matrix(0,2,2)
+    J[1,2] <- -a^2
+    J[2,1] <- -a*dx0invdt
+    J[2,2] <- x0inv*a^2
+    cov.ab <- J%*%E%*%t(J)
+    out$a <- c(a,sqrt(cov.ab[1,1]))
+    out$b <- c(b,sqrt(cov.ab[2,2]))
+    out$cov.ab <- cov.ab[1,2]
+    out$y0[1] <- out$a[1]
+    out$y0[2] <- out$a[2]
+    out$age['ci[t]'] <- out$fact*out$age['s[t]']
+    out$y0['ci[y]'] <- out$fact*out$y0['s[y]']
+    if (model==1){
+        out$age['disp[t]'] <- sqrt(out$mswd)*out$age['ci[t]']
+        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
+    }
+    if (plot){
+        scatterplot(XY,xlim=xlim,ylim=ylim,alpha=alpha,
+                    show.ellipses=show.ellipses,
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,
+                    hide=hide,omit=omit,omit.col=omit.col,...)
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Pb'),
+                        xlab=x.lab,ylab=y.lab)
+    }
+    invisible(out)
+}
 #' @param inverse toggles between normal and inverse isochrons. If the
 #'     isochron plots \code{Y} against \code{X}, and
 #'
@@ -453,7 +537,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     d2calc <- clear(y,hide,omit)
     fit <- regression(d2calc,model=model)
     out <- isochron_init(fit,alpha=alpha)
-    out$y0[c('y','s[y]')] <- out$a
+    out$y0[c('y','s[y]')] <- out$a 
     if (inverse){
         R76 <- out$a
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
@@ -931,7 +1015,7 @@ isochron_init <- function(fit,alpha=0.05){
         out$fact <- tfact(alpha,fit$df)
     } else {
         out$fact <- nfact(alpha)
-        out$w <- c(out$w,NA,NA)
+        if (length(out$w)==1) out$w <- c(out$w,NA,NA)
         names(out$w) <- c('s','ll','ul')
     }
     out$alpha <- alpha
@@ -1051,12 +1135,20 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
         mymtext(line1,line=1,...)
         mymtext(line2,line=0,...)
     } else if (fit$model==3){
-        rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
-        list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
-        args3 <- quote(a+b/-c)
-        expr3 <- fit$displabel
-        call3 <- substitute(e~a,list(e=expr3,a=args3))
-        line3 <- do.call(substitute,list(eval(call3),list3))
+        if (type=='U-Pb'){
+            rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
+            line3 <- substitute('overdispersion ='~a+b/-c~'% of Pb'[o],
+                                list(a=rounded.disp[1],
+                                     b=rounded.disp[3],
+                                     c=rounded.disp[2]))
+        } else {
+            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
+            list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
+            args3 <- quote(a+b/-c)
+            expr3 <- fit$displabel
+            call3 <- substitute(e~a,list(e=expr3,a=args3))
+            line3 <- do.call(substitute,list(eval(call3),list3))
+        }
         mymtext(line1,line=2,...)
         mymtext(line2,line=1,...)
         mymtext(line3,line=0,...)

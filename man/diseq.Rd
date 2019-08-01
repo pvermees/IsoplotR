@@ -5,46 +5,72 @@
 \title{Set up U-series disequilibrium correction for U-Pb
     geochronology}
 \usage{
-diseq(option = 0, U48 = 1, Th0U8 = 1, Ra6U8 = 1, Pa1U5 = 1,
-  fThU = 1, fRaU = 1, fPaU = 1)
+diseq(U48 = list(x = 1, sx = 0, option = 0), ThU = list(x = 1, sx = 0,
+  option = 0), RaU = list(x = 1, sx = 0, option = 0), PaU = list(x = 1,
+  sx = 0, option = 0))
 }
 \arguments{
-\item{option}{one of four options:
+\item{U48}{a list containing three items (\code{x}, \code{sx} and
+    \code{option}) specifying the \eqn{{}^{234}}U/\eqn{{}^{238}}U
+    disequilibrium.
 
-\code{0}: no disequilibrium correction
+If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+    disequilibrium correction is applied.
 
-\code{1}: use assumed initial activity ratios
+If \code{option=1}, then \code{x} contains the initial
+    \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
 
-\code{2}: use measured current activity ratios
+If \code{option=2}, then \code{x} contains the measured
+    \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.}
 
-\code{3}: use partition coefficients between the mineral and magma}
+\item{ThU}{a list containing three items (\code{x}, \code{sx} and
+    \code{option}) specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U
+    disequilibrium.
 
-\item{U48}{the \eqn{^{234}}U/\eqn{^{238}}U-activity ratio (initial
-if \code{option=1} or measured if \code{option=2}).}
+If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+    disequilibrium correction is applied.
 
-\item{Th0U8}{the \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
-(initial if \code{option=1} or measured if \code{option=2}).}
+If \code{option=1}, then \code{x} contains the initial
+    \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
 
-\item{Ra6U8}{the \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
-(initial if \code{option=1} or measured if \code{option=2}).}
+If \code{option=2}, then \code{x} contains the measured
+    \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
 
-\item{Pa1U5}{the \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
-(initial if \code{option=1} or measured if \code{option=2}).}
+If \code{option=3}, then \code{x} contains the measured Th/U ratio
+    of the magma (assumed or determined from the whole rock or
+    volcanic glass). This only applies for Th-bearing U-Pb data
+    formats 7 and 8.}
 
-\item{fThU}{the Th/U fractionation factor between the mineral (m)
-and the magma (M): \code{fThU} = (Th/U)\eqn{_m}/(Th/U)\eqn{_M}.}
+\item{RaU}{a list containing three items (\code{x}, \code{sx} and
+    \code{option}) specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U
+    disequilibrium.
 
-\item{fRaU}{the Ra/U fractionation factor between the mineral (m)
-and the magma (M): \code{fRaU} = (Ra/U)\eqn{_m}/(Ra/U)\eqn{_M}.}
+If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+    disequilibrium correction is applied.
 
-\item{fPaU}{the Pa/U fractionation factor between the mineral (m)
-and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.}
+If \code{option=1}, then \code{x} contains the initial
+    \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
+
+If \code{option=2}, then \code{x} contains the measured
+    \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.}
+
+\item{PaU}{a list containing three items (\code{x}, \code{sx} and
+    \code{option}) specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U
+    disequilibrium.
+
+If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+    disequilibrium correction is applied.
+
+If \code{option=1}, then \code{x} contains the initial
+    \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio.
+
+If \code{option=2}, then \code{x} contains the measured
+    \eqn{{}^{231}}Ra/\eqn{{}^{235}}U ratio.}
 }
 \value{
-a list with the following items: \code{option} and (\code{U48},
-\code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option=1} or
-\code{option=2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
-\code{option=3}].
+a list with the activity ratios, an eigen composition of
+    the decay contant matrix and the atomic abundances of the
+    parent and (intermediate) daughter nuclides
 }
 \description{
 The U-Pb method conventionally assumes initial secular
@@ -66,32 +92,20 @@ and \eqn{{}^{231}}Pa:
 
 \item{Specify the assumed initial activity ratios and calculate how
 much excess \eqn{{}^{206}}Pb and \eqn{{}^{207}}Pb these would have
-produced. (Wendt and Carl, 1985).}
+produced.}
 
 \item{Measure the current activity ratios to infer the initial
-ratios.  This approach only works for young samples (< 5Ma, say).}
+ratios.  This approach only works for young samples.}
 
-\item{Specify the elemental fractionation factor between Th and U
-in the magma chamber and the mineral (Schaerer,
-1984). \code{IsoplotR} generalises this approach to Ra/U and Pa/U
-as well. However, it still assumes secular equilibrium between
-\eqn{{}^{234}}U and \eqn{{}^{238}}Th.}
+\item{The initial \eqn{{}^{230}}Th/\eqn{{}^{238}}U activity ratio
+can also be estimated by providing the Th/U-ratio of the magma.}
 
 }
 }
 \examples{
-d <- diseq(option=3,fThU=2)
-fn <- system.file("UPb1.csv",package="IsoplotR")
-UPb <- read.data(fn,method='U-Pb',format=1,d=d)
-concordia(UPb)
-
-}
-\references{
-Schaerer, U., 1984. The effect of initial \eqn{{}^{230}}Th
-disequilibrium on young UPb ages: the Makalu case, Himalaya. Earth
-and Planetary Science Letters, 67(2), pp.191-204.
-
-Wendt, I. and Carl, C., 1985. U/Pb dating of discordant 0.1 Ma old
-secondary U minerals. Earth and Planetary Science Letters, 73(2-4),
-pp.278-284.
+d <- diseq(U48=list(x=0,option=1),ThU=list(x=2,option=1),
+           RaU=list(x=2,option=1),PaU=list(x=2,option=1))
+fn <- system.file("diseq.csv",package="IsoplotR")
+UPb <- read.data(fn,method='U-Pb',format=2)
+concordia(UPb,type=2,show.age=1)
 }

@@ -175,7 +175,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              i2i=FALSE,hide=NULL,...){
     x <- clear(x,hide)
     tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
-    X <- cbind(x$x[,'Ar39'],tt)
+    X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     y.lab='age [Ma]'
     XY <- plot.spectrum.axes(x=X,alpha=alpha,xlab=x.lab,
@@ -200,7 +200,7 @@ plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
                                plateau.col=c("#00FF0080","#FF000080"),
                                clabel="",...){
     ns <- nrow(x)
-    x <- clear(x[,1:3],hide)
+    x <- clear(x[,1:3,drop=FALSE],hide)
     valid <- !is.na(rowSums(x))
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
@@ -289,7 +289,7 @@ get.plateau <- function(x,alpha=0.05,random.effects=TRUE){
             valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1),
                                random.effects=random.effects)
             if (all(valid) & (fract > out$fract)){
-                out <- weightedmean(YsY[i:j,],random.effects=random.effects,
+                out <- weightedmean(YsY[i:j,,drop=FALSE],random.effects=random.effects,
                                     plot=FALSE,detect.outliers=FALSE,
                                     alpha=alpha)
                 out$i <- i:j

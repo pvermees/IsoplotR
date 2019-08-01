@@ -103,11 +103,11 @@ peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,alpha=0.05,...){
         x[,1] <- log(x[,1])
     }
     if (identical(k,'min')) {
-        out <- min_age_model(x,sigdig=sigdig,alpha=alpha)
+        out <- min_age_model(x,alpha=alpha)
     } else if (identical(k,'auto')) {
-        out <- normal.mixtures(x,k=BIC_fit(x,5),sigdig=sigdig,alpha=alpha,...)
+        out <- normal.mixtures(x,k=BIC_fit(x,5),alpha=alpha,...)
     } else {
-        out <- normal.mixtures(x,k,sigdig=sigdig,alpha=alpha,...)
+        out <- normal.mixtures(x,k,alpha=alpha,...)
     }
     if (log) {
         out$peaks['t',] <- exp(out$peaks['t',])
@@ -268,7 +268,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,detritus=detritus)
-    fit <- peakfit.default(tt,k=k,sigdig=sigdig,log=log,alpha=alpha)
+    fit <- peakfit.default(tt,k=k,log=log,alpha=alpha)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -327,7 +327,7 @@ get.props.err <- function(E){
 }
 
 peaks2legend <- function(fit,sigdig=2,k=NULL){
-    if (identical(k,'min')) return(min_age_to_legend(fit,sigdig))
+    if (identical(k,'min')) return(min_age_to_legend(fit,sigdig=sigdig))
     out <- NULL
     for (i in 1:ncol(fit$peaks)){
         rounded.age <- roundit(fit$peaks[1,i],fit$peaks[2:3,i],sigdig=sigdig)
@@ -346,7 +346,7 @@ min_age_to_legend <- function(fit,sigdig=2){
     paste0('Minimum: ',rounded.age[1],'\u00B1',rounded.age[2],' | ',rounded.age[3])
 }
 
-normal.mixtures <- function(x,k,sigdig=2,alpha=0.05,...){
+normal.mixtures <- function(x,k,alpha=0.05,...){
     good <- !is.na(x[,1]+x[,2])
     zu <- x[good,1]
     su <- x[good,2]
@@ -392,7 +392,6 @@ normal.mixtures <- function(x,k,sigdig=2,alpha=0.05,...){
                         props.err=get.props.err(E),
                         df=n-2*k+1,alpha=alpha)
     out$L <- L
-    out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
 }
 # uses sum-of-logs identity from Wikipedia
@@ -517,7 +516,7 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
 }
 
 # Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
-min_age_model <- function(zs,sigdig=2,alpha=0.05){
+min_age_model <- function(zs,alpha=0.05){
     z <- zs[,1]
     mu <- seq(min(z),max(z),length.out=100)
     sigma <- seq(stats::sd(z)/10,2*stats::sd(z),length.out=10)

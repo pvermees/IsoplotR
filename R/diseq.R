@@ -20,283 +20,422 @@
 #' 
 #' \item{Specify the assumed initial activity ratios and calculate how
 #' much excess \eqn{{}^{206}}Pb and \eqn{{}^{207}}Pb these would have
-#' produced. (Wendt and Carl, 1985).}
+#' produced.}
 #' 
 #' \item{Measure the current activity ratios to infer the initial
-#' ratios.  This approach only works for young samples (< 5Ma, say).}
+#' ratios.  This approach only works for young samples.}
 #' 
-#' \item{Specify the elemental fractionation factor between Th and U
-#' in the magma chamber and the mineral (Schaerer,
-#' 1984). \code{IsoplotR} generalises this approach to Ra/U and Pa/U
-#' as well. However, it still assumes secular equilibrium between
-#' \eqn{{}^{234}}U and \eqn{{}^{238}}Th.}
-#'
+#' \item{The initial \eqn{{}^{230}}Th/\eqn{{}^{238}}U activity ratio
+#' can also be estimated by providing the Th/U-ratio of the magma.}
+#' 
 #' }
-#' 
-#' @param option one of four options:
 #'
-#' \code{0}: no disequilibrium correction
+#' @param U48 a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{234}}U/\eqn{{}^{238}}U
+#'     disequilibrium.
 #'
-#' \code{1}: use assumed initial activity ratios
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
 #'
-#' \code{2}: use measured current activity ratios
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
 #'
-#' \code{3}: use partition coefficients between the mineral and magma
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
 #'
-#' @param U48 the \eqn{^{234}}U/\eqn{^{238}}U-activity ratio (initial
-#'     if \code{option=1} or measured if \code{option=2}).
+#' @param ThU a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U
+#'     disequilibrium.
+#'
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
+#'
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+#'
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+#'
+#' If \code{option=3}, then \code{x} contains the measured Th/U ratio
+#'     of the magma (assumed or determined from the whole rock or
+#'     volcanic glass). This only applies for Th-bearing U-Pb data
+#'     formats 7 and 8.
+#'
+#' @param RaU a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U
+#'     disequilibrium.
+#'
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
+#'
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
+#'
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
 #' 
-#' @param Th0U8 the \eqn{^{230}}Th/\eqn{^{238}}U-activity ratio
-#'     (initial if \code{option=1} or measured if \code{option=2}).
+#' @param PaU a list containing three items (\code{x}, \code{sx} and
+#'     \code{option}) specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U
+#'     disequilibrium.
+#'
+#' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
+#'     disequilibrium correction is applied.
+#'
+#' If \code{option=1}, then \code{x} contains the initial
+#'     \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio.
+#'
+#' If \code{option=2}, then \code{x} contains the measured
+#'     \eqn{{}^{231}}Ra/\eqn{{}^{235}}U ratio.
 #' 
-#' @param Ra6U8 the \eqn{^{226}}Ra/\eqn{^{238}}U-activity ratio
-#'     (initial if \code{option=1} or measured if \code{option=2}).
-#' 
-#' @param Pa1U5 the \eqn{^{231}}Pa/\eqn{^{235}}U-activity ratio
-#'     (initial if \code{option=1} or measured if \code{option=2}).
-#' 
-#' @param fThU the Th/U fractionation factor between the mineral (m)
-#'     and the magma (M): \code{fThU} = (Th/U)\eqn{_m}/(Th/U)\eqn{_M}.
-#' 
-#' @param fRaU the Ra/U fractionation factor between the mineral (m)
-#'     and the magma (M): \code{fRaU} = (Ra/U)\eqn{_m}/(Ra/U)\eqn{_M}.
-#' 
-#' @param fPaU the Pa/U fractionation factor between the mineral (m)
-#'     and the magma (M): \code{fPaU} = (Pa/U)\eqn{_m}/(Pa/U)\eqn{_M}.
-#' 
-#' @return
-#' a list with the following items: \code{option} and (\code{U48},
-#' \code{Th08}, \code{Ra6U8}, \code{Pa1U8}) [if \code{option=1} or
-#' \code{option=2}] and (\code{fThU}, \code{RaU}, \code{PaU}) [if
-#' \code{option=3}].
+#' @return a list with the activity ratios, an eigen composition of
+#'     the decay contant matrix and the atomic abundances of the
+#'     parent and (intermediate) daughter nuclides
 #' 
 #' @examples
-#' d <- diseq(option=3,fThU=2)
-#' fn <- system.file("UPb1.csv",package="IsoplotR")
-#' UPb <- read.data(fn,method='U-Pb',format=1,d=d)
-#' concordia(UPb)
-#' 
-#' @references
-#' Schaerer, U., 1984. The effect of initial \eqn{{}^{230}}Th
-#' disequilibrium on young UPb ages: the Makalu case, Himalaya. Earth
-#' and Planetary Science Letters, 67(2), pp.191-204.
-#' 
-#' Wendt, I. and Carl, C., 1985. U/Pb dating of discordant 0.1 Ma old
-#' secondary U minerals. Earth and Planetary Science Letters, 73(2-4),
-#' pp.278-284.
+#' d <- diseq(U48=list(x=0,option=1),ThU=list(x=2,option=1),
+#'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
+#' fn <- system.file("diseq.csv",package="IsoplotR")
+#' UPb <- read.data(fn,method='U-Pb',format=2)
+#' concordia(UPb,type=2,show.age=1)
 #' @export
-diseq <- function(option=0,
-                  U48=1,Th0U8=1,Ra6U8=1,Pa1U5=1,
-                  fThU=1,fRaU=1,fPaU=1){
-    out <- list(option=option)
-    if (option%in%c(1,2)){
-        out$U48=U48
-        out$Th0U8=Th0U8
-        out$Ra6U8=Ra6U8
-        out$Pa1U5=Pa1U5        
-    } else if (option==3){
-        out$fThU = fThU
-        out$fRaU = fRaU
-        out$fPaU = fPaU
+diseq <- function(U48=list(x=1,sx=0,option=0),
+                  ThU=list(x=1,sx=0,option=0),
+                  RaU=list(x=1,sx=0,option=0),
+                  PaU=list(x=1,sx=0,option=0)){
+    out <- list()
+    class(out) <- 'diseq'
+    out$U48 <- U48
+    out$ThU <- ThU
+    out$RaU <- RaU
+    out$PaU <- PaU
+    out$equilibrium <- check.equilibrium(d=out)
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l26 <- settings('lambda','Ra226')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    l31 <- settings('lambda','Pa231')[1]*1000
+    out$Q <- matrix(0,8,8)
+    out$Q[1,1] <- -((l26-l38)*(l30-l38)*(l34-l38))/(l26*l30*l34)
+    out$Q[2,1] <- -(l38*(l26-l38)*(l30-l38))/(l26*l30*l34)
+    out$Q[2,2] <- -((l26-l34)*(l30-l34))/(l26*l30)
+    out$Q[3,1] <- -(l38*(l26-l38))/(l26*l30)
+    out$Q[3,2] <- -(l34*(l26-l34))/(l26*l30)
+    out$Q[3,3] <- -(l26-l30)/l26
+    out$Q[4,1] <- -l38/l26
+    out$Q[4,2] <- -l34/l26
+    out$Q[4,3] <- -l30/l26
+    out$Q[4,4] <- -1
+    out$Q[5,1:5] <- 1
+    out$Q[6,6] <- -(l31-l35)/l31
+    out$Q[7,6] <- -l35/l31
+    out$Q[7,7] <- -1
+    out$Q[8,6:8] <- 1
+    out$Qinv <- matrix(0,8,8)
+    out$Qinv[1,1] <- -(l26*l30*l34)/((l26-l38)*(l30-l38)*(l34-l38))
+    out$Qinv[2,1] <- (l26*l30*l38)/((l26-l34)*(l30-l34)*(l34-l38))
+    out$Qinv[2,2] <- -(l26*l30)/((l26-l34)*(l30-l34))
+    out$Qinv[3,1] <- -(l26*l34*l38)/((l26-l30)*(l30-l34)*(l30-l38))
+    out$Qinv[3,2] <- (l26*l34)/((l26-l30)*(l30-l34))
+    out$Qinv[3,3] <- -l26/(l26-l30)
+    out$Qinv[4,1] <- (l30*l34*l38)/((l26-l30)*(l26-l34)*(l26-l38))
+    out$Qinv[4,2] <- -(l30*l34)/((l26-l30)*(l26-l34))
+    out$Qinv[4,3] <- l30/(l26-l30)
+    out$Qinv[4,4] <- -1
+    out$Qinv[5,1:5] <- 1
+    out$Qinv[6,6] <- -l31/(l31-l35)
+    out$Qinv[7,6] <- l35 /(l31-l35)
+    out$Qinv[7,7] <- -1
+    out$Qinv[8,6:8] <-1
+    out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
+    out$n0 <- rep(0,8)
+    nuclides <- c('U238','U234','Th230','Ra226',
+                  'Pb206','U235','Pa231','Pb207')
+    names(out$L) <- nuclides
+    names(out$n0) <- nuclides
+    out
+}
+
+#' @export
+`[.diseq` <- function(x,i){
+    out <- x
+    for (ratio in c('U48','ThU','RaU','PaU')){
+        j <- min(length(out[[ratio]]$x),i)
+        out[[ratio]]$x <- out[[ratio]]$x[j]
     }
     out
 }
 
-# from Wendt & Carl (1985, EPSL):
-wendt <- function(tt,d=diseq()){
-    dd <- d
-    if (d$option==2){
-        l4 <- settings('lambda','U234')[1]*1000
-        l0 <- settings('lambda','Th230')[1]*1000
-        l6 <- settings('lambda','Ra226')[1]*1000
-        l1 <- settings('lambda','Pa231')[1]*1000
-        # the next 6 lines are safety measures against bad input
-        fact <- 20
-        if (tt>(fact/l6) & d$Ra6U8!=1) ttt <- fact/l6
-        else if (tt>(fact/l1) & d$Pa1U5!=1) ttt <- fact/l1
-        else if (tt>(fact/l0) & d$Th0U8!=1) ttt <- fact/l0
-        else if (tt>(fact/l4) & d$U48!=1) ttt <- fact/l4
-        else ttt <- tt
-        if (d$U48!=1) dd$U48 <- max(0, 1 + (d$U48-1)*exp(l4*ttt))
-        if (d$Th0U8!=1) dd$Th0U8 <- max(0, 1 + (d$Th0U8-1)*exp(l0*ttt))
-        if (d$Ra6U8!=1) dd$Ra6U8 <- max(0, 1 + (d$Ra6U8-1)*exp(l6*ttt))
-        if (d$Pa1U5!=1) dd$Pa1U5 <- max(0, 1 + (d$Pa1U5-1)*exp(l1*ttt))
-    }
-    out <- list(d1=0,d2=0,dd1dt=0,dd2dt=0,
-                d2d1dt2=0,d2d2dt2=0,dd1dl5=0,dd2dl8=0)
-    if (d$option>0){
-        out$d1 <- d1(tt,dd=dd)
-        out$d2 <- d2(tt,dd=dd)
-        out$dd1dt <- dd1dt(tt,dd=dd)
-        out$dd2dt <- dd2dt(tt,dd=dd)
-        out$d2d1dt2 <- d2d1dt2(tt,dd=dd)
-        out$d2d2dt2 <- d2d2dt2(tt,dd=dd)
-        out$dd1dl5 <- dd1dl5(tt,dd=dd)
-        out$dd2dl8 <- dd2dl8(tt,dd=dd)
+# infer initial activity ratios from Th/U measurements
+copy_diseq <- function(x,d=diseq()){
+    out <- d
+    if (d$ThU$option==3){
+        if (x$format>6){
+            U <- settings('iratio','U238U235')[1]
+            out$ThU$x <- (x$x[,'Th232U238']/d$ThU$x)*U/(1+U)
+        }
+        out$ThU$option <- 1
     }
     out
 }
-d1 <- function(tt,dd=diseq()){
-    l1 <- settings('lambda','Pa231')[1]*1000
-    l5 <- settings('lambda','U235')[1]
-    if (dd$option<3){
-        D0 <- dd$Pa1U5 - 1
-        out <- D0*(l5/l1)*exp(l5*tt)*(1-exp(-l1*tt))
+
+geomean.diseq <- function(x,...){
+    out <- x
+    for (ratio in c('U48','ThU','RaU','PaU')){
+        out[[ratio]]$x <- geomean(x[[ratio]]$x,...)
+    }
+    out
+}
+
+# to infer initial 38,34,30,35 from measured 34/38 and 30/38
+mexp.8405 <- function(){
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    out <- list()
+    out$L <- c(l38,l34,l30,l35)
+    names(out$L) <- c('U238','U234','Th230','U235')
+    out$Q <- diag(1,4,4)
+    out$Q[1,1] <- (l30-l38)*(l34-l38)/(l34*l38)
+    out$Q[2,1] <- (l30-l38)/l34
+    out$Q[2,2] <- (l30-l34)/l34
+    out$Q[3,1:2] <- 1
+    out$Qinv <- diag(1,4,4)
+    out$Qinv[1,1] <- (l34*l38)/((l30-l38)*(l34-l38))
+    out$Qinv[2,1] <- -(l34*l38)/((l30-l34)*(l34-l38))
+    out$Qinv[2,2] <- l34/(l30-l34)
+    out$Qinv[3,1] <- (l34*l38)/((l30-l34)*(l30-l38))
+    out$Qinv[3,2] <- -l34/(l30-l34)
+    out
+}
+
+# to infer initial 38,34,35 from measured 34/38
+mexp.845 <- function(nratios=3){
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l26 <- settings('lambda','Ra226')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    out <- list()
+    out$L <- c(l38,l34,l35)
+    names(out$L) <- c('U238','U234','U235')
+    out$Q <- diag(1,3,3)
+    out$Q[1,1] <- (l34-l38)/l38
+    out$Q[2,1] <- 1
+    out$Qinv <- diag(1,3,3)
+    out$Qinv[1,1] <- l38/(l34-l38)
+    out$Qinv[2,1] <- -l38/(l34-l38)
+    out
+}
+
+reverse <- function(tt,mexp,nt){
+    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    names(out) <- names(nt)
+    out
+}
+forward <- function(tt,d=diseq(),derivative=0){
+    if (derivative==0){
+        out <- as.vector(d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    } else if (derivative==1){
+        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*%
+                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    } else if (derivative==2){
+        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
+                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    }
+    names(out) <- names(d$L)
+    out
+}
+
+fix.diseq <- function(d=diseq(),tt=0){
+    out <- geomean(d)
+    factor <- 10
+    ratios <- c('U48','ThU','RaU','PaU')
+    nuclides <- c('U234','Th230','Ra226','Pa231')
+    for (i in 1:length(nuclides)){
+        ratio <- ratios[i]
+        nuclide <- nuclides[i]
+        measured <- out[[ratio]]$option>1
+        expired <- tt*out$L[nuclide]>10
+        equilibrium <- out[[ratio]]$x==1
+        deficit <- out[[ratio]]$x<1
+        if (equilibrium){
+            out[[ratio]]$option <- 0
+        } else if (measured & expired){
+            out[[ratio]]$option <- 1
+            if (deficit) out[[ratio]]$x <- 0
+            else out[[ratio]]$x <- 10
+        }        
+    }
+    out
+}
+
+check.equilibrium <- function(d=diseq()){
+    U48 <- (d$U48$option==0 | all(d$U48$x==1))
+    ThU <- (d$ThU$option==0 | all(d$ThU$x==1))
+    RaU <- (d$RaU$option==0 | all(d$RaU$x==1))
+    PaU <- (d$PaU$option==0 | all(d$PaU$x==1))
+    U48 & ThU & RaU & PaU
+}
+
+# d only contains one sample
+mclean <- function(tt=0,d=diseq(),exterr=FALSE){
+    out <- list()
+    l38 <- settings('lambda','U238')[1]
+    l34 <- settings('lambda','U234')[1]*1000
+    l30 <- settings('lambda','Th230')[1]*1000
+    l26 <- settings('lambda','Ra226')[1]*1000
+    l35 <- settings('lambda','U235')[1]
+    l31 <- settings('lambda','Pa231')[1]*1000
+    U <- iratio('U238U235')[1]
+    out$dPb206U238dl38 <- 0
+    out$dPb206U238dl34 <- 0
+    out$dPb206U238dl30 <- 0
+    out$dPb206U238dl26 <- 0
+    out$dPb207U235dl35 <- 0
+    out$dPb207U235dl31 <- 0
+    d <- fix.diseq(d=d,tt=tt)
+    if (check.equilibrium(d=d)){
+        out$Pb206U238 <- exp(l38*tt)-1
+        out$Pb207U235 <- exp(l35*tt)-1
+        out$dPb206U238dt <- exp(l38*tt)*l38
+        out$dPb207U235dt <- exp(l35*tt)*l35
+        out$d2Pb206U238dt2 <- exp(l38*tt)*l38^2
+        out$d2Pb207U235dt2 <- exp(l35*tt)*l35^2
+        if (exterr){
+            out$dPb206U238dl38 <- tt*exp(l38*tt)
+            out$dPb207U235dl35 <- tt*exp(l35*tt)
+        }
     } else {
-        out <- (l5/l1)*(dd$fPaU-1)
+        d$n0['U238'] <- 1/l38
+        d$n0['U235'] <- 1/l35
+        if (d$U48$option<2){     # initial 234U
+            if (d$U48$option==0) out$n0['U234'] <- 1/l34
+            else d$n0['U234'] <- d$U48$x/l34
+            if (d$ThU$option<2){ # initial 230Th
+                if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
+                else d$n0['Th230'] <- d$ThU$x/l30
+            } else {             # measured 230Th
+                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
+                nt['Th230'] <- d$ThU$x*nt['U238']*l30/l38 # overwrite
+                d$n0['Th230'] <- reverse(tt=tt,mexp=mexp.8405(),nt=nt)['Th230']
+            }
+        } else {                 # measured 234U
+            if (d$ThU$option<2){ # initial 230Th
+                nt <- forward(tt=tt,d=d)[c('U238','U234','U235')]
+                nt['U234'] <- d$U48$x*nt['U238']*l34/l38 # overwrite
+                d$n0['U234'] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234']
+                if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
+                else d$n0['Th230'] <- d$ThU$x/l30
+            } else {             # measured 230Th
+                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
+                nt['U234'] <- d$U48$x*nt['U238']*l34/l38 # overwrite
+                nt['Th230'] <- d$ThU$x*nt['U238']*l30/l38 # overwrite
+                d$n0[c('U234','Th230')] <-
+                    reverse(tt=tt,mexp=mexp.8405(),nt=nt)[c('U234','Th230')]
+            }
+        }
+        if (d$RaU$option==0) d$n0['Ra226'] <- 1/l26
+        else d$n0['Ra226'] <- d$RaU$x/l26
+        if (d$PaU$option==0) d$n0['Pa231'] <- 1/l31
+        else d$n0['Pa231'] <- d$PaU$x/l31
+        d$nt <- forward(tt=tt,d=d)
+        dntdt <- forward(tt,d=d,derivative=1)
+        d2ntdt2 <- forward(tt,d=d,derivative=2)
+        out$Pb206U238 <- d$nt['Pb206']/d$nt['U238']
+        out$Pb207U235 <- d$nt['Pb207']/d$nt['U235']
+        out$dPb206U238dt <- dntdt['Pb206']/d$nt['U238'] -
+            out$Pb206U238*dntdt['U238']/d$nt['U238']
+        out$d2Pb206U238dt2 <- d2ntdt2['Pb206']/d$nt['U238'] -
+            2*dntdt['Pb206']*dntdt['U238']/d$nt['U238']^2 -
+            out$Pb206U238*d2ntdt2['U238']/d$nt['U238'] +
+            2*out$Pb206U238*(dntdt['U238']/d$nt['U238'])^2
+        out$dPb207U235dt <- dntdt['Pb207']/d$nt['U235'] -
+            out$Pb207U235*dntdt['U235']/d$nt['U235']
+        out$d2Pb207U235dt2 <- d2ntdt2['Pb207']/d$nt['U235'] -
+            2*dntdt['Pb207']*dntdt['U235']/d$nt['U235']^2 -
+            out$Pb207U235*d2ntdt2['U235']/d$nt['U235'] +
+            2*out$Pb207U235*(dntdt['U235']/d$nt['U235'])^2
+        if (exterr){
+            K <- get.diseq.K(tt=tt,d=d)
+            out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
+            out$dPb206U238dl34 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U234')
+            out$dPb206U238dl30 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='Th230')
+            out$dPb206U238dl26 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='Ra226')
+            out$dPb207U235dl35 <- drdl(d=d,K=K,den='U235',num='Pb207',parent='U235')
+            out$dPb207U235dl31 <- drdl(d=d,K=K,den='U235',num='Pb207',parent='Pa231')
+        }
     }
-    out
-}
-d2 <- function(tt,dd=diseq()){
-    l4 <- settings('lambda','U234')[1]*1000
-    l6 <- settings('lambda','Ra226')[1]*1000
-    l0 <- settings('lambda','Th230')[1]*1000
-    l8 <- settings('lambda','U238')[1]
-    if (dd$option<3){
-        A0 <- dd$U48 - 1
-        B0 <- dd$Th0U8 - 1
-        C0 <- dd$Ra6U8 - 1
-        K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
-        K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
-        K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
-        K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
-        out <- exp(l8*tt)*(K1*exp(-l4*tt)+K2*exp(-l0*tt)+K3*exp(-l6*tt)+K4)
+    if (tt>0){
+        out$Pb207Pb206 <- out$Pb207U235/(U*out$Pb206U238)
+        out$dPb207Pb206dt <- (out$dPb207U235dt*out$Pb206U238 -
+                              out$dPb206U238dt*out$Pb207U235)/(U*out$Pb206U238^2)
     } else {
-        out <- (l8/l0)*(dd$fThU-1) + (l8/l6)*(dd$fRaU-1)
+        out$Pb207Pb206 <- 0
+        out$dPb207Pb206dt <- 0
     }
-    out
-}
-dd1dl5 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        l5 <- settings('lambda','U235')[1]
-        out <- d1(tt,dd=dd)*(tt+1/l5)
+    if (exterr){
+        out$dPb207Pb206dl38 <- -out$dPb206U238dl38*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl34 <- -out$dPb206U238dl34*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl30 <- -out$dPb206U238dl30*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl26 <- -out$dPb206U238dl26*out$Pb207U235/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl35 <- out$dPb207U235dl35*out$Pb206U238/(U*out$Pb206U238^2)
+        out$dPb207Pb206dl31 <- out$dPb207U235dl31*out$Pb206U238/(U*out$Pb206U238^2)
+        out$dPb207Pb206dU <- -out$Pb207Pb206/U
     } else {
-        l1 <- settings('lambda','Pa231')[1]*1000
-        out <- (dd$fPaU-1)/l1
+        out$dPb207Pb206dl38 <- 0
+        out$dPb207Pb206dl34 <- 0
+        out$dPb207Pb206dl30 <- 0
+        out$dPb207Pb206dl26 <- 0
+        out$dPb207Pb206dl35 <- 0
+        out$dPb207Pb206dl31 <- 0
+        out$dPb207Pb206dU <- 0
     }
     out
 }
-dd2dl8 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        l8 <- settings('lambda','U238')[1]
-        out <- d2(tt,dd=dd)*(tt+1/l8)
-    } else {
-        l0 <- settings('lambda','Th230')[1]*1000
-        l6 <- settings('lambda','Ra226')[1]*1000
-        out <- (dd$fThU-1)/l0 + (dd$fRaU-1)/l6
+
+get.diseq.K <- function(tt=0,d=diseq()){
+    nl <- length(d$L)
+    out <- matrix(0,nl,nl)
+    colnames(out) <- names(d$L)
+    rownames(out) <- names(d$L)
+    for (i in 1:nl){
+        for (j in 1:nl){
+            if (i==j){
+                out[i,j] <- tt*exp(-d$L[i]*tt)
+            } else if (d$L[i]==d$L[j]){
+                # do nothing
+            } else {
+                out[i,j] <- (exp(-d$L[i]*tt)-exp(-d$L[j]*tt))/(d$L[j]-d$L[i])
+            }
+        }
     }
     out
 }
-dd1dt <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        l5 <- settings('lambda','U235')[1]
-        l1 <- settings('lambda','Pa231')[1]*1000
-        D0 <- dd$Pa1U5 - 1
-        out <- l5*d1(tt,dd=dd) + D0*l5*exp((l5-l1)*tt)
-    } else {
-        out <- 0
-    }
+drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
+                 num='Pb206',den='U238',parent='Th230'){
+    # 1. create matrix derivative
+    i <- which(names(d$L)%in%parent)
+    nl <- length(d$L)
+    dAdl <- matrix(0,nl,nl)
+    dAdl[c(i,i+1),i] <- c(-1,1)
+    H <- d$Qinv %*% dAdl %*% d$Q
+    P <- H * K
+    dntdl <- as.vector(d$Q %*% P %*% d$Qinv %*% d$nt)
+    names(dntdl) <- names(d$L)
+    # 2. derivative of the ratio
+    out <- (d$nt[den]*dntdl[num]-
+            d$nt[num]*dntdl[den])/d$nt[den]^2
     out
 }
-d2d1dt2 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        D0 <- dd$Pa1U5 - 1
-        l5 <- settings('lambda','U235')[1]
-        l1 <- settings('lambda','Pa231')[1]*1000
-        out <- l5*l5*d1(tt,dd=dd) + D0*l5*(l5-l1)*exp((l5-l1)*tt)
-    } else {
-        out <- 0
-    }
-    out
-}
-dd2dt <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        A0 <- dd$U48 - 1
-        B0 <- dd$Th0U8 - 1
-        C0 <- dd$Ra6U8 - 1    
-        l6 <- settings('lambda','Ra226')[1]*1000
-        l0 <- settings('lambda','Th230')[1]*1000
-        l4 <- settings('lambda','U234')[1]*1000
-        l8 <- settings('lambda','U238')[1]
-        K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
-        K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
-        K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
-        K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
-        out <- (l8-l4)*K1*exp((l8-l4)*tt) + (l8-l0)*K2*exp((l8-l0)*tt) +
-            (l8-l6)*K3*exp((l8-l6)*tt) + l8*K4*exp(l8*tt)
-    } else {
-        out <- 0
-    }
-    out
-}
-d2d2dt2 <- function(tt,dd=diseq()){
-    if (dd$option<3){
-        A0 <- dd$U48 - 1
-        B0 <- dd$Th0U8 - 1
-        C0 <- dd$Ra6U8 - 1
-        l6 <- settings('lambda','Ra226')[1]*1000
-        l0 <- settings('lambda','Th230')[1]*1000
-        l4 <- settings('lambda','U234')[1]*1000
-        l8 <- settings('lambda','U238')[1]
-        K1 <- -A0*l8*l0*l6/(l4*(l0-l4)*(l6-l4))
-        K2 <- (l8*l6/(l6-l0))*(A0/(l0-l4)-B0/l0)
-        K3 <- (l8/(l6-l0))*(B0-l0*A0/(l6-l4))-C0*l8/l6
-        K4 <- A0*l8/l4 + B0*l8/l0 + C0*l8/l6
-        out <- (l8-l4)*(l8-l4)*K1*exp((l8-l4)*tt) +
-            (l8-l0)*(l8-l0)*K2*exp((l8-l0)*tt) +
-            (l8-l6)*(l8-l6)*K3*exp((l8-l6)*tt) + K4*l8*exp(l8*tt)
-    } else {
-        out <- 0
-    }
-    out
-}
+
 diseq.75.misfit <- function(tt,x,d){
-    abs(log(x) - log(subset(age_to_Pb207U235_ratio(tt,d=d),select='75')))
+    (x - subset(age_to_Pb207U235_ratio(tt,d=d),select='75'))^2
 }
 diseq.68.misfit <- function(tt,x,d){
-    abs(log(x) - log(subset(age_to_Pb206U238_ratio(tt,d=d),select='68')))
+    (x - subset(age_to_Pb206U238_ratio(tt,d=d),select='68'))^2
 }
-Pb207Pb206.misfit <- function(tt,x,d=diseq()){
-    abs(x - subset(age_to_Pb207Pb206_ratio(tt,d=d),select='76'))
-}
-# derivative of the 7/6 misfit function w.r.t. time
-dmf76dt <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+D$d1
-    r68 <- exp(l8*t.76)-1+D$d2
-    dr75dt <- l5*exp(l5*t.76)+D$dd1dt
-    dr68dt <- l8*exp(l8*t.76)+D$dd2dt
-    2*(r75/(U*r68)-x)*(dr75dt*r68-r75*dr68dt)/(U*r68^2)
-}
-dmf76dl5 <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+D$d1
-    r68 <- exp(l8*t.76)-1+D$d2
-    dr75dl5 <- t.76*exp(l5*t.76)+D$dd1dl5
-    2*(r75/(U*r68)-x)/(U*r68)
-}
-dmf76dl8 <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+D$d1
-    r68 <- exp(l8*t.76)-1+D$d2
-    dr68dl8 <- l8*exp(l8*t.76)+D$dd2dt
-    2*(r75/(U*r68)-x)*(-r75*dr68dl8)/(U*r68^2)
-}
-dmf76dU <- function(x,t.76,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
-    D <- wendt(tt=t.76,d=d)
-    r75 <- exp(l5*t.76)-1+D$d1
-    r68 <- exp(l8*t.76)-1+D$d2
-    -2*(r75/(U*r68)-x)*r75/(r68*U^2)
+get.76.misfit <- function(tt,x,d=diseq()){
+    (x - subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76'))^2
 }

@@ -140,12 +140,12 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
-#' \code{1}: use the Stacey-Kramer two-stage model to infer the initial
+#' \code{1}: the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
 #'
-#' \code{2}: use the isochron intercept as the initial Pb-composition
+#' \code{2}: the isochron intercept as the initial Pb-composition
 #'
-#' \code{3}: use the Pb-composition stored in
+#' \code{3}: the Pb-composition stored in
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')}
 #' 
@@ -357,18 +357,18 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out <- c(tt,st)
     if (hasClass(x,'UPb')){
         if (type==1){
-            R <- age_to_Pb207U235_ratio(tt,st)
-            out <- get.Pb207U235.age(R[,1],R[,2],exterr=TRUE)
+            R <- age_to_Pb207U235_ratio(tt,st,d=x$d)
+            out <- get.Pb207U235.age(R[1],R[2],d=x$d,exterr=TRUE)
         } else if (type==2 | (type==4 & (tt<cutoff.76)) | (type==5)){
-            R <- age_to_Pb206U238_ratio(tt,st)
-            out <- get.Pb206U238.age(R[,1],R[,2],exterr=TRUE)
+            R <- age_to_Pb206U238_ratio(tt,st,d=x$d)
+            out <- get.Pb206U238.age(R[1],R[2],d=x$d,exterr=TRUE)
         } else if (type==3 | (type==4 & (tt>=cutoff.76))){
-            R <- age_to_Pb207Pb206_ratio(tt,st)
-            out <- get.Pb207Pb206.age(R[,1],R[,2],exterr=TRUE)
+            R <- age_to_Pb207Pb206_ratio(tt,st,d=x$d)
+            out <- get.Pb207Pb206.age(R[1],R[2],d=x$d,exterr=TRUE)
         }
     } else if (hasClass(x,'PbPb')){
         R <- age_to_Pb207Pb206_ratio(tt,st)
-        out <- get.Pb207Pb206.age(R[,1],R[,2],exterr=TRUE)
+        out <- get.Pb207Pb206.age(R[1],R[2],exterr=TRUE)
     } else if (hasClass(x,'ArAr')){
         R <- get.ArAr.ratio(tt,st,x$J[1],0,exterr=FALSE)
         out <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
@@ -387,7 +387,7 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     } else if (hasClass(x,'LuHf')){
         R <- get.LuHf.ratio(tt,st,exterr=FALSE)
         out <- get.LuHf.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'fissiontracks')){
+    } else if (hasClass(x,'fissiontracks') & x$format<3){
         out[2] <- tt * sqrt( (x$zeta[2]/x$zeta[1])^2 + (st/tt)^2 )
     }
     out

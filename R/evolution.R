@@ -232,7 +232,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
-    pdat <- y[,c('Th230U238','sTh230U238','U234U238','sU234U238','rYZ')]
+    pdat <- y[,c('Th230U238','sTh230U238',
+                 'U234U238','sU234U238','rYZ'),drop=FALSE]
     scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,add=TRUE,

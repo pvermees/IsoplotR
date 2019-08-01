@@ -42,7 +42,7 @@ subset.detritals <- function(x,subset,...){
 }
 #' @export
 subset.UThHe <- function(x,subset,...){
-    out <- x[subset,]
+    out <- x[subset,,drop=FALSE]
     class(out) <- class(x)
     out
 }
@@ -134,7 +134,7 @@ cor2cov4 <- function(sW,sX,sY,sZ,rWX,rWY,rWZ,rXY,rXZ,rYZ){
     covmat[1,2] <- rWX*sW*sX
     covmat[1,3] <- rWY*sW*sY
     covmat[1,4] <- rWZ*sW*sZ
-    covmat[2,3] <- rXY*sX*sZ
+    covmat[2,3] <- rXY*sX*sY
     covmat[2,4] <- rXZ*sX*sZ
     covmat[3,4] <- rYZ*sY*sZ
     covmat[2,1] <- covmat[1,2]
@@ -170,14 +170,14 @@ wtdmean2D <- function(x){
     O12 <- rep(0,ns)
     for (i in 1:ns){
         E <- cor2cov2(x[i,2],x[i,4],x[i,5])
-        O <- solve(E)
-        O11[i] <- O[1,1]
-        O22[i] <- O[2,2]
-        O12[i] <- O[1,2]
+        DET <- E[1,1]*E[2,2]-E[1,2]*E[2,1]
+        O11[i] <- E[2,2]/DET
+        O22[i] <- E[1,1]/DET
+        O12[i] <- -E[1,2]/DET
     }
     numx <- sum(O22)*sum(X*O11+Y*O12)-sum(O12)*sum(Y*O22+X*O12)
-    den <- sum(O11)*sum(O22)-sum(O12)^2
     numy <- sum(O11)*sum(Y*O22+X*O12)-sum(O12)*sum(X*O11+Y*O12)
+    den <- sum(O11)*sum(O22)-sum(O12)^2
     xbar <- numx/den
     ybar <- numy/den
     out <- list()
@@ -254,10 +254,12 @@ errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
 }
 # returns standard error
 errorprop1x2 <- function(J1,J2,E11,E22,E12){
-    sqrt(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
+    v <- E11*J1^2 + 2*E12*J1*J2 + E22*J2^2
+    sqrt(v)
 }
 errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){
-    sqrt(E11*J1^2 + E22*J2^2 + E33*J3^2 + 2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23)
+    v <- E11*J1^2 + E22*J2^2 + E33*J3^2 + 2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23
+    sqrt(v)
 }
 
 quotient <- function(X,sX,Y,sY,rXY){
@@ -426,8 +428,8 @@ mymtext <- function(text,line=0,...){
 }
 
 # if doall==FALSE, only returns the lower right submatrix
-blockinverse <- function(AA,BB,CC,DD,doall=FALSE){
-    invAA <- solve(AA)
+blockinverse <- function(AA,BB,CC,DD,invAA=NA,doall=FALSE){
+    if (all(is.na(invAA))) invAA <- solve(AA)
     invDCAB <- solve(DD-CC%*%invAA%*%BB)
     if (doall){
         ul <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
@@ -440,6 +442,13 @@ blockinverse <- function(AA,BB,CC,DD,doall=FALSE){
     }
     out
 }
+blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
+    ABDE <- rbind(cbind(AA,BB),cbind(DD,EE))
+    invABDE <- blockinverse(AA=AA,BB=BB,CC=DD,DD=EE,doall=TRUE)
+    CF <- rbind(CC,FF)
+    GH <- cbind(GG,HH)
+    blockinverse(AA=ABDE,BB=CF,CC=GH,DD=II,invAA=invABDE,doall=TRUE)
+}
 
 # Optimise with some fixed parameters 
 # Like optim, but with option to fix some parameters.
@@ -450,44 +459,44 @@ blockinverse <- function(AA,BB,CC,DD,doall=FALSE){
 # Originally written by Barry Rowlingson, modified by PV
 optifix <- function(parms, fixed, fn, gr = NULL, ...,
                     method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), 
-                    lower = -Inf, upper = Inf, control = list(), hessian = FALSE){ 
+                    lower = -Inf, upper = Inf, control = list(), hessian = FALSE){
     force(fn)
     force(fixed) 
-    .npar=length(parms) 
-    .fixValues = parms[fixed]
-    names(.fixValues)=names(parms)[fixed]
-    .parStart = parms[!fixed]
-    names(.parStart)=names(parms)[!fixed]
+    .npar <- length(parms) 
+    .fixValues <- parms[fixed]
+    names(.fixValues) <- names(parms)[fixed]
+    .parStart <- parms[!fixed]
+    names(.parStart) <- names(parms)[!fixed]
   
-    .fn <- function(par,pnames=names(parms),...){
-        .par = rep(NA,sum(!fixed))
-        .par[!fixed] = par
-        .par[fixed] = .fixValues
-        names(.par)=pnames
+    .fn <- function(parms,pnames=names(parms),...){
+        .par <- rep(NA,sum(!fixed))
+        .par[!fixed] <- parms
+        .par[fixed] <- .fixValues
+        names(.par) <- pnames
         fn(.par,...)
     }
 
     if(!is.null(gr)){
-        .gr <- function(par,pnames=names(parms),...){
-            .gpar = rep(NA,sum(!fixed))
-            .gpar[!fixed] = par
-            .gpar[fixed] = .fixValues
-            names(.par)=pnames
+        .gr <- function(parms,pnames=names(parms),...){
+            .gpar <- rep(NA,sum(!fixed))
+            .gpar[!fixed] <- parms
+            .gpar[fixed] <- .fixValues
+            names(.gpar) <- pnames
             gr(.gpar,...)[!fixed]
         }
     } else {
         .gr <- NULL
     }
 
-    .opt = stats::optim(.parStart,.fn,.gr,...,method=method,
+    .opt <- stats::optim(.parStart,.fn,.gr,...,method=method,
                         lower=lower,upper=upper,
                         control=control,hessian=hessian) 
     
-    .opt$fullpars = rep(NA,sum(!fixed)) 
-    .opt$fullpars[fixed]=.fixValues 
-    .opt$fullpars[!fixed]=.opt$par 
-    names(.opt$fullpars)=names(parms)
-    .opt$fixed = fixed
+    .opt$fullpars <- rep(NA,sum(!fixed)) 
+    .opt$fullpars[fixed] <- .fixValues 
+    .opt$fullpars[!fixed] <- .opt$par
+    names(.opt$fullpars) <- names(parms)
+    .opt$fixed <- fixed
 
     # remove fullpars (PV)
     .opt$par <- .opt$fullpars
@@ -507,10 +516,24 @@ clear <- function(x,...){
     out
 }
 
-get.ntit <- function(x){
+get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
+get.ntit.default <- function(x,...){
     ns <- length(x)
     nisnan <- length(which(is.na(x)))
     out <- 'n='
     if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
     paste0(out,ns)
+}
+get.ntit.fissiontracks <- function(x,...){
+    if (x$format<2){
+        out <- get.ntit.default(x$x[,'Ns'])
+    } else {
+        out <- get.ntit.default(x$Ns)
+    }
+    out    
+}
+
+geomean <- function(x,...){ UseMethod("geomean",x) }
+geomean.default <- function(x,...){
+    exp(mean(log(x),na.rm=TRUE))
 }
