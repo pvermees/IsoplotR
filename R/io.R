@@ -36,26 +36,38 @@
 #'
 #' @param x either a file name (\code{.csv} format) OR a matrix
 #' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
-#'     \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os},
-#'     \code{Th-U}, \code{'U-Th-He'}, \code{'fissiontracks'} or
-#'     \code{'other'}
+#'     \code{'K-Ca'}, \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd},
+#'     \code{Re-Os}, \code{Th-U}, \code{'U-Th-He'},
+#'     \code{'fissiontracks'} or \code{'other'}
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
 #'
 #' if \code{method='U-Pb'}, then \code{format} is one of either:
 #'
-#' \enumerate{
-#' \item{\code{7/5, err[7/5], 6/8, err[6/8], rho}}
-#' \item{\code{8/6, err[8/6], 7/6, err[7/6] (, rho)}}
-#' \item{\code{X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z]}\cr
-#' \code{(, rho[X,Y]) (, rho[Y,Z])}}
-#' \item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }\cr
-#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }\cr
-#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }\cr
-#' \code{7/6, err[7/6], 4/7, err[4/7], 4/6, err[4/6]}}
-#' }
+#' \code{1}: \code{07/35, err[07/35], 06/38, err[o6/38], rho}
+#' 
+#' \code{2}: \code{38/06, err[38/06], 07/06, err[07/06] (, rho)}
+#' 
+#' \code{3}: \code{X=07/06, err[X], Y=06/38, err[Y], Z=07/06, err[Z]}
+#' \code{(, rho[X,Y]) (, rho[Y,Z])}
+#' 
+#' \code{4}: \code{X=07/35, err[X], Y=06/38, err[Y], Z=04/38, }
+#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}
+#' 
+#' \code{5}: \code{X=38/06, err[X]}, \code{Y=07/06, err[Y]},
+#' \code{Z=04/06, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]}
+#' 
+#' \code{6}: \code{07/35, err[07/35]}, \code{06/38, err[06/38]},
+#' \code{04/38, err[04/38]}, \code{07/06, err[07/06]}, \code{04/07,
+#' err[04/07]}, code{04/06, err[04/06]}
+#'
+#' \code{7}: \code{W=07/35, err[W]}, \code{X=06/38, err[X]},
+#' \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]}, \code{rho[W,X],
+#' rho[W,Y]}, \code{rho[W,Z], rho[X,Y]}, \code{rho[X,Z], rho[Y,Z]}
+#' 
+#' \code{8}: \code{W=38/06, err[W]}, \code{X=07/06, err[X]},
+#' \code{Y=08/06, err[Y]}, and \code{Z=32/38, err[Z]}, \code{rho[W,X],
+#' rho[W,Y]}, \code{rho[W,Z], rho[X,Y]}, \code{rho[X,Z], rho[Y,Z]}
 #'
 #' where optional columns are marked in round brackets
 #'
@@ -290,22 +302,20 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
 as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     out <- list()
     class(out) <- "UPb"
-    out$x <- NA
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     X <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
-    cnames <- NULL
-    if (format==1 & nc>4){
+    if (format==1){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238','rhoXY')
-    } else if (format==2 & nc>3){
+    } else if (format==2){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206','rhoXY')
-        X <- read.XsXYsYrXY(X)
-    } else if (format==3 & nc>5){
+        X <- read.XsXYsYrXY(x=X,cnames=cnames)
+    } else if (format==3){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb207Pb206','errPb207Pb206',
@@ -327,31 +337,31 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
         }
         X[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
         X[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
-    } else if (format==4 & nc>8){
+    } else if (format==4){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb204U238','errPb204U238',
                     'rhoXY','rhoXZ','rhoYZ')
-    } else if (format==5 & nc>8){
+    } else if (format==5){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb204Pb206','errPb204Pb206',
                     'rhoXY','rhoXZ','rhoYZ')
-    } else if (format==6 & nc>11){
+    } else if (format==6){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb204U238','errPb204U238',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb204Pb207','errPb204Pb207',
                     'Pb204Pb206','errPb204Pb206')
-    } else if (format==7 & nc>7){
+    } else if (format==7){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb208Th232','errPb208Th232',
                     'Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
-    } else if (format==8 & nc>7){
+    } else if (format==8){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb208Pb206','errPb208Pb206',
@@ -359,8 +369,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
     }
-    out$x <- subset(X,select=1:length(cnames))
-    colnames(out$x) <- cnames
+    out$x <- insert.data(x=X,cnames=cnames)
     out$d <- copy_diseq(x=out,d=d)
     out
 }
@@ -446,20 +455,16 @@ as.PbPb <- function(x,format=1,ierr=1){
     X <- errconvert(X,gc='Pb-Pb',format=format,ierr=ierr)
     cnames <- NULL
     if (format==1 & nc>4){
-        cnames <- c('Pb206Pb204','errPb206Pb204',
-                    'Pb207Pb204','errPb207Pb204','rho')
-        out$x <- read.XsXYsYrXY(X)
+        out$x <- read.XsXYsYrXY(x=X,cnames=c('Pb206Pb204','errPb206Pb204',
+                                           'Pb207Pb204','errPb207Pb204','rho'))
     } else if (format==2 & nc>4) {
-        cnames <- c('Pb204Pb206','errPb204Pb206',
-                    'Pb207Pb206','errPb207Pb206','rho')
-        out$x <- read.XsXYsYrXY(X)
+        out$x <- read.XsXYsYrXY(x=X,cnames=c('Pb204Pb206','errPb204Pb206',
+                                           'Pb207Pb206','errPb207Pb206','rho'))
     } else if (format==3 & nc>5){
-        cnames <- c('Pb206Pb204','errPb206Pb204',
-                    'Pb207Pb204','errPb207Pb204',
-                    'Pb207Pb206','errPb207Pb206')
-        out$x <- subset(X,select=1:length(cnames))
+        out$x <- insert.data(x=X,cnames=c('Pb206Pb204','errPb206Pb204',
+                                          'Pb207Pb204','errPb207Pb204',
+                                          'Pb207Pb206','errPb207Pb206'))
     }
-    colnames(out$x) <- cnames
     out
 }
 as.ArAr <- function(x,format=3,ierr=1){
@@ -472,36 +477,25 @@ as.ArAr <- function(x,format=3,ierr=1){
     bi <- 4 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
     X <- errconvert(X,gc='Ar-Ar',format=format,ierr=ierr)
-    if (format==3 & nc>6){
-        if (nc>7){
-            out$x <- subset(X,select=1:7)
-        } else {
-            ns <- nr-bi+1 # number of samples
-            out$x <- cbind(subset(X,select=1:6),1/ns)
-        }
-        colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
-                             'Ar36Ar40','errAr36Ar40',
-                             'Ar39Ar36','errAr39Ar36','Ar39')
-    } else if (nc>3){
-        if (nc>5){
-            out$x <- subset(X,select=1:6)
-        }
-        if (nc==4) {
-            X <- cbind(subset(X,select=1:4),0)
-        }
-        if (nc %in% c(4,5)){
-            ns <- nr-bi+1 # number of samples
-            out$x <- cbind(subset(X,select=1:5),1/ns)
-        }
-        if (format==1) {
-            colnames(out$x) <- c('Ar39Ar36','errAr39Ar36',
-                                 'Ar40Ar36','errAr40Ar36',
-                                 'rho','Ar39')
-        } else {
-            colnames(out$x) <- c('Ar39Ar40','errAr39Ar40',
-                                 'Ar36Ar40','errAr36Ar40',
-                                 'rho','Ar39')
-        }
+    if (format==1) {
+        cnames <- c('Ar39Ar36','errAr39Ar36',
+                    'Ar40Ar36','errAr40Ar36',
+                    'rho','Ar39')
+    } else if (format==2) {
+        cnames <- c('Ar39Ar40','errAr39Ar40',
+                    'Ar36Ar40','errAr36Ar40',
+                    'rho','Ar39')
+    } else if (format==3){
+        cnames <- c('Ar39Ar40','errAr39Ar40',
+                    'Ar36Ar40','errAr36Ar40',
+                    'Ar39Ar36','errAr39Ar36','Ar39')
+    } else {
+        stop('Invalid input format.')
+    }
+    out$x <- insert.data(x=X,cnames=cnames)
+    if (ncol(X)<ncol(out$x)){
+        ns <- nr-bi+1
+        out$x[,'Ar39'] <- 1/ns
     }
     out
 }
@@ -515,28 +509,23 @@ as.KCa <- function(x,format=1,ierr=1){
     X <- shiny2matrix(x,bi,nr,nc)
     X <- errconvert(X,gc='K-Ca',format=format,ierr=ierr)
     if (format==1 & nc==4){
-        out$x <- cbind(X,0)
         cnames <- c('K40Ca44','errK40Ca44',
                     'Ca40Ca44','errCa40Ca44','rho')
     } else if (format==1 & nc>4){
-        out$x <- subset(X,select=1:5)
         cnames <- c('K40Ca44','errK40Ca44',
                     'Ca40Ca44','errCa40Ca44','rho')
     } else if (format==2 & nc==4){
-        out$x <- cbind(X,0)
         cnames <- c('K40Ca40','errK40Ca40',
                     'Ca44Ca40','errCa44Ca40','rho')
     } else if (format==2 & nc>4){
-        out$x <- subset(X,select=1:5)
         cnames <- c('K40Ca40','errK40Ca40',
                     'Ca44Ca40','errCa44Ca40','rho')
     } else if (format==3 & nc>5){
-        out$x <- subset(X,select=1:6)
         cnames <- c('K40Ca44','errK40Ca44',
                     'Ca40Ca44','errCa40Ca44',
                     'K40Ca40','errK40Ca40')
     }
-    colnames(out$x) <- cnames
+    out$x <- insert.data(x=X,cnames=cnames)
     out
 }
 as.RbSr <- function(x,format=1,ierr=1){
@@ -591,7 +580,7 @@ as.LuHf <- function(x,format=1,ierr=1){
     }
     as.PD(x,"LuHf",cnames,format,ierr)
 }
-as.PD <- function(x,classname,colnames,format,ierr){
+as.PD <- function(x,classname,cnames,format,ierr){
     out <- list()
     class(out) <- c(classname,'PD')
     out$x <- NA
@@ -601,14 +590,8 @@ as.PD <- function(x,classname,colnames,format,ierr){
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     X <- errconvert(X,gc='PD',format=format,ierr=ierr)
-    if (format==3 & nc>5){
-        out$x <- subset(X,select=1:6)
-    } else if (format<3 & nc>3){
-        out$x <- read.XsXYsYrXY(X)
-    } else {
-        stop('The data table is not formatted correctly.')
-    }
-    colnames(out$x) <- colnames
+    if (format<3) out$x <- read.XsXYsYrXY(x=X,cnames=cnames)
+    else out$x <- insert.data(x=X,cnames=cnames)
     out
 }
 as.ThU <- function(x,format=1,ierr=1,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
@@ -629,28 +612,23 @@ as.ThU <- function(x,format=1,ierr=1,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0))
                     'U234Th232','errU234Th232',
                     'Th230Th232','errTh230Th232',
                     'rhoXY','rhoXZ','rhoYZ')
-        out$x <- subset(X,select=1:9)
     } else if (format==2 & nc>8) {
         cnames <- c('Th232U238','errTh232U238',
                     'U234U238','errU234U238',
                     'Th230U238','errTh230U238',
                     'rhoXY','rhoXZ','rhoYZ')
-        out$x <- subset(X,select=1:9)
     } else if (format==3 & nc>3) {
         if (nc==4) X <- cbind(subset(X,select=1:4),0)
         cnames <- c('U238Th232','errU238Th232',
                     'Th230Th232','errTh230Th232',
                     'rho')
-        out$x <- subset(X,select=1:5)
     } else if (format==4 & nc>3) {
         if (nc==4) X <- cbind(subset(X,select=1:4),0)
         cnames <- c('Th232U238','errTh232U238',
                     'Th230U238','errTh230U238',
                     'rho')
-        out$x <- subset(X,select=1:5)
     }
-    out$x <- subset(X,select=1:length(cnames))
-    colnames(out$x) <- cnames
+    out$x <- insert.data(x=X,cnames=cnames)
     out
 }
 as.UThHe <- function(x,ierr=1){
@@ -662,8 +640,7 @@ as.UThHe <- function(x,ierr=1){
     X <- errconvert(X,gc='U-Th-He',ierr=ierr)
     if (nc>5) cnames <- c('He','errHe','U','errU','Th','errTh')
     if (nc>7) cnames <- c(cnames,'Sm','errSm')
-    out <- subset(X,select=1:length(cnames))
-    colnames(out) <- cnames
+    out <- insert.data(x=X,cnames=cnames)
     class(out) <- append("UThHe",class(out))
     out
 }
@@ -677,8 +654,7 @@ as.fissiontracks <- function(x,format=1,ierr=1){
         out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
         out$rhoD <- errAdjust(as.numeric(x[4,1:2]),ierr=ierr)
         X <- shiny2matrix(x,6,nr,nc)
-        out$x <- subset(X,select=1:2)
-        colnames(out$x) <- c('Ns','Ni')
+        out$x <- insert.data(x=X,cnames=c('Ns','Ni'))
     } else {
         if (format==2){
             out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
@@ -735,16 +711,20 @@ shiny2matrix <- function(x,br,nr,nc){
     )
 }
 
-# for data of class UPb, PbPb, PD (including LuHf, SmNd, RbSr, and ReOs) 
-read.XsXYsYrXY <- function(x){
-    nc <- ncol(x)
-    if (nc == 4){
-        out <- cbind(x,0)
-    } else {
-        out <- x[,1:5,drop=FALSE]
-        i <- which(is.na(x[,5]))
-        out[i,5] <- 0
-    }
+insert.data <- function(x,cnames){
+    nr <- nrow(x)
+    nc <- length(cnames)
+    out <- matrix(0,nr,nc)
+    ncx <- min(nc,ncol(x))
+    out[1:nr,1:ncx] <- as.matrix(x)[1:nr,1:ncx]
+    colnames(out) <- cnames
+    out
+}
+
+read.XsXYsYrXY <- function(x,cnames){
+    out <- insert.data(x=x,cnames=cnames)
+    i <- which(is.na(x[,5]))
+    out[i,5] <- 0
     out
 }
 

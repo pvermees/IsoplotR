@@ -5,14 +5,19 @@
 #' Stacey-Kramers mantle evolution model, isochron regression, or any
 #' nominal inital Pb isotope composition.
 #'
-#' @details \code{IsoplotR} implements six different methods to
-#'     correct for the presence of non-radiogenic (`common')
-#'     lead. This includes three strategies tailored to datasets that
-#'     include \eqn{^{204}}Pb measurements and a further three
-#'     strategies for datasets that do not. \eqn{^{204}}Pb is the only
-#'     one of lead's four stable isotopes that does not have a
-#'     naturally occurring radioactive parent. This makes it very
-#'     useful for common-Pb correction:
+#' @details
+#'
+#' \code{IsoplotR} implements nine different methods to correct for
+#' the presence of non-radiogenic (`common') lead. This includes three
+#' strategies tailored to datasets that include \eqn{^{204}}Pb
+#' measurements, three strategies tailored to datasets that include
+#' \eqn{^{208}}Pb measurements, and a further three strategies for
+#' datasets that only include \eqn{^{206}}Pb and
+#' \eqn{^{207}}Pb.
+#'
+#' \eqn{^{204}}Pb is the only one of lead's four stable isotopes that
+#' does not have a naturally occurring radioactive parent. This makes
+#' it very useful for common-Pb correction:
 #' 
 #' \eqn{\left[\frac{{}^{206|7}Pb}{{}^{204}Pb}\right]_r =
 #' \left[\frac{{}^{206|7}Pb}{{}^{204}Pb}\right]_m -
@@ -53,8 +58,19 @@
 #' same way, using \eqn{\left[{}^{207}Pb/{}^{204}Pb\right]_{3.7Ga} =
 #' 12.998}.
 #'
-#' In the absence of \eqn{^{204}}Pb measurements, a \eqn{^{207}}
-#' Pb-based common lead correction can be used:
+#' In the absence of \eqn{^{204}}Pb measurements, a \eqn{^{208}}Pb-based
+#' common lead correction can be used:
+#'
+#' \eqn{\frac{{}^{206|7}Pb_r}{{}^{208}Pb_\circ} =
+#' \frac{{}^{206|7}Pb_m}{{}^{208}Pb_\circ} -
+#' \frac{{}^{206|7}Pb_m}{{}^{208}Pb_\circ}}
+#'
+#' where \eqn{{}^{208}Pb_\circ} marks the non-radiogenic
+#' \eqn{{}^{208}Pb}-component, which is obtained by removing the
+#' radiogenic component for any given age.
+#'
+#' If neither \eqn{{}^{204}}Pb nor \eqn{{}^{208}}Pb were measured,
+#' then a \eqn{^{207}} Pb-based common lead correction can be used:
 #'
 #' \eqn{ \left[\frac{{}^{207}Pb}{{}^{206}Pb}\right]_m = f
 #' \left[\frac{{}^{207}Pb}{{}^{206}Pb}\right]_\circ + (1-f)
@@ -84,12 +100,12 @@
 #' @param x an object of class \code{UPb}
 #'
 #' @param option one of either
+#' 
+#' \code{1} Stacey-Kramers correction
+#' 
+#' \code{2} isochron regression
 #'
-#' \enumerate{
-#'    \item Stacey-Kramers correction
-#'    \item isochron regression
-#'    \item nominal common Pb isotope composition
-#' }
+#' \code{3} nominal common Pb isotope composition
 #'
 #' @param omit vector with indices of aliquots that should be omitted
 #'     from the isochron regression (only used if \code{option=2})

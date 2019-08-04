@@ -27,27 +27,39 @@ read.data(x, ...)
 \item{...}{optional arguments to the \code{read.csv} function}
 
 \item{method}{one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
-\code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os},
-\code{Th-U}, \code{'U-Th-He'}, \code{'fissiontracks'} or
-\code{'other'}}
+\code{'K-Ca'}, \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd},
+\code{Re-Os}, \code{Th-U}, \code{'U-Th-He'},
+\code{'fissiontracks'} or \code{'other'}}
 
 \item{format}{formatting option, depends on the value of
     \code{method}.
 
 if \code{method='U-Pb'}, then \code{format} is one of either:
 
-\enumerate{
-\item{\code{7/5, err[7/5], 6/8, err[6/8], rho}}
-\item{\code{8/6, err[8/6], 7/6, err[7/6] (, rho)}}
-\item{\code{X=7/6, err[X], Y=6/8, err[Y], Z=7/6, err[Z]}\cr
-\code{(, rho[X,Y]) (, rho[Y,Z])}}
-\item{\code{X=7/5, err[X], Y=6/8, err[Y], Z=4/8, }\cr
-\code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-\item{\code{X=8/6, err[X], Y=7/6, err[Y], Z=4/6, }\cr
-\code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-\item{\code{7/5, err[7/5], 6/8, err[6/8], 4/8, err[4/8], }\cr
-\code{7/6, err[7/6], 4/7, err[4/7], 4/6, err[4/6]}}
-}
+\code{1}: \code{07/35, err[07/35], 06/38, err[o6/38], rho}
+
+\code{2}: \code{38/06, err[38/06], 07/06, err[07/06] (, rho)}
+
+\code{3}: \code{X=07/06, err[X], Y=06/38, err[Y], Z=07/06, err[Z]}
+\code{(, rho[X,Y]) (, rho[Y,Z])}
+
+\code{4}: \code{X=07/35, err[X], Y=06/38, err[Y], Z=04/38, }
+\code{rho[X,Y], rho[X,Z], rho[Y,Z]}
+
+\code{5}: \code{X=38/06, err[X]}, \code{Y=07/06, err[Y]},
+\code{Z=04/06, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]}
+
+\code{6}: \code{07/35, err[07/35]}, \code{06/38, err[06/38]},
+\code{04/38, err[04/38]}, \code{07/06, err[07/06]}, \code{04/07,
+err[04/07]}, code{04/06, err[04/06]}
+
+\code{7}: \code{W=07/35, err[W]}, \code{X=06/38, err[X]},
+\code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]}, \code{rho[W,X],
+rho[W,Y]}, \code{rho[W,Z], rho[X,Y]}, \code{rho[X,Z], rho[Y,Z]}
+
+\code{8}: \code{W=38/06, err[W]}, \code{X=07/06, err[X]},
+\code{Y=08/06, err[Y]}, and \code{Z=32/38, err[Z]}, \code{rho[W,X],
+rho[W,Y]}, \code{rho[W,Z], rho[X,Y]}, \code{rho[X,Z], rho[Y,Z]}
 
 where optional columns are marked in round brackets
 
