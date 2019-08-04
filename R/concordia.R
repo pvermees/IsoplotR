@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Plots U-Pb data on Wetherill, Tera-Wasserburg or U-Th-Pb concordia
-#' diagrams, calculate concordia ages and compositions, evaluates the
+#' diagrams, calculates concordia ages and compositions, evaluates the
 #' equivalence of multiple
 #' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U,
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U, or
@@ -92,7 +92,7 @@
 #' 
 #' @param concordia.col colour of the concordia line
 #' 
-#' @param exterr show decay constant uncertainty?
+#' @param exterr show decay constant uncertainties?
 #' 
 #' @param show.age one of either:
 #'
@@ -119,41 +119,41 @@
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
 #' 
-#' @param common.Pb
-#' apply a common lead correction using one of three methods:
+#' @param common.Pb apply a common lead correction using one of three
+#'     methods:
 #'
-#' \code{1}: use the Stacey-Kramers two-stage model to infer the initial
+#' \code{1}: the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
 #'
-#' \code{2}: use the isochron intercept as the initial Pb-composition
+#' \code{2}: the isochron intercept as the initial Pb-composition
 #'
-#' \code{3}: use the Pb-composition stored in
-#' \code{settings('iratio','Pb207Pb206')} (if \code{x$format}<4);
+#' \code{3}: the Pb-composition stored in
+#' 
+#' \code{settings('iratio','Pb206Pb204')} (if \code{x$format<4});
+#' 
 #' \code{settings('iratio','Pb206Pb204')} and
-#' \code{settings('iratio','Pb207Pb204')} (if 7<\code{x$format}>3);
-#' or \code{settings('iratio','Pb208Pb206')} and
-#' \code{settings('iratio','Pb208Pb207')} (if \code{x$format}>6).
+#' \code{settings('iratio','Pb207Pb204')} (if \code{3<x$format<7}); or
+#' 
+#' \code{settings('iratio','Pb208Pb206')} and
+#' \code{settings('iratio','Pb208Pb207')} (if \code{x$format=7} or
+#' \code{8}).
 #' 
 #' @param anchor
 #' control parameters to fix the intercept age or common Pb
 #' composition of the discordia fit. This is a two-element list.
 #'
-#' \itemize{
-#'
-#' \item The first element is a boolean flag indicating whether the
+#' The first element is a boolean flag indicating whether the
 #' discordia line should be anchored. If this is \code{FALSE}, then
 #' the second item is ignored and both the common Pb composition and
 #' age are estimated.
 #'
-#' \item If the first element is \code{TRUE} and the second element is
+#' If the first element is \code{TRUE} and the second element is
 #' \code{NA}, then the common Pb composition is fixed at the values
 #' stored in \code{settings('iratio',...)}.
 #'
-#' \item If the first element is \code{TRUE} and the second element is
+#' If the first element is \code{TRUE} and the second element is
 #' a number, then the discordia line is forced to intersect the
 #' concordia line at an age equal to that number.
-#'
-#' }
 #'
 #' @param ticks either a scalar indicating the desired number of age
 #'     ticks to be placed along the concordia line, OR a vector of
@@ -188,9 +188,7 @@
 #' combined goodness of fit, respectively. }
 #'
 #' \item{df}{ a three-element vector with the number of degrees of
-#' freedom used for the \code{mswd} calculation.  These values are
-#' useful when expanding the analytical uncertainties if
-#' \code{mswd>1}.
+#' freedom used for the \code{mswd} calculation.
 #'
 #' }
 #'

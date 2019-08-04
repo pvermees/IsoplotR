@@ -73,7 +73,7 @@
 #' this is a three-element vector with the standard deviation of the
 #' (assumedly) Normal dispersion and the lower and upper half-widths
 #' of its \eqn{100(1-\alpha)\%} confidence interval. \code{w=0} if
-#' code{model<3}.}
+#' \code{model<3}.}
 #'
 #' OR, otherwise:
 #'
@@ -143,26 +143,21 @@ central.default <- function(x,alpha=0.05,...){
     names(out$disp) <- c('s','ll','ul')
     out
 }
-
-#' @param model choose one of the following statistical models:
+#' @param model if the scatter between the data points is solely
+#'     caused by the analytical uncertainty, then the MSWD value
+#'     should be approximately equal to one. There are three
+#'     strategies to deal with the case where MSWD>1.choose one of the
+#'     following statistical models:
 #'
-#' \code{1}: weighted mean. This model assumes that the scatter
-#' between the data points is solely caused by the analytical
-#' uncertainty. If the assumption is correct, then the MSWD value
-#' should be approximately equal to one. There are three strategies to
-#' deal with the case where MSWD>1. The first of these is to assume
-#' that the analytical uncertainties have been underestimated by a
-#' factor \eqn{\sqrt{MSWD}}.
+#' \code{1}: assume that the analytical uncertainties have been
+#' underestimated by a factor \eqn{\sqrt{MSWD}}.
 #'
-#' \code{2}: unweighted mean. A second way to deal with over- or
-#' underdispersed datasets is to simply ignore the analytical
+#' \code{2}: ignore the analytical
 #' uncertainties.
 #'
-#' \code{3}: weighted mean with overdispersion: instead of attributing
-#' any overdispersion (MSWD > 1) to underestimated analytical
-#' uncertainties (model 1), one could also attribute it to the
-#' presence of geological uncertainty, which manifests itself as an
-#' added (co)variance term.
+#' \code{3}: attribute any excess dispersion to the presence of
+#' geological uncertainty, which manifests itself as an added
+#' (co)variance term.
 #'
 #' @rdname central
 #' @export

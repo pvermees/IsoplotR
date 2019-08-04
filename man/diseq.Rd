@@ -18,10 +18,12 @@ If \code{option=0}, then \code{x} and \code{sx} are ignored and no
     disequilibrium correction is applied.
 
 If \code{option=1}, then \code{x} contains the initial
-    \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
+    \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio and \code{sx} its
+    standard error.
 
 If \code{option=2}, then \code{x} contains the measured
-    \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.}
+    \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio and \code{sx} its
+    standard error.}
 
 \item{ThU}{a list containing three items (\code{x}, \code{sx} and
     \code{option}) specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U
@@ -31,15 +33,17 @@ If \code{option=0}, then \code{x} and \code{sx} are ignored and no
     disequilibrium correction is applied.
 
 If \code{option=1}, then \code{x} contains the initial
-    \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+    \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio and \code{sx} its
+    standard error.
 
 If \code{option=2}, then \code{x} contains the measured
-    \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+    \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio and \code{sx} its
+    standard error.
 
 If \code{option=3}, then \code{x} contains the measured Th/U ratio
     of the magma (assumed or determined from the whole rock or
-    volcanic glass). This only applies for Th-bearing U-Pb data
-    formats 7 and 8.}
+    volcanic glass) and \code{sx} its standard error. This only
+    applies for Th-bearing U-Pb data formats 7 and 8.}
 
 \item{RaU}{a list containing three items (\code{x}, \code{sx} and
     \code{option}) specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U
@@ -49,10 +53,8 @@ If \code{option=0}, then \code{x} and \code{sx} are ignored and no
     disequilibrium correction is applied.
 
 If \code{option=1}, then \code{x} contains the initial
-    \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
-
-If \code{option=2}, then \code{x} contains the measured
-    \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.}
+    \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio and \code{sx} its
+    standard error.}
 
 \item{PaU}{a list containing three items (\code{x}, \code{sx} and
     \code{option}) specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U
@@ -62,15 +64,29 @@ If \code{option=0}, then \code{x} and \code{sx} are ignored and no
     disequilibrium correction is applied.
 
 If \code{option=1}, then \code{x} contains the initial
-    \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio.
-
-If \code{option=2}, then \code{x} contains the measured
-    \eqn{{}^{231}}Ra/\eqn{{}^{235}}U ratio.}
+    \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio and \code{sx} its
+    standard error.}
 }
 \value{
-a list with the activity ratios, an eigen composition of
-    the decay contant matrix and the atomic abundances of the
-    parent and (intermediate) daughter nuclides
+a list with the following items:
+
+\describe{
+
+\item{U48, ThU, RaU, PaU}{the same as the corresponding input arguments}
+
+\item{equilibrium}{a boolean flag indicating whether
+\code{option=TRUE} and/or \code{x=1} for all activity ratios}
+
+\item{Q}{the eigenvectors of the disequilibrium matrix exponential}
+
+\item{Qinv}{the inverse of \code{Q}}
+
+\item{L}{a named vector of all the relevant decay constants}
+
+\item{n0}{the initial atomic abundances of all the parent and
+daughter isotopes (used by \code{\link{mclean}})}
+
+}
 }
 \description{
 The U-Pb method conventionally assumes initial secular
@@ -106,6 +122,10 @@ can also be estimated by providing the Th/U-ratio of the magma.}
 d <- diseq(U48=list(x=0,option=1),ThU=list(x=2,option=1),
            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 fn <- system.file("diseq.csv",package="IsoplotR")
-UPb <- read.data(fn,method='U-Pb',format=2)
+UPb <- read.data(fn,method='U-Pb',format=2,d=d)
 concordia(UPb,type=2,show.age=1)
+}
+\seealso{
+\code{\link{mclean}}, \code{\link{concordia}},
+    \code{\link{ludwig}}
 }

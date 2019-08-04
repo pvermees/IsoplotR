@@ -8,7 +8,7 @@
 #' Empirical cumulative distribution functions or cumulative age
 #' distributions are the most straightforward way to visualise the
 #' probability distribution of multiple dates.  Suppose that we have a
-#' set of \eqn{n} dates \eqn{t_i}. The the CAD is a step function that
+#' set of \eqn{n} dates \eqn{t_i}. The CAD is a step function that
 #' sets out the rank order of the dates against their numerical value:
 #'
 #' \eqn{CAD(t) = \sum_i 1(t<t_i)/n}
@@ -61,7 +61,6 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     graphics::lines(stats::ecdf(d),pch=pch,verticals=verticals,col=col)
     mymtext(get.ntit(d),line=0,adj=1)
 }
-
 #' @rdname cad
 #' @export
 cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
@@ -78,14 +77,14 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     }
     graphics::legend("bottomright",legend=names(x2plot),lwd=1,col=colour)
 }
-
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), or the (Wetherill) concordia age
-#'     (\code{type}=5)
+#'     (\code{type}=4), the concordia age (\code{type}=5), or the
+#'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).
+#' 
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U-age and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-age is used. This parameter is
@@ -109,14 +108,24 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
-#' \code{1}: use the isochron intercept as the initial Pb-composition
-#'
-#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' \code{1}: the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
 #'
-#' \code{3}: use the Pb-composition stored in
+#' \code{2}: the isochron intercept as the initial Pb-composition
+#'
+#' \code{3}: the Pb-composition stored in
+#' 
+#' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
+#' \code{UPb} and \code{x$format<4});
+#' 
 #' \code{settings('iratio','Pb206Pb204')} and
-#' \code{settings('iratio','Pb207Pb204')}
+#' \code{settings('iratio','Pb207Pb204')} (if \code{x} has class
+#' \code{PbPb} or \code{x} has class \code{UPb} and
+#' \code{3<x$format<7}); or
+#'
+#' \code{settings('iratio','Pb208Pb206')} and
+#' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+#' \code{UPb} and \code{x$format=7} or \code{8}).
 #' 
 #' @rdname cad
 #' @export

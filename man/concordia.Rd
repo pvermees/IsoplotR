@@ -68,7 +68,7 @@ etc.}
 
 \item{concordia.col}{colour of the concordia line}
 
-\item{exterr}{show decay constant uncertainty?}
+\item{exterr}{show decay constant uncertainties?}
 
 \item{show.age}{one of either:
 
@@ -95,17 +95,24 @@ geological (co)variance term.}
 \item{sigdig}{number of significant digits for the
 concordia/discordia age}
 
-\item{common.Pb}{apply a common lead correction using one of three methods:
+\item{common.Pb}{apply a common lead correction using one of three
+    methods:
 
-\code{1}: use the Stacey-Kramers two-stage model to infer the initial
+\code{1}: the Stacey-Kramer two-stage model to infer the initial
 Pb-composition
 
-\code{2}: use the isochron intercept as the initial Pb-composition
+\code{2}: the isochron intercept as the initial Pb-composition
 
-\code{3}: use the Pb-composition stored in
-\code{settings('iratio','Pb207Pb206')} (if \code{x$format}<4) or
+\code{3}: the Pb-composition stored in
+
+\code{settings('iratio','Pb206Pb204')} (if \code{x$format<4});
+
 \code{settings('iratio','Pb206Pb204')} and
-\code{settings('iratio','Pb207Pb204')} (if \code{x$format}>3)}
+\code{settings('iratio','Pb207Pb204')} (if \code{3<x$format<7}); or
+
+\code{settings('iratio','Pb208Pb206')} and
+\code{settings('iratio','Pb208Pb207')} (if \code{x$format=7} or
+\code{8}).}
 
 \item{ticks}{either a scalar indicating the desired number of age
 ticks to be placed along the concordia line, OR a vector of
@@ -114,22 +121,18 @@ tick ages.}
 \item{anchor}{control parameters to fix the intercept age or common Pb
 composition of the discordia fit. This is a two-element list.
 
-\itemize{
-
-\item The first element is a boolean flag indicating whether the
+The first element is a boolean flag indicating whether the
 discordia line should be anchored. If this is \code{FALSE}, then
 the second item is ignored and both the common Pb composition and
 age are estimated.
 
-\item If the first element is \code{TRUE} and the second element is
+If the first element is \code{TRUE} and the second element is
 \code{NA}, then the common Pb composition is fixed at the values
 stored in \code{settings('iratio',...)}.
 
-\item If the first element is \code{TRUE} and the second element is
+If the first element is \code{TRUE} and the second element is
 a number, then the discordia line is forced to intersect the
-concordia line at an age equal to that number.
-
-}}
+concordia line at an age equal to that number.}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the concordia diagram}
@@ -163,9 +166,7 @@ the Chi-square test for isotopic equivalence, age concordance and
 combined goodness of fit, respectively. }
 
 \item{df}{ a three-element vector with the number of degrees of
-freedom used for the \code{mswd} calculation.  These values are
-useful when expanding the analytical uncertainties if
-\code{mswd>1}.
+freedom used for the \code{mswd} calculation.
 
 }
 
@@ -229,11 +230,12 @@ important if \code{show.age=4}).}
 }
 }
 \description{
-Plots U-Pb data on Wetherill and Tera-Wasserburg concordia
-diagrams, calculate concordia ages and compositions, evaluates the
+Plots U-Pb data on Wetherill, Tera-Wasserburg or U-Th-Pb concordia
+diagrams, calculates concordia ages and compositions, evaluates the
 equivalence of multiple
-(\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U or
-\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U)
+(\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U,
+\eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U, or
+\eqn{^{208}}Th/\eqn{^{232}}Th-\eqn{^{206}}Pb/\eqn{^{238}}U)
 compositions, computes the weighted mean isotopic composition and
 the corresponding concordia age using the method of maximum
 likelihood, computes the MSWD of equivalence and concordance and
@@ -248,17 +250,19 @@ The concordia diagram is a graphical means of assessing the
 internal consistency of U-Pb data. It sets out the measured
 \eqn{^{206}}Pb/\eqn{^{238}}U- and
 \eqn{^{207}}Pb/\eqn{^{235}}U-ratios against each other (`Wetherill'
-diagram) or, equivalently, the \eqn{^{207}}Pb/\eqn{^{206}}Pb- and
+diagram); or, equivalently, the \eqn{^{207}}Pb/\eqn{^{206}}Pb- and
 \eqn{^{206}}Pb/\eqn{^{238}}U-ratios (`Tera-Wasserburg'
-diagram). The space of concordant isotopic compositions is marked
-by a curve, the `concordia line'. Isotopic ratio measurements are
-shown as 100(1-\code{alpha})\% confidence ellipses. Concordant
-samples plot near to, or overlap with, the concordia line. They
-represent the pinnacle of geochronological robustness. Samples that
-plot away from the concordia line but are aligned along a linear
-trend form an isochron (or `discordia' line) that can be used to
-infer the composition of the non-radiogenic (`common') lead or to
-constrain the timing of prior lead loss.
+diagram). Alternatively, for data formats 7 and 8, it is also
+possible to plot \eqn{^{208}}Pb/\eqn{^{232}}Th against the
+\eqn{^{206}}Pb/\eqn{^{238}}U.  The space of concordant isotopic
+compositions is marked by a curve, the `concordia line'. Isotopic
+ratio measurements are shown as 100(1-\code{alpha})\% confidence
+ellipses. Concordant samples plot near to, or overlap with, the
+concordia line. They represent the pinnacle of geochronological
+robustness. Samples that plot away from the concordia line but are
+aligned along a linear trend form an isochron (or `discordia' line)
+that can be used to infer the composition of the non-radiogenic
+(`common') lead or to constrain the timing of prior lead loss.
 }
 \examples{
 data(examples)

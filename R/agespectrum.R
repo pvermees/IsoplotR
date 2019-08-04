@@ -9,10 +9,11 @@
 #'
 #' @details
 #' \code{IsoplotR} defines the `plateau age' as the weighted mean age
-#' of the longest sequence (in terms of cumulative \eqn{^{39}}Ar
-#' content) of consecutive heating steps that pass the modified
-#' Chauvenet criterion (see \code{\link{weightedmean}}).  Note that
-#' this definition is different (and simpler) than the one used by
+#' (using a random effects model with two sources of dispersion) of
+#' the longest sequence (in terms of cumulative \eqn{^{39}}Ar content)
+#' of consecutive heating steps that pass the modified Chauvenet
+#' criterion (see \code{\link{weightedmean}}).  Note that this
+#' definition is different (and simpler) than the one used by
 #' \code{Isoplot} (Ludwig, 2003). However, it is important to mention
 #' that all definitions of an age plateau are heuristic by nature and
 #' should not be used for quantitative inference.
@@ -30,10 +31,10 @@
 #'     confidence intervals.
 #' 
 #' @param plateau logical flag indicating whether a plateau age should
-#'     be calculated. If \code{plateau=TRUE}, the function will
-#'     compute the weighted mean of the largest succession of steps
-#'     that pass the Chi-square test for age homogeneity.  If
-#'     \code{TRUE}, returns a list with plateau parameters.
+#'     be calculated. If \code{plateau=TRUE}, the function computes
+#'     the weighted mean of the largest succession of steps that pass
+#'     the Chi-square test for age homogeneity.  If \code{TRUE}, it
+#'     returns a list with plateau parameters.
 #' 
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours of the plot symbols.
@@ -58,7 +59,7 @@
 #' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.}
 #'
-#' \item{for plot symbols, set \code{plateau.col=NA}}
+#' \item{for empty boxes, set \code{plateau.col=NA}}
 #'
 #' }
 #' 

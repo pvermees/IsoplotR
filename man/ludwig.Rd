@@ -17,10 +17,10 @@ ludwig(x, ...)
 \arguments{
 \item{x}{an object of class \code{UPb}}
 
-\item{...}{optional arguments}
+\item{...}{optional}
 
 \item{exterr}{propagate external sources of
-uncertainty (e.g., decay constants)?}
+uncertainty (i.e. decay constants)?}
 
 \item{alpha}{cutoff value for confidence intervals}
 

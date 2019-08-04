@@ -9,7 +9,6 @@
 #' calculates isochron ages.
 #'
 #' @details
-#'
 #' Similar to the \code{\link{concordia}} diagram (for U-Pb data) and
 #' the \code{\link{helioplot}} diagram (for U-Th-He data), the
 #' evolution diagram simultaneously displays the isotopic composition

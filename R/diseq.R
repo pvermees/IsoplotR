@@ -38,10 +38,12 @@
 #'     disequilibrium correction is applied.
 #'
 #' If \code{option=1}, then \code{x} contains the initial
-#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
+#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio and \code{sx} its
+#'     standard error.
 #'
 #' If \code{option=2}, then \code{x} contains the measured
-#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio.
+#'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio and \code{sx} its
+#'     standard error.
 #'
 #' @param ThU a list containing three items (\code{x}, \code{sx} and
 #'     \code{option}) specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U
@@ -51,15 +53,17 @@
 #'     disequilibrium correction is applied.
 #'
 #' If \code{option=1}, then \code{x} contains the initial
-#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio and \code{sx} its
+#'     standard error.
 #'
 #' If \code{option=2}, then \code{x} contains the measured
-#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio.
+#'     \eqn{{}^{230}}Th/\eqn{{}^{238}}U ratio and \code{sx} its
+#'     standard error.
 #'
 #' If \code{option=3}, then \code{x} contains the measured Th/U ratio
 #'     of the magma (assumed or determined from the whole rock or
-#'     volcanic glass). This only applies for Th-bearing U-Pb data
-#'     formats 7 and 8.
+#'     volcanic glass) and \code{sx} its standard error. This only
+#'     applies for Th-bearing U-Pb data formats 7 and 8.
 #'
 #' @param RaU a list containing three items (\code{x}, \code{sx} and
 #'     \code{option}) specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U
@@ -69,10 +73,8 @@
 #'     disequilibrium correction is applied.
 #'
 #' If \code{option=1}, then \code{x} contains the initial
-#'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
-#'
-#' If \code{option=2}, then \code{x} contains the measured
-#'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio.
+#'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio and \code{sx} its
+#'     standard error.
 #' 
 #' @param PaU a list containing three items (\code{x}, \code{sx} and
 #'     \code{option}) specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U
@@ -82,20 +84,36 @@
 #'     disequilibrium correction is applied.
 #'
 #' If \code{option=1}, then \code{x} contains the initial
-#'     \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio.
+#'     \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio and \code{sx} its
+#'     standard error.
+#' 
+#' @return a list with the following items:
 #'
-#' If \code{option=2}, then \code{x} contains the measured
-#'     \eqn{{}^{231}}Ra/\eqn{{}^{235}}U ratio.
+#' \describe{
 #' 
-#' @return a list with the activity ratios, an eigen composition of
-#'     the decay contant matrix and the atomic abundances of the
-#'     parent and (intermediate) daughter nuclides
+#' \item{U48, ThU, RaU, PaU}{the same as the corresponding input arguments}
 #' 
+#' \item{equilibrium}{a boolean flag indicating whether
+#' \code{option=TRUE} and/or \code{x=1} for all activity ratios}
+#'
+#' \item{Q}{the eigenvectors of the disequilibrium matrix exponential}
+#'
+#' \item{Qinv}{the inverse of \code{Q}}
+#'
+#' \item{L}{a named vector of all the relevant decay constants}
+#'
+#' \item{n0}{the initial atomic abundances of all the parent and
+#' daughter isotopes (used by \code{\link{mclean}})}
+#' 
+#' }
+#'
+#' @seealso \code{\link{mclean}}, \code{\link{concordia}},
+#'     \code{\link{ludwig}}
 #' @examples
 #' d <- diseq(U48=list(x=0,option=1),ThU=list(x=2,option=1),
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' fn <- system.file("diseq.csv",package="IsoplotR")
-#' UPb <- read.data(fn,method='U-Pb',format=2)
+#' UPb <- read.data(fn,method='U-Pb',format=2,d=d)
 #' concordia(UPb,type=2,show.age=1)
 #' @export
 diseq <- function(U48=list(x=1,sx=0,option=0),
@@ -279,7 +297,56 @@ check.equilibrium <- function(d=diseq()){
     U48 & ThU & RaU & PaU
 }
 
-# d only contains one sample
+#' @title Predict disequilibrium concordia compositions
+#' 
+#' @description
+#' Returns the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and
+#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U ratios for any given time with or
+#' without initial U-series disequilibrium.
+#'
+#' @details
+#' U decays to Pb in 14 (for \eqn{{}^{238}}U) or 11/12 (for
+#' \eqn{{}^{235}}U) steps. Conventional U-Pb geochronology assumes
+#' that secular equilibrium between all the short lived intermediate
+#' daughters was established at the time of isotopic closure. Under
+#' this assumption, the relative abundances of those intermediate
+#' daughters can be neglected and the age equation reduces to a simple
+#' function of the measured Pb/U ratios. In reality, however, the
+#' assumption of initial secular equilibrium is rarely met. Accounting
+#' for disequilibrium requires a more complex set of age equations,
+#' which are based on a coupled system of differetial equations. The
+#' solution to this system of equations is given by a matrix
+#' exponential. \code{IsoplotR} solves this matrix exponential for any
+#' given time, using either the assumed initial activity ratios, or
+#' (for young samples) the measured activity ratios of the longest
+#' lived intermediate daughters. Based on a \code{Matlab} script by
+#' Noah McLean.
+#'
+#' @param tt the age of the sample
+#' @param d an object of class \link{diseq}
+#' @param exterr propagate the uncertainties associated with decay
+#'     constants and the \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
+#'
+#' @return
+#' a list containing the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios at time \code{tt}; the
+#' derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to time; and
+#' the derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to the
+#' intermediate decay constants and
+#' \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
+#'
+#' @seealso \code{\link{diseq}}
+#' @author Noah McLean (algorithm) and Pieter Vermeesch (code)
+#' @examples
+#' d <- diseq(U48=list(x=0,option=1),ThU=list(x=2,option=1),
+#'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
+#' mclean(tt=2,d=d)
+#' @export
 mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out <- list()
     l38 <- settings('lambda','U238')[1]
@@ -311,7 +378,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         d$n0['U238'] <- 1/l38
         d$n0['U235'] <- 1/l35
         if (d$U48$option<2){     # initial 234U
-            if (d$U48$option==0) out$n0['U234'] <- 1/l34
+            if (d$U48$option==0) d$n0['U234'] <- 1/l34
             else d$n0['U234'] <- d$U48$x/l34
             if (d$ThU$option<2){ # initial 230Th
                 if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
