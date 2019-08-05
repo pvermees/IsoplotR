@@ -17,10 +17,10 @@ ludwig(x, ...)
 \arguments{
 \item{x}{an object of class \code{UPb}}
 
-\item{...}{optional arguments}
+\item{...}{optional}
 
 \item{exterr}{propagate external sources of
-uncertainty (e.g., decay constants)?}
+uncertainty (i.e. decay constants)?}
 
 \item{alpha}{cutoff value for confidence intervals}
 
@@ -46,21 +46,18 @@ geological (co)variance term.}
     Pb composition of the discordia fit. This is a two-element
     list.
 
-\itemize{
-
-\item The first element is a boolean flag indicating whether the
+The first element is a boolean flag indicating whether the
 discordia line should be anchored. If this is \code{FALSE}, then
 the second item is ignored and both the common Pb composition and
 age are estimated.
 
-\item If the first element is \code{TRUE} and the second element is
+If the first element is \code{TRUE} and the second element is
 \code{NA}, then the common Pb composition is fixed at the values
 stored in \code{settings('iratio',...)}.
 
-item If the first element is \code{TRUE} and the second element is a
+If the first element is \code{TRUE} and the second element is a
 number, then the discordia line is forced to intersect the
-concordia line at an age equal to that number.
-}}
+concordia line at an age equal to that number.}
 }
 \value{
 \describe{
@@ -99,8 +96,7 @@ most sophisticated form, this algorithm does not only allow for
 correlated errors between variables, but also between
 aliquots. \code{IsoplotR} currently uses this algorithm to
 propagate decay constant uncertainties in the total Pb-U isochron
-ages. Future versions of the program will generalise this approach
-to other chronometers as well.
+ages.
 }
 \examples{
 f <- system.file("UPb4.csv",package="IsoplotR")

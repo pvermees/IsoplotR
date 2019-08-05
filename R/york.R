@@ -5,7 +5,7 @@
 #' Implements the unified regression algorithm of York et al. (2004)
 #' which, although based on least squares, yields results that are
 #' consistent with maximum likelihood estimates of Titterington and
-#' Halliday (1979)
+#' Halliday (1979).
 #'
 #' @details
 #' Given n pairs of (approximately) collinear measurements \eqn{X_i}
@@ -207,46 +207,44 @@ data2york <- function(x,...){ UseMethod("data2york",x) }
 #' @rdname data2york
 #' @export
 data2york.default <- function(x,format=1,...){
+    cnames <- c('X','sX','Y','sY','rXY')
     if (format==3){
-        out <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
-                                         x[,4],x[,5],x[,6]))
+        X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
+                                       x[,4],x[,5],x[,6]))
+        out <- insert.data(x=X,cnames=cnames)
     } else {
-        out <- read.XsXYsYrXY(x)
+        out <- read.XsXYsYrXY(x=x,cnames=cnames)
     }
-    colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
 
-#' @param option returns one of
+#' @param option one of
 #'
-#' \enumerate{
-#'
-#' \item Wetherill concordia ratios: \code{X=07/35}, \code{sX=s[07/35]},
+#' \code{1} Wetherill concordia ratios: \code{X=07/35}, \code{sX=s[07/35]},
 #'     \code{Y=06/38}, \code{sY=s[06/38]}, \code{rXY}.
 #'
-#' \item Tera-Wasserburg ratios: \code{X=08/06}, \code{sX=s[08/06]},
+#' \code{2} Tera-Wasserburg ratios: \code{X=38/06}, \code{sX=s[38/06]},
 #'     \code{Y=07/06}, \code{sY=s[07/06]}, \code{rho=rXY}.
 #'
-#' \item \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=38/06},
-#'     \code{sY=s[38/06]}, \code{rho=rXY} (only valid if \code{format=4,5,6}).
+#' \code{3} \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=38/06},
+#'     \code{sY=s[38/06]}, \code{rho=rXY} (only valid if
+#'     \code{format=4,5} or \code{6}).
 #'
-#' \item \code{X=04/07}, \code{sX=s[04/07]}, \code{Y=05/07},
+#' \code{4} \code{X=04/07}, \code{sX=s[04/07]}, \code{Y=05/07},
 #'     \code{sY=s[35/07]}, \code{rho=rXY} (only valid if
-#'     \code{format=4,5,6}).
+#'     \code{format=4,5} or \code{6}).
 #'
-#' \item U-Th-Pb concordia ratios: \code{X=08/32}, \code{sX=s[08/32]},
+#' \code{5} U-Th-Pb concordia ratios: \code{X=08/32}, \code{sX=s[08/32]},
 #'     \code{Y=06/38}, \code{sY=s[06/38]}, \code{rho=rXY} (only valid
-#'     if \code{format=7,8}).
+#'     if \code{format=7} or \code{8}).
 #'
-#' \item \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
+#' \code{6} \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
 #'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
-#'     \code{format=7,8}).
+#'     \code{format=7} or \code{8}).
 #' 
-#' \item \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
+#' \code{7} \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
 #'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
-#'     \code{format=7,8}). 
-#' 
-#' }
+#'     \code{format=7} or \code{8}).
 #'
 #' @param tt the age of the sample. This is only used if \code{x} has
 #'     class 7 or 8, in order to calculate the inherited

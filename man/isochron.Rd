@@ -125,28 +125,23 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label for the colour scale}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can
-    either be a single colour or multiple colours to form a colour
-    ramp (to be used if \code{levels!=NA}):
+\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+colour or multiple colours to form a colour ramp. Examples:
 
-\itemize{
+a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
+\code{'white'}, etc.;
 
-\item{a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
-\code{'white'}, etc.}
-
-\item{multiple colours: \code{c(rbg(1,0,0,0.5)},
+multiple colours: \code{c(rbg(1,0,0,0.5)},
 \code{rgb(0,1,0,0.5))}, \code{c('#FF000080','#00FF0080')},
-\code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.}
+\code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.;
 
-\item{a colour palette: \code{rainbow(n=100)},
-\code{topo.colors(n=100,alpha=0.5)}, etc.}
+a colour palette: \code{rainbow(n=100)},
+\code{topo.colors(n=100,alpha=0.5)}, etc.; or
 
-\item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
-etc.}
+a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
+etc.
 
-\item{for empty ellipses, set \code{ellipse.col=NA}}
-
-}}
+For empty ellipses, set \code{ellipse.col=NA}}
 
 \item{ci.col}{the fill colour for the confidence interval of the
 intercept and slope.}
@@ -161,27 +156,19 @@ intercept and slope.}
 
 \item{model}{construct the isochron using either:
 
-\enumerate{
+\code{1} Error-weighted least squares regression
 
-\item{Error-weighted least squares regression}
+\code{2} Ordinary least squares regression
 
-\item{Ordinary least squares regression}
-
-\item{Error-weighted least squares with overdispersion term}
-
-}}
+\code{3} Error-weighted least squares with overdispersion term}
 
 \item{show.ellipses}{show the data as:
 
-\enumerate{
+\code{1} points
 
-\item points
+\code{2} error ellipses
 
-\item error ellipses
-
-\item error crosses
-
-}}
+\code{3} error crosses}
 
 \item{xlab}{text label for the horizontal plot axis}
 
@@ -247,21 +234,17 @@ if \code{inverse=TRUE}, then \code{X} =
 \item{type}{following the classification of
 Ludwig and Titterington (1994), one of either:
 
-\enumerate{
-
-\item `Rosholt type-II' isochron, setting out
+\code{1} `Rosholt type-II' isochron, setting out
 \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
 
-\item `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
+\code{2} `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
 vs. \eqn{^{232}}Th/\eqn{^{238}}U
 
-\item `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
+\code{3} `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
 vs. \eqn{^{238}}U/\eqn{^{232}}Th
 
-\item `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
-vs. \eqn{^{232}}Th/\eqn{^{238}}U
-
-}}
+\code{4} `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
+vs. \eqn{^{232}}Th/\eqn{^{238}}U}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ArAr}, \code{KCa},
@@ -363,8 +346,8 @@ propagated uncertainty.}
 
 \item{p.value}{the p-value of a Chi-square test for linearity.}
 
-\item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of a
-t-distribution with \code{df} degrees of freedom.}
+\item{fact}{the \eqn{100(1-\alpha/2)\%} confidence multiplier for
+the confidence intervals.}
 
 \item{y0}{a four-element vector containing:
 
@@ -401,6 +384,80 @@ interval (only returned if \code{model=3}).}
 the isochron plot, the analytical uncertainty of X, the Y-variable
 for the isochron plot, the analytical uncertainty of Y, and the
 correlation coefficient between X and Y.}
+
+\item{xlab}{the x-label of the isochron plot}
+
+\item{ylab}{the y-label of the isochron plot}
+
+}
+
+OR if \code{x} has class \code{UPb}:
+
+\describe{
+
+\item{par}{a three element vector containing the isochron age and
+the common Pb isotope ratios}
+
+\item{cov}{the covariance matrix of \code{par}}
+
+\item{n}{the number of analyses in the dataset}
+
+\item{df}{the degrees of freedom for the linear fit, i.e. \eqn{2n-3}}
+
+\item{a}{the y-intercept and its standard error}
+
+\item{b}{the isochron slope and its standard error}
+
+\item{cov.ab}{the covariance between \code{a} and \code{b}.}
+
+\item{mswd}{the mean square of the residuals (a.k.a `reduced
+    Chi-square') statistic.}
+
+\item{p.value}{the p-value of a Chi-square test for linearity.}
+
+\item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the
+confidence intervals.}
+
+\item{y0}{a three or four-element vector containing:
+
+\code{y}: the initial \eqn{^{206}}Pb/\eqn{^{204}}U-ratio (if
+\code{type=1} and \code{x$format=4,5} or \code{6});
+\eqn{^{207}}Pb/\eqn{^{204}}U-ratio (if \code{type=2} and
+\code{x$format=4,5} or \code{6});
+\eqn{^{208}}Pb/\eqn{^{206}}U-ratio (if \code{type=1} and
+\code{x$format=7} or \code{8}); or
+\eqn{^{208}}Pb/\eqn{^{207}}U-ratio (if \code{type=2} and
+\code{x$format=7} or \code{8}).
+
+\code{s[y]}: the propagated uncertainty of \code{y}
+
+\code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{y}.
+
+\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only returned
+if \code{model=1})}
+
+\item{y0label}{the y-axis label of the isochron plot}
+
+\item{age}{a three (or four) element vector containing:
+
+\code{t}: the isochron age
+
+\code{s[t]}: the propagated uncertainty of \code{t}
+
+\code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{t}
+
+\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
+interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
+if \code{model=1}).}
+
+\item{w}{the overdispersion term, i.e. a three-element vector with
+the standard deviation of the (assumedly) Normally distributed
+geological scatter that underlies the measurements, and the lower
+and upper half-width of its \eqn{100(1-\alpha)\%} confidence
+interval (only returned if \code{model=3}).}
 
 \item{xlab}{the x-label of the isochron plot}
 
@@ -446,8 +503,10 @@ Ar-Ar, K-Ca, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf isochrons. The
 maximum likelihood algorithm of Titterington and Halliday (1979)
 was generalised from two to three dimensions by Ludwig and
 Titterington (1994) for U-series disequilibrium dating.  Also this
-algorithm is implemented in \code{IsoplotR}.  The extent to which
-the observed scatter in the data can be explained by the analytical
+algorithm is implemented in \code{IsoplotR}. Finally, the
+constrained maximum likelihood algorithm of Ludwig (1998) is used
+for isochron regression of U-Pb data. The extent to which the
+observed scatter in the data can be explained by the analytical
 uncertainties can be assessed using the Mean Square of the Weighted
 Deviates (MSWD, McIntyre et al., 1966), which is defined as:
 
@@ -492,6 +551,9 @@ isochron(examples$ThU,type=4)
 Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
 \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 Cosmochimica Acta, 58(22), pp.5031-5042.
+
+Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
+ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
 
 Nicolaysen, L.O., 1961. Graphic interpretation of discordant age
 measurements on metamorphic rocks. Annals of the New York Academy

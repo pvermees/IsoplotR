@@ -15,7 +15,7 @@
 #'
 #' \item a two element vector containing an isotopic ratio and its standard
 #' error, or the spontaneous and induced track densities \code{Ns} and
-#' \code{Ni} (if \code{method='fissiontracks'}),
+#' \code{Ni},
 #'
 #' \item a four element vector containing \code{Ar40Ar39},
 #' \code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
@@ -54,15 +54,15 @@
 #' \code{ReOs}, \code{LuHf}, \code{UThHe} or \code{fissiontracks}.  }
 #'
 #' @param method one of either \code{'U238-Pb206'},
-#'     \code{'U235-Pb207'}, \code{'Pb207-Pb206'}, \code{'Ar-Ar'},
-#'     \code{'K-Ca'}, \code{'Th-U'}, \code{'Re-Os'}, \code{'Sm-Nd'},
-#'     \code{'Rb-Sr'}, \code{'Lu-Hf'}, \code{'U-Th-He'} or
-#'     \code{'fissiontracks'}
+#'     \code{'U235-Pb207'}, \code{'Pb207-Pb206'},
+#'     \code{'Th232-Pb208'}, \code{'Ar-Ar'}, \code{'K-Ca'},
+#'     \code{'Th-U'}, \code{'Re-Os'}, \code{'Sm-Nd'}, \code{'Rb-Sr'},
+#'     \code{'Lu-Hf'}, \code{'U-Th-He'} or \code{'fissiontracks'}
 #' 
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
 #' 
-#' @param i (optional) index of a particular aliquot
+#' @param i index of a particular aliquot
 #' 
 #' @param d an object of class \code{\link{diseq}}.
 #' 
@@ -82,7 +82,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
         out <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'Pb207-Pb206')){
         out <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,d=d)
-    } else if (identical(method,'Pb208-Th238')){
+    } else if (identical(method,'Th232-Pb208')){
         out <- get.Pb208Th232.age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Ar-Ar')){
         out <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
@@ -146,8 +146,18 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{2}: the isochron intercept as the initial Pb-composition
 #'
 #' \code{3}: the Pb-composition stored in
+#' 
+#' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
+#' \code{UPb} and \code{x$format<4});
+#' 
 #' \code{settings('iratio','Pb206Pb204')} and
-#' \code{settings('iratio','Pb207Pb204')}
+#' \code{settings('iratio','Pb207Pb204')} (if \code{x} has class
+#' \code{PbPb} or \code{x} has class \code{UPb} and
+#' \code{3<x$format<7}); or
+#'
+#' \code{settings('iratio','Pb208Pb206')} and
+#' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+#' \code{UPb} and \code{x$format=7} or \code{8}).
 #' 
 #' @param show.p Show the p-value for concordance for each aliquot to
 #'     the output table. Note: it would be unwise to use the p-value
@@ -254,13 +264,13 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=1,
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os or
-#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}. When applied to data
-#'     of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
-#'     a detrital Th-correction.
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
+#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
+#'     uses the default values stored in
+#'     \code{settings('iratio',...)}. When applied to data of class
+#'     \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
+#'     detrital Th-correction.
 #'
 #' @rdname age
 #' @export

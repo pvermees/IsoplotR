@@ -12,7 +12,7 @@ scatterplot(xy, xlim = NA, ylim = NA, alpha = 0.05,
   omit.col = NA, addcolourbar = TRUE, ...)
 }
 \arguments{
-\item{xy}{matrix with columns X, sX, Y, sY(, rXY)}
+\item{xy}{matrix with columns \code{X, sX, Y, sY(, rXY)}}
 
 \item{xlim}{(optional) two-element vector with the x-axis limits}
 
@@ -23,34 +23,36 @@ scatterplot(xy, xlim = NA, ylim = NA, alpha = 0.05,
 \item{show.numbers}{logical flag (\code{TRUE} to show grain
 numbers)}
 
-\item{show.ellipses}{show the data as: \enumerate{ \item points
-\item error ellipses \item error crosses }}
+\item{show.ellipses}{show the data as:
+
+\code{1}: points
+
+\code{2}: error ellipses
+
+\code{3}: error crosses}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
 
 \item{clabel}{label for the colour scale}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can
-    either be a single colour or multiple colours to form a colour
-    ramp (to be used if \code{levels!=NA}):
+\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+colour or multiple colours to form a colour ramp. Examples:
 
-\itemize{
+a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
+\code{'white'}, etc.;
 
-\item{a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
-\code{'white'}, etc.}
-
-\item{multiple colours: \code{c(rbg(1,0,0,0.5)},
+multiple colours: \code{c(rbg(1,0,0,0.5)},
 \code{rgb(0,1,0,0.5))}, \code{c('#FF000080','#00FF0080')},
-\code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.}
+\code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.;
 
-\item{a colour palette: \code{rainbow(n=100)},
-\code{topo.colors(n=100,alpha=0.5)}, etc.}
+a colour palette: \code{rainbow(n=100)},
+\code{topo.colors(n=100,alpha=0.5)}, etc.; or
 
-\item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
-etc.}
+a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
+etc.
 
-}}
+For empty ellipses, set \code{ellipse.col=NA}}
 
 \item{fit}{the output of \code{york()} (optional).}
 

@@ -52,54 +52,54 @@ mindens <- function(mineral,x=NULL){
 #' \code{'tracklength'}: equivalent isotropic fission track length
 #' @param ... depends on the value for \code{setting}:
 #'
-#' \itemize{
-#'
-#' \item for \code{'lambda'}: the isotope of interest (one of either
+#' For \code{'lambda'}: the isotope of interest (one of either
 #' \code{"fission"}, \code{"U238"}, \code{"U235"}, \code{"U234"},
-#' \code{"Th232"}, \code{"Th230"}, \code{"Re187"}, \code{"Sm147"},
-#' \code{"Rb87"}, \code{"Lu176"}, or \code{"K40"}) PLUS (optionally)
-#' the decay constant value and its analytical error.  Omitting the
-#' latter two numbers simply returns the existing values.
+#' \code{"Th232"}, \code{"Th230"}, \code{"Pa231"}, \code{"Ra226"},
+#' \code{"Re187"}, \code{"Sm147"}, \code{"Rb87"}, \code{"Lu176"}, or
+#' \code{"K40"}) PLUS (optionally) the decay constant value and its
+#' analytical error.  Omitting the latter two numbers simply returns
+#' the existing values.
 #'
-#' \item for \code{'iratio'}: the isotopic ratio of interest (one of
-#' either \code{"Ar40Ar36"}, \code{"Ar38Ar36"},\code{"Ca40Ca44"},
+#' For \code{'iratio'}: the isotopic ratio of interest (one of either
+#' \code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Ca40Ca44"},
 #' \code{"Rb85Rb87"}, \code{"Sr88Sr86"}, \code{"Sr87Sr86"},
 #' \code{"Sr84Sr86"}, \code{"Re185Re187"}, \code{"Os184Os192"}
 #' \code{"Os186Os192"}, \code{"Os187Os192"}, \code{"Os188Os192"},
-#' \code{"Os189Os192"}, \code{"Os190Os192"}, \code{"U238U235"},
-#' \code{"Sm144Sm152"}, \code{"Sm147Sm152"}, \code{"Sm148Sm152"},
-#' \code{"Sm149Sm152"}, \code{"Sm150Sm152"}, \code{"Sm154Sm152"},
-#' \code{"Nd142Nd144"}, \code{"Nd143Nd144"}, \code{"Nd145Nd144"},
-#' \code{"Nd146Nd144"}, \code{"Nd148Nd144"}, \code{"Nd150Nd144"},
-#' \code{"Lu176Lu175"}, \code{"Hf174Hf177"}, \code{"Hf176Hf177"},
-#' \code{"Hf178Hf177"}, \code{"Hf179Hf177"}, \code{"Hf180Hf177"}) PLUS
-#' (optionally) the isotopic ratio and its analytical error.  Omitting
-#' the latter two numbers simply returns the existing values.
+#' \code{"Os189Os192"}, \code{"Os190Os192"}, \code{"Sm144Sm152"},
+#' \code{"Sm147Sm152"}, \code{"Sm148Sm152"}, \code{"Sm149Sm152"},
+#' \code{"Sm150Sm152"}, \code{"Sm154Sm152"}, \code{"Nd142Nd144"},
+#' \code{"Nd143Nd144"}, \code{"Nd145Nd144"}, \code{"Nd146Nd144"},
+#' \code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
+#' \code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
+#' \code{"Hf179Hf177"}, \code{"Hf180Hf177"}, \code{"U238U235"},
+#' \code{"Pb207Pb206"}, \code{"Pb206Pb204"}, \code{"Pb207Pb204"},
+#' \code{"Pb208Pb206"}, \code{"Pb208Pb206"}) PLUS (optionally) the
+#' isotopic ratio and its analytical error.  Omitting the latter two
+#' numbers simply returns the existing values.
 #'
-#' \item for \code{'imass'}: the (isotopic) molar mass of interest
-#' (one of either \code{"U"}, \code{"Rb"}, \code{"Rb85"},
-#' \code{"Rb87"}, \code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"},
-#' \code{"Sr88"}, \code{"Re"}, \code{"Re185"}, \code{"Re187"},
-#' \code{"Os"}, \code{"Os184"}, \code{"Os186"}, \code{"Os187"},
-#' \code{"Os188"}, \code{"Os189"}, \code{"Os190"}, \code{"Os192"},
-#' \code{"Sm"}, \code{"Nd"}, \code{"Lu"}, \code{"Hf"}) PLUS
-#' (optionally) the molar mass and its analytical error.  Omitting the
-#' latter two numbers simply returns the existing values.
+#' For \code{'imass'}: the (isotopic) molar mass of interest (one of
+#' either \code{"U"}, \code{"Rb"}, \code{"Rb85"}, \code{"Rb87"},
+#' \code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"}, \code{"Sr88"},
+#' \code{"Re"}, \code{"Re185"}, \code{"Re187"}, \code{"Os"},
+#' \code{"Os184"}, \code{"Os186"}, \code{"Os187"}, \code{"Os188"},
+#' \code{"Os189"}, \code{"Os190"}, \code{"Os192"}, \code{"Sm"},
+#' \code{"Nd"}, \code{"Lu"}, \code{"Hf"}) PLUS (optionally) the molar
+#' mass and its analytical error.  Omitting the latter two numbers
+#' simply returns the existing values.
 #'
-#' \item for \code{'mindens'}: the mineral of interest (one of either
+#' For \code{'mindens'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the mineral
 #' density. Omitting the latter number simply returns the existing
 #' value.
 #'
-#' \item \code{'etchfact'}: the mineral of interest (one of either
+#' For \code{'etchfact'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the etch efficiency
 #' factor. Omitting this number simply returns the existing value.
 #'
-#' \item \code{'tracklength'}: the mineral of interest (one of either
+#' For \code{'tracklength'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the equivalent isotropic
 #' fission track length. Omitting this number simply returns the
 #' existing value.
-#' }
 #' 
 #' @param fname the path of a \code{.json} file
 #' 
@@ -115,7 +115,6 @@ mindens <- function(mineral,x=NULL){
 #' \enumerate{
 #' \item Decay constants:
 #' \itemize{
-#'
 #' \item \eqn{^{238}}U, \eqn{^{235}}U: Jaffey, A. H., et
 #' al. "Precision measurement of half-lives and specific
 #' activities of U\eqn{^{235}} and U\eqn{^{238}}."
@@ -169,11 +168,12 @@ mindens <- function(mineral,x=NULL){
 #' "IUPAC-IUGS recommendation on the half life of \eqn{^{87}}Rb".
 #' Geochimica et Cosmochimica Acta, 164, pp.382-385.
 #'
-#' \item Lu: Soederlund, Ulf, et al. "The \eqn{^{176}}Lu decay constant
-#' determined by Lu-Hf and U-Pb isotope systematics of Precambrian
-#' mafic intrusions." Earth and Planetary Science Letters 219.3 (2004): 311-324.
-#'
+#' \item Lu: Soederlund, Ulf, et
+#' al. "The \eqn{^{176}}Lu decay constant determined by Lu-Hf and
+#' U-Pb isotope systematics of Precambrian mafic intrusions."
+#' Earth and Planetary Science Letters 219.3 (2004): 311-324.
 #' }
+#'
 #' \item Isotopic ratios:
 #' \itemize{
 #' \item Ar: Lee, Jee-Yon, et

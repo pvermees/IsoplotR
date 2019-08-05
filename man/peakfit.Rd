@@ -80,13 +80,13 @@ model?}
 \item{exterr}{propagate the external sources of uncertainty into
 the component age errors?}
 
-\item{type}{scalar valueindicating whether to plot the
+\item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-(\code{type}=4), or the (Wetherill) concordia age
-(\code{type}=5)}
+(\code{type}=4), the concordia age (\code{type}=5), or the
+\eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).}
 
 \item{cutoff.76}{the age (in Ma) below which the
 \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
@@ -105,15 +105,24 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \item{common.Pb}{apply a common lead correction using one of three
     methods:
 
-\code{1}: use the Stacey-Kramers two-stage model to infer the initial
+\code{1}: the Stacey-Kramer two-stage model to infer the initial
 Pb-composition
 
-\code{2}: use the isochron intercept as the initial Pb-composition
+\code{2}: the isochron intercept as the initial Pb-composition
 
-\code{3}: use the Pb-composition stored in
-\code{settings('iratio','Pb207Pb206')} (if \code{x$format}<4) or
+\code{3}: the Pb-composition stored in
+
+\code{settings('iratio','Pb206Pb204')} (if \code{x} has class
+\code{UPb} and \code{x$format<4});
+
 \code{settings('iratio','Pb206Pb204')} and
-\code{settings('iratio','Pb207Pb204')} (if \code{x$format}>3)}
+\code{settings('iratio','Pb207Pb204')} (if \code{x} has class
+\code{PbPb} or \code{x} has class \code{UPb} and
+\code{3<x$format<7}); or
+
+\code{settings('iratio','Pb208Pb206')} and
+\code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+\code{UPb} and \code{x$format=7} or \code{8}).}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka
 `inherited', `excess', or `common')
@@ -180,7 +189,7 @@ s[t_n]\}}.  Define \eqn{z_i = \log(t_i)} and \eqn{s[z_i] =
 s[t_i]/t_i}.  Suppose that these \eqn{n} values are derived from a
 mixture of \eqn{k>2} populations with means
 \eqn{\{\mu_1,...,\mu_k\}}. Such a \emph{discrete mixture} may be
-mathematically described by: \eqn{P(z_i|\mu,\omega) = \sum_{j=1}^k
+mathematically described by \eqn{P(z_i|\mu,\omega) = \sum_{j=1}^k
 \pi_j N(z_i | \mu_j, s[z_j]^2 )} where \eqn{\pi_j} is the
 proportion of the population that belongs to the \eqn{j^{th}}
 component, and \eqn{\pi_k=1-\sum_{j=1}^{k-1}\pi_j}. This equation

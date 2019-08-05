@@ -126,24 +126,21 @@ weightedmean <- function(x,...){
 #'     either be a single colour or multiple colours to form a colour
 #'     ramp (to be used if \code{levels!=NA}):
 #'
-#' \itemize{
+#' a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
+#' \code{'white'}, etc.;
 #'
-#' \item{a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
-#' \code{'white'}, etc.}
-#'
-#' \item{multiple colours: \code{c(rbg(1,0,0,0.5)},
+#' multiple colours: \code{c(rbg(1,0,0,0.5)},
 #' \code{rgb(0,1,0,0.5))}, \code{c('#FF000080','#00FF0080')},
-#' \code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.}
+#' \code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.;
 #'
-#' \item{a colour palette: \code{rainbow(n=100)},
-#' \code{topo.colors(n=100,alpha=0.5)}, etc.}
+#' a colour palette: \code{rainbow(n=100)},
+#' \code{topo.colors(n=100,alpha=0.5)}, etc.; or
 #'
-#' \item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
-#' etc.}
+#' a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
+#' etc.
 #'
-#' \item{for plot symbols, set \code{rect.col=NA}}
-#'
-#' }
+#' For empty boxes, set \code{rect.col=NA}
+#' 
 #' @param outlier.col if \code{detect.outliers=TRUE}, the outliers are
 #'     given a different colour.
 #' @param sigdig the number of significant digits of the numerical
@@ -196,7 +193,8 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), or the (Wetherill) concordia age (\code{type}=5) 
+#'     (\code{type}=4), the concordia age (\code{type}=5), or the
+#'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
@@ -217,17 +215,29 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #'
 #' Set \code{cutoff.disc=NA} to turn off this filter.
 #' @param exterr propagate decay constant uncertainties?
+#'
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
-#' \code{1}: use the isochron intercept as the initial Pb-composition
-#'
-#' \code{2}: use the Stacey-Kramer two-stage model to infer the initial
+#' \code{1}: the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
 #'
-#' \code{3}: use the Pb-composition stored in
+#' \code{2}: the isochron intercept as the initial Pb-composition
+#'
+#' \code{3}: the Pb-composition stored in
+#' 
+#' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
+#' \code{UPb} and \code{x$format<4});
+#' 
 #' \code{settings('iratio','Pb206Pb204')} and
-#' \code{settings('iratio','Pb207Pb204')}
+#' \code{settings('iratio','Pb207Pb204')} (if \code{x} has class
+#' \code{PbPb} or \code{x} has class \code{UPb} and
+#' \code{3<x$format<7}); or
+#'
+#' \code{settings('iratio','Pb208Pb206')} and
+#' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+#' \code{UPb} and \code{x$format=7} or \code{8}).
+#'
 #' @examples
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
@@ -277,12 +287,11 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in
-#'     \code{settings('iratio',...)}.
+#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#'     \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
+#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}.
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format=1} or \code{2}).
 #'
