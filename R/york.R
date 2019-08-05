@@ -5,7 +5,7 @@
 #' Implements the unified regression algorithm of York et al. (2004)
 #' which, although based on least squares, yields results that are
 #' consistent with maximum likelihood estimates of Titterington and
-#' Halliday (1979)
+#' Halliday (1979).
 #'
 #' @details
 #' Given n pairs of (approximately) collinear measurements \eqn{X_i}

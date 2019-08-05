@@ -52,28 +52,22 @@
 #' \item{p.value}{the p-value of a Chi-square test with \code{df}
 #' degrees of freedom (only reported if \code{model=1}.)}
 #'
-#' }
-#'
-#' \item{age}{a three- or four-element vector with:
-#'
-#' \code{t}: the central age.
-#'
-#' \code{s[t]}: the standard error of \code{t}.
-#'
+#' \item{age}{a three- or four-element vector with:\cr
+#' \code{t}: the central age.\cr
+#' \code{s[t]}: the standard error of \code{t}.\cr
 #' \code{ci[t]}: the width of a \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t}.
-#'
+#' interval for \code{t}.\cr
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval enhanced by a factor of \eqn{\sqrt{mswd}} (only reported
-#' if \code{model=1}).
-#'
-#' }
+#' if \code{model=1}). }
 #'
 #' \item{w}{the geological overdispersion term. If \code{model=3},
 #' this is a three-element vector with the standard deviation of the
 #' (assumedly) Normal dispersion and the lower and upper half-widths
 #' of its \eqn{100(1-\alpha)\%} confidence interval. \code{w=0} if
 #' \code{model<3}.}
+#'
+#' }
 #'
 #' OR, otherwise:
 #'

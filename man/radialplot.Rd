@@ -140,24 +140,19 @@ different background colours of the plot symbols.}
     either be a single colour or multiple colours to form a colour
     ramp (to be used if \code{levels!=NA}):
 
-\itemize{
+a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
+\code{'white'}, etc.;
 
-\item{a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
-\code{'white'}, etc.}
-
-\item{multiple colours: \code{c(rbg(1,0,0,0.5)},
+multiple colours: \code{c(rbg(1,0,0,0.5)},
 \code{rgb(0,1,0,0.5))}, \code{c('#FF000080','#00FF0080')},
-\code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.}
+\code{c('blue','red')}, \code{c('blue','yellow','red')}, etc.;
 
-\item{a colour palette: \code{rainbow(n=100)},
-\code{topo.colors(n=100,alpha=0.5)}, etc.}
+a colour palette: \code{rainbow(n=100)},
+\code{topo.colors(n=100,alpha=0.5)}, etc.; or
 
-\item{a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
-etc.}
+a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))}, etc.
 
-\item{for plot symbols, set \code{bg=NA}}
-
-}}
+for plot symbols, set \code{bg=NA}}
 
 \item{col}{text colour to be used if \code{show.numbers=TRUE}}
 

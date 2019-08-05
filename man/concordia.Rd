@@ -21,19 +21,15 @@ confidence intervals}
 
 \item{type}{one of
 
-\enumerate{
+\code{1}: Wetherill -- \eqn{{}^{206}}Pb/\eqn{{}^{238}}U
+vs. \eqn{{}^{207}}Pb/\eqn{{}^{235}}U
 
-\item{Wetherill: \eqn{{}^{206}}Pb/\eqn{{}^{238}}U
-vs. \eqn{{}^{207}}Pb/\eqn{{}^{235}}U}
+\code{2}: Tera-Wasserburg -- \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb
+vs. \eqn{{}^{238}}U/\eqn{{}^{206}}Pb
 
-\item{Tera-Wasserburg: \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb
-vs. \eqn{{}^{238}}U/\eqn{{}^{206}}Pb}
-
-\item{U-Th-Pb concordia: \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th
+\code{3}: U-Th-Pb concordia -- \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th
 vs. \eqn{{}^{206}}Pb/\eqn{{}^{238}}U (only available if
-\code{x$format=7} or \code{x$format=8}})
-
-}}
+\code{x$format=7} or \code{8})}
 
 \item{show.numbers}{logical flag (\code{TRUE} to show grain
 numbers)}
@@ -142,7 +138,7 @@ aliquots.}
 \item{...}{optional arguments to the generic \code{plot} function}
 }
 \value{
-if \code{show.age=1}, returns a list with the following items:
+If \code{show.age=1}, returns a list with the following items:
 
 \describe{
 
@@ -162,26 +158,20 @@ the Chi-square test for isotopic equivalence, age concordance and
 combined goodness of fit, respectively. }
 
 \item{df}{ a three-element vector with the number of degrees of
-freedom used for the \code{mswd} calculation.
+freedom used for the \code{mswd} calculation. }
 
-}
-
-\item{age}{a 4-element vector with:
-
-\code{t}: the concordia age (in Ma)
-
-\code{s[t]}: the estimated uncertainty of \code{t}
-
+\item{age}{a 4-element vector with:\cr
+\code{t}: the concordia age (in Ma)\cr
+\code{s[t]}: the estimated uncertainty of \code{t}\cr
 \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval of \code{t} for the appropriate degrees of freedom
-
+interval of \code{t} for the appropriate degrees of freedom\cr
 \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{t} augmented by \eqn{\sqrt{mswd}} to account for
 overdispersed datasets.}
 
 }
 
-if \code{show.age=2}, \code{3} or \code{4}, returns a list with the
+If \code{show.age=2}, \code{3} or \code{4}, returns a list with the
 following items:
 
 \describe{

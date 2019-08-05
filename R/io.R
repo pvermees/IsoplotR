@@ -8,22 +8,23 @@
 #'
 #' \itemize{
 #' \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv},
-#' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv} }
-#' \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv} }
+#' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv}, \code{UPb7.csv},
+#' \code{UPb8.csv}}
+#' \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv}}
 #' \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
-#' \item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}, \code{KCa3.csv}}, 
+#' \item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}, \code{KCa3.csv}}
 #' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}, \code{ReOs3.csv}}
 #' \item{Sm-Nd: \code{SmNd1.csv}, \code{SmNd2.csv}, \code{SmNd3.csv}}
 #' \item{Rb-Sr: \code{RbSr1.csv}, \code{RbSr2.csv}, \code{RbSr3.csv}}
 #' \item{Lu-Hf: \code{LuHf1.csv}, \code{LuHf2.csv}, \code{LuHf3.csv}}
-#' \item{Th-U: \code{ThU1.csv}, \code{ThU2.csv}, \code{ThU3.csv},
+#' \item{Th-U: \code{ThU1.csv}, \code{ThU2.csv}, \code{ThU3.csv}
 #' \code{ThU4.csv}}
 #' \item{fissiontracks: \code{FT1.csv}, \code{FT2.csv},
 #' \code{FT3.csv}}
 #' \item{U-Th-He: \code{UThHe.csv}, \code{UThSmHe.csv}}
 #' \item{detritals: \code{DZ.csv}}
 #' \item{other: \code{LudwigMixture.csv}, \code{LudwigMean.csv},
-#' \code{LudwigKDE.csv} \code{LudwigSpectrum.csv}}
+#' \code{LudwigKDE.csv}, \code{LudwigSpectrum.csv}}
 #' }
 #'
 #' The contents of these files can be viewed using the
@@ -35,39 +36,38 @@
 #' \code{ArAr <- read.data(fname,method='Ar-Ar',format=1)}
 #'
 #' @param x either a file name (\code{.csv} format) OR a matrix
+#' 
 #' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
 #'     \code{'K-Ca'}, \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd},
 #'     \code{Re-Os}, \code{Th-U}, \code{'U-Th-He'},
 #'     \code{'fissiontracks'} or \code{'other'}
+#' 
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
 #'
 #' if \code{method='U-Pb'}, then \code{format} is one of either:
 #'
-#' \code{1}: \code{07/35, err[07/35], 06/38, err[o6/38], rho}
-#' 
-#' \code{2}: \code{38/06, err[38/06], 07/06, err[07/06] (, rho)}
-#' 
-#' \code{3}: \code{X=07/06, err[X], Y=06/38, err[Y], Z=07/06, err[Z]}
-#' \code{(, rho[X,Y]) (, rho[Y,Z])}
-#' 
-#' \code{4}: \code{X=07/35, err[X], Y=06/38, err[Y], Z=04/38, }
-#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}
-#' 
-#' \code{5}: \code{X=38/06, err[X]}, \code{Y=07/06, err[Y]},
-#' \code{Z=04/06, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]}
-#' 
-#' \code{6}: \code{07/35, err[07/35]}, \code{06/38, err[06/38]},
-#' \code{04/38, err[04/38]}, \code{07/06, err[07/06]}, \code{04/07,
-#' err[04/07]}, code{04/06, err[04/06]}
-#'
-#' \code{7}: \code{W=07/35, err[W]}, \code{X=06/38, err[X]},
-#' \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]}, \code{rho[W,X],
-#' rho[W,Y]}, \code{rho[W,Z], rho[X,Y]}, \code{rho[X,Z], rho[Y,Z]}
-#' 
-#' \code{8}: \code{W=38/06, err[W]}, \code{X=07/06, err[X]},
-#' \code{Y=08/06, err[Y]}, and \code{Z=32/38, err[Z]}, \code{rho[W,X],
-#' rho[W,Y]}, \code{rho[W,Z], rho[X,Y]}, \code{rho[X,Z], rho[Y,Z]}
+#' \enumerate{
+#' \item{\code{07/35, err[07/35],} \code{06/38, err[06/38], rho}} 
+#' \item{\code{38/06, err[38/06],}\code{07/06, err[07/06] (, rho)}}
+#' \item{\code{X=07/06, err[X],} \code{Y=06/38, err[Y],}
+#'       \code{Z=07/06, err[Z]} \code{(, rho[X,Y]) (, rho[Y,Z])}} 
+#' \item{\code{X=07/35, err[X], Y=06/38, err[Y], Z=04/38, }
+#'       \code{rho[X,Y], rho[X,Z], rho[Y,Z]}} 
+#' \item{\code{X=38/06, err[X]}, \code{Y=07/06, err[Y]},
+#'       \code{Z=04/06, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{07/35, err[07/35]}, \code{06/38, err[06/38]},
+#'       \code{04/38, err[04/38]}, \code{07/06, err[07/06]},
+#'       \code{04/07, err[04/07]}, code{04/06, err[04/06]}}
+#' \item{\code{W=07/35, err[W]}, \code{X=06/38, err[X]},
+#'       \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]},
+#'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
+#'       \code{rho[X,Z], rho[Y,Z]}} 
+#' \item{\code{W=38/06, err[W]}, \code{X=07/06, err[X]},
+#'       \code{Y=08/06, err[Y]}, and \code{Z=32/38, err[Z]},
+#'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
+#'       \code{rho[X,Z], rho[Y,Z]}}
+#' }
 #'
 #' where optional columns are marked in round brackets
 #'
@@ -139,8 +139,10 @@
 #' if \code{method='Th-U'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z],}\cr\code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
-#' \item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z],}\cr\code{ rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=8/2, err[X], Y=4/2, err[Y], Z=0/2, err[Z],}\cr
+#' \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#' \item{\code{X=2/8, err[X], Y=4/8, err[Y], Z=0/8, err[Z],}\cr
+#' \code{ rho[X,Y], rho[X,Z], rho[Y,Z]}}
 #' \item{\code{X=8/2, err[X], Y=0/2, err[Y], rho[X,Y]}}
 #' \item{\code{X=2/8, err[X], Y=0/8, err[Y], rho[X,Y]}}
 #' }
@@ -180,14 +182,15 @@
 #' }
 #' 
 #' @param ierr indicates whether the analytical uncertainties are
-#'     reported as: \enumerate{
+#'     reported as: 
 #' 
-#' \item{1\eqn{\sigma} absolute uncertainties.}
-#' \item{2\eqn{\sigma} absolute uncertainties.}
-#' \item{1\eqn{\sigma} relative uncertainties (\%).}
-#' \item{2\eqn{\sigma} relative uncertainties (\%).}
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
 #' 
-#' }
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: 1\eqn{\sigma} relative uncertainties (\%).
+#' 
+#' \code{4}: 2\eqn{\sigma} relative uncertainties (\%).
 #'
 #' @param d an object of class \code{\link{diseq}}.
 #' 
@@ -205,10 +208,65 @@
 #' 
 #' @seealso \code{\link{examples}}, \code{\link{settings}}
 #' 
-#' @return an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
-#'     \code{KCa}, \code{UThHe}, \code{ReOs}, \code{SmNd},
-#'     \code{RbSr}, \code{LuHf}, \code{detritals},
-#'     \code{fissiontracks}, \code{ThU} or \code{other}
+#' @return
+#' \itemize{
+#' 
+#' \item If \code{method="U-Pb"}: an object of class \code{UPb}, i.e. a list
+#' inheriting the input arguments \code{x}, \code{format} and \code{d}.
+#'
+#' \item If \code{method="ArAr"}: and object of class \code{ArAr}, i.e. a
+#' three item list containing the following items:
+#'
+#' \code{x}: a matrix containing the isotopic measurements
+#'
+#' \code{J}: a two-element vector with the J-factor and its
+#' uncertainty, extracted from the input file.
+#' 
+#' \code{format}: same as the input argument
+#' 
+#' \item If \code{method="Pb-Pb"}, \code{"K-Ca"}, \code{"Rb-Sr"},
+#' \code{"Sm-Nd"}, \code{"Lu-Hf"}, or \code{"Re-Os"}: objects of
+#' classes \code{PbPb}, \code{KCa}, \code{RbSr}, \code{SmNd},
+#' \code{LuHf}, or \code{ReOs}, respectively; i.e. a list inheriting
+#' the input arguments \code{x} and \code{format}.
+#'
+#' \item If \code{method="UThHe"}: an object of class \code{UThHe},
+#' i.e. a matrix with the contents of \code{x}.
+#'
+#' \item If \code{method="fissiontracks"}: an object of class
+#' \code{fissiontracks}, i.e. a list containing the following items:
+#'
+#' \code{format}: same as the input argument
+#'
+#' \code{x}: a matrix of spontaneous and induced fission track counts
+#' (only returned if \code{format=1})
+#'
+#' \code{rhoD}: the track density of the dosimeter glass, extracted
+#' from the input data (only returned if \code{format=1})
+#'
+#' \code{zeta}: the zeta calibration constant extracted from the input
+#' data (only returned if \code{format<3})
+#'
+#' \code{Ns} a list containing the spontaneous fission track counts
+#' (only returned if \code{format>1})
+#'
+#' \code{U}: a list of lists containing the U-concentration or
+#' U/Ca-ratio measurements for each of the analysed grains (only
+#' returned if \code{format>1})
+#'
+#' \code{sU}: a list of lists containing the standard errors of the
+#' U-concentration or U/Ca-ratio measurements for each of the analysed
+#' grains (only returned if \code{format>1})
+#'
+#' \code{spotSize}: the laser ablation spot size (only returned if
+#' \code{format>1})
+#'
+#' \item If \code{method="detritals"}: an object of class
+#' \code{detritals}, i.e. a list of named vectors, one for each
+#' detrital sample.
+#'
+#' }
+#' 
 #' @examples
 #'
 #' f1 <- system.file("UPb1.csv",package="IsoplotR")

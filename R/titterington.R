@@ -22,7 +22,8 @@
 #' function.
 #'
 #' @param x an \code{[nx9]} matrix with the following columns:
-#'     \code{X, sX, Y, sY, Z, sZ}, \code{rhoXY, rhoXZ, rhoYZ}.
+#'     \code{X, sX,} \code{Y, sY,} \code{Z, sZ}, \code{rhoXY,}
+#'     \code{rhoXZ,} \code{rhoYZ}.
 #' @param alpha cutoff value for confidence intervals
 #' @return A four-element list of vectors containing:
 #'

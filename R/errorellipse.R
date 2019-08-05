@@ -42,14 +42,20 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' (optionally) displays the linear fit on this diagram, and can show
 #' a third variable as a colour scale.
 #'
-#' @param xy matrix with columns X, sX, Y, sY(, rXY)
+#' @param xy matrix with columns \code{X, sX, Y, sY(, rXY)}
 #' @param xlim (optional) two-element vector with the x-axis limits
 #' @param ylim (optional) two-element vector with the y-axis limits
 #' @param alpha the probability cutoff for the error ellipses
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
-#' @param show.ellipses show the data as: \enumerate{ \item points
-#'     \item error ellipses \item error crosses }
+#' @param show.ellipses show the data as:
+#' 
+#' \code{1}: points
+#' 
+#' \code{2}: error ellipses
+#' 
+#' \code{3}: error crosses
+#' 
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
 #' @param clabel label for the colour scale

@@ -12,7 +12,7 @@ scatterplot(xy, xlim = NA, ylim = NA, alpha = 0.05,
   omit.col = NA, addcolourbar = TRUE, ...)
 }
 \arguments{
-\item{xy}{matrix with columns X, sX, Y, sY(, rXY)}
+\item{xy}{matrix with columns \code{X, sX, Y, sY(, rXY)}}
 
 \item{xlim}{(optional) two-element vector with the x-axis limits}
 
@@ -23,8 +23,13 @@ scatterplot(xy, xlim = NA, ylim = NA, alpha = 0.05,
 \item{show.numbers}{logical flag (\code{TRUE} to show grain
 numbers)}
 
-\item{show.ellipses}{show the data as: \enumerate{ \item points
-\item error ellipses \item error crosses }}
+\item{show.ellipses}{show the data as:
+
+\code{1}: points
+
+\code{2}: error ellipses
+
+\code{3}: error crosses}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
