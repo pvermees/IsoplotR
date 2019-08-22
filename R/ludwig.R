@@ -563,7 +563,7 @@ d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,x='a0',y='c0',i=1,j=1){
            dMdx%*%l$omega33%*%dMdy + d2Mdxdy%*%l$omega33%*%l$M)
 }
 
-data2ludwig <- function(x,tt,a0,b0=0,g0=rep(0,length(x)),exterr=FALSE,w=0,...){
+data2ludwig <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
     if (x$format %in% c(1,2,3))
         out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)
     else if (x$format %in% c(4,5,6))
@@ -749,17 +749,20 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     o11 <- omega[i1,i1]; o12 <- omega[i1,i2]; o13 <- omega[i1,i3]
     o21 <- omega[i2,i1]; o22 <- omega[i2,i2]; o23 <- omega[i2,i3]
     o31 <- omega[i3,i1]; o32 <- omega[i3,i2]; o33 <- omega[i3,i3]
-    A <- t(K0%*%(o11+t(o11))*U*b0*W + K0%*%(o12+t(o21))*a0*W +
-           K0%*%(o13+t(o31)) + L0%*%(o21+t(o12))*U*b0*W +
-           L0%*%(o22+t(o22))*a0*W + L0%*%(o23+t(o32)))
-    B <- -(U*b0*W*(o11+t(o11))*U*b0*W + a0*W*(o22+t(o22))*a0*W + (o33+t(o33)) +
-           U*b0*W*(o12+t(o21))*a0*W + a0*W*(o12+t(o21))*U*b0*W +
-           U*b0*W*(o13+t(o31)) + (o13+t(o31))*U*b0*W +
-           a0*W*(o23+t(o32)) + (o23+t(o32))*a0*W )
+    Wd <- diag(W)
+    AA <- (Wd%*%o11%*%Wd)*(U*b0)^2 + (Wd%*%o22%*%Wd)*a0^2 + o33 +
+        U*a0*b0*Wd%*%(o12+o21)%*%Wd +
+        U*b0*(Wd%*%o13+o31%*%Wd) + a0*(Wd%*%o23+o32%*%Wd)
+    BT <- t(U*b0*K0%*%o11%*%Wd + a0*L0%*%o22%*%Wd +
+            a0*K0%*%o12%*%Wd + U*b0*L0%*%o21%*%Wd +
+            K0%*%o13 + L0%*%o23)
+    CC <- U*b0*Wd%*%o11%*%K0 + a0*Wd%*%o22%*%L0 +
+        a0*Wd%*%o12%*%K0 + U*b0*Wd%*%o21%*%L0 +
+        o13%*%K0 + o23%*%L0
     out <- list(omega11=o11,omega12=o12,omega13=o13,
                 omega21=o21,omega22=o22,omega23=o23,omega31=o31,
                 omega32=o32,omega33=o33,omega=omega,omegainv=ED)
-    out$M <- as.vector(solve(B,A))
+    out$M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
     out$c0 <- as.vector(Z - out$M - x82)
     out$K <- as.vector(X - out$c0*b0*U*W - x75)
     out$L <- as.vector(Y - out$c0*a0*W - x68)

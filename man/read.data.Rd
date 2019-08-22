@@ -213,7 +213,7 @@ uncertainty, extracted from the input file.
 \code{"Sm-Nd"}, \code{"Lu-Hf"}, or \code{"Re-Os"}: objects of
 classes \code{PbPb}, \code{KCa}, \code{RbSr}, \code{SmNd},
 \code{LuHf}, or \code{ReOs}, respectively; i.e. a list inheriting
-the input arguments \code{x}, \code{format}.
+the input arguments \code{x} and \code{format}.
 
 \item If \code{method="UThHe"}: an object of class \code{UThHe},
 i.e. a matrix with the contents of \code{x}.

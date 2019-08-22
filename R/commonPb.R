@@ -63,7 +63,7 @@
 #'
 #' \eqn{\frac{{}^{206|7}Pb_r}{{}^{208}Pb_\circ} =
 #' \frac{{}^{206|7}Pb_m}{{}^{208}Pb_\circ} -
-#' \frac{{}^{206|7}Pb_m}{{}^{208}Pb_\circ}}
+#' \left[\frac{{}^{206|7}Pb}{{}^{208}Pb}\right]_\circ}
 #'
 #' where \eqn{{}^{208}Pb_\circ} marks the non-radiogenic
 #' \eqn{{}^{208}Pb}-component, which is obtained by removing the
@@ -101,11 +101,11 @@
 #'
 #' @param option one of either
 #' 
-#' \code{1} Stacey-Kramers correction
+#' \code{1}: Stacey-Kramers correction
 #' 
-#' \code{2} isochron regression
+#' \code{2}: isochron regression
 #'
-#' \code{3} nominal common Pb isotope composition
+#' \code{3}: nominal common Pb isotope composition
 #'
 #' @param omit vector with indices of aliquots that should be omitted
 #'     from the isochron regression (only used if \code{option=2})

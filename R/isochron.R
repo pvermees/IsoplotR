@@ -140,19 +140,19 @@
 #'
 #' @param model construct the isochron using either:
 #'
-#' \code{1} Error-weighted least squares regression
+#' \code{1}: Error-weighted least squares regression
 #'
-#' \code{2} Ordinary least squares regression
+#' \code{2}: Ordinary least squares regression
 #'
-#' \code{3} Error-weighted least squares with overdispersion term
+#' \code{3}: Error-weighted least squares with overdispersion term
 #'
 #' @param show.ellipses show the data as:
 #'
-#' \code{1} points
+#' \code{1}: points
 #'
-#' \code{2} error ellipses
+#' \code{2}: error ellipses
 #'
-#' \code{3} error crosses
+#' \code{3}: error crosses
 #'
 #' @param xlab text label for the horizontal plot axis
 #' 
@@ -782,16 +782,16 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @param type following the classification of
 #' Ludwig and Titterington (1994), one of either:
 #'
-#' \code{1} `Rosholt type-II' isochron, setting out
+#' \code{1}: `Rosholt type-II' isochron, setting out
 #' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
 #'
-#' \code{2} `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
+#' \code{2}: `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
 #' vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #'
-#' \code{3} `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
+#' \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
 #' vs. \eqn{^{238}}U/\eqn{^{232}}Th
 #'
-#' \code{4} `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
+#' \code{4}: `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
 #' vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #' @rdname isochron
 #' @export
