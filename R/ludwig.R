@@ -166,8 +166,11 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     out$exterr <- exterr
     out
 }
+
 get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),...){
-    out <- fit_ludwig_discordia(x,init=init,w=0,exterr=exterr,anchor=anchor,...)
+    out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
+                   x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
+                   lower=c(0,0,0),upper=c(1000,100,100),...)
     out$w <- 0
     out
 }
@@ -181,13 +184,20 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
     out
 }
 get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),...){
-    out <- list(w=0,par=init)
 #    for (i in 1:5){ # loop for more accurate but slower and more unstable results
-    out <- fit_ludwig_discordia(x,init=out$par,w=out$w,
-                                exterr=exterr,anchor=anchor,...)
+    out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
+                   x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
+                   lower=c(0,0,0),upper=c(1000,100,100),...)
     out$w <- stats::optimise(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
                              exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
 #    }
+    out
+}
+get.ta0b0.model13 <- function(x,init,anchor=list(FALSE,NA),model=1,exterr=FALSE,...){
+    out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
+                   x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
+                   lower=c(0,0,0),upper=c(1000,100,100),...)
+    out$w <- 0
     out
 }
 
@@ -285,12 +295,6 @@ model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
     out
 }
 
-fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
-    optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
-            x=x,w=w,exterr=exterr,fixed=fixit(x,anchor),
-            lower=c(0,0,0),upper=c(1000,100,100),...)
-}
-
 LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
     # these two lines produce slightly more accurate but much slower results:
     # fit <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,anchor=anchor)
@@ -299,10 +303,26 @@ LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
 }
 LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
     if (x$format < 4){
-        l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],exterr=exterr,w=w)
+        l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],w=w,exterr=exterr)
         D <- c(l$K,l$L)
     } else {
-        l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],exterr=exterr,w=w)
+        l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],w=w,exterr=exterr)
+        D <- c(l$K,l$L,l$M)
+    }
+    out <- D %*% l$omega %*% D
+    if (LL){
+        k <- length(D)
+        detE <- determinant(2*pi*l$omegainv,logarithm=TRUE)$modulus
+        out <- -0.5*(out + k*log(2*pi) + detE)
+    }
+    out    
+}
+LL.lud.UPb.new <- function(ta0b0w,x,exterr=FALSE,LL=FALSE){
+    if (x$format < 4){
+        l <- data2ludwig(x,tt=ta0b0w[1],a0=ta0b0w[2],w=ta0b0w[3],exterr=exterr)
+        D <- c(l$K,l$L)
+    } else {
+        l <- data2ludwig(x,tt=ta0b0w[1],a0=ta0b0w[2],b0=ta0b0w[3],w=ta0b0w[4],exterr=exterr)
         D <- c(l$K,l$L,l$M)
     }
     out <- D %*% l$omega %*% D
@@ -318,13 +338,33 @@ LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     if (x$format<4){
-        l <- data2ludwig(x,tt=tt,a0=a0,exterr=exterr,w=w)
+        l <- data2ludwig(x,tt=tt,a0=a0,w=w,exterr=exterr)
         dSdt <- dSdx_2D(l=l,tt=tt,a0=a0,x='t')
         dSda0 <- dSdx_2D(l=l,tt=tt,a0=a0,x='a0')
         out <- c(dSdt,dSda0)
     } else {
         b0 <- ta0b0[3]
-        l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,exterr=exterr,w=w)
+        l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
+        dSdt <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='t')
+        dSda0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='a0')
+        dSdb0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='b0')
+        out <- c(dSdt,dSda0,dSdb0)
+    }
+    out
+}
+LL.lud.UPb.gr.new <- function(ta0b0w,x,exterr=FALSE){
+    tt <- ta0b0w[1]
+    a0 <- ta0b0w[2]
+    if (x$format<4){
+        w <- ta0b0w[3]
+        l <- data2ludwig(x,tt=tt,a0=a0,w=w,exterr=exterr)
+        dSdt <- dSdx_2D(l=l,tt=tt,a0=a0,x='t')
+        dSda0 <- dSdx_2D(l=l,tt=tt,a0=a0,x='a0')
+        out <- c(dSdt,dSda0)
+    } else {
+        b0 <- ta0b0[3]
+        w <- ta0b0w[4]
+        l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
         dSdt <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='t')
         dSda0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='a0')
         dSdb0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='b0')
@@ -563,7 +603,7 @@ d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,x='a0',y='c0',i=1,j=1){
            dMdx%*%l$omega33%*%dMdy + d2Mdxdy%*%l$omega33%*%l$M)
 }
 
-data2ludwig <- function(x,tt,a0,b0=0,exterr=FALSE,w=0,...){
+data2ludwig <- function(x,tt,a0,b0=0,w=0,exterr=FALSE,...){
     if (x$format %in% c(1,2,3))
         out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr)
     else if (x$format %in% c(4,5,6))
@@ -835,6 +875,18 @@ fixit <- function(x,anchor=list(FALSE,NA)){
         else out <- c(FALSE,TRUE,TRUE)
     } else {
         stop('Illegal input format.')
+    }
+    out
+}
+
+fixit.new <- function(x,anchor=list(FALSE,NA),model=1){
+    if (x$format<4) np <- 3
+    else np <- 4
+    out <- rep(FALSE,np)
+    if (model==1) out[np] <- TRUE # fix w
+    if (anchor[[1]]){ # anchor t or a0(,b0)
+        if (is.numeric(anchor[[2]])) out[1] <- TRUE # fix t
+        else out[2:(np-1)] <- TRUE # fix a0(,b0)
     }
     out
 }
