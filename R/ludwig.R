@@ -166,11 +166,29 @@ get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     out$exterr <- exterr
     out
 }
+get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
+    # first do a model 2 regression:
+    if (x$format < 4){
+        init <- get.ta0b0.model2.2D(x,anchor=anchor)
+    } else {
+        init <- get.ta0b0.model2.3D(x,anchor=anchor)
+    }
+    # then use the results for possible further fitting:
+    if (model!=2){
+        out <- optifix(parms=c(init,0),fn=LL.lud.UPb.new,gr=LL.lud.UPb.gr.new,
+                       method="L-BFGS-B",x=x,exterr=exterr,
+                       fixed=fixit(x,anchor=anchor,model=model),
+                       lower=c(0,0,0,0),upper=c(10000,100,100,1),...)
+    }
+    out$model <- model
+    out$exterr <- exterr
+    out
+}
 
 get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),...){
     out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
                    x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
-                   lower=c(0,0,0),upper=c(1000,100,100),...)
+                   lower=c(0,0,0),upper=c(10000,100,100),...)
     out$w <- 0
     out
 }
@@ -187,17 +205,10 @@ get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),...){
 #    for (i in 1:5){ # loop for more accurate but slower and more unstable results
     out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
                    x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
-                   lower=c(0,0,0),upper=c(1000,100,100),...)
+                   lower=c(0,0,0),upper=c(10000,100,100),...)
     out$w <- stats::optimise(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
                              exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
 #    }
-    out
-}
-get.ta0b0.model13 <- function(x,init,anchor=list(FALSE,NA),model=1,exterr=FALSE,...){
-    out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
-                   x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
-                   lower=c(0,0,0),upper=c(1000,100,100),...)
-    out$w <- 0
     out
 }
 
@@ -358,17 +369,19 @@ LL.lud.UPb.gr.new <- function(ta0b0w,x,exterr=FALSE){
     if (x$format<4){
         w <- ta0b0w[3]
         l <- data2ludwig(x,tt=tt,a0=a0,w=w,exterr=exterr)
-        dSdt <- dSdx_2D(l=l,tt=tt,a0=a0,x='t')
-        dSda0 <- dSdx_2D(l=l,tt=tt,a0=a0,x='a0')
-        out <- c(dSdt,dSda0)
+        dLdt <- dLdx_2D(l=l,tt=tt,a0=a0,x='t')
+        dLda0 <- dLdx_2D(l=l,tt=tt,a0=a0,x='a0')
+        dLdw
+        out <- c(dLdt,dLda0,dLdw)
     } else {
         b0 <- ta0b0[3]
         w <- ta0b0w[4]
         l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-        dSdt <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='t')
-        dSda0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='a0')
-        dSdb0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='b0')
-        out <- c(dSdt,dSda0,dSdb0)
+        dLdt <- dLdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='t')
+        dLda0 <- dLdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='a0')
+        dLdb0 <- dLdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='b0')
+        dLdw
+        out <- c(dLdt,dLda0,dLdb0,dLdw)
     }
     out
 }
@@ -539,6 +552,149 @@ d2Sdxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
            dLdx%*%l$omega22%*%dLdy + d2Ldxdy%*%l$omega22%*%l$L)
 }
 d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,x='a0',y='c0',i=1,j=1){
+    ns <- length(l$K)
+    zeros <- rep(0,ns)
+    dKdx <- zeros; dLdx <- zeros; dMdx <- zeros;
+    dKdy <- zeros; dLdy <- zeros; dMdy <- zeros;
+    d2Kdxdy <- zeros; d2Ldxdy <- zeros; d2Mdxdy <- zeros;
+    if (identical(x,'t')){
+        dKdx <- l$dKdt
+        dLdx <- l$dLdt
+        dMdx <- l$dMdt
+        if (identical(y,'t')){
+            d2Kdxdy <- l$d2Kdt2
+            d2Ldxdy <- l$d2Ldt2
+            d2Mdxdy <- l$d2Mdt2
+        }
+    } else if (identical(x,'a0')){
+        dLdx <- l$dLda0
+    } else if (identical(x,'b0')){
+        dKdx <- l$dKdb0
+    } else if (identical(x,'c0')){
+        dKdx[i] <- l$dKdc0[i]
+        dLdx[i] <- l$dLdc0[i]
+        dMdx[i] <- l$dMdc0[i]
+        if (identical(y,'a0')) d2Ldxdy[i] <- l$d2Ldc0da0[i]
+        else if (identical(y,'b0')) d2Kdxdy[i] <- l$d2Kdc0db0[i]
+    } else {
+        stop('Invalid option.')
+    }
+    if (identical(y,'t')){
+        dKdy <- l$dKdt
+        dLdy <- l$dLdt
+        dMdy <- l$dMdt
+    } else if (identical(y,'a0')){
+        dLdy <- l$dLda0
+    } else if (identical(y,'b0')){
+        dKdy <- l$dKdb0
+    } else if (identical(y,'c0')){
+        dKdy[j] <- l$dKdc0[j]
+        dLdy[j] <- l$dLdc0[j]
+        dMdy[j] <- l$dMdc0[j]
+        if (identical(x,'a0')) d2Ldxdy[j] <- l$d2Ldc0da0[j]
+        else if (identical(x,'b0')) d2Kdxdy[j] <- l$d2Kdc0db0[j]
+    } else {
+        stop('Invalid option.')
+    }
+    return(l$K%*%l$omega11%*%d2Kdxdy + dKdy%*%l$omega11%*%dKdx +
+           dKdx%*%l$omega11%*%dKdy + d2Kdxdy%*%l$omega11%*%l$K +
+           l$K%*%l$omega12%*%d2Ldxdy + dKdy%*%l$omega12%*%dLdx +
+           dKdx%*%l$omega12%*%dLdy + d2Kdxdy%*%l$omega12%*%l$L +
+           l$K%*%l$omega13%*%d2Mdxdy + dKdy%*%l$omega13%*%dMdx +
+           dKdx%*%l$omega13%*%dMdy + d2Kdxdy%*%l$omega13%*%l$M +
+           l$L%*%l$omega21%*%d2Kdxdy + dLdy%*%l$omega21%*%dKdx +
+           dLdx%*%l$omega21%*%dKdy + d2Ldxdy%*%l$omega21%*%l$K +
+           l$L%*%l$omega22%*%d2Ldxdy + dLdy%*%l$omega22%*%dLdx +
+           dLdx%*%l$omega22%*%dLdy + d2Ldxdy%*%l$omega22%*%l$L +
+           l$L%*%l$omega23%*%d2Mdxdy + dLdy%*%l$omega23%*%dMdx +
+           dLdx%*%l$omega23%*%dMdy + d2Ldxdy%*%l$omega23%*%l$M +
+           l$M%*%l$omega31%*%d2Kdxdy + dMdy%*%l$omega31%*%dKdx +
+           dMdx%*%l$omega31%*%dKdy + d2Mdxdy%*%l$omega31%*%l$K +
+           l$M%*%l$omega32%*%d2Ldxdy + dMdy%*%l$omega32%*%dLdx +
+           dMdx%*%l$omega32%*%dLdy + d2Mdxdy%*%l$omega32%*%l$L +
+           l$M%*%l$omega33%*%d2Mdxdy + dMdy%*%l$omega33%*%dMdx +
+           dMdx%*%l$omega33%*%dMdy + d2Mdxdy%*%l$omega33%*%l$M)
+}
+
+dLdx_2D <- function(l,tt=0,a0=0,x='a0'){
+    if (identical(x,'t')){
+        dKdx <- l$dKdt
+        dLdx <- l$dLdt
+    } else if (identical(x,'a0')){
+        dKdx <- l$dKda0
+        dLdx <- 0*l$K
+    }
+    return(l$K%*%l$omega11%*%dKdx + dKdx%*%l$omega11%*%l$K +
+           l$K%*%l$omega12%*%dLdx + dKdx%*%l$omega12%*%l$L +
+           l$L%*%l$omega21%*%dKdx + dLdx%*%l$omega21%*%l$K +
+           l$L%*%l$omega22%*%dLdx + dLdx%*%l$omega22%*%l$L)
+}
+dLdx_3D <- function(l,tt=0,a0=0,b0=0,x='a0'){
+    zeros <- 0*l$K
+    if (identical(x,'t')){
+        dKdx <- l$dKdt
+        dLdx <- l$dLdt
+        dMdx <- l$dMdt
+    } else if (identical(x,'a0')){
+        dKdx <- zeros
+        dLdx <- l$dLda0
+        dMdx <- zeros
+    } else if (identical(x,'b0')){
+        dKdx <- l$dKdb0
+        dLdx <- zeros
+        dMdx <- zeros
+    }
+    return(l$K%*%l$omega11%*%dKdx + dKdx%*%l$omega11%*%l$K +
+           l$K%*%l$omega12%*%dLdx + dKdx%*%l$omega12%*%l$L +
+           l$K%*%l$omega13%*%dMdx + dKdx%*%l$omega13%*%l$M +
+           l$L%*%l$omega21%*%dKdx + dLdx%*%l$omega21%*%l$K +
+           l$L%*%l$omega22%*%dLdx + dLdx%*%l$omega22%*%l$L +
+           l$L%*%l$omega23%*%dMdx + dLdx%*%l$omega23%*%l$M +
+           l$M%*%l$omega31%*%dKdx + dMdx%*%l$omega31%*%l$K +
+           l$M%*%l$omega32%*%dLdx + dMdx%*%l$omega32%*%l$L +
+           l$M%*%l$omega33%*%dMdx + dMdx%*%l$omega33%*%l$M)
+}
+d2Ldxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
+    ns <- length(l$K)
+    zeros <- rep(0,ns)
+    dKdx <- zeros; dLdx <- zeros
+    dKdy <- zeros; dLdy <- zeros
+    d2Kdxdy <- zeros; d2Ldxdy <- zeros;
+    if (identical(x,'t')){
+        dKdx <- l$dKdt
+        dLdx <- l$dLdt
+        if (identical(y,'t')) d2Kdxdy <- l$d2Kdt2
+    } else if (identical(x,'a0')){
+        dKdx <- l$dKda0
+    } else if (identical(x,'c0')){
+        dKdx[i] <- l$dKdc0[i]
+        dLdx[i] <- l$dLdc0[i]
+        if (identical(y,'a0')) d2Kdxdy[i] <- l$d2Kdc0da0[i]
+    } else {
+        stop('Invalid option.')
+    }
+    if (identical(y,'t')){
+        dKdy <- l$dKdt
+        dLdy <- l$dLdt
+    } else if (identical(y,'a0')){
+        dKdy <- l$dKda0
+    } else if (identical(y,'c0')){
+        dKdy[j] <- l$dKdc0[j]
+        dLdy[j] <- l$dLdc0[j]
+        if (identical(x,'a0')) d2Kdxdy[j] <- l$d2Kdc0da0[j]
+    } else {
+        stop('Invalid option.')
+    }
+    return(l$K%*%l$omega11%*%d2Kdxdy + dKdy%*%l$omega11%*%dKdx +
+           dKdx%*%l$omega11%*%dKdy + d2Kdxdy%*%l$omega11%*%l$K +
+           l$K%*%l$omega12%*%d2Ldxdy + dKdy%*%l$omega12%*%dLdx +
+           dKdx%*%l$omega12%*%dLdy + d2Kdxdy%*%l$omega12%*%l$L +
+           l$L%*%l$omega21%*%d2Kdxdy + dLdy%*%l$omega21%*%dKdx +
+           dLdx%*%l$omega21%*%dKdy + d2Ldxdy%*%l$omega21%*%l$K +
+           l$L%*%l$omega22%*%d2Ldxdy + dLdy%*%l$omega22%*%dLdx +
+           dLdx%*%l$omega22%*%dLdy + d2Ldxdy%*%l$omega22%*%l$L)
+}
+d2Ldxdy_3D <- function(l,tt=0,a0=0,b0=0,x='a0',y='c0',i=1,j=1){
     ns <- length(l$K)
     zeros <- rep(0,ns)
     dKdx <- zeros; dLdx <- zeros; dMdx <- zeros;
