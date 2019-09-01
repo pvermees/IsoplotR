@@ -288,7 +288,7 @@ model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
 fit_ludwig_discordia <- function(x,init,w=0,exterr=FALSE,anchor=list(FALSE,NA),...){
     optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
             x=x,w=w,exterr=exterr,fixed=fixit(x,anchor),
-            lower=c(0,0,0),upper=c(1000,100,100),...)
+            lower=c(0,0,0),upper=c(10000,100,100),...)
 }
 
 LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
