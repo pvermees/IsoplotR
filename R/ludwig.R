@@ -717,19 +717,19 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     dKLdt <- c(dKdt,dLdt)
     out$dLLdt <- -(dKLdt%*%O%*%dKLdt)/2
     dKda0 <- -U*c0
-    dKLda0 <- c(dKda0,rep(0,ns))
+    dKLda0 <- c(dKda0,zeros)
     out$dLLda0 <- -(dKLda0%*%O%*%dKLda0)/2
     dKdc0 <- rep(-U*a0,ns)
     dLdc0 <- rep(-1,ns)
     dKLdc0 <- c(dKdc0,dLdc0)
-    dEDdw <- get.Ew_2D(w=w,Y=Y,a0=a0,deriv=1)
     out$dLLdc0 <- -(dKLdc0%*%O%*%dKLdc0)/2
+    dEDdw <- get.Ew_2D(w=w,Y=Y,a0=a0,deriv=1)
     out$dLLdw <- (KL%*%O%*%dEDdw%*%O%*%KL - trace(O%*%dEDdw))/2
     d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
     d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
     d2KLdt2 <- c(d2Kdt2,d2Ldt2)
     d2Kdc0da0 <- rep(-U,ns)
-    d2KLdc0da0 <- c(d2Kdc0da0,rep(0,ns))
+    d2KLdc0da0 <- c(d2Kdc0da0,zeros)
     out
 }
 # rederived from Ludwig (1998):
@@ -770,12 +770,12 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     i3 <- (2*ns+1):(3*ns)
-    omega <- blockinverse3x3(AA=ED[i1,i1],BB=ED[i1,i2],CC=ED[i1,i3],
-                             DD=ED[i2,i1],EE=ED[i2,i2],FF=ED[i2,i3],
-                             GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
-    o11 <- omega[i1,i1]; o12 <- omega[i1,i2]; o13 <- omega[i1,i3]
-    o21 <- omega[i2,i1]; o22 <- omega[i2,i2]; o23 <- omega[i2,i3]
-    o31 <- omega[i3,i1]; o32 <- omega[i3,i2]; o33 <- omega[i3,i3]
+    O <- blockinverse3x3(AA=ED[i1,i1],BB=ED[i1,i2],CC=ED[i1,i3],
+                         DD=ED[i2,i1],EE=ED[i2,i2],FF=ED[i2,i3],
+                         GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
+    o11 <- O[i1,i1]; o12 <- O[i1,i2]; o13 <- O[i1,i3]
+    o21 <- O[i2,i1]; o22 <- O[i2,i2]; o23 <- O[i2,i3]
+    o31 <- O[i3,i1]; o32 <- O[i3,i2]; o33 <- O[i3,i3]
     K0 <- X - U*b0*Z - D$Pb207U235
     L0 <- Y - a0*Z - D$Pb206U238
     V <- t(K0%*%(o11+t(o11))*U*b0 + L0%*%(o12+t(o21))*U*b0 + K0%*%(o12+t(o21))*a0 +
@@ -783,26 +783,41 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     W <- -(U*b0*(o11+t(o11))*U*b0 + U*b0*(o12+t(o12))*a0 + U*b0*(o13+t(o13)) +
            a0*(o21+t(o21))*U*b0 + a0*(o22+t(o22))*a0 + a0*(o23+t(o23)) +
            (o31+t(o31))*U*b0 + (o32+t(o32))*a0 + (o33+t(o33)))
-    out <- list(omega=omega,omegainv=ED,omega11=o11,omega12=o12,
+    out <- list(omega=O,omegainv=ED,omega11=o11,omega12=o12,
                 omega13=o13,omega21=o21,omega22=o22,omega23=o23,
                 omega31=o31,omega32=o32,omega33=o33)
-    out$M <- as.vector(solve(W,V))
-    out$c0 <- as.vector(Z - out$M)
-    out$K <- as.vector(X - U*b0*out$c0 - x75)
-    out$L <- as.vector(Y - a0*out$c0 - x68)
-    out$dKdt <- rep(-D$dPb207U235dt,ns)
-    out$dLdt <- rep(-D$dPb206U238dt,ns)
-    out$dMdt <- zeros
-    out$dKdb0 <- as.vector(-U*out$c0)
-    out$dLda0 <- as.vector(-out$c0)
-    out$dKdc0 <- rep(-U*b0,ns)
-    out$dLdc0 <- rep(-a0,ns)
-    out$dMdc0 <- rep(-1,ns)
-    out$d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
-    out$d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
-    out$d2Mdt2 <- zeros
-    out$d2Ldc0da0 <- rep(-1,ns)
-    out$d2Kdc0db0 <- rep(-U,ns)
+    M <- as.vector(solve(W,V))
+    c0 <- as.vector(Z - M)
+    K <- as.vector(X - U*b0*c0 - x75)
+    L <- as.vector(Y - a0*c0 - x68)
+    KLM <- c(K,L,M)
+    out$SS <- KLM%*%O%*%KLM
+    detE <- determinant(ED,logarithm=TRUE)$modulus
+    out$LL <- 3*log(2*pi)/2 - detE/2 - out$SS/2
+    dKdt <- rep(-D$dPb207U235dt,ns)
+    dLdt <- rep(-D$dPb206U238dt,ns)
+    dKLMdt <- c(dKdt,dLdt,zeros)
+    out$dLLdt <- -(dKLMdt%*%O%*%dKLMdt)/2
+    dKdb0 <- as.vector(-U*c0)
+    dKLMdb0 <- c(dKdb0,zeros,zeros)
+    out$dLLdb0 <- -(dKLMdb0%*%O%*%dKLMdb0)/2
+    dLda0 <- as.vector(-c0)
+    dKLMda0 <- c(zeros,dLda0,zeros)
+    out$dLLda0 <- -(dKLMda0%*%O%*%dKLMda0)/2
+    dKdc0 <- rep(-U*b0,ns)
+    dLdc0 <- rep(-a0,ns)
+    dMdc0 <- rep(-1,ns)
+    dKLMdc0 <- c(dKdc0,dLdc0,dMdc0)
+    out$dLLdc0 <- -(dKLMdc0%*%O%*%dKLMdc0)/2
+    dEDdw <- get.Ew_3D(w=w,Z=Z,a0=a0,b0=b0,deriv=1)
+    out$dLLdw <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2
+    d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
+    d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
+    d2KLMdt2 <- c(d2Kdt2,d2Ldt2,zeros)
+    d2Ldc0da0 <- rep(-1,ns)
+    d2KLMdc0da0 <- c(zeros,d2Ldc0da0,zeros)
+    d2Kdc0db0 <- rep(-U,ns)
+    d2KLMdc0db0 <- c(d2Kdc0db0,zeros,zeros)
     out
 }
 data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
@@ -847,16 +862,17 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     E[4*ns+5,4*ns+5] <- (lambda('Pa231')[2]*1000)^2
     E[4*ns+6,4*ns+6] <- (lambda('Th230')[2]*1000)^2
     E[4*ns+7,4*ns+7] <- (lambda('Ra226')[2]*1000)^2
-    ED <- J%*%E%*%t(J) + get.Ew_Th(w=w,W=W,Z=Z,x82=x82,a0=10,b0=b0)
+    Ew <- get.Ew_Th(w=w,W=W,Z=Z,x82=x82,a0=10,b0=b0)
+    ED <- J%*%E%*%t(J) + Ew
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     i3 <- (2*ns+1):(3*ns)
-    omega <- blockinverse3x3(AA=ED[i1,i1],BB=ED[i1,i2],CC=ED[i1,i3],
-                             DD=ED[i2,i1],EE=ED[i2,i2],FF=ED[i2,i3],
-                             GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
-    o11 <- omega[i1,i1]; o12 <- omega[i1,i2]; o13 <- omega[i1,i3]
-    o21 <- omega[i2,i1]; o22 <- omega[i2,i2]; o23 <- omega[i2,i3]
-    o31 <- omega[i3,i1]; o32 <- omega[i3,i2]; o33 <- omega[i3,i3]
+    O <- blockinverse3x3(AA=ED[i1,i1],BB=ED[i1,i2],CC=ED[i1,i3],
+                         DD=ED[i2,i1],EE=ED[i2,i2],FF=ED[i2,i3],
+                         GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
+    o11 <- O[i1,i1]; o12 <- O[i1,i2]; o13 <- O[i1,i3]
+    o21 <- O[i2,i1]; o22 <- O[i2,i2]; o23 <- O[i2,i3]
+    o31 <- O[i3,i1]; o32 <- O[i3,i2]; o33 <- O[i3,i3]
     Wd <- diag(W)
     AA <- (Wd%*%o11%*%Wd)*(U*b0)^2 + (Wd%*%o22%*%Wd)*a0^2 + o33 +
         U*a0*b0*Wd%*%(o12+o21)%*%Wd +
@@ -869,24 +885,41 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
         o13%*%K0 + o23%*%L0
     out <- list(omega11=o11,omega12=o12,omega13=o13,
                 omega21=o21,omega22=o22,omega23=o23,omega31=o31,
-                omega32=o32,omega33=o33,omega=omega,omegainv=ED)
-    out$M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
-    out$c0 <- as.vector(Z - out$M - x82)
-    out$K <- as.vector(X - out$c0*b0*U*W - x75)
-    out$L <- as.vector(Y - out$c0*a0*W - x68)
-    out$dKdt <- rep(-D$dPb207U235dt,ns)
-    out$dLdt <- rep(-D$dPb206U238dt,ns)
-    out$dMdt <- rep(-exp(l2*tt)*l2,ns)
-    out$dLda0 <- -out$c0*W
-    out$dKdb0 <- -out$c0*U*W
-    out$dKdc0 <- -b0*U*W
-    out$dLdc0 <- -a0*W
-    out$dMdc0 <- rep(-1,ns)
-    out$d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
-    out$d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
-    out$d2Mdt2 <- rep(-exp(l2*tt)*l2^2,ns)
-    out$d2Ldc0da0 <- -W
-    out$d2Kdc0db0 <- -U*W
+                omega32=o32,omega33=o33,omega=O,omegainv=ED)
+    M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
+    c0 <- as.vector(Z - M - x82)
+    K <- as.vector(X - c0*b0*U*W - x75)
+    L <- as.vector(Y - c0*a0*W - x68)
+    KLM <- c(K,L,M)
+    out$SS <- KLM%*%O%*%KLM
+    detE <- determinant(ED,logarithm=TRUE)$modulus
+    out$LL <- 3*log(2*pi)/2 - detE/2 - out$SS/2
+    dKdt <- rep(-D$dPb207U235dt,ns)
+    dLdt <- rep(-D$dPb206U238dt,ns)
+    dMdt <- rep(-exp(l2*tt)*l2,ns)
+    dKLMdt <- c(dKdt,dLdt,dMdt)
+    out$dLLdt <- -(dKLMdt%*%O%*%dKLMdt)/2
+    dLda0 <- -c0*W
+    dKLMda0 <- c(zeros,dLda0,zeros)
+    out$dLLda0 <- -(dKLMda0%*%O%*%dKLMda0)/2
+    dKdb0 <- -c0*U*W
+    dKLMdb0 <- c(dKdb0,zeros,zeros)
+    out$dLLdb0 <- -(dKLMdb0%*%O%*%dKLMdb0)/2
+    dKdc0 <- -b0*U*W
+    dLdc0 <- -a0*W
+    dMdc0 <- rep(-1,ns)
+    dKLMdc0 <- c(dKdc0,dLdc0,dMdc0)
+    out$dLLdc0 <- -(dKLMdc0%*%O%*%dKLMdc0)/2
+    dEDdw <- get.Ew_Th(w=w,W=W,Z=Z,x82=x82,a0=10,b0=b0,deriv=1)
+    out$dLLdw <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2    
+    d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
+    d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
+    d2Mdt2 <- rep(-exp(l2*tt)*l2^2,ns)
+    d2KLMdt2 <- c(d2Kdt2,d2Ldt2,d2Mdt2)
+    d2Ldc0da0 <- -W
+    d2KLMdc0da0 <- c(zeros,d2Ldc0da0,zeros)
+    d2Kdc0db0 <- -U*W
+    d2KLMdc0db0 <- c(d2Kdc0db0,zeros,zeros)
     out
 }
 
@@ -905,31 +938,35 @@ get.Ew_2D <- function(w,Y,a0,deriv=0){
     }
     out
 }
-get.Ew_3D <- function(w,Z,a0,b0){
+get.Ew_3D <- function(w,Z,a0,b0,deriv=0){
+    ns <- length(Z)
     if (w>0){
-        ns <- length(Z)
         U <- iratio('U238U235')[1]
-        E <- diag(c(a0,b0)*w)^2
+        if (deriv==1) E <- 2*w*diag(c(a0,b0))^2
+        else if (deriv==2) E <- 2*diag(c(a0,b0))^2
+        else E <- diag(c(a0,b0)*w)^2
         J <- matrix(0,3*ns,2)
         J[1:ns,2] <- -U*Z               # dK0db0
         J[(ns+1):(2*ns),1] <- -Z        # dL0da0
         out <- J %*% E %*% t(J)
     } else {
-        out <- 0
+        out <- matrix(0,3*ns,3*ns)
     }
     out
 }
-get.Ew_Th <- function(w,W,Z,x82,a0,b0){
+get.Ew_Th <- function(w,W,Z,x82,a0,b0,deriv=0){
+    ns <- length(W)
     if (w>0){
-        ns <- length(W)
         U <- iratio('U238U235')[1]
-        E <- diag(c(a0,b0)*w)^2
+        if (deriv==1) E <- 2*w*diag(c(a0,b0))^2
+        else if (deriv==2) E <- 2*diag(c(a0,b0))^2
+        else E <- diag(c(a0,b0)*w)^2
         J <- matrix(0,3*ns,2)
         J[1:ns,1] <- (x82-Z)*U*W        # dK0db0
         J[(ns+1):(2*ns),2] <- (x82-Z)*W # dL0da0
         out <- J %*% E %*% t(J)
     } else {
-        out <- 0
+        out <- matrix(0,3*ns,3*ns)
     }
     out
 }
