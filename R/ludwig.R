@@ -665,7 +665,7 @@ data2ludwig <- function(x,tt,a0,b0=0,w=0,exterr=FALSE,...){
     else stop('Incorrect input format.')
     out
 }
-data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
+data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,hessian=FALSE){
     U <- iratio('U238U235')[1]
     ns <- length(x)
     zeros <- rep(0,ns)
@@ -712,28 +712,30 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     out$SS <- KL%*%O%*%KL
     detE <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- log(2*pi) - detE/2 - out$SS/2
-    dKdt <- rep(-D$dPb207U235dt,ns)
-    dLdt <- rep(-D$dPb206U238dt,ns)
-    dKLdt <- c(dKdt,dLdt)
-    out$dLLdt <- -(dKLdt%*%O%*%dKLdt)/2
-    dKda0 <- -U*c0
-    dKLda0 <- c(dKda0,zeros)
-    out$dLLda0 <- -(dKLda0%*%O%*%dKLda0)/2
-    dKdc0 <- rep(-U*a0,ns)
-    dLdc0 <- rep(-1,ns)
-    dKLdc0 <- c(dKdc0,dLdc0)
-    out$dLLdc0 <- -(dKLdc0%*%O%*%dKLdc0)/2
+    JD <- matrix(0,2*ns,3)
+    parnames <- c('t','a0','c0','w')
+    colnames(JD) <- parnames[1:3]
+    JD[i1,'t']  <- -D$dPb207U235dt # dKdt
+    JD[i2,'t']  <- -D$dPb206U238dt # dLdt
+    JD[i1,'a0'] <- -U*c0           # dKda0
+    JD[i1,'c0'] <- -U*a0           # dKdc0
+    JD[i2,'c0'] <- -1              # dLdc0
+    out$jacobian <- rep(0,4)
+    names(out$jacobian) <- parnames
+    for (pn in parnames[1:3]){
+        out$jacobian[pn] <- -(t(JD[,pn])%*%O%*%JD[,pn])/2
+    }
     dEDdw <- get.Ew_2D(w=w,Y=Y,a0=a0,deriv=1)
-    out$dLLdw <- (KL%*%O%*%dEDdw%*%O%*%KL - trace(O%*%dEDdw))/2
-    d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
-    d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
-    d2KLdt2 <- c(d2Kdt2,d2Ldt2)
-    d2Kdc0da0 <- rep(-U,ns)
-    d2KLdc0da0 <- c(d2Kdc0da0,zeros)
+    out$jacobian['w'] <- (KL%*%O%*%dEDdw%*%O%*%KL - trace(O%*%dEDdw))/2
+    if (hessian){
+        d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
+        d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
+        d2Kdc0da0 <- rep(-U,ns)
+    }
     out
 }
 # rederived from Ludwig (1998):
-data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
+data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,hessian=FALSE){
     U <- iratio('U238U235')[1]
     ns <- length(x)
     zeros <- rep(0,ns)
@@ -794,33 +796,32 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     out$SS <- KLM%*%O%*%KLM
     detE <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- 3*log(2*pi)/2 - detE/2 - out$SS/2
-    dKdt <- rep(-D$dPb207U235dt,ns)
-    dLdt <- rep(-D$dPb206U238dt,ns)
-    dKLMdt <- c(dKdt,dLdt,zeros)
-    out$dLLdt <- -(dKLMdt%*%O%*%dKLMdt)/2
-    dKdb0 <- as.vector(-U*c0)
-    dKLMdb0 <- c(dKdb0,zeros,zeros)
-    out$dLLdb0 <- -(dKLMdb0%*%O%*%dKLMdb0)/2
-    dLda0 <- as.vector(-c0)
-    dKLMda0 <- c(zeros,dLda0,zeros)
-    out$dLLda0 <- -(dKLMda0%*%O%*%dKLMda0)/2
-    dKdc0 <- rep(-U*b0,ns)
-    dLdc0 <- rep(-a0,ns)
-    dMdc0 <- rep(-1,ns)
-    dKLMdc0 <- c(dKdc0,dLdc0,dMdc0)
-    out$dLLdc0 <- -(dKLMdc0%*%O%*%dKLMdc0)/2
+    JD <- matrix(0,3*ns,4)
+    parnames <- c('t','a0','b0','c0','w')
+    colnames(JD) <- parnames[1:4]
+    JD[i1,'t']  <- -D$dPb207U235dt # dKdt
+    JD[i2,'t']  <- -D$dPb206U238dt # dLdt
+    JD[i2,'a0'] <- -c0             # dLda0
+    JD[i1,'b0'] <- -U*c0           # dKdb0
+    JD[i1,'c0'] <- -U*b0           # dKdc0
+    JD[i2,'c0'] <- -a0             # dLdc0
+    JD[i3,'c0'] <- -1              # dMdc0
+    out$jacobian <- rep(0,5)
+    names(out$jacobian) <- parnames
+    for (pn in parnames[1:4]){
+        out$jacobian[pn] <- -(t(JD[,pn])%*%O%*%JD[,pn])/2
+    }
     dEDdw <- get.Ew_3D(w=w,Z=Z,a0=a0,b0=b0,deriv=1)
-    out$dLLdw <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2
-    d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
-    d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
-    d2KLMdt2 <- c(d2Kdt2,d2Ldt2,zeros)
-    d2Ldc0da0 <- rep(-1,ns)
-    d2KLMdc0da0 <- c(zeros,d2Ldc0da0,zeros)
-    d2Kdc0db0 <- rep(-U,ns)
-    d2KLMdc0db0 <- c(d2Kdc0db0,zeros,zeros)
+    out$jacobian['w'] <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2
+    if (hessian){
+        d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
+        d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
+        d2Ldc0da0 <- rep(-1,ns)
+        d2Kdc0db0 <- rep(-U,ns)
+    }
     out
 }
-data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
+data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE,hessian=FALSE){
     l2 <- lambda('Th232')[1]
     U <- iratio('U238U235')[1]
     D <- mclean(tt=tt,d=x$d,exterr=exterr)
@@ -894,32 +895,31 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     out$SS <- KLM%*%O%*%KLM
     detE <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- 3*log(2*pi)/2 - detE/2 - out$SS/2
-    dKdt <- rep(-D$dPb207U235dt,ns)
-    dLdt <- rep(-D$dPb206U238dt,ns)
-    dMdt <- rep(-exp(l2*tt)*l2,ns)
-    dKLMdt <- c(dKdt,dLdt,dMdt)
-    out$dLLdt <- -(dKLMdt%*%O%*%dKLMdt)/2
-    dLda0 <- -c0*W
-    dKLMda0 <- c(zeros,dLda0,zeros)
-    out$dLLda0 <- -(dKLMda0%*%O%*%dKLMda0)/2
-    dKdb0 <- -c0*U*W
-    dKLMdb0 <- c(dKdb0,zeros,zeros)
-    out$dLLdb0 <- -(dKLMdb0%*%O%*%dKLMdb0)/2
-    dKdc0 <- -b0*U*W
-    dLdc0 <- -a0*W
-    dMdc0 <- rep(-1,ns)
-    dKLMdc0 <- c(dKdc0,dLdc0,dMdc0)
-    out$dLLdc0 <- -(dKLMdc0%*%O%*%dKLMdc0)/2
+    JD <- matrix(0,3*ns,4)
+    parnames <- c('t','a0','b0','c0','w')
+    colnames(JD) <- parnames[1:4]
+    JD[i1,'t']  <- -D$dPb207U235dt # dKdt
+    JD[i2,'t']  <- -D$dPb206U238dt # dLdt
+    JD[i3,'t']  <- -exp(l2*tt)*l2  # dMdt
+    JD[i2,'a0'] <- -c0*W           # dLda0
+    JD[i1,'b0'] <- -c0*U*W         # dKdb0
+    JD[i1,'c0'] <- -b0*U*W         # dKdc0
+    JD[i2,'c0'] <- -a0*W           # dLdc0
+    JD[i3,'c0'] <- -1              # dMdc0
+    out$jacobian <- rep(0,5)
+    names(out$jacobian) <- parnames
+    for (pn in parnames[1:4]){
+        out$jacobian[pn] <- -(t(JD[,pn])%*%O%*%JD[,pn])/2
+    }
     dEDdw <- get.Ew_Th(w=w,W=W,Z=Z,x82=x82,a0=10,b0=b0,deriv=1)
-    out$dLLdw <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2    
-    d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
-    d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
-    d2Mdt2 <- rep(-exp(l2*tt)*l2^2,ns)
-    d2KLMdt2 <- c(d2Kdt2,d2Ldt2,d2Mdt2)
-    d2Ldc0da0 <- -W
-    d2KLMdc0da0 <- c(zeros,d2Ldc0da0,zeros)
-    d2Kdc0db0 <- -U*W
-    d2KLMdc0db0 <- c(d2Kdc0db0,zeros,zeros)
+    out$jacobian['w'] <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2
+    if (hessian){
+        d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
+        d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
+        d2Mdt2 <- rep(-exp(l2*tt)*l2^2,ns)
+        d2Ldc0da0 <- -W
+        d2Kdc0db0 <- -U*W
+    }
     out
 }
 
