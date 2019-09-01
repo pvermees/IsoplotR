@@ -330,19 +330,14 @@ LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
 }
 LL.lud.UPb.new <- function(ta0b0w,x,exterr=FALSE,LL=FALSE){
     if (x$format < 4){
-        l <- data2ludwig(x,tt=ta0b0w[1],a0=ta0b0w[2],w=ta0b0w[3],exterr=exterr)
-        D <- c(l$K,l$L)
+        l <- data2ludwig.new(x,tt=ta0b0w[1],a0=ta0b0w[2],
+                             w=ta0b0w[3],exterr=exterr)
     } else {
-        l <- data2ludwig(x,tt=ta0b0w[1],a0=ta0b0w[2],b0=ta0b0w[3],w=ta0b0w[4],exterr=exterr)
-        D <- c(l$K,l$L,l$M)
+        l <- data2ludwig.new(x,tt=ta0b0w[1],a0=ta0b0w[2],b0=ta0b0w[3],
+                             w=ta0b0w[4],exterr=exterr)
     }
-    out <- D %*% l$omega %*% D
-    if (LL){
-        k <- length(D)
-        detE <- determinant(2*pi*l$omegainv,logarithm=TRUE)$modulus
-        out <- -0.5*(out + k*log(2*pi) + detE)
-    }
-    out    
+    if (LL) return(l$LL)
+    else return(l$SS)
 }
 
 LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
@@ -369,19 +364,19 @@ LL.lud.UPb.gr.new <- function(ta0b0w,x,exterr=FALSE){
     if (x$format<4){
         w <- ta0b0w[3]
         l <- data2ludwig(x,tt=tt,a0=a0,w=w,exterr=exterr)
-        dLdt <- dLdx_2D(l=l,tt=tt,a0=a0,x='t')
-        dLda0 <- dLdx_2D(l=l,tt=tt,a0=a0,x='a0')
-        dLdw
-        out <- c(dLdt,dLda0,dLdw)
+        dLLdt <- dLLdx_2D(l=l,x='t')
+        dLLda0 <- dLLdx_2D(l=l,x='a0')
+        dLLdw <- dLLdx_2D(l=l,x='w')
+        out <- c(dLLdt,dLLda0,dLLdw)
     } else {
         b0 <- ta0b0[3]
         w <- ta0b0w[4]
         l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-        dLdt <- dLdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='t')
-        dLda0 <- dLdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='a0')
-        dLdb0 <- dLdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='b0')
-        dLdw
-        out <- c(dLdt,dLda0,dLdb0,dLdw)
+        dLLdt <- dLLdx_3D(l=l,x='t')
+        dLLda0 <- dLLdx_3D(l=l,x='a0')
+        dLLdb0 <- dLLdx_3D(l=l,x='b0')
+        dLLdw <- dLLdx_3D(l=l,x='w')
+        out <- c(dLLdt,dLLda0,dLLdb0,dLLdw)
     }
     out
 }
@@ -487,7 +482,7 @@ dSdx_2D <- function(l,tt=0,a0=0,x='a0'){
            l$L%*%l$omega22%*%dLdx + dLdx%*%l$omega22%*%l$L)
 }
 dSdx_3D <- function(l,tt=0,a0=0,b0=0,x='a0'){
-    zeros <- 0*l$K
+    zneros <- 0*l$K
     if (identical(x,'t')){
         dKdx <- l$dKdt
         dLdx <- l$dLdt
@@ -616,12 +611,15 @@ d2Sdxdy_3D <- function(l,tt=0,a0=0,b0=0,x='a0',y='c0',i=1,j=1){
            dMdx%*%l$omega33%*%dMdy + d2Mdxdy%*%l$omega33%*%l$M)
 }
 
-dLdx_2D <- function(l,tt=0,a0=0,x='a0'){
+dLLdx_2D <- function(l,x='a0'){
     if (identical(x,'t')){
         dKdx <- l$dKdt
         dLdx <- l$dLdt
     } else if (identical(x,'a0')){
         dKdx <- l$dKda0
+        dLdx <- 0*l$K
+    } else if (identical(x,'w')){
+        dKdx <- l$dK
         dLdx <- 0*l$K
     }
     return(l$K%*%l$omega11%*%dKdx + dKdx%*%l$omega11%*%l$K +
@@ -629,7 +627,7 @@ dLdx_2D <- function(l,tt=0,a0=0,x='a0'){
            l$L%*%l$omega21%*%dKdx + dLdx%*%l$omega21%*%l$K +
            l$L%*%l$omega22%*%dLdx + dLdx%*%l$omega22%*%l$L)
 }
-dLdx_3D <- function(l,tt=0,a0=0,b0=0,x='a0'){
+dLLdx_3D <- function(l,x='a0'){
     zeros <- 0*l$K
     if (identical(x,'t')){
         dKdx <- l$dKdt
@@ -654,7 +652,7 @@ dLdx_3D <- function(l,tt=0,a0=0,b0=0,x='a0'){
            l$M%*%l$omega32%*%dLdx + dMdx%*%l$omega32%*%l$L +
            l$M%*%l$omega33%*%dMdx + dMdx%*%l$omega33%*%l$M)
 }
-d2Ldxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
+d2LLdxdy_2D <- function(l,x='a0',y='c0',i=1,j=1){
     ns <- length(l$K)
     zeros <- rep(0,ns)
     dKdx <- zeros; dLdx <- zeros
@@ -694,7 +692,7 @@ d2Ldxdy_2D <- function(l,tt=0,a0=0,x='a0',y='c0',i=1,j=1){
            l$L%*%l$omega22%*%d2Ldxdy + dLdy%*%l$omega22%*%dLdx +
            dLdx%*%l$omega22%*%dLdy + d2Ldxdy%*%l$omega22%*%l$L)
 }
-d2Ldxdy_3D <- function(l,tt=0,a0=0,b0=0,x='a0',y='c0',i=1,j=1){
+d2LLdxdy_3D <- function(l,x='a0',y='c0',i=1,j=1){
     ns <- length(l$K)
     zeros <- rep(0,ns)
     dKdx <- zeros; dLdx <- zeros; dMdx <- zeros;
@@ -769,6 +767,16 @@ data2ludwig <- function(x,tt,a0,b0=0,w=0,exterr=FALSE,...){
     else stop('Incorrect input format.')
     out
 }
+data2ludwig.new <- function(x,tt,a0,b0=0,w=0,exterr=FALSE,...){
+    if (x$format %in% c(1,2,3))
+        out <- data2ludwig_2D.new(x,tt=tt,a0=a0,w=w,exterr=exterr)
+    else if (x$format %in% c(4,5,6))
+        out <- data2ludwig_3D.new(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
+    else if (x$format %in% c(7,8))
+        out <- data2ludwig_Th.new(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
+    else stop('Incorrect input format.')
+    out
+}
 data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     U <- iratio('U238U235')[1]
     ns <- length(x)
@@ -819,6 +827,73 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
     out$d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
     out$d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
     out$d2Kdc0da0 <- rep(-U,ns)
+    out
+}
+data2ludwig_2D.new <- function(x,tt,a0,w=0,exterr=FALSE){
+    U <- iratio('U238U235')[1]
+    ns <- length(x)
+    zeros <- rep(0,ns)
+    E <- matrix(0,2*ns+6,2*ns+6)
+    J <- matrix(0,2*ns,2*ns+6)
+    J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
+    X <- zeros
+    Y <- zeros
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    for (i in 1:ns){
+        wd <- wetherill(x,i)
+        X[i] <- wd$x['Pb207U235']
+        Y[i] <- wd$x['Pb206U238']
+        E[c(i,ns+i),c(i,ns+i)] <- wd$cov
+        J[i,2*ns+2] <- -D$dPb207U235dl35     # dKdl35
+        J[i,2*ns+4] <- -D$dPb207U235dl31     # dKdl31
+        J[ns+i,2*ns+1] <- -D$dPb206U238dl38  # dLdl31
+        J[ns+i,2*ns+3] <- -D$dPb206U238dl34  # dLdl34
+        J[ns+i,2*ns+5] <- -D$dPb206U238dl30  # dLdl30
+        J[ns+i,2*ns+6] <- -D$dPb206U238dl26  # dLdl26
+    }
+    E[2*ns+1,2*ns+1] <- lambda('U238')[2]^2
+    E[2*ns+2,2*ns+2] <- lambda('U235')[2]^2
+    E[2*ns+3,2*ns+3] <- lambda('U234')[2]^2
+    E[2*ns+4,2*ns+4] <- lambda('Pa231')[2]^2
+    E[2*ns+5,2*ns+5] <- lambda('Th230')[2]^2
+    E[2*ns+6,2*ns+6] <- lambda('Ra226')[2]^2
+    Ew <- get.Ew_2D(w=w,Y=Y,a0=a0)
+    ED <- J%*%E%*%t(J) + Ew
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    O <- blockinverse(AA=ED[i1,i1],BB=ED[i1,i2],
+                      CC=ED[i2,i1],DD=ED[i2,i2],doall=TRUE)
+    K0 <- X - D$Pb207U235 - a0*U*Y + a0*U*D$Pb206U238
+    A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U + K0%*%(O[i1,i2]+t(O[i2,i1])))
+    B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U + (O[i2,i2]+t(O[i2,i2])) +
+           a0*U*(O[i1,i2]+t(O[i1,i2])) + (O[i2,i1]+t(O[i2,i1]))*a0*U)
+    out <- list(omega11=O[i1,i1],omega12=O[i1,i2],omega21=O[i2,i1],
+                omega22=O[i2,i2],omega=O,omegainv=ED)
+    L <- as.vector(solve(B,A))
+    c0 <- Y - D$Pb206U238 - L
+    K <- X - D$Pb207U235 - a0*U*c0
+    KL <- c(K,L)
+    out$SS <- KL%*%O%*%KL
+    detE <- determinant(ED,logarithm=TRUE)$modulus
+    out$LL <- log(2*pi) - detE/2 - out$SS/2
+    dKdt <- rep(-D$dPb207U235dt,ns)
+    dLdt <- rep(-D$dPb206U238dt,ns)
+    dKLdt <- c(dKdt,dLdt)
+    out$dLLdt <- -(dKLdt%*%O%*%dKLdt)/2
+    dKda0 <- -U*c0
+    dKLda0 <- c(dKda0,rep(0,ns))
+    out$dLLda0 <- -(dKLda0%*%O%*%dKLda0)/2
+    dKdc0 <- rep(-U*a0,ns)
+    dLdc0 <- rep(-1,ns)
+    dKLdc0 <- c(dKdc0,dLdc0)
+    dEDdw <- get.Ew_2D(w=w,Y=Y,a0=a0,deriv=1)
+    out$dLLdc0 <- -(dKLdc0%*%O%*%dKLdc0)/2
+    out$dLLdw <- (KL%*%O%*%dEDdw%*%O%*%KL - trace(O%*%dEDdw))/2
+    d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
+    d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
+    d2KLdt2 <- c(d2Kdt2,d2Ldt2)
+    d2Kdc0da0 <- rep(-U,ns)
+    d2KLdc0da0 <- c(d2Kdc0da0,rep(0,ns))
     out
 }
 # rederived from Ludwig (1998):
@@ -978,16 +1053,18 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     out
 }
 
-get.Ew_2D <- function(w,Y,a0){
+get.Ew_2D <- function(w,Y,a0,deriv=0){
+    ns <- length(Y)
     if (w>0){
-        ns <- length(Y)
         U <- iratio('U238U235')[1]
-        sa0 <- (a0*w)^2
+        if (deriv==1) sa0 <- 2*w*a0^2
+        else if (deriv==2) sa0 <- 2*a0^2
+        else sa0 <- (a0*w)^2
         J <- matrix(0,2*ns,1)
         J[1:ns,1] <- -U*Y               # dK0da0
         out <- J %*% sa0 %*% t(J)
     } else {
-        out <- 0
+        out <- matrix(0,2*ns,2*ns)
     }
     out
 }
@@ -1034,7 +1111,6 @@ fixit <- function(x,anchor=list(FALSE,NA)){
     }
     out
 }
-
 fixit.new <- function(x,anchor=list(FALSE,NA),model=1){
     if (x$format<4) np <- 3
     else np <- 4

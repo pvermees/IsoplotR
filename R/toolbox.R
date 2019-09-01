@@ -537,3 +537,7 @@ geomean <- function(x,...){ UseMethod("geomean",x) }
 geomean.default <- function(x,...){
     exp(mean(log(x),na.rm=TRUE))
 }
+
+trace <- function(x){
+    sum(diag(x))
+}
