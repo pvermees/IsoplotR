@@ -154,28 +154,13 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     out
 }
 
-get.ta0b0 <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
-    init <- get.ta0b0.model2(x,anchor=anchor)
-    if (model==1)
-        out <- get.ta0b0.model1(x,init=init,exterr=exterr,anchor=anchor,...)
-    else if (model==2)
-        out <- list(par=init,w=0)
-    else if (model==3)
-        out <- get.ta0b0.model3(x,init=init,exterr=exterr,anchor=anchor,...)
-    out$model <- model
-    out$exterr <- exterr
-    out
-}
 get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     # first do a model 2 regression:
-    if (x$format < 4){
-        init <- get.ta0b0.model2.2D(x,anchor=anchor)
-    } else {
-        init <- get.ta0b0.model2.3D(x,anchor=anchor)
-    }
+    if (x$format < 4) init <- get.ta0b0.model2.2D(x,anchor=anchor)
+    else init <- get.ta0b0.model2.3D(x,anchor=anchor)
     # then use the results for possible further fitting:
     if (model!=2){
-        out <- optifix(parms=c(init,0),fn=LL.lud.UPb.new,gr=LL.lud.UPb.gr.new,
+        out <- optifix(parms=c(init,0),fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model),
                        lower=c(0,0,0,0),upper=c(10000,100,100,1),...)
@@ -183,56 +168,6 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     out$model <- model
     out$exterr <- exterr
     out
-}
-
-get.ta0b0.model1 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),...){
-    out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
-                   x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
-                   lower=c(0,0,0),upper=c(10000,100,100),...)
-    out$w <- 0
-    out
-}
-get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
-    if (x$format %in% c(1,2,3))
-        out <- get.ta0b0.model2.2D(x,anchor=anchor)
-    else if (x$format %in% c(4,5,6,7,8))
-        out <- get.ta0b0.model2.3D(x,anchor=anchor)
-    else
-        stop("Illegal input format.")
-    out
-}
-get.ta0b0.model3 <- function(x,init,exterr=FALSE,anchor=list(FALSE,NA),...){
-#    for (i in 1:5){ # loop for more accurate but slower and more unstable results
-    out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,method="L-BFGS-B",
-                   x=x,w=0,exterr=exterr,fixed=fixit(x,anchor),
-                   lower=c(0,0,0),upper=c(10000,100,100),...)
-    out$w <- stats::optimise(LL.lud.disp,interval=c(0,1),x=x,ta0b0=out$par,
-                             exterr=exterr,anchor=anchor,maximum=TRUE)$maximum
-#    }
-    out
-}
-
-get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
-    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-    if (!anchor[[1]]) {
-        xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-        intercept <- xyfit$coef[1]
-        slope <- xyfit$coef[2]
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
-    } else if (is.na(anchor[[2]])){
-        intercept <- settings('iratio','Pb207Pb206')[1]
-        xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
-        slope <- xyfit$coef
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
-    } else if (is.numeric(anchor[[2]])){
-        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
-        xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
-                           0 + I(xy[,'X']-TW$x['U238Pb206']))
-        slope <- xyfit$coef
-        intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
-        ta0b0 <- c(anchor[[2]],intercept)
-    }
-    ta0b0
 }
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
@@ -306,59 +241,22 @@ model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
     out
 }
 
-LL.lud.disp <- function(w,x,ta0b0,exterr=FALSE,anchor=list(FALSE,NA)){
-    # these two lines produce slightly more accurate but much slower results:
-    # fit <- fit_ludwig_discordia(x,init=ta0b0,w=w,exterr=exterr,anchor=anchor)
-    # LL.lud.UPb(ta0b0=fit$par,x=x,exterr=exterr,w=w,LL=TRUE)
-    LL.lud.UPb(ta0b0=ta0b0,x=x,exterr=exterr,w=w,LL=TRUE)
-}
-LL.lud.UPb <- function(ta0b0,x,exterr=FALSE,w=0,LL=FALSE){
-    if (x$format < 4){
-        l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],w=w,exterr=exterr)
-        D <- c(l$K,l$L)
+LL.lud.UPb <- function(ta0b0w,x,exterr=FALSE,LL=FALSE){
+    tt <- ta0b0w[1]
+    a0 <- ta0b0w[2]
+    if (x$format<4){
+        b0 <- 0
+        w <- ta0b0w[3]
     } else {
-        l <- data2ludwig(x,tt=ta0b0[1],a0=ta0b0[2],b0=ta0b0[3],w=w,exterr=exterr)
-        D <- c(l$K,l$L,l$M)
+        b0 <- ta0b0w[3]
+        w <- ta0b0w[4]        
     }
-    out <- D %*% l$omega %*% D
-    if (LL){
-        k <- length(D)
-        detE <- determinant(2*pi*l$omegainv,logarithm=TRUE)$modulus
-        out <- -0.5*(out + k*log(2*pi) + detE)
-    }
-    out    
-}
-LL.lud.UPb.new <- function(ta0b0w,x,exterr=FALSE,LL=FALSE){
-    if (x$format < 4){
-        l <- data2ludwig.new(x,tt=ta0b0w[1],a0=ta0b0w[2],
-                             w=ta0b0w[3],exterr=exterr)
-    } else {
-        l <- data2ludwig.new(x,tt=ta0b0w[1],a0=ta0b0w[2],b0=ta0b0w[3],
-                             w=ta0b0w[4],exterr=exterr)
-    }
+    l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
     if (LL) return(l$LL)
     else return(l$SS)
 }
 
-LL.lud.UPb.gr <- function(ta0b0,x,exterr=FALSE,w=0){
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
-    if (x$format<4){
-        l <- data2ludwig(x,tt=tt,a0=a0,w=w,exterr=exterr)
-        dSdt <- dSdx_2D(l=l,tt=tt,a0=a0,x='t')
-        dSda0 <- dSdx_2D(l=l,tt=tt,a0=a0,x='a0')
-        out <- c(dSdt,dSda0)
-    } else {
-        b0 <- ta0b0[3]
-        l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-        dSdt <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='t')
-        dSda0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='a0')
-        dSdb0 <- dSdx_3D(l=l,tt=tt,a0=a0,b0=b0,x='b0')
-        out <- c(dSdt,dSda0,dSdb0)
-    }
-    out
-}
-LL.lud.UPb.gr.new <- function(ta0b0w,x,exterr=FALSE){
+LL.lud.UPb.gr <- function(ta0b0w,x,exterr=FALSE){
     tt <- ta0b0w[1]
     a0 <- ta0b0w[2]
     if (x$format<4){
@@ -767,69 +665,7 @@ data2ludwig <- function(x,tt,a0,b0=0,w=0,exterr=FALSE,...){
     else stop('Incorrect input format.')
     out
 }
-data2ludwig.new <- function(x,tt,a0,b0=0,w=0,exterr=FALSE,...){
-    if (x$format %in% c(1,2,3))
-        out <- data2ludwig_2D.new(x,tt=tt,a0=a0,w=w,exterr=exterr)
-    else if (x$format %in% c(4,5,6))
-        out <- data2ludwig_3D.new(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-    else if (x$format %in% c(7,8))
-        out <- data2ludwig_Th.new(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-    else stop('Incorrect input format.')
-    out
-}
 data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE){
-    U <- iratio('U238U235')[1]
-    ns <- length(x)
-    zeros <- rep(0,ns)
-    E <- matrix(0,2*ns+6,2*ns+6)
-    J <- matrix(0,2*ns,2*ns+6)
-    J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
-    X <- zeros
-    Y <- zeros
-    D <- mclean(tt=tt,d=x$d,exterr=exterr)
-    for (i in 1:ns){
-        wd <- wetherill(x,i)
-        X[i] <- wd$x['Pb207U235']
-        Y[i] <- wd$x['Pb206U238']
-        E[c(i,ns+i),c(i,ns+i)] <- wd$cov
-        J[i,2*ns+2] <- -D$dPb207U235dl35     # dKdl35
-        J[i,2*ns+4] <- -D$dPb207U235dl31     # dKdl31
-        J[ns+i,2*ns+1] <- -D$dPb206U238dl38  # dLdl31
-        J[ns+i,2*ns+3] <- -D$dPb206U238dl34  # dLdl34
-        J[ns+i,2*ns+5] <- -D$dPb206U238dl30  # dLdl30
-        J[ns+i,2*ns+6] <- -D$dPb206U238dl26  # dLdl26
-    }
-    E[2*ns+1,2*ns+1] <- lambda('U238')[2]^2
-    E[2*ns+2,2*ns+2] <- lambda('U235')[2]^2
-    E[2*ns+3,2*ns+3] <- lambda('U234')[2]^2
-    E[2*ns+4,2*ns+4] <- lambda('Pa231')[2]^2
-    E[2*ns+5,2*ns+5] <- lambda('Th230')[2]^2
-    E[2*ns+6,2*ns+6] <- lambda('Ra226')[2]^2
-    OI <- J%*%E%*%t(J) + get.Ew_2D(w=w,Y=Y,a0=a0)
-    i1 <- 1:ns
-    i2 <- (ns+1):(2*ns)
-    O <- blockinverse(AA=OI[i1,i1],BB=OI[i1,i2],
-                      CC=OI[i2,i1],DD=OI[i2,i2],doall=TRUE)
-    K0 <- X - D$Pb207U235 - a0*U*Y + a0*U*D$Pb206U238
-    A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U + K0%*%(O[i1,i2]+t(O[i2,i1])))
-    B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U + (O[i2,i2]+t(O[i2,i2])) +
-           a0*U*(O[i1,i2]+t(O[i1,i2])) + (O[i2,i1]+t(O[i2,i1]))*a0*U)
-    out <- list(omega11=O[i1,i1],omega12=O[i1,i2],omega21=O[i2,i1],
-                omega22=O[i2,i2],omega=O,omegainv=OI)
-    out$L <- as.vector(solve(B,A))
-    out$c0 <- Y - D$Pb206U238 - out$L
-    out$K <- X - D$Pb207U235 - a0*U*out$c0
-    out$dKdt <- rep(-D$dPb207U235dt,ns)
-    out$dLdt <- rep(-D$dPb206U238dt,ns)
-    out$dKda0 <- -U*out$c0
-    out$dKdc0 <- rep(-U*a0,ns)
-    out$dLdc0 <- rep(-1,ns)
-    out$d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
-    out$d2Ldt2 <- rep(-D$d2Pb206U238dt2,ns)
-    out$d2Kdc0da0 <- rep(-U,ns)
-    out
-}
-data2ludwig_2D.new <- function(x,tt,a0,w=0,exterr=FALSE){
     U <- iratio('U238U235')[1]
     ns <- length(x)
     zeros <- rep(0,ns)
@@ -929,7 +765,8 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE){
     E[3*ns+4,3*ns+4] <- (lambda('Pa231')[2]*1000)^2
     E[3*ns+5,3*ns+5] <- (lambda('Th230')[2]*1000)^2
     E[3*ns+6,3*ns+6] <- (lambda('Ra226')[2]*1000)^2
-    ED <- J%*%E%*%t(J) + get.Ew_3D(w=w,Z=Z,a0=a0,b0=b0)
+    Ew <- get.Ew_3D(w=w,Z=Z,a0=a0,b0=b0)
+    ED <- J%*%E%*%t(J) + Ew
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     i3 <- (2*ns+1):(3*ns)
@@ -1097,21 +934,7 @@ get.Ew_Th <- function(w,W,Z,x82,a0,b0){
     out
 }
 
-fixit <- function(x,anchor=list(FALSE,NA)){
-    if (x$format %in% c(1,2,3)){
-        if (!anchor[[1]]) out <- rep(FALSE,2)
-        else if (is.numeric(anchor[[2]])) out <- c(TRUE,FALSE)
-        else out <- c(FALSE,TRUE)
-    } else if (x$format %in% c(4,5,6,7,8)){
-        if (!anchor[[1]]) out <- rep(FALSE,3)
-        else if (is.numeric(anchor[[2]])) out <- c(TRUE,FALSE,FALSE)
-        else out <- c(FALSE,TRUE,TRUE)
-    } else {
-        stop('Illegal input format.')
-    }
-    out
-}
-fixit.new <- function(x,anchor=list(FALSE,NA),model=1){
+fixit <- function(x,anchor=list(FALSE,NA),model=1){
     if (x$format<4) np <- 3
     else np <- 4
     out <- rep(FALSE,np)
