@@ -107,7 +107,7 @@ ludwig.default <- function(x,...){
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
-    fit <- get.ta0b0(x,exterr=exterr,model=model,anchor=anchor,...)
+    fit <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor,...)
     out <- fit[c('par','w','model')]
     out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
     out$n <- length(x)
@@ -156,18 +156,49 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 
 get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     # first do a model 2 regression:
-    if (x$format < 4) init <- get.ta0b0.model2.2D(x,anchor=anchor)
-    else init <- get.ta0b0.model2.3D(x,anchor=anchor)
+    if (x$format < 4){
+        init <- get.ta0b0.model2.2D(x,anchor=anchor)
+        lower <- c(0,0,0)
+        upper <- c(10000,100,1)
+    } else {
+        init <- get.ta0b0.model2.3D(x,anchor=anchor)
+        lower <- c(0,0,0,0)
+        upper <- c(10000,100,100,1)
+    }
     # then use the results for possible further fitting:
-    if (model!=2){
+    if (model==2){
+        out <- list(par=init)
+    } else {
         out <- optifix(parms=c(init,0),fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model),
-                       lower=c(0,0,0,0),upper=c(10000,100,100,1),...)
+                       lower=lower,upper=upper,control=list(fnscale=-1),...)
     }
     out$model <- model
     out$exterr <- exterr
     out
+}
+get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
+    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
+    if (!anchor[[1]]) {
+        xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+        intercept <- xyfit$coef[1]
+        slope <- xyfit$coef[2]
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+    } else if (is.na(anchor[[2]])){
+        intercept <- settings('iratio','Pb207Pb206')[1]
+        xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
+        slope <- xyfit$coef
+        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+    } else if (is.numeric(anchor[[2]])){
+        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
+        xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
+                           0 + I(xy[,'X']-TW$x['U238Pb206']))
+        slope <- xyfit$coef
+        intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
+        ta0b0 <- c(anchor[[2]],intercept)
+    }
+    ta0b0
 }
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
@@ -241,7 +272,7 @@ model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
     out
 }
 
-LL.lud.UPb <- function(ta0b0w,x,exterr=FALSE,LL=FALSE){
+LL.lud.UPb <- function(ta0b0w,x,exterr=FALSE,LL=TRUE){
     tt <- ta0b0w[1]
     a0 <- ta0b0w[2]
     if (x$format<4){
@@ -252,19 +283,24 @@ LL.lud.UPb <- function(ta0b0w,x,exterr=FALSE,LL=FALSE){
         w <- ta0b0w[4]        
     }
     l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
-    if (LL) return(l$LL)
-    else return(l$SS)
+    if (LL) out <- l$LL
+    else out <- l$SS
+    out
 }
 
 LL.lud.UPb.gr <- function(ta0b0w,x,exterr=FALSE){
+    tt <- ta0b0w[1]
+    a0 <- ta0b0w[2]
     if (x$format<4){
-        out <- data2ludwig(x,tt=ta0b0w[1],a0=ta0b0w[2],w=ta0b0w[3],
+        b0 <- 0
+        w <- ta0b0w[3]
+        out <- data2ludwig(x,tt=tt,a0=ta0b0w[2],w=ta0b0w[3],
                            exterr=exterr,jacobian=TRUE)$jacobian
     } else {
-        out <- data2ludwig(x,tt=ta0b0w[1],a0=ta0b0w[2],b0=ta0b0w[3],
-                           w=ta0b0w[3],exterr=exterr,jacobian=TRUE)$jacobian
+        b0 <- ta0b0w[3]
+        w <- ta0b0w[4]
     }
-    out
+    data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr,jacobian=TRUE)$jacobian
 }
 
 fisher.lud <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
@@ -366,7 +402,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     KL <- c(K,L)
     out$SS <- KL%*%O%*%KL
     detE <- determinant(ED,logarithm=TRUE)$modulus
-    out$LL <- log(2*pi) - detE/2 - out$SS/2
+    out$LL <- -(2*log(2*pi) + detE + out$SS)/2
     if (jacobian | hessian){
         JKL <- matrix(0,2*ns,ns+2) # derivatives of KL w.r.t. c0, t, and a0
         colnames(JKL) <- c(paste0('c0[',i1,']'),'t','a0')
