@@ -781,7 +781,7 @@ insert.data <- function(x,cnames){
 
 read.XsXYsYrXY <- function(x,cnames){
     out <- insert.data(x=x,cnames=cnames)
-    i <- which(is.na(x[,5]))
+    i <- which(is.na(out[,5]))
     out[i,5] <- 0
     out
 }

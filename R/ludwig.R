@@ -386,7 +386,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     E[2*ns+4,2*ns+4] <- lambda('Pa231')[2]^2
     E[2*ns+5,2*ns+5] <- lambda('Th230')[2]^2
     E[2*ns+6,2*ns+6] <- lambda('Ra226')[2]^2
-    Ew <- get.Ew_2D(w=w,Y=Y,a0=a0)
+    Ew <- get.Ew_2D(w=w,ns=ns,tt=tt,D=D)
     ED <- J%*%E%*%t(J) + Ew
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
@@ -402,7 +402,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     KL <- c(K,L)
     out$SS <- KL%*%O%*%KL
     detE <- determinant(ED,logarithm=TRUE)$modulus
-    out$LL <- -(2*log(2*pi) + detE + out$SS)/2
+    out$LL <- -(2*ns*log(2*pi) + detE + out$SS)/2
     if (jacobian | hessian){
         JKL <- matrix(0,2*ns,ns+2) # derivatives of KL w.r.t. c0, t, and a0
         colnames(JKL) <- c(paste0('c0[',i1,']'),'t','a0')
@@ -416,7 +416,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
         names(out$jacobian) <- c('t','a0','w')
         out$jacobian['t'] <- -KL%*%O%*%JKL[,'t']
         out$jacobian['a0'] <- -KL%*%O%*%JKL[,'a0']
-        dEDdw <- get.Ew_2D(w=w,Y=Y,a0=a0,deriv=1)
+        dEDdw <- get.Ew_2D(w=w,ns=ns,tt=tt,D=D)
         dOdw <- -O%*%dEDdw%*%O
         out$jacobian['w'] <- -(trace(O%*%dEDdw) + KL%*%dOdw%*%KL)/2
     }
@@ -437,7 +437,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
         out$hessian['t','t'] <-
             t(JKL[,'t'])%*%O%*%JKL[,'t'] + KL%*%O%*%d2KLdt2      # d2dt2
         out$hessian['a0','a0'] <- t(JKL[,'a0'])%*%O%*%JKL[,'a0'] # d2da02
-        d2EDdw2 <- get.Ew_2D(w=w,Y=Y,a0=a0,deriv=2)
+        d2EDdw2 <- get.Ew_2D(w=w,ns=ns,tt=tt,D=D)
         out$hessian['w','w'] <-                                  # d2dw2
             (KL%*%dOdw%*%dEDdw%*%O%*%KL + KL%*%O%*%d2EDdw2%*%O%*%KL +
              KL%*%O%*%dEDdw%*%dOdw%*%KL + trace(O%*%dEDdw%*%ED)^2 -
@@ -644,16 +644,14 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE,
     out
 }
 
-get.Ew_2D <- function(w,Y,a0,deriv=0){
-    ns <- length(Y)
+get.Ew_2D <- function(w=0,ns=1,tt=0,D=mclean(),deriv=0){
     if (w>0){
-        U <- iratio('U238U235')[1]
-        if (deriv==1) sa0 <- 2*w*a0^2
-        else if (deriv==2) sa0 <- 2*a0^2
-        else sa0 <- (a0*w)^2
+        if (deriv==1) E <- 2*w
+        else if (deriv==2) E <- 2
+        else E <- w^2
         J <- matrix(0,2*ns,1)
-        J[1:ns,1] <- -U*Y               # dK0da0
-        out <- J %*% sa0 %*% t(J)
+        J[1:ns,1] <- D$dPb207U235dt*tt
+        out <- J %*% E %*% t(J)
     } else {
         out <- matrix(0,2*ns,2*ns)
     }
