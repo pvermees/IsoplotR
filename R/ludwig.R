@@ -391,7 +391,7 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     i2 <- (ns+1):(2*ns)
     O <- blockinverse(AA=ED[i1,i1],BB=ED[i1,i2],
                       CC=ED[i2,i1],DD=ED[i2,i2],doall=TRUE)
-    K0 <- X - D$Pb207U235 - a0*U*Y + a0*U*D$Pb206U238
+    K0 <- X - D$Pb207U235 + a0*U*(D$Pb206U238 - Y)
     A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U + K0%*%(O[i1,i2]+t(O[i2,i1])))
     B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U + (O[i2,i2]+t(O[i2,i2])) +
            a0*U*(O[i1,i2]+t(O[i1,i2])) + (O[i2,i1]+t(O[i2,i1]))*a0*U)
@@ -647,20 +647,16 @@ get.Ew_2D <- function(w=0,ns=1,tt=0,D=mclean(),deriv=0){
     out <- matrix(0,2*ns,2*ns)
     if (w>0){
         J <- matrix(0,2,1)
+        J[1,1] <- D$dPb207U235dt
+        J[2,1] <- D$dPb206U238dt
         if (deriv==1) {
             dEdw <- 2*w
-            J[1,1] <- D$d2Pb207U235dt2
-            J[2,1] <- D$d2Pb206U238dt2
             Ew <- J%*%dEdw%*%t(J)
         } else if (deriv==2) {
             d2Edw2 <- 2
-            J[1,1] <- 0 # TODO
-            J[2,1] <- 0 # TODO
             Ew <- J%*%d2Edw2%*%t(J)
         } else {
             E <- w^2
-            J[1,1] <- D$dPb207U235dt
-            J[2,1] <- D$dPb206U238dt
             Ew <- J%*%E%*%t(J)
         }
         diag(out[1:ns,1:ns]) <- Ew[1,1]

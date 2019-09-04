@@ -78,6 +78,8 @@
 #'     `model-1' isochron regression.
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from age plateau calculation
 #' @param ... optional parameters to the generic \code{plot} function
 #'
 #' @return
@@ -137,11 +139,11 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
                                 xlab='cumulative fraction',
-                                ylab='age [Ma]',hide=NULL,...){    
+                                ylab='age [Ma]',hide=NULL,omit=NULL,...){
     XY <- plot.spectrum.axes(x=x,alpha=alpha,xlab=xlab,
                              ylab=ylab,hide=hide,...)
     pc <- get.plateau.colours(x=x,levels=levels,plateau=plateau,
-                              hide=hide,plateau.col=plateau.col,
+                              hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
                               random.effects=random.effects,alpha=alpha)
     if (plateau){
@@ -169,8 +171,10 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
                              plateau.col=c("#00FF0080","#FF000080"),
                              non.plateau.col="#00FFFF80",sigdig=2,
                              exterr=TRUE,line.col='red',lwd=2,
-                             i2i=FALSE,hide=NULL,...){
-    x <- clear(x,hide)
+                             i2i=FALSE,hide=NULL,omit=NULL,...){
+    ns <- length(x)
+    plotit <- (1:ns)%ni%hide
+    calcit <- (1:ns)%ni%c(hide,omit)
     tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
@@ -178,14 +182,13 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     XY <- plot.spectrum.axes(x=X,alpha=alpha,xlab=x.lab,
                              ylab=y.lab,hide=hide,...)
     pc <- get.plateau.colours(x=X,levels=levels,plateau=plateau,
-                              hide=hide,plateau.col=plateau.col,
+                              hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
                               random.effects=random.effects,alpha=alpha)
     if (plateau){
         if (exterr) pc$plat <- add.exterr.to.wtdmean(x,pc$plat)
         plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
-        graphics::title(plateau.title(pc$plat,sigdig=sigdig,
-                                      Ar=TRUE,units='Ma'))
+        graphics::title(plateau.title(pc$plat,sigdig=sigdig,Ar=TRUE,units='Ma'))
     }
     plot.spectrum(XY=XY,col=pc$col)
     colourbar(z=levels,col=plateau.col,clabel=clabel)
@@ -193,9 +196,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
 }
 
 plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
-                               ylab='age [Ma]',hide=NULL,levels=NA,
-                               plateau.col=c("#00FF0080","#FF000080"),
-                               clabel="",...){
+                               ylab='age [Ma]',hide=NULL,...){
     ns <- nrow(x)
     x <- clear(x[,1:3,drop=FALSE],hide)
     valid <- !is.na(rowSums(x))
@@ -210,19 +211,19 @@ plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
     graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
     list(X=X,Yl=Yl,Yu=Yu,ylim=c(minY,maxY))
 }
-get.plateau.colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,
+get.plateau.colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,omit=NULL,
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 random.effects=TRUE,alpha=0.05){
     ns <- nrow(x)
-    if (!all(is.na(levels))) levels <- clear(levels,hide)
+    calcit <- (1:ns)%ni%c(hide,omit)
     if (plateau){
-        plat <- get.plateau(x,alpha=alpha,random.effects=random.effects)
+        plat <- get.plateau(x,alpha=alpha,random.effects=random.effects,calcit=calcit)
         plat$valid <- NULL
         colour <- rep(non.plateau.col,ns)
         np <- length(plat$i)
         levels <- levels[plat$i]
-        cols <- set.ellipse.colours(ns=np,levels=levels,col=plateau.col)
+        cols <- set.ellipse.colours(ns=np,levels=levels,hide=hide,col=plateau.col)
         colour[plat$i] <- cols
         plat$n <- ns
     } else {
@@ -269,7 +270,7 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
 }
 # x is a three column vector with Ar39
 # cumulative fractions, ages and uncertainties
-get.plateau <- function(x,alpha=0.05,random.effects=TRUE){
+get.plateau <- function(x,alpha=0.05,random.effects=TRUE,calcit=rep(TRUE,nrow(x))){
     X <- x[,1]/sum(x[,1],na.rm=TRUE)
     YsY <- subset(x,select=c(2,3))
     ns <- length(X)
@@ -283,8 +284,7 @@ get.plateau <- function(x,alpha=0.05,random.effects=TRUE){
             fract <- sum(X[i:j],na.rm=TRUE)
             Y <- YsY[i:j,1]
             sY <- YsY[i:j,2]
-            valid <- chauvenet(Y,sY,valid=rep(TRUE,j-i+1),
-                               random.effects=random.effects)
+            valid <- chauvenet(Y,sY,valid=calcit[i:j],random.effects=random.effects)
             if (all(valid) & (fract > out$fract)){
                 out <- weightedmean(YsY[i:j,,drop=FALSE],random.effects=random.effects,
                                     plot=FALSE,detect.outliers=FALSE,

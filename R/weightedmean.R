@@ -698,6 +698,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 # valid is a vector of logical flags indicating whether the corresponding
 # measurements have already been rejected or not
 chauvenet <- function(X,sX,valid,random.effects=TRUE){
+    if (sum(valid)<2) return(valid)
     fit <- get.weightedmean(X,sX,random.effects=random.effects,valid=valid)
     mu <- fit$mean[1]
     if (random.effects) sigma <- sqrt(fit$disp[1]^2 + sX^2)
