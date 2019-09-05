@@ -167,7 +167,7 @@ intersection.misfit.york <- function(tt,a,b,covmat=NULL,d=diseq()){
         dmda <- -D$Pb206U238
         dmdb <- -1
         dmdt <- D$dPb207U235dt/U - a*D$dPb206U238dt
-        dtda <- -dmda/dmdt
+        dtda <- -dmda/dmdt # implicit differentiation
         dtdb <- -dmdb/dmdt
         J <- matrix(0,2,2)
         J[1,1] <- dtda
