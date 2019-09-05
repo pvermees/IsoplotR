@@ -169,7 +169,10 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     if (model==2){
         out <- list(par=init)
     } else {
-        out <- optifix(parms=c(init,0),fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
+        if (model==1) initw <- c(init,0)  # no overdispersion
+        else initw <- c(init,init[1]/100) # 1% overdispersion as a first guess
+        names(initw)[3] <- 'w'
+        out <- optifix(parms=initw,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model),
                        lower=lower,upper=upper,
@@ -644,27 +647,25 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE,
 }
 
 get.Ew_2D <- function(w=0,ns=1,tt=0,D=mclean(),deriv=0){
+    J <- matrix(0,2,1)
+    J[1,1] <- D$dPb207U235dt
+    J[2,1] <- D$dPb206U238dt
+    if (deriv==1) {
+        dEdw <- 2*w
+        Ew <- J%*%dEdw%*%t(J)
+    } else if (deriv==2) {
+        d2Edw2 <- 2
+        Ew <- J%*%d2Edw2%*%t(J)
+    } else {
+        E <- w^2
+        Ew <- J%*%E%*%t(J)
+    }
     out <- matrix(0,2*ns,2*ns)
-    if (w>0){
-        J <- matrix(0,2,1)
-        J[1,1] <- D$dPb207U235dt
-        J[2,1] <- D$dPb206U238dt
-        if (deriv==1) {
-            dEdw <- 2*w
-            Ew <- J%*%dEdw%*%t(J)
-        } else if (deriv==2) {
-            d2Edw2 <- 2
-            Ew <- J%*%d2Edw2%*%t(J)
-        } else {
-            E <- w^2
-            Ew <- J%*%E%*%t(J)
-        }
-        diag(out[1:ns,1:ns]) <- Ew[1,1]
-        diag(out[(ns+1):(2*ns),(ns+1):(2*ns)]) <- Ew[2,2]
-        diag(out[1:ns,(ns+1):(2*ns)]) <- Ew[1,2]
-        diag(out[(ns+1):(2*ns),1:ns]) <- Ew[2,1]
-    } 
-   out
+    diag(out[1:ns,1:ns]) <- Ew[1,1]
+    diag(out[(ns+1):(2*ns),(ns+1):(2*ns)]) <- Ew[2,2]
+    diag(out[1:ns,(ns+1):(2*ns)]) <- Ew[1,2]
+    diag(out[(ns+1):(2*ns),1:ns]) <- Ew[2,1]
+    out
 }
 get.Ew_3D <- function(w,Z,a0,b0,deriv=0){
     ns <- length(Z)
