@@ -174,7 +174,9 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     }
     # then use the results for possible further fitting:
     if (model==2){
-        out <- fit
+        out <- list(par=rep(0,3),cov=matrix(0,3,3))
+        out$par[1:2] <- fit$par
+        out$cov[1:2,1:2] <- fit$cov
     } else {
         if (model==1) init <- c(fit$par,0)  # no overdispersion
         else init <- c(fit$par,fit$par[1]/100) # 1% overdispersion as a first guess
@@ -209,11 +211,9 @@ get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
         intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
         ta0b0 <- c(anchor[[2]],intercept)
     }
-    ta0b0w <- c(ta0b0,0) # add zero overdispersion w
-    covmat <- matrix(0,3,3)
-    covmat[1:2,1:2] <- intersection.misfit.york(tt=ta0b0[1],a=intercept,b=slope,
-                                                covmat=vcov(xyfit),d=x$d)
-    list(par=ta0b0w,cov=covmat)
+    covmat <- intersection.misfit.york(tt=ta0b0[1],a=intercept,b=slope,
+                                       covmat=vcov(xyfit),d=x$d)
+    list(par=ta0b0,cov=covmat)
 }
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
@@ -322,21 +322,20 @@ fisher.lud <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
     if (x$format %in% c(1,2,3)){
         fish <- data2ludwig_2D(x,tt=fit$par[1],a0=fit$par[2],w=fit$par[3],
                                exterr=fit$exterr,hessian=TRUE)$hessian
-        fish <- fisher_lud_2D(x,fit)
-        i2 <- (ns+1):(ns+2)
+        i2 <- (ns+1):(ns+3)
     } else if (x$format %in% c(4,5,6)){
         fish <- data2ludwig_3D(x,tt=fit$par[1],a0=fit$par[2],b0=fit$par[3],
                                w=fit$par[4],exterr=fit$exterr,hessian=TRUE)$hessian
-        i2 <- (ns+1):(ns+3)
+        i2 <- (ns+1):(ns+4)
     } else if (x$format %in% c(7,8)){
         fish <- data2ludwig_Th(x,tt=fit$par[1],a0=fit$par[2],b0=fit$par[3],
                                w=fit$par[4],exterr=fit$exterr,hessian=TRUE)$hessian
-        i2 <- (ns+1):(ns+3)
+        i2 <- (ns+1):(ns+4)
     }
     anchorfish(AA=fish[i1,i1],BB=fish[i1,i2],
                CC=fish[i2,i1],DD=fish[i2,i2],anchor=anchor)
 }
-anchorfish <- function(AA,BB,CC,DD,anchor){
+anchorfish <- function(AA,BB,CC,DD,anchor=list(FALSE,NA)){
     npar <- nrow(DD)
     out <- matrix(0,npar,npar)
     if (anchor[[1]] && is.numeric(anchor[[2]])){
