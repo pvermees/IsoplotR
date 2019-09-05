@@ -3,10 +3,8 @@
 concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05,
                                           model=1,anchor=list(FALSE,NA)){
     fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
-    out <- list()
+    out <- fit
     out$model <- model
-    out$mswd <- fit$mswd
-    out$p.value <- fit$p.value
     out$fact <- tfact(alpha,fit$df)
     out$format <- x$format
     if (wetherill){
@@ -16,18 +14,22 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
         out$x <- fit$par
         out$cov <- fit$cov
     }
+    np <- length(fit$par)
+    if (model==3) i <- 1:np
+    else i <- 1:(np-1)      # ignore w
+    np <-  # number of fit parameters
     if (model==1 && fit$mswd>1){
         out$err <- matrix(NA,3,length(out$x))
         rownames(out$err) <- c('s','ci','disp')
-        out$err['disp',] <-
-            out$fact*sqrt(fit$mswd)*sqrt(diag(out$cov))
+        out$err['disp',i] <-
+            out$fact*sqrt(fit$mswd)*sqrt(diag(out$cov)[i])
     } else {
-        out$err <- matrix(NA,2,length(out$x))
+        out$err <- matrix(NA,2,np)
         rownames(out$err) <- c('s','ci')
     }
     if (model==3) out$fact <- nfact(alpha)
-    out$err['s',] <- sqrt(diag(out$cov))
-    out$err['ci',] <- out$fact*out$err['s',]
+    out$err['s',i] <- sqrt(diag(out$cov)[i])
+    out$err['ci',i] <- out$fact*out$err['s',i]
     colnames(out$err) <- names(out$x)
     out
 }
@@ -355,8 +357,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
-        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
-        line4 <- substitute('overdispersion ='~a+b/-c~'% of Pb'[o],
+        rounded.disp <- roundit(fit$x['w'],fit$wci,sigdig=sigdig)
+        line4 <- substitute('overdispersion ='~a+b/-c~'Ma',
                             list(a=rounded.disp[1],
                                  b=rounded.disp[3],
                                  c=rounded.disp[2]))        

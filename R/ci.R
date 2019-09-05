@@ -45,23 +45,27 @@ profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
     ul <- wu - fit$w
     c(ll,ul)
 }
-profile_LL_discordia_disp <- function(fit,x,alpha=0.05){
-    w <- fit$w
-    ta0b0 <- fit$par
-    wrange <- c(0,1)
-    LLmax <- LL.lud.disp(w=w,x=x,ta0b0=ta0b0)
-    cutoff <- stats::qchisq(1-alpha,1)    
-    if (abs(LL.lud.disp(w=wrange[1],x=x,ta0b0=ta0b0)-LLmax) < cutoff/2){
+
+profile_LL_ludwig <- function(fit,x,alpha=0.05){
+    ta0b0w <- fit$par
+    w <- ta0b0w['w']
+    wmax <- 3*(w + sqrt(fit$cov['w','w']))
+    wrange <- c(0,wmax)
+    LLmax <- LL.lud.UPb(ta0b0w,x=x,exterr=FALSE,LL=TRUE)
+    cutoff <- stats::qchisq(1-alpha,1)
+    LLl <- get.ta0b0w(x,exterr=FALSE,model=3,w=wrange[1])$LL
+    if (abs(LLl-LLmax) < cutoff/2){
         wl <- 0
     } else {
-        wl <- stats::optimize(profile_discordia_helper,interval=c(wrange[1],w),
-                              x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
+        wl <- uniroot(profile_discordia_helper,interval=c(wrange[1],w),
+                      x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$root
     }
-    if (abs(LL.lud.disp(w=wrange[2],x=x,ta0b0=ta0b0)-LLmax) < cutoff/2){
+    LLu <- get.ta0b0w(x,exterr=FALSE,model=3,w=wrange[2])$LL
+    if (abs(LLu-LLmax) < cutoff/2){
         wu <- Inf
     } else {
-        wu <- stats::optimize(profile_discordia_helper,interval=c(w,wrange[2]),
-                              x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$minimum
+        wu <- uniroot(profile_discordia_helper,interval=c(w,wrange[2]),
+                      x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$root
     }
     ll <- w - wl
     ul <- wu - w
@@ -106,13 +110,13 @@ profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     LL <- LL.sigma(sigma,X,sX)
     abs(LLmax-LL-cutoff/2)
 }
-profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff){
-    LL <- LL.lud.disp(w=w,x=x,ta0b0=ta0b0)
-    abs(LLmax-LL-cutoff/2)
-}
 profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
     LL <- LL.uvw(w,UVW=UVW,x=x,doSm=doSm)
     abs(LLmax-LL-cutoff/2)
+}
+profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff=cutoff){
+    LL <- get.ta0b0w(x,exterr=FALSE,model=3,w=w)$LL
+    LLmax-LL-cutoff/2
 }
 
 LL.FT <- function(mu,sigma,y,m){

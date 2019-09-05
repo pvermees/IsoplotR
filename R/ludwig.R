@@ -102,6 +102,7 @@ ludwig.default <- function(x,...){
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA)){
     out <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+    if (model==3) out$wci <- profile_LL_ludwig(fit=out,x=x,alpha=alpha)
     out$n <- length(x)
     mswd <- mswd.lud(out$par,x=x,anchor=anchor)
     out <- c(out,mswd)
@@ -143,7 +144,7 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     out
 }
 
-get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
+get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
     # first do a model 2 regression:
     if (x$format < 4){
         fit <- get.ta0b0.model2.2D(x,anchor=anchor)
@@ -160,15 +161,20 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
         out$par[1:2] <- fit$par
         out$cov[1:2,1:2] <- fit$cov
     } else {
-        if (model==1) init <- c(fit$par,0)  # no overdispersion
-        else init <- c(fit$par,fit$par[1]/100) # 1% overdispersion as a first guess
+        if (model==1){
+            init <- c(fit$par,0)  # no overdispersion
+        } else {
+            if (is.numeric(w)) init <- c(fit$par,w)
+            else init <- c(fit$par,fit$par[1]/100) # 1% overdispersion as a first guess
+        }
         names(init)[3] <- 'w'
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
-                       fixed=fixit(x,anchor=anchor,model=model),
+                       fixed=fixit(x,anchor=anchor,model=model,w=w),
                        lower=lower,upper=upper,
                        control=list(fnscale=-1),...)
         out <- list()
+        out$LL <- fit$value
         out$par <- fit$par
         out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
     }
@@ -695,11 +701,11 @@ get.Ew_Th <- function(w,W,Z,x82,a0,b0,deriv=0){
     out
 }
 
-fixit <- function(x,anchor=list(FALSE,NA),model=1){
+fixit <- function(x,anchor=list(FALSE,NA),model=1,w=NA){
     if (x$format<4) np <- 3
     else np <- 4
     out <- rep(FALSE,np)
-    if (model==1) out[np] <- TRUE # fix w
+    if (model==1 | is.numeric(w)) out[np] <- TRUE # fix w
     if (anchor[[1]]){ # anchor t or a0(,b0)
         if (is.numeric(anchor[[2]])) out[1] <- TRUE # fix t
         else out[2:(np-1)] <- TRUE # fix a0(,b0)
