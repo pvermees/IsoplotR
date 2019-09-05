@@ -26,8 +26,8 @@
 #' @return
 #' \describe{
 #'
-#' \item{par}{a two-element vector with the lower concordia intercept
-#' and initial \eqn{^{207}}Pb/\eqn{^{206}}Pb-ratio.}
+#' \item{par}{a vector with the lower concordia intercept,
+#' the common Pb ratios and the dispersion parameter.}
 #'
 #' \item{cov}{the covariance matrix of \code{par}}
 #'
@@ -38,12 +38,6 @@
 #' Chi-square statistic) for the fit.}
 #'
 #' \item{p.value}{p-value of a Chi-square test for the linear fit}
-#'
-#' \item{w}{the overdispersion, i.e., a three-element vector with the
-#' estimated standard deviation of the (assumedly) Normal distribution
-#' that underlies the true isochron; and the lower and upper
-#' half-widths of its \eqn{100(1-\alpha)\%} confidence interval (only
-#' relevant if \code{model = 3}).}
 #'
 #' }
 #'
@@ -107,22 +101,10 @@ ludwig.default <- function(x,...){
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA)){
-    fit <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor)
-    if (model==2){
-        out <- fit
-    } else {
-        out <- list()
-        out$par <- fit$par
-        out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
-    }
-    out$model <- model
+    out <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     out$n <- length(x)
-    mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
+    mswd <- mswd.lud(out$par,x=x,anchor=anchor)
     out <- c(out,mswd)
-    if (model==3){
-        out$w <- c(fit$w,profile_LL_discordia_disp(fit,x=x,alpha=alpha))
-        names(out$w) <- c('s','ll','ul')
-    }
     if (x$format %in% c(1,2,3)) parnames <- c('t','76i','w')
     else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
     else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i','w')
@@ -181,11 +163,14 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
         if (model==1) init <- c(fit$par,0)  # no overdispersion
         else init <- c(fit$par,fit$par[1]/100) # 1% overdispersion as a first guess
         names(init)[3] <- 'w'
-        out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
+        fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model),
                        lower=lower,upper=upper,
                        control=list(fnscale=-1),...)
+        out <- list()
+        out$par <- fit$par
+        out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
     }
     out$model <- model
     out$exterr <- exterr
@@ -321,15 +306,15 @@ fisher.lud <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
     i1 <- 1:ns
     if (x$format %in% c(1,2,3)){
         fish <- data2ludwig_2D(x,tt=fit$par[1],a0=fit$par[2],w=fit$par[3],
-                               exterr=fit$exterr,hessian=TRUE)$hessian
+                               exterr=exterr,hessian=TRUE)$hessian
         i2 <- (ns+1):(ns+3)
     } else if (x$format %in% c(4,5,6)){
         fish <- data2ludwig_3D(x,tt=fit$par[1],a0=fit$par[2],b0=fit$par[3],
-                               w=fit$par[4],exterr=fit$exterr,hessian=TRUE)$hessian
+                               w=fit$par[4],exterr=exterr,hessian=TRUE)$hessian
         i2 <- (ns+1):(ns+4)
     } else if (x$format %in% c(7,8)){
         fish <- data2ludwig_Th(x,tt=fit$par[1],a0=fit$par[2],b0=fit$par[3],
-                               w=fit$par[4],exterr=fit$exterr,hessian=TRUE)$hessian
+                               w=fit$par[4],exterr=exterr,hessian=TRUE)$hessian
         i2 <- (ns+1):(ns+4)
     }
     anchorfish(AA=fish[i1,i1],BB=fish[i1,i2],
