@@ -6,7 +6,6 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     out <- list()
     out$model <- model
     out$mswd <- fit$mswd
-    out$w <- fit$w
     out$p.value <- fit$p.value
     out$fact <- tfact(alpha,fit$df)
     out$format <- x$format
@@ -33,7 +32,8 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     out
 }
 # extracts concordia intersection parameters from an ordinary York fit
-concordia.intersection.ab <- function(a,b,exterr=FALSE,wetherill=FALSE,d=diseq()){
+concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
+                                      exterr=FALSE,wetherill=FALSE,d=diseq()){
     l8 <- lambda('U238')[1]
     ta <- get.Pb207Pb206.age(a,d=d)[1]
     out <- c(1,a) # tl, 7/6 intercept
@@ -77,7 +77,7 @@ twfit2wfit <- function(fit,x){
     if (x$format %in% c(1,2,3)){
         a0 <- 1
         b0 <- fit$par['76i']
-        E[c(1,3),c(1,3)] <- fit$cov
+        E[c(1,3),c(1,3)] <- fit$cov[1:2,1:2]
     } else if (x$format %in% c(4,5,6)){
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
@@ -154,13 +154,27 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0,d=diseq()){
     YY - BB*XX
 }
 # a = intercept, b = slope on TW concordia
-intersection.misfit.york <- function(tt,a,b,d=diseq()){
+intersection.misfit.york <- function(tt,a,b,covmat=NULL,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
     D <- mclean(tt=tt,d=d)
     # misfit is based on difference in slope in TW space
-    D$Pb207U235/U - a*D$Pb206U238 - b
+    m <- D$Pb207U235/U - a*D$Pb206U238 - b
+    if (is.null(covmat)){
+        return(m)
+    } else { # error propagation
+        dmda <- -D$Pb206U238
+        dmdb <- -1
+        dmdt <- D$dPb207U235dt/U - a*D$dPb206U238dt
+        dtda <- -dmda/dmdt
+        dtdb <- -dmdb/dmdt
+        J <- matrix(0,2,2)
+        J[1,1] <- dtda
+        J[1,2] <- dtdb
+        J[2,1] <- 1    # dada
+        return(J%*%covmat%*%t(J))
+    }
 }
 
 discordia.line <- function(fit,wetherill,d=diseq()){

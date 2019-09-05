@@ -106,10 +106,16 @@ ludwig.default <- function(x,...){
 #'     \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
-ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
-    fit <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor,...)
-    out <- fit[c('par','w','model')]
-    out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA)){
+    fit <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+    if (model==2){
+        out <- fit
+    } else {
+        out <- list()
+        out$par <- fit$par
+        out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+    }
+    out$model <- model
     out$n <- length(x)
     mswd <- mswd.lud(fit$par,x=x,anchor=anchor)
     out <- c(out,mswd)
@@ -117,9 +123,9 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),.
         out$w <- c(fit$w,profile_LL_discordia_disp(fit,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
-    if (x$format %in% c(1,2,3)) parnames <- c('t','76i')
-    else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i')
-    else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i')
+    if (x$format %in% c(1,2,3)) parnames <- c('t','76i','w')
+    else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
+    else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i','w')
     else stop("Illegal input format.")
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
@@ -128,6 +134,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),.
 }
 
 mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
+    ns <- length(x)
     tt <- ta0b0[1]
     a0 <- ta0b0[2]
     out <- list()
@@ -143,7 +150,7 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
         else if (tanchored) out$df <- 2*ns-2
         else out$df <- 2*ns-3
     }
-    SS <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=0,exterr=exterr)$SS
+    SS <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=0)$SS
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)
         out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
@@ -157,22 +164,22 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),...){
     # first do a model 2 regression:
     if (x$format < 4){
-        init <- get.ta0b0.model2.2D(x,anchor=anchor)
+        fit <- get.ta0b0.model2.2D(x,anchor=anchor)
         lower <- c(0,0,0)
-        upper <- c(10000,100,init[1])
+        upper <- c(10000,100,fit$par[1])
     } else {
-        init <- get.ta0b0.model2.3D(x,anchor=anchor)
+        fit <- get.ta0b0.model2.3D(x,anchor=anchor)
         lower <- c(0,0,0,0)
-        upper <- c(10000,100,100,init[1])
+        upper <- c(10000,100,100,fit$par[1])
     }
     # then use the results for possible further fitting:
     if (model==2){
-        out <- list(par=init)
+        out <- fit
     } else {
-        if (model==1) initw <- c(init,0)  # no overdispersion
-        else initw <- c(init,init[1]/100) # 1% overdispersion as a first guess
-        names(initw)[3] <- 'w'
-        out <- optifix(parms=initw,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
+        if (model==1) init <- c(fit$par,0)  # no overdispersion
+        else init <- c(fit$par,fit$par[1]/100) # 1% overdispersion as a first guess
+        names(init)[3] <- 'w'
+        out <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model),
                        lower=lower,upper=upper,
@@ -202,7 +209,11 @@ get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
         intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
         ta0b0 <- c(anchor[[2]],intercept)
     }
-    ta0b0
+    ta0b0w <- c(ta0b0,0) # add zero overdispersion w
+    covmat <- matrix(0,3,3)
+    covmat[1:2,1:2] <- intersection.misfit.york(tt=ta0b0[1],a=intercept,b=slope,
+                                                covmat=vcov(xyfit),d=x$d)
+    list(par=ta0b0w,cov=covmat)
 }
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
