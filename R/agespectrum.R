@@ -16,7 +16,11 @@
 #' definition is different (and simpler) than the one used by
 #' \code{Isoplot} (Ludwig, 2003). However, it is important to mention
 #' that all definitions of an age plateau are heuristic by nature and
-#' should not be used for quantitative inference.
+#' should not be used for quantitative inference. It is possible (and
+#' likely) that the plateau steps exhibit significant
+#' overdispersion. This overdispersion can be manually reduced by
+#' removing individual heating steps with the optional \code{omit}
+#' argument.
 #'
 #' @param x
 #' a three-column matrix whose first column gives the amount of
@@ -163,7 +167,11 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 #'     calibration factor) uncertainties?
 #' @examples
 #' data(examples)
-#' agespectrum(examples$ArAr,ylim=c(0,80))
+#' par(mfrow=c(2,1))
+#' agespectrum(examples$ArAr)
+#' # removing the first 6 steps yields the longest plateau
+#' # that passes the chi-square test for homogeneity
+#' agespectrum(examples$ArAr,omit=1:6)
 #' @rdname agespectrum
 #' @export
 agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
@@ -262,11 +270,16 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
                              u=units,
                              n=length(fit$i),
                              N=fit$n))
+    line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
+                        list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig),
+                             b=roundit(fit$p.value,fit$p.value,
+                                       sigdig=sigdig)))
     a <- signif(100*fit$fract,sigdig)
-    if (Ar) line2 <- bquote(paste("Includes ",.(a),"% of the ",""^"39","Ar"))
-    else line2 <- bquote(paste("Includes ",.(a),"% of the spectrum"))
-    mymtext(line1,line=1,...)
-    mymtext(line2,line=0,...)
+    if (Ar) line3 <- bquote(paste("includes ",.(a),"% of the ",""^"39","Ar"))
+    else line3 <- bquote(paste("includes ",.(a),"% of the spectrum"))
+    mymtext(line1,line=2,...)
+    mymtext(line2,line=1,...)
+    mymtext(line3,line=0,...)
 }
 # x is a three column vector with Ar39
 # cumulative fractions, ages and uncertainties
