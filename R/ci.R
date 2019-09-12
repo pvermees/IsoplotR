@@ -69,7 +69,9 @@ profile_LL_ludwig <- function(fit,x,alpha=0.05){
     }
     ll <- w - wl
     ul <- wu - w
-    c(ll,ul)
+    out <- c(ll,ul)
+    names(out) <- c('ll','ul')
+    out
 }
 
 profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
