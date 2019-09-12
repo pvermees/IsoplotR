@@ -18,8 +18,6 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
     if (model==3) i <- 1:np
     else i <- 1:(np-1)      # ignore w
     if (model==1 && fit$mswd>1){
-        ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@3@"]]));##:ess-bp-end:##
         out$err <- matrix(NA,3,length(out$x))
         rownames(out$err) <- c('s','ci','disp')
         out$err['disp',i] <-
