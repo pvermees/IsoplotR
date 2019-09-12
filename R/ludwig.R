@@ -145,27 +145,22 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 }
 
 get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
+    out <- list()
     # first do a model 2 regression:
-    if (x$format < 4){
-        fit <- get.ta0b0.model2.2D(x,anchor=anchor)
-        lower <- c(0,0,0)
-        upper <- c(10000,100,fit$par[1])
-    } else {
-        fit <- get.ta0b0.model2.3D(x,anchor=anchor)
-        lower <- c(0,0,0,0)
-        upper <- c(10000,100,100,fit$par[1])
-    }
+    if (x$format<4) ta0b0 <- get.ta0b0.model2.2D(x,anchor=anchor)
+    else ta0b0 <- get.ta0b0.model2.3D(x,anchor=anchor)
     # then use the results for possible further fitting:
     if (model==2){
-        out <- list(par=rep(0,3),cov=matrix(0,3,3))
-        out$par[1:2] <- fit$par
-        out$cov[1:2,1:2] <- fit$cov
+        out$par <- c(ta0b0,0)
+        out$cov <- matrix(0,length(ta0b0)+1,length(ta0b0)+1)
     } else {
+        lower <- c(ta0b0/2,0)
+        upper <- c(2*ta0b0,ta0b0[1])
         if (model==1){
-            init <- c(fit$par,0)  # no overdispersion
+            init <- c(ta0b0,0)  # no overdispersion
         } else {
-            if (is.numeric(w)) init <- c(fit$par,w)
-            else init <- c(fit$par,fit$par[1]/100) # 1% overdispersion as a first guess
+            if (is.numeric(w)) init <- c(ta0b0,w)
+            else init <- c(ta0b0,ta0b0[1]/100) # 1% overdispersion as a first guess
         }
         names(init)[3] <- 'w'
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
@@ -183,28 +178,22 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
     out
 }
 get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
-    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-    if (!anchor[[1]]) {
-        xyfit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-        intercept <- xyfit$coef[1]
-        slope <- xyfit$coef[2]
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+    tlim <- c(1e-5,min(get.Pb206U238.age(x)[,1]))
+    if (!anchor[[1]]){
+        tt <- stats::optimise(SS.model2.2D,interval=tlim,x=x)$minimum
+        fits <- model2fit.2D(tt,x=x)
+        a0 <- fits$y0
     } else if (is.na(anchor[[2]])){
-        intercept <- settings('iratio','Pb207Pb206')[1]
-        xyfit <- stats::lm(I(xy[,'Y']-intercept) ~ 0 + xy[,'X'])
-        slope <- xyfit$coef
-        ta0b0 <- concordia.intersection.ab(intercept,slope,wetherill=FALSE,d=x$d)
+        a0 <- settings('iratio','Pb207Pb206')[1]
+        tt <- stats::optimise(SS.model2.2D,interval=tlim,x=x,a0=a0)$minimum
     } else if (is.numeric(anchor[[2]])){
-        TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
-        xyfit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
-                           0 + I(xy[,'X']-TW$x['U238Pb206']))
-        slope <- xyfit$coef
-        intercept <- TW$x['Pb207Pb206'] - slope*TW$x['U238Pb206']
-        ta0b0 <- c(anchor[[2]],intercept)
+        tt <- anchor[[2]]
+        fits <- model2fit.2D(tt,x=x)
+        a0 <- fits$y0[1]
     }
-    covmat <- intersection.misfit.york(tt=ta0b0[1],a=intercept,b=slope,
-                                       covmat=vcov(xyfit),d=x$d)
-    list(par=ta0b0,cov=covmat)
+    out <- c(tt,a0)
+    names(out) <- c('t','76i')
+    out
 }
 get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
     tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
@@ -235,9 +224,29 @@ get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
         names(out) <- c('t','68i','78i')
     out
 }
+SS.model2.2D <- function(tt,x,a0=NA){
+    model2fit.2D(tt=tt,x=x,a0=a0)$SS
+}
 SS.model2.3D <- function(tt,x,a0=NA,b0=NA){
-    fits <- model2fit.3D(tt=tt,x=x,a0=a0,b0=b0)
-    fits$SS
+    model2fit.3D(tt=tt,x=x,a0=a0,b0=b0)$SS
+}
+model2fit.2D <- function(tt,x=x,a0=NA,b0=NA){
+    ns <- length(x)
+    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
+    xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
+    yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
+    out <- list()
+    out$y0 <- 0
+    if (is.na(a0)){
+        fit <- stats::lm(I(xy[,'Y']-yr) ~ I(xy[,'X']-xr) + 0)
+        out$y0 <- yr - fit$coef[1]*xr
+        out$SS <- sum(fit$residuals^2)
+    } else {
+        out$y0 <- a0
+        yp <- yr+(a0-yr)*(xr-xy[,'X'])/xr
+        out$SS <- sum((yp-xy[,'Y'])^2)
+    }
+    out
 }
 model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
     ns <- length(x)

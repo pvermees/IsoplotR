@@ -260,7 +260,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb206U238')
         }
-    } else if (option==2){ # 38/06 vs. 07/06
+    } else if (option==2){ # 07/06 vs. 38/06
         for (i in 1:ns){
             td <- tera.wasserburg(x,i=i)
             out[i,] <- data2york_UPb_helper(td,i1='U238Pb206',i2='Pb207Pb206')
