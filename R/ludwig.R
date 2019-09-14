@@ -101,19 +101,19 @@ ludwig.default <- function(x,...){
 #' @rdname ludwig
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA)){
-    out <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor)
-    if (model==3) out$wci <- profile_LL_ludwig(fit=out,x=x,alpha=alpha)
-    out$n <- length(x)
-    mswd <- mswd.lud(out$par,x=x,anchor=anchor)
-    out <- c(out,mswd)
     if (x$format %in% c(1,2,3)) parnames <- c('t','76i')
     else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i')
     else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i')
     else stop("Illegal input format.")
     if (model==3) parnames <- c(parnames,'w')
+    out <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
-    colnames(out$cov) <- parnames
+    colnames(out$cov) <- parnames    
+    out$n <- length(x)
+    mswd <- mswd.lud(out$par,x=x,anchor=anchor)
+    out <- c(out,mswd)
+    if (model==3) out$wci <- profile_LL_ludwig(fit=out,x=x,alpha=alpha)
     out
 }
 
@@ -376,7 +376,7 @@ data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
             out$jacobian['w'] <- -(dlnDetEDdw + KL%*%dOdw%*%KL)/2
         }
     }
-    if (hessian){
+    if (hessian){ # second derivatives of the NEGATIVE log-likelihood
         out$hessian <- matrix(0,ns+np,ns+np)
         hesnames <- c(paste0('c0[',1:ns,']'),'t','a0','w')[1:(ns+np)]
         rownames(out$hessian) <- hesnames
@@ -386,26 +386,26 @@ data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
         d2KLdt2[i2] <- -D$d2Pb206U238dt2 # d2Ldt2
         d2KLdc0da0 <- matrix(0,2*ns,ns)
         diag(d2KLdc0da0[i1,i1]) <- -U    # d2Kdc0da0
-        out$hessian[i1,i1] <- t(JKL[,i1])%*%O%*%JKL[,i1]              # d2dc02
-        out$hessian['t',i1] <- t(JKL[,'t'])%*%O%*%JKL[,i1]            # d2dc0dt
+        out$hessian[i1,i1] <- t(JKL[,i1])%*%O%*%JKL[,i1]                  # d2dc02
+        out$hessian['t',i1] <- t(JKL[,'t'])%*%O%*%JKL[,i1]                # d2dc0dt
         out$hessian['a0',i1] <-
-            t(JKL[,'a0'])%*%O%*%JKL[,i1] + KL%*%O%*%d2KLdc0da0        # d2dc0da0
+            t(JKL[,'a0'])%*%O%*%JKL[,i1] + KL%*%O%*%d2KLdc0da0            # d2dc0da0
         out$hessian['t','t'] <-
-            t(JKL[,'t'])%*%O%*%JKL[,'t'] + KL%*%O%*%d2KLdt2           # d2dt2
-        out$hessian['a0','a0'] <- t(JKL[,'a0'])%*%O%*%JKL[,'a0']      # d2da02
-        out$hessian[i1,'t'] <- out$hessian['t',i1]                    # d2dc0dt
-        out$hessian[i1,'a0'] <- out$hessian['a0',i1]                  # d2dc0da0
+            t(JKL[,'t'])%*%O%*%JKL[,'t'] + KL%*%O%*%d2KLdt2               # d2dt2
+        out$hessian['a0','a0'] <- t(JKL[,'a0'])%*%O%*%JKL[,'a0']          # d2da02
+        out$hessian[i1,'t'] <- out$hessian['t',i1]                        # d2dc0dt
+        out$hessian[i1,'a0'] <- out$hessian['a0',i1]                      # d2dc0da0
         if (np==3){
             d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=2)
-            d2lnDetEDdw2 <- trace(O%*%d2EDdw2 - trace(O%*%dEDdw%*%O%*%dEDdw))
-            d2Odw2 <- dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw 
-            out$hessian['w','w'] <- -(d2lnDetEDdw2 + KL%*%d2Odw2%*%KL)/2 # d2dw2
-            out$hessian['w',i1] <- KL%*%dOdw%*%JKL[,i1]                  # d2dwdc0
-            out$hessian['w','t'] <- KL%*%dOdw%*%JKL[,'t']                # d2dwdt
-            out$hessian['w','a0'] <- KL%*%dOdw%*%JKL[,'a0']              # d2dwda0
-            out$hessian[i1,'w'] <- out$hessian['w',i1]                   # d2dc0dw
-            out$hessian['t','w'] <- out$hessian['w','t']                 # d2dtdw
-            out$hessian['a0','w'] <- out$hessian['w','a0']               # d2da0dw
+            d2lnDetEDdw2 <- trace(O%*%d2EDdw2) - trace(O%*%dEDdw%*%O%*%dEDdw) 
+            d2Odw2 <- -(dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw)
+            out$hessian['w','w'] <- (d2lnDetEDdw2 + KL%*%d2Odw2%*%KL)/2   # d2dw2
+            out$hessian['w',i1] <- KL%*%dOdw%*%JKL[,i1]                   # d2dwdc0
+            out$hessian['w','t'] <- KL%*%dOdw%*%JKL[,'t']                 # d2dwdt
+            out$hessian['w','a0'] <- KL%*%dOdw%*%JKL[,'a0']               # d2dwda0
+            out$hessian[i1,'w'] <- out$hessian['w',i1]                    # d2dc0dw
+            out$hessian['t','w'] <- out$hessian['w','t']                  # d2dtdw
+            out$hessian['a0','w'] <- out$hessian['w','a0']                # d2da0dw
         }
     }
     out
@@ -477,7 +477,7 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     KLM <- c(K,L,M)
     out$SS <- KLM%*%O%*%KLM
     detED <- determinant(ED,logarithm=TRUE)$modulus
-    out$LL <- -(3*log(2*pi)/2 + detED/2 + out$SS)/2
+    out$LL <- -(3*log(2*pi) + detED + out$SS)/2
     if (jacobian | hessian){
         JKLM <- matrix(0,3*ns,ns+3) # derivatives of KLM w.r.t. c0, t, a0 and b0
         colnames(JKLM) <- c(paste0('c0[',i1,']'),'t','a0','b0')
