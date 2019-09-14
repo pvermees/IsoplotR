@@ -106,10 +106,11 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA)){
     out$n <- length(x)
     mswd <- mswd.lud(out$par,x=x,anchor=anchor)
     out <- c(out,mswd)
-    if (x$format %in% c(1,2,3)) parnames <- c('t','76i','w')
-    else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
-    else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i','w')
+    if (x$format %in% c(1,2,3)) parnames <- c('t','76i')
+    else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i')
+    else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i')
     else stop("Illegal input format.")
+    if (model==3) parnames <- c(parnames,'w')
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
     colnames(out$cov) <- parnames
@@ -118,22 +119,18 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA)){
 
 mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     ns <- length(x)
-    tt <- ta0b0[1]
-    a0 <- ta0b0[2]
     out <- list()
     anchored <- anchor[[1]]
     tanchored <- is.numeric(anchor[[2]])
     if (x$format<4){
-        b0 <- 0
         if (anchored) out$df <- ns-1
         else out$df <- ns-2
     } else {
-        b0 <- ta0b0[3]
         if (anchored && tanchored) out$df <- 2*ns-1
         else if (tanchored) out$df <- 2*ns-2
         else out$df <- 2*ns-3
     }
-    SS <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=0)$SS
+    SS <- data2ludwig(x,ta0b0=ta0b0)$SS
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)
         out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
@@ -152,13 +149,10 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
         out$par <- ta0b0
         out$cov <- fit$cov
     } else {
+        init <- ta0b0
         lower <- ta0b0/2
         upper <- 2*ta0b0
-        if (model==1){
-            init <- c(ta0b0,0)  # no overdispersion
-            lower <- c(lower,0)
-            upper <- c(upper,0)
-        } else { # model 3
+        if (model==3){
             if (is.numeric(w)){
                 init <- c(init,w)
                 lower <- c(lower,0)
@@ -248,50 +242,30 @@ SS.model2 <- function(ta0b0,x){
 }
 
 LL.lud.UPb <- function(ta0b0w,x,exterr=FALSE,LL=TRUE){
-    tt <- ta0b0w[1]
-    a0 <- ta0b0w[2]
-    if (x$format<4){
-        b0 <- 0
-        w <- 0
-    } else {
-        b0 <- ta0b0w[3]
-        w <- ta0b0w[4]        
-    }
-    l <- data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr)
+    l <- data2ludwig(x,ta0b0w=ta0b0w,exterr=exterr)
     if (LL) out <- l$LL
     else out <- l$SS
     out
 }
 
 LL.lud.UPb.gr <- function(ta0b0w,x,exterr=FALSE){
-    tt <- ta0b0w[1]
-    a0 <- ta0b0w[2]
-    if (x$format<4){
-        b0 <- 0
-        w <- 0
-    } else {
-        b0 <- ta0b0w[3]
-        w <- ta0b0w[4]
-    }
-    data2ludwig(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr,jacobian=TRUE)$jacobian
+    data2ludwig(x,ta0b0w=ta0b0w,exterr=exterr,jacobian=TRUE)$jacobian
 }
 
 fisher.lud <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
     ns <- length(x)
     i1 <- 1:ns
     if (x$format %in% c(1,2,3)){
-        fish <- data2ludwig_2D(x,tt=fit$par[1],a0=fit$par[2],w=fit$par[3],
-                               exterr=exterr,hessian=TRUE)$hessian
-        i2 <- (ns+1):(ns+3)
+        fish <- data2ludwig_2D(x,ta0w=fit$par,exterr=exterr,hessian=TRUE)$hessian
     } else if (x$format %in% c(4,5,6)){
-        fish <- data2ludwig_3D(x,tt=fit$par[1],a0=fit$par[2],b0=fit$par[3],
-                               w=fit$par[4],exterr=exterr,hessian=TRUE)$hessian
-        i2 <- (ns+1):(ns+4)
+        fish <- data2ludwig_3D(x,ta0b0w=fit$par,exterr=exterr,hessian=TRUE)$hessian
     } else if (x$format %in% c(7,8)){
-        fish <- data2ludwig_Th(x,tt=fit$par[1],a0=fit$par[2],b0=fit$par[3],
-                               w=fit$par[4],exterr=exterr,hessian=TRUE)$hessian
-        i2 <- (ns+1):(ns+4)
+        fish <- data2ludwig_Th(x,ta0b0w=fit$par,exterr=exterr,hessian=TRUE)$hessian
+    } else {
+        stop("Incorrect input format.")
     }
+    np <- length(fit$par)
+    i2 <- (ns+1):(ns+np)
     anchorfish(AA=fish[i1,i1],BB=fish[i1,i2],
                CC=fish[i2,i1],DD=fish[i2,i2],anchor=anchor)
 }
@@ -314,24 +288,28 @@ anchorfish <- function(AA,BB,CC,DD,anchor=list(FALSE,NA)){
     out
 }
 
-data2ludwig <- function(x,tt,a0,b0=0,w=0,exterr=FALSE,
+data2ludwig <- function(x,ta0b0w,exterr=FALSE,
                         jacobian=FALSE,hessian=FALSE){
     if (x$format %in% c(1,2,3))
-        out <- data2ludwig_2D(x,tt=tt,a0=a0,w=w,exterr=exterr,
+        out <- data2ludwig_2D(x,ta0w=ta0b0w,exterr=exterr,
                               jacobian=jacobian,hessian=hessian)
     else if (x$format %in% c(4,5,6))
-        out <- data2ludwig_3D(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr,
+        out <- data2ludwig_3D(x,ta0b0w=ta0b0w,exterr=exterr,
                               jacobian=jacobian,hessian=hessian)
     else if (x$format %in% c(7,8))
-        out <- data2ludwig_Th(x,tt=tt,a0=a0,b0=b0,w=w,exterr=exterr,
+        out <- data2ludwig_Th(x,ta0b0w=ta0b0w,exterr=exterr,
                               jacobian=jacobian,hessian=hessian)
     else stop('Incorrect input format.')
     out
 }
-data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
+data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
                            jacobian=FALSE,hessian=FALSE){
     out <- list()
     U <- iratio('U238U235')[1]
+    np <- min(3,length(ta0w)) # number of parameters
+    tt <- ta0w[1]
+    a0 <- ta0w[2]
+    if (np==3) w <- ta0w[3] # model 3 regression
     ns <- length(x)
     zeros <- rep(0,ns)
     E <- matrix(0,2*ns+6,2*ns+6)
@@ -358,8 +336,11 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
     E[2*ns+4,2*ns+4] <- lambda('Pa231')[2]^2
     E[2*ns+5,2*ns+5] <- lambda('Th230')[2]^2
     E[2*ns+6,2*ns+6] <- lambda('Ra226')[2]^2
-    Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
-    ED <- J%*%E%*%t(J) + Ew
+    ED <- J%*%E%*%t(J)
+    if (np==3){
+        Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
+        ED <- ED + Ew
+    }
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     O <- blockinverse(AA=ED[i1,i1],BB=ED[i1,i2],
@@ -384,18 +365,20 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
         JKL[i1,'t']  <- -D$dPb207U235dt # dKdt
         JKL[i2,'t']  <- -D$dPb206U238dt # dLdt
         JKL[i1,'a0'] <- -U*c0           # dKda0
-        out$jacobian <- rep(0,3) # derivatives of LL w.r.t t, a0 and w
-        names(out$jacobian) <- c('t','a0','w')
+        out$jacobian <- rep(0,np) # derivatives of LL w.r.t t, a0 and w
+        names(out$jacobian) <- c('t','a0','w')[1:np]
         out$jacobian['t'] <- -KL%*%O%*%JKL[,'t']
         out$jacobian['a0'] <- -KL%*%O%*%JKL[,'a0']
-        dEDdw <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=1)
-        dlnDetEDdw <- trace(O%*%dEDdw)
-        dOdw <- -O%*%dEDdw%*%O
-        out$jacobian['w'] <- -(dlnDetEDdw + KL%*%dOdw%*%KL)/2
+        if (np==3){
+            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=1)
+            dlnDetEDdw <- trace(O%*%dEDdw)
+            dOdw <- -O%*%dEDdw%*%O
+            out$jacobian['w'] <- -(dlnDetEDdw + KL%*%dOdw%*%KL)/2
+        }
     }
     if (hessian){
-        out$hessian <- matrix(0,ns+3,ns+3)
-        hesnames <- c(paste0('c0[',1:ns,']'),'t','a0','w')
+        out$hessian <- matrix(0,ns+np,ns+np)
+        hesnames <- c(paste0('c0[',1:ns,']'),'t','a0','w')[1:(ns+np)]
         rownames(out$hessian) <- hesnames
         colnames(out$hessian) <- hesnames
         d2KLdt2 <- rep(0,2*ns)
@@ -410,26 +393,32 @@ data2ludwig_2D <- function(x,tt,a0,w=0,exterr=FALSE,
         out$hessian['t','t'] <-
             t(JKL[,'t'])%*%O%*%JKL[,'t'] + KL%*%O%*%d2KLdt2           # d2dt2
         out$hessian['a0','a0'] <- t(JKL[,'a0'])%*%O%*%JKL[,'a0']      # d2da02
-        d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=2)
-        d2lnDetEDdw2 <- trace(O%*%d2EDdw2 - trace(O%*%dEDdw%*%O%*%dEDdw))
-        d2Odw2 <- dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw 
-        out$hessian['w','w'] <- -(d2lnDetEDdw2 + KL%*%d2Odw2%*%KL )/2 # d2dw2
-        out$hessian['w',i1] <- KL%*%dOdw%*%JKL[,i1]                   # d2dwdc0
-        out$hessian['w','t'] <- KL%*%dOdw%*%JKL[,'t']                 # d2dwdt
-        out$hessian['w','a0'] <- KL%*%dOdw%*%JKL[,'a0']               # d2dwda0
-        out$hessian[i1,'t'] <- out$hessian['t',i1]                    # d2dc0dt
-        out$hessian[i1,'a0'] <- out$hessian['a0',i1]                  # d2dc0da0
-        out$hessian[i1,'w'] <- out$hessian['w',i1]                    # d2dc0dw
-        out$hessian['t','w'] <- out$hessian['w','t']                  # d2dtdw
-        out$hessian['a0','w'] <- out$hessian['w','a0']                # d2da0dw
+        if (np==3){
+            d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=2)
+            d2lnDetEDdw2 <- trace(O%*%d2EDdw2 - trace(O%*%dEDdw%*%O%*%dEDdw))
+            d2Odw2 <- dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw 
+            out$hessian['w','w'] <- -(d2lnDetEDdw2 + KL%*%d2Odw2%*%KL )/2 # d2dw2
+            out$hessian['w',i1] <- KL%*%dOdw%*%JKL[,i1]                   # d2dwdc0
+            out$hessian['w','t'] <- KL%*%dOdw%*%JKL[,'t']                 # d2dwdt
+            out$hessian['w','a0'] <- KL%*%dOdw%*%JKL[,'a0']               # d2dwda0
+            out$hessian[i1,'t'] <- out$hessian['t',i1]                    # d2dc0dt
+            out$hessian[i1,'a0'] <- out$hessian['a0',i1]                  # d2dc0da0
+            out$hessian[i1,'w'] <- out$hessian['w',i1]                    # d2dc0dw
+            out$hessian['t','w'] <- out$hessian['w','t']                  # d2dtdw
+            out$hessian['a0','w'] <- out$hessian['w','a0']                # d2da0dw
+        }
     }
     out
 }
 # rederived from Ludwig (1998):
-data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,
-                           jacobian=FALSE,hessian=FALSE){
+data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     out <- list()
     U <- iratio('U238U235')[1]
+    np <- min(4,length(ta0b0w)) # number of parameters
+    tt <- ta0b0w[1]
+    a0 <- ta0b0w[2]
+    b0 <- ta0b0w[3]
+    if (np==4) w <- ta0b0w[4] # model 3 regression
     ns <- length(x)
     zeros <- rep(0,ns)
     E <- matrix(0,3*ns+6,3*ns+6)
@@ -460,8 +449,11 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,
     E[3*ns+4,3*ns+4] <- (lambda('Pa231')[2]*1000)^2
     E[3*ns+5,3*ns+5] <- (lambda('Th230')[2]*1000)^2
     E[3*ns+6,3*ns+6] <- (lambda('Ra226')[2]*1000)^2
-    Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
-    ED <- J%*%E%*%t(J) + Ew
+    ED <- J%*%E%*%t(J)
+    if (np==4){
+        Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
+        ED <- ED + Ew
+    }
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     i3 <- (2*ns+1):(3*ns)
@@ -496,15 +488,17 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,
         JD[i2,'t']  <- -D$dPb206U238dt # dLdt
         JD[i2,'a0'] <- -c0             # dLda0
         JD[i1,'b0'] <- -U*c0           # dKdb0
-        out$jacobian <- rep(0,4) # derivatives of LL w.r.t t, a0, b0 and w
-        names(out$jacobian) <- c('t','a0','b0','w')
+        out$jacobian <- rep(0,np) # derivatives of LL w.r.t t, a0, b0 (and w)
+        names(out$jacobian) <- c('t','a0','b0','w')[1:np]
         out$jacobian['t'] <- -KLM%*%O%*%JKLM[,'t']
         out$jacobian['a0'] <- -KLM%*%O%*%JKLM[,'a0']
         out$jacobian['b0'] <- -KLM%*%O%*%JKLM[,'b0']
-        dEDdw <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=1)
-        dlnDetEDdw <- trace(O%*%dEDdw)
-        dOdw <- -O%*%dEDdw%*%O
-        out$jacobian['w'] <- -(dlnDetEDdw + KLM%*%dOdw%*%KLM)/2
+        if (np==4){
+            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=1)
+            dlnDetEDdw <- trace(O%*%dEDdw)
+            dOdw <- -O%*%dEDdw%*%O
+            out$jacobian['w'] <- -(dlnDetEDdw + KLM%*%dOdw%*%KLM)/2
+        }
     }
     if (hessian){
         d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
@@ -514,9 +508,13 @@ data2ludwig_3D <- function(x,tt,a0,b0,w=0,exterr=FALSE,
     }
     out
 }
-data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE,
-                           jacobian=FALSE,hessian=FALSE){
+data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     out <- list()
+    np <- min(4,length(ta0b0w)) # number of parameters
+    tt <- ta0b0w[1]
+    a0 <- ta0b0w[2]
+    b0 <- ta0b0w[3]
+    if (np==4) w <- ta0b0w[4] # model 3 regression
     l2 <- lambda('Th232')[1]
     U <- iratio('U238U235')[1]
     D <- mclean(tt=tt,d=x$d,exterr=exterr)
@@ -558,8 +556,11 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE,
     E[4*ns+5,4*ns+5] <- (lambda('Pa231')[2]*1000)^2
     E[4*ns+6,4*ns+6] <- (lambda('Th230')[2]*1000)^2
     E[4*ns+7,4*ns+7] <- (lambda('Ra226')[2]*1000)^2
-    Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
-    ED <- J%*%E%*%t(J) + Ew
+    ED <- J%*%E%*%t(J)
+    if (np==4){
+        Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
+        ED <- ED + Ew
+    }
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     i3 <- (2*ns+1):(3*ns)
@@ -599,13 +600,15 @@ data2ludwig_Th <- function(x,tt,a0,b0,w=0,exterr=FALSE,
         JD[i1,'c0'] <- -b0*U*W         # dKdc0
         JD[i2,'c0'] <- -a0*W           # dLdc0
         JD[i3,'c0'] <- -1              # dMdc0
-        out$jacobian <- rep(0,5)
-        names(out$jacobian) <- jacnames
+        out$jacobian <- rep(0,np)
+        names(out$jacobian) <- jacnames[1:np]
         for (pn in jacnames[1:4]){
             out$jacobian[pn] <- -KLM%*%O%*%JD[,pn]
         }
-        dEDdw <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=1)
-        out$jacobian['w'] <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2
+        if (np==4){
+            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=1)
+            out$jacobian['w'] <- (KLM%*%O%*%dEDdw%*%O%*%KLM - trace(O%*%dEDdw))/2
+        }
     }
     if (hessian){
         d2Kdt2 <- rep(-D$d2Pb207U235dt2,ns)
@@ -650,11 +653,11 @@ get.Ew <- function(w=0,format=1,ns=1,tt=0,D=mclean(),deriv=0){
 }
 
 fixit <- function(x,anchor=list(FALSE,NA),model=1,w=NA){
-    if (x$format<4) np <- 3
-    else np <- 4
-    if (model==2) np <- np-1
+    if (x$format<4) np <- 2
+    else np <- 3
+    if (model==3) np <- np+1
     out <- rep(FALSE,np)
-    if (model==1 | is.numeric(w)) out[np] <- TRUE # fix w
+    if (model==3 & is.numeric(w)) out[np] <- TRUE # fix w
     if (anchor[[1]]){ # anchor t or a0(,b0)
         if (is.numeric(anchor[[2]])) out[1] <- TRUE # fix t
         else out[2:(np-1)] <- TRUE # fix a0(,b0)
