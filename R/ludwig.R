@@ -146,21 +146,29 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 
 get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
     out <- list()
-    ta0b0 <- get.ta0b0.model2(x,anchor=anchor)
+    fit <- get.ta0b0.model2(x,anchor=anchor)
+    ta0b0 <- fit$ta0b0
     if (model==2){
-        out$par <- c(ta0b0,0)
-        out$cov <- fisher.model2(x,fit=fit,anchor=anchor)
-        out$cov <- matrix(0,length(ta0b0)+1,length(ta0b0)+1)
+        out$par <- ta0b0
+        out$cov <- fit$cov
     } else {
-        lower <- c(ta0b0/2,0)
-        upper <- c(2*ta0b0,ta0b0[1])
+        lower <- ta0b0/2
+        upper <- 2*ta0b0
         if (model==1){
             init <- c(ta0b0,0)  # no overdispersion
-        } else {
-            if (is.numeric(w)) init <- c(ta0b0,w)
-            else init <- c(ta0b0,ta0b0[1]/100) # 1% overdispersion as a first guess
+            lower <- c(lower,0)
+            upper <- c(upper,0)
+        } else { # model 3
+            if (is.numeric(w)){
+                init <- c(init,w)
+                lower <- c(lower,0)
+                upper <- c(upper,0)
+            } else{
+                init <- c(init,ta0b0[1]/100)
+                lower <- c(lower,0)
+                upper <- c(upper,ta0b0[1])
+            }
         }
-        names(init)[3] <- 'w'
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model,w=w),
@@ -176,7 +184,7 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
     out
 }
 
-get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
+get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),...){
     if (x$format<4){
         np <- 2
         init <- c(1,0)
@@ -189,12 +197,11 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
         upper <- c(10000,100,100)
     }
     fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                   x=x,exterr=exterr,
-                   fixed=fixit(x,anchor=anchor,model=model),
+                   x=x,fixed=fixit(x,anchor=anchor,model=2),
                    lower=lower,upper=upper,hessian=TRUE,...)
     out <- list()
     out$ta0b0 <- fit$par
-    out$cov <- np*fit$minimum/(length(np)-2)*solve(fit$hessian)
+    out$cov <- np*fit$value/(length(x)-2)*solve(fit$hessian)
     out
 }
 
@@ -240,127 +247,12 @@ SS.model2 <- function(ta0b0,x){
     out
 }
 
-get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
-    if (x$format<4) ta0b0 <- get.ta0b0.model2.2D(x,anchor=anchor)
-    else ta0b0 <- get.ta0b0.model2.3D(x,anchor=anchor)
-    ta0b0
-}
-get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
-    tlim <- c(1e-5,min(get.Pb206U238.age(x)[,1]))
-    if (!anchor[[1]]){
-        tt <- stats::optimise(SS.model2.2D,interval=tlim,x=x)$minimum
-        fits <- model2fit.2D(tt,x=x)
-        a0 <- fits$y0
-    } else if (is.na(anchor[[2]])){
-        a0 <- settings('iratio','Pb207Pb206')[1]
-        tt <- stats::optimise(SS.model2.2D,interval=tlim,x=x,a0=a0)$minimum
-    } else if (is.numeric(anchor[[2]])){
-        tt <- anchor[[2]]
-        fits <- model2fit.2D(tt,x=x)
-        a0 <- fits$y0[1]
-    }
-    out <- c(tt,a0)
-    names(out) <- c('t','76i')
-    out
-}
-get.ta0b0.model2.3D <- function(x,anchor=list(FALSE,NA)){
-    tlim <- c(1e-5,max(get.Pb206U238.age(x)[,1]))
-    if (!anchor[[1]]){
-        tt <- stats::optimise(SS.model2.3D,interval=tlim,x=x)$minimum
-        fits <- model2fit.3D(tt,x=x)
-        a0 <- fits$y0[1]
-        b0 <- fits$y0[2]
-    } else if (is.na(anchor[[2]])){
-        if (x$format%in%c(4,5,6)){
-            a0 <- settings('iratio','Pb206Pb204')[1]
-            b0 <- settings('iratio','Pb207Pb204')[1]
-        } else {
-            a0 <- 1/settings('iratio','Pb208Pb206')[1]
-            b0 <- 1/settings('iratio','Pb208Pb207')[1]
-        }
-        tt <- stats::optimise(SS.model2.3D,interval=tlim,x=x,a0=a0,b0=b0)$minimum
-    } else if (is.numeric(anchor[[2]])){
-        tt <- anchor[[2]]
-        fits <- model2fit.3D(tt,x=x)
-        a0 <- fits$y0[1]
-        b0 <- fits$y0[2]
-    }
-    out <- c(tt,a0,b0)
-    if (x$format%in%c(4,5,6))
-        names(out) <- c('t','64i','74i')
-    else
-        names(out) <- c('t','68i','78i')
-    out
-}
-SS.model2.2D <- function(tt,x,a0=NA){
-    model2fit.2D(tt=tt,x=x,a0=a0)$SS
-}
-SS.model2.3D <- function(tt,x,a0=NA,b0=NA){
-    model2fit.3D(tt=tt,x=x,a0=a0,b0=b0)$SS
-}
-model2fit.2D <- function(tt,x=x,a0=NA,b0=NA){
-    ns <- length(x)
-    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-    xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
-    yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
-    out <- list()
-    out$y0 <- 0
-    if (is.na(a0)){
-        fit <- stats::lm(I(xy[,'Y']-yr) ~ I(xy[,'X']-xr) + 0)
-        out$y0 <- yr - fit$coef[1]*xr
-        out$SS <- sum(fit$residuals^2)
-    } else {
-        out$y0 <- a0
-        yp <- yr+(a0-yr)*(xr-xy[,'X'])/xr
-        out$SS <- sum((yp-xy[,'Y'])^2)
-    }
-    out
-}
-model2fit.3D <- function(tt,x=x,a0=NA,b0=NA){
-    ns <- length(x)
-    xy <- matrix(0,ns,4)
-    for (i in 1:ns){
-        if (x$format %in% c(4,5,6))
-            xy[i,] <- get.UPb.isochron.ratios.204(x,i)$x
-        else
-            xy[i,] <- get.UPb.isochron.ratios.208(x,i,tt=tt)$x[1:4]
-    }
-    x6 <- xy[,1] # U238Pb206
-    y6 <- xy[,2] # Pb204Pb206 or Pb208cPb206
-    xr6 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
-    out <- list()
-    out$y0 <- c(0,0) # (6/48)i, (7/48)i
-    if (is.na(a0)){
-        fit06 <- stats::lm(y6 ~ I(x6-xr6) + 0)
-        out$y0[1] <- -1/(xr6*fit06$coef)
-        SS06 <- sum(fit06$residuals^2)
-    } else {
-        out$y0[1] <- a0
-        yp <- (x6-xr6)*a0/xr6
-        SS06 <- sum((yp-y6)^2)
-    }
-    x7 <- xy[,3] # U235Pb207
-    y7 <- xy[,4] # Pb204Pb207 or Pb208cPb207
-    xr7 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
-    if (is.na(b0)){
-        fit07 <- stats::lm(y7 ~ I(x7-xr7) + 0)
-        out$y0[2] <- -1/(xr7*fit07$coef)
-        SS07 <- sum(fit07$residuals^2)
-    } else {
-        out$y0[2] <- b0
-        yp <- (x7-xr7)*b0/xr7
-        SS07 <- sum((yp-y7)^2)
-    }
-    out$SS <- SS06 + SS07
-    out
-}
-
 LL.lud.UPb <- function(ta0b0w,x,exterr=FALSE,LL=TRUE){
     tt <- ta0b0w[1]
     a0 <- ta0b0w[2]
     if (x$format<4){
         b0 <- 0
-        w <- ta0b0w[3]
+        w <- 0
     } else {
         b0 <- ta0b0w[3]
         w <- ta0b0w[4]        
@@ -376,7 +268,7 @@ LL.lud.UPb.gr <- function(ta0b0w,x,exterr=FALSE){
     a0 <- ta0b0w[2]
     if (x$format<4){
         b0 <- 0
-        w <- ta0b0w[3]
+        w <- 0
     } else {
         b0 <- ta0b0w[3]
         w <- ta0b0w[4]
@@ -760,6 +652,7 @@ get.Ew <- function(w=0,format=1,ns=1,tt=0,D=mclean(),deriv=0){
 fixit <- function(x,anchor=list(FALSE,NA),model=1,w=NA){
     if (x$format<4) np <- 3
     else np <- 4
+    if (model==2) np <- np-1
     out <- rep(FALSE,np)
     if (model==1 | is.numeric(w)) out[np] <- TRUE # fix w
     if (anchor[[1]]){ # anchor t or a0(,b0)
