@@ -393,19 +393,19 @@ data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
         out$hessian['t','t'] <-
             t(JKL[,'t'])%*%O%*%JKL[,'t'] + KL%*%O%*%d2KLdt2           # d2dt2
         out$hessian['a0','a0'] <- t(JKL[,'a0'])%*%O%*%JKL[,'a0']      # d2da02
+        out$hessian[i1,'t'] <- out$hessian['t',i1]                    # d2dc0dt
+        out$hessian[i1,'a0'] <- out$hessian['a0',i1]                  # d2dc0da0
         if (np==3){
             d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=2)
             d2lnDetEDdw2 <- trace(O%*%d2EDdw2 - trace(O%*%dEDdw%*%O%*%dEDdw))
             d2Odw2 <- dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw 
-            out$hessian['w','w'] <- -(d2lnDetEDdw2 + KL%*%d2Odw2%*%KL )/2 # d2dw2
-            out$hessian['w',i1] <- KL%*%dOdw%*%JKL[,i1]                   # d2dwdc0
-            out$hessian['w','t'] <- KL%*%dOdw%*%JKL[,'t']                 # d2dwdt
-            out$hessian['w','a0'] <- KL%*%dOdw%*%JKL[,'a0']               # d2dwda0
-            out$hessian[i1,'t'] <- out$hessian['t',i1]                    # d2dc0dt
-            out$hessian[i1,'a0'] <- out$hessian['a0',i1]                  # d2dc0da0
-            out$hessian[i1,'w'] <- out$hessian['w',i1]                    # d2dc0dw
-            out$hessian['t','w'] <- out$hessian['w','t']                  # d2dtdw
-            out$hessian['a0','w'] <- out$hessian['w','a0']                # d2da0dw
+            out$hessian['w','w'] <- -(d2lnDetEDdw2 + KL%*%d2Odw2%*%KL)/2 # d2dw2
+            out$hessian['w',i1] <- KL%*%dOdw%*%JKL[,i1]                  # d2dwdc0
+            out$hessian['w','t'] <- KL%*%dOdw%*%JKL[,'t']                # d2dwdt
+            out$hessian['w','a0'] <- KL%*%dOdw%*%JKL[,'a0']              # d2dwda0
+            out$hessian[i1,'w'] <- out$hessian['w',i1]                   # d2dc0dw
+            out$hessian['t','w'] <- out$hessian['w','t']                 # d2dtdw
+            out$hessian['a0','w'] <- out$hessian['w','a0']               # d2da0dw
         }
     }
     out
