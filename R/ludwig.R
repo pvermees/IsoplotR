@@ -146,12 +146,10 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 
 get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
     out <- list()
-    # first do a model 2 regression:
-    if (x$format<4) ta0b0 <- get.ta0b0.model2.2D(x,anchor=anchor)
-    else ta0b0 <- get.ta0b0.model2.3D(x,anchor=anchor)
-    # then use the results for possible further fitting:
+    ta0b0 <- get.ta0b0.model2(x,anchor=anchor)
     if (model==2){
         out$par <- c(ta0b0,0)
+        out$cov <- fisher.model2(x,fit=fit,anchor=anchor)
         out$cov <- matrix(0,length(ta0b0)+1,length(ta0b0)+1)
     } else {
         lower <- c(ta0b0/2,0)
@@ -176,6 +174,76 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
     out$model <- model
     out$exterr <- exterr
     out
+}
+
+get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
+    if (x$format<4){
+        np <- 2
+        init <- c(1,0)
+        lower <- c(0,0)
+        upper <- c(10000,100)
+    } else {
+        np <- 3
+        init <- c(1,0,0)
+        lower <- c(0,0,0)
+        upper <- c(10000,100,100)
+    }
+    fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
+                   x=x,exterr=exterr,
+                   fixed=fixit(x,anchor=anchor,model=model),
+                   lower=lower,upper=upper,hessian=TRUE,...)
+    out <- list()
+    out$ta0b0 <- fit$par
+    out$cov <- np*fit$minimum/(length(np)-2)*solve(fit$hessian)
+    out
+}
+
+SS.model2 <- function(ta0b0,x){
+    tt <- ta0b0[1]
+    a0 <- ta0b0[2]
+    out <- list()
+    if (x$format<4){
+        xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
+        xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
+        yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
+        yp <- yr+(a0-yr)*(xr-xy[,'X'])/xr
+        out <- sum((yp-xy[,'Y'])^2)
+    } else {
+        b0 <- ta0b0[2]
+        ns <- length(x)
+        xy <- matrix(0,ns,4)
+        if (x$format<7){
+            for (i in 1:ns){
+                xy[i,] <- get.UPb.isochron.ratios.204(x,i)$x
+            }
+        } else {
+            for (i in 1:ns){
+                xy[i,] <- get.UPb.isochron.ratios.208(x,i,tt=tt)$x[1:4]
+            }
+        }
+        x6 <- xy[,1] # U238Pb206
+        y6 <- xy[,2] # Pb204Pb206 or Pb208cPb206
+        x7 <- xy[,3] # U235Pb207
+        y7 <- xy[,4] # Pb204Pb207 or Pb208cPb207
+        r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
+        r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
+        out <- list()
+        out$y0 <- c(0,0) # (6/48)i, (7/48)i
+        out$y0[1] <- a0
+        yp <- (x6-xr6)*a0/xr6
+        SS06 <- sum((yp-y6)^2)
+        out$y0[2] <- b0
+        yp <- (x7-xr7)*b0/xr7
+        SS07 <- sum((yp-y7)^2)
+        out <- SS06 + SS07
+    }
+    out
+}
+
+get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA)){
+    if (x$format<4) ta0b0 <- get.ta0b0.model2.2D(x,anchor=anchor)
+    else ta0b0 <- get.ta0b0.model2.3D(x,anchor=anchor)
+    ta0b0
 }
 get.ta0b0.model2.2D <- function(x,anchor=list(FALSE,NA)){
     tlim <- c(1e-5,min(get.Pb206U238.age(x)[,1]))
