@@ -197,11 +197,20 @@ tera.wasserburg <- function(x,i){
     class(out) <- "terawasserburg"
     out
 }
-get.UPb.isochron.ratios.204 <- function(x,i){
+get.UPb.isochron.ratios.204 <- function(x,i=NA){
     if (x$format%in%c(4,5,6)){
         labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
     } else {
         stop('Incorrect input format for the get.UPb.isochron.ratios function.')
+    }
+    if (all(is.na(i))){
+        ns <- length(x)
+        out <- matrix(0,ns,length(labels))
+        for (j in 1:ns){
+            out[j,] <- get.UPb.isochron.ratios.204(x,i=j)$x
+        }
+        colnames(out) <- labels
+        return(out)
     }
     U <- iratio('U238U235')[1]
     tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06
@@ -224,12 +233,21 @@ get.UPb.isochron.ratios.204 <- function(x,i){
     rownames(out$cov) <- labels
     out
 }
-get.UPb.isochron.ratios.208 <- function(x,i,tt=0){
+get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
     if (x$format%in%c(7,8)){
         labels <- c('U238Pb206','Pb208cPb206','U235Pb207',
                     'Pb208cPb207','Th232U238','Th232Pb208')
     } else {
         stop('Incorrect input format for the get.UPb.isochron.ratios function.')
+    }
+    if (all(is.na(i))){
+        ns <- length(x)
+        out <- matrix(0,ns,length(labels))
+        for (j in 1:ns){
+            out[j,] <- get.UPb.isochron.ratios.208(x,i=j,tt=tt)$x
+        }
+        colnames(out) <- labels
+        return(out)
     }
     l2 <- settings('lambda','Th232')[1]
     U <- iratio('U238U235')[1]
