@@ -99,13 +99,13 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
         PbPb <- quotient(y[,'X'],y[,'sX'],y[,'Y'],y[,'sY'],y[,'rXY'])
     } else if (common.Pb == 1){
         y <- data2york(x,inverse=FALSE)
-        tt <- rep(1000,length(x))
+        tt <- rep(4500,length(x))
         for (j in 1:10){
             i6474 <- stacey.kramers(tt)
             r64 <- y[,'X'] - i6474[,1]
             r74 <- y[,'Y'] - i6474[,2]
             PbPb <- quotient(r64,y[,'sX'],r74,y[,'sY'],y[,'rXY'])
-            tt <- PbPb2t(PbPb)
+            tt <- PbPb2t(PbPb)[,'t']
         }
     } else if (common.Pb == 2){
         y <- data2york(x,inverse=TRUE)
