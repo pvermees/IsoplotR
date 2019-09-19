@@ -634,7 +634,23 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.col=omit.col,...)
-        if (growth) plot_PbPb_evolution(out$age['t'],inverse=inverse)
+        if (growth){
+            xylim <- par('usr')
+            if (xylim[1]<0) xylim[1] <- xylim[2]/100
+            if (xylim[3]<0) xylim[3] <- xylim[4]/100
+            if (inverse){
+                Pb64 <- 1/xylim[1:2]
+                Pb74 <- xylim[3:4]/xylim[2:1]
+            } else {
+                Pb64 <- xylim[1:2]
+                Pb74 <- xylim[3:4]
+            }
+            tx <- sk2t(Pb206Pb204=Pb64)
+            ty <- sk2t(Pb207Pb204=Pb74)
+            tmin <- max(min(tx),min(ty))
+            tmax <- min(max(tx),max(ty))
+            plot_PbPb_evolution(from=tmin,to=tmax,inverse=inverse)
+        }
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
                         xlab=x.lab,ylab=y.lab)
     }
@@ -1128,9 +1144,9 @@ get.limits <- function(x,sx){
     c(minx,maxx)
 }
 
-plot_PbPb_evolution <- function(tt,inverse=TRUE){
+plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     nn <- 50
-    tijd <- seq(0,tt,length.out=nn)
+    tijd <- seq(from=from,to=to,length.out=nn)
     ticks <- pretty(tijd)
     tijd[nn] <- max(ticks)
     xy <- stacey.kramers(tijd,inverse=inverse)
@@ -1190,7 +1206,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
     line1 <- do.call(substitute,list(eval(call1),list1))
     line2 <- do.call(substitute,list(eval(call2),list2))
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
+        line3 <- substitute('MSWD ='~a*', p('*chi^2*')='~b,
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
         mymtext(line1,line=2,...)

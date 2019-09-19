@@ -94,29 +94,31 @@ PbPb.inverse.ratios <- function(x){
 }
 
 PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
+    y <- PbPb.normal.ratios(x)
     if (common.Pb == 0){
-        y <- data2york(x,inverse=FALSE)
-        PbPb <- quotient(y[,'X'],y[,'sX'],y[,'Y'],y[,'sY'],y[,'rXY'])
+        PbPb <- quotient(y[,'Pb206Pb204'],y[,'errPb206Pb204'],
+                         y[,'Pb207Pb204'],y[,'errPb207Pb204'],y[,'rho'])
     } else if (common.Pb == 1){
-        y <- data2york(x,inverse=FALSE)
-        tt <- rep(1000,length(x))
-        for (j in 1:10){
+        yi <- PbPb.inverse.ratios(x)
+        tt <- get.Pb207Pb206.age(x=yi[,'Pb207Pb206'])[,'t76']
+        for (j in 1:10){ # simple iterative method instead of ML for now
             i6474 <- stacey.kramers(tt)
-            r64 <- y[,'X'] - i6474[,1]
-            r74 <- y[,'Y'] - i6474[,2]
-            PbPb <- quotient(r64,y[,'sX'],r74,y[,'sY'],y[,'rXY'])
-            tt <- PbPb2t(PbPb)
+            r64 <- y[,'Pb206Pb204'] - i6474[,1]
+            r74 <- y[,'Pb207Pb204'] - i6474[,2]
+            PbPb <- quotient(r64,y[,'errPb206Pb204'],
+                             r74,y[,'errPb207Pb204'],y[,'rho'])
+            tt <- PbPb2t(PbPb)[,'t']
         }
     } else if (common.Pb == 2){
         y <- data2york(x,inverse=TRUE)
         fit <- regression(y,model=1)
         PbPb <- get.76(y,a=fit$a[1],b=fit$b[1])
     } else if (common.Pb == 3){
-        y <- data2york(x,inverse=FALSE)
-        r64 <- y[,'X'] - settings('iratio','Pb206Pb204')[1]
-        r74 <- y[,'Y'] - settings('iratio','Pb207Pb204')[1]
-        PbPb <- quotient(r64,y[,'sX'],r74,y[,'sY'],y[,'rXY'])
-        # alternative implementation:
+        r64 <- y[,'Pb206Pb204'] - settings('iratio','Pb206Pb204')[1]
+        r74 <- y[,'Pb207Pb204'] - settings('iratio','Pb207Pb204')[1]
+        PbPb <- quotient(r64,y[,'errPb206Pb204'],
+                         r74,y[,'errPb207Pb204'],y[,'rho'])
+        # alternative implementation: project along inverse isochron:
         # y <- data2york(x,inverse=TRUE)
         # i74 <- settings('iratio','Pb207Pb204')[1]
         # i64 <- settings('iratio','Pb206Pb204')[1]

@@ -329,7 +329,7 @@ common.Pb.stacey.kramers <- function(x){
             tint <- stats::optimise(SS.SK.without.204,
                                     interval=c(0,5000),x=x,i=i)$minimum
             i6474 <- stacey.kramers(tint)
-            c76 <- i6474['i74']/i6474['i64']
+            c76 <- i6474[,'i74']/i6474[,'i64']
             out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=FALSE)
         }
     } else if (x$format %in% c(4,5,6)){
@@ -339,8 +339,8 @@ common.Pb.stacey.kramers <- function(x){
             tint <- stats::optimise(SS.SK.with.204,
                                     interval=c(0,5000),x=x,i=i)$minimum
             c6474 <- stacey.kramers(tint)
-            c46 <- 1/c6474['i64']
-            c47 <- 1/c6474['i74']
+            c46 <- 1/c6474[,'i64']
+            c47 <- 1/c6474[,'i74']
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
         }
     } else if (x$format %in% c(7,8)){
@@ -352,8 +352,8 @@ common.Pb.stacey.kramers <- function(x){
             tint <- stats::optimise(SS.SK.with.208,
                                     interval=c(0,5000),x=x,i=i)$minimum
             c678 <- stacey.kramers(tint)
-            c86 <- c678['i84']/c678['i64']
-            c87 <- c678['i84']/c678['i74']
+            c86 <- c678[,'i84']/c678[,'i64']
+            c87 <- c678[,'i84']/c678[,'i74']
             out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0806=c86,c0807=c87)
         }
     }
@@ -546,11 +546,61 @@ stacey.kramers <- function(tt,inverse=FALSE){
     i84 <- sk.208.204 + sk.232.204*(exp(l2*ti)-exp(l2*tt))
     if (inverse){ # for Pb-Pb data
         out <- cbind(1/i64,i74/i64,i84/64)
-        names(out) <- c('i46','i76','i86')
+        colnames(out) <- c('i46','i76','i86')
     } else {
         out <- cbind(i64,i74,i84)
-        names(out) <- c('i64','i74','i84')
+        colnames(out) <- c('i64','i74','i84')
     }
+    out
+}
+# TODO: add option for Pb207Pb206 ratios to be used with inverse isochrons
+sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
+    l5 <- lambda('U235')[1]
+    l8 <- lambda('U238')[1]
+    ti.young <- 3700
+    sk.206.204.young <- 11.152
+    sk.207.204.young <- 12.998
+    sk.208.204.young <- 31.23
+    sk.238.204.young <- 9.74
+    sk.232.204.young <- 36.84
+    ti.old <- 4570
+    sk.206.204.old <- 9.307
+    sk.207.204.old <- 10.294
+    sk.208.204.old <- 29.487
+    sk.238.204.old <- 7.19
+    sk.232.204.old <- 33.21
+    l5 <- lambda('U235')[1]
+    l8 <- lambda('U238')[1]
+    U <- iratio('U238U235')[1]
+    out <- c(0,ti.old)
+    # 1. 206/204
+    min64 <- sk.206.204.old
+    max64 <- sk.206.204.young+sk.238.204.young*(exp(l8*ti.young)-1)
+    good64 <- !is.na(Pb206Pb204)
+    big64 <- good64 & (Pb206Pb204>max64)
+    small64 <- good64 & (Pb206Pb204<min64)
+    mid64 <- good64 & !big64 & !small64
+    out[big64] <- 0
+    out[small64] <- ti.old
+    out[mid64] <- log( exp(l8*ti.young) +
+                       (sk.206.204.young-Pb206Pb204[mid64])/sk.238.204.young )/l8
+    if (any(mid64) && out[mid64]>ti.young)
+        out[mid64] <- log( exp(l8*ti.old) +
+                           (sk.206.204.old-Pb206Pb204[mid64])/sk.238.204.old )/l8
+    # 2. 207/204
+    min74 <- sk.207.204.old
+    max74 <- sk.207.204.young + sk.238.204.young*(exp(l5*ti.young)-1)/U
+    good74 <- !is.na(Pb207Pb204)
+    big74 <- good74 & (Pb207Pb204>max74)
+    small74 <- good74 & (Pb207Pb204<min74)
+    mid74 <- good74 & !big74 & !small74
+    out[big74] <- 0
+    out[small74] <- ti.old
+    out[mid74] <- log( exp(l5*ti.young) +
+                       U*(sk.207.204.young-Pb207Pb204[mid74])/sk.238.204.young )/l5
+    if (any(mid74) && out[mid74]>ti.young)
+        out[mid74] <- log( exp(l5*ti.old) +
+                           (sk.207.204.old-Pb207Pb204[mid74])/sk.238.204.old )/l5
     out
 }
 
