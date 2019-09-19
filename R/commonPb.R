@@ -329,7 +329,7 @@ common.Pb.stacey.kramers <- function(x){
             tint <- stats::optimise(SS.SK.without.204,
                                     interval=c(0,5000),x=x,i=i)$minimum
             i6474 <- stacey.kramers(tint)
-            c76 <- i6474['i74']/i6474['i64']
+            c76 <- i6474[,'i74']/i6474[,'i64']
             out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=FALSE)
         }
     } else if (x$format %in% c(4,5,6)){
@@ -339,8 +339,8 @@ common.Pb.stacey.kramers <- function(x){
             tint <- stats::optimise(SS.SK.with.204,
                                     interval=c(0,5000),x=x,i=i)$minimum
             c6474 <- stacey.kramers(tint)
-            c46 <- 1/c6474['i64']
-            c47 <- 1/c6474['i74']
+            c46 <- 1/c6474[,'i64']
+            c47 <- 1/c6474[,'i74']
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
         }
     } else if (x$format %in% c(7,8)){
@@ -352,8 +352,8 @@ common.Pb.stacey.kramers <- function(x){
             tint <- stats::optimise(SS.SK.with.208,
                                     interval=c(0,5000),x=x,i=i)$minimum
             c678 <- stacey.kramers(tint)
-            c86 <- c678['i84']/c678['i64']
-            c87 <- c678['i84']/c678['i74']
+            c86 <- c678[,'i84']/c678[,'i64']
+            c87 <- c678[,'i84']/c678[,'i74']
             out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0806=c86,c0807=c87)
         }
     }
@@ -553,6 +553,7 @@ stacey.kramers <- function(tt,inverse=FALSE){
     }
     out
 }
+# TODO: add option for Pb207Pb206 ratios to be used with inverse isochrons
 sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]

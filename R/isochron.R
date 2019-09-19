@@ -636,15 +636,19 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     hide=hide,omit=omit,omit.col=omit.col,...)
         if (growth){
             xylim <- par('usr')
+            if (xylim[1]<0) xylim[1] <- xylim[2]/100
+            if (xylim[3]<0) xylim[3] <- xylim[4]/100
             if (inverse){
-                tx <- sk2t(Pb206Pb204=1/xylim)
-                ty <- c(0,4570)
+                Pb64 <- 1/xylim[1:2]
+                Pb74 <- xylim[3:4]/xylim[2:1]
             } else {
-                tx <- sk2t(Pb206Pb204=xylim[1:2])
-                ty <- sk2t(Pb207Pb204=xylim[3:4])
+                Pb64 <- xylim[1:2]
+                Pb74 <- xylim[3:4]
             }
-            tmin <- max(min(tx,ty))
-            tmax <- min(max(tx,ty))
+            tx <- sk2t(Pb206Pb204=Pb64)
+            ty <- sk2t(Pb207Pb204=Pb74)
+            tmin <- max(min(tx),min(ty))
+            tmax <- min(max(tx),max(ty))
             plot_PbPb_evolution(from=tmin,to=tmax,inverse=inverse)
         }
         graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
