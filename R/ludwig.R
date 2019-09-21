@@ -100,7 +100,8 @@ ludwig.default <- function(x,...){
 #'     \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
-ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA)){
+ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
+                       anchor=list(FALSE,NA)){
     if (x$format %in% c(1,2,3)) parnames <- c('t','76i')
     else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i')
     else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i')
@@ -141,7 +142,8 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     out
 }
 
-get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
+get.ta0b0w <- function(x,exterr=FALSE,model=1,
+                       anchor=list(FALSE,NA),w=NA,...){
     out <- list()
     fit2 <- get.ta0b0.model2(x,anchor=anchor)
     ta0b0 <- fit2$ta0b0
@@ -301,8 +303,7 @@ anchorfish <- function(AA,BB,CC,DD,anchor=list(FALSE,NA)){
     out
 }
 
-data2ludwig <- function(x,ta0b0w,exterr=FALSE,
-                        jacobian=FALSE,hessian=FALSE){
+data2ludwig <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     if (x$format %in% c(1,2,3))
         out <- data2ludwig_2D(x,ta0w=ta0b0w,exterr=exterr,
                               jacobian=jacobian,hessian=hessian)
@@ -315,8 +316,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE,
     else stop('Incorrect input format.')
     out
 }
-data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
-                           jacobian=FALSE,hessian=FALSE){
+data2ludwig_2D <- function(x,ta0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     out <- list()
     U <- iratio('U238U235')[1]
     np <- min(3,length(ta0w)) # number of parameters
@@ -335,7 +335,7 @@ data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
         wd <- wetherill(x,i)
         X[i] <- wd$x['Pb207U235']
         Y[i] <- wd$x['Pb206U238']
-        E[c(i,ns+i),c(i,ns+i)] <- wd$cov
+        E[(0:1)*ns+i,(0:1)*ns+i] <- wd$cov
         J[i,2*ns+2] <- -D$dPb207U235dl35     # dKdl35
         J[i,2*ns+4] <- -D$dPb207U235dl31     # dKdl31
         J[ns+i,2*ns+1] <- -D$dPb206U238dl38  # dLdl31
@@ -446,7 +446,7 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         X[i] <- wd$x['Pb207U235']
         Y[i] <- wd$x['Pb206U238']
         Z[i] <- wd$x['Pb204U238']
-        E[c(i,ns+i,2*ns+i),c(i,ns+i,2*ns+i)] <- wd$cov
+        E[(0:2)*ns+i,(0:2)*ns+i] <- wd$cov
         J[i,3*ns+2] <- -D$dPb207U235dl35     #dKdl35
         J[i,3*ns+4] <- -D$dPb207U235dl31     #dKdl31
         J[ns+i,3*ns+1] <- -D$dPb206U238dl38  #dLdl38
@@ -521,9 +521,9 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         d2KLMdt2[i1] <- -D$d2Pb207U235dt2 # d2Kdt2
         d2KLMdt2[i2] <- -D$d2Pb206U238dt2 # d2Ldt2
         d2KLMdc0da0 <- matrix(0,3*ns,ns)
-        diag(d2KLMdc0da0[i2,i1]) <- -1     # d2Ldc0da0
+        diag(d2KLMdc0da0[i2,i1]) <- -1    # d2Ldc0da0
         d2KLMdc0db0 <- matrix(0,3*ns,ns)
-        diag(d2KLMdc0db0[i1,i1]) <- -U     # d2Kdc0db0
+        diag(d2KLMdc0db0[i1,i1]) <- -U    # d2Kdc0db0
         out$hessian[i1,i1] <- t(JKLM[,i1])%*%O%*%JKLM[,i1]                # d2dc02
         out$hessian['t','t'] <-
             t(JKLM[,'t'])%*%O%*%JKLM[,'t'] + KLM%*%O%*%d2KLMdt2           # d2dt2
