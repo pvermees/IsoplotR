@@ -406,6 +406,8 @@ data2ludwig_2D <- function(x,ta0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$hessian['t','t'] <-
             t(JKL[,'t'])%*%O%*%JKL[,'t'] + KL%*%O%*%d2KLdt2               # d2dt2
         out$hessian['a0','a0'] <- t(JKL[,'a0'])%*%O%*%JKL[,'a0']          # d2da02
+        out$hessian['t','a0'] <- t(JKL[,'t'])%*%O%*%JKL[,'a0']            # d2dtda0
+        out$hessian['a0','t'] <- out$hessian['t','a0']                    # d2da0dt
         out$hessian[i1,'t'] <- out$hessian['t',i1]                        # d2dc0dt
         out$hessian[i1,'a0'] <- out$hessian['a0',i1]                      # d2dc0da0
         if (np==3){
@@ -527,13 +529,19 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$hessian[i1,i1] <- t(JKLM[,i1])%*%O%*%JKLM[,i1]                # d2dc02
         out$hessian['t','t'] <-
             t(JKLM[,'t'])%*%O%*%JKLM[,'t'] + KLM%*%O%*%d2KLMdt2           # d2dt2
+        out$hessian['t','a0'] <- t(JKLM[,'t'])%*%O%*%JKLM[,'a0']          # d2dtda0
+        out$hessian['t','b0'] <- t(JKLM[,'t'])%*%O%*%JKLM[,'b0']          # d2dtdb0
         out$hessian['a0','a0'] <- t(JKLM[,'a0'])%*%O%*%JKLM[,'a0']        # d2da02
         out$hessian['b0','b0'] <- t(JKLM[,'b0'])%*%O%*%JKLM[,'b0']        # d2db02
+        out$hessian['a0','b0'] <- t(JKLM[,'a0'])%*%O%*%JKLM[,'b0']        # d2da0db0
         out$hessian['t',i1] <- t(JKLM[,'t'])%*%O%*%JKLM[,i1]              # d2dc0dt
         out$hessian['a0',i1] <-
             t(JKLM[,'a0'])%*%O%*%JKLM[,i1] + KLM%*%O%*%d2KLMdc0da0        # d2dc0da0
         out$hessian['b0',i1] <-
             t(JKLM[,'b0'])%*%O%*%JKLM[,i1] + KLM%*%O%*%d2KLMdc0db0        # d2dc0db0
+        out$hessian['a0','t'] <- out$hessian['t','a0']                    # d2da0dt
+        out$hessian['b0','t'] <- out$hessian['t','b0']                    # d2db0dt
+        out$hessian['b0','a0'] <- out$hessian['a0','b0']                  # d2db0da0
         out$hessian[i1,'t'] <- out$hessian['t',i1]                        # d2dtdc0
         out$hessian[i1,'a0'] <- out$hessian['a0',i1]                      # d2da0dc0
         out$hessian[i1,'b0'] <- out$hessian['b0',i1]                      # d2db0dc0
