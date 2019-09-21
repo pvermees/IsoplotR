@@ -642,7 +642,7 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         JKLM <- matrix(0,3*ns,ns+3)
         colnames(JKLM) <- c(paste0('c0[',i1,']'),'t','a0','b0')
         rownames(JKLM) <- c(paste0('K[',i1,']'),paste0('L[',i1,']'),paste0('M[',i1,']'))
-        diag(JKLM[i1,i1]) <- -U*b0*W      # dKdc0
+        diag(JKLM[i1,i1]) <- -b0*U*W      # dKdc0
         diag(JKLM[i2,i1]) <- -a0*W        # dLdc0
         diag(JKLM[i3,i1]) <- -1           # dMdc0
         JKLM[i1,'t']  <- -D$dPb207U235dt  # dKdt
@@ -672,9 +672,9 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         d2KLMdt2[i2] <- -D$d2Pb206U238dt2  # d2Ldt2
         d2KLMdt2[i3] <- -D$d2Pb208Th232dt2 # d2Mdt2
         d2KLMdc0da0 <- matrix(0,3*ns,ns)
-        diag(d2KLMdc0da0[i2,i1]) <- -1     # d2Ldc0da0
+        diag(d2KLMdc0da0[i2,i1]) <- -W     # d2Ldc0da0
         d2KLMdc0db0 <- matrix(0,3*ns,ns)
-        diag(d2KLMdc0db0[i1,i1]) <- -U     # d2Kdc0db0
+        diag(d2KLMdc0db0[i1,i1]) <- -U*W   # d2Kdc0db0
         out$hessian[i1,i1] <- t(JKLM[,i1])%*%O%*%JKLM[,i1]                # d2dc02
         out$hessian['t','t'] <-
             t(JKLM[,'t'])%*%O%*%JKLM[,'t'] + KLM%*%O%*%d2KLMdt2           # d2dt2

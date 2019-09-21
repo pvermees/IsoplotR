@@ -453,7 +453,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$dPb207Pb206dl26 <- -out$dPb206U238dl26*out$Pb207U235/(U*out$Pb206U238^2)
         out$dPb207Pb206dl35 <- out$dPb207U235dl35*out$Pb206U238/(U*out$Pb206U238^2)
         out$dPb207Pb206dl31 <- out$dPb207U235dl31*out$Pb206U238/(U*out$Pb206U238^2)
-        out$dPb208Th232dl32 <- exp(l32*tt)*l32
+        out$dPb208Th232dl32 <- exp(l32*tt)*tt
         out$dPb207Pb206dU <- -out$Pb207Pb206/U
     } else {
         out$dPb207Pb206dl38 <- 0
