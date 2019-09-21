@@ -143,11 +143,11 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
 
 get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
     out <- list()
-    fit <- get.ta0b0.model2(x,anchor=anchor)
-    ta0b0 <- fit$ta0b0
+    fit2 <- get.ta0b0.model2(x,anchor=anchor)
+    ta0b0 <- fit2$ta0b0
     if (model==2){
         out$par <- ta0b0
-        out$cov <- fit$cov
+        out$cov <- fit2$cov
     } else {
         init <- ta0b0
         lower <- ta0b0/2
@@ -171,7 +171,7 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,anchor=list(FALSE,NA),w=NA,...){
         out <- list()
         out$LL <- fit$value
         out$par <- fit$par
-        out$cov <- fisher.lud(x,fit=fit,anchor=anchor)
+        out$cov <- fisher.lud(x,fit=fit,exterr=exterr,anchor=anchor)
     }
     out$model <- model
     out$exterr <- exterr
@@ -345,10 +345,10 @@ data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
     }
     E[2*ns+1,2*ns+1] <- lambda('U238')[2]^2
     E[2*ns+2,2*ns+2] <- lambda('U235')[2]^2
-    E[2*ns+3,2*ns+3] <- lambda('U234')[2]^2
-    E[2*ns+4,2*ns+4] <- lambda('Pa231')[2]^2
-    E[2*ns+5,2*ns+5] <- lambda('Th230')[2]^2
-    E[2*ns+6,2*ns+6] <- lambda('Ra226')[2]^2
+    E[2*ns+3,2*ns+3] <- (lambda('U234')[2]*1000)^2
+    E[2*ns+4,2*ns+4] <- (lambda('Pa231')[2]*1000)^2
+    E[2*ns+5,2*ns+5] <- (lambda('Th230')[2]*1000)^2
+    E[2*ns+6,2*ns+6] <- (lambda('Ra226')[2]*1000)^2
     ED <- J%*%E%*%t(J)
     if (np==3){
         Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
@@ -378,7 +378,7 @@ data2ludwig_2D <- function(x,ta0w,exterr=FALSE,
         JKL[i1,'t']  <- -D$dPb207U235dt # dKdt
         JKL[i2,'t']  <- -D$dPb206U238dt # dLdt
         JKL[i1,'a0'] <- -U*c0           # dKda0
-        out$jacobian <- rep(0,np) # derivatives of LL w.r.t t, a0 and w
+        out$jacobian <- rep(0,np) # derivatives of LL w.r.t t, a0 (and w)
         names(out$jacobian) <- c('t','a0','w')[1:np]
         out$jacobian['t'] <- -KL%*%O%*%JKL[,'t']
         out$jacobian['a0'] <- -KL%*%O%*%JKL[,'a0']
@@ -441,8 +441,6 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     Y <- zeros
     Z <- zeros
     D <- mclean(tt=tt,d=x$d,exterr=exterr)
-    x75 <- D$Pb207U235
-    x68 <- D$Pb206U238
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
         X[i] <- wd$x['Pb207U235']
@@ -476,8 +474,8 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     o11 <- O[i1,i1]; o12 <- O[i1,i2]; o13 <- O[i1,i3]
     o21 <- O[i2,i1]; o22 <- O[i2,i2]; o23 <- O[i2,i3]
     o31 <- O[i3,i1]; o32 <- O[i3,i2]; o33 <- O[i3,i3]
-    K0 <- X - U*b0*Z - D$Pb207U235
-    L0 <- Y - a0*Z - D$Pb206U238
+    K0 <- X - D$Pb207U235 - U*b0*Z
+    L0 <- Y - D$Pb206U238 - a0*Z
     V <- t(K0%*%(o11+t(o11))*U*b0 + L0%*%(o12+t(o21))*U*b0 + K0%*%(o12+t(o21))*a0 +
            L0%*%(o22+t(o22))*a0 + K0%*%(o13+t(o31)) + L0%*%(o23+t(o32)))
     W <- -(U*b0*(o11+t(o11))*U*b0 + U*b0*(o12+t(o12))*a0 + U*b0*(o13+t(o13)) +
@@ -485,8 +483,8 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
            (o31+t(o31))*U*b0 + (o32+t(o32))*a0 + (o33+t(o33)))
     M <- as.vector(solve(W,V))
     c0 <- as.vector(Z - M)
-    K <- as.vector(X - U*b0*c0 - x75)
-    L <- as.vector(Y - a0*c0 - x68)
+    K <- as.vector(X - D$Pb207U235 - U*b0*c0)
+    L <- as.vector(Y - D$Pb206U238 - a0*c0)
     KLM <- c(K,L,M)
     out$SS <- KLM%*%O%*%KLM
     detED <- determinant(ED,logarithm=TRUE)$modulus
@@ -494,6 +492,7 @@ data2ludwig_3D <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     if (jacobian | hessian){
         JKLM <- matrix(0,3*ns,ns+3) # derivatives of KLM w.r.t. c0, t, a0 and b0
         colnames(JKLM) <- c(paste0('c0[',i1,']'),'t','a0','b0')
+        rownames(JKLM) <- c(paste0('K[',i1,']'),paste0('L[',i1,']'),paste0('M[',i1,']'))
         diag(JKLM[i1,i1]) <- -U*b0       # dKdc0
         diag(JKLM[i2,i1]) <- -a0         # dLdc0
         diag(JKLM[i3,i1]) <- -1          # dMdc0
