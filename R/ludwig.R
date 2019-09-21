@@ -165,7 +165,7 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,
                 upper <- c(upper,ta0b0[1])
             }
         }
-        fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
+        fit <- optifix(parms=init,fn=LL.lud.UPb,gr=NULL,#LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model,w=w),
                        lower=lower,upper=upper,
