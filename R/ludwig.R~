@@ -142,7 +142,6 @@ mswd.lud <- function(ta0b0,x,anchor=list(FALSE,NA)){
     out
 }
 
-# w is a logarithmic quantity
 get.ta0b0w <- function(x,exterr=FALSE,model=1,
                        anchor=list(FALSE,NA),w=NA,...){
     out <- list()
@@ -156,10 +155,15 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,
         lower <- ta0b0/2
         upper <- 2*ta0b0
         if (model==3){
-            if (is.na(w)) ww <- log(init[1])-5
-            init <- c(init,ww)
-            lower <- c(lower,ww-10)
-            upper <- c(upper,log(upper[1]))
+            if (is.numeric(w) & w>0){
+                init <- c(init,log(w))
+                lower <- c(lower,log(w))
+                upper <- c(upper,log(w))
+            } else{
+                init <- c(init,log(init[1])-5)
+                lower <- c(lower,log(init[1])-15)
+                upper <- c(upper,log(upper[1]))
+            }
         }
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
@@ -716,13 +720,13 @@ get.Ew <- function(w=0,format=1,ns=1,tt=0,D=mclean(),deriv=0){
     J[2,1] <- -D$dPb206U238dt # dLdt
     if (format>6) J[3,1] <- -D$dPb208Th232dt # dMdt
     if (deriv==1) {
-        dEdw <- 2*exp(w)
+        dEdw <- 2*w
         Ew <- J%*%dEdw%*%t(J)
     } else if (deriv==2) {
-        d2Edw2 <- 2*exp(w)
+        d2Edw2 <- 2
         Ew <- J%*%d2Edw2%*%t(J)
     } else {
-        E <- exp(w)^2
+        E <- w^2
         Ew <- J%*%E%*%t(J)
     }
     out <- matrix(0,ndim*ns,ndim*ns)
