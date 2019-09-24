@@ -152,7 +152,7 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,
         out$par <- ta0b0
         out$cov <- fit2$cov
     } else {
-        init <- c(ta0b0[1],log(ta0b0[2:3]))
+        init <- ta0b0
         lower <- c(init[1]/2,init[2:3]-5)
         upper <- c(init[1]*2,init[2:3]+5)
         if (model==3){
@@ -164,7 +164,7 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model,w=w),
-                       lower=lower,upper=upper,hessian=TRUE,
+                       lower=lower,upper=upper,
                        control=list(fnscale=-1),...)
         out <- list()
         out$LL <- fit$value
@@ -204,9 +204,9 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),...){
         a0 <- 1/fit6$coef[1]
         fit7 <- lm(xyz[,'Pb208cPb207'] ~ xyz[,'U235Pb207'])
         b0 <- 1/fit7$coef[1]
-        init <- c(tt,a0,b0)
-        lower <- c(.0001,.001,.001)
-        upper <- c(10000,100,100)        
+        init <- c(tt,log(a0),log(b0))
+        lower <- c(init[1]/10,init[2:3]-5)
+        upper <- c(init[1]*10,init[2:3]+5)
     } else {
         stop('Incorrect input format.')
     }
@@ -227,7 +227,7 @@ SS.model2 <- function(ta0b0,x){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
-        yp <- yr+(a0-yr)*(xr-xy[,'X'])/xr
+        yp <- yr+(exp(a0)-yr)*(xr-xy[,'X'])/xr
         out <- sum((yp-xy[,'Y'])^2)
     } else {
         b0 <- ta0b0[3]
@@ -243,9 +243,9 @@ SS.model2 <- function(ta0b0,x){
         y7 <- xy[,4] # Pb204Pb207 or Pb208cPb207
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
-        y6p <- (r86-x6)/(r86*a0)
+        y6p <- (r86-x6)/(r86*exp(a0))
         SS6 <- sum((y6p-y6)^2)
-        y7p <- (r57-x7)/(r57*b0)
+        y7p <- (r57-x7)/(r57*exp(b0))
         SS7 <- sum((y7p-y7)^2)
         out <- SS6 + SS7
     }
@@ -667,6 +667,10 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         d2KLMdt2[i1] <- -D$d2Pb207U235dt2        # d2Kdt2
         d2KLMdt2[i2] <- -D$d2Pb206U238dt2        # d2Ldt2
         d2KLMdt2[i3] <- -D$d2Pb208Th232dt2       # d2Mdt2
+        d2KLMda02 <- rep(0,3*ns)
+        d2KLMda02[i2] <- -c0*W*exp(a0)           # d2Lda02
+        d2KLMdb02 <- rep(0,3*ns)
+        d2KLMdb02[i1] <- -c0*U*W*exp(b0)         # d2Kdb02
         d2KLMdc0da0 <- matrix(0,3*ns,ns)
         diag(d2KLMdc0da0[i2,i1]) <- -W*exp(a0)   # d2Ldc0da0
         d2KLMdc0db0 <- matrix(0,3*ns,ns)
@@ -674,10 +678,12 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$hessian[i1,i1] <- t(JKLM[,i1])%*%O%*%JKLM[,i1]                # d2dc02
         out$hessian['t','t'] <-
             t(JKLM[,'t'])%*%O%*%JKLM[,'t'] + KLM%*%O%*%d2KLMdt2           # d2dt2
+        out$hessian['a0','a0'] <-
+            t(JKLM[,'a0'])%*%O%*%JKLM[,'a0'] + KLM%*%O%*%d2KLMda02        # d2da02
+        out$hessian['b0','b0'] <-
+            t(JKLM[,'b0'])%*%O%*%JKLM[,'b0'] + KLM%*%O%*%d2KLMdb02        # d2db02
         out$hessian['t','a0'] <- t(JKLM[,'t'])%*%O%*%JKLM[,'a0']          # d2dtda0
         out$hessian['t','b0'] <- t(JKLM[,'t'])%*%O%*%JKLM[,'b0']          # d2dtdb0
-        out$hessian['a0','a0'] <- t(JKLM[,'a0'])%*%O%*%JKLM[,'a0']        # d2da02
-        out$hessian['b0','b0'] <- t(JKLM[,'b0'])%*%O%*%JKLM[,'b0']        # d2db02
         out$hessian['a0','b0'] <- t(JKLM[,'a0'])%*%O%*%JKLM[,'b0']        # d2da0db0
         out$hessian['t',i1] <- t(JKLM[,'t'])%*%O%*%JKLM[,i1]              # d2dc0dt
         out$hessian['a0',i1] <-
