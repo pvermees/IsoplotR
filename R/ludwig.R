@@ -110,7 +110,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
     out <- get.ta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     names(out$par) <- parnames
     rownames(out$cov) <- parnames
-    colnames(out$cov) <- parnames    
+    colnames(out$cov) <- parnames
     out$n <- length(x)
     mswd <- mswd.lud(out$par,x=x,anchor=anchor)
     out <- c(out,mswd)
@@ -152,9 +152,9 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,
         out$par <- ta0b0
         out$cov <- fit2$cov
     } else {
-        init <- ta0b0
-        lower <- ta0b0/2
-        upper <- 2*ta0b0
+        init <- c(ta0b0[1],log(ta0b0[2:3]))
+        lower <- c(init[1]/2,init[2:3]-5)
+        upper <- c(init[1]*2,init[2:3]+5)
         if (model==3){
             if (is.na(w)) ww <- log(init[1])-5
             init <- c(init,ww)
@@ -164,7 +164,7 @@ get.ta0b0w <- function(x,exterr=FALSE,model=1,
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model,w=w),
-                       lower=lower,upper=upper,
+                       lower=lower,upper=upper,hessian=TRUE,
                        control=list(fnscale=-1),...)
         out <- list()
         out$LL <- fit$value
@@ -200,10 +200,10 @@ get.ta0b0.model2 <- function(x,anchor=list(FALSE,NA),...){
     } else if (x$format%in%c(7,8)){
         np <- 3
         xyz <- get.UPb.isochron.ratios.208(x,tt=tt)
-        fit <- lm(xyz[,'Pb208cPb206'] ~ xyz[,'U238Pb206'])
-        a0 <- 1/fit$coef[1]
-        fit <- lm(xyz[,'Pb208cPb207'] ~ xyz[,'U235Pb207'])
-        b0 <- 1/fit$coef[1]
+        fit6 <- lm(xyz[,'Pb208cPb206'] ~ xyz[,'U238Pb206'])
+        a0 <- 1/fit6$coef[1]
+        fit7 <- lm(xyz[,'Pb208cPb207'] ~ xyz[,'U235Pb207'])
+        b0 <- 1/fit7$coef[1]
         init <- c(tt,a0,b0)
         lower <- c(.0001,.001,.001)
         upper <- c(10000,100,100)        
@@ -584,8 +584,8 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         Y[i] <- wd$x['Pb206U238']
         Z[i] <- wd$x['Pb208Th232']
         W[i] <- wd$x['Th232U238']
-        K0[i] <- X[i] - D$Pb207U235 - (Z[i]-D$Pb208Th232)*b0*U*W[i]
-        L0[i] <- Y[i] - D$Pb206U238 - (Z[i]-D$Pb208Th232)*a0*W[i]
+        K0[i] <- X[i] - D$Pb207U235 - (Z[i]-D$Pb208Th232)*exp(b0)*U*W[i]
+        L0[i] <- Y[i] - D$Pb206U238 - (Z[i]-D$Pb208Th232)*exp(a0)*W[i]
         E[(0:3)*ns+i,(0:3)*ns+i] <- wd$cov
         J[i,4*ns+2] <- -D$dPb207U235dl35       # dKdl35
         J[i,4*ns+5] <- -D$dPb207U235dl31       # dKdl31
@@ -617,19 +617,19 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     o21 <- O[i2,i1]; o22 <- O[i2,i2]; o23 <- O[i2,i3]
     o31 <- O[i3,i1]; o32 <- O[i3,i2]; o33 <- O[i3,i3]
     Wd <- diag(W)
-    AA <- (Wd%*%o11%*%Wd)*(U*b0)^2 + (Wd%*%o22%*%Wd)*a0^2 + o33 +
-        U*a0*b0*Wd%*%(o12+o21)%*%Wd +
-        U*b0*(Wd%*%o13+o31%*%Wd) + a0*(Wd%*%o23+o32%*%Wd)
-    BT <- t(U*b0*K0%*%o11%*%Wd + a0*L0%*%o22%*%Wd +
-            a0*K0%*%o12%*%Wd + U*b0*L0%*%o21%*%Wd +
+    AA <- (Wd%*%o11%*%Wd)*(U*exp(b0))^2 + (Wd%*%o22%*%Wd)*exp(a0)^2 + o33 +
+        U*exp(a0)*exp(b0)*Wd%*%(o12+o21)%*%Wd +
+        U*exp(b0)*(Wd%*%o13+o31%*%Wd) + exp(a0)*(Wd%*%o23+o32%*%Wd)
+    BT <- t(U*exp(b0)*K0%*%o11%*%Wd + exp(a0)*L0%*%o22%*%Wd +
+            exp(a0)*K0%*%o12%*%Wd + U*exp(b0)*L0%*%o21%*%Wd +
             K0%*%o13 + L0%*%o23)
-    CC <- U*b0*Wd%*%o11%*%K0 + a0*Wd%*%o22%*%L0 +
-        a0*Wd%*%o12%*%K0 + U*b0*Wd%*%o21%*%L0 +
+    CC <- U*exp(b0)*Wd%*%o11%*%K0 + exp(a0)*Wd%*%o22%*%L0 +
+        exp(a0)*Wd%*%o12%*%K0 + U*exp(b0)*Wd%*%o21%*%L0 +
         o13%*%K0 + o23%*%L0
     M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
     c0 <- as.vector(Z - D$Pb208Th232 - M)
-    K <- as.vector(X - D$Pb207U235 - c0*b0*U*W)
-    L <- as.vector(Y - D$Pb206U238 - c0*a0*W)
+    K <- as.vector(X - D$Pb207U235 - c0*exp(b0)*U*W)
+    L <- as.vector(Y - D$Pb206U238 - c0*exp(a0)*W)
     KLM <- c(K,L,M)
     out$SS <- KLM%*%O%*%KLM
     detED <- determinant(ED,logarithm=TRUE)$modulus
@@ -638,14 +638,14 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         JKLM <- matrix(0,3*ns,ns+3)
         colnames(JKLM) <- c(paste0('c0[',i1,']'),'t','a0','b0')
         rownames(JKLM) <- c(paste0('K[',i1,']'),paste0('L[',i1,']'),paste0('M[',i1,']'))
-        diag(JKLM[i1,i1]) <- -b0*U*W      # dKdc0
-        diag(JKLM[i2,i1]) <- -a0*W        # dLdc0
-        diag(JKLM[i3,i1]) <- -1           # dMdc0
-        JKLM[i1,'t']  <- -D$dPb207U235dt  # dKdt
-        JKLM[i2,'t']  <- -D$dPb206U238dt  # dLdt
-        JKLM[i3,'t']  <- -D$dPb208Th232dt # dMdt
-        JKLM[i2,'a0'] <- -c0*W            # dLda0
-        JKLM[i1,'b0'] <- -c0*U*W          # dKdb0
+        diag(JKLM[i1,i1]) <- -exp(b0)*U*W  # dKdc0
+        diag(JKLM[i2,i1]) <- -exp(a0)*W    # dLdc0
+        diag(JKLM[i3,i1]) <- -1            # dMdc0
+        JKLM[i1,'t']  <- -D$dPb207U235dt   # dKdt
+        JKLM[i2,'t']  <- -D$dPb206U238dt   # dLdt
+        JKLM[i3,'t']  <- -D$dPb208Th232dt  # dMdt
+        JKLM[i2,'a0'] <- -c0*W*exp(a0)     # dLda0
+        JKLM[i1,'b0'] <- -c0*U*W*exp(b0)   # dKdb0
         out$jacobian <- rep(0,np)
         names(out$jacobian) <- c('t','a0','b0','w')[1:np]
         out$jacobian['t'] <- -KLM%*%O%*%JKLM[,'t']
@@ -664,13 +664,13 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         rownames(out$hessian) <- hesnames
         colnames(out$hessian) <- hesnames
         d2KLMdt2 <- rep(0,3*ns)
-        d2KLMdt2[i1] <- -D$d2Pb207U235dt2  # d2Kdt2
-        d2KLMdt2[i2] <- -D$d2Pb206U238dt2  # d2Ldt2
-        d2KLMdt2[i3] <- -D$d2Pb208Th232dt2 # d2Mdt2
+        d2KLMdt2[i1] <- -D$d2Pb207U235dt2        # d2Kdt2
+        d2KLMdt2[i2] <- -D$d2Pb206U238dt2        # d2Ldt2
+        d2KLMdt2[i3] <- -D$d2Pb208Th232dt2       # d2Mdt2
         d2KLMdc0da0 <- matrix(0,3*ns,ns)
-        diag(d2KLMdc0da0[i2,i1]) <- -W     # d2Ldc0da0
+        diag(d2KLMdc0da0[i2,i1]) <- -W*exp(a0)   # d2Ldc0da0
         d2KLMdc0db0 <- matrix(0,3*ns,ns)
-        diag(d2KLMdc0db0[i1,i1]) <- -U*W   # d2Kdc0db0
+        diag(d2KLMdc0db0[i1,i1]) <- -U*W*exp(b0) # d2Kdc0db0
         out$hessian[i1,i1] <- t(JKLM[,i1])%*%O%*%JKLM[,i1]                # d2dc02
         out$hessian['t','t'] <-
             t(JKLM[,'t'])%*%O%*%JKLM[,'t'] + KLM%*%O%*%d2KLMdt2           # d2dt2
