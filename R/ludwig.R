@@ -150,8 +150,8 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         out$cov <- fit2$cov
     } else {
         init <- lta0b0
-        lower <- init-5
-        upper <- init+5
+        lower <- init-2
+        upper <- init+2
         if (model==3){
             if (is.na(w)) ww <- init[1]-5
             init <- c(init,ww)
@@ -204,7 +204,7 @@ get.lta0b0.model2 <- function(x,anchor=list(FALSE,NA),...){
     }
     fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                    x=x,fixed=fixit(x,anchor=anchor,model=2),
-                   lower=init-5,upper=init+5,hessian=TRUE,...)
+                   lower=init-2,upper=init+2,hessian=TRUE,...)
     out <- list()
     out$lta0b0 <- fit$par
     if (det(fit$hessian) > 0)
@@ -305,7 +305,7 @@ data2ludwig_2D <- function(x,lta0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     np <- min(3,length(lta0w)) # number of parameters
     lt <- lta0w[1]
     a0 <- lta0w[2]
-    if (np==3) w <- ta0w[3] # model 3 regression
+    if (np==3) w <- lta0w[3] # model 3 regression
     ns <- length(x)
     zeros <- rep(0,ns)
     E <- matrix(0,2*ns+6,2*ns+6)
@@ -334,7 +334,7 @@ data2ludwig_2D <- function(x,lta0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     E[2*ns+6,2*ns+6] <- (lambda('Ra226')[2]*1000)^2
     ED <- J%*%E%*%t(J)
     if (np==3){
-        Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
+        Ew <- get.Ew(w=w,format=x$format,ns=ns,D=D)
         ED <- ED + Ew
     }
     i1 <- 1:ns
@@ -369,7 +369,7 @@ data2ludwig_2D <- function(x,lta0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$jacobian['lt'] <- -KL%*%O%*%JKL[,'lt']
         out$jacobian['a0'] <- -KL%*%O%*%JKL[,'a0']
         if (np==3){
-            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,lt=lt,D=D,deriv=1)
+            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=1)
             dlnDetEDdw <- trace(O%*%dEDdw)
             dOdw <- -O%*%dEDdw%*%O
             out$jacobian['w'] <- -(dlnDetEDdw + KL%*%dOdw%*%KL)/2
@@ -402,7 +402,7 @@ data2ludwig_2D <- function(x,lta0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$hessian[i1,'lt'] <- out$hessian['lt',i1]                      # d2dc0dlt
         out$hessian[i1,'a0'] <- out$hessian['a0',i1]                      # d2dc0da0
         if (np==3){
-            d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,lt=lt,D=D,deriv=2)
+            d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=2)
             d2lnDetEDdw2 <- trace(O%*%d2EDdw2) - trace(O%*%dEDdw%*%O%*%dEDdw) 
             d2Odw2 <- -(dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw)
             out$hessian['w','w'] <- (d2lnDetEDdw2 + KL%*%d2Odw2%*%KL)/2   # d2dw2
@@ -455,7 +455,7 @@ data2ludwig_3D <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     E[3*ns+6,3*ns+6] <- (lambda('Ra226')[2]*1000)^2
     ED <- J%*%E%*%t(J)
     if (np==4){
-        Ew <- get.Ew(w=w,format=x$format,ns=ns,lt=lt,D=D)
+        Ew <- get.Ew(w=w,format=x$format,ns=ns,D=D)
         ED <- ED + Ew
     }
     i1 <- 1:ns
@@ -469,10 +469,12 @@ data2ludwig_3D <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     o31 <- O[i3,i1]; o32 <- O[i3,i2]; o33 <- O[i3,i3]
     K0 <- X - D$Pb207U235 - U*exp(b0)*Z
     L0 <- Y - D$Pb206U238 - exp(a0)*Z
-    V <- t(K0%*%(o11+t(o11))*U*exp(b0) + L0%*%(o12+t(o21))*U*exp(b0) + K0%*%(o12+t(o21))*exp(a0) +
-           L0%*%(o22+t(o22))*exp(a0) + K0%*%(o13+t(o31)) + L0%*%(o23+t(o32)))
-    W <- -(U*exp(b0)*(o11+t(o11))*U*exp(b0) + U*exp(b0)*(o12+t(o12))*exp(a0) + U*exp(b0)*(o13+t(o13)) +
-           exp(a0)*(o21+t(o21))*U*exp(b0) + exp(a0)*(o22+t(o22))*exp(a0) + a0*(o23+t(o23)) +
+    V <- t(K0%*%(o11+t(o11))*U*exp(b0) + L0%*%(o12+t(o21))*U*exp(b0) +
+           K0%*%(o12+t(o21))*exp(a0) + L0%*%(o22+t(o22))*exp(a0) +
+           K0%*%(o13+t(o31)) + L0%*%(o23+t(o32)))
+    W <- -(U*exp(b0)*(o11+t(o11))*U*exp(b0) + U*exp(b0)*(o12+t(o12))*exp(a0) +
+           U*exp(b0)*(o13+t(o13)) + exp(a0)*(o21+t(o21))*U*exp(b0) +
+           exp(a0)*(o22+t(o22))*exp(a0) + exp(a0)*(o23+t(o23)) +
            (o31+t(o31))*U*exp(b0) + (o32+t(o32))*exp(a0) + (o33+t(o33)))
     M <- as.vector(solve(W,V))
     c0 <- as.vector(Z - M)
@@ -483,49 +485,53 @@ data2ludwig_3D <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     detED <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- -(3*ns*log(2*pi) + detED + out$SS)/2
     if (jacobian | hessian){
-        dtdlt <- lt
+        dtdlt <- exp(lt)
         dKdt <- -D$dPb207U235dt
         dLdt <- -D$dPb206U238dt
-        JKLM <- matrix(0,3*ns,ns+3) # derivatives of KLM w.r.t. c0, t, a0 and b0
+        dLda0 <- -c0*exp(a0)
+        dKdb0 <- -U*c0*exp(b0)
+        dKdc0 <- -U*exp(b0)
+        dLdc0 <- -exp(a0)
+        dMdc0 <- -1
+        JKLM <- matrix(0,3*ns,ns+3) # derivatives of KLM w.r.t. c0, lt, a0 and b0
         colnames(JKLM) <- c(paste0('c0[',i1,']'),'lt','a0','b0')
         rownames(JKLM) <- c(paste0('K[',i1,']'),paste0('L[',i1,']'),paste0('M[',i1,']'))
-        diag(JKLM[i1,i1]) <- -U*exp(b0)         # dKdc0
-        diag(JKLM[i2,i1]) <- -exp(a0)           # dLdc0
-        diag(JKLM[i3,i1]) <- -1                 # dMdc0
-        JKLM[i1,'lt']  <- dKdt*dtdlt # dKdlt
-        JKLM[i2,'lt']  <- dLdt*dtdlt # dLdt
-        JKLM[i2,'a0'] <- -c0*exp(a0)            # dLda0
-        JKLM[i1,'b0'] <- -U*c0*exp(b0)          # dKdb0
+        diag(JKLM[i1,i1]) <- dKdc0
+        diag(JKLM[i2,i1]) <- dLdc0
+        diag(JKLM[i3,i1]) <- dMdc0
+        JKLM[i1,'lt']  <- dKdt*dtdlt
+        JKLM[i2,'lt']  <- dLdt*dtdlt
+        JKLM[i2,'a0'] <- dLda0
+        JKLM[i1,'b0'] <- dKdb0
         out$jacobian <- rep(0,np) # derivatives of LL w.r.t lt, a0, b0 (and w)
         names(out$jacobian) <- c('lt','a0','b0','w')[1:np]
         out$jacobian['lt'] <- -KLM%*%O%*%JKLM[,'lt']
         out$jacobian['a0'] <- -KLM%*%O%*%JKLM[,'a0']
         out$jacobian['b0'] <- -KLM%*%O%*%JKLM[,'b0']
         if (np==4){
-            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,lt=lt,D=D,deriv=1)
+            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=1)
             dlnDetEDdw <- trace(O%*%dEDdw)
             dOdw <- -O%*%dEDdw%*%O
             out$jacobian['w'] <- -(dlnDetEDdw + KLM%*%dOdw%*%KLM)/2
         }
     }
     if (hessian){
-        d2tdlt2 <- lt
-        out$hessian <- matrix(0,ns+np,ns+np)
-        hesnames <- c(paste0('c0[',1:ns,']'),'lt','a0','b0','w')[1:(ns+np)]
-        rownames(out$hessian) <- hesnames
-        colnames(out$hessian) <- hesnames
-        d2KLMdt2 <- rep(0,3*ns)
-        d2Kdt2 <- dKdt # 2nd derivative = 1st derivative
-        d2Ldt2 <- dLdt # 2nd derivative = 1st derivative
+        d2tdlt2 <- exp(lt)
+        d2Kdt2 <- -D$d2Pb207U235dt2
+        d2Ldt2 <- -D$d2Pb206U238dt2
         d2KLMdlt2 <- rep(0,3*ns)
         d2KLMdlt2[i1] <- d2Kdt2*dtdlt^2 + dKdt*d2tdlt2 # d2Kdlt2
         d2KLMdlt2[i2] <- d2Ldt2*dtdlt^2 + dLdt*d2tdlt2 # d2Ldlt2
+        d2KLMda02 <- JKLM[,'a0'] # second derivative w.r.t a0 = first derivative
+        d2KLMdb02 <- JKLM[,'b0'] # second derivative w.r.t b0 = first derivative
         d2KLMdc0da0 <- matrix(0,3*ns,ns)
         diag(d2KLMdc0da0[i2,i1]) <- -exp(a0)           # d2Ldc0da0
         d2KLMdc0db0 <- matrix(0,3*ns,ns)
         diag(d2KLMdc0db0[i1,i1]) <- -U*exp(b0)         # d2Kdc0db0
-        d2KLMda02 <- JKLM[,'a0'] # second derivative w.r.t a0 = first derivative
-        d2KLMdb02 <- JKLM[,'b0'] # second derivative w.r.t b0 = first derivative
+        out$hessian <- matrix(0,ns+np,ns+np)
+        hesnames <- c(paste0('c0[',1:ns,']'),'lt','a0','b0','w')[1:(ns+np)]
+        rownames(out$hessian) <- hesnames
+        colnames(out$hessian) <- hesnames
         out$hessian[i1,i1] <- t(JKLM[,i1])%*%O%*%JKLM[,i1]                # d2dc02
         out$hessian['lt','lt'] <-
             t(JKLM[,'lt'])%*%O%*%JKLM[,'lt'] + KLM%*%O%*%d2KLMdlt2        # d2dlt2
@@ -548,12 +554,12 @@ data2ludwig_3D <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$hessian[i1,'a0'] <- out$hessian['a0',i1]                      # d2da0dc0
         out$hessian[i1,'b0'] <- out$hessian['b0',i1]                      # d2db0dc0
         if (np==4){
-            d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,lt=lt,D=D,deriv=2)
+            d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=2)
             d2lnDetEDdw2 <- trace(O%*%d2EDdw2) - trace(O%*%dEDdw%*%O%*%dEDdw) 
             d2Odw2 <- -(dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw)
             out$hessian['w','w'] <- (d2lnDetEDdw2 + KLM%*%d2Odw2%*%KLM)/2 # d2dw2
             out$hessian['w',i1] <- KLM%*%dOdw%*%JKLM[,i1]                 # d2dwdc0
-            out$hessian['w','lt'] <- KLM%*%dOdw%*%JKLM[,'lt']              # d2dwdlt
+            out$hessian['w','lt'] <- KLM%*%dOdw%*%JKLM[,'lt']             # d2dwdlt
             out$hessian['w','a0'] <- KLM%*%dOdw%*%JKLM[,'a0']             # d2dwda0
             out$hessian['w','b0'] <- KLM%*%dOdw%*%JKLM[,'b0']             # d2dwdb0
             out$hessian[i1,'w'] <- out$hessian['w',i1]                    # d2dc0dw
@@ -610,7 +616,7 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     E[4*ns+7,4*ns+7] <- (lambda('Ra226')[2]*1000)^2
     ED <- J%*%E%*%t(J)
     if (np==4){
-        Ew <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D)
+        Ew <- get.Ew(w=w,format=x$format,ns=ns,D=D)
         ED <- ED + Ew
     }
     i1 <- 1:ns
@@ -658,7 +664,7 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$jacobian['a0'] <- -KLM%*%O%*%JKLM[,'a0']
         out$jacobian['b0'] <- -KLM%*%O%*%JKLM[,'b0']
         if (np==4){
-            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=1)
+            dEDdw <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=1)
             dlnDetEDdw <- trace(O%*%dEDdw)
             dOdw <- -O%*%dEDdw%*%O
             out$jacobian['w'] <- -(dlnDetEDdw + KLM%*%dOdw%*%KLM)/2
@@ -703,7 +709,7 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         out$hessian[i1,'a0'] <- out$hessian['a0',i1]                      # d2da0dc0
         out$hessian[i1,'b0'] <- out$hessian['b0',i1]                      # d2db0dc0
         if (np==4){
-            d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,tt=tt,D=D,deriv=2)
+            d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=2)
             d2lnDetEDdw2 <- trace(O%*%d2EDdw2) - trace(O%*%dEDdw%*%O%*%dEDdw) 
             d2Odw2 <- -(dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw)
             out$hessian['w','w'] <- (d2lnDetEDdw2 + KLM%*%d2Odw2%*%KLM)/2 # d2dw2
@@ -720,19 +726,18 @@ data2ludwig_Th <- function(x,ta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     out
 }
 
-get.Ew <- function(w=0,format=1,ns=1,lt=0,D=mclean(),deriv=0){
+get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     if (format<4) ndim <- 2
     else ndim <- 3
-    dltdt <- lt
     J <- matrix(0,ndim,1)
-    J[1,1] <- -D$dPb207U235dt*dltdt                # dKdlt
-    J[2,1] <- -D$dPb206U238dt*dltdt                # dLdlt
-    if (format>6) J[3,1] <- -D$dPb208Th232dt*dltdt # dMdt
+    J[1,1] <- -D$dPb207U235dt                # dKdt
+    J[2,1] <- -D$dPb206U238dt                # dLdt
+    if (format>6) J[3,1] <- -D$dPb208Th232dt # dMdt
     if (deriv==1) {
-        dEdw <- 2*exp(w)
+        dEdw <- 2*exp(w)^2
         Ew <- J%*%dEdw%*%t(J)
     } else if (deriv==2) {
-        d2Edw2 <- 2*exp(w)
+        d2Edw2 <- 4*exp(w)^2
         Ew <- J%*%d2Edw2%*%t(J)
     } else {
         E <- exp(w)^2
