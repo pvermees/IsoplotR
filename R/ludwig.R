@@ -102,18 +102,37 @@ ludwig.default <- function(x,...){
 #' @export
 ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
                        anchor=list(FALSE,NA)){
-    if (x$format %in% c(1,2,3)) parnames <- c('t','76i')
-    else if (x$format %in% c(4,5,6)) parnames <- c('t','64i','74i')
-    else if (x$format %in% c(7,8)) parnames <- c('t','68i','78i')
-    else stop("Illegal input format.")
-    if (model==3) parnames <- c(parnames,'w')
-    out <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
-    names(out$par) <- parnames
-    rownames(out$cov) <- parnames
-    colnames(out$cov) <- parnames
+    fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+    out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     mswd <- mswd.lud(out$par,x=x,anchor=anchor)
     c(out,mswd)
+}
+
+exponentiate_ludwig <- function(fit,format){
+    out <- fit
+    np <- length(fit$logpar)
+    J <- matrix(0,np,np)
+    out$par <- rep(0,np)
+    if (fit$model==3){
+        out$par[1:(np-1)] <- exp(fit$logpar[1:(np-1)])
+        out$par[np] <- sqrt(exp(fit$logpar[np]))
+        diag(J[1:(np-1),1:(np-1)]) <- exp(fit$logpar[1:(np-1)])
+        J[np,np] <- sqrt(exp(fit$logpar[np]))/2
+    } else {
+        out$par <- exp(fit$logpar)
+        diag(J) <- exp(fit$logpar[1:np])
+    }
+    out$cov <- J %*% fit$logcov %*% t(J)
+    if (format %in% c(1,2,3)) parnames <- c('t','76i')
+    else if (format %in% c(4,5,6)) parnames <- c('t','64i','74i')
+    else if (format %in% c(7,8)) parnames <- c('t','68i','78i')
+    else stop("Illegal input format.")
+    if (fit$model==3) parnames <- c(parnames,'w')
+    names(out$par) <- parnames
+    rownames(out$cov) <- parnames
+    colnames(out$cov) <- parnames
+    out
 }
 
 mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
@@ -142,12 +161,12 @@ mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
 
 get.lta0b0w <- function(x,exterr=FALSE,model=1,
                         anchor=list(FALSE,NA),w=NA,...){
-    out <- list()
+    out <- list(model=model,exterr=exterr)
     fit2 <- get.lta0b0.model2(x,anchor=anchor)
     lta0b0 <- fit2$lta0b0
     if (model==2){
-        out$par <- lta0b0
-        out$cov <- fit2$cov
+        out$logpar <- lta0b0
+        out$logcov <- fit2$cov
     } else {
         init <- lta0b0
         lower <- init-1
@@ -163,13 +182,18 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
                        fixed=fixit(x,anchor=anchor,model=model,w=w),
                        lower=lower,upper=upper,
                        control=list(fnscale=-1),...)
-        out <- list()
         out$LL <- fit$value
-        out$par <- fit$par
-        out$cov <- fisher.lud(x,fit=fit,exterr=exterr,anchor=anchor)
+        out$logpar <- fit$par
+        out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,anchor=anchor)
     }
-    out$model <- model
-    out$exterr <- exterr
+    if (x$format %in% c(1,2,3)) parnames <- c('log(t)','log(76i)')
+    else if (x$format %in% c(4,5,6)) parnames <- c('log(t)','log(64i)','log(74i)')
+    else if (x$format %in% c(7,8)) parnames <- c('log(t)','log(68i)','log(78i)')
+    else stop("Illegal input format.")
+    if (model==3) parnames <- c(parnames,'log(w^2)')
+    names(out$logpar) <- parnames
+    rownames(out$logcov) <- parnames
+    colnames(out$logcov) <- parnames
     out
 }
 
@@ -204,7 +228,7 @@ get.lta0b0.model2 <- function(x,anchor=list(FALSE,NA),...){
     }
     fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                    x=x,fixed=fixit(x,anchor=anchor,model=2),
-                   lower=init-1,upper=init+1,hessian=TRUE,...)
+                   lower=init-2,upper=init+2,hessian=TRUE,...)
     out <- list()
     out$lta0b0 <- fit$par
     if (det(fit$hessian) > 0)
