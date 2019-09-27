@@ -67,7 +67,7 @@ concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
 twfit2wfit <- function(fit,x){
-    tt <- fit$par[1]
+    tt <- fit$par['t']
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
@@ -81,11 +81,11 @@ twfit2wfit <- function(fit,x){
     } else if (x$format %in% c(4,5,6)){
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
-        E <- fit$cov
+        E <- fit$cov[1:3,1:3]
     } else if (x$format %in% c(7,8)){
         a0 <- fit$par['68i']
         b0 <- fit$par['78i']
-        E <- fit$cov
+        E <- fit$cov[1:3,1:3]
     } else {
         stop('Incorrect input format')
     }
@@ -221,15 +221,15 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         ciy <- c(ll,rev(ul))
     } else {
         fit2d <- tw3d2d(fit)
-        X[1] <- age_to_U238Pb206_ratio(fit2d$x['t'],d=d)[,'86']
-        Y[1] <- age_to_Pb207Pb206_ratio(fit2d$x['t'],d=d)[,'76']
-        r75 <- age_to_Pb207U235_ratio(fit2d$x['t'],d=d)[,'75']
+        X[1] <- age_to_U238Pb206_ratio(fit2d$par['t'],d=d)[,'86']
+        Y[1] <- age_to_Pb207Pb206_ratio(fit2d$par['t'],d=d)[,'76']
+        r75 <- age_to_Pb207U235_ratio(fit2d$par['t'],d=d)[,'75']
         r68 <- 1/X[1]
-        Y[2] <- fit2d$x['76i']
+        Y[2] <- fit2d$par['76i']
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
-        tl <- check.zero.UPb(fit2d$x['t'])
+        tl <- check.zero.UPb(fit2d$par['t'])
         U <- settings('iratio','U238U235')[1]
         nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
@@ -266,16 +266,16 @@ discordia.line <- function(fit,wetherill,d=diseq()){
 }
 
 tw3d2d <- function(fit){
-    out <- list(x=fit$par,cov=fit$cov,fact=fit$fact)
+    out <- list(par=fit$par,cov=fit$cov,fact=fit$fact)
     if (fit$format > 3){
         labels <- c('t','76i')
-        out$x <- c(fit$par['t'],fit$x[3]/fit$x[2]) # x[2] = Pb206i, x[3] = Pb207i
+        out$par <- c(fit$par['t'],fit$par[3]/fit$par[2]) # par[2] = Pb206i, par[3] = Pb207i
         J <- matrix(0,2,3)
         J[1,1] <- 1
         J[2,2] <- -fit$par[3]/fit$par[2]^2
         J[2,3] <- 1/fit$par[2]
         out$cov <- J %*% fit$cov %*% t(J)
-        names(out$x) <- labels
+        names(out$par) <- labels
         colnames(out$cov) <- labels
     }
     out
@@ -355,7 +355,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
-        rounded.disp <- roundit(fit$par['w'],fit$wci,sigdig=sigdig)
+        rounded.disp <- roundit(fit$par['w'],fit$err[,'w'],sigdig=sigdig)
         line4 <- substitute('overdispersion ='~a+b/-c~'Ma',
                             list(a=rounded.disp[1],
                                  b=rounded.disp[3],
