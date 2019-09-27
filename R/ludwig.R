@@ -105,7 +105,7 @@ ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
     fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
-    mswd <- mswd.lud(out$par,x=x,anchor=anchor)
+    mswd <- mswd.lud(out$logpar,x=x,anchor=anchor)
     c(out,mswd)
 }
 
