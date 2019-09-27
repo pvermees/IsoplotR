@@ -113,25 +113,16 @@ exponentiate_ludwig <- function(fit,format){
     out <- fit
     np <- length(fit$logpar)
     J <- matrix(0,np,np)
-    out$par <- rep(0,np)
-    if (fit$model==3){
-        out$par[1:(np-1)] <- exp(fit$logpar[1:(np-1)])
-        out$par[np] <- sqrt(exp(fit$logpar[np]))
-        diag(J[1:(np-1),1:(np-1)]) <- exp(fit$logpar[1:(np-1)])
-        J[np,np] <- sqrt(exp(fit$logpar[np]))/2
-    } else {
-        out$par <- exp(fit$logpar)
-        diag(J) <- exp(fit$logpar[1:np])
-    }
+    out$par <- exp(fit$logpar)
+    diag(J) <- exp(fit$logpar[1:np])
     out$cov <- J %*% fit$logcov %*% t(J)
-    if (format %in% c(1,2,3)) parnames <- c('t','76i')
-    else if (format %in% c(4,5,6)) parnames <- c('t','64i','74i')
-    else if (format %in% c(7,8)) parnames <- c('t','68i','78i')
+    if (format %in% c(1,2,3)) parnames <- c('t','76i','w')
+    else if (format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
+    else if (format %in% c(7,8)) parnames <- c('t','68i','78i','w')
     else stop("Illegal input format.")
-    if (fit$model==3) parnames <- c(parnames,'w')
-    names(out$par) <- parnames
-    rownames(out$cov) <- parnames
-    colnames(out$cov) <- parnames
+    names(out$par) <- parnames[1:np]
+    rownames(out$cov) <- parnames[1:np]
+    colnames(out$cov) <- parnames[1:np]
     out
 }
 
@@ -190,7 +181,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     else if (x$format %in% c(4,5,6)) parnames <- c('log(t)','log(64i)','log(74i)')
     else if (x$format %in% c(7,8)) parnames <- c('log(t)','log(68i)','log(78i)')
     else stop("Illegal input format.")
-    if (model==3) parnames <- c(parnames,'log(w^2)')
+    if (model==3) parnames <- c(parnames,'log(w)')
     names(out$logpar) <- parnames
     rownames(out$logcov) <- parnames
     colnames(out$logcov) <- parnames
@@ -772,13 +763,13 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     J[2,1] <- -D$dPb206U238dt                # dLdt
     if (format>6) J[3,1] <- -D$dPb208Th232dt # dMdt
     if (deriv==1) {
-        dEdw <- exp(w)
+        dEdw <- 2*exp(w)^2
         Ew <- J%*%dEdw%*%t(J)
     } else if (deriv==2) {
-        d2Edw2 <- exp(w)
+        d2Edw2 <- 4*exp(w)^2
         Ew <- J%*%d2Edw2%*%t(J)
     } else {
-        E <- exp(w)
+        E <- exp(w)^2
         Ew <- J%*%E%*%t(J)
     }
     out <- matrix(0,ndim*ns,ndim*ns)

@@ -97,7 +97,7 @@ twfit2wfit <- function(fit,x){
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
     } else {
-        search.range <- c(-1000,tt-buffer)
+        search.range <- c(0,tt-buffer)
         if (x$d$U48$option>0) # disequilibrium samples
             search.range[1] <- -0.001/settings('lambda','U234')[1]
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
@@ -274,7 +274,7 @@ tw3d2d <- function(fit){
         J[1,1] <- 1
         J[2,2] <- -fit$par[3]/fit$par[2]^2
         J[2,3] <- 1/fit$par[2]
-        out$cov <- J %*% fit$cov %*% t(J)
+        out$cov <- J %*% fit$cov[1:3,1:3] %*% t(J)
         names(out$par) <- labels
         colnames(out$cov) <- labels
     }
@@ -355,11 +355,11 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
-        rounded.disp <- roundit(fit$par['w'],fit$err[,'w'],sigdig=sigdig)
+        ll <- exp(fit$logpar['log(w)'] - fit$fact*sqrt(fit$logcov['log(w)','log(w)']))
+        ul <- exp(fit$logpar['log(w)'] + fit$fact*sqrt(fit$logcov['log(w)','log(w)']))
+        rounded.disp <- roundit(fit$par['w'],c(ll,ul),sigdig=sigdig)
         line4 <- substitute('overdispersion ='~a+b/-c~'Ma',
-                            list(a=rounded.disp[1],
-                                 b=rounded.disp[3],
-                                 c=rounded.disp[2]))        
+                            list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2]))
     }
     extrarow <- fit$format>3 & !wetherill
     if (fit$model==1 & extrarow){
