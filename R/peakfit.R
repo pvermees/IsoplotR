@@ -531,7 +531,7 @@ min_age_model <- function(zs,alpha=0.05){
     z <- zs[,1]
     mu <- seq(min(z),max(z),length.out=100)
     sigma <- seq(stats::sd(z)/10,2*stats::sd(z),length.out=10)
-    prop <- seq(0,1,length.out=20)
+    prop <- seq(from=0,to=1,length.out=20)
     L <- Inf
     # grid search!
     for (mui in mu){ # mu
@@ -568,11 +568,15 @@ get.minage.L <- function(pars,zs){
     prop <- pars[3]
     AA  <- prop/sqrt(2*pi*s^2)
     BB <- -0.5*((z-mu)/s)^2
-    CC <- (1-prop)/sqrt(s*pi*(sigma^2+s^2))
+    CC <- (1-prop)/sqrt(2*pi*(sigma^2+s^2))
     mu0 <- (mu/sigma^2 + z/s^2)/(1/sigma^2 + 1/s^2)
     s0 <- 1/sqrt(1/sigma^2 + 1/s^2)
     DD <- 2*(1-stats::pnorm((mu-mu0)/s0))
     EE <- -0.5*((z-mu)^2)/(sigma^2+s^2)
-    fu <- AA*exp(BB) + CC*DD*exp(EE)
-    -sum(log(fu))
+    pos <- AA>0
+    logfu <- z*0
+    logfu[pos] <- log(AA[pos]) + BB + # log(a + b) = log(a) + log(1 + b/a):
+        log(1 + exp(EE[pos]-BB[pos])*CC[pos]*DD[pos]/AA[pos])
+    logfu[!pos] <- log(AA[!pos]*exp(BB[!pos]) + CC*DD[!pos]*exp(EE[!pos]))
+    -sum(logfu)
 }
