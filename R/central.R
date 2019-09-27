@@ -208,7 +208,8 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,exterr=FALSE,...){
             theta <- sum(wj*pj)/sum(wj)
         }
         tt <- log(1+0.5*L8*(x$zeta[1]/1e6)*x$rhoD[1]*theta/(1-theta))/L8
-        st <- tt * sqrt((sum(wj)*(theta*(1-theta))^2) + (x$rhoD[2]/x$rhoD[1])^2)
+        st <- tt * sqrt(1/(sum(wj)*(theta*(1-theta))^2) +
+                        (x$rhoD[2]/x$rhoD[1])^2 + (x$zeta[2]/x$zeta[1])^2)
         mu <- log(theta/(1-theta))
         # remove two d.o.f. for mu and sigma
         out$df <- length(Nsj)-2
