@@ -150,8 +150,8 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         out$cov <- fit2$cov
     } else {
         init <- lta0b0
-        lower <- init-2
-        upper <- init+2
+        lower <- init-1
+        upper <- init+1
         if (model==3){
             if (is.na(w)) ww <- init[1]-5
             init <- c(init,ww)
@@ -204,7 +204,7 @@ get.lta0b0.model2 <- function(x,anchor=list(FALSE,NA),...){
     }
     fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                    x=x,fixed=fixit(x,anchor=anchor,model=2),
-                   lower=init-2,upper=init+2,hessian=TRUE,...)
+                   lower=init-1,upper=init+1,hessian=TRUE,...)
     out <- list()
     out$lta0b0 <- fit$par
     if (det(fit$hessian) > 0)
@@ -748,13 +748,13 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     J[2,1] <- -D$dPb206U238dt                # dLdt
     if (format>6) J[3,1] <- -D$dPb208Th232dt # dMdt
     if (deriv==1) {
-        dEdw <- 2*exp(w)^2
+        dEdw <- exp(w)
         Ew <- J%*%dEdw%*%t(J)
     } else if (deriv==2) {
-        d2Edw2 <- 4*exp(w)^2
+        d2Edw2 <- exp(w)
         Ew <- J%*%d2Edw2%*%t(J)
     } else {
-        E <- exp(w)^2
+        E <- exp(w)
         Ew <- J%*%E%*%t(J)
     }
     out <- matrix(0,ndim*ns,ndim*ns)
@@ -762,8 +762,8 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     diag(out[(ns+1):(2*ns),(ns+1):(2*ns)]) <- Ew[2,2]
     diag(out[1:ns,(ns+1):(2*ns)]) <- Ew[1,2]
     diag(out[(ns+1):(2*ns),1:ns]) <- Ew[2,1]
-    if (format>4){
-        diag(out[(ns+1):(2*ns),(2*ns+1):(3*ns)]) <- Ew[3,3]
+    if (format>3){
+        diag(out[(2*ns+1):(3*ns),(2*ns+1):(3*ns)]) <- Ew[3,3]
         diag(out[1:ns,(2*ns+1):(3*ns)]) <- Ew[1,3]
         diag(out[(2*ns+1):(3*ns),1:ns]) <- Ew[3,1]
         diag(out[(ns+1):(2*ns),(2*ns+1):(3*ns)]) <- Ew[2,3]
