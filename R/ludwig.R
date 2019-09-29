@@ -165,7 +165,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         out$logcov <- np*fit$value/(length(x)-2)*solve(fit$hessian) # from R-intro
     } else {
         if (model==3){
-            if (is.na(w)) ww <- init[1]-5
+            if (is.na(w)) ww <- init[1]
             init <- c(init,ww)
             lower <- c(lower,ww-10)
             upper <- c(upper,upper[1])
@@ -391,7 +391,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
                exp(a0)*U*(O[i1,i2]+t(O[i1,i2])) +
                (O[i2,i1]+t(O[i2,i1]))*exp(a0)*U)
         L <- as.vector(solve(B,A))
-        c0 <- Y - D$Pb206U23p8 - L
+        c0 <- Y - D$Pb206U238 - L
         K <- X - D$Pb207U235 - exp(a0)*U*c0
         KLM <- c(K,L)
     } else if (x$format%in%c(4,5,6)){
