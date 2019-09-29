@@ -153,15 +153,17 @@ mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
 get.lta0b0w <- function(x,exterr=FALSE,model=1,
                         anchor=list(FALSE,NA),w=NA,...){
     out <- list(model=model,exterr=exterr)
-    fit2 <- get.lta0b0.model2(x,anchor=anchor) # replace with titterington for models 1, 3
-    lta0b0 <- fit2$lta0b0
+    init <- get.lta0b0.init(x,model=model,anchor=anchor)
+    lower <- init-1
+    upper <- init+1
     if (model==2){
-        out$logpar <- lta0b0
-        out$logcov <- fit2$cov
+        fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
+                       x=x,fixed=fixit(x,anchor=anchor,model=2),
+                       lower=init-2,upper=init+2,hessian=TRUE,...)
+        np <- length(fit$par)
+        out$logpar <- fit$par
+        out$logcov <- np*fit$value/(length(x)-2)*solve(fit$hessian) # from R-intro
     } else {
-        init <- lta0b0
-        lower <- init-1
-        upper <- init+1
         if (model==3){
             if (is.na(w)) ww <- init[1]-5
             init <- c(init,ww)
@@ -188,50 +190,52 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     out
 }
 
-get.lta0b0.model2 <- function(x,anchor=list(FALSE,NA),...){
+get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA),...){
     out <- list()
-    xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-    fit <- lm(xy[,'Y'] ~ xy[,'X'])
-    if (fit$coef[2]<0) { # negative slope
-        out$intersections <- 2
-        tt <- get.Pb206U238.age(-fit$coef[2]/fit$coef[1])[1]
-    } else{ # positive slope
-        out$intersections <- 1
-        tt <- get.Pb207Pb206.age(fit$coef[1])[1]
-    }
-    if (x$format%in%c(1,2,3)){
-        np <- 2
-        a0 <- fit$coef[1]
-        init <- log(c(tt,a0))
-    } else if (x$format%in%c(4,5,6)){
-        np <- 3
-        xyz <- get.UPb.isochron.ratios.204(x)
-        fit <- lm(xyz[,'Pb204Pb206'] ~ xyz[,'U238Pb206'])
-        a0 <- 1/fit$coef[1]
-        fit <- lm(xyz[,'Pb204Pb207'] ~ xyz[,'U235Pb207'])
-        b0 <- 1/fit$coef[1]
-        init <- log(c(tt,a0,b0))
-    } else if (x$format%in%c(7,8)){
-        np <- 3
-        xyz <- get.UPb.isochron.ratios.208(x,tt=tt)
-        fit6 <- lm(xyz[,'Pb208cPb206'] ~ xyz[,'U238Pb206'])
-        fit7 <- lm(xyz[,'Pb208cPb207'] ~ xyz[,'U235Pb207'])
-        a0 <- 1/fit6$coef[1]
-        b0 <- 1/fit7$coef[1]
-        init <- log(c(tt,a0,b0))
+    xy <- data2york(x,option=2)
+    if (model==2){
+        fit <- lm(xy[,'Y'] ~ xy[,'X'])
+        a <- fit$coef[1]
+        b <- fit$coef[2]
+        covmat <- vcov(fit)
     } else {
-        stop('Incorrect input format.')
+        fit <- york(xy)
+        a <- fit$a[1]
+        b <- fit$b[1]
+        covmat <- matrix(c(fit$a[2]^2,fit$cov.ab,
+                           fit$cov.ab,fit$b[2]^2),2,2)
     }
-    fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                   x=x,fixed=fixit(x,anchor=anchor,model=2),
-                   lower=init-2,upper=init+2,hessian=TRUE,...)
-    out$lta0b0 <- fit$par
-    if (det(fit$hessian) > 0)
-        out$cov <- np*fit$value/(length(x)-2)*solve(fit$hessian) # from R-intro
-    else
-        out$cov <- matrix(0,np,np)
-    out
+    tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
+    tt <- tint['t[l]']
+    if (x$format<4){
+        a0 <- a
+        init <- log(c(tt,a0))
+        names(init) <- c('lt','a0')
+    } else {
+        if (x$format<7) option <- 3
+        else option <- 6
+        xy <- data2york(x,option=option) # 04-08c/06 vs 38/06
+        if (model==2){
+            fit <- lm(xy[,'Y'] ~ xy[,'X'])
+            a0 <- 1/fit$coef[1]
+        } else {
+            fit <- york(xy)
+            a0 <- 1/fit$a[1]
+        }
+        xy <- data2york(x,option=option+1) # 04-08c/07 vs 38/07
+        if (model==2){
+            fit <- lm(xy[,'Y'] ~ xy[,'X'])
+            b0 <- 1/fit$coef[1]
+        } else {
+            fit <- york(xy)
+            b0 <- 1/fit$a[1]
+        }
+        init <- log(c(tt,a0,b0))
+        names(init) <- c('lt','a0','b0')
+    }
+    init
 }
+
 SS.model2 <- function(lta0b0,x){
     tt <- exp(lta0b0[1])
     a0 <- exp(lta0b0[2])
@@ -245,11 +249,8 @@ SS.model2 <- function(lta0b0,x){
     } else {
         b0 <- exp(lta0b0[3])
         ns <- length(x)
-        if (x$format<7){
-            xy <- get.UPb.isochron.ratios.204(x)
-        } else {
-            xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
-        }
+        if (x$format<7) xy <- get.UPb.isochron.ratios.204(x)
+        else xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
         x6 <- xy[,1] # U238Pb206
         y6 <- xy[,2] # Pb204Pb206 or Pb208cPb206
         x7 <- xy[,3] # U235Pb207
