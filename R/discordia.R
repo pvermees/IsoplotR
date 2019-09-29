@@ -98,8 +98,6 @@ twfit2wfit <- function(fit,x){
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
     } else {
         search.range <- c(0,tt-buffer)
-        if (x$d$U48$option>0) # disequilibrium samples
-            search.range[1] <- -0.001/settings('lambda','U234')[1]
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
         tu <- tt
