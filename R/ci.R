@@ -10,7 +10,7 @@ profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
                                   mu=mu,y=y,m=m,LLmax=LLmax,
                                   cutoff=cutoff)$minimum
     }
-    sigmauinit <- 2*stats::sd(log(y)-log(m-y))
+    sigmauinit <- 2*stats::sd(log(y+0.5)-log(m-y))
     if (abs(LL.FT(mu=mu,sigma=sigmauinit,y=y,m=m)-LLmax) < cutoff/2){
         sigmau <- Inf
     } else {
