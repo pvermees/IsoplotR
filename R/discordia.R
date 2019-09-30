@@ -97,7 +97,7 @@ twfit2wfit <- function(fit,x){
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
     } else {
-        search.range <- c(0,tt-buffer)
+        search.range <- c(-1000,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
         tu <- tt

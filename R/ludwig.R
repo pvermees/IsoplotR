@@ -159,7 +159,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     if (model==2){
         fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                        x=x,fixed=fixit(x,anchor=anchor,model=2),
-                       lower=init-2,upper=init+2,hessian=TRUE,...)
+                       lower=lower,upper=upper,hessian=TRUE,...)
         np <- length(fit$par)
         out$logpar <- fit$par
         out$logcov <- np*fit$value/(length(x)-2)*solve(fit$hessian) # from R-intro
@@ -173,8 +173,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,
                        fixed=fixit(x,anchor=anchor,model=model,w=w),
-                       lower=lower,upper=upper,
-                       control=list(fnscale=-1),...)
+                       lower=lower,upper=upper,control=list(fnscale=-1),...)
         out$LL <- fit$value
         out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,anchor=anchor)
