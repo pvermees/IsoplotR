@@ -443,12 +443,12 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                              show.ellipses=1*(model!=2),xlab='x',
                              ylab='y',hide=NULL,omit=NULL,
                              omit.col=NA,...){
-    y <- data2york(x)
     d2calc <- clear(x,hide,omit)
-    fit <- regression(d2calc,model=model)
+    fit <- regression(data2york(d2calc),model=model)
     fit <- regression_init(fit,alpha=alpha)
     fit <- ci_isochron(fit)
     if (plot){
+        y <- data2york(x)
         scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
@@ -1216,7 +1216,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
         mymtext(line1,line=1,...)
         mymtext(line2,line=0,...)
     } else if (fit$model==3){
-        if (type=='U-Pb'){
+        if (!is.na(type) & type=='U-Pb'){
             rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
             line3 <- substitute('overdispersion ='~a+b/-c~'% of Pb'[o],
                                 list(a=rounded.disp[1],
