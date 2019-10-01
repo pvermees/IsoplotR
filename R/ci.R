@@ -46,34 +46,6 @@ profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
     c(ll,ul)
 }
 
-profile_LL_ludwig <- function(fit,x,alpha=0.05){
-    ta0b0w <- fit$par
-    w <- ta0b0w['w']
-    wmax <- 3*(w + sqrt(fit$cov['w','w']))
-    wrange <- c(0,wmax)
-    LLmax <- LL.lud.UPb(ta0b0w,x=x,exterr=FALSE,LL=TRUE)
-    cutoff <- stats::qchisq(1-alpha,1)
-    LLl <- get.ta0b0w(x,exterr=FALSE,model=3,w=wrange[1])$LL
-    if (abs(LLl-LLmax) < cutoff/2){
-        wl <- 0
-    } else {
-        wl <- uniroot(profile_discordia_helper,interval=c(wrange[1],w),
-                      x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$root
-    }
-    LLu <- get.ta0b0w(x,exterr=FALSE,model=3,w=wrange[2])$LL
-    if (abs(LLu-LLmax) < cutoff/2){
-        wu <- Inf
-    } else {
-        wu <- uniroot(profile_discordia_helper,interval=c(w,wrange[2]),
-                      x=x,ta0b0=ta0b0,LLmax=LLmax,cutoff=cutoff)$root
-    }
-    ll <- w - wl
-    ul <- wu - w
-    out <- c(ll,ul)
-    names(out) <- c('ll','ul')
-    out
-}
-
 profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     mu <- fit$mu[1]
     sigma <- fit$sigma
@@ -186,4 +158,12 @@ profile_LL_isochron_disp <- function(fit){
 profile_isochron_helper <- function(w,xyz,LLmax,cutoff,type='york'){
     LL <- LL.isochron(w,xyz,type=type)
     abs(LLmax-LL-cutoff/2)
+}
+
+ci_log2lin_lud <- function(fit,fact=1){
+    lx <- fit$logpar['log(w)']
+    slx <- sqrt(fit$logcov['log(w)','log(w)'])
+    ll <- exp(lx - fact*slx)
+    ul <- exp(lx + fact*slx)
+    c(exp(lx),ll,ul)
 }

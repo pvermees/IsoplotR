@@ -490,6 +490,7 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         E <- lud$cov[c(1,3),c(1,3)]
         x.lab <- quote(''^235*'U/'^207*'Pb')
     }
+    lud$w <- ci_log2lin_lud(fit=lud,fact=nfact(alpha))
     out <- isochron_init(lud,alpha=0.05)
     out$age[1] <- tt
     out$age[2] <- sqrt(lud$cov[1,1])
@@ -1217,8 +1218,8 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
         mymtext(line2,line=0,...)
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
-            rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig=sigdig)
-            line3 <- substitute('overdispersion ='~a+b/-c~'% of Pb'[o],
+            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
+            line3 <- substitute('overdispersion ='~a+b/-c~'Ma',
                                 list(a=rounded.disp[1],
                                      b=rounded.disp[3],
                                      c=rounded.disp[2]))

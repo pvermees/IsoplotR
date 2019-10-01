@@ -353,9 +353,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
-        ll <- exp(fit$logpar['log(w)'] - fit$fact*sqrt(fit$logcov['log(w)','log(w)']))
-        ul <- exp(fit$logpar['log(w)'] + fit$fact*sqrt(fit$logcov['log(w)','log(w)']))
-        rounded.disp <- roundit(fit$par['w'],c(ll,ul),sigdig=sigdig)
+        ci <- ci_log2lin_lud(fit=fit,fact=fit$fact)
+        rounded.disp <- roundit(ci[1],ci[2:3],sigdig=sigdig)
         line4 <- substitute('overdispersion ='~a+b/-c~'Ma',
                             list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2]))
     }
