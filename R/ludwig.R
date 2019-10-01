@@ -243,7 +243,7 @@ SS.model2 <- function(lta0b0,x){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
-        yp <- yr+(exp(a0)-yr)*(xr-xy[,'X'])/xr
+        yp <- a0+(yr-a0)*xy[,'X']/xr
         out <- sum((yp-xy[,'Y'])^2)
     } else {
         b0 <- exp(lta0b0[3])
