@@ -154,25 +154,22 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
                         anchor=list(FALSE,NA),w=NA,...){
     out <- list(model=model,exterr=exterr)
     init <- get.lta0b0.init(x,model=model,anchor=anchor)
+    fixed <- fixit(x,anchor=anchor,model=model,w=w)
+    if (model==3){
+        if (is.na(w)) ww <- init[1]/100
+        else ww <- w
+        init <- c(init,ww)
+    }
     lower <- init-1
     upper <- init+1
     if (model==2){
         fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                       x=x,fixed=fixit(x,anchor=anchor,model=2),
-                       lower=lower,upper=upper,hessian=TRUE,...)
+                       x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
         np <- length(fit$par)
         out$logpar <- fit$par
         out$logcov <- np*fit$value/(length(x)-2)*solve(fit$hessian) # from R-intro
     } else {
-        if (model==3){
-            if (is.na(w)) ww <- init[1]
-            else ww <- w
-            init <- c(init,ww)
-            lower <- c(lower,ww-10)
-            upper <- c(upper,upper[1])
-        }
-        fixed <- fixit(x,anchor=anchor,model=model,w=w)
-        fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
+        fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
                        lower=lower,upper=upper,control=list(fnscale=-1),...)
         out$LL <- fit$value
@@ -266,14 +263,14 @@ SS.model2 <- function(lta0b0,x){
     out
 }
 
-LL.lud.UPb <- function(lta0b0w,x,exterr=FALSE,LL=TRUE){
+LL.lud <- function(lta0b0w,x,exterr=FALSE,LL=TRUE){
     l <- data2ludwig(x,lta0b0w=lta0b0w,exterr=exterr)
     if (LL) out <- l$LL
     else out <- l$SS
     out
 }
 
-LL.lud.UPb.gr <- function(lta0b0w,x,exterr=FALSE){
+LL.lud.gr <- function(lta0b0w,x,exterr=FALSE){
     data2ludwig(x,lta0b0w=lta0b0w,exterr=exterr,jacobian=TRUE)$jacobian
 }
 
@@ -475,23 +472,23 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
             dMdt <- -D$dPb208Th232dt
             dMdc0 <- -1
         }
+        diag(JKLM[i1,i1]) <- dKdc0
         JKLM[i1,'lt']  <- dKdt*dtdlt
         JKLM[i1,'a0'] <- dKda0
-        diag(JKLM[i1,i1]) <- dKdc0
+        diag(JKLM[i2,i1]) <- dLdc0
         JKLM[i2,'lt']  <- dLdt*dtdlt
         JKLM[i2,'a0'] <- dLda0
-        diag(JKLM[i2,i1]) <- dLdc0
-        out$jacobian['lt'] <- -KLM%*%O%*%JKLM[,'lt']
-        out$jacobian['a0'] <- -KLM%*%O%*%JKLM[,'a0']
         if (x$format>3){
             JKLM[i1,'b0'] <- dKdb0
             JKLM[i2,'b0'] <- dLdb0
+            diag(JKLM[i3,i1]) <- dMdc0
             JKLM[i3,'lt']  <- dMdt*dtdlt
             JKLM[i3,'a0']  <- dMda0
             JKLM[i3,'b0']  <- dMdb0
-            diag(JKLM[i3,i1]) <- dMdc0
             out$jacobian['b0'] <- -KLM%*%O%*%JKLM[,'b0']
         }
+        out$jacobian['lt'] <- -KLM%*%O%*%JKLM[,'lt']
+        out$jacobian['a0'] <- -KLM%*%O%*%JKLM[,'a0']
         if (np==(NP+1)){
             dEDdw <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=1)
             dlnDetEDdw <- trace(O%*%dEDdw)
