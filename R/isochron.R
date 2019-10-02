@@ -490,7 +490,7 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         E <- lud$cov[c(1,3),c(1,3)]
         x.lab <- quote(''^235*'U/'^207*'Pb')
     }
-    lud$w <- ci_log2lin_lud(fit=lud,fact=nfact(alpha))
+    if (model==3) lud$w <- ci_log2lin_lud(fit=lud,fact=nfact(alpha))
     out <- isochron_init(lud,alpha=0.05)
     out$age[1] <- tt
     out$age[2] <- sqrt(lud$cov[1,1])

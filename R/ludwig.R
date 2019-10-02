@@ -166,17 +166,18 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     } else {
         if (model==3){
             if (is.na(w)) ww <- init[1]
+            else ww <- w
             init <- c(init,ww)
             lower <- c(lower,ww-10)
             upper <- c(upper,upper[1])
         }
+        fixed <- fixit(x,anchor=anchor,model=model,w=w)
         fit <- optifix(parms=init,fn=LL.lud.UPb,gr=LL.lud.UPb.gr,
-                       method="L-BFGS-B",x=x,exterr=exterr,
-                       fixed=fixit(x,anchor=anchor,model=model,w=w),
+                       method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
                        lower=lower,upper=upper,control=list(fnscale=-1),...)
         out$LL <- fit$value
         out$logpar <- fit$par
-        out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,anchor=anchor)
+        out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
     }
     if (x$format %in% c(1,2,3)) parnames <- c('log(t)','log(76i)')
     else if (x$format %in% c(4,5,6)) parnames <- c('log(t)','log(64i)','log(74i)')
@@ -276,31 +277,25 @@ LL.lud.UPb.gr <- function(lta0b0w,x,exterr=FALSE){
     data2ludwig(x,lta0b0w=lta0b0w,exterr=exterr,jacobian=TRUE)$jacobian
 }
 
-fisher.lud <- function(x,fit,exterr=TRUE,anchor=list(FALSE,NA),...){
+fisher.lud <- function(x,fit,exterr=TRUE,fixed=rep(FALSE,length(fit$par)),...){
     fish <- data2ludwig(x,lta0b0w=fit$par,exterr=exterr,hessian=TRUE)$hessian
     ns <- length(x)
     np <- length(fit$par)
     i1 <- 1:ns
-    i2 <- (ns+1):(ns+np)
+    i2 <- ns+(1:np)
+    out <- matrix(0,ns+np,ns+np)
     anchorfish(AA=fish[i1,i1],BB=fish[i1,i2],
-               CC=fish[i2,i1],DD=fish[i2,i2],anchor=anchor)
+               CC=fish[i2,i1],DD=fish[i2,i2],fixed=fixed)
 }
-anchorfish <- function(AA,BB,CC,DD,anchor=list(FALSE,NA)){
-    npar <- nrow(DD)
-    out <- matrix(0,npar,npar)
-    if (anchor[[1]] && is.numeric(anchor[[2]])){
-        bb <- subset(BB,select=-1)
-        cc <- t(subset(t(CC),select=-1))
-        dd <- DD[-1,-1]
-        out[2:npar,2:npar] <- blockinverse(AA,bb,cc,dd)
-    } else if (anchor[[1]]){
-        bb <- subset(BB,select=1)
-        cc <- t(subset(t(CC),select=1))
-        dd <- DD[1,1]
-        out[1,1] <- blockinverse(AA,bb,cc,dd)
-    } else {
-        out <- blockinverse(AA,BB,CC,DD)
-    }
+anchorfish <- function(AA,BB,CC,DD,fixed=rep(FALSE,nrow(DD))){
+    ns <- nrow(AA)
+    np <- nrow(DD)
+    i <- (1:np)[!fixed]
+    bb <- BB[,i,drop=FALSE]
+    cc <- CC[i,,drop=FALSE]
+    dd <- DD[i,i,drop=FALSE]
+    out <- matrix(0,np,np)
+    out[i,i] <- blockinverse(AA,bb,cc,dd)
     out
 }
 
@@ -432,9 +427,9 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
                 K0%*%O[i1,i3] + L0%*%O[i2,i3])
         CC <- U*exp(b0)*Wd%*%O[i1,i1]%*%K0 +
             exp(a0)*Wd%*%O[i2,i2]%*%L0 +
-            exp(a0)*Wd%*%O[i1,i2]%*%K0 +
-            U*exp(b0)*Wd%*%O[i2,i1]%*%L0 +
-            O[i1,i3]%*%K0 + O[i2,i3]%*%L0
+            exp(a0)*Wd%*%O[i2,i1]%*%K0 +
+            U*exp(b0)*Wd%*%O[i1,i2]%*%L0 +
+            O[i3,i1]%*%K0 + O[i3,i2]%*%L0
         M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
         c0 <- as.vector(Z - D$Pb208Th232 - M)
         K <- as.vector(X - D$Pb207U235 - c0*exp(b0)*U*W)
@@ -613,16 +608,19 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
         Ew <- J%*%E%*%t(J)
     }
     out <- matrix(0,ndim*ns,ndim*ns)
-    diag(out[1:ns,1:ns]) <- Ew[1,1]
-    diag(out[(ns+1):(2*ns),(ns+1):(2*ns)]) <- Ew[2,2]
-    diag(out[1:ns,(ns+1):(2*ns)]) <- Ew[1,2]
-    diag(out[(ns+1):(2*ns),1:ns]) <- Ew[2,1]
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    diag(out[i1,i1]) <- Ew[1,1]
+    diag(out[i2,i2]) <- Ew[2,2]
+    diag(out[i1,i2]) <- Ew[1,2]
+    diag(out[i2,i1]) <- Ew[2,1]
     if (format>3){
-        diag(out[(2*ns+1):(3*ns),(2*ns+1):(3*ns)]) <- Ew[3,3]
-        diag(out[1:ns,(2*ns+1):(3*ns)]) <- Ew[1,3]
-        diag(out[(2*ns+1):(3*ns),1:ns]) <- Ew[3,1]
-        diag(out[(ns+1):(2*ns),(2*ns+1):(3*ns)]) <- Ew[2,3]
-        diag(out[(2*ns+1):(3*ns),(ns+1):(2*ns)]) <- Ew[3,2]
+        i3 <- (2*ns+1):(3*ns)
+        diag(out[i3,i3]) <- Ew[3,3]
+        diag(out[i1,i3]) <- Ew[1,3]
+        diag(out[i3,i1]) <- Ew[3,1]
+        diag(out[i2,i3]) <- Ew[2,3]
+        diag(out[i3,i2]) <- Ew[3,2]
     }
     out
 }
