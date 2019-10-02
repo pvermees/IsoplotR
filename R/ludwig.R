@@ -165,9 +165,12 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     if (model==2){
         fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                        x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
-        np <- length(fit$par)
+        np <- length(fit$par) # number of parameters
+        ns <- length(x)       # number of samples
+        ne <- np-1            # number of equations
+        mse <- fit$value/(ne*ns-np) # mean square error
         out$logpar <- fit$par
-        out$logcov <- np*fit$value/(length(x)-2)*solve(fit$hessian) # from R-intro
+        out$logcov <- solve(fit$hessian)*mse
     } else {
         fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
@@ -254,10 +257,10 @@ SS.model2 <- function(lta0b0,x){
         y7 <- xy[,4] # Pb204Pb207 or Pb208cPb207
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
-        y6p <- (r86-x6)/(r86*a0)
-        SS6 <- sum((y6p-y6)^2)
-        y7p <- (r57-x7)/(r57*b0)
-        SS7 <- sum((y7p-y7)^2)
+        y6p <- (r86-x6)/(a0*r86)
+        SS6 <- sum((y6p-y6)^2)/var(y6)
+        y7p <- (r57-x7)/(b0*r57)
+        SS7 <- sum((y7p-y7)^2)/var(y7)
         out <- SS6 + SS7
     }
     out
