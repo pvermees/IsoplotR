@@ -152,6 +152,7 @@ mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
 
 get.lta0b0w <- function(x,exterr=FALSE,model=1,
                         anchor=list(FALSE,NA),w=NA,...){
+    if (model==3) parnames <- c(parnames,'log(w)')
     out <- list(model=model,exterr=exterr)
     init <- get.lta0b0.init(x,model=model,anchor=anchor)
     fixed <- fixit(x,anchor=anchor,model=model,w=w)
@@ -168,9 +169,10 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         np <- length(fit$par) # number of parameters
         ns <- length(x)       # number of samples
         ne <- np-1            # number of equations
-        mse <- fit$value/(ne*ns-np) # mean square error
+        mse <- fit$value/(ne*ns-np)   # mean square error
         out$logpar <- fit$par
-        out$logcov <- solve(fit$hessian)*mse
+        out$logcov <- matrix(0,np,np) # initialise
+        out$logcov[!fixed,!fixed] <- solve(fit$hessian)*mse
     } else {
         fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
@@ -183,16 +185,44 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     else if (x$format %in% c(4,5,6)) parnames <- c('log(t)','log(64i)','log(74i)')
     else if (x$format %in% c(7,8)) parnames <- c('log(t)','log(68i)','log(78i)')
     else stop("Illegal input format.")
-    if (model==3) parnames <- c(parnames,'log(w)')
     names(out$logpar) <- parnames
     rownames(out$logcov) <- parnames
     colnames(out$logcov) <- parnames
     out
 }
 
-get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA),...){
-    out <- list()
+# all anchored initialisation is done by model 2 regression
+anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
+    if (x$format<4) np <- 2
+    else np <- 3
+    init <- rep(0,np)
+    names(init) <- c('lt','a0','b0')[1:np]
     xy <- data2york(x,option=2)
+    if (is.na(anchor[[2]])){ # fix common Pb composition
+        if (x$format%in%c(1,2,3)){
+            a <- settings('iratio','Pb207Pb206')[1]
+            fit <- stats::lm(I(xy[,'Y']-a) ~ 0 + xy[,'X'])
+            b <- fit$coef
+            covmat <- matrix(c(0,0,0,vcov(fit)),2,2)
+        }
+    } else if (is.numeric(anchor[[2]])){ # fix age
+        init['lt'] <- log(anchor[[2]])
+        if (x$format%in%c(1,2,3)){
+            TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
+            fit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
+                                 0 + I(xy[,'X']-TW$x['U238Pb206']))
+            b <- fit$coef
+            init['a0'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
+        }
+    }
+
+}
+
+get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA)){
+    out <- list()
+    if (anchor[[1]]) return(anchored.lta0b0.init(x=x,anchor=anchor))
+    xy <- data2york(x,option=2)
+    # First, get the approximate intercept age
     if (model==2){
         fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         a <- fit$coef[1]
@@ -207,6 +237,7 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA),...){
     }
     tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
     tt <- tint['t[l]']
+    # Then, estimate the common Pb intercept(s)
     if (x$format<4){
         a0 <- a
         init <- log(c(tt,a0))
@@ -277,7 +308,7 @@ LL.lud.gr <- function(lta0b0w,x,exterr=FALSE){
     data2ludwig(x,lta0b0w=lta0b0w,exterr=exterr,jacobian=TRUE)$jacobian
 }
 
-fisher.lud <- function(x,fit,exterr=TRUE,fixed=rep(FALSE,length(fit$par)),...){
+fisher.lud <- function(x,fit,exterr=TRUE,fixed=rep(FALSE,length(fit$par))){
     fish <- data2ludwig(x,lta0b0w=fit$par,exterr=exterr,hessian=TRUE)$hessian
     ns <- length(x)
     np <- length(fit$par)
