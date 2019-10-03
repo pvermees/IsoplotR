@@ -13,13 +13,14 @@ agespectrum(x, ...)
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80", sigdig = 2, line.col = "red",
   lwd = 2, xlab = "cumulative fraction", ylab = "age [Ma]",
-  hide = NULL, ...)
+  hide = NULL, omit = NULL, ...)
 
 \method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
   random.effects = TRUE, levels = NA, clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80", sigdig = 2, exterr = TRUE,
-  line.col = "red", lwd = 2, i2i = FALSE, hide = NULL, ...)
+  line.col = "red", lwd = 2, i2i = FALSE, hide = NULL,
+  omit = NULL, ...)
 }
 \arguments{
 \item{x}{a three-column matrix whose first column gives the amount of
@@ -91,6 +92,9 @@ values reported in the title of the graphical output.}
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}
 
+\item{omit}{vector with indices of aliquots that should be plotted
+but omitted from age plateau calculation}
+
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}
 
@@ -159,11 +163,19 @@ criterion (see \code{\link{weightedmean}}).  Note that this
 definition is different (and simpler) than the one used by
 \code{Isoplot} (Ludwig, 2003). However, it is important to mention
 that all definitions of an age plateau are heuristic by nature and
-should not be used for quantitative inference.
+should not be used for quantitative inference. It is possible (and
+likely) that the plateau steps exhibit significant
+overdispersion. This overdispersion can be manually reduced by
+removing individual heating steps with the optional \code{omit}
+argument.
 }
 \examples{
 data(examples)
-agespectrum(examples$ArAr,ylim=c(0,80))
+par(mfrow=c(2,1))
+agespectrum(examples$ArAr)
+# removing the first 6 steps yields the longest plateau
+# that passes the chi-square test for homogeneity
+agespectrum(examples$ArAr,omit=1:6)
 }
 \seealso{
 \code{\link{weightedmean}}

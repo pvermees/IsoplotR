@@ -219,12 +219,7 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
-#' \code{1}: the Stacey-Kramer two-stage model to infer the initial
-#' Pb-composition
-#'
-#' \code{2}: the isochron intercept as the initial Pb-composition
-#'
-#' \code{3}: the Pb-composition stored in
+#' \code{1}: the Pb-composition stored in
 #' 
 #' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
 #' \code{UPb} and \code{x$format<4});
@@ -237,6 +232,11 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #' \code{settings('iratio','Pb208Pb206')} and
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
+#'
+#' \code{2}: the isochron intercept as the initial Pb-composition
+#'
+#' \code{3}: the Stacey-Kramers two-stage model to infer the initial
+#' Pb-composition (only applicable if \code{x} has class \code{UPb})
 #'
 #' @examples
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
@@ -273,7 +273,7 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
                               to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
-                              alpha=0.05,exterr=TRUE,common.Pb=1,
+                              alpha=0.05,exterr=TRUE,common.Pb=2,
                               ranked=FALSE,hide=NULL,omit=NULL,
                               omit.col=NA,...){
     weightedmean_helper(x,random.effects=random.effects,

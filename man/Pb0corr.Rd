@@ -4,18 +4,18 @@
 \alias{Pb0corr}
 \title{Common Pb correction}
 \usage{
-Pb0corr(x, option = 1, omit = NULL)
+Pb0corr(x, option = 3, omit = NULL)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
 
 \item{option}{one of either
 
-\code{1}: Stacey-Kramers correction
+\code{1}: nominal common Pb isotope composition
 
 \code{2}: isochron regression
 
-\code{3}: nominal common Pb isotope composition}
+\code{3}: Stacey-Kramers correction}
 
 \item{omit}{vector with indices of aliquots that should be omitted
 from the isochron regression (only used if \code{option=2})}
@@ -122,11 +122,11 @@ of the partial resetting event.
 }
 \examples{
 data(examples)
-UPb <- Pb0corr(examples$UPb,option=1)
+UPb <- Pb0corr(examples$UPb,option=2)
 concordia(UPb)
 # produces identical results as:
 dev.new()
-concordia(examples$UPb,common.Pb=1)
+concordia(examples$UPb,common.Pb=2)
 }
 \references{
 Ludwig, K.R., 1998. On the treatment of concordant uranium-lead

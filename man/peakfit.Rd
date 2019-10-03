@@ -105,12 +105,7 @@ between the \eqn{^{206}}Pb/\eqn{^{238}}U and
 \item{common.Pb}{apply a common lead correction using one of three
     methods:
 
-\code{1}: the Stacey-Kramer two-stage model to infer the initial
-Pb-composition
-
-\code{2}: the isochron intercept as the initial Pb-composition
-
-\code{3}: the Pb-composition stored in
+\code{1}: the Pb-composition stored in
 
 \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
 \code{UPb} and \code{x$format<4});
@@ -122,7 +117,12 @@ Pb-composition
 
 \code{settings('iratio','Pb208Pb206')} and
 \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
-\code{UPb} and \code{x$format=7} or \code{8}).}
+\code{UPb} and \code{x$format=7} or \code{8}).
+
+\code{2}: the isochron intercept as the initial Pb-composition
+
+\code{3}: the Stacey-Kramers two-stage model to infer the initial
+Pb-composition (only applicable if \code{x} has class \code{UPb})}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka
 `inherited', `excess', or `common')

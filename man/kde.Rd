@@ -43,7 +43,7 @@ kde(x, ...)
   log = FALSE, n = 512, plot = TRUE, pch = "|",
   xlab = "age [Ma]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
   hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
-  binwidth = NA, common.Pb = 1, hide = NULL, ...)
+  binwidth = NA, common.Pb = 2, hide = NULL, ...)
 
 \method{kde}{ArAr}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = "|",
@@ -188,12 +188,7 @@ Set \code{cutoff.disc=NA} to turn off this filter.}
 \item{common.Pb}{apply a common lead correction using one of three
     methods:
 
-\code{1}: the Stacey-Kramer two-stage model to infer the initial
-Pb-composition
-
-\code{2}: the isochron intercept as the initial Pb-composition
-
-\code{3}: the Pb-composition stored in
+\code{1}: the Pb-composition stored in
 
 \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
 \code{UPb} and \code{x$format<4});
@@ -205,7 +200,12 @@ Pb-composition
 
 \code{settings('iratio','Pb208Pb206')} and
 \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
-\code{UPb} and \code{x$format=7} or \code{8}).}
+\code{UPb} and \code{x$format=7} or \code{8}).
+
+\code{2}: the isochron intercept as the initial Pb-composition
+
+\code{3}: the Stacey-Kramers two-stage model to infer the initial
+Pb-composition (only valid if \code{x} has class \code{UPb}).}
 
 \item{ncol}{scalar value indicating the number of columns over
 which the KDEs should be divided.}

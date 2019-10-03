@@ -88,10 +88,6 @@ profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
     LL <- LL.uvw(w,UVW=UVW,x=x,doSm=doSm)
     abs(LLmax-LL-cutoff/2)
 }
-profile_discordia_helper <- function(w,x,ta0b0,LLmax,cutoff=cutoff){
-    LL <- get.ta0b0w(x,exterr=FALSE,model=3,w=w)$LL
-    LLmax-LL-cutoff/2
-}
 
 LL.FT <- function(mu,sigma,y,m){
     LL <- 0

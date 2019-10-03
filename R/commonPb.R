@@ -101,12 +101,12 @@
 #'
 #' @param option one of either
 #' 
-#' \code{1}: Stacey-Kramers correction
-#' 
+#' \code{1}: nominal common Pb isotope composition
+#'
 #' \code{2}: isochron regression
 #'
-#' \code{3}: nominal common Pb isotope composition
-#'
+#' \code{3}: Stacey-Kramers correction
+#' 
 #' @param omit vector with indices of aliquots that should be omitted
 #'     from the isochron regression (only used if \code{option=2})
 #'
@@ -125,22 +125,22 @@
 #' 
 #' @examples
 #' data(examples)
-#' UPb <- Pb0corr(examples$UPb,option=1)
+#' UPb <- Pb0corr(examples$UPb,option=2)
 #' concordia(UPb)
 #' # produces identical results as:
 #' dev.new()
-#' concordia(examples$UPb,common.Pb=1)
+#' concordia(examples$UPb,common.Pb=2)
 #' @export
-Pb0corr <- function(x,option=1,omit=NULL){
+Pb0corr <- function(x,option=3,omit=NULL){
     ns <- length(x)
     out <- x
     out$x.raw <- x$x
     if (option == 1){
-        x.corr <- common.Pb.stacey.kramers(x)
+        x.corr <- common.Pb.nominal(x)
     } else if (option == 2){
         x.corr <- common.Pb.isochron(x,omit=omit)
     } else if (option == 3){
-        x.corr <- common.Pb.nominal(x)
+        x.corr <- common.Pb.stacey.kramers(x)
     } else {
         return
     }

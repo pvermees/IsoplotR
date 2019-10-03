@@ -140,12 +140,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
-#' \code{1}: the Stacey-Kramer two-stage model to infer the initial
-#' Pb-composition
-#'
-#' \code{2}: the isochron intercept as the initial Pb-composition
-#'
-#' \code{3}: the Pb-composition stored in
+#' \code{1}: the Pb-composition stored in
 #' 
 #' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
 #' \code{UPb} and \code{x$format<4});
@@ -159,6 +154,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
 #' 
+#' \code{2}: the isochron intercept as the initial Pb-composition
+#'
+#' \code{3}: the Stacey-Kramer two-stage model to infer the initial
+#' Pb-composition
+#'
 #' @param show.p Show the p-value for concordance for each aliquot to
 #'     the output table. Note: it would be unwise to use the p-value
 #'     value as a concordance filter. Doing so would `punish' high
@@ -244,7 +244,7 @@ age.UPb <- function(x,type=1,exterr=TRUE,i=NA,
 }
 #' @rdname age
 #' @export
-age.PbPb <- function(x,isochron=TRUE,common.Pb=1,
+age.PbPb <- function(x,isochron=TRUE,common.Pb=2,
                      exterr=TRUE,i=NA,sigdig=NA,...){
     if (isochron)
         out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)

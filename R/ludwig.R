@@ -100,8 +100,8 @@ ludwig.default <- function(x,...){
 #'     \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
-ludwig.UPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
-                       anchor=list(FALSE,NA)){
+ludwig <- function(x,exterr=FALSE,alpha=0.05,model=1,
+                   anchor=list(FALSE,NA)){
     fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
@@ -139,7 +139,7 @@ mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
         else if (tanchored) out$df <- 2*ns-2
         else out$df <- 2*ns-3
     }
-    SS <- data2ludwig(x,lta0b0=lta0b0)$SS
+    SS <- data2ludwig(x,lta0b0w=lta0b0)$SS
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)
         out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
@@ -194,10 +194,10 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA),...){
     out <- list()
     xy <- data2york(x,option=2)
     if (model==2){
-        fit <- lm(xy[,'Y'] ~ xy[,'X'])
+        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         a <- fit$coef[1]
         b <- fit$coef[2]
-        covmat <- vcov(fit)
+        covmat <- stats::vcov(fit)
     } else {
         fit <- york(xy)
         a <- fit$a[1]
@@ -216,7 +216,7 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA),...){
         else option <- 6
         xy <- data2york(x,option=option) # 04-08c/06 vs 38/06
         if (model==2){
-            fit <- lm(xy[,'Y'] ~ xy[,'X'])
+            fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
             a0 <- 1/fit$coef[1]
         } else {
             fit <- york(xy)
@@ -224,7 +224,7 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA),...){
         }
         xy <- data2york(x,option=option+1) # 04-08c/07 vs 38/07
         if (model==2){
-            fit <- lm(xy[,'Y'] ~ xy[,'X'])
+            fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
             b0 <- 1/fit$coef[1]
         } else {
             fit <- york(xy)
@@ -258,9 +258,9 @@ SS.model2 <- function(lta0b0,x){
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
         y6p <- (r86-x6)/(a0*r86)
-        SS6 <- sum((y6p-y6)^2)/var(y6)
+        SS6 <- sum((y6p-y6)^2)/stats::var(y6)
         y7p <- (r57-x7)/(b0*r57)
-        SS7 <- sum((y7p-y7)^2)/var(y7)
+        SS7 <- sum((y7p-y7)^2)/stats::var(y7)
         out <- SS6 + SS7
     }
     out

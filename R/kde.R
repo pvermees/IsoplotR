@@ -165,12 +165,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #' @param common.Pb apply a common lead correction using one of three
 #'     methods:
 #'
-#' \code{1}: the Stacey-Kramer two-stage model to infer the initial
-#' Pb-composition
-#'
-#' \code{2}: the isochron intercept as the initial Pb-composition
-#'
-#' \code{3}: the Pb-composition stored in
+#' \code{1}: the Pb-composition stored in
 #' 
 #' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
 #' \code{UPb} and \code{x$format<4});
@@ -183,6 +178,11 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #' \code{settings('iratio','Pb208Pb206')} and
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
+#'
+#' \code{2}: the isochron intercept as the initial Pb-composition
+#'
+#' \code{3}: the Stacey-Kramers two-stage model to infer the initial
+#' Pb-composition (only valid if \code{x} has class \code{UPb}).
 #'
 #' @rdname kde
 #' @export
@@ -242,7 +242,7 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
 kde.PbPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                      n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                     show.hist=TRUE,bty='n',binwidth=NA,common.Pb=1,
+                     show.hist=TRUE,bty='n',binwidth=NA,common.Pb=2,
                      hide=NULL,...){
     tt <- PbPb.age(x,common.Pb=common.Pb)[,1]
     kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,

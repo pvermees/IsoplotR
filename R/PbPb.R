@@ -99,21 +99,6 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
         PbPb <- quotient(y[,'Pb206Pb204'],y[,'errPb206Pb204'],
                          y[,'Pb207Pb204'],y[,'errPb207Pb204'],y[,'rho'])
     } else if (common.Pb == 1){
-        yi <- PbPb.inverse.ratios(x)
-        tt <- get.Pb207Pb206.age(x=yi[,'Pb207Pb206'])[,'t76']
-        for (j in 1:10){ # simple iterative method instead of ML for now
-            i6474 <- stacey.kramers(tt)
-            r64 <- y[,'Pb206Pb204'] - i6474[,1]
-            r74 <- y[,'Pb207Pb204'] - i6474[,2]
-            PbPb <- quotient(r64,y[,'errPb206Pb204'],
-                             r74,y[,'errPb207Pb204'],y[,'rho'])
-            tt <- PbPb2t(PbPb)[,'t']
-        }
-    } else if (common.Pb == 2){
-        y <- data2york(x,inverse=TRUE)
-        fit <- regression(y,model=1)
-        PbPb <- get.76(y,a=fit$a[1],b=fit$b[1])
-    } else if (common.Pb == 3){
         r64 <- y[,'Pb206Pb204'] - settings('iratio','Pb206Pb204')[1]
         r74 <- y[,'Pb207Pb204'] - settings('iratio','Pb207Pb204')[1]
         PbPb <- quotient(r64,y[,'errPb206Pb204'],
@@ -123,6 +108,10 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
         # i74 <- settings('iratio','Pb207Pb204')[1]
         # i64 <- settings('iratio','Pb206Pb204')[1]
         # PbPb <- get.76(y,a=i74/i64,b=i74)
+    } else if (common.Pb == 2){
+        y <- data2york(x,inverse=TRUE)
+        fit <- regression(y,model=1)
+        PbPb <- get.76(y,a=fit$a[1],b=fit$b[1])
     }
     PbPb2t(PbPb,exterr=exterr,sigdig=sigdig,i=i)
 }
