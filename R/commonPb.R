@@ -336,8 +336,7 @@ common.Pb.stacey.kramers <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
         for (i in 1:ns){
-            tint <- stats::optimise(SS.SK.with.204,
-                                    interval=c(0,5000),x=x,i=i)$minimum
+            tint <- stats::optimise(SS.SK.with.204,interval=c(0,5000),x=x,i=i)$minimum
             c6474 <- stacey.kramers(tint)
             c46 <- 1/c6474[,'i64']
             c47 <- 1/c6474[,'i74']
@@ -464,8 +463,8 @@ SS.SK.without.204 <- function(tt,x,i){
 SS.SK.with.204 <- function(tt,x,i){
     wi <- wetherill(x,i=i)
     i6474 <- stacey.kramers(tt)
-    i64 <- i6474['i64']
-    i74 <- i6474['i74']
+    i64 <- i6474[1,'i64']
+    i74 <- i6474[1,'i74']
     U <- iratio('U238U235')[1]
     ccw <- list(x=rep(0,2),cov=matrix(0,2,2))
     cnames <- c('Pb207U235','Pb206U238')
