@@ -101,12 +101,12 @@
 #'
 #' @param option one of either
 #' 
-#' \code{1}: Stacey-Kramers correction
-#' 
+#' \code{1}: nominal common Pb isotope composition
+#'
 #' \code{2}: isochron regression
 #'
-#' \code{3}: nominal common Pb isotope composition
-#'
+#' \code{3}: Stacey-Kramers correction
+#' 
 #' @param omit vector with indices of aliquots that should be omitted
 #'     from the isochron regression (only used if \code{option=2})
 #'
@@ -125,22 +125,22 @@
 #' 
 #' @examples
 #' data(examples)
-#' UPb <- Pb0corr(examples$UPb,option=1)
+#' UPb <- Pb0corr(examples$UPb,option=2)
 #' concordia(UPb)
 #' # produces identical results as:
 #' dev.new()
-#' concordia(examples$UPb,common.Pb=1)
+#' concordia(examples$UPb,common.Pb=2)
 #' @export
-Pb0corr <- function(x,option=1,omit=NULL){
+Pb0corr <- function(x,option=3,omit=NULL){
     ns <- length(x)
     out <- x
     out$x.raw <- x$x
     if (option == 1){
-        x.corr <- common.Pb.stacey.kramers(x)
+        x.corr <- common.Pb.nominal(x)
     } else if (option == 2){
         x.corr <- common.Pb.isochron(x,omit=omit)
     } else if (option == 3){
-        x.corr <- common.Pb.nominal(x)
+        x.corr <- common.Pb.stacey.kramers(x)
     } else {
         return
     }
@@ -336,8 +336,7 @@ common.Pb.stacey.kramers <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
         for (i in 1:ns){
-            tint <- stats::optimise(SS.SK.with.204,
-                                    interval=c(0,5000),x=x,i=i)$minimum
+            tint <- stats::optimise(SS.SK.with.204,interval=c(0,5000),x=x,i=i)$minimum
             c6474 <- stacey.kramers(tint)
             c46 <- 1/c6474[,'i64']
             c47 <- 1/c6474[,'i74']
@@ -464,8 +463,8 @@ SS.SK.without.204 <- function(tt,x,i){
 SS.SK.with.204 <- function(tt,x,i){
     wi <- wetherill(x,i=i)
     i6474 <- stacey.kramers(tt)
-    i64 <- i6474['i64']
-    i74 <- i6474['i74']
+    i64 <- i6474[1,'i64']
+    i74 <- i6474[1,'i74']
     U <- iratio('U238U235')[1]
     ccw <- list(x=rep(0,2),cov=matrix(0,2,2))
     cnames <- c('Pb207U235','Pb206U238')

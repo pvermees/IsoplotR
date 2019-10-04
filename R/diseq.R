@@ -349,12 +349,13 @@ check.equilibrium <- function(d=diseq()){
 #' @export
 mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out <- list()
-    l38 <- settings('lambda','U238')[1]
-    l34 <- settings('lambda','U234')[1]*1000
-    l30 <- settings('lambda','Th230')[1]*1000
-    l26 <- settings('lambda','Ra226')[1]*1000
-    l35 <- settings('lambda','U235')[1]
-    l31 <- settings('lambda','Pa231')[1]*1000
+    l38 <- lambda('U238')[1]
+    l34 <- lambda('U234')[1]*1000
+    l30 <- lambda('Th230')[1]*1000
+    l26 <- lambda('Ra226')[1]*1000
+    l35 <- lambda('U235')[1]
+    l32 <- lambda('Th232')[1]
+    l31 <- lambda('Pa231')[1]*1000
     U <- iratio('U238U235')[1]
     out$dPb206U238dl38 <- 0
     out$dPb206U238dl34 <- 0
@@ -362,6 +363,9 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out$dPb206U238dl26 <- 0
     out$dPb207U235dl35 <- 0
     out$dPb207U235dl31 <- 0
+    out$Pb208Th232 <- exp(l32*tt)-1
+    out$dPb208Th232dt <- exp(l32*tt)*l32
+    out$d2Pb208Th232dt2 <- exp(l32*tt)*l32^2
     d <- fix.diseq(d=d,tt=tt)
     if (check.equilibrium(d=d)){
         out$Pb206U238 <- exp(l38*tt)-1
@@ -449,6 +453,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$dPb207Pb206dl26 <- -out$dPb206U238dl26*out$Pb207U235/(U*out$Pb206U238^2)
         out$dPb207Pb206dl35 <- out$dPb207U235dl35*out$Pb206U238/(U*out$Pb206U238^2)
         out$dPb207Pb206dl31 <- out$dPb207U235dl31*out$Pb206U238/(U*out$Pb206U238^2)
+        out$dPb208Th232dl32 <- exp(l32*tt)*tt
         out$dPb207Pb206dU <- -out$Pb207Pb206/U
     } else {
         out$dPb207Pb206dl38 <- 0
@@ -457,7 +462,9 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$dPb207Pb206dl26 <- 0
         out$dPb207Pb206dl35 <- 0
         out$dPb207Pb206dl31 <- 0
+        out$dPb208Th232dl32 <- 0
         out$dPb207Pb206dU <- 0
+        
     }
     out
 }
