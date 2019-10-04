@@ -531,7 +531,7 @@ min_age_model <- function(zs,alpha=0.05){
     z <- zs[,1]
     mu <- seq(min(z),max(z),length.out=100)
     sigma <- seq(stats::sd(z)/10,2*stats::sd(z),length.out=10)
-    prop <- seq(0,1,length.out=20)
+    prop <- seq(from=0,to=1,length.out=20)
     L <- Inf
     # grid search!
     for (mui in mu){ # mu
