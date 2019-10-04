@@ -497,22 +497,30 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
         XY <- data2york(x,option=3)
         y0par <- '64i'
-        y.lab <- quote(''^204*'Pb/'^206*'Pb')
+        out$y0[1] <- lud$par[y0par]
+        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
         out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
+        y.lab <- quote(''^204*'Pb/'^206*'Pb')
     } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
         XY <- data2york(x,option=4)
         y0par <- '74i'
-        y.lab <- quote(''^204*'Pb/'^207*'Pb')
+        out$y0[1] <- lud$par[y0par]
+        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
         out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
+        y.lab <- quote(''^204*'Pb/'^207*'Pb')
     } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
         XY <- data2york(x,option=6,tt=tt)
         y0par <- '68i'
-        y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
+        out$y0[1] <- 1/lud$par[y0par]
+        out$y0[2] <- out$y0[1]*sqrt(lud$cov[y0par,y0par])/lud$par[y0par]
         out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+        y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
     } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
         XY <- data2york(x,option=7,tt=tt)
         U <- settings('iratio','U238U235')[1]
         y0par <- '78i'
+        out$y0[1] <- 1/lud$par[y0par]
+        out$y0[2] <- out$y0[1]*sqrt(lud$cov[y0par,y0par])/lud$par[y0par]
         y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
         out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
     } else {
@@ -528,8 +536,6 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$a <- c(a,sqrt(cov.ab[1,1]))
     out$b <- c(b,sqrt(cov.ab[2,2]))
     out$cov.ab <- cov.ab[1,2]
-    out$y0[1] <- lud$par[y0par]
-    out$y0[2] <- sqrt(lud$cov[y0par,y0par])
     out$y0['ci[y]'] <- out$fact*out$y0['s[y]']
     out$age['ci[t]'] <- out$fact*out$age['s[t]']
     if (model==1){
