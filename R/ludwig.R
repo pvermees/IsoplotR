@@ -221,7 +221,7 @@ anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
         fit <- stats::lm(I(xy[,'Y']-i76) ~ 0 + xy[,'X'])
         b <- fit$coef
         covmat <- matrix(0,2,2)
-        covmat[2,2] <- vcov(fit)
+        covmat[2,2] <- stats::vcov(fit)
         tint <- concordia.intersection.ab(i76,b,covmat=covmat,d=x$d)[1]
         init['lt'] <- log(tint)
     } else if (is.numeric(anchor[[2]])){ # fix age

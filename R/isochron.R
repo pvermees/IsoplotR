@@ -643,7 +643,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.col=omit.col,...)
         if (growth){
-            xylim <- par('usr')
+            xylim <- graphics::par('usr')
             if (xylim[1]<0) xylim[1] <- xylim[2]/100
             if (xylim[3]<0) xylim[3] <- xylim[4]/100
             if (inverse){
