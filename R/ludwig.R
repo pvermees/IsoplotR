@@ -161,8 +161,8 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         else ww <- w
         init <- c(init,ww)
     }
-    lower <- init-1
-    upper <- init+1
+    lower <- (init-1)[!fixed]
+    upper <- (init+1)[!fixed]
     if (model==2){
         fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                        x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
@@ -176,7 +176,8 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     } else {
         fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                       lower=lower,upper=upper,control=list(fnscale=-1),...)
+                       lower=lower,upper=upper,
+                       control=list(fnscale=-1),...)
         out$LL <- fit$value
         out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
@@ -197,25 +198,61 @@ anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
     else np <- 3
     init <- rep(0,np)
     names(init) <- c('lt','a0','b0')[1:np]
-    xy <- data2york(x,option=2)
     if (is.na(anchor[[2]])){ # fix common Pb composition
+        xy <- data2york(x,option=2)
         if (x$format%in%c(1,2,3)){
-            a <- settings('iratio','Pb207Pb206')[1]
-            fit <- stats::lm(I(xy[,'Y']-a) ~ 0 + xy[,'X'])
-            b <- fit$coef
-            covmat <- matrix(c(0,0,0,vcov(fit)),2,2)
+            i76 <- iratio('Pb207Pb206')[1]
+            init['a0'] <- log(i76)
+        } else if (x$format%in%c(4,5,6)){
+            i64 <- iratio('Pb206Pb204')[1]
+            i74 <- iratio('Pb207Pb204')[1]
+            init['a0'] <- log(i64)
+            init['b0'] <- log(i74)
+            i76 <- i74/i64
+        } else if (x$format%in%c(7,8)){
+            i86 <- iratio('Pb208Pb206')[1]
+            i87 <- iratio('Pb208Pb207')[1]
+            init['a0'] <- -log(i86)
+            init['b0'] <- -log(i87)
+            i76 <- i86/i87
+        } else {
+            stop('incorrect input format')
         }
+        fit <- stats::lm(I(xy[,'Y']-i76) ~ 0 + xy[,'X'])
+        b <- fit$coef
+        covmat <- matrix(0,2,2)
+        covmat[2,2] <- vcov(fit)
+        tint <- concordia.intersection.ab(i76,b,covmat=covmat,d=x$d)[1]
+        init['lt'] <- log(tint)
     } else if (is.numeric(anchor[[2]])){ # fix age
         init['lt'] <- log(anchor[[2]])
         if (x$format%in%c(1,2,3)){
+            xy <- data2york(x,option=2)
             TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
-            fit <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
-                                 0 + I(xy[,'X']-TW$x['U238Pb206']))
-            b <- fit$coef
+            b <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
+                               0 + I(xy[,'X']-TW$x['U238Pb206']))$coef
             init['a0'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
+        } else if (x$format%in%c(4,5,6)){
+            r86 <- age_to_U238Pb206_ratio(anchor[[2]],st=0,d=x$d)[1]
+            xy <- data2york(x,option=3)
+            b <- stats::lm(xy[,'Y'] ~ 0 + I(xy[,'X']-r86))$coef
+            init['a0'] <- log(-b) + log(r86)
+            r57 <- age_to_U235Pb207_ratio(anchor[[2]],st=0,d=x$d)[1]
+            xy <- data2york(x,option=4)
+            b <- stats::lm(xy[,'Y'] ~ 0 + I(xy[,'X']-r57))$coef
+            init['b0'] <- log(-b) + log(r57)
+        } else if (x$format%in%c(7,8)){
+            r86 <- age_to_U238Pb206_ratio(anchor[[2]],st=0,d=x$d)[1]
+            xy <- data2york(x,option=6)
+            init['a0'] <- log(stats::lm(xy[,'Y'] ~ 0 + I(xy[,'X']-r86))$coef)
+            r57 <- age_to_U235Pb207_ratio(anchor[[2]],st=0,d=x$d)[1]
+            xy <- data2york(x,option=7)
+            init['b0'] <- log(stats::lm(xy[,'Y'] ~ 0 + I(xy[,'X']-r57))$coef)
+        } else {
+            stop('incorrect input format')
         }
     }
-
+    init
 }
 
 get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA)){
@@ -657,14 +694,15 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
 }
 
 fixit <- function(x,anchor=list(FALSE,NA),model=1,w=NA){
-    if (x$format<4) np <- 2
-    else np <- 3
-    if (model==3) np <- np+1
+    if (x$format<4) NP <- 2
+    else NP <- 3
+    if (model==3) np <- NP+1
+    else np <- NP
     out <- rep(FALSE,np)
     if (model==3 & is.numeric(w)) out[np] <- TRUE # fix w
     if (anchor[[1]]){ # anchor t or a0(,b0)
         if (is.numeric(anchor[[2]])) out[1] <- TRUE # fix t
-        else out[2:(np-1)] <- TRUE # fix a0(,b0)
+        else out[2:NP] <- TRUE # fix a0(,b0)
     }
     out
 }
