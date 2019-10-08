@@ -111,10 +111,11 @@
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
 #' 
-#' @param common.Pb apply a common lead correction using one of three
-#'     methods:
+#' @param common.Pb common lead correction:
 #'
-#' \code{1}: the Pb-composition stored in
+#' \code{0}:none
+#'
+#' \code{1}: use the Pb-composition stored in
 #' 
 #' \code{settings('iratio','Pb206Pb204')} (if \code{x$format<4});
 #' 
@@ -125,9 +126,9 @@
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x$format=7} or
 #' \code{8}).
 #' 
-#' \code{2}: the isochron intercept as the initial Pb-composition
+#' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{3}: the Stacey-Kramers two-stage model to infer the initial
+#' \code{3}: use the Stacey-Kramers two-stage model to infer the initial
 #' Pb-composition.
 #'
 #' @param anchor
@@ -198,13 +199,18 @@
 #'
 #' \describe{
 #'
-#' \item{model}{ the fitting model (\code{=show.age-1}).}
+#' \item{model}{the fitting model (\code{=show.age-1}).}
 #'
-#' \item{x}{ a vector with the upper and lower intercept
-#' ages (if \code{type=1}) or the lower intercept age and
-#' common Pb intercept(s) (if \code{type=2}).}
+#' \item{par}{a vector with the upper and lower intercept ages (if
+#' \code{type=1}) or the lower intercept age and common Pb
+#' intercept(s) (if \code{type=2}). If \code{show.age=4}, includes an
+#' overdispersion term as well.}
 #'
-#' \item{cov}{ the covariance matrix of the elements in \code{x}.}
+#' \item{cov}{ the covariance matrix of the elements in \code{par}.}
+#'
+#' \item{logpar}{the logarithm of \code{par}}
+#'
+#' \item{logcov}{the logarithm of \code{cov}}
 #'
 #' \item{err}{ a matrix with the following rows:
 #'
@@ -228,10 +234,8 @@
 #' w.r.t the analytical uncertainties (not reported if
 #' \code{show.age=3}).}
 #'
-#' \item{w}{ three-element vector with the standard deviation of the
-#' (assumedly) Normal overdispersion term and the lower and upper
-#' half-widths of its \eqn{100(1-\alpha)\%} confidence interval (only
-#' important if \code{show.age=4}).}
+#' \item{fact}{ the \eqn{(1-\alpha/2)}-percentile of a t-distribution
+#' with \code{df} degrees of freedom. }
 #'
 #' \item{n}{ the number of aliquots in the dataset }
 #'

@@ -137,10 +137,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     estimate (only used if \code{type=1}, \code{isochron=FALSE} and
 #'     \code{central=FALSE}).
 #' 
-#' @param common.Pb apply a common lead correction using one of three
-#'     methods:
+#' @param common.Pb common lead correction:
 #'
-#' \code{1}: the Pb-composition stored in
+#' \code{0}: none
+#'
+#' \code{1}: use the Pb-composition stored in
 #' 
 #' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
 #' \code{UPb} and \code{x$format<4});
@@ -154,9 +155,9 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
 #' 
-#' \code{2}: the isochron intercept as the initial Pb-composition
+#' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{3}: the Stacey-Kramer two-stage model to infer the initial
+#' \code{3}: use the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
 #'
 #' @param show.p Show the p-value for concordance for each aliquot to

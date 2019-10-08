@@ -105,10 +105,11 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'
 #' Set \code{cutoff.disc=NA} to turn off this filter.
 #' 
-#' @param common.Pb apply a common lead correction using one of three
-#'     methods:
+#' @param common.Pb common lead correction:
 #'
-#' \code{1}: the Pb-composition stored in
+#' \code{0}: none
+#'
+#' \code{1}: use the Pb-composition stored in
 #' 
 #' \code{settings('iratio','Pb206Pb204')} (if \code{x} has class
 #' \code{UPb} and \code{x$format<4});
@@ -122,9 +123,9 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
 #' 
-#' \code{2}: the isochron intercept as the initial Pb-composition
+#' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{3}: the Stacey-Kramers two-stage model to infer the initial
+#' \code{3}: use the Stacey-Kramers two-stage model to infer the initial
 #' Pb-composition (only applicable if \code{x} has class \code{UPb})
 #'
 #' @rdname cad

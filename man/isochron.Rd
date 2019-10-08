@@ -3,6 +3,7 @@
 \name{isochron}
 \alias{isochron}
 \alias{isochron.default}
+\alias{isochron.UPb}
 \alias{isochron.PbPb}
 \alias{isochron.ArAr}
 \alias{isochron.KCa}
@@ -22,6 +23,14 @@ isochron(x, ...)
   line.col = "black", lwd = 1, plot = TRUE, title = TRUE,
   model = 1, show.ellipses = 1 * (model != 2), xlab = "x",
   ylab = "y", hide = NULL, omit = NULL, omit.col = NA, ...)
+
+\method{isochron}{UPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
+  ellipse.col = c("#00FF0080", "#FF000080"), type = 1,
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = FALSE, model = 1, show.ellipses = 1 * (model != 2),
+  anchor = list(FALSE, NA), hide = NULL, omit = NULL,
+  omit.col = NA, ...)
 
 \method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
@@ -101,7 +110,7 @@ isochron(x, ...)
 
 OR
 
-an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
+an object of class \code{ArAr}, \code{KCa}, \code{PbPb}, \code{UPb},
 \code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or
 \code{ThU}.}
 
@@ -183,6 +192,40 @@ but omitted from the isochron age calculation.}
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
 
+\item{type}{following the classification of
+Ludwig and Titterington (1994), one of either:
+
+\code{1}: `Rosholt type-II' isochron, setting out
+\eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
+
+\code{2}: `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
+vs. \eqn{^{232}}Th/\eqn{^{238}}U
+
+\code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
+vs. \eqn{^{238}}U/\eqn{^{232}}Th
+
+\code{4}: `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
+vs. \eqn{^{232}}Th/\eqn{^{238}}U}
+
+\item{exterr}{propagate external sources of uncertainty
+(J, decay constant)?}
+
+\item{anchor}{control parameters to fix the intercept age or common Pb
+composition of the isochron fit. This is a two-element list.
+
+The first element is a boolean flag indicating whether the
+isochron line should be anchored. If this is \code{FALSE}, then
+the second item is ignored and both the common Pb composition and
+age are estimated.
+
+If the first element is \code{TRUE} and the second element is
+\code{NA}, then the common Pb composition is fixed at the values
+stored in \code{settings('iratio',...)}.
+
+If the first element is \code{TRUE} and the second element is
+a number, then the isochron line is forced to intersect the
+concordia line at an age equal to that number.}
+
 \item{inverse}{toggles between normal and inverse isochrons. If the
     isochron plots \code{Y} against \code{X}, and
 
@@ -226,25 +269,7 @@ if \code{inverse=TRUE}, then \code{X} =
     \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
     \code{LuHf}).}
 
-\item{exterr}{propagate external sources of uncertainty
-(J, decay constant)?}
-
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
-
-\item{type}{following the classification of
-Ludwig and Titterington (1994), one of either:
-
-\code{1}: `Rosholt type-II' isochron, setting out
-\eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
-
-\code{2}: `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
-vs. \eqn{^{232}}Th/\eqn{^{238}}U
-
-\code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
-vs. \eqn{^{238}}U/\eqn{^{232}}Th
-
-\code{4}: `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
-vs. \eqn{^{232}}Th/\eqn{^{238}}U}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ArAr}, \code{KCa},
@@ -395,10 +420,16 @@ OR if \code{x} has class \code{UPb}:
 
 \describe{
 
-\item{par}{a three element vector containing the isochron age and
-the common Pb isotope ratios}
+\item{par}{if \code{model=1} or \code{2}, a three element vector
+containing the isochron age and the common Pb isotope ratios. If
+\code{model=3}, adds a fourth element with the overdispersion
+parameter \eqn{w}.}
 
 \item{cov}{the covariance matrix of \code{par}}
+
+\item{logpar}{the logarithm of \code{par}}
+
+\item{logcov}{the logarithm of \code{cov}}
 
 \item{n}{the number of analyses in the dataset}
 
@@ -452,12 +483,6 @@ interval for \code{t}
 \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
 if \code{model=1}).}
-
-\item{w}{the overdispersion term, i.e. a three-element vector with
-the standard deviation of the (assumedly) Normally distributed
-geological scatter that underlies the measurements, and the lower
-and upper half-width of its \eqn{100(1-\alpha)\%} confidence
-interval (only returned if \code{model=3}).}
 
 \item{xlab}{the x-label of the isochron plot}
 
