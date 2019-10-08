@@ -62,13 +62,20 @@ concordia line at an age equal to that number.}
 \value{
 \describe{
 
-\item{par}{a vector with the lower concordia intercept,
-the common Pb ratios and the dispersion parameter.}
+\item{LL}{the log likelihood of the discordia fit}
+
+\item{par}{a vector with the lower concordia intercept, the common
+Pb ratios and (if \code{model=3}) the dispersion parameter}
 
 \item{cov}{the covariance matrix of \code{par}}
 
-\item{df}{the degrees of freedom of the model fit (\eqn{3n-3},
-where \eqn{n} is the number of aliquots).}
+\item{logpar}{the logarithms of \code{par}}
+
+\item{logcov}{the logarithms of \code{cov}}
+
+\item{df}{the degrees of freedom of the model fit (\eqn{n-2} if
+\code{x$format<4} or \eqn{2n-3} if \code{x$format>3}, where \eqn{n}
+is the number of aliquots).}
 
 \item{mswd}{the mean square of weighted deviates (a.k.a. reduced
 Chi-square statistic) for the fit.}

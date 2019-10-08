@@ -87,7 +87,7 @@
 #'
 #' OR
 #'
-#' an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
+#' an object of class \code{ArAr}, \code{KCa}, \code{PbPb}, \code{UPb},
 #' \code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or
 #' \code{ThU}.
 #'
@@ -318,10 +318,16 @@
 #'
 #' \describe{
 #'
-#' \item{par}{a three element vector containing the isochron age and
-#' the common Pb isotope ratios}
+#' \item{par}{if \code{model=1} or \code{2}, a three element vector
+#' containing the isochron age and the common Pb isotope ratios. If
+#' \code{model=3}, adds a fourth element with the overdispersion
+#' parameter \eqn{w}.}
 #'
 #' \item{cov}{the covariance matrix of \code{par}}
+#'
+#' \item{logpar}{the logarithm of \code{par}}
+#'
+#' \item{logcov}{the logarithm of \code{cov}}
 #'
 #' \item{n}{the number of analyses in the dataset}
 #'
@@ -375,12 +381,6 @@
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
 #' if \code{model=1}).}
-#'
-#' \item{w}{the overdispersion term, i.e. a three-element vector with
-#' the standard deviation of the (assumedly) Normally distributed
-#' geological scatter that underlies the measurements, and the lower
-#' and upper half-width of its \eqn{100(1-\alpha)\%} confidence
-#' interval (only returned if \code{model=3}).}
 #'
 #' \item{xlab}{the x-label of the isochron plot}
 #'
@@ -460,6 +460,25 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     }
     invisible(fit)
 }
+#' @param anchor
+#' control parameters to fix the intercept age or common Pb
+#' composition of the isochron fit. This is a two-element list.
+#'
+#' The first element is a boolean flag indicating whether the
+#' isochron line should be anchored. If this is \code{FALSE}, then
+#' the second item is ignored and both the common Pb composition and
+#' age are estimated.
+#'
+#' If the first element is \code{TRUE} and the second element is
+#' \code{NA}, then the common Pb composition is fixed at the values
+#' stored in \code{settings('iratio',...)}.
+#'
+#' If the first element is \code{TRUE} and the second element is
+#' a number, then the isochron line is forced to intersect the
+#' concordia line at an age equal to that number.
+#'
+#' @rdname isochron
+#' @export
 isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          show.numbers=FALSE,levels=NA,clabel="",
                          ellipse.col=c("#00FF0080","#FF000080"),
