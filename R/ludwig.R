@@ -644,8 +644,8 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         }
         if (np==(NP+1)){ # with w
             d2EDdw2 <- get.Ew(w=w,format=x$format,ns=ns,D=D,deriv=2)
-            d2lnDetEDdw2 <- trace(O%*%d2EDdw2) - trace(O%*%dEDdw%*%O%*%dEDdw) 
             d2Odw2 <- -(dOdw%*%dEDdw%*%O + O%*%d2EDdw2%*%O + O%*%dEDdw%*%dOdw)
+            d2lnDetEDdw2 <- trace(dOdw%*%dEDdw + O%*%d2EDdw2)
             out$hessian['w','w'] <- (d2lnDetEDdw2 + KLM%*%d2Odw2%*%KLM)/2 # d2dw2
             out$hessian['w',i1] <- KLM%*%dOdw%*%JKLM[,i1]                 # d2dwdc0
             out$hessian['w','lt'] <- KLM%*%dOdw%*%JKLM[,'lt']             # d2dwdt
