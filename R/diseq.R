@@ -270,7 +270,7 @@ forward <- function(tt,d=diseq(),derivative=0){
 # prevent extrapolation of measured activity ratios to infinity
 fix.diseq <- function(d=diseq(),tt=0){
     out <- geomean(d)
-    factor <- 10
+    factor <- 10 # same as in clip.diseq
     ratios <- c('U48','ThU','RaU','PaU')
     nuclides <- c('U234','Th230','Ra226','Pa231')
     for (i in 1:length(nuclides)){
@@ -285,7 +285,7 @@ fix.diseq <- function(d=diseq(),tt=0){
         } else if (measured & expired){
             out[[ratio]]$option <- 1
             if (deficit) out[[ratio]]$x <- 0
-            else out[[ratio]]$x <- 10
+            else out[[ratio]]$x <- 100
         }        
     }
     out
@@ -294,7 +294,7 @@ fix.diseq <- function(d=diseq(),tt=0){
 clip.diseq <- function(x,type=1,d=diseq()){
     l34 <- lambda('U234')[1]*1000
     l30 <- lambda('Th230')[1]*1000
-    factor <- 10
+    factor <- 10 # same as in fix.diseq
     out <- x
     out$t[1] <- max(0,x$t[1])
     out$t[2] <- min(x$t[2],factor/l34)
