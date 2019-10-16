@@ -169,7 +169,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         init <- c(init,ww)
     }
     lower <- (init-1)[!fixed]
-    upper <- (init+1)[!fixed]
+    upper <- (init+2)[!fixed]
     if (model==2){
         fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                        x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
@@ -276,7 +276,7 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA)){
         covmat <- matrix(c(fit$a[2]^2,fit$cov.ab,
                            fit$cov.ab,fit$b[2]^2),2,2)
     }
-    tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
+    tint <- concordia.intersection.ab(a,b,covmat=covmat)
     tt <- tint['t[l]']
     # Then, estimate the common Pb intercept(s)
     if (x$format<4){
