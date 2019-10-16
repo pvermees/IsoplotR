@@ -369,6 +369,9 @@ prepare.concordia.line <- function(x,tlim,type=1,...){
         stop('Incorrect input format.')
     }
     graphics::plot(lims$x,lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
+    if (measured.disequilibrium(x$d)){
+        lims <- clip.diseq(lims,type=type,d=x$d)
+    }
     lims
 }
 # concordia sequence
@@ -436,10 +439,10 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
     if (is.null(tlim)) out$t <- c(0,0)
     else out$t <- tlim
     nse <- 3 # number of standard errors used for buffer
-    if (!is.null(tlim) && type==1){
+    if (!is.null(tlim) & type==1){
         if (!xset) out$x <- age_to_Pb207U235_ratio(tlim,d=x$d)[,'75']
         if (!yset) out$y <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
-    } else if (!is.null(tlim) && type==2){
+    } else if (!is.null(tlim) & type==2){
         if (tlim[1] <= 0){
             U238Pb206 <- get.U238Pb206.ratios(x)
             if (xset) maxx <- out$x[2]
@@ -448,10 +451,10 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
         }
         if (!xset) out$x <- age_to_U238Pb206_ratio(out$t,d=x$d)[,'86']
         if (!yset) out$y <- age_to_Pb207Pb206_ratio(out$t,d=x$d)[,'76']
-    } else if (!is.null(tlim) && type==3){
+    } else if (!is.null(tlim) & type==3){
         if (!xset) out$x <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
         if (!yset) out$y <- age_to_Pb208Th232_ratio(tlim)[,'82']
-    } else if (is.null(tlim) && type==1) {
+    } else if (is.null(tlim) & type==1) {
         if (!xset){
             Pb207U235 <- get.Pb207U235.ratios(x)
             minx <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
@@ -474,7 +477,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
         }
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
-    } else if (is.null(tlim) && type==2){
+    } else if (is.null(tlim) & type==2){
         U238Pb206 <- get.U238Pb206.ratios(x)
         Pb207Pb206 <- get.Pb207Pb206.ratios(x)
         if (!xset){
@@ -493,7 +496,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,...){
             miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=x$d)[,'76'])
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
-    } else if (is.null(tlim) && type==3){
+    } else if (is.null(tlim) & type==3){
         if (!xset){
             Pb206U238 <- get.Pb206U238.ratios(x)
             minx <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
