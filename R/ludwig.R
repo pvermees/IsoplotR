@@ -169,7 +169,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         init <- c(init,ww)
     }
     lower <- (init-1)[!fixed]
-    upper <- (init+1)[!fixed]
+    upper <- (init+2)[!fixed]
     if (model==2){
         fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
                        x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)

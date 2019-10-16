@@ -389,20 +389,20 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 else d$n0['Th230'] <- d$ThU$x/l30
             } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
-                nt['Th230'] <- d$ThU$x*nt['U238']*l30/l38 # overwrite
+                nt['Th230'] <- d$ThU$x*nt['U238']*l38/l30 # overwrite
                 d$n0['Th230'] <- reverse(tt=tt,mexp=mexp.8405(),nt=nt)['Th230']
             }
         } else {                 # measured 234U
             if (d$ThU$option<2){ # initial 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','U235')]
-                nt['U234'] <- d$U48$x*nt['U238']*l34/l38 # overwrite
+                nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
                 d$n0['U234'] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234']
                 if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
                 else d$n0['Th230'] <- d$ThU$x/l30
             } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
-                nt['U234'] <- d$U48$x*nt['U238']*l34/l38 # overwrite
-                nt['Th230'] <- d$ThU$x*nt['U238']*l30/l38 # overwrite
+                nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
+                nt['Th230'] <- d$ThU$x*nt['U238']*l38/l30 # overwrite
                 d$n0[c('U234','Th230')] <-
                     reverse(tt=tt,mexp=mexp.8405(),nt=nt)[c('U234','Th230')]
             }
@@ -411,6 +411,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         else d$n0['Ra226'] <- d$RaU$x/l26
         if (d$PaU$option==0) d$n0['Pa231'] <- 1/l31
         else d$n0['Pa231'] <- d$PaU$x/l31
+        out$U48i <- (d$n0['U234']*l34)/(d$n0['U238']*l38)
+        out$ThUi <- (d$n0['Th230']*l30)/(d$n0['U238']*l38)
         d$nt <- forward(tt=tt,d=d)
         dntdt <- forward(tt,d=d,derivative=1)
         d2ntdt2 <- forward(tt,d=d,derivative=2)
