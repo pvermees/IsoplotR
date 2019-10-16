@@ -166,7 +166,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[7,7] <- -1
     out$Qinv[8,6:8] <-1
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
-    out$n0 <- rep(0,8)
+    out$n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
     nuclides <- c('U238','U234','Th230','Ra226',
                   'Pb206','U235','Pa231','Pb207')
     names(out$L) <- nuclides
@@ -248,8 +248,14 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    expired <- (tt>10/mexp$L)
+    L <- mexp$L
+    L[expired] <- 0 # don't bother restoring the expired nuclides
+    out <- as.vector(mexp$Q %*% diag(exp(L*tt)) %*% mexp$Qinv %*% nt)
     names(out) <- names(nt)
+    negative <- (out<0)
+    out[expired] <- 500*out['U238']*mexp$L['U238']/mexp$L[expired]
+    out[negative] <- 0
     out
 }
 forward <- function(tt,d=diseq(),derivative=0){
@@ -266,26 +272,25 @@ forward <- function(tt,d=diseq(),derivative=0){
     out
 }
 
-fix.diseq <- function(d=diseq(),tt=0){
-    out <- geomean(d)
-    factor <- 10
-    ratios <- c('U48','ThU','RaU','PaU')
-    nuclides <- c('U234','Th230','Ra226','Pa231')
-    for (i in 1:length(nuclides)){
-        ratio <- ratios[i]
-        nuclide <- nuclides[i]
-        measured <- out[[ratio]]$option>1
-        expired <- tt*out$L[nuclide]>10
-        equilibrium <- out[[ratio]]$x==1
-        deficit <- out[[ratio]]$x<1
-        if (equilibrium){
-            out[[ratio]]$option <- 0
-        } else if (measured & expired){
-            out[[ratio]]$option <- 1
-            if (deficit) out[[ratio]]$x <- 0
-            else out[[ratio]]$x <- 10
-        }        
+# cut off concordia bounds for measured diseq samples
+clip.diseq <- function(x,type=1,d=diseq()){
+    l34 <- lambda('U234')[1]*1000
+    cutoff <- 10
+    out <- x
+    out$t[1] <- max(0,x$t[1])
+    out$t[2] <- min(x$t[2],cutoff/l34)
+    if (type==1){
+        xym <- age_to_wetherill_ratios(out$t[1],d=d)$x
+        xyM <- age_to_wetherill_ratios(out$t[2],d=d)$x
+    } else if (type==2){
+        xym <- age_to_terawasserburg_ratios(out$t[1],d=d)$x
+        xyM <- age_to_terawasserburg_ratios(out$t[2],d=d)$x
+    } else if (type==3){
+        xym <- age_to_cottle_ratios(out$t[1],d=d)$x
+        xyM <- age_to_cottle_ratios(out$t[2],d=d)$x
     }
+    out$x <- c(xym[1],xyM[1])
+    out$y <- c(xym[2],xyM[2])
     out
 }
 
@@ -295,6 +300,11 @@ check.equilibrium <- function(d=diseq()){
     RaU <- (d$RaU$option==0 | all(d$RaU$x==1))
     PaU <- (d$PaU$option==0 | all(d$PaU$x==1))
     U48 & ThU & RaU & PaU
+}
+measured.disequilibrium <- function(d=diseq()){
+    equilibrium <- check.equilibrium(d)
+    measured <- (d$U48$option>1 | d$ThU$option>1)
+    !equilibrium & measured
 }
 
 #' @title Predict disequilibrium concordia compositions
@@ -366,7 +376,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out$Pb208Th232 <- exp(l32*tt)-1
     out$dPb208Th232dt <- exp(l32*tt)*l32
     out$d2Pb208Th232dt2 <- exp(l32*tt)*l32^2
-    d <- fix.diseq(d=d,tt=tt)
     if (check.equilibrium(d=d)){
         out$Pb206U238 <- exp(l38*tt)-1
         out$Pb207U235 <- exp(l35*tt)-1
@@ -379,15 +388,11 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$dPb207U235dl35 <- tt*exp(l35*tt)
         }
     } else {
-        d$n0['U238'] <- 1/l38
-        d$n0['U235'] <- 1/l35
-        if (d$U48$option<2){     # initial 234U
-            if (d$U48$option==0) d$n0['U234'] <- 1/l34
-            else d$n0['U234'] <- d$U48$x/l34
-            if (d$ThU$option<2){ # initial 230Th
-                if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
-                else d$n0['Th230'] <- d$ThU$x/l30
-            } else {             # measured 230Th
+        if (d$U48$option<2){      # initial 234U
+            if (d$U48$option==1) d$n0['U234'] <- d$U48$x/l34
+            if (d$ThU$option==1){ # initial 230Th
+                d$n0['Th230'] <- d$ThU$x/l30
+            } else if (d$ThU$option==2){ # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
                 nt['Th230'] <- d$ThU$x*nt['U238']*l38/l30 # overwrite
                 d$n0['Th230'] <- reverse(tt=tt,mexp=mexp.8405(),nt=nt)['Th230']
@@ -397,8 +402,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 nt <- forward(tt=tt,d=d)[c('U238','U234','U235')]
                 nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
                 d$n0['U234'] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234']
-                if (d$ThU$option==0) d$n0['Th230'] <- 1/l30
-                else d$n0['Th230'] <- d$ThU$x/l30
+                if (d$ThU$option==1) d$n0['Th230'] <- d$ThU$x/l30
             } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
                 nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
@@ -407,10 +411,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                     reverse(tt=tt,mexp=mexp.8405(),nt=nt)[c('U234','Th230')]
             }
         }
-        if (d$RaU$option==0) d$n0['Ra226'] <- 1/l26
-        else d$n0['Ra226'] <- d$RaU$x/l26
-        if (d$PaU$option==0) d$n0['Pa231'] <- 1/l31
-        else d$n0['Pa231'] <- d$PaU$x/l31
+        if (d$RaU$option>0) d$n0['Ra226'] <- d$RaU$x/l26
+        if (d$PaU$option>0) d$n0['Pa231'] <- d$PaU$x/l31
         out$U48i <- (d$n0['U234']*l34)/(d$n0['U238']*l38)
         out$ThUi <- (d$n0['Th230']*l30)/(d$n0['U238']*l38)
         d$nt <- forward(tt=tt,d=d)
