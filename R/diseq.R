@@ -248,9 +248,14 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    expired <- (tt>10/mexp$L)
+    L <- mexp$L
+    L[expired] <- 0 # don't bother restoring the expired nuclides
+    out <- as.vector(mexp$Q %*% diag(exp(L*tt)) %*% mexp$Qinv %*% nt)
     names(out) <- names(nt)
-    out[out<0] <- 0
+    negative <- (out<0)
+    out[expired] <- 500*out['U238']*mexp$L['U238']/mexp$L[expired]
+    out[negative] <- 0
     out
 }
 forward <- function(tt,d=diseq(),derivative=0){
@@ -267,37 +272,13 @@ forward <- function(tt,d=diseq(),derivative=0){
     out
 }
 
-# prevent extrapolation of measured activity ratios to infinity
-fix.diseq <- function(d=diseq(),tt=0){
-    out <- geomean(d)
-    factor <- 10 # same as in clip.diseq
-    ratios <- c('U48','ThU','RaU','PaU')
-    nuclides <- c('U234','Th230','Ra226','Pa231')
-    for (i in 1:length(nuclides)){
-        ratio <- ratios[i]
-        nuclide <- nuclides[i]
-        measured <- out[[ratio]]$option>1
-        expired <- tt*out$L[nuclide]>10
-        equilibrium <- out[[ratio]]$x==1
-        deficit <- out[[ratio]]$x<1
-        if (equilibrium){
-            out[[ratio]]$option <- 0
-        } else if (measured & expired){
-            out[[ratio]]$option <- 1
-            if (deficit) out[[ratio]]$x <- 0
-            else out[[ratio]]$x <- 100
-        }        
-    }
-    out
-}
 # cut off concordia bounds for measured diseq samples
 clip.diseq <- function(x,type=1,d=diseq()){
     l34 <- lambda('U234')[1]*1000
-    l30 <- lambda('Th230')[1]*1000
-    factor <- 10 # same as in fix.diseq
+    cutoff <- 10
     out <- x
     out$t[1] <- max(0,x$t[1])
-    out$t[2] <- min(x$t[2],factor/l34)
+    out$t[2] <- min(x$t[2],cutoff/l34)
     if (type==1){
         xym <- age_to_wetherill_ratios(out$t[1],d=d)$x
         xyM <- age_to_wetherill_ratios(out$t[2],d=d)$x
@@ -395,7 +376,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out$Pb208Th232 <- exp(l32*tt)-1
     out$dPb208Th232dt <- exp(l32*tt)*l32
     out$d2Pb208Th232dt2 <- exp(l32*tt)*l32^2
-    d <- fix.diseq(d=d,tt=tt)
     if (check.equilibrium(d=d)){
         out$Pb206U238 <- exp(l38*tt)-1
         out$Pb207U235 <- exp(l35*tt)-1
