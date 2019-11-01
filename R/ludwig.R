@@ -276,7 +276,7 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA)){
         covmat <- matrix(c(fit$a[2]^2,fit$cov.ab,
                            fit$cov.ab,fit$b[2]^2),2,2)
     }
-    tint <- concordia.intersection.ab(a,b,covmat=covmat)
+    tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
     tt <- tint['t[l]']
     # Then, estimate the common Pb intercept(s)
     if (x$format<4){
