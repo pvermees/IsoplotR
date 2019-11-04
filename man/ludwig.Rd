@@ -86,7 +86,8 @@ Chi-square statistic) for the fit.}
 }
 \description{
 Implements the maximum likelihood algorithm for Total-Pb/U isochron
-regression of Ludwig (1998)
+regression of Ludwig (1998) and extends the underlying methodology
+to accommodate U-Th-Pb data and initial U-series disequilibrium.
 }
 \details{
 The 3-dimensional regression algorithm of Ludwig and Titterington
