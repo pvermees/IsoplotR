@@ -279,10 +279,11 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA)){
     tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
     tt <- tint['t[l]']
     # Then, estimate the common Pb intercept(s)
+    minval <- 0.01
     if (x$format<4){
         a0 <- a
-        init <- log(c(tt,a0))
-        names(init) <- c('lt','a0')
+        expinit <- c(tt,a0)
+        labels <- c('lt','a0')
     } else {
         if (x$format<7) option <- 3
         else option <- 6
@@ -302,9 +303,12 @@ get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA)){
             fit <- york(xy)
             b0 <- 1/fit$a[1]
         }
-        init <- log(c(tt,a0,b0))
-        names(init) <- c('lt','a0','b0')
+        expinit <- c(tt,a0,b0)
+        labels <- c('lt','a0','b0')
     }
+    expinit[expinit<=0] <- 1e-5
+    init <- log(expinit)
+    names(init) <- labels
     init
 }
 

@@ -76,11 +76,11 @@ described by:
 
 where \eqn{\left[{}^{206}Pb/{}^{204}Pb\right]_{3.7Ga} = 11.152} and
 \eqn{\left[{}^{238}U/{}^{204}Pb\right]_{sk} = 9.74}. These
-Equations can be solved iteratively for \eqn{t} and
-\eqn{\left[{}^{206}Pb/{}^{204}Pb\right]_\circ}. The
-\eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb-ratio is corrected in exactly the
-same way, using \eqn{\left[{}^{207}Pb/{}^{204}Pb\right]_{3.7Ga} =
-12.998}.
+Equations can be solved for \eqn{t} and
+\eqn{\left[{}^{206}Pb/{}^{204}Pb\right]_\circ} using the method of
+maximum likelihood. The \eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb-ratio is
+corrected in exactly the same way, using
+\eqn{\left[{}^{207}Pb/{}^{204}Pb\right]_{3.7Ga} = 12.998}.
 
 In the absence of \eqn{^{204}}Pb measurements, a \eqn{^{208}}Pb-based
 common lead correction can be used:
@@ -133,6 +133,6 @@ Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
 ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
 
 Stacey, J.T. and Kramers, 1., 1975. Approximation of terrestrial
-lead isotope evolution by a two-stage model. Earth and planetary
-science letters, 26(2), pp.207-221.
+lead isotope evolution by a two-stage model. Earth and Planetary
+Science Letters, 26(2), pp.207-221.
 }
