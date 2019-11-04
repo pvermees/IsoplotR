@@ -91,15 +91,18 @@ twfit2wfit <- function(fit,x){
     }
     disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
-    if (conc.slope > disc.slope){
+    if (disc.slope < conc.slope){
         search.range <- c(tt,get.Pb207Pb206.age(b0/a0,d=x$d)[1])+buffer
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
-    } else {
+    } else if (disc.slope < l8/l5){
         search.range <- c(-1000,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=x$d)$root
+        tu <- tt
+    } else { # only one intercept
+        tl <- -1000
         tu <- tt
     }
     du <- mclean(tt=tu,d=x$d)
