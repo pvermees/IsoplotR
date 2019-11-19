@@ -575,10 +575,10 @@ get.minage.L <- function(pars,zs){
     s0 <- 1/sqrt(1/sigma^2 + 1/s^2)
     DD <- 2*(1-stats::pnorm((mu-mu0)/s0))
     EE <- -0.5*((z-mu)^2)/(sigma^2+s^2)
-    pos <- AA>0
+    minexp <- .Machine$double.min.exp*log(.Machine$double.base)
+    maxexp <- .Machine$double.max.exp*log(.Machine$double.base)
+    fin <- (BB>minexp) & (BB<maxexp) & (EE>minexp) & (EE<maxexp) # finite
     logfu <- z*0
-    logfu[pos] <- log(AA[pos]) + BB + # log(a + b) = log(a) + log(1 + b/a):
-        log(1 + exp(EE[pos]-BB[pos])*CC[pos]*DD[pos]/AA[pos])
-    logfu[!pos] <- log(AA[!pos]*exp(BB[!pos]) + CC*DD[!pos]*exp(EE[!pos]))
+    logfu[fin] <- log(AA[fin]*exp(BB[fin]) + CC[fin]*DD[fin]*exp(EE[fin]))
     -sum(logfu)
 }
