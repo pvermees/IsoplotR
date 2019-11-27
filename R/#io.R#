@@ -426,7 +426,8 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
-        X[which(is.na(X),arr.ind=TRUE)] <- 0
+        ij <- which(is.na(X[,9:14]),arr.ind=TRUE)
+        X[,9:14][ij] <- 0
     }
     out$x <- insert.data(x=X,cnames=cnames)
     out$d <- copy_diseq(x=out,d=d)
