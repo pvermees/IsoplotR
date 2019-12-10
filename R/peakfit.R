@@ -136,6 +136,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
     out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
 }
+#'
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
@@ -147,14 +148,20 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc two element vector with the maximum and minimum
-#'     percentage discordance allowed between the
-#'     \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U
-#'     age (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or
-#'     between the \eqn{^{206}}Pb/\eqn{^{238}}U and
-#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (if
-#'     \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).  Set
-#'     \code{cutoff.disc=NA} if you do not want to use this filter.
+#' 
+#' @param cutoff.disc discordance cutoff filter. This is a three
+#'     element list.
+#'
+#' The first two items contain the minimum (negative) and maximum
+#' (positive) percentage discordance allowed between the
+#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
+#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
+#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+#'
+#' The third item is a boolean flag that controls whether the
+#' discordance filter should be applied before (\code{TRUE}) or after
+#' (\code{FALSE}) the common-Pb correction.
 #'
 #' @param common.Pb common lead correction:
 #'
@@ -182,7 +189,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #'
 #' @rdname peakfit
 #' @export
-peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
                         common.Pb=0,exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    exterr=exterr,sigdig=sigdig,log=log,alpha=alpha,common.Pb=common.Pb,...)
@@ -271,7 +278,7 @@ peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2, log=TRUE,
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,sigdig=sigdig,log=log,alpha=alpha,...)
 }
-peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
                            exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
                            common.Pb=0,alpha=0.05,detritus=0,...){
     if (k<1) return(NULL)
@@ -505,7 +512,7 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
     list(peaks=peaks,peaks.err=peaks.err)
 }
 
-BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=c(-15,5),
+BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
                     exterr=TRUE,detritus=0,common.Pb=0,...){
     n <- length(x)
     BIC <- Inf
