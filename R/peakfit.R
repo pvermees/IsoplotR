@@ -89,6 +89,7 @@
 #' truncated normal mixture model for overdispersed binomial
 #' data. Journal of Statistical Computation and Simulation,
 #' 59(4):349-373, 1997.
+#' 
 #' @rdname peakfit
 #' @export
 peakfit <- function(x,...){ UseMethod("peakfit",x) }
@@ -136,7 +137,6 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
     out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
 }
-#'
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
