@@ -211,11 +211,12 @@ data2york.default <- function(x,format=1,...){
     if (format==3){
         X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
                                        x[,4],x[,5],x[,6]))
-        out <- insert.data(x=X,cnames=cnames)
+        opt <- NULL
     } else {
-        out <- read.XsXYsYrXY(x=x,cnames=cnames)
+        X <- x
+        opt <- 5
     }
-    out
+    insert.data(x=X,cnames=cnames,opt=opt)
 }
 
 #' @param option one of
