@@ -366,13 +366,14 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     X <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
+    opt <- NULL
     if (format==1){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238','rhoXY')
     } else if (format==2){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206','rhoXY')
-        X <- read.XsXYsYrXY(x=X,cnames=cnames)
+        opt <- 5
     } else if (format==3){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
@@ -405,6 +406,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb207Pb206','errPb207Pb206',
                     'Pb204Pb206','errPb204Pb206',
                     'rhoXY','rhoXZ','rhoYZ')
+        opt <- 7:9
     } else if (format==6){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
@@ -426,10 +428,9 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
-        ij <- which(is.na(X[,9:14]),arr.ind=TRUE)
-        X[,9:14][ij] <- 0
+        opt <- 9:14
     }
-    out$x <- insert.data(x=X,cnames=cnames)
+    out$x <- insert.data(x=X,cnames=cnames,opt=opt)
     out$d <- copy_diseq(x=out,d=d)
     out
 }
@@ -506,25 +507,28 @@ get.cov.47.75 <- function(Pb204Pb207,errPb204Pb207,
 as.PbPb <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "PbPb"
-    out$x <- NA
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     X <- errconvert(X,gc='Pb-Pb',format=format,ierr=ierr)
-    cnames <- NULL
+    opt <- NULL
     if (format==1 & nc>4){
-        out$x <- read.XsXYsYrXY(x=X,cnames=c('Pb206Pb204','errPb206Pb204',
-                                           'Pb207Pb204','errPb207Pb204','rho'))
+        cnames <- c('Pb206Pb204','errPb206Pb204',
+                    'Pb207Pb204','errPb207Pb204','rho')
     } else if (format==2 & nc>4) {
-        out$x <- read.XsXYsYrXY(x=X,cnames=c('Pb204Pb206','errPb204Pb206',
-                                           'Pb207Pb206','errPb207Pb206','rho'))
+        cnames <- c('Pb204Pb206','errPb204Pb206',
+                    'Pb207Pb206','errPb207Pb206','rho')
+        opt <- 5
     } else if (format==3 & nc>5){
-        out$x <- insert.data(x=X,cnames=c('Pb206Pb204','errPb206Pb204',
-                                          'Pb207Pb204','errPb207Pb204',
-                                          'Pb207Pb206','errPb207Pb206'))
+        cnames <- c('Pb206Pb204','errPb206Pb204',
+                    'Pb207Pb204','errPb207Pb204',
+                    'Pb207Pb206','errPb207Pb206')
+    } else {
+        stop('Invalid PbPb input format')
     }
+    out$x <- insert.data(x=X,cnames=cnames,opt=opt)
     out
 }
 as.ArAr <- function(x,format=3,ierr=1){
@@ -650,8 +654,9 @@ as.PD <- function(x,classname,cnames,format,ierr){
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
     X <- errconvert(X,gc='PD',format=format,ierr=ierr)
-    if (format<3) out$x <- read.XsXYsYrXY(x=X,cnames=cnames)
-    else out$x <- insert.data(x=X,cnames=cnames)
+    if (format<3) opt <- 5
+    else opt <- NULL
+    out$x <- insert.data(x=X,cnames=cnames,opt=opt)
     out
 }
 as.ThU <- function(x,format=1,ierr=1,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
@@ -771,20 +776,17 @@ shiny2matrix <- function(x,br,nr,nc){
     )
 }
 
-insert.data <- function(x,cnames){
+insert.data <- function(x,cnames,opt=NULL){
     nr <- nrow(x)
     nc <- length(cnames)
     out <- matrix(0,nr,nc)
     ncx <- min(nc,ncol(x))
     out[1:nr,1:ncx] <- as.matrix(x)[1:nr,1:ncx]
+    if (!is.null(opt)){ # replace NA values in optional columns with zeros
+        ij <- which(is.na(out[,opt]),arr.ind=TRUE)
+        out[,opt][ij] <- 0
+    }
     colnames(out) <- cnames
-    out
-}
-
-read.XsXYsYrXY <- function(x,cnames){
-    out <- insert.data(x=x,cnames=cnames)
-    i <- which(is.na(out[,5]))
-    out[i,5] <- 0
     out
 }
 
