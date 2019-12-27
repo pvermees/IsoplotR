@@ -161,21 +161,21 @@ mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
 get.lta0b0w <- function(x,exterr=FALSE,model=1,
                         anchor=list(FALSE,NA),w=NA,...){
     out <- list(model=model,exterr=exterr)
-    if (anchor[[1]]){ # anchored regression is always initialised with model-2
+    if (anchor[[1]]){
         init <- anchored.lta0b0.init(x=x,anchor=anchor)
+    } else if (model==3){
+        init <- get.lta0b0w(x,model=1,w=w)$logpar
+        if (is.na(w)){
+            ww <- optimise(LL.lud.w,interval=init[1]+c(-5,5),
+                           lta0b0=init,x=x,maximum=TRUE)$maximum
+        } else {
+            ww <- w
+        }
+        init <- c(init,ww)
     } else { #if (model==2){
         init <- get.lta0b0.init(x,anchor=anchor)
     }
-    # else {
-    #    init <- get.lta0b0w(x,exterr=FALSE,model=2,
-    #                        anchor=anchor,w=w)$logpar
-    #}
     fixed <- fixit(x,anchor=anchor,model=model,w=w)
-    if (model==3){
-        if (is.na(w)) ww <- init[1]/100
-        else ww <- w
-        init <- c(init,ww)
-    }
     lower <- (init-1)[!fixed]
     upper <- (init+2)[!fixed]
     if (model==2){
@@ -194,7 +194,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
                        lower=lower,upper=upper,
                        control=list(fnscale=-1),...)
         out$LL <- fit$value
-        out$logpar <- fit$par
+        out$logpar <- fit$par        
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
     }
     if (x$format %in% c(1,2,3)) parnames <- c('log(t)','log(76i)')
@@ -335,9 +335,13 @@ LL.lud <- function(lta0b0w,x,exterr=FALSE,LL=TRUE){
     else out <- l$SS
     out
 }
-
 LL.lud.gr <- function(lta0b0w,x,exterr=FALSE){
     data2ludwig(x,lta0b0w=lta0b0w,exterr=exterr,jacobian=TRUE)$jacobian
+}
+# LL to initialise w:
+LL.lud.w <- function(w,lta0b0,x){
+    lta0b0w <- c(lta0b0,w)
+    LL.lud(lta0b0w=lta0b0w,x=x,LL=TRUE)
 }
 
 fisher.lud <- function(x,fit,exterr=TRUE,fixed=rep(FALSE,length(fit$par))){
