@@ -161,7 +161,15 @@ mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
 get.lta0b0w <- function(x,exterr=FALSE,model=1,
                         anchor=list(FALSE,NA),w=NA,...){
     out <- list(model=model,exterr=exterr)
-    init <- get.lta0b0.init(x,model=model,anchor=anchor)
+    if (anchor[[1]]){ # anchored regression is always initialised with model-2
+        init <- anchored.lta0b0.init(x=x,anchor=anchor)
+    } else { #if (model==2){
+        init <- get.lta0b0.init(x,anchor=anchor)
+    }
+    # else {
+    #    init <- get.lta0b0w(x,exterr=FALSE,model=2,
+    #                        anchor=anchor,w=w)$logpar
+    #}
     fixed <- fixit(x,anchor=anchor,model=model,w=w)
     if (model==3){
         if (is.na(w)) ww <- init[1]/100
@@ -200,7 +208,39 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     out
 }
 
-# all anchored initialisation is done by model 2 regression
+get.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
+    out <- list()
+    xy <- data2york(x,option=2)
+    # First, get the approximate intercept age using a model-2 regression
+    fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+    a <- fit$coef[1]
+    b <- fit$coef[2]
+    covmat <- stats::vcov(fit)
+    tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
+    tt <- tint['t[l]']
+    # Then, estimate the common Pb intercept(s)
+    minval <- 0.01
+    if (x$format<4){
+        a0 <- a
+        expinit <- c(tt,a0)
+        labels <- c('lt','a0')
+    } else {
+        if (x$format<7) option <- 3
+        else option <- 6
+        xy <- data2york(x,option=option) # 04-08c/06 vs 38/06
+        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+        a0 <- 1/fit$coef[1]
+        xy <- data2york(x,option=option+1) # 04-08c/07 vs 38/07
+        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+        b0 <- 1/fit$coef[1]
+        expinit <- c(tt,a0,b0)
+        labels <- c('lt','a0','b0')
+    }
+    expinit[expinit<=0] <- 1e-5
+    init <- log(expinit)
+    names(init) <- labels
+    init
+}
 anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
     if (x$format<4) np <- 2
     else np <- 3
@@ -256,59 +296,6 @@ anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
             init['b0'] <- -(log(-b)+log(r57))
         }
     }
-    init
-}
-
-get.lta0b0.init <- function(x,model=1,anchor=list(FALSE,NA)){
-    out <- list()
-    if (anchor[[1]]) return(anchored.lta0b0.init(x=x,anchor=anchor))
-    xy <- data2york(x,option=2)
-    # First, get the approximate intercept age
-    if (model==2){
-        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-        a <- fit$coef[1]
-        b <- fit$coef[2]
-        covmat <- stats::vcov(fit)
-    } else {
-        fit <- york(xy)
-        a <- fit$a[1]
-        b <- fit$b[1]
-        covmat <- matrix(c(fit$a[2]^2,fit$cov.ab,
-                           fit$cov.ab,fit$b[2]^2),2,2)
-    }
-    tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
-    tt <- tint['t[l]']
-    # Then, estimate the common Pb intercept(s)
-    minval <- 0.01
-    if (x$format<4){
-        a0 <- a
-        expinit <- c(tt,a0)
-        labels <- c('lt','a0')
-    } else {
-        if (x$format<7) option <- 3
-        else option <- 6
-        xy <- data2york(x,option=option) # 04-08c/06 vs 38/06
-        if (model==2){
-            fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-            a0 <- 1/fit$coef[1]
-        } else {
-            fit <- york(xy)
-            a0 <- 1/fit$a[1]
-        }
-        xy <- data2york(x,option=option+1) # 04-08c/07 vs 38/07
-        if (model==2){
-            fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-            b0 <- 1/fit$coef[1]
-        } else {
-            fit <- york(xy)
-            b0 <- 1/fit$a[1]
-        }
-        expinit <- c(tt,a0,b0)
-        labels <- c('lt','a0','b0')
-    }
-    expinit[expinit<=0] <- 1e-5
-    init <- log(expinit)
-    names(init) <- labels
     init
 }
 
@@ -524,7 +511,9 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
             names(out$jacobian) <- c('lt','a0','w')[1:np]
         } else {
             colnames(JKLM) <- c(paste0('c0[',i1,']'),'lt','a0','b0')
-            rownames(JKLM) <- c(paste0('K[',i1,']'),paste0('L[',i1,']'),paste0('M[',i1,']'))
+            rownames(JKLM) <- c(paste0('K[',i1,']'),
+                                paste0('L[',i1,']'),
+                                paste0('M[',i1,']'))
             names(out$jacobian) <- c('lt','a0','b0','w')[1:np]
         }
         dtdlt <- exp(lt)
