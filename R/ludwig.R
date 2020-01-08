@@ -166,8 +166,8 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     } else if (model==3){
         init <- get.lta0b0w(x,model=1,w=w)$logpar
         if (is.na(w)){
-            ww <- optimise(LL.lud.w,interval=init[1]+c(-5,5),
-                           lta0b0=init,x=x,maximum=TRUE)$maximum
+            ww <- stats::optimise(LL.lud.w,interval=init[1]+c(-5,5),
+                                  lta0b0=init,x=x,maximum=TRUE)$maximum
         } else {
             ww <- w
         }

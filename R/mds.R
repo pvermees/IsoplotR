@@ -161,37 +161,29 @@ KS.diss <- function(x,y) {
 
 # arguments:
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
-                     col='black',bg='white',xlab="",ylab="",...){
-    ellipsis <- list(...)
-    plotchar <- 'pch' %in% names(ellipsis)
-    if (plotchar) pch <- ellipsis$pch
-    ellipsis$pch <- NULL
+                     col='black',bg='white',xlab,ylab,pch,...){
     if (shepard & !x$classical){
-        if (!plotchar) pch <- 21
+        if (missing(pch)) pch <- 21
+        if (missing(xlab)) xlab <- 'dissimilarities'
+        if (missing(ylab)) ylab <- 'distances/disparities'
         shep <- MASS::Shepard(x$diss,x$points)
-        args <- c(list(x=shep,col=col,bg=bg,pch=pch,
-                       xlab='dissimilarities',
-                       ylab='distances/disparities'),
-                  ellipsis)
-        do.call(graphics::plot,args)
+        graphics::plot(x=shep,col=col,bg=bg,pch=pch,
+                       xlab=xlab,ylab=ylab,...)
         graphics::lines(shep$x,shep$yf,type="S")
         graphics::title(paste0("Stress = ",x$stress))
     } else {
-        if (!plotchar) pch <- NA
-        args <- c(list(x=x$points,type='n',asp=1,xlab=xlab,ylab=ylab),
-                  ellipsis)
-        do.call(graphics::plot,args)
+        if (missing(pch)) pch <- NA
+        if (missing(xlab)) xlab <- ''
+        if (missing(ylab)) ylab <- ''
+        graphics::plot(x=x$points,type='n',asp=1,
+                       xlab=xlab,ylab=ylab,...)
         if (nnlines) plotlines(x$points,x$diss)
         if (is.na(pch)) {
-            args <- c(list(x=x$points,labels=labels(x$diss),
-                           col=col,bg=bg,pos=pos),
-                      ellipsis)
-            graphics::points(x$points,pch=pch)
-            do.call(graphics::text,args)
+            graphics::points(x$points,pch=pch,...)
+            graphics::text(x=x$points,labels=labels(x$diss),
+                           col=col,bg=bg,pos=pos)
         } else {
-            args <- c(list(x=x$points,pch=pch,col=col,bg=bg),
-                      ellipsis)
-            do.call(graphics::points,args)
+            graphics::points(x=x$points,pch=pch,col=col,bg=bg,...)
             graphics::text(x$points,labels=labels(x$diss),pos=pos)
         }
     }

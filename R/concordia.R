@@ -417,24 +417,25 @@ age_to_concordia_ratios <- function(tt,type=1,exterr=FALSE,d=diseq()){
     else
         stop('Invalid concordia type.')
 }
-get.concordia.limits <- function(x,tlim=NULL,type=1,...){
+get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
     out <- list()
-    args <- list(...)
-    xset <- ('xlim' %in% names(args))
-    yset <- ('ylim' %in% names(args))
-    if (xset) {
-        out$x <- args$xlim
-        minx <- args$xlim[1]
-        maxx <- args$xlim[2]
-    } else {
+    if (missing(xlim)) {
+        xset <- FALSE
         out$x <- c(0,0)
-    }
-    if (yset) {
-        out$y <- args$ylim
-        miny <- args$ylim[1]
-        maxy <- args$ylim[2]
     } else {
+        xset <- TRUE
+        out$x <- xlim
+        minx <- xlim[1]
+        maxx <- xlim[2]        
+    }
+    if (missing(ylim)) {
+        yset <- FALSE
         out$y <- c(0,0)
+    } else {
+        yset <- TRUE
+        out$y <- ylim
+        miny <- ylim[1]
+        maxy <- ylim[2]
     }
     if (is.null(tlim)) out$t <- c(0,0)
     else out$t <- tlim

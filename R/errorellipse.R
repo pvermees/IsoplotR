@@ -94,6 +94,9 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     aliquots.
 #' @param addcolourbar add a colour bar to display the colours used to
 #'     \code{levels}
+#' @param bg background colour for the plot symbols (only used if
+#'     \code{show.ellipses=0}).
+#' @param cex plot symbol magnification.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -112,7 +115,7 @@ scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                         fit='none',add=FALSE,empty=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
                         hide=NULL,omit=NULL,omit.col=NA,
-                        addcolourbar=TRUE,...){
+                        addcolourbar=TRUE,bg,cex,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -135,25 +138,29 @@ scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                                       hide=hide,omit=omit,omit.col=omit.col)
     }
     if (show.ellipses==0){ # points and or text
-        plot_points(xy[,'X'],xy[,'Y'],mybg=colour,mycex=1,
+        if (missing(cex)) cex <- 1
+        if (missing(bg)) bg <- colour
+        plot_points(xy[,'X'],xy[,'Y'],bg=bg,cex=cex,
                     show.numbers=show.numbers,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
+        if (missing(cex)) cex <- 0.25
         for (i in sn[plotit]){
             if (!any(is.na(xy[i,]))){
                 covmat <- cor2cov2(xy[i,'sX'],xy[i,'sY'],xy[i,'rXY'])
                 ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=alpha)
                 graphics::polygon(ell,col=colour[i])
                 if (show.numbers) graphics::text(xy[i,'X'],xy[i,'Y'],i)
-                else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=0.25)
+                else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=cex)
             }
         }
     } else { # error cross
+        if (missing(cex)) cex <- 0.5
         if (show.numbers)
             graphics::text(xy[plotit,'X'],xy[plotit,'Y'],
                            sn[plotit],adj=c(0,1),col=colour)
         else
             graphics::points(xy[plotit,'X'],xy[plotit,'Y'],
-                             pch=19,cex=0.5,col=colour)
+                             pch=19,cex=cex,col=colour)
         fact <- stats::qnorm(1-alpha/2)
         dx <- fact*xy[plotit,'sX']
         dy <- fact*xy[plotit,'sY']

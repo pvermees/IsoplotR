@@ -8,7 +8,7 @@ helioplot(x, logratio = TRUE, model = 1, show.central.comp = TRUE,
   show.numbers = FALSE, alpha = 0.05, contour.col = c("white",
   "red"), levels = NA, clabel = "", ellipse.col = c("#00FF0080",
   "#0000FF80"), sigdig = 2, xlim = NA, ylim = NA, fact = NA,
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+  hide = NULL, omit = NULL, omit.col = NA, bg = ellipse.cols, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe}}
@@ -95,6 +95,9 @@ but omitted from the central age calculation.}
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
 
+\item{bg}{background colour for the plot symbols (only used if
+\code{model=2}).}
+
 \item{...}{optional arguments to the generic \code{plot} function}
 }
 \description{
@@ -158,8 +161,8 @@ dev.new()
 helioplot(examples$UThHe,logratio=FALSE)
 }
 \references{
-Aitchison, J., 1986, The statistical analysis of compositional
-data: London, Chapman and Hall, 416 p.
+Aitchison, J., 1986, The statistical analysis of
+    compositional data: London, Chapman and Hall, 416 p.
 
 Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
 ages. Chemical Geology, 249(3), pp.339-347.

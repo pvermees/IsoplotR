@@ -123,11 +123,12 @@
 #'     but omitted from the central age calculation.
 #' @param omit.col colour that should be used for the omitted
 #'     aliquots.
+#' @param bg background colour for the plot symbols (only used if
+#'     \code{model=2}).
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
-#' @references
-#' Aitchison, J., 1986, The statistical analysis of compositional
-#' data: London, Chapman and Hall, 416 p.
+#' @references Aitchison, J., 1986, The statistical analysis of
+#'     compositional data: London, Chapman and Hall, 416 p.
 #'
 #' Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
 #' ages. Chemical Geology, 249(3), pp.339-347.
@@ -145,7 +146,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                       contour.col=c('white','red'),levels=NA,clabel="",
                       ellipse.col=c("#00FF0080","#0000FF80"),
                       sigdig=2,xlim=NA,ylim=NA,fact=NA,hide=NULL,
-                      omit=NULL,omit.col=NA,...){
+                      omit=NULL,omit.col=NA,bg=ellipse.cols,...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
@@ -157,13 +158,12 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                         omit=omit,omit.col=omit.col)
     if (logratio) {
         plot_logratio_contours(x2plot,contour.col=contour.col,
-                               xlim=xlim,ylim=ylim,...)
+                               xlim=xlim,ylim=ylim)
         if (model==2){
             u <- log(x[,'U']/x[,'He'])
             v <- log(x[,'Th']/x[,'He'])
-            plot_points(u,v,mybg=ellipse.cols,
-                        show.numbers=show.numbers,
-                        hide=hide,omit=omit,...)
+            plot_points(u,v,show.numbers=show.numbers,
+                        hide=hide,omit=omit,bg=bg,...)
         } else {
             plot_logratio_ellipses(x,ellipse.cols=ellipse.cols,
                                    alpha=alpha,levels=levels,
@@ -176,8 +176,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                 xlim=xlim,ylim=ylim)
         if (model==2){
             plot_helioplot_points(x,show.numbers=show.numbers,
-                                  fact=fact,mybg=ellipse.cols,
-                                  hide=hide,omit=omit)
+                                  fact=fact,hide=hide,omit=omit,bg=bg,...)
         } else {
             plot_helioplot_ellipses(x,ellipse.cols=ellipse.cols,
                                     fact=fact,alpha=alpha,levels=levels,
@@ -244,14 +243,13 @@ plot_helioplot_ellipses <- function(x,ellipse.cols,fact=c(1,1,1),
         else graphics::points(x0y0[1],x0y0[2],pch=19,cex=0.25)
     }
 }
-plot_helioplot_points <- function(x,fact=c(1,1,1),mybg=NA,
+plot_helioplot_points <- function(x,fact=c(1,1,1),bg=NA,
                                   show.numbers=FALSE,hide=NULL,
                                   omit=NULL,...){
     xyz <- renormalise(x[,c('He','U','Th'),drop=FALSE],fact=fact)
     xy <- xyz2xy(xyz)
-    plot_points(xy[,1],xy[,2],mybg=mybg,
-                show.numbers=show.numbers,
-                hide=hide,omit=omit,...)
+    plot_points(xy[,1],xy[,2],show.numbers=show.numbers,
+                hide=hide,omit=omit,bg=bg,...)
 }
 
 plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
