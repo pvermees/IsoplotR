@@ -344,7 +344,7 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     mymtext(text=clabel,side=3,adj=1)
 }
 
-plot_points <- function(x,y,bg='yellow',pch=21,col='black',cex=1.5,pos=1,
+plot_points <- function(x,y,bg='yellow',pch=21,cex=1.5,pos,col,
                         show.numbers=FALSE,hide=NULL,omit=NULL,...){
     ns <- length(x)
     sn <- clear(1:ns,hide)
@@ -352,13 +352,20 @@ plot_points <- function(x,y,bg='yellow',pch=21,col='black',cex=1.5,pos=1,
     Y <- y[sn]
     hascol <- !all(is.na(bg))
     show.points <- (hascol | !show.numbers)
-    if (show.points) graphics::points(X,Y,bg=bg,pch=pch,col=col,cex=cex,...)
-    if (show.numbers & show.points){
+    if (show.points){
+        if (missing(pos)) pos <- 1
+        if (missing(col)) col <- 'black'
+        graphics::points(X,Y,bg=bg,pch=pch,col=col,cex=cex,...)
+    } else {
+        if (missing(pos)) pos <- NULL
+        if (missing(col)){
+            tcol <- rep('black',ns)
+            tcol[omit] <- 'grey'
+            col <- tcol[sn]
+        }
+    }
+    if (show.numbers){
         graphics::text(X,Y,col=col,cex=cex,pos=pos,labels=sn,...)
-    } else if (show.numbers & !show.points){
-        tcol <- rep('black',ns)
-        tcol[omit] <- 'grey'
-        graphics::text(X,Y,col=tcol[sn],cex=cex,pos=NULL,labels=sn,...)
     }
 }
 

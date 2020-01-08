@@ -123,11 +123,12 @@
 #'     but omitted from the central age calculation.
 #' @param omit.col colour that should be used for the omitted
 #'     aliquots.
+#' @param bg background colour for the plot symbols (only used if
+#'     \code{model=2}).
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
-#' @references
-#' Aitchison, J., 1986, The statistical analysis of compositional
-#' data: London, Chapman and Hall, 416 p.
+#' @references Aitchison, J., 1986, The statistical analysis of
+#'     compositional data: London, Chapman and Hall, 416 p.
 #'
 #' Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
 #' ages. Chemical Geology, 249(3), pp.339-347.
@@ -157,7 +158,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                         omit=omit,omit.col=omit.col)
     if (logratio) {
         plot_logratio_contours(x2plot,contour.col=contour.col,
-                               xlim=xlim,ylim=ylim,...)
+                               xlim=xlim,ylim=ylim)
         if (model==2){
             u <- log(x[,'U']/x[,'He'])
             v <- log(x[,'Th']/x[,'He'])
@@ -175,7 +176,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                 xlim=xlim,ylim=ylim)
         if (model==2){
             plot_helioplot_points(x,show.numbers=show.numbers,
-                                  fact=fact,hide=hide,omit=omit,bg=bg)
+                                  fact=fact,hide=hide,omit=omit,bg=bg,...)
         } else {
             plot_helioplot_ellipses(x,ellipse.cols=ellipse.cols,
                                     fact=fact,alpha=alpha,levels=levels,
