@@ -9,7 +9,7 @@ scatterplot(xy, xlim = NA, ylim = NA, alpha = 0.05,
   clabel = "", ellipse.col = c("#00FF0080", "#FF000080"),
   fit = "none", add = FALSE, empty = FALSE, ci.col = "gray80",
   line.col = "black", lwd = 1, hide = NULL, omit = NULL,
-  omit.col = NA, addcolourbar = TRUE, bg = NULL, cex, ...)
+  omit.col = NA, addcolourbar = TRUE, bg, cex, ...)
 }
 \arguments{
 \item{xy}{matrix with columns \code{X, sX, Y, sY(, rXY)}}
