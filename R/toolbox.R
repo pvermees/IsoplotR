@@ -344,74 +344,22 @@ colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
     mymtext(text=clabel,side=3,adj=1)
 }
 
-# mybg, mypch etc are the default values that will be used if bg, pch are not in ...
-# this function can be used to override parameters that are in the ...
-plot_points <- function(x,y,mybg='yellow',mypch=21,mycol='black',mycex=1.5,mypos=1,
+plot_points <- function(x,y,bg='yellow',pch=21,col='black',cex=1.5,pos=1,
                         show.numbers=FALSE,hide=NULL,omit=NULL,...){
     ns <- length(x)
     sn <- clear(1:ns,hide)
-    pargs <- get_points_pars(...,mybg=mybg,mypch=mypch,mycol=mycol,mycex=mycex)
-    targs <- get_text_pars(...,mycol=mycol,mycex=mycex,mypos=mypos)
-    pargs$x <- x[sn]
-    pargs$y <- y[sn]
-    targs$x <- x[sn]
-    targs$y <- y[sn]
-    hascol <- !all(is.na(mybg))
+    X <- x[sn]
+    Y <- y[sn]
+    hascol <- !all(is.na(bg))
     show.points <- (hascol | !show.numbers)
-    if (show.points){
-        do.call(graphics::points,pargs)
-    }
+    if (show.points) graphics::points(X,Y,bg=bg,pch=pch,col=col,cex=cex,...)
     if (show.numbers & show.points){
-        targs$labels <- sn
-        do.call(graphics::text,targs)
+        graphics::text(X,Y,col=col,cex=cex,pos=pos,labels=sn,...)
     } else if (show.numbers & !show.points){
         tcol <- rep('black',ns)
         tcol[omit] <- 'grey'
-        targs$col <- tcol[sn]
-        targs$labels <- sn
-        targs$pos <- NULL
-        do.call(graphics::text,targs)
+        graphics::text(X,Y,col=tcol[sn],cex=cex,pos=NULL,labels=sn,...)
     }
-}
-get_points_pars <- function(...,mybg='yellow',mypch=21,mycol='black',mycex=1.5){
-    ellipsis <- list(...)
-    pars <- names(ellipsis)
-    out <- ellipsis
-    if ('pch' %in% pars)
-        out$pch <- ellipsis$pch
-    else
-        out$pch <- mypch
-    if ('col' %in% pars)
-        out$col <- ellipsis$col
-    else
-        out$col <- mycol
-    if ('bg' %in% pars)
-        out$bg <- ellipsis$bg
-    else
-        out$bg <- mybg
-    if ('cex' %in% pars)
-        out$cex <- ellipsis$cex
-    else
-        out$cex <- mycex
-    out
-}
-get_text_pars <- function(...,mycol='black',mycex=1.5,mypos=NULL){
-    ellipsis <- list(...)
-    pars <- names(ellipsis)
-    out <- ellipsis
-    if ('col' %in% pars)
-        out$col <- ellipsis$col
-    else
-        out$col <- mycol
-    if ('cex' %in% pars)
-        out$cex <- ellipsis$cex
-    else
-        out$cex <- mycex
-    if ('pos' %in% pars)
-        out$pos <- ellipsis$pos
-    else
-        out$pos <- mypos
-    out
 }
 
 nfact <- function(alpha){

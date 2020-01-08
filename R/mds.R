@@ -161,26 +161,29 @@ KS.diss <- function(x,y) {
 
 # arguments:
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
-                     col='black',bg='white',xlab="",ylab="",pch,...){
+                     col='black',bg='white',xlab,ylab,pch,...){
     if (shepard & !x$classical){
         if (missing(pch)) pch <- 21
+        if (missing(xlab)) xlab <- 'dissimilarities'
+        if (missing(ylab)) ylab <- 'distances/disparities'
         shep <- MASS::Shepard(x$diss,x$points)
         graphics::plot(x=shep,col=col,bg=bg,pch=pch,
-                       xlab='dissimilarities',
-                       ylab='distances/disparities',...)
+                       xlab=xlab,ylab=ylab,...)
         graphics::lines(shep$x,shep$yf,type="S")
         graphics::title(paste0("Stress = ",x$stress))
     } else {
         if (missing(pch)) pch <- NA
+        if (missing(xlab)) xlab <- ''
+        if (missing(ylab)) ylab <- ''
         graphics::plot(x=x$points,type='n',asp=1,
-                      xlab=xlab,ylab=ylab,...)
+                       xlab=xlab,ylab=ylab,...)
         if (nnlines) plotlines(x$points,x$diss)
         if (is.na(pch)) {
-            graphics::points(x$points,pch=pch)
+            graphics::points(x$points,pch=pch,...)
             graphics::text(x=x$points,labels=labels(x$diss),
                            col=col,bg=bg,pos=pos)
         } else {
-            graphics::points(x=x$points,pch=pch,col=col,bg=bg)
+            graphics::points(x=x$points,pch=pch,col=col,bg=bg,...)
             graphics::text(x$points,labels=labels(x$diss),pos=pos)
         }
     }

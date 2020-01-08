@@ -112,7 +112,7 @@ scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                         fit='none',add=FALSE,empty=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
                         hide=NULL,omit=NULL,omit.col=NA,
-                        addcolourbar=TRUE,...){
+                        addcolourbar=TRUE,bg=NULL,cex=1,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -135,7 +135,8 @@ scatterplot <- function(xy,xlim=NA,ylim=NA,alpha=0.05,
                                       hide=hide,omit=omit,omit.col=omit.col)
     }
     if (show.ellipses==0){ # points and or text
-        plot_points(xy[,'X'],xy[,'Y'],mybg=colour,mycex=1,
+        if (is.null(bg)) bg <- colour
+        plot_points(xy[,'X'],xy[,'Y'],bg=bg,cex=cex,
                     show.numbers=show.numbers,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
         for (i in sn[plotit]){
