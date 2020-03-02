@@ -336,28 +336,30 @@ age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,detritu
 }
 #' @rdname age
 #' @export
+age.ThPb <-function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+    age.PD(x,nuclide='Th232',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
+}
+#' @rdname age
+#' @export
 age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
-    age.PD(x,'Re187',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
+    age.PD(x,nuclide='Re187',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
 }
 #' @rdname age
 #' @export
 age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
-    age.PD(x,'Sm147',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
+    age.PD(x,nuclide='Sm147',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
 }
 #' @rdname age
 #' @export
 age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
-    age.PD(x,'Rb87',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
+    age.PD(x,nuclide='Rb87',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
 }
 #' @rdname age
 #' @export
-age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,
-                     sigdig=NA,...){
-    age.PD(x,'Lu176',isochron=isochron,i2i=i2i,exterr=exterr,i=i,
-           sigdig=sigdig,...)
+age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
+    age.PD(x,nuclide='Lu176',isochron=isochron,i2i=i2i,exterr=exterr,i=i,sigdig=sigdig,...)
 }
-age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,
-                   sigdig=NA,...){
+age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig)
     else out <- PD.age(x,nuclide,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out

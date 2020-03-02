@@ -741,6 +741,23 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
+isochron.ThPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,levels=NA,clabel="",
+                          ellipse.col=c("#00FF0080","#FF000080"),
+                          inverse=FALSE,ci.col='gray80',line.col='black',
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
+                          show.ellipses=1*(model!=2),
+                          hide=NULL,omit=NULL,omit.col=NA,...){
+    isochron_PD(x,nuclide='Th232',xlim=xlim,ylim=ylim,alpha=alpha,
+                sigdig=sigdig,show.numbers=show.numbers,
+                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
+                inverse=inverse,ci.col=ci.col,line.col=line.col,
+                lwd=lwd,plot=plot,exterr=exterr,model=model,
+                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                omit.col=omit.col,...)
+}
+#' @rdname isochron
+#' @export
 isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          show.numbers=FALSE,levels=NA,clabel="",
                          ellipse.col=c("#00FF0080","#FF000080"),
@@ -748,7 +765,7 @@ isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
                          show.ellipses=1*(model!=2),
                          hide=NULL,omit=NULL,omit.col=NA,...){
-    isochron_PD(x,'K40',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,nuclide='K40',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,
@@ -765,7 +782,7 @@ isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,'Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,nuclide='Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
@@ -781,7 +798,7 @@ isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,'Re187',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,nuclide='Re187',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,lwd=lwd,
@@ -797,7 +814,7 @@ isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,'Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,nuclide='Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,
@@ -814,7 +831,7 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,'Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,nuclide='Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,
@@ -1062,7 +1079,15 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
 
 get.isochron.labels <- function(nuclide,inverse=FALSE){
     out <- list()
-    if (identical(nuclide,'Sm147')){
+    if (identical(nuclide,'Th232')){
+        if (inverse){
+            out$x <- quote(''^232*'Th/'^208*'Pb')
+            out$y <- quote(''^204*'Pb/'^208*'Pb')
+        } else {
+            out$x <- quote(''^232*'Th/'^204*'Pb')
+            out$y <- quote(''^208*'Pb/'^204*'Pb')
+        }
+    } else if (identical(nuclide,'Sm147')){
         if (inverse){
             out$x <- quote(''^147*'Sm/'^143*'Nd')
             out$y <- quote(''^144*'Nd/'^143*'Nd')

@@ -362,6 +362,24 @@ weightedmean.KCa <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
+weightedmean.ThPb <- function(x,random.effects=TRUE,
+                              detect.outliers=TRUE,plot=TRUE, from=NA,
+                              to=NA,levels=NA,clabel="",
+                              rect.col=c("#00FF0080","#FF000080"),
+                              outlier.col="#00FFFF80",sigdig=2,
+                              alpha=0.05,exterr=TRUE,ranked=FALSE,
+                              i2i=TRUE,hide=NULL,omit=NULL,
+                              omit.col=NA,...){
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
+                        from=from,to=to,levels=levels,clabel=clabel,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig, alpha=alpha,exterr=exterr,
+                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        omit=omit,omit.col=omit.col,...)
+}
+#' @rdname weightedmean
+#' @export
 weightedmean.ReOs <- function(x,random.effects=TRUE,
                               detect.outliers=TRUE,plot=TRUE, from=NA,
                               to=NA,levels=NA,clabel="",

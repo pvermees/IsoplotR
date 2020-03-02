@@ -281,6 +281,20 @@ kde.KCa <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 show.hist=show.hist,bty=bty,binwidth=binwidth,
                 hide=hide,...)
 }
+#' @rdname kde
+#' @export
+kde.ThPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                     n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
+                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
+                     show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,
+                     hide=NULL,...){
+    tt <- ThPb.age(x,i2i=i2i)[,1]
+    kde.default(tt,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
+                n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
+                kde.col=kde.col,hist.col=hist.col,
+                show.hist=show.hist,bty=bty,binwidth=binwidth,
+                hide=hide,...)
+}
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format=1} or \code{2}).
 #'

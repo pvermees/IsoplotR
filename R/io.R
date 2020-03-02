@@ -333,6 +333,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
         out <- as.PbPb(x,format=format,ierr=ierr)
     } else if (identical(method,'Ar-Ar')){
         out <- as.ArAr(x,format=format,ierr=ierr)
+    } else if (identical(method,'Th-Pb')){
+        out <- as.ThPb(x,format=format,ierr=ierr)
     } else if (identical(method,'K-Ca')){
         out <- as.KCa(x,format=format,ierr=ierr)
     } else if (identical(method,'Re-Os')){
@@ -563,6 +565,31 @@ as.ArAr <- function(x,format=3,ierr=1){
     }
     out
 }
+as.ThPb <- function(x,format=1,ierr=1){
+    out <- list()
+    class(out) <- "ThPb"
+    out$format <- format
+    nc <- ncol(x)
+    nr <- nrow(x)
+    bi <- 2 # begin index
+    X <- shiny2matrix(x,bi,nr,nc)
+    X <- errconvert(X,gc='Th-Pb',format=format,ierr=ierr)
+    if (format==1 & nc>3){
+        cnames <- c('Th232Pb204','errTh232Pb204',
+                    'Pb208Pb204','errPb208Pb204','rho')
+    } else if (format==2 & nc>3){
+        cnames <- c('Th232Pb208','errTh232Pb208',
+                    'Pb204Pb208','errPb204Pb208','rho')
+    } else if (format==3 & nc>5){
+        cnames <- c('Th232Pb204','errTh232Pb204',
+                    'Pb208Pb204','errPb208Pb204',
+                    'Th232Pb208','errTh232Pb208')
+    } else {
+        stop("Incorrect format or insufficient columns")
+    }
+    out$x <- insert.data(x=X,cnames=cnames)
+    out
+}
 as.KCa <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "KCa"
@@ -572,22 +599,18 @@ as.KCa <- function(x,format=1,ierr=1){
     bi <- 2 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
     X <- errconvert(X,gc='K-Ca',format=format,ierr=ierr)
-    if (format==1 & nc==4){
+    if (format==1 & nc>3){
         cnames <- c('K40Ca44','errK40Ca44',
                     'Ca40Ca44','errCa40Ca44','rho')
-    } else if (format==1 & nc>4){
-        cnames <- c('K40Ca44','errK40Ca44',
-                    'Ca40Ca44','errCa40Ca44','rho')
-    } else if (format==2 & nc==4){
-        cnames <- c('K40Ca40','errK40Ca40',
-                    'Ca44Ca40','errCa44Ca40','rho')
-    } else if (format==2 & nc>4){
+    } else if (format==2 & nc>3){
         cnames <- c('K40Ca40','errK40Ca40',
                     'Ca44Ca40','errCa44Ca40','rho')
     } else if (format==3 & nc>5){
         cnames <- c('K40Ca44','errK40Ca44',
                     'Ca40Ca44','errCa40Ca44',
                     'K40Ca40','errK40Ca40')
+    } else {
+        stop("Incorrect format or insufficient columns")
     }
     out$x <- insert.data(x=X,cnames=cnames)
     out

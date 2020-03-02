@@ -361,6 +361,14 @@ data2york.ArAr <- function(x,inverse=TRUE,...){
 }
 #' @rdname data2york
 #' @export
+data2york.ThPb <- function(x,inverse=FALSE,...){
+    out <- data2york(x$x,format=x$format,...)
+    invert <- (inverse & x$format%in%c(1,3)) | (!inverse & x$format==2)
+    if (invert) out <- normal2inverse(out)
+    out
+}
+#' @rdname data2york
+#' @export
 data2york.KCa <- function(x,inverse=FALSE,...){
     out <- data2york(x$x,format=x$format,...)
     invert <- (inverse & x$format%in%c(1,3)) | (!inverse & x$format==2)

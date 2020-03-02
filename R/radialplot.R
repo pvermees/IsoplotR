@@ -302,6 +302,22 @@ radialplot.KCa <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
+radialplot.ThPb <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+                            transformation='log',show.numbers=FALSE,
+                            pch=21,levels=NA,clabel="",
+                            bg=c("yellow","red"),col='black',
+                            markers=NULL,k=0,exterr=TRUE,i2i=TRUE,
+                            alpha=0.05,hide=NULL,omit=NULL,
+                            omit.col=NA,...){
+    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+               transformation=transformation,
+               show.numbers=show.numbers,pch=pch,levels=levels,
+               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
+               exterr=exterr,i2i=i2i,alpha=alpha,hide=hide,
+               omit=omit,omit.col=omit.col,...)
+}
+#' @rdname radialplot
+#' @export
 radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
                              transformation='log',show.numbers=FALSE,
                              pch=21,levels=NA,clabel="",
