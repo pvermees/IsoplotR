@@ -155,27 +155,11 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0,d=diseq()){
     YY - BB*XX
 }
 # a = intercept, b = slope on TW concordia
-intersection.misfit.york <- function(tt,a,b,covmat=NULL,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
+intersection.misfit.york <- function(tt,a,b,d=diseq()){
     D <- mclean(tt=tt,d=d)
     # misfit is based on difference in slope in TW space
-    m <- D$Pb207U235/U - a*D$Pb206U238 - b
-    if (is.null(covmat)){
-        return(m)
-    } else { # error propagation
-        dmda <- -D$Pb206U238
-        dmdb <- -1
-        dmdt <- D$dPb207U235dt/U - a*D$dPb206U238dt
-        dtda <- -dmda/dmdt # implicit differentiation
-        dtdb <- -dmdb/dmdt
-        J <- matrix(0,2,2)
-        J[1,1] <- dtda
-        J[1,2] <- dtdb
-        J[2,1] <- 1    # dada
-        return(J%*%covmat%*%t(J))
-    }
+    #D$Pb207U235/U - a*D$Pb206U238 - b
+    (D$Pb207Pb206-a)*D$Pb206U238 - b
 }
 
 discordia.line <- function(fit,wetherill,d=diseq()){
