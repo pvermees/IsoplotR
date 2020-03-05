@@ -291,6 +291,16 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
         }
+    } else if (option==8 && x$format%in%c(7,8)){ # 06/08 vs. 32/08
+        for (i in 1:ns){
+            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb206cPb208')
+        }
+    } else if (option==9 && x$format%in%c(7,8)){ # 07/08 vs. 32/08
+        for (i in 1:ns){
+            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
+        }
     } else {
         stop('Incompatible input format and concordia type.')
     }

@@ -498,16 +498,28 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     l8 <- settings('lambda','U238')[1]
     l5 <- settings('lambda','U235')[1]
     D <- mclean(tt,d=x$d)
-    if (type==1){                               # 38/06
+    if (type==1){                           # 04-08c/06 vs. 38/06
         x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)[1]
         dx0invdt <- D$dPb206U238dt
         E <- lud$cov[1:2,1:2]
         x.lab <- quote(''^238*'U/'^206*'Pb')
-    } else {                                    # 35/07
+    } else if (type==2){                    # 04-08c/07 vs. 35/07
         x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)[1]
         dx0invdt <- D$dPb207U235dt
         E <- lud$cov[c(1,3),c(1,3)]
         x.lab <- quote(''^235*'U/'^207*'Pb')
+    } else if (type==3 & x$format%in%c(7,8)){  # 06c/08 vs. 32/08
+        x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
+        dx0invdt <- D$dPb208Th232dt
+        E <- lud$cov[1:2,1:2]
+        x.lab <- quote(''^232*'Th/'^208*'Pb')
+    } else if (type==4 & x$format%in%c(7,8)){  # 07c/08 vs. 32/08
+        x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
+        dx0invdt <- D$dPb208Th232dt
+        E <- lud$cov[c(1,3),c(1,3)]
+        x.lab <- quote(''^232*'Th/'^208*'Pb')
+    } else {
+        stop('Invalid isochron type.')
     }
     if (model==3) lud$w <- ci_log2lin_lud(fit=lud,fact=nfact(alpha))
     out <- isochron_init(lud,alpha=0.05)
@@ -542,13 +554,32 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         out$y0[2] <- out$y0[1]*sqrt(lud$cov[y0par,y0par])/lud$par[y0par]
         y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
         out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
+    } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
+        XY <- data2york(x,option=8,tt=tt)
+        y0par <- '68i'
+        out$y0[1] <- lud$par[y0par]
+        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
+        y.lab <- quote(''^206*'Pb'[o]*'/'^208*'Pb')
+        out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
+    } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
+        XY <- data2york(x,option=9,tt=tt)
+        y0par <- '78i'
+        out$y0[1] <- lud$par[y0par]
+        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
+        y.lab <- quote(''^207*'Pb'[o]*'/'^208*'Pb')
+        out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
     } else {
         stop('Isochron regression is not available for this input format.')
     }
-    a <- 1/lud$par[y0par]
-    b <- -a*x0inv
     J <- matrix(0,2,2)
-    J[1,2] <- -a^2
+    if (type<3){
+        a <- 1/lud$par[y0par]
+        J[1,2] <- -a^2
+    } else {
+        a <- lud$par[y0par]
+        J[1,2] <- 1
+    }
+    b <- -a*x0inv
     J[2,1] <- -a*dx0invdt
     J[2,2] <- x0inv*a^2
     cov.ab <- J%*%E%*%t(J)

@@ -236,7 +236,8 @@ get.UPb.isochron.ratios.204 <- function(x,i=NA){
 get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
     if (x$format%in%c(7,8)){
         labels <- c('U238Pb206','Pb208cPb206','U235Pb207',
-                    'Pb208cPb207','Th232U238','Th232Pb208')
+                    'Pb208cPb207','Th232U238','Th232Pb208',
+                    'Pb206cPb208','Pb207cPb208')
     } else {
         stop('Incorrect input format for the get.UPb.isochron.ratios function.')
     }
@@ -250,14 +251,21 @@ get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
         return(out)
     }
     l2 <- settings('lambda','Th232')[1]
+    l5 <- settings('lambda','U235')[1]
+    l8 <- settings('lambda','U238')[1]
     U <- iratio('U238U235')[1]
     tw <- tera.wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
     U8Pb6 <- tw$x['U238Pb206']
-    Pb8c6 <- tw$x['Pb208Pb206'] - tw$x['Th232U238']*tw$x['U238Pb206']*(exp(l2*tt)-1)
+    Pb8c6 <- tw$x['Pb208Pb206'] -
+        tw$x['Th232U238']*tw$x['U238Pb206']*(exp(l2*tt)-1)
     U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
     Pb8c7 <- Pb8c6/tw$x['Pb207Pb206']
     Th2Pb8 <- tw$x['Th232U238']*tw$x['U238Pb206']/tw$x['Pb208Pb206']
-    J <- matrix(0,6,4)
+    Pb6c8 <- 1/tw$x['Pb208Pb206'] -
+        (exp(l8*tt)-1)*tw$x['U238Pb206']/tw$x['Pb208Pb206']
+    Pb7c8 <- tw$x['Pb207Pb206']/tw$x['Pb208Pb206'] -
+        (exp(l5*tt)-1)*tw$x['U238Pb206']/(U*tw$x['Pb208Pb206'])
+    J <- matrix(0,8,4)
     J[1,1] <- 1
     J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
     J[2,3] <- 1
@@ -272,8 +280,14 @@ get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
     J[6,1] <- tw$x['Th232U238']/tw$x['Pb208Pb206']
     J[6,3] <- -Th2Pb8/tw$x['Pb208Pb206']
     J[6,4] <- tw$x['U238Pb206']/tw$x['Pb208Pb206']
+    J[7,1] <- -(exp(l8*tt)-1)/tw$x['Pb208Pb206']
+    J[7,3] <- -Pb6c8/tw$x['Pb208Pb206']
+    J[8,1] <- -(exp(l5*tt)-1)/(U*tw$x['Pb208Pb206'])
+    J[8,2] <- 1/tw$x['Pb208Pb206']
+    J[8,3] <- -Pb7c8/tw$x['Pb208Pb206']
     out <- list()
-    out$x <- c(U8Pb6,Pb8c6,U5Pb7,Pb8c7,tw$x['Th232U238'],Th2Pb8)
+    out$x <- c(U8Pb6,Pb8c6,U5Pb7,Pb8c7,
+               tw$x['Th232U238'],Th2Pb8,Pb6c8,Pb7c8)
     out$cov <- J %*% tw$cov %*% t(J)
     names(out$x) <- labels
     colnames(out$cov) <- labels
