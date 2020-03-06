@@ -221,31 +221,32 @@ data2york.default <- function(x,format=1,...){
 
 #' @param option one of
 #'
-#' \code{1}: Wetherill concordia ratios: \code{X=07/35}, \code{sX=s[07/35]},
-#'     \code{Y=06/38}, \code{sY=s[06/38]}, \code{rXY}.
+#' \code{1}: Wetherill concordia ratios: \code{X=07/35},
+#' \code{sX=s[07/35]}, \code{Y=06/38}, \code{sY=s[06/38]}, \code{rXY}.
 #'
-#' \code{2}: Tera-Wasserburg ratios: \code{X=38/06}, \code{sX=s[38/06]},
-#'     \code{Y=07/06}, \code{sY=s[07/06]}, \code{rho=rXY}.
+#' \code{2}: Tera-Wasserburg ratios: \code{X=38/06},
+#' \code{sX=s[38/06]}, \code{Y=07/06}, \code{sY=s[07/06]},
+#' \code{rho=rXY}.
 #'
-#' \code{3}: \code{X=04/06}, \code{sX=s[04/06]}, \code{Y=38/06},
-#'     \code{sY=s[38/06]}, \code{rho=rXY} (only valid if
-#'     \code{format=4,5} or \code{6}).
+#' \code{3}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=04/06},
+#' \code{sY=s[04/06]}, \code{rho=rXY} (only valid if \code{format=4,5}
+#' or \code{6}).
 #'
-#' \code{4}: \code{X=04/07}, \code{sX=s[04/07]}, \code{Y=05/07},
-#'     \code{sY=s[35/07]}, \code{rho=rXY} (only valid if
-#'     \code{format=4,5} or \code{6}).
+#' \code{4}: \code{X=35/07}, \code{sX=s[35/07]}, \code{Y=04/07},
+#' \code{sY=s[04/07]}, \code{rho=rXY} (only valid if \code{format=4,5}
+#' or \code{6}).
 #'
-#' \code{5}: U-Th-Pb concordia ratios: \code{X=08/32}, \code{sX=s[08/32]},
-#'     \code{Y=06/38}, \code{sY=s[06/38]}, \code{rho=rXY} (only valid
-#'     if \code{format=7} or \code{8}).
+#' \code{5}: U-Th-Pb concordia ratios: \code{X=06/38},
+#' \code{sX=s[06/38]}, \code{Y=08/32}, \code{sY=s[08/32]},
+#' \code{rho=rXY} (only valid if \code{format=7} or \code{8}).
 #'
 #' \code{6}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
-#'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
-#'     \code{format=7} or \code{8}).
+#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{format=7}
+#' or \code{8}).
 #' 
 #' \code{7}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
-#'     \code{sY=s[08/06]}, \code{rho=rXY} (only valid if
-#'     \code{format=7} or \code{8}).
+#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{format=7}
+#' or \code{8}).
 #'
 #' @param tt the age of the sample. This is only used if \code{x} has
 #'     class 7 or 8, in order to calculate the inherited

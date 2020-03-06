@@ -194,7 +194,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
                        lower=lower,upper=upper,
                        control=list(fnscale=-1),...)
         out$LL <- fit$value
-        out$logpar <- fit$par        
+        out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
     }
     if (x$format %in% c(1,2,3)) parnames <- c('log(t)','log(76i)')
