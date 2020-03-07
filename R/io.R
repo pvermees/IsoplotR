@@ -526,15 +526,17 @@ as.PbPb <- function(x,format=1,ierr=1){
     opt <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb206Pb204','errPb206Pb204',
-                    'Pb207Pb204','errPb207Pb204','rho')
+                    'Pb207Pb204','errPb207Pb204',
+                    'rho')
     } else if (format==2 & nc>4) {
         cnames <- c('Pb204Pb206','errPb204Pb206',
-                    'Pb207Pb206','errPb207Pb206','rho')
+                    'Pb207Pb206','errPb207Pb206',
+                    'rho')
         opt <- 5
     } else if (format==3 & nc>5){
         cnames <- c('Pb206Pb204','errPb206Pb204',
                     'Pb207Pb204','errPb207Pb204',
-                    'Pb207Pb206','errPb207Pb206')
+                    'Pb206Pb207','errPb206Pb207')
     } else {
         stop('Invalid PbPb input format')
     }

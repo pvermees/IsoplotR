@@ -387,9 +387,13 @@ data2york.KCa <- function(x,inverse=FALSE,...){
 #' @rdname data2york
 #' @export
 data2york.PbPb <- function(x,inverse=TRUE,...){
-    if (inverse) out <- PbPb.inverse.ratios(x)
-    else out <- PbPb.normal.ratios(x)
-    colnames(out) <- c('X','sX','Y','sY','rXY')
+    out <- data2york(x$x,format=x$format,...)
+    invert <- (inverse & x$format%in%c(1,3)) | (!inverse & x$format==2)
+    if (invert){ # swap columns for normal2inverse function
+        out[,c('X','sX','Y','sY','rXY')] <- out[,c('Y','sY','X','sX','rXY')]
+        out <- normal2inverse(out)
+        out[,c('X','sX','Y','sY','rXY')] <- out[,c('Y','sY','X','sX','rXY')]
+    }
     out
 }
 
