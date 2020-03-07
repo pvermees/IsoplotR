@@ -367,7 +367,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
-    X <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
     opt <- NULL
     if (format==1){
         cnames <- c('Pb207U235','errPb207U235',
@@ -381,23 +380,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb206U238','errPb206U238',
                     'Pb207Pb206','errPb207Pb206',
                     'rhoXY','rhoYZ')
-        if (nc > 7){
-            rhoXY <- X[,7]
-            rhoYZ <- X[,8]
-            i <- which(is.na(rhoXY))
-            j <- which(is.na(rhoYZ))
-        } else if (nc == 7){
-            rhoXY <- X[,7]
-            i <- which(is.na(rhoXY))
-            j <- 1:nrow(X)
-            X <- cbind(X,0)
-        } else {
-            i <- 1:nrow(X)
-            j <- 1:nrow(X)
-            X <- cbind(X,0,0)
-        }
-        X[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
-        X[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
     } else if (format==4){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
@@ -430,12 +412,38 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
-        opt <- 9:14
+        opt <- 8:14
     }
-    out$x <- insert.data(x=X,cnames=cnames,opt=opt)
+    X <- insert.data(x=X,cnames=cnames,opt=opt)
+    out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
+    if (format==3) out$x <- optionalredundancy2cor(X=out$x,nc=nc)
     out$d <- copy_diseq(x=out,d=d)
     out
 }
+# for U-Pb format 3, the correlation coefficients are optional
+# and can be inferred from the redundancy of the ratios
+optionalredundancy2cor <- function(X,nc){
+    out <- X
+    if (nc > 7){
+        rhoXY <- X[,7]
+        rhoYZ <- X[,8]
+        i <- which(is.na(rhoXY))
+        j <- which(is.na(rhoYZ))
+    } else if (nc == 7){
+        rhoXY <- X[,7]
+        i <- which(is.na(rhoXY))
+        j <- 1:nrow(X)
+        out <- cbind(X,0)
+    } else {
+        i <- 1:nrow(X)
+        j <- 1:nrow(X)
+        out <- cbind(X,0,0)
+    }
+    out[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
+    out[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
+    out
+}
+
 get.cor.75.68 <- function(Pb207U235,errPb207U235,
                           Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
