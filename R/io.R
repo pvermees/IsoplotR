@@ -589,9 +589,9 @@ as.ThPb <- function(x,format=1,ierr=1){
         cnames <- c('Th232Pb208','errTh232Pb208',
                     'Pb204Pb208','errPb204Pb208','rho')
     } else if (format==3 & nc>5){
-        cnames <- c('Th232Pb204','errTh232Pb204',
-                    'Pb208Pb204','errPb208Pb204',
-                    'Th232Pb208','errTh232Pb208')
+        cnames <- c('Th232Pb208','errTh232Pb208',
+                    'Pb204Pb208','errPb204Pb208',
+                    'Th232Pb204','errTh232Pb204')
     } else {
         stop("Incorrect format or insufficient columns")
     }

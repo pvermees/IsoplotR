@@ -363,18 +363,16 @@ data2york_UPb_helper <- function(x,i1=1,i2=2){
 #' @rdname data2york
 #' @export
 data2york.ArAr <- function(x,inverse=TRUE,...){
-    if (inverse)
-        out <- ArAr.inverse.ratios(x)
-    else
-        out <- ArAr.normal.ratios(x)
-    colnames(out) <- c('X','sX','Y','sY','rXY')
+    out <- data2york(x$x,format=x$format,...)
+    invert <- (inverse & x$format==1) | (!inverse & x$format%in%c(2,3))
+    if (invert) out <- normal2inverse(out)
     out
 }
 #' @rdname data2york
 #' @export
 data2york.ThPb <- function(x,inverse=FALSE,...){
     out <- data2york(x$x,format=x$format,...)
-    invert <- (inverse & x$format%in%c(1,3)) | (!inverse & x$format==2)
+    invert <- (inverse & x$format==1) | (!inverse & x$format%in%c(2,3))
     if (invert) out <- normal2inverse(out)
     out
 }
