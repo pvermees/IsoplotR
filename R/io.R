@@ -76,7 +76,7 @@
 #' \enumerate{
 #' \item{\code{6/4, err[6/4], 7/4, err[7/4], rho}}
 #' \item{\code{4/6, err[4/6], 7/6, err[7/6], rho}}
-#' \item{\code{6/4, err[6/4], 7/4, err[7/4], 7/6, err[7/6]}}
+#' \item{\code{6/4, err[6/4], 7/4, err[7/4], 6/7, err[6/7]}}
 #' }
 #'
 #' if \code{method='Ar-Ar'}, then \code{format} is one of either:
