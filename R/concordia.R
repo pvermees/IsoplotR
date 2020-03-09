@@ -289,7 +289,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                         alpha=alpha,exterr=exterr,ticks=ticks)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
-    else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
+    else if (x$format==7 & type==3) y <- data2york(X,option=5)
     else stop('Concordia type incompatible with this input format.')
     scatterplot(y,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
@@ -752,10 +752,17 @@ emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
                          age_to_Pb207Pb206_ratio(tlim[2]),0,0))
         dat$format <- 2
     } else if (type==3){
-        dat$x <- rbind(c(0,0,age_to_Pb206U238_ratio(tlim[1]),0,
-                         age_to_Pb208Th232_ratio(tlim[1]),0,rep(0,8)),
-                       c(0,0,age_to_Pb206U238_ratio(tlim[2]),0,
-                         age_to_Pb208Th232_ratio(tlim[2]),0,rep(0,8)))
+        Th232U238 <- 1
+        U238Pb206m <- age_to_U238Pb206_ratio(tlim[1])
+        U238Pb206M <- age_to_U238Pb206_ratio(tlim[2])
+        Pb207Pb206m <- age_to_Pb207Pb206_ratio(tlim[1])
+        Pb207Pb206M <- age_to_Pb207Pb206_ratio(tlim[2])
+        Pb208Th232m <- age_to_Pb208Th232_ratio(tlim[1])
+        Pb208Th232M <- age_to_Pb208Th232_ratio(tlim[2])
+        Pb208Pb206m <- Pb208Th232m*Th232U238*U238Pb206m
+        Pb208Pb206M <- Pb208Th232M*Th232U238*U238Pb206M
+        dat$x <- rbind(c(U238Pb206m,Pb207Pb206m,Pb208Pb206m,Th232U238,rep(0,6)),
+                       c(U238Pb206M,Pb207Pb206M,Pb208Pb206M,Th232U238,rep(0,6)))
         dat$format <- 7
     } else {
         stop('Invalid concordia type.')
