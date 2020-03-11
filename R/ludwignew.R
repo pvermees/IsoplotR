@@ -110,7 +110,13 @@ ludwig.default <- function(x,...){
 #' @export
 ludwig <- function(x,exterr=FALSE,alpha=0.05,model=1,
                    anchor=list(FALSE,NA)){
-    fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+    if (x$format==7){
+        init <- get.lta0b0.init(x,anchor=anchor)
+        fit <- get.lta0b0c0w(x,lta0b0=init,exterr=exterr,
+                             model=model,anchor=anchor)
+    } else {
+        fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+    }
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     mswd <- mswd.lud(out$logpar,x=x,anchor=anchor)
@@ -706,4 +712,78 @@ fixit <- function(x,anchor=list(FALSE,NA),model=1,w=NA){
         else out[2:NP] <- TRUE # fix a0(,b0)
     }
     out
+}
+
+# everything below this point is for U-Th-Pb regression
+
+get.lta0b0c0w <- function(x,lta0b0,exterr=FALSE,model=1,
+                          anchor=list(FALSE,NA),w=NA,...){
+    NP <- length(lta0b0)
+    lt <- lta0b0[1]
+    a0 <- lta0b0[2]
+    if (NP>2) b0 <- lta0b0[3]
+    ns <- length(x)
+    zeros <- rep(0,ns)
+    XYZW <- list()
+    XYZW$X <- zeros
+    XYZW$Y <- zeros
+    if (x$format>3) XYZW$Z <- zeros
+    if (x$format>6) XYZW$W <- zeros
+    NR <- length(XYZW)
+    XYZW$E <- matrix(0,ns*NR,ns*NR)
+    for (i in 1:ns){
+        wd <- wetherill(x,i=i)
+        XYZW$X[i] <- wd$x['Pb207U235']
+        XYZW$Y[i] <- wd$x['Pb206U238']
+        if (x$format%in%c(4,5,6)){
+            XYZW$Z[i] <- wd$x['Pb204U238']
+        } else {
+            XYZW$Z[i] <- wd$x['Pb208Th232']
+            XYZW$W[i] <- wd$x['Th232U238']
+        }
+        XYZW$E[(0:(NR-1))*ns+i,(0:(NR-1))*ns+i] <- wd$cov
+    }
+    D <- mclean(tt=exp(lt),d=x$d,exterr=exterr)
+    if (x$format<4) c0 <- XYXW$Y - D$Pb206U238
+    else if (x$format<7) c0 <- XYZW$Z
+    else c0 <- XYZW$Z - D$Pb208Th232
+    init <- c(lt,a0,b0,c0)
+    fixed <- rep(FALSE,length(init))
+    fit <- optifix(parms=init,fn=LL.lud,XYZW=XYZW,
+                   method="L-BFGS-B",x=x,exterr=exterr,
+                   fixed=fixed,#lower=lower,upper=upper,
+                   control=list(fnscale=-1),...)
+    fit
+}
+
+LL.lud <- function(lta0b0c0,x,exterr=FALSE,LL=TRUE,XYZW){
+    tt <- exp(lta0b0c0[1])
+    a0 <- exp(lta0b0c0[2])
+    b0 <- exp(lta0b0c0[3])
+    c0 <- lta0b0c0[-(1:3)]
+    X <- XYZW$X
+    Y <- XYZW$Y
+    Z <- XYZW$Z
+    W <- XYZW$W
+    E <- XYZW$E
+    U <- iratio('U238U235')[1]
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    K <- X - b0*U*W*c0 - D$Pb207U235
+    L <- Y - a0*W*c0 - D$Pb206U238
+    M <- Z - c0 - D$Pb208Th232
+    ns <- length(X)
+    J <- matrix(0,3*ns,4*ns)
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    i3 <- (2*ns+1):(3*ns)
+    i4 <- (3*ns+1):(4*ns)
+    J[i1,i1] <- diag(ns)
+    J[i2,i2] <- diag(ns)
+    J[i3,i3] <- diag(ns)
+    J[i1,i4] <- -U*b0*c0
+    J[i2,i4] <- -a0*c0
+    ED <- J %*% E %*% t(J)
+    D <- c(K,L,M)
+    SS <- D %*% solve(ED) %*% D
+    -SS
 }
