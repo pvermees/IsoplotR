@@ -1,119 +1,8 @@
-#' @title
-#' Linear regression of U-Pb data with correlated errors, taking
-#' into account decay constant uncertainties.
-#'
-#' @description
-#' Implements the maximum likelihood algorithm for Total-Pb/U isochron
-#' regression of Ludwig (1998) and extends the underlying methodology
-#' to accommodate U-Th-Pb data and initial U-series disequilibrium.
-#'
-#' @details
-#' The 3-dimensional regression algorithm of Ludwig and Titterington
-#' (1994) was modified by Ludwig (1998) to fit so-called `Total Pb-U
-#' isochrons'. These are constrained to a radiogenic endmember
-#' composition that falls on the \code{\link{concordia}} line. In its
-#' most sophisticated form, this algorithm does not only allow for
-#' correlated errors between variables, but also between
-#' aliquots. \code{IsoplotR} currently uses this algorithm to
-#' propagate decay constant uncertainties in the total Pb-U isochron
-#' ages.
-#'
-#' @param x an object of class \code{UPb}
-#' 
-#' @param alpha cutoff value for confidence intervals
-#' 
-#' @param ... optional
-#' 
-#' @return
-#' \describe{
-#'
-#' \item{LL}{the log likelihood of the discordia fit}
-#'
-#' \item{par}{a vector with the lower concordia intercept, the common
-#' Pb ratios and (if \code{model=3}) the dispersion parameter}
-#'
-#' \item{cov}{the covariance matrix of \code{par}}
-#'
-#' \item{logpar}{the logarithms of \code{par}}
-#'
-#' \item{logcov}{the logarithms of \code{cov}}
-#'
-#' \item{df}{the degrees of freedom of the model fit (\eqn{n-2} if
-#' \code{x$format<4} or \eqn{2n-3} if \code{x$format>3}, where \eqn{n}
-#' is the number of aliquots).}
-#'
-#' \item{mswd}{the mean square of weighted deviates (a.k.a. reduced
-#' Chi-square statistic) for the fit.}
-#'
-#' \item{p.value}{p-value of a Chi-square test for the linear fit}
-#'
-#' }
-#'
-#' @examples
-#' f <- system.file("UPb4.csv",package="IsoplotR")
-#' d <- read.data(f,method="U-Pb",format=4)
-#' fit <- ludwig(d)
-#' @references
-#' Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
-#' ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
-#'
-#' Ludwig, K.R. and Titterington, D.M., 1994. Calculation of
-#' \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
-#' Cosmochimica Acta, 58(22), pp.5031-5042.
-#'
-#' @export
-ludwig <- function(x,...){ UseMethod("ludwig",x) }
-#' @rdname ludwig
-#' @export
-ludwig.default <- function(x,...){
-    stop( "No default method available (yet)." )
-}
-#' @param exterr propagate external sources of
-#' uncertainty (i.e. decay constants)?
-#' @param model one of three regression models:
-#'
-#' \code{1}: fit a discordia line through the data using the maximum
-#' likelihood algorithm of Ludwig (1998), which assumes that the
-#' scatter of the data is solely due to the analytical
-#' uncertainties. In this case, \code{IsoplotR} will either calculate
-#' an upper and lower intercept age (for Wetherill concordia), or a
-#' lower intercept age and common
-#' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
-#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
-#' uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
-#'
-#' \code{2}: fit a discordia line ignoring the analytical uncertainties
-#'
-#' \code{3}: fit a discordia line using a modified maximum likelihood
-#' algorithm that includes accounts for any overdispersion by adding a
-#' geological (co)variance term.
-#' @param anchor control parameters to fix the intercept age or common
-#'     Pb composition of the discordia fit. This is a two-element
-#'     list.
-#'
-#' The first element is a boolean flag indicating whether the
-#' discordia line should be anchored. If this is \code{FALSE}, then
-#' the second item is ignored and both the common Pb composition and
-#' age are estimated.
-#'
-#' If the first element is \code{TRUE} and the second element is
-#' \code{NA}, then the common Pb composition is fixed at the values
-#' stored in \code{settings('iratio',...)}.
-#'
-#' If the first element is \code{TRUE} and the second element is a
-#' number, then the discordia line is forced to intersect the
-#' concordia line at an age equal to that number.
-#'
-#' @seealso \code{\link{concordia}}, \code{\link{titterington}},
-#'     \code{\link{isochron}}
-#' @rdname ludwig
-#' @export
-ludwig <- function(x,...){ UseMethod("ludwig",x) }
-#' @rdname isochron
-#' @export
-ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,
-                           anchor=list(FALSE,NA)){
-    fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+ludwig.UThPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
+                   anchor=list(FALSE,NA)){
+    init <- get.lta0b0.init(x,anchor=anchor)
+    fit <- get.lta0b0c0w(x,lta0b0=init,exterr=exterr,
+                         model=model,anchor=anchor)
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     mswd <- mswd.lud(out$logpar,x=x,anchor=anchor)
@@ -506,7 +395,6 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         L <- as.vector(Y - D$Pb206U238 - c0*exp(a0)*W)
         KLM <- c(K,L,M)
     }
-    out$c0 <- c0
     out$SS <- KLM%*%O%*%KLM
     detED <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- -(NP*ns*log(2*pi) + detED + out$SS)/2
@@ -710,4 +598,78 @@ fixit <- function(x,anchor=list(FALSE,NA),model=1,w=NA){
         else out[2:NP] <- TRUE # fix a0(,b0)
     }
     out
+}
+
+# everything below this point is for U-Th-Pb regression
+
+get.lta0b0c0w <- function(x,lta0b0,exterr=FALSE,model=1,
+                          anchor=list(FALSE,NA),w=NA,...){
+    NP <- length(lta0b0)
+    lt <- lta0b0[1]
+    a0 <- lta0b0[2]
+    if (NP>2) b0 <- lta0b0[3]
+    ns <- length(x)
+    zeros <- rep(0,ns)
+    XYZW <- list()
+    XYZW$X <- zeros
+    XYZW$Y <- zeros
+    if (x$format>3) XYZW$Z <- zeros
+    if (x$format>6) XYZW$W <- zeros
+    NR <- length(XYZW)
+    XYZW$E <- matrix(0,ns*NR,ns*NR)
+    for (i in 1:ns){
+        wd <- wetherill(x,i=i)
+        XYZW$X[i] <- wd$x['Pb207U235']
+        XYZW$Y[i] <- wd$x['Pb206U238']
+        if (x$format%in%c(4,5,6)){
+            XYZW$Z[i] <- wd$x['Pb204U238']
+        } else {
+            XYZW$Z[i] <- wd$x['Pb208Th232']
+            XYZW$W[i] <- wd$x['Th232U238']
+        }
+        XYZW$E[(0:(NR-1))*ns+i,(0:(NR-1))*ns+i] <- wd$cov
+    }
+    D <- mclean(tt=exp(lt),d=x$d,exterr=exterr)
+    if (x$format<4) c0 <- XYXW$Y - D$Pb206U238
+    else if (x$format<7) c0 <- XYZW$Z
+    else c0 <- XYZW$Z - D$Pb208Th232
+    init <- c(lt,a0,b0,c0)
+    fixed <- rep(FALSE,length(init))
+    fit <- optifix(parms=init,fn=LL.lud,XYZW=XYZW,
+                   method="L-BFGS-B",x=x,exterr=exterr,
+                   fixed=fixed,#lower=lower,upper=upper,
+                   control=list(fnscale=-1),...)
+    fit
+}
+
+LL.lud <- function(lta0b0c0,x,exterr=FALSE,LL=TRUE,XYZW){
+    tt <- exp(lta0b0c0[1])
+    a0 <- exp(lta0b0c0[2])
+    b0 <- exp(lta0b0c0[3])
+    c0 <- lta0b0c0[-(1:3)]
+    X <- XYZW$X
+    Y <- XYZW$Y
+    Z <- XYZW$Z
+    W <- XYZW$W
+    E <- XYZW$E
+    U <- iratio('U238U235')[1]
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    K <- X - b0*U*W*c0 - D$Pb207U235
+    L <- Y - a0*W*c0 - D$Pb206U238
+    M <- Z - c0 - D$Pb208Th232
+    ns <- length(X)
+    J <- matrix(0,3*ns,4*ns)
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    i3 <- (2*ns+1):(3*ns)
+    i4 <- (3*ns+1):(4*ns)
+    J[i1,i1] <- diag(ns)
+    J[i2,i2] <- diag(ns)
+    J[i3,i3] <- diag(ns)
+    J[i1,i4] <- -U*b0*c0
+    J[i2,i4] <- -a0*c0
+    ED <- J %*% E %*% t(J)
+    D <- c(K,L,M)
+    SS <- D %*% solve(ED) %*% D
+    -SS
 }

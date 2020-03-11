@@ -401,6 +401,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
         opt <- 8:14
+        class(out) <- append('UThPb',class(out))
     }
     X <- insert.data(x=X,cnames=cnames,opt=opt)
     out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
