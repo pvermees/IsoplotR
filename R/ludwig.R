@@ -506,7 +506,6 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         L <- as.vector(Y - D$Pb206U238 - c0*exp(a0)*W)
         KLM <- c(K,L,M)
     }
-    out$c0 <- c0
     out$SS <- KLM%*%O%*%KLM
     detED <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- -(NP*ns*log(2*pi) + detED + out$SS)/2
