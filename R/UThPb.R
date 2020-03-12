@@ -1,66 +1,74 @@
 ludwig.UThPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
                          anchor=list(FALSE,NA)){
-    lta0b0 <- get.lta0b0.init(x,anchor=anchor)
-    fit <- get.lta0b0c0.UThPb(x,lta0b0=lta0b0,exterr=exterr,
-                              model=model,anchor=anchor)
+    init <- get.lta0b0wc0.init(x=x,anchor=anchor,model=model)
+    fit <- get.lta0b0wc0.UThPb(x,init=init,exterr=exterr,
+                               model=model,anchor=anchor)
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     out
 }
 
-get.lta0b0c0.UThPb <- function(x,lta0b0,exterr=FALSE,model=1,
-                               anchor=list(FALSE,NA),...){
-    lt <- lta0b0[1]
-    a0 <- lta0b0[2]
-    b0 <- lta0b0[3]
-    NR <- 4
+get.lta0b0wc0.init <- function(x,model=1,anchor=list(FALSE,NA)){
     ns <- length(x)
-    zeros <- rep(0,ns)
-    XYZW <- list(X=zeros,Y=zeros,Z=zeros,W=zeros,
-                 E=matrix(0,NR*ns,NR*ns))
-    for (i in 1:ns){
-        wd <- wetherill(x,i=i)
-        XYZW$X[i] <- wd$x['Pb207U235']
-        XYZW$Y[i] <- wd$x['Pb206U238']
-        XYZW$Z[i] <- wd$x['Pb208Th232']
-        XYZW$W[i] <- wd$x['Th232U238']
-        XYZW$E[(0:(NR-1))*ns+i,(0:(NR-1))*ns+i] <- wd$cov
-    }
-    c0 <- log(XYZW$Z - exp(lambda('Th232')[1]*exp(lt)) + 1)
     if (model==3){
-        init <- c(lt,a0,b0,0,c0)
-        names(init) <- c('log(t)','log(a0)','log(b0)',
-                         'log(w)',paste0('log(c0[',1:ns,'])'))
-        lower <- c(lt,a0,b0,-8,c0)-2
-        upper <- c(lt,a0,b0,0,c0)+2
-        NP <- 4
+        lta0b0w <- get.lta0b0w(x=x,model=3,anchor=anchor)$logpar
+        c0 <- log(data2ludwig(x=x,lta0b0w=lta0b0w)$c0)
+        out <- c(lta0b0w,c0)
+        names(out) <- c('log(t)','log(a0)','log(b0)',
+                        'log(w)',paste0('log(c0[',1:ns,'])'))
     } else {
-        init <- c(lt,a0,b0,c0)
-        names(init) <- c('log(t)','log(a0)','log(b0)',
-                         paste0('log(c0[',1:ns,'])'))
-        lower <- init-1
-        upper <- init+2
-        NP <- 3
+        lta0b0 <- get.lta0b0.init(x,anchor=anchor)
+        c0 <- log(data2ludwig(x=x,lta0b0w=lta0b0,model=model)$c0)
+        out <- c(lta0b0,c0)
+        names(out) <- c('log(t)','log(a0)','log(b0)',
+                        paste0('log(c0[',1:ns,'])'))
     }
+    out
+}
+
+get.lta0b0wc0.UThPb <- function(x,init,exterr=FALSE,model=1,
+                                anchor=list(FALSE,NA),...){
+    XYZW <- get_XYZW(x)
     fixed <- rep(FALSE,length(init))
     fit <- optifix(parms=init,fn=LL.lud.UThPb,XYZW=XYZW,
-                   method="L-BFGS-B",x=x,exterr=exterr,
-                   fixed=fixed,lower=lower,upper=upper,
-                   hessian=TRUE,LL=TRUE,
+                   method="BFGS",x=x,exterr=exterr,
+                   fixed=fixed,hessian=TRUE,LL=TRUE,
                    control=list(fnscale=-1),...)
     out <- LL.lud.UThPb(lta0b0wc0=fit$par,x=x,LL=FALSE,XYZW=XYZW)
     out$model <- model
+    if (model==3) NP <- 4 else NP <- 3
     out$logpar <- fit$par[1:NP]
     out$logcov <- solve(-fit$hessian)[1:NP,1:NP]
     out
 }
 
-LL.lud.UThPb <- function(lta0b0wc0,x,exterr=FALSE,LL=TRUE,XYZW){
+get_XYZW <- function(x){
     ns <- length(x)
-    NP <- length(lta0b0wc0)
+    zeros <- rep(0,ns)
+    out <- list(X=zeros,Y=zeros,Z=zeros,W=zeros,
+                E=matrix(0,4*ns,4*ns))
+    for (i in 1:ns){
+        wd <- wetherill(x,i=i)
+        out$X[i] <- wd$x['Pb207U235']
+        out$Y[i] <- wd$x['Pb206U238']
+        out$Z[i] <- wd$x['Pb208Th232']
+        out$W[i] <- wd$x['Th232U238']
+        out$E[(0:3)*ns+i,(0:3)*ns+i] <- wd$cov
+    }
+    out
+}
+
+LL.lud.UThPb <- function(lta0b0wc0,x,exterr=FALSE,LL=TRUE,XYZW){
     tt <- exp(lta0b0wc0[1])
     a0 <- exp(lta0b0wc0[2])
     b0 <- exp(lta0b0wc0[3])
+    X <- XYZW$X
+    Y <- XYZW$Y
+    Z <- XYZW$Z
+    W <- XYZW$W
+    E <- XYZW$E
+    ns <- length(x)
+    NP <- length(lta0b0wc0)
     model3 <- NP>(ns+3)
     if (model3){
         w <- exp(lta0b0wc0[4])
@@ -68,11 +76,6 @@ LL.lud.UThPb <- function(lta0b0wc0,x,exterr=FALSE,LL=TRUE,XYZW){
     } else {
         c0 <- exp(lta0b0wc0[3+(1:ns)])
     }
-    X <- XYZW$X
-    Y <- XYZW$Y
-    Z <- XYZW$Z
-    W <- XYZW$W
-    E <- XYZW$E
     U <- iratio('U238U235')[1]
     D <- mclean(tt=tt,d=x$d,exterr=exterr)
     K <- X - b0*U*W*c0 - D$Pb207U235
@@ -95,13 +98,16 @@ LL.lud.UThPb <- function(lta0b0wc0,x,exterr=FALSE,LL=TRUE,XYZW){
         Jw[i1] <- -D$dPb207U235dt
         Jw[i2] <- -D$dPb206U238dt
         Jw[i3] <- -D$dPb208Th232dt
-        ED <- ED + Jw%*%w^2%*% t(Jw)
+        ED <- ED + Jw %*% (w^2) %*% t(Jw)
     }
+    O <- blockinverse3x3(ED[i1,i1],ED[i1,i2],ED[i1,i3],
+                         ED[i2,i1],ED[i2,i2],ED[i2,i3],
+                         ED[i3,i1],ED[i3,i2],ED[i3,i3])
     D <- c(K,L,M)
-    SS <- D %*% solve(ED) %*% D
+    SS <- D %*% O %*% D
     if (LL){
         detED <- determinant(ED,logarithm=TRUE)$modulus
-        out <- -(NP*ns*log(2*pi) + detED + SS)/2
+        out <- -(3*ns*log(2*pi) + detED + SS)/2
     } else {
         out <- list()
         out$df <- 3*ns-NP
@@ -109,13 +115,4 @@ LL.lud.UThPb <- function(lta0b0wc0,x,exterr=FALSE,LL=TRUE,XYZW){
         out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     }
     out
-}
-
-init.lw.UThPb <- function(lt,a0,b0,c0,x,XYZW){
-    LL <- function(lw,lt,a0,b0,c0,x,XYZW){
-        LL.lud.UThPb(lta0b0wc0=c(lt,a0,b0,lw,c0),
-                     x=x,XYZW=XYZW,LL=TRUE)
-    }
-    stats::optimise(LL,interval=c(-10,2),lt=lt,a0=a0,b0=b0,
-                    c0=c0,x=x,XYZW=XYZW,maximum=TRUE)$maximum
 }
