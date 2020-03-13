@@ -18,7 +18,7 @@ get.lta0b0wc0.init <- function(x,model=1,anchor=list(FALSE,NA)){
                         'log(w)',paste0('log(c0[',1:ns,'])'))
     } else {
         lta0b0 <- get.lta0b0.init(x,anchor=anchor)
-        c0 <- log(data2ludwig(x=x,lta0b0w=lta0b0,model=model)$c0)
+        c0 <- log(data2ludwig(x=x,lta0b0w=lta0b0)$c0)
         out <- c(lta0b0,c0)
         names(out) <- c('log(t)','log(a0)','log(b0)',
                         paste0('log(c0[',1:ns,'])'))
@@ -59,6 +59,7 @@ get_XYZW <- function(x){
 }
 
 LL.lud.UThPb <- function(lta0b0wc0,x,exterr=FALSE,LL=TRUE,XYZW){
+    print(lta0b0wc0)
     tt <- exp(lta0b0wc0[1])
     a0 <- exp(lta0b0wc0[2])
     b0 <- exp(lta0b0wc0[3])
