@@ -763,8 +763,10 @@ as.fissiontracks <- function(x,format=1,ierr=1){
         for (i in 1:ns){
             UsU <- as.numeric(x[i+si-1,3:nc])
             UsU <- errAdjust(UsU,i=errcols,ierr=ierr)
-            out$U[[i]] <- UsU[1]
-            out$sU[[i]] <- UsU[2]
+            iU <- seq(from=1,to=length(UsU)-1,by=2)
+            isU <- seq(from=2,to=length(UsU),by=2)
+            out$U[[i]] <- UsU[iU]
+            out$sU[[i]] <- UsU[isU]
         }
     }
     out
