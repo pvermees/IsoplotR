@@ -30,10 +30,16 @@ get.lta0b0wc0.UThPb <- function(x,init,exterr=FALSE,model=1,
                                 anchor=list(FALSE,NA),...){
     XYZW <- get_XYZW(x)
     fixed <- rep(FALSE,length(init))
+    lower <- init-2
+    upper <- init+2
+    if (model==3){
+        lower[4] <- lower[1]-4
+        upper[4] <- upper[1]
+    }
     fit <- optifix(parms=init,fn=LL.lud.UThPb,XYZW=XYZW,
-                   method="BFGS",x=x,exterr=exterr,
-                   fixed=fixed,hessian=TRUE,LL=TRUE,
-                   control=list(fnscale=-1),...)
+                   method="L-BFGS-B",lower=lower,upper=upper,
+                   x=x,exterr=exterr,fixed=fixed,hessian=TRUE,
+                   LL=TRUE,control=list(fnscale=-1),...)
     out <- LL.lud.UThPb(lta0b0wc0=fit$par,x=x,LL=FALSE,XYZW=XYZW)
     out$model <- model
     if (model==3) NP <- 4 else NP <- 3
@@ -59,7 +65,6 @@ get_XYZW <- function(x){
 }
 
 LL.lud.UThPb <- function(lta0b0wc0,x,exterr=FALSE,LL=TRUE,XYZW){
-    print(lta0b0wc0)
     tt <- exp(lta0b0wc0[1])
     a0 <- exp(lta0b0wc0[2])
     b0 <- exp(lta0b0wc0[3])
