@@ -174,34 +174,6 @@ Pb0corr <- function(x,option=3,omit=NULL){
         out$x[,c('Pb204Pb207','errPb204Pb207',
                  'Pb204Pb206','errPb204Pb206')] <- 0
     } else if (x$format==7){
-        out$x[,'Pb207U235'] <- 1/x.corr[,'U235Pb207']
-        out$x[,'Pb206U238'] <- 1/x.corr[,'U238Pb206']
-        out$x[,'Pb208Th232'] <- 1/x.corr[,'Th232Pb208']
-        out$x[,'Th232U238'] <- x.corr[,'Th232U238']
-        J <- matrix(0,4,4)
-        J[4,4] <- 1
-        for (i in 1:ns){
-            covmat <- cor2cov4(sW=x.corr[i,'errU235Pb207'],sX=x.corr[i,'errU238Pb206'],
-                               sY=x.corr[i,'errTh232Pb208'],sZ=x.corr[i,'errTh232U238'],
-                               rWX=x.corr[i,'rhoXY'],rWY=x.corr[i,'rhoXZ'],
-                               rWZ=x.corr[i,'rhoXW'],rXY=x.corr[i,'rhoYZ'],
-                               rXZ=x.corr[i,'rhoYW'],rYZ=x.corr[i,'rhoZW'])
-            J[1,1] <- -out$x[i,'Pb207U235']/x.corr[i,'U235Pb207']
-            J[2,2] <- -out$x[i,'Pb206U238']/x.corr[i,'U238Pb206']
-            J[3,3] <- -out$x[i,'Pb208Th232']/x.corr[i,'Th232Pb208']
-            E <- J %*% covmat %*% t(J)
-            out$x[i,'errPb207U235'] <- sqrt(E[1,1])
-            out$x[i,'errPb206U238'] <- sqrt(E[2,2])
-            out$x[i,'errPb208Th232'] <- sqrt(E[3,3])
-            out$x[i,'errTh232U238'] <- sqrt(E[4,4])
-            out$x[i,'rhoXY'] <- E[1,2]/sqrt(E[1,1]*E[2,2])
-            out$x[i,'rhoXZ'] <- E[1,3]/sqrt(E[1,1]*E[3,3])
-            out$x[i,'rhoXW'] <- E[1,4]/sqrt(E[1,1]*E[4,4])
-            out$x[i,'rhoYZ'] <- E[2,3]/sqrt(E[2,2]*E[3,3])
-            out$x[i,'rhoYW'] <- E[2,4]/sqrt(E[2,2]*E[4,4])
-            out$x[i,'rhoZW'] <- E[3,4]/sqrt(E[3,3]*E[4,4])
-        }
-    } else if (x$format==8){
         U <- settings('iratio','U238U235')[1]
         out$x[,'U238Pb206'] <- x.corr[,'U238Pb206']
         out$x[,'Pb207Pb206'] <- x.corr[,'U238Pb206']/(U*x.corr[,'U235Pb207'])
@@ -229,10 +201,12 @@ Pb0corr <- function(x,option=3,omit=NULL){
             out$x[i,'errTh232U238'] <- sqrt(E[4,4])
             out$x[i,'rhoXY'] <- E[1,2]/sqrt(E[1,1]*E[2,2])
             out$x[i,'rhoXZ'] <- E[1,3]/sqrt(E[1,1]*E[3,3])
-            out$x[i,'rhoXW'] <- E[1,4]/sqrt(E[1,1]*E[4,4])
             out$x[i,'rhoYZ'] <- E[2,3]/sqrt(E[2,2]*E[3,3])
-            out$x[i,'rhoYW'] <- E[2,4]/sqrt(E[2,2]*E[4,4])
-            out$x[i,'rhoZW'] <- E[3,4]/sqrt(E[3,3]*E[4,4])
+            if (E[4,4]>0){
+                out$x[i,'rhoXW'] <- E[1,4]/sqrt(E[1,1]*E[4,4])
+                out$x[i,'rhoYW'] <- E[2,4]/sqrt(E[2,2]*E[4,4])
+                out$x[i,'rhoZW'] <- E[3,4]/sqrt(E[3,3]*E[4,4])
+            }
         }
     } else {
         stop('Incorrect input format.')
@@ -288,18 +262,19 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47,project.err=TRUE){
     out
 }
 correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
-    ir <- get.UPb.isochron.ratios.208(x,i,tt=tt) # 38/06 08c/06 35/07 08c/07 32/38 32/08
+    # 38/06 08c/06 35/07 08c/07 32/38 32/08 06c/08 07c/08:
+    ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
     r3507 <- age_to_U235Pb207_ratio(tt=tt,d=x$d)[1]
     r3806 <- age_to_U238Pb206_ratio(tt=tt,d=x$d)[1]
-    x3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507/c0807
-    x3806 <- ir$x['U238Pb206'] + ir$x['Pb208cPb206']*r3806/c0806
-    x3208 <- 1/(exp(lambda('Th232')[1]*tt) - 1)
+    x3507 <- ir$x['U235Pb207']/(1-ir$x['Pb208cPb207']/c0807)
+    x3806 <- ir$x['U238Pb206']/(1-ir$x['Pb208cPb206']/c0806)
+    x3208 <- 1/(exp(lambda('Th232')[1]*tt)-1)
     x3238 <- ir$x['Th232U238']
-    J <- matrix(0,4,6)
+    J <- matrix(0,4,8)
     J[1,3] <- 1
-    J[1,4] <- r3507/c0807
+    J[1,4] <- (ir$x['U235Pb207']/c0807)/(1-ir$x['Pb208cPb207']/c0807)^2
     J[2,1] <- 1
-    J[2,2] <- r3806/c0806
+    J[2,2] <- (ir$x['U238Pb206']/c0806)/(1-ir$x['Pb208cPb206']/c0806)^2
     J[3,6] <- 1
     J[4,5] <- 1
     E <- J %*% ir$cov %*% t(J)
@@ -310,13 +285,16 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
                     'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
     out[c(1,3,5,7)] <- c(x3507,x3806,x3208,x3238)
     out[c(2,4,6,8)] <- sqrt(diag(E))
-    cormat <- stats::cov2cor(E)
+    if (out[8]>0) cormat <- stats::cov2cor(E)
+    else cormat <- stats::cov2cor(E[1:3,1:3])
     out[9] <- cormat[1,2]
     out[10] <- cormat[1,3]
-    out[11] <- cormat[1,4]
     out[12] <- cormat[2,3]
-    out[13] <- cormat[2,4]
-    out[14] <- cormat[3,4]
+    if (out[8]>0){
+        out[11] <- cormat[1,4]
+        out[13] <- cormat[2,4]
+        out[14] <- cormat[3,4]
+    }
     out
 }
 
@@ -342,7 +320,7 @@ common.Pb.stacey.kramers <- function(x){
             c47 <- 1/c6474[,'i74']
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
         }
-    } else if (x$format %in% c(7,8)){
+    } else if (x$format==7){
         out <- matrix(0,ns,14)
         colnames(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
                            'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
@@ -355,6 +333,8 @@ common.Pb.stacey.kramers <- function(x){
             c87 <- c678[,'i84']/c678[,'i74']
             out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0806=c86,c0807=c87)
         }
+    } else {
+        stop('Invalid input format.')
     }
     out
 }
@@ -395,7 +375,7 @@ common.Pb.isochron <- function(x,omit=NULL){
             c47 <- m47 - d47d57*m57
             out[i,] <- correct.common.Pb.with.204(x,i,c46,c47,project.err=FALSE)
         }
-    } else if (x$format %in% c(7,8)){
+    } else if (x$format==7){
         out <- matrix(0,ns,14)
         colnames(out) <- c('U235Pb207','errU235Pb207','U238Pb206','errU238Pb206',
                            'Th232Pb208','errTh232Pb208','Th232U238','errTh232U238',
@@ -482,8 +462,8 @@ SS.SK.with.204 <- function(tt,x,i){
 }
 SS.SK.with.208 <- function(tt,x,i){
     i678 <- stacey.kramers(tt)
-    c86 <- i678['i84']/i678['i64']
-    c87 <- i678['i84']/i678['i74']
+    c86 <- i678[,'i84']/i678[,'i64']
+    c87 <- i678[,'i84']/i678[,'i74']
     SS.with.208(tt,x,i,c86,c87)
 }
 SS.with.208 <- function(tt,x,i,c86,c87){
