@@ -346,9 +346,10 @@ common.Pb.isochron <- function(x,omit=NULL){
         out <- x$x
         c0806 <- 1/fit$par['68i']
         c0807 <- 1/fit$par['78i']
+        c0832 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,
-                                                  c0807=c0807,project.err=FALSE)
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,c0807=c0807,
+                                                  c0832=c0832[i],project.err=FALSE)
         }
     }
     out
