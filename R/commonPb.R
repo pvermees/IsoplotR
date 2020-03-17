@@ -237,13 +237,16 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
     m08c07 <- ir$x['Pb208cPb207']
     m3208 <- ir$x['Th232Pb208']
     ThU <- ir$x['Th232U238']
-    # 1. calculate Wetherill ratios:
-    r0735 <- 1/m3507 - m08c07/(m3507*c0807)
-    r0638 <- 1/m3806 - m08c06/(m3806*c0806)
-    r0832 <- exp(lambda('Th232')[1]*tt)-1
+    # 1. calculate radiogenic ratios:
+    D <- mclean(tt=tt)
+    r3806 <- m3806 + m08c06/(c0806*D$Pb206U238)
+    r3507 <- m3507 + m08c07/(c0807*D$Pb207U235)
+    r0832 <- D$Pb208Th232
     J <- matrix(0,4,8)
-    J[1,3] <- -r0735/m3507  # d0735/d3507
-    J[2,1] <- -r0638/m3806  # d0638/d3806
+    J[1,1] <- 1                      # d0638/d3806
+    J[1,2] <- -1/(c0806*D$Pb206U238) # d0638/d3806
+    J[2,3] <- 1                      # d0735/d3507
+    J[2,4] <- -1/(c0807*D$Pb207U235) # d0735/dm08c07
     J[3,6] <- -1/m3208^2    # d0832/d3208 (same error as input data)
     J[4,5] <- 1             # d3238/d32d38
     if (project.err){ # don't evaluate for concordia projections
@@ -253,16 +256,15 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
     Ew <- J %*% ir$cov %*% t(J)
     # 2. convert to Tera-Wasserburg ratios:
     U <- settings('iratio','U238U235')[1]
-    r3806 <- 1/r0638
-    r0706 <- r0735/(U*r0638)
-    r0806 <- ThU*r0832/r0638
+    r0706 <- r3806/(U*r3507)
+    r0806 <- ThU*r3806*r0832
     J <- matrix(0,4,4)
-    J[1,2] <- -r3806/r0638
-    J[2,1] <- 1/(U*r0638)
-    J[2,2] <- -r0706/r0638
-    J[3,2] <- -r0806/r0638
-    J[3,3] <- ThU/r0638
-    J[3,4] <- r0832/r0638
+    J[1,1] <- 1             # d3806d3806
+    J[2,1] <- 1/(U*r3507)   # d0706d3806
+    J[2,2] <- -r0706/r3507  # d0706d3507
+    J[3,1] <- ThU*r0832
+    J[3,3] <- ThU*r3806
+    J[3,4] <- r3806*r0832
     J[4,4] <- 1
     Etw <- J %*% Ew %*% t(J)
     cormat <- matrix(0,4,4)
