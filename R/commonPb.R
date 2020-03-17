@@ -228,52 +228,37 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47,project.err=TRUE){
     names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
     out
 }
-correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,project.err=TRUE){
-    # 38/06 08c/06 35/07 08c/07 32/38 32/08 06c/08 07c/08:
-    ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
-    m3806 <- ir$x['U238Pb206']
-    m08c06 <- ir$x['Pb208cPb206']
-    m3507 <- ir$x['U235Pb207']
-    m08c07 <- ir$x['Pb208cPb207']
-    m3208 <- ir$x['Th232Pb208']
-    ThU <- ir$x['Th232U238']
-    # 1. calculate radiogenic ratios:
-    D <- mclean(tt=tt)
-    r3806 <- m3806 + m08c06/(c0806*D$Pb206U238)
-    r3507 <- m3507 + m08c07/(c0807*D$Pb207U235)
-    r0832 <- D$Pb208Th232
-    J <- matrix(0,4,8)
-    J[1,1] <- 1                      # d0638/d3806
-    J[1,2] <- -1/(c0806*D$Pb206U238) # d0638/d3806
-    J[2,3] <- 1                      # d0735/d3507
-    J[2,4] <- -1/(c0807*D$Pb207U235) # d0735/dm08c07
-    J[3,6] <- -1/m3208^2    # d0832/d3208 (same error as input data)
-    J[4,5] <- 1             # d3238/d32d38
-    if (project.err){ # don't evaluate for concordia projections
-        J[1,4] <- -1/(m3507*c08c07) # d0735/d08c07
-        J[2,2] <- -1/(m3806*c08c06) # d0638/d08c06
+correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,c0832=NULL,project.err=TRUE){
+    U <- iratio('U238U235')[1]
+    l2 <- lambda('Th232')[1]
+    wd <- wetherill(x,i) # 0735, 0638, 0832, 3238
+    r0832 <- exp(l2*tt) - 1
+    if (is.null(c0832)) c0832 <- wd$x['Pb208Th232'] - r0832
+    r0638 <- wd$x['Pb206U238'] - c0832*wd$x['Th232U238']/c0806
+    r0735 <- wd$x['Pb207U235'] - c0832*wd$x['Th232U238']*U/c0807
+    r3238 <- wd$x['Th232U238']
+    Ew <- wd$cov
+    r3806 <- 1/r0638
+    r0706 <- r0735/(U*r0638)
+    r0806 <- r3238*r0832/r0638
+    if (project.err){
+        J <- matrix(0,4,4)
+        J[1,2] <- -r3806/r0638
+        J[2,1] <- 1/(U*r0638)
+        J[2,2] <- -r0706/r0638
+        J[3,2] <- -r0806/r0638
+        J[3,3] <- r3238/r0638
+        J[3,4] <- r0832/r0638
+        J[4,4] <- 1
+        Etw <- J %*% Ew %*% t(J)
+    } else {
+        Etw <- tera.wasserburg(x,i)$cov
     }
-    Ew <- J %*% ir$cov %*% t(J)
-    # 2. convert to Tera-Wasserburg ratios:
-    U <- settings('iratio','U238U235')[1]
-    r0706 <- r3806/(U*r3507)
-    r0806 <- ThU*r3806*r0832
-    J <- matrix(0,4,4)
-    J[1,1] <- 1             # d3806d3806
-    J[2,1] <- 1/(U*r3507)   # d0706d3806
-    J[2,2] <- -r0706/r3507  # d0706d3507
-    J[3,1] <- ThU*r0832
-    J[3,3] <- ThU*r3806
-    J[3,4] <- r3806*r0832
-    J[4,4] <- 1
-    Etw <- J %*% Ew %*% t(J)
     cormat <- matrix(0,4,4)
     if (Etw[4,4]>0) cormat <- cov2cor(Etw)
     else cormat[1:3,1:3] <- cov2cor(Etw[1:3,1:3])
-    out <- c(r3806,sqrt(Etw[1,1]),
-             r0706,sqrt(Etw[2,2]),
-             r0806,sqrt(Etw[3,3]),
-             ThU,ir$cov['Th232U238','Th232U238'],
+    out <- c(r3806,sqrt(Etw[1,1]),r0706,sqrt(Etw[2,2]),
+             r0806,sqrt(Etw[3,3]),r3238,sqrt(Etw[4,4]),
              cormat[1,2:4],cormat[2,3:4],cormat[3,4])    
     names(out) <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
