@@ -204,18 +204,18 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     names(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
     out
 }
-correct.common.Pb.with.204 <- function(x,i,c46,c47,c48=NULL,project.err=TRUE){
+correct.common.Pb.with.204 <- function(x,i,c64,c74,c48=NULL,project.err=TRUE){
     U <- iratio('U238U235')[1]
     wd <- wetherill(x,i) # 75, 68, 48
     if (is.null(c48)) c48 <- wd$x['Pb204U238']
-    r0735 <- wd$x['Pb207U235'] - U*c48/c47
-    r0638 <- wd$x['Pb206U238'] - c48/c46
+    r0735 <- wd$x['Pb207U235'] - U*c48*c74
+    r0638 <- wd$x['Pb206U238'] - c48*c64
     if (project.err){
         Jw <- matrix(0,2,3)
         Jw[1,1] <- 1
-        Jw[1,3] <- -U/c74
+        Jw[1,3] <- -U*c74
         Jw[2,2] <- 1
-        Jw[2,3] <- -1/c74
+        Jw[2,3] <- -c64
         Ew <- Jw %*% tw$cov %*% t(Jw)
     } else {
         Ew <- wd$cov
@@ -283,15 +283,12 @@ common.Pb.stacey.kramers <- function(x){
         for (i in 1:ns){
             tint <- stats::optimise(SS.SK.with.204,interval=c(0,5000),x=x,i=i)$minimum
             c6474 <- stacey.kramers(tint)
-            c46 <- 1/c6474[,'i64']
-            c47 <- 1/c6474[,'i74']
-            out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
+            out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c6474[,'i64'],c74=c6474[,'i74'])
         }
     } else if (x$format==7){
         out <- x$x
         for (i in 1:ns){
-            tint <- stats::optimise(SS.SK.with.208,
-                                    interval=c(0,5000),x=x,i=i)$minimum
+            tint <- stats::optimise(SS.SK.with.208,interval=c(0,5000),x=x,i=i)$minimum
             c678 <- stacey.kramers(tint)
             c86 <- c678[,'i84']/c678[,'i64']
             c87 <- c678[,'i84']/c678[,'i74']
@@ -317,28 +314,18 @@ common.Pb.isochron <- function(x,omit=NULL){
         m86 <- get.U238Pb206.ratios(x)[,1]
         c76 <- m76 - slope*m86
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.without.204(x,i,c76[i],lower=TRUE,project.err=FALSE)
+            out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76[i],lower=TRUE,
+                                                     project.err=FALSE)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb206U238','errPb206U238','rho')
-        r86 <- age_to_U238Pb206_ratio(tt=tt,st=0,d=x$d)[1]
-        i46 <- 1/fit$par['64i']
-        d46d86 <- -i46/r86
-        r57 <- age_to_U235Pb207_ratio(tt=tt,st=0,d=x$d)[1]
-        i47 <- 1/fit$par['74i']
-        d47d57 <- -i47/r57
+        c64 <- fit$par['64i']
+        c74 <- fit$par['74i']
         c48 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
         for (i in 1:ns){
-            rr <- get.UPb.isochron.ratios.204(x,i)
-            m46 <- rr$x['Pb204Pb206']
-            m86 <- rr$x['U238Pb206']
-            c46 <- m46 - d46d86*m86
-            m47 <- rr$x['Pb204Pb207']
-            m57 <- rr$x['U235Pb207']
-            c47 <- m47 - d47d57*m57
-            out[i,] <- correct.common.Pb.with.204(x,i=i,c46=c46,c47=c47,
+            out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c64,c74=c74,
                                                   c48=c48[i],project.err=FALSE)
         }
     } else if (x$format==7){
@@ -362,25 +349,25 @@ common.Pb.nominal <- function(x){
                            'Pb207Pb206','errPb207Pb206','rho')
         c76 <- settings('iratio','Pb207Pb206')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=TRUE)
+            out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76,lower=TRUE)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb206U238','errPb206U238','rho')
-        c46 <- 1/settings('iratio','Pb206Pb204')[1]
-        c47 <- 1/settings('iratio','Pb207Pb204')[1]
+        c64 <- settings('iratio','Pb206Pb204')[1]
+        c74 <- settings('iratio','Pb207Pb204')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.204(x,i,c46,c47)
+            out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c64,c74=c74)
         }
     } else if (x$format==7){
         out <- x$x
-        c86 <- settings('iratio','Pb208Pb206')[1]
-        c87 <- settings('iratio','Pb208Pb207')[1]
+        c0806 <- settings('iratio','Pb208Pb206')[1]
+        c0807 <- settings('iratio','Pb208Pb207')[1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.with.208,interval=c(0,5000),
                                     c86=c86,c87=c87,x=x,i=i)$minimum
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0806=c86,c0807=c87)
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0806=c0806,c0807=c0807)
         }
     }
     out
