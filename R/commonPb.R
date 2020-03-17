@@ -204,27 +204,24 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     names(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rho')
     out
 }
-correct.common.Pb.with.204 <- function(x,i,c46,c47,project.err=TRUE){
-    ir <- get.UPb.isochron.ratios.204(x,i) # 86, 46, 57, 47
-    U <- settings('iratio','U238U235')[1]
-    m86 <- ir$x['U238Pb206']
-    m46 <- ir$x['Pb204Pb206']
-    m57 <- ir$x['U235Pb207']
-    m47 <- ir$x['Pb204Pb207']
-    r75 <- 1/m57 - m47/(m57*c47)
-    r68 <- 1/m86 - m46/(m86*c46)
-    J <- matrix(0,2,4)
-    J[1,3] <- -r75/m57       # d75/d57
-    J[2,1] <- -r68/m86       # d68/d86
-    if (project.err){ # don't evaluate for concordia projections
-        J[1,4] <- -1/(m57*c47)   # d75/d47
-        J[2,2] <- -1/(m86*c46)   # d68/d46
+correct.common.Pb.with.204 <- function(x,i,c46,c47,c48=NULL,project.err=TRUE){
+    U <- iratio('U238U235')[1]
+    wd <- wetherill(x,i) # 75, 68, 48
+    if (is.null(c48)) c48 <- wd$x['Pb204U238']
+    r0735 <- wd$x['Pb207U235'] - U*c48/c47
+    r0638 <- wd$x['Pb206U238'] - c48/c46
+    if (project.err){
+        Jw <- matrix(0,2,3)
+        Jw[1,1] <- 1
+        Jw[1,3] <- -U/c74
+        Jw[2,2] <- 1
+        Jw[2,3] <- -1/c74
+        Ew <- Jw %*% tw$cov %*% t(Jw)
+    } else {
+        Ew <- wd$cov
     }
-    E <- J %*% ir$cov %*% t(J)
-    sr75 <- sqrt(E[1,1])
-    sr68 <- sqrt(E[2,2])
-    rho <- stats::cov2cor(E)[1,2]
-    out <- c(r75,sr75,r68,sr68,rho)
+    rho <- cov2cor(Ew)[1,2]
+    out <- c(r0735,sqrt(Ew[1,1]),r0638,sqrt(Ew[2,2]),rho)
     names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
     out
 }
@@ -332,6 +329,7 @@ common.Pb.isochron <- function(x,omit=NULL){
         r57 <- age_to_U235Pb207_ratio(tt=tt,st=0,d=x$d)[1]
         i47 <- 1/fit$par['74i']
         d47d57 <- -i47/r57
+        c48 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
         for (i in 1:ns){
             rr <- get.UPb.isochron.ratios.204(x,i)
             m46 <- rr$x['Pb204Pb206']
@@ -340,7 +338,8 @@ common.Pb.isochron <- function(x,omit=NULL){
             m47 <- rr$x['Pb204Pb207']
             m57 <- rr$x['U235Pb207']
             c47 <- m47 - d47d57*m57
-            out[i,] <- correct.common.Pb.with.204(x,i,c46,c47,project.err=FALSE)
+            out[i,] <- correct.common.Pb.with.204(x,i=i,c46=c46,c47=c47,
+                                                  c48=c48[i],project.err=FALSE)
         }
     } else if (x$format==7){
         out <- x$x
