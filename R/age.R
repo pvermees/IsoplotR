@@ -416,6 +416,8 @@ get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,
         out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb)
     } else if (hasClass(x,'ArAr')){
         out <- ArAr.age(x,exterr=FALSE,i2i=i2i)
+    } else if (hasClass(x,'ThPb')){
+        out <- ThPb.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'KCa')){
         out <- KCa.age(x,exterr=FALSE,i2i=i2i)
     } else if (hasClass(x,'UThHe')){

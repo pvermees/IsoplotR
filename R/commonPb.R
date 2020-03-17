@@ -366,7 +366,7 @@ common.Pb.nominal <- function(x){
         c0807 <- settings('iratio','Pb208Pb207')[1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.with.208,interval=c(0,5000),
-                                    c86=c86,c87=c87,x=x,i=i)$minimum
+                                    c0806=c0806,c0807=c0807,x=x,i=i)$minimum
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0806=c0806,c0807=c0807)
         }
     }
@@ -412,16 +412,16 @@ SS.SK.with.204 <- function(tt,x,i){
 }
 SS.SK.with.208 <- function(tt,x,i){
     i678 <- stacey.kramers(tt)
-    c86 <- i678[,'i84']/i678[,'i64']
-    c87 <- i678[,'i84']/i678[,'i74']
-    SS.with.208(tt,x,i,c86,c87)
+    c0806 <- i678[,'i84']/i678[,'i64']
+    c0807 <- i678[,'i84']/i678[,'i74']
+    SS.with.208(tt,x,i,c0806,c0807)
 }
-SS.with.208 <- function(tt,x,i,c86,c87){
+SS.with.208 <- function(tt,x,i,c0806,c0807){
     xy <- get.UPb.isochron.ratios.208(x,i,tt=tt) # U8Pb6, Pb8c6, U5Pb7, Pb8c7
     O6 <- solve(xy$cov[1:2,1:2])
     X6 <- xy$x['U238Pb206']
-    A6 <- xy$x['Pb208cPb206'] - c86
-    B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d)[1]*c86
+    A6 <- xy$x['Pb208cPb206'] - c0806
+    B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d)[1]*c0806
     # 1. fit 08c/06
     X6.fitted <- (X6*O6[1,1] + A6*O6[1,2] + A6*B6*O6[1,2] +
                   A6*B6*O6[2,2]) / (O6[1,1] - 2*B6*O6[1,2] + O6[2,2]*B6^2)
@@ -432,8 +432,8 @@ SS.with.208 <- function(tt,x,i,c86,c87){
     # 2. fit 08c/07
     O7 <- solve(xy$cov[3:4,3:4])
     X7 <- xy$x['U235Pb207']
-    A7 <- xy$x['Pb208cPb207'] - c87
-    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d)[1]*c87
+    A7 <- xy$x['Pb208cPb207'] - c0807
+    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d)[1]*c0807
     X7.fitted <- (X7*O7[1,1] + A7*O7[1,2] + A7*B7*O7[1,2] +
                   A7*B7*O7[2,2]) / (O7[1,1] - 2*B7*O7[1,2] + O7[2,2]*B7^2)
     K7 <- X7 - X7.fitted

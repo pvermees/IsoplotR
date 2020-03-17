@@ -220,6 +220,13 @@ peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,
 }
 #' @rdname peakfit
 #' @export
+peakfit.ThPb <- function(x,k=1,exterr=TRUE,sigdig=2,
+                         log=TRUE,i2i=FALSE,alpha=0.05,...){
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
+                   log=log,i2i=i2i,alpha=alpha,...)
+}
+#' @rdname peakfit
+#' @export
 peakfit.KCa <- function(x,k=1,exterr=TRUE,sigdig=2,
                          log=TRUE,i2i=FALSE,alpha=0.05,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
