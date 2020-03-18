@@ -74,8 +74,8 @@ recursive.search <- function(tm,tM,a,b,d=diseq(),depth=1){
             if (is.na(out[2])) out[2] <- tlu[2]
         }
         if (all(is.na(out))){ # no intersection
-            tlu <- optimise(intersection.misfit.york,
-                            interval=c(tm,tM),a=a,b=b,d=d)$minimum
+            tlu <- stats::optimise(intersection.misfit.york,
+                                   interval=c(tm,tM),a=a,b=b,d=d)$minimum
             out <- rep(tlu,2)
         }
     }

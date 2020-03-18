@@ -22,7 +22,45 @@
 #' 
 #' @param alpha cutoff value for confidence intervals
 #' 
-#' @param ... optional
+#' @param exterr propagate external sources of
+#' uncertainty (i.e. decay constants)?
+#' 
+#' @param model one of three regression models:
+#'
+#' \code{1}: fit a discordia line through the data using the maximum
+#' likelihood algorithm of Ludwig (1998), which assumes that the
+#' scatter of the data is solely due to the analytical
+#' uncertainties. In this case, \code{IsoplotR} will either calculate
+#' an upper and lower intercept age (for Wetherill concordia), or a
+#' lower intercept age and common
+#' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
+#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
+#' uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
+#'
+#' \code{2}: fit a discordia line ignoring the analytical uncertainties
+#'
+#' \code{3}: fit a discordia line using a modified maximum likelihood
+#' algorithm that includes accounts for any overdispersion by adding a
+#' geological (co)variance term.
+#' 
+#' @param anchor control parameters to fix the intercept age or common
+#'     Pb composition of the discordia fit. This is a two-element
+#'     list.
+#'
+#' The first element is a boolean flag indicating whether the
+#' discordia line should be anchored. If this is \code{FALSE}, then
+#' the second item is ignored and both the common Pb composition and
+#' age are estimated.
+#'
+#' If the first element is \code{TRUE} and the second element is
+#' \code{NA}, then the common Pb composition is fixed at the values
+#' stored in \code{settings('iratio',...)}.
+#'
+#' If the first element is \code{TRUE} and the second element is a
+#' number, then the discordia line is forced to intersect the
+#' concordia line at an age equal to that number.
+#'
+#' @param ... optional arguments
 #' 
 #' @return
 #' \describe{
@@ -53,6 +91,7 @@
 #' f <- system.file("UPb4.csv",package="IsoplotR")
 #' d <- read.data(f,method="U-Pb",format=4)
 #' fit <- ludwig(d)
+#' 
 #' @references
 #' Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
 #' ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
@@ -61,58 +100,14 @@
 #' \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 #' Cosmochimica Acta, 58(22), pp.5031-5042.
 #'
-#' @export
-ludwig <- function(x,...){ UseMethod("ludwig",x) }
-#' @rdname ludwig
-#' @export
-ludwig.default <- function(x,...){
-    stop( "No default method available (yet)." )
-}
-#' @param exterr propagate external sources of
-#' uncertainty (i.e. decay constants)?
-#' @param model one of three regression models:
-#'
-#' \code{1}: fit a discordia line through the data using the maximum
-#' likelihood algorithm of Ludwig (1998), which assumes that the
-#' scatter of the data is solely due to the analytical
-#' uncertainties. In this case, \code{IsoplotR} will either calculate
-#' an upper and lower intercept age (for Wetherill concordia), or a
-#' lower intercept age and common
-#' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
-#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
-#' uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
-#'
-#' \code{2}: fit a discordia line ignoring the analytical uncertainties
-#'
-#' \code{3}: fit a discordia line using a modified maximum likelihood
-#' algorithm that includes accounts for any overdispersion by adding a
-#' geological (co)variance term.
-#' @param anchor control parameters to fix the intercept age or common
-#'     Pb composition of the discordia fit. This is a two-element
-#'     list.
-#'
-#' The first element is a boolean flag indicating whether the
-#' discordia line should be anchored. If this is \code{FALSE}, then
-#' the second item is ignored and both the common Pb composition and
-#' age are estimated.
-#'
-#' If the first element is \code{TRUE} and the second element is
-#' \code{NA}, then the common Pb composition is fixed at the values
-#' stored in \code{settings('iratio',...)}.
-#'
-#' If the first element is \code{TRUE} and the second element is a
-#' number, then the discordia line is forced to intersect the
-#' concordia line at an age equal to that number.
-#'
 #' @seealso \code{\link{concordia}}, \code{\link{titterington}},
 #'     \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,...){ UseMethod("ludwig",x) }
-#' @rdname isochron
+#' @rdname ludwig
 #' @export
-ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,
-                           anchor=list(FALSE,NA)){
+ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
     fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)

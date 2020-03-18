@@ -8,7 +8,7 @@ wtest.UPb <- function(lta0b0w,x){
         lta0b0w[4] <- lw[i]
         LL[i] <- LL.lud(lta0b0w=lta0b0w,x=x,LL=TRUE)
     }
-    plot(lw,LL,type='l')
+    graphics::plot(lw,LL,type='l')
 }
 
 # to be used in UThPb.R as:
@@ -23,5 +23,5 @@ wtest.UThPb <- function(lta0b0wc0,x){
         LL[i] <- LL.lud.UThPb(lta0b0wc0=lta0b0wc0,x=x,
                               LL=TRUE,XYZW=XYZW)
     }
-    plot(lw,LL,type='l')
+    graphics::plot(lw,LL,type='l')
 }

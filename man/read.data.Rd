@@ -26,10 +26,10 @@ read.data(x, ...)
 
 \item{...}{optional arguments to the \code{read.csv} function}
 
-\item{method}{one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
-\code{'K-Ca'}, \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd},
-\code{Re-Os}, \code{Th-U}, \code{'U-Th-He'},
-\code{'fissiontracks'} or \code{'other'}}
+\item{method}{one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Th-Pv'},
+\code{'Ar-Ar'}, \code{'K-Ca'}, \code{'detritals'},
+\code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os}, \code{Th-U},
+\code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}}
 
 \item{format}{formatting option, depends on the value of
     \code{method}.
@@ -44,18 +44,14 @@ if \code{method='U-Pb'}, then \code{format} is one of either:
 \item{\code{X=07/35, err[X], Y=06/38, err[Y], Z=04/38, }
       \code{rho[X,Y], rho[X,Z], rho[Y,Z]}} 
 \item{\code{X=38/06, err[X]}, \code{Y=07/06, err[Y]},
-      \code{Z=04/06, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+      \code{Z=04/06, err[Z] (}, \code{rho[X,Y], rho[X,Z], rho[Y,Z])}}
 \item{\code{07/35, err[07/35]}, \code{06/38, err[06/38]},
       \code{04/38, err[04/38]}, \code{07/06, err[07/06]},
       \code{04/07, err[04/07]}, \code{04/06, err[04/06]}}
-\item{\code{W=07/35, err[W]}, \code{X=06/38, err[X]},
-      \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]},
-      \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
-      \code{rho[X,Z], rho[Y,Z]}} 
 \item{\code{W=38/06, err[W]}, \code{X=07/06, err[X]},
-      \code{Y=08/06, err[Y]}, and \code{Z=32/38, err[Z]},
+      \code{Y=08/06, err[Y]}, and \code{Z=32/38, (err[Z]},
       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
-      \code{rho[X,Z], rho[Y,Z]}}
+      \code{rho[X,Z], rho[Y,Z])}}
 }
 
 where optional columns are marked in round brackets
@@ -65,7 +61,16 @@ if \code{method='Pb-Pb'}, then \code{format} is one of either:
 \enumerate{
 \item{\code{6/4, err[6/4], 7/4, err[7/4], rho}}
 \item{\code{4/6, err[4/6], 7/6, err[7/6], rho}}
-\item{\code{6/4, err[6/4], 7/4, err[7/4], 7/6, err[7/6]}}
+\item{\code{6/4, err[6/4], 7/4, err[7/4], 6/7, err[6/7]}}
+}
+
+if \code{method='Th-Pb'}, then \code{format} is one of either:
+
+\enumerate{
+\item{\code{32/04, err[32/04], 08/04, err[08/04], rho}}
+\item{\code{32/08, err[32/08], 04/08, err[08/04], rho}}
+\item{\code{32/04, err[32/04], 08/04, }
+      \code{err[08/04], 32/08, err[32/08]}}
 }
 
 if \code{method='Ar-Ar'}, then \code{format} is one of either:
@@ -209,11 +214,12 @@ uncertainty, extracted from the input file.
 
 \code{format}: same as the input argument
 
-\item If \code{method="Pb-Pb"}, \code{"K-Ca"}, \code{"Rb-Sr"},
-\code{"Sm-Nd"}, \code{"Lu-Hf"}, or \code{"Re-Os"}: objects of
-classes \code{PbPb}, \code{KCa}, \code{RbSr}, \code{SmNd},
-\code{LuHf}, or \code{ReOs}, respectively; i.e. a list inheriting
-the input arguments \code{x} and \code{format}.
+\item If \code{method="Pb-Pb"}, \code{method="Th-Pb"},
+\code{"K-Ca"}, \code{"Rb-Sr"}, \code{"Sm-Nd"}, \code{"Lu-Hf"}, or
+\code{"Re-Os"}: objects of classes \code{PbPb}, \code{KCa},
+\code{RbSr}, \code{SmNd}, \code{LuHf}, or \code{ReOs},
+respectively; i.e. a list inheriting the input arguments \code{x}
+and \code{format}.
 
 \item If \code{method="UThHe"}: an object of class \code{UThHe},
 i.e. a matrix with the contents of \code{x}.
@@ -261,9 +267,9 @@ IsoplotR provides the following example input files:
 
 \itemize{
 \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv},
-\code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv}, \code{UPb7.csv},
-\code{UPb8.csv}}
+\code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv}, \code{UPb7.csv}}
 \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv}}
+\item{Th-Pb: \code{ThPb1.csv}, \code{ThPb2.csv}, \code{ThPb3.csv}}
 \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
 \item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}, \code{KCa3.csv}}
 \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}, \code{ReOs3.csv}}

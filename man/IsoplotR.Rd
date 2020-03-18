@@ -9,7 +9,7 @@
 \description{
 A list of documented functions may be viewed by typing
     \code{help(package='IsoplotR')}.  Detailed instructions are
-    provided at \url{http://ucl.ac.uk/~ucfbpve/isoplotr}. Further
+    provided at \url{http://ucl.ac.uk/~ucfbpve/isoplotr/}. Further
     details about the theoretical background are provided by
     Vermeesch (2018).
 }

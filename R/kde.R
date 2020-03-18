@@ -16,8 +16,8 @@
 #'
 #' \eqn{KDE(t) = \sum_{i=1}^{n}N(t|\mu=t_i,\sigma=h[t])/n}
 #'
-#' where \eqn{N(t|\mu,\sigma)} is the probability of observing a
-#' value \eqn{t} under a Normal distribution with mean \eqn{\mu} and
+#' where \eqn{N(t|\mu,\sigma)} is the probability of observing a value
+#' \eqn{t} under a Normal distribution with mean \eqn{\mu} and
 #' standard deviation \eqn{\sigma}.  \eqn{h[t]} is the smoothing
 #' parameter or `bandwidth' of the kernel density estimate, which may
 #' or may not depend on the age \eqn{t}. If \eqn{h[t]} depends on
@@ -31,9 +31,9 @@
 #' distribution's sparsely sampled troughs. Thus, the resolution of
 #' the density estimate is optimised according to data availability.
 #' @param x a vector of numbers OR an object of class \code{UPb},
-#'     \code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd},
-#'     \code{RbSr}, \code{UThHe}, \code{fissiontracks}, \code{ThU} or
-#'     \code{detrital}
+#'     \code{PbPb}, \code{ThPb}, \code{ArAr}, \code{KCa}, \code{ReOs},
+#'     \code{SmNd}, \code{RbSr}, \code{UThHe}, \code{fissiontracks},
+#'     \code{ThU} or \code{detrital}
 #' @rdname kde
 #' @export
 kde <- function(x,...){ UseMethod("kde",x) }
@@ -178,7 +178,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'
 #' \code{settings('iratio','Pb208Pb206')} and
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
-#' \code{UPb} and \code{x$format=7} or \code{8}).
+#' \code{UPb} and \code{x$format=7}).
 #'
 #' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
@@ -234,9 +234,10 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
-#'     \eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
+#'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
 #'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
 #'     stored in \code{settings('iratio',...)}.
 #' @rdname kde

@@ -8,6 +8,7 @@
 \alias{radialplot.PbPb}
 \alias{radialplot.ArAr}
 \alias{radialplot.KCa}
+\alias{radialplot.ThPb}
 \alias{radialplot.UThHe}
 \alias{radialplot.ReOs}
 \alias{radialplot.SmNd}
@@ -59,6 +60,13 @@ radialplot(x, ...)
   i2i = FALSE, alpha = 0.05, hide = NULL, omit = NULL,
   omit.col = NA, ...)
 
+\method{radialplot}{ThPb}(x, from = NA, to = NA, t0 = NA,
+  sigdig = 2, transformation = "log", show.numbers = FALSE,
+  pch = 21, levels = NA, clabel = "", bg = c("yellow", "red"),
+  col = "black", markers = NULL, k = 0, exterr = TRUE,
+  i2i = TRUE, alpha = 0.05, hide = NULL, omit = NULL,
+  omit.col = NA, ...)
+
 \method{radialplot}{UThHe}(x, from = NA, to = NA, t0 = NA,
   sigdig = 2, transformation = "log", show.numbers = FALSE,
   pch = 21, levels = NA, clabel = "", bg = c("yellow", "red"),
@@ -107,7 +115,7 @@ OR
 
 and object of class \code{fissiontracks}, \code{UThHe},
 \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr},
-\code{LuHf}, \code{ThU}, \code{PbPb} or \code{UPb}}
+\code{LuHf}, \code{ThU}, \code{PbPb}, \code{ThPb} or \code{UPb}}
 
 \item{...}{additional arguments to the generic \code{points}
 function}
@@ -136,9 +144,9 @@ different background colours of the plot symbols.}
 
 \item{clabel}{label of the colour legend}
 
-\item{bg}{Fill colour for the plot symbols. This can
-    either be a single colour or multiple colours to form a colour
-    ramp (to be used if \code{levels!=NA}):
+\item{bg}{Fill colour for the plot symbols. This can either be a
+    single colour or multiple colours to form a colour ramp (to be
+    used if \code{levels!=NA}):
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
 \code{'white'}, etc.;
@@ -240,10 +248,10 @@ initial Pb-composition}
 \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
 \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
 \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-\eqn{^{230}}Th/\eqn{^{232}}Th or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-uses the default values stored in
-\code{settings('iratio',...)}.}
+\eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
+\eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
+fit. Setting \code{i2i} to \code{FALSE} uses the default values
+stored in \code{settings('iratio',...)}.}
 
 \item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
     when \code{x$format == 1} or \code{2}).

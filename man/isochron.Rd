@@ -6,6 +6,7 @@
 \alias{isochron.UPb}
 \alias{isochron.PbPb}
 \alias{isochron.ArAr}
+\alias{isochron.ThPb}
 \alias{isochron.KCa}
 \alias{isochron.RbSr}
 \alias{isochron.ReOs}
@@ -42,6 +43,13 @@ isochron(x, ...)
 \method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
   sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
   ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
+  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
+  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
+  hide = NULL, omit = NULL, omit.col = NA, ...)
+
+\method{isochron}{ThPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
+  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
+  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
   ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
   exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
   hide = NULL, omit = NULL, omit.col = NA, ...)
@@ -110,9 +118,9 @@ isochron(x, ...)
 
 OR
 
-an object of class \code{ArAr}, \code{KCa}, \code{PbPb}, \code{UPb},
-\code{ReOs}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{UThHe} or
-\code{ThU}.}
+an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
+\code{UPb}, \code{ThPb}, \code{ReOs}, \code{RbSr}, \code{SmNd},
+\code{LuHf}, \code{UThHe} or \code{ThU}.}
 
 \item{...}{optional arguments to be passed on to the generic plot
 function if \code{model=2}}
@@ -229,52 +237,51 @@ concordia line at an age equal to that number.}
 \item{inverse}{toggles between normal and inverse isochrons. If the
     isochron plots \code{Y} against \code{X}, and
 
-if \code{inverse=FALSE}, then \code{X} =
-    \eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
-    \eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
-    \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{36}}Ar and
-    \code{Y} = \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar (if \code{x} has
-    class \code{ArAr}), or \code{X} =
-    \eqn{{}^{40}}K/\eqn{{}^{44}}Ca and \code{Y} =
-    \eqn{{}^{40}}Ca/\eqn{{}^{44}}Ca (if \code{x} has class
-    \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{86}}Sr and
-    \code{Y} = \eqn{{}^{87}}Sr/\eqn{{}^{86}}Sr (if \code{x} has
-    class \code{RbSr}), or \code{X} =
-    \eqn{{}^{147}}Sm/\eqn{{}^{144}}Nd and \code{Y} =
-    \eqn{{}^{143}}Nd/\eqn{{}^{144}}Nd (if \code{x} has class
-    \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{188}}Os
-    and \code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x}
-    has class \code{ReOs}), or \code{X} =
-    \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and \code{Y} =
-    \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
-    \code{LuHf}).
+If \code{inverse=TRUE}, then \code{X} =
+\eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb and \code{Y} =
+\eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb (if \code{x} has class
+\code{PbPb}), or \code{X} = \eqn{{}^{232}}Th/\eqn{{}^{208}}Pb and
+\code{Y} = \eqn{{}^{204}}Pb/\eqn{{}^{208}}Pb (if \code{x} has class
+\code{ThPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{40}}Ar and
+\code{Y} = \eqn{{}^{36}}Ar/\eqn{{}^{40}}Ar (if \code{x} has class
+\code{ArAr}), or \code{X} = \eqn{{}^{40}}K/\eqn{{}^{40}}Ca and
+\code{Y} = \eqn{{}^{44}}Ca/\eqn{{}^{40}}Ca (if \code{x} has class
+\code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{87}}Sr and
+\code{Y} = \eqn{{}^{86}}Sr/\eqn{{}^{87}}Sr (if \code{x} has class
+\code{RbSr}), or \code{X} = \eqn{{}^{147}}Sm/\eqn{{}^{143}}Nd and
+\code{Y} = \eqn{{}^{144}}Nd/\eqn{{}^{143}}Nd (if \code{x} has class
+\code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{187}}Os and
+\code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x} has class
+\code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and
+\code{Y} = \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
+\code{LuHf}).
 
-if \code{inverse=TRUE}, then \code{X} =
-    \eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb and \code{Y} =
-    \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb (if \code{x} has class
-    \code{PbPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{40}}Ar and
-    \code{Y} = \eqn{{}^{36}}Ar/\eqn{{}^{40}}Ar (if \code{x} has
-    class \code{ArAr}), or \code{X} =
-    \eqn{{}^{40}}K/\eqn{{}^{40}}Ca and \code{Y} =
-    \eqn{{}^{44}}Ca/\eqn{{}^{40}}Ca (if \code{x} has class
-    \code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{87}}Sr and
-    \code{Y} = \eqn{{}^{86}}Sr/\eqn{{}^{87}}Sr (if \code{x} has
-    class \code{RbSr}), or \code{X} =
-    \eqn{{}^{147}}Sm/\eqn{{}^{143}}Nd and \code{Y} =
-    \eqn{{}^{144}}Nd/\eqn{{}^{143}}Nd (if \code{x} has class
-    \code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{187}}Os
-    and \code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x}
-    has class \code{ReOs}), or \code{X} =
-    \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and \code{Y} =
-    \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
-    \code{LuHf}).}
+If \code{inverse=FALSE}, then \code{X} =
+\eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
+\eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
+\code{PbPb}), or \code{X} = \eqn{{}^{232}}Th/\eqn{{}^{204}}Pb and
+\code{Y} = \eqn{{}^{208}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
+\code{ThPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{36}}Ar and
+\code{Y} = \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar (if \code{x} has class
+\code{ArAr}), or \code{X} = \eqn{{}^{40}}K/\eqn{{}^{44}}Ca and
+\code{Y} = \eqn{{}^{40}}Ca/\eqn{{}^{44}}Ca (if \code{x} has class
+\code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{86}}Sr and
+\code{Y} = \eqn{{}^{87}}Sr/\eqn{{}^{86}}Sr (if \code{x} has class
+\code{RbSr}), or \code{X} = \eqn{{}^{147}}Sm/\eqn{{}^{144}}Nd and
+\code{Y} = \eqn{{}^{143}}Nd/\eqn{{}^{144}}Nd (if \code{x} has class
+\code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{188}}Os and
+\code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x} has class
+\code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and
+\code{Y} = \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
+\code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 }
 \value{
-If \code{x} has class \code{PbPb}, \code{ArAr}, \code{KCa},
-    \code{RbSr}, \code{SmNd}, \code{ReOs} or \code{LuHf}, or
-    \code{UThHe}, returns a list with the following items:
+If \code{x} has class \code{PbPb}, \code{ThPb},
+    \code{ArAr}, \code{KCa}, \code{RbSr}, \code{SmNd}, \code{ReOs}
+    or \code{LuHf}, or \code{UThHe}, returns a list with the
+    following items:
 
 \describe{
 
@@ -291,8 +298,9 @@ error.}
 
 \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
 \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
-\eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
-\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio.
+\eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+\eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{208}}Pb/\eqn{^{204}}Pb
+ratio.
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
@@ -306,9 +314,10 @@ applicable if \code{ model=1}).  }
 \item{age}{a four-element list containing:
 
 \code{t}: the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
-\eqn{^{40}}Ar/\eqn{^{39}}Ar, \eqn{^{40}}K/\eqn{^{40}}Ca,
-\eqn{^{187}}Os/\eqn{^{187}}Re, \eqn{^{87}}Sr/\eqn{^{87}}Rb,
-\eqn{^{143}}Nd/\eqn{^{144}}Nd or \eqn{^{176}}Hf/\eqn{^{177}}Hf age.
+\eqn{^{208}}Pb/\eqn{^{232}}Th, \eqn{^{40}}Ar/\eqn{^{39}}Ar,
+\eqn{^{40}}K/\eqn{^{40}}Ca, \eqn{^{187}}Os/\eqn{^{187}}Re,
+\eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
+\eqn{^{176}}Hf/\eqn{^{177}}Hf age.
 
 \code{s[t]}: the propagated uncertainty of \code{t}
 
@@ -458,7 +467,7 @@ confidence intervals.}
 \eqn{^{208}}Pb/\eqn{^{206}}U-ratio (if \code{type=1} and
 \code{x$format=7} or \code{8}); or
 \eqn{^{208}}Pb/\eqn{^{207}}U-ratio (if \code{type=2} and
-\code{x$format=7} or \code{8}).
+\code{x$format=7}).
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
@@ -491,9 +500,9 @@ if \code{model=1}).}
 }
 }
 \description{
-Plots cogenetic Ar-Ar, K-Ca, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os, Lu-Hf,
-U-Th-He or Th-U data as X-Y scatterplots, fits an isochron curve
-through them using the \code{york} function, and computes the
+Plots cogenetic Ar-Ar, K-Ca, Pb-Pb, Th-Pb, Rb-Sr, Sm-Nd, Re-Os,
+Lu-Hf, U-Th-He or Th-U data as X-Y scatterplots, fits an isochron
+curve through them using the \code{york} function, and computes the
 corresponding isochron age, including decay constant uncertainties.
 }
 \details{
@@ -524,11 +533,11 @@ the maximum likelihood approach of Titterington and Halliday
 (1979).
 
 \code{IsoplotR} uses the York et al. (2004) algorithm for its
-Ar-Ar, K-Ca, Pb-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf isochrons. The
-maximum likelihood algorithm of Titterington and Halliday (1979)
-was generalised from two to three dimensions by Ludwig and
-Titterington (1994) for U-series disequilibrium dating.  Also this
-algorithm is implemented in \code{IsoplotR}. Finally, the
+Ar-Ar, K-Ca, Pb-Pb, Th-Pb, Rb-Sr, Sm-Nd, Re-Os and Lu-Hf
+isochrons. The maximum likelihood algorithm of Titterington and
+Halliday (1979) was generalised from two to three dimensions by
+Ludwig and Titterington (1994) for U-series disequilibrium dating.
+Also this algorithm is implemented in \code{IsoplotR}. Finally, the
 constrained maximum likelihood algorithm of Ludwig (1998) is used
 for isochron regression of U-Pb data. The extent to which the
 observed scatter in the data can be explained by the analytical

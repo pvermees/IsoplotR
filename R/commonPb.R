@@ -216,11 +216,11 @@ correct.common.Pb.with.204 <- function(x,i,c64,c74,c48=NULL,project.err=TRUE){
         Jw[1,3] <- -U*c74
         Jw[2,2] <- 1
         Jw[2,3] <- -c64
-        Ew <- Jw %*% tw$cov %*% t(Jw)
+        Ew <- Jw %*% wd$cov %*% t(Jw)
     } else {
         Ew <- wd$cov
     }
-    rho <- cov2cor(Ew)[1,2]
+    rho <- stats::cov2cor(Ew)[1,2]
     out <- c(r0735,sqrt(Ew[1,1]),r0638,sqrt(Ew[2,2]),rho)
     names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rho')
     out
@@ -256,8 +256,8 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,c0832=NULL,project.err
         Etw <- tera.wasserburg(x,i)$cov
     }
     cormat <- matrix(0,4,4)
-    if (Etw[4,4]>0) cormat <- cov2cor(Etw)
-    else cormat[1:3,1:3] <- cov2cor(Etw[1:3,1:3])
+    if (Etw[4,4]>0) cormat <- stats::cov2cor(Etw)
+    else cormat[1:3,1:3] <- stats::cov2cor(Etw[1:3,1:3])
     out <- c(r3806,sqrt(Etw[1,1]),r0706,sqrt(Etw[2,2]),
              r0806,sqrt(Etw[3,3]),r3238,sqrt(Etw[4,4]),
              cormat[1,2:4],cormat[2,3:4],cormat[3,4])    

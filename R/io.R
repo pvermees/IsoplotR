@@ -10,6 +10,7 @@
 #' \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv},
 #' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv}, \code{UPb7.csv}}
 #' \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv}}
+#' \item{Th-Pb: \code{ThPb1.csv}, \code{ThPb2.csv}, \code{ThPb3.csv}}
 #' \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
 #' \item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}, \code{KCa3.csv}}
 #' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}, \code{ReOs3.csv}}
@@ -36,10 +37,10 @@
 #'
 #' @param x either a file name (\code{.csv} format) OR a matrix
 #' 
-#' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
-#'     \code{'K-Ca'}, \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd},
-#'     \code{Re-Os}, \code{Th-U}, \code{'U-Th-He'},
-#'     \code{'fissiontracks'} or \code{'other'}
+#' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Th-Pv'},
+#'     \code{'Ar-Ar'}, \code{'K-Ca'}, \code{'detritals'},
+#'     \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os}, \code{Th-U},
+#'     \code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}
 #' 
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
@@ -74,6 +75,15 @@
 #' \item{\code{6/4, err[6/4], 7/4, err[7/4], 6/7, err[6/7]}}
 #' }
 #'
+#' if \code{method='Th-Pb'}, then \code{format} is one of either:
+#'
+#' \enumerate{
+#' \item{\code{32/04, err[32/04], 08/04, err[08/04], rho}}
+#' \item{\code{32/08, err[32/08], 04/08, err[08/04], rho}}
+#' \item{\code{32/04, err[32/04], 08/04, }
+#'       \code{err[08/04], 32/08, err[32/08]}}
+#' }
+#' 
 #' if \code{method='Ar-Ar'}, then \code{format} is one of either:
 #'
 #' \enumerate{
@@ -219,11 +229,12 @@
 #' 
 #' \code{format}: same as the input argument
 #' 
-#' \item If \code{method="Pb-Pb"}, \code{"K-Ca"}, \code{"Rb-Sr"},
-#' \code{"Sm-Nd"}, \code{"Lu-Hf"}, or \code{"Re-Os"}: objects of
-#' classes \code{PbPb}, \code{KCa}, \code{RbSr}, \code{SmNd},
-#' \code{LuHf}, or \code{ReOs}, respectively; i.e. a list inheriting
-#' the input arguments \code{x} and \code{format}.
+#' \item If \code{method="Pb-Pb"}, \code{method="Th-Pb"},
+#' \code{"K-Ca"}, \code{"Rb-Sr"}, \code{"Sm-Nd"}, \code{"Lu-Hf"}, or
+#' \code{"Re-Os"}: objects of classes \code{PbPb}, \code{KCa},
+#' \code{RbSr}, \code{SmNd}, \code{LuHf}, or \code{ReOs},
+#' respectively; i.e. a list inheriting the input arguments \code{x}
+#' and \code{format}.
 #'
 #' \item If \code{method="UThHe"}: an object of class \code{UThHe},
 #' i.e. a matrix with the contents of \code{x}.
