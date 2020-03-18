@@ -227,10 +227,14 @@ correct.common.Pb.with.204 <- function(x,i,c64,c74,c48=NULL,project.err=TRUE){
 }
 correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,c0832=NULL,project.err=TRUE){
     U <- iratio('U238U235')[1]
-    l2 <- lambda('Th232')[1]
     wd <- wetherill(x,i) # 0735, 0638, 0832, 3238
-    r0832 <- exp(l2*tt) - 1
-    if (is.null(c0832)) c0832 <- wd$x['Pb208Th232'] - r0832
+    if (is.null(c0832)){
+        l2 <- lambda('Th232')[1]
+        r0832 <- exp(l2*tt) - 1
+        c0832 <- wd$x['Pb208Th232'] - r0832
+    } else {
+        r0832 <- wd$x['Pb208Th232'] - c0832
+    }
     r0638 <- wd$x['Pb206U238'] - c0832*wd$x['Th232U238']/c0806
     r0735 <- wd$x['Pb207U235'] - c0832*wd$x['Th232U238']*U/c0807
     r3238 <- wd$x['Th232U238']

@@ -944,7 +944,8 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,show.p=FALSE,common.Pb=0,...){
+UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,
+                    show.p=FALSE,common.Pb=0,...){
     if (common.Pb>0) X <- Pb0corr(x,option=common.Pb)
     else X <- x
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
