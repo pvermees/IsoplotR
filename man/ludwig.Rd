@@ -6,16 +6,15 @@
 \title{Linear regression of U-Pb data with correlated errors, taking
 into account decay constant uncertainties.}
 \usage{
-ludwig(x, exterr = FALSE, alpha = 0.05, model = 1,
-  anchor = list(FALSE, NA))
+ludwig(x, ...)
 
-ludwig.default(x, ...)
-
-ludwig(x, exterr = FALSE, alpha = 0.05, model = 1,
-  anchor = list(FALSE, NA))
+\method{ludwig}{default}(x, exterr = FALSE, alpha = 0.05, model = 1,
+  anchor = list(FALSE, NA), ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
+
+\item{...}{optional arguments}
 
 \item{exterr}{propagate external sources of
 uncertainty (i.e. decay constants)?}
@@ -56,8 +55,6 @@ stored in \code{settings('iratio',...)}.
 If the first element is \code{TRUE} and the second element is a
 number, then the discordia line is forced to intersect the
 concordia line at an age equal to that number.}
-
-\item{...}{optional}
 }
 \value{
 \describe{
@@ -104,6 +101,7 @@ ages.
 f <- system.file("UPb4.csv",package="IsoplotR")
 d <- read.data(f,method="U-Pb",format=4)
 fit <- ludwig(d)
+
 }
 \references{
 Ludwig, K.R., 1998. On the treatment of concordant uranium-lead

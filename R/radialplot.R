@@ -38,7 +38,7 @@
 #'
 #' and object of class \code{fissiontracks}, \code{UThHe},
 #' \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr},
-#' \code{LuHf}, \code{ThU}, \code{PbPb} or \code{UPb}
+#' \code{LuHf}, \code{ThU}, \code{PbPb}, \code{ThPb} or \code{UPb}
 #' @param from minimum age limit of the radial scale
 #' @param to maximum age limit of the radial scale
 #' @param t0 central value
@@ -54,9 +54,9 @@
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours of the plot symbols.
 #' @param clabel label of the colour legend
-#' @param bg Fill colour for the plot symbols. This can
-#'     either be a single colour or multiple colours to form a colour
-#'     ramp (to be used if \code{levels!=NA}):
+#' @param bg Fill colour for the plot symbols. This can either be a
+#'     single colour or multiple colours to form a colour ramp (to be
+#'     used if \code{levels!=NA}):
 #'
 #' a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
 #' \code{'white'}, etc.;
@@ -249,10 +249,10 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
 #'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
 #'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in
-#'     \code{settings('iratio',...)}.
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
+#'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}.
 #' @rdname radialplot
 #' @export
 radialplot.PbPb <- function(x,from=NA,to=NA,t0=NA,sigdig=2,

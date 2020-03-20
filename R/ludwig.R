@@ -22,7 +22,45 @@
 #' 
 #' @param alpha cutoff value for confidence intervals
 #' 
-#' @param ... optional
+#' @param exterr propagate external sources of
+#' uncertainty (i.e. decay constants)?
+#' 
+#' @param model one of three regression models:
+#'
+#' \code{1}: fit a discordia line through the data using the maximum
+#' likelihood algorithm of Ludwig (1998), which assumes that the
+#' scatter of the data is solely due to the analytical
+#' uncertainties. In this case, \code{IsoplotR} will either calculate
+#' an upper and lower intercept age (for Wetherill concordia), or a
+#' lower intercept age and common
+#' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
+#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
+#' uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
+#'
+#' \code{2}: fit a discordia line ignoring the analytical uncertainties
+#'
+#' \code{3}: fit a discordia line using a modified maximum likelihood
+#' algorithm that includes accounts for any overdispersion by adding a
+#' geological (co)variance term.
+#' 
+#' @param anchor control parameters to fix the intercept age or common
+#'     Pb composition of the discordia fit. This is a two-element
+#'     list.
+#'
+#' The first element is a boolean flag indicating whether the
+#' discordia line should be anchored. If this is \code{FALSE}, then
+#' the second item is ignored and both the common Pb composition and
+#' age are estimated.
+#'
+#' If the first element is \code{TRUE} and the second element is
+#' \code{NA}, then the common Pb composition is fixed at the values
+#' stored in \code{settings('iratio',...)}.
+#'
+#' If the first element is \code{TRUE} and the second element is a
+#' number, then the discordia line is forced to intersect the
+#' concordia line at an age equal to that number.
+#'
+#' @param ... optional arguments
 #' 
 #' @return
 #' \describe{
@@ -53,6 +91,7 @@
 #' f <- system.file("UPb4.csv",package="IsoplotR")
 #' d <- read.data(f,method="U-Pb",format=4)
 #' fit <- ludwig(d)
+#' 
 #' @references
 #' Ludwig, K.R., 1998. On the treatment of concordant uranium-lead
 #' ages. Geochimica et Cosmochimica Acta, 62(4), pp.665-676.
@@ -61,60 +100,30 @@
 #' \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
 #' Cosmochimica Acta, 58(22), pp.5031-5042.
 #'
-#' @export
-ludwig <- function(x,...){ UseMethod("ludwig",x) }
-#' @rdname ludwig
-#' @export
-ludwig.default <- function(x,...){
-    stop( "No default method available (yet)." )
-}
-#' @param exterr propagate external sources of
-#' uncertainty (i.e. decay constants)?
-#' @param model one of three regression models:
-#'
-#' \code{1}: fit a discordia line through the data using the maximum
-#' likelihood algorithm of Ludwig (1998), which assumes that the
-#' scatter of the data is solely due to the analytical
-#' uncertainties. In this case, \code{IsoplotR} will either calculate
-#' an upper and lower intercept age (for Wetherill concordia), or a
-#' lower intercept age and common
-#' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
-#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
-#' uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
-#'
-#' \code{2}: fit a discordia line ignoring the analytical uncertainties
-#'
-#' \code{3}: fit a discordia line using a modified maximum likelihood
-#' algorithm that includes accounts for any overdispersion by adding a
-#' geological (co)variance term.
-#' @param anchor control parameters to fix the intercept age or common
-#'     Pb composition of the discordia fit. This is a two-element
-#'     list.
-#'
-#' The first element is a boolean flag indicating whether the
-#' discordia line should be anchored. If this is \code{FALSE}, then
-#' the second item is ignored and both the common Pb composition and
-#' age are estimated.
-#'
-#' If the first element is \code{TRUE} and the second element is
-#' \code{NA}, then the common Pb composition is fixed at the values
-#' stored in \code{settings('iratio',...)}.
-#'
-#' If the first element is \code{TRUE} and the second element is a
-#' number, then the discordia line is forced to intersect the
-#' concordia line at an age equal to that number.
-#'
 #' @seealso \code{\link{concordia}}, \code{\link{titterington}},
 #'     \code{\link{isochron}}
 #' @rdname ludwig
 #' @export
-ludwig <- function(x,exterr=FALSE,alpha=0.05,model=1,
-                   anchor=list(FALSE,NA)){
+ludwig <- function(x,...){ UseMethod("ludwig",x) }
+#' @rdname ludwig
+#' @export
+ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
     fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     mswd <- mswd.lud(out$logpar,x=x,anchor=anchor)
     c(out,mswd)
+}
+
+wtest.UPb <- function(lta0b0w,x){
+    nn <- 50
+    lw <- seq(from=-10,to=2,length.out=nn)
+    LL <- rep(0,nn)
+    for (i in 1:nn){
+        lta0b0w[4] <- lw[i]
+        LL[i] <- LL.lud(lta0b0w=lta0b0w,x=x,LL=TRUE)
+    }
+    plot(lw,LL,type='l')
 }
 
 exponentiate_ludwig <- function(fit,format){
@@ -126,7 +135,7 @@ exponentiate_ludwig <- function(fit,format){
     out$cov <- J %*% fit$logcov %*% t(J)
     if (format %in% c(1,2,3)) parnames <- c('t','76i','w')
     else if (format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
-    else if (format %in% c(7,8)) parnames <- c('t','68i','78i','w')
+    else if (format == 7) parnames <- c('t','68i','78i','w')
     else stop("Illegal input format.")
     names(out$par) <- parnames[1:np]
     rownames(out$cov) <- parnames[1:np]
@@ -172,7 +181,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
             ww <- w
         }
         init <- c(init,ww)
-    } else { #if (model==2){
+    } else {
         init <- get.lta0b0.init(x,anchor=anchor)
     }
     fixed <- fixit(x,anchor=anchor,model=model,w=w)
@@ -194,12 +203,12 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
                        lower=lower,upper=upper,
                        control=list(fnscale=-1),...)
         out$LL <- fit$value
-        out$logpar <- fit$par        
+        out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
     }
     if (x$format %in% c(1,2,3)) parnames <- c('log(t)','log(76i)')
     else if (x$format %in% c(4,5,6)) parnames <- c('log(t)','log(64i)','log(74i)')
-    else if (x$format %in% c(7,8)) parnames <- c('log(t)','log(68i)','log(78i)')
+    else if (x$format == 7) parnames <- c('log(t)','log(68i)','log(78i)')
     else stop("Illegal input format.")
     if (model==3) parnames <- c(parnames,'log(w)')
     names(out$logpar) <- parnames
@@ -257,7 +266,7 @@ anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
             init['a0'] <- log(i64)
             init['b0'] <- log(i74)
             i76 <- i74/i64
-        } else if (x$format%in%c(7,8)){
+        } else if (x$format==7){
             i86 <- iratio('Pb208Pb206')[1]
             i87 <- iratio('Pb208Pb207')[1]
             init['a0'] <- -log(i86)
@@ -386,7 +395,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         L0 <- zeros
         NP <- 3 # lt, a0, b0
         NR <- 3 # X, Y, Z
-    } else if (x$format%in%c(7,8)){
+    } else if (x$format==7){
         b0 <- lta0b0w[3]
         Z <- zeros
         W <- zeros
@@ -478,7 +487,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         K <- as.vector(X - D$Pb207U235 - U*exp(b0)*c0)
         L <- as.vector(Y - D$Pb206U238 - exp(a0)*c0)
         KLM <- c(K,L,M)
-    } else if (x$format%in%c(7,8)){
+    } else if (x$format==7){
         Wd <- diag(W)
         K0 <- X - D$Pb207U235 - (Z-D$Pb208Th232)*U*W*exp(b0)
         L0 <- Y - D$Pb206U238 - (Z-D$Pb208Th232)*W*exp(a0)
@@ -503,6 +512,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         L <- as.vector(Y - D$Pb206U238 - c0*exp(a0)*W)
         KLM <- c(K,L,M)
     }
+    out$c0 <- c0
     out$SS <- KLM%*%O%*%KLM
     detED <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- -(NP*ns*log(2*pi) + detED + out$SS)/2
@@ -536,7 +546,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
             dLda0 <- -c0*exp(a0)
             dLdc0 <- -exp(a0)
             dMdc0 <- -1
-        } else if (x$format%in%c(7,8)){
+        } else if (x$format==7){
             dKdb0 <- -c0*U*W*exp(b0)
             dKdc0 <- -U*W*exp(b0)
             dLda0 <- -c0*W*exp(a0)
@@ -589,7 +599,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
             d2Lda02 <- -c0*exp(a0)
             d2Lda0dc0 <- -exp(a0)
             d2Mdlt2 <- 0
-        } else if (x$format%in%c(7,8)){
+        } else if (x$format==7){
             d2Kdb02 <- -c0*U*W*exp(b0)
             d2Kdb0dc0 <- -U*W*exp(b0)
             d2Lda02 <- -c0*W*exp(a0)

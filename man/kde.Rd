@@ -8,6 +8,7 @@
 \alias{kde.PbPb}
 \alias{kde.ArAr}
 \alias{kde.KCa}
+\alias{kde.ThPb}
 \alias{kde.ThU}
 \alias{kde.ReOs}
 \alias{kde.SmNd}
@@ -57,6 +58,12 @@ kde(x, ...)
   hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
   binwidth = NA, i2i = FALSE, hide = NULL, ...)
 
+\method{kde}{ThPb}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
+  log = FALSE, n = 512, plot = TRUE, pch = "|",
+  xlab = "age [Ma]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
+  hist.col = rgb(0, 1, 0, 0.2), show.hist = TRUE, bty = "n",
+  binwidth = NA, i2i = FALSE, hide = NULL, ...)
+
 \method{kde}{ThU}(x, from = NA, to = NA, bw = NA, adaptive = TRUE,
   log = FALSE, n = 512, plot = TRUE, pch = "|",
   xlab = "age [ka]", ylab = "", kde.col = rgb(1, 0, 1, 0.6),
@@ -101,9 +108,9 @@ kde(x, ...)
 }
 \arguments{
 \item{x}{a vector of numbers OR an object of class \code{UPb},
-\code{PbPb}, \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd},
-\code{RbSr}, \code{UThHe}, \code{fissiontracks}, \code{ThU} or
-\code{detrital}}
+\code{PbPb}, \code{ThPb}, \code{ArAr}, \code{KCa}, \code{ReOs},
+\code{SmNd}, \code{RbSr}, \code{UThHe}, \code{fissiontracks},
+\code{ThU} or \code{detrital}}
 
 \item{...}{optional arguments to be passed on to \code{R}'s
 \code{density} function.}
@@ -201,7 +208,7 @@ Set \code{cutoff.disc=NA} to turn off this filter.}
 
 \code{settings('iratio','Pb208Pb206')} and
 \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
-\code{UPb} and \code{x$format=7} or \code{8}).
+\code{UPb} and \code{x$format=7}).
 
 \code{2}: use the isochron intercept as the initial Pb-composition
 
@@ -223,9 +230,10 @@ should all integrate to the same value.}
 \item{i2i}{`isochron to intercept': calculates the initial (aka
 `inherited', `excess', or `common')
 \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-\eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-\eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th or
-\eqn{^{176}}Hf/\eqn{^{177}}Hf ratio from an isochron
+\eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+\eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
+\eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
+\eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
 fit. Setting \code{i2i} to \code{FALSE} uses the default values
 stored in \code{settings('iratio',...)}.}
 
@@ -285,8 +293,8 @@ density estimates (KDEs; Vermeesch, 2012) smooth data by applying a
 
 \eqn{KDE(t) = \sum_{i=1}^{n}N(t|\mu=t_i,\sigma=h[t])/n}
 
-where \eqn{N(t|\mu,\sigma)} is the probability of observing a
-value \eqn{t} under a Normal distribution with mean \eqn{\mu} and
+where \eqn{N(t|\mu,\sigma)} is the probability of observing a value
+\eqn{t} under a Normal distribution with mean \eqn{\mu} and
 standard deviation \eqn{\sigma}.  \eqn{h[t]} is the smoothing
 parameter or `bandwidth' of the kernel density estimate, which may
 or may not depend on the age \eqn{t}. If \eqn{h[t]} depends on

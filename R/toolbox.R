@@ -7,6 +7,8 @@ length.ArAr <- function(x){ nrow(x$x) }
 #' @export
 length.PD <- function(x){ nrow(x$x) }
 #' @export
+length.ThPb <- function(x){ nrow(x$x) }
+#' @export
 length.KCa <- function(x){ nrow(x$x) }
 #' @export
 length.ThU <- function(x){ nrow(x$x) }
@@ -28,6 +30,8 @@ subset.UPb  <- function(x,subset,...){ subset_helper(x,subset,...) }
 subset.PbPb <- function(x,subset,...){ subset_helper(x,subset,...) }
 #' @export
 subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
+#' @export
+subset.ThPb <- function(x,subset,...){ subset_helper(x,subset,...) }
 #' @export
 subset.KCa <- function(x,subset,...){ subset_helper(x,subset,...) }
 #' @export

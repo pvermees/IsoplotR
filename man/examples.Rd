@@ -18,6 +18,9 @@ Ludwig (2003)'s \code{Isoplot} program.
 \code{PbPb}: an object of class \code{PbPb} containing a Pb-Pb
 dataset from Connelly et al. (2017).
 
+\code{ThPb}: an object of class \code{ThPb} containing the Th-Pb
+data for allanite sample MF482 of Janots and Rubatto (2014).
+
 \code{DZ}: an object of class \code{detrital} containing a detrital
 zircon U-Pb dataset from Namibia (Vermeesch et al., 2015).
 
@@ -122,6 +125,10 @@ Harrison, T.M., Heizler, M.T., McKeegan, K.D. and Schmitt, A.K.,
 2010. In situ \eqn{^{40}}K-\eqn{^{40}}Ca `double-plus' SIMS dating
 resolves Klokken feldspar \eqn{^{40}}K-\eqn{^{40}}Ar paradox. Earth
 and Planetary Science Letters, 299(3-4), pp.426-433.
+
+Janots, E. and Rubatto, D., 2014. U-Th-Pb dating of collision in the
+external Alpine domains (Urseren zone, Switzerland) using low
+temperature allanite and monazite. Lithos, 184, pp. 155-166.
 
 Kamo, S.L., Czamanske, G.K. and Krogh, T.E., 1996. A minimum U-Pb
 age for Siberian flood-basalt volcanism. Geochimica et Cosmochimica

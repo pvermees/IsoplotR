@@ -45,9 +45,9 @@ For \code{'iratio'}: the isotopic ratio of interest (one of either
 \code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
 \code{"Hf179Hf177"}, \code{"Hf180Hf177"}, \code{"U238U235"},
 \code{"Pb207Pb206"}, \code{"Pb206Pb204"}, \code{"Pb207Pb204"},
-\code{"Pb208Pb206"}, \code{"Pb208Pb206"}) PLUS (optionally) the
-isotopic ratio and its analytical error.  Omitting the latter two
-numbers simply returns the existing values.
+\code{"Pb208Pb204"}, \code{"Pb208Pb206"}, \code{"Pb208Pb206"}) PLUS
+(optionally) the isotopic ratio and its analytical error.  Omitting
+the latter two numbers simply returns the existing values.
 
 For \code{'imass'}: the (isotopic) molar mass of interest (one of
 either \code{"U"}, \code{"Rb"}, \code{"Rb85"}, \code{"Rb87"},

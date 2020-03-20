@@ -23,8 +23,8 @@
 #' \eqn{^{207}}Pb/\eqn{^{235}}U-ratios against each other (`Wetherill'
 #' diagram); or, equivalently, the \eqn{^{207}}Pb/\eqn{^{206}}Pb- and
 #' \eqn{^{206}}Pb/\eqn{^{238}}U-ratios (`Tera-Wasserburg'
-#' diagram). Alternatively, for data formats 7 and 8, it is also
-#' possible to plot \eqn{^{208}}Pb/\eqn{^{232}}Th against the
+#' diagram). Alternatively, for data format 7, it is also possible to
+#' plot \eqn{^{208}}Pb/\eqn{^{232}}Th against the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U.  The space of concordant isotopic
 #' compositions is marked by a curve, the `concordia line'. Isotopic
 #' ratio measurements are shown as 100(1-\code{alpha})\% confidence
@@ -52,7 +52,7 @@
 #'
 #' \code{3}: U-Th-Pb concordia -- \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th
 #' vs. \eqn{{}^{206}}Pb/\eqn{{}^{238}}U (only available if
-#' \code{x$format=7} or \code{8})
+#' \code{x$format=7})
 #' 
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
@@ -123,8 +123,7 @@
 #' \code{settings('iratio','Pb207Pb204')} (if \code{3<x$format<7}); or
 #' 
 #' \code{settings('iratio','Pb208Pb206')} and
-#' \code{settings('iratio','Pb208Pb207')} (if \code{x$format=7} or
-#' \code{8}).
+#' \code{settings('iratio','Pb208Pb207')} (if \code{x$format=7}).
 #' 
 #' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
@@ -289,7 +288,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                         alpha=alpha,exterr=exterr,ticks=ticks)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
-    else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
+    else if (x$format==7 & type==3) y <- data2york(X,option=5)
     else stop('Concordia type incompatible with this input format.')
     scatterplot(y,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
@@ -752,10 +751,17 @@ emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
                          age_to_Pb207Pb206_ratio(tlim[2]),0,0))
         dat$format <- 2
     } else if (type==3){
-        dat$x <- rbind(c(0,0,age_to_Pb206U238_ratio(tlim[1]),0,
-                         age_to_Pb208Th232_ratio(tlim[1]),0,rep(0,8)),
-                       c(0,0,age_to_Pb206U238_ratio(tlim[2]),0,
-                         age_to_Pb208Th232_ratio(tlim[2]),0,rep(0,8)))
+        Th232U238 <- 1
+        U238Pb206m <- age_to_U238Pb206_ratio(tlim[1])
+        U238Pb206M <- age_to_U238Pb206_ratio(tlim[2])
+        Pb207Pb206m <- age_to_Pb207Pb206_ratio(tlim[1])
+        Pb207Pb206M <- age_to_Pb207Pb206_ratio(tlim[2])
+        Pb208Th232m <- age_to_Pb208Th232_ratio(tlim[1])
+        Pb208Th232M <- age_to_Pb208Th232_ratio(tlim[2])
+        Pb208Pb206m <- Pb208Th232m*Th232U238*U238Pb206m
+        Pb208Pb206M <- Pb208Th232M*Th232U238*U238Pb206M
+        dat$x <- rbind(c(U238Pb206m,Pb207Pb206m,Pb208Pb206m,Th232U238,rep(0,6)),
+                       c(U238Pb206M,Pb207Pb206M,Pb208Pb206M,Th232U238,rep(0,6)))
         dat$format <- 7
     } else {
         stop('Invalid concordia type.')

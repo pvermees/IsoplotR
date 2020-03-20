@@ -8,9 +8,9 @@
 #'
 #' \itemize{
 #' \item{U-Pb: \code{UPb1.csv}, \code{UPb2.csv}, \code{UPb3.csv},
-#' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv}, \code{UPb7.csv},
-#' \code{UPb8.csv}}
+#' \code{UPb4.csv}, \code{UPb5.csv}, \code{UPb6.csv}, \code{UPb7.csv}}
 #' \item{Pb-Pb: \code{PbPb1.csv}, \code{PbPb2.csv}, \code{PbPb3.csv}}
+#' \item{Th-Pb: \code{ThPb1.csv}, \code{ThPb2.csv}, \code{ThPb3.csv}}
 #' \item{Ar-Ar: \code{ArAr1.csv}, \code{ArAr2.csv}, \code{ArAr3.csv}}
 #' \item{K-Ca: \code{KCa1.csv}, \code{KCa2.csv}, \code{KCa3.csv}}
 #' \item{Re-Os: \code{ReOs1.csv}, \code{ReOs2.csv}, \code{ReOs3.csv}}
@@ -37,10 +37,10 @@
 #'
 #' @param x either a file name (\code{.csv} format) OR a matrix
 #' 
-#' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Ar-Ar'},
-#'     \code{'K-Ca'}, \code{'detritals'}, \code{Rb-Sr}, \code{Sm-Nd},
-#'     \code{Re-Os}, \code{Th-U}, \code{'U-Th-He'},
-#'     \code{'fissiontracks'} or \code{'other'}
+#' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Th-Pv'},
+#'     \code{'Ar-Ar'}, \code{'K-Ca'}, \code{'detritals'},
+#'     \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os}, \code{Th-U},
+#'     \code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}
 #' 
 #' @param format formatting option, depends on the value of
 #'     \code{method}.
@@ -55,18 +55,14 @@
 #' \item{\code{X=07/35, err[X], Y=06/38, err[Y], Z=04/38, }
 #'       \code{rho[X,Y], rho[X,Z], rho[Y,Z]}} 
 #' \item{\code{X=38/06, err[X]}, \code{Y=07/06, err[Y]},
-#'       \code{Z=04/06, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]}}
+#'       \code{Z=04/06, err[Z] (}, \code{rho[X,Y], rho[X,Z], rho[Y,Z])}}
 #' \item{\code{07/35, err[07/35]}, \code{06/38, err[06/38]},
 #'       \code{04/38, err[04/38]}, \code{07/06, err[07/06]},
 #'       \code{04/07, err[04/07]}, \code{04/06, err[04/06]}}
-#' \item{\code{W=07/35, err[W]}, \code{X=06/38, err[X]},
-#'       \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]},
-#'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
-#'       \code{rho[X,Z], rho[Y,Z]}} 
 #' \item{\code{W=38/06, err[W]}, \code{X=07/06, err[X]},
-#'       \code{Y=08/06, err[Y]}, and \code{Z=32/38, err[Z]},
+#'       \code{Y=08/06, err[Y]}, and \code{Z=32/38, (err[Z]},
 #'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
-#'       \code{rho[X,Z], rho[Y,Z]}}
+#'       \code{rho[X,Z], rho[Y,Z])}}
 #' }
 #'
 #' where optional columns are marked in round brackets
@@ -76,9 +72,18 @@
 #' \enumerate{
 #' \item{\code{6/4, err[6/4], 7/4, err[7/4], rho}}
 #' \item{\code{4/6, err[4/6], 7/6, err[7/6], rho}}
-#' \item{\code{6/4, err[6/4], 7/4, err[7/4], 7/6, err[7/6]}}
+#' \item{\code{6/4, err[6/4], 7/4, err[7/4], 6/7, err[6/7]}}
 #' }
 #'
+#' if \code{method='Th-Pb'}, then \code{format} is one of either:
+#'
+#' \enumerate{
+#' \item{\code{32/04, err[32/04], 08/04, err[08/04], rho}}
+#' \item{\code{32/08, err[32/08], 04/08, err[08/04], rho}}
+#' \item{\code{32/04, err[32/04], 08/04, }
+#'       \code{err[08/04], 32/08, err[32/08]}}
+#' }
+#' 
 #' if \code{method='Ar-Ar'}, then \code{format} is one of either:
 #'
 #' \enumerate{
@@ -224,11 +229,12 @@
 #' 
 #' \code{format}: same as the input argument
 #' 
-#' \item If \code{method="Pb-Pb"}, \code{"K-Ca"}, \code{"Rb-Sr"},
-#' \code{"Sm-Nd"}, \code{"Lu-Hf"}, or \code{"Re-Os"}: objects of
-#' classes \code{PbPb}, \code{KCa}, \code{RbSr}, \code{SmNd},
-#' \code{LuHf}, or \code{ReOs}, respectively; i.e. a list inheriting
-#' the input arguments \code{x} and \code{format}.
+#' \item If \code{method="Pb-Pb"}, \code{method="Th-Pb"},
+#' \code{"K-Ca"}, \code{"Rb-Sr"}, \code{"Sm-Nd"}, \code{"Lu-Hf"}, or
+#' \code{"Re-Os"}: objects of classes \code{PbPb}, \code{KCa},
+#' \code{RbSr}, \code{SmNd}, \code{LuHf}, or \code{ReOs},
+#' respectively; i.e. a list inheriting the input arguments \code{x}
+#' and \code{format}.
 #'
 #' \item If \code{method="UThHe"}: an object of class \code{UThHe},
 #' i.e. a matrix with the contents of \code{x}.
@@ -367,7 +373,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
     else X <- shiny2matrix(x,2,nr,nc)
-    X <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
     opt <- NULL
     if (format==1){
         cnames <- c('Pb207U235','errPb207U235',
@@ -381,23 +386,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb206U238','errPb206U238',
                     'Pb207Pb206','errPb207Pb206',
                     'rhoXY','rhoYZ')
-        if (nc > 7){
-            rhoXY <- X[,7]
-            rhoYZ <- X[,8]
-            i <- which(is.na(rhoXY))
-            j <- which(is.na(rhoYZ))
-        } else if (nc == 7){
-            rhoXY <- X[,7]
-            i <- which(is.na(rhoXY))
-            j <- 1:nrow(X)
-            X <- cbind(X,0)
-        } else {
-            i <- 1:nrow(X)
-            j <- 1:nrow(X)
-            X <- cbind(X,0,0)
-        }
-        X[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
-        X[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
     } else if (format==4){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
@@ -417,25 +405,45 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb204Pb207','errPb204Pb207',
                     'Pb204Pb206','errPb204Pb206')
     } else if (format==7){
-        cnames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238',
-                    'Pb208Th232','errPb208Th232',
-                    'Th232U238','errTh232U238',
-                    'rhoXY','rhoXZ','rhoXW',
-                    'rhoYZ','rhoYW','rhoZW')
-    } else if (format==8){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb208Pb206','errPb208Pb206',
                     'Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
-        opt <- 9:14
+        opt <- 8:14
+        #class(out) <- append('UThPb',class(out))
     }
-    out$x <- insert.data(x=X,cnames=cnames,opt=opt)
+    X <- insert.data(x=X,cnames=cnames,opt=opt)
+    out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
+    if (format==3) out$x <- optionalredundancy2cor(X=out$x,nc=nc)
     out$d <- copy_diseq(x=out,d=d)
     out
 }
+# for U-Pb format 3, the correlation coefficients are optional
+# and can be inferred from the redundancy of the ratios
+optionalredundancy2cor <- function(X,nc){
+    out <- X
+    if (nc > 7){
+        rhoXY <- X[,7]
+        rhoYZ <- X[,8]
+        i <- which(is.na(rhoXY))
+        j <- which(is.na(rhoYZ))
+    } else if (nc == 7){
+        rhoXY <- X[,7]
+        i <- which(is.na(rhoXY))
+        j <- 1:nrow(X)
+        out <- cbind(X,0)
+    } else {
+        i <- 1:nrow(X)
+        j <- 1:nrow(X)
+        out <- cbind(X,0,0)
+    }
+    out[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
+    out[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
+    out
+}
+
 get.cor.75.68 <- function(Pb207U235,errPb207U235,
                           Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
@@ -518,15 +526,17 @@ as.PbPb <- function(x,format=1,ierr=1){
     opt <- NULL
     if (format==1 & nc>4){
         cnames <- c('Pb206Pb204','errPb206Pb204',
-                    'Pb207Pb204','errPb207Pb204','rho')
+                    'Pb207Pb204','errPb207Pb204',
+                    'rho')
     } else if (format==2 & nc>4) {
         cnames <- c('Pb204Pb206','errPb204Pb206',
-                    'Pb207Pb206','errPb207Pb206','rho')
+                    'Pb207Pb206','errPb207Pb206',
+                    'rho')
         opt <- 5
     } else if (format==3 & nc>5){
         cnames <- c('Pb206Pb204','errPb206Pb204',
                     'Pb207Pb204','errPb207Pb204',
-                    'Pb207Pb206','errPb207Pb206')
+                    'Pb206Pb207','errPb206Pb207')
     } else {
         stop('Invalid PbPb input format')
     }
@@ -581,9 +591,9 @@ as.ThPb <- function(x,format=1,ierr=1){
         cnames <- c('Th232Pb208','errTh232Pb208',
                     'Pb204Pb208','errPb204Pb208','rho')
     } else if (format==3 & nc>5){
-        cnames <- c('Th232Pb204','errTh232Pb204',
-                    'Pb208Pb204','errPb208Pb204',
-                    'Th232Pb208','errTh232Pb208')
+        cnames <- c('Th232Pb208','errTh232Pb208',
+                    'Pb204Pb208','errPb204Pb208',
+                    'Th232Pb204','errTh232Pb204')
     } else {
         stop("Incorrect format or insufficient columns")
     }
@@ -848,7 +858,7 @@ getErrCols <- function(gc,format=NA,ierr=1){
     UPb12 = (gc=='U-Pb' && format%in%(1:2))
     UPb345 = (gc=='U-Pb' && format%in%(3:5))
     UPb6 = (gc=='U-Pb' && format==6)
-    UPb78 = (gc=='U-Pb' && format%in%(7:8))
+    UPb7 = (gc=='U-Pb' && format==7)
     PbPb12 = (gc=='Pb-Pb' && format%in%(1:2))
     PbPb3 = (gc=='Pb-Pb' && format==3)
     ArAr12 = (gc=='Ar-Ar' && format%in%(1:2))
@@ -868,7 +878,7 @@ getErrCols <- function(gc,format=NA,ierr=1){
         cols = c(2,4)
     } else if (UPb345 | PbPb3 | ArAr3 | KCa1 | PD1 | UThHe | ThU12){
         cols = c(2,4,6)
-    } else if (UPb78){
+    } else if (UPb7){
         cols = seq(from=2,to=8,by=2)
     } else if (UPb6){
         cols = seq(from=2,to=12,by=2)

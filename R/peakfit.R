@@ -30,11 +30,11 @@
 #' \code{\link{central}} age model), but truncated at this discrete
 #' value (Van der Touw et al., 1997).
 #' 
-#' @param x either an \code{[nx2]} matrix with measurements and
-#'     their standard errors, or an object of class
-#'     \code{fissiontracks}, \code{UPb}, \code{PbPb}, \code{ArAr},
-#'     \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{LuHf},
-#'     \code{ThU} or \code{UThHe}
+#' @param x either an \code{[nx2]} matrix with measurements and their
+#'     standard errors, or an object of class \code{fissiontracks},
+#'     \code{UPb}, \code{PbPb}, \code{ThPb}, \code{ArAr}, \code{KCa},
+#'     \code{ReOs}, \code{SmNd}, \code{RbSr}, \code{LuHf}, \code{ThU}
+#'     or \code{UThHe}
 #' @param k the number of discrete age components to be
 #'     sought. Setting this parameter to \code{'auto'} automatically
 #'     selects the optimal number of components (up to a maximum of 5)
@@ -48,8 +48,7 @@
 #' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments (not used)
 #' @seealso \code{\link{radialplot}}, \code{\link{central}}
-#' @return
-#' Returns a list with the following items:
+#' @return Returns a list with the following items:
 #'
 #' \describe{
 #'
@@ -204,16 +203,22 @@ peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
 #'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#'     \eqn{^{187}}Os/\eqn{^{188}}Os or \eqn{^{176}}Hf/\eqn{^{177}}Hf
-#'     ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
-#'     uses the default values stored in
-#'     \code{settings('iratio',...)}. When applied to data of class
-#'     \code{ThU}, setting \code{i2i} to \code{TRUE} applies a
-#'     detrital Th-correction.
+#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
+#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
+#'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
+#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
+#'     stored in \code{settings('iratio',...)}.
 #' @rdname peakfit
 #' @export
 peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,
+                         log=TRUE,i2i=FALSE,alpha=0.05,...){
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
+                   log=log,i2i=i2i,alpha=alpha,...)
+}
+#' @rdname peakfit
+#' @export
+peakfit.ThPb <- function(x,k=1,exterr=TRUE,sigdig=2,
                          log=TRUE,i2i=FALSE,alpha=0.05,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,alpha=alpha,...)
@@ -254,7 +259,7 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
                    log=log,i2i=i2i,alpha=alpha,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format=1} or \code{2}.
+#'     when \code{x$format=1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'

@@ -39,27 +39,45 @@ concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
     out <- c(1,a) # tl, 7/6 intercept
     if (wetherill) names(out) <- c('t[l]','t[u]')
     else names(out) <- c('t[l]','76i')
-    if (b<0) { # negative slope => two intersections with concordia line
+    if (b<0) { # negative slope => two (or zero) intersections with concordia line
         tb <- get.Pb206U238.age(-b/a,d=d)[1]
-        search.range <- c(tb,ta)
-        midpoint <- stats::optimize(intersection.misfit.york,
-                                    search.range,a=a,b=b,d=d)$minimum
-        search.range[2] <- midpoint
-        if (intersection.misfit.york(search.range[1],a=a,b=b,d=d)*
-            intersection.misfit.york(search.range[2],a=a,b=b,d=d)>0)
-            stop("Can't find the lower intercept age. ",
-                 "Check your disequilibrium settings.")
-        out['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                      interval=search.range,a=a,b=b,d=d)$root
-        if (wetherill){
-            search.range <- c(midpoint,ta)
-            out['t[u]'] <- stats::uniroot(intersection.misfit.york,
-                                          interval=search.range,a=a,b=b,d=d)$root
-        }   
+        tlu <- recursive.search(tm=tb,tM=ta,a=a,b=b,d=d)
+        out['t[l]'] <- tlu[1]
+        if (wetherill) out['t[u]'] <- tlu[2]
     } else {
         search.range <- c(ta,2/l8)
         out['t[l]'] <- stats::uniroot(intersection.misfit.york,
                                       interval=search.range,a=a,b=b,d=d)$root
+    }
+    out
+}
+
+recursive.search <- function(tm,tM,a,b,d=diseq(),depth=1){
+    out <- c(NA,NA)
+    if (depth<3){
+        mid <- (tm+tM)/2
+        mfmin <- intersection.misfit.york(tm,a=a,b=b,d=d)
+        mfmid <- intersection.misfit.york(mid,a=a,b=b,d=d)
+        mfmax <- intersection.misfit.york(tM,a=a,b=b,d=d)
+        if (mfmin*mfmid<0){ # different signs
+            out[1] <- stats::uniroot(intersection.misfit.york,
+                                     interval=c(tm,mid),a=a,b=b,d=d)$root
+        } else {
+            out <- recursive.search(tm=tm,tM=mid,a=a,b=b,d=d,depth=depth+1)
+        }
+        if (mfmax*mfmid<0){ # different signs
+            out[2] <- stats::uniroot(intersection.misfit.york,
+                                     interval=c(mid,tM),a=a,b=b,d=d)$root
+        } else {
+            tlu <- recursive.search(tm=mid,tM=tM,a=a,b=b,d=d,depth=depth+1)
+            if (is.na(out[1])) out[1] <- tlu[1]
+            if (is.na(out[2])) out[2] <- tlu[2]
+        }
+        if (all(is.na(out))){ # no intersection
+            tlu <- stats::optimise(intersection.misfit.york,
+                                   interval=c(tm,tM),a=a,b=b,d=d)$minimum
+            out <- rep(tlu,2)
+        }
     }
     out
 }
@@ -82,7 +100,7 @@ twfit2wfit <- function(fit,x){
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
         E <- fit$cov[1:3,1:3]
-    } else if (x$format %in% c(7,8)){
+    } else if (x$format==7){
         a0 <- fit$par['68i']
         b0 <- fit$par['78i']
         E <- fit$cov[1:3,1:3]
@@ -155,27 +173,11 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0,d=diseq()){
     YY - BB*XX
 }
 # a = intercept, b = slope on TW concordia
-intersection.misfit.york <- function(tt,a,b,covmat=NULL,d=diseq()){
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
+intersection.misfit.york <- function(tt,a,b,d=diseq()){
     D <- mclean(tt=tt,d=d)
     # misfit is based on difference in slope in TW space
-    m <- D$Pb207U235/U - a*D$Pb206U238 - b
-    if (is.null(covmat)){
-        return(m)
-    } else { # error propagation
-        dmda <- -D$Pb206U238
-        dmdb <- -1
-        dmdt <- D$dPb207U235dt/U - a*D$dPb206U238dt
-        dtda <- -dmda/dmdt # implicit differentiation
-        dtdb <- -dmdb/dmdt
-        J <- matrix(0,2,2)
-        J[1,1] <- dtda
-        J[1,2] <- dtdb
-        J[2,1] <- 1    # dada
-        return(J%*%covmat%*%t(J))
-    }
+    #D$Pb207U235/U - a*D$Pb206U238 - b
+    (D$Pb207Pb206-a)*D$Pb206U238 - b
 }
 
 discordia.line <- function(fit,wetherill,d=diseq()){
@@ -327,7 +329,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         }
         call3 <- substitute(e~a,list(e=expr3,a=args2))
         line3 <- do.call('substitute',list(call3,list3))        
-    } else if (fit$format%in%c(7,8)){
+    } else if (fit$format==7){
         i86 <- 1/fit$par['68i']
         i87 <- 1/fit$par['78i']
         i86err <- i86*fit$err[,'68i']/fit$par['68i']
