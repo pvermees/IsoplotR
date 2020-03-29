@@ -59,6 +59,10 @@
 #' \item{\code{07/35, err[07/35]}, \code{06/38, err[06/38]},
 #'       \code{04/38, err[04/38]}, \code{07/06, err[07/06]},
 #'       \code{04/07, err[04/07]}, \code{04/06, err[04/06]}}
+#' \item{\code{W=07/35, err[W]}, \code{X=06/38, err[X]},
+#'       \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]},
+#'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
+#'       \code{rho[X,Z], rho[Y,Z]}}
 #' \item{\code{W=38/06, err[W]}, \code{X=07/06, err[X]},
 #'       \code{Y=08/06, err[Y]}, and \code{Z=32/38, (err[Z]},
 #'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},

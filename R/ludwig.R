@@ -135,7 +135,7 @@ exponentiate_ludwig <- function(fit,format){
     out$cov <- J %*% fit$logcov %*% t(J)
     if (format %in% c(1,2,3)) parnames <- c('t','76i','w')
     else if (format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
-    else if (format == 7) parnames <- c('t','68i','78i','w')
+    else if (format %in% c(7,8)) parnames <- c('t','68i','78i','w')
     else stop("Illegal input format.")
     names(out$par) <- parnames[1:np]
     rownames(out$cov) <- parnames[1:np]

@@ -328,6 +328,7 @@ w2tw <- function(w,format){
     }
     ns <- nrow(w)
     out <- w*0
+    colnames(out) <- cnames
     for (i in 1:ns){
         tw <- tera.wasserburg(x=w,i=i,format=format)
         out[i,] <- wtw_helper(x=tw$x,covmat=tw$cov,cnames=cnames)
@@ -354,8 +355,9 @@ tw2w <- function(tw,format){
     } else {
         stop('Invalid input format.')
     }
-    ns <- nrow(w)
-    out <- w*0
+    ns <- nrow(tw)
+    out <- tw*0
+    colnames(out) <- cnames
     for (i in 1:ns){
         w <- wetherill(x=tw,i=i,format=format)
         out[i,] <- wtw_helper(x=w$x,covmat=w$cov,cnames=cnames)
@@ -364,26 +366,28 @@ tw2w <- function(tw,format){
 }
 
 wtw_helper <- function(x,covmat,cnames){
-    out <- rep(0,length(cnames))
+    nc <- length(cnames)
+    out <- rep(0,nc)
     names(out) <- cnames
     err <- sqrt(diag(covmat))
     cormat <- 0*covmat
+    pos <- which(diag(covmat)>0)
     cormat[pos,pos] <- cov2cor(covmat[pos,pos])
-    out[i,c(1,3)] <- x[1:2]
-    out[i,c(2,4)] <- err[1:2]
-    out[i,'rXY'] <- cormat[1,2]
-    if (format>3){
-        out[i,5] <- x[3]
-        out[i,6] <- err[3]
-        out[i,'rhoXZ'] <- cormat[1,3]
-        out[i,'rhoYZ'] <- cormat[2,3]
+    out[c(1,3)] <- x[1:2]
+    out[c(2,4)] <- err[1:2]
+    out['rhoXY'] <- cormat[1,2]
+    if (nc>5){
+        out[5] <- x[3]
+        out[6] <- err[3]
+        out['rhoXZ'] <- cormat[1,3]
+        out['rhoYZ'] <- cormat[2,3]
     }
-    if (format>6){
-        out[i,7] <- x[4]
-        out[i,8] <- err[4]
-        out[i,'rhoXW'] <- cormat[1,4]
-        out[i,'rhoYW'] <- cormat[2,4]
-        out[i,'rhoZW'] <- cormat[3,4]
+    if (nc>9){
+        out[7] <- x[4]
+        out[8] <- err[4]
+        out['rhoXW'] <- cormat[1,4]
+        out['rhoYW'] <- cormat[2,4]
+        out['rhoZW'] <- cormat[3,4]
     }
     out
 }
