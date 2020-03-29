@@ -238,23 +238,23 @@ data2york.default <- function(x,format=1,...){
 #'
 #' \code{5}: U-Th-Pb concordia ratios: \code{X=06/38},
 #' \code{sX=s[06/38]}, \code{Y=08/32}, \code{sY=s[08/32]},
-#' \code{rho=rXY} (only valid if \code{x$format=7}).
+#' \code{rho=rXY} (only valid if \code{x$format=7,8}).
 #'
 #' \code{6}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
-#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{x$format=7}).
+#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
 #' 
 #' \code{7}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
-#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{x$format=7}).
+#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
 #' 
 #' \code{8}: \code{X=32/08}, \code{sX=s[32/08]}, \code{Y=06/08},
-#' \code{sY=s[06/08]}, \code{rho=rXY} (only valid if \code{x$format=7}).
+#' \code{sY=s[06/08]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
 #'
 #' \code{9}: \code{X=32/08}, \code{sX=s[32/08]}, \code{Y=07/08},
-#' \code{sY=s[07/08]}, \code{rho=rXY} (only valid if \code{x$format=7}).
+#' \code{sY=s[07/08]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
 #'
 #' @param tt the age of the sample. This is only used if
-#'     \code{x$format=7}, in order to calculate the inherited
-#'     \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th ratio.
+#'     \code{x$format=7} or \code{8}, in order to calculate the
+#'     inherited \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th ratio.
 #'
 #' @rdname data2york
 #' @export
@@ -296,12 +296,12 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
         }
-    } else if (option==8 && x$format==7){ # 06/08 vs. 32/08
+    } else if (option==8 && x$format%in%c(7,8)){ # 06/08 vs. 32/08
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb206cPb208')
         }
-    } else if (option==9 && x$format==7){ # 07/08 vs. 32/08
+    } else if (option==9 && x$format%in%c(7,8)){ # 07/08 vs. 32/08
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')

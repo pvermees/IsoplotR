@@ -100,7 +100,7 @@ twfit2wfit <- function(fit,x){
         a0 <- fit$par['64i']
         b0 <- fit$par['74i']
         E <- fit$cov[1:3,1:3]
-    } else if (x$format==7){
+    } else if (x$format%in%c(7,8)){
         a0 <- fit$par['68i']
         b0 <- fit$par['78i']
         E <- fit$cov[1:3,1:3]

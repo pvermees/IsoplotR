@@ -174,6 +174,8 @@ Pb0corr <- function(x,option=3,omit=NULL){
         out$x[,c('Pb204Pb207','errPb204Pb207',
                  'Pb204Pb206','errPb204Pb206')] <- 0
     } else if (x$format==7){
+        
+    }  else if (x$format==8){
         out$x <- x.corr
     } else {
         stop('Incorrect input format.')

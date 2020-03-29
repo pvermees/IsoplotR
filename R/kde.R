@@ -178,7 +178,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'
 #' \code{settings('iratio','Pb208Pb206')} and
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
-#' \code{UPb} and \code{x$format=7}).
+#' \code{UPb} and \code{x$format=7,8}).
 #'
 #' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
