@@ -173,7 +173,7 @@ Pb0corr <- function(x,option=3,omit=NULL){
     } else if (x$format==7){
         out$x <- x.corr
     }  else if (x$format==8){
-        out$x <- w2tw(x.corr,format=8)
+        out$x <- w2tw(x.corr,format=7)
     } else {
         stop('Incorrect input format.')
     }
@@ -241,9 +241,11 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,
     r0638 <- wd$x['Pb206U238'] - c0832*wd$x['Th232U238']/c0806
     r3238 <- wd$x['Th232U238']
     if (project.err){
-        J <- matrix(0,4,4)
+        J <- diag(4)
         J[1,3] <- -wd$x['Th232U238']*U/c0807
         J[2,3] <- -wd$x['Th232U238']/c0806
+        J[1,4] <- -c0832*U/c0807
+        J[2,4] <- -c0832/c0807
         E <- J %*% wd$cov %*% t(J)
     } else {
         E <- wd$cov
@@ -283,7 +285,10 @@ common.Pb.stacey.kramers <- function(x){
             out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c6474[,'i64'],c74=c6474[,'i74'])
         }
     } else if (x$format%in%c(7,8)){
-        out <- x$x
+        out <- matrix(0,ns,14)
+        colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
+                           'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
+                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
         for (i in 1:ns){
             tint <- stats::optimise(SS.SK.with.208,interval=c(0,5000),x=x,i=i)$minimum
             c678 <- stacey.kramers(tint)
@@ -326,7 +331,10 @@ common.Pb.isochron <- function(x,omit=NULL){
                                                   c48=c48[i],project.err=FALSE)
         }
     } else if (x$format%in%c(7,8)){
-        out <- x$x
+        out <- matrix(0,ns,14)
+        colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
+                           'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
+                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
         c0806 <- 1/fit$par['68i']
         c0807 <- 1/fit$par['78i']
         c0832 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
@@ -358,7 +366,10 @@ common.Pb.nominal <- function(x){
             out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c64,c74=c74)
         }
     } else if (x$format%in%c(7,8)){
-        out <- x$x
+        out <- matrix(0,ns,14)
+        colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
+                           'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
+                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
         c0806 <- settings('iratio','Pb208Pb206')[1]
         c0807 <- settings('iratio','Pb208Pb207')[1]
         for (i in 1:ns){
