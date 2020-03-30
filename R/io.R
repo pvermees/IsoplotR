@@ -59,6 +59,10 @@
 #' \item{\code{07/35, err[07/35]}, \code{06/38, err[06/38]},
 #'       \code{04/38, err[04/38]}, \code{07/06, err[07/06]},
 #'       \code{04/07, err[04/07]}, \code{04/06, err[04/06]}}
+#' \item{\code{W=07/35, err[W]}, \code{X=06/38, err[X]},
+#'       \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]},
+#'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
+#'       \code{rho[X,Z], rho[Y,Z]}}
 #' \item{\code{W=38/06, err[W]}, \code{X=07/06, err[X]},
 #'       \code{Y=08/06, err[Y]}, and \code{Z=32/38, (err[Z]},
 #'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
@@ -405,6 +409,14 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb204Pb207','errPb204Pb207',
                     'Pb204Pb206','errPb204Pb206')
     } else if (format==7){
+        cnames <- c('Pb207U235','errPb207U235',
+                    'Pb206U238','errPb206U238',
+                    'Pb208Th232','errPb208Th232',
+                    'Th232U238','errTh232U238',
+                    'rhoXY','rhoXZ','rhoXW',
+                    'rhoYZ','rhoYW','rhoZW')
+        opt <- 8:14
+    } else if (format==8){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb208Pb206','errPb208Pb206',
@@ -412,7 +424,8 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
         opt <- 8:14
-        #class(out) <- append('UThPb',class(out))
+    } else {
+        stop('Invalid input format')
     }
     X <- insert.data(x=X,cnames=cnames,opt=opt)
     out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
