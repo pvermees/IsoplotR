@@ -871,7 +871,7 @@ getErrCols <- function(gc,format=NA,ierr=1){
     UPb12 = (gc=='U-Pb' && format%in%(1:2))
     UPb345 = (gc=='U-Pb' && format%in%(3:5))
     UPb6 = (gc=='U-Pb' && format==6)
-    UPb7 = (gc=='U-Pb' && format==7)
+    UPb78 = (gc=='U-Pb' && format%in%(7:8))
     PbPb12 = (gc=='Pb-Pb' && format%in%(1:2))
     PbPb3 = (gc=='Pb-Pb' && format==3)
     ArAr12 = (gc=='Ar-Ar' && format%in%(1:2))
@@ -891,7 +891,7 @@ getErrCols <- function(gc,format=NA,ierr=1){
         cols = c(2,4)
     } else if (UPb345 | PbPb3 | ArAr3 | KCa1 | PD1 | UThHe | ThU12){
         cols = c(2,4,6)
-    } else if (UPb7){
+    } else if (UPb78){
         cols = seq(from=2,to=8,by=2)
     } else if (UPb6){
         cols = seq(from=2,to=12,by=2)

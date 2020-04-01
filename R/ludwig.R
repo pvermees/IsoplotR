@@ -115,17 +115,6 @@ ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,N
     c(out,mswd)
 }
 
-wtest.UPb <- function(lta0b0w,x){
-    nn <- 50
-    lw <- seq(from=-10,to=2,length.out=nn)
-    LL <- rep(0,nn)
-    for (i in 1:nn){
-        lta0b0w[4] <- lw[i]
-        LL[i] <- LL.lud(lta0b0w=lta0b0w,x=x,LL=TRUE)
-    }
-    plot(lw,LL,type='l')
-}
-
 exponentiate_ludwig <- function(fit,format){
     out <- fit
     np <- length(fit$logpar)
