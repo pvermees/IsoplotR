@@ -566,11 +566,17 @@ min_age_model <- function(zs,alpha=0.05){
     out$L <- L
     out$peaks <- matrix(0,3,1)
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
-    df <- length(z)-3
     out$peaks['t',] <- fit[1]
-    if (E[1,1]<0) out$peaks['s[t]',] <- NA
-    else out$peaks['s[t]',] <- sqrt(E[1,1])
+    out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
     out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
+    out$disp <- matrix(0,2,1)
+    rownames(out$disp) <- c('d','s[d]')
+    out$disp['d',] <- fit[2]
+    out$disp['s[d]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
+    out$props <- matrix(0,2,1)
+    rownames(out$props) <- c('p','s[p]')
+    out$props['p',] <- fit[3]
+    out$props['s[p]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
     out
 }
 
