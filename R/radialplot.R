@@ -436,7 +436,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                      cutoff.disc=cutoff.disc,common.Pb=common.Pb,
                      detritus=detritus)
     markers <- c(markers,peaks$peaks['t',])
-    tt <- get.ages(x2calc,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,detritus=detritus,common.Pb=common.Pb)
     radial_helper(tt,from=from,to=to,t0=t0,
                   transformation=transformation,
@@ -468,7 +468,7 @@ radial_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
-    X <- x2zs(x,t0=t0,from=from,to=to,transformation=transformation)
+    X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
     pcol <- set.ellipse.colours(ns=ns,levels=levels,col=bg,hide=hide,
                                 omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
