@@ -329,7 +329,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         }
         call3 <- substitute(e~a,list(e=expr3,a=args2))
         line3 <- do.call('substitute',list(call3,list3))        
-    } else if (fit$format==7){
+    } else if (fit$format%in%c(7,8)){
         i86 <- 1/fit$par['68i']
         i87 <- 1/fit$par['78i']
         i86err <- i86*fit$err[,'68i']/fit$par['68i']
