@@ -185,7 +185,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
         mse <- fit$value/(ne*ns-np)   # mean square error
         out$logpar <- fit$par
         out$logcov <- matrix(0,np,np) # initialise
-        out$logcov[!fixed,!fixed] <- solve(fit$hessian)*mse
+        out$logcov[!fixed,!fixed] <- solve(fit$hessian/2)*mse
     } else {
         fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
@@ -319,9 +319,9 @@ SS.model2 <- function(lta0b0,x){
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
         y6p <- (r86-x6)/(a0*r86)
-        SS6 <- sum((y6p-y6)^2)/stats::var(y6)
+        SS6 <- sum((y6p-y6)^2)
         y7p <- (r57-x7)/(b0*r57)
-        SS7 <- sum((y7p-y7)^2)/stats::var(y7)
+        SS7 <- sum((y7p-y7)^2)
         out <- SS6 + SS7
     }
     out
