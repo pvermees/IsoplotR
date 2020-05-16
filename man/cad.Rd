@@ -20,51 +20,170 @@
 \usage{
 cad(x, ...)
 
-\method{cad}{default}(x, pch = NA, verticals = TRUE,
-  xlab = "age [Ma]", col = "black", hide = NULL, ...)
+\method{cad}{default}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  hide = NULL,
+  ...
+)
 
-\method{cad}{detritals}(x, pch = NA, verticals = TRUE,
-  xlab = "age [Ma]", col = "heat.colors", hide = NULL, ...)
+\method{cad}{detritals}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "heat.colors",
+  hide = NULL,
+  ...
+)
 
-\method{cad}{UPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", type = 4, cutoff.76 = 1100,
-  cutoff.disc = list(-15, 5, TRUE), common.Pb = 0, hide = NULL, ...)
+\method{cad}{UPb}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  type = 4,
+  cutoff.76 = 1100,
+  cutoff.disc = list(-15, 5, TRUE),
+  common.Pb = 0,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{PbPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", common.Pb = 1, hide = NULL, ...)
+\method{cad}{PbPb}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  common.Pb = 1,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{ArAr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = FALSE, hide = NULL, ...)
+\method{cad}{ArAr}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = FALSE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{KCa}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = FALSE, hide = NULL, ...)
+\method{cad}{KCa}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = FALSE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{ThPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = TRUE, hide = NULL, ...)
+\method{cad}{ThPb}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = TRUE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{ThU}(x, pch = NA, verticals = TRUE, xlab = "age [ka]",
-  col = "black", i2i = FALSE, detritus = 0, hide = NULL, ...)
+\method{cad}{ThU}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [ka]",
+  col = "black",
+  i2i = FALSE,
+  detritus = 0,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{ThPb}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = TRUE, hide = NULL, ...)
+\method{cad}{ThPb}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = TRUE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{ReOs}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = TRUE, hide = NULL, ...)
+\method{cad}{ReOs}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = TRUE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{SmNd}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = TRUE, hide = NULL, ...)
+\method{cad}{SmNd}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = TRUE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{RbSr}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = TRUE, hide = NULL, ...)
+\method{cad}{RbSr}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = TRUE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{LuHf}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", i2i = TRUE, hide = NULL, ...)
+\method{cad}{LuHf}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  i2i = TRUE,
+  hide = NULL,
+  ...
+)
 
-\method{cad}{UThHe}(x, pch = NA, verticals = TRUE, xlab = "age [Ma]",
-  col = "black", hide = NULL, ...)
+\method{cad}{UThHe}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  hide = NULL,
+  ...
+)
 
-\method{cad}{fissiontracks}(x, pch = NA, verticals = TRUE,
-  xlab = "age [Ma]", col = "black", hide = NULL, ...)
+\method{cad}{fissiontracks}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  hide = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{a numerical vector OR an object of class \code{UPb},

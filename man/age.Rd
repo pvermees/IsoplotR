@@ -19,45 +19,58 @@
 \usage{
 age(x, ...)
 
-\method{age}{default}(x, method = "U238-Pb206", exterr = TRUE,
-  J = c(NA, NA), zeta = c(NA, NA), rhoD = c(NA, NA), d = diseq(),
-  ...)
+\method{age}{default}(
+  x,
+  method = "U238-Pb206",
+  exterr = TRUE,
+  J = c(NA, NA),
+  zeta = c(NA, NA),
+  rhoD = c(NA, NA),
+  d = diseq(),
+  ...
+)
 
-\method{age}{UPb}(x, type = 1, exterr = TRUE, i = NA, sigdig = NA,
-  common.Pb = 0, show.p = FALSE, ...)
+\method{age}{UPb}(
+  x,
+  type = 1,
+  exterr = TRUE,
+  i = NA,
+  sigdig = NA,
+  common.Pb = 0,
+  show.p = FALSE,
+  ...
+)
 
-\method{age}{PbPb}(x, isochron = TRUE, common.Pb = 2, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{PbPb}(x, isochron = TRUE, common.Pb = 2, exterr = TRUE, i = NA, sigdig = NA, ...)
 
-\method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
 
-\method{age}{KCa}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{KCa}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
 
-\method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NA,
-  sigdig = NA, ...)
+\method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NA, sigdig = NA, ...)
 
-\method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA,
-  exterr = TRUE, ...)
+\method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA, exterr = TRUE, ...)
 
-\method{age}{ThU}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, detritus = 0, ...)
+\method{age}{ThU}(
+  x,
+  isochron = FALSE,
+  i2i = TRUE,
+  exterr = TRUE,
+  i = NA,
+  sigdig = NA,
+  detritus = 0,
+  ...
+)
 
-\method{age}{ThPb}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{ThPb}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
 
-\method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
 
-\method{age}{SmNd}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{SmNd}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
 
-\method{age}{RbSr}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{RbSr}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
 
-\method{age}{LuHf}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE,
-  i = NA, sigdig = NA, ...)
+\method{age}{LuHf}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
 }
 \arguments{
 \item{x}{can be:

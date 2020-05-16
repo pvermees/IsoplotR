@@ -4,19 +4,35 @@
 \alias{scatterplot}
 \title{Create a scatter plot with error ellipses or crosses}
 \usage{
-scatterplot(xy, xlim = NA, ylim = NA, alpha = 0.05,
-  show.numbers = FALSE, show.ellipses = 1, levels = NA,
-  clabel = "", ellipse.col = c("#00FF0080", "#FF000080"),
-  fit = "none", add = FALSE, empty = FALSE, ci.col = "gray80",
-  line.col = "black", lwd = 1, hide = NULL, omit = NULL,
-  omit.col = NA, addcolourbar = TRUE, bg, cex, ...)
+scatterplot(
+  xy,
+  alpha = 0.05,
+  show.numbers = FALSE,
+  show.ellipses = 1,
+  levels = NA,
+  clabel = "",
+  ellipse.col = c("#00FF0080", "#FF000080"),
+  fit = "none",
+  add = FALSE,
+  empty = FALSE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  addcolourbar = TRUE,
+  bg,
+  cex,
+  xlim,
+  ylim,
+  xlab,
+  ylab,
+  ...
+)
 }
 \arguments{
 \item{xy}{matrix with columns \code{X, sX, Y, sY(, rXY)}}
-
-\item{xlim}{(optional) two-element vector with the x-axis limits}
-
-\item{ylim}{(optional) two-element vector with the y-axis limits}
 
 \item{alpha}{the probability cutoff for the error ellipses}
 
@@ -85,6 +101,14 @@ aliquots.}
 \code{show.ellipses=0}).}
 
 \item{cex}{plot symbol magnification.}
+
+\item{xlim}{(optional) two-element vector with the x-axis limits}
+
+\item{ylim}{(optional) two-element vector with the y-axis limits}
+
+\item{xlab}{(optional) x-axis label (only used when \code{add=FALSE})}
+
+\item{ylab}{(optional) y-axis label (only used when \code{add=FALSE})}
 
 \item{...}{optional arguments to format the points and text.}
 }

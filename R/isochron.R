@@ -91,10 +91,6 @@
 #' \code{UPb}, \code{ThPb}, \code{ReOs}, \code{RbSr}, \code{SmNd},
 #' \code{LuHf}, \code{UThHe} or \code{ThU}.
 #'
-#' @param xlim 2-element vector with the x-axis limits
-#'
-#' @param ylim 2-element vector with the y-axis limits
-#'
 #' @param alpha confidence cutoff for the error ellipses and
 #'     confidence intervals
 #'
@@ -438,22 +434,20 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                             show.numbers=FALSE,levels=NA,clabel="",
+isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
+                             levels=NA,clabel="",xlab='x',ylab='y',
                              ellipse.col=c("#00FF0080","#FF000080"),
                              ci.col='gray80',line.col='black',lwd=1,
                              plot=TRUE,title=TRUE,model=1,
-                             show.ellipses=1*(model!=2),xlab='x',
-                             ylab='y',hide=NULL,omit=NULL,
-                             omit.col=NA,...){
+                             show.ellipses=1*(model!=2),
+                             hide=NULL,omit=NULL,omit.col=NA,...){
     d2calc <- clear(x,hide,omit)
     fit <- regression(data2york(d2calc),model=model)
     fit <- regression_init(fit,alpha=alpha)
     fit <- ci_isochron(fit)
     if (plot){
         y <- data2york(x)
-        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
+        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=fit,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
@@ -482,14 +476,14 @@ isochron.default <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #'
 #' @rdname isochron
 #' @export
-isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.UPb <- function(x,alpha=0.05,sigdig=2,
                          show.numbers=FALSE,levels=NA,clabel="",
                          ellipse.col=c("#00FF0080","#FF000080"),
                          type=1,ci.col='gray80',line.col='black',
                          lwd=1,plot=TRUE,exterr=FALSE,model=1,
                          show.ellipses=1*(model!=2),
-                         anchor=list(FALSE,NA),hide=NULL,omit=NULL,
-                         omit.col=NA,...){
+                         anchor=list(FALSE,NA),hide=NULL,
+                         omit=NULL,omit.col=NA,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -596,8 +590,7 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
     }
     if (plot){
-        scatterplot(XY,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
+        scatterplot(XY,alpha=alpha,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
@@ -654,13 +647,14 @@ isochron.UPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
 #' @rdname isochron
 #' @export
-isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.PbPb <- function(x,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=TRUE,ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
-                          exterr=TRUE,model=1,show.ellipses=1*(model!=2),
-                          growth=FALSE,hide=NULL,omit=NULL,omit.col=NA,...){
+                          exterr=TRUE,model=1,growth=FALSE,
+                          show.ellipses=1*(model!=2),
+                          hide=NULL,omit=NULL,omit.col=NA,...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
     fit <- regression(d2calc,model=model)
@@ -687,8 +681,7 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                                         exterr=exterr)[2]
     }
     if (plot) {
-        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
+        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
@@ -717,12 +710,12 @@ isochron.PbPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
-isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.ArAr <- function(x,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          inverse=TRUE,ci.col='gray80',line.col='black',
-                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                          show.ellipses=1*(model!=2),
+                          inverse=TRUE,ci.col='gray80',
+                          line.col='black',lwd=1,plot=TRUE,
+                          exterr=TRUE,model=1,show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.col=NA,...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
@@ -760,8 +753,7 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
                                   x$J[1],x$J[2],exterr=exterr)[2]
     }
     if (plot) {
-        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
+        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
@@ -773,16 +765,16 @@ isochron.ArAr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
-isochron.ThPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.ThPb <- function(x,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
-                          inverse=FALSE,ci.col='gray80',line.col='black',
-                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                          show.ellipses=1*(model!=2),
+                          inverse=FALSE,ci.col='gray80',
+                          line.col='black',lwd=1,plot=TRUE,
+                          exterr=TRUE,model=1,show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.col=NA,...){
-    isochron_PD(x,nuclide='Th232',xlim=xlim,ylim=ylim,alpha=alpha,
-                sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
+    isochron_PD(x,nuclide='Th232',alpha=alpha,sigdig=sigdig,
+                show.numbers=show.numbers,levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,
                 lwd=lwd,plot=plot,exterr=exterr,model=model,
                 show.ellipses=show.ellipses,hide=hide,omit=omit,
@@ -790,32 +782,31 @@ isochron.ThPb <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
-isochron.KCa <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
-                         show.numbers=FALSE,levels=NA,clabel="",
+isochron.KCa <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
+                         levels=NA,clabel="",inverse=FALSE,ci.col='gray80',
                          ellipse.col=c("#00FF0080","#FF000080"),
-                         inverse=FALSE,ci.col='gray80',line.col='black',
-                         lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                         show.ellipses=1*(model!=2),
+                         line.col='black',lwd=1,plot=TRUE,exterr=TRUE,
+                         model=1,show.ellipses=1*(model!=2),
                          hide=NULL,omit=NULL,omit.col=NA,...){
-    isochron_PD(x,nuclide='K40',xlim=xlim,ylim=ylim,alpha=alpha,
-                sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
+    isochron_PD(x,nuclide='K40',alpha=alpha,sigdig=sigdig,
+                show.numbers=show.numbers,levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,
                 lwd=lwd,plot=plot,exterr=exterr,model=model,
-                show.ellipses=show.ellipses,bratio=0.895,
-                hide=hide,omit=omit,omit.col=omit.col,...)
+                show.ellipses=show.ellipses,bratio=0.895, hide=hide,
+                omit=omit,omit.col=omit.col,...)
 }
 #' @rdname isochron
 #' @export
-isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.RbSr <- function(x,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=FALSE,ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,nuclide='Rb87',xlim=xlim,ylim=ylim,alpha=alpha,
-                sigdig=sigdig,show.numbers=show.numbers,levels=levels,
+    isochron_PD(x,nuclide='Rb87',alpha=alpha,sigdig=sigdig,
+                show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.col=ellipse.col,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
                 exterr=exterr,model=model,show.ellipses=show.ellipses,
@@ -823,47 +814,48 @@ isochron.RbSr <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
-isochron.ReOs <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.ReOs <- function(x,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=FALSE,ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,nuclide='Re187',xlim=xlim,ylim=ylim,alpha=alpha,
-                sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
-                inverse=inverse,ci.col=ci.col,line.col=line.col,lwd=lwd,
-                plot=plot,exterr=exterr,model=model,show.ellipses=show.ellipses,
-                hide=hide,omit=omit,omit.col=omit.col,...)
+    isochron_PD(x,nuclide='Re187',alpha=alpha,sigdig=sigdig,
+                show.numbers=show.numbers,levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,
+                inverse=inverse,ci.col=ci.col,line.col=line.col,
+                lwd=lwd, plot=plot,exterr=exterr,model=model,
+                show.ellipses=show.ellipses, hide=hide,omit=omit,
+                omit.col=omit.col,...)
 }
 #' @rdname isochron
 #' @export
-isochron.SmNd <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.SmNd <- function(x,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=FALSE,ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,nuclide='Sm147',xlim=xlim,ylim=ylim,alpha=alpha,
-                sigdig=sigdig,show.numbers=show.numbers,
-                levels=levels,clabel=clabel,ellipse.col=ellipse.col,
+    isochron_PD(x,nuclide='Sm147',alpha=alpha,sigdig=sigdig,
+                show.numbers=show.numbers, levels=levels,
+                clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,
                 lwd=lwd,plot=plot,exterr=exterr,model=model,
-                show.ellipses=show.ellipses,hide=hide,
-                omit=omit,omit.col=omit.col,...)
+                show.ellipses=show.ellipses,hide=hide, omit=omit,
+                omit.col=omit.col,...)
 }
 #' @rdname isochron
 #' @export
-isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.LuHf <- function(x,alpha=0.05,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.col=c("#00FF0080","#FF000080"),
                           inverse=FALSE,ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.col=NA,...){
-    isochron_PD(x,nuclide='Lu176',xlim=xlim,ylim=ylim,alpha=alpha,
+    isochron_PD(x,nuclide='Lu176',alpha=alpha,
                 sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.col=ellipse.col,
                 inverse=inverse,ci.col=ci.col,line.col=line.col,
@@ -887,13 +879,12 @@ isochron.LuHf <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
 #' vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #' @rdname isochron
 #' @export
-isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
-                          sigdig=2,show.numbers=FALSE,levels=NA,
-                          clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                          ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
-                          show.ellipses=1*(model!=2),hide=NULL,
-                          omit=NULL,omit.col=NA,...){
+isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
+                          show.numbers=FALSE,levels=NA,clabel="",
+                          ellipse.col=c("#00FF0080","#FF000080"),
+                          ci.col='gray80',line.col='black',lwd=1,plot=TRUE,
+                          exterr=TRUE,model=1,show.ellipses=1*(model!=2),
+                          hide=NULL,omit=NULL,omit.col=NA,...){
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,
                                exterr=exterr,alpha=alpha,
@@ -911,12 +902,12 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
         out$displabel <- quote('('^234*'U/'^238*'U)-dispersion = ')
     }
     if (plot){
-        scatterplot(out$xyz,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,fit=out,
+        scatterplot(out$xyz,alpha=alpha,show.numbers=show.numbers,
+                    levels=levels,clabel=clabel,
+                    ellipse.col=ellipse.col,fit=out,
                     show.ellipses=show.ellipses,ci.col=ci.col,
-                    line.col=line.col,lwd=lwd,
-                    hide=hide,omit=omit,omit.col=omit.col,...)
+                    line.col=line.col,lwd=lwd, hide=hide,omit=omit,
+                    omit.col=omit.col,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,
                         type=intercept.type,units='ka'),
                         xlab=out$xlab,ylab=out$ylab)
@@ -925,7 +916,7 @@ isochron.ThU <- function (x,type=2,xlim=NA,ylim=NA,alpha=0.05,
 }
 #' @rdname isochron
 #' @export
-isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
+isochron.UThHe <- function(x,alpha=0.05,sigdig=2,
                            show.numbers=FALSE,levels=NA,clabel="",
                            ellipse.col=c("#00FF0080","#FF000080"),
                            ci.col='gray80',line.col='black',lwd=1,
@@ -943,7 +934,7 @@ isochron.UThHe <- function(x,xlim=NA,ylim=NA,alpha=0.05,sigdig=2,
     out$displabel <- quote('He-dispersion = ')
     out$y0label <- quote('He'[o]*' = ')
     if (plot) {
-        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
+        scatterplot(y,,alpha=alpha,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     show.ellipses=show.ellipses,ci.col=ci.col,
@@ -1064,12 +1055,12 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
     out
 }
 
-isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
-                        sigdig=2,show.numbers=FALSE,levels=NA,
-                        clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                        inverse=FALSE,ci.col='gray80',line.col='black',
-                        lwd=1,plot=TRUE,exterr=TRUE,model=1,
-                        show.ellipses=1*(model!=2),bratio=1,
+isochron_PD <- function(x,nuclide,alpha=0.05,sigdig=2,
+                        show.numbers=FALSE,levels=NA, clabel="",
+                        ellipse.col=c("#00FF0080","#FF000080"),
+                        inverse=FALSE,ci.col='gray80',
+                        line.col='black',lwd=1,plot=TRUE,exterr=TRUE,
+                        model=1,show.ellipses=1*(model!=2),bratio=1,
                         hide=NULL,omit=NULL,...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
@@ -1097,8 +1088,7 @@ isochron_PD <- function(x,nuclide,xlim=NA,ylim=NA,alpha=0.05,
     out$y0label <-
         substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*' = ')))
     if (plot){
-        scatterplot(y,xlim=xlim,ylim=ylim,alpha=alpha,
-                    show.ellipses=show.ellipses,
+        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.col=ellipse.col,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,

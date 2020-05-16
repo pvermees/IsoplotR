@@ -8,19 +8,43 @@
 \usage{
 agespectrum(x, ...)
 
-\method{agespectrum}{default}(x, alpha = 0.05, plateau = TRUE,
-  random.effects = TRUE, levels = NA, clabel = "",
+\method{agespectrum}{default}(
+  x,
+  alpha = 0.05,
+  plateau = TRUE,
+  random.effects = TRUE,
+  levels = NA,
+  clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
-  non.plateau.col = "#00FFFF80", sigdig = 2, line.col = "red",
-  lwd = 2, xlab = "cumulative fraction", ylab = "age [Ma]",
-  hide = NULL, omit = NULL, ...)
+  non.plateau.col = "#00FFFF80",
+  sigdig = 2,
+  line.col = "red",
+  lwd = 2,
+  xlab = "cumulative fraction",
+  ylab = "age [Ma]",
+  hide = NULL,
+  omit = NULL,
+  ...
+)
 
-\method{agespectrum}{ArAr}(x, alpha = 0.05, plateau = TRUE,
-  random.effects = TRUE, levels = NA, clabel = "",
+\method{agespectrum}{ArAr}(
+  x,
+  alpha = 0.05,
+  plateau = TRUE,
+  random.effects = TRUE,
+  levels = NA,
+  clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
-  non.plateau.col = "#00FFFF80", sigdig = 2, exterr = TRUE,
-  line.col = "red", lwd = 2, i2i = FALSE, hide = NULL,
-  omit = NULL, ...)
+  non.plateau.col = "#00FFFF80",
+  sigdig = 2,
+  exterr = TRUE,
+  line.col = "red",
+  lwd = 2,
+  i2i = FALSE,
+  hide = NULL,
+  omit = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{a three-column matrix whose first column gives the amount of

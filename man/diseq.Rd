@@ -5,9 +5,12 @@
 \title{Set up U-series disequilibrium correction for U-Pb
     geochronology}
 \usage{
-diseq(U48 = list(x = 1, sx = 0, option = 0), ThU = list(x = 1, sx = 0,
-  option = 0), RaU = list(x = 1, sx = 0, option = 0), PaU = list(x = 1,
-  sx = 0, option = 0))
+diseq(
+  U48 = list(x = 1, sx = 0, option = 0),
+  ThU = list(x = 1, sx = 0, option = 0),
+  RaU = list(x = 1, sx = 0, option = 0),
+  PaU = list(x = 1, sx = 0, option = 0)
+)
 }
 \arguments{
 \item{U48}{a list containing three items (\code{x}, \code{sx} and

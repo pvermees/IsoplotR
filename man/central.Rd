@@ -13,8 +13,7 @@ central(x, ...)
 
 \method{central}{UThHe}(x, alpha = 0.05, model = 1, ...)
 
-\method{central}{fissiontracks}(x, mineral = NA, alpha = 0.05,
-  exterr = FALSE, ...)
+\method{central}{fissiontracks}(x, mineral = NA, alpha = 0.05, exterr = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe} or \code{fissiontracks},

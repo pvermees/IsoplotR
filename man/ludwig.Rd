@@ -8,8 +8,14 @@ into account decay constant uncertainties.}
 \usage{
 ludwig(x, ...)
 
-\method{ludwig}{default}(x, exterr = FALSE, alpha = 0.05, model = 1,
-  anchor = list(FALSE, NA), ...)
+\method{ludwig}{default}(
+  x,
+  exterr = FALSE,
+  alpha = 0.05,
+  model = 1,
+  anchor = list(FALSE, NA),
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}

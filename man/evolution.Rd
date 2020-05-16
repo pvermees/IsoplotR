@@ -4,11 +4,27 @@
 \alias{evolution}
 \title{Th-U evolution diagram}
 \usage{
-evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
-  detritus = 0, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
-  isochron = FALSE, model = 1, exterr = TRUE, sigdig = 2,
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+evolution(
+  x,
+  xlim = NA,
+  ylim = NA,
+  alpha = 0.05,
+  transform = FALSE,
+  detritus = 0,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.col = c("#00FF0080", "#FF000080"),
+  line.col = "darksalmon",
+  isochron = FALSE,
+  model = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{ThU}}
