@@ -11,7 +11,8 @@ scatterplot(
   show.ellipses = 1,
   levels = NA,
   clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"),
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
   fit = "none",
   add = FALSE,
   empty = FALSE,
@@ -52,7 +53,7 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label for the colour scale}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
@@ -69,6 +70,10 @@ a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.
 
 For empty ellipses, set \code{ellipse.col=NA}}
+
+\item{ellipse.stroke}{the stroke colour for the error
+ellipses. Follows the same formatting guidelines as
+\code{ellipse.fill}}
 
 \item{fit}{the output of \code{york()} (optional).}
 

@@ -59,7 +59,7 @@
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
 #' @param clabel label of the colour legend.
-#' @param ellipse.col
+#' @param ellipse.fill
 #' Fill colour for the error ellipses. This can either be a single
 #' colour or multiple colours to form a colour ramp. Examples:
 #'
@@ -76,7 +76,11 @@
 #' a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.
 #'
-#' For empty ellipses, set \code{ellipse.col=NA}
+#' For empty ellipses, set \code{ellipse.fill=NA}
+#' 
+#' @param ellipse.stroke the stroke colour for the error
+#'     ellipses. Follows the same formatting guidelines as
+#'     \code{ellipse.fill}
 #' @param line.col colour of the age grid
 #' @param isochron fit a 3D isochron to the data?
 #' @param exterr propagate the decay constant uncertainty in the
@@ -135,22 +139,24 @@
 #' @export
 evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                       detritus=0,show.numbers=FALSE,levels=NA,
-                      clabel="",ellipse.col=c("#00FF0080","#FF000080"),
-                      line.col='darksalmon',isochron=FALSE,model=1,
-                      exterr=TRUE,sigdig=2,hide=NULL,omit=NULL,
-                      omit.col=NA,...){
+                      clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
+                      ellipse.stroke='black',line.col='darksalmon',
+                      isochron=FALSE,model=1,exterr=TRUE,sigdig=2,
+                      hide=NULL,omit=NULL,omit.col=NA,...){
     if (x$format %in% c(1,2)){
         if (transform){
             U4U8vst(x,detritus=detritus,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,
+                    clabel=clabel,ellipse.fill=ellipse.fill,
+                    ellipse.stroke=ellipse.stroke,
                     show.ellipses=(model!=2),hide=hide,omit=omit,
                     omit.col=omit.col,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
                         ylim=ylim,alpha=alpha,detritus=detritus,
                         show.numbers=show.numbers,levels=levels,
-                        clabel=clabel,ellipse.col=ellipse.col,
+                        clabel=clabel,ellipse.fill=ellipse.fill,
+                        ellipse.stroke=ellipse.stroke,
                         line.col=line.col,show.ellipses=(model!=2),
                         hide=hide,omit=omit,omit.col=omit.col,...)
         }
@@ -164,7 +170,8 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
         Th02vsU8Th2(x,isochron=isochron,model=model,xlim=xlim,
                     ylim=ylim,alpha=alpha,show.numbers=show.numbers,
                     exterr=exterr,sigdig=sigdig,levels=levels,
-                    clabel=clabel,ellipse.col=ellipse.col,
+                    clabel=clabel,ellipse.fill=ellipse.fill,
+                    ellipse.stroke=ellipse.stroke,
                     line.col=line.col,hide=hide,omit=omit,
                     omit.col=omit.col,...)
     }
@@ -172,8 +179,9 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
 
 U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
                     show.numbers=FALSE,levels=NA,clabel="",
-                    ellipse.col=c("#00FF0080","#FF000080"),
-                    show.ellipses=TRUE,hide=NULL,omit=NULL,omit.col=NA,...){
+                    ellipse.fill=c("#00FF0080","#FF000080"),
+                    ellipse.stroke='black',show.ellipses=TRUE,
+                    hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -193,16 +201,18 @@ U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
     d[,'rXY'] <- ta0[,'cov[t,48_0]']/(ta0[,'s[t]']*ta0[,'s[48_0]'])
     scatterplot(d,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
-                clabel=clabel,ellipse.col=ellipse.col,add=TRUE,
+                clabel=clabel,ellipse.fill=ellipse.fill,
+                ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,...)
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
-                        xlim=NA,ylim=NA,alpha=0.05,
-                        show.numbers=FALSE,levels=NA,clabel="",
-                        ellipse.col=c("#00FF0080","#FF000080"),
-                        line.col='darksalmon',show.ellipses=TRUE,
-                        hide=NULL,omit=NULL,omit.col=NA,...){
+U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0, xlim=NA,
+                        ylim=NA,alpha=0.05, show.numbers=FALSE,
+                        levels=NA,clabel="",
+                        ellipse.fill=c("#00FF0080","#FF000080"),
+                        ellipse.stroke='black',line.col='darksalmon',
+                        show.ellipses=TRUE,hide=NULL,omit=NULL,
+                        omit.col=NA,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -221,7 +231,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
         initial[4] <- sqrt(fit$cov['B','B'])
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
         scatterplot(initial,alpha=alpha,
-                    ellipse.col=grDevices::rgb(1,1,1,0.85),
+                    ellipse.fill=grDevices::rgb(1,1,1,0.85),
                     line.col='black',add=TRUE)
         e48 <- 1
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
@@ -231,17 +241,20 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
                  'U234U238','sU234U238','rYZ'),drop=FALSE]
     scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
-                clabel=clabel,ellipse.col=ellipse.col,add=TRUE,
+                clabel=clabel,ellipse.fill=ellipse.fill,
+                ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,...)
-    colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
+    colourbar(z=levels[calcit],fill=ellipse.fill,
+              stroke=ellipse.stroke,clabel=clabel)
 }
 
 Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
                         alpha=0.05,show.numbers=FALSE,exterr=TRUE,
                         clabel="",levels=NA,
-                        ellipse.col=c("#00FF0080","#FF000080"),
-                        sigdig=2,line.col='darksalmon',
-                        hide=NULL,omit=NULL,omit.col=NA,...){
+                        ellipse.fill=c("#00FF0080","#FF000080"),
+                        ellipse.stroke='black',sigdig=2,
+                        line.col='darksalmon',hide=NULL,omit=NULL,
+                        omit.col=NA,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -282,13 +295,15 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
     }
     if (isochron){ # plot the data and isochron line fit
         isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
-                     levels=levels,ellipse.col=ellipse.col,
+                     levels=levels,ellipse.fill=ellipse.fill,
+                     ellipse.stroke=ellipse.stroke,
                      line.col='black',exterr=exterr,sigdig=sigdig,
                      add=TRUE,model=model,hide=hide,
                      omit=omit,omit.col=omit.col)
     } else { # plot just the data
         scatterplot(d,alpha=alpha,show.numbers=show.numbers,
-                    levels=levels,ellipse.col=ellipse.col,
+                    levels=levels,ellipse.fill=ellipse.fill,
+                    ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
                     omit.col=omit.col)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
@@ -298,7 +313,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
                                 "232","Th)"[o]^x*" = 0]"))
         mymtext(tit,line=0,...)
     }
-    colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
+    colourbar(z=levels[calcit],fill=ellipse.fill,
+              stroke=ellipse.stroke,clabel=clabel)
 }
 
 evolution.title <- function(fit,sigdig=2,...){

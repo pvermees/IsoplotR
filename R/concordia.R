@@ -63,7 +63,7 @@
 #' @param clabel label for the colour legend (only used if
 #'     \code{levels} is not \code{NA}).
 #' 
-#' @param ellipse.col
+#' @param ellipse.fill
 #' Fill colour for the error ellipses. This can either be a single
 #' colour or multiple colours to form a colour ramp. Examples:
 #'
@@ -80,7 +80,11 @@
 #' a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 #' etc.
 #'
-#' For empty ellipses, set \code{ellipse.col=NA}
+#' For empty ellipses, set \code{ellipse.fill=NA}
+#' 
+#' @param ellipse.stroke the stroke colour for the error
+#'     ellipses. Follows the same formatting guidelines as
+#'     \code{ellipse.fill}
 #' 
 #' @param concordia.col colour of the concordia line
 #' 
@@ -257,11 +261,12 @@
 #' @export
 concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       show.numbers=FALSE,levels=NA,clabel="",
-                      ellipse.col=c("#00FF0080","#FF000080"),
+                      ellipse.fill=c("#00FF0080","#FF000080"),
+                      ellipse.stroke='black',
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
-                      omit.col=NA,...){
+                      omit.col=NA,...){    
     if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -292,7 +297,8 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     else stop('Concordia type incompatible with this input format.')
     scatterplot(y,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
-                clabel=clabel,ellipse.col=ellipse.col,add=TRUE,
+                clabel=clabel,ellipse.fill=ellipse.fill,
+                ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.col=omit.col,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
@@ -302,7 +308,10 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
         fit$n <- length(X2calc)
         graphics::title(concordia.title(fit,sigdig=sigdig))
     }
-    colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
+    # must be added to the end because otherwise R doesn't
+    # add the concordia ellipse to the scatterplot
+    colourbar(z=levels[calcit],fill=ellipse.fill,
+              stroke=ellipse.stroke,clabel=clabel)
     invisible(fit)
 }
 

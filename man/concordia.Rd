@@ -12,7 +12,8 @@ concordia(
   show.numbers = FALSE,
   levels = NA,
   clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"),
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
   concordia.col = "darksalmon",
   exterr = FALSE,
   show.age = 0,
@@ -55,7 +56,7 @@ as different background colours within the error ellipses.}
 \item{clabel}{label for the colour legend (only used if
 \code{levels} is not \code{NA}).}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
@@ -71,7 +72,11 @@ a colour palette: \code{rainbow(n=100)},
 a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.
 
-For empty ellipses, set \code{ellipse.col=NA}}
+For empty ellipses, set \code{ellipse.fill=NA}}
+
+\item{ellipse.stroke}{the stroke colour for the error
+ellipses. Follows the same formatting guidelines as
+\code{ellipse.fill}}
 
 \item{concordia.col}{colour of the concordia line}
 

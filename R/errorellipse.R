@@ -57,7 +57,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
 #' @param clabel label for the colour scale
-#' @param ellipse.col
+#' @param ellipse.fill
 #' Fill colour for the error ellipses. This can either be a single
 #' colour or multiple colours to form a colour ramp. Examples:
 #'
@@ -75,6 +75,9 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' etc.
 #'
 #' For empty ellipses, set \code{ellipse.col=NA}
+#' @param ellipse.stroke the stroke colour for the error
+#'     ellipses. Follows the same formatting guidelines as
+#'     \code{ellipse.fill}
 #' @param fit the output of \code{york()} (optional).
 #' @param add if \code{TRUE}, adds the points and lines to the
 #'     existing plot.
@@ -113,10 +116,10 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @export
 scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
                         show.ellipses=1,levels=NA,clabel="",
-                        ellipse.col=c("#00FF0080","#FF000080"),
-                        fit='none',add=FALSE,empty=FALSE,
-                        ci.col='gray80',line.col='black',lwd=1,
-                        hide=NULL,omit=NULL,omit.col=NA,
+                        ellipse.fill=c("#00FF0080","#FF000080"),
+                        ellipse.stroke="black",fit='none',add=FALSE,
+                        empty=FALSE, ci.col='gray80',line.col='black',
+                        lwd=1, hide=NULL,omit=NULL,omit.col=NA,
                         addcolourbar=TRUE,bg,cex,xlim,ylim,xlab,ylab,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
@@ -139,15 +142,18 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
     graphics::box()
     nolevels <- all(is.na(levels))
     if (show.ellipses==2 && nolevels){
-        colour <- rep('black',ns)
+        fill <- rep(ellipse.fill[1],ns)
+        stroke <- rep(ellipse.stroke[1],ns)
     } else {
-        colour <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.col,
+        fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
+                                    hide=hide,omit=omit,omit.col=omit.col)
+        stroke <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.stroke,
                                       hide=hide,omit=omit,omit.col=omit.col)
     }
     if (show.ellipses==0){ # points and or text
         if (missing(cex)) cex <- 1
-        if (missing(bg)) bg <- colour
-        plot_points(xy[,'X'],xy[,'Y'],bg=bg,cex=cex,
+        if (missing(bg)) bg <- fill
+        plot_points(xy[,'X'],xy[,'Y'],bg=bg,cex=cex,col=stroke,
                     show.numbers=show.numbers,hide=hide,omit=omit,...)
     } else if (show.ellipses==1){ # error ellipse
         if (missing(cex)) cex <- 0.25
@@ -155,7 +161,7 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
             if (!any(is.na(xy[i,]))){
                 covmat <- cor2cov2(xy[i,'sX'],xy[i,'sY'],xy[i,'rXY'])
                 ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=alpha)
-                graphics::polygon(ell,col=colour[i])
+                graphics::polygon(ell,col=fill[i],border=stroke[i])
                 if (show.numbers) graphics::text(xy[i,'X'],xy[i,'Y'],i)
                 else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=cex)
             }
@@ -164,24 +170,25 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
         if (missing(cex)) cex <- 0.5
         if (show.numbers)
             graphics::text(xy[plotit,'X'],xy[plotit,'Y'],
-                           sn[plotit],adj=c(0,1),col=colour)
+                           sn[plotit],adj=c(0,1),col=stroke)
         else
             graphics::points(xy[plotit,'X'],xy[plotit,'Y'],
-                             pch=19,cex=cex,col=colour)
+                             pch=21,cex=cex,col=stroke,bg=fill)
         fact <- stats::qnorm(1-alpha/2)
         dx <- fact*xy[plotit,'sX']
         dy <- fact*xy[plotit,'sY']
         graphics::arrows(xy[plotit,'X'],xy[plotit,'Y']-dy,
                          xy[plotit,'X'],xy[plotit,'Y']+dy,
                          code=3,angle=90,
-                         length=0.05,col=colour)
+                         length=0.05,col=stroke)
         graphics::arrows(xy[plotit,'X']-dx,xy[plotit,'Y'],
                          xy[plotit,'X']+dx,xy[plotit,'Y'],
                          code=3,angle=90,
-                         length=0.05,col=colour)
+                         length=0.05,col=stroke)
     }
     if (!nolevels & addcolourbar){
-        colourbar(z=levels[calcit],col=ellipse.col,clabel=clabel)
+        colourbar(z=levels[calcit],fill=ellipse.fill,
+                  stroke=ellipse.stroke,clabel=clabel)
     }
 }
 
