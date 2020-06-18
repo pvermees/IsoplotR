@@ -262,7 +262,8 @@ errorprop1x2 <- function(J1,J2,E11,E22,E12){
     sqrt(v)
 }
 errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){
-    v <- E11*J1^2 + E22*J2^2 + E33*J3^2 + 2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23
+    v <- E11*J1^2 + E22*J2^2 + E33*J3^2 +
+        2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23
     sqrt(v)
 }
 
