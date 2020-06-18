@@ -4,19 +4,36 @@
 \alias{scatterplot}
 \title{Create a scatter plot with error ellipses or crosses}
 \usage{
-scatterplot(xy, xlim = NA, ylim = NA, alpha = 0.05,
-  show.numbers = FALSE, show.ellipses = 1, levels = NA,
-  clabel = "", ellipse.col = c("#00FF0080", "#FF000080"),
-  fit = "none", add = FALSE, empty = FALSE, ci.col = "gray80",
-  line.col = "black", lwd = 1, hide = NULL, omit = NULL,
-  omit.col = NA, addcolourbar = TRUE, bg, cex, ...)
+scatterplot(
+  xy,
+  alpha = 0.05,
+  show.numbers = FALSE,
+  show.ellipses = 1,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  fit = "none",
+  add = FALSE,
+  empty = FALSE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  addcolourbar = TRUE,
+  bg,
+  cex,
+  xlim,
+  ylim,
+  xlab,
+  ylab,
+  ...
+)
 }
 \arguments{
 \item{xy}{matrix with columns \code{X, sX, Y, sY(, rXY)}}
-
-\item{xlim}{(optional) two-element vector with the x-axis limits}
-
-\item{ylim}{(optional) two-element vector with the y-axis limits}
 
 \item{alpha}{the probability cutoff for the error ellipses}
 
@@ -36,7 +53,7 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label for the colour scale}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
@@ -53,6 +70,10 @@ a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.
 
 For empty ellipses, set \code{ellipse.col=NA}}
+
+\item{ellipse.stroke}{the stroke colour for the error
+ellipses. Follows the same formatting guidelines as
+\code{ellipse.fill}}
 
 \item{fit}{the output of \code{york()} (optional).}
 
@@ -85,6 +106,14 @@ aliquots.}
 \code{show.ellipses=0}).}
 
 \item{cex}{plot symbol magnification.}
+
+\item{xlim}{(optional) two-element vector with the x-axis limits}
+
+\item{ylim}{(optional) two-element vector with the y-axis limits}
+
+\item{xlab}{(optional) x-axis label (only used when \code{add=FALSE})}
+
+\item{ylab}{(optional) y-axis label (only used when \code{add=FALSE})}
 
 \item{...}{optional arguments to format the points and text.}
 }

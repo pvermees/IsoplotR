@@ -372,7 +372,7 @@ wtw_helper <- function(x,covmat,cnames){
     err <- sqrt(diag(covmat))
     cormat <- 0*covmat
     pos <- which(diag(covmat)>0)
-    cormat[pos,pos] <- cov2cor(covmat[pos,pos])
+    cormat[pos,pos] <- stats::cov2cor(covmat[pos,pos])
     out[c(1,3)] <- x[1:2]
     out[c(2,4)] <- err[1:2]
     out['rhoXY'] <- cormat[1,2]

@@ -19,45 +19,125 @@
 \usage{
 peakfit(x, ...)
 
-\method{peakfit}{default}(x, k = "auto", sigdig = 2, log = TRUE,
-  alpha = 0.05, ...)
+\method{peakfit}{default}(x, k = "auto", sigdig = 2, log = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, alpha = 0.05, ...)
+\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{UPb}(x, k = 1, type = 4, cutoff.76 = 1100,
-  cutoff.disc = list(-15, 5, TRUE), common.Pb = 0, exterr = TRUE,
-  sigdig = 2, log = TRUE, alpha = 0.05, ...)
+\method{peakfit}{UPb}(
+  x,
+  k = 1,
+  type = 4,
+  cutoff.76 = 1100,
+  cutoff.disc = list(-15, 5, TRUE),
+  common.Pb = 0,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{PbPb}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, common.Pb = 0, alpha = 0.05, ...)
+\method{peakfit}{PbPb}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  common.Pb = 0,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{ArAr}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, i2i = FALSE, alpha = 0.05, ...)
+\method{peakfit}{ArAr}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = FALSE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{ThPb}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, i2i = FALSE, alpha = 0.05, ...)
+\method{peakfit}{ThPb}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = FALSE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{KCa}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, i2i = FALSE, alpha = 0.05, ...)
+\method{peakfit}{KCa}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = FALSE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{ReOs}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{ReOs}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = TRUE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{SmNd}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{SmNd}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = TRUE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{RbSr}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{RbSr}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = TRUE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{LuHf}(x, k = 1, exterr = TRUE, sigdig = 2,
-  log = TRUE, i2i = TRUE, alpha = 0.05, ...)
+\method{peakfit}{LuHf}(
+  x,
+  k = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = TRUE,
+  alpha = 0.05,
+  ...
+)
 
-\method{peakfit}{ThU}(x, k = 1, exterr = FALSE, sigdig = 2,
-  log = TRUE, i2i = TRUE, alpha = 0.05, detritus = 0, ...)
+\method{peakfit}{ThU}(
+  x,
+  k = 1,
+  exterr = FALSE,
+  sigdig = 2,
+  log = TRUE,
+  i2i = TRUE,
+  alpha = 0.05,
+  detritus = 0,
+  ...
+)
 
-\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE,
-  alpha = 0.05, ...)
+\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{either an \code{[nx2]} matrix with measurements and their

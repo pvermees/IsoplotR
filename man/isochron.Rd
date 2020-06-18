@@ -18,90 +18,282 @@
 \usage{
 isochron(x, ...)
 
-\method{isochron}{default}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, title = TRUE,
-  model = 1, show.ellipses = 1 * (model != 2), xlab = "x",
-  ylab = "y", hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{default}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  xlab = "x",
+  ylab = "y",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  title = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{UPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), type = 1,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = FALSE, model = 1, show.ellipses = 1 * (model != 2),
-  anchor = list(FALSE, NA), hide = NULL, omit = NULL,
-  omit.col = NA, ...)
+\method{isochron}{UPb}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  type = 1,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = FALSE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  anchor = list(FALSE, NA),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{PbPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  growth = FALSE, hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{PbPb}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  inverse = TRUE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  growth = FALSE,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{ArAr}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = TRUE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{ArAr}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  inverse = TRUE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{ThPb}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{ThPb}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  inverse = FALSE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{KCa}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{KCa}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  inverse = FALSE,
+  ci.col = "gray80",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{RbSr}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{RbSr}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  inverse = FALSE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{ReOs}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{ReOs}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  inverse = FALSE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{SmNd}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{SmNd}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  inverse = FALSE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{LuHf}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), inverse = FALSE,
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{LuHf}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  inverse = FALSE,
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{ThU}(x, type = 2, xlim = NA, ylim = NA,
-  alpha = 0.05, sigdig = 2, show.numbers = FALSE, levels = NA,
-  clabel = "", ellipse.col = c("#00FF0080", "#FF000080"),
-  ci.col = "gray80", line.col = "black", lwd = 1, plot = TRUE,
-  exterr = TRUE, model = 1, show.ellipses = 1 * (model != 2),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+\method{isochron}{ThU}(
+  x,
+  type = 2,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  exterr = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 
-\method{isochron}{UThHe}(x, xlim = NA, ylim = NA, alpha = 0.05,
-  sigdig = 2, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), ci.col = "gray80",
-  line.col = "black", lwd = 1, plot = TRUE, model = 1,
-  show.ellipses = 2 * (model != 2), hide = NULL, omit = NULL,
-  omit.col = "grey", ...)
+\method{isochron}{UThHe}(
+  x,
+  alpha = 0.05,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  model = 1,
+  show.ellipses = 2 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.col = "grey",
+  ...
+)
 }
 \arguments{
 \item{x}{EITHER a matrix with the following five columns:
@@ -125,10 +317,6 @@ an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
 \item{...}{optional arguments to be passed on to the generic plot
 function if \code{model=2}}
 
-\item{xlim}{2-element vector with the x-axis limits}
-
-\item{ylim}{2-element vector with the y-axis limits}
-
 \item{alpha}{confidence cutoff for the error ellipses and
 confidence intervals}
 
@@ -142,7 +330,11 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label for the colour scale}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+\item{xlab}{text label for the horizontal plot axis}
+
+\item{ylab}{text label for the vertical plot axis}
+
+\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
@@ -159,6 +351,10 @@ a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.
 
 For empty ellipses, set \code{ellipse.col=NA}}
+
+\item{ellipse.stroke}{the stroke colour for the error
+ellipses. Follows the same formatting guidelines as
+\code{ellipse.fill}}
 
 \item{ci.col}{the fill colour for the confidence interval of the
 intercept and slope.}
@@ -186,10 +382,6 @@ intercept and slope.}
 \code{2}: error ellipses
 
 \code{3}: error crosses}
-
-\item{xlab}{text label for the horizontal plot axis}
-
-\item{ylab}{text label for the vertical plot axis}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}

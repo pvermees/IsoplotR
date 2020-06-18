@@ -4,11 +4,27 @@
 \alias{helioplot}
 \title{Visualise U-Th-He data on a logratio plot or ternary diagram}
 \usage{
-helioplot(x, logratio = TRUE, model = 1, show.central.comp = TRUE,
-  show.numbers = FALSE, alpha = 0.05, contour.col = c("white",
-  "red"), levels = NA, clabel = "", ellipse.col = c("#00FF0080",
-  "#0000FF80"), sigdig = 2, xlim = NA, ylim = NA, fact = NA,
-  hide = NULL, omit = NULL, omit.col = NA, bg = ellipse.cols, ...)
+helioplot(
+  x,
+  logratio = TRUE,
+  model = 1,
+  show.central.comp = TRUE,
+  show.numbers = FALSE,
+  alpha = 0.05,
+  contour.col = c("white", "red"),
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#0000FF80"),
+  ellipse.stroke = "black",
+  sigdig = 2,
+  xlim = NA,
+  ylim = NA,
+  fact = NA,
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe}}
@@ -54,7 +70,7 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label of the colour scale}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
@@ -67,10 +83,13 @@ multiple colours: \code{c(rbg(1,0,0,0.5)},
 a colour palette: \code{rainbow(n=100)},
 \code{topo.colors(n=100,alpha=0.5)}, etc.; or
 
-a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
-etc.
+a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))}, etc.
 
-For empty ellipses, set \code{ellipse.col=NA}}
+For empty ellipses, set \code{ellipse.fill=NA}}
+
+\item{ellipse.stroke}{the stroke colour for the error
+ellipses. Follows the same formatting guidelines as
+\code{ellipse.fill}}
 
 \item{sigdig}{number of significant digits for the central age}
 
@@ -94,9 +113,6 @@ but omitted from the central age calculation.}
 
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
-
-\item{bg}{background colour for the plot symbols (only used if
-\code{model=2}).}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

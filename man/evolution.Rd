@@ -4,11 +4,28 @@
 \alias{evolution}
 \title{Th-U evolution diagram}
 \usage{
-evolution(x, xlim = NA, ylim = NA, alpha = 0.05, transform = FALSE,
-  detritus = 0, show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"), line.col = "darksalmon",
-  isochron = FALSE, model = 1, exterr = TRUE, sigdig = 2,
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+evolution(
+  x,
+  xlim = NA,
+  ylim = NA,
+  alpha = 0.05,
+  transform = FALSE,
+  detritus = 0,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  line.col = "darksalmon",
+  isochron = FALSE,
+  model = 1,
+  exterr = TRUE,
+  sigdig = 2,
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{ThU}}
@@ -45,7 +62,7 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label of the colour legend.}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
@@ -61,7 +78,11 @@ a colour palette: \code{rainbow(n=100)},
 a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.
 
-For empty ellipses, set \code{ellipse.col=NA}}
+For empty ellipses, set \code{ellipse.fill=NA}}
+
+\item{ellipse.stroke}{the stroke colour for the error
+ellipses. Follows the same formatting guidelines as
+\code{ellipse.fill}}
 
 \item{line.col}{colour of the age grid}
 

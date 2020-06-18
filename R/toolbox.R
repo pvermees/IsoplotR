@@ -322,9 +322,11 @@ validLevels <- function(levels){
     (all(is.numeric(levels)) & !any(is.na(levels)))
 }
 
-colourbar <- function(z=c(0,1),col=c("#00FF0080","#FF000080"),
-                      strip.width=0.02,clabel="",...){
+colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
+                      stroke='black',strip.width=0.02,clabel="",...){
     if (!validLevels(z)) return()
+    if (all(is.na(fill)) | length(unique(fill))==1) col <- stroke
+    else col <- fill
     ucoord <- graphics::par()$usr
     plotwidth <- (ucoord[2]-ucoord[1])
     plotheight <- (ucoord[4]-ucoord[3])

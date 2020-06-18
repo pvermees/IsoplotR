@@ -4,12 +4,28 @@
 \alias{concordia}
 \title{Concordia diagram}
 \usage{
-concordia(x = NULL, tlim = NULL, alpha = 0.05, type = 1,
-  show.numbers = FALSE, levels = NA, clabel = "",
-  ellipse.col = c("#00FF0080", "#FF000080"),
-  concordia.col = "darksalmon", exterr = FALSE, show.age = 0,
-  sigdig = 2, common.Pb = 0, ticks = 5, anchor = list(FALSE, NA),
-  hide = NULL, omit = NULL, omit.col = NA, ...)
+concordia(
+  x = NULL,
+  tlim = NULL,
+  alpha = 0.05,
+  type = 1,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  concordia.col = "darksalmon",
+  exterr = FALSE,
+  show.age = 0,
+  sigdig = 2,
+  common.Pb = 0,
+  ticks = 5,
+  anchor = list(FALSE, NA),
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -29,7 +45,7 @@ vs. \eqn{{}^{238}}U/\eqn{{}^{206}}Pb
 
 \code{3}: U-Th-Pb concordia -- \eqn{{}^{208}}Pb/\eqn{{}^{232}}Th
 vs. \eqn{{}^{206}}Pb/\eqn{{}^{238}}U (only available if
-\code{x$format=7})}
+\code{x$format=7} or \code{8})}
 
 \item{show.numbers}{logical flag (\code{TRUE} to show grain
 numbers)}
@@ -40,7 +56,7 @@ as different background colours within the error ellipses.}
 \item{clabel}{label for the colour legend (only used if
 \code{levels} is not \code{NA}).}
 
-\item{ellipse.col}{Fill colour for the error ellipses. This can either be a single
+\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
@@ -56,7 +72,11 @@ a colour palette: \code{rainbow(n=100)},
 a reversed palette: \code{rev(topo.colors(n=100,alpha=0.5))},
 etc.
 
-For empty ellipses, set \code{ellipse.col=NA}}
+For empty ellipses, set \code{ellipse.fill=NA}}
+
+\item{ellipse.stroke}{the stroke colour for the error
+ellipses. Follows the same formatting guidelines as
+\code{ellipse.fill}}
 
 \item{concordia.col}{colour of the concordia line}
 
@@ -99,7 +119,7 @@ concordia/discordia age}
 \code{settings('iratio','Pb207Pb204')} (if \code{3<x$format<7}); or
 
 \code{settings('iratio','Pb208Pb206')} and
-\code{settings('iratio','Pb208Pb207')} (if \code{x$format=7}).
+\code{settings('iratio','Pb208Pb207')} (if \code{x$format>6}).
 
 \code{2}: use the isochron intercept as the initial Pb-composition
 
@@ -241,8 +261,8 @@ internal consistency of U-Pb data. It sets out the measured
 \eqn{^{207}}Pb/\eqn{^{235}}U-ratios against each other (`Wetherill'
 diagram); or, equivalently, the \eqn{^{207}}Pb/\eqn{^{206}}Pb- and
 \eqn{^{206}}Pb/\eqn{^{238}}U-ratios (`Tera-Wasserburg'
-diagram). Alternatively, for data format 7, it is also possible to
-plot \eqn{^{208}}Pb/\eqn{^{232}}Th against the
+diagram). Alternatively, for data format 7 and 8, it is also
+possible to plot \eqn{^{208}}Pb/\eqn{^{232}}Th against the
 \eqn{^{206}}Pb/\eqn{^{238}}U.  The space of concordant isotopic
 compositions is marked by a curve, the `concordia line'. Isotopic
 ratio measurements are shown as 100(1-\code{alpha})\% confidence
