@@ -230,7 +230,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
-                           cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                           cutoff.76=1100,cutoff.disc=discfilter(),
                            show.numbers=FALSE,pch=21,sigdig=2,
                            levels=NA,clabel="",bg=c("yellow","red"),
                            col='black',markers=NULL,k=0,exterr=TRUE,
@@ -424,7 +424,7 @@ radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
                detritus=detritus,hide=hide,omit=omit,omit.col=omit.col,...)
 }
 age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
-                       type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                       type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                        show.numbers=FALSE,pch=21,levels=NA,sigdig=2,
                        clabel="",bg=c("yellow","red"),col='black',
                        markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
@@ -457,7 +457,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 }
 
 radial_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
-                          type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                          type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                           show.numbers=FALSE,pch=21,levels=NA,clabel="",
                           bg=c("yellow","red"),col='black',markers=NULL,
                           k=0,i2i=FALSE,alpha=0.05,units='MA',detritus=0,

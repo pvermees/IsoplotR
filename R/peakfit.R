@@ -188,7 +188,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #'
 #' @rdname peakfit
 #' @export
-peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                         common.Pb=0,exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    exterr=exterr,sigdig=sigdig,log=log,alpha=alpha,common.Pb=common.Pb,...)
@@ -283,7 +283,7 @@ peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2, log=TRUE,
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,sigdig=sigdig,log=log,alpha=alpha,...)
 }
-peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                            exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
                            common.Pb=0,alpha=0.05,detritus=0,...){
     if (k<1) return(NULL)
@@ -517,7 +517,7 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
     list(peaks=peaks,peaks.err=peaks.err)
 }
 
-BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                     exterr=TRUE,detritus=0,common.Pb=0,...){
     n <- length(x)
     BIC <- Inf

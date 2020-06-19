@@ -192,7 +192,7 @@ kde.UPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,pch='|',xlab="age [Ma]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                     show.hist=TRUE, bty='n',binwidth=NA,type=4,
-                    cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                    cutoff.76=1100,cutoff.disc=discfilter(),
                     common.Pb=0,hide=NULL,...){
     tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                           cutoff.disc=cutoff.disc,common.Pb=common.Pb)[,1]
