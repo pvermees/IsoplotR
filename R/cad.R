@@ -89,22 +89,25 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U-age and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc discordance cutoff filter. This is a three
-#'     element list.
+#' @param cutoff.disc discordance cutoff filter. This is an object of
+#'     class \code{discfilter}, i.e. a three element list containing:
 #'
-#' The first two items contain the minimum (negative) and maximum
-#' (positive) percentage discordance allowed between the
-#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+#' \code{option}: one of \code{'t'} (absolute age filter), \code{'r'}
+#' (relative age filter), \code{'sk'} (Stacey-Kramers common Pb
+#' filter), \code{'a'} (perpendicular Aitcison distance) and
+#' \code{'c'} (concordia distance). For further details about these
+#' filters, see the paper by Vermeesch (2020).
 #'
-#' The third item is a boolean flag that controls whether the
-#' discordance filter should be applied before (\code{TRUE}) or after
+#' \code{before}: logical flag indicating whether the discordance
+#' filter should be applied before (\code{TRUE}) or after
 #' (\code{FALSE}) the common-Pb correction.
 #'
-#' Set \code{cutoff.disc=NA} to turn off this filter.
-#' 
+#' \code{cutoff}: a two-element vector with the minimum (negative) and
+#' maximum (positive) allowed discordance. Default values vary between
+#' the different options. To view them, enter \code{discfilter()} at
+#' the \code{R} command line.
+#'
+#' Set \code{cutoff.disc=NA} to turn off the filter. 
 #' @param common.Pb common lead correction:
 #'
 #' \code{0}: none
@@ -125,9 +128,12 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' 
 #' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{3}: use the Stacey-Kramers two-stage model to infer the initial
-#' Pb-composition (only applicable if \code{x} has class \code{UPb})
-#'
+#' \code{3}: use the Stacey-Kramers two-stage model to infer the
+#' initial Pb-composition (only applicable if \code{x} has class
+#' \code{UPb})
+#' @references Vermeesch (2020) ``On the treatment of discordant data
+#'     in detrital zircon U--Pb geochronology'', 
+#'     https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 #' @rdname cad
 #' @export
 cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',

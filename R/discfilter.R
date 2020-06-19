@@ -11,6 +11,7 @@ discfilter <- function(option='c',before=TRUE,cutoff){
         else stop('Invalid discordance filter option.')
     }
     out$cutoff <- cutoff
+    class(out) <- 'discfilter'
     out
 }
 
