@@ -1000,7 +1000,7 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,
     if (common.Pb>0) X <- Pb0corr(x,option=common.Pb)
     else X <- x
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
-    hasTh <- x$format>6
+    hasTh <- (x$format>6)
     if (hasTh) labels <- c(labels,'t.82','s[t.82]')
     if (conc) labels <- c(labels,'t.conc','s[t.conc]')
     tlabels <- labels
@@ -1027,13 +1027,19 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,
             out <- c(out,t.conc.out)
         }
         if (discordance%in%c(0,'t',1,'r',2,'sk',3,'a',4,'c')){
-            tt <- matrix(out,nrow=1)
-            colnames(tt) <- tlabels
+            tt <- c(t.75[1],t.68[1],t.76[1])
+            tlabels <- c('t.75','t.68','t.76')
+            if (discordance%in%c(2,4)){
+                tt <- c(tt,t.conc$age[1])
+                tlabels <- c(tlabels,'t.conc')
+            }
+            ttt <- matrix(tt,nrow=1)
+            colnames(ttt) <- tlabels
             j <- ((1:length(x))%in%i)
             x <- subset(x,subset=j)
             X <- subset(X,subset=j)
-            dif <- discordance(x=x,X=X,tt=tt,option=discordance)
-            out <- c(out,dif)
+            dif <- discordance(x=x,X=X,tt=ttt,option=discordance)
+            out <- c(out,signif(dif,digits=sigdig))
         }
         if (discordance%in%c(5,'p')){
             SS.concordance <-
@@ -1046,7 +1052,7 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,
         names(out) <- labels
     } else {
         nn <- nrow(X$x)
-        out <- matrix(0,nn,length(labels))
+        out <- matrix(0,nrow=nn,ncol=length(labels))
         for (i in 1:nn){
             out[i,] <- UPb.age(X,i=i,exterr=exterr,sigdig=sigdig,
                                conc=conc,discordance=discordance)
