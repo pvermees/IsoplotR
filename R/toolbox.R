@@ -25,19 +25,28 @@ length.fissiontracks <- function(x){
 }
 
 #' @export
-subset.UPb  <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.UPb  <- function(x,...){
+    out <- x
+    out$x <- subset(x$x,...)
+    if ('x.raw' %in% names(x)){
+        out$x.raw <- subset(x$x.raw,...)
+    }
+    out$d$Q <- subset(x$Q,...)
+    out$d$Qinv <- subset(x$Qinv,...)
+    out
+}
 #' @export
-subset.PbPb <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.PbPb <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ArAr <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.ThPb <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ThPb <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.KCa <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.KCa <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.PD <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.PD <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ThU <- function(x,...){ subset_helper(x,...) }
 #' @export
 subset.detritals <- function(x,subset,...){
     out <- x[subset]
@@ -45,27 +54,27 @@ subset.detritals <- function(x,subset,...){
     out
 }
 #' @export
-subset.UThHe <- function(x,subset,...){
-    out <- x[subset,,drop=FALSE]
+subset.UThHe <- function(x,...){
+    out <- subset(x,...)
     class(out) <- class(x)
     out
 }
 #' @export
-subset.fissiontracks <- function(x,subset,...){
+subset.fissiontracks <- function(x,...){
     if (x$format==1){
-        out <- subset_helper(x,subset,...)
+        out <- subset_helper(x,...)
     } else {
         out <- x
-        out$Ns <- x$Ns[subset]
-        out$A <- x$A[subset]
-        out$U <- x$U[subset]
-        out$sU <- x$sU[subset]
+        out$Ns <- subset(x$Ns,...)
+        out$A <- subset(x$A,...)
+        out$U <- subset(x$U,...)
+        out$sU <- subset(x$sU,...)
     }
     out
 }
-subset_helper <- function(x,subset){
+subset_helper <- function(x,...){
     out <- x
-    out$x <- subset(x$x,subset=subset)
+    out$x <- subset(x$x,...)
     out
 }
 
