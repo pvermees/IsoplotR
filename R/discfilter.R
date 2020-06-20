@@ -5,7 +5,7 @@ discfilter <- function(option='c',before=TRUE,cutoff){
     if (missing(cutoff)){
         if (option%in%c(0,'t')) cutoff <- c(-5,50)
         else if (option%in%c(1,'r')) cutoff <- c(-5,15)
-        else if (option%in%c(2,'sk')) cutoff <- c(-0.001,0.01)
+        else if (option%in%c(2,'sk')) cutoff <- c(-0.01,0.1)
         else if (option%in%c(3,'a')) cutoff <- c(-1,5)
         else if (option%in%c(4,'c')) cutoff <- c(-1,5)
         else stop('Invalid discordance filter option.')
@@ -33,8 +33,9 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
         } else if (cutoff.disc$option%in%c(1,'r')){
             dif <- (1-tt[,'t.68']/tt[,'t.76'])*100
         } else if (cutoff.disc$option%in%c(2,'sk')){
+            x.corr <- Pb0corr(x,option=3)
             U8Pb6.raw <- get.U238Pb206.ratios(x)[,'U238Pb206']
-            U8Pb6.corr <- get.U238Pb206.ratios(X)[,'U238Pb206']
+            U8Pb6.corr <- get.U238Pb206.ratios(x.corr)[,'U238Pb206']
             dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
         } else if (cutoff.disc$option%in%c(3,'a')){
             X1 <- age_to_U238Pb206_ratio(tt[,'t.76'])[,1]
