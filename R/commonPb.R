@@ -142,7 +142,7 @@ Pb0corr <- function(x,option=3,omit=NULL){
     } else if (option == 3){
         x.corr <- common.Pb.stacey.kramers(x)
     } else {
-        return
+        return(out)
     }
     if (x$format==1){
         out$x <- tw2w(x.corr,format=2)

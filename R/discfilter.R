@@ -59,7 +59,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
     out
 }
 
-# x: raw data, X: common Pb corrected data (if relevant)
+# x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
     if (option%in%c(0,'t')){
         dif <- tt[,'t.76']-tt[,'t.68']
