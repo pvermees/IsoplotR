@@ -230,14 +230,11 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @export
 age.UPb <- function(x,type=1,exterr=TRUE,i=NA,
                     sigdig=NA,common.Pb=0,discordance=0,...){
-    if (common.Pb %in% c(1,2,3)){
-        X <- Pb0corr(x,option=common.Pb)
-    } else {
-        X <- x
-    }
     if (type==1){
-        out <- UPb.age(X,exterr=exterr,i=i,sigdig=sigdig,discordance=discordance,...)
+        out <- UPb.age(x,exterr=exterr,i=i,sigdig=sigdig,
+                       discordance=discordance,common.Pb=common.Pb,...)
     } else if (type==2){
+        X <- Pb0corr(x,option=common.Pb)
         out <- concordia.age(X,wetherill=TRUE,exterr=exterr)
     } else if (type %in% c(3,4,5)){
         out <- concordia.intersection.ludwig(x,wetherill=FALSE,exterr=exterr,model=type-2)
