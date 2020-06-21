@@ -79,17 +79,22 @@ subset_helper <- function(x,...){
 }
 
 roundit <- function(age,err,sigdig=2){
-    if (length(age)==1) dat <- c(age,err)
-    else dat <- cbind(age,err)
-    min.err <- min(abs(dat),na.rm=TRUE)
-    if (is.na(sigdig)) {
-        out <- dat
-    } else if (any(dat<=0, na.rm=TRUE)){
-        out <- signif(dat,sigdig)
+    if (missing(err)){
+        if (is.na(sigdig)) out <- age
+        else out <- signif(age,digits=sigdig)
     } else {
-        nsmall <- min(20,max(0,-(trunc(log10(min.err))-sigdig)))
-        out <- format(dat,digits=sigdig,nsmall=nsmall,
-                      trim=TRUE,scientific=FALSE)
+        if (length(age)==1) dat <- c(age,err)
+        else dat <- cbind(age,err)
+        min.err <- min(abs(dat),na.rm=TRUE)
+        if (is.na(sigdig)) {
+            out <- dat
+        } else if (any(dat<=0, na.rm=TRUE)){
+            out <- signif(dat,sigdig)
+        } else {
+            nsmall <- min(20,max(0,-(trunc(log10(min.err))-sigdig)))
+            out <- format(dat,digits=sigdig,nsmall=nsmall,
+                          trim=TRUE,scientific=FALSE)
+        }
     }
     out
 }

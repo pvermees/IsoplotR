@@ -8,7 +8,7 @@ discfilter <- function(option='c',before=TRUE,cutoff){
         else if (option%in%c(2,'sk')) cutoff <- c(-0.01,0.1)
         else if (option%in%c(3,'a')) cutoff <- c(-1,5)
         else if (option%in%c(4,'c')) cutoff <- c(-1,5)
-        else stop('Invalid discordance filter option.')
+        else cutoff <- c(-Inf,Inf)
     }
     out$cutoff <- cutoff
     class(out) <- 'discfilter'
@@ -17,20 +17,14 @@ discfilter <- function(option='c',before=TRUE,cutoff){
 
 filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                             cutoff.disc=discfilter(),common.Pb=0){
-    if (is.null(cutoff.disc)){
+    if (is.na(cutoff.disc$option)){
         is.concordant <- rep(TRUE,length(x))
     } else {
         conc <- (type==5) | (cutoff.disc$option=='c')
-        if (cutoff.disc$before | common.Pb==0){
-            X <- x
-            tt <- UPb.age(X,exterr=exterr,conc=conc,
-                          discordance=cutoff.disc$option)
-        } else {
-            X <- Pb0corr(x,option=common.Pb)
-            tt <- UPb.age(X,exterr=exterr,conc=conc,
-                          common.Pb=common.Pb,discordance=cutoff.disc$option)
-        }
-        is.concordant <- (tt[,'disc']>cutoff.disc$cutoff[1]) & (tt[,'disc']<cutoff.disc$cutoff[2])
+        tt <- UPb.age(x,exterr=exterr,conc=conc,
+                      common.Pb=common.Pb,discordance=cutoff.disc)
+        is.concordant <- (tt[,'disc']>cutoff.disc$cutoff[1]) &
+                         (tt[,'disc']<cutoff.disc$cutoff[2])
     }
     if (!any(is.concordant)){
         stop(paste0('There are no concordant grains in this sample.',
@@ -41,7 +35,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                     'common-Pb correction.'))
     }
     if (!cutoff.disc$before & common.Pb!=0){
-        tt <- UPb.age(X,exterr=exterr,conc=conc,common.Pb=common.Pb)
+        tt <- UPb.age(x,exterr=exterr,conc=conc,common.Pb=common.Pb)
     }
     out <- matrix(NA,length(x),2)
     if (type==1){
@@ -65,6 +59,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
     out
 }
 
+# x: raw data, X: common Pb corrected data (if relevant)
 discordance <- function(x,X,tt=NULL,option=4){
     if (option%in%c(0,'t')){
         dif <- tt[,'t.76']-tt[,'t.68']
