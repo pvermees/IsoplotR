@@ -547,62 +547,82 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
 }
 
 # Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
-min_age_model <- function(zs,alpha=0.05){
-    z <- zs[,1]
-    mu <- seq(min(z),max(z),length.out=100)
-    sigma <- seq(stats::sd(z)/10,2*stats::sd(z),length.out=10)
-    prop <- seq(from=0,to=1,length.out=20)
-    L <- Inf
-    # grid search!
-    for (mui in mu){ # mu
-        for (sigmai in sigma){ # sigma
-            for (propi in prop){ # pi
-                pars <- c(mui,sigmai,propi)
-                newL <- get.minage.L(pars,zs)
-                if (newL < L) {
-                    L <- newL
-                    fit <- pars
-                }
-            }
-        }
+# np = number of parameters (must be 3 or 4)
+min_age_model <- function(zs,alpha=0.05,np=4){
+    # 1. set search limits
+    imin <- which.min(zs[,1])
+    mg <- zs[imin,1]
+    Mg <- min(mg + 10*zs[imin,2], max(zs[,1]))
+    mp <- 0
+    Mp <- 1
+    cfit <- continuous_mixture(zs[,1],zs[,2])
+    ms <- cfit$sigma/10
+    Ms <- diff(range(zs[,1]))
+    MM <- max(zs[,1])
+    m <- c(mg,mp,ms)
+    M <- c(Mg,Mp,Ms,MM)
+    LL <- function(par,zs,m,M){
+        g <- jeffreys(par[1],m[1],M[1])
+        p <- jeffreys(par[2],m[2],M[2])
+        s <- jeffreys(par[3],m[3],M[3])
+        if (length(par)>3)
+            m <- jeffreys(par[4],g,M[4])
+        else
+            m <- g
+        get.minage.L(pars=c(g,p,s,m),zs=zs)
     }
-    H <- stats::optimHess(fit,get.minage.L,zs=zs)
-    E <- solve(H)
+    fit <- optim(rep(0,np),LL,method='BFGS',zs=zs,m=m,M=M)
+    jpar <- fit$par # Jeffreys parameters!
+    H <- stats::optimHess(jpar,LL,zs=zs,m=m,M=M)
+    jE <- solve(H)
+    par <- rep(0,np)
+    par[1] <- jeffreys(jpar[1],m[1],M[1])
+    par[2] <- jeffreys(jpar[2],m[2],M[2])
+    par[3] <- jeffreys(jpar[3],m[3],M[3])
+    J <- matrix(0,np,np)
+    J[1,1] <- jeffreys(jpar[1],m[1],M[1],deriv=TRUE)
+    J[2,2] <- jeffreys(jpar[2],m[2],M[2],deriv=TRUE)
+    J[3,3] <- jeffreys(jpar[3],m[3],M[3],deriv=TRUE)
+    if (np==4) {
+        par[4] <- jeffreys(jpar[4],par[1],M[4])
+        J[4,4] <- jeffreys(jpar[4],par[1],M[4],deriv=TRUE)
+    }
+    else stop('incorrect number of parameters')
+    E <- J %*% jE %*% t(J)
     out <- list()
-    out$L <- L
+    out$L <- fit$value
     out$peaks <- matrix(0,3,1)
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
-    out$peaks['t',] <- fit[1]
+    out$peaks['t',] <- par[1]
     out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
     out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
     out$disp <- matrix(0,2,1)
     rownames(out$disp) <- c('d','s[d]')
-    out$disp['d',] <- fit[2]
+    out$disp['d',] <- par[2]
     out$disp['s[d]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
     out$props <- matrix(0,2,1)
     rownames(out$props) <- c('p','s[p]')
-    out$props['p',] <- fit[3]
+    out$props['p',] <- par[3]
     out$props['s[p]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
     out
 }
 
+# Section 6.11 of Galbraith (2005)
 get.minage.L <- function(pars,zs){
     z <- zs[,1]
     s <- zs[,2]
-    mu <- pars[1]
-    sigma <- pars[2]
-    prop <- pars[3]
+    gam <- pars[1]
+    prop <- pars[2]
+    sig <- pars[3]
+    mu <- pars[4]
     AA  <- prop/sqrt(2*pi*s^2)
-    BB <- -0.5*((z-mu)/s)^2
-    CC <- (1-prop)/sqrt(2*pi*(sigma^2+s^2))
-    mu0 <- (mu/sigma^2 + z/s^2)/(1/sigma^2 + 1/s^2)
-    s0 <- 1/sqrt(1/sigma^2 + 1/s^2)
-    DD <- 2*(1-stats::pnorm((mu-mu0)/s0))
-    EE <- -0.5*((z-mu)^2)/(sigma^2+s^2)
-    minexp <- .Machine$double.min.exp*log(.Machine$double.base)
-    maxexp <- .Machine$double.max.exp*log(.Machine$double.base)
-    fin <- (BB>minexp) & (BB<maxexp) & (EE>minexp) & (EE<maxexp) # finite
-    logfu <- z*0
-    logfu[fin] <- log(AA[fin]*exp(BB[fin]) + CC[fin]*DD[fin]*exp(EE[fin]))
-    -sum(logfu)
+    BB <- -0.5*((z-gam)/s)^2
+    CC <- (1-prop)/sqrt(2*pi*(sig^2+s^2))
+    mu0 <- (mu/sig^2 + z/s^2)/(1/sig^2 + 1/s^2)
+    s0 <- 1/sqrt(1/sig^2 + 1/s^2)
+    DD <- 1-stats::pnorm((gam-mu0)/s0)
+    EE <- 1-stats::pnorm((gam-mu)/s)
+    FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
+    fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
+    sum(-log(fu))
 }
