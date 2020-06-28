@@ -553,35 +553,26 @@ min_age_model <- function(zs,alpha=0.05,np=4){
     mz <- zs[imin,1]
     Mz <- max(zs[,1])
     cfit <- continuous_mixture(zs[,1],zs[,2])
-    ms <- cfit$sigma/10
+    ms <- cfit$sigma/5
     Ms <- diff(range(zs[,1]))
-    LL <- function(par,zs,mz,Mz,ms,Ms){
-        gam <- (mz+Mz*exp(par[1]))/(1+exp(par[1]))
-        prop <- jeffreys(par[2],m=0,M=1)
-        sig <- jeffreys(par[3],m=ms,M=Ms)
-        mu <- (gam+(Mz-mz+gam)*exp(par[4]))/(1+exp(par[4]))
+    LL <- function(par,zs,Mz){
+        gam <- par[1]
+        prop <- par[2]
+        sig <- par[3]
+        mu <- gam + (Mz-gam)*par[4]
         get.minage.L(pars=c(gam,prop,sig,mu),zs=zs)
     }
     dz <- min(10*zs[imin,2],Mz-mz)
-    Mg <- log(dz) - log(Mz-mz-dz)
-    fit <- optim(rep(0,np),LL,method='L-BFGS-B',zs=zs,
-                 mz=mz,Mz=Mz,ms=ms,Ms=Ms,
-                 lower=c(-10,-10,ms,-10),
-                 upper=c(Mg,10,Ms,10))
+    fit <- optim(rep(0,np),LL,method='L-BFGS-B',zs=zs,Mz=Mz,
+                 lower=c(mz,0.01,ms,0),upper=c(mz+dz,0.99,Ms,1))
     jpar <- fit$par # Jeffreys parameters!
-    H <- stats::optimHess(jpar,LL,zs=zs,mz=mz,Mz=Mz,ms=ms,Ms=Ms)
+    H <- stats::optimHess(jpar,LL,zs=zs,Mz=Mz)
     jE <- solve(H)
-    par <- rep(0,np)
-    par[1] <- (mz+Mz*exp(jpar[1]))/(1+exp(jpar[1]))
-    par[2] <- jeffreys(jpar[2],0,1)
-    par[3] <- jeffreys(jpar[3],ms,Ms)
-    par[4] <- (par[1]+(Mz-mz+par[1])*exp(jpar[4]))/(1+exp(jpar[4]))
-    J <- matrix(0,np,np)
-    J[1,1] <- exp(jpar[1])*(Mz-mz)/(1+exp(jpar[1]))^2
-    J[2,2] <- jeffreys(jpar[2],0,1,deriv=TRUE)
-    J[3,3] <- jeffreys(jpar[3],ms,Ms,deriv=TRUE)
-    J[4,1] <- J[1,1]
-    J[4,4] <- exp(jpar[4])*(Mz-mz)/(1+exp(jpar[4]))^2
+    par <- jpar
+    par[4] <- jpar[1] + (Mz-jpar[1])*jpar[4]
+    J <- diag(np)
+    J[4,1] <- 1-jpar[4]
+    J[4,4] <- Mz-jpar[1]
     E <- J %*% jE %*% t(J)
     out <- list()
     out$L <- fit$value
@@ -590,14 +581,19 @@ min_age_model <- function(zs,alpha=0.05,np=4){
     out$peaks['t',] <- par[1]
     out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
     out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
-    out$disp <- matrix(0,2,1)
-    rownames(out$disp) <- c('d','s[d]')
-    out$disp['d',] <- par[2]
-    out$disp['s[d]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
     out$props <- matrix(0,2,1)
     rownames(out$props) <- c('p','s[p]')
-    out$props['p',] <- par[3]
-    out$props['s[p]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
+    out$props['p',] <- par[2]
+    out$props['s[p]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
+    out$disp <- matrix(0,2,1)
+    rownames(out$disp) <- c('d','s[d]')
+    out$disp['d',] <- par[3]
+    out$disp['s[d]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
+    out$mu <- matrix(0,3,1)
+    rownames(out$mu) <- c('t','s[t]','ci[t]')
+    out$mu['t',] <- par[4]
+    out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
+    out$mu['ci[t]',] <- nfact(alpha)*out$mu['s[t]',]
     out
 }
 
@@ -619,21 +615,4 @@ get.minage.L <- function(pars,zs){
     FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
     fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
     sum(-log(fu))
-}
-
-jeffreys <- function(x,m,M,inverse=TRUE,deriv=FALSE){
-    if (inverse){
-        if (deriv){
-            out <- (M-m)*exp(x)/(1+exp(x))^2
-        } else {
-            out <- m + (M-m)*exp(x)/(1+exp(x))
-        }
-    } else {
-        if (deriv){
-            out <- 1/(x-m)
-        } else {
-            out <- log(x-m) - log(M-m)
-        }        
-    }
-    out
 }
