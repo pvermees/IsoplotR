@@ -549,45 +549,39 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
 # Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
 # np = number of parameters (must be 3 or 4)
 min_age_model <- function(zs,alpha=0.05,np=4){
-    # 1. set search limits
     imin <- which.min(zs[,1])
-    mg <- zs[imin,1]
-    Mg <- min(mg + 10*zs[imin,2], max(zs[,1]))
-    mp <- 0
-    Mp <- 1
+    mz <- zs[imin,1]
+    Mz <- max(zs[,1])
     cfit <- continuous_mixture(zs[,1],zs[,2])
     ms <- cfit$sigma/10
     Ms <- diff(range(zs[,1]))
-    MM <- max(zs[,1])
-    m <- c(mg,mp,ms)
-    M <- c(Mg,Mp,Ms,MM)
-    LL <- function(par,zs,m,M){
-        g <- jeffreys(par[1],m[1],M[1])
-        p <- jeffreys(par[2],m[2],M[2])
-        s <- jeffreys(par[3],m[3],M[3])
-        if (length(par)>3)
-            m <- jeffreys(par[4],g,M[4])
-        else
-            m <- g
-        get.minage.L(pars=c(g,p,s,m),zs=zs)
+    LL <- function(par,zs,mz,Mz,ms,Ms){
+        gam <- (mz+Mz*exp(par[1]))/(1+exp(par[1]))
+        prop <- jeffreys(par[2],m=0,M=1)
+        sig <- jeffreys(par[3],m=ms,M=Ms)
+        mu <- (gam+(Mz-mz+gam)*exp(par[4]))/(1+exp(par[4]))
+        get.minage.L(pars=c(gam,prop,sig,mu),zs=zs)
     }
-    fit <- optim(rep(0,np),LL,method='BFGS',zs=zs,m=m,M=M)
+    dz <- min(10*zs[imin,2],Mz-mz)
+    Mg <- log(dz) - log(Mz-mz-dz)
+    fit <- optim(rep(0,np),LL,method='L-BFGS-B',zs=zs,
+                 mz=mz,Mz=Mz,ms=ms,Ms=Ms,
+                 lower=c(-10,-10,ms,-10),
+                 upper=c(Mg,10,Ms,10))
     jpar <- fit$par # Jeffreys parameters!
-    H <- stats::optimHess(jpar,LL,zs=zs,m=m,M=M)
+    H <- stats::optimHess(jpar,LL,zs=zs,mz=mz,Mz=Mz,ms=ms,Ms=Ms)
     jE <- solve(H)
     par <- rep(0,np)
-    par[1] <- jeffreys(jpar[1],m[1],M[1])
-    par[2] <- jeffreys(jpar[2],m[2],M[2])
-    par[3] <- jeffreys(jpar[3],m[3],M[3])
+    par[1] <- (mz+Mz*exp(jpar[1]))/(1+exp(jpar[1]))
+    par[2] <- jeffreys(jpar[2],0,1)
+    par[3] <- jeffreys(jpar[3],ms,Ms)
+    par[4] <- (par[1]+(Mz-mz+par[1])*exp(jpar[4]))/(1+exp(jpar[4]))
     J <- matrix(0,np,np)
-    J[1,1] <- jeffreys(jpar[1],m[1],M[1],deriv=TRUE)
-    J[2,2] <- jeffreys(jpar[2],m[2],M[2],deriv=TRUE)
-    J[3,3] <- jeffreys(jpar[3],m[3],M[3],deriv=TRUE)
-    if (np==4) {
-        par[4] <- jeffreys(jpar[4],par[1],M[4])
-        J[4,4] <- jeffreys(jpar[4],par[1],M[4],deriv=TRUE)
-    }
-    else stop('incorrect number of parameters')
+    J[1,1] <- exp(jpar[1])*(Mz-mz)/(1+exp(jpar[1]))^2
+    J[2,2] <- jeffreys(jpar[2],0,1,deriv=TRUE)
+    J[3,3] <- jeffreys(jpar[3],ms,Ms,deriv=TRUE)
+    J[4,1] <- J[1,1]
+    J[4,4] <- exp(jpar[4])*(Mz-mz)/(1+exp(jpar[4]))^2
     E <- J %*% jE %*% t(J)
     out <- list()
     out$L <- fit$value
@@ -625,4 +619,21 @@ get.minage.L <- function(pars,zs){
     FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
     fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
     sum(-log(fu))
+}
+
+jeffreys <- function(x,m,M,inverse=TRUE,deriv=FALSE){
+    if (inverse){
+        if (deriv){
+            out <- (M-m)*exp(x)/(1+exp(x))^2
+        } else {
+            out <- m + (M-m)*exp(x)/(1+exp(x))
+        }
+    } else {
+        if (deriv){
+            out <- 1/(x-m)
+        } else {
+            out <- log(x-m) - log(M-m)
+        }        
+    }
+    out
 }

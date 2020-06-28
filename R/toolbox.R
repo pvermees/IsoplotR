@@ -519,12 +519,3 @@ geomean.default <- function(x,...){
 trace <- function(x){
     sum(diag(x))
 }
-
-jeffreys <- function(x,m,M,deriv=FALSE){
-    if (deriv){
-        out <- (M-m)*exp(x)/(1+exp(x))^2
-    } else {
-        out <- m + (M-m)*exp(x)/(1+exp(x))
-    }
-    out
-}
