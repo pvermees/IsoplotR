@@ -547,7 +547,6 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
 }
 
 # Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
-# np = number of parameters (must be 3 or 4)
 min_age_model <- function(zs,alpha=0.05,np=4){
     imin <- which.min(zs[,1])
     mz <- zs[imin,1]
@@ -559,7 +558,8 @@ min_age_model <- function(zs,alpha=0.05,np=4){
         gam <- par[1]
         prop <- par[2]
         sig <- par[3]
-        mu <- gam + (Mz-gam)*par[4]
+        if (length(par)<4) mu <- gam
+        else mu <- gam + (Mz-gam)*par[4]
         get.minage.L(pars=c(gam,prop,sig,mu),zs=zs)
     }
     dz <- min(10*zs[imin,2],Mz-mz)
@@ -569,31 +569,39 @@ min_age_model <- function(zs,alpha=0.05,np=4){
     H <- stats::optimHess(jpar,LL,zs=zs,Mz=Mz)
     jE <- solve(H)
     par <- jpar
-    par[4] <- jpar[1] + (Mz-jpar[1])*jpar[4]
     J <- diag(np)
-    J[4,1] <- 1-jpar[4]
-    J[4,4] <- Mz-jpar[1]
+    if (np==4){
+        par[4] <- jpar[1] + (Mz-jpar[1])*jpar[4]
+        J[4,1] <- 1-jpar[4]
+        J[4,4] <- Mz-jpar[1]
+    }
     E <- J %*% jE %*% t(J)
-    out <- list()
-    out$L <- fit$value
-    out$peaks <- matrix(0,3,1)
-    rownames(out$peaks) <- c('t','s[t]','ci[t]')
-    out$peaks['t',] <- par[1]
-    out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
-    out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
-    out$props <- matrix(0,2,1)
-    rownames(out$props) <- c('p','s[p]')
-    out$props['p',] <- par[2]
-    out$props['s[p]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
-    out$disp <- matrix(0,2,1)
-    rownames(out$disp) <- c('d','s[d]')
-    out$disp['d',] <- par[3]
-    out$disp['s[d]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
-    out$mu <- matrix(0,3,1)
-    rownames(out$mu) <- c('t','s[t]','ci[t]')
-    out$mu['t',] <- par[4]
-    out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
-    out$mu['ci[t]',] <- nfact(alpha)*out$mu['s[t]',]
+    if (E[1,1]<0 & np==4){
+        out <- min_age_model(zs=zs,alpha=alpha,np=3)
+    } else {
+        out <- list()
+        out$L <- fit$value
+        out$peaks <- matrix(0,3,1)
+        rownames(out$peaks) <- c('t','s[t]','ci[t]')
+        out$peaks['t',] <- par[1]
+        out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
+        out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
+        out$props <- matrix(0,2,1)
+        rownames(out$props) <- c('p','s[p]')
+        out$props['p',] <- par[2]
+        out$props['s[p]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
+        out$disp <- matrix(0,2,1)
+        rownames(out$disp) <- c('d','s[d]')
+        out$disp['d',] <- par[3]
+        out$disp['s[d]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
+        if (np==4){
+            out$mu <- matrix(0,3,1)
+            rownames(out$mu) <- c('t','s[t]','ci[t]')
+            out$mu['t',] <- par[4]
+            out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
+            out$mu['ci[t]',] <- nfact(alpha)*out$mu['s[t]',]
+        }
+    }
     out
 }
 
