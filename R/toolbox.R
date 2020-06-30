@@ -31,8 +31,6 @@ subset.UPb  <- function(x,...){
     if ('x.raw' %in% names(x)){
         out$x.raw <- subset(x$x.raw,...)
     }
-    out$d$Q <- subset(x$Q,...)
-    out$d$Qinv <- subset(x$Qinv,...)
     out
 }
 #' @export

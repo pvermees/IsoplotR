@@ -60,7 +60,7 @@ kde(x, ...)
   binwidth = NA,
   type = 4,
   cutoff.76 = 1100,
-  cutoff.disc = list(-15, 5, TRUE),
+  cutoff.disc = discfilter(),
   common.Pb = 0,
   hide = NULL,
   ...
@@ -401,21 +401,25 @@ from the plot.}
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 only used if \code{type=4}.}
 
-\item{cutoff.disc}{discordance cutoff filter. This is a three
-    element list.
+\item{cutoff.disc}{discordance cutoff filter. This is an object of
+    class \code{discfilter}, i.e. a three element list containing:
 
-The first two items contain the minimum (negative) and maximum
-(positive) percentage discordance allowed between the
-\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-(if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-\eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-(if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
+\code{option}: one of \code{'t'} (absolute age filter), \code{'r'}
+(relative age filter), \code{'sk'} (Stacey-Kramers common Pb
+filter), \code{'a'} (perpendicular Aitcison distance) and
+\code{'c'} (concordia distance). For further details about these
+filters, see the paper by Vermeesch (2020).
 
-The third item is a boolean flag that controls whether the
-discordance filter should be applied before (\code{TRUE}) or after
+\code{before}: logical flag indicating whether the discordance
+filter should be applied before (\code{TRUE}) or after
 (\code{FALSE}) the common-Pb correction.
 
-Set \code{cutoff.disc=NA} to turn off this filter.}
+\code{cutoff}: a two-element vector with the minimum (negative) and
+maximum (positive) allowed discordance. Default values vary between
+the different options. To view them, enter \code{discfilter()} at
+the \code{R} command line.
+
+Set \code{cutoff.disc=NA} to turn off the filter.}
 
 \item{common.Pb}{common lead correction:
 
@@ -552,6 +556,10 @@ of Statistics 38.5 (2010): 2916-2957.
 
 Vermeesch, P., 2012. On the visualisation of detrital age
 distributions. Chemical Geology, 312, pp.190-194.
+
+Vermeesch (2020) ``On the treatment of discordant data
+    in detrital zircon U--Pb geochronology'', 
+    https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 }
 \seealso{
 \code{\link{radialplot}}, \code{\link{cad}}

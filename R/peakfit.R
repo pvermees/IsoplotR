@@ -563,8 +563,8 @@ min_age_model <- function(zs,alpha=0.05,np=4){
         get.minage.L(pars=c(gam,prop,sig,mu),zs=zs)
     }
     dz <- min(10*zs[imin,2],Mz-mz)
-    fit <- optim(rep(0,np),LL,method='L-BFGS-B',zs=zs,Mz=Mz,
-                 lower=c(mz,0.01,ms,0),upper=c(mz+dz,0.99,Ms,1))
+    fit <- stats::optim(rep(0,np),LL,method='L-BFGS-B',zs=zs,Mz=Mz,
+                        lower=c(mz,0.01,ms,0),upper=c(mz+dz,0.99,Ms,1))
     jpar <- fit$par # Jeffreys parameters!
     H <- stats::optimHess(jpar,LL,zs=zs,Mz=Mz)
     jE <- solve(H)

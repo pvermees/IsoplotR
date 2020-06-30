@@ -161,12 +161,20 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{3}: use the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
 #'
-#' @param show.p Show the p-value for concordance for each aliquot to
-#'     the output table. Note: it would be unwise to use the p-value
-#'     value as a concordance filter. Doing so would `punish' high
-#'     precision measurements, which are more likely to fail the
-#'     Chi-square test than low precision measurements. The latter
-#'     would therefore be `rewarded' by such a criterion.
+#' @param discordance discordance calculator. This is an object of
+#'     class \code{discfilter}, i.e. a three element list containing:
+#'
+#' \code{option}: one of \code{'t'} (absolute age filter), \code{'r'}
+#' (relative age filter), \code{'sk'} (Stacey-Kramers common Pb
+#' filter), \code{'a'} (perpendicular Aitcison distance) and
+#' \code{'c'} (concordia distance). For further details about these
+#' definitions, see the paper by Vermeesch (2020). To omit the
+#' discordance from the output of the \code{age} function, set
+#' \code{option = NA}.
+#'
+#' \code{before}: logical flag indicating whether the discordance
+#' should be calculated before (\code{TRUE}) or after
+#' (\code{FALSE}) the common-Pb correction.
 #'
 #' @return
 #' \enumerate{
@@ -229,7 +237,8 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @rdname age
 #' @export
 age.UPb <- function(x,type=1,exterr=TRUE,i=NA,
-                    sigdig=NA,common.Pb=0,discordance=0,...){
+                    sigdig=NA,common.Pb=0,
+                    discordance=discfilter(option=NA),...){
     if (type==1){
         out <- UPb.age(x,exterr=exterr,i=i,sigdig=sigdig,
                        discordance=discordance,common.Pb=common.Pb,...)
