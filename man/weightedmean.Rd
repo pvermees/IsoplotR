@@ -391,24 +391,7 @@ aliquots.}
 only used if \code{type=4}.}
 
 \item{cutoff.disc}{discordance cutoff filter. This is an object of
-    class \code{discfilter}, i.e. a three element list containing:
-
-\code{option}: one of \code{'t'} (absolute age filter), \code{'r'}
-(relative age filter), \code{'sk'} (Stacey-Kramers common Pb
-filter), \code{'a'} (perpendicular Aitcison distance) and
-\code{'c'} (concordia distance). For further details about these
-filters, see the paper by Vermeesch (2020).
-
-\code{before}: logical flag indicating whether the discordance
-filter should be applied before (\code{TRUE}) or after
-(\code{FALSE}) the common-Pb correction.
-
-\code{cutoff}: a two-element vector with the minimum (negative) and
-maximum (positive) allowed discordance. Default values vary between
-the different options. To view them, enter \code{discfilter()} at
-the \code{R} command line.
-
-Set \code{cutoff.disc=NA} to turn off the filter.}
+class \code{discfilter}}
 
 \item{exterr}{propagate decay constant uncertainties?}
 

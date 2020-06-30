@@ -162,19 +162,21 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' Pb-composition
 #'
 #' @param discordance discordance calculator. This is an object of
-#'     class \code{discfilter}, i.e. a three element list containing:
+#'     class \code{\link{discfilter}}, or a two element list
+#'     containing:
 #'
-#' \code{option}: one of \code{'t'} (absolute age filter), \code{'r'}
-#' (relative age filter), \code{'sk'} (Stacey-Kramers common Pb
-#' filter), \code{'a'} (perpendicular Aitcison distance) and
+#' \code{option}: one of \code{0} or \code{'t'} (absolute age filter);
+#' \code{1} or \code{'r'} (relative age filter); \code{2} or
+#' \code{'sk'} (Stacey-Kramers common Pb filter); \code{3} or
+#' \code{'a'} (perpendicular Aitchison distance); or \code{4} or
 #' \code{'c'} (concordia distance). For further details about these
 #' definitions, see the paper by Vermeesch (2020). To omit the
 #' discordance from the output of the \code{age} function, set
 #' \code{option = NA}.
 #'
 #' \code{before}: logical flag indicating whether the discordance
-#' should be calculated before (\code{TRUE}) or after
-#' (\code{FALSE}) the common-Pb correction.
+#' should be calculated before (\code{TRUE}) or after (\code{FALSE})
+#' the common-Pb correction.
 #'
 #' @return
 #' \enumerate{

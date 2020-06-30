@@ -1,3 +1,66 @@
+#' @title Set up a discordance filter
+#' 
+#' @description Define a discordance cutoff to filter U--Pb data.
+#' 
+#' @details The most reliable U--Pb age constraints are obtained from
+#'     (zircon) grains whose \eqn{^{206}}Pb/\eqn{^{238}}U and
+#'     \eqn{^{207}}Pb/\eqn{^{206}}Pb ages are statistically
+#'     indistinguishable from each other. U--Pb compositions that
+#'     fulfil this requirements are called `concordant'. Those that
+#'     violate it are called `discordant'. The discordance of the
+#'     \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
+#'     systems can be defined in five different ways. By setting a
+#'     cutoff for any of these criteria, U--Pb data can be filtered
+#'     for data quality.
+#'
+#' @param option one of five options:
+#'
+#' \code{0} or \code{'t'}: the absolute age difference (Ma) between
+#' the \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
+#' ages.
+#'
+#' \code{1} or \code{'r'}: the relative age difference (%) between the
+#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb ages.
+#'
+#' \code{2} or \code{'sk'}: percentage of common Pb measured along a
+#' mixing line connecting the measured composition and the
+#' Stacey-Kramers mantle composition in Tera-Wasserburg space.
+#'
+#' \code{3} or \code{'a'}: logratio distance (%) measured along a
+#' perpendicular line connecting Tera-Wasserburg concordia and the
+#' measured composition.
+#'
+#' \code{4} or \code{'c'}: logratio distance (%) measured along a line
+#' connecting the measured composition and the corresponding single
+#' grain concordia age composition.
+#'
+#' For further details about, see the paper by Vermeesch (2020).
+#'
+#' @param before logical flag indicating whether the discordance
+#'     filter should be applied before (\code{TRUE}) or after
+#'     (\code{FALSE}) the common-Pb correction.
+#'
+#' @param cutoff a two-element vector with the minimum (negative) and
+#'     maximum (positive) allowed discordance. Default values vary
+#'     between the different options. To view them, enter
+#'     \code{discfilter()} at the \code{R} command line.
+#' 
+#' @return a list with the input parameters. Default values for
+#'     \code{cutoff} are \code{c(-5,50)} if \code{option=='t'},
+#'     \code{c(-5,15)} if \code{option=='r'}, \code{c(-0.01,0.1)} if
+#'     \code{option=='sk'}, \code{c(-1,5)} if \code{option=='a'}, and
+#'     \code{c(-1,5)} if \code{option=='c'}.
+#' 
+#' @seealso \code{\link{cad}}, \code{\link{kde}}, \code{\link{radial}}
+#' @references Vermeesch (2020) ``On the treatment of discordant data
+#'     in detrital zircon U--Pb geochronology'',
+#'     \code{https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf}
+#' @examples
+#' dscf <- discfilter(option='c',before=TRUE)
+#' tt <- age(x=examples$UPb,exterr=FALSE,sigdig=2,
+#'           conc=TRUE,discordance=dscf,common.Pb=3)
+#' 
+#' @export
 discfilter <- function(option='c',before=TRUE,cutoff){
     out <- list()
     out$option <- option
