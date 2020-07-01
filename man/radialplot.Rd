@@ -37,7 +37,7 @@ radialplot(x, ...)
   alpha = 0.05,
   units = "",
   hide = NA,
-  omit = NA,
+  omit = NULL,
   omit.col = NA,
   ...
 )
