@@ -415,34 +415,35 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out
 }
 
-get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,
+get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit=NA,
                      cutoff.disc=discfilter(),common.Pb=0,detritus=0){
     if (hasClass(x,'UPb')){
         out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                               cutoff.disc=cutoff.disc,
+                               cutoff.disc=cutoff.disc,omit=omit,
                                exterr=FALSE,common.Pb=common.Pb)
     } else if (hasClass(x,'PbPb')){
-        out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb)
+        out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb,omit=omit)
     } else if (hasClass(x,'ArAr')){
-        out <- ArAr.age(x,exterr=FALSE,i2i=i2i)
+        out <- ArAr.age(x,exterr=FALSE,i2i=i2i,omit=omit)
     } else if (hasClass(x,'ThPb')){
-        out <- ThPb.age(x,exterr=FALSE,i2i=i2i)
+        out <- ThPb.age(x,exterr=FALSE,i2i=i2i,omit=omit)
     } else if (hasClass(x,'KCa')){
-        out <- KCa.age(x,exterr=FALSE,i2i=i2i)
+        out <- KCa.age(x,exterr=FALSE,i2i=i2i,omit=omit)
     } else if (hasClass(x,'UThHe')){
         out <- UThHe.age(x)
     } else if (hasClass(x,'ReOs')){
-        out <- ReOs.age(x,exterr=FALSE,i2i=i2i)
+        out <- ReOs.age(x,exterr=FALSE,i2i=i2i,omit=omit)
     } else if (hasClass(x,'SmNd')){
-        out <- SmNd.age(x,exterr=FALSE,i2i=i2i)
+        out <- SmNd.age(x,exterr=FALSE,i2i=i2i,omit=omit)
     } else if (hasClass(x,'RbSr')){
-        out <- RbSr.age(x,exterr=FALSE,i2i=i2i)
+        out <- RbSr.age(x,exterr=FALSE,i2i=i2i,omit=omit)
     } else if (hasClass(x,'LuHf')){
-        out <- LuHf.age(x,exterr=FALSE,i2i=i2i)
+        out <- LuHf.age(x,exterr=FALSE,i2i=i2i,omit=omit)
     } else if (hasClass(x,'fissiontracks')){
         out <- fissiontrack.age(x,exterr=FALSE)
     } else if (hasClass(x,'ThU')){
-        out <- ThU.age(x,exterr=FALSE,i2i=i2i,detritus=detritus)
+        out <- ThU.age(x,exterr=FALSE,i2i=i2i,
+                       detritus=detritus,omit=omit)
     }
     out
 }

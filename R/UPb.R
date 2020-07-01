@@ -995,12 +995,12 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,
+UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit=NA,
                     discordance=discfilter(option=NA),common.Pb=0,...){
     if (is.na(discordance$option) | discordance$before) xd <- x
-    else xd <- Pb0corr(x,option=common.Pb)
+    else xd <- Pb0corr(x,option=common.Pb,omit=omit)
     if (common.Pb==0) X <- x
-    else X <- Pb0corr(x,option=common.Pb)
+    else X <- Pb0corr(x,option=common.Pb,omit=omit)
     if (!is.na(i)){
         out <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,sigdig=sigdig,
                               conc=conc,discordance=discordance)
@@ -1017,7 +1017,7 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,
 }
 
 UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
-                           discordance=discfilter(option=NA),common.Pb=0,...){
+                           discordance=discfilter(option=NA),...){
     xi <- subset(x,subset=((1:length(x))%in%i))
     Xi <- subset(X,subset=((1:length(X))%in%i))
     xdi <- subset(xd,subset=((1:length(xd))%in%i))
@@ -1042,7 +1042,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
         t.82.out <- roundit(t.82[1],t.82[2],sigdig=sigdig)
         out <- c(out,t.82.out)
     }
-    if (conc | discordance$option%in%c(2,4)){
+    if (conc | discordance$option%in%c(2,'sk',4,'c')){
         t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
     }
     if (conc){

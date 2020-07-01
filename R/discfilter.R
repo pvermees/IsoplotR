@@ -79,12 +79,12 @@ discfilter <- function(option='c',before=TRUE,cutoff){
 }
 
 filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
-                            cutoff.disc=discfilter(),common.Pb=0){
+                            cutoff.disc=discfilter(),common.Pb=0,omit=NA){
     if (is.na(cutoff.disc$option)){
         is.concordant <- rep(TRUE,length(x))
     } else {
         conc <- (type==5) | (cutoff.disc$option=='c')
-        tt <- UPb.age(x,exterr=exterr,conc=conc,
+        tt <- UPb.age(x,exterr=exterr,conc=conc,omit=omit,
                       common.Pb=common.Pb,discordance=cutoff.disc)
         is.concordant <- (tt[,'disc']>cutoff.disc$cutoff[1]) &
                          (tt[,'disc']<cutoff.disc$cutoff[2])
