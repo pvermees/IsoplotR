@@ -1,4 +1,4 @@
-regression <- function(xyz,model=1,type='york',omit=NA){
+regression <- function(xyz,model=1,type='york',omit=NULL){
     xyz2calc <- clear(xyz,omit)
     if (model==1) out <- model1regression(xyz2calc,type=type)
     else if (model==2) out <- model2regression(xyz2calc,type=type)

@@ -1,4 +1,4 @@
-PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,omit=NA){
+PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,omit=NULL){
     if (common.Pb == 0){
         y <- data2york(x,inverse=TRUE)
         PbPb <- y[,c('Y','sY')]

@@ -415,7 +415,7 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out
 }
 
-get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit=NA,
+get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit=NULL,
                      cutoff.disc=discfilter(),common.Pb=0,detritus=0){
     if (hasClass(x,'UPb')){
         out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,

@@ -457,9 +457,9 @@ Th230correction <- function(x,option=0,dat=NA){
     }
     out
 }
-Th230correction.isochron <- function(x,dat){
+Th230correction.isochron <- function(x,dat,omit=NULL){
     osmond <- data2tit.ThU(dat,osmond=TRUE)
-    fit <- titterington(osmond)
+    fit <- titterington(clear(osmond,omit))
     out <- x
     out[,'U234U238'] <- x[,'U234U238'] - fit$par['b']*osmond[,'X']
     out[,'Th230U238'] <- x[,'Th230U238'] - fit$par['B']*osmond[,'X']
@@ -524,5 +524,5 @@ Th230correction.measured.detritus <- function(x){
     out[,'U234U238'] <- a
     out[,'sU234U238'] <- sa
     out[,'rYZ'] <- covaA/(sA*sa)
-    out    
+    out
 }

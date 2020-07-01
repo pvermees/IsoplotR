@@ -121,7 +121,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                show.numbers=FALSE,pch=21,levels=NA,
                                clabel="",bg=c("yellow","red"),col='black',
                                k=0,markers=NULL,alpha=0.05,
-                               units='',hide=NA,omit=NA,omit.col=NA,...){
+                               units='',hide=NA,omit=NULL,omit.col=NA,...){
     x <- x[,c(1,2),drop=FALSE]
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -424,7 +424,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                      detritus=detritus)
     markers <- c(markers,peaks$peaks['t',])
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   i2i=i2i,detritus=detritus,common.Pb=common.Pb)
+                   i2i=i2i,omit=unique(c(hide,omit)),
+                   detritus=detritus,common.Pb=common.Pb)
     radial_helper(tt,from=from,to=to,t0=t0,
                   transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
