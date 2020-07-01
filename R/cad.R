@@ -115,9 +115,6 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition (only applicable if \code{x} has class
 #' \code{UPb})
-#' @references Vermeesch (2020) ``On the treatment of discordant data
-#'     in detrital zircon U--Pb geochronology'', 
-#'     https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 #' @rdname cad
 #' @export
 cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',

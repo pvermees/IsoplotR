@@ -232,9 +232,6 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #'
 #' data(examples)
 #' weightedmean(examples$LudwigMean)
-#' @references Vermeesch (2020) ``On the treatment of discordant data
-#'     in detrital zircon U--Pb geochronology'', 
-#'     https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 #' @rdname weightedmean
 #' @export
 weightedmean.UPb <- function(x,random.effects=TRUE,

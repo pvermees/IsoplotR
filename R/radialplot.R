@@ -213,9 +213,6 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #'
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition
-#' @references Vermeesch (2020) ``On the treatment of discordant data
-#'     in detrital zircon U--Pb geochronology'', 
-#'     https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 #' @rdname radialplot
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,

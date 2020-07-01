@@ -540,10 +540,6 @@ of Statistics 38.5 (2010): 2916-2957.
 
 Vermeesch, P., 2012. On the visualisation of detrital age
 distributions. Chemical Geology, 312, pp.190-194.
-
-Vermeesch (2020) ``On the treatment of discordant data
-    in detrital zircon U--Pb geochronology'', 
-    https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 }
 \seealso{
 \code{\link{radialplot}}, \code{\link{cad}}

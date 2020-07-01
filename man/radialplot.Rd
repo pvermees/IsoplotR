@@ -528,10 +528,6 @@ Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
 Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
 mixed fission track ages. Nuclear Tracks and Radiation
 Measurements, 21(4), pp.459-470.
-
-Vermeesch (2020) ``On the treatment of discordant data
-    in detrital zircon U--Pb geochronology'', 
-    https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 }
 \seealso{
 \code{\link{peakfit}}, \code{\link{central}}

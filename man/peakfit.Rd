@@ -301,10 +301,6 @@ van der Touw, J., Galbraith, R., and Laslett, G. A logistic
 truncated normal mixture model for overdispersed binomial
 data. Journal of Statistical Computation and Simulation,
 59(4):349-373, 1997.
-
-Vermeesch (2020) ``On the treatment of discordant data
-    in detrital zircon U--Pb geochronology'', 
-    https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 }
 \seealso{
 \code{\link{radialplot}}, \code{\link{central}}

@@ -51,7 +51,7 @@
 #'     \code{option=='sk'}, \code{c(-1,5)} if \code{option=='a'}, and
 #'     \code{c(-1,5)} if \code{option=='c'}.
 #' 
-#' @seealso \code{\link{cad}}, \code{\link{kde}}, \code{\link{radial}}
+#' @seealso \code{\link{cad}}, \code{\link{kde}}, \code{\link{radialplot}}
 #' @references Vermeesch (2020) ``On the treatment of discordant data
 #'     in detrital zircon U--Pb geochronology'',
 #'     \code{https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf}

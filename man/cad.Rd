@@ -304,10 +304,6 @@ data(examples)
 cad(examples$DZ,verticals=FALSE,pch=20)
 }
 \references{
-Vermeesch (2020) ``On the treatment of discordant data
-    in detrital zircon U--Pb geochronology'', 
-    https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
-
 Vermeesch, P., 2007. Quantitative geomorphology of the
     White Mountains (California) using detrital apatite fission
     track thermochronology. Journal of Geophysical Research: Earth

@@ -541,11 +541,6 @@ weightedmean(cbind(ages,errs))
 data(examples)
 weightedmean(examples$LudwigMean)
 }
-\references{
-Vermeesch (2020) ``On the treatment of discordant data
-    in detrital zircon U--Pb geochronology'', 
-    https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
-}
 \seealso{
 \code{\link{central}}
 }

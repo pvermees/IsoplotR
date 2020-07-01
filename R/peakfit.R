@@ -174,9 +174,6 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition (only applicable if \code{x} has class
 #' \code{UPb})
-#' @references Vermeesch (2020) ``On the treatment of discordant data
-#'     in detrital zircon U--Pb geochronology'', 
-#'     https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf
 #' @rdname peakfit
 #' @export
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),

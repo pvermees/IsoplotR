@@ -73,5 +73,5 @@ Vermeesch (2020) ``On the treatment of discordant data
     \code{https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf}
 }
 \seealso{
-\code{\link{cad}}, \code{\link{kde}}, \code{\link{radial}}
+\code{\link{cad}}, \code{\link{kde}}, \code{\link{radialplot}}
 }
