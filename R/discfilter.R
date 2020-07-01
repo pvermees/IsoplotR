@@ -56,9 +56,9 @@
 #'     in detrital zircon U--Pb geochronology'',
 #'     \code{https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf}
 #' @examples
-#' dscf <- discfilter(option='c',before=TRUE)
-#' tt <- age(x=examples$UPb,exterr=FALSE,sigdig=2,
-#'           conc=TRUE,discordance=dscf,common.Pb=3)
+#' dscf <- discfilter(option='c',before=TRUE,cutoff=c(-1,1))
+#' weightedmean(x=examples$UPb,exterr=FALSE,sigdig=2,
+#'              cutoff.disc=dscf,common.Pb=3)
 #' 
 #' @export
 discfilter <- function(option='c',before=TRUE,cutoff){

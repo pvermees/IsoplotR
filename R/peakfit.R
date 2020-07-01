@@ -96,18 +96,18 @@ peakfit <- function(x,...){ UseMethod("peakfit",x) }
 #' @export
 peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,alpha=0.05,...){
     good <- !is.na(x[,1]+x[,2])
-    x <- subset(x,subset=good)
+    X <- subset(x,subset=good)
     if (k<1) return(NULL)
     if (log) {
-        x[,2] <- x[,2]/x[,1]
-        x[,1] <- log(x[,1])
+        X[,2] <- X[,2]/X[,1]
+        X[,1] <- log(X[,1])
     }
     if (identical(k,'min')) {
-        out <- min_age_model(x,alpha=alpha)
+        out <- min_age_model(X,alpha=alpha)
     } else if (identical(k,'auto')) {
-        out <- normal.mixtures(x,k=BIC_fit(x,5),alpha=alpha,...)
+        out <- normal.mixtures(X,k=BIC_fit(X,5),alpha=alpha,...)
     } else {
-        out <- normal.mixtures(x,k,alpha=alpha,...)
+        out <- normal.mixtures(X,k,alpha=alpha,...)
     }
     if (log) {
         out$peaks['t',] <- exp(out$peaks['t',])
@@ -176,10 +176,13 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' \code{UPb})
 #' @rdname peakfit
 #' @export
-peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
-                        common.Pb=0,exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
-    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   exterr=exterr,sigdig=sigdig,log=log,alpha=alpha,common.Pb=common.Pb,...)
+peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
+                        cutoff.disc=discfilter(), common.Pb=0,
+                        exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
+    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
+                   cutoff.disc=cutoff.disc,exterr=exterr,
+                   sigdig=sigdig,log=log,alpha=alpha,
+                   common.Pb=common.Pb,...)
 }
 #' @rdname peakfit
 #' @export

@@ -62,9 +62,9 @@ The most reliable U--Pb age constraints are obtained from
     for data quality.
 }
 \examples{
-dscf <- discfilter(option='c',before=TRUE)
-tt <- age(x=examples$UPb,exterr=FALSE,sigdig=2,
-          conc=TRUE,discordance=dscf,common.Pb=3)
+dscf <- discfilter(option='c',before=TRUE,cutoff=c(-1,1))
+weightedmean(x=examples$UPb,exterr=FALSE,sigdig=2,
+             cutoff.disc=dscf,common.Pb=3)
 
 }
 \references{
