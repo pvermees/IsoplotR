@@ -134,7 +134,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                   clabel=clabel,bg=bg,col=col,markers=markers,
                   alpha=alpha,units=units,hide=hide,omit=omit,
                   omit.col=omit.col,...)
-    fit <- central(x,alpha=alpha)
+    fit <- central(x2calc,alpha=alpha)
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
                                  units=units,ntit=get.ntit(x2calc[,1])))
     if (!is.null(peaks$legend))
