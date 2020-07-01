@@ -1016,13 +1016,14 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit=NULL,
     out
 }
 
+# x = raw data
+# X = common Pb corrected data (if common.Pb>0)
+# xd = discordant data (raw if before==FALSE, common Pb corrected if before==FALSE)
 UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
                            discordance=discfilter(option=NA),...){
-    xi <- subset(x,subset=((1:length(x))%in%i))
     Xi <- subset(X,subset=((1:length(X))%in%i))
-    xdi <- subset(xd,subset=((1:length(xd))%in%i))
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
-    hasTh <- (xi$format>6)
+    hasTh <- (x$format>6)
     if (hasTh) labels <- c(labels,'t.82','s[t.82]')
     if (conc) labels <- c(labels,'t.conc','s[t.conc]')
     tlabels <- labels
@@ -1042,23 +1043,15 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
         t.82.out <- roundit(t.82[1],t.82[2],sigdig=sigdig)
         out <- c(out,t.82.out)
     }
-    if (conc | discordance$option%in%c(2,'sk',4,'c')){
-        t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
-    }
     if (conc){
+        t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
         t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
         out <- c(out,t.conc.out)
     }
     if (discordance$option%in%c(0,'t',1,'r',2,'sk',3,'a',4,'c')){
-        tt <- c(t.75[1],t.68[1],t.76[1])
-        tlabels <- c('t.75','t.68','t.76')
-        if (discordance$option%in%c(2,'sk',4,'c')){
-            tt <- c(tt,t.conc$age[1])
-            tlabels <- c(tlabels,'t.conc')
-        }
-        ttt <- matrix(tt,nrow=1)
-        colnames(ttt) <- tlabels
-        dif <- discordance(x=xi,X=xdi,tt=ttt,option=discordance$option)
+        xi <- subset(x,subset=((1:length(x))%in%i))
+        xdi <- subset(xd,subset=((1:length(xd))%in%i))
+        dif <- discordance(x=xi,X=xdi,option=discordance$option)
         out <- c(out,roundit(dif,sigdig=sigdig))
     }
     if (discordance$option%in%c(5,'p')){

@@ -80,12 +80,11 @@ discfilter <- function(option='c',before=TRUE,cutoff){
 
 filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                             cutoff.disc=discfilter(),common.Pb=0,omit=NULL){
+    tt <- UPb.age(x,exterr=exterr,conc=(type==5),omit=omit,
+                  common.Pb=common.Pb,discordance=cutoff.disc)
     if (is.na(cutoff.disc$option)){
         is.concordant <- rep(TRUE,length(x))
     } else {
-        conc <- (type==5) | (cutoff.disc$option=='c')
-        tt <- UPb.age(x,exterr=exterr,conc=conc,omit=omit,
-                      common.Pb=common.Pb,discordance=cutoff.disc)
         is.concordant <- (tt[,'disc']>cutoff.disc$cutoff[1]) &
                          (tt[,'disc']<cutoff.disc$cutoff[2])
     }
@@ -96,9 +95,6 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                     '(if you have already applied a common-Pb correction), ',
                     'apply the discordance filter before the ',
                     'common-Pb correction.'))
-    }
-    if (!cutoff.disc$before & common.Pb!=0){
-        tt <- UPb.age(x,exterr=exterr,conc=conc,common.Pb=common.Pb)
     }
     out <- matrix(NA,length(x),2)
     if (type==1){
@@ -124,28 +120,35 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
 
 # x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
+    if (option%in%c(0,'t',1,'r',3,'a')){
+        t.68 <- get.Pb206U238.age(X,exterr=exterr)[1]
+        t.76 <- get.Pb207Pb206.age(X,exterr=exterr,
+                                   t.68=subset(t.68,select=1))[1]
+    } else if (option%in%c(4,'c')){
+        t.conc <- concordia.age(x=X,i=1)$age[1]
+    }
     if (option%in%c(0,'t')){
-        dif <- tt[,'t.76']-tt[,'t.68']
+        dif <- t.76-t.68
     } else if (option%in%c(1,'r')){
-        dif <- (1-tt[,'t.68']/tt[,'t.76'])*100
+        dif <- (1-t.68/t.76)*100
     } else if (option%in%c(2,'sk')){
         x.corr <- Pb0corr(x,option=3)
         U8Pb6.raw <- get.U238Pb206.ratios(x)[,'U238Pb206']
         U8Pb6.corr <- get.U238Pb206.ratios(x.corr)[,'U238Pb206']
         dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
     } else if (option%in%c(3,'a')){
-        X1 <- age_to_U238Pb206_ratio(tt[,'t.76'])[,1]
-        Y1 <- age_to_Pb207Pb206_ratio(tt[,'t.68'])[,1]
+        X1 <- age_to_U238Pb206_ratio(t.76)[,1]
+        Y1 <- age_to_Pb207Pb206_ratio(t.68)[,1]
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
         Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
         DX <- log(U8Pb6) - log(X1)
         DY <- log(Pb76) - log(Y1)
         dif <- 100*DX*sin(atan(DY/DX))
     } else if (option%in%c(4,'c')){
-        x1 <- age_to_U238Pb206_ratio(tt[,'t.conc'])[,1]
+        x1 <- age_to_U238Pb206_ratio(t.conc)[,1]
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
         dx <- log(x1) - log(U8Pb6)
-        x2 <- age_to_Pb207Pb206_ratio(tt[,'t.conc'])[,1]
+        x2 <- age_to_Pb207Pb206_ratio(t.conc)[,1]
         Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
         dy <- log(x2) - log(Pb76)
         dif <- 100*sqrt(dx^2+dy^2)
