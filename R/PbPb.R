@@ -1,4 +1,4 @@
-PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
+PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,omit4c=NULL){
     if (common.Pb == 0){
         y <- data2york(x,inverse=TRUE)
         PbPb <- y[,c('Y','sY')]
@@ -14,7 +14,7 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0){
         # PbPb <- get.76(y,a=i74/i64,b=i74)
     } else if (common.Pb == 2){
         y <- data2york(x,inverse=TRUE)
-        fit <- regression(y,model=1)
+        fit <- regression(y,model=1,omit=omit4c)
         PbPb <- get.76(y,a=fit$a[1],b=fit$b[1])
     }
     PbPb2t(PbPb,exterr=exterr,sigdig=sigdig,i=i)

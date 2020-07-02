@@ -199,23 +199,9 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc discordance cutoff filter. This is a three
-#'     element list.
-#'
-#' The first two items contain the minimum (negative) and maximum
-#' (positive) percentage discordance allowed between the
-#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
-#'
-#' The third item is a boolean flag that controls whether the
-#' discordance filter should be applied before (\code{TRUE}) or after
-#' (\code{FALSE}) the common-Pb correction.
-#'
-#' Set \code{cutoff.disc=NA} to turn off this filter.
+#' @param cutoff.disc discordance cutoff filter. This is an object of
+#'     class \code{discfilter}
 #' @param exterr propagate decay constant uncertainties?
-#'
 #' @param common.Pb common lead correction:
 #'
 #' \code{0}: none
@@ -239,7 +225,6 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition (only applicable if \code{x} has class
 #' \code{UPb})
-#'
 #' @examples
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
@@ -250,14 +235,14 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #' @rdname weightedmean
 #' @export
 weightedmean.UPb <- function(x,random.effects=TRUE,
-                             detect.outliers=TRUE,plot=TRUE,
-                             from=NA,to=NA,levels=NA,clabel="",
+                             detect.outliers=TRUE,plot=TRUE,from=NA,
+                             to=NA,levels=NA,clabel="",
                              rect.col=c("#00FF0080","#FF000080"),
-                             outlier.col="#00FFFF80",sigdig=2,
-                             type=4,cutoff.76=1100,alpha=0.05,
-                             cutoff.disc=list(-15,5,TRUE),
-                             exterr=TRUE,ranked=FALSE,common.Pb=0,
-                             hide=NULL,omit=NULL,omit.col=NA,...){
+                             outlier.col="#00FFFF80",sigdig=2,type=4,
+                             cutoff.76=1100,alpha=0.05,
+                             cutoff.disc=discfilter(),exterr=TRUE,
+                             ranked=FALSE,common.Pb=0,hide=NULL,
+                             omit=NULL,omit.col=NA,...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
@@ -524,13 +509,14 @@ weightedmean_helper <- function(x,random.effects=TRUE,
                                 from=NA,to=NA,levels=NA,clabel="",
                                 rect.col=c("#00FF0080","#FF000080"),
                                 outlier.col="#00FFFF80",type=4,
-                                cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                                cutoff.76=1100,cutoff.disc=discfilter(),
                                 sigdig=2,alpha=0.05,exterr=TRUE,
                                 ranked=FALSE,i2i=FALSE,common.Pb=1,
                                 units='',detritus=0,hide=NULL,
                                 omit=NULL,omit.col=NA,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   i2i=i2i,common.Pb=common.Pb,detritus=detritus)
+                   i2i=i2i,omit4c=unique(c(hide,omit)),
+                   common.Pb=common.Pb,detritus=detritus)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,hide=hide,

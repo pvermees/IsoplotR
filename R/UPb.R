@@ -1,4 +1,4 @@
-wetherill <- function(x,i,format){
+wetherill <- function(x,i=1,format){
     if (missing(format)){
         X <- x$x
         format <- x$format
@@ -97,7 +97,7 @@ wetherill <- function(x,i,format){
     class(out) <- "wetherill"
     out
 }
-tera.wasserburg <- function(x,i,format){
+tera.wasserburg <- function(x,i=1,format){
     if (missing(format)){
         X <- x$x
         format <- x$format
@@ -805,7 +805,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     }
     out
 }
-get.Pb207U235.age.UPb <- function(x,i,exterr=FALSE,...){
+get.Pb207U235.age.UPb <- function(x,i=1,exterr=FALSE,...){
     r75 <- get.Pb207U235.ratios(x)
     get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],exterr=exterr,d=x$d)
 }
@@ -928,7 +928,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...
     }
     out    
 }
-get.Pb207Pb206.age.UPb <- function(x,i,exterr=FALSE,...){
+get.Pb207Pb206.age.UPb <- function(x,i=1,exterr=FALSE,...){
     r76 <- get.Pb207Pb206.ratios(x)
     get.Pb207Pb206.age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],
                        exterr=exterr,d=x$d[i],...)
@@ -995,103 +995,76 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,
-                    show.p=FALSE,common.Pb=0,...){
-    if (common.Pb>0) X <- Pb0corr(x,option=common.Pb)
-    else X <- x
+UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit4c=NULL,
+                    discordance=discfilter(option=NA),common.Pb=0,...){
+    if (is.na(discordance$option) | discordance$before) xd <- x
+    else xd <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
+    if (common.Pb==0) X <- x
+    else X <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
+    if (!is.na(i)){
+        out <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,sigdig=sigdig,
+                              conc=conc,discordance=discordance)
+    } else {
+        nn <- length(x)
+        out <- NULL
+        for (i in 1:nn){
+            ti <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,sigdig=sigdig,
+                                 conc=conc,discordance=discordance)
+            out <- rbind(out,ti)
+        }
+    }
+    out
+}
+
+# x = raw data
+# X = common Pb corrected data (if common.Pb>0)
+# xd = discordant data (raw if before==FALSE, common Pb corrected if before==FALSE)
+UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
+                           discordance=discfilter(option=NA),...){
+    Xi <- subset(X,subset=((1:length(X))%in%i))
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
-    hasTh <- x$format>6
+    hasTh <- (x$format>6)
     if (hasTh) labels <- c(labels,'t.82','s[t.82]')
     if (conc) labels <- c(labels,'t.conc','s[t.conc]')
-    if (conc & show.p) labels <- c(labels,'p[conc]')
-    if (!is.na(i)){
-        t.75 <- get.Pb207U235.age(X,i,exterr=exterr)
-        t.68 <- get.Pb206U238.age(X,i,exterr=exterr)
-        t.76 <- get.Pb207Pb206.age(X,i,exterr=exterr,t.68=t.68[1])
-        t.75.out <- roundit(t.75[1],t.75[2],sigdig=sigdig)
-        t.68.out <- roundit(t.68[1],t.68[2],sigdig=sigdig)
-        t.76.out <- roundit(t.76[1],t.76[2],sigdig=sigdig)
-        out <- c(t.75.out,t.68.out,t.76.out)
-        if (hasTh){
-            t.82 <- get.Pb208Th232.age(X,i,exterr=exterr)
-            t.82.out <- roundit(t.82[1],t.82[2],sigdig=sigdig)
-            out <- c(out,t.82.out)
-        }
-        if (conc){
-            t.conc <- concordia.age(x=X,i=i,exterr=exterr)
-            t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
-            out <- c(out,t.conc.out)
-        }
-        if (conc & show.p){
-            SS.concordance <-
-                LL.concordia.age(tt=t.conc$age[1],cc=wetherill(X,i),
-                                 mswd=TRUE,exterr=exterr,d=x$d)
-            p.value <- 1-stats::pchisq(SS.concordance,1)
-            if (!is.na(sigdig)) p.value <- signif(p.value,sigdig)
-            out <- c(out,p.value)
-        }
-        names(out) <- labels
-    } else {
-        nn <- nrow(X$x)
-        out <- matrix(0,nn,length(labels))
-        for (i in 1:nn){
-            out[i,] <- UPb.age(X,i=i,exterr=exterr,sigdig=sigdig,
-                               conc=conc,show.p=show.p)
-        }
-        colnames(out) <- labels
+    tlabels <- labels
+    if (discordance$option%in%c(0,'t',1,'r',2,'sk',3,'a',4,'c'))
+        labels <- c(labels,'disc')
+    if (discordance$option%in%c(5,'p'))
+        labels <- c(labels,'p[conc]')
+    t.75 <- get.Pb207U235.age(Xi,exterr=exterr)
+    t.68 <- get.Pb206U238.age(Xi,exterr=exterr)
+    t.76 <- get.Pb207Pb206.age(Xi,exterr=exterr,t.68=subset(t.68,select=1))
+    t.75.out <- roundit(t.75[1],t.75[2],sigdig=sigdig)
+    t.68.out <- roundit(t.68[1],t.68[2],sigdig=sigdig)
+    t.76.out <- roundit(t.76[1],t.76[2],sigdig=sigdig)
+    out <- c(t.75.out,t.68.out,t.76.out)
+    if (hasTh){
+        t.82 <- get.Pb208Th232.age(Xi,exterr=exterr)
+        t.82.out <- roundit(t.82[1],t.82[2],sigdig=sigdig)
+        out <- c(out,t.82.out)
     }
+    if (conc){
+        t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
+        t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
+        out <- c(out,t.conc.out)
+    }
+    if (!is.na(discordance$option)){
+        xdi <- subset(xd,subset=((1:length(xd))%in%i))
+    }
+    if (discordance$option%in%c(0,'t',1,'r',2,'sk',3,'a',4,'c')){
+        xi <- subset(x,subset=((1:length(x))%in%i))
+        dif <- discordance(x=xi,X=xdi,option=discordance$option)
+        out <- c(out,roundit(dif,sigdig=sigdig))
+    }
+    if (discordance$option%in%c(5,'p')){
+        t.conc <- concordia.age(x=xdi,exterr=exterr)
+        SS.concordance <-
+            LL.concordia.age(tt=t.conc$age[1],cc=wetherill(xdi,i=1),
+                             mswd=TRUE,exterr=exterr,d=xdi$d)
+        p.value <- 1-stats::pchisq(SS.concordance,1)
+        p.value <- roundit(p.value,sigdig=sigdig)
+        out <- c(out,p.value)
+    }
+    names(out) <- labels
     out
-}
-
-filter.UPb.ages <- function(x,type=4,cutoff.76=1100,exterr=FALSE,
-                            cutoff.disc=list(-15,5,TRUE),common.Pb=0){
-    tout <- UPb.age(x,exterr=exterr,conc=(type==5),common.Pb=common.Pb)
-    if (any(is.na(cutoff.disc))){
-        is.concordant <- rep(TRUE,length(x))
-    } else {
-        # apply cutoff filter before common Pb correction?
-        if (cutoff.disc[[3]] & common.Pb>0){
-            tin <- UPb.age(x,exterr=exterr,conc=(type==5),common.Pb=0)
-        } else { # apply cutoff filter after common Pb correction.
-            tin <- tout
-        }
-        is.concordant <- concordant(tin,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc)
-        if (!any(is.concordant)){
-            stop(paste0('There are no concordant grains in this sample.',
-                        'Try adjusting the discordance limits OR ',
-                        'apply a common-Pb correction OR ',
-                        '(if you have already applied a common-Pb correction), ',
-                        'apply the discordance filter before the ',
-                        'common-Pb correction.'))
-        }
-    }
-    out <- matrix(NA,length(x),2)
-    if (type==1){
-        out[is.concordant,] <- tout[is.concordant,c('t.75','s[t.75]'),drop=FALSE]
-    } else if (type==2){
-        out[is.concordant,] <- tout[is.concordant,c('t.68','s[t.68]'),drop=FALSE]
-    } else if (type==3){
-        out[is.concordant,] <- tout[is.concordant,c('t.76','s[t.76]'),drop=FALSE]
-    } else if (type==4){
-        do.76 <- (tout[,'t.68']>cutoff.76)
-        i.76 <- as.vector(which(do.76 & is.concordant))
-        i.68 <- as.vector(which(!do.76 & is.concordant))
-        out[i.76,] <- tout[i.76,c('t.76','s[t.76]'),drop=FALSE]
-        out[i.68,] <- tout[i.68,c('t.68','s[t.68]'),drop=FALSE]
-    } else if (type==5){
-        out[is.concordant,] <- tout[is.concordant,c('t.conc','s[t.conc]'),drop=FALSE]
-    } else if (type==6){
-        out[is.concordant,] <- tout[is.concordant,c('t.82','s[t.82]'),drop=FALSE]
-    }
-    colnames(out) <- c('t','s[t]')
-    out
-}
-
-concordant <- function(tt,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE)){
-    do.76 <- (tt[,'t.68'] > cutoff.76)
-    disc.75.68 <- 100*(1-tt[,'t.75']/tt[,'t.68'])
-    disc.68.76 <- 100*(1-tt[,'t.68']/tt[,'t.76'])
-    conc.75.68 <- !do.76 & (disc.75.68>cutoff.disc[[1]]) & (disc.75.68<cutoff.disc[[2]])
-    conc.68.76 <- do.76 & (disc.68.76>cutoff.disc[[1]]) & (disc.68.76<cutoff.disc[[2]])
-    conc.75.68 | conc.68.76
 }

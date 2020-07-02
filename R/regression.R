@@ -1,11 +1,13 @@
-regression <- function(xyz,model=1,type='york'){
-    if (model==1) out <- model1regression(xyz,type=type)
-    else if (model==2) out <- model2regression(xyz,type=type)
-    else if (model==3) out <- model3regression(xyz,type=type)
+regression <- function(xyz,model=1,type='york',omit=NULL){
+    xyz2calc <- clear(xyz,omit)
+    if (model==1) out <- model1regression(xyz2calc,type=type)
+    else if (model==2) out <- model2regression(xyz2calc,type=type)
+    else if (model==3) out <- model3regression(xyz2calc,type=type)
     else stop('invalid regression model')
     out$xyz <- xyz
     out$model <- model
-    out$n <- nrow(xyz)
+    out$n <- nrow(xyz2calc)
+    out$omit <- omit
     out
 }
 

@@ -96,18 +96,18 @@ peakfit <- function(x,...){ UseMethod("peakfit",x) }
 #' @export
 peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,alpha=0.05,...){
     good <- !is.na(x[,1]+x[,2])
-    x <- subset(x,subset=good)
+    X <- subset(x,subset=good)
     if (k<1) return(NULL)
     if (log) {
-        x[,2] <- x[,2]/x[,1]
-        x[,1] <- log(x[,1])
+        X[,2] <- X[,2]/X[,1]
+        X[,1] <- log(X[,1])
     }
     if (identical(k,'min')) {
-        out <- min_age_model(x,alpha=alpha)
+        out <- min_age_model(X,alpha=alpha)
     } else if (identical(k,'auto')) {
-        out <- normal.mixtures(x,k=BIC_fit(x,5),alpha=alpha,...)
+        out <- normal.mixtures(X,k=BIC_fit(X,5),alpha=alpha,...)
     } else {
-        out <- normal.mixtures(x,k,alpha=alpha,...)
+        out <- normal.mixtures(X,k,alpha=alpha,...)
     }
     if (log) {
         out$peaks['t',] <- exp(out$peaks['t',])
@@ -147,21 +147,10 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
+#' @param cutoff.disc discordance cutoff filter. This is an object of
+#'     class \code{\link{discfilter}}. Set \code{cutoff.disc=NA} to
+#'     turn off the filter.
 #' 
-#' @param cutoff.disc discordance cutoff filter. This is a three
-#'     element list.
-#'
-#' The first two items contain the minimum (negative) and maximum
-#' (positive) percentage discordance allowed between the
-#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
-#'
-#' The third item is a boolean flag that controls whether the
-#' discordance filter should be applied before (\code{TRUE}) or after
-#' (\code{FALSE}) the common-Pb correction.
-#'
 #' @param common.Pb common lead correction:
 #'
 #' \code{0}:none
@@ -185,13 +174,15 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition (only applicable if \code{x} has class
 #' \code{UPb})
-#'
 #' @rdname peakfit
 #' @export
-peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
-                        common.Pb=0,exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
-    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   exterr=exterr,sigdig=sigdig,log=log,alpha=alpha,common.Pb=common.Pb,...)
+peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
+                        cutoff.disc=discfilter(),common.Pb=0,
+                        exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
+    peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
+                   cutoff.disc=cutoff.disc,exterr=exterr,
+                   sigdig=sigdig,log=log,alpha=alpha,
+                   common.Pb=common.Pb,...)
 }
 #' @rdname peakfit
 #' @export
@@ -275,15 +266,15 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @export
 peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2, log=TRUE,
                         i2i=TRUE,alpha=0.05,detritus=0,...){
-    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,
-                   alpha=alpha,detritus=detritus,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,
+                   i2i=i2i,alpha=alpha,detritus=detritus,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,sigdig=sigdig,log=log,alpha=alpha,...)
 }
-peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                            exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
                            common.Pb=0,alpha=0.05,detritus=0,...){
     if (k<1) return(NULL)
@@ -292,7 +283,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TR
                      cutoff.disc=cutoff.disc,detritus=detritus,commonPb=common.Pb)
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,detritus=detritus)
+                   cutoff.disc=cutoff.disc,detritus=detritus,...)
     fit <- peakfit.default(tt,k=k,log=log,alpha=alpha)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
@@ -517,7 +508,7 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
     list(peaks=peaks,peaks.err=peaks.err)
 }
 
-BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                     exterr=TRUE,detritus=0,common.Pb=0,...){
     n <- length(x)
     BIC <- Inf
@@ -541,62 +532,80 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
 }
 
 # Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
-min_age_model <- function(zs,alpha=0.05){
-    z <- zs[,1]
-    mu <- seq(min(z),max(z),length.out=100)
-    sigma <- seq(stats::sd(z)/10,2*stats::sd(z),length.out=10)
-    prop <- seq(from=0,to=1,length.out=20)
-    L <- Inf
-    # grid search!
-    for (mui in mu){ # mu
-        for (sigmai in sigma){ # sigma
-            for (propi in prop){ # pi
-                pars <- c(mui,sigmai,propi)
-                newL <- get.minage.L(pars,zs)
-                if (newL < L) {
-                    L <- newL
-                    fit <- pars
-                }
-            }
+min_age_model <- function(zs,alpha=0.05,np=4){
+    imin <- which.min(zs[,1])
+    mz <- zs[imin,1]
+    Mz <- max(zs[,1])
+    cfit <- continuous_mixture(zs[,1],zs[,2])
+    ms <- cfit$sigma/5
+    Ms <- diff(range(zs[,1]))
+    LL <- function(par,zs,Mz){
+        gam <- par[1]
+        prop <- par[2]
+        sig <- par[3]
+        if (length(par)<4) mu <- gam
+        else mu <- gam + (Mz-gam)*par[4]
+        get.minage.L(pars=c(gam,prop,sig,mu),zs=zs)
+    }
+    dz <- min(10*zs[imin,2],Mz-mz)
+    fit <- stats::optim(rep(0,np),LL,method='L-BFGS-B',zs=zs,Mz=Mz,
+                        lower=c(mz,0.01,ms,0),upper=c(mz+dz,0.99,Ms,1))
+    jpar <- fit$par # Jeffreys parameters!
+    H <- stats::optimHess(jpar,LL,zs=zs,Mz=Mz)
+    jE <- solve(H)
+    par <- jpar
+    J <- diag(np)
+    if (np==4){
+        par[4] <- jpar[1] + (Mz-jpar[1])*jpar[4]
+        J[4,1] <- 1-jpar[4]
+        J[4,4] <- Mz-jpar[1]
+    }
+    E <- J %*% jE %*% t(J)
+    if (E[1,1]<0 & np==4){
+        out <- min_age_model(zs=zs,alpha=alpha,np=3)
+    } else {
+        out <- list()
+        out$L <- fit$value
+        out$peaks <- matrix(0,3,1)
+        rownames(out$peaks) <- c('t','s[t]','ci[t]')
+        out$peaks['t',] <- par[1]
+        out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
+        out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
+        out$props <- matrix(0,2,1)
+        rownames(out$props) <- c('p','s[p]')
+        out$props['p',] <- par[2]
+        out$props['s[p]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
+        out$disp <- matrix(0,2,1)
+        rownames(out$disp) <- c('d','s[d]')
+        out$disp['d',] <- par[3]
+        out$disp['s[d]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
+        if (np==4){
+            out$mu <- matrix(0,3,1)
+            rownames(out$mu) <- c('t','s[t]','ci[t]')
+            out$mu['t',] <- par[4]
+            out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
+            out$mu['ci[t]',] <- nfact(alpha)*out$mu['s[t]',]
         }
     }
-    H <- stats::optimHess(fit,get.minage.L,zs=zs)
-    E <- solve(H)
-    out <- list()
-    out$L <- L
-    out$peaks <- matrix(0,3,1)
-    rownames(out$peaks) <- c('t','s[t]','ci[t]')
-    out$peaks['t',] <- fit[1]
-    out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
-    out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
-    out$disp <- matrix(0,2,1)
-    rownames(out$disp) <- c('d','s[d]')
-    out$disp['d',] <- fit[2]
-    out$disp['s[d]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
-    out$props <- matrix(0,2,1)
-    rownames(out$props) <- c('p','s[p]')
-    out$props['p',] <- fit[3]
-    out$props['s[p]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
     out
 }
 
+# Section 6.11 of Galbraith (2005)
 get.minage.L <- function(pars,zs){
     z <- zs[,1]
     s <- zs[,2]
-    mu <- pars[1]
-    sigma <- pars[2]
-    prop <- pars[3]
+    gam <- pars[1]
+    prop <- pars[2]
+    sig <- pars[3]
+    mu <- pars[4]
     AA  <- prop/sqrt(2*pi*s^2)
-    BB <- -0.5*((z-mu)/s)^2
-    CC <- (1-prop)/sqrt(2*pi*(sigma^2+s^2))
-    mu0 <- (mu/sigma^2 + z/s^2)/(1/sigma^2 + 1/s^2)
-    s0 <- 1/sqrt(1/sigma^2 + 1/s^2)
-    DD <- 2*(1-stats::pnorm((mu-mu0)/s0))
-    EE <- -0.5*((z-mu)^2)/(sigma^2+s^2)
-    minexp <- .Machine$double.min.exp*log(.Machine$double.base)
-    maxexp <- .Machine$double.max.exp*log(.Machine$double.base)
-    fin <- (BB>minexp) & (BB<maxexp) & (EE>minexp) & (EE<maxexp) # finite
-    logfu <- z*0
-    logfu[fin] <- log(AA[fin]*exp(BB[fin]) + CC[fin]*DD[fin]*exp(EE[fin]))
-    -sum(logfu)
+    BB <- -0.5*((z-gam)/s)^2
+    CC <- (1-prop)/sqrt(2*pi*(sig^2+s^2))
+    mu0 <- (mu/sig^2 + z/s^2)/(1/sig^2 + 1/s^2)
+    s0 <- 1/sqrt(1/sig^2 + 1/s^2)
+    DD <- 1-stats::pnorm((gam-mu0)/s0)
+    EE <- 1-stats::pnorm((gam-mu)/s)
+    FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
+    fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
+    sum(-log(fu))
 }

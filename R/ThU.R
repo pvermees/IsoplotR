@@ -1,22 +1,24 @@
-ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,cor=TRUE,detritus=0){
+ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,
+                    cor=TRUE,detritus=0,omit4c=NULL){
     if (x$format %in% c(1,2)){
         ns <- length(x)
         out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
-                                  cor=cor,detritus=detritus)
+                                  cor=cor,detritus=detritus,omit4c=omit4c)
     } else {
-        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
-                                     i2i=i2i,sigdig=sigdig)
+        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,i2i=i2i,
+                                     sigdig=sigdig,omit4c=omit4c)
     }
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0){
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
+                               cor=TRUE,detritus=0,omit4c=NULL){
     ns <- length(x)
     out <- matrix(0,ns,5)
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     d <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
     if (detritus==1)
-        d <- Th230correction.isochron(d,dat=x)
+        d <- Th230correction.isochron(d,dat=x,omit4c=omit4c)
     else if (detritus==3)
         d <- Th230correction.measured.detritus(x)
     if (detritus!=2) Th02 <- c(0,0)
@@ -40,11 +42,11 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,cor=TRUE,detritus=0
     out
 }
 
-get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA){
+get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,omit4c=NULL){
     ns <- length(x)
     d <- data2york(x,type=2,generic=FALSE)
     if (i2i){
-        fit <- isochron.ThU(x,type=2,plot=FALSE,exterr=FALSE)
+        fit <- isochron.ThU(x,type=2,plot=FALSE,exterr=FALSE,omit=omit4c)
         d[,'Th230U238'] <- d[,'Th230U238'] - fit$b[1]*d[,'Th232U238']
     }
     out <- matrix(0,ns,2)

@@ -25,19 +25,26 @@ length.fissiontracks <- function(x){
 }
 
 #' @export
-subset.UPb  <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.UPb  <- function(x,...){
+    out <- x
+    out$x <- subset(x$x,...)
+    if ('x.raw' %in% names(x)){
+        out$x.raw <- subset(x$x.raw,...)
+    }
+    out
+}
 #' @export
-subset.PbPb <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.PbPb <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.ArAr <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ArAr <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.ThPb <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ThPb <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.KCa <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.KCa <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.PD <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.PD <- function(x,...){ subset_helper(x,...) }
 #' @export
-subset.ThU <- function(x,subset,...){ subset_helper(x,subset,...) }
+subset.ThU <- function(x,...){ subset_helper(x,...) }
 #' @export
 subset.detritals <- function(x,subset,...){
     out <- x[subset]
@@ -45,42 +52,47 @@ subset.detritals <- function(x,subset,...){
     out
 }
 #' @export
-subset.UThHe <- function(x,subset,...){
-    out <- x[subset,,drop=FALSE]
+subset.UThHe <- function(x,...){
+    out <- subset.matrix(x,...)
     class(out) <- class(x)
     out
 }
 #' @export
-subset.fissiontracks <- function(x,subset,...){
+subset.fissiontracks <- function(x,...){
     if (x$format==1){
-        out <- subset_helper(x,subset,...)
+        out <- subset_helper(x,...)
     } else {
         out <- x
-        out$Ns <- x$Ns[subset]
-        out$A <- x$A[subset]
-        out$U <- x$U[subset]
-        out$sU <- x$sU[subset]
+        out$Ns <- subset(x$Ns,...)
+        out$A <- subset(x$A,...)
+        out$U <- subset(x$U,...)
+        out$sU <- subset(x$sU,...)
     }
     out
 }
-subset_helper <- function(x,subset){
+subset_helper <- function(x,...){
     out <- x
-    out$x <- subset(x$x,subset=subset)
+    out$x <- subset.matrix(x$x,...)
     out
 }
 
 roundit <- function(age,err,sigdig=2){
-    if (length(age)==1) dat <- c(age,err)
-    else dat <- cbind(age,err)
-    min.err <- min(abs(dat),na.rm=TRUE)
-    if (is.na(sigdig)) {
-        out <- dat
-    } else if (any(dat<=0, na.rm=TRUE)){
-        out <- signif(dat,sigdig)
+    if (missing(err)){
+        if (is.na(sigdig)) out <- age
+        else out <- signif(age,digits=sigdig)
     } else {
-        nsmall <- min(20,max(0,-(trunc(log10(min.err))-sigdig)))
-        out <- format(dat,digits=sigdig,nsmall=nsmall,
-                      trim=TRUE,scientific=FALSE)
+        if (length(age)==1) dat <- c(age,err)
+        else dat <- cbind(age,err)
+        min.err <- min(abs(dat),na.rm=TRUE)
+        if (is.na(sigdig)) {
+            out <- dat
+        } else if (any(dat<=0, na.rm=TRUE)){
+            out <- signif(dat,sigdig)
+        } else {
+            nsmall <- min(20,max(0,-(trunc(log10(min.err))-sigdig)))
+            out <- format(dat,digits=sigdig,nsmall=nsmall,
+                          trim=TRUE,scientific=FALSE)
+        }
     }
     out
 }
@@ -262,7 +274,8 @@ errorprop1x2 <- function(J1,J2,E11,E22,E12){
     sqrt(v)
 }
 errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){
-    v <- E11*J1^2 + E22*J2^2 + E33*J3^2 + 2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23
+    v <- E11*J1^2 + E22*J2^2 + E33*J3^2 +
+        2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23
     sqrt(v)
 }
 
@@ -474,7 +487,7 @@ clear <- function(x,...){
     i <- unlist(list(...))
     if (hasClass(x,'matrix')) sn <- 1:nrow(x)
     else sn <- 1:length(x)
-    if (is.numeric(i)) out <- subset(x,subset=sn%ni%i)
+    if (length(i)>0) out <- subset(x,subset=sn%ni%i)
     else out <- x
     out
 }

@@ -161,12 +161,22 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' \code{3}: use the Stacey-Kramer two-stage model to infer the initial
 #' Pb-composition
 #'
-#' @param show.p Show the p-value for concordance for each aliquot to
-#'     the output table. Note: it would be unwise to use the p-value
-#'     value as a concordance filter. Doing so would `punish' high
-#'     precision measurements, which are more likely to fail the
-#'     Chi-square test than low precision measurements. The latter
-#'     would therefore be `rewarded' by such a criterion.
+#' @param discordance discordance calculator. This is an object of
+#'     class \code{\link{discfilter}}, or a two element list
+#'     containing:
+#'
+#' \code{option}: one of \code{0} or \code{'t'} (absolute age filter);
+#' \code{1} or \code{'r'} (relative age filter); \code{2} or
+#' \code{'sk'} (Stacey-Kramers common Pb filter); \code{3} or
+#' \code{'a'} (perpendicular Aitchison distance); or \code{4} or
+#' \code{'c'} (concordia distance). For further details about these
+#' definitions, see the paper by Vermeesch (2020). To omit the
+#' discordance from the output of the \code{age} function, set
+#' \code{option = NA}.
+#'
+#' \code{before}: logical flag indicating whether the discordance
+#' should be calculated before (\code{TRUE}) or after (\code{FALSE})
+#' the common-Pb correction.
 #'
 #' @return
 #' \enumerate{
@@ -229,15 +239,13 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @rdname age
 #' @export
 age.UPb <- function(x,type=1,exterr=TRUE,i=NA,
-                    sigdig=NA,common.Pb=0,show.p=FALSE,...){
-    if (common.Pb %in% c(1,2,3)){
-        X <- Pb0corr(x,option=common.Pb)
-    } else {
-        X <- x
-    }
+                    sigdig=NA,common.Pb=0,
+                    discordance=discfilter(option=NA),...){
     if (type==1){
-        out <- UPb.age(X,exterr=exterr,i=i,sigdig=sigdig,show.p=show.p,...)
+        out <- UPb.age(x,exterr=exterr,i=i,sigdig=sigdig,
+                       discordance=discordance,common.Pb=common.Pb,...)
     } else if (type==2){
+        X <- Pb0corr(x,option=common.Pb)
         out <- concordia.age(X,wetherill=TRUE,exterr=exterr)
     } else if (type %in% c(3,4,5)){
         out <- concordia.intersection.ludwig(x,wetherill=FALSE,exterr=exterr,model=type-2)
@@ -407,34 +415,35 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out
 }
 
-get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,
-                     cutoff.disc=list(-15,5,TRUE),common.Pb=0,detritus=0){
+get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
+                     cutoff.disc=discfilter(),common.Pb=0,detritus=0){
     if (hasClass(x,'UPb')){
         out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                               cutoff.disc=cutoff.disc,
+                               cutoff.disc=cutoff.disc,omit4c=omit4c,
                                exterr=FALSE,common.Pb=common.Pb)
     } else if (hasClass(x,'PbPb')){
-        out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb)
+        out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb,omit4c=omit4c)
     } else if (hasClass(x,'ArAr')){
-        out <- ArAr.age(x,exterr=FALSE,i2i=i2i)
+        out <- ArAr.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (hasClass(x,'ThPb')){
-        out <- ThPb.age(x,exterr=FALSE,i2i=i2i)
+        out <- ThPb.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (hasClass(x,'KCa')){
-        out <- KCa.age(x,exterr=FALSE,i2i=i2i)
+        out <- KCa.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (hasClass(x,'UThHe')){
         out <- UThHe.age(x)
     } else if (hasClass(x,'ReOs')){
-        out <- ReOs.age(x,exterr=FALSE,i2i=i2i)
+        out <- ReOs.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (hasClass(x,'SmNd')){
-        out <- SmNd.age(x,exterr=FALSE,i2i=i2i)
+        out <- SmNd.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (hasClass(x,'RbSr')){
-        out <- RbSr.age(x,exterr=FALSE,i2i=i2i)
+        out <- RbSr.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (hasClass(x,'LuHf')){
-        out <- LuHf.age(x,exterr=FALSE,i2i=i2i)
+        out <- LuHf.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (hasClass(x,'fissiontracks')){
         out <- fissiontrack.age(x,exterr=FALSE)
     } else if (hasClass(x,'ThU')){
-        out <- ThU.age(x,exterr=FALSE,i2i=i2i,detritus=detritus)
+        out <- ThU.age(x,exterr=FALSE,i2i=i2i,
+                       detritus=detritus,omit4c=omit4c)
     }
     out
 }

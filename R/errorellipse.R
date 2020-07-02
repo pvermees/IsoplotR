@@ -48,11 +48,11 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     numbers)
 #' @param show.ellipses show the data as:
 #' 
-#' \code{1}: points
+#' \code{0}: points
 #' 
-#' \code{2}: error ellipses
+#' \code{1}: error ellipses
 #' 
-#' \code{3}: error crosses
+#' \code{2}: error crosses
 #' 
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
@@ -91,8 +91,10 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from the isochron age calculation.
-#' @param omit.col colour that should be used for the omitted
+#' @param omit.fill fill colour that should be used for the omitted
 #'     aliquots.
+#' @param omit.stroke stroke colour that should be used for the
+#'     omitted aliquots.
 #' @param addcolourbar add a colour bar to display the colours used to
 #'     \code{levels}
 #' @param bg background colour for the plot symbols (only used if
@@ -100,8 +102,10 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param cex plot symbol magnification.
 #' @param xlim (optional) two-element vector with the x-axis limits
 #' @param ylim (optional) two-element vector with the y-axis limits
-#' @param xlab (optional) x-axis label (only used when \code{add=FALSE})
-#' @param ylab (optional) y-axis label (only used when \code{add=FALSE})
+#' @param xlab (optional) x-axis label (only used when
+#'     \code{add=FALSE})
+#' @param ylab (optional) y-axis label (only used when
+#'     \code{add=FALSE})
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -119,8 +123,9 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke="black",fit='none',add=FALSE,
                         empty=FALSE, ci.col='gray80',line.col='black',
-                        lwd=1, hide=NULL,omit=NULL,omit.col=NA,
-                        addcolourbar=TRUE,bg,cex,xlim,ylim,xlab,ylab,...){
+                        lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
+                        omit.stroke="grey",addcolourbar=TRUE,
+                        bg,cex,xlim,ylim,xlab,ylab,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -141,15 +146,10 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
     }
     graphics::box()
     nolevels <- all(is.na(levels))
-    if (show.ellipses==2 && nolevels){
-        fill <- rep(ellipse.fill[1],ns)
-        stroke <- rep(ellipse.stroke[1],ns)
-    } else {
-        fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
-                                    hide=hide,omit=omit,omit.col=omit.col)
-        stroke <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.stroke,
-                                      hide=hide,omit=omit,omit.col=omit.col)
-    }
+    fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
+                                hide=hide,omit=omit,omit.col=omit.fill)
+    stroke <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.stroke,
+                                  hide=hide,omit=omit,omit.col=omit.stroke)
     if (show.ellipses==0){ # points and or text
         if (missing(cex)) cex <- 1
         if (missing(bg)) bg <- fill

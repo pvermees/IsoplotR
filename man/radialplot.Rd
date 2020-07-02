@@ -37,7 +37,7 @@ radialplot(x, ...)
   alpha = 0.05,
   units = "",
   hide = NA,
-  omit = NA,
+  omit = NULL,
   omit.col = NA,
   ...
 )
@@ -73,7 +73,7 @@ radialplot(x, ...)
   transformation = "log",
   type = 4,
   cutoff.76 = 1100,
-  cutoff.disc = list(-15, 5, TRUE),
+  cutoff.disc = discfilter(),
   show.numbers = FALSE,
   pch = 21,
   sigdig = 2,
@@ -427,21 +427,9 @@ the error propagation for the central age and mixture models?}
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 only used if \code{type=4}.}
 
-\item{cutoff.disc}{discordance cutoff filter. This is a three
-    element list.
-
-The first two items contain the minimum (negative) and maximum
-(positive) percentage discordance allowed between the
-\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-(if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-\eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-(if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
-
-The third item is a boolean flag that controls whether the
-discordance filter should be applied before (\code{TRUE}) or after
-(\code{FALSE}) the common-Pb correction.
-
-Set \code{cutoff.disc=NA} to turn off this filter.}
+\item{cutoff.disc}{discordance cutoff filter. This is an object of
+class \code{\link{discfilter}} Set \code{cutoff.disc=NA} to
+turn off the filter.}
 
 \item{common.Pb}{common lead correction:
 
@@ -504,10 +492,10 @@ constructed as follows.  Consider a set of dates
 to be a transformation of \eqn{t_i} (e.g., \eqn{z_i = log[t_i]}),
 and let \eqn{s[z_i]} be its propagated analytical uncertainty
 (i.e., \eqn{s[z_i] = s[t_i]/t_i} in the case of a logarithmic
-transformation). Create a scatterplot of \eqn{(x_i,y_i)} values,
+transformation). Create a scatter plot of \eqn{(x_i,y_i)} values,
 where \eqn{x_i = 1/s[z_i]} and \eqn{y_i = (z_i-z_\circ)/s[z_i]},
 where \eqn{z_\circ} is some reference value such as the mean. The
-slope of a line connecting the origin of this scatterplot with any
+slope of a line connecting the origin of this scatter plot with any
 of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
 the date \eqn{t_i}.  These dates can be more easily visualised by
 drawing a radial scale at some convenient distance from the origin

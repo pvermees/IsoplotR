@@ -30,15 +30,15 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
 
 # i2i = isochron to intercept
 # bratio = branching ratio
-PD.age <- function(x,nuclide,exterr=TRUE,i=NA,
-                   sigdig=NA,i2i=TRUE,bratio=1,...){
+PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
+                   i2i=TRUE,bratio=1,omit4c=NULL,...){
     ns <- length(x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     if (ns<2) i2i <- FALSE
     if (i2i){
         y <- data2york(x,inverse=TRUE)
-        fit <- regression(y,model=1)
+        fit <- regression(y,model=1,omit=omit4c)
         DP <- matrix(0,ns,2)
         DP[,1] <- 1/(y[,'X'] - y[,'Y']/fit$b[1])
         J1 <- -DP[,1]^2

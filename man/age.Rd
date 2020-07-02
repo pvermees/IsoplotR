@@ -37,7 +37,7 @@ age(x, ...)
   i = NA,
   sigdig = NA,
   common.Pb = 0,
-  show.p = FALSE,
+  discordance = discfilter(option = NA),
   ...
 )
 
@@ -190,12 +190,22 @@ estimate (only used if \code{type=1}, \code{isochron=FALSE} and
 \code{3}: use the Stacey-Kramer two-stage model to infer the initial
 Pb-composition}
 
-\item{show.p}{Show the p-value for concordance for each aliquot to
-the output table. Note: it would be unwise to use the p-value
-value as a concordance filter. Doing so would `punish' high
-precision measurements, which are more likely to fail the
-Chi-square test than low precision measurements. The latter
-would therefore be `rewarded' by such a criterion.}
+\item{discordance}{discordance calculator. This is an object of
+    class \code{\link{discfilter}}, or a two element list
+    containing:
+
+\code{option}: one of \code{0} or \code{'t'} (absolute age filter);
+\code{1} or \code{'r'} (relative age filter); \code{2} or
+\code{'sk'} (Stacey-Kramers common Pb filter); \code{3} or
+\code{'a'} (perpendicular Aitchison distance); or \code{4} or
+\code{'c'} (concordia distance). For further details about these
+definitions, see the paper by Vermeesch (2020). To omit the
+discordance from the output of the \code{age} function, set
+\code{option = NA}.
+
+\code{before}: logical flag indicating whether the discordance
+should be calculated before (\code{TRUE}) or after (\code{FALSE})
+the common-Pb correction.}
 
 \item{isochron}{logical flag indicating whether each analysis
 should be considered separately (\code{isochron=FALSE}) or an

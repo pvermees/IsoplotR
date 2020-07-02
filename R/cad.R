@@ -89,22 +89,9 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U-age and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc discordance cutoff filter. This is a three
-#'     element list.
-#'
-#' The first two items contain the minimum (negative) and maximum
-#' (positive) percentage discordance allowed between the
-#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
-#'
-#' The third item is a boolean flag that controls whether the
-#' discordance filter should be applied before (\code{TRUE}) or after
-#' (\code{FALSE}) the common-Pb correction.
-#'
-#' Set \code{cutoff.disc=NA} to turn off this filter.
-#' 
+#' @param cutoff.disc discordance cutoff filter. This is an object of
+#'     class \code{\link{discfilter}}. Set \code{cutoff.disc=NA} to
+#'     turn off the filter.
 #' @param common.Pb common lead correction:
 #'
 #' \code{0}: none
@@ -125,19 +112,30 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' 
 #' \code{2}: use the isochron intercept as the initial Pb-composition
 #'
-#' \code{3}: use the Stacey-Kramers two-stage model to infer the initial
-#' Pb-composition (only applicable if \code{x} has class \code{UPb})
-#'
+#' \code{3}: use the Stacey-Kramers two-stage model to infer the
+#' initial Pb-composition (only applicable if \code{x} has class
+#' \code{UPb})
+#' @references Vermeesch, P., 2007. Quantitative geomorphology of the
+#'     White Mountains (California) using detrital apatite fission
+#'     track thermochronology. Journal of Geophysical Research: Earth
+#'     Surface, 112(F3). 
 #' @rdname cad
 #' @export
 cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     col='black',type=4,cutoff.76=1100,
-                    cutoff.disc=list(-15,5,TRUE),common.Pb=0,
+                    cutoff.disc=discfilter(),common.Pb=0,
                     hide=NULL,...){
-    tt <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
-                          cutoff.disc=cutoff.disc,common.Pb=common.Pb)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,type=type,cutoff.76=cutoff.76,
+               cutoff.disc=cutoff.disc,common.Pb=common.Pb,
+               pch=pch,verticals=verticals,xlab=xlab,
+               col=col,hide=hide,...)
+}
+#' @rdname cad
+#' @export
+cad.PbPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
+                     col='black',common.Pb=1,hide=NULL,...){
+    cad_helper(x,common.Pb=common.Pb,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
@@ -149,42 +147,26 @@ cad.UPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
 #'     stored in \code{settings('iratio',...)}.
 #' 
-#' @references Vermeesch, P., 2007. Quantitative geomorphology of the
-#'     White Mountains (California) using detrital apatite fission
-#'     track thermochronology. Journal of Geophysical Research: Earth
-#'     Surface, 112(F3).
-#' 
-#' @rdname cad
-#' @export
-cad.PbPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                     col='black',common.Pb=1,hide=NULL,...){
-    tt <- PbPb.age(x,common.Pb=common.Pb)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
-}
 #' @rdname cad
 #' @export
 cad.ArAr <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',i2i=FALSE,hide=NULL,...){
-    tt <- ArAr.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.KCa <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                     col='black',i2i=FALSE,hide=NULL,...){
-    tt <- KCa.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.ThPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',i2i=TRUE,hide=NULL,...){
-    tt <- ThPb.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format=1} or \code{2}).
@@ -204,63 +186,66 @@ cad.ThPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @export
 cad.ThU <- function(x,pch=NA,verticals=TRUE, xlab='age [ka]',
                     col='black',i2i=FALSE,detritus=0,hide=NULL,...){
-    tt <- ThU.age(x,i2i=i2i,detritus=detritus)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,detritus=detritus,pch=pch,
+               verticals=verticals,xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.ThPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',i2i=TRUE,hide=NULL,...){
-    tt <- ThPb.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.ReOs <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',i2i=TRUE,hide=NULL,...){
-    tt <- ReOs.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.SmNd <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',i2i=TRUE,hide=NULL,...){
-    tt <- SmNd.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.RbSr <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',i2i=TRUE,hide=NULL,...){
-    tt <- RbSr.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.LuHf <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                      col='black',i2i=TRUE,hide=NULL,...){
-    tt <- LuHf.age(x,i2i=i2i)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,i2i=i2i,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.UThHe <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                       col='black',hide=NULL,...){
-    tt <- UThHe.age(x)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad
 #' @export
 cad.fissiontracks <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                               col='black',hide=NULL,...){
-    tt <- fissiontrack.age(x)[,1]
-    cad.default(tt,pch=pch,verticals=verticals,xlab=xlab,
-                col=col,hide=hide,...)
+    cad_helper(x,pch=pch,verticals=verticals,
+               xlab=xlab,col=col,hide=hide,...)
+}
+
+cad_helper <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
+                       col='black',hide=NULL,type=4,cutoff.76=1100,
+                       cutoff.disc=discfilter(),common.Pb=0,
+                       i2i=FALSE,detritus=0,...){
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
+                   cutoff.disc=cutoff.disc,i2i=i2i,
+                   common.Pb=common.Pb,detritus=detritus,omit4c=hide)
+    cad.default(tt[,1],pch=pch,verticals=verticals,
+                xlab=xlab,col=col,hide=hide,...)
 }

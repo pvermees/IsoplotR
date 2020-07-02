@@ -60,7 +60,7 @@ kde(x, ...)
   binwidth = NA,
   type = 4,
   cutoff.76 = 1100,
-  cutoff.disc = list(-15, 5, TRUE),
+  cutoff.disc = discfilter(),
   common.Pb = 0,
   hide = NULL,
   ...
@@ -401,21 +401,9 @@ from the plot.}
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 only used if \code{type=4}.}
 
-\item{cutoff.disc}{discordance cutoff filter. This is a three
-    element list.
-
-The first two items contain the minimum (negative) and maximum
-(positive) percentage discordance allowed between the
-\eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-(if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-\eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-(if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
-
-The third item is a boolean flag that controls whether the
-discordance filter should be applied before (\code{TRUE}) or after
-(\code{FALSE}) the common-Pb correction.
-
-Set \code{cutoff.disc=NA} to turn off this filter.}
+\item{cutoff.disc}{discordance cutoff filter. This is an object of
+class \code{\link{discfilter}}. Set \code{cutoff.disc=NA} to
+turn off the filter.}
 
 \item{common.Pb}{common lead correction:
 

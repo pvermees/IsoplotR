@@ -23,7 +23,8 @@ concordia(
   anchor = list(FALSE, NA),
   hide = NULL,
   omit = NULL,
-  omit.col = NA,
+  omit.fill = NA,
+  omit.stroke = "grey",
   ...
 )
 }
@@ -152,8 +153,11 @@ from the concordia diagram}
 \item{omit}{vector with indices of aliquots that should be plotted
 but omitted from concordia or discordia age calculation}
 
-\item{omit.col}{colour that should be used for the omitted
+\item{omit.fill}{fill colour that should be used for the omitted
 aliquots.}
+
+\item{omit.stroke}{stroke colour that should be used for the
+omitted aliquots.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

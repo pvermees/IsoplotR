@@ -124,8 +124,10 @@
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from the central age calculation.
-#' @param omit.col colour that should be used for the omitted
+#' @param omit.fill fill colour that should be used for the omitted
 #'     aliquots.
+#' @param omit.stroke stroke colour that should be used for the
+#'     omitted aliquots.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
 #' @references Aitchison, J., 1986, The statistical analysis of
@@ -147,7 +149,8 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                       contour.col=c('white','red'),levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
-                      ylim=NA,fact=NA,hide=NULL,omit=NULL,omit.col=NA,...){
+                      ylim=NA,fact=NA,hide=NULL,omit=NULL,
+                      omit.fill=NA,omit.stroke='grey',...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
@@ -156,10 +159,10 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     fit <- central.UThHe(x2calc,alpha=alpha,model=model)
     fill <- set.ellipse.colours(ns=ns,levels=levels,
                                 col=ellipse.fill,hide=hide,
-                                omit=omit,omit.col=omit.col)
+                                omit=omit,omit.col=omit.fill)
     stroke <- set.ellipse.colours(ns=ns,levels=levels,
                                   col=ellipse.stroke,hide=hide,
-                                  omit=omit,omit.col=omit.col)
+                                  omit=omit,omit.col=omit.stroke)
     if (logratio) {
         plot_logratio_contours(x2plot,contour.col=contour.col,
                                xlim=xlim,ylim=ylim)
@@ -191,9 +194,9 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     if (show.central.comp){
         plot_central_ellipse(fit,fact=fact,logratio=logratio,
                              alpha=alpha,doSm=doSm(x))
-        fit$n <- length(which(calcit))
-        graphics::title(helioplot_title(fit,sigdig=sigdig))
     }
+    fit$n <- length(which(calcit))
+    graphics::title(helioplot_title(fit,sigdig=sigdig))
     invisible(colourbar(z=levels[calcit],fill=ellipse.fill,
                         stroke=ellipse.stroke,clabel=clabel))
 }

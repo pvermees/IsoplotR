@@ -21,7 +21,8 @@ scatterplot(
   lwd = 1,
   hide = NULL,
   omit = NULL,
-  omit.col = NA,
+  omit.fill = NA,
+  omit.stroke = "grey",
   addcolourbar = TRUE,
   bg,
   cex,
@@ -42,11 +43,11 @@ numbers)}
 
 \item{show.ellipses}{show the data as:
 
-\code{1}: points
+\code{0}: points
 
-\code{2}: error ellipses
+\code{1}: error ellipses
 
-\code{3}: error crosses}
+\code{2}: error crosses}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
@@ -96,8 +97,11 @@ from the plot.}
 \item{omit}{vector with indices of aliquots that should be plotted
 but omitted from the isochron age calculation.}
 
-\item{omit.col}{colour that should be used for the omitted
+\item{omit.fill}{fill colour that should be used for the omitted
 aliquots.}
+
+\item{omit.stroke}{stroke colour that should be used for the
+omitted aliquots.}
 
 \item{addcolourbar}{add a colour bar to display the colours used to
 \code{levels}}
@@ -111,9 +115,11 @@ aliquots.}
 
 \item{ylim}{(optional) two-element vector with the y-axis limits}
 
-\item{xlab}{(optional) x-axis label (only used when \code{add=FALSE})}
+\item{xlab}{(optional) x-axis label (only used when
+\code{add=FALSE})}
 
-\item{ylab}{(optional) y-axis label (only used when \code{add=FALSE})}
+\item{ylab}{(optional) y-axis label (only used when
+\code{add=FALSE})}
 
 \item{...}{optional arguments to format the points and text.}
 }

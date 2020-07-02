@@ -15,10 +15,10 @@
 #' to be a transformation of \eqn{t_i} (e.g., \eqn{z_i = log[t_i]}),
 #' and let \eqn{s[z_i]} be its propagated analytical uncertainty
 #' (i.e., \eqn{s[z_i] = s[t_i]/t_i} in the case of a logarithmic
-#' transformation). Create a scatterplot of \eqn{(x_i,y_i)} values,
+#' transformation). Create a scatter plot of \eqn{(x_i,y_i)} values,
 #' where \eqn{x_i = 1/s[z_i]} and \eqn{y_i = (z_i-z_\circ)/s[z_i]},
 #' where \eqn{z_\circ} is some reference value such as the mean. The
-#' slope of a line connecting the origin of this scatterplot with any
+#' slope of a line connecting the origin of this scatter plot with any
 #' of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
 #' the date \eqn{t_i}.  These dates can be more easily visualised by
 #' drawing a radial scale at some convenient distance from the origin
@@ -121,7 +121,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                                show.numbers=FALSE,pch=21,levels=NA,
                                clabel="",bg=c("yellow","red"),col='black',
                                k=0,markers=NULL,alpha=0.05,
-                               units='',hide=NA,omit=NA,omit.col=NA,...){
+                               units='',hide=NA,omit=NULL,omit.col=NA,...){
     x <- x[,c(1,2),drop=FALSE]
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -134,7 +134,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
                   clabel=clabel,bg=bg,col=col,markers=markers,
                   alpha=alpha,units=units,hide=hide,omit=omit,
                   omit.col=omit.col,...)
-    fit <- central(x,alpha=alpha)
+    fit <- central(x2calc,alpha=alpha)
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
                                  units=units,ntit=get.ntit(x2calc[,1])))
     if (!is.null(peaks$legend))
@@ -187,22 +187,10 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
-#' @param cutoff.disc discordance cutoff filter. This is a three
-#'     element list.
-#'
-#' The first two items contain the minimum (negative) and maximum
-#' (positive) percentage discordance allowed between the
-#' \eqn{^{207}}Pb/\eqn{^{235}}U and \eqn{^{206}}Pb/\eqn{^{238}}U age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U < \code{cutoff.76}) or between the
-#' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb age
-#' (if \eqn{^{206}}Pb/\eqn{^{238}}U > \code{cutoff.76}).
-#'
-#' The third item is a boolean flag that controls whether the
-#' discordance filter should be applied before (\code{TRUE}) or after
-#' (\code{FALSE}) the common-Pb correction.
-#'
-#' Set \code{cutoff.disc=NA} to turn off this filter.
-#'
+#' @param cutoff.disc discordance cutoff filter. This is an object of
+#'     class \code{\link{discfilter}} Set \code{cutoff.disc=NA} to
+#'     turn off the filter.
+#' 
 #' @param common.Pb common lead correction:
 #'
 #' \code{0}: none
@@ -225,12 +213,11 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #'
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition
-#'
 #' @rdname radialplot
 #' @export
 radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            transformation='log',type=4,
-                           cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                           cutoff.76=1100,cutoff.disc=discfilter(),
                            show.numbers=FALSE,pch=21,sigdig=2,
                            levels=NA,clabel="",bg=c("yellow","red"),
                            col='black',markers=NULL,k=0,exterr=TRUE,
@@ -424,7 +411,7 @@ radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
                detritus=detritus,hide=hide,omit=omit,omit.col=omit.col,...)
 }
 age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
-                       type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                       type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                        show.numbers=FALSE,pch=21,levels=NA,sigdig=2,
                        clabel="",bg=c("yellow","red"),col='black',
                        markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
@@ -437,14 +424,16 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                      detritus=detritus)
     markers <- c(markers,peaks$peaks['t',])
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   i2i=i2i,detritus=detritus,common.Pb=common.Pb)
+                   i2i=i2i,omit4c=unique(c(hide,omit)),
+                   detritus=detritus,common.Pb=common.Pb)
     radial_helper(tt,from=from,to=to,t0=t0,
                   transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
                   clabel=clabel,bg=bg,col=col,markers=markers,
                   alpha=alpha,units=units,hide=hide,omit=omit,
                   omit.col=omit.col,...)
-    fit <- central(tt,alpha=alpha)
+    selection <- clear(1:nrow(tt),unique(c(hide,omit)))
+    fit <- central(tt[selection,],alpha=alpha)
     if (exterr){
         fit$age[1:2] <- add.exterr(x2calc,tt=fit$age[1],st=fit$age[2],
                                    cutoff.76=cutoff.76,type=type)
@@ -457,7 +446,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
 }
 
 radial_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
-                          type=4,cutoff.76=1100,cutoff.disc=list(-15,5,TRUE),
+                          type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                           show.numbers=FALSE,pch=21,levels=NA,clabel="",
                           bg=c("yellow","red"),col='black',markers=NULL,
                           k=0,i2i=FALSE,alpha=0.05,units='MA',detritus=0,

@@ -4,7 +4,7 @@
 \alias{Pb0corr}
 \title{Common Pb correction}
 \usage{
-Pb0corr(x, option = 3, omit = NULL)
+Pb0corr(x, option = 3, omit4c = NULL)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -17,8 +17,9 @@ Pb0corr(x, option = 3, omit = NULL)
 
 \code{3}: Stacey-Kramers correction}
 
-\item{omit}{vector with indices of aliquots that should be omitted
-from the isochron regression (only used if \code{option=2})}
+\item{omit4c}{vector with indices of aliquots that should be
+omitted from the isochron regression (only used if
+\code{option=2})}
 }
 \value{
 Returns a list in which \code{x.raw} contains the original data and

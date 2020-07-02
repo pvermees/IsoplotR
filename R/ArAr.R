@@ -38,14 +38,14 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
 
 # x an object of class \code{ArAr} returns a matrix 
 # of 40Ar/39Ar-ages and their uncertainties.
-ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE){
+ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=FALSE,omit4c=NULL){
     ns <- length(x)
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     y <- data2york(x,inverse=TRUE)
     if (i2i){
-        fit <- york(y)
+        fit <- york(clear(y,omit4c))
         b <- fit$b[1]
     } else {
         atm <- iratio("Ar40Ar36")[1]
