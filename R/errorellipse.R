@@ -48,11 +48,11 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     numbers)
 #' @param show.ellipses show the data as:
 #' 
-#' \code{1}: points
+#' \code{0}: points
 #' 
-#' \code{2}: error ellipses
+#' \code{1}: error ellipses
 #' 
-#' \code{3}: error crosses
+#' \code{2}: error crosses
 #' 
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
@@ -146,15 +146,10 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
     }
     graphics::box()
     nolevels <- all(is.na(levels))
-    if (show.ellipses==2 && nolevels){
-        fill <- rep(ellipse.fill[1],ns)
-        stroke <- rep(ellipse.stroke[1],ns)
-    } else {
-        fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
-                                    hide=hide,omit=omit,omit.col=omit.fill)
-        stroke <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.stroke,
-                                      hide=hide,omit=omit,omit.col=omit.stroke)
-    }
+    fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
+                                hide=hide,omit=omit,omit.col=omit.fill)
+    stroke <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.stroke,
+                                  hide=hide,omit=omit,omit.col=omit.stroke)
     if (show.ellipses==0){ # points and or text
         if (missing(cex)) cex <- 1
         if (missing(bg)) bg <- fill

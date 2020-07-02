@@ -492,10 +492,10 @@ constructed as follows.  Consider a set of dates
 to be a transformation of \eqn{t_i} (e.g., \eqn{z_i = log[t_i]}),
 and let \eqn{s[z_i]} be its propagated analytical uncertainty
 (i.e., \eqn{s[z_i] = s[t_i]/t_i} in the case of a logarithmic
-transformation). Create a scatterplot of \eqn{(x_i,y_i)} values,
+transformation). Create a scatter plot of \eqn{(x_i,y_i)} values,
 where \eqn{x_i = 1/s[z_i]} and \eqn{y_i = (z_i-z_\circ)/s[z_i]},
 where \eqn{z_\circ} is some reference value such as the mean. The
-slope of a line connecting the origin of this scatterplot with any
+slope of a line connecting the origin of this scatter plot with any
 of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
 the date \eqn{t_i}.  These dates can be more easily visualised by
 drawing a radial scale at some convenient distance from the origin
