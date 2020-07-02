@@ -53,7 +53,7 @@ subset.detritals <- function(x,subset,...){
 }
 #' @export
 subset.UThHe <- function(x,...){
-    out <- subset(x,...)
+    out <- subset.matrix(x,...)
     class(out) <- class(x)
     out
 }
@@ -72,7 +72,7 @@ subset.fissiontracks <- function(x,...){
 }
 subset_helper <- function(x,...){
     out <- x
-    out$x <- subset(x$x,...)
+    out$x <- subset.matrix(x$x,...)
     out
 }
 
@@ -487,7 +487,7 @@ clear <- function(x,...){
     i <- unlist(list(...))
     if (hasClass(x,'matrix')) sn <- 1:nrow(x)
     else sn <- 1:length(x)
-    if (is.numeric(i)) out <- subset(x,subset=sn%ni%i)
+    if (length(i)>0) out <- subset(x,subset=sn%ni%i)
     else out <- x
     out
 }

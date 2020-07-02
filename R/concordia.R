@@ -158,8 +158,10 @@
 #'     from the concordia diagram
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from concordia or discordia age calculation
-#' @param omit.col colour that should be used for the omitted
+#' @param omit.fill fill colour that should be used for the omitted
 #'     aliquots.
+#' @param omit.stroke stroke colour that should be used for the
+#'     omitted aliquots.
 #' @param ... optional arguments to the generic \code{plot} function
 #'
 #' @return
@@ -266,7 +268,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,sigdig=2,common.Pb=0,ticks=5,
                       anchor=list(FALSE,NA),hide=NULL,omit=NULL,
-                      omit.col=NA,...){    
+                      omit.fill=NA,omit.stroke='grey',...){    
     if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -299,7 +301,8 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                 show.ellipses=1*(show.age!=3),levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
-                hide=hide,omit=omit,omit.col=omit.col,addcolourbar=FALSE,...)
+                hide=hide,omit=omit,omit.fill=omit.fill,
+                omit.stroke=omit.stroke,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
         fit <- concordia.age(X2calc,type=type,exterr=exterr,alpha=alpha)

@@ -116,7 +116,9 @@
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from the isochron age calculation.
-#' @param omit.col colour that should be used for the omitted
+#' @param omit.fill fill colour that should be used for the omitted
+#'     aliquots.
+#' @param omit.stroke stroke colour that should be used for the omitted
 #'     aliquots.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{isochron}}
@@ -142,7 +144,8 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
                       isochron=FALSE,model=1,exterr=TRUE,sigdig=2,
-                      hide=NULL,omit=NULL,omit.col=NA,...){
+                      hide=NULL,omit=NULL,omit.fill=NA,
+                      omit.stroke='grey',...){
     if (x$format %in% c(1,2)){
         if (transform){
             U4U8vst(x,detritus=detritus,xlim=xlim,ylim=ylim,alpha=alpha,
@@ -150,7 +153,7 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     show.ellipses=(model!=2),hide=hide,omit=omit,
-                    omit.col=omit.col,...)
+                    omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
                         ylim=ylim,alpha=alpha,detritus=detritus,
@@ -158,7 +161,8 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                         clabel=clabel,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,
                         line.col=line.col,show.ellipses=(model!=2),
-                        hide=hide,omit=omit,omit.col=omit.col,...)
+                        hide=hide,omit=omit,omit.fill=omit.fill,
+                        omit.stroke=omit.stroke,...)
         }
         if (isochron){
             fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,
@@ -173,7 +177,7 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     line.col=line.col,hide=hide,omit=omit,
-                    omit.col=omit.col,...)
+                    omit.fill=omit.fill,omit.stroke=omit.stroke,...)
     }
 }
 
@@ -181,7 +185,8 @@ U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
                     show.numbers=FALSE,levels=NA,clabel="",
                     ellipse.fill=c("#00FF0080","#FF000080"),
                     ellipse.stroke='black',show.ellipses=TRUE,
-                    hide=NULL,omit=NULL,omit.col=NA,...){
+                    hide=NULL,omit=NULL,omit.fill=NA,
+                    omit.stroke='grey',...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,detritus=detritus)
@@ -201,8 +206,8 @@ U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
     scatterplot(d,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
-                ellipse.stroke=ellipse.stroke,add=TRUE,
-                hide=hide,omit=omit,omit.col=omit.col,...)
+                ellipse.stroke=ellipse.stroke,add=TRUE, hide=hide,
+                omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0, xlim=NA,
@@ -211,7 +216,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0, xlim=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
                         show.ellipses=TRUE,hide=NULL,omit=NULL,
-                        omit.col=NA,...){
+                        omit.fill=NA,omit.stroke='grey',...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -241,8 +246,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0, xlim=NA,
     scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
-                ellipse.stroke=ellipse.stroke,add=TRUE,
-                hide=hide,omit=omit,omit.col=omit.col,...)
+                ellipse.stroke=ellipse.stroke,add=TRUE,hide=hide,
+                omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
     colourbar(z=levels[calcit],fill=ellipse.fill,
               stroke=ellipse.stroke,clabel=clabel)
 }
@@ -253,7 +258,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
                         line.col='darksalmon',hide=NULL,omit=NULL,
-                        omit.col=NA,...){
+                        omit.fill=NA,omit.stroke='grey',...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -268,7 +273,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
     maxY <- graphics::par('usr')[4]
     if (isochron){
         fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
-                            hide=hide,omit=omit,omit.col=omit.col)
+                            hide=hide,omit=omit,omit.fill=omit.fill,
+                            omit.stroke=omit.stroke)
         Th230Th232_0x <- fit$y0[1]
     } else {
         Th230Th232_0x <- 0
@@ -298,13 +304,13 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
                      ellipse.stroke=ellipse.stroke,
                      line.col='black',exterr=exterr,sigdig=sigdig,
                      add=TRUE,model=model,hide=hide,
-                     omit=omit,omit.col=omit.col)
+                     omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke)
     } else { # plot just the data
         scatterplot(d,alpha=alpha,show.numbers=show.numbers,
                     levels=levels,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
-                    omit.col=omit.col)
+                    omit.fill=omit.fill,omit.stroke=omit.stroke)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
