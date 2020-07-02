@@ -107,8 +107,9 @@
 #'
 #' \code{3}: Stacey-Kramers correction
 #' 
-#' @param omit vector with indices of aliquots that should be omitted
-#'     from the isochron regression (only used if \code{option=2})
+#' @param omit4c vector with indices of aliquots that should be
+#'     omitted from the isochron regression (only used if
+#'     \code{option=2})
 #'
 #' @return
 #' Returns a list in which \code{x.raw} contains the original data and
@@ -131,14 +132,14 @@
 #' dev.new()
 #' concordia(examples$UPb,common.Pb=2)
 #' @export
-Pb0corr <- function(x,option=3,omit=NULL){
+Pb0corr <- function(x,option=3,omit4c=NULL){
     ns <- length(x)
     out <- x
     out$x.raw <- x$x
     if (option == 1){
         x.corr <- common.Pb.nominal(x)
     } else if (option == 2){
-        x.corr <- common.Pb.isochron(x,omit=omit)
+        x.corr <- common.Pb.isochron(x,omit=omit4c)
     } else if (option == 3){
         x.corr <- common.Pb.stacey.kramers(x)
     } else {

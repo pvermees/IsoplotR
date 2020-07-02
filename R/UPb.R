@@ -995,12 +995,12 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit=NULL,
+UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit4c=NULL,
                     discordance=discfilter(option=NA),common.Pb=0,...){
     if (is.na(discordance$option) | discordance$before) xd <- x
-    else xd <- Pb0corr(x,option=common.Pb,omit=omit)
+    else xd <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
     if (common.Pb==0) X <- x
-    else X <- Pb0corr(x,option=common.Pb,omit=omit)
+    else X <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
     if (!is.na(i)){
         out <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,sigdig=sigdig,
                               conc=conc,discordance=discordance)
@@ -1048,16 +1048,19 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
         t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
         out <- c(out,t.conc.out)
     }
+    if (!is.na(discordance$option)){
+        xdi <- subset(xd,subset=((1:length(xd))%in%i))
+    }
     if (discordance$option%in%c(0,'t',1,'r',2,'sk',3,'a',4,'c')){
         xi <- subset(x,subset=((1:length(x))%in%i))
-        xdi <- subset(xd,subset=((1:length(xd))%in%i))
         dif <- discordance(x=xi,X=xdi,option=discordance$option)
         out <- c(out,roundit(dif,sigdig=sigdig))
     }
     if (discordance$option%in%c(5,'p')){
+        t.conc <- concordia.age(x=xdi,exterr=exterr)
         SS.concordance <-
-            LL.concordia.age(tt=t.conc$age[1],cc=wetherill(Xi,i=1),
-                             mswd=TRUE,exterr=exterr,d=X$d)
+            LL.concordia.age(tt=t.conc$age[1],cc=wetherill(xdi,i=1),
+                             mswd=TRUE,exterr=exterr,d=xdi$d)
         p.value <- 1-stats::pchisq(SS.concordance,1)
         p.value <- roundit(p.value,sigdig=sigdig)
         out <- c(out,p.value)

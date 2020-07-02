@@ -424,7 +424,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                      detritus=detritus)
     markers <- c(markers,peaks$peaks['t',])
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   i2i=i2i,omit=unique(c(hide,omit)),
+                   i2i=i2i,omit4c=unique(c(hide,omit)),
                    detritus=detritus,common.Pb=common.Pb)
     radial_helper(tt,from=from,to=to,t0=t0,
                   transformation=transformation,
@@ -432,7 +432,8 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
                   clabel=clabel,bg=bg,col=col,markers=markers,
                   alpha=alpha,units=units,hide=hide,omit=omit,
                   omit.col=omit.col,...)
-    fit <- central(tt,alpha=alpha)
+    selection <- clear(1:nrow(tt),unique(c(hide,omit)))
+    fit <- central(tt[selection,],alpha=alpha)
     if (exterr){
         fit$age[1:2] <- add.exterr(x2calc,tt=fit$age[1],st=fit$age[2],
                                    cutoff.76=cutoff.76,type=type)

@@ -177,7 +177,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @rdname peakfit
 #' @export
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
-                        cutoff.disc=discfilter(), common.Pb=0,
+                        cutoff.disc=discfilter(),common.Pb=0,
                         exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
     peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,exterr=exterr,
@@ -266,8 +266,8 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @export
 peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2, log=TRUE,
                         i2i=TRUE,alpha=0.05,detritus=0,...){
-    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,i2i=i2i,
-                   alpha=alpha,detritus=detritus,...)
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,
+                   i2i=i2i,alpha=alpha,detritus=detritus,...)
 }
 #' @rdname peakfit
 #' @export
@@ -283,7 +283,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                      cutoff.disc=cutoff.disc,detritus=detritus,commonPb=common.Pb)
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,detritus=detritus)
+                   cutoff.disc=cutoff.disc,detritus=detritus,...)
     fit <- peakfit.default(tt,k=k,log=log,alpha=alpha)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1

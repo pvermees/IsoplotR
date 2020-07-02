@@ -184,7 +184,6 @@ U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
                     hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
-    calcit <- (1:ns)%ni%c(hide,omit)
     ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,detritus=detritus)
     nsd <- 3
     if (any(is.na(xlim)))
@@ -216,7 +215,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0, xlim=NA,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    y <- data2evolution(x,detritus=detritus)
+    y <- data2evolution(x,detritus=detritus,omit4c=unique(c(hide,omit)))
     d2plot <- subset(y,subset=plotit)
     lim <- evolution.lines(d2plot,xlim=xlim,ylim=ylim,...)
     if (isochron){
@@ -258,7 +257,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    d <- data2evolution(x)
+    d <- data2evolution(x,omit4c=unique(c(hide,omit)))
     d2plot <- subset(d,subset=plotit)
     scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
     ticks <- c(0,1,10,20,50,100,200,300)
@@ -426,12 +425,12 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
     rbind(xlim,ylim)
 }
 
-data2evolution <- function(x,detritus=0){
+data2evolution <- function(x,detritus=0,omit4c=NULL){
     ns <- length(x)
     out <- matrix(0,ns,5)
     if (x$format %in% c(1,2)){
         td <- data2tit(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
-        out <- Th230correction(td,option=detritus,dat=x)
+        out <- Th230correction(td,option=detritus,dat=x,omit4c=omit4c)
     } else if (x$format %in% c(3,4)){
         out <- data2york(x,type=1) # 8/2 - 0/2
         covariance <- out[,'sX']*out[,'sY']*out[,'rXY']
@@ -445,10 +444,10 @@ data2evolution <- function(x,detritus=0){
 
 # x = table with 'Th230U238','errTh230U238', 'U234U238','errU234U238'
 #                (and 'Th232U238','errTh232U238' if option==2)
-Th230correction <- function(x,option=0,dat=NA){
+Th230correction <- function(x,option=0,dat=NA,omit4c=NULL){
     out <- x
     if (option==1){
-        out <- Th230correction.isochron(x,dat=dat)
+        out <- Th230correction.isochron(x,dat=dat,omit4c=omit4c)
     } else if (option==2){
         tt <- get.ThU.age.corals(dat,detritus=2)[,'t']
         out <- Th230correction.assumed.detritus(x,age=tt,Th02=dat$Th02)
@@ -457,9 +456,9 @@ Th230correction <- function(x,option=0,dat=NA){
     }
     out
 }
-Th230correction.isochron <- function(x,dat,omit=NULL){
+Th230correction.isochron <- function(x,dat,omit4c=NULL){
     osmond <- data2tit.ThU(dat,osmond=TRUE)
-    fit <- titterington(clear(osmond,omit))
+    fit <- titterington(clear(osmond,omit4c))
     out <- x
     out[,'U234U238'] <- x[,'U234U238'] - fit$par['b']*osmond[,'X']
     out[,'Th230U238'] <- x[,'Th230U238'] - fit$par['B']*osmond[,'X']

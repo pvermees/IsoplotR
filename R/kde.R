@@ -385,7 +385,7 @@ kde_helper <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                        common.Pb=0,i2i=FALSE,detritus=0,hide=NULL,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,i2i=i2i,
-                   common.Pb=common.Pb,detritus=detritus,omit=hide)
+                   common.Pb=common.Pb,detritus=detritus,omit4c=hide)
     kde.default(tt[,1],from=from,to=to,bw=bw,adaptive=adaptive,
                 log=log,n=n,plot=plot,pch=pch,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,hide=hide,

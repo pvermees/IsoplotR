@@ -245,7 +245,7 @@ cad_helper <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                        i2i=FALSE,detritus=0,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,i2i=i2i,
-                   common.Pb=common.Pb,detritus=detritus,omit=hide)
+                   common.Pb=common.Pb,detritus=detritus,omit4c=hide)
     cad.default(tt[,1],pch=pch,verticals=verticals,
                 xlab=xlab,col=col,hide=hide,...)
 }

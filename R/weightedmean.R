@@ -515,7 +515,7 @@ weightedmean_helper <- function(x,random.effects=TRUE,
                                 units='',detritus=0,hide=NULL,
                                 omit=NULL,omit.col=NA,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   i2i=i2i,omit=unique(c(hide,omit)),
+                   i2i=i2i,omit4c=unique(c(hide,omit)),
                    common.Pb=common.Pb,detritus=detritus)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,

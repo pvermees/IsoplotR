@@ -119,7 +119,7 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke="black",fit='none',add=FALSE,
                         empty=FALSE, ci.col='gray80',line.col='black',
-                        lwd=1, hide=NULL,omit=NULL,omit.col=NA,
+                        lwd=1,hide=NULL,omit=NULL,omit.col=NA,
                         addcolourbar=TRUE,bg,cex,xlim,ylim,xlab,ylab,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))

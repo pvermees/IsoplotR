@@ -276,7 +276,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     if (common.Pb<1) X <- x
-    else X <- Pb0corr(x,option=common.Pb,omit=unique(c(hide,omit)))
+    else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     fit <- NULL

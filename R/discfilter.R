@@ -79,14 +79,15 @@ discfilter <- function(option='c',before=TRUE,cutoff){
 }
 
 filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
-                            cutoff.disc=discfilter(),common.Pb=0,omit=NULL){
-    tt <- UPb.age(x,exterr=exterr,conc=(type==5),omit=omit,
+                            cutoff.disc=discfilter(),common.Pb=0,omit4c=NULL){
+    tt <- UPb.age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
                   common.Pb=common.Pb,discordance=cutoff.disc)
     if (is.na(cutoff.disc$option)){
         is.concordant <- rep(TRUE,length(x))
     } else {
-        is.concordant <- (tt[,'disc']>cutoff.disc$cutoff[1]) &
-                         (tt[,'disc']<cutoff.disc$cutoff[2])
+        dcol <- which(colnames(tt)%in%c('disc','p[conc]'))
+        is.concordant <- (tt[,dcol]>cutoff.disc$cutoff[1]) &
+                         (tt[,dcol]<cutoff.disc$cutoff[2])
     }
     if (!any(is.concordant)){
         stop(paste0('There are no concordant grains in this sample.',
@@ -121,9 +122,8 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
 # x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
     if (option%in%c(0,'t',1,'r',3,'a')){
-        t.68 <- get.Pb206U238.age(X,exterr=exterr)[1]
-        t.76 <- get.Pb207Pb206.age(X,exterr=exterr,
-                                   t.68=subset(t.68,select=1))[1]
+        t.68 <- get.Pb206U238.age(X)[1]
+        t.76 <- get.Pb207Pb206.age(X,t.68=t.68)[1]
     } else if (option%in%c(4,'c')){
         t.conc <- concordia.age(x=X,i=1)$age[1]
     }
