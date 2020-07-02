@@ -194,9 +194,9 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     if (show.central.comp){
         plot_central_ellipse(fit,fact=fact,logratio=logratio,
                              alpha=alpha,doSm=doSm(x))
-        fit$n <- length(which(calcit))
-        graphics::title(helioplot_title(fit,sigdig=sigdig))
     }
+    fit$n <- length(which(calcit))
+    graphics::title(helioplot_title(fit,sigdig=sigdig))
     invisible(colourbar(z=levels[calcit],fill=ellipse.fill,
                         stroke=ellipse.stroke,clabel=clabel))
 }
