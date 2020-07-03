@@ -132,11 +132,11 @@ If \code{plateau=TRUE}, returns a list with the following items:
 
 \describe{ \item{mean}{a 3-element vector with:
 
-\code{x}: the plateau mean
+\code{t}: the plateau mean
 
-\code{s[x]}: the standard error of \code{x}
+\code{s[t]}: the standard error of \code{x}
 
-\code{ci[x]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
+\code{ci[t]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
 \code{t} }
 
 \item{disp}{a 3-element vector with:
