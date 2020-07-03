@@ -15,16 +15,27 @@
 #' determined on different aliquots of the same sample, and let
 #' \eqn{\{s[t_1], ..., s[t_n]\}} be their analytical
 #' uncertainties. \code{IsoplotR} then calculates the weighted mean of
-#' these data assuming a Normal distribution with two sources of
-#' variance:
+#' these data using one of two methods:
 #'
-#' \eqn{t_i \sim N(\mu, \sigma^2 = s[t_i]^2 + \omega^2 )}
+#' \enumerate{
+#'
+#' \item The ordinary error-weighted mean:
+#'
+#' \eqn{\mu = \sum(t_i/s[t_i]^2)/\sum(1/s[t_i]^2)}
+#'
+#' \item A random effects model with two sources of variance:
+#'
+#' \eqn{\log[t_i] \sim N(\log[\mu], \sigma^2 = (s[t_i]/t_i)^2 + \omega^2 )}
 #'
 #' where \eqn{\mu} is the mean, \eqn{\sigma^2} is the total variance
 #' and \eqn{\omega} is the 'overdispersion'. This equation can be
 #' solved for \eqn{\mu} and \eqn{\omega} by the method of maximum
-#' likelihood. IsoplotR uses a modified version of Chauvenet's
-#' criterion for outlier detection:
+#' likelihood.
+#' 
+#' }
+#'
+#' IsoplotR uses a modified version of Chauvenet's criterion for
+#' outlier detection:
 #'
 #' \enumerate{
 #'
@@ -33,8 +44,9 @@
 #' \eqn{s[t_i]}
 #'
 #' \item For each \eqn{t_i}, compute the probability \eqn{p_i} that
-#' that \eqn{|t-\mu|>|t_i-\mu|} for \eqn{t \sim
-#' N(0,\sqrt{s[t_i]^2+\omega^2) }}
+#' that \eqn{|t-\mu|>|t_i-\mu|} for \eqn{t \sim N(\mu, s[t_i]^2 MSWD)}
+#' (ordinary weighted mean) or \eqn{\log[t] \sim
+#' N(\log[\mu],s[t_i]^2+\omega^2)} (random effects model)
 #'
 #' \item Let \eqn{p_j \equiv \min(p_1, ..., p_n)}. If
 #' \eqn{p_j<0.05/n}, then reject the j\eqn{^{th}} date, reduce \eqn{n}
@@ -714,7 +726,7 @@ chauvenet <- function(X,sX,valid,random.effects=TRUE){
     if (sum(valid)<2) return(valid)
     fit <- get.weightedmean(X,sX,random.effects=random.effects,valid=valid)
     if (random.effects){
-        if (all(X>0)){
+        if (all(X>0,na.rm=TRUE)){
             x <- log(X)
             mu <- log(fit$mean[1])
             sigma <- sqrt((fit$disp[1]/fit$mean[1])^2 + (sX/X)^2)
