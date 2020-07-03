@@ -323,15 +323,22 @@ mswd_UThHe <- function(x,fit,doSm=FALSE){
 }
 
 continuous_mixture <- function(zu,su){
-    sigma <- stats::sd(zu)
-    for (i in 1:30){ # page 100 of Galbraith (2005)
-        wu <- 1/(sigma^2+su^2)
-        mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
-        fit <- stats::optimize(eq.6.9,c(0,10*stats::sd(zu)),mu=mu,zu=zu,su=su)
-        sigma <- fit$minimum
+    if (length(unique(zu))>1){
+        sigma <- stats::sd(zu)
+        for (i in 1:30){ # page 100 of Galbraith (2005)
+            wu <- 1/(sigma^2+su^2)
+            mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
+            fit <- stats::optimise(f=eq.6.9,interval=c(0,10*stats::sd(zu)),
+                                   mu=mu,zu=zu,su=su)
+            sigma <- fit$minimum
+        }
+    } else{
+        sigma <- 0
+        wu <- 1/su^2
+        mu <- zu[1]
     }
-    smu <- 1/sqrt(sum(wu,na.rm=TRUE))
     out <- list()
+    smu <- 1/sqrt(sum(wu,na.rm=TRUE))
     out$mu <- c(mu,smu)
     out$sigma <- sigma
     out

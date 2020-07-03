@@ -91,11 +91,11 @@
 #'
 #' \describe{ \item{mean}{a 3-element vector with:
 #'
-#' \code{x}: the plateau mean
+#' \code{t}: the plateau mean
 #'
-#' \code{s[x]}: the standard error of \code{x}
+#' \code{s[t]}: the standard error of \code{x}
 #'
-#' \code{ci[x]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
+#' \code{ci[t]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
 #' \code{t} }
 #'
 #' \item{disp}{a 3-element vector with:
@@ -183,7 +183,7 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    tt <- ArAr.age(x,exterr=FALSE,i2i=i2i)
+    tt <- ArAr.age(x,exterr=FALSE,i2i=i2i,omit4c=unique(c(hide,omit)))
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     y.lab='age [Ma]'
@@ -260,8 +260,8 @@ plot.plateau <- function(fit,line.col='red',lwd=2){
     graphics::lines(c(0,1),rep(fit$mean[1],2),col=line.col,lwd=lwd)
 }
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
-    rounded.mean <- roundit(fit$mean['x'],
-                            fit$mean[c('s[x]','ci[x]')],
+    rounded.mean <- roundit(fit$mean['t'],
+                            fit$mean[c('s[t]','ci[t]')],
                             sigdig=sigdig)
     line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
                         list(a=rounded.mean[1],
