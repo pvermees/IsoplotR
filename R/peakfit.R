@@ -148,8 +148,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
 #'     only used if \code{type=4}.
 #' @param cutoff.disc discordance cutoff filter. This is an object of
-#'     class \code{\link{discfilter}}. Set \code{cutoff.disc=NA} to
-#'     turn off the filter.
+#'     class \code{\link{discfilter}}.
 #' 
 #' @param common.Pb common lead correction:
 #'

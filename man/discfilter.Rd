@@ -4,27 +4,29 @@
 \alias{discfilter}
 \title{Set up a discordance filter}
 \usage{
-discfilter(option = "c", before = TRUE, cutoff)
+discfilter(option = 0, before = TRUE, cutoff)
 }
 \arguments{
 \item{option}{one of five options:
 
-\code{0} or \code{'t'}: the absolute age difference (Ma) between
+\code{0}: do not apply a discordance filter
+
+\code{1} or \code{'t'}: the absolute age difference (Ma) between
 the \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
 ages.
 
-\code{1} or \code{'r'}: the relative age difference (%) between the
+\code{2} or \code{'r'}: the relative age difference (%) between the
 \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb ages.
 
-\code{2} or \code{'sk'}: percentage of common Pb measured along a
+\code{3} or \code{'sk'}: percentage of common Pb measured along a
 mixing line connecting the measured composition and the
 Stacey-Kramers mantle composition in Tera-Wasserburg space.
 
-\code{3} or \code{'a'}: logratio distance (%) measured along a
+\code{4} or \code{'a'}: logratio distance (%) measured along a
 perpendicular line connecting Tera-Wasserburg concordia and the
 measured composition.
 
-\code{4} or \code{'c'}: logratio distance (%) measured along a line
+\code{5} or \code{'c'}: logratio distance (%) measured along a line
 connecting the measured composition and the corresponding single
 grain concordia age composition.
 

@@ -15,22 +15,24 @@
 #'
 #' @param option one of five options:
 #'
-#' \code{0} or \code{'t'}: the absolute age difference (Ma) between
+#' \code{0}: do not apply a discordance filter
+#' 
+#' \code{1} or \code{'t'}: the absolute age difference (Ma) between
 #' the \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
 #' ages.
-#'
-#' \code{1} or \code{'r'}: the relative age difference (%) between the
+#' 
+#' \code{2} or \code{'r'}: the relative age difference (%) between the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb ages.
 #'
-#' \code{2} or \code{'sk'}: percentage of common Pb measured along a
+#' \code{3} or \code{'sk'}: percentage of common Pb measured along a
 #' mixing line connecting the measured composition and the
 #' Stacey-Kramers mantle composition in Tera-Wasserburg space.
 #'
-#' \code{3} or \code{'a'}: logratio distance (%) measured along a
+#' \code{4} or \code{'a'}: logratio distance (%) measured along a
 #' perpendicular line connecting Tera-Wasserburg concordia and the
 #' measured composition.
 #'
-#' \code{4} or \code{'c'}: logratio distance (%) measured along a line
+#' \code{5} or \code{'c'}: logratio distance (%) measured along a line
 #' connecting the measured composition and the corresponding single
 #' grain concordia age composition.
 #'
@@ -61,16 +63,16 @@
 #'              cutoff.disc=dscf,common.Pb=3)
 #' 
 #' @export
-discfilter <- function(option='c',before=TRUE,cutoff){
+discfilter <- function(option=0,before=TRUE,cutoff){
     out <- list()
     out$option <- option
     out$before <- before
     if (missing(cutoff)){
-        if (option%in%c(0,'t')) cutoff <- c(-5,50)
-        else if (option%in%c(1,'r')) cutoff <- c(-5,15)
-        else if (option%in%c(2,'sk')) cutoff <- c(-0.01,0.1)
-        else if (option%in%c(3,'a')) cutoff <- c(-1,5)
-        else if (option%in%c(4,'c')) cutoff <- c(-1,5)
+        if (option%in%c(1,'t')) cutoff <- c(-5,50)
+        else if (option%in%c(2,'r')) cutoff <- c(-5,15)
+        else if (option%in%c(3,'sk')) cutoff <- c(-0.01,0.1)
+        else if (option%in%c(4,'a')) cutoff <- c(-1,5)
+        else if (option%in%c(5,'c')) cutoff <- c(-1,5)
         else cutoff <- c(-Inf,Inf)
     }
     out$cutoff <- cutoff
@@ -82,7 +84,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                             cutoff.disc=discfilter(),common.Pb=0,omit4c=NULL){
     tt <- UPb.age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
                   common.Pb=common.Pb,discordance=cutoff.disc)
-    if (is.na(cutoff.disc$option)){
+    if (cutoff.disc$option==0){
         is.concordant <- rep(TRUE,length(x))
     } else {
         dcol <- which(colnames(tt)%in%c('disc','p[conc]'))
@@ -121,22 +123,22 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
 
 # x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
-    if (option%in%c(0,'t',1,'r',3,'a')){
+    if (option%in%c(1,'t',2,'r',4,'a')){
         t.68 <- get.Pb206U238.age(X)[1]
         t.76 <- get.Pb207Pb206.age(X,t.68=t.68)[1]
-    } else if (option%in%c(4,'c')){
+    } else if (option%in%c(5,'c')){
         t.conc <- concordia.age(x=X,i=1)$age[1]
     }
-    if (option%in%c(0,'t')){
+    if (option%in%c(1,'t')){
         dif <- t.76-t.68
-    } else if (option%in%c(1,'r')){
+    } else if (option%in%c(2,'r')){
         dif <- (1-t.68/t.76)*100
-    } else if (option%in%c(2,'sk')){
+    } else if (option%in%c(3,'sk')){
         x.corr <- Pb0corr(x,option=3)
         U8Pb6.raw <- get.U238Pb206.ratios(x)[,'U238Pb206']
         U8Pb6.corr <- get.U238Pb206.ratios(x.corr)[,'U238Pb206']
         dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
-    } else if (option%in%c(3,'a')){
+    } else if (option%in%c(4,'a')){
         X1 <- age_to_U238Pb206_ratio(t.76)[,1]
         Y1 <- age_to_Pb207Pb206_ratio(t.68)[,1]
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
@@ -144,7 +146,7 @@ discordance <- function(x,X,tt=NULL,option=4){
         DX <- log(U8Pb6) - log(X1)
         DY <- log(Pb76) - log(Y1)
         dif <- 100*DX*sin(atan(DY/DX))
-    } else if (option%in%c(4,'c')){
+    } else if (option%in%c(5,'c')){
         x1 <- age_to_U238Pb206_ratio(t.conc)[,1]
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
         dx <- log(x1) - log(U8Pb6)

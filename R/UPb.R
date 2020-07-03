@@ -996,8 +996,8 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
 UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit4c=NULL,
-                    discordance=discfilter(option=NA),common.Pb=0,...){
-    if (is.na(discordance$option) | discordance$before) xd <- x
+                    discordance=discfilter(),common.Pb=0,...){
+    if (discordance$option==0 | discordance$before) xd <- x
     else xd <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
     if (common.Pb==0) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
@@ -1020,16 +1020,16 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit4c=NULL,
 # X = common Pb corrected data (if common.Pb>0)
 # xd = discordant data (raw if before==FALSE, common Pb corrected if before==FALSE)
 UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
-                           discordance=discfilter(option=NA),...){
+                           discordance=discfilter(),...){
     Xi <- subset(X,subset=((1:length(X))%in%i))
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
     hasTh <- (x$format>6)
     if (hasTh) labels <- c(labels,'t.82','s[t.82]')
     if (conc) labels <- c(labels,'t.conc','s[t.conc]')
     tlabels <- labels
-    if (discordance$option%in%c(0,'t',1,'r',2,'sk',3,'a',4,'c'))
+    if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c'))
         labels <- c(labels,'disc')
-    if (discordance$option%in%c(5,'p'))
+    if (discordance$option%in%c(6,'p'))
         labels <- c(labels,'p[conc]')
     t.75 <- get.Pb207U235.age(Xi,exterr=exterr)
     t.68 <- get.Pb206U238.age(Xi,exterr=exterr)
@@ -1048,15 +1048,15 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
         t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
         out <- c(out,t.conc.out)
     }
-    if (!is.na(discordance$option)){
+    if (discordance$option>0){
         xdi <- subset(xd,subset=((1:length(xd))%in%i))
     }
-    if (discordance$option%in%c(0,'t',1,'r',2,'sk',3,'a',4,'c')){
+    if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
         xi <- subset(x,subset=((1:length(x))%in%i))
         dif <- discordance(x=xi,X=xdi,option=discordance$option)
         out <- c(out,roundit(dif,sigdig=sigdig))
     }
-    if (discordance$option%in%c(5,'p')){
+    if (discordance$option%in%c(6,'p')){
         t.conc <- concordia.age(x=xdi,exterr=exterr)
         SS.concordance <-
             LL.concordia.age(tt=t.conc$age[1],cc=wetherill(xdi,i=1),
