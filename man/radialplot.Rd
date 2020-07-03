@@ -428,8 +428,7 @@ the error propagation for the central age and mixture models?}
 only used if \code{type=4}.}
 
 \item{cutoff.disc}{discordance cutoff filter. This is an object of
-class \code{\link{discfilter}} Set \code{cutoff.disc=NA} to
-turn off the filter.}
+class \code{\link{discfilter}}.}
 
 \item{common.Pb}{common lead correction:
 

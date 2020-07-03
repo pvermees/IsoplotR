@@ -165,14 +165,14 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     class \code{\link{discfilter}}, or a two element list
 #'     containing:
 #'
-#' \code{option}: one of \code{0} or \code{'t'} (absolute age filter);
-#' \code{1} or \code{'r'} (relative age filter); \code{2} or
-#' \code{'sk'} (Stacey-Kramers common Pb filter); \code{3} or
-#' \code{'a'} (perpendicular Aitchison distance); or \code{4} or
-#' \code{'c'} (concordia distance). For further details about these
-#' definitions, see the paper by Vermeesch (2020). To omit the
-#' discordance from the output of the \code{age} function, set
-#' \code{option = NA}.
+#' \code{option}: one of \code{1} or \code{'t'} (absolute age filter);
+#' \code{2} or \code{'r'} (relative age filter); \code{3} or
+#' \code{'sk'} (Stacey-Kramers common Pb filter); \code{4} or
+#' \code{'a'} (perpendicular Aitchison distance); \code{5} or
+#' \code{'c'} (concordia distance); or \code{6} (p-value of
+#' concordance). For further details about these definitions, see the
+#' paper by Vermeesch (2020). To omit the discordance from the output
+#' of the \code{age} function, set \code{option = NA}.
 #'
 #' \code{before}: logical flag indicating whether the discordance
 #' should be calculated before (\code{TRUE}) or after (\code{FALSE})
@@ -240,7 +240,7 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #' @export
 age.UPb <- function(x,type=1,exterr=TRUE,i=NA,
                     sigdig=NA,common.Pb=0,
-                    discordance=discfilter(option=NA),...){
+                    discordance=discfilter(),...){
     if (type==1){
         out <- UPb.age(x,exterr=exterr,i=i,sigdig=sigdig,
                        discordance=discordance,common.Pb=common.Pb,...)

@@ -15,22 +15,24 @@
 #'
 #' @param option one of five options:
 #'
-#' \code{0} or \code{'t'}: the absolute age difference (Ma) between
+#' \code{0}: do not apply a discordance filter
+#' 
+#' \code{1} or \code{'t'}: the absolute age difference (Ma) between
 #' the \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
 #' ages.
-#'
-#' \code{1} or \code{'r'}: the relative age difference (%) between the
+#' 
+#' \code{2} or \code{'r'}: the relative age difference (%) between the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb ages.
 #'
-#' \code{2} or \code{'sk'}: percentage of common Pb measured along a
+#' \code{3} or \code{'sk'}: percentage of common Pb measured along a
 #' mixing line connecting the measured composition and the
 #' Stacey-Kramers mantle composition in Tera-Wasserburg space.
 #'
-#' \code{3} or \code{'a'}: logratio distance (%) measured along a
+#' \code{4} or \code{'a'}: logratio distance (%) measured along a
 #' perpendicular line connecting Tera-Wasserburg concordia and the
 #' measured composition.
 #'
-#' \code{4} or \code{'c'}: logratio distance (%) measured along a line
+#' \code{5} or \code{'c'}: logratio distance (%) measured along a line
 #' connecting the measured composition and the corresponding single
 #' grain concordia age composition.
 #'
@@ -61,16 +63,16 @@
 #'              cutoff.disc=dscf,common.Pb=3)
 #' 
 #' @export
-discfilter <- function(option='c',before=TRUE,cutoff){
+discfilter <- function(option=0,before=TRUE,cutoff){
     out <- list()
     out$option <- option
     out$before <- before
     if (missing(cutoff)){
-        if (option%in%c(0,'t')) cutoff <- c(-5,50)
-        else if (option%in%c(1,'r')) cutoff <- c(-5,15)
-        else if (option%in%c(2,'sk')) cutoff <- c(-0.01,0.1)
-        else if (option%in%c(3,'a')) cutoff <- c(-1,5)
-        else if (option%in%c(4,'c')) cutoff <- c(-1,5)
+        if (option%in%c(1,'t')) cutoff <- c(-5,50)
+        else if (option%in%c(2,'r')) cutoff <- c(-5,15)
+        else if (option%in%c(3,'sk')) cutoff <- c(-0.01,0.1)
+        else if (option%in%c(4,'a')) cutoff <- c(-1,5)
+        else if (option%in%c(5,'c')) cutoff <- c(-1,5)
         else cutoff <- c(-Inf,Inf)
     }
     out$cutoff <- cutoff
@@ -82,7 +84,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                             cutoff.disc=discfilter(),common.Pb=0,omit4c=NULL){
     tt <- UPb.age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
                   common.Pb=common.Pb,discordance=cutoff.disc)
-    if (is.na(cutoff.disc$option)){
+    if (cutoff.disc$option==0){
         is.concordant <- rep(TRUE,length(x))
     } else {
         dcol <- which(colnames(tt)%in%c('disc','p[conc]'))
