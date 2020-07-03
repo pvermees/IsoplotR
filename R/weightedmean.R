@@ -566,12 +566,14 @@ get.weightedmean <- function(X,sX,random.effects=TRUE,
         if (all(x>0)){
             fit <- central(cbind(x,sx),alpha=alpha)
             out$mean <- fit$age
-            out$disp <- fit$disp*fit$age[1]
+            out$disp <- fit$disp*out$mean['t']
             out$mswd <- fit$mswd
             out$p.value <- fit$p.value
         } else {
             out$mean <- rep(NA,3)
             out$disp <- rep(NA,3)
+            names(out$mean) <- c('t','s[t]','ci[t]')
+            names(out$disp) <- c('s','ll','ul')
             fit <- continuous_mixture(x,sx)
             out$mean['t'] <- fit$mu[1]
             out$mean['s[t]'] <- fit$mu[2]
