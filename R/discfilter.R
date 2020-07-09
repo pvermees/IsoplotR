@@ -36,7 +36,7 @@
 #' connecting the measured composition and the corresponding single
 #' grain concordia age composition.
 #'
-#' For further details about, see the paper by Vermeesch (2020).
+#' Further details in Vermeesch (2020).
 #'
 #' @param before logical flag indicating whether the discordance
 #'     filter should be applied before (\code{TRUE}) or after
@@ -45,13 +45,20 @@
 #' @param cutoff a two-element vector with the minimum (negative) and
 #'     maximum (positive) allowed discordance. Default values vary
 #'     between the different options. To view them, enter
-#'     \code{discfilter()} at the \code{R} command line.
+#'     \code{discfilter(option)} at the \code{R} command line.
 #' 
 #' @return a list with the input parameters. Default values for
-#'     \code{cutoff} are \code{c(-5,50)} if \code{option=='t'},
-#'     \code{c(-5,15)} if \code{option=='r'}, \code{c(-0.01,0.1)} if
-#'     \code{option=='sk'}, \code{c(-1,5)} if \code{option=='a'}, and
-#'     \code{c(-1,5)} if \code{option=='c'}.
+#'     \code{cutoff} are
+#'
+#' \code{c(-5,50)} if \code{option=='t'};
+#'
+#' \code{c(-5,15)} if \code{option=='r'};
+#' 
+#' \code{c(-0.01,0.1)} if \code{option=='sk'};
+#'
+#' \code{c(-1,5)} if \code{option=='a'}; and
+#' 
+#' \code{c(-1,5)} if \code{option=='c'}.
 #' 
 #' @seealso \code{\link{cad}}, \code{\link{kde}}, \code{\link{radialplot}}
 #' @references Vermeesch (2020) ``On the treatment of discordant data

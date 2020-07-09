@@ -275,8 +275,8 @@
 #'
 #' \item{p.value}{the p-value of a Chi-square test for linearity.}
 #'
-#' \item{fact}{the \eqn{100(1-\alpha/2)\%} confidence multiplier for
-#' the confidence intervals.}
+#' \item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the confidence
+#' intervals.}
 #'
 #' \item{y0}{a four-element vector containing:
 #'
@@ -350,8 +350,8 @@
 #'
 #' \item{p.value}{the p-value of a Chi-square test for linearity.}
 #'
-#' \item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the
-#' confidence intervals.}
+#' \item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the confidence
+#' intervals.}
 #'
 #' \item{y0}{a three or four-element vector containing:
 #'
