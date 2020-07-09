@@ -165,14 +165,21 @@ age.default <- function(x,method='U238-Pb206',exterr=TRUE,J=c(NA,NA),
 #'     class \code{\link{discfilter}}, or a two element list
 #'     containing:
 #'
-#' \code{option}: one of \code{1} or \code{'t'} (absolute age filter);
-#' \code{2} or \code{'r'} (relative age filter); \code{3} or
-#' \code{'sk'} (Stacey-Kramers common Pb filter); \code{4} or
-#' \code{'a'} (perpendicular Aitchison distance); \code{5} or
-#' \code{'c'} (concordia distance); or \code{6} (p-value of
-#' concordance). For further details about these definitions, see the
-#' paper by Vermeesch (2020). To omit the discordance from the output
-#' of the \code{age} function, set \code{option = NA}.
+#' \code{option}: one of
+#'
+#' \code{1} or \code{'t'} (absolute age filter);
+#' 
+#' \code{2} or \code{'r'} (relative age filter);
+#'
+#' \code{3} or \code{'sk'} (Stacey-Kramers common Pb filter);
+#'
+#' \code{4} or \code{'a'} (perpendicular Aitchison distance);
+#'
+#' \code{5} or \code{'c'} (concordia distance);
+#'
+#' \code{6} or \code{'p'} (p-value of concordance); or
+#'
+#' \code{NA} (omit the discordance from the output)
 #'
 #' \code{before}: logical flag indicating whether the discordance
 #' should be calculated before (\code{TRUE}) or after (\code{FALSE})

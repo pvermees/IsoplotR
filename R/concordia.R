@@ -544,7 +544,7 @@ concordia.title <- function(fit,sigdig=2,alpha=0.05,...){
         expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d~'Ma (n='*n*')')
         list1$d <- rounded.age[4]
     }
-    line1 <- do.call('substitute',list(eval(expr1),list1))
+    line1 <- do.call(substitute,list(eval(expr1),list1))
     line2 <- substitute('MSWD ='~a~'|'~b~'|'~c~
                             ', p('*chi^2*') ='~d~'|'~e~'|'~f,
                         list(a=signif(fit$mswd['concordance'],2),
