@@ -869,39 +869,39 @@ errAdjust <- function(x,i=2,ierr=1){
 }
 
 getErrCols <- function(gc,format=NA,ierr=1){
-    UPb12 = (gc=='U-Pb' && format%in%(1:2))
-    UPb345 = (gc=='U-Pb' && format%in%(3:5))
-    UPb6 = (gc=='U-Pb' && format==6)
-    UPb78 = (gc=='U-Pb' && format%in%(7:8))
-    PbPb12 = (gc=='Pb-Pb' && format%in%(1:2))
-    PbPb3 = (gc=='Pb-Pb' && format==3)
-    ArAr12 = (gc=='Ar-Ar' && format%in%(1:2))
-    ArAr3 = (gc=='Ar-Ar' && format==3)
-    KCa1 = (gc=='K-Ca' && format==1)
-    KCa23 = (gc=='K-Ca' && format%in%(1:2))
-    PD1 = (gc=='PD' && format==1)
-    PD23 = (gc=='PD' && format%in%(2:3))
-    UThHe = (gc=='U-Th-He')
-    ThU12 = (gc=='Th-U' && format<3)
-    ThU34 = (gc=='Th-U' && format>2)
-    radial = (gc=='other' && identical(format,'radial'))
-    regression = (gc=='other' && identical(format,'regression'))
-    spectrum = (gc=='other' && identical(format,'spectrum'))
-    average = (gc=='other' && identical(format,'average'))
-    if (UPb12 | PbPb12 | ArAr12 | KCa23 | PD23 | ThU34 | regression){
-        cols = c(2,4)
-    } else if (UPb345 | PbPb3 | ArAr3 | KCa1 | PD1 | UThHe | ThU12){
-        cols = c(2,4,6)
+    UPb12 <- (gc=='U-Pb' && format%in%(1:2))
+    UPb345 <- (gc=='U-Pb' && format%in%(3:5))
+    UPb6 <- (gc=='U-Pb' && format==6)
+    UPb78 <- (gc=='U-Pb' && format%in%(7:8))
+    PbPb12 <- (gc=='Pb-Pb' && format%in%(1:2))
+    PbPb3 <- (gc=='Pb-Pb' && format==3)
+    ArAr12 <- (gc=='Ar-Ar' && format%in%(1:2))
+    ArAr3 <- (gc=='Ar-Ar' && format==3)
+    KCa12 <- (gc=='K-Ca' && format%in%(1:2))
+    KCa3 <- (gc=='K-Ca' && format==3)
+    PD12 <- (gc=='PD' && format%in%(1:2))
+    PD3 <- (gc=='PD' && format==3)
+    UThHe <- (gc=='U-Th-He')
+    ThU12 <- (gc=='Th-U' && format<3)
+    ThU34 <- (gc=='Th-U' && format>2)
+    radial <- (gc=='other' && identical(format,'radial'))
+    regression <- (gc=='other' && identical(format,'regression'))
+    spectrum <- (gc=='other' && identical(format,'spectrum'))
+    average <- (gc=='other' && identical(format,'average'))
+    if (UPb12 | PbPb12 | ArAr12 | KCa12 | PD12 | ThU34 | regression){
+        cols <- c(2,4)
+    } else if (UPb345 | PbPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12){
+        cols <- c(2,4,6)
     } else if (UPb78){
-        cols = seq(from=2,to=8,by=2)
+        cols <- seq(from=2,to=8,by=2)
     } else if (UPb6){
-        cols = seq(from=2,to=12,by=2)
+        cols <- seq(from=2,to=12,by=2)
     } else if (radial || average){
-        cols = 2
+        cols <- 2
     } else if (spectrum){
-        cols = 3
+        cols <- 3
     } else {
-        cols = NULL
+        cols <- NULL
     }
     cols
 }

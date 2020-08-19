@@ -103,7 +103,7 @@ peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,alpha=0.05,...){
         X[,1] <- log(X[,1])
     }
     if (identical(k,'min')) {
-        out <- min_age_model(X,alpha=alpha)
+        out <- min_age_model(X,alpha=alpha,...)
     } else if (identical(k,'auto')) {
         out <- normal.mixtures(X,k=BIC_fit(X,5),alpha=alpha,...)
     } else {
@@ -530,7 +530,6 @@ BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
     }) 
 }
 
-# Simple 3-parameter Normal model (Section 6.11 of Galbraith, 2005)
 min_age_model <- function(zs,alpha=0.05,np=4){
     imin <- which.min(zs[,1])
     mz <- zs[imin,1]
