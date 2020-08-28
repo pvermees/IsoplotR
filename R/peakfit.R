@@ -279,7 +279,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
     if (k<1) return(NULL)
     if (identical(k,'auto')){
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,
-                     cutoff.disc=cutoff.disc,detritus=detritus,commonPb=common.Pb)
+                     cutoff.disc=cutoff.disc,detritus=detritus,common.Pb=common.Pb)
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,detritus=detritus,...)
@@ -507,15 +507,12 @@ theta2age <- function(x,theta,beta.var,exterr=TRUE){
     list(peaks=peaks,peaks.err=peaks.err)
 }
 
-BIC_fit <- function(x,max.k,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
-                    exterr=TRUE,detritus=0,common.Pb=0,...){
+BIC_fit <- function(x,max.k,...){
     n <- length(x)
     BIC <- Inf
     tryCatch({
         for (k in 1:max.k){
-            fit <- peakfit(x,k,type=type,cutoff.76=cutoff.76,
-                           cutoff.disc=cutoff.disc,exterr=exterr,
-                           detritus=detritus,common.Pb=common.Pb,...)
+            fit <- peakfit(x,k,...)
             p <- 2*k-1
             newBIC <- -2*fit$L+p*log(n)
             if (newBIC<BIC) {
