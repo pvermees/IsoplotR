@@ -602,5 +602,7 @@ get.minage.L <- function(pars,zs){
     EE <- 1-stats::pnorm((gam-mu)/s)
     FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
     fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
+    fu[fu<.Machine$double.xmin] <- .Machine$double.xmin
+    fu[fu>.Machine$double.xmax] <- .Machine$double.xmax
     sum(-log(fu))
 }
