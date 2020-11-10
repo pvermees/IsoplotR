@@ -6,21 +6,11 @@ contains the code for IsoplotR's core commands. A graphical user
 interface is provided in a separate repository at
 [https://github.com/pvermees/IsoplotRgui](https://github.com/pvermees/IsoplotRgui).
 
-## Prerequisites
-
-You must have **R** installed on your system (see
-[https://www.r-project.org/](https://www.r-project.org/)).
-Additionally, to install IsoplotR from Github, you also need the
-**remotes** package.  This can be installed by typing the following
-code at the R command line prompt:
-
-```
-install.packages('remotes')
-```
-
 ## Installation
 
-The most recent stable version of IsoplotR is available from **CRAN** at
+You must have **R** installed on your system (see
+[https://www.r-project.org/](https://www.r-project.org/)). The most
+recent stable version of IsoplotR is available from **CRAN** at
 [https://cran.r-project.org/package=IsoplotR](https://cran.r-project.org/package=IsoplotR)
 and can be installed on your system as follows:
 
@@ -28,11 +18,27 @@ and can be installed on your system as follows:
 install.packages('IsoplotR')
 ```
 
-Alternatively, to install the current development version of IsoplotR from Github, type:
+Alternatively, the current development version of **IsoplotR** can be installed from Github with the **remotes** package:
 
 ```
-library(devtools)
-install_github('pvermees/IsoplotR')
+install.packages('remotes')
+remotes::install_github('pvermees/IsoplotR')
+```
+
+## Usage
+
+Once installed, **IsoplotR** can be loaded into memory by entering the following code at the **R** command prompt:
+
+```
+library(IsoplotR)
+```
+
+Now we can issue **IsoplotR** commands to **R**. For example:
+
+```
+setwd(system.file(package='IsoplotR')) # navigate to the built-in data files
+RbSr <- read.data('RbSr1.csv',method='Rb-Sr',format=1)  
+isochron(RbSr)
 ```
 
 ## Further information
