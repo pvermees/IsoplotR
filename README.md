@@ -9,13 +9,13 @@ interface is provided in a separate repository at
 ## Prerequisites
 
 You must have **R** installed on your system (see
-[http://r-project.org](http://r-project.org)).  Additionally, to
-install IsoplotR from Github, you also need the **devtools** package.
-This can be installed by typing the following code at the R command
-line prompt:
+[https://www.r-project.org/](https://www.r-project.org/)).
+Additionally, to install IsoplotR from Github, you also need the
+**remotes** package.  This can be installed by typing the following
+code at the R command line prompt:
 
 ```
-install.packages('devtools')
+install.packages('remotes')
 ```
 
 ## Installation
@@ -37,15 +37,15 @@ install_github('pvermees/IsoplotR')
 
 ## Further information
 
-See [http://isoplotr.london-geochron.com](http://ucl.ac.uk/~ucfbpve/isoplotr/)
+See [http://isoplotr.london-geochron.com](https://www.ucl.ac.uk/~ucfbpve/isoplotr/)
 
 [Vermeesch, P., 2018, IsoplotR: a free and open toolbox for
 geochronology. Geoscience Frontiers, v.9, p.1479-1493, doi:
-10.1016/j.gsf.2018.04.001.](http://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/)
+10.1016/j.gsf.2018.04.001.](https://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/)
 
 ## Author
 
-[Pieter Vermeesch](http://ucl.ac.uk/~ucfbpve/)
+[Pieter Vermeesch](https://www.ucl.ac.uk/~ucfbpve/)
 
 ## License
 
