@@ -18,22 +18,22 @@ and can be installed on your system as follows:
 install.packages('IsoplotR')
 ```
 
-Alternatively, the current development version of **IsoplotR** can be installed from Github with the **remotes** package:
+Alternatively, the current development version of IsoplotR can be installed from Github with the **remotes** package:
 
 ```
 install.packages('remotes')
 remotes::install_github('pvermees/IsoplotR')
 ```
 
-## Usage
+## Example
 
-Once installed, **IsoplotR** can be loaded into memory by entering the following code at the **R** command prompt:
+Once installed, IsoplotR can be loaded into memory by entering the following code at the R command prompt:
 
 ```
 library(IsoplotR)
 ```
 
-Now we can issue **IsoplotR** commands to **R**. For example:
+Now we can issue IsoplotR commands to R. For example:
 
 ```
 setwd(system.file(package='IsoplotR')) # navigate to the built-in data files
