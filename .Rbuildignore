@@ -1,0 +1,4 @@
+.gitignore
+.git$
+R/\.Rhistory
+Dockerfile
