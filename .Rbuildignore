@@ -1,4 +1,4 @@
-.gitignore
-.git$
-R/\.Rhistory
+\.gitignore
+^\.git/$
+^R/\.Rhistory/$
 Dockerfile
