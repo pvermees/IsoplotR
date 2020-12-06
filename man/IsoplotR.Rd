@@ -9,7 +9,7 @@
 \description{
 A list of documented functions may be viewed by typing
     \code{help(package='IsoplotR')}.  Detailed instructions are
-    provided at \url{http://ucl.ac.uk/~ucfbpve/isoplotr/}. Further
+    provided at \url{https://www.ucl.ac.uk/~ucfbpve/isoplotr/}. Further
     details about the theoretical background are provided by
     Vermeesch (2018).
 }
@@ -21,7 +21,7 @@ Vermeesch, P., 2018, IsoplotR: a free and open toolbox
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://ucl.ac.uk/~ucfbpve/isoplotr/}
+  \item \url{https://www.ucl.ac.uk/~ucfbpve/isoplotr/}
 }
 
 }
