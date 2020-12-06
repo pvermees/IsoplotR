@@ -214,7 +214,7 @@ get.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
     a <- fit$coef[1]
     b <- fit$coef[2]
     covmat <- stats::vcov(fit)
-    tint <- concordia.intersection.ab(a,b,covmat=covmat,d=x$d)
+    tint <- concordia.intersection.ab(a,b,covmat=covmat) # no disequilibrium correction
     tt <- tint['t[l]']
     # Then, estimate the common Pb intercept(s)
     minval <- 0.01
