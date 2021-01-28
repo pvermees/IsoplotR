@@ -724,7 +724,7 @@ get.Pb207Pb206.ratios <- function(x,exterr=FALSE){
 get.Pb208Th232.ratios <- function(x){
     labels <- c('Pb208Th232','errPb208Th232')
     if (x$format == 7){
-        out <- x$x[,labels]
+        out <- x$x[,labels,drop=FALSE]
     } else if (x$format == 8){
         ns <- length(x)
         out <- matrix(0,ns,2)
