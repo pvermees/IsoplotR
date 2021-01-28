@@ -38,9 +38,9 @@
 #'
 #' @param x either a file name (\code{.csv} format) OR a matrix
 #' 
-#' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Th-Pv'},
+#' @param method one of \code{'U-Pb'}, \code{'Pb-Pb'}, \code{'Th-Pb'},
 #'     \code{'Ar-Ar'}, \code{'K-Ca'}, \code{'detritals'},
-#'     \code{Rb-Sr}, \code{Sm-Nd}, \code{Re-Os}, \code{Th-U},
+#'     \code{'Rb-Sr'}, \code{'Sm-Nd'}, \code{'Re-Os'}, \code{'Th-U'},
 #'     \code{'U-Th-He'}, \code{'fissiontracks'} or \code{'other'}
 #' 
 #' @param format formatting option, depends on the value of
