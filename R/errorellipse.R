@@ -178,12 +178,10 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
         dy <- fact*xy[plotit,'sY']
         graphics::arrows(xy[plotit,'X'],xy[plotit,'Y']-dy,
                          xy[plotit,'X'],xy[plotit,'Y']+dy,
-                         code=3,angle=90,
-                         length=0.05,col=stroke)
+                         code=3,angle=90,length=0.05,col=stroke)
         graphics::arrows(xy[plotit,'X']-dx,xy[plotit,'Y'],
                          xy[plotit,'X']+dx,xy[plotit,'Y'],
-                         code=3,angle=90,
-                         length=0.05,col=stroke)
+                         code=3,angle=90,length=0.05,col=stroke)
     }
     if (!nolevels & addcolourbar){
         colourbar(z=levels[calcit],fill=ellipse.fill,

@@ -468,20 +468,15 @@ isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
 }
 #' @param anchor
 #' control parameters to fix the intercept age or common Pb
-#' composition of the isochron fit. This is a two-element list.
+#' composition of the isochron fit. This can be a scalar or a vector.
 #'
-#' The first element is a boolean flag indicating whether the
-#' isochron line should be anchored. If this is \code{FALSE}, then
-#' the second item is ignored and both the common Pb composition and
-#' age are estimated.
+#' If \code{anchor[1]=0}: do not anchor the isochron.
 #'
-#' If the first element is \code{TRUE} and the second element is
-#' \code{NA}, then the common Pb composition is fixed at the values
+#' If \code{anchor[1]=1}: fix the common Pb composition at the values
 #' stored in \code{settings('iratio',...)}.
 #'
-#' If the first element is \code{TRUE} and the second element is
-#' a number, then the isochron line is forced to intersect the
-#' concordia line at an age equal to that number.
+#' If \code{anchor[1]=2}: force the isochron line to intersect the
+#' concordia line at an age equal to \code{anchor[2]}.
 #'
 #' @rdname isochron
 #' @export
@@ -491,9 +486,9 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
                          ellipse.stroke='black',type=1,
                          ci.col='gray80',line.col='black',lwd=1,
                          plot=TRUE,exterr=FALSE,model=1,
-                         show.ellipses=1*(model!=2),
-                         anchor=list(FALSE,NA),hide=NULL,
-                         omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                         show.ellipses=1*(model!=2),anchor=0,
+                         hide=NULL, omit=NULL,omit.fill=NA,
+                         omit.stroke='grey',...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)

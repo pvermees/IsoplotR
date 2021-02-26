@@ -1,5 +1,4 @@
-ludwig.UThPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
-                         anchor=list(FALSE,NA)){
+ludwig.UThPb <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0){
     init <- get.lta0b0wc0.init(x=x,anchor=anchor,model=model)
     fit <- get.lta0b0wc0.UThPb(x,init=init,exterr=exterr,
                                model=model,anchor=anchor)
@@ -8,7 +7,7 @@ ludwig.UThPb <- function(x,exterr=FALSE,alpha=0.05,model=1,
     out
 }
 
-get.lta0b0wc0.init <- function(x,model=1,anchor=list(FALSE,NA)){
+get.lta0b0wc0.init <- function(x,model=1,anchor=0){
     ns <- length(x)
     if (model==3){
         lta0b0w <- get.lta0b0w(x=x,model=3,anchor=anchor)$logpar
@@ -26,8 +25,7 @@ get.lta0b0wc0.init <- function(x,model=1,anchor=list(FALSE,NA)){
     out
 }
 
-get.lta0b0wc0.UThPb <- function(x,init,exterr=FALSE,model=1,
-                                anchor=list(FALSE,NA),...){
+get.lta0b0wc0.UThPb <- function(x,init,exterr=FALSE,model=1,anchor=0,...){
     XYZW <- get_XYZW(x)
     fixed <- rep(FALSE,length(init))
     lower <- init-2
