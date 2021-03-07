@@ -131,14 +131,17 @@ mswd.lud <- function(lta0b0,x,anchor=0){
     ns <- length(x)
     out <- list()
     anchored <- (anchor[1]>0)
-    tanchored <- (length(anchor)>1 & is.numeric(anchor[2]))
+    tanchored <- (anchor[1]==2 && length(anchor)>1 && is.numeric(anchor[2]))
     if (x$format<4){
         if (anchored) out$df <- ns-1
         else out$df <- ns-2
     } else {
-        if (anchored && tanchored) out$df <- 2*ns-1
-        else if (tanchored) out$df <- 2*ns-2
-        else out$df <- 2*ns-3
+        if (anchored){
+            if (tanchored) out$df <- 2*ns-2
+            else out$df <- 2*ns-1
+        } else {
+            out$df <- 2*ns-3
+        }
     }
     SS <- data2ludwig(x,lta0b0w=lta0b0)$SS
     if (out$df>0){
@@ -153,7 +156,7 @@ mswd.lud <- function(lta0b0,x,anchor=0){
 
 get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
-    if (anchor[1]>0){
+    if (anchor[1] %in% c(1,2)){
         init <- anchored.lta0b0.init(x=x,anchor=anchor)
     } else if (model==3){
         init <- get.lta0b0w(x,model=1,w=w)$logpar
@@ -183,8 +186,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     } else {
         fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                       lower=lower,upper=upper,
-                       control=list(fnscale=-1),...)
+                       lower=lower,upper=upper,control=list(fnscale=-1),...)
         out$LL <- fit$value
         out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
@@ -287,6 +289,8 @@ anchored.lta0b0.init <- function(x,anchor=1){
             b <- stats::lm(xy7[,'Y'] ~ 0 + I(xy7[,'X']-r57))$coef
             init['b0'] <- -(log(-b)+log(r57))
         }
+    } else { 
+        stop("Invalid discordia regression anchor.")
     }
     init
 }
