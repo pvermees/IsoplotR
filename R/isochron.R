@@ -355,14 +355,18 @@
 #'
 #' \item{y0}{a three or four-element vector containing:
 #'
-#' \code{y}: the initial \eqn{^{206}}Pb/\eqn{^{204}}U-ratio (if
+#' \code{y}: the initial \eqn{^{206}}Pb/\eqn{^{204}}Pb-ratio (if
 #' \code{type=1} and \code{x$format=4,5} or \code{6});
-#' \eqn{^{207}}Pb/\eqn{^{204}}U-ratio (if \code{type=2} and
+#' \eqn{^{207}}Pb/\eqn{^{204}}Pb-ratio (if \code{type=2} and
 #' \code{x$format=4,5} or \code{6});
-#' \eqn{^{208}}Pb/\eqn{^{206}}U-ratio (if \code{type=1} and
+#' \eqn{^{208}}Pb/\eqn{^{206}}Pb-ratio (if \code{type=1} and
+#' \code{x$format=7} or \code{8}); 
+#' \eqn{^{208}}Pb/\eqn{^{207}}Pb-ratio (if \code{type=2} and
+#' \code{x$format=7} or \code{8});
+#' \eqn{^{206}}Pb/\eqn{^{208}}Pb-ratio (if \code{type=3} and
 #' \code{x$format=7} or \code{8}); or
-#' \eqn{^{208}}Pb/\eqn{^{207}}U-ratio (if \code{type=2} and
-#' \code{x$format=7}).
+#' \eqn{^{207}}Pb/\eqn{^{208}}Pb-ratio (if \code{type=4} and
+#' \code{x$format=7} or \code{8}).
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
@@ -894,8 +898,29 @@ isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
                 hide=hide,omit=omit,omit.fill=omit.fill,
                 omit.stroke=omit.stroke,...)
 }
-#' @param type following the classification of
-#' Ludwig and Titterington (1994), one of either:
+#' @param type
+#'
+#' if \code{x} has class \code{UPb} and \code{x$format=4}, \code{5} or 
+#' \code{6}:
+#'
+#' \code{1}: \eqn{^{204}}Pb/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
+#'
+#' \code{2}: \eqn{^{204}}Pb/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
+#'
+#' if \code{x} has class \code{UPb} and \code{x$format=7} or \code{8}:
+#'
+#' \code{1}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
+#'
+#' \code{2}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
+#' 
+#' \code{3}: \eqn{^{206}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
+#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
+#'
+#' \code{4}: \eqn{^{207}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
+#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
+#' 
+#' if \code{x} has class \code{ThU}, and following the classification
+#' of Ludwig and Titterington (1994), one of either:
 #'
 #' \code{1}: `Rosholt type-II' isochron, setting out
 #' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
