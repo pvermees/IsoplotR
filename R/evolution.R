@@ -334,7 +334,7 @@ evolution.title <- function(fit,sigdig=2,...){
     list2 <- list(a=rounded.a0[1],
                   b=rounded.a0[2],
                   c=rounded.a0[3])
-    if (fit$model==1 && fit$mswd>1){
+    if (inflate(fit)){
         args1 <- quote(~a%+-%b~'|'~c~'|'~d~'ka'~'(n='*n*')')
         args2 <- quote(~a%+-%b~'|'~c~'|'~d)
         list1$d <- rounded.age[4]
@@ -347,7 +347,7 @@ evolution.title <- function(fit,sigdig=2,...){
     line1 <- do.call(substitute,list(eval(call1),list1))
     call2 <- substitute(e~a,list(e=expr2,a=args2))
     line2 <- do.call(substitute,list(eval(call2),list2))
-    if (fit$model==1 && fit$mswd>1){
+    if (inflate(fit)){
         line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
                                  b=signif(fit$p.value,2)))

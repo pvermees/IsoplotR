@@ -34,8 +34,9 @@
 #' an upper and lower intercept age (for Wetherill concordia), or a
 #' lower intercept age and common
 #' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
-#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
-#' uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
+#' Tera-Wasserburg). If the p-value for the chi-square test is less
+#' than \code{alpha}, then the analytical uncertainties are augmented
+#' by a factor \eqn{\sqrt{MSWD}}.
 #'
 #' \code{2}: fit a discordia line ignoring the analytical uncertainties
 #'

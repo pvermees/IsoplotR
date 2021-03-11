@@ -1032,7 +1032,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out$y0['s[y]'] <- tst['s[48_0]']
     out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
     out <- ci_isochron(out,disp=FALSE)
-    if (model==1 && out$mswd>1){
+    if (inflate(out)){
         tdispt <- get.ThU.age(out$par[i08],
                               sqrt(out$mswd)*sqrt(out$cov[i08,i08]),
                               out$par[i48],
@@ -1071,7 +1071,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
     out$y0[c('y','s[y]')] <-
         get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
     out <- ci_isochron(out,disp=FALSE)
-    if (model==1 && out$mswd>1){
+    if (inflate(out)){
         out$age['disp[t]'] <-
             out$fact*get.ThU.age(Th230U238[1],
                                   sqrt(out$mswd)*Th230U238[2],
@@ -1263,7 +1263,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 }
 
 isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
-    if (fit$model==1 && fit$mswd>1){
+    if (inflate(fit)){
         args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
     } else {
@@ -1284,7 +1284,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
                       b=intercept[2],
                       c=intercept[3],
                       u='')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- slope[4]
             list2$d <- intercept[4]
         }
@@ -1301,7 +1301,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
                       b=rounded.intercept[2],
                       c=rounded.intercept[3],
                       u='')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- rounded.age[4]
             list2$d <- rounded.intercept[4]
         }

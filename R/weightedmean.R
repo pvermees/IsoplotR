@@ -637,17 +637,30 @@ wtdmean.title <- function(fit,sigdig=2,units='',...){
         line1line <- 2
         line2line <- 1
     } else {
-        rounded.mean <- roundit(fit$mean['t'],
-                                fit$mean[c('s[t]','ci[t]','disp[t]')],
-                                sigdig=sigdig)
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
-                            list(a=rounded.mean['t'],
-                                 b=rounded.mean['s[t]'],
-                                 c=rounded.mean['ci[t]'],
-                                 d=rounded.mean['disp[t]'],
-                                 u=units,
-                                 n=sum(fit$valid),
-                                 N=length(fit$valid)))
+        if (inflate(c(fit,model=1))){
+            rounded.mean <- roundit(fit$mean['t'],
+                                    fit$mean[c('s[t]','ci[t]','disp[t]')],
+                                    sigdig=sigdig)
+            line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
+                                list(a=rounded.mean['t'],
+                                     b=rounded.mean['s[t]'],
+                                     c=rounded.mean['ci[t]'],
+                                     d=rounded.mean['disp[t]'],
+                                     u=units,
+                                     n=sum(fit$valid),
+                                     N=length(fit$valid)))
+        } else {
+            rounded.mean <- roundit(fit$mean['t'],
+                                    fit$mean[c('s[t]','ci[t]')],
+                                    sigdig=sigdig)
+            line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
+                                list(a=rounded.mean['t'],
+                                     b=rounded.mean['s[t]'],
+                                     c=rounded.mean['ci[t]'],
+                                     u=units,
+                                     n=sum(fit$valid),
+                                     N=length(fit$valid)))
+        }
         line1line <- 1
         line2line <- 0
     }

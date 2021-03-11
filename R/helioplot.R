@@ -324,7 +324,7 @@ helioplot_title <- function(fit,sigdig=2,...){
                   c=rounded.age[3],
                   n=fit$n)
     line1line <- 1
-    if (fit$model==1 && fit$mswd>1){
+    if (inflate(fit)){
         args1 <- quote(~a%+-%b~'|'~c~'|'~d~'Ma'~'(n='*n*')')
         list1$d <- rounded.age[4]
         line2 <- substitute('MSWD ='~a~', p('*chi^2*') ='~b,
