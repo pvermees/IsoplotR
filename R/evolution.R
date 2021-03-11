@@ -347,7 +347,7 @@ evolution.title <- function(fit,sigdig=2,...){
     line1 <- do.call(substitute,list(eval(call1),list1))
     call2 <- substitute(e~a,list(e=expr2,a=args2))
     line2 <- do.call(substitute,list(eval(call2),list2))
-    if (inflate(fit)){
+    if (fit$model==1){
         line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
                             list(a=signif(fit$mswd,2),
                                  b=signif(fit$p.value,2)))
