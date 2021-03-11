@@ -124,15 +124,15 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
                         empty=FALSE, ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
-                        bg,cex,xlim,ylim,xlab,ylab,...){
+                        bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
     plotit <- sn%ni%hide
     calcit <- sn%ni%c(hide,omit)
     colnames(xy) <- c('X','sX','Y','sY','rXY')
-    if (missing(xlim)) xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
-    if (missing(ylim)) ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
+    if (is.null(xlim)) xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
+    if (is.null(ylim)) ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
     if (!add){
         if (missing(xlab)) xlab <- ''
         if (missing(ylab)) ylab <- ''

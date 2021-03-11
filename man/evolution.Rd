@@ -6,8 +6,8 @@
 \usage{
 evolution(
   x,
-  xlim = NA,
-  ylim = NA,
+  xlim = NULL,
+  ylim = NULL,
   alpha = 0.05,
   transform = FALSE,
   detritus = 0,

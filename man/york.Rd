@@ -29,7 +29,7 @@ A four-element list of vectors containing:
     \item{mswd}{the mean square of the residuals (a.k.a
     `reduced Chi-square') statistic}
 
-    \item{df}{degrees of freedom of the linear fit \eqn{(2n-2)}}
+    \item{df}{degrees of freedom of the linear fit \eqn{(n-2)}}
 
     \item{p.value}{p-value of a Chi-square value with \code{df}
     degrees of freedom}

@@ -259,13 +259,13 @@ the geochronometer given by \code{method} and its standard error.
 table with the following columns: \code{t.75}, \code{err[t.75]},
 \code{t.68}, \code{err[t.68]}, \code{t.76}, \code{err[t.76]},
 (\code{t.82}, \code{err[t.82]},) \code{t.conc}, \code{err[t.conc]},
-(\code{err[p.conc]},) containing the
+(\code{disc}) or \code{err[p.conc]},) containing the
 \eqn{^{207}}Pb/\eqn{^{235}}U-age and standard error, the
 \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, (the
 \eqn{^{208}}Pb/\eqn{^{232}}Th-age and standard error,) the single
-grain concordia age and standard error, (and the p-value for
-concordance,) respectively.
+grain concordia age and standard error, (and the \% discordance or
+p-value for concordance,) respectively.
 
 \item if \code{x} has class \code{UPb} and \code{type=2, 3, 4} or
 \code{5}, returns the output of the \code{\link{concordia}}

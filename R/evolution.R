@@ -139,7 +139,7 @@
 #'     errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
-evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
+evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
                       detritus=0,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
@@ -181,7 +181,7 @@ evolution <- function(x,xlim=NA,ylim=NA,alpha=0.05,transform=FALSE,
     }
 }
 
-U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
+U4U8vst <- function(x,detritus=0,xlim=NULL,ylim=NULL,alpha=0.05,
                     show.numbers=FALSE,levels=NA,clabel="",
                     ellipse.fill=c("#00FF0080","#FF000080"),
                     ellipse.stroke='black',show.ellipses=TRUE,
@@ -191,10 +191,10 @@ U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
     plotit <- (1:ns)%ni%hide
     ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,detritus=detritus)
     nsd <- 3
-    if (any(is.na(xlim)))
+    if (is.null(xlim))
         xlim <- range(c(ta0[plotit,'t']-nsd*ta0[plotit,'s[t]'],
                         ta0[plotit,'t']+nsd*ta0[plotit,'s[t]']))
-    if (any(is.na(ylim)))
+    if (is.null(ylim))
         ylim <- range(c(ta0[plotit,'48_0']-nsd*ta0[plotit,'s[48_0]'],
                         ta0[plotit,'48_0']+nsd*ta0[plotit,'s[48_0]']))
     x.lab <- 'Age [ka]'
@@ -210,9 +210,9 @@ U4U8vst <- function(x,detritus=0,xlim=NA,ylim=NA,alpha=0.05,
                 omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0, xlim=NA,
-                        ylim=NA,alpha=0.05, show.numbers=FALSE,
-                        levels=NA,clabel="",
+U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
+                        xlim=NULL,ylim=NULL,alpha=0.05,
+                        show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
                         show.ellipses=TRUE,hide=NULL,omit=NULL,
@@ -252,7 +252,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0, xlim=NA,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NA,ylim=NA,
+Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
                         alpha=0.05,show.numbers=FALSE,exterr=TRUE,
                         clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
@@ -370,20 +370,20 @@ evolution.title <- function(fit,sigdig=2,...){
     }
 }
 
-evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
+evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
                             line.col='darksalmon',...){
     nn <- 20
     maxt <- 400
     tt <- seq(from=0,to=maxt,by=50)
     nsd <- 3
-    if (any(is.na(xlim))){
+    if (is.null(xlim)){
         min.dx <- 0
         max.dx <- max(d[,'Th230U238']+nsd*d[,'sTh230U238'])
     } else {
         min.dx <- xlim[1]
         max.dx <- xlim[2]
     }
-    if (any(is.na(ylim))){
+    if (is.null(ylim)){
         min.dy <- min(d[,'U234U238']-nsd*d[,'sU234U238'])
         max.dy <- max(d[,'U234U238']+nsd*d[,'sU234U238'])
         a01 <- get.ThU.age(min.dx,0,min.dy,0,0,exterr=FALSE)['48_0']
@@ -400,12 +400,12 @@ evolution.lines <- function(d,xlim=NA,ylim=NA,bty='n',
         a0min <- 0
         a0max <- 1.5
     }
-    if (any(is.na(xlim))){
+    if (is.null(xlim)){
         xlim <- range(pretty(c(min(get.Th230U238(tt,a0min)),
                                max(get.Th230U238(tt,a0max)))))
     }
     a0 <- pretty(c(a0min,a0max))
-    if (any(is.na(ylim))){
+    if (is.null(ylim)){
         ylim <- range(a0)
         a0 <- a0[a0>0]
     } else {

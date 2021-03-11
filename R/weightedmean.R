@@ -462,7 +462,7 @@ weightedmean.UThHe <- function(x,random.effects=TRUE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=FALSE,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        units='Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -481,7 +481,7 @@ weightedmean.fissiontracks <- function(x,random.effects=TRUE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,exterr=exterr,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        units='Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 weightedmean_helper <- function(x,random.effects=TRUE,
