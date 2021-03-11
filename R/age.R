@@ -416,8 +416,18 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     } else if (hasClass(x,'LuHf')){
         R <- get.LuHf.ratio(tt,st,exterr=FALSE)
         out <- get.LuHf.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'fissiontracks') & x$format<3){
-        out[2] <- tt * sqrt( (x$zeta[2]/x$zeta[1])^2 + (st/tt)^2 )
+    } else if (hasClass(x,'fissiontracks')){
+        if (x$format==1) {
+            rhoD <- x$rhoD
+            zeta <- x$zeta
+        } else if (x$format==2) {
+            rhoD <- c(1,0)
+            zeta <- x$zeta
+        } else {
+            rhoD <- c(1,0)
+            zeta <- c(1,0)
+        }
+        out[2] <- tt * sqrt( (st/tt)^2 + (rhoD[2]/rhoD[1])^2 + (zeta[2]/zeta[1])^2 )
     }
     out
 }

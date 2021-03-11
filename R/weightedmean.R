@@ -457,20 +457,13 @@ weightedmean.UThHe <- function(x,random.effects=TRUE,
                                outlier.col="#00FFFF80",sigdig=2,
                                alpha=0.05,ranked=FALSE,hide=NULL,
                                omit=NULL,omit.col=NA,...){
-    tt <- UThHe.age(x)
-    fit <- weightedmean.default(tt,random.effects=random.effects,
-                                detect.outliers=detect.outliers,
-                                alpha=alpha,plot=FALSE,hide=hide,
-                                omit=omit)
-    if (plot){
-        plot_weightedmean(tt[,1],tt[,2],fit=fit,from=from,to=to,
-                          levels=levels,clabel=clabel,
-                          rect.col=rect.col,outlier.col=outlier.col,
-                          sigdig=sigdig,alpha=alpha,units='Ma',
-                          ranked=ranked,hide=hide,omit=omit,
-                          omit.col=omit.col,...)
-    }
-    invisible(fit)
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
+                        from=from,to=to,levels=levels,clabel=clabel,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=FALSE,
+                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -483,40 +476,13 @@ weightedmean.fissiontracks <- function(x,random.effects=TRUE,
                                        exterr=TRUE,ranked=FALSE,
                                        hide=NULL, omit=NULL,
                                        omit.col=NA,...){
-    tt <- fissiontrack.age(x,exterr=FALSE)
-    # calculated weighted mean age ignoring zeta and rhoD uncertainties
-    fit <- weightedmean.default(tt,random.effects=random.effects,
-                                detect.outliers=detect.outliers,
-                                alpha=alpha,plot=FALSE,hide=hide,
-                                omit=omit,...)
-    out <- fit
-    if (exterr){
-        if (x$format==1) {
-            rhoD <- x$rhoD
-            zeta <- x$zeta
-        } else if (x$format==2) {
-            rhoD <- c(1,0)
-            zeta <- x$zeta
-        } else {
-            rhoD <- c(1,0)
-            zeta <- c(1,0)
-        }
-        out$mean['s[x]'] <- fit$mean['t']*
-            sqrt( (fit$mean['s[t]']/fit$mean['t'])^2 +
-                  (rhoD[2]/rhoD[1])^2 +
-                  (zeta[2]/zeta[1])^2
-                )
-        out$mean['ci[t]'] <- nfact(alpha)*out$mean['s[t]']
-    }
-    if (plot){
-        plot_weightedmean(tt[,1],tt[,2],fit=out,from=from,to=to,
-                          levels=levels,clabel=clabel,
-                          rect.col=rect.col,outlier.col=outlier.col,
-                          sigdig=sigdig,alpha=alpha,units='Ma',
-                          ranked=ranked,hide=hide,omit=omit,
-                          omit.col=omit.col,...)
-    }
-    invisible(out)
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
+                        from=from,to=to,levels=levels,clabel=clabel,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=exterr,
+                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        omit=omit,omit.col=omit.col,...)
 }
 weightedmean_helper <- function(x,random.effects=TRUE,
                                 detect.outliers=TRUE,plot=TRUE,
