@@ -26,8 +26,8 @@ scatterplot(
   addcolourbar = TRUE,
   bg,
   cex,
-  xlim,
-  ylim,
+  xlim = NULL,
+  ylim = NULL,
   xlab,
   ylab,
   ...

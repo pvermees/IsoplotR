@@ -433,8 +433,8 @@ weightedmean.RbSr <- function(x,random.effects=TRUE,
 #' @rdname weightedmean
 #' @export
 weightedmean.LuHf <- function(x,random.effects=TRUE,
-                              detect.outliers=TRUE,plot=TRUE,from=NA,
-                              to=NA,levels=NA,clabel="",
+                              detect.outliers=TRUE,plot=TRUE,
+                              from=NA,to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               alpha=0.05,exterr=TRUE,i2i=TRUE,
@@ -457,19 +457,13 @@ weightedmean.UThHe <- function(x,random.effects=TRUE,
                                outlier.col="#00FFFF80",sigdig=2,
                                alpha=0.05,ranked=FALSE,hide=NULL,
                                omit=NULL,omit.col=NA,...){
-    tt <- UThHe.age(x)
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
-                                alpha=alpha,plot=FALSE,hide=hide,
-                                omit=omit)
-    if (plot){
-        plot_weightedmean(tt[,1],tt[,2],fit=fit,from=from,to=to,
-                          levels=levels,clabel=clabel,
-                          rect.col=rect.col,outlier.col=outlier.col,
-                          sigdig=sigdig,alpha=alpha,units='Ma',
-                          ranked=ranked,hide=hide,omit=omit,
-                          omit.col=omit.col,...)
-    }
-    invisible(fit)
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
+                        from=from,to=to,levels=levels,clabel=clabel,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=FALSE,
+                        units='Ma',ranked=ranked,hide=hide,
+                        omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -482,39 +476,13 @@ weightedmean.fissiontracks <- function(x,random.effects=TRUE,
                                        exterr=TRUE,ranked=FALSE,
                                        hide=NULL, omit=NULL,
                                        omit.col=NA,...){
-    tt <- fissiontrack.age(x,exterr=FALSE)
-    # calculated weighted mean age ignoring zeta and rhoD uncertainties
-    fit <- weightedmean.default(tt,detect.outliers=detect.outliers,
-                                alpha=alpha,plot=FALSE,hide=hide,
-                                omit=omit,...)
-    out <- fit
-    if (exterr){
-        if (x$format==1) {
-            rhoD <- x$rhoD
-            zeta <- x$zeta
-        } else if (x$format==2) {
-            rhoD <- c(1,0)
-            zeta <- x$zeta
-        } else {
-            rhoD <- c(1,0)
-            zeta <- c(1,0)
-        }
-        out$mean['s[x]'] <- fit$mean['t']*
-            sqrt( (fit$mean['s[t]']/fit$mean['t'])^2 +
-                  (rhoD[2]/rhoD[1])^2 +
-                  (zeta[2]/zeta[1])^2
-                )
-        out$mean['ci[t]'] <- nfact(alpha)*out$mean['s[t]']
-    }
-    if (plot){
-        plot_weightedmean(tt[,1],tt[,2],fit=out,from=from,to=to,
-                          levels=levels,clabel=clabel,
-                          rect.col=rect.col,outlier.col=outlier.col,
-                          sigdig=sigdig,alpha=alpha,units='Ma',
-                          ranked=ranked,hide=hide,omit=omit,
-                          omit.col=omit.col,...)
-    }
-    invisible(out)
+    weightedmean_helper(x,random.effects=random.effects,
+                        detect.outliers=detect.outliers,plot=plot,
+                        from=from,to=to,levels=levels,clabel=clabel,
+                        rect.col=rect.col,outlier.col=outlier.col,
+                        sigdig=sigdig,alpha=alpha,exterr=exterr,
+                        units='Ma',ranked=ranked,hide=hide,
+                        omit=omit,omit.col=omit.col,...)
 }
 weightedmean_helper <- function(x,random.effects=TRUE,
                                 detect.outliers=TRUE,plot=TRUE,
@@ -614,17 +582,17 @@ get.weightedmean <- function(X,sX,random.effects=TRUE,
 }
 
 wtdmean.title <- function(fit,sigdig=2,units='',...){
+    rounded.mean <- roundit(fit$mean['t'],
+                            fit$mean[c('s[t]','ci[t]')],
+                            sigdig=sigdig)
+    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
+                        list(a=rounded.mean['t'],
+                             b=rounded.mean['s[t]'],
+                             c=rounded.mean['ci[t]'],
+                             u=units,
+                             n=sum(fit$valid),
+                             N=length(fit$valid)))
     if (fit$random.effects){
-        rounded.mean <- roundit(fit$mean['t'],
-                                fit$mean[c('s[t]','ci[t]')],
-                                sigdig=sigdig)
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
-                            list(a=rounded.mean['t'],
-                                 b=rounded.mean['s[t]'],
-                                 c=rounded.mean['ci[t]'],
-                                 u=units,
-                                 n=sum(fit$valid),
-                                 N=length(fit$valid)))
         rounded.disp <- roundit(fit$disp['s'],
                                 fit$disp[c('ll','ul')],
                                 sigdig=sigdig)
@@ -637,17 +605,19 @@ wtdmean.title <- function(fit,sigdig=2,units='',...){
         line1line <- 2
         line2line <- 1
     } else {
-        rounded.mean <- roundit(fit$mean['t'],
-                                fit$mean[c('s[t]','ci[t]','disp[t]')],
-                                sigdig=sigdig)
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
-                            list(a=rounded.mean['t'],
-                                 b=rounded.mean['s[t]'],
-                                 c=rounded.mean['ci[t]'],
-                                 d=rounded.mean['disp[t]'],
-                                 u=units,
-                                 n=sum(fit$valid),
-                                 N=length(fit$valid)))
+        if (inflate(c(fit,model=1))){
+            rounded.mean <- roundit(fit$mean['t'],
+                                    fit$mean[c('s[t]','ci[t]','disp[t]')],
+                                    sigdig=sigdig)
+            line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
+                                list(a=rounded.mean['t'],
+                                     b=rounded.mean['s[t]'],
+                                     c=rounded.mean['ci[t]'],
+                                     d=rounded.mean['disp[t]'],
+                                     u=units,
+                                     n=sum(fit$valid),
+                                     N=length(fit$valid)))
+        }
         line1line <- 1
         line2line <- 0
     }
@@ -764,7 +734,12 @@ add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
         out$mean['ci[t]'] <- nfact(fit$alpha)*out$mean['s[t]']
     } else {
         out$mean['ci[t]'] <- tfact(fit$alpha,fit$df)*out$mean['s[t]']
-        out$mean['disp[t]'] <- sqrt(fit$mswd)*out$mean['ci[t]']
+        if (inflate(c(fit,model=1))){
+            out$mean['disp[t]'] <- tfact(fit$alpha,fit$df)*
+                add.exterr(x,tt=fit$mean['t'],
+                           st=sqrt(fit$mswd)*fit$mean['s[t]'],
+                           cutoff.76=cutoff.76,type=type)[2]
+        }
     }
     ns <- length(x)
     ci.exterr <- list(x=c(0,ns+1,ns+1,0),

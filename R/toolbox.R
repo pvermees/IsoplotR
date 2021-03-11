@@ -517,3 +517,7 @@ geomean.default <- function(x,...){
 trace <- function(x){
     sum(diag(x))
 }
+
+inflate <- function(fit){
+    (fit$model==1) && (fit$p.value<fit$alpha)
+}

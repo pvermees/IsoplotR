@@ -1,7 +1,7 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.05,
-                                          model=1,anchor=list(FALSE,NA)){
+concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
+                                          alpha=0.05,model=1,anchor=0){
     fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit
     out$fact <- tfact(alpha,fit$df)
@@ -16,7 +16,8 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,alpha=0.
         out$cov <- fit$cov
     }
     np <- length(out$par)
-    if (model==1 && fit$mswd>1){
+    out$alpha <- alpha
+    if (inflate(out)){
         out$err <- matrix(NA,3,np)
         rownames(out$err) <- c('s','ci','disp')
         out$err['disp',] <-
@@ -287,7 +288,7 @@ tw3d2d <- function(fit){
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2,...){
     lower.age <- roundit(fit$par[1],fit$err[,1],sigdig=sigdig)
-    if (fit$model==1 && fit$mswd>1){
+    if (inflate(fit)){
         args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
     } else {
@@ -301,7 +302,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         expr1 <- quote('lower intercept =')
         expr2 <- quote('upper intercept =')
         list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3],u='Ma')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- lower.age[4]
             list2$d <- upper.age[4]
         }
@@ -310,7 +311,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
         list2 <- list(a=i76[1],b=i76[2],c=i76[3],u='')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- lower.age[4]
             list2$d <- i76[4]
         }
@@ -322,7 +323,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         expr3 <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
         list2 <- list(a=i64[1],b=i64[2],c=i64[3],u='')
         list3 <- list(a=i74[1],b=i74[2],c=i74[3],u='')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- lower.age[4]
             list2$d <- i64[4]
             list3$d <- i74[4]
@@ -341,7 +342,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         expr3 <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
         list2 <- list(a=ri86[1],b=ri86[2],c=ri86[3],u='')
         list3 <- list(a=ri87[1],b=ri87[2],c=ri87[3],u='')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- lower.age[4]
             list2$d <- ri86[4]
             list3$d <- ri87[4]

@@ -8,14 +8,7 @@ into account decay constant uncertainties.}
 \usage{
 ludwig(x, ...)
 
-\method{ludwig}{default}(
-  x,
-  exterr = FALSE,
-  alpha = 0.05,
-  model = 1,
-  anchor = list(FALSE, NA),
-  ...
-)
+\method{ludwig}{default}(x, exterr = FALSE, alpha = 0.05, model = 1, anchor = 0, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -36,8 +29,9 @@ uncertainties. In this case, \code{IsoplotR} will either calculate
 an upper and lower intercept age (for Wetherill concordia), or a
 lower intercept age and common
 (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
-Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
-uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
+Tera-Wasserburg). If the p-value for the chi-square test is less
+than \code{alpha}, then the analytical uncertainties are augmented
+by a factor \eqn{\sqrt{MSWD}}.
 
 \code{2}: fit a discordia line ignoring the analytical uncertainties
 
@@ -45,22 +39,16 @@ uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
 algorithm that includes accounts for any overdispersion by adding a
 geological (co)variance term.}
 
-\item{anchor}{control parameters to fix the intercept age or common
-    Pb composition of the discordia fit. This is a two-element
-    list.
+\item{anchor}{control parameters to fix the intercept age or common Pb
+composition of the isochron fit. This can be a scalar or a vector.
 
-The first element is a boolean flag indicating whether the
-discordia line should be anchored. If this is \code{FALSE}, then
-the second item is ignored and both the common Pb composition and
-age are estimated.
+If \code{anchor[1]=0}: do not anchor the isochron.
 
-If the first element is \code{TRUE} and the second element is
-\code{NA}, then the common Pb composition is fixed at the values
+If \code{anchor[1]=1}: fix the common Pb composition at the values
 stored in \code{settings('iratio',...)}.
 
-If the first element is \code{TRUE} and the second element is a
-number, then the discordia line is forced to intersect the
-concordia line at an age equal to that number.}
+If \code{anchor[1]=2}: force the isochron line to intersect the
+concordia line at an age equal to \code{anchor[2]}.}
 }
 \value{
 \describe{

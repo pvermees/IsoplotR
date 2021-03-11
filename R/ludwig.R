@@ -34,8 +34,9 @@
 #' an upper and lower intercept age (for Wetherill concordia), or a
 #' lower intercept age and common
 #' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
-#' Tera-Wasserburg). If \eqn{MSWD}>0, then the analytical
-#' uncertainties are augmented by a factor \eqn{\sqrt{MSWD}}.
+#' Tera-Wasserburg). If the p-value for the chi-square test is less
+#' than \code{alpha}, then the analytical uncertainties are augmented
+#' by a factor \eqn{\sqrt{MSWD}}.
 #'
 #' \code{2}: fit a discordia line ignoring the analytical uncertainties
 #'
@@ -43,22 +44,17 @@
 #' algorithm that includes accounts for any overdispersion by adding a
 #' geological (co)variance term.
 #' 
-#' @param anchor control parameters to fix the intercept age or common
-#'     Pb composition of the discordia fit. This is a two-element
-#'     list.
+#' @param anchor
+#' control parameters to fix the intercept age or common Pb
+#' composition of the isochron fit. This can be a scalar or a vector.
 #'
-#' The first element is a boolean flag indicating whether the
-#' discordia line should be anchored. If this is \code{FALSE}, then
-#' the second item is ignored and both the common Pb composition and
-#' age are estimated.
+#' If \code{anchor[1]=0}: do not anchor the isochron.
 #'
-#' If the first element is \code{TRUE} and the second element is
-#' \code{NA}, then the common Pb composition is fixed at the values
+#' If \code{anchor[1]=1}: fix the common Pb composition at the values
 #' stored in \code{settings('iratio',...)}.
 #'
-#' If the first element is \code{TRUE} and the second element is a
-#' number, then the discordia line is forced to intersect the
-#' concordia line at an age equal to that number.
+#' If \code{anchor[1]=2}: force the isochron line to intersect the
+#' concordia line at an age equal to \code{anchor[2]}.
 #'
 #' @param ... optional arguments
 #' 
@@ -107,7 +103,7 @@
 ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
-ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=list(FALSE,NA),...){
+ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
     fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
@@ -132,18 +128,21 @@ exponentiate_ludwig <- function(fit,format){
     out
 }
 
-mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
+mswd.lud <- function(lta0b0,x,anchor=0){
     ns <- length(x)
     out <- list()
-    anchored <- anchor[[1]]
-    tanchored <- is.numeric(anchor[[2]])
+    anchored <- (anchor[1]>0)
+    tanchored <- (anchor[1]==2 && length(anchor)>1 && is.numeric(anchor[2]))
     if (x$format<4){
         if (anchored) out$df <- ns-1
         else out$df <- ns-2
     } else {
-        if (anchored && tanchored) out$df <- 2*ns-1
-        else if (tanchored) out$df <- 2*ns-2
-        else out$df <- 2*ns-3
+        if (anchored){
+            if (tanchored) out$df <- 2*ns-2
+            else out$df <- 2*ns-1
+        } else {
+            out$df <- 2*ns-3
+        }
     }
     SS <- data2ludwig(x,lta0b0w=lta0b0)$SS
     if (out$df>0){
@@ -156,10 +155,9 @@ mswd.lud <- function(lta0b0,x,anchor=list(FALSE,NA)){
     out
 }
 
-get.lta0b0w <- function(x,exterr=FALSE,model=1,
-                        anchor=list(FALSE,NA),w=NA,...){
+get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
-    if (anchor[[1]]){
+    if (anchor[1] %in% c(1,2)){
         init <- anchored.lta0b0.init(x=x,anchor=anchor)
     } else if (model==3){
         init <- get.lta0b0w(x,model=1,w=w)$logpar
@@ -189,8 +187,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     } else {
         fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                       lower=lower,upper=upper,
-                       control=list(fnscale=-1),...)
+                       lower=lower,upper=upper,control=list(fnscale=-1),...)
         out$LL <- fit$value
         out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
@@ -206,7 +203,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,
     out
 }
 
-get.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
+get.lta0b0.init <- function(x,anchor=0){
     out <- list()
     xy <- data2york(x,option=2)
     # First, get the approximate intercept age using a model-2 regression
@@ -239,12 +236,12 @@ get.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
     names(init) <- labels
     init
 }
-anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
+anchored.lta0b0.init <- function(x,anchor=1){
     if (x$format<4) np <- 2
     else np <- 3
     init <- rep(0,np)
     names(init) <- c('lt','a0','b0')[1:np]
-    if (is.na(anchor[[2]])){ # fix common Pb composition
+    if (anchor[1]==1){ # fix common Pb composition
         xy <- data2york(x,option=2)
         if (x$format%in%c(1,2,3)){
             i76 <- iratio('Pb207Pb206')[1]
@@ -270,29 +267,31 @@ anchored.lta0b0.init <- function(x,anchor=list(FALSE,NA)){
         covmat[2,2] <- stats::vcov(fit)
         tint <- concordia.intersection.ab(i76,b,covmat=covmat,d=x$d)[1]
         init['lt'] <- log(tint)
-    } else if (is.numeric(anchor[[2]])){ # fix age
-        init['lt'] <- log(anchor[[2]])
+    } else if (anchor[1]==2){ # fix age
+        init['lt'] <- log(anchor[2])
         if (x$format<4){
             xy <- data2york(x,option=2)
-            TW <- age_to_terawasserburg_ratios(anchor[[2]],st=0,exterr=FALSE,d=x$d)
+            TW <- age_to_terawasserburg_ratios(anchor[2],st=0,exterr=FALSE,d=x$d)
             b <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
                                0 + I(xy[,'X']-TW$x['U238Pb206']))$coef
             init['a0'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
         } else {
-            r86 <- age_to_U238Pb206_ratio(anchor[[2]],st=0,d=x$d)[1]
+            r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=x$d)[1]
             if (x$format<7){
                 xy6 <- data2york(x,option=3)
                 xy7 <- data2york(x,option=4)
             } else {
-                xy6 <- data2york(x,option=6,tt=anchor[[2]])
-                xy7 <- data2york(x,option=7,tt=anchor[[2]])
+                xy6 <- data2york(x,option=6,tt=anchor[2])
+                xy7 <- data2york(x,option=7,tt=anchor[2])
             }
             b <- stats::lm(xy6[,'Y'] ~ 0 + I(xy6[,'X']-r86))$coef
             init['a0'] <- -(log(-b)+log(r86))
-            r57 <- age_to_U235Pb207_ratio(anchor[[2]],st=0,d=x$d)[1]
+            r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=x$d)[1]
             b <- stats::lm(xy7[,'Y'] ~ 0 + I(xy7[,'X']-r57))$coef
             init['b0'] <- -(log(-b)+log(r57))
         }
+    } else { 
+        stop("Invalid discordia regression anchor.")
     }
     init
 }
@@ -693,15 +692,15 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     out
 }
 
-fixit <- function(x,anchor=list(FALSE,NA),model=1,w=NA){
+fixit <- function(x,anchor=0,model=1,w=NA){
     if (x$format<4) NP <- 2
     else NP <- 3
     if (model==3) np <- NP+1
     else np <- NP
     out <- rep(FALSE,np)
     if (model==3 & is.numeric(w)) out[np] <- TRUE # fix w
-    if (anchor[[1]]){ # anchor t or a0(,b0)
-        if (is.numeric(anchor[[2]])) out[1] <- TRUE # fix t
+    if (anchor[1]>0){ # anchor t or a0(,b0)
+        if (anchor[1]==2) out[1] <- TRUE # fix t
         else out[2:NP] <- TRUE # fix a0(,b0)
     }
     out

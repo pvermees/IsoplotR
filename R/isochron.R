@@ -472,20 +472,15 @@ isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
 }
 #' @param anchor
 #' control parameters to fix the intercept age or common Pb
-#' composition of the isochron fit. This is a two-element list.
+#' composition of the isochron fit. This can be a scalar or a vector.
 #'
-#' The first element is a boolean flag indicating whether the
-#' isochron line should be anchored. If this is \code{FALSE}, then
-#' the second item is ignored and both the common Pb composition and
-#' age are estimated.
+#' If \code{anchor[1]=0}: do not anchor the isochron.
 #'
-#' If the first element is \code{TRUE} and the second element is
-#' \code{NA}, then the common Pb composition is fixed at the values
+#' If \code{anchor[1]=1}: fix the common Pb composition at the values
 #' stored in \code{settings('iratio',...)}.
 #'
-#' If the first element is \code{TRUE} and the second element is
-#' a number, then the isochron line is forced to intersect the
-#' concordia line at an age equal to that number.
+#' If \code{anchor[1]=2}: force the isochron line to intersect the
+#' concordia line at an age equal to \code{anchor[2]}.
 #'
 #' @rdname isochron
 #' @export
@@ -495,9 +490,9 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
                          ellipse.stroke='black',type=1,
                          ci.col='gray80',line.col='black',lwd=1,
                          plot=TRUE,exterr=FALSE,model=1,
-                         show.ellipses=1*(model!=2),
-                         anchor=list(FALSE,NA),hide=NULL,
-                         omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                         show.ellipses=1*(model!=2),anchor=0,
+                         hide=NULL, omit=NULL,omit.fill=NA,
+                         omit.stroke='grey',...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -1062,7 +1057,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out$y0['s[y]'] <- tst['s[48_0]']
     out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
     out <- ci_isochron(out,disp=FALSE)
-    if (model==1 && out$mswd>1){
+    if (inflate(out)){
         tdispt <- get.ThU.age(out$par[i08],
                               sqrt(out$mswd)*sqrt(out$cov[i08,i08]),
                               out$par[i48],
@@ -1101,7 +1096,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
     out$y0[c('y','s[y]')] <-
         get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
     out <- ci_isochron(out,disp=FALSE)
-    if (model==1 && out$mswd>1){
+    if (inflate(out)){
         out$age['disp[t]'] <-
             out$fact*get.ThU.age(Th230U238[1],
                                   sqrt(out$mswd)*Th230U238[2],
@@ -1293,7 +1288,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 }
 
 isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
-    if (fit$model==1 && fit$mswd>1){
+    if (inflate(fit)){
         args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
     } else {
@@ -1314,7 +1309,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
                       b=intercept[2],
                       c=intercept[3],
                       u='')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- slope[4]
             list2$d <- intercept[4]
         }
@@ -1331,7 +1326,7 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
                       b=rounded.intercept[2],
                       c=rounded.intercept[3],
                       u='')
-        if (fit$model==1 && fit$mswd>1){
+        if (inflate(fit)){
             list1$d <- rounded.age[4]
             list2$d <- rounded.intercept[4]
         }

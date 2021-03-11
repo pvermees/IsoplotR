@@ -60,7 +60,7 @@ isochron(x, ...)
   exterr = FALSE,
   model = 1,
   show.ellipses = 1 * (model != 2),
-  anchor = list(FALSE, NA),
+  anchor = 0,
   hide = NULL,
   omit = NULL,
   omit.fill = NA,
@@ -445,20 +445,15 @@ vs. \eqn{^{232}}Th/\eqn{^{238}}U}
 (J, decay constant)?}
 
 \item{anchor}{control parameters to fix the intercept age or common Pb
-composition of the isochron fit. This is a two-element list.
+composition of the isochron fit. This can be a scalar or a vector.
 
-The first element is a boolean flag indicating whether the
-isochron line should be anchored. If this is \code{FALSE}, then
-the second item is ignored and both the common Pb composition and
-age are estimated.
+If \code{anchor[1]=0}: do not anchor the isochron.
 
-If the first element is \code{TRUE} and the second element is
-\code{NA}, then the common Pb composition is fixed at the values
+If \code{anchor[1]=1}: fix the common Pb composition at the values
 stored in \code{settings('iratio',...)}.
 
-If the first element is \code{TRUE} and the second element is
-a number, then the isochron line is forced to intersect the
-concordia line at an age equal to that number.}
+If \code{anchor[1]=2}: force the isochron line to intersect the
+concordia line at an age equal to \code{anchor[2]}.}
 
 \item{inverse}{toggles between normal and inverse isochrons. If the
     isochron plots \code{Y} against \code{X}, and
