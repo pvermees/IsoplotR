@@ -156,7 +156,6 @@ central.default <- function(x,alpha=0.05,...){
 #' @rdname central
 #' @export
 central.UThHe <- function(x,alpha=0.05,model=1,...){
-    out <- list()
     ns <- nrow(x)
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
@@ -175,6 +174,7 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
         out$w <- c(w,profile_LL_central_disp_UThHe(fit=out,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
+    out$alpha <- alpha
     out$age['ci[t]'] <- f*out$age['s[t]']
     out
 }
@@ -309,7 +309,7 @@ LL.uvw <- function(w,UVW,x,doSm=TRUE,LL=TRUE){
             out <- out + SS
         }
     }
-    out
+    as.numeric(out)
 }
 mswd_UThHe <- function(x,fit,doSm=FALSE){
     out <- list()

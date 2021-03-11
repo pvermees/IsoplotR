@@ -614,17 +614,17 @@ get.weightedmean <- function(X,sX,random.effects=TRUE,
 }
 
 wtdmean.title <- function(fit,sigdig=2,units='',...){
+    rounded.mean <- roundit(fit$mean['t'],
+                            fit$mean[c('s[t]','ci[t]')],
+                            sigdig=sigdig)
+    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
+                        list(a=rounded.mean['t'],
+                             b=rounded.mean['s[t]'],
+                             c=rounded.mean['ci[t]'],
+                             u=units,
+                             n=sum(fit$valid),
+                             N=length(fit$valid)))
     if (fit$random.effects){
-        rounded.mean <- roundit(fit$mean['t'],
-                                fit$mean[c('s[t]','ci[t]')],
-                                sigdig=sigdig)
-        line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
-                            list(a=rounded.mean['t'],
-                                 b=rounded.mean['s[t]'],
-                                 c=rounded.mean['ci[t]'],
-                                 u=units,
-                                 n=sum(fit$valid),
-                                 N=length(fit$valid)))
         rounded.disp <- roundit(fit$disp['s'],
                                 fit$disp[c('ll','ul')],
                                 sigdig=sigdig)
@@ -646,17 +646,6 @@ wtdmean.title <- function(fit,sigdig=2,units='',...){
                                      b=rounded.mean['s[t]'],
                                      c=rounded.mean['ci[t]'],
                                      d=rounded.mean['disp[t]'],
-                                     u=units,
-                                     n=sum(fit$valid),
-                                     N=length(fit$valid)))
-        } else {
-            rounded.mean <- roundit(fit$mean['t'],
-                                    fit$mean[c('s[t]','ci[t]')],
-                                    sigdig=sigdig)
-            line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
-                                list(a=rounded.mean['t'],
-                                     b=rounded.mean['s[t]'],
-                                     c=rounded.mean['ci[t]'],
                                      u=units,
                                      n=sum(fit$valid),
                                      N=length(fit$valid)))
@@ -777,7 +766,12 @@ add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
         out$mean['ci[t]'] <- nfact(fit$alpha)*out$mean['s[t]']
     } else {
         out$mean['ci[t]'] <- tfact(fit$alpha,fit$df)*out$mean['s[t]']
-        out$mean['disp[t]'] <- sqrt(fit$mswd)*out$mean['ci[t]']
+        if (inflate(c(fit,model=1))){
+            out$mean['disp[t]'] <- tfact(fit$alpha,fit$df)*
+                add.exterr(x,tt=fit$mean['t'],
+                           st=sqrt(fit$mswd)*fit$mean['s[t]'],
+                           cutoff.76=cutoff.76,type=type)[2]
+        }
     }
     ns <- length(x)
     ci.exterr <- list(x=c(0,ns+1,ns+1,0),
