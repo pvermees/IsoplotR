@@ -36,7 +36,7 @@
 #' connecting the measured composition and the corresponding single
 #' grain concordia age composition.
 #'
-#' Further details in Vermeesch (2020).
+#' Further details in Vermeesch (2021).
 #'
 #' @param before logical flag indicating whether the discordance
 #'     filter should be applied before (\code{TRUE}) or after
@@ -50,20 +50,20 @@
 #' @return a list with the input parameters. Default values for
 #'     \code{cutoff} are
 #'
-#' \code{c(-5,50)} if \code{option=='t'};
+#' \code{c(-50,140)} if \code{option=='t'};
 #'
 #' \code{c(-5,15)} if \code{option=='r'};
 #' 
-#' \code{c(-0.01,0.1)} if \code{option=='sk'};
+#' \code{c(-0.3,1)} if \code{option=='sk'};
 #'
-#' \code{c(-1,5)} if \code{option=='a'}; and
+#' \code{c(-2,6)} if \code{option=='a'}; and
 #' 
-#' \code{c(-1,5)} if \code{option=='c'}.
+#' \code{c(-2,7)} if \code{option=='c'}.
 #' 
-#' @seealso \code{\link{cad}}, \code{\link{kde}}, \code{\link{radialplot}}
-#' @references Vermeesch (2020) ``On the treatment of discordant data
-#'     in detrital zircon U--Pb geochronology'',
-#'     \code{https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf}
+#' @seealso \code{\link{cad}}, \code{\link{kde}},
+#'     \code{\link{radialplot}}
+#' @references Vermeesch (2021) ``On the treatment of discordant data
+#'     in detrital zircon U--Pb geochronology'', Geochronology.
 #' @examples
 #' dscf <- discfilter(option='c',before=TRUE,cutoff=c(-1,1))
 #' weightedmean(x=examples$UPb,exterr=FALSE,sigdig=2,
@@ -75,11 +75,11 @@ discfilter <- function(option=0,before=TRUE,cutoff){
     out$option <- option
     out$before <- before
     if (missing(cutoff)){
-        if (option%in%c(1,'t')) cutoff <- c(-5,50)
+        if (option%in%c(1,'t')) cutoff <- c(-50,140)
         else if (option%in%c(2,'r')) cutoff <- c(-5,15)
-        else if (option%in%c(3,'sk')) cutoff <- c(-0.01,0.1)
-        else if (option%in%c(4,'a')) cutoff <- c(-1,5)
-        else if (option%in%c(5,'c')) cutoff <- c(-1,5)
+        else if (option%in%c(3,'sk')) cutoff <- c(-0.3,1)
+        else if (option%in%c(4,'a')) cutoff <- c(-2,6)
+        else if (option%in%c(5,'c')) cutoff <- c(-2,7)
         else cutoff <- c(-Inf,Inf)
     }
     out$cutoff <- cutoff
