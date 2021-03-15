@@ -30,7 +30,7 @@ measured composition.
 connecting the measured composition and the corresponding single
 grain concordia age composition.
 
-Further details in Vermeesch (2020).}
+Further details in Vermeesch (2021).}
 
 \item{before}{logical flag indicating whether the discordance
 filter should be applied before (\code{TRUE}) or after
@@ -45,15 +45,15 @@ between the different options. To view them, enter
 a list with the input parameters. Default values for
     \code{cutoff} are
 
-\code{c(-5,50)} if \code{option=='t'};
+\code{c(-50,140)} if \code{option=='t'};
 
 \code{c(-5,15)} if \code{option=='r'};
 
-\code{c(-0.01,0.1)} if \code{option=='sk'};
+\code{c(-0.3,1)} if \code{option=='sk'};
 
-\code{c(-1,5)} if \code{option=='a'}; and
+\code{c(-2,6)} if \code{option=='a'}; and
 
-\code{c(-1,5)} if \code{option=='c'}.
+\code{c(-2,7)} if \code{option=='c'}.
 }
 \description{
 Define a discordance cutoff to filter U--Pb data.
@@ -77,10 +77,10 @@ weightedmean(x=examples$UPb,exterr=FALSE,sigdig=2,
 
 }
 \references{
-Vermeesch (2020) ``On the treatment of discordant data
-    in detrital zircon U--Pb geochronology'',
-    \code{https://www.dropbox.com/s/8sdrwxuo8urjgzu/writeup.pdf}
+Vermeesch (2021) ``On the treatment of discordant data
+    in detrital zircon U--Pb geochronology'', Geochronology.
 }
 \seealso{
-\code{\link{cad}}, \code{\link{kde}}, \code{\link{radialplot}}
+\code{\link{cad}}, \code{\link{kde}},
+    \code{\link{radialplot}}
 }
