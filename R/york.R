@@ -243,8 +243,8 @@ data2york.default <- function(x,format=1,...){
 #' \code{6}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
 #' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
 #' 
-#' \code{7}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
-#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
+#' \code{7}: \code{X=35/07}, \code{sX=s[35/07]}, \code{Y=08/07},
+#' \code{sY=s[08/07]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
 #' 
 #' \code{8}: \code{X=32/08}, \code{sX=s[32/08]}, \code{Y=06/08},
 #' \code{sY=s[06/08]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
