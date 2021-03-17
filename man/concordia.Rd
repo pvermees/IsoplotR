@@ -20,7 +20,7 @@ concordia(
   sigdig = 2,
   common.Pb = 0,
   ticks = 5,
-  anchor = list(FALSE, NA),
+  anchor = 0,
   hide = NULL,
   omit = NULL,
   omit.fill = NA,
@@ -132,20 +132,15 @@ ticks to be placed along the concordia line, OR a vector of
 tick ages.}
 
 \item{anchor}{control parameters to fix the intercept age or common Pb
-composition of the discordia fit. This is a two-element list.
+composition of the isochron fit. This can be a scalar or a vector.
 
-The first element is a boolean flag indicating whether the
-discordia line should be anchored. If this is \code{FALSE}, then
-the second item is ignored and both the common Pb composition and
-age are estimated.
+If \code{anchor[1]=0}: do not anchor the isochron.
 
-If the first element is \code{TRUE} and the second element is
-\code{NA}, then the common Pb composition is fixed at the values
+If \code{anchor[1]=1}: fix the common Pb composition at the values
 stored in \code{settings('iratio',...)}.
 
-If the first element is \code{TRUE} and the second element is
-a number, then the discordia line is forced to intersect the
-concordia line at an age equal to that number.}
+If \code{anchor[1]=2}: force the isochron line to intersect the
+concordia line at an age equal to \code{anchor[2]}.}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the concordia diagram}
