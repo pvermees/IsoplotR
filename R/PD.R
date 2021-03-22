@@ -62,7 +62,6 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
 }
 
 get.nominal.initials <- function(x){
-    out <- c(0,0)
     if (hasClass(x,'RbSr')){
         out <- settings('iratio','Sr87Sr86')
     } else if (hasClass(x,'SmNd')){
@@ -75,6 +74,12 @@ get.nominal.initials <- function(x){
         out <- settings('iratio','Hf176Hf177')
     } else if (hasClass(x,'KCa')){
         out <- settings('iratio','Ca40Ca44')
+    } else if (hasClass(x,'ThPb')){
+        out <- settings('iratio','Pb208Pb204')
+    } else if (hasClass(x,'ArAr')){
+        out <- settings('iratio','Ar40Ar36')
+    } else {
+        out <- c(0,0)
     }
     list(y0=out[1],sy0=out[2])
 }

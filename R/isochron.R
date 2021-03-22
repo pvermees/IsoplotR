@@ -715,11 +715,38 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
             tmin <- max(min(tx),min(ty))
             tmax <- min(max(tx),max(ty))
             plot_PbPb_evolution(from=tmin,to=tmax,inverse=inverse)
+            ski <- SK.intersection(out,inverse=inverse)
+        } else {
+            ski <- NULL
         }
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb'),
+        graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb',ski=ski),
                         xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
+}
+SK.intersection <- function(fit,inverse,m=0,M=5000){
+    SKi.misfit <- function(tt,a,b){
+        i6474 <- stacey.kramers(tt)
+        pred74 <- a + b*i6474[1]
+        pred74-i6474[2]
+    }
+    if (inverse){
+        a <- fit$b[1]
+        b <- fit$y0[1]
+    } else {
+        a <- fit$a[1]
+        b <- fit$b[1]
+    }
+    if ((M-m)<10){
+        out <- NULL
+    } else if (sign(SKi.misfit(m,a,b)) == sign(SKi.misfit(M,a,b))){
+        ski1 <- SK.intersection(fit,inverse,m=m,M=m+(M-m)/2)
+        ski2 <- SK.intersection(fit,inverse,m=m+(M-m)/2,M=M)
+        out <- unique(c(ski1,ski2))
+    } else {
+        out <- uniroot(SKi.misfit,interval=c(m,M),a=a,b=b)$root
+    }
+    out
 }
 #' @rdname isochron
 #' @export
@@ -1287,7 +1314,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 }
 
-isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
+isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",ski=NULL,...){
     if (inflate(fit)){
         args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
@@ -1334,35 +1361,41 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",...){
     }
     call1 <- substitute(e~a,list(e=expr1,a=args1))
     call2 <- substitute(e~a,list(e=expr2,a=args2))
-    line1 <- do.call(substitute,list(eval(call1),list1))
-    line2 <- do.call(substitute,list(eval(call2),list2))
+    linecontent <- list()
+    linecontent[[1]] <- do.call(substitute,list(eval(call1),list1))
+    linecontent[[2]] <- do.call(substitute,list(eval(call2),list2))
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a*', p('*chi^2*')='~b,
-                            list(a=signif(fit$mswd,sigdig),
-                                 b=signif(fit$p.value,sigdig)))
-        mymtext(line1,line=2,...)
-        mymtext(line2,line=1,...)
-        mymtext(line3,line=0,...)
-    } else if (fit$model==2){
-        mymtext(line1,line=1,...)
-        mymtext(line2,line=0,...)
+        linecontent[[3]] <- substitute('MSWD ='~a*', p('*chi^2*')='~b,
+                                       list(a=signif(fit$mswd,sigdig),
+                                            b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
             rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
-            line3 <- substitute('overdispersion ='~a+b/-c~'Ma',
-                                list(a=rounded.disp[1],
-                                     b=rounded.disp[3],
-                                     c=rounded.disp[2]))
+            linecontent[[3]] <- substitute('overdispersion ='~a+b/-c~'Ma',
+                                           list(a=rounded.disp[1],
+                                                b=rounded.disp[3],
+                                                c=rounded.disp[2]))
         } else {
             rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
             list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
             args3 <- quote(a+b/-c)
             expr3 <- fit$displabel
             call3 <- substitute(e~a,list(e=expr3,a=args3))
-            line3 <- do.call(substitute,list(eval(call3),list3))
+            linecontent[[3]] <- do.call(substitute,list(eval(call3),list3))
         }
-        mymtext(line1,line=2,...)
-        mymtext(line2,line=1,...)
-        mymtext(line3,line=0,...)
+    }
+    nl <- length(linecontent)
+    if (!is.null(ski)){
+        growthline <- paste0('intercepts growth curve at ',
+                             roundit(ski[1],sigdig=sigdig))
+        if (length(ski)>1){
+            growthline <- paste0(growthline,' and ',roundit(ski[2],sigdig=sigdig))
+        }
+        growthline <- paste0(growthline,' Ma')
+        nl <- nl + 1
+        linecontent[[nl]] <- growthline
+    }
+    for (i in nl:1){
+        mymtext(linecontent[[i]],line=nl-i,...)
     }
 }

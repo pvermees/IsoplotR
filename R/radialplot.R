@@ -169,7 +169,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
                 levels=levels[plotit],clabel=clabel,
                 markers=markers,bg=pcol[plotit],
                 col=tcol[plotit],sn=(1:ns)[plotit],...)
-    colourbar(z=levels[calcit],col=bg,clabel=clabel)
+    colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
     fit <- central(x2calc,alpha=alpha,exterr=exterr)
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
                                  units='Ma',ntit=get.ntit(x2calc)))
@@ -464,7 +464,7 @@ radial_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
     radial.plot(X,show.numbers=show.numbers,pch=pch,
                 levels=levels[plotit],clabel=clabel,markers=markers,
                 bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],...)
-    colourbar(z=levels[calcit],col=bg,clabel=clabel)    
+    colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
 }
 
 radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
