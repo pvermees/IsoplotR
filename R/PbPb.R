@@ -4,8 +4,13 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,omit4c=NULL){
         PbPb <- y[,c('Y','sY')]
     } else {
         y <- data2york(x,inverse=TRUE)
-        if (common.Pb == 1) b <- settings('iratio','Pb207Pb204')[1]
-        else b <- regression(y,model=1,omit=omit4c)$b[1]
+        if (common.Pb == 1){
+            b <- settings('iratio','Pb207Pb204')[1]
+        } else if (common.Pb == 2) {
+            b <- regression(y,model=1,omit=omit4c)$b[1]
+        } else {
+            stop('illegal common.Pb option')
+        }
         ns <- nrow(y)
         PbPb <- matrix(0,ns,2)
         PbPb[,1] <- y[,'Y'] - b*y[,'X']
