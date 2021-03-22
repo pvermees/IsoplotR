@@ -76,8 +76,6 @@ get.nominal.initials <- function(x){
         out <- settings('iratio','Ca40Ca44')
     } else if (hasClass(x,'ThPb')){
         out <- settings('iratio','Pb208Pb204')
-    } else if (hasClass(x,'PbPb')){
-        out <- settings('iratio','Pb207Pb204')
     } else if (hasClass(x,'ArAr')){
         out <- settings('iratio','Ar40Ar36')
     } else {
