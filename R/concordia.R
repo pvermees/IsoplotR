@@ -121,7 +121,7 @@
 #'
 #' \code{1}: use the Pb-composition stored in
 #' 
-#' \code{settings('iratio','Pb206Pb204')} (if \code{x$format<4});
+#' \code{settings('iratio','Pb207Pb206')} (if \code{x$format<4});
 #' 
 #' \code{settings('iratio','Pb206Pb204')} and
 #' \code{settings('iratio','Pb207Pb204')} (if \code{3<x$format<7}); or
