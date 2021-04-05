@@ -744,7 +744,7 @@ SK.intersection <- function(fit,inverse,m=0,M=5000){
         ski2 <- SK.intersection(fit,inverse,m=m+(M-m)/2,M=M)
         out <- unique(c(ski1,ski2))
     } else {
-        out <- uniroot(SKi.misfit,interval=c(m,M),a=a,b=b)$root
+        out <- stats::uniroot(SKi.misfit,interval=c(m,M),a=a,b=b)$root
     }
     out
 }

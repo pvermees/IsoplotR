@@ -31,7 +31,7 @@ A four-element list of vectors containing:
     \item{p.value}{p-value of a Chi-square test for linearity}
 
     \item{df}{the number of degrees of freedom for the
-              Chi-square test (3\eqn{n}-3)}
+              Chi-square test (2\eqn{n}-4)}
 
     \item{tfact}{the \eqn{100(1-\alpha/2)\%} percentile of the
                  t-distribution with \eqn{(n-2k+1)} degrees of freedom}

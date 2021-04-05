@@ -401,7 +401,7 @@ class \code{discfilter}}
 
 \code{1}: use the Pb-composition stored in
 
-\code{settings('iratio','Pb206Pb204')} (if \code{x} has class
+\code{settings('iratio','Pb207Pb206')} (if \code{x} has class
 \code{UPb} and \code{x$format<4});
 
 \code{settings('iratio','Pb206Pb204')} and
