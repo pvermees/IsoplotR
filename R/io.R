@@ -390,7 +390,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb207Pb206','errPb207Pb206',
-                    'rhoXY','rhoYZ')
+                    'rhoXY','rhoXZ','rhoYZ')
     } else if (format==4){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
