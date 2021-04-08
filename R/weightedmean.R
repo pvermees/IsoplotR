@@ -168,7 +168,7 @@ weightedmean <- function(x,...){
 #' @importFrom grDevices rgb
 #' @rdname weightedmean
 #' @export
-weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
+weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
                                  detect.outliers=TRUE,plot=TRUE,
                                  levels=NA,clabel="",
                                  rect.col=c("#00FF0080","#FF000080"),
@@ -246,7 +246,7 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=TRUE,
 #' weightedmean(examples$LudwigMean)
 #' @rdname weightedmean
 #' @export
-weightedmean.UPb <- function(x,random.effects=TRUE,
+weightedmean.UPb <- function(x,random.effects=FALSE,
                              detect.outliers=TRUE,plot=TRUE,from=NA,
                              to=NA,levels=NA,clabel="",
                              rect.col=c("#00FF0080","#FF000080"),
@@ -267,7 +267,7 @@ weightedmean.UPb <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.PbPb <- function(x,random.effects=TRUE,
+weightedmean.PbPb <- function(x,random.effects=FALSE,
                               detect.outliers=TRUE,plot=TRUE, from=NA,
                               to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
@@ -307,7 +307,7 @@ weightedmean.PbPb <- function(x,random.effects=TRUE,
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #' @rdname weightedmean
 #' @export
-weightedmean.ThU <- function(x,random.effects=TRUE,
+weightedmean.ThU <- function(x,random.effects=FALSE,
                              detect.outliers=TRUE,plot=TRUE, from=NA,
                              to=NA,levels=NA,clabel="",
                              rect.col=c("#00FF0080","#FF000080"),
@@ -324,7 +324,7 @@ weightedmean.ThU <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.ArAr <- function(x,random.effects=TRUE,
+weightedmean.ArAr <- function(x,random.effects=FALSE,
                               detect.outliers=TRUE,plot=TRUE, from=NA,
                               to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
@@ -342,7 +342,7 @@ weightedmean.ArAr <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.KCa <- function(x,random.effects=TRUE,
+weightedmean.KCa <- function(x,random.effects=FALSE,
                              detect.outliers=TRUE,plot=TRUE, from=NA,
                              to=NA,levels=NA,clabel="",
                              rect.col=c("#00FF0080","#FF000080"),
@@ -360,7 +360,7 @@ weightedmean.KCa <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.ThPb <- function(x,random.effects=TRUE,
+weightedmean.ThPb <- function(x,random.effects=FALSE,
                               detect.outliers=TRUE,plot=TRUE, from=NA,
                               to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
@@ -378,7 +378,7 @@ weightedmean.ThPb <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.ReOs <- function(x,random.effects=TRUE,
+weightedmean.ReOs <- function(x,random.effects=FALSE,
                               detect.outliers=TRUE,plot=TRUE, from=NA,
                               to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
@@ -396,7 +396,7 @@ weightedmean.ReOs <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.SmNd <- function(x,random.effects=TRUE,
+weightedmean.SmNd <- function(x,random.effects=FALSE,
                               detect.outliers=TRUE,plot=TRUE,from=NA,
                               to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
@@ -414,7 +414,7 @@ weightedmean.SmNd <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.RbSr <- function(x,random.effects=TRUE,
+weightedmean.RbSr <- function(x,random.effects=FALSE,
                               detect.outliers=TRUE,plot=TRUE,from=NA,
                               to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
@@ -432,7 +432,7 @@ weightedmean.RbSr <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.LuHf <- function(x,random.effects=TRUE,
+weightedmean.LuHf <- function(x,random.effects=FALSE,
                               detect.outliers=TRUE,plot=TRUE,
                               from=NA,to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
@@ -450,7 +450,7 @@ weightedmean.LuHf <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.UThHe <- function(x,random.effects=TRUE,
+weightedmean.UThHe <- function(x,random.effects=FALSE,
                                detect.outliers=TRUE,plot=TRUE,
                                from=NA,to=NA,levels=NA,clabel="",
                                rect.col=c("#00FF0080","#FF000080"),
@@ -467,7 +467,7 @@ weightedmean.UThHe <- function(x,random.effects=TRUE,
 }
 #' @rdname weightedmean
 #' @export
-weightedmean.fissiontracks <- function(x,random.effects=TRUE,
+weightedmean.fissiontracks <- function(x,random.effects=FALSE,
                                        detect.outliers=TRUE,plot=TRUE,
                                        from=NA,to=NA,levels=NA,clabel="",
                                        rect.col=c("#00FF0080","#FF000080"),
@@ -484,7 +484,7 @@ weightedmean.fissiontracks <- function(x,random.effects=TRUE,
                         units='Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
-weightedmean_helper <- function(x,random.effects=TRUE,
+weightedmean_helper <- function(x,random.effects=FALSE,
                                 detect.outliers=TRUE,plot=TRUE,
                                 from=NA,to=NA,levels=NA,clabel="",
                                 rect.col=c("#00FF0080","#FF000080"),
@@ -515,7 +515,7 @@ weightedmean_helper <- function(x,random.effects=TRUE,
     invisible(out)
 }
 
-get.weightedmean <- function(X,sX,random.effects=TRUE,
+get.weightedmean <- function(X,sX,random.effects=FALSE,
                              valid=TRUE,alpha=0.05){
     ns <- length(X)
     x <- X[valid]
@@ -686,7 +686,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
         graphics::rect(xleft=i-0.4,ybottom=x[i]-fact*sx[i],
                        xright=i+0.4,ytop=x[i]+fact*sx[i],col=col)
     }
-    colourbar(z=levels[valid],col=rect.col,clabel=clabel)
+    colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
     graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units))
 }
 
@@ -694,7 +694,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 # X and sX are some measurements and their standard errors
 # valid is a vector of logical flags indicating whether the corresponding
 # measurements have already been rejected or not
-chauvenet <- function(X,sX,valid,random.effects=TRUE){
+chauvenet <- function(X,sX,valid,random.effects=FALSE){
     if (sum(valid)<2) return(valid)
     fit <- get.weightedmean(X,sX,random.effects=random.effects,valid=valid)
     if (random.effects){
