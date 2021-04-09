@@ -390,7 +390,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb207Pb206','errPb207Pb206',
-                    'rhoXY','rhoXZ','rhoYZ')
+                    'rhoXY','rhoYZ')
     } else if (format==4){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
@@ -438,19 +438,20 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
 # and can be inferred from the redundancy of the ratios
 optionalredundancy2cor <- function(X,nc){
     out <- X
-    if (nc > 7){
-        rhoXY <- X[,7]
-        rhoYZ <- X[,8]
-        i <- which(is.na(rhoXY))
-        j <- which(is.na(rhoYZ))
-    } else if (nc == 7){
+    nr <- nrow(X)
+    if (nc > 6){
         rhoXY <- X[,7]
         i <- which(is.na(rhoXY))
-        j <- 1:nrow(X)
-        out <- cbind(X,0)
+        if (nc > 7){
+            rhoYZ <- X[,8]
+            j <- which(is.na(rhoYZ))
+        } else {
+            j <- 1:nr
+            out <- cbind(X,0)
+        }
     } else {
-        i <- 1:nrow(X)
-        j <- 1:nrow(X)
+        i <- 1:nr
+        j <- 1:nr
         out <- cbind(X,0,0)
     }
     out[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
