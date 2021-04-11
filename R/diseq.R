@@ -114,7 +114,7 @@
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' fn <- system.file("diseq.csv",package="IsoplotR")
 #' UPb <- read.data(fn,method='U-Pb',format=2,d=d)
-#' concordia(UPb4,type=2,xlim=c(0,5000),ylim=c(0.047,0.057))
+#' concordia(UPb,type=2,xlim=c(0,5000),ylim=c(0.047,0.057))
 #' @export
 diseq <- function(U48=list(x=1,sx=0,option=0),
                   ThU=list(x=1,sx=0,option=0),
