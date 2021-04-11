@@ -121,6 +121,8 @@
 #' and marking the 100[1-\eqn{\alpha}]\% confidence limits of a normal
 #' distribution whose standard deviation equals the overdispersion
 #' parameter if \code{random.effects=TRUE}). }
+#'
+#' }
 #' @rdname weightedmean
 #' @export
 weightedmean <- function(x,...){

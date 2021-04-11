@@ -444,7 +444,52 @@ stored in \code{settings('iratio',...)}.}
 \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
 }
 \value{
+Returns a list with the following items:
 
+\describe{
+
+\item{mean}{a three element vector with:
+
+\code{t}: the weighted mean
+
+\code{s[t]}: the standard error of the weighted mean
+
+\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{t}
+
+}
+
+\item{disp}{a three-element vector with the (over)dispersion and
+the lower and upper half-widths of its \eqn{100(1-\alpha)\%}
+confidence interval.}
+
+\item{mswd}{the Mean Square of the Weighted Deviates
+(a.k.a. `reduced Chi-square' statistic)}
+
+\item{df}{the number of degrees of freedom of the Chi-square test
+for homogeneity (\eqn{df=n-1}, where \eqn{n} is the number of
+samples).}
+
+\item{p.value}{the p-value of a Chi-square test with \eqn{df}
+degrees of freedom, testing the null hypothesis that the underlying
+population is not overdispersed.}
+
+\item{valid}{vector of logical flags indicating which steps are
+included into the weighted mean calculation}
+
+\item{plotpar}{list of plot parameters for the weighted mean
+diagram, including \code{mean} (the mean value), \code{ci} (a grey
+rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
+ignoring systematic errors), \code{ci.exterr} (a grey rectangle
+with the 100[1-\eqn{\alpha}]\% confidence interval including
+systematic errors), \code{dash1} and \code{dash2} (lines marking
+the 100[1-\eqn{\alpha}]\% confidence interval augmented by
+\eqn{\sqrt{mswd}} overdispersion if \code{random.effects=FALSE}),
+and marking the 100[1-\eqn{\alpha}]\% confidence limits of a normal
+distribution whose standard deviation equals the overdispersion
+parameter if \code{random.effects=TRUE}). }
+
+}
 }
 \description{
 Models the data as a Normal distribution with two sources of
