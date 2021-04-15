@@ -316,7 +316,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
 # helper function for plot.concordia
 plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
                                 alpha=0.05,exterr=TRUE,ticks=5){
-    if (all(is.null(x$x))){
+    if (is.null(x$x)){
         m <- 0
         M <- 4500
     } else {

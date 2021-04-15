@@ -248,14 +248,11 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    expired <- (tt>10/mexp$L)
+    dead <- (tt>0.02/mexp$L) # 20 half-lives
     L <- mexp$L
-    L[expired] <- 0 # don't bother restoring the expired nuclides
+    L[dead] <- 0.02/tt # hack to avoid singularity
     out <- as.vector(mexp$Q %*% diag(exp(L*tt)) %*% mexp$Qinv %*% nt)
     names(out) <- names(nt)
-    negative <- (out<0)
-    out[expired] <- 500*out['U238']*mexp$L['U238']/mexp$L[expired]
-    out[negative] <- 0
     out
 }
 forward <- function(tt,d=diseq(),derivative=0){
