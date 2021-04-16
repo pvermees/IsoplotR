@@ -261,7 +261,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
             ul[overshot] <- yconc[overshot]
             overshot <- ll>yconc
             ll[overshot] <- yconc[overshot]
-        }        
+        }
         cix <- c(x,rev(x))
         ciy <- c(ll,rev(ul))
     }
@@ -273,7 +273,7 @@ tw3d2d <- function(fit){
     out <- list(par=fit$par,cov=fit$cov,fact=fit$fact)
     if (fit$format > 3){
         labels <- c('t','76i')
-        out$par <- c(fit$par['t'],fit$par[3]/fit$par[2]) # par[2] = Pb206i, par[3] = Pb207i
+        out$par <- c(fit$par['t'],fit$par[3]/fit$par[2]) # par = c(Pb206i,Pb207i)
         J <- matrix(0,2,3)
         J[1,1] <- 1
         J[2,2] <- -fit$par[3]/fit$par[2]^2

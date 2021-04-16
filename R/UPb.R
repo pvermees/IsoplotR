@@ -838,7 +838,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl38
         } else { # apply a disequilibrium correction
             t.68 <- tryCatch({
-                search.range <- c(t.init/1000,t.init+100)
+                search.range <- c(t.init/10,t.init+10)
                 stats::optimise(diseq.68.misfit,interval=search.range,x=x,d=d)$minimum
             }, error = function(error_condition) {
                 t.init

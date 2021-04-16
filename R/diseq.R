@@ -248,10 +248,7 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    dead <- (tt>0.02/mexp$L) # 20 half-lives
-    L <- mexp$L
-    L[dead] <- 0.02/tt # hack to avoid singularity
-    out <- as.vector(mexp$Q %*% diag(exp(L*tt)) %*% mexp$Qinv %*% nt)
+    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
     names(out) <- names(nt)
     out
 }

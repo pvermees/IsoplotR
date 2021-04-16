@@ -280,11 +280,19 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     if (show.age>1){
         wetherill <- (type==1)
         x2calc <- subset(x,subset=calcit)
-        fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,exterr=exterr,
-                                             alpha=alpha,model=(show.age-1),anchor=anchor)
+        fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
+                                             exterr=exterr,alpha=alpha,
+                                             model=(show.age-1),anchor=anchor)
         discordia.line(fit,wetherill=wetherill,d=x$d)
         fit$n <- length(x2calc)
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
+    }
+    if (X2plot$d$U48$option==2 | X2plot$d$U48$option==2){
+        D <- mclean(tt=fit$par['t'],d=X2plot$d)
+        X2plot$d$U48$x <- D$U48i
+        X2plot$d$U48$option <- 1
+        X2plot$d$ThU$x <- D$ThUi
+        X2plot$d$ThU$option <- 1
     }
     plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
@@ -329,7 +337,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
     for (i in 1:nn){ # build the concordia line
-        xy <- age_to_concordia_ratios(tt[i],type=type,exterr=exterr,d=x$d[i])
+        xy <- age_to_concordia_ratios(tt[i],type=type,exterr=exterr,d=x$d)
         if (exterr){ # show decay constant uncertainty
             if (i > 1) oldell <- ell
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
@@ -345,7 +353,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         ticks <- prettier(lims$t,type=type,n=ticks)
     graphics::lines(conc[,'x'],conc[,'y'],col=col,lwd=2)
     for (i in 1:length(ticks)){
-        xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=x$d[i])
+        xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=x$d)
         if (exterr){ # show ticks as ellipse
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
             graphics::polygon(ell,col='white')
@@ -385,9 +393,9 @@ cseq <- function(m,M,type=1,n=50){
     if (type==1){
         out <- seq(m,M,length.out=n)
     } else if (m>0){
-        out <- exp(seq(0,log(M/m),length.out=n))*m
+        out <- exp(seq(log(m),log(M),length.out=n))
     } else {
-        out <- exp(seq(0,log(M+1-m),length.out=n))+1-m
+        out <- exp(seq(0,log(M+1),length.out=n))-1
     }
     out[out<=0] <- min(out[out>0])/10
     out
@@ -443,8 +451,18 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
         miny <- ylim[1]
         maxy <- ylim[2]
     }
-    if (is.null(tlim)) out$t <- c(0,0)
-    else out$t <- tlim
+    measured.discordance <- FALSE
+    if (x$d$ThU$option==2){
+        measured.discordance <- TRUE
+        out$t <- c(0,0.5) # TODO
+    } else if (x$d$U48$option==2){
+        measured.discordance <- TRUE
+        out$t <- c(0,5) # TODO
+    } else if (is.null(tlim)) {
+        out$t <- c(0,0)
+    } else {
+        out$t <- tlim
+    }
     nse <- 3 # number of standard errors used for buffer
     if (!is.null(tlim) & type==1){
         if (!xset) out$x <- age_to_Pb207U235_ratio(tlim,d=x$d)[,'75']
@@ -472,8 +490,10 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
             miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
             maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
         }
-        out$t[1] <- get.Pb206U238.age(miny,d=x$d)[1]
-        out$t[2] <- get.Pb207U235.age(maxx,d=x$d)[1]
+        if (!measured.discordance){
+            out$t[1] <- get.Pb206U238.age(miny,d=x$d)[1]
+            out$t[2] <- get.Pb207U235.age(maxx,d=x$d)[1]
+        }
         if (!xset){
             minx <- min(minx,age_to_Pb207U235_ratio(out$t[1],d=x$d)[,'75'])
             maxx <- max(maxx,age_to_Pb207U235_ratio(out$t[2],d=x$d)[,'75'])
@@ -495,8 +515,10 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
             miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
             maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
         }
-        out$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
-        out$t[2] <- get.Pb207Pb206.age(maxy,d=x$d,interval=c(out$t[1],10000))[1]
+        if (!measured.discordance){
+            out$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
+            out$t[2] <- get.Pb207Pb206.age(maxy,d=x$d,interval=c(out$t[1],10000))[1]
+        }
         if (!xset)
             minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=x$d)[,'86'])
         if (!yset)
@@ -514,8 +536,10 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
             miny <- min(Pb208Th232[,1]-nse*Pb208Th232[,2],na.rm=TRUE)
             maxy <- max(Pb208Th232[,1]+nse*Pb208Th232[,2],na.rm=TRUE)
         }
-        out$t[1] <- get.Pb206U238.age(minx,d=x$d)[1]
-        out$t[2] <- get.Pb208Th232.age(maxy)[1]
+        if (!measured.discordance){
+            out$t[1] <- get.Pb206U238.age(minx,d=x$d)[1]
+            out$t[2] <- get.Pb208Th232.age(maxy)[1]
+        }
         if (!xset){
             minx <- min(minx,age_to_Pb206U238_ratio(out$t[1],d=x$d)[,'68'])
             maxx <- max(maxx,age_to_Pb206U238_ratio(out$t[2],d=x$d)[,'68'])
