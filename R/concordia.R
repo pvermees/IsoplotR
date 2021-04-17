@@ -285,8 +285,6 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
         fit$n <- length(x2calc)
-        discordia.line(fit,wetherill=wetherill,d=x$d)
-        graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
         if (measured.diseq){
             D <- mclean(tt=fit$par['t'],d=x$d)
             X2plot$d$U48$x <- D$U48i
@@ -294,6 +292,8 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
             X2plot$d$U48$option <- 1
             X2plot$d$ThU$option <- 1
         }
+        discordia.line(fit,wetherill=wetherill,d=X2plot$d)
+        graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     } else {
         if (measured.diseq){
             X2plot$d$U48$option <- 1
