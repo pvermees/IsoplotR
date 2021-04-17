@@ -790,8 +790,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             J[1,1] <- 1/(l5*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         } else { # apply a disequilibrium correction
-            search.range <- c(t.75/1000,t.75+100)
-            t.75 <- stats::optimize(diseq.75.misfit,interval=search.range,x=x,d=d)$minimum
+            t.75 <- stats::optim(t.75,diseq.75.misfit,method='BFGS',x=x,d=d)$par
             D <- mclean(tt=t.75,d=d,exterr=exterr)    # implicit differentiation of 
             J[1,1] <- -1/D$dPb207U235dt               # mf=(x-Pb7U5)^2 => dt/dx
             J[1,2] <- D$dPb207U235dl35/D$dPb207U235dt # and dt/dl35
@@ -838,8 +837,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl38
         } else { # apply a disequilibrium correction
             t.68 <- tryCatch({
-                search.range <- c(t.init/10,t.init+10)
-                stats::optimise(diseq.68.misfit,interval=search.range,x=x,d=d)$minimum
+                stats::optim(t.init,diseq.68.misfit,method='BFGS',x=x,d=d)$par
             }, error = function(error_condition) {
                 t.init
             })

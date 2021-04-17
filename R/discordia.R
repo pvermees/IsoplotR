@@ -251,7 +251,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         tl <- check.zero.UPb(fit2d$par['t'])
         U <- settings('iratio','U238U235')[1]
         nsteps <- 100
-        x <- seq(from=max(1,usr[1]),to=usr[2],length.out=nsteps)
+        x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
         y <- yl + (y0-yl)*(1-x*r68) # = y0 + yl*x*r68 - y0*x*r68
         D <- mclean(tt=tl,d=d)
         d75dtl <- D$dPb207U235dt
