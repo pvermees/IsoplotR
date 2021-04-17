@@ -276,7 +276,6 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
     fit <- NULL
-    measured.diseq <- (X2plot$d$U48$option==2 | X2plot$d$ThU$option==2)
     if (show.age>1){
         lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
         wetherill <- (type==1)
@@ -285,17 +284,17 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
         fit$n <- length(x2calc)
-        if (measured.diseq){
-            D <- mclean(tt=fit$par[1],d=x$d)
+        if (measured.diseq(x2calc$d)){
+            D <- mclean(tt=fit$par[1],d=x2calc$d)
             X2plot$d$U48$x <- D$U48i
             X2plot$d$ThU$x <- D$ThUi
             X2plot$d$U48$option <- 1
             X2plot$d$ThU$option <- 1
         }
-        discordia.line(fit,wetherill=wetherill,d=X2plot$d)
+        discordia.line(fit,wetherill=wetherill,d=x2calc$d)
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
     } else {
-        if (measured.diseq){
+        if (measured.diseq(X2plot$d)){
             X2plot$d$U48$option <- 1
             X2plot$d$ThU$option <- 1
         }
@@ -340,8 +339,6 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
     }
     nn <- 30 # number of segments into which the concordia line is divided
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@24@"]]));##:ess-bp-end:##
     tt <- cseq(m,M,type=type,n=nn)
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
@@ -371,7 +368,8 @@ browser(expr=is.null(.ESSBP.[["@24@"]]));##:ess-bp-end:##
         }
         pos <- 2
         if ((type%in%c(1,2)  & diff(range(conc[,'x'],na.rm=TRUE))<0.05) |
-            (type==2 & diff(range(conc[,'x'],na.rm=TRUE))<2.5) & exterr){ pos <- NULL }
+            (type==2 & diff(range(conc[,'x'],na.rm=TRUE))<2.5) & exterr)
+        { pos <- NULL }
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
     graphics::box()

@@ -248,10 +248,7 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    L <- mexp$L
-    expired <- (tt>20/L)
-    L[expired] <- 20/tt
-    out <- as.vector(mexp$Q %*% diag(exp(L*tt)) %*% mexp$Qinv %*% nt)
+    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
     names(out) <- names(nt)
     out
 }
@@ -513,4 +510,8 @@ diseq.68.misfit <- function(tt,x,d){
 }
 get.76.misfit <- function(tt,x,d=diseq()){
     (x - subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76'))^2
+}
+
+measured.diseq <- function(d){
+    (d$U48$option==2 | d$ThU$option==2)
 }
