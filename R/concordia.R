@@ -286,7 +286,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                                              model=(show.age-1),anchor=anchor)
         fit$n <- length(x2calc)
         if (measured.diseq){
-            D <- mclean(tt=fit$par['t'],d=x$d)
+            D <- mclean(tt=fit$par[1],d=x$d)
             X2plot$d$U48$x <- D$U48i
             X2plot$d$ThU$x <- D$ThUi
             X2plot$d$U48$option <- 1
@@ -340,6 +340,8 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
     }
     nn <- 30 # number of segments into which the concordia line is divided
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@24@"]]));##:ess-bp-end:##
     tt <- cseq(m,M,type=type,n=nn)
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
