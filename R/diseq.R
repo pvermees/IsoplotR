@@ -248,7 +248,10 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    L <- mexp$L
+    expired <- (tt>20/L)
+    L[expired] <- 20/tt
+    out <- as.vector(mexp$Q %*% diag(exp(L*tt)) %*% mexp$Qinv %*% nt)
     names(out) <- names(nt)
     out
 }

@@ -275,24 +275,31 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     if (common.Pb<1) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
-    lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     fit <- NULL
+    measured.diseq <- (X2plot$d$U48$option==2 | X2plot$d$ThU$option==2)
     if (show.age>1){
+        lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
         wetherill <- (type==1)
         x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
-        discordia.line(fit,wetherill=wetherill,d=x$d)
         fit$n <- length(x2calc)
+        discordia.line(fit,wetherill=wetherill,d=x$d)
         graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
-    }
-    if (X2plot$d$U48$option==2 | X2plot$d$U48$option==2){
-        D <- mclean(tt=fit$par['t'],d=X2plot$d)
-        X2plot$d$U48$x <- D$U48i
-        X2plot$d$U48$option <- 1
-        X2plot$d$ThU$x <- D$ThUi
-        X2plot$d$ThU$option <- 1
+        if (measured.diseq){
+            D <- mclean(tt=fit$par['t'],d=x$d)
+            X2plot$d$U48$x <- D$U48i
+            X2plot$d$ThU$x <- D$ThUi
+            X2plot$d$U48$option <- 1
+            X2plot$d$ThU$option <- 1
+        }
+    } else {
+        if (measured.diseq){
+            X2plot$d$U48$option <- 1
+            X2plot$d$ThU$option <- 1
+        }
+        lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     }
     plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
