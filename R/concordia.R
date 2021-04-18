@@ -496,14 +496,17 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
         if (!measured.discordance){
             out$t[1] <- get.Pb206U238.age(miny,d=x$d)[1]
             out$t[2] <- get.Pb207U235.age(maxx,d=x$d)[1]
+            d <- x$d
+        } else {
+            d <- diseq()
         }
         if (!xset){
-            minx <- min(minx,age_to_Pb207U235_ratio(out$t[1],d=x$d)[,'75'])
-            maxx <- max(maxx,age_to_Pb207U235_ratio(out$t[2],d=x$d)[,'75'])
+            minx <- min(minx,age_to_Pb207U235_ratio(out$t[1],d=d)[,'75'])
+            maxx <- max(maxx,age_to_Pb207U235_ratio(out$t[2],d=d)[,'75'])
         }
         if (!yset){
-            miny <- min(miny,age_to_Pb206U238_ratio(out$t[1],d=x$d)[,'68'])
-            maxy <- max(maxy,age_to_Pb206U238_ratio(out$t[2],d=x$d)[,'68'])
+            miny <- min(miny,age_to_Pb206U238_ratio(out$t[1],d=d)[,'68'])
+            maxy <- max(maxy,age_to_Pb206U238_ratio(out$t[2],d=d)[,'68'])
         }
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
@@ -521,11 +524,12 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
         if (!measured.discordance){
             out$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
             out$t[2] <- get.Pb207Pb206.age(maxy,d=x$d,interval=c(out$t[1],10000))[1]
+            d <- x$d
+        } else {
+            d <- diseq()
         }
-        if (!xset)
-            minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=x$d)[,'86'])
-        if (!yset)
-            miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=x$d)[,'76'])
+        if (!xset) minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=d)[,'86'])
+        if (!yset) miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=d)[,'76'])
         out$x <- c(minx,maxx)
         out$y <- c(miny,maxy)
     } else if (is.null(tlim) & type==3){
@@ -542,10 +546,13 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
         if (!measured.discordance){
             out$t[1] <- get.Pb206U238.age(minx,d=x$d)[1]
             out$t[2] <- get.Pb208Th232.age(maxy)[1]
+            d <- x$d
+        } else {
+            d <- diseq()
         }
         if (!xset){
-            minx <- min(minx,age_to_Pb206U238_ratio(out$t[1],d=x$d)[,'68'])
-            maxx <- max(maxx,age_to_Pb206U238_ratio(out$t[2],d=x$d)[,'68'])
+            minx <- min(minx,age_to_Pb206U238_ratio(out$t[1],d=d)[,'68'])
+            maxx <- max(maxx,age_to_Pb206U238_ratio(out$t[2],d=d)[,'68'])
         }
         if (!yset){
             miny <- min(miny,age_to_Pb208Th232_ratio(out$t[1])[,'82'])
