@@ -290,9 +290,12 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
             X2plot$d$ThU$x <- D$ThUi
             X2plot$d$U48$option <- 1
             X2plot$d$ThU$option <- 1
+            wetherill.title <- FALSE
+        } else {
+            wetherill.title <- TRUE
         }
         discordia.line(fit,wetherill=wetherill,d=x2calc$d)
-        graphics::title(discordia.title(fit,wetherill=wetherill,sigdig=sigdig))
+        graphics::title(discordia.title(fit,wetherill=wetherill.title,sigdig=sigdig))
     } else {
         if (measured.diseq(X2plot$d)){
             X2plot$d$U48$option <- 1
