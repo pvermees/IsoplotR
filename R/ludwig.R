@@ -713,16 +713,20 @@ fixit <- function(x,anchor=0,model=1,w=NA){
 }
 
 # special case for measured disequilibrium
-ludwig2step <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
+ludwig2step <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
     # 1. fit without disequilibrium
     X <- x
     X$d <- diseq()
-    fit1 <- ludwig(X)
+    fit1 <- ludwig(X,alpha=alpha,model=model)
     # 2. fix common Pb intercept
     init <- fit1$logpar
     np <- length(init)
-    fixed <- c(FALSE,rep(TRUE,np-1))
-    dinit <- c(1,rep(0,np-1))
+    fixed <- rep(TRUE,np)
+    dinit <- rep(0,np)
+    if (model==3) ifix <- c(1,np)
+    else ifix <- 1
+    fixed[ifix] <- FALSE
+    dinit[ifix] <- 1
     lower <- (init-dinit)[!fixed]
     upper <- (init+dinit)[!fixed]
     fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
