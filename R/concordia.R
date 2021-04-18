@@ -330,14 +330,10 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
 # helper function for plot.concordia
 plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
                                 alpha=0.05,exterr=TRUE,ticks=5){
-    if (is.null(x$x)){
-        m <- 0
-        M <- 4500
-    } else {
-        range.t <- range(lims$t)
-        m <- max(0.8*lims$t[1],lims$t[1]-range.t/20)
-        M <- min(1.2*lims$t[2],lims$t[2]+range.t/20)
-    }
+    if (length(ticks)<2)
+        ticks <- prettier(lims$t,type=type,n=ticks)
+    m <- ticks[1]
+    M <- tail(ticks,1)
     nn <- 30 # number of segments into which the concordia line is divided
     tt <- cseq(m,M,type=type,n=nn)
     conc <- matrix(0,nn,2)
@@ -355,9 +351,10 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         }
         conc[i,] <- xy$x
     }
-    if (length(ticks)<2)
-        ticks <- prettier(lims$t,type=type,n=ticks)
     graphics::lines(conc[,'x'],conc[,'y'],col=col,lwd=2)
+    dx <- diff(par('usr')[1:2])
+    if (exterr & ((type==1 & dx<0.03) | (type==2 & dx<3) | (type==3 & dx<0.005)))
+    { pos <- NULL } else { pos <- 2 }
     for (i in 1:length(ticks)){
         xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=x$d)
         if (exterr){ # show ticks as ellipse
@@ -366,10 +363,6 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         } else {
             graphics::points(xy$x[1],xy$x[2],pch=21,bg='white')
         }
-        pos <- 2
-        if ((type%in%c(1,2)  & diff(range(conc[,'x'],na.rm=TRUE))<0.05) |
-            (type==2 & diff(range(conc[,'x'],na.rm=TRUE))<2.5) & exterr)
-        { pos <- NULL }
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
     graphics::box()
@@ -414,7 +407,7 @@ prettier <- function(x,type=1,n=5){
     }
     m <- min(x)
     M <- max(x)
-    if (M/m<50){ # linear spacing if TW spans less than 1 order of magnitude
+    if (M/m<10){ # linear spacing if TW spans less than 1 order of magnitude
         out <- pilot
     } else { # log spacing if TW spans more than 1 order of magnitude
         out <- cseq(m,M,type=type,n=n)
@@ -785,8 +778,10 @@ get.concordia.SS <- function(x,covmat){
 
 emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
                            concordia.col='darksalmon',ticks=5,...){
-    if (is.null(tlim) && type%in%c(1,3)) tlim <- c(1,3500)
-    else if (is.null(tlim)) tlim <- c(100,3500)
+    if (is.null(tlim)){
+        if (type%in%c(1,3)) tlim <- c(1,4500)
+        else tlim <- c(100,4500)
+    } 
     dat <- list()
     class(dat) <- 'UPb'
     dat$d <- diseq()
