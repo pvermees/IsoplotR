@@ -185,9 +185,13 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         out$logcov <- matrix(0,np,np) # initialise
         out$logcov[!fixed,!fixed] <- solve(fit$hessian/2)*mse
     } else {
-        fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                       method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                       lower=lower,upper=upper,control=list(fnscale=-1),...)
+        if (measured.diseq(x$d) & anchor[1]<1){
+            fit <- ludwig2step(x,exterr=exterr,alpha=alpha,model=model,...)
+        } else {
+            fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                           method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                           lower=lower,upper=upper,control=list(fnscale=-1),...)
+        }
         out$LL <- fit$value
         out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
@@ -706,4 +710,22 @@ fixit <- function(x,anchor=0,model=1,w=NA){
         else out[2:NP] <- TRUE # fix a0(,b0)
     }
     out
+}
+
+# special case for measured disequilibrium
+ludwig2step <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
+    # 1. fit without disequilibrium
+    X <- x
+    X$d <- diseq()
+    fit1 <- ludwig(X)
+    # 2. fix common Pb intercept
+    init <- fit1$logpar
+    np <- length(init)
+    fixed <- c(FALSE,rep(TRUE,np-1))
+    dinit <- c(1,rep(0,np-1))
+    lower <- (init-dinit)[!fixed]
+    upper <- (init+dinit)[!fixed]
+    fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                   method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                   lower=lower,upper=upper,control=list(fnscale=-1),...)
 }

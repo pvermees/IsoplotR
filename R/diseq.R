@@ -297,7 +297,7 @@ check.equilibrium <- function(d=diseq()){
 }
 measured.disequilibrium <- function(d=diseq()){
     equilibrium <- check.equilibrium(d)
-    measured <- (d$U48$option>1 | d$ThU$option>1)
+    measured <- (d$U48$option==2 | d$ThU$option==2)
     !equilibrium & measured
 }
 
