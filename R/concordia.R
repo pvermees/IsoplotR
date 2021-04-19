@@ -411,9 +411,10 @@ prettier <- function(x,type=1,n=5){
         M <- max(x)
         if (M/m<50){ # linear spacing if TW spans less than 1 order of magnitude
             out <- pretty(x,n=n)
+            if (out[1]<=0) out[1] <- out[2]/10
         } else { # log spacing if TW spans more than 1 order of magnitude
-            mexp <- floor(log10(m))
-            Mexp <- ceiling(log10(M))
+            mexp <- log10(floor(10^(log10(m)%%1))) + floor(log10(m))
+            Mexp <- log10(ceiling(10^(log10(M)%%1))) + floor(log10(M))
             out <- c(c(1,2,5) %o% 10^(mexp:Mexp))
         }
     }
@@ -452,10 +453,10 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
     measured.discordance <- FALSE
     if (x$d$ThU$option==2){
         measured.discordance <- TRUE
-        out$t <- c(0,0.5) # TODO
+        out$t <- c(0.001,0.5) # TODO
     } else if (x$d$U48$option==2){
         measured.discordance <- TRUE
-        out$t <- c(0,5) # TODO
+        out$t <- c(0.001,5) # TODO
     } else if (is.null(tlim)) {
         out$t <- c(0,0)
     } else {
