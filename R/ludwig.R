@@ -186,7 +186,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         out$logcov[!fixed,!fixed] <- solve(fit$hessian/2)*mse
     } else {
         if (measured.diseq(x$d) & anchor[1]<1){
-            fit <- ludwig2step(x,exterr=exterr,alpha=alpha,model=model,...)
+            fit <- ludwig2step(x,exterr=exterr,model=model,...)
         } else {
             fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                            method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,

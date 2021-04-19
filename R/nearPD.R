@@ -2,29 +2,16 @@
 ## Copyright (C) 2007-2019 Martin Maechler
 ## Computes the nearest correlation matrix to an approximate
 ## correlation matrix, i.e. not positive semidefinite.
-nearPD <- function(x,               # n-by-n approx covariance/correlation matrix
-                   corr = FALSE, keepDiag = FALSE,
-                   base.matrix = FALSE, # if TRUE return "base matrix" otherwise "dpoMatrix"
-                   do2eigen = TRUE,  # if TRUE do a sfsmisc::posdefify() eigen step
-                   doSym = FALSE,  # symmetrize after tcrossprod()
-                   doDykstra = TRUE, # do use Dykstra's correction
-                   only.values = FALSE,# if TRUE simply return lambda[j].
-                   ensureSymmetry = !isSymmetric(x),# so user can set to FALSE iff she knows..
-                   eig.tol = 1e-6, # defines relative positiveness of eigenvalues compared to largest
-                   conv.tol = 1e-7, # convergence tolerance for algorithm
-                   posd.tol = 1e-8, # tolerance for enforcing positive definiteness
-                   maxit = 100L, # maximum number of iterations allowed
-                   conv.norm.type = "I",
-                   trace = FALSE # set to TRUE (or 1 ..) to trace iterations
-                   ){
-    if(ensureSymmetry) { ## only if needed/wanted ...
-	## message("applying nearPD() to symmpart(x)")
-	x <- symmpart(x)
-    }
+nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
+                   base.matrix = FALSE, do2eigen = TRUE,
+                   doSym = FALSE, doDykstra = TRUE,
+                   only.values = FALSE, eig.tol = 1e-6,
+                   conv.tol = 1e-7, posd.tol = 1e-8,
+                   maxit = 100L, conv.norm.type = "I",
+                   trace = FALSE){
     n <- ncol(x)
     if(keepDiag) diagX0 <- diag(x)
     if(doDykstra) {
-        ## D_S should be like x, but filled with '0' -- following also works for 'Matrix':
         D_S <- x; D_S[] <- 0
     }
     X <- x

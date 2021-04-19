@@ -335,8 +335,8 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
                                 alpha=0.05,exterr=TRUE,ticks=5){
     if (length(ticks)<2)
         ticks <- prettier(lims$t,type=type,n=ticks)
-    m <- ticks[1]
-    M <- tail(ticks,1)
+    m <- max(lims$t[1],ticks[1])
+    M <- min(lims$t[2],tail(ticks,1))
     nn <- 30 # number of segments into which the concordia line is divided
     tt <- cseq(m,M,type=type,n=nn)
     conc <- matrix(0,nn,2)
@@ -404,24 +404,19 @@ cseq <- function(m,M,type=1,n=50){
     out
 }
 prettier <- function(x,type=1,n=5){
-    pilot <- pretty(x,n=n)
     if (type%in%c(1,3)){
-        return(pilot)
-    }
-    m <- min(x)
-    M <- max(x)
-    if (M/m<10){ # linear spacing if TW spans less than 1 order of magnitude
-        out <- pilot
-    } else { # log spacing if TW spans more than 1 order of magnitude
-        out <- cseq(m,M,type=type,n=n)
-        init <- out
-        out[1] <- pilot[1]
-        out[n] <- utils::tail(pilot,1)
-        for (i in 2:(n-1)){ # prettify
-            out[i] <- pretty(init[(i-1):i],n=2)[2]
+        out <- pretty(x,n=n)
+    } else {
+        m <- min(x)
+        M <- max(x)
+        if (M/m<50){ # linear spacing if TW spans less than 1 order of magnitude
+            out <- pretty(x,n=n)
+        } else { # log spacing if TW spans more than 1 order of magnitude
+            mexp <- floor(log10(m))
+            Mexp <- ceiling(log10(M))
+            out <- c(c(1,2,5) %o% 10^(mexp:Mexp))
         }
     }
-    out[out<=0] <- min(out[out>0])/2
     out
 }
 age_to_concordia_ratios <- function(tt,type=1,exterr=FALSE,d=diseq()){
