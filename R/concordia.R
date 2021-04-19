@@ -336,7 +336,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
     if (length(ticks)<2)
         ticks <- prettier(lims$t,type=type,n=ticks)
     m <- max(lims$t[1],ticks[1])
-    M <- min(lims$t[2],tail(ticks,1))
+    M <- min(lims$t[2],utils::tail(ticks,1))
     nn <- 30 # number of segments into which the concordia line is divided
     tt <- cseq(m,M,type=type,n=nn)
     conc <- matrix(0,nn,2)
@@ -355,7 +355,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         conc[i,] <- xy$x
     }
     graphics::lines(conc[,'x'],conc[,'y'],col=col,lwd=2)
-    dx <- diff(par('usr')[1:2])
+    dx <- diff(graphics::par('usr')[1:2])
     if (exterr & ((type==1 & dx<0.03) | (type==2 & dx<3) | (type==3 & dx<0.005)))
     { pos <- NULL } else { pos <- 2 }
     for (i in 1:length(ticks)){

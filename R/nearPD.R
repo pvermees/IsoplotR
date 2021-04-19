@@ -77,8 +77,8 @@ nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
 	    diag(X) <- diagX0
     } ## end from posdefify(sfsmisc)
     structure(list(mat = if(base.matrix) X
-                         else new("dpoMatrix", x = as.vector(X),
-                                  Dim = c(n,n), Dimnames = .M.DN(x)),
+                         else methods::new("dpoMatrix", x = as.vector(X),
+                                           Dim = c(n,n), Dimnames = .M.DN(x)),
                    eigenvalues = d,
                    corr = corr, normF = norm(x-X, "F"), iterations = iter,
 		   rel.tol = conv, converged = converged),
@@ -87,5 +87,4 @@ nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
 
 .M.DN <- function(x) dimnames(x) %||% list(NULL,NULL)
 
-##' return 'x' unless it is NULL where you'd use 'orElse'
 `%||%` <- function(x, orElse) if(!is.null(x)) x else orElse
