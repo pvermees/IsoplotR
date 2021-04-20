@@ -266,28 +266,6 @@ forward <- function(tt,d=diseq(),derivative=0){
     out
 }
 
-# cut off concordia bounds for measured diseq samples
-clip.diseq <- function(x,type=1,d=diseq()){
-    l34 <- lambda('U234')[1]*1000
-    cutoff <- 10
-    out <- x
-    out$t[1] <- max(0,x$t[1])
-    out$t[2] <- min(x$t[2],cutoff/l34)
-    if (type==1){
-        xym <- age_to_wetherill_ratios(out$t[1],d=d)$x
-        xyM <- age_to_wetherill_ratios(out$t[2],d=d)$x
-    } else if (type==2){
-        xym <- age_to_terawasserburg_ratios(out$t[1],d=d)$x
-        xyM <- age_to_terawasserburg_ratios(out$t[2],d=d)$x
-    } else if (type==3){
-        xym <- age_to_cottle_ratios(out$t[1],d=d)$x
-        xyM <- age_to_cottle_ratios(out$t[2],d=d)$x
-    }
-    out$x <- c(xym[1],xyM[1])
-    out$y <- c(xym[2],xyM[2])
-    out
-}
-
 check.equilibrium <- function(d=diseq()){
     U48 <- (d$U48$option==0 | all(d$U48$x==1))
     ThU <- (d$ThU$option==0 | all(d$ThU$x==1))
