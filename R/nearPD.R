@@ -3,7 +3,7 @@
 ## Computes the nearest correlation matrix to an approximate
 ## correlation matrix, i.e. not positive semidefinite.
 nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
-                   base.matrix = FALSE, do2eigen = TRUE,
+                   base.matrix = TRUE, do2eigen = TRUE,
                    doSym = FALSE, doDykstra = TRUE,
                    only.values = FALSE, eig.tol = 1e-6,
                    conv.tol = 1e-7, posd.tol = 1e-8,

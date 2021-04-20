@@ -6,7 +6,7 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
     out <- fit
     out$fact <- tfact(alpha,fit$df)
     out$format <- x$format
-    if (wetherill & !measured.diseq(x$d)){
+    if (wetherill & !measured.disequilibrium(x$d)){
         wfit <- twfit2wfit(fit,x)
         out$par <- wfit$par
         out$cov <- wfit$cov
@@ -189,7 +189,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
     J <- matrix(0,1,2)
     usr <- graphics::par('usr')
     if (wetherill){
-        if (measured.diseq(d)){
+        if (measured.disequilibrium(d)){
             U85 <- iratio('U238U235')[1]
             fit2d <- tw3d2d(fit)
             xy1 <- age_to_wetherill_ratios(fit$par[1])

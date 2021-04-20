@@ -489,7 +489,3 @@ diseq.68.misfit <- function(tt,x,d){
 get.76.misfit <- function(tt,x,d=diseq()){
     (x - subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76'))^2
 }
-
-measured.diseq <- function(d){
-    (d$U48$option==2 | d$ThU$option==2)
-}
