@@ -276,6 +276,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
     fit <- NULL
+    lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     if (show.age>1){
         wetherill <- (type==1)
         x2calc <- subset(x,subset=calcit)
@@ -283,15 +284,11 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
         fit$n <- length(x2calc)
-        concpar <- prepare.concordia.line(x=X2plot,tlim=tlim,
-                                          type=type,tmd=fit$par[1],...)
         discordia.line(fit,wetherill=wetherill,d=x2calc$d)
         md <- measured.disequilibrium(x2calc$d)
         graphics::title(discordia.title(fit,wetherill=!md,sigdig=sigdig))
-    } else {
-        concpar <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     }
-    plot.concordia.line(concpar$dat,lims=concpar$lims,type=type,col=concordia.col,
+    plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
@@ -359,9 +356,8 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
     graphics::box()
 }
 # helper function for plot.concordia
-# tmd = time of measured disequilibrium (discordia age if x$d$U48$option==2)
-prepare.concordia.line <- function(x,tlim,type=1,tmd=0,...){
-    out <- get.concordia.limits(x,tlim=tlim,type=type,tmd=tmd,...)
+prepare.concordia.line <- function(x,tlim,type=1,...){
+    out <- get.concordia.limits(x,tlim=tlim,type=type,...)
     if (type==1){
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
@@ -374,7 +370,7 @@ prepare.concordia.line <- function(x,tlim,type=1,tmd=0,...){
     } else {
         stop('Incorrect input format.')
     }
-    graphics::plot(out$lims$x,out$lims$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
+    graphics::plot(out$x,out$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
     out
 }
 # concordia sequence
@@ -416,128 +412,118 @@ age_to_concordia_ratios <- function(tt,type=1,exterr=FALSE,d=diseq()){
     else
         stop('Invalid concordia type.')
 }
-get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,tmd=0.01,...){
-    lims <- list()
-    X <- x
+get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
+    out <- list()
     if (missing(xlim)) {
         xset <- FALSE
-        lims$x <- c(NA,NA)
+        out$x <- c(NA,NA)
     } else {
         xset <- TRUE
-        lims$x <- xlim
+        out$x <- xlim
         minx <- xlim[1]
         maxx <- xlim[2]        
     }
     if (missing(ylim)) {
         yset <- FALSE
-        lims$y <- c(NA,NA)
+        out$y <- c(NA,NA)
     } else {
         yset <- TRUE
-        lims$y <- ylim
+        out$y <- ylim
         miny <- ylim[1]
         maxy <- ylim[2]
     }
     nse <- 3 # number of standard errors used for buffer
     if (measured.disequilibrium(x$d)){
-        if (is.null(tlim)){
-            if (x$d$ThU$option==2) lims$t <- c(0,0.5)
-            else lims$t <- c(0,5)
+        if (is.null(tlim)){ # TODO
+            if (x$d$ThU$option==2) out$t <- c(0,0.5)
+            else out$t <- c(0,5)
         }
-        D <- mclean(tt=tmd,d=x$d)
-        X$d$U48$x <- D$U48i
-        X$d$ThU$x <- D$ThUi
-        X$d$U48$option <- 1
-        X$d$ThU$option <- 1
         if (type==1){
             if (!xset){
-                Pb207U235 <- get.Pb207U235.ratios(X)
-                minx <- min(Pb207U235[,1]-nse*Pb207U235[,2],na.rm=TRUE)
-                maxx <- max(Pb207U235[,1]+nse*Pb207U235[,2],na.rm=TRUE)
+                Pb207U235 <- get.Pb207U235.ratios(x)
+                minx <- min(Pb207U235[,1]-nse*Pb207U235[,2],
+                            age_to_Pb207U235_ratio(out$t,d=x$d)[,'75'],
+                            na.rm=TRUE)
+                maxx <- max(Pb207U235[,1]+nse*Pb207U235[,2],
+                            age_to_Pb207U235_ratio(out$t,d=x$d)[,'75'],
+                            na.rm=TRUE)
             }
             if (!yset){
-                Pb206U238 <- get.Pb206U238.ratios(X)
-                miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
-                maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
+                Pb206U238 <- get.Pb206U238.ratios(x)
+                miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],
+                            age_to_Pb206U238_ratio(out$t,d=x$d)[,'68'],
+                            na.rm=TRUE)
+                maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],
+                            age_to_Pb206U238_ratio(out$t,d=x$d)[,'68'],
+                            na.rm=TRUE)
             }
-            if (!xset){
-                minx <- min(minx,age_to_Pb207U235_ratio(lims$t,d=X$d)[,'75'])
-                maxx <- max(maxx,age_to_Pb207U235_ratio(lims$t,d=X$d)[,'75'])
-            }
-            if (!yset){
-                miny <- min(miny,age_to_Pb206U238_ratio(lims$t,d=X$d)[,'68'])
-                maxy <- max(maxy,age_to_Pb206U238_ratio(lims$t,d=X$d)[,'68'])
-            }
-            lims$x <- c(minx,maxx)
-            lims$y <- c(miny,maxy)
+            out$x <- c(minx,maxx)
+            out$y <- c(miny,maxy)
         } else if (type==2){
-            U238Pb206 <- get.U238Pb206.ratios(X)
-            Pb207Pb206 <- get.Pb207Pb206.ratios(X)
+            if (is.null(tlim)) out$t[1] <- 0.1
+            U238Pb206 <- get.U238Pb206.ratios(x)
+            Pb207Pb206 <- get.Pb207Pb206.ratios(x)
             if (!xset){
-                minx <- min(U238Pb206[,1]-nse*U238Pb206[,2],na.rm=TRUE)
-                maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
+                minx <- min(U238Pb206[,1]-nse*U238Pb206[,2],
+                            age_to_U238Pb206_ratio(out$t,d=x$d)[,'86'],
+                            na.rm=TRUE)
+                maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],
+                            age_to_U238Pb206_ratio(out$t,d=x$d)[,'86'],
+                            na.rm=TRUE)
             }
             if (!yset){
-                miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
-                maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
+                miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],
+                            age_to_Pb207Pb206_ratio(out$t,d=x$d)[,'76'],
+                            na.rm=TRUE)
+                maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],
+                            age_to_Pb207Pb206_ratio(out$t,d=x$d)[,'76'],
+                            na.rm=TRUE)
             }
-            if (is.null(tlim)){
-                if (x$d$ThU$option==2) lims$t <- c(max(tmd*0.8,0.1),0.5)
-                else lims$t <- c(max(tmd*0.8,0.1),5)
-            }
-            if (is.null(tlim)) lims$t[1] <- 0.8*tmd
-            if (!xset){
-                minx <- min(minx,age_to_U238Pb206_ratio(lims$t,d=X$d)[,'86'])
-                maxx <- max(maxx,age_to_U238Pb206_ratio(lims$t,d=X$d)[,'86'])
-            }
-            if (!yset){
-                miny <- min(miny,age_to_Pb207Pb206_ratio(lims$t,d=X$d)[,'76'])
-                maxy <- max(maxy,age_to_Pb207Pb206_ratio(lims$t,d=X$d)[,'76'])
-            }
-            lims$x <- c(minx,maxx)
-            lims$y <- c(miny,maxy)
+            out$x <- c(minx,maxx)
+            out$y <- c(miny,maxy)
         } else if (type==3){
             if (!xset){
                 Pb206U238 <- get.Pb206U238.ratios(X)
-                minx <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
-                maxx <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
+                minx <- min(Pb206U238[,1]-nse*Pb206U238[,2],
+                            age_to_Pb206U238_ratio(out$t,d=x$d)[,'68'],
+                            na.rm=TRUE)
+                maxx <- max(Pb206U238[,1]+nse*Pb206U238[,2],
+                            age_to_Pb206U238_ratio(out$t,d=x$d)[,'68'],
+                            na.rm=TRUE)
             }
             if (!yset){
                 Pb208Th232 <- get.Pb208Th232.ratios(X)
-                miny <- min(Pb208Th232[,1]-nse*Pb208Th232[,2],na.rm=TRUE)
-                maxy <- max(Pb208Th232[,1]+nse*Pb208Th232[,2],na.rm=TRUE)
+                miny <- min(Pb208Th232[,1]-nse*Pb208Th232[,2],
+                            age_to_Pb208Th232_ratio(out$t)[,'82'],
+                            na.rm=TRUE)
+                maxy <- max(Pb208Th232[,1]+nse*Pb208Th232[,2],
+                            age_to_Pb208Th232_ratio(out$t)[,'82'],
+                            na.rm=TRUE)
             }
-            if (!xset){
-                minx <- min(minx,age_to_Pb206U238_ratio(lims$t,d=X$d)[,'68'])
-                maxx <- max(maxx,age_to_Pb206U238_ratio(lims$t,d=X$d)[,'68'])
-            }
-            if (!yset){
-                miny <- min(miny,age_to_Pb208Th232_ratio(lims$t)[,'82'])
-                maxy <- max(maxy,age_to_Pb208Th232_ratio(lims$t)[,'82'])
-            }
-            lims$x <- c(minx,maxx)
-            lims$y <- c(miny,maxy)
+            out$x <- c(minx,maxx)
+            out$y <- c(miny,maxy)
         }
     } else {
         if (is.null(tlim)) {
-            lims$t <- c(NA,NA)
+            out$t <- c(NA,NA)
         } else {
-            lims$t <- tlim
+            out$t <- tlim
         }
         if (!is.null(tlim) & type==1){
-            if (!xset) lims$x <- age_to_Pb207U235_ratio(tlim,d=x$d)[,'75']
-            if (!yset) lims$y <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
+            if (!xset) out$x <- age_to_Pb207U235_ratio(tlim,d=x$d)[,'75']
+            if (!yset) out$y <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
         } else if (!is.null(tlim) & type==2){
             if (tlim[1] <= 0){
                 U238Pb206 <- get.U238Pb206.ratios(x)
-                if (xset) maxx <- lims$x[2]
+                if (xset) maxx <- out$x[2]
                 else maxx <- max(U238Pb206[,1]+nse*U238Pb206[,2],na.rm=TRUE)
-                lims$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
+                out$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
             }
-            if (!xset) lims$x <- age_to_U238Pb206_ratio(lims$t,d=x$d)[,'86']
-            if (!yset) lims$y <- age_to_Pb207Pb206_ratio(lims$t,d=x$d)[,'76']
+            if (!xset) out$x <- age_to_U238Pb206_ratio(out$t,d=x$d)[,'86']
+            if (!yset) out$y <- age_to_Pb207Pb206_ratio(out$t,d=x$d)[,'76']
         } else if (!is.null(tlim) & type==3){
-            if (!xset) lims$x <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
-            if (!yset) lims$y <- age_to_Pb208Th232_ratio(tlim)[,'82']
+            if (!xset) out$x <- age_to_Pb206U238_ratio(tlim,d=x$d)[,'68']
+            if (!yset) out$y <- age_to_Pb208Th232_ratio(tlim)[,'82']
         } else if (is.null(tlim) & type==1) {
             if (!xset){
                 Pb207U235 <- get.Pb207U235.ratios(x)
@@ -549,18 +535,18 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,tmd=0.01,...){
                 miny <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
                 maxy <- max(Pb206U238[,1]+nse*Pb206U238[,2],na.rm=TRUE)
             }
-            lims$t[1] <- get.Pb206U238.age(miny,d=x$d)[1]
-            lims$t[2] <- get.Pb207U235.age(maxx,d=x$d)[1]
+            out$t[1] <- get.Pb206U238.age(miny,d=x$d)[1]
+            out$t[2] <- get.Pb207U235.age(maxx,d=x$d)[1]
             if (!xset){
-                minx <- min(minx,age_to_Pb207U235_ratio(lims$t[1],d=x$d)[,'75'])
-                maxx <- max(maxx,age_to_Pb207U235_ratio(lims$t[2],d=x$d)[,'75'])
+                minx <- min(minx,age_to_Pb207U235_ratio(out$t[1],d=x$d)[,'75'])
+                maxx <- max(maxx,age_to_Pb207U235_ratio(out$t[2],d=x$d)[,'75'])
             }
             if (!yset){
-                miny <- min(miny,age_to_Pb206U238_ratio(lims$t[1],d=x$d)[,'68'])
-                maxy <- max(maxy,age_to_Pb206U238_ratio(lims$t[2],d=x$d)[,'68'])
+                miny <- min(miny,age_to_Pb206U238_ratio(out$t[1],d=x$d)[,'68'])
+                maxy <- max(maxy,age_to_Pb206U238_ratio(out$t[2],d=x$d)[,'68'])
             }
-            lims$x <- c(minx,maxx)
-            lims$y <- c(miny,maxy)
+            out$x <- c(minx,maxx)
+            out$y <- c(miny,maxy)
         } else if (is.null(tlim) & type==2){
             U238Pb206 <- get.U238Pb206.ratios(x)
             Pb207Pb206 <- get.Pb207Pb206.ratios(x)
@@ -572,12 +558,12 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,tmd=0.01,...){
                 miny <- min(Pb207Pb206[,1]-nse*Pb207Pb206[,2],na.rm=TRUE)
                 maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
             }
-            lims$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
-            lims$t[2] <- get.Pb207Pb206.age(maxy,d=x$d,interval=c(lims$t[1],10000))[1]
-            if (!xset) minx <- min(minx,age_to_U238Pb206_ratio(lims$t[2],d=x$d)[,'86'])
-            if (!yset) miny <- min(miny,age_to_Pb207Pb206_ratio(lims$t[1],d=x$d)[,'76'])
-            lims$x <- c(minx,maxx)
-            lims$y <- c(miny,maxy)
+            out$t[1] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
+            out$t[2] <- get.Pb207Pb206.age(maxy,d=x$d,interval=c(out$t[1],10000))[1]
+            if (!xset) minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=x$d)[,'86'])
+            if (!yset) miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=x$d)[,'76'])
+            out$x <- c(minx,maxx)
+            out$y <- c(miny,maxy)
         } else if (is.null(tlim) & type==3){
             if (!xset){
                 Pb206U238 <- get.Pb206U238.ratios(x)
@@ -589,21 +575,21 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,tmd=0.01,...){
                 miny <- min(Pb208Th232[,1]-nse*Pb208Th232[,2],na.rm=TRUE)
                 maxy <- max(Pb208Th232[,1]+nse*Pb208Th232[,2],na.rm=TRUE)
             }
-            lims$t[1] <- get.Pb206U238.age(minx,d=x$d)[1]
-            lims$t[2] <- get.Pb208Th232.age(maxy)[1]
+            out$t[1] <- get.Pb206U238.age(minx,d=x$d)[1]
+            out$t[2] <- get.Pb208Th232.age(maxy)[1]
             if (!xset){
-                minx <- min(minx,age_to_Pb206U238_ratio(lims$t[1],d=x$d)[,'68'])
-                maxx <- max(maxx,age_to_Pb206U238_ratio(lims$t[2],d=x$d)[,'68'])
+                minx <- min(minx,age_to_Pb206U238_ratio(out$t[1],d=x$d)[,'68'])
+                maxx <- max(maxx,age_to_Pb206U238_ratio(out$t[2],d=x$d)[,'68'])
             }
             if (!yset){
-                miny <- min(miny,age_to_Pb208Th232_ratio(lims$t[1])[,'82'])
-                maxy <- max(maxy,age_to_Pb208Th232_ratio(lims$t[2])[,'82'])
+                miny <- min(miny,age_to_Pb208Th232_ratio(out$t[1])[,'82'])
+                maxy <- max(maxy,age_to_Pb208Th232_ratio(out$t[2])[,'82'])
             }
-            lims$x <- c(minx,maxx)
-            lims$y <- c(miny,maxy)
+            out$x <- c(minx,maxx)
+            out$y <- c(miny,maxy)
         }
     }
-    list(lims=lims,dat=X)
+    out
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
