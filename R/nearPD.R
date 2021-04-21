@@ -3,8 +3,7 @@
 ## Computes the nearest correlation matrix to an approximate
 ## correlation matrix, i.e. not positive semidefinite.
 nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
-                   base.matrix = TRUE, do2eigen = TRUE,
-                   doSym = FALSE, doDykstra = TRUE,
+                   do2eigen = TRUE, doSym = FALSE, doDykstra = TRUE,
                    only.values = FALSE, eig.tol = 1e-6,
                    conv.tol = 1e-7, posd.tol = 1e-8,
                    maxit = 100L, conv.norm.type = "I",
@@ -76,10 +75,7 @@ nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
 	else if(keepDiag)
 	    diag(X) <- diagX0
     } ## end from posdefify(sfsmisc)
-    structure(list(mat = if(base.matrix) X
-                         else methods::new("dpoMatrix", x = as.vector(X),
-                                           Dim = c(n,n), Dimnames = .M.DN(x)),
-                   eigenvalues = d,
+    structure(list(mat = X, eigenvalues = d,
                    corr = corr, normF = norm(x-X, "F"), iterations = iter,
 		   rel.tol = conv, converged = converged),
 	      class = "nearPD")

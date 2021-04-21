@@ -164,7 +164,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[6,6] <- -l31/(l31-l35)
     out$Qinv[7,6] <- l35 /(l31-l35)
     out$Qinv[7,7] <- -1
-    out$Qinv[8,6:8] <-1
+    out$Qinv[8,6:8] <- 1
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
     out$n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
     nuclides <- c('U238','U234','Th230','Ra226',
