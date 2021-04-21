@@ -436,7 +436,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
     if (is.null(tlim)) out$t <- c(0,0)
     else out$t <- tlim
     if (measured.disequilibrium(x$d)){
-        if (is.null(tlim)) out$t[2] <- meas.diseq.maxt(x)
+        if (is.null(tlim)) out$t[2] <- meas.diseq.maxt(x$d)
         if (type==1){
             if (!xset){
                 Pb7U5 <- get.Pb207U235.ratios(x)

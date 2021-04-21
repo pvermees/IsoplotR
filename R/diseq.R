@@ -481,26 +481,33 @@ drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
 }
 
 diseq.75.misfit <- function(tt,x,d){
-    (x - subset(age_to_Pb207U235_ratio(tt,d=d),select='75'))^2
+    pred <- subset(age_to_Pb207U235_ratio(tt,d=d),select='75')
+    get.5678.misfit(obs=x,pred)
 }
 diseq.68.misfit <- function(tt,x,d){
-    (x - subset(age_to_Pb206U238_ratio(tt,d=d),select='68'))^2
+    pred <- subset(age_to_Pb206U238_ratio(tt,d=d),select='68')
+    get.5678.misfit(obs=x,pred)
 }
 get.76.misfit <- function(tt,x,d=diseq()){
-    (x - subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76'))^2
+    pred <- subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76')
+    get.5678.misfit(obs=x,pred)
+}
+get.5678.misfit <- function(obs,pred){
+    smallnum <- 1e-4
+    abs(log(obs+smallnum) - log(pred+smallnum))
 }
 
-meas.diseq.maxt <- function(x){
-    ThU.misfit <- function(tt,x){
-        mclean(tt=tt,d=x$d)$ThUi^2
+meas.diseq.maxt <- function(d){
+    ThU.misfit <- function(tt,d){
+        mclean(tt=tt,d=d)$ThUi^2
     }
-    U48.misfit <- function(tt,x,maxU48){
-        (mclean(tt=tt,d=x$d)$U48i-maxU48)^2
+    U48.misfit <- function(tt,d,maxU48){
+        (mclean(tt=tt,d=d)$U48i-maxU48)^2
     }
-    if (x$d$ThU$option==2){
-        out <- optimise(ThU.misfit,c(0,1),x=x)$minimum
-    } else if (x$d$U48$option==2){
-        out <- optimise(U48.misfit,c(0,10),x=x,maxU48=500)$minimum
+    if (d$ThU$option==2){
+        out <- optimise(ThU.misfit,c(0,1),d=d)$minimum
+    } else if (d$U48$option==2){
+        out <- optimise(U48.misfit,c(0,10),d=d,maxU48=500)$minimum
     } else {
         out <- 4500
     }
