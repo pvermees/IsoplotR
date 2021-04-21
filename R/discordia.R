@@ -192,7 +192,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         if (measured.disequilibrium(d)){
             U85 <- iratio('U238U235')[1]
             fit2d <- tw3d2d(fit)
-            xy1 <- age_to_wetherill_ratios(fit$par[1])
+            xy1 <- age_to_wetherill_ratios(fit$par[1],d=d)
             x1 <- xy1$x[1]
             x2 <- usr[2]
             y1 <- xy1$x[2]

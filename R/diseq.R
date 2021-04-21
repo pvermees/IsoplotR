@@ -489,3 +489,20 @@ diseq.68.misfit <- function(tt,x,d){
 get.76.misfit <- function(tt,x,d=diseq()){
     (x - subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76'))^2
 }
+
+meas.diseq.maxt <- function(x){
+    ThU.misfit <- function(tt,x){
+        mclean(tt=tt,d=x$d)$ThUi^2
+    }
+    U48.misfit <- function(tt,x,maxU48){
+        (mclean(tt=tt,d=x$d)$U48i-maxU48)^2
+    }
+    if (x$d$ThU$option==2){
+        out <- optimise(ThU.misfit,c(0,1),x=x)$minimum
+    } else if (x$d$U48$option==2){
+        out <- optimise(U48.misfit,c(0,10),x=x,maxU48=500)$minimum
+    } else {
+        out <- 4500
+    }
+    out
+}
