@@ -75,10 +75,7 @@ nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
 	else if(keepDiag)
 	    diag(X) <- diagX0
     } ## end from posdefify(sfsmisc)
-    structure(list(mat = X, eigenvalues = d,
-                   corr = corr, normF = norm(x-X, "F"), iterations = iter,
-		   rel.tol = conv, converged = converged),
-	      class = "nearPD")
+    X
 }
 
 .M.DN <- function(x) dimnames(x) %||% list(NULL,NULL)
