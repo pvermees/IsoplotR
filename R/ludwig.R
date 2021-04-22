@@ -657,8 +657,10 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
                 out$hessian['b0','w'] <- out$hessian['w','b0']            # d2db0dw
             }
         }
-        if (det(out$hessian)<0)
-            out$hessian <- nearPD(out$hessian)$mat
+        if (any(eigen(out$hessian)$values<0)){
+            warning('Non positive definite Hessian matrix in Ludwig regression.')
+            out$hessian <- nearPD(out$hessian)
+        }
     }
     out
 }

@@ -285,8 +285,8 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                                              model=(show.age-1),anchor=anchor)
         fit$n <- length(x2calc)
         discordia.line(fit,wetherill=wetherill,d=x2calc$d)
-        md <- measured.disequilibrium(x2calc$d)
-        graphics::title(discordia.title(fit,wetherill=!md,sigdig=sigdig))
+        wethertit <- wetherill & !measured.disequilibrium(x2calc$d)
+        graphics::title(discordia.title(fit,wetherill=wethertit,sigdig=sigdig))
     }
     plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
