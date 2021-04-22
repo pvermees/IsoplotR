@@ -475,14 +475,14 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
         } else if (type==3){
             Pb6U8t <- age_to_Pb206U238_ratio(out$t,d=x$d)[,'68']
             if (!xset){
-                Pb6U8 <- get.Pb206U238.ratios(X)
+                Pb6U8 <- get.Pb206U238.ratios(x)
                 minx <- min(Pb6U8[,1]-nse*Pb6U8[,2],Pb6U8t,na.rm=TRUE)
                 maxx <- max(Pb6U8[,1]+nse*Pb6U8[,2],na.rm=TRUE)
             }
             if (is.null(tlim) & maxx>Pb6U8t[1])
                 out$t[2] <- get.Pb206U238.age(1/maxx,d=x$d)[1]
             if (!yset){
-                Pb8Th2 <- get.Pb208Th232.ratios(X)
+                Pb8Th2 <- get.Pb208Th232.ratios(x)
                 Pb8Th2t <- age_to_Pb208Th232_ratio(out$t)[,'82']
                 miny <- min(Pb8Th2[,1]-nse*Pb8Th2[,2],Pb8Th2t,na.rm=TRUE)
                 maxy <- max(Pb8Th2[,1]+nse*Pb8Th2[,2],Pb8Th2t,na.rm=TRUE)
