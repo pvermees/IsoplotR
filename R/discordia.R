@@ -200,8 +200,8 @@ discordia.line <- function(fit,wetherill,d=diseq()){
             y2 <- y1 + (x2-x1)*dydx
             X <- c(x1,x2)
             Y <- c(y1,y2)
-            cix <- NA
-            ciy <- NA
+            cix <- NA # computing confidence envelopes is very tricky
+            ciy <- NA # for this rarely used function -> don't bother
         } else {
             tl <- fit$par[1]
             tu <- fit$par[2]

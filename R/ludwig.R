@@ -157,10 +157,8 @@ mswd.lud <- function(lta0b0,x,anchor=0){
 
 get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
-    if (anchor[1] %in% c(1,2)){
-        init <- anchored.lta0b0.init(x=x,anchor=anchor)
-    } else if (model==3){
-        init <- get.lta0b0w(x,model=1,w=w)$logpar
+    if (model==3){
+        init <- get.lta0b0w(x,model=1,anchor=anchor,w=w)$logpar
         if (is.na(w)){
             ww <- stats::optimise(LL.lud.w,interval=init[1]+c(-5,5),
                                   lta0b0=init,x=x,maximum=TRUE)$maximum
@@ -168,6 +166,8 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
             ww <- w
         }
         init <- c(init,ww)
+    } else if (anchor[1] %in% c(1,2)){
+        init <- anchored.lta0b0.init(x=x,anchor=anchor)
     } else {
         init <- get.lta0b0.init(x,anchor=anchor)
     }
