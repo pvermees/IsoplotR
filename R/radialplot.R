@@ -41,7 +41,7 @@
 #' \code{LuHf}, \code{ThU}, \code{PbPb}, \code{ThPb} or \code{UPb}
 #' @param from minimum age limit of the radial scale
 #' @param to maximum age limit of the radial scale
-#' @param t0 central value
+#' @param z0 central value
 #' @param transformation one of either \code{log}, \code{linear},
 #'     \code{sqrt} or \code{arcsin} (if \code{x} has class
 #'     \code{fissiontracks} and \code{fissiontracks$type} \eqn{\neq
@@ -116,7 +116,7 @@
 radialplot <- function(x,...){ UseMethod("radialplot",x) }
 #' @rdname radialplot
 #' @export
-radialplot.default <- function(x,from=NA,to=NA,t0=NA,
+radialplot.default <- function(x,from=NA,to=NA,z0=NA,
                                transformation='log',sigdig=2,
                                show.numbers=FALSE,pch=21,levels=NA,
                                clabel="",bg=c("yellow","red"),col='black',
@@ -128,7 +128,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
     x2calc <- clear(x,hide,omit)
     peaks <- peakfit(x2calc,k=k,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
-    radial_helper(x,from=from,to=to,t0=t0,
+    radial_helper(x,from=from,to=to,z0=z0,
                   transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
                   clabel=clabel,bg=bg,col=col,markers=markers,
@@ -144,7 +144,7 @@ radialplot.default <- function(x,from=NA,to=NA,t0=NA,
 #'     the error propagation for the central age and mixture models?
 #' @rdname radialplot
 #' @export
-radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
+radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
                                      transformation='arcsin',sigdig=2,
                                      show.numbers=FALSE,pch=21,
                                      levels=NA,clabel="",
@@ -158,7 +158,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
     x2plot <- clear(x,hide)
     peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
     markers <- c(markers,peaks$peaks['t',])
-    X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
+    X <- x2zs(x2plot,z0=z0,from=from,to=to,transformation=transformation)
     pcol <- set.ellipse.colours(ns=ns,levels=levels[plotit],
                                 col=bg,hide=hide,omit=omit,
                                 omit.col=omit.col)
@@ -214,7 +214,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,t0=NA,
 #' initial Pb-composition
 #' @rdname radialplot
 #' @export
-radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
+radialplot.UPb <- function(x,from=NA,to=NA,z0=NA,
                            transformation='log',type=4,
                            cutoff.76=1100,cutoff.disc=discfilter(),
                            show.numbers=FALSE,pch=21,sigdig=2,
@@ -222,7 +222,7 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
                            col='black',markers=NULL,k=0,exterr=TRUE,
                            common.Pb=0,alpha=0.05,hide=NULL,
                            omit=NULL,omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,type=type,
                cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,levels=levels,
@@ -241,13 +241,13 @@ radialplot.UPb <- function(x,from=NA,to=NA,t0=NA,
 #'     stored in \code{settings('iratio',...)}.
 #' @rdname radialplot
 #' @export
-radialplot.PbPb <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.PbPb <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,clabel="",bg=c("yellow","red"),
                             col='black',markers=NULL,k=0,
                             exterr=TRUE,common.Pb=2,alpha=0.05,
                             hide=NULL,omit=NULL,omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -256,14 +256,14 @@ radialplot.PbPb <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.ArAr <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,clabel="",
                             bg=c("yellow","red"),col='black',
                             markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
                             alpha=0.05,hide=NULL,omit=NULL,
                             omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -272,14 +272,14 @@ radialplot.ArAr <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.KCa <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.KCa <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                            transformation='log',show.numbers=FALSE,
                            pch=21,levels=NA,clabel="",
                            bg=c("yellow","red"),col='black',
                            markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
                            alpha=0.05,hide=NULL,omit=NULL,
                            omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -288,14 +288,14 @@ radialplot.KCa <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.ThPb <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.ThPb <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,clabel="",
                             bg=c("yellow","red"),col='black',
                             markers=NULL,k=0,exterr=TRUE,i2i=TRUE,
                             alpha=0.05,hide=NULL,omit=NULL,
                             omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -304,13 +304,13 @@ radialplot.ThPb <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.UThHe <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                              transformation='log',show.numbers=FALSE,
                              pch=21,levels=NA,clabel="",
                              bg=c("yellow","red"),col='black',
                              markers=NULL,k=0,alpha=0.05,
                              hide=NULL,omit=NULL,omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -319,14 +319,14 @@ radialplot.UThHe <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.ReOs <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.ReOs <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,clabel="",
                             bg=c("yellow","red"),col='black',
                             markers=NULL,k=0,exterr=TRUE,i2i=TRUE,
                             alpha=0.05,hide=NULL,omit=NULL,
                             omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -335,14 +335,14 @@ radialplot.ReOs <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.SmNd <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.SmNd <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,clabel="",
                             bg=c("yellow","red"),col='black',
                             markers=NULL,k=0,exterr=TRUE,i2i=TRUE,
                             alpha=0.05,hide=NULL,omit=NULL,
                             omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -351,14 +351,14 @@ radialplot.SmNd <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.RbSr <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.RbSr <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,clabel="",
                             bg=c("yellow","red"),col='black',
                             markers=NULL,k=0,exterr=TRUE,i2i=TRUE,
                             alpha=0.05,hide=NULL,omit=NULL,
                             omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -367,14 +367,14 @@ radialplot.RbSr <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 }
 #' @rdname radialplot
 #' @export
-radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.LuHf <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                             transformation='log',show.numbers=FALSE,
                             pch=21,levels=NA,clabel="",
                             bg=c("yellow","red"),col='black',
                             markers=NULL,k=0,exterr=TRUE,i2i=TRUE,
                             alpha=0.05,hide=NULL,omit=NULL,
                             omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
@@ -396,20 +396,20 @@ radialplot.LuHf <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #' @rdname radialplot
 #' @export
-radialplot.ThU <- function(x,from=NA,to=NA,t0=NA,sigdig=2,
+radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                            transformation='log',show.numbers=FALSE,
                            pch=21,levels=NA,clabel="",
                            bg=c("yellow","red"),col='black',markers=NULL,
                            k=0,i2i=TRUE,alpha=0.05,detritus=0,
                            hide=NULL,omit=NULL,omit.col=NA,...){
-    age2radial(x,from=from,to=to,t0=t0,sigdig=sigdig,
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
                exterr=FALSE,i2i=i2i,alpha=alpha,units='ka',
                detritus=detritus,hide=hide,omit=omit,omit.col=omit.col,...)
 }
-age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
+age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                        type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                        show.numbers=FALSE,pch=21,levels=NA,sigdig=2,
                        clabel="",bg=c("yellow","red"),col='black',
@@ -425,7 +425,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,omit4c=unique(c(hide,omit)),
                    detritus=detritus,common.Pb=common.Pb)
-    radial_helper(tt,from=from,to=to,t0=t0,
+    radial_helper(tt,from=from,to=to,z0=z0,
                   transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
                   clabel=clabel,bg=bg,col=col,markers=markers,
@@ -444,7 +444,7 @@ age2radial <- function(x,from=NA,to=NA,t0=NA,transformation='log',
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
 
-radial_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
+radial_helper <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                           type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                           show.numbers=FALSE,pch=21,levels=NA,clabel="",
                           bg=c("yellow","red"),col='black',markers=NULL,
@@ -456,7 +456,7 @@ radial_helper <- function(x,from=NA,to=NA,t0=NA,transformation='log',
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
-    X <- x2zs(x2plot,t0=t0,from=from,to=to,transformation=transformation)
+    X <- x2zs(x2plot,z0=z0,from=from,to=to,transformation=transformation)
     pcol <- set.ellipse.colours(ns=ns,levels=levels,col=bg,hide=hide,
                                 omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
@@ -622,7 +622,7 @@ get.radial.tticks <- function(x){
 }
 
 x2zs <- function(x,...){ UseMethod("x2zs",x) }
-x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
+x2zs.default <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
     out <- list()
     if (is.na(transformation)) out$transformation <- 'log'
     else out$transformation <- transformation
@@ -644,7 +644,7 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
         out$s <- x[,2]
         out$xlab <- expression(1/sigma)
     }
-    out$z0 <- get.z0(out,t0,from,to)
+    out$z0 <- get.z0(out,z0,from,to)
     # reset limits if necessary
     if (is.na(from)){
         min.z <- get.min.z(out)
@@ -670,7 +670,7 @@ x2zs.default <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
     }
     out
 }
-x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
+x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
     out <- list()
     if (transformation %in% c('linear','log','arcsin','sqrt')){
         out$transformation <- transformation
@@ -685,14 +685,14 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
             tt <- fissiontrack.age(x,exterr=FALSE)
             out$z <- tt[,'t']
             out$s <- tt[,'s[t]']
-            out$z0 <- get.z0(out,t0,from,to)
+            out$z0 <- get.z0(out,z0,from,to)
             out$xlab <- expression(1/sigma)
         }
         if (identical(transformation,'sqrt')){
             tt <- fissiontrack.age(x,exterr=FALSE)
             out$z <- sqrt(tt[,'t'])
             out$s <- 0.5*tt[,'s[t]']/out$z
-            out$z0 <- get.z0(out,t0,from,to)
+            out$z0 <- get.z0(out,z0,from,to)
             out$xlab <- 'precision'
         }
         if (identical(transformation,'log')){
@@ -703,14 +703,14 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
                 out$offset <- 0
                 out$z <- log(tt[,'t'])
                 out$s <- tt[,'s[t]']/tt[,'t']
-                out$z0 <- get.z0(out,t0,from,to)
+                out$z0 <- get.z0(out,z0,from,to)
                 out$xlab <- expression(t/sigma)
             }
         }
         if (identical(out$transformation,'arcsin')){
             out$z <- atan(sqrt((Ns+3/8)/(Ni+3/8)))
             out$s <- sqrt(1/(Ns+Ni+1/2))/2
-            if (is.na(t0))
+            if (is.na(z0))
                 if (is.na(from) | is.na(to)) {
                     out$z0 <- atan(sqrt(sum(Ns,na.rm=TRUE)/
                                         sum(Ni,na.rm=TRUE)))
@@ -720,7 +720,7 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
                     out$z0 <- mean(c(zmin,zmax),na.rm=TRUE)
                 }
             else {
-                out$z0 <- att(t0,x$zeta[1],x$rhoD[1])
+                out$z0 <- att(z0,x$zeta[1],x$rhoD[1])
             }
             out$xlab <- 'Ns+Ni'
         }
@@ -754,7 +754,7 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
     } else {
         tt <- fissiontrack.age(x,exterr=FALSE)
         if (identical(transformation,'arcsin')) transformation <- 'log'
-        out <- x2zs.default(tt,t0=t0,from=from,to=to,
+        out <- x2zs.default(tt,z0=z0,from=from,to=to,
                             transformation=transformation)
     }
     out
@@ -763,8 +763,8 @@ x2zs.fissiontracks <- function(x,t0=NA,from=NA,to=NA,transformation=NA,...){
 # only for log and lin transformation
 # x is a list containing the items z, s, transformation
 # and (if transformation=='log) offset
-get.z0 <- function(x,t0=NA,from=NA,to=NA){
-    if (is.na(t0)){
+get.z0 <- function(x,z0=NA,from=NA,to=NA){
+    if (is.na(z0)){
         if (is.na(from) | is.na(to)) {
             z0 <- mean(x$z,na.rm=TRUE)
         } else if (identical(x$transformation,'log')) {
@@ -777,11 +777,11 @@ get.z0 <- function(x,t0=NA,from=NA,to=NA){
             stop('illegal input')
         }
     } else if (identical(x$transformation,'log')){
-        z0 <- log(t0+x$offset)
+        z0 <- log(z0+x$offset)
     } else if (identical(x$transformation,'linear')){
-        z0 <- t0
+        z0 <- z0
     } else if (identical(x$transformation,'sqrt')){
-        z0 <- sqrt(t0)
+        z0 <- sqrt(z0)
     } else {
         stop('illegal input')
     }

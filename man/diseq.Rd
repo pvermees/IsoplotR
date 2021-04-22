@@ -126,7 +126,7 @@ d <- diseq(U48=list(x=0,option=1),ThU=list(x=2,option=1),
            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 fn <- system.file("diseq.csv",package="IsoplotR")
 UPb <- read.data(fn,method='U-Pb',format=2,d=d)
-concordia(UPb,type=2,show.age=1)
+concordia(UPb,type=2,xlim=c(0,5000),ylim=c(0.047,0.057))
 }
 \seealso{
 \code{\link{mclean}}, \code{\link{concordia}},

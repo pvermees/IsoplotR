@@ -157,10 +157,8 @@ mswd.lud <- function(lta0b0,x,anchor=0){
 
 get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
-    if (anchor[1] %in% c(1,2)){
-        init <- anchored.lta0b0.init(x=x,anchor=anchor)
-    } else if (model==3){
-        init <- get.lta0b0w(x,model=1,w=w)$logpar
+    if (model==3){
+        init <- get.lta0b0w(x,model=1,anchor=anchor,w=w)$logpar
         if (is.na(w)){
             ww <- stats::optimise(LL.lud.w,interval=init[1]+c(-5,5),
                                   lta0b0=init,x=x,maximum=TRUE)$maximum
@@ -168,6 +166,8 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
             ww <- w
         }
         init <- c(init,ww)
+    } else if (anchor[1] %in% c(1,2)){
+        init <- anchored.lta0b0.init(x=x,anchor=anchor)
     } else {
         init <- get.lta0b0.init(x,anchor=anchor)
     }
@@ -185,9 +185,13 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         out$logcov <- matrix(0,np,np) # initialise
         out$logcov[!fixed,!fixed] <- solve(fit$hessian/2)*mse
     } else {
-        fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                       method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                       lower=lower,upper=upper,control=list(fnscale=-1),...)
+        if (measured.disequilibrium(x$d) & anchor[1]<1){
+            fit <- ludwig2step(x,exterr=exterr,model=model,...)
+        } else {
+            fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                           method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                           lower=lower,upper=upper,control=list(fnscale=-1),...)
+        }
         out$LL <- fit$value
         out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
@@ -653,6 +657,8 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
                 out$hessian['b0','w'] <- out$hessian['w','b0']            # d2db0dw
             }
         }
+        if (det(out$hessian)<0)
+            out$hessian <- nearPD(out$hessian)$mat
     }
     out
 }
@@ -704,4 +710,26 @@ fixit <- function(x,anchor=0,model=1,w=NA){
         else out[2:NP] <- TRUE # fix a0(,b0)
     }
     out
+}
+
+# special case for measured disequilibrium
+ludwig2step <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
+    # 1. fit without disequilibrium
+    X <- x
+    X$d <- diseq()
+    fit1 <- ludwig(X,alpha=alpha,model=model)
+    # 2. fix common Pb intercept
+    init <- fit1$logpar
+    np <- length(init)
+    fixed <- rep(TRUE,np)
+    dinit <- rep(0,np)
+    if (model==3) ifix <- c(1,np)
+    else ifix <- 1
+    fixed[ifix] <- FALSE
+    dinit[ifix] <- 1
+    lower <- (init-dinit)[!fixed]
+    upper <- (init+dinit)[!fixed]
+    fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                   method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                   lower=lower,upper=upper,control=list(fnscale=-1),...)
 }

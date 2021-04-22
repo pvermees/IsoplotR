@@ -114,7 +114,7 @@
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' fn <- system.file("diseq.csv",package="IsoplotR")
 #' UPb <- read.data(fn,method='U-Pb',format=2,d=d)
-#' concordia(UPb4,type=2,xlim=c(0,5000),ylim=c(0.047,0.057))
+#' concordia(UPb,type=2,xlim=c(0,5000),ylim=c(0.047,0.057))
 #' @export
 diseq <- function(U48=list(x=1,sx=0,option=0),
                   ThU=list(x=1,sx=0,option=0),
@@ -164,7 +164,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[6,6] <- -l31/(l31-l35)
     out$Qinv[7,6] <- l35 /(l31-l35)
     out$Qinv[7,7] <- -1
-    out$Qinv[8,6:8] <-1
+    out$Qinv[8,6:8] <- 1
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
     out$n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
     nuclides <- c('U238','U234','Th230','Ra226',
@@ -248,14 +248,8 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    expired <- (tt>10/mexp$L)
-    L <- mexp$L
-    L[expired] <- 0 # don't bother restoring the expired nuclides
-    out <- as.vector(mexp$Q %*% diag(exp(L*tt)) %*% mexp$Qinv %*% nt)
+    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
     names(out) <- names(nt)
-    negative <- (out<0)
-    out[expired] <- 500*out['U238']*mexp$L['U238']/mexp$L[expired]
-    out[negative] <- 0
     out
 }
 forward <- function(tt,d=diseq(),derivative=0){
@@ -272,28 +266,6 @@ forward <- function(tt,d=diseq(),derivative=0){
     out
 }
 
-# cut off concordia bounds for measured diseq samples
-clip.diseq <- function(x,type=1,d=diseq()){
-    l34 <- lambda('U234')[1]*1000
-    cutoff <- 10
-    out <- x
-    out$t[1] <- max(0,x$t[1])
-    out$t[2] <- min(x$t[2],cutoff/l34)
-    if (type==1){
-        xym <- age_to_wetherill_ratios(out$t[1],d=d)$x
-        xyM <- age_to_wetherill_ratios(out$t[2],d=d)$x
-    } else if (type==2){
-        xym <- age_to_terawasserburg_ratios(out$t[1],d=d)$x
-        xyM <- age_to_terawasserburg_ratios(out$t[2],d=d)$x
-    } else if (type==3){
-        xym <- age_to_cottle_ratios(out$t[1],d=d)$x
-        xyM <- age_to_cottle_ratios(out$t[2],d=d)$x
-    }
-    out$x <- c(xym[1],xyM[1])
-    out$y <- c(xym[2],xyM[2])
-    out
-}
-
 check.equilibrium <- function(d=diseq()){
     U48 <- (d$U48$option==0 | all(d$U48$x==1))
     ThU <- (d$ThU$option==0 | all(d$ThU$x==1))
@@ -303,7 +275,7 @@ check.equilibrium <- function(d=diseq()){
 }
 measured.disequilibrium <- function(d=diseq()){
     equilibrium <- check.equilibrium(d)
-    measured <- (d$U48$option>1 | d$ThU$option>1)
+    measured <- (d$U48$option==2 | d$ThU$option==2)
     !equilibrium & measured
 }
 
@@ -509,11 +481,35 @@ drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
 }
 
 diseq.75.misfit <- function(tt,x,d){
-    (x - subset(age_to_Pb207U235_ratio(tt,d=d),select='75'))^2
+    pred <- subset(age_to_Pb207U235_ratio(tt,d=d),select='75')
+    get.5678.misfit(obs=x,pred)
 }
 diseq.68.misfit <- function(tt,x,d){
-    (x - subset(age_to_Pb206U238_ratio(tt,d=d),select='68'))^2
+    pred <- subset(age_to_Pb206U238_ratio(tt,d=d),select='68')
+    get.5678.misfit(obs=x,pred)
 }
 get.76.misfit <- function(tt,x,d=diseq()){
-    (x - subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76'))^2
+    pred <- subset(age_to_Pb207Pb206_ratio(tt=tt,d=d),select='76')
+    get.5678.misfit(obs=x,pred)
+}
+get.5678.misfit <- function(obs,pred){
+    smallnum <- 1e-4
+    abs(log(obs+smallnum) - log(pred+smallnum))
+}
+
+meas.diseq.maxt <- function(d){
+    ThU.misfit <- function(tt,d){
+        mclean(tt=tt,d=d)$ThUi^2
+    }
+    U48.misfit <- function(tt,d,maxU48){
+        (mclean(tt=tt,d=d)$U48i-maxU48)^2
+    }
+    if (d$ThU$option==2){
+        out <- stats::optimise(ThU.misfit,c(0,1),d=d)$minimum
+    } else if (d$U48$option==2){
+        out <- stats::optimise(U48.misfit,c(0,10),d=d,maxU48=500)$minimum
+    } else {
+        out <- 4500
+    }
+    out
 }

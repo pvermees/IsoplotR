@@ -195,8 +195,7 @@ if \code{method='other'}, \code{x} is read as a table, unless
 
 \describe{
 \item{\code{radial} or \code{average}:}{\code{X, err[X]}}
-\item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho} \cr
-      OR \code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
+\item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho}}
 \item{\code{spectrum}:}{\code{f, X, err[X]}} 
 }}
 
