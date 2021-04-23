@@ -155,28 +155,45 @@ mswd.lud <- function(lta0b0,x,anchor=0){
     out
 }
 
+fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
+    if (measured.disequilibrium(x$d) & anchor[1]<1){
+        out <- fit.lta0b0w2step(x,exterr=exterr,model=model,
+                                anchor=anchor,w=w,...)
+    } else {
+        if (model==3){
+            init <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)$par
+            if (is.na(w)){
+                ww <- stats::optimise(LL.lud.w,interval=init[1]+c(-5,5),
+                                      lta0b0=init,x=x,maximum=TRUE)$maximum
+            } else {
+                ww <- w
+            }
+            init <- c(init,ww)
+        } else if (anchor[1] %in% c(1,2)){
+            init <- anchored.lta0b0.init(x=x,anchor=anchor)
+        } else {
+            init <- get.lta0b0.init(x,anchor=anchor)
+        }
+        fixed <- fixit(x,anchor=anchor,model=model,w=w)
+        lower <- (init-1)[!fixed]
+        upper <- (init+2)[!fixed]
+        if (model==2){
+            out <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",x=x,
+                           fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
+        } else {
+            out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                           method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                           lower=lower,upper=upper,control=list(fnscale=-1),...)
+        }
+    }
+    out    
+}
+
 get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
-    if (model==3){
-        init <- get.lta0b0w(x,model=1,anchor=anchor,w=w)$logpar
-        if (is.na(w)){
-            ww <- stats::optimise(LL.lud.w,interval=init[1]+c(-5,5),
-                                  lta0b0=init,x=x,maximum=TRUE)$maximum
-        } else {
-            ww <- w
-        }
-        init <- c(init,ww)
-    } else if (anchor[1] %in% c(1,2)){
-        init <- anchored.lta0b0.init(x=x,anchor=anchor)
-    } else {
-        init <- get.lta0b0.init(x,anchor=anchor)
-    }
+    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
     fixed <- fixit(x,anchor=anchor,model=model,w=w)
-    lower <- (init-1)[!fixed]
-    upper <- (init+2)[!fixed]
     if (model==2){
-        fit <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                       x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
         np <- length(fit$par) # number of parameters
         ns <- length(x)       # number of samples
         ne <- np-1            # number of equations
@@ -185,27 +202,25 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         out$logcov <- matrix(0,np,np) # initialise
         out$logcov[!fixed,!fixed] <- solve(fit$hessian/2)*mse
     } else {
-        if (measured.disequilibrium(x$d) & anchor[1]<1){
-            fit <- ludwig2step(x,exterr=exterr,model=model,...)
-        } else {
-            fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                           method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                           lower=lower,upper=upper,control=list(fnscale=-1),...)
-        }
         out$LL <- fit$value
         out$logpar <- fit$par
         out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
     }
-    if (x$format %in% c(1,2,3)) parnames <- c('log(t)','log(76i)')
-    else if (x$format %in% c(4,5,6)) parnames <- c('log(t)','log(64i)','log(74i)')
-    else if (x$format %in% c(7,8)) parnames <- c('log(t)','log(68i)','log(78i)')
-    else stop("Illegal input format.")
+    if (x$format %in% c(1,2,3))
+        parnames <- c('log(t)','log(76i)')
+    else if (x$format %in% c(4,5,6))
+        parnames <- c('log(t)','log(64i)','log(74i)')
+    else if (x$format %in% c(7,8))
+        parnames <- c('log(t)','log(68i)','log(78i)')
+    else
+        stop("Illegal input format.")
     if (model==3) parnames <- c(parnames,'log(w)')
     names(out$logpar) <- parnames
     rownames(out$logcov) <- parnames
     colnames(out$logcov) <- parnames
     out
 }
+
 
 get.lta0b0.init <- function(x,anchor=0){
     out <- list()
@@ -215,7 +230,8 @@ get.lta0b0.init <- function(x,anchor=0){
     a <- fit$coef[1]
     b <- fit$coef[2]
     covmat <- stats::vcov(fit)
-    tint <- concordia.intersection.ab(a,b,covmat=covmat) # no disequilibrium correction
+    # no disequilibrium correction:
+    tint <- concordia.intersection.ab(a,b,covmat=covmat)
     tt <- tint['t[l]']
     # Then, estimate the common Pb intercept(s)
     minval <- 0.01
@@ -715,23 +731,43 @@ fixit <- function(x,anchor=0,model=1,w=NA){
 }
 
 # special case for measured disequilibrium
-ludwig2step <- function(x,exterr=FALSE,alpha=0.05,model=1,...){
+fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     # 1. fit without disequilibrium
     X <- x
     X$d <- diseq()
-    fit1 <- ludwig(X,alpha=alpha,model=model)
-    # 2. fix common Pb intercept
-    init <- fit1$logpar
-    np <- length(init)
-    fixed <- rep(TRUE,np)
-    dinit <- rep(0,np)
-    if (model==3) ifix <- c(1,np)
-    else ifix <- 1
-    fixed[ifix] <- FALSE
-    dinit[ifix] <- 1
-    lower <- (init-dinit)[!fixed]
-    upper <- (init+dinit)[!fixed]
-    fit <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                   method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                   lower=lower,upper=upper,control=list(fnscale=-1),...)
+    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
+    # 2. check that the measured disequilibrium is physically possible
+    tinit <- exp(fit1$par[1])
+    D <- mclean(tt=tinit,d=x$d)
+    redo <- FALSE
+    if (D$U48i<0){
+        redo <- TRUE
+        X <- x
+        X$d$U48$x <- 0
+        X$d$U48$option <- 1
+    }
+    if (D$ThUi<0){
+        redo <- TRUE
+        X <- x
+        X$d$ThU$x <- 0
+        X$d$ThU$option <- 1
+    }
+    if (redo){
+        fit2 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
+    } else { # 3. fix common Pb intercept
+        init <- fit1$par
+        np <- length(init)
+        fixed <- rep(TRUE,np)
+        dinit <- rep(0,np)
+        if (model==3) ifix <- c(1,np)
+        else ifix <- 1
+        fixed[ifix] <- FALSE
+        dinit[ifix] <- 1
+        lower <- (init-dinit)[!fixed]
+        upper <- (init+dinit)[!fixed]
+        fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                        lower=lower,upper=upper,control=list(fnscale=-1),...)
+    }
+    fit2
 }
