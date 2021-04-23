@@ -129,6 +129,7 @@ exponentiate_ludwig <- function(fit,format){
 }
 
 mswd.lud <- function(lta0b0,x,anchor=0){
+    x$d <- replace.impossible.diseq(tt=exp(lta0b0[1]),d=x$d)
     ns <- length(x)
     out <- list()
     anchored <- (anchor[1]>0)
