@@ -757,7 +757,7 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     upper <- (init+dinit)[!fixed]
     if (model==2){
         fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                        x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
+                        x=X,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
     } else {
         fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                         method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
