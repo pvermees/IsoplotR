@@ -272,6 +272,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
+    x2calc <- subset(x,subset=calcit)
     if (common.Pb<1) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
@@ -279,7 +280,6 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     if (show.age>1){
         wetherill <- (type==1)
-        x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
