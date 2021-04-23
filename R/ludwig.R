@@ -185,26 +185,28 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
                            method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
                            lower=lower,upper=upper,control=list(fnscale=-1),...)
         }
+        out$fixed <- fixed
+        out$x <- x
+        out$model <- model
+        out$exterr <- exterr
     }
     out    
 }
 
 get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    out <- list(model=model,exterr=exterr)
-    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
-    fixed <- fixit(x,anchor=anchor,model=model,w=w)
+    out <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
     if (model==2){
-        np <- length(fit$par) # number of parameters
-        ns <- length(x)       # number of samples
+        np <- length(out$par) # number of parameters
+        ns <- length(out$x)   # number of samples
         ne <- np-1            # number of equations
-        mse <- fit$value/(ne*ns-np)   # mean square error
-        out$logpar <- fit$par
+        mse <- out$value/(ne*ns-np)   # mean square error
+        out$logpar <- out$par
         out$logcov <- matrix(0,np,np) # initialise
-        out$logcov[!fixed,!fixed] <- solve(fit$hessian/2)*mse
+        out$logcov[!out$fixed,!out$fixed] <- solve(out$hessian/2)*mse
     } else {
-        out$LL <- fit$value
-        out$logpar <- fit$par
-        out$logcov <- fisher.lud(x,fit=fit,exterr=exterr,fixed=fixed)
+        out$LL <- out$value
+        out$logpar <- out$par
+        out$logcov <- fisher.lud(out)
     }
     if (x$format %in% c(1,2,3))
         parnames <- c('log(t)','log(76i)')
@@ -361,15 +363,16 @@ LL.lud.w <- function(w,lta0b0,x){
     LL.lud(lta0b0w=lta0b0w,x=x,LL=TRUE)
 }
 
-fisher.lud <- function(x,fit,exterr=TRUE,fixed=rep(FALSE,length(fit$par))){
-    fish <- data2ludwig(x,lta0b0w=fit$par,exterr=exterr,hessian=TRUE)$hessian
-    ns <- length(x)
+fisher.lud <- function(fit){
+    fish <- data2ludwig(fit$x,lta0b0w=fit$par,
+                        exterr=fit$exterr,hessian=TRUE)$hessian
+    ns <- length(fit$x)
     np <- length(fit$par)
     i1 <- 1:ns
     i2 <- ns+(1:np)
     out <- matrix(0,ns+np,ns+np)
     anchorfish(AA=fish[i1,i1],BB=fish[i1,i2],
-               CC=fish[i2,i1],DD=fish[i2,i2],fixed=fixed)
+               CC=fish[i2,i1],DD=fish[i2,i2],fixed=fit$fixed)
 }
 anchorfish <- function(AA,BB,CC,DD,fixed=rep(FALSE,nrow(DD))){
     ns <- nrow(AA)
@@ -753,7 +756,7 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         X$d$ThU$option <- 1
     }
     if (redo){
-        fit2 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
+        out <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
     } else { # 3. fix common Pb intercept
         init <- fit1$par
         np <- length(init)
@@ -765,9 +768,13 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         dinit[ifix] <- 1
         lower <- (init-dinit)[!fixed]
         upper <- (init+dinit)[!fixed]
-        fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                        method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                        lower=lower,upper=upper,control=list(fnscale=-1),...)
+        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                       method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                       lower=lower,upper=upper,control=list(fnscale=-1),...)
+        out$fixed <- fixed
+        out$x <- X
+        out$exterr <- exterr
+        out$model <- model
     }
-    fit2
+    out
 }
