@@ -194,19 +194,20 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
 }
 
 get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    out <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
+    out <- list(model=model,exterr=exterr)
+    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
     if (model==2){
-        np <- length(out$par) # number of parameters
-        ns <- length(out$x)   # number of samples
+        np <- length(fit$par) # number of parameters
+        ns <- length(fit$x)   # number of samples
         ne <- np-1            # number of equations
-        mse <- out$value/(ne*ns-np)   # mean square error
-        out$logpar <- out$par
+        mse <- fit$value/(ne*ns-np)   # mean square error
+        out$logpar <- fit$par
         out$logcov <- matrix(0,np,np) # initialise
-        out$logcov[!out$fixed,!out$fixed] <- solve(out$hessian/2)*mse
+        out$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian/2)*mse
     } else {
-        out$LL <- out$value
-        out$logpar <- out$par
-        out$logcov <- fisher.lud(out)
+        out$LL <- fit$value
+        out$logpar <- fit$par
+        out$logcov <- fisher.lud(fit)
     }
     if (x$format %in% c(1,2,3))
         parnames <- c('log(t)','log(76i)')
