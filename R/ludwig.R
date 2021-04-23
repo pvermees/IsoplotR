@@ -129,7 +129,8 @@ exponentiate_ludwig <- function(fit,format){
 }
 
 mswd.lud <- function(lta0b0,x,anchor=0){
-    x$d <- replace.impossible.diseq(tt=exp(lta0b0[1]),d=x$d)
+    if (measured.disequilibrium(x$d))
+        x$d <- replace.impossible.diseq(tt=exp(lta0b0[1]),d=x$d)
     ns <- length(x)
     out <- list()
     anchored <- (anchor[1]>0)
@@ -754,9 +755,14 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     dinit[ifix] <- 1
     lower <- (init-dinit)[!fixed]
     upper <- (init+dinit)[!fixed]
-    fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                    method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
-                    lower=lower,upper=upper,control=list(fnscale=-1),...)
+    if (model==2){
+        fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
+                        x=x,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
+    } else {
+        fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                        method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
+                        lower=lower,upper=upper,control=list(fnscale=-1),...)
+    }
     fit2$fixed <- fixed
     fit2$x <- X
     fit2$exterr <- exterr

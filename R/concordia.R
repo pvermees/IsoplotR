@@ -283,7 +283,8 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
-        x2calc$d <- replace.impossible.diseq(tt=fit$par[1],d=x2calc$d)
+        if (measured.disequilibrium(x2calc$d))
+            x2calc$d <- replace.impossible.diseq(tt=fit$par[1],d=x2calc$d)
         fit$n <- length(x2calc)
         discordia.line(fit,wetherill=wetherill,d=x2calc$d)
         wethertit <- wetherill & !measured.disequilibrium(x2calc$d)
