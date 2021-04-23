@@ -272,6 +272,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
+    x2calc <- subset(x,subset=calcit)
     if (common.Pb<1) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
@@ -279,20 +280,21 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     if (show.age>1){
         wetherill <- (type==1)
-        x2calc <- subset(x,subset=calcit)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,alpha=alpha,
                                              model=(show.age-1),anchor=anchor)
+        wethertit <- wetherill & !measured.disequilibrium(x2calc$d)
+        if (measured.disequilibrium(x2calc$d))
+            x2calc$d <- replace.impossible.diseq(tt=fit$par[1],d=x2calc$d)
         fit$n <- length(x2calc)
         discordia.line(fit,wetherill=wetherill,d=x2calc$d)
-        wethertit <- wetherill & !measured.disequilibrium(x2calc$d)
         graphics::title(discordia.title(fit,wetherill=wethertit,sigdig=sigdig))
     }
-    plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
+    plot.concordia.line(x2calc,lims=lims,type=type,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
-    if (type==1) y <- data2york(X,option=1)
-    else if (type==2) y <- data2york(X,option=2)
-    else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
+    if (type==1) y <- data2york(X2plot,option=1)
+    else if (type==2) y <- data2york(X2plot,option=2)
+    else if (x$format%in%c(7,8) & type==3) y <- data2york(X2plot,option=5)
     else stop('Concordia type incompatible with this input format.')
     scatterplot(y,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,

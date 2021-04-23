@@ -507,7 +507,8 @@ meas.diseq.maxt <- function(d){
     if (d$ThU$option==2){
         out <- stats::optimise(ThU.misfit,c(0,1),d=d)$minimum
     } else if (d$U48$option==2){
-        out <- stats::optimise(U48.misfit,c(0,10),d=d,maxU48=500)$minimum
+        if (d$U48$x<1) M <- 0 else M <- 500
+        out <- stats::optimise(U48.misfit,c(0,10),d=d,maxU48=M)$minimum
     } else {
         out <- 4500
     }
