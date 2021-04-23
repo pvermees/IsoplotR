@@ -741,41 +741,38 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     X$d <- diseq()
     fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
     # 2. check that the measured disequilibrium is physically possible
-    tinit <- exp(fit1$par[1])
-    D <- mclean(tt=tinit,d=x$d)
-    redo <- FALSE
+    X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
+    # 3. fix common Pb intercept
+    init <- fit1$par
+    np <- length(init)
+    fixed <- rep(TRUE,np)
+    dinit <- rep(0,np)
+    if (model==3) ifix <- c(1,np)
+    else ifix <- 1
+    fixed[ifix] <- FALSE
+    dinit[ifix] <- 1
+    lower <- (init-dinit)[!fixed]
+    upper <- (init+dinit)[!fixed]
+    fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                    method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
+                    lower=lower,upper=upper,control=list(fnscale=-1),...)
+    fit2$fixed <- fixed
+    fit2$x <- X
+    fit2$exterr <- exterr
+    fit2$model <- model
+    fit2
+}
+
+replace.impossible.diseq <- function(tt,d){
+    out <- d
+    D <- mclean(tt=tt,d=d)
     if (D$U48i<0){
-        redo <- TRUE
-        X <- x
-        X$d$U48$x <- 0
-        X$d$U48$option <- 1
+        out$U48$x <- 0
+        out$U48$option <- 1
     }
     if (D$ThUi<0){
-        redo <- TRUE
-        X <- x
-        X$d$ThU$x <- 0
-        X$d$ThU$option <- 1
-    }
-    if (redo){
-        out <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
-    } else { # 3. fix common Pb intercept
-        init <- fit1$par
-        np <- length(init)
-        fixed <- rep(TRUE,np)
-        dinit <- rep(0,np)
-        if (model==3) ifix <- c(1,np)
-        else ifix <- 1
-        fixed[ifix] <- FALSE
-        dinit[ifix] <- 1
-        lower <- (init-dinit)[!fixed]
-        upper <- (init+dinit)[!fixed]
-        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                       method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                       lower=lower,upper=upper,control=list(fnscale=-1),...)
-        out$fixed <- fixed
-        out$x <- X
-        out$exterr <- exterr
-        out$model <- model
+        out$ThU$x <- 0
+        out$ThU$option <- 1
     }
     out
 }
