@@ -158,6 +158,7 @@ mswd.lud <- function(lta0b0,x,anchor=0){
 }
 
 fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
+    fixed <- fixit(x,anchor=anchor,model=model,w=w)
     if (measured.disequilibrium(x$d) & anchor[1]<1){
         out <- fit.lta0b0w2step(x,exterr=exterr,model=model,
                                 anchor=anchor,w=w,...)
@@ -176,7 +177,6 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         } else {
             init <- get.lta0b0.init(x,anchor=anchor)
         }
-        fixed <- fixit(x,anchor=anchor,model=model,w=w)
         lower <- (init-1)[!fixed]
         upper <- (init+2)[!fixed]
         if (model==2){
@@ -187,11 +187,11 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
                            method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
                            lower=lower,upper=upper,control=list(fnscale=-1),...)
         }
-        out$fixed <- fixed
         out$x <- x
         out$model <- model
         out$exterr <- exterr
     }
+    out$fixed <- fixed
     out    
 }
 
@@ -199,13 +199,16 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
     fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
     if (model==2){
-        np <- length(fit$par) # number of parameters
-        ns <- length(fit$x)   # number of samples
-        ne <- np-1            # number of equations
-        mse <- fit$value/(ne*ns-np)   # mean square error
+        H <- stats::optimHess(par=fit$par,fn=SS.model2,x=x)
+        mse <- SS.model2(lta0b0=fit$par,x=x,err=TRUE)
+        np <- length(fit$par) # number of paramters
+        nf <- sum(fit$fixed)  # number of free parameters
+        ns <- length(x)       # number of samples
+        nv <- np-1            # number of independent variables
+        mse <- fit$value/(nv*ns-nf)   # mean square error
         out$logpar <- fit$par
         out$logcov <- matrix(0,np,np) # initialise
-        out$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian/2)*mse
+        out$logcov[!fit$fixed,!fit$fixed] <- solve(H)*mse
     } else {
         out$LL <- fit$value
         out$logpar <- fit$par
@@ -321,16 +324,17 @@ anchored.lta0b0.init <- function(x,anchor=1){
     init
 }
 
-SS.model2 <- function(lta0b0,x){
+SS.model2 <- function(lta0b0,x,err=FALSE){
     tt <- exp(lta0b0[1])
     a0 <- exp(lta0b0[2])
-    out <- list()
     if (x$format<4){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
         yp <- a0+(yr-a0)*xy[,'X']/xr
-        out <- sum((yp-xy[,'Y'])^2)
+        dy <- yp-xy[,'Y']
+        if (err) out <- var(dy)
+        else out <- sum(dy^2)/2
     } else {
         b0 <- exp(lta0b0[3])
         ns <- length(x)
@@ -343,10 +347,11 @@ SS.model2 <- function(lta0b0,x){
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
         y6p <- (r86-x6)/(a0*r86)
-        SS6 <- sum((y6p-y6)^2)
         y7p <- (r57-x7)/(b0*r57)
-        SS7 <- sum((y7p-y7)^2)
-        out <- SS6 + SS7
+        dy6 <- y6p-y6
+        dy7 <- y7p-y7
+        if (err) out <- var(dy6) + var(dy7)
+        else out <- sum(dy6^2 + dy7^2)/2
     }
     out
 }
@@ -757,13 +762,12 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     upper <- (init+dinit)[!fixed]
     if (model==2){
         fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                        x=X,fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
+                        x=X,fixed=fixed,lower=lower,upper=upper,...)
     } else {
         fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                         method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
                         lower=lower,upper=upper,control=list(fnscale=-1),...)
     }
-    fit2$fixed <- fixed
     fit2$x <- X
     fit2$exterr <- exterr
     fit2$model <- model
