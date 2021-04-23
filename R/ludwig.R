@@ -162,6 +162,7 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     if (measured.disequilibrium(x$d) & anchor[1]<1){
         out <- fit.lta0b0w2step(x,exterr=exterr,model=model,
                                 anchor=anchor,w=w,...)
+        out$hessian <- stats::optimHess(par=out$par,fn=SS.model2,x=x)
     } else {
         if (model==3){
             init <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)$par
@@ -199,8 +200,6 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
     fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
     if (model==2){
-        H <- stats::optimHess(par=fit$par,fn=SS.model2,x=x)
-        mse <- SS.model2(lta0b0=fit$par,x=x,err=TRUE)
         np <- length(fit$par) # number of paramters
         nf <- sum(fit$fixed)  # number of free parameters
         ns <- length(x)       # number of samples
@@ -208,7 +207,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         mse <- fit$value/(nv*ns-nf)   # mean square error
         out$logpar <- fit$par
         out$logcov <- matrix(0,np,np) # initialise
-        out$logcov[!fit$fixed,!fit$fixed] <- solve(H)*mse
+        out$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)*mse
     } else {
         out$LL <- fit$value
         out$logpar <- fit$par
@@ -324,7 +323,7 @@ anchored.lta0b0.init <- function(x,anchor=1){
     init
 }
 
-SS.model2 <- function(lta0b0,x,err=FALSE){
+SS.model2 <- function(lta0b0,x){
     tt <- exp(lta0b0[1])
     a0 <- exp(lta0b0[2])
     if (x$format<4){
@@ -333,8 +332,7 @@ SS.model2 <- function(lta0b0,x,err=FALSE){
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
         yp <- a0+(yr-a0)*xy[,'X']/xr
         dy <- yp-xy[,'Y']
-        if (err) out <- var(dy)
-        else out <- sum(dy^2)/2
+        out <- sum(dy^2)/2
     } else {
         b0 <- exp(lta0b0[3])
         ns <- length(x)
@@ -350,8 +348,7 @@ SS.model2 <- function(lta0b0,x,err=FALSE){
         y7p <- (r57-x7)/(b0*r57)
         dy6 <- y6p-y6
         dy7 <- y7p-y7
-        if (err) out <- var(dy6) + var(dy7)
-        else out <- sum(dy6^2 + dy7^2)/2
+        out <- sum(dy6^2 + dy7^2)/2
     }
     out
 }
