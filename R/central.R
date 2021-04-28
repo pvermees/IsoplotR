@@ -179,15 +179,11 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     out
 }
 
-#' @param mineral setting this parameter to either \code{apatite} or
-#'     \code{zircon} changes the default efficiency factor, initial
-#'     fission track length and density to preset values (only affects
-#'     results if \code{x$format=2})
 #' @param exterr include the zeta or decay constant uncertainty into
 #'     the error propagation for the central age?
 #' @rdname central
 #' @export
-central.fissiontracks <- function(x,mineral=NA,alpha=0.05,exterr=FALSE,...){
+central.fissiontracks <- function(x,alpha=0.05,exterr=FALSE,...){
     out <- list()
     if (x$format<2){
         L8 <- lambda('U238')[1]
@@ -222,7 +218,7 @@ central.fissiontracks <- function(x,mineral=NA,alpha=0.05,exterr=FALSE,...){
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$disp) <- c('s','ll','ul')
     } else if (x$format>1){
-        tst <- age(x,exterr=FALSE,mineral=mineral)
+        tst <- age(x,exterr=FALSE)
         out <- central.default(tst,alpha=alpha)
     }
     if (exterr & x$format<3){

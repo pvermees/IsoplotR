@@ -762,20 +762,16 @@ as.fissiontracks <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "fissiontracks"
     out$format <- format
+    si <- 6 # start index
     if (format==1){
         out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
         out$rhoD <- errAdjust(as.numeric(x[4,1:2]),ierr=ierr)
-        X <- shiny2matrix(x,6,nr,nc)
+        X <- shiny2matrix(x,si,nr,nc)
         out$x <- insert.data(x=X,cnames=c('Ns','Ni'))
     } else {
-        if (format==2){
-            out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
-            out$spotSize <- as.numeric(x[4,1])
-            si <- 6 # start index
-        } else {
-            out$spotSize <- as.numeric(x[2,1])
-            si <- 4
-        }
+        if (format==2) out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
+        else out$mineral <- x[2,1]
+        out$spotSize <- as.numeric(x[4,1])
         ns <- nr-si+1
         Ns <- as.numeric(x[si:nr,1])
         A <- as.numeric(x[si:nr,2])
