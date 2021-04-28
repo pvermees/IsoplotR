@@ -215,7 +215,7 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     ULabel <- paste0(fact[3],' x U')
     ThLabel <- paste0(fact[2],' x Th')
     labels <- c(HeLabel,ULabel,ThLabel)
-    graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1))
+    graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1),xpd=NA)
 }
 
 plot_logratio_ellipses <- function(x,fill,stroke,alpha=0.05,

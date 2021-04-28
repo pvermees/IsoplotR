@@ -240,7 +240,7 @@
 #' respectively; i.e. a list inheriting the input arguments \code{x}
 #' and \code{format}.
 #'
-#' \item If \code{method="UThHe"}: an object of class \code{UThHe},
+#' \item If \code{method="U-Th-He"}: an object of class \code{UThHe},
 #' i.e. a matrix with the contents of \code{x}.
 #'
 #' \item If \code{method="fissiontracks"}: an object of class
