@@ -47,8 +47,11 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,omit4c
     d <- data2york(x,type=2,generic=FALSE)
     if (i2i){
         fit <- isochron.ThU(x,type=2,plot=FALSE,exterr=FALSE,omit=omit4c)
-        d[,'Th230U238'] <- d[,'Th230U238'] - fit$b[1]*d[,'Th232U238']
+        Th02 <- fit$b[1]
+    } else {
+        Th02 <- x$Th02[1]
     }
+    d[,'Th230U238'] <- d[,'Th230U238'] - Th02*d[,'Th232U238']
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
