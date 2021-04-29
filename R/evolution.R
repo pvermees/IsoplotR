@@ -438,12 +438,7 @@ data2evolution <- function(x,detritus=0,omit4c=NULL){
         td <- data2tit(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
         out <- Th230correction(td,option=detritus,dat=x,omit4c=omit4c)
     } else if (x$format %in% c(3,4)){
-        out <- data2york(x,type=1) # 8/2 - 0/2
-        covariance <- out[,'sX']*out[,'sY']*out[,'rXY']
-        out[,5] <- covariance
-        colnames(out) <- c('U238Th232','errU238Th232',
-                           'Th230Th232','errTh230Th232',
-                           'cov')
+        out <- data2york(x,type=1,generic=FALSE) # 8/2 - 0/2
     }
     out
 }
