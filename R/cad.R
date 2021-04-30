@@ -44,7 +44,7 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #'     palettes (e.g., \code{'heat.colors'}, \code{'terrain.colors'},
 #'     \code{'topo.colors'}, \code{'cm.colors'}) (if \code{x} has
 #'     class \code{detritals}) OR the name or code for a colour to
-#'     give to single sample datasets (otherwise).
+#'     give to single sample datasets.
 #' @param ... optional arguments to the generic \code{plot} function
 #' 
 #' @examples
@@ -68,7 +68,8 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     ns <- length(x2plot)
-    colour <- do.call(col,list(ns))
+    if ('function'%in%class(col)) colour <- do.call(col,list(ns))
+    else colour <- rep('black',ns)
     graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
                    ylab='cumulative probability',...)
     for (i in 1:ns){
