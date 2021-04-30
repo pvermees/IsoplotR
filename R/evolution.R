@@ -284,12 +284,12 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
     else
         graphics::text(X[2],X[2],'\U221E',pos=2,col=line.col)
     for (tick in ticks){ # plot isolines
-        Y <- get.Th230Th232(tick,Th230Th232_0x,X)
+        Y <- get.Th230Th232.ratio(tick,Th230Th232_0x,X)
         graphics::lines(X,Y,col=line.col,...)
         if (Y[2]<minY){
             # do nothing
         } else if (Y[2]>maxY){ # label below upper margin
-            xtext <- get.U238Th232(tick,Th230Th232_0x,maxY)
+            xtext <- get.U238Th232.ratio(tick,Th230Th232_0x,maxY)
             ytext <- maxY
             graphics::text(xtext,ytext,tick,pos=1,col=line.col)
         } else { # label to the left of the right margin
@@ -401,8 +401,8 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
         a0max <- 1.5
     }
     if (is.null(xlim)){
-        xlim <- range(pretty(c(min(get.Th230U238(tt,a0min)),
-                               max(get.Th230U238(tt,a0max)))))
+        xlim <- range(pretty(c(min(get.Th230U238.ratio(tt,a0min)),
+                               max(get.Th230U238.ratio(tt,a0max)))))
     }
     a0 <- pretty(c(a0min,a0max))
     if (is.null(ylim)){
@@ -417,14 +417,14 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
     na0 <- length(a0)
     for (i in 1:na0){
         ttt <- seq(0,maxt,length.out=nn)
-        x <- get.Th230U238(ttt,a0[i])
-        y <- get.U234U238(ttt,a0[i])
+        x <- get.Th230U238.ratio(ttt,a0[i])
+        y <- get.U234U238.ratio(ttt,a0[i])
         graphics::lines(x,y,col=line.col)
     }
     for (i in 2:nn){
-        x <- get.Th230U238(tt[i],a0)
-        y <- get.U234U238(tt[i],a0)
-        x0 <- get.Th230U238(tt[i],1)
+        x <- get.Th230U238.ratio(tt[i],a0)
+        y <- get.U234U238.ratio(tt[i],a0)
+        x0 <- get.Th230U238.ratio(tt[i],1)
         graphics::lines(c(x0,x),c(1,y),col=line.col)
         graphics::text(x[na0],y[na0],tt[i],pos=4,col=line.col)
     }

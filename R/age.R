@@ -464,3 +464,96 @@ get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
     }
     out
 }
+
+#' @title Predict isotopic ratios from ages
+#' @description Groups a set of functions that take one (or more) ages
+#'     (and their uncertainties) as input and produces the U--Pb,
+#'     Pb--Pb, Ar--Ar, K--Ca, Rb--Sr, Sm--Nd, Lu--Hf, Re--Os or
+#'     Stacey-Kramers ratios as output.
+#' @param tt a scalar or (except when \code{ratio} =
+#'     \code{'Wetherill'}, \code{'Tera-Wasserburg'} or
+#'     \code{'U-Th-Pb'}) vector of ages.
+#' @param st a scalar or (except when \code{ratio} =
+#'     \code{'Wetherill'}, \code{'Tera-Wasserburg'} or
+#'     \code{'U-Th-Pb'}) vector with the standard error(s) of
+#'     \code{tt}. Not used when \code{ratio} =
+#'     \code{'Stacey-Kramers'}.
+#' @param ratio one of \code{'Pb207U235'}, \code{'U238Pb206'},
+#'     \code{'Pb207Pb206'}, \code{'Pb208Th232'}, \code{'Wetherill'},
+#'     \code{'Tera-Wasserburg'}, \code{'U-Th-Pb'}, \code{'Ar40Ar39'},
+#'     \code{'Ca40K40'}, \code{'Hf176Lu176'}, \code{'Sr87Rb87'},
+#'     \code{'Os187Re187'}, \code{'Nd143Sm147'} or
+#'     \code{'Stacey-Kramers'}.
+#' @param exterr logical. If \code{TRUE}, propagates decay constant
+#'     uncertainties into \code{st}. Not used when \code{ratio} =
+#'     \code{'Stacey-Kramers'}.
+#' @param d an object of class \link{diseq}.
+#' @param J the J-factor of the Ar--Ar system (only used if
+#'     \code{ratio} is \code{'Ar40Ar39'}).
+#' @param sJ the standard error of \code{J} (only used if \code{ratio}
+#'     is \code{'Ar40Ar39'}).
+#' @return If \code{ratio} is \code{'Pb207U235'}, \code{'U238Pb206'},
+#'     \code{'Pb207Pb206'}, \code{'Pb208Th232'}, \code{'Ar40Ar39'},
+#'     \code{'Ca40K40'}, \code{'Hf176Lu176'}, \code{'Sr87Rb87'},
+#'     \code{'Os187Re187'} or \code{'Nd143Sm147'}: either a
+#'     two-element vector or a two-column matrix with the predicted
+#'     isotopic ratio(s) and its/their standard error(s).
+#'
+#' If \code{ratio} is \code{'Wetherill'}, \code{'Tera-Wasserburg'} or
+#'     \code{'U-Th-Pb'}: a two-element list containing
+#'
+#' \code{x}: the concordia ratios
+#'
+#' \code{cov}: the covariance matrix of the concordia ratios
+#'
+#' If \code{ratio} is \code{'Stacey-Kramers'}: a three-column matrix
+#' with predicted \eqn{^{206}}Pb/\eqn{^{204}}Pb,
+#' \eqn{^{207}}Pb/\eqn{^{204}}Pb and \eqn{^{208}}Pb/\eqn{^{204}}Pb
+#' ratios.
+#' 
+#' @examples
+#' ratios <- c('Pb207U235','U238Pb206','Pb207Pb206','Pb208Th232',
+#'             'Wetherill','Tera-Wasserburg','U-Th-Pb','Ar40Ar39',
+#'             'Ca40K40','Hf176Lu176','Sr87Rb87','Os187Re187',
+#'             'Nd143Sm147','Stacey-Kramers')
+#' for (ratio in ratios){
+#'      r <- age2ratio(tt=1000,st=10,ratio=ratio,J=1,sJ=0.1)
+#'      print(r)
+#' }
+#' @export
+age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,d=diseq(),J,sJ){
+    if (ratio=='Pb206U238'){
+        out <- age_to_Pb206U238_ratio(tt,st,d=d,exterr=exterr)
+    } else if (ratio=='Pb207U235'){
+        out <- age_to_Pb207U235_ratio(tt,st,d=d,exterr=exterr)
+    } else if (ratio=='U238Pb206'){
+        out <- age_to_U238Pb206_ratio(tt,st,d=d,exterr=exterr)
+    } else if (ratio=='Pb207Pb206'){
+        out <- age_to_Pb207Pb206_ratio(tt,st,d=d,exterr=exterr)
+    } else if (ratio=='Pb208Th232'){
+        out <- age_to_Pb208Th232_ratio(tt,st,exterr=exterr)
+    } else if (ratio=='Wetherill'){
+        out <- age_to_wetherill_ratios(tt,st,d=d,exterr=exterr)
+    } else if (ratio=='Tera-Wasserburg'){
+        out <- age_to_terawasserburg_ratios(tt,st,d=d,exterr=exterr)
+    } else if (ratio=='U-Th-Pb'){
+        out <- age_to_cottle_ratios(tt,st,d=d,exterr=exterr)
+    } else if (ratio=='Ar40Ar39'){
+        out <- get.ArAr.ratio(tt,st,J=J,sJ=sJ,exterr=exterr)
+    } else if (ratio=='Ca40K40'){
+        out <- get.KCa.ratio(tt,st,exterr=exterr)
+    } else if (ratio=='Hf176Lu176'){
+        out <- get.LuHf.ratio(tt,st,exterr=exterr)
+    } else if (ratio=='Sr87Rb87'){
+        out <- get.RbSr.ratio(tt,st,exterr=exterr)
+    } else if (ratio=='Os187Re187'){
+        out <- get.ReOs.ratio(tt,st,exterr=exterr)
+    } else if (ratio=='Nd143Sm147'){
+        out <- get.SmNd.ratio(tt,st,exterr=exterr)
+    } else if (ratio=='Stacey-Kramers'){
+        out <- stacey.kramers(tt)
+    } else {
+        stop('Invalid ratio argument to age2ratio().')
+    }
+    out
+}

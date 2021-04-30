@@ -213,9 +213,9 @@ if \code{method='other'}, \code{x} is read as a table, unless
 \item{d}{an object of class \code{\link{diseq}}.}
 
 \item{Th02}{2-element vector with the assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{isochron=FALSE} and
-\code{detritus=2}}
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for
+formats 1 and 2) or rock (for formats 3 and 4) and its standard
+error.}
 
 \item{Th02U48}{9-element vector with the measured composition of
 the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
@@ -245,7 +245,7 @@ uncertainty, extracted from the input file.
 respectively; i.e. a list inheriting the input arguments \code{x}
 and \code{format}.
 
-\item If \code{method="UThHe"}: an object of class \code{UThHe},
+\item If \code{method="U-Th-He"}: an object of class \code{UThHe},
 i.e. a matrix with the contents of \code{x}.
 
 \item If \code{method="fissiontracks"}: an object of class

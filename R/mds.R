@@ -159,7 +159,6 @@ KS.diss <- function(x,y) {
     return(out)
 }
 
-# arguments:
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
                      col='black',bg='white',xlab,ylab,pch,...){
     if (shepard & !x$classical){

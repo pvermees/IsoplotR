@@ -95,9 +95,23 @@ get.He <- function(tt,U,Th,Sm=0){
     aa*U + bb*Th + cc*Sm
 }
 
-# atomic abundance of 147Sm (Chang et al., 2002)
+# atomic abundance of 147Sm
 f147Sm <- function(){
-    c(0.1502,0.0003)    
+    S <- iratio('Sm144Sm152')[1] + iratio('Sm147Sm152')[1] +
+        iratio('Sm148Sm152')[1] + iratio('Sm149Sm152')[1] +
+        iratio('Sm150Sm152')[1] + iratio('Sm154Sm152')[1]
+    sS <- sqrt(iratio('Sm144Sm152')[2]^2 + iratio('Sm147Sm152')[2]^2 +
+               iratio('Sm148Sm152')[2]^2 + iratio('Sm149Sm152')[2]^2 +
+               iratio('Sm150Sm152')[2]^2 + iratio('Sm154Sm152')[2]^2 )
+    f152Sm <- 1/(1 + S)
+    sf152Sm <- sS/(1 + S)^2
+    out <- rep(0,2)
+    out[1] <- f152Sm*iratio('Sm147Sm152')[1]
+    # error propagation ignores covariance between f152Sm and Sm147Sm152:
+    out[2] <- out[1]* 
+        sqrt( (sf152Sm/f152Sm)^2 +
+              ((iratio('Sm147Sm152')[2]/iratio('Sm147Sm152')[1]))^2 )
+    out
 }
 
 doSm <- function(x){

@@ -132,23 +132,6 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     out
 }
 
-get.Th230Th232_0x <- function(tt,Th230Th232,errTh230Th232=0){
-    l0 <- settings('lambda','Th230')[1]
-    Th230Th232_0x <- Th230Th232 * exp(l0*tt)
-    errTh230Th232_0x <- errTh230Th232/Th230Th232
-    c(Th230Th232_0x,errTh230Th232_0x)
-}
-
-get.Th230Th232 <- function(tt,Th230Th232_0x,U238Th232){
-    l0 <- settings('lambda','Th230')[1]
-    Th230Th232_0x * exp(-l0*tt) + U238Th232 * (1 - exp(-l0*tt))
-}
-
-get.U238Th232 <- function(tt,Th230Th232_0x,Th230Th232){
-    l0 <- settings('lambda','Th230')[1]
-    (Th230Th232 - Th230Th232_0x * exp(-l0*tt)) / (1 - exp(-l0*tt))
-}
-
 k1 <- function(tt,l0,l4){
     (1-exp((l4[1]-l0[1])*tt))*l0[1]/(l4[1]-l0[1])
 }
@@ -187,14 +170,31 @@ ThU.convert <- function(x){
     out
 }
 
-get.Th230U238 <- function(tt,U234U238_0){
+get.Th230Th232_0x <- function(tt,Th230Th232,errTh230Th232=0){
+    l0 <- settings('lambda','Th230')[1]
+    Th230Th232_0x <- Th230Th232 * exp(l0*tt)
+    errTh230Th232_0x <- errTh230Th232/Th230Th232
+    c(Th230Th232_0x,errTh230Th232_0x)
+}
+
+get.Th230Th232.ratio <- function(tt,Th230Th232_0x,U238Th232){
+    l0 <- settings('lambda','Th230')[1]
+    Th230Th232_0x * exp(-l0*tt) + U238Th232 * (1 - exp(-l0*tt))
+}
+
+get.U238Th232.ratio <- function(tt,Th230Th232_0x,Th230Th232){
+    l0 <- settings('lambda','Th230')[1]
+    (Th230Th232 - Th230Th232_0x * exp(-l0*tt)) / (1 - exp(-l0*tt))
+}
+
+get.Th230U238.ratio <- function(tt,U234U238_0){
     l4 <- lambda('U234')
     l0 <- lambda('Th230')
-    a <- get.U234U238(tt,U234U238_0)
+    a <- get.U234U238.ratio(tt,U234U238_0)
     1 - exp(-l0[1]*tt) - (a-1)*k1(tt,l0,l4)
 }
 
-get.U234U238 <- function(tt,U234U238_0){
+get.U234U238.ratio <- function(tt,U234U238_0){
     l4 <- lambda('U234')
     1 + (U234U238_0-1)*exp(-l4[1]*tt)
 }

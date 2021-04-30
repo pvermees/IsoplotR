@@ -228,7 +228,6 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out
 }
 
-
 get.lta0b0.init <- function(x,anchor=0){
     out <- list()
     xy <- data2york(x,option=2)

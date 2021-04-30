@@ -309,22 +309,6 @@ S.tit <- function(abAB,dat){
     S
 }
 
-# dat is the output of matrix2covlist
-get.titterington.xy <- function(dat,abAB){
-    ns <- length(dat$omega)
-    out <- matrix(NA,ns,3)
-    colnames(out) <- c('X','Y','Z')
-    for (i in 1:ns){
-        abg <- alpha.beta.gamma(abAB[1],abAB[2],abAB[3],abAB[4],
-                                dat$XYZ[[i]],dat$omega[[i]])
-        XYZ <- dat$XYZ[[i]]
-        out[i,1] <- XYZ[1] + abg[2]/abg[1]
-        out[i,2] <- XYZ[2] + abAB[1] + abAB[2]*XYZ[1]
-        out[i,2] <- XYZ[3] + abAB[3] + abAB[4]*XYZ[1]
-    }
-    out
-}
-
 data2tit <- function(x,...){ UseMethod("data2tit",x) }
 data2tit.default <- function(x,...){ stop('default function undefined') }
 # osmond = FALSE: 8/2 - 4/2 - 0/2

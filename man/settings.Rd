@@ -131,21 +131,21 @@ Science Letters, 371, pp.82-91.
 Blachot, J. and Wapstra, A.H., 2003. The NUBASE evaluation of
 nuclear and decay properties. Nuclear Physics A, 729(1), pp.3-128.
 
-\item Sm: Lugmair, G. W., and
-K. Marti. "Lunar initial \eqn{^{143}}Nd/\eqn{^{144}}Nd: differential
-evolution of the lunar crust and mantle."
-Earth and Planetary Science Letters 39.3 (1978): 349-357.
+\item Sm: Villa, I.M., Holden, N.E., Possolo, A., Ickert, R.B.,
+Hibbert, D.B. and Renne, P.R., 2020. IUPAC-IUGS recommendation on
+the half-lives of \eqn{^{147}}Sm and \eqn{^{146}}Sm. Geochimica et
+Cosmochimica Acta, 285, pp.70-77.
 
 \item Nd: Zhao, Motian, et
 al. "Absolute measurements of neodymium isotopic abundances and atomic
 weight by MC-ICPMS." International Journal of Mass Spectrometry 245.1
 (2005): 36-40.
 
-\item Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and Hannah,
-J.L., 2007.  Assessment of the 187Re decay constant by cross
-calibration of Re-Os molybdenite and U-Pb zircon chronometers in
-magmatic ore systems. Geochimica et Cosmochimica Acta, 71(8),
-pp.1999-2013.
+\item Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and
+Hannah, J.L., 2007.  Assessment of the \eqn{^{187}}Re decay
+constant by cross calibration of Re-Os molybdenite and U-Pb zircon
+chronometers in magmatic ore systems. Geochimica et Cosmochimica
+Acta, 71(8), pp.1999-2013.
 
 \item Ar: Renne, Paul R., et
 al. "Response to the comment by WH Schwarz et al. on "Joint

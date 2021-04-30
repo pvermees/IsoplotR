@@ -561,6 +561,10 @@ geological scatter that underlies the measurements, and the lower
 and upper half-widths of its \eqn{100(1-\alpha)\%} confidence
 interval (only returned if \code{model=3}).}
 
+\item{ski}{(only reported if \code{x} has class \code{PbPb} and
+\code{growth} is \code{TRUE}) the intercept(s) of the isochron with
+the Stacey-Kramers mantle evolution curve.}
+
 }
 
 OR, if \code{x} has class \code{ThU}:
