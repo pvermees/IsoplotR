@@ -508,11 +508,11 @@ assess both the magnitude and the precision of quantitative data in
 one glance.
 }
 \examples{
-data(examples)
-radialplot(examples$FT1)
+attach(examples)
+radialplot(FT1)
 
 dev.new()
-radialplot(examples$LudwigMixture,k='min')
+radialplot(LudwigMixture,k='min')
 }
 \references{
 Galbraith, R.F., 1988. Graphical display of estimates

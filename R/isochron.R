@@ -235,6 +235,10 @@
 #' and upper half-widths of its \eqn{100(1-\alpha)\%} confidence
 #' interval (only returned if \code{model=3}).}
 #'
+#' \item{ski}{(only reported if \code{x} has class \code{PbPb} and
+#' \code{growth} is \code{TRUE}) the intercept(s) of the isochron with
+#' the Stacey-Kramers mantle evolution curve.}
+#'
 #' }
 #'
 #' OR, if \code{x} has class \code{ThU}:
@@ -399,13 +403,13 @@
 #' }
 #'
 #' @examples
-#' data(examples)
-#' isochron(examples$RbSr)
+#' attach(examples)
+#' isochron(RbSr)
 #'
-#' fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
+#' fit <- isochron(ArAr,inverse=FALSE,plot=FALSE)
 #'
 #' dev.new()
-#' isochron(examples$ThU,type=4)
+#' isochron(ThU,type=4)
 #'
 #' @seealso
 #' \code{\link{york}},
@@ -494,7 +498,6 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
                          hide=NULL, omit=NULL,omit.fill=NA,
                          omit.stroke='grey',...){
     ns <- length(x)
-    plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     x2calc <- subset(x,subset=calcit)
     lud <- ludwig(x2calc,exterr=exterr,model=model,anchor=anchor)
@@ -715,7 +718,7 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
             tmin <- max(min(tx),min(ty))
             tmax <- min(max(tx),max(ty))
             plot_PbPb_evolution(from=tmin,to=tmax,inverse=inverse)
-            ski <- SK.intersection(out,inverse=inverse)
+            out$ski <- SK.intersection(out,inverse=inverse)
         } else {
             ski <- NULL
         }
@@ -1130,7 +1133,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
                                   exterr=exterr)['s[t]']
         out$y0['disp[y]'] <-
             out$fact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
-                                        sqrt(out$mswd)*Th230Th232[2])[2]
+                                       sqrt(out$mswd)*Th230Th232[2])[2]
     }
     out$xlab <- x.lab
     out$ylab <- y.lab

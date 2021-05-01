@@ -213,9 +213,9 @@ if \code{method='other'}, \code{x} is read as a table, unless
 \item{d}{an object of class \code{\link{diseq}}.}
 
 \item{Th02}{2-element vector with the assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus and its
-standard error. Only used if \code{isochron=FALSE} and
-\code{detritus=2}}
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for
+formats 1 and 2) or rock (for formats 3 and 4) and its standard
+error.}
 
 \item{Th02U48}{9-element vector with the measured composition of
 the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
@@ -223,64 +223,10 @@ the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
 \code{rYZ}.}
 }
 \value{
-\itemize{
-
-\item If \code{method="U-Pb"}: an object of class \code{UPb}, i.e. a list
-inheriting the input arguments \code{x}, \code{format} and \code{d}.
-
-\item If \code{method="ArAr"}: and object of class \code{ArAr}, i.e. a
-three item list containing the following items:
-
-\code{x}: a matrix containing the isotopic measurements
-
-\code{J}: a two-element vector with the J-factor and its
-uncertainty, extracted from the input file.
-
-\code{format}: same as the input argument
-
-\item If \code{method="Pb-Pb"}, \code{method="Th-Pb"},
-\code{"K-Ca"}, \code{"Rb-Sr"}, \code{"Sm-Nd"}, \code{"Lu-Hf"}, or
-\code{"Re-Os"}: objects of classes \code{PbPb}, \code{KCa},
-\code{RbSr}, \code{SmNd}, \code{LuHf}, or \code{ReOs},
-respectively; i.e. a list inheriting the input arguments \code{x}
-and \code{format}.
-
-\item If \code{method="UThHe"}: an object of class \code{UThHe},
-i.e. a matrix with the contents of \code{x}.
-
-\item If \code{method="fissiontracks"}: an object of class
-\code{fissiontracks}, i.e. a list containing the following items:
-
-\code{format}: same as the input argument
-
-\code{x}: a matrix of spontaneous and induced fission track counts
-(only returned if \code{format=1})
-
-\code{rhoD}: the track density of the dosimeter glass, extracted
-from the input data (only returned if \code{format=1})
-
-\code{zeta}: the zeta calibration constant extracted from the input
-data (only returned if \code{format<3})
-
-\code{Ns} a list containing the spontaneous fission track counts
-(only returned if \code{format>1})
-
-\code{U}: a list of lists containing the U-concentration or
-U/Ca-ratio measurements for each of the analysed grains (only
-returned if \code{format>1})
-
-\code{sU}: a list of lists containing the standard errors of the
-U-concentration or U/Ca-ratio measurements for each of the analysed
-grains (only returned if \code{format>1})
-
-\code{spotSize}: the laser ablation spot size (only returned if
-\code{format>1})
-
-\item If \code{method="detritals"}: an object of class
-\code{detritals}, i.e. a list of named vectors, one for each
-detrital sample.
-
-}
+An object of class \code{UPb}, \code{PbPb}, \code{ThPb},
+    \code{KCa}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{ReOs},
+    \code{UThHe}, \code{fissiontracks}, \code{detritals} or
+    \code{PD}. See \code{\link{classes}} for further details.
 }
 \description{
 Cast a \code{.csv} file or a matrix into one of \code{IsoplotR}'s

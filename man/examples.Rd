@@ -79,27 +79,27 @@ a dataset of dispersed zircon fission track ages of the example
 dataset by Ludwig (2003).
 }
 \examples{
-data(examples)
+attach(examples)
 
-concordia(examples$UPb)
+concordia(UPb)
 
-agespectrum(examples$ArAr)
+agespectrum(ArAr)
 
-isochron(examples$ReOs)
+isochron(ReOs)
 
-radialplot(examples$FT1)
+radialplot(FT1)
 
-helioplot(examples$UThHe)
+helioplot(UThHe)
 
-evolution(examples$ThU)
+evolution(ThU)
 
-kde(examples$DZ)
+kde(DZ)
 
-radialplot(examples$LudwigMixture)
+radialplot(LudwigMixture)
 
-agespectrum(examples$LudwigSpectrum)
+agespectrum(LudwigSpectrum)
 
-weightedmean(examples$LudwigMean)
+weightedmean(LudwigMean)
 
 }
 \references{

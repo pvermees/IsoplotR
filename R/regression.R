@@ -35,7 +35,7 @@ model2regression <- function(xyz,type='york'){
         out$cov.ab <- E[1,2]
     } else if (identical(type,'titterington')){
         out <- list()
-        fit <- stats::lm(subset(xyz,select=c('Y','Z')) ~ xyz[,'X'])
+        fit <- stats::lm(xyz[,c('Y','Z')] ~ xyz[,'X'])
         out$df <- fit$df.residual
         out$par <- c(stats::coef(fit))
         out$cov <- stats::vcov(fit)
@@ -89,18 +89,8 @@ LL.york <- function(w,xy){
     m1 <- P[,1]
     m2 <- P[,2]
     z <- ((x1-m1)/s1)^2 + ((x2-m2)/s2)^2 - 2*rho*(x1-m1)*(x2-m2)/(s1*s2)
-    L1 <- - log(s1) - log(s2) - 0.5*log(1-rho^2) - 0.5*z/(1-rho^2)
-    out <- sum(L1)
-#    out <- 0
-#    for (i in 1:nrow(D)){
-#        E <- cor2cov2(D[i,'sX'],D[i,'sY'],D[i,'rXY'])
-#        X[1,1] <- D[i,'X']-P[i,1]
-#        X[1,2] <- D[i,'Y']-P[i,2]
-#        SS <- X %*% solve(E) %*% t(X)
-#        detE <- determinant(E,logarithm=TRUE)$modulus
-#        out <- out - 0.5*detE - 0.5*SS
-#    }
-    out
+    LL <- - log(s1) - log(s2) - 0.5*log(1-rho^2) - 0.5*z/(1-rho^2)
+    sum(LL)
 }
 LL.titterington <- function(w,xyz){
     out <- 0

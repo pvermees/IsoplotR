@@ -169,11 +169,11 @@ datasets (Th-U formats 3 and 4), in which \eqn{^{234}}U and
 decorated with a fanning set of \code{\link{isochron}} lines.
 }
 \examples{
-data(examples)
-evolution(examples$ThU)
+attach(examples)
+evolution(ThU)
 
 dev.new()
-evolution(examples$ThU,transform=TRUE,
+evolution(ThU,transform=TRUE,
           isochron=TRUE,model=1)
 
 }

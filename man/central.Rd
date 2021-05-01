@@ -13,7 +13,7 @@ central(x, ...)
 
 \method{central}{UThHe}(x, alpha = 0.05, model = 1, ...)
 
-\method{central}{fissiontracks}(x, mineral = NA, alpha = 0.05, exterr = FALSE, ...)
+\method{central}{fissiontracks}(x, alpha = 0.05, exterr = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe} or \code{fissiontracks},
@@ -39,11 +39,6 @@ uncertainties.
 \code{3}: attribute any excess dispersion to the presence of
 geological uncertainty, which manifests itself as an added
 (co)variance term.}
-
-\item{mineral}{setting this parameter to either \code{apatite} or
-\code{zircon} changes the default efficiency factor, initial
-fission track length and density to preset values (only affects
-results if \code{x$format=2})}
 
 \item{exterr}{include the zeta or decay constant uncertainty into
 the error propagation for the central age?}
@@ -139,8 +134,8 @@ usually small unless the data are imprecise and/or strongly
 overdispersed.
 }
 \examples{
-data(examples)
-print(central(examples$UThHe)$age)
+attach(examples)
+print(central(UThHe)$age)
 
 }
 \references{

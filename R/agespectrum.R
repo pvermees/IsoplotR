@@ -166,12 +166,12 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
 #' @examples
-#' data(examples)
+#' attach(examples)
 #' par(mfrow=c(2,1))
-#' agespectrum(examples$ArAr)
+#' agespectrum(ArAr)
 #' # removing the first 6 steps yields the longest plateau
 #' # that passes the chi-square test for homogeneity
-#' agespectrum(examples$ArAr,omit=1:6)
+#' agespectrum(ArAr,omit=1:6)
 #' @rdname agespectrum
 #' @export
 agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,

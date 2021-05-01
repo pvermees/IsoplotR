@@ -286,10 +286,10 @@ component is a continuous distribution (as descibed by the
 value (Van der Touw et al., 1997).
 }
 \examples{
-data(examples)
-peakfit(examples$FT1,k=2)
+attach(examples)
+peakfit(FT1,k=2)
 
-peakfit(examples$LudwigMixture,k='min')
+peakfit(LudwigMixture,k='min')
 }
 \references{
 Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for

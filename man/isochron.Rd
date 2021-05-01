@@ -561,6 +561,10 @@ geological scatter that underlies the measurements, and the lower
 and upper half-widths of its \eqn{100(1-\alpha)\%} confidence
 interval (only returned if \code{model=3}).}
 
+\item{ski}{(only reported if \code{x} has class \code{PbPb} and
+\code{growth} is \code{TRUE}) the intercept(s) of the isochron with
+the Stacey-Kramers mantle evolution curve.}
+
 }
 
 OR, if \code{x} has class \code{ThU}:
@@ -797,13 +801,13 @@ adding an overdispersion \emph{term} that lowers the MSWD to unity.
 }
 }
 \examples{
-data(examples)
-isochron(examples$RbSr)
+attach(examples)
+isochron(RbSr)
 
-fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
+fit <- isochron(ArAr,inverse=FALSE,plot=FALSE)
 
 dev.new()
-isochron(examples$ThU,type=4)
+isochron(ThU,type=4)
 
 }
 \references{

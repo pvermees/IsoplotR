@@ -122,12 +122,12 @@ they constrain both the initial igneous age as well as the timing
 of the partial resetting event.
 }
 \examples{
-data(examples)
-UPb <- Pb0corr(examples$UPb,option=2)
-concordia(UPb)
+attach(examples)
+corrected <- Pb0corr(UPb,option=2)
+concordia(corrected)
 # produces identical results as:
 dev.new()
-concordia(examples$UPb,common.Pb=2)
+concordia(UPb,common.Pb=2)
 }
 \references{
 Ludwig, K.R., 1998. On the treatment of concordant uranium-lead

@@ -100,8 +100,8 @@
 #'     \code{\link{helioplot}}
 #' 
 #' @examples
-#' data(examples)
-#' print(central(examples$UThHe)$age)
+#' attach(examples)
+#' print(central(UThHe)$age)
 #'
 #' @references Galbraith, R.F. and Laslett, G.M., 1993. Statistical
 #'     models for mixed fission track ages. Nuclear Tracks and

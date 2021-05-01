@@ -100,9 +100,9 @@ get.absolute.zeta <- function(mineral){
 #'     \code{x$zeta} value
 #' @seealso \code{\link{age}}
 #' @examples
-#' data(examples)
-#' print(examples$FT1$zeta)
-#' FT <- set.zeta(examples$FT1,tst=c(250,5))
+#' attach(examples)
+#' print(FT1$zeta)
+#' FT <- set.zeta(FT1,tst=c(250,5))
 #' print(FT$zeta)
 #'
 #' @references

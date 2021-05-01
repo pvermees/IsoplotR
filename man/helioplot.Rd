@@ -175,10 +175,10 @@ purpose as the U-Pb \code{\link{concordia}} diagram and the
 U-series \code{\link{evolution}} plot.
 }
 \examples{
-data(examples)
-helioplot(examples$UThHe)
+attach(examples)
+helioplot(UThHe)
 dev.new()
-helioplot(examples$UThHe,logratio=FALSE)
+helioplot(UThHe,logratio=FALSE)
 }
 \references{
 Aitchison, J., 1986, The statistical analysis of

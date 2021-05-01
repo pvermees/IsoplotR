@@ -12,7 +12,7 @@ agespectrum(x, ...)
   x,
   alpha = 0.05,
   plateau = TRUE,
-  random.effects = TRUE,
+  random.effects = FALSE,
   levels = NA,
   clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
@@ -31,7 +31,7 @@ agespectrum(x, ...)
   x,
   alpha = 0.05,
   plateau = TRUE,
-  random.effects = TRUE,
+  random.effects = FALSE,
   levels = NA,
   clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
@@ -194,12 +194,12 @@ removing individual heating steps with the optional \code{omit}
 argument.
 }
 \examples{
-data(examples)
+attach(examples)
 par(mfrow=c(2,1))
-agespectrum(examples$ArAr)
+agespectrum(ArAr)
 # removing the first 6 steps yields the longest plateau
 # that passes the chi-square test for homogeneity
-agespectrum(examples$ArAr,omit=1:6)
+agespectrum(ArAr,omit=1:6)
 }
 \seealso{
 \code{\link{weightedmean}}

@@ -48,8 +48,8 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' @param ... optional arguments to the generic \code{plot} function
 #' 
 #' @examples
-#' data(examples)
-#' cad(examples$DZ,verticals=FALSE,pch=20)
+#' attach(examples)
+#' cad(DZ,verticals=FALSE,pch=20)
 #' @rdname cad
 #' @export
 cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
@@ -68,7 +68,7 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     ns <- length(x2plot)
-    if ('function'%in%class(col)) colour <- do.call(col,list(ns))
+    if (is.function(col)) colour <- do.call(col,list(ns))
     else colour <- rep('black',ns)
     graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
                    ylab='cumulative probability',...)

@@ -125,12 +125,12 @@
 #' Science Letters, 26(2), pp.207-221.
 #' 
 #' @examples
-#' data(examples)
-#' UPb <- Pb0corr(examples$UPb,option=2)
-#' concordia(UPb)
+#' attach(examples)
+#' corrected <- Pb0corr(UPb,option=2)
+#' concordia(corrected)
 #' # produces identical results as:
 #' dev.new()
-#' concordia(examples$UPb,common.Pb=2)
+#' concordia(UPb,common.Pb=2)
 #' @export
 Pb0corr <- function(x,option=3,omit4c=NULL){
     ns <- length(x)

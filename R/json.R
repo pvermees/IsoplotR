@@ -1,14 +1,14 @@
 # The following code was lifted from Alex Couture-Beil <rjson_pkg at mofo.ca>'s
-# rjson package (version 0.2.15) The C-code was removed and only native R code retained
-toJSON <- function(x)
-{
+# rjson package (version 0.2.15) The C-code was removed and only native
+# R code retained
+toJSON <- function(x){
     #convert factors to characters
     if( is.factor( x ) == TRUE ) {
         tmp_names <- names( x )
         x = as.character( x )
         names( x ) <- tmp_names
     }
-
+    
     if( !is.vector(x) && !is.null(x) && !is.list(x) ) {
         x <- as.list( x )
         warning("JSON only supports vectors and lists - But I'll try anyways")
@@ -80,8 +80,7 @@ toJSON <- function(x)
 #create an object, which can be used to parse JSON data spanning multiple buffers
 #it will be able to pull out multiple objects.. e.g: "[5][2,1]" is two different
 # JSON objects - it can be called twice to get both items
-newJSONParser <- function()
-{
+newJSONParser <- function(){
     buffer <- c()
     return(	list(
         "addData" = function( buf ) { 
@@ -106,8 +105,7 @@ newJSONParser <- function()
 }
 
 
-fromJSON <- function( json_str, file, unexpected.escape = "error" )
-{
+fromJSON <- function( json_str, file, unexpected.escape = "error" ){
     if( missing( json_str ) ) {
         if( missing( file ) )
             stop( "either json_str or file must be supplied to fromJSON")
@@ -120,8 +118,7 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
     return( .fromJSON_R( json_str ) )
 }
 
-.fromJSON_R <- function( json_str )
-{
+.fromJSON_R <- function( json_str ){
     if( !is.character(json_str) )
         stop( "JSON objects must be a character string" )
     chars = strsplit(json_str, "")[[1]]
@@ -132,8 +129,7 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
         return( NULL )
 }
 
-.parseValue <- function( chars, i )
-{
+.parseValue <- function( chars, i ){
     if( i > length( chars ) )
         return( list( "incomplete" = TRUE ) )
     
@@ -172,8 +168,7 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
     stop( err )
 }
 
-.parseObj <- function( chars, i )
-{
+.parseObj <- function( chars, i ){
     obj <- list()
     if( chars[i] != "{" ) stop("error - no openning tag")
     i = i + 1
@@ -188,7 +183,6 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
             if( i > length( chars ) ) return( list( "incomplete" = TRUE ) )
         }
 
-        
         #look out for empty lists
         if( chars[i] == "}" && first_pass == TRUE ) {
             i = i + 1
@@ -249,8 +243,7 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
     return( list(val=obj, size=i) )
 }
 
-.parseArray <- function( chars, i )
-{
+.parseArray <- function( chars, i ){
     useVect <- TRUE
     arr <- list()
     if( chars[i] != "[" ) stop("error - no openning tag")
@@ -306,8 +299,7 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
     return( list(val=arr, size=i) )
 }
 
-.parseString <- function( chars, i )
-{
+.parseString <- function( chars, i ){
     str_start = i
     if( chars[i] != "\"") stop("error")
     i = i + 1
@@ -332,8 +324,7 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
         size=i ))
 }
 
-.parseNumber <- function( chars, i )
-{
+.parseNumber <- function( chars, i ){
     str_start = i
 
     if( chars[i] == "-" )
@@ -383,22 +374,19 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" )
         size=i ))
 }
 
-.parseTrue <- function( chars, i )
-{
+.parseTrue <- function( chars, i ){
     if( paste(chars[i:(i+3)], collapse="") == "true" )
         return( list(val=TRUE,size=i+4) )
     stop("error parsing true value (maybe the word starts with t but isnt true)")
 }
 
-.parseFalse <- function( chars, i )
-{
+.parseFalse <- function( chars, i ){
     if( paste(chars[i:(i+4)], collapse="") == "false" )
         return( list(val=FALSE,size=i+5) )
     stop("error parsing false value (maybe the word starts with f but isnt false)")
 }
 
-.parseNull <- function( chars, i )
-{
+.parseNull <- function( chars, i ){
     if( paste(chars[i:(i+3)], collapse="") == "null" )
         return( list(val=NULL,size=i+4) )
     stop("error parsing null value (maybe the word starts with n but isnt null)")

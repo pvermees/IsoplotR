@@ -95,10 +95,10 @@
 #' terms of their mutual distances. Psychometrika, 3(1):19-22, 1938.
 #'
 #' @examples
-#' data(examples)
-#' mds(examples$DZ,nnlines=TRUE,pch=21,cex=5)
+#' attach(examples)
+#' mds(DZ,nnlines=TRUE,pch=21,cex=5)
 #' dev.new()
-#' mds(examples$DZ,shepard=TRUE)
+#' mds(DZ,shepard=TRUE)
 #' @rdname mds
 #' @export
 mds <- function(x,...){ UseMethod("mds",x) }
@@ -159,7 +159,6 @@ KS.diss <- function(x,y) {
     return(out)
 }
 
-# arguments:
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
                      col='black',bg='white',xlab,ylab,pch,...){
     if (shepard & !x$classical){
