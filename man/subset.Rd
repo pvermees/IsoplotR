@@ -27,7 +27,7 @@
 
 \method{subset}{ThU}(x, ...)
 
-\method{subset}{detritals}(x, select)
+\method{subset}{detritals}(x, select, ...)
 
 \method{subset}{UThHe}(x, ...)
 
@@ -44,9 +44,13 @@
 \code{subset}: logical expression indicating elements or rows to
 keep: missing values are taken as false.
 
-\code{select}: expression, indicating columns to select from a data frame.}
+\code{select}: expression, indicating columns to select from a data frame.
 
-\item{subset}{a vector with sample names or numbers.}
+Note: if \code{x} has class \code{detritals}, then only the
+argument \code{select} is accepted. In this case the function will
+also accept the indices of the samples to retain.}
+
+\item{select}{a vector with sample names or numbers.}
 }
 \value{
 an object with the same class as \code{x}.

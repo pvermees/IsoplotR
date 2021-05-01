@@ -11,9 +11,6 @@
 #' length(examples$UPb)
 #' @rdname length
 #' @export
-length <- function(x){ base::length(x) }
-#' @rdname length
-#' @export
 length.UPb  <- function(x){ nrow(x$x) }
 #' @rdname length
 #' @export
@@ -62,6 +59,10 @@ length.fissiontracks <- function(x){
 #' keep: missing values are taken as false.
 #'
 #' \code{select}: expression, indicating columns to select from a data frame.
+#'
+#' Note: if \code{x} has class \code{detritals}, then only the
+#' argument \code{select} is accepted. In this case the function will
+#' also accept the indices of the samples to retain.
 #' 
 #' @return an object with the same class as \code{x}.
 #' @examples
@@ -97,10 +98,10 @@ subset.PD <- function(x,...){ subset_helper(x,...) }
 #' @rdname subset
 #' @export
 subset.ThU <- function(x,...){ subset_helper(x,...) }
-#' @param subset a vector with sample names or numbers.
+#' @param select a vector with sample names or numbers.
 #' @rdname subset
 #' @export
-subset.detritals <- function(x,select){
+subset.detritals <- function(x,select,...){
     out <- x[select]
     class(out) <- class(x)
     out
