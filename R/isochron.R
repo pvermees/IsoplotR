@@ -498,7 +498,6 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
                          hide=NULL, omit=NULL,omit.fill=NA,
                          omit.stroke='grey',...){
     ns <- length(x)
-    plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
     x2calc <- subset(x,subset=calcit)
     lud <- ludwig(x2calc,exterr=exterr,model=model,anchor=anchor)

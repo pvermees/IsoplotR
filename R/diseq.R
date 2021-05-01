@@ -174,16 +174,6 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out
 }
 
-#' @export
-`[.diseq` <- function(x,i){
-    out <- x
-    for (ratio in c('U48','ThU','RaU','PaU')){
-        j <- min(length(out[[ratio]]$x),i)
-        out[[ratio]]$x <- out[[ratio]]$x[j]
-    }
-    out
-}
-
 # infer initial activity ratios from Th/U measurements
 copy_diseq <- function(x,d=diseq()){
     out <- d

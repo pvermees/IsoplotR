@@ -1,138 +1,3 @@
-#' @title Count the number of aliquots in a sample
-#' @description Count the number of rows (aliquots) in a dataset
-#'     returned by \code{read.data} or, for datasets of class
-#'     \code{detritals}, the number of columns (samples).
-#' @param x an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
-#'     \code{ThPb}, \code{KCa}, \code{PD}, \code{ThU},
-#'     \code{detritals}, \code{UThHe} or \code{fissiontracks}.
-#' @return a scalar
-#' @examples
-#' data(examples)
-#' length(examples$UPb)
-#' @rdname length
-#' @export
-length.UPb  <- function(x){ nrow(x$x) }
-#' @rdname length
-#' @export
-length.PbPb <- function(x){ nrow(x$x) }
-#' @rdname length
-#' @export
-length.ArAr <- function(x){ nrow(x$x) }
-#' @rdname length
-#' @export
-length.PD <- function(x){ nrow(x$x) }
-#' @rdname length
-#' @export
-length.ThPb <- function(x){ nrow(x$x) }
-#' @rdname length
-#' @export
-length.KCa <- function(x){ nrow(x$x) }
-#' @rdname length
-#' @export
-length.ThU <- function(x){ nrow(x$x) }
-#' @rdname length
-#' @export
-length.UThHe <- function(x){ nrow(x) }
-#' @rdname length
-#' @export
-length.KDE <- function(x){ length(x$ages) }
-#' @rdname length
-#' @export
-length.KDEs <- function(x){ length(x$kdes) }
-#' @rdname length
-#' @export
-length.fissiontracks <- function(x){
-    if (x$format==1) return(nrow(x$x))
-    else return(length(x$Ns))
-}
-
-#' @title Subset geochronological datasets
-#' @description Retain selected rows or columns from a larger dataset
-#'     produced by \code{read.data}.
-#' @param x an object of class \code{UPb}, \code{PbPb}, \code{ArAr},
-#'     \code{ThPb}, \code{KCa}, \code{PD}, \code{ThU},
-#'     \code{detritals}, \code{UThHe} or \code{fissiontracks}.
-#' @param ... arguments to be passed onto the generic
-#'     \code{\link[base]{subset}} function. Specifically:
-#'
-#' \code{subset}: logical expression indicating elements or rows to
-#' keep: missing values are taken as false.
-#'
-#' \code{select}: expression, indicating columns to select from a data frame.
-#'
-#' Note: if \code{x} has class \code{detritals}, then only the
-#' argument \code{select} is accepted. In this case the function will
-#' also accept the indices of the samples to retain.
-#' 
-#' @return an object with the same class as \code{x}.
-#' @examples
-#' data(examples)
-#' tt <- age(examples$UPb)
-#' old <- (tt[,'t.conc'] > 230)
-#' UPb <- subset(examples$UPb,subset=old)
-#' @rdname subset
-#' @export
-subset.UPb  <- function(x,...){
-    out <- x
-    out$x <- subset(x$x,...)
-    if ('x.raw' %in% names(x)){
-        out$x.raw <- subset(x$x.raw,...)
-    }
-    out
-}
-#' @rdname subset
-#' @export
-subset.PbPb <- function(x,...){ subset_helper(x,...) }
-#' @rdname subset
-#' @export
-subset.ArAr <- function(x,...){ subset_helper(x,...) }
-#' @rdname subset
-#' @export
-subset.ThPb <- function(x,...){ subset_helper(x,...) }
-#' @rdname subset
-#' @export
-subset.KCa <- function(x,...){ subset_helper(x,...) }
-#' @rdname subset
-#' @export
-subset.PD <- function(x,...){ subset_helper(x,...) }
-#' @rdname subset
-#' @export
-subset.ThU <- function(x,...){ subset_helper(x,...) }
-#' @param select a vector with sample names or numbers.
-#' @rdname subset
-#' @export
-subset.detritals <- function(x,select,...){
-    out <- x[select]
-    class(out) <- class(x)
-    out
-}
-#' @rdname subset
-#' @export
-subset.UThHe <- function(x,...){
-    out <- subset.matrix(x,...)
-    class(out) <- class(x)
-    out
-}
-#' @rdname subset
-#' @export
-subset.fissiontracks <- function(x,...){
-    if (x$format==1){
-        out <- subset_helper(x,...)
-    } else {
-        out <- x
-        out$Ns <- subset(x$Ns,...)
-        out$A <- subset(x$A,...)
-        out$U <- subset(x$U,...)
-        out$sU <- subset(x$sU,...)
-    }
-    out
-}
-subset_helper <- function(x,...){
-    out <- x
-    out$x <- subset.matrix(x$x,...)
-    out
-}
-
 roundit <- function(age,err,sigdig=2){
     if (missing(err)){
         if (is.na(sigdig)) out <- age
@@ -343,10 +208,6 @@ quotient <- function(X,sX,Y,sY,rXY){
     cbind(YX,sYX)
 }
 
-hasClass <- function(x,classname){
-    classname %in% class(x)
-}
-
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){
     (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus) +
@@ -542,7 +403,7 @@ optifix <- function(parms, fixed, fn, gr = NULL, ...,
 
 clear <- function(x,...){
     i <- unlist(list(...))
-    if (hasClass(x,'matrix')) sn <- 1:nrow(x)
+    if (is.matrix(x)) sn <- 1:nrow(x)
     else sn <- 1:length(x)
     if (length(i)>0) out <- subset(x,subset=sn%ni%i)
     else out <- x

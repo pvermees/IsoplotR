@@ -384,7 +384,7 @@ age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=TRUE,i=NA,sigdig=NA,.
 # calculated without taking into account the external errors
 add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out <- c(tt,st)
-    if (hasClass(x,'UPb')){
+    if (is.UPb(x)){
         if (type==1){
             R <- age_to_Pb207U235_ratio(tt,st,d=x$d)
             out <- get.Pb207U235.age(R[1],R[2],d=x$d,exterr=TRUE)
@@ -395,28 +395,28 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
             R <- age_to_Pb207Pb206_ratio(tt,st,d=x$d)
             out <- get.Pb207Pb206.age(R[1],R[2],d=x$d,exterr=TRUE)
         }
-    } else if (hasClass(x,'PbPb')){
+    } else if (is.PbPb(x)){
         R <- age_to_Pb207Pb206_ratio(tt,st)
         out <- get.Pb207Pb206.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'ArAr')){
+    } else if (is.ArAr(x)){
         R <- get.ArAr.ratio(tt,st,x$J[1],0,exterr=FALSE)
         out <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
-    } else if (hasClass(x,'KCa')){
+    } else if (is.KCa(x)){
         R <- get.KCa.ratio(tt,st,exterr=FALSE)
         out <- get.KCa.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'ReOs')){
+    } else if (is.ReOs(x)){
         R <- get.ReOs.ratio(tt,st,exterr=FALSE)
         out <- get.ReOs.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'SmNd')){
+    } else if (is.SmNd(x)){
         R <- get.SmNd.ratio(tt,st,exterr=FALSE)
         out <- get.SmNd.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'RbSr')){
+    } else if (is.RbSr(x)){
         R <- get.RbSr.ratio(tt,st,exterr=FALSE)
         out <- get.RbSr.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'LuHf')){
+    } else if (is.LuHf(x)){
         R <- get.LuHf.ratio(tt,st,exterr=FALSE)
         out <- get.LuHf.age(R[1],R[2],exterr=TRUE)
-    } else if (hasClass(x,'fissiontracks')){
+    } else if (is.fissiontracks(x)){
         if (x$format==1) {
             rhoD <- x$rhoD
             zeta <- x$zeta
@@ -434,31 +434,31 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
 
 get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
                      cutoff.disc=discfilter(),common.Pb=0,detritus=0){
-    if (hasClass(x,'UPb')){
+    if (is.UPb(x)){
         out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                                cutoff.disc=cutoff.disc,omit4c=omit4c,
                                exterr=FALSE,common.Pb=common.Pb)
-    } else if (hasClass(x,'PbPb')){
+    } else if (is.PbPb(x)){
         out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb,omit4c=omit4c)
-    } else if (hasClass(x,'ArAr')){
+    } else if (is.ArAr(x)){
         out <- ArAr.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
-    } else if (hasClass(x,'ThPb')){
+    } else if (is.ThPb(x)){
         out <- ThPb.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
-    } else if (hasClass(x,'KCa')){
+    } else if (is.KCa(x)){
         out <- KCa.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
-    } else if (hasClass(x,'UThHe')){
+    } else if (is.UThHe(x)){
         out <- UThHe.age(x)
-    } else if (hasClass(x,'ReOs')){
+    } else if (is.ReOs(x)){
         out <- ReOs.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
-    } else if (hasClass(x,'SmNd')){
+    } else if (is.SmNd(x)){
         out <- SmNd.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
-    } else if (hasClass(x,'RbSr')){
+    } else if (is.RbSr(x)){
         out <- RbSr.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
-    } else if (hasClass(x,'LuHf')){
+    } else if (is.LuHf(x)){
         out <- LuHf.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
-    } else if (hasClass(x,'fissiontracks')){
+    } else if (is.fissiontracks(x)){
         out <- fissiontrack.age(x,exterr=FALSE)
-    } else if (hasClass(x,'ThU')){
+    } else if (is.ThU(x)){
         out <- ThU.age(x,exterr=FALSE,i2i=i2i,
                        detritus=detritus,omit4c=omit4c)
     }

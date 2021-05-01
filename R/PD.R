@@ -62,21 +62,21 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
 }
 
 get.nominal.initials <- function(x){
-    if (hasClass(x,'RbSr')){
+    if (is.RbSr(x)){
         out <- settings('iratio','Sr87Sr86')
-    } else if (hasClass(x,'SmNd')){
+    } else if (is.SmNd(x)){
         out <- settings('iratio','Nd143Nd144')
-    } else if (hasClass(x,'ReOs')){
+    } else if (is.ReOs(x)){
         Os72 <- settings('iratio','Os187Os192')
         Os82 <- settings('iratio','Os188Os192')
         out <- quotient(Os82[1],Os82[2],Os72[1],Os72[2],0)
-    } else if (hasClass(x,'LuHf')){
+    } else if (is.LuHf(x)){
         out <- settings('iratio','Hf176Hf177')
-    } else if (hasClass(x,'KCa')){
+    } else if (is.KCa(x)){
         out <- settings('iratio','Ca40Ca44')
-    } else if (hasClass(x,'ThPb')){
+    } else if (is.ThPb(x)){
         out <- settings('iratio','Pb208Pb204')
-    } else if (hasClass(x,'ArAr')){
+    } else if (is.ArAr(x)){
         out <- settings('iratio','Ar40Ar36')
     } else {
         out <- c(0,0)

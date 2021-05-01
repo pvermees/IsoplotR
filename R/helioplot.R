@@ -493,7 +493,7 @@ get.logratioplot.limits <- function(x,nse=3){
 
 # x is an object of class UThHe
 UThHe2uvw <- function(x){
-    if (hasClass(x,'UThHe')){
+    if (is.UThHe(x)){
         logHe <- log(x[,'He'])
         u <- log(x[,'U']) - logHe
         v <- log(x[,'Th']) - logHe
@@ -506,7 +506,7 @@ UThHe2uvw <- function(x){
     out
 }
 UThHe2uv <- function(x){
-    if (hasClass(x,'UThHe')){
+    if (is.UThHe(x)){
         logHe <- log(x[,'He'])
         u <- log(x[,'U']) - logHe
         v <- log(x[,'Th']) - logHe
@@ -572,7 +572,7 @@ uv2UThHe <- function(uv,covmat=matrix(0,2,2)){
     out
 }
 uv2HeUTh <- function(uv){
-    if (hasClass(uv,"matrix")){
+    if (is.matrix(uv)){
         u <- uv[,1]
         v <- uv[,2]
     } else {
@@ -639,7 +639,7 @@ UThHe2uv.covmat <- function(x,i,w=0){
 
 # ternary compositions to plot coordinates
 xyz2xy <- function(xyz){
-    if (hasClass(xyz,"matrix")){
+    if (is.matrix(xyz)){
         n <- nrow(xyz)
         x <- xyz[,1]
         y <- xyz[,2]
@@ -657,7 +657,7 @@ xyz2xy <- function(xyz){
 }
 
 renormalise <- function(xyz,fact=c(1,1,1)){
-    if (hasClass(xyz,"matrix")){
+    if (is.matrix(xyz)){
         nr <- nrow(xyz)
         FACT <- matrix(rep(fact,nr),nrow=nr,byrow=TRUE)
         out <- xyz*FACT
