@@ -292,6 +292,12 @@ subset.fissiontracks <- function(x,...){
     }
     out
 }
+#' @export
+subset.detritals <- function(x,subset){
+    out <- x[subset]
+    class(out) <- class(x)
+    out
+}
 subset_helper <- function(x,...){
     out <- x
     out$x <- subset.matrix(x$x,...)
