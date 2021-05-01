@@ -305,13 +305,13 @@ analytical uncertainties. Includes options for single grain,
 isochron and concordia ages.
 }
 \examples{
-data(examples)
-tUPb <- age(examples$UPb,type=1)
-tconc <- age(examples$UPb,type=2)
-tdisc <- age(examples$UPb,type=3)
-tArAr <- age(examples$ArAr)
-tiso <- age(examples$ArAr,isochron=TRUE,i2i=TRUE)
-tcentral <- age(examples$FT1,central=TRUE)
+attach(examples)
+tUPb <- age(UPb,type=1)
+tconc <- age(UPb,type=2)
+tdisc <- age(UPb,type=3)
+tArAr <- age(ArAr)
+tiso <- age(ArAr,isochron=TRUE,i2i=TRUE)
+tcentral <- age(FT1,central=TRUE)
 }
 \seealso{
 \code{\link{concordia}}, \code{\link{isochron}},

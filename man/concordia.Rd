@@ -273,15 +273,15 @@ that can be used to infer the composition of the non-radiogenic
 (`common') lead or to constrain the timing of prior lead loss.
 }
 \examples{
-data(examples)
-concordia(examples$UPb,show.age=2)
+attach(examples)
+concordia(UPb,show.age=2)
 
 dev.new()
-concordia(examples$UPb,type=1,xlim=c(24.9,25.4),
+concordia(UPb,type=1,xlim=c(24.9,25.4),
           ylim=c(0.0508,0.0518),ticks=249:254,exterr=TRUE)
 
 dev.new()
-concordia(examples$UPb,type=2,show.age=2,anchor=list(TRUE,0))
+concordia(UPb,type=2,show.age=2,anchor=list(TRUE,0))
 
 }
 \references{

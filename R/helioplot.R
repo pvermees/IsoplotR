@@ -139,10 +139,10 @@
 #' Vermeesch, P., 2010. HelioPlot, and the treatment of overdispersed
 #'     (U-Th-Sm)/He data. Chemical Geology, 271(3), pp.108-111.
 #' @examples
-#' data(examples)
-#' helioplot(examples$UThHe)
+#' attach(examples)
+#' helioplot(UThHe)
 #' dev.new()
-#' helioplot(examples$UThHe,logratio=FALSE)
+#' helioplot(UThHe,logratio=FALSE)
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                       show.numbers=FALSE,alpha=0.05,

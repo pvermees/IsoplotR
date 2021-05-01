@@ -299,8 +299,8 @@ probability density estimates such as histograms, in which such
 components stand out as peaks.
 }
 \examples{
-data(examples)
-cad(examples$DZ,verticals=FALSE,pch=20)
+attach(examples)
+cad(DZ,verticals=FALSE,pch=20)
 }
 \references{
 Vermeesch, P., 2007. Quantitative geomorphology of the

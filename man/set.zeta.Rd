@@ -89,9 +89,9 @@ where \eqn{[{}^{238}U]} may either stand for the
 apatite) or U/Si (for zircon) ratio measurement (Vermeesch, 2017).
 }
 \examples{
-data(examples)
-print(examples$FT1$zeta)
-FT <- set.zeta(examples$FT1,tst=c(250,5))
+attach(examples)
+print(FT1$zeta)
+FT <- set.zeta(FT1,tst=c(250,5))
 print(FT$zeta)
 
 }

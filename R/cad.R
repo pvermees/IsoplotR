@@ -48,8 +48,8 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' @param ... optional arguments to the generic \code{plot} function
 #' 
 #' @examples
-#' data(examples)
-#' cad(examples$DZ,verticals=FALSE,pch=20)
+#' attach(examples)
+#' cad(DZ,verticals=FALSE,pch=20)
 #' @rdname cad
 #' @export
 cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',

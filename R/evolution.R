@@ -124,11 +124,11 @@
 #' @seealso \code{\link{isochron}}
 #'
 #' @examples
-#' data(examples)
-#' evolution(examples$ThU)
+#' attach(examples)
+#' evolution(ThU)
 #'
 #' dev.new()
-#' evolution(examples$ThU,transform=TRUE,
+#' evolution(ThU,transform=TRUE,
 #'           isochron=TRUE,model=1)
 #'
 #' @references Ludwig, K.R. and Titterington, D.M., 1994. Calculation

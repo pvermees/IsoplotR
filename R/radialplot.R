@@ -106,11 +106,11 @@
 #' mixed fission track ages. Nuclear Tracks and Radiation
 #' Measurements, 21(4), pp.459-470.
 #' @examples
-#' data(examples)
-#' radialplot(examples$FT1)
+#' attach(examples)
+#' radialplot(FT1)
 #'
 #' dev.new()
-#' radialplot(examples$LudwigMixture,k='min')
+#' radialplot(LudwigMixture,k='min')
 #' @rdname radialplot
 #' @export
 radialplot <- function(x,...){ UseMethod("radialplot",x) }

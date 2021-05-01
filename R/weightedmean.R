@@ -248,8 +248,8 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
 #' weightedmean(cbind(ages,errs))
 #'
-#' data(examples)
-#' weightedmean(examples$LudwigMean)
+#' attach(examples)
+#' weightedmean(LudwigMean)
 #' @rdname weightedmean
 #' @export
 weightedmean.UPb <- function(x,random.effects=FALSE,

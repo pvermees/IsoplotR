@@ -134,8 +134,8 @@ usually small unless the data are imprecise and/or strongly
 overdispersed.
 }
 \examples{
-data(examples)
-print(central(examples$UThHe)$age)
+attach(examples)
+print(central(UThHe)$age)
 
 }
 \references{

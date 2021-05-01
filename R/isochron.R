@@ -403,13 +403,13 @@
 #' }
 #'
 #' @examples
-#' data(examples)
-#' isochron(examples$RbSr)
+#' attach(examples)
+#' isochron(RbSr)
 #'
-#' fit <- isochron(examples$ArAr,inverse=FALSE,plot=FALSE)
+#' fit <- isochron(ArAr,inverse=FALSE,plot=FALSE)
 #'
 #' dev.new()
-#' isochron(examples$ThU,type=4)
+#' isochron(ThU,type=4)
 #'
 #' @seealso
 #' \code{\link{york}},
