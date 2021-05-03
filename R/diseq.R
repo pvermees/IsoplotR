@@ -12,7 +12,7 @@
 #'
 #' @details
 #' There are three ways to correct for the initial disequilibrium
-#' between the activity of \eqn{{}^{238}}U, \eqn{{}^{234}}Th,
+#' between the activity of \eqn{{}^{238}}U, \eqn{{}^{234}}U,
 #' \eqn{{}^{230}}Th, and \eqn{{}^{226}}Ra; or between \eqn{{}^{235}}U
 #' and \eqn{{}^{231}}Pa:
 #'
