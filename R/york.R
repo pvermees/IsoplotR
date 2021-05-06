@@ -75,7 +75,9 @@
 york <- function(x,alpha=0.05){
     if (ncol(x)==4) x <- cbind(x,0)
     colnames(x) <- c('X','sX','Y','sY','rXY')
-    ab <- stats::lm(x[,'Y'] ~ x[,'X'])$coefficients # initial guess
+    X <- x[,'X']
+    Y <- x[,'Y']
+    ab <- stats::lm(Y ~ X)$coefficients # initial guess
     a <- ab[1]
     b <- ab[2]
     if (any(is.na(ab)))
@@ -88,19 +90,18 @@ york <- function(x,alpha=0.05){
         W <- wX*wY/(wX+b*b*wY-2*b*x[,'rXY']*A)
         Xbar <- sum(W*x[,'X'],na.rm=TRUE)/sum(W,na.rm=TRUE)
         Ybar <- sum(W*x[,'Y'],na.rm=TRUE)/sum(W,na.rm=TRUE)
-        U <- x[,'X']-Xbar
-        V <- x[,'Y']-Ybar
+        U <- X-Xbar
+        V <- Y-Ybar
         B <- W*(U/wY+b*V/wX-(b*U+V)*x[,'rXY']/A)
         b <- sum(W*B*V,na.rm=TRUE)/sum(W*B*U,na.rm=TRUE)
         if ((bold/b-1)^2 < 1e-15) break # convergence reached
     }
     a <- Ybar-b*Xbar
-    X <- Xbar + B
     xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
     u <- X-xbar
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
-    out <- get.york.mswd(x,a,b)
+    out <- list()
     out$fact <- 1
     out$a <- c(a,sa)
     out$b <- c(b,sb)
@@ -108,21 +109,9 @@ york <- function(x,alpha=0.05){
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
     out$type <- 'york'
-    out
-}
-
-get.york.mswd <- function(x,a,b){
-    xy <- get.york.xy(x,a,b)
-    X2 <- 0
-    ns <- length(x[,'X'])
-    for (i in 1:ns){
-        E <- cor2cov2(x[i,'sX'],x[i,'sY'],x[i,'rXY'])
-        X <- matrix(c(x[i,'X']-xy[i,1],x[i,'Y']-xy[i,2]),1,2)
-        if (!any(is.na(X)))
-            X2 <- X2 + X %*% solve(E) %*% t(X)
-    }
-    out <- list()
-    out$df <- ns-2
+    # compute MSWD:
+    X2 <- sum(W*(Y-b*X-a)^2)
+    out$df <- nrow(x)-2
     if (out$df>0){
         out$mswd <- as.numeric(X2/out$df)
         out$p.value <- as.numeric(1-stats::pchisq(X2,out$df))

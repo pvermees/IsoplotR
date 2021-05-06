@@ -6,13 +6,12 @@
 #'
 #' @details \code{IsoplotR} uses the following S3 classes to store
 #'     geochronological data: \code{UPb}, \code{PbPb}, \code{ThPb},
-#'     \code{KCa}, \code{RbSr}, \code{SmNd}, \code{LuHf}, \code{ReOs},
-#'     \code{UThHe}, \code{fissiontracks}, \code{detritals} and
-#'     \code{PD}, where the latter is the parent class of the simple
-#'     parent-daughter chronometers \code{RbSr}, \code{SmNd},
-#'     \code{LuHf} and \code{ReOs}. All these classes have overloaded
-#'     versions of the generic \code{length()} function, \code{`[`}
-#'     subsetting method.
+#'     \code{KCa}, \code{UThHe}, \code{fissiontracks},
+#'     \code{detritals} and \code{PD}, where the latter is the parent
+#'     class of the simple parent-daughter chronometers \code{RbSr},
+#'     \code{SmNd}, \code{LuHf} and \code{ReOs}. All these classes
+#'     have overloaded versions of the generic \code{length()}
+#'     function and \code{`[`} subsetting method.
 #'
 #' \itemize{
 #' 
