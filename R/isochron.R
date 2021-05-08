@@ -721,10 +721,10 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
             plot_PbPb_evolution(from=tmin,to=tmax,inverse=inverse)
             out$ski <- SK.intersection(out,inverse=inverse)
         } else {
-            ski <- NULL
+            out$ski <- NULL
         }
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='Pb-Pb',ski=ski),
-                        xlab=x.lab,ylab=y.lab)
+        tit <- isochrontitle(out,sigdig=sigdig,type='Pb-Pb',ski=out$ski)
+        graphics::title(tit,xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
 }
