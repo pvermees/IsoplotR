@@ -492,10 +492,10 @@ parameter if \code{random.effects=TRUE}). }
 }
 }
 \description{
-Models the data as a Normal distribution with two sources of
+Models the data as a normal distribution with two sources of
 variance.  Estimates the mean and `overdispersion' using the method
-of Maximum Likelihood. Computes the MSWD of a Normal fit without
-overdispersion. Implements a modified Chauvenet Criterion to detect
+of maximum likelihood. Computes the MSWD of a normal fit without
+overdispersion. Implements a modified Chauvenet criterion to detect
 and reject outliers. Only propagates the analytical uncertainty
 associated with decay constants and \eqn{\zeta} and J-factors after
 computing the weighted mean isotopic composition.

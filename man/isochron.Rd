@@ -729,9 +729,10 @@ if \code{model=1}).}
 }
 }
 \description{
-Plots cogenetic Ar-Ar, K-Ca, Pb-Pb, Th-Pb, Rb-Sr, Sm-Nd, Re-Os,
-Lu-Hf, U-Th-He or Th-U data as X-Y scatterplots, fits an isochron
-curve through them using the \code{york} function, and computes the
+Plots cogenetic U-Pb, Ar-Ar, K-Ca, Pb-Pb, Th-Pb, Rb-Sr, Sm-Nd,
+Re-Os, Lu-Hf, U-Th-He or Th-U data as X-Y scatterplots, fits an
+isochron curve through them using the \code{york},
+\code{titterington} or \code{ludwig} function, and computes the
 corresponding isochron age, including decay constant uncertainties.
 }
 \details{

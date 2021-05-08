@@ -70,7 +70,7 @@
 #'
 #' }
 #'
-#' \item\code{UThHe}: a matrix
+#' \item\code{UThHe}: a matrix of He, U, Th (and Sm) measurements
 #'
 #' \item\code{fissiontracks}: a list containing
 #'
@@ -292,7 +292,7 @@ subset.fissiontracks <- function(x,...){
     out
 }
 #' @export
-subset.detritals <- function(x,subset){
+subset.detritals <- function(x,subset,...){
     out <- x[subset]
     class(out) <- class(x)
     out

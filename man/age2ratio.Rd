@@ -59,8 +59,8 @@ ratios.
 \description{
 Groups a set of functions that take one (or more) ages
     (and their uncertainties) as input and produces the U--Pb,
-    Pb--Pb, Ar--Ar, K--Ca, Rb--Sr, Sm--Nd, Lu--Hf, Re--Os or
-    Stacey-Kramers ratios as output.
+    Th--Pb, Pb--Pb, Ar--Ar, K--Ca, Rb--Sr, Sm--Nd, Lu--Hf, Re--Os,
+    concordia or Stacey-Kramers ratios as output.
 }
 \examples{
 ratios <- c('Pb207U235','U238Pb206','Pb207Pb206','Pb208Th232',

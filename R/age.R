@@ -468,8 +468,8 @@ get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #' @title Predict isotopic ratios from ages
 #' @description Groups a set of functions that take one (or more) ages
 #'     (and their uncertainties) as input and produces the U--Pb,
-#'     Pb--Pb, Ar--Ar, K--Ca, Rb--Sr, Sm--Nd, Lu--Hf, Re--Os or
-#'     Stacey-Kramers ratios as output.
+#'     Th--Pb, Pb--Pb, Ar--Ar, K--Ca, Rb--Sr, Sm--Nd, Lu--Hf, Re--Os,
+#'     concordia or Stacey-Kramers ratios as output.
 #' @param tt a scalar or (except when \code{ratio} =
 #'     \code{'Wetherill'}, \code{'Tera-Wasserburg'} or
 #'     \code{'U-Th-Pb'}) vector of ages.
