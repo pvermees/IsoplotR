@@ -509,7 +509,7 @@ plot_radial_points <- function(x,show.points=TRUE,show.numbers=FALSE,
 plot_radial_axes <- function(x,...){
     xs <- stats::na.omit(x$s)
     graphics::Axis(side=2,at=c(-2,0,2),labels=c(-2,0,2),...)
-    if (x$transformation=='arcsin'){
+    if (x$transformation %in% c('arcsin','arctan')){
         plabels <- pretty(c(0,range(1/(2*xs)^2 - 1/2)))
         pticks <- (2*sqrt(plabels+1/2))
     } else {
@@ -578,6 +578,8 @@ t2z <- function(tt,x,zeta,rhoD){
         out <- log(tt+x$offset)
     } else if (identical(x$transformation,'arcsin')){
         out <- att(tt,zeta,rhoD)
+    } else if (identical(x$transformation,'arctan')){
+        out <- atan(sqrt(tt))
     } else if (identical(x$transformation,'linear')){
         out <- tt
     } else if (identical(x$transformation,'sqrt')){
@@ -592,7 +594,7 @@ get.radial.tticks <- function(x){
     } else if (identical(x$transformation,'log')){
         logrange <- log10(c(x$from,x$to)+x$offset)
         out <- grDevices::axisTicks(usr=logrange,log=TRUE)-x$offset
-    } else if (x$transformation=='arcsin'){
+    } else if (x$transformation %in% c('arcsin','arctan')){
         logrange <- log10(c(x$from,x$to))
         out <- grDevices::axisTicks(usr=logrange,log=TRUE)
     }  else if (identical(x$transformation,'sqrt')){
@@ -786,12 +788,12 @@ get.z0 <- function(x,z0=NA,from=NA,to=NA){
     z0
 }
 
-# arcsin/arctan transformation
+# arctan transformation
 att <- function(tt,zeta,rhoD){
     L8 <- lambda('U238')[1]
     atan(sqrt((exp(L8*tt)-1)/(L8*(zeta/1e6)*rhoD/2)))
 }
-# inverse arcsin/arctan transformation
+# inverse arctan transformation
 iatt <- function(z,zeta,rhoD){
     L8 <- lambda('U238')[1]
     log(1+L8*(zeta/2e6)*rhoD*tan(z)^2)/L8
