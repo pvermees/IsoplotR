@@ -146,11 +146,9 @@ mindens <- function(mineral,x=NULL){
 #' weight by MC-ICPMS." International Journal of Mass Spectrometry 245.1
 #' (2005): 36-40.
 #'
-#' \item Re: Selby, D., Creaser, R.A., Stein, H.J., Markey, R.J. and
-#' Hannah, J.L., 2007.  Assessment of the \eqn{^{187}}Re decay
-#' constant by cross calibration of Re-Os molybdenite and U-Pb zircon
-#' chronometers in magmatic ore systems. Geochimica et Cosmochimica
-#' Acta, 71(8), pp.1999-2013.
+#' \item Re: Smoliar, Michael I., Richard J. Walker, and John
+#' W. Morgan. "Re-Os ages of group IIA, IIIA, IVA, and IVB iron meteorites."
+#' Science 271.5252 (1996): 1099-1102.
 #'
 #' \item Ar: Renne, Paul R., et
 #' al. "Response to the comment by WH Schwarz et al. on "Joint
@@ -164,10 +162,9 @@ mindens <- function(mineral,x=NULL){
 #' "IUPAC-IUGS recommendation on the half life of \eqn{^{87}}Rb".
 #' Geochimica et Cosmochimica Acta, 164, pp.382-385.
 #'
-#' \item Lu: Soederlund, Ulf, et
-#' al. "The \eqn{^{176}}Lu decay constant determined by Lu-Hf and
-#' U-Pb isotope systematics of Precambrian mafic intrusions."
-#' Earth and Planetary Science Letters 219.3 (2004): 311-324.
+#' \item Lu: Soederlund, Ulf, et al. "The \eqn{^{176}}Lu decay constant
+#' determined by Lu-Hf and U-Pb isotope systematics of Precambrian mafic
+#' intrusions." Earth and Planetary Science Letters 219.3 (2004): 311-324.
 #' }
 #'
 #' \item Isotopic ratios:

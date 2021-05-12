@@ -720,8 +720,6 @@ chauvenet <- function(X,sX,valid,random.effects=FALSE){
         x <- X
         mu <- fit$mean[1]
         sigma <- sqrt(fit$mean[2]^2 + max(1,fit$mswd)*sX^2)
-        # max(1,mswd) is an ad hoc solution to avoid
-        # dealing with underdispersed datasets
     }
     misfit <- abs(x-mu)/sigma
     prob <- 2*(1-stats::pnorm(misfit))
