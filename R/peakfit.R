@@ -376,7 +376,7 @@ normal.mixtures <- function(x,k,alpha=0.05,...){
     L <- -Inf
     for (j in 1:100){
         lpfiu <- matrix(0,n,k) # log(pii x fiu) taking logs enhances stability 
-        for (i in 1:k){        # compared to Galbraiths orignal formulation
+        for (i in 1:k){        # compared to Galbraith's original formulation
             lpfiu[,i] <- log(pii[i]) + stats::dnorm(yu,betai[i]*xu,1,log=TRUE)
         }
         piu <- matrix(0,n,k)
@@ -409,7 +409,7 @@ normal.mixtures <- function(x,k,alpha=0.05,...){
     out$L <- L
     out
 }
-# uses sum-of-logs identity from Wikipedia
+# uses log-of-sums identity from Wikipedia
 get.L.normal.mixture <- function(lpfiu){
     if (ncol(lpfiu)<2){
         fu <- lpfiu
@@ -418,7 +418,7 @@ get.L.normal.mixture <- function(lpfiu){
         a0 <- subset(sorted.lpfiu,select=1)
         ai <- subset(sorted.lpfiu,select=-1)
         aia0 <- apply(ai,2,'-',a0)
-        fu <- a0 + log(1 + sum(exp(aia0)))
+        fu <- a0 + log(1 + rowSums(exp(aia0)))
     }
     sum(fu)
 }
