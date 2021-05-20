@@ -528,34 +528,42 @@ BIC_fit <- function(x,max.k,...){
 }
 
 min_age_model <- function(zs,alpha=0.05,np=4){
-    imin <- which.min(zs[,1])
-    mz <- zs[imin,1]
+    # maps the parameters from -Inf/+Inf to model space
+    mappar <- function(par,Mz){
+        np <- length(par)
+        gam <- par[1]
+        prop <- exp(par[2])/(1+exp(par[2]))
+        sig <- exp(par[3])
+        if (np<4) mu <- gam
+        else mu <- gam + (Mz-gam)*exp(par[4])/(1+exp(par[4]))
+        c(gam,prop,sig,mu)
+    }
+    # computes the log-likelihood function using the transformed parameters
+    LL <- function(par,zs,Mz){
+        get.minage.L(pars=mappar(par,Mz),zs=zs)
+    }
+    mz <- min(zs[,1])
     Mz <- max(zs[,1])
     cfit <- continuous_mixture(zs[,1],zs[,2])
-    ms <- cfit$sigma/5
-    Ms <- diff(range(zs[,1]))
-    LL <- function(par,zs,Mz){
-        gam <- par[1]
-        prop <- par[2]
-        sig <- par[3]
-        if (length(par)<4) mu <- gam
-        else mu <- gam + (Mz-gam)*par[4]
-        get.minage.L(pars=c(gam,prop,sig,mu),zs=zs)
-    }
-    dz <- min(10*zs[imin,2],Mz-mz)
-    fit <- stats::optim(rep(0,np),LL,method='L-BFGS-B',zs=zs,Mz=Mz,
-                        lower=c(mz,0.01,ms,0),upper=c(mz+dz,0.99,Ms,1))
-    jpar <- fit$par # Jeffreys parameters!
-    H <- stats::optimHess(jpar,LL,zs=zs,Mz=Mz)
-    jE <- solve(H)
-    par <- jpar
+    init <- rep(0,np)
+    init[1] <- mz
+    init[2] <- 0
+    init[3] <- log(cfit$sigma)
+    fit <- stats::optim(init,LL,method='L-BFGS-B',zs=zs,Mz=Mz,
+                        lower=init+c(0,-10,-2,-10)[1:np],
+                        upper=init+c(Mz-mz,10,+2,10)[1:np])
+    H <- stats::optimHess(fit$par,LL,zs=zs,Mz=Mz)
+    lE <- solve(H)
+    par <- mappar(fit$par,Mz)
+    # propagate the uncertainties from -Inf/+Inf to model space
     J <- diag(np)
+    J[2,2] <- exp(fit$par[2])/(1+exp(fit$par[2]))^2
+    J[3,3] <- exp(fit$par[3])
     if (np==4){
-        par[4] <- jpar[1] + (Mz-jpar[1])*jpar[4]
-        J[4,1] <- 1-jpar[4]
-        J[4,4] <- Mz-jpar[1]
+        J[4,1] <- 1-exp(fit$par[4])/(1+exp(fit$par[4]))
+        J[4,4] <- (Mz-par[1])*exp(fit$par[4])/(1+exp(fit$par[4]))^2
     }
-    E <- J %*% jE %*% t(J)
+    E <- J %*% lE %*% t(J)
     if (E[1,1]<0 & np==4){
         out <- min_age_model(zs=zs,alpha=alpha,np=3)
     } else {

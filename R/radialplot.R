@@ -126,7 +126,7 @@ radialplot.default <- function(x,from=NA,to=NA,z0=NA,
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     x2calc <- clear(x,hide,omit)
-    peaks <- peakfit(x2calc,k=k,sigdig=sigdig)
+    peaks <- peakfit(x2calc,k=k,sigdig=sigdig,alpha=alpha)
     markers <- c(markers,peaks$peaks['t',])
     radial_helper(x,from=from,to=to,z0=z0,
                   transformation=transformation,
@@ -156,7 +156,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
-    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig)
+    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig,alpha=alpha)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x2plot,z0=z0,from=from,to=to,transformation=transformation)
     pcol <- set.ellipse.colours(ns=ns,levels=levels[plotit],
@@ -420,7 +420,7 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
     peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig,
                      i2i=i2i,type=type,cutoff.76=cutoff.76,
                      cutoff.disc=cutoff.disc,common.Pb=common.Pb,
-                     detritus=detritus)
+                     detritus=detritus,alpha=alpha)
     markers <- c(markers,peaks$peaks['t',])
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,omit4c=unique(c(hide,omit)),
