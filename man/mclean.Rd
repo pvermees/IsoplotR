@@ -4,7 +4,7 @@
 \alias{mclean}
 \title{Predict disequilibrium concordia compositions}
 \usage{
-mclean(tt = 0, d = diseq(), exterr = FALSE)
+mclean(tt = 0, d = diseq(), exterr = FALSE, i = 1)
 }
 \arguments{
 \item{tt}{the age of the sample}
@@ -13,6 +13,8 @@ mclean(tt = 0, d = diseq(), exterr = FALSE)
 
 \item{exterr}{propagate the uncertainties associated with decay
 constants and the \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.}
+
+\item{i}{aliquot to be used, if \code{d$ThU$option=3}.}
 }
 \value{
 a list containing the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,

@@ -62,6 +62,10 @@ dating approach.
 \code{ThU}: an object of class \code{ThU} containing a synthetic
 `Osmond-type' dataset from Titterington and Ludwig (1994).
 
+\code{MountTom}: an object of class \code{other} containing a
+collection of zircon fission track ages and errors from Brandon
+(1992).
+
 \code{LudwigMean}: an object of class \code{other} containing a
 collection of \eqn{^{206}}Pb/\eqn{^{238}}U-ages and errors of the
 example dataset by Ludwig (2003).
@@ -103,6 +107,9 @@ weightedmean(LudwigMean)
 
 }
 \references{
+Brandon, M.T., 1992. Decomposition of fission-track grain-age
+distributions. American Journal of Science, 292(8), pp.535-564.
+
 Barfod, G.H., Albarede, F., Knoll, A.H., Xiao, S., Telouk, P.,
 Frei, R. and Baker, J., 2002. New Lu-Hf and Pb-Pb age constraints on
 the earliest animal fossils. Earth and Planetary Science Letters, 201(1),

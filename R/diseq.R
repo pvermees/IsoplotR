@@ -298,6 +298,7 @@ measured.disequilibrium <- function(d=diseq()){
 #' @param d an object of class \link{diseq}
 #' @param exterr propagate the uncertainties associated with decay
 #'     constants and the \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
+#' @param i aliquot to be used, if \code{d$ThU$option=3}.
 #'
 #' @return
 #' a list containing the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
@@ -319,7 +320,7 @@ measured.disequilibrium <- function(d=diseq()){
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' mclean(tt=2,d=d)
 #' @export
-mclean <- function(tt=0,d=diseq(),exterr=FALSE){
+mclean <- function(tt=0,d=diseq(),exterr=FALSE,i=1){
     out <- list()
     l38 <- lambda('U238')[1]
     l34 <- lambda('U234')[1]*1000
@@ -353,10 +354,10 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         if (d$U48$option<2){      # initial 234U
             if (d$U48$option==1) d$n0['U234'] <- d$U48$x/l34
             if (d$ThU$option==1){ # initial 230Th
-                d$n0['Th230'] <- d$ThU$x/l30
+                d$n0['Th230'] <- d$ThU$x[i]/l30
             } else if (d$ThU$option==2){ # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
-                nt['Th230'] <- d$ThU$x*nt['U238']*l38/l30 # overwrite
+                nt['Th230'] <- d$ThU$x[i]*nt['U238']*l38/l30 # overwrite
                 d$n0['Th230'] <- reverse(tt=tt,mexp=mexp.8405(),nt=nt)['Th230']
             }
         } else {                 # measured 234U
@@ -364,11 +365,11 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 nt <- forward(tt=tt,d=d)[c('U238','U234','U235')]
                 nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
                 d$n0['U234'] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234']
-                if (d$ThU$option==1) d$n0['Th230'] <- d$ThU$x/l30
+                if (d$ThU$option==1) d$n0['Th230'] <- d$ThU$x[i]/l30
             } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
                 nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
-                nt['Th230'] <- d$ThU$x*nt['U238']*l38/l30 # overwrite
+                nt['Th230'] <- d$ThU$x[i]*nt['U238']*l38/l30 # overwrite
                 d$n0[c('U234','Th230')] <-
                     reverse(tt=tt,mexp=mexp.8405(),nt=nt)[c('U234','Th230')]
             }
