@@ -102,6 +102,8 @@ mindens <- function(mineral,x=NULL){
 #' existing value.
 #' 
 #' @param fname the path of a \code{.json} file
+#'
+#' @param reset logical. If \code{TRUE}, restores the default values
 #' 
 #' @return if \code{setting=NA} and \code{fname=NA}, returns a
 #'     \code{.json} string
@@ -240,29 +242,33 @@ mindens <- function(mineral,x=NULL){
 #' settings('iratio','U238U235',138.88,0)
 #' print(settings('iratio','U238U235'))
 #' @export
-settings <- function(setting=NA,...,fname=NA){
-    args <- list(...)
-    nargs <- length(args)
-    if (!is.na(fname)){
-        prefs <- fromJSON(file=fname)
-        .IsoplotR$lambda <- prefs$lambda
-        .IsoplotR$iratio <- prefs$iratio
-        .IsoplotR$imass <- prefs$imass
-        .IsoplotR$etchfact <- prefs$etchfact
-        .IsoplotR$tracklength <- prefs$tracklength
-        .IsoplotR$mindens <- prefs$mindens
-    } else if (!is.na(setting) & (nargs>0)){
-        if (nargs==1){
-            Rcommand <- paste0(setting,"('",args[[1]],"')")
-            return(eval(parse(text=Rcommand)))
-        } else if (nargs==2) {
-            Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],")")
-        } else if (nargs==3) {
-            Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],",",args[[3]],")")
-        }
-        eval(parse(text=Rcommand))
+settings <- function(setting=NA,...,fname=NA,reset=FALSE){
+    if (reset){
+        settings(fname=system.file("constants.json",package="IsoplotR"))
     } else {
-        preferences <- as.list(.IsoplotR)
-        return(toJSON(preferences))
+        args <- list(...)
+        nargs <- length(args)
+        if (!is.na(fname)){
+            prefs <- fromJSON(file=fname)
+            .IsoplotR$lambda <- prefs$lambda
+            .IsoplotR$iratio <- prefs$iratio
+            .IsoplotR$imass <- prefs$imass
+            .IsoplotR$etchfact <- prefs$etchfact
+            .IsoplotR$tracklength <- prefs$tracklength
+            .IsoplotR$mindens <- prefs$mindens
+        } else if (!is.na(setting) & (nargs>0)){
+            if (nargs==1){
+                Rcommand <- paste0(setting,"('",args[[1]],"')")
+                return(eval(parse(text=Rcommand)))
+            } else if (nargs==2) {
+                Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],")")
+            } else if (nargs==3) {
+                Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],",",args[[3]],")")
+            }
+            eval(parse(text=Rcommand))
+        } else {
+            preferences <- as.list(.IsoplotR)
+            return(toJSON(preferences))
+        }
     }
 }
