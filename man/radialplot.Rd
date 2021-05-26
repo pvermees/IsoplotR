@@ -321,7 +321,7 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
-  i2i = TRUE,
+  i2i = FALSE,
   alpha = 0.05,
   detritus = 0,
   hide = NULL,
@@ -496,16 +496,18 @@ where \eqn{x_i = 1/s[z_i]} and \eqn{y_i = (z_i-z_\circ)/s[z_i]},
 where \eqn{z_\circ} is some reference value such as the mean. The
 slope of a line connecting the origin of this scatter plot with any
 of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
-the date \eqn{t_i}.  These dates can be more easily visualised by
-drawing a radial scale at some convenient distance from the origin
-and annotating it with labelled ticks at the appropriate
-angles. While the angular position of each data point represents
-the date, its horizontal distance from the origin is proportional
-to the precision. Imprecise measurements plot on the left hand side
-of the radial plot, whereas precise age determinations are found
-further towards the right. Thus, radial plots allow the observer to
-assess both the magnitude and the precision of quantitative data in
-one glance.
+the date \eqn{t_i}.
+
+These dates can be more easily visualised by drawing a radial scale
+at some convenient distance from the origin and annotating it with
+labelled ticks at the appropriate angles. While the angular
+position of each data point represents the date, its horizontal
+distance from the origin is proportional to the
+precision. Imprecise measurements plot on the left hand side of the
+radial plot, whereas precise age determinations are found further
+towards the right. Thus, radial plots allow the observer to assess
+both the magnitude and the precision of quantitative data in one
+glance.
 }
 \examples{
 attach(examples)

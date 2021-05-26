@@ -60,6 +60,18 @@
 #' the data do not exhibit any overdispersion, then the heuristic
 #' outlier detection method is equivalent to Ludwig (2003)'s `2-sigma'
 #' method.
+#'
+#' Warning: the uncertainty budget of the weighted mean does not
+#' include the uncertainty of the initial daughter correction (if
+#' any). This uncertainty is neither a purely systematic nor a purely
+#' random uncertainty and cannot easily be propagated with
+#' conventional geochronological data processing algorithms. This
+#' caveat is especially pertinent to chronometers whose initial
+#' daughter composition is determined by isochron regression. You may
+#' note that the uncertainties of the weighted mean are usually much
+#' smaller than those of the isochron. In this case the isochron
+#' errors are more meaningful, and the weighted mean plot should just
+#' be used to inspect the residuals of the data around the isochron.
 #' 
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
@@ -591,7 +603,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
     out
 }
 
-wtdmean.title <- function(fit,sigdig=2,units='',i2i=FALSE,...){
+wtdmean.title <- function(fit,sigdig=2,units='',...){
     rounded.mean <- roundit(fit$mean['t'],
                             fit$mean[c('s[t]','ci[t]')],
                             sigdig=sigdig)
@@ -637,10 +649,6 @@ wtdmean.title <- function(fit,sigdig=2,units='',i2i=FALSE,...){
                                        sigdig=sigdig)))
     mymtext(line1,line=line1line,...)
     mymtext(line2,line=line2line,...)
-    if (i2i){
-        mymtext('(error estimates do not include isochron uncertainty)',
-                line=line1line+1,...)
-    }
 }
 
 plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
@@ -701,7 +709,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                        xright=i+0.4,ytop=x[i]+fact*sx[i],col=col)
     }
     colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
-    graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units,i2i=i2i))
+    graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units))
 }
 
 # prune the data if necessary

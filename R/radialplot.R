@@ -20,16 +20,18 @@
 #' where \eqn{z_\circ} is some reference value such as the mean. The
 #' slope of a line connecting the origin of this scatter plot with any
 #' of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
-#' the date \eqn{t_i}.  These dates can be more easily visualised by
-#' drawing a radial scale at some convenient distance from the origin
-#' and annotating it with labelled ticks at the appropriate
-#' angles. While the angular position of each data point represents
-#' the date, its horizontal distance from the origin is proportional
-#' to the precision. Imprecise measurements plot on the left hand side
-#' of the radial plot, whereas precise age determinations are found
-#' further towards the right. Thus, radial plots allow the observer to
-#' assess both the magnitude and the precision of quantitative data in
-#' one glance.
+#' the date \eqn{t_i}.
+#'
+#' These dates can be more easily visualised by drawing a radial scale
+#' at some convenient distance from the origin and annotating it with
+#' labelled ticks at the appropriate angles. While the angular
+#' position of each data point represents the date, its horizontal
+#' distance from the origin is proportional to the
+#' precision. Imprecise measurements plot on the left hand side of the
+#' radial plot, whereas precise age determinations are found further
+#' towards the right. Thus, radial plots allow the observer to assess
+#' both the magnitude and the precision of quantitative data in one
+#' glance.
 #' 
 #' @param x Either an \code{[nx2]} matix of (transformed) values z
 #'     and their standard errors s
@@ -438,9 +440,8 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                                    cutoff.76=cutoff.76,type=type)
         fit$age[3] <- fit$age[2]*nfact(alpha)
     }
-    I2I <- (i2i|common.Pb==2|detritus==1)
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
-                                 units=units,ntit=get.ntit(tt[,1]),i2i=I2I))
+                                 units=units,ntit=get.ntit(tt[,1])))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -802,7 +803,7 @@ iatt <- function(z,zeta,rhoD){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
-                         ntit=paste0('n=',fit$df+2),i2i=FALSE,...){
+                         ntit=paste0('n=',fit$df+2),...){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
     line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'('*n*')',
@@ -816,9 +817,6 @@ radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
     mymtext(line1,line=2,...)
     mymtext(line2,line=1,...)
     mymtext(line3,line=0,...)
-    if (i2i){
-        mymtext('(error estimates do not include isochron uncertainty)',line=3,...)
-    }
 }
 
 get.offset <- function(x,from=NA){

@@ -550,6 +550,18 @@ Chauvenet criterion. If the analytical uncertainties are large and
 the data do not exhibit any overdispersion, then the heuristic
 outlier detection method is equivalent to Ludwig (2003)'s `2-sigma'
 method.
+
+Warning: the uncertainty budget of the weighted mean does not
+include the uncertainty of the initial daughter correction (if
+any). This uncertainty is neither a purely systematic nor a purely
+random uncertainty and cannot easily be propagated with
+conventional geochronological data processing algorithms. This
+caveat is especially pertinent to chronometers whose initial
+daughter composition is determined by isochron regression. You may
+note that the uncertainties of the weighted mean are usually much
+smaller than those of the isochron. In this case the isochron
+errors are more meaningful, and the weighted mean plot should just
+be used to inspect the residuals of the data around the isochron.
 }
 \examples{
 ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)

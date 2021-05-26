@@ -23,6 +23,11 @@
 #' usually small unless the data are imprecise and/or strongly
 #' overdispersed.
 #'
+#' Note: the uncertainty budget of the central age does not include
+#' the uncertainty of the initial daughter correction (if any), for
+#' the same reasons as discussed under the \code{\link{weightedmean}}
+#' function.
+#' 
 #' @param x an object of class \code{UThHe} or \code{fissiontracks},
 #'     OR a 2-column matrix with (strictly positive) values and
 #'     uncertainties
