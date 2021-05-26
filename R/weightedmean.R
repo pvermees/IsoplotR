@@ -60,6 +60,18 @@
 #' the data do not exhibit any overdispersion, then the heuristic
 #' outlier detection method is equivalent to Ludwig (2003)'s `2-sigma'
 #' method.
+#'
+#' Warning: the uncertainty budget of the weighted mean does not
+#' include the uncertainty of the initial daughter correction (if
+#' any). This uncertainty is neither a purely systematic nor a purely
+#' random uncertainty and cannot easily be propagated with
+#' conventional geochronological data processing algorithms. This
+#' caveat is especially pertinent to chronometers whose initial
+#' daughter composition is determined by isochron regression. You may
+#' note that the uncertainties of the weighted mean are usually much
+#' smaller than those of the isochron. In this case the isochron
+#' errors are more meaningful, and the weighted mean plot should just
+#' be used to inspect the residuals of the data around the isochron.
 #' 
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
@@ -511,12 +523,13 @@ weightedmean_helper <- function(x,random.effects=FALSE,
         out <- add.exterr.to.wtdmean(x,fit,cutoff.76=cutoff.76,type=type)
     else out <- fit
     if (plot){
+        I2I <- (i2i|common.Pb==2|detritus==1)
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,
                           levels=levels,clabel=clabel,
                           rect.col=rect.col,outlier.col=outlier.col,
                           sigdig=sigdig,alpha=alpha,units=units,
                           ranked=ranked,hide=hide,omit=omit,
-                          omit.col=omit.col,...)
+                          omit.col=omit.col,i2i=I2I,...)
     }
     invisible(out)
 }
@@ -642,7 +655,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               alpha=0.05,units='',ranked=FALSE,
-                              hide=NULL,omit=NULL,omit.col=NA,...){
+                              hide=NULL,omit=NULL,omit.col=NA,i2i=FALSE,...){
     NS <- length(X)
     plotit <- (1:NS)%ni%hide
     calcit <- (1:NS)%ni%c(hide,omit)

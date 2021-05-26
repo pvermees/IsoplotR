@@ -832,7 +832,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
         sl5 <- lambda('U235')[2]
         if (x>-1) t.init <- log(1+x)/l5 else t.init <- 0
         J <- matrix(0,1,2)
-        if (d$equilibrium){
+        if (d$equilibrium | d$PaU$option<1){
             t.75 <- t.init
             J[1,1] <- 1/(l5*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5

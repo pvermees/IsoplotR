@@ -20,16 +20,18 @@
 #' where \eqn{z_\circ} is some reference value such as the mean. The
 #' slope of a line connecting the origin of this scatter plot with any
 #' of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
-#' the date \eqn{t_i}.  These dates can be more easily visualised by
-#' drawing a radial scale at some convenient distance from the origin
-#' and annotating it with labelled ticks at the appropriate
-#' angles. While the angular position of each data point represents
-#' the date, its horizontal distance from the origin is proportional
-#' to the precision. Imprecise measurements plot on the left hand side
-#' of the radial plot, whereas precise age determinations are found
-#' further towards the right. Thus, radial plots allow the observer to
-#' assess both the magnitude and the precision of quantitative data in
-#' one glance.
+#' the date \eqn{t_i}.
+#'
+#' These dates can be more easily visualised by drawing a radial scale
+#' at some convenient distance from the origin and annotating it with
+#' labelled ticks at the appropriate angles. While the angular
+#' position of each data point represents the date, its horizontal
+#' distance from the origin is proportional to the
+#' precision. Imprecise measurements plot on the left hand side of the
+#' radial plot, whereas precise age determinations are found further
+#' towards the right. Thus, radial plots allow the observer to assess
+#' both the magnitude and the precision of quantitative data in one
+#' glance.
 #' 
 #' @param x Either an \code{[nx2]} matix of (transformed) values z
 #'     and their standard errors s
@@ -400,7 +402,7 @@ radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                            transformation='log',show.numbers=FALSE,
                            pch=21,levels=NA,clabel="",
                            bg=c("yellow","red"),col='black',markers=NULL,
-                           k=0,i2i=TRUE,alpha=0.05,detritus=0,
+                           k=0,i2i=FALSE,alpha=0.05,detritus=0,
                            hide=NULL,omit=NULL,omit.col=NA,...){
     age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,

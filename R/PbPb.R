@@ -1,25 +1,28 @@
-PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,omit4c=NULL){
+PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,
+                     omit4c=NULL,projerr=FALSE){
+    y <- data2york(x,inverse=TRUE)
     if (common.Pb == 0){
-        y <- data2york(x,inverse=TRUE)
         PbPb <- y[,c('Y','sY')]
     } else {
-        y <- data2york(x,inverse=TRUE)
         if (common.Pb == 1){
-            b <- settings('iratio','Pb207Pb204')[1]
+            b <- settings('iratio','Pb207Pb204')
         } else if (common.Pb == 2) {
-            b <- regression(y,model=1,omit=omit4c)$b[1]
+            b <- regression(y,model=1,omit=omit4c)$b
         } else {
             stop('illegal common.Pb option')
         }
         ns <- nrow(y)
         PbPb <- matrix(0,ns,2)
-        PbPb[,1] <- y[,'Y'] - b*y[,'X']
-        J1 <- -b
+        PbPb[,1] <- y[,'Y'] - b[1]*y[,'X']
+        J1 <- -b[1]
         J2 <- rep(1,ns)
+        J3 <- -y[,'X']
         E11 <- y[,'sX']^2
         E22 <- y[,'sY']^2
         E12 <- y[,'sX']*y[,'sY']*y[,'rXY']
-        PbPb[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
+        E33 <- b[2]^2
+        if (projerr) PbPb[,2] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
+        else PbPb[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
     }
     PbPb2t(PbPb,exterr=exterr,sigdig=sigdig,i=i)
 }

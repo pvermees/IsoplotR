@@ -132,6 +132,11 @@ and the true ages are assumed to follow lognormal distributions.
 The difference between the central age and the weighted mean age is
 usually small unless the data are imprecise and/or strongly
 overdispersed.
+
+Note: the uncertainty budget of the central age does not include
+the uncertainty of the initial daughter correction (if any), for
+the same reasons as discussed under the \code{\link{weightedmean}}
+function.
 }
 \examples{
 attach(examples)

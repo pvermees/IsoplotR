@@ -30,8 +30,9 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
 
 # i2i = isochron to intercept
 # bratio = branching ratio
+# projerr = isochron projection error
 PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
-                   i2i=TRUE,bratio=1,omit4c=NULL,...){
+                   i2i=TRUE,bratio=1,omit4c=NULL,projerr=FALSE,...){
     ns <- length(x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
@@ -43,16 +44,19 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
         DP[,1] <- 1/(y[,'X'] - y[,'Y']/fit$b[1])
         J1 <- -DP[,1]^2
         J2 <- (DP[,1]^2)/fit$b[1]
+        J3 <- y[,'Y']/(y[,'Y']^2 - (fit$b[1]*y[,'X'])^2)
         E11 <- y[,'sX']^2
         E22 <- y[,'sY']^2
         E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
-        DP[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
+        E33 <- fit$b[2]^2
+        if (projerr) DP[,2] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
+        else DP[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
     } else {
         initial <- get.nominal.initials(x)
         dat <- data2york(x,exterr=exterr)
         dat[,'Y'] <- dat[,'Y'] - initial$y0
+        if (projerr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
         DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
-        if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
     }
     tt <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
                      nuclide,exterr=exterr,bratio=bratio)

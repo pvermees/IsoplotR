@@ -22,7 +22,7 @@ age(x, ...)
 \method{age}{default}(
   x,
   method = "U238-Pb206",
-  exterr = TRUE,
+  exterr = FALSE,
   J = c(NA, NA),
   zeta = c(NA, NA),
   rhoD = c(NA, NA),
@@ -33,7 +33,7 @@ age(x, ...)
 \method{age}{UPb}(
   x,
   type = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   i = NA,
   sigdig = NA,
   common.Pb = 0,
@@ -41,11 +41,38 @@ age(x, ...)
   ...
 )
 
-\method{age}{PbPb}(x, isochron = TRUE, common.Pb = 2, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{PbPb}(
+  x,
+  isochron = TRUE,
+  common.Pb = 2,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 
-\method{age}{ArAr}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{ArAr}(
+  x,
+  isochron = FALSE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 
-\method{age}{KCa}(x, isochron = FALSE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{KCa}(
+  x,
+  isochron = FALSE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 
 \method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NA, sigdig = NA, ...)
 
@@ -55,22 +82,67 @@ age(x, ...)
   x,
   isochron = FALSE,
   i2i = TRUE,
-  exterr = TRUE,
+  exterr = FALSE,
   i = NA,
   sigdig = NA,
   detritus = 0,
   ...
 )
 
-\method{age}{ThPb}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{ThPb}(
+  x,
+  isochron = TRUE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 
-\method{age}{ReOs}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{ReOs}(
+  x,
+  isochron = TRUE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 
-\method{age}{SmNd}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{SmNd}(
+  x,
+  isochron = TRUE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 
-\method{age}{RbSr}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{RbSr}(
+  x,
+  isochron = TRUE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 
-\method{age}{LuHf}(x, isochron = TRUE, i2i = TRUE, exterr = TRUE, i = NA, sigdig = NA, ...)
+\method{age}{LuHf}(
+  x,
+  isochron = TRUE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NA,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{can be:
@@ -218,6 +290,13 @@ the common-Pb correction.}
 should be considered separately (\code{isochron=FALSE}) or an
 isochron age should be calculated from all analyses together
 (\code{isochron=TRUE}).}
+
+\item{projerr}{logical. If \code{TRUE}, propagates the uncertainty
+of the non-radiogenic isotope correction (the `projection
+error') into the age uncertainty. Note that the resulting
+single grain age uncertainties may be strongly correlated with
+each other, but these error correlations are not reported in
+the output.}
 
 \item{i2i}{`isochron to intercept': calculates the initial (aka
 `inherited', `excess', or `common')
