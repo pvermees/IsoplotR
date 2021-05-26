@@ -438,8 +438,9 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                                    cutoff.76=cutoff.76,type=type)
         fit$age[3] <- fit$age[2]*nfact(alpha)
     }
+    I2I <- (i2i|common.Pb==2|detritus==1)
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
-                                 units=units,ntit=get.ntit(tt[,1])))
+                                 units=units,ntit=get.ntit(tt[,1]),i2i=I2I))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -801,7 +802,7 @@ iatt <- function(z,zeta,rhoD){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
-                         ntit=paste0('n=',fit$df+2),...){
+                         ntit=paste0('n=',fit$df+2),i2i=FALSE,...){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
     line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'('*n*')',
@@ -815,6 +816,9 @@ radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
     mymtext(line1,line=2,...)
     mymtext(line2,line=1,...)
     mymtext(line3,line=0,...)
+    if (i2i){
+        mymtext('(error estimates do not include isochron uncertainty)',line=3,...)
+    }
 }
 
 get.offset <- function(x,from=NA){

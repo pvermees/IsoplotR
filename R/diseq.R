@@ -484,8 +484,7 @@ get.76.misfit <- function(tt,x,d=diseq()){
     get.5678.misfit(obs=x,pred)
 }
 get.5678.misfit <- function(obs,pred){
-    smallnum <- 1e-4
-    abs(log(obs+smallnum) - log(pred+smallnum))
+    abs(log(obs+1) - log(pred+1)) # +1 for robustness to negative values
 }
 
 meas.diseq.maxt <- function(d){
