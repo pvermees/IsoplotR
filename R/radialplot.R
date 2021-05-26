@@ -400,7 +400,7 @@ radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                            transformation='log',show.numbers=FALSE,
                            pch=21,levels=NA,clabel="",
                            bg=c("yellow","red"),col='black',markers=NULL,
-                           k=0,i2i=TRUE,alpha=0.05,detritus=0,
+                           k=0,i2i=FALSE,alpha=0.05,detritus=0,
                            hide=NULL,omit=NULL,omit.col=NA,...){
     age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,
