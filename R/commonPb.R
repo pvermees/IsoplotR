@@ -181,7 +181,7 @@ Pb0corr <- function(x,option=3,omit4c=NULL){
     out
 }
 
-correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
+correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,projerr=TRUE){
     tw <- tera.wasserburg(x,i)
     m86 <- tw$x['U238Pb206']
     m76 <- tw$x['Pb207Pb206']
@@ -191,7 +191,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
     r76 <- cctw$x['Pb207Pb206']
     cnames <- c('U238Pb206','Pb207Pb206') 
     covmat <- tw$cov[cnames,cnames]
-    if (project.err){
+    if (projerr){
         f <- (m76-r76)/(c76-r76)
         E <- covmat/((1-f)^2)
     } else {
@@ -205,13 +205,13 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,project.err=TRUE){
                     'Pb207Pb206','errPb207Pb206','rhoXY')
     out
 }
-correct.common.Pb.with.204 <- function(x,i,c64,c74,c48=NULL,project.err=TRUE){
+correct.common.Pb.with.204 <- function(x,i,c64,c74,c48=NULL,projerr=TRUE){
     U <- iratio('U238U235')[1]
     wd <- wetherill(x,i) # 75, 68, 48
     if (is.null(c48)) c48 <- wd$x['Pb204U238']
     r0735 <- wd$x['Pb207U235'] - U*c48*c74
     r0638 <- wd$x['Pb206U238'] - c48*c64
-    if (project.err){
+    if (projerr){
         Jw <- matrix(0,2,3)
         Jw[1,1] <- 1
         Jw[1,3] <- -U*c74
@@ -228,7 +228,7 @@ correct.common.Pb.with.204 <- function(x,i,c64,c74,c48=NULL,project.err=TRUE){
     out
 }
 correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,
-                                       c0832=NULL,project.err=TRUE){
+                                       c0832=NULL,projerr=TRUE){
     U <- iratio('U238U235')[1]
     wd <- wetherill(x,i) # 0735, 0638, 0832, 3238
     if (is.null(c0832)){
@@ -241,7 +241,7 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,
     r0735 <- wd$x['Pb207U235'] - c0832*wd$x['Th232U238']*U/c0807
     r0638 <- wd$x['Pb206U238'] - c0832*wd$x['Th232U238']/c0806
     r3238 <- wd$x['Th232U238']
-    if (project.err){
+    if (projerr){
         J <- diag(4)
         J[1,3] <- -wd$x['Th232U238']*U/c0807
         J[2,3] <- -wd$x['Th232U238']/c0806
@@ -318,7 +318,7 @@ common.Pb.isochron <- function(x,omit=NULL){
         c76 <- m76 - slope*m86
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76[i],lower=TRUE,
-                                                     project.err=FALSE)
+                                                     projerr=FALSE)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
@@ -329,7 +329,7 @@ common.Pb.isochron <- function(x,omit=NULL){
         c48 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c64,c74=c74,
-                                                  c48=c48[i],project.err=FALSE)
+                                                  c48=c48[i],projerr=FALSE)
         }
     } else if (x$format%in%c(7,8)){
         out <- matrix(0,ns,14)
@@ -341,7 +341,7 @@ common.Pb.isochron <- function(x,omit=NULL){
         c0832 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,c0807=c0807,
-                                                  c0832=c0832[i],project.err=FALSE)
+                                                  c0832=c0832[i],projerr=FALSE)
         }
     }
     out
