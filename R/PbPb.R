@@ -1,10 +1,9 @@
 PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,
                      omit4c=NULL,projerr=FALSE){
+    y <- data2york(x,inverse=TRUE)
     if (common.Pb == 0){
-        y <- data2york(x,inverse=TRUE)
         PbPb <- y[,c('Y','sY')]
     } else {
-        y <- data2york(x,inverse=TRUE)
         if (common.Pb == 1){
             b <- settings('iratio','Pb207Pb204')
         } else if (common.Pb == 2) {
