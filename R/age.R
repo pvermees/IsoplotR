@@ -297,6 +297,10 @@ age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
     else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
     out
 }
+
+#' @param projerr logical. If \code{TRUE}, propagates the uncertainty
+#'     of the isochron slope into the age uncertainty. Only used if
+#'     \code{i2i=TRUE}.
 #' @rdname age
 #' @export
 age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
@@ -356,37 +360,44 @@ age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
 }
 #' @rdname age
 #' @export
-age.ThPb <-function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.ThPb <-function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
+                    i=NA,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Th232',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,...)
+           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
-age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
+                     i=NA,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Re187',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,...)
+           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
-age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
+                     i=NA,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Sm147',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,...)
+           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
-age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
+                     i=NA,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Rb87',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,...)
+           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
-age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
+                     i=NA,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Lu176',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,...)
+           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
 }
-age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,
+                   exterr=FALSE,i=NA,sigdig=NA,projerr=FALSE,...){
     if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig)
-    else out <- PD.age(x,nuclide,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
+    else out <- PD.age(x,nuclide,exterr=exterr,i=i,
+                       sigdig=sigdig,i2i=i2i,projerr=projerr,...)
     out
 }
 # tt and st are the age and error (scalars produced by peakfit or weightedmean)
