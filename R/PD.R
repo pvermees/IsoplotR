@@ -55,8 +55,8 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
         initial <- get.nominal.initials(x)
         dat <- data2york(x,exterr=exterr)
         dat[,'Y'] <- dat[,'Y'] - initial$y0
+        if (projerr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
         DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
-        if (exterr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
     }
     tt <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
                      nuclide,exterr=exterr,bratio=bratio)

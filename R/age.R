@@ -260,14 +260,21 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NA,
     }
     out
 }
+#' @param projerr logical. If \code{TRUE}, propagates the uncertainty
+#'     of the non-radiogenic isotope correction (the `projection
+#'     error') into the age uncertainty. Note that the resulting
+#'     single grain age uncertainties may be strongly correlated with
+#'     each other, but these error correlations are not reported in
+#'     the output.
 #' @rdname age
 #' @export
-age.PbPb <- function(x,isochron=TRUE,common.Pb=2,
-                     exterr=FALSE,i=NA,sigdig=NA,...){
+age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
+                     i=NA,sigdig=NA,projerr=FALSE,...){
     if (isochron)
         out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
     else
-        out <- PbPb.age(x,exterr=exterr,i=i,sigdig=sigdig,common.Pb=common.Pb)
+        out <- PbPb.age(x,exterr=exterr,i=i,sigdig=sigdig,
+                        common.Pb=common.Pb,projerr=projerr)
     out
 }
 
@@ -292,15 +299,13 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=2,
 #'
 #' @rdname age
 #' @export
-age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
+                     i=NA,sigdig=NA,projerr=FALSE,...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
+    else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
     out
 }
 
-#' @param projerr logical. If \code{TRUE}, propagates the uncertainty
-#'     of the isochron slope into the age uncertainty. Only used if
-#'     \code{i2i=TRUE}.
 #' @rdname age
 #' @export
 age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
