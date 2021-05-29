@@ -4,7 +4,8 @@
 #' @description
 #' Implementation of a graphical device developed by Rex Galbraith to
 #' display several estimates of the same quantity that have different
-#' standard errors.
+#' standard errors. Serves as a vehicle to display finite and continuous
+#' mixture models.
 #' 
 #' @details
 #' The radial plot (Galbraith, 1988, 1990) is a graphical device that
@@ -210,7 +211,12 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
 #'
-#' \code{2}: use the isochron intercept as the initial Pb-composition
+#' \code{2}: remove the common Pb by projecting the data along an
+#' inverse isochron. Note: choosing this option introduces a degree of
+#' circularity in the central age calculation. In this case the radial
+#' plot just serves as a way to visualise the residuals of the data
+#' around the isochron, and one should be careful not to
+#' over-interpret the numerical output.
 #'
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition
@@ -232,15 +238,20 @@ radialplot.UPb <- function(x,from=NA,to=NA,z0=NA,
                k=k,exterr=exterr,alpha=alpha,hide=hide,
                omit=omit,omit.col=omit.col,common.Pb=common.Pb,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka
-#'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
-#'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}.
+#' @param i2i `isochron to intercept': calculates the initial
+#' (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+#' \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#' \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th,
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{204}}Pb/\eqn{^{208}}Pb
+#' ratio from an isochron fit. Setting \code{i2i} to \code{FALSE} uses
+#' the default values stored in \code{settings('iratio',...)}.
+#' 
+#' Note that choosing this option introduces a degree of circularity
+#' in the central age calculation. In this case the radial plot plot
+#' just serves as a way to visualise the residuals of the data around
+#' the isochron, and one should be careful not to over-interpret the
+#' numerical output.
 #' @rdname radialplot
 #' @export
 radialplot.PbPb <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
