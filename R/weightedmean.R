@@ -2,13 +2,15 @@
 #' Calculate the weighted mean age
 #' 
 #' @description
-#' Models the data as a normal distribution with two sources of
-#' variance.  Estimates the mean and `overdispersion' using the method
-#' of maximum likelihood. Computes the MSWD of a normal fit without
+#' Averages heteroscedastic data either using the ordinary weighted
+#' mean, or using a random effects model with two sources of variance.
+#' Computes the MSWD of a normal fit without
 #' overdispersion. Implements a modified Chauvenet criterion to detect
-#' and reject outliers. Only propagates the analytical uncertainty
-#' associated with decay constants and \eqn{\zeta} and J-factors after
-#' computing the weighted mean isotopic composition.
+#' and reject outliers. Only propagates the systematic uncertainty
+#' associated with decay constants and calibration factors after
+#' computing the weighted mean isotopic composition. Does not propagate
+#' the uncertainty of any initial daughter correction, because this is
+#' neither a purely random or purely systematic uncertainty.
 #' 
 #' @details
 #' Let \eqn{\{t_1, ..., t_n\}} be a set of n age estimates
@@ -53,7 +55,7 @@
 #' by one (i.e., \eqn{n \rightarrow n-1}) and repeat steps 1 through 3
 #' until the surviving dates pass the third step.  }
 #'
-#' If the analtyical uncertainties are small compared to the scatter
+#' If the analytical uncertainties are small compared to the scatter
 #' between the dates (i.e. if \eqn{\omega \gg s[t]} for all \eqn{i}),
 #' then this generalised algorithm reduces to the conventional
 #' Chauvenet criterion. If the analytical uncertainties are large and
@@ -61,18 +63,18 @@
 #' outlier detection method is equivalent to Ludwig (2003)'s `2-sigma'
 #' method.
 #'
-#' Warning: the uncertainty budget of the weighted mean does not
-#' include the uncertainty of the initial daughter correction (if
-#' any). This uncertainty is neither a purely systematic nor a purely
-#' random uncertainty and cannot easily be propagated with
-#' conventional geochronological data processing algorithms. This
-#' caveat is especially pertinent to chronometers whose initial
-#' daughter composition is determined by isochron regression. You may
-#' note that the uncertainties of the weighted mean are usually much
-#' smaller than those of the isochron. In this case the isochron
-#' errors are more meaningful, and the weighted mean plot should just
-#' be used to inspect the residuals of the data around the isochron.
-#' 
+#' The uncertainty budget of the weighted mean does not include the
+#' uncertainty of the initial daughter correction (if any). This
+#' uncertainty is neither a purely systematic nor a purely random
+#' uncertainty and cannot easily be propagated with conventional
+#' geochronological data processing algorithms. This caveat is
+#' especially pertinent to chronometers whose initial daughter
+#' composition is determined by isochron regression. You may note that
+#' the uncertainties of the weighted mean are usually much smaller
+#' than those of the isochron. In this case the isochron errors are
+#' more meaningful, and the weighted mean plot should just be used to
+#' inspect the residuals of the data around the isochron.
+#'
 #' @param x a two column matrix of values (first column) and their
 #'     standard errors (second column) OR an object of class
 #'     \code{UPb}, \code{PbPb}, \code{ThPb}, \code{ArAr}, \code{KCa},
@@ -95,9 +97,14 @@
 #'
 #' \item{mean}{a three element vector with:
 #'
-#' \code{t}: the weighted mean
+#' \code{t}: the weighted mean. An asterisk is added to the plot title
+#' if the initial daughter correction is based on an isochron
+#' regression, to mark the circularity of using an isochron to compute
+#' a weighted mean.
 #'
-#' \code{s[t]}: the standard error of the weighted mean
+#' \code{s[t]}: the standard error of the weighted mean, excluding the
+#' uncertainty of the initial daughter correction.  This is because
+#' this uncertainty is neither purely random nor purely systematic.
 #'
 #' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{t}
@@ -135,6 +142,7 @@
 #' parameter if \code{random.effects=TRUE}). }
 #'
 #' }
+#'
 #' @rdname weightedmean
 #' @export
 weightedmean <- function(x,...){
@@ -250,11 +258,17 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
 #'
-#' \code{2}: use the isochron intercept as the initial Pb-composition
+#' \code{2}: remove the common Pb by projecting the data along an
+#' inverse isochron. Note: choosing this option introduces a degree of
+#' circularity in the weighted age calculation. In this case the
+#' weighted mean plot just serves as a way to visualise the residuals
+#' of the data around the isochron, and one should be careful not to
+#' over-interpret the numerical output.
 #'
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition (only applicable if \code{x} has class
 #' \code{UPb})
+#'
 #' @examples
 #' ages <- c(251.9,251.59,251.47,251.35,251.1,251.04,250.79,250.73,251.22,228.43)
 #' errs <- c(0.28,0.28,0.63,0.34,0.28,0.63,0.28,0.4,0.28,0.33)
@@ -301,15 +315,21 @@ weightedmean.PbPb <- function(x,random.effects=FALSE,
                         units='Ma',ranked=ranked,hide=hide,omit=omit,
                         omit.col=omit.col,common.Pb=common.Pb,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka
-#'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
-#'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}.
+#' @param i2i `isochron to intercept': calculates the initial
+#' (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+#' \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#' \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th,
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{204}}Pb/\eqn{^{208}}Pb
+#' ratio from an isochron fit. Setting \code{i2i} to \code{FALSE} uses
+#' the default values stored in \code{settings('iratio',...)}.
+#'
+#' Note that choosing this option introduces a degree of circularity
+#' in the weighted age calculation. In this case the weighted mean
+#' plot just serves as a way to visualise the residuals of the data
+#' around the isochron, and one should be careful not to
+#' over-interpret the numerical output.
+#' 
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
 #'     when \code{x$format=1} or \code{2}).
 #'
@@ -523,13 +543,13 @@ weightedmean_helper <- function(x,random.effects=FALSE,
         out <- add.exterr.to.wtdmean(x,fit,cutoff.76=cutoff.76,type=type)
     else out <- fit
     if (plot){
-        I2I <- (i2i|common.Pb==2|detritus==1)
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,
                           levels=levels,clabel=clabel,
                           rect.col=rect.col,outlier.col=outlier.col,
                           sigdig=sigdig,alpha=alpha,units=units,
-                          ranked=ranked,hide=hide,omit=omit,
-                          omit.col=omit.col,i2i=I2I,...)
+                          ranked=ranked,hide=hide,
+                          omit=omit,omit.col=omit.col,
+                          caveat=(i2i|common.Pb==2|detritus==1),...)
     }
     invisible(out)
 }
@@ -603,12 +623,14 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
     out
 }
 
-wtdmean.title <- function(fit,sigdig=2,units='',...){
+wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
     rounded.mean <- roundit(fit$mean['t'],
                             fit$mean[c('s[t]','ci[t]')],
                             sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
-                        list(a=rounded.mean['t'],
+    ast <- ifelse(caveat,'*','')
+    line1 <- substitute('mean'*ast~'='~a%+-%b~'|'~c~u~'(n='*n/N*')',
+                        list(ast=ast,
+                             a=rounded.mean['t'],
                              b=rounded.mean['s[t]'],
                              c=rounded.mean['ci[t]'],
                              u=units,
@@ -631,8 +653,9 @@ wtdmean.title <- function(fit,sigdig=2,units='',...){
             rounded.mean <- roundit(fit$mean['t'],
                                     fit$mean[c('s[t]','ci[t]','disp[t]')],
                                     sigdig=sigdig)
-            line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
-                                list(a=rounded.mean['t'],
+            line1 <- substitute('mean'*ast~'='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
+                                list(ast=ast,
+                                     a=rounded.mean['t'],
                                      b=rounded.mean['s[t]'],
                                      c=rounded.mean['ci[t]'],
                                      d=rounded.mean['disp[t]'],
@@ -655,7 +678,8 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               alpha=0.05,units='',ranked=FALSE,
-                              hide=NULL,omit=NULL,omit.col=NA,i2i=FALSE,...){
+                              hide=NULL,omit=NULL,omit.col=NA,
+                              caveat=FALSE,...){
     NS <- length(X)
     plotit <- (1:NS)%ni%hide
     calcit <- (1:NS)%ni%c(hide,omit)
@@ -709,7 +733,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                        xright=i+0.4,ytop=x[i]+fact*sx[i],col=col)
     }
     colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
-    graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units))
+    graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units,caveat=caveat))
 }
 
 # prune the data if necessary

@@ -4,7 +4,11 @@
 #' @description
 #' Computes the geometric mean composition of a continuous mixture of
 #' fission track or U-Th-He data and returns the corresponding age and
-#' fitting parameters.
+#' fitting parameters. Only propagates the systematic uncertainty
+#' associated with decay constants and calibration factors after
+#' computing the weighted mean isotopic composition. Does not propagate
+#' the uncertainty of any initial daughter correction, because this is
+#' neither a purely random or purely systematic uncertainty.
 #'
 #' @details
 #' The central age assumes that the observed age distribution is the
@@ -23,9 +27,9 @@
 #' usually small unless the data are imprecise and/or strongly
 #' overdispersed.
 #'
-#' Note: the uncertainty budget of the central age does not include
-#' the uncertainty of the initial daughter correction (if any), for
-#' the same reasons as discussed under the \code{\link{weightedmean}}
+#' The uncertainty budget of the central age does not include the
+#' uncertainty of the initial daughter correction (if any), for the
+#' same reasons as discussed under the \code{\link{weightedmean}}
 #' function.
 #' 
 #' @param x an object of class \code{UThHe} or \code{fissiontracks},

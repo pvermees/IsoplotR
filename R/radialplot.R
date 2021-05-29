@@ -4,7 +4,8 @@
 #' @description
 #' Implementation of a graphical device developed by Rex Galbraith to
 #' display several estimates of the same quantity that have different
-#' standard errors.
+#' standard errors. Serves as a vehicle to display finite and continuous
+#' mixture models.
 #' 
 #' @details
 #' The radial plot (Galbraith, 1988, 1990) is a graphical device that
@@ -94,6 +95,15 @@
 #'     aliquots.
 #' @param ... additional arguments to the generic \code{points}
 #'     function
+#' @return does not produce any numerical output, but does report the
+#'     central age and the results of any mixture modelling in the
+#'     title. An asterisk is added to the plot title if the initial
+#'     daughter correction is based on an isochron regression, to
+#'     highlight the circularity of using an isochron to compute a
+#'     central age, and to indicate that the reported uncertainties do
+#'     not include the uncertainty of the initial daughter correction.
+#'     This is because this uncertainty is neither purely random nor
+#'     purely systematic.
 #' @seealso \code{\link{peakfit}}, \code{\link{central}}
 #' @references Galbraith, R.F., 1988. Graphical display of estimates
 #'     having differing standard errors. Technometrics, 30(3),
@@ -210,7 +220,12 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
 #'
-#' \code{2}: use the isochron intercept as the initial Pb-composition
+#' \code{2}: remove the common Pb by projecting the data along an
+#' inverse isochron. Note: choosing this option introduces a degree of
+#' circularity in the central age calculation. In this case the radial
+#' plot just serves as a way to visualise the residuals of the data
+#' around the isochron, and one should be careful not to
+#' over-interpret the numerical output.
 #'
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the
 #' initial Pb-composition
@@ -232,15 +247,20 @@ radialplot.UPb <- function(x,from=NA,to=NA,z0=NA,
                k=k,exterr=exterr,alpha=alpha,hide=hide,
                omit=omit,omit.col=omit.col,common.Pb=common.Pb,...)
 }
-#' @param i2i `isochron to intercept': calculates the initial (aka
-#'     `inherited', `excess', or `common')
-#'     \eqn{^{40}}Ar/\eqn{^{36}}Ar, \eqn{^{40}}Ca/\eqn{^{44}}Ca,
-#'     \eqn{^{207}}Pb/\eqn{^{204}}Pb, \eqn{^{87}}Sr/\eqn{^{86}}Sr,
-#'     \eqn{^{143}}Nd/\eqn{^{144}}Nd, \eqn{^{187}}Os/\eqn{^{188}}Os,
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
-#'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
-#'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}.
+#' @param i2i `isochron to intercept': calculates the initial
+#' (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
+#' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
+#' \eqn{^{87}}Sr/\eqn{^{86}}Sr, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
+#' \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{230}}Th/\eqn{^{232}}Th,
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{204}}Pb/\eqn{^{208}}Pb
+#' ratio from an isochron fit. Setting \code{i2i} to \code{FALSE} uses
+#' the default values stored in \code{settings('iratio',...)}.
+#' 
+#' Note that choosing this option introduces a degree of circularity
+#' in the central age calculation. In this case the radial plot plot
+#' just serves as a way to visualise the residuals of the data around
+#' the isochron, and one should be careful not to over-interpret the
+#' numerical output.
 #' @rdname radialplot
 #' @export
 radialplot.PbPb <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
@@ -441,7 +461,8 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
         fit$age[3] <- fit$age[2]*nfact(alpha)
     }
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
-                                 units=units,ntit=get.ntit(tt[,1])))
+                                 units=units,ntit=get.ntit(tt[,1]),
+                                 caveat=(i2i|common.Pb==2|detritus==1)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -803,11 +824,12 @@ iatt <- function(z,zeta,rhoD){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
-                         ntit=paste0('n=',fit$df+2),...){
+                         ntit=paste0('n=',fit$df+2),caveat=FALSE,...){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
-    line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'('*n*')',
-                        list(a=rounded.age[1],b=rounded.age[2],
+    line1 <- substitute('central age'*ast~'='~a%+-%b~'|'~c~d~'('*n*')',
+                        list(ast=ifelse(caveat,'*',''),
+                             a=rounded.age[1],b=rounded.age[2],
                              c=rounded.age[3],d=units,n=ntit))
     line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                         list(a=signif(fit$mswd,sigdig),
