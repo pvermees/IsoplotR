@@ -95,6 +95,15 @@
 #'     aliquots.
 #' @param ... additional arguments to the generic \code{points}
 #'     function
+#' @return does not produce any numerical output, but does report the
+#'     central age and the results of any mixture modelling in the
+#'     title. An asterisk is added to the plot title if the initial
+#'     daughter correction is based on an isochron regression, to
+#'     highlight the circularity of using an isochron to compute a
+#'     central age, and to indicate that the reported uncertainties do
+#'     not include the uncertainty of the initial daughter correction.
+#'     This is because this uncertainty is neither purely random nor
+#'     purely systematic.
 #' @seealso \code{\link{peakfit}}, \code{\link{central}}
 #' @references Galbraith, R.F., 1988. Graphical display of estimates
 #'     having differing standard errors. Technometrics, 30(3),
@@ -476,7 +485,8 @@ radial_helper <- function(x,from=NA,to=NA,z0=NA,transformation='log',
     tcol[omit] <- 'grey'
     radial.plot(X,show.numbers=show.numbers,pch=pch,
                 levels=levels[plotit],clabel=clabel,markers=markers,
-                bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],...)
+                bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],
+                caveat=(i2i|common.Pb==2|detritus==1),...)
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
 }
 
@@ -814,11 +824,13 @@ iatt <- function(z,zeta,rhoD){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
-                         ntit=paste0('n=',fit$df+2),...){
+                         ntit=paste0('n=',fit$df+2),caveat=FALSE,...){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
-    line1 <- substitute('central age ='~a%+-%b~'|'~c~d~'('*n*')',
-                        list(a=rounded.age[1],b=rounded.age[2],
+    
+    line1 <- substitute('central age'*ast~'='~a%+-%b~'|'~c~d~'('*n*')',
+                        list(ast=ifelse(caveat,'*',''),
+                             a=rounded.age[1],b=rounded.age[2],
                              c=rounded.age[3],d=units,n=ntit))
     line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                         list(a=signif(fit$mswd,sigdig),

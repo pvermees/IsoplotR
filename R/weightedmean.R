@@ -97,9 +97,14 @@
 #'
 #' \item{mean}{a three element vector with:
 #'
-#' \code{t}: the weighted mean
+#' \code{t}: the weighted mean. An asterisk is added to the plot title
+#' if the initial daughter correction is based on an isochron
+#' regression, to mark the circularity of using an isochron to compute
+#' a weighted mean.
 #'
-#' \code{s[t]}: the standard error of the weighted mean
+#' \code{s[t]}: the standard error of the weighted mean, excluding the
+#' uncertainty of the initial daughter correction.  This is because
+#' this uncertainty is neither purely random nor purely systematic.
 #'
 #' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
 #' \code{t}
@@ -137,6 +142,7 @@
 #' parameter if \code{random.effects=TRUE}). }
 #'
 #' }
+#'
 #' @rdname weightedmean
 #' @export
 weightedmean <- function(x,...){
@@ -537,13 +543,13 @@ weightedmean_helper <- function(x,random.effects=FALSE,
         out <- add.exterr.to.wtdmean(x,fit,cutoff.76=cutoff.76,type=type)
     else out <- fit
     if (plot){
-        I2I <- (i2i|common.Pb==2|detritus==1)
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,
                           levels=levels,clabel=clabel,
                           rect.col=rect.col,outlier.col=outlier.col,
                           sigdig=sigdig,alpha=alpha,units=units,
-                          ranked=ranked,hide=hide,omit=omit,
-                          omit.col=omit.col,i2i=I2I,...)
+                          ranked=ranked,hide=hide,
+                          omit=omit,omit.col=omit.col,
+                          caveat=(i2i|common.Pb==2|detritus==1),...)
     }
     invisible(out)
 }
@@ -617,12 +623,14 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
     out
 }
 
-wtdmean.title <- function(fit,sigdig=2,units='',...){
+wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
     rounded.mean <- roundit(fit$mean['t'],
                             fit$mean[c('s[t]','ci[t]')],
                             sigdig=sigdig)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
-                        list(a=rounded.mean['t'],
+    ast <- ifelse(caveat,'*','')
+    line1 <- substitute('mean'*ast~'='~a%+-%b~'|'~c~u~'(n='*n/N*')',
+                        list(ast=ast,
+                             a=rounded.mean['t'],
                              b=rounded.mean['s[t]'],
                              c=rounded.mean['ci[t]'],
                              u=units,
@@ -645,8 +653,9 @@ wtdmean.title <- function(fit,sigdig=2,units='',...){
             rounded.mean <- roundit(fit$mean['t'],
                                     fit$mean[c('s[t]','ci[t]','disp[t]')],
                                     sigdig=sigdig)
-            line1 <- substitute('mean ='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
-                                list(a=rounded.mean['t'],
+            line1 <- substitute('mean'*ast~'='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
+                                list(ast=ast,
+                                     a=rounded.mean['t'],
                                      b=rounded.mean['s[t]'],
                                      c=rounded.mean['ci[t]'],
                                      d=rounded.mean['disp[t]'],
@@ -669,7 +678,8 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               alpha=0.05,units='',ranked=FALSE,
-                              hide=NULL,omit=NULL,omit.col=NA,i2i=FALSE,...){
+                              hide=NULL,omit=NULL,omit.col=NA,
+                              caveat=FALSE,...){
     NS <- length(X)
     plotit <- (1:NS)%ni%hide
     calcit <- (1:NS)%ni%c(hide,omit)
@@ -723,7 +733,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                        xright=i+0.4,ytop=x[i]+fact*sx[i],col=col)
     }
     colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
-    graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units))
+    graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units,caveat=caveat))
 }
 
 # prune the data if necessary
