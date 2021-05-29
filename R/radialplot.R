@@ -461,7 +461,8 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
         fit$age[3] <- fit$age[2]*nfact(alpha)
     }
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
-                                 units=units,ntit=get.ntit(tt[,1])))
+                                 units=units,ntit=get.ntit(tt[,1]),
+                                 caveat=(i2i|common.Pb==2|detritus==1)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -485,8 +486,7 @@ radial_helper <- function(x,from=NA,to=NA,z0=NA,transformation='log',
     tcol[omit] <- 'grey'
     radial.plot(X,show.numbers=show.numbers,pch=pch,
                 levels=levels[plotit],clabel=clabel,markers=markers,
-                bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],
-                caveat=(i2i|common.Pb==2|detritus==1),...)
+                bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
 }
 
@@ -827,7 +827,6 @@ radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
                          ntit=paste0('n=',fit$df+2),caveat=FALSE,...){
     rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
     rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
-    
     line1 <- substitute('central age'*ast~'='~a%+-%b~'|'~c~d~'('*n*')',
                         list(ast=ifelse(caveat,'*',''),
                              a=rounded.age[1],b=rounded.age[2],
