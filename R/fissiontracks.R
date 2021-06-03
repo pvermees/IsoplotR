@@ -143,9 +143,9 @@ set.zeta <- function(x,tst,exterr=TRUE,update=TRUE,sigdig=2){
     zsz <- roundit(zeta,zetaErr,sigdig=sigdig)
     if (update){
         out <- x
-        out$zeta <- zsz
+        out$zeta <- as.numeric(zsz)
     } else {
-        out <- matrix(zsz,1,2)
+        out <- matrix(as.numeric(zsz),1,2)
         colnames(out) <- c('zeta','s[zeta]')
     }
     out
