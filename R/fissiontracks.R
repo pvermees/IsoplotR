@@ -3,14 +3,14 @@ fissiontrack.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
         out <- EDM.age(x,i,sigdig=sigdig,exterr=exterr)
     } else if (x$format > 1){
         if (x$format == 3){
-            x$zeta <- get.absolute.zeta(x$mineral);
+            x$zeta <- get.absolute.zeta(x$mineral,exterr=exterr);
         }
         out <- ICP.age(x,i,sigdig=sigdig,exterr=exterr)
     }
     out
 }
 
-get.absolute.zeta <- function(mineral){
+get.absolute.zeta <- function(mineral,exterr=FALSE){
     R <- iratio('U238U235')[1]
     MM <- imass('U')[1]
     qap <- etchfact(mineral)
@@ -19,7 +19,13 @@ get.absolute.zeta <- function(mineral){
     dens <- mindens(mineral)
     Na <- 6.02214e23
     zeta <- 4*(1+R)*MM*1e18/(Na*Lf*qap*L*dens*R)
-    c(zeta,0)
+    if (exterr){
+        Lf <- lambda('fission')
+        szeta <- zeta*Lf[2]/Lf[1]
+    } else {
+        szeta <- 0
+    }
+    c(zeta,szeta)
 }
 
 #' @title Calculate the zeta calibration coefficient for fission track dating

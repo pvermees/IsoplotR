@@ -454,7 +454,7 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
             Lf <- lambda('fission')
         }
         out[2] <- tt * sqrt( (st/tt)^2 + (rhoD[2]/rhoD[1])^2 +
-                             (zeta[2]/zeta[1])^2 +(Lf[2]/Lf[1])^2 )
+                             (zeta[2]/zeta[1])^2 + (Lf[2]/Lf[1])^2 )
     }
     out
 }
