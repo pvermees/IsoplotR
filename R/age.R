@@ -311,7 +311,8 @@ age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
 age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
                     i=NA,sigdig=NA,projerr=FALSE,...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- KCa.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
+    else out <- KCa.age(x,exterr=exterr,i=i,sigdig=sigdig,
+                        i2i=i2i,projerr=projerr,...)
     out
 }
 
