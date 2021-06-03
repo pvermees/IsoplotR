@@ -149,11 +149,11 @@
 #'
 #' @param show.ellipses show the data as:
 #'
-#' \code{1}: points
+#' \code{0}: points
 #'
-#' \code{2}: error ellipses
+#' \code{1}: error ellipses
 #'
-#' \code{3}: error crosses
+#' \code{2}: error crosses
 #'
 #' @param xlab text label for the horizontal plot axis
 #' 
@@ -455,8 +455,9 @@ isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
                              ellipse.fill=c("#00FF0080","#FF000080"),
                              ellipse.stroke='black',ci.col='gray80',
                              line.col='black',lwd=1,plot=TRUE,
-                             title=TRUE,model=1,show.ellipses=1*(model!=2),hide=NULL,
-                             omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                             title=TRUE,model=1,show.ellipses=1*(model!=2),
+                             hide=NULL,omit=NULL,omit.fill=NA,
+                             omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     fit <- regression(data2york(d2calc),model=model)
     fit <- regression_init(fit,alpha=alpha)
