@@ -389,11 +389,11 @@ intercept and slope.}
 
 \item{show.ellipses}{show the data as:
 
-\code{1}: points
+\code{0}: points
 
-\code{2}: error ellipses
+\code{1}: error ellipses
 
-\code{3}: error crosses}
+\code{2}: error crosses}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}
