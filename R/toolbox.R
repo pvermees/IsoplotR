@@ -16,7 +16,7 @@ roundit <- function(age,err,sigdig=2){
                           trim=TRUE,scientific=FALSE)
         }
     }
-    out
+    matrix(as.numeric(out),ncol=2)
 }
 
 # count the number of TRUEs in x
