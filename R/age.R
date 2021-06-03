@@ -442,17 +442,19 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
         R <- get.LuHf.ratio(tt,st,exterr=FALSE)
         out <- get.LuHf.age(R[1],R[2],exterr=TRUE)
     } else if (is.fissiontracks(x)){
+        zeta <- c(1,0)
+        rhoD <- c(1,0)
+        Lf <- c(1,0)
         if (x$format==1) {
             rhoD <- x$rhoD
             zeta <- x$zeta
         } else if (x$format==2) {
-            rhoD <- c(1,0)
             zeta <- x$zeta
         } else {
-            rhoD <- c(1,0)
-            zeta <- c(1,0)
+            Lf <- lambda('fission')
         }
-        out[2] <- tt * sqrt( (st/tt)^2 + (rhoD[2]/rhoD[1])^2 + (zeta[2]/zeta[1])^2 )
+        out[2] <- tt * sqrt( (st/tt)^2 + (rhoD[2]/rhoD[1])^2 +
+                             (zeta[2]/zeta[1])^2 +(Lf[2]/Lf[1])^2 )
     }
     out
 }

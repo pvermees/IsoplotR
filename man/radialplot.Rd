@@ -351,7 +351,7 @@ function}
 
 \item{transformation}{one of either \code{log}, \code{linear},
 \code{sqrt} or \code{arcsin} (if \code{x} has class
-\code{fissiontracks} and \code{fissiontracks$type} \eqn{\neq
+\code{fissiontracks} and \code{fissiontracks$format} \eqn{\neq
 1}).}
 
 \item{sigdig}{the number of significant digits of the numerical
