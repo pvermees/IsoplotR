@@ -2,9 +2,15 @@ roundit <- function(age,err,sigdig=2){
     if (missing(err)){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
+        nc <- 1
     } else {
-        if (length(age)==1) dat <- c(age,err)
-        else dat <- cbind(age,err)
+        if (length(age)==1){
+            dat <- c(age,err)
+            nc <- length(dat)
+        } else {
+            dat <- cbind(age,err)
+            nc <- ncol(dat)
+        }
         min.err <- min(abs(dat),na.rm=TRUE)
         if (is.na(sigdig)) {
             out <- dat
@@ -16,7 +22,7 @@ roundit <- function(age,err,sigdig=2){
                           trim=TRUE,scientific=FALSE)
         }
     }
-    matrix(as.numeric(out),ncol=2)
+    out#matrix(as.numeric(out),ncol=nc)
 }
 
 # count the number of TRUEs in x
