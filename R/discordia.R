@@ -302,7 +302,7 @@ tw3d2d <- function(fit){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2,...){
-    lower.age <- roundit(fit$par[1],fit$err[,1],sigdig=sigdig)
+    lower.age <- roundit(fit$par[1],fit$err[,1],sigdig=sigdig,text=TRUE)
     if (inflate(fit)){
         args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
         args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
@@ -313,7 +313,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
     list1 <- list(a=lower.age[1],b=lower.age[2],
                   c=lower.age[3],u='Ma',n=fit$n)
     if (wetherill){
-        upper.age <- roundit(fit$par[2],fit$err[,2],sigdig=sigdig)
+        upper.age <- roundit(fit$par[2],fit$err[,2],sigdig=sigdig,text=TRUE)
         expr1 <- quote('lower intercept =')
         expr2 <- quote('upper intercept =')
         list2 <- list(a=upper.age[1],b=upper.age[2],c=upper.age[3],u='Ma')
@@ -322,7 +322,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list2$d <- upper.age[4]
         }
     } else if (fit$format%in%c(1,2,3)){
-        i76 <- roundit(fit$par['76i'],fit$err[,'76i'],sigdig=sigdig)
+        i76 <- roundit(fit$par['76i'],fit$err[,'76i'],sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
         list2 <- list(a=i76[1],b=i76[2],c=i76[3],u='')
@@ -331,8 +331,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list2$d <- i76[4]
         }
     } else if (fit$format%in%c(4,5,6)){
-        i64 <- roundit(fit$par['64i'],fit$err[,'64i'],sigdig=sigdig)
-        i74 <- roundit(fit$par['74i'],fit$err[,'74i'],sigdig=sigdig)
+        i64 <- roundit(fit$par['64i'],fit$err[,'64i'],sigdig=sigdig,text=TRUE)
+        i74 <- roundit(fit$par['74i'],fit$err[,'74i'],sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')
         expr2 <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
         expr3 <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
@@ -350,8 +350,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         i87 <- 1/fit$par['78i']
         i86err <- i86*fit$err[,'68i']/fit$par['68i']
         i87err <- i87*fit$err[,'78i']/fit$par['78i']
-        ri86 <- roundit(i86,i86err,sigdig=sigdig)
-        ri87 <- roundit(i87,i87err,sigdig=sigdig)
+        ri86 <- roundit(i86,i86err,sigdig=sigdig,text=TRUE)
+        ri87 <- roundit(i87,i87err,sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')
         expr2 <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
         expr3 <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
@@ -375,9 +375,10 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                                  b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
         ci <- ci_log2lin_lud(fit=fit,fact=fit$fact)
-        rounded.disp <- roundit(ci[1],ci[2:3],sigdig=sigdig)
+        rounded.disp <- roundit(ci[1],ci[2:3],sigdig=sigdig,text=TRUE)
         line4 <- substitute('overdispersion ='~a+b/-c~'Ma',
-                            list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2]))
+                            list(a=rounded.disp[1],b=rounded.disp[3],
+                                 c=rounded.disp[2]))
     }
     extrarow <- fit$format>3 & !wetherill
     if (fit$model==1 & extrarow){

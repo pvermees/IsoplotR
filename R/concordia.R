@@ -578,7 +578,7 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 concordia.title <- function(fit,sigdig=2,alpha=0.05,...){
-    rounded.age <- roundit(fit$age[1],fit$age[-1],sigdig=sigdig)
+    rounded.age <- roundit(fit$age[1],fit$age[-1],sigdig=sigdig,text=TRUE)
     expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'Ma (n='*n*')')
     list1 <- list(a=rounded.age[1],b=rounded.age[2],c=rounded.age[3],n=fit$n)
     if (fit$p.value['combined']<alpha){

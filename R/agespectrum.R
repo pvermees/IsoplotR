@@ -262,7 +262,7 @@ plot.plateau <- function(fit,line.col='red',lwd=2){
 plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
     rounded.mean <- roundit(fit$mean['t'],
                             fit$mean[c('s[t]','ci[t]')],
-                            sigdig=sigdig)
+                            sigdig=sigdig,text=TRUE)
     line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
                         list(a=rounded.mean[1],
                              b=rounded.mean[2],
@@ -271,9 +271,9 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
                              n=length(fit$i),
                              N=fit$n))
     line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
-                        list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig),
+                        list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig,text=TRUE),
                              b=roundit(fit$p.value,fit$p.value,
-                                       sigdig=sigdig)))
+                                       sigdig=sigdig,text=TRUE)))
     a <- signif(100*fit$fract,sigdig)
     if (Ar) line3 <- bquote(paste("includes ",.(a),"% of the ",""^"39","Ar"))
     else line3 <- bquote(paste("includes ",.(a),"% of the spectrum"))
@@ -299,7 +299,8 @@ get.plateau <- function(x,alpha=0.05,random.effects=FALSE,calcit=rep(TRUE,nrow(x
             sY <- YsY[i:j,2]
             valid <- chauvenet(Y,sY,valid=calcit[i:j],random.effects=random.effects)
             if (all(valid) & (fract > out$fract)){
-                out <- weightedmean(YsY[i:j,,drop=FALSE],random.effects=random.effects,
+                out <- weightedmean(YsY[i:j,,drop=FALSE],
+                                    random.effects=random.effects,
                                     plot=FALSE,detect.outliers=FALSE,
                                     alpha=alpha)
                 out$i <- i:j
