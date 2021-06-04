@@ -68,8 +68,7 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     ns <- length(x2plot)
-    if (is.function(col)) colour <- do.call(col,list(ns))
-    else colour <- rep('black',ns)
+    colour <- do.call(col,list(ns))
     graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
                    ylab='cumulative probability',...)
     for (i in 1:ns){
