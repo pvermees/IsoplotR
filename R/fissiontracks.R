@@ -149,10 +149,10 @@ set.zeta <- function(x,tst,exterr=TRUE,update=TRUE,sigdig=2){
     zsz <- roundit(zeta,zetaErr,sigdig=sigdig)
     if (update){
         out <- x
-        out$zeta <- as.numeric(zsz)
+        out$zeta <- as.vector(zsz)
     } else {
-        out <- matrix(as.numeric(zsz),1,2)
-        colnames(out) <- c('zeta','s[zeta]')
+        out <- as.vector(zsz)
+        names(out) <- c('zeta','s[zeta]')
     }
     out
 }

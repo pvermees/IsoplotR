@@ -22,8 +22,11 @@ roundit <- function(age,err,sigdig=2,text=FALSE){
                           trim=TRUE,scientific=FALSE)
         }
     }
-    if (text) return(out)
-    else return(matrix(as.numeric(out),ncol=nc))
+    if (!text){
+        out <- matrix(as.numeric(out),ncol=nc)
+        if (nrow(out)==1) out <- as.vector(out)
+    }
+    out
 }
 
 # count the number of TRUEs in x
