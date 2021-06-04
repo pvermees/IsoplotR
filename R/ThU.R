@@ -35,11 +35,9 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
                                exterr=exterr,cor=cor)
     }
     if (!is.na(sigdig)){
-        temp <- out # store numerical values because roundit creates text
-        temp[,c(1,2)] <- roundit(out[,1],out[,2],sigdig=sigdig)
-        temp[,c(3,4)] <- roundit(out[,3],out[,4],sigdig=sigdig)
-        temp[,5] <- signif(out[,5],sigdig)
-        out <- temp
+        out[,c(1,2)] <- roundit(out[,1],out[,2],sigdig=sigdig)
+        out[,c(3,4)] <- roundit(out[,3],out[,4],sigdig=sigdig)
+        out[,5] <- signif(out[,5],sigdig)
     }
     if (!is.na(i)) out <- out[i,]
     out
