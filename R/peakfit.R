@@ -345,11 +345,13 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
     if (identical(k,'min')) return(min_age_to_legend(fit,sigdig=sigdig))
     out <- NULL
     for (i in 1:ncol(fit$peaks)){
-        rounded.age <- roundit(fit$peaks[1,i],fit$peaks[2:3,i],sigdig=sigdig)
+        rounded.age <- roundit(fit$peaks[1,i],fit$peaks[2:3,i],
+                               sigdig=sigdig,text=TRUE)
         line <- paste0('Peak ',i,': ',rounded.age[1],' \u00B1 ',
                        rounded.age[2],' | ',rounded.age[3])
         if (k>1){
-            rounded.prop <- roundit(100*fit$props[1,i],100*fit$props[2,i],sigdig=sigdig)
+            rounded.prop <- roundit(100*fit$props[1,i],100*fit$props[2,i],
+                                    sigdig=sigdig,text=TRUE)
             line <- paste0(line,' (',rounded.prop[1],'%)')
         }
         out <- c(out,line)
@@ -357,7 +359,8 @@ peaks2legend <- function(fit,sigdig=2,k=NULL){
     out
 }
 min_age_to_legend <- function(fit,sigdig=2){
-    rounded.age <- roundit(fit$peaks[1],fit$peaks[2:3],sigdig=sigdig)
+    rounded.age <- roundit(fit$peaks[1],fit$peaks[2:3],
+                           sigdig=sigdig,text=TRUE)
     paste0('Minimum: ',rounded.age[1],'\u00B1',rounded.age[2],' | ',rounded.age[3])
 }
 

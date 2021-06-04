@@ -323,8 +323,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
 }
 
 evolution.title <- function(fit,sigdig=2,...){
-    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
-    rounded.a0 <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig)
+    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
+    rounded.a0 <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig,text=TRUE)
     expr1 <- quote('isochron age =')
     list1 <- list(a=rounded.age[1],
                   b=rounded.age[2],
@@ -358,7 +358,7 @@ evolution.title <- function(fit,sigdig=2,...){
         mymtext(line1,line=1,...)
         mymtext(line2,line=0,...)
     } else if (fit$model==3) {
-        rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
+        rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig,text=TRUE)
         expr3 <- quote('('^232*'Th/'^238*'U)'-dispersion~'=')
         args3 <- quote(a+b-c)
         list3 <- list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2])

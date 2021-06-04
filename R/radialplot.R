@@ -825,8 +825,10 @@ iatt <- function(z,zeta,rhoD){
 # this would be much easier in unicode but that doesn't render in PDF:
 radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
                          ntit=paste0('n=',fit$df+2),caveat=FALSE,...){
-    rounded.age <- roundit(fit$age[1],fit$age[2:3],sigdig=sigdig)
-    rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],sigdig=sigdig)
+    rounded.age <- roundit(fit$age[1],fit$age[2:3],
+                           sigdig=sigdig,text=TRUE)
+    rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],
+                            sigdig=sigdig,text=TRUE)
     line1 <- substitute('central age'*ast~'='~a%+-%b~'|'~c~d~'('*n*')',
                         list(ast=ifelse(caveat,'*',''),
                              a=rounded.age[1],b=rounded.age[2],

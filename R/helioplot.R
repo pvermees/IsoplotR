@@ -316,7 +316,7 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
 }
 
 helioplot_title <- function(fit,sigdig=2,...){
-    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
+    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
     expr <- quote('central age =')
     args1 <- quote(~a%+-%b~'|'~c~'Ma'~'(n='*n*')')
     list1 <- list(a=rounded.age[1],
@@ -334,7 +334,7 @@ helioplot_title <- function(fit,sigdig=2,...){
     } else if (fit$model==2){
         line1line <- 0
     } else if (fit$model==3){
-        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig)
+        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig,text=TRUE)
         list2 <- list(a=rounded.disp[1],b=rounded.disp[2],c=rounded.disp[3])
         expr2 <- quote('dispersion =')
         args2 <- quote(a+c-b~'%')

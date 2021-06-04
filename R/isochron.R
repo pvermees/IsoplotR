@@ -1328,8 +1328,8 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",ski=NULL,...){
         args2 <- quote(a%+-%b~'|'~c~u)
     }
     if (is.na(type)){
-        intercept <- roundit(fit$a[1],fit$a[2:4],sigdig=sigdig)
-        slope <- roundit(fit$b[1],fit$b[2:4],sigdig=sigdig)
+        intercept <- roundit(fit$a[1],fit$a[2:4],sigdig=sigdig,text=TRUE)
+        slope <- roundit(fit$b[1],fit$b[2:4],sigdig=sigdig,text=TRUE)
         expr1 <- 'slope ='
         expr2 <- 'intercept ='
         list1 <- list(a=slope[1],
@@ -1346,8 +1346,8 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",ski=NULL,...){
             list2$d <- intercept[4]
         }
     } else {
-        rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig)
-        rounded.intercept <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig)
+        rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
+        rounded.intercept <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig,text=TRUE)
         expr1 <- 'age ='
         list1 <- list(a=rounded.age[1],
                       b=rounded.age[2],
@@ -1375,13 +1375,13 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",ski=NULL,...){
                                             b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
-            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
+            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig,text=TRUE)
             linecontent[[3]] <- substitute('overdispersion ='~a+b/-c~'Ma',
                                            list(a=rounded.disp[1],
                                                 b=rounded.disp[3],
                                                 c=rounded.disp[2]))
         } else {
-            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig)
+            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig,text=TRUE)
             list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
             args3 <- quote(a+b/-c)
             expr3 <- fit$displabel
@@ -1392,9 +1392,10 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",ski=NULL,...){
     nl <- length(linecontent)
     if (!is.null(ski)){
         growthline <- paste0('intercepts growth curve at ',
-                             roundit(ski[1],sigdig=sigdig))
+                             roundit(ski[1],sigdig=sigdig,text=TRUE))
         if (length(ski)>1){
-            growthline <- paste0(growthline,' and ',roundit(ski[2],sigdig=sigdig))
+            growthline <- paste0(growthline,' and ',
+                                 roundit(ski[2],sigdig=sigdig,text=TRUE))
         }
         growthline <- paste0(growthline,' Ma')
         nl <- nl + 1

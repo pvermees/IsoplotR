@@ -1,4 +1,4 @@
-roundit <- function(age,err,sigdig=2){
+roundit <- function(age,err,sigdig=2,text=FALSE){
     if (missing(err)){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
@@ -22,7 +22,8 @@ roundit <- function(age,err,sigdig=2){
                           trim=TRUE,scientific=FALSE)
         }
     }
-    out#matrix(as.numeric(out),ncol=nc)
+    if (text) return(out)
+    else return(matrix(as.numeric(out),ncol=nc))
 }
 
 # count the number of TRUEs in x

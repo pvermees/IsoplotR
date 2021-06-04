@@ -624,9 +624,8 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
 }
 
 wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
-    rounded.mean <- roundit(fit$mean['t'],
-                            fit$mean[c('s[t]','ci[t]')],
-                            sigdig=sigdig)
+    rounded.mean <- roundit(fit$mean['t'],fit$mean[c('s[t]','ci[t]')],
+                            sigdig=sigdig,text=TRUE)
     ast <- ifelse(caveat,'*','')
     line1 <- substitute('mean'*ast~'='~a%+-%b~'|'~c~u~'(n='*n/N*')',
                         list(ast=ast,
@@ -639,7 +638,7 @@ wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
     if (fit$random.effects){
         rounded.disp <- roundit(fit$disp['s'],
                                 fit$disp[c('ll','ul')],
-                                sigdig=sigdig)
+                                sigdig=sigdig,text=TRUE)
         line3 <- substitute('dispersion ='~a+b/-c~u,
                             list(a=rounded.disp['s'],
                                  b=rounded.disp['ul'],
@@ -652,7 +651,7 @@ wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
         if (inflate(c(fit,model=1))){
             rounded.mean <- roundit(fit$mean['t'],
                                     fit$mean[c('s[t]','ci[t]','disp[t]')],
-                                    sigdig=sigdig)
+                                    sigdig=sigdig,text=TRUE)
             line1 <- substitute('mean'*ast~'='~a%+-%b~'|'~c~'|'~d~u~'(n='*n/N*')',
                                 list(ast=ast,
                                      a=rounded.mean['t'],
@@ -667,9 +666,9 @@ wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
         line2line <- 0
     }
     line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
-                        list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig),
+                        list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig,text=TRUE),
                              b=roundit(fit$p.value,fit$p.value,
-                                       sigdig=sigdig)))
+                                       sigdig=sigdig,text=TRUE)))
     mymtext(line1,line=line1line,...)
     mymtext(line2,line=line2line,...)
 }
