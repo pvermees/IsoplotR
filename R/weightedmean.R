@@ -758,12 +758,13 @@ chauvenet <- function(X,sX,valid,random.effects=FALSE){
         sigma <- sqrt(fit$mean[2]^2 + max(1,fit$mswd)*sX^2)
     }
     misfit <- abs(x-mu)/sigma
-    prob <- 2*(1-stats::pnorm(misfit))
+    prob <- 2*(1-stats::pnorm(misfit[valid]))
     iworst <- which.max(misfit[valid])
+    ivalid <- which(valid)
     minp <- prob[iworst]
     ns <- length(which(valid))
     if (ns*minp < 0.5) {
-        valid[iworst] <- FALSE # remove outlier
+        valid[ivalid[iworst]] <- FALSE # remove outlier
     } 
     valid
 }

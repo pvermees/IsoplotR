@@ -15,7 +15,6 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
                                cor=TRUE,detritus=0,omit4c=NULL){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     if (detritus==3){
         d <- Th230correction.measured.detritus(x)
     } else {
@@ -40,10 +39,12 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
         out[,5] <- signif(out[,5],sigdig)
     }
     if (!is.na(i)) out <- out[i,]
+    colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     out
 }
 
-get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,omit4c=NULL){
+get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,
+                                  sigdig=NA,omit4c=NULL){
     ns <- length(x)
     d <- data2york(x,type=2,generic=FALSE)
     if (i2i){
@@ -54,13 +55,13 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,omit4c
     }
     d[,'Th230U238'] <- d[,'Th230U238'] - Th02[1]*d[,'Th232U238']
     out <- matrix(0,ns,2)
-    colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
         tst <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],exterr=exterr)
         out[j,] <- tst[c('t','s[t]')]
     }
     if (!is.na(sigdig)) out <- roundit(out[,1],out[,2],sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
+    colnames(out) <- c('t','s[t]')
     out
 }
 
