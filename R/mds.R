@@ -106,7 +106,7 @@ mds <- function(x,...){ UseMethod("mds",x) }
 #' @export
 mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
                         nnlines=FALSE,pos=NULL,col='black',
-                        bg='white',xlab="",ylab="",...){
+                        bg='white',xlab=NA,ylab=NA,...){
     out <- list()
     if (classical) out$points <- stats::cmdscale(x)
     else out <- MASS::isoMDS(d=x)
@@ -122,7 +122,7 @@ mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
 #' @export
 mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
                           nnlines=FALSE,pos=NULL,col='black',
-                          bg='white',xlab="",ylab="",hide=NULL,...){
+                          bg='white',xlab=NA,ylab=NA,hide=NULL,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     d <- diss(x2plot)
@@ -160,11 +160,11 @@ KS.diss <- function(x,y) {
 }
 
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
-                     col='black',bg='white',xlab,ylab,pch,...){
+                     col='black',bg='white',xlab=NA,ylab=NA,pch,...){
     if (shepard & !x$classical){
         if (missing(pch)) pch <- 21
-        if (missing(xlab)) xlab <- 'dissimilarities'
-        if (missing(ylab)) ylab <- 'distances/disparities'
+        if (is.na(xlab)) xlab <- 'dissimilarities'
+        if (is.na(ylab)) ylab <- 'distances/disparities'
         shep <- MASS::Shepard(x$diss,x$points)
         graphics::plot(x=shep,col=col,bg=bg,pch=pch,
                        xlab=xlab,ylab=ylab,...)
