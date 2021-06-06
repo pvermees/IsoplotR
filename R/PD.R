@@ -35,7 +35,6 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
                    i2i=TRUE,bratio=1,omit4c=NULL,projerr=FALSE,...){
     ns <- length(x)
     out <- matrix(0,ns,2)
-    colnames(out) <- c('t','s[t]')
     if (ns<2) i2i <- FALSE
     if (i2i){
         y <- data2york(x,inverse=TRUE)
@@ -62,6 +61,7 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
                      nuclide,exterr=exterr,bratio=bratio)
     out <- roundit(subset(tt,select=1),subset(tt,select=2),sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
+    colnames(out) <- c('t','s[t]')
     out
 }
 

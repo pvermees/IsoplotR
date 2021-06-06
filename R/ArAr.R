@@ -43,7 +43,6 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,
     ns <- length(x)
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
-    colnames(out) <- c('t','s[t]')
     if (i2i){
         y <- data2york(x,inverse=TRUE)
         fit <- york(clear(y,omit4c))
@@ -70,5 +69,6 @@ ArAr.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,
     tt <- get.ArAr.age(DP,sDP,x$J[1],x$J[2],exterr=exterr)
     out <- roundit(tt[,1],tt[,2],sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
+    colnames(out) <- c('t','s[t]')
     out
 }

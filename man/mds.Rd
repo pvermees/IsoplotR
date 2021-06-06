@@ -17,8 +17,8 @@ mds(x, ...)
   pos = NULL,
   col = "black",
   bg = "white",
-  xlab = "",
-  ylab = "",
+  xlab = NA,
+  ylab = NA,
   ...
 )
 
@@ -31,8 +31,8 @@ mds(x, ...)
   pos = NULL,
   col = "black",
   bg = "white",
-  xlab = "",
-  ylab = "",
+  xlab = NA,
+  ylab = NA,
   hide = NULL,
   ...
 )
