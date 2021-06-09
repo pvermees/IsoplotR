@@ -111,21 +111,19 @@ LL.sigma <- function(sigma,X,sX){
     sum(log(wi) - wi*(X-mu)^2)/2
 }
 
-ci_regression <- function(fit,disp=TRUE,i1='b',i2='a'){
+ci_regression <- function(fit,i1='b',i2='a'){
     out <- fit
-    if (fit$model==3) out$fact <- nfact(fit$alpha)
-    else out$fact <- tfact(fit$alpha,fit$df)
-    out[[i1]]['ci[t]'] <- out$fact*fit[[i1]]['s[t]']
-    out[[i2]]['ci[y]'] <- out$fact*fit[[i2]]['s[y]']
-    if (fit$model==1 & disp){
-        out[[i2]]['disp[y]'] <- sqrt(fit$mswd)*out[[i2]]['ci[y]']
+    out[[i1]]['ci[t]'] <- ntfact(fit$alpha)*fit[[i1]]['s[t]']
+    out[[i2]]['ci[y]'] <- ntfact(fit$alpha)*fit[[i2]]['s[y]']
+    if (inflate(fit)){
+        out[[i2]]['disp[y]'] <- ntfact(fit$alpha,fit)*fit[[i2]]['s[y]']
     } else if (fit$model==3) {
         out$w[c('ll','ul')] <- profile_LL_isochron_disp(fit)
     }
     out    
 }
-ci_isochron <- function(fit,disp=TRUE){
-    ci_regression(fit,disp=disp,i1='age',i2='y0')
+ci_isochron <- function(fit){
+    ci_regression(fit,i1='age',i2='y0')
 }
 
 profile_LL_isochron_disp <- function(fit){
