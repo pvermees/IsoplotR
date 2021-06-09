@@ -290,7 +290,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
         for (i in 1:numpeaks){
             age.with.exterr <- add.exterr(x,fit$peaks['t',i],fit$peaks['s[t]',i],type=type)
             fit$peaks['s[t]',i] <- age.with.exterr[2]
-            fit$peaks['ci[t]',i] <- nfact(alpha)*fit$peaks['s[t]',i]
+            fit$peaks['ci[t]',i] <- ntfact(alpha)*fit$peaks['s[t]',i]
         }
     }
     fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
@@ -481,7 +481,7 @@ format.peaks <- function(peaks,peaks.err,props,props.err,df,alpha=0.05){
     rownames(out$peaks) <- c('t','s[t]','ci[t]')
     out$peaks['t',] <- peaks
     out$peaks['s[t]',] <- peaks.err
-    out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
+    out$peaks['ci[t]',] <- ntfact(alpha)*out$peaks['s[t]',]
     out$props <- matrix(0,2,k)
     colnames(out$props) <- 1:k
     rownames(out$props) <- c('p','s[p]')
@@ -576,7 +576,7 @@ min_age_model <- function(zs,alpha=0.05,np=4){
         rownames(out$peaks) <- c('t','s[t]','ci[t]')
         out$peaks['t',] <- par[1]
         out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
-        out$peaks['ci[t]',] <- nfact(alpha)*out$peaks['s[t]',]
+        out$peaks['ci[t]',] <- ntfact(alpha)*out$peaks['s[t]',]
         out$props <- matrix(0,2,1)
         rownames(out$props) <- c('p','s[p]')
         out$props['p',] <- par[2]
@@ -590,7 +590,7 @@ min_age_model <- function(zs,alpha=0.05,np=4){
             rownames(out$mu) <- c('t','s[t]','ci[t]')
             out$mu['t',] <- par[4]
             out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
-            out$mu['ci[t]',] <- nfact(alpha)*out$mu['s[t]',]
+            out$mu['ci[t]',] <- ntfact(alpha)*out$mu['s[t]',]
         }
     }
     out
