@@ -184,13 +184,19 @@
 #' freedom used for the \code{mswd} calculation. }
 #'
 #' \item{age}{a 4-element vector with:\cr
+#' 
 #' \code{t}: the concordia age (in Ma)\cr
+#' 
 #' \code{s[t]}: the estimated uncertainty of \code{t}\cr
-#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval of \code{t} for the appropriate degrees of freedom\cr
+#' 
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval of
+#' 
+#' \code{t} for the appropriate degrees of freedom\cr
+#' 
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} augmented by \eqn{\sqrt{mswd}} to account for
-#' overdispersed datasets.}
+#' overdispersed datasets.
+#' }
 #'
 #' }
 #'
@@ -216,8 +222,8 @@
 #'
 #' \code{s}: the estimated standard deviation for \code{x}
 #'
-#' \code{ci}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval of \code{x} for the appropriate degrees of freedom
+#' \code{ci}: the \eqn{100(1-\alpha)\%} confidence interval of
+#' \code{x} for the appropriate degrees of freedom
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{x} augmented by \eqn{\sqrt{mswd}} to account for

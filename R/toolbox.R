@@ -316,11 +316,15 @@ plot_points <- function(x,y,bg='yellow',pch=21,cex=1.5,pos,col,
     }
 }
 
-ntfact <- function(alpha=0.05,mswd=NULL){
-    if (!is.null(mswd) && mswd$df>0){
-        out <- stats::qt(1-alpha/2,df=mswd$df)*sqrt(mswd$mswd)
+ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
+    if (is.null(mswd)){
+        if (is.null(df)){
+            out <- stats::qnorm(1-alpha/2)
+        } else if (mswd$df>0){
+            out <- stats::qt(1-alpha/2,df=df)
+        }
     } else {
-        out <- stats::qnorm(1-alpha/2)
+        out <- stats::qt(1-alpha/2,df=mswd$df)*sqrt(mswd$mswd)
     }
     out
 }

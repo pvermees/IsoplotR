@@ -602,8 +602,9 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
         out$mswd <- SS/out$df
         out$p.value <- 1-stats::pchisq(SS,out$df)
         out$mean['ci[t]'] <- ntfact(alpha)*out$mean['s[t]']
-        if (inflate(c(out,model=1)))
+        if (inflate(c(out,model=1))){
             out$mean['disp[t]'] <- ntfact(alpha,out)*out$mean['s[t]']
+        }
         out$valid <- valid
     }
     plotpar <- list()
@@ -777,8 +778,9 @@ add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
                    cutoff.76=cutoff.76,type=type)
     out$mean['ci[t]'] <- ntfact(fit$alpha)*out$mean['s[t]']
     if (inflate(c(fit,model=1+2*fit$random.effects))){
-        out$mean['disp[t]'] <- ntfact(fit$alpha,fit)*
-            add.exterr(x,tt=fit$mean['t'],st=fit$mean['s[t]'],
+        out$mean['disp[t]'] <- ntfact(fit$alpha,df=fit$df)*
+            add.exterr(x,tt=fit$mean['t'],
+                       st=sqrt(fit$mswd)*fit$mean['s[t]'],
                        cutoff.76=cutoff.76,type=type)[2]
     }
     ns <- length(x)

@@ -200,8 +200,8 @@
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{y}.
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{y}.
 #'
 #' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only
@@ -217,8 +217,8 @@
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t}.
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{t}.
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
@@ -289,8 +289,8 @@
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{y}.
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{y}.
 #'
 #' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
@@ -301,8 +301,8 @@
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t}
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{t}
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
@@ -375,8 +375,8 @@
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{y}.
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{y}.
 #'
 #' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only returned
@@ -390,8 +390,8 @@
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t}
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{t}
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
@@ -691,8 +691,8 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
         get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
     out <- ci_isochron(out)
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,out)*
-            get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)[2]
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
     }
     if (plot) {
         scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
@@ -792,8 +792,9 @@ isochron.ArAr <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
         get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     out <- ci_isochron(out)
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,out)*
-            get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)[2]
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.ArAr.age(R09,sqrt(out$mswd)*sR09,
+                         x$J[1],x$J[2],exterr=exterr)[2]
     }
     if (plot) {
         scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
@@ -1088,11 +1089,11 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
     out <- ci_isochron(out)
     if (inflate(out)){
-        tdispt <- get.ThU.age(out$par[i08],sqrt(out$cov[i08,i08]),
-                              out$par[i48],sqrt(out$cov[i48,i48]),
+        tdispt <- get.ThU.age(out$par[i08],sqrt(out$mswd*out$cov[i08,i08]),
+                              out$par[i48],sqrt(out$mswd*out$cov[i48,i48]),
                               out$mswd*out$cov[i48,i08],exterr=exterr)
-        out$age['disp[t]'] <- ntfact(alpha,out)*tdispt['s[t]']
-        out$y0['disp[y]'] <- ntfact(alpha,out)*tdispt['s[48_0]']
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*tdispt['s[t]']
+        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*tdispt['s[48_0]']
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1124,11 +1125,11 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
         get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
     out <- ci_isochron(out)
     if (inflate(out)){
-        tfact <- 
-        out$age['disp[t]'] <- ntfact(alpha,out)*
-            get.ThU.age(Th230U238[1],Th230U238[2],exterr=exterr)['s[t]']
-        out$y0['disp[y]'] <- ntfact(alpha,out)*
-            get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])[2]
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.ThU.age(Th230U238[1],sqrt(out$mswd)*Th230U238[2],exterr=exterr)['s[t]']
+        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*
+            get.Th230Th232_0x(out$age['t'],Th230Th232[1],
+                              sqrt(out$mswd)*Th230Th232[2])[2]
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1160,8 +1161,9 @@ isochron_PD <- function(x,nuclide,alpha=0.05,sigdig=2,
                                          exterr=exterr,bratio=bratio)
     out <- ci_isochron(out)
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,out)*
-            get.PD.age(DP,sDP,nuclide,exterr=exterr,bratio=bratio)[2]
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.PD.age(DP,sqrt(out$mswd)*sDP,nuclide,
+                       exterr=exterr,bratio=bratio)[2]
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$displabel <-
@@ -1278,7 +1280,7 @@ regression_init <- function(fit,alpha=0.05){
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
     out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
     out$a['ci[a]'] <- ntfact(alpha)*fit$a['s[a]']
-    out$b['ci[b]'] <- nftfact(alpha)*fit$b['s[b]']
+    out$b['ci[b]'] <- ntfact(alpha)*fit$b['s[b]']
     if (inflate(out)){
         out$a['disp[a]'] <- ntfact(alpha,out)*fit$a['s[a]']
         out$b['disp[b]'] <- ntfact(alpha,out)*fit$b['s[b]']
