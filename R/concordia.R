@@ -234,9 +234,6 @@
 #' w.r.t the analytical uncertainties (not reported if
 #' \code{show.age=3}).}
 #'
-#' \item{fact}{ the \eqn{(1-\alpha/2)}-percentile of a t-distribution
-#' with \code{df} degrees of freedom. }
-#'
 #' \item{n}{ the number of aliquots in the dataset }
 #'
 #' }
@@ -619,11 +616,14 @@ concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
         out <- c(out,mswd.concordia(x,cc4age,type=type4age,tt=tt[1],exterr=exterr))
         out$age <- rep(NA,4)
         names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-        tfact <- stats::qt(1-alpha/2,out$df['combined'])
         out$age[c('t','s[t]')] <- tt
-        out$age['ci[t]'] <- tfact*out$age['s[t]']
-        if (out$mswd['combined']>1)
-            out$age['disp[t]'] <- tfact*out$mswd['combined']*out$age['s[t]']
+        out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
+        mswd <- list(mswd=out$mswd['combined'],model=1,
+                     p.value=out$p.value['combined'],
+                     df=out$df['combined'],alpha=alpha)
+        if (inflate(mswd)){
+            out$age['disp[t]'] <- ntfact(alpha,mswd)*out$age['s[t]']
+        }
         out$x <- cc$x
         out$cov <- cc$cov
     } else {

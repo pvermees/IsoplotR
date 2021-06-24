@@ -458,7 +458,7 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
     if (exterr){
         fit$age[1:2] <- add.exterr(x2calc,tt=fit$age[1],st=fit$age[2],
                                    cutoff.76=cutoff.76,type=type)
-        fit$age[3] <- fit$age[2]*nfact(alpha)
+        fit$age[3] <- fit$age[2]*ntfact(alpha)
     }
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
                                  units=units,ntit=get.ntit(tt[,1]),
