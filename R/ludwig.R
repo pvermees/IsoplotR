@@ -179,7 +179,7 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
             init <- get.lta0b0.init(x,anchor=anchor)
         }
         lower <- (init-1)[!fixed]
-        upper <- (init+2)[!fixed]
+        upper <- (init+1)[!fixed]
         if (model==2){
             out <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",x=x,
                            fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
@@ -391,7 +391,6 @@ anchorfish <- function(AA,BB,CC,DD,fixed=rep(FALSE,nrow(DD))){
 }
 
 data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
-    print(lta0b0w)
     out <- list()
     U <- iratio('U238U235')[1]
     lt <- lta0b0w[1]
