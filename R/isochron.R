@@ -1239,6 +1239,7 @@ get.isochron.labels <- function(nuclide,inverse=FALSE){
 
 isochron_init <- function(fit,alpha=0.05){
     out <- fit
+    out$alpha <- alpha
     if (fit$model==1){
         out$age <- rep(NA,4)
         out$y0 <- rep(NA,4)
@@ -1260,6 +1261,7 @@ isochron_init <- function(fit,alpha=0.05){
 }
 regression_init <- function(fit,alpha=0.05){
     out <- fit
+    out$alpha <- alpha
     out$displabel <- quote('y-dispersion = ')
     out$y0label <- quote('y-intercept = ')
     if (fit$model==1){

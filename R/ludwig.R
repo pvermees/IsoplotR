@@ -391,6 +391,7 @@ anchorfish <- function(AA,BB,CC,DD,fixed=rep(FALSE,nrow(DD))){
 }
 
 data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
+    print(lta0b0w)
     out <- list()
     U <- iratio('U238U235')[1]
     lt <- lta0b0w[1]

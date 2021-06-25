@@ -270,7 +270,8 @@ settings <- function(setting=NA,...,fname=NA,reset=FALSE){
             } else if (nargs==2) {
                 Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],")")
             } else if (nargs==3) {
-                Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],",",args[[3]],")")
+                Rcommand <- paste0(setting,"('",args[[1]],"',",
+                                   args[[2]],",",args[[3]],")")
             }
             out <- eval(parse(text=Rcommand))
         } else {
