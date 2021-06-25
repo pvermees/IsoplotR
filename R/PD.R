@@ -60,7 +60,7 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
     tt <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
                      nuclide,exterr=exterr,bratio=bratio)
     out <- roundit(subset(tt,select=1),subset(tt,select=2),sigdig=sigdig)
-    if (!is.na(i)) out <- out[i,]
+    if (!is.na(i)) out <- out[i,,drop=FALSE]
     colnames(out) <- c('t','s[t]')
     out
 }

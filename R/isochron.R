@@ -599,8 +599,8 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
     out$y0['ci[y]'] <- ntfact(alpha)*out$y0['s[y]']
     out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,out$mswd)*out$age['s[t]']
-        out$y0['disp[y]'] <- ntfact(alpha,out$mswd)*out$y0['s[y]']
+        out$age['disp[t]'] <- ntfact(alpha,out)*out$age['s[t]']
+        out$y0['disp[y]'] <- ntfact(alpha,out)*out$y0['s[y]']
     }
     if (plot){
         scatterplot(XY,alpha=alpha,show.ellipses=show.ellipses,
