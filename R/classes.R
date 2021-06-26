@@ -258,8 +258,9 @@ median.diseq <- function(d){
     for (ratio in c('U48','ThU','RaU','PaU')){
         out[[ratio]]$x <- median(d[[ratio]]$x)
         out[[ratio]]$sx <- median(d[[ratio]]$sx)
-        out$n0 <- apply(d$n0,1,'median')
     }
+    out$n0 <- matrix(apply(d$n0,1,'median'),ncol=1)
+    rownames(out$n0) <- rownames(d$n0)
     out    
 }
 

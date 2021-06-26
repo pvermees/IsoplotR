@@ -185,8 +185,8 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,projerr=TRUE){
     tw <- tera.wasserburg(x,i)
     m86 <- tw$x['U238Pb206']
     m76 <- tw$x['Pb207Pb206']
-    tint <- project.concordia(m86,m76,c76,d=x$d,lower=lower)
-    cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d)
+    tint <- project.concordia(m86,m76,c76,d=median(x$d[i]),lower=lower)
+    cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d[i])
     r86 <- cctw$x['U238Pb206']
     r76 <- cctw$x['Pb207Pb206']
     cnames <- c('U238Pb206','Pb207Pb206') 
@@ -310,8 +310,9 @@ common.Pb.isochron <- function(x,omit=NULL){
     tt <- fit$par[1]
     if (x$format %in% c(1,2,3)){
         out <- matrix(0,ns,5)
-        colnames(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206','errPb207Pb206','rhoXY')
-        rr <- age_to_terawasserburg_ratios(tt,d=x$d)$x
+        colnames(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206',
+                           'errPb207Pb206','rhoXY')
+        rr <- age_to_terawasserburg_ratios(tt,d=median(x$d))$x
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
         m76 <- get.Pb207Pb206.ratios(x)[,1]
         m86 <- get.U238Pb206.ratios(x)[,1]
@@ -387,7 +388,7 @@ SS.SK.without.204 <- function(tt,x,i){
     X <- tw$x['U238Pb206']
     Y <- tw$x['Pb207Pb206']
     i6474 <- stacey.kramers(tt)
-    cct <- age_to_terawasserburg_ratios(tt,st=0,d=x$d)
+    cct <- age_to_terawasserburg_ratios(tt,st=0,d=x$d[i])
     a <- i6474[2]/i6474[1] # intercept
     b <- (cct$x['Pb207Pb206']-a)/cct$x['U238Pb206'] # slope
     cnames <- c('U238Pb206','Pb207Pb206')
@@ -417,7 +418,7 @@ SS.SK.with.204 <- function(tt,x,i){
     J[2,2] <- 1
     J[2,3] <- -i64
     ccw$cov <- J %*% wi$cov %*% t(J)
-    LL.concordia.age(tt,ccw,mswd=FALSE,exterr=FALSE,d=x$d)
+    LL.concordia.age(tt,ccw,mswd=FALSE,exterr=FALSE,d=x$d[i])
 }
 SS.SK.with.208 <- function(tt,x,i){
     i678 <- stacey.kramers(tt)
@@ -430,7 +431,7 @@ SS.with.208 <- function(tt,x,i,c0806,c0807){
     O6 <- solve(xy$cov[1:2,1:2])
     X6 <- xy$x['U238Pb206']
     A6 <- xy$x['Pb208cPb206'] - c0806
-    B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d)[1]*c0806
+    B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d[i])[1]*c0806
     # 1. fit 08c/06
     X6.fitted <- (X6*O6[1,1] + A6*O6[1,2] + A6*B6*O6[1,2] +
                   A6*B6*O6[2,2]) / (O6[1,1] - 2*B6*O6[1,2] + O6[2,2]*B6^2)
@@ -442,7 +443,7 @@ SS.with.208 <- function(tt,x,i,c0806,c0807){
     O7 <- solve(xy$cov[3:4,3:4])
     X7 <- xy$x['U235Pb207']
     A7 <- xy$x['Pb208cPb207'] - c0807
-    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d)[1]*c0807
+    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d[i])[1]*c0807
     X7.fitted <- (X7*O7[1,1] + A7*O7[1,2] + A7*B7*O7[1,2] +
                   A7*B7*O7[2,2]) / (O7[1,1] - 2*B7*O7[1,2] + O7[2,2]*B7^2)
     K7 <- X7 - X7.fitted
