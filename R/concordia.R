@@ -290,7 +290,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
         if (measured.disequilibrium(x2calc$d))
             x2calc$d <- replace.impossible.diseq(tt=fit$par[1],d=x2calc$d)
         fit$n <- length(x2calc)
-        discordia.line(fit,wetherill=wetherill,d=x2calc$d)
+        discordia.line(fit,wetherill=wetherill,d=median(x2calc$d))
         graphics::title(discordia.title(fit,wetherill=wethertit,sigdig=sigdig))
     }
     plot.concordia.line(x2calc,lims=lims,type=type,col=concordia.col,
@@ -332,7 +332,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
     for (i in 1:nn){ # build the concordia line
-        xy <- age_to_concordia_ratios(tt[i],type=type,exterr=exterr,d=x$d)
+        xy <- age_to_concordia_ratios(tt[i],type=type,exterr=exterr,d=median(x$d))
         if (exterr){ # show decay constant uncertainty
             if (i > 1) oldell <- ell
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
@@ -349,7 +349,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
     if (exterr & ((type==1 & dx<0.03) | (type==2 & dx<3) | (type==3 & dx<0.005)))
     { pos <- NULL } else { pos <- 2 }
     for (i in 1:length(ticks)){
-        xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=x$d)
+        xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=median(x$d))
         if (exterr){ # show ticks as ellipse
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
             graphics::polygon(ell,col='white')

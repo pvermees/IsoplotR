@@ -352,6 +352,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         }
     } else {
         d$n0 <- (d$n0 %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
+        rownames(d$n0) <- names(d$L)
         if (d$U48$option<2){      # initial 234U
             if (d$U48$option==1) d$n0['U234',] <- d$U48$x/l34
             if (d$ThU$option==1){ # initial 230Th
