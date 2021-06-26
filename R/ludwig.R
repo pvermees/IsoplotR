@@ -425,6 +425,8 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
+    nc <- length(D$ThUi)
+    j <- 1
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
         X[i] <- wd$x['Pb207U235']
@@ -436,13 +438,14 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
             W[i] <- wd$x['Th232U238']
         }
         E[(0:(NR-1))*ns+i,(0:(NR-1))*ns+i] <- wd$cov
-        J[i,NR*ns+2] <- -D$dPb207U235dl35     #dKdl35
-        J[i,NR*ns+5] <- -D$dPb207U235dl31     #dKdl31
-        J[ns+i,NR*ns+1] <- -D$dPb206U238dl38  #dLdl38
-        J[ns+i,NR*ns+3] <- -D$dPb206U238dl34  #dLdl34
-        J[ns+i,NR*ns+6] <- -D$dPb206U238dl30  #dLdl30
-        J[ns+i,NR*ns+7] <- -D$dPb206U238dl26  #dLdl26
-        if (x$format>6) J[2*ns+i,NR*ns+4] <- -D$dPb208Th232dl32 # dMdl32
+        if (nc>1) j <- i
+        J[i,NR*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
+        J[i,NR*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
+        J[ns+i,NR*ns+1] <- -D$dPb206U238dl38[j]  #dLdl38
+        J[ns+i,NR*ns+3] <- -D$dPb206U238dl34[j]  #dLdl34
+        J[ns+i,NR*ns+6] <- -D$dPb206U238dl30[j]  #dLdl30
+        J[ns+i,NR*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
+        if (x$format>6) J[2*ns+i,NR*ns+4] <- -D$dPb208Th232dl32[j] # dMdl32
     }
     E[NR*ns+1,NR*ns+1] <- lambda('U238')[2]^2
     E[NR*ns+2,NR*ns+2] <- lambda('U235')[2]^2
@@ -689,38 +692,27 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
 }
 
 get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
-    if (format<4) ndim <- 2
-    else ndim <- 3
-    J <- matrix(0,ndim,1)
-    J[1,1] <- -D$dPb207U235dt                # dKdt
-    J[2,1] <- -D$dPb206U238dt                # dLdt
-    if (format>6) J[3,1] <- -D$dPb208Th232dt # dMdt
-    if (deriv==1) {
-        dEdw <- 2*exp(w)^2
-        Ew <- J%*%dEdw%*%t(J)
-    } else if (deriv==2) {
-        d2Edw2 <- 4*exp(w)^2
-        Ew <- J%*%d2Edw2%*%t(J)
-    } else {
-        E <- exp(w)^2
-        Ew <- J%*%E%*%t(J)
-    }
-    out <- matrix(0,ndim*ns,ndim*ns)
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
-    diag(out[i1,i1]) <- Ew[1,1]
-    diag(out[i2,i2]) <- Ew[2,2]
-    diag(out[i1,i2]) <- Ew[1,2]
-    diag(out[i2,i1]) <- Ew[2,1]
-    if (format>3){
+    if (format<4) {
+        J <- matrix(0,2*ns,ns)
+    } else {
+        J <- matrix(0,3*ns,ns)
         i3 <- (2*ns+1):(3*ns)
-        diag(out[i3,i3]) <- Ew[3,3]
-        diag(out[i1,i3]) <- Ew[1,3]
-        diag(out[i3,i1]) <- Ew[3,1]
-        diag(out[i2,i3]) <- Ew[2,3]
-        diag(out[i3,i2]) <- Ew[3,2]
     }
-    out
+    diag(J[i1,i1]) <- -D$dPb207U235dt      # dKdt
+    diag(J[i2,i1]) <- -D$dPb206U238dt      # dLdt
+    if (format>6) {
+        diag(J[i3,i1]) <- -D$dPb208Th232dt # dMdt
+    }
+    if (deriv==1) {
+        dEdx <- 2*exp(w)^2
+    } else if (deriv==2) {
+        dEdx <- 4*exp(w)^2
+    } else {
+        dEdx <- exp(w)^2
+    }
+    dEdx*J%*%t(J)
 }
 
 fixit <- function(x,anchor=0,model=1,w=NA){

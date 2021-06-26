@@ -464,11 +464,11 @@ drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
     dAdl[c(i,i+1),i] <- c(-1,1)
     H <- d$Qinv %*% dAdl %*% d$Q
     P <- H * K
-    dntdl <- as.vector(d$Q %*% P %*% d$Qinv %*% d$nt)
-    names(dntdl) <- names(d$L)
+    dntdl <- (d$Q %*% P %*% d$Qinv %*% d$nt)
+    rownames(dntdl) <- names(d$L)
     # 2. derivative of the ratio
-    out <- (d$nt[den]*dntdl[num]-
-            d$nt[num]*dntdl[den])/d$nt[den]^2
+    out <- (d$nt[den,]*dntdl[num,]-
+            d$nt[num,]*dntdl[den,])/d$nt[den,,drop=FALSE]^2
     out
 }
 
