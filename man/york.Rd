@@ -15,7 +15,7 @@ coefficients of the X- and Y-values.}
 \item{alpha}{cutoff value for confidence intervals}
 }
 \value{
-A four-element list of vectors containing:
+A seven-element list of vectors containing:
 
     \describe{
 
@@ -33,6 +33,8 @@ A four-element list of vectors containing:
 
     \item{p.value}{p-value of a Chi-square value with \code{df}
     degrees of freedom}
+
+    \item{alpha}{the value of the eponymous input argument}
 
     }
 }

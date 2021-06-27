@@ -297,7 +297,6 @@ measured.disequilibrium <- function(d=diseq()){
 #' @param d an object of class \link{diseq}
 #' @param exterr propagate the uncertainties associated with decay
 #'     constants and the \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
-#' @param i aliquot to be used, if \code{d$ThU$option=3}.
 #'
 #' @return
 #' a list containing the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,

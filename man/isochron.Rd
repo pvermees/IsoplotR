@@ -525,8 +525,8 @@ ratio.
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
-\code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y}.
+\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{y}.
 
 \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only
@@ -542,8 +542,8 @@ applicable if \code{ model=1}).  }
 
 \code{s[t]}: the propagated uncertainty of \code{t}
 
-\code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t}.
+\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{t}.
 
 \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
@@ -614,8 +614,8 @@ intervals.}
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
-\code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y}.
+\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{y}.
 
 \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
@@ -626,8 +626,8 @@ interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
 
 \code{s[t]}: the propagated uncertainty of \code{t}
 
-\code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t}
+\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{t}
 
 \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
@@ -700,8 +700,8 @@ intervals.}
 
 \code{s[y]}: the propagated uncertainty of \code{y}
 
-\code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y}.
+\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{y}.
 
 \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only returned
@@ -715,8 +715,8 @@ if \code{model=1})}
 
 \code{s[t]}: the propagated uncertainty of \code{t}
 
-\code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t}
+\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+\code{t}
 
 \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported

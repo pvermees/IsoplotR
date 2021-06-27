@@ -107,7 +107,7 @@ twfit2wfit <- function(fit,x){
     }
     disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
-    md <- median(x$d)
+    md <- mediand(x$d)
     if (disc.slope < conc.slope){
         search.range <- c(tt,get.Pb207Pb206.age(b0/a0,d=md)[1])+buffer
         tl <- tt

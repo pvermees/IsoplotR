@@ -411,7 +411,7 @@ age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,
 add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out <- c(tt,st)
     if (is.UPb(x)){
-        md <- median(x$d)
+        md <- mediand(x$d)
         if (type==1){
             R <- age_to_Pb207U235_ratio(tt,st,d=md)
             out <- get.Pb207U235.age(R[1],R[2],d=md,exterr=TRUE)

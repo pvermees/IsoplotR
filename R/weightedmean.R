@@ -602,7 +602,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
         out$mswd <- SS/out$df
         out$p.value <- 1-stats::pchisq(SS,out$df)
         out$mean['ci[t]'] <- ntfact(alpha)*out$mean['s[t]']
-        if (inflate(c(out,model=1))){
+        if (inflate(out)){
             out$mean['disp[t]'] <- ntfact(alpha,out)*out$mean['s[t]']
         }
         out$valid <- valid
@@ -650,7 +650,7 @@ wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
         line1line <- 2
         line2line <- 1
     } else {
-        if (inflate(c(fit,model=1))){
+        if (inflate(fit)){
             rounded.mean <- roundit(fit$mean['t'],
                                     fit$mean[c('s[t]','ci[t]','disp[t]')],
                                     sigdig=sigdig,text=TRUE)

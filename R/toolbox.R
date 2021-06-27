@@ -453,5 +453,8 @@ trace <- function(x){
 }
 
 inflate <- function(fit){
-    (fit$model==1) && (fit$p.value<fit$alpha)
+    if (is.null(fit$model)) fit$model <- 1
+    if (is.null(fit$alpha)) out <- FALSE
+    else out <- fit$model==1 && (fit$p.value<fit$alpha)
+    out
 }

@@ -185,7 +185,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,projerr=TRUE){
     tw <- tera.wasserburg(x,i)
     m86 <- tw$x['U238Pb206']
     m76 <- tw$x['Pb207Pb206']
-    tint <- project.concordia(m86,m76,c76,d=median(x$d[i]),lower=lower)
+    tint <- project.concordia(m86,m76,c76,d=x$d[i],lower=lower)
     cctw <- age_to_terawasserburg_ratios(tt=tint,st=0,d=x$d[i])
     r86 <- cctw$x['U238Pb206']
     r76 <- cctw$x['Pb207Pb206']
@@ -312,7 +312,7 @@ common.Pb.isochron <- function(x,omit=NULL){
         out <- matrix(0,ns,5)
         colnames(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206',
                            'errPb207Pb206','rhoXY')
-        rr <- age_to_terawasserburg_ratios(tt,d=median(x$d))$x
+        rr <- age_to_terawasserburg_ratios(tt,d=mediand(x$d))$x
         slope <- (rr['Pb207Pb206']-fit$par['76i'])/rr['U238Pb206']
         m76 <- get.Pb207Pb206.ratios(x)[,1]
         m86 <- get.U238Pb206.ratios(x)[,1]
