@@ -427,30 +427,28 @@ SS.SK.with.208 <- function(tt,x,i){
     SS.with.208(tt,x,i,c0806,c0807)
 }
 SS.with.208 <- function(tt,x,i,c0806,c0807){
-    xy <- get.UPb.isochron.ratios.208(x,i,tt=tt) # U8Pb6, Pb8c6, U5Pb7, Pb8c7
-    O6 <- solve(xy$cov[1:2,1:2])
-    X6 <- xy$x['U238Pb206']
-    A6 <- xy$x['Pb208cPb206'] - c0806
-    B6 <- age_to_Pb206U238_ratio(tt,st=0,d=x$d[i])[1]*c0806
+    XY <- get.UPb.isochron.ratios.208(x,i,tt=tt) # U8Pb6, Pb8c6, U5Pb7, Pb8c7
     # 1. fit 08c/06
-    X6.fitted <- (X6*O6[1,1] + A6*O6[1,2] + A6*B6*O6[1,2] +
-                  A6*B6*O6[2,2]) / (O6[1,1] - 2*B6*O6[1,2] + O6[2,2]*B6^2)
-    K6 <- X6 - X6.fitted
-    L6 <- A6 + B6*X6.fitted
-    D6 <- cbind(K6,L6)
+    XY6 <- matrix(c(XY$x[1],sqrt(XY$cov[1,1]),
+                    XY$x[2],sqrt(XY$cov[2,2]),
+                    cov2cor(XY$cov[1:2,1:2])[1,2]),nrow=1)
+    colnames(XY6) <- c('X','sX','Y','sY','rXY')
+    x6r <- age_to_U238Pb206_ratio(tt,st=0,d=x$d[i])[1]
+    xy6 <- get.york.xy(x=XY6,a=c0806,b=-c0806/x6r)
+    O6 <- solve(XY$cov[1:2,1:2])
+    D6 <- XY6[c(1,3)] - xy6
     SS6 <- D6 %*% O6 %*% t(D6)
     # 2. fit 08c/07
-    O7 <- solve(xy$cov[3:4,3:4])
-    X7 <- xy$x['U235Pb207']
-    A7 <- xy$x['Pb208cPb207'] - c0807
-    B7 <- age_to_Pb207U235_ratio(tt,st=0,d=x$d[i])[1]*c0807
-    X7.fitted <- (X7*O7[1,1] + A7*O7[1,2] + A7*B7*O7[1,2] +
-                  A7*B7*O7[2,2]) / (O7[1,1] - 2*B7*O7[1,2] + O7[2,2]*B7^2)
-    K7 <- X7 - X7.fitted
-    L7 <- A7 + B7*X7.fitted
-    # 3. combine to get SS
-    D7 <- cbind(K7,L7)
+    XY7 <- matrix(c(XY$x[3],sqrt(XY$cov[3,3]),
+                    XY$x[4],sqrt(XY$cov[4,4]),
+                    cov2cor(XY$cov[3:4,3:4])[1,2]),nrow=1)
+    colnames(XY7) <- c('X','sX','Y','sY','rXY')
+    x7r <- 1/age_to_U235Pb207_ratio(tt,st=0,d=x$d[i])[1]
+    xy7 <- get.york.xy(x=XY7,a=c0807,b=-c0807/x7r)
+    O7 <- solve(XY$cov[3:4,3:4])
+    D7 <- XY7[c(1,3)] - xy7
     SS7 <- D7 %*% O7 %*% t(D7)
+    # 3. combine to get SS
     SS6 + SS7
 }
 
