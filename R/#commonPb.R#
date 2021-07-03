@@ -181,8 +181,6 @@ Pb0corr <- function(x,option=3,omit4c=NULL,projerr=NULL){
     } else {
         stop('Incorrect input format.')
     }
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@13@"]]));##:ess-bp-end:##
     out
 }
 

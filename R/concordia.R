@@ -264,9 +264,9 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                       ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',
                       concordia.col='darksalmon',exterr=FALSE,
-                      show.age=0,sigdig=2,common.Pb=0,ticks=5,
-                      anchor=0,hide=NULL,omit=NULL, omit.fill=NA,
-                      omit.stroke='grey',...){    
+                      show.age=0,sigdig=2,common.Pb=0,projerr=NULL,
+                      ticks=5,anchor=0,hide=NULL,omit=NULL,
+                      omit.fill=NA,omit.stroke='grey',...){    
     if (is.null(x)){
         emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -277,7 +277,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     calcit <- (1:ns)%ni%c(hide,omit)
     x2calc <- subset(x,subset=calcit)
     if (common.Pb<1) X <- x
-    else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
+    else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)),projerr=projerr)
     X2plot <- subset(X,subset=plotit)
     fit <- NULL
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
