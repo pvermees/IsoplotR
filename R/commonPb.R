@@ -443,11 +443,23 @@ SS.with.208 <- function(tt,x,i,c0806,c0807){
                     XY$x[4],sqrt(XY$cov[4,4]),
                     cov2cor(XY$cov[3:4,3:4])[1,2]),nrow=1)
     colnames(XY7) <- c('X','sX','Y','sY','rXY')
-    x7r <- 1/age_to_U235Pb207_ratio(tt,st=0,d=x$d[i])[1]
+    x7r <- age_to_U235Pb207_ratio(tt,st=0,d=x$d[i])[1]
     xy7 <- get.york.xy(x=XY7,a=c0807,b=-c0807/x7r)
     O7 <- solve(XY$cov[3:4,3:4])
     D7 <- XY7[c(1,3)] - xy7
     SS7 <- D7 %*% O7 %*% t(D7)
+    if (FALSE){ # debug
+        oldpar <- par(mfrow=c(2,1))
+        plot(x=c(0,x6r,XY6[1,1]),y=c(c0806,0,XY6[1,3]),type='n')
+        lines(ellipse(XY$x[1],XY$x[2],covmat=XY$cov[1:2,1:2]))
+        lines(x=c(0,x6r),y=c(c0806,0))
+        points(xy6,pch=16)
+        plot(x=c(0,x7r,XY7[1,1]),y=c(c0807,0,XY7[1,3]),type='n')
+        lines(ellipse(XY$x[3],XY$x[4],covmat=XY$cov[3:4,3:4]))
+        lines(x=c(0,x7r),y=c(c0807,0))
+        points(xy7,pch=16)
+        par(oldpar)
+    }
     # 3. combine to get SS
     SS6 + SS7
 }
