@@ -238,7 +238,7 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47,tt=NULL,projerr=TRUE){
     out[5] <- cov2cor(E)[1,2]
     out
 }
-correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,projerr=TRUE){
+correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,projerr=TRUE,cc=FALSE){
     ir <- get.UPb.isochron.ratios.208(x,i,tt=tt) # 3806 08c06 3507 08c07 3238 3208 06c08 07c08
     r3507 <- age_to_U235Pb207_ratio(tt,d=x$d[i])[1]
     p3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507/c0807
@@ -256,27 +256,34 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,projerr=TRUE){
     Jp[3,8] <- r3208*c0807
     Jp[4,5] <- 1
     Ep <- Jp %*% ir$cov %*% t(Jp)
-    out <- rep(NA,14)
-    names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
-                    'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
-                    'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
-    out[1] <- 1/p[1]
-    out[3] <- 1/p[2]
-    out[5] <- 1/p[3]
-    out[7] <- p[4]
     J <- matrix(0,4,4)
     J[1,1] <- -1/p[1]^2
     J[2,2] <- -1/p[2]^2
     J[3,3] <- -1/p[3]^2
     J[4,4] <- 1
     E <- J %*% Ep %*% t(J)
-    cormat <- matrix(0,4,4)
-    pos <- which(diag(E)>0)
-    cormat[pos,pos] <- stats::cov2cor(E[pos,pos])
-    out[c(2,4,6,8)] <- sqrt(diag(E))
-    out[9:11] <- cormat[1,2:4]
-    out[12:13] <- cormat[2,3:4]
-    out[14] <- cormat[3,4]
+    if (cc){
+        out <- list()
+        cnames <- c('Pb207U235','Pb206U238')
+        out$x <- 1/p[1:2]
+        out$cov <- E[1:2,1:2]
+        names(out$x) <- cnames
+        rownames(out$cov) <- cnames
+        colnames(out$cov) <- cnames
+    } else {
+        out <- rep(NA,14)
+        names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
+                        'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
+                        'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
+        out[c(1,3,5,7)] <- c(1/p[1:3],p[4])
+        cormat <- matrix(0,4,4)
+        pos <- which(diag(E)>0)
+        cormat[pos,pos] <- stats::cov2cor(E[pos,pos])
+        out[c(2,4,6,8)] <- sqrt(diag(E))
+        out[9:11] <- cormat[1,2:4]
+        out[12:13] <- cormat[2,3:4]
+        out[14] <- cormat[3,4]
+    }
     out
 }
 
@@ -450,44 +457,8 @@ SS.SK.with.208 <- function(tt,x,i){
     SS.with.208(tt,x,i,c0806,c0807)
 }
 SS.with.208 <- function(tt,x,i,c0806,c0807){
-    XY <- get.UPb.isochron.ratios.208(x,i,tt=tt) # U8Pb6, Pb8c6, U5Pb7, Pb8c7
-    # 1. fit 08c/06
-    XY6 <- matrix(c(XY$x[1],sqrt(XY$cov[1,1]),
-                    XY$x[2],sqrt(XY$cov[2,2]),
-                    cov2cor(XY$cov[1:2,1:2])[1,2]),nrow=1)
-    colnames(XY6) <- c('X','sX','Y','sY','rXY')
-    x6r <- age_to_U238Pb206_ratio(tt,st=0,d=x$d[i])[1]
-    xy6 <- get.york.xy(x=XY6,a=c0806,b=-c0806/x6r)
-    O6 <- solve(XY$cov[1:2,1:2])
-    D6 <- XY6[c(1,3)] - xy6
-    SS6 <- D6 %*% O6 %*% t(D6)
-    # 2. fit 08c/07
-    XY7 <- matrix(c(XY$x[3],sqrt(XY$cov[3,3]),
-                    XY$x[4],sqrt(XY$cov[4,4]),
-                    cov2cor(XY$cov[3:4,3:4])[1,2]),nrow=1)
-    colnames(XY7) <- c('X','sX','Y','sY','rXY')
-    x7r <- age_to_U235Pb207_ratio(tt,st=0,d=x$d[i])[1]
-    xy7 <- get.york.xy(x=XY7,a=c0807,b=-c0807/x7r)
-    O7 <- solve(XY$cov[3:4,3:4])
-    D7 <- XY7[c(1,3)] - xy7
-    SS7 <- D7 %*% O7 %*% t(D7)
-    if (FALSE){ # debug
-        XYraw <- get.UPb.isochron.ratios.208(x,i=i,tt=0)
-        oldpar <- par(mfrow=c(2,1))
-        plot(x=c(0,x6r,XY6[1,1],XYraw$x[1]),y=c(c0806,0,XY6[1,3],XYraw$x[2]),type='n')
-        lines(ellipse(XYraw$x[1],XYraw$x[2],covmat=XYraw$cov[1:2,1:2]),col='blue')
-        lines(ellipse(XY$x[1],XY$x[2],covmat=XY$cov[1:2,1:2]))
-        lines(x=c(0,x6r),y=c(c0806,0))
-        points(xy6,pch=16)
-        plot(x=c(0,x7r,XY7[1,1],XYraw$x[3]),y=c(c0807,0,XY7[1,3],XYraw$x[4]),type='n')
-        lines(ellipse(XYraw$x[3],XYraw$x[4],covmat=XYraw$cov[3:4,3:4]),col='blue')
-        lines(ellipse(XY$x[3],XY$x[4],covmat=XY$cov[3:4,3:4]))
-        lines(x=c(0,x7r),y=c(c0807,0))
-        points(xy7,pch=16)
-        par(oldpar)
-    }
-    # 3. combine to get SS
-    SS6 + SS7
+    ccw <- correct.common.Pb.with.208(x,i=i,tt=tt,c0806=c0806,c0807=c0807,cc=TRUE)
+    LL.concordia.age(tt,ccw,mswd=TRUE,exterr=FALSE,d=x$d[i])
 }
 
 stacey.kramers <- function(tt,inverse=FALSE){
