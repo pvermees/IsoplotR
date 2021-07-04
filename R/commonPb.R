@@ -230,39 +230,47 @@ correct.common.Pb.with.204 <- function(x,i,c64,c74,c48=NULL,projerr=TRUE){
                     'Pb206U238','errPb206U238','rhoXY')
     out
 }
-correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,
-                                       c0832=NULL,projerr=TRUE){
-    U <- iratio('U238U235')[1]
-    wd <- wetherill(x,i) # 0735, 0638, 0832, 3238
-    if (is.null(c0832)){
-        l2 <- lambda('Th232')[1]
-        r0832 <- exp(l2*tt) - 1
-        c0832 <- wd$x['Pb208Th232'] - r0832
-    } else {
-        r0832 <- wd$x['Pb208Th232'] - c0832
-    }
-    r0735 <- wd$x['Pb207U235'] - c0832*wd$x['Th232U238']*U/c0807
-    r0638 <- wd$x['Pb206U238'] - c0832*wd$x['Th232U238']/c0806
-    r3238 <- wd$x['Th232U238']
+correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,projerr=TRUE){
+    ir <- get.UPb.isochron.ratios.208(x,i,tt=tt) # 3806 08c06 3507 08c07 3238 3208 06c08 07c08
+    r3507 <- age_to_U235Pb207_ratio(tt,d=x$d[i])[1]
+    p3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507/c0807
+    r3806 <- age_to_U238Pb206_ratio(tt,d=x$d[i])[1]
+    p3806 <- ir$x['U238Pb206'] + ir$x['Pb208cPb206']*r3806/c0806
+    r3208 <- 1/age_to_Pb208Th232_ratio(tt)[1]
+    p3208 <- ir$x['Th232Pb208'] + ir$x['Pb207cPb208']*r3208*c0807
+    p <- c(p3507,p3806,p3208,ir$x['Th232U238']) # projected compositions
+    Jp <- matrix(0,4,8)
+    Jp[1,3] <- 1
+    Jp[2,1] <- 1
+    Jp[3,6] <- 1
+    Jp[4,5] <- 1
     if (projerr){
-        J <- diag(4)
-        J[1,3] <- -wd$x['Th232U238']*U/c0807
-        J[2,3] <- -wd$x['Th232U238']/c0806
-        J[1,4] <- -c0832*U/c0807
-        J[2,4] <- -c0832/c0807
-        E <- J %*% wd$cov %*% t(J)
-    } else {
-        E <- wd$cov
+        Jp[1,4] <- r3507/c0807
+        Jp[2,2] <- r3806/c0806
+        Jp[3,8] <- r3208*c0807
     }
-    err <- sqrt(diag(E))
-    cormat <- matrix(0,4,4)
-    pos <- which(err>0)
-    cormat[pos,pos] <- stats::cov2cor(E[pos,pos])
-    out <- c(r0735,err[1],r0638,err[2],r0832,err[3],r3238,err[4],
-             cormat[1,2:4],cormat[2,3:4],cormat[3,4])
+    Ep <- Jp %*% ir$cov %*% t(Jp)
+    out <- rep(NA,14)
     names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                     'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                     'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
+    out[1] <- 1/p[1]
+    out[3] <- 1/p[2]
+    out[5] <- 1/p[3]
+    out[7] <- p[4]
+    J <- matrix(0,4,4)
+    J[1,1] <- -1/p[1]^2
+    J[2,2] <- -1/p[2]^2
+    J[3,3] <- -1/p[3]^2
+    J[4,4] <- 1
+    E <- J %*% Ep %*% t(J)
+    cormat <- matrix(0,4,4)
+    pos <- which(diag(E)>0)
+    cormat[pos,pos] <- stats::cov2cor(E[pos,pos])
+    out[c(2,4,6,8)] <- sqrt(diag(E))
+    out[9:11] <- cormat[1,2:4]
+    out[12:13] <- cormat[2,3:4]
+    out[14] <- cormat[3,4]
     out
 }
 
@@ -345,10 +353,9 @@ common.Pb.isochron <- function(x,omit=NULL,projerr=FALSE){
                            'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
         c0806 <- 1/fit$par['68i']
         c0807 <- 1/fit$par['78i']
-        c0832 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,c0807=c0807,
-                                                  c0832=c0832[i],projerr=projerr)
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,
+                                                  c0807=c0807,projerr=projerr)
         }
     }
     out
@@ -455,6 +462,21 @@ SS.with.208 <- function(tt,x,i,c0806,c0807){
     O7 <- solve(XY$cov[3:4,3:4])
     D7 <- XY7[c(1,3)] - xy7
     SS7 <- D7 %*% O7 %*% t(D7)
+    if (FALSE){ # debug
+        XYraw <- get.UPb.isochron.ratios.208(x,i=i,tt=0)
+        oldpar <- par(mfrow=c(2,1))
+        plot(x=c(0,x6r,XY6[1,1],XYraw$x[1]),y=c(c0806,0,XY6[1,3],XYraw$x[2]),type='n')
+        lines(ellipse(XYraw$x[1],XYraw$x[2],covmat=XYraw$cov[1:2,1:2]),col='blue')
+        lines(ellipse(XY$x[1],XY$x[2],covmat=XY$cov[1:2,1:2]))
+        lines(x=c(0,x6r),y=c(c0806,0))
+        points(xy6,pch=16)
+        plot(x=c(0,x7r,XY7[1,1],XYraw$x[3]),y=c(c0807,0,XY7[1,3],XYraw$x[4]),type='n')
+        lines(ellipse(XYraw$x[3],XYraw$x[4],covmat=XYraw$cov[3:4,3:4]),col='blue')
+        lines(ellipse(XY$x[3],XY$x[4],covmat=XY$cov[3:4,3:4]))
+        lines(x=c(0,x7r),y=c(c0807,0))
+        points(xy7,pch=16)
+        par(oldpar)
+    }
     # 3. combine to get SS
     SS6 + SS7
 }
