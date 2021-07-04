@@ -181,8 +181,6 @@ Pb0corr <- function(x,option=3,omit4c=NULL,projerr=NULL){
     } else {
         stop('Incorrect input format.')
     }
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@13@"]]));##:ess-bp-end:##
     out
 }
 
@@ -297,7 +295,8 @@ common.Pb.stacey.kramers <- function(x,projerr=TRUE){
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                            'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
         for (i in 1:ns){
-            tint <- stats::optimise(SS.SK.with.208,interval=c(0,5000),x=x,i=i)$minimum
+            maxt <- get.Pb208Th232.age(x,i=i)[1]
+            tint <- stats::optimise(SS.SK.with.208,interval=c(0,maxt),x=x,i=i)$minimum
             c678 <- stacey.kramers(tint)
             c86 <- c678[,'i84']/c678[,'i64']
             c87 <- c678[,'i84']/c678[,'i74']
