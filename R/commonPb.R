@@ -205,7 +205,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,lower=TRUE,projerr=TRUE){
                     'Pb207Pb206','errPb207Pb206','rhoXY')
     out
 }
-correct.common.Pb.with.204 <- function(x,i,c46,c47,tt=NULL,projerr=TRUE){
+correct.common.Pb.with.204 <- function(x,i,c46,c47,tt=NULL,projerr=TRUE,cc=FALSE){
     ir <- get.UPb.isochron.ratios.204(x,i=i) # 3806, 0406, 3507, 0407
     Jp <- matrix(0,2,4)
     if (is.null(tt)){ # line through measurement
@@ -226,16 +226,26 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47,tt=NULL,projerr=TRUE){
         Jp[2,2] <- r3806/c46
     }
     Ep <- Jp %*% ir$cov %*% t(Jp)
-    out <- rep(NA,5)
-    out[1] <- 1/p3507
-    out[3] <- 1/p3806
-    names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
     J <- matrix(0,2,2)
     J[1,1] <- -1/p3507^2
     J[2,2] <- -1/p3806^2
     E <- J %*% Ep %*% t(J)
-    out[c(2,4)] <- sqrt(diag(E))
-    out[5] <- cov2cor(E)[1,2]
+    if (cc){
+        out <- list()
+        cnames <- c('Pb207U235','Pb206U238')
+        out$x <- 1/c(p3507,p3806)
+        out$cov <- E
+        names(out$x) <- cnames
+        rownames(out$cov) <- cnames
+        colnames(out$cov) <- cnames
+    } else {
+        out <- rep(NA,5)
+        names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
+        out[1] <- 1/p3507
+        out[3] <- 1/p3806
+        out[c(2,4)] <- sqrt(diag(E))
+        out[5] <- cov2cor(E)[1,2]
+    }
     out
 }
 correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,projerr=TRUE,cc=FALSE){
@@ -431,24 +441,11 @@ SS.SK.without.204 <- function(tt,x,i){
     as.numeric(d %*% omega %*% t(d))
 }
 SS.SK.with.204 <- function(tt,x,i){
-    wi <- wetherill(x,i=i)
-    i6474 <- stacey.kramers(tt)
-    i64 <- i6474[1,'i64']
-    i74 <- i6474[1,'i74']
-    U <- iratio('U238U235')[1]
-    ccw <- list(x=rep(0,2),cov=matrix(0,2,2))
-    cnames <- c('Pb207U235','Pb206U238')
-    names(ccw$x) <- cnames
-    ccw$x[1] <- wi$x['Pb207U235'] - i74*wi$x['Pb204U238']*U
-    ccw$x[2] <- wi$x['Pb206U238'] - i64*wi$x['Pb204U238']
-    J <- matrix(0,2,3)
-    rownames(J) <- cnames
-    J[1,1] <- 1
-    J[1,3] <- -i74*U
-    J[2,2] <- 1
-    J[2,3] <- -i64
-    ccw$cov <- J %*% wi$cov %*% t(J)
-    LL.concordia.age(tt,ccw,mswd=FALSE,exterr=FALSE,d=x$d[i])
+    c6474 <- stacey.kramers(tt)
+    c46 <- 1/c6474[1,'i64']
+    c47 <- 1/c6474[1,'i74']    
+    ccw <- correct.common.Pb.with.204(x=x,i=i,c46=c46,c47=c47,tt=tt,cc=TRUE)
+    LL.concordia.age(tt,ccw,mswd=TRUE,exterr=FALSE,d=x$d[i])
 }
 SS.SK.with.208 <- function(tt,x,i){
     i678 <- stacey.kramers(tt)
