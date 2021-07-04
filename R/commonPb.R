@@ -132,19 +132,16 @@
 #' dev.new()
 #' concordia(UPb,common.Pb=2)
 #' @export
-Pb0corr <- function(x,option=3,omit4c=NULL,projerr=NULL){
+Pb0corr <- function(x,option=3,omit4c=NULL){
     ns <- length(x)
     out <- x
     out$x.raw <- x$x
     if (option == 1){
-        if (is.null(projerr)) projerr <- TRUE
-        x.corr <- common.Pb.nominal(x,projerr=projerr)
+        x.corr <- common.Pb.nominal(x)
     } else if (option == 2){
-        if (is.null(projerr)) projerr <- FALSE
-        x.corr <- common.Pb.isochron(x,omit=omit4c,projerr=projerr)
+        x.corr <- common.Pb.isochron(x,omit=omit4c)
     } else if (option == 3){
-        if (is.null(projerr)) projerr <- TRUE
-        x.corr <- common.Pb.stacey.kramers(x,projerr=projerr)
+        x.corr <- common.Pb.stacey.kramers(x)
     } else {
         return(out)
     }
@@ -281,21 +278,23 @@ common.Pb.stacey.kramers <- function(x,projerr=TRUE){
         colnames(out) <- c('U238Pb206','errU238Pb206',
                            'Pb207Pb206','errPb207Pb206','rhoXY')
         for (i in 1:ns){
+            maxt <- get.Pb207Pb206.age(x,i=i)[1]
             tint <- stats::optimise(SS.SK.without.204,
-                                    interval=c(0,5000),x=x,i=i)$minimum
+                                    interval=c(0,maxt),x=x,i=i)$minimum
             i6474 <- stacey.kramers(tint)
             c76 <- i6474[,'i74']/i6474[,'i64']
-            out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=FALSE,projerr=projerr)
+            out[i,] <- correct.common.Pb.without.204(x,i,c76,lower=FALSE,projerr=TRUE)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb206U238','errPb206U238','rhoXY')
         for (i in 1:ns){
-            tint <- stats::optimise(SS.SK.with.204,interval=c(0,5000),x=x,i=i)$minimum
+            maxt <- get.Pb207Pb206.age(x,i=i)[1]
+            tint <- stats::optimise(SS.SK.with.204,interval=c(0,maxt),x=x,i=i)$minimum
             c6474 <- stacey.kramers(tint)
             out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c6474[,'i64'],
-                                                  c74=c6474[,'i74'],projerr=projerr)
+                                                  c74=c6474[,'i74'],projerr=TRUE)
         }
     } else if (x$format%in%c(7,8)){
         out <- matrix(0,ns,14)
@@ -309,7 +308,7 @@ common.Pb.stacey.kramers <- function(x,projerr=TRUE){
             c86 <- c678[,'i84']/c678[,'i64']
             c87 <- c678[,'i84']/c678[,'i74']
             out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0806=c86,
-                                                  c0807=c87,projerr=projerr)
+                                                  c0807=c87,projerr=TRUE)
         }
     } else {
         stop('Invalid input format.')
@@ -317,7 +316,7 @@ common.Pb.stacey.kramers <- function(x,projerr=TRUE){
     out
 }
 
-common.Pb.isochron <- function(x,omit=NULL,projerr=FALSE){
+common.Pb.isochron <- function(x,omit=NULL){
     ns <- length(x)
     calcit <- (1:ns)%ni%omit
     fit <- ludwig(subset(x,subset=calcit))
@@ -333,7 +332,7 @@ common.Pb.isochron <- function(x,omit=NULL,projerr=FALSE){
         c76 <- m76 - slope*m86
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76[i],
-                                                     lower=TRUE,projerr=projerr)
+                                                     lower=TRUE,projerr=FALSE)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
@@ -344,7 +343,7 @@ common.Pb.isochron <- function(x,omit=NULL,projerr=FALSE){
         c48 <- data2ludwig(x=x,lta0b0w=fit$logpar)$c0
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c64,c74=c74,
-                                                  c48=c48[i],projerr=projerr)
+                                                  c48=c48[i],projerr=FALSE)
         }
     } else if (x$format%in%c(7,8)){
         out <- matrix(0,ns,14)
@@ -355,13 +354,13 @@ common.Pb.isochron <- function(x,omit=NULL,projerr=FALSE){
         c0807 <- 1/fit$par['78i']
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,
-                                                  c0807=c0807,projerr=projerr)
+                                                  c0807=c0807,projerr=TRUE)
         }
     }
     out
 }
 
-common.Pb.nominal <- function(x,projerr=TRUE){
+common.Pb.nominal <- function(x){
     ns <- length(x)
     if (x$format %in% c(1,2,3)){
         out <- matrix(0,ns,5)
@@ -369,7 +368,7 @@ common.Pb.nominal <- function(x,projerr=TRUE){
                            'Pb207Pb206','errPb207Pb206','rhoXY')
         c76 <- settings('iratio','Pb207Pb206')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76,lower=TRUE,projerr=projerr)
+            out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76,lower=TRUE,projerr=TRUE)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
@@ -378,7 +377,7 @@ common.Pb.nominal <- function(x,projerr=TRUE){
         c64 <- settings('iratio','Pb206Pb204')[1]
         c74 <- settings('iratio','Pb207Pb204')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c64,c74=c74,projerr=projerr)
+            out[i,] <- correct.common.Pb.with.204(x,i=i,c64=c64,c74=c74,projerr=TRUE)
         }
     } else if (x$format%in%c(7,8)){
         out <- matrix(0,ns,14)
@@ -391,7 +390,7 @@ common.Pb.nominal <- function(x,projerr=TRUE){
             tint <- stats::optimise(SS.with.208,interval=c(0,5000),
                                     c0806=c0806,c0807=c0807,x=x,i=i)$minimum
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0806=c0806,
-                                                  c0807=c0807,projerr=projerr)
+                                                  c0807=c0807,projerr=TRUE)
         }
     }
     out
