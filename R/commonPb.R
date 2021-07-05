@@ -181,12 +181,12 @@ Pb0corr <- function(x,option=3,omit4c=NULL){
     out
 }
 
-correct.common.Pb.without.204 <- function(x,i,c76,tt=NULL,lower=TRUE){
+correct.common.Pb.without.204 <- function(x,i,c76,tt=NULL){
     tw <- tera.wasserburg(x,i)
     m86 <- tw$x['U238Pb206']
     m76 <- tw$x['Pb207Pb206']
     if (is.null(tt)){
-        tt <- project.concordia(m86,m76,c76,d=x$d[i],lower=lower)
+        tt <- project.concordia(m86,m76,c76,d=x$d[i])
         cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d[i])
         r86 <- cctw$x['U238Pb206']
         r76 <- cctw$x['Pb207Pb206']
@@ -204,7 +204,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,tt=NULL,lower=TRUE){
         r76 <- cctw$x['Pb207Pb206']
         slope <- (c76-r76)/r86
         p76 <- m76 + slope*m86
-        out <- correct.common.Pb.without.204(x=x,i=i,c76=p76,lower=lower)
+        out <- correct.common.Pb.without.204(x=x,i=i,c76=p76)
     }
     out
 }
@@ -312,7 +312,7 @@ common.Pb.stacey.kramers <- function(x){
                                     interval=c(0,maxt),x=x,i=i)$minimum
             i6474 <- stacey.kramers(tint)
             c76 <- i6474[,'i74']/i6474[,'i64']
-            out[i,] <- correct.common.Pb.without.204(x=x,i=i,c76=c76,tt=tint,lower=FALSE)
+            out[i,] <- correct.common.Pb.without.204(x=x,i=i,c76=c76,tt=tint)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
@@ -389,7 +389,7 @@ common.Pb.nominal <- function(x){
                            'Pb207Pb206','errPb207Pb206','rhoXY')
         c76 <- settings('iratio','Pb207Pb206')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76,lower=TRUE)
+            out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
@@ -540,7 +540,7 @@ sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
     out
 }
 
-project.concordia <- function(m86,m76,c76,d=diseq(),lower=TRUE){
+project.concordia <- function(m86,m76,c76,d=diseq()){
     t68 <- get.Pb206U238.age(1/m86,d=d)[1]
     t76 <- get.Pb207Pb206.age(m76,d=d)[1]
     a <- c76
@@ -559,7 +559,7 @@ project.concordia <- function(m86,m76,c76,d=diseq(),lower=TRUE){
         search.range <- c(0,t68)
         go.ahead <- TRUE
     } else if (neg & below){
-        if (lower){
+        if (neg){
             search.range[1] <- 0
             search.range[2] <- get.search.limit(a=a,b=b,d=d,m=0,M=5000)
             if (!is.na(search.range[2])) go.ahead <- TRUE
