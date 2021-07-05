@@ -1,31 +1,37 @@
 .IsoplotR <- new.env(parent = emptyenv())
 
 lambda <- function(nuclide,x=NULL,e=NULL){
-    if (is.null(x) & is.null(e)) return(.IsoplotR$lambda[[nuclide]])
+    old <- .IsoplotR$lambda[[nuclide]]
     if (is.numeric(x)) .IsoplotR$lambda[[nuclide]][1] <- x
     if (is.numeric(e)) .IsoplotR$lambda[[nuclide]][2] <- e
+    invisible(old)
 }
 iratio <- function(ratio,x=NULL,e=NULL){
-    if (is.null(x) & is.null(e)) return(.IsoplotR$iratio[[ratio]])
+    old <- .IsoplotR$iratio[[ratio]]
     if (is.numeric(x)) .IsoplotR$iratio[[ratio]][1] <- x
     if (is.numeric(e)) .IsoplotR$iratio[[ratio]][2] <- e
+    invisible(old)
 }
 imass <- function(nuclide,x=NULL,e=NULL){
-    if (is.null(x) & is.null(e)) return(.IsoplotR$imass[[nuclide]])
+    old <- .IsoplotR$imass[[nuclide]]
     if (is.numeric(x)) .IsoplotR$imass[[nuclide]][1] <- x
     if (is.numeric(e)) .IsoplotR$imass[[nuclide]][2] <- e
+    invisible(old)
 }
 etchfact <- function(mineral,x=NULL){
-    if (is.null(x)) return(.IsoplotR$etchfact[[mineral]])
+    old <- .IsoplotR$etchfact[[mineral]]
     if (is.numeric(x)) .IsoplotR$etchfact[[mineral]] <- x
+    invisible(old)
 }
 tracklength <- function(mineral,x=NULL){
-    if (is.null(x)) return(.IsoplotR$tracklength[[mineral]])
+    old <- .IsoplotR$tracklength[[mineral]]
     if (is.numeric(x)) .IsoplotR$tracklength[[mineral]] <- x
+    invisible(old)
 }
 mindens <- function(mineral,x=NULL){
-    if (is.null(x)) return(.IsoplotR$mindens[[mineral]])
+    old <- .IsoplotR$mindens[[mineral]]
     if (is.numeric(x)) .IsoplotR$mindens[[mineral]] <- x
+    invisible(old)
 }
 
 #' @title Load settings to and from json
@@ -243,8 +249,9 @@ mindens <- function(mineral,x=NULL){
 #' print(settings('iratio','U238U235'))
 #' @export
 settings <- function(setting=NA,...,fname=NA,reset=FALSE){
+    out <- .IsoplotR
     if (reset){
-        settings(fname=system.file("constants.json",package="IsoplotR"))
+        out <- settings(fname=system.file("constants.json",package="IsoplotR"))
     } else {
         args <- list(...)
         nargs <- length(args)
@@ -263,12 +270,14 @@ settings <- function(setting=NA,...,fname=NA,reset=FALSE){
             } else if (nargs==2) {
                 Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],")")
             } else if (nargs==3) {
-                Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],",",args[[3]],")")
+                Rcommand <- paste0(setting,"('",args[[1]],"',",
+                                   args[[2]],",",args[[3]],")")
             }
-            eval(parse(text=Rcommand))
+            out <- eval(parse(text=Rcommand))
         } else {
             preferences <- as.list(.IsoplotR)
-            return(toJSON(preferences))
+            out <- toJSON(preferences)
         }
     }
+    invisible(out)
 }

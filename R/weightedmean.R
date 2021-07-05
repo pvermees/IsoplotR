@@ -561,7 +561,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
     sx <- sX[valid]
     out <- list()
     if (length(x)<=1){
-        out$mean <- c(x,sx,nfact(alpha)*sx)
+        out$mean <- c(x,sx,ntfact(alpha)*sx)
         out$mswd <- 0
         out$p.value <- 1
         return(out)
@@ -584,7 +584,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
             fit <- continuous_mixture(x,sx)
             out$mean['t'] <- fit$mu[1]
             out$mean['s[t]'] <- fit$mu[2]
-            out$mean['ci[t]'] <- nfact(alpha)*out$mean['s[t]']
+            out$mean['ci[t]'] <- ntfact(alpha)*out$mean['s[t]']
             out$disp['s'] <- fit$sigma
             out$disp[c('ll','ul')] <-
                 profile_LL_weightedmean_disp(fit,x,sx,alpha)
@@ -601,8 +601,10 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
         SS <- sum(((x-out$mean['t'])/sx)^2)
         out$mswd <- SS/out$df
         out$p.value <- 1-stats::pchisq(SS,out$df)
-        out$mean['ci[t]'] <- tfact(alpha,out$df)*out$mean['s[t]']
-        out$mean['disp[t]'] <- sqrt(out$mswd)*out$mean['ci[t]']
+        out$mean['ci[t]'] <- ntfact(alpha)*out$mean['s[t]']
+        if (inflate(out)){
+            out$mean['disp[t]'] <- ntfact(alpha,out)*out$mean['s[t]']
+        }
         out$valid <- valid
     }
     plotpar <- list()
@@ -612,7 +614,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,
                            rep(out$mean['t']-out$mean['ci[t]'],2)))
     plotpar$ci.exterr <- NA # to be defined later
     if (random.effects){
-        cit <- nfact(alpha)*out$disp['s']
+        cit <- ntfact(alpha)*out$disp['s']
     } else {
         cit <- out$mean['disp[t]']
     }
@@ -648,7 +650,7 @@ wtdmean.title <- function(fit,sigdig=2,units='',caveat=FALSE,...){
         line1line <- 2
         line2line <- 1
     } else {
-        if (inflate(c(fit,model=1))){
+        if (inflate(fit)){
             rounded.mean <- roundit(fit$mean['t'],
                                     fit$mean[c('s[t]','ci[t]','disp[t]')],
                                     sigdig=sigdig,text=TRUE)
@@ -699,13 +701,13 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
         calcit <- calcit[i]
         colour <- colour[i]
     }
-    fact <- nfact(alpha)
+    f <- ntfact(alpha)
     if (is.na(from))
-        minx <- min(c(x-fact*sx,x-fact*fit$disp['s']),na.rm=TRUE)
+        minx <- min(c(x-f*sx,x-f*fit$disp['s']),na.rm=TRUE)
     else
         minx <- from
     if (is.na(to))
-        maxx <- max(c(x+fact*sx,x+fact*fit$disp['s']),na.rm=TRUE)
+        maxx <- max(c(x+f*sx,x+f*fit$disp['s']),na.rm=TRUE)
     else
         maxx <- to
     graphics::plot(c(0,ns+1),c(minx,maxx),type='n',
@@ -728,8 +730,8 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
         } else {
             col <- outlier.col
         }
-        graphics::rect(xleft=i-0.4,ybottom=x[i]-fact*sx[i],
-                       xright=i+0.4,ytop=x[i]+fact*sx[i],col=col)
+        graphics::rect(xleft=i-0.4,ybottom=x[i]-f*sx[i],
+                       xright=i+0.4,ytop=x[i]+f*sx[i],col=col)
     }
     colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
     graphics::title(wtdmean.title(fit,sigdig=sigdig,units=units,caveat=caveat))
@@ -774,16 +776,12 @@ add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
     out$mean[c('t','s[t]')] <-
         add.exterr(x,tt=fit$mean['t'],st=fit$mean['s[t]'],
                    cutoff.76=cutoff.76,type=type)
-    if (fit$random.effects){
-        out$mean['ci[t]'] <- nfact(fit$alpha)*out$mean['s[t]']
-    } else {
-        out$mean['ci[t]'] <- tfact(fit$alpha,fit$df)*out$mean['s[t]']
-        if (inflate(c(fit,model=1))){
-            out$mean['disp[t]'] <- tfact(fit$alpha,fit$df)*
-                add.exterr(x,tt=fit$mean['t'],
-                           st=sqrt(fit$mswd)*fit$mean['s[t]'],
-                           cutoff.76=cutoff.76,type=type)[2]
-        }
+    out$mean['ci[t]'] <- ntfact(fit$alpha)*out$mean['s[t]']
+    if (inflate(c(fit,model=1+2*fit$random.effects))){
+        out$mean['disp[t]'] <- ntfact(fit$alpha,df=fit$df)*
+            add.exterr(x,tt=fit$mean['t'],
+                       st=sqrt(fit$mswd)*fit$mean['s[t]'],
+                       cutoff.76=cutoff.76,type=type)[2]
     }
     ns <- length(x)
     ci.exterr <- list(x=c(0,ns+1,ns+1,0),

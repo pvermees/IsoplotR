@@ -139,7 +139,7 @@ central.default <- function(x,alpha=0.05,...){
     # add back one d.o.f. for the homogeneity test
     out$mswd <- Chi2/(out$df+1)
     out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-    out$age <- c(tt,st,nfact(alpha)*st)
+    out$age <- c(tt,st,ntfact(alpha)*st)
     out$disp <- c(fit$sigma,
                   profile_LL_weightedmean_disp(fit,zu,su,alpha))
     names(out$age) <- c('t','s[t]','ci[t]')
@@ -169,22 +169,20 @@ central.UThHe <- function(x,alpha=0.05,model=1,...){
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
     mswd <- mswd_UThHe(x,fit,doSm=doSm)
-    f <- tfact(alpha,mswd$df)
     if (model==1){
         out <- c(fit,mswd)
         out$age['disp[t]'] <-
-            uvw2age(out,doSm=doSm(x),fact=f*sqrt(mswd$mswd))[2]
+            uvw2age(out,doSm=doSm(x),fact=ntfact(alpha,mswd))[2]
     } else if (model==2){
         out <- fit
     } else {
-        f <- nfact(alpha)
         w <- get.UThHe.w(x,fit)
         out <- UThHe_logratio_mean(x,model=model,w=w)
         out$w <- c(w,profile_LL_central_disp_UThHe(fit=out,x=x,alpha=alpha))
         names(out$w) <- c('s','ll','ul')
     }
     out$alpha <- alpha
-    out$age['ci[t]'] <- f*out$age['s[t]']
+    out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
     out
 }
 
@@ -232,7 +230,7 @@ central.fissiontracks <- function(x,alpha=0.05,exterr=FALSE,...){
     }
     if (exterr){
         out$age[1:2] <- add.exterr(x,tt=out$age[1],st=out$age[2])
-        out$age[3] <- out$age[2]*nfact(alpha)
+        out$age[3] <- out$age[2]*ntfact(alpha)
     }
     out
 }
@@ -243,7 +241,7 @@ UThHe_logratio_mean <- function(x,model=1,w=0,fact=1){
     out$w <- w
     out$age <- rep(NA,3)
     names(out$age) <- c('t','s[t]','ci[t]')
-    out$age[c('t','s[t]')] <- uvw2age(out,doSm(x))
+    out$age[c('t','s[t]')] <- uvw2age(out,doSm(x),fact=fact)
     out
 }
 

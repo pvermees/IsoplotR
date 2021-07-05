@@ -242,6 +242,8 @@ length.fissiontracks <- function(x){
     for (ratio in c('U48','ThU','RaU','PaU')){
         j <- min(length(out[[ratio]]$x),i)
         out[[ratio]]$x <- out[[ratio]]$x[j]
+        k <- min(length(out[[ratio]]$sx),i)
+        out[[ratio]]$sx <- out[[ratio]]$sx[k]
     }
     out
 }
@@ -249,6 +251,17 @@ length.fissiontracks <- function(x){
     out <- x
     out$x <- x$x[...]
     out
+}
+
+mediand <- function(d){
+    out <- d
+    for (ratio in c('U48','ThU','RaU','PaU')){
+        out[[ratio]]$x <- stats::median(d[[ratio]]$x)
+        out[[ratio]]$sx <- stats::median(d[[ratio]]$sx)
+    }
+    out$n0 <- matrix(apply(d$n0,1,'median'),ncol=1)
+    rownames(out$n0) <- rownames(d$n0)
+    out    
 }
 
 #' @export

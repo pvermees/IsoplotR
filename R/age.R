@@ -411,15 +411,16 @@ age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,
 add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out <- c(tt,st)
     if (is.UPb(x)){
+        md <- mediand(x$d)
         if (type==1){
-            R <- age_to_Pb207U235_ratio(tt,st,d=x$d)
-            out <- get.Pb207U235.age(R[1],R[2],d=x$d,exterr=TRUE)
+            R <- age_to_Pb207U235_ratio(tt,st,d=md)
+            out <- get.Pb207U235.age(R[1],R[2],d=md,exterr=TRUE)
         } else if (type==2 | (type==4 & (tt<cutoff.76)) | (type==5)){
-            R <- age_to_Pb206U238_ratio(tt,st,d=x$d)
-            out <- get.Pb206U238.age(R[1],R[2],d=x$d,exterr=TRUE)
+            R <- age_to_Pb206U238_ratio(tt,st,d=md)
+            out <- get.Pb206U238.age(R[1],R[2],d=md,exterr=TRUE)
         } else if (type==3 | (type==4 & (tt>=cutoff.76))){
-            R <- age_to_Pb207Pb206_ratio(tt,st,d=x$d)
-            out <- get.Pb207Pb206.age(R[1],R[2],d=x$d,exterr=TRUE)
+            R <- age_to_Pb207Pb206_ratio(tt,st,d=md)
+            out <- get.Pb207Pb206.age(R[1],R[2],d=md,exterr=TRUE)
         }
     } else if (is.PbPb(x)){
         R <- age_to_Pb207Pb206_ratio(tt,st)

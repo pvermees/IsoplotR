@@ -190,8 +190,10 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
 }
 
 plot_isochron_line <- function(fit,x,ci.col='gray80',...){
+    if (inflate(fit)) f <- ntfact(fit$alpha,fit)
+    else f <- ntfact(fit$alpha)
     y <- fit$a[1]+fit$b[1]*x
-    e <- fit$fact*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
+    e <- f*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
     cix <- c(x,rev(x))
     ciy <- c(y+e,rev(y-e))
     graphics::polygon(cix,ciy,col=ci.col,border=NA)

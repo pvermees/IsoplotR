@@ -853,7 +853,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
 }
 get.Pb207U235.age.UPb <- function(x,i=1,exterr=FALSE,...){
     r75 <- get.Pb207U235.ratios(x)
-    get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],exterr=exterr,d=x$d)
+    get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],exterr=exterr,d=x$d[i])
 }
 get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb207U235'
@@ -890,9 +890,9 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             }, error = function(error_condition) {
                 t.init
             })
-            D <- mclean(tt=t.68,d=d,exterr=exterr)    # implicit differentiation of 
-            J[1,1] <- -1/D$dPb206U238dt               # mf=(x-Pb6U8)^2 => dt/dx
-            J[1,2] <- D$dPb206U238dl38/D$dPb206U238dt # and dt/dl38
+            D <- mclean(tt=t.68,d=d,exterr=exterr)    # implicit differentiation
+            J[1,1] <- -1/D$dPb206U238dt               # of mf=(x-Pb6U8)^2 
+            J[1,2] <- D$dPb206U238dl38/D$dPb206U238dt # => dt/dx and dt/dl38
         }
         E <- matrix(0,2,2)
         E[1,1] <- sx^2

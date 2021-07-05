@@ -166,11 +166,10 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[7,7] <- -1
     out$Qinv[8,6:8] <- 1
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
-    out$n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
-    nuclides <- c('U238','U234','Th230','Ra226',
-                  'Pb206','U235','Pa231','Pb207')
+    out$n0 <- matrix(c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0),ncol=1)
+    nuclides <- c('U238','U234','Th230','Ra226','Pb206','U235','Pa231','Pb207')
     names(out$L) <- nuclides
-    names(out$n0) <- nuclides
+    rownames(out$n0) <- nuclides
     out
 }
 
@@ -238,21 +237,21 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    out <- as.vector(mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
-    names(out) <- names(nt)
+    out <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    rownames(out) <- rownames(nt)
     out
 }
 forward <- function(tt,d=diseq(),derivative=0){
     if (derivative==0){
-        out <- as.vector(d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        out <- (d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     } else if (derivative==1){
-        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*%
-                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        out <- (d$Q %*% diag(exp(-d$L)) %*%
+                diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     } else if (derivative==2){
-        out <- as.vector(d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
-                         diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        out <- (d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
+                diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     }
-    names(out) <- names(d$L)
+    rownames(out) <- names(d$L)
     out
 }
 
@@ -298,7 +297,6 @@ measured.disequilibrium <- function(d=diseq()){
 #' @param d an object of class \link{diseq}
 #' @param exterr propagate the uncertainties associated with decay
 #'     constants and the \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
-#' @param i aliquot to be used, if \code{d$ThU$option=3}.
 #'
 #' @return
 #' a list containing the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
@@ -320,7 +318,7 @@ measured.disequilibrium <- function(d=diseq()){
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' mclean(tt=2,d=d)
 #' @export
-mclean <- function(tt=0,d=diseq(),exterr=FALSE,i=1){
+mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out <- list()
     l38 <- lambda('U238')[1]
     l34 <- lambda('U234')[1]*1000
@@ -330,71 +328,75 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE,i=1){
     l32 <- lambda('Th232')[1]
     l31 <- lambda('Pa231')[1]*1000
     U <- iratio('U238U235')[1]
-    out$dPb206U238dl38 <- 0
-    out$dPb206U238dl34 <- 0
-    out$dPb206U238dl30 <- 0
-    out$dPb206U238dl26 <- 0
-    out$dPb207U235dl35 <- 0
-    out$dPb207U235dl31 <- 0
-    out$Pb208Th232 <- exp(l32*tt)-1
-    out$dPb208Th232dt <- exp(l32*tt)*l32
-    out$d2Pb208Th232dt2 <- exp(l32*tt)*l32^2
+    nc <- length(d$ThU$x)
+    out$dPb206U238dl38 <- rep(0,nc)
+    out$dPb206U238dl34 <- rep(0,nc)
+    out$dPb206U238dl30 <- rep(0,nc)
+    out$dPb206U238dl26 <- rep(0,nc)
+    out$dPb207U235dl35 <- rep(0,nc)
+    out$dPb207U235dl31 <- rep(0,nc)
+    out$Pb208Th232 <- rep(exp(l32*tt)-1,nc)
+    out$dPb208Th232dt <- rep(exp(l32*tt)*l32,nc)
+    out$d2Pb208Th232dt2 <- rep(exp(l32*tt)*l32^2,nc)
     if (check.equilibrium(d=d)){
-        out$Pb206U238 <- exp(l38*tt)-1
-        out$Pb207U235 <- exp(l35*tt)-1
-        out$dPb206U238dt <- exp(l38*tt)*l38
-        out$dPb207U235dt <- exp(l35*tt)*l35
-        out$d2Pb206U238dt2 <- exp(l38*tt)*l38^2
-        out$d2Pb207U235dt2 <- exp(l35*tt)*l35^2
+        out$Pb206U238 <- rep(exp(l38*tt)-1,nc)
+        out$Pb207U235 <- rep(exp(l35*tt)-1,nc)
+        out$dPb206U238dt <- rep(exp(l38*tt)*l38,nc)
+        out$dPb207U235dt <- rep(exp(l35*tt)*l35,nc)
+        out$d2Pb206U238dt2 <- rep(exp(l38*tt)*l38^2,nc)
+        out$d2Pb207U235dt2 <- rep(exp(l35*tt)*l35^2,nc)
         if (exterr){
-            out$dPb206U238dl38 <- tt*exp(l38*tt)
-            out$dPb207U235dl35 <- tt*exp(l35*tt)
+            out$dPb206U238dl38 <- rep(tt*exp(l38*tt),nc)
+            out$dPb207U235dl35 <- rep(tt*exp(l35*tt),nc)
         }
     } else {
+        d$n0 <- (d$n0 %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
+        rownames(d$n0) <- names(d$L)
         if (d$U48$option<2){      # initial 234U
-            if (d$U48$option==1) d$n0['U234'] <- d$U48$x/l34
+            if (d$U48$option==1) d$n0['U234',] <- d$U48$x/l34
             if (d$ThU$option==1){ # initial 230Th
-                d$n0['Th230'] <- d$ThU$x[i]/l30
+                d$n0['Th230',] <- d$ThU$x/l30
             } else if (d$ThU$option==2){ # measured 230Th
-                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
-                nt['Th230'] <- d$ThU$x[i]*nt['U238']*l38/l30 # overwrite
-                d$n0['Th230'] <- reverse(tt=tt,mexp=mexp.8405(),nt=nt)['Th230']
+                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
+                nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
+                d$n0['Th230',] <-
+                    reverse(tt=tt,mexp=mexp.8405(),nt=nt)['Th230',]
             }
         } else {                 # measured 234U
             if (d$ThU$option<2){ # initial 230Th
-                nt <- forward(tt=tt,d=d)[c('U238','U234','U235')]
-                nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
-                d$n0['U234'] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234']
-                if (d$ThU$option==1) d$n0['Th230'] <- d$ThU$x[i]/l30
+                nt <- forward(tt=tt,d=d)[c('U238','U234','U235'),,drop=FALSE]
+                nt['U234',] <- d$U48$x*nt['U238',]*l38/l34 # overwrite
+                d$n0['U234',] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234',]
+                if (d$ThU$option==1) d$n0['Th230',] <- d$ThU$x/l30
             } else {             # measured 230Th
-                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235')]
-                nt['U234'] <- d$U48$x*nt['U238']*l38/l34 # overwrite
-                nt['Th230'] <- d$ThU$x[i]*nt['U238']*l38/l30 # overwrite
-                d$n0[c('U234','Th230')] <-
-                    reverse(tt=tt,mexp=mexp.8405(),nt=nt)[c('U234','Th230')]
+                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
+                nt['U234',] <- d$U48$x*nt['U238',]*l38/l34 # overwrite
+                nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
+                d$n0[c('U234','Th230'),] <-
+                    reverse(tt=tt,mexp=mexp.8405(),nt=nt)[c('U234','Th230'),]
             }
         }
-        if (d$RaU$option>0) d$n0['Ra226'] <- d$RaU$x/l26
-        if (d$PaU$option>0) d$n0['Pa231'] <- d$PaU$x/l31
-        out$U48i <- (d$n0['U234']*l34)/(d$n0['U238']*l38)
-        out$ThUi <- (d$n0['Th230']*l30)/(d$n0['U238']*l38)
+        if (d$RaU$option>0) d$n0['Ra226',] <- d$RaU$x/l26
+        if (d$PaU$option>0) d$n0['Pa231',] <- d$PaU$x/l31
+        out$U48i <- (d$n0['U234',]*l34)/(d$n0['U238',]*l38)
+        out$ThUi <- (d$n0['Th230',]*l30)/(d$n0['U238',]*l38)
         d$nt <- forward(tt=tt,d=d)
         dntdt <- forward(tt,d=d,derivative=1)
         d2ntdt2 <- forward(tt,d=d,derivative=2)
-        out$Pb206U238 <- d$nt['Pb206']/d$nt['U238']
-        out$Pb207U235 <- d$nt['Pb207']/d$nt['U235']
-        out$dPb206U238dt <- dntdt['Pb206']/d$nt['U238'] -
-            out$Pb206U238*dntdt['U238']/d$nt['U238']
-        out$d2Pb206U238dt2 <- d2ntdt2['Pb206']/d$nt['U238'] -
-            2*dntdt['Pb206']*dntdt['U238']/d$nt['U238']^2 -
-            out$Pb206U238*d2ntdt2['U238']/d$nt['U238'] +
-            2*out$Pb206U238*(dntdt['U238']/d$nt['U238'])^2
-        out$dPb207U235dt <- dntdt['Pb207']/d$nt['U235'] -
-            out$Pb207U235*dntdt['U235']/d$nt['U235']
-        out$d2Pb207U235dt2 <- d2ntdt2['Pb207']/d$nt['U235'] -
-            2*dntdt['Pb207']*dntdt['U235']/d$nt['U235']^2 -
-            out$Pb207U235*d2ntdt2['U235']/d$nt['U235'] +
-            2*out$Pb207U235*(dntdt['U235']/d$nt['U235'])^2
+        out$Pb206U238 <- d$nt['Pb206',]/d$nt['U238',]
+        out$Pb207U235 <- d$nt['Pb207',]/d$nt['U235',]
+        out$dPb206U238dt <- dntdt['Pb206',]/d$nt['U238',] -
+            out$Pb206U238*dntdt['U238',]/d$nt['U238',]
+        out$d2Pb206U238dt2 <- d2ntdt2['Pb206',]/d$nt['U238',] -
+            2*dntdt['Pb206',]*dntdt['U238',]/d$nt['U238',]^2 -
+            out$Pb206U238*d2ntdt2['U238',]/d$nt['U238',] +
+            2*out$Pb206U238*(dntdt['U238',]/d$nt['U238',])^2
+        out$dPb207U235dt <- dntdt['Pb207',]/d$nt['U235',] -
+            out$Pb207U235*dntdt['U235',]/d$nt['U235',]
+        out$d2Pb207U235dt2 <- d2ntdt2['Pb207',]/d$nt['U235',] -
+            2*dntdt['Pb207',]*dntdt['U235',]/d$nt['U235',]^2 -
+            out$Pb207U235*d2ntdt2['U235',]/d$nt['U235',] +
+            2*out$Pb207U235*(dntdt['U235',]/d$nt['U235',])^2
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
@@ -410,8 +412,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE,i=1){
         out$dPb207Pb206dt <- (out$dPb207U235dt*out$Pb206U238 -
                               out$dPb206U238dt*out$Pb207U235)/(U*out$Pb206U238^2)
     } else {
-        out$Pb207Pb206 <- 0
-        out$dPb207Pb206dt <- 0
+        out$Pb207Pb206 <- rep(0,nc)
+        out$dPb207Pb206dt <- rep(0,nc)
     }
     if (exterr){
         out$dPb207Pb206dl38 <- -out$dPb206U238dl38*out$Pb207U235/(U*out$Pb206U238^2)
@@ -420,18 +422,17 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE,i=1){
         out$dPb207Pb206dl26 <- -out$dPb206U238dl26*out$Pb207U235/(U*out$Pb206U238^2)
         out$dPb207Pb206dl35 <- out$dPb207U235dl35*out$Pb206U238/(U*out$Pb206U238^2)
         out$dPb207Pb206dl31 <- out$dPb207U235dl31*out$Pb206U238/(U*out$Pb206U238^2)
-        out$dPb208Th232dl32 <- exp(l32*tt)*tt
+        out$dPb208Th232dl32 <- rep(exp(l32*tt)*tt,nc)
         out$dPb207Pb206dU <- -out$Pb207Pb206/U
     } else {
-        out$dPb207Pb206dl38 <- 0
-        out$dPb207Pb206dl34 <- 0
-        out$dPb207Pb206dl30 <- 0
-        out$dPb207Pb206dl26 <- 0
-        out$dPb207Pb206dl35 <- 0
-        out$dPb207Pb206dl31 <- 0
-        out$dPb208Th232dl32 <- 0
-        out$dPb207Pb206dU <- 0
-        
+        out$dPb207Pb206dl38 <- rep(0,nc)
+        out$dPb207Pb206dl34 <- rep(0,nc)
+        out$dPb207Pb206dl30 <- rep(0,nc)
+        out$dPb207Pb206dl26 <- rep(0,nc)
+        out$dPb207Pb206dl35 <- rep(0,nc)
+        out$dPb207Pb206dl31 <- rep(0,nc)
+        out$dPb208Th232dl32 <- rep(0,nc)
+        out$dPb207Pb206dU <- rep(0,nc)
     }
     out
 }
@@ -463,11 +464,11 @@ drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
     dAdl[c(i,i+1),i] <- c(-1,1)
     H <- d$Qinv %*% dAdl %*% d$Q
     P <- H * K
-    dntdl <- as.vector(d$Q %*% P %*% d$Qinv %*% d$nt)
-    names(dntdl) <- names(d$L)
+    dntdl <- (d$Q %*% P %*% d$Qinv %*% d$nt)
+    rownames(dntdl) <- names(d$L)
     # 2. derivative of the ratio
-    out <- (d$nt[den]*dntdl[num]-
-            d$nt[num]*dntdl[den])/d$nt[den]^2
+    out <- (d$nt[den,]*dntdl[num,]-
+            d$nt[num,]*dntdl[den,])/d$nt[den,,drop=FALSE]^2
     out
 }
 

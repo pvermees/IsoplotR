@@ -4,7 +4,6 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
                                           alpha=0.05,model=1,anchor=0){
     fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
     out <- fit
-    out$fact <- tfact(alpha,fit$df)
     out$format <- x$format
     if (wetherill & !measured.disequilibrium(x$d)){
         wfit <- twfit2wfit(fit,x)
@@ -20,15 +19,13 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
     if (inflate(out)){
         out$err <- matrix(NA,3,np)
         rownames(out$err) <- c('s','ci','disp')
-        out$err['disp',] <-
-            out$fact*sqrt(fit$mswd)*sqrt(diag(out$cov))
+        out$err['disp',] <- ntfact(alpha,fit)*sqrt(diag(out$cov))
     } else {
         out$err <- matrix(NA,2,np)
         rownames(out$err) <- c('s','ci')
     }
-    if (model==3) out$fact <- nfact(alpha)
     out$err['s',] <- sqrt(diag(out$cov))
-    out$err['ci',] <- out$fact*out$err['s',]
+    out$err['ci',] <- ntfact(alpha)*out$err['s',]
     colnames(out$err) <- names(out$par)
     out
 }
@@ -110,22 +107,23 @@ twfit2wfit <- function(fit,x){
     }
     disc.slope <- a0/(b0*U)
     conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
+    md <- mediand(x$d)
     if (disc.slope < conc.slope){
-        search.range <- c(tt,get.Pb207Pb206.age(b0/a0,d=x$d)[1])+buffer
+        search.range <- c(tt,get.Pb207Pb206.age(b0/a0,d=md)[1])+buffer
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,d=x$d)$root
+                             t2=tt,a0=a0,b0=b0,d=md)$root
     } else if (disc.slope < l8/l5){
         search.range <- c(-1000,tt-buffer)
         tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,d=x$d)$root
+                             t2=tt,a0=a0,b0=b0,d=md)$root
         tu <- tt
     } else { # only one intercept
         tl <- -1000
         tu <- tt
     }
-    du <- mclean(tt=tu,d=x$d)
-    dl <- mclean(tt=tl,d=x$d)
+    du <- mclean(tt=tu,d=md)
+    dl <- mclean(tt=tl,d=md)
     XX <- du$Pb207U235 - dl$Pb207U235
     YY <- du$Pb206U238 - dl$Pb206U238
     BB <- a0/(b0*U)
@@ -229,8 +227,8 @@ discordia.line <- function(fit,wetherill,d=diseq()){
             E12 <- fit$cov[1,2]
             E22 <- fit$cov[2,2]
             sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
-            ul <- y + fit$fact*sy
-            ll <- y - fit$fact*sy
+            ul <- y + ntfact(fit$alpha)*sy
+            ll <- y - ntfact(fit$alpha)*sy
             t75 <- get.Pb207U235.age(x,d=d)[,'t75']
             yconc <- age_to_Pb206U238_ratio(t75,d=d)[,'68']
             overshot <- ul>yconc
@@ -260,8 +258,8 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
         J2 <- 1 - x*r68                                # dy/dy0
         sy <- errorprop1x2(J1,J2,fit2d$cov[1,1],fit2d$cov[2,2],fit2d$cov[1,2])
-        ul <- y + fit2d$fact*sy
-        ll <- y - fit2d$fact*sy
+        ul <- y + ntfact(fit2d$alpha)*sy
+        ll <- y - ntfact(fit2d$alpha)*sy
         yconc <- rep(0,nsteps)
         t68 <- get.Pb206U238.age(1/x,d=d)[,'t68']
         yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
@@ -285,7 +283,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
 }
 
 tw3d2d <- function(fit){
-    out <- list(par=fit$par,cov=fit$cov,fact=fit$fact)
+    out <- list(par=fit$par,cov=fit$cov,alpha=fit$alpha)
     if (fit$format > 3){
         labels <- c('t','76i')
         out$par <- c(fit$par['t'],fit$par[3]/fit$par[2]) # par = c(Pb206i,Pb207i)
@@ -374,7 +372,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
                             list(a=signif(fit$mswd,sigdig),
                                  b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
-        ci <- ci_log2lin_lud(fit=fit,fact=fit$fact)
+        ci <- ci_log2lin_lud(fit=fit)
         rounded.disp <- roundit(ci[1],ci[2:3],sigdig=sigdig,text=TRUE)
         line4 <- substitute('overdispersion ='~a+b/-c~'Ma',
                             list(a=rounded.disp[1],b=rounded.disp[3],

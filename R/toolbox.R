@@ -316,12 +316,18 @@ plot_points <- function(x,y,bg='yellow',pch=21,cex=1.5,pos,col,
     }
 }
 
-nfact <- function(alpha){
-    stats::qnorm(1-alpha/2)
-}
-tfact <- function(alpha,df){
-    if (df>0) out <- stats::qt(1-alpha/2,df=df)
-    else out <- 1.96
+ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
+    if (is.null(mswd)){
+        if (is.null(df)){
+            out <- stats::qnorm(1-alpha/2)
+        } else if (df>0){
+            out <- stats::qt(1-alpha/2,df=df)
+        }
+    } else if (mswd$df>0){
+        out <- stats::qt(1-alpha/2,df=mswd$df)*sqrt(mswd$mswd)
+    } else {
+        out <- stats::qnorm(1-alpha/2)
+    }
     out
 }
 
@@ -447,5 +453,8 @@ trace <- function(x){
 }
 
 inflate <- function(fit){
-    (fit$model==1) && (fit$p.value<fit$alpha)
+    if (is.null(fit$model)) fit$model <- 1
+    if (is.null(fit$alpha)) out <- FALSE
+    else out <- fit$model==1 && (fit$p.value<fit$alpha)
+    out
 }

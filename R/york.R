@@ -26,7 +26,7 @@
 #'     uncertainties of the Y-values, and (optionally) the correlation
 #'     coefficients of the X- and Y-values.
 #' @param alpha cutoff value for confidence intervals
-#' @return A four-element list of vectors containing:
+#' @return A seven-element list of vectors containing:
 #'
 #'     \describe{
 #'
@@ -44,6 +44,8 @@
 #'
 #'     \item{p.value}{p-value of a Chi-square value with \code{df}
 #'     degrees of freedom}
+#'
+#'     \item{alpha}{the value of the eponymous input argument}
 #'
 #'     }
 #' 
@@ -102,7 +104,7 @@ york <- function(x,alpha=0.05){
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- list()
-    out$fact <- 1
+    out$alpha <- alpha
     out$a <- c(a,sa)
     out$b <- c(b,sb)
     out$cov.ab <- -xbar*sb^2

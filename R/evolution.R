@@ -166,7 +166,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
         }
         if (isochron){
             fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,
-                                model=model,hide=hide,omit=omit)
+                                model=model,hide=hide,omit=omit,alpha=alpha)
             fit$n <- length(x)-length(hide)-length(omit)
             graphics::title(evolution.title(fit,sigdig=sigdig))
         }

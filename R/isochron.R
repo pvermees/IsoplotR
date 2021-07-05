@@ -200,8 +200,8 @@
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{y}.
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{y}.
 #'
 #' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only
@@ -217,8 +217,8 @@
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t}.
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{t}.
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
@@ -289,8 +289,8 @@
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{y}.
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{y}.
 #'
 #' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
@@ -301,8 +301,8 @@
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t}
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{t}
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
@@ -375,8 +375,8 @@
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
-#' \code{ci[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{y}.
+#' \code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{y}.
 #'
 #' \code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only returned
@@ -390,8 +390,8 @@
 #'
 #' \code{s[t]}: the propagated uncertainty of \code{t}
 #'
-#' \code{ci[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t}
+#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
+#' \code{t}
 #'
 #' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
 #' interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
@@ -460,18 +460,17 @@ isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
                              omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     fit <- regression(data2york(d2calc),model=model)
-    fit <- regression_init(fit,alpha=alpha)
-    fit <- ci_isochron(fit)
+    out <- ci_isochron(regression_init(fit,alpha=alpha))
     if (plot){
         y <- data2york(x)
         scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
-                    ellipse.stroke=ellipse.stroke,fit=fit,
+                    ellipse.stroke=ellipse.stroke,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        if (title) graphics::title(isochrontitle(fit,sigdig=sigdig),
+        if (title) graphics::title(isochrontitle(out,sigdig=sigdig),
                                    xlab=xlab,ylab=ylab)
     }
     invisible(fit)
@@ -508,14 +507,14 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
     b0 <- lud$par['b0']
     l8 <- settings('lambda','U238')[1]
     l5 <- settings('lambda','U235')[1]
-    D <- mclean(tt,d=x$d)
+    D <- mclean(tt,d=mediand(x$d))
     if (type==1){                           # 04-08c/06 vs. 38/06
-        x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)[1]
+        x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=mediand(x$d))[1]
         dx0invdt <- D$dPb206U238dt
         E <- lud$cov[1:2,1:2]
         x.lab <- quote(''^238*'U/'^206*'Pb')
     } else if (type==2){                    # 04-08c/07 vs. 35/07
-        x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)[1]
+        x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=mediand(x$d))[1]
         dx0invdt <- D$dPb207U235dt
         E <- lud$cov[c(1,3),c(1,3)]
         x.lab <- quote(''^235*'U/'^207*'Pb')
@@ -532,7 +531,7 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
     } else {
         stop('Invalid isochron type.')
     }
-    if (model==3) lud$w <- ci_log2lin_lud(fit=lud,fact=nfact(alpha))
+    if (model==3) lud$w <- ci_log2lin_lud(fit=lud,fact=ntfact(alpha))
     out <- isochron_init(lud,alpha=0.05)
     out$age[1] <- tt
     out$age[2] <- sqrt(lud$cov[1,1])
@@ -597,11 +596,11 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
     out$a <- c(a,sqrt(cov.ab[1,1]))
     out$b <- c(b,sqrt(cov.ab[2,2]))
     out$cov.ab <- cov.ab[1,2]
-    out$y0['ci[y]'] <- out$fact*out$y0['s[y]']
-    out$age['ci[t]'] <- out$fact*out$age['s[t]']
-    if (model==1){
-        out$age['disp[t]'] <- sqrt(out$mswd)*out$age['ci[t]']
-        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['ci[y]']
+    out$y0['ci[y]'] <- ntfact(alpha)*out$y0['s[y]']
+    out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
+    if (inflate(out)){
+        out$age['disp[t]'] <- ntfact(alpha,out)*out$age['s[t]']
+        out$y0['disp[y]'] <- ntfact(alpha,out)*out$y0['s[y]']
     }
     if (plot){
         scatterplot(XY,alpha=alpha,show.ellipses=show.ellipses,
@@ -691,10 +690,9 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
     out$age[c('t','s[t]')] <-
         get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
     out <- ci_isochron(out)
-    if (model==1){
-        out$age['disp[t]'] <-
-            out$fact*get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],
-                                        exterr=exterr)[2]
+    if (inflate(out)){
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
     }
     if (plot) {
         scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
@@ -793,10 +791,10 @@ isochron.ArAr <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
     out$age[c('t','s[t]')] <-
         get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     out <- ci_isochron(out)
-    if (model==1){
-        out$age['disp[t]'] <-
-            out$fact*get.ArAr.age(R09,sqrt(out$mswd)*sR09,
-                                  x$J[1],x$J[2],exterr=exterr)[2]
+    if (inflate(out)){
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.ArAr.age(R09,sqrt(out$mswd)*sR09,
+                         x$J[1],x$J[2],exterr=exterr)[2]
     }
     if (plot) {
         scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
@@ -1015,8 +1013,9 @@ isochron.UThHe <- function(x,alpha=0.05,sigdig=2,
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
     out <- ci_isochron(out)
-    if (model==1)
-        out$age['disp[t]'] <- out$fact*sqrt(out$mswd)*out$age['s[t]']
+    if (inflate(out)){
+        out$age['disp[t]'] <- ntfact(alpha,out)*out$age['s[t]']
+    }
     out$displabel <- quote('He-dispersion = ')
     out$y0label <- quote('He'[o]*' = ')
     if (plot) {
@@ -1088,16 +1087,13 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out$age['s[t]'] <- tst['s[t]']
     out$y0['s[y]'] <- tst['s[48_0]']
     out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
-    out <- ci_isochron(out,disp=FALSE)
+    out <- ci_isochron(out)
     if (inflate(out)){
-        tdispt <- get.ThU.age(out$par[i08],
-                              sqrt(out$mswd)*sqrt(out$cov[i08,i08]),
-                              out$par[i48],
-                              sqrt(out$mswd)*sqrt(out$cov[i48,i48]),
-                              out$mswd*out$cov[i48,i08],
-                              exterr=exterr)
-        out$age['disp[t]'] <- out$fact*tdispt['s[t]']
-        out$y0['disp[y]'] <- out$fact*tdispt['s[48_0]']
+        tdispt <- get.ThU.age(out$par[i08],sqrt(out$mswd*out$cov[i08,i08]),
+                              out$par[i48],sqrt(out$mswd*out$cov[i48,i48]),
+                              out$mswd*out$cov[i48,i08],exterr=exterr)
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*tdispt['s[t]']
+        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*tdispt['s[48_0]']
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1127,15 +1123,13 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
                     exterr=exterr)[c('t','s[t]')]
     out$y0[c('y','s[y]')] <-
         get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
-    out <- ci_isochron(out,disp=FALSE)
+    out <- ci_isochron(out)
     if (inflate(out)){
-        out$age['disp[t]'] <-
-            out$fact*get.ThU.age(Th230U238[1],
-                                  sqrt(out$mswd)*Th230U238[2],
-                                  exterr=exterr)['s[t]']
-        out$y0['disp[y]'] <-
-            out$fact*get.Th230Th232_0x(out$age['t'],Th230Th232[1],
-                                       sqrt(out$mswd)*Th230Th232[2])[2]
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.ThU.age(Th230U238[1],sqrt(out$mswd)*Th230U238[2],exterr=exterr)['s[t]']
+        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*
+            get.Th230Th232_0x(out$age['t'],Th230Th232[1],
+                              sqrt(out$mswd)*Th230Th232[2])[2]
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1166,9 +1160,10 @@ isochron_PD <- function(x,nuclide,alpha=0.05,sigdig=2,
     out$age[c('t','s[t]')] <- get.PD.age(DP,sDP,nuclide,
                                          exterr=exterr,bratio=bratio)
     out <- ci_isochron(out)
-    if (model==1){
-        out$age['disp[t]'] <- out$fact*get.PD.age(DP,sqrt(out$mswd)*sDP,
-                              nuclide,exterr=exterr,bratio=bratio)[2]
+    if (inflate(out)){
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+            get.PD.age(DP,sqrt(out$mswd)*sDP,nuclide,
+                       exterr=exterr,bratio=bratio)[2]
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$displabel <-
@@ -1244,6 +1239,7 @@ get.isochron.labels <- function(nuclide,inverse=FALSE){
 
 isochron_init <- function(fit,alpha=0.05){
     out <- fit
+    out$alpha <- alpha
     if (fit$model==1){
         out$age <- rep(NA,4)
         out$y0 <- rep(NA,4)
@@ -1255,10 +1251,7 @@ isochron_init <- function(fit,alpha=0.05){
         names(out$age) <- c('t','s[t]','ci[t]')
         names(out$y0) <- c('y','s[y]','ci[y]')
     }
-    if (fit$model < 3){
-        out$fact <- tfact(alpha,fit$df)
-    } else {
-        out$fact <- nfact(alpha)
+    if (fit$model > 2){
         if (length(out$w)==1) out$w <- c(out$w,NA,NA)
         names(out$w) <- c('s','ll','ul')
     }
@@ -1268,6 +1261,7 @@ isochron_init <- function(fit,alpha=0.05){
 }
 regression_init <- function(fit,alpha=0.05){
     out <- fit
+    out$alpha <- alpha
     out$displabel <- quote('y-dispersion = ')
     out$y0label <- quote('y-intercept = ')
     if (fit$model==1){
@@ -1281,20 +1275,17 @@ regression_init <- function(fit,alpha=0.05){
         names(out$a) <- c('a','s[a]','ci[a]')
         names(out$b) <- c('b','s[b]','ci[b]')
     }
-    if (fit$model < 3){
-        out$fact <- tfact(alpha,fit$df)
-    } else {
-        out$fact <- nfact(alpha)
+    if (fit$model > 2){
         out$w <- c(fit$w,NA,NA)
         names(out$w) <- c('s','ll','ul')
     }
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
     out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
-    out$a['ci[a]'] <- out$fact*fit$a['s[a]']
-    out$b['ci[b]'] <- out$fact*fit$b['s[b]']
-    if (out$model==1){
-        out$a['disp[a]'] <- out$fact*sqrt(fit$mswd)*fit$a['s[a]']
-        out$b['disp[b]'] <- out$fact*sqrt(fit$mswd)*fit$b['s[b]']
+    out$a['ci[a]'] <- ntfact(alpha)*fit$a['s[a]']
+    out$b['ci[b]'] <- ntfact(alpha)*fit$b['s[b]']
+    if (inflate(out)){
+        out$a['disp[a]'] <- ntfact(alpha,out)*fit$a['s[a]']
+        out$b['disp[b]'] <- ntfact(alpha,out)*fit$b['s[b]']
     }
     out$alpha <- alpha
     class(out) <- "isochron"
