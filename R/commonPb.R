@@ -247,7 +247,7 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47,tt=NULL,cc=FALSE){
         out[1] <- 1/p3507
         out[3] <- 1/p3806
         out[c(2,4)] <- sqrt(diag(E))
-        out[5] <- cov2cor(E)[1,2]
+        out[5] <- stats::cov2cor(E)[1,2]
     }
     out
 }
