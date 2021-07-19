@@ -295,9 +295,9 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     }
     plot.concordia.line(x2calc,lims=lims,type=type,col=concordia.col,
                         alpha=alpha,exterr=exterr,ticks=ticks)
-    if (type==1) y <- data2york(X2plot,option=1)
-    else if (type==2) y <- data2york(X2plot,option=2)
-    else if (x$format%in%c(7,8) & type==3) y <- data2york(X2plot,option=5)
+    if (type==1) y <- data2york(X,option=1)
+    else if (type==2) y <- data2york(X,option=2)
+    else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
     else stop('Concordia type incompatible with this input format.')
     scatterplot(y,alpha=alpha,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
