@@ -613,7 +613,7 @@ concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
         if (type==3){
             cc4age <- cc
             type4age <- 3
-        } else { # use wetherill
+        } else { # use Wetherill
             cc4age <- concordia.comp(x,type=1)
             type4age <- 1
         }
@@ -646,7 +646,7 @@ concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
 concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
     if (type==1) Pb206U238 <- cc$x['Pb206U238']
     else if (type==2) Pb206U238 <- 1/cc$x['U238Pb206']
-    else if (type==3) Pb206U238 <- 1/cc$x['Pb206U238']
+    else if (type==3) Pb206U238 <- cc$x['Pb206U238']
     else stop('Incorrect concordia type.')
     midpoint <- get.Pb206U238.age(x=Pb206U238,d=d)[1]
     fit1 <- stats::optimise(LL.concordia.age,interval=c(0,midpoint),
@@ -759,7 +759,7 @@ LL.concordia.comp <- function(mu,x,type=1,mswd=FALSE,...){
         }
         X <- matrix(xi$x[j]-mu,1,2)
         covmat <- xi$cov[j,j]
-        if (mswd) out <- out + get.concordia.SS(X,covmat)
+        if (mswd) out <- out + stats::mahalanobis(x=X,center=FALSE,cov=covmat)
         else out <- out + LL.norm(X,covmat)
     }
     out
@@ -802,13 +802,9 @@ LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
         E <- J %*% Lcov %*% t(J)
         covmat <- covmat + E
     }
-    if (mswd) out <- get.concordia.SS(dx,covmat)
+    if (mswd) out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
     else out <- LL.norm(dx,covmat)
     out
-}
-
-get.concordia.SS <- function(x,covmat){
-    x %*% solve(covmat) %*% t(x)
 }
 
 emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
