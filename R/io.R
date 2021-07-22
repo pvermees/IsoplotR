@@ -391,15 +391,19 @@ optionalredundancy2cor <- function(X,nc){
             j <- which(is.na(rhoYZ))
         } else {
             j <- 1:nr
-            out <- cbind(X,0)
         }
     } else {
         i <- 1:nr
         j <- 1:nr
-        out <- cbind(X,0,0)
     }
     out[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
     out[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
+    if ( any(abs(out[i,7])>1) | any(abs(out[j,8])>1) ){
+        out[,8] <- 0
+        out[,7] <- normal2inverse(cbind(X[,3:6],0))[,5]
+        warning('Redundant ratios of U-Pb data format ',
+                'lead to impossible correlation coefficients.')
+    }
     out
 }
 
