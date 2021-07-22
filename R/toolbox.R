@@ -221,7 +221,7 @@ quotient <- function(X,sX,Y,sY,rXY){
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){
     (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus) +
-        get.concordia.SS(x,covmat)/2
+        stats::mahalanobis(x,center=FALSE,cov=covmat)/2
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
