@@ -400,9 +400,19 @@ optionalredundancy2cor <- function(X,nc){
     out[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
     if ( any(abs(out[i,7])>1) | any(abs(out[j,8])>1) ){
         out[,8] <- 0
-        out[,7] <- normal2inverse(cbind(X[,3:6],0))[,5]
+        U <- iratio('U238U235')[1]
+        J11 <- U*X[,5]
+        J12 <- U*X[,3]
+        J21 <- 1
+        J22 <- 0
+        E11 <- X[,4]^2
+        E22 <- X[,6]^2
+        E12 <- 0
+        out[,7] <- errorprop(J11,J12,J21,J22,E11,E22,E12)[,'cov']/sqrt(X[,2]*X[,4])
         warning('Redundant ratios of U-Pb data format ',
-                'lead to impossible correlation coefficients.')
+                'lead to impossible correlation coefficients. ',
+                'These were replaced with alternative values ',
+                'assuming zero Tera-Wasserburg correlations.')
     }
     out
 }
