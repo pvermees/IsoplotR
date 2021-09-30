@@ -739,30 +739,23 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
     # 2. check that the measured disequilibrium is physically possible
     X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
-    # 3. fix common Pb intercept
+    # 3. model-2 fit
     init <- fit1$par
-    np <- length(init)
-    fixed <- rep(TRUE,np)
-    dinit <- rep(0,np)
-    if (model==3) ifix <- c(1,np)
-    else ifix <- 1
-    fixed[ifix] <- FALSE
-    dinit[ifix] <- 1
-    lower <- (init-dinit)[!fixed]
-    upper <- (init+dinit)[!fixed]
-    # 4. model-2 regression
+    fixed <- fixit(X,anchor=anchor,model=model,w=w)
     fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                    x=X,fixed=fixed,lower=lower,upper=upper,...)
-    # 5. model-1 or 3 (if so requested):
-    if (model!=2){
-        fit2 <- optifix(parms=fit2$par,fn=LL.lud,gr=LL.lud.gr,
-                        method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
-                        lower=lower,upper=upper,control=list(fnscale=-1),...)
+                    x=X,fixed=fixed,lower=init-1,upper=init+1,...)
+    if (model==2){
+        out <- fit2
+    } else {
+        init <- fit2$par
+        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                       method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
+                       lower=init-1,upper=init+1,control=list(fnscale=-1),...)
     }
-    fit2$x <- X
-    fit2$exterr <- exterr
-    fit2$model <- model
-    fit2
+    out$x <- X
+    out$exterr <- exterr
+    out$model <- model
+    out
 }
 
 replace.impossible.diseq <- function(tt,d){
