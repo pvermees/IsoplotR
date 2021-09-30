@@ -750,11 +750,12 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     dinit[ifix] <- 1
     lower <- (init-dinit)[!fixed]
     upper <- (init+dinit)[!fixed]
-    if (model==2){
-        fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                        x=X,fixed=fixed,lower=lower,upper=upper,...)
-    } else {
-        fit2 <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+    # 4. model-2 regression
+    fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
+                    x=X,fixed=fixed,lower=lower,upper=upper,...)
+    # 5. model-1 or 3 (if so requested):
+    if (model!=2){
+        fit2 <- optifix(parms=fit2$par,fn=LL.lud,gr=LL.lud.gr,
                         method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
                         lower=lower,upper=upper,control=list(fnscale=-1),...)
     }
