@@ -105,21 +105,26 @@ twfit2wfit <- function(fit,x){
     } else {
         stop('Incorrect input format')
     }
-    disc.slope <- a0/(b0*U)
-    conc.slope <- (l8*exp(l8*tt))/(l5*exp(l5*tt))
     md <- mediand(x$d)
+    D <- mclean(tt,d=md)
+    disc.slope <- a0/(b0*U)
+    conc.slope <- D$dPb206U238dt/D$dPb207U235dt
     if (disc.slope < conc.slope){
         search.range <- c(tt,get.Pb207Pb206.age(b0/a0,d=md)[1])+buffer
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,a0=a0,b0=b0,d=md)$root
-    } else if (disc.slope < l8/l5){
-        search.range <- c(-1000,tt-buffer)
-        tl <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,d=md)$root
-        tu <- tt
-    } else { # only one intercept
-        tl <- -1000
+    } else {
+        search.range <- c(0,tt-buffer)
+        if (check.equilibrium(d=md)) search.range[1] <- -1000
+        tl <- tryCatch(
+            stats::uniroot(intersection.misfit.ludwig,
+                           interval=search.range,
+                           t2=tt,a0=a0,b0=b0,d=md)$root
+          , error=function(e){
+              stop("Can't find the lower intercept.",
+                   "Try fitting the data in Tera-Wasserburg space.")
+          })
         tu <- tt
     }
     du <- mclean(tt=tu,d=md)

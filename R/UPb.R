@@ -1065,9 +1065,10 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit4c=NULL,
 
 # x = raw data
 # X = common Pb corrected data (if common.Pb>0)
-# xd = discordant data (raw if before==FALSE, common Pb corrected if before==FALSE)
-UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,conc=TRUE,
-                           discordance=discfilter(),...){
+# xd = data to be used for concordia age calculation 
+#      (raw if before==TRUE, common Pb corrected if before==FALSE)
+UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,
+                           conc=TRUE,discordance=discfilter(),...){
     Xi <- subset(X,subset=((1:length(X))%in%i))
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
     hasTh <- (x$format>6)
