@@ -771,3 +771,54 @@ replace.impossible.diseq <- function(tt,d){
     }
     out
 }
+
+ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
+    if (x$format%in%(4:6)){
+        option <- (3:4)[type]
+        d <- data2york(x,option=option)
+        fit <- regression(d,model=model,type='york')
+        out <- fit
+        if (option==3){
+            Pb6U8 <- -fit$b[1]/fit$a[1]
+            tt <- get.Pb206U238.age(x=Pb6U8,d=x$d)[1]
+            a0 <- 1/fit$a[1]
+            out$par <- c(tt,a0,NA)
+            E <- rbind(c(fit$a[2]^2,fit$cov.ab),
+                       c(fit$cov.ab,fit$b[2]^2))
+            D <- mclean(t=tt,d=x$d,exterr=exterr)
+            J <- matrix(0,2,2)
+            dPb6U8da <- fit$b[1]/fit$a[1]^2
+            dPb6U8db <- -1/fit$a[1]
+            J[1,1] <- dPb6U8da/D$dPb206U238dt # dt/da
+            J[1,2] <- dPb6U8db/D$dPb206U238dt # dt/db
+            J[2,1] <- -1/fit$a[1]^2 # da0/da
+            out$cov <- matrix(NA,3,3)
+            out$cov[1:2,1:2] <- J%*%E%*%t(J)
+        } else if (option==4){
+            Pb7U5 <- -fit$b[1]/fit$a[1]
+            tt <- get.Pb207U235.age(x=Pb7U5,d=x$d)[1]
+            b0 <- 1/fit$a[1]
+            out$par <- c(tt,NA,b0)
+            E <- rbind(c(fit$a[2]^2,fit$cov.ab),
+                       c(fit$cov.ab,fit$b[2]^2))
+            D <- mclean(t=tt,d=x$d,exterr=exterr)
+            J <- matrix(0,2,2)
+            dPb7U5da <- fit$b[1]/fit$a[1]^2
+            dPb7U5db <- -1/fit$a[1]
+            J[1,1] <- dPb7U5da/D$dPb207U235dt # dt/da
+            J[1,2] <- dPb7U5db/D$dPb207U235dt # dt/db
+            J[2,1] <- -1/fit$a[1]^2 # db0/da
+            out$cov <- matrix(NA,3,3)
+            out$cov[c(1,3),c(1,3)] <- J%*%E%*%t(J)
+        }
+        pnames <- c('t','64i','74i')
+    } else if (x$format%in%(7:8)){
+        option <- (6:9)[type]
+    } else {
+        stop('Data format incompatible with isochron regression.')
+    }
+    names(out$par) <- pnames
+    colnames(out$cov) <- pnames
+    rownames(out$cov) <- pnames
+    invisible(out)
+}
