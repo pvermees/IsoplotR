@@ -694,20 +694,6 @@ concordia.comp <- function(x,type=1){
     out
 }
 
-# x is an object of class "terawasserburg"
-initial.concordia.age <- function(x,d=diseq()){
-    e <- eigen(x$cov)
-    v <- e$vectors[,1]
-    if (v[1]==0) return(get.Pb207Pb206.age(x$x['Pb207Pb206'],0,d=d)[1])
-    if (v[2]==0) return(get.Pb206U238.age(1/x$x['U238Pb206'],0,d=d)[1])
-    b <- v[1]/v[2] # slope of the ellipse
-    x0 <- x$x['U238Pb206']
-    y0 <- x$x['Pb207Pb206']
-    a <- y0 - b*x0
-    fit <- concordia.intersection.ab(a,b,exterr=FALSE,d=d)
-    fit[1]
-}
-
 mswd.concordia <- function(x,cc,type=1,tt=0,exterr=TRUE){
     SS.equivalence <- 
         LL.concordia.comp(mu=cc$x,x=x,type=type,mswd=TRUE)
