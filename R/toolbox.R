@@ -365,7 +365,7 @@ blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
 #   parms to hold constant (not optimize). If TRUE, the corresponding
 #   parameter in fn() is fixed. Otherwise it's variable and optimised over.
 # lower, upper: a vector with the lower and upper ends of the search
-#   ranges of the free parameters, respectivelyl
+#   ranges of the free parameters, respectively
 # Originally written by Barry Rowlingson, modified by PV
 optifix <- function(parms, fixed, fn, gr = NULL, ...,
                     method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), 

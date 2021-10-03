@@ -176,7 +176,7 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         } else if (anchor[1] %in% c(1,2)){
             init <- anchored.lta0b0.init(x=x,anchor=anchor)
         } else {
-            init <- get.lta0b0.init(x,anchor=anchor)
+            init <- get.lta0b0.init(x)
         }
         lower <- (init-1)[!fixed]
         upper <- (init+1)[!fixed]
@@ -200,7 +200,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
     fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
     if (model==2){
-        np <- length(fit$par) # number of paramters
+        np <- length(fit$par) # number of parameters
         nf <- sum(fit$fixed)  # number of free parameters
         ns <- length(x)       # number of samples
         nv <- np-1            # number of independent variables
@@ -228,7 +228,7 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out
 }
 
-get.lta0b0.init <- function(x,anchor=0){
+get.lta0b0.init <- function(x){
     out <- list()
     xy <- data2york(x,option=2)
     # First, get the approximate intercept age using a model-2 regression
@@ -773,52 +773,39 @@ replace.impossible.diseq <- function(tt,d){
 }
 
 ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
-    if (x$format%in%(4:6)){
-        option <- (3:4)[type]
-        d <- data2york(x,option=option)
-        fit <- regression(d,model=model,type='york')
-        out <- fit
-        if (option==3){
-            Pb6U8 <- -fit$b[1]/fit$a[1]
-            tt <- get.Pb206U238.age(x=Pb6U8,d=x$d)[1]
-            a0 <- 1/fit$a[1]
-            out$par <- c(tt,a0,NA)
-            E <- rbind(c(fit$a[2]^2,fit$cov.ab),
-                       c(fit$cov.ab,fit$b[2]^2))
-            D <- mclean(t=tt,d=x$d,exterr=exterr)
-            J <- matrix(0,2,2)
-            dPb6U8da <- fit$b[1]/fit$a[1]^2
-            dPb6U8db <- -1/fit$a[1]
-            J[1,1] <- dPb6U8da/D$dPb206U238dt # dt/da
-            J[1,2] <- dPb6U8db/D$dPb206U238dt # dt/db
-            J[2,1] <- -1/fit$a[1]^2 # da0/da
-            out$cov <- matrix(NA,3,3)
-            out$cov[1:2,1:2] <- J%*%E%*%t(J)
-        } else if (option==4){
-            Pb7U5 <- -fit$b[1]/fit$a[1]
-            tt <- get.Pb207U235.age(x=Pb7U5,d=x$d)[1]
-            b0 <- 1/fit$a[1]
-            out$par <- c(tt,NA,b0)
-            E <- rbind(c(fit$a[2]^2,fit$cov.ab),
-                       c(fit$cov.ab,fit$b[2]^2))
-            D <- mclean(t=tt,d=x$d,exterr=exterr)
-            J <- matrix(0,2,2)
-            dPb7U5da <- fit$b[1]/fit$a[1]^2
-            dPb7U5db <- -1/fit$a[1]
-            J[1,1] <- dPb7U5da/D$dPb207U235dt # dt/da
-            J[1,2] <- dPb7U5db/D$dPb207U235dt # dt/db
-            J[2,1] <- -1/fit$a[1]^2 # db0/da
-            out$cov <- matrix(NA,3,3)
-            out$cov[c(1,3),c(1,3)] <- J%*%E%*%t(J)
-        }
-        pnames <- c('t','64i','74i')
-    } else if (x$format%in%(7:8)){
-        option <- (6:9)[type]
+    init <- log(c(300,0.05))
+    fit <- optifix(init,fixed=rep(FALSE,2),fn=LL.lty0w,
+                   x=x,type=type,method="L-BFGS-B",
+                   lower=c(-5,-7),upper=c(9,3))
+    fit
+}
+
+LL.lty0w <- function(lty0w,x,type=1){
+    tt <- exp(lty0w[1])
+    y0 <- exp(lty0w[2])
+    if (length(lty0w)>2) w <- exp(lty0w[3])
+    else w <- 0
+    if (type%in%(1:2)){
+        D <- mclean(tt=tt,d=x$d)
+        x0 <- 1/ifelse(type==1,D$Pb206U238,D$Pb207U235)
+    } else if (type%in%(3:4)){
+        x0 <- 1/D$Pb208Th232
     } else {
-        stop('Data format incompatible with isochron regression.')
+        stop('invalid isochron type')
     }
-    names(out$par) <- pnames
-    colnames(out$cov) <- pnames
-    rownames(out$cov) <- pnames
-    invisible(out)
+    if (x$format%in%(4:6)) option <- (3:4)[type]
+    else if (x$format%in%(7:9)) option <- (7:8)[type]
+    else stop('Data format not suitable for isochron regression.')
+    XY <- data2york(x,option=option,tt=tt)
+    xy <- get.york.xy(XY,a=y0,b=-y0/x0)
+    KL <- c(XY[,1]-xy[,1],XY[,1]-xy[,1])
+    ns <- nrow(XY)
+    i1 <- 1:ns
+    i2 <- ns+i1
+    covmat <- matrix(0,2*ns,2*ns)
+    covmat[cbind(i1,i1)] <- XY[,'sX']^2
+    covmat[cbind(i2,i2)] <- XY[,'sY']^2
+    covmat[cbind(i1,i2)] <- XY[,'sX']*XY[,'sY']*XY[,'rXY']
+    covmat[cbind(i2,i1)] <- covmat[cbind(i1,i2)]
+    LL.norm(KL,covmat)
 }
