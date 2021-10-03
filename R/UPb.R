@@ -232,7 +232,7 @@ get.UPb.isochron.ratios.204 <- function(x,i=NA){
     Pb47 <- tw$x['Pb204Pb206']/tw$x['Pb207Pb206']
     J <- matrix(0,4,3)
     J[1,1] <- 1
-    J[2,2] <- 1
+    J[2,3] <- 1
     J[3,1] <- 1/(U*tw$x['Pb207Pb206'])
     J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']
     J[4,2] <- -Pb47/tw$x['Pb207Pb206']
