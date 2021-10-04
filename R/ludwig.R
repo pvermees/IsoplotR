@@ -248,10 +248,10 @@ get.lta0b0.init <- function(x){
     } else {
         if (x$format<7) option <- 3
         else option <- 6
-        xy <- data2york(x,option=option) # 04-08c/06 vs 38/06
+        xy <- data2york(x,option=option,tt=tt) # 04-08c/06 vs 38/06
         fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         a0 <- 1/fit$coef[1]
-        xy <- data2york(x,option=option+1) # 04-08c/07 vs 38/07
+        xy <- data2york(x,option=option+1,tt=tt) # 04-08c/07 vs 38/07
         fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         b0 <- 1/fit$coef[1]
         expinit <- c(tt,a0,b0)
@@ -773,17 +773,44 @@ replace.impossible.diseq <- function(tt,d){
 }
 
 ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
-    init <- log(c(300,0.05))
-    fit <- optifix(init,fixed=rep(FALSE,2),fn=LL.lty0w,
+    if (x$format %in% (4:6)) parnames <- c('t','64i','74i')
+    else if (x$format %in% (7:8)) parnames <- c('t','68i','78i')
+    else stop("Illegal input format.")
+    lta0b0 <- get.lta0b0.init(x)
+    if (type%in%c(1,3)){
+        ij <- c(1,2)
+        init <- lta0b0[-3]
+    } else if (type%in%c(2,4)){
+        ij <- c(1,3)
+        init <- lta0b0[-2]
+    } else {
+        stop('Incorrect isochron type')
+    }
+    fixed <- fixit(x,anchor=anchor,model=model)[-2]
+    fit <- optifix(init,fixed=fixed,fn=LL.lta0w,
                    x=x,type=type,method="L-BFGS-B",
-                   lower=c(-5,-7),upper=c(9,3))
-    fit
+                   lower=c(-5,-7),upper=c(9,3),hessian=TRUE)
+    out <- list(model=model,logpar=rep(NA,3),logcov=matrix(0,3,3),
+                par=rep(NA,3),cov=matrix(0,3,3))
+    out$logpar[ij] <- fit$par
+    out$logcov[ij,ij] <- solve(fit$hessian)
+    out$par[ij] <- exp(out$logpar[ij])
+    out$cov[ij,ij] <- diag(out$par[ij])%*%out$logcov[ij,ij]%*%diag(out$par[ij])
+    names(out$par) <- parnames
+    rownames(out$cov) <- parnames
+    colnames(out$cov) <- parnames
+    SS <- LL.lta0w(lta0w=fit$par,x=x,type=type,SS=TRUE)
+    out$n <- length(x)
+    out$df <- out$n-2
+    out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
+    out$mswd <- SS/out$df
+    out
 }
 
-LL.lty0w <- function(lty0w,x,type=1){
-    tt <- exp(lty0w[1])
-    y0 <- exp(lty0w[2])
-    if (length(lty0w)>2) w <- exp(lty0w[3])
+LL.lta0w <- function(lta0w,x,type=1,SS=FALSE){
+    tt <- exp(lta0w[1])
+    y0 <- exp(-lta0w[2])
+    if (length(lta0w)>2) w <- exp(lta0w[3])
     else w <- 0
     if (type%in%(1:2)){
         D <- mclean(tt=tt,d=x$d)
@@ -798,7 +825,7 @@ LL.lty0w <- function(lty0w,x,type=1){
     else stop('Data format not suitable for isochron regression.')
     XY <- data2york(x,option=option,tt=tt)
     xy <- get.york.xy(XY,a=y0,b=-y0/x0)
-    KL <- c(XY[,1]-xy[,1],XY[,1]-xy[,1])
+    KL <- c(XY[,1]-xy[,1],XY[,3]-xy[,2])
     ns <- nrow(XY)
     i1 <- 1:ns
     i2 <- ns+i1
@@ -807,5 +834,10 @@ LL.lty0w <- function(lty0w,x,type=1){
     covmat[cbind(i2,i2)] <- XY[,'sY']^2
     covmat[cbind(i1,i2)] <- XY[,'sX']*XY[,'sY']*XY[,'rXY']
     covmat[cbind(i2,i1)] <- covmat[cbind(i1,i2)]
-    LL.norm(KL,covmat)
+    if (SS){
+        out <- stats::mahalanobis(KL,center=FALSE,cov=covmat)
+    } else {
+        out <- LL.norm(KL,covmat)
+    }
+    out
 }
