@@ -788,15 +788,16 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
         stop('Incorrect isochron type')
     }
     fixed <- fixit(x,anchor=anchor,model=model)[-2]
+    np <- sum(fixed)
     lower <- (init-1)[!fixed]
     upper <- (init+1)[!fixed]
     fit <- optifix(init,fixed=fixed,fn=LL.lta0w,
                    x=x,type=type,method="L-BFGS-B",
                    lower=lower,upper=upper,hessian=TRUE)
-    out <- list(model=model,logpar=rep(NA,3),logcov=matrix(0,3,3),
-                par=rep(NA,3),cov=matrix(0,3,3))
+    out <- list(model=model,logpar=lta0b0,logcov=matrix(0,3,3),
+                par=exp(lta0b0),cov=matrix(0,3,3))
     out$logpar[ij] <- fit$par
-    out$logcov[ij,ij] <- solve(fit$hessian)
+    out$logcov[ij[!fixed],ij[!fixed]] <- solve(fit$hessian)
     out$par[ij] <- exp(out$logpar[ij])
     out$cov[ij,ij] <- diag(out$par[ij])%*%out$logcov[ij,ij]%*%diag(out$par[ij])
     names(out$par) <- parnames
@@ -804,7 +805,7 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
     colnames(out$cov) <- parnames
     SS <- LL.lta0w(lta0w=fit$par,x=x,type=type,SS=TRUE)
     out$n <- length(x)
-    out$df <- out$n-sum(fixed)
+    out$df <- out$n-np
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out$mswd <- SS/out$df
     out
