@@ -776,7 +776,8 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
     if (x$format %in% (4:6)) parnames <- c('t','64i','74i')
     else if (x$format %in% (7:8)) parnames <- c('t','68i','78i')
     else stop("Illegal input format.")
-    lta0b0 <- get.lta0b0.init(x)
+    if (anchor[1]==0) lta0b0 <- get.lta0b0.init(x)
+    else lta0b0 <- anchored.lta0b0.init(x=x,anchor=anchor)
     if (type%in%c(1,3)){
         ij <- c(1,2)
         init <- lta0b0[-3]
@@ -787,9 +788,11 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
         stop('Incorrect isochron type')
     }
     fixed <- fixit(x,anchor=anchor,model=model)[-2]
+    lower <- (init-1)[!fixed]
+    upper <- (init+1)[!fixed]
     fit <- optifix(init,fixed=fixed,fn=LL.lta0w,
                    x=x,type=type,method="L-BFGS-B",
-                   lower=c(-5,-7),upper=c(9,3),hessian=TRUE)
+                   lower=lower,upper=upper,hessian=TRUE)
     out <- list(model=model,logpar=rep(NA,3),logcov=matrix(0,3,3),
                 par=rep(NA,3),cov=matrix(0,3,3))
     out$logpar[ij] <- fit$par
@@ -801,7 +804,7 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
     colnames(out$cov) <- parnames
     SS <- LL.lta0w(lta0w=fit$par,x=x,type=type,SS=TRUE)
     out$n <- length(x)
-    out$df <- out$n-2
+    out$df <- out$n-sum(fixed)
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out$mswd <- SS/out$df
     out
@@ -809,19 +812,20 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
 
 LL.lta0w <- function(lta0w,x,type=1,SS=FALSE){
     tt <- exp(lta0w[1])
-    y0 <- exp(-lta0w[2])
     if (length(lta0w)>2) w <- exp(lta0w[3])
     else w <- 0
     if (type%in%(1:2)){
         D <- mclean(tt=tt,d=x$d)
         x0 <- 1/ifelse(type==1,D$Pb206U238,D$Pb207U235)
+        y0 <- exp(-lta0w[2])
     } else if (type%in%(3:4)){
-        x0 <- 1/D$Pb208Th232
+        x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
+        y0 <- exp(lta0w[2])
     } else {
         stop('invalid isochron type')
     }
     if (x$format%in%(4:6)) option <- (3:4)[type]
-    else if (x$format%in%(7:9)) option <- (7:8)[type]
+    else if (x$format%in%(7:8)) option <- (6:9)[type]
     else stop('Data format not suitable for isochron regression.')
     XY <- data2york(x,option=option,tt=tt)
     xy <- get.york.xy(XY,a=y0,b=-y0/x0)
