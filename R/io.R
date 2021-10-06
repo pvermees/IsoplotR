@@ -197,9 +197,9 @@
 #' 
 #' \code{2}: 2\eqn{\sigma} absolute uncertainties.
 #' 
-#' \code{3}: 1\eqn{\sigma} relative uncertainties (\%).
+#' \code{3}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
 #' 
-#' \code{4}: 2\eqn{\sigma} relative uncertainties (\%).
+#' \code{4}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
 #'
 #' @param d an object of class \code{\link{diseq}}.
 #' 
