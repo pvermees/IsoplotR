@@ -1,10 +1,10 @@
-compisofit <- function(x,type=1){
+compisofit <- function(dat){
     
     logcovmat <- function(X,sX,Y,sY,sXY){
         ns <- length(sX)
         E <- matrix(0,2*ns,2*ns)
-        iX <- seq(from=1,to=2*ns-1,by=2)
-        iY <- iX + 1
+        iX <- 1:ns
+        iY <- ns+iX
         diag(E)[iX] <- sX^2
         diag(E)[iY] <- sY^2
         diag(E[iX,iY]) <- sXY
@@ -15,23 +15,28 @@ compisofit <- function(x,type=1){
         J %*% E %*% t(J)
     }
     
-    misfit <- function(lx,lx0,ly0,X,Y,O){
-        x <- exp(lx)
+    l1xx0misfit <- function(l1xx0,lx0,ly0,X,Y,O,LL=TRUE){
         x0 <- exp(lx0)
         y0 <- exp(ly0)
+        x <- x0*exp(1-exp(l1xx0))
         ns <- length(X)
         D <- rep(NA,ns)
-        iX <- seq(from=1,to=2*ns-1,by=2)
-        iY <- iX + 1
+        iX <- 1:ns
+        iY <- ns+iX
         D[iX] <- log(X)-log(x)
-        D[iY] <- log(Y)-log(y0)-log(1-x/x0)
-        D %*% O %*% D
+        D[iY] <- log(Y)-ly0-l1xx0
+        SS <- D %*% O %*% D
+        if (LL) out <- SS/2
+        else out <- SS
+        out
     }
     
-    xy0misfit <- function(lxy0,X,Y,O){
-        lx <- optim(log(X),misfit,lx0=lxy0[1],ly0=lxy0[2],
-                    X=X,Y=Y,O=O,method='BFGS')$par
-        misfit(lx,lx0=lxy0[1],ly0=lxy0[2],X=X,Y=Y,O=O)
+    misfit <- function(lxy0,X,Y,O,LL=TRUE){
+        x0 <- exp(lxy0[1])
+        il1xx0 <- log(abs(1-X/x0))
+        l1xx0 <- optim(il1xx0,fn=l1xx0misfit,method='BFGS',
+                       lx0=lxy0[1],ly0=lxy0[2],X=X,Y=Y,O=O)$par
+        l1xx0misfit(l1xx0,lx0=lxy0[1],ly0=lxy0[2],X=X,Y=Y,O=O,LL=LL)
     }
     
     X <- dat[,1]
@@ -43,15 +48,13 @@ compisofit <- function(x,type=1){
     E <- logcovmat(X,sX,Y,sY,sXY)
     O <- solve(E)
     
-    ab <- lm(Y ~ X)$coefficients
-    init <- c(log(-ab[1]/ab[2]),log(ab[1]))
-    lxy0fit <- optim(init,xy0misfit,X=X,Y=Y,O=O,method='BFGS')$par
-    lxfit <- optim(log(X),misfit,lx0=lxy0fit[1],ly0=lxy0fit[2],
-                   X=X,Y=Y,O=O,method='BFGS')$par
-    
+    ab <- abs(lm(Y ~ X)$coefficients)
+    init <- c(log(ab[1]/ab[2]),log(ab[1]))
+    fit <- optim(init,fn=misfit,X=X,Y=Y,O=O,hessian=TRUE)
     out <- list()
-    out$x <- exp(lxfit)
-    out$x0 <- exp(lxy0fit)[1]
-    out$y0 <- exp(lxy0fit)[2]
+    out$logpar <- fit$par
+    out$logcov <- solve(fit$hessian)
+    out$LL <- fit$value
+    out$SS <- misfit(fit$par,X=X,Y=Y,O=O,LL=FALSE)
     out
 }

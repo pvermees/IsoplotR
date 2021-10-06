@@ -507,11 +507,11 @@ get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #'     \code{'U-Th-Pb'}) vector with the standard error(s) of
 #'     \code{tt}. Not used when \code{ratio} =
 #'     \code{'Stacey-Kramers'}.
-#' @param ratio one of \code{'Pb207U235'}, \code{'U238Pb206'},
-#'     \code{'Pb207Pb206'}, \code{'Pb208Th232'}, \code{'Wetherill'},
-#'     \code{'Tera-Wasserburg'}, \code{'U-Th-Pb'}, \code{'Ar40Ar39'},
-#'     \code{'Ca40K40'}, \code{'Hf176Lu176'}, \code{'Sr87Rb87'},
-#'     \code{'Os187Re187'}, \code{'Nd143Sm147'} or
+#' @param ratio one of \code{'Pb206U238'}, \code{'Pb207U235'},
+#'     \code{'U238Pb206'}, \code{'Pb207Pb206'}, \code{'Pb208Th232'},
+#'     \code{'Wetherill'}, \code{'Tera-Wasserburg'}, \code{'U-Th-Pb'},
+#'     \code{'Ar40Ar39'}, \code{'Ca40K40'}, \code{'Hf176Lu176'},
+#'     \code{'Sr87Rb87'}, \code{'Os187Re187'}, \code{'Nd143Sm147'} or
 #'     \code{'Stacey-Kramers'}.
 #' @param exterr logical. If \code{TRUE}, propagates decay constant
 #'     uncertainties into \code{st}. Not used when \code{ratio} =
@@ -541,10 +541,10 @@ get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #' ratios.
 #' 
 #' @examples
-#' ratios <- c('Pb207U235','U238Pb206','Pb207Pb206','Pb208Th232',
-#'             'Wetherill','Tera-Wasserburg','U-Th-Pb','Ar40Ar39',
-#'             'Ca40K40','Hf176Lu176','Sr87Rb87','Os187Re187',
-#'             'Nd143Sm147','Stacey-Kramers')
+#' ratios <- c('Pb206U238','Pb207U235','U238Pb206','Pb207Pb206',
+#'             'Pb208Th232','Wetherill','Tera-Wasserburg','U-Th-Pb',
+#'             'Ar40Ar39','Ca40K40','Hf176Lu176','Sr87Rb87',
+#'             'Os187Re187','Nd143Sm147','Stacey-Kramers')
 #' for (ratio in ratios){
 #'      r <- age2ratio(tt=1000,st=10,ratio=ratio,J=1,sJ=0.1)
 #'      print(r)
