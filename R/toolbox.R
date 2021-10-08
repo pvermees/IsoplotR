@@ -224,6 +224,11 @@ LL.norm <- function(x,covmat){
         stats::mahalanobis(x,center=FALSE,cov=covmat)/2
 }
 
+# convert a sum of squares to a negative univariate normal log likelihood
+SS2LL <- function(SS,nn){
+    nn*log(SS*sqrt(2*pi)/(nn-2)) + (nn-2)/2
+}
+
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
     nl <- length(levels)

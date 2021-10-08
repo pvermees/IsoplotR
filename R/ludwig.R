@@ -162,7 +162,7 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     if (measured.disequilibrium(x$d) & anchor[1]<1){
         out <- fit.lta0b0w2step(x,exterr=exterr,model=model,
                                 anchor=anchor,w=w,...)
-        out$hessian <- stats::optimHess(par=out$par,fn=SS.model2,x=x)
+        out$hessian <- stats::optimHess(par=out$par,fn=LL.lud.model2,x=x)
     } else {
         if (model==3){
             init <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)$par
@@ -181,7 +181,7 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         lower <- (init-1)[!fixed]
         upper <- (init+1)[!fixed]
         if (model==2){
-            out <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",x=x,
+            out <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=x,
                            fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
         } else {
             out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
@@ -200,14 +200,10 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out <- list(model=model,exterr=exterr)
     fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
     if (model==2){
-        np <- length(fit$par) # number of parameters
-        nf <- sum(fit$fixed)  # number of free parameters
-        ns <- length(x)       # number of samples
-        nv <- np-1            # number of independent variables
-        mse <- fit$value/(nv*ns-nf)   # mean square error
         out$logpar <- fit$par
-        out$logcov <- matrix(0,np,np) # initialise
-        out$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)*mse
+        np <- length(fit$par)
+        out$logcov <- matrix(0,np,np)
+        out$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)
     } else {
         out$LL <- fit$value
         out$logpar <- fit$par
@@ -324,16 +320,17 @@ anchored.lta0b0.init <- function(x,anchor=1){
     init
 }
 
-SS.model2 <- function(lta0b0,x){
+LL.lud.model2 <- function(lta0b0,x){
     tt <- exp(lta0b0[1])
     a0 <- exp(lta0b0[2])
+    nn <- length(x)
     if (x$format<4){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
         yp <- a0+(yr-a0)*xy[,'X']/xr
         dy <- yp-xy[,'Y']
-        out <- sum(dy^2)/2
+        LL <- SS2LL(SS=sum(dy^2),nn=nn)
     } else {
         b0 <- exp(lta0b0[3])
         ns <- length(x)
@@ -347,11 +344,13 @@ SS.model2 <- function(lta0b0,x){
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
         y6p <- (r86-x6)/(a0*r86)
         y7p <- (r57-x7)/(b0*r57)
-        dy6 <- y6p-y6
-        dy7 <- y7p-y7
-        out <- sum(dy6^2 + dy7^2)/2
+        SS6 <- sum((y6-y6p)^2)
+        SS7 <- sum((y7-y7p)^2)
+        LL6 <- SS2LL(SS=SS6,nn=nn)
+        LL7 <- SS2LL(SS=SS7,nn=nn)
+        LL <- LL6 + LL7
     }
-    out
+    LL
 }
 
 LL.lud <- function(lta0b0w,x,exterr=FALSE,LL=TRUE){
@@ -742,7 +741,7 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     # 3. model-2 fit
     init <- fit1$par
     fixed <- fixit(X,anchor=anchor,model=model,w=w)
-    fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
+    fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",
                     x=X,fixed=fixed,lower=init-1,upper=init+1,...)
     if (model==2){
         out <- fit2

@@ -262,9 +262,8 @@ get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
         colnames(out) <- labels
         return(out)
     }
+    D <- mclean(tt,d=x$d)
     l2 <- settings('lambda','Th232')[1]
-    l5 <- settings('lambda','U235')[1]
-    l8 <- settings('lambda','U238')[1]
     U <- iratio('U238U235')[1]
     tw <- tera.wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
     U8Pb6 <- tw$x['U238Pb206']
@@ -274,9 +273,9 @@ get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
     Pb8c7 <- Pb8c6/tw$x['Pb207Pb206']
     Th2Pb8 <- tw$x['Th232U238']*tw$x['U238Pb206']/tw$x['Pb208Pb206']
     Pb6c8 <- 1/tw$x['Pb208Pb206'] -
-        (exp(l8*tt)-1)*tw$x['U238Pb206']/tw$x['Pb208Pb206']
+        D$Pb206U238*tw$x['U238Pb206']/tw$x['Pb208Pb206']
     Pb7c8 <- tw$x['Pb207Pb206']/tw$x['Pb208Pb206'] -
-        (exp(l5*tt)-1)*tw$x['U238Pb206']/(U*tw$x['Pb208Pb206'])
+        D$Pb207U235*tw$x['U238Pb206']/(U*tw$x['Pb208Pb206'])
     J <- matrix(0,8,4)
     J[1,1] <- 1
     J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
@@ -292,9 +291,9 @@ get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
     J[6,1] <- tw$x['Th232U238']/tw$x['Pb208Pb206']
     J[6,3] <- -Th2Pb8/tw$x['Pb208Pb206']
     J[6,4] <- tw$x['U238Pb206']/tw$x['Pb208Pb206']
-    J[7,1] <- -(exp(l8*tt)-1)/tw$x['Pb208Pb206']
+    J[7,1] <- -D$Pb206U238/tw$x['Pb208Pb206']
     J[7,3] <- -Pb6c8/tw$x['Pb208Pb206']
-    J[8,1] <- -(exp(l5*tt)-1)/(U*tw$x['Pb208Pb206'])
+    J[8,1] <- -D$Pb207U235/(U*tw$x['Pb208Pb206'])
     J[8,2] <- 1/tw$x['Pb208Pb206']
     J[8,3] <- -Pb7c8/tw$x['Pb208Pb206']
     out <- list()

@@ -55,7 +55,7 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         J <- diag(1/out$par[i])
         out$logcov[i,i] <- J%*%out$cov[i,i]%*%t(J)
     } else if (x$format%in%(7:8)) {
-        UThPbmisfit <- function(lta0,lt=NULL,la0=NULL,option=1,LL=TRUE,d=diseq()){
+        UThPbmisfit <- function(lta0,lt=NULL,la0=NULL,option=1,d=diseq()){
             if (length(lta0)>1){
                 tt <- exp(lta0[1])
                 a0 <- exp(lta0[2])
@@ -80,20 +80,19 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
                 x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
                 y0 <- a0
             }
+            nn <- length(x)
             XY <- data2york(x,option=option,tt=tt)
             yp <- y0*(1-XY[,'X']/x0)
             SS <- sum((yp-XY[,'Y'])^2)
-            if (LL) out <- SS/2
-            else out <- SS
-            out
+            SS2LL(SS,nn)
         }        
         option <- (6:9)[type]
         pnames <- c('t','68i','78i')
         lnames <- c('log(t)','log(68i)','log(78i)')
         if (anchor[1]<1){
-            fit <- optim(c(0,0),fn=UThPbmisfit,option=option,d=x$d,hessian=TRUE)
+            fit <- optim(c(2,-1),fn=UThPbmisfit,option=option,d=x$d,hessian=TRUE)
             out$logpar[i] <- fit$par
-            out$logcov[i,i] <- solve(fit$hessian)
+            out$logcov[i,i] <- solve(fit$hessian)            
         } else if (anchor[1]==1){
             la0 <- log(anchor[2])
             fit <- optim(0,fn=UThPbmisfit,method='BFGS',
