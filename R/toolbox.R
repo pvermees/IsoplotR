@@ -225,8 +225,8 @@ LL.norm <- function(x,covmat){
 }
 
 # convert a sum of squares to a negative univariate normal log likelihood
-SS2LL <- function(SS,nn){
-    nn*log(SS*sqrt(2*pi)/(nn-2)) + (nn-2)/2
+SS2LL <- function(SS,nn,df=nn-2){
+    nn*log(SS*sqrt(2*pi)/df) + df/2
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),

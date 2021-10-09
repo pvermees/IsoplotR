@@ -21,7 +21,7 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
             ab <- fit$coefficients
             covmat <- vcov(fit)
         } else if (anchor[1]==1) {
-            y0 <- 1/anchor[2]
+            y0 <- 1/iratio('Pb206Pb204')[1]
             fit <- stats::lm( I(XY[,'Y']-y0) ~ 0 + XY[,'X'] )
             ab <- c(y0,fit$coefficients)
             covmat <- matrix(0,2,2)
@@ -55,56 +55,76 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         J <- diag(1/out$par[i])
         out$logcov[i,i] <- J%*%out$cov[i,i]%*%t(J)
     } else if (x$format%in%(7:8)) {
-        UThPbmisfit <- function(lta0,lt=NULL,la0=NULL,option=1,d=diseq()){
+        UThPbmisfit <- function(lta0,x,tt=NULL,a0=NULL,option=1){
+            nn <- length(x)
             if (length(lta0)>1){
                 tt <- exp(lta0[1])
                 a0 <- exp(lta0[2])
-            } else if (is.null(lt)){
+                df <- nn-2
+            } else if (is.null(tt)){
                 tt <- exp(lta0)
-                a0 <- exp(la0)
+                df <- nn-1
             } else if (is.null(a0)){
-                tt <- exp(lt)
                 a0 <- exp(lta0)
+                df <- nn-1
             } else {
-                stop('You must provide initial values for both lt and a0.')
+                stop('You must provide initial values for both t and a0.')
             }
             if (option==6){
-                D <- mclean(tt,d=d)
+                D <- mclean(tt,d=x$d)
                 x0 <- 1/D$Pb206U238
                 y0 <- 1/a0
             } else if (option==7){
-                D <- mclean(tt,d=d)
+                D <- mclean(tt,d=x$d)
                 x0 <- 1/D$Pb207U235
                 y0 <- 1/a0
             } else {
                 x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
                 y0 <- a0
             }
-            nn <- length(x)
             XY <- data2york(x,option=option,tt=tt)
             yp <- y0*(1-XY[,'X']/x0)
             SS <- sum((yp-XY[,'Y'])^2)
-            SS2LL(SS,nn)
-        }        
+            SS2LL(SS,nn,df)
+        }
+        model2init <- function(x,option=1,tt=NULL,a0=NULL){
+            ti <- min(get.Pb206U238.age(x)[,1]) # first stab
+            XY <- data2york(x,option=option,tt=ti)
+            init <- c(0,0)
+            if (option==6){
+                init[1] <- min(get.Pb206U238.age(1/XY[,'X'])[,1])
+                init[2] <- 1/median(XY[,'Y'])
+            } else if (option==7){
+                init[1] <- min(get.Pb207U235.age(1/XY[,'X'])[,1])
+                init[2] <- 1/median(XY[,'Y'])
+            } else {
+                init[1] <- min(get.Pb208Th232.age(1/XY[,'X'])[,1])
+                init[2] <- median(XY[,'Y'])
+            }
+            log(init)
+        }
         option <- (6:9)[type]
         pnames <- c('t','68i','78i')
         lnames <- c('log(t)','log(68i)','log(78i)')
+        init <- model2init(x,option=option)
         if (anchor[1]<1){
-            fit <- optim(c(2,-1),fn=UThPbmisfit,option=option,d=x$d,hessian=TRUE)
+            fit <- optim(init,fn=UThPbmisfit,x=x,option=option,hessian=TRUE)
             out$logpar[i] <- fit$par
-            out$logcov[i,i] <- solve(fit$hessian)            
+            out$logcov[i,i] <- solve(fit$hessian)
         } else if (anchor[1]==1){
-            la0 <- log(anchor[2])
-            fit <- optim(0,fn=UThPbmisfit,method='BFGS',
-                         la0=la0,option=option,d=x$d,hessian=TRUE)
-            out$logpar[i] <- c(fit$par,la0)
+            a0 <- ifelse(type%in%c(1,3),
+                         1/iratio('Pb208Pb206')[1],
+                         1/iratio('Pb208Pb207')[1])
+            fit <- optim(init[1],fn=UThPbmisfit,x=x,method='BFGS',
+                         a0=a0,option=option,hessian=TRUE)
+            out$logpar[i] <- c(fit$par,log(a0))
             out$logcov[i,i] <- matrix(0,2,2)
             out$logcov[i[1],i[1]] <- 1/fit$hessian
         } else {
-            lt <- log(anchor[2])
-            fit <- optim(0,fn=UThPbmisfit,method='BFGS',
-                         lt=lt,option=option,d=x$d,hessian=TRUE)
-            out$logpar[i] <- c(lt,fit$par)
+            tt <- anchor[2]
+            fit <- optim(init[2],fn=UThPbmisfit,x=x,method='BFGS',
+                         tt=tt,option=option,hessian=TRUE)
+            out$logpar[i] <- c(log(tt),fit$par)
             out$logcov[i,i] <- matrix(0,2,2)
             out$logcov[i[2],i[2]] <- 1/fit$hessian
         }
