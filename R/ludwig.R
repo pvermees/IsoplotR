@@ -344,11 +344,8 @@ LL.lud.model2 <- function(lta0b0,x){
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
         y6p <- (r86-x6)/(a0*r86)
         y7p <- (r57-x7)/(b0*r57)
-        SS6 <- sum((y6-y6p)^2)
-        SS7 <- sum((y7-y7p)^2)
-        LL6 <- SS2LL(SS=SS6,nn=nn)
-        LL7 <- SS2LL(SS=SS7,nn=nn)
-        LL <- LL6 + LL7
+        D <- cbind(y6-y6p,y7-y7p)
+        LL <- sum(apply(D,1,LL.norm,covmat=cov(D)))
     }
     LL
 }
