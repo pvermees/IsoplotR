@@ -506,6 +506,8 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
     } else {
         fit <- ludwig2d(x2calc,type=type,model=model,anchor=anchor,exterr=exterr)
     }
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@77@"]]));##:ess-bp-end:##
     tt <- fit$par['t']
     a0 <- fit$par['a0']
     b0 <- fit$par['b0']

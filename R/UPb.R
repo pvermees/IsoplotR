@@ -213,7 +213,7 @@ get.UPb.isochron.ratios.204 <- function(x,i=NA){
     if (x$format%in%c(4,5,6)){
         labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
     } else {
-        stop('Format does not contain 204Pb function.')
+        stop('Format does not contain 204Pb.')
     }
     if (all(is.na(i))){
         ns <- length(x)
