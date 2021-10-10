@@ -1,9 +1,6 @@
 ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
     if (model==1){
         out <- ludwig2d_helper(x=x,type=type,anchor=anchor,exterr=exterr)
-        out$mswd <- 1 # TODO
-        out$p.value <- 0 # TODO
-        out$df <- 1 # TODO
     } else if (model==2){
         out <- ludwig2d_model2(x=x,type=type,anchor=anchor,exterr=exterr)
     } else {
@@ -38,7 +35,8 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
     
     if (x$format%in%(4:6)){
         
-        LL_UPb <- function(lta0w,d,Y,Z,O,tt=NULL,a0=NULL,w=0,option=1){
+        LL_UPb <- function(lta0w,d,Y,Z,O,tt=NULL,
+                           a0=NULL,w=0,option=1,LL=TRUE){
             np <- length(lta0w)
             if (np>2){
                 tt <- exp(lta0w[1])
@@ -90,7 +88,12 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
                 stop('query')
             })
             SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
-            SS
+            if (LL){
+                out <- SS/2
+            } else {
+                out <- SS
+            }
+            out
         }
 
         Y <- rep(NA,ns)
@@ -121,11 +124,13 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
         fit <- optim(init$logpar[i],LL_UPb,method='L-BFGS-B',
                      lower=init$logpar[i]-2,upper=init$logpar[i]+2,
                      d=x$d,Y=Y,Z=Z,O=O,option=option,hessian=TRUE)
+
         out <- init
         out$logpar[i] <- fit$par
         out$logcov[i,i] <- solve(fit$hessian)
         out$par[i] <- exp(out$logpar[i])
         out$cov[i,i] <- diag(out$par[i])%*%out$logcov[i,i]%*%diag(out$par[i])
+        SS <- LL_UPb(fit$par,d=x$d,Y=Y,Z=Z,O=O,option=option,LL=FALSE)
 
     } else {
         option <- (6:9)[type]
@@ -134,6 +139,9 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
         }
     }
     
+    out$df <- ifelse(anchor[1]<1,length(x)-2,length(x)-1)
+    out$mswd <- SS/out$df
+    out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out
 }
 
