@@ -506,8 +506,6 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
     } else {
         fit <- ludwig2d(x2calc,type=type,model=model,anchor=anchor,exterr=exterr)
     }
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@77@"]]));##:ess-bp-end:##
     tt <- fit$par['t']
     a0 <- fit$par['a0']
     b0 <- fit$par['b0']
@@ -543,21 +541,21 @@ browser(expr=is.null(.ESSBP.[["@77@"]]));##:ess-bp-end:##
     out$age[2] <- sqrt(fit$cov[1,1])
     if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
         XY <- data2york(x,option=3)
-        y0par <- '64i'
+        y0par <- 'a0'
         out$y0[1] <- fit$par[y0par]
         out$y0[2] <- sqrt(fit$cov[y0par,y0par])
         out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
         y.lab <- quote(''^204*'Pb/'^206*'Pb')
     } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
         XY <- data2york(x,option=4)
-        y0par <- '74i'
+        y0par <- 'b0'
         out$y0[1] <- fit$par[y0par]
         out$y0[2] <- sqrt(fit$cov[y0par,y0par])
         out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
         y.lab <- quote(''^204*'Pb/'^207*'Pb')
     } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
         XY <- data2york(x,option=6,tt=tt)
-        y0par <- '68i'
+        y0par <- 'a0'
         out$y0[1] <- 1/fit$par[y0par]
         out$y0[2] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
         out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
@@ -565,21 +563,21 @@ browser(expr=is.null(.ESSBP.[["@77@"]]));##:ess-bp-end:##
     } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
         XY <- data2york(x,option=7,tt=tt)
         U <- settings('iratio','U238U235')[1]
-        y0par <- '78i'
+        y0par <- 'b0'
         out$y0[1] <- 1/fit$par[y0par]
         out$y0[2] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
         y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
         out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
     } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
         XY <- data2york(x,option=8,tt=tt)
-        y0par <- '68i'
+        y0par <- 'a0'
         out$y0[1] <- fit$par[y0par]
         out$y0[2] <- sqrt(fit$cov[y0par,y0par])
         y.lab <- quote(''^206*'Pb'[o]*'/'^208*'Pb')
         out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
     } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
         XY <- data2york(x,option=9,tt=tt)
-        y0par <- '78i'
+        y0par <- 'b0'
         out$y0[1] <- fit$par[y0par]
         out$y0[2] <- sqrt(fit$cov[y0par,y0par])
         y.lab <- quote(''^207*'Pb'[o]*'/'^208*'Pb')

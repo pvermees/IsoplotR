@@ -116,15 +116,13 @@ exponentiate_ludwig <- function(fit,format){
     np <- length(fit$logpar)
     J <- matrix(0,np,np)
     out$par <- exp(fit$logpar)
+    parnames <- c('t','a0','b0','w')
+    if (fit$model!=3) parnames <- parnames[-4]
+    if (format < 4) parnames <- parnames[-3]
+    names(out$par) <- parnames
+    rownames(J) <- parnames
     diag(J) <- exp(fit$logpar[1:np])
     out$cov <- J %*% fit$logcov %*% t(J)
-    if (format %in% c(1,2,3)) parnames <- c('t','76i','w')
-    else if (format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
-    else if (format %in% c(7,8)) parnames <- c('t','68i','78i','w')
-    else stop("Illegal input format.")
-    names(out$par) <- parnames[1:np]
-    rownames(out$cov) <- parnames[1:np]
-    colnames(out$cov) <- parnames[1:np]
     out
 }
 
@@ -209,15 +207,9 @@ get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         out$logpar <- fit$par
         out$logcov <- fisher.lud(fit)
     }
-    if (x$format %in% c(1,2,3))
-        parnames <- c('log(t)','log(76i)')
-    else if (x$format %in% c(4,5,6))
-        parnames <- c('log(t)','log(64i)','log(74i)')
-    else if (x$format %in% c(7,8))
-        parnames <- c('log(t)','log(68i)','log(78i)')
-    else
-        stop("Illegal input format.")
-    if (model==3) parnames <- c(parnames,'log(w)')
+    parnames <- c('log(t)','log(a0)','log(b0)','log(w)')
+    if (model!=3) parnames <- parnames[-4]
+    if (x$format < 4) parnames <- parnames[-3]
     names(out$logpar) <- parnames
     rownames(out$logcov) <- parnames
     colnames(out$logcov) <- parnames
@@ -240,7 +232,7 @@ get.lta0b0.init <- function(x){
     if (x$format<4){
         a0 <- a
         expinit <- c(tt,a0)
-        labels <- c('lt','a0')
+        labels <- c('log(t)','log(a0)')
     } else {
         if (x$format<7) option <- 3
         else option <- 6
@@ -251,34 +243,34 @@ get.lta0b0.init <- function(x){
         fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
         b0 <- 1/fit$coef[1]
         expinit <- c(tt,a0,b0)
-        labels <- c('lt','a0','b0')
+        labels <- c('log(t)','log(a0)','log(b0)')
     }
     expinit[expinit<=0] <- 1e-5
-    init <- log(expinit)
-    names(init) <- labels
-    init
+    out <- log(expinit)
+    names(out) <- labels
+    out
 }
 anchored.lta0b0.init <- function(x,anchor=1){
     if (x$format<4) np <- 2
     else np <- 3
     init <- rep(0,np)
-    names(init) <- c('lt','a0','b0')[1:np]
+    names(init) <- c('log(t)','log(a0)','log(b0)')[1:np]
     if (anchor[1]==1){ # fix common Pb composition
         xy <- data2york(x,option=2)
         if (x$format%in%c(1,2,3)){
             i76 <- iratio('Pb207Pb206')[1]
-            init['a0'] <- log(i76)
+            init['log(a0)'] <- log(i76)
         } else if (x$format%in%c(4,5,6)){
             i64 <- iratio('Pb206Pb204')[1]
             i74 <- iratio('Pb207Pb204')[1]
-            init['a0'] <- log(i64)
-            init['b0'] <- log(i74)
+            init['log(a0)'] <- log(i64)
+            init['log(b0)'] <- log(i74)
             i76 <- i74/i64
         } else if (x$format%in%c(7,8)){
             i86 <- iratio('Pb208Pb206')[1]
             i87 <- iratio('Pb208Pb207')[1]
-            init['a0'] <- -log(i86)
-            init['b0'] <- -log(i87)
+            init['log(a0)'] <- -log(i86)
+            init['log(b0)'] <- -log(i87)
             i76 <- i86/i87
         } else {
             stop('incorrect input format')
@@ -289,16 +281,16 @@ anchored.lta0b0.init <- function(x,anchor=1){
         covmat[2,2] <- stats::vcov(fit)
         tint <- concordia.intersection.ab(i76,b,covmat=covmat,
                                           d=mediand(x$d))[1]
-        init['lt'] <- log(tint)
+        init['log(t)'] <- log(tint)
     } else if (anchor[1]==2){ # fix age
-        init['lt'] <- log(anchor[2])
+        init['log(t)'] <- log(anchor[2])
         if (x$format<4){
             xy <- data2york(x,option=2)
             TW <- age_to_terawasserburg_ratios(anchor[2],st=0,
                                                exterr=FALSE,d=mediand(x$d))
             b <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
                                0 + I(xy[,'X']-TW$x['U238Pb206']))$coef
-            init['a0'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
+            init['log(a0)'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
         } else {
             r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=mediand(x$d))[1]
             if (x$format<7){
@@ -309,10 +301,10 @@ anchored.lta0b0.init <- function(x,anchor=1){
                 xy7 <- data2york(x,option=7,tt=anchor[2])
             }
             b <- stats::lm(xy6[,'Y'] ~ 0 + I(xy6[,'X']-r86))$coef
-            init['a0'] <- -(log(-b)+log(r86))
+            init['log(a0)'] <- -(log(-b)+log(r86))
             r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=mediand(x$d))[1]
             b <- stats::lm(xy7[,'Y'] ~ 0 + I(xy7[,'X']-r57))$coef
-            init['b0'] <- -(log(-b)+log(r57))
+            init['log(b0)'] <- -(log(-b)+log(r57))
         }
     } else { 
         stop("Invalid discordia regression anchor.")

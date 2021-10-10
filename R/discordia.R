@@ -92,18 +92,12 @@ twfit2wfit <- function(fit,x){
     J <- matrix(0,2,3)
     if (x$format %in% c(1,2,3)){
         a0 <- 1
-        b0 <- fit$par['76i']
+        b0 <- fit$par['a0']
         E[c(1,3),c(1,3)] <- fit$cov[1:2,1:2]
-    } else if (x$format %in% c(4,5,6)){
-        a0 <- fit$par['64i']
-        b0 <- fit$par['74i']
-        E <- fit$cov[1:3,1:3]
-    } else if (x$format%in%c(7,8)){
-        a0 <- fit$par['68i']
-        b0 <- fit$par['78i']
-        E <- fit$cov[1:3,1:3]
     } else {
-        stop('Incorrect input format')
+        a0 <- fit$par['a0']
+        b0 <- fit$par['b0']
+        E <- fit$cov[1:3,1:3]
     }
     md <- mediand(x$d)
     D <- mclean(tt,d=md)
@@ -334,8 +328,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list2$d <- i76[4]
         }
     } else if (fit$format%in%c(4,5,6)){
-        i64 <- roundit(fit$par['64i'],fit$err[,'64i'],sigdig=sigdig,text=TRUE)
-        i74 <- roundit(fit$par['74i'],fit$err[,'74i'],sigdig=sigdig,text=TRUE)
+        i64 <- roundit(fit$par['a0'],fit$err[,'a0'],sigdig=sigdig,text=TRUE)
+        i74 <- roundit(fit$par['b0'],fit$err[,'b0'],sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')
         expr2 <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
         expr3 <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
@@ -349,10 +343,10 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         call3 <- substitute(e~a,list(e=expr3,a=args2))
         line3 <- do.call('substitute',list(call3,list3))        
     } else if (fit$format%in%c(7,8)){
-        i86 <- 1/fit$par['68i']
-        i87 <- 1/fit$par['78i']
-        i86err <- i86*fit$err[,'68i']/fit$par['68i']
-        i87err <- i87*fit$err[,'78i']/fit$par['78i']
+        i86 <- 1/fit$par['a0']
+        i87 <- 1/fit$par['b0']
+        i86err <- i86*fit$err[,'a0']/fit$par['a0']
+        i87err <- i87*fit$err[,'b0']/fit$par['b0']
         ri86 <- roundit(i86,i86err,sigdig=sigdig,text=TRUE)
         ri87 <- roundit(i87,i87err,sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')

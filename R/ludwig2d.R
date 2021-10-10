@@ -1,11 +1,27 @@
 ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
     if (model==1){
         out <- ludwig2d_helper(x=x,type=type,anchor=anchor,exterr=exterr)
+        out$mswd <- 1 # TODO
+        out$p.value <- 0 # TODO
+        out$df <- 1 # TODO
     } else if (model==2){
         out <- ludwig2d_model2(x=x,type=type,anchor=anchor,exterr=exterr)
     } else {
         out <- ludwig2d_helper(x=x,w=NULL,type=type,anchor=anchor,exterr=exterr)
     }
+
+    pnames <- c('t','a0','b0')
+    if (model==3) pnames <- c(pnames,'w')
+    names(out$par) <- pnames
+    rownames(out$cov) <- pnames
+    colnames(out$cov) <- pnames
+
+    lnames <- c('log(t)','log(a0)','log(b0)')
+    if (model==3) lnames <- c(pnames,'log(w)')
+    names(out$logpar) <- lnames
+    rownames(out$logcov) <- lnames
+    colnames(out$logcov) <- lnames
+
     out$model <- model
     out$n <- length(x)
     out
@@ -130,9 +146,6 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
     else if (type%in%c(2,4)) i <- c(1,3)
     else stop('Invalid isochron type.')
     
-    pnames <- c('t','a0','b0')
-    lnames <- c('log(t)','log(a0)','log(b0)')
-    
     if (x$format%in%(4:6)){
         XY <- data2york(x,option=(3:4)[type])
         if (anchor[1]<1){
@@ -255,13 +268,6 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
     } else {
         stop('2D ludwig regression is not available for this format')
     }
-    
-    names(out$par) <- pnames
-    rownames(out$cov) <- pnames
-    colnames(out$cov) <- pnames
-    names(out$logpar) <- lnames
-    rownames(out$logcov) <- lnames
-    colnames(out$logcov) <- lnames
-        
+            
     out
 }
