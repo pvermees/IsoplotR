@@ -3,18 +3,20 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
         out <- ludwig2d_helper(x=x,type=type,anchor=anchor,exterr=exterr)
     } else if (model==2){
         out <- ludwig2d_model2(x=x,type=type,anchor=anchor,exterr=exterr)
-    } else {
+    } else if (model==3){
         out <- ludwig2d_helper(x=x,w=NULL,type=type,anchor=anchor,exterr=exterr)
+    } else {
+        stop('Invalid fit model.')
     }
 
     pnames <- c('t','a0','b0')
-    if (model==3) pnames <- c(pnames,'w')
+    if (model!=2) pnames <- c(pnames,'w')
     names(out$par) <- pnames
     rownames(out$cov) <- pnames
     colnames(out$cov) <- pnames
 
     lnames <- c('log(t)','log(a0)','log(b0)')
-    if (model==3) lnames <- c(pnames,'log(w)')
+    if (model!=2) lnames <- c(lnames,'log(w)')
     names(out$logpar) <- lnames
     rownames(out$logcov) <- lnames
     colnames(out$logcov) <- lnames
@@ -25,17 +27,23 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
 }
 
 ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
-    out <- ludwig2d_model2(x=x,type=type,anchor=anchor)
-
+    
+    out <- list(par=rep(NA,4),cov=matrix(NA,4,4),
+                logpar=rep(NA,4),logcov=matrix(NA,4,4))    
     if (type%in%c(1,3)) i <- c(1,2)
     else if (type%in%c(2,4)) i <- c(1,3)
     else stop('Invalid isochron type.')
-
+    model2fit <- ludwig2d_model2(x=x,type=type,anchor=anchor)
+    init <- model2fit$logpar[i]
+    if (is.null(w)){ # model 3 regression
+        init <- c(init,0)
+        i <- c(i,4)
+    }
     ns <- length(x)
     
     if (x$format%in%(4:6)){
         
-        LL_UPb <- function(lta0w,d,Y,Z,O,tt=NULL,
+        LL_UPb <- function(lta0w,d,Y,Z,E,tt=NULL,
                            a0=NULL,w=0,option=1,LL=TRUE){
             np <- length(lta0w)
             if (np>2){
@@ -68,12 +76,16 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
                     w <- 0
                 }
             }
-            
             D <- mclean(tt=tt,d=d)
             dY <- Y - ifelse(type==1,D$Pb206U238,D$Pb207U235)
             ns <- length(Y)
             i1 <- 1:ns
             i2 <- ns+(1:ns)
+            J <- matrix(0,2*ns,ns)
+            J[i1,i1] <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
+            Ew <- J%*%t(J)*w^2 + E
+            O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
+                              Ew[i1,i2],Ew[i2,i2],doall=TRUE)
             AA <- dY%*%O[i1,i1]%*%dY + dY%*%O[i1,i2]%*%Z +
                 Z%*%O[i2,i1]%*%dY + Z%*%O[i2,i2]%*%Z
             BB <- a0*dY%*%O[i1,i1] + dY%*%O[i1,i2] +
@@ -82,55 +94,58 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
                 O[i2,i1]%*%dY + O[i2,i2]%*%Z
             DD <- O[i1,i1]*a0^2 + O[i1,i2]*a0 +
                 O[i2,i1]*a0 + O[i2,i2]
-            tryCatch({
-                z <- solve(DD+t(DD),t(BB)+CC)
-            }, error = function(e){
-                stop('query')
-            })
+            z <- solve(DD+t(DD),t(BB)+CC)
             SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
             if (LL){
-                out <- SS/2
+                detEw <- determinant(Ew,logarithm=TRUE)$modulus
+                out <- (2*ns*log(2*pi) + detEw + SS)/2
             } else {
                 out <- SS
             }
             out
-        }
+        } # end of LL_UPb
 
         Y <- rep(NA,ns)
         Z <- rep(NA,ns)
         U <- iratio('U238U235')[1]
-        E11 <- matrix(0,ns,ns)
-        E12 <- matrix(0,ns,ns)
-        E22 <- matrix(0,ns,ns)
+        E <- matrix(0,2*ns,2*ns)
         for (j in 1:ns){
             wd <- wetherill(x,i=j)
             if (type==1){
                 Y[j] <- wd$x['Pb206U238']
                 Z[j] <- wd$x['Pb204U238']
-                E11[j,j] <- wd$cov['Pb206U238','Pb206U238']
-                E22[j,j] <- wd$cov['Pb204U238','Pb204U238']
-                E12[j,j] <- wd$cov['Pb206U238','Pb204U238']
+                E[j,j] <- wd$cov['Pb206U238','Pb206U238']
+                E[ns+j,ns+j] <- wd$cov['Pb204U238','Pb204U238']
+                E[j,ns+j] <- wd$cov['Pb206U238','Pb204U238']
+                E[ns+j,j] <- E[j,ns+j]
             } else {
                 Y[j] <- wd$x['Pb207U235']
                 Z[j] <- wd$x['Pb204U238']*U
-                E11[j,j] <- wd$cov['Pb207U235','Pb207U235']
-                E22[j,j] <- wd$cov['Pb204U238','Pb204U238']*U^2
-                E12[j,j] <- wd$cov['Pb207U235','Pb204U238']*U
+                E[j,j] <- wd$cov['Pb207U235','Pb207U235']
+                E[ns+j,ns+j] <- wd$cov['Pb204U238','Pb204U238']*U^2
+                E[j,ns+j] <- wd$cov['Pb207U235','Pb204U238']*U
+                E[ns+j,j] <- E[j,ns+j]
             }      
         }
-        O <- blockinverse(E11,E12,E12,E22,doall=TRUE)
+        
+        fit <- optim(init,LL_UPb,method='L-BFGS-B',
+                     lower=init-2,upper=init+2,
+                     w=w,d=x$d,Y=Y,Z=Z,E=E,option=option,hessian=TRUE)
 
-        init <- ludwig2d_model2(x=x,type=type,anchor=anchor)
-        fit <- optim(init$logpar[i],LL_UPb,method='L-BFGS-B',
-                     lower=init$logpar[i]-2,upper=init$logpar[i]+2,
-                     d=x$d,Y=Y,Z=Z,O=O,option=option,hessian=TRUE)
+        if (FALSE){ # TEMP
+            lw <- seq(from=-4,to=-2,length.out=20)
+            LL <- lw*0
+            for (i in 1:20){
+                LL[i] <- LL_UPb(init,w=exp(lw[i]),d=x$d,Y=Y,Z=Z,E=E,option=option)
+            }
+            plot(lw,LL,type='l')
+        }
 
-        out <- init
         out$logpar[i] <- fit$par
         out$logcov[i,i] <- solve(fit$hessian)
         out$par[i] <- exp(out$logpar[i])
         out$cov[i,i] <- diag(out$par[i])%*%out$logcov[i,i]%*%diag(out$par[i])
-        SS <- LL_UPb(fit$par,d=x$d,Y=Y,Z=Z,O=O,option=option,LL=FALSE)
+        SS <- LL_UPb(fit$par[1:2],d=x$d,Y=Y,Z=Z,E=E,option=option,LL=FALSE)
 
     } else {
         option <- (6:9)[type]
