@@ -27,119 +27,43 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
 }
 
 ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
-    
+
     out <- list(par=rep(NA,4),cov=matrix(NA,4,4),
                 logpar=rep(NA,4),logcov=matrix(NA,4,4))    
     if (type%in%c(1,3)) i <- c(1,2)
     else if (type%in%c(2,4)) i <- c(1,3)
     else stop('Invalid isochron type.')
-    model2fit <- ludwig2d_model2(x=x,type=type,anchor=anchor)
-    init <- model2fit$logpar[i]
     if (is.null(w)){ # model 3 regression
-        init <- c(init,0)
-        i <- c(i,4)
+        model1fit <- ludwig2d_helper(x=x,type=type,anchor=anchor)
+        LL0 <- LL_lud2d_UPb(lta0w=model1fit$logpar[i],x=x,type=type)
+        LLw <- LL_lud2d_UPb(lta0w=model1fit$logpar[i],x=x,w=0.01,type=type)
+        if (LLw>LL0){ # zero dispersion
+            out <- model1fit
+            out$par[4] <- 0
+            out$logpar[4] <- -Inf
+            return(out)
+        } else {
+            init <- model1fit$logpar[i]
+            winit <- initwlud2d(x=x,lta0=init)
+            init <- c(init,winit)
+            i <- c(i,4)
+        }
+    } else {
+        model2fit <- ludwig2d_model2(x=x,type=type,anchor=anchor)
+        init <- model2fit$logpar[i]
     }
-    ns <- length(x)
     
     if (x$format%in%(4:6)){
-        
-        LL_UPb <- function(lta0w,d,Y,Z,E,tt=NULL,
-                           a0=NULL,w=0,option=1,LL=TRUE){
-            np <- length(lta0w)
-            if (np>2){
-                tt <- exp(lta0w[1])
-                a0 <- exp(lta0w[2])
-                w <- exp(lta0w[3])
-            } else if (np==2){
-                if (!is.null(tt)){
-                    a0 <- exp(lta0w[1])
-                    w <- exp(lta0w[2])
-                } else if (!is.null(a0)){
-                    tt <- exp(lta0w[1])
-                    w <- exp(lta0w[2])
-                } else {
-                    tt <- exp(lta0w[1])
-                    a0 <- exp(lta0w[2])
-                }
-            } else if (np==1){
-                if (!is.null(tt) & !is.null(a0)){
-                    w <- exp(lta0w)
-                } else if (!is.null(tt) & !is.null(w)){
-                    a0 <- exp(lta0w)
-                } else {
-                    tt <- exp(lta0w)
-                }
-            } else {
-                if (is.null(tt) | is.null(a0)){
-                    stop("Missing tt and a0 values.")
-                } else if (is.null(w)){
-                    w <- 0
-                }
-            }
-            D <- mclean(tt=tt,d=d)
-            dY <- Y - ifelse(type==1,D$Pb206U238,D$Pb207U235)
-            ns <- length(Y)
-            i1 <- 1:ns
-            i2 <- ns+(1:ns)
-            J <- matrix(0,2*ns,ns)
-            diag(J[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
-            Ew <- J%*%t(J)*w^2 + E
-            O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
-                              Ew[i1,i2],Ew[i2,i2],doall=TRUE)
-            AA <- dY%*%O[i1,i1]%*%dY + dY%*%O[i1,i2]%*%Z +
-                Z%*%O[i2,i1]%*%dY + Z%*%O[i2,i2]%*%Z
-            BB <- a0*dY%*%O[i1,i1] + dY%*%O[i1,i2] +
-                a0*Z%*%O[i2,i1] + Z%*%O[i2,i2]
-            CC <- a0*O[i1,i1]%*%dY + a0*O[i1,i2]%*%Z +
-                O[i2,i1]%*%dY + O[i2,i2]%*%Z
-            DD <- O[i1,i1]*a0^2 + O[i1,i2]*a0 +
-                O[i2,i1]*a0 + O[i2,i2]
-            z <- solve(DD+t(DD),t(BB)+CC)
-            SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
-            if (LL){
-                detEw <- determinant(Ew,logarithm=TRUE)$modulus
-                out <- (2*ns*log(2*pi) + detEw + SS)/2
-            } else {
-                out <- SS
-            }
-            as.numeric(out)
-        } # end of LL_UPb
-
-        Y <- rep(NA,ns)
-        Z <- rep(NA,ns)
-        U <- iratio('U238U235')[1]
-        E <- matrix(0,2*ns,2*ns)
-        for (j in 1:ns){
-            wd <- wetherill(x,i=j)
-            if (type==1){
-                Y[j] <- wd$x['Pb206U238']
-                Z[j] <- wd$x['Pb204U238']
-                E[j,j] <- wd$cov['Pb206U238','Pb206U238']
-                E[ns+j,ns+j] <- wd$cov['Pb204U238','Pb204U238']
-                E[j,ns+j] <- wd$cov['Pb206U238','Pb204U238']
-                E[ns+j,j] <- E[j,ns+j]
-            } else {
-                Y[j] <- wd$x['Pb207U235']
-                Z[j] <- wd$x['Pb204U238']*U
-                E[j,j] <- wd$cov['Pb207U235','Pb207U235']
-                E[ns+j,ns+j] <- wd$cov['Pb204U238','Pb204U238']*U^2
-                E[j,ns+j] <- wd$cov['Pb207U235','Pb204U238']*U
-                E[ns+j,j] <- E[j,ns+j]
-            }      
-        }
-        
-        fit <- optim(init,LL_UPb,method='L-BFGS-B',
+        fit <- optim(init,LL_lud2d_UPb,method='L-BFGS-B',
                      lower=init-2,upper=init+2,
-                     w=w,d=x$d,Y=Y,Z=Z,E=E,option=option,hessian=TRUE)
+                     w=w,x=x,type=type,hessian=TRUE)
 
         out$logpar[i] <- fit$par
         out$logcov[i,i] <- solve(fit$hessian)
         out$par[i] <- exp(out$logpar[i])
         out$cov[i,i] <- diag(out$par[i])%*%out$logcov[i,i]%*%diag(out$par[i])
-        SS <- LL_UPb(fit$par[1:2],d=x$d,Y=Y,Z=Z,E=E,option=option,LL=FALSE)
-
+        SS <- LL_lud2d_UPb(fit$par[1:2],x=x,type=type,LL=FALSE)
     } else {
-        option <- (6:9)[type]
         LL_UThPb <- function(lta0w,x,type=1,anchor=0){
             
         }
@@ -150,6 +74,102 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out
 }
+initwlud2d <- function(x=x,lta0=init,type=1){
+    LL <- function(w,lta0,x,type=1){
+        LL_lud2d_UPb(lta0,x=x,w=w,type=type)
+    }
+    stats::optim(0,LL,method='L-BFGS-B',lower=0,upper=exp(lta0[1]),
+                 x=x,lta0=lta0,type=type)$par
+}
+LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,type=1,LL=TRUE,ddw=FALSE){
+    ns <- length(x)
+    Y <- rep(NA,ns)
+    Z <- rep(NA,ns)
+    E <- matrix(0,2*ns,2*ns)
+    for (i in 1:ns){
+        wd <- wetherill(x,i=i)
+        if (type==1){
+            Y[i] <- wd$x['Pb206U238']
+            Z[i] <- wd$x['Pb204U238']
+            E[i,i] <- wd$cov['Pb206U238','Pb206U238']
+            E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']
+            E[i,ns+i] <- wd$cov['Pb206U238','Pb204U238']
+            E[ns+i,i] <- E[i,ns+i]
+        } else {
+            U <- iratio('U238U235')[1]
+            Y[i] <- wd$x['Pb207U235']
+            Z[i] <- wd$x['Pb204U238']*U
+            E[i,i] <- wd$cov['Pb207U235','Pb207U235']
+            E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']*U^2
+            E[i,ns+i] <- wd$cov['Pb207U235','Pb204U238']*U
+            E[ns+i,i] <- E[i,ns+i]
+        }      
+    }        
+    np <- length(lta0w)
+    if (np>2){
+        tt <- exp(lta0w[1])
+        a0 <- exp(lta0w[2])
+        w <- exp(lta0w[3])
+    } else if (np==2){
+        if (!is.null(tt)){
+            a0 <- exp(lta0w[1])
+            w <- exp(lta0w[2])
+        } else if (!is.null(a0)){
+            tt <- exp(lta0w[1])
+            w <- exp(lta0w[2])
+        } else {
+            tt <- exp(lta0w[1])
+            a0 <- exp(lta0w[2])
+        }
+    } else if (np==1){
+        if (!is.null(tt) & !is.null(a0)){
+            w <- exp(lta0w)
+        } else if (!is.null(tt) & !is.null(w)){
+            a0 <- exp(lta0w)
+        } else {
+            tt <- exp(lta0w)
+        }
+    } else {
+        if (is.null(tt) | is.null(a0)){
+            stop("Missing tt and a0 values.")
+        } else if (is.null(w)){
+            w <- 0
+        }
+    }
+    D <- mclean(tt=tt,d=x$d)
+    dY <- Y - ifelse(type==1,D$Pb206U238,D$Pb207U235)
+    ns <- length(Y)
+    i1 <- 1:ns
+    i2 <- ns+(1:ns)
+    J <- matrix(0,2*ns,ns)
+    diag(J[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
+    Ew <- J%*%t(J)*w + E
+    O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
+                      Ew[i1,i2],Ew[i2,i2],doall=TRUE)
+    AA <- dY%*%O[i1,i1]%*%dY + dY%*%O[i1,i2]%*%Z +
+        Z%*%O[i2,i1]%*%dY + Z%*%O[i2,i2]%*%Z
+    BB <- a0*dY%*%O[i1,i1] + dY%*%O[i1,i2] +
+        a0*Z%*%O[i2,i1] + Z%*%O[i2,i2]
+    CC <- a0*O[i1,i1]%*%dY + a0*O[i1,i2]%*%Z +
+        O[i2,i1]%*%dY + O[i2,i2]%*%Z
+    DD <- O[i1,i1]*a0^2 + O[i1,i2]*a0 +
+        O[i2,i1]*a0 + O[i2,i2]
+    z <- as.vector(solve(DD+t(DD),t(BB)+CC))
+    SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
+    if (ddw){ # derivative of LL with respect to w
+        K <- dY-a0*z
+        M <- Z-z
+        derivative <- diag(w,2*ns,2*ns)*
+            (O%*%J%*%t(J) - c(K,M)%*%O%*%J%*%t(J)%*%O%*%c(K,M))
+        out <- sum(diag(derivative))
+    } else if (LL){ # negative log likelihood
+        detEw <- determinant(Ew,logarithm=TRUE)$modulus
+        out <- (2*ns*log(2*pi) + detEw + SS)/2
+    } else { # sum of squares
+        out <- SS
+    }
+    as.numeric(out)
+} # end of LL_UPb
 
 ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
 
