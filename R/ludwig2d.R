@@ -118,9 +118,9 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
     Y <- rep(NA,ns)
     Z <- rep(NA,ns)
     E <- matrix(0,2*ns+7,2*ns+7)
-    J <- matrix(2*ns,2*ns+7)
+    J <- matrix(0,2*ns,2*ns+7)
     J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
-    D <- mclean(tt=exp(lt),d=x$d,exterr=exterr)
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
     nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
     j <- 1
     for (i in 1:ns){
@@ -133,8 +133,10 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
             E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']
             E[i,ns+i] <- wd$cov['Pb206U238','Pb204U238']
             E[ns+i,i] <- E[i,ns+i]
-            J[i,2*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
-            J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
+            J[i,2*ns+1] <- -D$dPb206U238dl38[j]  #dLdl38
+            J[i,2*ns+3] <- -D$dPb206U238dl34[j]  #dLdl34
+            J[i,2*ns+6] <- -D$dPb206U238dl30[j]  #dLdl30
+            J[i,2*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
         } else {
             U <- iratio('U238U235')[1]
             Y[i] <- wd$x['Pb207U235']
@@ -143,10 +145,8 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
             E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']*U^2
             E[i,ns+i] <- wd$cov['Pb207U235','Pb204U238']*U
             E[ns+i,i] <- E[i,ns+i]
-            J[i,2*ns+1] <- -D$dPb206U238dl38[j]  #dLdl38
-            J[i,2*ns+3] <- -D$dPb206U238dl34[j]  #dLdl34
-            J[i,2*ns+6] <- -D$dPb206U238dl30[j]  #dLdl30
-            J[i,2*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
+            J[i,2*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
+            J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
         }
     }
     E[2*ns+1,2*ns+1] <- lambda('U238')[2]^2
@@ -216,21 +216,35 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         }
         DP <- -ab[2]/ab[1]
         Dd <- 1/ab[1]
+        E <- matrix(0,8,8)
+        E[1:2,1:2] <- covmat
+        E[3,3] <- lambda('U238')[2]^2
+        E[4,4] <- lambda('U235')[2]^2
+        E[5,5] <- (lambda('U234')[2]*1000)^2
+        E[6,6] <- (lambda('Pa231')[2]*1000)^2
+        E[7,7] <- (lambda('Th230')[2]*1000)^2
+        E[8,8] <- (lambda('Ra226')[2]*1000)^2
+        J <- matrix(0,2,8)
         if (type==1){
             tt <- get.Pb206U238.age(DP)[1]
-            D <- mclean(tt,d=x$d)
+            D <- mclean(tt,d=x$d,exterr=exterr)
             dtdPbU <- 1/D$dPb206U238dt
+            J[1,3] <- dtdPbU*D$dPb206U238dl38
+            J[1,5] <- dtdPbU*D$dPb206U238dl34
+            J[1,7] <- dtdPbU*D$dPb206U238dl30
+            J[1,8] <- dtdPbU*D$dPb206U238dl26
         } else {
             tt <- get.Pb207U235.age(DP)[1]
-            D <- mclean(tt,d=x$pd)
+            D <- mclean(tt,d=x$d,exterr=exterr)
             dtdPbU <- 1/D$dPb207U235dt
+            J[1,4] <- dtdPbU*D$dPb207U235dl35
+            J[1,6] <- dtdPbU*D$dPb207U235dl31
         }
-        J <- matrix(0,2,2)
         J[1,1] <- dtdPbU*ab[2]/ab[1]^2
         J[1,2] <- -dtdPbU/ab[1]
         J[2,1] <- -1/ab[1]^2
         out$par[i] <- c(tt,Dd)
-        out$cov[i,i] <- J%*%covmat%*%t(J)
+        out$cov[i,i] <- J%*%E%*%t(J)
         out$logpar[i] <- log(out$par[i])
         J <- diag(1/out$par[i])
         out$logcov[i,i] <- J%*%out$cov[i,i]%*%t(J)
