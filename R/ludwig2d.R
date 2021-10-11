@@ -55,14 +55,14 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
     
     if (x$format%in%(4:6)){
         fit <- optim(init,LL_lud2d_UPb,method='L-BFGS-B',
-                     lower=init-2,upper=init+2,
+                     lower=init-2,upper=init+2,exterr=exterr,
                      w=w,x=x,type=type,hessian=TRUE)
 
         out$logpar[i] <- fit$par
         out$logcov[i,i] <- solve(fit$hessian)
         out$par[i] <- exp(out$logpar[i])
         out$cov[i,i] <- diag(out$par[i])%*%out$logcov[i,i]%*%diag(out$par[i])
-        SS <- LL_lud2d_UPb(fit$par[1:2],x=x,type=type,LL=FALSE)
+        SS <- LL_lud2d_UPb(fit$par[1:2],x=x,type=type,exterr=exterr,LL=FALSE)
     } else {
         LL_UThPb <- function(lta0w,x,type=1,anchor=0){
             
@@ -81,30 +81,9 @@ initwlud2d <- function(x=x,lta0=init,type=1){
     stats::optim(0,LL,method='L-BFGS-B',lower=0,upper=exp(lta0[1]),
                  x=x,lta0=lta0,type=type)$par
 }
-LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,type=1,LL=TRUE){
+LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
+                         type=1,LL=TRUE,exterr=FALSE){
     ns <- length(x)
-    Y <- rep(NA,ns)
-    Z <- rep(NA,ns)
-    E <- matrix(0,2*ns,2*ns)
-    for (i in 1:ns){
-        wd <- wetherill(x,i=i)
-        if (type==1){
-            Y[i] <- wd$x['Pb206U238']
-            Z[i] <- wd$x['Pb204U238']
-            E[i,i] <- wd$cov['Pb206U238','Pb206U238']
-            E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']
-            E[i,ns+i] <- wd$cov['Pb206U238','Pb204U238']
-            E[ns+i,i] <- E[i,ns+i]
-        } else {
-            U <- iratio('U238U235')[1]
-            Y[i] <- wd$x['Pb207U235']
-            Z[i] <- wd$x['Pb204U238']*U
-            E[i,i] <- wd$cov['Pb207U235','Pb207U235']
-            E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']*U^2
-            E[i,ns+i] <- wd$cov['Pb207U235','Pb204U238']*U
-            E[ns+i,i] <- E[i,ns+i]
-        }      
-    }        
     np <- length(lta0w)
     if (np>2){
         tt <- exp(lta0w[1])
@@ -136,14 +115,55 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,type=1,LL=TRUE){
             w <- 0
         }
     }
-    D <- mclean(tt=tt,d=x$d)
+    Y <- rep(NA,ns)
+    Z <- rep(NA,ns)
+    E <- matrix(0,2*ns+7,2*ns+7)
+    J <- matrix(2*ns,2*ns+7)
+    J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
+    D <- mclean(tt=exp(lt),d=x$d,exterr=exterr)
+    nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
+    j <- 1
+    for (i in 1:ns){
+        wd <- wetherill(x,i=i)
+        if (nc>1) j <- i
+        if (type==1){
+            Y[i] <- wd$x['Pb206U238']
+            Z[i] <- wd$x['Pb204U238']
+            E[i,i] <- wd$cov['Pb206U238','Pb206U238']
+            E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']
+            E[i,ns+i] <- wd$cov['Pb206U238','Pb204U238']
+            E[ns+i,i] <- E[i,ns+i]
+            J[i,2*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
+            J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
+        } else {
+            U <- iratio('U238U235')[1]
+            Y[i] <- wd$x['Pb207U235']
+            Z[i] <- wd$x['Pb204U238']*U
+            E[i,i] <- wd$cov['Pb207U235','Pb207U235']
+            E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']*U^2
+            E[i,ns+i] <- wd$cov['Pb207U235','Pb204U238']*U
+            E[ns+i,i] <- E[i,ns+i]
+            J[i,2*ns+1] <- -D$dPb206U238dl38[j]  #dLdl38
+            J[i,2*ns+3] <- -D$dPb206U238dl34[j]  #dLdl34
+            J[i,2*ns+6] <- -D$dPb206U238dl30[j]  #dLdl30
+            J[i,2*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
+        }
+    }
+    E[2*ns+1,2*ns+1] <- lambda('U238')[2]^2
+    E[2*ns+2,2*ns+2] <- lambda('U235')[2]^2
+    E[2*ns+3,2*ns+3] <- (lambda('U234')[2]*1000)^2
+    E[2*ns+4,2*ns+4] <- lambda('Th232')[2]^2
+    E[2*ns+5,2*ns+5] <- (lambda('Pa231')[2]*1000)^2
+    E[2*ns+6,2*ns+6] <- (lambda('Th230')[2]*1000)^2
+    E[2*ns+7,2*ns+7] <- (lambda('Ra226')[2]*1000)^2
+    ED <- J%*%E%*%t(J)
     dY <- Y - ifelse(type==1,D$Pb206U238,D$Pb207U235)
     ns <- length(Y)
     i1 <- 1:ns
     i2 <- ns+(1:ns)
     J <- matrix(0,2*ns,ns)
     diag(J[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
-    Ew <- J%*%t(J)*w + E
+    Ew <- J%*%t(J)*w + ED
     O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
                       Ew[i1,i2],Ew[i2,i2],doall=TRUE)
     AA <- dY%*%O[i1,i1]%*%dY + dY%*%O[i1,i2]%*%Z +

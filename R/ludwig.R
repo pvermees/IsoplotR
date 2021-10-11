@@ -424,7 +424,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
-    nc <- length(D$ThUi)
+    nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
     j <- 1
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
