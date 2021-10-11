@@ -82,7 +82,7 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
             i1 <- 1:ns
             i2 <- ns+(1:ns)
             J <- matrix(0,2*ns,ns)
-            J[i1,i1] <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
+            diag(J[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
             Ew <- J%*%t(J)*w^2 + E
             O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
                               Ew[i1,i2],Ew[i2,i2],doall=TRUE)
@@ -102,7 +102,7 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
             } else {
                 out <- SS
             }
-            out
+            as.numeric(out)
         } # end of LL_UPb
 
         Y <- rep(NA,ns)
@@ -131,15 +131,6 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
         fit <- optim(init,LL_UPb,method='L-BFGS-B',
                      lower=init-2,upper=init+2,
                      w=w,d=x$d,Y=Y,Z=Z,E=E,option=option,hessian=TRUE)
-
-        if (FALSE){ # TEMP
-            lw <- seq(from=-4,to=-2,length.out=20)
-            LL <- lw*0
-            for (i in 1:20){
-                LL[i] <- LL_UPb(init,w=exp(lw[i]),d=x$d,Y=Y,Z=Z,E=E,option=option)
-            }
-            plot(lw,LL,type='l')
-        }
 
         out$logpar[i] <- fit$par
         out$logcov[i,i] <- solve(fit$hessian)
