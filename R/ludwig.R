@@ -163,14 +163,23 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         out$hessian <- stats::optimHess(par=out$par,fn=LL.lud.model2,x=x)
     } else {
         if (model==3){
-            init <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)$par
-            if (is.na(w)){
-                ww <- stats::optimise(LL.lud.w,interval=init[1]+c(-5,5),
-                                      lta0b0=init,x=x,maximum=TRUE)$maximum
-            } else {
-                ww <- w
+            model1fit <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)
+            init <- model1fit$par
+            if (is.na(w)){ # estimate the dispersion
+                LL0 <- LL.lud.w(-5,lta0b0=init,x=x)
+                LLw <- LL.lud.w(-4,lta0b0=init,x=x)
+                if (LLw<LL0){ # zero dispersion
+                    w <- -Inf
+                    out <- model1fit
+                    fixed[4] <- TRUE
+                } else {
+                    w <- stats::optimise(LL.lud.w,interval=init[1]+c(-10,0),
+                                         lta0b0=init,x=x,maximum=TRUE)$maximum
+                }
+            } else { # fixed dispersion
+                fixed[4] <- TRUE
             }
-            init <- c(init,ww)
+            init <- c(init,w)
         } else if (anchor[1] %in% c(1,2)){
             init <- anchored.lta0b0.init(x=x,anchor=anchor)
         } else {

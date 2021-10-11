@@ -158,7 +158,12 @@ profile_isochron_helper <- function(w,xyz,LLmax,cutoff,type='york'){
 ci_log2lin_lud <- function(fit,fact=1){
     lx <- fit$logpar['log(w)']
     slx <- sqrt(fit$logcov['log(w)','log(w)'])
-    ll <- exp(lx - fact*slx)
-    ul <- exp(lx + fact*slx)
+    if (is.finite(lx)){
+        ll <- exp(lx - fact*slx)
+        ul <- exp(lx + fact*slx)
+    } else {
+        ll <- 0
+        ul <- NA
+    }
     c(exp(lx),ll,ul)
 }

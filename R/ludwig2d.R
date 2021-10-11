@@ -81,7 +81,7 @@ initwlud2d <- function(x=x,lta0=init,type=1){
     stats::optim(0,LL,method='L-BFGS-B',lower=0,upper=exp(lta0[1]),
                  x=x,lta0=lta0,type=type)$par
 }
-LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,type=1,LL=TRUE,ddw=FALSE){
+LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,type=1,LL=TRUE){
     ns <- length(x)
     Y <- rep(NA,ns)
     Z <- rep(NA,ns)
@@ -156,13 +156,7 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,type=1,LL=TRUE,ddw=FALSE){
         O[i2,i1]*a0 + O[i2,i2]
     z <- as.vector(solve(DD+t(DD),t(BB)+CC))
     SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
-    if (ddw){ # derivative of LL with respect to w
-        K <- dY-a0*z
-        M <- Z-z
-        derivative <- diag(w,2*ns,2*ns)*
-            (O%*%J%*%t(J) - c(K,M)%*%O%*%J%*%t(J)%*%O%*%c(K,M))
-        out <- sum(diag(derivative))
-    } else if (LL){ # negative log likelihood
+    if (LL){ # negative log likelihood
         detEw <- determinant(Ew,logarithm=TRUE)$modulus
         out <- (2*ns*log(2*pi) + detEw + SS)/2
     } else { # sum of squares
