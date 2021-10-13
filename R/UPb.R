@@ -828,22 +828,22 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
         }
     } else {
         l5 <- lambda('U235')[1]
-        sl5 <- lambda('U235')[2]
-        if (x>-1) t.init <- log(1+x)/l5 else t.init <- 0
-        J <- matrix(0,1,2)
+        t.init <- ifelse(x>-1,log(1+x)/l5,0)
+        E <- matrix(0,3,3)
+        J <- matrix(0,1,3)
+        E[1,1] <- sx^2
+        E[2:3,2:3] <- getEl('U235')
         if (d$equilibrium | d$PaU$option<1){
             t.75 <- t.init
             J[1,1] <- 1/(l5*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         } else { # apply a disequilibrium correction
             t.75 <- stats::optim(t.init,diseq.75.misfit,method='BFGS',x=x,d=d)$par
-            D <- mclean(tt=t.75,d=d,exterr=exterr)    # implicit differentiation of 
-            J[1,1] <- -1/D$dPb207U235dt               # mf=(x-Pb7U5)^2 => dt/dx
-            J[1,2] <- D$dPb207U235dl35/D$dPb207U235dt # and dt/dl35
+            D <- mclean(tt=t.75,d=d,exterr=exterr)    
+            J[1,1] <- 1/D$dPb207U235dt                 # dt/dx
+            J[1,2] <- -D$dPb207U235dl35/D$dPb207U235dt # dt/dl35
+            J[1,3] <- -D$dPb207U235dl31/D$dPb207U235dt # dt/dl31
         }
-        E <- matrix(0,2,2)
-        E[1,1] <- sx^2
-        E[2,2] <- sl5^2
         st.75 <- sqrt(J %*% E %*% t(J))
         out <- c(t.75,st.75)
         names(out) <- c('t75','s[t75]')
@@ -1114,4 +1114,28 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,
     }
     names(out) <- labels
     out
+}
+
+getEl <- function(parent){
+    out <- matrix(0,7,7)
+    out[1,1] <- lambda('U238')[2]^2
+    out[2,2] <- lambda('U235')[2]^2
+    out[3,3] <- (lambda('U234')[2]*1000)^2
+    out[4,4] <- lambda('Th232')[2]^2
+    out[5,5] <- (lambda('Pa231')[2]*1000)^2
+    out[6,6] <- (lambda('Th230')[2]*1000)^2
+    out[7,7] <- (lambda('Ra226')[2]*1000)^2
+    rcnames <- c('U238','U235','U234','Th232','Pa231','Th230','Ra226')
+    rownames(out) <- rcnames
+    colnames(out) <- rcnames
+    if (identical(parent,'U238')){
+        rcnames <- c('U238','U234','Th230','Ra226')
+    } else if (identical(parent,'U235')){
+        rcnames <- c('U235','Pa231')
+    } else if (identical(parent,'Th232')){
+        rcnames <- c('Th232')
+    } else {
+        # do nothing
+    }
+    out[rcnames,rcnames]
 }

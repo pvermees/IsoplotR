@@ -57,7 +57,6 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
         fit <- optim(init,LL_lud2d_UPb,method='L-BFGS-B',
                      lower=init-2,upper=init+2,exterr=exterr,
                      w=w,x=x,type=type,hessian=TRUE)
-
         out$logpar[i] <- fit$par
         out$logcov[i,i] <- solve(fit$hessian)
         out$par[i] <- exp(out$logpar[i])
@@ -158,12 +157,11 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
     E[2*ns+7,2*ns+7] <- (lambda('Ra226')[2]*1000)^2
     ED <- J%*%E%*%t(J)
     dY <- Y - ifelse(type==1,D$Pb206U238,D$Pb207U235)
-    ns <- length(Y)
     i1 <- 1:ns
     i2 <- ns+(1:ns)
-    J <- matrix(0,2*ns,ns)
-    diag(J[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
-    Ew <- J%*%t(J)*w + ED
+    Jw <- matrix(0,2*ns,ns)
+    diag(Jw[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
+    Ew <- Jw%*%t(Jw)*w^2 + ED
     O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
                       Ew[i1,i2],Ew[i2,i2],doall=TRUE)
     AA <- dY%*%O[i1,i1]%*%dY + dY%*%O[i1,i2]%*%Z +
@@ -195,6 +193,7 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
     else stop('Invalid isochron type.')
     
     if (x$format%in%(4:6)){
+        
         XY <- data2york(x,option=(3:4)[type])
         if (anchor[1]<1){
             fit <- stats::lm( XY[,'Y'] ~ XY[,'X'] )
@@ -250,6 +249,7 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         out$logcov[i,i] <- J%*%out$cov[i,i]%*%t(J)
         
     } else if (x$format%in%(7:8)){
+        
         LL <- function(lta0,x,tt=NULL,a0=NULL,option=1){
             nn <- length(x)
             if (length(lta0)>1){
