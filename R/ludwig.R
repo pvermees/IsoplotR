@@ -160,7 +160,8 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     if (measured.disequilibrium(x$d) & anchor[1]<1){
         out <- fit.lta0b0w2step(x,exterr=exterr,model=model,
                                 anchor=anchor,w=w,...)
-        out$hessian <- stats::optimHess(par=out$par,fn=LL.lud.model2,x=x)
+        out$hessian <- stats::optimHess(par=out$par,fn=LL.lud.model2,
+                                        x=x,exterr=exterr)
     } else {
         if (model==3){
             model1fit <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)
@@ -188,8 +189,9 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
         lower <- (init-1)[!fixed]
         upper <- (init+1)[!fixed]
         if (model==2){
-            out <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=x,
-                           fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
+            out <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",
+                           x=x,fixed=fixed,lower=lower,upper=upper,
+                           exterr=exterr,hessian=TRUE,...)
         } else {
             out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                            method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
@@ -321,7 +323,7 @@ anchored.lta0b0.init <- function(x,anchor=1){
     init
 }
 
-LL.lud.model2 <- function(lta0b0,x){
+LL.lud.model2 <- function(lta0b0,x,exterr=FALSE){
     tt <- exp(lta0b0[1])
     a0 <- exp(lta0b0[2])
     nn <- length(x)
@@ -331,10 +333,33 @@ LL.lud.model2 <- function(lta0b0,x){
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
         yp <- a0+(yr-a0)*xy[,'X']/xr
         dy <- yp-xy[,'Y']
-        LL <- SS2LL(SS=sum(dy^2),nn=nn)
+        SS <- sum(dy^2)
+        if (exterr){
+            D <- mclean(tt,d=x$d,exterr=exterr)
+            dypdxr <- (a0-yr)*xy[,'X',drop=FALSE]/xr^2
+            dypdyr <- xy[,'X',drop=FALSE]/xr
+            dxrdPbU <- -xr^2
+            dyrdPbPb <- 1
+            dPbUdl <- rep(0,7)
+            dPbPbdl <- rep(0,7)
+            dPbUdl[1] <- D$dPb206U238dl38
+            dPbUdl[3] <- D$dPb206U238dl34
+            dPbUdl[6] <- D$dPb206U238dl30
+            dPbUdl[7] <- D$dPb206U238dl26
+            dPbPbdl[1] <- D$dPb207Pb206dl38
+            dPbPbdl[2] <- D$dPb207Pb206dl35
+            dPbPbdl[3] <- D$dPb207Pb206dl34
+            dPbPbdl[5] <- D$dPb207Pb206dl31
+            dPbPbdl[6] <- D$dPb207Pb206dl30
+            dPbPbdl[7] <- D$dPb207Pb206dl26
+            J <- (dypdxr*dxrdPbU)%*%dPbUdl + (dypdyr*dyrdPbPb)%*%dPbPbdl
+            covmat <- diag(SS/(nn-2),nn,nn) + J%*%getEl()%*%t(J)
+            LL <- LL.norm(dy,covmat)
+        } else {
+            LL <- SS2LL(SS=SS,nn=nn)
+        }
     } else {
         b0 <- exp(lta0b0[3])
-        ns <- length(x)
         if (x$format<7) xy <- get.UPb.isochron.ratios.204(x)
         else xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
         x6 <- xy[,1] # U238Pb206
@@ -346,7 +371,11 @@ LL.lud.model2 <- function(lta0b0,x){
         y6p <- (r86-x6)/(a0*r86)
         y7p <- (r57-x7)/(b0*r57)
         D <- cbind(y6-y6p,y7-y7p)
-        LL <- sum(apply(D,1,LL.norm,covmat=stats::cov(D)))
+        if (exterr){
+            
+        } else {
+            LL <- sum(apply(D,1,LL.norm,covmat=stats::cov(D)))
+        }
     }
     LL
 }
@@ -733,8 +762,8 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     # 3. model-2 fit
     init <- fit1$par
     fixed <- fixit(X,anchor=anchor,model=model,w=w)
-    fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",
-                    x=X,fixed=fixed,lower=init-1,upper=init+1,...)
+    fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=X,
+                    fixed=fixed,lower=init-1,upper=init+1,exterr=exterr,...)
     if (model==2){
         out <- fit2
     } else {
