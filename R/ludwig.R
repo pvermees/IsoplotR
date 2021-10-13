@@ -362,19 +362,40 @@ LL.lud.model2 <- function(lta0b0,x,exterr=FALSE){
         b0 <- exp(lta0b0[3])
         if (x$format<7) xy <- get.UPb.isochron.ratios.204(x)
         else xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
-        x6 <- xy[,1] # U238Pb206
-        y6 <- xy[,2] # Pb204Pb206 or Pb208cPb206
-        x7 <- xy[,3] # U235Pb207
-        y7 <- xy[,4] # Pb204Pb207 or Pb208cPb207
+        x6 <- xy[,1,drop=FALSE] # U238Pb206
+        y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
+        x7 <- xy[,3,drop=FALSE] # U235Pb207
+        y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
         y6p <- (r86-x6)/(a0*r86)
         y7p <- (r57-x7)/(b0*r57)
-        D <- cbind(y6-y6p,y7-y7p)
+        dy <- cbind(y6-y6p,y7-y7p)
+        E <- stats::cov(dy)
         if (exterr){
-            
+            D <- mclean(tt=tt,d=x$d,exterr=exterr)
+            dy6pd68 <- -x6/a0
+            dy7pd75 <- -x7/b0
+            d68dl <- matrix(0,1,7)
+            d68dl[1] <- D$dPb206U238dl38
+            d68dl[3] <- D$dPb206U238dl34
+            d68dl[6] <- D$dPb206U238dl30
+            d68dl[7] <- D$dPb206U238dl26
+            d75dl <- matrix(0,1,7)
+            d75dl[2] <- D$dPb207U235dl35
+            d75dl[5] <- D$dPb207U235dl31
+            J <- matrix(0,2*nn,7)
+            J[1:nn,] <- dy6pd68%*%d68dl
+            J[nn+(1:nn),] <- dy7pd75%*%d75dl
+            EE <- matrix(0,2*nn,2*nn)
+            diag(EE)[1:nn] <- E[1,1]
+            diag(EE)[nn+(1:nn)] <- E[2,2]
+            diag(EE[1:nn,nn+(1:nn)]) <- E[1,2]
+            diag(EE[nn+(1:nn),1:nn]) <- E[2,1]
+            covmat <- EE + J %*% getEl() %*% t(J)
+            LL <- LL.norm(c(y6-y6p,y7-y7p),covmat)
         } else {
-            LL <- sum(apply(D,1,LL.norm,covmat=stats::cov(D)))
+            LL <- sum(apply(dy,1,LL.norm,covmat=E))
         }
     }
     LL
