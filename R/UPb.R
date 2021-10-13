@@ -852,7 +852,8 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
 }
 get.Pb207U235.age.UPb <- function(x,i=1,exterr=FALSE,...){
     r75 <- get.Pb207U235.ratios(x)
-    get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],exterr=exterr,d=x$d[i])
+    get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],
+                      exterr=exterr,d=x$d[i])
 }
 get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb207U235'
@@ -873,9 +874,11 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             out[i,] <- get.Pb206U238.age(x[i],sxi,exterr=exterr,d=d[i])
         }
     } else {
+        E <- matrix(0,5,5)
+        E[1,1] <- sx^2
+        E[2:5,2:5] <- getEl('U238')
+        J <- matrix(0,1,5)
         l8 <- lambda('U238')[1]
-        sl8 <- lambda('U238')[2]
-        J <- matrix(0,1,2)
         if (x>-1) t.init <- log(1+x)/l8 else t.init <- 0
         if (d$equilibrium){
             t.68 <- t.init
@@ -889,13 +892,13 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             }, error = function(error_condition) {
                 t.init
             })
-            D <- mclean(tt=t.68,d=d,exterr=exterr)    # implicit differentiation
-            J[1,1] <- -1/D$dPb206U238dt               # of mf=(x-Pb6U8)^2 
-            J[1,2] <- D$dPb206U238dl38/D$dPb206U238dt # => dt/dx and dt/dl38
+            D <- mclean(tt=t.68,d=d,exterr=exterr)
+            J[1,1] <- 1/D$dPb206U238dt
+            J[1,2] <- -D$dPb206U238dl38/D$dPb206U238dt # dt/dl38
+            J[1,3] <- -D$dPb206U238dl34/D$dPb206U238dt # dt/dl34
+            J[1,4] <- -D$dPb206U238dl30/D$dPb206U238dt # dt/dl30
+            J[1,5] <- -D$dPb206U238dl26/D$dPb206U238dt # dt/dl26
         }
-        E <- matrix(0,2,2)
-        E[1,1] <- sx^2
-        E[2,2] <- sl8^2
         st.68 <- sqrt(J %*% E %*% t(J))
         out <- c(t.68,st.68)
         names(out) <- c('t68','s[t68]')
@@ -958,16 +961,19 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...
         }
         t.76 <- stats::optimise(get.76.misfit,x=x,d=d,interval=interval)$minimum
         D <- mclean(tt=t.76,d=d,exterr=exterr)
-        J <- matrix(0,1,4)
-        J[1,1] <- -1/D$dPb207Pb206dt                # dt/dx
-        J[1,2] <- D$dPb207Pb206dl35/D$dPb207Pb206dt # dt/dl35
-        J[1,3] <- D$dPb207Pb206dl38/D$dPb207Pb206dt # dt/dl38
-        J[1,4] <- D$dPb207Pb206dU/D$dPb207Pb206dt   # dt/dU
-        E <- matrix(0,4,4)
+        E <- matrix(0,9,9)
         E[1,1] <- sx^2
-        E[2,2] <- lambda('U235')[2]^2
-        E[3,3] <- lambda('U238')[2]^2
-        E[4,4] <- iratio('U238U235')[2]^2
+        E[2,2] <- iratio('U238U235')[2]^2
+        E[3:9,3:9] <- getEl()
+        J <- matrix(0,1,9)
+        J[1,1] <- -1/D$dPb207Pb206dt                # dt/dx
+        J[1,2] <- D$dPb207Pb206dU/D$dPb207Pb206dt   # dt/dU
+        J[1,3] <- D$dPb207Pb206dl38/D$dPb207Pb206dt # dt/dl38
+        J[1,4] <- D$dPb207Pb206dl35/D$dPb207Pb206dt # dt/dl35
+        J[1,5] <- D$dPb207Pb206dl34/D$dPb207Pb206dt # dt/dl34
+        J[1,7] <- D$dPb207Pb206dl31/D$dPb207Pb206dt # dt/dl31
+        J[1,8] <- D$dPb207Pb206dl30/D$dPb207Pb206dt # dt/dl30
+        J[1,9] <- D$dPb207Pb206dl26/D$dPb207Pb206dt # dt/dl26
         st.76 <- sqrt( J %*% E %*% t(J) )
         out <- c(t.76,st.76)
         names(out) <- c('t76','s[t76]')
@@ -1128,7 +1134,9 @@ getEl <- function(parent){
     rcnames <- c('U238','U235','U234','Th232','Pa231','Th230','Ra226')
     rownames(out) <- rcnames
     colnames(out) <- rcnames
-    if (identical(parent,'U238')){
+    if (missing(parent)){
+        # do nothing
+    } else if (identical(parent,'U238')){
         rcnames <- c('U238','U234','Th230','Ra226')
     } else if (identical(parent,'U235')){
         rcnames <- c('U235','Pa231')
