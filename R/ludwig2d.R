@@ -54,9 +54,9 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
     }
     
     if (x$format%in%(4:6)){
-        fit <- optim(init,LL_lud2d_UPb,method='L-BFGS-B',
-                     lower=init-2,upper=init+2,exterr=exterr,
-                     w=w,x=x,type=type,hessian=TRUE)
+        fit <- stats::optim(init,LL_lud2d_UPb,method='L-BFGS-B',
+                            lower=init-2,upper=init+2,exterr=exterr,
+                            w=w,x=x,type=type,hessian=TRUE)
         out$logpar[i] <- fit$par
         out$logcov[i,i] <- solve(fit$hessian)
         out$par[i] <- exp(out$logpar[i])
@@ -73,7 +73,7 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out
 }
-initwlud2d <- function(x=x,lta0=init,type=1){
+initwlud2d <- function(x=x,lta0,type=1){
     LL <- function(w,lta0,x,type=1){
         LL_lud2d_UPb(lta0,x=x,w=w,type=type)
     }
@@ -148,13 +148,7 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
             J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
         }
     }
-    E[2*ns+1,2*ns+1] <- lambda('U238')[2]^2
-    E[2*ns+2,2*ns+2] <- lambda('U235')[2]^2
-    E[2*ns+3,2*ns+3] <- (lambda('U234')[2]*1000)^2
-    E[2*ns+4,2*ns+4] <- lambda('Th232')[2]^2
-    E[2*ns+5,2*ns+5] <- (lambda('Pa231')[2]*1000)^2
-    E[2*ns+6,2*ns+6] <- (lambda('Th230')[2]*1000)^2
-    E[2*ns+7,2*ns+7] <- (lambda('Ra226')[2]*1000)^2
+    E[2*ns+1:7,2*ns+1:7] <- getEl()
     ED <- J%*%E%*%t(J)
     dY <- Y - ifelse(type==1,D$Pb206U238,D$Pb207U235)
     i1 <- 1:ns
@@ -198,20 +192,20 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         if (anchor[1]<1){
             fit <- stats::lm( XY[,'Y'] ~ XY[,'X'] )
             ab <- fit$coefficients
-            covmat <- vcov(fit)
+            covmat <- stats::vcov(fit)
         } else if (anchor[1]==1) {
             y0 <- 1/iratio('Pb206Pb204')[1]
             fit <- stats::lm( I(XY[,'Y']-y0) ~ 0 + XY[,'X'] )
             ab <- c(y0,fit$coefficients)
             covmat <- matrix(0,2,2)
-            covmat[2,2] <- vcov(fit)
+            covmat[2,2] <- stats::vcov(fit)
         } else {
             x0 <- 1/mclean(anchor[2],d=x$d)$Pb206U238
             fit <- stats::lm( I(XY[,'Y']-0) ~ 0 + I(XY[,'X']-x0) )
             y0 <- -x0*fit$coefficients
             ab <- c(y0,fit$coefficients)
             covmat <- matrix(0,2,2)
-            covmat[2,2] <- vcov(fit)
+            covmat[2,2] <- stats::vcov(fit)
         }
         DP <- -ab[2]/ab[1]
         Dd <- 1/ab[1]
@@ -307,37 +301,35 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
             init <- c(0,0)
             if (option==6){
                 init[1] <- min(get.Pb206U238.age(1/XY[,'X'])[,1])
-                init[2] <- 1/median(XY[,'Y'])
             } else if (option==7){
                 init[1] <- min(get.Pb207U235.age(1/XY[,'X'])[,1])
-                init[2] <- 1/median(XY[,'Y'])
             } else {
                 init[1] <- min(get.Pb208Th232.age(1/XY[,'X'])[,1])
-                init[2] <- median(XY[,'Y'])
             }
+            init[2] <- stats::median(XY[,'Y'])
             log(init)
         }
         
         option <- (6:9)[type]
         init <- model2init(x,option=option)
         if (anchor[1]<1){
-            fit <- optim(init,fn=LL,x=x,option=option,
-                         exterr=exterr,hessian=TRUE)
+            fit <- stats::optim(init,fn=LL,x=x,option=option,
+                                exterr=exterr,hessian=TRUE)
             out$logpar[i] <- fit$par
             out$logcov[i,i] <- solve(fit$hessian)
         } else if (anchor[1]==1){
             a0 <- ifelse(type%in%c(1,3),
                          1/iratio('Pb208Pb206')[1],
                          1/iratio('Pb208Pb207')[1])
-            fit <- optim(init[1],fn=LL,x=x,method='BFGS',a0=a0,
-                         option=option,exterr=exterr,hessian=TRUE)
+            fit <- stats::optim(init[1],fn=LL,x=x,method='BFGS',a0=a0,
+                                option=option,exterr=exterr,hessian=TRUE)
             out$logpar[i] <- c(fit$par,log(a0))
             out$logcov[i,i] <- matrix(0,2,2)
             out$logcov[i[1],i[1]] <- 1/fit$hessian
         } else {
             tt <- anchor[2]
-            fit <- optim(init[2],fn=LL,x=x,method='BFGS',tt=tt,
-                         option=option,exterr=exterr,hessian=TRUE)
+            fit <- stats::optim(init[2],fn=LL,x=x,method='BFGS',tt=tt,
+                                option=option,exterr=exterr,hessian=TRUE)
             out$logpar[i] <- c(log(tt),fit$par)
             out$logcov[i,i] <- matrix(0,2,2)
             out$logcov[i[2],i[2]] <- 1/fit$hessian

@@ -346,7 +346,7 @@ LL.lud.model2 <- function(lta0b0,x){
         y6p <- (r86-x6)/(a0*r86)
         y7p <- (r57-x7)/(b0*r57)
         D <- cbind(y6-y6p,y7-y7p)
-        LL <- sum(apply(D,1,LL.norm,covmat=cov(D)))
+        LL <- sum(apply(D,1,LL.norm,covmat=stats::cov(D)))
     }
     LL
 }
@@ -446,13 +446,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         J[ns+i,NR*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
         if (x$format>6) J[2*ns+i,NR*ns+4] <- -D$dPb208Th232dl32[j] # dMdl32
     }
-    E[NR*ns+1,NR*ns+1] <- lambda('U238')[2]^2
-    E[NR*ns+2,NR*ns+2] <- lambda('U235')[2]^2
-    E[NR*ns+3,NR*ns+3] <- (lambda('U234')[2]*1000)^2
-    E[NR*ns+4,NR*ns+4] <- lambda('Th232')[2]^2
-    E[NR*ns+5,NR*ns+5] <- (lambda('Pa231')[2]*1000)^2
-    E[NR*ns+6,NR*ns+6] <- (lambda('Th230')[2]*1000)^2
-    E[NR*ns+7,NR*ns+7] <- (lambda('Ra226')[2]*1000)^2
+    E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     ED <- J%*%E%*%t(J)
     if (np==(NP+1)){ # fit overdispersion
         Ew <- get.Ew(w=w,format=x$format,ns=ns,D=D)

@@ -36,7 +36,7 @@ concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
     ta <- get.Pb207Pb206.age(a,d=d)[1]
     out <- c(1,a) # tl, 7/6 intercept
     if (wetherill) names(out) <- c('t[l]','t[u]')
-    else names(out) <- c('t[l]','76i')
+    else names(out) <- c('t[l]','a0')
     if (b<0) { # negative slope => two (or zero) intersections with concordia line
         tb <- get.Pb206U238.age(-b/a,d=d)[1]
         tlu <- recursive.search(tm=tb,tM=ta,a=a,b=b,d=d)
@@ -241,7 +241,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         Y[1] <- age_to_Pb207Pb206_ratio(fit2d$par['t'],d=d)[,'76']
         r75 <- age_to_Pb207U235_ratio(fit2d$par['t'],d=d)[,'75']
         r68 <- 1/X[1]
-        Y[2] <- fit2d$par['76i']
+        Y[2] <- fit2d$par['a0']
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
@@ -284,7 +284,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
 tw3d2d <- function(fit){
     out <- list(par=fit$par,cov=fit$cov,alpha=fit$alpha)
     if (fit$format > 3){
-        labels <- c('t','76i')
+        labels <- c('t','a0')
         out$par <- c(fit$par['t'],fit$par[3]/fit$par[2]) # par = c(Pb206i,Pb207i)
         J <- matrix(0,2,3)
         J[1,1] <- 1
@@ -319,7 +319,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list2$d <- upper.age[4]
         }
     } else if (fit$format%in%c(1,2,3)){
-        i76 <- roundit(fit$par['76i'],fit$err[,'76i'],sigdig=sigdig,text=TRUE)
+        i76 <- roundit(fit$par['a0'],fit$err[,'a0'],sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
         list2 <- list(a=i76[1],b=i76[2],c=i76[3],u='')

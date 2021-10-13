@@ -486,6 +486,14 @@ isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
 #'
 #' If \code{anchor[1]=2}: force the isochron line to intersect the
 #' concordia line at an age equal to \code{anchor[2]}.
+#' 
+#' @param joint
+#' logical. Only applies to U-Pb data formats 4 and above. If
+#' \code{TRUE}, carries out three dimensional regression.  If
+#' \code{FALSE}, uses two dimensional isochron regression.  The latter
+#' can be used to compute \eqn{{}^{207}}Pb/\eqn{{}^{235}}U isochrons,
+#' which are immune to the complexities of initial
+#' \eqn{{}^{234}}U/\eqn{{}^{238}}U disequilibrium.
 #'
 #' @rdname isochron
 #' @export

@@ -16,7 +16,7 @@ get.lta0b0wc0.init <- function(x,model=1,anchor=0){
         names(out) <- c('log(t)','log(a0)','log(b0)',
                         'log(w)',paste0('log(c0[',1:ns,'])'))
     } else {
-        lta0b0 <- get.lta0b0.init(x,anchor=anchor)
+        lta0b0 <- get.lta0b0.init(x)
         c0 <- log(data2ludwig(x=x,lta0b0w=lta0b0)$c0)
         out <- c(lta0b0,c0)
         names(out) <- c('log(t)','log(a0)','log(b0)',

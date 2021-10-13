@@ -17,11 +17,11 @@ age2ratio(tt, st = 0, ratio = "Pb206U238", exterr = FALSE, d = diseq(), J, sJ)
 \code{tt}. Not used when \code{ratio} =
 \code{'Stacey-Kramers'}.}
 
-\item{ratio}{one of \code{'Pb207U235'}, \code{'U238Pb206'},
-\code{'Pb207Pb206'}, \code{'Pb208Th232'}, \code{'Wetherill'},
-\code{'Tera-Wasserburg'}, \code{'U-Th-Pb'}, \code{'Ar40Ar39'},
-\code{'Ca40K40'}, \code{'Hf176Lu176'}, \code{'Sr87Rb87'},
-\code{'Os187Re187'}, \code{'Nd143Sm147'} or
+\item{ratio}{one of \code{'Pb206U238'}, \code{'Pb207U235'},
+\code{'U238Pb206'}, \code{'Pb207Pb206'}, \code{'Pb208Th232'},
+\code{'Wetherill'}, \code{'Tera-Wasserburg'}, \code{'U-Th-Pb'},
+\code{'Ar40Ar39'}, \code{'Ca40K40'}, \code{'Hf176Lu176'},
+\code{'Sr87Rb87'}, \code{'Os187Re187'}, \code{'Nd143Sm147'} or
 \code{'Stacey-Kramers'}.}
 
 \item{exterr}{logical. If \code{TRUE}, propagates decay constant
@@ -63,10 +63,10 @@ Groups a set of functions that take one (or more) ages
     concordia or Stacey-Kramers ratios as output.
 }
 \examples{
-ratios <- c('Pb207U235','U238Pb206','Pb207Pb206','Pb208Th232',
-            'Wetherill','Tera-Wasserburg','U-Th-Pb','Ar40Ar39',
-            'Ca40K40','Hf176Lu176','Sr87Rb87','Os187Re187',
-            'Nd143Sm147','Stacey-Kramers')
+ratios <- c('Pb206U238','Pb207U235','U238Pb206','Pb207Pb206',
+            'Pb208Th232','Wetherill','Tera-Wasserburg','U-Th-Pb',
+            'Ar40Ar39','Ca40K40','Hf176Lu176','Sr87Rb87',
+            'Os187Re187','Nd143Sm147','Stacey-Kramers')
 for (ratio in ratios){
      r <- age2ratio(tt=1000,st=10,ratio=ratio,J=1,sJ=0.1)
      print(r)

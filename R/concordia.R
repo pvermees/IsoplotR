@@ -249,11 +249,11 @@
 #' concordia(UPb,show.age=2)
 #'
 #' dev.new()
-#' concordia(UPb,type=1,xlim=c(24.9,25.4),
+#' concordia(UPb,type=2,xlim=c(24.9,25.4),
 #'           ylim=c(0.0508,0.0518),ticks=249:254,exterr=TRUE)
 #'
 #' dev.new()
-#' concordia(UPb,type=2,show.age=2,anchor=list(TRUE,0))
+#' concordia(UPb,show.age=2,anchor=c(2,260))
 #'
 #' @references Ludwig, K.R., 1998. On the treatment of concordant
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
