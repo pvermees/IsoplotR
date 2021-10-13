@@ -215,32 +215,30 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         }
         DP <- -ab[2]/ab[1]
         Dd <- 1/ab[1]
-        E <- matrix(0,8,8)
-        E[1:2,1:2] <- covmat
-        E[3,3] <- lambda('U238')[2]^2
-        E[4,4] <- lambda('U235')[2]^2
-        E[5,5] <- (lambda('U234')[2]*1000)^2
-        E[6,6] <- (lambda('Pa231')[2]*1000)^2
-        E[7,7] <- (lambda('Th230')[2]*1000)^2
-        E[8,8] <- (lambda('Ra226')[2]*1000)^2
-        J <- matrix(0,2,8)
         if (type==1){
             tt <- get.Pb206U238.age(DP)[1]
             D <- mclean(tt,d=x$d,exterr=exterr)
-            dtdPbU <- 1/D$dPb206U238dt
-            J[1,3] <- dtdPbU*D$dPb206U238dl38
-            J[1,5] <- dtdPbU*D$dPb206U238dl34
-            J[1,7] <- dtdPbU*D$dPb206U238dl30
-            J[1,8] <- dtdPbU*D$dPb206U238dl26
+            dtdDP <- 1/D$dPb206U238dt
+            E <- matrix(0,6,6)
+            E[3:6,3:6] <- getEl('U238')
+            J <- matrix(0,2,6)
+            J[1,3] <- dtdDP*D$dPb206U238dl38
+            J[1,4] <- dtdDP*D$dPb206U238dl34
+            J[1,5] <- dtdDP*D$dPb206U238dl30
+            J[1,6] <- dtdDP*D$dPb206U238dl26
         } else {
             tt <- get.Pb207U235.age(DP)[1]
             D <- mclean(tt,d=x$d,exterr=exterr)
-            dtdPbU <- 1/D$dPb207U235dt
-            J[1,4] <- dtdPbU*D$dPb207U235dl35
-            J[1,6] <- dtdPbU*D$dPb207U235dl31
+            dtdDP <- 1/D$dPb207U235dt
+            E <- matrix(0,4,4)
+            E[3:4,3:4] <- getEl('U235')
+            J <- matrix(0,2,4)
+            J[1,3] <- dtdDP*D$dPb207U235dl35
+            J[1,4] <- dtdDP*D$dPb207U235dl31
         }
-        J[1,1] <- dtdPbU*ab[2]/ab[1]^2
-        J[1,2] <- -dtdPbU/ab[1]
+        E[1:2,1:2] <- covmat
+        J[1,1] <- dtdDP*ab[2]/ab[1]^2
+        J[1,2] <- -dtdDP/ab[1]
         J[2,1] <- -1/ab[1]^2
         out$par[i] <- c(tt,Dd)
         out$cov[i,i] <- J%*%E%*%t(J)
@@ -250,37 +248,57 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         
     } else if (x$format%in%(7:8)){
         
-        LL <- function(lta0,x,tt=NULL,a0=NULL,option=1){
-            nn <- length(x)
+        LL <- function(lta0,x,tt=NULL,a0=NULL,option=1,exterr=FALSE){
+            ns <- length(x)
             if (length(lta0)>1){
                 tt <- exp(lta0[1])
                 a0 <- exp(lta0[2])
-                df <- nn-2
+                df <- ns-2
             } else if (is.null(tt)){
                 tt <- exp(lta0)
-                df <- nn-1
+                df <- ns-1
             } else if (is.null(a0)){
                 a0 <- exp(lta0)
-                df <- nn-1
+                df <- ns-1
             } else {
                 stop('You must provide initial values for both t and a0.')
             }
+            D <- mclean(tt,d=x$d,exterr=exterr)
             if (option==6){
-                D <- mclean(tt,d=x$d)
                 x0 <- 1/D$Pb206U238
                 y0 <- 1/a0
             } else if (option==7){
-                D <- mclean(tt,d=x$d)
                 x0 <- 1/D$Pb207U235
                 y0 <- 1/a0
             } else {
-                x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
+                x0 <- 1/D$Pb208Th232
                 y0 <- a0
             }
             XY <- data2york(x,option=option,tt=tt)
             yp <- y0*(1-XY[,'X']/x0)
             SS <- sum((yp-XY[,'Y'])^2)
-            SS2LL(SS,nn,df)
+            if (exterr){
+                dypdx0 <- y0*XY[,'X',drop=FALSE]/x0^2
+                dx0dDP <- -x0^2
+                dDPdl <- matrix(0,1,7)
+                if (option==6){
+                    dDPdl[1] <- D$dPb206U238dl38
+                    dDPdl[3] <- D$dPb206U238dl34
+                    dDPdl[6] <- D$dPb206U238dl30
+                    dDPdl[7] <- D$dPb206U238dl26
+                } else if (option==7){
+                    dDPdl[2] <- D$dPb207U235dl35
+                    dDPdl[5] <- D$dPb207U235dl31
+                } else {
+                    dDPdl[4] <- D$dPb208Th232dl32
+                }
+                J <- (dypdx0 * dx0dDP) %*% dDPdl
+                covmat <- diag(SS/df,ns,ns) + J%*%getEl()%*%t(J)
+                out <- LL.norm(yp-XY[,'Y'],covmat)
+            } else {
+                out <- SS2LL(SS,ns,df)
+            } 
+            out
         }
         
         model2init <- function(x,option=1,tt=NULL,a0=NULL){
@@ -303,22 +321,23 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         option <- (6:9)[type]
         init <- model2init(x,option=option)
         if (anchor[1]<1){
-            fit <- optim(init,fn=LL,x=x,option=option,hessian=TRUE)
+            fit <- optim(init,fn=LL,x=x,option=option,
+                         exterr=exterr,hessian=TRUE)
             out$logpar[i] <- fit$par
             out$logcov[i,i] <- solve(fit$hessian)
         } else if (anchor[1]==1){
             a0 <- ifelse(type%in%c(1,3),
                          1/iratio('Pb208Pb206')[1],
                          1/iratio('Pb208Pb207')[1])
-            fit <- optim(init[1],fn=LL,x=x,method='BFGS',
-                         a0=a0,option=option,hessian=TRUE)
+            fit <- optim(init[1],fn=LL,x=x,method='BFGS',a0=a0,
+                         option=option,exterr=exterr,hessian=TRUE)
             out$logpar[i] <- c(fit$par,log(a0))
             out$logcov[i,i] <- matrix(0,2,2)
             out$logcov[i[1],i[1]] <- 1/fit$hessian
         } else {
             tt <- anchor[2]
-            fit <- optim(init[2],fn=LL,x=x,method='BFGS',
-                         tt=tt,option=option,hessian=TRUE)
+            fit <- optim(init[2],fn=LL,x=x,method='BFGS',tt=tt,
+                         option=option,exterr=exterr,hessian=TRUE)
             out$logpar[i] <- c(log(tt),fit$par)
             out$logcov[i,i] <- matrix(0,2,2)
             out$logcov[i[2],i[2]] <- 1/fit$hessian
