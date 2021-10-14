@@ -104,7 +104,25 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
-    fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=NA,...)
+    fit$model <- model
+    fit$exterr <- exterr
+    if (model==2){
+        fit$logpar <- fit$par
+        np <- length(fit$par)
+        fit$logcov <- matrix(0,np,np)
+        fit$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)
+    } else {
+        fit$LL <- fit$value
+        fit$logpar <- fit$par
+        fit$logcov <- fisher.lud(fit)
+    }
+    parnames <- c('log(t)','log(a0)','log(b0)','log(w)')
+    if (model!=3) parnames <- parnames[-4]
+    if (x$format < 4) parnames <- parnames[-3]
+    names(fit$logpar) <- parnames
+    rownames(fit$logcov) <- parnames
+    colnames(fit$logcov) <- parnames
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     mswd <- mswd.lud(out$logpar,x=x,anchor=anchor)
@@ -203,28 +221,6 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     }
     out$fixed <- fixed
     out    
-}
-
-get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    out <- list(model=model,exterr=exterr)
-    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
-    if (model==2){
-        out$logpar <- fit$par
-        np <- length(fit$par)
-        out$logcov <- matrix(0,np,np)
-        out$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)
-    } else {
-        out$LL <- fit$value
-        out$logpar <- fit$par
-        out$logcov <- fisher.lud(fit)
-    }
-    parnames <- c('log(t)','log(a0)','log(b0)','log(w)')
-    if (model!=3) parnames <- parnames[-4]
-    if (x$format < 4) parnames <- parnames[-3]
-    names(out$logpar) <- parnames
-    rownames(out$logcov) <- parnames
-    colnames(out$logcov) <- parnames
-    out
 }
 
 get.lta0b0.init <- function(x){
