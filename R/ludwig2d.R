@@ -254,44 +254,14 @@ initwlud2d <- function(x=x,lta0,type=1){
 
 LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
                          type=1,LL=TRUE,exterr=FALSE){
+    p <- parse_lta0b0w(lta0w=lta0w,tt=tt,a0=a0,w=w)
     ns <- length(x)
-    np <- length(lta0w)
-    if (np>2){
-        tt <- exp(lta0w[1])
-        a0 <- exp(lta0w[2])
-        w <- exp(lta0w[3])
-    } else if (np==2){
-        if (!is.null(tt)){
-            a0 <- exp(lta0w[1])
-            w <- exp(lta0w[2])
-        } else if (!is.null(a0)){
-            tt <- exp(lta0w[1])
-            w <- exp(lta0w[2])
-        } else {
-            tt <- exp(lta0w[1])
-            a0 <- exp(lta0w[2])
-        }
-    } else if (np==1){
-        if (!is.null(tt) & !is.null(a0)){
-            w <- exp(lta0w)
-        } else if (!is.null(tt) & !is.null(w)){
-            a0 <- exp(lta0w)
-        } else {
-            tt <- exp(lta0w)
-        }
-    } else {
-        if (is.null(tt) | is.null(a0)){
-            stop("Missing tt and a0 values.")
-        } else if (is.null(w)){
-            w <- 0
-        }
-    }
     Y <- rep(NA,ns)
     Z <- rep(NA,ns)
     E <- matrix(0,2*ns+7,2*ns+7)
     J <- matrix(0,2*ns,2*ns+7)
     J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
-    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    D <- mclean(tt=p$tt,d=x$d,exterr=exterr)
     nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
     j <- 1
     for (i in 1:ns){
@@ -327,17 +297,17 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
     i2 <- ns+(1:ns)
     Jw <- matrix(0,2*ns,ns)
     diag(Jw[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
-    Ew <- Jw%*%t(Jw)*w^2 + ED
+    Ew <- Jw%*%t(Jw)*p$w^2 + ED
     O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
                       Ew[i1,i2],Ew[i2,i2],doall=TRUE)
     AA <- dY%*%O[i1,i1]%*%dY + dY%*%O[i1,i2]%*%Z +
         Z%*%O[i2,i1]%*%dY + Z%*%O[i2,i2]%*%Z
-    BB <- a0*dY%*%O[i1,i1] + dY%*%O[i1,i2] +
-        a0*Z%*%O[i2,i1] + Z%*%O[i2,i2]
-    CC <- a0*O[i1,i1]%*%dY + a0*O[i1,i2]%*%Z +
+    BB <- p$a0*dY%*%O[i1,i1] + dY%*%O[i1,i2] +
+        p$a0*Z%*%O[i2,i1] + Z%*%O[i2,i2]
+    CC <- p$a0*O[i1,i1]%*%dY + p$a0*O[i1,i2]%*%Z +
         O[i2,i1]%*%dY + O[i2,i2]%*%Z
-    DD <- O[i1,i1]*a0^2 + O[i1,i2]*a0 +
-        O[i2,i1]*a0 + O[i2,i2]
+    DD <- O[i1,i1]*p$a0^2 + O[i1,i2]*p$a0 +
+        O[i2,i1]*p$a0 + O[i2,i2]
     z <- as.vector(solve(DD+t(DD),t(BB)+CC))
     SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
     if (LL){ # negative log likelihood
@@ -349,6 +319,43 @@ LL_lud2d_UPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
     as.numeric(out)
 } # end of LL_UPb
 
-LL_UThPb <- function(lta0w,x,type=1,anchor=0){
+LL_UThPb <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
+                     type=1,LL=TRUE,exterr=FALSE){
+    p <- parse_lta0b0w(lta0w=lta0w,tt=tt,a0=a0,w=w)
     
 } # end of LL_UThPb
+
+parse_lta0b0w <- function(lta0w,tt=NULL,a0=NULL,w=0){
+    np <- length(lta0w)
+    if (np>2){
+        tt <- exp(lta0w[1])
+        a0 <- exp(lta0w[2])
+        w <- exp(lta0w[3])
+    } else if (np==2){
+        if (!is.null(tt)){
+            a0 <- exp(lta0w[1])
+            w <- exp(lta0w[2])
+        } else if (!is.null(a0)){
+            tt <- exp(lta0w[1])
+            w <- exp(lta0w[2])
+        } else {
+            tt <- exp(lta0w[1])
+            a0 <- exp(lta0w[2])
+        }
+    } else if (np==1){
+        if (!is.null(tt) & !is.null(a0)){
+            w <- exp(lta0w)
+        } else if (!is.null(tt) & !is.null(w)){
+            a0 <- exp(lta0w)
+        } else {
+            tt <- exp(lta0w)
+        }
+    } else {
+        if (is.null(tt) | is.null(a0)){
+            stop("Missing tt and a0 values.")
+        } else if (is.null(w)){
+            w <- 0
+        }
+    }
+    list(tt=tt,a0=a0,w=w)
+}
