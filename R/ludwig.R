@@ -129,50 +129,6 @@ ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
     c(out,mswd)
 }
 
-exponentiate_ludwig <- function(fit,format){
-    out <- fit
-    np <- length(fit$logpar)
-    J <- matrix(0,np,np)
-    out$par <- exp(fit$logpar)
-    parnames <- c('t','a0','b0','w')
-    if (fit$model!=3) parnames <- parnames[-4]
-    if (format < 4) parnames <- parnames[-3]
-    names(out$par) <- parnames
-    rownames(J) <- parnames
-    diag(J) <- exp(fit$logpar[1:np])
-    out$cov <- J %*% fit$logcov %*% t(J)
-    out
-}
-
-mswd.lud <- function(lta0b0,x,anchor=0){
-    if (measured.disequilibrium(x$d))
-        x$d <- replace.impossible.diseq(tt=exp(lta0b0[1]),d=x$d)
-    ns <- length(x)
-    out <- list()
-    anchored <- (anchor[1]>0)
-    tanchored <- (anchor[1]==2 && length(anchor)>1 && is.numeric(anchor[2]))
-    if (x$format<4){
-        if (anchored) out$df <- ns-1
-        else out$df <- ns-2
-    } else {
-        if (anchored){
-            if (tanchored) out$df <- 2*ns-2
-            else out$df <- 2*ns-1
-        } else {
-            out$df <- 2*ns-3
-        }
-    }
-    SS <- data2ludwig(x,lta0b0w=lta0b0)$SS
-    if (out$df>0){
-        out$mswd <- as.vector(SS/out$df)
-        out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
-    } else {
-        out$mswd <- 1
-        out$p.value <- 1
-    }
-    out
-}
-
 fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     fixed <- fixit(x,anchor=anchor,model=model,w=w)
     if (measured.disequilibrium(x$d) & anchor[1]<1){
@@ -223,6 +179,33 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
     out    
 }
 
+# special case for measured disequilibrium
+fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
+    # 1. fit without disequilibrium
+    X <- x
+    X$d <- diseq()
+    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
+    # 2. check that the measured disequilibrium is physically possible
+    X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
+    # 3. model-2 fit
+    init <- fit1$par
+    fixed <- fixit(X,anchor=anchor,model=model,w=w)
+    fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=X,
+                    fixed=fixed,lower=init-1,upper=init+1,exterr=exterr,...)
+    if (model==2){
+        out <- fit2
+    } else {
+        init <- fit2$par
+        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                       method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
+                       lower=init-1,upper=init+1,control=list(fnscale=-1),...)
+    }
+    out$x <- X
+    out$exterr <- exterr
+    out$model <- model
+    out
+}
+
 get.lta0b0.init <- function(x){
     out <- list()
     xy <- data2york(x,option=2)
@@ -257,6 +240,7 @@ get.lta0b0.init <- function(x){
     names(out) <- labels
     out
 }
+
 anchored.lta0b0.init <- function(x,anchor=1){
     if (x$format<4) np <- 2
     else np <- 3
@@ -317,6 +301,64 @@ anchored.lta0b0.init <- function(x,anchor=1){
         stop("Invalid discordia regression anchor.")
     }
     init
+}
+
+exponentiate_ludwig <- function(fit,format){
+    out <- fit
+    np <- length(fit$logpar)
+    J <- matrix(0,np,np)
+    out$par <- exp(fit$logpar)
+    parnames <- c('t','a0','b0','w')
+    if (fit$model!=3) parnames <- parnames[-4]
+    if (format < 4) parnames <- parnames[-3]
+    names(out$par) <- parnames
+    rownames(J) <- parnames
+    diag(J) <- exp(fit$logpar[1:np])
+    out$cov <- J %*% fit$logcov %*% t(J)
+    out
+}
+
+mswd.lud <- function(lta0b0,x,anchor=0){
+    if (measured.disequilibrium(x$d))
+        x$d <- replace.impossible.diseq(tt=exp(lta0b0[1]),d=x$d)
+    ns <- length(x)
+    out <- list()
+    anchored <- (anchor[1]>0)
+    tanchored <- (anchor[1]==2 && length(anchor)>1 && is.numeric(anchor[2]))
+    if (x$format<4){
+        if (anchored) out$df <- ns-1
+        else out$df <- ns-2
+    } else {
+        if (anchored){
+            if (tanchored) out$df <- 2*ns-2
+            else out$df <- 2*ns-1
+        } else {
+            out$df <- 2*ns-3
+        }
+    }
+    SS <- data2ludwig(x,lta0b0w=lta0b0)$SS
+    if (out$df>0){
+        out$mswd <- as.vector(SS/out$df)
+        out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
+    } else {
+        out$mswd <- 1
+        out$p.value <- 1
+    }
+    out
+}
+
+replace.impossible.diseq <- function(tt,d){
+    out <- d
+    D <- mclean(tt=tt,d=d)
+    if (D$U48i<0){
+        out$U48$x <- 0
+        out$U48$option <- 1
+    }
+    if (D$ThUi<0){
+        out$ThU$x <- 0
+        out$ThU$option <- 1
+    }
+    out
 }
 
 LL.lud.model2 <- function(lta0b0,x,exterr=FALSE){
@@ -764,47 +806,6 @@ fixit <- function(x,anchor=0,model=1,w=NA){
     if (anchor[1]>0){ # anchor t or a0(,b0)
         if (anchor[1]==2) out[1] <- TRUE # fix t
         else out[2:NP] <- TRUE # fix a0(,b0)
-    }
-    out
-}
-
-# special case for measured disequilibrium
-fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    # 1. fit without disequilibrium
-    X <- x
-    X$d <- diseq()
-    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
-    # 2. check that the measured disequilibrium is physically possible
-    X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
-    # 3. model-2 fit
-    init <- fit1$par
-    fixed <- fixit(X,anchor=anchor,model=model,w=w)
-    fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=X,
-                    fixed=fixed,lower=init-1,upper=init+1,exterr=exterr,...)
-    if (model==2){
-        out <- fit2
-    } else {
-        init <- fit2$par
-        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                       method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
-                       lower=init-1,upper=init+1,control=list(fnscale=-1),...)
-    }
-    out$x <- X
-    out$exterr <- exterr
-    out$model <- model
-    out
-}
-
-replace.impossible.diseq <- function(tt,d){
-    out <- d
-    D <- mclean(tt=tt,d=d)
-    if (D$U48i<0){
-        out$U48$x <- 0
-        out$U48$option <- 1
-    }
-    if (D$ThUi<0){
-        out$ThU$x <- 0
-        out$ThU$option <- 1
     }
     out
 }
