@@ -49,7 +49,8 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
             covmat <- matrix(0,2,2)
             covmat[2,2] <- stats::vcov(fit)
         } else {
-            x0 <- 1/mclean(anchor[2],d=x$d)$Pb206U238
+            D <- mclean(anchor[2],d=x$d)
+            x0 <- 1/ifelse(type==1,D$Pb206U238,D$Pb207U235)
             fit <- stats::lm( I(XY[,'Y']-0) ~ 0 + I(XY[,'X']-x0) )
             y0 <- -x0*fit$coefficients
             ab <- c(y0,fit$coefficients)
