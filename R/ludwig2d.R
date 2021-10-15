@@ -202,8 +202,8 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
     else if (type%in%c(2,4)) i <- c(1,3)
     else stop('Invalid isochron type.')
     if (is.null(w)){ # model 3 regression
-        model1fit <- ludwig2d_helper(x=x,type=type,anchor=anchor)
-        LL0 <- LL_lud2d(lta0w=model1fit$logpar[i],x=x,type=type)
+        model1fit <- ludwig2d_helper(x=x,type=type,anchor=anchor,exterr=exterr)
+        LL0 <- LL_lud2d(lta0w=model1fit$logpar[i],x=x,w=0.00,type=type)
         LLw <- LL_lud2d(lta0w=model1fit$logpar[i],x=x,w=0.01,type=type)
         if (LLw>LL0){ # zero dispersion
             out <- model1fit
@@ -247,100 +247,6 @@ initwlud2d <- function(x=x,lta0,type=1){
 
 LL_lud2d <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
                          type=1,LL=TRUE,exterr=FALSE){
-    p <- parse_lta0b0w(lta0w=lta0w,tt=tt,a0=a0,w=w)
-    ns <- length(x)
-    Y <- rep(NA,ns)
-    Z <- rep(NA,ns)
-    A <- diag(1,ns,ns)
-    U <- iratio('U238U235')[1]
-    E <- matrix(0,2*ns+7,2*ns+7)
-    J <- matrix(0,2*ns,2*ns+7)
-    J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
-    D <- mclean(tt=p$tt,d=x$d,exterr=exterr)
-    nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
-    j <- 1
-    for (i in 1:ns){
-        wd <- wetherill(x,i=i)
-        if (nc>1) j <- i
-        if (x$format<7){
-            if (type==1){
-                Y[i] <- wd$x['Pb206U238'] - D$Pb206U238
-                Z[i] <- wd$x['Pb204U238']
-                A[i,i] <- p$a0
-                E[i,i] <- wd$cov['Pb206U238','Pb206U238']
-                E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']
-                E[i,ns+i] <- wd$cov['Pb206U238','Pb204U238']
-                E[ns+i,i] <- E[i,ns+i]
-                J[i,2*ns+1] <- -D$dPb206U238dl38[j]     #dLdl38
-                J[i,2*ns+3] <- -D$dPb206U238dl34[j]     #dLdl34
-                J[i,2*ns+6] <- -D$dPb206U238dl30[j]     #dLdl30
-                J[i,2*ns+7] <- -D$dPb206U238dl26[j]     #dLdl26
-            } else {
-                Y[i] <- wd$x['Pb207U235'] - D$Pb207U235
-                Z[i] <- wd$x['Pb204U238']*U
-                A[i,i] <- p$a0
-                E[i,i] <- wd$cov['Pb207U235','Pb207U235']
-                E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']*U^2
-                E[i,ns+i] <- wd$cov['Pb207U235','Pb204U238']*U
-                E[ns+i,i] <- E[i,ns+i]
-                J[i,2*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
-                J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
-            }
-        } else {
-            if (type%in%c(1,3)){
-                Y[i] <- wd$x['Pb206U238'] - D$Pb206U238
-                Z[i] <- wd$x['Pb208Th232'] - D$Pb208Th232
-                A[i,i] <- p$a0*wd$x['Th232U238']
-                E[i,i] <- wd$cov['Pb206U238','Pb206U238']
-                E[ns+i,ns+i] <- wd$cov['Pb208Th232','Pb208Th232']
-                E[i,ns+i] <- wd$cov['Pb206U238','Pb208Th232']
-                E[ns+i,i] <- E[i,ns+i]
-                J[i,2*ns+1] <- -D$dPb206U238dl38[j]     #dLdl38
-                J[i,2*ns+3] <- -D$dPb206U238dl34[j]     #dLdl34
-                J[i,2*ns+6] <- -D$dPb206U238dl30[j]     #dLdl30
-                J[i,2*ns+7] <- -D$dPb206U238dl26[j]     #dLdl26
-                J[ns+i,2*ns+4] <- -D$dPb208Th232dl32[j] #dMdl32
-            } else if (type%in%c(2,4)){
-                Y[i] <- wd$x['Pb207U235'] - D$Pb207U235
-                Z[i] <- wd$x['Pb208Th232'] - D$Pb208Th232
-                A[i,i] <- p$a0*wd$x['Th232U238']*U
-                E[i,i] <- wd$cov['Pb207U235','Pb207U235']
-                E[ns+i,ns+i] <- wd$cov['Pb208Th232','Pb208Th232']
-                E[i,ns+i] <- wd$cov['Pb207U235','Pb208Th232']
-                E[ns+i,i] <- E[i,ns+i]
-                J[i,2*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
-                J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
-                J[ns+i,2*ns+4] <- -D$dPb208Th232dl32[j] #dMdl32
-            } else {
-                stop("Invalid isochron type.")
-            }
-        }
-    }
-    E[2*ns+1:7,2*ns+1:7] <- getEl()
-    ED <- J%*%E%*%t(J)
-    i1 <- 1:ns
-    i2 <- ns+(1:ns)
-    Jw <- matrix(0,2*ns,ns)
-    diag(Jw[i1,i1]) <- -ifelse(type==1,D$dPb206U238dt,D$Pb207U235)
-    Ew <- Jw%*%t(Jw)*p$w^2 + ED
-    O <- blockinverse(Ew[i1,i1],Ew[i1,i2],
-                      Ew[i1,i2],Ew[i2,i2],doall=TRUE)
-    AA <- Y%*%O[i1,i1]%*%Y + Y%*%O[i1,i2]%*%Z + Z%*%O[i2,i1]%*%Y + Z%*%O[i2,i2]%*%Z
-    BB <- Y%*%O[i1,i1]%*%A + Y%*%O[i1,i2] + Z%*%O[i2,i1]%*%A + Z%*%O[i2,i2]
-    CC <- A%*%O[i1,i1]%*%Y + A%*%O[i1,i2]%*%Z + O[i2,i1]%*%Y + O[i2,i2]%*%Z
-    DD <- A%*%O[i1,i1]%*%A + A%*%O[i1,i2] + O[i2,i1]%*%A + O[i2,i2]
-    z <- as.vector(solve(DD+t(DD),t(BB)+CC))
-    SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
-    if (LL){ # negative log likelihood
-        detEw <- determinant(Ew,logarithm=TRUE)$modulus
-        out <- (2*ns*log(2*pi) + detEw + SS)/2
-    } else { # sum of squares
-        out <- SS
-    }
-    as.numeric(out)
-} # end of LL_lud2d
-
-parse_lta0b0w <- function(lta0w,tt=NULL,a0=NULL,w=0){
     np <- length(lta0w)
     if (np>2){
         tt <- exp(lta0w[1])
@@ -372,5 +278,96 @@ parse_lta0b0w <- function(lta0w,tt=NULL,a0=NULL,w=0){
             w <- 0
         }
     }
-    list(tt=tt,a0=a0,w=w)
-}
+    ns <- length(x)
+    Y <- rep(NA,ns)
+    Z <- rep(NA,ns)
+    A <- diag(1,ns,ns)
+    U <- iratio('U238U235')[1]
+    E <- matrix(0,2*ns+7,2*ns+7)
+    J <- matrix(0,2*ns,2*ns+7)
+    J[1:(2*ns),1:(2*ns)] <- diag(2*ns)
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
+    j <- 1
+    for (i in 1:ns){
+        wd <- wetherill(x,i=i)
+        if (nc>1) j <- i
+        if (x$format<7){
+            if (type==1){
+                Y[i] <- wd$x['Pb206U238'] - D$Pb206U238
+                Z[i] <- wd$x['Pb204U238']
+                A[i,i] <- a0
+                E[i,i] <- wd$cov['Pb206U238','Pb206U238']
+                E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']
+                E[i,ns+i] <- wd$cov['Pb206U238','Pb204U238']
+                E[ns+i,i] <- E[i,ns+i]
+                J[i,2*ns+1] <- -D$dPb206U238dl38[j]     #dLdl38
+                J[i,2*ns+3] <- -D$dPb206U238dl34[j]     #dLdl34
+                J[i,2*ns+6] <- -D$dPb206U238dl30[j]     #dLdl30
+                J[i,2*ns+7] <- -D$dPb206U238dl26[j]     #dLdl26
+            } else if (type==2){
+                Y[i] <- wd$x['Pb207U235'] - D$Pb207U235
+                Z[i] <- wd$x['Pb204U238']*U
+                A[i,i] <- a0
+                E[i,i] <- wd$cov['Pb207U235','Pb207U235']
+                E[ns+i,ns+i] <- wd$cov['Pb204U238','Pb204U238']*U^2
+                E[i,ns+i] <- wd$cov['Pb207U235','Pb204U238']*U
+                E[ns+i,i] <- E[i,ns+i]
+                J[i,2*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
+                J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
+            } else {
+                stop("Invalid isochron type.")
+            }
+        } else {
+            if (type%in%c(1,3)){
+                Y[i] <- wd$x['Pb206U238'] - D$Pb206U238
+                Z[i] <- wd$x['Pb208Th232'] - D$Pb208Th232
+                A[i,i] <- a0*wd$x['Th232U238']
+                E[i,i] <- wd$cov['Pb206U238','Pb206U238']
+                E[ns+i,ns+i] <- wd$cov['Pb208Th232','Pb208Th232']
+                E[i,ns+i] <- wd$cov['Pb206U238','Pb208Th232']
+                E[ns+i,i] <- E[i,ns+i]
+                J[i,2*ns+1] <- -D$dPb206U238dl38[j]     #dLdl38
+                J[i,2*ns+3] <- -D$dPb206U238dl34[j]     #dLdl34
+                J[i,2*ns+6] <- -D$dPb206U238dl30[j]     #dLdl30
+                J[i,2*ns+7] <- -D$dPb206U238dl26[j]     #dLdl26
+                J[ns+i,2*ns+4] <- -D$dPb208Th232dl32[j] #dMdl32
+            } else if (type%in%c(2,4)){
+                Y[i] <- wd$x['Pb207U235'] - D$Pb207U235
+                Z[i] <- wd$x['Pb208Th232'] - D$Pb208Th232
+                A[i,i] <- a0*wd$x['Th232U238']*U
+                E[i,i] <- wd$cov['Pb207U235','Pb207U235']
+                E[ns+i,ns+i] <- wd$cov['Pb208Th232','Pb208Th232']
+                E[i,ns+i] <- wd$cov['Pb207U235','Pb208Th232']
+                E[ns+i,i] <- E[i,ns+i]
+                J[i,2*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
+                J[i,2*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
+                J[ns+i,2*ns+4] <- -D$dPb208Th232dl32[j] #dMdl32
+            } else {
+                stop("Invalid isochron type.")
+            }
+        }
+    }
+    E[(2*ns)+(1:7),(2*ns)+(1:7)] <- getEl()
+    ED <- J%*%E%*%t(J)
+    i1 <- 1:ns
+    i2 <- ns+(1:ns)
+    Jw <- matrix(0,2*ns,ns)
+    diag(Jw[i1,i1]) <- -ifelse(type%in%c(1,3),D$dPb206U238dt,D$Pb207U235)
+    if (type%in%c(2,4)) diag(Jw[i2,i1]) <- -D$Pb208Th232
+    Ew <- Jw%*%t(Jw)*w^2 + ED
+    O <- blockinverse(Ew[i1,i1],Ew[i1,i2],Ew[i1,i2],Ew[i2,i2],doall=TRUE)
+    AA <- Y%*%O[i1,i1]%*%Y + Y%*%O[i1,i2]%*%Z + Z%*%O[i2,i1]%*%Y + Z%*%O[i2,i2]%*%Z
+    BB <- Y%*%O[i1,i1]%*%A + Y%*%O[i1,i2] + Z%*%O[i2,i1]%*%A + Z%*%O[i2,i2]
+    CC <- A%*%O[i1,i1]%*%Y + A%*%O[i1,i2]%*%Z + O[i2,i1]%*%Y + O[i2,i2]%*%Z
+    DD <- A%*%O[i1,i1]%*%A + A%*%O[i1,i2] + O[i2,i1]%*%A + O[i2,i2]
+    z <- as.vector(solve(DD+t(DD),t(BB)+CC))
+    SS <- AA - BB%*%z - t(z)%*%CC + t(z)%*%DD%*%z
+    if (LL){ # negative log likelihood
+        detEw <- determinant(Ew,logarithm=TRUE)$modulus
+        out <- (2*ns*log(2*pi) + detEw + SS)/2
+    } else { # sum of squares
+        out <- SS
+    }
+    as.numeric(out)
+} # end of LL_lud2d
