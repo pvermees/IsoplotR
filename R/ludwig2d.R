@@ -53,7 +53,7 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
             ab <- fit$coefficients
             covmat <- stats::vcov(fit)
         } else if (anchor[1]==1) {
-            y0 <- 1/iratio('Pb206Pb204')[1]
+            y0 <- 1/ifelse(type==1,iratio('Pb206Pb204')[1],iratio('Pb207Pb204')[1])
             fit <- stats::lm( I(XY[,'Y']-y0) ~ 0 + XY[,'X'] )
             ab <- c(y0,fit$coefficients)
             covmat <- matrix(0,2,2)
@@ -245,10 +245,9 @@ ludwig2d_helper <- function(x,model=1,type=1,anchor=0,exterr=FALSE){
 
 initwlud2d <- function(x=x,lta0,type=1){
     LL <- function(w,lta0,x,type=1){
-        LL_lud2d(lta0,x=x,w=w,type=type)
+        LL_lud2d(c(lta0,w),x=x,type=type)
     }
-    stats::optim(0,LL,method='L-BFGS-B',lower=0,upper=exp(lta0[1]),
-                 x=x,lta0=lta0,type=type)$par
+    stats::optim(0,LL,method='BFGS',lta0=lta0,x=x,type=type)$par
 }
 
 LL_lud2d <- function(lta0w,x,type=1,LL=TRUE,exterr=FALSE){
