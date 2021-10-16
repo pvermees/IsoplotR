@@ -231,13 +231,13 @@ ludwig2d_helper <- function(x,model=1,type=1,anchor=0,exterr=FALSE){
     fit <- optifix(init,fixed=fixed,LL_lud2d,method='L-BFGS-B',
                    lower=lower,upper=upper,exterr=exterr,
                    x=x,type=type,hessian=TRUE)
-    SS <- LL_lud2d(fit$par[1:2],x=x,type=type,exterr=exterr,LL=FALSE)
     out$logpar <- fit$par
     out$logcov[!fixed,!fixed] <- solve(fit$hessian)
     out$par <- exp(out$logpar)
     out$cov <- diag(out$par)%*%out$logcov%*%diag(out$par)
     
     out$df <- ifelse(anchor[1]<1,length(x)-2,length(x)-1)
+    SS <- LL_lud2d(fit$par[1:2],x=x,type=type,exterr=FALSE,LL=FALSE)
     out$mswd <- SS/out$df
     out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
     out
