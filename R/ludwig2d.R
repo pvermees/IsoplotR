@@ -1,22 +1,36 @@
 ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
-    if (model==1){
-        out <- ludwig2d_helper(x=x,type=type,anchor=anchor,exterr=exterr)
-    } else if (model==2){
-        out <- ludwig2d_model2(x=x,type=type,anchor=anchor,exterr=exterr)
-    } else if (model==3){
-        out <- ludwig2d_helper(x=x,w=NULL,type=type,anchor=anchor,exterr=exterr)
+    if (model==2){
+        fit <- ludwig2d_model2(x=x,type=type,anchor=anchor,exterr=exterr)
     } else {
-        stop('Invalid fit model.')
+        fit <- ludwig2d_helper(x=x,model=model,type=type,
+                               anchor=anchor,exterr=exterr)
     }
 
+    out <- fit
+    np <- ifelse(model==3,4,3)
+    out$par <- rep(NA,np)
+    out$cov <- matrix(0,np,np)
+    out$logpar <- rep(NA,np)
+    out$logcov <- matrix(0,np,np)
+    
+    if (type%in%c(1,3)) i <- c(1,2)
+    else if (type%in%c(2,4)) i <- c(1,3)
+    else stop('Invalid isochron type.')
+    if (model==3) i <- c(i,4)
+
+    out$par[i] <- fit$par
+    out$cov[i,i] <- fit$cov
+    out$logpar[i] <- fit$logpar
+    out$logcov[i,i] <- fit$logcov
+    
     pnames <- c('t','a0','b0')
-    if (model!=2) pnames <- c(pnames,'w')
+    if (model==3) pnames <- c(pnames,'w')
     names(out$par) <- pnames
     rownames(out$cov) <- pnames
     colnames(out$cov) <- pnames
 
     lnames <- c('log(t)','log(a0)','log(b0)')
-    if (model!=2) lnames <- c(lnames,'log(w)')
+    if (model==3) lnames <- c(lnames,'log(w)')
     names(out$logpar) <- lnames
     rownames(out$logcov) <- lnames
     colnames(out$logcov) <- lnames
@@ -28,13 +42,9 @@ ludwig2d <- function(x,type=1,model=1,anchor=0,exterr=FALSE){
 
 ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
 
-    out <- list(par=rep(NA,3),cov=matrix(NA,3,3),
-                logpar=rep(NA,3),logcov=matrix(NA,3,3))    
-    
-    if (type%in%c(1,3)) i <- c(1,2)
-    else if (type%in%c(2,4)) i <- c(1,3)
-    else stop('Invalid isochron type.')
-    
+    out <- list(par=rep(NA,2),cov=matrix(0,2,2),
+                logpar=rep(NA,2),logcov=matrix(0,2,2))
+        
     if (x$format%in%(4:6)){
         
         XY <- data2york(x,option=(3:4)[type])
@@ -84,11 +94,11 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         J[1,1] <- dtdDP*ab[2]/ab[1]^2
         J[1,2] <- -dtdDP/ab[1]
         J[2,1] <- -1/ab[1]^2
-        out$par[i] <- c(tt,Dd)
-        out$cov[i,i] <- J%*%E%*%t(J)
-        out$logpar[i] <- log(out$par[i])
-        J <- diag(1/out$par[i])
-        out$logcov[i,i] <- J%*%out$cov[i,i]%*%t(J)
+        out$par <- c(tt,Dd)
+        out$cov <- J%*%E%*%t(J)
+        out$logpar <- log(out$par)
+        J <- diag(1/out$par)
+        out$logcov <- J%*%out$cov%*%t(J)
         
     } else if (x$format%in%(7:8)){
         
@@ -178,13 +188,11 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         fit <- optifix(init,fixed=fixed,fn=LL,x=x,option=option,
                        method='L-BFGS-B',lower=lower,upper=upper,
                        exterr=exterr,hessian=TRUE)
-        ii <- i[!fixed]
-        out$logpar[i] <- fit$par
-        out$logcov[i,i] <- 0
-        out$logcov[ii,ii] <- solve(fit$hessian)
-        out$par[i] <- exp(out$logpar[i])
-        J <- diag(out$par[i])
-        out$cov[i,i] <- J %*% out$logcov[i,i] %*% t(J)
+        out$logpar <- fit$par
+        out$logcov[!fixed,!fixed] <- solve(fit$hessian)
+        out$par <- exp(out$logpar)
+        J <- diag(out$par)
+        out$cov <- J %*% out$logcov %*% t(J)
         
     } else {
         stop('2D ludwig regression is not available for this format')
@@ -192,41 +200,42 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
     out
 } # end of ludwig2d_model2
 
-ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
+ludwig2d_helper <- function(x,model=1,type=1,anchor=0,exterr=FALSE){
 
-    out <- list(par=rep(NA,4),cov=matrix(NA,4,4),
-                logpar=rep(NA,4),logcov=matrix(NA,4,4))    
-    if (type%in%c(1,3)) i <- c(1,2)
-    else if (type%in%c(2,4)) i <- c(1,3)
-    else stop('Invalid isochron type.')
-    if (is.null(w)){ # model 3 regression
+    fixed <- fixit(x=x,anchor=anchor,model=model,joint=FALSE)
+    np <- length(fixed)
+    out <- list(par=rep(NA,np),cov=matrix(0,np,np),
+                logpar=rep(NA,np),logcov=matrix(0,np,np))
+    
+    if (model==1){
+        model2fit <- ludwig2d_model2(x=x,type=type,anchor=anchor)
+        init <- model2fit$logpar
+    } else {
         model1fit <- ludwig2d_helper(x=x,type=type,anchor=anchor,exterr=exterr)
-        LL0 <- LL_lud2d(lta0w=model1fit$logpar[i],x=x,w=0.00,type=type)
-        LLw <- LL_lud2d(lta0w=model1fit$logpar[i],x=x,w=0.01,type=type)
+        LL0 <- LL_lud2d(lta0w=c(model1fit$logpar,-5),x=x,type=type)
+        LLw <- LL_lud2d(lta0w=c(model1fit$logpar,-4),x=x,type=type)
         if (LLw>LL0){ # zero dispersion
-            out <- model1fit
-            out$par[4] <- 0
-            out$logpar[4] <- -Inf
+            out$par[1:2] <- model1fit$par
+            out$cov[1:2,1:2] <- model1fit$cov
+            out$logpar <- c(model1fit$logpar,-Inf)
+            out$logcov[1:2,1:2] <- model1fit$logcov
             return(out)
         } else {
-            init <- model1fit$logpar[i]
+            init <- model1fit$logpar
             winit <- initwlud2d(x=x,lta0=init)
             init <- c(init,winit)
-            i <- c(i,4)
         }
-    } else {
-        model2fit <- ludwig2d_model2(x=x,type=type,anchor=anchor)
-        init <- model2fit$logpar[i]
     }
-    fit <- stats::optim(init,LL_lud2d,method='L-BFGS-B',
-                        lower=init-2,upper=init+2,exterr=exterr,
-                        w=w,x=x,type=type,hessian=TRUE)
+    lower <- (init-2)[!fixed]
+    upper <- (init+2)[!fixed]
+    fit <- optifix(init,fixed=fixed,LL_lud2d,method='L-BFGS-B',
+                   lower=lower,upper=upper,exterr=exterr,
+                   x=x,type=type,hessian=TRUE)
     SS <- LL_lud2d(fit$par[1:2],x=x,type=type,exterr=exterr,LL=FALSE)
-    
-    out$logpar[i] <- fit$par
-    out$logcov[i,i] <- solve(fit$hessian)
-    out$par[i] <- exp(out$logpar[i])
-    out$cov[i,i] <- diag(out$par[i])%*%out$logcov[i,i]%*%diag(out$par[i])
+    out$logpar <- fit$par
+    out$logcov[!fixed,!fixed] <- solve(fit$hessian)
+    out$par <- exp(out$logpar)
+    out$cov <- diag(out$par)%*%out$logcov%*%diag(out$par)
     
     out$df <- ifelse(anchor[1]<1,length(x)-2,length(x)-1)
     out$mswd <- SS/out$df
@@ -242,39 +251,11 @@ initwlud2d <- function(x=x,lta0,type=1){
                  x=x,lta0=lta0,type=type)$par
 }
 
-LL_lud2d <- function(lta0w,x,tt=NULL,a0=NULL,w=0,
-                         type=1,LL=TRUE,exterr=FALSE){
+LL_lud2d <- function(lta0w,x,type=1,LL=TRUE,exterr=FALSE){
     np <- length(lta0w)
-    if (np>2){
-        tt <- exp(lta0w[1])
-        a0 <- exp(lta0w[2])
-        w <- exp(lta0w[3])
-    } else if (np==2){
-        if (!is.null(tt)){
-            a0 <- exp(lta0w[1])
-            w <- exp(lta0w[2])
-        } else if (!is.null(a0)){
-            tt <- exp(lta0w[1])
-            w <- exp(lta0w[2])
-        } else {
-            tt <- exp(lta0w[1])
-            a0 <- exp(lta0w[2])
-        }
-    } else if (np==1){
-        if (!is.null(tt) & !is.null(a0)){
-            w <- exp(lta0w)
-        } else if (!is.null(tt) & !is.null(w)){
-            a0 <- exp(lta0w)
-        } else {
-            tt <- exp(lta0w)
-        }
-    } else {
-        if (is.null(tt) | is.null(a0)){
-            stop("Missing tt and a0 values.")
-        } else if (is.null(w)){
-            w <- 0
-        }
-    }
+    tt <- exp(lta0w[1])
+    a0 <- exp(lta0w[2])
+    w <- ifelse(np>2,exp(lta0w[3]),0)
     ns <- length(x)
     Y <- rep(NA,ns)
     Z <- rep(NA,ns)

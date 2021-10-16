@@ -104,7 +104,7 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
-    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=NA,...)
+    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,...)
     fit$model <- model
     fit$exterr <- exterr
     if (model==2){
@@ -129,30 +129,25 @@ ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
     c(out,mswd)
 }
 
-fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    fixed <- fixit(x,anchor=anchor,model=model,w=w)
+fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,...){
+    fixed <- fixit(x,anchor=anchor,model=model)
     if (measured.disequilibrium(x$d) & anchor[1]<1){
-        out <- fit.lta0b0w2step(x,exterr=exterr,model=model,
-                                anchor=anchor,w=w,...)
+        out <- fit.lta0b0w2step(x,exterr=exterr,model=model,anchor=anchor,...)
         out$hessian <- stats::optimHess(par=out$par,fn=LL.lud.model2,
                                         x=x,exterr=exterr)
     } else {
         if (model==3){
-            model1fit <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)
+            model1fit <- fit.lta0b0w(x,model=1,anchor=anchor)
             init <- model1fit$par
-            if (is.na(w)){ # estimate the dispersion
-                LL0 <- LL.lud.w(-5,lta0b0=init,x=x)
-                LLw <- LL.lud.w(-4,lta0b0=init,x=x)
-                if (LLw<LL0){ # zero dispersion
-                    w <- -Inf
-                    out <- model1fit
-                    fixed[4] <- TRUE
-                } else {
-                    w <- stats::optimise(LL.lud.w,interval=init[1]+c(-10,0),
-                                         lta0b0=init,x=x,maximum=TRUE)$maximum
-                }
-            } else { # fixed dispersion
+            LL0 <- LL.lud.w(-5,lta0b0=init,x=x)
+            LLw <- LL.lud.w(-4,lta0b0=init,x=x)
+            if (LLw<LL0){ # zero dispersion
+                w <- -Inf
+                out <- model1fit
                 fixed[4] <- TRUE
+            } else {
+                w <- stats::optimise(LL.lud.w,interval=init[1]+c(-10,0),
+                                     lta0b0=init,x=x,maximum=TRUE)$maximum
             }
             init <- c(init,w)
         } else if (anchor[1] %in% c(1,2)){
@@ -180,16 +175,16 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
 }
 
 # special case for measured disequilibrium
-fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
+fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,...){
     # 1. fit without disequilibrium
     X <- x
     X$d <- diseq()
-    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
+    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,...)
     # 2. check that the measured disequilibrium is physically possible
     X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
     # 3. model-2 fit
     init <- fit1$par
-    fixed <- fixit(X,anchor=anchor,model=model,w=w)
+    fixed <- fixit(X,anchor=anchor,model=model)
     fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=X,
                     fixed=fixed,lower=init-1,upper=init+1,exterr=exterr,...)
     if (model==2){
@@ -796,13 +791,12 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     dEdx*J%*%t(J)
 }
 
-fixit <- function(x,anchor=0,model=1,w=NA,joint=TRUE){
+fixit <- function(x,anchor=0,model=1,joint=TRUE){
     if (x$format>3 & joint) NP <- 3
     else NP <- 2
     if (model==3) np <- NP+1
     else np <- NP
     out <- rep(FALSE,np)
-    if (model==3 & is.numeric(w)) out[np] <- TRUE # fix w
     if (anchor[1]>0){ # anchor t or a0(,b0)
         if (anchor[1]==2) out[1] <- TRUE # fix t
         else out[2:NP] <- TRUE # fix a0(,b0)
