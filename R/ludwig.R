@@ -796,9 +796,9 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     dEdx*J%*%t(J)
 }
 
-fixit <- function(x,anchor=0,model=1,w=NA){
-    if (x$format<4) NP <- 2
-    else NP <- 3
+fixit <- function(x,anchor=0,model=1,w=NA,joint=TRUE){
+    if (x$format>3 & joint) NP <- 3
+    else NP <- 2
     if (model==3) np <- NP+1
     else np <- NP
     out <- rep(FALSE,np)

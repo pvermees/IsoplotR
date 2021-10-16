@@ -92,21 +92,11 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
         
     } else if (x$format%in%(7:8)){
         
-        LL <- function(lta0,x,tt=NULL,a0=NULL,option=1,exterr=FALSE){
+        LL <- function(lta0,x,np=2,option=1,exterr=FALSE){
             ns <- length(x)
-            if (length(lta0)>1){
-                tt <- exp(lta0[1])
-                a0 <- exp(lta0[2])
-                df <- ns-2
-            } else if (is.null(tt)){
-                tt <- exp(lta0)
-                df <- ns-1
-            } else if (is.null(a0)){
-                a0 <- exp(lta0)
-                df <- ns-1
-            } else {
-                stop('You must provide initial values for both t and a0.')
-            }
+            tt <- exp(lta0[1])
+            a0 <- exp(lta0[2])
+            df <- ns-np
             D <- mclean(tt,d=x$d,exterr=exterr)
             if (option==6){
                 x0 <- 1/D$Pb206U238
@@ -145,45 +135,53 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
             out
         }
         
-        model2init <- function(x,option=1,tt=NULL,a0=NULL){
-            ti <- min(get.Pb206U238.age(x)[,1]) # first stab
-            XY <- data2york(x,option=option,tt=ti)
+        model2init <- function(x,option=1,anchor=0){
             init <- c(0,0)
-            if (option==6){
-                init[1] <- min(get.Pb206U238.age(1/XY[,'X'])[,1])
-            } else if (option==7){
-                init[1] <- min(get.Pb207U235.age(1/XY[,'X'])[,1])
+            if (anchor[1]==2){
+                ti <- anchor[2]
             } else {
-                init[1] <- min(get.Pb208Th232.age(1/XY[,'X'])[,1])
+                ti <- min(get.Pb206U238.age(x)[,1]) # first stab
+                XY <- data2york(x,option=option,tt=ti)
+                if (option==6){
+                    init[1] <- min(get.Pb206U238.age(1/XY[,'X'])[,1])
+                } else if (option==7){
+                    init[1] <- min(get.Pb207U235.age(1/XY[,'X'])[,1])
+                } else {
+                    init[1] <- min(get.Pb208Th232.age(1/XY[,'X'])[,1])
+                }
             }
-            init[2] <- stats::median(XY[,'Y'])
+            init[1] <- ti
+            if (anchor[1]==1) {
+                if (option==6) {
+                    init[2] <- 1/iratio('Pb208Pb206')[1]
+                } else if (option==7) {
+                    init[2] <- 1/iratio('Pb208Pb207')[1]
+                } else if (option==7) {
+                    init[2] <- iratio('Pb208Pb206')[1]
+                } else if (option==8) {
+                    init[2] <- iratio('Pb208Pb207')[1]
+                } else {
+                    stop("Illegal isochron option")
+                }
+            } else {
+                XY <- data2york(x,option=option,tt=0)
+                init[2] <- stats::median(XY[,'Y'])
+            }
             log(init)
         }
         
         option <- (6:9)[type]
-        init <- model2init(x,option=option)
-        if (anchor[1]<1){
-            fit <- stats::optim(init,fn=LL,x=x,option=option,
-                                exterr=exterr,hessian=TRUE)
-            out$logpar[i] <- fit$par
-            out$logcov[i,i] <- solve(fit$hessian)
-        } else if (anchor[1]==1){
-            a0 <- ifelse(type%in%c(1,3),
-                         1/iratio('Pb208Pb206')[1],
-                         1/iratio('Pb208Pb207')[1])
-            fit <- stats::optim(init[1],fn=LL,x=x,method='BFGS',a0=a0,
-                                option=option,exterr=exterr,hessian=TRUE)
-            out$logpar[i] <- c(fit$par,log(a0))
-            out$logcov[i,i] <- matrix(0,2,2)
-            out$logcov[i[1],i[1]] <- 1/fit$hessian
-        } else {
-            tt <- anchor[2]
-            fit <- stats::optim(init[2],fn=LL,x=x,method='BFGS',tt=tt,
-                                option=option,exterr=exterr,hessian=TRUE)
-            out$logpar[i] <- c(log(tt),fit$par)
-            out$logcov[i,i] <- matrix(0,2,2)
-            out$logcov[i[2],i[2]] <- 1/fit$hessian
-        }
+        init <- model2init(x,option=option,anchor=anchor)
+        fixed <- fixit(x=x,anchor=anchor,model=2,joint=FALSE)
+        lower <- (init-5)[!fixed]
+        upper <- (init+5)[!fixed]
+        fit <- optifix(init,fixed=fixed,fn=LL,x=x,option=option,
+                       method='L-BFGS-B',lower=lower,upper=upper,
+                       exterr=exterr,hessian=TRUE)
+        ii <- i[!fixed]
+        out$logpar[i] <- fit$par
+        out$logcov[i,i] <- 0
+        out$logcov[ii,ii] <- solve(fit$hessian)
         out$par[i] <- exp(out$logpar[i])
         J <- diag(out$par[i])
         out$cov[i,i] <- J %*% out$logcov[i,i] %*% t(J)
@@ -191,7 +189,6 @@ ludwig2d_model2 <- function(x,type=1,anchor=0,exterr=FALSE){
     } else {
         stop('2D ludwig regression is not available for this format')
     }
-            
     out
 } # end of ludwig2d_model2
 
@@ -221,7 +218,6 @@ ludwig2d_helper <- function(x,w=0,type=1,anchor=0,exterr=FALSE){
         model2fit <- ludwig2d_model2(x=x,type=type,anchor=anchor)
         init <- model2fit$logpar[i]
     }
-    
     fit <- stats::optim(init,LL_lud2d,method='L-BFGS-B',
                         lower=init-2,upper=init+2,exterr=exterr,
                         w=w,x=x,type=type,hessian=TRUE)
