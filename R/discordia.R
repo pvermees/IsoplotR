@@ -36,7 +36,7 @@ concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
     ta <- get.Pb207Pb206.age(a,d=d)[1]
     out <- c(1,a) # tl, 7/6 intercept
     if (wetherill) names(out) <- c('t[l]','t[u]')
-    else names(out) <- c('t[l]','76i')
+    else names(out) <- c('t[l]','a0')
     if (b<0) { # negative slope => two (or zero) intersections with concordia line
         tb <- get.Pb206U238.age(-b/a,d=d)[1]
         tlu <- recursive.search(tm=tb,tM=ta,a=a,b=b,d=d)
@@ -92,18 +92,12 @@ twfit2wfit <- function(fit,x){
     J <- matrix(0,2,3)
     if (x$format %in% c(1,2,3)){
         a0 <- 1
-        b0 <- fit$par['76i']
+        b0 <- fit$par['a0']
         E[c(1,3),c(1,3)] <- fit$cov[1:2,1:2]
-    } else if (x$format %in% c(4,5,6)){
-        a0 <- fit$par['64i']
-        b0 <- fit$par['74i']
-        E <- fit$cov[1:3,1:3]
-    } else if (x$format%in%c(7,8)){
-        a0 <- fit$par['68i']
-        b0 <- fit$par['78i']
-        E <- fit$cov[1:3,1:3]
     } else {
-        stop('Incorrect input format')
+        a0 <- fit$par['a0']
+        b0 <- fit$par['b0']
+        E <- fit$cov[1:3,1:3]
     }
     md <- mediand(x$d)
     D <- mclean(tt,d=md)
@@ -247,7 +241,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
         Y[1] <- age_to_Pb207Pb206_ratio(fit2d$par['t'],d=d)[,'76']
         r75 <- age_to_Pb207U235_ratio(fit2d$par['t'],d=d)[,'75']
         r68 <- 1/X[1]
-        Y[2] <- fit2d$par['76i']
+        Y[2] <- fit2d$par['a0']
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
@@ -290,7 +284,7 @@ discordia.line <- function(fit,wetherill,d=diseq()){
 tw3d2d <- function(fit){
     out <- list(par=fit$par,cov=fit$cov,alpha=fit$alpha)
     if (fit$format > 3){
-        labels <- c('t','76i')
+        labels <- c('t','a0')
         out$par <- c(fit$par['t'],fit$par[3]/fit$par[2]) # par = c(Pb206i,Pb207i)
         J <- matrix(0,2,3)
         J[1,1] <- 1
@@ -325,7 +319,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list2$d <- upper.age[4]
         }
     } else if (fit$format%in%c(1,2,3)){
-        i76 <- roundit(fit$par['76i'],fit$err[,'76i'],sigdig=sigdig,text=TRUE)
+        i76 <- roundit(fit$par['a0'],fit$err[,'a0'],sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')
         expr2 <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
         list2 <- list(a=i76[1],b=i76[2],c=i76[3],u='')
@@ -334,8 +328,8 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
             list2$d <- i76[4]
         }
     } else if (fit$format%in%c(4,5,6)){
-        i64 <- roundit(fit$par['64i'],fit$err[,'64i'],sigdig=sigdig,text=TRUE)
-        i74 <- roundit(fit$par['74i'],fit$err[,'74i'],sigdig=sigdig,text=TRUE)
+        i64 <- roundit(fit$par['a0'],fit$err[,'a0'],sigdig=sigdig,text=TRUE)
+        i74 <- roundit(fit$par['b0'],fit$err[,'b0'],sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')
         expr2 <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
         expr3 <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
@@ -349,10 +343,10 @@ discordia.title <- function(fit,wetherill,sigdig=2,...){
         call3 <- substitute(e~a,list(e=expr3,a=args2))
         line3 <- do.call('substitute',list(call3,list3))        
     } else if (fit$format%in%c(7,8)){
-        i86 <- 1/fit$par['68i']
-        i87 <- 1/fit$par['78i']
-        i86err <- i86*fit$err[,'68i']/fit$par['68i']
-        i87err <- i87*fit$err[,'78i']/fit$par['78i']
+        i86 <- 1/fit$par['a0']
+        i87 <- 1/fit$par['b0']
+        i86err <- i86*fit$err[,'a0']/fit$par['a0']
+        i87err <- i87*fit$err[,'b0']/fit$par['b0']
         ri86 <- roundit(i86,i86err,sigdig=sigdig,text=TRUE)
         ri87 <- roundit(i87,i87err,sigdig=sigdig,text=TRUE)
         expr1 <- quote('age =')

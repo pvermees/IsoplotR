@@ -50,6 +50,7 @@ isochron(x, ...)
   show.numbers = FALSE,
   levels = NA,
   clabel = "",
+  joint = TRUE,
   ellipse.fill = c("#00FF0080", "#FF000080"),
   ellipse.stroke = "black",
   type = 1,
@@ -406,6 +407,13 @@ aliquots.}
 
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
+
+\item{joint}{logical. Only applies to U-Pb data formats 4 and above. If
+\code{TRUE}, carries out three dimensional regression.  If
+\code{FALSE}, uses two dimensional isochron regression.  The latter
+can be used to compute \eqn{{}^{207}}Pb/\eqn{{}^{235}}U isochrons,
+which are immune to the complexities of initial
+\eqn{{}^{234}}U/\eqn{{}^{238}}U disequilibrium.}
 
 \item{type}{if \code{x} has class \code{UPb} and \code{x$format=4}, \code{5} or 
 \code{6}:

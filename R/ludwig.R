@@ -104,11 +104,198 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
-    fit <- get.lta0b0w(x,exterr=exterr,model=model,anchor=anchor)
+    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,...)
+    fit$model <- model
+    fit$exterr <- exterr
+    if (model==2){
+        fit$logpar <- fit$par
+        np <- length(fit$par)
+        fit$logcov <- matrix(0,np,np)
+        fit$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)
+    } else {
+        fit$LL <- fit$value
+        fit$logpar <- fit$par
+        fit$logcov <- fisher.lud(fit)
+    }
+    parnames <- c('log(t)','log(a0)','log(b0)','log(w)')
+    if (model!=3) parnames <- parnames[-4]
+    if (x$format < 4) parnames <- parnames[-3]
+    names(fit$logpar) <- parnames
+    rownames(fit$logcov) <- parnames
+    colnames(fit$logcov) <- parnames
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     mswd <- mswd.lud(out$logpar,x=x,anchor=anchor)
     c(out,mswd)
+}
+
+fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,...){
+    fixed <- fixit(x,anchor=anchor,model=model)
+    if (measured.disequilibrium(x$d) & anchor[1]<1){
+        out <- fit.lta0b0w2step(x,exterr=exterr,model=model,anchor=anchor,...)
+        out$hessian <- stats::optimHess(par=out$par,fn=LL.lud.model2,
+                                        x=x,exterr=exterr)
+    } else {
+        if (model==3){
+            model1fit <- fit.lta0b0w(x,model=1,anchor=anchor)
+            init <- model1fit$par
+            LL0 <- LL.lud.w(-5,lta0b0=init,x=x)
+            LLw <- LL.lud.w(-4,lta0b0=init,x=x)
+            if (LLw<LL0){ # zero dispersion
+                w <- -Inf
+                out <- model1fit
+                fixed[4] <- TRUE
+            } else {
+                w <- stats::optimise(LL.lud.w,interval=init[1]+c(-10,0),
+                                     lta0b0=init,x=x,maximum=TRUE)$maximum
+            }
+            init <- c(init,w)
+        } else if (anchor[1] %in% c(1,2)){
+            init <- anchored.lta0b0.init(x=x,anchor=anchor)
+        } else {
+            init <- get.lta0b0.init(x)
+        }
+        lower <- (init-1)[!fixed]
+        upper <- (init+1)[!fixed]
+        if (model==2){
+            out <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",
+                           x=x,fixed=fixed,lower=lower,upper=upper,
+                           exterr=exterr,hessian=TRUE,...)
+        } else {
+            out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                           method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
+                           lower=lower,upper=upper,control=list(fnscale=-1),...)
+        }
+        out$x <- x
+        out$model <- model
+        out$exterr <- exterr
+    }
+    out$fixed <- fixed
+    out    
+}
+
+# special case for measured disequilibrium
+fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,...){
+    # 1. fit without disequilibrium
+    X <- x
+    X$d <- diseq()
+    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,...)
+    # 2. check that the measured disequilibrium is physically possible
+    X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
+    # 3. model-2 fit
+    init <- fit1$par
+    fixed <- fixit(X,anchor=anchor,model=model)
+    fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=X,
+                    fixed=fixed,lower=init-1,upper=init+1,exterr=exterr,...)
+    if (model==2){
+        out <- fit2
+    } else {
+        init <- fit2$par
+        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+                       method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
+                       lower=init-1,upper=init+1,control=list(fnscale=-1),...)
+    }
+    out$x <- X
+    out$exterr <- exterr
+    out$model <- model
+    out
+}
+
+get.lta0b0.init <- function(x){
+    out <- list()
+    xy <- data2york(x,option=2)
+    # First, get the approximate intercept age using a model-2 regression
+    fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+    a <- fit$coef[1]
+    b <- fit$coef[2]
+    covmat <- stats::vcov(fit)
+    # no disequilibrium correction:
+    tint <- concordia.intersection.ab(a,b,covmat=covmat)
+    tt <- tint['t[l]']
+    # Then, estimate the common Pb intercept(s)
+    minval <- 0.01
+    if (x$format<4){
+        a0 <- a
+        expinit <- c(tt,a0)
+        labels <- c('log(t)','log(a0)')
+    } else {
+        if (x$format<7) option <- 3
+        else option <- 6
+        xy <- data2york(x,option=option,tt=tt) # 04-08c/06 vs 38/06
+        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+        a0 <- 1/fit$coef[1]
+        xy <- data2york(x,option=option+1,tt=tt) # 04-08c/07 vs 38/07
+        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
+        b0 <- 1/fit$coef[1]
+        expinit <- c(tt,a0,b0)
+        labels <- c('log(t)','log(a0)','log(b0)')
+    }
+    expinit[expinit<=0] <- 1e-5
+    out <- log(expinit)
+    names(out) <- labels
+    out
+}
+
+anchored.lta0b0.init <- function(x,anchor=1){
+    if (x$format<4) np <- 2
+    else np <- 3
+    init <- rep(0,np)
+    names(init) <- c('log(t)','log(a0)','log(b0)')[1:np]
+    if (anchor[1]==1){ # fix common Pb composition
+        xy <- data2york(x,option=2)
+        if (x$format%in%c(1,2,3)){
+            i76 <- iratio('Pb207Pb206')[1]
+            init['log(a0)'] <- log(i76)
+        } else if (x$format%in%c(4,5,6)){
+            i64 <- iratio('Pb206Pb204')[1]
+            i74 <- iratio('Pb207Pb204')[1]
+            init['log(a0)'] <- log(i64)
+            init['log(b0)'] <- log(i74)
+            i76 <- i74/i64
+        } else if (x$format%in%c(7,8)){
+            i86 <- iratio('Pb208Pb206')[1]
+            i87 <- iratio('Pb208Pb207')[1]
+            init['log(a0)'] <- -log(i86)
+            init['log(b0)'] <- -log(i87)
+            i76 <- i86/i87
+        } else {
+            stop('incorrect input format')
+        }
+        fit <- stats::lm(I(xy[,'Y']-i76) ~ 0 + xy[,'X'])
+        b <- fit$coef
+        covmat <- matrix(0,2,2)
+        covmat[2,2] <- stats::vcov(fit)
+        tint <- concordia.intersection.ab(i76,b,covmat=covmat,
+                                          d=mediand(x$d))[1]
+        init['log(t)'] <- log(tint)
+    } else if (anchor[1]==2){ # fix age
+        init['log(t)'] <- log(anchor[2])
+        if (x$format<4){
+            xy <- data2york(x,option=2)
+            TW <- age_to_terawasserburg_ratios(anchor[2],st=0,
+                                               exterr=FALSE,d=mediand(x$d))
+            b <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
+                               0 + I(xy[,'X']-TW$x['U238Pb206']))$coef
+            init['log(a0)'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
+        } else {
+            r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=mediand(x$d))[1]
+            if (x$format<7){
+                xy6 <- data2york(x,option=3)
+                xy7 <- data2york(x,option=4)
+            } else {
+                xy6 <- data2york(x,option=6,tt=anchor[2])
+                xy7 <- data2york(x,option=7,tt=anchor[2])
+            }
+            b <- stats::lm(xy6[,'Y'] ~ 0 + I(xy6[,'X']-r86))$coef
+            init['log(a0)'] <- -(log(-b)+log(r86))
+            r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=mediand(x$d))[1]
+            b <- stats::lm(xy7[,'Y'] ~ 0 + I(xy7[,'X']-r57))$coef
+            init['log(b0)'] <- -(log(-b)+log(r57))
+        }
+    } else { 
+        stop("Invalid discordia regression anchor.")
+    }
+    init
 }
 
 exponentiate_ludwig <- function(fit,format){
@@ -116,15 +303,13 @@ exponentiate_ludwig <- function(fit,format){
     np <- length(fit$logpar)
     J <- matrix(0,np,np)
     out$par <- exp(fit$logpar)
+    parnames <- c('t','a0','b0','w')
+    if (fit$model!=3) parnames <- parnames[-4]
+    if (format < 4) parnames <- parnames[-3]
+    names(out$par) <- parnames
+    rownames(J) <- parnames
     diag(J) <- exp(fit$logpar[1:np])
     out$cov <- J %*% fit$logcov %*% t(J)
-    if (format %in% c(1,2,3)) parnames <- c('t','76i','w')
-    else if (format %in% c(4,5,6)) parnames <- c('t','64i','74i','w')
-    else if (format %in% c(7,8)) parnames <- c('t','68i','78i','w')
-    else stop("Illegal input format.")
-    names(out$par) <- parnames[1:np]
-    rownames(out$cov) <- parnames[1:np]
-    colnames(out$cov) <- parnames[1:np]
     out
 }
 
@@ -157,201 +342,96 @@ mswd.lud <- function(lta0b0,x,anchor=0){
     out
 }
 
-fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    fixed <- fixit(x,anchor=anchor,model=model,w=w)
-    if (measured.disequilibrium(x$d) & anchor[1]<1){
-        out <- fit.lta0b0w2step(x,exterr=exterr,model=model,
-                                anchor=anchor,w=w,...)
-        out$hessian <- stats::optimHess(par=out$par,fn=SS.model2,x=x)
-    } else {
-        if (model==3){
-            init <- fit.lta0b0w(x,model=1,anchor=anchor,w=w)$par
-            if (is.na(w)){
-                ww <- stats::optimise(LL.lud.w,interval=init[1]+c(-5,5),
-                                      lta0b0=init,x=x,maximum=TRUE)$maximum
-            } else {
-                ww <- w
-            }
-            init <- c(init,ww)
-        } else if (anchor[1] %in% c(1,2)){
-            init <- anchored.lta0b0.init(x=x,anchor=anchor)
-        } else {
-            init <- get.lta0b0.init(x,anchor=anchor)
-        }
-        lower <- (init-1)[!fixed]
-        upper <- (init+1)[!fixed]
-        if (model==2){
-            out <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",x=x,
-                           fixed=fixed,lower=lower,upper=upper,hessian=TRUE,...)
-        } else {
-            out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                           method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
-                           lower=lower,upper=upper,control=list(fnscale=-1),...)
-        }
-        out$x <- x
-        out$model <- model
-        out$exterr <- exterr
+replace.impossible.diseq <- function(tt,d){
+    out <- d
+    D <- mclean(tt=tt,d=d)
+    if (D$U48i<0){
+        out$U48$x <- 0
+        out$U48$option <- 1
     }
-    out$fixed <- fixed
-    out    
-}
-
-get.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    out <- list(model=model,exterr=exterr)
-    fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,w=w,...)
-    if (model==2){
-        np <- length(fit$par) # number of paramters
-        nf <- sum(fit$fixed)  # number of free parameters
-        ns <- length(x)       # number of samples
-        nv <- np-1            # number of independent variables
-        mse <- fit$value/(nv*ns-nf)   # mean square error
-        out$logpar <- fit$par
-        out$logcov <- matrix(0,np,np) # initialise
-        out$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)*mse
-    } else {
-        out$LL <- fit$value
-        out$logpar <- fit$par
-        out$logcov <- fisher.lud(fit)
+    if (D$ThUi<0){
+        out$ThU$x <- 0
+        out$ThU$option <- 1
     }
-    if (x$format %in% c(1,2,3))
-        parnames <- c('log(t)','log(76i)')
-    else if (x$format %in% c(4,5,6))
-        parnames <- c('log(t)','log(64i)','log(74i)')
-    else if (x$format %in% c(7,8))
-        parnames <- c('log(t)','log(68i)','log(78i)')
-    else
-        stop("Illegal input format.")
-    if (model==3) parnames <- c(parnames,'log(w)')
-    names(out$logpar) <- parnames
-    rownames(out$logcov) <- parnames
-    colnames(out$logcov) <- parnames
     out
 }
 
-get.lta0b0.init <- function(x,anchor=0){
-    out <- list()
-    xy <- data2york(x,option=2)
-    # First, get the approximate intercept age using a model-2 regression
-    fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-    a <- fit$coef[1]
-    b <- fit$coef[2]
-    covmat <- stats::vcov(fit)
-    # no disequilibrium correction:
-    tint <- concordia.intersection.ab(a,b,covmat=covmat)
-    tt <- tint['t[l]']
-    # Then, estimate the common Pb intercept(s)
-    minval <- 0.01
-    if (x$format<4){
-        a0 <- a
-        expinit <- c(tt,a0)
-        labels <- c('lt','a0')
-    } else {
-        if (x$format<7) option <- 3
-        else option <- 6
-        xy <- data2york(x,option=option) # 04-08c/06 vs 38/06
-        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-        a0 <- 1/fit$coef[1]
-        xy <- data2york(x,option=option+1) # 04-08c/07 vs 38/07
-        fit <- stats::lm(xy[,'Y'] ~ xy[,'X'])
-        b0 <- 1/fit$coef[1]
-        expinit <- c(tt,a0,b0)
-        labels <- c('lt','a0','b0')
-    }
-    expinit[expinit<=0] <- 1e-5
-    init <- log(expinit)
-    names(init) <- labels
-    init
-}
-anchored.lta0b0.init <- function(x,anchor=1){
-    if (x$format<4) np <- 2
-    else np <- 3
-    init <- rep(0,np)
-    names(init) <- c('lt','a0','b0')[1:np]
-    if (anchor[1]==1){ # fix common Pb composition
-        xy <- data2york(x,option=2)
-        if (x$format%in%c(1,2,3)){
-            i76 <- iratio('Pb207Pb206')[1]
-            init['a0'] <- log(i76)
-        } else if (x$format%in%c(4,5,6)){
-            i64 <- iratio('Pb206Pb204')[1]
-            i74 <- iratio('Pb207Pb204')[1]
-            init['a0'] <- log(i64)
-            init['b0'] <- log(i74)
-            i76 <- i74/i64
-        } else if (x$format%in%c(7,8)){
-            i86 <- iratio('Pb208Pb206')[1]
-            i87 <- iratio('Pb208Pb207')[1]
-            init['a0'] <- -log(i86)
-            init['b0'] <- -log(i87)
-            i76 <- i86/i87
-        } else {
-            stop('incorrect input format')
-        }
-        fit <- stats::lm(I(xy[,'Y']-i76) ~ 0 + xy[,'X'])
-        b <- fit$coef
-        covmat <- matrix(0,2,2)
-        covmat[2,2] <- stats::vcov(fit)
-        tint <- concordia.intersection.ab(i76,b,covmat=covmat,
-                                          d=mediand(x$d))[1]
-        init['lt'] <- log(tint)
-    } else if (anchor[1]==2){ # fix age
-        init['lt'] <- log(anchor[2])
-        if (x$format<4){
-            xy <- data2york(x,option=2)
-            TW <- age_to_terawasserburg_ratios(anchor[2],st=0,
-                                               exterr=FALSE,d=mediand(x$d))
-            b <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
-                               0 + I(xy[,'X']-TW$x['U238Pb206']))$coef
-            init['a0'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
-        } else {
-            r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=mediand(x$d))[1]
-            if (x$format<7){
-                xy6 <- data2york(x,option=3)
-                xy7 <- data2york(x,option=4)
-            } else {
-                xy6 <- data2york(x,option=6,tt=anchor[2])
-                xy7 <- data2york(x,option=7,tt=anchor[2])
-            }
-            b <- stats::lm(xy6[,'Y'] ~ 0 + I(xy6[,'X']-r86))$coef
-            init['a0'] <- -(log(-b)+log(r86))
-            r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=mediand(x$d))[1]
-            b <- stats::lm(xy7[,'Y'] ~ 0 + I(xy7[,'X']-r57))$coef
-            init['b0'] <- -(log(-b)+log(r57))
-        }
-    } else { 
-        stop("Invalid discordia regression anchor.")
-    }
-    init
-}
-
-SS.model2 <- function(lta0b0,x){
+LL.lud.model2 <- function(lta0b0,x,exterr=FALSE){
     tt <- exp(lta0b0[1])
     a0 <- exp(lta0b0[2])
+    nn <- length(x)
     if (x$format<4){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
         yp <- a0+(yr-a0)*xy[,'X']/xr
         dy <- yp-xy[,'Y']
-        out <- sum(dy^2)/2
+        SS <- sum(dy^2)
+        if (exterr){
+            D <- mclean(tt,d=x$d,exterr=exterr)
+            dypdxr <- (a0-yr)*xy[,'X',drop=FALSE]/xr^2
+            dypdyr <- xy[,'X',drop=FALSE]/xr
+            dxrdPbU <- -xr^2
+            dyrdPbPb <- 1
+            dPbUdl <- rep(0,7)
+            dPbPbdl <- rep(0,7)
+            dPbUdl[1] <- D$dPb206U238dl38
+            dPbUdl[3] <- D$dPb206U238dl34
+            dPbUdl[6] <- D$dPb206U238dl30
+            dPbUdl[7] <- D$dPb206U238dl26
+            dPbPbdl[1] <- D$dPb207Pb206dl38
+            dPbPbdl[2] <- D$dPb207Pb206dl35
+            dPbPbdl[3] <- D$dPb207Pb206dl34
+            dPbPbdl[5] <- D$dPb207Pb206dl31
+            dPbPbdl[6] <- D$dPb207Pb206dl30
+            dPbPbdl[7] <- D$dPb207Pb206dl26
+            J <- (dypdxr*dxrdPbU)%*%dPbUdl + (dypdyr*dyrdPbPb)%*%dPbPbdl
+            covmat <- diag(SS/(nn-2),nn,nn) + J%*%getEl()%*%t(J)
+            LL <- LL.norm(dy,covmat)
+        } else {
+            LL <- SS2LL(SS=SS,nn=nn)
+        }
     } else {
         b0 <- exp(lta0b0[3])
-        ns <- length(x)
         if (x$format<7) xy <- get.UPb.isochron.ratios.204(x)
         else xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
-        x6 <- xy[,1] # U238Pb206
-        y6 <- xy[,2] # Pb204Pb206 or Pb208cPb206
-        x7 <- xy[,3] # U235Pb207
-        y7 <- xy[,4] # Pb204Pb207 or Pb208cPb207
+        x6 <- xy[,1,drop=FALSE] # U238Pb206
+        y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
+        x7 <- xy[,3,drop=FALSE] # U235Pb207
+        y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
         y6p <- (r86-x6)/(a0*r86)
         y7p <- (r57-x7)/(b0*r57)
-        dy6 <- y6p-y6
-        dy7 <- y7p-y7
-        out <- sum(dy6^2 + dy7^2)/2
+        dy <- cbind(y6-y6p,y7-y7p)
+        E <- stats::cov(dy)
+        if (exterr){
+            D <- mclean(tt=tt,d=x$d,exterr=exterr)
+            dy6pd68 <- -x6/a0
+            dy7pd75 <- -x7/b0
+            d68dl <- matrix(0,1,7)
+            d68dl[1] <- D$dPb206U238dl38
+            d68dl[3] <- D$dPb206U238dl34
+            d68dl[6] <- D$dPb206U238dl30
+            d68dl[7] <- D$dPb206U238dl26
+            d75dl <- matrix(0,1,7)
+            d75dl[2] <- D$dPb207U235dl35
+            d75dl[5] <- D$dPb207U235dl31
+            J <- matrix(0,2*nn,7)
+            J[1:nn,] <- dy6pd68%*%d68dl
+            J[nn+(1:nn),] <- dy7pd75%*%d75dl
+            EE <- matrix(0,2*nn,2*nn)
+            diag(EE)[1:nn] <- E[1,1]
+            diag(EE)[nn+(1:nn)] <- E[2,2]
+            diag(EE[1:nn,nn+(1:nn)]) <- E[1,2]
+            diag(EE[nn+(1:nn),1:nn]) <- E[2,1]
+            covmat <- EE + J %*% getEl() %*% t(J)
+            LL <- LL.norm(c(y6-y6p,y7-y7p),covmat)
+        } else {
+            LL <- sum(apply(dy,1,LL.norm,covmat=E))
+        }
     }
-    out
+    LL
 }
 
 LL.lud <- function(lta0b0w,x,exterr=FALSE,LL=TRUE){
@@ -427,7 +507,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
-    nc <- length(D$ThUi)
+    nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
     j <- 1
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
@@ -449,13 +529,7 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
         J[ns+i,NR*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
         if (x$format>6) J[2*ns+i,NR*ns+4] <- -D$dPb208Th232dl32[j] # dMdl32
     }
-    E[NR*ns+1,NR*ns+1] <- lambda('U238')[2]^2
-    E[NR*ns+2,NR*ns+2] <- lambda('U235')[2]^2
-    E[NR*ns+3,NR*ns+3] <- (lambda('U234')[2]*1000)^2
-    E[NR*ns+4,NR*ns+4] <- lambda('Th232')[2]^2
-    E[NR*ns+5,NR*ns+5] <- (lambda('Pa231')[2]*1000)^2
-    E[NR*ns+6,NR*ns+6] <- (lambda('Th230')[2]*1000)^2
-    E[NR*ns+7,NR*ns+7] <- (lambda('Ra226')[2]*1000)^2
+    E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     ED <- J%*%E%*%t(J)
     if (np==(NP+1)){ # fit overdispersion
         Ew <- get.Ew(w=w,format=x$format,ns=ns,D=D)
@@ -717,57 +791,15 @@ get.Ew <- function(w=0,format=1,ns=1,D=mclean(),deriv=0){
     dEdx*J%*%t(J)
 }
 
-fixit <- function(x,anchor=0,model=1,w=NA){
-    if (x$format<4) NP <- 2
-    else NP <- 3
+fixit <- function(x,anchor=0,model=1,joint=TRUE){
+    if (x$format>3 & joint) NP <- 3
+    else NP <- 2
     if (model==3) np <- NP+1
     else np <- NP
     out <- rep(FALSE,np)
-    if (model==3 & is.numeric(w)) out[np] <- TRUE # fix w
     if (anchor[1]>0){ # anchor t or a0(,b0)
         if (anchor[1]==2) out[1] <- TRUE # fix t
         else out[2:NP] <- TRUE # fix a0(,b0)
-    }
-    out
-}
-
-# special case for measured disequilibrium
-fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,w=NA,...){
-    # 1. fit without disequilibrium
-    X <- x
-    X$d <- diseq()
-    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,w=w,...)
-    # 2. check that the measured disequilibrium is physically possible
-    X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
-    # 3. model-2 fit
-    init <- fit1$par
-    fixed <- fixit(X,anchor=anchor,model=model,w=w)
-    fit2 <- optifix(parms=init,fn=SS.model2,method="L-BFGS-B",
-                    x=X,fixed=fixed,lower=init-1,upper=init+1,...)
-    if (model==2){
-        out <- fit2
-    } else {
-        init <- fit2$par
-        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                       method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
-                       lower=init-1,upper=init+1,control=list(fnscale=-1),...)
-    }
-    out$x <- X
-    out$exterr <- exterr
-    out$model <- model
-    out
-}
-
-replace.impossible.diseq <- function(tt,d){
-    out <- d
-    D <- mclean(tt=tt,d=d)
-    if (D$U48i<0){
-        out$U48$x <- 0
-        out$U48$option <- 1
-    }
-    if (D$ThUi<0){
-        out$ThU$x <- 0
-        out$ThU$option <- 1
     }
     out
 }

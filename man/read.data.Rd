@@ -206,9 +206,9 @@ if \code{method='other'}, \code{x} is read as a table, unless
 
 \code{2}: 2\eqn{\sigma} absolute uncertainties.
 
-\code{3}: 1\eqn{\sigma} relative uncertainties (\%).
+\code{3}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
 
-\code{4}: 2\eqn{\sigma} relative uncertainties (\%).}
+\code{4}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).}
 
 \item{d}{an object of class \code{\link{diseq}}.}
 

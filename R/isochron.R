@@ -486,132 +486,153 @@ isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
 #'
 #' If \code{anchor[1]=2}: force the isochron line to intersect the
 #' concordia line at an age equal to \code{anchor[2]}.
+#' 
+#' @param joint
+#' logical. Only applies to U-Pb data formats 4 and above. If
+#' \code{TRUE}, carries out three dimensional regression.  If
+#' \code{FALSE}, uses two dimensional isochron regression.  The latter
+#' can be used to compute \eqn{{}^{207}}Pb/\eqn{{}^{235}}U isochrons,
+#' which are immune to the complexities of initial
+#' \eqn{{}^{234}}U/\eqn{{}^{238}}U disequilibrium.
 #'
 #' @rdname isochron
 #' @export
-isochron.UPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
-                         levels=NA,clabel="",
+isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
+                         levels=NA,clabel="",joint=TRUE,
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',type=1,
                          ci.col='gray80',line.col='black',lwd=1,
                          plot=TRUE,exterr=FALSE,model=1,
                          show.ellipses=1*(model!=2),anchor=0,
-                         hide=NULL, omit=NULL,omit.fill=NA,
+                         hide=NULL,omit=NULL,omit.fill=NA,
                          omit.stroke='grey',...){
-    ns <- length(x)
-    calcit <- (1:ns)%ni%c(hide,omit)
-    x2calc <- subset(x,subset=calcit)
-    lud <- ludwig(x2calc,exterr=exterr,model=model,anchor=anchor)
-    tt <- lud$par['t']
-    a0 <- lud$par['a0']
-    b0 <- lud$par['b0']
-    l8 <- settings('lambda','U238')[1]
-    l5 <- settings('lambda','U235')[1]
-    D <- mclean(tt,d=mediand(x$d))
-    if (type==1){                           # 04-08c/06 vs. 38/06
-        x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=mediand(x$d))[1]
-        dx0invdt <- D$dPb206U238dt
-        E <- lud$cov[1:2,1:2]
-        x.lab <- quote(''^238*'U/'^206*'Pb')
-    } else if (type==2){                    # 04-08c/07 vs. 35/07
-        x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=mediand(x$d))[1]
-        dx0invdt <- D$dPb207U235dt
-        E <- lud$cov[c(1,3),c(1,3)]
-        x.lab <- quote(''^235*'U/'^207*'Pb')
-    } else if (type==3 & x$format%in%c(7,8)){  # 06c/08 vs. 32/08
-        x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-        dx0invdt <- D$dPb208Th232dt
-        E <- lud$cov[1:2,1:2]
-        x.lab <- quote(''^232*'Th/'^208*'Pb')
-    } else if (type==4 & x$format%in%c(7,8)){  # 07c/08 vs. 32/08
-        x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-        dx0invdt <- D$dPb208Th232dt
-        E <- lud$cov[c(1,3),c(1,3)]
-        x.lab <- quote(''^232*'Th/'^208*'Pb')
+    if (x$format<4){
+        out <- concordia(x,type=2,show.age=model+1,alpha=alpha,sigdig=sigdig,
+                         show.numbers=show.numbers,levels=levels,clabel=clabel,
+                         ellipse.fill=ellipse.fill,ellipse.stroke=ellipse.stroke,
+                         exterr=exterr,anchor=anchor,hide=hide,omit=omit,
+                         omit.fill=omit.fill,omit.stroke=omit.stroke,...)
     } else {
-        stop('Invalid isochron type.')
-    }
-    if (model==3) lud$w <- ci_log2lin_lud(fit=lud,fact=ntfact(alpha))
-    out <- isochron_init(lud,alpha=0.05)
-    out$age[1] <- tt
-    out$age[2] <- sqrt(lud$cov[1,1])
-    if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
-        XY <- data2york(x,option=3)
-        y0par <- '64i'
-        out$y0[1] <- lud$par[y0par]
-        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
-        out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
-        y.lab <- quote(''^204*'Pb/'^206*'Pb')
-    } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
-        XY <- data2york(x,option=4)
-        y0par <- '74i'
-        out$y0[1] <- lud$par[y0par]
-        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
-        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
-        y.lab <- quote(''^204*'Pb/'^207*'Pb')
-    } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
-        XY <- data2york(x,option=6,tt=tt)
-        y0par <- '68i'
-        out$y0[1] <- 1/lud$par[y0par]
-        out$y0[2] <- out$y0[1]*sqrt(lud$cov[y0par,y0par])/lud$par[y0par]
-        out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
-        y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
-    } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
-        XY <- data2york(x,option=7,tt=tt)
-        U <- settings('iratio','U238U235')[1]
-        y0par <- '78i'
-        out$y0[1] <- 1/lud$par[y0par]
-        out$y0[2] <- out$y0[1]*sqrt(lud$cov[y0par,y0par])/lud$par[y0par]
-        y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
-        out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
-    } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
-        XY <- data2york(x,option=8,tt=tt)
-        y0par <- '68i'
-        out$y0[1] <- lud$par[y0par]
-        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
-        y.lab <- quote(''^206*'Pb'[o]*'/'^208*'Pb')
-        out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
-    } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
-        XY <- data2york(x,option=9,tt=tt)
-        y0par <- '78i'
-        out$y0[1] <- lud$par[y0par]
-        out$y0[2] <- sqrt(lud$cov[y0par,y0par])
-        y.lab <- quote(''^207*'Pb'[o]*'/'^208*'Pb')
-        out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
-    } else {
-        stop('Isochron regression is not available for this input format.')
-    }
-    J <- matrix(0,2,2)
-    if (type<3){
-        a <- 1/lud$par[y0par]
-        J[1,2] <- -a^2
-    } else {
-        a <- lud$par[y0par]
-        J[1,2] <- 1
-    }
-    b <- -a*x0inv
-    J[2,1] <- -a*dx0invdt
-    J[2,2] <- x0inv*a^2
-    cov.ab <- J%*%E%*%t(J)
-    out$a <- c(a,sqrt(cov.ab[1,1]))
-    out$b <- c(b,sqrt(cov.ab[2,2]))
-    out$cov.ab <- cov.ab[1,2]
-    out$y0['ci[y]'] <- ntfact(alpha)*out$y0['s[y]']
-    out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
-    if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,out)*out$age['s[t]']
-        out$y0['disp[y]'] <- ntfact(alpha,out)*out$y0['s[y]']
-    }
-    if (plot){
-        scatterplot(XY,alpha=alpha,show.ellipses=show.ellipses,
-                    show.numbers=show.numbers,levels=levels,
-                    clabel=clabel,ellipse.fill=ellipse.fill,
-                    ellipse.stroke=ellipse.stroke,fit=out,
-                    ci.col=ci.col,line.col=line.col,lwd=lwd,
-                    hide=hide,omit=omit,omit.fill=omit.fill,
-                    omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Pb'),
-                        xlab=x.lab,ylab=y.lab)
+        ns <- length(x)
+        calcit <- (1:ns)%ni%c(hide,omit)
+        x2calc <- subset(x,subset=calcit)
+        if (joint){
+            fit <- ludwig(x2calc,model=model,anchor=anchor,exterr=exterr)
+        } else {
+            fit <- ludwig2d(x2calc,type=type,model=model,
+                            anchor=anchor,exterr=exterr)
+        }
+        tt <- fit$par['t']
+        a0 <- fit$par['a0']
+        b0 <- fit$par['b0']
+        l8 <- settings('lambda','U238')[1]
+        l5 <- settings('lambda','U235')[1]
+        D <- mclean(tt,d=mediand(x$d))
+        if (type==1){                           # 04-08c/06 vs. 38/06
+            x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=mediand(x$d))[1]
+            dx0invdt <- D$dPb206U238dt
+            E <- fit$cov[1:2,1:2]
+            x.lab <- quote(''^238*'U/'^206*'Pb')
+        } else if (type==2){                    # 04-08c/07 vs. 35/07
+            x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=mediand(x$d))[1]
+            dx0invdt <- D$dPb207U235dt
+            E <- fit$cov[c(1,3),c(1,3)]
+            x.lab <- quote(''^235*'U/'^207*'Pb')
+        } else if (type==3 & x$format%in%c(7,8)){  # 06c/08 vs. 32/08
+            x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
+            dx0invdt <- D$dPb208Th232dt
+            E <- fit$cov[1:2,1:2]
+            x.lab <- quote(''^232*'Th/'^208*'Pb')
+        } else if (type==4 & x$format%in%c(7,8)){  # 07c/08 vs. 32/08
+            x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
+            dx0invdt <- D$dPb208Th232dt
+            E <- fit$cov[c(1,3),c(1,3)]
+            x.lab <- quote(''^232*'Th/'^208*'Pb')
+        } else {
+            stop('Invalid isochron type.')
+        }
+        if (model==3) fit$w <- ci_log2lin_lud(fit=fit,fact=ntfact(alpha))
+        out <- isochron_init(fit,alpha=0.05)
+        out$age[1] <- tt
+        out$age[2] <- sqrt(fit$cov[1,1])
+        if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
+            XY <- data2york(x,option=3)
+            y0par <- 'a0'
+            out$y0[1] <- fit$par[y0par]
+            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
+            y.lab <- quote(''^204*'Pb/'^206*'Pb')
+        } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
+            XY <- data2york(x,option=4)
+            y0par <- 'b0'
+            out$y0[1] <- fit$par[y0par]
+            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
+            y.lab <- quote(''^204*'Pb/'^207*'Pb')
+        } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
+            XY <- data2york(x,option=6,tt=tt)
+            y0par <- 'a0'
+            out$y0[1] <- 1/fit$par[y0par]
+            out$y0[2] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
+            out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+            y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
+        } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
+            XY <- data2york(x,option=7,tt=tt)
+            U <- settings('iratio','U238U235')[1]
+            y0par <- 'b0'
+            out$y0[1] <- 1/fit$par[y0par]
+            out$y0[2] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
+            y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
+            out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
+        } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
+            XY <- data2york(x,option=8,tt=tt)
+            y0par <- 'a0'
+            out$y0[1] <- fit$par[y0par]
+            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            y.lab <- quote(''^206*'Pb'[o]*'/'^208*'Pb')
+            out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
+        } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
+            XY <- data2york(x,option=9,tt=tt)
+            y0par <- 'b0'
+            out$y0[1] <- fit$par[y0par]
+            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            y.lab <- quote(''^207*'Pb'[o]*'/'^208*'Pb')
+            out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
+        } else {
+            stop('Isochron regression is not available for this input format.')
+        }
+        J <- matrix(0,2,2)
+        if (type<3){
+            a <- 1/fit$par[y0par]
+            J[1,2] <- -a^2
+        } else {
+            a <- fit$par[y0par]
+            J[1,2] <- 1
+        }
+        b <- -a*x0inv
+        J[2,1] <- -a*dx0invdt
+        J[2,2] <- x0inv*a^2
+        cov.ab <- J%*%E%*%t(J)
+        out$a <- c(a,sqrt(cov.ab[1,1]))
+        out$b <- c(b,sqrt(cov.ab[2,2]))
+        out$cov.ab <- cov.ab[1,2]
+        out$y0['ci[y]'] <- ntfact(alpha)*out$y0['s[y]']
+        out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
+        if (inflate(out)){
+            out$age['disp[t]'] <- ntfact(alpha,out)*out$age['s[t]']
+            out$y0['disp[y]'] <- ntfact(alpha,out)*out$y0['s[y]']
+        }
+        if (plot){
+            scatterplot(XY,alpha=alpha,show.ellipses=show.ellipses,
+                        show.numbers=show.numbers,levels=levels,
+                        clabel=clabel,ellipse.fill=ellipse.fill,
+                        ellipse.stroke=ellipse.stroke,fit=out,
+                        ci.col=ci.col,line.col=line.col,lwd=lwd,
+                        hide=hide,omit=omit,omit.fill=omit.fill,
+                        omit.stroke=omit.stroke,...)
+            graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Pb'),
+                            xlab=x.lab,ylab=y.lab)
+        }
     }
     invisible(out)
 }

@@ -53,8 +53,8 @@ model3regression <- function(xyz,type='york'){
     out <- list()
     if (identical(type,'york')){
         out$w <- stats::optimize(LL.york,
-                                 interval=c(0,stats::sd(xyz[,'Y'])),
-                                 xy=xyz,maximum=TRUE)$maximum
+                             interval=c(0,stats::sd(xyz[,'Y'])),
+                             xy=xyz,maximum=TRUE)$maximum
         dd <- augment_york_errors(xyz,out$w)
         out <- c(out,york(dd))
     } else if (identical(type,'titterington')){

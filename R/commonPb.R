@@ -354,7 +354,7 @@ common.Pb.isochron <- function(x,omit=NULL){
         out <- matrix(0,ns,5)
         colnames(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206',
                            'errPb207Pb206','rhoXY')
-        c76 <- fit$par['76i']
+        c76 <- fit$par['a0']
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76,tt=tt)
         }
@@ -362,8 +362,8 @@ common.Pb.isochron <- function(x,omit=NULL){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb206U238','errPb206U238','rhoXY')
-        c46 <- 1/fit$par['64i']
-        c47 <- 1/fit$par['74i']
+        c46 <- 1/fit$par['a0']
+        c47 <- 1/fit$par['b0']
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.204(x,i=i,c46=c46,c47=c47,tt=tt)
         }
@@ -372,8 +372,8 @@ common.Pb.isochron <- function(x,omit=NULL){
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                            'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
-        c0806 <- 1/fit$par['68i']
-        c0807 <- 1/fit$par['78i']
+        c0806 <- 1/fit$par['a0']
+        c0807 <- 1/fit$par['b0']
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,c0807=c0807)
         }

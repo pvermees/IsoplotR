@@ -137,7 +137,8 @@ profile_LL_isochron_disp <- function(fit){
         wl <- stats::optimize(profile_isochron_helper,interval=c(0,w),xyz=xyz,
                               LLmax=LLmax,cutoff=cutoff,type=fit$type)$minimum
     }
-    if (abs(LL.isochron(stats::sd(xyz[,'Y']),xyz=xyz,type=fit$type)-LLmax) < cutoff/2){
+    LL <- LL.isochron(stats::sd(xyz[,'Y']),xyz=xyz,type=fit$type)
+    if (abs(LL-LLmax) < cutoff/2){
         wu <- Inf
     } else {
         wu <- stats::optimize(profile_isochron_helper,
@@ -157,7 +158,12 @@ profile_isochron_helper <- function(w,xyz,LLmax,cutoff,type='york'){
 ci_log2lin_lud <- function(fit,fact=1){
     lx <- fit$logpar['log(w)']
     slx <- sqrt(fit$logcov['log(w)','log(w)'])
-    ll <- exp(lx - fact*slx)
-    ul <- exp(lx + fact*slx)
+    if (is.finite(lx)){
+        ll <- exp(lx - fact*slx)
+        ul <- exp(lx + fact*slx)
+    } else {
+        ll <- 0
+        ul <- NA
+    }
     c(exp(lx),ll,ul)
 }
