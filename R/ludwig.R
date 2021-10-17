@@ -142,9 +142,11 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,...){
             LL0 <- LL.lud.w(-5,lta0b0=init,x=x)
             LLw <- LL.lud.w(-4,lta0b0=init,x=x)
             if (LLw<LL0){ # zero dispersion
-                w <- -Inf
                 out <- model1fit
-                fixed[4] <- TRUE
+                out$model <- model
+                out$par <- c(out$par,-Inf)
+                out$fixed[length(fixed)] <- TRUE
+                return(out)
             } else {
                 w <- stats::optimise(LL.lud.w,interval=init[1]+c(-10,0),
                                      lta0b0=init,x=x,maximum=TRUE)$maximum

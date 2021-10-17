@@ -221,9 +221,8 @@ ludwig2d_helper <- function(x,model=1,type=1,anchor=0,exterr=FALSE){
             out$logcov[1:2,1:2] <- model1fit$logcov
             return(out)
         } else {
-            init <- model1fit$logpar
-            winit <- initwlud2d(x=x,lta0=init)
-            init <- c(init,winit)
+            winit <- initwlud2d(x=x,lta0=model1fit$logpar,type=type)
+            init <- c(model1fit$logpar,winit)
         }
     }
     lower <- (init-2)[!fixed]
@@ -247,7 +246,7 @@ initwlud2d <- function(x=x,lta0,type=1){
     LL <- function(w,lta0,x,type=1){
         LL_lud2d(c(lta0,w),x=x,type=type)
     }
-    stats::optim(0,LL,method='BFGS',lta0=lta0,x=x,type=type)$par
+    stats::optimise(LL,lta0=lta0,x=x,type=type,lower=-5,upper=5)$min
 }
 
 LL_lud2d <- function(lta0w,x,type=1,LL=TRUE,exterr=FALSE){
