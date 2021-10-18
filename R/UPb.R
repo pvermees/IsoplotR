@@ -959,6 +959,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...
                 interval[1] <- midpoint
             }
         }
+        if (measured.disequilibrium(d)) interval[2] <- meas.diseq.maxt(d)
         t.76 <- stats::optimise(get.76.misfit,x=x,d=d,interval=interval)$minimum
         D <- mclean(tt=t.76,d=d,exterr=exterr)
         E <- matrix(0,9,9)
