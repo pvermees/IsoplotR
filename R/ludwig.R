@@ -130,12 +130,10 @@ ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
 }
 
 fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,...){
-    fixed <- fixit(x,anchor=anchor,model=model)
     if (measured.disequilibrium(x$d) & anchor[1]<1){
-        out <- fit.lta0b0w2step(x,exterr=exterr,model=model,anchor=anchor,...)
-        out$hessian <- stats::optimHess(par=out$par,fn=LL.lud.model2,
-                                        x=x,exterr=exterr)
+        out <- fit.lta0b0w2step(x,exterr=exterr,model=model,hessian=TRUE,...)
     } else {
+        fixed <- fixit(x,anchor=anchor,model=model)
         if (model==3){
             model1fit <- fit.lta0b0w(x,model=1,anchor=anchor)
             init <- model1fit$par
@@ -162,7 +160,7 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,...){
         if (model==2){
             out <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",
                            x=x,fixed=fixed,lower=lower,upper=upper,
-                           exterr=exterr,hessian=TRUE,...)
+                           exterr=exterr,hessian=TRUE)
         } else {
             out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
                            method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
@@ -171,30 +169,31 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,...){
         out$x <- x
         out$model <- model
         out$exterr <- exterr
+        out$fixed <- fixed
     }
-    out$fixed <- fixed
     out    
 }
 
 # special case for measured disequilibrium
-fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,anchor=0,...){
+fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,...){
     # 1. fit without disequilibrium
     X <- x
     X$d <- diseq()
-    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model,anchor=anchor,...)
+    fit1 <- fit.lta0b0w(X,exterr=exterr,model=model)
     # 2. check that the measured disequilibrium is physically possible
     X$d <- replace.impossible.diseq(tt=exp(fit1$par[1]),d=x$d)
     # 3. model-2 fit
     init <- fit1$par
-    fixed <- fixit(X,anchor=anchor,model=model)
-    fit2 <- optifix(parms=init,fn=LL.lud.model2,method="L-BFGS-B",x=X,
-                    fixed=fixed,lower=init-1,upper=init+1,exterr=exterr,...)
+    np2 <- ifelse(x$format<4,2,3)
+    fit2 <- stats::optim(init[1:np2],fn=LL.lud.model2,method="L-BFGS-B",
+                         x=X,lower=init-1,upper=init+1,exterr=exterr,...)
     if (model==2){
         out <- fit2
+        out$fixed <- rep(FALSE,np2)
     } else {
-        init <- fit2$par
+        init[1:np2] <- fit2$par
         out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
-                       method="L-BFGS-B",x=X,exterr=exterr,fixed=fixed,
+                       method="L-BFGS-B",x=X,exterr=exterr,fixed=fit1$fixed,
                        lower=init-1,upper=init+1,control=list(fnscale=-1),...)
     }
     out$x <- X
