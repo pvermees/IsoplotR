@@ -830,6 +830,8 @@ getErrCols <- function(gc,format=NA,ierr=1){
     UPb78 <- (gc=='U-Pb' && format%in%(7:8))
     PbPb12 <- (gc=='Pb-Pb' && format%in%(1:2))
     PbPb3 <- (gc=='Pb-Pb' && format==3)
+    ThPb12 <- (gc=='Th-Pb' && format%in%(1:2))
+    ThPb3 <- (gc=='Th-Pb' && format==3)    
     ArAr12 <- (gc=='Ar-Ar' && format%in%(1:2))
     ArAr3 <- (gc=='Ar-Ar' && format==3)
     KCa12 <- (gc=='K-Ca' && format%in%(1:2))
@@ -843,9 +845,9 @@ getErrCols <- function(gc,format=NA,ierr=1){
     regression <- (gc=='other' && identical(format,'regression'))
     spectrum <- (gc=='other' && identical(format,'spectrum'))
     average <- (gc=='other' && identical(format,'average'))
-    if (UPb12 | PbPb12 | ArAr12 | KCa12 | PD12 | ThU34 | regression){
+    if (UPb12 | PbPb12 | ThPb12 | ArAr12 | KCa12 | PD12 | ThU34 | regression){
         cols <- c(2,4)
-    } else if (UPb345 | PbPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12){
+    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12){
         cols <- c(2,4,6)
     } else if (UPb78){
         cols <- seq(from=2,to=8,by=2)
