@@ -3,6 +3,16 @@ roundit <- function(age,err,sigdig=2,text=FALSE){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
         nc <- 1
+    } else if (any(age<0)){
+        s <- sign(age)
+        out <- roundit(age=abs(age),err=err,sigdig=sigdig)
+        if (is.matrix(out)){
+            out[,1] <- s*out[,1]
+            nc <- ncol(out)
+        } else {
+            out[1] <- s*out[1]
+            nc <- length(out)
+        }
     } else {
         if (length(age)==1){
             dat <- c(age,err)
@@ -14,8 +24,6 @@ roundit <- function(age,err,sigdig=2,text=FALSE){
         min.err <- min(abs(dat),na.rm=TRUE)
         if (is.na(sigdig)) {
             out <- dat
-        } else if (any(dat<=0, na.rm=TRUE)){
-            out <- signif(dat,sigdig)
         } else {
             nsmall <- min(20,max(0,-(trunc(log10(min.err))-sigdig)))
             out <- format(dat,digits=sigdig,nsmall=nsmall,

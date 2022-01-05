@@ -140,7 +140,8 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
         if (empty) return()
     }
     if (!identical(fit,'none')){
-        plot_isochron_line(fit,x=seq(xlim[1],xlim[2],length.out=100),
+        usr <- graphics::par('usr')
+        plot_isochron_line(fit,x=seq(usr[1],usr[2],length.out=100),
                            ci.col=ci.col,col=line.col,lwd=lwd)
     }
     graphics::box()
