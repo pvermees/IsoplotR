@@ -162,7 +162,7 @@ fit.lta0b0w <- function(x,exterr=FALSE,model=1,anchor=0,...){
                            x=x,fixed=fixed,lower=lower,upper=upper,
                            exterr=exterr,hessian=TRUE)
         } else {
-            out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+            out <- optifix(parms=init,fn=LL.lud,#gr=LL.lud.gr,
                            method="L-BFGS-B",x=x,exterr=exterr,fixed=fixed,
                            lower=lower,upper=upper,control=list(fnscale=-1),...)
         }
@@ -192,7 +192,7 @@ fit.lta0b0w2step <- function(x,exterr=FALSE,model=1,...){
         out$fixed <- rep(FALSE,np2)
     } else {
         init[1:np2] <- fit2$par
-        out <- optifix(parms=init,fn=LL.lud,gr=LL.lud.gr,
+        out <- optifix(parms=init,fn=LL.lud,#gr=LL.lud.gr,
                        method="L-BFGS-B",x=X,exterr=exterr,fixed=fit1$fixed,
                        lower=init-1,upper=init+1,control=list(fnscale=-1),...)
     }
