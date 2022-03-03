@@ -427,10 +427,11 @@ SS.SK.without.204 <- function(tt,x,i){
     cnames <- c('U238Pb206','Pb207Pb206')
     covmat <- tw$cov[cnames,cnames]
     omega <- solve(covmat)
-    x.fitted <- (X*omega[1,1]+Y*omega[1,2]-a*omega[1,2])/
-                (omega[1,1]+b*omega[1,2])
-    y.fitted <- a + b*x.fitted
-    d <- cbind(X-x.fitted,Y-y.fitted)
+    xy <- cbind('X'=X,'sX'=sqrt(covmat[1,1]),
+                'Y'=Y,'sY'=sqrt(covmat[2,2]),
+                'rXY'=cov2cor(covmat)[1,2])
+    xy.fitted <- get.york.xy(xy,a,b)
+    d <- cbind(X-xy.fitted[1],Y-xy.fitted[2])
     as.numeric(d %*% omega %*% t(d))
 }
 SS.SK.with.204 <- function(tt,x,i){
