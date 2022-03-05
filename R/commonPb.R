@@ -429,7 +429,7 @@ SS.SK.without.204 <- function(tt,x,i){
     omega <- solve(covmat)
     xy <- cbind('X'=X,'sX'=sqrt(covmat[1,1]),
                 'Y'=Y,'sY'=sqrt(covmat[2,2]),
-                'rXY'=cov2cor(covmat)[1,2])
+                'rXY'=stats::cov2cor(covmat)[1,2])
     xy.fitted <- get.york.xy(xy,a,b)
     d <- cbind(X-xy.fitted[1],Y-xy.fitted[2])
     as.numeric(d %*% omega %*% t(d))
