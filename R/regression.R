@@ -117,8 +117,6 @@ LL.titterington <- function(w,xyz){
     }
     out
 }
-LL.ludwig <- function(w,xyz){
-}
 
 augment_york_errors <- function(xy,w){
     out <- xy

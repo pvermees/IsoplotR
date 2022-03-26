@@ -31,7 +31,9 @@ roundit <- function(age,err,sigdig=2,text=FALSE){
         }
     }
     if (!text){
-        out <- matrix(as.numeric(out),ncol=nc)
+        suppressWarnings( # suppress NA warnings
+            out <- matrix(as.numeric(out),ncol=nc)
+        ) 
         if (nrow(out)==1) out <- as.vector(out)
     }
     out
