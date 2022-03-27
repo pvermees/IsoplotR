@@ -285,7 +285,7 @@
 #'
 #' \item{y0}{a four-element vector containing:
 #'
-#' \code{y}: the intercept (i.e. \code{a})
+#' \code{y}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
 #'
 #' \code{s[y]}: the propagated uncertainty of \code{y}
 #'
@@ -1064,7 +1064,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^230*'Th/'^232*'Th')
-        y0.lab <- quote('('^230*'Th/'^232*'Th)'[o]*'=')
     } else if (type == 2){ # 0/8 vs 2/8
         osmond <- TRUE
         ia <- 'A'
@@ -1074,7 +1073,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^230*'Th/'^238*'U')
-        y0.lab <- quote('('^230*'Th/'^238*'U)'[o]*'=')
     } else if (type == 3){ # 4/2 vs 8/2
         osmond <- FALSE
         ia <- 'a'
@@ -1084,7 +1082,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         id <- c('X','sX','Y','sY','rXY')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^234*'U/'^232*'Th')
-        y0.lab <- quote('('^234*'U/'^232*'Th)'[o]*'=')
     } else if (type == 4){ # 4/8 vs 2/8
         osmond <- TRUE
         ia <- 'a'
@@ -1094,7 +1091,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         id <- c('X','sX','Y','sY','rXY')
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^234*'U/'^238*'U')
-        y0.lab <- quote('('^234*'U/'^238*'U)'[o]*'=')
     }
     tit <- data2tit(x,osmond=osmond)
     d2calc <- clear(tit,hide,omit)
@@ -1108,20 +1104,20 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
                        out$par[i48],sqrt(out$cov[i48,i48]),
                        out$cov[i48,i08],exterr=exterr)
     out$age['t'] <- tst['t']
-    out$y0['y'] <- out$a[1]
+    out$y0['y'] <- tst['48_0']
     out$age['s[t]'] <- tst['s[t]']
-    out$y0['s[y]'] <- out$a[2]
+    out$y0['s[y]'] <- tst['s[48_0]']
+    out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
     out <- ci_isochron(out)
     if (inflate(out)){
         tdispt <- get.ThU.age(out$par[i08],sqrt(out$mswd*out$cov[i08,i08]),
                               out$par[i48],sqrt(out$mswd*out$cov[i48,i48]),
                               out$mswd*out$cov[i48,i08],exterr=exterr)
         out$age['disp[t]'] <- ntfact(alpha,df=out$df)*tdispt['s[t]']
-        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*out$y0['s[y]']
+        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*tdispt['s[48_0]']
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
-    out$y0label <- y0.lab
     out$xyz <- subset(out$xyz,select=id)
     out
 }
