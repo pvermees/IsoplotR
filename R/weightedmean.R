@@ -698,6 +698,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
         x <- x[i]
         sx <- sx[i]
         valid <- valid[i]
+        levels <- levels[i]
         calcit <- calcit[i]
         colour <- colour[i]
     }
