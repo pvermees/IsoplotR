@@ -82,12 +82,15 @@ titterington <- function(x,alpha=0.05){
     B <- fitXZ$b[1]
     init <- c(a,b,A,B)
     dat <- matrix2covlist(x)
-    fit <- stats::optim(init,fn=S.tit,gr=gr.tit,method="BFGS",dat)
+    fit <- stats::optim(init,fn=L.tit,method="BFGS",gr=gr.tit,dat=dat)
     fish <- fisher.tit(fit$par,dat)
-    covmat <- solve(fish)
+    AA <- fish[1:ns,1:ns]
+    BB <- fish[1:ns,(ns+1):(ns+4)]
+    CC <- fish[(ns+1):(ns+4),1:ns]
+    DD <- fish[(ns+1):(ns+4),(ns+1):(ns+4)]
     out <- list()
     out$par <- fit$par
-    out$cov <- covmat[(ns+1):(ns+4),(ns+1):(ns+4)]
+    out$cov <- blockinverse(AA,BB,CC,DD)
     mswd <- mswd.tit(fit$par,dat)
     out <- c(out,mswd)
     parnames <- c('a','b','A','B')
@@ -194,23 +197,24 @@ fisher.tit <- function(abAB,dat){
         d2L.dbdA <- d2L.dbdA - x*omega[2,3]
         d2L.dbdB <- d2L.dbdB - omega[2,3]*x^2
         
-        d2L.dadx <- -(omega[1,2] + b*omega[2,2] + B*omega[2,3])
-        d2L.dbdx <- -x*(omega[1,2] + b*omega[2,2] + B*omega[2,3]) +
-            omega[2,2]*(Y-a-b*x) + omega[1,2]*(X-x) + omega[2,3]*(Z-A-B*x)
-        d2L.dAdx <- -(omega[1,3] + b*omega[2,3] + B*omega[3,3])
-        d2L.dBdx <- -x*(omega[1,3] + b*omega[2,3] + B*omega[3,3]) +
-            omega[2,3]*(Y-a-b*x) + omega[1,3]*(X-x) + omega[3,3]*(Z-A-B*x)
+        d2L.dadx <- -(omega[1,2] + b*omega[2,2] + B*omega[2,3])   # N1i
+        d2L.dbdx <- -x*(omega[1,2] + b*omega[2,2] + B*omega[2,3]) # xi*N1i
+                     # + omega[2,2]*(Y-a-b*x) + omega[1,2]*(X-x) + omega[2,3]*(Z-A-B*x)
+        d2L.dAdx <- -(omega[1,3] + b*omega[2,3] + B*omega[3,3])   # N2i
+        d2L.dBdx <- -x*(omega[1,3] + b*omega[2,3] + B*omega[3,3]) # xi*N2i
+                     # + omega[2,3]*(Y-a-b*x) + omega[1,3]*(X-x) + omega[3,3]*(Z-A-B*x)
         d2L.dx2 <- -(omega[1,1] + 2*b*omega[1,2] + 2*B*omega[1,3] +
                      omega[2,2]*b^2 + omega[2,3]*B^2 + 2*omega[3,3]*b*B)
+        
         out[i,i] <- -d2L.dx2
         out[i,ns+1] <- -d2L.dadx
         out[i,ns+2] <- -d2L.dbdx
         out[i,ns+3] <- -d2L.dAdx
         out[i,ns+4] <- -d2L.dBdx
-        out[ns+1,i] <- -d2L.dadx
-        out[ns+2,i] <- -d2L.dbdx
-        out[ns+3,i] <- -d2L.dAdx
-        out[ns+4,i] <- -d2L.dBdx
+        out[ns+1,i] <- out[i,ns+1]
+        out[ns+2,i] <- out[i,ns+2]
+        out[ns+3,i] <- out[i,ns+3]
+        out[ns+4,i] <- out[i,ns+4]
     }
     out[ns+1,ns+1] <- -d2L.da2
     out[ns+2,ns+2] <- -d2L.db2
@@ -219,15 +223,15 @@ fisher.tit <- function(abAB,dat){
     out[ns+1,ns+2] <- -d2L.dadb
     out[ns+1,ns+3] <- -d2L.dadA
     out[ns+1,ns+4] <- -d2L.dadB
-    out[ns+2,ns+1] <- -d2L.dadb
     out[ns+2,ns+3] <- -d2L.dbdA
     out[ns+2,ns+4] <- -d2L.dbdB
-    out[ns+3,ns+1] <- -d2L.dadA
-    out[ns+3,ns+2] <- -d2L.dbdA
     out[ns+3,ns+4] <- -d2L.dAdB
-    out[ns+4,ns+1] <- -d2L.dadB
-    out[ns+4,ns+2] <- -d2L.dbdB
-    out[ns+4,ns+3] <- -d2L.dAdB
+    out[ns+2,ns+1] <- out[ns+1,ns+2]
+    out[ns+3,ns+1] <- out[ns+1,ns+3]
+    out[ns+3,ns+2] <- out[ns+2,ns+3]
+    out[ns+4,ns+1] <- out[ns+1,ns+4]
+    out[ns+4,ns+2] <- out[ns+2,ns+4]
+    out[ns+4,ns+3] <- out[ns+3,ns+4]
     out
 }
 
@@ -241,7 +245,7 @@ gr.tit <- function(abAB,dat){
     dS.db <- 0
     dS.dA <- 0
     dS.dB <- 0
-    dS.dS <- -1/2
+    dL.dS <- -1/2
     dr.da <- -1
     dR.dA <- -1
     dR.da <- 0
@@ -289,10 +293,10 @@ gr.tit <- function(abAB,dat){
         dS.dA <- dgamma.dA - 2*(beta/alpha)*dbeta.dA + dalpha.dA*(beta/alpha)^2
         dS.dB <- dgamma.dB - 2*(beta/alpha)*dbeta.dB + dalpha.dB*(beta/alpha)^2
     }
-    c(dS.da,dS.db,dS.dA,dS.dB)
+    c(dS.da,dS.db,dS.dA,dS.dB)*dL.dS
 }
 
-S.tit <- function(abAB,dat){
+L.tit <- function(abAB,dat){
     ns <- length(dat)
     a <- abAB[1] # y intercept
     b <- abAB[2] # y slope
@@ -306,7 +310,7 @@ S.tit <- function(abAB,dat){
         gamma <- abg[3]
         S <- S + gamma - (beta^2)/alpha
     }
-    S
+    S/2
 }
 
 data2tit <- function(x,...){ UseMethod("data2tit",x) }
