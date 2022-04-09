@@ -1061,6 +1061,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         ib <- 'B'
         i48 <- 'b'
         i08 <- 'B'
+        i02 <- 'A'
         id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^230*'Th/'^232*'Th')
@@ -1070,6 +1071,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         ib <- 'B'
         i48 <- 'a'
         i08 <- 'A'
+        i02 <- 'B'
         id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^230*'Th/'^238*'U')
@@ -1079,6 +1081,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         ib <- 'b'
         i48 <- 'b'
         i08 <- 'B'
+        i02 <- 'A'
         id <- c('X','sX','Y','sY','rXY')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^234*'U/'^232*'Th')
@@ -1088,6 +1091,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         ib <- 'b'
         i48 <- 'a'
         i08 <- 'A'
+        i02 <- 'B'
         id <- c('X','sX','Y','sY','rXY')
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^234*'U/'^238*'U')
@@ -1100,6 +1104,9 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
     out$cov.ab <- out$cov[ia,ib]
+    out$PAR <- fit$par[c(i48,i08,i02)]
+    out$COV <- fit$cov[c(i48,i08,i02),c(i48,i08,i02)]
+    names(out$PAR) <- rownames(out$COV) <- colnames(out$COV) <- c('i48','i08','i02')
     tst <- get.ThU.age(out$par[i08],sqrt(out$cov[i08,i08]),
                        out$par[i48],sqrt(out$cov[i48,i48]),
                        out$cov[i48,i08],exterr=exterr)
