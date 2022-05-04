@@ -283,6 +283,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  y0option = 1,
   ...
 )
 
@@ -446,8 +447,8 @@ vs. \eqn{^{232}}Th/\eqn{^{238}}U
 \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
 vs. \eqn{^{238}}U/\eqn{^{232}}Th
 
-\code{4}: `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
-vs. \eqn{^{232}}Th/\eqn{^{238}}U}
+\code{4}: `Osmond type-II' isochron, setting out
+\eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U}
 
 \item{exterr}{propagate external sources of uncertainty
 (J, decay constant)?}
@@ -505,6 +506,16 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
+
+\item{y0option}{controls the type of initial activity ratio that is
+    reported along the 3D isochron age. Only relevant to Th-U data
+    format 1 and 2. Set to:
+
+\code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+
+\code{y0option=2} for the initial \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+
+\code{y0option=3} for the initial \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ThPb},

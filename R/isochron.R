@@ -977,8 +977,19 @@ isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 #' \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
 #' vs. \eqn{^{238}}U/\eqn{^{232}}Th
 #'
-#' \code{4}: `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
-#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
+#' \code{4}: `Osmond type-II' isochron, setting out
+#' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
+#' 
+#' @param y0option controls the type of initial activity ratio that is
+#'     reported along the 3D isochron age. Only relevant to Th-U data
+#'     format 1 and 2. Set to:
+#'
+#' \code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+#'
+#' \code{y0option=2} for the initial \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+#'
+#' \code{y0option=3} for the initial \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.
+#' 
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
@@ -988,11 +999,11 @@ isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
                           line.col='black',lwd=1,plot=TRUE,
                           exterr=TRUE,model=1,show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
-                          omit.stroke='grey',...){
+                          omit.stroke='grey',y0option=1,...){
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,
                                exterr=exterr,alpha=alpha,
-                               hide=hide,omit=omit)
+                               hide=hide,omit=omit,y0option=y0option)
         intercept.type <- 'Th-U-3D'
     } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,
@@ -1155,7 +1166,7 @@ y0ci <- function(out,tst,y0option=1,exterr=FALSE,alpha=0.05){
     if (inflate(out)){ # overwrite dispersion to remove decay constant errors
         f2E <- E
         f2E[1:3,1:3] <- out$mswd*E[1:3,1:3]
-        E3 <- J %*% fE %*% t(J)
+        E3 <- J %*% f2E %*% t(J)
         out$age['disp[t]'] <- ntfact(alpha,df=out$df)*sqrt(E3[1,1])
         out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*sqrt(J2 %*% E3 %*% J2)
     }
