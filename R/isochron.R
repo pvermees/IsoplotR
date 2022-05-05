@@ -981,7 +981,7 @@ isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 #' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #' 
 #' @param y0option controls the type of initial activity ratio that is
-#'     reported along the 3D isochron age. Only relevant to Th-U data
+#'     reported along with the 3D isochron age. Only relevant to Th-U data
 #'     format 1 and 2. Set to:
 #'
 #' \code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
@@ -1194,17 +1194,18 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
         get.ThU.age(Th230U238[1],Th230U238[2],
                     exterr=exterr)[c('t','s[t]')]
     out$y0[c('y','s[y]')] <-
-        get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
+        get.Th230Th232_0(out$age['t'],Th230Th232[1],Th230Th232[2])
     out <- ci_isochron(out)
     if (inflate(out)){
         out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
             get.ThU.age(Th230U238[1],sqrt(out$mswd)*Th230U238[2],exterr=exterr)['s[t]']
         out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*
-            get.Th230Th232_0x(out$age['t'],Th230Th232[1],
-                              sqrt(out$mswd)*Th230Th232[2])[2]
+            get.Th230Th232_0(out$age['t'],Th230Th232[1],
+                             sqrt(out$mswd)*Th230Th232[2])[2]
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
+    out$y0label <- quote('('^230*'Th/'^232*'Th)'[o]*'=')
     out
 }
 

@@ -176,11 +176,11 @@ ThU.convert <- function(x){
     out
 }
 
-get.Th230Th232_0x <- function(tt,Th230Th232,errTh230Th232=0){
+get.Th230Th232_0 <- function(tt,Th230Th232,errTh230Th232=0){
     l0 <- settings('lambda','Th230')[1]
-    Th230Th232_0x <- Th230Th232 * exp(l0*tt)
-    errTh230Th232_0x <- errTh230Th232/Th230Th232
-    c(Th230Th232_0x,errTh230Th232_0x)
+    Th230Th232_0 <- Th230Th232 * exp(l0*tt)
+    errTh230Th232_0 <- errTh230Th232/Th230Th232
+    c(Th230Th232_0,errTh230Th232_0)
 }
 
 get.Th230Th232.ratio <- function(tt,Th230Th232_0x,U238Th232){
