@@ -141,7 +141,7 @@ york.1966.zero.intercept <- function(x,alpha=0.05){
     c(b,sb)
 }
 
-# get fitted X and X given a dataset x=cbind(X,sX,Y,sY,rXY),
+# get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
 get.york.xy <- function(x,a,b){
