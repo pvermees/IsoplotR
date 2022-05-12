@@ -41,7 +41,7 @@
 #' @param transform if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 #'     vs. Th-U age.
 #' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format} is \code{2} or \code{3}.
+#'     when \code{x$format} is \code{1} or \code{2}).
 #'
 #' \code{0}: no correction
 #'
@@ -315,7 +315,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
         tit <- expression(paste("[isochrons assume ("^"230","Th/"^
-                                "232","Th)"[o]^x*" = 0]"))
+                                "232","Th)"[i]" = 0]"))
         mymtext(tit,line=0,...)
     }
     colourbar(z=levels[calcit],fill=ellipse.fill,
