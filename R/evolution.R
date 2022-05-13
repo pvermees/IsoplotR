@@ -436,59 +436,51 @@ data2evolution <- function(x,detritus=0,omit4c=NULL){
     out <- matrix(0,ns,5)
     if (x$format %in% c(1,2)){
         td <- data2tit(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
-        out <- Th230correction(td,option=detritus,dat=x,omit4c=omit4c)
+        if (detritus==1){
+            out <- Th230correction.isochron(td,omit4c=omit4c)
+        } else if (detritus==2){
+            tt <- get.ThU.age.corals(x,detritus=2)[,'t']
+            out <- Th230correction.assumed.detritus(td,age=tt,Th02i=x$Th02i)
+        } else if (detritus==3){
+            out <- Th230correction.measured.detritus(td,Th02U48=x$Th02U48)
+        } else {
+            out <- td
+        }
     } else if (x$format %in% c(3,4)){
         out <- data2york(x,type=1,generic=FALSE) # 8/2 - 0/2
     }
     out
 }
 
-# x = table with 'Th230U238','errTh230U238', 'U234U238','errU234U238'
-#                (and 'Th232U238','errTh232U238' if option==2)
-Th230correction <- function(x,option=0,dat=NA,omit4c=NULL){
-    out <- x
-    if (option==1){
-        out <- Th230correction.isochron(x,dat=dat,omit4c=omit4c)
-    } else if (option==2){
-        tt <- get.ThU.age.corals(dat,detritus=2)[,'t']
-        out <- Th230correction.assumed.detritus(x,age=tt,Th02i=dat$Th02i)
-    } else if (option==3){
-        out <- Th230correction.measured.detritus(dat)
-    }
+Th230correction.isochron <- function(td,omit4c=NULL){
+    fit <- titterington(clear(td,omit4c))
+    out <- td
+    out[,'U234U238'] <- td[,'U234U238'] - fit$par['b']*td[,'Th232U238']
+    out[,'Th230U238'] <- td[,'Th230U238'] - fit$par['B']*td[,'Th232U238']
     out
 }
-Th230correction.isochron <- function(x,dat,omit4c=NULL){
-    osmond <- data2tit.ThU(dat,osmond=TRUE)
-    fit <- titterington(clear(osmond,omit4c))
-    out <- x
-    out[,'U234U238'] <- x[,'U234U238'] - fit$par['b']*osmond[,'X']
-    out[,'Th230U238'] <- x[,'Th230U238'] - fit$par['B']*osmond[,'X']
-    out
-}
-Th230correction.assumed.detritus <- function(x,age=Inf,Th02i=c(0,0)){
-    out <- x
+Th230correction.assumed.detritus <- function(td,age=Inf,Th02i=c(0,0)){
+    out <- td
     l0 <- lambda('Th230')[1]
-    A <- Th02i[1]*exp(-l0*age)*x[,'Th232U238']
-    out[,'Th230U238'] <- x[,'Th230U238'] - A
-    dA.dTh02i <- -exp(-l0*age)*x[,'Th232U238']
+    A <- Th02i[1]*exp(-l0*age)*td[,'Th232U238']
+    out[,'Th230U238'] <- td[,'Th230U238'] - A
+    dA.dTh02i <- -exp(-l0*age)*td[,'Th232U238']
     dA.Th2U8 <- -Th02i[1]*exp(-l0*age)
     sA <- errorprop1x2(dA.dTh02i,dA.Th2U8,
-                       Th02i[2]^2,x[,'sTh232U238']^2,0)
-    out[,'sTh230U238'] <- sqrt(x[,'sTh230U238']^2 + sA^2)         
+                       Th02i[2]^2,td[,'sTh232U238']^2,0)
+    out[,'sTh230U238'] <- sqrt(td[,'sTh230U238']^2 + sA^2)         
     out
 }
-Th230correction.measured.detritus <- function(x){
-    Th02U48 <- x$Th02U48
-    osmond <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
-    X1 <- osmond[,'Th232U238']
-    sX1 <- osmond[,'sTh232U238']
-    Y1 <- osmond[,'U234U238']
-    sY1 <- osmond[,'sU234U238']
-    Z1 <- osmond[,'Th230U238']
-    sZ1 <- osmond[,'sTh230U238']
-    rX1Y1 <- osmond[,'rXY']
-    rX1Z1 <- osmond[,'rXZ']
-    rY1Z1 <- osmond[,'rYZ']
+Th230correction.measured.detritus <- function(td,Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+    X1 <- td[,'Th232U238']
+    sX1 <- td[,'sTh232U238']
+    Y1 <- td[,'U234U238']
+    sY1 <- td[,'sU234U238']
+    Z1 <- td[,'Th230U238']
+    sZ1 <- td[,'sTh230U238']
+    rX1Y1 <- td[,'rXY']
+    rX1Z1 <- td[,'rXZ']
+    rY1Z1 <- td[,'rYZ']
     covX1Y1 <- rX1Y1*sX1*sY1
     covX1Z1 <- rX1Z1*sX1*sZ1
     covY1Z1 <- rY1Z1*sY1*sZ1
@@ -518,7 +510,7 @@ Th230correction.measured.detritus <- function(x){
     covaA <- b*B*((r2*sX1)^2+(r1*sX2)^2) +
         (r2^2)*(covY1Z1-B*covX1Y1-b*covX1Z1) +
         (r1^2)*(covY2Z2-B*covX2Y2-b*covX2Z2)
-    out <- osmond
+    out <- td
     out[,'Th230U238'] <- A
     out[,'sTh230U238'] <- sA
     out[,'U234U238'] <- a

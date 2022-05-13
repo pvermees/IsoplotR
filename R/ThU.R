@@ -12,23 +12,23 @@ ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,
 
 get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
                                cor=TRUE,detritus=0,omit4c=NULL){
-    ns <- length(x)
-    out <- matrix(0,ns,5)
+    td <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
     if (detritus==3){
-        d <- Th230correction.measured.detritus(x)
+        td <- Th230correction.measured.detritus(td,Th02U48=x$Th02U48)
     } else {
-        d <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
         if (detritus==1){
-            d <- Th230correction.isochron(d,dat=x,omit4c=omit4c)
+            td <- Th230correction.isochron(td,omit4c=omit4c)
         }
     }
     if (detritus==2) Th02i <- x$Th02i
     else Th02i <- c(0,0)
+    ns <- length(x)
+    out <- matrix(0,ns,5)
     for (j in 1:ns){
-        out[j,] <- get.ThU.age(Th230U238=d[j,'Th230U238'],sTh230U238=d[j,'sTh230U238'],
-                               U234U238=d[j,'U234U238'],sU234U238=d[j,'sU234U238'],
-                               cov4808=d[j,'rYZ']*d[j,'sU234U238']*d[j,'sTh230U238'],
-                               Th232U238=d[j,'Th232U238'],sTh232U238=d[j,'sTh232U238'],
+        out[j,] <- get.ThU.age(Th230U238=td[j,'Th230U238'],sTh230U238=td[j,'sTh230U238'],
+                               U234U238=td[j,'U234U238'],sU234U238=td[j,'sU234U238'],
+                               cov4808=td[j,'rYZ']*td[j,'sU234U238']*td[j,'sTh230U238'],
+                               Th232U238=td[j,'Th232U238'],sTh232U238=td[j,'sTh232U238'],
                                Th230Th232i=Th02i[1],sTh230Th232i=Th02i[2],
                                exterr=exterr,cor=cor)
     }
