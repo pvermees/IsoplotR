@@ -53,15 +53,18 @@
 #' \code{3}: correct the data using the measured present day
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
-#' 
+#'
+#' @param ThUwr The Th/U-ratio of the whole rock. Used to estimate the
+#'     initial \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium. Only
+#'     applicable when \code{x$format} is \code{3} or \code{4}.
 #' @param show.numbers label the error ellipses with the grain
 #'     numbers?
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
 #' @param clabel label of the colour legend.
-#' @param ellipse.fill
-#' Fill colour for the error ellipses. This can either be a single
-#' colour or multiple colours to form a colour ramp. Examples:
+#' @param ellipse.fill Fill colour for the error ellipses. This can
+#'     either be a single colour or multiple colours to form a colour
+#'     ramp. Examples:
 #'
 #' a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
 #' \code{'white'}, etc.;
@@ -82,7 +85,7 @@
 #'     ellipses. Follows the same formatting guidelines as
 #'     \code{ellipse.fill}
 #' @param line.col colour of the age grid
-#' @param isochron fit a 3D isochron to the data?
+#' @param isochron fit an isochron to the data?
 #' @param exterr propagate the decay constant uncertainty in the
 #'     isochron age?
 #' @param sigdig number of significant digits for the isochron age
@@ -266,7 +269,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,ThUwr=NULL,
     d <- data2evolution(x,omit4c=unique(c(hide,omit)))
     d2plot <- subset(d,subset=plotit)
     scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
-    ticks <- c(0,1,10,20,50,100,200,300,Inf)
+    ticks <- c(0,5,10,20,50,100,200,Inf)
     X <- graphics::par('usr')[1:2]
     Y <- X
     minY <- graphics::par('usr')[3]
@@ -322,7 +325,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,ThUwr=NULL,
                                     "232","Th)"[i]*" = 0]"))
             mymtext(tit,line=0,...)
         } else { # add equiline
-            middle <- mean(min(X[1],Y[1]),max(X[2],Y[2]))
+            middle <- max(X[1],minY)/2 + min(X[2],maxY)/2
             graphics::text(middle,middle,'1:1',pos=3)
             lines(X,X)
         }
