@@ -203,9 +203,9 @@
 #'
 #' @param d an object of class \code{\link{diseq}}.
 #' 
-#' @param ThU The Th/U-ratio of the whole rock. Used to estimate the
-#'     initial \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium (for Th-U
-#'     formats 3 and 4).
+#' @param ThU the elemental Th/U-ratio of the whole rock. Used to
+#'     estimate the initial \eqn{^{230}}Th/\eqn{^{238}}U
+#'     disequilibrium (for Th-U formats 3 and 4).
 #'
 #' @param Th02i 2-element vector with the assumed initial
 #'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for
@@ -677,7 +677,7 @@ as.ThU <- function(x,format=1,ierr=1,ThU=0,Th02i=c(0,0),
     class(out) <- "ThU"
     out$x <- NA
     out$format <- format
-    out$ThU <- ThU
+    out$ThU <- ThUc2a(ThU)
     out$Th02i <- Th02i
     out$Th02U48 <- Th02U48
     nc <- ncol(x)

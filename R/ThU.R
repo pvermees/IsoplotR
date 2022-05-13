@@ -182,16 +182,6 @@ get.Th230Th232_0 <- function(tt,Th230Th232,errTh230Th232=0){
     c(Th230Th232_0,errTh230Th232_0)
 }
 
-get.Th230Th232.ratio <- function(tt,Th230Th232_0,U238Th232){
-    l0 <- settings('lambda','Th230')[1]
-    Th230Th232_0 * exp(-l0*tt) + U238Th232 * (1 - exp(-l0*tt))
-}
-
-get.U238Th232.ratio <- function(tt,Th230Th232_0,Th230Th232){
-    l0 <- settings('lambda','Th230')[1]
-    (Th230Th232 - Th230Th232_0 * exp(-l0*tt)) / (1 - exp(-l0*tt))
-}
-
 get.Th230U238.ratio <- function(tt,U234U238_0){
     l4 <- lambda('U234')
     l0 <- lambda('Th230')
