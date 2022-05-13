@@ -140,7 +140,7 @@
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
-                      detritus=0,show.numbers=FALSE,levels=NA,
+                      detritus=0,ThUwr=NULL,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
                       isochron=FALSE,model=1,exterr=TRUE,sigdig=2,
@@ -171,7 +171,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
             graphics::title(evolution.title(fit,sigdig=sigdig))
         }
     } else {
-        Th02vsU8Th2(x,isochron=isochron,model=model,xlim=xlim,
+        Th02vsU8Th2(x,isochron=isochron,ThUwr=ThUwr,model=model,xlim=xlim,
                     ylim=ylim,alpha=alpha,show.numbers=show.numbers,
                     exterr=exterr,sigdig=sigdig,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -252,8 +252,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
-                        alpha=0.05,show.numbers=FALSE,exterr=TRUE,
+Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,ThUwr=NULL,
+                        xlim=NULL,ylim=NULL,alpha=0.05,
+                        show.numbers=FALSE,exterr=TRUE,
                         clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -265,37 +266,39 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
     d <- data2evolution(x,omit4c=unique(c(hide,omit)))
     d2plot <- subset(d,subset=plotit)
     scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
-    ticks <- c(0,1,10,20,50,100,200,300)
+    ticks <- c(0,1,10,20,50,100,200,300,Inf)
     X <- graphics::par('usr')[1:2]
     Y <- X
-    graphics::lines(X,Y,col=line.col,...) # equilibrium line
     minY <- graphics::par('usr')[3]
     maxY <- graphics::par('usr')[4]
     if (isochron){
         fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
-        Th230Th232_0x <- fit$y0[1]
+        anchor <- c(0,fit$a[1])
+    } else if (!is.null(ThUwr)){
+        anchor <- c(ThUwr,ThUwr)
+        ticks <- rev(rev(ticks)[-1]) # removed infinity
     } else {
-        Th230Th232_0x <- 0
+        anchor <- c(0,0)
     }
-    if (maxY<X[2]) # add infinity symbol for equilibrium line
-        graphics::text(maxY,maxY,'\U221E',pos=1,col=line.col)
-    else
-        graphics::text(X[2],X[2],'\U221E',pos=2,col=line.col)
+    l0 <- lambda('Th230')[1]
     for (tick in ticks){ # plot isolines
-        Y <- get.Th230Th232.ratio(tick,Th230Th232_0x,X)
+        if (is.finite(tick)) ticktext <- tick
+        else ticktext <- expression(infinity)
+        slope <- 1-exp(-l0*tick)
+        Y <- anchor[2] + slope*(X-anchor[1])
         graphics::lines(X,Y,col=line.col,...)
         if (Y[2]<minY){
             # do nothing
         } else if (Y[2]>maxY){ # label below upper margin
-            xtext <- get.U238Th232.ratio(tick,Th230Th232_0x,maxY)
+            xtext <- anchor[1] + (maxY-anchor[2])/slope
             ytext <- maxY
-            graphics::text(xtext,ytext,tick,pos=1,col=line.col)
+            graphics::text(xtext,ytext,ticktext,pos=1,col=line.col)
         } else { # label to the left of the right margin
             xtext <- X[2]
             ytext <- Y[2]
-            graphics::text(xtext,ytext,tick,pos=2,col=line.col)
+            graphics::text(xtext,ytext,ticktext,pos=2,col=line.col)
         }
     }
     if (isochron){ # plot the data and isochron line fit
@@ -314,9 +317,15 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
-        tit <- expression(paste("[isochrons assume ("^"230","Th/"^
-                                "232","Th)"[i]*" = 0]"))
-        mymtext(tit,line=0,...)
+        if (is.null(ThUwr)){
+            tit <- expression(paste("[isochrons assume ("^"230","Th/"^
+                                    "232","Th)"[i]*" = 0]"))
+            mymtext(tit,line=0,...)
+        } else { # add equiline
+            middle <- mean(min(X[1],Y[1]),max(X[2],Y[2]))
+            graphics::text(middle,middle,'1:1',pos=3)
+            lines(X,X)
+        }
     }
     colourbar(z=levels[calcit],fill=ellipse.fill,
               stroke=ellipse.stroke,clabel=clabel)
