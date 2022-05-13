@@ -54,9 +54,6 @@
 #' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
 #' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
 #'
-#' @param ThUwr The Th/U-ratio of the whole rock. Used to estimate the
-#'     initial \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium. Only
-#'     applicable when \code{x$format} is \code{3} or \code{4}.
 #' @param show.numbers label the error ellipses with the grain
 #'     numbers?
 #' @param levels a vector with additional values to be displayed as
@@ -143,7 +140,7 @@
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
-                      detritus=0,ThUwr=NULL,show.numbers=FALSE,levels=NA,
+                      detritus=0,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
                       isochron=FALSE,model=1,exterr=TRUE,sigdig=2,
@@ -174,7 +171,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
             graphics::title(evolution.title(fit,sigdig=sigdig))
         }
     } else {
-        Th02vsU8Th2(x,isochron=isochron,ThUwr=ThUwr,model=model,xlim=xlim,
+        Th02vsU8Th2(x,isochron=isochron,model=model,xlim=xlim,
                     ylim=ylim,alpha=alpha,show.numbers=show.numbers,
                     exterr=exterr,sigdig=sigdig,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -255,10 +252,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,ThUwr=NULL,
-                        xlim=NULL,ylim=NULL,alpha=0.05,
-                        show.numbers=FALSE,exterr=TRUE,
-                        clabel="",levels=NA,
+Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
+                        alpha=0.05,show.numbers=FALSE,
+                        exterr=TRUE,clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
                         line.col='darksalmon',hide=NULL,omit=NULL,
@@ -279,8 +275,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,ThUwr=NULL,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
         anchor <- c(0,fit$a[1])
-    } else if (!is.null(ThUwr)){
-        anchor <- c(ThUwr,ThUwr)
+    } else if (x$ThU>0){
+        anchor <- rep(x$ThU,2)
         ticks <- rev(rev(ticks)[-1]) # removed infinity
     } else {
         anchor <- c(0,0)
@@ -320,14 +316,14 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,ThUwr=NULL,
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
-        if (is.null(ThUwr)){
-            tit <- expression(paste("[isochrons assume ("^"230","Th/"^
-                                    "232","Th)"[i]*" = 0]"))
-            mymtext(tit,line=0,...)
-        } else { # add equiline
+        if (x$ThU>0){
             middle <- max(X[1],minY)/2 + min(X[2],maxY)/2
             graphics::text(middle,middle,'1:1',pos=3)
             lines(X,X)
+        } else { # add equiline
+            tit <- expression(paste("[isochrons assume ("^"230","Th/"^
+                                    "232","Th)"[i]*" = 0]"))
+            mymtext(tit,line=0,...)
         }
     }
     colourbar(z=levels[calcit],fill=ellipse.fill,
