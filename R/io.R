@@ -1,4 +1,3 @@
-
 #' @title Read geochronology data
 #'
 #' @description
@@ -204,7 +203,7 @@
 #'
 #' @param d an object of class \code{\link{diseq}}.
 #' 
-#' @param Th02 2-element vector with the assumed initial
+#' @param Th02i 2-element vector with the assumed initial
 #'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for
 #'     formats 1 and 2) or rock (for formats 3 and 4) and its standard
 #'     error.
@@ -267,22 +266,22 @@ read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
 read.data.default <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
-                              Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                              Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
     read.data.matrix(X,method=method,format=format,ierr=ierr,d=d,
-                     Th02=Th02,Th02U48=Th02U48)
+                     Th02i=Th02i,Th02U48=Th02U48)
 }
 #' @rdname read.data
 #' @export
 read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
-                                 Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                                 Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     read.data.matrix(as.matrix(x),method=method,format=format,
-                     ierr=ierr,d=d,Th02=Th02,Th02U48=Th02U48,...)
+                     ierr=ierr,d=d,Th02i=Th02i,Th02U48=Th02U48,...)
 }
 #' @rdname read.data
 #' @export
 read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
-                             Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
+                             Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format=format,ierr=ierr,d=d)
     } else if (identical(method,'Pb-Pb')){
@@ -302,7 +301,7 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
     } else if (identical(method,'Lu-Hf')){
         out <- as.LuHf(x,format=format,ierr=ierr)
     } else if (identical(method,'Th-U')){
-        out <- as.ThU(x,format=format,ierr=ierr,Th02=Th02,Th02U48=Th02U48)
+        out <- as.ThU(x,format=format,ierr=ierr,Th02i=Th02i,Th02U48=Th02U48)
     } else if (identical(method,'U-Th-He')){
         out <- as.UThHe(x,ierr=ierr)
     } else if (identical(method,'fissiontracks')){
@@ -666,12 +665,12 @@ as.PD <- function(x,classname,cnames,format,ierr){
     out$x <- insert.data(x=X,cnames=cnames,opt=opt)
     out
 }
-as.ThU <- function(x,format=1,ierr=1,Th02=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+as.ThU <- function(x,format=1,ierr=1,Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     out <- list()
     class(out) <- "ThU"
     out$x <- NA
     out$format <- format
-    out$Th02 <- Th02
+    out$Th02i <- Th02i
     out$Th02U48 <- Th02U48
     nc <- ncol(x)
     nr <- nrow(x)

@@ -315,7 +315,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
         tit <- expression(paste("[isochrons assume ("^"230","Th/"^
-                                "232","Th)"[i]" = 0]"))
+                                "232","Th)"[i]*" = 0]"))
         mymtext(tit,line=0,...)
     }
     colourbar(z=levels[calcit],fill=ellipse.fill,
@@ -451,7 +451,7 @@ Th230correction <- function(x,option=0,dat=NA,omit4c=NULL){
         out <- Th230correction.isochron(x,dat=dat,omit4c=omit4c)
     } else if (option==2){
         tt <- get.ThU.age.corals(dat,detritus=2)[,'t']
-        out <- Th230correction.assumed.detritus(x,age=tt,Th02=dat$Th02)
+        out <- Th230correction.assumed.detritus(x,age=tt,Th02i=dat$Th02i)
     } else if (option==3){
         out <- Th230correction.measured.detritus(dat)
     }
@@ -465,15 +465,15 @@ Th230correction.isochron <- function(x,dat,omit4c=NULL){
     out[,'Th230U238'] <- x[,'Th230U238'] - fit$par['B']*osmond[,'X']
     out
 }
-Th230correction.assumed.detritus <- function(x,age=Inf,Th02=c(0,0)){
+Th230correction.assumed.detritus <- function(x,age=Inf,Th02i=c(0,0)){
     out <- x
     l0 <- lambda('Th230')[1]
-    A <- Th02[1]*exp(-l0*age)*x[,'Th232U238']
+    A <- Th02i[1]*exp(-l0*age)*x[,'Th232U238']
     out[,'Th230U238'] <- x[,'Th230U238'] - A
-    dA.dTh02 <- -exp(-l0*age)*x[,'Th232U238']
-    dA.Th2U8 <- -Th02[1]*exp(-l0*age)
-    sA <- errorprop1x2(dA.dTh02,dA.Th2U8,
-                       Th02[2]^2,x[,'sTh232U238']^2,0)
+    dA.dTh02i <- -exp(-l0*age)*x[,'Th232U238']
+    dA.Th2U8 <- -Th02i[1]*exp(-l0*age)
+    sA <- errorprop1x2(dA.dTh02i,dA.Th2U8,
+                       Th02i[2]^2,x[,'sTh232U238']^2,0)
     out[,'sTh230U238'] <- sqrt(x[,'sTh230U238']^2 + sA^2)         
     out
 }

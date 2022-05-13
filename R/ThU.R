@@ -1,7 +1,6 @@
 ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,
                     cor=TRUE,detritus=0,omit4c=NULL){
     if (x$format %in% c(1,2)){
-        ns <- length(x)
         out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
                                   cor=cor,detritus=detritus,omit4c=omit4c)
     } else {
@@ -23,14 +22,14 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
             d <- Th230correction.isochron(d,dat=x,omit4c=omit4c)
         }
     }
-    if (detritus==2) Th02 <- x$Th02
-    else Th02 <- c(0,0)
+    if (detritus==2) Th02i <- x$Th02i
+    else Th02i <- c(0,0)
     for (j in 1:ns){
         out[j,] <- get.ThU.age(Th230U238=d[j,'Th230U238'],sTh230U238=d[j,'sTh230U238'],
                                U234U238=d[j,'U234U238'],sU234U238=d[j,'sU234U238'],
                                cov4808=d[j,'rYZ']*d[j,'sU234U238']*d[j,'sTh230U238'],
                                Th232U238=d[j,'Th232U238'],sTh232U238=d[j,'sTh232U238'],
-                               Th230Th232d=Th02[1],sTh230Th232d=Th02[2],
+                               Th230Th232i=Th02i[1],sTh230Th232i=Th02i[2],
                                exterr=exterr,cor=cor)
     }
     if (!is.na(sigdig)){
@@ -51,7 +50,7 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,
         fit <- isochron.ThU(x,type=2,plot=FALSE,exterr=FALSE,omit=omit4c)
         Th02 <- fit$b
     } else {
-        Th02 <- x$Th02
+        Th02 <- x$Th02i
     }
     d[,'Th230U238'] <- d[,'Th230U238'] - Th02[1]*d[,'Th232U238']
     out <- matrix(0,ns,2)
@@ -68,7 +67,7 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,
 get.ThU.age <- function(Th230U238,sTh230U238,
                         U234U238=1,sU234U238=0,cov4808=0,
                         Th232U238=0,sTh232U238=0,
-                        Th230Th232d=0,sTh230Th232d=0,
+                        Th230Th232i=0,sTh230Th232i=0,
                         exterr=TRUE,cor=FALSE,jacobian=FALSE){
     l0 <- lambda('Th230')
     l4 <- lambda('U234')
@@ -79,7 +78,7 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     covAa <- cov4808
     fit <- stats::optimize(ThU.misfit,interval=c(0,2000),
                            A=A,a=a,l0=l0,l4=l4,
-                           Th2U8=Th232U238,Th02d=Th230Th232d)
+                           Th2U8=Th232U238,Th02i=Th230Th232i)
     tt <- fit$minimum
     a0 <- 1+(a-1)*exp(l4[1]*tt)
     l40 <- l4[1]-l0[1]
@@ -93,14 +92,14 @@ get.ThU.age <- function(Th230U238,sTh230U238,
     dD.dl0 <- (a-1)*dk1.dl0 - tt*exp(-l0[1]*tt)
     dD.dl4 <- (a-1)*dk1.dl4
     dD.dt <- (a-1)*dk1.dt - l0[1]*exp(-l0[1]*tt)
-    dD.dTh2U8 <- -exp(-l0[1]*tt)*Th230Th232d
-    dD.dTh02d <- -exp(-l0[1]*tt)*Th232U238
+    dD.dTh2U8 <- -exp(-l0[1]*tt)*Th230Th232i
+    dD.dTh02i <- -exp(-l0[1]*tt)*Th232U238
     dt.da <- -dD.da/dD.dt
     dt.dA <- -dD.dA/dD.dt
     dt.dl0 <- -dD.dl0/dD.dt
     dt.dl4 <- -dD.dl4/dD.dt
     dt.dTh2U8 <- -dD.dTh2U8/dD.dt
-    dt.dTh02d <- -dD.dTh02d/dD.dt
+    dt.dTh02i <- -dD.dTh02i/dD.dt
     da0.da <- el4t + (a-1)*l4[1]*dt.da*el4t
     da0.dA <- (a-1)*l4[1]*dt.dA*el4t
     da0.dl0 <- (a-1)*l4[1]*dt.dl0*el4t
@@ -114,12 +113,12 @@ get.ThU.age <- function(Th230U238,sTh230U238,
         J[1,3] <- dt.dl0
         J[1,4] <- dt.dl4
         J[1,5] <- dt.dTh2U8
-        J[1,6] <- dt.dTh02d
+        J[1,6] <- dt.dTh02i
         J[2,3] <- da0.dl0
         J[2,4] <- da0.dl4
     }
     E <- matrix(0,6,6)
-    diag(E) <- c(sa,sA,l0[2],l4[2],sTh232U238,sTh230Th232d)^2
+    diag(E) <- c(sa,sA,l0[2],l4[2],sTh232U238,sTh230Th232i)^2
     E[1,2] <- covAa
     E[2,1] <- E[1,2]
     covmat <- J %*% E %*% t(J)
@@ -141,8 +140,8 @@ get.ThU.age <- function(Th230U238,sTh230U238,
 k1 <- function(tt,l0,l4){
     (1-exp((l4[1]-l0[1])*tt))*l0[1]/(l4[1]-l0[1])
 }
-ThU.misfit <- function(tt,A,a,l0,l4,Th2U8=0,Th02d=0){
-    ( 1 - exp(-l0[1]*tt)*(1-Th2U8*Th02d) - (a-1)*k1(tt,l0,l4) - A )^2
+ThU.misfit <- function(tt,A,a,l0,l4,Th2U8=0,Th02i=0){
+    ( 1 - exp(-l0[1]*tt)*(1-Th2U8*Th02i) - (a-1)*k1(tt,l0,l4) - A )^2
 }
 
 # converts format 1 to format 2 and vice versa
