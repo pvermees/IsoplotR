@@ -457,7 +457,7 @@ data2evolution <- function(x,Th0i=0,omit4c=NULL){
         } else if (Th0i==2){
             out <- Th230correction.measured.detritus(td,Th02U48=x$Th02U48)
         } else if (Th0i==3){
-            tt <- get.ThU.age.corals(x,Th0i=2)[,'t']
+            tt <- get.ThU.age.corals(x,Th0i=Th0i)[,'t']
             out <- Th230correction.assumed.detritus(td,age=tt,Th02i=x$Th02i)
         } else {
             out <- td
