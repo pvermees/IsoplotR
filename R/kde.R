@@ -297,13 +297,11 @@ kde.ThPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 kde.ThU <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,rug=TRUE,xlab="age [ka]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                    show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,
-                    Th0i=0,hide=NULL,...){
-    kde_helper(x,i2i=i2i,Th0i=Th0i,from=from,to=to,bw=bw,
-               adaptive=adaptive,log=log,n=n,plot=plot,rug=rug,
-               xlab=xlab,ylab=ylab,kde.col=kde.col,
-               hist.col=hist.col,show.hist=show.hist,bty=bty,
-               binwidth=binwidth,hide=hide,...)
+                    show.hist=TRUE,bty='n',binwidth=NA,Th0i=0,hide=NULL,...){
+    kde_helper(x,Th0i=Th0i,from=from,to=to,bw=bw,adaptive=adaptive,
+               log=log,n=n,plot=plot,rug=rug,xlab=xlab,ylab=ylab,
+               kde.col=kde.col,hist.col=hist.col,show.hist=show.hist,
+               bty=bty,binwidth=binwidth,hide=hide,...)
 }
 #' @rdname kde
 #' @export

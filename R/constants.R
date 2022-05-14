@@ -34,7 +34,7 @@ mindens <- function(mineral,x=NULL){
     invisible(old)
 }
 
-#' @title Load settings to and from json
+#' @title Retrieve and record global settings
 #'
 #' @description
 #' Get and set preferred values for decay constants, isotopic

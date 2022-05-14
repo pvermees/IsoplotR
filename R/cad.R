@@ -188,8 +188,8 @@ cad.ThPb <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @rdname cad
 #' @export
 cad.ThU <- function(x,pch=NA,verticals=TRUE, xlab='age [ka]',
-                    col='black',i2i=FALSE,Th0i=0,hide=NULL,...){
-    cad_helper(x,i2i=i2i,Th0i=Th0i,pch=pch,verticals=verticals,
+                    col='black',Th0i=0,hide=NULL,...){
+    cad_helper(x,Th0i=Th0i,pch=pch,verticals=verticals,
                xlab=xlab,col=col,hide=hide,...)
 }
 #' @rdname cad

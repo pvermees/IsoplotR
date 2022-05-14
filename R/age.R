@@ -293,9 +293,7 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
 #'     \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
 #'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
 #'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}. When applied to data
-#'     of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
-#'     a detrital Th-correction.
+#'     stored in \code{settings('iratio',...)}.
 #'
 #' @rdname age
 #' @export
@@ -361,7 +359,7 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
 #' 
 #' @rdname age
 #' @export
-age.ThU <- function(x,isochron=FALSE,Th0i=TRUE,exterr=FALSE,i=NA,sigdig=NA,...){
+age.ThU <- function(x,isochron=FALSE,Th0i=0,exterr=FALSE,i=NA,sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
     else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,Th0i=Th0i,...)
     out

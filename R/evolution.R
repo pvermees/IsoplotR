@@ -5,7 +5,7 @@
 #' diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or (if
 #' \eqn{^{234}}U/\eqn{^{238}}U is assumed to be in secular
 #' equilibrium), a
-#' \eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram;
 #' calculates isochron ages.
 #'
 #' @details
@@ -66,7 +66,7 @@
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
 #' @param clabel label of the colour legend.
-#' @param ellipse.fill Fill colour for the error ellipses. This can
+#' @param ellipse.fill fill colour for the error ellipses. This can
 #'     either be a single colour or multiple colours to form a colour
 #'     ramp. Examples:
 #'
@@ -324,7 +324,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         graphics::title(xlab=xlab,ylab=ylab)
         if (Th0i==0){
             tit <- expression(paste("[isochrons assume ("^"230","Th/"^
-                                    "232","Th)"[i]*" = 0]"))
+                                    "232","Th)"[0]*" = 0]"))
             mymtext(tit,line=0,...)
         }
         if (Th0i==2){ # add equiline

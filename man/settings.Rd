@@ -2,7 +2,7 @@
 % Please edit documentation in R/constants.R
 \name{settings}
 \alias{settings}
-\title{Load settings to and from json}
+\title{Retrieve and record global settings}
 \usage{
 settings(setting = NA, ..., fname = NA, reset = FALSE)
 }

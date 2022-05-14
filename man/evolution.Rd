@@ -70,7 +70,7 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label of the colour legend.}
 
-\item{ellipse.fill}{Fill colour for the error ellipses. This can
+\item{ellipse.fill}{fill colour for the error ellipses. This can
     either be a single colour or multiple colours to form a colour
     ramp. Examples:
 
@@ -148,7 +148,7 @@ Plots Th-U data on a
 diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or (if
 \eqn{^{234}}U/\eqn{^{238}}U is assumed to be in secular
 equilibrium), a
-\eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
+\eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram;
 calculates isochron ages.
 }
 \details{

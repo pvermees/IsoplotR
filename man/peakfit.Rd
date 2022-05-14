@@ -299,10 +299,10 @@ Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
 mixed fission track ages. Nuclear Tracks and Radiation
 Measurements, 21(4), pp.459-470.
 
-van der Touw, J., Galbraith, R., and Laslett, G. A logistic
-truncated normal mixture model for overdispersed binomial
+van der Touw, J., Galbraith, R., and Laslett, G. A., 1997.
+Logistic truncated normal mixture model for overdispersed binomial
 data. Journal of Statistical Computation and Simulation,
-59(4):349-373, 1997.
+59(4), pp.349-373.
 }
 \seealso{
 \code{\link{radialplot}}, \code{\link{central}}

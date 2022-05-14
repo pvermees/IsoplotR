@@ -104,7 +104,6 @@ cad(x, ...)
   verticals = TRUE,
   xlab = "age [ka]",
   col = "black",
-  i2i = FALSE,
   Th0i = 0,
   hide = NULL,
   ...

@@ -78,7 +78,7 @@ age(x, ...)
 
 \method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA, exterr = TRUE, ...)
 
-\method{age}{ThU}(x, isochron = FALSE, Th0i = TRUE, exterr = FALSE, i = NA, sigdig = NA, ...)
+\method{age}{ThU}(x, isochron = FALSE, Th0i = 0, exterr = FALSE, i = NA, sigdig = NA, ...)
 
 \method{age}{ThPb}(
   x,
@@ -296,9 +296,7 @@ the output.}
 \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
 \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
 fit. Setting \code{i2i} to \code{FALSE} uses the default values
-stored in \code{settings('iratio',...)}. When applied to data
-of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
-a detrital Th-correction.}
+stored in \code{settings('iratio',...)}.}
 
 \item{central}{logical flag indicating whether each analysis should
 be considered separately (\code{central=FALSE}) or a central

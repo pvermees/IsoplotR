@@ -195,7 +195,6 @@ kde(x, ...)
   show.hist = TRUE,
   bty = "n",
   binwidth = NA,
-  i2i = FALSE,
   Th0i = 0,
   hide = NULL,
   ...
