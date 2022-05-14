@@ -490,16 +490,12 @@ get.5678.misfit <- function(obs,pred){
 
 meas.diseq.maxt <- function(d){
     if (d$ThU$option==2){
-        misfit <- function(tt,d){
-            mclean(tt=tt,d=d)$ThUi^2
-        }
-        out <- stats::optimise(misfit,c(0,1),d=d)$minimum
+        out <- stats::optimise(function(tt,d) mclean(tt=tt,d=d)$ThUi^2,
+                               c(0,1),d=d)$minimum
     } else if (d$U48$option==2){
-        misfit <- function(tt,d,maxU48){
-            (mclean(tt=tt,d=d)$U48i-maxU48)^2
-        }
         M <- ifelse(d$U48$x<1,0,500)
-        out <- stats::optimise(misfit,c(0,10),d=d,maxU48=M)$minimum
+        out <- stats::optimise(function(tt,d,maxU48) (mclean(tt=tt,d=d)$U48i-maxU48)^2,
+                               c(0,10),d=d,maxU48=M)$minimum
     } else {
         out <- 4500
     }

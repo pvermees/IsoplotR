@@ -330,8 +330,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         if (Th0i==2){ # add equiline
             middle <- max(X[1],minY)/2 + min(X[2],maxY)/2
             graphics::text(middle,middle,'1:1',pos=3)
-            lines(X,X)
-            points(x$U8Th2,x$U8Th2,pch=16)
+            graphics::lines(X,X)
+            graphics::points(x$U8Th2,x$U8Th2,pch=16)
         }
     }
     colourbar(z=levels[calcit],fill=ellipse.fill,

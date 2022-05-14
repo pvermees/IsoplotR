@@ -8,7 +8,7 @@ irr.default <- function(x,alpha=0.05,...){
     g <- log((v-a)/b)
     init <- c(a,b,g)
     XYZ <- york2clr(x)
-    fit <- optim(init,LL.irr.generic,XYZ=XYZ)
+    fit <- stats::optim(init,LL.irr.generic,XYZ=XYZ)
 }
 irr.PD <- function(x,alpha=0.05,inverse=FALSE,...){
     

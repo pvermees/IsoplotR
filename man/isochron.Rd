@@ -508,7 +508,7 @@ If \code{inverse=FALSE}, then \code{X} =
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 
 \item{y0option}{controls the type of initial activity ratio that is
-    reported along the 3D isochron age. Only relevant to Th-U data
+    reported along with the 3D isochron age. Only relevant to Th-U data
     format 1 and 2. Set to:
 
 \code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,

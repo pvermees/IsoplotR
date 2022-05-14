@@ -4,7 +4,7 @@ ThU.age <- function(x,exterr=FALSE,i=NA,Th0i=0,sigdig=NA,
         out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
                                   cor=cor,Th0i=Th0i,omit4c=omit4c)
     } else {
-        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,Th0i=0,
+        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,Th0i=Th0i,
                                      sigdig=sigdig,omit4c=omit4c)
     }
     out
