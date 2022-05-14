@@ -40,19 +40,26 @@
 #'     confidence intervals
 #' @param transform if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 #'     vs. Th-U age.
-#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format} is \code{1} or \code{2}).
+#' @param Th0i initial \eqn{^{230}}Th correction.
 #'
 #' \code{0}: no correction
 #'
-#' \code{1}: project the data along an isochron fit
+#' \code{1}: if \code{x$format} is \code{1} or \code{2}, project the
+#' data along an isochron fit. If \code{x$format} is \code{3} or
+#' \code{4}, infer the initial \eqn{^{230}}Th/\eqn{^{238}}U activity
+#' ratio from the isochron.
 #'
-#' \code{2}: correct the data using an assumed initial
-#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#' \code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+#' data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+#' \eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratios in the detritus. If \code{x$format} is \code{3} or
+#' \code{4}, anchor the isochrons to the equiline, based on the
+#' measured \eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole
+#' rock, as stored in \code{x} by the \code{read.data()} function.
 #'
-#' \code{3}: correct the data using the measured present day
-#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#' \code{3}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+#' if \code{x$format} is \code{1} or \code{2}).
 #'
 #' @param show.numbers label the error ellipses with the grain
 #'     numbers?
@@ -140,15 +147,14 @@
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
-                      detritus=0,show.numbers=FALSE,levels=NA,
+                      Th0i=0,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
                       isochron=FALSE,model=1,exterr=TRUE,sigdig=2,
-                      hide=NULL,omit=NULL,omit.fill=NA,
-                      omit.stroke='grey',...){
+                      hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (x$format %in% c(1,2)){
         if (transform){
-            U4U8vst(x,detritus=detritus,xlim=xlim,ylim=ylim,alpha=alpha,
+            U4U8vst(x,Th0i=Th0i,xlim=xlim,ylim=ylim,alpha=alpha,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
@@ -156,7 +162,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
-                        ylim=ylim,alpha=alpha,detritus=detritus,
+                        ylim=ylim,alpha=alpha,Th0i=Th0i,
                         show.numbers=show.numbers,levels=levels,
                         clabel=clabel,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,
@@ -171,17 +177,17 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
             graphics::title(evolution.title(fit,sigdig=sigdig))
         }
     } else {
-        Th02vsU8Th2(x,isochron=isochron,model=model,xlim=xlim,
-                    ylim=ylim,alpha=alpha,show.numbers=show.numbers,
+        Th02vsU8Th2(x,isochron=isochron,model=model,Th0i=Th0i,
+                    xlim=xlim,ylim=ylim,alpha=alpha,show.numbers=show.numbers,
                     exterr=exterr,sigdig=sigdig,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
-                    ellipse.stroke=ellipse.stroke,
-                    line.col=line.col,hide=hide,omit=omit,
-                    omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+                    ellipse.stroke=ellipse.stroke,line.col=line.col,
+                    hide=hide,omit=omit,omit.fill=omit.fill,
+                    omit.stroke=omit.stroke,...)
     }
 }
 
-U4U8vst <- function(x,detritus=0,xlim=NULL,ylim=NULL,alpha=0.05,
+U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,alpha=0.05,
                     show.numbers=FALSE,levels=NA,clabel="",
                     ellipse.fill=c("#00FF0080","#FF000080"),
                     ellipse.stroke='black',show.ellipses=TRUE,
@@ -189,7 +195,7 @@ U4U8vst <- function(x,detritus=0,xlim=NULL,ylim=NULL,alpha=0.05,
                     omit.stroke='grey',...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
-    ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,detritus=detritus)
+    ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,Th0i=Th0i)
     nsd <- 3
     if (is.null(xlim))
         xlim <- range(c(ta0[plotit,'t']-nsd*ta0[plotit,'s[t]'],
@@ -210,7 +216,7 @@ U4U8vst <- function(x,detritus=0,xlim=NULL,ylim=NULL,alpha=0.05,
                 omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 
-U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
+U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
                         xlim=NULL,ylim=NULL,alpha=0.05,
                         show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
@@ -220,7 +226,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    y <- data2evolution(x,detritus=detritus,omit4c=unique(c(hide,omit)))
+    y <- data2evolution(x,Th0i=Th0i,omit4c=unique(c(hide,omit)))
     d2plot <- subset(y,subset=plotit)
     lim <- evolution.lines(d2plot,xlim=xlim,ylim=ylim,...)
     if (isochron){
@@ -252,8 +258,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,detritus=0,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
-                        alpha=0.05,show.numbers=FALSE,
+Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
+                        ylim=NULL,alpha=0.05,show.numbers=FALSE,
                         exterr=TRUE,clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -270,14 +276,14 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
     Y <- X
     minY <- graphics::par('usr')[3]
     maxY <- graphics::par('usr')[4]
-    if (isochron){
+    if (isochron|Th0i==1){
         fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
         anchor <- c(0,fit$a[1])
-    } else if (x$Th2U8>0){
-        anchor <- rep(x$Th2U8,2)
-        ticks <- rev(rev(ticks)[-1]) # removed infinity
+    } else if (Th0i==2){
+        anchor <- rep(x$U8Th2,2)
+        ticks <- rev(rev(ticks)[-1]) # remove infinity
     } else {
         anchor <- c(0,0)
     }
@@ -316,14 +322,16 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
-        if (x$Th2U8>0){
-            middle <- max(X[1],minY)/2 + min(X[2],maxY)/2
-            graphics::text(middle,middle,'1:1',pos=3)
-            lines(X,X)
-        } else { # add equiline
+        if (Th0i==0){
             tit <- expression(paste("[isochrons assume ("^"230","Th/"^
                                     "232","Th)"[i]*" = 0]"))
             mymtext(tit,line=0,...)
+        }
+        if (Th0i==2){ # add equiline
+            middle <- max(X[1],minY)/2 + min(X[2],maxY)/2
+            graphics::text(middle,middle,'1:1',pos=3)
+            lines(X,X)
+            points(x$U8Th2,x$U8Th2,pch=16)
         }
     }
     colourbar(z=levels[calcit],fill=ellipse.fill,
@@ -439,18 +447,18 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
     rbind(xlim,ylim)
 }
 
-data2evolution <- function(x,detritus=0,omit4c=NULL){
+data2evolution <- function(x,Th0i=0,omit4c=NULL){
     ns <- length(x)
     out <- matrix(0,ns,5)
     if (x$format %in% c(1,2)){
         td <- data2tit(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
-        if (detritus==1){
+        if (Th0i==1){
             out <- Th230correction.isochron(td,omit4c=omit4c)
-        } else if (detritus==2){
-            tt <- get.ThU.age.corals(x,detritus=2)[,'t']
-            out <- Th230correction.assumed.detritus(td,age=tt,Th02i=x$Th02i)
-        } else if (detritus==3){
+        } else if (Th0i==2){
             out <- Th230correction.measured.detritus(td,Th02U48=x$Th02U48)
+        } else if (Th0i==3){
+            tt <- get.ThU.age.corals(x,Th0i=2)[,'t']
+            out <- Th230correction.assumed.detritus(td,age=tt,Th02i=x$Th02i)
         } else {
             out <- td
         }

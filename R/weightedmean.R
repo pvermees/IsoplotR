@@ -330,19 +330,24 @@ weightedmean.PbPb <- function(x,random.effects=FALSE,
 #' around the isochron, and one should be careful not to
 #' over-interpret the numerical output.
 #' 
-#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format=1} or \code{2}).
+#' @param Th0i initial \eqn{^{230}}Th correction.
 #'
 #' \code{0}: no correction
 #'
 #' \code{1}: project the data along an isochron fit
 #'
-#' \code{2}: correct the data using an assumed initial
-#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#' \code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+#' data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+#' \eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratios in the detritus. If \code{x$format} is \code{3} or
+#' \code{4}, correct the data using the measured
+#' \eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+#' stored in \code{x} by the \code{read.data()} function.
 #'
-#' \code{3}: correct the data using the measured present day
-#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#' \code{3}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+#' if \code{x$format} is \code{1} or \code{2}).
+#' 
 #' @rdname weightedmean
 #' @export
 weightedmean.ThU <- function(x,random.effects=FALSE,
@@ -350,14 +355,14 @@ weightedmean.ThU <- function(x,random.effects=FALSE,
                              to=NA,levels=NA,clabel="",
                              rect.col=c("#00FF0080","#FF000080"),
                              outlier.col="#00FFFF80",sigdig=2,
-                             alpha=0.05,ranked=FALSE,i2i=TRUE,
-                             detritus=0,hide=NULL,omit=NULL,omit.col=NA,...){
+                             alpha=0.05,ranked=FALSE,Th0i=0,
+                             hide=NULL,omit=NULL,omit.col=NA,...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,alpha=alpha,ranked=ranked,
-                        i2i=i2i,units='ka',detritus=detritus,hide=hide,
+                        Th0i=Th0i,units='ka',hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -530,11 +535,11 @@ weightedmean_helper <- function(x,random.effects=FALSE,
                                 cutoff.76=1100,cutoff.disc=discfilter(),
                                 sigdig=2,alpha=0.05,exterr=TRUE,
                                 ranked=FALSE,i2i=FALSE,common.Pb=1,
-                                units='',detritus=0,hide=NULL,
+                                units='',Th0i=0,hide=NULL,
                                 omit=NULL,omit.col=NA,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,omit4c=unique(c(hide,omit)),
-                   common.Pb=common.Pb,detritus=detritus)
+                   common.Pb=common.Pb,Th0i=Th0i)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 alpha=alpha,plot=FALSE,hide=hide,
@@ -549,7 +554,7 @@ weightedmean_helper <- function(x,random.effects=FALSE,
                           sigdig=sigdig,alpha=alpha,units=units,
                           ranked=ranked,hide=hide,
                           omit=omit,omit.col=omit.col,
-                          caveat=(i2i|common.Pb==2|detritus==1),...)
+                          caveat=(i2i|common.Pb==2|Th0i==1),...)
     }
     invisible(out)
 }

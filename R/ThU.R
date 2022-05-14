@@ -1,26 +1,26 @@
-ThU.age <- function(x,exterr=FALSE,i=NA,i2i=FALSE,sigdig=NA,
-                    cor=TRUE,detritus=0,omit4c=NULL){
+ThU.age <- function(x,exterr=FALSE,i=NA,Th0i=0,sigdig=NA,
+                    cor=TRUE,omit4c=NULL){
     if (x$format %in% c(1,2)){
         out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
-                                  cor=cor,detritus=detritus,omit4c=omit4c)
+                                  cor=cor,Th0i=Th0i,omit4c=omit4c)
     } else {
-        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,i2i=i2i,
+        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,Th0i=0,
                                      sigdig=sigdig,omit4c=omit4c)
     }
     out
 }
 
 get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
-                               cor=TRUE,detritus=0,omit4c=NULL){
+                               cor=TRUE,Th0i=0,omit4c=NULL){
     td <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
-    if (detritus==3){
+    if (Th0i==2){
         td <- Th230correction.measured.detritus(td,Th02U48=x$Th02U48)
     } else {
-        if (detritus==1){
+        if (Th0i==1){
             td <- Th230correction.isochron(td,omit4c=omit4c)
         }
     }
-    if (detritus==2) Th02i <- x$Th02i
+    if (Th0i==3) Th02i <- x$Th02i
     else Th02i <- c(0,0)
     ns <- length(x)
     out <- matrix(0,ns,5)
@@ -42,17 +42,18 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
     out
 }
 
-get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,
-                                  sigdig=NA,omit4c=NULL){
+get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,Th0i=0,sigdig=NA,omit4c=NULL){
     ns <- length(x)
     d <- data2york(x,type=2,generic=FALSE)
-    if (i2i){
+    if (Th0i==1){
         fit <- isochron.ThU(x,type=2,plot=FALSE,exterr=FALSE,omit=omit4c)
-        Th02 <- fit$b
-    } else if (x$ThU>0){
-        Th02 <- x$Th02i
+        Th02 <- fit$b[1]
+    } else if (Th0i==2){
+        Th02 <- (1-d[,'Th230U238'])/(1/x$U8Th2-d[,'Th232U238'])
+    } else {
+        Th02 <- 0
     }
-    d[,'Th230U238'] <- d[,'Th230U238'] - Th02[1]*d[,'Th232U238']
+    d[,'Th230U238'] <- d[,'Th230U238'] - Th02*d[,'Th232U238']
     out <- matrix(0,ns,2)
     for (j in 1:ns){
         tst <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],exterr=exterr)

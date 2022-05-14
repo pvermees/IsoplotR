@@ -403,50 +403,49 @@ radialplot.LuHf <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                exterr=exterr,i2i=i2i,alpha=alpha,hide=hide,
                omit=omit,omit.col=omit.col,...)
 }
-#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format == 1} or \code{2}).
+#' @param Th0i initial \eqn{^{230}}Th correction.
 #'
 #' \code{0}: no correction
 #'
 #' \code{1}: project the data along an isochron fit
 #'
-#' \code{2}: correct the data using an assumed initial
-#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#' \code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+#' data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+#' \eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratios in the detritus. If \code{x$format} is \code{3} or
+#' \code{4}, correct the data using the measured
+#' \eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+#' stored in \code{x} by the \code{read.data()} function.
 #'
-#' \code{3}: correct the data using the measured present day
-#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#' \code{3}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+#' if \code{x$format} is \code{1} or \code{2}).
+#' 
 #' @rdname radialplot
 #' @export
 radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                            transformation='log',show.numbers=FALSE,
-                           pch=21,levels=NA,clabel="",
-                           bg=c("yellow","red"),col='black',markers=NULL,
-                           k=0,i2i=FALSE,alpha=0.05,detritus=0,
+                           pch=21,levels=NA,clabel="",bg=c("yellow","red"),
+                           col='black',markers=NULL,k=0,Th0i=0,alpha=0.05,
                            hide=NULL,omit=NULL,omit.col=NA,...){
-    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
-               transformation=transformation,
-               show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               exterr=FALSE,i2i=i2i,alpha=alpha,units='ka',
-               detritus=detritus,hide=hide,omit=omit,omit.col=omit.col,...)
+    age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,transformation=transformation,
+               show.numbers=show.numbers,pch=pch,levels=levels,clabel=clabel,bg=bg,
+               col=col,markers=markers,k=k,exterr=FALSE,Th0i=Th0i,alpha=alpha,
+               units='ka',hide=hide,omit=omit,omit.col=omit.col,...)
 }
-age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
-                       type=4,cutoff.76=1100,cutoff.disc=discfilter(),
+age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',type=4,
+                       cutoff.76=1100,cutoff.disc=discfilter(),
                        show.numbers=FALSE,pch=21,levels=NA,sigdig=2,
-                       clabel="",bg=c("yellow","red"),col='black',
-                       markers=NULL,k=0,exterr=TRUE,i2i=FALSE,
-                       common.Pb=0,alpha=0.05,units='Ma',detritus=0,
-                       hide=NULL,omit=NULL,omit.col=NA,...){
+                       clabel="",bg=c("yellow","red"),col='black',markers=NULL,
+                       k=0,exterr=TRUE,i2i=FALSE,Th0i=0,common.Pb=0,alpha=0.05,
+                       units='Ma',hide=NULL,omit=NULL,omit.col=NA,...){
     x2calc <- clear(x,hide,omit)
-    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig,
-                     i2i=i2i,type=type,cutoff.76=cutoff.76,
-                     cutoff.disc=cutoff.disc,common.Pb=common.Pb,
-                     detritus=detritus,alpha=alpha)
+    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig,i2i=i2i,
+                     type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+                     common.Pb=common.Pb,Th0i=Th0i,alpha=alpha)
     markers <- c(markers,peaks$peaks['t',])
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
-                   i2i=i2i,omit4c=unique(c(hide,omit)),
-                   detritus=detritus,common.Pb=common.Pb)
+    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,i2i=i2i,
+                   omit4c=unique(c(hide,omit)),Th0i=Th0i,common.Pb=common.Pb)
     radial_helper(tt,from=from,to=to,z0=z0,
                   transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
@@ -462,7 +461,7 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',
     }
     graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
                                  units=units,ntit=get.ntit(tt[,1]),
-                                 caveat=(i2i|common.Pb==2|detritus==1)))
+                                 caveat=(i2i|common.Pb==2|Th0i==1)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -471,7 +470,7 @@ radial_helper <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                           type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                           show.numbers=FALSE,pch=21,levels=NA,clabel="",
                           bg=c("yellow","red"),col='black',markers=NULL,
-                          k=0,i2i=FALSE,alpha=0.05,units='MA',detritus=0,
+                          k=0,i2i=FALSE,alpha=0.05,units='MA',Th0i=0,
                           hide=NULL,omit=NULL,omit.col=NA,common.Pb=0,...){
     x <- x[,c(1,2),drop=FALSE]
     ns <- nrow(x)
