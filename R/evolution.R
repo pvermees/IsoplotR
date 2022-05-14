@@ -275,8 +275,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
         anchor <- c(0,fit$a[1])
-    } else if (x$ThU>0){
-        anchor <- rep(x$ThU,2)
+    } else if (x$Th2U8>0){
+        anchor <- rep(x$Th2U8,2)
         ticks <- rev(rev(ticks)[-1]) # removed infinity
     } else {
         anchor <- c(0,0)
@@ -316,7 +316,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,xlim=NULL,ylim=NULL,
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
-        if (x$ThU>0){
+        if (x$Th2U8>0){
             middle <- max(X[1],minY)/2 + min(X[2],maxY)/2
             graphics::text(middle,middle,'1:1',pos=3)
             lines(X,X)

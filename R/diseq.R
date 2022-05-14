@@ -186,16 +186,6 @@ copy_diseq <- function(x,d=diseq()){
     out
 }
 
-# concentration to activity ratio
-ThUc2a <- function(ThU){
-    U <- iratio('U238U235')[1]
-    l8 <- lambda('U238')[1]
-    l2 <- lambda('Th232')[1]
-    MU <- imass('U')[1]
-    MTh <- imass('Th')[1]
-    ThU*(MU/MTh)*(l2/l8)*(U+1)/U
-}
-
 geomean.diseq <- function(x,...){
     out <- x
     for (ratio in c('U48','ThU','RaU','PaU')){

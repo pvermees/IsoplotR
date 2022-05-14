@@ -49,7 +49,7 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,i2i=FALSE,
     if (i2i){
         fit <- isochron.ThU(x,type=2,plot=FALSE,exterr=FALSE,omit=omit4c)
         Th02 <- fit$b
-    } else {
+    } else if (x$ThU>0){
         Th02 <- x$Th02i
     }
     d[,'Th230U238'] <- d[,'Th230U238'] - Th02[1]*d[,'Th232U238']

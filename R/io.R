@@ -203,9 +203,10 @@
 #'
 #' @param d an object of class \code{\link{diseq}}.
 #' 
-#' @param ThU the elemental Th/U-ratio of the whole rock. Used to
-#'     estimate the initial \eqn{^{230}}Th/\eqn{^{238}}U
-#'     disequilibrium (for Th-U formats 3 and 4).
+#' @param Th2U8 \eqn{^{230}}Th/\eqn{^{238}}U activity-ratio of the
+#'     whole rock. Used to estimate the initial
+#'     \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium (for Th-U formats 3
+#'     and 4).
 #'
 #' @param Th02i 2-element vector with the assumed initial
 #'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for
@@ -269,11 +270,11 @@ read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @rdname read.data
 #' @export
 read.data.default <- function(x,method='U-Pb',format=1,ierr=1,
-                              d=diseq(),ThU=0,Th02i=c(0,0),
+                              d=diseq(),Th2U8=0,Th02i=c(0,0),
                               Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
     read.data.matrix(X,method=method,format=format,ierr=ierr,d=d,
-                     ThU=ThU,Th02i=Th02i,Th02U48=Th02U48)
+                     Th2U8=Th2U8,Th02i=Th02i,Th02U48=Th02U48)
 }
 #' @rdname read.data
 #' @export
@@ -285,7 +286,7 @@ read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
 #' @rdname read.data
 #' @export
 read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,
-                             d=diseq(),ThU=0,Th02i=c(0,0),
+                             d=diseq(),Th2U8=0,Th02i=c(0,0),
                              Th02U48=c(0,0,1e6,0,0,0,0,0,0),...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format=format,ierr=ierr,d=d)
@@ -307,7 +308,7 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,
         out <- as.LuHf(x,format=format,ierr=ierr)
     } else if (identical(method,'Th-U')){
         out <- as.ThU(x,format=format,ierr=ierr,
-                      ThU=ThU,Th02i=Th02i,Th02U48=Th02U48)
+                      Th2U8=Th2U8,Th02i=Th02i,Th02U48=Th02U48)
     } else if (identical(method,'U-Th-He')){
         out <- as.UThHe(x,ierr=ierr)
     } else if (identical(method,'fissiontracks')){
@@ -671,13 +672,13 @@ as.PD <- function(x,classname,cnames,format,ierr){
     out$x <- insert.data(x=X,cnames=cnames,opt=opt)
     out
 }
-as.ThU <- function(x,format=1,ierr=1,ThU=0,Th02i=c(0,0),
+as.ThU <- function(x,format=1,ierr=1,Th2U8=0,Th02i=c(0,0),
                    Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     out <- list()
     class(out) <- "ThU"
     out$x <- NA
     out$format <- format
-    out$ThU <- ThUc2a(ThU)
+    out$Th2U8 <- Th2U8
     out$Th02i <- Th02i
     out$Th02U48 <- Th02U48
     nc <- ncol(x)
