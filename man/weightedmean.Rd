@@ -100,8 +100,7 @@ weightedmean(x, ...)
   sigdig = 2,
   alpha = 0.05,
   ranked = FALSE,
-  i2i = TRUE,
-  detritus = 0,
+  Th0i = 0,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -424,6 +423,24 @@ over-interpret the numerical output.
 initial Pb-composition (only applicable if \code{x} has class
 \code{UPb})}
 
+\item{Th0i}{initial \eqn{^{230}}Th correction.
+
+\code{0}: no correction
+
+\code{1}: project the data along an isochron fit
+
+\code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+\eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+activity ratios in the detritus. If \code{x$format} is \code{3} or
+\code{4}, correct the data using the measured
+\eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+stored in \code{x} by the \code{read.data()} function.
+
+\code{3}: correct the data using an assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+if \code{x$format} is \code{1} or \code{2}).}
+
 \item{i2i}{`isochron to intercept': calculates the initial
 (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
 \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{207}}Pb/\eqn{^{204}}Pb,
@@ -438,20 +455,6 @@ in the weighted age calculation. In this case the weighted mean
 plot just serves as a way to visualise the residuals of the data
 around the isochron, and one should be careful not to
 over-interpret the numerical output.}
-
-\item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format=1} or \code{2}).
-
-\code{0}: no correction
-
-\code{1}: project the data along an isochron fit
-
-\code{2}: correct the data using an assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
-
-\code{3}: correct the data using the measured present day
-\eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-\eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
 }
 \value{
 Returns a list with the following items:

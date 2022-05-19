@@ -283,6 +283,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  y0option = 1,
   ...
 )
 
@@ -446,8 +447,8 @@ vs. \eqn{^{232}}Th/\eqn{^{238}}U
 \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
 vs. \eqn{^{238}}U/\eqn{^{232}}Th
 
-\code{4}: `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
-vs. \eqn{^{232}}Th/\eqn{^{238}}U}
+\code{4}: `Osmond type-II' isochron, setting out
+\eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U}
 
 \item{exterr}{propagate external sources of uncertainty
 (J, decay constant)?}
@@ -505,6 +506,16 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
+
+\item{y0option}{controls the type of initial activity ratio that is
+    reported along with the 3D isochron age. Only relevant to Th-U data
+    formats 1 and 2. Set to:
+
+\code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+
+\code{y0option=2} for the initial \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+
+\code{y0option=3} for the initial \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ThPb},
@@ -776,11 +787,12 @@ isochrons. The maximum likelihood algorithm of Titterington and
 Halliday (1979) was generalised from two to three dimensions by
 Ludwig and Titterington (1994) for U-series disequilibrium dating.
 Also this algorithm is implemented in \code{IsoplotR}. Finally, the
-constrained maximum likelihood algorithm of Ludwig (1998) is used
-for isochron regression of U-Pb data. The extent to which the
-observed scatter in the data can be explained by the analytical
-uncertainties can be assessed using the Mean Square of the Weighted
-Deviates (MSWD, McIntyre et al., 1966), which is defined as:
+constrained maximum likelihood algorithms of Ludwig (1998) and
+Vermeesch (2020) are used for isochron regression of U-Pb data. The
+extent to which the observed scatter in the data can be explained
+by the analytical uncertainties can be assessed using the Mean
+Square of the Weighted Deviates (MSWD, McIntyre et al., 1966),
+which is defined as:
 
 \eqn{MSWD = ([X - \hat{X}] \Sigma_{X}^{-1} [X - \hat{X}]^T)/df}
 
@@ -834,6 +846,10 @@ of Sciences, 91(1), pp.198-206.
 Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
 parallel isochrons and the method of maximum likelihood. Chemical
 Geology, 26(3), pp.183-195.
+
+Vermeesch, P., 2020. Unifying the U-Pb and Th-Pb methods: joint
+isochron regression and common Pb correction, Geochronology, 2,
+119-131.
 
 York, D., 1966. Least-squares fitting of a straight line. Canadian
 Journal of Physics, 44(5), pp.1079-1086.

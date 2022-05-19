@@ -5,7 +5,7 @@
 \alias{read.data.default}
 \alias{read.data.data.frame}
 \alias{read.data.matrix}
-\title{Read geochronology data}
+\title{Read geochronological data}
 \usage{
 read.data(x, ...)
 
@@ -15,8 +15,9 @@ read.data(x, ...)
   format = 1,
   ierr = 1,
   d = diseq(),
-  Th02 = c(0, 0),
+  Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
+  U8Th2 = 0,
   ...
 )
 
@@ -26,8 +27,9 @@ read.data(x, ...)
   format = 1,
   ierr = 1,
   d = diseq(),
-  Th02 = c(0, 0),
+  Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
+  U8Th2 = 0,
   ...
 )
 
@@ -37,8 +39,9 @@ read.data(x, ...)
   format = 1,
   ierr = 1,
   d = diseq(),
-  Th02 = c(0, 0),
+  Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
+  U8Th2 = 0,
   ...
 )
 }
@@ -212,15 +215,19 @@ if \code{method='other'}, \code{x} is read as a table, unless
 
 \item{d}{an object of class \code{\link{diseq}}.}
 
-\item{Th02}{2-element vector with the assumed initial
+\item{Th02i}{2-element vector with the assumed initial
 \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for
-formats 1 and 2) or rock (for formats 3 and 4) and its standard
-error.}
+Th-U formats 1 and 2) and its standard error.}
 
 \item{Th02U48}{9-element vector with the measured composition of
 the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
 \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
 \code{rYZ}.}
+
+\item{U8Th2}{\eqn{^{238}}U/\eqn{^{232}}Th activity-ratio of the
+whole rock. Used to estimate the initial
+\eqn{^{230}}Th/\eqn{^{238}}U disequilibrium (for Th-U formats 3
+and 4).}
 }
 \value{
 An object of class \code{UPb}, \code{PbPb}, \code{ThPb},

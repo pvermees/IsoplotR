@@ -78,16 +78,7 @@ age(x, ...)
 
 \method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA, exterr = TRUE, ...)
 
-\method{age}{ThU}(
-  x,
-  isochron = FALSE,
-  i2i = TRUE,
-  exterr = FALSE,
-  i = NA,
-  sigdig = NA,
-  detritus = 0,
-  ...
-)
+\method{age}{ThU}(x, isochron = FALSE, Th0i = 0, exterr = FALSE, i = NA, sigdig = NA, ...)
 
 \method{age}{ThPb}(
   x,
@@ -305,28 +296,30 @@ the output.}
 \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
 \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
 fit. Setting \code{i2i} to \code{FALSE} uses the default values
-stored in \code{settings('iratio',...)}. When applied to data
-of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
-a detrital Th-correction.}
+stored in \code{settings('iratio',...)}.}
 
 \item{central}{logical flag indicating whether each analysis should
 be considered separately (\code{central=FALSE}) or a central
 age should be calculated from all analyses together
 (\code{central=TRUE}).}
 
-\item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format = 1} or \code{2}).
+\item{Th0i}{initial \eqn{^{230}}Th correction.
 
 \code{0}: no correction
 
 \code{1}: project the data along an isochron fit
 
-\code{2}: correct the data using an assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+\code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+\eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+activity ratios in the detritus. If \code{x$format} is \code{3} or
+\code{4}, correct the data using the measured
+\eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+stored in \code{x} by the \code{read.data()} function.
 
-\code{3}: correct the data using the measured present day
-\eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-\eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
+\code{3}: correct the data using an assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+if \code{x$format} is \code{1} or \code{2}).}
 }
 \value{
 \enumerate{

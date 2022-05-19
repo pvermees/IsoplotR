@@ -274,32 +274,34 @@ kde.ThPb <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                kde.col=kde.col,hist.col=hist.col,show.hist=show.hist,
                bty=bty,binwidth=binwidth,hide=hide,...)
 }
-#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format=1} or \code{2}).
+#' @param Th0i initial \eqn{^{230}}Th correction.
 #'
 #' \code{0}: no correction
 #'
 #' \code{1}: project the data along an isochron fit
 #'
-#' \code{2}: correct the data using an assumed initial
-#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#' \code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+#' data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+#' \eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratios in the detritus. If \code{x$format} is \code{3} or
+#' \code{4}, correct the data using the measured
+#' \eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+#' stored in \code{x} by the \code{read.data()} function.
 #'
-#' \code{3}: correct the data using the measured present day
-#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#' \code{3}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+#' if \code{x$format} is \code{1} or \code{2}).
 #'
 #' @rdname kde
 #' @export
 kde.ThU <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                     n=512,plot=TRUE,rug=TRUE,xlab="age [ka]",ylab="",
                     kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
-                    show.hist=TRUE,bty='n',binwidth=NA,i2i=FALSE,
-                    detritus=0,hide=NULL,...){
-    kde_helper(x,i2i=i2i,detritus=detritus,from=from,to=to,bw=bw,
-               adaptive=adaptive,log=log,n=n,plot=plot,rug=rug,
-               xlab=xlab,ylab=ylab,kde.col=kde.col,
-               hist.col=hist.col,show.hist=show.hist,bty=bty,
-               binwidth=binwidth,hide=hide,...)
+                    show.hist=TRUE,bty='n',binwidth=NA,Th0i=0,hide=NULL,...){
+    kde_helper(x,Th0i=Th0i,from=from,to=to,bw=bw,adaptive=adaptive,
+               log=log,n=n,plot=plot,rug=rug,xlab=xlab,ylab=ylab,
+               kde.col=kde.col,hist.col=hist.col,show.hist=show.hist,
+               bty=bty,binwidth=binwidth,hide=hide,...)
 }
 #' @rdname kde
 #' @export
@@ -380,10 +382,10 @@ kde_helper <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                        kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                        show.hist=TRUE, bty='n',binwidth=NA,type=4,
                        cutoff.76=1100,cutoff.disc=discfilter(),
-                       common.Pb=0,i2i=FALSE,detritus=0,hide=NULL,...){
+                       common.Pb=0,i2i=FALSE,Th0i=0,hide=NULL,...){
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,i2i=i2i,
-                   common.Pb=common.Pb,detritus=detritus,omit4c=hide)
+                   common.Pb=common.Pb,Th0i=Th0i,omit4c=hide)
     kde.default(tt[,1],from=from,to=to,bw=bw,adaptive=adaptive,
                 log=log,n=n,plot=plot,rug=rug,xlab=xlab,ylab=ylab,
                 kde.col=kde.col,hist.col=hist.col,hide=hide,

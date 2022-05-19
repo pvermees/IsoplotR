@@ -34,7 +34,7 @@ mindens <- function(mineral,x=NULL){
     invisible(old)
 }
 
-#' @title Load settings to and from json
+#' @title Retrieve and record global settings
 #'
 #' @description
 #' Get and set preferred values for decay constants, isotopic
@@ -84,14 +84,14 @@ mindens <- function(mineral,x=NULL){
 #' the latter two numbers simply returns the existing values.
 #'
 #' For \code{'imass'}: the (isotopic) molar mass of interest (one of
-#' either \code{"U"}, \code{"Rb"}, \code{"Rb85"}, \code{"Rb87"},
-#' \code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"}, \code{"Sr88"},
-#' \code{"Re"}, \code{"Re185"}, \code{"Re187"}, \code{"Os"},
-#' \code{"Os184"}, \code{"Os186"}, \code{"Os187"}, \code{"Os188"},
-#' \code{"Os189"}, \code{"Os190"}, \code{"Os192"}, \code{"Sm"},
-#' \code{"Nd"}, \code{"Lu"}, \code{"Hf"}) PLUS (optionally) the molar
-#' mass and its analytical error.  Omitting the latter two numbers
-#' simply returns the existing values.
+#' either \code{"U"}, \code{"Th"}, \code{"Rb"}, \code{"Rb85"},
+#' \code{"Rb87"}, \code{"Sr84"}, \code{"Sr86"}, \code{"Sr87"},
+#' \code{"Sr88"}, \code{"Re"}, \code{"Re185"}, \code{"Re187"},
+#' \code{"Os"}, \code{"Os184"}, \code{"Os186"}, \code{"Os187"},
+#' \code{"Os188"}, \code{"Os189"}, \code{"Os190"}, \code{"Os192"},
+#' \code{"Sm"}, \code{"Nd"}, \code{"Lu"}, \code{"Hf"}) PLUS
+#' (optionally) the molar mass and its analytical error.  Omitting the
+#' latter two numbers simply returns the existing values.
 #'
 #' For \code{'mindens'}: the mineral of interest (one of either
 #' \code{"apatite"} or \code{"zircon"}) PLUS the mineral

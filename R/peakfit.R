@@ -84,10 +84,10 @@
 #' mixed fission track ages. Nuclear Tracks and Radiation
 #' Measurements, 21(4), pp.459-470.
 #'
-#' van der Touw, J., Galbraith, R., and Laslett, G. A logistic
-#' truncated normal mixture model for overdispersed binomial
+#' van der Touw, J., Galbraith, R., and Laslett, G. A., 1997.
+#' Logistic truncated normal mixture model for overdispersed binomial
 #' data. Journal of Statistical Computation and Simulation,
-#' 59(4):349-373, 1997.
+#' 59(4), pp.349-373.
 #' 
 #' @rdname peakfit
 #' @export
@@ -248,25 +248,30 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,alpha=alpha,...)
 }
-#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format=1} or \code{2}).
+#' @param Th0i initial \eqn{^{230}}Th correction.
 #'
 #' \code{0}: no correction
 #'
 #' \code{1}: project the data along an isochron fit
 #'
-#' \code{2}: correct the data using an assumed initial
-#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#' \code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+#' data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+#' \eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratios in the detritus. If \code{x$format} is \code{3} or
+#' \code{4}, correct the data using the measured
+#' \eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+#' stored in \code{x} by the \code{read.data()} function.
 #'
-#' \code{3}: correct the data using the measured present day
-#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#' \code{3}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+#' if \code{x$format} is \code{1} or \code{2}).
+#' 
 #' @rdname peakfit
 #' @export
-peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2, log=TRUE,
-                        i2i=TRUE,alpha=0.05,detritus=0,...){
-    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,
-                   i2i=i2i,alpha=alpha,detritus=detritus,...)
+peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2,
+                        log=TRUE,alpha=0.05,Th0i=0,...){
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
+                   log=log,alpha=alpha,Th0i=Th0i,...)
 }
 #' @rdname peakfit
 #' @export
@@ -275,20 +280,21 @@ peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                            exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
-                           common.Pb=0,alpha=0.05,detritus=0,...){
+                           common.Pb=0,alpha=0.05,Th0i=0,...){
     if (k<1) return(NULL)
     if (identical(k,'auto')){
-        k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,
-                     cutoff.disc=cutoff.disc,detritus=detritus,common.Pb=common.Pb)
+        k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,i2i=i2i,
+                     cutoff.disc=cutoff.disc,Th0i=Th0i,common.Pb=common.Pb)
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,detritus=detritus,...)
+                   cutoff.disc=cutoff.disc,Th0i=Th0i,...)
     fit <- peakfit.default(tt,k=k,log=log,alpha=alpha)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
         for (i in 1:numpeaks){
-            age.with.exterr <- add.exterr(x,fit$peaks['t',i],fit$peaks['s[t]',i],type=type)
+            age.with.exterr <- add.exterr(x,fit$peaks['t',i],
+                                          fit$peaks['s[t]',i],type=type)
             fit$peaks['s[t]',i] <- age.with.exterr[2]
             fit$peaks['ci[t]',i] <- ntfact(alpha)*fit$peaks['s[t]',i]
         }

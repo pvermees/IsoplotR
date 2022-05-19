@@ -293,9 +293,7 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
 #'     \eqn{^{187}}Os/\eqn{^{188}}Os, \eqn{^{176}}Hf/\eqn{^{177}}Hf or
 #'     \eqn{^{204}}Pb/\eqn{^{208}}Pb ratio from an isochron
 #'     fit. Setting \code{i2i} to \code{FALSE} uses the default values
-#'     stored in \code{settings('iratio',...)}. When applied to data
-#'     of class \code{ThU}, setting \code{i2i} to \code{TRUE} applies
-#'     a detrital Th-correction.
+#'     stored in \code{settings('iratio',...)}.
 #'
 #' @rdname age
 #' @export
@@ -341,27 +339,29 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
     out
 }
 
-#' @param detritus detrital \eqn{^{230}}Th correction (only applicable
-#'     when \code{x$format = 1} or \code{2}).
+#' @param Th0i initial \eqn{^{230}}Th correction.
 #'
 #' \code{0}: no correction
 #'
 #' \code{1}: project the data along an isochron fit
 #'
-#' \code{2}: correct the data using an assumed initial
-#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+#' \code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+#' data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+#' \eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratios in the detritus. If \code{x$format} is \code{3} or
+#' \code{4}, correct the data using the measured
+#' \eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+#' stored in \code{x} by the \code{read.data()} function.
 #'
-#' \code{3}: correct the data using the measured present day
-#' \eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-#' \eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.
+#' \code{3}: correct the data using an assumed initial
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+#' if \code{x$format} is \code{1} or \code{2}).
 #' 
 #' @rdname age
 #' @export
-age.ThU <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
-                    i=NA,sigdig=NA,detritus=0,...){
+age.ThU <- function(x,isochron=FALSE,Th0i=0,exterr=FALSE,i=NA,sigdig=NA,...){
     if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,
-                        i2i=i2i,detritus=detritus,...)
+    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,Th0i=Th0i,...)
     out
 }
 #' @rdname age
@@ -462,7 +462,7 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
 }
 
 get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
-                     cutoff.disc=discfilter(),common.Pb=0,detritus=0){
+                     cutoff.disc=discfilter(),common.Pb=0,Th0i=0){
     if (is.UPb(x)){
         out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
                                cutoff.disc=cutoff.disc,omit4c=omit4c,
@@ -488,8 +488,7 @@ get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
     } else if (is.fissiontracks(x)){
         out <- fissiontrack.age(x,exterr=FALSE)
     } else if (is.ThU(x)){
-        out <- ThU.age(x,exterr=FALSE,i2i=i2i,
-                       detritus=detritus,omit4c=omit4c)
+        out <- ThU.age(x,exterr=FALSE,Th0i=Th0i,omit4c=omit4c)
     }
     out
 }

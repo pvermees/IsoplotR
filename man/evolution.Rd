@@ -10,7 +10,7 @@ evolution(
   ylim = NULL,
   alpha = 0.05,
   transform = FALSE,
-  detritus = 0,
+  Th0i = 0,
   show.numbers = FALSE,
   levels = NA,
   clabel = "",
@@ -41,19 +41,26 @@ confidence intervals}
 \item{transform}{if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 vs. Th-U age.}
 
-\item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format} is \code{2} or \code{3}.
+\item{Th0i}{initial \eqn{^{230}}Th correction.
 
 \code{0}: no correction
 
-\code{1}: project the data along an isochron fit
+\code{1}: if \code{x$format} is \code{1} or \code{2}, project the
+data along an isochron fit. If \code{x$format} is \code{3} or
+\code{4}, infer the initial \eqn{^{230}}Th/\eqn{^{238}}U activity
+ratio from the isochron.
 
-\code{2}: correct the data using an assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+\code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+\eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+activity ratios in the detritus. If \code{x$format} is \code{3} or
+\code{4}, anchor the isochrons to the equiline, based on the
+measured \eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole
+rock, as stored in \code{x} by the \code{read.data()} function.
 
-\code{3}: correct the data using the measured present day
-\eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-\eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
+\code{3}: correct the data using an assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+if \code{x$format} is \code{1} or \code{2}).}
 
 \item{show.numbers}{label the error ellipses with the grain
 numbers?}
@@ -63,8 +70,9 @@ different background colours within the error ellipses.}
 
 \item{clabel}{label of the colour legend.}
 
-\item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
-colour or multiple colours to form a colour ramp. Examples:
+\item{ellipse.fill}{fill colour for the error ellipses. This can
+    either be a single colour or multiple colours to form a colour
+    ramp. Examples:
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
 \code{'white'}, etc.;
@@ -87,7 +95,7 @@ ellipses. Follows the same formatting guidelines as
 
 \item{line.col}{colour of the age grid}
 
-\item{isochron}{fit a 3D isochron to the data?}
+\item{isochron}{fit an isochron to the data?}
 
 \item{model}{if \code{isochron=TRUE}, choose one of three
     regression models:
@@ -140,7 +148,7 @@ Plots Th-U data on a
 diagram, a \eqn{^{234}}U/\eqn{^{238}}U-age diagram, or (if
 \eqn{^{234}}U/\eqn{^{238}}U is assumed to be in secular
 equilibrium), a
-\eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram,
+\eqn{^{230}}Th/\eqn{^{232}}Th-\eqn{^{238}}U/\eqn{^{232}}Th diagram;
 calculates isochron ages.
 }
 \details{

@@ -50,12 +50,15 @@
 #' \item{\code{format}}{a number between 1 and 4}
 #'
 #' \item{\code{Th02}}{a two element vector with the assumed initial
-#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of Th-bearing detritus (for
-#'     formats 1 and 2) or rock (for formats 3 and 4) and its standard
-#'     error}
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of Th-bearing
+#'     detritus. Only aplicable to formats 1 and 2.}
 #' 
 #' \item{\code{Th02U48}}{9-element vector with the measured
 #'     composition of Th-bearing detritus}
+#'
+#' \item{\code{U8Th2}}{the measured \eqn{^{238}}U/\eqn{^{232}}Th
+#'       activity ratio of the whole rock. Only applicable to formats
+#'       3 and 4}
 #'
 #' }
 #' 

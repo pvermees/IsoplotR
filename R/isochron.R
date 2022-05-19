@@ -41,11 +41,12 @@
 #' Halliday (1979) was generalised from two to three dimensions by
 #' Ludwig and Titterington (1994) for U-series disequilibrium dating.
 #' Also this algorithm is implemented in \code{IsoplotR}. Finally, the
-#' constrained maximum likelihood algorithm of Ludwig (1998) is used
-#' for isochron regression of U-Pb data. The extent to which the
-#' observed scatter in the data can be explained by the analytical
-#' uncertainties can be assessed using the Mean Square of the Weighted
-#' Deviates (MSWD, McIntyre et al., 1966), which is defined as:
+#' constrained maximum likelihood algorithms of Ludwig (1998) and
+#' Vermeesch (2020) are used for isochron regression of U-Pb data. The
+#' extent to which the observed scatter in the data can be explained
+#' by the analytical uncertainties can be assessed using the Mean
+#' Square of the Weighted Deviates (MSWD, McIntyre et al., 1966),
+#' which is defined as:
 #'
 #' \eqn{MSWD = ([X - \hat{X}] \Sigma_{X}^{-1} [X - \hat{X}]^T)/df}
 #'
@@ -432,6 +433,10 @@
 #' Titterington, D.M. and Halliday, A.N., 1979. On the fitting of
 #' parallel isochrons and the method of maximum likelihood. Chemical
 #' Geology, 26(3), pp.183-195.
+#'
+#' Vermeesch, P., 2020. Unifying the U-Pb and Th-Pb methods: joint
+#' isochron regression and common Pb correction, Geochronology, 2,
+#' 119-131.
 #'
 #' York, D., 1966. Least-squares fitting of a straight line. Canadian
 #' Journal of Physics, 44(5), pp.1079-1086.
@@ -977,8 +982,19 @@ isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 #' \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
 #' vs. \eqn{^{238}}U/\eqn{^{232}}Th
 #'
-#' \code{4}: `Osmond type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{238}}U
-#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
+#' \code{4}: `Osmond type-II' isochron, setting out
+#' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
+#' 
+#' @param y0option controls the type of initial activity ratio that is
+#'     reported along with the 3D isochron age. Only relevant to Th-U data
+#'     formats 1 and 2. Set to:
+#'
+#' \code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+#'
+#' \code{y0option=2} for the initial \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+#'
+#' \code{y0option=3} for the initial \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.
+#' 
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
@@ -988,11 +1004,11 @@ isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
                           line.col='black',lwd=1,plot=TRUE,
                           exterr=TRUE,model=1,show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
-                          omit.stroke='grey',...){
+                          omit.stroke='grey',y0option=1,...){
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,
                                exterr=exterr,alpha=alpha,
-                               hide=hide,omit=omit)
+                               hide=hide,omit=omit,y0option=y0option)
         intercept.type <- 'Th-U-3D'
     } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,
@@ -1054,13 +1070,14 @@ isochron.UThHe <- function(x,alpha=0.05,sigdig=2,
 }
 
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
-                            alpha=0.05,hide=NULL,omit=NULL){
+                            alpha=0.05,hide=NULL,omit=NULL,y0option=1){
     if (type == 1){ # 0/2 vs 8/2
         osmond <- FALSE
         ia <- 'A'
         ib <- 'B'
         i48 <- 'b'
         i08 <- 'B'
+        i02 <- 'A'
         id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^230*'Th/'^232*'Th')
@@ -1070,6 +1087,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         ib <- 'B'
         i48 <- 'a'
         i08 <- 'A'
+        i02 <- 'B'
         id <- c('X','sX','Z','sZ','rXZ')
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^230*'Th/'^238*'U')
@@ -1079,6 +1097,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         ib <- 'b'
         i48 <- 'b'
         i08 <- 'B'
+        i02 <- 'A'
         id <- c('X','sX','Y','sY','rXY')
         x.lab <- quote(''^238*'U/'^232*'Th')
         y.lab <- quote(''^234*'U/'^232*'Th')
@@ -1088,6 +1107,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
         ib <- 'b'
         i48 <- 'a'
         i08 <- 'A'
+        i02 <- 'B'
         id <- c('X','sX','Y','sY','rXY')
         x.lab <- quote(''^232*'Th/'^238*'U')
         y.lab <- quote(''^234*'U/'^238*'U')
@@ -1100,25 +1120,61 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
     out$cov.ab <- out$cov[ia,ib]
+    out$PAR <- fit$par[c(i48,i08,i02)]
+    out$COV <- fit$cov[c(i48,i08,i02),c(i48,i08,i02)]
+    names(out$PAR) <- rownames(out$COV) <- colnames(out$COV) <- c('i48','i08','i02')
     tst <- get.ThU.age(out$par[i08],sqrt(out$cov[i08,i08]),
                        out$par[i48],sqrt(out$cov[i48,i48]),
-                       out$cov[i48,i08],exterr=exterr)
+                       out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
     out$age['t'] <- tst['t']
-    out$y0['y'] <- tst['48_0']
     out$age['s[t]'] <- tst['s[t]']
-    out$y0['s[y]'] <- tst['s[48_0]']
-    out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
-    out <- ci_isochron(out)
-    if (inflate(out)){
-        tdispt <- get.ThU.age(out$par[i08],sqrt(out$mswd*out$cov[i08,i08]),
-                              out$par[i48],sqrt(out$mswd*out$cov[i48,i48]),
-                              out$mswd*out$cov[i48,i08],exterr=exterr)
-        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*tdispt['s[t]']
-        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*tdispt['s[48_0]']
-    }
+    out <- y0ci(out,tst,y0option,exterr=exterr,alpha=alpha)
     out$xlab <- x.lab
     out$ylab <- y.lab
     out$xyz <- subset(out$xyz,select=id)
+    out
+}
+y0ci <- function(out,tst,y0option=1,exterr=FALSE,alpha=0.05){
+    l0 <- lambda('Th230')
+    l4 <- lambda('U234')
+    E <- matrix(0,5,5)
+    E[1:3,1:3] <- out$COV
+    E[4,4] <- l0[2]^2
+    E[5,5] <- l4[2]^2
+    J <- matrix(0,6,5)
+    J[1,c(1,2,4,5)] <- tst[c('dt.d48','dt.d08','dt.dl0','dt.dl4')]
+    J[2:4,1:3] <- diag(3)
+    J[5:6,4:5] <- diag(2)*exterr
+    E2 <- J %*% E %*% t(J)
+    J2 <- rep(0,6)
+    if (y0option==1){
+        out$y0['y'] <- 1 + (out$PAR['i48']-1)*exp(l4[1]*tst['t'])
+        out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
+        J2[1] <- l4[1]*(out$PAR['i48']-1)*exp(l4[1]*tst['t'])
+        J2[2] <- exp(l4[1]*tst['t'])
+        J2[6] <- ifelse(exterr,(out$PAR['i48']-1)*exp(l4[1]*tst['t'])*tst['t'],0)
+    } else if (y0option==2){
+        out$y0['y'] <- 1 + (out$PAR['i02']-1)*exp(l0[1]*tst['t'])
+        out$y0label <- quote('('^230*'Th/'^230*'Th)'[o]*'=')
+        J2[1] <- l0[1]*(out$PAR['i02']-1)*exp(l0[1]*tst['t'])
+        J2[4] <- exp(l0[1]*tst['t'])
+        J2[5] <- ifelse(exterr,(out$PAR['i02']-1)*exp(l0[1]*tst['t'])*tst['t'],0)
+    } else {
+        out$y0['y'] <- 1 + (out$PAR['i08']-1)*exp(l0[1]*tst['t'])
+        out$y0label <- quote('('^230*'Th/'^238*'U)'[o]*'=')
+        J2[1] <- l0[1]*(out$PAR['i08']-1)*exp(l0[1]*tst['t'])
+        J2[3] <- exp(l0[1]*tst['t'])
+        J2[5] <- ifelse(exterr,(out$PAR['i08']-1)*exp(l0[1]*tst['t'])*tst['t'],0)
+    }
+    out$y0['s[y]'] <- sqrt(J2 %*% E2 %*% J2)
+    out <- ci_isochron(out)
+    if (inflate(out)){ # overwrite dispersion to remove decay constant errors
+        f2E <- E
+        f2E[1:3,1:3] <- out$mswd*E[1:3,1:3]
+        E3 <- J %*% f2E %*% t(J)
+        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*sqrt(E3[1,1])
+        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*sqrt(J2 %*% E3 %*% J2)
+    }
     out
 }
 isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
@@ -1143,17 +1199,18 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
         get.ThU.age(Th230U238[1],Th230U238[2],
                     exterr=exterr)[c('t','s[t]')]
     out$y0[c('y','s[y]')] <-
-        get.Th230Th232_0x(out$age['t'],Th230Th232[1],Th230Th232[2])
+        get.Th230Th232_0(out$age['t'],Th230Th232[1],Th230Th232[2])
     out <- ci_isochron(out)
     if (inflate(out)){
         out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
             get.ThU.age(Th230U238[1],sqrt(out$mswd)*Th230U238[2],exterr=exterr)['s[t]']
         out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*
-            get.Th230Th232_0x(out$age['t'],Th230Th232[1],
-                              sqrt(out$mswd)*Th230Th232[2])[2]
+            get.Th230Th232_0(out$age['t'],Th230Th232[1],
+                             sqrt(out$mswd)*Th230Th232[2])[2]
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
+    out$y0label <- quote('('^230*'Th/'^232*'Th)'[o]*'=')
     out
 }
 

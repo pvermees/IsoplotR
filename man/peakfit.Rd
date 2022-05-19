@@ -131,9 +131,8 @@ peakfit(x, ...)
   exterr = FALSE,
   sigdig = 2,
   log = TRUE,
-  i2i = TRUE,
   alpha = 0.05,
-  detritus = 0,
+  Th0i = 0,
   ...
 )
 
@@ -214,19 +213,23 @@ initial Pb-composition (only applicable if \code{x} has class
 fit. Setting \code{i2i} to \code{FALSE} uses the default values
 stored in \code{settings('iratio',...)}.}
 
-\item{detritus}{detrital \eqn{^{230}}Th correction (only applicable
-    when \code{x$format=1} or \code{2}).
+\item{Th0i}{initial \eqn{^{230}}Th correction.
 
 \code{0}: no correction
 
 \code{1}: project the data along an isochron fit
 
-\code{2}: correct the data using an assumed initial
-\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus.
+\code{2}: if \code{x$format} is \code{1} or \code{2}, correct the
+data using the measured present day \eqn{^{230}}Th/\eqn{^{238}}U,
+\eqn{^{232}}Th/\eqn{^{238}}U and \eqn{^{234}}U/\eqn{^{238}}U
+activity ratios in the detritus. If \code{x$format} is \code{3} or
+\code{4}, correct the data using the measured
+\eqn{^{238}}U/\eqn{^{232}}Th activity ratio of the whole rock, as
+stored in \code{x} by the \code{read.data()} function.
 
-\code{3}: correct the data using the measured present day
-\eqn{^{230}}Th/\eqn{^{238}}U, \eqn{^{232}}Th/\eqn{^{238}}U and
-\eqn{^{234}}U/\eqn{^{238}}U-ratios in the detritus.}
+\code{3}: correct the data using an assumed initial
+\eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
+if \code{x$format} is \code{1} or \code{2}).}
 }
 \value{
 Returns a list with the following items:
@@ -296,10 +299,10 @@ Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
 mixed fission track ages. Nuclear Tracks and Radiation
 Measurements, 21(4), pp.459-470.
 
-van der Touw, J., Galbraith, R., and Laslett, G. A logistic
-truncated normal mixture model for overdispersed binomial
+van der Touw, J., Galbraith, R., and Laslett, G. A., 1997.
+Logistic truncated normal mixture model for overdispersed binomial
 data. Journal of Statistical Computation and Simulation,
-59(4):349-373, 1997.
+59(4), pp.349-373.
 }
 \seealso{
 \code{\link{radialplot}}, \code{\link{central}}
