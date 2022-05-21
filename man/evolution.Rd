@@ -181,8 +181,7 @@ attach(examples)
 evolution(ThU)
 
 dev.new()
-evolution(ThU,transform=TRUE,
-          isochron=TRUE,model=1)
+evolution(ThU,transform=TRUE,isochron=TRUE,model=1)
 
 }
 \references{

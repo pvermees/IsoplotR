@@ -135,8 +135,7 @@
 #' evolution(ThU)
 #'
 #' dev.new()
-#' evolution(ThU,transform=TRUE,
-#'           isochron=TRUE,model=1)
+#' evolution(ThU,transform=TRUE,isochron=TRUE,model=1)
 #'
 #' @references Ludwig, K.R. and Titterington, D.M., 1994. Calculation
 #'     of \eqn{^{230}}Th/U isochrons, ages, and errors. Geochimica et
