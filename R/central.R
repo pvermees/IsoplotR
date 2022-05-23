@@ -124,7 +124,7 @@
 central <- function(x,...){ UseMethod("central",x) }
 #' @rdname central
 #' @export
-central.default <- function(x,alpha=0.05,...){
+central.default <- function(x,oerr=5,...){
     good <- !is.na(rowSums(x))
     zu <- log(x[good,1])
     su <- x[good,2]/x[good,1]
@@ -139,9 +139,9 @@ central.default <- function(x,alpha=0.05,...){
     # add back one d.o.f. for the homogeneity test
     out$mswd <- Chi2/(out$df+1)
     out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-    out$age <- c(tt,st,ntfact(alpha)*st)
+    out$age <- c(tt,st,ntfact(alpha())*st)
     out$disp <- c(fit$sigma,
-                  profile_LL_weightedmean_disp(fit,zu,su,alpha))
+                  profile_LL_weightedmean_disp(fit,zu,su,alpha()))
     names(out$age) <- c('t','s[t]','ci[t]')
     names(out$disp) <- c('s','ll','ul')
     out

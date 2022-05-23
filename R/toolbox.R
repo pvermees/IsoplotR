@@ -473,3 +473,13 @@ inflate <- function(fit){
     else out <- fit$model==1 && (fit$p.value<fit$alpha)
     out
 }
+
+geterr <- function(x,sx,oerr=5){
+    if (oerr==1) out <- sx
+    else if (oerr==2) out <- 2*sx
+    else if (oerr==3) out <- 100*sx/x
+    else if (oerr==4) out <- 200*sx/x
+    else if (oerr==5) out <- ntfact(alpha())*sx
+    else if (oerr==6) out <- 100*ntfact(alpha())*sx/x
+    else stop('Illegal oerr value')
+}

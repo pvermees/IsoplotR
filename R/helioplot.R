@@ -63,8 +63,25 @@
 #'     white ellipse?
 #' @param show.numbers show the grain numbers inside the error
 #'     ellipses?
-#' @param alpha probability cutoff for the error ellipses and
-#'     confidence intervals
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{4}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{5}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#' 
 #' @param contour.col two-element vector with the fill colours to be
 #'     assigned to the minimum and maximum age contour
 #' @param levels a vector with additional values to be displayed as
@@ -145,9 +162,8 @@
 #' helioplot(UThHe,logratio=FALSE)
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
-                      show.numbers=FALSE,alpha=0.05,
-                      contour.col=c('white','red'),levels=NA,
-                      clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
+                      show.numbers=FALSE,oerr=5,contour.col=c('white','red'),
+                      levels=NA,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
                       omit.fill=NA,omit.stroke='grey',...){
@@ -156,7 +172,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
-    fit <- central.UThHe(x2calc,alpha=alpha,model=model)
+    fit <- central.UThHe(x2calc,oerr=oerr,model=model)
     fill <- set.ellipse.colours(ns=ns,levels=levels,
                                 col=ellipse.fill,hide=hide,
                                 omit=omit,omit.col=omit.fill)
@@ -173,7 +189,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                         hide=hide,omit=omit,bg=fill,col=stroke,...)
         } else {
             plot_logratio_ellipses(x,fill=fill,stroke=stroke,
-                                   alpha=alpha,levels=levels,
+                                   oerr=oerr,levels=levels,
                                    show.numbers=show.numbers,hide=hide)
         }
     } else {
@@ -187,13 +203,13 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                   bg=fill,col=stroke,...)
         } else {
             plot_helioplot_ellipses(x,fill=fill,stroke=stroke,fact=fact,
-                                    alpha=alpha,levels=levels,
+                                    oerr=oerr,levels=levels,
                                     show.numbers=show.numbers,hide=hide)
         }
     }
     if (show.central.comp){
         plot_central_ellipse(fit,fact=fact,logratio=logratio,
-                             alpha=alpha,doSm=doSm(x))
+                             oerr=oerr,doSm=doSm(x))
     }
     fit$n <- length(which(calcit))
     graphics::title(helioplot_title(fit,sigdig=sigdig))
@@ -218,27 +234,27 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1),xpd=NA)
 }
 
-plot_logratio_ellipses <- function(x,fill,stroke,alpha=0.05,
+plot_logratio_ellipses <- function(x,fill,stroke,oerr=5,
                                    show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha())
         graphics::polygon(ell,col=fill[i],border=stroke[i])
         if (show.numbers) graphics::text(x0,y0,labels=i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
 }
-plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),alpha=0.05,
+plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=5,
                                     show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha())
         HeUTh0 <- uv2HeUTh(uvc$uv)
         HeUTh <- uv2HeUTh(ell)
         xyz <- renormalise(HeUTh,fact=fact)
@@ -260,9 +276,9 @@ plot_helioplot_points <- function(x,fact=c(1,1,1),bg=NA,
 }
 
 plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
-                                 alpha=0.05,doSm=TRUE,...){
+                                 oerr=5,doSm=TRUE,...){
     ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
-                   covmat=fit$covmat[1:2,1:2],alpha=alpha)
+                   covmat=fit$covmat[1:2,1:2],alpha=alpha())
     if (logratio){
         graphics::polygon(ell,col="#FFFFFFBF")
     } else {
