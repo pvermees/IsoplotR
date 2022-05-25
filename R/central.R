@@ -164,25 +164,30 @@ central.default <- function(x,oerr=5,...){
 #'
 #' @rdname central
 #' @export
-central.UThHe <- function(x,alpha=0.05,model=1,...){
+central.UThHe <- function(x,model=1,...){
     ns <- nrow(x)
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
     mswd <- mswd_UThHe(x,fit,doSm=doSm)
     if (model==1){
+        if (mswd$p.value<alpha()){
+            fit$age['disp[t]'] <- uvw2age(fit,doSm=doSm(x),fact=mswd$mswd)[2]
+        }
         out <- c(fit,mswd)
-        out$age['disp[t]'] <-
-            uvw2age(out,doSm=doSm(x),fact=ntfact(alpha,mswd))[2]
     } else if (model==2){
         out <- fit
     } else {
-        w <- get.UThHe.w(x,fit)
+        init <- log(mswd$mswd)/2
+        lw <- stats::optimise(LL.uvw,interval=init+c(-3,3),
+                              UVW=fit$uvw,x=x,doSm=doSm(x),
+                              maximum=TRUE)$maximum
+        w <- exp(lw)
+        H <- stats::optimHess(lw,LL.uvw,UVW=fit$uvw,x=x,doSm=doSm(x))
+        sw <- w*solve(-H)
         out <- UThHe_logratio_mean(x,model=model,w=w)
-        out$w <- c(w,profile_LL_central_disp_UThHe(fit=out,x=x,alpha=alpha))
-        names(out$w) <- c('s','ll','ul')
+        out$w <- c(w,sw)
+        names(out$w) <- c('w','s[w]')
     }
-    out$alpha <- alpha
-    out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
     out
 }
 
@@ -239,9 +244,8 @@ UThHe_logratio_mean <- function(x,model=1,w=0,fact=1){
     out <- average_uvw(x,model=model,w=w)
     out$model <- model
     out$w <- w
-    out$age <- rep(NA,3)
-    names(out$age) <- c('t','s[t]','ci[t]')
-    out$age[c('t','s[t]')] <- uvw2age(out,doSm(x),fact=fact)
+    out$age <- uvw2age(out,doSm(x),fact=fact)
+    names(out$age) <- c('t','s[t]')
     out
 }
 
@@ -288,13 +292,8 @@ average_uvw <- function(x,model=1,w=0){
     out
 }
 
-get.UThHe.w <- function(x,fit){
-    stats::optimize(LL.uvw,interval=c(0,100),
-                    UVW=fit$uvw,x=x,doSm=doSm(x),
-                    maximum=TRUE)$maximum
-}
-
-LL.uvw <- function(w,UVW,x,doSm=TRUE,LL=TRUE){
+LL.uvw <- function(lw,UVW,x,doSm=TRUE,LL=TRUE){
+    w <- exp(lw)
     out <- 0
     for (i in 1:length(x)){
         if (doSm){
@@ -318,7 +317,7 @@ mswd_UThHe <- function(x,fit,doSm=FALSE){
     out <- list()
     if (doSm) nd <- 3
     else nd <- 2
-    SS <- LL.uvw(w=fit$w,fit$uvw[1:nd],x,doSm=doSm,LL=FALSE)
+    SS <- LL.uvw(lw=log(fit$w),fit$uvw[1:nd],x,doSm=doSm,LL=FALSE)
     out$df <- nd*(length(x)-1)
     out$mswd <- as.numeric(SS/out$df)
     out$p.value <- 1-stats::pchisq(SS,out$df)

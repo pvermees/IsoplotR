@@ -1,4 +1,4 @@
-roundit <- function(age,err,sigdig=2,text=FALSE){
+roundit <- function(age,err,sigdig=2,oerr=5,text=FALSE){
     if (missing(err)){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
@@ -25,7 +25,7 @@ roundit <- function(age,err,sigdig=2,text=FALSE){
         if (is.na(sigdig)) {
             out <- dat
         } else {
-            nsmall <- min(20,max(0,-(trunc(log10(min.err))-sigdig)))
+            nsmall <- min(10,max(0,-(trunc(log10(min.err))-sigdig)))
             out <- format(dat,digits=sigdig,nsmall=nsmall,
                           trim=TRUE,scientific=FALSE)
         }
@@ -482,4 +482,27 @@ geterr <- function(x,sx,oerr=5){
     else if (oerr==5) out <- ntfact(alpha())*sx
     else if (oerr==6) out <- 100*ntfact(alpha())*sx/x
     else stop('Illegal oerr value')
+}
+
+tithelp <- function(x,sx,n,sigdig=2,oerr=5,prefix='age =',units='Ma'){
+    xerr <- geterr(x,sx,oerr=oerr)
+    rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    dispersed <- (length(sx)>1)
+    relerr <- (oerr %in% c(2,4,6))
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=n)
+    if (dispersed){
+        lst$c <- rounded[3]
+        if (relerr){
+            out <- substitute(p~a~u%+-%b~'|'~c*'%'~'(n='*n*')',lst)
+        } else {
+            out <- substitute(p~a%+-%b~'|'~c~u~'(n='*n*')',lst)
+        }
+    } else {
+        if (relerr){
+            out <- substitute(p~a~u%+-%b*'%'~'(n='*n*')',lst)
+        } else {
+            out <- substitute(p~a%+-%b~u~'(n='*n*')',lst)
+        }
+    }
+    out
 }
