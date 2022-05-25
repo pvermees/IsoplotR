@@ -332,12 +332,10 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
 }
 
 helioplot_title <- function(fit,sigdig=2,oerr=5,...){
-    line1 <- tithelp(x=fit$age[1],sx=fit$age[-1],n=fit$n,
-                     sigdig=sigdig,oerr=oerr,prefix="central age =")
+    line1 <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                    sigdig=sigdig,oerr=oerr,prefix="central age =")
     line1line <- 1
     if (inflate(fit)){
-        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'Ma'~'(n='*n*')')
-        list1$d <- rounded.age[4]
         line2 <- substitute('MSWD ='~a~', p('*chi^2*') ='~b,
                             list(a=signif(fit$mswd,2),
                                  b=signif(fit$p.value,2)))

@@ -484,7 +484,7 @@ geterr <- function(x,sx,oerr=5){
     else stop('Illegal oerr value')
 }
 
-tithelp <- function(x,sx,n,sigdig=2,oerr=5,prefix='age =',units='Ma'){
+agetit <- function(x,sx,n,sigdig=2,oerr=5,prefix='age ='){
     xerr <- geterr(x,sx,oerr=oerr)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     dispersed <- (length(sx)>1)
@@ -493,15 +493,15 @@ tithelp <- function(x,sx,n,sigdig=2,oerr=5,prefix='age =',units='Ma'){
     if (dispersed){
         lst$c <- rounded[3]
         if (relerr){
-            out <- substitute(p~a~u%+-%b~'|'~c*'%'~'(n='*n*')',lst)
+            out <- substitute(p~a~'Ma'%+-%b~'|'~c*'%'~'(n='*n*')',lst)
         } else {
-            out <- substitute(p~a%+-%b~'|'~c~u~'(n='*n*')',lst)
+            out <- substitute(p~a%+-%b~'|'~c~'Ma (n='*n*')',lst)
         }
     } else {
         if (relerr){
-            out <- substitute(p~a~u%+-%b*'%'~'(n='*n*')',lst)
+            out <- substitute(p~a~'Ma'%+-%b*'%'~'(n='*n*')',lst)
         } else {
-            out <- substitute(p~a%+-%b~u~'(n='*n*')',lst)
+            out <- substitute(p~a%+-%b~'Ma (n='*n*')',lst)
         }
     }
     out
