@@ -331,21 +331,6 @@ plot_points <- function(x,y,bg='yellow',pch=21,cex=1.5,pos,col,
     }
 }
 
-ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
-    if (is.null(mswd)){
-        if (is.null(df)){
-            out <- stats::qnorm(1-alpha/2)
-        } else if (df>0){
-            out <- stats::qt(1-alpha/2,df=df)
-        }
-    } else if (mswd$df>0){
-        out <- stats::qt(1-alpha/2,df=mswd$df)*sqrt(mswd$mswd)
-    } else {
-        out <- stats::qnorm(1-alpha/2)
-    }
-    out
-}
-
 mymtext <- function(text,line=0,...){
     graphics::mtext(text,line=line,cex=graphics::par('cex'),...)
 }
@@ -465,44 +450,4 @@ geomean.default <- function(x,...){
 
 trace <- function(x){
     sum(diag(x))
-}
-
-inflate <- function(fit){
-    if (is.null(fit$model)) fit$model <- 1
-    if (is.null(fit$alpha)) out <- FALSE
-    else out <- fit$model==1 && (fit$p.value<fit$alpha)
-    out
-}
-
-geterr <- function(x,sx,oerr=5){
-    if (oerr==1) out <- sx
-    else if (oerr==2) out <- 2*sx
-    else if (oerr==3) out <- 100*sx/x
-    else if (oerr==4) out <- 200*sx/x
-    else if (oerr==5) out <- ntfact(alpha())*sx
-    else if (oerr==6) out <- 100*ntfact(alpha())*sx/x
-    else stop('Illegal oerr value')
-}
-
-agetit <- function(x,sx,n,sigdig=2,oerr=5,prefix='age ='){
-    xerr <- geterr(x,sx,oerr=oerr)
-    rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
-    dispersed <- (length(sx)>1)
-    relerr <- (oerr %in% c(2,4,6))
-    lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=n)
-    if (dispersed){
-        lst$c <- rounded[3]
-        if (relerr){
-            out <- substitute(p~a~'Ma'%+-%b~'|'~c*'%'~'(n='*n*')',lst)
-        } else {
-            out <- substitute(p~a%+-%b~'|'~c~'Ma (n='*n*')',lst)
-        }
-    } else {
-        if (relerr){
-            out <- substitute(p~a~'Ma'%+-%b*'%'~'(n='*n*')',lst)
-        } else {
-            out <- substitute(p~a%+-%b~'Ma (n='*n*')',lst)
-        }
-    }
-    out
 }

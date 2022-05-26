@@ -167,3 +167,78 @@ ci_log2lin_lud <- function(fit,fact=1){
     }
     c(exp(lx),ll,ul)
 }
+
+ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
+    if (is.null(mswd)){
+        if (is.null(df)){
+            out <- stats::qnorm(1-alpha/2)
+        } else if (df>0){
+            out <- stats::qt(1-alpha/2,df=df)
+        }
+    } else if (mswd$df>0){
+        out <- stats::qt(1-alpha/2,df=mswd$df)*sqrt(mswd$mswd)
+    } else {
+        out <- stats::qnorm(1-alpha/2)
+    }
+    out
+}
+
+inflate <- function(fit){
+    if (is.null(fit$model)) fit$model <- 1
+    if (is.null(fit$alpha)) out <- FALSE
+    else out <- fit$model==1 && (fit$p.value<fit$alpha)
+    out
+}
+
+geterr <- function(x,sx,oerr=5){
+    if (oerr==1) out <- sx
+    else if (oerr==2) out <- 2*sx
+    else if (oerr==3) out <- 100*sx/x
+    else if (oerr==4) out <- 200*sx/x
+    else if (oerr==5) out <- ntfact(alpha())*sx
+    else if (oerr==6) out <- 100*ntfact(alpha())*sx/x
+    else stop('Illegal oerr value')
+}
+
+agetit <- function(x,sx,n,sigdig=2,oerr=5,prefix='age ='){
+    xerr <- geterr(x,sx,oerr=oerr)
+    rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    dispersed <- (length(sx)>1)
+    relerr <- (oerr %in% c(3,4,6))
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=n)
+    if (dispersed){
+        lst$c <- rounded[3]
+        if (relerr){
+            out <- substitute(p~a~'Ma'%+-%b~'|'~c*'%'~'(n='*n*')',lst)
+        } else {
+            out <- substitute(p~a%+-%b~'|'~c~'Ma (n='*n*')',lst)
+        }
+    } else {
+        if (relerr){
+            out <- substitute(p~a~'Ma'%+-%b*'%'~'(n='*n*')',lst)
+        } else {
+            out <- substitute(p~a%+-%b~'Ma (n='*n*')',lst)
+        }
+    }
+    out
+}
+mswdtit <- function(mswd,p,sigdig=2){
+    substitute('MSWD ='~a~', p('*chi^2*') ='~b,
+               list(a=signif(mswd,sigdig),b=signif(p,sigdig)))
+}
+disptit <- function(w,sw,sigdig=2,oerr=5,prefix='dispersion ='){
+    werr <- geterr(w,sw,oerr=oerr)
+    rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2])
+    relerr <- (oerr %in% c(3,4,6))
+    if (relerr){
+        out <- substitute(p~a%+-%b*'%',lst)
+    } else if (werr/w<0.5){
+        out <- substitute(p~a%+-%b,lst)
+    } else {
+        lst$b <- signif(w-exp(log(w)-werr/w),sigdig)
+        lst$c <- signif(exp(log(w)+werr/w)-w,sigdig)
+        out <- substitute(p~a+b-c,lst)
+    }
+    out
+}

@@ -335,20 +335,13 @@ helioplot_title <- function(fit,sigdig=2,oerr=5,...){
     line1 <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
                     sigdig=sigdig,oerr=oerr,prefix="central age =")
     line1line <- 1
-    if (inflate(fit)){
-        line2 <- substitute('MSWD ='~a~', p('*chi^2*') ='~b,
-                            list(a=signif(fit$mswd,2),
-                                 b=signif(fit$p.value,2)))
+    if (fit$model==1){
+        line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
         mymtext(line2,line=0,...)
     } else if (fit$model==2){
         line1line <- 0
     } else if (fit$model==3){
-        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig,text=TRUE)
-        list2 <- list(a=rounded.disp[1],b=rounded.disp[2],c=rounded.disp[3])
-        expr2 <- quote('dispersion =')
-        args2 <- quote(a+c-b~'%')
-        call2 <- substitute(e~a,list(e=expr2,a=args2))
-        line2 <- do.call(substitute,list(eval(call2),list2))
+        line2 <- disptit(fit$w[1],fit$w[-1],sigdig=sigdig,oerr=oerr)
         mymtext(line2,line=0,...)
     }
     mymtext(line1,line=line1line,...)
