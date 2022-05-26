@@ -139,11 +139,10 @@ central.default <- function(x,oerr=5,...){
     # add back one d.o.f. for the homogeneity test
     out$mswd <- Chi2/(out$df+1)
     out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-    out$age <- c(tt,st,ntfact(alpha())*st)
-    out$disp <- c(fit$sigma,
-                  profile_LL_weightedmean_disp(fit,zu,su,alpha()))
-    names(out$age) <- c('t','s[t]','ci[t]')
-    names(out$disp) <- c('s','ll','ul')
+    out$age <- c(tt,st)
+    out$disp <- fit$sigma
+    names(out$age) <- c('t','s[t]')
+    names(out$disp) <- c('w','s[w]')
     out
 }
 #' @param model if the scatter between the data points is solely
@@ -169,16 +168,16 @@ central.UThHe <- function(x,model=1,...){
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
     mswd <- mswd_UThHe(x,fit,doSm=doSm)
+    if (inflate(fit)){
+        fit$age['disp[t]'] <- uvw2age(fit,doSm=doSm,fact=mswd$mswd)[2]
+    }
     if (model==1){
-        if (mswd$p.value<alpha()){
-            fit$age['disp[t]'] <- uvw2age(fit,doSm=doSm(x),fact=mswd$mswd)[2]
-        }
         out <- c(fit,mswd)
     } else if (model==2){
         out <- fit
     } else {
-        init <- log(mswd$mswd)/2
-        lw <- stats::optimise(LL.uvw,interval=init+c(-3,3),
+        init <- log(sqrt(mswd$mswd)*fit$age['s[t]']/fit$age['t'])
+        lw <- stats::optimise(LL.uvw,interval=init+c(-5,5),
                               UVW=fit$uvw,x=x,doSm=doSm(x),
                               maximum=TRUE)$maximum
         w <- exp(lw)
@@ -195,7 +194,7 @@ central.UThHe <- function(x,model=1,...){
 #'     the error propagation for the central age?
 #' @rdname central
 #' @export
-central.fissiontracks <- function(x,alpha=0.05,exterr=FALSE,...){
+central.fissiontracks <- function(x,oerr=5,exterr=FALSE,...){
     out <- list()
     if (x$format<2){
         L8 <- lambda('U238')[1]
@@ -224,18 +223,18 @@ central.fissiontracks <- function(x,alpha=0.05,exterr=FALSE,...){
         # add back one d.o.f. for homogeneity test
         out$mswd <- Chi2/(out$df+1)
         out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
-        out$age <- c(tt,st,stats::qt(1-alpha/2,out$df)*st)
-        out$disp <- c(sigma,profile_LL_central_disp_FT(
-                                mu=mu,sigma=sigma,y=Nsj,m=mj,alpha=alpha))
-        names(out$age) <- c('t','s[t]','ci[t]')
-        names(out$disp) <- c('s','ll','ul')
+        out$age <- c(tt,st)
+        kappa <- log(sigma)
+        H <- stats::optimHess(par=c(mu,kappa),fn=LL.FT,y=Nsj,m=mj)
+        out$disp <- c(sigma,sqrt(solve(-H)[2,2])*sigma)
+        names(out$age) <- c('t','s[t]')
+        names(out$disp) <- c('w','s[w]')
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE)
-        out <- central.default(tst,alpha=alpha)
+        out <- central.default(tst,oerr=oerr)
     }
     if (exterr){
         out$age[1:2] <- add.exterr(x,tt=out$age[1],st=out$age[2])
-        out$age[3] <- out$age[2]*ntfact(alpha)
     }
     out
 }
@@ -330,9 +329,10 @@ continuous_mixture <- function(zu,su){
         for (i in 1:30){ # page 100 of Galbraith (2005)
             wu <- 1/(sigma^2+su^2)
             mu <- sum(wu*zu,na.rm=TRUE)/sum(wu,na.rm=TRUE)
-            fit <- stats::optimise(f=eq.6.9,interval=c(0,10*stats::sd(zu)),
+            kappa <- log(sigma)
+            fit <- stats::optimise(f=eq.6.9,interval=kappa+c(-3,3),
                                    mu=mu,zu=zu,su=su)
-            sigma <- fit$minimum
+            sigma <- exp(fit$minimum)
         }
     } else{
         sigma <- 0
@@ -341,12 +341,14 @@ continuous_mixture <- function(zu,su){
     }
     out <- list()
     smu <- 1/sqrt(sum(wu,na.rm=TRUE))
+    ssigma <- 1/sqrt(2*(sigma^2)*sum(wu^2,na.rm=TRUE))
     out$mu <- c(mu,smu)
-    out$sigma <- sigma
+    out$sigma <- c(sigma,ssigma)
     out
 }
 
-eq.6.9 <- function(sigma,mu,zu,su){
+eq.6.9 <- function(kappa,mu,zu,su){
+    sigma <- exp(kappa)
     wu <- 1/(sigma^2+su^2)
     (1-sum((wu*(zu-mu))^2,na.rm=TRUE)/sum(wu,na.rm=TRUE))^2
 }

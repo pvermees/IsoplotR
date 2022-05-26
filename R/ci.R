@@ -89,7 +89,9 @@ profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
     abs(LLmax-LL-cutoff/2)
 }
 
-LL.FT <- function(mu,sigma,y,m){
+LL.FT <- function(par,y,m){
+    mu <- par[1]
+    sigma <- exp(par[2])
     LL <- 0
     ns <- length(y)
     for (i in 1:ns){
@@ -185,18 +187,20 @@ ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
 
 inflate <- function(fit){
     if (is.null(fit$model)) fit$model <- 1
-    if (is.null(fit$alpha)) out <- FALSE
-    else out <- fit$model==1 && (fit$p.value<fit$alpha)
+    else out <- fit$model==1 && (fit$p.value<alpha())
     out
 }
 
-geterr <- function(x,sx,oerr=5){
+# df != NULL for fission track data
+geterr <- function(x,sx,oerr=5,df=NULL){
+    if (is.null(df)) fact <- ntfact(alpha())
+    else fact <- stats::qt(1-alpha()/2,df=df)
     if (oerr==1) out <- sx
     else if (oerr==2) out <- 2*sx
     else if (oerr==3) out <- 100*sx/x
     else if (oerr==4) out <- 200*sx/x
-    else if (oerr==5) out <- ntfact(alpha())*sx
-    else if (oerr==6) out <- 100*ntfact(alpha())*sx/x
+    else if (oerr==5) out <- fact*sx
+    else if (oerr==6) out <- 100*fact*sx/x
     else stop('Illegal oerr value')
 }
 
@@ -207,24 +211,25 @@ oerr2alpha <- function(oerr=1){
     out
 }
 
-agetit <- function(x,sx,n,sigdig=2,oerr=5,prefix='age ='){
-    xerr <- geterr(x,sx,oerr=oerr)
+agetit <- function(x,sx,n=NA,ntit=paste0('n=',n),sigdig=2,
+                   oerr=5,prefix='age =',df=NULL){
+    xerr <- geterr(x,sx,oerr=oerr,df=df)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     dispersed <- (length(sx)>1)
     relerr <- (oerr %in% c(3,4,6))
-    lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=n)
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=ntit)
     if (dispersed){
         lst$c <- rounded[3]
         if (relerr){
-            out <- substitute(p~a~'Ma'%+-%b~'|'~c*'%'~'(n='*n*')',lst)
+            out <- substitute(p~a~'Ma'%+-%b~'|'~c*'% ('*n*')',lst)
         } else {
-            out <- substitute(p~a%+-%b~'|'~c~'Ma (n='*n*')',lst)
+            out <- substitute(p~a%+-%b~'|'~c~'Ma ('*n*')',lst)
         }
     } else {
         if (relerr){
-            out <- substitute(p~a~'Ma'%+-%b*'%'~'(n='*n*')',lst)
+            out <- substitute(p~a~'Ma'%+-%b*'% ('*n*')',lst)
         } else {
-            out <- substitute(p~a%+-%b~'Ma (n='*n*')',lst)
+            out <- substitute(p~a%+-%b~'Ma ('*n*')',lst)
         }
     }
     out

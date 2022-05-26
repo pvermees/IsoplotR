@@ -161,14 +161,14 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
                                      show.numbers=FALSE,pch=21,
                                      levels=NA,clabel="",
                                      bg=c("yellow","red"),col='black',
-                                     markers=NULL,k=0,exterr=TRUE,alpha=0.05,
+                                     markers=NULL,k=0,exterr=TRUE,oerr=5,
                                      hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
-    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig,alpha=alpha)
+    peaks <- peakfit(x2calc,k=k,exterr=exterr,sigdig=sigdig,alpha=alpha())
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x2plot,z0=z0,from=from,to=to,transformation=transformation)
     pcol <- set.ellipse.colours(ns=ns,levels=levels[plotit],
@@ -182,8 +182,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
                 markers=markers,bg=pcol[plotit],
                 col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
-    fit <- central(x2calc,alpha=alpha,exterr=exterr)
-    graphics::title(radial.title(fit,sigdig=sigdig,alpha=alpha,
+    fit <- central(x2calc,oerr=oerr,exterr=exterr)
+    graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,
                                  units='Ma',ntit=get.ntit(x2calc)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
@@ -821,22 +821,13 @@ iatt <- function(z,zeta,rhoD){
     log(1+L8*(zeta/2e6)*rhoD*tan(z)^2)/L8
 }
 
-# this would be much easier in unicode but that doesn't render in PDF:
-radial.title <- function(fit,sigdig=2,alpha=0.05,units='',
-                         ntit=paste0('n=',fit$df+2),caveat=FALSE,...){
-    rounded.age <- roundit(fit$age[1],fit$age[2:3],
-                           sigdig=sigdig,text=TRUE)
-    rounded.disp <- roundit(100*fit$disp[1],100*fit$disp[2:3],
-                            sigdig=sigdig,text=TRUE)
-    line1 <- substitute('central age'*ast~'='~a%+-%b~'|'~c~d~'('*n*')',
-                        list(ast=ifelse(caveat,'*',''),
-                             a=rounded.age[1],b=rounded.age[2],
-                             c=rounded.age[3],d=units,n=ntit))
-    line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
-                        list(a=signif(fit$mswd,sigdig),
-                             b=signif(fit$p.value,sigdig)))
-    line3 <- substitute('dispersion ='~a+b/-c*'%',
-                        list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2]))
+radial.title <- function(fit,sigdig=2,oerr=5,units='',
+                         ntit=paste0('n=',fit$df+2),
+                         caveat=FALSE,...){
+    line1 <- agetit(fit$age[1],fit$age[2],ntit=ntit,sigdig=sigdig,
+                    oerr=oerr,prefix='central age =',df=fit$df)
+    line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
+    line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,oerr=oerr)
     mymtext(line1,line=2,...)
     mymtext(line2,line=1,...)
     mymtext(line3,line=0,...)
