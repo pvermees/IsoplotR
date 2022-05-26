@@ -200,6 +200,13 @@ geterr <- function(x,sx,oerr=5){
     else stop('Illegal oerr value')
 }
 
+oerr2alpha <- function(oerr=1){
+    if (oerr%in%c(1,3)) out <- stats::pnorm(-1)*2
+    else if (oerr%in%c(2,4)) out <- stats::pnorm(-2)*2
+    else out <- alpha()
+    out
+}
+
 agetit <- function(x,sx,n,sigdig=2,oerr=5,prefix='age ='){
     xerr <- geterr(x,sx,oerr=oerr)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)

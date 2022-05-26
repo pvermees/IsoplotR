@@ -241,7 +241,7 @@ plot_logratio_ellipses <- function(x,fill,stroke,oerr=5,
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha())
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=oerr2alpha(oerr))
         graphics::polygon(ell,col=fill[i],border=stroke[i])
         if (show.numbers) graphics::text(x0,y0,labels=i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
@@ -254,7 +254,7 @@ plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=5,
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha())
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=oerr2alpha(oerr))
         HeUTh0 <- uv2HeUTh(uvc$uv)
         HeUTh <- uv2HeUTh(ell)
         xyz <- renormalise(HeUTh,fact=fact)
@@ -278,7 +278,7 @@ plot_helioplot_points <- function(x,fact=c(1,1,1),bg=NA,
 plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
                                  oerr=5,doSm=TRUE,...){
     ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
-                   covmat=fit$covmat[1:2,1:2],alpha=alpha())
+                   covmat=fit$covmat[1:2,1:2],alpha=oerr2alpha(oerr))
     if (logratio){
         graphics::polygon(ell,col="#FFFFFFBF")
     } else {
