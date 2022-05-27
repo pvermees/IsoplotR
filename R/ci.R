@@ -95,8 +95,8 @@ LL.FT <- function(par,y,m){
     LL <- 0
     ns <- length(y)
     for (i in 1:ns){
-        LL <- LL + log(stats::integrate(pyumu,lower=mu-10*sigma,
-                                        upper=mu+10*sigma,mu=mu,
+        LL <- LL + log(stats::integrate(pyumu,lower=mu-5*sigma,
+                                        upper=mu+5*sigma,mu=mu,
                                         sigma=sigma,m=m[i],y=y[i])$value)
     }
     LL
