@@ -187,8 +187,7 @@ ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
 
 inflate <- function(fit){
     if (is.null(fit$model)) fit$model <- 1
-    else out <- fit$model==1 && (fit$p.value<alpha())
-    out
+    (fit$model==1) && (fit$p.value<alpha())
 }
 
 # df != NULL for fission track data

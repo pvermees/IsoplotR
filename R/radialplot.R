@@ -827,10 +827,18 @@ radial.title <- function(fit,sigdig=2,oerr=5,units='',
     line1 <- agetit(fit$age[1],fit$age[2],ntit=ntit,sigdig=sigdig,
                     oerr=oerr,prefix='central age =',df=fit$df)
     line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
-    line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,oerr=oerr)
-    mymtext(line1,line=2,...)
-    mymtext(line2,line=1,...)
-    mymtext(line3,line=0,...)
+    if (fit$p.value<alpha()){
+        line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,oerr=oerr)
+        mymtext(line3,line=0,...)
+        line1line <- 2
+        line2line <- 1
+    } else {
+        line1line <- 1
+        line2line <- 0
+    }
+    mymtext(line1,line=line1line,...)
+    mymtext(line2,line=line2line,...)
+    
 }
 
 get.offset <- function(x,from=NA){
