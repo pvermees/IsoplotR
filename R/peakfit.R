@@ -90,7 +90,7 @@
 peakfit <- function(x,...){ UseMethod("peakfit",x) }
 #' @rdname peakfit
 #' @export
-peakfit.default <- function(x,k='auto',sigdig=2,oerr=5,log=TRUE,...){
+peakfit.default <- function(x,k='auto',sigdig=2,oerr=5,log=TRUE,np=4,...){
     good <- !is.na(x[,1]+x[,2])
     X <- subset(x,subset=good)
     if (k<1) return(NULL)
@@ -99,7 +99,7 @@ peakfit.default <- function(x,k='auto',sigdig=2,oerr=5,log=TRUE,...){
         X[,1] <- log(X[,1])
     }
     if (identical(k,'min')) {
-        out <- min_age_model(X,...)
+        out <- min_age_model(X,np=np)
     } else if (identical(k,'auto')) {
         out <- normal.mixtures(X,k=BIC_fit(X,5),...)
     } else {
@@ -115,7 +115,7 @@ peakfit.default <- function(x,k='auto',sigdig=2,oerr=5,log=TRUE,...){
 #' @rdname peakfit
 #' @export
 peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
-                                  log=TRUE,oerr=5,...){
+                                  log=TRUE,oerr=5,np=4,...){
     out <- NULL
     if (k == 0) return(out)
     if (identical(k,'auto')) k <- BIC_fit(x,5,log=log)
@@ -171,17 +171,18 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @export
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
                         cutoff.disc=discfilter(),common.Pb=0,
-                        exterr=TRUE,sigdig=2,log=TRUE,oerr=5,...){
+                        exterr=TRUE,sigdig=2,log=TRUE,oerr=5,np=4,...){
     peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,exterr=exterr,
-                   sigdig=sigdig,log=log,oerr=oerr,common.Pb=common.Pb,...)
+                   sigdig=sigdig,log=log,oerr=oerr,
+                   common.Pb=common.Pb,np=np,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,common.Pb=0,oerr=5,...){
-    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,common.Pb=common.Pb,oerr=oerr,...)
+                         log=TRUE,common.Pb=0,oerr=5,np=4,...){
+    peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,
+                   common.Pb=common.Pb,oerr=oerr,np=np,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
@@ -195,51 +196,51 @@ peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @rdname peakfit
 #' @export
 peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=FALSE,oerr=5,...){
+                         log=TRUE,i2i=FALSE,oerr=5,np=4,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,oerr=oerr,...)
+                   log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.ThPb <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=FALSE,oerr=5,...){
+                         log=TRUE,i2i=FALSE,oerr=5,np=np,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,oerr=oerr,...)
+                   log=log,i2i=i2i,oerr=oerr,np=4,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.KCa <- function(x,k=1,exterr=TRUE,sigdig=2,
-                        log=TRUE,i2i=FALSE,oerr=5,...){
+                        log=TRUE,i2i=FALSE,oerr=5,np=4,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,oerr=oerr,...)
+                   log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.ReOs <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,oerr=5,...){
+                         log=TRUE,i2i=TRUE,oerr=5,np=4,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,oerr=oerr,...)
+                   log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.SmNd <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,oerr=5,...){
+                         log=TRUE,i2i=TRUE,oerr=5,np=4,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,oerr=oerr,...)
+                   log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.RbSr <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,oerr=5,...){
+                         log=TRUE,i2i=TRUE,oerr=5,np=4,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,oerr=oerr,...)
+                   log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,oerr=5,...){
+                         log=TRUE,i2i=TRUE,oerr=5,np=4,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,oerr=oerr,...)
+                   log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @param Th0i initial \eqn{^{230}}Th correction.
 #'
@@ -262,26 +263,26 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @rdname peakfit
 #' @export
 peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2,
-                        log=TRUE,oerr=5,Th0i=0,...){
+                        log=TRUE,oerr=5,Th0i=0,np=4,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,oerr=oerr,Th0i=Th0i,...)
+                   log=log,oerr=oerr,Th0i=Th0i,np=np,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,oerr=5,...){
-    peakfit_helper(x,k=k,sigdig=sigdig,log=log,oerr=oerr,...)
+peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,oerr=5,np=4,...){
+    peakfit_helper(x,k=k,sigdig=sigdig,log=log,oerr=oerr,np=np,...)
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                            exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
-                           common.Pb=0,oerr=5,Th0i=0,...){
+                           common.Pb=0,oerr=5,Th0i=0,np=4,...){
     if (k<1) return(NULL)
     if (identical(k,'auto')){
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,i2i=i2i,
                      cutoff.disc=cutoff.disc,Th0i=Th0i,common.Pb=common.Pb)
     }
-    tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
-                   cutoff.disc=cutoff.disc,Th0i=Th0i,...)
-    fit <- peakfit.default(tt,k=k,log=log)
+    tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,
+                   cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,Th0i=Th0i)
+    fit <- peakfit.default(tt,k=k,log=log,np=np,...)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -549,7 +550,7 @@ min_age_model <- function(zs,np=4){
                         lower=init+c(0,-10,-2,-10)[1:np],
                         upper=init+c(Mz-mz,10,+2,10)[1:np])
     H <- stats::optimHess(fit$par,LL,zs=zs,Mz=Mz)
-    lE <- solve(H)
+    lE <- MASS::ginv(H)
     par <- mappar(fit$par,Mz)
     # propagate the uncertainties from -Inf/+Inf to model space
     J <- diag(np)
@@ -601,7 +602,7 @@ get.minage.L <- function(pars,zs){
     mu0 <- (mu/sig^2 + z/s^2)/(1/sig^2 + 1/s^2)
     s0 <- 1/sqrt(1/sig^2 + 1/s^2)
     DD <- 1-stats::pnorm((gam-mu0)/s0)
-    EE <- 1-stats::pnorm((gam-mu)/s)
+    EE <- 1-stats::pnorm((gam-mu)/sig)
     FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
     fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
     fu[fu<.Machine$double.xmin] <- .Machine$double.xmin
