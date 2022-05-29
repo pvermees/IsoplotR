@@ -124,7 +124,7 @@
 central <- function(x,...){ UseMethod("central",x) }
 #' @rdname central
 #' @export
-central.default <- function(x,oerr=5,...){
+central.default <- function(x,...){
     good <- !is.na(rowSums(x))
     zu <- log(x[good,1])
     su <- x[good,2]/x[good,1]
@@ -194,7 +194,7 @@ central.UThHe <- function(x,model=1,...){
 #'     the error propagation for the central age?
 #' @rdname central
 #' @export
-central.fissiontracks <- function(x,oerr=5,exterr=FALSE,...){
+central.fissiontracks <- function(x,exterr=FALSE,...){
     out <- list()
     if (x$format<2){
         L8 <- lambda('U238')[1]
@@ -231,7 +231,7 @@ central.fissiontracks <- function(x,oerr=5,exterr=FALSE,...){
         names(out$disp) <- c('w','s[w]')
     } else if (x$format>1){
         tst <- age(x,exterr=FALSE)
-        out <- central.default(tst,oerr=oerr)
+        out <- central.default(tst)
     }
     if (exterr){
         out$age[1:2] <- add.exterr(x,tt=out$age[1],st=out$age[2])

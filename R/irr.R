@@ -27,7 +27,7 @@ irr.RbSr <- function(x,alpha=0.05,model=1,inverse=FALSE,...){
         b <- exp(lam[1]*exp(bp))-1
     }
     g <- log((v-a)/b)
-    init <- c(ap,bp,g,0)
+    init <- c(ap,bp,g,-2)
     XYZ <- york2clr(ydat)
     out <- stats::optim(init,LL.irr.a,XYZ=XYZ,lam=lam,inverse=inverse)
     out
@@ -51,7 +51,7 @@ LL.irr.generic <- function(abg,XYZ){
 LL.irr.a <- function(abgw,XYZ,lam,inverse=FALSE){
     wgba <- rev(abgw)
     abg <- rev(wgba[-1])
-    LL.irr.a.w(abg,XYZ=XYZ,w=-Inf,lam=lam,inverse=inverse)
+    LL.irr.a.w(abg,XYZ=XYZ,w=wgba[1],lam=lam,inverse=inverse)
 }
 LL.irr.a.w <- function(abg,XYZ,lam,w=-Inf,inverse=FALSE){
     if (inverse){

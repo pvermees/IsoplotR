@@ -45,21 +45,17 @@
 #'     legend in which the peak fitting results are to be displayed.
 #' @param log take the logs of the data before applying the mixture
 #'     model?
-#' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments (not used)
 #' @seealso \code{\link{radialplot}}, \code{\link{central}}
 #' @return Returns a list with the following items:
 #'
 #' \describe{
 #'
-#' \item{peaks}{a \code{3 x k} matrix with the following rows:
+#' \item{peaks}{a \code{2 x k} matrix with the following rows:
 #'
 #' \code{t}: the ages of the \code{k} peaks
 #'
 #' \code{s[t]}: the estimated uncertainties of \code{t}
-#'
-#' \code{ci[t]}: the widths of approximate \eqn{100(1-\alpha)\%}
-#' confidence intervals for \code{t}}
 #'
 #' \item{props}{a \code{2 x k} matrix with the following rows:
 #'
@@ -94,7 +90,7 @@
 peakfit <- function(x,...){ UseMethod("peakfit",x) }
 #' @rdname peakfit
 #' @export
-peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,alpha=0.05,...){
+peakfit.default <- function(x,k='auto',sigdig=2,oerr=5,log=TRUE,...){
     good <- !is.na(x[,1]+x[,2])
     X <- subset(x,subset=good)
     if (k<1) return(NULL)
@@ -103,37 +99,35 @@ peakfit.default <- function(x,k='auto',sigdig=2,log=TRUE,alpha=0.05,...){
         X[,1] <- log(X[,1])
     }
     if (identical(k,'min')) {
-        out <- min_age_model(X,alpha=alpha,...)
+        out <- min_age_model(X,...)
     } else if (identical(k,'auto')) {
-        out <- normal.mixtures(X,k=BIC_fit(X,5),alpha=alpha,...)
+        out <- normal.mixtures(X,k=BIC_fit(X,5),...)
     } else {
-        out <- normal.mixtures(X,k,alpha=alpha,...)
+        out <- normal.mixtures(X,k,...)
     }
     if (log) {
         out$peaks['t',] <- exp(out$peaks['t',])
         out$peaks['s[t]',] <- out$peaks['t',] * out$peaks['s[t]',]
-        out$peaks['ci[t]',] <- out$peaks['t',] * out$peaks['ci[t]',]
     }
-    out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
+    out$legend <- peaks2legend(out,k=k,sigdig=sigdig,oerr=oerr)
     out
 }
 #' @rdname peakfit
 #' @export
 peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
-                                  log=TRUE,alpha=0.05,...){
+                                  log=TRUE,oerr=5,...){
     out <- NULL
     if (k == 0) return(out)
     if (identical(k,'auto')) k <- BIC_fit(x,5,log=log)
     if (x$format == 1 & !identical(k,'min')){
-        out <- binomial.mixtures(x,k,exterr=exterr,alpha=alpha,...)
+        out <- binomial.mixtures(x,k,exterr=exterr,...)
     }  else if (x$format == 3){
         tt <- get.ages(x)
-        out <- peakfit.default(tt,k=k,log=log,alpha=alpha)
+        out <- peakfit.default(tt,k=k,log=log,sigdig=sigdig,oerr=oerr)
     } else {
-        out <- peakfit_helper(x,k=k,sigdig=sigdig,log=log,
-                              exterr=exterr,alpha=alpha,...)
+        out <- peakfit_helper(x,k=k,sigdig=sigdig,oerr=oerr,
+                              log=log,exterr=exterr,...)
     }
-    out$legend <- peaks2legend(out,sigdig=sigdig,k=k)
     out
 }
 #' @param type scalar indicating whether to plot the
@@ -177,18 +171,17 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @export
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
                         cutoff.disc=discfilter(),common.Pb=0,
-                        exterr=TRUE,sigdig=2,log=TRUE,alpha=0.05,...){
+                        exterr=TRUE,sigdig=2,log=TRUE,oerr=5,...){
     peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,exterr=exterr,
-                   sigdig=sigdig,log=log,alpha=alpha,
-                   common.Pb=common.Pb,...)
+                   sigdig=sigdig,log=log,oerr=oerr,common.Pb=common.Pb,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,common.Pb=0,alpha=0.05,...){
+                         log=TRUE,common.Pb=0,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,common.Pb=common.Pb,alpha=alpha,...)
+                   log=log,common.Pb=common.Pb,oerr=oerr,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial (aka
 #'     `inherited', `excess', or `common')
@@ -202,51 +195,51 @@ peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @rdname peakfit
 #' @export
 peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=FALSE,alpha=0.05,...){
+                         log=TRUE,i2i=FALSE,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,i2i=i2i,oerr=oerr,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.ThPb <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=FALSE,alpha=0.05,...){
+                         log=TRUE,i2i=FALSE,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,i2i=i2i,oerr=oerr,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.KCa <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=FALSE,alpha=0.05,...){
+                        log=TRUE,i2i=FALSE,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,i2i=i2i,oerr=oerr,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.ReOs <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,alpha=0.05,...){
+                         log=TRUE,i2i=TRUE,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,i2i=i2i,oerr=oerr,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.SmNd <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,alpha=0.05,...){
+                         log=TRUE,i2i=TRUE,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,i2i=i2i,oerr=oerr,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.RbSr <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,alpha=0.05,...){
+                         log=TRUE,i2i=TRUE,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,i2i=i2i,oerr=oerr,...)
 }
 #' @rdname peakfit
 #' @export
 peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
-                         log=TRUE,i2i=TRUE,alpha=0.05,...){
+                         log=TRUE,i2i=TRUE,oerr=5,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,i2i=i2i,alpha=alpha,...)
+                   log=log,i2i=i2i,oerr=oerr,...)
 }
 #' @param Th0i initial \eqn{^{230}}Th correction.
 #'
@@ -269,18 +262,18 @@ peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @rdname peakfit
 #' @export
 peakfit.ThU <- function(x,k=1,exterr=FALSE,sigdig=2,
-                        log=TRUE,alpha=0.05,Th0i=0,...){
+                        log=TRUE,oerr=5,Th0i=0,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
-                   log=log,alpha=alpha,Th0i=Th0i,...)
+                   log=log,oerr=oerr,Th0i=Th0i,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,alpha=0.05,...){
-    peakfit_helper(x,k=k,sigdig=sigdig,log=log,alpha=alpha,...)
+peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,oerr=5,...){
+    peakfit_helper(x,k=k,sigdig=sigdig,log=log,oerr=oerr,...)
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                            exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
-                           common.Pb=0,alpha=0.05,Th0i=0,...){
+                           common.Pb=0,oerr=5,Th0i=0,...){
     if (k<1) return(NULL)
     if (identical(k,'auto')){
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,i2i=i2i,
@@ -288,7 +281,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,Th0i=Th0i,...)
-    fit <- peakfit.default(tt,k=k,log=log,alpha=alpha)
+    fit <- peakfit.default(tt,k=k,log=log)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -296,10 +289,9 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
             age.with.exterr <- add.exterr(x,fit$peaks['t',i],
                                           fit$peaks['s[t]',i],type=type)
             fit$peaks['s[t]',i] <- age.with.exterr[2]
-            fit$peaks['ci[t]',i] <- ntfact(alpha)*fit$peaks['s[t]',i]
         }
     }
-    fit$legend <- peaks2legend(fit,sigdig=sigdig,k=k)
+    fit$legend <- peaks2legend(fit,k=k,sigdig=sigdig,oerr=oerr)
     fit
 }
 
@@ -347,30 +339,32 @@ get.props.err <- function(E){
     out
 }
 
-peaks2legend <- function(fit,sigdig=2,k=NULL){
-    if (identical(k,'min')) return(min_age_to_legend(fit,sigdig=sigdig))
-    out <- NULL
-    for (i in 1:ncol(fit$peaks)){
-        rounded.age <- roundit(fit$peaks[1,i],fit$peaks[2:3,i],
-                               sigdig=sigdig,text=TRUE)
-        line <- paste0('Peak ',i,': ',rounded.age[1],' \u00B1 ',
-                       rounded.age[2],' | ',rounded.age[3])
-        if (k>1){
-            rounded.prop <- roundit(100*fit$props[1,i],100*fit$props[2,i],
-                                    sigdig=sigdig,text=TRUE)
-            line <- paste0(line,' (',rounded.prop[1],'%)')
+peaks2legend <- function(fit,k=NULL,sigdig=2,oerr=5){
+    if (identical(k,'min')){
+        tit <- peaktit(x=fit$peaks[1],sx=fit$peaks[2],
+                       p=fit$props[1],sp=fit$props[2],
+                       sigdig=sigdig,oerr=oerr,prefix=paste0('Minimum:'))
+        out <- as.expression(tit)
+    } else {
+        out <- NULL
+        for (i in 1:ncol(fit$peaks)){
+            if (k>1){
+                tit <- peaktit(x=fit$peaks[1,i],sx=fit$peaks[2,i],
+                               p=fit$props[1,i],sp=fit$props[2,i],
+                               sigdig=sigdig,oerr=oerr,
+                               prefix=paste0('Peak ',i,':'))
+            } else {
+                tit <- peaktit(x=fit$peaks[1,i],sx=fit$peaks[2,i],
+                               sigdig=sigdig,oerr=oerr,
+                               prefix=paste0('Peak ',i,':'))
+            }
+            out <- c(out,as.expression(tit))
         }
-        out <- c(out,line)
     }
     out
 }
-min_age_to_legend <- function(fit,sigdig=2){
-    rounded.age <- roundit(fit$peaks[1],fit$peaks[2:3],
-                           sigdig=sigdig,text=TRUE)
-    paste0('Minimum: ',rounded.age[1],'\u00B1',rounded.age[2],' | ',rounded.age[3])
-}
 
-normal.mixtures <- function(x,k,alpha=0.05,...){
+normal.mixtures <- function(x,k,...){
     good <- !is.na(x[,1]+x[,2])
     zu <- x[good,1]
     su <- x[good,2]
@@ -410,11 +404,8 @@ normal.mixtures <- function(x,k,alpha=0.05,...){
         biu[,i] <- -(1-(yu-betai[i]*xu)^2)*xu^2
     }
     E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
-    out <- format.peaks(peaks=betai,
-                        peaks.err=sqrt(diag(E)[k:(2*k-1)]),
-                        props=pii,
-                        props.err=get.props.err(E),
-                        df=n-2*k+1,alpha=alpha)
+    out <- format.peaks(peaks=betai,peaks.err=sqrt(diag(E)[k:(2*k-1)]),
+                        props=pii,props.err=get.props.err(E),df=n-2*k+1)
     out$L <- L
     out
 }
@@ -432,7 +423,7 @@ get.L.normal.mixture <- function(lpfiu){
     sum(fu)
 }
 
-binomial.mixtures <- function(x,k,exterr=TRUE,alpha=0.05,...){
+binomial.mixtures <- function(x,k,exterr=TRUE,...){
     yu <- x$x[,'Ns']
     mu <- x$x[,'Ns'] + x$x[,'Ni']
     NsNi <- (x$x[,'Ns']+0.5)/(x$x[,'Ni']+0.5)
@@ -470,24 +461,20 @@ binomial.mixtures <- function(x,k,exterr=TRUE,alpha=0.05,...){
     E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
     beta.var <- diag(E)[k:(2*k-1)]
     pe <- theta2age(x,thetai,beta.var,exterr)
-    out <- format.peaks(peaks=pe$peaks,
-                        peaks.err=pe$peaks.err,
-                        props=pii,
-                        props.err=get.props.err(E),
-                        df=n-2*k+1,alpha=alpha)
+    out <- format.peaks(peaks=pe$peaks,peaks.err=pe$peaks.err,
+                        props=pii,props.err=get.props.err(E),df=n-2*k+1)
     out$L <- L
     out
 }
 
-format.peaks <- function(peaks,peaks.err,props,props.err,df,alpha=0.05){
+format.peaks <- function(peaks,peaks.err,props,props.err,df){
     out <- list()
     k <- length(peaks)
-    out$peaks <- matrix(0,3,k)
+    out$peaks <- matrix(0,2,k)
     colnames(out$peaks) <- 1:k
-    rownames(out$peaks) <- c('t','s[t]','ci[t]')
+    rownames(out$peaks) <- c('t','s[t]')
     out$peaks['t',] <- peaks
     out$peaks['s[t]',] <- peaks.err
-    out$peaks['ci[t]',] <- ntfact(alpha)*out$peaks['s[t]',]
     out$props <- matrix(0,2,k)
     colnames(out$props) <- 1:k
     rownames(out$props) <- c('p','s[p]')
@@ -536,7 +523,7 @@ BIC_fit <- function(x,max.k,...){
     }) 
 }
 
-min_age_model <- function(zs,alpha=0.05,np=4){
+min_age_model <- function(zs,np=4){
     # maps the parameters from -Inf/+Inf to model space
     mappar <- function(par,Mz){
         np <- length(par)
@@ -557,7 +544,7 @@ min_age_model <- function(zs,alpha=0.05,np=4){
     init <- rep(0,np)
     init[1] <- mz
     init[2] <- 0
-    init[3] <- log(cfit$sigma)
+    init[3] <- log(cfit$sigma[1])
     fit <- stats::optim(init,LL,method='L-BFGS-B',zs=zs,Mz=Mz,
                         lower=init+c(0,-10,-2,-10)[1:np],
                         upper=init+c(Mz-mz,10,+2,10)[1:np])
@@ -574,7 +561,7 @@ min_age_model <- function(zs,alpha=0.05,np=4){
     }
     E <- J %*% lE %*% t(J)
     if (E[1,1]<0 & np==4){
-        out <- min_age_model(zs=zs,alpha=alpha,np=3)
+        out <- min_age_model(zs=zs,np=3)
     } else {
         out <- list()
         out$L <- fit$value
@@ -582,7 +569,6 @@ min_age_model <- function(zs,alpha=0.05,np=4){
         rownames(out$peaks) <- c('t','s[t]','ci[t]')
         out$peaks['t',] <- par[1]
         out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
-        out$peaks['ci[t]',] <- ntfact(alpha)*out$peaks['s[t]',]
         out$props <- matrix(0,2,1)
         rownames(out$props) <- c('p','s[p]')
         out$props['p',] <- par[2]
@@ -596,7 +582,6 @@ min_age_model <- function(zs,alpha=0.05,np=4){
             rownames(out$mu) <- c('t','s[t]','ci[t]')
             out$mu['t',] <- par[4]
             out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
-            out$mu['ci[t]',] <- ntfact(alpha)*out$mu['s[t]',]
         }
     }
     out

@@ -191,9 +191,9 @@ inflate <- function(fit){
 }
 
 # df != NULL for fission track data
-geterr <- function(x,sx,oerr=5,df=NULL){
-    if (is.null(df)) fact <- ntfact(alpha())
-    else fact <- stats::qt(1-alpha()/2,df=df)
+geterr <- function(x,sx,oerr=5,dof=NULL){
+    if (is.null(dof)) fact <- ntfact(alpha())
+    else fact <- stats::qt(1-alpha()/2,df=dof)
     if (oerr==1) out <- sx
     else if (oerr==2) out <- 2*sx
     else if (oerr==3) out <- 100*sx/x
@@ -211,8 +211,8 @@ oerr2alpha <- function(oerr=1){
 }
 
 agetit <- function(x,sx,n=NA,ntit=paste0('n=',n),sigdig=2,
-                   oerr=5,prefix='age =',df=NULL){
-    xerr <- geterr(x,sx,oerr=oerr,df=df)
+                   oerr=5,units='Ma',prefix='age =',dof=NULL){
+    xerr <- geterr(x,sx,oerr=oerr,dof=dof)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     dispersed <- (length(sx)>1)
     relerr <- (oerr %in% c(3,4,6))
@@ -220,15 +220,15 @@ agetit <- function(x,sx,n=NA,ntit=paste0('n=',n),sigdig=2,
     if (dispersed){
         lst$c <- rounded[3]
         if (relerr){
-            out <- substitute(p~a~'Ma'%+-%b~'|'~c*'% ('*n*')',lst)
+            out <- substitute(p~a~u%+-%b~'|'~c*'% ('*n*')',lst)
         } else {
-            out <- substitute(p~a%+-%b~'|'~c~'Ma ('*n*')',lst)
+            out <- substitute(p~a%+-%b~'|'~c~u~'('*n*')',lst)
         }
     } else {
         if (relerr){
-            out <- substitute(p~a~'Ma'%+-%b*'% ('*n*')',lst)
+            out <- substitute(p~a~u%+-%b*'% ('*n*')',lst)
         } else {
-            out <- substitute(p~a%+-%b~'Ma ('*n*')',lst)
+            out <- substitute(p~a%+-%b~u~'('*n*')',lst)
         }
     }
     out
@@ -250,6 +250,19 @@ disptit <- function(w,sw,sigdig=2,oerr=5,prefix='dispersion ='){
         lst$b <- signif(w-exp(log(w)-werr/w),sigdig)
         lst$c <- signif(exp(log(w)+werr/w)-w,sigdig)
         out <- substitute(p~a+b-c,lst)
+    }
+    out
+}
+peaktit <- function(x,sx,p=NULL,sp=NULL,sigdig=2,oerr=5,unit='Ma',prefix=NULL){
+    xerr <- geterr(x,sx,oerr=oerr)
+    rounded.x <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    rounded.p <- roundit(100*p,100*sp,sigdig=sigdig,text=TRUE)
+    relerr <- (oerr %in% c(3,4,6))
+    lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)
+    if (relerr){
+        out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)
+    } else {
+        out <- substitute(p~a~u%+-%b*'% (prop='*c*'%)',lst)
     }
     out
 }
