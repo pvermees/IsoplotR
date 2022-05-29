@@ -282,7 +282,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,
                    cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,Th0i=Th0i)
-    fit <- peakfit.default(tt,k=k,np=np,log=log,oerr=oerr)
+    fit <- peakfit.default(tt,k=k,np=np,log=log,oerr=oerr,sigdig=sigdig)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -567,8 +567,8 @@ min_age_model <- function(zs,np=4){
     } else {
         out <- list()
         out$L <- fit$value
-        out$peaks <- matrix(0,3,1)
-        rownames(out$peaks) <- c('t','s[t]','ci[t]')
+        out$peaks <- matrix(0,2,1)
+        rownames(out$peaks) <- c('t','s[t]')
         out$peaks['t',] <- par[1]
         out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
         out$props <- matrix(0,2,1)
@@ -580,8 +580,8 @@ min_age_model <- function(zs,np=4){
         out$disp['d',] <- par[3]
         out$disp['s[d]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
         if (np==4){
-            out$mu <- matrix(0,3,1)
-            rownames(out$mu) <- c('t','s[t]','ci[t]')
+            out$mu <- matrix(0,2,1)
+            rownames(out$mu) <- c('t','s[t]')
             out$mu['t',] <- par[4]
             out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
         }

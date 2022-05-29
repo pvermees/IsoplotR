@@ -1,51 +1,3 @@
-# based on equation 6.5 of Galbraith (2005)
-profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
-    LLmax <- LL.FT(mu=mu,sigma=sigma,y=y,m=m)
-    cutoff <- stats::qchisq(1-alpha,1)
-    if (abs(LL.FT(mu=mu,sigma=exp(-10),y=y,m=m)-LLmax) < cutoff/2){
-        sigmal <- 0
-    } else {
-        sigmal <- stats::optimize(profile_central_FT_helper,
-                                  interval=c(0,sigma),
-                                  mu=mu,y=y,m=m,LLmax=LLmax,
-                                  cutoff=cutoff)$minimum
-    }
-    sigmauinit <- 2*stats::sd(log(y+0.5)-log(m-y))
-    if (abs(LL.FT(mu=mu,sigma=sigmauinit,y=y,m=m)-LLmax) < cutoff/2){
-        sigmau <- Inf
-    } else {
-        sigmau <- stats::optimize(profile_central_FT_helper,
-                                  interval=c(sigma,sigmauinit),
-                                  mu=mu,y=y,m=m,LLmax=LLmax,
-                                  cutoff=cutoff)$minimum
-    }    
-    ll <- sigma - sigmal
-    ul <- sigmau - sigma
-    c(ll,ul)
-}
-profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
-    LLmax <- LL.uvw(fit$w,fit$uvw,x=x,doSm=doSm(x))
-    cutoff <- stats::qchisq(1-alpha,1)
-    doSm <- doSm(x)
-    if (abs(LL.uvw(0,UVW=fit$uvw,x=x,doSm=doSm)-LLmax) < cutoff/2){
-        wl <- 0
-    } else {
-        wl <- stats::optimize(profile_UThHe_disp_helper,
-                              interval=c(0,fit$w),x=x,UVW=fit$uvw,
-                              doSm=doSm,LLmax=LLmax,cutoff=cutoff)$minimum
-    }
-    if (abs(LL.uvw(100,UVW=fit$uvw,x=x,doSm=doSm)-LLmax) < cutoff/2){
-        wu <- Inf
-    } else {
-        wu <- stats::optimize(profile_UThHe_disp_helper,
-                              interval=c(fit$w,10),x=x,UVW=fit$uvw,
-                              doSm=doSm,LLmax=LLmax,cutoff=cutoff)$minimum
-    }
-    ll <- fit$w - wl
-    ul <- wu - fit$w
-    c(ll,ul)
-}
-
 profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     mu <- fit$mu[1]
     sigma <- fit$sigma
@@ -71,46 +23,9 @@ profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
     ul <- sigmau - sigma
     c(ll,ul)
 }
-profile_central_FT_helper <- function(sigma,mu,y,m,LLmax,cutoff){
-    # update mu from sigma using section 3.9.1 from Galbraith (2005)
-    theta <- 1/(1+exp(-mu))
-    wj <- m/(theta*(1-theta) + (m-1)*(theta^2)*((1-theta)^2)*(sigma^2))
-    theta <- sum(wj*y/m)/sum(wj)
-    mu <- log(theta)-log(1-theta)
-    LL <- LL.FT(mu=mu,sigma=sigma,y=y,m=m)
-    abs(LLmax-LL-cutoff/2)
-}
 profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
     LL <- LL.sigma(sigma,X,sX)
     abs(LLmax-LL-cutoff/2)
-}
-profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
-    LL <- LL.uvw(w,UVW=UVW,x=x,doSm=doSm)
-    abs(LLmax-LL-cutoff/2)
-}
-
-LL.FT <- function(par,y,m){
-    mu <- par[1]
-    sigma <- exp(par[2])
-    LL <- 0
-    ns <- length(y)
-    for (i in 1:ns){
-        LL <- LL + log(stats::integrate(pyumu,lower=mu-5*sigma,
-                                        upper=mu+5*sigma,mu=mu,
-                                        sigma=sigma,m=m[i],y=y[i])$value)
-    }
-    LL
-}
-pyumu <- function(B,mu,sigma,m,y){
-    theta <- exp(B)/(1+exp(B))
-    stats::dbinom(y,m,theta)*stats::dnorm(B,mean=mu,sd=sigma)
-}
-
-# Equation 18 of Galbraith and Roberts (2012)
-LL.sigma <- function(sigma,X,sX){
-    wi <- 1/(sigma^2+sX^2)
-    mu <- sum(wi*X)/sum(wi)
-    sum(log(wi) - wi*(X-mu)^2)/2
 }
 
 ci_regression <- function(fit,i1='b',i2='a'){
@@ -203,6 +118,7 @@ geterr <- function(x,sx,oerr=5,dof=NULL){
     else stop('Illegal oerr value')
 }
 
+# get significance level for error ellipses
 oerr2alpha <- function(oerr=1){
     if (oerr%in%c(1,3)) out <- stats::pnorm(-1)*2
     else if (oerr%in%c(2,4)) out <- stats::pnorm(-2)*2

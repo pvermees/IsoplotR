@@ -1,5 +1,8 @@
 roundit <- function(age,err,sigdig=2,oerr=5,text=FALSE){
-    if (missing(err)){
+    if (oerr %in% c(3,4,6)){
+        out <- roundit(age,err*age/100,sigdig=sigdig+2)
+        out[2] <- signif(err,sigdig)
+    } else if (missing(err)){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
         nc <- 1

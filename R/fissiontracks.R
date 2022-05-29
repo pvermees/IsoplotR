@@ -263,3 +263,26 @@ get.ICP.age <- function(Ns,A,UsU,zeta){
     st <- tt * sqrt(1/Ns + (zeta[2]/zeta[1])^2 + (UsU[2]/UsU[1])^2)
     c(tt,st)
 }
+
+LL.FT <- function(par,y,m){
+    mu <- par[1]
+    sigma <- exp(par[2])
+    LL <- 0
+    ns <- length(y)
+    for (i in 1:ns){
+        LL <- LL + log(stats::integrate(pyumu,lower=mu-5*sigma,
+                                        upper=mu+5*sigma,mu=mu,
+                                        sigma=sigma,m=m[i],y=y[i])$value)
+    }
+    LL
+}
+pyumu <- function(B,mu,sigma,m,y){
+    theta <- exp(B)/(1+exp(B))
+    stats::dbinom(y,m,theta)*stats::dnorm(B,mean=mu,sd=sigma)
+}
+# Equation 18 of Galbraith and Roberts (2012)
+LL.sigma <- function(sigma,X,sX){
+    wi <- 1/(sigma^2+sX^2)
+    mu <- sum(wi*X)/sum(wi)
+    sum(log(wi) - wi*(X-mu)^2)/2
+}
