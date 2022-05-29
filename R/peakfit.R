@@ -282,7 +282,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
     }
     tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,
                    cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,Th0i=Th0i)
-    fit <- peakfit.default(tt,k=k,log=log,np=np,...)
+    fit <- peakfit.default(tt,k=k,np=np,log=log,oerr=oerr)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
@@ -344,7 +344,8 @@ peaks2legend <- function(fit,k=NULL,sigdig=2,oerr=5){
     if (identical(k,'min')){
         tit <- peaktit(x=fit$peaks[1],sx=fit$peaks[2],
                        p=fit$props[1],sp=fit$props[2],
-                       sigdig=sigdig,oerr=oerr,prefix=paste0('Minimum:'))
+                       sigdig=sigdig,oerr=oerr,
+                       prefix=paste0('Minimum:'))
         out <- as.expression(tit)
     } else {
         out <- NULL

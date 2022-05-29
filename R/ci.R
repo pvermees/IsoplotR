@@ -253,16 +253,16 @@ disptit <- function(w,sw,sigdig=2,oerr=5,prefix='dispersion ='){
     }
     out
 }
-peaktit <- function(x,sx,p=NULL,sp=NULL,sigdig=2,oerr=5,unit='Ma',prefix=NULL){
+peaktit <- function(x,sx,p,sp,sigdig=2,oerr=5,unit='Ma',prefix=NULL){
     xerr <- geterr(x,sx,oerr=oerr)
     rounded.x <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     rounded.p <- roundit(100*p,100*sp,sigdig=sigdig,text=TRUE)
     relerr <- (oerr %in% c(3,4,6))
     lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)
     if (relerr){
-        out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)
-    } else {
         out <- substitute(p~a~u%+-%b*'% (prop='*c*'%)',lst)
+    } else {
+        out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)
     }
     out
 }

@@ -142,7 +142,7 @@ radialplot.default <- function(x,from=NA,to=NA,z0=NA,transformation='log',
     radial_helper(x,from=from,to=to,z0=z0,transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
                   clabel=clabel,bg=bg,col=col,markers=markers,
-                  units=units,hide=hide,omit=omit,omit.col=omit.col,...)
+                  hide=hide,omit=omit,omit.col=omit.col,...)
     fit <- central(x2calc)
     graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,
                                  units=units,ntit=get.ntit(x2calc[,1])))
@@ -179,7 +179,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
                 markers=markers,bg=pcol[plotit],
                 col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
-    fit <- central(x2calc,oerr=oerr,exterr=exterr)
+    fit <- central(x2calc,exterr=exterr)
     graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,units='Ma',
                                  ntit=get.ntit(x2calc),dof=fit$df))
     if (!is.null(peaks$legend))
@@ -432,8 +432,8 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',type=4,
                        k=0,np=4,exterr=TRUE,i2i=FALSE,Th0i=0,common.Pb=0,
                        oerr=5,units='Ma',hide=NULL,omit=NULL,omit.col=NA,...){
     x2calc <- clear(x,hide,omit)
-    peaks <- peakfit(x2calc,k=k,np=np,exterr=exterr,sigdig=sigdig,oerr=oerr,
-                     i2i=i2i,type=type,cutoff.76=cutoff.76,
+    peaks <- peakfit(x2calc,k=k,np=np,exterr=exterr,sigdig=sigdig,
+                     oerr=oerr,i2i=i2i,type=type,cutoff.76=cutoff.76,
                      cutoff.disc=cutoff.disc,common.Pb=common.Pb,Th0i=Th0i)
     markers <- c(markers,peaks$peaks['t',])
     tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,i2i=i2i,
@@ -441,8 +441,7 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',type=4,
     radial_helper(tt,from=from,to=to,z0=z0,transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
                   clabel=clabel,bg=bg,col=col,markers=markers,
-                  oerr=oerr,units=units,hide=hide,omit=omit,
-                  omit.col=omit.col,...)
+                  hide=hide,omit=omit,omit.col=omit.col,...)
     selection <- clear(1:nrow(tt),unique(c(hide,omit)))
     fit <- central(tt[selection,])
     if (exterr){
