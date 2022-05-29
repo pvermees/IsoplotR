@@ -377,7 +377,7 @@ radialplot.RbSr <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerrr=oerr,hide=hide,
+               np=np,exterr=exterr,i2i=i2i,oerr=oerr,hide=hide,
                omit=omit,omit.col=omit.col,...)
 }
 #' @rdname radialplot

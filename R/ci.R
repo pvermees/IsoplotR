@@ -169,10 +169,10 @@ disptit <- function(w,sw,sigdig=2,oerr=5,prefix='dispersion ='){
     }
     out
 }
-peaktit <- function(x,sx,p,sp,sigdig=2,oerr=5,unit='Ma',prefix=NULL){
+peaktit <- function(x,sx,p,sigdig=2,oerr=5,unit='Ma',prefix=NULL){
     xerr <- geterr(x,sx,oerr=oerr)
     rounded.x <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
-    rounded.p <- roundit(100*p,100*sp,sigdig=sigdig,text=TRUE)
+    rounded.p <- signif(100*p,sigdig)
     relerr <- (oerr %in% c(3,4,6))
     lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)
     if (relerr){

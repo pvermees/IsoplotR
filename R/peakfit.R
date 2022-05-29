@@ -28,7 +28,10 @@
 #' single discrete age peak (\eqn{\exp(m)}, say) and the second
 #' component is a continuous distribution (as descibed by the
 #' \code{\link{central}} age model), but truncated at this discrete
-#' value (Van der Touw et al., 1997).
+#' value. \code{IsoplotR} uses a normal likelihood function
+#' (section 6.11 of Galbraith, 2005) for the minimum age model.
+#' This may result in some inaccuracy for young and/or uranium-poor
+#' fission track samples. 
 #' 
 #' @param x either an \code{[nx2]} matrix with measurements and their
 #'     standard errors, or an object of class \code{fissiontracks},
@@ -80,10 +83,8 @@
 #' mixed fission track ages. Nuclear Tracks and Radiation
 #' Measurements, 21(4), pp.459-470.
 #'
-#' van der Touw, J., Galbraith, R., and Laslett, G. A., 1997.
-#' Logistic truncated normal mixture model for overdispersed binomial
-#' data. Journal of Statistical Computation and Simulation,
-#' 59(4), pp.349-373.
+#' Galbraith, R.F. 2005, Statistics for fission track
+#' analysis. Chapman and Hall/CRC, 229p.
 #' 
 #' @rdname peakfit
 #' @export
@@ -342,19 +343,16 @@ get.props.err <- function(E){
 
 peaks2legend <- function(fit,k=NULL,sigdig=2,oerr=5){
     if (identical(k,'min')){
-        tit <- peaktit(x=fit$peaks[1],sx=fit$peaks[2],
-                       p=fit$props[1],sp=fit$props[2],
-                       sigdig=sigdig,oerr=oerr,
-                       prefix=paste0('Minimum:'))
+        tit <- peaktit(x=fit$peaks[1],sx=fit$peaks[2],p=fit$props[1],
+                       sigdig=sigdig,oerr=oerr,prefix=paste0('Minimum:'))
         out <- as.expression(tit)
     } else {
         out <- NULL
         for (i in 1:ncol(fit$peaks)){
             if (k>1){
                 tit <- peaktit(x=fit$peaks[1,i],sx=fit$peaks[2,i],
-                               p=fit$props[1,i],sp=fit$props[2,i],
-                               sigdig=sigdig,oerr=oerr,
-                               prefix=paste0('Peak ',i,':'))
+                               p=fit$props[1,i],sigdig=sigdig,
+                               oerr=oerr,prefix=paste0('Peak ',i,':'))
             } else {
                 tit <- peaktit(x=fit$peaks[1,i],sx=fit$peaks[2,i],
                                sigdig=sigdig,oerr=oerr,
@@ -543,14 +541,16 @@ min_age_model <- function(zs,np=4){
     mz <- min(zs[,1])
     Mz <- max(zs[,1])
     cfit <- continuous_mixture(zs[,1],zs[,2])
-    init <- rep(0,np)
-    init[1] <- mz
-    init[2] <- 0
-    init[3] <- log(cfit$sigma[1])
-    fit <- stats::optim(init,LL,method='L-BFGS-B',zs=zs,Mz=Mz,
-                        lower=init+c(0,-10,-2,-10)[1:np],
-                        upper=init+c(Mz-mz,10,+2,10)[1:np])
-    H <- stats::optimHess(fit$par,LL,zs=zs,Mz=Mz)
+    init <- c(mz,0,log(cfit$sigma[1]),0)[1:np]
+    ll <- c(mz,-10,init[3]-10,-10)[1:np]
+    ul <- c(cfit$mu[1],10,init[3],10)[1:np]
+    fit <- stats::optim(init,LL,method='L-BFGS-B',zs=zs,Mz=Mz,lower=ll,upper=ul)
+    if (fit$par[3]<(-10)) fit$par[2] <- 10 # sigma=0 => pi=1 (no sensitivity for pi)
+    H <- tryCatch(stats::optimHess(fit$par,LL,zs=zs,Mz=Mz),
+                  error=function(e){ return(NULL) })
+    if (is.null(H) & np>3){
+        return(min_age_model(zs=zs,np=3))
+    }
     lE <- MASS::ginv(H)
     par <- mappar(fit$par,Mz)
     # propagate the uncertainties from -Inf/+Inf to model space
