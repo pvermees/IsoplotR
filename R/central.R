@@ -35,7 +35,6 @@
 #' @param x an object of class \code{UThHe} or \code{fissiontracks},
 #'     OR a 2-column matrix with (strictly positive) values and
 #'     uncertainties
-#' @param alpha cutoff value for confidence intervals
 #' @param ... optional arguments
 #' @return
 #' If \code{x} has class \code{UThHe}, returns a list containing the
@@ -184,8 +183,8 @@ central.UThHe <- function(x,model=1,...){
         H <- stats::optimHess(lw,LL.uvw,UVW=fit$uvw,x=x,doSm=doSm(x))
         sw <- w*solve(-H)
         out <- UThHe_logratio_mean(x,model=model,w=w)
-        out$w <- c(w,sw)
-        names(out$w) <- c('w','s[w]')
+        out$disp <- c(w,sw)
+        names(out$disp) <- c('w','s[w]')
     }
     out
 }
@@ -242,7 +241,7 @@ central.fissiontracks <- function(x,exterr=FALSE,...){
 UThHe_logratio_mean <- function(x,model=1,w=0,fact=1){
     out <- average_uvw(x,model=model,w=w)
     out$model <- model
-    out$w <- w
+    out$disp <- w
     out$age <- uvw2age(out,doSm(x),fact=fact)
     names(out$age) <- c('t','s[t]')
     out
@@ -316,7 +315,7 @@ mswd_UThHe <- function(x,fit,doSm=FALSE){
     out <- list()
     if (doSm) nd <- 3
     else nd <- 2
-    SS <- LL.uvw(lw=log(fit$w),fit$uvw[1:nd],x,doSm=doSm,LL=FALSE)
+    SS <- LL.uvw(lw=log(fit$disp),fit$uvw[1:nd],x,doSm=doSm,LL=FALSE)
     out$df <- nd*(length(x)-1)
     out$mswd <- as.numeric(SS/out$df)
     out$p.value <- 1-stats::pchisq(SS,out$df)

@@ -556,7 +556,7 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
         } else {
             stop('Invalid isochron type.')
         }
-        if (model==3) fit$w <- ci_log2lin_lud(fit=fit,fact=ntfact(alpha))
+        if (model==3) fit$disp <- ci_log2lin_lud(fit=fit,fact=ntfact(alpha))
         out <- isochron_init(fit,alpha=0.05)
         out$age[1] <- tt
         out$age[2] <- sqrt(fit$cov[1,1])
@@ -1330,8 +1330,8 @@ isochron_init <- function(fit,alpha=0.05){
         names(out$y0) <- c('y','s[y]','ci[y]')
     }
     if (fit$model > 2){
-        if (length(out$w)==1) out$w <- c(out$w,NA,NA)
-        names(out$w) <- c('s','ll','ul')
+        if (length(out$disp)==1) out$disp <- c(out$disp,NA,NA)
+        names(out$disp) <- c('s','ll','ul')
     }
     out$alpha <- alpha
     class(out) <- "isochron"
@@ -1354,8 +1354,8 @@ regression_init <- function(fit,alpha=0.05){
         names(out$b) <- c('b','s[b]','ci[b]')
     }
     if (fit$model > 2){
-        out$w <- c(fit$w,NA,NA)
-        names(out$w) <- c('s','ll','ul')
+        out$disp <- c(fit$disp,NA,NA)
+        names(out$disp) <- c('s','ll','ul')
     }
     out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
     out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
@@ -1444,13 +1444,15 @@ isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",ski=NULL,...){
                                             b=signif(fit$p.value,sigdig)))
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
-            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig,text=TRUE)
+            rounded.disp <- roundit(fit$disp[1],fit$disp[2:3],
+                                    sigdig=sigdig,text=TRUE)
             linecontent[[3]] <- substitute('overdispersion ='~a+b/-c~'Ma',
                                            list(a=rounded.disp[1],
                                                 b=rounded.disp[3],
                                                 c=rounded.disp[2]))
         } else {
-            rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig,text=TRUE)
+            rounded.disp <- roundit(fit$disp[1],fit$disp[2:3],
+                                    sigdig=sigdig,text=TRUE)
             list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
             args3 <- quote(a+b/-c)
             expr3 <- fit$displabel

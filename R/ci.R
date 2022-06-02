@@ -106,42 +106,43 @@ inflate <- function(fit){
 }
 
 # df != NULL for fission track data
-geterr <- function(x,sx,oerr=5,dof=NULL){
+geterr <- function(x,sx,oerr=3,dof=NULL,absolute=FALSE){
+    if (oerr>3 & absolute) oerr <- oerr-3
     if (is.null(dof)) fact <- ntfact(alpha())
     else fact <- stats::qt(1-alpha()/2,df=dof)
     if (oerr==1) out <- sx
     else if (oerr==2) out <- 2*sx
-    else if (oerr==3) out <- 100*sx/x
-    else if (oerr==4) out <- 200*sx/x
-    else if (oerr==5) out <- fact*sx
+    else if (oerr==3) out <- fact*sx
+    else if (oerr==4) out <- 100*sx/x
+    else if (oerr==5) out <- 200*sx/x
     else if (oerr==6) out <- 100*fact*sx/x
     else stop('Illegal oerr value')
+    out
 }
 
 # get significance level for error ellipses
 oerr2alpha <- function(oerr=1){
-    if (oerr%in%c(1,3)) out <- stats::pnorm(-1)*2
-    else if (oerr%in%c(2,4)) out <- stats::pnorm(-2)*2
+    if (oerr%in%c(1,4)) out <- stats::pnorm(-1)*2
+    else if (oerr%in%c(2,5)) out <- stats::pnorm(-2)*2
     else out <- alpha()
     out
 }
 
 agetit <- function(x,sx,n=NA,ntit=paste0('n=',n),sigdig=2,
-                   oerr=5,units='Ma',prefix='age =',dof=NULL){
+                   oerr=3,units='Ma',prefix='age =',dof=NULL){
     xerr <- geterr(x,sx,oerr=oerr,dof=dof)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     dispersed <- (length(sx)>1)
-    relerr <- (oerr %in% c(3,4,6))
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=ntit)
     if (dispersed){
         lst$c <- rounded[3]
-        if (relerr){
+        if (oerr>3){
             out <- substitute(p~a~u%+-%b~'|'~c*'% ('*n*')',lst)
         } else {
             out <- substitute(p~a%+-%b~'|'~c~u~'('*n*')',lst)
         }
     } else {
-        if (relerr){
+        if (oerr>3){
             out <- substitute(p~a~u%+-%b*'% ('*n*')',lst)
         } else {
             out <- substitute(p~a%+-%b~u~'('*n*')',lst)
@@ -153,12 +154,11 @@ mswdtit <- function(mswd,p,sigdig=2){
     substitute('MSWD ='~a~', p('*chi^2*') ='~b,
                list(a=signif(mswd,sigdig),b=signif(p,sigdig)))
 }
-disptit <- function(w,sw,sigdig=2,oerr=5,prefix='dispersion ='){
+disptit <- function(w,sw,sigdig=2,oerr=3,prefix='dispersion ='){
     werr <- geterr(w,sw,oerr=oerr)
     rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
     lst <- list(p=prefix,a=rounded[1],b=rounded[2])
-    relerr <- (oerr %in% c(3,4,6))
-    if (relerr){
+    if (oerr>3){
         out <- substitute(p~a%+-%b*'%',lst)
     } else if (werr/w<0.5){
         out <- substitute(p~a%+-%b,lst)
@@ -169,13 +169,12 @@ disptit <- function(w,sw,sigdig=2,oerr=5,prefix='dispersion ='){
     }
     out
 }
-peaktit <- function(x,sx,p,sigdig=2,oerr=5,unit='Ma',prefix=NULL){
+peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
     xerr <- geterr(x,sx,oerr=oerr)
     rounded.x <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     rounded.p <- signif(100*p,sigdig)
-    relerr <- (oerr %in% c(3,4,6))
     lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)
-    if (relerr){
+    if (oerr>3){
         out <- substitute(p~a~u%+-%b*'% (prop='*c*'%)',lst)
     } else {
         out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)

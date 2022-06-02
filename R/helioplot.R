@@ -70,18 +70,18 @@
 #' 
 #' \code{2}: 2\eqn{\sigma} absolute uncertainties.
 #' 
-#' \code{3}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
-#' 
-#' \code{4}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
-#'
-#' \code{5}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
 #' \eqn{\alpha} equales the value that is stored in
 #' \code{settings('alpha')}.
+#' 
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
 #'
 #' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
 #' \eqn{\alpha} equales the value that is stored in
 #' \code{settings('alpha')}.
-#' 
+#'
 #' @param contour.col two-element vector with the fill colours to be
 #'     assigned to the minimum and maximum age contour
 #' @param levels a vector with additional values to be displayed as
@@ -162,7 +162,7 @@
 #' helioplot(UThHe,logratio=FALSE)
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
-                      show.numbers=FALSE,oerr=5,contour.col=c('white','red'),
+                      show.numbers=FALSE,oerr=3,contour.col=c('white','red'),
                       levels=NA,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
@@ -234,7 +234,7 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1),xpd=NA)
 }
 
-plot_logratio_ellipses <- function(x,fill,stroke,oerr=5,
+plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,
                                    show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
@@ -247,7 +247,7 @@ plot_logratio_ellipses <- function(x,fill,stroke,oerr=5,
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
 }
-plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=5,
+plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=3,
                                     show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
@@ -276,7 +276,7 @@ plot_helioplot_points <- function(x,fact=c(1,1,1),bg=NA,
 }
 
 plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
-                                 oerr=5,doSm=TRUE,...){
+                                 oerr=3,doSm=TRUE,...){
     ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
                    covmat=fit$covmat[1:2,1:2],alpha=oerr2alpha(oerr))
     if (logratio){
@@ -331,7 +331,7 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
     }
 }
 
-helioplot_title <- function(fit,sigdig=2,oerr=5,...){
+helioplot_title <- function(fit,sigdig=2,oerr=3,...){
     line1 <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
                     sigdig=sigdig,oerr=oerr,prefix="central age =")
     line1line <- 1
@@ -341,7 +341,7 @@ helioplot_title <- function(fit,sigdig=2,oerr=5,...){
     } else if (fit$model==2){
         line1line <- 0
     } else if (fit$model==3){
-        line2 <- disptit(fit$w[1],fit$w[-1],sigdig=sigdig,oerr=oerr)
+        line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,oerr=oerr)
         mymtext(line2,line=0,...)
     }
     mymtext(line1,line=line1line,...)

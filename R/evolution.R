@@ -373,7 +373,7 @@ evolution.title <- function(fit,sigdig=2,...){
         mymtext(line1,line=1,...)
         mymtext(line2,line=0,...)
     } else if (fit$model==3) {
-        rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig,text=TRUE)
+        rounded.disp <- roundit(fit$disp[1],fit$disp[2:3],sigdig=sigdig,text=TRUE)
         expr3 <- quote('('^232*'Th/'^238*'U)'-dispersion~'=')
         args3 <- quote(a+b-c)
         list3 <- list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2])

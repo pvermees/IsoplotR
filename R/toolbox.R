@@ -1,5 +1,5 @@
-roundit <- function(age,err,sigdig=2,oerr=5,text=FALSE){
-    if (oerr %in% c(3,4,6)){
+roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
+    if (oerr>3){
         out <- roundit(age,err*age/100,sigdig=sigdig+2)
         out[2] <- signif(err,sigdig)
     } else if (missing(err)){
@@ -444,6 +444,9 @@ get.ntit.fissiontracks <- function(x,...){
         out <- get.ntit.default(x$Ns)
     }
     out    
+}
+ntit.valid <- function(valid,...){
+    paste0(sum(valid),'/',length(valid))
 }
 
 geomean <- function(x,...){ UseMethod("geomean",x) }
