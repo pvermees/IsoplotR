@@ -547,7 +547,8 @@ weightedmean_helper <- function(x,random.effects=FALSE,
                                 detect.outliers=detect.outliers,
                                 oerr=oerr,plot=FALSE,hide=hide,omit=omit)
     if (exterr)
-        out <- add.exterr.to.wtdmean(x,fit,cutoff.76=cutoff.76,type=type)
+        out <- add.exterr.to.wtdmean(x,fit,oerr=oerr,
+                                     cutoff.76=cutoff.76,type=type)
     else out <- fit
     if (plot){
         plot_weightedmean(tt[,1],tt[,2],from=from,to=to,fit=out,
@@ -610,7 +611,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
     cit <- geterr(x=out$mean['t'],sx=out$mean['s[t]'],oerr=oerr,absolute=TRUE)
     plotpar$ci <- list(x=c(0,ns+1,ns+1,0),
                        y=c(rep(out$mean['t']+cit,2),rep(out$mean['t']-cit,2)))
-    plotpar$ci.exterr <- NA # to be defined later
+    plotpar$ci.exterr <- NULL # to be defined later
     if (out$random.effects){
         cid <- geterr(x=out$mean['t'],sx=out$disp['w'],
                       oerr=oerr,absolute=TRUE)
@@ -659,7 +660,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
     else maxx <- to
     graphics::plot(c(0,ns+1),c(minx,maxx),type='n',
                    axes=FALSE,xlab='N',ylab='',...)
-    if (!any(is.na(fit$plotpar$ci.exterr)))
+    if (!is.null(fit$plotpar$ci.exterr))
         graphics::polygon(fit$plotpar$ci.exterr,col='gray90',border=NA)
     graphics::polygon(fit$plotpar$ci,col='gray75',border=NA)
     graphics::lines(fit$plotpar$mean)
@@ -688,9 +689,11 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
     line1 <- agetit(x=fit$mean[1],sx=fit$mean[-1],n=ntit.valid(fit$valid),
-                    sigdig=sigdig,oerr=oerr,prefix=paste0('mean',ast,' ='))
+                    sigdig=sigdig,oerr=oerr,units=units,
+                    prefix=paste0('mean',ast,' ='))
     if (fit$random.effects){
-        line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,oerr=oerr)
+        line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,
+                         oerr=oerr,units=units)
     } else {
         line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     }
@@ -732,7 +735,7 @@ chauvenet <- function(X,sX,valid,random.effects=FALSE){
     valid
 }
 
-add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
+add.exterr.to.wtdmean <- function(x,fit,oerr=3,cutoff.76=1100,type=4){
     out <- fit
     out$mean[c('t','s[t]')] <-
         add.exterr(x,
@@ -747,9 +750,12 @@ add.exterr.to.wtdmean <- function(x,fit,cutoff.76=1100,type=4){
                        cutoff.76=cutoff.76,type=type)[2]
     }
     ns <- length(x)
+    cit <- geterr(x=out$mean['t'],
+                  sx=out$mean['s[t]'],
+                  oerr=oerr,absolute=TRUE)
     ci.exterr <- list(x=c(0,ns+1,ns+1,0),
-                      y=c(rep(out$mean['t']+out$mean['ci[t]'],2),
-                          rep(out$mean['t']-out$mean['ci[t]'],2)))
+                      y=c(rep(out$mean['t']+cit,2),
+                          rep(out$mean['t']-cit,2)))
     out$plotpar$ci.exterr <- ci.exterr
     out
 }
