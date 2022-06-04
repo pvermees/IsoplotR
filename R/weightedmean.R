@@ -638,7 +638,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
     colour <- set.ellipse.colours(ns=NS,levels=levels,col=rect.col,
                                   hide=hide,omit=which(!fit$valid),
                                   omit.col=omit.col)
-    Xerr <- geterr(X,sX,oerr=oerr)
+    Xerr <- geterr(X,sX,oerr=oerr,absolute=TRUE)
     x <- X[plotit]
     xerr <- Xerr[plotit]
     valid <- fit$valid[plotit]

@@ -1,7 +1,7 @@
 roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
     if (oerr>3){
         out <- roundit(age,err*age/100,sigdig=sigdig+2)
-        out[2] <- signif(err,sigdig)
+        out[-1] <- signif(err,sigdig)
     } else if (missing(err)){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
