@@ -117,7 +117,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' dat <- cbind(X,sX,Y,sY)
 #' scatterplot(dat,fit=york(dat),show.ellipses=2)
 #' @export
-scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
+scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         show.ellipses=1,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke="black",fit='none',add=FALSE,
@@ -160,7 +160,7 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
         for (i in sn[plotit]){
             if (!any(is.na(xy[i,]))){
                 covmat <- cor2cov2(xy[i,'sX'],xy[i,'sY'],xy[i,'rXY'])
-                ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=alpha)
+                ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=oerr2alpha(oerr))
                 graphics::polygon(ell,col=fill[i],border=stroke[i])
                 if (show.numbers) graphics::text(xy[i,'X'],xy[i,'Y'],i)
                 else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=cex)
@@ -174,9 +174,8 @@ scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
         else
             graphics::points(xy[plotit,'X'],xy[plotit,'Y'],
                              pch=21,cex=cex,col=stroke,bg=fill)
-        fact <- stats::qnorm(1-alpha/2)
-        dx <- fact*xy[plotit,'sX']
-        dy <- fact*xy[plotit,'sY']
+        dx <- geterr(x=xy[plotit,'X'],sx=xy[plotit,'sX'],oerr=oerr,absolute=TRUE)
+        dy <- geterr(x=xy[plotit,'Y'],sx=xy[plotit,'sY'],oerr=oerr,absolute=TRUE)
         graphics::arrows(xy[plotit,'X'],xy[plotit,'Y']-dy,
                          xy[plotit,'X'],xy[plotit,'Y']+dy,
                          code=3,angle=90,length=0.05,col=stroke)

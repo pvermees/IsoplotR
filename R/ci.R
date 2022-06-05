@@ -151,20 +151,26 @@ agetit <- function(x,sx,n=NULL,ntit=paste0('(n=',n,')'),sigdig=2,
     out
 }
 mswdtit <- function(mswd,p,sigdig=2){
-    substitute('MSWD ='~a~', p('*chi^2*') ='~b,
+    substitute('MSWD ='~a*', p('*chi^2*') ='~b,
                list(a=signif(mswd,sigdig),b=signif(p,sigdig)))
 }
 disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
-    werr <- geterr(w,sw,oerr=oerr)
-    rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    if (w>0){
+        werr <- geterr(w,sw,oerr=oerr)
+        rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    } else {
+        w <- 0
+        werr <- NA
+        rounded <- c(w,werr)
+    }
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units)
     if (oerr>3){
         out <- substitute(p~a~u%+-%b*'%',lst)
-    } else if (werr/w<0.5){
+    } else if (is.na(werr) | sw/w>0.5){
         out <- substitute(p~a%+-%b~u,lst)
     } else {
-        lst$b <- signif(w-exp(log(w)-werr/w),sigdig)
-        lst$c <- signif(exp(log(w)+werr/w)-w,sigdig)
+        lst$b <- signif(exp(log(w)+werr/w)-w,sigdig)
+        lst$c <- signif(w-exp(log(w)-werr/w),sigdig)
         out <- substitute(p~a+b-c~u,lst)
     }
     out

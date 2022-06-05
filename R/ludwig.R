@@ -120,9 +120,7 @@ ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
     parnames <- c('log(t)','log(a0)','log(b0)','log(w)')
     if (model!=3) parnames <- parnames[-4]
     if (x$format < 4) parnames <- parnames[-3]
-    names(fit$logpar) <- parnames
-    rownames(fit$logcov) <- parnames
-    colnames(fit$logcov) <- parnames
+    names(fit$logpar) <-  rownames(fit$logcov) <- colnames(fit$logcov) <- parnames
     out <- exponentiate_ludwig(fit,format=x$format)
     out$n <- length(x)
     mswd <- mswd.lud(out$logpar,x=x,anchor=anchor)
