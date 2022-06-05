@@ -113,9 +113,9 @@ geterr <- function(x,sx,oerr=3,dof=NULL,absolute=FALSE){
     if (oerr==1) out <- sx
     else if (oerr==2) out <- 2*sx
     else if (oerr==3) out <- fact*sx
-    else if (oerr==4) out <- 100*sx/x
-    else if (oerr==5) out <- 200*sx/x
-    else if (oerr==6) out <- 100*fact*sx/x
+    else if (oerr==4) out <- abs(100*sx/x)
+    else if (oerr==5) out <- abs(200*sx/x)
+    else if (oerr==6) out <- abs(100*fact*sx/x)
     else stop('Illegal oerr value')
     out
 }
@@ -128,8 +128,8 @@ oerr2alpha <- function(oerr=1){
     out
 }
 
-agetit <- function(x,sx,n=NA,ntit=paste0('n=',n),sigdig=2,
-                   oerr=3,units='Ma',prefix='age =',dof=NULL){
+agetit <- function(x,sx,n=NULL,ntit=paste0('(n=',n,')'),sigdig=2,
+                   oerr=3,units=' Ma',prefix='age =',dof=NULL){
     xerr <- geterr(x,sx,oerr=oerr,dof=dof)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     dispersed <- (length(sx)>1)
@@ -137,15 +137,15 @@ agetit <- function(x,sx,n=NA,ntit=paste0('n=',n),sigdig=2,
     if (dispersed){
         lst$c <- rounded[3]
         if (oerr>3){
-            out <- substitute(p~a~u%+-%b~'|'~c*'% ('*n*')',lst)
+            out <- substitute(p~a*u%+-%b~'|'~c*'%'~n,lst)
         } else {
-            out <- substitute(p~a%+-%b~'|'~c~u~'('*n*')',lst)
+            out <- substitute(p~a%+-%b~'|'~c~u~n,lst)
         }
     } else {
         if (oerr>3){
-            out <- substitute(p~a~u%+-%b*'% ('*n*')',lst)
+            out <- substitute(p~a*u%+-%b*'%'~n,lst)
         } else {
-            out <- substitute(p~a%+-%b~u~'('*n*')',lst)
+            out <- substitute(p~a%+-%b~u~n,lst)
         }
     }
     out

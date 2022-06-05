@@ -290,8 +290,9 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
         if (measured.disequilibrium(x2calc$d))
             x2calc$d <- replace.impossible.diseq(tt=fit$par[1],d=x2calc$d)
         fit$n <- length(x2calc)
-        discordia.line(fit,wetherill=wetherill,d=mediand(x2calc$d))
-        graphics::title(discordia.title(fit,wetherill=wethertit,sigdig=sigdig))
+        discordia.line(fit,wetherill=wetherill,d=mediand(x2calc$d),oerr=oerr)
+        graphics::title(discordia.title(fit,wetherill=wethertit,
+                                        sigdig=sigdig,oerr=oerr))
     }
     plot.concordia.line(x2calc,lims=lims,type=type,col=concordia.col,
                         oerr=oerr,exterr=exterr,ticks=ticks)

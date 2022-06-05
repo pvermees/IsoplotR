@@ -1,6 +1,6 @@
 roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
     if (oerr>3){
-        out <- roundit(age,err*age/100,sigdig=sigdig+2)
+        out <- roundit(age,err*age/100,sigdig=sigdig)
         out[-1] <- signif(err,sigdig)
     } else if (missing(err)){
         if (is.na(sigdig)) out <- age
@@ -433,9 +433,9 @@ get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
 get.ntit.default <- function(x,...){
     ns <- length(x)
     nisnan <- length(which(is.na(x)))
-    out <- 'n='
+    out <- '(n='
     if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
-    paste0(out,ns)
+    paste0(out,ns,')')
 }
 get.ntit.fissiontracks <- function(x,...){
     if (x$format<2){
@@ -446,7 +446,7 @@ get.ntit.fissiontracks <- function(x,...){
     out    
 }
 ntit.valid <- function(valid,...){
-    paste0(sum(valid),'/',length(valid))
+    paste0('(',sum(valid),'/',length(valid),')')
 }
 
 geomean <- function(x,...){ UseMethod("geomean",x) }
