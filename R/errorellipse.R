@@ -142,7 +142,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     if (!identical(fit,'none')){
         usr <- graphics::par('usr')
         plot_isochron_line(fit,x=seq(usr[1],usr[2],length.out=100),
-                           ci.col=ci.col,col=line.col,lwd=lwd)
+                           oerr=oerr,ci.col=ci.col,col=line.col,lwd=lwd)
     }
     graphics::box()
     nolevels <- all(is.na(levels))
@@ -189,11 +189,10 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     }
 }
 
-plot_isochron_line <- function(fit,x,ci.col='gray80',...){
-    if (inflate(fit)) f <- ntfact(fit$alpha,fit)
-    else f <- ntfact(fit$alpha)
+plot_isochron_line <- function(fit,x,oerr=3,ci.col='gray80',...){
     y <- fit$a[1]+fit$b[1]*x
-    e <- f*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
+    sy <- sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
+    e <- geterr(x=y,sx=sy,oerr=oerr,absolute=TRUE)
     cix <- c(x,rev(x))
     ciy <- c(y+e,rev(y-e))
     graphics::polygon(cix,ciy,col=ci.col,border=NA)

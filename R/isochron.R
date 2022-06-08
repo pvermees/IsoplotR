@@ -455,7 +455,7 @@
 isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
-isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
+isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                              levels=NA,clabel="",xlab='x',ylab='y',
                              ellipse.fill=c("#00FF0080","#FF000080"),
                              ellipse.stroke='black',ci.col='gray80',
@@ -465,17 +465,16 @@ isochron.default <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
                              omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     fit <- regression(data2york(d2calc),model=model)
-    out <- ci_isochron(regression_init(fit,alpha=alpha))
     if (plot){
         y <- data2york(x)
-        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
+        scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
-                    ellipse.stroke=ellipse.stroke,fit=out,
+                    ellipse.stroke=ellipse.stroke,fit=fit,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        if (title) graphics::title(isochrontitle(out,sigdig=sigdig),
+        if (title) graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,units=''),
                                    xlab=xlab,ylab=ylab)
     }
     invisible(fit)
@@ -1318,61 +1317,6 @@ get.isochron.labels <- function(nuclide,inverse=FALSE){
     out
 }
 
-isochron_init <- function(fit,alpha=0.05){
-    out <- fit
-    out$alpha <- alpha
-    if (fit$model==1){
-        out$age <- rep(NA,4)
-        out$y0 <- rep(NA,4)
-        names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-        names(out$y0) <- c('y','s[y]','ci[y]','disp[y]')
-    } else {
-        out$age <- rep(NA,3)
-        out$y0 <- rep(NA,3)
-        names(out$age) <- c('t','s[t]','ci[t]')
-        names(out$y0) <- c('y','s[y]','ci[y]')
-    }
-    if (fit$model > 2){
-        if (length(out$disp)==1) out$disp <- c(out$disp,NA,NA)
-        names(out$disp) <- c('s','ll','ul')
-    }
-    out$alpha <- alpha
-    class(out) <- "isochron"
-    out
-}
-regression_init <- function(fit,alpha=0.05){
-    out <- fit
-    out$alpha <- alpha
-    out$displabel <- quote('y-dispersion = ')
-    out$y0label <- quote('y-intercept = ')
-    if (fit$model==1){
-        out$a <- rep(NA,4)
-        out$b <- rep(NA,4)
-        names(out$a) <- c('a','s[a]','ci[a]','disp[a]')
-        names(out$b) <- c('b','s[b]','ci[b]','disp[b]')
-    } else {
-        out$a <- rep(NA,3)
-        out$b <- rep(NA,3)
-        names(out$a) <- c('a','s[a]','ci[a]')
-        names(out$b) <- c('b','s[b]','ci[b]')
-    }
-    if (fit$model > 2){
-        out$disp <- c(fit$disp,NA,NA)
-        names(out$disp) <- c('s','ll','ul')
-    }
-    out$a[c('a','s[a]')] <- fit$a[c('a','s[a]')]
-    out$b[c('b','s[b]')] <- fit$b[c('b','s[b]')]
-    out$a['ci[a]'] <- ntfact(alpha)*fit$a['s[a]']
-    out$b['ci[b]'] <- ntfact(alpha)*fit$b['s[b]']
-    if (inflate(out)){
-        out$a['disp[a]'] <- ntfact(alpha,out)*fit$a['s[a]']
-        out$b['disp[b]'] <- ntfact(alpha,out)*fit$b['s[b]']
-    }
-    out$alpha <- alpha
-    class(out) <- "isochron"
-    out
-}
-
 get.limits <- function(x,sx){
     minx <- min(x-3*sx,na.rm=TRUE)
     maxx <- max(x+3*sx,na.rm=TRUE)
@@ -1391,76 +1335,29 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 }
 
-isochrontitle <- function(fit,sigdig=2,type=NA,units="Ma",ski=NULL,...){
-    if (inflate(fit)){
-        args1 <- quote(a%+-%b~'|'~c~'|'~d~u~'(n='*n*')')
-        args2 <- quote(a%+-%b~'|'~c~'|'~d~u)
-    } else {
-        args1 <- quote(a%+-%b~'|'~c~u~'(n='*n*')')
-        args2 <- quote(a%+-%b~'|'~c~u)
-    }
-    if (is.na(type)){
-        intercept <- roundit(fit$a[1],fit$a[2:4],sigdig=sigdig,text=TRUE)
-        slope <- roundit(fit$b[1],fit$b[2:4],sigdig=sigdig,text=TRUE)
-        expr1 <- 'slope ='
-        expr2 <- 'intercept ='
-        list1 <- list(a=slope[1],
-                      b=slope[2],
-                      c=slope[3],
-                      u='',
-                      n=fit$n)
-        list2 <- list(a=intercept[1],
-                      b=intercept[2],
-                      c=intercept[3],
-                      u='')
-        if (inflate(fit)){
-            list1$d <- slope[4]
-            list2$d <- intercept[4]
-        }
-    } else {
-        rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
-        rounded.intercept <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig,text=TRUE)
-        expr1 <- 'age ='
-        list1 <- list(a=rounded.age[1],
-                      b=rounded.age[2],
-                      c=rounded.age[3],
-                      u=units,
-                      n=fit$n)
-        list2 <- list(a=rounded.intercept[1],
-                      b=rounded.intercept[2],
-                      c=rounded.intercept[3],
-                      u='')
-        if (inflate(fit)){
-            list1$d <- rounded.age[4]
-            list2$d <- rounded.intercept[4]
-        }
-        expr2 <- fit$y0label
-    }
-    call1 <- substitute(e~a,list(e=expr1,a=args1))
-    call2 <- substitute(e~a,list(e=expr2,a=args2))
+isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units="Ma",ski=NULL,...){
     linecontent <- list()
-    linecontent[[1]] <- do.call(substitute,list(eval(call1),list1))
-    linecontent[[2]] <- do.call(substitute,list(eval(call2),list2))
+    if (is.na(type)){
+        linecontent[[1]] <- agetit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
+                                   prefix='intercept =',sigdig=sigdig,oerr=oerr)
+        linecontent[[2]] <- agetit(x=fit$b[1],sx=fit$b[-1],ntit='',units=units,
+                                   prefix='slope =',sigdig=sigdig,oerr=oerr)
+    } else {
+        linecontent[[1]] <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                                   units=units,sigdig=sigdig,oerr=oerr)
+        linecontent[[2]] <- agetit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
+                                   units='',prefix=fit$y0label,
+                                   sigdig=sigdig,oerr=oerr)
+    }
     if (fit$model==1){
-        linecontent[[3]] <- substitute('MSWD ='~a*', p('*chi^2*')='~b,
-                                       list(a=signif(fit$mswd,sigdig),
-                                            b=signif(fit$p.value,sigdig)))
+        linecontent[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
-            rounded.disp <- roundit(fit$disp[1],fit$disp[2:3],
-                                    sigdig=sigdig,text=TRUE)
-            linecontent[[3]] <- substitute('overdispersion ='~a+b/-c~'Ma',
-                                           list(a=rounded.disp[1],
-                                                b=rounded.disp[3],
-                                                c=rounded.disp[2]))
+            linecontent[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],
+                                        sigdig=sigdig,oerr=oerr,units='Ma ')
         } else {
-            rounded.disp <- roundit(fit$disp[1],fit$disp[2:3],
-                                    sigdig=sigdig,text=TRUE)
-            list3 <- list(a=rounded.disp[1],c=rounded.disp[2],b=rounded.disp[3])
-            args3 <- quote(a+b/-c)
-            expr3 <- fit$displabel
-            call3 <- substitute(e~a,list(e=expr3,a=args3))
-            linecontent[[3]] <- do.call(substitute,list(eval(call3),list3))
+            linecontent[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
+                                        oerr=oerr,prefix=fit$displabel,units='Ma ')
         }
     }
     nl <- length(linecontent)
