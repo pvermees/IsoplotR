@@ -991,12 +991,12 @@ isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 #'
 #' \code{y0option=1} for the authigenic \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
 #'
-#' \code{y0option=2} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
-#'
 #' \code{y0option=2} for the detrital \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
 #'
-#' \code{y0option=3} for the authigenic \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.
+#' \code{y0option=3} for the authigenic \eqn{^{230}}Th/\eqn{^{238}}U activity ratio,
 #' 
+#' \code{y0option=4} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio.
+#'
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
@@ -1130,52 +1130,53 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
                        out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
     out$age['t'] <- tst['t']
     out$age['s[t]'] <- tst['s[t]']
-    out <- y0ci(out,tst,y0option,exterr=exterr,alpha=alpha)
+    out <- gety0(out=out,tst=tst,option=y0option,exterr=exterr,alpha=alpha)
     out$xlab <- x.lab
     out$ylab <- y.lab
     out$xyz <- subset(out$xyz,select=id)
     out
 }
-y0ci <- function(out,tst,y0option=1,exterr=FALSE,alpha=0.05){
-    l0 <- lambda('Th230')
-    l4 <- lambda('U234')
-    E <- matrix(0,5,5)
-    E[1:3,1:3] <- out$COV
-    E[4,4] <- l0[2]^2
-    E[5,5] <- l4[2]^2
-    J <- matrix(0,6,5)
-    J[1,c(1,2,4,5)] <- tst[c('dt.d48','dt.d08','dt.dl0','dt.dl4')]
-    J[2:4,1:3] <- diag(3)
-    J[5:6,4:5] <- diag(2)*exterr
-    E2 <- J %*% E %*% t(J)
-    J2 <- rep(0,6)
-    if (y0option==1){
+gety0 <- function(out,tst,option=1,exterr=FALSE,alpha=0.05){
+    if (option==1){
+        out$y0['y'] <- out$PAR['i48']
+        out$y0['s[y]'] <- sqrt(out$COV['i48','i48'])
+        out$y0label <- quote('('^234*'U/'^238*'U)=')
+    } else if (option==2){
+        out$y0['y'] <- out$PAR['i02']
+        out$y0['s[y]'] <- sqrt(out$COV['i02','i02'])
+        out$y0label <- quote('('^230*'Th/'^230*'Th)=')
+    } else if (option==3){
+        out$y0['y'] <- out$PAR['i08']
+        out$y0['s[y]'] <- sqrt(out$COV['i08','i08'])
+        out$y0label <- quote('('^230*'Th/'^238*'U)=')
+    } else {
+        l4 <- lambda('U234')
         out$y0['y'] <- 1 + (out$PAR['i48']-1)*exp(l4[1]*tst['t'])
-        out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
+        E <- matrix(0,2,2)
+        E[1,1] <- out$COV['i48','i48']
+        E[2,2] <- l4[2]^2
+        J <- matrix(0,3,2)
+        J[1,1] <- tst['dt.d48']
+        J[2,1] <- 1
+        J[3,2] <- ifelse(exterr,1,0)
+        E2 <- J %*% E %*% t(J)
+        J2 <- rep(0,3)
         J2[1] <- l4[1]*(out$PAR['i48']-1)*exp(l4[1]*tst['t'])
         J2[2] <- exp(l4[1]*tst['t'])
-        J2[6] <- ifelse(exterr,(out$PAR['i48']-1)*exp(l4[1]*tst['t'])*tst['t'],0)
-    } else if (y0option==2){
-        out$y0['y'] <- 1 + (out$PAR['i02']-1)*exp(l0[1]*tst['t'])
-        out$y0label <- quote('('^230*'Th/'^230*'Th)'[o]*'=')
-        J2[1] <- l0[1]*(out$PAR['i02']-1)*exp(l0[1]*tst['t'])
-        J2[4] <- exp(l0[1]*tst['t'])
-        J2[5] <- ifelse(exterr,(out$PAR['i02']-1)*exp(l0[01]*tst['t'])*tst['t'],0)
-    } else {
-        out$y0['y'] <- 1 + (out$PAR['i08']-1)*exp(l0[1]*tst['t'])
-        out$y0label <- quote('('^230*'Th/'^238*'U)'[o]*'=')
-        J2[1] <- l0[1]*(out$PAR['i08']-1)*exp(l0[1]*tst['t'])
-        J2[3] <- exp(l0[1]*tst['t'])
-        J2[5] <- ifelse(exterr,(out$PAR['i08']-1)*exp(l0[1]*tst['t'])*tst['t'],0)
+        J2[3] <- ifelse(exterr,(out$PAR['i48']-1)*exp(l4[1]*tst['t'])*tst['t'],0)
+        out$y0['s[y]'] <- sqrt(J2 %*% E2 %*% J2)
+        out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
     }
-    out$y0['s[y]'] <- sqrt(J2 %*% E2 %*% J2)
-    out <- ci_isochron(out)
     if (inflate(out)){ # overwrite dispersion to remove decay constant errors
-        f2E <- E
-        f2E[1:3,1:3] <- out$mswd*E[1:3,1:3]
-        E3 <- J %*% f2E %*% t(J)
-        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*sqrt(E3[1,1])
-        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*sqrt(J2 %*% E3 %*% J2)
+        if (option<4){
+            out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
+            out$age['disp[y]'] <- sqrt(out$mswd)*out$age['s[y]']
+        } else {
+            E[1,1] <- out$mswd*out$COV['i48','i48']
+            E3 <- J2 %*% (J %*% E %*% t(J)) %*% J2
+            out$age['disp[t]'] <- sqrt(E3[1,1])
+            out$y0['disp[y]'] <- sqrt(E3[2,2])
+        }
     }
     out
 }
