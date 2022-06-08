@@ -20,8 +20,6 @@
 #'
 #' @param x an object of class \code{UPb}
 #' 
-#' @param alpha cutoff value for confidence intervals
-#' 
 #' @param exterr propagate external sources of
 #' uncertainty (i.e. decay constants)?
 #' 
@@ -35,7 +33,7 @@
 #' lower intercept age and common
 #' (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
 #' Tera-Wasserburg). If the p-value for the chi-square test is less
-#' than \code{alpha}, then the analytical uncertainties are augmented
+#' than \code{alpha()}, then the analytical uncertainties are augmented
 #' by a factor \eqn{\sqrt{MSWD}}.
 #'
 #' \code{2}: fit a discordia line ignoring the analytical uncertainties
@@ -103,7 +101,7 @@
 ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
-ludwig.default <- function(x,exterr=FALSE,alpha=0.05,model=1,anchor=0,...){
+ludwig.default <- function(x,exterr=FALSE,model=1,anchor=0,...){
     fit <- fit.lta0b0w(x,exterr=exterr,model=model,anchor=anchor,...)
     fit$model <- model
     fit$exterr <- exterr

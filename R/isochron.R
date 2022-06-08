@@ -985,15 +985,17 @@ isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 #' \code{4}: `Osmond type-II' isochron, setting out
 #' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #' 
-#' @param y0option controls the type of initial activity ratio that is
-#'     reported along with the 3D isochron age. Only relevant to Th-U data
-#'     formats 1 and 2. Set to:
+#' @param y0option controls the type of activity ratio that is
+#'     reported along with the 3D isochron age. Only relevant to Th-U
+#'     data formats 1 and 2. Set to:
 #'
-#' \code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+#' \code{y0option=1} for the authigenic \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
 #'
-#' \code{y0option=2} for the initial \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+#' \code{y0option=2} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
 #'
-#' \code{y0option=3} for the initial \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.
+#' \code{y0option=2} for the detrital \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+#'
+#' \code{y0option=3} for the authigenic \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.
 #' 
 #' @rdname isochron
 #' @export
@@ -1158,7 +1160,7 @@ y0ci <- function(out,tst,y0option=1,exterr=FALSE,alpha=0.05){
         out$y0label <- quote('('^230*'Th/'^230*'Th)'[o]*'=')
         J2[1] <- l0[1]*(out$PAR['i02']-1)*exp(l0[1]*tst['t'])
         J2[4] <- exp(l0[1]*tst['t'])
-        J2[5] <- ifelse(exterr,(out$PAR['i02']-1)*exp(l0[1]*tst['t'])*tst['t'],0)
+        J2[5] <- ifelse(exterr,(out$PAR['i02']-1)*exp(l0[01]*tst['t'])*tst['t'],0)
     } else {
         out$y0['y'] <- 1 + (out$PAR['i08']-1)*exp(l0[1]*tst['t'])
         out$y0label <- quote('('^230*'Th/'^238*'U)'[o]*'=')

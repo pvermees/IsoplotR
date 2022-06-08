@@ -145,7 +145,7 @@
 #'     errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
-evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
+evolution <- function(x,xlim=NULL,ylim=NULL,oerr=3,transform=FALSE,
                       Th0i=0,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
@@ -153,7 +153,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
                       hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (x$format %in% c(1,2)){
         if (transform){
-            U4U8vst(x,Th0i=Th0i,xlim=xlim,ylim=ylim,alpha=alpha,
+            U4U8vst(x,Th0i=Th0i,xlim=xlim,ylim=ylim,oerr=oerr,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
@@ -161,7 +161,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
-                        ylim=ylim,alpha=alpha,Th0i=Th0i,
+                        ylim=ylim,oerr=oerr,Th0i=Th0i,
                         show.numbers=show.numbers,levels=levels,
                         clabel=clabel,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,
@@ -171,13 +171,13 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
         }
         if (isochron){
             fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,
-                                model=model,hide=hide,omit=omit,alpha=alpha)
+                                model=model,hide=hide,omit=omit,oerr=oerr)
             fit$n <- length(x)-length(hide)-length(omit)
-            graphics::title(evolution.title(fit,sigdig=sigdig))
+            graphics::title(evolution.title(fit,sigdig=sigdig,oerr=oerr))
         }
     } else {
         Th02vsU8Th2(x,isochron=isochron,model=model,Th0i=Th0i,
-                    xlim=xlim,ylim=ylim,alpha=alpha,show.numbers=show.numbers,
+                    xlim=xlim,ylim=ylim,oerr=oerr,show.numbers=show.numbers,
                     exterr=exterr,sigdig=sigdig,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,line.col=line.col,
@@ -186,7 +186,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
     }
 }
 
-U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,alpha=0.05,
+U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
                     show.numbers=FALSE,levels=NA,clabel="",
                     ellipse.fill=c("#00FF0080","#FF000080"),
                     ellipse.stroke='black',show.ellipses=TRUE,
@@ -208,7 +208,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,alpha=0.05,
     d <- ta0
     colnames(d) <- c('X','sX','Y','sY','rXY')
     d[,'rXY'] <- ta0[,'cov[t,48_0]']/(ta0[,'s[t]']*ta0[,'s[48_0]'])
-    scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+    scatterplot(d,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE, hide=hide,
@@ -216,7 +216,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,alpha=0.05,
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
-                        xlim=NULL,ylim=NULL,alpha=0.05,
+                        xlim=NULL,ylim=NULL,oerr=3,
                         show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
@@ -239,16 +239,15 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
         initial[3] <- b48
         initial[4] <- sqrt(fit$cov['B','B'])
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
-        scatterplot(initial,alpha=alpha,
-                    ellipse.fill=grDevices::rgb(1,1,1,0.85),
-                    line.col='black',add=TRUE)
+        scatterplot(initial,oerr=oerr,line.col='black',add=TRUE,
+                    ellipse.fill=grDevices::rgb(1,1,1,0.85))
         e48 <- 1
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
     pdat <- y[,c('Th230U238','sTh230U238',
                  'U234U238','sU234U238','rYZ'),drop=FALSE]
-    scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
+    scatterplot(pdat,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,hide=hide,
@@ -258,7 +257,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
 }
 
 Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
-                        ylim=NULL,alpha=0.05,show.numbers=FALSE,
+                        ylim=NULL,oerr=3,show.numbers=FALSE,
                         exterr=TRUE,clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -313,7 +312,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
                      add=TRUE,model=model,hide=hide,
                      omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke)
     } else { # plot just the data
-        scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+        scatterplot(d,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
@@ -337,7 +336,11 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-evolution.title <- function(fit,sigdig=2,...){
+evolution.title <- function(fit,sigdig=2,oerr=3,...){
+    line1 <- agetit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
+                    oerr=oerr,prefix='isochron age =',units=' ka')
+    line2 <- agetit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
+                    oerr=oerr,prefix='isochron age =',units=' ka')
     rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
     rounded.a0 <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig,text=TRUE)
     expr1 <- quote('isochron age =')

@@ -24,7 +24,6 @@
 #' @param x an \code{[nx9]} matrix with the following columns:
 #'     \code{X, sX,} \code{Y, sY,} \code{Z, sZ}, \code{rhoXY,}
 #'     \code{rhoXZ,} \code{rhoYZ}.
-#' @param alpha cutoff value for confidence intervals
 #' @return A four-element list of vectors containing:
 #'
 #'     \describe{
@@ -72,7 +71,7 @@
 #' errors of the best straight line. American Journal of Physics,
 #' 72(3), pp.367-375.
 #' @export
-titterington <- function(x,alpha=0.05){
+titterington <- function(x){
     ns <- nrow(x)
     fitXY <- york(subset(x,select=c(1,2,3,4,7)))
     a <- fitXY$a[1]
