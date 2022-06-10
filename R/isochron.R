@@ -563,49 +563,51 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             fit$disp <- c('w'=w,'s[w]'=sw)
         }
         out <- fit
-        out$age[1] <- tt
-        out$age[2] <- sqrt(fit$cov[1,1])
+        out$age <- NULL
+        out$age['t'] <- tt
+        out$age['s[t]'] <- sqrt(fit$cov[1,1])
+        out$y0 <- NULL
         if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
             XY <- data2york(x,option=3)
             y0par <- 'a0'
-            out$y0[1] <- fit$par[y0par]
-            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            out$y0['y'] <- fit$par[y0par]
+            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
             out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
             y.lab <- quote(''^204*'Pb/'^206*'Pb')
         } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
             XY <- data2york(x,option=4)
             y0par <- 'b0'
-            out$y0[1] <- fit$par[y0par]
-            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            out$y0['y'] <- fit$par[y0par]
+            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
             out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
             y.lab <- quote(''^204*'Pb/'^207*'Pb')
         } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
             XY <- data2york(x,option=6,tt=tt)
             y0par <- 'a0'
-            out$y0[1] <- 1/fit$par[y0par]
-            out$y0[2] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
+            out$y0['y'] <- 1/fit$par[y0par]
+            out$y0['s[y]'] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
             out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
             y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
         } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
             XY <- data2york(x,option=7,tt=tt)
             U <- settings('iratio','U238U235')[1]
             y0par <- 'b0'
-            out$y0[1] <- 1/fit$par[y0par]
-            out$y0[2] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
+            out$y0['y'] <- 1/fit$par[y0par]
+            out$y0['s[y]'] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
             y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
             out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
         } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
             XY <- data2york(x,option=8,tt=tt)
             y0par <- 'a0'
-            out$y0[1] <- fit$par[y0par]
-            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            out$y0['y'] <- fit$par[y0par]
+            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
             y.lab <- quote(''^206*'Pb'[o]*'/'^208*'Pb')
             out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
         } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
             XY <- data2york(x,option=9,tt=tt)
             y0par <- 'b0'
-            out$y0[1] <- fit$par[y0par]
-            out$y0[2] <- sqrt(fit$cov[y0par,y0par])
+            out$y0['y'] <- fit$par[y0par]
+            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
             y.lab <- quote(''^207*'Pb'[o]*'/'^208*'Pb')
             out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
         } else {
@@ -623,8 +625,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         J[2,1] <- -a*dx0invdt
         J[2,2] <- x0inv*a^2
         cov.ab <- J%*%E%*%t(J)
-        out$a <- c(a,sqrt(cov.ab[1,1]))
-        out$b <- c(b,sqrt(cov.ab[2,2]))
+        out$a <- c('a'=a,'s[a]'=sqrt(cov.ab[1,1]))
+        out$b <- c('b'=b,'s[b]'=sqrt(cov.ab[2,2]))
         out$cov.ab <- cov.ab[1,2]
         if (inflate(out)){
             out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
