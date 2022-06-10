@@ -1005,7 +1005,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           line.col='black',lwd=1,plot=TRUE,
                           exterr=TRUE,model=1,show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
-                          omit.stroke='grey',y0option=1,...){
+                          omit.stroke='grey',y0option=4,...){
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr,
                                oerr=oerr,hide=hide,omit=omit,y0option=y0option)
@@ -1069,7 +1069,7 @@ isochron.UThHe <- function(x,alpha=0.05,sigdig=2,
 }
 
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
-                            oerr=3,hide=NULL,omit=NULL,y0option=1){
+                            oerr=3,hide=NULL,omit=NULL,y0option=4){
     if (type == 1){ # 0/2 vs 8/2
         osmond <- FALSE
         ia <- 'A'

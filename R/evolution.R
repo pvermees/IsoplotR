@@ -346,7 +346,7 @@ evolution.title <- function(fit,sigdig=2,oerr=3,...){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     }
     if (fit$model==3) {
-        prefix <- expression('('^232*'Th/'^238*'U)'-dispersion~'=')
+        prefix <- quote('('^232*'Th/'^238*'U)-'*dispersion~'=')
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[-1],sigdig=sigdig,
                                     oerr=oerr,units='',prefix=prefix)
     }

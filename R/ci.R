@@ -107,7 +107,7 @@ disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units)
     if (oerr>3){
         out <- substitute(p~a~u%+-%b*'%',lst)
-    } else if (is.na(werr) | sw/w>0.5){
+    } else if (is.na(werr) | sw/w<0.5){
         out <- substitute(p~a%+-%b~u,lst)
     } else {
         lst$b <- signif(exp(log(w)+werr/w)-w,sigdig)
