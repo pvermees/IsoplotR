@@ -501,7 +501,7 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 #'
 #' @rdname isochron
 #' @export
-isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
+isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          levels=NA,clabel="",joint=TRUE,
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',type=1,
@@ -511,7 +511,7 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
                          hide=NULL,omit=NULL,omit.fill=NA,
                          omit.stroke='grey',...){
     if (x$format<4){
-        out <- concordia(x,type=2,show.age=model+1,alpha=alpha,sigdig=sigdig,
+        out <- concordia(x,type=2,show.age=model+1,oerr=oerr,sigdig=sigdig,
                          show.numbers=show.numbers,levels=levels,clabel=clabel,
                          ellipse.fill=ellipse.fill,ellipse.stroke=ellipse.stroke,
                          exterr=exterr,anchor=anchor,hide=hide,omit=omit,
@@ -555,8 +555,14 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
         } else {
             stop('Invalid isochron type.')
         }
-        if (model==3) fit$disp <- ci_log2lin_lud(fit=fit,fact=ntfact(alpha))
-        out <- isochron_init(fit,alpha=0.05)
+        if (model==3){
+            lw <- fit$logpar['log(w)']
+            w <- exp(lw)
+            slw <- sqrt(fit$logcov['log(w)','log(w)'])
+            sw <- ifelse(is.finite(lw),slw*w,NA)
+            fit$disp <- c('w'=w,'s[w]'=sw)
+        }
+        out <- fit
         out$age[1] <- tt
         out$age[2] <- sqrt(fit$cov[1,1])
         if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
@@ -620,21 +626,19 @@ isochron.UPb <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
         out$a <- c(a,sqrt(cov.ab[1,1]))
         out$b <- c(b,sqrt(cov.ab[2,2]))
         out$cov.ab <- cov.ab[1,2]
-        out$y0['ci[y]'] <- ntfact(alpha)*out$y0['s[y]']
-        out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
         if (inflate(out)){
-            out$age['disp[t]'] <- ntfact(alpha,out)*out$age['s[t]']
-            out$y0['disp[y]'] <- ntfact(alpha,out)*out$y0['s[y]']
+            out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
+            out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
         }
         if (plot){
-            scatterplot(XY,alpha=alpha,show.ellipses=show.ellipses,
+            scatterplot(XY,oerr=oerr,show.ellipses=show.ellipses,
                         show.numbers=show.numbers,levels=levels,
                         clabel=clabel,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,fit=out,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
-            graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Pb'),
+            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb'),
                             xlab=x.lab,ylab=y.lab)
         }
     }
