@@ -337,54 +337,22 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
 }
 
 evolution.title <- function(fit,sigdig=2,oerr=3,...){
-    line1 <- agetit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
-                    oerr=oerr,prefix='isochron age =',units=' ka')
-    line2 <- agetit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
-                    oerr=oerr,prefix='isochron age =',units=' ka')
-    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
-    rounded.a0 <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig,text=TRUE)
-    expr1 <- quote('isochron age =')
-    list1 <- list(a=rounded.age[1],
-                  b=rounded.age[2],
-                  c=rounded.age[3],
-                  n=fit$n)
-    expr2 <- quote('('^234*'U/'^238*'U)'[o]*~'=')
-    list2 <- list(a=rounded.a0[1],
-                  b=rounded.a0[2],
-                  c=rounded.a0[3])
-    if (inflate(fit)){
-        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'ka'~'(n='*n*')')
-        args2 <- quote(~a%+-%b~'|'~c~'|'~d)
-        list1$d <- rounded.age[4]
-        list2$d <- rounded.a0[4]
-    } else {
-        args1 <- quote(~a%+-%b~'|'~c~'ka')
-        args2 <- quote(~a%+-%b~'|'~c)
-    }
-    call1 <- substitute(e~a,list(e=expr1,a=args1))
-    line1 <- do.call(substitute,list(eval(call1),list1))
-    call2 <- substitute(e~a,list(e=expr2,a=args2))
-    line2 <- do.call(substitute,list(eval(call2),list2))
+    content <- list()
+    content[[1]] <- agetit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
+                           oerr=oerr,prefix='isochron age =',units=' ka')
+    content[[2]] <- agetit(x=fit$y0[1],sx=fit$y0[-1],sigdig=sigdig,ntit='',
+                           oerr=oerr,prefix=fit$y0label,units='')
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
-                            list(a=signif(fit$mswd,2),
-                                 b=signif(fit$p.value,2)))
-        mymtext(line1,line=2,...)
-        mymtext(line2,line=1,...)
-        mymtext(line3,line=0,...)
-    } else if (fit$model==2) {
-        mymtext(line1,line=1,...)
-        mymtext(line2,line=0,...)
-    } else if (fit$model==3) {
-        rounded.disp <- roundit(fit$disp[1],fit$disp[2:3],sigdig=sigdig,text=TRUE)
-        expr3 <- quote('('^232*'Th/'^238*'U)'-dispersion~'=')
-        args3 <- quote(a+b-c)
-        list3 <- list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2])
-        call3 <- substitute(e~a,list(e=expr3,a=args3))
-        line3 <- do.call(substitute,list(eval(call3),list3))
-        mymtext(line1,line=2,...)
-        mymtext(line2,line=1,...)
-        mymtext(line3,line=0,...)
+        content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
+    }
+    if (fit$model==3) {
+        prefix <- expression('('^232*'Th/'^238*'U)'-dispersion~'=')
+        content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[-1],sigdig=sigdig,
+                                    oerr=oerr,units='',prefix=prefix)
+    }
+    nl <- length(content)
+    for (i in 1:nl){
+        mymtext(content[[i]],line=nl-i)
     }
 }
 

@@ -998,7 +998,7 @@ isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 #'
 #' @rdname isochron
 #' @export
-isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
+isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           show.numbers=FALSE,levels=NA,clabel="",
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
@@ -1007,14 +1007,12 @@ isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=1,...){
     if (x$format %in% c(1,2)){
-        out <- isochron_ThU_3D(x,type=type,model=model,
-                               exterr=exterr,alpha=alpha,
-                               hide=hide,omit=omit,y0option=y0option)
+        out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr,
+                               oerr=oerr,hide=hide,omit=omit,y0option=y0option)
         intercept.type <- 'Th-U-3D'
     } else if (x$format %in% c(3,4)){
-        out <- isochron_ThU_2D(x,type=type,model=model,
-                               exterr=exterr,alpha=alpha,
-                               hide=hide,omit=omit)
+        out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr,
+                               oerr=oerr,hide=hide,omit=omit)
         intercept.type <- 'Th-U-2D'
     }
     if (type %in% c(1,3)){
@@ -1023,10 +1021,10 @@ isochron.ThU <- function (x,type=2,alpha=0.05,sigdig=2,
         out$displabel <- quote('('^234*'U/'^238*'U)-dispersion = ')
     }
     if (plot){
-        scatterplot(out$xyz,alpha=alpha,show.numbers=show.numbers,
-                    levels=levels,clabel=clabel,
-                    ellipse.fill=ellipse.fill,ellipse.stroke=ellipse.stroke,
-                    fit=out,show.ellipses=show.ellipses,ci.col=ci.col,
+        scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
+                    levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
+                    ellipse.stroke=ellipse.stroke,fit=out,
+                    show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         graphics::title(isochrontitle(out,sigdig=sigdig,
@@ -1071,7 +1069,7 @@ isochron.UThHe <- function(x,alpha=0.05,sigdig=2,
 }
 
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
-                            alpha=0.05,hide=NULL,omit=NULL,y0option=1){
+                            oerr=3,hide=NULL,omit=NULL,y0option=1){
     if (type == 1){ # 0/2 vs 8/2
         osmond <- FALSE
         ia <- 'A'
@@ -1115,27 +1113,26 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     }
     tit <- data2tit(x,osmond=osmond)
     d2calc <- clear(tit,hide,omit)
-    fit <- regression(d2calc,model=model,type="titterington")
-    out <- isochron_init(fit,alpha=alpha)
+    out <- regression(d2calc,model=model,type="titterington")
     out$xyz <- tit
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
     out$cov.ab <- out$cov[ia,ib]
-    out$PAR <- fit$par[c(i48,i08,i02)]
-    out$COV <- fit$cov[c(i48,i08,i02),c(i48,i08,i02)]
+    out$PAR <- out$par[c(i48,i08,i02)]
+    out$COV <- out$cov[c(i48,i08,i02),c(i48,i08,i02)]
     names(out$PAR) <- rownames(out$COV) <- colnames(out$COV) <- c('i48','i08','i02')
     tst <- get.ThU.age(out$par[i08],sqrt(out$cov[i08,i08]),
                        out$par[i48],sqrt(out$cov[i48,i48]),
                        out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
     out$age['t'] <- tst['t']
     out$age['s[t]'] <- tst['s[t]']
-    out <- gety0(out=out,tst=tst,option=y0option,exterr=exterr,alpha=alpha)
+    out <- gety0(out=out,tst=tst,option=y0option,exterr=exterr,oerr=oerr)
     out$xlab <- x.lab
     out$ylab <- y.lab
     out$xyz <- subset(out$xyz,select=id)
     out
 }
-gety0 <- function(out,tst,option=1,exterr=FALSE,alpha=0.05){
+gety0 <- function(out,tst,option=1,exterr=FALSE,oerr=3){
     if (option==1){
         out$y0['y'] <- out$PAR['i48']
         out$y0['s[y]'] <- sqrt(out$COV['i48','i48'])
@@ -1180,11 +1177,10 @@ gety0 <- function(out,tst,option=1,exterr=FALSE,alpha=0.05){
     out
 }
 isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
-                            alpha=0.05,hide=NULL,omit=NULL){
+                            oerr=3,hide=NULL,omit=NULL){
     y <- data2york(x,type=type)
     d2calc <- clear(y,hide,omit)
-    fit <- regression(d2calc,model=model,type="york")
-    out <- isochron_init(fit,alpha=alpha)
+    out <- regression(d2calc,model=model,type="york")
     out$xyz <- y
     if (type==1){
         Th230U238 <- out$b
@@ -1204,11 +1200,12 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
         get.Th230Th232_0(out$age['t'],Th230Th232[1],Th230Th232[2])
     out <- ci_isochron(out)
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
-            get.ThU.age(Th230U238[1],sqrt(out$mswd)*Th230U238[2],exterr=exterr)['s[t]']
-        out$y0['disp[y]'] <- ntfact(alpha,df=out$df)*
-            get.Th230Th232_0(out$age['t'],Th230Th232[1],
-                             sqrt(out$mswd)*Th230Th232[2])[2]
+        out$age['disp[t]'] <- get.ThU.age(Th230U238[1],
+                                          sqrt(out$mswd)*Th230U238[2],
+                                          exterr=exterr)['s[t]']
+        out$y0['disp[y]'] <- get.Th230Th232_0(out$age['t'],
+                                              Th230Th232[1],
+                                              sqrt(out$mswd)*Th230Th232[2])[2]
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1336,31 +1333,31 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 }
 
 isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units="Ma",ski=NULL,...){
-    linecontent <- list()
+    content <- list()
     if (is.na(type)){
-        linecontent[[1]] <- agetit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
-                                   prefix='intercept =',sigdig=sigdig,oerr=oerr)
-        linecontent[[2]] <- agetit(x=fit$b[1],sx=fit$b[-1],ntit='',units=units,
-                                   prefix='slope =',sigdig=sigdig,oerr=oerr)
+        content[[1]] <- agetit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
+                               prefix='intercept =',sigdig=sigdig,oerr=oerr)
+        content[[2]] <- agetit(x=fit$b[1],sx=fit$b[-1],ntit='',units=units,
+                               prefix='slope =',sigdig=sigdig,oerr=oerr)
     } else {
-        linecontent[[1]] <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
-                                   units=units,sigdig=sigdig,oerr=oerr)
-        linecontent[[2]] <- agetit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
-                                   units='',prefix=fit$y0label,
-                                   sigdig=sigdig,oerr=oerr)
+        content[[1]] <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                               units=units,sigdig=sigdig,oerr=oerr)
+        content[[2]] <- agetit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
+                               units='',prefix=fit$y0label,
+                               sigdig=sigdig,oerr=oerr)
     }
     if (fit$model==1){
-        linecontent[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
+        content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
-            linecontent[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],
-                                        sigdig=sigdig,oerr=oerr,units='Ma ')
+            content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],
+                                    sigdig=sigdig,oerr=oerr,units='Ma ')
         } else {
-            linecontent[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                        oerr=oerr,prefix=fit$displabel,units='Ma ')
+            content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
+                                    oerr=oerr,prefix=fit$displabel,units='Ma ')
         }
     }
-    nl <- length(linecontent)
+    nl <- length(content)
     if (!is.null(ski)){
         growthline <- paste0('intercepts growth curve at ',
                              roundit(ski[1],sigdig=sigdig,text=TRUE))
@@ -1370,9 +1367,9 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units="Ma",ski=NULL,...){
         }
         growthline <- paste0(growthline,' Ma')
         nl <- nl + 1
-        linecontent[[nl]] <- growthline
+        content[[nl]] <- growthline
     }
     for (i in nl:1){
-        mymtext(linecontent[[i]],line=nl-i,...)
+        mymtext(content[[i]],line=nl-i,...)
     }
 }
