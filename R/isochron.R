@@ -708,7 +708,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         R76 <- out$a
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
         y.lab <- quote(''^207*'Pb/'^206*'Pb')
-        out$y0label <- quote(''^207*'Pb/'^206*'Pb = ')
+        out$y0label <- quote(''^207*'Pb/'^206*'Pb = '[])
     } else {
         R76 <- out$b
         x.lab <- quote(''^206*'Pb/'^204*'Pb')
@@ -716,11 +716,11 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*' = ')
     }
     out$displabel <- quote('dispersion = ')
-    out$age[c('t','s[t]')] <-
-        get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
+    out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
     if (inflate(out)){
         out$age['disp[t]'] <- 
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
+        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
@@ -781,9 +781,8 @@ SK.intersection <- function(fit,inverse,m=0,M=5000){
 }
 #' @rdname isochron
 #' @export
-isochron.ArAr <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
-                          levels=NA,clabel="",
-                          ellipse.fill=c("#00FF0080","#FF000080"),
+isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
+                          clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
@@ -791,8 +790,7 @@ isochron.ArAr <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    fit <- regression(d2calc,model=model)
-    out <- isochron_init(fit,alpha=alpha)
+    out <- regression(d2calc,model=model)
     a <- out$a['a']
     sa <- out$a['s[a]']
     b <- out$b['b']
@@ -813,26 +811,23 @@ isochron.ArAr <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
         x.lab <- quote(''^39*'Ar/'^36*'Ar')
         y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
-    out$displabel <-
-        substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
+    out$displabel <- substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
     out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[o]*' = ')
-    out$age[c('t','s[t]')] <-
-        get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
-    out <- ci_isochron(out)
+    out$age[c('t','s[t]')] <- get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
-            get.ArAr.age(R09,sqrt(out$mswd)*sR09,
-                         x$J[1],x$J[2],exterr=exterr)[2]
+        out$age['disp[t]'] <- get.ArAr.age(R09,sqrt(out$mswd)*sR09,
+                                           x$J[1],x$J[2],exterr=exterr)[2]
+        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     if (plot) {
-        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
+        scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='Ar-Ar'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
