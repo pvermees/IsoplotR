@@ -688,10 +688,10 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 
 wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
-    line1 <- agetit(x=fit$mean[1],sx=fit$mean[-1],
-                    ntit=ntit.valid(fit$valid),
-                    sigdig=sigdig,oerr=oerr,units=units,
-                    prefix=paste0('mean',ast,' ='))
+    line1 <- maintit(x=fit$mean[1],sx=fit$mean[-1],
+                     ntit=ntit.valid(fit$valid),
+                     sigdig=sigdig,oerr=oerr,units=units,
+                     prefix=paste0('mean',ast,' ='))
     if (fit$random.effects){
         line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,
                          oerr=oerr,units=units)

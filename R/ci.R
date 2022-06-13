@@ -69,8 +69,8 @@ oerr2alpha <- function(oerr=1){
     out
 }
 
-agetit <- function(x,sx,n=NULL,ntit=paste0('(n=',n,')'),sigdig=2,
-                   oerr=3,units=' Ma',prefix='age =',dof=NULL){
+maintit <- function(x,sx,n=NULL,ntit=paste0('(n=',n,')'),sigdig=2,
+                    oerr=3,units=' Ma',prefix='age =',dof=NULL){
     xerr <- geterr(x,sx,oerr=oerr,dof=dof)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     dispersed <- (length(sx)>1)

@@ -693,9 +693,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 #' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
 #' @rdname isochron
 #' @export
-isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
-                          levels=NA,clabel="",
-                          ellipse.fill=c("#00FF0080","#FF000080"),
+isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+                          clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE, exterr=TRUE,model=1,growth=FALSE,
@@ -703,8 +702,7 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    fit <- regression(d2calc,model=model)
-    out <- isochron_init(fit,alpha=alpha)
+    out <- regression(d2calc,model=model)
     out$y0[c('y','s[y]')] <- out$a 
     if (inverse){
         R76 <- out$a
@@ -720,13 +718,12 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
     out$displabel <- quote('dispersion = ')
     out$age[c('t','s[t]')] <-
         get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
-    out <- ci_isochron(out)
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
+        out$age['disp[t]'] <- 
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
     }
     if (plot) {
-        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
+        scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
@@ -753,7 +750,7 @@ isochron.PbPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
         } else {
             out$ski <- NULL
         }
-        tit <- isochrontitle(out,sigdig=sigdig,type='Pb-Pb',ski=out$ski)
+        tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',ski=out$ski)
         graphics::title(tit,xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
@@ -1341,16 +1338,16 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units="Ma",ski=NULL,...){
     content <- list()
     if (is.na(type)){
-        content[[1]] <- agetit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
-                               prefix='intercept =',sigdig=sigdig,oerr=oerr)
-        content[[2]] <- agetit(x=fit$b[1],sx=fit$b[-1],ntit='',units=units,
-                               prefix='slope =',sigdig=sigdig,oerr=oerr)
+        content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
+                                prefix='intercept =',sigdig=sigdig,oerr=oerr)
+        content[[2]] <- maintit(x=fit$b[1],sx=fit$b[-1],ntit='',units=units,
+                                prefix='slope =',sigdig=sigdig,oerr=oerr)
     } else {
-        content[[1]] <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
-                               units=units,sigdig=sigdig,oerr=oerr)
-        content[[2]] <- agetit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
-                               units='',prefix=fit$y0label,
-                               sigdig=sigdig,oerr=oerr)
+        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                                units=units,sigdig=sigdig,oerr=oerr)
+        content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
+                                units='',prefix=fit$y0label,
+                                sigdig=sigdig,oerr=oerr)
     }
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)

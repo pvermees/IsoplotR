@@ -338,10 +338,10 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
 
 evolution.title <- function(fit,sigdig=2,oerr=3,...){
     content <- list()
-    content[[1]] <- agetit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
-                           oerr=oerr,prefix='isochron age =',units=' ka')
-    content[[2]] <- agetit(x=fit$y0[1],sx=fit$y0[-1],sigdig=sigdig,ntit='',
-                           oerr=oerr,prefix=fit$y0label,units='')
+    content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
+                            oerr=oerr,prefix='isochron age =',units=' ka')
+    content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],sigdig=sigdig,ntit='',
+                            oerr=oerr,prefix=fit$y0label,units='')
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     }

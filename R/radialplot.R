@@ -828,8 +828,8 @@ iatt <- function(z,zeta,rhoD){
 
 radial.title <- function(fit,sigdig=2,oerr=3,units='',
                          ntit,caveat=FALSE,dof=NULL,...){
-    line1 <- agetit(fit$age[1],fit$age[2],ntit=ntit,units=units,
-                    sigdig=sigdig,oerr=oerr,prefix='central age =',dof=dof)
+    line1 <- maintit(fit$age[1],fit$age[2],ntit=ntit,units=units,
+                     sigdig=sigdig,oerr=oerr,prefix='central age =',dof=dof)
     line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     if (fit$p.value<alpha()){
         line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,oerr=oerr)

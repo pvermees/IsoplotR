@@ -299,31 +299,31 @@ tw3d2d <- function(fit){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,...){
-    line1 <- agetit(x=fit$par[1],sx=fit$err[,1],n=fit$n,
-                    sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
+    line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,
+                     sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
     if (wetherill){
-        line2 <- agetit(x=fit$par[2],sx=fit$err[,2],ntit='',
-                        sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
+        line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',
+                         sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
     } else if (fit$format<4){
-        line2 <- agetit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
-                        sigdig=sigdig,oerr=oerr,units='',
-                        prefix=quote('('^207*'Pb/'^206*'Pb)'[o]*'='))
+        line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
+                         sigdig=sigdig,oerr=oerr,units='',
+                         prefix=quote('('^207*'Pb/'^206*'Pb)'[o]*'='))
     } else if (fit$format<7){
-        line2 <- agetit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
-                        sigdig=sigdig,oerr=oerr,units='',
-                        prefix=quote('('^206*'Pb/'^204*'Pb)'[o]*'='))
-        line3 <- agetit(x=fit$par['b0'],sx=fit$err[,'b0'],ntit='',
-                        sigdig=sigdig,oerr=oerr,units='',
-                        prefix=quote('('^207*'Pb/'^204*'Pb)'[o]*'='))
+        line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
+                         sigdig=sigdig,oerr=oerr,units='',
+                         prefix=quote('('^206*'Pb/'^204*'Pb)'[o]*'='))
+        line3 <- maintit(x=fit$par['b0'],sx=fit$err[,'b0'],ntit='',
+                         sigdig=sigdig,oerr=oerr,units='',
+                         prefix=quote('('^207*'Pb/'^204*'Pb)'[o]*'='))
     } else if (fit$format<9){
         i86 <- 1/fit$par['a0']
         i87 <- 1/fit$par['b0']
         i86err <- i86*fit$err[,'a0']/fit$par['a0']
         i87err <- i87*fit$err[,'b0']/fit$par['b0']
-        line2 <- agetit(x=i86,sx=i86err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                        prefix=quote('('^208*'Pb/'^206*'Pb)'[o]*'='))
-        line3 <- agetit(x=i87,sx=i87err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                        prefix=quote('('^208*'Pb/'^207*'Pb)'[o]*'='))
+        line2 <- maintit(x=i86,sx=i86err,ntit='',sigdig=sigdig,oerr=oerr,units='',
+                         prefix=quote('('^208*'Pb/'^206*'Pb)'[o]*'='))
+        line3 <- maintit(x=i87,sx=i87err,ntit='',sigdig=sigdig,oerr=oerr,units='',
+                         prefix=quote('('^208*'Pb/'^207*'Pb)'[o]*'='))
     } else {
         stop('Invalid U-Pb data format.')
     }

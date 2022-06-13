@@ -587,9 +587,9 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
 }
 
 concordia.title <- function(fit,sigdig=2,oerr=3,...){
-    line1 <- agetit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
-                    sigdig=sigdig,oerr=oerr,units='Ma',
-                    prefix=paste0('concordia age ='))
+    line1 <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                     sigdig=sigdig,oerr=oerr,units='Ma',
+                     prefix=paste0('concordia age ='))
     line2 <- substitute('MSWD ='~a~'|'~b~'|'~c~
                             ', p('*chi^2*') ='~d~'|'~e~'|'~f,
                         list(a=signif(fit$mswd['concordance'],2),
