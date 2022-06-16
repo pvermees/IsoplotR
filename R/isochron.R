@@ -797,8 +797,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
     sb <- out$b['s[b]']
     if (inverse) {
         R09 <- -b/a
-        sR09 <- R09*sqrt((sa/a)^2 + (sb/b)^2 -
-                         2*out$cov.ab/(a*b))
+        sR09 <- R09*sqrt((sa/a)^2 + (sb/b)^2 - 2*out$cov.ab/(a*b))
         out$y0['y'] <- 1/a
         out$y0['s[y]'] <- sa/a^2
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
@@ -834,15 +833,14 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
 }
 #' @rdname isochron
 #' @export
-isochron.ThPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
-                          levels=NA,clabel="",
-                          ellipse.fill=c("#00FF0080","#FF000080"),
+isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+                          clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    isochron_PD(x,nuclide='Th232',alpha=alpha,sigdig=sigdig,
+    isochron_PD(x,nuclide='Th232',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
@@ -853,15 +851,14 @@ isochron.ThPb <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 }
 #' @rdname isochron
 #' @export
-isochron.KCa <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
-                         levels=NA,clabel="",inverse=FALSE,
-                         ci.col='gray80',
+isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+                         clabel="",inverse=FALSE,ci.col='gray80',
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',line.col='black',
                          lwd=1, plot=TRUE,exterr=TRUE,model=1,
                          show.ellipses=1*(model!=2),hide=NULL,
                          omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    isochron_PD(x,nuclide='K40',alpha=alpha,sigdig=sigdig,
+    isochron_PD(x,nuclide='K40',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
@@ -872,15 +869,14 @@ isochron.KCa <- function(x,alpha=0.05,sigdig=2,show.numbers=FALSE,
 }
 #' @rdname isochron
 #' @export
-isochron.RbSr <- function(x,alpha=0.05,sigdig=2,
-                          show.numbers=FALSE,levels=NA,clabel="",
-                          ellipse.fill=c("#00FF0080","#FF000080"),
+isochron.RbSr <- function(x,oerr=oerr,sigdig=2,show.numbers=FALSE,levels=NA,
+                          clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    isochron_PD(x,nuclide='Rb87',alpha=alpha,sigdig=sigdig,
+    isochron_PD(x,nuclide='Rb87',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
@@ -891,15 +887,14 @@ isochron.RbSr <- function(x,alpha=0.05,sigdig=2,
 }
 #' @rdname isochron
 #' @export
-isochron.ReOs <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
-                          levels=NA,clabel="",
-                          ellipse.fill=c("#00FF0080","#FF000080"),
+isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+                          clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    isochron_PD(x,nuclide='Re187',alpha=alpha,sigdig=sigdig,
+    isochron_PD(x,nuclide='Re187',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
@@ -910,15 +905,14 @@ isochron.ReOs <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 }
 #' @rdname isochron
 #' @export
-isochron.SmNd <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
-                          levels=NA,clabel="",
-                          ellipse.fill=c("#00FF0080","#FF000080"),
+isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+                          clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    isochron_PD(x,nuclide='Sm147',alpha=alpha,sigdig=sigdig,
+    isochron_PD(x,nuclide='Sm147',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers, levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
@@ -929,16 +923,15 @@ isochron.SmNd <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
 }
 #' @rdname isochron
 #' @export
-isochron.LuHf <- function(x,alpha=0.05,sigdig=2, show.numbers=FALSE,
-                          levels=NA,clabel="",
-                          ellipse.fill=c("#00FF0080","#FF000080"),
+isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+                          clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    isochron_PD(x,nuclide='Lu176',alpha=alpha, sigdig=sigdig,
-                show.numbers=show.numbers, levels=levels,
+    isochron_PD(x,nuclide='Lu176',oerr=oerr,sigdig=sigdig,
+                show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
@@ -1211,8 +1204,8 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
     out
 }
 
-isochron_PD <- function(x,nuclide,alpha=0.05,sigdig=2,
-                        show.numbers=FALSE,levels=NA, clabel="",
+isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
+                        show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',inverse=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
@@ -1221,8 +1214,7 @@ isochron_PD <- function(x,nuclide,alpha=0.05,sigdig=2,
                         hide=NULL,omit=NULL,...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    fit <- regression(d2calc,model=model)
-    out <- isochron_init(fit,alpha=alpha)
+    out <- regression(d2calc,model=model)
     out$y0[c('y','s[y]')] <- out$a
     if (inverse){
         DP <- -out$b[1]/out$a[1]
@@ -1234,11 +1226,9 @@ isochron_PD <- function(x,nuclide,alpha=0.05,sigdig=2,
     }
     out$age[c('t','s[t]')] <- get.PD.age(DP,sDP,nuclide,
                                          exterr=exterr,bratio=bratio)
-    out <- ci_isochron(out)
     if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,df=out$df)*
-            get.PD.age(DP,sqrt(out$mswd)*sDP,nuclide,
-                       exterr=exterr,bratio=bratio)[2]
+        out$age['disp[t]'] <- get.PD.age(DP,sqrt(out$mswd)*sDP,nuclide,
+                                         exterr=exterr,bratio=bratio)[2]
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$displabel <-
@@ -1246,13 +1236,13 @@ isochron_PD <- function(x,nuclide,alpha=0.05,sigdig=2,
     out$y0label <-
         substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*' = ')))
     if (plot){
-        scatterplot(y,alpha=alpha,show.ellipses=show.ellipses,
+        scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='PD'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='PD'),
                         xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
@@ -1349,10 +1339,10 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units="Ma",ski=NULL,...){
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
             content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],
-                                    sigdig=sigdig,oerr=oerr,units='Ma ')
+                                    sigdig=sigdig,oerr=oerr,units='')
         } else {
             content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                    oerr=oerr,prefix=fit$displabel,units='Ma ')
+                                    oerr=oerr,prefix=fit$displabel,units='')
         }
     }
     nl <- length(content)
