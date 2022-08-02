@@ -80,13 +80,13 @@ maintit <- function(x,sx,n=NULL,ntit=paste0('(n=',n,')'),sigdig=2,
         if (oerr>3){
             out <- substitute(p~a*u%+-%b~'|'~c*'%'~n,lst)
         } else {
-            out <- substitute(p~a%+-%b~'|'~c~u~n,lst)
+            out <- substitute(p~a%+-%b~'|'~c*u~n,lst)
         }
     } else {
         if (oerr>3){
             out <- substitute(p~a*u%+-%b*'%'~n,lst)
         } else {
-            out <- substitute(p~a%+-%b~u~n,lst)
+            out <- substitute(p~a%+-%b*u~n,lst)
         }
     }
     out

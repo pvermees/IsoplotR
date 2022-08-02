@@ -93,9 +93,6 @@
 #' \code{UPb}, \code{ThPb}, \code{ReOs}, \code{RbSr}, \code{SmNd},
 #' \code{LuHf}, \code{UThHe} or \code{ThU}.
 #'
-#' @param alpha confidence cutoff for the error ellipses and
-#'     confidence intervals
-#'
 #' @param show.numbers logical flag (\code{TRUE} to show grain numbers)
 #'
 #' @param sigdig the number of significant digits of the numerical
@@ -1026,8 +1023,8 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
 }
 #' @rdname isochron
 #' @export
-isochron.UThHe <- function(x,alpha=0.05,sigdig=2,
-                           show.numbers=FALSE,levels=NA,clabel="",
+isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,
+                           levels=NA,clabel="",
                            ellipse.fill=c("#00FF0080","#FF000080"),
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,model=1,
@@ -1035,25 +1032,19 @@ isochron.UThHe <- function(x,alpha=0.05,sigdig=2,
                            omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x)
     d2calc <- clear(y,hide,omit)
-    fit <- regression(d2calc,model=model)
-    out <- isochron_init(fit,alpha=alpha)
+    out <- regression(d2calc,model=model)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
-    out <- ci_isochron(out)
-    if (inflate(out)){
-        out$age['disp[t]'] <- ntfact(alpha,out)*out$age['s[t]']
-    }
     out$displabel <- quote('He-dispersion = ')
     out$y0label <- quote('He'[o]*' = ')
     if (plot) {
-        scatterplot(y,alpha=alpha,show.numbers=show.numbers,levels=levels,
+        scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
                     show.ellipses=show.ellipses,ci.col=ci.col,
-                    line.col=line.col,lwd=lwd,hide=hide,
-                    omit=omit,omit.fill=omit.fill,
-                    omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,type='U-Th-He'),
+                    line.col=line.col,lwd=lwd,hide=hide,omit=omit,
+                    omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+        graphics::title(isochrontitle(out,sigdig=sigdig,oerr=oerr,type='U-Th-He'),
                         xlab="P",ylab="He")
     }
     invisible(out)
@@ -1320,7 +1311,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 }
 
-isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units="Ma",ski=NULL,...){
+isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=" Ma",ski=NULL,...){
     content <- list()
     if (is.na(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
