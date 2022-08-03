@@ -1,31 +1,3 @@
-ci_regression <- function(fit,i1='b',i2='a'){
-    out <- fit
-    out[[i1]]['ci[t]'] <- ntfact(fit$alpha)*fit[[i1]]['s[t]']
-    out[[i2]]['ci[y]'] <- ntfact(fit$alpha)*fit[[i2]]['s[y]']
-    if (inflate(fit)){
-        out[[i2]]['disp[y]'] <- ntfact(fit$alpha,fit)*fit[[i2]]['s[y]']
-    } else if (fit$model==3) {
-        out$w[c('ll','ul')] <- profile_LL_isochron_disp(fit)
-    }
-    out    
-}
-ci_isochron <- function(fit){
-    ci_regression(fit,i1='age',i2='y0')
-}
-
-ci_log2lin_lud <- function(fit,fact=1){
-    lx <- fit$logpar['log(w)']
-    slx <- sqrt(fit$logcov['log(w)','log(w)'])
-    if (is.finite(lx)){
-        ll <- exp(lx - fact*slx)
-        ul <- exp(lx + fact*slx)
-    } else {
-        ll <- 0
-        ul <- NA
-    }
-    c(exp(lx),ll,ul)
-}
-
 ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
     if (is.null(mswd)){
         if (is.null(df)){
@@ -127,4 +99,24 @@ peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
         out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)
     }
     out
+}
+
+get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
+get.ntit.default <- function(x,...){
+    ns <- length(x)
+    nisnan <- length(which(is.na(x)))
+    out <- '(n='
+    if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
+    paste0(out,ns,')')
+}
+get.ntit.fissiontracks <- function(x,...){
+    if (x$format<2){
+        out <- get.ntit.default(x$x[,'Ns'])
+    } else {
+        out <- get.ntit.default(x$Ns)
+    }
+    out    
+}
+ntit.valid <- function(valid,...){
+    paste0('(',sum(valid),'/',length(valid),')')
 }

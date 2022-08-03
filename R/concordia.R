@@ -39,9 +39,25 @@
 #' 
 #' @param tlim age limits of the concordia line
 #' 
-#' @param alpha probability cutoff for the error ellipses and
-#'     confidence intervals
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported as:
 #' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
 #' @param type one of
 #'
 #' \code{1}: Wetherill -- \eqn{{}^{206}}Pb/\eqn{{}^{238}}U

@@ -654,9 +654,9 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
         calcit <- calcit[i]
         colour <- colour[i]
     }
-    if (is.na(from)) minx <- min(x-xerr,fit$plotpar$dash1$y)
+    if (is.na(from)) minx <- min(x-xerr,fit$plotpar$dash1$y,na.rm=TRUE)
     else minx <- from
-    if (is.na(to)) maxx <- max(x+xerr,fit$plotpar$dash2$y)
+    if (is.na(to)) maxx <- max(x+xerr,fit$plotpar$dash2$y,na.rm=TRUE)
     else maxx <- to
     graphics::plot(c(0,ns+1),c(minx,maxx),type='n',
                    axes=FALSE,xlab='N',ylab='',...)

@@ -167,7 +167,8 @@ central.UThHe <- function(x,model=1,...){
     doSm <- doSm(x)
     fit <- UThHe_logratio_mean(x,model=model,w=0)
     mswd <- mswd_UThHe(x,fit,doSm=doSm)
-    if (inflate(fit)){
+    mswd$model <- model # to fulfil requirements of inflate function
+    if (inflate(mswd)){
         fit$age['disp[t]'] <- uvw2age(fit,doSm=doSm,fact=mswd$mswd)[2]
     }
     if (model==1){

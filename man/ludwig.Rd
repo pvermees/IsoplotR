@@ -8,7 +8,7 @@ into account decay constant uncertainties.}
 \usage{
 ludwig(x, ...)
 
-\method{ludwig}{default}(x, exterr = FALSE, alpha = 0.05, model = 1, anchor = 0, ...)
+\method{ludwig}{default}(x, exterr = FALSE, model = 1, anchor = 0, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -17,8 +17,6 @@ ludwig(x, ...)
 
 \item{exterr}{propagate external sources of
 uncertainty (i.e. decay constants)?}
-
-\item{alpha}{cutoff value for confidence intervals}
 
 \item{model}{one of three regression models:
 
@@ -30,7 +28,7 @@ an upper and lower intercept age (for Wetherill concordia), or a
 lower intercept age and common
 (\eqn{^{207}}Pb/\eqn{^{206}}Pb)\eqn{_\circ}-ratio intercept (for
 Tera-Wasserburg). If the p-value for the chi-square test is less
-than \code{alpha}, then the analytical uncertainties are augmented
+than \code{alpha()}, then the analytical uncertainties are augmented
 by a factor \eqn{\sqrt{MSWD}}.
 
 \code{2}: fit a discordia line ignoring the analytical uncertainties

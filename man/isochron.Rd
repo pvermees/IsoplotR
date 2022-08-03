@@ -12,15 +12,15 @@
 \alias{isochron.ReOs}
 \alias{isochron.SmNd}
 \alias{isochron.LuHf}
-\alias{isochron.ThU}
 \alias{isochron.UThHe}
+\alias{isochron.ThU}
 \title{Calculate and plot isochrons}
 \usage{
 isochron(x, ...)
 
 \method{isochron}{default}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -45,7 +45,7 @@ isochron(x, ...)
 
 \method{isochron}{UPb}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -71,7 +71,7 @@ isochron(x, ...)
 
 \method{isochron}{PbPb}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -96,7 +96,7 @@ isochron(x, ...)
 
 \method{isochron}{ArAr}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -120,7 +120,7 @@ isochron(x, ...)
 
 \method{isochron}{ThPb}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -144,7 +144,7 @@ isochron(x, ...)
 
 \method{isochron}{KCa}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -168,7 +168,7 @@ isochron(x, ...)
 
 \method{isochron}{RbSr}(
   x,
-  alpha = 0.05,
+  oerr = oerr,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -192,7 +192,7 @@ isochron(x, ...)
 
 \method{isochron}{ReOs}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -216,7 +216,7 @@ isochron(x, ...)
 
 \method{isochron}{SmNd}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -240,7 +240,7 @@ isochron(x, ...)
 
 \method{isochron}{LuHf}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -262,10 +262,32 @@ isochron(x, ...)
   ...
 )
 
+\method{isochron}{UThHe}(
+  x,
+  sigdig = 2,
+  oerr = 3,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  model = 1,
+  show.ellipses = 2 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.fill = NA,
+  omit.stroke = "grey",
+  ...
+)
+
 \method{isochron}{ThU}(
   x,
   type = 2,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -283,29 +305,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
-  y0option = 1,
-  ...
-)
-
-\method{isochron}{UThHe}(
-  x,
-  alpha = 0.05,
-  sigdig = 2,
-  show.numbers = FALSE,
-  levels = NA,
-  clabel = "",
-  ellipse.fill = c("#00FF0080", "#FF000080"),
-  ellipse.stroke = "black",
-  ci.col = "gray80",
-  line.col = "black",
-  lwd = 1,
-  plot = TRUE,
-  model = 1,
-  show.ellipses = 2 * (model != 2),
-  hide = NULL,
-  omit = NULL,
-  omit.fill = NA,
-  omit.stroke = "grey",
+  y0option = 4,
   ...
 )
 }
@@ -331,8 +331,24 @@ an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
 \item{...}{optional arguments to be passed on to the generic plot
 function if \code{model=2}}
 
-\item{alpha}{confidence cutoff for the error ellipses and
-confidence intervals}
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output}
@@ -507,15 +523,17 @@ If \code{inverse=FALSE}, then \code{X} =
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 
-\item{y0option}{controls the type of initial activity ratio that is
-    reported along with the 3D isochron age. Only relevant to Th-U data
-    formats 1 and 2. Set to:
+\item{y0option}{controls the type of activity ratio that is
+    reported along with the 3D isochron age. Only relevant to Th-U
+    data formats 1 and 2. Set to:
 
-\code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+\code{y0option=1} for the authigenic \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
 
-\code{y0option=2} for the initial \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+\code{y0option=2} for the detrital \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
 
-\code{y0option=3} for the initial \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.}
+\code{y0option=3} for the authigenic \eqn{^{230}}Th/\eqn{^{238}}U activity ratio,
+
+\code{y0option=4} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio.}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ThPb},

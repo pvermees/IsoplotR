@@ -46,8 +46,28 @@
 #'     the component age errors?
 #' @param sigdig number of significant digits to be used for any
 #'     legend in which the peak fitting results are to be displayed.
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
 #' @param log take the logs of the data before applying the mixture
 #'     model?
+#' @param np number of parameters for the minimum age model. Must be
+#'     either 3 or 4.
 #' @param ... optional arguments (not used)
 #' @seealso \code{\link{radialplot}}, \code{\link{central}}
 #' @return Returns a list with the following items:
@@ -71,6 +91,8 @@
 #'
 #' \item{legend}{a vector of text expressions to be used in a figure
 #'     legend}
+#'
+#' }
 #'
 #' }
 #' @examples

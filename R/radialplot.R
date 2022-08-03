@@ -83,8 +83,11 @@
 #'     estimates the minimum value using a three parameter model
 #'     consisting of a Normal distribution truncated by a discrete
 #'     component.
+#' @param np number of parameters for the minimum age
+#'     model. Must be either 3 or 4.
 #' @param markers vector of ages of radial marker lines to add to the
 #'     plot.
+#' 
 #' @param oerr indicates whether the analytical uncertainties of the
 #'     output are reported as:
 #' 

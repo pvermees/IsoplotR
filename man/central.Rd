@@ -9,11 +9,11 @@
 \usage{
 central(x, ...)
 
-\method{central}{default}(x, alpha = 0.05, ...)
+\method{central}{default}(x, ...)
 
-\method{central}{UThHe}(x, alpha = 0.05, model = 1, ...)
+\method{central}{UThHe}(x, model = 1, ...)
 
-\method{central}{fissiontracks}(x, alpha = 0.05, exterr = FALSE, ...)
+\method{central}{fissiontracks}(x, exterr = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe} or \code{fissiontracks},
@@ -21,8 +21,6 @@ OR a 2-column matrix with (strictly positive) values and
 uncertainties}
 
 \item{...}{optional arguments}
-
-\item{alpha}{cutoff value for confidence intervals}
 
 \item{model}{if the scatter between the data points is solely
     caused by the analytical uncertainty, then the MSWD value

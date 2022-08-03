@@ -10,7 +10,7 @@ agespectrum(x, ...)
 
 \method{agespectrum}{default}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   plateau = TRUE,
   random.effects = FALSE,
   levels = NA,
@@ -29,7 +29,7 @@ agespectrum(x, ...)
 
 \method{agespectrum}{ArAr}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   plateau = TRUE,
   random.effects = FALSE,
   levels = NA,
@@ -57,8 +57,24 @@ an object of class \code{ArAr}}
 
 \item{...}{optional parameters to the generic \code{plot} function}
 
-\item{alpha}{the confidence level of the error bars/boxes and
-confidence intervals.}
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{plateau}{logical flag indicating whether a plateau age should
 be calculated. If \code{plateau=TRUE}, the function computes

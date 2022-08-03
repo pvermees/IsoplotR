@@ -6,7 +6,7 @@
 \usage{
 scatterplot(
   xy,
-  alpha = 0.05,
+  oerr = 3,
   show.numbers = FALSE,
   show.ellipses = 1,
   levels = NA,
@@ -36,7 +36,24 @@ scatterplot(
 \arguments{
 \item{xy}{matrix with columns \code{X, sX, Y, sY(, rXY)}}
 
-\item{alpha}{the probability cutoff for the error ellipses}
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{show.numbers}{logical flag (\code{TRUE} to show grain
 numbers)}

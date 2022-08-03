@@ -42,7 +42,24 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' a third variable as a colour scale.
 #'
 #' @param xy matrix with columns \code{X, sX, Y, sY(, rXY)}
-#' @param alpha the probability cutoff for the error ellipses
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
 #' @param show.ellipses show the data as:

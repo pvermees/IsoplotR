@@ -20,7 +20,9 @@ settings(setting = NA, ..., fname = NA, reset = FALSE)
 
 \code{'etchfact'}: fission track etch efficiency factors
 
-\code{'tracklength'}: equivalent isotropic fission track length}
+\code{'tracklength'}: equivalent isotropic fission track length
+
+\code{'alpha'}: the significance level of confidence intervals}
 
 \item{...}{depends on the value for \code{setting}:
 
