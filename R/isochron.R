@@ -890,7 +890,7 @@ isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 }
 #' @rdname isochron
 #' @export
-isochron.RbSr <- function(x,oerr=oerr,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',

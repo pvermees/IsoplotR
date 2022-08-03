@@ -168,7 +168,7 @@ isochron(x, ...)
 
 \method{isochron}{RbSr}(
   x,
-  oerr = oerr,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,

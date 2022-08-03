@@ -19,9 +19,9 @@
 \usage{
 peakfit(x, ...)
 
-\method{peakfit}{default}(x, k = "auto", sigdig = 2, oerr = 5, log = TRUE, np = 4, ...)
+\method{peakfit}{default}(x, k = "auto", sigdig = 2, oerr = 3, log = TRUE, np = 4, ...)
 
-\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, oerr = 5, np = 4, ...)
+\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, oerr = 3, np = 4, ...)
 
 \method{peakfit}{UPb}(
   x,
@@ -33,7 +33,7 @@ peakfit(x, ...)
   exterr = TRUE,
   sigdig = 2,
   log = TRUE,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -45,7 +45,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   common.Pb = 0,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -57,7 +57,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -69,7 +69,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
-  oerr = 5,
+  oerr = 3,
   np = np,
   ...
 )
@@ -81,7 +81,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -93,7 +93,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -105,7 +105,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -117,7 +117,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -129,7 +129,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 5,
+  oerr = 3,
   np = 4,
   ...
 )
@@ -140,13 +140,13 @@ peakfit(x, ...)
   exterr = FALSE,
   sigdig = 2,
   log = TRUE,
-  oerr = 5,
+  oerr = 3,
   Th0i = 0,
   np = 4,
   ...
 )
 
-\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, oerr = 5, np = 4, ...)
+\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, oerr = 3, np = 4, ...)
 }
 \arguments{
 \item{x}{either an \code{[nx2]} matrix with measurements and their
@@ -272,19 +272,21 @@ Returns a list with the following items:
 
 \code{s[t]}: the estimated uncertainties of \code{t}
 
+}
+
 \item{props}{a \code{2 x k} matrix with the following rows:
 
 \code{p}: the proportions of the \code{k} peaks
 
 \code{s[p]}: the estimated uncertainties (standard errors) of
-\code{p}}
+\code{p}
+
+}
 
 \item{L}{the log-likelihood of the fit}
 
 \item{legend}{a vector of text expressions to be used in a figure
     legend}
-
-}
 
 }
 }
