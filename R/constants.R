@@ -33,7 +33,7 @@ mindens <- function(mineral,x=NULL){
     if (is.numeric(x)) .IsoplotR$mindens[[mineral]] <- x
     invisible(old)
 }
-alpha <- function(alpha,x=NULL){
+alpha <- function(x=NULL){
     old <- .IsoplotR$alpha
     if (is.numeric(x)) .IsoplotR$alpha <- x
     invisible(old)
