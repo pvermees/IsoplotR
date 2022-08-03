@@ -213,7 +213,7 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
         if (exterr) pc$plat <- add.exterr.to.wtdmean(x,pc$plat)
         plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
         graphics::title(plateau.title(pc$plat,oerr=oerr,sigdig=sigdig,
-                                      Ar=TRUE,units='Ma'))
+                                      Ar=TRUE,units=' Ma'))
     }
     plot.spectrum(XY=XY,col=pc$col)
     colourbar(z=levels,fill=plateau.col,clabel=clabel)

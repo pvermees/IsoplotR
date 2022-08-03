@@ -306,7 +306,7 @@ weightedmean.UPb <- function(x,random.effects=FALSE,
                         rect.col=rect.col,outlier.col=outlier.col,
                         type=type,cutoff.76=cutoff.76,
                         cutoff.disc=cutoff.disc,sigdig=sigdig,
-                        oerr=oerr,exterr=exterr,units='Ma',
+                        oerr=oerr,exterr=exterr,units=' Ma',
                         ranked=ranked,hide=hide,omit=omit,
                         omit.col=omit.col,common.Pb=common.Pb,...)
 }
@@ -325,7 +325,7 @@ weightedmean.PbPb <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        units='Ma',ranked=ranked,hide=hide,omit=omit,
+                        units=' Ma',ranked=ranked,hide=hide,omit=omit,
                         omit.col=omit.col,common.Pb=common.Pb,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial
@@ -375,7 +375,7 @@ weightedmean.ThU <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,ranked=ranked,
-                        Th0i=Th0i,units='ka',hide=hide,
+                        Th0i=Th0i,units=' ka',hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -392,7 +392,7 @@ weightedmean.ArAr <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,i2i=i2i,
-                        units='Ma',ranked=ranked,hide=hide,omit=omit,
+                        units=' Ma',ranked=ranked,hide=hide,omit=omit,
                         omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -409,7 +409,7 @@ weightedmean.KCa <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=NULL,
+                        i2i=i2i,units=' Ma',ranked=ranked,hide=NULL,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -426,7 +426,7 @@ weightedmean.ThPb <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig, oerr=oerr,exterr=exterr,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -443,7 +443,7 @@ weightedmean.ReOs <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -460,7 +460,7 @@ weightedmean.SmNd <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -477,7 +477,7 @@ weightedmean.RbSr <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -494,7 +494,7 @@ weightedmean.LuHf <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        i2i=i2i,units='Ma',ranked=ranked,hide=hide,
+                        i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -511,7 +511,7 @@ weightedmean.UThHe <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=FALSE,
-                        units='Ma',ranked=ranked,hide=hide,
+                        units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 #' @rdname weightedmean
@@ -528,7 +528,7 @@ weightedmean.fissiontracks <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        units='Ma',ranked=ranked,hide=hide,
+                        units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,...)
 }
 weightedmean_helper <- function(x,random.effects=FALSE,
