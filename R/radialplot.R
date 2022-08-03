@@ -201,7 +201,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
                 col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
     fit <- central(x2calc,exterr=exterr)
-    graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,units='Ma',
+    graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,units=' Ma',
                                  ntit=get.ntit(x2calc),dof=fit$df))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
@@ -444,14 +444,14 @@ radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
     age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,clabel=clabel,bg=bg,
                col=col,markers=markers,k=k,np=np,exterr=FALSE,Th0i=Th0i,oerr=oerr,
-               units='ka',hide=hide,omit=omit,omit.col=omit.col,...)
+               units=' ka',hide=hide,omit=omit,omit.col=omit.col,...)
 }
 age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',type=4,
                        cutoff.76=1100,cutoff.disc=discfilter(),
                        show.numbers=FALSE,pch=21,levels=NA,sigdig=2,
                        clabel="",bg=c("yellow","red"),col='black',markers=NULL,
                        k=0,np=4,exterr=TRUE,i2i=FALSE,Th0i=0,common.Pb=0,
-                       oerr=3,units='Ma',hide=NULL,omit=NULL,omit.col=NA,...){
+                       oerr=3,units=' Ma',hide=NULL,omit=NULL,omit.col=NA,...){
     x2calc <- clear(x,hide,omit)
     peaks <- peakfit(x2calc,k=k,np=np,exterr=exterr,sigdig=sigdig,
                      oerr=oerr,i2i=i2i,type=type,cutoff.76=cutoff.76,

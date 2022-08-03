@@ -272,7 +272,13 @@ settings <- function(setting=NA,...,fname=NA,reset=FALSE){
             .IsoplotR$tracklength <- prefs$tracklength
             .IsoplotR$mindens <- prefs$mindens
             .IsoplotR$alpha <- prefs$alpha
-        } else if (!is.na(setting) & (nargs>0)){
+        } else if (identical(setting,'alpha')){
+            if (nargs<1){
+                out <- alpha()
+            } else {
+                alpha(args[[1]])
+            }
+        } else if (!is.na(setting) & nargs>0){
             if (nargs==1){
                 Rcommand <- paste0(setting,"('",args[[1]],"')")
                 return(eval(parse(text=Rcommand)))
@@ -281,6 +287,8 @@ settings <- function(setting=NA,...,fname=NA,reset=FALSE){
             } else if (nargs==3) {
                 Rcommand <- paste0(setting,"('",args[[1]],"',",
                                    args[[2]],",",args[[3]],")")
+            } else {
+                warning('incorrect number of arguments')
             }
             out <- eval(parse(text=Rcommand))
         } else {

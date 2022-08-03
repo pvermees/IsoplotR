@@ -1344,7 +1344,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 }
 
-isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=" Ma",ski=NULL,...){
+isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=' Ma',ski=NULL,...){
     content <- list()
     if (is.na(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
