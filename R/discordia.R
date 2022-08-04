@@ -213,8 +213,8 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
         } else {
             tl <- fit$par[1]
             tu <- fit$par[2]
-            X <- age_to_Pb207U235_ratio(fit$par,d=d)[,'75']
-            Y <- age_to_Pb206U238_ratio(fit$par,d=d)[,'68']
+            X <- age_to_Pb207U235_ratio(c(tl,tu),d=d)[,'75']
+            Y <- age_to_Pb206U238_ratio(c(tl,tu),d=d)[,'68']
             x <- seq(from=max(0,usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
             du <- mclean(tt=tu,d=d)
             dl <- mclean(tt=tl,d=d)
