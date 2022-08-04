@@ -9,7 +9,6 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
         wfit <- twfit2wfit(fit,x)
         out$par <- wfit$par
         out$cov <- wfit$cov
-        names(out$par) <- c('t[l]','t[u]')
     } else {
         out$par <- fit$par
         out$cov <- fit$cov
@@ -86,16 +85,22 @@ twfit2wfit <- function(fit,x){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    E <- matrix(0,3,3)
-    J <- matrix(0,2,3)
+    if (fit$model==3){
+        E <- matrix(0,4,4)
+        J <- matrix(0,3,4)
+        w <- fit$par['w']
+    } else {
+        E <- matrix(0,3,3)
+        J <- matrix(0,2,3)
+    }
     if (x$format %in% c(1,2,3)){
         a0 <- 1
         b0 <- fit$par['a0']
-        E[c(1,3),c(1,3)] <- fit$cov[1:2,1:2]
+        E[-2,-2] <- fit$cov
     } else {
         a0 <- fit$par['a0']
         b0 <- fit$par['b0']
-        E <- fit$cov[1:3,1:3]
+        E <- fit$cov
     }
     md <- mediand(x$d)
     D <- mclean(tt,d=md)
@@ -147,8 +152,16 @@ twfit2wfit <- function(fit,x){
         J[2,1] <- 1
     }
     out <- list()
-    out$par <- c(tl,tu)
+    if (fit$model==3){
+        out$par <- c(tl,tu,w)
+        J[3,4] <- 1
+        nms <- c('t[l]','t[u]','w')
+    } else {
+        out$par <- c(tl,tu)
+        nms <- c('t[l]','t[u]')
+    }
     out$cov <- J %*% E %*% t(J)
+    rownames(out$cov) <- colnames(out$cov) <- names(out$par) <- nms
     out
 }
 
