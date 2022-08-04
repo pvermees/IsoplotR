@@ -201,8 +201,8 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
                 col=tcol[plotit],sn=(1:ns)[plotit],...)
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
     fit <- central(x2calc,exterr=exterr)
-    graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,units=' Ma',
-                                 ntit=get.ntit(x2calc),dof=fit$df))
+    graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,
+                                 units=' Ma',ntit=get.ntit(x2calc)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -829,10 +829,11 @@ iatt <- function(z,zeta,rhoD){
     log(1+L8*(zeta/2e6)*rhoD*tan(z)^2)/L8
 }
 
-radial.title <- function(fit,sigdig=2,oerr=3,units='',
-                         ntit,caveat=FALSE,dof=NULL,...){
+radial.title <- function(fit,sigdig=2,oerr=3,units='',ntit,caveat=FALSE,...){
+    ast <- ifelse(caveat,'*','')
     line1 <- maintit(fit$age[1],fit$age[2],ntit=ntit,units=units,
-                     sigdig=sigdig,oerr=oerr,prefix='central age =',dof=dof)
+                     sigdig=sigdig,oerr=oerr,dof=fit$df,
+                     prefix=paste0('central age',ast,' ='))
     line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     if (fit$p.value<alpha()){
         line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,oerr=oerr)

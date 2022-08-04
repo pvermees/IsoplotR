@@ -638,7 +638,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
     colour <- set.ellipse.colours(ns=NS,levels=levels,col=rect.col,
                                   hide=hide,omit=which(!fit$valid),
                                   omit.col=omit.col)
-    Xerr <- geterr(X,sX,oerr=oerr,absolute=TRUE)
+    Xerr <- geterr(X,sX,oerr=oerr,absolute=TRUE,dof=fit$df)
     x <- X[plotit]
     xerr <- Xerr[plotit]
     valid <- fit$valid[plotit]
@@ -689,8 +689,8 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
     line1 <- maintit(x=fit$mean[1],sx=fit$mean[-1],
-                     ntit=ntit.valid(fit$valid),
-                     sigdig=sigdig,oerr=oerr,units=units,
+                     ntit=ntit.valid(fit$valid),sigdig=sigdig,
+                     oerr=oerr,units=units,dof=fit$df,
                      prefix=paste0('mean',ast,' ='))
     if (fit$random.effects){
         line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,
