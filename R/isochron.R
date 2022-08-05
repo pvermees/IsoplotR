@@ -1186,15 +1186,15 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
     if (option==1){
         out$y0['y'] <- out$PAR['i48']
         out$y0['s[y]'] <- sqrt(out$COV['i48','i48'])
-        out$y0label <- quote('('^234*'U/'^238*'U)=')
+        out$y0label <- quote('('^234*'U/'^238*'U)'[0]*'=')
     } else if (option==2){
         out$y0['y'] <- out$PAR['i02']
         out$y0['s[y]'] <- sqrt(out$COV['i02','i02'])
-        out$y0label <- quote('('^230*'Th/'^230*'Th)=')
+        out$y0label <- quote('('^230*'Th/'^230*'Th)'[0]*'=')
     } else if (option==3){
         out$y0['y'] <- out$PAR['i08']
         out$y0['s[y]'] <- sqrt(out$COV['i08','i08'])
-        out$y0label <- quote('('^230*'Th/'^238*'U)=')
+        out$y0label <- quote('('^230*'Th/'^238*'U)'[0]*'=')
     } else {
         l4 <- lambda('U234')
         out$y0['y'] <- 1 + (out$PAR['i48']-1)*exp(l4[1]*tst['t'])
@@ -1211,7 +1211,7 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
         J2[2] <- exp(l4[1]*tst['t'])
         J2[3] <- ifelse(exterr,(out$PAR['i48']-1)*exp(l4[1]*tst['t'])*tst['t'],0)
         out$y0['s[y]'] <- sqrt(J2 %*% E2 %*% J2)
-        out$y0label <- quote('('^234*'U/'^238*'U)'[o]*'=')
+        out$y0label <- quote('('^234*'U/'^238*'U)'[i]*'=')
     }
     if (inflate(out)){ # overwrite dispersion to remove decay constant errors
         if (option<4){
