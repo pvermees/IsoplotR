@@ -1348,15 +1348,15 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=' Ma',ski=NULL,...){
     content <- list()
     if (is.na(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,units=units,
-                                prefix='intercept =',sigdig=sigdig,oerr=oerr)
+                                prefix='intercept =',sigdig=sigdig,oerr=oerr,dof=fit$df)
         content[[2]] <- maintit(x=fit$b[1],sx=fit$b[-1],ntit='',units=units,
-                                prefix='slope =',sigdig=sigdig,oerr=oerr)
+                                prefix='slope =',sigdig=sigdig,oerr=oerr,dof=fit$df)
     } else {
         content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
-                                units=units,sigdig=sigdig,oerr=oerr)
+                                units=units,sigdig=sigdig,oerr=oerr,dof=fit$df)
         content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
                                 units='',prefix=fit$y0label,
-                                sigdig=sigdig,oerr=oerr)
+                                sigdig=sigdig,oerr=oerr,dof=fit$df)
     }
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)

@@ -315,18 +315,18 @@ discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,...){
     line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,dof=fit$df,
                      sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
     if (wetherill){
-        line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',
+        line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',dof=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
     } else if (fit$format<4){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
-                         sigdig=sigdig,oerr=oerr,units='',
+                         sigdig=sigdig,oerr=oerr,units='',dof=fit$df,
                          prefix=quote('('^207*'Pb/'^206*'Pb)'[o]*'='))
     } else if (fit$format<7){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
-                         sigdig=sigdig,oerr=oerr,units='',
+                         sigdig=sigdig,oerr=oerr,units='',dof=fit$df,
                          prefix=quote('('^206*'Pb/'^204*'Pb)'[o]*'='))
         line3 <- maintit(x=fit$par['b0'],sx=fit$err[,'b0'],ntit='',
-                         sigdig=sigdig,oerr=oerr,units='',
+                         sigdig=sigdig,oerr=oerr,units='',dof=fit$df,
                          prefix=quote('('^207*'Pb/'^204*'Pb)'[o]*'='))
     } else if (fit$format<9){
         i86 <- 1/fit$par['a0']
@@ -334,9 +334,9 @@ discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,...){
         i86err <- i86*fit$err[,'a0']/fit$par['a0']
         i87err <- i87*fit$err[,'b0']/fit$par['b0']
         line2 <- maintit(x=i86,sx=i86err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                         prefix=quote('('^208*'Pb/'^206*'Pb)'[o]*'='))
+                         dof=fit$df,prefix=quote('('^208*'Pb/'^206*'Pb)'[o]*'='))
         line3 <- maintit(x=i87,sx=i87err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                         prefix=quote('('^208*'Pb/'^207*'Pb)'[o]*'='))
+                         dof=fit$df,prefix=quote('('^208*'Pb/'^207*'Pb)'[o]*'='))
     } else {
         stop('Invalid U-Pb data format.')
     }
