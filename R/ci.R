@@ -20,9 +20,11 @@ inflate <- function(fit){
 
 # df != NULL for fission track data
 geterr <- function(x,sx,oerr=3,dof=NULL,absolute=FALSE){
+    fact <- rep(ntfact(alpha()),length(sx))
+    if (!is.null(dof)){ # used for titles, when length(sx)==2
+        fact[-1] <- stats::qt(1-alpha()/2,df=dof)
+    }
     if (oerr>3 & absolute) oerr <- oerr-3
-    if (is.null(dof)) fact <- ntfact(alpha())
-    else fact <- stats::qt(1-alpha()/2,df=dof)
     if (oerr==1) out <- sx
     else if (oerr==2) out <- 2*sx
     else if (oerr==3) out <- fact*sx

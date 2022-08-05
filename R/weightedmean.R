@@ -604,7 +604,8 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
         SS <- sum(((x-out$mean['t'])/sx)^2)
         out$mswd <- SS/out$df
         out$p.value <- 1-stats::pchisq(SS,out$df)
-        if (inflate(out)) out$mean['disp[t]'] <- sqrt(out$mswd)*out$mean['s[t]']
+        if (inflate(out))
+            out$mean['disp[t]'] <- sqrt(out$mswd)*out$mean['s[t]']
     }
     plotpar <- list()
     plotpar$mean <- list(x=c(0,ns+1),y=rep(out$mean['t'],2))
@@ -638,7 +639,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
     colour <- set.ellipse.colours(ns=NS,levels=levels,col=rect.col,
                                   hide=hide,omit=which(!fit$valid),
                                   omit.col=omit.col)
-    Xerr <- geterr(X,sX,oerr=oerr,absolute=TRUE,dof=fit$df)
+    Xerr <- geterr(X,sX,oerr=oerr,absolute=TRUE)
     x <- X[plotit]
     xerr <- Xerr[plotit]
     valid <- fit$valid[plotit]
@@ -689,9 +690,8 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
     line1 <- maintit(x=fit$mean[1],sx=fit$mean[-1],
-                     ntit=ntit.valid(fit$valid),sigdig=sigdig,
-                     oerr=oerr,units=units,dof=fit$df,
-                     prefix=paste0('mean',ast,' ='))
+                     ntit=ntit.valid(fit$valid),sigdig=sigdig,dof=fit$df,
+                     oerr=oerr,units=units,prefix=paste0('mean',ast,' ='))
     if (fit$random.effects){
         line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,
                          oerr=oerr,units=units)

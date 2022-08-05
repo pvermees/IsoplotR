@@ -312,7 +312,7 @@ tw3d2d <- function(fit){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,...){
-    line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,
+    line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,dof=fit$df,
                      sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
     if (wetherill){
         line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',
