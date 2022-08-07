@@ -729,12 +729,12 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         R76 <- out$a
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
         y.lab <- quote(''^207*'Pb/'^206*'Pb')
-        out$y0label <- quote(''^207*'Pb/'^206*'Pb = '[])
+        out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
     } else {
         R76 <- out$b
         x.lab <- quote(''^206*'Pb/'^204*'Pb')
         y.lab <- quote(''^207*'Pb/'^204*'Pb')
-        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*' = ')
+        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
     }
     out$displabel <- quote('dispersion = ')
     out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
@@ -832,7 +832,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
         y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
     out$displabel <- substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
-    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[o]*' = ')
+    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[o]*'=')
     out$age[c('t','s[t]')] <- get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     if (inflate(out)){
         out$age['disp[t]'] <- get.ArAr.age(R09,sqrt(out$mswd)*sR09,
@@ -978,7 +978,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     out$displabel <- quote('He-dispersion = ')
-    out$y0label <- quote('He'[o]*' = ')
+    out$y0label <- quote('He'[o]*'=')
     if (plot) {
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1255,10 +1255,8 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
-    out$displabel <-
-        substitute(a*b*c,list(a='(',b=lab$y,c=')-dispersion = '))
-    out$y0label <-
-        substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*' = ')))
+    out$displabel <- substitute(a*b*c,list(a='(',b=lab$y,c=')-dispersion = '))
+    out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*'=')))
     if (plot){
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
