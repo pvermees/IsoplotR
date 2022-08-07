@@ -93,6 +93,29 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #' @param x an object of class \code{fissiontracks}
 #' @param tst a two-element vector with the true age and its standard
 #'     error
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' (only used when \code{update} is \code{FALSE})
+#'
+#' @param sigdig the number of significant digits (only used when
+#'     \code{update} is \code{FALSE}).
 #' @param exterr logical flag indicating whether the external
 #'     uncertainties associated with the age standard or the dosimeter
 #'     glass (for the EDM) should be accounted for when propagating
@@ -102,7 +125,8 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #'     two-element vector with the calibration constant and its
 #'     standard error.
 #' @return an object of class \code{fissiontracks} with an updated
-#'     \code{x$zeta} value
+#'     \code{x$zeta} value or (if \code{update} is \code{FALSE}), a
+#'     2-element matrix with the zeta estimate and its uncertainty.
 #' @seealso \code{\link{age}}
 #' @examples
 #' attach(examples)
@@ -122,7 +146,7 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #' Vermeesch, P., 2017. Statistics for LA-ICP-MS based fission track
 #' dating. Chemical Geology, 456, pp.19-27.
 #' @export
-set.zeta <- function(x,tst,exterr=TRUE,update=TRUE){
+set.zeta <- function(x,tst,exterr=TRUE,oerr=1,sigdig=NA,update=TRUE){
     N <- length(x$Ns)
     L8 <- lambda('U238')[1]
     tt <- tst[1]
@@ -150,8 +174,8 @@ set.zeta <- function(x,tst,exterr=TRUE,update=TRUE){
         out <- x
         out$zeta <- zsz
     } else {
-        out <- zsz
-        names(out) <- c('zeta','s[zeta]')
+        out <- matrix(agerr(zsz,oerr=oerr,sigdig=sigdig),ncol=2)
+        colnames(out) <- c('zeta','s[zeta]')
     }
     out
 }
