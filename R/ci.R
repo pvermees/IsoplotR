@@ -35,20 +35,22 @@ geterr <- function(x,sx,oerr=3,dof=NULL,absolute=FALSE){
 }
 
 # formats table or vector of ages and errors
-agerr <- function(x,oerr=1,sigdig=NA){
+agerr <- function(x,...){ UseMethod("agerr",x) }
+agerr.default <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
-    if (methods::is(x,'matrix')){
-        nc <- ncol(tst)
-        i <- seq(from=2,to=nc,by=2)
-        tst[,i] <- geterr(x=x[,i-1],sx=x[,i],oerr=oerr)
-        rounded <- roundit(age=tst[,i-1],err=tst[,i],sigdig=sigdig)
-        out[,i-1] <- rounded[,1:(nc/2)]
-        out[,i] <- rounded[,(nc/2+1):nc]
-        if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
-    } else {
-        tst[2] <- geterr(x=x[1],sx=x[2],oerr=oerr)
-        out <- roundit(age=tst[1],err=tst[2],sigdig=sigdig)
-    }
+    tst[2] <- geterr(x=x[1],sx=x[2],oerr=oerr)
+    out <- roundit(age=tst[1],err=tst[2],sigdig=sigdig)
+    out
+}
+agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
+    out <- tst <- x
+    nc <- ncol(tst)
+    i <- seq(from=2,to=nc,by=2)
+    tst[,i] <- geterr(x=x[,i-1],sx=x[,i],oerr=oerr)
+    rounded <- roundit(age=tst[,i-1],err=tst[,i],sigdig=sigdig)
+    out[,i-1] <- rounded[,1:(nc/2)]
+    out[,i] <- rounded[,(nc/2+1):nc]
+    if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
     out
 }
 

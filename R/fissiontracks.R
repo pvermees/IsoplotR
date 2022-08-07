@@ -101,7 +101,6 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #'     return an updated version of the input data, or simply return a
 #'     two-element vector with the calibration constant and its
 #'     standard error.
-#' @param sigdig number of significant digits
 #' @return an object of class \code{fissiontracks} with an updated
 #'     \code{x$zeta} value
 #' @seealso \code{\link{age}}
@@ -123,35 +122,35 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #' Vermeesch, P., 2017. Statistics for LA-ICP-MS based fission track
 #' dating. Chemical Geology, 456, pp.19-27.
 #' @export
-set.zeta <- function(x,tst,exterr=TRUE,update=TRUE,sigdig=2){
+set.zeta <- function(x,tst,exterr=TRUE,update=TRUE){
     N <- length(x$Ns)
     L8 <- lambda('U238')[1]
     tt <- tst[1]
     if (exterr) st <- tst[2]
     else st <- 0
+    zsz <- rep(NA,2)
     if (x$format==1){
         Ns <- sum(x$x[,'Ns'])
         Ni <- sum(x$x[,'Ni'])
         rhoD <- x$rhoD
         if (!exterr) rhoD[2] <- 0
-        zeta <- 2e6*(exp(L8*tt)-1)/(L8*rhoD[1]*Ns/Ni)
-        zetaErr <- zeta * sqrt( (L8*exp(L8*tt)*st/(exp(L8*tt)-1))^2 +
-                                (rhoD[2]/rhoD[1])^2 + 1/Ns + 1/Ni )
+        zsz[1] <- 2e6*(exp(L8*tt)-1)/(L8*rhoD[1]*Ns/Ni)
+        zsz[2] <- zsz[1] * sqrt( (L8*exp(L8*tt)*st/(exp(L8*tt)-1))^2 +
+                                 (rhoD[2]/rhoD[1])^2 + 1/Ns + 1/Ni )
     } else {
         Ns <- sum(x$Ns)
         UsU <- get.UsU(x)
         UA <- sum(UsU[,1]*x$A)
         UAerr <- sqrt( sum(UsU[,2]*x$A)^2 )
-        zeta <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
-        zetaErr <- zeta * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
-                                1/Ns + (UAerr/UA)^2 )
+        zsz[1] <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
+        zsz[2] <- zsz[1] * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
+                                 1/Ns + (UAerr/UA)^2 )
     }
-    zsz <- roundit(zeta,zetaErr,sigdig=sigdig)
     if (update){
         out <- x
-        out$zeta <- as.vector(zsz)
+        out$zeta <- zsz
     } else {
-        out <- as.vector(zsz)
+        out <- zsz
         names(out) <- c('zeta','s[zeta]')
     }
     out
