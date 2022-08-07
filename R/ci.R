@@ -44,6 +44,7 @@ agerr <- function(x,oerr=1,sigdig=NA){
         rounded <- roundit(age=tst[,i-1],err=tst[,i],sigdig=sigdig)
         out[,i-1] <- rounded[,1:(nc/2)]
         out[,i] <- rounded[,(nc/2+1):nc]
+        if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
     } else {
         tst[2] <- geterr(x=x[1],sx=x[2],oerr=oerr)
         out <- roundit(age=tst[1],err=tst[2],sigdig=sigdig)

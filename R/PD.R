@@ -31,8 +31,8 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
 # i2i = isochron to intercept
 # bratio = branching ratio
 # projerr = isochron projection error
-PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
-                   i2i=TRUE,bratio=1,omit4c=NULL,projerr=FALSE,...){
+PD.age <- function(x,nuclide,exterr=TRUE,i=NA,i2i=TRUE,
+                   bratio=1,omit4c=NULL,projerr=FALSE,...){
     ns <- length(x)
     out <- matrix(0,ns,2)
     if (ns<2) i2i <- FALSE
@@ -57,9 +57,8 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NA,sigdig=NA,
         if (projerr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
         DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
     }
-    tt <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
+    out <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
                      nuclide,exterr=exterr,bratio=bratio)
-    out <- roundit(subset(tt,select=1),subset(tt,select=2),sigdig=sigdig)
     if (!is.na(i)) out <- out[i,,drop=FALSE]
     colnames(out) <- c('t','s[t]')
     out

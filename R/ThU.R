@@ -1,16 +1,16 @@
-ThU.age <- function(x,exterr=FALSE,i=NA,Th0i=0,sigdig=NA,
+ThU.age <- function(x,exterr=FALSE,i=NA,Th0i=0,
                     cor=TRUE,omit4c=NULL){
     if (x$format %in% c(1,2)){
-        out <- get.ThU.age.corals(x,exterr=exterr,i=i,sigdig=sigdig,
-                                  cor=cor,Th0i=Th0i,omit4c=omit4c)
+        out <- get.ThU.age.corals(x,exterr=exterr,i=i,cor=cor,
+                                  Th0i=Th0i,omit4c=omit4c)
     } else {
-        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,Th0i=Th0i,
-                                     sigdig=sigdig,omit4c=omit4c)
+        out <- get.ThU.age.volcanics(x,exterr=exterr,i=i,
+                                     Th0i=Th0i,omit4c=omit4c)
     }
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,
                                cor=TRUE,Th0i=0,omit4c=NULL){
     td <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
     if (Th0i==2){
@@ -32,17 +32,12 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,sigdig=NA,
                                Th230Th232i=Th02i[1],sTh230Th232i=Th02i[2],
                                exterr=exterr,cor=cor)
     }
-    if (!is.na(sigdig)){
-        out[,c(1,2)] <- roundit(out[,1],out[,2],sigdig=sigdig)
-        out[,c(3,4)] <- roundit(out[,3],out[,4],sigdig=sigdig)
-        out[,5] <- signif(out[,5],sigdig)
-    }
     if (!is.na(i)) out <- out[i,]
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     out
 }
 
-get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,Th0i=0,sigdig=NA,omit4c=NULL){
+get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,Th0i=0,omit4c=NULL){
     ns <- length(x)
     d <- data2york(x,type=2,generic=FALSE)
     if (Th0i==1){
@@ -59,7 +54,6 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,Th0i=0,sigdig=NA,omit4c=NU
         tst <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],exterr=exterr)
         out[j,] <- tst[c('t','s[t]')]
     }
-    if (!is.na(sigdig)) out <- roundit(out[,1],out[,2],sigdig=sigdig)
     if (!is.na(i)) out <- out[i,]
     colnames(out) <- c('t','s[t]')
     out

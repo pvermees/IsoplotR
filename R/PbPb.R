@@ -1,4 +1,4 @@
-PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,
+PbPb.age <- function(x,exterr=TRUE,i=NA,common.Pb=0,
                      omit4c=NULL,projerr=FALSE){
     y <- data2york(x,inverse=TRUE)
     if (common.Pb == 0){
@@ -24,16 +24,15 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,common.Pb=0,
         if (projerr) PbPb[,2] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
         else PbPb[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
     }
-    PbPb2t(PbPb,exterr=exterr,sigdig=sigdig,i=i)
+    PbPb2t(PbPb,exterr=exterr,i=i)
 }
 
-PbPb2t <- function(PbPb,exterr=FALSE,sigdig=NA,i=NA){
+PbPb2t <- function(PbPb,exterr=FALSE,i=NA){
     ns <- nrow(PbPb)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
-        tt <- get.Pb207Pb206.age(PbPb[j,1],PbPb[j,2],exterr=exterr)
-        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
+        out[j,] <- get.Pb207Pb206.age(PbPb[j,1],PbPb[j,2],exterr=exterr)
     }
     if (!is.na(i)) out <- out[i,]
     out
