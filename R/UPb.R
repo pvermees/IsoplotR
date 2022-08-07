@@ -1048,20 +1048,20 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit4c=NULL,
+UPb.age <- function(x,exterr=FALSE,i=NA,conc=TRUE,omit4c=NULL,
                     discordance=discfilter(),common.Pb=0,...){
     if (discordance$option==0 | discordance$before) xd <- x
     else xd <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
     if (common.Pb==0) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
     if (!is.na(i)){
-        out <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,sigdig=sigdig,
+        out <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
                               conc=conc,discordance=discordance)
     } else {
         nn <- length(x)
         out <- NULL
         for (i in 1:nn){
-            ti <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,sigdig=sigdig,
+            ti <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
                                  conc=conc,discordance=discordance)
             out <- rbind(out,ti)
         }
@@ -1073,7 +1073,7 @@ UPb.age <- function(x,exterr=FALSE,i=NA,sigdig=NA,conc=TRUE,omit4c=NULL,
 # X = common Pb corrected data (if common.Pb>0)
 # xd = data to be used for concordia age calculation 
 #      (raw if before==TRUE, common Pb corrected if before==FALSE)
-UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,
+UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
                            conc=TRUE,discordance=discfilter(),...){
     Xi <- subset(X,subset=((1:length(X))%in%i))
     labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
@@ -1088,19 +1088,14 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,
     t.75 <- get.Pb207U235.age(Xi,exterr=exterr)
     t.68 <- get.Pb206U238.age(Xi,exterr=exterr)
     t.76 <- get.Pb207Pb206.age(Xi,exterr=exterr,t.68=subset(t.68,select=1))
-    t.75.out <- roundit(t.75[1],t.75[2],sigdig=sigdig)
-    t.68.out <- roundit(t.68[1],t.68[2],sigdig=sigdig)
-    t.76.out <- roundit(t.76[1],t.76[2],sigdig=sigdig)
-    out <- c(t.75.out,t.68.out,t.76.out)
+    out <- c(t.75,t.68,t.76)
     if (hasTh){
         t.82 <- get.Pb208Th232.age(Xi,exterr=exterr)
-        t.82.out <- roundit(t.82[1],t.82[2],sigdig=sigdig)
-        out <- c(out,t.82.out)
+        out <- c(out,t.82)
     }
     if (conc){
         t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
-        t.conc.out <- roundit(t.conc$age[1],t.conc$age[2],sigdig=sigdig)
-        out <- c(out,t.conc.out)
+        out <- c(out,t.conc$age)
     }
     if (discordance$option>0){
         xdi <- subset(xd,subset=((1:length(xd))%in%i))
@@ -1108,7 +1103,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,
     if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
         xi <- subset(x,subset=((1:length(x))%in%i))
         dif <- discordance(x=xi,X=xdi,option=discordance$option)
-        out <- c(out,roundit(dif,sigdig=sigdig))
+        out <- c(out,dif)
     }
     if (discordance$option%in%c(6,'p')){
         t.conc <- concordia.age(x=xdi,exterr=exterr)
@@ -1116,7 +1111,6 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,sigdig=NA,
             LL.concordia.age(tt=t.conc$age[1],cc=wetherill(xdi,i=1),
                              mswd=TRUE,exterr=exterr,d=xdi$d)
         p.value <- 1-stats::pchisq(SS.concordance,1)
-        p.value <- roundit(p.value,sigdig=sigdig)
         out <- c(out,p.value)
     }
     names(out) <- labels
