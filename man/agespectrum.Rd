@@ -144,43 +144,13 @@ ratio from an isochron fit. Setting \code{i2i} to \code{FALSE}
 uses the default values stored in \code{settings('iratio',...)}}
 }
 \value{
-If \code{plateau=TRUE}, returns a list with the following items:
+If \code{plateau=TRUE}, returns a list containing the output of the
+    \code{weightedmean} function, plus the following items:
 
-\describe{ \item{mean}{a 3-element vector with:
-
-\code{t}: the plateau mean
-
-\code{s[t]}: the standard error of \code{x}
-
-\code{ci[t]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
-\code{t} }
-
-\item{disp}{a 3-element vector with:
-
-\code{w}: the overdispersion, i.e. the standard deviation of the
-Normal distribution that is assumed to describe the true ages.
-
-\code{ll}: the width of the lower half of a 100(1-\eqn{\alpha})\%
-confidence interval for the overdispersion
-
-\code{ul}: the width of the upper half of a 100(1-\eqn{\alpha})\%
-confidence interval for the overdispersion}
-
-\item{df}{the degrees of freedom for the weighted mean plateau fit}
-
-\item{mswd}{the mean square of the weighted deviates of the
-plateau}
-
-\item{p.value}{the p-value of a Chi-square test with \eqn{df=n-2}
-degrees of freedom, where \eqn{n} is the number of steps in the
-plateau and 2 degrees of freedom have been removed to estimate the
-mean and the dispersion.}
+\describe{
 
 \item{fract}{the fraction of \eqn{^{39}}Ar contained in the
 plateau}
-
-\item{plotpar}{plot parameters for the weighted mean (see
-\code{\link{weightedmean}})}
 
 \item{i}{indices of the steps that are retained for the plateau age
 calculation}
