@@ -552,7 +552,7 @@ error.}
 
 \item{df}{the degrees of freedom of the linear fit (\eqn{df=n-2})}
 
-\item{y0}{a four-element list containing:
+\item{y0}{a two- or three-element list containing:
 
 \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
 \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
@@ -560,16 +560,12 @@ error.}
 \eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{208}}Pb/\eqn{^{204}}Pb
 ratio.
 
-\code{s[y]}: the propagated uncertainty of \code{y}
+\code{s[y]}: the standard error of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y}.
+\code{disp[y]}: the standard error of \code{y} enhanced by
+\eqn{\sqrt{mswd}} (only applicable if \code{ model=1}).  }
 
-\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only
-applicable if \code{ model=1}).  }
-
-\item{age}{a four-element list containing:
+\item{age}{a three-element list containing:
 
 \code{t}: the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
 \eqn{^{208}}Pb/\eqn{^{232}}Th, \eqn{^{40}}Ar/\eqn{^{39}}Ar,
@@ -577,14 +573,10 @@ applicable if \code{ model=1}).  }
 \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
 \eqn{^{176}}Hf/\eqn{^{177}}Hf age.
 
-\code{s[t]}: the propagated uncertainty of \code{t}
+\code{s[t]}: the standard error of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}.
-
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
-applicable if \code{ model=1}).  }
+\code{disp[t]}: the standard error of \code{t} enhanced by
+\eqn{\sqrt{mswd}} (only applicable if \code{ model=1}).  }
 
 \item{mswd}{the mean square of the residuals (a.k.a `reduced
     Chi-square') statistic (omitted if \code{model=2}).}
@@ -592,11 +584,10 @@ applicable if \code{ model=1}).  }
 \item{p.value}{the p-value of a Chi-square test for linearity
 (omitted if \code{model=2})}
 
-\item{w}{the overdispersion term, i.e. a three-element vector with
-the standard deviation of the (assumedly) Normally distributed
-geological scatter that underlies the measurements, and the lower
-and upper half-widths of its \eqn{100(1-\alpha)\%} confidence
-interval (only returned if \code{model=3}).}
+\item{w}{the overdispersion term, i.e. a two-element vector with
+the standard deviation of the (assumed) Normally distributed
+geological scatter that underlies the measurements, and its
+standard error (only returned if \code{model=3}).}
 
 \item{ski}{(only reported if \code{x} has class \code{PbPb} and
 \code{growth} is \code{TRUE}) the intercept(s) of the isochron with
@@ -642,39 +633,28 @@ propagated uncertainty.}
 
 \item{p.value}{the p-value of a Chi-square test for linearity.}
 
-\item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the confidence
-intervals.}
-
-\item{y0}{a four-element vector containing:
+\item{y0}{a three-element vector containing:
 
 \code{y}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
 
-\code{s[y]}: the propagated uncertainty of \code{y}
+\code{s[y]}: the standard error of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y}.
+\code{disp[y]}: the standard error of \code{y} enhanced by
+\eqn{\sqrt{mswd}}.}
 
-\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
-
-\item{age}{a three (or four) element vector containing:
+\item{age}{a two (or three) element vector containing:
 
 \code{t}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
 
-\code{s[t]}: the propagated uncertainty of \code{t}
+\code{s[t]}: the standard error of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}
+\code{disp[t]}: the standard error of \code{t} enhanced by
+\eqn{\sqrt{mswd}} (only reported if \code{model=1}).}
 
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
-if \code{model=1}).}
-
-\item{w}{the overdispersion term, i.e. a three-element vector with
+\item{w}{the overdispersion term, i.e. a two-element vector with
 the standard deviation of the (assumedly) Normally distributed
-geological scatter that underlies the measurements, and the lower
-and upper half-width of its \eqn{100(1-\alpha)\%} confidence
-interval (only returned if \code{model=3}).}
+geological scatter that underlies the measurements, and its
+standard error.}
 
 \item{d}{a matrix with the following columns: the X-variable for
 the isochron plot, the analytical uncertainty of X, the Y-variable
@@ -717,10 +697,7 @@ parameter \eqn{w}.}
 
 \item{p.value}{the p-value of a Chi-square test for linearity.}
 
-\item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the confidence
-intervals.}
-
-\item{y0}{a three or four-element vector containing:
+\item{y0}{a two or three-element vector containing:
 
 \code{y}: the initial \eqn{^{206}}Pb/\eqn{^{204}}Pb-ratio (if
 \code{type=1} and \code{x$format=4,5} or \code{6});
@@ -735,29 +712,21 @@ intervals.}
 \eqn{^{207}}Pb/\eqn{^{208}}Pb-ratio (if \code{type=4} and
 \code{x$format=7} or \code{8}).
 
-\code{s[y]}: the propagated uncertainty of \code{y}
+\code{s[y]}: the standard error of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y}.
-
-\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only returned
-if \code{model=1})}
+\code{disp[y]}: the standard error of \code{y} enhanced by
+\eqn{\sqrt{mswd}} (only returned if \code{model=1})}
 
 \item{y0label}{the y-axis label of the isochron plot}
 
-\item{age}{a three (or four) element vector containing:
+\item{age}{a two (or three) element vector containing:
 
 \code{t}: the isochron age
 
-\code{s[t]}: the propagated uncertainty of \code{t}
+\code{s[t]}: the standard error of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}
-
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
-if \code{model=1}).}
+\code{disp[t]}: the standard error of \code{t} enhanced by
+\eqn{\sqrt{mswd}} (only reported if \code{model=1}).}
 
 \item{xlab}{the x-label of the isochron plot}
 

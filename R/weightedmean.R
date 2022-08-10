@@ -609,16 +609,16 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
     }
     plotpar <- list()
     plotpar$mean <- list(x=c(0,ns+1),y=rep(out$mean['t'],2))
-    cit <- geterr(x=out$mean['t'],sx=out$mean['s[t]'],oerr=oerr,absolute=TRUE)
+    cit <- ci(x=out$mean['t'],sx=out$mean['s[t]'],oerr=oerr,absolute=TRUE)
     plotpar$ci <- list(x=c(0,ns+1,ns+1,0),
                        y=c(rep(out$mean['t']+cit,2),rep(out$mean['t']-cit,2)))
     plotpar$ci.exterr <- NULL # to be defined later
     if (out$random.effects){
-        cid <- geterr(x=out$mean['t'],sx=out$disp['w'],
-                      oerr=oerr,absolute=TRUE)
+        cid <- ci(x=out$mean['t'],sx=out$disp['w'],
+                  oerr=oerr,absolute=TRUE)
     } else if (length(out$mean)>2){
-        cid <- geterr(x=out$mean['t'],sx=out$mean['disp[t]'],
-                      oerr=oerr,absolute=TRUE)
+        cid <- ci(x=out$mean['t'],sx=out$mean['disp[t]'],
+                  oerr=oerr,absolute=TRUE)
     } else {
         cid <- cit
     }
@@ -639,7 +639,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
     colour <- set.ellipse.colours(ns=NS,levels=levels,col=rect.col,
                                   hide=hide,omit=which(!fit$valid),
                                   omit.col=omit.col)
-    Xerr <- geterr(X,sX,oerr=oerr,absolute=TRUE)
+    Xerr <- ci(X,sX,oerr=oerr,absolute=TRUE)
     x <- X[plotit]
     xerr <- Xerr[plotit]
     valid <- fit$valid[plotit]
@@ -690,7 +690,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
     line1 <- maintit(x=fit$mean[1],sx=fit$mean[-1],
-                     ntit=ntit.valid(fit$valid),sigdig=sigdig,dof=fit$df,
+                     ntit=ntit.valid(fit$valid),sigdig=sigdig,df=fit$df,
                      oerr=oerr,units=units,prefix=paste0('mean',ast,' ='))
     if (fit$random.effects){
         line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,
@@ -751,9 +751,9 @@ add.exterr.to.wtdmean <- function(x,fit,oerr=3,cutoff.76=1100,type=4){
                        cutoff.76=cutoff.76,type=type)[2]
     }
     ns <- length(x)
-    cit <- geterr(x=out$mean['t'],
-                  sx=out$mean['s[t]'],
-                  oerr=oerr,absolute=TRUE)
+    cit <- ci(x=out$mean['t'],
+              sx=out$mean['s[t]'],
+              oerr=oerr,absolute=TRUE)
     ci.exterr <- list(x=c(0,ns+1,ns+1,0),
                       y=c(rep(out$mean['t']+cit,2),
                           rep(out$mean['t']-cit,2)))

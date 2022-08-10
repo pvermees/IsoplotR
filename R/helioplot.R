@@ -332,7 +332,7 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
 }
 
 helioplot_title <- function(fit,sigdig=2,oerr=3,...){
-    line1 <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,dof=fit$df,
+    line1 <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,df=fit$df,
                      sigdig=sigdig,oerr=oerr,prefix="central age =")
     line1line <- 1
     if (fit$model==1){

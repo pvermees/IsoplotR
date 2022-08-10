@@ -199,7 +199,7 @@ plot.spectrum.axes <- function(x,oerr=3,xlab='cumulative fraction',
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
     sY <- x[valid,3]
-    Yerr <- geterr(Y,sY,oerr=oerr)
+    Yerr <- ci(Y,sY,oerr=oerr)
     Yl <- Y-Yerr
     Yu <- Y+Yerr
     minY <- min(Yl,na.rm=TRUE)

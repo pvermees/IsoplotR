@@ -18,10 +18,66 @@ inflate <- function(fit){
     (fit$model==1) && (fit$p.value<alpha())
 }
 
-geterr <- function(x,sx,oerr=3,dof=NULL,absolute=FALSE){
+#' @title Confidence intervals
+#' @description Given a parameter estimate and its standard error,
+#'     calculate the corresponding 1-sigma, 2-sigma or 100(1-alpha)%
+#'     confidence interval, in absolute or relative units.
+#' @param x scalar estimate
+#' @param sx scalar or vector with the standard error of x without and
+#'     (optionally) with \eqn{\sqrt{MSWD}} overdispersion multiplier.
+#' @param oerr indicates if the confidence intervals should be
+#'     reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#' 
+#' @param df (optional) number of degrees of freedom. Only used if
+#'     \code{sx} is a vector.
+#' @param absolute logical. Returns absolute uncertainties even if
+#'     \code{oerr} is greater than 3. Used for some internal
+#'     \code{IsoplotR} functions.
+#' @return A scalar or vector of the same size as \code{sx}.
+#' @details Several of \code{IsoplotR}'s plotting functions (including
+#'     \code{isochron}, \code{weightedmean}, \code{concordia},
+#'     \code{radialplot} and \code{helioplot}) return lists of
+#'     parameters and their standard errors. For `model-1' fits, if
+#'     the data pass a Chi-square test of homogeneity, then just one
+#'     estimate for the standard error is reported.  This estimate can
+#'     be converted to a confidence interval by multiplication with
+#'     the appropriate quantile of a Normal distribution. Datasets
+#'     that fail the Chi-square test are said to be `overdispersed'
+#'     with respect to the analytical uncertainties. The simplest way
+#'     (`model-1') to deal with overdispersion is to inflate the
+#'     standard error with a \eqn{\sqrt{MSWD}} premultiplier. In this
+#'     case, \code{IsoplotR} returns two estimates of the standard
+#'     error.  To convert the second estimate to a confidence interval
+#'     requires multiplication with the desired quantile of a
+#'     t-distribution with the appropriate degrees of freedom.
+#' @examples
+#' attach(examples)
+#' fit <- isochron(examples$PbPb,plot=FALSE,exterr=FALSE)
+#' err <- ci(x=fit$age[1],sx=fit$age[-1],oerr=5,df=fit$df)
+#' message('age=',signif(fit$age[1],4),
+#'         'Ma, 2se=',signif(err[1],2),
+#'         '%, 2se(with dispersion)=',signif(err[2],2),'%')
+#' @export
+ci <- function(x,sx,oerr=3,df=NULL,absolute=FALSE){
     fact <- rep(ntfact(alpha()),length(sx))
-    if (!is.null(dof)){ # used for titles, when length(sx)==2
-        fact[-1] <- stats::qt(1-alpha()/2,df=dof)
+    if (!is.null(df)){
+        fact[-1] <- stats::qt(1-alpha()/2,df=df)
     }
     if (oerr>3 & absolute) oerr <- oerr-3
     if (oerr==1) out <- sx
@@ -38,7 +94,7 @@ geterr <- function(x,sx,oerr=3,dof=NULL,absolute=FALSE){
 agerr <- function(x,...){ UseMethod("agerr",x) }
 agerr.default <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
-    tst[2] <- geterr(x=x[1],sx=x[2],oerr=oerr)
+    tst[2] <- ci(x=x[1],sx=x[2],oerr=oerr)
     out <- roundit(age=tst[1],err=tst[2],sigdig=sigdig)
     out
 }
@@ -46,7 +102,7 @@ agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
     nc <- ncol(tst)
     i <- seq(from=2,to=nc,by=2)
-    tst[,i] <- geterr(x=x[,i-1],sx=x[,i],oerr=oerr)
+    tst[,i] <- ci(x=x[,i-1],sx=x[,i],oerr=oerr)
     rounded <- roundit(age=tst[,i-1],err=tst[,i],sigdig=sigdig)
     out[,i-1] <- rounded[,1:(nc/2)]
     out[,i] <- rounded[,(nc/2+1):nc]
@@ -63,8 +119,8 @@ oerr2alpha <- function(oerr=1){
 }
 
 maintit <- function(x,sx,n=NULL,ntit=paste0('(n=',n,')'),sigdig=2,
-                    oerr=3,units=' Ma',prefix='age =',dof=NULL){
-    xerr <- geterr(x,sx,oerr=oerr,dof=dof)
+                    oerr=3,units=' Ma',prefix='age =',df=NULL){
+    xerr <- ci(x,sx,oerr=oerr,df=df)
     rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     dispersed <- (length(sx)>1)
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=ntit)
@@ -90,7 +146,7 @@ mswdtit <- function(mswd,p,sigdig=2){
 }
 disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     if (w>0){
-        werr <- geterr(w,sw,oerr=oerr)
+        werr <- ci(w,sw,oerr=oerr)
         rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
     } else {
         w <- 0
@@ -110,7 +166,7 @@ disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     out
 }
 peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
-    xerr <- geterr(x,sx,oerr=oerr)
+    xerr <- ci(x,sx,oerr=oerr)
     rounded.x <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
     rounded.p <- signif(100*p,sigdig)
     lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)

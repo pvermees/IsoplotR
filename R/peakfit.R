@@ -78,7 +78,7 @@
 #'
 #' \code{t}: the ages of the \code{k} peaks
 #'
-#' \code{s[t]}: the estimated uncertainties of \code{t}
+#' \code{s[t]}: the standard errors of \code{t}
 #'
 #' }
 #'
@@ -86,8 +86,7 @@
 #'
 #' \code{p}: the proportions of the \code{k} peaks
 #'
-#' \code{s[p]}: the estimated uncertainties (standard errors) of
-#' \code{p}
+#' \code{s[p]}: the standard errors of \code{p}
 #'
 #' }
 #'

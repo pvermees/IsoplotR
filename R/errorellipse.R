@@ -191,8 +191,8 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         else
             graphics::points(xy[plotit,'X'],xy[plotit,'Y'],
                              pch=21,cex=cex,col=stroke,bg=fill)
-        dx <- geterr(x=xy[plotit,'X'],sx=xy[plotit,'sX'],oerr=oerr,absolute=TRUE)
-        dy <- geterr(x=xy[plotit,'Y'],sx=xy[plotit,'sY'],oerr=oerr,absolute=TRUE)
+        dx <- ci(x=xy[plotit,'X'],sx=xy[plotit,'sX'],oerr=oerr,absolute=TRUE)
+        dy <- ci(x=xy[plotit,'Y'],sx=xy[plotit,'sY'],oerr=oerr,absolute=TRUE)
         graphics::arrows(xy[plotit,'X'],xy[plotit,'Y']-dy,
                          xy[plotit,'X'],xy[plotit,'Y']+dy,
                          code=3,angle=90,length=0.05,col=stroke)
@@ -209,7 +209,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
 plot_isochron_line <- function(fit,x,oerr=3,ci.col='gray80',...){
     y <- fit$a[1]+fit$b[1]*x
     sy <- sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
-    e <- geterr(x=y,sx=sy,oerr=oerr,absolute=TRUE)
+    e <- ci(x=y,sx=sy,oerr=oerr,absolute=TRUE)
     cix <- c(x,rev(x))
     ciy <- c(y+e,rev(y-e))
     graphics::polygon(cix,ciy,col=ci.col,border=NA)
