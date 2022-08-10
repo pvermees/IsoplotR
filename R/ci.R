@@ -20,7 +20,7 @@ inflate <- function(fit){
 
 #' @title Confidence intervals
 #' @description Given a parameter estimate and its standard error,
-#'     calculate the corresponding 1-sigma, 2-sigma or 100(1-alpha)%
+#'     calculate the corresponding 1-sigma, 2-sigma or \eqn{100(1-\alpha)%}
 #'     confidence interval, in absolute or relative units.
 #' @param x scalar estimate
 #' @param sx scalar or vector with the standard error of x without and
@@ -51,19 +51,20 @@ inflate <- function(fit){
 #'     \code{IsoplotR} functions.
 #' @return A scalar or vector of the same size as \code{sx}.
 #' @details Several of \code{IsoplotR}'s plotting functions (including
-#'     \code{isochron}, \code{weightedmean}, \code{concordia},
-#'     \code{radialplot} and \code{helioplot}) return lists of
-#'     parameters and their standard errors. For `model-1' fits, if
-#'     the data pass a Chi-square test of homogeneity, then just one
-#'     estimate for the standard error is reported.  This estimate can
-#'     be converted to a confidence interval by multiplication with
-#'     the appropriate quantile of a Normal distribution. Datasets
-#'     that fail the Chi-square test are said to be `overdispersed'
-#'     with respect to the analytical uncertainties. The simplest way
-#'     (`model-1') to deal with overdispersion is to inflate the
-#'     standard error with a \eqn{\sqrt{MSWD}} premultiplier. In this
-#'     case, \code{IsoplotR} returns two estimates of the standard
-#'     error.  To convert the second estimate to a confidence interval
+#'     \code{\link{isochron}}, \code{\link{weightedmean}},
+#'     \code{\link{concordia}}, \code{\link{radialplot}} and
+#'     \code{\link{helioplot}}) return lists of parameters and their
+#'     standard errors. For `model-1' fits, if the data pass a
+#'     Chi-square test of homogeneity, then just one estimate for the
+#'     standard error is reported.  This estimate can be converted to
+#'     a confidence interval by multiplication with the appropriate
+#'     quantile of a Normal distribution. Datasets that fail the
+#'     Chi-square test are said to be `overdispersed' with respect to
+#'     the analytical uncertainties. The simplest way (`model-1') to
+#'     deal with overdispersion is to inflate the standard error with
+#'     a \eqn{\sqrt{MSWD}} premultiplier. In this case,
+#'     \code{IsoplotR} returns two estimates of the standard error.
+#'     To convert the second estimate to a confidence interval
 #'     requires multiplication with the desired quantile of a
 #'     t-distribution with the appropriate degrees of freedom.
 #' @examples

@@ -335,16 +335,3 @@ data2tit.ThU <- function(x,osmond=TRUE,generic=TRUE,...){
     }
     out
 }
-
-# ia = index for the chosen intercept
-# ib = index for the chosen slope
-tit2york <- function(fit,ia,ib){
-    out <- list()
-    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
-    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
-    out$cov.ab <- fit$cov[ia,ib]
-    out$y0 <- c(0,0)
-    out$p.value <- 0
-    out$mswd <- fit$mswd
-    out
-}
