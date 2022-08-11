@@ -199,20 +199,14 @@
 #' \item{df}{ a three-element vector with the number of degrees of
 #' freedom used for the \code{mswd} calculation. }
 #'
-#' \item{age}{a 4-element vector with:\cr
+#' \item{age}{a two-or three-element vector with:\cr
 #' 
 #' \code{t}: the concordia age (in Ma)\cr
 #' 
-#' \code{s[t]}: the estimated uncertainty of \code{t}\cr
-#' 
-#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval of
-#' 
-#' \code{t} for the appropriate degrees of freedom\cr
-#' 
-#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t} augmented by \eqn{\sqrt{mswd}} to account for
-#' overdispersed datasets.
-#' }
+#' \code{s[t]}: the standard error of \code{t}\cr
+
+#' \code{disp[t]}: the standard error of \code{t} augmented by
+#' \eqn{\sqrt{mswd}} to account for any overdispersion. }
 #'
 #' }
 #'
@@ -234,16 +228,13 @@
 #'
 #' \item{logcov}{the logarithm of \code{cov}}
 #'
-#' \item{err}{ a matrix with the following rows:
+#' \item{err}{ a matrix with on or two rows:
 #'
-#' \code{s}: the estimated standard deviation for \code{x}
+#' \code{s}: the standard errors of the parameter estimates
 #'
-#' \code{ci}: the \eqn{100(1-\alpha)\%} confidence interval of
-#' \code{x} for the appropriate degrees of freedom
-#'
-#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{x} augmented by \eqn{\sqrt{mswd}} to account for
-#' overdispersed datasets (only reported if \code{show.age=2}).  }
+#' \code{disp}: the standard errors of the parameter estimates
+#' augmented by \eqn{\sqrt{mswd}} to account for overdispersed
+#' datasets (only reported if \code{show.age=2}). }
 #'
 #' \item{df}{ the degrees of freedom of the concordia fit (concordance
 #' + equivalence)}

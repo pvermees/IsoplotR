@@ -20,8 +20,9 @@ inflate <- function(fit){
 
 #' @title Confidence intervals
 #' @description Given a parameter estimate and its standard error,
-#'     calculate the corresponding 1-sigma, 2-sigma or \eqn{100(1-\alpha)%}
-#'     confidence interval, in absolute or relative units.
+#'     calculate the corresponding 1-sigma, 2-sigma or
+#'     \eqn{100(1-\alpha)\%} confidence interval, in absolute or
+#'     relative units.
 #' @param x scalar estimate
 #' @param sx scalar or vector with the standard error of x without and
 #'     (optionally) with \eqn{\sqrt{MSWD}} overdispersion multiplier.
@@ -69,11 +70,11 @@ inflate <- function(fit){
 #'     t-distribution with the appropriate degrees of freedom.
 #' @examples
 #' attach(examples)
-#' fit <- isochron(examples$PbPb,plot=FALSE,exterr=FALSE)
+#' fit <- isochron(PbPb,plot=FALSE,exterr=FALSE)
 #' err <- ci(x=fit$age[1],sx=fit$age[-1],oerr=5,df=fit$df)
-#' message('age=',signif(fit$age[1],4),
-#'         'Ma, 2se=',signif(err[1],2),
-#'         '%, 2se(with dispersion)=',signif(err[2],2),'%')
+#' message('age=',signif(fit$age[1],4),'Ma, ',
+#'         '2se=',signif(err[1],2),'%, ',
+#'         '2se(with dispersion)=',signif(err[2],2),'%')
 #' @export
 ci <- function(x,sx,oerr=3,df=NULL,absolute=FALSE){
     fact <- rep(ntfact(alpha()),length(sx))

@@ -42,7 +42,10 @@ ci(x, sx, oerr = 3, df = NULL, absolute = FALSE)
 A scalar or vector of the same size as \code{sx}.
 }
 \description{
-
+Given a parameter estimate and its standard error,
+    calculate the corresponding 1-sigma, 2-sigma or
+    \eqn{100(1-\alpha)\%} confidence interval, in absolute or
+    relative units.
 }
 \details{
 Several of \code{IsoplotR}'s plotting functions (including
@@ -65,9 +68,9 @@ Several of \code{IsoplotR}'s plotting functions (including
 }
 \examples{
 attach(examples)
-fit <- isochron(examples$PbPb,plot=FALSE,exterr=FALSE)
+fit <- isochron(PbPb,plot=FALSE,exterr=FALSE)
 err <- ci(x=fit$age[1],sx=fit$age[-1],oerr=5,df=fit$df)
-message('age=',signif(fit$age[1],4),
-        'Ma, 2se=',signif(err[1],2),
-        '\%, 2se(with dispersion)=',signif(err[2],2),'\%')
+message('age=',signif(fit$age[1],4),'Ma, ',
+        '2se=',signif(err[1],2),'\%, ',
+        '2se(with dispersion)=',signif(err[2],2),'\%')
 }
