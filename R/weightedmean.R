@@ -180,7 +180,7 @@ weightedmean <- function(x,...){
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output.
 #' @param oerr indicates whether the analytical uncertainties of the
-#'     output are reported as:
+#'     output are reported in the plot title as:
 #' 
 #' \code{1}: 1\eqn{\sigma} absolute uncertainties.
 #' 

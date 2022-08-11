@@ -36,7 +36,7 @@ evolution(
 \item{ylim}{y-axis limits}
 
 \item{oerr}{indicates whether the analytical uncertainties of the
-    output are reported as:
+    output are reported in the plot title as:
 
 \code{1}: 1\eqn{\sigma} absolute uncertainties.
 

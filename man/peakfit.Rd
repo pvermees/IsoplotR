@@ -166,7 +166,7 @@ using the Bayes Information Criterion (BIC).}
 legend in which the peak fitting results are to be displayed.}
 
 \item{oerr}{indicates whether the analytical uncertainties of the
-    output are reported as:
+    output are reported in the plot legend as:
 
 \code{1}: 1\eqn{\sigma} absolute uncertainties.
 

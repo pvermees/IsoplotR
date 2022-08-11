@@ -414,7 +414,7 @@ model. Must be either 3 or 4.}
 plot.}
 
 \item{oerr}{indicates whether the analytical uncertainties of the
-    output are reported as:
+    output are reported in the plot title as:
 
 \code{1}: 1\eqn{\sigma} absolute uncertainties.
 

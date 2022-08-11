@@ -103,7 +103,7 @@ algorithm that includes accounts for any overdispersion by adding a
 geological (co)variance term.}
 
 \item{oerr}{indicates whether the analytical uncertainties of the
-    output are reported as:
+    output are reported in the plot title as:
 
 \code{1}: 1\eqn{\sigma} absolute uncertainties.
 

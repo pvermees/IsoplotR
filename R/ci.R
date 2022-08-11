@@ -105,7 +105,8 @@ agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
     nc <- ncol(tst)
     i <- seq(from=2,to=nc,by=2)
     tst[,i] <- ci(x=x[,i-1],sx=x[,i],oerr=oerr)
-    rounded <- roundit(age=tst[,i-1],err=tst[,i],sigdig=sigdig)
+    rounded <- roundit(age=tst[,i-1,drop=FALSE],
+                       err=tst[,i,drop=FALSE],sigdig=sigdig)
     out[,i-1] <- rounded[,1:(nc/2)]
     out[,i] <- rounded[,(nc/2+1):nc]
     if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
