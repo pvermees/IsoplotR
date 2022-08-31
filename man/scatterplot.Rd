@@ -30,6 +30,7 @@ scatterplot(
   ylim = NULL,
   xlab,
   ylab,
+  asp = NA,
   ...
 )
 }
@@ -137,6 +138,8 @@ omitted aliquots.}
 
 \item{ylab}{(optional) y-axis label (only used when
 \code{add=FALSE})}
+
+\item{asp}{the y/x aspect ratio, see `plot.window'.}
 
 \item{...}{optional arguments to format the points and text.}
 }
