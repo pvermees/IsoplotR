@@ -31,9 +31,25 @@
 #'
 #' an object of class \code{ArAr}
 #'
-#' @param alpha the confidence level of the error bars/boxes and
-#'     confidence intervals.
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported in the plot title as:
 #' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
 #' @param plateau logical flag indicating whether a plateau age should
 #'     be calculated. If \code{plateau=TRUE}, the function computes
 #'     the weighted mean of the largest succession of steps that pass
@@ -87,43 +103,14 @@
 #' @param ... optional parameters to the generic \code{plot} function
 #'
 #' @return
-#' If \code{plateau=TRUE}, returns a list with the following items:
 #'
-#' \describe{ \item{mean}{a 3-element vector with:
+#' If \code{plateau=TRUE}, returns a list containing the output of the
+#'     \code{weightedmean} function, plus the following items:
 #'
-#' \code{t}: the plateau mean
-#'
-#' \code{s[t]}: the standard error of \code{x}
-#'
-#' \code{ci[t]}: the width of a 100(1-\eqn{\alpha})\% confidence interval of
-#' \code{t} }
-#'
-#' \item{disp}{a 3-element vector with:
-#'
-#' \code{w}: the overdispersion, i.e. the standard deviation of the
-#' Normal distribution that is assumed to describe the true ages.
-#'
-#' \code{ll}: the width of the lower half of a 100(1-\eqn{\alpha})\%
-#' confidence interval for the overdispersion
-#'
-#' \code{ul}: the width of the upper half of a 100(1-\eqn{\alpha})\%
-#' confidence interval for the overdispersion}
-#'
-#' \item{df}{the degrees of freedom for the weighted mean plateau fit}
-#'
-#' \item{mswd}{the mean square of the weighted deviates of the
-#' plateau}
-#'
-#' \item{p.value}{the p-value of a Chi-square test with \eqn{df=n-2}
-#' degrees of freedom, where \eqn{n} is the number of steps in the
-#' plateau and 2 degrees of freedom have been removed to estimate the
-#' mean and the dispersion.}
+#' \describe{
 #'
 #' \item{fract}{the fraction of \eqn{^{39}}Ar contained in the
 #' plateau}
-#'
-#' \item{plotpar}{plot parameters for the weighted mean (see
-#' \code{\link{weightedmean}})}
 #'
 #' \item{i}{indices of the steps that are retained for the plateau age
 #' calculation}
@@ -137,22 +124,22 @@ agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 
 #' @rdname agespectrum
 #' @export
-agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
+agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                                 random.effects=FALSE,levels=NA,clabel="",
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
                                 xlab='cumulative fraction',
                                 ylab='age [Ma]',hide=NULL,omit=NULL,...){
-    XY <- plot.spectrum.axes(x=x,alpha=alpha,xlab=xlab,
+    XY <- plot.spectrum.axes(x=x,oerr=oerr,xlab=xlab,
                              ylab=ylab,hide=hide,...)
     pc <- get.plateau.colours(x=x,levels=levels,plateau=plateau,
                               hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
-                              random.effects=random.effects,alpha=alpha)
+                              random.effects=random.effects,oerr=oerr)
     if (plateau){
         plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
-        graphics::title(plateau.title(pc$plat,sigdig=sigdig,Ar=FALSE))
+        graphics::title(plateau.title(pc$plat,oerr=oerr,sigdig=sigdig,Ar=FALSE))
     }
     plot.spectrum(XY=XY,col=pc$col)
     colourbar(z=levels,fill=plateau.col,clabel=clabel)
@@ -174,7 +161,7 @@ agespectrum.default <- function(x,alpha=0.05,plateau=TRUE,
 #' agespectrum(ArAr,omit=1:6)
 #' @rdname agespectrum
 #' @export
-agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
+agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
                              random.effects=FALSE,levels=NA,clabel="",
                              plateau.col=c("#00FF0080","#FF000080"),
                              non.plateau.col="#00FFFF80",sigdig=2,
@@ -187,23 +174,24 @@ agespectrum.ArAr <- function(x,alpha=0.05,plateau=TRUE,
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     y.lab='age [Ma]'
-    XY <- plot.spectrum.axes(x=X,alpha=alpha,xlab=x.lab,
+    XY <- plot.spectrum.axes(x=X,oerr=oerr,xlab=x.lab,
                              ylab=y.lab,hide=hide,...)
     pc <- get.plateau.colours(x=X,levels=levels,plateau=plateau,
                               hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
-                              random.effects=random.effects,alpha=alpha)
+                              random.effects=random.effects,oerr=oerr)
     if (plateau){
         if (exterr) pc$plat <- add.exterr.to.wtdmean(x,pc$plat)
         plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
-        graphics::title(plateau.title(pc$plat,sigdig=sigdig,Ar=TRUE,units='Ma'))
+        graphics::title(plateau.title(pc$plat,oerr=oerr,sigdig=sigdig,
+                                      Ar=TRUE,units=' Ma'))
     }
     plot.spectrum(XY=XY,col=pc$col)
     colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
 
-plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
+plot.spectrum.axes <- function(x,oerr=3,xlab='cumulative fraction',
                                ylab='age [Ma]',hide=NULL,...){
     ns <- nrow(x)
     x <- clear(x[,1:3,drop=FALSE],hide)
@@ -211,9 +199,9 @@ plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
     X <- c(0,cumsum(x[valid,1])/sum(x[valid,1]))
     Y <- x[valid,2]
     sY <- x[valid,3]
-    fact <- stats::qnorm(1-alpha/2)
-    Yl <- Y-fact*sY
-    Yu <- Y+fact*sY
+    Yerr <- ci(Y,sY,oerr=oerr)
+    Yl <- Y-Yerr
+    Yu <- Y+Yerr
     minY <- min(Yl,na.rm=TRUE)
     maxY <- max(Yu,na.rm=TRUE)
     graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
@@ -222,11 +210,11 @@ plot.spectrum.axes <- function(x,alpha=0.05,xlab='cumulative fraction',
 get.plateau.colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,omit=NULL,
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
-                                random.effects=FALSE,alpha=0.05){
+                                random.effects=FALSE,oerr=3){
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     if (plateau){
-        plat <- get.plateau(x,alpha=alpha,random.effects=random.effects,calcit=calcit)
+        plat <- get.plateau(x,oerr=oerr,random.effects=random.effects,calcit=calcit)
         plat$valid <- NULL
         colour <- rep(non.plateau.col,ns)
         np <- length(plat$i)
@@ -259,21 +247,11 @@ plot.plateau <- function(fit,line.col='red',lwd=2){
     graphics::polygon(ci,col='gray75',border=NA)
     graphics::lines(c(0,1),rep(fit$mean[1],2),col=line.col,lwd=lwd)
 }
-plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
-    rounded.mean <- roundit(fit$mean['t'],
-                            fit$mean[c('s[t]','ci[t]')],
-                            sigdig=sigdig,text=TRUE)
-    line1 <- substitute('mean ='~a%+-%b~'|'~c~u~'(n='*n/N*')',
-                        list(a=rounded.mean[1],
-                             b=rounded.mean[2],
-                             c=rounded.mean[3],
-                             u=units,
-                             n=length(fit$i),
-                             N=fit$n))
-    line2 <- substitute('MSWD ='~a*', p('*chi^2*') ='~b,
-                        list(a=roundit(fit$mswd,fit$mswd,sigdig=sigdig,text=TRUE),
-                             b=roundit(fit$p.value,fit$p.value,
-                                       sigdig=sigdig,text=TRUE)))
+plateau.title <- function(fit,sigdig=2,oerr=3,Ar=TRUE,units='',...){
+    ntit <- paste0('(n=',length(fit$i),'/',fit$n,')')
+    line1 <- maintit(fit$mean[1],fit$mean[2],ntit=ntit,units=units,
+                     sigdig=sigdig,oerr=oerr,prefix='mean=')
+    line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     a <- signif(100*fit$fract,sigdig)
     if (Ar) line3 <- bquote(paste("includes ",.(a),"% of the ",""^"39","Ar"))
     else line3 <- bquote(paste("includes ",.(a),"% of the spectrum"))
@@ -283,7 +261,7 @@ plateau.title <- function(fit,sigdig=2,Ar=TRUE,units='',...){
 }
 # x is a three column vector with Ar39
 # cumulative fractions, ages and uncertainties
-get.plateau <- function(x,alpha=0.05,random.effects=FALSE,calcit=rep(TRUE,nrow(x))){
+get.plateau <- function(x,oerr=3,random.effects=FALSE,calcit=rep(TRUE,nrow(x))){
     X <- x[,1]/sum(x[,1],na.rm=TRUE)
     YsY <- subset(x,select=c(2,3))
     ns <- length(X)
@@ -299,10 +277,8 @@ get.plateau <- function(x,alpha=0.05,random.effects=FALSE,calcit=rep(TRUE,nrow(x
             sY <- YsY[i:j,2]
             valid <- chauvenet(Y,sY,valid=calcit[i:j],random.effects=random.effects)
             if (all(valid) & (fract > out$fract)){
-                out <- weightedmean(YsY[i:j,,drop=FALSE],
-                                    random.effects=random.effects,
-                                    plot=FALSE,detect.outliers=FALSE,
-                                    alpha=alpha)
+                out <- weightedmean(YsY[i:j,,drop=FALSE],random.effects=random.effects,
+                                    plot=FALSE,detect.outliers=FALSE,oerr=oerr)
                 out$i <- i:j
                 out$fract <- fract
                 break

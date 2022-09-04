@@ -1,169 +1,202 @@
-# based on equation 6.5 of Galbraith (2005)
-profile_LL_central_disp_FT <- function(mu,sigma,y,m,alpha=0.05){
-    LLmax <- LL.FT(mu=mu,sigma=sigma,y=y,m=m)
-    cutoff <- stats::qchisq(1-alpha,1)
-    if (abs(LL.FT(mu=mu,sigma=exp(-10),y=y,m=m)-LLmax) < cutoff/2){
-        sigmal <- 0
+ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
+    if (is.null(mswd)){
+        if (is.null(df)){
+            out <- stats::qnorm(1-alpha/2)
+        } else if (df>0){
+            out <- stats::qt(1-alpha/2,df=df)
+        }
+    } else if (mswd$df>0){
+        out <- stats::qt(1-alpha/2,df=mswd$df)*sqrt(mswd$mswd)
     } else {
-        sigmal <- stats::optimize(profile_central_FT_helper,
-                                  interval=c(0,sigma),
-                                  mu=mu,y=y,m=m,LLmax=LLmax,
-                                  cutoff=cutoff)$minimum
+        out <- stats::qnorm(1-alpha/2)
     }
-    sigmauinit <- 2*stats::sd(log(y+0.5)-log(m-y))
-    if (abs(LL.FT(mu=mu,sigma=sigmauinit,y=y,m=m)-LLmax) < cutoff/2){
-        sigmau <- Inf
-    } else {
-        sigmau <- stats::optimize(profile_central_FT_helper,
-                                  interval=c(sigma,sigmauinit),
-                                  mu=mu,y=y,m=m,LLmax=LLmax,
-                                  cutoff=cutoff)$minimum
-    }    
-    ll <- sigma - sigmal
-    ul <- sigmau - sigma
-    c(ll,ul)
-}
-profile_LL_central_disp_UThHe <- function(fit,x,alpha=0.05){
-    LLmax <- LL.uvw(fit$w,fit$uvw,x=x,doSm=doSm(x))
-    cutoff <- stats::qchisq(1-alpha,1)
-    doSm <- doSm(x)
-    if (abs(LL.uvw(0,UVW=fit$uvw,x=x,doSm=doSm)-LLmax) < cutoff/2){
-        wl <- 0
-    } else {
-        wl <- stats::optimize(profile_UThHe_disp_helper,
-                              interval=c(0,fit$w),x=x,UVW=fit$uvw,
-                              doSm=doSm,LLmax=LLmax,cutoff=cutoff)$minimum
-    }
-    if (abs(LL.uvw(100,UVW=fit$uvw,x=x,doSm=doSm)-LLmax) < cutoff/2){
-        wu <- Inf
-    } else {
-        wu <- stats::optimize(profile_UThHe_disp_helper,
-                              interval=c(fit$w,10),x=x,UVW=fit$uvw,
-                              doSm=doSm,LLmax=LLmax,cutoff=cutoff)$minimum
-    }
-    ll <- fit$w - wl
-    ul <- wu - fit$w
-    c(ll,ul)
+    out
 }
 
-profile_LL_weightedmean_disp <- function(fit,X,sX,alpha=0.05){
-    mu <- fit$mu[1]
-    sigma <- fit$sigma
-    LLmax <- LL.sigma(sigma,X,sX)
-    cutoff <- stats::qchisq(1-alpha,1)
-    if (abs(LL.sigma(0,X,sX)-LLmax) < cutoff/2){
-        sigmal <- 0
+inflate <- function(fit){
+    if (is.null(fit$model)) fit$model <- 1
+    (fit$model==1) && (fit$p.value<alpha())
+}
+
+#' @title Confidence intervals
+#' @description Given a parameter estimate and its standard error,
+#'     calculate the corresponding 1-sigma, 2-sigma or
+#'     \eqn{100(1-\alpha)\%} confidence interval, in absolute or
+#'     relative units.
+#' @param x scalar estimate
+#' @param sx scalar or vector with the standard error of x without and
+#'     (optionally) with \eqn{\sqrt{MSWD}} overdispersion multiplier.
+#' @param oerr indicates if the confidence intervals should be
+#'     reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#' 
+#' @param df (optional) number of degrees of freedom. Only used if
+#'     \code{sx} is a vector.
+#' @param absolute logical. Returns absolute uncertainties even if
+#'     \code{oerr} is greater than 3. Used for some internal
+#'     \code{IsoplotR} functions.
+#' @return A scalar or vector of the same size as \code{sx}.
+#' @details Several of \code{IsoplotR}'s plotting functions (including
+#'     \code{\link{isochron}}, \code{\link{weightedmean}},
+#'     \code{\link{concordia}}, \code{\link{radialplot}} and
+#'     \code{\link{helioplot}}) return lists of parameters and their
+#'     standard errors. For `model-1' fits, if the data pass a
+#'     Chi-square test of homogeneity, then just one estimate for the
+#'     standard error is reported.  This estimate can be converted to
+#'     a confidence interval by multiplication with the appropriate
+#'     quantile of a Normal distribution. Datasets that fail the
+#'     Chi-square test are said to be `overdispersed' with respect to
+#'     the analytical uncertainties. The simplest way (`model-1') to
+#'     deal with overdispersion is to inflate the standard error with
+#'     a \eqn{\sqrt{MSWD}} premultiplier. In this case,
+#'     \code{IsoplotR} returns two estimates of the standard error.
+#'     To convert the second estimate to a confidence interval
+#'     requires multiplication with the desired quantile of a
+#'     t-distribution with the appropriate degrees of freedom.
+#' @examples
+#' attach(examples)
+#' fit <- isochron(PbPb,plot=FALSE,exterr=FALSE)
+#' err <- ci(x=fit$age[1],sx=fit$age[-1],oerr=5,df=fit$df)
+#' message('age=',signif(fit$age[1],4),'Ma, ',
+#'         '2se=',signif(err[1],2),'%, ',
+#'         '2se(with dispersion)=',signif(err[2],2),'%')
+#' @export
+ci <- function(x,sx,oerr=3,df=NULL,absolute=FALSE){
+    fact <- rep(ntfact(alpha()),length(sx))
+    if (!is.null(df)){
+        fact[-1] <- stats::qt(1-alpha()/2,df=df)
+    }
+    if (oerr>3 & absolute) oerr <- oerr-3
+    if (oerr==1) out <- sx
+    else if (oerr==2) out <- 2*sx
+    else if (oerr==3) out <- fact*sx
+    else if (oerr==4) out <- abs(100*sx/x)
+    else if (oerr==5) out <- abs(200*sx/x)
+    else if (oerr==6) out <- abs(100*fact*sx/x)
+    else stop('Illegal oerr value')
+    out
+}
+
+# formats table or vector of ages and errors
+agerr <- function(x,...){ UseMethod("agerr",x) }
+agerr.default <- function(x,oerr=1,sigdig=NA,...){
+    out <- tst <- x
+    tst[2] <- ci(x=x[1],sx=x[2],oerr=oerr)
+    out <- roundit(age=tst[1],err=tst[2],sigdig=sigdig)
+    out
+}
+agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
+    out <- tst <- x
+    nc <- ncol(tst)
+    i <- seq(from=2,to=nc,by=2)
+    tst[,i] <- ci(x=x[,i-1],sx=x[,i],oerr=oerr)
+    rounded <- roundit(age=tst[,i-1,drop=FALSE],
+                       err=tst[,i,drop=FALSE],sigdig=sigdig)
+    out[,i-1] <- rounded[,1:(nc/2)]
+    out[,i] <- rounded[,(nc/2+1):nc]
+    if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
+    out
+}
+
+# get significance level for error ellipses
+oerr2alpha <- function(oerr=1){
+    if (oerr%in%c(1,4)) out <- stats::pnorm(-1)*2
+    else if (oerr%in%c(2,5)) out <- stats::pnorm(-2)*2
+    else out <- alpha()
+    out
+}
+
+maintit <- function(x,sx,n=NULL,ntit=paste0('(n=',n,')'),sigdig=2,
+                    oerr=3,units=' Ma',prefix='age =',df=NULL){
+    xerr <- ci(x,sx,oerr=oerr,df=df)
+    rounded <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    dispersed <- (length(sx)>1)
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units,n=ntit)
+    if (dispersed){
+        lst$c <- rounded[3]
+        if (oerr>3){
+            out <- substitute(p~a*u%+-%b~'|'~c*'%'~n,lst)
+        } else {
+            out <- substitute(p~a%+-%b~'|'~c*u~n,lst)
+        }
     } else {
-        sigmal <- stats::optimize(profile_weightedmean_helper,
-                                  interval=c(0,sigma),
-                                  X=X,sX=sX,LLmax=LLmax,
-                                  cutoff=cutoff)$minimum
+        if (oerr>3){
+            out <- substitute(p~a*u%+-%b*'%'~n,lst)
+        } else {
+            out <- substitute(p~a%+-%b*u~n,lst)
+        }
     }
-    if (abs(LL.sigma(10*stats::sd(X),X,sX)-LLmax) < cutoff/2){
-        sigmau <- Inf
+    out
+}
+mswdtit <- function(mswd,p,sigdig=2){
+    substitute('MSWD ='~a*', p('*chi^2*') ='~b,
+               list(a=signif(mswd,sigdig),b=signif(p,sigdig)))
+}
+disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
+    if (w>0){
+        werr <- ci(w,sw,oerr=oerr)
+        rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
     } else {
-        sigmau <- stats::optimize(profile_weightedmean_helper,
-                                  interval=c(sigma,10*stats::sd(X)),
-                                  X=X,sX=sX,LLmax=LLmax,
-                                  cutoff=cutoff)$minimum
+        w <- 0
+        werr <- NA
+        rounded <- c(w,werr)
     }
-    ll <- sigma - sigmal
-    ul <- sigmau - sigma
-    c(ll,ul)
-}
-profile_central_FT_helper <- function(sigma,mu,y,m,LLmax,cutoff){
-    # update mu from sigma using section 3.9.1 from Galbraith (2005)
-    theta <- 1/(1+exp(-mu))
-    wj <- m/(theta*(1-theta) + (m-1)*(theta^2)*((1-theta)^2)*(sigma^2))
-    theta <- sum(wj*y/m)/sum(wj)
-    mu <- log(theta)-log(1-theta)
-    LL <- LL.FT(mu=mu,sigma=sigma,y=y,m=m)
-    abs(LLmax-LL-cutoff/2)
-}
-profile_weightedmean_helper <- function(sigma,X,sX,LLmax,cutoff){
-    LL <- LL.sigma(sigma,X,sX)
-    abs(LLmax-LL-cutoff/2)
-}
-profile_UThHe_disp_helper <- function(w,x,UVW,doSm=FALSE,LLmax,cutoff){
-    LL <- LL.uvw(w,UVW=UVW,x=x,doSm=doSm)
-    abs(LLmax-LL-cutoff/2)
-}
-
-LL.FT <- function(mu,sigma,y,m){
-    LL <- 0
-    ns <- length(y)
-    for (i in 1:ns){
-        LL <- LL + log(stats::integrate(pyumu,lower=mu-10*sigma,
-                                        upper=mu+10*sigma,mu=mu,
-                                        sigma=sigma,m=m[i],y=y[i])$value)
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units)
+    if (oerr>3){
+        out <- substitute(p~a*u%+-%b*'%',lst)
+    } else if (is.na(werr) | sw/w<0.5){
+        out <- substitute(p~a%+-%b*u,lst)
+    } else {
+        lst$b <- signif(exp(log(w)+werr/w)-w,sigdig)
+        lst$c <- signif(w-exp(log(w)-werr/w),sigdig)
+        out <- substitute(p~a+b-c*u,lst)
     }
-    LL
+    out
 }
-pyumu <- function(B,mu,sigma,m,y){
-    theta <- exp(B)/(1+exp(B))
-    stats::dbinom(y,m,theta)*stats::dnorm(B,mean=mu,sd=sigma)
+peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
+    xerr <- ci(x,sx,oerr=oerr)
+    rounded.x <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
+    rounded.p <- signif(100*p,sigdig)
+    lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)
+    if (oerr>3){
+        out <- substitute(p~a~u%+-%b*'% (prop='*c*'%)',lst)
+    } else {
+        out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)
+    }
+    out
 }
 
-# Equation 18 of Galbraith and Roberts (2012)
-LL.sigma <- function(sigma,X,sX){
-    wi <- 1/(sigma^2+sX^2)
-    mu <- sum(wi*X)/sum(wi)
-    sum(log(wi) - wi*(X-mu)^2)/2
+get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
+get.ntit.default <- function(x,...){
+    ns <- length(x)
+    nisnan <- length(which(is.na(x)))
+    out <- '(n='
+    if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
+    paste0(out,ns,')')
 }
-
-ci_regression <- function(fit,i1='b',i2='a'){
-    out <- fit
-    out[[i1]]['ci[t]'] <- ntfact(fit$alpha)*fit[[i1]]['s[t]']
-    out[[i2]]['ci[y]'] <- ntfact(fit$alpha)*fit[[i2]]['s[y]']
-    if (inflate(fit)){
-        out[[i2]]['disp[y]'] <- ntfact(fit$alpha,fit)*fit[[i2]]['s[y]']
-    } else if (fit$model==3) {
-        out$w[c('ll','ul')] <- profile_LL_isochron_disp(fit)
+get.ntit.fissiontracks <- function(x,...){
+    if (x$format<2){
+        out <- get.ntit.default(x$x[,'Ns'])
+    } else {
+        out <- get.ntit.default(x$Ns)
     }
     out    
 }
-ci_isochron <- function(fit){
-    ci_regression(fit,i1='age',i2='y0')
-}
-
-profile_LL_isochron_disp <- function(fit){
-    cutoff <- stats::qchisq(1-fit$alpha,1)
-    w <- fit$w['s']
-    xyz <- fit$xyz
-    LLmax <- LL.isochron(w,xyz,type=fit$type)
-    if (abs(LL.isochron(0,xyz,type=fit$type)-LLmax) < cutoff/2){
-        wl <- 0
-    } else {
-        wl <- stats::optimize(profile_isochron_helper,interval=c(0,w),xyz=xyz,
-                              LLmax=LLmax,cutoff=cutoff,type=fit$type)$minimum
-    }
-    LL <- LL.isochron(stats::sd(xyz[,'Y']),xyz=xyz,type=fit$type)
-    if (abs(LL-LLmax) < cutoff/2){
-        wu <- Inf
-    } else {
-        wu <- stats::optimize(profile_isochron_helper,
-                              interval=c(w,stats::sd(xyz[,'Y'])),
-                              xyz=xyz,LLmax=LLmax,cutoff=cutoff,
-                              type=fit$type)$minimum
-    }
-    ll <- w - wl
-    ul <- wu - w
-    c(ll,ul)
-}
-profile_isochron_helper <- function(w,xyz,LLmax,cutoff,type='york'){
-    LL <- LL.isochron(w,xyz,type=type)
-    abs(LLmax-LL-cutoff/2)
-}
-
-ci_log2lin_lud <- function(fit,fact=1){
-    lx <- fit$logpar['log(w)']
-    slx <- sqrt(fit$logcov['log(w)','log(w)'])
-    if (is.finite(lx)){
-        ll <- exp(lx - fact*slx)
-        ul <- exp(lx + fact*slx)
-    } else {
-        ll <- 0
-        ul <- NA
-    }
-    c(exp(lx),ll,ul)
+ntit.valid <- function(valid,...){
+    paste0('(',sum(valid),'/',length(valid),')')
 }

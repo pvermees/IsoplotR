@@ -22,6 +22,8 @@ age(x, ...)
 \method{age}{default}(
   x,
   method = "U238-Pb206",
+  oerr = 1,
+  sigdig = NA,
   exterr = FALSE,
   J = c(NA, NA),
   zeta = c(NA, NA),
@@ -35,6 +37,7 @@ age(x, ...)
   type = 1,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   common.Pb = 0,
   discordance = discfilter(),
@@ -47,6 +50,7 @@ age(x, ...)
   common.Pb = 2,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
@@ -58,6 +62,7 @@ age(x, ...)
   i2i = TRUE,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
@@ -69,16 +74,26 @@ age(x, ...)
   i2i = TRUE,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
 )
 
-\method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NA, sigdig = NA, ...)
+\method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NA, oerr = 1, sigdig = NA, ...)
 
-\method{age}{fissiontracks}(x, central = FALSE, i = NA, sigdig = NA, exterr = TRUE, ...)
+\method{age}{fissiontracks}(x, central = FALSE, i = NA, oerr = 1, sigdig = NA, exterr = TRUE, ...)
 
-\method{age}{ThU}(x, isochron = FALSE, Th0i = 0, exterr = FALSE, i = NA, sigdig = NA, ...)
+\method{age}{ThU}(
+  x,
+  isochron = FALSE,
+  Th0i = 0,
+  exterr = FALSE,
+  i = NA,
+  oerr = 1,
+  sigdig = NA,
+  ...
+)
 
 \method{age}{ThPb}(
   x,
@@ -86,6 +101,7 @@ age(x, ...)
   i2i = TRUE,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
@@ -97,6 +113,7 @@ age(x, ...)
   i2i = TRUE,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
@@ -108,6 +125,7 @@ age(x, ...)
   i2i = TRUE,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
@@ -119,6 +137,7 @@ age(x, ...)
   i2i = TRUE,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
@@ -130,6 +149,7 @@ age(x, ...)
   i2i = TRUE,
   exterr = FALSE,
   i = NA,
+  oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
@@ -191,6 +211,31 @@ OR
 \code{'Th-U'}, \code{'Re-Os'}, \code{'Sm-Nd'}, \code{'Rb-Sr'},
 \code{'Lu-Hf'}, \code{'U-Th-He'} or \code{'fissiontracks'}}
 
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+(only used when \code{isochron} and \code{central} are \code{FALSE})}
+
+\item{sigdig}{number of significant digits for the uncertainty
+estimate (only used if \code{type=1}, \code{isochron=FALSE} and
+\code{central=FALSE}).}
+
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}
 
@@ -225,10 +270,6 @@ maximum likelihood algorithm that accounts for overdispersion by
 adding a geological (co)variance term.}
 
 \item{i}{index of a particular aliquot}
-
-\item{sigdig}{number of significant digits for the uncertainty
-estimate (only used if \code{type=1}, \code{isochron=FALSE} and
-\code{central=FALSE}).}
 
 \item{common.Pb}{common lead correction:
 

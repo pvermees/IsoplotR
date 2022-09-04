@@ -95,5 +95,6 @@
     "mindens": {
 	"apatite": 3.22,
 	"zircon": 4.7
-    }
+    },
+    "alpha": 0.05
 }

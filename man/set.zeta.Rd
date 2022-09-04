@@ -4,7 +4,7 @@
 \alias{set.zeta}
 \title{Calculate the zeta calibration coefficient for fission track dating}
 \usage{
-set.zeta(x, tst, exterr = TRUE, update = TRUE, sigdig = 2)
+set.zeta(x, tst, exterr = TRUE, oerr = 1, sigdig = NA, update = TRUE)
 }
 \arguments{
 \item{x}{an object of class \code{fissiontracks}}
@@ -17,16 +17,39 @@ uncertainties associated with the age standard or the dosimeter
 glass (for the EDM) should be accounted for when propagating
 the uncertainty of the zeta calibration constant.}
 
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+(only used when \code{update} is \code{FALSE})}
+
+\item{sigdig}{the number of significant digits (only used when
+\code{update} is \code{FALSE}).}
+
 \item{update}{logical flag indicating whether the function should
 return an updated version of the input data, or simply return a
 two-element vector with the calibration constant and its
 standard error.}
-
-\item{sigdig}{number of significant digits}
 }
 \value{
 an object of class \code{fissiontracks} with an updated
-    \code{x$zeta} value
+    \code{x$zeta} value or (if \code{update} is \code{FALSE}), a
+    2-element matrix with the zeta estimate and its uncertainty.
 }
 \description{
 Determines the zeta calibration constant of a fission track dataset

@@ -77,34 +77,6 @@ toJSON <- function(x){
     stop( "shouldnt make it here - unhandled type not caught" )
 }
 
-#create an object, which can be used to parse JSON data spanning multiple buffers
-#it will be able to pull out multiple objects.. e.g: "[5][2,1]" is two different
-# JSON objects - it can be called twice to get both items
-newJSONParser <- function(){
-    buffer <- c()
-    return(	list(
-        "addData" = function( buf ) { 
-            chars = strsplit(buf, "")[[1]]
-            for( ch in chars )
-                buffer[ length(buffer) + 1 ]  <<- ch
-        },
-        "getObject" = function()
-        {
-            tmp <- .parseValue( buffer, 1)
-            if( is.null( tmp$incomplete ) == FALSE )
-                return( NULL )
-
-            if( tmp$size > length(buffer) )
-                buffer <<- c()
-            else
-                buffer <<- buffer[ tmp$size : length(buffer) ]
-
-            return( tmp$val )
-        }
-    ) )
-}
-
-
 fromJSON <- function( json_str, file, unexpected.escape = "error" ){
     if( missing( json_str ) ) {
         if( missing( file ) )

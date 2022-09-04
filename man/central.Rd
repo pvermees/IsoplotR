@@ -9,11 +9,11 @@
 \usage{
 central(x, ...)
 
-\method{central}{default}(x, alpha = 0.05, ...)
+\method{central}{default}(x, ...)
 
-\method{central}{UThHe}(x, alpha = 0.05, model = 1, ...)
+\method{central}{UThHe}(x, model = 1, ...)
 
-\method{central}{fissiontracks}(x, alpha = 0.05, exterr = FALSE, ...)
+\method{central}{fissiontracks}(x, exterr = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class \code{UThHe} or \code{fissiontracks},
@@ -21,8 +21,6 @@ OR a 2-column matrix with (strictly positive) values and
 uncertainties}
 
 \item{...}{optional arguments}
-
-\item{alpha}{cutoff value for confidence intervals}
 
 \item{model}{if the scatter between the data points is solely
     caused by the analytical uncertainty, then the MSWD value
@@ -67,19 +65,15 @@ reported if \code{model=1}).}
 \item{p.value}{the p-value of a Chi-square test with \code{df}
 degrees of freedom (only reported if \code{model=1}.)}
 
-\item{age}{a three- or four-element vector with:\cr
+\item{age}{a two- or three-element vector with:\cr
 \code{t}: the central age.\cr
 \code{s[t]}: the standard error of \code{t}.\cr
-\code{ci[t]}: the width of a \eqn{100(1-\alpha)\%} confidence
-interval for \code{t}.\cr
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval enhanced by a factor of \eqn{\sqrt{mswd}} (only reported
-if \code{model=1}). }
+\code{disp[t]}: the standard error of \code{t} enhanced by a
+factor of \eqn{\sqrt{mswd}} (only reported if \code{model=1}). }
 
 \item{w}{the geological overdispersion term. If \code{model=3},
-this is a three-element vector with the standard deviation of the
-(assumedly) Normal dispersion and the lower and upper half-widths
-of its \eqn{100(1-\alpha)\%} confidence interval. \code{w=0} if
+this is a two-element vector with the standard deviation of the
+(assumedly) Normal dispersion and its standard error. \code{w=0} if
 \code{model<3}.}
 
 }
@@ -88,18 +82,11 @@ OR, otherwise:
 
 \describe{
 
-\item{age}{a three-element vector with:
+\item{age}{a two-element vector with the central age and its
+standard error.}
 
-\code{t}: the central age.
-
-\code{s[t]}: the standard error of \code{t}.
-
-\code{ci[t]}: the width of a \eqn{100(1-\alpha)\%} confidence
-interval for \code{t}.}
-
-\item{disp}{a three-element vector with the overdispersion
-(standard deviation) of the excess scatter, and the upper and lower
-half-widths of its \eqn{100(1-\alpha)\%} confidence interval.}
+\item{disp}{a two-element vector with the overdispersion (standard
+deviation) of the excess scatter, and its standard error.}
 
 \item{mswd}{the reduced Chi-square statistic of data concordance,
 i.e. \eqn{mswd=X^2/df}, where \eqn{X^2} is a Chi-square statistic
@@ -148,9 +135,9 @@ print(central(UThHe)$age)
 
 }
 \references{
-Galbraith, R.F. and Laslett, G.M., 1993. Statistical
-    models for mixed fission track ages. Nuclear Tracks and
-    Radiation Measurements, 21(4), pp.459-470.
+Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
+mixed fission track ages. Nuclear Tracks and Radiation
+Measurements, 21(4), pp.459-470.
 
 Vermeesch, P., 2008. Three new ways to calculate average (U-Th)/He
     ages. Chemical Geology, 249(3), pp.339-347.

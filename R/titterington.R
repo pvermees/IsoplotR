@@ -24,7 +24,6 @@
 #' @param x an \code{[nx9]} matrix with the following columns:
 #'     \code{X, sX,} \code{Y, sY,} \code{Z, sZ}, \code{rhoXY,}
 #'     \code{rhoXZ,} \code{rhoYZ}.
-#' @param alpha cutoff value for confidence intervals
 #' @return A four-element list of vectors containing:
 #'
 #'     \describe{
@@ -72,7 +71,7 @@
 #' errors of the best straight line. American Journal of Physics,
 #' 72(3), pp.367-375.
 #' @export
-titterington <- function(x,alpha=0.05){
+titterington <- function(x){
     ns <- nrow(x)
     fitXY <- york(subset(x,select=c(1,2,3,4,7)))
     a <- fitXY$a[1]
@@ -197,12 +196,10 @@ fisher.tit <- function(abAB,dat){
         d2L.dbdA <- d2L.dbdA - x*omega[2,3]
         d2L.dbdB <- d2L.dbdB - omega[2,3]*x^2
         
-        d2L.dadx <- -(omega[1,2] + b*omega[2,2] + B*omega[2,3])   # N1i
-        d2L.dbdx <- -x*(omega[1,2] + b*omega[2,2] + B*omega[2,3]) # xi*N1i
-                     # + omega[2,2]*(Y-a-b*x) + omega[1,2]*(X-x) + omega[2,3]*(Z-A-B*x)
-        d2L.dAdx <- -(omega[1,3] + b*omega[2,3] + B*omega[3,3])   # N2i
-        d2L.dBdx <- -x*(omega[1,3] + b*omega[2,3] + B*omega[3,3]) # xi*N2i
-                     # + omega[2,3]*(Y-a-b*x) + omega[1,3]*(X-x) + omega[3,3]*(Z-A-B*x)
+        d2L.dadx <- -(omega[1,2] + b*omega[2,2] + B*omega[2,3])
+        d2L.dbdx <- -x*(omega[1,2] + b*omega[2,2] + B*omega[2,3])
+        d2L.dAdx <- -(omega[1,3] + b*omega[2,3] + B*omega[3,3])
+        d2L.dBdx <- -x*(omega[1,3] + b*omega[2,3] + B*omega[3,3])
         d2L.dx2 <- -(omega[1,1] + 2*b*omega[1,2] + 2*B*omega[1,3] +
                      omega[2,2]*b^2 + omega[2,3]*B^2 + 2*omega[3,3]*b*B)
         
@@ -336,18 +333,5 @@ data2tit.ThU <- function(x,osmond=TRUE,generic=TRUE,...){
         colnames(out) <- c('U238Th232','sU238Th232','U234Th232','su234Th232',
                            'Th230Th232','sTh230Th232','rXY','rXZ','rYZ')
     }
-    out
-}
-
-# ia = index for the chosen intercept
-# ib = index for the chosen slope
-tit2york <- function(fit,ia,ib){
-    out <- list()
-    out$a <- c(fit$par[ia],sqrt(fit$cov[ia,ia]))
-    out$b <- c(fit$par[ib],sqrt(fit$cov[ib,ib]))
-    out$cov.ab <- fit$cov[ia,ib]
-    out$y0 <- c(0,0)
-    out$p.value <- 0
-    out$mswd <- fit$mswd
     out
 }

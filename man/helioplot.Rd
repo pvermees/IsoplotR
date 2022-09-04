@@ -10,7 +10,7 @@ helioplot(
   model = 1,
   show.central.comp = TRUE,
   show.numbers = FALSE,
-  alpha = 0.05,
+  oerr = 3,
   contour.col = c("white", "red"),
   levels = NA,
   clabel = "",
@@ -60,8 +60,24 @@ white ellipse?}
 \item{show.numbers}{show the grain numbers inside the error
 ellipses?}
 
-\item{alpha}{probability cutoff for the error ellipses and
-confidence intervals}
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported in the plot title as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{contour.col}{two-element vector with the fill colours to be
 assigned to the minimum and maximum age contour}

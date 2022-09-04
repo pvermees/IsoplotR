@@ -59,6 +59,29 @@
 #'     \code{'Th232-Pb208'}, \code{'Ar-Ar'}, \code{'K-Ca'},
 #'     \code{'Th-U'}, \code{'Re-Os'}, \code{'Sm-Nd'}, \code{'Rb-Sr'},
 #'     \code{'Lu-Hf'}, \code{'U-Th-He'} or \code{'fissiontracks'}
+#'
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' (only used when \code{isochron} and \code{central} are \code{FALSE})
+#'
+#' @param sigdig the number of significant digits.
 #' 
 #' @param exterr propagate the external (decay constant and
 #'     calibration factor) uncertainties?
@@ -74,45 +97,46 @@
 age <- function(x,...){ UseMethod("age",x) }
 #' @rdname age
 #' @export
-age.default <- function(x,method='U238-Pb206',exterr=FALSE,J=c(NA,NA),
-                        zeta=c(NA,NA),rhoD=c(NA,NA),d=diseq(),...){
+age.default <- function(x,method='U238-Pb206',oerr=1,sigdig=NA,
+                        exterr=FALSE,J=c(NA,NA),zeta=c(NA,NA),
+                        rhoD=c(NA,NA),d=diseq(),...){
     if (length(x)==1) x <- c(x,0)
     if (identical(method,'U235-Pb207')){
-        out <- get.Pb207U235.age(x=x[1],sx=x[2],exterr=exterr,d=d)
+        tst <- get.Pb207U235.age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'U238-Pb206')){
-        out <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,d=d)
+        tst <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'Pb207-Pb206')){
-        out <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,d=d)
+        tst <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Th232-Pb208')){
-        out <- get.Pb208Th232.age(x=x[1],sx=x[2],exterr,d=d)
+        tst <- get.Pb208Th232.age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Ar-Ar')){
-        out <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
+        tst <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
                             J=x[3],sJ=x[4],exterr=exterr)
     } else if (identical(method,'K-Ca')){
-        out <- get.KCa.age(K40Ca40=x[1],sK40Ca40=x[2],exterr=exterr)
+        tst <- get.KCa.age(K40Ca40=x[1],sK40Ca40=x[2],exterr=exterr)
     } else if (identical(method,'Re-Os')){
-        out <- get.ReOs.age(Os187Re187=x[1],sOs187Re187=x[2],exterr=exterr)
+        tst <- get.ReOs.age(Os187Re187=x[1],sOs187Re187=x[2],exterr=exterr)
     } else if (identical(method,'Rb-Sr')){
-        out <- get.RbSr.age(Rb87Sr86=x[1],sRb87Sr86=x[2],exterr)
+        tst <- get.RbSr.age(Rb87Sr86=x[1],sRb87Sr86=x[2],exterr)
     } else if (identical(method,'Sm-Nd')){
-        out <- get.SmNd.age(Nd143Sm147=x[1],sNd143Sm147=x[2],exterr)
+        tst <- get.SmNd.age(Nd143Sm147=x[1],sNd143Sm147=x[2],exterr)
     } else if (identical(method,'Lu-Hf')){
-        out <- get.LuHf.age(Hf176Lu176=x[1],sHf176Lu176=x[2],exterr)
+        tst <- get.LuHf.age(Hf176Lu176=x[1],sHf176Lu176=x[2],exterr)
     } else if (identical(method,'Th-U')){
-        out <- get.ThU.age(Th230U238=x[1],sTh230U238=x[2],U234U238=x[3],
+        tst <- get.ThU.age(Th230U238=x[1],sTh230U238=x[2],U234U238=x[3],
                            sU234U238=x[4],cov4808=x[5],exterr=exterr)
     } else if (identical(method,'U-Th-He') && length(x)==6){
-        out <- get.UThHe.age(U=x[1],sU=x[2],Th=x[3],
+        tst <- get.UThHe.age(U=x[1],sU=x[2],Th=x[3],
                              sTh=x[4],He=x[5],sHe=x[6])
     } else if (identical(method,'U-Th-He') && length(x)==8){
-        out <- get.UThHe.age(U=x[1],sU=x[2],Th=x[3],sTh=x[4],
+        tst <- get.UThHe.age(U=x[1],sU=x[2],Th=x[3],sTh=x[4],
                              He=x[5],sHe=x[6],Sm=x[7],sSm=x[8])
     } else if (identical(method,'fissiontracks')){
-        out <- get.EDM.age(Ns=x[1],Ni=x[2],zeta=zeta,rhoD=rhoD)
+        tst <- get.EDM.age(Ns=x[1],Ni=x[2],zeta=zeta,rhoD=rhoD)
     } else {
-        out <- NA
+        tst <- NA
     }
-    out
+    agerr(tst,oerr=oerr,sigdig=sigdig)
 }
 
 #' @param type scalar flag indicating whether
@@ -246,11 +270,12 @@ age.default <- function(x,method='U238-Pb206',exterr=FALSE,J=c(NA,NA),
 #' @rdname age
 #' @export
 age.UPb <- function(x,type=1,exterr=FALSE,i=NA,
-                    sigdig=NA,common.Pb=0,
+                    oerr=1,sigdig=NA,common.Pb=0,
                     discordance=discfilter(),...){
     if (type==1){
-        out <- UPb.age(x,exterr=exterr,i=i,sigdig=sigdig,
-                       discordance=discordance,common.Pb=common.Pb,...)
+        tst <- UPb.age(x,exterr=exterr,i=i,discordance=discordance,
+                       common.Pb=common.Pb,...)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     } else if (type==2){
         X <- Pb0corr(x,option=common.Pb)
         out <- concordia.age(X,wetherill=TRUE,exterr=exterr)
@@ -269,12 +294,14 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NA,
 #' @rdname age
 #' @export
 age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
-                     i=NA,sigdig=NA,projerr=FALSE,...){
-    if (isochron)
-        out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else
-        out <- PbPb.age(x,exterr=exterr,i=i,sigdig=sigdig,
+                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    if (isochron){
+        out <- isochron(x,plot=FALSE,exterr=exterr,...)
+    } else {
+        tst <- PbPb.age(x,exterr=exterr,i=i,
                         common.Pb=common.Pb,projerr=projerr)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+    }
     out
 }
 
@@ -298,19 +325,26 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
 #' @rdname age
 #' @export
 age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
-                     i=NA,sigdig=NA,projerr=FALSE,...){
-    if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- ArAr.age(x,exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
+                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    if (isochron){
+        out <- isochron(x,plot=FALSE,exterr=exterr,...)
+    } else {
+        tst <- ArAr.age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+    }
     out
 }
 
 #' @rdname age
 #' @export
 age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
-                    i=NA,sigdig=NA,projerr=FALSE,...){
-    if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- KCa.age(x,exterr=exterr,i=i,sigdig=sigdig,
-                        i2i=i2i,projerr=projerr,...)
+                    i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    if (isochron){
+        out <- isochron(x,plot=FALSE,exterr=exterr,...)
+    } else {
+        tst <- KCa.age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+    }
     out
 }
 
@@ -320,10 +354,15 @@ age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
 #'     (\code{central=TRUE}).
 #' @rdname age
 #' @export
-age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NA,sigdig=NA,...){
-    if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig,...)
-    else if (central) out <- central(x)
-    else out <- UThHe.age(x,i=i,sigdig=sigdig)
+age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NA,oerr=1,sigdig=NA,...){
+    if (isochron){
+        out <- isochron(x,plot=FALSE,...)
+    } else if (central) {
+        out <- central(x)
+    } else {
+        tst <- UThHe.age(x,i=i)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+    }
     out
 }
 
@@ -333,9 +372,14 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NA,sigdig=NA,...){
 #'     dosimeter glass and its standard error.
 #' @rdname age
 #' @export
-age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
-    if (central) out <- central(x)
-    else out <- fissiontrack.age(x,i=i,sigdig=sigdig,exterr=exterr)
+age.fissiontracks <- function(x,central=FALSE,i=NA,
+                              oerr=1,sigdig=NA,exterr=TRUE,...){
+    if (central){
+        out <- central(x)
+    } else {
+        tst <- fissiontrack.age(x,i=i,exterr=exterr)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+    }
     out
 }
 
@@ -359,51 +403,60 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,sigdig=NA,exterr=TRUE,...){
 #' 
 #' @rdname age
 #' @export
-age.ThU <- function(x,isochron=FALSE,Th0i=0,exterr=FALSE,i=NA,sigdig=NA,...){
-    if (isochron) out <- isochron(x,plot=FALSE,exterr=exterr,sigdig=sigdig,...)
-    else out <- ThU.age(x,exterr=exterr,i=i,sigdig=sigdig,Th0i=Th0i,...)
+age.ThU <- function(x,isochron=FALSE,Th0i=0,
+                    exterr=FALSE,i=NA,oerr=1,sigdig=NA,...){
+    if (isochron) {
+        out <- isochron(x,plot=FALSE,exterr=exterr,...)
+    } else {
+        tst <- ThU.age(x,exterr=exterr,i=i,Th0i=Th0i,...)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+    }
     out
 }
 #' @rdname age
 #' @export
 age.ThPb <-function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                    i=NA,sigdig=NA,projerr=FALSE,...){
-    age.PD(x,nuclide='Th232',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
+                    i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    age.PD(x,nuclide='Th232',isochron=isochron,i2i=i2i,exterr=exterr,
+           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,sigdig=NA,projerr=FALSE,...){
-    age.PD(x,nuclide='Re187',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
+                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    age.PD(x,nuclide='Re187',isochron=isochron,i2i=i2i,exterr=exterr,
+           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,sigdig=NA,projerr=FALSE,...){
-    age.PD(x,nuclide='Sm147',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
+                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    age.PD(x,nuclide='Sm147',isochron=isochron,i2i=i2i,exterr=exterr,
+           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,sigdig=NA,projerr=FALSE,...){
-    age.PD(x,nuclide='Rb87',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
+                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    age.PD(x,nuclide='Rb87',isochron=isochron,i2i=i2i,exterr=exterr,
+           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,sigdig=NA,projerr=FALSE,...){
-    age.PD(x,nuclide='Lu176',isochron=isochron,i2i=i2i,
-           exterr=exterr,i=i,sigdig=sigdig,projerr=projerr,...)
+                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    age.PD(x,nuclide='Lu176',isochron=isochron,i2i=i2i,exterr=exterr,
+           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
-age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,
-                   exterr=FALSE,i=NA,sigdig=NA,projerr=FALSE,...){
-    if (isochron) out <- isochron(x,plot=FALSE,sigdig=sigdig)
-    else out <- PD.age(x,nuclide,exterr=exterr,i=i,
-                       sigdig=sigdig,i2i=i2i,projerr=projerr,...)
+age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
+                   i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+    if (isochron){
+        out <- isochron(x,plot=FALSE)
+    } else {
+        tst <- PD.age(x,nuclide,exterr=exterr,i=i,
+                      i2i=i2i,projerr=projerr,...)
+        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+    }
     out
 }
 # tt and st are the age and error (scalars produced by peakfit or weightedmean)

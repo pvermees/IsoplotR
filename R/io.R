@@ -190,8 +190,8 @@
 #' \item{\code{spectrum}:}{\code{f, X, err[X]}} 
 #' }
 #' 
-#' @param ierr indicates whether the analytical uncertainties are
-#'     reported as: 
+#' @param ierr indicates whether the analytical uncertainties of the
+#'     input are provided as:
 #' 
 #' \code{1}: 1\eqn{\sigma} absolute uncertainties.
 #' 

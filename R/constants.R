@@ -33,6 +33,11 @@ mindens <- function(mineral,x=NULL){
     if (is.numeric(x)) .IsoplotR$mindens[[mineral]] <- x
     invisible(old)
 }
+alpha <- function(x=NULL){
+    old <- .IsoplotR$alpha
+    if (is.numeric(x)) .IsoplotR$alpha <- x
+    invisible(old)
+}
 
 #' @title Retrieve and record global settings
 #'
@@ -56,6 +61,9 @@ mindens <- function(mineral,x=NULL){
 #' \code{'etchfact'}: fission track etch efficiency factors
 #'
 #' \code{'tracklength'}: equivalent isotropic fission track length
+#'
+#' \code{'alpha'}: the significance level of confidence intervals
+#' 
 #' @param ... depends on the value for \code{setting}:
 #'
 #' For \code{'lambda'}: the isotope of interest (one of either
@@ -263,7 +271,14 @@ settings <- function(setting=NA,...,fname=NA,reset=FALSE){
             .IsoplotR$etchfact <- prefs$etchfact
             .IsoplotR$tracklength <- prefs$tracklength
             .IsoplotR$mindens <- prefs$mindens
-        } else if (!is.na(setting) & (nargs>0)){
+            .IsoplotR$alpha <- prefs$alpha
+        } else if (identical(setting,'alpha')){
+            if (nargs<1){
+                out <- alpha()
+            } else {
+                alpha(args[[1]])
+            }
+        } else if (!is.na(setting) & nargs>0){
             if (nargs==1){
                 Rcommand <- paste0(setting,"('",args[[1]],"')")
                 return(eval(parse(text=Rcommand)))
@@ -272,6 +287,8 @@ settings <- function(setting=NA,...,fname=NA,reset=FALSE){
             } else if (nargs==3) {
                 Rcommand <- paste0(setting,"('",args[[1]],"',",
                                    args[[2]],",",args[[3]],")")
+            } else {
+                warning('incorrect number of arguments')
             }
             out <- eval(parse(text=Rcommand))
         } else {

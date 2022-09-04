@@ -202,8 +202,8 @@ if \code{method='other'}, \code{x} is read as a table, unless
 \item{\code{spectrum}:}{\code{f, X, err[X]}} 
 }}
 
-\item{ierr}{indicates whether the analytical uncertainties are
-    reported as: 
+\item{ierr}{indicates whether the analytical uncertainties of the
+    input are provided as:
 
 \code{1}: 1\eqn{\sigma} absolute uncertainties.
 

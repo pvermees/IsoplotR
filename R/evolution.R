@@ -36,8 +36,24 @@
 #' @param x an object of class \code{ThU}
 #' @param xlim x-axis limits
 #' @param ylim y-axis limits
-#' @param alpha probability cutoff for the error ellipses and
-#'     confidence intervals
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported in the plot title as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
 #' @param transform if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 #'     vs. Th-U age.
 #' @param Th0i initial \eqn{^{230}}Th correction.
@@ -145,7 +161,7 @@
 #'     errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
-evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
+evolution <- function(x,xlim=NULL,ylim=NULL,oerr=3,transform=FALSE,
                       Th0i=0,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
@@ -153,7 +169,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
                       hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (x$format %in% c(1,2)){
         if (transform){
-            U4U8vst(x,Th0i=Th0i,xlim=xlim,ylim=ylim,alpha=alpha,
+            U4U8vst(x,Th0i=Th0i,xlim=xlim,ylim=ylim,oerr=oerr,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
@@ -161,7 +177,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
-                        ylim=ylim,alpha=alpha,Th0i=Th0i,
+                        ylim=ylim,oerr=oerr,Th0i=Th0i,
                         show.numbers=show.numbers,levels=levels,
                         clabel=clabel,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,
@@ -171,13 +187,13 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
         }
         if (isochron){
             fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,
-                                model=model,hide=hide,omit=omit,alpha=alpha)
+                                model=model,hide=hide,omit=omit,oerr=oerr)
             fit$n <- length(x)-length(hide)-length(omit)
-            graphics::title(evolution.title(fit,sigdig=sigdig))
+            graphics::title(evolution.title(fit,sigdig=sigdig,oerr=oerr))
         }
     } else {
         Th02vsU8Th2(x,isochron=isochron,model=model,Th0i=Th0i,
-                    xlim=xlim,ylim=ylim,alpha=alpha,show.numbers=show.numbers,
+                    xlim=xlim,ylim=ylim,oerr=oerr,show.numbers=show.numbers,
                     exterr=exterr,sigdig=sigdig,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,line.col=line.col,
@@ -186,7 +202,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,alpha=0.05,transform=FALSE,
     }
 }
 
-U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,alpha=0.05,
+U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
                     show.numbers=FALSE,levels=NA,clabel="",
                     ellipse.fill=c("#00FF0080","#FF000080"),
                     ellipse.stroke='black',show.ellipses=TRUE,
@@ -208,7 +224,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,alpha=0.05,
     d <- ta0
     colnames(d) <- c('X','sX','Y','sY','rXY')
     d[,'rXY'] <- ta0[,'cov[t,48_0]']/(ta0[,'s[t]']*ta0[,'s[48_0]'])
-    scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+    scatterplot(d,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE, hide=hide,
@@ -216,7 +232,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,alpha=0.05,
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
-                        xlim=NULL,ylim=NULL,alpha=0.05,
+                        xlim=NULL,ylim=NULL,oerr=3,
                         show.numbers=FALSE,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
@@ -239,16 +255,15 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
         initial[3] <- b48
         initial[4] <- sqrt(fit$cov['B','B'])
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
-        scatterplot(initial,alpha=alpha,
-                    ellipse.fill=grDevices::rgb(1,1,1,0.85),
-                    line.col='black',add=TRUE)
+        scatterplot(initial,oerr=oerr,line.col='black',add=TRUE,
+                    ellipse.fill=grDevices::rgb(1,1,1,0.85))
         e48 <- 1
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
     }
     pdat <- y[,c('Th230U238','sTh230U238',
                  'U234U238','sU234U238','rYZ'),drop=FALSE]
-    scatterplot(pdat,alpha=alpha,show.numbers=show.numbers,
+    scatterplot(pdat,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,hide=hide,
@@ -258,7 +273,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
 }
 
 Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
-                        ylim=NULL,alpha=0.05,show.numbers=FALSE,
+                        ylim=NULL,oerr=3,show.numbers=FALSE,
                         exterr=TRUE,clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -313,7 +328,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
                      add=TRUE,model=model,hide=hide,
                      omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke)
     } else { # plot just the data
-        scatterplot(d,alpha=alpha,show.numbers=show.numbers,
+        scatterplot(d,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
@@ -337,51 +352,23 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-evolution.title <- function(fit,sigdig=2,...){
-    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
-    rounded.a0 <- roundit(fit$y0[1],fit$y0[2:4],sigdig=sigdig,text=TRUE)
-    expr1 <- quote('isochron age =')
-    list1 <- list(a=rounded.age[1],
-                  b=rounded.age[2],
-                  c=rounded.age[3],
-                  n=fit$n)
-    expr2 <- quote('('^234*'U/'^238*'U)'[o]*~'=')
-    list2 <- list(a=rounded.a0[1],
-                  b=rounded.a0[2],
-                  c=rounded.a0[3])
-    if (inflate(fit)){
-        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'ka'~'(n='*n*')')
-        args2 <- quote(~a%+-%b~'|'~c~'|'~d)
-        list1$d <- rounded.age[4]
-        list2$d <- rounded.a0[4]
-    } else {
-        args1 <- quote(~a%+-%b~'|'~c~'ka')
-        args2 <- quote(~a%+-%b~'|'~c)
-    }
-    call1 <- substitute(e~a,list(e=expr1,a=args1))
-    line1 <- do.call(substitute,list(eval(call1),list1))
-    call2 <- substitute(e~a,list(e=expr2,a=args2))
-    line2 <- do.call(substitute,list(eval(call2),list2))
+evolution.title <- function(fit,sigdig=2,oerr=3,...){
+    content <- list()
+    content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
+                            oerr=oerr,prefix='isochron age =',units=' ka',df=fit$df)
+    content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],sigdig=sigdig,ntit='',
+                            oerr=oerr,prefix=fit$y0label,units='',df=fit$df)
     if (fit$model==1){
-        line3 <- substitute('MSWD ='~a~', p('*chi^2*')='~b,
-                            list(a=signif(fit$mswd,2),
-                                 b=signif(fit$p.value,2)))
-        mymtext(line1,line=2,...)
-        mymtext(line2,line=1,...)
-        mymtext(line3,line=0,...)
-    } else if (fit$model==2) {
-        mymtext(line1,line=1,...)
-        mymtext(line2,line=0,...)
-    } else if (fit$model==3) {
-        rounded.disp <- roundit(fit$w[1],fit$w[2:3],sigdig=sigdig,text=TRUE)
-        expr3 <- quote('('^232*'Th/'^238*'U)'-dispersion~'=')
-        args3 <- quote(a+b-c)
-        list3 <- list(a=rounded.disp[1],b=rounded.disp[3],c=rounded.disp[2])
-        call3 <- substitute(e~a,list(e=expr3,a=args3))
-        line3 <- do.call(substitute,list(eval(call3),list3))
-        mymtext(line1,line=2,...)
-        mymtext(line2,line=1,...)
-        mymtext(line3,line=0,...)
+        content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
+    }
+    if (fit$model==3) {
+        prefix <- quote('('^232*'Th/'^238*'U)-'*dispersion~'=')
+        content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[-1],sigdig=sigdig,
+                                    oerr=oerr,units='',prefix=prefix)
+    }
+    nl <- length(content)
+    for (i in 1:nl){
+        mymtext(content[[i]],line=nl-i)
     }
 }
 

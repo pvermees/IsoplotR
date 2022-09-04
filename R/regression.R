@@ -51,32 +51,31 @@ model2regression <- function(xyz,type='york'){
 
 model3regression <- function(xyz,type='york'){
     out <- list()
+    init <- log(stats::sd(xyz[,'Y']))
     if (identical(type,'york')){
-        out$w <- stats::optimize(LL.york,
-                             interval=c(0,stats::sd(xyz[,'Y'])),
-                             xy=xyz,maximum=TRUE)$maximum
-        dd <- augment_york_errors(xyz,out$w)
+        lw <- stats::optimise(LL.york,interval=init+c(-5,2),
+                              xy=xyz,maximum=TRUE)$maximum
+        H <- stats::optimHess(lw,LL.york,xy=xyz)
+        slw <- sqrt(solve(-H))
+        out$disp <- c('w'=exp(lw),'s[w]'=slw*exp(lw))
+        dd <- augment_york_errors(xyz,out$disp['w'])
         out <- c(out,york(dd))
     } else if (identical(type,'titterington')){
-        out$w <- stats::optimize(LL.titterington,
-                                 interval=c(0,stats::sd(xyz[,'Y'])),
-                                 xyz=xyz,maximum=TRUE)$maximum
-        dd <- augment_titterington_errors(xyz,out$w)
-        out <- c(out,titterington(dd))
+        lw <- stats::optimise(LL.titterington,interval=init+c(-5,2),
+                              xy=xyz,maximum=TRUE)$maximum
+        H <- stats::optimHess(lw,LL.titterington,xy=xyz)
+        slw <- sqrt(solve(-H))
+        out$disp <- c('w'=exp(lw),'s[w]'=slw*exp(lw))
+        dd <- augment_titterington_errors(xyz,out$disp['w'])
+        out <- c(out,titterington(dd))                
     } else {
         stop('invalid output type for model 3 regression')
     }
     out
 }
 
-LL.isochron <- function(w,xyz,type='york'){
-    if (identical(type,'york'))
-        out <- LL.york(w,xyz)
-    else if (identical(type,'titterington'))
-        out <- LL.titterington(w,xyz)
-    out
-}
-LL.york <- function(w,xy){
+LL.york <- function(lw,xy){
+    w <- exp(lw)
     D <- augment_york_errors(xy,w)
     X <- matrix(0,1,2)
     fit <- york(D)
@@ -92,8 +91,9 @@ LL.york <- function(w,xy){
     LL <- - log(s1) - log(s2) - 0.5*log(1-rho^2) - 0.5*z/(1-rho^2)
     sum(LL)
 }
-LL.titterington <- function(w,xyz){
+LL.titterington <- function(lw,xyz){
     out <- 0
+    w <- exp(lw)
     D <- augment_titterington_errors(xyz,w)
     fit <- titterington(D)
     dat <- matrix2covlist(D)
