@@ -77,3 +77,7 @@ nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
     } ## end from posdefify(sfsmisc)
     X
 }
+
+.M.DN <- function(x) dimnames(x) %||% list(NULL,NULL)
+
+`%||%` <- function(x, orElse) if(!is.null(x)) x else orElse

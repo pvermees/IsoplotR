@@ -25,6 +25,7 @@
 #'     uncertainties of the X-values, the Y-values, the analytical
 #'     uncertainties of the Y-values, and (optionally) the correlation
 #'     coefficients of the X- and Y-values.
+#' @param alpha cutoff value for confidence intervals
 #' @return A seven-element list of vectors containing:
 #'
 #'     \describe{
@@ -43,6 +44,8 @@
 #'
 #'     \item{p.value}{p-value of a Chi-square value with \code{df}
 #'     degrees of freedom}
+#'
+#'     \item{alpha}{the value of the eponymous input argument}
 #'
 #'     }
 #' 
@@ -71,7 +74,7 @@
 #' fit <- york(dat)
 #' scatterplot(dat,fit=fit)
 #' @export
-york <- function(x){
+york <- function(x,alpha=0.05){
     if (ncol(x)==4) x <- cbind(x,0)
     colnames(x) <- c('X','sX','Y','sY','rXY')
     X <- x[,'X']
@@ -101,6 +104,7 @@ york <- function(x){
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- list()
+    out$alpha <- alpha
     out$a <- c(a,sa)
     out$b <- c(b,sb)
     out$cov.ab <- -xbar*sb^2
@@ -118,6 +122,23 @@ york <- function(x){
         out$p.value <- 1
     }
     out
+}
+
+york.1966.zero.intercept <- function(x,alpha=0.05){
+    colnames(x)[1:4] <- c('X','sX','Y','sY')
+    b <- stats::lm(x[,'Y'] ~ 0 + x[,'X'])$coefficients # initial guess
+    wX <- 1/x[,'sX']^2
+    wY <- 1/x[,'sY']^2
+    for (i in 1:10){
+        W <- wX*wY/(wX+wY*b^2)
+        Xbar <- sum(W*x[,'X'])/sum(W)
+        Ybar <- sum(W*x[,'Y'])/sum(W)
+        b <- Ybar/Xbar
+    }
+    U <- x[,'X']-Xbar
+    V <- x[,'Y']-Ybar
+    sb <- (sum(W*(b*U-V)^2)/sum(W*U^2))/(nrow(x)-1)
+    c(b,sb)
 }
 
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),

@@ -42,24 +42,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' a third variable as a colour scale.
 #'
 #' @param xy matrix with columns \code{X, sX, Y, sY(, rXY)}
-#' @param oerr indicates whether the analytical uncertainties of the
-#'     output are reported as:
-#' 
-#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
-#' 
-#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
-#' 
-#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
-#' \eqn{\alpha} equales the value that is stored in
-#' \code{settings('alpha')}.
-#'
-#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
-#' 
-#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
-#'
-#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
-#' \eqn{\alpha} equales the value that is stored in
-#' \code{settings('alpha')}.
+#' @param alpha the probability cutoff for the error ellipses
 #' @param show.numbers logical flag (\code{TRUE} to show grain
 #'     numbers)
 #' @param show.ellipses show the data as:
@@ -122,7 +105,6 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     \code{add=FALSE})
 #' @param ylab (optional) y-axis label (only used when
 #'     \code{add=FALSE})
-#' @param asp the y/x aspect ratio, see `plot.window'.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -135,14 +117,14 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' dat <- cbind(X,sX,Y,sY)
 #' scatterplot(dat,fit=york(dat),show.ellipses=2)
 #' @export
-scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
+scatterplot <- function(xy,alpha=0.05,show.numbers=FALSE,
                         show.ellipses=1,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke="black",fit='none',add=FALSE,
                         empty=FALSE, ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
-                        bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,asp=NA,...){
+                        bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -154,13 +136,13 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     if (!add){
         if (missing(xlab)) xlab <- ''
         if (missing(ylab)) ylab <- ''
-        graphics::plot(xlim,ylim,type='n',xlab=xlab,ylab=ylab,bty='n',asp=asp)
+        graphics::plot(xlim,ylim,type='n',xlab=xlab,ylab=ylab,bty='n')
         if (empty) return()
     }
     if (!identical(fit,'none')){
         usr <- graphics::par('usr')
         plot_isochron_line(fit,x=seq(usr[1],usr[2],length.out=100),
-                           oerr=oerr,ci.col=ci.col,col=line.col,lwd=lwd)
+                           ci.col=ci.col,col=line.col,lwd=lwd)
     }
     graphics::box()
     nolevels <- all(is.na(levels))
@@ -178,7 +160,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         for (i in sn[plotit]){
             if (!any(is.na(xy[i,]))){
                 covmat <- cor2cov2(xy[i,'sX'],xy[i,'sY'],xy[i,'rXY'])
-                ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=oerr2alpha(oerr))
+                ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=alpha)
                 graphics::polygon(ell,col=fill[i],border=stroke[i])
                 if (show.numbers) graphics::text(xy[i,'X'],xy[i,'Y'],i)
                 else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=cex)
@@ -192,8 +174,9 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         else
             graphics::points(xy[plotit,'X'],xy[plotit,'Y'],
                              pch=21,cex=cex,col=stroke,bg=fill)
-        dx <- ci(x=xy[plotit,'X'],sx=xy[plotit,'sX'],oerr=oerr,absolute=TRUE)
-        dy <- ci(x=xy[plotit,'Y'],sx=xy[plotit,'sY'],oerr=oerr,absolute=TRUE)
+        fact <- stats::qnorm(1-alpha/2)
+        dx <- fact*xy[plotit,'sX']
+        dy <- fact*xy[plotit,'sY']
         graphics::arrows(xy[plotit,'X'],xy[plotit,'Y']-dy,
                          xy[plotit,'X'],xy[plotit,'Y']+dy,
                          code=3,angle=90,length=0.05,col=stroke)
@@ -207,10 +190,11 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     }
 }
 
-plot_isochron_line <- function(fit,x,oerr=3,ci.col='gray80',...){
+plot_isochron_line <- function(fit,x,ci.col='gray80',...){
+    if (inflate(fit)) f <- ntfact(fit$alpha,fit)
+    else f <- ntfact(fit$alpha)
     y <- fit$a[1]+fit$b[1]*x
-    sy <- sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
-    e <- ci(x=y,sx=sy,oerr=oerr,absolute=TRUE)
+    e <- f*sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
     cix <- c(x,rev(x))
     ciy <- c(y+e,rev(y-e))
     graphics::polygon(cix,ciy,col=ci.col,border=NA)

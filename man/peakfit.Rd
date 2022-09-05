@@ -19,9 +19,9 @@
 \usage{
 peakfit(x, ...)
 
-\method{peakfit}{default}(x, k = "auto", sigdig = 2, oerr = 3, log = TRUE, np = 4, ...)
+\method{peakfit}{default}(x, k = "auto", sigdig = 2, log = TRUE, alpha = 0.05, ...)
 
-\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, oerr = 3, np = 4, ...)
+\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, alpha = 0.05, ...)
 
 \method{peakfit}{UPb}(
   x,
@@ -33,8 +33,7 @@ peakfit(x, ...)
   exterr = TRUE,
   sigdig = 2,
   log = TRUE,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -45,8 +44,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   common.Pb = 0,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -57,8 +55,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -69,8 +66,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
-  oerr = 3,
-  np = np,
+  alpha = 0.05,
   ...
 )
 
@@ -81,8 +77,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -93,8 +88,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -105,8 +99,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -117,8 +110,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -129,8 +121,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
-  oerr = 3,
-  np = 4,
+  alpha = 0.05,
   ...
 )
 
@@ -140,13 +131,12 @@ peakfit(x, ...)
   exterr = FALSE,
   sigdig = 2,
   log = TRUE,
-  oerr = 3,
+  alpha = 0.05,
   Th0i = 0,
-  np = 4,
   ...
 )
 
-\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, oerr = 3, np = 4, ...)
+\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, alpha = 0.05, ...)
 }
 \arguments{
 \item{x}{either an \code{[nx2]} matrix with measurements and their
@@ -165,30 +155,10 @@ using the Bayes Information Criterion (BIC).}
 \item{sigdig}{number of significant digits to be used for any
 legend in which the peak fitting results are to be displayed.}
 
-\item{oerr}{indicates whether the analytical uncertainties of the
-    output are reported in the plot legend as:
-
-\code{1}: 1\eqn{\sigma} absolute uncertainties.
-
-\code{2}: 2\eqn{\sigma} absolute uncertainties.
-
-\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
-\eqn{\alpha} equales the value that is stored in
-\code{settings('alpha')}.
-
-\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
-
-\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
-
-\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
-\eqn{\alpha} equales the value that is stored in
-\code{settings('alpha')}.}
-
 \item{log}{take the logs of the data before applying the mixture
 model?}
 
-\item{np}{number of parameters for the minimum age model. Must be
-either 3 or 4.}
+\item{alpha}{cutoff value for confidence intervals}
 
 \item{exterr}{propagate the external sources of uncertainty into
 the component age errors?}
@@ -266,21 +236,21 @@ Returns a list with the following items:
 
 \describe{
 
-\item{peaks}{a \code{2 x k} matrix with the following rows:
+\item{peaks}{a \code{3 x k} matrix with the following rows:
 
 \code{t}: the ages of the \code{k} peaks
 
-\code{s[t]}: the standard errors of \code{t}
+\code{s[t]}: the estimated uncertainties of \code{t}
 
-}
+\code{ci[t]}: the widths of approximate \eqn{100(1-\alpha)\%}
+confidence intervals for \code{t}}
 
 \item{props}{a \code{2 x k} matrix with the following rows:
 
 \code{p}: the proportions of the \code{k} peaks
 
-\code{s[p]}: the standard errors of \code{p}
-
-}
+\code{s[p]}: the estimated uncertainties (standard errors) of
+\code{p}}
 
 \item{L}{the log-likelihood of the fit}
 
@@ -316,10 +286,7 @@ come from one of two components, whereby the first component is a
 single discrete age peak (\eqn{\exp(m)}, say) and the second
 component is a continuous distribution (as descibed by the
 \code{\link{central}} age model), but truncated at this discrete
-value. \code{IsoplotR} uses a normal likelihood function
-(section 6.11 of Galbraith, 2005) for the minimum age model.
-This may result in some inaccuracy for young and/or uranium-poor
-fission track samples.
+value (Van der Touw et al., 1997).
 }
 \examples{
 attach(examples)
@@ -332,8 +299,10 @@ Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
 mixed fission track ages. Nuclear Tracks and Radiation
 Measurements, 21(4), pp.459-470.
 
-Galbraith, R.F. 2005, Statistics for fission track
-analysis. Chapman and Hall/CRC, 229p.
+van der Touw, J., Galbraith, R., and Laslett, G. A., 1997.
+Logistic truncated normal mixture model for overdispersed binomial
+data. Journal of Statistical Computation and Simulation,
+59(4), pp.349-373.
 }
 \seealso{
 \code{\link{radialplot}}, \code{\link{central}}

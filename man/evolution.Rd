@@ -8,7 +8,7 @@ evolution(
   x,
   xlim = NULL,
   ylim = NULL,
-  oerr = 3,
+  alpha = 0.05,
   transform = FALSE,
   Th0i = 0,
   show.numbers = FALSE,
@@ -35,24 +35,8 @@ evolution(
 
 \item{ylim}{y-axis limits}
 
-\item{oerr}{indicates whether the analytical uncertainties of the
-    output are reported in the plot title as:
-
-\code{1}: 1\eqn{\sigma} absolute uncertainties.
-
-\code{2}: 2\eqn{\sigma} absolute uncertainties.
-
-\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
-\eqn{\alpha} equales the value that is stored in
-\code{settings('alpha')}.
-
-\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
-
-\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
-
-\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
-\eqn{\alpha} equales the value that is stored in
-\code{settings('alpha')}.}
+\item{alpha}{probability cutoff for the error ellipses and
+confidence intervals}
 
 \item{transform}{if \code{TRUE}, plots \eqn{^{234}}U/\eqn{^{238}}U
 vs. Th-U age.}
