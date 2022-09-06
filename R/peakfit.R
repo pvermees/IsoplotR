@@ -372,15 +372,9 @@ peaks2legend <- function(fit,k=NULL,sigdig=2,oerr=3){
     } else {
         out <- NULL
         for (i in 1:ncol(fit$peaks)){
-            if (k>1){
-                tit <- peaktit(x=fit$peaks[1,i],sx=fit$peaks[2,i],
-                               p=fit$props[1,i],sigdig=sigdig,
-                               oerr=oerr,prefix=paste0('Peak ',i,':'))
-            } else {
-                tit <- peaktit(x=fit$peaks[1,i],sx=fit$peaks[2,i],
-                               sigdig=sigdig,oerr=oerr,
-                               prefix=paste0('Peak ',i,':'))
-            }
+            tit <- peaktit(x=fit$peaks[1,i],sx=fit$peaks[2,i],
+                           p=fit$props[1,i],sigdig=sigdig,
+                           oerr=oerr,prefix=paste0('Peak ',i,':'))
             out <- c(out,as.expression(tit))
         }
     }
