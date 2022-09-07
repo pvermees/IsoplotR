@@ -39,9 +39,25 @@
 #' 
 #' @param tlim age limits of the concordia line
 #' 
-#' @param alpha probability cutoff for the error ellipses and
-#'     confidence intervals
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported in the plot title as:
 #' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
 #' @param type one of
 #'
 #' \code{1}: Wetherill -- \eqn{{}^{206}}Pb/\eqn{{}^{238}}U
@@ -183,20 +199,14 @@
 #' \item{df}{ a three-element vector with the number of degrees of
 #' freedom used for the \code{mswd} calculation. }
 #'
-#' \item{age}{a 4-element vector with:\cr
+#' \item{age}{a two-or three-element vector with:\cr
 #' 
 #' \code{t}: the concordia age (in Ma)\cr
 #' 
-#' \code{s[t]}: the estimated uncertainty of \code{t}\cr
-#' 
-#' \code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval of
-#' 
-#' \code{t} for the appropriate degrees of freedom\cr
-#' 
-#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{t} augmented by \eqn{\sqrt{mswd}} to account for
-#' overdispersed datasets.
-#' }
+#' \code{s[t]}: the standard error of \code{t}\cr
+
+#' \code{disp[t]}: the standard error of \code{t} augmented by
+#' \eqn{\sqrt{mswd}} to account for any overdispersion. }
 #'
 #' }
 #'
@@ -218,16 +228,13 @@
 #'
 #' \item{logcov}{the logarithm of \code{cov}}
 #'
-#' \item{err}{ a matrix with the following rows:
+#' \item{err}{ a matrix with on or two rows:
 #'
-#' \code{s}: the estimated standard deviation for \code{x}
+#' \code{s}: the standard errors of the parameter estimates
 #'
-#' \code{ci}: the \eqn{100(1-\alpha)\%} confidence interval of
-#' \code{x} for the appropriate degrees of freedom
-#'
-#' \code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-#' interval for \code{x} augmented by \eqn{\sqrt{mswd}} to account for
-#' overdispersed datasets (only reported if \code{show.age=2}).  }
+#' \code{disp}: the standard errors of the parameter estimates
+#' augmented by \eqn{\sqrt{mswd}} to account for overdispersed
+#' datasets (only reported if \code{show.age=2}). }
 #'
 #' \item{df}{ the degrees of freedom of the concordia fit (concordance
 #' + equivalence)}
@@ -259,16 +266,16 @@
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
 #'     pp.665-676.
 #' @export
-concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
+concordia <- function(x=NULL,tlim=NULL,type=1,
                       show.numbers=FALSE,levels=NA,clabel="",
                       ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',
                       concordia.col='darksalmon',exterr=FALSE,
-                      show.age=0,sigdig=2,common.Pb=0,
+                      show.age=0,oerr=3,sigdig=2,common.Pb=0,
                       ticks=5,anchor=0,hide=NULL,omit=NULL,
                       omit.fill=NA,omit.stroke='grey',...){    
     if (is.null(x)){
-        emptyconcordia(tlim=tlim,alpha=alpha,type=type,exterr=exterr,
+        emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
         return(invisible(NULL))
     }
@@ -284,22 +291,23 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
     if (show.age>1){
         wetherill <- (type==1)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
-                                             exterr=exterr,alpha=alpha,
+                                             exterr=exterr,oerr=oerr,
                                              model=(show.age-1),anchor=anchor)
         wethertit <- wetherill & !measured.disequilibrium(x2calc$d)
         if (measured.disequilibrium(x2calc$d))
             x2calc$d <- replace.impossible.diseq(tt=fit$par[1],d=x2calc$d)
         fit$n <- length(x2calc)
-        discordia.line(fit,wetherill=wetherill,d=mediand(x2calc$d))
-        graphics::title(discordia.title(fit,wetherill=wethertit,sigdig=sigdig))
+        discordia.line(fit,wetherill=wetherill,d=mediand(x2calc$d),oerr=oerr)
+        graphics::title(discordia.title(fit,wetherill=wethertit,
+                                        sigdig=sigdig,oerr=oerr))
     }
     plot.concordia.line(x2calc,lims=lims,type=type,col=concordia.col,
-                        alpha=alpha,exterr=exterr,ticks=ticks)
+                        oerr=oerr,exterr=exterr,ticks=ticks)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
     else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
     else stop('Concordia type incompatible with this input format.')
-    scatterplot(y,alpha=alpha,show.numbers=show.numbers,
+    scatterplot(y,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=1*(show.age!=3),levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
@@ -307,11 +315,11 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
                 omit.stroke=omit.stroke,addcolourbar=FALSE,...)
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
-        fit <- concordia.age(X2calc,type=type,exterr=exterr,alpha=alpha)
+        fit <- concordia.age(X2calc,type=type,exterr=exterr)
         ell <- ellipse(fit$x[1],fit$x[2],fit$cov)
         graphics::polygon(ell,col='white')
         fit$n <- length(X2calc)
-        graphics::title(concordia.title(fit,sigdig=sigdig))
+        graphics::title(concordia.title(fit,sigdig=sigdig,oerr=oerr))
     }
     # must be added to the end because otherwise R doesn't
     # add the concordia ellipse to the scatterplot
@@ -322,7 +330,7 @@ concordia <- function(x=NULL,tlim=NULL,alpha=0.05,type=1,
 
 # helper function for plot.concordia
 plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
-                                alpha=0.05,exterr=TRUE,ticks=5){
+                                oerr=3,exterr=TRUE,ticks=5){
     if (length(ticks)<2)
         ticks <- prettier(lims$t,type=type,n=ticks)
     m <- min(lims$t[1],ticks[1])
@@ -336,7 +344,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
                                       exterr=exterr,d=mediand(x$d))
         if (exterr){ # show decay constant uncertainty
             if (i > 1) oldell <- ell
-            ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
+            ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=oerr2alpha(oerr))
             if (i > 1){
                 xycd <- rbind(oldell,ell)
                 ii <- grDevices::chull(xycd)
@@ -353,7 +361,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
         xy <- age_to_concordia_ratios(ticks[i],type=type,
                                       exterr=exterr,d=mediand(x$d))
         if (exterr){ # show ticks as ellipse
-            ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=alpha)
+            ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=oerr2alpha(oerr))
             graphics::polygon(ell,col='white')
         } else {
             graphics::points(xy$x[1],xy$x[2],pch=21,bg='white')
@@ -585,18 +593,12 @@ get.concordia.limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
     out
 }
 
-# this would be much easier in unicode but that doesn't render in PDF:
-concordia.title <- function(fit,sigdig=2,alpha=0.05,...){
-    rounded.age <- roundit(fit$age[1],fit$age[-1],sigdig=sigdig,text=TRUE)
-    expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'Ma (n='*n*')')
-    list1 <- list(a=rounded.age[1],b=rounded.age[2],c=rounded.age[3],n=fit$n)
-    if (fit$p.value['combined']<alpha){
-        expr1 <- expression('concordia age ='~a%+-%b~'|'~c~'|'~d~'Ma (n='*n*')')
-        list1$d <- rounded.age[4]
-    }
-    line1 <- do.call(substitute,list(eval(expr1),list1))
+concordia.title <- function(fit,sigdig=2,oerr=3,...){
+    line1 <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                     sigdig=sigdig,oerr=oerr,units=' Ma',df=fit$df[3],
+                     prefix=paste0('concordia age ='))
     line2 <- substitute('MSWD ='~a~'|'~b~'|'~c~
-                            ', p('*chi^2*') ='~d~'|'~e~'|'~f,
+                        ', p('*chi^2*') ='~d~'|'~e~'|'~f,
                         list(a=signif(fit$mswd['concordance'],2),
                              b=signif(fit$mswd['equivalence'],2),
                              c=signif(fit$mswd['combined'],2),
@@ -607,7 +609,7 @@ concordia.title <- function(fit,sigdig=2,alpha=0.05,...){
     mymtext(line2,line=0,...)
 }
 
-concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
+concordia.age <- function(x,i=NA,type=1,exterr=TRUE,...){
     if (is.na(i)){
         cc <- concordia.comp(x,type=type)
         if (type==3){
@@ -626,15 +628,13 @@ concordia.age <- function(x,i=NA,type=1,exterr=TRUE,alpha=0.05,...){
     out <- list()
     if (is.na(i)){ # these calculations are only relevant to weighted means
         out <- c(out,mswd.concordia(x,cc4age,type=type4age,tt=tt[1],exterr=exterr))
-        out$age <- rep(NA,4)
-        names(out$age) <- c('t','s[t]','ci[t]','disp[t]')
-        out$age[c('t','s[t]')] <- tt
-        out$age['ci[t]'] <- ntfact(alpha)*out$age['s[t]']
+        out$age <- tt
+        names(out$age) <- c('t','s[t]')
         mswd <- list(mswd=out$mswd['combined'],model=1,
                      p.value=out$p.value['combined'],
-                     df=out$df['combined'],alpha=alpha)
+                     df=out$df['combined'])
         if (inflate(mswd)){
-            out$age['disp[t]'] <- ntfact(alpha,mswd)*out$age['s[t]']
+            out$age['disp[t]'] <- sqrt(mswd$mswd)*out$age['s[t]']
         }
         out$x <- cc$x
         out$cov <- cc$cov
@@ -793,7 +793,7 @@ LL.concordia.age <- function(tt,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
     out
 }
 
-emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
+emptyconcordia <- function(tlim=NULL,oerr=3,type=1,exterr=TRUE,
                            concordia.col='darksalmon',ticks=5,...){
     if (is.null(tlim)){
         if (type%in%c(1,3)) tlim <- c(1,4500)
@@ -825,5 +825,5 @@ emptyconcordia <- function(tlim=NULL,alpha=0.05,type=1,exterr=TRUE,
     }
     lims <- prepare.concordia.line(x=dat,tlim=tlim,type=type,...)
     plot.concordia.line(x=dat,lims=lims,type=type,col=concordia.col,
-                        alpha=alpha,exterr=exterr,ticks=ticks)
+                        oerr=oerr,exterr=exterr,ticks=ticks)
 }

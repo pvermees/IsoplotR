@@ -1,17 +1,19 @@
-UThHe.age <- function(x,i=NA,sigdig=NA){
+UThHe.age <- function(x,i=NA){
     ns <- nrow(x)
     doSm <- doSm(x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
-        if (doSm) tt <- get.UThHe.age(U=x[j,'U'],sU=x[j,'errU'],
-                                      Th=x[j,'Th'],sTh=x[j,'errTh'],
-                                      He=x[j,'He'],sHe=x[j,'errHe'],
-                                      Sm=x[j,'Sm'],sSm=x[j,'errSm'])
-        else tt <- get.UThHe.age(U=x[j,'U'],sU=x[j,'errU'],
-                                 Th=x[j,'Th'],sTh=x[j,'errTh'],
-                                 He=x[j,'He'],sHe=x[j,'errHe'])
-        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
+        if (doSm){
+            out[j,] <- get.UThHe.age(U=x[j,'U'],sU=x[j,'errU'],
+                                     Th=x[j,'Th'],sTh=x[j,'errTh'],
+                                     He=x[j,'He'],sHe=x[j,'errHe'],
+                                     Sm=x[j,'Sm'],sSm=x[j,'errSm'])
+        } else {
+            out[j,] <- get.UThHe.age(U=x[j,'U'],sU=x[j,'errU'],
+                                     Th=x[j,'Th'],sTh=x[j,'errTh'],
+                                     He=x[j,'He'],sHe=x[j,'errHe'])
+        }
     }
     if (!is.na(i)) out <- out[i,]
     out

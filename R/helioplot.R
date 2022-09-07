@@ -63,8 +63,25 @@
 #'     white ellipse?
 #' @param show.numbers show the grain numbers inside the error
 #'     ellipses?
-#' @param alpha probability cutoff for the error ellipses and
-#'     confidence intervals
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported in the plot title as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#' 
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
 #' @param contour.col two-element vector with the fill colours to be
 #'     assigned to the minimum and maximum age contour
 #' @param levels a vector with additional values to be displayed as
@@ -145,9 +162,8 @@
 #' helioplot(UThHe,logratio=FALSE)
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
-                      show.numbers=FALSE,alpha=0.05,
-                      contour.col=c('white','red'),levels=NA,
-                      clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
+                      show.numbers=FALSE,oerr=3,contour.col=c('white','red'),
+                      levels=NA,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
                       omit.fill=NA,omit.stroke='grey',...){
@@ -156,7 +172,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
-    fit <- central.UThHe(x2calc,alpha=alpha,model=model)
+    fit <- central.UThHe(x2calc,oerr=oerr,model=model)
     fill <- set.ellipse.colours(ns=ns,levels=levels,
                                 col=ellipse.fill,hide=hide,
                                 omit=omit,omit.col=omit.fill)
@@ -173,7 +189,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                         hide=hide,omit=omit,bg=fill,col=stroke,...)
         } else {
             plot_logratio_ellipses(x,fill=fill,stroke=stroke,
-                                   alpha=alpha,levels=levels,
+                                   oerr=oerr,levels=levels,
                                    show.numbers=show.numbers,hide=hide)
         }
     } else {
@@ -187,16 +203,16 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                   bg=fill,col=stroke,...)
         } else {
             plot_helioplot_ellipses(x,fill=fill,stroke=stroke,fact=fact,
-                                    alpha=alpha,levels=levels,
+                                    oerr=oerr,levels=levels,
                                     show.numbers=show.numbers,hide=hide)
         }
     }
     if (show.central.comp){
         plot_central_ellipse(fit,fact=fact,logratio=logratio,
-                             alpha=alpha,doSm=doSm(x))
+                             oerr=oerr,doSm=doSm(x))
     }
     fit$n <- length(which(calcit))
-    graphics::title(helioplot_title(fit,sigdig=sigdig))
+    graphics::title(helioplot_title(fit,sigdig=sigdig,oerr=oerr))
     invisible(colourbar(z=levels[calcit],fill=ellipse.fill,
                         stroke=ellipse.stroke,clabel=clabel))
 }
@@ -218,27 +234,27 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1),xpd=NA)
 }
 
-plot_logratio_ellipses <- function(x,fill,stroke,alpha=0.05,
+plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,
                                    show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=oerr2alpha(oerr))
         graphics::polygon(ell,col=fill[i],border=stroke[i])
         if (show.numbers) graphics::text(x0,y0,labels=i)
         else graphics::points(x0,y0,pch=19,cex=0.25)
     }
 }
-plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),alpha=0.05,
+plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=3,
                                     show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv.covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
-        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=alpha)
+        ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=oerr2alpha(oerr))
         HeUTh0 <- uv2HeUTh(uvc$uv)
         HeUTh <- uv2HeUTh(ell)
         xyz <- renormalise(HeUTh,fact=fact)
@@ -260,9 +276,9 @@ plot_helioplot_points <- function(x,fact=c(1,1,1),bg=NA,
 }
 
 plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
-                                 alpha=0.05,doSm=TRUE,...){
+                                 oerr=3,doSm=TRUE,...){
     ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
-                   covmat=fit$covmat[1:2,1:2],alpha=alpha)
+                   covmat=fit$covmat[1:2,1:2],alpha=oerr2alpha(oerr))
     if (logratio){
         graphics::polygon(ell,col="#FFFFFFBF")
     } else {
@@ -315,35 +331,19 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
     }
 }
 
-helioplot_title <- function(fit,sigdig=2,...){
-    rounded.age <- roundit(fit$age[1],fit$age[2:4],sigdig=sigdig,text=TRUE)
-    expr <- quote('central age =')
-    args1 <- quote(~a%+-%b~'|'~c~'Ma'~'(n='*n*')')
-    list1 <- list(a=rounded.age[1],
-                  b=rounded.age[2],
-                  c=rounded.age[3],
-                  n=fit$n)
+helioplot_title <- function(fit,sigdig=2,oerr=3,...){
+    line1 <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,df=fit$df,
+                     sigdig=sigdig,oerr=oerr,prefix="central age =")
     line1line <- 1
-    if (inflate(fit)){
-        args1 <- quote(~a%+-%b~'|'~c~'|'~d~'Ma'~'(n='*n*')')
-        list1$d <- rounded.age[4]
-        line2 <- substitute('MSWD ='~a~', p('*chi^2*') ='~b,
-                            list(a=signif(fit$mswd,2),
-                                 b=signif(fit$p.value,2)))
+    if (fit$model==1){
+        line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
         mymtext(line2,line=0,...)
     } else if (fit$model==2){
         line1line <- 0
     } else if (fit$model==3){
-        rounded.disp <- roundit(100*fit$w[1],100*fit$w[2:3],sigdig,text=TRUE)
-        list2 <- list(a=rounded.disp[1],b=rounded.disp[2],c=rounded.disp[3])
-        expr2 <- quote('dispersion =')
-        args2 <- quote(a+c-b~'%')
-        call2 <- substitute(e~a,list(e=expr2,a=args2))
-        line2 <- do.call(substitute,list(eval(call2),list2))
+        line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,oerr=oerr)
         mymtext(line2,line=0,...)
     }
-    call1 <- substitute(e~a,list(e=expr,a=args1))
-    line1 <- do.call(substitute,list(eval(call1),list1))
     mymtext(line1,line=line1line,...)
 }
 

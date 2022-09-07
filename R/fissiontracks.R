@@ -1,11 +1,11 @@
-fissiontrack.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
+fissiontrack.age <- function(x,i=NA,exterr=TRUE){
     if (x$format < 2){
-        out <- EDM.age(x,i,sigdig=sigdig,exterr=exterr)
+        out <- EDM.age(x,i,exterr=exterr)
     } else if (x$format > 1){
         if (x$format == 3){
             x$zeta <- get.absolute.zeta(x$mineral,exterr=exterr);
         }
-        out <- ICP.age(x,i,sigdig=sigdig,exterr=exterr)
+        out <- ICP.age(x,i,exterr=exterr)
     }
     out
 }
@@ -93,6 +93,29 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #' @param x an object of class \code{fissiontracks}
 #' @param tst a two-element vector with the true age and its standard
 #'     error
+#' @param oerr indicates whether the analytical uncertainties of the
+#'     output are reported as:
+#' 
+#' \code{1}: 1\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{2}: 2\eqn{\sigma} absolute uncertainties.
+#' 
+#' \code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' \code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#' 
+#' \code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+#'
+#' \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+#' \eqn{\alpha} equales the value that is stored in
+#' \code{settings('alpha')}.
+#'
+#' (only used when \code{update} is \code{FALSE})
+#'
+#' @param sigdig the number of significant digits (only used when
+#'     \code{update} is \code{FALSE}).
 #' @param exterr logical flag indicating whether the external
 #'     uncertainties associated with the age standard or the dosimeter
 #'     glass (for the EDM) should be accounted for when propagating
@@ -101,9 +124,9 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #'     return an updated version of the input data, or simply return a
 #'     two-element vector with the calibration constant and its
 #'     standard error.
-#' @param sigdig number of significant digits
 #' @return an object of class \code{fissiontracks} with an updated
-#'     \code{x$zeta} value
+#'     \code{x$zeta} value or (if \code{update} is \code{FALSE}), a
+#'     2-element matrix with the zeta estimate and its uncertainty.
 #' @seealso \code{\link{age}}
 #' @examples
 #' attach(examples)
@@ -123,41 +146,41 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #' Vermeesch, P., 2017. Statistics for LA-ICP-MS based fission track
 #' dating. Chemical Geology, 456, pp.19-27.
 #' @export
-set.zeta <- function(x,tst,exterr=TRUE,update=TRUE,sigdig=2){
+set.zeta <- function(x,tst,exterr=TRUE,oerr=1,sigdig=NA,update=TRUE){
     N <- length(x$Ns)
     L8 <- lambda('U238')[1]
     tt <- tst[1]
     if (exterr) st <- tst[2]
     else st <- 0
+    zsz <- rep(NA,2)
     if (x$format==1){
         Ns <- sum(x$x[,'Ns'])
         Ni <- sum(x$x[,'Ni'])
         rhoD <- x$rhoD
         if (!exterr) rhoD[2] <- 0
-        zeta <- 2e6*(exp(L8*tt)-1)/(L8*rhoD[1]*Ns/Ni)
-        zetaErr <- zeta * sqrt( (L8*exp(L8*tt)*st/(exp(L8*tt)-1))^2 +
-                                (rhoD[2]/rhoD[1])^2 + 1/Ns + 1/Ni )
+        zsz[1] <- 2e6*(exp(L8*tt)-1)/(L8*rhoD[1]*Ns/Ni)
+        zsz[2] <- zsz[1] * sqrt( (L8*exp(L8*tt)*st/(exp(L8*tt)-1))^2 +
+                                 (rhoD[2]/rhoD[1])^2 + 1/Ns + 1/Ni )
     } else {
         Ns <- sum(x$Ns)
         UsU <- get.UsU(x)
         UA <- sum(UsU[,1]*x$A)
         UAerr <- sqrt( sum(UsU[,2]*x$A)^2 )
-        zeta <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
-        zetaErr <- zeta * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
-                                1/Ns + (UAerr/UA)^2 )
+        zsz[1] <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
+        zsz[2] <- zsz[1] * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
+                                 1/Ns + (UAerr/UA)^2 )
     }
-    zsz <- roundit(zeta,zetaErr,sigdig=sigdig)
     if (update){
         out <- x
-        out$zeta <- as.vector(zsz)
+        out$zeta <- zsz
     } else {
-        out <- as.vector(zsz)
-        names(out) <- c('zeta','s[zeta]')
+        out <- matrix(agerr(zsz,oerr=oerr,sigdig=sigdig),ncol=2)
+        colnames(out) <- c('zeta','s[zeta]')
     }
     out
 }
 
-ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
+ICP.age <- function(x,i=NA,exterr=TRUE){
     ngrains <- length(x$Ns)
     tt <- rep(NA,ngrains)
     st <- rep(NA,ngrains)
@@ -183,8 +206,7 @@ ICP.age <- function(x,i=NA,sigdig=NA,exterr=TRUE){
         tt[i] <- tst[1]
         st[i] <- tst[2]
     }
-    out <- roundit(tt,st,sigdig=sigdig)
-    colnames(out) <- c('t','s[t]')
+    out <- cbind('t'=tt,'s[t]'=st)
     out
 }
 
@@ -226,7 +248,7 @@ get.UsU <- function(x){
     out
 }
 
-EDM.age <- function(x,i=NA,sigdig=2,exterr=TRUE){
+EDM.age <- function(x,i=NA,exterr=TRUE){
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
@@ -238,8 +260,7 @@ EDM.age <- function(x,i=NA,sigdig=2,exterr=TRUE){
         rhoD <- c(x$rhoD[1],0)
     }
     for (j in 1:ns){
-        tt <- get.EDM.age(x$x[j,'Ns'],x$x[j,'Ni'],zeta,rhoD)
-        out[j,] <- roundit(tt[1],tt[2],sigdig=sigdig)
+        out[j,] <- get.EDM.age(x$x[j,'Ns'],x$x[j,'Ni'],zeta,rhoD)
     }
     if (!is.na(i)) out <- out[i,]
     out
@@ -262,4 +283,27 @@ get.ICP.age <- function(Ns,A,UsU,zeta){
     tt <- log(1+L8*zeta[1]*Ns/(2*UsU[1]*A))/L8
     st <- tt * sqrt(1/Ns + (zeta[2]/zeta[1])^2 + (UsU[2]/UsU[1])^2)
     c(tt,st)
+}
+
+LL.FT <- function(par,y,m){
+    mu <- par[1]
+    sigma <- exp(par[2])
+    LL <- 0
+    ns <- length(y)
+    for (i in 1:ns){
+        LL <- LL + log(stats::integrate(pyumu,lower=mu-5*sigma,
+                                        upper=mu+5*sigma,mu=mu,
+                                        sigma=sigma,m=m[i],y=y[i])$value)
+    }
+    LL
+}
+pyumu <- function(B,mu,sigma,m,y){
+    theta <- exp(B)/(1+exp(B))
+    stats::dbinom(y,m,theta)*stats::dnorm(B,mean=mu,sd=sigma)
+}
+# Equation 18 of Galbraith and Roberts (2012)
+LL.sigma <- function(sigma,X,sX){
+    wi <- 1/(sigma^2+sX^2)
+    mu <- sum(wi*X)/sum(wi)
+    sum(log(wi) - wi*(X-mu)^2)/2
 }

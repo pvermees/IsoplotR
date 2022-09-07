@@ -1,5 +1,8 @@
-roundit <- function(age,err,sigdig=2,text=FALSE){
-    if (missing(err)){
+roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
+    if (oerr>3){
+        out <- roundit(age,err*age/100,sigdig=sigdig)
+        out[-1] <- signif(err,sigdig)
+    } else if (missing(err)){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
         nc <- 1
@@ -22,10 +25,10 @@ roundit <- function(age,err,sigdig=2,text=FALSE){
             nc <- ncol(dat)
         }
         min.err <- min(abs(dat),na.rm=TRUE)
-        if (is.na(sigdig)) {
+        if (is.na(sigdig) | min.err==0) {
             out <- dat
         } else {
-            nsmall <- min(20,max(0,-(trunc(log10(min.err))-sigdig)))
+            nsmall <- min(10,max(0,-(trunc(log10(min.err))-sigdig)))
             out <- format(dat,digits=sigdig,nsmall=nsmall,
                           trim=TRUE,scientific=FALSE)
         }
@@ -33,8 +36,7 @@ roundit <- function(age,err,sigdig=2,text=FALSE){
     if (!text){
         suppressWarnings( # suppress NA warnings
             out <- matrix(as.numeric(out),ncol=nc)
-        ) 
-        if (nrow(out)==1) out <- as.vector(out)
+        )
     }
     out
 }
@@ -331,21 +333,6 @@ plot_points <- function(x,y,bg='yellow',pch=21,cex=1.5,pos,col,
     }
 }
 
-ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
-    if (is.null(mswd)){
-        if (is.null(df)){
-            out <- stats::qnorm(1-alpha/2)
-        } else if (df>0){
-            out <- stats::qt(1-alpha/2,df=df)
-        }
-    } else if (mswd$df>0){
-        out <- stats::qt(1-alpha/2,df=mswd$df)*sqrt(mswd$mswd)
-    } else {
-        out <- stats::qnorm(1-alpha/2)
-    }
-    out
-}
-
 mymtext <- function(text,line=0,...){
     graphics::mtext(text,line=line,cex=graphics::par('cex'),...)
 }
@@ -441,23 +428,6 @@ clear <- function(x,...){
     out
 }
 
-get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
-get.ntit.default <- function(x,...){
-    ns <- length(x)
-    nisnan <- length(which(is.na(x)))
-    out <- 'n='
-    if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
-    paste0(out,ns)
-}
-get.ntit.fissiontracks <- function(x,...){
-    if (x$format<2){
-        out <- get.ntit.default(x$x[,'Ns'])
-    } else {
-        out <- get.ntit.default(x$Ns)
-    }
-    out    
-}
-
 geomean <- function(x,...){ UseMethod("geomean",x) }
 geomean.default <- function(x,...){
     exp(mean(log(x),na.rm=TRUE))
@@ -465,11 +435,4 @@ geomean.default <- function(x,...){
 
 trace <- function(x){
     sum(diag(x))
-}
-
-inflate <- function(fit){
-    if (is.null(fit$model)) fit$model <- 1
-    if (is.null(fit$alpha)) out <- FALSE
-    else out <- fit$model==1 && (fit$p.value<fit$alpha)
-    out
 }

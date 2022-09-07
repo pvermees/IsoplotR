@@ -35,7 +35,7 @@ cad(x, ...)
   pch = NA,
   verticals = TRUE,
   xlab = "age [Ma]",
-  col = "heat.colors",
+  col = "rainbow",
   hide = NULL,
   ...
 )
@@ -199,11 +199,15 @@ the CAD should be connected by vertical lines}
 
 \item{xlab}{x-axis label}
 
-\item{col}{either the name of one of \code{R}'s built-in colour
-palettes (e.g., \code{'heat.colors'}, \code{'terrain.colors'},
-\code{'topo.colors'}, \code{'cm.colors'}) (if \code{x} has
-class \code{detritals}) OR the name or code for a colour to
-give to single sample datasets.}
+\item{col}{if \code{x} has class \code{detritals}, the name of one
+    of \code{R}'s built-in colour palettes (e.g.,
+    \code{'heat.colors'}, \code{'terrain.colors'},
+    \code{'topo.colors'}, \code{'cm.colors'}), OR a vector with the
+    names or codes of two colours to use as the start and end of a
+    colour ramp (e.g. \code{col=c('yellow','blue')}).
+
+For all other data formats, the name or code for a colour to give
+    to a single sample dataset}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}

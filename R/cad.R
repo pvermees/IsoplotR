@@ -40,11 +40,16 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' @param xlab x-axis label
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
-#' @param col either the name of one of \code{R}'s built-in colour
-#'     palettes (e.g., \code{'heat.colors'}, \code{'terrain.colors'},
-#'     \code{'topo.colors'}, \code{'cm.colors'}) (if \code{x} has
-#'     class \code{detritals}) OR the name or code for a colour to
-#'     give to single sample datasets.
+#' @param col if \code{x} has class \code{detritals}, the name of one
+#'     of \code{R}'s built-in colour palettes (e.g.,
+#'     \code{'heat.colors'}, \code{'terrain.colors'},
+#'     \code{'topo.colors'}, \code{'cm.colors'}), OR a vector with the
+#'     names or codes of two colours to use as the start and end of a
+#'     colour ramp (e.g. \code{col=c('yellow','blue')}).
+#'
+#' For all other data formats, the name or code for a colour to give
+#'     to a single sample dataset
+#'
 #' @param ... optional arguments to the generic \code{plot} function
 #' 
 #' @examples
@@ -64,11 +69,15 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #' @rdname cad
 #' @export
 cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                          col='heat.colors',hide=NULL,...){
+                          col='rainbow',hide=NULL,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     ns <- length(x2plot)
-    colour <- do.call(col,list(ns))
+    if (length(col)>1){
+        colour <- levels2colours(levels=0:(ns-1),col=col)
+    } else {
+        colour <- do.call(col,list(ns))
+    }
     graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
                    ylab='cumulative probability',...)
     for (i in 1:ns){

@@ -7,7 +7,6 @@
 concordia(
   x = NULL,
   tlim = NULL,
-  alpha = 0.05,
   type = 1,
   show.numbers = FALSE,
   levels = NA,
@@ -17,6 +16,7 @@ concordia(
   concordia.col = "darksalmon",
   exterr = FALSE,
   show.age = 0,
+  oerr = 3,
   sigdig = 2,
   common.Pb = 0,
   ticks = 5,
@@ -32,9 +32,6 @@ concordia(
 \item{x}{an object of class \code{UPb}}
 
 \item{tlim}{age limits of the concordia line}
-
-\item{alpha}{probability cutoff for the error ellipses and
-confidence intervals}
 
 \item{type}{one of
 
@@ -104,6 +101,25 @@ uncertainties are augmented by a factor \eqn{\sqrt{mswd}}.
 \code{4}: fit a discordia line using a modified maximum likelihood
 algorithm that includes accounts for any overdispersion by adding a
 geological (co)variance term.}
+
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported in the plot title as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{sigdig}{number of significant digits for the
 concordia/discordia age}
@@ -179,20 +195,13 @@ combined goodness of fit, respectively. }
 \item{df}{ a three-element vector with the number of degrees of
 freedom used for the \code{mswd} calculation. }
 
-\item{age}{a 4-element vector with:\cr
+\item{age}{a two-or three-element vector with:\cr
 
 \code{t}: the concordia age (in Ma)\cr
 
-\code{s[t]}: the estimated uncertainty of \code{t}\cr
-
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval of
-
-\code{t} for the appropriate degrees of freedom\cr
-
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t} augmented by \eqn{\sqrt{mswd}} to account for
-overdispersed datasets.
-}
+\code{s[t]}: the standard error of \code{t}\cr
+\code{disp[t]}: the standard error of \code{t} augmented by
+\eqn{\sqrt{mswd}} to account for any overdispersion. }
 
 }
 
@@ -214,16 +223,13 @@ overdispersion term as well.}
 
 \item{logcov}{the logarithm of \code{cov}}
 
-\item{err}{ a matrix with the following rows:
+\item{err}{ a matrix with on or two rows:
 
-\code{s}: the estimated standard deviation for \code{x}
+\code{s}: the standard errors of the parameter estimates
 
-\code{ci}: the \eqn{100(1-\alpha)\%} confidence interval of
-\code{x} for the appropriate degrees of freedom
-
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{x} augmented by \eqn{\sqrt{mswd}} to account for
-overdispersed datasets (only reported if \code{show.age=2}).  }
+\code{disp}: the standard errors of the parameter estimates
+augmented by \eqn{\sqrt{mswd}} to account for overdispersed
+datasets (only reported if \code{show.age=2}). }
 
 \item{df}{ the degrees of freedom of the concordia fit (concordance
 + equivalence)}

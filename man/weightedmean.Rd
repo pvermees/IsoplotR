@@ -31,7 +31,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   ranked = FALSE,
   hide = NULL,
   omit = NULL,
@@ -53,7 +53,7 @@ weightedmean(x, ...)
   sigdig = 2,
   type = 4,
   cutoff.76 = 1100,
-  alpha = 0.05,
+  oerr = 3,
   cutoff.disc = discfilter(),
   exterr = TRUE,
   ranked = FALSE,
@@ -76,7 +76,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   common.Pb = 2,
   ranked = FALSE,
@@ -98,7 +98,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   ranked = FALSE,
   Th0i = 0,
   hide = NULL,
@@ -119,7 +119,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   ranked = FALSE,
   i2i = FALSE,
@@ -141,7 +141,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   ranked = FALSE,
   i2i = FALSE,
@@ -163,7 +163,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   ranked = FALSE,
   i2i = TRUE,
@@ -185,7 +185,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   ranked = FALSE,
   i2i = TRUE,
@@ -207,7 +207,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   ranked = FALSE,
   i2i = TRUE,
@@ -229,7 +229,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   i2i = TRUE,
   ranked = FALSE,
@@ -251,7 +251,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   i2i = TRUE,
   ranked = FALSE,
@@ -273,7 +273,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   ranked = FALSE,
   hide = NULL,
   omit = NULL,
@@ -293,7 +293,7 @@ weightedmean(x, ...)
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
-  alpha = 0.05,
+  oerr = 3,
   exterr = TRUE,
   ranked = FALSE,
   hide = NULL,
@@ -363,7 +363,24 @@ given a different colour.}
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output.}
 
-\item{alpha}{the confidence limits of the error bars/rectangles.}
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported in the plot title as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{ranked}{plot the aliquots in order of increasing age?}
 
@@ -461,7 +478,7 @@ Returns a list with the following items:
 
 \describe{
 
-\item{mean}{a three element vector with:
+\item{mean}{a two or three element vector with:
 
 \code{t}: the weighted mean. An asterisk is added to the plot title
 if the initial daughter correction is based on an isochron
@@ -472,14 +489,10 @@ a weighted mean.
 uncertainty of the initial daughter correction.  This is because
 this uncertainty is neither purely random nor purely systematic.
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}
-
 }
 
-\item{disp}{a three-element vector with the (over)dispersion and
-the lower and upper half-widths of its \eqn{100(1-\alpha)\%}
-confidence interval.}
+\item{disp}{a two-element vector with the (over)dispersion and its
+standard error.}
 
 \item{mswd}{the Mean Square of the Weighted Deviates
 (a.k.a. `reduced Chi-square' statistic)}
@@ -497,15 +510,15 @@ included into the weighted mean calculation}
 
 \item{plotpar}{list of plot parameters for the weighted mean
 diagram, including \code{mean} (the mean value), \code{ci} (a grey
-rectangle with the 100[1-\eqn{\alpha}]\% confidence interval
-ignoring systematic errors), \code{ci.exterr} (a grey rectangle
-with the 100[1-\eqn{\alpha}]\% confidence interval including
-systematic errors), \code{dash1} and \code{dash2} (lines marking
-the 100[1-\eqn{\alpha}]\% confidence interval augmented by
+rectangle with the (1 s.e., 2 s.e. or 100[1-\eqn{\alpha}]\%,
+depending on the value of \code{oerr}) confidence interval ignoring
+systematic errors), \code{ci.exterr} (a grey rectangle with the
+confidence interval including systematic errors), \code{dash1} and
+\code{dash2} (lines marking the confidence interval augmented by
 \eqn{\sqrt{mswd}} overdispersion if \code{random.effects=FALSE}),
-and marking the 100[1-\eqn{\alpha}]\% confidence limits of a normal
-distribution whose standard deviation equals the overdispersion
-parameter if \code{random.effects=TRUE}). }
+and marking the confidence limits of a normal distribution whose
+standard deviation equals the overdispersion parameter if
+\code{random.effects=TRUE}). }
 
 }
 }

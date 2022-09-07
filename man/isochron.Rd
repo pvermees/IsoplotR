@@ -12,15 +12,15 @@
 \alias{isochron.ReOs}
 \alias{isochron.SmNd}
 \alias{isochron.LuHf}
-\alias{isochron.ThU}
 \alias{isochron.UThHe}
+\alias{isochron.ThU}
 \title{Calculate and plot isochrons}
 \usage{
 isochron(x, ...)
 
 \method{isochron}{default}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -45,7 +45,7 @@ isochron(x, ...)
 
 \method{isochron}{UPb}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -71,7 +71,7 @@ isochron(x, ...)
 
 \method{isochron}{PbPb}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -96,7 +96,7 @@ isochron(x, ...)
 
 \method{isochron}{ArAr}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -120,7 +120,7 @@ isochron(x, ...)
 
 \method{isochron}{ThPb}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -144,7 +144,7 @@ isochron(x, ...)
 
 \method{isochron}{KCa}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -168,7 +168,7 @@ isochron(x, ...)
 
 \method{isochron}{RbSr}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -192,7 +192,7 @@ isochron(x, ...)
 
 \method{isochron}{ReOs}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -216,7 +216,7 @@ isochron(x, ...)
 
 \method{isochron}{SmNd}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -240,7 +240,7 @@ isochron(x, ...)
 
 \method{isochron}{LuHf}(
   x,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -262,10 +262,32 @@ isochron(x, ...)
   ...
 )
 
+\method{isochron}{UThHe}(
+  x,
+  sigdig = 2,
+  oerr = 3,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  model = 1,
+  show.ellipses = 2 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.fill = NA,
+  omit.stroke = "grey",
+  ...
+)
+
 \method{isochron}{ThU}(
   x,
   type = 2,
-  alpha = 0.05,
+  oerr = 3,
   sigdig = 2,
   show.numbers = FALSE,
   levels = NA,
@@ -283,29 +305,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
-  y0option = 1,
-  ...
-)
-
-\method{isochron}{UThHe}(
-  x,
-  alpha = 0.05,
-  sigdig = 2,
-  show.numbers = FALSE,
-  levels = NA,
-  clabel = "",
-  ellipse.fill = c("#00FF0080", "#FF000080"),
-  ellipse.stroke = "black",
-  ci.col = "gray80",
-  line.col = "black",
-  lwd = 1,
-  plot = TRUE,
-  model = 1,
-  show.ellipses = 2 * (model != 2),
-  hide = NULL,
-  omit = NULL,
-  omit.fill = NA,
-  omit.stroke = "grey",
+  y0option = 4,
   ...
 )
 }
@@ -331,8 +331,24 @@ an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
 \item{...}{optional arguments to be passed on to the generic plot
 function if \code{model=2}}
 
-\item{alpha}{confidence cutoff for the error ellipses and
-confidence intervals}
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported in the plot title as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output}
@@ -507,15 +523,17 @@ If \code{inverse=FALSE}, then \code{X} =
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 
-\item{y0option}{controls the type of initial activity ratio that is
-    reported along with the 3D isochron age. Only relevant to Th-U data
-    formats 1 and 2. Set to:
+\item{y0option}{controls the type of activity ratio that is
+    reported along with the 3D isochron age. Only relevant to Th-U
+    data formats 1 and 2. Set to:
 
-\code{y0option=1} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+\code{y0option=1} for the authigenic \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
 
-\code{y0option=2} for the initial \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+\code{y0option=2} for the detrital \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
 
-\code{y0option=3} for the initial \eqn{^{230}}Th/\eqn{^{238}}U activity ratio.}
+\code{y0option=3} for the authigenic \eqn{^{230}}Th/\eqn{^{238}}U activity ratio,
+
+\code{y0option=4} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio.}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ThPb},
@@ -534,7 +552,7 @@ error.}
 
 \item{df}{the degrees of freedom of the linear fit (\eqn{df=n-2})}
 
-\item{y0}{a four-element list containing:
+\item{y0}{a two- or three-element list containing:
 
 \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
 \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
@@ -542,16 +560,12 @@ error.}
 \eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{208}}Pb/\eqn{^{204}}Pb
 ratio.
 
-\code{s[y]}: the propagated uncertainty of \code{y}
+\code{s[y]}: the standard error of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y}.
+\code{disp[y]}: the standard error of \code{y} enhanced by
+\eqn{\sqrt{mswd}} (only applicable if \code{ model=1}).  }
 
-\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only
-applicable if \code{ model=1}).  }
-
-\item{age}{a four-element list containing:
+\item{age}{a three-element list containing:
 
 \code{t}: the \eqn{^{207}}Pb/\eqn{^{206}}Pb,
 \eqn{^{208}}Pb/\eqn{^{232}}Th, \eqn{^{40}}Ar/\eqn{^{39}}Ar,
@@ -559,14 +573,10 @@ applicable if \code{ model=1}).  }
 \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd or
 \eqn{^{176}}Hf/\eqn{^{177}}Hf age.
 
-\code{s[t]}: the propagated uncertainty of \code{t}
+\code{s[t]}: the standard error of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}.
-
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only
-applicable if \code{ model=1}).  }
+\code{disp[t]}: the standard error of \code{t} enhanced by
+\eqn{\sqrt{mswd}} (only applicable if \code{ model=1}).  }
 
 \item{mswd}{the mean square of the residuals (a.k.a `reduced
     Chi-square') statistic (omitted if \code{model=2}).}
@@ -574,11 +584,10 @@ applicable if \code{ model=1}).  }
 \item{p.value}{the p-value of a Chi-square test for linearity
 (omitted if \code{model=2})}
 
-\item{w}{the overdispersion term, i.e. a three-element vector with
-the standard deviation of the (assumedly) Normally distributed
-geological scatter that underlies the measurements, and the lower
-and upper half-widths of its \eqn{100(1-\alpha)\%} confidence
-interval (only returned if \code{model=3}).}
+\item{w}{the overdispersion term, i.e. a two-element vector with
+the standard deviation of the (assumed) Normally distributed
+geological scatter that underlies the measurements, and its
+standard error (only returned if \code{model=3}).}
 
 \item{ski}{(only reported if \code{x} has class \code{PbPb} and
 \code{growth} is \code{TRUE}) the intercept(s) of the isochron with
@@ -624,39 +633,28 @@ propagated uncertainty.}
 
 \item{p.value}{the p-value of a Chi-square test for linearity.}
 
-\item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the confidence
-intervals.}
-
-\item{y0}{a four-element vector containing:
+\item{y0}{a three-element vector containing:
 
 \code{y}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
 
-\code{s[y]}: the propagated uncertainty of \code{y}
+\code{s[y]}: the standard error of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y}.
+\code{disp[y]}: the standard error of \code{y} enhanced by
+\eqn{\sqrt{mswd}}.}
 
-\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y} enhanced by \eqn{\sqrt{mswd}}.}
-
-\item{age}{a three (or four) element vector containing:
+\item{age}{a two (or three) element vector containing:
 
 \code{t}: the initial \eqn{^{234}}U/\eqn{^{238}}U-ratio
 
-\code{s[t]}: the propagated uncertainty of \code{t}
+\code{s[t]}: the standard error of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}
+\code{disp[t]}: the standard error of \code{t} enhanced by
+\eqn{\sqrt{mswd}} (only reported if \code{model=1}).}
 
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
-if \code{model=1}).}
-
-\item{w}{the overdispersion term, i.e. a three-element vector with
+\item{w}{the overdispersion term, i.e. a two-element vector with
 the standard deviation of the (assumedly) Normally distributed
-geological scatter that underlies the measurements, and the lower
-and upper half-width of its \eqn{100(1-\alpha)\%} confidence
-interval (only returned if \code{model=3}).}
+geological scatter that underlies the measurements, and its
+standard error.}
 
 \item{d}{a matrix with the following columns: the X-variable for
 the isochron plot, the analytical uncertainty of X, the Y-variable
@@ -699,10 +697,7 @@ parameter \eqn{w}.}
 
 \item{p.value}{the p-value of a Chi-square test for linearity.}
 
-\item{fact}{the \eqn{100(1-\alpha/2)\%} multiplier for the confidence
-intervals.}
-
-\item{y0}{a three or four-element vector containing:
+\item{y0}{a two or three-element vector containing:
 
 \code{y}: the initial \eqn{^{206}}Pb/\eqn{^{204}}Pb-ratio (if
 \code{type=1} and \code{x$format=4,5} or \code{6});
@@ -717,29 +712,21 @@ intervals.}
 \eqn{^{207}}Pb/\eqn{^{208}}Pb-ratio (if \code{type=4} and
 \code{x$format=7} or \code{8}).
 
-\code{s[y]}: the propagated uncertainty of \code{y}
+\code{s[y]}: the standard error of \code{y}
 
-\code{ci[y]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{y}.
-
-\code{disp[y]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{y} enhanced by \eqn{\sqrt{mswd}} (only returned
-if \code{model=1})}
+\code{disp[y]}: the standard error of \code{y} enhanced by
+\eqn{\sqrt{mswd}} (only returned if \code{model=1})}
 
 \item{y0label}{the y-axis label of the isochron plot}
 
-\item{age}{a three (or four) element vector containing:
+\item{age}{a two (or three) element vector containing:
 
 \code{t}: the isochron age
 
-\code{s[t]}: the propagated uncertainty of \code{t}
+\code{s[t]}: the standard error of \code{t}
 
-\code{ci[t]}: the \eqn{100(1-\alpha)\%} confidence interval for
-\code{t}
-
-\code{disp[t]}: the studentised \eqn{100(1-\alpha)\%} confidence
-interval for \code{t} enhanced by \eqn{\sqrt{mswd}} (only reported
-if \code{model=1}).}
+\code{disp[t]}: the standard error of \code{t} enhanced by
+\eqn{\sqrt{mswd}} (only reported if \code{model=1}).}
 
 \item{xlab}{the x-label of the isochron plot}
 

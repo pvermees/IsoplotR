@@ -33,8 +33,9 @@ radialplot(x, ...)
   bg = c("yellow", "red"),
   col = "black",
   k = 0,
+  np = 4,
   markers = NULL,
-  alpha = 0.05,
+  oerr = 3,
   units = "",
   hide = NA,
   omit = NULL,
@@ -57,8 +58,9 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -83,9 +85,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   common.Pb = 0,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -107,9 +110,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   common.Pb = 2,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -131,9 +135,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   i2i = FALSE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -155,9 +160,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   i2i = FALSE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -179,9 +185,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   i2i = TRUE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -203,7 +210,8 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
-  alpha = 0.05,
+  np = 4,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -225,9 +233,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   i2i = TRUE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -249,9 +258,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   i2i = TRUE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -273,9 +283,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   i2i = TRUE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -297,9 +308,10 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   exterr = TRUE,
   i2i = TRUE,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -321,8 +333,9 @@ radialplot(x, ...)
   col = "black",
   markers = NULL,
   k = 0,
+  np = 4,
   Th0i = 0,
-  alpha = 0.05,
+  oerr = 3,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -394,10 +407,30 @@ estimates the minimum value using a three parameter model
 consisting of a Normal distribution truncated by a discrete
 component.}
 
+\item{np}{number of parameters for the minimum age
+model. Must be either 3 or 4.}
+
 \item{markers}{vector of ages of radial marker lines to add to the
 plot.}
 
-\item{alpha}{cutoff value for confidence intervals}
+\item{oerr}{indicates whether the analytical uncertainties of the
+    output are reported in the plot title as:
+
+\code{1}: 1\eqn{\sigma} absolute uncertainties.
+
+\code{2}: 2\eqn{\sigma} absolute uncertainties.
+
+\code{3}: absolute (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.
+
+\code{4}: 1\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{5}: 2\eqn{\sigma} relative uncertainties (\eqn{\%}).
+
+\code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
+\eqn{\alpha} equales the value that is stored in
+\code{settings('alpha')}.}
 
 \item{units}{measurement units to be displayed in the legend.}
 
