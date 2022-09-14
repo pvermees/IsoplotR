@@ -559,8 +559,8 @@ min_age_model <- function(zs,np=4){
     Mz <- max(zs[,1])
     cfit <- continuous_mixture(zs[,1],zs[,2])
     init <- c(mz,0,log(cfit$sigma[1]),0)[1:np]
-    ll <- c(mz,-10,init[3]-10,-10)[1:np]
-    ul <- c(cfit$mu[1],10,init[3],10)[1:np]
+    ll <- c(mz,-20,init[3]-20,-20)[1:np]
+    ul <- c(cfit$mu[1],20,init[3]+2,20)[1:np]
     fit <- stats::optim(init,LL,method='L-BFGS-B',zs=zs,Mz=Mz,lower=ll,upper=ul)
     if (fit$par[3]<(-10)) fit$par[2] <- 10 # sigma=0 => pi=1 (no sensitivity for pi)
     H <- tryCatch(stats::optimHess(fit$par,LL,zs=zs,Mz=Mz),

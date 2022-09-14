@@ -25,7 +25,7 @@ roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
             nc <- ncol(dat)
         }
         min.err <- min(abs(dat),na.rm=TRUE)
-        if (is.na(sigdig)) {
+        if (is.na(sigdig) | min.err==0) {
             out <- dat
         } else {
             nsmall <- min(10,max(0,-(trunc(log10(min.err))-sigdig)))
