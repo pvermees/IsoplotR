@@ -1162,7 +1162,7 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
     } else if (option==2){
         out$y0['y'] <- out$PAR['i02']
         out$y0['s[y]'] <- sqrt(out$COV['i02','i02'])
-        out$y0label <- quote('('^230*'Th/'^230*'Th)'[0]*'=')
+        out$y0label <- quote('('^230*'Th/'^232*'Th)'[0]*'=')
     } else if (option==3){
         out$y0['y'] <- out$PAR['i08']
         out$y0['s[y]'] <- sqrt(out$COV['i08','i08'])
