@@ -152,6 +152,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
         out <- peakfit_helper(x,k=k,sigdig=sigdig,oerr=oerr,
                               log=log,exterr=exterr,...)
     }
+    out$legend <- peaks2legend(out,k=k,sigdig=sigdig,oerr=oerr)
     out
 }
 #' @param type scalar indicating whether to plot the
