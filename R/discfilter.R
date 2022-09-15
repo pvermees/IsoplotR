@@ -21,20 +21,20 @@
 #' the \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
 #' ages.
 #' 
-#' \code{2} or \code{'r'}: the relative age difference (%) between the
+#' \code{2} or \code{'r'}: the relative age difference (\%) between the
 #' \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb ages.
 #'
 #' \code{3} or \code{'sk'}: percentage of common Pb measured along a
 #' mixing line connecting the measured composition and the
 #' Stacey-Kramers mantle composition in Tera-Wasserburg space.
 #'
-#' \code{4} or \code{'a'}: logratio distance (%) measured along a
+#' \code{4} or \code{'a'}: logratio distance (\%) measured along a
 #' perpendicular line connecting Tera-Wasserburg concordia and the
 #' measured composition.
 #'
-#' \code{5} or \code{'c'}: logratio distance (%) measured along a line
-#' connecting the measured composition and the corresponding single
-#' grain concordia age composition.
+#' \code{5} or \code{'c'}: logratio distance (\%) measured along a
+#' line connecting the measured composition and the corresponding
+#' single grain concordia age composition.
 #'
 #' Further details in Vermeesch (2021).
 #'
@@ -96,7 +96,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
     } else {
         dcol <- which(colnames(tt)%in%c('disc','p[conc]'))
         is.concordant <- (tt[,dcol]>cutoff.disc$cutoff[1]) &
-                         (tt[,dcol]<cutoff.disc$cutoff[2])
+            (tt[,dcol]<cutoff.disc$cutoff[2])
     }
     if (!any(is.concordant)){
         stop(paste0('There are no concordant grains in this sample.',
@@ -128,7 +128,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
     out
 }
 
-# x: raw data, X: common Pb corrected data (or not)
+                                        # x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
     t.68 <- get.Pb206U238.age(X)[1]
     t.76 <- get.Pb207Pb206.age(X,t.68=t.68)[1]
