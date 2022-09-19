@@ -15,20 +15,20 @@ discfilter(option = 0, before = TRUE, cutoff)
 the \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb
 ages.
 
-\code{2} or \code{'r'}: the relative age difference (%) between the
+\code{2} or \code{'r'}: the relative age difference (\%) between the
 \eqn{^{206}}Pb/\eqn{^{238}}U and \eqn{^{207}}Pb/\eqn{^{206}}Pb ages.
 
 \code{3} or \code{'sk'}: percentage of common Pb measured along a
 mixing line connecting the measured composition and the
 Stacey-Kramers mantle composition in Tera-Wasserburg space.
 
-\code{4} or \code{'a'}: logratio distance (%) measured along a
+\code{4} or \code{'a'}: logratio distance (\%) measured along a
 perpendicular line connecting Tera-Wasserburg concordia and the
 measured composition.
 
-\code{5} or \code{'c'}: logratio distance (%) measured along a line
-connecting the measured composition and the corresponding single
-grain concordia age composition.
+\code{5} or \code{'c'}: logratio distance (\%) measured along a
+line connecting the measured composition and the corresponding
+single grain concordia age composition.
 
 Further details in Vermeesch (2021).}
 

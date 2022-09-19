@@ -114,7 +114,7 @@
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' fn <- system.file("diseq.csv",package="IsoplotR")
 #' UPb <- read.data(fn,method='U-Pb',format=2,d=d)
-#' concordia(UPb,type=2,xlim=c(0,5000),ylim=c(0.047,0.057))
+#' concordia(UPb,type=2,xlim=c(0,700),ylim=c(0.05,0.5))
 #' @export
 diseq <- function(U48=list(x=1,sx=0,option=0),
                   ThU=list(x=1,sx=0,option=0),
@@ -166,7 +166,8 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[7,7] <- -1
     out$Qinv[8,6:8] <- 1
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
-    out$n0 <- matrix(c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0),ncol=1)
+    U <- iratio('U238U235')[1]
+    out$n0 <- matrix(c(U,U*l38/l34,U*l38/l30,U*l38/l26,0,1,l35/l31,0),ncol=1)
     nuclides <- c('U238','U234','Th230','Ra226','Pb206','U235','Pa231','Pb207')
     names(out$L) <- nuclides
     rownames(out$n0) <- nuclides
