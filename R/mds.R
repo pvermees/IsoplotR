@@ -47,6 +47,8 @@
 #'
 #' @param x a dissimilarity matrix OR an object of class
 #'     \code{detrital}
+#' @param method either \code{'W2'} (for the Wasserstein-2 distance) or
+#'     \code{'KS'} (for the Kolmogorov-Smirnov distance).
 #' @param classical logical flag indicating whether classical
 #'     (\code{TRUE}) or nonmetric (\code{FALSE}) MDS should be used
 #' @param plot show the MDS configuration (if \code{shepard=FALSE}) or
@@ -57,9 +59,9 @@
 #'     used if \code{plot=TRUE}.
 #' @param nnlines if \code{TRUE}, draws nearest neighbour lines
 #' @param pos a position specifier for the labels (if
-#'     \code{par('pch')!=NA}). Values of 1, 2, 3 and 4 indicate positions
-#'     below, to the left of, above and to the right of the MDS
-#'     coordinates, respectively.
+#'     \code{par('pch')!=NA}). Values of 1, 2, 3 and 4 indicate
+#'     positions below, to the left of, above and to the right of the
+#'     MDS coordinates, respectively.
 #' @param col plot colour (may be a vector)
 #' @param bg background colour (may be a vector)
 #' @param xlab a string with the label of the x axis
@@ -120,12 +122,12 @@ mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
 }
 #' @rdname mds
 #' @export
-mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
-                          nnlines=FALSE,pos=NULL,col='black',
+mds.detritals <- function(x,method="W2",classical=FALSE,plot=TRUE,
+                          shepard=FALSE,nnlines=FALSE,pos=NULL,col='black',
                           bg='white',xlab=NA,ylab=NA,hide=NULL,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
-    d <- diss(x2plot)
+    d <- diss(x2plot,method=method)
     out <- mds.default(d,classical=classical,plot=plot,
                        shepard=shepard,nnlines=nnlines,pos=pos,
                        col=col,bg=bg,xlab=xlab,ylab=ylab,...)
@@ -141,13 +143,16 @@ mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
 #'     Kolmogorov-Smirnov statistic is the maximum vertical difference
 #'     between them. Both dissimilarity measures are useful for
 #'     multidimensional scaling.
-#' @param x an object of class \code{detrital}
-#' @param method one of either \code{'W2'} (for Wasserstein-2
-#'     distance) or \code{'KS'} (for Kolmogorov-Smirnov distance).
-#' @param return an object of class \code{dist}.
+#' @param x an object of class \code{detrital} OR a vector of numbers
+#' @param y a vector of numbers
+#' @param method either \code{'W2'} (for Wasserstein-2 distance) or
+#'     \code{'KS'} (for Kolmogorov-Smirnov distance).
+#' @param ... extra arguments (not used)
+#' @return an object of class \code{dist}.
 #' @examples
 #' d <- diss(examples$DZ,method='KS')
-#' @rdname mds
+#' mds(d)
+#' @rdname diss
 #' @export
 diss <- function(x,...){ UseMethod("diss",x) }
 #' @rdname diss
@@ -160,81 +165,60 @@ diss.default <- function(x,y,method='W2',...){
     }
     out
 }
-diss.detrital <- function(x,method='W2') {
+#' @rdname diss
+#' @export
+diss.detritals <- function(x,method='W2',...) {
     n <- length(x)
     d <- mat.or.vec(n,n)
     rownames(d) <- names(x)
     colnames(d) <- names(x)
     for (i in 1:n){
         for (j in 1:n){
-            d[i,j] <- diss(x[[i]],x[[j]],method=method)
+            d[i,j] <- diss(x[[i]],x[[j]],method=method,...)
     }   }
     stats::as.dist(d)
 }
-
 KS.diss <- function(x,y) {
-    xx = sort(x)
-    cdftmp = stats::ecdf(xx)
-    cdf1 = cdftmp(xx)
-    xy = sort(y)
-    cdftmp = stats::ecdf(xy)
-    cdfEstim = cdftmp(xy)
-    cdfRef = stats::approx(xx,cdf1,xy,yleft=0,yright=1,ties="mean")
-    dif = cdfRef$y - cdfEstim
-    dif = abs(dif)
-    out = max(dif)
-    return(out)
+    xx <- sort(x)
+    cdftmp <- stats::ecdf(xx)
+    cdf1 <- cdftmp(xx)
+    xy <- sort(y)
+    cdftmp <- stats::ecdf(xy)
+    cdfEstim <- cdftmp(xy)
+    cdfRef <- stats::approx(xx,cdf1,xy,yleft=0,yright=1,ties="mean")
+    dif <- abs(cdfRef$y - cdfEstim)
+    max(dif)
 }
-
-# lifted from the transport package (wasserstein1d function)
-Wasserstein.diss <- function(a, b, p=2, wa=NULL, wb=NULL) {
-    m <- length(a)
-    n <- length(b)
+# modified after the wasserstein1d function of the transport package
+Wasserstein.diss <- function(x, y, p=2) {
+    m <- length(x)
+    n <- length(y)
     stopifnot(m > 0 && n > 0)
-    if (m == n && is.null(wa) && is.null(wb)) {
-        return(mean(abs(sort(b)-sort(a))^p)^(1/p))
+    if (m == n) {
+        out <- mean(abs(sort(y)-sort(x))^p)^(1/p)
+    } else {
+        wx <- rep(1,m)
+        wy <- rep(1,n)
+        ordx <- order(x)
+        ordy <- order(y)
+        x <- x[ordx]
+        y <- y[ordy]
+        wx <- wx[ordx]
+        wy <- wy[ordy]
+        ux <- (wx/sum(wx))[-m]
+        uy <- (wy/sum(wy))[-n]
+        cux <- c(cumsum(ux))  
+        cuy <- c(cumsum(uy))  
+        xrep <- graphics::hist(cux,breaks=c(-Inf,cux,Inf),plot=FALSE)$counts+1
+        yrep <- graphics::hist(cuy,breaks=c(-Inf,cuy,Inf),plot=FALSE)$counts+1
+        xx <- rep(x, times=xrep)
+        yy <- rep(y, times=yrep)
+        uu <- sort(c(cux,cuy))
+        uu0 <- c(0,uu)
+        uu1 <- c(uu,1)
+        out <- sum((uu1-uu0)*abs(yy-xx)^p)^(1/p)
     }
-    stopifnot(is.null(wa) || length(wa) == m)
-    stopifnot(is.null(wb) || length(wb) == n)
-    if (is.null(wa)) {
-        wa <- rep(1,m)
-    } else { # remove points with zero weight
-        wha <- wa > 0
-        wa <- wa[wha]
-        a <- a[wha]
-        m <- length(a)
-    }
-    if (is.null(wb)) {
-        wb <- rep(1,n)
-    } else { # remove points with zero weight
-        whb <- wb > 0
-        wb <- wb[whb]
-        b <- b[whb]
-        n <- length(b)
-    }
-
-    orda <- order(a)
-    ordb <- order(b)
-    a <- a[orda]
-    b <- b[ordb]
-    wa <- wa[orda]
-    wb <- wb[ordb]
-    ua <- (wa/sum(wa))[-m]
-    ub <- (wb/sum(wb))[-n]
-    cua <- c(cumsum(ua))  
-    cub <- c(cumsum(ub))  
-    arep <- graphics::hist(cub, breaks = c(-Inf, cua, Inf), plot = FALSE)$counts + 1
-    brep <- graphics::hist(cua, breaks = c(-Inf, cub, Inf), plot = FALSE)$counts + 1
-
-    aa <- rep(a, times=arep)
-    bb <- rep(b, times=brep)
-
-    uu <- sort(c(cua,cub))
-    uu0 <- c(0,uu)
-    uu1 <- c(uu,1)
-    areap <- sum((uu1-uu0)*abs(bb-aa)^p)^(1/p)
-
-    return(areap)
+    out
 }
 
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
