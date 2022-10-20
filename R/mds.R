@@ -132,15 +132,42 @@ mds.detritals <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
     invisible(out)
 }
 
-# x is an object of class detrital
-diss <- function(x) {
+#' @title Dissimilarity between detrital age distributions
+#' @description Calculates the pairwise dissimilarity between detrital
+#'     age distributions, using either the Wasserstein-2 or
+#'     Kolmogorov-Smirnov distance.
+#' @details The Wasserstein distance is a function of the area between
+#'     two empirical cumulative distribution functions. The
+#'     Kolmogorov-Smirnov statistic is the maximum vertical difference
+#'     between them. Both dissimilarity measures are useful for
+#'     multidimensional scaling.
+#' @param x an object of class \code{detrital}
+#' @param method one of either \code{'W2'} (for Wasserstein-2
+#'     distance) or \code{'KS'} (for Kolmogorov-Smirnov distance).
+#' @param return an object of class \code{dist}.
+#' @examples
+#' d <- diss(examples$DZ,method='KS')
+#' @rdname mds
+#' @export
+diss <- function(x,...){ UseMethod("diss",x) }
+#' @rdname diss
+#' @export
+diss.default <- function(x,y,method='W2',...){
+    if (identical(method,'W2')){
+        out <- Wasserstein.diss(x,y)
+    } else {
+        out <- KS.diss(x,y)
+    }
+    out
+}
+diss.detrital <- function(x,method='W2') {
     n <- length(x)
     d <- mat.or.vec(n,n)
     rownames(d) <- names(x)
     colnames(d) <- names(x)
     for (i in 1:n){
         for (j in 1:n){
-            d[i,j] <- KS.diss(x[[i]],x[[j]])
+            d[i,j] <- diss(x[[i]],x[[j]],method=method)
     }   }
     stats::as.dist(d)
 }
@@ -157,6 +184,57 @@ KS.diss <- function(x,y) {
     dif = abs(dif)
     out = max(dif)
     return(out)
+}
+
+# lifted from the transport package (wasserstein1d function)
+Wasserstein.diss <- function(a, b, p=2, wa=NULL, wb=NULL) {
+    m <- length(a)
+    n <- length(b)
+    stopifnot(m > 0 && n > 0)
+    if (m == n && is.null(wa) && is.null(wb)) {
+        return(mean(abs(sort(b)-sort(a))^p)^(1/p))
+    }
+    stopifnot(is.null(wa) || length(wa) == m)
+    stopifnot(is.null(wb) || length(wb) == n)
+    if (is.null(wa)) {
+        wa <- rep(1,m)
+    } else { # remove points with zero weight
+        wha <- wa > 0
+        wa <- wa[wha]
+        a <- a[wha]
+        m <- length(a)
+    }
+    if (is.null(wb)) {
+        wb <- rep(1,n)
+    } else { # remove points with zero weight
+        whb <- wb > 0
+        wb <- wb[whb]
+        b <- b[whb]
+        n <- length(b)
+    }
+
+    orda <- order(a)
+    ordb <- order(b)
+    a <- a[orda]
+    b <- b[ordb]
+    wa <- wa[orda]
+    wb <- wb[ordb]
+    ua <- (wa/sum(wa))[-m]
+    ub <- (wb/sum(wb))[-n]
+    cua <- c(cumsum(ua))  
+    cub <- c(cumsum(ub))  
+    arep <- graphics::hist(cub, breaks = c(-Inf, cua, Inf), plot = FALSE)$counts + 1
+    brep <- graphics::hist(cua, breaks = c(-Inf, cub, Inf), plot = FALSE)$counts + 1
+
+    aa <- rep(a, times=arep)
+    bb <- rep(b, times=brep)
+
+    uu <- sort(c(cua,cub))
+    uu0 <- c(0,uu)
+    uu1 <- c(uu,1)
+    areap <- sum((uu1-uu0)*abs(bb-aa)^p)^(1/p)
+
+    return(areap)
 }
 
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
