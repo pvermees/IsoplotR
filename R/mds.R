@@ -168,6 +168,7 @@ diss.default <- function(x,y,method='W2',...){
 #' @rdname diss
 #' @export
 diss.detritals <- function(x,method='W2',...) {
+    print(method)
     n <- length(x)
     d <- mat.or.vec(n,n)
     rownames(d) <- names(x)
@@ -190,10 +191,10 @@ KS.diss <- function(x,y) {
     max(dif)
 }
 # modified after the wasserstein1d function of the transport package
-Wasserstein.diss <- function(x, y, p=2) {
+Wasserstein.diss <- function(x,y,p=2) {
     m <- length(x)
     n <- length(y)
-    stopifnot(m > 0 && n > 0)
+    stopifnot(m>0 && n>0)
     if (m == n) {
         out <- mean(abs(sort(y)-sort(x))^p)^(1/p)
     } else {
@@ -207,12 +208,12 @@ Wasserstein.diss <- function(x, y, p=2) {
         wy <- wy[ordy]
         ux <- (wx/sum(wx))[-m]
         uy <- (wy/sum(wy))[-n]
-        cux <- c(cumsum(ux))  
-        cuy <- c(cumsum(uy))  
-        xrep <- graphics::hist(cux,breaks=c(-Inf,cux,Inf),plot=FALSE)$counts+1
-        yrep <- graphics::hist(cuy,breaks=c(-Inf,cuy,Inf),plot=FALSE)$counts+1
-        xx <- rep(x, times=xrep)
-        yy <- rep(y, times=yrep)
+        cux <- c(cumsum(ux))
+        cuy <- c(cumsum(uy))
+        xrep <- hist(cuy,breaks=c(-Inf,cux,Inf),plot=FALSE)$counts+1
+        yrep <- hist(cux,breaks=c(-Inf,cuy,Inf),plot=FALSE)$counts+1
+        xx <- rep(x,times=xrep)
+        yy <- rep(y,times=yrep)
         uu <- sort(c(cux,cuy))
         uu0 <- c(0,uu)
         uu1 <- c(uu,1)
