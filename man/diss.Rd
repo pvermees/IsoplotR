@@ -8,7 +8,7 @@
 \usage{
 diss(x, ...)
 
-\method{diss}{default}(x, y, method = "W2", ...)
+\method{diss}{default}(x, y, method = "KS", ...)
 
 \method{diss}{detritals}(x, method = "W2", ...)
 }
@@ -19,8 +19,8 @@ diss(x, ...)
 
 \item{y}{a vector of numbers}
 
-\item{method}{either \code{'W2'} (for Wasserstein-2 distance) or
-\code{'KS'} (for Kolmogorov-Smirnov distance).}
+\item{method}{either \code{'KS'} (for Kolmogorov-Smirnov distance),
+or \code{'W2'} (for Wasserstein-2 distance).}
 }
 \value{
 an object of class \code{dist}.

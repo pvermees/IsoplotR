@@ -24,7 +24,7 @@ mds(x, ...)
 
 \method{mds}{detritals}(
   x,
-  method = "W2",
+  method = "KS",
   classical = FALSE,
   plot = TRUE,
   shepard = FALSE,
@@ -70,8 +70,8 @@ MDS coordinates, respectively.}
 
 \item{ylab}{a string with the label of the y axis}
 
-\item{method}{either \code{'W2'} (for the Wasserstein-2 distance) or
-\code{'KS'} (for the Kolmogorov-Smirnov distance).}
+\item{method}{either \code{'KS'} (for the Kolmogorov-Smirnov
+distance) or \code{'W2'} (for the Wasserstein-2 distance).}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}

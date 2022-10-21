@@ -47,8 +47,8 @@
 #'
 #' @param x a dissimilarity matrix OR an object of class
 #'     \code{detrital}
-#' @param method either \code{'W2'} (for the Wasserstein-2 distance) or
-#'     \code{'KS'} (for the Kolmogorov-Smirnov distance).
+#' @param method either \code{'KS'} (for the Kolmogorov-Smirnov
+#'     distance) or \code{'W2'} (for the Wasserstein-2 distance).
 #' @param classical logical flag indicating whether classical
 #'     (\code{TRUE}) or nonmetric (\code{FALSE}) MDS should be used
 #' @param plot show the MDS configuration (if \code{shepard=FALSE}) or
@@ -122,7 +122,7 @@ mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
 }
 #' @rdname mds
 #' @export
-mds.detritals <- function(x,method="W2",classical=FALSE,plot=TRUE,
+mds.detritals <- function(x,method="KS",classical=FALSE,plot=TRUE,
                           shepard=FALSE,nnlines=FALSE,pos=NULL,col='black',
                           bg='white',xlab=NA,ylab=NA,hide=NULL,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
@@ -145,8 +145,8 @@ mds.detritals <- function(x,method="W2",classical=FALSE,plot=TRUE,
 #'     multidimensional scaling.
 #' @param x an object of class \code{detrital} OR a vector of numbers
 #' @param y a vector of numbers
-#' @param method either \code{'W2'} (for Wasserstein-2 distance) or
-#'     \code{'KS'} (for Kolmogorov-Smirnov distance).
+#' @param method either \code{'KS'} (for Kolmogorov-Smirnov distance),
+#'     or \code{'W2'} (for Wasserstein-2 distance).
 #' @param ... extra arguments (not used)
 #' @return an object of class \code{dist}.
 #' @examples
@@ -157,7 +157,7 @@ mds.detritals <- function(x,method="W2",classical=FALSE,plot=TRUE,
 diss <- function(x,...){ UseMethod("diss",x) }
 #' @rdname diss
 #' @export
-diss.default <- function(x,y,method='W2',...){
+diss.default <- function(x,y,method='KS',...){
     if (identical(method,'W2')){
         out <- Wasserstein.diss(x,y)
     } else {
@@ -210,8 +210,8 @@ Wasserstein.diss <- function(x,y,p=2) {
         uy <- (wy/sum(wy))[-n]
         cux <- c(cumsum(ux))
         cuy <- c(cumsum(uy))
-        xrep <- hist(cuy,breaks=c(-Inf,cux,Inf),plot=FALSE)$counts+1
-        yrep <- hist(cux,breaks=c(-Inf,cuy,Inf),plot=FALSE)$counts+1
+        xrep <- graphics::hist(cuy,breaks=c(-Inf,cux,Inf),plot=FALSE)$counts+1
+        yrep <- graphics::hist(cux,breaks=c(-Inf,cuy,Inf),plot=FALSE)$counts+1
         xx <- rep(x,times=xrep)
         yy <- rep(y,times=yrep)
         uu <- sort(c(cux,cuy))
