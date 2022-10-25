@@ -502,11 +502,16 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          hide=NULL,omit=NULL,omit.fill=NA,
                          omit.stroke='grey',...){
     if (x$format<4){
-        out <- concordia(x,type=2,show.age=model+1,oerr=oerr,sigdig=sigdig,
-                         show.numbers=show.numbers,levels=levels,clabel=clabel,
-                         ellipse.fill=ellipse.fill,ellipse.stroke=ellipse.stroke,
-                         exterr=exterr,anchor=anchor,hide=hide,omit=omit,
-                         omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+        if (plot){
+            out <- concordia(x,type=2,show.age=model+1,oerr=oerr,sigdig=sigdig,
+                             show.numbers=show.numbers,levels=levels,clabel=clabel,
+                             ellipse.fill=ellipse.fill,
+                             ellipse.stroke=ellipse.stroke,
+                             exterr=exterr,anchor=anchor,hide=hide,omit=omit,
+                             omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+        } else {
+            out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+        }
     } else {
         ns <- length(x)
         calcit <- (1:ns)%ni%c(hide,omit)
