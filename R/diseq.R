@@ -402,6 +402,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             2*dntdt['Pb207',]*dntdt['U235',]/d$nt['U235',]^2 -
             out$Pb207U235*d2ntdt2['U235',]/d$nt['U235',] +
             2*out$Pb207U235*(dntdt['U235',]/d$nt['U235',])^2
+        out$n0 <- d$n0
+        out$nt <- d$nt
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
