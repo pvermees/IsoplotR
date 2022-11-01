@@ -1047,7 +1047,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,sigdig=sigdig,
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
                         type=intercept.type,units=' ka'),
                         xlab=out$xlab,ylab=out$ylab)
     }
