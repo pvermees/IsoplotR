@@ -111,9 +111,12 @@ ludwig.default <- function(x,exterr=FALSE,model=1,anchor=0,...){
         fit$logcov <- matrix(0,np,np)
         fit$logcov[!fit$fixed,!fit$fixed] <- solve(fit$hessian)
     } else {
+        fish <- data2ludwig(fit$x,lta0b0w=fit$par,
+                            exterr=fit$exterr,hessian=TRUE)
+        fit$warn <- fish$warn
         fit$LL <- fit$value
         fit$logpar <- fit$par
-        fit$logcov <- fisher.lud(fit)
+        fit$logcov <- fisher.lud(fit,fish$hessian)
     }
     parnames <- c('log(t)','log(a0)','log(b0)','log(w)')
     if (model!=3) parnames <- parnames[-4]
@@ -446,16 +449,13 @@ LL.lud.w <- function(w,lta0b0,x){
     LL.lud(lta0b0w=lta0b0w,x=x,LL=TRUE)
 }
 
-fisher.lud <- function(fit){
-    fish <- data2ludwig(fit$x,lta0b0w=fit$par,
-                        exterr=fit$exterr,hessian=TRUE)$hessian
+fisher.lud <- function(fit,hess){
     ns <- length(fit$x)
     np <- length(fit$par)
     i1 <- 1:ns
     i2 <- ns+(1:np)
-    out <- matrix(0,ns+np,ns+np)
-    anchorfish(AA=fish[i1,i1],BB=fish[i1,i2],
-               CC=fish[i2,i1],DD=fish[i2,i2],fixed=fit$fixed)
+    anchorfish(AA=hess[i1,i1],BB=hess[i1,i2],
+               CC=hess[i2,i1],DD=hess[i2,i2],fixed=fit$fixed)
 }
 anchorfish <- function(AA,BB,CC,DD,fixed=rep(FALSE,nrow(DD))){
     ns <- nrow(AA)
@@ -757,8 +757,11 @@ data2ludwig <- function(x,lta0b0w,exterr=FALSE,jacobian=FALSE,hessian=FALSE){
             }
         }
         if (any(eigen(out$hessian)$values<0)){
-            warning('Non positive definite Hessian matrix in Ludwig regression.')
+            out$warn <- warning('Non positive definite Hessian ',
+                                'matrix in Ludwig regression.')
             out$hessian <- nearPD(out$hessian)
+        } else {
+            out$warn <- NULL
         }
     }
     out

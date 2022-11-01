@@ -321,7 +321,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         }
     }
     if (isochron){ # plot the data and isochron line fit
-        isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
+        isochron.ThU(x,type=1,oerr=oerr,plot=TRUE,show.numbers=show.numbers,
                      levels=levels,ellipse.fill=ellipse.fill,
                      ellipse.stroke=ellipse.stroke,
                      line.col='black',exterr=exterr,sigdig=sigdig,

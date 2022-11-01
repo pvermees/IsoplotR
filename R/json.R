@@ -148,7 +148,7 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" ){
     
     first_pass <- TRUE
     while( TRUE ) {
-	
+
         #ignore whitespace
         while( chars[i] == " " || chars[i] == "\t" || chars[i] == "\n" ) {
             i = i + 1
@@ -207,7 +207,9 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" ){
             i = i + 1
             break
         }
-        if( chars[i] != "," ) stop("error - no closing tag")
+        if( chars[i] != "," ){
+            stop("error - no closing tag")
+        }
         i = i + 1
         if( i > length( chars ) )
             return( list( "incomplete" = TRUE ) )
@@ -261,7 +263,9 @@ fromJSON <- function( json_str, file, unexpected.escape = "error" ){
             i = i + 1
             break
         }
-        if( chars[i] != "," ) stop("error - no closing tag")
+        if( chars[i] != "," ){
+            stop("error - no closing tag")
+        }
         i = i + 1
         if( i > length( chars ) )
             return( list( "incomplete" = TRUE ) )
