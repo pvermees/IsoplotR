@@ -301,18 +301,20 @@ measured.disequilibrium <- function(d=diseq()){
 #' @param exterr propagate the uncertainties associated with decay
 #'     constants and the \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
 #'
-#' @return
-#' a list containing the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
-#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
-#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios at time \code{tt}; the
-#' derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
-#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
-#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to time; and
-#' the derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
-#' \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
-#' \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to the
-#' intermediate decay constants and
-#' \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
+#' @return a list containing the initial and present-day atomic
+#'     abundances of the \eqn{{}^{238}}U-\eqn{{}^{206}}Pb and
+#'     \eqn{{}^{235}}U-\eqn{{}^{207}}Pb decay chains (where the chains
+#'     are unconnected); the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios at time \code{tt}; the
+#'     derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to time;
+#'     and the derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to the
+#'     intermediate decay constants and
+#'     \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
 #'
 #' @seealso \code{\link{diseq}}
 #' @author Noah McLean (algorithm) and Pieter Vermeesch (code)
