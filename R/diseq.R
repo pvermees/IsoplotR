@@ -402,8 +402,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             2*dntdt['Pb207',]*dntdt['U235',]/d$nt['U235',]^2 -
             out$Pb207U235*d2ntdt2['U235',]/d$nt['U235',] +
             2*out$Pb207U235*(dntdt['U235',]/d$nt['U235',])^2
-        out$n0 <- d$n0
-        out$nt <- d$nt
+        out$n0 <- linkUseries(n=d$n0,U=U*exp((l38-l35)*tt))
+        out$nt <- linkUseries(n=d$nt,U=U)
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
@@ -442,6 +442,14 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$dPb207Pb206dU <- rep(0,nc)
     }
     out
+}
+
+linkUseries <- function(n,U){
+    U8series <- sweep(n[c('U238','U234','Th230','Ra226','Pb206'),,drop=FALSE],
+                      2,n['U238',],'/')
+    U5series <- sweep(n[c('U235','Pa231','Pb207'),,drop=FALSE],
+                      2,n['U235',],'/')
+    rbind(U8series,U5series)
 }
 
 get.diseq.K <- function(tt=0,d=diseq()){

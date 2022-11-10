@@ -1,0 +1,19 @@
+# for now, assume format 1,2,3 and measured 4/8 disequilibrium
+mcmc.UPb <- function(x,anchor=0,seed=1,burnin=1000,mcmc=9000,...){
+    init <- isochron(x,exterr=FALSE,model=1,anchor=anchor,plot=FALSE,...)
+    lt <- init$logpar[1]
+    la <- init$logpar[2]
+    pred <- mclean(init$par[1],d=x$d)
+    l48i <- log(pred$U48i)
+    V <- init$logcov
+    l34 <- lambda('U234')[1]
+    l38 <- lambda('U238')[1]
+    for (i in 1:burnin){
+    }
+    for (i in 1:n){
+    }
+}
+
+LLmcmcLudwig <- function(lt,la,l48i,){
+    
+}
