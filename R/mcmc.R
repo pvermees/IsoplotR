@@ -15,7 +15,7 @@ mcmc.UPb <- function(x,anchor=0,seed=1,burnin=1000,mcmc=9000,...){
     l38 <- lambda('U238')[1]
     for (i in 1:burnin){
     }
-    for (i in 1:n){
+    for (i in 1:mcmc){
     }
 }
 

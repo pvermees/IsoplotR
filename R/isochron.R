@@ -527,14 +527,14 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         b0 <- fit$par['b0']
         l8 <- settings('lambda','U238')[1]
         l5 <- settings('lambda','U235')[1]
-        D <- mclean(tt,d=mediand(x$d))
+        D <- mclean(tt,d=x$d)
         if (type==1){                           # 04-08c/06 vs. 38/06
-            x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=mediand(x$d))[1]
+            x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=x$d)[1]
             dx0invdt <- D$dPb206U238dt
             E <- fit$cov[1:2,1:2]
             x.lab <- quote(''^238*'U/'^206*'Pb')
         } else if (type==2){                    # 04-08c/07 vs. 35/07
-            x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=mediand(x$d))[1]
+            x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=x$d)[1]
             dx0invdt <- D$dPb207U235dt
             E <- fit$cov[c(1,3),c(1,3)]
             x.lab <- quote(''^235*'U/'^207*'Pb')

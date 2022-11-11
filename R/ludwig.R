@@ -265,20 +265,18 @@ anchored.lta0b0.init <- function(x,anchor=1){
         b <- fit$coef
         covmat <- matrix(0,2,2)
         covmat[2,2] <- stats::vcov(fit)
-        tint <- concordia.intersection.ab(i76,b,covmat=covmat,
-                                          d=mediand(x$d))[1]
+        tint <- concordia.intersection.ab(i76,b,covmat=covmat,d=x$d)[1]
         init['log(t)'] <- log(tint)
     } else if (anchor[1]==2){ # fix age
         init['log(t)'] <- log(anchor[2])
         if (x$format<4){
             xy <- data2york(x,option=2)
-            TW <- age_to_terawasserburg_ratios(anchor[2],st=0,
-                                               exterr=FALSE,d=mediand(x$d))
+            TW <- age_to_terawasserburg_ratios(anchor[2],st=0,exterr=FALSE,d=x$d)
             b <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
                                0 + I(xy[,'X']-TW$x['U238Pb206']))$coef
             init['log(a0)'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
         } else {
-            r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=mediand(x$d))[1]
+            r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=x$d)[1]
             if (x$format<7){
                 xy6 <- data2york(x,option=3)
                 xy7 <- data2york(x,option=4)
@@ -288,7 +286,7 @@ anchored.lta0b0.init <- function(x,anchor=1){
             }
             b <- stats::lm(xy6[,'Y'] ~ 0 + I(xy6[,'X']-r86))$coef
             init['log(a0)'] <- -(log(-b)+log(r86))
-            r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=mediand(x$d))[1]
+            r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=x$d)[1]
             b <- stats::lm(xy7[,'Y'] ~ 0 + I(xy7[,'X']-r57))$coef
             init['log(b0)'] <- -(log(-b)+log(r57))
         }
