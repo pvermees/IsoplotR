@@ -274,6 +274,9 @@ subset.UPb  <- function(x,...){
     if ('x.raw' %in% names(x)){
         out$x.raw <- subset(x$x.raw,...)
     }
+    if (length(x$d$ThU$x) > 1){
+        out$d$ThU$x <- subset(x$d$ThU$x,...)
+    }
     out
 }
 #' @export

@@ -383,7 +383,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     X <- insert.data(x=X,cnames=cnames,opt=opt)
     out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
     if (format==3) out$x <- optionalredundancy2cor(X=out$x,nc=nc)
-    out$d <- copy_diseq(x=out,d=d)
+    out$d <- copy_diseq(x=out,d=d) # for Th/U based diseq corrections
     out
 }
 # for U-Pb format 3, the correlation coefficients are optional
