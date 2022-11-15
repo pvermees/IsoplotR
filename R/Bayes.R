@@ -1,23 +1,24 @@
 # currently only works for formats 1-3
-mcmc.UPb <- function(x,anchor=0,seed=1,burnin=1000,mcmc=9000,...){
+mcmc.UPb <- function(x,anchor=0,seed=1,burnin=2000,mcmc=8000,...){
     set.seed(seed)
     ydat <- data2york(x,option=2)
-    X <- x
-    X$d <- diseq()
-    init <- isochron(X,exterr=FALSE,model=1,anchor=anchor,plot=FALSE,...)
-    lt <- init$logpar[1]
-    la <- init$logpar[2]
+    fit <- york(ydat)
+    Pb6U8 <- -fit$b[1]/fit$a[1]
+    tst <- IsoplotR::age(x=Pb6U8,type='U238-Pb206')
+    lt <- log(tst[1])
+    la <- log(fit$a[1])
     l48i <- 0
-    V <- matrix(0,3,3)
-    V[1:2,1:2] <- init$logcov
-    V[3,3] <- 1e-5
+    V <- diag(rep(1e-5,3))
     startvalue <- c(lt,la,l48i)
-    chain <- MH(startvalue,iterations=burnin+mcmc,V=V,d=x$d,ydat=ydat)
-    return(chain)
+    burnchain <- MH(startvalue,iterations=burnin,V=V,d=x$d,ydat=ydat)
+    postchain <- MH(burnchain[burnin,1:3],iterations=mcmc,
+                    V=cov(burnchain[round(burnin/2):burnin,1:3]),
+                    d=x$d,ydat=ydat)
+    rbind(burnchain,postchain)
 }
 
 MH <- function(startvalue,iterations,V,...){
-    chain <- array(dim = c(iterations+1,4))
+    chain <- matrix(NA,iterations,4)
     chain[1,1:3] <- startvalue
     chain[1,4] <- posterior(startvalue,...)
     colnames(chain) <- c('log[t]','log[a]','log[U48i]','posterior')
