@@ -101,12 +101,6 @@
 #' \item{Qinv}{the inverse of \code{Q}}
 #'
 #' \item{L}{a named vector of all the relevant decay constants}
-#'
-#' \item{n0}{the initial atomic abundances of all the parent and
-#' daughter isotopes (used by \code{\link{mclean}}). Note that the
-#' \eqn{{}^{238}}U and \eqn{{}^{235}}U decay chains have been
-#' disconnected, so the \eqn{{}^{238}}U/\eqn{{}^{235}}U ratio of
-#' \code{n0} is meaningless.}
 #' 
 #' }
 #'
@@ -169,9 +163,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$Qinv[7,7] <- -1
     out$Qinv[8,6:8] <- 1
     out$L <- c(l38,l34,l30,l26,0,l35,l31,0)
-    out$n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
-    nuclides <- c('U238','U234','Th230','Ra226','Pb206','U235','Pa231','Pb207')
-    names(out$L) <- names(out$n0) <- nuclides
+    names(out$L) <- c('U238','U234','Th230','Ra226','Pb206','U235','Pa231','Pb207')
     out
 }
 
@@ -239,20 +231,22 @@ mexp.845 <- function(nratios=3){
 }
 
 reverse <- function(tt,mexp,nt){
-    out <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
-    names(out) <- rownames(nt)
+    n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    out <- as.vector(n0)
+    names(out) <- names(nt)
     out
 }
 forward <- function(tt,d=diseq(),derivative=0){
-    if (derivative==0){
-        out <- (d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
-    } else if (derivative==1){
-        out <- (d$Q %*% diag(exp(-d$L)) %*%
-                diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    if (derivative==1){
+        nt <- (d$Q %*% diag(exp(-d$L)) %*%
+               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     } else if (derivative==2){
-        out <- (d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
-                diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        nt <- (d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
+               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+    } else {
+        nt <- (d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     }
+    out <- as.vector(nt)
     names(out) <- names(d$L)
     out
 }
@@ -350,6 +344,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$dPb207U235dl35 <- tt*exp(l35*tt)
         }
     } else {
+        d$n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
+        names(d$n0) <- names(d$L)
         d$ThU$x <- stats::median(d$ThU$x)
         if (d$U48$option<2){      # initial 234U
             if (d$U48$option==1) d$n0['U234'] <- d$U48$x/l34
@@ -397,6 +393,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             2*out$Pb207U235*(dntdt['U235']/d$nt['U235'])^2
         out$n0 <- linkUseries(n=d$n0,U=U*exp((l38-l35)*tt))
         out$nt <- linkUseries(n=d$nt,U=U)
+        out$U48 <- (out$nt['U234']*l34)/(out$nt['U238']*l38)
+        out$ThU <- (out$nt['Th230']*l30)/(out$nt['U238']*l38)
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
