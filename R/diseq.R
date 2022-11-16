@@ -372,8 +372,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         }
         if (d$RaU$option>0) d$n0['Ra226'] <- d$RaU$x/l26
         if (d$PaU$option>0) d$n0['Pa231'] <- d$PaU$x/l31
-        out$U48i <- (d$n0['U234']*l34)/(d$n0['U238']*l38)
-        out$ThUi <- (d$n0['Th230']*l30)/(d$n0['U238']*l38)
         d$nt <- forward(tt=tt,d=d)
         dntdt <- forward(tt,d=d,derivative=1)
         d2ntdt2 <- forward(tt,d=d,derivative=2)
@@ -391,10 +389,12 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             2*dntdt['Pb207']*dntdt['U235']/d$nt['U235']^2 -
             out$Pb207U235*d2ntdt2['U235']/d$nt['U235'] +
             2*out$Pb207U235*(dntdt['U235']/d$nt['U235'])^2
+        out$U48i <- (d$n0['U234']*l34)/(d$n0['U238']*l38)
+        out$ThUi <- (d$n0['Th230']*l30)/(d$n0['U238']*l38)
+        out$U48 <- (d$nt['U234']*l34)/(d$nt['U238']*l38)
+        out$ThU <- (d$nt['Th230']*l30)/(d$nt['U238']*l38)
         out$n0 <- linkUseries(n=d$n0,U=U*exp((l38-l35)*tt))
         out$nt <- linkUseries(n=d$nt,U=U)
-        out$U48 <- (out$nt['U234']*l34)/(out$nt['U238']*l38)
-        out$ThU <- (out$nt['Th230']*l30)/(out$nt['U238']*l38)
         if (exterr){
             K <- get.diseq.K(tt=tt,d=d)
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')

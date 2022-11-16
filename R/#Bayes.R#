@@ -9,7 +9,7 @@ mcmc.UPb <- function(x,anchor=0,seed=1,burnin=2000,mcmc=8000,...){
     la <- log(fit$a[1])
     l48i <- 0
     sla <- fit$a[2]/fit$a[1]
-    V <- diag(rep(1e-5,3))
+    V <- diag(c(1e-5,3))
     startvalue <- c(lt,la,l48i)
     burnchain <- MH(startvalue,iterations=burnin,V=V,d=x$d,ydat=ydat)
     postchain <- MH(burnchain[burnin,1:3],iterations=mcmc,
