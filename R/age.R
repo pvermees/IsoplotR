@@ -269,7 +269,7 @@ age.default <- function(x,method='U238-Pb206',oerr=1,sigdig=NA,
 #' tcentral <- age(FT1,central=TRUE)
 #' @rdname age
 #' @export
-age.UPb <- function(x,type=1,exterr=FALSE,i=NA,
+age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
                     oerr=1,sigdig=NA,common.Pb=0,
                     discordance=discfilter(),...){
     if (type==1){
@@ -294,7 +294,7 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NA,
 #' @rdname age
 #' @export
 age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
-                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                     i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
@@ -325,7 +325,7 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
 #' @rdname age
 #' @export
 age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
-                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                     i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
@@ -338,7 +338,7 @@ age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
 #' @rdname age
 #' @export
 age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
-                    i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                    i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
@@ -354,7 +354,7 @@ age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
 #'     (\code{central=TRUE}).
 #' @rdname age
 #' @export
-age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NA,oerr=1,sigdig=NA,...){
+age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NULL,oerr=1,sigdig=NA,...){
     if (isochron){
         out <- isochron(x,plot=FALSE,...)
     } else if (central) {
@@ -372,7 +372,7 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NA,oerr=1,sigdig=NA,...){
 #'     dosimeter glass and its standard error.
 #' @rdname age
 #' @export
-age.fissiontracks <- function(x,central=FALSE,i=NA,
+age.fissiontracks <- function(x,central=FALSE,i=NULL,
                               oerr=1,sigdig=NA,exterr=TRUE,...){
     if (central){
         out <- central(x)
@@ -404,7 +404,7 @@ age.fissiontracks <- function(x,central=FALSE,i=NA,
 #' @rdname age
 #' @export
 age.ThU <- function(x,isochron=FALSE,Th0i=0,
-                    exterr=FALSE,i=NA,oerr=1,sigdig=NA,...){
+                    exterr=FALSE,i=NULL,oerr=1,sigdig=NA,...){
     if (isochron) {
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
@@ -416,40 +416,40 @@ age.ThU <- function(x,isochron=FALSE,Th0i=0,
 #' @rdname age
 #' @export
 age.ThPb <-function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                    i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                    i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Th232',isochron=isochron,i2i=i2i,exterr=exterr,
            i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                     i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Re187',isochron=isochron,i2i=i2i,exterr=exterr,
            i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                     i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Sm147',isochron=isochron,i2i=i2i,exterr=exterr,
            i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                     i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Rb87',isochron=isochron,i2i=i2i,exterr=exterr,
            i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                     i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                     i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Lu176',isochron=isochron,i2i=i2i,exterr=exterr,
            i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
-                   i=NA,oerr=1,sigdig=NA,projerr=FALSE,...){
+                   i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     if (isochron){
         out <- isochron(x,plot=FALSE)
     } else {
@@ -464,15 +464,16 @@ age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
 add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out <- c(tt,st)
     if (is.UPb(x)){
+        md <- mediand(x$d)
         if (type==1){
-            R <- age_to_Pb207U235_ratio(tt,st,d=x$d)
-            out <- get.Pb207U235.age(R[1],R[2],d=x$d,exterr=TRUE)
+            R <- age_to_Pb207U235_ratio(tt,st,d=md)
+            out <- get.Pb207U235.age(R[1],R[2],d=md,exterr=TRUE)
         } else if (type==2 | (type==4 & (tt<cutoff.76)) | (type==5)){
-            R <- age_to_Pb206U238_ratio(tt,st,d=x$d)
-            out <- get.Pb206U238.age(R[1],R[2],d=x$d,exterr=TRUE)
+            R <- age_to_Pb206U238_ratio(tt,st,d=md)
+            out <- get.Pb206U238.age(R[1],R[2],d=md,exterr=TRUE)
         } else if (type==3 | (type==4 & (tt>=cutoff.76))){
-            R <- age_to_Pb207Pb206_ratio(tt,st,d=x$d)
-            out <- get.Pb207Pb206.age(R[1],R[2],d=x$d,exterr=TRUE)
+            R <- age_to_Pb207Pb206_ratio(tt,st,d=md)
+            out <- get.Pb207Pb206.age(R[1],R[2],d=md,exterr=TRUE)
         }
     } else if (is.PbPb(x)){
         R <- age_to_Pb207Pb206_ratio(tt,st)

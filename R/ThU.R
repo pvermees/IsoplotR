@@ -1,4 +1,4 @@
-ThU.age <- function(x,exterr=FALSE,i=NA,Th0i=0,
+ThU.age <- function(x,exterr=FALSE,i=NULL,Th0i=0,
                     cor=TRUE,omit4c=NULL){
     if (x$format %in% c(1,2)){
         out <- get.ThU.age.corals(x,exterr=exterr,i=i,cor=cor,
@@ -10,7 +10,7 @@ ThU.age <- function(x,exterr=FALSE,i=NA,Th0i=0,
     out
 }
 
-get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,
+get.ThU.age.corals <- function(x,exterr=FALSE,i=NULL,
                                cor=TRUE,Th0i=0,omit4c=NULL){
     td <- data2tit.ThU(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
     if (Th0i==2){
@@ -32,12 +32,12 @@ get.ThU.age.corals <- function(x,exterr=FALSE,i=NA,
                                Th230Th232i=Th02i[1],sTh230Th232i=Th02i[2],
                                exterr=exterr,cor=cor)
     }
-    if (!is.na(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,]
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     out
 }
 
-get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,Th0i=0,omit4c=NULL){
+get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NULL,Th0i=0,omit4c=NULL){
     ns <- length(x)
     d <- data2york(x,type=2,generic=FALSE)
     if (Th0i==1){
@@ -54,7 +54,7 @@ get.ThU.age.volcanics <- function(x,exterr=FALSE,i=NA,Th0i=0,omit4c=NULL){
         tst <- get.ThU.age(d[j,'Th230U238'],d[j,'errTh230U238'],exterr=exterr)
         out[j,] <- tst[c('t','s[t]')]
     }
-    if (!is.na(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,]
     colnames(out) <- c('t','s[t]')
     out
 }

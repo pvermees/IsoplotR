@@ -1,4 +1,4 @@
-fissiontrack.age <- function(x,i=NA,exterr=TRUE){
+fissiontrack.age <- function(x,i=NULL,exterr=TRUE){
     if (x$format < 2){
         out <- EDM.age(x,i,exterr=exterr)
     } else if (x$format > 1){
@@ -180,7 +180,7 @@ set.zeta <- function(x,tst,exterr=TRUE,oerr=1,sigdig=NA,update=TRUE){
     out
 }
 
-ICP.age <- function(x,i=NA,exterr=TRUE){
+ICP.age <- function(x,i=NULL,exterr=TRUE){
     ngrains <- length(x$Ns)
     tt <- rep(NA,ngrains)
     st <- rep(NA,ngrains)
@@ -248,7 +248,7 @@ get.UsU <- function(x){
     out
 }
 
-EDM.age <- function(x,i=NA,exterr=TRUE){
+EDM.age <- function(x,i=NULL,exterr=TRUE){
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
@@ -262,7 +262,7 @@ EDM.age <- function(x,i=NA,exterr=TRUE){
     for (j in 1:ns){
         out[j,] <- get.EDM.age(x$x[j,'Ns'],x$x[j,'Ni'],zeta,rhoD)
     }
-    if (!is.na(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,]
     out
 }
 

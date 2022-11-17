@@ -75,7 +75,11 @@ a list with the following items:
 
 \describe{
 
-\item{U48, ThU, RaU, PaU}{the same as the corresponding input arguments}
+\item{x}{a matrix with rows \code{U48}, \code{ThU}, \code{RaU} and
+\code{PaU}, storing the activity ratios.}
+
+\item{sx}{a matrix with rows \code{U48}, \code{ThU}, \code{RaU} and
+\code{PaU}, storing the standard errors of the activity ratios}
 
 \item{equilibrium}{a boolean flag indicating whether
 \code{option=TRUE} and/or \code{x=1} for all activity ratios}
@@ -85,12 +89,6 @@ a list with the following items:
 \item{Qinv}{the inverse of \code{Q}}
 
 \item{L}{a named vector of all the relevant decay constants}
-
-\item{n0}{the initial atomic abundances of all the parent and
-daughter isotopes (used by \code{\link{mclean}}). Note that the
-\eqn{{}^{238}}U and \eqn{{}^{235}}U decay chains have been
-disconnected, so the \eqn{{}^{238}}U/\eqn{{}^{235}}U ratio of
-\code{n0} is meaningless.}
 
 }
 }

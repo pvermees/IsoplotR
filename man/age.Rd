@@ -36,7 +36,7 @@ age(x, ...)
   x,
   type = 1,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   common.Pb = 0,
@@ -49,7 +49,7 @@ age(x, ...)
   isochron = TRUE,
   common.Pb = 2,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,
@@ -61,7 +61,7 @@ age(x, ...)
   isochron = FALSE,
   i2i = TRUE,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,
@@ -73,23 +73,23 @@ age(x, ...)
   isochron = FALSE,
   i2i = TRUE,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,
   ...
 )
 
-\method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NA, oerr = 1, sigdig = NA, ...)
+\method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NULL, oerr = 1, sigdig = NA, ...)
 
-\method{age}{fissiontracks}(x, central = FALSE, i = NA, oerr = 1, sigdig = NA, exterr = TRUE, ...)
+\method{age}{fissiontracks}(x, central = FALSE, i = NULL, oerr = 1, sigdig = NA, exterr = TRUE, ...)
 
 \method{age}{ThU}(
   x,
   isochron = FALSE,
   Th0i = 0,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   ...
@@ -100,7 +100,7 @@ age(x, ...)
   isochron = TRUE,
   i2i = TRUE,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,
@@ -112,7 +112,7 @@ age(x, ...)
   isochron = TRUE,
   i2i = TRUE,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,
@@ -124,7 +124,7 @@ age(x, ...)
   isochron = TRUE,
   i2i = TRUE,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,
@@ -136,7 +136,7 @@ age(x, ...)
   isochron = TRUE,
   i2i = TRUE,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,
@@ -148,7 +148,7 @@ age(x, ...)
   isochron = TRUE,
   i2i = TRUE,
   exterr = FALSE,
-  i = NA,
+  i = NULL,
   oerr = 1,
   sigdig = NA,
   projerr = FALSE,

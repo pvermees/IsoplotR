@@ -13,7 +13,7 @@ mcmc.UPb <- function(x,anchor=0,seed=1,burnin=2000,mcmc=8000,...){
     startvalue <- c(lt,la,l48i)
     burnchain <- MH(startvalue,iterations=burnin,V=V,d=x$d,ydat=ydat)
     postchain <- MH(burnchain[burnin,1:3],iterations=mcmc,
-                    V=cov(burnchain[round(burnin/2):burnin,1:3]),
+                    V=stats::cov(burnchain[round(burnin/2):burnin,1:3]),
                     d=x$d,ydat=ydat)
     rbind(burnchain,postchain)
 }
@@ -75,8 +75,8 @@ likelihood <- function(param,d,ydat){
     sU48m <- d$U48$sx
     d$U48 <- list(x=U48i,sx=0,option=1)
     pred <- mclean(tt=tt,d=d)
-    Pb76 <- pred$nt['Pb207']/pred$nt['Pb206']
-    U8Pb6 <- pred$nt['U238']/pred$nt['Pb206']
+    Pb76 <- pred$nt['Pb207',]/pred$nt['Pb206',]
+    U8Pb6 <- pred$nt['U238',]/pred$nt['Pb206',]
     b <- (Pb76-a)/U8Pb6
     xy <- get.york.xy(ydat,a=a,b=b)
     dxy <- c(ydat[,'X']-xy[,1],ydat[,'Y']-xy[,2])
@@ -88,6 +88,5 @@ likelihood <- function(param,d,ydat){
         ydat[,'rXY']*ydat[,'sX']*ydat[,'sY']
     LLUPb <- -LL.norm(dxy,E)
     LLU48 <- stats::dnorm(pred$U48,mean=U48m,sd=sU48m,log=TRUE)
-    #message('U-Pb:',LLUPb,', LLU48:',LLU48)
     return(LLUPb+LLU48)
 }

@@ -1,4 +1,4 @@
-PbPb.age <- function(x,exterr=TRUE,i=NA,common.Pb=0,
+PbPb.age <- function(x,exterr=TRUE,i=NULL,common.Pb=0,
                      omit4c=NULL,projerr=FALSE){
     y <- data2york(x,inverse=TRUE)
     if (common.Pb == 0){
@@ -27,13 +27,13 @@ PbPb.age <- function(x,exterr=TRUE,i=NA,common.Pb=0,
     PbPb2t(PbPb,exterr=exterr,i=i)
 }
 
-PbPb2t <- function(PbPb,exterr=FALSE,i=NA){
+PbPb2t <- function(PbPb,exterr=FALSE,i=NULL){
     ns <- nrow(PbPb)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
         out[j,] <- get.Pb207Pb206.age(PbPb[j,1],PbPb[j,2],exterr=exterr)
     }
-    if (!is.na(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,]
     out
 }
