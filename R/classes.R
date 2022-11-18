@@ -242,9 +242,12 @@ length.fissiontracks <- function(x){
 #' @export
 `[.diseq` <- function(x,i){
     out <- x
-    j <- min(ncol(x$x),i)
-    out$x <- x$x[,j,drop=FALSE]
-    out$sx <- x$sx[,j,drop=FALSE]
+    for (ratio in c('U48','ThU','RaU','PaU')){
+        j <- min(length(out[[ratio]]$x),i)
+        out[[ratio]]$x <- out[[ratio]]$x[j]
+        k <- min(length(out[[ratio]]$sx),i)
+        out[[ratio]]$sx <- out[[ratio]]$sx[k]
+    }
     out
 }
 `[helper` <- function(x,...){

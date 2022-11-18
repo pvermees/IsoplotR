@@ -75,11 +75,7 @@ a list with the following items:
 
 \describe{
 
-\item{x}{a matrix with rows \code{U48}, \code{ThU}, \code{RaU} and
-\code{PaU}, storing the activity ratios.}
-
-\item{sx}{a matrix with rows \code{U48}, \code{ThU}, \code{RaU} and
-\code{PaU}, storing the standard errors of the activity ratios}
+\item{U48, ThU, RaU, PaU}{the same as the corresponding input arguments}
 
 \item{equilibrium}{a boolean flag indicating whether
 \code{option=TRUE} and/or \code{x=1} for all activity ratios}
