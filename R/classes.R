@@ -307,3 +307,12 @@ subset_helper <- function(x,...){
     out$x <- subset.matrix(x$x,...)
     out
 }
+
+mediand <- function(d){
+    out <- d
+    for (ratio in c('U48','ThU','RaU','PaU')){
+        out[[ratio]]$x <- stats::median(d[[ratio]]$x)
+        out[[ratio]]$sx <- stats::median(d[[ratio]]$sx)
+    }
+    out    
+}

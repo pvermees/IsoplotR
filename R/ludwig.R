@@ -241,6 +241,7 @@ anchored.lta0b0.init <- function(x,anchor=1){
     else np <- 3
     init <- rep(0,np)
     names(init) <- c('log(t)','log(a0)','log(b0)')[1:np]
+    md <- mediand(x$d)
     if (anchor[1]==1){ # fix common Pb composition
         xy <- data2york(x,option=2)
         if (x$format%in%c(1,2,3)){
@@ -265,18 +266,18 @@ anchored.lta0b0.init <- function(x,anchor=1){
         b <- fit$coef
         covmat <- matrix(0,2,2)
         covmat[2,2] <- stats::vcov(fit)
-        tint <- concordia.intersection.ab(i76,b,covmat=covmat,d=x$d)[1]
+        tint <- concordia.intersection.ab(i76,b,covmat=covmat,d=md)[1]
         init['log(t)'] <- log(tint)
     } else if (anchor[1]==2){ # fix age
         init['log(t)'] <- log(anchor[2])
         if (x$format<4){
             xy <- data2york(x,option=2)
-            TW <- age_to_terawasserburg_ratios(anchor[2],st=0,exterr=FALSE,d=x$d)
+            TW <- age_to_terawasserburg_ratios(anchor[2],st=0,exterr=FALSE,d=md)
             b <- stats::lm(I(xy[,'Y']-TW$x['Pb207Pb206']) ~
                                0 + I(xy[,'X']-TW$x['U238Pb206']))$coef
             init['log(a0)'] <- log(TW$x['Pb207Pb206'] - b*TW$x['U238Pb206'])
         } else {
-            r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=x$d)[1]
+            r86 <- age_to_U238Pb206_ratio(anchor[2],st=0,d=md)[1]
             if (x$format<7){
                 xy6 <- data2york(x,option=3)
                 xy7 <- data2york(x,option=4)
@@ -286,7 +287,7 @@ anchored.lta0b0.init <- function(x,anchor=1){
             }
             b <- stats::lm(xy6[,'Y'] ~ 0 + I(xy6[,'X']-r86))$coef
             init['log(a0)'] <- -(log(-b)+log(r86))
-            r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=x$d)[1]
+            r57 <- age_to_U235Pb207_ratio(anchor[2],st=0,d=md)[1]
             b <- stats::lm(xy7[,'Y'] ~ 0 + I(xy7[,'X']-r57))$coef
             init['log(b0)'] <- -(log(-b)+log(r57))
         }
