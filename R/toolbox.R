@@ -436,3 +436,19 @@ geomean.default <- function(x,...){
 trace <- function(x){
     sum(diag(x))
 }
+
+logit <- function(x,m=0,M=1,inverse=FALSE){
+    out <- x
+    if (inverse){
+        easy <- is.finite(x)
+        out[easy] <- m + M*exp(x[easy])/(1+exp(x[easy]))
+        out[x==Inf] <- m + M
+        out[x==-Inf] <- m
+    } else {
+        easy <- (x>m & x<M)
+        out[easy] <- log((x[easy]-m)/(M-x[easy]))
+        out[x>=M] <- Inf
+        out[x<=m] <- -Inf
+    }
+    out
+}
