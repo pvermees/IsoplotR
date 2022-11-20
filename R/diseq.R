@@ -123,6 +123,9 @@ diseq <- function(U48=list(x=1,sx=0,option=0),
     out$ThU <- ThU
     out$RaU <- RaU
     out$PaU <- PaU
+    for (i in seq_along(out)){
+        if (is.null(out[[i]]$sx)) out[[i]]$sx <- 0
+    }
     out$equilibrium <- check.equilibrium(d=out)
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000

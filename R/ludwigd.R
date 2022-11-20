@@ -1,10 +1,10 @@
 # Ludwig regression with initial disequilibrium
-ludwigd <- function(x,model=1,anchor=0,bayes=FALSE){
+ludwigd <- function(x,model=1,anchor=0,exterr=FALSE,bayes=FALSE){
     if (x$format<4){
-        init <- init.ludwigd(x,anchor=anchor)
+        init <- init.ludwigd(x,model=model,anchor=anchor)
         fit <- optim(par=init$pars,fn=LL.ludwigd,method="L-BFGS-B",
-                     lower=init$lower,upper=init$upper,
-                     hessian=TRUE,x=x,anchor=anchor)
+                     lower=init$lower,upper=init$upper,hessian=TRUE,
+                     x=x,anchor=anchor,model=model,exterr=exterr)
     } else if (x$format<7){
         # TODO
     } else {
@@ -24,7 +24,18 @@ init.ludwigd <- function(x,model=1,anchor=0){
         yfit <- york(yd)
         PbU0 <- -yfit$b[1]/yfit$a[1]
         pars <- lower <- upper <- vector()
-        if (anchor[1]==2){
+        if (anchor[1]==1){
+            pars['tt'] <- get.Pb206U238.age(x=PbU0)[1]
+            lower['tt'] <- pars['tt']/10
+            upper['tt'] <- pars['tt']*10
+            if (iratio('Pb207Pb206')[2]>0){
+                a0 <- iratio('Pb207Pb206')[1]
+                sa0 <- iratio('Pb207Pb206')[2]
+                pars['a0'] <- a0
+                lower['a0'] <- max(0,a0-sa0*3)
+                upper['a0'] <- a0+sa0*3
+            }
+        } else if (anchor[1]==2){
             if (length(anchor)>2 && anchor[3]>0){
                 pars['tt'] <- anchor[2]
                 lower['tt'] <- pars['tt']-anchor[3]*3
@@ -33,17 +44,6 @@ init.ludwigd <- function(x,model=1,anchor=0){
             pars['a0'] <- yfit$a[1]
             lower['a0'] <- pars['a0']/10
             upper['a0'] <- pars['a0']*10
-        } else if (anchor[1]==1){
-            if (iratio('Pb207Pb206')[2]>0){
-                a0 <- iratio('Pb207Pb206')[1]
-                sa0 <- iratio('Pb207Pb206')[2]
-                pars['a0'] <- a0
-                lower['a0'] <- max(0,a0-sa0*3)
-                upper['a0'] <- a0+sa0*3
-            }
-            pars['tt'] <- get.Pb206U238.age(x=PbU0)[1]
-            lower['tt'] <- pars['tt']/10
-            upper['tt'] <- pars['tt']*10
         } else {
             pars['tt'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['tt'] <- pars['tt']/10
@@ -83,6 +83,10 @@ init.ludwigd <- function(x,model=1,anchor=0){
                 stop('Zero uncertainty of measured 230/238 activity ratio')
             }
         }
+    } else if (x$format<7){
+        
+    } else {
+        
     }
     list(pars=pars,lower=lower,upper=upper)
 }
@@ -161,13 +165,13 @@ data2ludwigd <- function(x,ta0b0w,exterr=FALSE){
         NP <- 2 # number of fit parameters (tt, a0)
         NR <- 2 # number of isotopic ratios (X, Y)
     } else if (x$format%in%c(4,5,6)){
-        b0 <- ta0b0w['w']
+        b0 <- ta0b0w['b0']
         Z <- zeros
         L0 <- zeros
         NP <- 3 # tt, a0, b0
         NR <- 3 # X, Y, Z
     } else if (x$format%in%c(7,8)){
-        b0 <- ta0b0w['w']
+        b0 <- ta0b0w['b0']
         Z <- zeros
         W <- zeros
         L0 <- zeros
@@ -177,7 +181,7 @@ data2ludwigd <- function(x,ta0b0w,exterr=FALSE){
         stop('Incorrect input format.')
     }
     np <- min(NP+1,length(ta0b0w))  # np = NP (no w) or NP+1 (with w)
-    if (np==(NP+1)) w <- ta0b0w[np] # model 3
+    if (np==(NP+1)) w <- ta0b0w['w'] # model 3
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
@@ -206,7 +210,7 @@ data2ludwigd <- function(x,ta0b0w,exterr=FALSE){
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     ED <- J%*%E%*%t(J)
     if (np==(NP+1)){ # fit overdispersion
-        Ew <- get.Ew(w=w,format=x$format,ns=ns,D=D)
+        Ew <- get.Ewd(w=w,format=x$format,ns=ns,D=D)
         ED <- ED + Ew
     }
     i1 <- 1:ns
@@ -285,4 +289,22 @@ data2ludwigd <- function(x,ta0b0w,exterr=FALSE){
     detED <- determinant(ED,logarithm=TRUE)$modulus
     out$LL <- -(NP*ns*log(2*pi) + detED + out$SS)/2
     out
+}
+
+get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    if (format<4) {
+        J <- matrix(0,2*ns,ns)
+    } else {
+        J <- matrix(0,3*ns,ns)
+        i3 <- (2*ns+1):(3*ns)
+    }
+    diag(J[i1,i1]) <- -D$dPb207U235dt      # dKdt
+    diag(J[i2,i1]) <- -D$dPb206U238dt      # dLdt
+    if (format>6) {
+        diag(J[i3,i1]) <- -D$dPb208Th232dt # dMdt
+    }
+    dEdx <- w^2
+    dEdx*J%*%t(J)
 }
