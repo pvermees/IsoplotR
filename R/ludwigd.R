@@ -1,15 +1,9 @@
 # Ludwig regression with initial disequilibrium
 ludwigd <- function(x,model=1,anchor=0,exterr=FALSE,bayes=FALSE){
-    if (x$format<4){
-        init <- init.ludwigd(x,model=model,anchor=anchor)
-        fit <- optim(par=init$pars,fn=LL.ludwigd,method="L-BFGS-B",
-                     lower=init$lower,upper=init$upper,hessian=TRUE,
-                     x=x,anchor=anchor,model=model,exterr=exterr)
-    } else if (x$format<7){
-        # TODO
-    } else {
-        # TODO
-    }
+    init <- init.ludwigd(x,model=model,anchor=anchor)
+    fit <- optim(par=init$pars,fn=LL.ludwigd,method="L-BFGS-B",
+                 lower=init$lower,upper=init$upper,hessian=TRUE,
+                 x=x,anchor=anchor,model=model,exterr=exterr)
     if (det(fit$hessian)<0){
         warning('Ill-conditioned Hessian, replaced by ',
                 'nearest positive definite matrix')
@@ -19,11 +13,11 @@ ludwigd <- function(x,model=1,anchor=0,exterr=FALSE,bayes=FALSE){
 }
 
 init.ludwigd <- function(x,model=1,anchor=0){
+    pars <- lower <- upper <- vector()
     if (x$format<4){
         yd <- data2york(x,option=2)
         yfit <- york(yd)
         PbU0 <- -yfit$b[1]/yfit$a[1]
-        pars <- lower <- upper <- vector()
         if (anchor[1]==1){
             pars['tt'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['tt'] <- pars['tt']/10
@@ -52,41 +46,86 @@ init.ludwigd <- function(x,model=1,anchor=0){
             lower['a0'] <- pars['a0']/10
             upper['a0'] <- pars['a0']*10            
         }
-        if (model==3){
-            pars['w'] <- 0.01
-            lower['w'] <- 0
-            upper['w'] <- 10
-        }
-        if (x$d$U48$option==1 && x$d$U48$sx>0){
-            pars['U48i'] <- x$d$U48$x
-            lower['U48i'] <- max(0,pars['U48i']-x$d$U48$sx*3)
-            upper['U48i'] <- pars['U48i']+x$d$U48$sx*3
-        } else if (x$d$U48$option==2){
-            if (x$d$U48$sx>0){
-                pars['U48i'] <- 1
-                lower['U48i'] <- 0
-                upper['U48i'] <- 20
-            } else {
-                stop('Zero uncertainty of measured 234/238 activity ratio')
-            }
-        }
-        if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            pars['ThUi'] <- x$d$ThU$x
-            lower['ThUi'] <- max(0,pars['ThUi']-x$d$ThU$sx*3)
-            upper['ThUi'] <- pars['ThUi']+x$d$ThU$sx*3
-        } else if (x$d$ThU$option==2){
-            if (x$d$ThU$sx>0){
-                pars['ThUi'] <- 1
-                lower['ThUi'] <- 0
-                upper['ThUi'] <- 20
-            } else {
-                stop('Zero uncertainty of measured 230/238 activity ratio')
-            }
-        }
     } else if (x$format<7){
-        
+        yda <- data2york(x,option=3)
+        yfita <- york(yda)
+        Pb6U8 <- -yfita$b[1]/yfita$a[1]
+        ydb <- data2york(x,option=4)
+        yfitb <- york(ydb)
+        if (anchor[1]==1){
+            pars['tt'] <- get.Pb206U238.age(x=Pb6U8)[1]
+            lower['tt'] <- pars['tt']/10
+            upper['tt'] <- pars['tt']*10
+            if (iratio('Pb206Pb204')[2]>0){
+                a0 <- iratio('Pb206Pb204')[1]
+                sa0 <- iratio('Pb206Pb204')[2]
+                pars['a0'] <- a0
+                lower['a0'] <- max(0,a0-sa0*3)
+                upper['a0'] <- a0+sa0*3
+            }
+            if (iratio('Pb207Pb204')[2]>0){
+                b0 <- iratio('Pb207Pb204')[1]
+                sb0 <- iratio('Pb207Pb204')[2]
+                pars['b0'] <- b0
+                lower['b0'] <- max(0,b0-sb0*3)
+                upper['b0'] <- b0+sb0*3
+            }
+        } else if (anchor[1]==2){
+            if (length(anchor)>2 && anchor[3]>0){
+                pars['tt'] <- anchor[2]
+                lower['tt'] <- pars['tt']-anchor[3]*3
+                upper['tt'] <- pars['tt']+anchor[3]*3
+            }
+            pars['a0'] <- 1/yfita$a[1]
+            lower['a0'] <- pars['a0']/10
+            upper['a0'] <- pars['a0']*10
+            pars['b0'] <- 1/yfitb$a[1]
+            lower['b0'] <- pars['b0']/10
+            upper['b0'] <- pars['b0']*10
+        } else {
+            pars['tt'] <- get.Pb206U238.age(x=Pb6U8)[1]
+            lower['tt'] <- pars['tt']/10
+            upper['tt'] <- pars['tt']*10
+            pars['a0'] <- 1/yfita$a[1]
+            lower['a0'] <- pars['a0']/10
+            upper['a0'] <- pars['a0']*10
+            pars['b0'] <- 1/yfitb$a[1]
+            lower['b0'] <- pars['b0']/10
+            upper['b0'] <- pars['b0']*10
+        }
     } else {
         
+    }
+    if (model==3){
+        pars['w'] <- 0.01
+        lower['w'] <- 0
+        upper['w'] <- 10
+    }
+    if (x$d$U48$option==1 && x$d$U48$sx>0){
+        pars['U48i'] <- x$d$U48$x
+        lower['U48i'] <- max(0,pars['U48i']-x$d$U48$sx*3)
+        upper['U48i'] <- pars['U48i']+x$d$U48$sx*3
+    } else if (x$d$U48$option==2){
+        if (x$d$U48$sx>0){
+            pars['U48i'] <- 1
+            lower['U48i'] <- 0
+            upper['U48i'] <- 20
+        } else {
+            stop('Zero uncertainty of measured 234/238 activity ratio')
+        }
+    }
+    if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+        pars['ThUi'] <- x$d$ThU$x
+        lower['ThUi'] <- max(0,pars['ThUi']-x$d$ThU$sx*3)
+        upper['ThUi'] <- pars['ThUi']+x$d$ThU$sx*3
+    } else if (x$d$ThU$option==2){
+        if (x$d$ThU$sx>0){
+            pars['ThUi'] <- 1
+            lower['ThUi'] <- 0
+            upper['ThUi'] <- 20
+        } else {
+            stop('Zero uncertainty of measured 230/238 activity ratio')
+        }
     }
     list(pars=pars,lower=lower,upper=upper)
 }
@@ -127,25 +166,62 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             tt <- pars['tt']
             a0 <- pars['a0']
         }
-        ta0w <- c('tt'=unname(tt),'a0'=unname(a0))
-        if (model==3){
-            ta0w['w'] <- pars['w']
+        ta0b0w <- c('tt'=unname(tt),'a0'=unname(a0))
+    } else if (x$format<7){
+        if (anchor[1]==1){
+            tt <- pars['tt']
+            if (iratio('Pb206Pb204')[2]>0){
+                a0 <- pars['a0']
+                LL <- LL + dnorm(x=a0,
+                                 mean=iratio('Pb206Pb204')[1],
+                                 sd=iratio('Pb206Pb204')[2],
+                                 log=TRUE)
+            } else {
+                a0 <- iratio('Pb206Pb204')[1]
+            }
+            if (iratio('Pb207Pb204')[2]>0){
+                b0 <- pars['b0']
+                LL <- LL + dnorm(x=b0,
+                                 mean=iratio('Pb207Pb204')[1],
+                                 sd=iratio('Pb207Pb204')[2],
+                                 log=TRUE)
+            } else {
+                b0 <- iratio('Pb207Pb204')[1]
+            }
+        } else if (anchor[1]==2){
+            a0 <- pars['a0']
+            b0 <- pars['b0']
+            if (length(anchor)>2 && anchor[3]>0){
+                tt <- pars['tt']
+                st <- anchor[3]
+                LL <- LL + dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
+            } else {
+                tt <- anchor[2]
+            }
+        } else {
+            tt <- pars['tt']
+            a0 <- pars['a0']
+            b0 <- pars['b0']
         }
-        LL <- LL + data2ludwigd(X,ta0w,exterr=exterr)$LL
-        if (x$d$U48$option==1 && x$d$U48$sx>0){
-            U48i <- pars['U48i']
-            LL <- LL + dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-        } else if (x$d$U48$option==2 && x$d$U48$sx>0){
-            pred <- mclean(tt=tt,d=X$d)
-            LL <- LL + dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-        }
-        if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            ThUi <- pars['ThUi']
-            LL <- LL + dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-        } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
-            pred <- mclean(tt=tt,d=X$d)
-            LL <- LL + dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-        }
+        ta0b0w <- c('tt'=unname(tt),'a0'=unname(a0),'b0'=unname(b0))
+    }
+    if (model==3){
+        ta0b0w['w'] <- pars['w']
+    }
+    LL <- LL + data2ludwigd(X,ta0b0w,exterr=exterr)$LL
+    if (x$d$U48$option==1 && x$d$U48$sx>0){
+        U48i <- pars['U48i']
+        LL <- LL + dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+    } else if (x$d$U48$option==2 && x$d$U48$sx>0){
+        pred <- mclean(tt=tt,d=X$d)
+        LL <- LL + dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+    }
+    if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+        ThUi <- pars['ThUi']
+        LL <- LL + dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+    } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
+        pred <- mclean(tt=tt,d=X$d)
+        LL <- LL + dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
     }
     -LL
 }
