@@ -98,11 +98,6 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
         if (model==3){
             ta0w['w'] <- exp(pars['log[w]'])
         }
-        if (any(is.nan(ta0w))){
-            ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@74@"]]));##:ess-bp-end:##
-            foo <- 1
-        }
         LL <- LL + data2ludwigd(X,ta0w,exterr=exterr)$LL
         if (x$d$U48$option==1 && x$d$U48$sx>0){
             U48i <- logit(pars['logit[U48i]'],m=m,M=M,inverse=TRUE)
