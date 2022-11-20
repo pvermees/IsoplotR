@@ -94,7 +94,55 @@ init.ludwigd <- function(x,model=1,anchor=0){
             upper['b0'] <- pars['b0']*10
         }
     } else {
-        
+        yd <- data2york(x,option=2)
+        yfit <- york(yd)
+        Pb6U8 <- -yfit$b[1]/yfit$a[1]
+        tt <- get.Pb206U238.age(x=Pb6U8)[1]
+        yda <- data2york(x,option=6,tt=tt)
+        yfita <- york(yda)
+        ydb <- data2york(x,option=7,tt=tt)
+        yfitb <- york(ydb)
+        if (anchor[1]==1){
+            pars['tt'] <- tt
+            lower['tt'] <- tt/10
+            upper['tt'] <- tt*10
+            if (iratio('Pb208Pb206')[2]>0){
+                a0 <- 1/iratio('Pb208Pb206')[1]
+                sa0 <- iratio('Pb208Pb206')[2]*a0^2
+                pars['a0'] <- a0
+                lower['a0'] <- max(0,a0-sa0*3)
+                upper['a0'] <- a0+sa0*3
+            }
+            if (iratio('Pb207Pb206')[2]>0){
+                b0 <- 1/iratio('Pb208Pb207')[1]
+                sb0 <- iratio('Pb208Pb207')[2]/b0^2
+                pars['b0'] <- b0
+                lower['b0'] <- max(0,b0-sb0*3)
+                upper['b0'] <- b0+sb0*3
+            }
+        } else if (anchor[1]==2){
+            if (length(anchor)>2 && anchor[3]>0){
+                pars['tt'] <- anchor[2]
+                lower['tt'] <- pars['tt']-anchor[3]*3
+                upper['tt'] <- pars['tt']+anchor[3]*3
+            }
+            pars['a0'] <- 1/yfita$a[1]
+            lower['a0'] <- pars['a0']/10
+            upper['a0'] <- pars['a0']*10
+            pars['b0'] <- 1/yfitb$a[1]
+            lower['b0'] <- pars['b0']/10
+            upper['b0'] <- pars['b0']*10
+        } else {
+            pars['tt'] <- tt
+            lower['tt'] <- tt/10
+            upper['tt'] <- tt*10
+            pars['a0'] <- 1/yfita$a[1]
+            lower['a0'] <- pars['a0']/10
+            upper['a0'] <- pars['a0']*10
+            pars['b0'] <- 1/yfitb$a[1]
+            lower['b0'] <- pars['b0']/10
+            upper['b0'] <- pars['b0']*10
+        }
     }
     if (model==3){
         pars['w'] <- 0.01
@@ -187,6 +235,43 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
                                  log=TRUE)
             } else {
                 b0 <- iratio('Pb207Pb204')[1]
+            }
+        } else if (anchor[1]==2){
+            a0 <- pars['a0']
+            b0 <- pars['b0']
+            if (length(anchor)>2 && anchor[3]>0){
+                tt <- pars['tt']
+                st <- anchor[3]
+                LL <- LL + dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
+            } else {
+                tt <- anchor[2]
+            }
+        } else {
+            tt <- pars['tt']
+            a0 <- pars['a0']
+            b0 <- pars['b0']
+        }
+        ta0b0w <- c('tt'=unname(tt),'a0'=unname(a0),'b0'=unname(b0))
+    } else {
+        if (anchor[1]==1){
+            tt <- pars['tt']
+            if (iratio('Pb208Pb206')[2]>0){
+                a0 <- pars['a0']
+                LL <- LL + dnorm(x=1/a0,
+                                 mean=iratio('Pb208Pb206')[1],
+                                 sd=iratio('Pb208Pb206')[2],
+                                 log=TRUE)
+            } else {
+                a0 <- 1/iratio('Pb208Pb206')[1]
+            }
+            if (iratio('Pb208Pb207')[2]>0){
+                b0 <- pars['b0']
+                LL <- LL + dnorm(x=1/b0,
+                                 mean=iratio('Pb208Pb207')[1],
+                                 sd=iratio('Pb208Pb207')[2],
+                                 log=TRUE)
+            } else {
+                b0 <- 1/iratio('Pb208Pb207')[1]
             }
         } else if (anchor[1]==2){
             a0 <- pars['a0']
