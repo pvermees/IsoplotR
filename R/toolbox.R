@@ -440,10 +440,12 @@ trace <- function(x){
 logit <- function(x,m=0,M=1,inverse=FALSE){
     out <- x
     if (inverse){
-        easy <- is.finite(x)
+        toobig <- x>1000
+        toosmall <- x<(-1000)
+        easy <- !(toobig|toosmall)
         out[easy] <- m + M*exp(x[easy])/(1+exp(x[easy]))
-        out[x==Inf] <- m + M
-        out[x==-Inf] <- m
+        out[toobig] <- m + M
+        out[toosmall] <- m
     } else {
         easy <- (x>m & x<M)
         out[easy] <- log((x[easy]-m)/(M-x[easy]))
