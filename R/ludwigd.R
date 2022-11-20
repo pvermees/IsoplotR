@@ -33,18 +33,26 @@ init.ludwigd <- function(x,model=1,anchor=0,m=0,M=20){
         } else if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
             out['log[t]'] <- log(anchor[2])
         }
-        if (x$d$U48$option!=0 && x$d$U48$sx>0){
-            if (x$d$U48$option==1){
+        if (x$d$U48$option!=0){
+            if (x$d$U48$option==1 && x$d$U48$sx>0){
                 out['logit[U48i]'] <- logit(x$d$U48$x,m=m,M=M)
             } else if (x$d$U48$option==2){
-                out['logit[U48i]'] <- logit(1,m=m,M=M)
+                if (x$d$U48$sx>0){
+                    out['logit[U48i]'] <- logit(1,m=m,M=M)
+                } else {
+                    stop('Zero uncertainty of measured 234/238 activity ratio')
+                }
             }
         }
-        if (x$d$ThU$option!=0 && x$d$ThU$sx>0){
-            if (x$d$ThU$option==1){
-                out['logit[ThUi]'] <- logit(x$d$ThU$x,m=m,M=M)
+        if (x$d$ThU$option!=0){
+            if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+                out['logit[ThUi]'] <- logit(x$d$ThU$x,m=0,M=20)
             } else if (x$d$ThU$option==2){
-                out['logit[ThUi]'] <- logit(1,m=m,M=M)
+                if (x$d$ThU$sx>0){
+                    out['logit[ThUi]'] <- logit(1,m=0,M=20)
+                } else {
+                    stop('Zero uncertainty of measured 230/238 activity ratio')
+                }
             }
         }
     }
@@ -52,39 +60,45 @@ init.ludwigd <- function(x,model=1,anchor=0,m=0,M=20){
 }
 
 LL.ludwigd <- function(pars,x,exterr=FALSE,anchor=0,m=0,M=20){
+    X <- x
+    if ('logit[U48i]' %in% names(pars)){
+        X$d$U48$x <- logit(pars['logit[U48i]'],m=m,M=M,inverse=TRUE)
+        X$d$U48$option <- 1
+    }
+    if ('logit[ThUi]' %in% names(pars)){
+        X$d$ThU$x <- logit(pars['logit[ThUi]'],m=m,M=M,inverse=TRUE)
+        X$d$ThU$option <- 1
+    }
+    LL <- 0
     if (x$format<4){
-        lta0 <- pars[c('log[t]','log[a0]')]
-        X <- x
-        if (x$d$U48$option!=0){
-            U48i <- logit(pars['logit[U48i]'],m=m,M=M,inverse=TRUE)
-            X$d$U48$x <- U48i
-            X$d$U48$option <- 1
-        }
-        if (x$d$ThU$option!=0){
-            ThUi <- logit(pars['logit[U48i]'],m=m,M=M,inverse=TRUE)
-            X$d$ThU$x <- ThUi
-            X$d$ThU$option <- 1
-        }
-        LL <- data2ludwigd(X,lta0,exterr=exterr)$LL
         if (anchor[1]==1){
-            LL <- LL + dnorm(x=exp(pars['log[a0]']),
-                             mean=iratio('Pb207Pb206')[1],
-                             sd=iratio('Pb207Pb206')[2],log=TRUE)
-        } else if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
-            LL <- LL + dnorm(x=exp(pars['log[t]']),mean=anchor[2],
-                             sd=ifelse(,anchor[3],0),log=TRUE)
+            a0 <- iratio('Pb207Pb206')[1]
+            sa0 <- iratio('Pb207Pb206')[2]
+            LL <- LL + dnorm(x=exp(pars['log[a0]']),mean=a0,sd=sa0,log=TRUE)
+            lta0 <- c(pars['log[t]'],'log[a0]'=log(a0))
+        } else if (anchor[1]==2){
+            tt <- anchor[2]
+            if (length(anchor)>2 && anchor[3]>0){
+                st <- anchor[3]
+                LL <- LL + dnorm(x=exp(pars['logit[t]']),mean=tt,sd=st,log=TRUE)
+            }
+            lta0 <- c('log[t]'=log(tt),pars['log[a0]'])
+        } else {
+            lta0 <- pars[c('log[t]','log[a0]')]
         }
-        if (!x$d$equilibrium){
-            pred <- mclean(tt=exp(pars['log[t]']),d=X$d)
-        }
+        LL <- LL + data2ludwigd(X,lta0,exterr=exterr)$LL
         if (x$d$U48$option==1 && x$d$U48$sx>0){
+            U48i <- logit(pars['logit[U48i]'],m=m,M=M,inverse=TRUE)
             LL <- LL + dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
         } else if (x$d$U48$option==2){
+            pred <- mclean(tt=exp(lta0['log[t]']),d=X$d)
             LL <- LL + dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
         }
         if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+            ThUi <- logit(pars['logit[ThUi]'],m=m,M=M,inverse=TRUE)
             LL <- LL + dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
         } else if (x$d$ThU$option==2){
+            pred <- mclean(tt=exp(lta0['log[t]']),d=X$d)
             LL <- LL + dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
         }
     }
