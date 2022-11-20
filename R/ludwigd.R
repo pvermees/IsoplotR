@@ -2,7 +2,9 @@
 ludwigd <- function(x,model=1,anchor=0,bayes=FALSE){
     if (x$format<4){
         init <- init.ludwigd(x,anchor=anchor)
-        fit <- optim(par=init,fn=LL.ludwigd,method="BFGS",
+        fit <- optim(par=init,fn=LL.ludwigd,method="L-BFGS-B",
+                     lower=c(init['tt']/10,init['a0']/10,0),
+                     upper=c(init['tt']*10,init['a0']*10,20),
                      hessian=TRUE,x=x,anchor=anchor)
     } else if (x$format<7){
         # TODO
@@ -24,32 +26,32 @@ init.ludwigd <- function(x,model=1,anchor=0){
         PbU0 <- -yfit$b[1]/yfit$a[1]
         out <- vector()
         if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
-            out['logit[t]'] <- logit(anchor[2],m=0,M=5000)
-            out['logit[a0]'] <- logit(yfit$a[1],m=0,M=2)
+            out['tt'] <- anchor[2]
+            out['a0'] <- yfit$a[1]
         } else if (anchor[1]==1 && iratio('Pb207Pb206')[2]>0){
-            out['logit[t]'] <- logit(get.Pb206U238.age(x=PbU0)[1],m=0,M=5000)
-            out['logit[a0]'] <- logit(iratio('Pb207Pb206')[1],m=0,M=2)
+            out['tt'] <- get.Pb206U238.age(x=PbU0)[1]
+            out['a0'] <- iratio('Pb207Pb206')[1]
         } else {
-            out['logit[t]'] <- logit(get.Pb206U238.age(x=PbU0)[1],m=0,M=5000)
-            out['logit[a0]'] <- logit(yfit$a[1],m=0,M=2)
+            out['tt'] <- get.Pb206U238.age(x=PbU0)[1]
+            out['a0'] <- yfit$a[1]
         }
         if (model==3){
-            pars['log[w]'] <- log(0.01)
+            pars['w'] <- 0.01
         }
         if (x$d$U48$option==1 && x$d$U48$sx>0){
-            out['logit[U48i]'] <- logit(x$d$U48$x,m=0,M=20)
+            out['U48i'] <- x$d$U48$x
         } else if (x$d$U48$option==2){
             if (x$d$U48$sx>0){
-                out['logit[U48i]'] <- logit(1,m=0,M=20)
+                out['U48i'] <- 1
             } else {
                 stop('Zero uncertainty of measured 234/238 activity ratio')
             }
         }
         if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            out['logit[ThUi]'] <- logit(x$d$ThU$x,m=0,M=20)
+            out['ThUi'] <- x$d$ThU$x
         } else if (x$d$ThU$option==2){
             if (x$d$ThU$sx>0){
-                out['logit[ThUi]'] <- logit(1,m=0,M=20)
+                out['ThUi'] <- 1
             } else {
                 stop('Zero uncertainty of measured 230/238 activity ratio')
             }
@@ -60,20 +62,20 @@ init.ludwigd <- function(x,model=1,anchor=0){
 
 LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
     X <- x
-    if ('logit[U48i]' %in% names(pars)){
-        X$d$U48$x <- logit(pars['logit[U48i]'],m=0,M=20,inverse=TRUE)
+    if ('U48i' %in% names(pars)){
+        X$d$U48$x <- pars['U48i']
         X$d$U48$option <- 1
     }
     if ('logit[ThUi]' %in% names(pars)){
-        X$d$ThU$x <- logit(pars['logit[ThUi]'],m=0,M=20,inverse=TRUE)
+        X$d$ThU$x <- pars['ThUi']
         X$d$ThU$option <- 1
     }
     LL <- 0
     if (x$format<4){
         if (anchor[1]==1){
-            tt <- logit(pars['logit[t]'],m=0,M=5000,inverse=TRUE)
+            tt <- pars['tt']
             if (iratio('Pb207Pb206')[2]>0){
-                a0 <- logit(pars['logit[a0]'],m=0,M=2,inverse=TRUE)
+                a0 <- pars['a0']
                 LL <- LL + dnorm(x=a0,
                                  mean=iratio('Pb207Pb206')[1],
                                  sd=iratio('Pb207Pb206')[2],
@@ -82,32 +84,32 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
                 a0 <- iratio('Pb207Pb206')[1]
             }
         } else if (anchor[1]==2){
-            a0 <- logit(pars['logit[a0]'],m=0,M=2,inverse=TRUE)
+            a0 <- pars['a0']
             if (length(anchor)>2 && anchor[3]>0){
-                tt <- logit(pars['logit[t]'],m=0,M=5000,inverse=TRUE)
+                tt <- pars['tt']
                 st <- anchor[3]
                 LL <- LL + dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
             } else {
                 tt <- anchor[2]
             }
         } else {
-            tt <- logit(pars['logit[t]'],m=0,M=5000,inverse=TRUE)
-            a0 <- logit(pars['logit[a0]'],m=0,M=2,inverse=TRUE)
+            tt <- pars['tt']
+            a0 <- pars['a0']
         }
         ta0w <- c('tt'=unname(tt),'a0'=unname(a0))
         if (model==3){
-            ta0w['w'] <- exp(pars['log[w]'])
+            ta0w['w'] <- pars['w']
         }
         LL <- LL + data2ludwigd(X,ta0w,exterr=exterr)$LL
         if (x$d$U48$option==1 && x$d$U48$sx>0){
-            U48i <- logit(pars['logit[U48i]'],m=m,M=M,inverse=TRUE)
+            U48i <- pars['U48i']
             LL <- LL + dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
         } else if (x$d$U48$option==2 && x$d$U48$sx>0){
             pred <- mclean(tt=tt,d=X$d)
             LL <- LL + dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
         }
         if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            ThUi <- logit(pars['logit[ThUi]'],m=m,M=M,inverse=TRUE)
+            ThUi <- pars['ThUi']
             LL <- LL + dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
         } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
             pred <- mclean(tt=tt,d=X$d)
