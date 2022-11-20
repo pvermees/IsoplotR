@@ -22,37 +22,36 @@ init.ludwigd <- function(x,model=1,anchor=0,m=0,M=20){
         yd <- data2york(x,option=2)
         yfit <- york(yd)
         PbU0 <- -yfit$b[1]/yfit$a[1]
-        lt <- log(get.Pb206U238.age(x=PbU0)[1])
-        la0 <- log(yfit$a[1])
-        out <- c('log[t]'=unname(lt),'log[a0]'=unname(la0))
+        out <- vector()
+        if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
+            out['log[t]'] <- log(anchor[2])
+            lot['log[a0]'] <- log(yfit$a[1])
+        } else if (anchor[1]==1 && iratio('Pb207Pb206')[2]>0){
+            out['log[t]'] <- log(get.Pb206U238.age(x=PbU0)[1])
+            out['log[a0]'] <- log(iratio('Pb207Pb206')[1])
+        } else {
+            out['log[t]'] <- log(get.Pb206U238.age(x=PbU0)[1])
+            out['log[a0]'] <- log(yfit$a[1])
+        }
         if (model==3){
             pars['log[w]'] <- log(0.01)
         }
-        if (anchor[1]==1 && iratio('Pb207Pb206')[2]>0){
-            out['log[a0]'] <- log(iratio('Pb207Pb206')[1])
-        } else if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
-            out['log[t]'] <- log(anchor[2])
-        }
-        if (x$d$U48$option!=0){
-            if (x$d$U48$option==1 && x$d$U48$sx>0){
-                out['logit[U48i]'] <- logit(x$d$U48$x,m=m,M=M)
-            } else if (x$d$U48$option==2){
-                if (x$d$U48$sx>0){
-                    out['logit[U48i]'] <- logit(1,m=m,M=M)
-                } else {
-                    stop('Zero uncertainty of measured 234/238 activity ratio')
-                }
+        if (x$d$U48$option==1 && x$d$U48$sx>0){
+            out['logit[U48i]'] <- logit(x$d$U48$x,m=m,M=M)
+        } else if (x$d$U48$option==2){
+            if (x$d$U48$sx>0){
+                out['logit[U48i]'] <- logit(1,m=m,M=M)
+            } else {
+                stop('Zero uncertainty of measured 234/238 activity ratio')
             }
         }
-        if (x$d$ThU$option!=0){
-            if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-                out['logit[ThUi]'] <- logit(x$d$ThU$x,m=0,M=20)
-            } else if (x$d$ThU$option==2){
-                if (x$d$ThU$sx>0){
-                    out['logit[ThUi]'] <- logit(1,m=0,M=20)
-                } else {
-                    stop('Zero uncertainty of measured 230/238 activity ratio')
-                }
+        if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+            out['logit[ThUi]'] <- logit(x$d$ThU$x,m=0,M=20)
+        } else if (x$d$ThU$option==2){
+            if (x$d$ThU$sx>0){
+                out['logit[ThUi]'] <- logit(1,m=0,M=20)
+            } else {
+                stop('Zero uncertainty of measured 230/238 activity ratio')
             }
         }
     }
@@ -72,71 +71,81 @@ LL.ludwigd <- function(pars,x,exterr=FALSE,anchor=0,m=0,M=20){
     LL <- 0
     if (x$format<4){
         if (anchor[1]==1){
-            a0 <- iratio('Pb207Pb206')[1]
-            sa0 <- iratio('Pb207Pb206')[2]
-            LL <- LL + dnorm(x=exp(pars['log[a0]']),mean=a0,sd=sa0,log=TRUE)
-            lta0 <- c(pars['log[t]'],'log[a0]'=log(a0))
-        } else if (anchor[1]==2){
-            tt <- anchor[2]
-            if (length(anchor)>2 && anchor[3]>0){
-                st <- anchor[3]
-                LL <- LL + dnorm(x=exp(pars['logit[t]']),mean=tt,sd=st,log=TRUE)
+            tt <- exp(pars['log[t]'])
+            if (iratio('Pb207Pb206')[2]>0){
+                a0 <- exp(pars['log[a0]'])
+                LL <- LL + dnorm(x=a0,
+                                 mean=iratio('Pb207Pb206')[1],
+                                 sd=iratio('Pb207Pb206')[2],
+                                 log=TRUE)
+            } else {
+                a0 <- iratio('Pb207Pb206')[1]
             }
-            lta0 <- c('log[t]'=log(tt),pars['log[a0]'])
+        } else if (anchor[1]==2){
+            a0 <- exp(pars['log[a0]'])
+            if (length(anchor)>2 && anchor[3]>0){
+                tt <- exp(pars['log[t]'])
+                st <- anchor[3]
+                LL <- LL + dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
+            } else {
+                tt <- anchor[2]
+            }
         } else {
-            lta0 <- pars[c('log[t]','log[a0]')]
+            tt <- exp(pars['log[t]'])
+            a0 <- exp(pars['log[a0]'])
         }
-        LL <- LL + data2ludwigd(X,lta0,exterr=exterr)$LL
+        ta0 <- c('tt'=unname(tt),'a0'=unname(a0))
+        LL <- LL + data2ludwigd(X,ta0,exterr=exterr)$LL
         if (x$d$U48$option==1 && x$d$U48$sx>0){
             U48i <- logit(pars['logit[U48i]'],m=m,M=M,inverse=TRUE)
             LL <- LL + dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-        } else if (x$d$U48$option==2){
-            pred <- mclean(tt=exp(lta0['log[t]']),d=X$d)
+        } else if (x$d$U48$option==2 && x$d$U48$sx>0){
+            pred <- mclean(tt=tt,d=X$d)
             LL <- LL + dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
         }
         if (x$d$ThU$option==1 && x$d$ThU$sx>0){
             ThUi <- logit(pars['logit[ThUi]'],m=m,M=M,inverse=TRUE)
             LL <- LL + dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-        } else if (x$d$ThU$option==2){
-            pred <- mclean(tt=exp(lta0['log[t]']),d=X$d)
+        } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
+            pred <- mclean(tt=tt,d=X$d)
             LL <- LL + dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
         }
     }
     -LL
 }
 
-data2ludwigd <- function(x,lta0b0w,exterr=FALSE){
+data2ludwigd <- function(x,ta0b0w,exterr=FALSE){
     out <- list()
     U <- iratio('U238U235')[1]
-    lt <- lta0b0w[1]
-    a0 <- lta0b0w[2]
+    tt <- ta0b0w[1]
+    a0 <- ta0b0w[2]
     ns <- length(x)
     zeros <- rep(0,ns)
     X <- zeros
     Y <- zeros
     K0 <- zeros
-    D <- mclean(tt=exp(lt),d=x$d,exterr=exterr)
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format%in%c(1,2,3)){
-        NP <- 2 # number of fit parameters (lt, a0)
+        NP <- 2 # number of fit parameters (tt, a0)
         NR <- 2 # number of isotopic ratios (X, Y)
     } else if (x$format%in%c(4,5,6)){
-        b0 <- lta0b0w[3]
+        b0 <- ta0b0w[3]
         Z <- zeros
         L0 <- zeros
-        NP <- 3 # lt, a0, b0
+        NP <- 3 # tt, a0, b0
         NR <- 3 # X, Y, Z
     } else if (x$format%in%c(7,8)){
-        b0 <- lta0b0w[3]
+        b0 <- ta0b0w[3]
         Z <- zeros
         W <- zeros
         L0 <- zeros
-        NP <- 3 # lt, a0, b0
+        NP <- 3 # tt, a0, b0
         NR <- 4 # X, Y, Z, W
     } else {
         stop('Incorrect input format.')
     }
-    np <- min(NP+1,length(lta0b0w))  # np = NP (no w) or NP+1 (with w)
-    if (np==(NP+1)) w <- lta0b0w[np] # model 3
+    np <- min(NP+1,length(ta0b0w))  # np = NP (no w) or NP+1 (with w)
+    if (np==(NP+1)) w <- ta0b0w[np] # model 3
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
@@ -180,63 +189,63 @@ data2ludwigd <- function(x,lta0b0w,exterr=FALSE){
                              GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
     }
     if (x$format%in%c(1,2,3)){
-        K0 <- X - D$Pb207U235 + exp(a0)*U*(D$Pb206U238 - Y)
-        A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*exp(a0)*U +
+        K0 <- X - D$Pb207U235 + a0*U*(D$Pb206U238 - Y)
+        A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U +
                K0%*%(O[i1,i2]+t(O[i2,i1])))
-        B <- -(exp(a0)*U*(O[i1,i1]+t(O[i1,i1]))*exp(a0)*U +
+        B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U +
                (O[i2,i2]+t(O[i2,i2])) +
-               exp(a0)*U*(O[i1,i2]+t(O[i1,i2])) +
-               (O[i2,i1]+t(O[i2,i1]))*exp(a0)*U)
+               a0*U*(O[i1,i2]+t(O[i1,i2])) +
+               (O[i2,i1]+t(O[i2,i1]))*a0*U)
         L <- as.vector(solve(B,A))
         c0 <- Y - D$Pb206U238 - L
-        K <- X - D$Pb207U235 - exp(a0)*U*c0
+        K <- X - D$Pb207U235 - a0*U*c0
         KLM <- c(K,L)
     } else if (x$format%in%c(4,5,6)){
-        K0 <- X - D$Pb207U235 - U*exp(b0)*Z
-        L0 <- Y - D$Pb206U238 - exp(a0)*Z
-        V <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*U*exp(b0) +
-               L0%*%(O[i1,i2]+t(O[i2,i1]))*U*exp(b0) +
-               K0%*%(O[i1,i2]+t(O[i2,i1]))*exp(a0) +
-               L0%*%(O[i2,i2]+t(O[i2,i2]))*exp(a0) +
+        K0 <- X - D$Pb207U235 - U*b0*Z
+        L0 <- Y - D$Pb206U238 - a0*Z
+        V <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*U*b0 +
+               L0%*%(O[i1,i2]+t(O[i2,i1]))*U*b0 +
+               K0%*%(O[i1,i2]+t(O[i2,i1]))*a0 +
+               L0%*%(O[i2,i2]+t(O[i2,i2]))*a0 +
                K0%*%(O[i1,i3]+t(O[i3,i1])) +
                L0%*%(O[i2,i3]+t(O[i3,i2])))
-        W <- -(U*exp(b0)*(O[i1,i1]+t(O[i1,i1]))*U*exp(b0) +
-               U*exp(b0)*(O[i1,i2]+t(O[i1,i2]))*exp(a0) +
-               U*exp(b0)*(O[i1,i3]+t(O[i1,i3])) +
-               exp(a0)*(O[i2,i1]+t(O[i2,i1]))*U*exp(b0) +
-               exp(a0)*(O[i2,i2]+t(O[i2,i2]))*exp(a0) +
-               exp(a0)*(O[i2,i3]+t(O[i2,i3])) +
-               (O[i3,i1]+t(O[i3,i1]))*U*exp(b0) +
-               (O[i3,i2]+t(O[i3,i2]))*exp(a0) +
+        W <- -(U*b0*(O[i1,i1]+t(O[i1,i1]))*U*b0 +
+               U*b0*(O[i1,i2]+t(O[i1,i2]))*a0 +
+               U*b0*(O[i1,i3]+t(O[i1,i3])) +
+               a0*(O[i2,i1]+t(O[i2,i1]))*U*b0 +
+               a0*(O[i2,i2]+t(O[i2,i2]))*a0 +
+               a0*(O[i2,i3]+t(O[i2,i3])) +
+               (O[i3,i1]+t(O[i3,i1]))*U*b0 +
+               (O[i3,i2]+t(O[i3,i2]))*a0 +
                (O[i3,i3]+t(O[i3,i3])))
         M <- as.vector(solve(W,V))
         c0 <- as.vector(Z - M)
-        K <- as.vector(X - D$Pb207U235 - U*exp(b0)*c0)
-        L <- as.vector(Y - D$Pb206U238 - exp(a0)*c0)
+        K <- as.vector(X - D$Pb207U235 - U*b0*c0)
+        L <- as.vector(Y - D$Pb206U238 - a0*c0)
         KLM <- c(K,L,M)
     } else if (x$format%in%c(7,8)){
         Wd <- diag(W)
-        K0 <- X - D$Pb207U235 - (Z-D$Pb208Th232)*U*W*exp(b0)
-        L0 <- Y - D$Pb206U238 - (Z-D$Pb208Th232)*W*exp(a0)
-        AA <- (Wd%*%O[i1,i1]%*%Wd)*(U*exp(b0))^2 +
-            (Wd%*%O[i2,i2]%*%Wd)*exp(a0)^2 + O[i3,i3] +
-            U*exp(a0)*exp(b0)*Wd%*%(O[i1,i2]+O[i2,i1])%*%Wd +
-            U*exp(b0)*(Wd%*%O[i1,i3]+O[i3,i1]%*%Wd) +
-            exp(a0)*(Wd%*%O[i2,i3]+O[i3,i2]%*%Wd)
-        BT <- t(U*exp(b0)*K0%*%O[i1,i1]%*%Wd +
-                exp(a0)*L0%*%O[i2,i2]%*%Wd +
-                exp(a0)*K0%*%O[i1,i2]%*%Wd +
-                U*exp(b0)*L0%*%O[i2,i1]%*%Wd +
+        K0 <- X - D$Pb207U235 - (Z-D$Pb208Th232)*U*W*b0
+        L0 <- Y - D$Pb206U238 - (Z-D$Pb208Th232)*W*a0
+        AA <- (Wd%*%O[i1,i1]%*%Wd)*(U*b0)^2 +
+            (Wd%*%O[i2,i2]%*%Wd)*a0^2 + O[i3,i3] +
+            U*a0*b0*Wd%*%(O[i1,i2]+O[i2,i1])%*%Wd +
+            U*b0*(Wd%*%O[i1,i3]+O[i3,i1]%*%Wd) +
+            a0*(Wd%*%O[i2,i3]+O[i3,i2]%*%Wd)
+        BT <- t(U*b0*K0%*%O[i1,i1]%*%Wd +
+                a0*L0%*%O[i2,i2]%*%Wd +
+                a0*K0%*%O[i1,i2]%*%Wd +
+                U*b0*L0%*%O[i2,i1]%*%Wd +
                 K0%*%O[i1,i3] + L0%*%O[i2,i3])
-        CC <- U*exp(b0)*Wd%*%O[i1,i1]%*%K0 +
-            exp(a0)*Wd%*%O[i2,i2]%*%L0 +
-            exp(a0)*Wd%*%O[i2,i1]%*%K0 +
-            U*exp(b0)*Wd%*%O[i1,i2]%*%L0 +
+        CC <- U*b0*Wd%*%O[i1,i1]%*%K0 +
+            a0*Wd%*%O[i2,i2]%*%L0 +
+            a0*Wd%*%O[i2,i1]%*%K0 +
+            U*b0*Wd%*%O[i1,i2]%*%L0 +
             O[i3,i1]%*%K0 + O[i3,i2]%*%L0
         M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
         c0 <- as.vector(Z - D$Pb208Th232 - M)
-        K <- as.vector(X - D$Pb207U235 - c0*exp(b0)*U*W)
-        L <- as.vector(Y - D$Pb206U238 - c0*exp(a0)*W)
+        K <- as.vector(X - D$Pb207U235 - c0*b0*U*W)
+        L <- as.vector(Y - D$Pb206U238 - c0*a0*W)
         KLM <- c(K,L,M)
     }
     out$c0 <- c0
