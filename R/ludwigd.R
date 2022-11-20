@@ -2,9 +2,8 @@
 ludwigd <- function(x,model=1,anchor=0,bayes=FALSE){
     if (x$format<4){
         init <- init.ludwigd(x,anchor=anchor)
-        fit <- optim(par=init,fn=LL.ludwigd,method="L-BFGS-B",
-                     lower=c(init['tt']/10,init['a0']/10,0),
-                     upper=c(init['tt']*10,init['a0']*10,20),
+        fit <- optim(par=init$pars,fn=LL.ludwigd,method="L-BFGS-B",
+                     lower=init$lower,upper=init$upper,
                      hessian=TRUE,x=x,anchor=anchor)
     } else if (x$format<7){
         # TODO
@@ -24,40 +23,68 @@ init.ludwigd <- function(x,model=1,anchor=0){
         yd <- data2york(x,option=2)
         yfit <- york(yd)
         PbU0 <- -yfit$b[1]/yfit$a[1]
-        out <- vector()
-        if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
-            out['tt'] <- anchor[2]
-            out['a0'] <- yfit$a[1]
-        } else if (anchor[1]==1 && iratio('Pb207Pb206')[2]>0){
-            out['tt'] <- get.Pb206U238.age(x=PbU0)[1]
-            out['a0'] <- iratio('Pb207Pb206')[1]
+        pars <- lower <- upper <- vector()
+        if (anchor[1]==2){
+            if (length(anchor)>2 && anchor[3]>0){
+                pars['tt'] <- anchor[2]
+                lower['tt'] <- pars['tt']-anchor[3]*3
+                upper['tt'] <- pars['tt']+anchor[3]*3
+            }
+            pars['a0'] <- yfit$a[1]
+            lower['a0'] <- pars['a0']/10
+            upper['a0'] <- pars['a0']*10
+        } else if (anchor[1]==1){
+            if (iratio('Pb207Pb206')[2]>0){
+                a0 <- iratio('Pb207Pb206')[1]
+                sa0 <- iratio('Pb207Pb206')[2]
+                pars['a0'] <- a0
+                lower['a0'] <- max(0,a0-sa0*3)
+                upper['a0'] <- a0+sa0*3
+            }
+            pars['tt'] <- get.Pb206U238.age(x=PbU0)[1]
+            lower['tt'] <- pars['tt']/10
+            upper['tt'] <- pars['tt']*10
         } else {
-            out['tt'] <- get.Pb206U238.age(x=PbU0)[1]
-            out['a0'] <- yfit$a[1]
+            pars['tt'] <- get.Pb206U238.age(x=PbU0)[1]
+            lower['tt'] <- pars['tt']/10
+            upper['tt'] <- pars['tt']*10            
+            pars['a0'] <- yfit$a[1]
+            lower['a0'] <- pars['a0']/10
+            upper['a0'] <- pars['a0']*10            
         }
         if (model==3){
             pars['w'] <- 0.01
+            lower['w'] <- 0
+            upper['w'] <- 10
         }
         if (x$d$U48$option==1 && x$d$U48$sx>0){
-            out['U48i'] <- x$d$U48$x
+            pars['U48i'] <- x$d$U48$x
+            lower['U48i'] <- max(0,pars['U48i']-x$d$U48$sx*3)
+            upper['U48i'] <- pars['U48i']+x$d$U48$sx*3
         } else if (x$d$U48$option==2){
             if (x$d$U48$sx>0){
-                out['U48i'] <- 1
+                pars['U48i'] <- 1
+                lower['U48i'] <- 0
+                upper['U48i'] <- 20
             } else {
                 stop('Zero uncertainty of measured 234/238 activity ratio')
             }
         }
         if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            out['ThUi'] <- x$d$ThU$x
+            pars['ThUi'] <- x$d$ThU$x
+            lower['ThUi'] <- max(0,pars['ThUi']-x$d$ThU$sx*3)
+            upper['ThUi'] <- pars['ThUi']+x$d$ThU$sx*3
         } else if (x$d$ThU$option==2){
             if (x$d$ThU$sx>0){
-                out['ThUi'] <- 1
+                pars['ThUi'] <- 1
+                lower['ThUi'] <- 0
+                upper['ThUi'] <- 20
             } else {
                 stop('Zero uncertainty of measured 230/238 activity ratio')
             }
         }
     }
-    out
+    list(pars=pars,lower=lower,upper=upper)
 }
 
 LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
