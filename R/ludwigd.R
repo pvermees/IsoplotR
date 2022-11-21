@@ -194,7 +194,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             tt <- pars['tt']
             if (iratio('Pb207Pb206')[2]>0){
                 a0 <- pars['a0']
-                LL <- LL + dnorm(x=a0,
+                LL <- LL - dnorm(x=a0,
                                  mean=iratio('Pb207Pb206')[1],
                                  sd=iratio('Pb207Pb206')[2],
                                  log=TRUE)
@@ -206,7 +206,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             if (length(anchor)>2 && anchor[3]>0){
                 tt <- pars['tt']
                 st <- anchor[3]
-                LL <- LL + dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
+                LL <- LL - dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
             } else {
                 tt <- anchor[2]
             }
@@ -220,7 +220,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             tt <- pars['tt']
             if (iratio('Pb206Pb204')[2]>0){
                 a0 <- pars['a0']
-                LL <- LL + dnorm(x=a0,
+                LL <- LL - dnorm(x=a0,
                                  mean=iratio('Pb206Pb204')[1],
                                  sd=iratio('Pb206Pb204')[2],
                                  log=TRUE)
@@ -229,7 +229,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             }
             if (iratio('Pb207Pb204')[2]>0){
                 b0 <- pars['b0']
-                LL <- LL + dnorm(x=b0,
+                LL <- LL - dnorm(x=b0,
                                  mean=iratio('Pb207Pb204')[1],
                                  sd=iratio('Pb207Pb204')[2],
                                  log=TRUE)
@@ -242,7 +242,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             if (length(anchor)>2 && anchor[3]>0){
                 tt <- pars['tt']
                 st <- anchor[3]
-                LL <- LL + dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
+                LL <- LL - dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
             } else {
                 tt <- anchor[2]
             }
@@ -257,7 +257,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             tt <- pars['tt']
             if (iratio('Pb208Pb206')[2]>0){
                 a0 <- pars['a0']
-                LL <- LL + dnorm(x=1/a0,
+                LL <- LL - dnorm(x=1/a0,
                                  mean=iratio('Pb208Pb206')[1],
                                  sd=iratio('Pb208Pb206')[2],
                                  log=TRUE)
@@ -266,7 +266,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             }
             if (iratio('Pb208Pb207')[2]>0){
                 b0 <- pars['b0']
-                LL <- LL + dnorm(x=1/b0,
+                LL <- LL - dnorm(x=1/b0,
                                  mean=iratio('Pb208Pb207')[1],
                                  sd=iratio('Pb208Pb207')[2],
                                  log=TRUE)
@@ -279,7 +279,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             if (length(anchor)>2 && anchor[3]>0){
                 tt <- pars['tt']
                 st <- anchor[3]
-                LL <- LL + dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
+                LL <- LL - dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
             } else {
                 tt <- anchor[2]
             }
@@ -293,22 +293,26 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
     if (model==3){
         ta0b0w['w'] <- pars['w']
     }
-    LL <- LL + data2ludwigd(X,ta0b0w,exterr=exterr)$LL
+    if (model==2){
+        LL <- LL + LL.ludwig.model2(ta0b0w,X)
+    } else {
+        LL <- LL + data2ludwigd(X,ta0b0w,exterr=exterr)$LL
+    }
     if (x$d$U48$option==1 && x$d$U48$sx>0){
         U48i <- pars['U48i']
-        LL <- LL + dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+        LL <- LL - dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
     } else if (x$d$U48$option==2 && x$d$U48$sx>0){
         pred <- mclean(tt=tt,d=X$d)
-        LL <- LL + dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+        LL <- LL - dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
     }
     if (x$d$ThU$option==1 && x$d$ThU$sx>0){
         ThUi <- pars['ThUi']
-        LL <- LL + dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        LL <- LL - dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
     } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
         pred <- mclean(tt=tt,d=X$d)
-        LL <- LL + dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        LL <- LL - dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
     }
-    -LL
+    LL
 }
 
 data2ludwigd <- function(x,ta0b0w,exterr=FALSE){
@@ -448,7 +452,7 @@ data2ludwigd <- function(x,ta0b0w,exterr=FALSE){
     out$c0 <- c0
     out$SS <- KLM%*%O%*%KLM
     detED <- determinant(ED,logarithm=TRUE)$modulus
-    out$LL <- -(NP*ns*log(2*pi) + detED + out$SS)/2
+    out$LL <- (NP*ns*log(2*pi) + detED + out$SS)/2
     out
 }
 
@@ -468,4 +472,83 @@ get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
     }
     dEdx <- w^2
     dEdx*J%*%t(J)
+}
+
+LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
+    tt <- ta0b0['tt']
+    a0 <- ta0b0['a0']
+    nn <- length(x)
+    if (x$format<4){
+        xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
+        xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
+        yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
+        a <- a0
+        b <- (yr-a0)/xr
+        # sum of the squared Deming distances:
+        SS <- sum(((xy[,'Y']-b*xy[,'X']-a)^2)/(1+b^2))
+        if (exterr){
+            D <- mclean(tt,d=x$d,exterr=exterr)
+            dypdxr <- (a0-yr)*xy[,'X',drop=FALSE]/xr^2
+            dypdyr <- xy[,'X',drop=FALSE]/xr
+            dxrdPbU <- -xr^2
+            dyrdPbPb <- 1
+            dPbUdl <- rep(0,7)
+            dPbPbdl <- rep(0,7)
+            dPbUdl[1] <- D$dPb206U238dl38
+            dPbUdl[3] <- D$dPb206U238dl34
+            dPbUdl[6] <- D$dPb206U238dl30
+            dPbUdl[7] <- D$dPb206U238dl26
+            dPbPbdl[1] <- D$dPb207Pb206dl38
+            dPbPbdl[2] <- D$dPb207Pb206dl35
+            dPbPbdl[3] <- D$dPb207Pb206dl34
+            dPbPbdl[5] <- D$dPb207Pb206dl31
+            dPbPbdl[6] <- D$dPb207Pb206dl30
+            dPbPbdl[7] <- D$dPb207Pb206dl26
+            J <- (dypdxr*dxrdPbU)%*%dPbUdl + (dypdyr*dyrdPbPb)%*%dPbPbdl
+            covmat <- diag(SS/(nn-2),nn,nn) + J%*%getEl()%*%t(J)
+            LL <- LL.norm(dy,covmat)
+        } else {
+            LL <- SS2LL(SS=SS,nn=nn)
+        }
+    } else {
+        b0 <- ta0b0['b0']
+        if (x$format<7) xy <- get.UPb.isochron.ratios.204(x)
+        else xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+        x6 <- xy[,1,drop=FALSE] # U238Pb206
+        y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
+        x7 <- xy[,3,drop=FALSE] # U235Pb207
+        y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
+        r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
+        r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
+        y6p <- (r86-x6)/(a0*r86)
+        y7p <- (r57-x7)/(b0*r57)
+        dy <- cbind(y6-y6p,y7-y7p)
+        E <- stats::cov(dy)
+        if (exterr){
+            D <- mclean(tt=tt,d=x$d,exterr=exterr)
+            dy6pd68 <- -x6/a0
+            dy7pd75 <- -x7/b0
+            d68dl <- matrix(0,1,7)
+            d68dl[1] <- D$dPb206U238dl38
+            d68dl[3] <- D$dPb206U238dl34
+            d68dl[6] <- D$dPb206U238dl30
+            d68dl[7] <- D$dPb206U238dl26
+            d75dl <- matrix(0,1,7)
+            d75dl[2] <- D$dPb207U235dl35
+            d75dl[5] <- D$dPb207U235dl31
+            J <- matrix(0,2*nn,7)
+            J[1:nn,] <- dy6pd68%*%d68dl
+            J[nn+(1:nn),] <- dy7pd75%*%d75dl
+            EE <- matrix(0,2*nn,2*nn)
+            diag(EE)[1:nn] <- E[1,1]
+            diag(EE)[nn+(1:nn)] <- E[2,2]
+            diag(EE[1:nn,nn+(1:nn)]) <- E[1,2]
+            diag(EE[nn+(1:nn),1:nn]) <- E[2,1]
+            covmat <- EE + J %*% getEl() %*% t(J)
+            LL <- LL.norm(c(y6-y6p,y7-y7p),covmat)
+        } else {
+            LL <- sum(apply(dy,1,LL.norm,covmat=E))
+        }
+    }
+    LL
 }
