@@ -485,15 +485,25 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         a <- a0
         b <- (yr-a0)/xr
         # sum of the squared Deming distances:
-        SS <- sum(((xy[,'Y']-b*xy[,'X']-a)^2)/(1+b^2))
+        num <- (xy[,'Y']-b*xy[,'X']-a)^2
+        den <- 1+b^2
+        SS <- sum(num/den) # = sum(d^2)
         if (exterr){
             D <- mclean(tt,d=x$d,exterr=exterr)
-            dypdxr <- (a0-yr)*xy[,'X',drop=FALSE]/xr^2
-            dypdyr <- xy[,'X',drop=FALSE]/xr
+            dddnum <- sqrt(den/num)/2
+            dddden <- -dddnum*num/den^2
+            dnumdb <- 2*(xy[,'Y']-b*xy[,'X']-a)
+            ddendb <- 2*b
+            dbdxr <- (a-yr)/xr^2
+            dbdyr <- 1/xr
+            dnumdxr <- dnumdb*dbdxr
+            ddendxr <- ddendb*dbdxr
+            dnumdyr <- dnumdb*dbdyr
+            ddendyr <- ddendb*dbdyr
+            dddxr <- (dnumdxr*den - num*ddendxr)/den^2
             dxrdPbU <- -xr^2
             dyrdPbPb <- 1
-            dPbUdl <- rep(0,7)
-            dPbPbdl <- rep(0,7)
+            dPbUdl <- dPbPbdl <- rep(0,7)
             dPbUdl[1] <- D$dPb206U238dl38
             dPbUdl[3] <- D$dPb206U238dl34
             dPbUdl[6] <- D$dPb206U238dl30
