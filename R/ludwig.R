@@ -59,16 +59,13 @@
 #' @return
 #' \describe{
 #'
-#' \item{LL}{the log likelihood of the discordia fit}
-#'
 #' \item{par}{a vector with the lower concordia intercept, the common
-#' Pb ratios and (if \code{model=3}) the dispersion parameter}
+#' Pb ratios, the dispersion parameter (if \code{model=3}), and the
+#' initial \eqn{{}^{234}}U/\eqn{{}^{238}}U and
+#' \eqn{{}^{230}}Th/\eqn{{}^{238}}U activity ratio (in the presence of
+#' initial disequilibrium).}
 #'
 #' \item{cov}{the covariance matrix of \code{par}}
-#'
-#' \item{logpar}{the logarithms of \code{par}}
-#'
-#' \item{logcov}{the logarithms of \code{cov}}
 #'
 #' \item{df}{the degrees of freedom of the model fit (\eqn{n-2} if
 #' \code{x$format<4} or \eqn{2n-3} if \code{x$format>3}, where \eqn{n}
@@ -119,46 +116,51 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE){
     }
     out$cov <- MASS::ginv(hess)
     dimnames(out$cov) <- dimnames(hess)
-    nominal <- names(out$par)[names(out$par) %ni% names(fit$par)]
-    out$cov[nominal,nominal] <- 0
-    diag(out$cov)[nominal] <- am$sx[nominal]^2
+    anchored <- names(out$par)[names(out$par) %ni% names(fit$par)]
+    out$cov[anchored,anchored] <- 0
+    diag(out$cov)[anchored] <- am$sx[anchored]^2
     mswd <- mswd.lud(out$par,x=x,anchor=anchor,exterr=exterr)
     out$model <- model
     c(out,mswd)
 }
 
 anchormerge <- function(pars,x,anchor=0){
-    out <- list()
-    out$x <- pars
-    out$sx <- 0*pars
+    X <- pars
+    sX <- 0*pars
     if (anchor[1]==2){
-        out$x['t'] <- anchor[2]
-        out$sx['t'] <- ifelse(length(anchor>2),anchor[3],0)
+        X['t'] <- anchor[2]
+        sX['t'] <- ifelse(length(anchor)>2,anchor[3],0)
     }
     if (anchor[1]==1){
         if (x$format<4){
-            out$x['a0'] <- iratio('Pb207Pb206')[1]
-            out$sx['a0'] <- iratio('Pb207Pb206')[2]
+            X['a0'] <- iratio('Pb207Pb206')[1]
+            sX['a0'] <- iratio('Pb207Pb206')[2]
         } else if (x$format<7){
-            out$x['a0'] <- iratio('Pb206Pb204')[1]
-            out$x['b0'] <- iratio('Pb207Pb204')[1]
-            out$sx['a0'] <- iratio('Pb206Pb204')[2]
-            out$sx['b0'] <- iratio('Pb207Pb204')[2]
+            X['a0'] <- iratio('Pb206Pb204')[1]
+            X['b0'] <- iratio('Pb207Pb204')[1]
+            sX['a0'] <- iratio('Pb206Pb204')[2]
+            sX['b0'] <- iratio('Pb207Pb204')[2]
         } else {
-            out$x['a0'] <- 1/iratio('Pb208Pb206')[1]
-            out$x['b0'] <- 1/iratio('Pb208Pb207')[1]
-            out$sx['a0'] <- iratio('Pb208Pb206')[1]*out$x['a0']^2
-            out$sx['b0'] <- iratio('Pb208Pb207')[1]*out$x['b0']^2
+            X['a0'] <- 1/iratio('Pb208Pb206')[1]
+            X['b0'] <- 1/iratio('Pb208Pb207')[1]
+            sX['a0'] <- iratio('Pb208Pb206')[1]*X['a0']^2
+            sX['b0'] <- iratio('Pb208Pb207')[1]*X['b0']^2
         }
     }
     if (x$d$U48$option==1){
-        out$x['U48i'] <- x$d$U48$x
-        out$sx['U48i'] <- ifelse(is.null(x$d$U48$sx),0,x$d$U48$sx)
+        X['U48i'] <- x$d$U48$x
+        sX['U48i'] <- ifelse(is.null(x$d$U48$sx),0,x$d$U48$sx)
     }
     if (x$d$ThU$option==1){
-        out$x['ThUi'] <- x$d$ThU$x
-        out$sx['ThUi'] <- ifelse(is.null(x$d$ThU$sx),0,x$d$ThU$sx)
+        X['ThUi'] <- x$d$ThU$x
+        sX['ThUi'] <- ifelse(is.null(x$d$ThU$sx),0,x$d$ThU$sx)
     }
+    sortednames <- c('t','a0','b0','w','U48i','ThUi')
+    pnames <- names(X)
+    snames <- sortednames[which(sortednames %in% pnames)]
+    out <- list()
+    out$x <- X[snames]
+    out$sx <- sX[snames]
     out
 }
 

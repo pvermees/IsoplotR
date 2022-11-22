@@ -2,21 +2,15 @@
 % Please edit documentation in R/ludwig.R
 \name{ludwig}
 \alias{ludwig}
-\alias{ludwig.default}
 \title{Linear regression of U-Pb data with correlated errors, taking
 into account decay constant uncertainties.}
 \usage{
-ludwig(x, ...)
+ludwig(x, model = 1, anchor = 0, exterr = FALSE)
 
-\method{ludwig}{default}(x, exterr = FALSE, model = 1, anchor = 0, ...)
+ludwig(x, model = 1, anchor = 0, exterr = FALSE)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
-
-\item{...}{optional arguments}
-
-\item{exterr}{propagate external sources of
-uncertainty (i.e. decay constants)?}
 
 \item{model}{one of three regression models:
 
@@ -47,20 +41,22 @@ stored in \code{settings('iratio',...)}.
 
 If \code{anchor[1]=2}: force the isochron line to intersect the
 concordia line at an age equal to \code{anchor[2]}.}
+
+\item{exterr}{propagate external sources of
+uncertainty (i.e. decay constants)?}
+
+\item{...}{optional arguments}
 }
 \value{
 \describe{
 
-\item{LL}{the log likelihood of the discordia fit}
-
 \item{par}{a vector with the lower concordia intercept, the common
-Pb ratios and (if \code{model=3}) the dispersion parameter}
+Pb ratios, the dispersion parameter (if \code{model=3}), and the
+initial \eqn{{}^{234}}U/\eqn{{}^{238}}U and
+\eqn{{}^{230}}Th/\eqn{{}^{238}}U activity ratio (in the presence of
+initial disequilibrium).}
 
 \item{cov}{the covariance matrix of \code{par}}
-
-\item{logpar}{the logarithms of \code{par}}
-
-\item{logcov}{the logarithms of \code{cov}}
 
 \item{df}{the degrees of freedom of the model fit (\eqn{n-2} if
 \code{x$format<4} or \eqn{2n-3} if \code{x$format>3}, where \eqn{n}
