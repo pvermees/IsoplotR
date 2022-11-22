@@ -474,6 +474,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     U <- iratio('U238U235')[1]
     tt <- ta0b0w['t']
     a0 <- ta0b0w['a0']
+    disp <- 'w' %in% names(ta0b0w)
     ns <- length(x)
     zeros <- rep(0,ns)
     X <- zeros
@@ -499,8 +500,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     } else {
         stop('Incorrect input format.')
     }
-    np <- min(NP+1,length(ta0b0w))  # np = NP (no w) or NP+1 (with w)
-    if (np==(NP+1)) w <- ta0b0w['w'] # model 3
+    if (disp) w <- ta0b0w['w']
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
@@ -528,7 +528,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     }
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     ED <- J%*%E%*%t(J)
-    if (np==(NP+1)){ # fit overdispersion
+    if (disp){ # fit overdispersion
         Ew <- get.Ewd(w=w,format=x$format,ns=ns,D=D)
         ED <- ED + Ew
     }
