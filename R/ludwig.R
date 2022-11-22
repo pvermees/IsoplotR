@@ -169,7 +169,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
     if (x$format<4){
         yd <- data2york(x,option=2)
         yfit <- york(yd)
-        PbU0 <- -yfit$b[1]/yfit$a[1]
+        PbU0 <- abs(yfit$b[1]/yfit$a[1])
         if (anchor[1]==1){
             pars['t'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['t'] <- pars['t']/10
@@ -201,7 +201,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
     } else if (x$format<7){
         yda <- data2york(x,option=3)
         yfita <- york(yda)
-        Pb6U8 <- -yfita$b[1]/yfita$a[1]
+        Pb6U8 <- abs(yfita$b[1]/yfita$a[1])
         ydb <- data2york(x,option=4)
         yfitb <- york(ydb)
         if (anchor[1]==1){
@@ -248,7 +248,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
     } else {
         yd <- data2york(x,option=2)
         yfit <- york(yd)
-        Pb6U8 <- -yfit$b[1]/yfit$a[1]
+        Pb6U8 <- abs(yfit$b[1]/yfit$a[1])
         tt <- get.Pb206U238.age(x=Pb6U8)[1]
         yda <- data2york(x,option=6,tt=tt)
         yfita <- york(yda)
