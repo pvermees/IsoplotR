@@ -360,63 +360,6 @@ blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
     blockinverse(AA=ABDE,BB=CF,CC=GH,DD=II,invAA=invABDE,doall=TRUE)
 }
 
-# Optimise with some fixed parameters 
-# Like optim, but with option to fix some parameters.
-# parms: Parameters to potentially optimize in fn
-# fixed: A vector of TRUE/FALSE values indicating which parameters in
-#   parms to hold constant (not optimize). If TRUE, the corresponding
-#   parameter in fn() is fixed. Otherwise it's variable and optimised over.
-# lower, upper: a vector with the lower and upper ends of the search
-#   ranges of the free parameters, respectively
-# Originally written by Barry Rowlingson, modified by PV
-optifix <- function(parms, fixed, fn, gr = NULL, ...,
-                    method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), 
-                    lower = -Inf, upper = Inf, control = list(), hessian = FALSE){
-    force(fn)
-    force(fixed) 
-    .npar <- length(parms) 
-    .fixValues <- parms[fixed]
-    names(.fixValues) <- names(parms)[fixed]
-    .parStart <- parms[!fixed]
-    names(.parStart) <- names(parms)[!fixed]
-  
-    .fn <- function(parms,pnames=names(parms),...){
-        .par <- rep(NA,sum(!fixed))
-        .par[!fixed] <- parms
-        .par[fixed] <- .fixValues
-        names(.par) <- pnames
-        fn(.par,...)
-    }
-
-    if(!is.null(gr)){
-        .gr <- function(parms,pnames=names(parms),...){
-            .gpar <- rep(NA,sum(!fixed))
-            .gpar[!fixed] <- parms
-            .gpar[fixed] <- .fixValues
-            names(.gpar) <- pnames
-            gr(.gpar,...)[!fixed]
-        }
-    } else {
-        .gr <- NULL
-    }
-
-    .opt <- stats::optim(.parStart,.fn,.gr,...,method=method,
-                        lower=lower,upper=upper,
-                        control=control,hessian=hessian) 
-    
-    .opt$fullpars <- rep(NA,sum(!fixed)) 
-    .opt$fullpars[fixed] <- .fixValues 
-    .opt$fullpars[!fixed] <- .opt$par
-    names(.opt$fullpars) <- names(parms)
-    .opt$fixed <- fixed
-
-    # remove fullpars (PV)
-    .opt$par <- .opt$fullpars
-    .opt$fullpars <- NULL
-    
-    return(.opt)
-}
-
 '%ni%' <- function(x,y)!('%in%'(x,y))
 
 clear <- function(x,...){
