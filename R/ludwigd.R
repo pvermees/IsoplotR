@@ -482,23 +482,18 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
-        dd <- deming(aa=a0,bb=(yr-a0)/xr,xx=xy[,'X'],yy=xy[,'Y'])
-        SS <- sum(dd^2) # = sum(d^2)
+        xx <- xy[,'X',drop=FALSE]
+        yy <- xy[,'Y',drop=FALSE]
+        dem <- deming(a=a0,b=(yr-a0)/xr,x=xx,y=yy)
+        SS <- sum(dem$d^2) # = sum(d^2)
         if (exterr){
             D <- mclean(tt,d=x$d,exterr=exterr)
-            dnumdb <- 2*(b*xy[,'X',drop=FALSE]+a-xy[,'Y',drop=FALSE])*
-                xy[,'X',drop=FALSE]
-            ddendb <- 2*b
             dbdxr <- (a0-yr)/xr^2
             dbdyr <- 1/xr
-            dnumdxr <- dnumdb*dbdxr
-            ddendxr <- ddendb*dbdxr
-            dnumdyr <- dnumdb*dbdyr
-            ddendyr <- ddendb*dbdyr
-            dddxr <- (0.5/d)*(dnumdxr*den-num*ddendxr)/den^2
-            dddyr <- (0.5/d)*(dnumdyr*den-num*ddendyr)/den^2
             dxrdPbU <- -xr^2
             dyrdPbPb <- 1
+            dddPbU <- dem$dddb*dbdxr*dxrdPbU
+            dddPbPb <- dem$dddb*dbdyr*dyrdPbPb
             dPbUdl <- dPbPbdl <- rep(0,7)
             dPbUdl[1] <- D$dPb206U238dl38
             dPbUdl[3] <- D$dPb206U238dl34
@@ -510,9 +505,9 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
             dPbPbdl[5] <- D$dPb207Pb206dl31
             dPbPbdl[6] <- D$dPb207Pb206dl30
             dPbPbdl[7] <- D$dPb207Pb206dl26
-            J <- (dddxr*dxrdPbU)%*%dPbUdl + (dddyr*dyrdPbPb)%*%dPbPbdl
+            J <- dddPbU%*%dPbUdl + dddPbPb%*%dPbPbdl
             covmat <- diag(SS/(nn-2),nn,nn) + J%*%getEl()%*%t(J)
-            LL <- LL.norm(dd,covmat)
+            LL <- LL.norm(as.vector(dem$d),covmat)
         } else {
             LL <- SS2LL(SS=SS,nn=nn)
         }
@@ -526,14 +521,17 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
         r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
-        d6 <- deming(aa=1/a0,bb=-1/(a0*r86),xx=x6,yy=y6)
-        d7 <- deming(aa=1/b0,bb=-1/(b0*r57),xx=x7,yy=y7)
-        dd <- cbind(d6,d7)
-        E <- stats::cov(dd)
+        dem6 <- deming(a=1/a0,b=-1/(a0*r86),x=x6,y=y6)
+        dem7 <- deming(a=1/b0,b=-1/(b0*r57),x=x7,y=y7)
+        E <- stats::cov(cbind(dem6$d,dem7$d))
         if (exterr){
             D <- mclean(tt=tt,d=x$d,exterr=exterr)
-            dy6pd68 <- -x6/a0
-            dy7pd75 <- -x7/b0
+            dbd86 <- 1/(a0*r86^2)
+            dbd57 <- 1/(b0*r57^2)
+            dr68d86 <- -r86^2
+            dr57d75 <- -r57^2
+            dd6d68 <- dem6$dddb*dbd86*dr68d86
+            dd7d75 <- dem7$dddb*dbd57*dr57d75
             d68dl <- matrix(0,1,7)
             d68dl[1] <- D$dPb206U238dl38
             d68dl[3] <- D$dPb206U238dl34
@@ -543,16 +541,18 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
             d75dl[2] <- D$dPb207U235dl35
             d75dl[5] <- D$dPb207U235dl31
             J <- matrix(0,2*nn,7)
-            J[1:nn,] <- dy6pd68%*%d68dl
-            J[nn+(1:nn),] <- dy7pd75%*%d75dl
+            J[1:nn,] <- dd6d68%*%d68dl
+            J[nn+(1:nn),] <- dd7d75%*%d75dl
             EE <- matrix(0,2*nn,2*nn)
             diag(EE)[1:nn] <- E[1,1]
             diag(EE)[nn+(1:nn)] <- E[2,2]
             diag(EE[1:nn,nn+(1:nn)]) <- E[1,2]
             diag(EE[nn+(1:nn),1:nn]) <- E[2,1]
             covmat <- EE + J %*% getEl() %*% t(J)
-            LL <- LL.norm(c(y6-y6p,y7-y7p),covmat)
+            dd <- c(dem6$d,dem7$d)
+            LL <- LL.norm(dd,covmat)
         } else {
+            dd <- cbind(dem6$d,dem7$d)
             LL <- sum(apply(dd,1,LL.norm,covmat=E))
         }
     }

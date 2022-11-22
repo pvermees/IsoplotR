@@ -455,8 +455,13 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
     out
 }
 
-deming <- function(aa,bb,xx,yy){
-    num <- (bb*xx+aa-yy)^2
-    den <- 1+bb^2
-    sqrt(num/den)
+deming <- function(a,b,x,y){
+    out <- list()
+    N <- (b*x+a-y)^2
+    D <- 1+b^2
+    out$d <- sqrt(N/D)
+    dNdb <- 2*(b*x+a-y)*x
+    dDdb <- 2*b
+    out$dddb <- ((D*dNdb-N*dDdb)/D^2)/(2*out$d)
+    out
 }
