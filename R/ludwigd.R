@@ -1,18 +1,64 @@
 # Ludwig regression with initial disequilibrium
 ludwigd <- function(x,model=1,anchor=0,exterr=FALSE,bayes=FALSE){
-    init <- init.ludwigd(x,model=model,anchor=anchor)
+    init <- init.ludwigd(x,model=model,anchor=anchor,hessian=FALSE)
     fit <- optim(par=init$pars,fn=LL.ludwigd,method="L-BFGS-B",
-                 lower=init$lower,upper=init$upper,hessian=TRUE,
+                 lower=init$lower,upper=init$upper,hessian=FALSE,
                  x=x,anchor=anchor,model=model,exterr=exterr)
-    if (det(fit$hessian)<0){
+    out <- fit
+    am <- anchormerge(fit$par,x,anchor=anchor)
+    out$par <- am$x
+    hess <- optimHess(par=out$par,fn=LL.ludwigd,
+                      x=x,anchor=anchor,model=model,
+                      exterr=exterr,hessian=TRUE)
+    if (det(hess)<0){
         warning('Ill-conditioned Hessian, replaced by ',
                 'nearest positive definite matrix')
-        fit$hessian <- nearPD(fit$hessian)
+        hess <- nearPD(hess)
     }
-    fit
+    out$cov <- MASS::ginv(hess)
+    dimnames(out$cov) <- dimnames(hess)
+    nominal <- names(out$par)[!(names(out$par) %in% names(fit$par))]
+    out$cov[nominal,nominal] <- 0
+    diag(out$cov)[nominal] <- am$sx[nominal]^2
+    out
 }
 
-init.ludwigd <- function(x,model=1,anchor=0){
+anchormerge <- function(pars,x,anchor=0){
+    out <- list()
+    out$x <- pars
+    out$sx <- 0*pars
+    if (anchor[1]==2){
+        out$x['tt'] <- anchor[2]
+        out$sx['tt'] <- ifelse(length(anchor>2),anchor[3],0)
+    }
+    if (anchor[1]==1){
+        if (x$format<4){
+            out$x['a0'] <- iratio('Pb207Pb206')[1]
+            out$sx['a0'] <- iratio('Pb207Pb206')[2]
+        } else if (x$format<7){
+            out$x['a0'] <- iratio('Pb206Pb204')[1]
+            out$x['b0'] <- iratio('Pb207Pb204')[1]
+            out$sx['a0'] <- iratio('Pb206Pb204')[2]
+            out$sx['b0'] <- iratio('Pb207Pb204')[2]
+        } else {
+            out$x['a0'] <- 1/iratio('Pb208Pb206')[1]
+            out$x['b0'] <- 1/iratio('Pb208Pb207')[1]
+            out$sx['a0'] <- iratio('Pb208Pb206')[1]*out$x['a0']^2
+            out$sx['b0'] <- iratio('Pb208Pb207')[1]*out$x['b0']^2
+        }
+    }
+    if (x$d$U48$option==1){
+        out$x['U48i'] <- x$d$U48$x
+        out$sx['U48i'] <- ifelse(is.null(x$d$U48$sx),0,x$d$U48$sx)
+    }
+    if (x$d$ThU$option==1){
+        out$x['ThUi'] <- x$d$ThU$x
+        out$sx['ThUi'] <- ifelse(is.null(x$d$ThU$sx),0,x$d$ThU$sx)
+    }
+    out
+}
+
+init.ludwigd <- function(x,model=1,anchor=0,hessian=FALSE){
     pars <- lower <- upper <- vector()
     if (x$format<4){
         yd <- data2york(x,option=2)
@@ -22,7 +68,7 @@ init.ludwigd <- function(x,model=1,anchor=0){
             pars['tt'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['tt'] <- pars['tt']/10
             upper['tt'] <- pars['tt']*10
-            if (iratio('Pb207Pb206')[2]>0){
+            if (hessian && iratio('Pb207Pb206')[2]>0){
                 a0 <- iratio('Pb207Pb206')[1]
                 sa0 <- iratio('Pb207Pb206')[2]
                 pars['a0'] <- a0
@@ -30,7 +76,7 @@ init.ludwigd <- function(x,model=1,anchor=0){
                 upper['a0'] <- a0+sa0*3
             }
         } else if (anchor[1]==2){
-            if (length(anchor)>2 && anchor[3]>0){
+            if (hessian && length(anchor)>2 && anchor[3]>0){
                 pars['tt'] <- anchor[2]
                 lower['tt'] <- pars['tt']-anchor[3]*3
                 upper['tt'] <- pars['tt']+anchor[3]*3
@@ -56,14 +102,14 @@ init.ludwigd <- function(x,model=1,anchor=0){
             pars['tt'] <- get.Pb206U238.age(x=Pb6U8)[1]
             lower['tt'] <- pars['tt']/10
             upper['tt'] <- pars['tt']*10
-            if (iratio('Pb206Pb204')[2]>0){
+            if (hessian && iratio('Pb206Pb204')[2]>0){
                 a0 <- iratio('Pb206Pb204')[1]
                 sa0 <- iratio('Pb206Pb204')[2]
                 pars['a0'] <- a0
                 lower['a0'] <- max(0,a0-sa0*3)
                 upper['a0'] <- a0+sa0*3
             }
-            if (iratio('Pb207Pb204')[2]>0){
+            if (hessian && iratio('Pb207Pb204')[2]>0){
                 b0 <- iratio('Pb207Pb204')[1]
                 sb0 <- iratio('Pb207Pb204')[2]
                 pars['b0'] <- b0
@@ -71,7 +117,7 @@ init.ludwigd <- function(x,model=1,anchor=0){
                 upper['b0'] <- b0+sb0*3
             }
         } else if (anchor[1]==2){
-            if (length(anchor)>2 && anchor[3]>0){
+            if (hessian && length(anchor)>2 && anchor[3]>0){
                 pars['tt'] <- anchor[2]
                 lower['tt'] <- pars['tt']-anchor[3]*3
                 upper['tt'] <- pars['tt']+anchor[3]*3
@@ -106,14 +152,14 @@ init.ludwigd <- function(x,model=1,anchor=0){
             pars['tt'] <- tt
             lower['tt'] <- tt/10
             upper['tt'] <- tt*10
-            if (iratio('Pb208Pb206')[2]>0){
+            if (hessian && iratio('Pb208Pb206')[2]>0){
                 a0 <- 1/iratio('Pb208Pb206')[1]
                 sa0 <- iratio('Pb208Pb206')[2]*a0^2
                 pars['a0'] <- a0
                 lower['a0'] <- max(0,a0-sa0*3)
                 upper['a0'] <- a0+sa0*3
             }
-            if (iratio('Pb207Pb206')[2]>0){
+            if (hessian && iratio('Pb207Pb206')[2]>0){
                 b0 <- 1/iratio('Pb208Pb207')[1]
                 sb0 <- iratio('Pb208Pb207')[2]*b0^2
                 pars['b0'] <- b0
@@ -121,7 +167,7 @@ init.ludwigd <- function(x,model=1,anchor=0){
                 upper['b0'] <- b0+sb0*3
             }
         } else if (anchor[1]==2){
-            if (length(anchor)>2 && anchor[3]>0){
+            if (hessian && length(anchor)>2 && anchor[3]>0){
                 pars['tt'] <- anchor[2]
                 lower['tt'] <- pars['tt']-anchor[3]*3
                 upper['tt'] <- pars['tt']+anchor[3]*3
@@ -149,7 +195,7 @@ init.ludwigd <- function(x,model=1,anchor=0){
         lower['w'] <- 0
         upper['w'] <- 10
     }
-    if (x$d$U48$option==1 && x$d$U48$sx>0){
+    if (hessian && x$d$U48$option==1 && x$d$U48$sx>0){
         pars['U48i'] <- x$d$U48$x
         lower['U48i'] <- max(0,pars['U48i']-x$d$U48$sx*3)
         upper['U48i'] <- pars['U48i']+x$d$U48$sx*3
@@ -162,7 +208,7 @@ init.ludwigd <- function(x,model=1,anchor=0){
             stop('Zero uncertainty of measured 234/238 activity ratio')
         }
     }
-    if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+    if (hessian && x$d$ThU$option==1 && x$d$ThU$sx>0){
         pars['ThUi'] <- x$d$ThU$x
         lower['ThUi'] <- max(0,pars['ThUi']-x$d$ThU$sx*3)
         upper['ThUi'] <- pars['ThUi']+x$d$ThU$sx*3
@@ -178,7 +224,7 @@ init.ludwigd <- function(x,model=1,anchor=0){
     list(pars=pars,lower=lower,upper=upper)
 }
 
-LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
+LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
     X <- x
     if ('U48i' %in% names(pars)){
         X$d$U48$x <- pars['U48i']
@@ -192,7 +238,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
     if (x$format<4){
         if (anchor[1]==1){
             tt <- pars['tt']
-            if (iratio('Pb207Pb206')[2]>0){
+            if (hessian && iratio('Pb207Pb206')[2]>0){
                 a0 <- pars['a0']
                 LL <- LL - dnorm(x=a0,
                                  mean=iratio('Pb207Pb206')[1],
@@ -203,7 +249,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             }
         } else if (anchor[1]==2){
             a0 <- pars['a0']
-            if (length(anchor)>2 && anchor[3]>0){
+            if (hessian && length(anchor)>2 && anchor[3]>0){
                 tt <- pars['tt']
                 st <- anchor[3]
                 LL <- LL - dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
@@ -218,7 +264,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
     } else if (x$format<7){
         if (anchor[1]==1){
             tt <- pars['tt']
-            if (iratio('Pb206Pb204')[2]>0){
+            if (hessian && iratio('Pb206Pb204')[2]>0){
                 a0 <- pars['a0']
                 LL <- LL - dnorm(x=a0,
                                  mean=iratio('Pb206Pb204')[1],
@@ -227,7 +273,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             } else {
                 a0 <- iratio('Pb206Pb204')[1]
             }
-            if (iratio('Pb207Pb204')[2]>0){
+            if (hessian && iratio('Pb207Pb204')[2]>0){
                 b0 <- pars['b0']
                 LL <- LL - dnorm(x=b0,
                                  mean=iratio('Pb207Pb204')[1],
@@ -239,7 +285,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
         } else if (anchor[1]==2){
             a0 <- pars['a0']
             b0 <- pars['b0']
-            if (length(anchor)>2 && anchor[3]>0){
+            if (hessian && length(anchor)>2 && anchor[3]>0){
                 tt <- pars['tt']
                 st <- anchor[3]
                 LL <- LL - dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
@@ -255,7 +301,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
     } else {
         if (anchor[1]==1){
             tt <- pars['tt']
-            if (iratio('Pb208Pb206')[2]>0){
+            if (hessian && iratio('Pb208Pb206')[2]>0){
                 a0 <- pars['a0']
                 LL <- LL - dnorm(x=1/a0,
                                  mean=iratio('Pb208Pb206')[1],
@@ -264,7 +310,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
             } else {
                 a0 <- 1/iratio('Pb208Pb206')[1]
             }
-            if (iratio('Pb208Pb207')[2]>0){
+            if (hessian && iratio('Pb208Pb207')[2]>0){
                 b0 <- pars['b0']
                 LL <- LL - dnorm(x=1/b0,
                                  mean=iratio('Pb208Pb207')[1],
@@ -276,7 +322,7 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
         } else if (anchor[1]==2){
             a0 <- pars['a0']
             b0 <- pars['b0']
-            if (length(anchor)>2 && anchor[3]>0){
+            if (hessian && length(anchor)>2 && anchor[3]>0){
                 tt <- pars['tt']
                 st <- anchor[3]
                 LL <- LL - dnorm(x=tt,mean=anchor[2],sd=st,log=TRUE)
@@ -298,19 +344,21 @@ LL.ludwigd <- function(pars,x,model=1,exterr=FALSE,anchor=0){
     } else {
         LL <- LL + data2ludwigd(X,ta0b0w,exterr=exterr)$LL
     }
-    if (x$d$U48$option==1 && x$d$U48$sx>0){
-        U48i <- pars['U48i']
-        LL <- LL - dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-    } else if (x$d$U48$option==2 && x$d$U48$sx>0){
-        pred <- mclean(tt=tt,d=X$d)
-        LL <- LL - dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-    }
-    if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-        ThUi <- pars['ThUi']
-        LL <- LL - dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-    } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
-        pred <- mclean(tt=tt,d=X$d)
-        LL <- LL - dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+    if (hessian){
+        if (x$d$U48$option==1 && x$d$U48$sx>0){
+            U48i <- pars['U48i']
+            LL <- LL - dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+        } else if (x$d$U48$option==2 && x$d$U48$sx>0){
+            pred <- mclean(tt=tt,d=X$d)
+            LL <- LL - dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+        }
+        if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+            ThUi <- pars['ThUi']
+            LL <- LL - dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
+            pred <- mclean(tt=tt,d=X$d)
+            LL <- LL - dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        }
     }
     LL
 }
