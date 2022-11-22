@@ -454,3 +454,9 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
     }
     out
 }
+
+deming <- function(aa,bb,xx,yy){
+    num <- (bb*xx+aa-yy)^2
+    den <- 1+bb^2
+    sqrt(num/den)
+}
