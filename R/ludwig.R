@@ -133,7 +133,8 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE){
 anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE){
     X <- pars
     sX <- 0*pars
-    if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
+    nonzerosx <- (anchor[1]==2 && length(anchor)>2 && anchor[3]>0)
+    if (dontchecksx || nonzerosx){
         X['t'] <- anchor[2]
         sX['t'] <- anchor[3]
     }
@@ -422,9 +423,9 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
         ta0b0w['w'] <- pars['w']
     }
     if (model==2){
-        LL <- LL + LL.ludwig.model2(ta0b0w,X,exterr=exterr)
+        LL <- LL + LL.ludwig.model2(ta0b0w,X,anchor=anchor,exterr=exterr)
     } else {
-        LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
+        LL <- LL + data2ludwig(X,ta0b0w,anchor=anchor,exterr=exterr)$LL
     }
     if (hessian){
         if (x$d$U48$option==1 && x$d$U48$sx>0){
@@ -453,11 +454,10 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
     LL
 }
 
-data2ludwig <- function(x,ta0b0w,exterr=FALSE){
+data2ludwig <- function(x,ta0b0w,anchor=0,exterr=FALSE){
     out <- list()
     U <- iratio('U238U235')[1]
-    tt <- ta0b0w['t']
-    a0 <- ta0b0w['a0']
+    tt <- ifelse(anchor[1]==2,anchor[2],ta0b0w['t'])
     disp <- 'w' %in% names(ta0b0w)
     ns <- length(x)
     zeros <- rep(0,ns)
@@ -466,16 +466,19 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     K0 <- zeros
     D <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format%in%c(1,2,3)){
+        a0 <- ifelse(anchor[1]==1,iratio('Pb207Pb206')[1],ta0b0w['a0'])
         NP <- 2 # number of fit parameters (tt, a0)
         NR <- 2 # number of isotopic ratios (X, Y)
     } else if (x$format%in%c(4,5,6)){
-        b0 <- ta0b0w['b0']
+        a0 <- ifelse(anchor[1]==1,iratio('Pb206Pb204')[1],ta0b0w['a0'])
+        b0 <- ifelse(anchor[1]==1,iratio('Pb207Pb204')[1],ta0b0w['b0'])
         Z <- zeros
         L0 <- zeros
         NP <- 3 # tt, a0, b0
         NR <- 3 # X, Y, Z
     } else if (x$format%in%c(7,8)){
-        b0 <- ta0b0w['b0']
+        a0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb206')[1],ta0b0w['a0'])
+        b0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb207')[1],ta0b0w['b0'])
         Z <- zeros
         W <- zeros
         L0 <- zeros
@@ -713,7 +716,7 @@ mswd.lud <- function(ta0b0,x,anchor=0,exterr=FALSE){
             out$df <- 2*ns-3
         }
     }
-    SS <- data2ludwig(x,ta0b0w=ta0b0)$SS
+    SS <- data2ludwig(x,ta0b0w=ta0b0,anchor=anchor)$SS
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)
         out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
