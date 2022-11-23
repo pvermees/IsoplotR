@@ -429,29 +429,27 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
     } else {
         LL <- LL + data2ludwig(X,ta0b0w,anchor=anchor,exterr=exterr)$LL
     }
-    if (hessian){
-        if (x$d$U48$option==1 && x$d$U48$sx>0){
-            U48i <- pars['U48i']
-            LL <- LL - dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-        } else if (x$d$U48$option==2 && x$d$U48$sx>0){
-            pred <- mclean(tt=tt,d=X$d)
-            LL <- LL - dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-        }
-        if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            ThUi <- pars['ThUi']
-            LL <- LL - dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-        } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
-            pred <- mclean(tt=tt,d=X$d)
-            LL <- LL - dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-        }
-        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
-            RaUi <- pars['RaUi']
-            LL <- LL - dnorm(x=RaUi,mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
-        }
-        if (x$d$PaU$option==1 && x$d$PaU$sx>0){
-            PaUi <- pars['PaUi']
-            LL <- LL - dnorm(x=PaUi,mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
-        }
+    if (x$d$U48$option==2){
+        pred <- mclean(tt=tt,d=X$d)
+        LL <- LL - dnorm(x=pred$U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+    } else if (hessian && x$d$U48$option==1 && x$d$U48$sx>0){
+        U48i <- pars['U48i']
+        LL <- LL - dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)        
+    }
+    if (x$d$ThU$option==2){
+        pred <- mclean(tt=tt,d=X$d)
+        LL <- LL - dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)        
+    } else if (hessian && x$d$ThU$option==1 && x$d$ThU$sx>0){
+        ThUi <- pars['ThUi']
+        LL <- LL - dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+    }
+    if (hessian && x$d$RaU$option==1 && x$d$RaU$sx>0){
+        RaUi <- pars['RaUi']
+        LL <- LL - dnorm(x=RaUi,mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
+    }
+    if (hessian && x$d$PaU$option==1 && x$d$PaU$sx>0){
+        PaUi <- pars['PaUi']
+        LL <- LL - dnorm(x=PaUi,mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
     }
     LL
 }
