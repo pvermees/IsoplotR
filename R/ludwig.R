@@ -99,14 +99,14 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE){
-    init <- init.ludwig(x,model=model,anchor=anchor,hessian=FALSE)
-    fit <- optim(par=init$pars,fn=LL.ludwig,method="L-BFGS-B",
-                 lower=init$lower,upper=init$upper,hessian=FALSE,
-                 x=x,anchor=anchor,model=model,exterr=exterr)
-    out <- fit
-    am <- anchormerge(fit$par,x,anchor=anchor)
-    out$par <- am$x
-    hess <- optimHess(par=out$par,fn=LL.ludwig,
+    init <- init.ludwig(x,model=model,anchor=anchor)
+    fit1 <- optim(par=init$pars,fn=LL.ludwig,method="L-BFGS-B",
+                  lower=init$lower,upper=init$upper,hessian=FALSE,
+                  x=x,anchor=anchor,model=model,exterr=exterr)
+    fit2 <- fit1
+    am1 <- anchormerge(fit1$par,x,anchor=anchor)
+    fit2$par <- am1$x
+    hess <- optimHess(par=fit2$par,fn=LL.ludwig,
                       x=x,anchor=anchor,model=model,
                       exterr=exterr,hessian=TRUE)
     if (det(hess)<0){
@@ -114,48 +114,74 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE){
                 'nearest positive definite matrix')
         hess <- nearPD(hess)
     }
-    out$cov <- MASS::ginv(hess)
-    dimnames(out$cov) <- dimnames(hess)
-    anchored <- names(out$par)[names(out$par) %ni% names(fit$par)]
+    fit2$cov <- MASS::ginv(hess)
+    dimnames(fit2$cov) <- dimnames(hess)
+    am2 <- anchormerge(fit1$par,x,anchor=anchor,dontchecksx=TRUE)
+    anchored <- names(am2$x)[names(am2$x) %ni% names(fit1$par)]
+    out <- fit2
+    out$par <- am2$x
+    out$cov <- matrix(0,length(am2$x),length(am2$x))
+    rownames(out$cov) <- colnames(out$cov) <- names(am2$x)
+    out$cov[names(fit2$par),names(fit2$par)] <- fit2$cov
     out$cov[anchored,anchored] <- 0
-    diag(out$cov)[anchored] <- am$sx[anchored]^2
+    diag(out$cov)[anchored] <- am2$sx[anchored]^2
     mswd <- mswd.lud(out$par,x=x,anchor=anchor,exterr=exterr)
     out$model <- model
     c(out,mswd)
 }
 
-anchormerge <- function(pars,x,anchor=0){
+anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE){
     X <- pars
     sX <- 0*pars
-    if (anchor[1]==2){
+    if (anchor[1]==2 && length(anchor)>2 && anchor[3]>0){
         X['t'] <- anchor[2]
-        sX['t'] <- ifelse(length(anchor)>2,anchor[3],0)
+        sX['t'] <- anchor[3]
     }
     if (anchor[1]==1){
         if (x$format<4){
-            X['a0'] <- iratio('Pb207Pb206')[1]
-            sX['a0'] <- iratio('Pb207Pb206')[2]
+            nonzerosx <- (iratio('Pb207Pb206')[2]>0)
+            if (dontchecksx || nonzerosx){
+                X['a0'] <- iratio('Pb207Pb206')[1]
+                sX['a0'] <- iratio('Pb207Pb206')[2]
+            }
         } else if (x$format<7){
-            X['a0'] <- iratio('Pb206Pb204')[1]
-            X['b0'] <- iratio('Pb207Pb204')[1]
-            sX['a0'] <- iratio('Pb206Pb204')[2]
-            sX['b0'] <- iratio('Pb207Pb204')[2]
+            nonzerosx <- (iratio('Pb206Pb204')[2]>0 && iratio('Pb207Pb204')[2]>0)
+            if (dontchecksx || nonzerosx){
+                X['a0'] <- iratio('Pb206Pb204')[1]
+                X['b0'] <- iratio('Pb207Pb204')[1]
+                sX['a0'] <- iratio('Pb206Pb204')[2]
+                sX['b0'] <- iratio('Pb207Pb204')[2]
+            }
         } else {
-            X['a0'] <- 1/iratio('Pb208Pb206')[1]
-            X['b0'] <- 1/iratio('Pb208Pb207')[1]
-            sX['a0'] <- iratio('Pb208Pb206')[1]*X['a0']^2
-            sX['b0'] <- iratio('Pb208Pb207')[1]*X['b0']^2
+            nonzerosx <- (iratio('Pb208Pb206')[2]>0 && iratio('Pb208Pb207')[2]>0)
+            if (dontchecksx || nonzerosx){
+                X['a0'] <- 1/iratio('Pb208Pb206')[1]
+                X['b0'] <- 1/iratio('Pb208Pb207')[1]
+                sX['a0'] <- iratio('Pb208Pb206')[2]*X['a0']^2
+                sX['b0'] <- iratio('Pb208Pb207')[2]*X['b0']^2
+            }
         }
     }
-    if (x$d$U48$option==1){
+    checkit <- function(x,dontchecksx=FALSE){
+        x$option==1 && (dontchecksx || (!is.null(x$sx) && x$sx>0))
+    }
+    if (checkit(x$d$U48,dontchecksx)){
         X['U48i'] <- x$d$U48$x
-        sX['U48i'] <- ifelse(is.null(x$d$U48$sx),0,x$d$U48$sx)
+        sX['U48i'] <- x$d$U48$sx
     }
-    if (x$d$ThU$option==1){
+    if (checkit(x$d$ThU,dontchecksx)){
         X['ThUi'] <- x$d$ThU$x
-        sX['ThUi'] <- ifelse(is.null(x$d$ThU$sx),0,x$d$ThU$sx)
+        sX['ThUi'] <- x$d$ThU$sx
     }
-    sortednames <- c('t','a0','b0','w','U48i','ThUi')
+    if (checkit(x$d$RaU,dontchecksx)){
+        X['RaUi'] <- x$d$RaU$x
+        sX['RaUi'] <- x$d$RaU$sx
+    }
+    if (checkit(x$d$PaU,dontchecksx)){
+        X['PaUi'] <- x$d$PaU$x
+        sX['PaUi'] <- x$d$PaU$sx
+    }
+    sortednames <- c('t','a0','b0','w','U48i','ThUi','RaUi','PaUi')
     pnames <- names(X)
     snames <- sortednames[which(sortednames %in% pnames)]
     out <- list()
@@ -164,7 +190,7 @@ anchormerge <- function(pars,x,anchor=0){
     out
 }
 
-init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
+init.ludwig <- function(x,model=1,anchor=0){
     pars <- lower <- upper <- vector()
     if (x$format<4){
         yd <- data2york(x,option=2)
@@ -174,19 +200,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
             pars['t'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
-            if (hessian && iratio('Pb207Pb206')[2]>0){
-                a0 <- iratio('Pb207Pb206')[1]
-                sa0 <- iratio('Pb207Pb206')[2]
-                pars['a0'] <- a0
-                lower['a0'] <- max(0,a0-sa0*3)
-                upper['a0'] <- a0+sa0*3
-            }
         } else if (anchor[1]==2){
-            if (hessian && length(anchor)>2 && anchor[3]>0){
-                pars['t'] <- anchor[2]
-                lower['t'] <- pars['t']-anchor[3]*3
-                upper['t'] <- pars['t']+anchor[3]*3
-            }
             pars['a0'] <- yfit$a[1]
             lower['a0'] <- pars['a0']/10
             upper['a0'] <- pars['a0']*10
@@ -208,26 +222,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
             pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
-            if (hessian && iratio('Pb206Pb204')[2]>0){
-                a0 <- iratio('Pb206Pb204')[1]
-                sa0 <- iratio('Pb206Pb204')[2]
-                pars['a0'] <- a0
-                lower['a0'] <- max(0,a0-sa0*3)
-                upper['a0'] <- a0+sa0*3
-            }
-            if (hessian && iratio('Pb207Pb204')[2]>0){
-                b0 <- iratio('Pb207Pb204')[1]
-                sb0 <- iratio('Pb207Pb204')[2]
-                pars['b0'] <- b0
-                lower['b0'] <- max(0,b0-sb0*3)
-                upper['b0'] <- b0+sb0*3
-            }
         } else if (anchor[1]==2){
-            if (hessian && length(anchor)>2 && anchor[3]>0){
-                pars['t'] <- anchor[2]
-                lower['t'] <- pars['t']-anchor[3]*3
-                upper['t'] <- pars['t']+anchor[3]*3
-            }
             pars['a0'] <- 1/yfita$a[1]
             lower['a0'] <- pars['a0']/10
             upper['a0'] <- pars['a0']*10
@@ -258,26 +253,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
             pars['t'] <- tt
             lower['t'] <- tt/10
             upper['t'] <- tt*10
-            if (hessian && iratio('Pb208Pb206')[2]>0){
-                a0 <- 1/iratio('Pb208Pb206')[1]
-                sa0 <- iratio('Pb208Pb206')[2]*a0^2
-                pars['a0'] <- a0
-                lower['a0'] <- max(0,a0-sa0*3)
-                upper['a0'] <- a0+sa0*3
-            }
-            if (hessian && iratio('Pb207Pb206')[2]>0){
-                b0 <- 1/iratio('Pb208Pb207')[1]
-                sb0 <- iratio('Pb208Pb207')[2]*b0^2
-                pars['b0'] <- b0
-                lower['b0'] <- max(0,b0-sb0*3)
-                upper['b0'] <- b0+sb0*3
-            }
         } else if (anchor[1]==2){
-            if (hessian && length(anchor)>2 && anchor[3]>0){
-                pars['t'] <- anchor[2]
-                lower['t'] <- pars['t']-anchor[3]*3
-                upper['t'] <- pars['t']+anchor[3]*3
-            }
             pars['a0'] <- 1/yfita$a[1]
             lower['a0'] <- pars['a0']/10
             upper['a0'] <- pars['a0']*10
@@ -301,11 +277,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
         lower['w'] <- 0
         upper['w'] <- 10
     }
-    if (hessian && x$d$U48$option==1 && x$d$U48$sx>0){
-        pars['U48i'] <- x$d$U48$x
-        lower['U48i'] <- max(0,pars['U48i']-x$d$U48$sx*3)
-        upper['U48i'] <- pars['U48i']+x$d$U48$sx*3
-    } else if (x$d$U48$option==2){
+    if (x$d$U48$option==2){
         if (x$d$U48$sx>0){
             pars['U48i'] <- 1
             lower['U48i'] <- 0
@@ -314,11 +286,7 @@ init.ludwig <- function(x,model=1,anchor=0,hessian=FALSE){
             stop('Zero uncertainty of measured 234/238 activity ratio')
         }
     }
-    if (hessian && x$d$ThU$option==1 && x$d$ThU$sx>0){
-        pars['ThUi'] <- x$d$ThU$x
-        lower['ThUi'] <- max(0,pars['ThUi']-x$d$ThU$sx*3)
-        upper['ThUi'] <- pars['ThUi']+x$d$ThU$sx*3
-    } else if (x$d$ThU$option==2){
+    if (x$d$ThU$option==2){
         if (x$d$ThU$sx>0){
             pars['ThUi'] <- 1
             lower['ThUi'] <- 0
@@ -336,9 +304,17 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
         X$d$U48$x <- pars['U48i']
         X$d$U48$option <- 1
     }
-    if ('logit[ThUi]' %in% names(pars)){
+    if ('ThUi' %in% names(pars)){
         X$d$ThU$x <- pars['ThUi']
         X$d$ThU$option <- 1
+    }
+    if ('RaUi' %in% names(pars)){
+        X$d$RaU$x <- pars['RaUi']
+        X$d$RaU$option <- 1
+    }
+    if ('PaUi' %in% names(pars)){
+        X$d$PaU$x <- pars['PaUi']
+        X$d$PaU$option <- 1
     }
     LL <- 0
     if (x$format<4){
@@ -464,6 +440,14 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
         } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
             pred <- mclean(tt=tt,d=X$d)
             LL <- LL - dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        }
+        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
+            RaUi <- pars['RaUi']
+            LL <- LL - dnorm(x=RaUi,mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
+        }
+        if (x$d$PaU$option==1 && x$d$PaU$sx>0){
+            PaUi <- pars['PaUi']
+            LL <- LL - dnorm(x=PaUi,mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
         }
     }
     LL
