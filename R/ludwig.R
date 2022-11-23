@@ -133,10 +133,12 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE){
 anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE){
     X <- pars
     sX <- 0*pars
-    nonzerosx <- (anchor[1]==2 && length(anchor)>2 && anchor[3]>0)
-    if (dontchecksx || nonzerosx){
-        X['t'] <- anchor[2]
-        sX['t'] <- anchor[3]
+    if (anchor[1]==2){
+        nonzerosx <- (anchor[1]==2 && length(anchor)>2 && anchor[3]>0)
+        if (dontchecksx || nonzerosx){
+            X['t'] <- anchor[2]
+            sX['t'] <- anchor[3]
+        }
     }
     if (anchor[1]==1){
         if (x$format<4){
@@ -615,11 +617,11 @@ get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
     dEdx*J%*%t(J)
 }
 
-LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
-    tt <- ta0b0['t']
-    a0 <- ta0b0['a0']
+LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
+    tt <- ifelse(anchor[1]==2,anchor[2],ta0b0w['t'])
     nn <- length(x)
     if (x$format<4){
+        a0 <- ifelse(anchor[1]==1,iratio('Pb207Pb206')[1],ta0b0w['a0'])
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
@@ -653,9 +655,15 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
             LL <- SS2LL(SS=SS,nn=nn)
         }
     } else {
-        b0 <- ta0b0['b0']
-        if (x$format<7) xy <- get.UPb.isochron.ratios.204(x)
-        else xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+        if (x$format<7){
+            a0 <- ifelse(anchor[1]==1,iratio('Pb206Pb204')[1],ta0b0w['a0'])
+            b0 <- ifelse(anchor[1]==1,iratio('Pb207Pb204')[1],ta0b0w['b0'])
+            xy <- get.UPb.isochron.ratios.204(x)
+        } else {
+            a0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb206')[1],ta0b0w['a0'])
+            b0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb207')[1],ta0b0w['b0'])
+            xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+        }
         x6 <- xy[,1,drop=FALSE] # U238Pb206
         y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
         x7 <- xy[,3,drop=FALSE] # U235Pb207

@@ -273,7 +273,7 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
                       concordia.col='darksalmon',exterr=FALSE,
                       show.age=0,oerr=3,sigdig=2,common.Pb=0,
                       ticks=5,anchor=0,hide=NULL,omit=NULL,
-                      omit.fill=NA,omit.stroke='grey',...){    
+                      omit.fill=NA,omit.stroke='grey',...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
