@@ -431,7 +431,7 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
     }
     if (x$d$U48$option==2){
         pred <- mclean(tt=tt,d=X$d)
-        LL <- LL - dnorm(x=pred$U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+        LL <- LL - dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
     } else if (hessian && x$d$U48$option==1 && x$d$U48$sx>0){
         U48i <- pars['U48i']
         LL <- LL - dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)        
@@ -616,10 +616,10 @@ get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
 }
 
 LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
-    tt <- ifelse(anchor[1]==2,anchor[2],ta0b0w['t'])
+    tt <- ifelse(anchor[1]==2,anchor[2],ta0b0['t'])
     nn <- length(x)
     if (x$format<4){
-        a0 <- ifelse(anchor[1]==1,iratio('Pb207Pb206')[1],ta0b0w['a0'])
+        a0 <- ifelse(anchor[1]==1,iratio('Pb207Pb206')[1],ta0b0['a0'])
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
         xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
         yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
@@ -654,12 +654,12 @@ LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
         }
     } else {
         if (x$format<7){
-            a0 <- ifelse(anchor[1]==1,iratio('Pb206Pb204')[1],ta0b0w['a0'])
-            b0 <- ifelse(anchor[1]==1,iratio('Pb207Pb204')[1],ta0b0w['b0'])
+            a0 <- ifelse(anchor[1]==1,iratio('Pb206Pb204')[1],ta0b0['a0'])
+            b0 <- ifelse(anchor[1]==1,iratio('Pb207Pb204')[1],ta0b0['b0'])
             xy <- get.UPb.isochron.ratios.204(x)
         } else {
-            a0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb206')[1],ta0b0w['a0'])
-            b0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb207')[1],ta0b0w['b0'])
+            a0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb206')[1],ta0b0['a0'])
+            b0 <- ifelse(anchor[1]==1,1/iratio('Pb208Pb207')[1],ta0b0['b0'])
             xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
         }
         x6 <- xy[,1,drop=FALSE] # U238Pb206
