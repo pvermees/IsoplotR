@@ -311,16 +311,17 @@ tw3d2d <- function(fit){
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
-discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,...){
+discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
     line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,df=fit$df,
                      sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
     if (wetherill){
         line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
     } else if (fit$format<4){
-        line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
+        fit <- getUPby0(fit,option=y0option)
+        line2 <- maintit(x=fit$y0['y'],sx=fit$y0['s[y]'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=quote('('^207*'Pb/'^206*'Pb)'[o]*'='))
+                         prefix=fit$y0label)
     } else if (fit$format<7){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,

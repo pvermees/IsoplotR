@@ -269,11 +269,30 @@
 concordia <- function(x=NULL,tlim=NULL,type=1,
                       show.numbers=FALSE,levels=NA,clabel="",
                       ellipse.fill=c("#00FF0080","#FF000080"),
-                      ellipse.stroke='black',
-                      concordia.col='darksalmon',exterr=FALSE,
-                      show.age=0,oerr=3,sigdig=2,common.Pb=0,
-                      ticks=5,anchor=0,hide=NULL,omit=NULL,
-                      omit.fill=NA,omit.stroke='grey',...){
+                      ellipse.stroke='black',concordia.col='darksalmon',
+                      exterr=FALSE,show.age=0,oerr=3,
+                      sigdig=2,common.Pb=0,ticks=5,anchor=0,
+                      hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+    concordia_helper(x=x,tlim=tlim,type=type,show.numbers=show.numbers,
+                     levels=levels,clabel=clabel,
+                     ellipse.fill=ellipse.fill,
+                     ellipse.stroke=ellipse.stroke,
+                     concordia.col=concordia.col,exterr=exterr,
+                     show.age=show.age,oerr=oerr,sigdig=sigdig,
+                     common.Pb=common.Pb,ticks=ticks,anchor=anchor,
+                     hide=hide,omit=omit,omit.fill=omit.fill,
+                     omit.stroke=omit.stroke,...)
+}
+
+# the only difference between concordia and concordia_helper
+# is the y0option argument, which is used by isochron.UPb
+concordia_helper <- function(x=NULL,tlim=NULL,type=1,
+                             show.numbers=FALSE,levels=NA,clabel="",
+                             ellipse.fill=c("#00FF0080","#FF000080"),
+                             ellipse.stroke='black',concordia.col='darksalmon',
+                             exterr=FALSE,show.age=0,oerr=3,y0option=1,
+                             sigdig=2,common.Pb=0,ticks=5,anchor=0,
+                             hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -297,7 +316,8 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
         fit$n <- length(x2calc)
         discordia.line(fit,wetherill=wetherill,d=x2calc$d,oerr=oerr)
         graphics::title(discordia.title(fit,wetherill=wethertit,
-                                        sigdig=sigdig,oerr=oerr))
+                                        y0option=y0option,
+                                        sigdig=sigdig,oerr=oerr,...))
     }
     plot.concordia.line(x2calc,lims=lims,type=type,col=concordia.col,
                         oerr=oerr,exterr=exterr,ticks=ticks)

@@ -531,12 +531,12 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          omit.stroke='grey',y0option=1,...){
     if (x$format<4){
         if (plot){
-            out <- concordia(x,type=2,show.age=model+1,oerr=oerr,sigdig=sigdig,
-                             show.numbers=show.numbers,levels=levels,
-                             clabel=clabel,ellipse.fill=ellipse.fill,
-                             ellipse.stroke=ellipse.stroke,exterr=exterr,
-                             anchor=anchor,hide=hide,omit=omit,
-                             omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+            out <- concordia_helper(x,type=2,show.age=model+1,oerr=oerr,sigdig=sigdig,
+                                    show.numbers=show.numbers,levels=levels,
+                                    clabel=clabel,ellipse.fill=ellipse.fill,
+                                    ellipse.stroke=ellipse.stroke,exterr=exterr,
+                                    anchor=anchor,hide=hide,omit=omit,y0option=y0option,
+                                    omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
         }
@@ -655,10 +655,14 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
     invisible(out)
 }
 
-getUPby0 <- function(out,fmt,type=1,option=1){
+getUPby0 <- function(out,fmt=1,type=1,option=1){
     out$y0 <- c('y'=NA,'s[y]'=NA)
     if (option==1){
-        if (fmt %in% c(4,5,6) & type==1){        # 04/06 vs. 38/06
+        if (fmt<4){                              # 07/06 vs. 38/06
+            out$y0['y'] <- out$par['a0']
+            out$y0['s[y]'] <- out$err['s','a0']
+            out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
+        } else if (fmt %in% c(4,5,6) & type==1){ # 04/06 vs. 38/06
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])
             out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
