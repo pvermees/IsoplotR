@@ -99,7 +99,7 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,joint=TRUE,type=1,...){
-    init <- init.ludwig(x,model=model,anchor=anchor)
+    init <- init.ludwig(x,model=model,anchor=anchor,joint=joint,type=type)
     fit1 <- stats::optim(par=init$pars,fn=LL.ludwig,method="L-BFGS-B",
                          lower=init$lower,upper=init$upper,hessian=FALSE,
                          x=x,anchor=anchor,model=model,exterr=exterr)
@@ -210,69 +210,115 @@ init.ludwig <- function(x,model=1,anchor=0,joint=TRUE,type=1){
         } else {
             pars['t'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['t'] <- pars['t']/10
-            upper['t'] <- pars['t']*10            
+            upper['t'] <- pars['t']*10
             pars['a0'] <- yfit$a[1]
             lower['a0'] <- pars['a0']/10
-            upper['a0'] <- pars['a0']*10            
+            upper['a0'] <- pars['a0']*10
         }
     } else if (x$format<7){
-        yda <- data2york(x,option=3)
-        yfita <- york(yda)
-        Pb6U8 <- abs(yfita$b[1]/yfita$a[1])
-        ydb <- data2york(x,option=4)
-        yfitb <- york(ydb)
+        if (joint || type==1){
+            yda <- data2york(x,option=3)
+            yfita <- york(yda)
+            Pb6U8 <- abs(yfita$b[1]/yfita$a[1])
+        }
+        if (joint || type==2){
+            ydb <- data2york(x,option=4)
+            yfitb <- york(ydb)
+            Pb7U5 <- abs(yfitb$b[1]/yfitb$a[1])
+        }
         if (anchor[1]==1){
-            pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
+            if (joint || type==1){
+                pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
+            } else if (type==2){
+                pars['t'] <- get.Pb207U235.age(x=Pb7U5)[1]
+            }
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
         } else if (anchor[1]==2){
-            pars['a0'] <- 1/yfita$a[1]
-            lower['a0'] <- pars['a0']/10
-            upper['a0'] <- pars['a0']*10
-            pars['b0'] <- 1/yfitb$a[1]
-            lower['b0'] <- pars['b0']/10
-            upper['b0'] <- pars['b0']*10
+            if (joint || type==1){
+                pars['a0'] <- 1/yfita$a[1]
+                lower['a0'] <- pars['a0']/10
+                upper['a0'] <- pars['a0']*10
+            }
+            if (joint || type==2){
+                pars['b0'] <- 1/yfitb$a[1]
+                lower['b0'] <- pars['b0']/10
+                upper['b0'] <- pars['b0']*10
+            }
         } else {
-            pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
+            if (joint || type==1){
+                pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
+            } else if (type==2){
+                pars['t'] <- get.Pb207U235.age(x=Pb7U5)[1]
+            }
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
-            pars['a0'] <- 1/yfita$a[1]
-            lower['a0'] <- pars['a0']/10
-            upper['a0'] <- pars['a0']*10
-            pars['b0'] <- 1/yfitb$a[1]
-            lower['b0'] <- pars['b0']/10
-            upper['b0'] <- pars['b0']*10
+            if (joint || type==1){
+                pars['a0'] <- 1/yfita$a[1]
+                lower['a0'] <- pars['a0']/10
+                upper['a0'] <- pars['a0']*10
+            }
+            if (joint || type==2){
+                pars['b0'] <- 1/yfitb$a[1]
+                lower['b0'] <- pars['b0']/10
+                upper['b0'] <- pars['b0']*10
+            }
         }
     } else {
-        yd <- data2york(x,option=2)
-        yfit <- york(yd)
-        Pb6U8 <- abs(yfit$b[1]/yfit$a[1])
-        tt <- get.Pb206U238.age(x=Pb6U8)[1]
-        yda <- data2york(x,option=6,tt=tt)
-        yfita <- york(yda)
-        ydb <- data2york(x,option=7,tt=tt)
-        yfitb <- york(ydb)
+        if (joint || type==1){
+            yfit <- york(data2york(x,option=2))
+            Pb6U8 <- abs(yfit$b[1]/yfit$a[1])
+            tt <- get.Pb206U238.age(x=Pb6U8)[1]
+        } else if (type==2){
+            yfit <- york(data2york(x,option=7))
+            Pb7U5 <- abs(yfit$b[1]/yfit$a[1])
+            tt <- get.Pb207U235.age(x=Pb7U5)[1]
+        } else if (type==3){
+            yfit <- york(data2york(x,option=8))
+            Pb8Th2 <- abs(yfit$b[1]/yfit$a[1])
+            tt <- get.Pb208Th232.age(x=Pb8Th2)[1]
+        } else if (type==4){
+            yfit <- york(data2york(x,option=9))
+            Pb8Th2 <- abs(yfit$b[1]/yfit$a[1])
+            tt <- get.Pb208Th232.age(x=Pb8Th2)[1]
+        }
+        if (joint || type%in%c(1,3)){
+            yda <- data2york(x,option=6,tt=tt)
+            yfita <- york(yda)
+        }
+        if (joint || type%in%c(2,4)){
+            ydb <- data2york(x,option=7,tt=tt)
+            yfitb <- york(ydb)
+        }
         if (anchor[1]==1){
             pars['t'] <- tt
             lower['t'] <- tt/10
             upper['t'] <- tt*10
         } else if (anchor[1]==2){
-            pars['a0'] <- 1/yfita$a[1]
-            lower['a0'] <- pars['a0']/10
-            upper['a0'] <- pars['a0']*10
-            pars['b0'] <- 1/yfitb$a[1]
-            lower['b0'] <- pars['b0']/10
-            upper['b0'] <- pars['b0']*10
+            if (joint || type%in%c(1,3)){
+                pars['a0'] <- 1/yfita$a[1]
+                lower['a0'] <- pars['a0']/10
+                upper['a0'] <- pars['a0']*10
+            }
+            if (joint || type%in%c(2,4)){
+                pars['b0'] <- 1/yfitb$a[1]
+                lower['b0'] <- pars['b0']/10
+                upper['b0'] <- pars['b0']*10
+            }
         } else {
             pars['t'] <- tt
             lower['t'] <- tt/10
             upper['t'] <- tt*10
-            pars['a0'] <- 1/yfita$a[1]
-            lower['a0'] <- pars['a0']/10
-            upper['a0'] <- pars['a0']*10
-            pars['b0'] <- 1/yfitb$a[1]
-            lower['b0'] <- pars['b0']/10
-            upper['b0'] <- pars['b0']*10
+            if (joint || type%in%c(1,3)){
+                pars['a0'] <- 1/yfita$a[1]
+                lower['a0'] <- pars['a0']/10
+                upper['a0'] <- pars['a0']*10
+            }
+            if (joint || type%in%c(2,4)){
+                pars['b0'] <- 1/yfitb$a[1]
+                lower['b0'] <- pars['b0']/10
+                upper['b0'] <- pars['b0']*10
+            }
         }
     }
     if (model==3){
