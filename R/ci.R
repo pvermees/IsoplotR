@@ -186,9 +186,10 @@ peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
 }
 
 get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
-get.ntit.default <- function(x,...){
+get.ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
     ns <- length(x)
-    nisnan <- length(which(is.na(x)))
+    bad <- which(is.na(x) | x<m | x>M)
+    nisnan <- length(bad)
     out <- '(n='
     if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
     paste0(out,ns,')')

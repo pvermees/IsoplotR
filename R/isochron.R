@@ -544,12 +544,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         ns <- length(x)
         calcit <- (1:ns)%ni%c(hide,omit)
         x2calc <- subset(x,subset=calcit)
-        if (joint){
-            fit <- ludwig(x2calc,model=model,anchor=anchor,exterr=exterr)
-        } else {
-            fit <- ludwig2d(x2calc,type=type,model=model,
-                            anchor=anchor,exterr=exterr)
-        }
+        fit <- ludwig(x2calc,model=model,anchor=anchor,
+                      exterr=exterr,joint=joint,type=type)
         tt <- fit$par['t']
         a0 <- fit$par['a0']
         b0 <- fit$par['b0']
