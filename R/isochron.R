@@ -500,14 +500,14 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          plot=TRUE,exterr=FALSE,model=1,
                          show.ellipses=1*(model!=2),anchor=0,
                          hide=NULL,omit=NULL,omit.fill=NA,
-                         omit.stroke='grey',...){
+                         omit.stroke='grey',y0option=1,...){
     if (x$format<4){
         if (plot){
             out <- concordia(x,type=2,show.age=model+1,oerr=oerr,sigdig=sigdig,
-                             show.numbers=show.numbers,levels=levels,clabel=clabel,
-                             ellipse.fill=ellipse.fill,
-                             ellipse.stroke=ellipse.stroke,
-                             exterr=exterr,anchor=anchor,hide=hide,omit=omit,
+                             show.numbers=show.numbers,levels=levels,
+                             clabel=clabel,ellipse.fill=ellipse.fill,
+                             ellipse.stroke=ellipse.stroke,exterr=exterr,
+                             anchor=anchor,hide=hide,omit=omit,
                              omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
@@ -563,61 +563,42 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         out$age <- NULL
         out$age['t'] <- tt
         out$age['s[t]'] <- sqrt(fit$cov[1,1])
-        out$y0 <- NULL
+        J <- matrix(0,2,2)
         if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
             XY <- data2york(x,option=3)
-            y0par <- 'a0'
-            out$y0['y'] <- fit$par[y0par]
-            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
-            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
+            a <- 1/fit$par['a0']
+            J[1,2] <- -a^2
             y.lab <- quote(''^204*'Pb/'^206*'Pb')
         } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
             XY <- data2york(x,option=4)
-            y0par <- 'b0'
-            out$y0['y'] <- fit$par[y0par]
-            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
-            out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
+            a <- 1/fit$par['b0']
+            J[1,2] <- -a^2
             y.lab <- quote(''^204*'Pb/'^207*'Pb')
         } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
             XY <- data2york(x,option=6,tt=tt)
-            y0par <- 'a0'
-            out$y0['y'] <- 1/fit$par[y0par]
-            out$y0['s[y]'] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
-            out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+            a <- 1/fit$par['a0']
+            J[1,2] <- -a^2
             y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
         } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
             XY <- data2york(x,option=7,tt=tt)
             U <- settings('iratio','U238U235')[1]
-            y0par <- 'b0'
-            out$y0['y'] <- 1/fit$par[y0par]
-            out$y0['s[y]'] <- out$y0[1]*sqrt(fit$cov[y0par,y0par])/fit$par[y0par]
+            a <- 1/fit$par['b0']
+            J[1,2] <- -a^2
             y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
-            out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
         } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
             XY <- data2york(x,option=8,tt=tt)
-            y0par <- 'a0'
-            out$y0['y'] <- fit$par[y0par]
-            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
+            a <- fit$par['a0']
+            J[1,2] <- 1
             y.lab <- quote(''^206*'Pb'[o]*'/'^208*'Pb')
-            out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
         } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
             XY <- data2york(x,option=9,tt=tt)
-            y0par <- 'b0'
-            out$y0['y'] <- fit$par[y0par]
-            out$y0['s[y]'] <- sqrt(fit$cov[y0par,y0par])
+            a <- fit$par['b0']
+            J[1,2] <- 1
             y.lab <- quote(''^207*'Pb'[o]*'/'^208*'Pb')
-            out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
         } else {
             stop('Isochron regression is not available for this input format.')
         }
-        J <- matrix(0,2,2)
-        if (type<3){
-            a <- 1/fit$par[y0par]
-            J[1,2] <- -a^2
-        } else {
-            a <- fit$par[y0par]
-            J[1,2] <- 1
-        }
+        out <- getUPby0(out=out,fmt=x$format,type=type,option=y0option)
         b <- -a*x0inv
         J[2,1] <- -a*dx0invdt
         J[2,2] <- x0inv*a^2
@@ -644,6 +625,55 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         }
     }
     invisible(out)
+}
+
+getUPby0 <- function(out,fmt,type=1,option=1){
+    out$y0 <- c('y'=NA,'s[y]'=NA)
+    if (option==1){
+        if (fmt %in% c(4,5,6) & type==1){        # 04/06 vs. 38/06
+            out$y0['y'] <- out$par['a0']
+            out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])
+            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
+        } else if (fmt %in% c(4,5,6) & type==2){ # 04/07 vs. 35/07
+            out$y0['y'] <- out$par['b0']
+            out$y0['s[y]'] <- sqrt(out$cov['b0','b0'])
+            out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
+        } else if (fmt %in% c(7,8) & type==1){   # 08/06 vs. 38/06
+            out$y0['y'] <- 1/out$par['a0']
+            out$y0['s[y]'] <- out$y0[1]*sqrt(out$cov['a0','a0'])/out$par['a0']
+            out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+        } else if (fmt %in% c(7,8) & type==2){   # 08/07 vs. 35/07
+            out$y0['y'] <- 1/out$par['b0']
+            out$y0['s[y]'] <- out$y0[1]*sqrt(out$cov['b0','b0'])/out$par['b0']
+            out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
+        } else if (fmt %in% c(7,8) & type==3){   # 06c/08 vs. 32/08
+            out$y0['y'] <- out$par['a0']
+            out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])
+            out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
+        } else if (fmt %in% c(7,8) & type==4){   # 07c/08 vs. 32/08
+            out$y0['y'] <- out$par['b0']
+            out$y0['s[y]'] <- sqrt(out$cov['b0','b0'])
+            out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
+        }
+    } else {
+        if (option==2){
+            out$y0label <- quote('('^234*'U/'^238*'U)'[i]*'=')
+            y0par <- 'U48i'
+        } else if (option==3){
+            out$y0label <- quote('('^230*'Th/'^238*'U)'[i]*'=')
+            y0par <- 'ThUi'
+        } else {
+            stop('Invalid y0option value.')
+        }
+        if (y0par %in% names(out$par)){
+            out$y0['y'] <- out$par[y0par][1]
+            out$y0['s[y]'] <- sqrt(out$cov[y0par,y0par])
+        } else {
+            out$y0['y'] <- 1
+            out$y0['s[y]'] <- 0
+        }
+    }
+    out
 }
 #' @param inverse toggles between normal and inverse isochrons. If the
 #'     isochron plots \code{Y} against \code{X}, and
