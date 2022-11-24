@@ -482,13 +482,41 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 #' If \code{anchor[1]=2}: force the isochron line to intersect the
 #' concordia line at an age equal to \code{anchor[2]}.
 #' 
-#' @param joint
-#' logical. Only applies to U-Pb data formats 4 and above. If
-#' \code{TRUE}, carries out three dimensional regression.  If
-#' \code{FALSE}, uses two dimensional isochron regression.  The latter
-#' can be used to compute \eqn{{}^{207}}Pb/\eqn{{}^{235}}U isochrons,
-#' which are immune to the complexities of initial
-#' \eqn{{}^{234}}U/\eqn{{}^{238}}U disequilibrium.
+#' @param joint logical. Only applies to U-Pb data formats 4 and
+#'     above. If \code{TRUE}, carries out three dimensional
+#'     regression.  If \code{FALSE}, uses two dimensional isochron
+#'     regression.  The latter can be used to compute
+#'     \eqn{{}^{207}}Pb/\eqn{{}^{235}}U isochrons, which are immune to
+#'     the complexities of initial \eqn{{}^{234}}U/\eqn{{}^{238}}U
+#'     disequilibrium.
+#'
+#' @param y0option controls the type of y-intercept or activity ratio
+#'     that is reported along with the isochron age. Only relevant to
+#'     U-Pb data and Th-U data formats 1 and 2.
+#'
+#' For U-Pb data:
+#'
+#' \code{y0option=1} reports the common Pb composition,
+#'
+#' \code{y0option=2} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratio.
+#'
+#' \code{y0option=3} reports the initial \eqn{^{230}}Th/\eqn{^{238}}U
+#' activity ratio,
+#'
+#' For Th-U data:
+#'
+#' \code{y0option=1} reports the authigenic
+#' \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+#'
+#' \code{y0option=2} reports the detrital
+#' \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+#'
+#' \code{y0option=3} reports the authigenic
+#' \eqn{^{230}}Th/\eqn{^{238}}U activity ratio,
+#' 
+#' \code{y0option=4} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
+#' activity ratio.
 #'
 #' @rdname isochron
 #' @export
@@ -1035,18 +1063,6 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
 #' \code{4}: `Osmond type-II' isochron, setting out
 #' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #' 
-#' @param y0option controls the type of activity ratio that is
-#'     reported along with the 3D isochron age. Only relevant to Th-U
-#'     data formats 1 and 2. Set to:
-#'
-#' \code{y0option=1} for the authigenic \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
-#'
-#' \code{y0option=2} for the detrital \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
-#'
-#' \code{y0option=3} for the authigenic \eqn{^{230}}Th/\eqn{^{238}}U activity ratio,
-#' 
-#' \code{y0option=4} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio.
-#'
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
