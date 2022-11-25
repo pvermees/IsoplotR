@@ -121,15 +121,31 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,joint=TRUE,type=1,...){
     am2 <- anchormerge(fit1$par,x,anchor=anchor,dontchecksx=TRUE)
     anchored <- names(am2$x)[names(am2$x) %ni% names(fit1$par)]
     out <- fit2
+    out$model <- model
     out$par <- am2$x
     out$cov <- matrix(0,length(am2$x),length(am2$x))
     rownames(out$cov) <- colnames(out$cov) <- names(am2$x)
     out$cov[names(fit2$par),names(fit2$par)] <- fit2$cov
     out$cov[anchored,anchored] <- 0
     diag(out$cov)[anchored] <- am2$sx[anchored]^2
-    mswd <- mswd.lud(out$par,x=x,anchor=anchor,exterr=exterr)
-    out$model <- model
+    mswd <- mswd.lud(out$par,x=x,anchor=anchor,exterr=exterr,joint=joint)
+    if (!joint && x$format>3) out <- plug2dLudwig(out,type=type)
     c(out,mswd)
+}
+
+plug2dLudwig <- function(fit,type=1){
+    out <- fit
+    fnames <- pnames <- names(fit$par)
+    if ('t' %ni% pnames) pnames <- c('t',pnames)
+    if ('a0' %ni% pnames) pnames <- c(pnames[1],'a0',pnames[-1])
+    if ('b0' %ni% pnames) pnames <- c(pnames[1:2],'b0',pnames[-(1:2)])
+    np <- length(pnames)
+    out$par <- rep(NA,np)
+    out$cov <- matrix(NA,np,np)
+    rownames(out$cov) <- colnames(out$cov) <- names(out$par) <- pnames
+    out$par[fnames] <- fit$par
+    out$cov[fnames,fnames] <- fit$cov
+    out
 }
 
 anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE){
@@ -493,14 +509,14 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,
     if (model==3){
         ta0b0w['w'] <- pars['w']
     }
-    if (joint && model==2){
+    if (model==2 && (joint || x$format<4)){
         LL <- LL + LL.ludwig.model2(ta0b0w,X,anchor=anchor,exterr=exterr)
-    } else if (joint){
+    } else if (joint || x$format<4){
         LL <- LL + data2ludwig(X,ta0b0w,anchor=anchor,exterr=exterr)$LL
     } else if (model==2){
         LL <- LL + LL.ludwig.model2.2d(ta0b0w,X,anchor=anchor,exterr=exterr)
     } else {
-        LL <- LL + LL.ludwig.2d(ta0b0w,X,anchor=anchor,exterr=exterr)
+        LL <- LL + LL.ludwig.2d(ta0b0w,X,anchor=anchor,exterr=exterr,type=type)
     }
     if (x$d$U48$option==2){
         pred <- mclean(tt=tt,d=X$d)
@@ -527,16 +543,21 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,
     LL
 }
 
-LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1){
-    if (x$format<4){
-        yd <- data2york(x,option=2)
-    } else if (x$format<7){
+LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1,LL=TRUE){
+    tt <- ta0b0w['t']
+    if (x$format %in% c(4,5,6)){
         if (type==1){
             yd <- data2york(x,option=3)
+            a <- ta0b0w['a0']
+            Pb6U8 <- age_to_Pb206U238_ratio(tt)[1]
+            b <- -a*U8Pb6
         } else {
             yd <- data2york(x,option=4)
+            a <- ta0b0w['b0']
+            Pb7U5 <- age_to_Pb207U235_ratio(tt)[1]
+            b <- -a*Pb7U5
         }
-    } else {
+    } else if (x$format %in% c(7,8)){
         if (anchor[1]==2 & length(anchor)>1){
             tt <- anchor[2]
         } else {
@@ -551,10 +572,17 @@ LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1){
         } else if (type==4){
             yd <- data2york(x,option=8,tt=tt)
         }
+    } else {
+        stop('LL.ludwig.2d is only relevant to U-Pb formats 4-8')
     }
-    yfit <- york(yd)
-    SS <- yfit$mswd*yfit$df
-    SS2LL(SS,nn=length(x),df=yfit$df)
+    xy <- get.york.xy(yd,a=a,b=b)
+    SS <- 
+    if (LL){
+        out <- SS2LL(SS,nn=length(x),df=yfit$df)
+    } else {
+        out <- SS
+    }
+    out
 }
 
 data2ludwig <- function(x,ta0b0w,anchor=0,exterr=FALSE){
@@ -813,23 +841,27 @@ LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
     LL
 }
 
-mswd.lud <- function(ta0b0,x,anchor=0,exterr=FALSE){
+mswd.lud <- function(ta0b0,x,anchor=0,exterr=FALSE,joint=TRUE){
     out <- list()
     ns <- length(x)
     anchored <- (anchor[1]>0)
     tanchored <- (anchor[1]==2 && length(anchor)>1 && is.numeric(anchor[2]))
-    if (x$format<4){
-        if (anchored) out$df <- ns-1
-        else out$df <- ns-2
-    } else {
+    if (joint && x$format>3){
         if (anchored){
             if (tanchored) out$df <- 2*ns-2
             else out$df <- 2*ns-1
         } else {
             out$df <- 2*ns-3
-        }
+        }        
+    } else {
+        if (anchored) out$df <- ns-1
+        else out$df <- ns-2
     }
-    SS <- data2ludwig(x,ta0b0w=ta0b0,anchor=anchor)$SS
+    if (joint){
+        SS <- data2ludwig(x,ta0b0w=ta0b0,anchor=anchor)$SS
+    } else {
+        SS <- LL.ludwig.2d(ta0b0w=ta0b0,x=x,anchor=anchor,exterr=exterr,LL=FALSE)
+    }
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)
         out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
