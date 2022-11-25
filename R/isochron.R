@@ -577,10 +577,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             stop('Invalid isochron type.')
         }
         if (model==3){
-            lw <- fit$logpar['log(w)']
-            w <- exp(lw)
-            slw <- sqrt(fit$logcov['log(w)','log(w)'])
-            sw <- ifelse(is.finite(lw),slw*w,NA)
+            w <- fit$par['w']
+            sw <- sqrt(fit$cov['w','w'])
             fit$disp <- c('w'=w,'s[w]'=sw)
         }
         out <- fit
