@@ -128,7 +128,8 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,joint=TRUE,type=1,...){
     out$cov[names(fit2$par),names(fit2$par)] <- fit2$cov
     out$cov[anchored,anchored] <- 0
     diag(out$cov)[anchored] <- am2$sx[anchored]^2
-    mswd <- mswd.lud(out$par,x=x,anchor=anchor,exterr=exterr,joint=joint)
+    mswd <- mswd.lud(out$par,x=x,anchor=anchor,
+                     exterr=exterr,joint=joint,type=type)
     if (!joint && x$format>3) out <- plug2dLudwig(out,type=type)
     c(out,mswd)
 }
@@ -548,31 +549,42 @@ LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1,LL=TRUE){
     if (x$format %in% c(4,5,6)){
         if (type==1){
             yd <- data2york(x,option=3)
-            a <- ta0b0w['a0']
+            a <- 1/ta0b0w['a0']
             Pb6U8 <- age_to_Pb206U238_ratio(tt)[1]
             b <- -a*Pb6U8
         } else {
             yd <- data2york(x,option=4)
-            a <- ta0b0w['b0']
+            a <- 1/ta0b0w['b0']
             Pb7U5 <- age_to_Pb207U235_ratio(tt)[1]
             b <- -a*Pb7U5
         }
     } else if (x$format %in% c(7,8)){
         if (type==1){
-            yd <- data2york(x,option=5,tt=tt)
-        } else if (type==2){
             yd <- data2york(x,option=6,tt=tt)
-        } else if (type==3){
+            a <- 1/ta0b0w['a0']
+            Pb6U8 <- age_to_Pb206U238_ratio(tt)[1]
+            b <- -a*Pb6U8
+        } else if (type==2){
             yd <- data2york(x,option=7,tt=tt)
-        } else if (type==4){
+            a <- 1/ta0b0w['b0']
+            Pb7U5 <- age_to_Pb207U235_ratio(tt)[1]
+            b <- -a*Pb7U5
+        } else if (type==3){
             yd <- data2york(x,option=8,tt=tt)
+            a <- ta0b0w['a0']
+            Pb8Th2 <- age_to_Pb208Th232_ratio(tt)[1]
+            b <- -a*Pb8Th2
+        } else if (type==4){
+            yd <- data2york(x,option=9,tt=tt)
+            a <- ta0b0w['b0']
+            Pb8Th2 <- age_to_Pb208Th232_ratio(tt)[1]
+            b <- -a*Pb8Th2
         }
     } else {
         stop('LL.ludwig.2d is only relevant to U-Pb formats 4-8')
     }
     w <- ifelse('w' %in% names(ta0b0w),ta0b0w['w'],0)
-    out <- LL.york(w=w,xy=yd,a=a,b=b,LL=LL)
-    out
+    LL.york(w=w,xy=yd,a=a,b=b,LL=LL)
 }
 
 data2ludwig <- function(x,ta0b0w,anchor=0,exterr=FALSE){
@@ -736,10 +748,6 @@ get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
     dEdx*J%*%t(J)
 }
 
-LL.ludwig.model2.2d <- function(ta0b0w,X,anchor=0,exterr=FALSE){
-    
-}
-
 LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
     tt <- ifelse(anchor[1]==2,anchor[2],ta0b0['t'])
     nn <- length(x)
@@ -751,7 +759,7 @@ LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
         xx <- xy[,'X',drop=FALSE]
         yy <- xy[,'Y',drop=FALSE]
         dem <- deming(a=a0,b=(yr-a0)/xr,x=xx,y=yy)
-        SS <- sum(dem$d^2) # = sum(d^2)
+        SS <- sum(dem$d^2)
         if (exterr){
             D <- mclean(tt,d=x$d,exterr=exterr)
             dbdxr <- (a0-yr)/xr^2
@@ -831,7 +839,7 @@ LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
     LL
 }
 
-mswd.lud <- function(ta0b0,x,anchor=0,exterr=FALSE,joint=TRUE){
+mswd.lud <- function(ta0b0,x,anchor=0,exterr=FALSE,joint=TRUE,type=1){
     out <- list()
     ns <- length(x)
     anchored <- (anchor[1]>0)
@@ -850,7 +858,8 @@ mswd.lud <- function(ta0b0,x,anchor=0,exterr=FALSE,joint=TRUE){
     if (joint){
         SS <- data2ludwig(x,ta0b0w=ta0b0,anchor=anchor)$SS
     } else {
-        SS <- LL.ludwig.2d(ta0b0w=ta0b0,x=x,anchor=anchor,exterr=exterr,LL=FALSE)
+        SS <- LL.ludwig.2d(ta0b0w=ta0b0,x=x,anchor=anchor,
+                           type=type,exterr=exterr,LL=FALSE)
     }
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)
