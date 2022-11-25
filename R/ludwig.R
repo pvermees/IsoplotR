@@ -550,7 +550,7 @@ LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1,LL=TRUE){
             yd <- data2york(x,option=3)
             a <- ta0b0w['a0']
             Pb6U8 <- age_to_Pb206U238_ratio(tt)[1]
-            b <- -a*U8Pb6
+            b <- -a*Pb6U8
         } else {
             yd <- data2york(x,option=4)
             a <- ta0b0w['b0']
@@ -558,11 +558,6 @@ LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1,LL=TRUE){
             b <- -a*Pb7U5
         }
     } else if (x$format %in% c(7,8)){
-        if (anchor[1]==2 & length(anchor)>1){
-            tt <- anchor[2]
-        } else {
-            tt <- ta0b0w['t']
-        }
         if (type==1){
             yd <- data2york(x,option=5,tt=tt)
         } else if (type==2){
@@ -575,13 +570,8 @@ LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1,LL=TRUE){
     } else {
         stop('LL.ludwig.2d is only relevant to U-Pb formats 4-8')
     }
-    xy <- get.york.xy(yd,a=a,b=b)
-    SS <- 
-    if (LL){
-        out <- SS2LL(SS,nn=length(x),df=yfit$df)
-    } else {
-        out <- SS
-    }
+    w <- ifelse('w' %in% names(ta0b0w),ta0b0w['w'],0)
+    out <- LL.york(w=w,xy=yd,a=a,b=b,LL=LL)
     out
 }
 

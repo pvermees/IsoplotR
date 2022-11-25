@@ -53,19 +53,18 @@ model3regression <- function(xyz,type='york'){
     out <- list()
     init <- log(stats::sd(xyz[,'Y']))
     if (identical(type,'york')){
-        lw <- stats::optimise(LL.york,interval=init+c(-5,2),
-                              xy=xyz,maximum=TRUE)$maximum
-        H <- stats::optimHess(lw,LL.york,xy=xyz)
-        slw <- sqrt(solve(-H))
-        out$disp <- c('w'=exp(lw),'s[w]'=slw*exp(lw))
+        w <- stats::optimise(LL.york,interval=c(0,3*init),xy=xyz)$minimum
+        H <- stats::optimHess(w,LL.york,xy=xyz)
+        sw <- sqrt(solve(-H))
+        out$disp <- c('w'=w,'s[w]'=sw)
         dd <- augment_york_errors(xyz,out$disp['w'])
         out <- c(out,york(dd))
     } else if (identical(type,'titterington')){
-        lw <- stats::optimise(LL.titterington,interval=init+c(-5,2),
-                              xy=xyz,maximum=TRUE)$maximum
-        H <- stats::optimHess(lw,LL.titterington,xy=xyz)
-        slw <- sqrt(solve(-H))
-        out$disp <- c('w'=exp(lw),'s[w]'=slw*exp(lw))
+        w <- stats::optimise(LL.titterington,interval=c(0,3*init),
+                             xy=xyz,maximum=TRUE)$maximum
+        H <- stats::optimHess(w,LL.titterington,xy=xyz)
+        sw <- sqrt(solve(-H))
+        out$disp <- c('w'=w,'s[w]'=sw)
         dd <- augment_titterington_errors(xyz,out$disp['w'])
         out <- c(out,titterington(dd))                
     } else {
@@ -74,26 +73,30 @@ model3regression <- function(xyz,type='york'){
     out
 }
 
-LL.york <- function(lw,xy){
-    w <- exp(lw)
-    D <- augment_york_errors(xy,w)
-    X <- matrix(0,1,2)
-    fit <- york(D)
-    P <- get.york.xy(D,fit$a[1],fit$b[1])
-    x1 <- D[,'X']
-    x2 <- D[,'Y']
-    s1 <- D[,'sX']
-    s2 <- D[,'sY']
-    rho <- D[,'rXY']
+LL.york <- function(w=0,xy,a=NULL,b=NULL,LL=TRUE){
+    if (w==0) O <- xy
+    else O <- augment_york_errors(xy,w)
+    if (is.null(a) || is.null(b)){
+        fit <- york(O)
+        a <- fit$a[1]
+        b <- fit$b[1]
+    }
+    P <- get.york.xy(O,a=a,b=b)
+    x1 <- O[,'X']
+    x2 <- O[,'Y']
+    s1 <- O[,'sX']
+    s2 <- O[,'sY']
+    rho <- O[,'rXY']
     m1 <- P[,1]
     m2 <- P[,2]
-    z <- ((x1-m1)/s1)^2 + ((x2-m2)/s2)^2 - 2*rho*(x1-m1)*(x2-m2)/(s1*s2)
-    LL <- - log(s1) - log(s2) - 0.5*log(1-rho^2) - 0.5*z/(1-rho^2)
-    sum(LL)
+    z2 <- ((x1-m1)/s1)^2 + ((x2-m2)/s2)^2 - 2*rho*(x1-m1)*(x2-m2)/(s1*s2)
+    SS <- sum(z2/(1-rho^2))
+    if (LL) out <- sum(log(s1)+log(s2)+0.5*log(1-rho^2)) + SS/2
+    else out <- SS
+    out
 }
-LL.titterington <- function(lw,xyz){
+LL.titterington <- function(w,xyz){
     out <- 0
-    w <- exp(lw)
     D <- augment_titterington_errors(xyz,w)
     fit <- titterington(D)
     dat <- matrix2covlist(D)
