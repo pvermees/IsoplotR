@@ -102,12 +102,14 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,joint=TRUE,type=1,...){
     init <- init.ludwig(x,model=model,anchor=anchor,joint=joint,type=type)
     fit1 <- stats::optim(par=init$pars,fn=LL.ludwig,method="L-BFGS-B",
                          lower=init$lower,upper=init$upper,hessian=FALSE,
-                         x=x,anchor=anchor,model=model,exterr=exterr)
+                         x=x,anchor=anchor,joint=joint,type=type,
+                         model=model,exterr=exterr)
     fit2 <- fit1
     am1 <- anchormerge(fit1$par,x,anchor=anchor)
     fit2$par <- am1$x
-    hess <- stats::optimHess(par=fit2$par,fn=LL.ludwig,
-                             x=x,anchor=anchor,model=model,
+    hess <- stats::optimHess(par=fit2$par,fn=LL.ludwig,x=x,
+                             anchor=anchor,joint=joint,
+                             type=type,model=model,
                              exterr=exterr,hessian=TRUE)
     if (det(hess)<0){
         warning('Ill-conditioned Hessian, replaced by ',
@@ -347,7 +349,8 @@ init.ludwig <- function(x,model=1,anchor=0,joint=TRUE,type=1){
     list(pars=pars,lower=lower,upper=upper)
 }
 
-LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
+LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,
+                      hessian=FALSE,joint=TRUE,type=1){
     X <- x
     if ('U48i' %in% names(pars)){
         X$d$U48$x <- pars['U48i']
@@ -395,27 +398,31 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
     } else if (x$format<7){
         if (anchor[1]==1){
             tt <- pars['t']
-            if (hessian && iratio('Pb206Pb204')[2]>0){
-                a0 <- pars['a0']
-                LL <- LL - stats::dnorm(x=a0,
-                                        mean=iratio('Pb206Pb204')[1],
-                                        sd=iratio('Pb206Pb204')[2],
-                                        log=TRUE)
-            } else {
-                a0 <- iratio('Pb206Pb204')[1]
+            if (joint || type==1){
+                if (hessian && iratio('Pb206Pb204')[2]>0){
+                    a0 <- pars['a0']
+                    LL <- LL - stats::dnorm(x=a0,
+                                            mean=iratio('Pb206Pb204')[1],
+                                            sd=iratio('Pb206Pb204')[2],
+                                            log=TRUE)
+                } else {
+                    a0 <- iratio('Pb206Pb204')[1]
+                }
             }
-            if (hessian && iratio('Pb207Pb204')[2]>0){
-                b0 <- pars['b0']
-                LL <- LL - stats::dnorm(x=b0,
-                                        mean=iratio('Pb207Pb204')[1],
-                                        sd=iratio('Pb207Pb204')[2],
-                                        log=TRUE)
-            } else {
-                b0 <- iratio('Pb207Pb204')[1]
+            if (joint || type==2){
+                if (hessian && iratio('Pb207Pb204')[2]>0){
+                    b0 <- pars['b0']
+                    LL <- LL - stats::dnorm(x=b0,
+                                            mean=iratio('Pb207Pb204')[1],
+                                            sd=iratio('Pb207Pb204')[2],
+                                            log=TRUE)
+                } else {
+                    b0 <- iratio('Pb207Pb204')[1]
+                }
             }
         } else if (anchor[1]==2){
-            a0 <- pars['a0']
-            b0 <- pars['b0']
+            if (joint || type==1) a0 <- pars['a0']
+            if (joint || type==2) b0 <- pars['b0']
             if (hessian && length(anchor)>2 && anchor[3]>0){
                 tt <- pars['t']
                 st <- anchor[3]
@@ -425,34 +432,44 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
             }
         } else {
             tt <- pars['t']
-            a0 <- pars['a0']
-            b0 <- pars['b0']
+            if (joint || type==1) a0 <- pars['a0']
+            if (joint || type==2) b0 <- pars['b0']
         }
-        ta0b0w <- c('t'=unname(tt),'a0'=unname(a0),'b0'=unname(b0))
+        if (joint){
+            ta0b0w <- c('t'=unname(tt),'a0'=unname(a0),'b0'=unname(b0))
+        } else if (type==1){
+            ta0b0w <- c('t'=unname(tt),'a0'=unname(a0))
+        } else if (type==2){
+            ta0b0w <- c('t'=unname(tt),'b0'=unname(b0))
+        }
     } else {
         if (anchor[1]==1){
             tt <- pars['t']
-            if (hessian && iratio('Pb208Pb206')[2]>0){
-                a0 <- pars['a0']
-                LL <- LL - stats::dnorm(x=1/a0,
-                                        mean=iratio('Pb208Pb206')[1],
-                                        sd=iratio('Pb208Pb206')[2],
-                                        log=TRUE)
-            } else {
-                a0 <- 1/iratio('Pb208Pb206')[1]
+            if (joint || type%in%c(1,3)){
+                if (hessian && iratio('Pb208Pb206')[2]>0){
+                    a0 <- pars['a0']
+                    LL <- LL - stats::dnorm(x=1/a0,
+                                            mean=iratio('Pb208Pb206')[1],
+                                            sd=iratio('Pb208Pb206')[2],
+                                            log=TRUE)
+                } else {
+                    a0 <- 1/iratio('Pb208Pb206')[1]
+                }
             }
-            if (hessian && iratio('Pb208Pb207')[2]>0){
-                b0 <- pars['b0']
-                LL <- LL - stats::dnorm(x=1/b0,
-                                        mean=iratio('Pb208Pb207')[1],
-                                        sd=iratio('Pb208Pb207')[2],
-                                        log=TRUE)
-            } else {
-                b0 <- 1/iratio('Pb208Pb207')[1]
+            if (joint || type%in%c(2,4)){
+                if (hessian && iratio('Pb208Pb207')[2]>0){
+                    b0 <- pars['b0']
+                    LL <- LL - stats::dnorm(x=1/b0,
+                                            mean=iratio('Pb208Pb207')[1],
+                                            sd=iratio('Pb208Pb207')[2],
+                                            log=TRUE)
+                } else {
+                    b0 <- 1/iratio('Pb208Pb207')[1]
+                }
             }
         } else if (anchor[1]==2){
-            a0 <- pars['a0']
-            b0 <- pars['b0']
+            if (joint || type%in%c(1,3)) a0 <- pars['a0']
+            if (joint || type%in%c(2,4)) b0 <- pars['b0']
             if (hessian && length(anchor)>2 && anchor[3]>0){
                 tt <- pars['t']
                 st <- anchor[3]
@@ -462,29 +479,39 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
             }
         } else {
             tt <- pars['t']
-            a0 <- pars['a0']
-            b0 <- pars['b0']
+            if (joint || type%in%c(1,3)) a0 <- pars['a0']
+            if (joint || type%in%c(2,4)) b0 <- pars['b0']
         }
-        ta0b0w <- c('t'=unname(tt),'a0'=unname(a0),'b0'=unname(b0))
+        if (joint){
+            ta0b0w <- c('t'=unname(tt),'a0'=unname(a0),'b0'=unname(b0))
+        } else if (type%in%c(1,3)){
+            ta0b0w <- c('t'=unname(tt),'a0'=unname(a0))
+        } else if (type%in%c(2,4)){
+            ta0b0w <- c('t'=unname(tt),'b0'=unname(b0))
+        }
     }
     if (model==3){
         ta0b0w['w'] <- pars['w']
     }
-    if (model==2){
+    if (joint && model==2){
         LL <- LL + LL.ludwig.model2(ta0b0w,X,anchor=anchor,exterr=exterr)
-    } else {
+    } else if (joint){
         LL <- LL + data2ludwig(X,ta0b0w,anchor=anchor,exterr=exterr)$LL
+    } else if (model==2){
+        LL <- LL + LL.ludwig.model2.2d(ta0b0w,X,anchor=anchor,exterr=exterr)
+    } else {
+        LL <- LL + LL.ludwig.2d(ta0b0w,X,anchor=anchor,exterr=exterr)
     }
     if (x$d$U48$option==2){
         pred <- mclean(tt=tt,d=X$d)
         LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
     } else if (hessian && x$d$U48$option==1 && x$d$U48$sx>0){
         U48i <- pars['U48i']
-        LL <- LL - stats::dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)        
+        LL <- LL - stats::dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE) 
     }
     if (x$d$ThU$option==2){
         pred <- mclean(tt=tt,d=X$d)
-        LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)        
+        LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
     } else if (hessian && x$d$ThU$option==1 && x$d$ThU$sx>0){
         ThUi <- pars['ThUi']
         LL <- LL - stats::dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
@@ -498,6 +525,36 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,hessian=FALSE){
         LL <- LL - stats::dnorm(x=PaUi,mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
     }
     LL
+}
+
+LL.ludwig.2d <- function(ta0b0w,x,anchor=0,exterr=FALSE,type=1){
+    if (x$format<4){
+        yd <- data2york(x,option=2)
+    } else if (x$format<7){
+        if (type==1){
+            yd <- data2york(x,option=3)
+        } else {
+            yd <- data2york(x,option=4)
+        }
+    } else {
+        if (anchor[1]==2 & length(anchor)>1){
+            tt <- anchor[2]
+        } else {
+            tt <- ta0b0w['t']
+        }
+        if (type==1){
+            yd <- data2york(x,option=5,tt=tt)
+        } else if (type==2){
+            yd <- data2york(x,option=6,tt=tt)
+        } else if (type==3){
+            yd <- data2york(x,option=7,tt=tt)
+        } else if (type==4){
+            yd <- data2york(x,option=8,tt=tt)
+        }
+    }
+    yfit <- york(yd)
+    SS <- yfit$mswd*yfit$df
+    SS2LL(SS,nn=length(x),df=yfit$df)
 }
 
 data2ludwig <- function(x,ta0b0w,anchor=0,exterr=FALSE){
@@ -659,6 +716,10 @@ get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
     }
     dEdx <- w^2
     dEdx*J%*%t(J)
+}
+
+LL.ludwig.model2.2d <- function(ta0b0w,X,anchor=0,exterr=FALSE){
+    
 }
 
 LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
