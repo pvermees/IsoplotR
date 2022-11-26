@@ -127,11 +127,3 @@ augment_titterington_errors <- function(xyz,w){
     out[,'rYZ'] <- xyz[,'rYZ']*xyz[,'sY']/out[,'sY']
     out
 }
-
-LL.deming <- function(a,b,x,y,LL=FALSE){
-    dem <- deming(a=a,b=b,x=x,y=y)
-    SS <- sum(dem$d^2)
-    if (LL) out <- SS2LL(SS=SS,nn=length(x))
-    else out <- SS
-    out
-}

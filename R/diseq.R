@@ -325,14 +325,11 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$dPb207U235dl35 -> out$dPb207U235dl31
     out$Pb208Th232 <- rep(exp(l32*tt)-1,nc)
     out$dPb208Th232dt <- rep(exp(l32*tt)*l32,nc)
-    out$d2Pb208Th232dt2 <- rep(exp(l32*tt)*l32^2,nc)
     if (d$equilibrium){
         out$Pb206U238 <- rep(exp(l38*tt)-1,nc)
         out$Pb207U235 <- rep(exp(l35*tt)-1,nc)
         out$dPb206U238dt <- rep(exp(l38*tt)*l38,nc)
         out$dPb207U235dt <- rep(exp(l35*tt)*l35,nc)
-        out$d2Pb206U238dt2 <- rep(exp(l38*tt)*l38^2,nc)
-        out$d2Pb207U235dt2 <- rep(exp(l35*tt)*l35^2,nc)
         if (exterr){
             out$dPb206U238dl38 <- rep(tt*exp(l38*tt),nc)
             out$dPb207U235dl35 <- rep(tt*exp(l35*tt),nc)
@@ -368,21 +365,12 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         if (d$PaU$option>0) d$n0['Pa231',] <- d$PaU$x/l31
         d$nt <- forward(tt=tt,d=d)
         dntdt <- forward(tt,d=d,derivative=1)
-        d2ntdt2 <- forward(tt,d=d,derivative=2)
         out$Pb206U238 <- d$nt['Pb206',]/d$nt['U238',]
         out$Pb207U235 <- d$nt['Pb207',]/d$nt['U235',]
         out$dPb206U238dt <- dntdt['Pb206',]/d$nt['U238',] -
             out$Pb206U238*dntdt['U238',]/d$nt['U238',]
-        out$d2Pb206U238dt2 <- d2ntdt2['Pb206',]/d$nt['U238',] -
-            2*dntdt['Pb206',]*dntdt['U238',]/d$nt['U238',]^2 -
-            out$Pb206U238*d2ntdt2['U238',]/d$nt['U238',] +
-            2*out$Pb206U238*(dntdt['U238',]/d$nt['U238',])^2
         out$dPb207U235dt <- dntdt['Pb207',]/d$nt['U235',] -
             out$Pb207U235*dntdt['U235',]/d$nt['U235',]
-        out$d2Pb207U235dt2 <- d2ntdt2['Pb207',]/d$nt['U235',] -
-            2*dntdt['Pb207',]*dntdt['U235',]/d$nt['U235',]^2 -
-            out$Pb207U235*d2ntdt2['U235',]/d$nt['U235',] +
-            2*out$Pb207U235*(dntdt['U235',]/d$nt['U235',])^2
         out$U48i <- (d$n0['U234',]*l34)/(d$n0['U238',]*l38)
         out$ThUi <- (d$n0['Th230',]*l30)/(d$n0['U238',]*l38)
         out$U48 <- (d$nt['U234',]*l34)/(d$nt['U238',]*l38)
@@ -465,7 +453,7 @@ drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
     rownames(dntdl) <- names(d$L)
     # 2. derivative of the ratio
     out <- (d$nt[den,]*dntdl[num,]-d$nt[num,]*dntdl[den,])/d$nt[den,,drop=FALSE]^2
-    out
+    as.vector(out)
 }
 diseq.75.misfit <- function(tt,x,d){
     pred <- subset(age_to_Pb207U235_ratio(tt,d=d),select='75')

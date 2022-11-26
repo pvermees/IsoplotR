@@ -821,7 +821,7 @@ LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
 LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
                          type=1,LL=TRUE){
     tt <- ta0b0w['t']
-    if (x$format %in% c(4,5,6)){
+    if (x$format %in% (4:6)){
         if (type==1){
             yd <- data2york(x,option=3)
             a <- 1/ta0b0w['a0']
@@ -832,9 +832,8 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
             a <- 1/ta0b0w['b0']
             r75 <- age_to_Pb207U235_ratio(tt)[1]
             b <- -a*r75
-            dbdl35 <- -a*D$dPb206U238dl38
         }
-    } else if (x$format %in% c(7,8)){
+    } else if (x$format %in% (7:8)){
         if (type==1){
             yd <- data2york(x,option=6,tt=tt)
             a <- 1/ta0b0w['a0']
@@ -860,10 +859,30 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
         stop('LL.ludwig.2d is only relevant to U-Pb formats 4-8')
     }
     w <- ifelse('w' %in% names(ta0b0w),ta0b0w['w'],0)
+    ns <- length(x)
     if (model==2){
-        out <- LL.deming(a=a,b=b,x=yd[,'X'],y=yd[,'Y'],LL=LL)
+        dem <- deming(a=a,b=b,x=yd[,'X'],y=yd[,'Y'])
+        D <- as.vector(dem$d)
+        E <- diag(sum(D^2)/(ns-2),ns,ns)
+        if (exterr){
+            J <- matrix(0,ns,7)
+            El <- getEl()
+            colnames(J) <- colnames(El)
+            McL <- mclean(tt=tt,d=x$d,exterr=exterr)
+            if (type==1){
+                J[,'U238'] <- a*McL$dPb206U238dl38*dem$dddb
+                J[,'U234'] <- a*McL$dPb206U238dl34*dem$dddb
+                J[,'Th230'] <- a*McL$dPb206U238dl30*dem$dddb
+                J[,'Ra226'] <- a*McL$dPb206U238dl26*dem$dddb
+            } else if (type==2){
+                J[,'U235'] <- a*McL$dPb207U235dl35*dem$dddb
+                J[,'Pa231'] <- a*McL$dPb207U235dl31*dem$dddb
+            } else {
+                J[,'Th232'] <- a*McL$dPb208Th232dl32*dem$dddb
+            }
+            E <- E + J %*% El %*% t(J)
+        }
     } else {
-        ns <- nrow(yd)
         O <- augment_york_errors(yd,w)
         P <- get.york.xy(O,a=a,b=b)
         D <- c(O[,'X']-P[,1],O[,'Y']-P[,2])
@@ -873,8 +892,27 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
         diag(E)[ix] <- O[,'sX']^2
         diag(E)[iy] <- O[,'sY']^2
         E[ix,iy] <- E[iy,ix] <- diag(O[,'rXY']*O[,'sX']*O[,'sY'])
-        out <- LL.norm(D,E)
+        if (exterr){
+            El <- getEl()
+            J <- matrix(0,2*ns,7)
+            colnames(J) <- colnames(El)
+            McL <- mclean(tt=tt,d=x$d,exterr=exterr)
+            if (type==1){
+                J[iy,'U238'] <- a*McL$dPb206U238dl38*P[,1]
+                J[iy,'U234'] <- a*McL$dPb206U238dl34*P[,1]
+                J[iy,'Th230'] <- a*McL$dPb206U238dl30*P[,1]
+                J[iy,'Ra226'] <- a*McL$dPb206U238dl26*P[,1]
+            } else if (type==2){
+                J[iy,'U235'] <- a*McL$dPb207U235dl35*P[,1]
+                J[iy,'Pa231'] <- a*McL$dPb207U235dl31*P[,1]
+            } else {
+                J[iy,'Th232'] <- a*McL$dPb208Th232dl32*P[,1]
+            }
+            E <- E + J %*% El %*% t(J)
+        }
     }
+    if (LL) out <- LL.norm(D,E)
+    else out <- stats::mahalanobis(D,center=FALSE,cov=E)
     out
 }
 
