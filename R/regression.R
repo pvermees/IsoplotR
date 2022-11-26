@@ -73,27 +73,20 @@ model3regression <- function(xyz,type='york'){
     out
 }
 
-LL.york <- function(w=0,xy,a=NULL,b=NULL,LL=TRUE){
-    if (w==0) O <- xy
-    else O <- augment_york_errors(xy,w)
-    if (is.null(a) || is.null(b)){
-        fit <- york(O)
-        a <- fit$a[1]
-        b <- fit$b[1]
-    }
-    P <- get.york.xy(O,a=a,b=b)
+LL.york <- function(w=0,xy){
+    O <- augment_york_errors(xy,w)
     x1 <- O[,'X']
     x2 <- O[,'Y']
     s1 <- O[,'sX']
     s2 <- O[,'sY']
     rho <- O[,'rXY']
+    fit <- york(O)
+    P <- get.york.xy(O,a=fit$a[1],b=fit$b[1])
     m1 <- P[,1]
     m2 <- P[,2]
     z2 <- ((x1-m1)/s1)^2 + ((x2-m2)/s2)^2 - 2*rho*(x1-m1)*(x2-m2)/(s1*s2)
     SS <- sum(z2/(1-rho^2))
-    if (LL) out <- sum(log(s1)+log(s2)+0.5*log(1-rho^2)) + SS/2
-    else out <- SS
-    out
+    sum(log(s1)+log(s2)+0.5*log(1-rho^2)) + SS/2
 }
 LL.titterington <- function(w,xyz){
     out <- 0
@@ -132,5 +125,13 @@ augment_titterington_errors <- function(xyz,w){
     out[,'sY'] <- sqrt(xyz[,'sY']^2 + w^2)
     out[,'rXY'] <- xyz[,'rXY']*xyz[,'sY']/out[,'sY']
     out[,'rYZ'] <- xyz[,'rYZ']*xyz[,'sY']/out[,'sY']
+    out
+}
+
+LL.deming <- function(a,b,x,y,LL=FALSE){
+    dem <- deming(a=a,b=b,x=x,y=y)
+    SS <- sum(dem$d^2)
+    if (LL) out <- SS2LL(SS=SS,nn=length(x))
+    else out <- SS
     out
 }

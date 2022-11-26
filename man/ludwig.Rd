@@ -5,9 +5,9 @@
 \title{Linear regression of U-Pb data with correlated errors, taking
 into account decay constant uncertainties.}
 \usage{
-ludwig(x, model = 1, anchor = 0, exterr = FALSE, joint = TRUE, type = 1, ...)
+ludwig(x, model = 1, anchor = 0, exterr = FALSE, type = "joint", ...)
 
-ludwig(x, model = 1, anchor = 0, exterr = FALSE, joint = TRUE, type = 1, ...)
+ludwig(x, model = 1, anchor = 0, exterr = FALSE, type = "joint", ...)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -44,6 +44,31 @@ concordia line at an age equal to \code{anchor[2]}.}
 
 \item{exterr}{propagate external sources of
 uncertainty (i.e. decay constants)?}
+
+\item{type}{only relevant if \code{x$format>3}. Can take on the following
+values:
+
+\code{'joint'} or \code{0}: 3-dimensional isochron regression.
+
+\code{1}: 2-dimensional regression of
+\eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb vs.
+\eqn{{}^{238}}U/\eqn{{}^{206}}Pb (for U-Pb formats 4, 5 and 6), or
+of \eqn{{}^{208}}Pb/\eqn{{}^{206}}Pb vs.
+\eqn{{}^{238}}U/\eqn{{}^{206}}Pb (for U-Pb formats 7 and 8).
+
+\code{2}: 2-dimensional regression of
+\eqn{{}^{204}}Pb/\eqn{{}^{207}}Pb vs.
+\eqn{{}^{235}}U/\eqn{{}^{207}}Pb (for U-Pb formats 4, 5 and 6), or
+of \eqn{{}^{208}}Pb/\eqn{{}^{207}}Pb vs.
+\eqn{{}^{235}}U/\eqn{{}^{207}}Pb (for U-Pb formats 7 and 8).
+
+\code{3}: 2-dimensional regression of
+\eqn{{}^{206}}Pb/\eqn{{}^{208}}Pb vs.
+\eqn{{}^{232}}Th/\eqn{{}^{208}}Pb (only for U-Pb formats 7 and 8).
+
+\code{4}: 2-dimensional regression of
+\eqn{{}^{207}}Pb/\eqn{{}^{208}}Pb vs.
+\eqn{{}^{232}}Th/\eqn{{}^{208}}Pb (only for U-Pb formats 7 and 8).}
 
 \item{...}{optional arguments}
 }
