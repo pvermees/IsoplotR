@@ -839,34 +839,34 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
         if (type==1){
             yd <- data2york(x,option=3)
             a <- 1/ta0b0w['a0']
-            r68 <- age_to_Pb206U238_ratio(tt)[1]
+            r68 <- age_to_Pb206U238_ratio(tt,d=x$d)[1]
             b <- -a*r68
         } else {
             yd <- data2york(x,option=4)
             a <- 1/ta0b0w['b0']
-            r75 <- age_to_Pb207U235_ratio(tt)[1]
+            r75 <- age_to_Pb207U235_ratio(tt,d=x$d)[1]
             b <- -a*r75
         }
     } else if (x$format %in% (7:8)){
         if (type==1){
             yd <- data2york(x,option=6,tt=tt)
             a <- 1/ta0b0w['a0']
-            r68 <- age_to_Pb206U238_ratio(tt)[1]
+            r68 <- age_to_Pb206U238_ratio(tt,d=x$d)[1]
             b <- -a*r68
         } else if (type==2){
             yd <- data2york(x,option=7,tt=tt)
             a <- 1/ta0b0w['b0']
-            r75 <- age_to_Pb207U235_ratio(tt)[1]
+            r75 <- age_to_Pb207U235_ratio(tt,d=x$d)[1]
             b <- -a*r75
         } else if (type==3){
             yd <- data2york(x,option=8,tt=tt)
             a <- ta0b0w['a0']
-            r82 <- age_to_Pb208Th232_ratio(tt)[1]
+            r82 <- age_to_Pb208Th232_ratio(tt,d=x$d)[1]
             b <- -a*r82
         } else if (type==4){
             yd <- data2york(x,option=9,tt=tt)
             a <- ta0b0w['b0']
-            r82 <- age_to_Pb208Th232_ratio(tt)[1]
+            r82 <- age_to_Pb208Th232_ratio(tt,d=x$d)[1]
             b <- -a*r82
         }
     } else {
