@@ -245,10 +245,13 @@ forward <- function(tt,d=diseq(),derivative=0){
 }
 
 check.equilibrium <- function(d=diseq()){
-    U48 <- (d$U48$option==0 | all(d$U48$x==1))
-    ThU <- (d$ThU$option==0 | all(d$ThU$x==1))
-    RaU <- (d$RaU$option==0 | all(d$RaU$x==1))
-    PaU <- (d$PaU$option==0 | all(d$PaU$x==1))
+    checkratio <- function(r){
+        r$option == 0 || all(r$x==1) & (is.null(r$sx) | all(r$sx==0))
+    }
+    U48 <- checkratio(d$U48)
+    ThU <- checkratio(d$ThU)
+    RaU <- checkratio(d$RaU)
+    PaU <- checkratio(d$PaU)
     U48 & ThU & RaU & PaU
 }
 

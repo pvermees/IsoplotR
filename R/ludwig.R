@@ -861,12 +861,12 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
         } else if (type==3){
             yd <- data2york(x,option=8,tt=tt)
             a <- ta0b0w['a0']
-            r82 <- age_to_Pb208Th232_ratio(tt,d=x$d)[1]
+            r82 <- age_to_Pb208Th232_ratio(tt)[1]
             b <- -a*r82
         } else if (type==4){
             yd <- data2york(x,option=9,tt=tt)
             a <- ta0b0w['b0']
-            r82 <- age_to_Pb208Th232_ratio(tt,d=x$d)[1]
+            r82 <- age_to_Pb208Th232_ratio(tt)[1]
             b <- -a*r82
         }
     } else {
