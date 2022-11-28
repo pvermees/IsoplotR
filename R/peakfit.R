@@ -569,7 +569,12 @@ min_age_model <- function(zs,np=4){
     if (is.null(H) & np>3){
         return(min_age_model(zs=zs,np=3))
     }
-    lE <- MASS::ginv(H)
+    if (det(H)<0){
+        warning('Ill-conditioned Hessian, replaced by ',
+                'nearest positive definite matrix')
+        H <- nearPD(H)
+    }
+    lE <- solve(H)
     par <- mappar(fit$par,Mz)
     # propagate the uncertainties from -Inf/+Inf to model space
     J <- diag(np)

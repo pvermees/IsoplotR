@@ -579,7 +579,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         if (model==3){
             w <- fit$par['w']
             sw <- sqrt(fit$cov['w','w'])
-            fit$disp <- c('w'=w,'s[w]'=sw)
+            fit$disp <- c(w,'s[w]'=sw)
         }
         out <- fit
         out$age <- NULL

@@ -139,7 +139,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
                 'nearest positive definite matrix')
         hess <- nearPD(hess)
     }
-    fit2$cov <- MASS::ginv(hess)
+    fit2$cov <- solve(hess)
     dimnames(fit2$cov) <- dimnames(hess)
     am2 <- anchormerge(fit1$par,x,anchor=anchor,type=type,dontchecksx=TRUE)
     anchored <- names(am2$x)[names(am2$x) %ni% names(fit1$par)]
@@ -216,7 +216,7 @@ anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE,type='joint'){
                 nonzerosx <- (iratio('Pb208Pb207')[2]>0)
                 if (dontchecksx || nonzerosx){
                     X['b0'] <- 1/iratio('Pb208Pb207')[1]
-                    sX['b0'] <- iratio('Pb208Pb207')[2]*X['b0']^2                    
+                    sX['b0'] <- iratio('Pb208Pb207')[2]*X['b0']^2
                 }
             }
         }
