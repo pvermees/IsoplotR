@@ -556,18 +556,22 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         if (type==1){                           # 04-08c/06 vs. 38/06
             x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=md)[1]
             dx0invdt <- D$dPb206U238dt
+            E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^238*'U/'^206*'Pb')
         } else if (type==2){                    # 04-08c/07 vs. 35/07
             x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=md)[1]
             dx0invdt <- D$dPb207U235dt
+            E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^235*'U/'^207*'Pb')
         } else if (type==3 & x$format%in%c(7,8)){  # 06c/08 vs. 32/08
             x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
             dx0invdt <- D$dPb208Th232dt
+            E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^232*'Th/'^208*'Pb')
         } else if (type==4 & x$format%in%c(7,8)){  # 07c/08 vs. 32/08
             x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
             dx0invdt <- D$dPb208Th232dt
+            E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^232*'Th/'^208*'Pb')
         } else {
             stop('Invalid isochron type.')
@@ -620,7 +624,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         b <- -a*x0inv
         J[2,1] <- -a*dx0invdt
         J[2,2] <- x0inv*a^2
-        cov.ab <- J%*%fit$cov%*%t(J)
+        cov.ab <- J%*%E%*%t(J)
         out$a <- c(a,sqrt(cov.ab[1,1]))
         out$b <- c(b,sqrt(cov.ab[2,2]))
         names(out$a) <- c('a','s[a]')
