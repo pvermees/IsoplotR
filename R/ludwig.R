@@ -250,11 +250,15 @@ anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint'){
+    relerr <- function(yfit){ # relative error of the x-intercept
+        sqrt((yfit$a[2]/yfit$a[1])^2 + (yfit$b[2]/yfit$b[1])^2)
+    }
     pars <- lower <- upper <- vector()
     if (x$format<4){
         yd <- data2york(x,option=2)
         yfit <- york(yd)
         PbU0 <- abs(yfit$b[1]/yfit$a[1])
+        if (model==3) swt <- relerr(yfit)
         if (anchor[1]==1){
             pars['t'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['t'] <- pars['t']/10
@@ -285,8 +289,10 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         if (anchor[1]==1){
             if (type%in%c('joint',0,1)){
                 pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
+                if (model==3) swt <- relerr(yfita)
             } else if (type==2){
                 pars['t'] <- get.Pb207U235.age(x=Pb7U5)[1]
+                if (model==3) swt <- relerr(yfitb)
             }
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
@@ -304,8 +310,10 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         } else {
             if (type%in%c('joint',0,1)){
                 pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
+                if (model==3) swt <- relerr(yfita)
             } else if (type==2){
                 pars['t'] <- get.Pb207U235.age(x=Pb7U5)[1]
+                if (model==3) swt <- relerr(yfitb)
             }
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
@@ -338,6 +346,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
             Pb8Th2 <- abs(yfit$b[1]/yfit$a[1])
             tt <- get.Pb208Th232.age(x=Pb8Th2)[1]
         }
+        if (model==3) swt <- relerr(yfit)
         if (type%in%c('joint',0,1,3)){
             yda <- data2york(x,option=6,tt=tt)
             yfita <- york(yda)
@@ -378,9 +387,9 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         }
     }
     if (model==3){
-        pars['w'] <- 0.01
+        pars['w'] <- pars['t']*swt
         lower['w'] <- 0
-        upper['w'] <- 10
+        upper['w'] <- pars['w']*10
     }
     if (x$d$U48$option==2){
         if (x$d$U48$sx>0){
@@ -835,47 +844,53 @@ LL.ludwig.model2 <- function(ta0b0,x,anchor=0,exterr=FALSE){
 LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
                          type=1,LL=TRUE){
     tt <- ta0b0w['t']
+    McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format %in% (4:6)){
         if (type==1){
-            yd <- data2york(x,option=3)
+            O <- data2york(x,option=3)
             a <- 1/ta0b0w['a0']
             r68 <- age_to_Pb206U238_ratio(tt,d=x$d)[1]
             b <- -a*r68
+            dbdt <- -a*McL$dPb206U238dt
         } else {
-            yd <- data2york(x,option=4)
+            O <- data2york(x,option=4)
             a <- 1/ta0b0w['b0']
             r75 <- age_to_Pb207U235_ratio(tt,d=x$d)[1]
             b <- -a*r75
+            dbdt <- -a*McL$dPb207U235dt
         }
     } else if (x$format %in% (7:8)){
         if (type==1){
-            yd <- data2york(x,option=6,tt=tt)
+            O <- data2york(x,option=6,tt=tt)
             a <- 1/ta0b0w['a0']
             r68 <- age_to_Pb206U238_ratio(tt,d=x$d)[1]
             b <- -a*r68
+            dbdt <- -a*McL$dPb206U238dt
         } else if (type==2){
-            yd <- data2york(x,option=7,tt=tt)
+            O <- data2york(x,option=7,tt=tt)
             a <- 1/ta0b0w['b0']
             r75 <- age_to_Pb207U235_ratio(tt,d=x$d)[1]
             b <- -a*r75
+            dbdt <- -a*McL$dPb207U235dt
         } else if (type==3){
-            yd <- data2york(x,option=8,tt=tt)
+            O <- data2york(x,option=8,tt=tt)
             a <- ta0b0w['a0']
             r82 <- age_to_Pb208Th232_ratio(tt)[1]
             b <- -a*r82
+            dbdt <- -a*McL$dPb208Th232dt
         } else if (type==4){
-            yd <- data2york(x,option=9,tt=tt)
+            O <- data2york(x,option=9,tt=tt)
             a <- ta0b0w['b0']
             r82 <- age_to_Pb208Th232_ratio(tt)[1]
             b <- -a*r82
+            dbdt <- -a*McL$dPb208Th232dt
         }
     } else {
         stop('LL.ludwig.2d is only relevant to U-Pb formats 4-8')
     }
-    w <- ifelse('w' %in% names(ta0b0w),ta0b0w['w'],0)
     ns <- length(x)
     if (model==2){
-        dem <- deming(a=a,b=b,x=yd[,'X'],y=yd[,'Y'])
+        dem <- deming(a=a,b=b,x=O[,'X'],y=O[,'Y'])
         D <- as.vector(dem$d)
         SS <- sum(D^2)
         E <- diag(SS,ns,ns)/(ns-2)
@@ -898,7 +913,6 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
             E <- E + J %*% El %*% t(J)
         }
     } else {
-        O <- augment_york_errors(yd,w)
         P <- get.york.xy(O,a=a,b=b)
         D <- c(O[,'X']-P[,1],O[,'Y']-P[,2])
         E <- matrix(0,2*ns,2*ns)
@@ -907,11 +921,16 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
         diag(E)[ix] <- O[,'sX']^2
         diag(E)[iy] <- O[,'sY']^2
         E[ix,iy] <- E[iy,ix] <- diag(O[,'rXY']*O[,'sX']*O[,'sY'])
+        if ('w' %in% names(ta0b0w)){
+            w <- ta0b0w['w']
+            Jw <- matrix(0,2*ns,2*ns)
+            diag(Jw)[iy] <- -P[,1]*dbdt
+            E <- E + Jw%*%t(Jw)*w^2
+        }
         if (exterr){
             El <- getEl()
             J <- matrix(0,2*ns,7)
             colnames(J) <- colnames(El)
-            McL <- mclean(tt=tt,d=x$d,exterr=exterr)
             if (type==1){
                 J[iy,'U238'] <- a*McL$dPb206U238dl38*P[,1]
                 J[iy,'U234'] <- a*McL$dPb206U238dl34*P[,1]
@@ -925,7 +944,7 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
             }
             E <- E + J %*% El %*% t(J)
         }
-        SS <- stats::mahalanobis(D,center=FALSE,cov=E)
+        if (!LL) SS <- stats::mahalanobis(D,center=FALSE,cov=E)
     }
     if (LL) out <- LL.norm(D,E)
     else out <- SS
