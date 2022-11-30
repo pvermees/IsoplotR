@@ -1,8 +1,8 @@
-regression <- function(xyz,model=1,type='york',omit=NULL){
+regression <- function(xyz,model=1,type='york',omit=NULL,wtype='slope'){
     xyz2calc <- clear(xyz,omit)
     if (model==1) out <- model1regression(xyz2calc,type=type)
     else if (model==2) out <- model2regression(xyz2calc,type=type)
-    else if (model==3) out <- model3regression(xyz2calc,type=type)
+    else if (model==3) out <- model3regression(xyz2calc,type=type,wtype=wtype)
     else stop('invalid regression model')
     out$xyz <- xyz
     out$model <- model
@@ -49,16 +49,25 @@ model2regression <- function(xyz,type='york'){
     out
 }
 
-model3regression <- function(xyz,type='york'){
-    out <- list()
-    init <- log(stats::sd(xyz[,'Y']))
+model3regression <- function(xyz,type='york',wtype='slope'){
+    out <- pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
-        w <- stats::optimise(LL.york,interval=c(0,3*init),xy=xyz)$minimum
-        H <- stats::optimHess(w,LL.york,xy=xyz)
-        sw <- sqrt(solve(-H))
-        out$disp <- c('w'=w,'s[w]'=sw)
-        dd <- augment_york_errors(xyz,out$disp['w'])
-        out <- c(out,york(dd))
+        a <- pilot$a[1]
+        b <- pilot$b[1]
+        if (wtype %in% c('slope',0,'a')) w <- pilot$a[2]
+        else w <- pilot$b[2]
+        init <- c('a'=unname(a),'b'=unname(b),'w'=unname(w))
+        lower <- c('a'=unname(a/2),'b'=unname(b/2),'w'=unname(w/10))
+        upper <- init*c(2,2,10)
+        fit <- stats::optim(init,LL.york,method='L-BFGS-B',
+                            lower=lower,upper=upper,XY=xyz,
+                            wtype=wtype,hessian=TRUE)
+        covmat <- solve(fit$hessian)
+        out$a <- c(fit$par['a'],sqrt(covmat['a','a']))
+        out$b <- c(fit$par['b'],sqrt(covmat['b','b']))
+        out$cov.ab <- covmat['a','b']
+        out$disp <- c('w'=unname(fit$par['w']),
+                      's[w]'=unname(sqrt(covmat['w','w'])))
     } else if (identical(type,'titterington')){
         w <- stats::optimise(LL.titterington,interval=c(0,3*init),
                              xy=xyz,maximum=TRUE)$maximum
@@ -73,20 +82,28 @@ model3regression <- function(xyz,type='york'){
     out
 }
 
-LL.york <- function(w=0,xy){
-    O <- augment_york_errors(xy,w)
-    x1 <- O[,'X']
-    x2 <- O[,'Y']
-    s1 <- O[,'sX']
-    s2 <- O[,'sY']
-    rho <- O[,'rXY']
-    fit <- york(O)
-    P <- get.york.xy(O,a=fit$a[1],b=fit$b[1])
-    m1 <- P[,1]
-    m2 <- P[,2]
-    z2 <- ((x1-m1)/s1)^2 + ((x2-m2)/s2)^2 - 2*rho*(x1-m1)*(x2-m2)/(s1*s2)
-    SS <- sum(z2/(1-rho^2))
-    sum(log(s1)+log(s2)+0.5*log(1-rho^2)) + SS/2
+LL.york <- function(abw,XY,wtype='slope'){
+    ns <- nrow(XY)
+    X <- XY[,'X']
+    Y <- XY[,'Y']
+    sX <- XY[,'sX']
+    sY <- XY[,'sY']
+    rXY <- XY[,'rXY']
+    P <- get.york.xy(XY,a=abw['a'],b=abw['b'])
+    x <- P[,1]
+    y <- P[,2]
+    D <- c(X-x,Y-y)
+    E <- matrix(0,2*ns,2*ns)
+    ix <- 1:ns
+    iy <- (ns+1):(2*ns)
+    diag(E)[ix] <- sX^2
+    diag(E)[iy] <- sY^2
+    E[ix,iy] <- E[iy,ix] <- diag(rXY*sX*sY)
+    Jw <- matrix(0,2*ns,2*ns)
+    if (wtype%in%c(0,'slope','a')) diag(Jw)[iy] <- -1
+    else diag(Jw)[iy] <- -x
+    Ew <- Jw %*% t(Jw) * abw['w']^2
+    LL.norm(D,E+Ew)
 }
 LL.titterington <- function(w,xyz){
     out <- 0
@@ -114,12 +131,6 @@ LL.titterington <- function(w,xyz){
     out
 }
 
-augment_york_errors <- function(xy,w){
-    out <- xy
-    out[,'sY'] <- sqrt(xy[,'sY']^2 + w^2)
-    out[,'rXY'] <- xy[,'rXY']*xy[,'sY']/out[,'sY']
-    out
-}
 augment_titterington_errors <- function(xyz,w){
     out <- xyz
     out[,'sY'] <- sqrt(xyz[,'sY']^2 + w^2)
