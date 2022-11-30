@@ -250,15 +250,15 @@ anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint'){
-    relerr <- function(yfit){ # relative error of the x-intercept
-        sqrt((yfit$a[2]/yfit$a[1])^2 + (yfit$b[2]/yfit$b[1])^2)
+    if (model==3){
+        pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
+        w <- sqrt(pilot$cov['t','t'])
     }
     pars <- lower <- upper <- vector()
     if (x$format<4){
         yd <- data2york(x,option=2)
         yfit <- york(yd)
         PbU0 <- abs(yfit$b[1]/yfit$a[1])
-        if (model==3) swt <- relerr(yfit)
         if (anchor[1]==1){
             pars['t'] <- get.Pb206U238.age(x=PbU0)[1]
             lower['t'] <- pars['t']/10
@@ -289,10 +289,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         if (anchor[1]==1){
             if (type%in%c('joint',0,1)){
                 pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
-                if (model==3) swt <- relerr(yfita)
             } else if (type==2){
                 pars['t'] <- get.Pb207U235.age(x=Pb7U5)[1]
-                if (model==3) swt <- relerr(yfitb)
             }
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
@@ -310,10 +308,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         } else {
             if (type%in%c('joint',0,1)){
                 pars['t'] <- get.Pb206U238.age(x=Pb6U8)[1]
-                if (model==3) swt <- relerr(yfita)
             } else if (type==2){
                 pars['t'] <- get.Pb207U235.age(x=Pb7U5)[1]
-                if (model==3) swt <- relerr(yfitb)
             }
             lower['t'] <- pars['t']/10
             upper['t'] <- pars['t']*10
@@ -346,7 +342,6 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
             Pb8Th2 <- abs(yfit$b[1]/yfit$a[1])
             tt <- get.Pb208Th232.age(x=Pb8Th2)[1]
         }
-        if (model==3) swt <- relerr(yfit)
         if (type%in%c('joint',0,1,3)){
             yda <- data2york(x,option=6,tt=tt)
             yfita <- york(yda)
@@ -387,9 +382,9 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         }
     }
     if (model==3){
-        pars['w'] <- pars['t']*swt
-        lower['w'] <- 0
-        upper['w'] <- pars['w']*10
+        pars['w'] <- w
+        lower['w'] <- w/10
+        upper['w'] <- w*10
     }
     if (x$d$U48$option==2){
         if (x$d$U48$sx>0){
