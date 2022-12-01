@@ -408,3 +408,19 @@ deming <- function(a,b,x,y){
     out$dddb <- ((D*dNdb-N*dDdb)/D^2)/(2*out$d)
     out
 }
+
+hesscheck <- function(H){
+    if (det(H)>0){
+        out <- H
+    } else {
+        warning('Ill-conditioned Hessian, replaced by ',
+                'nearest positive definite matrix')
+        out <- nearPD(H)
+    }
+    out
+}
+
+invertcovmat <- function(sx,sy,sxy){
+    den <- (sx*sy)^2 - sxy^2
+    cbind('xx'=(sy^2)/den,'yy'=(sx^2)/den,'xy'=-sxy/den)
+}

@@ -752,12 +752,12 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,wtype='slope',
-                          growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
+                          plot=TRUE,exterr=TRUE,model=1,growth=FALSE,
+                          show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
+    out <- regression(d2calc,model=model,wtype=ifelse(inverse,0,1))
     out$y0[c('y','s[y]')] <- out$a 
     if (inverse){
         R76 <- out$a
@@ -776,6 +776,8 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         out$age['disp[t]'] <- 
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
+    } else {
+        out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,

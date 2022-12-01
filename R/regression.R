@@ -54,20 +54,30 @@ model3regression <- function(xyz,type='york',wtype='slope'){
     if (identical(type,'york')){
         a <- pilot$a[1]
         b <- pilot$b[1]
-        if (wtype %in% c('slope',0,'a')) w <- pilot$a[2]
-        else w <- pilot$b[2]
-        init <- c('a'=unname(a),'b'=unname(b),'w'=unname(w))
-        lower <- c('a'=unname(a/2),'b'=unname(b/2),'w'=unname(w/10))
-        upper <- init*c(2,2,10)
+        if (wtype %in% c('intercept',0,'a')){
+            lw <- log(pilot$a[2]*sqrt(pilot$mswd))
+        } else {
+            lw <- log(pilot$b[2]*sqrt(pilot$mswd))
+        }
+        init <- lower <- upper <-
+            c('a'=unname(a),'b'=unname(b),'lw'=unname(lw))
+        lower['a'] <- init['a']*0.9
+        lower['b'] <- min(init['b']*c(.9,1.1))
+        lower['lw'] <- init['lw'] - 5
+        upper['a'] <- init['a']*1.1
+        upper['b'] <- max(init['b']*c(.9,1.1))
+        upper['lw'] <- init['lw'] + 2
         fit <- stats::optim(init,LL.york,method='L-BFGS-B',
                             lower=lower,upper=upper,XY=xyz,
                             wtype=wtype,hessian=TRUE)
-        covmat <- solve(fit$hessian)
+        hess <- hesscheck(fit$hessian)
+        covmat <- solve(hess)
         out$a <- c(fit$par['a'],sqrt(covmat['a','a']))
         out$b <- c(fit$par['b'],sqrt(covmat['b','b']))
         out$cov.ab <- covmat['a','b']
-        out$disp <- c('w'=unname(fit$par['w']),
-                      's[w]'=unname(sqrt(covmat['w','w'])))
+        w <- exp(fit$par['lw'])
+        sw <- w*sqrt(covmat['lw','lw'])
+        out$disp <- c('w'=unname(w),'s[w]'=unname(sw))
     } else if (identical(type,'titterington')){
         w <- stats::optimise(LL.titterington,interval=c(0,3*init),
                              xy=xyz,maximum=TRUE)$maximum
@@ -82,28 +92,36 @@ model3regression <- function(xyz,type='york',wtype='slope'){
     out
 }
 
-LL.york <- function(abw,XY,wtype='slope'){
+LL.york <- function(ablw,XY,wtype='slope'){
     ns <- nrow(XY)
     X <- XY[,'X']
     Y <- XY[,'Y']
     sX <- XY[,'sX']
     sY <- XY[,'sY']
     rXY <- XY[,'rXY']
-    P <- get.york.xy(XY,a=abw['a'],b=abw['b'])
-    x <- P[,1]
-    y <- P[,2]
+    P <- get.york.xy(XY,a=ablw['a'],b=ablw['b'])
+    x <- P[,'x']
+    y <- P[,'y']
     D <- c(X-x,Y-y)
-    E <- matrix(0,2*ns,2*ns)
+    E <- matrix(0,3*ns,3*ns)
     ix <- 1:ns
     iy <- (ns+1):(2*ns)
+    iw <- (2*ns+1):(3*ns)
     diag(E)[ix] <- sX^2
     diag(E)[iy] <- sY^2
+    diag(E)[iw] <- exp(ablw['lw'])^2
     E[ix,iy] <- E[iy,ix] <- diag(rXY*sX*sY)
-    Jw <- matrix(0,2*ns,2*ns)
-    if (wtype%in%c(0,'slope','a')) diag(Jw)[iy] <- -1
-    else diag(Jw)[iy] <- -x
-    Ew <- Jw %*% t(Jw) * abw['w']^2
-    LL.norm(D,E+Ew)
+    Jw <- matrix(0,2*ns,3*ns)
+    Jw[ix,ix] <- Jw[iy,iy] <- diag(ns)
+    if (wtype%in%c(0,'intercept','a')){
+        Jw[ix,iw] <- -diag(P[,'dxda'])
+        Jw[iy,iw] <- -diag(P[,'dyda'])
+    } else {
+        Jw[ix,iw] <- -diag(P[,'dxdb'])
+        Jw[iy,iw] <- -diag(P[,'dydb'])
+    }
+    Ew <- Jw %*% E %*% t(Jw)
+    LL.norm(D,Ew)
 }
 LL.titterington <- function(w,xyz){
     out <- 0

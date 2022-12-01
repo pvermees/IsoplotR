@@ -131,14 +131,10 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     fit2 <- fit1
     am1 <- anchormerge(fit1$par,x,anchor=anchor,type=type)
     fit2$par <- am1$x
-    hess <- stats::optimHess(par=fit2$par,fn=LL.ludwig,x=x,
-                             anchor=anchor,type=type,model=model,
-                             exterr=exterr,hessian=TRUE)
-    if (det(hess)<0){
-        warning('Ill-conditioned Hessian, replaced by ',
-                'nearest positive definite matrix')
-        hess <- nearPD(hess)
-    }
+    H <- stats::optimHess(par=fit2$par,fn=LL.ludwig,x=x,
+                          anchor=anchor,type=type,model=model,
+                          exterr=exterr,hessian=TRUE)
+    hess <- hesscheck(H)
     fit2$cov <- solve(hess)
     dimnames(fit2$cov) <- dimnames(hess)
     am2 <- anchormerge(fit1$par,x,anchor=anchor,type=type,dontchecksx=TRUE)
