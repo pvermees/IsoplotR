@@ -577,9 +577,9 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             stop('Invalid isochron type.')
         }
         if (model==3){
-            w <- fit$par['w']
-            sw <- sqrt(fit$cov['w','w'])
-            fit$disp <- c(w,'s[w]'=sw)
+            disp <- exp(fit$par['w'])
+            sdisp <- disp*sqrt(fit$cov['w','w'])
+            fit$disp <- c(disp,'s[w]'=sdisp)
         }
         out <- fit
         out$age <- NULL
@@ -776,7 +776,8 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         out$age['disp[t]'] <- 
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
-    } else {
+    }
+    if (model==3){
         out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
     }
     if (plot) {

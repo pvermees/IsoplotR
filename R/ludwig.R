@@ -248,7 +248,7 @@ anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE,type='joint'){
 init.ludwig <- function(x,model=1,anchor=0,type='joint'){
     if (model==3){
         pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
-        w <- sqrt(pilot$cov['t','t'])
+        w <- sqrt(pilot$cov['t','t']*pilot$mswd)
     }
     pars <- lower <- upper <- vector()
     if (x$format<4){
@@ -379,8 +379,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
     }
     if (model==3){
         pars['w'] <- w
-        lower['w'] <- w/10
-        upper['w'] <- w*10
+        lower['w'] <- w - 5
+        upper['w'] <- w + 2
     }
     if (x$d$U48$option==2){
         if (x$d$U48$sx>0){
@@ -723,7 +723,7 @@ data2ludwig <- function(x,ta0b0w,anchor=0,exterr=FALSE){
     out
 }
 
-get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
+get.Ewd <- function(w=-Inf,format=1,ns=1,D=mclean()){
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     if (format<4) {
@@ -737,7 +737,7 @@ get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
     if (format>6) {
         diag(J[i3,i1]) <- -D$dPb208Th232dt # dMdt
     }
-    dEdx <- w^2
+    dEdx <- exp(w)^2
     dEdx*J%*%t(J)
 }
 
@@ -904,36 +904,30 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
             E <- E + J %*% El %*% t(J)
         }
     } else {
-        P <- get.york.xy(O,a=a,b=b)
-        D <- c(O[,'X']-P[,1],O[,'Y']-P[,2])
-        E <- matrix(0,2*ns,2*ns)
-        ix <- 1:ns
-        iy <- (ns+1):(2*ns)
-        diag(E)[ix] <- O[,'sX']^2
-        diag(E)[iy] <- O[,'sY']^2
-        E[ix,iy] <- E[iy,ix] <- diag(O[,'rXY']*O[,'sX']*O[,'sY'])
-        if ('w' %in% names(ta0b0w)){
-            w <- ta0b0w['w']
-            Jw <- matrix(0,2*ns,2*ns)
-            diag(Jw)[iy] <- -P[,1]*dbdt
-            E <- E + Jw%*%t(Jw)*w^2
-        }
+        w <- ifelse('w' %in% names(ta0b0w),ta0b0w['w'],-Inf)
+        DE <- york2DE(XY=O,a=a,b=b,w=w)
+        D <- DE$D
         if (exterr){
+            ix <- 1:ns
+            iy <- (ns+1):(2*ns)
             El <- getEl()
             J <- matrix(0,2*ns,7)
             colnames(J) <- colnames(El)
+            P <- get.york.xy(XY=O,a=a,b=b)
             if (type==1){
-                J[iy,'U238'] <- a*McL$dPb206U238dl38*P[,1]
-                J[iy,'U234'] <- a*McL$dPb206U238dl34*P[,1]
-                J[iy,'Th230'] <- a*McL$dPb206U238dl30*P[,1]
-                J[iy,'Ra226'] <- a*McL$dPb206U238dl26*P[,1]
+                J[iy,'U238'] <- a*McL$dPb206U238dl38*P[,'x']
+                J[iy,'U234'] <- a*McL$dPb206U238dl34*P[,'x']
+                J[iy,'Th230'] <- a*McL$dPb206U238dl30*P[,'x']
+                J[iy,'Ra226'] <- a*McL$dPb206U238dl26*P[,'x']
             } else if (type==2){
-                J[iy,'U235'] <- a*McL$dPb207U235dl35*P[,1]
-                J[iy,'Pa231'] <- a*McL$dPb207U235dl31*P[,1]
+                J[iy,'U235'] <- a*McL$dPb207U235dl35*P[,'x']
+                J[iy,'Pa231'] <- a*McL$dPb207U235dl31*P[,'x']
             } else {
-                J[iy,'Th232'] <- a*McL$dPb208Th232dl32*P[,1]
+                J[iy,'Th232'] <- a*McL$dPb208Th232dl32*P[,'x']
             }
-            E <- E + J %*% El %*% t(J)
+            E <- DE$E + J %*% El %*% t(J)
+        } else {
+            E <- DE$E
         }
         if (!LL) SS <- stats::mahalanobis(D,center=FALSE,cov=E)
     }
