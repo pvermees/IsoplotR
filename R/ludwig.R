@@ -246,11 +246,11 @@ anchormerge <- function(pars,x,anchor=0,dontchecksx=FALSE,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint'){
+    pars <- lower <- upper <- vector()
     if (model==3){
         pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
-        w <- sqrt(pilot$cov['t','t']*pilot$mswd)
+        w <- log(sqrt(pilot$cov['t','t']*pilot$mswd))
     }
-    pars <- lower <- upper <- vector()
     if (x$format<4){
         yd <- data2york(x,option=2)
         yfit <- york(yd)
@@ -904,8 +904,13 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,anchor=0,exterr=FALSE,
             E <- E + J %*% El %*% t(J)
         }
     } else {
-        w <- ifelse('w' %in% names(ta0b0w),ta0b0w['w'],-Inf)
-        DE <- york2DE(XY=O,a=a,b=b,w=w)
+        if ('w' %in% names(ta0b0w)){
+            # convert w from log(age) to log(slope):
+            ww <- ta0b0w['w'] + log(abs(dbdt))
+            DE <- york2DE(XY=O,a=a,b=b,w=ww)
+        } else {
+            DE <- york2DE(XY=O,a=a,b=b)
+        }
         D <- DE$D
         if (exterr){
             ix <- 1:ns
