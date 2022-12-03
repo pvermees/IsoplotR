@@ -1280,6 +1280,11 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                                          exterr=exterr,bratio=bratio)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
+    if (model==3){
+        dDPdt <- lambda(nuclide)[1]*(1+DP)
+        dDPdb <- ifelse(inverse,1/out$a[1],1)
+        out$disp <- out$disp*dDPdb/dDPdt
+    }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$displabel <- substitute(a*b*c,list(a='(',b=lab$y,c=')-dispersion = '))
     out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*'=')))
@@ -1390,10 +1395,10 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=' Ma',ski=NULL,...){
     } else if (fit$model==3){
         if (!is.na(type) & type=='U-Pb'){
             content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],
-                                    sigdig=sigdig,oerr=oerr,units='')
+                                    sigdig=sigdig,oerr=oerr,units=' Ma')
         } else {
             content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                    oerr=oerr,prefix=fit$displabel,units='')
+                                    oerr=oerr,prefix=fit$displabel,units=' Ma')
         }
     }
     nl <- length(content)
