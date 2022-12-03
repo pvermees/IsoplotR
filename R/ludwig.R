@@ -213,7 +213,9 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
     pars <- lower <- upper <- vector()
     if (model==3){
         pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
-        w <- log(sqrt(pilot$cov['t','t']*pilot$mswd))
+        w <- ifelse(pilot$cov['t','t']==0,
+                    log(pilot$par['t']/100),
+                    log(sqrt(pilot$cov['t','t']*pilot$mswd)))
     }
     if (x$format<4){
         yd <- data2york(x,option=2)
@@ -474,7 +476,9 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,type='joint'){
             ta0b0w <- c('t'=unname(tt),'b0'=unname(b0))
         }
     }
-    if (model==3) ta0b0w['w'] <- pars['w']
+    if (model==3){
+        ta0b0w['w'] <- pars['w']
+    }
     if (model==2 && (type%in%c('joint',0) || x$format<4)){
         LL <- LL + LL.ludwig.model2(ta0b0w,X,exterr=exterr)
     } else if (type%in%c('joint',0) || x$format<4){
