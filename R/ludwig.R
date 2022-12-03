@@ -130,12 +130,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
                         x=x,anchor=anchor,type=type,model=model,exterr=exterr)
     hess <- hesscheck(lfit$hessian)
     lfit$cov <- solve(hess)
-    fit <- lfit
-    fit$logpar <- lfit$par
-    fit$logcov <- lfit$cov
-    fit$par <- exp(lfit$par)
-    fit$cov <- diag(fit$par) %*% lfit$cov %*% diag(fit$par)
-    dimnames(fit$cov) <- dimnames(lfit$cov)
+    fit <- exponentiate(lfit)
     afit <- anchormerge(fit,x,anchor=anchor,type=type)
     out <- mswd.lud(afit,x=x,exterr=exterr,type=type)
     out$model <- model
@@ -144,6 +139,16 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
         sdisp <- disp*sqrt(out$cov['w','w'])
         out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     }
+    out
+}
+
+exponentiate <- function(fit){
+    out <- fit
+    out$logpar <- fit$par
+    out$logcov <- fit$cov
+    out$par <- exp(fit$par)
+    out$cov <- diag(out$par) %*% fit$cov %*% diag(out$par)
+    dimnames(out$cov) <- dimnames(fit$cov)
     out
 }
 
@@ -486,23 +491,19 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,type='joint'){
         pred <- mclean(tt=tt,d=X$d)
         LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
     } else if (x$d$U48$option==1 && x$d$U48$sx>0){
-        U48i <- pars['U48i']
-        LL <- LL - stats::dnorm(x=U48i,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE) 
+        LL <- LL - stats::dnorm(x=X$d$U48$x,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE) 
     }
     if (x$d$ThU$option==2){
         pred <- mclean(tt=tt,d=X$d)
         LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
     } else if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-        ThUi <- pars['ThUi']
-        LL <- LL - stats::dnorm(x=ThUi,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        LL <- LL - stats::dnorm(x=X$d$ThU$x,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
     }
     if (x$d$RaU$option==1 && x$d$RaU$sx>0){
-        RaUi <- pars['RaUi']
-        LL <- LL - stats::dnorm(x=RaUi,mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
+        LL <- LL - stats::dnorm(x=X$d$RaU$x,mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
     }
     if (x$d$PaU$option==1 && x$d$PaU$sx>0){
-        PaUi <- pars['PaUi']
-        LL <- LL - stats::dnorm(x=PaUi,mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
+        LL <- LL - stats::dnorm(x=X$d$PaU$x,mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
     }
     LL
 }
