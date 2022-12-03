@@ -147,7 +147,8 @@ exponentiate <- function(fit){
     out$logpar <- fit$par
     out$logcov <- fit$cov
     out$par <- exp(fit$par)
-    out$cov <- diag(out$par) %*% fit$cov %*% diag(out$par)
+    np <- length(out$par)
+    out$cov <- diag(out$par,np,np) %*% fit$cov %*% diag(out$par,np,np)
     dimnames(out$cov) <- dimnames(fit$cov)
     out
 }
@@ -380,7 +381,7 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,type='joint'){
     if ('t' %in% pnames){
         tt <- exp(pars['t'])
     } else if (anchor[1]==2){
-        tt <- exp(anchor[2])
+        tt <- anchor[2]
     } else {
         stop('missing t')
     }
