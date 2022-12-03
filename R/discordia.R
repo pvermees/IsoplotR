@@ -344,7 +344,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
     if (fit$model==1){
         line4 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
-        line4 <- disptit(w=fit$par['w'],sw=sqrt(fit$cov['w','w']),
+        line4 <- disptit(w=fit$disp['w'],sw=fit$disp['s[w]'],
                          units=' Ma',sigdig=sigdig,oerr=oerr)
     }
     extrarow <- fit$format>3 & !wetherill

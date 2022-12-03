@@ -576,11 +576,6 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         } else {
             stop('Invalid isochron type.')
         }
-        if (model==3){
-            disp <- exp(fit$par['w'])
-            sdisp <- disp*sqrt(fit$cov['w','w'])
-            fit$disp <- c(disp,'s[w]'=sdisp)
-        }
         out <- fit
         out$age <- NULL
         out$age['t'] <- tt

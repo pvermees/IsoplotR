@@ -133,6 +133,11 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     afit <- anchormerge(fit,x,anchor=anchor,type=type)
     out <- mswd.lud(afit,x=x,exterr=exterr,type=type)
     out$model <- model
+    if (model==3){
+        disp <- exp(out$par['w'])
+        sdisp <- disp*sqrt(out$cov['w','w'])
+        out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
+    }
     out
 }
 
@@ -141,8 +146,9 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
     inames <- names(fit$par)
     onames <- c('t','a0','b0','w')
     if (!x$d$equilibrium){
-        dnames <- c('U48i','ThUi','RaUi','PaUi')
-        onames <- c(onames,dnames)
+        dinames <- c('U48i','ThUi','RaUi','PaUi')
+        dnames <- c('U48','ThU','RaU','PaU')
+        onames <- c(onames,dinames)
     }
     non <- length(onames)
     out$par <- rep(0,non)
@@ -168,28 +174,35 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
     } else {
         out$par['a0'] <- NA
     }
-    if (type%in%c('joint',0,2,4)){
+    if (x$format>3 && type%in%c('joint',0,2,4)){
         if ('b0'%ni%inames && anchor[1]==1){
-            if (x$format<4) out$par['b0'] <- NA
-            else if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
+            if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
             else out$par['b0'] <- 1/iratio('Pb208Pb207')[1]
         } else {
             out$par['b0'] <- fit$par['b0']
             out$cov['b0',inames] <- fit$cov['b0',]
-            out$cov[inames,'b0'] <- fit$cov[,'b0']        
+            out$cov[inames,'b0'] <- fit$cov[,'b0']
         }
     } else {
         out$par['b0'] <- NA
     }
-    if ('w'%ni%inames) out$par['w'] <- NA
+    if ('w'%in%inames){
+        out$par['w'] <- fit$par['w']
+        out$cov['w',inames] <- fit$cov['w',]
+        out$cov[inames,'w'] <- fit$cov[,'w']
+    } else {
+        out$par['w'] <- NA
+    }
     if (!x$d$equilibrium){
-        for (dname in dnames){
-            if (dname%in%inames){
-                out$par[dname] <- fit$par[dname]
-                out$cov[dname,inames] <- fit$cov[dname,]
-                out$cov[inames,dname] <- fit$cov[,dname]
+        for (i in seq_along(dnames)){
+            diname <- dinames[i]
+            if (diname%in%inames){
+                out$par[diname] <- fit$par[diname]
+                out$cov[diname,inames] <- fit$cov[diname,]
+                out$cov[inames,diname] <- fit$cov[,diname]
             } else {
-                out$par[dname] <- x$d[dname]$x
+                dname <- dnames[i]
+                out$par[diname] <- x$d[[dname]]$x
             }
         }
     }
