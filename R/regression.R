@@ -54,26 +54,39 @@ model3regression <- function(xyz,type='york',wtype='slope'){
     if (identical(type,'york')){
         a <- pilot$a[1]
         b <- pilot$b[1]
-        if (wtype %in% c('intercept',0,'a')){
-            w <- log(pilot$a[2]*sqrt(pilot$mswd))
-        } else {
-            w <- log(pilot$b[2]*sqrt(pilot$mswd))
-        }
+        wa <- pilot$a[2]*sqrt(pilot$mswd)
+        wb <- pilot$b[2]*sqrt(pilot$mswd)
+        w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
         init <- lower <- upper <-
             c('a'=unname(a),'b'=unname(b),'w'=unname(w))
-        lower['a'] <- init['a']*0.8
-        lower['b'] <- min(init['b']*c(.8,1.2))
-        lower['w'] <- init['w'] - 5
-        upper['a'] <- init['a']*1.2
-        upper['b'] <- max(init['b']*c(.8,1.2))
-        upper['w'] <- init['w'] + 2
+        lower['a'] <- init['a'] - 5*wa
+        lower['b'] <- init['b'] - 5*wb
+        lower['w'] <- init['w'] - 3
+        upper['a'] <- init['a'] + 5*wa
+        upper['b'] <- init['b'] + 5*wb
+        upper['w'] <- init['w'] + 1
         fit <- stats::optim(init,LL.york,method='L-BFGS-B',
                             lower=lower,upper=upper,XY=xyz,
                             wtype=wtype,hessian=TRUE)
+        if (FALSE){ # temporary test
+            nw <- 20
+            aa <- seq(from=lower['a'],to=upper['a'],length.out=nw)
+            bb <- seq(from=lower['b'],to=upper['b'],length.out=nw)
+            ww <- seq(from=lower['w'],to=upper['w'],length.out=nw)
+            LL <- 0*ww
+            for (i in 1:nw){
+                pars <- fit$par#init
+                #pars['a'] <- aa[i]; p <- aa
+                #pars['b'] <- bb[i]; p <- bb
+                pars['w'] <- ww[i]; p <- ww
+                LL[i] <- LL.york(pars,XY=xyz)
+            }
+            plot(p,LL,type='b')
+        }
         hess <- hesscheck(fit$hessian)
         covmat <- solve(hess)
-        out$a <- c(fit$par['a'],sqrt(covmat['a','a']))
-        out$b <- c(fit$par['b'],sqrt(covmat['b','b']))
+        out$a <- c('a'=unname(fit$par['a']),'s[a]'=unname(sqrt(covmat['a','a'])))
+        out$b <- c('b'=unname(fit$par['b']),'s[b]'=unname(sqrt(covmat['b','b'])))
         out$cov.ab <- covmat['a','b']
         disp <- exp(fit$par['w'])
         sdisp <- disp*sqrt(covmat['w','w'])

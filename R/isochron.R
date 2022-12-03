@@ -868,13 +868,19 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
         x.lab <- quote(''^39*'Ar/'^36*'Ar')
         y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
-    out$displabel <- substitute(a*b*c,list(a='(',b=y.lab,c=')-dispersion = '))
+    out$displabel <- 'dispersion = '
     out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[o]*'=')
     out$age[c('t','s[t]')] <- get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     if (inflate(out)){
         out$age['disp[t]'] <- get.ArAr.age(R09,sqrt(out$mswd)*sR09,
                                            x$J[1],x$J[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
+    }
+    if (model==3){
+        l40 <- lambda('K40')[1]
+        dArArdt <- l40*exp(l40*out$age['t'])/x$J[1]
+        if (inverse) out$disp <- out$disp*dArArdt
+        else out$disp <- out$disp/dArArdt
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,

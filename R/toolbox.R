@@ -410,12 +410,15 @@ deming <- function(a,b,x,y){
 }
 
 hesscheck <- function(H){
-    if (det(H)>0){
+    tol <- 1e-8
+    eig <- eigen(H,only.values=TRUE)$values
+    if (all(eig>tol)){
         out <- H
     } else {
         warning('Ill-conditioned Hessian, replaced by ',
                 'nearest positive definite matrix')
         out <- nearPD(H)
+        dimnames(out) <- dimnames(H)
     }
     out
 }
