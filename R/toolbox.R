@@ -427,3 +427,14 @@ invertcovmat <- function(sx,sy,sxy){
     den <- (sx*sy)^2 - sxy^2
     cbind('xx'=(sy^2)/den,'yy'=(sx^2)/den,'xy'=-sxy/den)
 }
+
+exponentiate <- function(fit,signs=fit$par/fit$par){
+    out <- fit
+    out$logpar <- fit$par
+    out$logcov <- fit$cov
+    out$par <- signs*exp(fit$par)
+    np <- length(out$par)
+    out$cov <- diag(out$par,np,np) %*% fit$cov %*% diag(out$par,np,np)
+    dimnames(out$cov) <- dimnames(fit$cov)
+    out
+}

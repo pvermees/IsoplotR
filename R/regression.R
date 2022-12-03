@@ -50,46 +50,30 @@ model2regression <- function(xyz,type='york'){
 }
 
 model3regression <- function(xyz,type='york',wtype='slope'){
-    out <- pilot <- model1regression(xyz,type=type)
+    pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
-        a <- pilot$a[1]
-        b <- pilot$b[1]
+        signs <- c('a'=sign(unname(pilot$a[1])),
+                   'b'=sign(unname(pilot$b[1])),
+                   'w'=1)
+        a <- log(signs['a']*pilot$a[1])
+        b <- log(signs['b']*pilot$b[1])
         wa <- pilot$a[2]*sqrt(pilot$mswd)
         wb <- pilot$b[2]*sqrt(pilot$mswd)
         w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
-        init <- lower <- upper <-
-            c('a'=unname(a),'b'=unname(b),'w'=unname(w))
-        lower['a'] <- init['a'] - 5*wa
-        lower['b'] <- init['b'] - 5*wb
-        lower['w'] <- init['w'] - 3
-        upper['a'] <- init['a'] + 5*wa
-        upper['b'] <- init['b'] + 5*wb
-        upper['w'] <- init['w'] + 1
+        init <- c('a'=unname(a),'b'=unname(b),'w'=unname(w))
+        lower <- init - 5
+        upper <- init + 5
         fit <- stats::optim(init,LL.york,method='L-BFGS-B',
-                            lower=lower,upper=upper,XY=xyz,
-                            wtype=wtype,hessian=TRUE)
-        if (FALSE){ # temporary test
-            nw <- 20
-            aa <- seq(from=lower['a'],to=upper['a'],length.out=nw)
-            bb <- seq(from=lower['b'],to=upper['b'],length.out=nw)
-            ww <- seq(from=lower['w'],to=upper['w'],length.out=nw)
-            LL <- 0*ww
-            for (i in 1:nw){
-                pars <- fit$par#init
-                #pars['a'] <- aa[i]; p <- aa
-                #pars['b'] <- bb[i]; p <- bb
-                pars['w'] <- ww[i]; p <- ww
-                LL[i] <- LL.york(pars,XY=xyz)
-            }
-            plot(p,LL,type='b')
-        }
+                            signs=signs,lower=lower,upper=upper,
+                            XY=xyz,wtype=wtype,hessian=TRUE)
         hess <- hesscheck(fit$hessian)
-        covmat <- solve(hess)
-        out$a <- c('a'=unname(fit$par['a']),'s[a]'=unname(sqrt(covmat['a','a'])))
-        out$b <- c('b'=unname(fit$par['b']),'s[b]'=unname(sqrt(covmat['b','b'])))
-        out$cov.ab <- covmat['a','b']
-        disp <- exp(fit$par['w'])
-        sdisp <- disp*sqrt(covmat['w','w'])
+        fit$cov <- solve(hess)
+        out <- exponentiate(fit,signs=signs)
+        out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
+        out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
+        out$cov.ab <- out$cov['a','b']
+        disp <- out$par['w']
+        sdisp <- sqrt(out$cov['w','w'])
         out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     } else if (identical(type,'titterington')){
         w <- stats::optimise(LL.titterington,interval=c(0,3*init),
@@ -105,7 +89,7 @@ model3regression <- function(xyz,type='york',wtype='slope'){
     out
 }
 
-york2DE <- function(XY,a,b,w=-Inf,wtype='slope'){
+york2DE <- function(XY,a,b,w=0,wtype='slope'){
     out <- list()
     ns <- nrow(XY)
     X <- XY[,'X']
@@ -122,7 +106,7 @@ york2DE <- function(XY,a,b,w=-Inf,wtype='slope'){
     iw <- (2*ns+1):(3*ns)
     diag(E)[ix] <- sX^2
     diag(E)[iy] <- sY^2
-    diag(E)[iw] <- exp(w)^2
+    diag(E)[iw] <- w^2
     E[ix,iy] <- E[iy,ix] <- diag(rXY*sX*sY)
     Jw <- matrix(0,2*ns,3*ns)
     Jw[ix,ix] <- Jw[iy,iy] <- diag(ns)
@@ -137,8 +121,11 @@ york2DE <- function(XY,a,b,w=-Inf,wtype='slope'){
     out$E <- Jw %*% E %*% t(Jw)
     out
 }
-LL.york <- function(abw,XY,wtype='slope'){
-    DE <- york2DE(XY,a=abw['a'],b=abw['b'],w=abw['w'],wtype=wtype)
+LL.york <- function(labw,XY,signs=labw/labw,wtype='slope'){
+    a <- signs['a']*exp(labw['a'])
+    b <- signs['b']*exp(labw['b'])
+    w <- exp(labw['w'])
+    DE <- york2DE(XY,a=a,b=b,w=w,wtype=wtype)
     LL.norm(DE$D,DE$E)
 }
 LL.titterington <- function(w,xyz){

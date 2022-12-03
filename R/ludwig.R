@@ -142,17 +142,6 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     out
 }
 
-exponentiate <- function(fit){
-    out <- fit
-    out$logpar <- fit$par
-    out$logcov <- fit$cov
-    out$par <- exp(fit$par)
-    np <- length(out$par)
-    out$cov <- diag(out$par,np,np) %*% fit$cov %*% diag(out$par,np,np)
-    dimnames(out$cov) <- dimnames(fit$cov)
-    out
-}
-
 anchormerge <- function(fit,x,anchor=0,type='joint'){
     out <- fit
     inames <- names(fit$par)
@@ -831,7 +820,7 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,LL=TRUE){
         if ('w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])){
             # convert w from log(age) to log(slope):
             ww <- ta0b0w['w'] + log(abs(dbdt))
-            DE <- york2DE(XY=O,a=a,b=b,w=ww)
+            DE <- york2DE(XY=O,a=a,b=b,w=exp(ww))
         } else {
             DE <- york2DE(XY=O,a=a,b=b)
         }

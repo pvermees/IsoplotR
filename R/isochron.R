@@ -873,9 +873,9 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
     }
     if (model==3){
         l40 <- lambda('K40')[1]
-        dArArdt <- l40*exp(l40*out$age['t'])/x$J[1]
-        if (inverse) out$disp <- out$disp*dArArdt
-        else out$disp <- out$disp/dArArdt
+        dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
+        d09db <- ifelse(inverse,1/a,1)
+        out$disp <- dtd09*d09db*out$disp
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
