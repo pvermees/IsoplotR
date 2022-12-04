@@ -450,7 +450,6 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                              omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     fit <- regression(data2york(d2calc),model=model)
-    fit$displabel <- quote('dispersion = ')
     if (inflate(fit)){
         fit$a['disp[a]'] <- sqrt(fit$mswd)*fit$a['s[a]']
         fit$b['disp[b]'] <- sqrt(fit$mswd)*fit$b['s[b]']
@@ -765,7 +764,6 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         y.lab <- quote(''^207*'Pb/'^204*'Pb')
         out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
     }
-    out$displabel <- quote('dispersion = ')
     out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
     if (inflate(out)){
         out$age['disp[t]'] <- 
@@ -863,7 +861,6 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
         x.lab <- quote(''^39*'Ar/'^36*'Ar')
         y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
-    out$displabel <- 'dispersion = '
     out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[o]*'=')
     out$age[c('t','s[t]')] <- get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     if (inflate(out)){
@@ -1015,7 +1012,6 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    out$displabel <- quote('dispersion = ')
     out$y0label <- quote('He'[o]*'=')
     if (plot) {
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
@@ -1078,10 +1074,12 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr,
                                hide=hide,omit=omit,y0option=y0option)
+        displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
         dispunits <- ''
     } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr,
                                hide=hide,omit=omit)
+        displabel <- 'dispersion ='
         dispunits <- ' ka'
     }
     if (plot){
@@ -1091,8 +1089,9 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Th-U',
-                                      dispunits=dispunits,units=' ka'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                      type='Th-U',units=' ka',
+                                      displabel=displabel,dispunits=dispunits),
                         xlab=out$xlab,ylab=out$ylab)
     }
     invisible(out)
@@ -1133,7 +1132,6 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
         l0 <- lambda('Th230')[1]
         dtd08 <- 1/(l0*(1-Th230U238))
         out$disp <- out$disp*dtd08
-        out$displabel <- quote('dispersion =')
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1204,7 +1202,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
                            out$mswd*out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
         out$age['disp[t]'] <- tst['s[t]']
     }
-    out$displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
     out <- getThUy0(out=out,tst=tst,option=y0option,exterr=exterr)
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1289,7 +1286,6 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
         out$disp <- out$disp*dDPdb/dDPdt
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
-    out$displabel <- substitute(a*b*c,list(a='(',b=lab$y,c=')-dispersion = '))
     out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*'=')))
     if (plot){
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
@@ -1377,8 +1373,8 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 }
 
 isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,
-                          units=' Ma',dispunits=units,
-                          ski=NULL,...){
+                          units=' Ma',displabel='dispersion =',
+                          dispunits=units,ski=NULL,...){
     content <- list()
     if (is.na(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,
@@ -1399,7 +1395,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                oerr=oerr,prefix=fit$displabel,units=dispunits)
+                                oerr=oerr,prefix=displabel,units=dispunits)
     }
     nl <- length(content)
     if (!is.null(ski)){
