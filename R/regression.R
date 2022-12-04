@@ -28,7 +28,7 @@ model2regression <- function(xyz,type='york'){
         pilot <- stats::lm(xyz[,'Y'] ~ xyz[,'X'])
         init <- pilot$coefficients
         names(init) <- c('a','b')
-        out <- optim(init,fn=LL.york.model2,XY=xyz,hessian=TRUE)
+        out <- stats::optim(init,fn=LL.york.model2,XY=xyz,hessian=TRUE)
         hess <- hesscheck(out$hessian)
         out$cov <- solve(hess)
         out$df <- nrow(xyz)-2
@@ -63,8 +63,11 @@ model3regression <- function(xyz,type='york',
         wb <- pilot$b[2]*sqrt(pilot$mswd)
         w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
         init <- c('a'=unname(a),'b'=unname(b),'w'=unname(w))
-        fit <- stats::optim(init,LL.york,method='BFGS',
-                            signs=signs,XY=xyz,wtype=wtype,hessian=TRUE)
+        lower <- init-5
+        upper <- init+5
+        fit <- stats::optim(init,LL.york,method='L-BFGS-B',
+                            lower=lower,upper=upper,signs=signs,
+                            XY=xyz,wtype=wtype,hessian=TRUE)
         hess <- hesscheck(fit$hessian)
         fit$cov <- solve(hess)
         out <- exponentiate(fit,signs=signs)
@@ -91,7 +94,10 @@ model3regression <- function(xyz,type='york',
         else stop('illegal wtype')
         init <- c('a'=unname(a),'b'=unname(b),
                   'A'=unname(A),'B'=unname(B),'w'=unname(w))
-        fit <- stats::optim(init,LL.titterington,method='BFGS',XYZ=xyz,
+        lower <- init-5
+        upper <- init+5
+        fit <- stats::optim(init,LL.titterington,method='L-BFGS-B',
+                            XYZ=xyz,lower=lower,upper=upper,
                             hessian=TRUE,wtype=wtype)
         hess <- hesscheck(fit$hessian)
         fit$cov <- solve(hess)

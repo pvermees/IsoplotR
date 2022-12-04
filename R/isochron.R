@@ -637,7 +637,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig),
+            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb'),
                             xlab=x.lab,ylab=y.lab)
         }
     }
