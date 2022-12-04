@@ -25,25 +25,24 @@ model1regression <- function(xyz,type='york'){
 
 model2regression <- function(xyz,type='york'){
     if (identical(type,'york')){
-        out <- list()
-        fit <- stats::lm(xyz[,'Y'] ~ xyz[,'X'])
-        E <- stats::vcov(fit)
-        out$df <- fit$df.residual
-        out$a <- c(stats::coef(fit)[1],sqrt(E[1,1]))
-        out$b <- c(stats::coef(fit)[2],sqrt(E[2,2]))
-        names(out$a) <- c('a','s[a]')
-        names(out$b) <- c('b','s[b]')
-        out$cov.ab <- E[1,2]
+        pilot <- stats::lm(xyz[,'Y'] ~ xyz[,'X'])
+        init <- pilot$coefficients
+        names(init) <- c('a','b')
+        out <- optim(init,fn=LL.york.model2,XY=xyz,hessian=TRUE)
+        hess <- hesscheck(out$hessian)
+        out$cov <- solve(hess)
+        out$df <- nrow(xyz)-2
+        out$a <- c(out$par['a'],'s[a]'=unname(sqrt(out$cov['a','a'])))
+        out$b <- c(out$par['b'],'s[b]'=unname(sqrt(out$cov['b','b'])))
+        out$cov.ab <- out$cov['a','b']
     } else if (identical(type,'titterington')){
-        out <- list()
-        fit <- stats::lm(xyz[,c('Y','Z')] ~ xyz[,'X'])
-        out$df <- fit$df.residual
-        out$par <- c(stats::coef(fit))
-        out$cov <- stats::vcov(fit)
-        parnames <- c('a','b','A','B')
-        names(out$par) <- parnames
-        colnames(out$cov) <- parnames
-        rownames(out$cov) <- parnames
+        pilot <- stats::lm(xyz[,c('Y','Z')] ~ xyz[,'X'])
+        init <- as.vector(pilot$coefficients)
+        names(init) <- c('a','b','A','B')
+        out <- optim(init,fn=LL.titterington.model2,XYZ=xyz,hessian=TRUE)
+        hess <- hesscheck(out$hessian)
+        out$cov <- solve(hess)
+        out$df <- 2*nrow(xyz)-4
     } else {
         stop('invalid output type for model 2 regression')
     }
@@ -138,6 +137,10 @@ LL.york <- function(labw,XY,signs=labw/labw,wtype='slope'){
     DE <- york2DE(XY,a=a,b=b,w=w,wtype=wtype)
     LL.norm(DE$D,DE$E)
 }
+LL.york.model2 <- function(ab,XY){
+    dem <- deming(a=ab['a'],b=ab['b'],x=XY[,'X'],y=XY[,'Y'])
+    SS2LL(SS=sum(dem$d^2),nn=nrow(XY))
+}
 
 titterington2DE <- function(XYZ,a,b,A,B,w=0,wtype='a'){
     out <- list()
@@ -189,4 +192,11 @@ LL.titterington <- function(labABw,XYZ,signs=labABw/labABw,wtype='a'){
     w <- exp(labABw['w'])
     DE <- titterington2DE(XYZ,a=a,b=b,A=A,B=B,w=w,wtype=wtype)
     LL.norm(DE$D,DE$E)
+}
+LL.titterington.model2 <- function(abAB,XYZ){
+    demXY <- deming(a=abAB['a'],b=abAB['b'],x=XYZ[,'X'],y=XYZ[,'Y'])
+    demXZ <- deming(a=abAB['A'],b=abAB['B'],x=XYZ[,'X'],y=XYZ[,'Z'])
+    dd <- cbind(demXY$d,demXZ$d)
+    E <- stats::cov(dd)
+    sum(apply(dd,1,LL.norm,covmat=E))
 }
