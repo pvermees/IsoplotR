@@ -325,19 +325,19 @@ discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
     } else if (fit$format<7){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=quote('('^206*'Pb/'^204*'Pb)'[o]*'='))
+                         prefix=quote('('^206*'Pb/'^204*'Pb)'[c]*'='))
         line3 <- maintit(x=fit$par['b0'],sx=fit$err[,'b0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=quote('('^207*'Pb/'^204*'Pb)'[o]*'='))
+                         prefix=quote('('^207*'Pb/'^204*'Pb)'[c]*'='))
     } else if (fit$format<9){
         i86 <- 1/fit$par['a0']
         i87 <- 1/fit$par['b0']
         i86err <- i86*fit$err[,'a0']/fit$par['a0']
         i87err <- i87*fit$err[,'b0']/fit$par['b0']
         line2 <- maintit(x=i86,sx=i86err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                         df=fit$df,prefix=quote('('^208*'Pb/'^206*'Pb)'[o]*'='))
+                         df=fit$df,prefix=quote('('^208*'Pb/'^206*'Pb)'[c]*'='))
         line3 <- maintit(x=i87,sx=i87err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                         df=fit$df,prefix=quote('('^208*'Pb/'^207*'Pb)'[o]*'='))
+                         df=fit$df,prefix=quote('('^208*'Pb/'^207*'Pb)'[c]*'='))
     } else {
         stop('Invalid U-Pb data format.')
     }

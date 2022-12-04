@@ -637,7 +637,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb'),
+            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig),
                             xlab=x.lab,ylab=y.lab)
         }
     }
@@ -650,31 +650,31 @@ getUPby0 <- function(out,fmt=1,type=1,option=1){
         if (fmt<4){                              # 07/06 vs. 38/06
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- out$err['s','a0']
-            out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
+            out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[c]*'=')
         } else if (fmt %in% c(4,5,6) & type==1){ # 04/06 vs. 38/06
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])
-            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[o]*'=')
+            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[c]*'=')
         } else if (fmt %in% c(4,5,6) & type==2){ # 04/07 vs. 35/07
             out$y0['y'] <- out$par['b0']
             out$y0['s[y]'] <- sqrt(out$cov['b0','b0'])
-            out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
+            out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
         } else if (fmt %in% c(7,8) & type==1){   # 08/06 vs. 38/06
             out$y0['y'] <- 1/out$par['a0']
             out$y0['s[y]'] <- out$y0[1]*sqrt(out$cov['a0','a0'])/out$par['a0']
-            out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[o]*'=')
+            out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[c]*'=')
         } else if (fmt %in% c(7,8) & type==2){   # 08/07 vs. 35/07
             out$y0['y'] <- 1/out$par['b0']
             out$y0['s[y]'] <- out$y0[1]*sqrt(out$cov['b0','b0'])/out$par['b0']
-            out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[o]*'=')
+            out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[c]*'=')
         } else if (fmt %in% c(7,8) & type==3){   # 06c/08 vs. 32/08
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])
-            out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[o]*'=')
+            out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[c]*'=')
         } else if (fmt %in% c(7,8) & type==4){   # 07c/08 vs. 32/08
             out$y0['y'] <- out$par['b0']
             out$y0['s[y]'] <- sqrt(out$cov['b0','b0'])
-            out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[o]*'=')
+            out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[c]*'=')
         }
     } else {
         if (option==2){
@@ -1078,17 +1078,11 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr,
                                hide=hide,omit=omit,y0option=y0option)
-        intercept.type <- 'Th-U-3D'
     } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr,
                                hide=hide,omit=omit)
-        intercept.type <- 'Th-U-2D'
     }
-    if (type %in% c(1,3)){
-        out$displabel <- quote('('^234*'U/'^232*'Th)-dispersion = ')
-    } else if (type %in% c(2,4)){
-        out$displabel <- quote('('^234*'U/'^238*'U)-dispersion = ')
-    }
+    out$displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1097,7 +1091,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                        type=intercept.type,units=' ka'),
+                                      type='Th-U',units=' ka'),
                         xlab=out$xlab,ylab=out$ylab)
     }
     invisible(out)
@@ -1212,15 +1206,15 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
     if (option==1){
         out$y0['y'] <- out$PAR['i48']
         out$y0['s[y]'] <- sqrt(out$COV['i48','i48'])
-        out$y0label <- quote('('^234*'U/'^238*'U)'[0]*'=')
+        out$y0label <- quote('('^234*'U/'^238*'U)'[a]*'=')
     } else if (option==2){
         out$y0['y'] <- out$PAR['i02']
         out$y0['s[y]'] <- sqrt(out$COV['i02','i02'])
-        out$y0label <- quote('('^230*'Th/'^232*'Th)'[0]*'=')
+        out$y0label <- quote('('^230*'Th/'^232*'Th)'[d]*'=')
     } else if (option==3){
         out$y0['y'] <- out$PAR['i08']
         out$y0['s[y]'] <- sqrt(out$COV['i08','i08'])
-        out$y0label <- quote('('^230*'Th/'^238*'U)'[0]*'=')
+        out$y0label <- quote('('^230*'Th/'^238*'U)'[a]*'=')
     } else {
         l4 <- lambda('U234')
         out$y0['y'] <- 1 + (out$PAR['i48']-1)*exp(l4[1]*tst['t'])
@@ -1393,13 +1387,9 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=' Ma',ski=NULL,...){
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
-        if (!is.na(type) & type=='U-Pb'){
-            content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],
-                                    sigdig=sigdig,oerr=oerr,units=' Ma')
-        } else {
-            content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                    oerr=oerr,prefix=fit$displabel,units=' Ma')
-        }
+        u <- ifelse(type%in%c('Th-U',NA),'',units)
+        content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
+                                oerr=oerr,prefix=fit$displabel,units=u)
     }
     nl <- length(content)
     if (!is.null(ski)){
