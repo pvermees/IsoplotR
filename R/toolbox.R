@@ -423,9 +423,27 @@ hesscheck <- function(H){
     out
 }
 
-invertcovmat <- function(sx,sy,sxy){
-    den <- (sx*sy)^2 - sxy^2
-    cbind('xx'=(sy^2)/den,'yy'=(sx^2)/den,'xy'=-sxy/den)
+invertcovmat <- function(sx,sy,sz,sxy=0,sxz=0,syz=0){
+    if (missing(sz)){
+        den <- (sx*sy)^2 - sxy^2
+        out <- cbind('xx'=(sy^2)/den,'yy'=(sx^2)/den,'xy'=-sxy/den)
+    } else {
+        aa <- sx^2
+        ee <- sy^2
+        ii <- sz^2
+        bb <- dd <- sxy
+        cc <- gg <- sxz
+        ff <- hh <- syz
+        den <- aa*(ee*ii-ff*hh) - bb*(dd*ii-ff*gg) + cc*(dd*hh-ee*gg)
+        xx <- (ee*ii-ff*hh)/den
+        yy <- (aa*ii-cc*gg)/den
+        zz <- (dd*hh-bb*dd)/den
+        xy <- (cc*hh-bb*ii)/den
+        xz <- (bb*ff-cc*ee)/den
+        yz <- (cc*dd-aa*ff)/den
+        out <- cbind('xx'=xx,'yy'=yy,'zz'=zz,'xy'=xy,'xz'=xz,'yz'=yz)
+    }
+    out
 }
 
 exponentiate <- function(fit,signs=fit$par/fit$par){

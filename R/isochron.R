@@ -1015,7 +1015,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    out$displabel <- quote('He-dispersion = ')
+    out$displabel <- quote('dispersion = ')
     out$y0label <- quote('He'[o]*'=')
     if (plot) {
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
