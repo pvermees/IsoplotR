@@ -1078,11 +1078,12 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr,
                                hide=hide,omit=omit,y0option=y0option)
+        dispunits <- ''
     } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr,
                                hide=hide,omit=omit)
+        dispunits <- ' ka'
     }
-    out$displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1090,8 +1091,8 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                      type='Th-U',units=' ka'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Th-U',
+                                      dispunits=dispunits,units=' ka'),
                         xlab=out$xlab,ylab=out$ylab)
     }
     invisible(out)
@@ -1101,7 +1102,8 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
                             hide=NULL,omit=NULL){
     y <- data2york(x,type=type)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,type="york")
+    out <- regression(d2calc,model=model,type="york",
+                      wtype=ifelse(type==1,'slope','intercept'))
     out$xyz <- y
     if (type==1){
         Th230U238 <- out$b
@@ -1126,6 +1128,12 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
         out$y0['disp[y]'] <- get.Th230Th232_0(out$age['t'],
                                               Th230Th232[1],
                                               sqrt(out$mswd)*Th230Th232[2])[2]
+    }
+    if (model==3){
+        l0 <- lambda('Th230')[1]
+        dtd08 <- 1/(l0*(1-Th230U238))
+        out$disp <- out$disp*dtd08
+        out$displabel <- quote('dispersion =')
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1196,6 +1204,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
                            out$mswd*out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
         out$age['disp[t]'] <- tst['s[t]']
     }
+    out$displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
     out <- getThUy0(out=out,tst=tst,option=y0option,exterr=exterr)
     out$xlab <- x.lab
     out$ylab <- y.lab
@@ -1367,7 +1376,9 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 }
 
-isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=' Ma',ski=NULL,...){
+isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,
+                          units=' Ma',dispunits=units,
+                          ski=NULL,...){
     content <- list()
     if (is.na(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,
@@ -1387,9 +1398,8 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,units=' Ma',ski=NULL,...){
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
-        u <- ifelse(type%in%c('Th-U',NA),'',units)
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                oerr=oerr,prefix=fit$displabel,units=u)
+                                oerr=oerr,prefix=fit$displabel,units=dispunits)
     }
     nl <- length(content)
     if (!is.null(ski)){
