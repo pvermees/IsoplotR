@@ -26,22 +26,30 @@ model1regression <- function(xyz,type='york'){
 model2regression <- function(xyz,type='york'){
     if (identical(type,'york')){
         pilot <- stats::lm(xyz[,'Y'] ~ xyz[,'X'])
-        init <- pilot$coefficients
-        names(init) <- c('a','b')
-        out <- stats::optim(init,fn=LL.york.model2,XY=xyz,hessian=TRUE)
-        hess <- hesscheck(out$hessian)
-        out$cov <- solve(hess)
+        pars <- pilot$coefficients
+        signs <- sign(pars)
+        init <- log(signs*pars)
+        names(init) <- names(signs) <- c('a','b')
+        fit <- stats::optim(init,fn=LL.york.model2,
+                            XY=xyz,signs=signs,hessian=TRUE)
+        hess <- hesscheck(fit$hessian)
+        fit$cov <- solve(hess)
+        out <- exponentiate(fit,signs=signs)
         out$df <- nrow(xyz)-2
         out$a <- c(out$par['a'],'s[a]'=unname(sqrt(out$cov['a','a'])))
         out$b <- c(out$par['b'],'s[b]'=unname(sqrt(out$cov['b','b'])))
         out$cov.ab <- out$cov['a','b']
     } else if (identical(type,'titterington')){
         pilot <- stats::lm(xyz[,c('Y','Z')] ~ xyz[,'X'])
-        init <- as.vector(pilot$coefficients)
-        names(init) <- c('a','b','A','B')
-        out <- optim(init,fn=LL.titterington.model2,XYZ=xyz,hessian=TRUE)
-        hess <- hesscheck(out$hessian)
-        out$cov <- solve(hess)
+        pars <- as.vector(pilot$coefficients)
+        signs <- sign(pars)
+        init <- log(signs*pars)
+        names(init) <- names(signs) <- c('a','b','A','B')
+        fit <- optim(init,fn=LL.titterington.model2,
+                     XYZ=xyz,signs=signs,hessian=TRUE)
+        hess <- hesscheck(fit$hessian)
+        fit$cov <- solve(hess)
+        out <- exponentiate(fit,signs=signs)
         out$df <- 2*nrow(xyz)-4
     } else {
         stop('invalid output type for model 2 regression')
@@ -63,10 +71,7 @@ model3regression <- function(xyz,type='york',
         wb <- pilot$b[2]*sqrt(pilot$mswd)
         w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
         init <- c('a'=unname(a),'b'=unname(b),'w'=unname(w))
-        lower <- init-5
-        upper <- init+5
-        fit <- stats::optim(init,LL.york,method='L-BFGS-B',
-                            lower=lower,upper=upper,signs=signs,
+        fit <- stats::optim(init,LL.york,signs=signs,
                             XY=xyz,wtype=wtype,hessian=TRUE)
         hess <- hesscheck(fit$hessian)
         fit$cov <- solve(hess)
@@ -94,10 +99,7 @@ model3regression <- function(xyz,type='york',
         else stop('illegal wtype')
         init <- c('a'=unname(a),'b'=unname(b),
                   'A'=unname(A),'B'=unname(B),'w'=unname(w))
-        lower <- init-5
-        upper <- init+5
-        fit <- stats::optim(init,LL.titterington,method='L-BFGS-B',
-                            XYZ=xyz,lower=lower,upper=upper,
+        fit <- stats::optim(init,LL.titterington,XYZ=xyz,
                             hessian=TRUE,wtype=wtype)
         hess <- hesscheck(fit$hessian)
         fit$cov <- solve(hess)
@@ -143,8 +145,10 @@ LL.york <- function(labw,XY,signs=labw/labw,wtype='slope'){
     DE <- york2DE(XY,a=a,b=b,w=w,wtype=wtype)
     LL.norm(DE$D,DE$E)
 }
-LL.york.model2 <- function(ab,XY){
-    dem <- deming(a=ab['a'],b=ab['b'],x=XY[,'X'],y=XY[,'Y'])
+LL.york.model2 <- function(ab,XY,signs=ab/ab){
+    dem <- deming(a=signs['a']*exp(ab['a']),
+                  b=signs['b']*exp(ab['b']),
+                  x=XY[,'X'],y=XY[,'Y'])
     SS2LL(SS=sum(dem$d^2),nn=nrow(XY))
 }
 
@@ -199,9 +203,13 @@ LL.titterington <- function(labABw,XYZ,signs=labABw/labABw,wtype='a'){
     DE <- titterington2DE(XYZ,a=a,b=b,A=A,B=B,w=w,wtype=wtype)
     LL.norm(DE$D,DE$E)
 }
-LL.titterington.model2 <- function(abAB,XYZ){
-    demXY <- deming(a=abAB['a'],b=abAB['b'],x=XYZ[,'X'],y=XYZ[,'Y'])
-    demXZ <- deming(a=abAB['A'],b=abAB['B'],x=XYZ[,'X'],y=XYZ[,'Z'])
+LL.titterington.model2 <- function(abAB,XYZ,signs=abAB/abAB){
+    demXY <- deming(a=signs['a']*exp(abAB['a']),
+                    b=signs['b']*exp(abAB['b']),
+                    x=XYZ[,'X'],y=XYZ[,'Y'])
+    demXZ <- deming(a=signs['A']*exp(abAB['A']),
+                    b=signs['B']*exp(abAB['B']),
+                    x=XYZ[,'X'],y=XYZ[,'Z'])
     dd <- cbind(demXY$d,demXZ$d)
     E <- stats::cov(dd)
     sum(apply(dd,1,LL.norm,covmat=E))
