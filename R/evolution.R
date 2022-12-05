@@ -125,7 +125,7 @@
 #' uncertainties have been underestipmated by a factor
 #' \eqn{\sqrt{MSWD}}.
 #'
-#' \code{2}: ordinary least squares regression: a second way to deal
+#' \code{2}: total least squares regression: a second way to deal
 #' with over- or underdispersed datasets is to simply ignore the
 #' analytical uncertainties.
 #'

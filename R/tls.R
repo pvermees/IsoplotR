@@ -1,3 +1,4 @@
+# total least squares using PCA, with jackknife error estimation
 # dat = data matrix whose first column is independent variable
 tls <- function(dat){
     out <- list()
