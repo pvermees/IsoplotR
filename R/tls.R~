@@ -1,0 +1,31 @@
+# dat = data matrix whose first column is independent variable
+tls <- function(dat){
+    ns <- nrow(dat)
+    nv <- ncol(dat)
+    np <- 2*(nv-1)
+    jack <- matrix(0,ns,np)
+    for (i in 1:ns){
+        jack[i,] <- getpar(dat[-i,])
+    }
+    avgjack <- colMeans(jack)
+    jackdiff <- sweep(jack,2,avgjack,'-')
+    SS <- matrix(0,np,np)
+    for (i in 1:ns){
+        SS <- SS + jackdiff[i,] %*% t(jackdiff[i,])
+    }
+    covmat <- SS*(ns-1)/ns
+}
+
+tlspar <- function(dat){
+    pc <- prcomp(dat)
+    np <- ncol(dat)-1
+    out <- matrix(NA,2,np)
+    rnames <- rownames(dat)
+    cnames <- colnames(dat)
+    rownames(out) <- c('(Intercept)',ifelse(is.null(rnames,'slope',rnames[1])))
+    for (i in 1:np){
+        out[1,i] <- pc$rotation[i+1,'PC1']/pc$rotation[1,'PC1']
+        out[2,i] <- pc$center[i+1] - out[i]*pc$center[1]
+    }
+    out
+}
