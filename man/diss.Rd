@@ -31,13 +31,22 @@ Calculates the pairwise dissimilarity between detrital
     Kolmogorov-Smirnov distance.
 }
 \details{
-The Wasserstein distance is a function of the area between
-    two empirical cumulative distribution functions. The
-    Kolmogorov-Smirnov statistic is the maximum vertical difference
+The Kolmogorov-Smirnov statistic is the maximum vertical
+    difference between two empirical cumulative distribution
+    functions. The Wasserstein distance is a function of the area
     between them. Both dissimilarity measures are useful for
     multidimensional scaling.
 }
 \examples{
 d <- diss(examples$DZ,method='KS')
 mds(d)
+}
+\seealso{
+\code{\link{mds}}
+}
+\author{
+Written by Pieter Vermeesch, using modified code from
+    Mathieu Vrac's \code{CDFt} package (\code{KolmogorovSmirnov}
+    function), and Dominic Schuhmacher's \code{transport} package
+    (\code{transport1d} function).
 }

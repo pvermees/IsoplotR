@@ -22,7 +22,7 @@ tls <- function(dat){
 }
 
 tlspar <- function(dat){
-    pc <- prcomp(dat)
+    pc <- stats::prcomp(dat)
     np <- ncol(dat)-1
     out <- vector()
     for (i in 1:np){

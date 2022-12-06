@@ -402,7 +402,7 @@ intercept and slope.}
 
 \code{1}: Error-weighted least squares regression
 
-\code{2}: Ordinary least squares regression
+\code{2}: Total least squares regression
 
 \code{3}: Error-weighted least squares with overdispersion term}
 
@@ -770,7 +770,7 @@ straight line through these points by least squares regression
 (Nicolaysen, 1961). The slope and intercept then yield the
 radiogenic daughter-parent ratio and the non-radiogenic daughter
 composition, respectively. There are several ways to fit an
-isochron.  The easiest of these is ordinary least squares
+isochron.  The easiest of these is total least squares
 regression, which weighs all data points equally. In the presence
 of quantifiable analytical uncertainty, it is equally
 straightforward to use the inverse of the y-errors as weights.  It
@@ -817,7 +817,7 @@ analytical uncertainties. In this case, the excess scatter can be
 accounted for by inflating those uncertainties by a \emph{factor}
 \eqn{\sqrt{MSWD}}.
 
-\item Ignore the analytical uncertainties and perform an ordinary
+\item Ignore the analytical uncertainties and perform a total
 least squares regression.
 
 \item Attribute the overdispersion to the presence of `geological

@@ -757,7 +757,6 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         out$y0[c('y','s[y]')] <- out$b
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
         y.lab <- quote(''^207*'Pb/'^206*'Pb')
-        out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[0]*'=')
     } else {
         R76 <- out$b
         out$y0[c('y','s[y]')] <- out$a
