@@ -44,54 +44,43 @@ model3regression <- function(xyz,type='york',
                              wtype=ifelse(type=='york','b','a')){
     pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
-        signs <- c('a'=sign(unname(pilot$a[1])),
-                   'b'=sign(unname(pilot$b[1])),
-                   'w'=1)
-        a <- log(signs['a']*pilot$a[1])
-        b <- log(signs['b']*pilot$b[1])
-        wa <- pilot$a[2]*sqrt(pilot$mswd)
-        wb <- pilot$b[2]*sqrt(pilot$mswd)
+        wa <- pilot$a['s[a]']*sqrt(pilot$mswd)
+        wb <- pilot$b['s[b]']*sqrt(pilot$mswd)
         w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
-        init <- c('a'=unname(a),'b'=unname(b),'w'=unname(w))
-        fit <- stats::optim(init,LL.york,signs=signs,
-                            XY=xyz,wtype=wtype,hessian=TRUE)
-        hess <- hesscheck(fit$hessian)
-        fit$cov <- solve(hess)
-        out <- exponentiate(fit,signs=signs)
+        init <- c(pilot$a['a'],pilot$b['b'],'w'=unname(w))
+        lower <- c(pilot$a['a']-5*pilot$a['s[a]']*sqrt(pilot$mswd),
+                   pilot$b['b']-5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']-5)
+        upper <- c(pilot$a['a']+5*pilot$a['s[a]']*sqrt(pilot$mswd),
+                   pilot$b['b']+5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']+2)
+        out <- stats::optim(init,LL.york,method='L-BFGS-B',
+                            lower=lower,upper=upper,XY=xyz,
+                            wtype=wtype,hessian=TRUE)
+        hess <- hesscheck(out$hessian)
+        out$cov <- solve(hess)
         out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
         out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
         out$cov.ab <- out$cov['a','b']
-        disp <- out$par['w']
-        sdisp <- sqrt(out$cov['w','w'])
-        out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     } else if (identical(type,'titterington')){
-        signs <- c('a'=sign(unname(pilot$par['a'])),
-                   'b'=sign(unname(pilot$par['b'])),
-                   'A'=sign(unname(pilot$par['A'])),
-                   'B'=sign(unname(pilot$par['B'])),
-                   'w'=1)
-        a <- log(signs['a']*pilot$par['a'])
-        b <- log(signs['b']*pilot$par['b'])
-        A <- log(signs['A']*pilot$par['A'])
-        B <- log(signs['B']*pilot$par['B'])
         if (wtype%in%c('intercept',0,'a')) w <- sqrt(pilot$cov['a','a']*pilot$mswd)
         else if (wtype%in%c(1,'b')) w <- sqrt(pilot$cov['b','b']*pilot$mswd)
         else if (wtype%in%c(2,'A')) w <- sqrt(pilot$cov['A','A']*pilot$mswd)
         else if (wtype%in%c(3,'B')) w <- sqrt(pilot$cov['B','B']*pilot$mswd)
         else stop('illegal wtype')
-        init <- c('a'=unname(a),'b'=unname(b),
-                  'A'=unname(A),'B'=unname(B),'w'=unname(w))
-        fit <- stats::optim(init,LL.titterington,XYZ=xyz,
+        init <- c(pilot$par,'w'=unname(log(w)))
+        spar <- sqrt(pilot$mswd*diag(pilot$cov))
+        lower <- c(pilot$par - 5*spar,'w'=init['w']-5)
+        upper <- c(pilot$par + 5*spar,'w'=init['w']+2)
+        out <- stats::optim(init,LL.titterington,method='L-BFGS-B',
+                            lower=lower,upper=upper,XYZ=xyz,
                             hessian=TRUE,wtype=wtype)
-        hess <- hesscheck(fit$hessian)
-        fit$cov <- solve(hess)
-        out <- exponentiate(fit,signs=signs)
-        disp <- out$par['w']
-        sdisp <- sqrt(out$cov['w','w'])
-        out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
+        hess <- hesscheck(out$hessian)
+        out$cov <- solve(hess)
     } else {
         stop('invalid output type for model 3 regression')
     }
+    disp <- exp(out$par['w'])
+    sdisp <- disp*sqrt(out$cov['w','w'])
+    out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     out
 }
 
@@ -120,11 +109,9 @@ york2DE <- function(XY,a,b,w=0,wtype='slope'){
     out$E <- Jw %*% E %*% t(Jw)
     out
 }
-LL.york <- function(labw,XY,signs=labw/labw,wtype='slope'){
-    a <- signs['a']*exp(labw['a'])
-    b <- signs['b']*exp(labw['b'])
-    w <- exp(labw['w'])
-    DE <- york2DE(XY,a=a,b=b,w=w,wtype=wtype)
+LL.york <- function(abw,XY,wtype='slope'){
+    DE <- york2DE(XY,a=abw['a'],b=abw['b'],
+                  w=exp(abw['w']),wtype=wtype)
     LL.norm(DE$D,DE$E)
 }
 
@@ -170,12 +157,9 @@ titterington2DE <- function(XYZ,a,b,A,B,w=0,wtype='a'){
     out$E <- Jw %*% E %*% t(Jw)
     out
 }
-LL.titterington <- function(labABw,XYZ,signs=labABw/labABw,wtype='a'){
-    a <- signs['a']*exp(labABw['a'])
-    b <- signs['b']*exp(labABw['b'])
-    A <- signs['A']*exp(labABw['A'])
-    B <- signs['B']*exp(labABw['B'])
-    w <- exp(labABw['w'])
-    DE <- titterington2DE(XYZ,a=a,b=b,A=A,B=B,w=w,wtype=wtype)
+LL.titterington <- function(abABw,XYZ,wtype='a'){
+    DE <- titterington2DE(XYZ,a=abABw['a'],b=abABw['b'],
+                          A=abABw['A'],B=abABw['B'],
+                          w=exp(abABw['w']),wtype=wtype)
     LL.norm(DE$D,DE$E)
 }
