@@ -8,7 +8,7 @@ tls <- function(dat){
     np <- 2*(nv-1)
     jack <- matrix(0,ns,np)
     for (i in 1:ns){
-        jack[i,] <- tlspar(dat[-i,],center=center)
+        jack[i,] <- tlspar(dat[-i,])
     }
     avgjack <- colMeans(jack)
     jackdiff <- sweep(jack,2,avgjack,'-')
