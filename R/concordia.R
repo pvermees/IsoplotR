@@ -698,13 +698,13 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         upper['PaUi'] <- 20
     }
     fit1 <- stats::optim(init,LL.concordia.age,method='L-BFGS-B',
-                         lower=lower,upper=upper,exterr=FALSE,
+                         lower=lower,upper=upper,exterr=exterr,
                          cc=cc,type=type,d=d,hessian=TRUE)
     lower['t'] <- upper['t']
     upper['t'] <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),5000)
     init['t'] <- (lower['t']+upper['t'])/2
     fit2 <- stats::optim(init,LL.concordia.age,method='L-BFGS-B',
-                         lower=lower,upper=upper,exterr=FALSE,
+                         lower=lower,upper=upper,exterr=exterr,
                          cc=cc,type=type,d=d,hessian=TRUE)
     o1 <- fit1$value
     o2 <- fit2$value
