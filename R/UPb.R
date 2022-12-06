@@ -1108,7 +1108,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (discordance$option%in%c(6,'p')){
         t.conc <- concordia.age(x=xdi,exterr=exterr)
         SS.concordance <-
-            LL.concordia.age(tt=t.conc$age[1],cc=wetherill(xdi,i=1),
+            LL.concordia.age(pars=t.conc$age[1],cc=wetherill(xdi,i=1),
                              mswd=TRUE,exterr=exterr,d=xdi$d)
         p.value <- 1-stats::pchisq(SS.concordance,1)
         out <- c(out,p.value)
