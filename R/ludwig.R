@@ -859,9 +859,9 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     ns <- length(x)
     np <- sum(diag(fit$cov)>0)
     if (x$format<4 || type%ni%c('joint',0)){
-        out$df <- 2*ns-np
+        out$df <- ns-np
     } else {
-        out$df <- 3*ns-np
+        out$df <- 2*ns-np
     }
     if (type%in%c('joint',0)){
         SS <- data2ludwig(x,ta0b0w=fit$par)$SS
