@@ -219,7 +219,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
         ylim <- range(c(ta0[plotit,'48_0']-nsd*ta0[plotit,'s[48_0]'],
                         ta0[plotit,'48_0']+nsd*ta0[plotit,'s[48_0]']))
     x.lab <- 'Age [ka]'
-    y.lab <- expression(paste("("^"234","U/"^"238","U)"[o]))
+    y.lab <- expression(paste("("^"234","U/"^"238","U)"[0]))
     graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
     d <- ta0
     colnames(d) <- c('X','sX','Y','sY','rXY')

@@ -594,23 +594,23 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             XY <- data2york(x,option=6,tt=tt)
             a <- 1/fit$par['a0']
             J[1,2] <- -a^2
-            y.lab <- quote(''^208*'Pb'[o]*'/'^206*'Pb')
+            y.lab <- quote(''^208*'Pb'[c]*'/'^206*'Pb')
         } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
             XY <- data2york(x,option=7,tt=tt)
             U <- settings('iratio','U238U235')[1]
             a <- 1/fit$par['b0']
             J[1,2] <- -a^2
-            y.lab <- quote(''^208*'Pb'[o]*'/'^207*'Pb')
+            y.lab <- quote(''^208*'Pb'[c]*'/'^207*'Pb')
         } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
             XY <- data2york(x,option=8,tt=tt)
             a <- fit$par['a0']
             J[1,2] <- 1
-            y.lab <- quote(''^206*'Pb'[o]*'/'^208*'Pb')
+            y.lab <- quote(''^206*'Pb'[c]*'/'^208*'Pb')
         } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
             XY <- data2york(x,option=9,tt=tt)
             a <- fit$par['b0']
             J[1,2] <- 1
-            y.lab <- quote(''^207*'Pb'[o]*'/'^208*'Pb')
+            y.lab <- quote(''^207*'Pb'[c]*'/'^208*'Pb')
         } else {
             stop('Isochron regression is not available for this input format.')
         }
@@ -752,18 +752,19 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
     out <- regression(d2calc,model=model,wtype=ifelse(inverse,0,1))
-    out$y0[c('y','s[y]')] <- out$a 
     if (inverse){
         R76 <- out$a
+        out$y0[c('y','s[y]')] <- out$b
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
         y.lab <- quote(''^207*'Pb/'^206*'Pb')
-        out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[o]*'=')
+        out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[0]*'=')
     } else {
         R76 <- out$b
+        out$y0[c('y','s[y]')] <- out$a
         x.lab <- quote(''^206*'Pb/'^204*'Pb')
         y.lab <- quote(''^207*'Pb/'^204*'Pb')
-        out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[o]*'=')
     }
+    out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
     out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
     if (inflate(out)){
         out$age['disp[t]'] <- 
@@ -861,7 +862,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
         x.lab <- quote(''^39*'Ar/'^36*'Ar')
         y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
-    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[o]*'=')
+    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
     out$age[c('t','s[t]')] <- get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
     if (inflate(out)){
         out$age['disp[t]'] <- get.ArAr.age(R09,sqrt(out$mswd)*sR09,
@@ -1012,7 +1013,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    out$y0label <- quote('He'[o]*'=')
+    out$y0label <- quote('He'[0]*'=')
     if (plot) {
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1135,7 +1136,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
-    out$y0label <- quote('('^230*'Th/'^232*'Th)'[o]*'=')
+    out$y0label <- quote('('^230*'Th/'^232*'Th)'[0]*'=')
     out
 }
 isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
@@ -1286,7 +1287,7 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
         out$disp <- out$disp*dDPdb/dDPdt
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
-    out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[o]*'=')))
+    out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[0]*'=')))
     if (plot){
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
