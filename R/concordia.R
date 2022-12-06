@@ -289,7 +289,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                              ellipse.stroke='black',concordia.col='darksalmon',
                              exterr=FALSE,show.age=0,oerr=3,y0option=1,
                              sigdig=2,common.Pb=0,ticks=5,anchor=0,
-                             hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                             hide=NULL,omit=NULL,omit.fill=NA,
+                             omit.stroke='grey',...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -303,20 +304,27 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
     fit <- NULL
-    lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     if (show.age>1){
         wetherill <- (type==1)
         fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
                                              exterr=exterr,oerr=oerr,
                                              model=(show.age-1),anchor=anchor)
-        wethertit <- wetherill & !measured.disequilibrium(x2calc$d)
+        if (measured.disequilibrium(x2calc$d)){
+            X2plot$d$U48 = list(x=fit$par['U48i'],option=1)
+            X2plot$d$ThU = list(x=fit$par['ThUi'],option=1)
+            X2plot$d$RaU = list(x=fit$par['RaUi'],option=1)
+            X2plot$d$PaU = list(x=fit$par['PaUi'],option=1)
+        }
         fit$n <- length(x2calc)
-        discordia.line(fit,wetherill=wetherill,d=x2calc$d,oerr=oerr)
-        graphics::title(discordia.title(fit,wetherill=wethertit,
+    }
+    lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
+    if (show.age>1){
+        discordia.line(fit,wetherill=wetherill,d=X2plot$d,oerr=oerr)
+        graphics::title(discordia.title(fit,wetherill=wetherill,
                                         y0option=y0option,
                                         sigdig=sigdig,oerr=oerr,...))
     }
-    plot.concordia.line(x2calc,lims=lims,type=type,col=concordia.col,
+    plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
                         oerr=oerr,exterr=exterr,ticks=ticks)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
@@ -661,22 +669,20 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
     else if (type==2) Pb206U238 <- 1/cc$x['U238Pb206']
     else if (type==3) Pb206U238 <- cc$x['Pb206U238']
     else stop('Incorrect concordia type.')
+    maxpoint <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),5000)
     midpoint <- get.Pb206U238.age(x=Pb206U238,d=d)[1]
     fit1 <- stats::optimise(LL.concordia.age,interval=c(0,midpoint),
                             exterr=FALSE,cc=cc,type=type,d=d)
-    fit2 <- stats::optimise(LL.concordia.age,interval=c(midpoint,5000),
+    fit2 <- stats::optimise(LL.concordia.age,interval=c(midpoint,maxpoint),
                             exterr=FALSE,cc=cc,type=type,d=d)
-    if (fit1$objective<fit2$objective){
-        tt <- fit1$minimum
-    } else {
-        tt <- fit2$minimum
-    }
-    hess <- stats::optimHess(tt,fn=LL.concordia.age,cc=cc,
-                             exterr=exterr,type=type,d=d)
-    if (det(hess)>1e-15)
-        tt.err <- as.numeric(sqrt(solve(hess)))
-    else
-        tt.err <- .Machine$double.ulp.digits
+    o1 <- fit1$objective
+    o2 <- fit2$objective
+    if (is.finite(o1)) tt <- fit1$minimum
+    if (is.finite(o2) && o2<o1) tt <- fit2$minimum
+    H <- stats::optimHess(tt,fn=LL.concordia.age,cc=cc,
+                          exterr=exterr,type=type,d=d)
+    hess <- hesscheck(H)
+    tt.err <- as.numeric(sqrt(solve(hess)))
     out <- c(tt,tt.err)
     names(out) <- c('t.conc','s[t.conc]')
     out
