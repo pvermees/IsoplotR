@@ -540,7 +540,7 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
     graphics::polygon(x$x,x$y,col=kde.col)
     graphics::lines(x$x,x$y,col='black')
     if (rug) rug(ages)
-    mymtext(get.ntit(x$ages),line=0,adj=1)
+    mymtext(get.ntit(x$ages,m=m,M=M),line=0,adj=1)
 }
 
 plot.KDEs <- function(x,ncol=NA,rug=FALSE,xlab="age [Ma]",ylab="",

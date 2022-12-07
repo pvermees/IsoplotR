@@ -86,12 +86,6 @@ a list with the following items:
 
 \item{L}{a named vector of all the relevant decay constants}
 
-\item{n0}{the initial atomic abundances of all the parent and
-daughter isotopes (used by \code{\link{mclean}}). Note that the
-\eqn{{}^{238}}U and \eqn{{}^{235}}U decay chains have been
-disconnected, so the \eqn{{}^{238}}U/\eqn{{}^{235}}U ratio of
-\code{n0} is meaningless.}
-
 }
 }
 \description{

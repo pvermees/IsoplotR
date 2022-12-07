@@ -163,12 +163,8 @@ disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units)
     if (oerr>3){
         out <- substitute(p~a*u%+-%b*'%',lst)
-    } else if (is.na(werr) | sw/w<0.5){
-        out <- substitute(p~a%+-%b*u,lst)
     } else {
-        lst$b <- signif(exp(log(w)+werr/w)-w,sigdig)
-        lst$c <- signif(w-exp(log(w)-werr/w),sigdig)
-        out <- substitute(p~a+b-c*u,lst)
+        out <- substitute(p~a%+-%b*u,lst)
     }
     out
 }
@@ -186,9 +182,10 @@ peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
 }
 
 get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
-get.ntit.default <- function(x,...){
+get.ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
     ns <- length(x)
-    nisnan <- length(which(is.na(x)))
+    bad <- which(is.na(x) | x<m | x>M)
+    nisnan <- length(bad)
     out <- '(n='
     if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
     paste0(out,ns,')')

@@ -138,15 +138,20 @@ mds.detritals <- function(x,method="KS",classical=FALSE,plot=TRUE,
 #' @description Calculates the pairwise dissimilarity between detrital
 #'     age distributions, using either the Wasserstein-2 or
 #'     Kolmogorov-Smirnov distance.
-#' @details The Wasserstein distance is a function of the area between
-#'     two empirical cumulative distribution functions. The
-#'     Kolmogorov-Smirnov statistic is the maximum vertical difference
+#' @details The Kolmogorov-Smirnov statistic is the maximum vertical
+#'     difference between two empirical cumulative distribution
+#'     functions. The Wasserstein distance is a function of the area
 #'     between them. Both dissimilarity measures are useful for
 #'     multidimensional scaling.
 #' @param x an object of class \code{detrital} OR a vector of numbers
 #' @param y a vector of numbers
 #' @param method either \code{'KS'} (for Kolmogorov-Smirnov distance),
 #'     or \code{'W2'} (for Wasserstein-2 distance).
+#' @author Written by Pieter Vermeesch, using modified code from
+#'     Mathieu Vrac's \code{CDFt} package (\code{KolmogorovSmirnov}
+#'     function), and Dominic Schuhmacher's \code{transport} package
+#'     (\code{transport1d} function).
+#' @seealso \code{\link{mds}}
 #' @param ... extra arguments (not used)
 #' @return an object of class \code{dist}.
 #' @examples

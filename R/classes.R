@@ -212,7 +212,7 @@ length.fissiontracks <- function(x){
     if ('x.raw' %in% names(x)){
         out$x.raw <- x$x.raw[...]
     }
-    out    
+    out
 }
 #' @export
 `[.ArAr` <- function(x,...){ `[helper`(x,...) }
@@ -254,17 +254,6 @@ length.fissiontracks <- function(x){
     out <- x
     out$x <- x$x[...]
     out
-}
-
-mediand <- function(d){
-    out <- d
-    for (ratio in c('U48','ThU','RaU','PaU')){
-        out[[ratio]]$x <- stats::median(d[[ratio]]$x)
-        out[[ratio]]$sx <- stats::median(d[[ratio]]$sx)
-    }
-    out$n0 <- matrix(apply(d$n0,1,'median'),ncol=1)
-    rownames(out$n0) <- rownames(d$n0)
-    out    
 }
 
 #' @export
@@ -317,4 +306,13 @@ subset_helper <- function(x,...){
     out <- x
     out$x <- subset.matrix(x$x,...)
     out
+}
+
+mediand <- function(d){
+    out <- d
+    for (ratio in c('U48','ThU','RaU','PaU')){
+        out[[ratio]]$x <- stats::median(d[[ratio]]$x)
+        out[[ratio]]$sx <- stats::median(d[[ratio]]$sx)
+    }
+    out    
 }

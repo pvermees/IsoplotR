@@ -75,5 +75,6 @@ nearPD <- function(x, corr = FALSE, keepDiag = FALSE,
 	else if(keepDiag)
 	    diag(X) <- diagX0
     } ## end from posdefify(sfsmisc)
+    dimnames(X) <- dimnames(x)
     X
 }

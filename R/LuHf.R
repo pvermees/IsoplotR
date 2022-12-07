@@ -81,6 +81,6 @@ get.LuHf.age <- function(Hf176Lu176,sHf176Lu176,exterr=TRUE){
     get.PD.age(Hf176Lu176,sHf176Lu176,nuclide='Lu176',exterr=exterr)
 }
 
-LuHf.age <- function(x,exterr=TRUE,i=NA,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
+LuHf.age <- function(x,exterr=TRUE,i=NULL,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
     PD.age(x,'Lu176',exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
 }
