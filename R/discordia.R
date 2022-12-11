@@ -24,26 +24,6 @@ concordia.intersection.ludwig <- function(x,fit,wetherill=TRUE){
     out$err['s',] <- sqrt(diag(out$cov))
     out
 }
-# extracts concordia intersection parameters from an ordinary York fit
-concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
-                                      exterr=FALSE,wetherill=FALSE,d=diseq()){
-    l8 <- lambda('U238')[1]
-    ta <- get.Pb207Pb206.age(a,d=d)[1]
-    out <- c(1,a) # tl, 7/6 intercept
-    if (wetherill) names(out) <- c('t[l]','t[u]')
-    else names(out) <- c('t[l]','a0')
-    if (b<0) { # negative slope => two (or zero) intersections with concordia line
-        tb <- get.Pb206U238.age(-b/a,d=d)[1]
-        tlu <- recursive.search(tm=tb,tM=ta,a=a,b=b,d=d)
-        out['t[l]'] <- tlu[1]
-        if (wetherill) out['t[u]'] <- tlu[2]
-    } else {
-        search.range <- c(ta,2/l8)
-        out['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                      interval=search.range,a=a,b=b,d=d)$root
-    }
-    out
-}
 
 recursive.search <- function(tm,tM,a,b,d=diseq(),depth=1){
     out <- c(NA,NA)

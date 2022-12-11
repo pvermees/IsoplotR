@@ -128,8 +128,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     lfit <- stats::optim(par=init$pars,fn=LL.ludwig,method="L-BFGS-B",
                         lower=init$lower,upper=init$upper,hessian=TRUE,
                         x=x,anchor=anchor,type=type,model=model,exterr=exterr)
-    hess <- hesscheck(lfit$hessian)
-    lfit$cov <- solve(hess)
+    lfit$cov <- inverthess(lfit$hessian)
     fit <- exponentiate(lfit)
     afit <- anchormerge(fit,x,anchor=anchor,type=type)
     out <- mswd.lud(afit,x=x,exterr=exterr,type=type)

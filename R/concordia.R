@@ -638,7 +638,7 @@ concordia.age <- function(x,i=NULL,type=1,exterr=TRUE,...){
         type4age <- 1
     }
     out <- concordia_age_helper(cc4age,d=mediand(x$d),type=type4age,exterr=exterr)
-    out$age <- c('t'=unname(out$par['t']),'s[t]'=unname(sqrt(out$tcov['t','t'])))
+    out$age <- c('t'=unname(out$par['t']),'s[t]'=unname(sqrt(out$cov['t','t'])))
     if (is.null(i)){ # these calculations are only relevant to weighted means
         out <- c(out,mswd.concordia(x,cc4age,type=type4age,
                                     pars=out$par,exterr=exterr))
@@ -703,8 +703,7 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
     o2 <- fit2$value
     if (is.finite(o1)) out <- fit1
     if (is.finite(o2) && o2<o1) out <- fit2
-    hess <- hesscheck(out$hessian)
-    out$tcov <- solve(hess)
+    out$cov <- inverthess(out$hessian)
     out
 }
 

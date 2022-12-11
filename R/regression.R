@@ -55,8 +55,10 @@ model3regression <- function(xyz,type='york',
         out <- stats::optim(init,LL.york,method='L-BFGS-B',
                             lower=lower,upper=upper,XY=xyz,
                             wtype=wtype,hessian=TRUE)
-        hess <- hesscheck(out$hessian)
-        out$cov <- solve(hess)
+        if (out$convergence>0){
+            out <- stats::optim(init,LL.york,XY=xyz,wtype=wtype,hessian=TRUE)
+        }
+        out$cov <- inverthess(out$hessian)
         out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
         out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
         out$cov.ab <- out$cov['a','b']
@@ -73,8 +75,7 @@ model3regression <- function(xyz,type='york',
         out <- stats::optim(init,LL.titterington,method='L-BFGS-B',
                             lower=lower,upper=upper,XYZ=xyz,
                             hessian=TRUE,wtype=wtype)
-        hess <- hesscheck(out$hessian)
-        out$cov <- solve(hess)
+        out$cov <- inverthess(out$hessian)
     } else {
         stop('invalid output type for model 3 regression')
     }

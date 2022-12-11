@@ -280,8 +280,8 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         X <- Pb0corr(x,option=common.Pb)
         out <- concordia.age(X,wetherill=TRUE,exterr=exterr)
     } else if (type %in% c(3,4,5)){
-        out <- concordia.intersection.ludwig(x,wetherill=FALSE,
-                                             exterr=exterr,model=type-2)
+        fit <- ludwig(x,exterr=exterr,model=type-2)
+        out <- concordia.intersection.ludwig(x,fit=fit,wetherill=FALSE)
     }
     out
 }
