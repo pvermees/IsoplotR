@@ -1,11 +1,9 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
-                                          oerr=3,model=1,anchor=0){
-    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+concordia.intersection.ludwig <- function(x,fit,wetherill=TRUE){
     out <- fit
     out$format <- x$format
-    if (wetherill & !measured.disequilibrium(x$d)){
+    if (wetherill){
         wfit <- twfit2wfit(fit,x)
         out$par <- wfit$par
         out$cov <- wfit$cov
@@ -80,6 +78,7 @@ recursive.search <- function(tm,tM,a,b,d=diseq(),depth=1){
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
 twfit2wfit <- function(fit,x){
+    if (measured.disequilibrium(x$d)) x <- measured2initial(x,fit)
     tt <- fit$par['t']
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
@@ -94,7 +93,7 @@ twfit2wfit <- function(fit,x){
         dPb76da0 <- -Pb76/fit$par['a0']
         dPb76db0 <- 1/fit$par['a0']
     }
-    E <- fit$cov
+    E <- fit$cov[c('t','a0','b0','w'),c('t','a0','b0','w')]
     J <- matrix(0,3,4)
     md <- mediand(x$d)
     D <- mclean(tt,d=md)
