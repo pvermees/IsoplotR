@@ -328,34 +328,36 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         lower['w'] <- pars['w'] - 5
         upper['w'] <- pars['w'] + 2
     }
-    if (x$d$U48$option>0 && x$d$U48$sx>0){
-        if (x$d$U48$option==1){
-            pars['U48i'] <- ifelse(x$d$U48$x>0,log(x$d$U48$x),-10)
-        } else {
-            pars['U48i'] <- 0
+    if (type%in%c('joint',0,1,3)){
+        if (x$d$U48$option>0 && x$d$U48$sx>0){
+            if (x$d$U48$option==1){
+                pars['U48i'] <- ifelse(x$d$U48$x>0,log(x$d$U48$x),-10)
+            } else {
+                pars['U48i'] <- 0
+            }
+            lower['U48i'] <- -10
+            upper['U48i'] <- log(20)
+        } else if (x$d$U48$option==2){
+            stop('Zero uncertainty of measured 234/238 activity ratio')
         }
-        lower['U48i'] <- -10
-        upper['U48i'] <- log(20)
-    } else if (x$d$U48$option==2){
-        stop('Zero uncertainty of measured 234/238 activity ratio')
-    }
-    if (x$d$ThU$option>0 && x$d$ThU$sx>0){
-        if (x$d$ThU$option==1){
-            pars['ThUi'] <- ifelse(x$d$ThU$x>0,log(x$d$ThU$x),-10)
-        } else {
-            pars['ThUi'] <- 0
+        if (x$d$ThU$option>0 && x$d$ThU$sx>0){
+            if (x$d$ThU$option==1){
+                pars['ThUi'] <- ifelse(x$d$ThU$x>0,log(x$d$ThU$x),-10)
+            } else {
+                pars['ThUi'] <- 0
+            }
+            lower['ThUi'] <- -10
+            upper['ThUi'] <- log(20)
+        } else if (x$d$ThU$option==2){
+            stop('Zero uncertainty of measured 230/238 activity ratio')
         }
-        lower['ThUi'] <- -10
-        upper['ThUi'] <- log(20)
-    } else if (x$d$ThU$option==2){
-        stop('Zero uncertainty of measured 230/238 activity ratio')
+        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
+            pars['RaUi'] <- ifelse(x$d$RaU$x>0,log(x$d$RaU$x),-10)
+            lower['RaUi'] <- -10
+            upper['RaUi'] <- log(20)
+        }
     }
-    if (x$d$RaU$option==1 && x$d$RaU$sx>0){
-        pars['RaUi'] <- ifelse(x$d$RaU$x>0,log(x$d$RaU$x),-10)
-        lower['RaUi'] <- -10
-        upper['RaUi'] <- log(20)
-    }
-    if (x$d$PaU$option==1 && x$d$PaU$sx>0){
+    if (type%in%c('joint',0,2,4) && x$d$PaU$option==1 && x$d$PaU$sx>0){
         pars['PaUi'] <- ifelse(x$d$PaU$x>0,log(x$d$PaU$x),-10)
         lower['PaUi'] <- -10
         upper['PaUi'] <- log(20)
@@ -476,22 +478,24 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,type='joint'){
     } else {
         LL <- LL + LL.ludwig.2d(ta0b0w,X,model=model,exterr=exterr,type=type)     
     }
-    if (x$d$U48$option==2){
-        pred <- mclean(tt=tt,d=X$d)
-        LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
-    } else if (x$d$U48$option==1 && x$d$U48$sx>0){
-        LL <- LL - stats::dnorm(x=X$d$U48$x,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE) 
+    if (type%in%c('joint',0,1,3)){
+        if (x$d$U48$option==2){
+            pred <- mclean(tt=tt,d=X$d)
+            LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE)
+        } else if (x$d$U48$option==1 && x$d$U48$sx>0){
+            LL <- LL - stats::dnorm(x=X$d$U48$x,mean=x$d$U48$x,sd=x$d$U48$sx,log=TRUE) 
+        }
+        if (x$d$ThU$option==2){
+            pred <- mclean(tt=tt,d=X$d)
+            LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        } else if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+            LL <- LL - stats::dnorm(x=X$d$ThU$x,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
+        }
+        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
+            LL <- LL - stats::dnorm(x=X$d$RaU$x,mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
+        }
     }
-    if (x$d$ThU$option==2){
-        pred <- mclean(tt=tt,d=X$d)
-        LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-    } else if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-        LL <- LL - stats::dnorm(x=X$d$ThU$x,mean=x$d$ThU$x,sd=x$d$ThU$sx,log=TRUE)
-    }
-    if (x$d$RaU$option==1 && x$d$RaU$sx>0){
-        LL <- LL - stats::dnorm(x=X$d$RaU$x,mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
-    }
-    if (x$d$PaU$option==1 && x$d$PaU$sx>0){
+    if (type%in%c('joint',0,2,4) && x$d$PaU$option==1 && x$d$PaU$sx>0){
         LL <- LL - stats::dnorm(x=X$d$PaU$x,mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
     }
     LL
