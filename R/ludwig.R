@@ -476,7 +476,7 @@ LL.ludwig <- function(pars,x,model=1,exterr=FALSE,anchor=0,type='joint'){
     } else if (type%in%c('joint',0) || x$format<4){
         LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
     } else {
-        LL <- LL + LL.ludwig.2d(ta0b0w,X,model=model,exterr=exterr,type=type)     
+        LL <- LL + LL.ludwig.2d(ta0b0w,X,model=model,exterr=exterr,type=type)
     }
     if (type%in%c('joint',0,1,3)){
         if (x$d$U48$option==2){
