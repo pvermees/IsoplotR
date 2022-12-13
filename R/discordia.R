@@ -1,11 +1,9 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
-                                          oerr=3,model=1,anchor=0){
-    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+concordia.intersection.ludwig <- function(x,fit,wetherill=TRUE){
     out <- fit
     out$format <- x$format
-    if (wetherill & !measured.disequilibrium(x$d)){
+    if (wetherill){
         wfit <- twfit2wfit(fit,x)
         out$par <- wfit$par
         out$cov <- wfit$cov
@@ -24,26 +22,6 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
     }
     colnames(out$err) <- names(out$par)
     out$err['s',] <- sqrt(diag(out$cov))
-    out
-}
-# extracts concordia intersection parameters from an ordinary York fit
-concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
-                                      exterr=FALSE,wetherill=FALSE,d=diseq()){
-    l8 <- lambda('U238')[1]
-    ta <- get.Pb207Pb206.age(a,d=d)[1]
-    out <- c(1,a) # tl, 7/6 intercept
-    if (wetherill) names(out) <- c('t[l]','t[u]')
-    else names(out) <- c('t[l]','a0')
-    if (b<0) { # negative slope => two (or zero) intersections with concordia line
-        tb <- get.Pb206U238.age(-b/a,d=d)[1]
-        tlu <- recursive.search(tm=tb,tM=ta,a=a,b=b,d=d)
-        out['t[l]'] <- tlu[1]
-        if (wetherill) out['t[u]'] <- tlu[2]
-    } else {
-        search.range <- c(ta,2/l8)
-        out['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                      interval=search.range,a=a,b=b,d=d)$root
-    }
     out
 }
 
@@ -80,6 +58,7 @@ recursive.search <- function(tm,tM,a,b,d=diseq(),depth=1){
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
 twfit2wfit <- function(fit,x){
+    if (measured.disequilibrium(x$d)) x <- measured2initial(x,fit)
     tt <- fit$par['t']
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
@@ -94,7 +73,7 @@ twfit2wfit <- function(fit,x){
         dPb76da0 <- -Pb76/fit$par['a0']
         dPb76db0 <- 1/fit$par['a0']
     }
-    E <- fit$cov
+    E <- fit$cov[c('t','a0','b0','w'),c('t','a0','b0','w')]
     J <- matrix(0,3,4)
     md <- mediand(x$d)
     D <- mclean(tt,d=md)

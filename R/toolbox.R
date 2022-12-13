@@ -422,6 +422,16 @@ hesscheck <- function(H){
     }
     out
 }
+inverthess <- function(hess){
+    H <- hesscheck(hess)
+    if (det(H)>1e8 || det(H)<1e-18){
+        out <- MASS::ginv(H)
+        dimnames(out) <- dimnames(H)
+    } else {
+        out <- solve(H)
+    }
+    out
+}
 
 invertcovmat <- function(sx,sy,sz,sxy=0,sxz=0,syz=0){
     if (missing(sz)){

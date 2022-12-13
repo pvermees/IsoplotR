@@ -307,24 +307,17 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
         fit <- concordia.age(X2calc,type=type,exterr=exterr)
+        X2plot <- measured2initial(x=X2plot,fit=fit)
     } else if (show.age>1){
-        wetherill <- (type==1)
-        fit <- concordia.intersection.ludwig(x2calc,wetherill=wetherill,
-                                             exterr=exterr,oerr=oerr,
-                                             model=(show.age-1),anchor=anchor)
-    }
-    if (show.age>0 && measured.disequilibrium(x2calc$d)){
-        pnames <- names(fit$par)
-        if ('U48i'%in%pnames) X2plot$d$U48 <- list(x=fit$par['U48i'],option=1)
-        if ('ThUi'%in%pnames) X2plot$d$ThU <- list(x=fit$par['ThUi'],option=1)
-        if ('RaUi'%in%pnames) X2plot$d$RaU <- list(x=fit$par['RaUi'],option=1)
-        if ('PaUi'%in%pnames) X2plot$d$PaU <- list(x=fit$par['PaUi'],option=1)
+        lfit <- ludwig(x,exterr=exterr,model=(show.age-1),anchor=anchor)
+        fit <- concordia.intersection.ludwig(x2calc,fit=lfit,wetherill=(type==1))
+        X2plot <- measured2initial(x=X2plot,fit=lfit)
     }
     fit$n <- length(x2calc)
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     if (show.age>1){
-        discordia.line(fit,wetherill=wetherill,d=X2plot$d,oerr=oerr)
-        graphics::title(discordia.title(fit,wetherill=wetherill,
+        discordia.line(fit,wetherill=(type==1),d=X2plot$d,oerr=oerr)
+        graphics::title(discordia.title(fit,wetherill=(type==1),
                                         y0option=y0option,
                                         sigdig=sigdig,oerr=oerr,...))
     }
@@ -645,7 +638,7 @@ concordia.age <- function(x,i=NULL,type=1,exterr=TRUE,...){
         type4age <- 1
     }
     out <- concordia_age_helper(cc4age,d=mediand(x$d),type=type4age,exterr=exterr)
-    out$age <- c('t'=unname(out$par['t']),'s[t]'=unname(sqrt(out$tcov['t','t'])))
+    out$age <- c('t'=unname(out$par['t']),'s[t]'=unname(sqrt(out$cov['t','t'])))
     if (is.null(i)){ # these calculations are only relevant to weighted means
         out <- c(out,mswd.concordia(x,cc4age,type=type4age,
                                     pars=out$par,exterr=exterr))
@@ -710,8 +703,7 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
     o2 <- fit2$value
     if (is.finite(o1)) out <- fit1
     if (is.finite(o2) && o2<o1) out <- fit2
-    hess <- hesscheck(out$hessian)
-    out$tcov <- solve(hess)
+    out$cov <- inverthess(out$hessian)
     out
 }
 

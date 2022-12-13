@@ -488,3 +488,18 @@ meas.diseq.maxt <- function(d){
     }
     out
 }
+
+measured2initial <- function(x,fit){
+    out <- x
+    fnames <- names(fit$par)
+    dnames <- c('U48','ThU','RaU','PaU')
+    for (dname in dnames){
+        iname <- paste0(dname,'i')
+        if (iname %in% fnames){
+            out$d[[dname]]$x <- fit$par[iname]
+            out$d[[dname]]$sx <- sqrt(fit$cov[iname,iname])
+            out$d[[dname]]$option <- 1
+        }
+    }
+    out
+}

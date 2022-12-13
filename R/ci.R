@@ -153,8 +153,13 @@ mswdtit <- function(mswd,p,sigdig=2){
 }
 disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     if (w>0){
-        werr <- ci(w,sw,oerr=oerr)
-        rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
+        if (identical(units,'%')) {
+            werr <- ci(100*w,100*sw,oerr=oerr,absolute=TRUE)
+            rounded <- roundit(100*w,werr,sigdig=sigdig,text=TRUE)
+        } else {
+            werr <- ci(w,sw,oerr=oerr)
+            rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
+        }
     } else {
         w <- 0
         werr <- NA

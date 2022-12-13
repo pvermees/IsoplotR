@@ -836,7 +836,8 @@ radial.title <- function(fit,sigdig=2,oerr=3,units='',ntit,caveat=FALSE,...){
                      prefix=paste0('central age',ast,' ='))
     line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     if (fit$p.value<alpha()){
-        line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,oerr=oerr)
+        line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],
+                         sigdig=sigdig,oerr=oerr,units='%')
         mymtext(line3,line=0,...)
         line1line <- 2
         line2line <- 1
