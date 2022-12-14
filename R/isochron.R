@@ -553,12 +553,12 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         md <- mediand(x$d)
         D <- mclean(tt,d=md,exterr=exterr)
         if (type==1){                           # 04-08c/06 vs. 38/06
-            x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=md)[1]
+            x0inv <- D$Pb206U238
             dx0invdt <- D$dPb206U238dt
             E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^238*'U/'^206*'Pb')
         } else if (type==2){                    # 04-08c/07 vs. 35/07
-            x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=md)[1]
+            x0inv <- D$Pb207U235
             dx0invdt <- D$dPb207U235dt
             E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^235*'U/'^207*'Pb')

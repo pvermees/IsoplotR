@@ -125,8 +125,8 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     init <- init.ludwig(x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init,fn=LL.ludwig,hessian=FALSE,
-                        x=x,anchor=anchor,type=type,
+    fit <- stats::optim(init,fn=LL.ludwig,method='L-BFGS-B',lower=init-1,upper=init+1,
+                        hessian=TRUE,x=x,anchor=anchor,type=type,
                         model=model,exterr=exterr)
     dfit <- adddiseq(fit,d=x$d)
     H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
@@ -498,7 +498,6 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     tt <- ta0b0w['t']
     a0 <- ta0b0w['a0']
     if (x$format>3) b0 <- ta0b0w['b0']
-    disp <- ('w'%in%names(ta0b0w) && !is.na(ta0b0w['w']))
     ns <- length(x)
     zeros <- rep(0,ns)
     X <- zeros
@@ -522,7 +521,6 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     } else {
         stop('Incorrect input format.')
     }
-    if (disp) w <- ta0b0w['w']
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
@@ -550,8 +548,8 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     }
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     ED <- J%*%E%*%t(J)
-    if (disp){ # fit overdispersion
-        Ew <- get.Ewd(w=w,format=x$format,ns=ns,D=D)
+    if ('w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])){
+        Ew <- get.Ewd(w=ta0b0w['w'],format=x$format,ns=ns,D=D)
         ED <- ED + Ew
     }
     i1 <- 1:ns
@@ -656,17 +654,16 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     a0 <- ta0b0['a0']
     if ('b0'%in%pnames) b0 <- ta0b0['b0']
     nn <- length(x)
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format<4){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-        McL <- mclean(tt=tt,d=x$d)
-        xr <- 1/McL$Pb206U238
-        yr <- McL$Pb207Pb206
+        xr <- 1/D$Pb206U238
+        yr <- D$Pb207Pb206
         xx <- xy[,'X',drop=FALSE]
         yy <- xy[,'Y',drop=FALSE]
         dem <- deming(a=a0,b=(yr-a0)/xr,x=xx,y=yy)
         SS <- sum(dem$d^2)
         if (exterr){
-            D <- mclean(tt,d=x$d,exterr=exterr)
             dbdxr <- (a0-yr)/xr^2
             dbdyr <- 1/xr
             dxrdPbU <- -xr^2
@@ -700,13 +697,13 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
         x7 <- xy[,3,drop=FALSE] # U235Pb207
         y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
-        r86 <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
-        r57 <- age_to_U235Pb207_ratio(tt,st=0,d=x$d)[1]
+        r86 <- 1/D$Pb206U238
+        r57 <- 1/D$Pb207U235
         dem6 <- deming(a=1/a0,b=-1/(a0*r86),x=x6,y=y6)
         dem7 <- deming(a=1/b0,b=-1/(b0*r57),x=x7,y=y7)
-        E <- stats::cov(cbind(dem6$d,dem7$d))
+        SS6 <- sum(dem6$d^2)
+        SS7 <- sum(dem7$d^2)
         if (exterr){
-            D <- mclean(tt=tt,d=x$d,exterr=exterr)
             dbd86 <- 1/(a0*r86^2)
             dbd57 <- 1/(b0*r57^2)
             dr68d86 <- -r86^2
@@ -721,20 +718,13 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
             d75dl <- matrix(0,1,7)
             d75dl[2] <- D$dPb207U235dl35
             d75dl[5] <- D$dPb207U235dl31
-            J <- matrix(0,2*nn,7)
-            J[1:nn,] <- dd6d68%*%d68dl
-            J[nn+(1:nn),] <- dd7d75%*%d75dl
-            EE <- matrix(0,2*nn,2*nn)
-            diag(EE)[1:nn] <- E[1,1]
-            diag(EE)[nn+(1:nn)] <- E[2,2]
-            diag(EE[1:nn,nn+(1:nn)]) <- E[1,2]
-            diag(EE[nn+(1:nn),1:nn]) <- E[2,1]
-            covmat <- EE + J %*% getEl() %*% t(J)
-            dd <- c(dem6$d,dem7$d)
-            LL <- LL.norm(dd,covmat)
+            J6 <- dd6d68%*%d68dl
+            J7 <- dd7d75%*%d75dl
+            E6 <- diag(SS6/(nn-2),nn,nn) + J6%*%getEl()%*%t(J6)
+            E7 <- diag(SS7/(nn-2),nn,nn) + J7%*%getEl()%*%t(J7)
+            LL <- LL.norm(as.vector(dem6$d),E6) + LL.norm(as.vector(dem7$d),E7)
         } else {
-            dd <- cbind(dem6$d,dem7$d)
-            LL <- sum(apply(dd,1,LL.norm,covmat=E))
+            LL <- SS2LL(SS=SS6+SS7,nn=2*nn)
         }
     }
     LL

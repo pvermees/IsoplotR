@@ -342,13 +342,13 @@ mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE){
             dm <- dM <- d
             dm$U48$option <- dM$U48$option <- 0 # U48 is irrelevant here
             dm$ThU <- list(x=0,sx=0,option=1)
-            dM$ThU <- list(x=100,sx=0,option=1)
+            dM$ThU <- list(x=50,sx=0,option=1)
             McLm <- mclean(tt=tt,d=dm)
             McLM <- mclean(tt=tt,d=dM)
-            if (McLm$ThU<d$ThU$x) {
+            if (McLm$ThU>d$ThU$x) {
                 d$ThU <- dm$ThU
                 out$truncated <- TRUE
-            } else if (McLM$ThU>d$ThU$x) {
+            } else if (McLM$ThU<d$ThU$x) {
                 d$ThU <- dM$ThU
                 out$truncated <- TRUE
             }
@@ -356,14 +356,14 @@ mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE){
         if (d$U48$option==2){
             dm <- dM <- d
             dm$U48 <- list(x=0,sx=0,option=1)
-            dM$U48 <- list(x=100,sx=0,option=1)
+            dM$U48 <- list(x=50,sx=0,option=1)
             McLm <- mclean(tt=tt,d=dm)
             McLM <- mclean(tt=tt,d=dM)
-            if (McLm$U48>d$U48$x){
-                d$U48 <- dm$U48
-                out$truncated <- TRUE
-            } else if (McLM$U48<d$U48$x) {
+            if (McLM$U48<d$U48$x) {
                 d$U48 <- dM$U48
+                out$truncated <- TRUE
+            } else if (McLm$U48>d$U48$x){
+                d$U48 <- dm$U48
                 out$truncated <- TRUE
             }
         }
