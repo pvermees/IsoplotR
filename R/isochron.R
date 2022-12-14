@@ -545,14 +545,12 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         x2calc <- subset(x,subset=calcit)
         fit <- ludwig(x2calc,model=model,anchor=anchor,
                       exterr=exterr,type=ifelse(joint,0,type))
-        if (measured.disequilibrium(x$d)) X <- measured2initial(x,fit)
-        else X <- x
         tt <- fit$par['t']
         a0 <- fit$par['a0']
         b0 <- fit$par['b0']
         l8 <- settings('lambda','U238')[1]
         l5 <- settings('lambda','U235')[1]
-        md <- mediand(X$d)
+        md <- mediand(x$d)
         D <- mclean(tt,d=md,exterr=exterr)
         if (type==1){                           # 04-08c/06 vs. 38/06
             x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=md)[1]
@@ -583,33 +581,33 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         out$age['s[t]'] <- sqrt(fit$cov['t','t'])
         J <- matrix(0,2,2)
         if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
-            XY <- data2york(X,option=3)
+            XY <- data2york(x,option=3)
             a <- 1/fit$par['a0']
             J[1,2] <- -a^2
             y.lab <- quote(''^204*'Pb/'^206*'Pb')
         } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
-            XY <- data2york(X,option=4)
+            XY <- data2york(x,option=4)
             a <- 1/fit$par['b0']
             J[1,2] <- -a^2
             y.lab <- quote(''^204*'Pb/'^207*'Pb')
         } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
-            XY <- data2york(X,option=6,tt=tt)
+            XY <- data2york(x,option=6,tt=tt)
             a <- 1/fit$par['a0']
             J[1,2] <- -a^2
             y.lab <- quote(''^208*'Pb'[c]*'/'^206*'Pb')
         } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
-            XY <- data2york(X,option=7,tt=tt)
+            XY <- data2york(x,option=7,tt=tt)
             U <- settings('iratio','U238U235')[1]
             a <- 1/fit$par['b0']
             J[1,2] <- -a^2
             y.lab <- quote(''^208*'Pb'[c]*'/'^207*'Pb')
         } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
-            XY <- data2york(X,option=8,tt=tt)
+            XY <- data2york(x,option=8,tt=tt)
             a <- fit$par['a0']
             J[1,2] <- 1
             y.lab <- quote(''^206*'Pb'[c]*'/'^208*'Pb')
         } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
-            XY <- data2york(X,option=9,tt=tt)
+            XY <- data2york(x,option=9,tt=tt)
             a <- fit$par['b0']
             J[1,2] <- 1
             y.lab <- quote(''^207*'Pb'[c]*'/'^208*'Pb')
