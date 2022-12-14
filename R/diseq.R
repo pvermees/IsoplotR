@@ -509,13 +509,13 @@ get.5678.misfit <- function(obs,pred){
 
 meas.diseq.maxt <- function(d){
     if (d$ThU$option==2){
-        out <- stats::optimise(function(tt,d) mclean(tt=tt,d=d)$ThUi^2,
-                               c(0,1),d=d)$minimum
+        cutoff <- ifelse(max(d$ThU$x)<1,0,50)
+        out <- stats::uniroot(function(tt,d,cutoff) mclean(tt=tt,d=d)$ThUi-cutoff,
+                              lower=0,upper=2,d=d,cutoff=cutoff)$root
     } else if (d$U48$option==2){
-        M <- ifelse(max(d$U48$x)<1,0,500)
-        out <- stats::optimise(
-                          function(tt,d,maxU48) (mclean(tt=tt,d=d)$U48i-maxU48)^2,
-                          c(0,10),d=d,maxU48=M)$minimum
+        cutoff <- ifelse(d$U48$x<1,0,50)
+        out <- stats::uniroot(function(tt,d,cutoff) mclean(tt=tt,d=d)$U48i-cutoff,
+                              lower=0,upper=10,d=d,cutoff=cutoff)$root
     } else {
         out <- 4500
     }

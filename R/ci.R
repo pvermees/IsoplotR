@@ -78,7 +78,7 @@ inflate <- function(fit){
 #' @export
 ci <- function(x,sx,oerr=3,df=NULL,absolute=FALSE){
     fact <- rep(ntfact(alpha()),length(sx))
-    if (!is.null(df)){
+    if (!is.null(df) && df>0){
         fact[-1] <- stats::qt(1-alpha()/2,df=df)
     }
     if (oerr>3 & absolute) oerr <- oerr-3
