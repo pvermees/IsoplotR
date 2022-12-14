@@ -312,8 +312,8 @@ measured.disequilibrium <- function(d=diseq()){
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' mclean(tt=2,d=d)
 #' @export
-mclean <- function(tt=0,d=diseq(),exterr=FALSE){
-    out <- list()
+mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE){
+    out <- list(truncated=FALSE)
     l38 <- d$L['U238']
     l34 <- d$L['U234']
     l30 <- d$L['Th230']
@@ -338,6 +338,35 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$dPb207U235dl35 <- rep(tt*exp(l35*tt),nc)
         }
     } else {
+        if (d$ThU$option==2){
+            dm <- dM <- d
+            dm$U48$option <- dM$U48$option <- 0 # U48 is irrelevant here
+            dm$ThU <- list(x=0,sx=0,option=1)
+            dM$ThU <- list(x=100,sx=0,option=1)
+            McLm <- mclean(tt=tt,d=dm)
+            McLM <- mclean(tt=tt,d=dM)
+            if (McLm$ThU<d$ThU$x) {
+                d$ThU <- dm$ThU
+                out$truncated <- TRUE
+            } else if (McLM$ThU>d$ThU$x) {
+                d$ThU <- dM$ThU
+                out$truncated <- TRUE
+            }
+        }
+        if (d$U48$option==2){
+            dm <- dM <- d
+            dm$U48 <- list(x=0,sx=0,option=1)
+            dM$U48 <- list(x=100,sx=0,option=1)
+            McLm <- mclean(tt=tt,d=dm)
+            McLM <- mclean(tt=tt,d=dM)
+            if (McLm$U48>d$U48$x){
+                d$U48 <- dm$U48
+                out$truncated <- TRUE
+            } else if (McLM$U48<d$U48$x) {
+                d$U48 <- dM$U48
+                out$truncated <- TRUE
+            }
+        }
         n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
         d$n0 <- (n0 %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
         rownames(d$n0) <- names(d$L)
@@ -376,8 +405,12 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$Pb207U235*dntdt['U235',]/d$nt['U235',]
         out$U48i <- (d$n0['U234',]*l34)/(d$n0['U238',]*l38)
         out$ThUi <- (d$n0['Th230',]*l30)/(d$n0['U238',]*l38)
+        out$RaUi <- (d$n0['Ra226',]*l26)/(d$n0['U238',]*l38)
+        out$PaUi <- (d$n0['Pa231',]*l31)/(d$n0['U235',]*l35)
         out$U48 <- (d$nt['U234',]*l34)/(d$nt['U238',]*l38)
         out$ThU <- (d$nt['Th230',]*l30)/(d$nt['U238',]*l38)
+        out$RaU <- (d$nt['Ra226',]*l26)/(d$nt['U238',]*l38)
+        out$PaU <- (d$nt['Pa231',]*l31)/(d$nt['U235',]*l35)
         out$n0 <- linkUseries(n=d$n0,U=U*exp((l38-l35)*tt))
         out$nt <- linkUseries(n=d$nt,U=U)
         if (exterr){
@@ -502,4 +535,35 @@ measured2initial <- function(x,fit){
         }
     }
     out
+}
+
+diseqinvert <- function(tt,x=x,type=type){
+    X <- x
+    LL <- 0
+    if (type%in%c('joint',0,1,3)){
+        if (x$d$U48$option==2){
+            pred <- mclean(tt=tt,d=x$d)
+            LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,
+                                    sd=x$d$U48$sx,log=TRUE)
+        } else if (x$d$U48$option==1 && x$d$U48$sx>0){
+            LL <- LL - stats::dnorm(x=x$d$U48$x,mean=x$d$U48$x,
+                                    sd=x$d$U48$sx,log=TRUE) 
+        }
+        if (x$d$ThU$option==2){
+            pred <- mclean(tt=tt,d=x$d)
+            LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,
+                                    sd=x$d$ThU$sx,log=TRUE)
+        } else if (x$d$ThU$option==1 && x$d$ThU$sx>0){
+            LL <- LL - stats::dnorm(x=x$d$ThU$x,mean=x$d$ThU$x,
+                                    sd=x$d$ThU$sx,log=TRUE)
+        }
+        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
+            LL <- LL - stats::dnorm(x=x$d$RaU$x,mean=x$d$RaU$x,
+                                    sd=x$d$RaU$sx,log=TRUE)
+        }
+    }
+    if (type%in%c('joint',0,2,4) && x$d$PaU$option==1 && x$d$PaU$sx>0){
+        LL <- LL - stats::dnorm(x=x$d$PaU$x,mean=x$d$PaU$x,
+                                sd=x$d$PaU$sx,log=TRUE)
+    }
 }

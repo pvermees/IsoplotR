@@ -307,11 +307,9 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
     if (show.age==1){
         X2calc <- subset(X,subset=calcit)
         fit <- concordia.age(X2calc,type=type,exterr=exterr)
-        X2plot <- measured2initial(x=X2plot,fit=fit)
     } else if (show.age>1){
         lfit <- ludwig(x,exterr=exterr,model=(show.age-1),anchor=anchor)
         fit <- concordia.intersection.ludwig(x2calc,fit=lfit,wetherill=(type==1))
-        X2plot <- measured2initial(x=X2plot,fit=lfit)
     }
     fit$n <- length(x2calc)
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
