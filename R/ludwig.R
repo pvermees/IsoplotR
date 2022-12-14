@@ -125,7 +125,7 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     init <- init.ludwig(x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init,fn=LL.ludwig,hessian=TRUE,
+    fit <- stats::optim(init,fn=LL.ludwig,hessian=FALSE,
                         x=x,anchor=anchor,type=type,
                         model=model,exterr=exterr)
     dfit <- adddiseq(fit,d=x$d)
@@ -248,7 +248,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
             if (anchor[1]==2){
                 out['t'] <- log(ifelse(anchor[2]>0,anchor[2],anchor[3]))
             } else {
-                out['t'] <- log(get.Pb206U238.age(x=PbU0)[1])
+                out['t'] <- log(get.Pb206U238.age(x=PbU0,d=x$d)[1])
             }
         }
         if (anchor[1]!=1 || iratio('Pb207Pb206')[2]>0){
@@ -271,14 +271,14 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         }
         if (anchor[1]!=2 || (length(anchor)>2 && anchor[3]>0)){
             if (anchor[1]==2){
-                out['t'] <- ifelse(anchor[2]>0,anchor[2],anchor[3])
+                out['t'] <- log(ifelse(anchor[2]>0,anchor[2],anchor[3]))
             } else if (type==2){
-                out['t'] <- log(get.Pb207U235.age(x=Pb7U5)[1])
+                out['t'] <- log(get.Pb207U235.age(x=Pb7U5,d=x$d)[1])
             } else {
-                out['t'] <- log(get.Pb206U238.age(x=Pb6U8)[1])
+                out['t'] <- log(get.Pb206U238.age(x=Pb6U8,d=x$d)[1])
             }
         }
-        if (type%in%c('joint',0,1) && 
+        if (type%in%c('joint',0,1) &&
             (anchor[1]!=1 || iratio('Pb206Pb204')[2]>0)){
             if (anchor[1]==1){
                 out['a0'] <- log(iratio('Pb206Pb204')[1])
@@ -298,7 +298,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         if (type==2){
             yfit <- york(data2york(x,option=7))
             Pb7U5 <- abs(yfit$b[1]/yfit$a[1])
-            tt <- get.Pb207U235.age(x=Pb7U5)[1]
+            tt <- get.Pb207U235.age(x=Pb7U5,d=x$d)[1]
         } else if (type==3){
             yfit <- york(data2york(x,option=8))
             Pb8Th2 <- abs(yfit$b[1]/yfit$a[1])
@@ -310,7 +310,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint'){
         } else {
             yfit <- york(data2york(x,option=2))
             Pb6U8 <- abs(yfit$b[1]/yfit$a[1])
-            tt <- get.Pb206U238.age(x=Pb6U8)[1]
+            tt <- get.Pb206U238.age(x=Pb6U8,d=x$d)[1]
         }
         if (type%in%c('joint',0,1,3)){
             yda <- data2york(x,option=6,tt=tt)
@@ -463,7 +463,7 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,anchor=0,type='joint'){
     }
     if ('U48i'%in%pnames){
         if (x$d$U48$option==1){
-            LL <- LL - stats::dnorm(x=par['U48i'],mean=x$d$U48$x,
+            LL <- LL - stats::dnorm(x=exp(par['U48i']),mean=x$d$U48$x,
                                     sd=x$d$U48$sx,log=TRUE) 
         } else if (x$d$U48$option==2){
             pred <- mclean(tt=tt,d=X$d)
@@ -473,7 +473,7 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,anchor=0,type='joint'){
     }
     if ('ThUi'%in%pnames){
         if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            LL <- LL - stats::dnorm(x=par['ThUi'],mean=x$d$ThU$x,
+            LL <- LL - stats::dnorm(x=exp(par['ThUi']),mean=x$d$ThU$x,
                                     sd=x$d$ThU$sx,log=TRUE)
         } else if (x$d$ThU$option==2){
             pred <- mclean(tt=tt,d=X$d)
@@ -482,10 +482,12 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,anchor=0,type='joint'){
         }
     }
     if ('RaUi'%in%pnames){
-        LL <- LL - stats::dnorm(x=par['RaUi'],mean=x$d$RaU$x,sd=x$d$RaU$sx,log=TRUE)
+        LL <- LL - stats::dnorm(x=exp(par['RaUi']),mean=x$d$RaU$x,
+                                sd=x$d$RaU$sx,log=TRUE)
     }
     if ('PaUi'%in%pnames){
-        LL <- LL - stats::dnorm(x=par['PaUi'],mean=x$d$PaU$x,sd=x$d$PaU$sx,log=TRUE)
+        LL <- LL - stats::dnorm(x=exp(par['PaUi']),mean=x$d$PaU$x,
+                                sd=x$d$PaU$sx,log=TRUE)
     }
     LL
 }
@@ -656,8 +658,9 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     nn <- length(x)
     if (x$format<4){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-        xr <- age_to_U238Pb206_ratio(tt,st=0,d=x$d)[1]
-        yr <- age_to_Pb207Pb206_ratio(tt,st=0,d=x$d)[1]
+        McL <- mclean(tt=tt,d=x$d)
+        xr <- 1/McL$Pb206U238
+        yr <- McL$Pb207Pb206
         xx <- xy[,'X',drop=FALSE]
         yy <- xy[,'Y',drop=FALSE]
         dem <- deming(a=a0,b=(yr-a0)/xr,x=xx,y=yy)
