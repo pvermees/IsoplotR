@@ -125,14 +125,19 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     init <- init.ludwig(x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init,fn=LL.ludwig,method='L-BFGS-B',lower=init-1,upper=init+1,
-                        hessian=TRUE,x=x,anchor=anchor,type=type,
-                        model=model,exterr=exterr)
+    fit <- stats::optim(init,fn=LL.ludwig,hessian=TRUE,x=x,
+                        anchor=anchor,type=type,model=model,exterr=exterr)
     dfit <- adddiseq(fit,d=x$d)
-    H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
-                          type=type,model=model,exterr=exterr)
-    dfit$cov <- inverthess(H)
-    efit <- exponentiate(dfit)
+    if (measured.disequilibrium(x$d)){
+        fit$cov <- solve(fit$hessian)
+        fit$ci <- get.ci.ludwig(par=dfit$par,x=x,type=type,
+                                model=model,exterr=exterr)
+    } else {
+        H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
+                              type=type,model=model,exterr=exterr)
+        fit$cov <- solve(H)
+    }
+    efit <- exponentiate(fit)
     afit <- anchormerge(efit,x,anchor=anchor,type=type)
     out <- mswd.lud(afit,x=x,exterr=exterr,type=type)
     out$model <- model

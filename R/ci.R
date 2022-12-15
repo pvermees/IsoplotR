@@ -206,3 +206,98 @@ get.ntit.fissiontracks <- function(x,...){
 ntit.valid <- function(valid,...){
     paste0('(',sum(valid),'/',length(valid),')')
 }
+
+# only used for measured disequilibrium
+get.ci.ludwig <- function(par,x,type='joint',model=1,exterr=FALSE){
+    maxLL <- LL.ludwig(par,x=x,type=type,model=model,exterr=exterr)
+    if (FALSE){ # test function
+        pname <- 'U48i'
+        pp <- seq(from=par[pname]-.5,to=par[pname]+.5,length.out=21)
+        LL <- pp*0
+        for (i in seq_along(pp)){
+            LL[i] <- profile.LL.ludwig(pp[i],par,pname,maxLL=maxLL,x=x,
+                                       type=type,model=model,exterr=exterr)
+        }
+        plot(pp,LL,type='b')
+        lines(rep(par[pname],2),range(LL))
+    }
+    out <- matrix(NA,nrow=2,ncol=length(par))
+    rownames(out) <- c('ll','ul')
+    colnames(out) <- names(par)
+    for (pname in names(par)){
+        message('Computing profile likelihood of ',pname)
+        ll <- stats::uniroot(profile.LL.ludwig,interval=par[pname]-c(1,0),
+                             par=par,pname=pname,maxLL=maxLL,x=x,type=type,
+                             model=model,exterr=exterr,extendInt="yes")$root
+        ul <- stats::uniroot(profile.LL.ludwig,interval=par[pname]+c(0,1),
+                             par=par,pname=pname,maxLL=maxLL,x=x,type=type,
+                             model=model,exterr=exterr,extendInt="yes")$root
+        out['ll',pname] <- exp(ll)
+        out['ul',pname] <- exp(ul)
+    }
+    out
+}
+
+profile.LL.ludwig <- function(thepar,par,pname,maxLL,x,
+                              type='joint',model=1,exterr=FALSE){
+    X <- x
+    pnames <- names(par)
+    i <- which(pnames %in% pname)
+    anchor <- 0
+    if (pname=='t'){
+        anchor <- c(2,exp(thepar),0)
+    } else if (pname=='U48i'){
+        X$d$U48$x <- exp(thepar)
+        X$d$U48$sx <- 0
+        X$d$U48$option <- 1
+    } else if (pname=='ThUi'){
+        X$d$ThU$x <- exp(thepar)
+        X$d$ThU$sx <- 0
+        X$d$ThU$option <- 1
+    } else {
+        if (pname=='a0'){
+            if (x$format<4){
+                setting <- 'Pb207Pb206'
+            } else if (x$format<7){
+                setting <- 'Pb206Pb204'
+            } else {
+                setting <- 'Pb208Pb206'
+            }
+        } else if (pname=='b0'){
+            if (x$format<4){
+                setting <- 'Pb207Pb206'
+            } else if (x$format<7){
+                setting <- 'Pb207Pb204'
+            } else {
+                setting <- 'Pb208Pb207'
+            }
+        } else {
+            stop('Invalid parameter name')
+        }
+        anchor <- 1
+        oldval <- iratio(setting)
+        iratio(setting,exp(thepar),0)
+    }
+    par <- par[-i]
+    fit <- optim(par,fn=LL.ludwig,x=X,type=type,model=model,
+                 anchor=anchor,exterr=exterr)
+    LL <- fit$value
+    if (anchor[1]==1){ # restore
+        iratio(setting,oldval[1],oldval[2])
+    } else if (pname=='U48i'){
+        pred <- mclean(tt=exp(par['t']),d=X$d)
+        LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,
+                                sd=x$d$U48$sx,log=TRUE)
+    } else if (pname=='ThUi'){
+        pred <- mclean(tt=exp(par['t']),d=X$d)
+        LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,
+                                sd=x$d$ThU$sx,log=TRUE)
+    } else if (pname=='RaUi'){
+        LL <- LL - stats::dnorm(x=exp(par['RaUi']),mean=x$d$RaU$x,
+                                sd=x$d$RaU$sx,log=TRUE)
+    } else if (pname=='PaUi'){
+        LL <- LL - stats::dnorm(x=exp(par['PaUi']),mean=x$d$PaU$x,
+                                sd=x$d$PaU$sx,log=TRUE)
+    }
+    abs(LL-maxLL)-1.92
+}
