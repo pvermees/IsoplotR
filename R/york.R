@@ -96,8 +96,9 @@ york <- function(x){
         if ((bold/b-1)^2 < 1e-15) break # convergence reached
     }
     a <- Ybar-b*Xbar
-    xbar <- sum(W*X,na.rm=TRUE)/sum(W,na.rm=TRUE)
-    u <- X-xbar
+    xadj <- Xbar+B
+    xbar <- sum(W*xadj,na.rm=TRUE)/sum(W,na.rm=TRUE)
+    u <- xadj-xbar
     sb <- sqrt(1/sum(W*u^2,na.rm=TRUE))
     sa <- sqrt(1/sum(W,na.rm=TRUE)+(xbar*sb)^2)
     out <- list()
