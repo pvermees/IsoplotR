@@ -196,9 +196,7 @@ combined goodness of fit, respectively. }
 freedom used for the \code{mswd} calculation. }
 
 \item{age}{a two-or three-element vector with:\cr
-
 \code{t}: the concordia age (in Ma)\cr
-
 \code{s[t]}: the standard error of \code{t}\cr
 \code{disp[t]}: the standard error of \code{t} augmented by
 \eqn{\sqrt{mswd}} to account for any overdispersion. }

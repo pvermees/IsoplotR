@@ -15,17 +15,20 @@ mclean(tt = 0, d = diseq(), exterr = FALSE)
 constants and the \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.}
 }
 \value{
-a list containing the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
-\eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
-\eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios at time \code{tt}; the
-derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
-\eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
-\eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to time; and
-the derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
-\eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
-\eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to the
-intermediate decay constants and
-\eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
+a list containing the initial and present-day atomic
+    abundances of the \eqn{{}^{238}}U-\eqn{{}^{206}}Pb and
+    \eqn{{}^{235}}U-\eqn{{}^{207}}Pb decay chains; the
+    \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+    \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+    \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios at time \code{tt}; the
+    derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+    \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+    \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to time;
+    and the derivatives of the \eqn{{}^{206}}Pb/\eqn{{}^{238}}U,
+    \eqn{{}^{207}}Pb/\eqn{{}^{235}}U and
+    \eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb ratios with respect to the
+    intermediate decay constants and
+    \eqn{{}^{238}}U/\eqn{{}^{235}}U-ratio.
 }
 \description{
 Returns the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and

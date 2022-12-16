@@ -66,6 +66,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  y0option = 1,
   ...
 )
 
@@ -401,7 +402,7 @@ intercept and slope.}
 
 \code{1}: Error-weighted least squares regression
 
-\code{2}: Ordinary least squares regression
+\code{2}: Total least squares regression
 
 \code{3}: Error-weighted least squares with overdispersion term}
 
@@ -425,12 +426,13 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{joint}{logical. Only applies to U-Pb data formats 4 and above. If
-\code{TRUE}, carries out three dimensional regression.  If
-\code{FALSE}, uses two dimensional isochron regression.  The latter
-can be used to compute \eqn{{}^{207}}Pb/\eqn{{}^{235}}U isochrons,
-which are immune to the complexities of initial
-\eqn{{}^{234}}U/\eqn{{}^{238}}U disequilibrium.}
+\item{joint}{logical. Only applies to U-Pb data formats 4 and
+above. If \code{TRUE}, carries out three dimensional
+regression.  If \code{FALSE}, uses two dimensional isochron
+regression.  The latter can be used to compute
+\eqn{{}^{207}}Pb/\eqn{{}^{235}}U isochrons, which are immune to
+the complexities of initial \eqn{{}^{234}}U/\eqn{{}^{238}}U
+disequilibrium.}
 
 \item{type}{if \code{x} has class \code{UPb} and \code{x$format=4}, \code{5} or 
 \code{6}:
@@ -480,6 +482,34 @@ stored in \code{settings('iratio',...)}.
 If \code{anchor[1]=2}: force the isochron line to intersect the
 concordia line at an age equal to \code{anchor[2]}.}
 
+\item{y0option}{controls the type of y-intercept or activity ratio
+    that is reported along with the isochron age. Only relevant to
+    U-Pb data and Th-U data formats 1 and 2.
+
+For U-Pb data:
+
+\code{y0option=1} reports the common Pb composition,
+
+\code{y0option=2} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
+activity ratio.
+
+\code{y0option=3} reports the initial \eqn{^{230}}Th/\eqn{^{238}}U
+activity ratio,
+
+For Th-U data:
+
+\code{y0option=1} reports the authigenic
+\eqn{^{234}}U/\eqn{^{238}}U activity ratio,
+
+\code{y0option=2} reports the detrital
+\eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
+
+\code{y0option=3} reports the authigenic
+\eqn{^{230}}Th/\eqn{^{238}}U activity ratio,
+
+\code{y0option=4} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
+activity ratio.}
+
 \item{inverse}{toggles between normal and inverse isochrons. If the
     isochron plots \code{Y} against \code{X}, and
 
@@ -522,18 +552,6 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
-
-\item{y0option}{controls the type of activity ratio that is
-    reported along with the 3D isochron age. Only relevant to Th-U
-    data formats 1 and 2. Set to:
-
-\code{y0option=1} for the authigenic \eqn{^{234}}U/\eqn{^{238}}U activity ratio,
-
-\code{y0option=2} for the detrital \eqn{^{230}}Th/\eqn{^{232}}Th activity ratio,
-
-\code{y0option=3} for the authigenic \eqn{^{230}}Th/\eqn{^{238}}U activity ratio,
-
-\code{y0option=4} for the initial \eqn{^{234}}U/\eqn{^{238}}U activity ratio.}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ThPb},
@@ -752,7 +770,7 @@ straight line through these points by least squares regression
 (Nicolaysen, 1961). The slope and intercept then yield the
 radiogenic daughter-parent ratio and the non-radiogenic daughter
 composition, respectively. There are several ways to fit an
-isochron.  The easiest of these is ordinary least squares
+isochron.  The easiest of these is total least squares
 regression, which weighs all data points equally. In the presence
 of quantifiable analytical uncertainty, it is equally
 straightforward to use the inverse of the y-errors as weights.  It
@@ -799,7 +817,7 @@ analytical uncertainties. In this case, the excess scatter can be
 accounted for by inflating those uncertainties by a \emph{factor}
 \eqn{\sqrt{MSWD}}.
 
-\item Ignore the analytical uncertainties and perform an ordinary
+\item Ignore the analytical uncertainties and perform a total
 least squares regression.
 
 \item Attribute the overdispersion to the presence of `geological

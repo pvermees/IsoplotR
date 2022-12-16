@@ -105,11 +105,15 @@ agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
     nc <- ncol(tst)
     i <- seq(from=2,to=nc,by=2)
     tst[,i] <- ci(x=x[,i-1],sx=x[,i],oerr=oerr)
-    rounded <- roundit(age=tst[,i-1,drop=FALSE],
-                       err=tst[,i,drop=FALSE],sigdig=sigdig)
-    out[,i-1] <- rounded[,1:(nc/2)]
-    out[,i] <- rounded[,(nc/2+1):nc]
-    if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
+    if (is.na(sigdig)){
+        out <- tst
+    } else {
+        rounded <- roundit(age=tst[,i-1,drop=FALSE],
+                           err=tst[,i,drop=FALSE],sigdig=sigdig)
+        out[,i-1] <- rounded[,1:(nc/2)]
+        out[,i] <- rounded[,(nc/2+1):nc]
+        if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
+    }
     out
 }
 
@@ -149,8 +153,13 @@ mswdtit <- function(mswd,p,sigdig=2){
 }
 disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     if (w>0){
-        werr <- ci(w,sw,oerr=oerr)
-        rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
+        if (identical(units,'%')) {
+            werr <- ci(100*w,100*sw,oerr=oerr,absolute=TRUE)
+            rounded <- roundit(100*w,werr,sigdig=sigdig,text=TRUE)
+        } else {
+            werr <- ci(w,sw,oerr=oerr)
+            rounded <- roundit(w,werr,sigdig=sigdig,oerr=oerr,text=TRUE)
+        }
     } else {
         w <- 0
         werr <- NA
@@ -159,12 +168,8 @@ disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],u=units)
     if (oerr>3){
         out <- substitute(p~a*u%+-%b*'%',lst)
-    } else if (is.na(werr) | sw/w<0.5){
-        out <- substitute(p~a%+-%b*u,lst)
     } else {
-        lst$b <- signif(exp(log(w)+werr/w)-w,sigdig)
-        lst$c <- signif(w-exp(log(w)-werr/w),sigdig)
-        out <- substitute(p~a+b-c*u,lst)
+        out <- substitute(p~a%+-%b*u,lst)
     }
     out
 }
@@ -182,9 +187,10 @@ peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
 }
 
 get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
-get.ntit.default <- function(x,...){
+get.ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
     ns <- length(x)
-    nisnan <- length(which(is.na(x)))
+    bad <- which(is.na(x) | x<m | x>M)
+    nisnan <- length(bad)
     out <- '(n='
     if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
     paste0(out,ns,')')

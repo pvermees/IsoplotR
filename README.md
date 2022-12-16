@@ -43,7 +43,7 @@ isochron(RbSr)
 
 ## Further information
 
-See [http://isoplotr.london-geochron.com](https://www.ucl.ac.uk/~ucfbpve/isoplotr/)
+See [https://isoplotr.london-geochron.com](https://www.ucl.ac.uk/~ucfbpve/isoplotr/)
 
 [Vermeesch, P., 2018, IsoplotR: a free and open toolbox for
 geochronology. Geoscience Frontiers, v.9, p.1479-1493, doi:

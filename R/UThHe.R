@@ -1,4 +1,4 @@
-UThHe.age <- function(x,i=NA){
+UThHe.age <- function(x,i=NULL){
     ns <- nrow(x)
     doSm <- doSm(x)
     out <- matrix(0,ns,2)
@@ -15,7 +15,7 @@ UThHe.age <- function(x,i=NA){
                                      He=x[j,'He'],sHe=x[j,'errHe'])
         }
     }
-    if (!is.na(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,]
     out
 }
 

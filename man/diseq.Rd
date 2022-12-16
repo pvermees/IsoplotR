@@ -86,9 +86,6 @@ a list with the following items:
 
 \item{L}{a named vector of all the relevant decay constants}
 
-\item{n0}{the initial atomic abundances of all the parent and
-daughter isotopes (used by \code{\link{mclean}})}
-
 }
 }
 \description{

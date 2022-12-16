@@ -100,6 +100,58 @@ titterington <- function(x){
     out
 }
 
+get.titterington.xyz <- function(XYZ,a,b,A,B){
+    omega <- invertcovmat(sx=XYZ[,'sX'],sy=XYZ[,'sY'],sz=XYZ[,'sZ'],
+                          sxy=XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY'],
+                          sxz=XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ'],
+                          syz=XYZ[,'rYZ']*XYZ[,'sY']*XYZ[,'sZ'])
+    r <- XYZ[,'Y']-a-b*XYZ[,'X']
+    R <- XYZ[,'Z']-A-B*XYZ[,'X']
+    alpha <- omega[,'xx'] + omega[,'yy']*b^2 + omega[,'zz']*B^2 +
+        2*omega[,'xy']*b + 2*omega[,'xz']*B + 2*omega[,'yz']*b*B
+    beta <- r*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
+        R*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz'])
+    x <- XYZ[,'X'] + beta/alpha
+    y <- a+b*x
+    z <- A+B*x
+    drda <- -1
+    drdb <- -XYZ[,'X']
+    drdA <- drdB <- dRda <- dRdb <- 0
+    dRdA <- -1
+    dRdB <- -XYZ[,'X']
+    dalphada <- dalphadA <- 0
+    dalphadb <- 2*omega[,'yy']*b + 2*omega[,'xy'] + 2*omega[,'yz']*B
+    dalphadB <- 2*omega[,'zz']*B + 2*omega[,'xz'] + 2*omega[,'yz']*b
+    dbetada <- drda*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
+        dRda*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz'])
+    dbetadb <- drdb*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
+        r*omega[,'yy'] +
+        dRdb*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz']) +
+        R*omega[,'yz']
+    dbetadA <- drdA*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
+        dRdA*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz'])
+    dbetadB <- drdB*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
+        r*omega[,'yz'] +
+        dRdB*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz']) +
+        R*omega[,'zz']
+    dxda <- (dbetada*alpha-beta*dalphada)/alpha^2
+    dxdb <- (dbetadb*alpha-beta*dalphadb)/alpha^2
+    dxdA <- (dbetadA*alpha-beta*dalphadA)/alpha^2
+    dxdB <- (dbetadB*alpha-beta*dalphadB)/alpha^2
+    dyda <- 1+b*dxda
+    dydb <- x+b*dxdb
+    dydA <- b*dxdA
+    dydB <- b*dxdB
+    dzda <- B*dxda
+    dzdb <- B*dxdb
+    dzdA <- 1+B*dxdA
+    dzdB <- x+B*dxdB
+    cbind('x'=x,'y'=y,'z'=z,
+          'dxda'=dxda,'dxdb'=dxdb,'dxdA'=dxdA,'dxdB'=dxdB,
+          'dyda'=dyda,'dydb'=dydb,'dydA'=dydA,'dydB'=dydB,
+          'dzda'=dzda,'dzdb'=dzdb,'dzdA'=dzdA,'dzdB'=dzdB)
+}
+
 mswd.tit <- function(abAB,dat){
     a <- abAB[1]
     b <- abAB[2]

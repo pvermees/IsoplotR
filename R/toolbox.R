@@ -360,63 +360,6 @@ blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
     blockinverse(AA=ABDE,BB=CF,CC=GH,DD=II,invAA=invABDE,doall=TRUE)
 }
 
-# Optimise with some fixed parameters 
-# Like optim, but with option to fix some parameters.
-# parms: Parameters to potentially optimize in fn
-# fixed: A vector of TRUE/FALSE values indicating which parameters in
-#   parms to hold constant (not optimize). If TRUE, the corresponding
-#   parameter in fn() is fixed. Otherwise it's variable and optimised over.
-# lower, upper: a vector with the lower and upper ends of the search
-#   ranges of the free parameters, respectively
-# Originally written by Barry Rowlingson, modified by PV
-optifix <- function(parms, fixed, fn, gr = NULL, ...,
-                    method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), 
-                    lower = -Inf, upper = Inf, control = list(), hessian = FALSE){
-    force(fn)
-    force(fixed) 
-    .npar <- length(parms) 
-    .fixValues <- parms[fixed]
-    names(.fixValues) <- names(parms)[fixed]
-    .parStart <- parms[!fixed]
-    names(.parStart) <- names(parms)[!fixed]
-  
-    .fn <- function(parms,pnames=names(parms),...){
-        .par <- rep(NA,sum(!fixed))
-        .par[!fixed] <- parms
-        .par[fixed] <- .fixValues
-        names(.par) <- pnames
-        fn(.par,...)
-    }
-
-    if(!is.null(gr)){
-        .gr <- function(parms,pnames=names(parms),...){
-            .gpar <- rep(NA,sum(!fixed))
-            .gpar[!fixed] <- parms
-            .gpar[fixed] <- .fixValues
-            names(.gpar) <- pnames
-            gr(.gpar,...)[!fixed]
-        }
-    } else {
-        .gr <- NULL
-    }
-
-    .opt <- stats::optim(.parStart,.fn,.gr,...,method=method,
-                        lower=lower,upper=upper,
-                        control=control,hessian=hessian) 
-    
-    .opt$fullpars <- rep(NA,sum(!fixed)) 
-    .opt$fullpars[fixed] <- .fixValues 
-    .opt$fullpars[!fixed] <- .opt$par
-    names(.opt$fullpars) <- names(parms)
-    .opt$fixed <- fixed
-
-    # remove fullpars (PV)
-    .opt$par <- .opt$fullpars
-    .opt$fullpars <- NULL
-    
-    return(.opt)
-}
-
 '%ni%' <- function(x,y)!('%in%'(x,y))
 
 clear <- function(x,...){
@@ -435,4 +378,91 @@ geomean.default <- function(x,...){
 
 trace <- function(x){
     sum(diag(x))
+}
+
+logit <- function(x,m=0,M=1,inverse=FALSE){
+    out <- x
+    if (inverse){
+        toobig <- x>1000
+        toosmall <- x<(-1000)
+        easy <- !(toobig|toosmall)
+        out[easy] <- m + M*exp(x[easy])/(1+exp(x[easy]))
+        out[toobig] <- m + M
+        out[toosmall] <- m
+    } else {
+        easy <- (x>m & x<M)
+        out[easy] <- log((x[easy]-m)/(M-x[easy]))
+        out[x>=M] <- Inf
+        out[x<=m] <- -Inf
+    }
+    out
+}
+
+deming <- function(a,b,x,y){
+    out <- list()
+    N <- (b*x+a-y)^2
+    D <- 1+b^2
+    out$d <- sqrt(N/D)
+    dNdb <- 2*(b*x+a-y)*x
+    dDdb <- 2*b
+    out$dddb <- ((D*dNdb-N*dDdb)/D^2)/(2*out$d)
+    out
+}
+
+hesscheck <- function(H){
+    tol <- 1e-8
+    eig <- eigen(H,only.values=TRUE)$values
+    if (all(eig>tol)){
+        out <- H
+    } else {
+        warning('Ill-conditioned Hessian, replaced by ',
+                'nearest positive definite matrix')
+        out <- nearPD(H)
+        dimnames(out) <- dimnames(H)
+    }
+    out
+}
+inverthess <- function(hess){
+    H <- hesscheck(hess)
+    if (det(H)>1e8 || det(H)<1e-18){
+        out <- MASS::ginv(H)
+        dimnames(out) <- dimnames(H)
+    } else {
+        out <- solve(H)
+    }
+    out
+}
+
+invertcovmat <- function(sx,sy,sz,sxy=0,sxz=0,syz=0){
+    if (missing(sz)){
+        den <- (sx*sy)^2 - sxy^2
+        out <- cbind('xx'=(sy^2)/den,'yy'=(sx^2)/den,'xy'=-sxy/den)
+    } else {
+        aa <- sx^2
+        ee <- sy^2
+        ii <- sz^2
+        bb <- dd <- sxy
+        cc <- gg <- sxz
+        ff <- hh <- syz
+        den <- aa*(ee*ii-ff*hh) - bb*(dd*ii-ff*gg) + cc*(dd*hh-ee*gg)
+        xx <- (ee*ii-ff*hh)/den
+        yy <- (aa*ii-cc*gg)/den
+        zz <- (dd*hh-bb*dd)/den
+        xy <- (cc*hh-bb*ii)/den
+        xz <- (bb*ff-cc*ee)/den
+        yz <- (cc*dd-aa*ff)/den
+        out <- cbind('xx'=xx,'yy'=yy,'zz'=zz,'xy'=xy,'xz'=xz,'yz'=yz)
+    }
+    out
+}
+
+exponentiate <- function(fit,signs=fit$par/fit$par){
+    out <- fit
+    out$logpar <- fit$par
+    out$logcov <- fit$cov
+    out$par <- signs*exp(fit$par)
+    np <- length(out$par)
+    out$cov <- diag(out$par,np,np) %*% fit$cov %*% diag(out$par,np,np)
+    dimnames(out$cov) <- dimnames(fit$cov)
+    out
 }

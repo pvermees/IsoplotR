@@ -209,13 +209,13 @@ tera.wasserburg <- function(x,i=1,format){
     class(out) <- "terawasserburg"
     out
 }
-get.UPb.isochron.ratios.204 <- function(x,i=NA){
+get.UPb.isochron.ratios.204 <- function(x,i=NULL){
     if (x$format%in%c(4,5,6)){
         labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
     } else {
         stop('Format does not contain 204Pb.')
     }
-    if (all(is.na(i))){
+    if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,length(labels))
         for (j in 1:ns){
@@ -245,7 +245,7 @@ get.UPb.isochron.ratios.204 <- function(x,i=NA){
     rownames(out$cov) <- labels
     out
 }
-get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
+get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
     if (x$format>6){
         labels <- c('U238Pb206','Pb208cPb206','U235Pb207',
                     'Pb208cPb207','Th232U238','Th232Pb208',
@@ -253,7 +253,7 @@ get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
     } else {
         stop('Incorrect input format for the get.UPb.isochron.ratios.208 function.')
     }
-    if (all(is.na(i))){
+    if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,length(labels))
         for (j in 1:ns){
@@ -262,7 +262,7 @@ get.UPb.isochron.ratios.208 <- function(x,i=NA,tt=0){
         colnames(out) <- labels
         return(out)
     }
-    D <- mclean(tt,d=x$d)
+    D <- mclean(tt,d=x$d[i])
     l2 <- settings('lambda','Th232')[1]
     U <- iratio('U238U235')[1]
     tw <- tera.wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
@@ -905,9 +905,9 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     }
     out
 }
-get.Pb206U238.age.UPb <- function(x,i=NA,exterr=FALSE,...){
+get.Pb206U238.age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     r68 <- get.Pb206U238.ratios(x)
-    if (is.na(i)){
+    if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,2)
         for (j in 1:ns){
@@ -939,7 +939,7 @@ twslope <- function(tt=0,d=diseq()){
 }
 
 get.Pb207Pb206.age <- function(x,...){ UseMethod("get.Pb207Pb206.age",x) }
-get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...){
+get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -951,7 +951,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NA,...
         }
     } else {
         interval <- c(1/10000,10000)
-        if (!d$equilibrium & !any(is.na(t.68))){
+        if (!d$equilibrium & !is.null(t.68)){
             midpoint <- stats::optimise(twslope,d=d,interval=interval)$minimum
             if (t.68<midpoint){
                 interval[2] <- midpoint
@@ -1030,9 +1030,9 @@ get.Pb208Th232.age.default <- function(x,sx=0,exterr=FALSE,...){
     }
     out
 }
-get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
+get.Pb208Th232.age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     r82 <- get.Pb208Th232.ratios(x)
-    if (is.na(i)){
+    if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,2)
         for (j in 1:ns){
@@ -1048,13 +1048,13 @@ get.Pb208Th232.age.UPb <- function(x,i=NA,exterr=FALSE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia ages and their uncertainties.
-UPb.age <- function(x,exterr=FALSE,i=NA,conc=TRUE,omit4c=NULL,
+UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
                     discordance=discfilter(),common.Pb=0,...){
     if (discordance$option==0 | discordance$before) xd <- x
     else xd <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
     if (common.Pb==0) X <- x
     else X <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
-    if (!is.na(i)){
+    if (!is.null(i)){
         out <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
                               conc=conc,discordance=discordance)
     } else {
@@ -1108,7 +1108,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (discordance$option%in%c(6,'p')){
         t.conc <- concordia.age(x=xdi,exterr=exterr)
         SS.concordance <-
-            LL.concordia.age(tt=t.conc$age[1],cc=wetherill(xdi,i=1),
+            LL.concordia.age(pars=t.conc$age[1],cc=wetherill(xdi,i=1),
                              mswd=TRUE,exterr=exterr,d=xdi$d)
         p.value <- 1-stats::pchisq(SS.concordance,1)
         out <- c(out,p.value)

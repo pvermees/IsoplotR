@@ -125,7 +125,7 @@
 #' uncertainties have been underestipmated by a factor
 #' \eqn{\sqrt{MSWD}}.
 #'
-#' \code{2}: ordinary least squares regression: a second way to deal
+#' \code{2}: total least squares regression: a second way to deal
 #' with over- or underdispersed datasets is to simply ignore the
 #' analytical uncertainties.
 #'
@@ -219,7 +219,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
         ylim <- range(c(ta0[plotit,'48_0']-nsd*ta0[plotit,'s[48_0]'],
                         ta0[plotit,'48_0']+nsd*ta0[plotit,'s[48_0]']))
     x.lab <- 'Age [ka]'
-    y.lab <- expression(paste("("^"234","U/"^"238","U)"[o]))
+    y.lab <- expression(paste("("^"234","U/"^"238","U)"[0]))
     graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
     d <- ta0
     colnames(d) <- c('X','sX','Y','sY','rXY')
@@ -321,7 +321,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         }
     }
     if (isochron){ # plot the data and isochron line fit
-        isochron.ThU(x,type=1,plot=TRUE,show.numbers=show.numbers,
+        isochron.ThU(x,type=1,oerr=oerr,plot=TRUE,show.numbers=show.numbers,
                      levels=levels,ellipse.fill=ellipse.fill,
                      ellipse.stroke=ellipse.stroke,
                      line.col='black',exterr=exterr,sigdig=sigdig,
@@ -338,7 +338,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         graphics::title(xlab=xlab,ylab=ylab)
         if (Th0i==0){
             tit <- expression(paste("[isochrons assume ("^"230","Th/"^
-                                    "232","Th)"[0]*" = 0]"))
+                                    "232","Th)"[i]*" = 0]"))
             mymtext(tit,line=0,...)
         }
         if (Th0i==2){ # add equiline
@@ -362,7 +362,7 @@ evolution.title <- function(fit,sigdig=2,oerr=3,...){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     }
     if (fit$model==3) {
-        prefix <- quote('('^232*'Th/'^238*'U)-'*dispersion~'=')
+        prefix <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[-1],sigdig=sigdig,
                                     oerr=oerr,units='',prefix=prefix)
     }

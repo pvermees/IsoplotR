@@ -1,11 +1,9 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
-                                          oerr=3,model=1,anchor=0){
-    fit <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+concordia.intersection.ludwig <- function(x,fit,wetherill=TRUE){
     out <- fit
     out$format <- x$format
-    if (wetherill & !measured.disequilibrium(x$d)){
+    if (wetherill){
         wfit <- twfit2wfit(fit,x)
         out$par <- wfit$par
         out$cov <- wfit$cov
@@ -24,26 +22,6 @@ concordia.intersection.ludwig <- function(x,wetherill=TRUE,exterr=FALSE,
     }
     colnames(out$err) <- names(out$par)
     out$err['s',] <- sqrt(diag(out$cov))
-    out
-}
-# extracts concordia intersection parameters from an ordinary York fit
-concordia.intersection.ab <- function(a,b,covmat=matrix(0,2,2),
-                                      exterr=FALSE,wetherill=FALSE,d=diseq()){
-    l8 <- lambda('U238')[1]
-    ta <- get.Pb207Pb206.age(a,d=d)[1]
-    out <- c(1,a) # tl, 7/6 intercept
-    if (wetherill) names(out) <- c('t[l]','t[u]')
-    else names(out) <- c('t[l]','a0')
-    if (b<0) { # negative slope => two (or zero) intersections with concordia line
-        tb <- get.Pb206U238.age(-b/a,d=d)[1]
-        tlu <- recursive.search(tm=tb,tM=ta,a=a,b=b,d=d)
-        out['t[l]'] <- tlu[1]
-        if (wetherill) out['t[u]'] <- tlu[2]
-    } else {
-        search.range <- c(ta,2/l8)
-        out['t[l]'] <- stats::uniroot(intersection.misfit.york,
-                                      interval=search.range,a=a,b=b,d=d)$root
-    }
     out
 }
 
@@ -80,44 +58,39 @@ recursive.search <- function(tm,tM,a,b,d=diseq(),depth=1){
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
 twfit2wfit <- function(fit,x){
+    if (measured.disequilibrium(x$d)) x <- measured2initial(x,fit)
     tt <- fit$par['t']
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    if (fit$model==3){
-        E <- matrix(0,4,4)
-        J <- matrix(0,3,4)
-        w <- fit$par['w']
+    if (x$format<4){
+        Pb76 <- fit$par['a0']
+        dPb76da0 <- 1
+        dPb76db0 <- 0
     } else {
-        E <- matrix(0,3,3)
-        J <- matrix(0,2,3)
+        Pb76 <- fit$par['b0']/fit$par['a0']
+        dPb76da0 <- -Pb76/fit$par['a0']
+        dPb76db0 <- 1/fit$par['a0']
     }
-    if (x$format %in% c(1,2,3)){
-        a0 <- 1
-        b0 <- fit$par['a0']
-        E[-2,-2] <- fit$cov
-    } else {
-        a0 <- fit$par['a0']
-        b0 <- fit$par['b0']
-        E <- fit$cov
-    }
+    E <- fit$cov[c('t','a0','b0','w'),c('t','a0','b0','w')]
+    J <- matrix(0,3,4)
     md <- mediand(x$d)
     D <- mclean(tt,d=md)
-    disc.slope <- a0/(b0*U)
+    disc.slope <- 1/(U*Pb76)
     conc.slope <- D$dPb206U238dt/D$dPb207U235dt
     if (disc.slope < conc.slope){
-        search.range <- c(tt,get.Pb207Pb206.age(b0/a0,d=md)[1])+buffer
+        search.range <- c(tt,get.Pb207Pb206.age(Pb76,d=md)[1])+buffer
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
-                             t2=tt,a0=a0,b0=b0,d=md)$root
+                             t2=tt,disc.slope=disc.slope,d=md)$root
     } else {
         search.range <- c(0,tt-buffer)
-        if (check.equilibrium(d=md)) search.range[1] <- -1000
+        if (check.equilibrium(d=x$d)) search.range[1] <- -1000
         tl <- tryCatch(
             stats::uniroot(intersection.misfit.ludwig,
                            interval=search.range,
-                           t2=tt,a0=a0,b0=b0,d=md)$root
+                           t2=tt,disc.slope=disc.slope,d=md)$root
           , error=function(e){
               stop("Can't find the lower intercept.",
                    "Try fitting the data in Tera-Wasserburg space.")
@@ -128,14 +101,14 @@ twfit2wfit <- function(fit,x){
     dl <- mclean(tt=tl,d=md)
     XX <- du$Pb207U235 - dl$Pb207U235
     YY <- du$Pb206U238 - dl$Pb206U238
-    BB <- a0/(b0*U)
+    BB <- disc.slope
     D <- (YY-BB*XX)^2 # misfit
     dXX.dtu <-  du$dPb207U235dt
     dXX.dtl <- -dl$dPb207U235dt
     dYY.dtu <-  du$dPb206U238dt
     dYY.dtl <- -dl$dPb206U238dt
-    dBB.da0 <-  1/(b0*U)
-    dBB.db0 <- -BB/b0
+    dBB.da0 <-  -dPb76da0*disc.slope/Pb76
+    dBB.db0 <- -dPb76db0*disc.slope/Pb76
     dD.dtl <- 2*(YY-BB*XX)*(dYY.dtl-BB*dXX.dtl)
     dD.dtu <- 2*(YY-BB*XX)*(dYY.dtu-BB*dXX.dtu)
     dD.da0 <- 2*(YY-BB*XX)*(-dBB.da0*XX)
@@ -151,23 +124,17 @@ twfit2wfit <- function(fit,x){
         J[1,3] <- -dD.db0/dD.dtl
         J[2,1] <- 1
     }
+    J[3,4] <- 1
     out <- list()
-    if (fit$model==3){
-        out$par <- c(tl,tu,w)
-        J[3,4] <- 1
-        nms <- c('t[l]','t[u]','w')
-    } else {
-        out$par <- c(tl,tu)
-        nms <- c('t[l]','t[u]')
-    }
+    out$par <- c(tl,tu,fit$par['w'])
     out$cov <- J %*% E %*% t(J)
-    rownames(out$cov) <- colnames(out$cov) <- names(out$par) <- nms
+    c('t[l]','t[u]','w') -> names(out$par) ->
+        rownames(out$cov) -> colnames(out$cov)
     out
 }
 
 # t1 = 1st Wetherill intercept, t2 = 2nd Wetherill intercept
-# a0 = 64i, b0 = 74i on TW concordia
-intersection.misfit.ludwig <- function(t1,t2,a0,b0,d=diseq()){
+intersection.misfit.ludwig <- function(t1,t2,disc.slope,d=diseq()){
     tl <- min(t1,t2)
     tu <- max(t1,t2)
     l5 <- lambda('U235')[1]
@@ -177,9 +144,8 @@ intersection.misfit.ludwig <- function(t1,t2,a0,b0,d=diseq()){
     dl <- mclean(tt=tl,d=d)
     XX <- du$Pb207U235 - dl$Pb207U235
     YY <- du$Pb206U238 - dl$Pb206U238
-    BB <- a0/(b0*U)
     # misfit is based on difference in slope in Wetherill space
-    YY - BB*XX
+    YY - disc.slope*XX
 }
 # a = intercept, b = slope on TW concordia
 intersection.misfit.york <- function(tt,a,b,d=diseq()){
@@ -311,39 +277,40 @@ tw3d2d <- function(fit){
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
-discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,...){
+discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
     line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,df=fit$df,
                      sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
     if (wetherill){
         line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
     } else if (fit$format<4){
-        line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
+        fit <- getUPby0(fit,option=y0option)
+        line2 <- maintit(x=fit$y0['y'],sx=fit$y0['s[y]'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=quote('('^207*'Pb/'^206*'Pb)'[o]*'='))
+                         prefix=fit$y0label)
     } else if (fit$format<7){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=quote('('^206*'Pb/'^204*'Pb)'[o]*'='))
+                         prefix=quote('('^206*'Pb/'^204*'Pb)'[c]*'='))
         line3 <- maintit(x=fit$par['b0'],sx=fit$err[,'b0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=quote('('^207*'Pb/'^204*'Pb)'[o]*'='))
+                         prefix=quote('('^207*'Pb/'^204*'Pb)'[c]*'='))
     } else if (fit$format<9){
         i86 <- 1/fit$par['a0']
         i87 <- 1/fit$par['b0']
         i86err <- i86*fit$err[,'a0']/fit$par['a0']
         i87err <- i87*fit$err[,'b0']/fit$par['b0']
         line2 <- maintit(x=i86,sx=i86err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                         df=fit$df,prefix=quote('('^208*'Pb/'^206*'Pb)'[o]*'='))
+                         df=fit$df,prefix=quote('('^208*'Pb/'^206*'Pb)'[c]*'='))
         line3 <- maintit(x=i87,sx=i87err,ntit='',sigdig=sigdig,oerr=oerr,units='',
-                         df=fit$df,prefix=quote('('^208*'Pb/'^207*'Pb)'[o]*'='))
+                         df=fit$df,prefix=quote('('^208*'Pb/'^207*'Pb)'[c]*'='))
     } else {
         stop('Invalid U-Pb data format.')
     }
     if (fit$model==1){
         line4 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
-        line4 <- disptit(w=fit$par['w'],sw=sqrt(fit$cov['w','w']),
+        line4 <- disptit(w=fit$disp['w'],sw=fit$disp['s[w]'],
                          units=' Ma',sigdig=sigdig,oerr=oerr)
     }
     extrarow <- fit$format>3 & !wetherill

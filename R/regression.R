@@ -1,8 +1,9 @@
-regression <- function(xyz,model=1,type='york',omit=NULL){
+regression <- function(xyz,model=1,type='york',omit=NULL,
+                       wtype=ifelse(type=='york','b','a')){
     xyz2calc <- clear(xyz,omit)
     if (model==1) out <- model1regression(xyz2calc,type=type)
     else if (model==2) out <- model2regression(xyz2calc,type=type)
-    else if (model==3) out <- model3regression(xyz2calc,type=type)
+    else if (model==3) out <- model3regression(xyz2calc,type=type,wtype=wtype)
     else stop('invalid regression model')
     out$xyz <- xyz
     out$model <- model
@@ -24,110 +25,142 @@ model1regression <- function(xyz,type='york'){
 
 model2regression <- function(xyz,type='york'){
     if (identical(type,'york')){
-        out <- list()
-        fit <- stats::lm(xyz[,'Y'] ~ xyz[,'X'])
-        E <- stats::vcov(fit)
-        out$df <- fit$df.residual
-        out$a <- c(stats::coef(fit)[1],sqrt(E[1,1]))
-        out$b <- c(stats::coef(fit)[2],sqrt(E[2,2]))
-        names(out$a) <- c('a','s[a]')
-        names(out$b) <- c('b','s[b]')
-        out$cov.ab <- E[1,2]
+        out <- tls(xyz[,c('X','Y')])
+        out$df <- nrow(xyz)-2
+        out$a <- c(out$par['a'],'s[a]'=unname(sqrt(out$cov['a','a'])))
+        out$b <- c(out$par['b'],'s[b]'=unname(sqrt(out$cov['b','b'])))
+        out$cov.ab <- out$cov['a','b']
     } else if (identical(type,'titterington')){
-        out <- list()
-        fit <- stats::lm(xyz[,c('Y','Z')] ~ xyz[,'X'])
-        out$df <- fit$df.residual
-        out$par <- c(stats::coef(fit))
-        out$cov <- stats::vcov(fit)
-        parnames <- c('a','b','A','B')
-        names(out$par) <- parnames
-        colnames(out$cov) <- parnames
-        rownames(out$cov) <- parnames
+        out <- tls(xyz[,c('X','Y','Z')])
+        out$df <- 2*nrow(xyz)-4
     } else {
         stop('invalid output type for model 2 regression')
     }
     out
 }
 
-model3regression <- function(xyz,type='york'){
-    out <- list()
-    init <- log(stats::sd(xyz[,'Y']))
+# fixes signs and uses logs for numerical stability:
+model3regression <- function(xyz,type='york',
+                             wtype=ifelse(type=='york','b','a')){
+    pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
-        lw <- stats::optimise(LL.york,interval=init+c(-5,2),
-                              xy=xyz,maximum=TRUE)$maximum
-        H <- stats::optimHess(lw,LL.york,xy=xyz)
-        slw <- sqrt(solve(-H))
-        out$disp <- c('w'=exp(lw),'s[w]'=slw*exp(lw))
-        dd <- augment_york_errors(xyz,out$disp['w'])
-        out <- c(out,york(dd))
+        wa <- pilot$a['s[a]']*sqrt(pilot$mswd)
+        wb <- pilot$b['s[b]']*sqrt(pilot$mswd)
+        w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
+        init <- c(pilot$a['a'],pilot$b['b'],'w'=unname(w))
+        lower <- c(pilot$a['a']-5*pilot$a['s[a]']*sqrt(pilot$mswd),
+                   pilot$b['b']-5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']-5)
+        upper <- c(pilot$a['a']+5*pilot$a['s[a]']*sqrt(pilot$mswd),
+                   pilot$b['b']+5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']+2)
+        out <- stats::optim(init,LL.york,method='L-BFGS-B',
+                            lower=lower,upper=upper,XY=xyz,
+                            wtype=wtype,hessian=TRUE)
+        if (out$convergence>0){
+            out <- stats::optim(init,LL.york,XY=xyz,wtype=wtype,hessian=TRUE)
+        }
+        out$cov <- inverthess(out$hessian)
+        out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
+        out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
+        out$cov.ab <- out$cov['a','b']
     } else if (identical(type,'titterington')){
-        lw <- stats::optimise(LL.titterington,interval=init+c(-5,2),
-                              xy=xyz,maximum=TRUE)$maximum
-        H <- stats::optimHess(lw,LL.titterington,xy=xyz)
-        slw <- sqrt(solve(-H))
-        out$disp <- c('w'=exp(lw),'s[w]'=slw*exp(lw))
-        dd <- augment_titterington_errors(xyz,out$disp['w'])
-        out <- c(out,titterington(dd))                
+        if (wtype%in%c('intercept',0,'a')) w <- sqrt(pilot$cov['a','a']*pilot$mswd)
+        else if (wtype%in%c(1,'b')) w <- sqrt(pilot$cov['b','b']*pilot$mswd)
+        else if (wtype%in%c(2,'A')) w <- sqrt(pilot$cov['A','A']*pilot$mswd)
+        else if (wtype%in%c(3,'B')) w <- sqrt(pilot$cov['B','B']*pilot$mswd)
+        else stop('illegal wtype')
+        init <- c(pilot$par,'w'=unname(log(w)))
+        spar <- sqrt(pilot$mswd*diag(pilot$cov))
+        lower <- c(pilot$par - 5*spar,'w'=init['w']-5)
+        upper <- c(pilot$par + 5*spar,'w'=init['w']+2)
+        out <- stats::optim(init,LL.titterington,method='L-BFGS-B',
+                            lower=lower,upper=upper,XYZ=xyz,
+                            hessian=TRUE,wtype=wtype)
+        out$cov <- inverthess(out$hessian)
     } else {
         stop('invalid output type for model 3 regression')
     }
+    disp <- exp(out$par['w'])
+    sdisp <- disp*sqrt(out$cov['w','w'])
+    out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     out
 }
 
-LL.york <- function(lw,xy){
-    w <- exp(lw)
-    D <- augment_york_errors(xy,w)
-    X <- matrix(0,1,2)
-    fit <- york(D)
-    P <- get.york.xy(D,fit$a[1],fit$b[1])
-    x1 <- D[,'X']
-    x2 <- D[,'Y']
-    s1 <- D[,'sX']
-    s2 <- D[,'sY']
-    rho <- D[,'rXY']
-    m1 <- P[,1]
-    m2 <- P[,2]
-    z <- ((x1-m1)/s1)^2 + ((x2-m2)/s2)^2 - 2*rho*(x1-m1)*(x2-m2)/(s1*s2)
-    LL <- - log(s1) - log(s2) - 0.5*log(1-rho^2) - 0.5*z/(1-rho^2)
-    sum(LL)
-}
-LL.titterington <- function(lw,xyz){
-    out <- 0
-    w <- exp(lw)
-    D <- augment_titterington_errors(xyz,w)
-    fit <- titterington(D)
-    dat <- matrix2covlist(D)
-    X <- matrix(0,1,3)
-    ns <- nrow(D)
-    for (i in 1:ns){
-        XYZ <- dat$XYZ[[i]]
-        O <- dat$omega[[i]]
-        E <- solve(O)
-        a <- fit$par[1]
-        b <- fit$par[2]
-        A <- fit$par[3]
-        B <- fit$par[4]
-        abg <- alpha.beta.gamma(a,b,A,B,XYZ,O)
-        X[1,1] <- -abg[2]/abg[1]
-        X[1,2] <- XYZ[2] - a - b*XYZ[1]
-        X[1,3] <- XYZ[3] - A - B*XYZ[1]
-        SS <- X %*% O %*% t(X)
-        detE <- determinant(E,logarithm=TRUE)$modulus
-        out <- out - 1.5*log(2*pi) - 0.5*detE - 0.5*SS
+york2DE <- function(XY,a,b,w=0,wtype='slope'){
+    out <- list()
+    ns <- nrow(XY)
+    P <- get.york.xy(XY,a=a,b=b)
+    E <- matrix(0,3*ns,3*ns)
+    ix <- 1:ns
+    iy <- (ns+1):(2*ns)
+    iw <- (2*ns+1):(3*ns)
+    diag(E)[ix] <- XY[,'sX']^2
+    diag(E)[iy] <- XY[,'sY']^2
+    diag(E)[iw] <- w^2
+    E[ix,iy] <- E[iy,ix] <- diag(XY[,'rXY']*XY[,'sX']*XY[,'sY'])
+    Jw <- matrix(0,2*ns,3*ns)
+    Jw[ix,ix] <- Jw[iy,iy] <- diag(ns)
+    if (wtype%in%c(0,'intercept','a')){
+        Jw[ix,iw] <- -diag(P[,'dxda'])
+        Jw[iy,iw] <- -diag(P[,'dyda'])
+    } else {
+        Jw[ix,iw] <- -diag(P[,'dxdb'])
+        Jw[iy,iw] <- -diag(P[,'dydb'])
     }
+    out$D <- c(XY[,'X']-P[,'x'],XY[,'Y']-P[,'y'])
+    out$E <- Jw %*% E %*% t(Jw)
     out
+}
+LL.york <- function(abw,XY,wtype='slope'){
+    DE <- york2DE(XY,a=abw['a'],b=abw['b'],
+                  w=exp(abw['w']),wtype=wtype)
+    LL.norm(DE$D,DE$E)
 }
 
-augment_york_errors <- function(xy,w){
-    out <- xy
-    out[,'sY'] <- sqrt(xy[,'sY']^2 + w^2)
-    out[,'rXY'] <- xy[,'rXY']*xy[,'sY']/out[,'sY']
+titterington2DE <- function(XYZ,a,b,A,B,w=0,wtype='a'){
+    out <- list()
+    ns <- nrow(XYZ)
+    P <- get.titterington.xyz(XYZ,a=a,b=b,A=A,B=B)
+    D <- c(XYZ[,'X']-P[,'x'],XYZ[,'Y']-P[,'y'],XYZ[,'Z']-P[,'z'])
+    E <- matrix(0,4*ns,4*ns)
+    ix <- 1:ns
+    iy <- (ns+1):(2*ns)
+    iz <- (2*ns+1):(3*ns)
+    iw <- (3*ns+1):(4*ns)
+    diag(E)[ix] <- XYZ[,'sX']^2
+    diag(E)[iy] <- XYZ[,'sY']^2
+    diag(E)[iz] <- XYZ[,'sZ']^2
+    diag(E)[iw] <- w^2
+    E[ix,iy] <- E[iy,ix] <- diag(XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY'])
+    E[ix,iz] <- E[iz,ix] <- diag(XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ'])
+    E[iy,iz] <- E[iz,iy] <- diag(XYZ[,'rYZ']*XYZ[,'sY']*XYZ[,'sZ'])
+    Jw <- matrix(0,3*ns,4*ns)
+    Jw[ix,ix] <- Jw[iy,iy] <- Jw[iz,iz] <- diag(ns)
+    if (wtype%in%c(0,'intercept','a')){
+        Jw[ix,iw] <- -diag(P[,'dxda'])
+        Jw[iy,iw] <- -diag(P[,'dyda'])
+        Jw[iz,iw] <- -diag(P[,'dzda'])
+    } else if (wtype%in%c(1,'b')){
+        Jw[ix,iw] <- -diag(P[,'dxdb'])
+        Jw[iy,iw] <- -diag(P[,'dydb'])
+        Jw[iz,iw] <- -diag(P[,'dzdb'])
+    } else if (wtype%in%c(2,'A')){
+        Jw[ix,iw] <- -diag(P[,'dxdA'])
+        Jw[iy,iw] <- -diag(P[,'dydA'])
+        Jw[iz,iw] <- -diag(P[,'dzdA'])
+    } else if (wtype%in%c(3,'B')){
+        Jw[ix,iw] <- -diag(P[,'dxdB'])
+        Jw[iy,iw] <- -diag(P[,'dydB'])
+        Jw[iz,iw] <- -diag(P[,'dzdB'])
+    } else {
+        stop('invalid wtype')
+    }
+    out$D <- c(XYZ[,'X']-P[,'x'],XYZ[,'Y']-P[,'y'],XYZ[,'Z']-P[,'z'])
+    out$E <- Jw %*% E %*% t(Jw)
     out
 }
-augment_titterington_errors <- function(xyz,w){
-    out <- xyz
-    out[,'sY'] <- sqrt(xyz[,'sY']^2 + w^2)
-    out[,'rXY'] <- xyz[,'rXY']*xyz[,'sY']/out[,'sY']
-    out[,'rYZ'] <- xyz[,'rYZ']*xyz[,'sY']/out[,'sY']
-    out
+LL.titterington <- function(abABw,XYZ,wtype='a'){
+    DE <- titterington2DE(XYZ,a=abABw['a'],b=abABw['b'],
+                          A=abABw['A'],B=abABw['B'],
+                          w=exp(abABw['w']),wtype=wtype)
+    LL.norm(DE$D,DE$E)
 }

@@ -569,7 +569,7 @@ min_age_model <- function(zs,np=4){
     if (is.null(H) & np>3){
         return(min_age_model(zs=zs,np=3))
     }
-    lE <- MASS::ginv(H)
+    lE <- inverthess(H)
     par <- mappar(fit$par,Mz)
     # propagate the uncertainties from -Inf/+Inf to model space
     J <- diag(np)
