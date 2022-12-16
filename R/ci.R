@@ -212,7 +212,7 @@ get.ci.ludwig <- function(par,x,type='joint',model=1,exterr=FALSE){
     maxLL <- LL.ludwig(par,x=x,type=type,model=model,exterr=exterr)
     if (FALSE){ # test function
         pname <- 'U48i'
-        pp <- seq(from=par[pname]-.5,to=par[pname]+.5,length.out=21)
+        pp <- seq(from=par[pname]-.1,to=par[pname]+.1,length.out=21)
         LL <- pp*0
         for (i in seq_along(pp)){
             LL[i] <- profile.LL.ludwig(pp[i],par,pname,maxLL=maxLL,x=x,
@@ -226,12 +226,15 @@ get.ci.ludwig <- function(par,x,type='joint',model=1,exterr=FALSE){
     colnames(out) <- names(par)
     for (pname in names(par)){
         message('Computing profile likelihood of ',pname)
-        ll <- stats::uniroot(profile.LL.ludwig,interval=par[pname]-c(1,0),
+        if (pname=='U48i'){
+            foo <- 1
+        }
+        ll <- stats::uniroot(profile.LL.ludwig,interval=par[pname]-c(.1,0),
                              par=par,pname=pname,maxLL=maxLL,x=x,type=type,
-                             model=model,exterr=exterr,extendInt="yes")$root
-        ul <- stats::uniroot(profile.LL.ludwig,interval=par[pname]+c(0,1),
+                             model=model,exterr=exterr,extendInt="downX")$root
+        ul <- stats::uniroot(profile.LL.ludwig,interval=par[pname]+c(.1,0),
                              par=par,pname=pname,maxLL=maxLL,x=x,type=type,
-                             model=model,exterr=exterr,extendInt="yes")$root
+                             model=model,exterr=exterr,extendInt="upX")$root
         out['ll',pname] <- exp(ll)
         out['ul',pname] <- exp(ul)
     }
@@ -264,11 +267,9 @@ profile.LL.ludwig <- function(thepar,par,pname,maxLL,x,
                 setting <- 'Pb208Pb206'
             }
         } else if (pname=='b0'){
-            if (x$format<4){
-                setting <- 'Pb207Pb206'
-            } else if (x$format<7){
+            if (x$format%in%c(4,5,6)){
                 setting <- 'Pb207Pb204'
-            } else {
+            } else if (x$format%in%c(7,8)){
                 setting <- 'Pb208Pb207'
             }
         } else {

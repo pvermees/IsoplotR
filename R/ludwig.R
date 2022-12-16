@@ -376,7 +376,7 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,anchor=0,type='joint'){
     } else if (x$format%in%c(4,5,6) && type%in%c('joint',0,2)){
         b0 <- iratio('Pb207Pb204')[1]
     } else if (x$format%in%c(7,8) && type%in%c('joint',0,2,4)){
-        b0 <- 1/iratio('Pb208Pb206')[1]
+        b0 <- 1/iratio('Pb208Pb207')[1]
     }
     X <- x
     if ('U48i' %in% pnames){
