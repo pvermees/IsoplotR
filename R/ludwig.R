@@ -237,6 +237,33 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
     out
 }
 
+inithelper <- function(yd,x0=NULL,y0=NULL){
+    out <- c('a'=NA,'b'=NA,'x0inv'=NA)
+    if (is.null(x0) & is.null(y0)){
+        fit <- york(yd)
+        out['a'] <- fit$a[1]
+        out['b'] <- fit$b[1]
+    } else if (is.null(y0)){ # anchor x
+        i <- which.min(yd[,'X'])
+        if (x0>yd[i,'X']){
+            out['b'] <- yd[i,'Y']/(yd[i,'X']-x0)
+        } else {
+            out['b'] <- yd[i,'Y']/(0-x0)
+        }
+        out['a'] <- -out['b']*x0
+    } else { # anchor y
+        i <- which.min(yd[,'Y'])
+        if (y0>yd[i,'Y']){
+            out['b'] <- (yd[i,'Y']-y0)/yd[i,'X']
+        } else {
+            out['b'] <- y0/(0-yd[i,'X'])
+        }
+        out['a'] <- y0
+    }
+    out['x0inv'] <- -out['b']/out['a']
+    out
+}
+
 init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
     out <- vector()
     if (model==3){
@@ -248,42 +275,27 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
     if (x$format<4){
         yd <- data2york(x,option=2)
         if (anchor[1]==1){
-            a <- Pb76c <- iratio('Pb207Pb206')[1]
-            i <- which.min(yd[,'Y'])
-            if (Pb76c>yd[i,'Y']){
-                b <- Pb7U8 <- (yd[i,'Y']-Pb76c)/yd[i,'X']
-            } else {
-                b <- Pb7U8 <- Pb76c/(0-yd[i,'X'])
-            }
-            Pb6U8r <- abs(Pb7U8/Pb76c)
-            tt <- get.Pb206U238.age(x=Pb6U8r,d=x$d)[1]
+            Pb76c <- iratio('Pb207Pb206')[1]
+            abx <- inithelper(yd=yd,y0=Pb76c)
+            tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
             out['t'] <- log(tt)
             if (!ci && iratio('Pb207Pb206')[2]>0) out['a0'] <- log(Pb76c)
         } else if (anchor[1]==2 && length(anchor)>2){
             tt <- anchor[2]
-            Pb6U8r <- mclean(tt=tt)$Pb206U238
-            U8Pb6r <- 1/Pb6U8r
-            i <- which.min(yd[,'X'])
-            if (U8Pb6r>yd[i,'X']){
-                b <- Pb7U8 <- yd[i,'Y']/(yd[i,'X']-U8Pb6r)
-            } else {
-                b <- Pb7U8 <- yd[i,'Y']/(0-U8Pb6r)
-            }
-            a <- Pb76c <- abs(Pb7U8/Pb6U8r)
+            U8Pb6r <- 1/mclean(tt=tt)$Pb206U238
+            abx <- inithelper(yd=yd,x0=U8Pb6r)
             if (!ci && anchor[3]>0) out['t'] <- log(tt)
-            out['a0'] <- log(Pb76c)
+            out['a0'] <- log(abx['a'])
         } else {
-            yfit <- york(yd)
-            a <- Pb76c <- yfit$a[1]
-            b <- Pb7U8 <- yfit$b[1]
-            Pb6U8r <- abs(yfit$b[1]/yfit$a[1])
-            tt <- get.Pb206U238.age(x=Pb6U8r,d=x$d)[1]
+            abx <- inithelper(yd)
+            tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
             out['t'] <- log(tt)
-            out['a0'] <- log(yfit$a[1])
+            out['a0'] <- log(abx['a'])
         }
         if (debug){
             scatterplot(yd)
-            abline(a=a,b=b)
+            abline(a=abx['a'],b=abx['b'])
+            title(exp(out))
         }
     } else if (x$format<7){
         yda <- data2york(x,option=3)
@@ -291,19 +303,17 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
         if (anchor[1]==1){
             if (type%in%c('joint',0,1)){
                 Pb64c <- iratio('Pb206Pb204')[1]
-                Pb4U8 <- lm(I(yda[,'Y']-1/Pb64c) ~ 0 + I(yda[,'X']-0))$coefficients
-                Pb6U8r <- abs(Pb4U8*Pb64c)
-                tt <- get.Pb206U238.age(x=Pb6U8r,d=x$d)[1]
+                abxa <- inithelper(yd=yda,y0=1/Pb64c)
+                tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
                 out['t'] <- log(tt)
                 if (!ci && iratio('Pb206Pb204')[2]>0) out['a0'] <- log(Pb64c)
             }
             if (type%in%c('joint',0,2)){
                 Pb74c <- iratio('Pb207Pb204')[1]
-                Pb4U5 <- lm(I(ydb[,'Y']-1/Pb74c) ~ 0 + I(ydb[,'X']-0))$coefficients
+                abxb <- inithelper(yd=ydb,y0=1/Pb74c)
             }
             if (type==2){
-                Pb7U5r <- abs(Pb4U5*Pb74c)
-                tt <- get.Pb206U238.age(x=Pb7U5r,d=x$d)[1]
+                tt <- get.Pb206U238.age(x=abxb['x0inv'],d=x$d)[1]
                 out['t'] <- log(tt)
             }
             if (type%in%c('joint',0,2)){
@@ -314,45 +324,39 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
             if (!ci && (length(anchor)>2 && anchor[3]>0)) out['t'] <- log(tt)
             if (type%in%c('joint',0,1)){
                 Pb6U8r <- mclean(tt=tt)$Pb206U238
-                Pb4U8 <- lm(I(yda[,'Y']-0) ~ 0 + I(yda[,'X']-1/Pb6U8r))$coefficients
-                out['a0'] <- log(abs(Pb6U8r/Pb4U8))
+                abxa <- inithelper(yd=yda,x0=1/Pb6U8r)
+                out['a0'] <- log(1/abxa['a'])
             }
             if (type%in%c('joint',0,2)){
                 Pb7U5r <- mclean(tt=tt)$Pb207U235
-                Pb4U5 <- lm(I(ydb[,'Y']-0) ~ 0 + I(ydb[,'X']-1/Pb7U5r))$coefficients
-                out['b0'] <- log(abs(Pb7U5r/Pb4U5))
+                abxb <- inithelper(yd=ydb,x0=1/Pb7U5r)
+                out['b0'] <- log(1/abxb['a'])
             }
         } else {
             if (type%in%c('joint',0,1)){
-                yfita <- york(yda)
-                Pb64c <- 1/yfita$a[1]
-                Pb6U8r <- abs(yfita$b[1]/yfita$a[1])
-                tt <- get.Pb206U238.age(x=Pb6U8r,d=x$d)[1]
+                abxa <- inithelper(yd=yda)
+                tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
                 out['t'] <- log(tt)
-                out['a0'] <- log(Pb64c)
+                out['a0'] <- log(1/abxa['a'])
             }
             if (type%in%c('joint',0,2)){
-                yfitb <- york(ydb)
-                Pb74c <- 1/yfitb$a[1]
+                abxb <- inithelper(yd=ydb)
             }
             if (type==2){
-                Pb7U5r <- abs(yfita$b[1]/yfita$a[1])
-                tt <- get.Pb207U235.age(x=Pb7U5r,d=x$d)[1]
-                out['t'] <- log(tt)
+                tt <- get.Pb207U235.age(x=abxb['x0inv'],d=x$d)[1]
             }
             if (type%in%c('joint',0,2)){
-                out['b0'] <- log(Pb74c)
+                out['b0'] <- log(1/abxb['a'])
             }
         }
         if (debug){
-            if (type%in%c('joint',0,1)){
-                a <- 1/exp(out['a0'])
-                x0 <- 1/Pb6U8r
-                b <- -a/x0
-                plot(c(0,x0),c(0,a),type='n')
-                scatterplot(yda,add=TRUE)
-                abline(a=a,b=b)
-            }
+            op <- par(mfrow=c(1,2))
+            scatterplot(yda)
+            abline(a=abxa['a'],b=abxa['b'])
+            title(exp(out))
+            scatterplot(ydb)
+            abline(a=abxb['a'],b=abxb['b'])
+            par(op)
         }
     } else { # TODO
         if (type==2){
