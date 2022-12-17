@@ -128,11 +128,12 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     fit <- stats::optim(init,fn=LL.ludwig,hessian=TRUE,x=x,anchor=anchor,
                         type=type,model=model,exterr=exterr,debug=FALSE)
     fit$cov <- solve(fit$hessian)
-    dfit <- adddiseq(fit,d=x$d)
-    if (measured.disequilibrium(x$d)){ # TODO: only apply to option==2 ratios
-        fit$ci <- get.ci.ludwig(par=dfit$par,x=x,type=type,
-                                model=model,exterr=exterr)
+    if (measured.disequilibrium(x$d)){
+        fit$ci <- get.ci.ludwig(fit$par,x=x,maxLL=fit$value,type=type,
+                                anchor=anchor,model=model,
+                                exterr=exterr,debug=TRUE)
     } else {
+        dfit <- adddiseq(fit,d=x$d)
         H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
                               type=type,model=model,exterr=exterr)
         fit$cov <- solve(H)
