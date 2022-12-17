@@ -248,23 +248,34 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
     if (x$format<4){
         yd <- data2york(x,option=2)
         if (anchor[1]==1){
-            Pb76c <- iratio('Pb207Pb206')[1]
-            Pb7U8 <- lm(I(yd[,'Y']-Pb76c) ~ 0 + I(yd[,'X']-0))$coefficients
+            a <- Pb76c <- iratio('Pb207Pb206')[1]
+            i <- which.min(yd[,'Y'])
+            if (Pb76c>yd[i,'Y']){
+                b <- Pb7U8 <- (yd[i,'Y']-Pb76c)/yd[i,'X']
+            } else {
+                b <- Pb7U8 <- Pb76c/(0-yd[i,'X'])
+            }
             Pb6U8r <- abs(Pb7U8/Pb76c)
             tt <- get.Pb206U238.age(x=Pb6U8r,d=x$d)[1]
             out['t'] <- log(tt)
-            if (ci || iratio('Pb207Pb206')[2]>0) out['a0'] <- log(Pb76c)
+            if (!ci && iratio('Pb207Pb206')[2]>0) out['a0'] <- log(Pb76c)
         } else if (anchor[1]==2 && length(anchor)>2){
             tt <- anchor[2]
             Pb6U8r <- mclean(tt=tt)$Pb206U238
-            Pb7U8 <- lm(I(yd[,'Y']-0) ~ 0 + I(yd[,'X']-1/Pb6U8r))$coefficients
-            Pb76c <- abs(Pb7U8/Pb6U8r)
-            if (ci || anchor[3]>0) out['t'] <- log(tt)
+            U8Pb6r <- 1/Pb6U8r
+            i <- which.min(yd[,'X'])
+            if (U8Pb6r>yd[i,'X']){
+                b <- Pb7U8 <- yd[i,'Y']/(yd[i,'X']-U8Pb6r)
+            } else {
+                b <- Pb7U8 <- yd[i,'Y']/(0-U8Pb6r)
+            }
+            a <- Pb76c <- abs(Pb7U8/Pb6U8r)
+            if (!ci && anchor[3]>0) out['t'] <- log(tt)
             out['a0'] <- log(Pb76c)
         } else {
             yfit <- york(yd)
-            Pb76c <- yfit$a[1]
-            Pb7U8 <- yfit$b[1]
+            a <- Pb76c <- yfit$a[1]
+            b <- Pb7U8 <- yfit$b[1]
             Pb6U8r <- abs(yfit$b[1]/yfit$a[1])
             tt <- get.Pb206U238.age(x=Pb6U8r,d=x$d)[1]
             out['t'] <- log(tt)
@@ -272,7 +283,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
         }
         if (debug){
             scatterplot(yd)
-            abline(a=Pb76c,b=Pb7U8)
+            abline(a=a,b=b)
         }
     } else if (x$format<7){
         yda <- data2york(x,option=3)
@@ -284,7 +295,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
                 Pb6U8r <- abs(Pb4U8*Pb64c)
                 tt <- get.Pb206U238.age(x=Pb6U8r,d=x$d)[1]
                 out['t'] <- log(tt)
-                if (ci || iratio('Pb206Pb204')[2]>0) out['a0'] <- log(Pb64c)
+                if (!ci && iratio('Pb206Pb204')[2]>0) out['a0'] <- log(Pb64c)
             }
             if (type%in%c('joint',0,2)){
                 Pb74c <- iratio('Pb207Pb204')[1]
@@ -296,11 +307,11 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
                 out['t'] <- log(tt)
             }
             if (type%in%c('joint',0,2)){
-                if (ci || iratio('Pb207Pb204')[2]>0) out['b0'] <- log(Pb74c)
+                if (!ci && iratio('Pb207Pb204')[2]>0) out['b0'] <- log(Pb74c)
             }
         } else if (anchor[1]==2 && length(anchor)>1){
             tt <- anchor[2]
-            if (ci || (length(anchor)>2 && anchor[3]>0)) out['t'] <- log(tt)
+            if (!ci && (length(anchor)>2 && anchor[3]>0)) out['t'] <- log(tt)
             if (type%in%c('joint',0,1)){
                 Pb6U8r <- mclean(tt=tt)$Pb206U238
                 Pb4U8 <- lm(I(yda[,'Y']-0) ~ 0 + I(yda[,'X']-1/Pb6U8r))$coefficients
@@ -397,8 +408,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
     out
 }
 
-LL.ludwig <- function(par,x,model=1,exterr=FALSE,
-                      anchor=0,type='joint',debug=FALSE){
+LL.ludwig <- function(par,x,model=1,exterr=FALSE,anchor=0,
+                      type='joint',ci=FALSE,debug=FALSE){
     if (debug){
         browser()
     }

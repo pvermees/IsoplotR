@@ -210,17 +210,16 @@ ntit.valid <- function(valid,...){
 # only used for measured disequilibrium
 get.ci.ludwig <- function(par,x,type='joint',model=1,exterr=FALSE){
     maxLL <- LL.ludwig(par,x=x,type=type,model=model,exterr=exterr)
-    if (FALSE){ # test function
+    if (TRUE){ # test function
         pname <- 't'
-        pp <- seq(from=par[pname]-.2,to=par[pname]+.2,length.out=21)
+        pp <- seq(from=par[pname]-.1,to=par[pname]+.1,length.out=21)
         LL <- pp*0
         for (i in seq_along(pp)){
-            LL[i] <- profile.LL.ludwig(pp[i],pname,maxLL=maxLL,x=x,
+            LL[i] <- profile.LL.ludwig(pp[i],pname,par=par,maxLL=maxLL,x=x,
                                        type=type,model=model,exterr=exterr)
-            
         }
         plot(pp,LL,type='b')
-        olines(rep(par[pname],2),range(LL))
+        lines(rep(par[pname],2),range(LL))
     }
     pnames <- names(par)[names(par)%in%c('t','U48i','ThUi')]
     out <- matrix(NA,nrow=2,ncol=length(pnames))
@@ -228,14 +227,11 @@ get.ci.ludwig <- function(par,x,type='joint',model=1,exterr=FALSE){
     colnames(out) <- pnames
     for (pname in pnames){
         message('Computing profile likelihood of ',pname)
-        if (pname=='U48i'){
-            foo <- 1
-        }
         ll <- stats::uniroot(profile.LL.ludwig,interval=par[pname]-c(.1,0),
-                             pname=pname,maxLL=maxLL,x=x,type=type,
+                             pname=pname,par=par,maxLL=maxLL,x=x,type=type,
                              model=model,exterr=exterr,extendInt="downX")$root
-        ul <- stats::uniroot(profile.LL.ludwig,interval=par[pname]+c(.1,0),
-                             pname=pname,maxLL=maxLL,x=x,type=type,
+        ul <- stats::uniroot(profile.LL.ludwig,interval=par[pname]+c(0,.1),
+                             pname=pname,par=par,maxLL=maxLL,x=x,type=type,
                              model=model,exterr=exterr,extendInt="upX")$root
         out['ll',pname] <- exp(ll)
         out['ul',pname] <- exp(ul)
@@ -243,18 +239,16 @@ get.ci.ludwig <- function(par,x,type='joint',model=1,exterr=FALSE){
     out
 }
 
-profile.LL.ludwig <- function(thepar,pname,maxLL,x,type='joint',
+profile.LL.ludwig <- function(thepar,pname,par,maxLL,x,type='joint',
                               model=1,exterr=FALSE){
     X <- x
     pnames <- names(par)
     i <- which(pnames %in% pname)
+    par <- par[-i]
     anchor <- 0
     if (pname=='t'){
         tt <- exp(thepar)
         anchor <- c(2,tt,0)
-        init <- init.ludwig(x,model=model,anchor=anchor,type=type,ci=TRUE)
-        D <- mclean(tt=tt,d=x$d)
-        par <- c(init,'U48i'=unname(D$U48i),'ThUi'=unname(D$ThU))
     } else if (pname=='U48i'){
         X$d$U48$x <- exp(thepar)
         X$d$U48$sx <- 0
@@ -285,14 +279,6 @@ profile.LL.ludwig <- function(thepar,pname,maxLL,x,type='joint',
         oldval <- iratio(setting)
         iratio(setting,exp(thepar),0)
     }
-    
-    D <- mclean(tt=exp(thepar),d=x$d)
-    x0 <- 1/D$Pb206U238
-    plot(x=c(0,x0),y=c(0,1/exp(init['a0'])),type='n')
-    scatterplot(data2york(x,option=3),add=TRUE)
-    b <- -1/exp(par['a0'])/x0
-    abline(a=1/exp(par['a0']),b=b)
-
     fit <- optim(par,fn=LL.ludwig,x=X,type=type,model=model,
                  anchor=anchor,exterr=exterr,debug=FALSE)
     LL <- fit$value
@@ -313,14 +299,5 @@ profile.LL.ludwig <- function(thepar,pname,maxLL,x,type='joint',
         LL <- LL - stats::dnorm(x=exp(fit$par['PaUi']),mean=x$d$PaU$x,
                                 sd=x$d$PaU$sx,log=TRUE)
     }
-    
-    D <- mclean(tt=exp(thepar),d=x$d)
-    x0 <- 1/D$Pb206U238
-    plot(x=c(0,x0),y=c(0,fit$par['a0']),type='n')
-    scatterplot(data2york(x,option=3),add=TRUE)
-    b <- -fit$par['a0']/x0
-    abline(a=fit$par['a0'],b=b)
-    
     abs(LL-maxLL)-1.92
-    LL
 }
