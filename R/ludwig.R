@@ -358,54 +358,121 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
             abline(a=abxb['a'],b=abxb['b'])
             par(op)
         }
-    } else { # TODO
-        if (type==2){
-            yfit <- york(data2york(x,option=7))
-            Pb7U5 <- abs(yfit$b[1]/yfit$a[1])
-            tt <- get.Pb207U235.age(x=Pb7U5,d=x$d)[1]
-        } else if (type==3){
-            yfit <- york(data2york(x,option=8))
-            Pb8Th2 <- abs(yfit$b[1]/yfit$a[1])
-            tt <- get.Pb208Th232.age(x=Pb8Th2)[1]
-        } else if (type==4){
-            yfit <- york(data2york(x,option=9))
-            Pb8Th2 <- abs(yfit$b[1]/yfit$a[1])
-            tt <- get.Pb208Th232.age(x=Pb8Th2)[1]
+    } else { # formats 7 and 8
+        if (anchor[1]==1){
+            yd <- data2york(x,option=2)
+            abx <- inithelper(yd=yd)
+            pilott <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+            if (type==1){ # 0806 vs 38/06
+                yd <- data2york(x,option=6,tt=pilott)
+                y0 <- iratio('Pb208Pb206')[1]
+            } else if (type==2){ # 0807 vs 35/07
+                yd <- data2york(x,option=7,tt=pilott)
+                y0 <- iratio('Pb208Pb207')[1]
+            } else if (type==3){ # 0608 vs 32/08
+                yd <- data2york(x,option=8,tt=pilott)
+                y0 <- 1/iratio('Pb208Pb206')[1]
+            } else if (type==4){ # 0708 vs 32/08
+                yd <- data2york(x,option=9,tt=pilott)
+                y0 <- 1/iratio('Pb208Pb207')[1]
+            } else { # joint, 0 or 1
+                y0 <- iratio('Pb207Pb206')[1]
+            }
+            abx <- inithelper(yd=yd,y0=y0)
+            if (type==1){
+                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                if (!ci && iratio('Pb208Pb206')[2]>0) out['a0'] <- log(y0)
+            } else if (type==2){
+                out['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
+                if (!ci && iratio('Pb208Pb207')[2]>0) out['b0'] <- log(y0)
+            } else if (type==3){
+                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                if (!ci && iratio('Pb208Pb206')[2]>0) out['a0'] <- log(1/y0)
+            } else if (type==4){
+                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                if (!ci && iratio('Pb208Pb207')[2]>0) out['b0'] <- log(1/y0)
+            } else { # joint, 0 or 1
+                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                if (!ci && iratio('Pb208Pb206')[2]>0){
+                    out['a0'] <- log(iratio('Pb208Pb206')[1])
+                }
+                if (!ci && iratio('Pb208Pb207')[2]>0){
+                    out['b0'] <- log(iratio('Pb208Pb207')[1])
+                }
+            }
+        } else if (anchor[1]==2 && length(anchor)>2){
+            tt <- anchor[2]
+            if (!ci && length(anchor)>3 && anchor[3]>0) out['t'] <- log(tt)
+            if (type==2){ # 0807 vs 35/07
+                yd <- data2york(x,option=7,tt=tt)
+                x0 <- age_to_U235Pb207_ratio(tt)[1]
+            } else if (type==3){ # 0608 vs 32/08
+                yd <- data2york(x,option=8,tt=tt)
+                x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
+            } else if (type==4){ # 0708 vs 32/08
+                yd <- data2york(x,option=9,tt=tt)
+                x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
+            } else { # joint, 0 or 1: 0806 vs 38/06
+                yd <- data2york(x,option=6,tt=tt)
+                x0 <- age_to_U238Pb206_ratio(tt)[1]
+            }
+            abx <- inithelper(yd=yd,x0=x0)
+            if (type==1){
+                out['a0'] <- log(abx['y0'])
+            } else if (type==2){
+                out['b0'] <- log(abx['y0'])
+            } else if (type==3){
+                out['a0'] <- 1/log(abx['y0'])
+            } else if (type==4){
+                out['b0'] <- 1/log(abx['y0'])
+            } else {
+                out['a0'] <- log(abx['a'])
+                ydb <- data2york(x,option=7)
+                abxb <- inithelper(yd=ydb,x0=x0)
+                out['b0'] <- log(abxb['a'])
+            }            
         } else {
-            yfit <- york(data2york(x,option=2))
-            Pb6U8 <- abs(yfit$b[1]/yfit$a[1])
-            tt <- get.Pb206U238.age(x=Pb6U8,d=x$d)[1]
-        }
-        if (type%in%c('joint',0,1,3)){
-            yda <- data2york(x,option=6,tt=tt)
-            yfita <- york(yda)
-        }
-        if (type%in%c('joint',0,2,4)){
-            ydb <- data2york(x,option=7,tt=tt)
-            yfitb <- york(ydb)
-        }
-        if (anchor[1]!=2 || (length(anchor)>2 && anchor[3]>0)){
-            if (anchor[1]==2){
-                out['t'] <- log(ifelse(anchor[2]>0,anchor[2],anchor[3]))
-            } else {
-                out['t'] <- log(tt)
+            yd <- data2york(x,option=2)
+            abx <- inithelper(yd=yd)
+            pilott <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+            if (type==1){ # 0806 vs 38/06
+                yd <- data2york(x,option=6,tt=pilott)
+            } else if (type==2){ # 0807 vs 35/07
+                yd <- data2york(x,option=7,tt=pilott)
+            } else if (type==3){ # 0608 vs 32/08
+                yd <- data2york(x,option=8,tt=pilott)
+            } else if (type==4){ # 0708 vs 32/08
+                yd <- data2york(x,option=9,tt=pilott)
+            } else { # joint, 0 or 1
+                # keep yd
             }
+            abx <- inithelper(yd=yd)
+            if (type==1){ # 0806 vs 38/06
+                tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+                out['a0'] <- log(abx['y0'])
+            } else if (type==2){ # 0807 vs 35/07
+                tt <- get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1]
+                out['b0'] <- log(abx['y0'])
+            } else if (type==3){ # 0608 vs 32/08
+                tt <- get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1]
+                out['a0'] <- log(1/abx['y0'])
+            } else if (type==4){ # 0708 vs 32/08
+                tt <- get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1]
+                out['b0'] <- 1/log(abx['y0'])
+            } else { # joint, 0 or 1
+                tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+                yda <- data2york(x,option=6)
+                ydb <- data2york(x,option=7)
+                abxa <- inithelper(yd=yda)
+                abxb <- inithelper(yd=ydb)
+                out['a0'] <- log(abxa['a'])
+                out['b0'] <- log(abxb['a'])
+            }            
         }
-        if (type%in%c('joint',0,1,3) &&
-            (anchor[1]!=1 || iratio('Pb208Pb206')[2]>0)){
-            if (anchor[1]==1){
-                out['a0'] <- log(iratio('Pb208Pb206')[1])
-            } else {
-                out['a0'] <- log(1/yfita$a[1])
-            }
-        }
-        if (type%in%c('joint',0,2,4) &&
-            (anchor[1]!=1 || iratio('Pb208Pb207')[2]>0)){
-            if (anchor[1]==1){
-                out['b0'] <- log(iratio('Pb208Pb207')[1])
-            } else {
-                out['b0'] <- log(1/yfitb$a[1])
-            }
+        if (debug){
+            scatterplot(yd)
+            abline(a=abx['a'],b=abx['b'])
+            title(exp(out))
         }
     }
     if (model==3) out['w'] <- log(w)
