@@ -125,8 +125,8 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     init <- init.ludwig(x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init,fn=LL.ludwig,hessian=TRUE,
-                        x=x,anchor=anchor,type=type,model=model,exterr=exterr)
+    fit <- stats::optim(init,fn=LL.ludwig,hessian=TRUE,x=x,anchor=anchor,
+                        type=type,model=model,exterr=exterr,debug=FALSE)
     fit$cov <- solve(fit$hessian)
     dfit <- adddiseq(fit,d=x$d)
     if (measured.disequilibrium(x$d)){ # TODO: only apply to option==2 ratios
@@ -241,8 +241,8 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
     out <- c('a'=NA,'b'=NA,'x0inv'=NA)
     if (is.null(x0) & is.null(y0)){
         fit <- york(yd)
-        out['a'] <- fit$a[1]
-        out['b'] <- fit$b[1]
+        out['a'] <- abs(fit$a[1])
+        out['b'] <- -abs(fit$b[1])
     } else if (is.null(y0)){ # anchor x
         i <- which.min(yd[,'X'])
         if (x0>yd[i,'X']){
@@ -250,7 +250,7 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
         } else {
             out['b'] <- yd[i,'Y']/(0-x0)
         }
-        out['a'] <- -out['b']*x0
+        out['a'] <- abs(out['b']*x0)
     } else { # anchor y
         i <- which.min(yd[,'Y'])
         if (y0>yd[i,'Y']){
@@ -400,9 +400,9 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
                     out['b0'] <- log(iratio('Pb208Pb207')[1])
                 }
             }
-        } else if (anchor[1]==2 && length(anchor)>2){
+        } else if (anchor[1]==2 && length(anchor)>1){
             tt <- anchor[2]
-            if (!ci && length(anchor)>3 && anchor[3]>0) out['t'] <- log(tt)
+            if (!ci && length(anchor)>2 && anchor[3]>0) out['t'] <- log(tt)
             if (type==2){ # 0807 vs 35/07
                 yd <- data2york(x,option=7,tt=tt)
                 x0 <- age_to_U235Pb207_ratio(tt)[1]
@@ -418,13 +418,13 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
             }
             abx <- inithelper(yd=yd,x0=x0)
             if (type==1){
-                out['a0'] <- log(abx['y0'])
+                out['a0'] <- log(abx['a'])
             } else if (type==2){
-                out['b0'] <- log(abx['y0'])
+                out['b0'] <- log(abx['a'])
             } else if (type==3){
-                out['a0'] <- 1/log(abx['y0'])
+                out['a0'] <- 1/log(abx['a'])
             } else if (type==4){
-                out['b0'] <- 1/log(abx['y0'])
+                out['b0'] <- 1/log(abx['a'])
             } else {
                 out['a0'] <- log(abx['a'])
                 ydb <- data2york(x,option=7)
@@ -448,19 +448,19 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
             }
             abx <- inithelper(yd=yd)
             if (type==1){ # 0806 vs 38/06
-                tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
-                out['a0'] <- log(abx['y0'])
+                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                out['a0'] <- log(abx['a'])
             } else if (type==2){ # 0807 vs 35/07
-                tt <- get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1]
-                out['b0'] <- log(abx['y0'])
+                out['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
+                out['b0'] <- log(abx['a'])
             } else if (type==3){ # 0608 vs 32/08
-                tt <- get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1]
-                out['a0'] <- log(1/abx['y0'])
+                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                out['a0'] <- log(1/abx['a'])
             } else if (type==4){ # 0708 vs 32/08
-                tt <- get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1]
-                out['b0'] <- 1/log(abx['y0'])
+                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                out['b0'] <- 1/log(abx['a'])
             } else { # joint, 0 or 1
-                tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
                 yda <- data2york(x,option=6)
                 ydb <- data2york(x,option=7)
                 abxa <- inithelper(yd=yda)
