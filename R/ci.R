@@ -211,18 +211,18 @@ ntit.valid <- function(valid,...){
 get.ci.ludwig <- function(par,x,type='joint',anchor=0,model=1,
                           exterr=FALSE,debug=FALSE){
     if (debug){ # test function
-        if (TRUE){
+        if (FALSE){
             maxLL <- LL.ludwig(par,x=x,anchor=anchor,type=type,
-                               model=model,exterr=exterr,LL48=FALSE,LL08=FALSE)
+                               model=model,exterr=exterr)
             pname <- 't'
             pval <- par['t']
         } else {
             maxLL <- LL.ludwig(par,x=x,anchor=anchor,type=type,
-                               model=model,exterr=exterr,LL48=TRUE,LL08=FALSE)
+                               model=model,exterr=exterr)
             pname <- 'U48i'
             pval <- log(mclean(tt=exp(par['t']),d=x$d)$U48i)
         }
-        pp <- seq(from=pval-.1,to=pval+.1,length.out=21)
+        pp <- seq(from=pval-.2,to=pval+.2,length.out=21)
         LL <- pp*0
         for (i in seq_along(pp)){
             LL[i] <- profile.LL.ludwig(pp[i],pname,x=x,maxLL=maxLL,
@@ -235,8 +235,7 @@ get.ci.ludwig <- function(par,x,type='joint',anchor=0,model=1,
     tt <- ifelse(anchor[1]==2,anchor[2],exp(par['t']))
     ci <- c(ll=NA,ul=NA)
     message('Computing profile likelihood of t')
-    maxLL <- LL.ludwig(par,x=x,anchor=anchor,type=type,
-                       model=model,exterr=exterr,LL48=FALSE,LL08=FALSE)
+    maxLL <- LL.ludwig(par,x=x,anchor=anchor,type=type,model=model,exterr=exterr)
     ci['ll'] <- stats::uniroot(profile.LL.ludwig,interval=log(tt)-c(.1,0),
                                pname='t',x=x,maxLL=maxLL,type=type,
                                anchor=anchor,model=model,exterr=exterr,
@@ -247,8 +246,6 @@ get.ci.ludwig <- function(par,x,type='joint',anchor=0,model=1,
     out <- data.frame('t'=ci)
     if (x$d$U48$option==2 && x$d$U48$sx>0){
         message('Computing profile likelihood of U48i')
-        maxLL <- LL.ludwig(par,x=x,anchor=anchor,type=type,
-                           model=model,exterr=exterr,LL48=TRUE,LL08=FALSE)
         U48i <- mclean(tt=tt,d=x$d)$U48i
         dLL <- profile.LL.ludwig(-Inf,pname='U48i',x=x,maxLL=maxLL,type=type,
                                  anchor=anchor,model=model,exterr=exterr)
@@ -265,8 +262,6 @@ get.ci.ludwig <- function(par,x,type='joint',anchor=0,model=1,
     }
     if (x$d$ThU$option==2 && x$d$ThU$sx>0){
         message('Computing profile likelihood of ThUi')
-        maxLL <- LL.ludwig(par,x=x,anchor=anchor,type=type,
-                           model=model,exterr=exterr,LL48=FALSE,LL08=TRUE)
         ThUi <- log(mclean(tt=tt,d=x$d)$ThUi)
         dLL <- profile.LL.ludwig(-Inf,pname='ThUi',x=x,maxLL=maxLL,type=type,
                                  anchor=anchor,model=model,exterr=exterr)
@@ -285,10 +280,7 @@ get.ci.ludwig <- function(par,x,type='joint',anchor=0,model=1,
 }
 
 profile.LL.ludwig <- function(thepar,pname,x,maxLL,type='joint',
-                              anchor=0,model=1,exterr=FALSE,debug=FALSE){
-    if (debug){
-        browser()
-    }
+                              anchor=0,model=1,exterr=FALSE){
     X <- x
     if (pname=='t'){
         tt <- exp(thepar)
@@ -306,7 +298,7 @@ profile.LL.ludwig <- function(thepar,pname,x,maxLL,type='joint',
     }
     init <- init.ludwig(X,model=model,anchor=anchor,type=type)
     fit <- optim(init,fn=LL.ludwig,method='L-BFGS-B',
-                 lower=init-2,upper=init+2,hessian=FALSE,x=X,
+                 lower=init-1,upper=init+1,hessian=FALSE,x=X,
                  anchor=anchor,type=type,model=model,exterr=exterr)
     LL <- fit$value
     if (pname=='U48i'){
@@ -317,6 +309,6 @@ profile.LL.ludwig <- function(thepar,pname,x,maxLL,type='joint',
         pred <- mclean(tt=exp(fit$par['t']),d=X$d)
         LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,
                                 sd=x$d$ThU$sx,log=TRUE)
-    }
+    }    
     abs(LL-maxLL)-1.92
 }
