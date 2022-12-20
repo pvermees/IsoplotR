@@ -312,7 +312,10 @@ measured.disequilibrium <- function(d=diseq()){
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' mclean(tt=2,d=d)
 #' @export
-mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE){
+mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,debug=FALSE){
+    if (debug){
+        browser()
+    }
     out <- list(truncated=FALSE)
     l38 <- d$L['U238']
     l34 <- d$L['U234']

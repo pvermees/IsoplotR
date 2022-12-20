@@ -583,7 +583,7 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,
     if (model==2 && (type%in%c('joint',0) || x$format<4)){
         LL <- LL + LL.ludwig.model2(ta0b0w,X,exterr=exterr)
     } else if (type%in%c('joint',0) || x$format<4){
-        LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
+        LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr,debug=debug)$LL
     } else {
         LL <- LL + LL.ludwig.2d(ta0b0w,X,model=model,exterr=exterr,type=type)
     }
@@ -614,7 +614,10 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,
     LL
 }
 
-data2ludwig <- function(x,ta0b0w,exterr=FALSE){
+data2ludwig <- function(x,ta0b0w,exterr=FALSE,debug=FALSE){
+    if (debug){
+        browser()
+    }
     out <- list()
     U <- iratio('U238U235')[1]
     tt <- ta0b0w['t']
@@ -625,7 +628,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     X <- zeros
     Y <- zeros
     K0 <- zeros
-    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    D <- mclean(tt=tt,d=x$d,exterr=exterr,debug=debug)
     if (x$format%in%c(1,2,3)){
         NP <- 2 # number of fit parameters (tt, a0)
         NR <- 2 # number of isotopic ratios (X, Y)

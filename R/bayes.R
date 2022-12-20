@@ -39,12 +39,50 @@ getsearchlimits <- function(fit,x,anchor=0,type='joint',model=1){
                                  x=x,anchor=anchor,type=type,model=model)
     }
     if (x$d$ThU$option==2){
+        lims$ThUi <- c('ll'=0,'ul'=20)
         out <- searchlimithelper(lims,'ThU','ThUi',init=fit$par,method=method,
                                  x=x,anchor=anchor,type=type,model=model)
     }
-    out
+    if ('t'%in%pnames){
+        st <- sqrt(fit$cov['t','t'])
+        out['ll','t'] <- out['ll','t'] - 2*st
+        out['ul','t'] <- out['ul','t'] + 2*st
+    }
+    out[,colSums(is.na(out))==0]
 }
 
 bayeslud <- function(fit,x,anchor=0,type='joint',model=1){
     lims <- getsearchlimits(fit=fit,x=x,anchor=anchor,type=type,model=model)
+    pnames <- colnames(lims)
+    np <- length(pnames)
+    parlist <- list()
+    if ('t'%in%pnames){
+        parlist$t <- seq(from=lims['ll','t'],to=lims['ul','t'],length.out=30)
+    }
+    if ('a0'%in%pnames){
+        parlist$a0 <- seq(from=lims['ll','a0'],to=lims['ul','a0'],length.out=5)
+    }
+    if ('b0'%in%pnames){
+        parlist$b0 <- seq(from=lims['ll','b0'],to=lims['ul','b0'],length.out=5)
+    }
+    if ('U48i'%in%pnames){
+        parlist$U48i <- seq(from=lims['ll','U48i'],
+                            to=lims['ul','U48i'],length.out=30)
+    }
+    if ('ThUi'%in%pnames){
+        parlist$ThUi <- seq(from=lims['ll','ThUi'],
+                            to=lims['ul','ThUi'],length.out=30)
+    }
+    ni <- lapply(parlist,'length')
+    pargrid <- expand.grid(parlist)
+    LLgrid <- array(NA,dim=unlist(lapply(parlist,'length')),dimnames=parlist)
+    for (i in 1:nrow(pargrid)){
+        p <- as.numeric(pargrid[i,])
+        names(p) <- pnames
+        LLgrid[i] <- LL.ludwig(p,x=x,model=model,
+                               anchor=anchor,type=type,debug=FALSE)
+    }
+    Lgrid <- exp(min(LLgrid)-LLgrid) # scale to avoid machine precision issues
+    Lt <- apply(Lgrid,margin=1,'+')
+    La0 <- apply(Lgrid,margin=2,'+')
 }
