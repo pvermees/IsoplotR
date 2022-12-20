@@ -33,13 +33,14 @@ getsearchlimits <- function(fit,x,anchor=0,type='joint',model=1){
     rownames(lims) <- c('ll','ul')
     colnames(lims) <- pnames
     lims <- as.data.frame(lims)
+    McL <- mclean(tt=exp(fit$par['t']),d=x$d)
     if (x$d$U48$option==2){
-        lims$U48i <- c('ll'=0,'ul'=20)
+        lims$U48i <- c('ll'=log(McL$U48i)-2,'ul'=min(log(McL$U48i)+1,log(20)))
         out <- searchlimithelper(lims,'U48','U48i',init=fit$par,method=method,
                                  x=x,anchor=anchor,type=type,model=model)
     }
     if (x$d$ThU$option==2){
-        lims$ThUi <- c('ll'=0,'ul'=20)
+        lims$ThUi <- c('ll'=log(McL$ThUi)-2,'ul'=min(log(McL$ThUi)+1,log(20)))
         out <- searchlimithelper(lims,'ThU','ThUi',init=fit$par,method=method,
                                  x=x,anchor=anchor,type=type,model=model)
     }
@@ -51,13 +52,13 @@ getsearchlimits <- function(fit,x,anchor=0,type='joint',model=1){
     out[,colSums(is.na(out))==0]
 }
 
-bayeslud <- function(fit,x,anchor=0,type='joint',model=1){
+bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE){
     lims <- getsearchlimits(fit=fit,x=x,anchor=anchor,type=type,model=model)
     pnames <- colnames(lims)
     np <- length(pnames)
     parlist <- list()
     if ('t'%in%pnames){
-        parlist$t <- seq(from=lims['ll','t'],to=lims['ul','t'],length.out=30)
+        parlist$t <- seq(from=lims['ll','t'],to=lims['ul','t'],length.out=20)
     }
     if ('a0'%in%pnames){
         parlist$a0 <- seq(from=lims['ll','a0'],to=lims['ul','a0'],length.out=5)
@@ -67,11 +68,11 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1){
     }
     if ('U48i'%in%pnames){
         parlist$U48i <- seq(from=lims['ll','U48i'],
-                            to=lims['ul','U48i'],length.out=30)
+                            to=lims['ul','U48i'],length.out=20)
     }
     if ('ThUi'%in%pnames){
         parlist$ThUi <- seq(from=lims['ll','ThUi'],
-                            to=lims['ul','ThUi'],length.out=30)
+                            to=lims['ul','ThUi'],length.out=20)
     }
     ni <- lapply(parlist,'length')
     pargrid <- expand.grid(parlist)
@@ -83,6 +84,13 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1){
                                anchor=anchor,type=type,debug=FALSE)
     }
     Lgrid <- exp(min(LLgrid)-LLgrid) # scale to avoid machine precision issues
-    Lt <- apply(Lgrid,margin=1,'+')
-    La0 <- apply(Lgrid,margin=2,'+')
+    out <- list()
+    for (pname in pnames){
+        out[[pname]] <- cbind(exp(parlist[[pname]]),
+                              log(colSums(apply(Lgrid,pname,'+'))))
+    }
+    if (debug){
+        plot(out$t,type='b')
+    }
+    out
 }
