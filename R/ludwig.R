@@ -131,7 +131,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
                         x=x,anchor=anchor,type=type,model=model,exterr=exterr)
     fit$cov <- solve(fit$hessian)
     if (measured.disequilibrium(x$d)){
-        fit <- bayeslud(fit,x=x,anchor=anchor,type=type,model=model)
+        fit <- bayeslud(fit,x=x,anchor=anchor,type=type,model=model,debug=TRUE)
     } else {
         dfit <- adddiseq(fit,d=x$d)
         H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
