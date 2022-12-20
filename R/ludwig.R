@@ -125,12 +125,13 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     init <- init.ludwig(x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init,fn=LL.ludwig,hessian=TRUE,x=x,anchor=anchor,
-                        type=type,model=model,exterr=exterr,debug=FALSE)
+    if (length(init)>1) method <- "Nelder-Mead"
+    else method <- "BFGS"
+    fit <- stats::optim(init,fn=LL.ludwig,method=method,hessian=TRUE,
+                        x=x,anchor=anchor,type=type,model=model,exterr=exterr)
     fit$cov <- solve(fit$hessian)
     if (measured.disequilibrium(x$d)){
-        fit$ci <- get.ci.ludwig(fit$par,x=x,type=type,anchor=anchor,
-                                model=model,exterr=exterr,debug=FALSE)
+        fit <- bayeslud(fit,x=x,anchor=anchor,type=type,model=model)
     } else {
         dfit <- adddiseq(fit,d=x$d)
         H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
@@ -336,14 +337,16 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',ci=FALSE,debug=FALSE){
             if (type%in%c('joint',0,1)){
                 abxa <- inithelper(yd=yda)
                 tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
-                out['t'] <- log(tt)
-                out['a0'] <- log(1/abxa['a'])
             }
             if (type%in%c('joint',0,2)){
                 abxb <- inithelper(yd=ydb)
             }
             if (type==2){
                 tt <- get.Pb207U235.age(x=abxb['x0inv'],d=x$d)[1]
+            }
+            out['t'] <- log(tt)
+            if (type%in%c('joint',0,1)){
+                out['a0'] <- log(1/abxa['a'])
             }
             if (type%in%c('joint',0,2)){
                 out['b0'] <- log(1/abxb['a'])
@@ -580,17 +583,6 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,
     if (model==2 && (type%in%c('joint',0) || x$format<4)){
         LL <- LL + LL.ludwig.model2(ta0b0w,X,exterr=exterr)
     } else if (type%in%c('joint',0) || x$format<4){
-        if (debug){
-            yd <- data2york(X,option=2)
-            xt <- age_to_U238Pb206_ratio(ta0b0w['t'],d=X$d)[1]
-            yt <- age_to_Pb207Pb206_ratio(ta0b0w['t'],d=X$d)[1]
-            plot(c(0,xt,min(yd[,'X']),max(yd[,'X'])),
-                 c(ta0b0w['a0'],0,min(yd[,'Y']),max(yd[,'Y'])),
-                 type='n')
-            scatterplot(yd,add=TRUE)
-            lines(x=c(0,xt),y=c(ta0b0w['a0'],yt))
-            Sys.sleep(0.5)
-        }
         LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
     } else {
         LL <- LL + LL.ludwig.2d(ta0b0w,X,model=model,exterr=exterr,type=type)
