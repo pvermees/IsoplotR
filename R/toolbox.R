@@ -466,3 +466,11 @@ exponentiate <- function(fit,signs=fit$par/fit$par){
     dimnames(out$cov) <- dimnames(fit$cov)
     out
 }
+
+# recursive function that returns log(exp(u)+exp(v))
+log_sum_exp <- function(u, v){
+    if (length(v)>1){
+        v <- log_sum_exp(v[1],v[-1])
+    } 
+    max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
+}
