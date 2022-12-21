@@ -1,4 +1,4 @@
-recursivelimitsearch <- function(pname,iname,ll,ul,LLmax,method,
+recursivelimitsearch.old <- function(pname,iname,ll,ul,LLmax,method,
                                  x=x,anchor=0,type=1,model=1,
                                  maxlevel=5,side='lower',debug=FALSE){
     newlim <- (ll+ul)/2
@@ -44,7 +44,7 @@ recursivelimitsearch <- function(pname,iname,ll,ul,LLmax,method,
                          model=model,maxlevel=maxlevel-1,side=side)
 }
     
-searchlimithelper <- function(lims,pname,iname,fit,method,x=x,
+searchlimithelper.old <- function(lims,pname,iname,fit,method,x=x,
                               anchor=0,type=1,model=1,debug=FALSE){
     McL <- mclean(tt=exp(fit$par['t']),d=x$d)
     par <- fit$par
@@ -86,7 +86,7 @@ searchlimithelper <- function(lims,pname,iname,fit,method,x=x,
     out
 }
 
-getsearchlimits <- function(fit,x,anchor=0,type='joint',model=1){
+getsearchlimits.old <- function(fit,x,anchor=0,type='joint',model=1){
     pnames <- names(fit$par)
     np <- length(pnames)
     if (np>1) method <- "Nelder-Mead"
@@ -124,7 +124,7 @@ getsearchlimits <- function(fit,x,anchor=0,type='joint',model=1){
     out[,colSums(is.na(out))==0]
 }
 
-bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE){
+bayeslud.old <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE){
     lims <- getsearchlimits(fit=fit,x=x,anchor=anchor,type=type,model=model)
     pnames <- colnames(lims)
     np <- length(pnames)
@@ -178,6 +178,10 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE){
         out[[pname]] <- cbind(x,y)
     }
     if (debug){
+        bayespline <- function(xy,n=100){
+            good <- is.finite(xy[,2])
+            spline(xy[good,1],xy[good,2],n=n)
+        }
         bayesplot <- function(dat,...){
             opt <- 2
             if (opt==1){
@@ -192,17 +196,140 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE){
                 plot(dat,...,type='b')
             }
         }
-        op <- par(mfrow=c(2,2))
-        if ('t'%in%pnames) bayesplot(out$t,xlab='t',ylab='F(t)')
-        if ('a0'%in%pnames) bayesplot(out$a0,xlab='a0',ylab='F(a0)')
-        if ('U48i'%in%pnames) bayesplot(out$U48i,xlab='U48i',ylab='F(U48i)')
-        if ('ThUi'%in%pnames) bayesplot(out$ThUi,xlab='ThUi',ylab='F(ThUi)')
-        par(op)
+        if (FALSE){
+            op <- par(mfrow=c(2,2))
+            if ('t'%in%pnames) bayesplot(out$t,xlab='t',ylab='F(t)')
+            if ('a0'%in%pnames) bayesplot(out$a0,xlab='a0',ylab='F(a0)')
+            if ('U48i'%in%pnames) bayesplot(out$U48i,xlab='U48i',ylab='F(U48i)')
+            if ('ThUi'%in%pnames) bayesplot(out$ThUi,xlab='ThUi',ylab='F(ThUi)')
+            par(op)
+        } else {
+            x <- parlist$t
+            y <- parlist$U48i
+            L <- matrix(NA,length(y),length(x))
+            for (i in seq_along(x)){
+                ii <- igrid[,'t']%in%ilist$t[i]
+                for (j in seq_along(y)){
+                    jj <- igrid[,'U48i']%in%ilist$U48i[j]
+                    selection <- which(ii&jj)
+                    L[j,i] <- log_sum_exp(u=LLgrid[selection[1]],v=LLgrid[selection[-1]])
+                }
+            }
+            contour(x,y,L)
+        }
     }
     out
 }
 
-bayespline <- function(xy,n=100){
-    good <- is.finite(xy[,2])
-    spline(xy[good,1],xy[good,2],n=n)
+recursivelimitsearch <- function(pname,iname,ll,ul,LLmax,method,
+                                 x=x,anchor=0,type=1,model=1,
+                                 maxlevel=5,side='lower',debug=FALSE){
+    newlim <- (ll+ul)/2
+    X <- x
+    X$d[[pname]] <- list(x=newlim,sx=0,option=1)
+    init <- init.ludwig(x=X,model=model,anchor=anchor,type=type)
+    fit <- stats::optim(init,fn=LL.ludwig,method=method,hessian=FALSE,
+                        x=X,anchor=anchor,type=type,model=model)
+    par <- fit$par
+    par[iname] <- log(newlim)
+    LL <- LL.ludwig(par,x=x,anchor=anchor,type=type,model=model)
+    if (debug) print(c(LLmax,LL,ll,ul))
+    if (LL<(LLmax+100)){ # not far enough
+        if (maxlevel<1){
+            if (side=='lower'){
+                return(ll)
+            } else {
+                return(ul)
+            }
+        } else {
+            if (side=='lower'){
+                ul <- newlim
+            } else {
+                ll <- newlim
+            }
+        }
+    } else { # too far
+        if (maxlevel<1){
+            return(newlim)
+        } else {
+            if (side=='lower'){
+                ll <- newlim
+            } else {
+                ul <- newlim
+            }
+        }        
+    }
+    recursivelimitsearch(pname=pname,iname=iname,ll=ll,ul=ul,LLmax=LLmax,
+                         method=method,x=x,anchor=anchor,type=type,
+                         model=model,maxlevel=maxlevel-1,side=side)
+}
+
+searchlimithelper <- function(pname,iname,fit,method,x=x,
+                              anchor=0,type=1,model=1,debug=FALSE){
+    McL <- mclean(tt=exp(fit$par['t']),d=x$d)
+    par <- fit$par
+    par[pname] <- log(unname(McL[[iname]]))
+    LLmax <- LL.ludwig(par,x=x,anchor=anchor,type=type,model=model)
+    ll <- recursivelimitsearch(pname=pname,iname=iname,ll=0,ul=unname(McL[[pname]]),
+                               LLmax=LLmax,method=method,x=x,anchor=anchor,
+                               type=type,model=model,maxlevel=5,side='lower')
+    ul <- recursivelimitsearch(pname=pname,iname=iname,ll=unname(McL[[pname]]),ul=20,
+                               LLmax=LLmax,method=method,x=x,anchor=anchor,
+                               type=type,model=model,maxlevel=5,side='upper')
+    c(ll=ll,ul=ul)
+}
+
+getsearchlimits <- function(fit,x,anchor=0,type='joint',model=1){
+    pnames <- names(fit$par)
+    np <- length(pnames)
+    if (np>1) method <- "Nelder-Mead"
+    else method <- "BFGS"
+    out <- NULL
+    if (x$d$U48$option==2){
+        lims <- searchlimithelper(lims,pname='U48',iname='U48i',fit=fit,
+                                 method=method,x=x,anchor=anchor,
+                                 type=type,model=model)
+        out <- cbind(out,U48i=lims)
+    }
+    if (x$d$ThU$option==2){
+        lims <- searchlimithelper(lims,pname='ThU',iname='ThUi',fit=fit,
+                                  method=method,x=x,anchor=anchor,
+                                  type=type,model=model)
+        out <- cbind(out,ThUi=lims)
+    }
+    out
+}
+
+bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE){
+    lims <- getsearchlimits(fit=fit,x=x,anchor=anchor,type=type,model=model)
+    pnames <- colnames(lims)
+    np <- length(pnames)
+    parlist <- list()
+    if ('U48i'%in%pnames){
+        n48i <- 10
+        parlist$U48i <- seq(from=lims['ll','U48i'],
+                            to=lims['ul','U48i'],length.out=n48i)
+    }
+    if ('ThUi'%in%pnames){
+        nThUi <- 10
+        parlist$ThUi <- seq(from=lims['ll','ThUi'],
+                            to=lims['ul','ThUi'],length.out=nThUi)
+    }
+    if (np==1){
+        nn <- length(parlist[[1]])
+        tt <- LL <- rep(NA,nn)
+        for (i in 1:nn){
+            LL[i] <- NA
+        }
+    } else {
+        n1 <- length(parlist[[1]])
+        n2 <- length(parlist[[2]])
+        tt <- LL <- matrix(NA,n1,n2)
+        for (i in 1:n1){
+            for (j in 1:n2){
+                LL[i,j] <- NA
+            }
+        }
+    }
+    out
 }
