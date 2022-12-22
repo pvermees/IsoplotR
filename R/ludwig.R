@@ -138,8 +138,6 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
                               type=type,model=model,exterr=exterr)
         fit$cov <- solve(H)
     }
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@85@"]]));##:ess-bp-end:##
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,x,anchor=anchor,type=type)
     out <- mswd.lud(afit,x=x,exterr=exterr,type=type)
