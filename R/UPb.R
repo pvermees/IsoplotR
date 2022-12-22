@@ -863,7 +863,7 @@ get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
 }
 
 get.Pb206U238.age <- function(x,...){ UseMethod("get.Pb206U238.age",x) }
-get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
+get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq()){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)

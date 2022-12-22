@@ -124,7 +124,7 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
-    init <- init.ludwig(x,model=model,anchor=anchor,type=type)
+    init <- init.ludwig(x,model=model,anchor=anchor,type=type,...)
     if (length(init)>1) method <- "Nelder-Mead"
     else method <- "BFGS"
     fit <- stats::optim(init,fn=LL.ludwig,method=method,hessian=TRUE,
@@ -266,6 +266,9 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
+    if (debug){
+        browser()
+    }
     out <- vector()
     if (model==3){
         pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)

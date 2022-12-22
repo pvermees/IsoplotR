@@ -468,7 +468,15 @@ exponentiate <- function(fit,signs=fit$par/fit$par){
 }
 
 # recursive function that returns log(exp(u)+exp(v))
-log_sum_exp <- function(u, v){
+log_sum_exp <- function(u,v){
+    if (missing(v)){
+        if (length(u)>1){
+            v <- u[-1]
+            u <- u[1]
+        } else {
+            return(u)
+        }
+    }
     if (length(v)>1){
         v <- log_sum_exp(v[1],v[-1])
     } 

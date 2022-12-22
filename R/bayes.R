@@ -10,8 +10,8 @@ initial2time <- function(x,anames,values,method='Nelder-Mead',
     init <- init.ludwig(x=X,model=model,anchor=anchor,type=type)
     fit <- stats::optim(init,fn=LL.ludwig,method=method,hessian=FALSE,
                         x=X,anchor=anchor,type=type,model=model)
-    tt <- ifelse('t'%in%names(fit$par),fit$par['t'],anchor[2])
-    McL <- mclean(tt=tt,d=X$d)
+    lt <- ifelse('t'%in%names(fit$par),fit$par['t'],anchor[2])
+    McL <- mclean(tt=exp(lt),d=X$d)
     out <- list()
     out$par <- fit$par
     for (aname in anames){
@@ -22,13 +22,13 @@ initial2time <- function(x,anames,values,method='Nelder-Mead',
     out
 }
 
-recursivelimitsearch <- function(aname,iname,ll,ul,LLmax,method,
+recursivelimitsearch <- function(aname,ll,ul,LLmax,method,
                                  x=x,anchor=0,type=1,model=1,
-                                 maxlevel=5,side='lower',debug=FALSE){
+                                 maxlevel=5,side='lower'){
     newlim <- (ll+ul)/2
     fit <- initial2time(x,anames=aname,values=newlim,method=method,
                         anchor=anchor,type=type,model=model)
-    if (fit$LL<(LLmax+100)){ # not far enough
+    if (fit$LL<(LLmax+25)){ # not far enough
         if (maxlevel<1){
             if (side=='lower'){
                 return(ll)
@@ -53,82 +53,105 @@ recursivelimitsearch <- function(aname,iname,ll,ul,LLmax,method,
             }
         }        
     }
-    recursivelimitsearch(aname=aname,iname=iname,ll=ll,ul=ul,LLmax=LLmax,
+    recursivelimitsearch(aname=aname,ll=ll,ul=ul,LLmax=LLmax,
                          method=method,x=x,anchor=anchor,type=type,
                          model=model,maxlevel=maxlevel-1,side=side)
 }
 
-searchlimithelper <- function(aname,iname,fit,method,x=x,
-                              anchor=0,type=1,model=1,debug=FALSE){
+searchlimithelper <- function(aname,fit,method,x=x,anchor=0,
+                              type=1,model=1,maxlevel=5){
     McL <- mclean(tt=exp(fit$par['t']),d=x$d)
     par <- fit$par
+    iname <- paste0(aname,'i')
     par[aname] <- log(unname(McL[[iname]]))
     LLmax <- LL.ludwig(par,x=x,anchor=anchor,type=type,model=model)
-    ll <- recursivelimitsearch(aname=aname,iname=iname,ll=0,ul=unname(McL[[aname]]),
+    ll <- recursivelimitsearch(aname=aname,ll=0,ul=unname(McL[[iname]]),
                                LLmax=LLmax,method=method,x=x,anchor=anchor,
-                               type=type,model=model,maxlevel=5,side='lower')
-    ul <- recursivelimitsearch(aname=aname,iname=iname,ll=unname(McL[[aname]]),ul=20,
+                               type=type,model=model,maxlevel=maxlevel,side='lower')
+    ul <- recursivelimitsearch(aname=aname,ll=unname(McL[[iname]]),ul=20,
                                LLmax=LLmax,method=method,x=x,anchor=anchor,
-                               type=type,model=model,maxlevel=5,side='upper')
+                               type=type,model=model,maxlevel=maxlevel,side='upper')
     c(ll=ll,ul=ul)
 }
 
 getsearchlimits <- function(fit,x,anchor=0,method='Nelder=-Mead',
-                            type='joint',model=1){
+                            type='joint',maxlevel=5,model=1){
     out <- NULL
     if (x$d$U48$option==2){
-        lims <- searchlimithelper(lims,aname='U48',iname='U48i',fit=fit,
+        message('Obtaining U48i search limits')
+        lims <- searchlimithelper(aname='U48',fit=fit,
                                   method=method,x=x,anchor=anchor,
-                                  type=type,model=model)
+                                  type=type,model=model,maxlevel=maxlevel)
         out <- cbind(out,U48i=lims)
     }
     if (x$d$ThU$option==2){
-        lims <- searchlimithelper(lims,aname='ThU',iname='ThUi',fit=fit,
+        message('Obtaining ThUi search limits')
+        lims <- searchlimithelper(aname='ThU',fit=fit,
                                   method=method,x=x,anchor=anchor,
-                                  type=type,model=model)
+                                  type=type,model=model,maxlevel=maxlevel)
         out <- cbind(out,ThUi=lims)
     }
     out
 }
 
-bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE){
+bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE,nsteps=15){
     if (length(fit$par)>1) method <- "Nelder-Mead"
     else method <- "BFGS"
-    lims <- getsearchlimits(fit=fit,x=x,method=method,
-                            anchor=anchor,type=type,model=model)
+    lims <- getsearchlimits(fit=fit,x=x,method=method,anchor=anchor,
+                            type=type,model=model,maxlevel=10)
     pnames <- names(fit$par)
     inames <- colnames(lims)
     ni <- length(inames)
     np <- length(pnames)
-    nn <- 20
-    ilist <- list()
+    ilist <- iilist <- list()
     for (iname in inames){
         ilist[[iname]] <- seq(from=lims['ll',iname],
-                                to=lims['ul',iname],
-                                length.out=nn)
+                               to=lims['ul',iname],length.out=nsteps)
+        iilist[[iname]] <- 1:nsteps
     }
-    pargrid <- expand.grid(ilist)
-    ng <- nrow(pargrid)
-    out <- matrix(NA,ng,np+ni+1)
-    colnames(out) <- c(pnames,inames,'LL')
-    aname1 <- ifelse(iname[1]=='U48i','U48','ThU')
+    igrid <- data.matrix(expand.grid(ilist))
+    iigrid <- data.matrix(expand.grid(iilist))
+    ng <- nrow(igrid)
+    LLgrid <- matrix(NA,ng,np+ni+1)
+    colnames(LLgrid) <- c(pnames,inames,'LL')
+    aname1 <- ifelse(inames[1]=='U48i','U48','ThU')
     if (ni==1){
         anames <- aname1
     } else {
-        aname2 <- ifelse(iname[2]=='U48i','U48','ThU')
+        aname2 <- ifelse(inames[2]=='U48i','U48','ThU')
         anames <- c(aname1,aname2)
     }
     for (i in 1:ng){
-        fit <- initial2time(x=x,anames=anames,values=pargrid[i,inames],
+        message('Iteration ',i,'/',ng)
+        fit <- initial2time(x=x,anames=anames,
+                            values=igrid[i,inames],
                             method=method,anchor=anchor,type=type,
                             model=model,debug=FALSE)
-        out[i,pnames] <- fit$par[pnames]
-        out[i,inames] <- pargrid[i,inames]
-        out[i,'LL'] <- fit$LL
+        LLgrid[i,pnames] <- fit$par[pnames]
+        LLgrid[i,inames] <- igrid[i,inames]
+        LLgrid[i,'LL'] <- -fit$LL
+    }
+    out <- NULL
+    for (iname in inames){
+        x <- ilist[[iname]]
+        LL <- marginal(LLgrid,iigrid,iilist,iname=iname)
+        out[[iname]] <- cbind(x=x,LL=LL)
     }
     if (debug){
-        L <- exp(min(out[,'LL'])-out[,'LL'])
-        plot(out[,'U48i'],L,type='b')
+        xLL <- out[['U48i']]
+        dx <- diff(xLL[,'x'])
+        y <- exp(xLL[,'LL'])/sum(exp(xLL[,'LL']*c(dx,tail(dx,n=1))))
+        plot(x,y,type='b')
     }
     out
+}
+
+marginal <- function(LLgrid,iigrid,iilist,iname='U48i'){
+    ii <- iilist[[iname]]
+    LL <- rep(NA,length(ii))
+    for (i in ii){
+        j <- iigrid[,iname]%in%i
+        LL[i] <- log_sum_exp(LLgrid[j,'LL'])
+    }
+    LL
 }
