@@ -124,10 +124,9 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
-    init <- init.ludwig(x,model=model,anchor=anchor,type=type,...)
-    if (length(init)>1) method <- "Nelder-Mead"
-    else method <- "BFGS"
-    fit <- stats::optim(init,fn=LL.ludwig,method=method,hessian=TRUE,
+    init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2,debug=FALSE)
+    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+                        lower=init$lower,upper=init$upper,hessian=TRUE,
                         x=x,anchor=anchor,type=type,model=model,exterr=exterr)
     fit$cov <- solve(fit$hessian)
     if (measured.disequilibrium(x$d)){
@@ -265,11 +264,11 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
     out
 }
 
-init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
+init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     if (debug){
         browser()
     }
-    out <- vector()
+    par <- vector()
     if (model==3){
         pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
         w <- ifelse(pilot$cov['t','t']==0,
@@ -282,24 +281,24 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
             Pb76c <- iratio('Pb207Pb206')[1]
             abx <- inithelper(yd=yd,y0=Pb76c)
             tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
-            out['t'] <- log(tt)
-            if (iratio('Pb207Pb206')[2]>0) out['a0'] <- log(Pb76c)
+            par['t'] <- log(tt)
+            if (iratio('Pb207Pb206')[2]>0) par['a0'] <- log(Pb76c)
         } else if (anchor[1]==2 && length(anchor)>2){
             tt <- anchor[2]
             U8Pb6r <- 1/mclean(tt=tt,d=x$d)$Pb206U238
             abx <- inithelper(yd=yd,x0=U8Pb6r)
-            if (anchor[3]>0) out['t'] <- log(tt)
-            out['a0'] <- log(abx['a'])
+            if (anchor[3]>0) par['t'] <- log(tt)
+            par['a0'] <- log(abx['a'])
         } else {
             abx <- inithelper(yd)
             tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
-            out['t'] <- log(tt)
-            out['a0'] <- log(abx['a'])
+            par['t'] <- log(tt)
+            par['a0'] <- log(abx['a'])
         }
         if (debug){
             scatterplot(yd)
             abline(a=abx['a'],b=abx['b'])
-            title(exp(out))
+            title(exp(par))
         }
     } else if (x$format<7){
         yda <- data2york(x,option=3)
@@ -309,8 +308,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
                 Pb64c <- iratio('Pb206Pb204')[1]
                 abxa <- inithelper(yd=yda,y0=1/Pb64c)
                 tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
-                out['t'] <- log(tt)
-                if (iratio('Pb206Pb204')[2]>0) out['a0'] <- log(Pb64c)
+                par['t'] <- log(tt)
+                if (iratio('Pb206Pb204')[2]>0) par['a0'] <- log(Pb64c)
             }
             if (type%in%c('joint',0,2)){
                 Pb74c <- iratio('Pb207Pb204')[1]
@@ -318,23 +317,23 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
             }
             if (type==2){
                 tt <- get.Pb206U238.age(x=abxb['x0inv'],d=x$d)[1]
-                out['t'] <- log(tt)
+                par['t'] <- log(tt)
             }
             if (type%in%c('joint',0,2)){
-                if (iratio('Pb207Pb204')[2]>0) out['b0'] <- log(Pb74c)
+                if (iratio('Pb207Pb204')[2]>0) par['b0'] <- log(Pb74c)
             }
         } else if (anchor[1]==2 && length(anchor)>1){
             tt <- anchor[2]
-            if ((length(anchor)>2 && anchor[3]>0)) out['t'] <- log(tt)
+            if ((length(anchor)>2 && anchor[3]>0)) par['t'] <- log(tt)
             if (type%in%c('joint',0,1)){
                 Pb6U8r <- mclean(tt=tt)$Pb206U238
                 abxa <- inithelper(yd=yda,x0=1/Pb6U8r)
-                out['a0'] <- log(1/abxa['a'])
+                par['a0'] <- log(1/abxa['a'])
             }
             if (type%in%c('joint',0,2)){
                 Pb7U5r <- mclean(tt=tt)$Pb207U235
                 abxb <- inithelper(yd=ydb,x0=1/Pb7U5r)
-                out['b0'] <- log(1/abxb['a'])
+                par['b0'] <- log(1/abxb['a'])
             }
         } else {
             if (type%in%c('joint',0,1)){
@@ -347,19 +346,19 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
             if (type==2){
                 tt <- get.Pb207U235.age(x=abxb['x0inv'],d=x$d)[1]
             }
-            out['t'] <- log(tt)
+            par['t'] <- log(tt)
             if (type%in%c('joint',0,1)){
-                out['a0'] <- log(1/abxa['a'])
+                par['a0'] <- log(1/abxa['a'])
             }
             if (type%in%c('joint',0,2)){
-                out['b0'] <- log(1/abxb['a'])
+                par['b0'] <- log(1/abxb['a'])
             }
         }
         if (debug){
             op <- par(mfrow=c(1,2))
             scatterplot(yda)
             abline(a=abxa['a'],b=abxa['b'])
-            title(exp(out))
+            title(exp(par))
             scatterplot(ydb)
             abline(a=abxb['a'],b=abxb['b'])
             par(op)
@@ -386,29 +385,29 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
             }
             abx <- inithelper(yd=yd,y0=y0)
             if (type==1){
-                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb206')[2]>0) out['a0'] <- log(y0)
+                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(y0)
             } else if (type==2){
-                out['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb207')[2]>0) out['b0'] <- log(y0)
+                par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
+                if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(y0)
             } else if (type==3){
-                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb206')[2]>0) out['a0'] <- log(1/y0)
+                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(1/y0)
             } else if (type==4){
-                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb207')[2]>0) out['b0'] <- log(1/y0)
+                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(1/y0)
             } else { # joint, 0 or 1
-                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
                 if (iratio('Pb208Pb206')[2]>0){
-                    out['a0'] <- log(iratio('Pb208Pb206')[1])
+                    par['a0'] <- log(iratio('Pb208Pb206')[1])
                 }
                 if (iratio('Pb208Pb207')[2]>0){
-                    out['b0'] <- log(iratio('Pb208Pb207')[1])
+                    par['b0'] <- log(iratio('Pb208Pb207')[1])
                 }
             }
         } else if (anchor[1]==2 && length(anchor)>1){
             tt <- anchor[2]
-            if (length(anchor)>2 && anchor[3]>0) out['t'] <- log(tt)
+            if (length(anchor)>2 && anchor[3]>0) par['t'] <- log(tt)
             if (type==2){ # 0807 vs 35/07
                 yd <- data2york(x,option=7,tt=tt)
                 x0 <- age_to_U235Pb207_ratio(tt)[1]
@@ -424,18 +423,18 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
             }
             abx <- inithelper(yd=yd,x0=x0)
             if (type==1){
-                out['a0'] <- log(abx['a'])
+                par['a0'] <- log(1/abx['a'])
             } else if (type==2){
-                out['b0'] <- log(abx['a'])
+                par['b0'] <- log(1/abx['a'])
             } else if (type==3){
-                out['a0'] <- 1/log(abx['a'])
+                par['a0'] <- log(abx['a'])
             } else if (type==4){
-                out['b0'] <- 1/log(abx['a'])
+                par['b0'] <- log(abx['a'])
             } else {
-                out['a0'] <- log(abx['a'])
+                par['a0'] <- log(1/abx['a'])
                 ydb <- data2york(x,option=7)
                 abxb <- inithelper(yd=ydb,x0=x0)
-                out['b0'] <- log(abxb['a'])
+                par['b0'] <- log(1/abxb['a'])
             }            
         } else {
             yd <- data2york(x,option=2)
@@ -454,38 +453,67 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',debug=FALSE){
             }
             abx <- inithelper(yd=yd)
             if (type==1){ # 0806 vs 38/06
-                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-                out['a0'] <- log(abx['a'])
+                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                par['a0'] <- log(1/abx['a'])
             } else if (type==2){ # 0807 vs 35/07
-                out['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
-                out['b0'] <- log(abx['a'])
+                par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
+                par['b0'] <- log(1/abx['a'])
             } else if (type==3){ # 0608 vs 32/08
-                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-                out['a0'] <- log(1/abx['a'])
+                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                par['a0'] <- log(abx['a'])
             } else if (type==4){ # 0708 vs 32/08
-                out['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-                out['b0'] <- 1/log(abx['a'])
+                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                par['b0'] <- log(abx['a'])
             } else { # joint, 0 or 1
-                out['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
                 yda <- data2york(x,option=6)
                 ydb <- data2york(x,option=7)
                 abxa <- inithelper(yd=yda)
                 abxb <- inithelper(yd=ydb)
-                out['a0'] <- log(abxa['a'])
-                out['b0'] <- log(abxb['a'])
+                par['a0'] <- log(1/abxa['a'])
+                par['b0'] <- log(1/abxb['a'])
             }            
         }
         if (debug){
             scatterplot(yd)
             abline(a=abx['a'],b=abx['b'])
-            title(exp(out))
+            title(exp(par))
         }
     }
-    if (model==3) out['w'] <- log(w)
-    out
+    if (model==3) par['w'] <- log(w)
+    if (x$d$U48$option==2 || x$d$ThU$option==2){
+        McL <- mclean(tt=tt,d=x$d)
+    }
+    lower <- par-buffer
+    upper <- par+buffer
+    if (x$d$U48$option==1 && !is.null(x$d$U48$sx) && x$d$U48$sx>0){
+        par['U48i'] <- x$d$U48$x
+    } else if (x$d$U48$option==2 && !is.null(x$d$U48$sx) && x$d$U48$sx>0){
+        par['U48i'] <- McL$U48i
+    }
+    if (x$d$ThU$option==1 && !is.null(x$d$ThU$sx) && x$d$ThU$sx>0){
+        par['ThUi'] <- x$d$ThU$x
+    } else if (x$d$ThU$option==2 && !is.null(x$d$ThU$sx) && x$d$ThU$sx>0){
+        par['ThUi'] <- McL$ThUi
+    }
+    if (x$d$RaU$option==1 && !is.null(x$d$RaU$sx) && x$d$RaU$sx>0){
+        par['RaUi'] <- x$d$RaU$x
+    }
+    if (x$d$PaU$option==1 && !is.null(x$d$PaU$sx) && x$d$PaU$sx>0){
+        par['PaUi'] <- x$d$PaU$x
+    }
+    if (x$d$U48$option>0){
+        lower['U48i'] <- 0
+        upper['U48i'] <- 20
+    }
+    if (x$d$ThU$option>0){
+        lower['ThUi'] <- 0
+        upper['ThUi'] <- 20
+    }    
+    list(par=par,lower=lower,upper=upper)
 }
 
-LL.ludwig <- function(par,x,model=1,exterr=FALSE,
+LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
                       anchor=0,type='joint',debug=FALSE){
     if (debug){
         browser()
@@ -514,11 +542,10 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,
     } else if (x$format%in%c(7,8) && type%in%c('joint',0,2,4)){
         b0 <- 1/iratio('Pb208Pb207')[1]
     }
-    X <- x
-    if ('U48i'%in%pnames) X$d$U48 <- list(x=exp(par['U48i']),sx=0,option=1)
-    if ('ThUi'%in%pnames) X$d$ThU <- list(x=exp(par['ThUi']),sx=0,option=1)
-    if ('RaUi'%in%pnames) X$d$RaU <- list(x=exp(par['RaUi']),sx=0,option=1)
-    if ('PaUi'%in%pnames) X$d$PaU <- list(x=exp(par['PaUi']),sx=0,option=1)
+    if ('U48i'%in%pnames) X$d$U48 <- list(x=par['U48i'],sx=0,option=1)
+    if ('ThUi'%in%pnames) X$d$ThU <- list(x=par['ThUi'],sx=0,option=1)
+    if ('RaUi'%in%pnames) X$d$RaU <- list(x=par['RaUi'],sx=0,option=1)
+    if ('PaUi'%in%pnames) X$d$PaU <- list(x=par['PaUi'],sx=0,option=1)
     LL <- 0
     if (x$format<4){
         if (anchor[1]==1 && iratio('Pb207Pb206')[2]>0){
@@ -591,9 +618,7 @@ LL.ludwig <- function(par,x,model=1,exterr=FALSE,
         LL <- LL + LL.ludwig.2d(ta0b0w,X,model=model,exterr=exterr,type=type)
     }
     if (x$d$U48$option==1 && 'U48i'%in%pnames){
-        ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@80@"]]));##:ess-bp-end:##
-        LL <- LL - stats::dnorm(x=exp(par['U48i']),mean=x$d$U48$x,
+        LL <- LL - stats::dnorm(x=par['U48i'],mean=x$d$U48$x,
                                 sd=x$d$U48$sx,log=TRUE) 
     } else if (x$d$U48$option==2 && !is.null(x$d$U48$sx) && x$d$U48$sx>0){
         pred <- mclean(tt=tt,d=X$d)
@@ -601,7 +626,7 @@ browser(expr=is.null(.ESSBP.[["@80@"]]));##:ess-bp-end:##
                                 sd=x$d$U48$sx,log=TRUE)
     }
     if (x$d$ThU$option==1 && 'ThUi'%in%pnames){
-        LL <- LL - stats::dnorm(x=exp(par['ThUi']),mean=x$d$ThU$x,
+        LL <- LL - stats::dnorm(x=par['ThUi'],mean=x$d$ThU$x,
                                 sd=x$d$ThU$sx,log=TRUE)
     } else if (x$d$ThU$option==2 && !is.null(x$d$ThU$sx) && x$d$ThU$sx>0){
         pred <- mclean(tt=tt,d=X$d)
@@ -609,11 +634,11 @@ browser(expr=is.null(.ESSBP.[["@80@"]]));##:ess-bp-end:##
                                 sd=x$d$ThU$sx,log=TRUE)
     }
     if ('RaUi'%in%pnames && !is.null(x$d$RaU$sx) && x$d$RaU$sx>0){
-        LL <- LL - stats::dnorm(x=exp(par['RaUi']),mean=x$d$RaU$x,
+        LL <- LL - stats::dnorm(x=par['RaUi'],mean=x$d$RaU$x,
                                 sd=x$d$RaU$sx,log=TRUE)
     }
     if ('PaUi'%in%pnames && !is.null(x$d$PaU$sx) && x$d$PaU$sx>0){
-        LL <- LL - stats::dnorm(x=exp(par['PaUi']),mean=x$d$PaU$x,
+        LL <- LL - stats::dnorm(x=par['PaUi'],mean=x$d$PaU$x,
                                 sd=x$d$PaU$sx,log=TRUE)
     }
     LL

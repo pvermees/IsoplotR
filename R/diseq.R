@@ -312,7 +312,7 @@ measured.disequilibrium <- function(d=diseq()){
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' mclean(tt=2,d=d)
 #' @export
-mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,debug=FALSE){
+mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,M=20,debug=FALSE){
     if (debug){
         browser()
     }
@@ -345,7 +345,7 @@ mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,debug=FALSE){
             dm <- dM <- d
             dm$U48$option <- dM$U48$option <- 0 # U48 is irrelevant here
             dm$ThU <- list(x=0,sx=0,option=1)
-            dM$ThU <- list(x=50,sx=0,option=1)
+            dM$ThU <- list(x=M,sx=0,option=1)
             McLm <- mclean(tt=tt,d=dm)
             McLM <- mclean(tt=tt,d=dM)
             if (McLm$ThU>d$ThU$x) {
@@ -359,7 +359,7 @@ mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,debug=FALSE){
         if (d$U48$option==2){
             dm <- dM <- d
             dm$U48 <- list(x=0,sx=0,option=1)
-            dM$U48 <- list(x=50,sx=0,option=1)
+            dM$U48 <- list(x=M,sx=0,option=1)
             McLm <- mclean(tt=tt,d=dm)
             McLM <- mclean(tt=tt,d=dM)
             if (McLM$U48<d$U48$x) {
@@ -512,13 +512,9 @@ get.5678.misfit <- function(obs,pred){
 
 meas.diseq.maxt <- function(d){
     if (d$ThU$option==2){
-        cutoff <- ifelse(max(d$ThU$x)<1,0,50)
-        out <- stats::uniroot(function(tt,d,cutoff) mclean(tt=tt,d=d)$ThUi-cutoff,
-                              lower=0,upper=2,d=d,cutoff=cutoff)$root
+        out <- 2
     } else if (d$U48$option==2){
-        cutoff <- ifelse(d$U48$x<1,0,50)
-        out <- stats::uniroot(function(tt,d,cutoff) mclean(tt=tt,d=d)$U48i-cutoff,
-                              lower=0,upper=10,d=d,cutoff=cutoff)$root
+        out <- 5
     } else {
         out <- 4500
     }
