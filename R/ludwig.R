@@ -124,13 +124,13 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
-    init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2,debug=FALSE)
+    init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=TRUE,
                         x=x,anchor=anchor,type=type,model=model,exterr=exterr)
-    fit$cov <- solve(fit$hessian)
     if (measured.disequilibrium(x$d)){
-        dfit <- bayeslud(fit,x=x,anchor=anchor,type=type,model=model,debug=TRUE)
+        fit$cov <- inverthess(fit$hessian)
+        fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,model=model)
     } else {
         dfit <- adddiseq(fit,d=x$d)
         H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
@@ -1016,5 +1016,20 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
         out$p.value <- 1
     }
     out$n <- ns
+    out
+}
+
+exponentiate <- function(fit){
+    out <- fit
+    pnames <- names(fit$par)
+    logparnames <- which(c('t','a0','b0','w')%in%pnames)
+    linparnames <- which(c('U48i','ThUi','RaUi','PaUi')%in%pnames)
+    logpar <- fit$par[logparnames]
+    logcov <- fit$cov[logparnames,logparnames]
+    out$par[logparnames] <- exp(fit$par[logparnames])
+    np <- length(logparnames)
+    out$cov[logparnames,logparnames] <-
+        diag(logpar,np,np) %*% logcov %*% diag(logpar,np,np)
+    dimnames(out$cov) <- dimnames(fit$cov)
     out
 }

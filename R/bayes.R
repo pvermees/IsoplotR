@@ -23,11 +23,11 @@ initial2time <- function(x,anames,values,anchor=0,type=1,model=1,debug=FALSE){
 }
 
 recursivelimitsearch <- function(aname,ll,ul,LLmax,x=x,anchor=0,
-                                 type=1,model=1,maxlevel=5,side='lower'){
+                                 type=1,model=1,buffer=10,maxlevel=5,side='lower'){
     newlim <- (ll+ul)/2
     fit <- initial2time(x,anames=aname,values=newlim,
                         anchor=anchor,type=type,model=model)
-    if (fit$LL<(LLmax+10)){ # not far enough
+    if (fit$LL<(LLmax+buffer)){ # not far enough
         if (maxlevel<1){
             if (side=='lower'){
                 return(ll)
@@ -94,7 +94,7 @@ getsearchlimits <- function(fit,x,anchor=0,type='joint',maxlevel=5,
     out
 }
 
-bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE,nsteps=50){
+bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
     lims <- getsearchlimits(fit=fit,x=x,anchor=anchor,type=type,
                             model=model,maxlevel=10,debug=FALSE)
     pnames <- names(fit$par)
@@ -129,18 +129,19 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,debug=FALSE,nsteps=50){
     }
     out <- NULL
     for (iname in inames){
-        x <- ilist[[iname]]
         LL <- marginal(LLgrid,iigrid,iilist,iname=iname)
-        out[[iname]] <- cbind(x=x,LL=LL)
+        dx <- diff(ilist[[iname]])
+        yy <- exp(LL-log_sum_exp(LL+log(c(dx,tail(dx,n=1)))))
+        out[[iname]] <- cbind(x=ilist[[iname]],L=LL)
     }
     if (debug){
-        xLL <- out[['U48i']]
-        dx <- diff(xLL[,'x'])
-        y <- exp(xLL[,'LL']-log_sum_exp(xLL[,'LL']+log(c(dx,tail(dx,n=1)))))
-        plot(x,y,type='b')
+        nact <- length(out)
+        op <- par(mfrow=c(1,nact))
+        for (act in 1:nact){
+            plot(out[[act]],type='b')
+        }
+        par(op)
     }
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@36@"]]));##:ess-bp-end:##
     out
 }
 
