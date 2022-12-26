@@ -1,4 +1,4 @@
-initial2time <- function(x,anames,values,anchor=0,type=1,model=1,debug=FALSE){
+initial2time <- function(x,anames,values,anchor=0,type='joint',model=1,debug=FALSE){
     if (debug){
         browser()
     }
@@ -22,8 +22,20 @@ initial2time <- function(x,anames,values,anchor=0,type=1,model=1,debug=FALSE){
     out
 }
 
+time2initial <- function(tt,x=x,type='joint',model=1){
+    anchor <- c(2,tt)
+    init <- init.ludwig(x=x,model=model,anchor=anchor,type=type)
+    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+                        lower=init$lower,upper=init$upper,hessian=FALSE,
+                        x=x,anchor=anchor,type=type,model=model)
+    out <- list()
+    out$par <- fit$par
+    out$LL <- fit$value
+    out
+}
+
 recursivelimitsearch <- function(aname,ll,ul,LLmax,x=x,anchor=0,
-                                 type=1,model=1,buffer=10,maxlevel=5,side='lower'){
+                                 type=1,model=1,buffer=20,maxlevel=5,side='lower'){
     newlim <- (ll+ul)/2
     fit <- initial2time(x,anames=aname,values=newlim,
                         anchor=anchor,type=type,model=model)
@@ -99,7 +111,6 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
                             model=model,maxlevel=10,debug=FALSE)
     pnames <- names(fit$par)
     inames <- colnames(lims)
-    ni <- length(inames)
     np <- length(pnames)
     ilist <- iilist <- list()
     for (iname in inames){
@@ -110,10 +121,10 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
     igrid <- data.matrix(expand.grid(ilist))
     iigrid <- data.matrix(expand.grid(iilist))
     ng <- nrow(igrid)
-    LLgrid <- matrix(NA,ng,np+ni+1)
-    colnames(LLgrid) <- c(pnames,inames,'LL')
+    LLgrid <- matrix(NA,ng,np+1)
+    colnames(LLgrid) <- c(pnames,'LL')
     aname1 <- ifelse(inames[1]=='U48i','U48','ThU')
-    if (ni==1){
+    if (length(inames)==1){
         anames <- aname1
     } else {
         aname2 <- ifelse(inames[2]=='U48i','U48','ThU')
@@ -121,11 +132,11 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
     }
     for (i in 1:ng){
         message('Iteration ',i,'/',ng)
-        fit <- initial2time(x=x,anames=anames,values=igrid[i,inames],
-                            anchor=anchor,type=type,model=model,debug=FALSE)
-        LLgrid[i,pnames] <- fit$par[pnames]
+        tfit <- initial2time(x=x,anames=anames,values=igrid[i,inames],
+                             anchor=anchor,type=type,model=model,debug=FALSE)
+        LLgrid[i,pnames] <- tfit$par[pnames]
         LLgrid[i,inames] <- igrid[i,inames]
-        LLgrid[i,'LL'] <- -fit$LL
+        LLgrid[i,'LL'] <- -tfit$LL
     }
     out <- NULL
     for (iname in inames){
@@ -133,6 +144,20 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
         dx <- diff(ilist[[iname]])
         yy <- exp(LL-log_sum_exp(LL+log(c(dx,tail(dx,n=1)))))
         out[[iname]] <- cbind(x=ilist[[iname]],L=LL)
+    }
+    if ('t'%in%pnames){
+        mint <- exp(min(LLgrid[,'t']))
+        maxt <- exp(max(LLgrid[,'t']))
+        tt <- seq(from=mint,to=maxt,length.out=nsteps)
+        LL <- tt*0
+        for (i in seq_along(tt)){
+            message('Iteration ',i,'/',ng)
+            ifit <- time2initial(tt=tt[i],x=x,type=type,model=model)
+            LL[i] <- -ifit$LL
+        }
+        dt <- diff(tt)
+        L <- exp(LL-log_sum_exp(LL+log(c(dt,tail(dt,n=1)))))
+        out[['t']] <- cbind(x=tt,L=L)
     }
     if (debug){
         nact <- length(out)

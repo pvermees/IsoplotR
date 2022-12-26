@@ -283,11 +283,11 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
             par['t'] <- log(tt)
             if (iratio('Pb207Pb206')[2]>0) par['a0'] <- log(Pb76c)
-        } else if (anchor[1]==2 && length(anchor)>2){
+        } else if (anchor[1]==2 && length(anchor)>1){
             tt <- anchor[2]
             U8Pb6r <- 1/mclean(tt=tt,d=x$d)$Pb206U238
             abx <- inithelper(yd=yd,x0=U8Pb6r)
-            if (anchor[3]>0) par['t'] <- log(tt)
+            if (length(anchor)>2 && anchor[3]>0) par['t'] <- log(tt)
             par['a0'] <- log(abx['a'])
         } else {
             abx <- inithelper(yd)
@@ -502,11 +502,11 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     if (x$d$PaU$option==1 && !is.null(x$d$PaU$sx) && x$d$PaU$sx>0){
         par['PaUi'] <- x$d$PaU$x
     }
-    if (x$d$U48$option>0){
+    if ('U48i'%in%names(par)){
         lower['U48i'] <- 0
         upper['U48i'] <- 20
     }
-    if (x$d$ThU$option>0){
+    if ('ThUi'%in%names(par)){
         lower['ThUi'] <- 0
         upper['ThUi'] <- 20
     }    

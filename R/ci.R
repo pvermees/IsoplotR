@@ -185,6 +185,36 @@ peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
     }
     out
 }
+bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
+                     sigdig=2,oerr=3,units=' Ma',prefix='age ='){
+    if (oerr%in%c(1,4)){
+        lq <- -1
+        uq <- 1
+    } else if (oerr%in%c(2,5)){
+        lq <- -2
+        uq <- 2
+    } else if (oerr%in%c(3,6)){
+        lq <- qnorm(alpha())
+        uq <- qnorm(1-alpha())
+    }
+    cdf <- cumsum(XL[,'L'])/sum(XL[,'L'])
+    ll <- spline(x=cdf,y=XL[,'x'],xout=pnorm(lq))
+    ul <- spline(x=cdf,y=XL[,'x'],xout=pnorm(uq))
+    le <- (x-ll$y)
+    ue <- (ul$y-x)
+    if (oerr>3) {
+        le <- le/x
+        ue <- ue/x
+    }
+    rounded <- roundit(x,c(le,ue),sigdig=sigdig,oerr=oerr,text=TRUE)
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2],c=rounded[3],u=units,n=ntit)
+    if (oerr>3){
+        out <- substitute(p~a+b-c*u*'%'~n,lst)
+    } else {
+        out <- substitute(p~a+b-c*u~n,lst)
+    }
+    out
+}
 
 get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
 get.ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
