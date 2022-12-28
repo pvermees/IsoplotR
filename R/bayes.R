@@ -130,6 +130,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
         aname2 <- ifelse(inames[2]=='U48i','U48','ThU')
         anames <- c(aname1,aname2)
     }
+    message('Calculating posterior distribution of the initial activity ratios')
     for (i in 1:ng){
         message('Iteration ',i,'/',ng)
         tfit <- initial2time(x=x,anames=anames,values=igrid[i,inames],
@@ -142,9 +143,10 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
     for (iname in inames){
         LL <- marginal(LLgrid,iigrid,iilist,iname=iname)
         dx <- diff(ilist[[iname]])
-        yy <- exp(LL-log_sum_exp(LL+log(c(dx,tail(dx,n=1)))))
-        out[[iname]] <- cbind(x=ilist[[iname]],L=LL)
+        L <- exp(LL-log_sum_exp(LL+log(c(dx,tail(dx,n=1)))))
+        out[[iname]] <- cbind(x=ilist[[iname]],L=L)
     }
+    message('Calculating posterior distribution of the age')
     if ('t'%in%pnames){
         mint <- exp(min(LLgrid[,'t']))
         maxt <- exp(max(LLgrid[,'t']))

@@ -289,10 +289,25 @@ discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
         line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
     } else if (fit$format<4){
+        pnames <- ifelse(is.null(fit$posterior),NULL,names(fit$posterior))
+        if (is.null(pnames)){
+            ipar <- NULL
+        } else if (y0option==2 && 'U48i'%in%pnames){
+            ipar <- 'U48i'
+        } else if (y0option==3 && 'ThUi'%in%pnames){
+            ipar <-'ThUi'
+        } else {
+            ipar <- NULL
+        }
         fit <- getUPby0(fit,option=y0option)
-        line2 <- maintit(x=fit$y0['y'],sx=fit$y0['s[y]'],ntit='',
-                         sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=fit$y0label)
+        if (is.null(ipar)){
+            line2 <- maintit(x=fit$y0['y'],sx=fit$y0['s[y]'],ntit='',
+                             sigdig=sigdig,oerr=oerr,units='',df=fit$df,
+                             prefix=fit$y0label)
+        } else {
+            line2 <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],ntit='',
+                              sigdig=sigdig,oerr=oerr,units='',prefix=fit$y0label)
+        }
     } else if (fit$format<7){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,

@@ -198,20 +198,23 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
         uq <- qnorm(1-alpha())
     }
     cdf <- cumsum(XL[,'L'])/sum(XL[,'L'])
-    ll <- spline(x=cdf,y=XL[,'x'],xout=pnorm(lq))
-    ul <- spline(x=cdf,y=XL[,'x'],xout=pnorm(uq))
+    increasing <- which(diff(cdf)>0)
+    ll <- spline(x=cdf[increasing],y=XL[increasing,'x'],
+                 xout=pnorm(lq),method='hyman')
+    ul <- spline(x=cdf[increasing],y=XL[increasing,'x'],
+                 xout=pnorm(uq),method='hyman')
     le <- (x-ll$y)
     ue <- (ul$y-x)
     if (oerr>3) {
-        le <- le/x
-        ue <- ue/x
+        le <- 100*le/x
+        ue <- 100*ue/x
     }
     rounded <- roundit(x,c(le,ue),sigdig=sigdig,oerr=oerr,text=TRUE)
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],c=rounded[3],u=units,n=ntit)
     if (oerr>3){
-        out <- substitute(p~a+b-c*u*'%'~n,lst)
+        out <- substitute(p~a*u+b/-c*'%'~n,lst)
     } else {
-        out <- substitute(p~a+b-c*u~n,lst)
+        out <- substitute(p~a+b/-c*u~n,lst)
     }
     out
 }

@@ -130,7 +130,8 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
                         x=x,anchor=anchor,type=type,model=model,exterr=exterr)
     if (measured.disequilibrium(x$d)){
         fit$cov <- inverthess(fit$hessian)
-        fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,model=model)
+        fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
+                                  model=model,debug=TRUE)
     } else {
         dfit <- adddiseq(fit,d=x$d)
         H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
