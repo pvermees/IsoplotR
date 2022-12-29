@@ -1026,14 +1026,12 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
 exponentiate <- function(fit){
     out <- fit
     pnames <- names(fit$par)
-    logparnames <- which(c('t','a0','b0','w')%in%pnames)
-    linparnames <- which(c('U48i','ThUi','RaUi','PaUi')%in%pnames)
-    logpar <- fit$par[logparnames]
-    logcov <- fit$cov[logparnames,logparnames]
-    out$par[logparnames] <- exp(fit$par[logparnames])
-    np <- length(logparnames)
-    J <- diag(out$par[logparnames],np,np)
-    out$cov[logparnames,logparnames] <- J %*% logcov %*% t(J)
+    totransform <- c('t','a0','b0','w')
+    lpnames <- totransform[totransform%in%pnames]
+    out$par[lpnames] <- exp(fit$par[lpnames])
+    np <- length(lpnames)
+    J <- diag(out$par[lpnames],np,np)
+    out$cov[lpnames,lpnames] <- J %*% fit$cov[lpnames,lpnames] %*% t(J)
     dimnames(out$cov) <- dimnames(fit$cov)
     out
 }

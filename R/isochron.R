@@ -551,8 +551,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         l8 <- settings('lambda','U238')[1]
         l5 <- settings('lambda','U235')[1]
         md <- mediand(x$d)
-        if (d$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
-        if (d$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
+        if (md$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
+        if (md$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
         D <- mclean(tt,d=md,exterr=exterr)
         if (type==1){                           # 04-08c/06 vs. 38/06
             x0inv <- D$Pb206U238
