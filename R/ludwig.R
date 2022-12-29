@@ -1032,8 +1032,8 @@ exponentiate <- function(fit){
     logcov <- fit$cov[logparnames,logparnames]
     out$par[logparnames] <- exp(fit$par[logparnames])
     np <- length(logparnames)
-    out$cov[logparnames,logparnames] <-
-        diag(logpar,np,np) %*% logcov %*% diag(logpar,np,np)
+    J <- diag(out$par[logparnames],np,np)
+    out$cov[logparnames,logparnames] <- J %*% logcov %*% t(J)
     dimnames(out$cov) <- dimnames(fit$cov)
     out
 }
