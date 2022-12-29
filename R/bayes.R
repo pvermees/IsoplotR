@@ -22,11 +22,10 @@ initial2time <- function(x,anames,values,anchor=0,type='joint',model=1,debug=FAL
     out
 }
 
-time2initial <- function(tt,x=x,type='joint',model=1){
+time2initial <- function(tt,x=x,init,lower,upper,type='joint',model=1){
     anchor <- c(2,tt)
-    init <- init.ludwig(x=x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=init$lower,upper=init$upper,hessian=FALSE,
+    fit <- stats::optim(init,fn=LL.ludwig,method='L-BFGS-B',
+                        lower=lower,upper=upper,hessian=FALSE,
                         x=x,anchor=anchor,type=type,model=model)
     out <- list()
     out$par <- fit$par
@@ -106,7 +105,11 @@ getsearchlimits <- function(fit,x,anchor=0,type='joint',maxlevel=5,
     out
 }
 
-bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
+bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,debug=FALSE){
+    if (is.null(nsteps)){
+        if (x$d$U48$option==2 && x$d$ThU$option==2) nsteps <- 20
+        else nsteps <- 30
+    }
     lims <- getsearchlimits(fit=fit,x=x,anchor=anchor,type=type,
                             model=model,maxlevel=10,debug=FALSE)
     pnames <- names(fit$par)
@@ -151,14 +154,27 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=30,debug=FALSE){
         mint <- exp(min(LLgrid[,'t']))
         maxt <- exp(max(LLgrid[,'t']))
         tt <- seq(from=mint,to=maxt,length.out=nsteps)
-        LL <- tt*0
-        for (i in seq_along(tt)){
-            message('Iteration ',i,'/',ng)
-            ifit <- time2initial(tt=tt[i],x=x,type=type,model=model)
-            LL[i] <- -ifit$LL
+        init <- lower <- upper <- rep(NA,np-1)
+        names(init) <- names(lower) <- names(upper) <- pnames[-1]
+        for (pname in names(init)){
+            lower[pname] <- min(LLgrid[,pname])
+            upper[pname] <- max(LLgrid[,pname])
+        }
+        LLgridt <- LLgrid[1:nsteps,]
+        for (i in 1:nsteps){
+            message('Iteration ',i,'/',nsteps)
+            for (pname in names(init)){
+                init[pname] <- approx(x=exp(LLgrid[,'t']),
+                                      y=LLgrid[,pname],xout=tt[i])$y
+            }
+            ifit <- time2initial(tt=tt[i],x=x,init,lower,upper,
+                                 type=type,model=model)
+            LLgridt[i,'t'] <- log(tt[i])
+            LLgridt[i,names(ifit$par)] <- ifit$par
+            LLgridt[i,'LL'] <- -ifit$LL
         }
         dt <- diff(tt)
-        L <- exp(LL-log_sum_exp(LL+log(c(dt,tail(dt,n=1)))))
+        L <- exp(LLgridt[,'LL']-log_sum_exp(LLgridt[,'LL']+log(c(dt,tail(dt,n=1)))))
         out[['t']] <- cbind(x=tt,L=L)
     }
     if (debug){

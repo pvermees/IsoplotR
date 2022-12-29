@@ -162,6 +162,8 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
     l8 <- lambda('U238')[1]
     J <- matrix(0,1,2)
     usr <- graphics::par('usr')
+    if (d$U48$option==2) d$U48 <- list(x=unname(fit$par['U48i']),option=1)
+    if (d$ThU$option==2) d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
     if (wetherill){
         if (measured.disequilibrium(d)){
             U85 <- iratio('U238U235')[1]

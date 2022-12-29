@@ -209,7 +209,7 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
         le <- 100*le/x
         ue <- 100*ue/x
     }
-    rounded <- roundit(x,c(le,ue),sigdig=sigdig,oerr=oerr,text=TRUE)
+    rounded <- roundit(x,c(ue,le),sigdig=sigdig,oerr=oerr,text=TRUE)
     lst <- list(p=prefix,a=rounded[1],b=rounded[2],c=rounded[3],u=units,n=ntit)
     if (oerr>3){
         out <- substitute(p~a*u+b/-c*'%'~n,lst)
