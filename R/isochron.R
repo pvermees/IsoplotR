@@ -551,6 +551,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         l8 <- settings('lambda','U238')[1]
         l5 <- settings('lambda','U235')[1]
         md <- mediand(x$d)
+        if (d$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
+        if (d$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
         D <- mclean(tt,d=md,exterr=exterr)
         if (type==1){                           # 04-08c/06 vs. 38/06
             x0inv <- D$Pb206U238
@@ -636,8 +638,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb'),
-                            xlab=x.lab,ylab=y.lab)
+            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
+                                          y0option=y0option),xlab=x.lab,ylab=y.lab)
         }
     }
     invisible(out)
@@ -1372,17 +1374,40 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 }
 
-isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,
+isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                           units=' Ma',displabel='dispersion =',
-                          dispunits=units,ski=NULL,...){
+                          dispunits=units,ski=NULL,y0option=1,...){
     content <- list()
-    if (is.na(type)){
+    if (is.null(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,
                                 units=units,prefix='intercept =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$b[1],sx=fit$b[-1],ntit='',
                                 units=units,prefix='slope =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
+    } else if (type=='U-Pb'){
+        if (is.null(fit$posterior) || 't'%ni%names(fit$posterior)){
+            content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                                    units=units,sigdig=sigdig,
+                                    oerr=oerr,df=fit$df)
+        } else {
+            content[[1]] <- bayestit(x=fit$par['t'],XL=fit$posterior$t,
+                                     n=fit$n,sigdig=sigdig,oerr=oerr)
+        }
+        if(is.null(fit$posterior)) pnames <- NULL
+        else pnames <- names(fit$posterior)
+        if (is.null(pnames)) ipar <- NULL
+        else if (y0option==2 && 'U48i'%in%pnames) ipar <- 'U48i'
+        else if (y0option==3 && 'ThUi'%in%pnames) ipar <-'ThUi'
+        else ipar <- NULL
+        if (is.null(ipar)){
+            content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
+                                    units='',prefix=fit$y0label,
+                                    sigdig=sigdig,oerr=oerr,df=fit$df)
+        } else {
+            content[[2]] <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],ntit='',
+                                     sigdig=sigdig,oerr=oerr,units='',prefix=fit$y0label)
+        }
     } else {
         content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
                                 units=units,sigdig=sigdig,

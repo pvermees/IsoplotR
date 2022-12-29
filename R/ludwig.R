@@ -131,12 +131,12 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',...){
     if (measured.disequilibrium(x$d)){
         fit$cov <- inverthess(fit$hessian)
         fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
-                                  model=model,debug=TRUE)
+                                  model=model,debug=FALSE)
     } else {
         dfit <- adddiseq(fit,d=x$d)
         H <- stats::optimHess(dfit$par,fn=LL.ludwig,x=x,anchor=anchor,
                               type=type,model=model,exterr=exterr)
-        fit$cov <- solve(H)
+        fit$cov <- inverthess(H)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,x,anchor=anchor,type=type)
@@ -1004,10 +1004,13 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     } else {
         out$df <- 2*ns-np
     }
+    X <- x
+    if (x$d$U48$option==2) X$d$U48 <- list(x=unname(fit$par['U48i']),option=1)
+    if (x$d$ThU$option==2) X$d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
     if (type%in%c('joint',0)){
-        SS <- data2ludwig(x,ta0b0w=fit$par)$SS
+        SS <- data2ludwig(X,ta0b0w=fit$par)$SS
     } else {
-        SS <- LL.ludwig.2d(ta0b0w=fit$par,x=x,type=type,exterr=exterr,LL=FALSE)
+        SS <- LL.ludwig.2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr,LL=FALSE)
     }
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)

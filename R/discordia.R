@@ -280,7 +280,7 @@ tw3d2d <- function(fit){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
-    if (is.null(fit$posterior) && 't'%in%colnames(fit$posterior)){
+    if (is.null(fit$posterior) || 't'%ni%colnames(fit$posterior)){
         line1 <- maintit(x=fit$par['t'],sx=fit$err[,1],n=fit$n,df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
     } else {
@@ -291,16 +291,12 @@ discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
         line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
     } else if (fit$format<4){
-        pnames <- ifelse(is.null(fit$posterior),NULL,names(fit$posterior))
-        if (is.null(pnames)){
-            ipar <- NULL
-        } else if (y0option==2 && 'U48i'%in%pnames){
-            ipar <- 'U48i'
-        } else if (y0option==3 && 'ThUi'%in%pnames){
-            ipar <-'ThUi'
-        } else {
-            ipar <- NULL
-        }
+        if (is.null(fit$posterior)) pnames <- NULL
+        else pnames <- names(fit$posterior)
+        if (is.null(pnames)) ipar <- NULL
+        else if (y0option==2 && 'U48i'%in%pnames) ipar <- 'U48i'
+        else if (y0option==3 && 'ThUi'%in%pnames) ipar <-'ThUi'
+        else ipar <- NULL
         fit <- getUPby0(fit,option=y0option)
         if (is.null(ipar)){
             line2 <- maintit(x=fit$y0['y'],sx=fit$y0['s[y]'],ntit='',
