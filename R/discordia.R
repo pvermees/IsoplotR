@@ -126,10 +126,15 @@ twfit2wfit <- function(fit,x){
     }
     J[3,4] <- 1
     out <- list()
-    out$par <- c(tl,tu,fit$par['w'])
-    out$cov <- J %*% E %*% t(J)
-    c('t[l]','t[u]','w') -> names(out$par) ->
-        rownames(out$cov) -> colnames(out$cov)
+    out$par <- c(tl,tu,fit$par[-1])
+    tokeep <- names(fit$par)[-1]
+    pnames <- c('t[l]','t[u]',tokeep)
+    np <- length(pnames)
+    out$cov <- matrix(0,np,np)
+    rownames(out$cov) <- colnames(out$cov) <- names(out$par) <- pnames
+    out$cov[tokeep,tokeep] <- fit$cov[tokeep,tokeep]
+    toreplace <- c('t[l]','t[u]','w')
+    out$cov[toreplace,toreplace] <- J %*% E %*% t(J)
     out
 }
 
@@ -280,7 +285,7 @@ tw3d2d <- function(fit){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
-    if (is.null(fit$posterior) || 't'%ni%colnames(fit$posterior)){
+    if (is.null(fit$posterior) || 't'%ni%names(fit$posterior)){
         line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
     } else {
