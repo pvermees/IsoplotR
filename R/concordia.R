@@ -350,7 +350,7 @@ plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
     m <- min(lims$t[1],ticks[1])
     M <- max(lims$t[2],utils::tail(ticks,1))
     nn <- 30 # number of segments into which the concordia line is divided
-    tt <- cseq(m,M,type=type,n=nn)
+    tt <- cseq(0.9*m,M,type=type,n=nn)
     conc <- matrix(0,nn,2)
     colnames(conc) <- c('x','y')
     md <- mediand(x$d)
