@@ -345,7 +345,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
 plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
                                 oerr=3,exterr=TRUE,ticks=5){
     if (length(ticks)<2)
-        ticks <- prettier(lims$t,type=type,n=ticks)
+        ticks <- prettier(lims$t,type=type,n=ticks,
+                          binary=measured.disequilibrium(x$d))
     m <- min(lims$t[1],ticks[1])
     M <- max(lims$t[2],utils::tail(ticks,1))
     nn <- 30 # number of segments into which the concordia line is divided
@@ -412,19 +413,27 @@ cseq <- function(m,M,type=1,n=50){
     out[out<=0] <- min(out[out>0])/10
     out
 }
-prettier <- function(x,type=1,n=5){
-    if (type%in%c(1,3)){
+prettier <- function(x,type=1,n=5,binary=FALSE){
+    m <- min(x)
+    M <- max(x)
+    if (binary){
+        out <- rep(m,n)
+        for (i in 2:n){
+            out[i] <- m + (M-m)/exp(n-i)
+        }
+        smallestdif <- min(diff(out)/out[-1])
+        digits <- ceiling(abs(log10(smallestdif)))+1
+        out <- signif(out,digits=digits)
+    } else if (type%in%c(1,3)){
         out <- pretty(x,n=n)
     } else {
-        m <- min(x)
-        M <- max(x)
-        if (M/m<20){ # linear spacing if TW spans less than 1 order of magnitude
-            out <- pretty(x,n=n)
-            if (out[1]<=0) out[1] <- out[2]/10
-        } else { # log spacing if TW spans more than 1 order of magnitude
+        if (M/m>20){ # log spacing if TW spans more than 1 order of magnitude
             mexp <- log10(floor(10^(log10(m)%%1))) + floor(log10(m))
             Mexp <- log10(ceiling(10^(log10(M)%%1))) + floor(log10(M))
             out <- c(c(1,2,5) %o% 10^(mexp:Mexp))
+        } else { # linear spacing if TW spans less than 1 order of magnitude
+            out <- pretty(x,n=n)
+            if (out[1]<=0) out[1] <- out[2]/10
         }
     }
     out
