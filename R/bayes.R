@@ -86,17 +86,17 @@ searchlimithelper <- function(aname,fit,x=x,anchor=0,type=1,
     c(ll=ll,ul=ul)
 }
 
-getsearchlimits <- function(fit,x,anchor=0,type='joint',maxlevel=5,
-                            model=1,debug=FALSE){
+getsearchlimits <- function(fit,x,anchor=0,type='joint',
+                            maxlevel=5,model=1,debug=FALSE){
     out <- NULL
-    if (x$d$U48$option==2){
+    if (x$d$U48$option==2 && type%in%c('joint',0,1,3)){
         message('Obtaining U48i search limits')
         lims <- searchlimithelper(aname='U48',fit=fit,x=x,
                                   anchor=anchor,type=type,model=model,
                                   maxlevel=maxlevel,debug=debug)
         out <- cbind(out,U48i=lims)
     }
-    if (x$d$ThU$option==2){
+    if (x$d$ThU$option==2 && type%in%c('joint',0,2,4)){
         message('Obtaining ThUi search limits')
         lims <- searchlimithelper(aname='ThU',fit=fit,x=x,anchor=anchor,
                                   type=type,model=model,maxlevel=maxlevel)
@@ -118,7 +118,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,debug=FALSE
     ilist <- iilist <- list()
     for (iname in inames){
         ilist[[iname]] <- seq(from=lims['ll',iname],
-                               to=lims['ul',iname],length.out=nsteps)
+                              to=lims['ul',iname],length.out=nsteps)
         iilist[[iname]] <- 1:nsteps
     }
     igrid <- data.matrix(expand.grid(ilist))
@@ -159,13 +159,18 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,debug=FALSE
         for (pname in names(init)){
             lower[pname] <- min(LLgrid[,pname])
             upper[pname] <- max(LLgrid[,pname])
+            if (upper[pname]==lower[pname] &&
+                pname%in%c('U48i','ThUi','RaUi','PaUi')){
+                lower[pname] <- 0
+                upper[pname] <- 20
+            }
         }
         LLgridt <- LLgrid[1:nsteps,]
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
             for (pname in names(init)){
                 init[pname] <- approx(x=exp(LLgrid[,'t']),
-                                      y=LLgrid[,pname],xout=tt[i])$y
+                                      y=LLgrid[,pname],xout=tt[i],rule=2)$y
             }
             ifit <- time2initial(tt=tt[i],x=x,init,lower,upper,
                                  type=type,model=model)
@@ -181,7 +186,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,debug=FALSE
         nact <- length(out)
         op <- par(mfrow=c(1,nact))
         for (act in 1:nact){
-            plot(out[[act]],type='b')
+            plot(out[[act]],type='b',xlab=names(out)[act])
         }
         par(op)
     }
