@@ -838,7 +838,8 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             J[1,1] <- 1/(l5*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         } else { # apply a disequilibrium correction
-            t.75 <- stats::optim(t.init,diseq.75.misfit,method='BFGS',x=x,d=d)$par
+            t.75 <- stats::optimise(diseq.75.misfit,x=x,d=d,
+                                    interval=t.init*c(.5,2))$minimum
             D <- mclean(tt=t.75,d=d,exterr=exterr)    
             J[1,1] <- 1/D$dPb207U235dt                 # dt/dx
             J[1,2] <- -D$dPb207U235dl35/D$dPb207U235dt # dt/dl35
