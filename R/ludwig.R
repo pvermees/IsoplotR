@@ -124,14 +124,16 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=TRUE,...){
-    init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2)
+    alim <- c(0,20,1e-5)
+    init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2,alim=alim)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=TRUE,
-                        x=x,anchor=anchor,type=type,model=model,exterr=exterr)
+                        x=x,anchor=anchor,type=type,model=model,
+                        exterr=exterr,alim=alim)
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(x$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
-                                  model=model,debug=plot)
+                                  model=model,debug=plot,alim=alim)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,x,anchor=anchor,type=type)
@@ -245,7 +247,8 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
     out
 }
 
-init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
+init.ludwig <- function(x,model=1,anchor=0,type='joint',
+                        alim=c(0,20,1e-5),buffer=1,debug=FALSE){
     if (debug){
         browser()
     }
@@ -482,12 +485,12 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             par['RaUi'] <- x$d$RaU$x
         }
         if ('U48i'%in%names(par)){
-            lower['U48i'] <- 0
-            upper['U48i'] <- 20
+            lower['U48i'] <- alim[1]+alim[3]
+            upper['U48i'] <- alim[2]-alim[3]
         }
         if ('ThUi'%in%names(par)){
-            lower['ThUi'] <- 0
-            upper['ThUi'] <- 20
+            lower['ThUi'] <- alim[1]+alim[3]
+            upper['ThUi'] <- alim[2]-alim[3]
         }    
     }
     if (type%in%c('joint',0,2,4)){
@@ -498,8 +501,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     list(par=par,lower=lower,upper=upper)
 }
 
-LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
-                      anchor=0,type='joint',debug=FALSE){
+LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,
+                      type='joint',alim=c(0,20,1e-5),debug=FALSE){
     if (debug){
         browser()
     }
@@ -596,19 +599,21 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
         ta0b0w['w'] <- exp(par['w'])
     }
     if (model==2 && (type%in%c('joint',0) || x$format<4)){
-        LL <- LL + LL.ludwig.model2(ta0b0w,X,exterr=exterr)
+        LL <- LL + LL.ludwig.model2(ta0b0w,x=X,exterr=exterr)
     } else if (type%in%c('joint',0) || x$format<4){
         LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
     } else {
-        LL <- LL + LL.ludwig.2d(ta0b0w,X,model=model,exterr=exterr,type=type)
+        LL <- LL + LL.ludwig.2d(ta0b0w,x=X,model=model,exterr=exterr,type=type)
     }
     if (x$d$U48$option==1 && 'U48i'%in%pnames){
         LL <- LL - stats::dnorm(x=par['U48i'],mean=x$d$U48$x,
-                                sd=x$d$U48$sx,log=TRUE) 
+                                sd=x$d$U48$sx,log=TRUE)
+
     } else if (x$d$U48$option==2 && !is.null(x$d$U48$sx) && x$d$U48$sx>0){
         pred <- mclean(tt=tt,d=X$d)
         LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,
-                                sd=x$d$U48$sx,log=TRUE)
+                                sd=x$d$U48$sx,log=TRUE) -
+            prior(x=X$d$U48$x,alim=alim)
     }
     if (x$d$ThU$option==1 && 'ThUi'%in%pnames){
         LL <- LL - stats::dnorm(x=par['ThUi'],mean=x$d$ThU$x,
@@ -616,7 +621,8 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
     } else if (x$d$ThU$option==2 && !is.null(x$d$ThU$sx) && x$d$ThU$sx>0){
         pred <- mclean(tt=tt,d=X$d)
         LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,
-                                sd=x$d$ThU$sx,log=TRUE)
+                                sd=x$d$ThU$sx,log=TRUE) -
+            prior(x=X$d$ThU$x,alim=alim)
     }
     if ('RaUi'%in%pnames && !is.null(x$d$RaU$sx) && x$d$RaU$sx>0){
         LL <- LL - stats::dnorm(x=par['RaUi'],mean=x$d$RaU$x,

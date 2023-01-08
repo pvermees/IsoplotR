@@ -1,4 +1,5 @@
-initial2time <- function(x,anames,values,anchor=0,type='joint',model=1,debug=FALSE){
+initial2time <- function(x,anames,values,anchor=0,type='joint',
+                         model=1,alim=c(0,20,1e-5),debug=FALSE){
     if (debug){
         browser()
     }
@@ -8,8 +9,8 @@ initial2time <- function(x,anames,values,anchor=0,type='joint',model=1,debug=FAL
     }
     init <- init.ludwig(x=X,model=model,anchor=anchor,type=type,debug=debug)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                       lower=init$lower,upper=init$upper,hessian=FALSE,
-                       x=x,X=X,anchor=anchor,type=type,model=model)
+                        lower=init$lower,upper=init$upper,hessian=FALSE,
+                        x=x,X=X,anchor=anchor,type=type,model=model,alim=alim)
     lt <- ifelse('t'%in%names(fit$par),fit$par['t'],anchor[2])
     McL <- mclean(tt=exp(lt),d=X$d)
     out <- list()
@@ -22,11 +23,12 @@ initial2time <- function(x,anames,values,anchor=0,type='joint',model=1,debug=FAL
     out
 }
 
-time2initial <- function(tt,x=x,init,lower,upper,type='joint',model=1){
+time2initial <- function(tt,x=x,init,lower,upper,type='joint',
+                         model=1,alim=c(0,20,1e-5)){
     anchor <- c(2,tt)
     fit <- stats::optim(init,fn=LL.ludwig,method='L-BFGS-B',
                         lower=lower,upper=upper,hessian=FALSE,
-                        x=x,anchor=anchor,type=type,model=model)
+                        x=x,anchor=anchor,type=type,model=model,alim=alim)
     out <- list()
     out$par <- fit$par
     out$LL <- fit$value
@@ -34,11 +36,12 @@ time2initial <- function(tt,x=x,init,lower,upper,type='joint',model=1){
 }
 
 recursivelimitsearch <- function(aname,ll,ul,LLmax,x=x,anchor=0,
-                                 type=1,model=1,buffer=20,maxlevel=5,side='lower'){
+                                 type=1,model=1,LLbuffer=15,
+                                 maxlevel=5,side='lower'){
     newlim <- (ll+ul)/2
     fit <- initial2time(x,anames=aname,values=newlim,
                         anchor=anchor,type=type,model=model)
-    if (fit$LL<(LLmax+buffer)){ # not far enough
+    if (fit$LL<(LLmax+LLbuffer)){ # not far enough
         if (maxlevel<1){
             if (side=='lower'){
                 return(ll)
@@ -68,19 +71,19 @@ recursivelimitsearch <- function(aname,ll,ul,LLmax,x=x,anchor=0,
                          maxlevel=maxlevel-1,side=side)
 }
 
-searchlimithelper <- function(aname,fit,x=x,anchor=0,type=1,
-                              model=1,maxlevel=5,debug=FALSE){
+searchlimithelper <- function(aname,fit,x=x,anchor=0,type=1,model=1,
+                              maxlevel=5,alim=c(0,20,1e-5),debug=FALSE){
     if (debug) browser()
     McL <- mclean(tt=exp(fit$par['t']),d=x$d)
     par <- fit$par
     iname <- paste0(aname,'i')
     par[aname] <- unname(McL[[iname]])
-    LLmax <- LL.ludwig(par,x=x,anchor=anchor,type=type,model=model)
+    LLmax <- LL.ludwig(par,x=x,anchor=anchor,type=type,model=model,alim=alim)
     midpoint <- ifelse(McL$truncated,1,unname(McL[[iname]]))
-    ll <- recursivelimitsearch(aname=aname,ll=0,ul=midpoint,
+    ll <- recursivelimitsearch(aname=aname,ll=alim[1]+alim[3],ul=midpoint,
                                LLmax=LLmax,x=x,anchor=anchor,type=type,
                                model=model,maxlevel=maxlevel,side='lower')
-    ul <- recursivelimitsearch(aname=aname,ll=midpoint,ul=20,
+    ul <- recursivelimitsearch(aname=aname,ll=midpoint,ul=alim[2]-alim[3],
                                LLmax=LLmax,x=x,anchor=anchor,type=type,
                                model=model,maxlevel=maxlevel,side='upper')
     c(ll=ll,ul=ul)
@@ -105,7 +108,8 @@ getsearchlimits <- function(fit,x,anchor=0,type='joint',
     out
 }
 
-bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,debug=FALSE){
+bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
+                     alim=c(0,20,1e-5),nsteps=NULL,debug=FALSE){
     if (is.null(nsteps)){
         if (x$d$U48$option==2 && x$d$ThU$option==2) nsteps <- 20
         else nsteps <- 30
@@ -161,8 +165,8 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,debug=FALSE
             upper[pname] <- max(LLgrid[,pname])
             if (upper[pname]==lower[pname] &&
                 pname%in%c('U48i','ThUi','RaUi','PaUi')){
-                lower[pname] <- 0
-                upper[pname] <- 20
+                lower[pname] <- alim[1]+alim[3]
+                upper[pname] <- alim[2]-alim[3]
             }
         }
         LLgridt <- LLgrid[1:nsteps,]
@@ -201,4 +205,18 @@ marginal <- function(LLgrid,iigrid,iilist,iname='U48i'){
         LL[i] <- log_sum_exp(LLgrid[j,'LL'])
     }
     LL
+}
+
+prior <- function(x,alim=c(0,20),mean=logit(1,m=alim[1],M=alim[2]),sd=3,log=TRUE){
+    lx <- logit(x,m=alim[1],M=alim[2])
+    dnorm(lx,mean=mean,sd=sd,log=log)
+}
+
+logit <- function(x,m=0,M=1,inverse=FALSE){
+    if (inverse){
+        out <- m+(M-m)*exp(x)/(1+exp(x))
+    } else {
+        out <- log(x-m)/log(M-x)
+    }
+    out
 }
