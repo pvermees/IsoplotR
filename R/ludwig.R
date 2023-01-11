@@ -608,7 +608,6 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,
     if (x$d$U48$option==1 && 'U48i'%in%pnames){
         LL <- LL - stats::dnorm(x=par['U48i'],mean=x$d$U48$x,
                                 sd=x$d$U48$sx,log=TRUE)
-
     } else if (x$d$U48$option==2 && !is.null(x$d$U48$sx) && x$d$U48$sx>0){
         pred <- mclean(tt=tt,d=X$d)
         LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,

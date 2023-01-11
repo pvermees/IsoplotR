@@ -1,11 +1,11 @@
-initial2time <- function(x,anames,values,anchor=0,type='joint',
+initial2time <- function(x,anames,avalues,anchor=0,type='joint',
                          model=1,alim=c(0,20,1e-5),debug=FALSE){
     if (debug){
         browser()
     }
     X <- x
     for (i in seq_along(anames)){
-        X$d[[anames[i]]] <- list(x=values[i],sx=0,option=1)
+        X$d[[anames[i]]] <- list(x=avalues[i],sx=0,option=1)
     }
     init <- init.ludwig(x=X,model=model,anchor=anchor,type=type,debug=debug)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
@@ -23,11 +23,11 @@ initial2time <- function(x,anames,values,anchor=0,type='joint',
     out
 }
 
-time2initial <- function(tt,x=x,init,lower,upper,type='joint',
-                         model=1,alim=c(0,20,1e-5)){
+time2initial <- function(tt,x=x,type='joint',model=1,alim=c(0,20,1e-5),debug=FALSE){
     anchor <- c(2,tt)
-    fit <- stats::optim(init,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=lower,upper=upper,hessian=FALSE,
+    init <- init.ludwig(x=x,model=model,anchor=anchor,type=type,debug=debug)
+    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+                        lower=init$lower,upper=init$upper,hessian=FALSE,
                         x=x,anchor=anchor,type=type,model=model,alim=alim)
     out <- list()
     out$par <- fit$par
@@ -39,7 +39,7 @@ recursivelimitsearch <- function(aname,ll,ul,LLmax,x=x,anchor=0,
                                  type=1,model=1,LLbuffer=15,
                                  maxlevel=5,side='lower'){
     newlim <- (ll+ul)/2
-    fit <- initial2time(x,anames=aname,values=newlim,
+    fit <- initial2time(x,anames=aname,avalues=newlim,
                         anchor=anchor,type=type,model=model)
     if (fit$LL<(LLmax+LLbuffer)){ # not far enough
         if (maxlevel<1){
@@ -140,7 +140,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     message('Calculating posterior distribution of the initial activity ratios')
     for (i in 1:ng){
         message('Iteration ',i,'/',ng)
-        tfit <- initial2time(x=x,anames=anames,values=igrid[i,inames],
+        tfit <- initial2time(x=x,anames=anames,avalues=igrid[i,inames],
                              anchor=anchor,type=type,model=model,debug=FALSE)
         LLgrid[i,pnames] <- tfit$par[pnames]
         LLgrid[i,inames] <- igrid[i,inames]
@@ -176,8 +176,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
                 init[pname] <- approx(x=exp(LLgrid[,'t']),
                                       y=LLgrid[,pname],xout=tt[i],rule=2)$y
             }
-            ifit <- time2initial(tt=tt[i],x=x,init,lower,upper,
-                                 type=type,model=model)
+            ifit <- time2initial(tt=tt[i],x=x,type=type,model=model)
             LLgridt[i,'t'] <- log(tt[i])
             LLgridt[i,names(ifit$par)] <- ifit$par
             LLgridt[i,'LL'] <- -ifit$LL
