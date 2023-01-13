@@ -133,7 +133,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=TRUE,...){
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(x$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
-                                  model=model,debug=plot,alim=alim)
+                                  model=model,alim=alim)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,x,anchor=anchor,type=type)
@@ -491,7 +491,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',
         if ('ThUi'%in%names(par)){
             lower['ThUi'] <- alim[1]+alim[3]
             upper['ThUi'] <- alim[2]-alim[3]
-        }    
+        }
     }
     if (type%in%c('joint',0,2,4)){
         if (x$d$PaU$option==1 && !is.null(x$d$PaU$sx) && x$d$PaU$sx>0){
