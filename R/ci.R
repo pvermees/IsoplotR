@@ -198,7 +198,7 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
         uq <- qnorm(1-alpha())
     }
     cdf <- cumsum(XL[,'L'])/sum(XL[,'L'])
-    increasing <- which(diff(cdf)>0)
+    increasing <- which(diff(cdf)>1e-20)
     ll <- spline(x=cdf[increasing],y=XL[increasing,'x'],
                  xout=pnorm(lq),method='hyman')
     ul <- spline(x=cdf[increasing],y=XL[increasing,'x'],
