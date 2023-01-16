@@ -150,7 +150,7 @@ getsearchlimits_t <- function(init,x,type='joint',maxlevel=5,
 }
 
 bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
-                     alim=c(0,20,1e-5),nsteps=NULL,debug=FALSE){
+                     alim=c(0,20,1e-5),nsteps=NULL,plot=FALSE){
     if (is.null(nsteps)){
         if (x$d$U48$option==2 && x$d$ThU$option==2) nsteps <- 20
         else nsteps <- 30
@@ -227,11 +227,11 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         L <- exp(LLgridt[,'LL']-log_sum_exp(LLgridt[,'LL']+log(c(dt,tail(dt,n=1)))))
         out[['t']] <- cbind(x=tt,L=L)
     }
-    if (debug){
-        nact <- length(out)
-        op <- par(mfrow=c(1,nact))
-        for (act in 1:nact){
-            plot(out[[act]],type='b',xlab=names(out)[act])
+    if (plot){
+        nbpar <- length(out)
+        op <- par(mfrow=c(1,nbpar))
+        for (bpar in 1:nbpar){
+            plot(out[[bpar]],type='b',xlab=names(out)[bpar])
         }
         par(op)
     }

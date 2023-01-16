@@ -341,32 +341,30 @@ mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,M=20,debug=FALSE){
             out$dPb207U235dl35 <- rep(tt*exp(l35*tt),nc)
         }
     } else {
-        if (d$ThU$option==2){
-            dm <- dM <- d
-            dm$U48$option <- dM$U48$option <- 0 # U48 is irrelevant here
-            dm$ThU <- list(x=0,sx=0,option=1)
-            dM$ThU <- list(x=M,sx=0,option=1)
-            McLm <- mclean(tt=tt,d=dm)
-            McLM <- mclean(tt=tt,d=dM)
-            if (McLm$ThU>d$ThU$x) {
-                d$ThU <- dm$ThU
+        nt <- meas.diseq.nt(d=d,nc=nc)[c('U238','U234','Th230','U235'),,drop=FALSE]
+        if (d$U48$option==2){
+            t234cutoff <- meas.diseq.maxt(d=d,nuclide='U234')
+            n0 <- reverse(tt=min(tt,t234cutoff),mexp=mexp.8405(),nt=nt)
+            U48i <- (n0['U234',]*l34)/(n0['U238',]*l38)
+            if (any(U48i<0)){
+                d$U48 <- list(x=0,sx=0,option=1)
                 out$truncated <- TRUE
-            } else if (McLM$ThU<d$ThU$x) {
-                d$ThU <- dM$ThU
+            }
+            if (any(U48i>M)){
+                d$U48 <- list(x=M,sx=0,option=1)
                 out$truncated <- TRUE
             }
         }
-        if (d$U48$option==2){
-            dm <- dM <- d
-            dm$U48 <- list(x=0,sx=0,option=1)
-            dM$U48 <- list(x=M,sx=0,option=1)
-            McLm <- mclean(tt=tt,d=dm)
-            McLM <- mclean(tt=tt,d=dM)
-            if (McLM$U48<d$U48$x) {
-                d$U48 <- dM$U48
+        if (d$ThU$option==2){
+            t230cutoff <- meas.diseq.maxt(d=d,nuclide='Th230')
+            n0 <- reverse(tt=min(tt,t230cutoff),mexp=mexp.8405(),nt=nt)
+            ThUi <- (n0['Th230',]*l30)/(n0['U238',]*l38)
+            if (any(ThUi<0)){
+                d$ThU <- list(x=0,sx=0,option=1)
                 out$truncated <- TRUE
-            } else if (McLm$U48>d$U48$x){
-                d$U48 <- dm$U48
+            }
+            if (any(ThUi>M)){
+                d$ThU <- list(x=M,sx=0,option=1)
                 out$truncated <- TRUE
             }
         }
@@ -510,11 +508,11 @@ get.5678.misfit <- function(obs,pred){
     abs(log(obs+1) - log(pred+1)) # +1 for robustness to negative values
 }
 
-meas.diseq.maxt <- function(d){
-    if (d$ThU$option==2){
-        out <- 2
-    } else if (d$U48$option==2){
-        out <- 5
+meas.diseq.maxt <- function(d,nuclide='auto'){
+    if ((d$ThU$option==2 && nuclide!='U234') || nuclide=='Th230'){
+        out <- 20*log(2)/d$L['Th230']
+    } else if (d$U48$option==2 || nuclide=='U234'){
+        out <- 20*log(2)/d$L['U234']
     } else {
         out <- 4500
     }
@@ -536,33 +534,16 @@ measured2initial <- function(x,fit){
     out
 }
 
-diseqinvert <- function(tt,x=x,type=type){
-    X <- x
-    LL <- 0
-    if (type%in%c('joint',0,1,3)){
-        if (x$d$U48$option==2){
-            pred <- mclean(tt=tt,d=x$d)
-            LL <- LL - stats::dnorm(x=pred$U48,mean=x$d$U48$x,
-                                    sd=x$d$U48$sx,log=TRUE)
-        } else if (x$d$U48$option==1 && x$d$U48$sx>0){
-            LL <- LL - stats::dnorm(x=x$d$U48$x,mean=x$d$U48$x,
-                                    sd=x$d$U48$sx,log=TRUE) 
-        }
-        if (x$d$ThU$option==2){
-            pred <- mclean(tt=tt,d=x$d)
-            LL <- LL - stats::dnorm(x=pred$ThU,mean=x$d$ThU$x,
-                                    sd=x$d$ThU$sx,log=TRUE)
-        } else if (x$d$ThU$option==1 && x$d$ThU$sx>0){
-            LL <- LL - stats::dnorm(x=x$d$ThU$x,mean=x$d$ThU$x,
-                                    sd=x$d$ThU$sx,log=TRUE)
-        }
-        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
-            LL <- LL - stats::dnorm(x=x$d$RaU$x,mean=x$d$RaU$x,
-                                    sd=x$d$RaU$sx,log=TRUE)
-        }
+meas.diseq.nt <- function(d,nc=1){
+    nt <- 0*d$L
+    nt[d$L>0] <- 1/d$L[d$L>0]
+    if (d$U48$option==2){
+        nt['U234'] <- d$U48$x*nt['U238']*d$L['U238']/d$L['U234']
     }
-    if (type%in%c('joint',0,2,4) && x$d$PaU$option==1 && x$d$PaU$sx>0){
-        LL <- LL - stats::dnorm(x=x$d$PaU$x,mean=x$d$PaU$x,
-                                sd=x$d$PaU$sx,log=TRUE)
+    if (d$ThU$option==2){
+        nt['Th230'] <- d$ThU$x*nt['U238']*d$L['U238']/d$L['Th230']
     }
+    out <- (nt %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
+    rownames(out) <- names(d$L)
+    out
 }

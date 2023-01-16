@@ -125,7 +125,8 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=TRUE,...){
     alim <- c(0,20,1e-5)
-    init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2,alim=alim)
+    init <- init.ludwig(x,model=model,anchor=anchor,
+                        type=type,buffer=2,alim=alim,debug=FALSE)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=TRUE,
                         x=x,anchor=anchor,type=type,model=model,
@@ -133,7 +134,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=TRUE,...){
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(x$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
-                                  model=model,alim=alim)
+                                  model=model,alim=alim,plot=plot)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,x,anchor=anchor,type=type)
@@ -474,12 +475,12 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',
         if (x$d$U48$option==1 && !is.null(x$d$U48$sx) && x$d$U48$sx>0){
             par['U48i'] <- x$d$U48$x
         } else if (x$d$U48$option==2 && !is.null(x$d$U48$sx) && x$d$U48$sx>0){
-            par['U48i'] <- McL$U48i
+            par['U48i'] <- max(0,McL$U48i)
         }
         if (x$d$ThU$option==1 && !is.null(x$d$ThU$sx) && x$d$ThU$sx>0){
             par['ThUi'] <- x$d$ThU$x
         } else if (x$d$ThU$option==2 && !is.null(x$d$ThU$sx) && x$d$ThU$sx>0){
-            par['ThUi'] <- McL$ThUi
+            par['ThUi'] <- max(0,McL$ThUi)
         }
         if (x$d$RaU$option==1 && !is.null(x$d$RaU$sx) && x$d$RaU$sx>0){
             par['RaUi'] <- x$d$RaU$x
