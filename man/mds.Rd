@@ -19,6 +19,7 @@ mds(x, ...)
   bg = "white",
   xlab = NA,
   ylab = NA,
+  asp = 1,
   ...
 )
 
@@ -35,6 +36,7 @@ mds(x, ...)
   xlab = NA,
   ylab = NA,
   hide = NULL,
+  asp = 1,
   ...
 )
 }

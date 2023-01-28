@@ -194,7 +194,6 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         L <- exp(LL-log_sum_exp(LL+log(c(dx,tail(dx,n=1)))))
         out[[iname]] <- cbind(x=ilist[[iname]],L=L)
     }
-    message('Calculating posterior distribution of the age')
     if ('t'%in%pnames){
         init <- exp(c(fit$par['t'],range(LLgrid[,'t'])))
         lims <- getsearchlimits_t(init=init,x=x,type=type,
@@ -212,6 +211,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
             }
         }
         LLgridt <- LLgrid[1:nsteps,]
+        message('Calculating posterior distribution of the age')
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
             for (pname in names(init)){

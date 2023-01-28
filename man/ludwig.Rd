@@ -5,9 +5,25 @@
 \title{Linear regression of U-Pb data with correlated errors, taking
 into account decay constant uncertainties.}
 \usage{
-ludwig(x, model = 1, anchor = 0, exterr = FALSE, type = "joint", ...)
+ludwig(
+  x,
+  model = 1,
+  anchor = 0,
+  exterr = FALSE,
+  type = "joint",
+  plot = TRUE,
+  ...
+)
 
-ludwig(x, model = 1, anchor = 0, exterr = FALSE, type = "joint", ...)
+ludwig(
+  x,
+  model = 1,
+  anchor = 0,
+  exterr = FALSE,
+  type = "joint",
+  plot = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}

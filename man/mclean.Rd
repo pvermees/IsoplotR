@@ -4,7 +4,14 @@
 \alias{mclean}
 \title{Predict disequilibrium concordia compositions}
 \usage{
-mclean(tt = 0, d = diseq(), exterr = FALSE)
+mclean(
+  tt = 0,
+  d = diseq(),
+  cutoff = NULL,
+  exterr = FALSE,
+  M = 20,
+  debug = FALSE
+)
 }
 \arguments{
 \item{tt}{the age of the sample}
