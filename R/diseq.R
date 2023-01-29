@@ -113,19 +113,29 @@
 #' UPb <- read.data(fn,method='U-Pb',format=2,d=d)
 #' concordia(UPb,type=2,xlim=c(0,700),ylim=c(0.05,0.5))
 #' @export
-diseq <- function(U48=list(x=1,sx=0,option=0),
-                  ThU=list(x=1,sx=0,option=0),
-                  RaU=list(x=1,sx=0,option=0),
-                  PaU=list(x=1,sx=0,option=0)){
+diseq <- function(U48=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  ThU=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  RaU=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  PaU=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  buffer=1e-5){
+    patch <- function(aratio){
+        out <- aratio
+        if (is.null(aratio$x)) out$x <- 1
+        if (is.null(aratio$sx)) out$sx <- 0
+        if (is.null(aratio$option)) out$option <- 0
+        if (is.null(aratio$m)) out$m <- 0
+        if (is.null(aratio$M)) out$M <- 20
+        if (is.null(aratio$x0)) out$x0 <- 1
+        if (is.null(aratio$sd)) out$sd <- 10
+        out
+    }
     out <- list()
     class(out) <- 'diseq'
-    out$U48 <- U48
-    out$ThU <- ThU
-    out$RaU <- RaU
-    out$PaU <- PaU
-    for (i in seq_along(out)){
-        if (is.null(out[[i]]$sx)) out[[i]]$sx <- 0
-    }
+    out$U48 <- patch(U48)
+    out$ThU <- patch(ThU)
+    out$RaU <- patch(RaU)
+    out$PaU <- patch(PaU)
+    out$buffer <- buffer
     out$equilibrium <- check.equilibrium(d=out)
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000
@@ -246,7 +256,7 @@ forward <- function(tt,d=diseq(),derivative=0){
 
 check.equilibrium <- function(d=diseq()){
     checkratio <- function(r){
-        r$option == 0 || all(r$x==1) & (is.null(r$sx) | all(r$sx==0))
+        r$option == 0 || all(r$x==1) & all(r$sx==0)
     }
     U48 <- checkratio(d$U48)
     ThU <- checkratio(d$ThU)
@@ -312,7 +322,7 @@ measured.disequilibrium <- function(d=diseq()){
 #'            RaU=list(x=2,option=1),PaU=list(x=2,option=1))
 #' mclean(tt=2,d=d)
 #' @export
-mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,M=20){
+mclean <- function(tt=0,d=diseq(),exterr=FALSE){
     out <- list(truncated=FALSE)
     l38 <- d$L['U238']
     l34 <- d$L['U234']
@@ -347,8 +357,8 @@ mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,M=20){
                 d$U48 <- list(x=0,sx=0,option=1)
                 out$truncated <- TRUE
             }
-            if (any(U48i>M)){
-                d$U48 <- list(x=M,sx=0,option=1)
+            if (any(U48i>d$U48$M)){
+                d$U48 <- list(x=d$U48$M,sx=0,option=1)
                 out$truncated <- TRUE
             }
         }
@@ -360,8 +370,8 @@ mclean <- function(tt=0,d=diseq(),cutoff=NULL,exterr=FALSE,M=20){
                 d$ThU <- list(x=0,sx=0,option=1)
                 out$truncated <- TRUE
             }
-            if (any(ThUi>M)){
-                d$ThU <- list(x=M,sx=0,option=1)
+            if (any(ThUi>d$ThU$M)){
+                d$ThU <- list(x=d$ThU$M,sx=0,option=1)
                 out$truncated <- TRUE
             }
         }
@@ -543,4 +553,11 @@ meas.diseq.nt <- function(d,nc=1){
     out <- (nt %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
     rownames(out) <- names(d$L)
     out
+}
+
+pname2aname <- function(pname){
+    substr(pname, 1, nchar(pname)-1)
+}
+aname2pname <- function(aname){
+    paste0(aname,'i')
 }
