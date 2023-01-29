@@ -72,6 +72,9 @@ MDS coordinates, respectively.}
 
 \item{ylab}{a string with the label of the y axis}
 
+\item{asp}{aspect ratio of the MDS configuration. See
+\code{plot.window} for further details.}
+
 \item{method}{either \code{'KS'} (for the Kolmogorov-Smirnov
 distance) or \code{'W2'} (for the Wasserstein-2 distance).}
 

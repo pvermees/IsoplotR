@@ -79,6 +79,10 @@
 #' \eqn{{}^{207}}Pb/\eqn{{}^{208}}Pb vs.
 #' \eqn{{}^{232}}Th/\eqn{{}^{208}}Pb (only for U-Pb formats 7 and 8).
 #'
+#' @param plot logical. Only relevant for datasets with measured
+#'     disequilibrium. If \code{TRUE}, plots the posterior
+#'     distribution of the age and initial activity ratios.
+#'
 #' @param ... optional arguments
 #' 
 #' @return
@@ -126,7 +130,7 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=TRUE,...){
     alim <- c(0,20,1e-5)
     init <- init.ludwig(x,model=model,anchor=anchor,
-                        type=type,buffer=2,alim=alim,debug=FALSE)
+                        type=type,buffer=2,alim=alim)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=TRUE,
                         x=x,anchor=anchor,type=type,model=model,
@@ -282,8 +286,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',
         }
         if (debug){
             scatterplot(yd)
-            abline(a=abx['a'],b=abx['b'])
-            title(exp(par))
+            graphics::abline(a=abx['a'],b=abx['b'])
+            graphics::title(exp(par))
         }
     } else if (x$format<7){
         yda <- data2york(x,option=3)
@@ -342,10 +346,10 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',
         if (debug){
             op <- par(mfrow=c(1,2))
             scatterplot(yda)
-            abline(a=abxa['a'],b=abxa['b'])
-            title(exp(par))
+            graphics::abline(a=abxa['a'],b=abxa['b'])
+            graphics::title(exp(par))
             scatterplot(ydb)
-            abline(a=abxb['a'],b=abxb['b'])
+            graphics::abline(a=abxb['a'],b=abxb['b'])
             par(op)
         }
     } else { # formats 7 and 8
@@ -461,8 +465,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',
         }
         if (debug){
             scatterplot(yd)
-            abline(a=abx['a'],b=abx['b'])
-            title(exp(par))
+            graphics::abline(a=abx['a'],b=abx['b'])
+            graphics::title(exp(par))
         }
     }
     if (model==3) par['w'] <- log(w)
@@ -649,7 +653,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE,debug=FALSE){
     X <- zeros
     Y <- zeros
     K0 <- zeros
-    D <- mclean(tt=tt,d=x$d,exterr=exterr,debug=debug)
+    D <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format%in%c(1,2,3)){
         NP <- 2 # number of fit parameters (tt, a0)
         NR <- 2 # number of isotopic ratios (X, Y)

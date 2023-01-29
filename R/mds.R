@@ -68,6 +68,8 @@
 #' @param ylab a string with the label of the y axis
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
+#' @param asp aspect ratio of the MDS configuration. See
+#'     \code{plot.window} for further details.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{cad}}, \code{\link{kde}}
 #' @return Returns an object of class \code{MDS}, i.e. a list

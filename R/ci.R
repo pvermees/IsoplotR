@@ -194,15 +194,15 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
         lq <- -2
         uq <- 2
     } else if (oerr%in%c(3,6)){
-        lq <- qnorm(alpha())
-        uq <- qnorm(1-alpha())
+        lq <- stats::qnorm(alpha())
+        uq <- stats::qnorm(1-alpha())
     }
     cdf <- cumsum(XL[,'L'])/sum(XL[,'L'])
     increasing <- which(diff(cdf)>1e-20)
-    ll <- spline(x=cdf[increasing],y=XL[increasing,'x'],
-                 xout=pnorm(lq),method='hyman')
-    ul <- spline(x=cdf[increasing],y=XL[increasing,'x'],
-                 xout=pnorm(uq),method='hyman')
+    ll <- stats::spline(x=cdf[increasing],y=XL[increasing,'x'],
+                        xout=stats::pnorm(lq),method='hyman')
+    ul <- stats::spline(x=cdf[increasing],y=XL[increasing,'x'],
+                        xout=stats::pnorm(uq),method='hyman')
     le <- (x-ll$y)
     ue <- (ul$y-x)
     if (oerr>3) {

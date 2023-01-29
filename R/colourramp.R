@@ -60,7 +60,7 @@ colour_ramp <- function(
   )
   last_colour <- colour_list[[length(colour_list)]]
   colour_count <- length(colour_list)
-  rgb_matrix <- col2rgb(colour_list) / 255
+  rgb_matrix <- grDevices::col2rgb(colour_list) / 255
   lab_list <- lapply(1:colour_count, function(i) {
     rgb2ceilab(rgb_matrix[, i]) * collapse
   })

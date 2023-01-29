@@ -86,6 +86,10 @@ of \eqn{{}^{208}}Pb/\eqn{{}^{207}}Pb vs.
 \eqn{{}^{207}}Pb/\eqn{{}^{208}}Pb vs.
 \eqn{{}^{232}}Th/\eqn{{}^{208}}Pb (only for U-Pb formats 7 and 8).}
 
+\item{plot}{logical. Only relevant for datasets with measured
+disequilibrium. If \code{TRUE}, plots the posterior
+distribution of the age and initial activity ratios.}
+
 \item{...}{optional arguments}
 }
 \value{

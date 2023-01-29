@@ -95,8 +95,7 @@ time2initial <- function(tt,x=x,type='joint',model=1,alim=c(0,20,1e-5),debug=FAL
     init <- init.ludwig(x=x,model=model,anchor=anchor,type=type)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=FALSE,
-                        x=x,anchor=anchor,type=type,model=model,alim=alim,
-                        debug=debug)
+                        x=x,anchor=anchor,type=type,model=model,alim=alim)
     out <- list()
     out$par <- fit$par
     out$LL <- fit$value
@@ -191,7 +190,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     for (iname in inames){
         LL <- marginal(LLgrid,iigrid,iilist,iname=iname)
         dx <- diff(ilist[[iname]])
-        L <- exp(LL-log_sum_exp(LL+log(c(dx,tail(dx,n=1)))))
+        L <- exp(LL-log_sum_exp(LL+log(c(dx,utils::tail(dx,n=1)))))
         out[[iname]] <- cbind(x=ilist[[iname]],L=L)
     }
     if ('t'%in%pnames){
@@ -215,8 +214,8 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
             for (pname in names(init)){
-                init[pname] <- approx(x=exp(LLgrid[,'t']),
-                                      y=LLgrid[,pname],xout=tt[i],rule=2)$y
+                init[pname] <- stats::approx(x=exp(LLgrid[,'t']),
+                                             y=LLgrid[,pname],xout=tt[i],rule=2)$y
             }
             ifit <- time2initial(tt=tt[i],x=x,type=type,model=model)
             LLgridt[i,'t'] <- log(tt[i])
@@ -224,16 +223,17 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
             LLgridt[i,'LL'] <- -ifit$LL
         }
         dt <- diff(tt)
-        L <- exp(LLgridt[,'LL']-log_sum_exp(LLgridt[,'LL']+log(c(dt,tail(dt,n=1)))))
+        sumlog <- LLgridt[,'LL'] + log(c(dt,utils::tail(dt,n=1)))
+        L <- exp(LLgridt[,'LL'] - log_sum_exp(sumlog))
         out[['t']] <- cbind(x=tt,L=L)
     }
     if (plot){
         nbpar <- length(out)
-        op <- par(mfrow=c(1,nbpar))
+        op <- graphics::par(mfrow=c(1,nbpar))
         for (bpar in 1:nbpar){
             plot(out[[bpar]],type='b',xlab=names(out)[bpar])
         }
-        par(op)
+        graphics::par(op)
     }
     out
 }
@@ -250,7 +250,7 @@ marginal <- function(LLgrid,iigrid,iilist,iname='U48i'){
 
 prior <- function(x,alim=c(0,20),mean=logit(1,m=alim[1],M=alim[2]),sd=10,log=TRUE){
     lx <- logit(x,m=alim[1],M=alim[2])
-    dnorm(lx,mean=mean,sd=sd,log=log)
+    stats::dnorm(lx,mean=mean,sd=sd,log=log)
 }
 
 logit <- function(x,m=0,M=1,inverse=FALSE){
