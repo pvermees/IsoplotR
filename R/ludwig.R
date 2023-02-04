@@ -132,6 +132,10 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=TRUE,
                         x=x,anchor=anchor,type=type,model=model,exterr=exterr)
+    if (fit$convergence>0){
+        fit <- stats::optim(init$par,fn=LL.ludwig,hessian=TRUE,x=x,
+                            anchor=anchor,type=type,model=model,exterr=exterr)
+    }
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(x$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
@@ -456,26 +460,30 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
         } else if (x$d$U48$option==2 && x$d$U48$sx>0){
             par['U48i'] <- max(0,McL$U48i)
         }
+        if ('U48i'%in%names(par)){
+            lower['U48i'] <- x$d$U48$m + x$d$buffer
+            upper['U48i'] <- x$d$U48$M - x$d$buffer
+        }
         if (x$d$ThU$option==1 && x$d$ThU$sx>0){
             par['ThUi'] <- x$d$ThU$x
         } else if (x$d$ThU$option==2 && x$d$ThU$sx>0){
             par['ThUi'] <- max(0,McL$ThUi)
         }
-        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
-            par['RaUi'] <- x$d$RaU$x
-        }
-        if ('U48i'%in%names(par)){
-            lower['U48i'] <- x$d$U48$m + x$d$buffer
-            upper['U48i'] <- x$d$U48$M - x$d$buffer
-        }
         if ('ThUi'%in%names(par)){
             lower['ThUi'] <- x$d$ThU$m + x$d$buffer
-            upper['ThUi'] <- x$d$ThU$m - x$d$buffer
+            upper['ThUi'] <- x$d$ThU$M - x$d$buffer
+        }
+        if (x$d$RaU$option==1 && x$d$RaU$sx>0){
+            par['RaUi'] <- x$d$RaU$x
+            lower['RaUi'] <- x$d$RaU$m + x$d$buffer
+            upper['RaUi'] <- x$d$RaU$M - x$d$buffer
         }
     }
     if (type%in%c('joint',0,2,4)){
         if (x$d$PaU$option==1 && x$d$PaU$sx>0){
             par['PaUi'] <- x$d$PaU$x
+            lower['PaUi'] <- x$d$PaU$m + x$d$buffer
+            upper['PaUi'] <- x$d$PaU$M - x$d$buffer
         }
     }
     list(par=par,lower=lower,upper=upper)

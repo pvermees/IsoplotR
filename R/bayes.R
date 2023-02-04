@@ -7,7 +7,7 @@ initial2time <- function(x,anames,avalues,anchor=0,
         X$d[[anames[i]]]$sx <- 0
         X$d[[anames[i]]]$option <- 1
     }
-    init <- init.ludwig(x=X,model=model,anchor=anchor,type=type)
+    init <- init.ludwig(x=X,model=model,anchor=anchor,type=type,debug=FALSE)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=FALSE,
                         x=x,X=X,anchor=anchor,type=type,model=model)
@@ -101,8 +101,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
     lims <- getsearchlimits_a(fit=fit,x=x,anchor=anchor,type=type,
                               model=model,maxlevel=10)
     inames <- colnames(lims)
-    pnames <- c('t','a0','b0')
-    pnames <- c(pnames[pnames %in% names(fit$par)],inames)
+    pnames <- names(fit$par)
     np <- length(pnames)
     ilist <- iilist <- list()
     for (iname in inames){
@@ -113,7 +112,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
     igrid <- data.matrix(expand.grid(ilist))
     iigrid <- data.matrix(expand.grid(iilist))
     ng <- nrow(igrid)
-    LLgrid <- matrix(NA,ng,np+1)
+    LLgrid <- matrix(NA,nrow=ng,ncol=np+1)
     colnames(LLgrid) <- c(pnames,'LL')
     aname1 <- ifelse(inames[1]=='U48i','U48','ThU')
     if (length(inames)==1){
@@ -126,7 +125,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
     for (i in 1:ng){
         message('Iteration ',i,'/',ng)
         tfit <- initial2time(x=x,anames=anames,avalues=igrid[i,inames],
-                             anchor=anchor,type=type,model=model)
+                             anchor=anchor,type=type,model=model,debug=FALSE)
         LLgrid[i,pnames] <- tfit$par[pnames]
         LLgrid[i,inames] <- igrid[i,inames]
         LLgrid[i,'LL'] <- -tfit$LL
@@ -143,24 +142,35 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
                   to=max(exp(LLgrid[,'t'])),
                   length.out=nsteps)
         ti <- which('t' %in% pnames)
-        init <- matrix(NA,nrow=nsteps,ncol=np-1)
-        colnames(init) <- pnames[-ti]
+        lower <- upper <- init <- matrix(NA,nrow=nsteps,ncol=np-1)
+        colnames(lower) <- colnames(upper) <- colnames(init) <- pnames[-ti]
         for (pname in pnames[-ti]){
             init[,pname] <- approx(x=LLgrid[,'t'],y=LLgrid[,pname],
                                    xout=log(tt),rule=2)$y
+        }
+        if ('a0' %in% pnames){
+            lower[,'a0'] <- init[,'a0']-1
+            upper[,'a0'] <- init[,'a0']+1
+        }
+        if ('b0' %in% pnames){
+            lower[,'b0'] <- init[,'b0']-1
+            upper[,'b0'] <- init[,'b0']+1
+        }
+        if ('U48i' %in% pnames){
+            lower[,'U48i'] <- init[,'U48i']/2
+            upper[,'U48i'] <- init[,'U48i']*2
+        }
+        if ('ThUi' %in% pnames){
+            lower[,'ThUi'] <- init[,'ThUi']/2
+            upper[,'ThUi'] <- init[,'ThUi']*2
         }
         LLgridt <- LLgrid[1:nsteps,]
         message('Calculating posterior distribution of the age')
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
             anchor <- c(2,tt[i])
-            lower <- upper <- init[i,]
-            lower['a0'] <- init[i,'a0']-1
-            upper['a0'] <- init[i,'a0']+1
-            lower['U48i'] <- init[i,'U48i']/2
-            upper['U48i'] <- init[i,'U48i']*2
             ifit <- stats::optim(init[i,],fn=LL.ludwig,method='L-BFGS-B',
-                                 lower=lower,upper=upper,hessian=FALSE,
+                                 lower=lower[i,],upper=upper[i,],hessian=FALSE,
                                  x=x,anchor=anchor,type=type,model=model)
             LLgridt[i,'t'] <- tt[i]
             LLgridt[i,names(ifit$par)] <- ifit$par
