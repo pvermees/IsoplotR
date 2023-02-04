@@ -93,17 +93,84 @@ getsearchlimits_a <- function(fit,x,anchor=0,type='joint',
     out
 }
 
-time2initial <- function(tt,x=x,type='joint',model=1,debug=FALSE){
+time2initial.old <- function(tt,x=x,type='joint',model=1,debug=FALSE){
     if (debug) browser()
     anchor <- c(2,tt)
     init <- init.ludwig(x=x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init$par,fn=LL.ludwig,hessian=FALSE,
+    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+                        lower=init$lower,upper=init$upper,hessian=FALSE,
                         x=x,anchor=anchor,type=type,model=model)
+    testplot(x=x,par=fit$par,anchor=anchor)
     out <- list()
     out$par <- fit$par
     out$LL <- fit$value
     out
 }
+time2initial <- function(tt,x=x,type='joint',model=1,debug=FALSE){
+    if (debug) browser()
+    anchor <- c(2,tt)
+    pars <- NULL
+    if (x$format<4){
+        pars['a0'] <- york(data2york(x,option=2))$a[1]
+    } else if (x$format<7){
+        pars['a0'] <- york(data2york(x,option=3))$a[1]
+        pars['b0'] <- york(data2york(x,option=4))$a[1]
+    } else {
+        if (type==1){ # 0806 vs 38/06
+            pars['a0'] <- 1/york(data2york(x,option=6,tt=tt))$a[1]
+        } else if (type==2){ # 0807 vs 35/07
+            pars['b0'] <- 1/york(data2york(x,option=7,tt=tt))$a[1]
+        } else if (type==3){ # 0608 vs 32/08
+            pars['a0'] <- york(data2york(x,option=8,tt=tt))$a[1]
+        } else if (type==4){ # 0708 vs 32/08
+            pars['b0'] <- york(data2york(x,option=9,tt=tt))$a[1]
+        } else { # joint, 0 or 1
+            pars['a0'] <- 1/york(data2york(x,option=6))$a[1]
+            pars['b0'] <- 1/york(data2york(x,option=7))$a[1]
+        }
+    }
+    lower <- log(pars) - 2 
+    upper <- log(pars) + 1
+    if (x$d$U48$option==2){
+        lower['U48i'] <- x$d$U48$m + x$d$buffer
+        upper['U48i'] <- x$d$U48$M - x$d$buffer
+    }
+    if (x$d$ThU$option==2){
+        lower['ThUi'] <- x$d$U48$m + x$d$buffer
+        upper['ThUi'] <- x$d$U48$M - x$d$buffer
+    }    
+    nr <- 5
+    pnames <- names(lower)
+    np <- length(pnames)
+    ilist <- list()
+    parseq <- matrix(NA,nrow=nr,ncol=np)
+    colnames(parseq) <- pnames
+    for (pname in pnames){
+        parseq[,pname] <- seq(from=lower[pname],to=upper[pname],length.out=nr)
+        ilist[[pname]] <- 2:nr
+    }
+    edges <- as.matrix(expand.grid(ilist))
+    LL <- Inf
+    for (i in 1:nrow(edges)){
+        ii <- edges[i,]
+        lower <- diag(parseq[ii-1,])
+        upper <- diag(parseq[ii,])
+        p <- setNames((lower+upper)/2, pnames)
+        fit <- stats::optim(p,fn=LL.ludwig,method='L-BFGS-B',
+                            lower=lower,upper=upper,hessian=FALSE,
+                            x=x,anchor=anchor,type=type,model=model)
+        if (fit$value<LL){
+            best <- fit
+            LL <- fit$value
+        }
+    }
+    testplot(x=x,par=best$par,anchor=anchor)
+    out <- list()
+    out$par <- best$par
+    out$LL <- best$value
+    out
+}
+
 recursivelimitsearch_t <- function(ll,ul,LLmax,x=x,type=1,maxlevel=5,
                                    model=1,LLbuffer=10,side='lower',debug=FALSE){
     if (debug) browser()
@@ -218,8 +285,8 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
                 init[pname] <- stats::approx(x=exp(LLgrid[,'t']),
                                              y=LLgrid[,pname],xout=tt[i],rule=2)$y
             }
-            ifit <- time2initial(tt=tt[i],x=x,type=type,model=model)
-            LLgridt[i,'t'] <- log(tt[i])
+            ifit <- time2initial(tt=tt[i],x=x,type=type,model=model,debug=FALSE)
+            LLgridt[i,'t'] <- tt[i]
             LLgridt[i,names(ifit$par)] <- ifit$par
             LLgridt[i,'LL'] <- -ifit$LL
         }
@@ -231,8 +298,11 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
     if (plot){
         nbpar <- length(out)
         op <- graphics::par(mfrow=c(1,nbpar))
-        for (bpar in 1:nbpar){
-            plot(out[[bpar]],type='b',xlab=names(out)[bpar])
+        for (bpar in names(out)){
+            plot(out[[bpar]],type='b',xlab=bpar)
+            if (bpar=='t') xx <- exp(fit$par[bpar])
+            else xx <- fit$par[bpar]
+            lines(rep(xx,2),range(out[[bpar]][,2]))
         }
         graphics::par(op)
     }

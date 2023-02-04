@@ -278,11 +278,6 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             par['t'] <- log(tt)
             par['a0'] <- log(abx['a'])
         }
-        if (debug){
-            scatterplot(yd)
-            graphics::abline(a=abx['a'],b=abx['b'])
-            graphics::title(exp(par))
-        }
     } else if (x$format<7){
         yda <- data2york(x,option=3)
         ydb <- data2york(x,option=4)
@@ -336,15 +331,6 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             if (type%in%c('joint',0,2)){
                 par['b0'] <- log(1/abxb['a'])
             }
-        }
-        if (debug){
-            op <- par(mfrow=c(1,2))
-            scatterplot(yda)
-            graphics::abline(a=abxa['a'],b=abxa['b'])
-            graphics::title(exp(par))
-            scatterplot(ydb)
-            graphics::abline(a=abxb['a'],b=abxb['b'])
-            par(op)
         }
     } else { # formats 7 and 8
         if (anchor[1]==1){
@@ -456,11 +442,6 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
                 par['a0'] <- log(1/abxa['a'])
                 par['b0'] <- log(1/abxb['a'])
             }            
-        }
-        if (debug){
-            scatterplot(yd)
-            graphics::abline(a=abx['a'],b=abx['b'])
-            graphics::title(exp(par))
         }
     }
     if (model==3) par['w'] <- log(w)
@@ -1022,4 +1003,28 @@ exponentiate <- function(fit){
     out$cov[lpnames,lpnames] <- J %*% fit$cov[lpnames,lpnames] %*% t(J)
     dimnames(out$cov) <- dimnames(fit$cov)
     out
+}
+
+# tt and a0 are in linear units
+testplot <- function(x,par,anchor=0,option=2){
+    X <- x
+    if (anchor[1]==2){
+        tt <- anchor[2]
+    } else {
+        tt <- exp(par['t'])
+    }
+    for (pname in c('U48i','ThUi','PaUi','RaUi')){
+        if (pname %in% names(par)){
+            X$d[[pname2aname(pname)]]$x <- par[pname]
+            X$d[[pname2aname(pname)]]$option <- 1
+        }
+    }
+    yd <- data2york(X,option=2)
+    tw <- age_to_terawasserburg_ratios(tt=tt,d=X$d)
+    a <- exp(par['a0'])
+    b <- (tw$x[2]-a)/tw$x[1]
+    plot(c(0,-a/b),c(0,a),type='n')
+    scatterplot(yd,add=TRUE)
+    abline(a=a,b=b)
+    points(c(0,tw$x[1]),c(a,tw$x[2]),pch=16)
 }
