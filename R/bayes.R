@@ -93,129 +93,6 @@ getsearchlimits_a <- function(fit,x,anchor=0,type='joint',
     out
 }
 
-time2initial.old <- function(tt,x=x,type='joint',model=1,debug=FALSE){
-    if (debug) browser()
-    anchor <- c(2,tt)
-    init <- init.ludwig(x=x,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=init$lower,upper=init$upper,hessian=FALSE,
-                        x=x,anchor=anchor,type=type,model=model)
-    testplot(x=x,par=fit$par,anchor=anchor)
-    out <- list()
-    out$par <- fit$par
-    out$LL <- fit$value
-    out
-}
-time2initial <- function(tt,x=x,type='joint',model=1,debug=FALSE){
-    if (debug) browser()
-    anchor <- c(2,tt)
-    pars <- NULL
-    if (x$format<4){
-        pars['a0'] <- york(data2york(x,option=2))$a[1]
-    } else if (x$format<7){
-        pars['a0'] <- york(data2york(x,option=3))$a[1]
-        pars['b0'] <- york(data2york(x,option=4))$a[1]
-    } else {
-        if (type==1){ # 0806 vs 38/06
-            pars['a0'] <- 1/york(data2york(x,option=6,tt=tt))$a[1]
-        } else if (type==2){ # 0807 vs 35/07
-            pars['b0'] <- 1/york(data2york(x,option=7,tt=tt))$a[1]
-        } else if (type==3){ # 0608 vs 32/08
-            pars['a0'] <- york(data2york(x,option=8,tt=tt))$a[1]
-        } else if (type==4){ # 0708 vs 32/08
-            pars['b0'] <- york(data2york(x,option=9,tt=tt))$a[1]
-        } else { # joint, 0 or 1
-            pars['a0'] <- 1/york(data2york(x,option=6))$a[1]
-            pars['b0'] <- 1/york(data2york(x,option=7))$a[1]
-        }
-    }
-    lower <- log(pars) - 2 
-    upper <- log(pars) + 1
-    if (x$d$U48$option==2){
-        lower['U48i'] <- x$d$U48$m + x$d$buffer
-        upper['U48i'] <- x$d$U48$M - x$d$buffer
-    }
-    if (x$d$ThU$option==2){
-        lower['ThUi'] <- x$d$U48$m + x$d$buffer
-        upper['ThUi'] <- x$d$U48$M - x$d$buffer
-    }    
-    nr <- 5
-    pnames <- names(lower)
-    np <- length(pnames)
-    ilist <- list()
-    parseq <- matrix(NA,nrow=nr,ncol=np)
-    colnames(parseq) <- pnames
-    for (pname in pnames){
-        parseq[,pname] <- seq(from=lower[pname],to=upper[pname],length.out=nr)
-        ilist[[pname]] <- 2:nr
-    }
-    edges <- as.matrix(expand.grid(ilist))
-    LL <- Inf
-    for (i in 1:nrow(edges)){
-        ii <- edges[i,]
-        lower <- diag(parseq[ii-1,])
-        upper <- diag(parseq[ii,])
-        p <- setNames((lower+upper)/2, pnames)
-        fit <- stats::optim(p,fn=LL.ludwig,method='L-BFGS-B',
-                            lower=lower,upper=upper,hessian=FALSE,
-                            x=x,anchor=anchor,type=type,model=model)
-        if (fit$value<LL){
-            best <- fit
-            LL <- fit$value
-        }
-    }
-    testplot(x=x,par=best$par,anchor=anchor)
-    out <- list()
-    out$par <- best$par
-    out$LL <- best$value
-    out
-}
-
-recursivelimitsearch_t <- function(ll,ul,LLmax,x=x,type=1,maxlevel=5,
-                                   model=1,LLbuffer=10,side='lower',debug=FALSE){
-    if (debug) browser()
-    if (side=='lower'){
-        fit <- time2initial(tt=ll,x=x,type=type,model=model)
-    } else {
-        fit <- time2initial(tt=ul,x=x,type=type,model=model)
-    }
-    dl <- (ul-ll)/5
-    if (fit$LL<(LLmax+LLbuffer)){ # not far enough
-        if (side=='lower'){
-            ll <- ll-dl
-        } else {
-            ul <- ul+dl
-        }
-    } else {
-        if (side=='lower'){
-            ll <- ll+dl
-        } else {
-            ul <- ul-dl
-        }
-    }
-    if (maxlevel<1){
-        if (side=='lower'){
-            return(ll)
-        } else {
-            return(ul)
-        }
-    }
-    recursivelimitsearch_t(ll=ll,ul=ul,LLmax=LLmax,x=x,type=type,
-                           model=model,maxlevel=maxlevel-1,side=side)
-}
-getsearchlimits_t <- function(init,x,type='joint',maxlevel=5,model=1,debug=FALSE){
-    if (debug) browser()
-    message('Obtaining t search limits')
-    LLmax <- time2initial(tt=init[1],x=x,type=type,model=model)$LL
-    ll <- recursivelimitsearch_t(ll=init[2],ul=init[1],LLmax=LLmax,
-                                 x=x,type=type,model=model,
-                                 maxlevel=maxlevel,side='lower')
-    ul <- recursivelimitsearch_t(ll=init[1],ul=init[3],LLmax=LLmax,
-                                 x=x,type=type,model=model,
-                                 maxlevel=maxlevel,side='upper')
-    c(ll,ul)
-}
-
 bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE){
     if (is.null(nsteps)){
         if (x$d$U48$option==2 && x$d$ThU$option==2) nsteps <- 20
@@ -223,8 +100,9 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
     }
     lims <- getsearchlimits_a(fit=fit,x=x,anchor=anchor,type=type,
                               model=model,maxlevel=10)
-    pnames <- names(fit$par)
     inames <- colnames(lims)
+    pnames <- c('t','a0','b0')
+    pnames <- c(pnames[pnames %in% names(fit$par)],inames)
     np <- length(pnames)
     ilist <- iilist <- list()
     for (iname in inames){
@@ -261,38 +139,34 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
         out[[iname]] <- cbind(x=ilist[[iname]],L=L)
     }
     if ('t'%in%pnames){
-        init <- exp(c(fit$par['t'],range(LLgrid[,'t'])))
-        lims <- getsearchlimits_t(init=init,x=x,type=type,
-                                  model=model,maxlevel=10)
-        tt <- seq(from=lims[1],to=lims[2],length.out=nsteps)
-        init <- lower <- upper <- rep(NA,np-1)
-        names(init) <- names(lower) <- names(upper) <- pnames[-1]
-        for (pname in names(init)){
-            lower[pname] <- min(LLgrid[,pname])
-            upper[pname] <- max(LLgrid[,pname])
-            if (upper[pname]==lower[pname] &&
-                pname%in%c('U48i','ThUi','RaUi','PaUi')){
-                aname <- pname2aname(pname)
-                lower[pname] <- x$d[[aname]]$m + x$d$buffer
-                upper[pname] <- x$d[[aname]]$M - x$d$buffer
-            }
+        tt <- seq(from=min(exp(LLgrid[,'t'])),
+                  to=max(exp(LLgrid[,'t'])),
+                  length.out=nsteps)
+        ti <- which('t' %in% pnames)
+        init <- matrix(NA,nrow=nsteps,ncol=np-1)
+        colnames(init) <- pnames[-ti]
+        for (pname in pnames[-ti]){
+            init[,pname] <- approx(x=LLgrid[,'t'],y=LLgrid[,pname],
+                                   xout=log(tt),rule=2)$y
         }
         LLgridt <- LLgrid[1:nsteps,]
         message('Calculating posterior distribution of the age')
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
-            for (pname in names(init)){
-                init[pname] <- stats::approx(x=exp(LLgrid[,'t']),
-                                             y=LLgrid[,pname],xout=tt[i],rule=2)$y
-            }
-            ifit <- time2initial(tt=tt[i],x=x,type=type,model=model,debug=FALSE)
+            anchor <- c(2,tt[i])
+            lower <- upper <- init[i,]
+            lower['a0'] <- init[i,'a0']-1
+            upper['a0'] <- init[i,'a0']+1
+            lower['U48i'] <- init[i,'U48i']/2
+            upper['U48i'] <- init[i,'U48i']*2
+            ifit <- stats::optim(init[i,],fn=LL.ludwig,method='L-BFGS-B',
+                                 lower=lower,upper=upper,hessian=FALSE,
+                                 x=x,anchor=anchor,type=type,model=model)
             LLgridt[i,'t'] <- tt[i]
             LLgridt[i,names(ifit$par)] <- ifit$par
-            LLgridt[i,'LL'] <- -ifit$LL
+            LLgridt[i,'LL'] <- -ifit$value
         }
-        dt <- diff(tt)
-        sumlog <- LLgridt[,'LL'] + log(c(dt,utils::tail(dt,n=1)))
-        L <- exp(LLgridt[,'LL'] - log_sum_exp(sumlog))
+        L <- exp(LLgridt[,'LL'] - log_sum_exp(LLgridt[,'LL']))
         out[['t']] <- cbind(x=tt,L=L)
     }
     if (plot){
