@@ -30,9 +30,9 @@
 #' 
 #' }
 #'
-#' @param U48 a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{234}}U/\eqn{{}^{238}}U
-#'     disequilibrium.
+#' @param U48 a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{234}}U/\eqn{{}^{238}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -45,9 +45,16 @@
 #'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio and \code{sx} its
 #'     standard error.
 #'
-#' @param ThU a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U
-#'     disequilibrium.
+#' \code{m}, \code{M} specify the minimum and maximum search limits of
+#' the initial \eqn{{}^{234}}U/\eqn{{}^{238}}U activity ratio.
+#'
+#' \code{x0} and \code{sd} specify the mean and standard deviation of
+#' the prior distribution for the the initial
+#' \eqn{{}^{234}}U/\eqn{{}^{238}}U activity ratio.
+#'
+#' @param ThU a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -65,9 +72,12 @@
 #'     volcanic glass) and \code{sx} its standard error. This only
 #'     applies for Th-bearing U-Pb data formats 7 and 8.
 #'
-#' @param RaU a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U
-#'     disequilibrium.
+#' \code{m}, \code{M}, \code{x0} and \code{sd} are analogous to the
+#' eponymous settings for \code{ThU}.
+#'
+#' @param RaU a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -76,9 +86,12 @@
 #'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio and \code{sx} its
 #'     standard error.
 #' 
-#' @param PaU a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U
-#'     disequilibrium.
+#' \code{m}, \code{M}, \code{x0} and \code{sd} are analogous to the
+#' eponymous settings for \code{ThU}.
+#' 
+#' @param PaU a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -86,6 +99,13 @@
 #' If \code{option=1}, then \code{x} contains the initial
 #'     \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio and \code{sx} its
 #'     standard error.
+#'
+#' \code{m}, \code{M}, \code{x0} and \code{sd} are analogous to the
+#' eponymous settings for \code{ThU}.
+#' 
+#' @param buffer small amount of padding to avoid singularities in the
+#'     prior distribution, which uses a logistic transformation:
+#' \eqn{y = \ln\left(\frac{x-m+buffer}{M+buffer-x}\right)}
 #' 
 #' @return a list with the following items:
 #'

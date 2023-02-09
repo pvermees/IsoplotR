@@ -1028,27 +1028,3 @@ exponentiate <- function(fit){
     dimnames(out$cov) <- dimnames(fit$cov)
     out
 }
-
-# tt and a0 are in linear units
-testplot <- function(x,par,anchor=0,option=2){
-    X <- x
-    if (anchor[1]==2){
-        tt <- anchor[2]
-    } else {
-        tt <- exp(par['t'])
-    }
-    for (pname in c('U48i','ThUi','PaUi','RaUi')){
-        if (pname %in% names(par)){
-            X$d[[pname2aname(pname)]]$x <- par[pname]
-            X$d[[pname2aname(pname)]]$option <- 1
-        }
-    }
-    yd <- data2york(X,option=2)
-    tw <- age_to_terawasserburg_ratios(tt=tt,d=X$d)
-    a <- exp(par['a0'])
-    b <- (tw$x[2]-a)/tw$x[1]
-    plot(c(0,-a/b),c(0,a),type='n')
-    scatterplot(yd,add=TRUE)
-    abline(a=a,b=b)
-    points(c(0,tw$x[1]),c(a,tw$x[2]),pch=16)
-}

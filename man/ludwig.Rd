@@ -11,7 +11,7 @@ ludwig(
   anchor = 0,
   exterr = FALSE,
   type = "joint",
-  plot = TRUE,
+  plot = FALSE,
   ...
 )
 
@@ -21,7 +21,7 @@ ludwig(
   anchor = 0,
   exterr = FALSE,
   type = "joint",
-  plot = TRUE,
+  plot = FALSE,
   ...
 )
 }

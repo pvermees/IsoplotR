@@ -178,8 +178,8 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         lower <- upper <- init <- matrix(NA,nrow=nsteps,ncol=np-1)
         colnames(lower) <- colnames(upper) <- colnames(init) <- pnames[-ti]
         for (pname in pnames[-ti]){
-            init[,pname] <- approx(x=LLgrid[,'t'],y=LLgrid[,pname],
-                                   xout=log(tt),rule=2)$y
+            init[,pname] <- stats::approx(x=LLgrid[,'t'],y=LLgrid[,pname],
+                                          xout=log(tt),rule=2)$y
         }
         if ('a0' %in% pnames){
             lower[,'a0'] <- init[,'a0']-1
@@ -220,7 +220,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
             plot(out[[bpar]],type='b',xlab=bpar)
             if (bpar=='t') xx <- exp(fit$par[bpar])
             else xx <- fit$par[bpar]
-            lines(rep(xx,2),range(out[[bpar]][,2]))
+            graphics::lines(rep(xx,2),range(out[[bpar]][,2]))
         }
         graphics::par(op)
     }
