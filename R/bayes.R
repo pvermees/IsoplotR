@@ -16,7 +16,7 @@ initial2time <- function(x,anames,avalues,anchor=0,
     out <- list()
     out$par <- fit$par
     for (aname in anames){
-        iname <- paste0(aname,'i')
+        iname <- aname2pname(aname)
         out$par[iname] <- McL[[iname]]
     }
     out$LL <- fit$value
@@ -53,28 +53,26 @@ recursivelimitsearch_a <- function(aname,ll,ul,LLmax,x=x,anchor=0,type=1,
         }        
     }
     recursivelimitsearch_a(aname=aname,ll=ll,ul=ul,LLmax=LLmax,
-                           x=x,anchor=anchor,type=type,model=model,
-                           maxlevel=maxlevel-1,side=side)
+                           LLbuffer=LLbuffer,x=x,anchor=anchor,type=type,
+                           model=model,maxlevel=maxlevel-1,side=side)
 }
-getsearchlimits_a <- function(fit,x,anchor=0,type='joint',
-                              maxlevel=5,model=1,debug=FALSE){
+getsearchlimits_a <- function(fit,x,anchor=0,type='joint',maxlevel=5,
+                              LLbuffer=10,model=1,debug=FALSE){
     if (debug) browser()
     helper <- function(aname,fit,x=x,anchor=0,type=1,model=1,maxlevel=5){
         m <- x$d[[aname]]$m
         M <- x$d[[aname]]$M
         buffer <- x$d$buffer
-        McL <- mclean(tt=exp(fit$par['t']),d=x$d)
-        par <- fit$par
-        iname <- paste0(aname,'i')
-        par[aname] <- unname(McL[[iname]])
-        LLmax <- LL.ludwig(par,x=x,anchor=anchor,type=type,model=model)
-        midpoint <- ifelse(McL$truncated,1,unname(McL[[iname]]))
+        midpoint <- unname(fit$par[aname2pname(aname)])
+        LLmax <- fit$value
         ll <- recursivelimitsearch_a(aname=aname,ll=m+buffer,ul=midpoint,
-                                     LLmax=LLmax,x=x,anchor=anchor,type=type,
-                                     model=model,maxlevel=maxlevel,side='lower')
+                                     LLmax=LLmax,LLbuffer=LLbuffer,x=x,
+                                     anchor=anchor,type=type,model=model,
+                                     maxlevel=maxlevel,side='lower')
         ul <- recursivelimitsearch_a(aname=aname,ll=midpoint,ul=M-buffer,
-                                     LLmax=LLmax,x=x,anchor=anchor,type=type,
-                                     model=model,maxlevel=maxlevel,side='upper')
+                                     LLmax=LLmax,LLbuffer=LLbuffer,x=x,
+                                     anchor=anchor,type=type,model=model,
+                                     maxlevel=maxlevel,side='upper')
         c(ll=ll,ul=ul)
     }
     out <- NULL
@@ -92,14 +90,49 @@ getsearchlimits_a <- function(fit,x,anchor=0,type='joint',
     }
     out
 }
+getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
+    message('Obtaining search limits for t')
+    mini <- which.min(LLgrid[,'t'])
+    maxi <- which.max(LLgrid[,'t'])
+    mint <- exp(LLgrid[mini,'t'])
+    maxt <- exp(LLgrid[maxi,'t'])
+    dt <- maxt-mint
+    LLmint <- -LLgrid[mini,'LL']
+    LLmax <- fit$value
+    lims <- init <- fit$par[-1]
+    for (i in 1:10){
+        if ((LLmint < (LLmax+LLbuffer)) && (mint > dt/4)){
+            mint <- (mint-dt/4)
+            ifit <- stats::optim(init,fn=LL.ludwig,hessian=FALSE,x=x,
+                                 anchor=c(2,mint),type=type,model=model)
+            LLmint <- ifit$value
+        } else {
+            break
+        }
+    }
+    LLmaxt <- -LLgrid[maxi,'LL']
+    for (i in 1:10){
+        if (LLmaxt < (LLmax+LLbuffer)){
+            maxt <- (maxt+dt/4)
+            ifit <- stats::optim(init,fn=LL.ludwig,hessian=FALSE,x=x,
+                                 anchor=c(2,maxt),type=type,model=model)
+            LLmaxt <- ifit$value
+        } else {
+            break
+        }
+    }
+    c(mint,maxt)
+}
 
-bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE){
+bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
+                     control=list(),nsteps=NULL,plot=FALSE){
     if (is.null(nsteps)){
         if (x$d$U48$option==2 && x$d$ThU$option==2) nsteps <- 20
         else nsteps <- 30
     }
+    LLbuffer <- 10
     lims <- getsearchlimits_a(fit=fit,x=x,anchor=anchor,type=type,
-                              model=model,maxlevel=10)
+                              LLbuffer=LLbuffer,model=model,maxlevel=10)
     inames <- colnames(lims)
     pnames <- names(fit$par)
     np <- length(pnames)
@@ -138,9 +171,9 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
         out[[iname]] <- cbind(x=ilist[[iname]],L=L)
     }
     if ('t'%in%pnames){
-        tt <- seq(from=min(exp(LLgrid[,'t'])),
-                  to=max(exp(LLgrid[,'t'])),
-                  length.out=nsteps)
+        lims <- getsearchlimits_t(LLgrid,LLbuffer=LLbuffer,x=x,
+                                  fit=fit,type=type,model=model)
+        tt <- seq(from=lims[1],to=lims[2],length.out=nsteps)
         ti <- which('t' %in% pnames)
         lower <- upper <- init <- matrix(NA,nrow=nsteps,ncol=np-1)
         colnames(lower) <- colnames(upper) <- colnames(init) <- pnames[-ti]
@@ -170,7 +203,8 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,nsteps=NULL,plot=FALSE)
             message('Iteration ',i,'/',nsteps)
             anchor <- c(2,tt[i])
             ifit <- stats::optim(init[i,],fn=LL.ludwig,method='L-BFGS-B',
-                                 lower=lower[i,],upper=upper[i,],hessian=FALSE,
+                                 control=control,lower=lower[i,],
+                                 upper=upper[i,],hessian=FALSE,
                                  x=x,anchor=anchor,type=type,model=model)
             LLgridt[i,'t'] <- tt[i]
             LLgridt[i,names(ifit$par)] <- ifit$par

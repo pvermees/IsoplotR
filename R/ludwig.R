@@ -129,17 +129,33 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2)
+    ctrl <- list()
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=init$lower,upper=init$upper,hessian=TRUE,
-                        x=x,anchor=anchor,type=type,model=model,exterr=exterr)
+                        lower=init$lower,upper=init$upper,
+                        hessian=TRUE,x=x,anchor=anchor,type=type,
+                        model=model,exterr=exterr)
     if (fit$convergence>0){
-        fit <- stats::optim(init$par,fn=LL.ludwig,hessian=TRUE,x=x,
-                            anchor=anchor,type=type,model=model,exterr=exterr)
+        ctrl <- list(fnscale=1e-15,maxit=1000)
+        fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+                            lower=init$lower,upper=init$upper,control=ctrl,
+                            hessian=TRUE,x=x,anchor=anchor,type=type,
+                            model=model,exterr=exterr)
+        NMfit <- stats::optim(init$par,fn=LL.ludwig,hessian=TRUE,x=x,
+                              anchor=anchor,type=type,model=model,exterr=exterr)
+        if (fit$value>NMfit$value){
+            fit <- NMfit
+            warning('L-BFGS-B did not converge. Switched to Nelder-Mead.')
+        }
+        if (fit$convergence>0){
+            warning('ludwig() did not converge.')
+        }
+    }
+    if (fit$convergence>0){
     }
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(x$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
-                                  model=model,plot=plot)
+                                  control=ctrl,model=model,plot=plot)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,x,anchor=anchor,type=type)
