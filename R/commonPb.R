@@ -439,7 +439,7 @@ SS.SK.with.204 <- function(tt,x,i){
     c46 <- 1/c6474[1,'i64']
     c47 <- 1/c6474[1,'i74']    
     ccw <- correct.common.Pb.with.204(x=x,i=i,c46=c46,c47=c47,tt=tt,cc=TRUE)
-    LL.concordia.age(tt,ccw,mswd=TRUE,exterr=FALSE,d=x$d[i])
+    LL.concordia.age(stats::setNames(tt,'t'),ccw,mswd=TRUE,exterr=FALSE,d=x$d[i])
 }
 SS.SK.with.208 <- function(tt,x,i){
     i678 <- stacey.kramers(tt)
@@ -449,7 +449,7 @@ SS.SK.with.208 <- function(tt,x,i){
 }
 SS.with.208 <- function(tt,x,i,c0806,c0807){
     ccw <- correct.common.Pb.with.208(x,i=i,tt=tt,c0806=c0806,c0807=c0807,cc=TRUE)
-    LL.concordia.age(tt,ccw,mswd=TRUE,exterr=FALSE,d=x$d[i])
+    LL.concordia.age(stats::setNames(tt,'t'),ccw,mswd=TRUE,exterr=FALSE,d=x$d[i])
 }
 
 stacey.kramers <- function(tt,inverse=FALSE){
