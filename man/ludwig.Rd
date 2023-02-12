@@ -5,9 +5,25 @@
 \title{Linear regression of U-Pb data with correlated errors, taking
 into account decay constant uncertainties.}
 \usage{
-ludwig(x, model = 1, anchor = 0, exterr = FALSE, type = "joint", ...)
+ludwig(
+  x,
+  model = 1,
+  anchor = 0,
+  exterr = FALSE,
+  type = "joint",
+  plot = FALSE,
+  ...
+)
 
-ludwig(x, model = 1, anchor = 0, exterr = FALSE, type = "joint", ...)
+ludwig(
+  x,
+  model = 1,
+  anchor = 0,
+  exterr = FALSE,
+  type = "joint",
+  plot = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{UPb}}
@@ -69,6 +85,10 @@ of \eqn{{}^{208}}Pb/\eqn{{}^{207}}Pb vs.
 \code{4}: 2-dimensional regression of
 \eqn{{}^{207}}Pb/\eqn{{}^{208}}Pb vs.
 \eqn{{}^{232}}Th/\eqn{{}^{208}}Pb (only for U-Pb formats 7 and 8).}
+
+\item{plot}{logical. Only relevant for datasets with measured
+disequilibrium. If \code{TRUE}, plots the posterior
+distribution of the age and initial activity ratios.}
 
 \item{...}{optional arguments}
 }

@@ -456,13 +456,18 @@ invertcovmat <- function(sx,sy,sz,sxy=0,sxz=0,syz=0){
     out
 }
 
-exponentiate <- function(fit,signs=fit$par/fit$par){
-    out <- fit
-    out$logpar <- fit$par
-    out$logcov <- fit$cov
-    out$par <- signs*exp(fit$par)
-    np <- length(out$par)
-    out$cov <- diag(out$par,np,np) %*% fit$cov %*% diag(out$par,np,np)
-    dimnames(out$cov) <- dimnames(fit$cov)
-    out
+# recursive function that returns log(exp(u)+exp(v))
+log_sum_exp <- function(u,v){
+    if (missing(v)){
+        if (length(u)>1){
+            v <- u[-1]
+            u <- u[1]
+        } else {
+            return(u)
+        }
+    }
+    if (length(v)>1){
+        v <- log_sum_exp(v[1],v[-1])
+    } 
+    max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
 }

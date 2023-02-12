@@ -19,9 +19,9 @@
 \usage{
 peakfit(x, ...)
 
-\method{peakfit}{default}(x, k = "auto", sigdig = 2, oerr = 3, log = TRUE, np = 4, ...)
+\method{peakfit}{default}(x, k = "auto", sigdig = 2, oerr = 3, log = TRUE, np = 3, ...)
 
-\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, oerr = 3, np = 4, ...)
+\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, oerr = 3, np = 3, ...)
 
 \method{peakfit}{UPb}(
   x,
@@ -34,7 +34,7 @@ peakfit(x, ...)
   sigdig = 2,
   log = TRUE,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -46,7 +46,7 @@ peakfit(x, ...)
   log = TRUE,
   common.Pb = 0,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -58,7 +58,7 @@ peakfit(x, ...)
   log = TRUE,
   i2i = FALSE,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -70,7 +70,7 @@ peakfit(x, ...)
   log = TRUE,
   i2i = FALSE,
   oerr = 3,
-  np = np,
+  np = 3,
   ...
 )
 
@@ -82,7 +82,7 @@ peakfit(x, ...)
   log = TRUE,
   i2i = FALSE,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -94,7 +94,7 @@ peakfit(x, ...)
   log = TRUE,
   i2i = TRUE,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -106,7 +106,7 @@ peakfit(x, ...)
   log = TRUE,
   i2i = TRUE,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -118,7 +118,7 @@ peakfit(x, ...)
   log = TRUE,
   i2i = TRUE,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -130,7 +130,7 @@ peakfit(x, ...)
   log = TRUE,
   i2i = TRUE,
   oerr = 3,
-  np = 4,
+  np = 3,
   ...
 )
 
@@ -142,11 +142,11 @@ peakfit(x, ...)
   log = TRUE,
   oerr = 3,
   Th0i = 0,
-  np = 4,
+  np = 3,
   ...
 )
 
-\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, oerr = 3, np = 4, ...)
+\method{peakfit}{UThHe}(x, k = 1, sigdig = 2, log = TRUE, oerr = 3, np = 3, ...)
 }
 \arguments{
 \item{x}{either an \code{[nx2]} matrix with measurements and their

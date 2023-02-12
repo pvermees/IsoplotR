@@ -68,6 +68,8 @@
 #' @param ylab a string with the label of the y axis
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
+#' @param asp aspect ratio of the MDS configuration. See
+#'     \code{plot.window} for further details.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{cad}}, \code{\link{kde}}
 #' @return Returns an object of class \code{MDS}, i.e. a list
@@ -108,7 +110,7 @@ mds <- function(x,...){ UseMethod("mds",x) }
 #' @export
 mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
                         nnlines=FALSE,pos=NULL,col='black',
-                        bg='white',xlab=NA,ylab=NA,...){
+                        bg='white',xlab=NA,ylab=NA,asp=1,...){
     out <- list()
     if (classical) out$points <- stats::cmdscale(x)
     else out <- MASS::isoMDS(d=x)
@@ -117,20 +119,20 @@ mds.default <- function(x,classical=FALSE,plot=TRUE,shepard=FALSE,
     class(out) <- "MDS"
     if (plot) plot.MDS(out,nnlines=nnlines,pos=pos,
                        shepard=shepard,col=col,bg=bg,
-                       xlab=xlab,ylab=ylab,...)
+                       xlab=xlab,ylab=ylab,asp=asp,...)
     invisible(out)
 }
 #' @rdname mds
 #' @export
 mds.detritals <- function(x,method="KS",classical=FALSE,plot=TRUE,
                           shepard=FALSE,nnlines=FALSE,pos=NULL,col='black',
-                          bg='white',xlab=NA,ylab=NA,hide=NULL,...){
+                          bg='white',xlab=NA,ylab=NA,hide=NULL,asp=1,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     d <- diss(x2plot,method=method)
     out <- mds.default(d,classical=classical,plot=plot,
                        shepard=shepard,nnlines=nnlines,pos=pos,
-                       col=col,bg=bg,xlab=xlab,ylab=ylab,...)
+                       col=col,bg=bg,xlab=xlab,ylab=ylab,asp=asp,...)
     invisible(out)
 }
 
@@ -228,7 +230,7 @@ Wasserstein.diss <- function(x,y,p=2) {
 }
 
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
-                     col='black',bg='white',xlab=NA,ylab=NA,pch,...){
+                     col='black',bg='white',xlab=NA,ylab=NA,asp=1,pch,...){
     if (shepard & !x$classical){
         if (missing(pch)) pch <- 21
         if (is.na(xlab)) xlab <- 'dissimilarities'
@@ -240,9 +242,9 @@ plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
         graphics::title(paste0("Stress = ",x$stress))
     } else {
         if (missing(pch)) pch <- NA
-        if (missing(xlab)) xlab <- ''
-        if (missing(ylab)) ylab <- ''
-        graphics::plot(x=x$points,type='n',asp=1,
+        if (is.na(xlab)) xlab <- 'Dim 1'
+        if (is.na(ylab)) ylab <- 'Dim 2'
+        graphics::plot(x=x$points,type='n',asp=asp,
                        xlab=xlab,ylab=ylab,...)
         if (nnlines) plotlines(x$points,x$diss)
         if (is.na(pch)) {

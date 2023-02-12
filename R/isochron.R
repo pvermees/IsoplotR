@@ -545,22 +545,22 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         x2calc <- subset(x,subset=calcit)
         fit <- ludwig(x2calc,model=model,anchor=anchor,
                       exterr=exterr,type=ifelse(joint,0,type))
-        if (measured.disequilibrium(x$d)) X <- measured2initial(x,fit)
-        else X <- x
         tt <- fit$par['t']
         a0 <- fit$par['a0']
         b0 <- fit$par['b0']
         l8 <- settings('lambda','U238')[1]
         l5 <- settings('lambda','U235')[1]
-        md <- mediand(X$d)
+        md <- mediand(x$d)
+        if (md$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
+        if (md$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
         D <- mclean(tt,d=md,exterr=exterr)
         if (type==1){                           # 04-08c/06 vs. 38/06
-            x0inv <- age_to_Pb206U238_ratio(tt=tt,st=0,d=md)[1]
+            x0inv <- D$Pb206U238
             dx0invdt <- D$dPb206U238dt
             E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^238*'U/'^206*'Pb')
         } else if (type==2){                    # 04-08c/07 vs. 35/07
-            x0inv <- age_to_Pb207U235_ratio(tt=tt,st=0,d=md)[1]
+            x0inv <- D$Pb207U235
             dx0invdt <- D$dPb207U235dt
             E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^235*'U/'^207*'Pb')
@@ -583,33 +583,33 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         out$age['s[t]'] <- sqrt(fit$cov['t','t'])
         J <- matrix(0,2,2)
         if (x$format%in%c(4,5,6) & type==1){        # 04/06 vs. 38/06
-            XY <- data2york(X,option=3)
+            XY <- data2york(x,option=3)
             a <- 1/fit$par['a0']
             J[1,2] <- -a^2
             y.lab <- quote(''^204*'Pb/'^206*'Pb')
         } else if (x$format%in%c(4,5,6) & type==2){ # 04/07 vs. 35/07
-            XY <- data2york(X,option=4)
+            XY <- data2york(x,option=4)
             a <- 1/fit$par['b0']
             J[1,2] <- -a^2
             y.lab <- quote(''^204*'Pb/'^207*'Pb')
         } else if (x$format%in%c(7,8) & type==1){   # 08/06 vs. 38/06
-            XY <- data2york(X,option=6,tt=tt)
+            XY <- data2york(x,option=6,tt=tt)
             a <- 1/fit$par['a0']
             J[1,2] <- -a^2
             y.lab <- quote(''^208*'Pb'[c]*'/'^206*'Pb')
         } else if (x$format%in%c(7,8) & type==2){   # 08/07 vs. 35/07
-            XY <- data2york(X,option=7,tt=tt)
+            XY <- data2york(x,option=7,tt=tt)
             U <- settings('iratio','U238U235')[1]
             a <- 1/fit$par['b0']
             J[1,2] <- -a^2
             y.lab <- quote(''^208*'Pb'[c]*'/'^207*'Pb')
         } else if (x$format%in%c(7,8) & type==3){   # 06c/08 vs. 32/08
-            XY <- data2york(X,option=8,tt=tt)
+            XY <- data2york(x,option=8,tt=tt)
             a <- fit$par['a0']
             J[1,2] <- 1
             y.lab <- quote(''^206*'Pb'[c]*'/'^208*'Pb')
         } else if (x$format%in%c(7,8) & type==4){   # 07c/08 vs. 32/08
-            XY <- data2york(X,option=9,tt=tt)
+            XY <- data2york(x,option=9,tt=tt)
             a <- fit$par['b0']
             J[1,2] <- 1
             y.lab <- quote(''^207*'Pb'[c]*'/'^208*'Pb')
@@ -638,8 +638,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb'),
-                            xlab=x.lab,ylab=y.lab)
+            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
+                                          y0option=y0option),xlab=x.lab,ylab=y.lab)
         }
     }
     invisible(out)
@@ -1374,17 +1374,40 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     graphics::text(xy[,1],xy[,2],labels=ticks,pos=3)
 }
 
-isochrontitle <- function(fit,oerr=3,sigdig=2,type=NA,
+isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                           units=' Ma',displabel='dispersion =',
-                          dispunits=units,ski=NULL,...){
+                          dispunits=units,ski=NULL,y0option=1,...){
     content <- list()
-    if (is.na(type)){
+    if (is.null(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,
                                 units=units,prefix='intercept =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$b[1],sx=fit$b[-1],ntit='',
                                 units=units,prefix='slope =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
+    } else if (type=='U-Pb'){
+        if (is.null(fit$posterior) || 't'%ni%names(fit$posterior)){
+            content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+                                    units=units,sigdig=sigdig,
+                                    oerr=oerr,df=fit$df)
+        } else {
+            content[[1]] <- bayestit(x=fit$par['t'],XL=fit$posterior$t,
+                                     n=fit$n,sigdig=sigdig,oerr=oerr)
+        }
+        if(is.null(fit$posterior)) pnames <- NULL
+        else pnames <- names(fit$posterior)
+        if (is.null(pnames)) ipar <- NULL
+        else if (y0option==2 && 'U48i'%in%pnames) ipar <- 'U48i'
+        else if (y0option==3 && 'ThUi'%in%pnames) ipar <-'ThUi'
+        else ipar <- NULL
+        if (is.null(ipar)){
+            content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
+                                    units='',prefix=fit$y0label,
+                                    sigdig=sigdig,oerr=oerr,df=fit$df)
+        } else {
+            content[[2]] <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],ntit='',
+                                     sigdig=sigdig,oerr=oerr,units='',prefix=fit$y0label)
+        }
     } else {
         content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
                                 units=units,sigdig=sigdig,

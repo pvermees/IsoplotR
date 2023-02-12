@@ -126,10 +126,15 @@ twfit2wfit <- function(fit,x){
     }
     J[3,4] <- 1
     out <- list()
-    out$par <- c(tl,tu,fit$par['w'])
-    out$cov <- J %*% E %*% t(J)
-    c('t[l]','t[u]','w') -> names(out$par) ->
-        rownames(out$cov) -> colnames(out$cov)
+    out$par <- c(tl,tu,fit$par[-1])
+    tokeep <- names(fit$par)[-1]
+    pnames <- c('t[l]','t[u]',tokeep)
+    np <- length(pnames)
+    out$cov <- matrix(0,np,np)
+    rownames(out$cov) <- colnames(out$cov) <- names(out$par) <- pnames
+    out$cov[tokeep,tokeep] <- fit$cov[tokeep,tokeep]
+    toreplace <- c('t[l]','t[u]','w')
+    out$cov[toreplace,toreplace] <- J %*% E %*% t(J)
     out
 }
 
@@ -162,6 +167,8 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
     l8 <- lambda('U238')[1]
     J <- matrix(0,1,2)
     usr <- graphics::par('usr')
+    if (d$U48$option==2) d$U48 <- list(x=unname(fit$par['U48i']),option=1)
+    if (d$ThU$option==2) d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
     if (wetherill){
         if (measured.disequilibrium(d)){
             U85 <- iratio('U238U235')[1]
@@ -278,16 +285,32 @@ tw3d2d <- function(fit){
 
 # this would be much easier in unicode but that doesn't render in PDF:
 discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
-    line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,df=fit$df,
-                     sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
+    if (is.null(fit$posterior) || 't'%ni%names(fit$posterior)){
+        line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,df=fit$df,
+                         sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
+    } else {
+        line1 <- bayestit(x=fit$par[1],XL=fit$posterior$t,n=fit$n,
+                          sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
+    }
     if (wetherill){
         line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
     } else if (fit$format<4){
+        if (is.null(fit$posterior)) pnames <- NULL
+        else pnames <- names(fit$posterior)
+        if (is.null(pnames)) ipar <- NULL
+        else if (y0option==2 && 'U48i'%in%pnames) ipar <- 'U48i'
+        else if (y0option==3 && 'ThUi'%in%pnames) ipar <-'ThUi'
+        else ipar <- NULL
         fit <- getUPby0(fit,option=y0option)
-        line2 <- maintit(x=fit$y0['y'],sx=fit$y0['s[y]'],ntit='',
-                         sigdig=sigdig,oerr=oerr,units='',df=fit$df,
-                         prefix=fit$y0label)
+        if (is.null(ipar)){
+            line2 <- maintit(x=fit$y0['y'],sx=fit$y0['s[y]'],ntit='',
+                             sigdig=sigdig,oerr=oerr,units='',df=fit$df,
+                             prefix=fit$y0label)
+        } else {
+            line2 <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],ntit='',
+                              sigdig=sigdig,oerr=oerr,units='',prefix=fit$y0label)
+        }
     } else if (fit$format<7){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,

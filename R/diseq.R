@@ -30,9 +30,9 @@
 #' 
 #' }
 #'
-#' @param U48 a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{234}}U/\eqn{{}^{238}}U
-#'     disequilibrium.
+#' @param U48 a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{234}}U/\eqn{{}^{238}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -45,9 +45,16 @@
 #'     \eqn{{}^{234}}U/\eqn{{}^{238}}U ratio and \code{sx} its
 #'     standard error.
 #'
-#' @param ThU a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U
-#'     disequilibrium.
+#' \code{m}, \code{M} specify the minimum and maximum search limits of
+#' the initial \eqn{{}^{234}}U/\eqn{{}^{238}}U activity ratio.
+#'
+#' \code{x0} and \code{sd} specify the mean and standard deviation of
+#' the prior distribution for the the initial
+#' \eqn{{}^{234}}U/\eqn{{}^{238}}U activity ratio.
+#'
+#' @param ThU a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{230}}Th/\eqn{{}^{238}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -65,9 +72,12 @@
 #'     volcanic glass) and \code{sx} its standard error. This only
 #'     applies for Th-bearing U-Pb data formats 7 and 8.
 #'
-#' @param RaU a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U
-#'     disequilibrium.
+#' \code{m}, \code{M}, \code{x0} and \code{sd} are analogous to the
+#' eponymous settings for \code{ThU}.
+#'
+#' @param RaU a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{226}}Ra/\eqn{{}^{238}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -76,9 +86,12 @@
 #'     \eqn{{}^{226}}Ra/\eqn{{}^{238}}U ratio and \code{sx} its
 #'     standard error.
 #' 
-#' @param PaU a list containing three items (\code{x}, \code{sx} and
-#'     \code{option}) specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U
-#'     disequilibrium.
+#' \code{m}, \code{M}, \code{x0} and \code{sd} are analogous to the
+#' eponymous settings for \code{ThU}.
+#' 
+#' @param PaU a list containing seven items (\code{x}, \code{sx},
+#'     \code{m}, \code{M}, \code{x0}, \code{sd} and \code{option})
+#'     specifying the \eqn{{}^{231}}Pa/\eqn{{}^{235}}U disequilibrium.
 #'
 #' If \code{option=0}, then \code{x} and \code{sx} are ignored and no
 #'     disequilibrium correction is applied.
@@ -86,6 +99,13 @@
 #' If \code{option=1}, then \code{x} contains the initial
 #'     \eqn{{}^{231}}Pa/\eqn{{}^{235}}U ratio and \code{sx} its
 #'     standard error.
+#'
+#' \code{m}, \code{M}, \code{x0} and \code{sd} are analogous to the
+#' eponymous settings for \code{ThU}.
+#' 
+#' @param buffer small amount of padding to avoid singularities in the
+#'     prior distribution, which uses a logistic transformation:
+#' \eqn{y = \ln\left(\frac{x-m+buffer}{M+buffer-x}\right)}
 #' 
 #' @return a list with the following items:
 #'
@@ -113,19 +133,29 @@
 #' UPb <- read.data(fn,method='U-Pb',format=2,d=d)
 #' concordia(UPb,type=2,xlim=c(0,700),ylim=c(0.05,0.5))
 #' @export
-diseq <- function(U48=list(x=1,sx=0,option=0),
-                  ThU=list(x=1,sx=0,option=0),
-                  RaU=list(x=1,sx=0,option=0),
-                  PaU=list(x=1,sx=0,option=0)){
+diseq <- function(U48=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  ThU=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  RaU=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  PaU=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
+                  buffer=1e-5){
+    patch <- function(aratio){
+        out <- aratio
+        if (is.null(aratio$x)) out$x <- 1
+        if (is.null(aratio$sx)) out$sx <- 0
+        if (is.null(aratio$option)) out$option <- 0
+        if (is.null(aratio$m)) out$m <- 0
+        if (is.null(aratio$M)) out$M <- 20
+        if (is.null(aratio$x0)) out$x0 <- 1
+        if (is.null(aratio$sd)) out$sd <- 10
+        out
+    }
     out <- list()
     class(out) <- 'diseq'
-    out$U48 <- U48
-    out$ThU <- ThU
-    out$RaU <- RaU
-    out$PaU <- PaU
-    for (i in seq_along(out)){
-        if (is.null(out[[i]]$sx)) out[[i]]$sx <- 0
-    }
+    out$U48 <- patch(U48)
+    out$ThU <- patch(ThU)
+    out$RaU <- patch(RaU)
+    out$PaU <- patch(PaU)
+    out$buffer <- buffer
     out$equilibrium <- check.equilibrium(d=out)
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000
@@ -246,7 +276,7 @@ forward <- function(tt,d=diseq(),derivative=0){
 
 check.equilibrium <- function(d=diseq()){
     checkratio <- function(r){
-        r$option == 0 || all(r$x==1) & (is.null(r$sx) | all(r$sx==0))
+        r$option == 0 || all(r$x==1) & all(r$sx==0)
     }
     U48 <- checkratio(d$U48)
     ThU <- checkratio(d$ThU)
@@ -313,7 +343,7 @@ measured.disequilibrium <- function(d=diseq()){
 #' mclean(tt=2,d=d)
 #' @export
 mclean <- function(tt=0,d=diseq(),exterr=FALSE){
-    out <- list()
+    out <- list(truncated=FALSE)
     l38 <- d$L['U238']
     l34 <- d$L['U234']
     l30 <- d$L['Th230']
@@ -338,6 +368,33 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$dPb207U235dl35 <- rep(tt*exp(l35*tt),nc)
         }
     } else {
+        nt <- meas.diseq.nt(d=d,nc=nc)[c('U238','U234','Th230','U235'),,drop=FALSE]
+        if (d$U48$option==2){
+            t234cutoff <- meas.diseq.maxt(d=d,nuclide='U234')
+            n0 <- reverse(tt=min(tt,t234cutoff),mexp=mexp.8405(),nt=nt)
+            U48i <- (n0['U234',]*l34)/(n0['U238',]*l38)
+            if (any(U48i<0)){
+                d$U48 <- list(x=0,sx=0,option=1)
+                out$truncated <- TRUE
+            }
+            if (any(U48i>d$U48$M)){
+                d$U48 <- list(x=d$U48$M,sx=0,option=1)
+                out$truncated <- TRUE
+            }
+        }
+        if (d$ThU$option==2){
+            t230cutoff <- meas.diseq.maxt(d=d,nuclide='Th230')
+            n0 <- reverse(tt=min(tt,t230cutoff),mexp=mexp.8405(),nt=nt)
+            ThUi <- (n0['Th230',]*l30)/(n0['U238',]*l38)
+            if (any(ThUi<0)){
+                d$ThU <- list(x=0,sx=0,option=1)
+                out$truncated <- TRUE
+            }
+            if (any(ThUi>d$ThU$M)){
+                d$ThU <- list(x=d$ThU$M,sx=0,option=1)
+                out$truncated <- TRUE
+            }
+        }
         n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
         d$n0 <- (n0 %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
         rownames(d$n0) <- names(d$L)
@@ -376,8 +433,12 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$Pb207U235*dntdt['U235',]/d$nt['U235',]
         out$U48i <- (d$n0['U234',]*l34)/(d$n0['U238',]*l38)
         out$ThUi <- (d$n0['Th230',]*l30)/(d$n0['U238',]*l38)
+        out$RaUi <- (d$n0['Ra226',]*l26)/(d$n0['U238',]*l38)
+        out$PaUi <- (d$n0['Pa231',]*l31)/(d$n0['U235',]*l35)
         out$U48 <- (d$nt['U234',]*l34)/(d$nt['U238',]*l38)
         out$ThU <- (d$nt['Th230',]*l30)/(d$nt['U238',]*l38)
+        out$RaU <- (d$nt['Ra226',]*l26)/(d$nt['U238',]*l38)
+        out$PaU <- (d$nt['Pa231',]*l31)/(d$nt['U235',]*l35)
         out$n0 <- linkUseries(n=d$n0,U=U*exp((l38-l35)*tt))
         out$nt <- linkUseries(n=d$nt,U=U)
         if (exterr){
@@ -474,15 +535,11 @@ get.5678.misfit <- function(obs,pred){
     abs(log(obs+1) - log(pred+1)) # +1 for robustness to negative values
 }
 
-meas.diseq.maxt <- function(d){
-    if (d$ThU$option==2){
-        out <- stats::optimise(function(tt,d) mclean(tt=tt,d=d)$ThUi^2,
-                               c(0,1),d=d)$minimum
-    } else if (d$U48$option==2){
-        M <- ifelse(max(d$U48$x)<1,0,500)
-        out <- stats::optimise(
-                          function(tt,d,maxU48) (mclean(tt=tt,d=d)$U48i-maxU48)^2,
-                          c(0,10),d=d,maxU48=M)$minimum
+meas.diseq.maxt <- function(d,nuclide='auto'){
+    if ((d$ThU$option==2 && nuclide!='U234') || nuclide=='Th230'){
+        out <- 20*log(2)/d$L['Th230']
+    } else if (d$U48$option==2 || nuclide=='U234'){
+        out <- 20*log(2)/d$L['U234']
     } else {
         out <- 4500
     }
@@ -502,4 +559,25 @@ measured2initial <- function(x,fit){
         }
     }
     out
+}
+
+meas.diseq.nt <- function(d,nc=1){
+    nt <- 0*d$L
+    nt[d$L>0] <- 1/d$L[d$L>0]
+    if (d$U48$option==2){
+        nt['U234'] <- d$U48$x*nt['U238']*d$L['U238']/d$L['U234']
+    }
+    if (d$ThU$option==2){
+        nt['Th230'] <- d$ThU$x*nt['U238']*d$L['U238']/d$L['Th230']
+    }
+    out <- (nt %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
+    rownames(out) <- names(d$L)
+    out
+}
+
+pname2aname <- function(pname){
+    substr(pname, 1, nchar(pname)-1)
+}
+aname2pname <- function(aname){
+    paste0(aname,'i')
 }
