@@ -173,15 +173,24 @@ disptit <- function(w,sw,sigdig=2,oerr=3,units='',prefix='dispersion ='){
     }
     out
 }
-peaktit <- function(x,sx,p,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
+peaktit <- function(x,sx,p=NULL,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
     xerr <- ci(x,sx,oerr=oerr)
     rounded.x <- roundit(x,xerr,sigdig=sigdig,oerr=oerr,text=TRUE)
-    rounded.p <- signif(100*p,sigdig)
-    lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)
-    if (oerr>3){
-        out <- substitute(p~a~u%+-%b*'% (prop='*c*'%)',lst)
+    if (is.null(p)){
+        lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],u=unit)
+        if (oerr>3){
+            out <- substitute(p~a~u%+-%b,lst)
+        } else {
+            out <- substitute(p~a%+-%b~u,lst)
+        }
     } else {
-        out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)
+        rounded.p <- signif(100*p,sigdig)
+        lst <- list(p=prefix,a=rounded.x[1],b=rounded.x[2],c=rounded.p[1],u=unit)
+        if (oerr>3){
+            out <- substitute(p~a~u%+-%b*'% (prop='*c*'%)',lst)
+        } else {
+            out <- substitute(p~a%+-%b~u~'(prop='*c*'%)',lst)
+        }
     }
     out
 }

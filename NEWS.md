@@ -1,6 +1,6 @@
 # IsoplotR
 
-Jan 28, 2023: (v.5.2) Adds Wasserstein distance to MDS plots; propagates disequilibrium activity ratio errors for U-Pb isochrons, as well as common-Pb and concordia age anchor errors. Replaces ordinary with total least squares in model-2 regression. Recasts model-3 regression terms of ages rather than y-intercepts.
+Feb 21, 2023: (v.5.2) Adds Wasserstein distance to MDS plots; propagates disequilibrium activity ratio errors for U-Pb isochrons, as well as common-Pb and concordia age anchor errors. Replaces ordinary with total least squares in model-2 regression. Recasts model-3 regression terms of ages rather than y-intercepts. Changes default output errors back from 2-sigma to Studentised confidence intervals.
 
 Sept 13, 2022: (v.5.0) Errors are now reported as absolute and relative uncertainties at 1σ, 2σ and arbitrary confidence levels. Improved security by the use of shinylight under the hood of IsoplotRgui. Replaced .png with .svg graphics. Fixes small but nasty bug in the minimum age algorithm.
 
