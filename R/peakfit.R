@@ -367,7 +367,9 @@ get.props.err <- function(E){
 
 peaks2legend <- function(fit,k=NULL,sigdig=2,oerr=3){
     if (identical(k,'min')){
-        tit <- peaktit(x=fit$peaks[1],sx=fit$peaks[2],p=fit$props[1],
+        if ('mu'%in%names(fit)) p <- fit$props[1] # 4 par model
+        else p <- NULL # 3 par model
+        tit <- peaktit(x=fit$peaks[1],sx=fit$peaks[2],p=p,
                        sigdig=sigdig,oerr=oerr,prefix=paste0('Minimum:'))
         out <- as.expression(tit)
     } else {
