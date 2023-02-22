@@ -1,99 +1,191 @@
-# IsoplotR
+# IsoplotR 5.2 
 
-* Feb 21, 2023 (5.2): Adds Wasserstein distance to MDS plots; propagates disequilibrium activity ratio errors for U-Pb isochrons, as well as common-Pb and concordia age anchor errors. Replaces ordinary with total least squares in model-2 regression. Recasts model-3 regression terms of ages rather than y-intercepts. Changes default output errors back from 2-sigma to Studentised confidence intervals.
+Feb 21, 2023: Adds Wasserstein distance to MDS plots; propagates disequilibrium activity ratio errors for U-Pb isochrons, as well as common-Pb and concordia age anchor errors. Replaces ordinary with total least squares in model-2 regression. Recasts model-3 regression terms of ages rather than y-intercepts. Changes default output errors back from 2-sigma to Studentised confidence intervals.
 
-* Oct 18, 2022 (5.1): Fixes (mostly minor) issues with the major upgrade to 5.0. 
+# IsoplotR 5.1 
 
-* Sept 13, 2022 (5.0): Errors are now reported as absolute and relative uncertainties at 1σ, 2σ and arbitrary confidence levels. Improved security by the use of shinylight under the hood of IsoplotRgui. Replaced .png with .svg graphics. Fixes small but nasty bug in the minimum age algorithm.
+Oct 18, 2022: Fixes (mostly minor) issues with the major upgrade to 5.0. 
 
-* May 21, 2022 (4.4): Additional options for U-series evolution diagrams and isochron plots, including initial 230Th-corrections based on the magmatic Th/U activity ratio.
+# IsoplotR 5.0 
 
-* Mar 3, 2022 (4.3): Fixed issue with detrital Stacey-Kramers correction, removed gradient function from Ludwig regression.
+Sept 13, 2022: Errors are now reported as absolute and relative uncertainties at 1σ, 2σ and arbitrary confidence levels. Improved security by the use of shinylight under the hood of IsoplotRgui. Replaced .png with .svg graphics. Fixes small but nasty bug in the minimum age algorithm.
 
-* Oct 20, 2021 (4.2): Added 2D U-Pb isochron regression.
+# IsoplotR 4.4 
 
-* Jul 9, 2021 (4.1): Removed student t-multiplier from confidence intervals, improved corrections for secular disequilibrium and common Pb.
+May 21, 2022: Additional options for U-series evolution diagrams and isochron plots, including initial 230Th-corrections based on the magmatic Th/U activity ratio.
 
-* Jun 6, 2021 (4.0): Expanded API; more robust handling of measured initial U-Pb disequilibrium; lots of minor bug fixes.
+# IsoplotR 4.3 
 
-* Apr 5, 2021 (3.8): Calculates intercepts of Pb-Pb isochrons with Stacey-Kramers mantle evolution curve; adds Th-Pb dataset to examples; fixes colour scale of radial plots.
+Mar 3, 2022: Fixed issue with detrital Stacey-Kramers correction, removed gradient function from Ludwig regression.
 
-* Mar 15, 2021 (3.7): Changed overdispersion reporting threshold for model-1 regression from MSWD-based to p-value based. Simplified API for anchored discordia regression.
+# IsoplotR 4.2 
 
-* Dec 17, 2020 (3.6): Formally added rug plot option to KDEs. Upgraded mirrors to shinyless version, increased robustness of disequilibrium correction, updated whitelist of allowable functions.
+Oct 20, 2021: Added 2D U-Pb isochron regression.
 
-* Nov 10, 2020 (3.5): Minor bug fixes. Compatible with `shinyless' IsoplotRgui
+# IsoplotR 4.1 
 
-* Jul 8, 2020 (3.4): Adds options to change the stroke colour of error ellipses (API change); introduces a log-transform to the random effects model for weighted means; and replaces the three parameter minimum age algorithm with a four parameter alternative.
+Jul 9, 2021: Removed student t-multiplier from confidence intervals, improved corrections for secular disequilibrium and common Pb.
 
-* Mar 18, 2020 (3.3): Adds Th-Pb geochronology to the toolbox.
+# IsoplotR 4.0 
 
-* Jan 25, 2020: Release of a Chinese language version of the graphical user interface. Thanks to Shuan Yan (Guangzhou), Pei Zhang and Hao Fang (Beijing), Qiuye Yu (Changsha), Hongcheng Guo (Lehigh), and Shihu Li (Lancaster) for the translation!
+Jun 6, 2021: Expanded API; more robust handling of measured initial U-Pb disequilibrium; lots of minor bug fixes.
 
-* Jan 22, 2020 (3.2): Fixes several minor bugs and increases stability.
+# IsoplotR 3.8 
 
-* Oct 8, 2019 (3.1): Unified Ludwig regression, including a new model-3 option that redefines the overdispersion parameter in terms of time rather than common Pb composition. Various minor bug fixes.
+Apr 5, 2021: Calculates intercepts of Pb-Pb isochrons with Stacey-Kramers mantle evolution curve; adds Th-Pb dataset to examples; fixes colour scale of radial plots.
 
-* Aug 5, 2019 (3.0): Adds isochrons for U-(Th-)Pb data, implements U-Pb initial disequilibrium corrections using matrix exponentials, completely rewritten Ludwig regression functions.
+# IsoplotR 3.7 
 
-* Jun 6, 2019 (2.7): Adds new input format for U-Pb data that include 208Pb and 232Th; option to perform discordance filter before common Pb correction. This update changes the .json format, which may cause problems for data saved in previous IsoplotR versions.
+Mar 15, 2021: Changed overdispersion reporting threshold for model-1 regression from MSWD-based to p-value based. Simplified API for anchored discordia regression.
 
-* May 4, 2019 (2.6): Adds inverse isochron option to K-Ca, Rb-Sr, Sm-Nd, Lu-Hf and Re-Os data. Improved dispersion estimates in model-3 regression.
+# IsoplotR 3.6 
 
-* Apr 3, 2019 (2.5): Several improvements, especially for the common-Pb corrections, which improve IsoplotR's robustness to very discordant data. Prepared in the run-up to the detrital zircon U-Pb dating workshop at the Beijing SHRIMP centre.
+Dec 17, 2020: Formally added rug plot option to KDEs. Upgraded mirrors to shinyless version, increased robustness of disequilibrium correction, updated whitelist of allowable functions.
 
-* Mar 4, 2019 (2.4): Implements initial disequilibrium corrections for U-Pb data, improved common Pb-corrections and initial ('common') non-radiogenic isotope compositions for other chronometers; increases robustness of the mixture modelling functions.
+# IsoplotR 3.5 
 
-* Dec 8, 2018 (2.3): Allows input uncertainties to be specified as absolute and relative errors at 1 or 2&sigma;.
+Nov 10, 2020: Minor bug fixes. Compatible with `shinyless' IsoplotRgui
 
-* Nov 9, 2018 (2.2): Adds ability to hide or omit samples from plots and calculations.
+# IsoplotR 3.4 
 
-* Oct 20, 2018 (2.1): Rewrote discordia regression function, which now uses the same maximum likelihood approach for 2D and 3D regression. Added option to anchor the discordia line to the concordia line, or to a specificy common Pb composition.
+Jul 8, 2020: Adds options to change the stroke colour of error ellipses (API change); introduces a log-transform to the random effects model for weighted means; and replaces the three parameter minimum age algorithm with a four parameter alternative.
 
-* Sep 10, 2018 (2.0): Adds K-Ca geochronology to the toolbox.
+# IsoplotR 3.3 
 
-* Aug 13, 2018 (1.4): Adds options for detrital 230Th-corrections from assumed or measured detritus; more flexible weighted mean plots.
+Mar 18, 2020: Adds Th-Pb geochronology to the toolbox.
 
-* Jun 4, 2018 (1.3): Includes bug fixes relating to the 'York fit' algorithm and error formatting, and added functionality for Stacey-Kramers evolution curves and ordinary weighted mean calculation.
+# IsoplotR 3.2 
 
-* May 1, 2018 (1.2): Includes bug fixes relating to the MSWD of isochrons, and discordia lines in Tera-Wasserburg space. Improved flexibility for loading data from R matrices and data frames.
+Jan 22, 2020: Fixes several minor bugs and increases stability.
 
-* Mar 28, 2018 (1.1): Adds profile log-likelihood confidence intervals for dispersion parameters, confidence envelopes for regression lines. 
+# IsoplotR 3.1 
 
-* Nov 11, 2017 (1.0): Adds model-2 and model-3 regression for all data, common-Pb correction for Pb-Pb data.
+Oct 8, 2019: Unified Ludwig regression, including a new model-3 option that redefines the overdispersion parameter in terms of time rather than common Pb composition. Various minor bug fixes.
 
-* Sep 25, 2017 (0.18): Adds confidence intervals.
+# IsoplotR 3.0 
 
-* Sep 1, 2017 (0.17): Added helium isochrons, volcanic Th-U isochrons, better and more flexible scaling of concordia axes.
+Aug 5, 2019: Adds isochrons for U-(Th-)Pb data, implements U-Pb initial disequilibrium corrections using matrix exponentials, completely rewritten Ludwig regression functions.
 
-* Jul 21, 2017 (0.16): Adds total Pb-U isochrons and common-Pb corrections.
+# IsoplotR 2.7
 
-* Jul 11, 2017 (0.15): Added U-series disequilibrium dating.
+Jun 6, 2019: Adds new input format for U-Pb data that include 208Pb and 232Th; option to perform discordance filter before common Pb correction. This update changes the .json format, which may cause problems for data saved in previous IsoplotR versions.
 
-* Jun 18, 2017 (0.14): Adds Pb-Pb dating functionality.
+# IsoplotR 2.6
 
-* Jun 25, 2017 (0.13): Added Lu-Hf functionality.
+May 4, 2019: Adds inverse isochron option to K-Ca, Rb-Sr, Sm-Nd, Lu-Hf and Re-Os data. Improved dispersion estimates in model-3 regression.
 
-* May 6, 2017 (0.12): Various bug fixes, improved documentation.
+# IsoplotR 2.5 
 
-* Apr 17, 2017 (0.11): Additional input formatting options added for Ar-Ar, Rb-Sr, Sm-Nd and Re-Os chronometers.
+Apr 3, 2019: Several improvements, especially for the common-Pb corrections, which improve IsoplotR's robustness to very discordant data. Prepared in the run-up to the detrital zircon U-Pb dating workshop at the Beijing SHRIMP centre.
 
-* Jan 8, 2017 (0.10): Added Rb-Sr and Sm-Nd functionality.
+# IsoplotR 2.4 
 
-* Dec 20, 2016 (0.9): Adds Re-Os isochrons. Improved error catching.
+Mar 4, 2019: Implements initial disequilibrium corrections for U-Pb data, improved common Pb-corrections and initial ('common') non-radiogenic isotope compositions for other chronometers; increases robustness of the mixture modelling functions.
 
-* Nov 16, 2016 (0.8): Adds functionality for fission track data using the external detector method and LA-ICP-MS. Plots these data and all other input formats on radial plots. Deconvolves age distributions into finite mixtures and constraints minimum ages from heteroscedastic data.
+# IsoplotR 2.3 
 
-* Aug 13, 2016 (0.7): Added functionality for U-Th-He data and MDS analysis of detrital age distributions.
+Dec 8, 2018: Allows input uncertainties to be specified as absolute and relative errors at 1 or 2&sigma;.
 
-* Jul 27, 2016 (0.6): Adds functions to plot age spectra and calculate weighted means.
+# IsoplotR 2.2 
 
-* Jul 3, 2016 (0.5): Calculates 40Ar/39Ar ages and isochrons.
+Nov 9, 2018: Adds ability to hide or omit samples from plots and calculations.
 
-* Jun 14, 2016 (0.4): Added functions to plot KDEs and CADs functions. Renamed and simplified existing functions.
+# IsoplotR 2.1 
 
-* May 23, 2016 (0.3): Adds functionality to compute concordia and discordia ages, and perform York-style linear regression of data with correlated errors.
+Oct 20, 2018: Rewrote discordia regression function, which now uses the same maximum likelihood approach for 2D and 3D regression. Added option to anchor the discordia line to the concordia line, or to a specificy common Pb composition.
 
-* May 5, 2016 (0.2): Adds uncertainty associated with decay constants and the 238U/235U ratio to the concordia diagrams.
+# IsoplotR 2.0 
 
-* Apr 21, 2016 (0.1): Plots U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams, taking into account error correlations.
+Sep 10, 2018: Adds K-Ca geochronology to the toolbox.
+
+# IsoplotR 1.4 
+
+Aug 13, 2018: Adds options for detrital 230Th-corrections from assumed or measured detritus; more flexible weighted mean plots.
+
+# IsoplotR 1.4 
+
+Jun 4, 2018: Includes bug fixes relating to the 'York fit' algorithm and error formatting, and added functionality for Stacey-Kramers evolution curves and ordinary weighted mean calculation.
+
+# IsoplotR 1.2 
+
+May 1, 2018: Includes bug fixes relating to the MSWD of isochrons, and discordia lines in Tera-Wasserburg space. Improved flexibility for loading data from R matrices and data frames.
+
+# IsoplotR 1.1 
+
+Mar 28, 2018: Adds profile log-likelihood confidence intervals for dispersion parameters, confidence envelopes for regression lines. 
+
+# IsoplotR 1.0 
+
+Nov 11, 2017: Adds model-2 and model-3 regression for all data, common-Pb correction for Pb-Pb data.
+
+# IsoplotR 0.18 
+
+Sep 25, 2017: Adds confidence intervals.
+
+# IsoplotR 0.17 
+
+Sep 1, 2017: Added helium isochrons, volcanic Th-U isochrons, better and more flexible scaling of concordia axes.
+
+# IsoplotR 0.16 
+
+Jul 21, 2017: Adds total Pb-U isochrons and common-Pb corrections.
+
+# IsoplotR 0.15 
+
+Jul 11, 2017: Added U-series disequilibrium dating.
+
+# IsoplotR 0.14 
+
+Jun 18, 2017: Adds Pb-Pb dating functionality.
+
+# IsoplotR 0.13 
+
+Jun 25, 2017: Added Lu-Hf functionality.
+
+# IsoplotR 0.12 
+
+May 6, 2017: Various bug fixes, improved documentation.
+
+# IsoplotR 0.11 
+
+Apr 17, 2017: Additional input formatting options added for Ar-Ar, Rb-Sr, Sm-Nd and Re-Os chronometers.
+
+# IsoplotR 0.10 
+
+Jan 8, 2017: Added Rb-Sr and Sm-Nd functionality.
+
+# IsoplotR 0.9 
+
+Dec 20, 2016: Adds Re-Os isochrons. Improved error catching.
+
+# IsoplotR 0.8 
+
+Nov 16, 2016: Adds functionality for fission track data using the external detector method and LA-ICP-MS. Plots these data and all other input formats on radial plots. Deconvolves age distributions into finite mixtures and constraints minimum ages from heteroscedastic data.
+
+# IsoplotR 0.7 
+
+Aug 13, 2016: Added functionality for U-Th-He data and MDS analysis of detrital age distributions.
+
+# IsoplotR 0.6 
+
+Jul 27, 2016: Adds functions to plot age spectra and calculate weighted means.
+
+# IsoplotR 0.5 
+
+Jul 3, 2016: Calculates 40Ar/39Ar ages and isochrons.
+
+# IsoplotR 0.4 
+
+Jun 14, 2016: Added functions to plot KDEs and CADs functions. Renamed and simplified existing functions.
+
+# IsoplotR 0.3 
+
+May 23, 2016: Adds functionality to compute concordia and discordia ages, and perform York-style linear regression of data with correlated errors.
+
+# IsoplotR 0.2 
+
+May 5, 2016: Adds uncertainty associated with decay constants and the 238U/235U ratio to the concordia diagrams.
+
+# IsoplotR 0.1 
+
+Apr 21, 2016: Plots U-Pb data on Wetherill and Tera-Wasserburg concordia diagrams, taking into account error correlations.

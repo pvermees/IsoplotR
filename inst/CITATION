@@ -1,17 +1,15 @@
-citHeader("To cite IsoplotR in publications use:")
-
-citEntry(entry = "Article",
-  title        = "{IsoplotR}: a free and open toolbox for geochronology",
-  author       = person("Pieter", "Vermeesch"),
+bibentry(
+  bibtype = "Article",
+  textVersion = paste("Vermeesch, Pieter (2018).",
+                      "IsoplotR: a free and open toolbox for geochronology.",
+                      "Geoscience Frontiers, 9, 1479-1493.",
+                      "URL https://doi.org/10.1016/j.gsf.2018.04.001"),
+  header = "To cite IsoplotR in publications, please use",
+  author = "Pieter Vermeesch",
+  title  = "{IsoplotR}: a free and open toolbox for geochronology",
   journal      = "Geoscience Frontiers",
   year         = "2018",
   volume       = "9",
   pages        = "1479-1493",
   url          = "https://doi.org/10.1016/j.gsf.2018.04.001",
-
-  textVersion  =
-  paste("Vermeesch, Pieter (2018).",
-        "IsoplotR: a free and open toolbox for geochronology.",
-        "Geoscience Frontiers, 9, 1479-1493.",
-        "URL https://doi.org/10.1016/j.gsf.2018.04.001")
 )
