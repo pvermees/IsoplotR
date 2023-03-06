@@ -286,32 +286,33 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
     d2plot <- subset(d,subset=plotit)
     scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
     ticks <- c(0,5,10,20,50,100,200,Inf)
+    nt <- length(ticks)
     X <- graphics::par('usr')[1:2]
     Y <- X
     minY <- graphics::par('usr')[3]
     maxY <- graphics::par('usr')[4]
+    l0 <- lambda('Th230')[1]
     if (isochron|Th0i==1){
         fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
-        anchor <- c(0,fit$a[1])
+        anchor <- cbind(0,fit$y0[1]*exp(-l0*ticks))
     } else if (Th0i==2){
-        anchor <- rep(x$U8Th2,2)
+        anchor <- matrix(x$U8Th2,nt-1,2)
         ticks <- rev(rev(ticks)[-1]) # remove infinity
     } else {
-        anchor <- c(0,0)
+        anchor <- matrix(0,nt,2)
     }
-    l0 <- lambda('Th230')[1]
-    for (tick in ticks){ # plot isolines
-        if (is.finite(tick)) ticktext <- tick
+    for (i in seq_along(ticks)){ # plot isolines
+        if (is.finite(ticks[i])) ticktext <- ticks[i]
         else ticktext <- expression(infinity)
-        slope <- 1-exp(-l0*tick)
-        Y <- anchor[2] + slope*(X-anchor[1])
+        slope <- 1-exp(-l0*ticks[i])
+        Y <- anchor[i,2] + slope*(X-anchor[i,1])
         graphics::lines(X,Y,col=line.col,...)
         if (Y[2]<minY){
             # do nothing
         } else if (Y[2]>maxY){ # label below upper margin
-            xtext <- anchor[1] + (maxY-anchor[2])/slope
+            xtext <- anchor[i,1] + (maxY-anchor[i,2])/slope
             ytext <- maxY
             graphics::text(xtext,ytext,ticktext,pos=1,col=line.col)
         } else { # label to the left of the right margin
