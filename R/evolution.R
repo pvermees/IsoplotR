@@ -296,7 +296,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
-        anchor <- cbind(0,fit$a[1]*exp(-l0*ticks))
+        anchor <- cbind(0,fit$y0[1]*exp(-l0*ticks))
     } else if (Th0i==2){
         anchor <- matrix(x$U8Th2,nt-1,2)
         ticks <- rev(rev(ticks)[-1]) # remove infinity
