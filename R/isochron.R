@@ -648,7 +648,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 }
 
 getUPby0 <- function(out,fmt=1,type=1,option=1){
-    out$y0 <- c('y'=NA,'s[y]'=NA)
+    out$y0 <- c()
     if (option==1){
         if (fmt<4){                              # 07/06 vs. 38/06
             out$y0['y'] <- out$par['a0']
@@ -696,6 +696,9 @@ getUPby0 <- function(out,fmt=1,type=1,option=1){
             out$y0['y'] <- 1
             out$y0['s[y]'] <- 0
         }
+    }
+    if (inflate(out)){
+        out$y0['disp'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     out
 }
