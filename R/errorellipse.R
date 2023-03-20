@@ -123,6 +123,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param ylab (optional) y-axis label (only used when
 #'     \code{add=FALSE})
 #' @param asp the y/x aspect ratio, see `plot.window'.
+#' @param log same as the eponymous argument to the generic
+#'     \code{plot} function.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -142,7 +144,8 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         empty=FALSE, ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
-                        bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,asp=NA,...){
+                        bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
+                        asp=NA,log='',...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -154,7 +157,8 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     if (!add){
         if (missing(xlab)) xlab <- ''
         if (missing(ylab)) ylab <- ''
-        graphics::plot(xlim,ylim,type='n',xlab=xlab,ylab=ylab,bty='n',asp=asp)
+        graphics::plot(xlim,ylim,type='n',xlab=xlab,ylab=ylab,
+                       bty='n',asp=asp,log=log)
         if (empty) return()
     }
     if (!identical(fit,'none')){
