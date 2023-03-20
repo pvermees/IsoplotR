@@ -128,19 +128,21 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
-    init <- init.ludwig(x,model=model,anchor=anchor,type=type,buffer=2)
+    X <- x
+    X$d <- mediand(x$d)
+    init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
     ctrl <- list()
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,
-                        hessian=TRUE,x=x,anchor=anchor,type=type,
+                        hessian=TRUE,x=X,anchor=anchor,type=type,
                         model=model,exterr=exterr)
     if (fit$convergence>0){
         ctrl <- list(fnscale=1e-15,maxit=1000)
         fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                             lower=init$lower,upper=init$upper,control=ctrl,
-                            hessian=TRUE,x=x,anchor=anchor,type=type,
+                            hessian=TRUE,x=X,anchor=anchor,type=type,
                             model=model,exterr=exterr)
-        NMfit <- stats::optim(init$par,fn=LL.ludwig,hessian=TRUE,x=x,
+        NMfit <- stats::optim(init$par,fn=LL.ludwig,hessian=TRUE,x=X,
                               anchor=anchor,type=type,model=model,exterr=exterr)
         if (fit$value>NMfit$value){
             fit <- NMfit
@@ -153,13 +155,13 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     if (fit$convergence>0){
     }
     fit$cov <- inverthess(fit$hessian)
-    if (measured.disequilibrium(x$d) && type%in%c('joint',0,1,3)){
-        fit$posterior <- bayeslud(fit,x=x,anchor=anchor,type=type,
+    if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
+        fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
                                   control=ctrl,model=model,plot=plot)
     }
     efit <- exponentiate(fit)
-    afit <- anchormerge(efit,x,anchor=anchor,type=type)
-    out <- mswd.lud(afit,x=x,exterr=exterr,type=type)
+    afit <- anchormerge(efit,X,anchor=anchor,type=type)
+    out <- mswd.lud(afit,x=X,exterr=exterr,type=type)
     out$model <- model
     if (model==3){
         disp <- out$par['w']
