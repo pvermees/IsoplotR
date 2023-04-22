@@ -92,17 +92,27 @@ ci <- function(x,sx,oerr=3,df=NULL,absolute=FALSE){
     out
 }
 
+errlabelswapper <- function(errnames){
+    if (any(grepl('s\\[',errnames))){
+        out <- gsub('s\\[','err\\[',errnames)
+    } else {
+        out <- errnames
+    }
+    out
+}
+
 # formats table or vector of ages and errors
 agerr <- function(x,...){ UseMethod("agerr",x) }
 agerr.default <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
     tst[2] <- ci(x=x[1],sx=x[2],oerr=oerr)
     out <- roundit(age=tst[1],err=tst[2],sigdig=sigdig)
+    names(out) <- names(tst) <- errlabelswapper(names(x))
     out
 }
 agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
-    nc <- ncol(tst)
+    nc <- ncol(x)
     i <- seq(from=2,to=nc,by=2)
     tst[,i] <- ci(x=x[,i-1],sx=x[,i],oerr=oerr)
     if (is.na(sigdig)){
@@ -114,6 +124,7 @@ agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
         out[,i] <- rounded[,(nc/2+1):nc]
         if (nc%%2==1) out[,nc] <- signif(tst[,nc],digits=sigdig)
     }
+    colnames(out) <- errlabelswapper(colnames(x))
     out
 }
 
