@@ -44,21 +44,15 @@ model3regression <- function(xyz,type='york',
                              wtype=ifelse(type=='york','b','a')){
     pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
-        wa <- pilot$a['s[a]']*sqrt(pilot$mswd)
-        wb <- pilot$b['s[b]']*sqrt(pilot$mswd)
+        wa <- sqrt(pilot$mswd)*pilot$a['s[a]']
+        wb <- sqrt(pilot$mswd)*pilot$b['s[b]']
         w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
         init <- c(pilot$a['a'],pilot$b['b'],'w'=unname(w))
-        lower <- c(pilot$a['a']-5*pilot$a['s[a]']*sqrt(pilot$mswd),
-                   pilot$b['b']-5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']-5)
-        upper <- c(pilot$a['a']+5*pilot$a['s[a]']*sqrt(pilot$mswd),
-                   pilot$b['b']+5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']+2)
-        out <- stats::optim(init,LL.york,method='L-BFGS-B',
-                            lower=lower,upper=upper,XY=xyz,
-                            wtype=wtype,hessian=TRUE)
-        if (out$convergence>0){
-            out <- stats::optim(init,LL.york,XY=xyz,wtype=wtype,hessian=TRUE)
-        }
-        out$cov <- inverthess(out$hessian)
+        out <- stats::optim(init,LL.york,XY=xyz,wtype=wtype,hessian=TRUE)
+        x <- get.york.xy(XY=xyz,a=out$par[1],b=out$par[2],
+                         w=exp(out$par[3]),wtype=wtype)[,'x']
+        H <- stats::optimHess(par=c(out$par,x),fn=LL.york.ablwx,XY=xyz,wtype=wtype)
+        out$cov <- solve(H)[1:3,1:3]
         out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
         out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
         out$cov.ab <- out$cov['a','b']
@@ -85,35 +79,50 @@ model3regression <- function(xyz,type='york',
     out
 }
 
-york2DE <- function(XY,a,b,w=0,wtype='slope'){
-    out <- list()
+LL.york.x <- function(x,XY,a,b,w=0){
     ns <- nrow(XY)
-    P <- get.york.xy(XY,a=a,b=b)
-    E <- matrix(0,3*ns,3*ns)
+    E <- matrix(0,2*ns,2*ns)
     ix <- 1:ns
     iy <- (ns+1):(2*ns)
-    iw <- (2*ns+1):(3*ns)
     diag(E)[ix] <- XY[,'sX']^2
-    diag(E)[iy] <- XY[,'sY']^2
-    diag(E)[iw] <- w^2
+    diag(E)[iy] <- XY[,'sY']^2 + (w*x)^2
     E[ix,iy] <- E[iy,ix] <- diag(XY[,'rXY']*XY[,'sX']*XY[,'sY'])
-    Jw <- matrix(0,2*ns,3*ns)
-    Jw[ix,ix] <- Jw[iy,iy] <- diag(ns)
-    if (wtype%in%c(0,'intercept','a')){
-        Jw[ix,iw] <- -diag(P[,'dxda'])
-        Jw[iy,iw] <- -diag(P[,'dyda'])
+    D <- c(XY[,'X']-x,XY[,'Y']-a-b*x)
+    LL.norm(D,E)
+}
+LL.york <- function(ablw,XY,wtype='intercept'){
+    a <- ablw[1]
+    b <- ablw[2]
+    w <- exp(ablw[3])
+    if (wtype%in%c('slope',1,'b')){
+        init <- get.york.xy(XY=XY,a=a,b=b)[,'x']
+        fit <- optim(init,fn=LL.york.x,XY=XY,a=a,b=b,w=w)
+        out <- fit$value
     } else {
-        Jw[ix,iw] <- -diag(P[,'dxdb'])
-        Jw[iy,iw] <- -diag(P[,'dydb'])
+        x <- get.york.xy(XY=XY,a=a,b=b,w=w,wtype=wtype)[,'x']
+        out <- LL.york.ablwx(c(ablw,x),XY,wtype=wtype)
     }
-    out$D <- c(XY[,'X']-P[,'x'],XY[,'Y']-P[,'y'])
-    out$E <- Jw %*% E %*% t(Jw)
     out
 }
-LL.york <- function(abw,XY,wtype='slope'){
-    DE <- york2DE(XY,a=abw['a'],b=abw['b'],
-                  w=exp(abw['w']),wtype=wtype)
-    LL.norm(DE$D,DE$E)
+LL.york.ablwx <- function(ablwx,XY,wtype='intercept'){
+    ns <- nrow(XY)
+    a <- ablwx[1]
+    b <- ablwx[2]
+    w <- exp(ablwx[3])
+    x <- ablwx[4:(ns+3)]
+    E <- matrix(0,2*ns,2*ns)
+    ix <- 1:ns
+    iy <- (ns+1):(2*ns)
+    diag(E)[ix] <- XY[,'sX']^2
+    diag(E)[iy] <- XY[,'sY']^2
+    if (wtype%in%c('intercept',0,'a')){
+        diag(E)[iy] <- diag(E)[iy] + w^2
+    } else if (wtype%in%c('slope',1,'b')){
+        diag(E)[iy] <- diag(E)[iy] + (w*x)^2
+    }
+    E[ix,iy] <- E[iy,ix] <- diag(XY[,'rXY']*XY[,'sX']*XY[,'sY'])
+    D <- c(XY[,'X']-x,XY[,'Y']-a-b*x)
+    LL.norm(D,E)
 }
 
 titterington2DE <- function(XYZ,a,b,A,B,w=0,wtype='a'){

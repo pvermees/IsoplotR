@@ -124,26 +124,25 @@ york <- function(x){
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
-get.york.xy <- function(XY,a,b){
+get.york.xy <- function(XY,a,b,w=0,wtype=NA){
     X <- XY[,'X']
     sX <- XY[,'sX']
     Y <- XY[,'Y']
     sY <- XY[,'sY']
     sXY <- XY[,'rXY']*sX*sY
+    if (wtype %in% c('intercept',0,'a')){
+        sY <- sqrt(sY^2 + w^2)
+    }
     O <- invertcovmat(sx=sX,sy=sY,sxy=sXY)
     N <- O[,'xx']*X + O[,'xy']*b*X + O[,'xy']*(Y-a) + b*(Y-a)*O[,'yy']
     D <- O[,'xx'] + 2*b*O[,'xy'] + O[,'yy']*b^2
-    x <- N/D
+    if (wtype %in% c('slope',1,'b')){
+        x <- optim(N/D,fn=LL.york.x,XY=XY,a=a,b=b,w=w)$par
+    } else {
+        x <- N/D
+    }
     y <- a + b*x
-    dNda <- - O[,'xy'] - b*O[,'yy']
-    dNdb <- O[,'xy']*X + (Y-a)*O[,'yy']
-    dDda <- 0
-    dDdb <- 2*O[,'xy'] + 2*O[,'yy']*b
-    dxda <- (dNda*D-N*dDda)/D^2
-    dxdb <- (dNdb*D-N*dDdb)/D^2
-    dyda <- 1 + b*dxda
-    dydb <- x + b*dxdb
-    cbind('x'=x,'y'=y,'dxda'=dxda,'dxdb'=dxdb,'dyda'=dyda,'dydb'=dydb)
+    cbind(x=x,y=y)
 }
 
 #' @title Prepare geochronological data for York regression
