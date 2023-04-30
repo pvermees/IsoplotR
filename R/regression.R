@@ -1,5 +1,5 @@
 regression <- function(xyz,model=1,type='york',omit=NULL,
-                       wtype=ifelse(type=='york','b','a')){
+                       wtype=ifelse(type=='york','a','b')){
     xyz2calc <- clear(xyz,omit)
     if (model==1) out <- model1regression(xyz2calc,type=type)
     else if (model==2) out <- model2regression(xyz2calc,type=type)
@@ -41,7 +41,7 @@ model2regression <- function(xyz,type='york'){
 
 # fixes signs and uses logs for numerical stability:
 model3regression <- function(xyz,type='york',
-                             wtype=ifelse(type=='york','b','a')){
+                             wtype=ifelse(type=='york','a','b')){
     pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
         wa <- sqrt(pilot$mswd)*pilot$a['s[a]']
@@ -79,30 +79,12 @@ model3regression <- function(xyz,type='york',
     out
 }
 
-LL.york.x <- function(x,XY,a,b,w=0){
-    ns <- nrow(XY)
-    E <- matrix(0,2*ns,2*ns)
-    ix <- 1:ns
-    iy <- (ns+1):(2*ns)
-    diag(E)[ix] <- XY[,'sX']^2
-    diag(E)[iy] <- XY[,'sY']^2 + (w*x)^2
-    E[ix,iy] <- E[iy,ix] <- diag(XY[,'rXY']*XY[,'sX']*XY[,'sY'])
-    D <- c(XY[,'X']-x,XY[,'Y']-a-b*x)
-    LL.norm(D,E)
-}
 LL.york <- function(ablw,XY,wtype='intercept'){
     a <- ablw[1]
     b <- ablw[2]
     w <- exp(ablw[3])
-    if (wtype%in%c('slope',1,'b')){
-        init <- get.york.xy(XY=XY,a=a,b=b)[,'x']
-        fit <- optim(init,fn=LL.york.x,XY=XY,a=a,b=b,w=w)
-        out <- fit$value
-    } else {
-        x <- get.york.xy(XY=XY,a=a,b=b,w=w,wtype=wtype)[,'x']
-        out <- LL.york.ablwx(c(ablw,x),XY,wtype=wtype)
-    }
-    out
+    x <- get.york.xy(XY=XY,a=a,b=b,w=w,wtype=wtype)[,'x']
+    LL.york.ablwx(c(ablw,x),XY,wtype=wtype)
 }
 LL.york.ablwx <- function(ablwx,XY,wtype='intercept'){
     ns <- nrow(XY)

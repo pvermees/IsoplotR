@@ -137,7 +137,28 @@ get.york.xy <- function(XY,a,b,w=0,wtype=NA){
     N <- O[,'xx']*X + O[,'xy']*b*X + O[,'xy']*(Y-a) + b*(Y-a)*O[,'yy']
     D <- O[,'xx'] + 2*b*O[,'xy'] + O[,'yy']*b^2
     if (wtype %in% c('slope',1,'b')){
-        x <- optim(N/D,fn=LL.york.x,XY=XY,a=a,b=b,w=w)$par
+        slopeyorkroot <- function(p,XYi,a,b,w){
+            E <- dEdx <- matrix(0,2,2)
+            E[1,1] <- XYi['sX']^2
+            E[2,2] <- XYi['sY']^2 + (w*p)^2
+            E[1,2] <- E[2,1] <- XYi['rXY']*XYi['sX']*XYi['sY']
+            D <- c(XYi['X']-p,XYi['Y']-a-b*p)
+            dEdx[2,2] <- 2*p*w^2
+            dDdx <- c(-1,-b)
+            O <- solve(E)
+            sum(diag(O%*%dEdx)) + 2*D%*%O%*%dDdx - D%*%O%*%dEdx%*%O%*%D
+        }
+        slopeyorkhelper <- function(i,XY,a,b,w,lower,upper){
+            uniroot(f=slopeyorkroot,lower=lower[i],upper=upper[i],
+                    XYi=XY[i,],a=a,b=b,w=w,extendInt='yes',
+                    tol=.Machine$double.eps^0.5)
+        }
+        ns <- nrow(XY)
+        init <- N/D
+        dx <- diff(range(XY[,'X']))
+        fit <- sapply(1:ns,slopeyorkhelper,lower=init-dx,
+                      upper=init+dx,XY=XY,a=a,b=b,w=w)
+        x <- unlist(fit[1,])
     } else {
         x <- N/D
     }
