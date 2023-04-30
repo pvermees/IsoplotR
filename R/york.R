@@ -124,19 +124,17 @@ york <- function(x){
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
-get.york.xy <- function(XY,a,b,w=0,wtype=NA){
+get.york.xy <- function(XY,a,b,w=0,model=1){
     X <- XY[,'X']
     sX <- XY[,'sX']
     Y <- XY[,'Y']
     sY <- XY[,'sY']
     sXY <- XY[,'rXY']*sX*sY
-    if (wtype %in% c('intercept',0,'a')){
-        sY <- sqrt(sY^2 + w^2)
-    }
+    if (model==3) sY <- sqrt(sY^2 + w^2)
     O <- invertcovmat(sx=sX,sy=sY,sxy=sXY)
     N <- O[,'xx']*X + O[,'xy']*b*X + O[,'xy']*(Y-a) + b*(Y-a)*O[,'yy']
     D <- O[,'xx'] + 2*b*O[,'xy'] + O[,'yy']*b^2
-    if (wtype %in% c('slope',1,'b')){
+    if (model==4){
         slopeyorkroot <- function(p,XYi,a,b,w){
             E <- dEdx <- matrix(0,2,2)
             E[1,1] <- XYi['sX']^2

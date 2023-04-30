@@ -232,8 +232,8 @@ quotient <- function(X,sX,Y,sY,rXY){
 
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){
-    (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus) +
-        stats::mahalanobis(x,center=FALSE,cov=covmat)/2
+    (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus
+        + stats::mahalanobis(x,center=FALSE,cov=covmat))/2
 }
 
 # convert a sum of squares to a negative univariate normal log likelihood

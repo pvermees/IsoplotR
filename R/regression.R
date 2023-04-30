@@ -1,10 +1,13 @@
-regression <- function(xyz,model=1,type='york',omit=NULL,
-                       wtype=ifelse(type=='york','a','b')){
+regression <- function(xyz,model=1,type='york',omit=NULL){
     xyz2calc <- clear(xyz,omit)
-    if (model==1) out <- model1regression(xyz2calc,type=type)
-    else if (model==2) out <- model2regression(xyz2calc,type=type)
-    else if (model==3) out <- model3regression(xyz2calc,type=type,wtype=wtype)
-    else stop('invalid regression model')
+    if (model==1)
+        out <- model1regression(xyz2calc,type=type)
+    else if (model==2)
+        out <- model2regression(xyz2calc,type=type)
+    else if (model%in%c(3,4))
+        out <- model34regression(xyz2calc,type=type,model=model)
+    else
+        stop('invalid regression model')
     out$xyz <- xyz
     out$model <- model
     out$n <- nrow(xyz2calc)
@@ -40,18 +43,20 @@ model2regression <- function(xyz,type='york'){
 }
 
 # fixes signs and uses logs for numerical stability:
-model3regression <- function(xyz,type='york',
-                             wtype=ifelse(type=='york','a','b')){
+model34regression <- function(xyz,type='york',model=3){
     pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
-        wa <- sqrt(pilot$mswd)*pilot$a['s[a]']
-        wb <- sqrt(pilot$mswd)*pilot$b['s[b]']
-        w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
+        err <- ifelse(model==3,pilot$a['s[a]'],pilot$b['s[b]'])
+        fact <- max(1,sqrt(pilot$mswd))
+        w <- log(fact*err)
         init <- c(pilot$a['a'],pilot$b['b'],'w'=unname(w))
-        out <- stats::optim(init,LL.york,XY=xyz,wtype=wtype,hessian=TRUE)
+        lower <- init - c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],20)
+        upper <- init + c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],2)
+        out <- stats::optim(init,LL.york,method='L-BFGS-B',
+                            lower=lower,upper=upper,XY=xyz,model=model)
         x <- get.york.xy(XY=xyz,a=out$par[1],b=out$par[2],
-                         w=exp(out$par[3]),wtype=wtype)[,'x']
-        H <- stats::optimHess(par=c(out$par,x),fn=LL.york.ablwx,XY=xyz,wtype=wtype)
+                         w=exp(out$par[3]),model=model)[,'x']
+        H <- stats::optimHess(par=c(out$par,x),fn=LL.york.ablwx,XY=xyz,model=model)
         out$cov <- solve(H)[1:3,1:3]
         out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
         out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
@@ -79,14 +84,41 @@ model3regression <- function(xyz,type='york',
     out
 }
 
-LL.york <- function(ablw,XY,wtype='intercept'){
+LL.york <- function(ablw,XY,model=3){
     a <- ablw[1]
     b <- ablw[2]
     w <- exp(ablw[3])
-    x <- get.york.xy(XY=XY,a=a,b=b,w=w,wtype=wtype)[,'x']
-    LL.york.ablwx(c(ablw,x),XY,wtype=wtype)
+    x <- get.york.xy(XY=XY,a=a,b=b,w=w,model=model)[,'x']
+    LL.york.ablwx(c(ablw,x),XY,model=model)
 }
-LL.york.ablwx <- function(ablwx,XY,wtype='intercept'){
+LL.york.ablwx <- function(ablwx,XY,model=3){
+    ns <- nrow(XY)
+    a <- ablwx[1]
+    b <- ablwx[2]
+    w <- exp(ablwx[3])
+    x <- ablwx[4:(ns+3)]
+    DE <- matrix(0,nrow=ns,ncol=5)
+    colnames(DE) <- c('X-x','Y-y','vX','vY','sXY')
+    DE[,'X-x'] <- XY[,'X']-x
+    DE[,'Y-y'] <- XY[,'Y']-a-b*x
+    DE[,'vX'] <- XY[,'sX']^2
+    if (model==3){
+        DE[,'vY'] <- XY[,'sY']^2 + w^2
+    } else if (model==4){
+        DE[,'vY'] <- XY[,'sY']^2 + (w*x)^2
+    } else {
+        DE[,'vY'] <- XY[,'sY']^2
+    }
+    DE[,'sXY'] <- XY[,'rXY']*XY[,'sX']*XY[,'sY']
+    detE <- DE[,'vX']*DE[,'vY'] - DE[,'sXY']^2
+    O11 <- DE[,'vY']/detE
+    O22 <- DE[,'vX']/detE
+    O12 <- -DE[,'sXY']/detE
+    maha <- (O11*DE[,'X-x'] + O12*DE[,'Y-y'])*DE[,'X-x'] +
+        (O12*DE[,'X-x'] + O22*DE[,'Y-y'])*DE[,'Y-y']
+    sum(log(detE) + maha)
+}
+LL.york.ablwx.old <- function(ablwx,XY,model=3){
     ns <- nrow(XY)
     a <- ablwx[1]
     b <- ablwx[2]
@@ -97,9 +129,9 @@ LL.york.ablwx <- function(ablwx,XY,wtype='intercept'){
     iy <- (ns+1):(2*ns)
     diag(E)[ix] <- XY[,'sX']^2
     diag(E)[iy] <- XY[,'sY']^2
-    if (wtype%in%c('intercept',0,'a')){
+    if (model==3){
         diag(E)[iy] <- diag(E)[iy] + w^2
-    } else if (wtype%in%c('slope',1,'b')){
+    } else if (model==4){
         diag(E)[iy] <- diag(E)[iy] + (w*x)^2
     }
     E[ix,iy] <- E[iy,ix] <- diag(XY[,'rXY']*XY[,'sX']*XY[,'sY'])

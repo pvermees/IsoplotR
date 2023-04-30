@@ -758,7 +758,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=ifelse(inverse,0,1))
+    out <- regression(d2calc,model=model)
     if (inverse){
         R76 <- out$a
         out$y0[c('y','s[y]')] <- out$b
@@ -839,7 +839,7 @@ SK.intersection <- function(fit,inverse,m=0,M=5000){
 }
 #' @rdname isochron
 #' @export
-isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
+isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
@@ -876,10 +876,19 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     if (model==3){
+        if (inverse){
+            w <- out$disp[1]
+            sw <- out$disp[2]
+            out$disp[1] <- w/a^2
+            out$disp[2] <- out$disp[1]*sw/w
+        }
+        dispunits <- ''
+    } else if (model==4){
         l40 <- lambda('K40')[1]
         dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
         d09db <- ifelse(inverse,1/a,1)
         out$disp <- dtd09*d09db*out$disp
+        dispunits <- ' Ma'
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
@@ -889,7 +898,8 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Ar-Ar'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                      dispunits=dispunits,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
@@ -1108,8 +1118,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
                             hide=NULL,omit=NULL){
     y <- data2york(x,type=type)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,type="york",
-                      wtype=ifelse(type==1,'slope','intercept'))
+    out <- regression(d2calc,model=model,type="york")
     out$xyz <- y
     if (type==1){
         Th230U238 <- out$b
@@ -1410,8 +1419,9 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                     units='',prefix=fit$y0label,
                                     sigdig=sigdig,oerr=oerr,df=fit$df)
         } else {
-            content[[2]] <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],ntit='',
-                                     sigdig=sigdig,oerr=oerr,units='',prefix=fit$y0label)
+            content[[2]] <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],
+                                     ntit='',sigdig=sigdig,oerr=oerr,units='',
+                                     prefix=fit$y0label)
         }
     } else {
         content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
@@ -1423,7 +1433,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     }
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
-    } else if (fit$model==3){
+    } else if (fit$model%in%c(3,4)){
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
                                 oerr=oerr,prefix=displabel,units=dispunits)
     }
