@@ -777,8 +777,11 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3){
+    if ((model==3 && inverse) || (model==4 && !inverse)){
         out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
+        dispunits <- ' Ma'
+    } else {
+        dispunits <- ''
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
@@ -808,7 +811,8 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         } else {
             out$ski <- NULL
         }
-        tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',ski=out$ski)
+        tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',
+                             dispunits=dispunits,ski=out$ski)
         graphics::title(tit,xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
