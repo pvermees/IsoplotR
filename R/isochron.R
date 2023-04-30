@@ -1301,9 +1301,12 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     if (model==3){
+        dispunits <- ''
+    } else if (model==4){
         dDPdt <- lambda(nuclide)[1]*(1+DP)
         dDPdb <- ifelse(inverse,1/out$a[1],1)
         out$disp <- out$disp*dDPdb/dDPdt
+        dispunits <- ' Ma'
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[0]*'=')))
