@@ -152,8 +152,6 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
             warning('ludwig() did not converge.')
         }
     }
-    if (fit$convergence>0){
-    }
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
@@ -953,17 +951,21 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,LL=TRUE){
             E <- E + J %*% El %*% t(J)
         }
     } else {
+        E <- matrix(0,nrow=2*ns,ncol=2*ns)
+        ix <- 1:ns
+        iy <- (ns+1):(2*ns)
+        diag(E)[ix] <- O[,'sX']^2
+        diag(E)[iy] <- O[,'sY']^2
+        diag(E[ix,iy]) <- diag(E[iy,ix]) <- O[,'rXY']*O[,'sX']*O[,'sY']
         if ('w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])){
-            # convert w from age to slope:
-            ww <- ta0b0w['w']*abs(dbdt)
-            DE <- york2DE(XY=O,a=a,b=b,w=ww)
+            w <- ta0b0w['w']
+            xx <- get.york.xy(O,a=a,b=b,w=w,wtype='a')[,'x']
+            diag(E)[iy] <- diag(E)[iy] + w^2
         } else {
-            DE <- york2DE(XY=O,a=a,b=b)
+            xx <- get.york.xy(O,a=a,b=b)[,'x']
         }
-        D <- DE$D
+        D <- c(O[,'X']-xx,O[,'Y']-a-b*xx)
         if (exterr){
-            ix <- 1:ns
-            iy <- (ns+1):(2*ns)
             El <- getEl()
             J <- matrix(0,2*ns,7)
             colnames(J) <- colnames(El)
@@ -979,9 +981,7 @@ LL.ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,LL=TRUE){
             } else {
                 J[iy,'Th232'] <- a*McL$dPb208Th232dl32*P[,'x']
             }
-            E <- DE$E + J %*% El %*% t(J)
-        } else {
-            E <- DE$E
+            E <- E + J %*% El %*% t(J)
         }
         if (!LL) SS <- stats::mahalanobis(D,center=FALSE,cov=E)
     }
