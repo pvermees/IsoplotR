@@ -433,14 +433,18 @@ inverthess <- function(hess){
     out
 }
 
-invertcovmat <- function(sx,sy,sz,sxy=0,sxz=0,syz=0){
-    if (missing(sz)){
-        den <- (sx*sy)^2 - sxy^2
-        out <- cbind('xx'=(sy^2)/den,'yy'=(sx^2)/den,'xy'=-sxy/den)
+det3x3 <- function(vx,vy,vz,sxy,sxz,syz){
+    vx*vy*vz + 2*sxy*syz*sxz - vy*sxz^2 - vz*sxy^2 - vx*syz^2
+}
+
+invertcovmat <- function(vx,vy,vz,sxy=0,sxz=0,syz=0){
+    if (missing(vz)){
+        den <- vx*vy - sxy^2
+        out <- cbind('xx'=vy/den,'yy'=vx/den,'xy'=-sxy/den)
     } else {
-        aa <- sx^2
-        ee <- sy^2
-        ii <- sz^2
+        aa <- vx
+        ee <- vy
+        ii <- vz
         bb <- dd <- sxy
         cc <- gg <- sxz
         ff <- hh <- syz
