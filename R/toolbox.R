@@ -448,10 +448,10 @@ invertcovmat <- function(vx,vy,vz,sxy=0,sxz=0,syz=0){
         bb <- dd <- sxy
         cc <- gg <- sxz
         ff <- hh <- syz
-        den <- aa*(ee*ii-ff*hh) - bb*(dd*ii-ff*gg) + cc*(dd*hh-ee*gg)
+        den <- det3x3(vx,vy,vz,sxy,sxz,syz)
         xx <- (ee*ii-ff*hh)/den
         yy <- (aa*ii-cc*gg)/den
-        zz <- (dd*hh-bb*dd)/den
+        zz <- (aa*ee-bb*dd)/den
         xy <- (cc*hh-bb*ii)/den
         xz <- (bb*ff-cc*ee)/den
         yz <- (cc*dd-aa*ff)/den

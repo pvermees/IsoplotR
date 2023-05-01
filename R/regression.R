@@ -58,7 +58,7 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         out <- stats::optim(init,LL.york,method='L-BFGS-B',lower=lower,
                             upper=upper,XY=xyz,wtype=wtype)
         x <- get.york.xy(XY=xyz,a=out$par['a'],b=out$par['b'],
-                         w=exp(out$par['lw']),model=3,wtype=wtype)[,'x']
+                         w=exp(out$par['lw']),wtype=wtype)[,'x']
         H <- stats::optimHess(par=c(out$par,x),fn=LL.york.ablwx,XY=xyz,wtype=wtype)
         out$cov <- solve(H)[1:3,1:3]
         out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
@@ -93,7 +93,7 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
 
 LL.york <- function(ablw,XY,wtype='a'){
     x <- get.york.xy(XY=XY,a=ablw['a'],b=ablw['b'],
-                     w=exp(ablw['lw']),model=3,wtype=wtype)[,'x']
+                     w=exp(ablw['lw']),wtype=wtype)[,'x']
     LL.york.ablwx(c(ablw,x),XY,wtype=wtype)
 }
 LL.york.ablwx <- function(ablwx,XY,wtype='a'){
@@ -115,7 +115,7 @@ LL.york.ablwx <- function(ablwx,XY,wtype='a'){
     O <- invertcovmat(vx=DE[,'vX'],vy=DE[,'vY'],sxy=DE[,'sXY'])
     maha <- (O[,'xx']*DE[,'X-x'] + O[,'xy']*DE[,'Y-y'])*DE[,'X-x'] +
         (O[,'xy']*DE[,'X-x'] + O[,'yy']*DE[,'Y-y'])*DE[,'Y-y']
-    sum(log(detE) + maha)
+    sum(log(detE) + maha)/2
 }
 
 LL.titterington <- function(abABlw,XYZ,wtype='a'){
@@ -138,8 +138,8 @@ LL.titterington.abABlwx <- function(abABlwx,XYZ,wtype='a'){
     DE[,'Y-y'] <- XYZ[,'Y']-a-b*x
     DE[,'Z-z'] <- XYZ[,'Z']-A-B*x
     DE[,'vX'] <- XYZ[,'sX']^2
-    DE[,'vY'] <- XYZ[,'sX']^2
-    DE[,'vZ'] <- XYZ[,'sX']^2
+    DE[,'vY'] <- XYZ[,'sY']^2
+    DE[,'vZ'] <- XYZ[,'sZ']^2
     if (wtype=='a'){
         DE[,'vY'] <- XYZ[,'sY']^2 + w^2
     } else if (wtype=='b'){
@@ -148,9 +148,6 @@ LL.titterington.abABlwx <- function(abABlwx,XYZ,wtype='a'){
         DE[,'vZ'] <- XYZ[,'sZ']^2 + w^2
     } else if (wtype=='B'){
         DE[,'vZ'] <- XYZ[,'sZ']^2 + (w*x)^2
-    } else {
-        DE[,'vY'] <- XYZ[,'sY']^2
-        DE[,'vZ'] <- XYZ[,'sZ']^2
     }
     DE[,'sXY'] <- XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY']
     DE[,'sXZ'] <- XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ']
@@ -163,5 +160,10 @@ LL.titterington.abABlwx <- function(abABlwx,XYZ,wtype='a'){
         (O[,'xx']*DE[,'X-x']+O[,'xy']*DE[,'Y-y']+O[,'xz']*DE[,'Z-z'])*DE[,'X-x']+
         (O[,'xy']*DE[,'X-x']+O[,'yy']*DE[,'Y-y']+O[,'yz']*DE[,'Z-z'])*DE[,'Y-y']+
         (O[,'xz']*DE[,'X-x']+O[,'yz']*DE[,'Y-y']+O[,'zz']*DE[,'Z-z'])*DE[,'Z-z']
-    sum(log(detE) + maha)
+    if (FALSE){
+        scatterplot(XYZ[,c('X','sX','Y','sY','rXY')])
+        points(x,a+b*x)
+        title(sum(log(detE) + maha)/2)
+    }
+    sum(log(detE) + maha)/2
 }
