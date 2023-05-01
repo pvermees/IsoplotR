@@ -141,9 +141,9 @@ get.titterington.xyz <- function(XYZ,a,b,A,B,w=0,wtype=NA){
             sum(diag(O%*%dEdx)) + 2*D%*%O%*%dDdx - D%*%O%*%dEdx%*%O%*%D
         }
         slopetithelper <- function(i,XYZ,a,b,A,B,w,lower,upper){
-            uniroot(f=slopetitroot,lower=lower[i],upper=upper[i],
-                    XYZi=XYZ[i,],a=a,b=b,A=A,B=B,w=w,extendInt='yes',
-                    tol=.Machine$double.eps^0.5)
+            stats::uniroot(f=slopetitroot,lower=lower[i],upper=upper[i],
+                           XYZi=XYZ[i,],a=a,b=b,A=A,B=B,w=w,extendInt='yes',
+                           tol=.Machine$double.eps^0.5)
         }
         ns <- nrow(XYZ)
         init <- XYZ[,'X'] + beta/alpha

@@ -147,9 +147,9 @@ get.york.xy <- function(XY,a,b,w=0,wtype=NA){
             sum(diag(O%*%dEdx)) + 2*D%*%O%*%dDdx - D%*%O%*%dEdx%*%O%*%D
         }
         slopeyorkhelper <- function(i,XY,a,b,w,lower,upper){
-            uniroot(f=slopeyorkroot,lower=lower[i],upper=upper[i],
-                    XYi=XY[i,],a=a,b=b,w=w,extendInt='yes',
-                    tol=.Machine$double.eps^0.5)
+            stats::uniroot(f=slopeyorkroot,lower=lower[i],upper=upper[i],
+                           XYi=XY[i,],a=a,b=b,w=w,extendInt='yes',
+                           tol=.Machine$double.eps^0.5)
         }
         ns <- nrow(XY)
         init <- N/D

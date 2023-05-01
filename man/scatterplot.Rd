@@ -31,6 +31,7 @@ scatterplot(
   xlab,
   ylab,
   asp = NA,
+  log = "",
   ...
 )
 }
@@ -140,6 +141,9 @@ omitted aliquots.}
 \code{add=FALSE})}
 
 \item{asp}{the y/x aspect ratio, see `plot.window'.}
+
+\item{log}{same as the eponymous argument to the generic
+\code{plot} function.}
 
 \item{...}{optional arguments to format the points and text.}
 }

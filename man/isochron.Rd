@@ -86,6 +86,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   growth = FALSE,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
@@ -111,6 +112,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -135,6 +137,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -159,6 +162,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -183,6 +187,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -207,6 +212,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -231,6 +237,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -255,6 +262,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -277,6 +285,7 @@ isochron(x, ...)
   lwd = 1,
   plot = TRUE,
   model = 1,
+  wtype = "intercept",
   show.ellipses = 2 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -301,6 +310,7 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
+  wtype = "a",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -550,6 +560,23 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and
 \code{Y} = \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
 \code{LuHf}).}
+
+\item{wtype}{controls the parameter responsible for the
+    overdispersion in model-3 regression.
+
+\code{0}, \code{'a'} or \code{'intercept'}: attributes the
+overdispersion to the y-intercept of the isochron.
+
+\code{1}, \code{'b'} or \code{'slope'}: attributes the
+overdispersion to the slope of the isochron.
+
+\code{'A'}: only available if \code{x} has class \code{ThU} and
+\code{x$format} is 1 or 2. Attributes the overdispersion to the
+authigenic \eqn{^{230}}Th/\eqn{^{238}}U-intercept of the isochron.
+
+\code{'B'}: only available if \code{x} has class \code{ThU} and
+\code{x$format} is 1 or 2. Attributes the overdispersion to the
+\eqn{^{230}}Th/\eqn{^{232}}Th-slope of the isochron.}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 }

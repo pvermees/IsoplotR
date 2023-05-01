@@ -164,6 +164,23 @@
 #'
 #' \code{3}: Error-weighted least squares with overdispersion term
 #'
+#' @param wtype controls the parameter responsible for the
+#'     overdispersion in model-3 regression.
+#'
+#' \code{0}, \code{'a'} or \code{'intercept'}: attributes the
+#' overdispersion to the y-intercept of the isochron.
+#'
+#' \code{1}, \code{'b'} or \code{'slope'}: attributes the
+#' overdispersion to the slope of the isochron.
+#'
+#' \code{'A'}: only available if \code{x} has class \code{ThU} and
+#' \code{x$format} is 1 or 2. Attributes the overdispersion to the
+#' authigenic \eqn{^{230}}Th/\eqn{^{238}}U-intercept of the isochron.
+#'
+#' \code{'B'}: only available if \code{x} has class \code{ThU} and
+#' \code{x$format} is 1 or 2. Attributes the overdispersion to the
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-slope of the isochron.
+#' 
 #' @param show.ellipses show the data as:
 #'
 #' \code{0}: points
@@ -1103,13 +1120,13 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                                hide=hide,omit=omit,y0option=y0option)
         if (model==3){
             if (wtype=='a'){
-                displabel <- quote('('^234*'U'[a]*'/'^238*'U)-dispersion = ')
+                displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
             } else if (wtype=='b'){
-                displabel <- quote('('^234*'U'[a]*'/'^232*'Th)-dispersion = ')
+                displabel <- quote('('^234*'U/'^232*'Th)-dispersion = ')
             } else if (wtype=='A'){
-                displabel <- quote('('^230*'Th'[a]*'/'^238*'U)-dispersion = ')
+                displabel <- quote('('^230*'Th/'^238*'U)'[a]*'-dispersion = ')
             } else if (wtype=='B'){
-                displabel <- quote('('^230*'Th'[a]*'/'^232*'Th)-dispersion = ')
+                displabel <- quote('('^230*'Th/'^232*'Th)-dispersion = ')
             }
         }
         dispunits <- ''
