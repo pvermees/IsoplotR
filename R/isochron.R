@@ -1096,16 +1096,47 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
+    displabel <- 'dispersion = '
+    dispunits <- ''
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,wtype=wtype,exterr=exterr,
                                hide=hide,omit=omit,y0option=y0option)
-        displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
+        if (model==3){
+            if (wtype=='a'){
+                displabel <- quote('('^234*'U'[a]*'/'^238*'U)-dispersion = ')
+            } else if (wtype=='b'){
+                displabel <- quote('('^234*'U'[a]*'/'^232*'Th)-dispersion = ')
+            } else if (wtype=='A'){
+                displabel <- quote('('^230*'Th'[a]*'/'^238*'U)-dispersion = ')
+            } else if (wtype=='B'){
+                displabel <- quote('('^230*'Th'[a]*'/'^232*'Th)-dispersion = ')
+            }
+        }
         dispunits <- ''
     } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,wtype=wtype,
                                exterr=exterr,hide=hide,omit=omit)
-        displabel <- 'dispersion ='
-        dispunits <- ' ka'
+        if (model==3){
+            if (type==1 && wtype%in%c('slope',1,'b')){
+                age2disp <- TRUE
+                Th230U238 <- out$b[1]
+            } else if (type==2 && wtype%in%c('intercept',0,'a')){
+                age2disp <- TRUE
+                Th230U238 <- out$a[1]
+            } else {
+                age2disp <- FALSE
+            }
+            if (age2disp){
+                l0 <- lambda('Th230')[1]
+                dtd08 <- 1/(l0*(1-Th230U238))
+                out$disp <- out$disp*dtd08
+                dispunits <- ' ka'
+            } else {
+                displabel <- quote('('^230*'Th/'^232*'Th)'[0]*'-dispersion = ')
+            }
+        }
+    } else {
+        stop('Illegal Th-U data format.')
     }
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
@@ -1151,11 +1182,6 @@ isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
         out$y0['disp[y]'] <- get.Th230Th232_0(out$age['t'],
                                               Th230Th232[1],
                                               sqrt(out$mswd)*Th230Th232[2])[2]
-    }
-    if (model==3){
-        l0 <- lambda('Th230')[1]
-        dtd08 <- 1/(l0*(1-Th230U238))
-        out$disp <- out$disp*dtd08
     }
     out$xlab <- x.lab
     out$ylab <- y.lab
