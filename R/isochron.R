@@ -1325,7 +1325,7 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',inverse=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
-                        plot=TRUE,exterr=TRUE,model=1,
+                        plot=TRUE,exterr=TRUE,model=1,wtype=NA,
                         show.ellipses=1*(model!=2),bratio=1,
                         hide=NULL,omit=NULL,...){
     y <- data2york(x,inverse=inverse)
@@ -1347,13 +1347,13 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                                          exterr=exterr,bratio=bratio)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3){
-        dispunits <- ''
-    } else if (model==4){
+    if (wtype%in%c('slope',1,'b')){
         dDPdt <- lambda(nuclide)[1]*(1+DP)
         dDPdb <- ifelse(inverse,1/out$a[1],1)
         out$disp <- out$disp*dDPdb/dDPdt
         dispunits <- ' Ma'
+    } else {
+        dispunits <- ''
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[0]*'=')))
@@ -1364,7 +1364,8 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                     ellipse.stroke=ellipse.stroke,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,...)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='PD'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                      type='PD',dispunits=dispunits),
                         xlab=lab$x,ylab=lab$y)
     }
     invisible(out)

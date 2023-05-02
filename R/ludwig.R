@@ -147,18 +147,20 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
                        model=model,exterr=exterr)
         fit$cov <- inverthess(H)
     } else {
-        # temporarily disabled:
-        #c0 <- LL.ludwig(fit$par,x=X,model=model,
-        #                exterr=exterr,type=type,getc0=TRUE)
-        #H <- optimHess(c(c0,fit$par),fn=LL.ludwig.c0,
-        #               x=X,anchor=anchor,type=type,
-        #               model=model,exterr=exterr)
-        #ns <- length(x)
-        #fit$cov <- inverthess(H)[-(1:ns),-(1:ns)]
-        H <- optimHess(fit$par,fn=LL.ludwig,
-                       x=X,anchor=anchor,type=type,
-                       model=model,exterr=exterr)
-        fit$cov <- inverthess(H)
+        if (TRUE){ #temporarily disabled:
+            c0 <- LL.ludwig(fit$par,x=X,model=model,
+                            exterr=exterr,type=type,getc0=TRUE)
+            H <- optimHess(c(c0,fit$par),fn=LL.ludwig.c0,
+                           x=X,anchor=anchor,type=type,
+                           model=model,exterr=exterr)
+            ns <- length(x)
+            fit$cov <- inverthess(H)[-(1:ns),-(1:ns)]
+        } else {
+            H <- optimHess(fit$par,fn=LL.ludwig,
+                           x=X,anchor=anchor,type=type,
+                           model=model,exterr=exterr)
+            fit$cov <- inverthess(H)
+        }
     }
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
