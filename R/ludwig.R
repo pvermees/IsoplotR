@@ -147,13 +147,18 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
                        model=model,exterr=exterr)
         fit$cov <- inverthess(H)
     } else {
-        c0 <- LL.ludwig(fit$par,x=X,model=model,
-                        exterr=exterr,type=type,getc0=TRUE)
-        H <- optimHess(c(c0,fit$par),fn=LL.ludwig.c0,
+        # temporarily disabled:
+        #c0 <- LL.ludwig(fit$par,x=X,model=model,
+        #                exterr=exterr,type=type,getc0=TRUE)
+        #H <- optimHess(c(c0,fit$par),fn=LL.ludwig.c0,
+        #               x=X,anchor=anchor,type=type,
+        #               model=model,exterr=exterr)
+        #ns <- length(x)
+        #fit$cov <- inverthess(H)[-(1:ns),-(1:ns)]
+        H <- optimHess(fit$par,fn=LL.ludwig,
                        x=X,anchor=anchor,type=type,
                        model=model,exterr=exterr)
-        ns <- length(x)
-        fit$cov <- inverthess(H)[-(1:ns),-(1:ns)]
+        fit$cov <- inverthess(H)
     }
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
@@ -292,6 +297,11 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     if (debug) browser()
     par <- vector()
+    if (model==3){
+        pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
+        st <- pilot$cov['t','t']
+        w <- ifelse(st==0,pilot$par['t']/100,sqrt(st*pilot$mswd))
+    }
     if (x$format<4){
         yd <- data2york(x,option=2)
         if (anchor[1]==1){
@@ -311,10 +321,6 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
             par['t'] <- log(tt)
             par['a0'] <- log(abx['a'])
-        }
-        if (model==3){
-            Pb76 <- get.Pb207Pb206.ratios(x)
-            par['w'] <- log(median(Pb76[,2]))
         }
     } else if (x$format<7){
         yda <- data2york(x,option=3)
@@ -369,10 +375,6 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             if (type%in%c('joint',0,2)){
                 par['b0'] <- log(1/abxb['a'])
             }
-        }
-        if (model==3){
-            Pb4U8 <- get.Pb204U238.ratios(x)
-            par['w'] <- log(median(Pb4U8[,2]))
         }
     } else { # formats 7 and 8
         if (anchor[1]==1){
@@ -485,10 +487,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
                 par['b0'] <- log(1/abxb['a'])
             }            
         }
-        if (model==3){
-            par['w'] <- log(median(x$x['Th232U238']/100))
-        }
     }
+    if (model==3) par['w'] <- log(w)
     if (x$d$U48$option==2 || x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
     }
@@ -726,9 +726,6 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
         }
         ii <- (0:(NR-1))*ns+i
         E[ii,ii] <- wd$cov
-        if (model3){
-            E[ii[NR],ii[NR]] <- E[ii[NR],ii[NR]] + ta0b0w['w']^2
-        }
         if (nc>1) j <- i
         J[i,NR*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
         J[i,NR*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
@@ -740,6 +737,10 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     }
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     ED <- J%*%E%*%t(J)
+    if (model3){
+        Ew <- getEw(w=ta0b0w['w'],format=x$format,ns=ns,D=D)
+        ED <- ED + Ew
+    }
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     if (x$format<4){
@@ -830,7 +831,7 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     out
 }
 
-get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
+getEw <- function(w=0,format=1,ns=1,D=mclean()){
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     if (format<4) {
