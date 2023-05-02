@@ -486,9 +486,9 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
     }
     invisible(fit)
 }
-#' @param anchor
-#' control parameters to fix the intercept age or common Pb
-#' composition of the isochron fit. This can be a scalar or a vector.
+#' @param anchor control parameters to fix the intercept age or common
+#'     Pb composition of the isochron fit. This can be a scalar or a
+#'     vector.
 #'
 #' If \code{anchor[1]=0}: do not anchor the isochron.
 #'
@@ -497,6 +497,40 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 #'
 #' If \code{anchor[1]=2}: force the isochron line to intersect the
 #' concordia line at an age equal to \code{anchor[2]}.
+#' 
+#' @param type if \code{x} has class \code{UPb} and \code{x$format=4},
+#'     \code{5} or \code{6}:
+#'
+#' \code{1}: \eqn{^{204}}Pb/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
+#'
+#' \code{2}: \eqn{^{204}}Pb/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
+#'
+#' if \code{x} has class \code{UPb} and \code{x$format=7} or \code{8}:
+#'
+#' \code{1}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
+#'
+#' \code{2}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
+#' 
+#' \code{3}: \eqn{^{206}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
+#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
+#'
+#' \code{4}: \eqn{^{207}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
+#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
+#' 
+#' if \code{x} has class \code{ThU}, and following the classification
+#' of Ludwig and Titterington (1994), one of either:
+#'
+#' \code{1}: `Rosholt type-II' isochron, setting out
+#' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
+#'
+#' \code{2}: `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
+#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
+#'
+#' \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
+#' vs. \eqn{^{238}}U/\eqn{^{232}}Th
+#'
+#' \code{4}: `Osmond type-II' isochron, setting out
+#' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #' 
 #' @param joint logical. Only applies to U-Pb data formats 4 and
 #'     above. If \code{TRUE}, carries out three dimensional
@@ -649,6 +683,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
             out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
         }
+        if (model==3) dispunits <- ifelse(joint,' Ma','')
         if (plot){
             scatterplot(XY,oerr=oerr,show.ellipses=show.ellipses,
                         show.numbers=show.numbers,levels=levels,
@@ -658,7 +693,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
             graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
-                                          y0option=y0option),xlab=x.lab,ylab=y.lab)
+                                          y0option=y0option,dispunits=dispunits),
+                            xlab=x.lab,ylab=y.lab)
         }
     }
     invisible(out)
@@ -1054,7 +1090,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     out$y0label <- quote('He'[0]*'=')
-    if (plot) {
+    if (plot){
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
@@ -1066,42 +1102,6 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
     }
     invisible(out)
 }
-#' @param type
-#'
-#' if \code{x} has class \code{UPb} and \code{x$format=4}, \code{5} or 
-#' \code{6}:
-#'
-#' \code{1}: \eqn{^{204}}Pb/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
-#'
-#' \code{2}: \eqn{^{204}}Pb/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
-#'
-#' if \code{x} has class \code{UPb} and \code{x$format=7} or \code{8}:
-#'
-#' \code{1}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
-#'
-#' \code{2}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
-#' 
-#' \code{3}: \eqn{^{206}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
-#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
-#'
-#' \code{4}: \eqn{^{207}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
-#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
-#' 
-#' if \code{x} has class \code{ThU}, and following the classification
-#' of Ludwig and Titterington (1994), one of either:
-#'
-#' \code{1}: `Rosholt type-II' isochron, setting out
-#' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
-#'
-#' \code{2}: `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
-#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
-#'
-#' \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
-#' vs. \eqn{^{238}}U/\eqn{^{232}}Th
-#'
-#' \code{4}: `Osmond type-II' isochron, setting out
-#' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
-#' 
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
@@ -1445,7 +1445,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 
 isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                           units=' Ma',displabel='dispersion =',
-                          dispunits=units,ski=NULL,y0option=1,...){
+                          dispunits='',ski=NULL,y0option=1,...){
     content <- list()
     if (is.null(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,

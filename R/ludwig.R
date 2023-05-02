@@ -488,7 +488,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
         }
     }
     if (model==3){
-        w <- ifelse(type%in%c('joint',0),par['t']/100,median(yd[,'sY']))
+        w <- ifelse(type%in%c('joint',0),abs(par['t'])/100,median(yd[,'sY']))
         par['w'] <- log(w)
     }
     if (x$d$U48$option==2 || x$d$ThU$option==2){
