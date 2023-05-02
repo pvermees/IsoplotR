@@ -299,11 +299,6 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     if (debug) browser()
     par <- vector()
-    if (model==3){
-        pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
-        st <- pilot$cov['t','t']
-        w <- ifelse(st==0,pilot$par['t']/100,sqrt(st*pilot$mswd))
-    }
     if (x$format<4){
         yd <- data2york(x,option=2)
         if (anchor[1]==1){
@@ -327,6 +322,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     } else if (x$format<7){
         yda <- data2york(x,option=3)
         ydb <- data2york(x,option=4)
+        if (type==1) yd <- yda
+        if (type==2) yd <- ydb
         if (anchor[1]==1){
             if (type%in%c('joint',0,1)){
                 Pb64c <- iratio('Pb206Pb204')[1]
@@ -450,7 +447,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
                 ydb <- data2york(x,option=7)
                 abxb <- inithelper(yd=ydb,x0=x0)
                 par['b0'] <- log(1/abxb['a'])
-            }            
+            }  
         } else {
             yd <- data2york(x,option=2)
             abx <- inithelper(yd=yd)
@@ -490,7 +487,10 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             }            
         }
     }
-    if (model==3) par['w'] <- log(w)
+    if (model==3){
+        w <- ifelse(type%in%c('joint',0),par['t']/100,median(yd[,'sY']))
+        par['w'] <- log(w)
+    }
     if (x$d$U48$option==2 || x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
     }
@@ -940,13 +940,13 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format %in% (4:6)){
         if (type==1){
-            O <- data2york(x,option=3)
+            yd <- data2york(x,option=3)
             a <- 1/ta0b0w['a0']
             r68 <- McL$Pb206U238
             b <- -a*r68
             dbdt <- -a*McL$dPb206U238dt
         } else {
-            O <- data2york(x,option=4)
+            yd <- data2york(x,option=4)
             a <- 1/ta0b0w['b0']
             r75 <- McL$Pb207U235
             b <- -a*r75
@@ -954,25 +954,25 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
         }
     } else if (x$format %in% (7:8)){
         if (type==1){
-            O <- data2york(x,option=6,tt=tt)
+            yd <- data2york(x,option=6,tt=tt)
             a <- 1/ta0b0w['a0']
             r68 <- McL$Pb206U238
             b <- -a*r68
             dbdt <- -a*McL$dPb206U238dt
         } else if (type==2){
-            O <- data2york(x,option=7,tt=tt)
+            yd <- data2york(x,option=7,tt=tt)
             a <- 1/ta0b0w['b0']
             r75 <- McL$Pb207U235
             b <- -a*r75
             dbdt <- -a*McL$dPb207U235dt
         } else if (type==3){
-            O <- data2york(x,option=8,tt=tt)
+            yd <- data2york(x,option=8,tt=tt)
             a <- ta0b0w['a0']
             r82 <- age_to_Pb208Th232_ratio(tt)[1]
             b <- -a*r82
             dbdt <- -a*McL$dPb208Th232dt
         } else if (type==4){
-            O <- data2york(x,option=9,tt=tt)
+            yd <- data2york(x,option=9,tt=tt)
             a <- ta0b0w['b0']
             r82 <- age_to_Pb208Th232_ratio(tt)[1]
             b <- -a*r82
@@ -983,7 +983,7 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     }
     ns <- length(x)
     if (model==2){
-        dem <- deming(a=a,b=b,x=O[,'X'],y=O[,'Y'])
+        dem <- deming(a=a,b=b,x=yd[,'X'],y=yd[,'Y'])
         D <- as.vector(dem$d)
         SS <- sum(D^2)
         E <- diag(SS,ns,ns)/(ns-2)
@@ -1006,35 +1006,38 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
             E <- E + J %*% El %*% t(J)
         }
     } else {
+        model3 <- 'w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])
         E <- matrix(0,nrow=2*ns,ncol=2*ns)
         ix <- 1:ns
         iy <- (ns+1):(2*ns)
-        diag(E)[ix] <- O[,'sX']^2
-        diag(E)[iy] <- O[,'sY']^2
-        diag(E[ix,iy]) <- diag(E[iy,ix]) <- O[,'rXY']*O[,'sX']*O[,'sY']
-        if ('w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])){
+        diag(E)[ix] <- yd[,'sX']^2
+        diag(E)[iy] <- yd[,'sY']^2
+        diag(E[ix,iy]) <- diag(E[iy,ix]) <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
+        if (model3){
             w <- ta0b0w['w']
-            if (is.null(c0)) c0 <- get.york.xy(O,a=a,b=b,w=w,wtype='a')[,'x']
             diag(E)[iy] <- diag(E)[iy] + w^2
+            yd[,'sY'] <- sqrt(diag(E)[iy])
+            yd[,'rXY'] <- diag(E[iy,ix])/(yd[,'sX']*yd[,'sY'])
+            if (is.null(c0)) c0 <- get.york.xy(yd,a=a,b=b,w=w,wtype='a')[,'x']
         } else {
-            if (is.null(c0)) c0 <- get.york.xy(O,a=a,b=b)[,'x']
+            if (is.null(c0)) c0 <- get.york.xy(yd,a=a,b=b)[,'x']
         }
-        D <- c(O[,'X']-c0,O[,'Y']-a-b*c0)
+        D <- c(yd[,'X']-c0,yd[,'Y']-a-b*c0)
         if (exterr){
             El <- getEl()
             J <- matrix(0,2*ns,7)
             colnames(J) <- colnames(El)
-            P <- get.york.xy(XY=O,a=a,b=b)
+            xy <- get.york.xy(XY=yd,a=a,b=b)
             if (type==1){
-                J[iy,'U238'] <- a*McL$dPb206U238dl38*P[,'x']
-                J[iy,'U234'] <- a*McL$dPb206U238dl34*P[,'x']
-                J[iy,'Th230'] <- a*McL$dPb206U238dl30*P[,'x']
-                J[iy,'Ra226'] <- a*McL$dPb206U238dl26*P[,'x']
+                J[iy,'U238'] <- a*McL$dPb206U238dl38*xy[,'x']
+                J[iy,'U234'] <- a*McL$dPb206U238dl34*xy[,'x']
+                J[iy,'Th230'] <- a*McL$dPb206U238dl30*xy[,'x']
+                J[iy,'Ra226'] <- a*McL$dPb206U238dl26*xy[,'x']
             } else if (type==2){
-                J[iy,'U235'] <- a*McL$dPb207U235dl35*P[,'x']
-                J[iy,'Pa231'] <- a*McL$dPb207U235dl31*P[,'x']
+                J[iy,'U235'] <- a*McL$dPb207U235dl35*xy[,'x']
+                J[iy,'Pa231'] <- a*McL$dPb207U235dl31*xy[,'x']
             } else {
-                J[iy,'Th232'] <- a*McL$dPb208Th232dl32*P[,'x']
+                J[iy,'Th232'] <- a*McL$dPb208Th232dl32*xy[,'x']
             }
             E <- E + J %*% El %*% t(J)
         }
