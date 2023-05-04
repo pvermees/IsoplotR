@@ -147,7 +147,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
                        model=model,exterr=exterr)
         fit$cov <- inverthess(H)
     } else {
-        if (TRUE){ #temporarily disabled:
+        if (FALSE){ #temporarily disabled:
             c0 <- LL.ludwig(fit$par,x=X,model=model,
                             exterr=exterr,type=type,getc0=TRUE)
             H <- optimHess(c(c0,fit$par),fn=LL.ludwig.c0,
@@ -693,7 +693,7 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     X <- zeros
     Y <- zeros
     K0 <- zeros
-    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format%in%c(1,2,3)){
         NP <- 2 # number of fit parameters (tt, a0)
         NR <- 2 # number of isotopic ratios (X, Y)
@@ -714,7 +714,7 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
-    nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
+    nc <- length(McL$ThUi) # nc>1 if each aliquot has its own diseq correction
     j <- 1
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
@@ -729,34 +729,34 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
         ii <- (0:(NR-1))*ns+i
         E[ii,ii] <- wd$cov
         if (nc>1) j <- i
-        J[i,NR*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
-        J[i,NR*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
-        J[ns+i,NR*ns+1] <- -D$dPb206U238dl38[j]  #dLdl38
-        J[ns+i,NR*ns+3] <- -D$dPb206U238dl34[j]  #dLdl34
-        J[ns+i,NR*ns+6] <- -D$dPb206U238dl30[j]  #dLdl30
-        J[ns+i,NR*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
-        if (x$format>6) J[2*ns+i,NR*ns+4] <- -D$dPb208Th232dl32[j] # dMdl32
+        J[i,NR*ns+2] <- -McL$dPb207U235dl35[j]     #dKdl35
+        J[i,NR*ns+5] <- -McL$dPb207U235dl31[j]     #dKdl31
+        J[ns+i,NR*ns+1] <- -McL$dPb206U238dl38[j]  #dLdl38
+        J[ns+i,NR*ns+3] <- -McL$dPb206U238dl34[j]  #dLdl34
+        J[ns+i,NR*ns+6] <- -McL$dPb206U238dl30[j]  #dLdl30
+        J[ns+i,NR*ns+7] <- -McL$dPb206U238dl26[j]  #dLdl26
+        if (x$format>6) J[2*ns+i,NR*ns+4] <- -McL$dPb208Th232dl32[j] # dMdl32
     }
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
-    ED <- J%*%E%*%t(J)
+    EE <- J%*%E%*%t(J)
     if (model3){
-        Ew <- getEw(w=ta0b0w['w'],format=x$format,ns=ns,D=D)
-        ED <- ED + Ew
+        Ew <- getEw(w=ta0b0w['w'],format=x$format,ns=ns,McL=McL)
+        EE <- EE + Ew
     }
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     if (x$format<4){
-        O <- blockinverse(AA=ED[i1,i1],BB=ED[i1,i2],
-                          CC=ED[i2,i1],DD=ED[i2,i2],doall=TRUE)
+        O <- blockinverse(AA=EE[i1,i1],BB=EE[i1,i2],
+                          CC=EE[i2,i1],DD=EE[i2,i2],doall=TRUE)
     } else {
         i3 <- (2*ns+1):(3*ns)
-        O <- blockinverse3x3(AA=ED[i1,i1],BB=ED[i1,i2],CC=ED[i1,i3],
-                             DD=ED[i2,i1],EE=ED[i2,i2],FF=ED[i2,i3],
-                             GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
+        O <- blockinverse3x3(AA=EE[i1,i1],BB=EE[i1,i2],CC=EE[i1,i3],
+                             DD=EE[i2,i1],EE=EE[i2,i2],FF=EE[i2,i3],
+                             GG=EE[i3,i1],HH=EE[i3,i2],II=EE[i3,i3])
     }
     if (x$format%in%c(1,2,3)){
         if (is.null(c0)){
-            K0 <- X - D$Pb207U235 + a0*U*(D$Pb206U238 - Y)
+            K0 <- X - McL$Pb207U235 + a0*U*(McL$Pb206U238 - Y)
             A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U +
                    K0%*%(O[i1,i2]+t(O[i2,i1])))
             B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U +
@@ -764,16 +764,16 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
                    a0*U*(O[i1,i2]+t(O[i1,i2])) +
                    (O[i2,i1]+t(O[i2,i1]))*a0*U)
             L <- as.vector(solve(B,A))
-            c0 <- Y - D$Pb206U238 - L
+            c0 <- Y - McL$Pb206U238 - L
         } else {
-            L <- Y - D$Pb206U238 - c0
+            L <- Y - McL$Pb206U238 - c0
         }
-        K <- X - D$Pb207U235 - a0*U*c0
+        K <- X - McL$Pb207U235 - a0*U*c0
         KLM <- c(K,L)
     } else if (x$format%in%c(4,5,6)){
         if (is.null(c0)){
-            K0 <- X - D$Pb207U235 - U*b0*Z
-            L0 <- Y - D$Pb206U238 - a0*Z
+            K0 <- X - McL$Pb207U235 - U*b0*Z
+            L0 <- Y - McL$Pb206U238 - a0*Z
             V <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*U*b0 +
                    L0%*%(O[i1,i2]+t(O[i2,i1]))*U*b0 +
                    K0%*%(O[i1,i2]+t(O[i2,i1]))*a0 +
@@ -794,14 +794,14 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
         } else {
             M <- as.vector(Z - c0)
         }
-        K <- as.vector(X - D$Pb207U235 - U*b0*c0)
-        L <- as.vector(Y - D$Pb206U238 - a0*c0)
+        K <- as.vector(X - McL$Pb207U235 - U*b0*c0)
+        L <- as.vector(Y - McL$Pb206U238 - a0*c0)
         KLM <- c(K,L,M)
     } else if (x$format%in%c(7,8)){
         if (is.null(c0)){
             Wd <- diag(W)
-            K0 <- X - D$Pb207U235 - (Z-D$Pb208Th232)*U*W*b0
-            L0 <- Y - D$Pb206U238 - (Z-D$Pb208Th232)*W*a0
+            K0 <- X - McL$Pb207U235 - (Z-McL$Pb208Th232)*U*W*b0
+            L0 <- Y - McL$Pb206U238 - (Z-McL$Pb208Th232)*W*a0
             AA <- (Wd%*%O[i1,i1]%*%Wd)*(U*b0)^2 +
                 (Wd%*%O[i2,i2]%*%Wd)*a0^2 + O[i3,i3] +
                 U*a0*b0*Wd%*%(O[i1,i2]+O[i2,i1])%*%Wd +
@@ -818,22 +818,22 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
                 U*b0*Wd%*%O[i1,i2]%*%L0 +
                 O[i3,i1]%*%K0 + O[i3,i2]%*%L0
             M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
-            c0 <- as.vector(Z - D$Pb208Th232 - M)
+            c0 <- as.vector(Z - McL$Pb208Th232 - M)
         } else {
-            M <- as.vector(Z - D$Pb208Th232 - c0)
+            M <- as.vector(Z - McL$Pb208Th232 - c0)
         }
-        K <- as.vector(X - D$Pb207U235 - c0*b0*U*W)
-        L <- as.vector(Y - D$Pb206U238 - c0*a0*W)
+        K <- as.vector(X - McL$Pb207U235 - c0*b0*U*W)
+        L <- as.vector(Y - McL$Pb206U238 - c0*a0*W)
         KLM <- c(K,L,M)
     }
     out$c0 <- c0
     out$SS <- KLM%*%O%*%KLM
-    detED <- determinant(ED,logarithm=TRUE)$modulus
-    out$LL <- (NP*ns*log(2*pi) + detED + out$SS)/2
+    detEE <- determinant(EE,logarithm=TRUE)$modulus
+    out$LL <- (NP*ns*log(2*pi) + detEE + out$SS)/2
     out
 }
 
-getEw <- function(w=0,format=1,ns=1,D=mclean()){
+getEw <- function(w=0,format=1,ns=1,McL=mclean()){
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
     if (format<4) {
@@ -842,10 +842,10 @@ getEw <- function(w=0,format=1,ns=1,D=mclean()){
         J <- matrix(0,3*ns,ns)
         i3 <- (2*ns+1):(3*ns)
     }
-    diag(J[i1,i1]) <- -D$dPb207U235dt      # dKdt
-    diag(J[i2,i1]) <- -D$dPb206U238dt      # dLdt
+    diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
+    diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
     if (format>6) {
-        diag(J[i3,i1]) <- -D$dPb208Th232dt # dMdt
+        diag(J[i3,i1]) <- -McL$dPb208Th232dt # dMdt
     }
     dEdx <- w^2
     dEdx*J%*%t(J)
@@ -857,11 +857,11 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     a0 <- ta0b0['a0']
     if ('b0'%in%pnames) b0 <- ta0b0['b0']
     nn <- length(x)
-    D <- mclean(tt=tt,d=x$d,exterr=exterr)
+    McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format<4){
         xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-        xr <- 1/D$Pb206U238
-        yr <- D$Pb207Pb206
+        xr <- 1/McL$Pb206U238
+        yr <- McL$Pb207Pb206
         xx <- xy[,'X',drop=FALSE]
         yy <- xy[,'Y',drop=FALSE]
         dem <- deming(a=a0,b=(yr-a0)/xr,x=xx,y=yy)
@@ -874,16 +874,16 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
             dddPbU <- dem$dddb*dbdxr*dxrdPbU
             dddPbPb <- dem$dddb*dbdyr*dyrdPbPb
             dPbUdl <- dPbPbdl <- rep(0,7)
-            dPbUdl[1] <- D$dPb206U238dl38
-            dPbUdl[3] <- D$dPb206U238dl34
-            dPbUdl[6] <- D$dPb206U238dl30
-            dPbUdl[7] <- D$dPb206U238dl26
-            dPbPbdl[1] <- D$dPb207Pb206dl38
-            dPbPbdl[2] <- D$dPb207Pb206dl35
-            dPbPbdl[3] <- D$dPb207Pb206dl34
-            dPbPbdl[5] <- D$dPb207Pb206dl31
-            dPbPbdl[6] <- D$dPb207Pb206dl30
-            dPbPbdl[7] <- D$dPb207Pb206dl26
+            dPbUdl[1] <- McL$dPb206U238dl38
+            dPbUdl[3] <- McL$dPb206U238dl34
+            dPbUdl[6] <- McL$dPb206U238dl30
+            dPbUdl[7] <- McL$dPb206U238dl26
+            dPbPbdl[1] <- McL$dPb207Pb206dl38
+            dPbPbdl[2] <- McL$dPb207Pb206dl35
+            dPbPbdl[3] <- McL$dPb207Pb206dl34
+            dPbPbdl[5] <- McL$dPb207Pb206dl31
+            dPbPbdl[6] <- McL$dPb207Pb206dl30
+            dPbPbdl[7] <- McL$dPb207Pb206dl26
             J <- dddPbU%*%dPbUdl + dddPbPb%*%dPbPbdl
             covmat <- diag(SS/(nn-2),nn,nn) + J%*%getEl()%*%t(J)
             LL <- LL.norm(as.vector(dem$d),covmat)
@@ -900,8 +900,8 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
         x7 <- xy[,3,drop=FALSE] # U235Pb207
         y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
-        r86 <- 1/D$Pb206U238
-        r57 <- 1/D$Pb207U235
+        r86 <- 1/McL$Pb206U238
+        r57 <- 1/McL$Pb207U235
         dem6 <- deming(a=1/a0,b=-1/(a0*r86),x=x6,y=y6)
         dem7 <- deming(a=1/b0,b=-1/(b0*r57),x=x7,y=y7)
         SS6 <- sum(dem6$d^2)
@@ -914,13 +914,13 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
             dd6d68 <- dem6$dddb*dbd86*dr68d86
             dd7d75 <- dem7$dddb*dbd57*dr57d75
             d68dl <- matrix(0,1,7)
-            d68dl[1] <- D$dPb206U238dl38
-            d68dl[3] <- D$dPb206U238dl34
-            d68dl[6] <- D$dPb206U238dl30
-            d68dl[7] <- D$dPb206U238dl26
+            d68dl[1] <- McL$dPb206U238dl38
+            d68dl[3] <- McL$dPb206U238dl34
+            d68dl[6] <- McL$dPb206U238dl30
+            d68dl[7] <- McL$dPb206U238dl26
             d75dl <- matrix(0,1,7)
-            d75dl[2] <- D$dPb207U235dl35
-            d75dl[5] <- D$dPb207U235dl31
+            d75dl[2] <- McL$dPb207U235dl35
+            d75dl[5] <- McL$dPb207U235dl31
             J6 <- dd6d68%*%d68dl
             J7 <- dd7d75%*%d75dl
             E6 <- diag(SS6/(nn-2),nn,nn) + J6%*%getEl()%*%t(J6)

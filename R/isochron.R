@@ -606,25 +606,25 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         md <- mediand(x$d)
         if (md$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
         if (md$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
-        D <- mclean(tt,d=md,exterr=exterr)
+        McL <- mclean(tt,d=md,exterr=exterr)
         if (type==1){                           # 04-08c/06 vs. 38/06
-            x0inv <- D$Pb206U238
-            dx0invdt <- D$dPb206U238dt
+            x0inv <- McL$Pb206U238
+            dx0invdt <- McL$dPb206U238dt
             E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^238*'U/'^206*'Pb')
         } else if (type==2){                    # 04-08c/07 vs. 35/07
-            x0inv <- D$Pb207U235
-            dx0invdt <- D$dPb207U235dt
+            x0inv <- McL$Pb207U235
+            dx0invdt <- McL$dPb207U235dt
             E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^235*'U/'^207*'Pb')
         } else if (type==3 & x$format%in%c(7,8)){  # 06c/08 vs. 32/08
             x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-            dx0invdt <- D$dPb208Th232dt
+            dx0invdt <- McL$dPb208Th232dt
             E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^232*'Th/'^208*'Pb')
         } else if (type==4 & x$format%in%c(7,8)){  # 07c/08 vs. 32/08
             x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-            dx0invdt <- D$dPb208Th232dt
+            dx0invdt <- McL$dPb208Th232dt
             E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^232*'Th/'^208*'Pb')
         } else {
