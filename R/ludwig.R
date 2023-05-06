@@ -868,115 +868,50 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
 }
 
 LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
-    pnames <- names(ta0b0)
     tt <- ta0b0['t']
     a0 <- ta0b0['a0']
-    if ('b0'%in%pnames) b0 <- ta0b0['b0']
+    b0 <- ta0b0['b0']
     nn <- length(x)
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format<4){
-        xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-        xr <- 1/McL$Pb206U238
-        yr <- McL$Pb207Pb206
-        xx <- xy[,'X',drop=FALSE]
-        yy <- xy[,'Y',drop=FALSE]
-        dem <- deming(a=a0,b=(yr-a0)/xr,x=xx,y=yy)
-        SS <- sum(dem$d^2)
-        if (exterr){
-            dbdxr <- (a0-yr)/xr^2
-            dbdyr <- 1/xr
-            dxrdPbU <- -xr^2
-            dyrdPbPb <- 1
-            dddPbU <- dem$dddb*dbdxr*dxrdPbU
-            dddPbPb <- dem$dddb*dbdyr*dyrdPbPb
-            dPbUdl <- dPbPbdl <- rep(0,7)
-            dPbUdl[1] <- McL$dPb206U238dl38
-            dPbUdl[3] <- McL$dPb206U238dl34
-            dPbUdl[6] <- McL$dPb206U238dl30
-            dPbUdl[7] <- McL$dPb206U238dl26
-            dPbPbdl[1] <- McL$dPb207Pb206dl38
-            dPbPbdl[2] <- McL$dPb207Pb206dl35
-            dPbPbdl[3] <- McL$dPb207Pb206dl34
-            dPbPbdl[5] <- McL$dPb207Pb206dl31
-            dPbPbdl[6] <- McL$dPb207Pb206dl30
-            dPbPbdl[7] <- McL$dPb207Pb206dl26
-            J <- dddPbU%*%dPbUdl + dddPbPb%*%dPbPbdl
-            covmat <- diag(SS/(nn-2),nn,nn) + J%*%getEl()%*%t(J)
-            LL <- LL.norm(as.vector(dem$d),covmat)
-        } else {
-            LL <- SS2LL(SS=SS,nn=nn)
-        }
+    if (x$format<7){
+        xy <- get.UPb.isochron.ratios.204(x)
     } else {
-        if (x$format<7){
-            xy <- get.UPb.isochron.ratios.204(x)
-        } else {
-            xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
-        }
-        x6 <- xy[,1,drop=FALSE] # U238Pb206
-        y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
-        x7 <- xy[,3,drop=FALSE] # U235Pb207
-        y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
-        r86 <- 1/McL$Pb206U238
-        r57 <- 1/McL$Pb207U235
-        dem6 <- deming(a=1/a0,b=-1/(a0*r86),x=x6,y=y6)
-        dem7 <- deming(a=1/b0,b=-1/(b0*r57),x=x7,y=y7)
-        SS6 <- sum(dem6$d^2)
-        SS7 <- sum(dem7$d^2)
-        if (exterr){
-            dbd86 <- 1/(a0*r86^2)
-            dbd57 <- 1/(b0*r57^2)
-            dr68d86 <- -r86^2
-            dr57d75 <- -r57^2
-            dd6d68 <- dem6$dddb*dbd86*dr68d86
-            dd7d75 <- dem7$dddb*dbd57*dr57d75
-            d68dl <- matrix(0,1,7)
-            d68dl[1] <- McL$dPb206U238dl38
-            d68dl[3] <- McL$dPb206U238dl34
-            d68dl[6] <- McL$dPb206U238dl30
-            d68dl[7] <- McL$dPb206U238dl26
-            d75dl <- matrix(0,1,7)
-            d75dl[2] <- McL$dPb207U235dl35
-            d75dl[5] <- McL$dPb207U235dl31
-            J6 <- dd6d68%*%d68dl
-            J7 <- dd7d75%*%d75dl
-            E6 <- diag(SS6/(nn-2),nn,nn) + J6%*%getEl()%*%t(J6)
-            E7 <- diag(SS7/(nn-2),nn,nn) + J7%*%getEl()%*%t(J7)
-            LL <- LL.norm(as.vector(dem6$d),E6) + LL.norm(as.vector(dem7$d),E7)
-        } else {
-            LL <- SS2LL(SS=SS6+SS7,nn=2*nn)
-        }
+        xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+    }
+    x6 <- xy[,1,drop=FALSE] # U238Pb206
+    y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
+    x7 <- xy[,3,drop=FALSE] # U235Pb207
+    y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
+    r86 <- 1/McL$Pb206U238
+    r57 <- 1/McL$Pb207U235
+    dem6 <- deming(a=1/a0,b=-1/(a0*r86),x=x6,y=y6)
+    dem7 <- deming(a=1/b0,b=-1/(b0*r57),x=x7,y=y7)
+    SS6 <- sum(dem6$d^2)
+    SS7 <- sum(dem7$d^2)
+    if (exterr){
+        dbd86 <- 1/(a0*r86^2)
+        dbd57 <- 1/(b0*r57^2)
+        dr68d86 <- -r86^2
+        dr57d75 <- -r57^2
+        dd6d68 <- dem6$dddb*dbd86*dr68d86
+        dd7d75 <- dem7$dddb*dbd57*dr57d75
+        d68dl <- matrix(0,1,7)
+        d68dl[1] <- McL$dPb206U238dl38
+        d68dl[3] <- McL$dPb206U238dl34
+        d68dl[6] <- McL$dPb206U238dl30
+        d68dl[7] <- McL$dPb206U238dl26
+        d75dl <- matrix(0,1,7)
+        d75dl[2] <- McL$dPb207U235dl35
+        d75dl[5] <- McL$dPb207U235dl31
+        J6 <- dd6d68%*%d68dl
+        J7 <- dd7d75%*%d75dl
+        E6 <- diag(SS6/(nn-2),nn,nn) + J6%*%getEl()%*%t(J6)
+        E7 <- diag(SS7/(nn-2),nn,nn) + J7%*%getEl()%*%t(J7)
+        LL <- LL.norm(as.vector(dem6$d),E6) + LL.norm(as.vector(dem7$d),E7)
+    } else {
+        LL <- SS2LL(SS=SS6+SS7,nn=2*nn)
     }
     LL
-}
-
-LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
-    out <- list()
-    if (x$format %in% (4:6)) opt <- 3:4
-    else if (x$format %in% (7:8)) opt <- 8:11
-    else stop('LL.ludwig.model2.2d is only relevant to U-Pb formats 4-8')
-    yd <- data2york(x,option=opt[type],tt=tt)        
-    dem <- deming(a=a0,b=b,x=yd[,'X'],y=yd[,'Y'])
-    D <- as.vector(dem$d)
-    SS <- sum(D^2)
-    E <- diag(SS,ns,ns)/(ns-2)
-    if (exterr){
-        J <- matrix(0,ns,7)
-        El <- getEl()
-        colnames(J) <- colnames(El)
-        if (type==1){
-            J[,'U238'] <- -dem$dddb*a*McL$dPb206U238dl38
-            J[,'U234'] <- -dem$dddb*a*McL$dPb206U238dl34
-            J[,'Th230'] <- -dem$dddb*a*McL$dPb206U238dl30
-            J[,'Ra226'] <- -dem$dddb*a*McL$dPb206U238dl26
-        } else if (type==2){
-            J[,'U235'] <- -dem$dddb*a*McL$dPb207U235dl35
-            J[,'Pa231'] <- -dem$dddb*a*McL$dPb207U235dl31
-        } else {
-            J[,'Th232'] <- -dem$dddb*a*McL$dPb208Th232dl32
-        }
-        E <- E + J %*% El %*% t(J)
-    }
-    out$SS <- SS
 }
 
 data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
@@ -1125,6 +1060,79 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     out
 }
 
+LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
+    pnames <- names(ta0b0)
+    tt <- ta0b0['t']
+    if ('a0'%in%pnames) a0 <- ta0b0['a0']
+    else if ('b0'%in%pnames) b0 <- ta0b0['b0']
+    else stop('neither a0 nor b0 were supplied')
+    McL <- mclean(tt=tt,d=x$d,exterr=exterr)
+    if (x$format %in% (1:3)){
+        yd <- data2york(x,option=2,tt=tt)
+        X0 <- 1/McL$Pb206U238
+        Y0 <- a0
+    } else if (x$format %in% (4:6)){
+        if (type==1){
+            yd <- data2york(x,option=3,tt=tt)
+            X0 <- 1/McL$Pb206U238
+            Y0 <- 1/a0
+        } else if (type==2){
+            yd <- data2york(x,option=4,tt=tt)
+            X0 <- 1/McL$Pb207U235
+            Y0 <- 1/b0
+        } else {
+            stop('invalid type')
+        }
+    } else if (x$format %in% (7:8)){
+        if (type==1){
+            yd <- data2york(x,option=6,tt=tt)
+            X0 <- 1/McL$Pb206U238
+            Y0 <- 1/a0
+        } else if (type==2){
+            yd <- data2york(x,option=7,tt=tt)
+            X0 <- 1/McL$Pb207U235
+            Y0 <- 1/b0
+        } else if (type==3){
+            yd <- data2york(x,option=8,tt=tt)
+            X0 <- 1/McL$Pb208Th232
+            Y0 <- a0
+        } else if (type==4){
+            yd <- data2york(x,option=9,tt=tt)
+            X0 <- 1/McL$Pb208Th232
+            Y0 <- b0
+        } else {
+            stop('invalid type')
+        }
+    } else {
+        stop('illegal format')
+    }
+    X <- yd[,'X',drop=FALSE]
+    Y <- yd[,'Y',drop=FALSE]
+    dem <- deming(a=Y0,b=-Y0/X0,x=X,y=Y)
+    D <- as.vector(dem$d)
+    SS <- sum(D^2)
+    ns <- length(x)
+    E <- diag(SS,ns,ns)/(ns-2)
+    if (exterr){
+        J <- matrix(0,ns,7)
+        El <- getEl()
+        colnames(J) <- colnames(El)
+        if (type==1){
+            J[,'U238'] <- -dem$dddb*a*McL$dPb206U238dl38
+            J[,'U234'] <- -dem$dddb*a*McL$dPb206U238dl34
+            J[,'Th230'] <- -dem$dddb*a*McL$dPb206U238dl30
+            J[,'Ra226'] <- -dem$dddb*a*McL$dPb206U238dl26
+        } else if (type==2){
+            J[,'U235'] <- -dem$dddb*a*McL$dPb207U235dl35
+            J[,'Pa231'] <- -dem$dddb*a*McL$dPb207U235dl31
+        } else {
+            J[,'Th232'] <- -dem$dddb*a*McL$dPb208Th232dl32
+        }
+        E <- E + J %*% El %*% t(J)
+    }
+    LL.norm(D,E)
+}
+
 mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     out <- fit
     ns <- length(x)
@@ -1137,7 +1145,7 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     X <- x
     if (x$d$U48$option==2) X$d$U48 <- list(x=unname(fit$par['U48i']),option=1)
     if (x$d$ThU$option==2) X$d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
-    if (type%in%c('joint',0)){
+    if (type%in%c('joint',0) && x$format>3){
         SS <- data2ludwig(X,ta0b0w=fit$par)$SS
     } else {
         SS <- data2ludwig.2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr)$SS
