@@ -640,13 +640,13 @@ LL.ludwig <- function(par,c0=NULL,x,X=x,model=1,exterr=FALSE,
         ta0b0w['w'] <- exp(par['w'])
     }
     if (model==2){
-        if (type%in%c('joint',0) || x$format<4){
+        if (type%in%c('joint',0) && x$format>3){
             LL <- LL + LL.ludwig.model2(ta0b0w,x=X,exterr=exterr)
         } else {
             LL <- LL + LL.ludwig.model2.2d(ta0b0w,x=X,exterr=exterr,type=type)
         }
     } else {
-        if (type%in%c('joint',0) || x$format<4){
+        if (type%in%c('joint',0) && x$format>3){
             LLc0 <- data2ludwig(X,ta0b0w,c0=c0,exterr=exterr)
         } else {
             LLc0 <- data2ludwig.2d(ta0b0w,c0=c0,x=X,model=model,
@@ -690,7 +690,7 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     U <- iratio('U238U235')[1]
     tt <- ta0b0w['t']
     a0 <- ta0b0w['a0']
-    if (x$format>3) b0 <- ta0b0w['b0']
+    b0 <- ta0b0w['b0']
     model3 <- 'w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])
     ns <- length(x)
     zeros <- rep(0,ns)
@@ -698,10 +698,7 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     Y <- zeros
     K0 <- zeros
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format%in%c(1,2,3)){
-        NP <- 2 # number of fit parameters (tt, a0)
-        NR <- 2 # number of isotopic ratios (X, Y)
-    } else if (x$format%in%c(4,5,6)){
+    if (x$format%in%c(4,5,6)){
         Z <- zeros
         L0 <- zeros
         NP <- 3 # tt, a0, b0
@@ -749,32 +746,11 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     }
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
-    if (x$format<4){
-        O <- blockinverse(AA=EE[i1,i1],BB=EE[i1,i2],
-                          CC=EE[i2,i1],DD=EE[i2,i2],doall=TRUE)
-    } else {
-        i3 <- (2*ns+1):(3*ns)
-        O <- blockinverse3x3(AA=EE[i1,i1],BB=EE[i1,i2],CC=EE[i1,i3],
-                             DD=EE[i2,i1],EE=EE[i2,i2],FF=EE[i2,i3],
-                             GG=EE[i3,i1],HH=EE[i3,i2],II=EE[i3,i3])
-    }
-    if (x$format%in%c(1,2,3)){
-        if (is.null(c0)){
-            K0 <- X - McL$Pb207U235 + a0*U*(McL$Pb206U238 - Y)
-            A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U +
-                   K0%*%(O[i1,i2]+t(O[i2,i1])))
-            B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U +
-                   (O[i2,i2]+t(O[i2,i2])) +
-                   a0*U*(O[i1,i2]+t(O[i1,i2])) +
-                   (O[i2,i1]+t(O[i2,i1]))*a0*U)
-            L <- as.vector(solve(B,A))
-            c0 <- Y - McL$Pb206U238 - L
-        } else {
-            L <- Y - McL$Pb206U238 - c0
-        }
-        K <- X - McL$Pb207U235 - a0*U*c0
-        KLM <- c(K,L)
-    } else if (x$format%in%c(4,5,6)){
+    i3 <- (2*ns+1):(3*ns)
+    O <- blockinverse3x3(AA=EE[i1,i1],BB=EE[i1,i2],CC=EE[i1,i3],
+                         DD=EE[i2,i1],EE=EE[i2,i2],FF=EE[i2,i3],
+                         GG=EE[i3,i1],HH=EE[i3,i2],II=EE[i3,i3])
+    if (x$format%in%c(4,5,6)){
         if (is.null(c0)){
             K0 <- X - McL$Pb207U235 - U*b0*Z
             L0 <- Y - McL$Pb206U238 - a0*Z
@@ -849,12 +825,15 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
     } else { # 2D regression
         J <- matrix(0,2*ns,ns)
     }
-    if (joint || format<4){
+    if (joint && format>3){
         diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
         diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
         if (format>6) {
             diag(J[i3,i1]) <- -McL$dPb208Th232dt # dMdt
         }
+    } else if (format<4){
+        diag(J[i1,i1]) <- -McL$dPb206U238dt      # dKdt
+        diag(J[i2,i1]) <- -McL$dPb207U235dt      # dLdt        
     } else if (format<7){
         if (type==1){
             diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
@@ -1015,10 +994,11 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     U85 <- iratio('U238U235')[1]
     multiplier <- 1
     if (x$format<4){
-        yd <- data2york(x,option=1) # X=07/35, Y=06/38
-        A <- McL$Pb206U238
-        L0 <- yd[,'Y'] - McL$Pb207U235 - a0*yd[,'X']
-        b <- a0
+        yd <- data2york(x,option=1) # X=06/38, Y=07/35
+        yd[,c('X','sX','Y','sY','rXY')] <- yd[,c('Y','sY','X','sX','rXY')]
+        A <- rep(McL$Pb206U238,ns)
+        L0 <- yd[,'Y'] - McL$Pb207U235 - a0*yd[,'X']*U85
+        b <- a0*U85
     } else if (x$format<7){
         if (type==1){               # X=04/38, Y=06/38
             yd <- data2york.UPb(x,option=10)
@@ -1078,12 +1058,12 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
         J <- matrix(0,2*ns,7)
         colnames(J) <- colnames(El)
         if (x$format<4){
-            J[i1,'U235'] <- -McL$dPb207U235dl35
-            J[i1,'P231'] <- -McL$dPb207U235dl31
-            J[i2,'U238'] <- -McL$dPb206U238dl38
-            J[i2,'U234'] <- -McL$dPb206U238dl34
-            J[i2,'Th230'] <- -McL$dPb206U238dl30
-            J[i2,'Ra226'] <- -McL$dPb206U238dl26
+            J[i1,'U238'] <- -McL$dPb206U238dl38
+            J[i1,'U234'] <- -McL$dPb206U238dl34
+            J[i1,'Th230'] <- -McL$dPb206U238dl30
+            J[i1,'Ra226'] <- -McL$dPb206U238dl26
+            J[i2,'U235'] <- -McL$dPb207U235dl35
+            J[i2,'Pa231'] <- -McL$dPb207U235dl31
         } else if (x$format<7){
             if (type==1){
                 J[i2,'U238'] <- -McL$dPb206U238dl38
