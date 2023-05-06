@@ -744,7 +744,7 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     EE <- J%*%E%*%t(J)
     if (model3){
-        Ew <- getEw(w=ta0b0w['w'],format=x$format,ns=ns,McL=McL)
+        Ew <- getEw(w=ta0b0w['w'],x=x,McL=McL)
         EE <- EE + Ew
     }
     i1 <- 1:ns
@@ -837,26 +837,52 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     out
 }
 
-getEw <- function(w=0,format=1,ns=1,McL=mclean(),type='joint'){
+getEw <- function(w=0,x,McL=mclean(),type='joint'){
+    format <- x$format
+    ns <- length(x)
+    joint <- type%in%c('joint',0)
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
-    joint <- type%in%c('joint',0)
     if (format>3 && joint){ # 3D regression
         J <- matrix(0,3*ns,ns)
         i3 <- (2*ns+1):(3*ns)
     } else { # 2D regression
         J <- matrix(0,2*ns,ns)
     }
-    if (joint){
+    if (joint || format<4){
         diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
         diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
         if (format>6) {
             diag(J[i3,i1]) <- -McL$dPb208Th232dt # dMdt
         }
-    } else if (type==1){
-        diag(J[i2,i1]) <- -McL$dPb206U238dt      # dKdt
-    } else if (type==2){
-        diag(J[i2,i1]) <- -McL$dPb207U235dt      # dKdt
+    } else if (format<7){
+        if (type==1){
+            diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
+        } else if (type==2){
+            diag(J[i2,i1]) <- -McL$dPb207U235dt   # dLdt
+        } else {
+            stop('invalid isochron type')
+        }
+    } else if (format<9){
+        ThU <- x$x[,'Th232U238']
+        U85 <- iratio('U238U235')[1]
+        if (type==1){
+            diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU      # dKdt
+            diag(J[i2,i1]) <- -McL$dPb206U238dt           # dLdt
+        } else if (type==2){
+            diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU*U85  # dKdt
+            diag(J[i2,i1]) <- -McL$dPb207U235dt           # dLdt
+        } else if (type==3){
+            diag(J[i1,i1]) <- -McL$dPb206U238dt/ThU       # dKdt
+            diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
+        } else if (type==4){
+            diag(J[i1,i1]) <- -McL$dPb206U238dt/(ThU*U85) # dKdt
+            diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
+        } else {
+            stop('invalid isochron type')
+        }
+    } else {
+        stop('invalid format')
     }
     dEdx <- w^2
     dEdx*J%*%t(J)
@@ -990,19 +1016,19 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     multiplier <- 1
     if (x$format<4){
         yd <- data2york(x,option=1) # X=07/35, Y=06/38
-        A <- exp(l8*tt)-1
-        L0 <- yd[,'Y'] - (exp(l5*tt)-1) - a0*yd[,'X']
+        A <- McL$Pb206U238
+        L0 <- yd[,'Y'] - McL$Pb207U235 - a0*yd[,'X']
         b <- a0
     } else if (x$format<7){
         if (type==1){               # X=04/38, Y=06/38
             yd <- data2york.UPb(x,option=10)
             A <- rep(0,ns)
-            L0 <- yd[,'Y'] - (exp(l8*tt)-1) - a0*yd[,'X']
+            L0 <- yd[,'Y'] - McL$Pb206U238 - a0*yd[,'X']
             b <- a0
         } else if (type==2){        # X=04/35, Y=07/35
             yd <- data2york.UPb(x,option=11)
             A <- rep(0,ns)
-            L0 <- yd[,'Y'] - (exp(l5*tt)-1) - b0*yd[,'X']
+            L0 <- yd[,'Y'] - McL$Pb207U235 - b0*yd[,'X']
             b <- b0
         } else {
             stop('invalid isochron type')
@@ -1011,26 +1037,26 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
         ThU <- x$x[,'Th232U238']
         if (type==1){
             yd <- data2york.UPb(x,option=12) # X=08/38, Y=06/38
-            A <- (exp(l2*tt)-1)*ThU
-            L0 <- yd[,'Y'] - (exp(l8*tt)-1) - a0*yd[,'X']
+            A <- McL$Pb208Th232*ThU
+            L0 <- yd[,'Y'] - McL$Pb206U238 - a0*yd[,'X']
             b <- a0
             multiplier <- ThU
         } else if (type==2){
             yd <- data2york.UPb(x,option=13) # X=08/35, Y=07/35
-            A <- (exp(l2*tt)-1)*ThU*U85
-            L0 <- yd[,'Y'] - (exp(l5*tt)-1) - b0*yd[,'X']
+            A <- McL$Pb208Th232*ThU*U85
+            L0 <- yd[,'Y'] - McL$Pb207U235 - b0*yd[,'X']
             b <- b0
             multiplier <- ThU*U85
         } else if (type==3){
             yd <- data2york.UPb(x,option=14) # X=06/32, Y=08/32
-            A <- (exp(l8*tt)-1)/ThU
-            L0 <- yd[,'Y'] - (exp(l2*tt)-1) - yd[,'X']/a0
-            b <- a0
+            A <- McL$Pb206U238/ThU
+            L0 <- yd[,'Y'] - McL$Pb208Th232 - yd[,'X']/a0
+            b <- 1/a0
         } else if (type==4){
             yd <- data2york.UPb(x,option=15) # X=07/32, Y=08/32
-            A <- (exp(l8*tt)-1)/(ThU*U85)
-            L0 <- yd[,'Y'] - (exp(l2*tt)-1) - yd[,'X']/b0
-            b <- b0
+            A <- McL$Pb206U238/(ThU*U85)
+            L0 <- yd[,'Y'] - McL$Pb208Th232- yd[,'X']/b0
+            b <- 1/b0
         } else {
             stop('invalid isochron type')
         }
@@ -1044,24 +1070,58 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     diag(E)[i2] <- yd[,'sY']^2
     diag(E[i1,i2]) <- diag(E[i2,i1]) <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
     if (model3){
-        Ew <- getEw(w=ta0b0w['w'],format=x$format,
-                    ns=ns,McL=McL,type=type)
+        Ew <- getEw(w=ta0b0w['w'],x=x,McL=McL,type=type)
         E <- E + Ew
     }
     if (exterr){
         El <- getEl()
         J <- matrix(0,2*ns,7)
         colnames(J) <- colnames(El)
-        if (type==1){
-            J[iy,'U238'] <- -McL$dPb206U238dl38
-            J[iy,'U234'] <- -McL$dPb206U238dl34
-            J[iy,'Th230'] <- -McL$dPb206U238dl30
-            J[iy,'Ra226'] <- -McL$dPb206U238dl26
-        } else if (type==2){
-            J[iy,'U235'] <- -McL$dPb207U235dl35
-            J[iy,'Pa231'] <- -McL$dPb207U235dl31
+        if (x$format<4){
+            J[i1,'U235'] <- -McL$dPb207U235dl35
+            J[i1,'P231'] <- -McL$dPb207U235dl31
+            J[i2,'U238'] <- -McL$dPb206U238dl38
+            J[i2,'U234'] <- -McL$dPb206U238dl34
+            J[i2,'Th230'] <- -McL$dPb206U238dl30
+            J[i2,'Ra226'] <- -McL$dPb206U238dl26
+        } else if (x$format<7){
+            if (type==1){
+                J[i2,'U238'] <- -McL$dPb206U238dl38
+                J[i2,'U234'] <- -McL$dPb206U238dl34
+                J[i2,'Th230'] <- -McL$dPb206U238dl30
+                J[i2,'Ra226'] <- -McL$dPb206U238dl26
+            } else if (type==2){
+                J[i2,'U235'] <- -McL$dPb207U235dl35
+                J[i2,'Pa231'] <- -McL$dPb207U235dl31                
+            } else {
+                stop('illegal type')
+            }
+        } else if (x$format<9){
+            if (type==1){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32*ThU
+                J[i2,'U238'] <- -McL$dPb206U238dl38
+                J[i2,'U234'] <- -McL$dPb206U238dl34
+                J[i2,'Th230'] <- -McL$dPb206U238dl30
+                J[i2,'Ra226'] <- -McL$dPb206U238dl26
+            } else if (type==2){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32*ThU*U85
+                J[i2,'U235'] <- -McL$dPb207U235dl35
+                J[i2,'Pa231'] <- -McL$dPb207U235dl31                
+            } else if (type==3){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32/ThU
+                J[i2,'U238'] <- -McL$dPb206U238dl38
+                J[i2,'U234'] <- -McL$dPb206U238dl34
+                J[i2,'Th230'] <- -McL$dPb206U238dl30
+                J[i2,'Ra226'] <- -McL$dPb206U238dl26                
+            } else if (type==4){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32/(ThU*U85)
+                J[i2,'U235'] <- -McL$dPb207U235dl35
+                J[i2,'Pa231'] <- -McL$dPb207U235dl31                
+            } else {
+                stop('illegal type')
+            }
         } else {
-            J[iy,'Th232'] <- -McL$dPb208Th232dl32
+            stop('illegal format')
         }
         E <- E + J %*% El %*% t(J)
     }
@@ -1082,8 +1142,6 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     out$c0 <- c0
     out$SS <- KL%*%O%*%KL
     out$LL <- LL.norm(KL,E)
-    scatterplot(yd); points(x=c0,y=yd[,'Y']-L); title(out$LL)
-    Sys.sleep(0.1)
     out
 }
 
