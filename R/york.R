@@ -303,18 +303,64 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
         }
+    } else if (option==10 && x$format%in%c(4,5,6)){ # 06/38 vs. 04/38 
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb206U238')
+        }
+    } else if (option==11 && x$format%in%c(4,5,6)){ # 07/35 vs. 04/35
+        J <- diag(2)
+        J[1,1] <- iratio('U238U235')[1]
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb207U235',J=J)
+        }
+    } else if (option==12 && x$format%in%c(7,8)){ # 06/38 vs. 08/38
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- x$x[i,'Th232U238']
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb208Th232',i2='Pb206U238',J=J)
+        }
+    } else if (option==13 && x$format%in%c(7,8)){ # 07/35 vs. 08/35
+        U85 <- iratio('U238U235')[1]
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- x$x[i,'Th232U238']*U85
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb208Th232',i2='Pb207U235',J=J)
+        }
+    } else if (option==14 && x$format%in%c(7,8)){ # 08/32 vs. 06/32
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- 1/x$x[i,'Th232U238']
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb206U238',i2='Pb208Th232',J=J)
+        }
+    } else if (option==15 && x$format%in%c(7,8)){ # 08/32 vs. 07/32
+        U85 <- iratio('U238U235')[1]
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- 1/(x$x[i,'Th232U238']*U85)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb208Th232',J=J)
+        }
     } else {
         stop('Incompatible input format and concordia type.')
     }
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-data2york_UPb_helper <- function(x,i1=1,i2=2){
-    X <- x$x[i1]
-    sX <- sqrt(x$cov[i1,i1])
-    Y <- x$x[i2]
-    sY <- sqrt(x$cov[i2,i2])
-    rXY <- x$cov[i1,i2]/(sX*sY)
+data2york_UPb_helper <- function(x,i1=1,i2=2,J=diag(2)){
+    XYin <- x$x[c(i1,i2)]
+    Ein <- x$cov[c(i1,i2),c(i1,i2)]
+    XYout <- J%*%XYin
+    Eout <- J%*%Ein%*%t(J)
+    X <- XYout[1]
+    sX <- sqrt(Eout[1,1])
+    Y <- XYout[2]
+    sY <- sqrt(Eout[2,2])
+    rXY <- Eout[1,2]/(sX*sY)
     c(X,sX,Y,sY,rXY)
 }
 #' @param inverse toggles between normal and inverse isochron
