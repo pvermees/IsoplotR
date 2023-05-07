@@ -731,61 +731,32 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
                          DD=EE[i2,i1],EE=EE[i2,i2],FF=EE[i2,i3],
                          GG=EE[i3,i1],HH=EE[i3,i2],II=EE[i3,i3])
     if (x$format%in%c(4,5,6)){
-        if (is.null(c0)){
-            K0 <- X - McL$Pb207U235 - U*b0*Z
-            L0 <- Y - McL$Pb206U238 - a0*Z
-            V <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*U*b0 +
-                   L0%*%(O[i1,i2]+t(O[i2,i1]))*U*b0 +
-                   K0%*%(O[i1,i2]+t(O[i2,i1]))*a0 +
-                   L0%*%(O[i2,i2]+t(O[i2,i2]))*a0 +
-                   K0%*%(O[i1,i3]+t(O[i3,i1])) +
-                   L0%*%(O[i2,i3]+t(O[i3,i2])))
-            W <- -(U*b0*(O[i1,i1]+t(O[i1,i1]))*U*b0 +
-                   U*b0*(O[i1,i2]+t(O[i1,i2]))*a0 +
-                   U*b0*(O[i1,i3]+t(O[i1,i3])) +
-                   a0*(O[i2,i1]+t(O[i2,i1]))*U*b0 +
-                   a0*(O[i2,i2]+t(O[i2,i2]))*a0 +
-                   a0*(O[i2,i3]+t(O[i2,i3])) +
-                   (O[i3,i1]+t(O[i3,i1]))*U*b0 +
-                   (O[i3,i2]+t(O[i3,i2]))*a0 +
-                   (O[i3,i3]+t(O[i3,i3])))
-            M <- as.vector(solve(W,V))
-            c0 <- as.vector(Z - M)
-        } else {
-            M <- as.vector(Z - c0)
-        }
-        K <- as.vector(X - McL$Pb207U235 - U*b0*c0)
-        L <- as.vector(Y - McL$Pb206U238 - a0*c0)
-        KLM <- c(K,L,M)
+        C1 <- U*b0
+        C2 <- a0
+        C3 <- 0
     } else if (x$format%in%c(7,8)){
-        if (is.null(c0)){
-            Wd <- diag(W)
-            K0 <- X - McL$Pb207U235 - (Z-McL$Pb208Th232)*U*W*b0
-            L0 <- Y - McL$Pb206U238 - (Z-McL$Pb208Th232)*W*a0
-            AA <- (Wd%*%O[i1,i1]%*%Wd)*(U*b0)^2 +
-                (Wd%*%O[i2,i2]%*%Wd)*a0^2 + O[i3,i3] +
-                U*a0*b0*Wd%*%(O[i1,i2]+O[i2,i1])%*%Wd +
-                U*b0*(Wd%*%O[i1,i3]+O[i3,i1]%*%Wd) +
-                a0*(Wd%*%O[i2,i3]+O[i3,i2]%*%Wd)
-            BT <- t(U*b0*K0%*%O[i1,i1]%*%Wd +
-                    a0*L0%*%O[i2,i2]%*%Wd +
-                    a0*K0%*%O[i1,i2]%*%Wd +
-                    U*b0*L0%*%O[i2,i1]%*%Wd +
-                    K0%*%O[i1,i3] + L0%*%O[i2,i3])
-            CC <- U*b0*Wd%*%O[i1,i1]%*%K0 +
-                a0*Wd%*%O[i2,i2]%*%L0 +
-                a0*Wd%*%O[i2,i1]%*%K0 +
-                U*b0*Wd%*%O[i1,i2]%*%L0 +
-                O[i3,i1]%*%K0 + O[i3,i2]%*%L0
-            M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
-            c0 <- as.vector(Z - McL$Pb208Th232 - M)
-        } else {
-            M <- as.vector(Z - McL$Pb208Th232 - c0)
-        }
-        K <- as.vector(X - McL$Pb207U235 - c0*b0*U*W)
-        L <- as.vector(Y - McL$Pb206U238 - c0*a0*W)
-        KLM <- c(K,L,M)
+        C1 <- U*b0*diag(W)
+        C2 <- a0*diag(W)
+        C3 <- -McL$Pb208Th232
     }
+    K0 <- X - C1%*%Z - McL$Pb207U235
+    L0 <- Y - C2%*%Z - McL$Pb206U238
+    AA <- C1%*%O[i1,i1]%*%C1 + C1%*%O[i1,i2]%*%C2 + C1%*%O[i1,i3] +
+        C2%*%O[i2,i1]%*%C1 + C2%*%O[i2,i2]%*%C2 + C2%*%O[i2,i3] +
+        O[i3,i1]%*%C1 + O[i3,i2]%*%C2 + O[i3,i3]
+    BB <- C1%*%O[i1,i1]%*%K0 + C1%*%O[i1,i2]%*%L0 + C1%*%O[i1,i3]*C3 +
+        C2%*%O[i2,i1]%*%K0 + C2%*%O[i2,i2]%*%L0 + C2%*%O[i2,i3]*C3 +
+        O[i3,i1]%*%K0 + O[i3,i2]%*%L0 + O[i3,i3]*C3
+    N <- as.vector(solve(-(AA+t(AA)),(BB+t(BB))))
+    if (is.null(c0)){
+        c0 <- as.vector(Z - N)
+    } else {
+        N <- as.vector(Z - c0)
+    }
+    K <- as.vector(K0 + C1%*%N)
+    L <- as.vector(L0 + C2%*%N)
+    M <- N + C3
+    KLM <- c(K,L,M)
     out$c0 <- c0
     out$SS <- KLM%*%O%*%KLM
     detEE <- determinant(EE,logarithm=TRUE)$modulus
