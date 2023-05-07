@@ -1093,39 +1093,58 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     else if ('b0'%in%pnames) b0 <- ta0b0['b0']
     else stop('neither a0 nor b0 were supplied')
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
+    dbdl38 <- dbdl34 <- dbdl30 <- dbdl26 <- dbdl35 <- dbdl31 <- dbdl32 <- 0
     if (x$format %in% (1:3)){ # X=07/06, Y=38/06
         yd <- data2york(x,option=2,tt=tt)
-        x0 <- 1/McL$Pb206U238
-        y0 <- a0
+        a <- a0
+        b <- -McL$Pb206U238*a0
+        dbdl38 <- -McL$dPb206U238dl38*a0
+        dbdl34 <- -McL$dPb206U238dl34*a0
+        dbdl30 <- -McL$dPb206U238dl30*a0
+        dbdl26 <- -McL$dPb206U238dl26*a0
     } else if (x$format %in% (4:6)){
-        if (type==1){         # X=04/06, Y=38/06
+        if (type==1){         # X=38/06, Y=04/06
             yd <- data2york(x,option=3,tt=tt)
-            x0 <- 1/McL$Pb206U238
-            y0 <- 1/a0
-        } else if (type==2){  # X=04/07, Y=35/07
+            a <- 1/a0
+            b <- -McL$Pb206U238/a0
+            dbdl38 <- -McL$dPb206U238dl38/a0
+            dbdl34 <- -McL$dPb206U238dl34/a0
+            dbdl30 <- -McL$dPb206U238dl30/a0
+            dbdl26 <- -McL$dPb206U238dl26/a0
+        } else if (type==2){  # X=35/07, Y=04/07
             yd <- data2york(x,option=4,tt=tt)
-            x0 <- 1/McL$Pb207U235
-            y0 <- 1/b0
+            a <- 1/b0
+            b <- -McL$Pb207U235/b0
+            dbdl35 <- -McL$dPb207U235dl35/b0
+            dbdl31 <- -McL$dPb207U235dl31/b0
         } else {
             stop('invalid type')
         }
     } else if (x$format %in% (7:8)){
-        if (type==1){         # X=08c/06, Y=38/06
+        if (type==1){         # X=38/06, Y=08c/06
             yd <- data2york(x,option=6,tt=tt)
-            x0 <- 1/McL$Pb206U238
-            y0 <- 1/a0
-        } else if (type==2){  # X=08c/07, Y=38/07
+            a <- 1/a0
+            b <- -McL$Pb206U238/a0
+            dbdl38 <- -McL$dPb206U238dl38/a0
+            dbdl34 <- -McL$dPb206U238dl34/a0
+            dbdl30 <- -McL$dPb206U238dl30/a0
+            dbdl26 <- -McL$dPb206U238dl26/a0
+        } else if (type==2){  # X=35/07, Y=08c/07
             yd <- data2york(x,option=7,tt=tt)
-            x0 <- 1/McL$Pb207U235
-            y0 <- 1/b0
-        } else if (type==3){  # X=06c/08, Y=32/08
+            a <- 1/b0
+            b <- -McL$Pb207U235/b0
+            dbdl35 <- -McL$dPb207U235dl35/b0
+            dbdl31 <- -McL$dPb207U235dl31/b0
+        } else if (type==3){  # X=32/08, Y=06c/08
             yd <- data2york(x,option=8,tt=tt)
-            x0 <- 1/McL$Pb208Th232
-            y0 <- a0
-        } else if (type==4){  # X=07c/08, Y=32/08
+            a <- a0
+            b <- -McL$Pb208Th232*a0
+            dbdl32 <- -McL$dPb208Th232dl32*a0
+        } else if (type==4){  # X=32/08, Y=07c/08
             yd <- data2york(x,option=9,tt=tt)
-            x0 <- 1/McL$Pb208Th232
-            y0 <- b0
+            a <- b0
+            x0 <- -McL$Pb208Th232*b0
+            dbdl32 <- -McL$dPb208Th232dl32*a0
         } else {
             stop('invalid type')
         }
@@ -1135,27 +1154,35 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     X <- yd[,'X',drop=FALSE]
     Y <- yd[,'Y',drop=FALSE]
     # Deming regression:
-    a <- y0
-    b <- -y0/x0
     xfitted <- X + (Y-a-b*X)*b/(1+b^2)
     sigma <- sd(X-xfitted)
-    LL <- -sum(dnorm(X,mean=xfitted,sd=sigma,log=TRUE))
     if (exterr){
-        J <- matrix(0,ns,7)
+        ns <- length(x)
         El <- getEl()
+        J <- matrix(0,ns,7)
         colnames(J) <- colnames(El)
-        if (type==1){
-            J[,'U238'] <- -dem$dddb*a*McL$dPb206U238dl38
-            J[,'U234'] <- -dem$dddb*a*McL$dPb206U238dl34
-            J[,'Th230'] <- -dem$dddb*a*McL$dPb206U238dl30
-            J[,'Ra226'] <- -dem$dddb*a*McL$dPb206U238dl26
-        } else if (type==2){
-            J[,'U235'] <- -dem$dddb*a*McL$dPb207U235dl35
-            J[,'Pa231'] <- -dem$dddb*a*McL$dPb207U235dl31
-        } else {
-            J[,'Th232'] <- -dem$dddb*a*McL$dPb208Th232dl32
-        }
-        E <- E + J %*% El %*% t(J)
+        dxdl38 <-  (Y-a)*dbdl38 - 2*X*b*dbdl38 # xfitted = (Y-a)*b - X*b^2
+        dxdl35 <-  (Y-a)*dbdl35 - 2*X*b*dbdl35
+        dxdl34 <-  (Y-a)*dbdl34 - 2*X*b*dbdl34
+        dxdl32 <-  (Y-a)*dbdl32 - 2*X*b*dbdl32
+        dxdl31 <-  (Y-a)*dbdl31 - 2*X*b*dbdl31
+        dxdl30 <-  (Y-a)*dbdl30 - 2*X*b*dbdl30
+        dxdl26 <-  (Y-a)*dbdl26 - 2*X*b*dbdl26
+        dxdl26 <-  (Y-a)*dbdl26 - 2*X*b*dbdl26
+        J[,'U238'] <- -dxdl38
+        J[,'U235'] <- -dxdl35
+        J[,'U234'] <- -dxdl34
+        J[,'Th232'] <- -dxdl32
+        J[,'Pa231'] <- -dxdl31
+        J[,'Th230'] <- -dxdl30
+        J[,'Ra226'] <- -dxdl26
+        D <- X-xfitted
+        E <- diag(0,ns,ns)
+        diag(E) <- var(D)
+        E <- E + J%*%El%*%t(J)
+        LL <- LL.norm(t(D),E)
+    } else {
+        LL <- -sum(dnorm(X,mean=xfitted,sd=sigma,log=TRUE))
     }
     LL
 }
