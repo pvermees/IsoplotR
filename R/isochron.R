@@ -683,7 +683,6 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
             out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
         }
-        if (model==3) dispunits <- ifelse(joint,' Ma','')
         if (plot){
             scatterplot(XY,oerr=oerr,show.ellipses=show.ellipses,
                         show.numbers=show.numbers,levels=levels,
@@ -693,7 +692,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
             graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
-                                          y0option=y0option,dispunits=dispunits),
+                                          y0option=y0option,dispunits=' Ma'),
                             xlab=x.lab,ylab=y.lab)
         }
     }

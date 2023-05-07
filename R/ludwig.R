@@ -135,33 +135,13 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,
                         x=X,anchor=anchor,type=type,
-                        model=model,exterr=exterr)
+                        model=model,exterr=exterr,hessian=TRUE)
     if (fit$convergence>0){
         ctrl <- list(fnscale=1e-15,maxit=1000)
         fit <- robustludwig(init,X=X,anchor=anchor,type=type,
                             model=model,exterr=exterr,control=ctrl)
     }
-    if (model==2){
-        H <- optimHess(fit$par,fn=LL.ludwig,
-                       x=X,anchor=anchor,type=type,
-                       model=model,exterr=exterr)
-        fit$cov <- inverthess(H)
-    } else {
-        if (FALSE){ #temporarily disabled:
-            c0 <- LL.ludwig(fit$par,x=X,model=model,
-                            exterr=exterr,type=type,getc0=TRUE)
-            H <- optimHess(c(c0,fit$par),fn=LL.ludwig.c0,
-                           x=X,anchor=anchor,type=type,
-                           model=model,exterr=exterr)
-            ns <- length(x)
-            fit$cov <- inverthess(H)[-(1:ns),-(1:ns)]
-        } else {
-            H <- optimHess(fit$par,fn=LL.ludwig,
-                           x=X,anchor=anchor,type=type,
-                           model=model,exterr=exterr)
-            fit$cov <- inverthess(H)
-        }
-    }
+    fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
                                   control=ctrl,model=model,plot=plot)
@@ -182,10 +162,10 @@ robustludwig <- function(init,X,anchor,type,model,exterr,control){
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,control=control,
                         x=X,anchor=anchor,type=type,
-                        model=model,exterr=exterr)
+                        model=model,exterr=exterr,hessian=TRUE)
     NMfit <- stats::optim(init$par,fn=LL.ludwig,x=X,
                           anchor=anchor,type=type,
-                          model=model,exterr=exterr)
+                          model=model,exterr=exterr,hessian=TRUE)
     if (fit$value>NMfit$value){
         fit <- NMfit
         warning('L-BFGS-B did not converge. Switched to Nelder-Mead.')

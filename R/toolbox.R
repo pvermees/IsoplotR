@@ -393,28 +393,13 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
     out
 }
 
-hesscheck <- function(H){
-    tol <- 1e-8
-    eig <- eigen(H,only.values=TRUE)$values
-    if (all(eig>tol)){
-        out <- H
-    } else {
-        warning('Ill-conditioned Hessian, replaced by ',
-                'nearest positive definite matrix')
-        out <- nearPD(H)
-        dimnames(out) <- dimnames(H)
-    }
-    out
-}
 inverthess <- function(hess){
-    H <- hesscheck(hess)
-    if (det(H)>1e8 || det(H)<1e-18){
-        out <- MASS::ginv(H)
-        dimnames(out) <- dimnames(H)
-    } else {
-        out <- solve(H)
-    }
-    out
+    tryCatch(solve(hess),
+             error = function(e){
+                 warning(e)
+                 H <- nearPD(hess)
+                 return(solve(H))
+             })
 }
 
 det3x3 <- function(vx,vy,vz,sxy,sxz,syz){
