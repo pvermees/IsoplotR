@@ -733,28 +733,28 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
     if (x$format%in%c(4,5,6)){
         C1 <- U*b0
         C2 <- a0
-        C3 <- 0
+        C3 <- rep(0,ns)
     } else if (x$format%in%c(7,8)){
-        C1 <- U*b0*diag(W)
-        C2 <- a0*diag(W)
-        C3 <- -McL$Pb208Th232
+        C1 <- U*b0*W
+        C2 <- a0*W
+        C3 <- -rep(McL$Pb208Th232,ns)
     }
-    K0 <- X - C1%*%Z - McL$Pb207U235
-    L0 <- Y - C2%*%Z - McL$Pb206U238
-    AA <- C1%*%O[i1,i1]%*%C1 + C1%*%O[i1,i2]%*%C2 + C1%*%O[i1,i3] +
-        C2%*%O[i2,i1]%*%C1 + C2%*%O[i2,i2]%*%C2 + C2%*%O[i2,i3] +
-        O[i3,i1]%*%C1 + O[i3,i2]%*%C2 + O[i3,i3]
-    BB <- C1%*%O[i1,i1]%*%K0 + C1%*%O[i1,i2]%*%L0 + C1%*%O[i1,i3]*C3 +
-        C2%*%O[i2,i1]%*%K0 + C2%*%O[i2,i2]%*%L0 + C2%*%O[i2,i3]*C3 +
-        O[i3,i1]%*%K0 + O[i3,i2]%*%L0 + O[i3,i3]*C3
-    N <- as.vector(solve(-(AA+t(AA)),(BB+t(BB))))
+    K0 <- X - C1*Z - McL$Pb207U235
+    L0 <- Y - C2*Z - McL$Pb206U238
+    AA <- C1*O[i1,i1]*C1 + C1*O[i1,i2]*C2 + C1*O[i1,i3] +
+        C2*O[i2,i1]*C1 + C2*O[i2,i2]*C2 + C2*O[i2,i3] +
+        O[i3,i1]*C1 + O[i3,i2]*C2 + O[i3,i3]
+    BB <- C1*O[i1,i1]%*%K0 + C1*O[i1,i2]%*%L0 + C1*O[i1,i3]%*%C3 +
+        C2*O[i2,i1]%*%K0 + C2*O[i2,i2]%*%L0 + C2*O[i2,i3]%*%C3 +
+        O[i3,i1]%*%K0 + O[i3,i2]%*%L0 + O[i3,i3]%*%C3
+    N <- as.vector(solve(-AA,BB))
     if (is.null(c0)){
         c0 <- as.vector(Z - N)
     } else {
         N <- as.vector(Z - c0)
     }
-    K <- as.vector(K0 + C1%*%N)
-    L <- as.vector(L0 + C2%*%N)
+    K <- as.vector(K0 + C1*N)
+    L <- as.vector(L0 + C2*N)
     M <- N + C3
     KLM <- c(K,L,M)
     out$c0 <- c0
