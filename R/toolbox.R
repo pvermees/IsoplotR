@@ -236,11 +236,6 @@ LL.norm <- function(x,covmat){
         + stats::mahalanobis(x,center=FALSE,cov=covmat))/2
 }
 
-# convert a sum of squares to a negative univariate normal log likelihood
-SS2LL <- function(SS,nn,df=nn-2){
-    nn*log(SS*sqrt(2*pi)/df) + df/2
-}
-
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
     nl <- length(levels)
@@ -395,17 +390,6 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
         out[x>=M] <- Inf
         out[x<=m] <- -Inf
     }
-    out
-}
-
-deming <- function(a,b,x,y){
-    out <- list()
-    N <- (b*x+a-y)^2
-    D <- 1+b^2
-    out$d <- sqrt(N/D)
-    dNdb <- 2*(b*x+a-y)*x
-    dDdb <- 2*b
-    out$dddb <- ((D*dNdb-N*dDdb)/D^2)/(2*out$d)
     out
 }
 

@@ -141,7 +141,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
         fit <- robustludwig(init,X=X,anchor=anchor,type=type,
                             model=model,exterr=exterr,control=ctrl)
     }
-    if (model==2 && (type%in%c('joint',0) || x$format<4)){
+    if (model==2){
         H <- optimHess(fit$par,fn=LL.ludwig,
                        x=X,anchor=anchor,type=type,
                        model=model,exterr=exterr)
@@ -874,20 +874,22 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     nn <- length(x)
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format<7){
-        xy <- get.UPb.isochron.ratios.204(x)
+        XY <- get.UPb.isochron.ratios.204(x)
     } else {
-        xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+        XY <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
     }
-    x6 <- xy[,1,drop=FALSE] # U238Pb206
-    y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
-    x7 <- xy[,3,drop=FALSE] # U235Pb207
-    y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
-    r86 <- 1/McL$Pb206U238
-    r57 <- 1/McL$Pb207U235
-    dem6 <- deming(a=1/a0,b=-1/(a0*r86),x=x6,y=y6)
-    dem7 <- deming(a=1/b0,b=-1/(b0*r57),x=x7,y=y7)
-    SS6 <- sum(dem6$d^2)
-    SS7 <- sum(dem7$d^2)
+    X6 <- XY[,1,drop=FALSE] # U238Pb206
+    Y6 <- XY[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
+    X7 <- XY[,3,drop=FALSE] # U235Pb207
+    Y7 <- XY[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
+    a6 <- 1/a0
+    a7 <- 1/b0
+    b6 <- -a6*McL$Pb206U238
+    b7 <- -a7*McL$Pb207U235
+    x6 <- X6 + (Y6-a6-b6*X6)*b6/(1+b6^2)
+    x7 <- X7 + (Y7-a7-b7*X7)*b7/(1+b7^2)
+    D <- cbind(X6-x6,X7-x7)
+    E <- cov(D)
     if (exterr){
         dbd86 <- 1/(a0*r86^2)
         dbd57 <- 1/(b0*r57^2)
@@ -908,10 +910,8 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         E6 <- diag(SS6/(nn-2),nn,nn) + J6%*%getEl()%*%t(J6)
         E7 <- diag(SS7/(nn-2),nn,nn) + J7%*%getEl()%*%t(J7)
         LL <- LL.norm(as.vector(dem6$d),E6) + LL.norm(as.vector(dem7$d),E7)
-    } else {
-        LL <- SS2LL(SS=SS6+SS7,nn=2*nn)
     }
-    LL
+    sum(LL.norm(D,E))
 }
 
 data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
@@ -1067,39 +1067,39 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     else if ('b0'%in%pnames) b0 <- ta0b0['b0']
     else stop('neither a0 nor b0 were supplied')
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format %in% (1:3)){
+    if (x$format %in% (1:3)){ # X=07/06, Y=38/06
         yd <- data2york(x,option=2,tt=tt)
-        X0 <- 1/McL$Pb206U238
-        Y0 <- a0
+        x0 <- 1/McL$Pb206U238
+        y0 <- a0
     } else if (x$format %in% (4:6)){
-        if (type==1){
+        if (type==1){         # X=04/06, Y=38/06
             yd <- data2york(x,option=3,tt=tt)
-            X0 <- 1/McL$Pb206U238
-            Y0 <- 1/a0
-        } else if (type==2){
+            x0 <- 1/McL$Pb206U238
+            y0 <- 1/a0
+        } else if (type==2){  # X=04/07, Y=35/07
             yd <- data2york(x,option=4,tt=tt)
-            X0 <- 1/McL$Pb207U235
-            Y0 <- 1/b0
+            x0 <- 1/McL$Pb207U235
+            y0 <- 1/b0
         } else {
             stop('invalid type')
         }
     } else if (x$format %in% (7:8)){
-        if (type==1){
+        if (type==1){         # X=08c/06, Y=38/06
             yd <- data2york(x,option=6,tt=tt)
-            X0 <- 1/McL$Pb206U238
-            Y0 <- 1/a0
-        } else if (type==2){
+            x0 <- 1/McL$Pb206U238
+            y0 <- 1/a0
+        } else if (type==2){  # X=08c/07, Y=38/07
             yd <- data2york(x,option=7,tt=tt)
-            X0 <- 1/McL$Pb207U235
-            Y0 <- 1/b0
-        } else if (type==3){
+            x0 <- 1/McL$Pb207U235
+            y0 <- 1/b0
+        } else if (type==3){  # X=06c/08, Y=32/08
             yd <- data2york(x,option=8,tt=tt)
-            X0 <- 1/McL$Pb208Th232
-            Y0 <- a0
-        } else if (type==4){
+            x0 <- 1/McL$Pb208Th232
+            y0 <- a0
+        } else if (type==4){  # X=07c/08, Y=32/08
             yd <- data2york(x,option=9,tt=tt)
-            X0 <- 1/McL$Pb208Th232
-            Y0 <- b0
+            x0 <- 1/McL$Pb208Th232
+            y0 <- b0
         } else {
             stop('invalid type')
         }
@@ -1108,11 +1108,12 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     }
     X <- yd[,'X',drop=FALSE]
     Y <- yd[,'Y',drop=FALSE]
-    dem <- deming(a=Y0,b=-Y0/X0,x=X,y=Y)
-    D <- as.vector(dem$d)
-    SS <- sum(D^2)
-    ns <- length(x)
-    E <- diag(SS,ns,ns)/(ns-2)
+    # Deming regression:
+    a <- y0
+    b <- -y0/x0
+    xfitted <- X + (Y-a-b*X)*b/(1+b^2)
+    sigma <- sd(X-xfitted)
+    LL <- -sum(dnorm(X,mean=xfitted,sd=sigma,log=TRUE))
     if (exterr){
         J <- matrix(0,ns,7)
         El <- getEl()
@@ -1130,7 +1131,7 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
         }
         E <- E + J %*% El %*% t(J)
     }
-    LL.norm(D,E)
+    LL
 }
 
 mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
