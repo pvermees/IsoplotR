@@ -871,7 +871,7 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     tt <- ta0b0['t']
     a0 <- ta0b0['a0']
     b0 <- ta0b0['b0']
-    nn <- length(x)
+    ns <- length(x)
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format<7){
         XY <- get.UPb.isochron.ratios.204(x)
@@ -886,32 +886,58 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     a7 <- 1/b0
     b6 <- -a6*McL$Pb206U238
     b7 <- -a7*McL$Pb207U235
-    x6 <- X6 + (Y6-a6-b6*X6)*b6/(1+b6^2)
-    x7 <- X7 + (Y7-a7-b7*X7)*b7/(1+b7^2)
+    N6 <- (Y6-a6-b6*X6)*b6
+    D6 <- 1+b6^2
+    x6 <- X6 + N6/D6
+    N7 <- (Y7-a7-b7*X7)*b7
+    D7 <- 1+b7^2
+    x7 <- X7 + N7/D7
     D <- cbind(X6-x6,X7-x7)
     E <- cov(D)
+    DD <- c(X6-x6,X7-x7)
+    EE <- matrix(0,2*ns,2*ns)
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    diag(EE[i1,i1]) <- E[1,1]
+    diag(EE[i2,i2]) <- E[2,2]
+    diag(EE[i1,i2]) <- diag(EE[i2,i1]) <- E[1,2]
     if (exterr){
-        dbd86 <- 1/(a0*r86^2)
-        dbd57 <- 1/(b0*r57^2)
-        dr68d86 <- -r86^2
-        dr57d75 <- -r57^2
-        dd6d68 <- dem6$dddb*dbd86*dr68d86
-        dd7d75 <- dem7$dddb*dbd57*dr57d75
-        d68dl <- matrix(0,1,7)
-        d68dl[1] <- McL$dPb206U238dl38
-        d68dl[3] <- McL$dPb206U238dl34
-        d68dl[6] <- McL$dPb206U238dl30
-        d68dl[7] <- McL$dPb206U238dl26
-        d75dl <- matrix(0,1,7)
-        d75dl[2] <- McL$dPb207U235dl35
-        d75dl[5] <- McL$dPb207U235dl31
-        J6 <- dd6d68%*%d68dl
-        J7 <- dd7d75%*%d75dl
-        E6 <- diag(SS6/(nn-2),nn,nn) + J6%*%getEl()%*%t(J6)
-        E7 <- diag(SS7/(nn-2),nn,nn) + J7%*%getEl()%*%t(J7)
-        LL <- LL.norm(as.vector(dem6$d),E6) + LL.norm(as.vector(dem7$d),E7)
+        db6dl38 <- -a6*McL$dPb206U238dl38
+        db6dl34 <- -a6*McL$dPb206U238dl34
+        db6dl30 <- -a6*McL$dPb206U238dl30
+        db6dl26 <- -a6*McL$dPb206U238dl26
+        db7dl35 <- -a7*McL$dPb207U235dl35
+        db7dl31 <- -a7*McL$dPb207U235dl31
+        dN6dl38 <-  (Y6-a6)*db6dl38 - 2*X6*b6*db6dl38 # N6 = (Y6-a6)*b6 - X6*b6^2
+        dN6dl34 <-  (Y6-a6)*db6dl34 - 2*X6*b6*db6dl34
+        dN6dl30 <-  (Y6-a6)*db6dl30 - 2*X6*b6*db6dl30
+        dN6dl26 <-  (Y6-a6)*db6dl26 - 2*X6*b6*db6dl26
+        dD6dl38 <- 2*b6*db6dl38                       # D6 = 1+b6^2
+        dD6dl34 <- 2*b6*db6dl34
+        dD6dl30 <- 2*b6*db6dl30
+        dD6dl26 <- 2*b6*db6dl26 
+        dN7dl35 <-  (Y7-a7)*db7dl35 - 2*X7*b7*db7dl35 # N7 = (Y7-a7)*b7 - X7*b7^2
+        dN7dl31 <-  (Y7-a7)*db7dl31 - 2*X7*b7*db7dl31
+        dD7dl35 <- 2*b7*db7dl35                       # D7 = 1+b7^2
+        dD7dl31 <- 2*b7*db7dl31
+        dx6dl38 <- (dN6dl38*D6-N6*dD6dl38)/D6^2         # x6 = N6/D6
+        dx6dl34 <- (dN6dl34*D6-N6*dD6dl34)/D6^2
+        dx6dl30 <- (dN6dl30*D6-N6*dD6dl30)/D6^2
+        dx6dl26 <- (dN6dl26*D6-N6*dD6dl26)/D6^2
+        dx7dl35 <- (dN7dl35*D7-N7*dD7dl35)/D7^2         # x7 = N7/D7
+        dx7dl31 <- (dN7dl31*D7-N7*dD7dl31)/D7^2
+        El <- getEl()
+        J <- matrix(0,2*ns,7)
+        colnames(J) <- colnames(El)
+        J[i1,'U238'] <- -dx6dl38
+        J[i1,'U234'] <- -dx6dl34
+        J[i1,'Th230'] <- -dx6dl30
+        J[i1,'Ra226'] <- -dx6dl26
+        J[i2,'U235'] <- -dx7dl35
+        J[i2,'Pa231'] <- -dx7dl31
+        EE <- EE + J%*%El%*%t(J)
     }
-    sum(LL.norm(D,E))
+    LL.norm(DD,EE)
 }
 
 data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
