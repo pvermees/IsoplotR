@@ -393,17 +393,22 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
     out
 }
 
-inverthess <- function(hess){
+invertible <- function(hess){
     tryCatch({
         E <- solve(hess)
-        if (any(diag(E)<0)) stop('Non positive definite Hessian')
-        return(E)
-    },
-    error = function(e){
-        warning(e)
+        return(all(diag(E)>0))
+    }, error = function(e){
+        return(FALSE)
+    })
+}
+
+inverthess <- function(hess){
+    if (invertible(hess)){
+        return(solve(hess))
+    } else {
         H <- nearPD(hess)
         return(solve(H))
-    })
+    }
 }
 
 det3x3 <- function(vx,vy,vz,sxy,sxz,syz){
@@ -447,4 +452,23 @@ log_sum_exp <- function(u,v){
         v <- log_sum_exp(v[1],v[-1])
     } 
     max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
+}
+
+robustfit <- function(init,fn,lower,upper,...){
+    fit <- stats::optim(par=init,fn=fn,hessian=TRUE,...)
+    if (!invertible(fit$hessian) || fit$convergence>0){
+        Bfit <- stats::optim(par=init,fn=fn,method='L-BFGS-B',lower=lower,
+                             upper=upper,hessian=TRUE,...)
+        if (invertible(Bfit$hessian)){
+            fit <- Bfit
+        } else {
+            warning('Ill-conditioned Hessian matrix')
+            if (fit$convergence>0 && Bfit$convergence>0 && Bfit$value<fit$value){
+                fit <- Bfit
+            } else if (fit$convergence>0 && Bfit$convergence==0){
+                fit <- Bfit
+            }
+        }
+    }
+    fit
 }

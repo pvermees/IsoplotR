@@ -131,16 +131,10 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     X <- x
     X$d <- mediand(x$d)
     init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
-    ctrl <- list()
-    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=init$lower,upper=init$upper,
-                        x=X,anchor=anchor,type=type,
-                        model=model,exterr=exterr,hessian=TRUE)
-    if (fit$convergence>0){
-        ctrl <- list(fnscale=1e-15,maxit=1000)
-        fit <- robustludwig(init,X=X,anchor=anchor,type=type,
-                            model=model,exterr=exterr,control=ctrl)
-    }
+    ctrl <- list(fnscale=1e-15,maxit=1000)
+    fit <- robustfit(init=init$par,fn=LL.ludwig,lower=init$lower,
+                     upper=init$upper,x=X,anchor=anchor,
+                     type=type,model=model,exterr=exterr,control=ctrl)
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
@@ -1094,8 +1088,8 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
         } else if (type==4){  # X=32/08, Y=07c/08
             yd <- data2york(x,option=9,tt=tt)
             a <- b0
-            x0 <- -McL$Pb208Th232*b0
-            dbdl32 <- -McL$dPb208Th232dl32*a0
+            b <- -McL$Pb208Th232*b0
+            dbdl32 <- -McL$dPb208Th232dl32*b0
         } else {
             stop('invalid type')
         }
@@ -1105,17 +1099,16 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     X <- yd[,'X',drop=FALSE]
     Y <- yd[,'Y',drop=FALSE]
     # Deming regression:
-    num <- (Y-a)*b-X*b^2
-    den <- 1+b^2
-    xfitted <- X + num/den
+    num <- Y-a-b*X
+    den <- sqrt(1+b^2)
     sigma <- sd(num/den)
     if (exterr){
         ns <- length(x)
         El <- getEl()
         J <- matrix(0,ns,7)
         colnames(J) <- colnames(El)
-        dnumdb <- (Y-a)-2*X*b
-        ddendb <- 2*b
+        dnumdb <- -X
+        ddendb <- -b/den
         dxdb <- (dnumdb*den-num*ddendb)/den^2
         J[,'U238'] <- -dxdb*dbdl38
         J[,'U235'] <- -dxdb*dbdl35
@@ -1124,13 +1117,13 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
         J[,'Pa231'] <- -dxdb*dbdl31
         J[,'Th230'] <- -dxdb*dbdl30
         J[,'Ra226'] <- -dxdb*dbdl26
-        D <- X-xfitted
+        D <- as.vector(num/den)
         E <- diag(0,ns,ns)
         diag(E) <- var(D)
         E <- E + J%*%El%*%t(J)
-        LL <- LL.norm(t(D),E)
+        LL <- LL.norm(D,E)
     } else {
-        LL <- -sum(dnorm(X,mean=xfitted,sd=sigma,log=TRUE))
+        LL <- -sum(dnorm(x=num/den,mean=0,sd=sigma,log=TRUE))
     }
     LL
 }
