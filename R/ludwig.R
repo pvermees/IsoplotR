@@ -1105,28 +1105,25 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     X <- yd[,'X',drop=FALSE]
     Y <- yd[,'Y',drop=FALSE]
     # Deming regression:
-    xfitted <- X + (Y-a-b*X)*b/(1+b^2)
-    sigma <- sd(X-xfitted)
+    num <- (Y-a)*b-X*b^2
+    den <- 1+b^2
+    xfitted <- X + num/den
+    sigma <- sd(num/den)
     if (exterr){
         ns <- length(x)
         El <- getEl()
         J <- matrix(0,ns,7)
         colnames(J) <- colnames(El)
-        dxdl38 <-  (Y-a)*dbdl38 - 2*X*b*dbdl38 # xfitted = (Y-a)*b - X*b^2
-        dxdl35 <-  (Y-a)*dbdl35 - 2*X*b*dbdl35
-        dxdl34 <-  (Y-a)*dbdl34 - 2*X*b*dbdl34
-        dxdl32 <-  (Y-a)*dbdl32 - 2*X*b*dbdl32
-        dxdl31 <-  (Y-a)*dbdl31 - 2*X*b*dbdl31
-        dxdl30 <-  (Y-a)*dbdl30 - 2*X*b*dbdl30
-        dxdl26 <-  (Y-a)*dbdl26 - 2*X*b*dbdl26
-        dxdl26 <-  (Y-a)*dbdl26 - 2*X*b*dbdl26
-        J[,'U238'] <- -dxdl38
-        J[,'U235'] <- -dxdl35
-        J[,'U234'] <- -dxdl34
-        J[,'Th232'] <- -dxdl32
-        J[,'Pa231'] <- -dxdl31
-        J[,'Th230'] <- -dxdl30
-        J[,'Ra226'] <- -dxdl26
+        dnumdb <- (Y-a)-2*X*b
+        ddendb <- 2*b
+        dxdb <- (dnumdb*den-num*ddendb)/den^2
+        J[,'U238'] <- -dxdb*dbdl38
+        J[,'U235'] <- -dxdb*dbdl35
+        J[,'U234'] <- -dxdb*dbdl34
+        J[,'Th232'] <- -dxdb*dbdl32
+        J[,'Pa231'] <- -dxdb*dbdl31
+        J[,'Th230'] <- -dxdb*dbdl30
+        J[,'Ra226'] <- -dxdb*dbdl26
         D <- X-xfitted
         E <- diag(0,ns,ns)
         diag(E) <- var(D)
