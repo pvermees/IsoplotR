@@ -394,12 +394,16 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
 }
 
 inverthess <- function(hess){
-    tryCatch(solve(hess),
-             error = function(e){
-                 warning(e)
-                 H <- nearPD(hess)
-                 return(solve(H))
-             })
+    tryCatch({
+        E <- solve(hess)
+        if (any(diag(E)<0)) stop('Non positive definite Hessian')
+        return(E)
+    },
+    error = function(e){
+        warning(e)
+        H <- nearPD(hess)
+        return(solve(H))
+    })
 }
 
 det3x3 <- function(vx,vy,vz,sxy,sxz,syz){
