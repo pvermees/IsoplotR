@@ -131,14 +131,14 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     X <- x
     X$d <- mediand(x$d)
     init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
-    ctrl <- list(fnscale=1e-15,maxit=1000)
-    fit <- robustfit(init=init$par,fn=LL.ludwig,lower=init$lower,
-                     upper=init$upper,x=X,anchor=anchor,
-                     type=type,model=model,exterr=exterr,control=ctrl)
+    ctrl <- list()
+    fit <- contingencyfit(init=init$par,fn=LL.ludwig,lower=init$lower,
+                          upper=init$upper,x=X,anchor=anchor,
+                          type=type,model=model,exterr=exterr,control=ctrl)
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
-                                  control=ctrl,model=model,plot=plot)
+                                  model=model,plot=plot,control=ctrl)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,X,anchor=anchor,type=type)
@@ -247,8 +247,8 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
     out <- c('a'=NA,'b'=NA,'x0inv'=NA)
     if (is.null(x0) & is.null(y0)){
         fit <- york(yd)
-        out['a'] <- abs(fit$a[1])
-        out['b'] <- -abs(fit$b[1])
+        out['a'] <- max(1e-10,fit$a[1])
+        out['b'] <- min(-1e-10,fit$b[1])
     } else if (is.null(y0)){ # anchor x
         i <- which.min(yd[,'X'])
         if (x0>yd[i,'X']){

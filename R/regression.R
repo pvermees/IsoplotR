@@ -55,7 +55,8 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         init <- c(pilot$a['a'],pilot$b['b'],lw=unname(lw))
         lower <- init - c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],20)
         upper <- init + c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],2)
-        out <- robustfit(init,LL.york,lower=lower,upper=upper,XY=xyz,wtype=wtype)
+        out <- contingencyfit(init,LL.york,lower=lower,
+                              upper=upper,XY=xyz,wtype=wtype)
         x <- get.york.xy(XY=xyz,a=out$par['a'],b=out$par['b'],
                          w=exp(out$par['lw']),wtype=wtype)[,'x']
         H <- stats::optimHess(par=c(out$par,x),fn=LL.york.ablwx,XY=xyz,wtype=wtype)
@@ -75,8 +76,8 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         init <- c(pilot$par,'lw'=unname(lw))
         lower <- c(pilot$par-10*spar,'lw'=init['lw']-10)
         upper <- c(pilot$par+10*spar,'lw'=init['lw']+2)
-        out <- robustfit(init,LL.titterington,lower=lower,
-                         upper=upper,XYZ=xyz,wtype=wtype)
+        out <- contingencyfit(init,LL.titterington,lower=lower,
+                              upper=upper,XYZ=xyz,wtype=wtype)
         x <- get.titterington.xyz(XYZ=xyz,a=out$par['a'],b=out$par['b'],
                                   A=out$par['A'],B=out$par['B'],
                                   w=exp(out$par['lw']),wtype=wtype)[,'x']

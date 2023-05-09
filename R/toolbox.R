@@ -454,19 +454,19 @@ log_sum_exp <- function(u,v){
     max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
 }
 
-robustfit <- function(init,fn,lower,upper,...){
-    fit <- stats::optim(par=init,fn=fn,hessian=TRUE,...)
+contingencyfit <- function(init,fn,lower,upper,...){
+    fit <- stats::optim(par=init,fn=fn,method='L-BFGS-B',lower=lower,
+                        upper=upper,hessian=TRUE,...)    
     if (!invertible(fit$hessian) || fit$convergence>0){
-        Bfit <- stats::optim(par=init,fn=fn,method='L-BFGS-B',lower=lower,
-                             upper=upper,hessian=TRUE,...)
-        if (invertible(Bfit$hessian)){
-            fit <- Bfit
+        NMfit <- stats::optim(par=init,fn=fn,hessian=TRUE,...)
+        if (invertible(NMfit$hessian)){
+            fit <- fit
         } else {
             warning('Ill-conditioned Hessian matrix')
-            if (fit$convergence>0 && Bfit$convergence>0 && Bfit$value<fit$value){
-                fit <- Bfit
-            } else if (fit$convergence>0 && Bfit$convergence==0){
-                fit <- Bfit
+            if (fit$convergence>0 && NMfit$convergence>0 && NMfit$value<fit$value){
+                fit <- NMfit
+            } else if (fit$convergence>0 && NMfit$convergence==0){
+                fit <- NMfit
             }
         }
     }
