@@ -438,17 +438,14 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
                 # keep yd
             }
             abx <- inithelper(yd=yd)
+            par['t'] <- log(pilott)
             if (type==1){ # 0806 vs 38/06
-                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
                 par['a0'] <- log(1/abx['a'])
             } else if (type==2){ # 0807 vs 35/07
-                par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
                 par['b0'] <- log(1/abx['a'])
             } else if (type==3){ # 0608 vs 32/08
-                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
                 par['a0'] <- log(abx['a'])
             } else if (type==4){ # 0708 vs 32/08
-                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
                 par['b0'] <- log(abx['a'])
             } else { # joint, 0 or 1
                 par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
@@ -462,7 +459,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
         }
     }
     if (model==3){
-        w <- ifelse(type%in%c('joint',0),abs(par['t'])/100,median(yd[,'sY']))
+        w <- abs(par['t'])/100
         par['w'] <- log(w)
     }
     if (x$d$U48$option==2 || x$d$ThU$option==2){
