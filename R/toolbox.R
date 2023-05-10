@@ -460,7 +460,7 @@ contingencyfit <- function(init,fn,lower,upper,...){
     if (!invertible(fit$hessian) || fit$convergence>0){
         NMfit <- stats::optim(par=init,fn=fn,hessian=TRUE,...)
         if (invertible(NMfit$hessian)){
-            fit <- fit
+            fit <- NMfit
         } else {
             warning('Ill-conditioned Hessian matrix')
             if (fit$convergence>0 && NMfit$convergence>0 && NMfit$value<fit$value){
