@@ -456,7 +456,7 @@ log_sum_exp <- function(u,v){
 
 contingencyfit <- function(init,fn,lower,upper,...){
     fit <- stats::optim(par=init,fn=fn,method='L-BFGS-B',lower=lower,
-                        upper=upper,hessian=TRUE,...)    
+                        upper=upper,hessian=TRUE,...)
     if (!invertible(fit$hessian) || fit$convergence>0){
         NMfit <- stats::optim(par=init,fn=fn,hessian=TRUE,...)
         if (invertible(NMfit$hessian)){
@@ -471,4 +471,20 @@ contingencyfit <- function(init,fn,lower,upper,...){
         }
     }
     fit
+}
+
+getparscale <- function(pars,option='york',x,wtype='a'){
+    dp <- 1e-4
+    lfact <- 1-dp/2
+    ufact <- 1+dp/2
+    if (option=='york'){
+        dLLda <- (LL.york(pars*c(1+dp,1,1),XY=x,wtype=wtype) -
+                  LL.york(pars*c(1-dp,1,1),XY=x,wtype=wtype))/(pars[1]*dp)
+        dLLdb <- (LL.york(pars*c(1,1+dp,1),XY=x,wtype=wtype) -
+                  LL.york(pars*c(1,1-dp,1),XY=x,wtype=wtype))/(pars[2]*dp)
+        dLLdw <- (LL.york(pars*c(1,1,1+dp),XY=x,wtype=wtype) -
+                  LL.york(pars*c(1,1,1-dp),XY=x,wtype=wtype))/(pars[3]*dp)
+        out <- 1/abs(c(dLLda,dLLdb,dLLdw))
+    }
+    out
 }
