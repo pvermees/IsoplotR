@@ -55,9 +55,9 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         init <- c(pilot$a['a'],pilot$b['b'],lw=unname(lw))
         lower <- init - c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],20)
         upper <- init + c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],2)
-        ctrl <- list(parscale=getparscale(pars=init,x=xyz,option='york'))
+        ps <- getparscale(fn=LL.york,args=list(ablw=init,XY=xyz,wtype=wtype))
         out <- contingencyfit(init,LL.york,lower=lower,upper=upper,
-                              XY=xyz,wtype=wtype,control=ctrl)
+                              XY=xyz,wtype=wtype,control=list(parscale=ps))
         out$cov <- inverthess(out$hessian)
         out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
         out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))

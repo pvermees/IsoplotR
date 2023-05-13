@@ -473,18 +473,21 @@ contingencyfit <- function(init,fn,lower,upper,...){
     fit
 }
 
-getparscale <- function(pars,option='york',x,wtype='a'){
+getparscale <- function(fn=LL.york,args){
     dp <- 1e-4
-    lfact <- 1-dp/2
-    ufact <- 1+dp/2
-    if (option=='york'){
-        dLLda <- (LL.york(pars*c(1+dp,1,1),XY=x,wtype=wtype) -
-                  LL.york(pars*c(1-dp,1,1),XY=x,wtype=wtype))/(pars[1]*dp)
-        dLLdb <- (LL.york(pars*c(1,1+dp,1),XY=x,wtype=wtype) -
-                  LL.york(pars*c(1,1-dp,1),XY=x,wtype=wtype))/(pars[2]*dp)
-        dLLdw <- (LL.york(pars*c(1,1,1+dp),XY=x,wtype=wtype) -
-                  LL.york(pars*c(1,1,1-dp),XY=x,wtype=wtype))/(pars[3]*dp)
-        out <- 1/abs(c(dLLda,dLLdb,dLLdw))
+    largs <- uargs <- args
+    init <- args[[1]]
+    np <- length(init)
+    dLLdp <- rep(NA,np)
+    for (i in 1:np){
+        lfact <- ufact <- rep(1,np)
+        ufact[i] <- 1+dp/2
+        lfact[i] <- 1-dp/2
+        uargs[[1]] <- init*ufact
+        largs[[1]] <- init*lfact
+        darg <- uargs[[1]][i] - largs[[1]][i]
+        dLLdp[i] <- (do.call(what=fn,args=uargs) -
+                     do.call(what=fn,args=largs))/darg
     }
-    out
+    out <- abs(1/dLLdp)
 }
