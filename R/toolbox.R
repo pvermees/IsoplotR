@@ -232,8 +232,10 @@ quotient <- function(X,sX,Y,sY,rXY){
 
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){
-    (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus
-        + stats::mahalanobis(x,center=FALSE,cov=covmat))/2
+    tryCatch({
+        (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus
+            + stats::mahalanobis(x,center=FALSE,cov=covmat))/2
+    },error=function(e) Inf)
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
@@ -454,11 +456,44 @@ log_sum_exp <- function(u,v){
     max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
 }
 
-contingencyfit <- function(init,fn,lower,upper,...){
+contingencyfit.old <- function(init,fn,lower,upper,...){
     fit <- stats::optim(par=init,fn=fn,method='L-BFGS-B',lower=lower,
                         upper=upper,hessian=TRUE,...)
     if (!invertible(fit$hessian) || fit$convergence>0){
         NMfit <- stats::optim(par=init,fn=fn,hessian=TRUE,...)
+        if (invertible(NMfit$hessian)){
+            fit <- NMfit
+        } else {
+            warning('Ill-conditioned Hessian matrix')
+            if (fit$convergence>0 && NMfit$convergence>0 && NMfit$value<fit$value){
+                fit <- NMfit
+            } else if (fit$convergence>0 && NMfit$convergence==0){
+                fit <- NMfit
+            }
+        }
+    }
+    fit
+}
+
+contingencyfit <- function(fn,args,lower,upper){
+    ps <- getparscale(fn=fn,args=args)
+    BFGSargs <- args
+    names(BFGSargs)[1] <- 'par'
+    BFGSargs[['fn']] <- fn
+    BFGSargs[['method']] <- 'L-BFGS-B'
+    BFGSargs[['lower']] <- lower
+    BFGSargs[['upper']] <- upper
+    BFGSargs[['hessian']] <- TRUE
+    BFGSargs[['control']] <- list(parscale=ps)
+    fit <- do.call(what=stats::optim,args=BFGSargs)
+    if (!invertible(fit$hessian) || fit$convergence>0){
+        NMargs <- args
+        names(NMargs)[1] <- 'par'
+        NMargs[['fn']] <- fn
+        NMargs[['method']] <- 'Nelder-Mead'
+        NMargs[['hessian']] <- TRUE
+        NMargs[['control']] <- list(parscale=ps)
+        NMfit <- do.call(what=stats::optim,args=NMargs)
         if (invertible(NMfit$hessian)){
             fit <- NMfit
         } else {
@@ -478,7 +513,7 @@ getparscale <- function(fn=LL.york,args){
     largs <- uargs <- args
     init <- args[[1]]
     np <- length(init)
-    dLLdp <- rep(NA,np)
+    dpdLL <- rep(NA,np)
     for (i in 1:np){
         lfact <- ufact <- rep(1,np)
         ufact[i] <- 1+dp/2
@@ -486,8 +521,9 @@ getparscale <- function(fn=LL.york,args){
         uargs[[1]] <- init*ufact
         largs[[1]] <- init*lfact
         darg <- uargs[[1]][i] - largs[[1]][i]
-        dLLdp[i] <- (do.call(what=fn,args=uargs) -
-                     do.call(what=fn,args=largs))/darg
+        LLu <- do.call(what=fn,args=uargs)
+        LLl <- do.call(what=fn,args=largs)
+        dpdLL[i] <- abs(darg/(LLu-LLl))
     }
-    out <- abs(1/dLLdp)
+    dpdLL/max(dpdLL)
 }

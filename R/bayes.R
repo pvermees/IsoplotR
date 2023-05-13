@@ -125,7 +125,7 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
 }
 
 bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
-                     control=list(),nsteps=NULL,plot=FALSE){
+                     nsteps=NULL,plot=FALSE){
     if (is.null(nsteps)){
         if (x$d$U48$option==2 && x$d$ThU$option==2) nsteps <- 20
         else nsteps <- 30
@@ -203,8 +203,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
             message('Iteration ',i,'/',nsteps)
             anchor <- c(2,tt[i])
             ifit <- stats::optim(init[i,],fn=LL.ludwig,method='L-BFGS-B',
-                                 control=control,lower=lower[i,],
-                                 upper=upper[i,],hessian=FALSE,
+                                 lower=lower[i,],upper=upper[i,],hessian=FALSE,
                                  x=x,anchor=anchor,type=type,model=model)
             LLgridt[i,'t'] <- tt[i]
             LLgridt[i,names(ifit$par)] <- ifit$par
