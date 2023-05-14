@@ -507,17 +507,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     list(par=par,lower=lower,upper=upper)
 }
 
-LL.ludwig.c0 <- function(par,x,X=x,model=1,exterr=FALSE,
-                         anchor=0,type='joint',debug=FALSE){
-    ns <- length(x)
-    c0 <- par[1:ns]
-    ta0b0w <- par[-(1:ns)]
-    LL.ludwig(ta0b0w,c0=c0,x=x,X=x,model=model,exterr=exterr,
-              anchor=anchor,type=type,debug=debug)
-}
-
-LL.ludwig <- function(par,c0=NULL,x,X=x,model=1,exterr=FALSE,
-                      anchor=0,type='joint',debug=FALSE,getc0=FALSE){
+LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
+                      anchor=0,type='joint',debug=FALSE){
     if (debug) browser()
     pnames <- names(par)
     if ('t' %in% pnames){
@@ -623,13 +614,11 @@ LL.ludwig <- function(par,c0=NULL,x,X=x,model=1,exterr=FALSE,
         }
     } else {
         if (type%in%c('joint',0) && x$format>3){
-            LLc0 <- data2ludwig(X,ta0b0w,c0=c0,exterr=exterr)
+            LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
         } else {
-            LLc0 <- data2ludwig.2d(ta0b0w,c0=c0,x=X,model=model,
-                                   exterr=exterr,type=type)
+            LL <- LL + data2ludwig.2d(ta0b0w,x=X,model=model,
+                                      exterr=exterr,type=type)$LL
         }
-        if (getc0) return(LLc0$c0)
-        else LL <- LL + LLc0$LL
     }
     if (x$d$U48$option==1 && 'U48i'%in%pnames){
         LL <- LL - stats::dnorm(x=par['U48i'],mean=x$d$U48$x,
@@ -660,7 +649,7 @@ LL.ludwig <- function(par,c0=NULL,x,X=x,model=1,exterr=FALSE,
     LL
 }
 
-data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
+data2ludwig <- function(x,ta0b0w,exterr=FALSE,debug=FALSE){
     if (debug) browser()
     out <- list()
     U <- iratio('U238U235')[1]
@@ -744,16 +733,11 @@ data2ludwig <- function(x,ta0b0w,c0=NULL,exterr=FALSE,debug=FALSE){
         C2*O[i2,i1]%*%K0 + C2*O[i2,i2]%*%L0 + C2*O[i2,i3]%*%C3 +
         O[i3,i1]%*%K0 + O[i3,i2]%*%L0 + O[i3,i3]%*%C3
     N <- as.vector(solve(-AA,BB))
-    if (is.null(c0)){
-        c0 <- as.vector(Z - N)
-    } else {
-        N <- as.vector(Z - c0)
-    }
     K <- as.vector(K0 + C1*N)
     L <- as.vector(L0 + C2*N)
     M <- N + C3
     KLM <- c(K,L,M)
-    out$c0 <- c0
+    out$c0 <- as.vector(Z - N)
     out$SS <- KLM%*%O%*%KLM
     detEE <- determinant(EE,logarithm=TRUE)$modulus
     out$LL <- (NP*ns*log(2*pi) + detEE + out$SS)/2
@@ -887,7 +871,7 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     LL.norm(DD,EE)
 }
 
-data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
+data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
     out <- list()
     pnames <- names(ta0b0w)
     tt <- ta0b0w['t']
@@ -1018,16 +1002,11 @@ data2ludwig.2d <- function(ta0b0w,c0=NULL,x,model=1,exterr=FALSE,type=1){
     BB <- O[i1,i1] + O[i1,i2]*b + b*O[i2,i1] + b*O[i2,i2]*b
     CC <- O[i1,i2]%*%L0 + b*O[i2,i2]%*%L0 - O[i1,i1]%*%A - b*O[i1,i2]%*%A
     DD <- t(CC)
-    if (is.null(c0)){
-        M <- -solve(BB,CC)
-        c0 <- (yd[,'X']-M)/multiplier
-    } else {
-        M <- yd[,'X']-c0*multiplier
-    }
+    M <- -solve(BB,CC)
     K <- M-A
     L <- L0+b*M
     KL <- c(K,L)
-    out$c0 <- c0
+    out$c0 <- (yd[,'X']-M)/multiplier
     out$SS <- KL%*%O%*%KL
     out$LL <- LL.norm(KL,E)
     out

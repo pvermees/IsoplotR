@@ -56,25 +56,10 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
                               upper=upper,XY=xyz,wtype=wtype)
         out$a <- c(out$par['a'],'s[a]'=NA)
         out$b <- c(out$par['b'],'s[b]'=NA)
-        H <- out$hessian
-        if (invertible(H)){
-            E <- solve(H)
-            Ew <- E['lw','lw']
-            out$a['s[a]'] <- unname(sqrt(E['a','a']))
-            out$b['s[b]'] <- unname(sqrt(E['b','b']))
-            out$cov.ab <- E['a','b']
-        } else if (invertible(H[1:2,1:2])){
-            Eab <- solve(H[1:2,1:2])
-            Ew <- 1/H['lw','lw']
-            out$a['s[a]'] <- unname(sqrt(Eab['a','a']))
-            out$b['s[b]'] <- unname(sqrt(Eab['b','b']))
-            out$cov.ab <- Eab['a','b']
-        } else {
-            out$a <- pilot$a
-            out$b <- pilot$b
-            out$cov.ab <- pilot$cov.ab
-            Ew <- 1/H['lw','lw']
-        }
+        E <- inverthess(out$hessian)
+        out$a['s[a]'] <- unname(sqrt(E['a','a']))
+        out$b['s[b]'] <- unname(sqrt(E['b','b']))
+        out$cov.ab <- E['a','b']
     } else if (identical(type,'titterington')){
         ilw <- init.titterington.lw(XYZ=xyz,wtype=wtype,pilot=pilot)$minimum
         init <- c(pilot$par,'lw'=unname(ilw))
@@ -82,23 +67,12 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         lower <- init - c(5*pilot$par[c('a','b','A','B')],2)
         out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
                               upper=upper,XYZ=xyz,wtype=wtype)
-        H <- out$hessian
-        if (invertible(H)){
-            out$cov <- solve(H)
-            Ew <- out$cov['lw','lw']
-        } else if (invertible(H[1:4,1:4])){
-            EabAB <- solve(H[1:4,1:4])
-            Ew <- 1/H['lw','lw']
-        } else {
-            out$par <- pilot$par
-            out$cov <- pilot$cov
-            Ew <- 1/H['lw','lw']
-        }
+        out$cov <- E <- inverthess(out$hessian)
     } else {
         stop('invalid output type for model 3 regression')
     }
     disp <- exp(out$par['lw'])
-    sdisp <- disp*sqrt(Ew)
+    sdisp <- disp*sqrt(E['lw','lw'])
     out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     out
 }

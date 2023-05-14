@@ -456,23 +456,22 @@ log_sum_exp <- function(u,v){
     max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
 }
 
-contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,...){
+contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
     fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
-                        upper=upper,hessian=hessian,...)
+                        upper=upper,hessian=hessian,control=control,...)
     if (fit$convergence>0 || (hessian && !invertible(fit$hessian))){
-        NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,...)
-        if (hessian && invertible(NMfit$hessian)){
-            fit <- NMfit
-        } else {
-            warning('Ill-conditioned Hessian matrix')
-            if (fit$convergence>0 && NMfit$convergence>0 && NMfit$value<fit$value){
+        NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=control,...)
+        if (NMfit$convergence>0){
+            warning('Optimisation did not converge.')
+            if (NMfit$value<fit$value) {
                 fit <- NMfit
-            } else if (fit$convergence>0 && NMfit$convergence==0){
-                fit <- NMfit
-            } else {
-                warning('Optimisation did not converge')
             }
+        } else {
+            fit <- NMfit
         }
+    }
+    if (hessian && !invertible(fit$hessian)){
+        warning('Ill-conditioned Hessian matrix')
     }
     fit
 }
