@@ -335,8 +335,8 @@ mymtext <- function(text,line=0,...){
 }
 
 # if doall==FALSE, only returns the lower right submatrix
-blockinverse <- function(AA,BB,CC,DD,invAA=NA,doall=FALSE){
-    if (all(is.na(invAA))) invAA <- solve(AA)
+blockinverse <- function(AA,BB,CC,DD,invAA=NULL,doall=FALSE){
+    if (is.null(invAA)) invAA <- solve(AA)
     invDCAB <- solve(DD-CC%*%invAA%*%BB)
     if (doall){
         ul <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
@@ -456,32 +456,11 @@ log_sum_exp <- function(u,v){
     max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
 }
 
-contingencyfit.old <- function(init,fn,lower,upper,...){
-    fit <- stats::optim(par=init,fn=fn,method='L-BFGS-B',lower=lower,
-                        upper=upper,hessian=TRUE,...)
-    if (!invertible(fit$hessian) || fit$convergence>0){
-        NMfit <- stats::optim(par=init,fn=fn,hessian=TRUE,...)
-        if (invertible(NMfit$hessian)){
-            fit <- NMfit
-        } else {
-            warning('Ill-conditioned Hessian matrix')
-            if (fit$convergence>0 && NMfit$convergence>0 && NMfit$value<fit$value){
-                fit <- NMfit
-            } else if (fit$convergence>0 && NMfit$convergence==0){
-                fit <- NMfit
-            }
-        }
-    }
-    fit
-}
-
 contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,...){
-    ps <- getparscale(fn=fn,par=par,...)
-    ctrl <- list(parscale=ps,factr=1e4)
     fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
-                        upper=upper,hessian=hessian,control=ctrl,...)
+                        upper=upper,hessian=hessian,...)
     if (fit$convergence>0 || (hessian && !invertible(fit$hessian))){
-        NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=ctrl,...)
+        NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,...)
         if (hessian && invertible(NMfit$hessian)){
             fit <- NMfit
         } else {

@@ -47,53 +47,82 @@ model2regression <- function(xyz,type='york'){
 # fixes signs and uses logs for numerical stability:
 model3regression <- function(xyz,type='york',model=3,wtype='a'){
     pilot <- model1regression(xyz,type=type)
-    fact <- max(1,sqrt(pilot$mswd))
     if (identical(type,'york')){
-        err <- ifelse(wtype%in%c('intercept',0,'a'),
-                      pilot$a['s[a]'],pilot$b['s[b]'])
-        lw <- log(fact*err)
-        init <- c(pilot$a['a'],pilot$b['b'],lw=unname(lw))
-        lower <- init - c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],20)
-        upper <- init + c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],2)
+        ilw <- init.york.lw(XY=xyz,wtype=wtype,pilot=pilot)$minimum
+        init <- c(pilot$a['a'],pilot$b['b'],lw=ilw)
+        upper <- init + c(5*pilot$a['s[a]'],5*pilot$b['s[b]'],2)
+        lower <- init - c(5*pilot$a['s[a]'],5*pilot$b['s[b]'],2)
         out <- contingencyfit(par=init,fn=LL.york,lower=lower,
                               upper=upper,XY=xyz,wtype=wtype)
-        out$cov <- inverthess(out$hessian)
-        out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
-        out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
-        out$cov.ab <- out$cov['a','b']
+        out$a <- c(out$par['a'],'s[a]'=NA)
+        out$b <- c(out$par['b'],'s[b]'=NA)
+        H <- out$hessian
+        if (invertible(H)){
+            E <- solve(H)
+            Ew <- E['lw','lw']
+            out$a['s[a]'] <- unname(sqrt(E['a','a']))
+            out$b['s[b]'] <- unname(sqrt(E['b','b']))
+            out$cov.ab <- E['a','b']
+        } else if (invertible(H[1:2,1:2])){
+            Eab <- solve(H[1:2,1:2])
+            Ew <- 1/H['lw','lw']
+            out$a['s[a]'] <- unname(sqrt(Eab['a','a']))
+            out$b['s[b]'] <- unname(sqrt(Eab['b','b']))
+            out$cov.ab <- Eab['a','b']
+        } else {
+            out$a <- pilot$a
+            out$b <- pilot$b
+            out$cov.ab <- pilot$cov.ab
+            Ew <- 1/H['lw','lw']
+        }
     } else if (identical(type,'titterington')){
-        spar <- fact*sqrt(diag(pilot$cov))
-        if (wtype%in%c('intercept',0,'a')) lw <- log(spar['a'])
-        else if (wtype%in%c(1,'b')) lw <- log(spar['b'])
-        else if (wtype%in%c(2,'A')) lw <- log(spar['A'])
-        else if (wtype%in%c(3,'B')) lw <- log(spar['B'])
-        else stop('illegal wtype')
-        init <- c(pilot$par,'lw'=unname(lw))
-        lower <- c(pilot$par-10*spar,'lw'=init['lw']-10)
-        upper <- c(pilot$par+10*spar,'lw'=init['lw']+2)
+        ilw <- init.titterington.lw(XYZ=xyz,wtype=wtype,pilot=pilot)$minimum
+        init <- c(pilot$par,'lw'=unname(ilw))
+        upper <- init + c(5*pilot$par[c('a','b','A','B')],2)
+        lower <- init - c(5*pilot$par[c('a','b','A','B')],2)
         out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
                               upper=upper,XYZ=xyz,wtype=wtype)
-        out$cov <- inverthess(out$hessian)
+        H <- out$hessian
+        if (invertible(H)){
+            out$cov <- solve(H)
+            Ew <- out$cov['lw','lw']
+        } else if (invertible(H[1:4,1:4])){
+            EabAB <- solve(H[1:4,1:4])
+            Ew <- 1/H['lw','lw']
+        } else {
+            out$par <- pilot$par
+            out$cov <- pilot$cov
+            Ew <- 1/H['lw','lw']
+        }
     } else {
         stop('invalid output type for model 3 regression')
     }
     disp <- exp(out$par['lw'])
-    sdisp <- disp*sqrt(out$cov['lw','lw'])
+    sdisp <- disp*sqrt(Ew)
     out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     out
 }
 
-LL.york <- function(par,XY,wtype='a'){
-    x <- get.york.xy(XY=XY,a=par['a'],b=par['b'],
-                     w=exp(par['lw']),wtype=wtype)[,'x']
-    LL.york.ablwx(c(par,x),XY,wtype=wtype)
+init.york.lw <- function(XY,wtype='a',pilot){
+    err <- ifelse(wtype%in%c('intercept',0,'a'),
+                  pilot$a['s[a]'],pilot$b['s[b]'])
+    init <- log(sqrt(pilot$mswd)*err)
+    stats::optimise(f=LL.york.lw,interval=init+c(-10,5),
+                    ab=c(pilot$a['a'],pilot$b['b']),XY=XY,wtype=wtype)
 }
-LL.york.ablwx <- function(ablwx,XY,wtype='a'){
+LL.york.lw <- function(lw,ab,XY,wtype='a'){
+    LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
+}
+LL.york.ab <- function(ab,lw,XY,wtype='a'){
+    LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
+}
+LL.york <- function(ablw,XY,wtype='a',debug=FALSE){
+    if (debug) browser()
     ns <- nrow(XY)
-    a <- ablwx[1]
-    b <- ablwx[2]
-    w <- exp(ablwx[3])
-    x <- ablwx[4:(ns+3)]
+    a <- ablw['a']
+    b <- ablw['b']
+    w <- exp(ablw['lw'])
+    x <- get.york.xy(XY=XY,a=a,b=b,w=w,wtype=wtype)[,'x']
     DE <- matrix(0,nrow=ns,ncol=5)
     colnames(DE) <- c('X-x','Y-y','vX','vY','sXY')
     DE[,'X-x'] <- XY[,'X']-x
@@ -110,20 +139,28 @@ LL.york.ablwx <- function(ablwx,XY,wtype='a'){
     sum(log(detE) + maha)/2
 }
 
-LL.titterington <- function(abABlw,XYZ,wtype='a'){
-    x <- get.titterington.xyz(XYZ=XYZ,a=abABlw['a'],b=abABlw['b'],
-                              A=abABlw['A'],B=abABlw['B'],
-                              w=exp(abABlw['lw']),wtype=wtype)[,'x']
-    LL.titterington.abABlwx(c(abABlw,x),XYZ=XYZ,wtype=wtype)
+init.titterington.lw <- function(XYZ,wtype='a',pilot){
+    fact <- max(1,sqrt(pilot$mswd))
+    spar <- fact*sqrt(diag(pilot$cov))
+    if (wtype%in%c('intercept',0,'a')) init <- log(spar['a'])
+    else if (wtype%in%c(1,'b')) init <- log(spar['b'])
+    else if (wtype%in%c(2,'A')) init <- log(spar['A'])
+    else if (wtype%in%c(3,'B')) init <- log(spar['B'])
+    else stop('illegal wtype')
+    stats::optimise(f=LL.titterington.lw,interval=init+c(-10,5),
+                    abAB=pilot$par,XYZ=XYZ,wtype=wtype)
 }
-LL.titterington.abABlwx <- function(abABlwx,XYZ,wtype='a'){
+LL.titterington.lw <- function(lw,abAB,XYZ,wtype='a'){
+    LL.titterington(abABlw=c(abAB,lw=unname(lw)),XYZ=XYZ,wtype=wtype)
+}
+LL.titterington <- function(abABlw,XYZ,wtype='a'){
     ns <- nrow(XYZ)
-    a <- abABlwx['a']
-    b <- abABlwx['b']
-    A <- abABlwx['A']
-    B <- abABlwx['B']
-    w <- exp(abABlwx['lw'])
-    x <- abABlwx[6:(ns+5)]
+    a <- abABlw['a']
+    b <- abABlw['b']
+    A <- abABlw['A']
+    B <- abABlw['B']
+    w <- exp(abABlw['lw'])
+    x <- get.titterington.xyz(XYZ=XYZ,a=a,b=b,A=A,B=B,w=w,wtype=wtype)[,'x']
     DE <- matrix(0,nrow=ns,ncol=9)
     colnames(DE) <- c('X-x','Y-y','Z-z','vX','vY','vZ','sXY','sXZ','sYZ')
     DE[,'X-x'] <- XYZ[,'X']-x

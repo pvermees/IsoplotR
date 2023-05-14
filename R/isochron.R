@@ -1329,7 +1329,7 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                         hide=NULL,omit=NULL,...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model)
+    out <- regression(d2calc,model=model,wtype=wtype)
     out$y0[c('y','s[y]')] <- out$a
     if (inverse){
         DP <- -out$b[1]/out$a[1]
