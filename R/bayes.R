@@ -202,9 +202,9 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
             anchor <- c(2,tt[i])
-            ifit <- stats::optim(init[i,],fn=LL.ludwig,method='L-BFGS-B',
-                                 lower=lower[i,],upper=upper[i,],hessian=FALSE,
-                                 x=x,anchor=anchor,type=type,model=model)
+            ifit <- contingencyfit(par=init[i,],fn=LL.ludwig,lower=lower[i,],
+                                   upper=upper[i,],hessian=FALSE,x=x,
+                                   anchor=anchor,type=type,model=model)
             LLgridt[i,'t'] <- tt[i]
             LLgridt[i,names(ifit$par)] <- ifit$par
             LLgridt[i,'LL'] <- -ifit$value

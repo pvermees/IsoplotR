@@ -475,26 +475,14 @@ contingencyfit.old <- function(init,fn,lower,upper,...){
     fit
 }
 
-contingencyfit <- function(fn,args,lower,upper){
-    ps <- getparscale(fn=fn,args=args)
-    BFGSargs <- args
-    names(BFGSargs)[1] <- 'par'
-    BFGSargs[['fn']] <- fn
-    BFGSargs[['method']] <- 'L-BFGS-B'
-    BFGSargs[['lower']] <- lower
-    BFGSargs[['upper']] <- upper
-    BFGSargs[['hessian']] <- TRUE
-    BFGSargs[['control']] <- list(parscale=ps)
-    fit <- do.call(what=stats::optim,args=BFGSargs)
-    if (!invertible(fit$hessian) || fit$convergence>0){
-        NMargs <- args
-        names(NMargs)[1] <- 'par'
-        NMargs[['fn']] <- fn
-        NMargs[['method']] <- 'Nelder-Mead'
-        NMargs[['hessian']] <- TRUE
-        NMargs[['control']] <- list(parscale=ps)
-        NMfit <- do.call(what=stats::optim,args=NMargs)
-        if (invertible(NMfit$hessian)){
+contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,...){
+    ps <- getparscale(fn=fn,par=par,...)
+    ctrl <- list(parscale=ps,factr=1e4)
+    fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
+                        upper=upper,hessian=hessian,control=ctrl,...)
+    if (fit$convergence>0 || (hessian && !invertible(fit$hessian))){
+        NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=ctrl,...)
+        if (hessian && invertible(NMfit$hessian)){
             fit <- NMfit
         } else {
             warning('Ill-conditioned Hessian matrix')
@@ -502,27 +490,30 @@ contingencyfit <- function(fn,args,lower,upper){
                 fit <- NMfit
             } else if (fit$convergence>0 && NMfit$convergence==0){
                 fit <- NMfit
+            } else {
+                warning('Optimisation did not converge')
             }
         }
     }
     fit
 }
 
-getparscale <- function(fn=LL.york,args){
+getparscale <- function(fn=LL.york,...){
+    pars <- list(...)
     dp <- 1e-4
-    largs <- uargs <- args
-    init <- args[[1]]
+    lpars <- upars <- pars
+    init <- pars[[1]]
     np <- length(init)
     dpdLL <- rep(NA,np)
     for (i in 1:np){
         lfact <- ufact <- rep(1,np)
         ufact[i] <- 1+dp/2
         lfact[i] <- 1-dp/2
-        uargs[[1]] <- init*ufact
-        largs[[1]] <- init*lfact
-        darg <- uargs[[1]][i] - largs[[1]][i]
-        LLu <- do.call(what=fn,args=uargs)
-        LLl <- do.call(what=fn,args=largs)
+        upars[[1]] <- init*ufact
+        lpars[[1]] <- init*lfact
+        darg <- upars[[1]][i] - lpars[[1]][i]
+        LLu <- do.call(what=fn,args=upars)
+        LLl <- do.call(what=fn,args=lpars)
         dpdLL[i] <- abs(darg/(LLu-LLl))
     }
     dpdLL/max(dpdLL)

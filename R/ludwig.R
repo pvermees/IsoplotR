@@ -131,9 +131,9 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     X <- x
     X$d <- mediand(x$d)
     init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
-    fit <- contingencyfit(LL.ludwig,lower=init$lower,upper=init$upper,
-                          args=list(par=init$par,x=X,anchor=anchor,
-                                    type=type,model=model,exterr=exterr))
+    fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
+                          upper=init$upper,x=X,anchor=anchor,
+                          type=type,model=model,exterr=exterr)
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
@@ -272,10 +272,13 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     if (debug) browser()
     if (model==3){
-        fit <- ludwig(x,model=1,anchor=anchor,type=type,buffer=buffer)
-        p <- log(fit$par)
-        p['w'] <- log(fit$cov['t','t'])
-        par <- p[!is.na(p)]
+        init <- init.ludwig(x,anchor=anchor,type=type,buffer=buffer)
+        fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
+                              upper=init$upper,x=x,anchor=anchor,type=type)
+        E <- inverthess(fit$hessian)
+        par <- fit$par
+        par['w'] <- fit$par['t']/100
+        tt <- exp(fit$par['t']) # needed for anchored regression
     } else {
         par <- vector()
         if (x$format<4){
@@ -381,7 +384,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
                 } else if (type==2){
                     par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
                     if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(y0)
-                } else if (type==3){
+    p            } else if (type==3){
                     par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
                     if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(1/y0)
                 } else if (type==4){

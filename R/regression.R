@@ -55,8 +55,8 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         init <- c(pilot$a['a'],pilot$b['b'],lw=unname(lw))
         lower <- init - c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],20)
         upper <- init + c(20*fact*pilot$a['s[a]'],20*fact*pilot$b['s[b]'],2)
-        out <- contingencyfit(LL.york,lower=lower,upper=upper,
-                              args=list(ablw=init,XY=xyz,wtype=wtype))
+        out <- contingencyfit(par=init,fn=LL.york,lower=lower,
+                              upper=upper,XY=xyz,wtype=wtype)
         out$cov <- inverthess(out$hessian)
         out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
         out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
@@ -71,8 +71,8 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         init <- c(pilot$par,'lw'=unname(lw))
         lower <- c(pilot$par-10*spar,'lw'=init['lw']-10)
         upper <- c(pilot$par+10*spar,'lw'=init['lw']+2)
-        out <- contingencyfit(LL.titterington,lower=lower,upper=upper,
-                              args=list(abABlw=init,XYZ=xyz,wtype=wtype))
+        out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
+                              upper=upper,XYZ=xyz,wtype=wtype)
         out$cov <- inverthess(out$hessian)
     } else {
         stop('invalid output type for model 3 regression')
@@ -83,10 +83,10 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
     out
 }
 
-LL.york <- function(ablw,XY,wtype='a'){
-    x <- get.york.xy(XY=XY,a=ablw['a'],b=ablw['b'],
-                     w=exp(ablw['lw']),wtype=wtype)[,'x']
-    LL.york.ablwx(c(ablw,x),XY,wtype=wtype)
+LL.york <- function(par,XY,wtype='a'){
+    x <- get.york.xy(XY=XY,a=par['a'],b=par['b'],
+                     w=exp(par['lw']),wtype=wtype)[,'x']
+    LL.york.ablwx(c(par,x),XY,wtype=wtype)
 }
 LL.york.ablwx <- function(ablwx,XY,wtype='a'){
     ns <- nrow(XY)
