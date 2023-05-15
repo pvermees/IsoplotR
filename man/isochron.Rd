@@ -444,8 +444,8 @@ regression.  The latter can be used to compute
 the complexities of initial \eqn{{}^{234}}U/\eqn{{}^{238}}U
 disequilibrium.}
 
-\item{type}{if \code{x} has class \code{UPb} and \code{x$format=4}, \code{5} or 
-\code{6}:
+\item{type}{if \code{x} has class \code{UPb} and \code{x$format=4},
+    \code{5} or \code{6}:
 
 \code{1}: \eqn{^{204}}Pb/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
 
@@ -481,8 +481,9 @@ vs. \eqn{^{238}}U/\eqn{^{232}}Th
 \item{exterr}{propagate external sources of uncertainty
 (J, decay constant)?}
 
-\item{anchor}{control parameters to fix the intercept age or common Pb
-composition of the isochron fit. This can be a scalar or a vector.
+\item{anchor}{control parameters to fix the intercept age or common
+    Pb composition of the isochron fit. This can be a scalar or a
+    vector.
 
 If \code{anchor[1]=0}: do not anchor the isochron.
 

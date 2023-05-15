@@ -246,8 +246,8 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
     out <- c('a'=NA,'b'=NA,'x0inv'=NA)
     if (is.null(x0) & is.null(y0)){
         fit <- york(yd)
-        out['a'] <- max(1e-10,fit$a[1])
-        out['b'] <- min(-1e-10,fit$b[1])
+        out['a'] <- max(sqrt(.Machine$double.eps),fit$a[1])
+        out['b'] <- min(-sqrt(.Machine$double.eps),fit$b[1])
     } else if (is.null(y0)){ # anchor x
         i <- which.min(yd[,'X'])
         if (x0>yd[i,'X']){
@@ -384,7 +384,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
                 } else if (type==2){
                     par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
                     if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(y0)
-    p            } else if (type==3){
+                } else if (type==3){
                     par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
                     if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(1/y0)
                 } else if (type==4){
@@ -824,7 +824,7 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     D7 <- 1+b7^2
     x7 <- X7 + N7/D7
     D <- cbind(X6-x6,X7-x7)
-    E <- cov(D)
+    E <- stats::cov(D)
     DD <- c(X6-x6,X7-x7)
     EE <- matrix(0,2*ns,2*ns)
     i1 <- 1:ns
@@ -992,7 +992,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
             } else {
                 stop('illegal type')
             }
-    pp    } else {
+        } else {
             stop('illegal format')
         }
         E <- E + J %*% El %*% t(J)
@@ -1082,7 +1082,7 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     # Deming regression:
     num <- Y-a-b*X
     den <- sqrt(1+b^2)
-    sigma <- sd(num/den)
+    sigma <- stats::sd(num/den)
     if (exterr){
         ns <- length(x)
         El <- getEl()
@@ -1100,11 +1100,11 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
         J[,'Ra226'] <- -dxdb*dbdl26
         D <- as.vector(num/den)
         E <- diag(0,ns,ns)
-        diag(E) <- var(D)
+        diag(E) <- stats::var(D)
         E <- E + J%*%El%*%t(J)
         LL <- LL.norm(D,E)
     } else {
-        LL <- -sum(dnorm(x=num/den,mean=0,sd=sigma,log=TRUE))
+        LL <- -sum(stats::dnorm(x=num/den,mean=0,sd=sigma,log=TRUE))
     }
     LL
 }
