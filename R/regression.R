@@ -1,10 +1,15 @@
-regression <- function(xyz,model=1,type='york',omit=NULL,
-                       wtype=ifelse(type=='york','b','a')){
+regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
     xyz2calc <- clear(xyz,omit)
-    if (model==1) out <- model1regression(xyz2calc,type=type)
-    else if (model==2) out <- model2regression(xyz2calc,type=type)
-    else if (model==3) out <- model3regression(xyz2calc,type=type,wtype=wtype)
-    else stop('invalid regression model')
+    if (model==1){
+        out <- model1regression(xyz2calc,type=type)
+    } else if (model==2){
+        out <- model2regression(xyz2calc,type=type)
+    } else if (model==3){
+        out <- model3regression(xyz2calc,type=type,wtype=wtype)
+        out$wtype <- wtype
+    } else {
+        stop('invalid regression model')
+    }
     out$xyz <- xyz
     out$model <- model
     out$n <- nrow(xyz2calc)
@@ -40,127 +45,128 @@ model2regression <- function(xyz,type='york'){
 }
 
 # fixes signs and uses logs for numerical stability:
-model3regression <- function(xyz,type='york',
-                             wtype=ifelse(type=='york','b','a')){
+model3regression <- function(xyz,type='york',model=3,wtype='a'){
     pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
-        wa <- pilot$a['s[a]']*sqrt(pilot$mswd)
-        wb <- pilot$b['s[b]']*sqrt(pilot$mswd)
-        w <- ifelse(wtype %in% c('intercept',0,'a'),log(wa),log(wb))
-        init <- c(pilot$a['a'],pilot$b['b'],'w'=unname(w))
-        lower <- c(pilot$a['a']-5*pilot$a['s[a]']*sqrt(pilot$mswd),
-                   pilot$b['b']-5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']-5)
-        upper <- c(pilot$a['a']+5*pilot$a['s[a]']*sqrt(pilot$mswd),
-                   pilot$b['b']+5*pilot$b['s[b]']*sqrt(pilot$mswd),init['w']+2)
-        out <- stats::optim(init,LL.york,method='L-BFGS-B',
-                            lower=lower,upper=upper,XY=xyz,
-                            wtype=wtype,hessian=TRUE)
-        if (out$convergence>0){
-            out <- stats::optim(init,LL.york,XY=xyz,wtype=wtype,hessian=TRUE)
-        }
-        out$cov <- inverthess(out$hessian)
-        out$a <- c('a'=unname(out$par['a']),'s[a]'=unname(sqrt(out$cov['a','a'])))
-        out$b <- c('b'=unname(out$par['b']),'s[b]'=unname(sqrt(out$cov['b','b'])))
-        out$cov.ab <- out$cov['a','b']
+        ilw <- init.york.lw(XY=xyz,wtype=wtype,pilot=pilot)$minimum
+        init <- c(pilot$a['a'],pilot$b['b'],lw=ilw)
+        upper <- init + c(5*pilot$a['s[a]'],5*pilot$b['s[b]'],2)
+        lower <- init - c(5*pilot$a['s[a]'],5*pilot$b['s[b]'],2)
+        out <- contingencyfit(par=init,fn=LL.york,lower=lower,
+                              upper=upper,XY=xyz,wtype=wtype)
+        out$a <- c(out$par['a'],'s[a]'=NA)
+        out$b <- c(out$par['b'],'s[b]'=NA)
+        E <- inverthess(out$hessian)
+        out$a['s[a]'] <- unname(sqrt(E['a','a']))
+        out$b['s[b]'] <- unname(sqrt(E['b','b']))
+        out$cov.ab <- E['a','b']
     } else if (identical(type,'titterington')){
-        if (wtype%in%c('intercept',0,'a')) w <- sqrt(pilot$cov['a','a']*pilot$mswd)
-        else if (wtype%in%c(1,'b')) w <- sqrt(pilot$cov['b','b']*pilot$mswd)
-        else if (wtype%in%c(2,'A')) w <- sqrt(pilot$cov['A','A']*pilot$mswd)
-        else if (wtype%in%c(3,'B')) w <- sqrt(pilot$cov['B','B']*pilot$mswd)
-        else stop('illegal wtype')
-        init <- c(pilot$par,'w'=unname(log(w)))
-        spar <- sqrt(pilot$mswd*diag(pilot$cov))
-        lower <- c(pilot$par - 5*spar,'w'=init['w']-5)
-        upper <- c(pilot$par + 5*spar,'w'=init['w']+2)
-        out <- stats::optim(init,LL.titterington,method='L-BFGS-B',
-                            lower=lower,upper=upper,XYZ=xyz,
-                            hessian=TRUE,wtype=wtype)
-        out$cov <- inverthess(out$hessian)
+        ilw <- init.titterington.lw(XYZ=xyz,wtype=wtype,pilot=pilot)$minimum
+        init <- c(pilot$par,'lw'=unname(ilw))
+        upper <- init + c(5*pilot$par[c('a','b','A','B')],2)
+        lower <- init - c(5*pilot$par[c('a','b','A','B')],2)
+        out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
+                              upper=upper,XYZ=xyz,wtype=wtype)
+        out$cov <- E <- inverthess(out$hessian)
     } else {
         stop('invalid output type for model 3 regression')
     }
-    disp <- exp(out$par['w'])
-    sdisp <- disp*sqrt(out$cov['w','w'])
+    disp <- exp(out$par['lw'])
+    sdisp <- disp*sqrt(E['lw','lw'])
     out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     out
 }
 
-york2DE <- function(XY,a,b,w=0,wtype='slope'){
-    out <- list()
-    ns <- nrow(XY)
-    P <- get.york.xy(XY,a=a,b=b)
-    E <- matrix(0,3*ns,3*ns)
-    ix <- 1:ns
-    iy <- (ns+1):(2*ns)
-    iw <- (2*ns+1):(3*ns)
-    diag(E)[ix] <- XY[,'sX']^2
-    diag(E)[iy] <- XY[,'sY']^2
-    diag(E)[iw] <- w^2
-    E[ix,iy] <- E[iy,ix] <- diag(XY[,'rXY']*XY[,'sX']*XY[,'sY'])
-    Jw <- matrix(0,2*ns,3*ns)
-    Jw[ix,ix] <- Jw[iy,iy] <- diag(ns)
-    if (wtype%in%c(0,'intercept','a')){
-        Jw[ix,iw] <- -diag(P[,'dxda'])
-        Jw[iy,iw] <- -diag(P[,'dyda'])
-    } else {
-        Jw[ix,iw] <- -diag(P[,'dxdb'])
-        Jw[iy,iw] <- -diag(P[,'dydb'])
-    }
-    out$D <- c(XY[,'X']-P[,'x'],XY[,'Y']-P[,'y'])
-    out$E <- Jw %*% E %*% t(Jw)
-    out
+init.york.lw <- function(XY,wtype='a',pilot){
+    err <- ifelse(wtype%in%c('intercept',0,'a'),
+                  pilot$a['s[a]'],pilot$b['s[b]'])
+    init <- log(sqrt(pilot$mswd)*err)
+    stats::optimise(f=LL.york.lw,interval=init+c(-10,5),
+                    ab=c(pilot$a['a'],pilot$b['b']),XY=XY,wtype=wtype)
 }
-LL.york <- function(abw,XY,wtype='slope'){
-    DE <- york2DE(XY,a=abw['a'],b=abw['b'],
-                  w=exp(abw['w']),wtype=wtype)
-    LL.norm(DE$D,DE$E)
+LL.york.lw <- function(lw,ab,XY,wtype='a'){
+    LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
+}
+LL.york.ab <- function(ab,lw,XY,wtype='a'){
+    LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
+}
+LL.york <- function(ablw,XY,wtype='a',debug=FALSE){
+    if (debug) browser()
+    ns <- nrow(XY)
+    a <- ablw['a']
+    b <- ablw['b']
+    w <- exp(ablw['lw'])
+    x <- get.york.xy(XY=XY,a=a,b=b,w=w,wtype=wtype)[,'x']
+    DE <- matrix(0,nrow=ns,ncol=5)
+    colnames(DE) <- c('X-x','Y-y','vX','vY','sXY')
+    DE[,'X-x'] <- XY[,'X']-x
+    DE[,'Y-y'] <- XY[,'Y']-a-b*x
+    DE[,'vX'] <- XY[,'sX']^2
+    if (wtype%in%c('intercept',0,'a')) DE[,'vY'] <- XY[,'sY']^2 + w^2
+    else if (wtype%in%c('slope',1,'b')) DE[,'vY'] <- XY[,'sY']^2 + (w*x)^2
+    else DE[,'vY'] <- XY[,'sY']^2
+    DE[,'sXY'] <- XY[,'rXY']*XY[,'sX']*XY[,'sY']
+    detE <- DE[,'vX']*DE[,'vY'] - DE[,'sXY']^2
+    O <- invertcovmat(vx=DE[,'vX'],vy=DE[,'vY'],sxy=DE[,'sXY'])
+    maha <- (O[,'xx']*DE[,'X-x'] + O[,'xy']*DE[,'Y-y'])*DE[,'X-x'] +
+        (O[,'xy']*DE[,'X-x'] + O[,'yy']*DE[,'Y-y'])*DE[,'Y-y']
+    sum(log(detE) + maha)/2
 }
 
-titterington2DE <- function(XYZ,a,b,A,B,w=0,wtype='a'){
-    out <- list()
-    ns <- nrow(XYZ)
-    P <- get.titterington.xyz(XYZ,a=a,b=b,A=A,B=B)
-    D <- c(XYZ[,'X']-P[,'x'],XYZ[,'Y']-P[,'y'],XYZ[,'Z']-P[,'z'])
-    E <- matrix(0,4*ns,4*ns)
-    ix <- 1:ns
-    iy <- (ns+1):(2*ns)
-    iz <- (2*ns+1):(3*ns)
-    iw <- (3*ns+1):(4*ns)
-    diag(E)[ix] <- XYZ[,'sX']^2
-    diag(E)[iy] <- XYZ[,'sY']^2
-    diag(E)[iz] <- XYZ[,'sZ']^2
-    diag(E)[iw] <- w^2
-    E[ix,iy] <- E[iy,ix] <- diag(XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY'])
-    E[ix,iz] <- E[iz,ix] <- diag(XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ'])
-    E[iy,iz] <- E[iz,iy] <- diag(XYZ[,'rYZ']*XYZ[,'sY']*XYZ[,'sZ'])
-    Jw <- matrix(0,3*ns,4*ns)
-    Jw[ix,ix] <- Jw[iy,iy] <- Jw[iz,iz] <- diag(ns)
-    if (wtype%in%c(0,'intercept','a')){
-        Jw[ix,iw] <- -diag(P[,'dxda'])
-        Jw[iy,iw] <- -diag(P[,'dyda'])
-        Jw[iz,iw] <- -diag(P[,'dzda'])
-    } else if (wtype%in%c(1,'b')){
-        Jw[ix,iw] <- -diag(P[,'dxdb'])
-        Jw[iy,iw] <- -diag(P[,'dydb'])
-        Jw[iz,iw] <- -diag(P[,'dzdb'])
-    } else if (wtype%in%c(2,'A')){
-        Jw[ix,iw] <- -diag(P[,'dxdA'])
-        Jw[iy,iw] <- -diag(P[,'dydA'])
-        Jw[iz,iw] <- -diag(P[,'dzdA'])
-    } else if (wtype%in%c(3,'B')){
-        Jw[ix,iw] <- -diag(P[,'dxdB'])
-        Jw[iy,iw] <- -diag(P[,'dydB'])
-        Jw[iz,iw] <- -diag(P[,'dzdB'])
-    } else {
-        stop('invalid wtype')
-    }
-    out$D <- c(XYZ[,'X']-P[,'x'],XYZ[,'Y']-P[,'y'],XYZ[,'Z']-P[,'z'])
-    out$E <- Jw %*% E %*% t(Jw)
-    out
+init.titterington.lw <- function(XYZ,wtype='a',pilot){
+    fact <- max(1,sqrt(pilot$mswd))
+    spar <- fact*sqrt(diag(pilot$cov))
+    if (wtype%in%c('intercept',0,'a')) init <- log(spar['a'])
+    else if (wtype%in%c(1,'b')) init <- log(spar['b'])
+    else if (wtype%in%c(2,'A')) init <- log(spar['A'])
+    else if (wtype%in%c(3,'B')) init <- log(spar['B'])
+    else stop('illegal wtype')
+    stats::optimise(f=LL.titterington.lw,interval=init+c(-10,5),
+                    abAB=pilot$par,XYZ=XYZ,wtype=wtype)
 }
-LL.titterington <- function(abABw,XYZ,wtype='a'){
-    DE <- titterington2DE(XYZ,a=abABw['a'],b=abABw['b'],
-                          A=abABw['A'],B=abABw['B'],
-                          w=exp(abABw['w']),wtype=wtype)
-    LL.norm(DE$D,DE$E)
+LL.titterington.lw <- function(lw,abAB,XYZ,wtype='a'){
+    LL.titterington(abABlw=c(abAB,lw=unname(lw)),XYZ=XYZ,wtype=wtype)
+}
+LL.titterington <- function(abABlw,XYZ,wtype='a'){
+    ns <- nrow(XYZ)
+    a <- abABlw['a']
+    b <- abABlw['b']
+    A <- abABlw['A']
+    B <- abABlw['B']
+    w <- exp(abABlw['lw'])
+    x <- get.titterington.xyz(XYZ=XYZ,a=a,b=b,A=A,B=B,w=w,wtype=wtype)[,'x']
+    DE <- matrix(0,nrow=ns,ncol=9)
+    colnames(DE) <- c('X-x','Y-y','Z-z','vX','vY','vZ','sXY','sXZ','sYZ')
+    DE[,'X-x'] <- XYZ[,'X']-x
+    DE[,'Y-y'] <- XYZ[,'Y']-a-b*x
+    DE[,'Z-z'] <- XYZ[,'Z']-A-B*x
+    DE[,'vX'] <- XYZ[,'sX']^2
+    DE[,'vY'] <- XYZ[,'sY']^2
+    DE[,'vZ'] <- XYZ[,'sZ']^2
+    if (wtype=='a'){
+        DE[,'vY'] <- XYZ[,'sY']^2 + w^2
+    } else if (wtype=='b'){
+        DE[,'vY'] <- XYZ[,'sY']^2 + (w*x)^2
+    } else if (wtype=='A'){
+        DE[,'vZ'] <- XYZ[,'sZ']^2 + w^2
+    } else if (wtype=='B'){
+        DE[,'vZ'] <- XYZ[,'sZ']^2 + (w*x)^2
+    }
+    DE[,'sXY'] <- XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY']
+    DE[,'sXZ'] <- XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ']
+    DE[,'sYZ'] <- XYZ[,'rYZ']*XYZ[,'sY']*XYZ[,'sZ']
+    detE <- det3x3(vx=DE[,'vX'],vy=DE[,'vY'],vz=DE[,'vZ'],
+                   sxy=DE[,'sXY'],sxz=DE[,'sXZ'],syz=DE[,'sYZ'])
+    O <- invertcovmat(vx=DE[,'vX'],vy=DE[,'vY'],vz=DE[,'vZ'],
+                      sxy=DE[,'sXY'],sxz=DE[,'sXZ'],syz=DE[,'sYZ'])
+    maha <-
+        (O[,'xx']*DE[,'X-x']+O[,'xy']*DE[,'Y-y']+O[,'xz']*DE[,'Z-z'])*DE[,'X-x']+
+        (O[,'xy']*DE[,'X-x']+O[,'yy']*DE[,'Y-y']+O[,'yz']*DE[,'Z-z'])*DE[,'Y-y']+
+        (O[,'xz']*DE[,'X-x']+O[,'yz']*DE[,'Y-y']+O[,'zz']*DE[,'Z-z'])*DE[,'Z-z']
+    if (FALSE){
+        scatterplot(XYZ[,c('X','sX','Y','sY','rXY')])
+        points(x,a+b*x)
+        title(sum(log(detE) + maha)/2)
+    }
+    sum(log(detE) + maha)/2
 }

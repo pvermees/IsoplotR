@@ -232,13 +232,10 @@ quotient <- function(X,sX,Y,sY,rXY){
 
 # negative multivariate log likelihood to be fed into R's optim function
 LL.norm <- function(x,covmat){
-    (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus) +
-        stats::mahalanobis(x,center=FALSE,cov=covmat)/2
-}
-
-# convert a sum of squares to a negative univariate normal log likelihood
-SS2LL <- function(SS,nn,df=nn-2){
-    nn*log(SS*sqrt(2*pi)/df) + df/2
+    tryCatch({
+        (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus
+            + stats::mahalanobis(x,center=FALSE,cov=covmat))/2
+    },error=function(e) Inf)
 }
 
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
@@ -338,8 +335,8 @@ mymtext <- function(text,line=0,...){
 }
 
 # if doall==FALSE, only returns the lower right submatrix
-blockinverse <- function(AA,BB,CC,DD,invAA=NA,doall=FALSE){
-    if (all(is.na(invAA))) invAA <- solve(AA)
+blockinverse <- function(AA,BB,CC,DD,invAA=NULL,doall=FALSE){
+    if (is.null(invAA)) invAA <- solve(AA)
     invDCAB <- solve(DD-CC%*%invAA%*%BB)
     if (doall){
         ul <- invAA + invAA %*% BB %*% invDCAB %*% CC %*% invAA
@@ -398,56 +395,43 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
     out
 }
 
-deming <- function(a,b,x,y){
-    out <- list()
-    N <- (b*x+a-y)^2
-    D <- 1+b^2
-    out$d <- sqrt(N/D)
-    dNdb <- 2*(b*x+a-y)*x
-    dDdb <- 2*b
-    out$dddb <- ((D*dNdb-N*dDdb)/D^2)/(2*out$d)
-    out
+invertible <- function(hess){
+    tryCatch({
+        E <- solve(hess)
+        return(all(diag(E)>0))
+    }, error = function(e){
+        return(FALSE)
+    })
 }
 
-hesscheck <- function(H){
-    tol <- 1e-8
-    eig <- eigen(H,only.values=TRUE)$values
-    if (all(eig>tol)){
-        out <- H
-    } else {
-        warning('Ill-conditioned Hessian, replaced by ',
-                'nearest positive definite matrix')
-        out <- nearPD(H)
-        dimnames(out) <- dimnames(H)
-    }
-    out
-}
 inverthess <- function(hess){
-    H <- hesscheck(hess)
-    if (det(H)>1e8 || det(H)<1e-18){
-        out <- MASS::ginv(H)
-        dimnames(out) <- dimnames(H)
+    if (invertible(hess)){
+        return(solve(hess))
     } else {
-        out <- solve(H)
+        H <- nearPD(hess)
+        return(solve(H))
     }
-    out
 }
 
-invertcovmat <- function(sx,sy,sz,sxy=0,sxz=0,syz=0){
-    if (missing(sz)){
-        den <- (sx*sy)^2 - sxy^2
-        out <- cbind('xx'=(sy^2)/den,'yy'=(sx^2)/den,'xy'=-sxy/den)
+det3x3 <- function(vx,vy,vz,sxy,sxz,syz){
+    vx*vy*vz + 2*sxy*syz*sxz - vy*sxz^2 - vz*sxy^2 - vx*syz^2
+}
+
+invertcovmat <- function(vx,vy,vz,sxy=0,sxz=0,syz=0){
+    if (missing(vz)){
+        den <- vx*vy - sxy^2
+        out <- cbind('xx'=vy/den,'yy'=vx/den,'xy'=-sxy/den)
     } else {
-        aa <- sx^2
-        ee <- sy^2
-        ii <- sz^2
+        aa <- vx
+        ee <- vy
+        ii <- vz
         bb <- dd <- sxy
         cc <- gg <- sxz
         ff <- hh <- syz
-        den <- aa*(ee*ii-ff*hh) - bb*(dd*ii-ff*gg) + cc*(dd*hh-ee*gg)
+        den <- det3x3(vx,vy,vz,sxy,sxz,syz)
         xx <- (ee*ii-ff*hh)/den
         yy <- (aa*ii-cc*gg)/den
-        zz <- (dd*hh-bb*dd)/den
+        zz <- (aa*ee-bb*dd)/den
         xy <- (cc*hh-bb*ii)/den
         xz <- (bb*ff-cc*ee)/den
         yz <- (cc*dd-aa*ff)/den
@@ -470,4 +454,45 @@ log_sum_exp <- function(u,v){
         v <- log_sum_exp(v[1],v[-1])
     } 
     max(u, v) + log(exp(u - max(u, v)) + exp(v - max(u, v)))
+}
+
+contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
+    fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
+                        upper=upper,hessian=hessian,control=control,...)
+    if (fit$convergence>0 || (hessian && !invertible(fit$hessian))){
+        NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=control,...)
+        if (NMfit$convergence>0){
+            warning('Optimisation did not converge.')
+            if (NMfit$value<fit$value) {
+                fit <- NMfit
+            }
+        } else {
+            fit <- NMfit
+        }
+    }
+    if (hessian && !invertible(fit$hessian)){
+        warning('Ill-conditioned Hessian matrix')
+    }
+    fit
+}
+
+getparscale <- function(fn=LL.york,...){
+    pars <- list(...)
+    dp <- 1e-4
+    lpars <- upars <- pars
+    init <- pars[[1]]
+    np <- length(init)
+    dpdLL <- rep(NA,np)
+    for (i in 1:np){
+        lfact <- ufact <- rep(1,np)
+        ufact[i] <- 1+dp/2
+        lfact[i] <- 1-dp/2
+        upars[[1]] <- init*ufact
+        lpars[[1]] <- init*lfact
+        darg <- upars[[1]][i] - lpars[[1]][i]
+        LLu <- do.call(what=fn,args=upars)
+        LLl <- do.call(what=fn,args=lpars)
+        dpdLL[i] <- abs(darg/(LLu-LLl))
+    }
+    dpdLL/max(dpdLL)
 }

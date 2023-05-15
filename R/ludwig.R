@@ -131,33 +131,13 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     X <- x
     X$d <- mediand(x$d)
     init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
-    ctrl <- list()
-    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=init$lower,upper=init$upper,
-                        hessian=TRUE,x=X,anchor=anchor,type=type,
-                        model=model,exterr=exterr)
-    if (fit$convergence>0){
-        ctrl <- list(fnscale=1e-15,maxit=1000)
-        fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                            lower=init$lower,upper=init$upper,control=ctrl,
-                            hessian=TRUE,x=X,anchor=anchor,type=type,
-                            model=model,exterr=exterr)
-        NMfit <- stats::optim(init$par,fn=LL.ludwig,hessian=TRUE,x=X,
-                              anchor=anchor,type=type,model=model,exterr=exterr)
-        if (fit$value>NMfit$value){
-            fit <- NMfit
-            warning('L-BFGS-B did not converge. Switched to Nelder-Mead.')
-        }
-        if (fit$convergence>0){
-            warning('ludwig() did not converge.')
-        }
-    }
-    if (fit$convergence>0){
-    }
+    fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
+                          upper=init$upper,x=X,anchor=anchor,
+                          type=type,model=model,exterr=exterr)
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
-                                  control=ctrl,model=model,plot=plot)
+                                  model=model,plot=plot)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,X,anchor=anchor,type=type)
@@ -169,6 +149,24 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
         out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     }
     out
+}
+
+robustludwig <- function(init,X,anchor,type,model,exterr,control){
+    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+                        lower=init$lower,upper=init$upper,control=control,
+                        x=X,anchor=anchor,type=type,
+                        model=model,exterr=exterr,hessian=TRUE)
+    NMfit <- stats::optim(init$par,fn=LL.ludwig,x=X,
+                          anchor=anchor,type=type,
+                          model=model,exterr=exterr,hessian=TRUE)
+    if (fit$value>NMfit$value){
+        fit <- NMfit
+        warning('L-BFGS-B did not converge. Switched to Nelder-Mead.')
+    }
+    if (fit$convergence>0){
+        warning('ludwig() did not converge.')
+    }
+    fit
 }
 
 anchormerge <- function(fit,x,anchor=0,type='joint'){
@@ -248,8 +246,8 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
     out <- c('a'=NA,'b'=NA,'x0inv'=NA)
     if (is.null(x0) & is.null(y0)){
         fit <- york(yd)
-        out['a'] <- abs(fit$a[1])
-        out['b'] <- -abs(fit$b[1])
+        out['a'] <- max(sqrt(.Machine$double.eps),fit$a[1])
+        out['b'] <- min(-sqrt(.Machine$double.eps),fit$b[1])
     } else if (is.null(y0)){ # anchor x
         i <- which.min(yd[,'X'])
         if (x0>yd[i,'X']){
@@ -273,200 +271,202 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     if (debug) browser()
-    par <- vector()
     if (model==3){
-        pilot <- ludwig(x=x,model=1,anchor=anchor,type=type)
-        w <- ifelse(pilot$cov['t','t']==0,
-                    pilot$par['t']/100,
-                    sqrt(pilot$cov['t','t']*pilot$mswd))
-    }
-    if (x$format<4){
-        yd <- data2york(x,option=2)
-        if (anchor[1]==1){
-            Pb76c <- iratio('Pb207Pb206')[1]
-            abx <- inithelper(yd=yd,y0=Pb76c)
-            tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
-            par['t'] <- log(tt)
-            if (iratio('Pb207Pb206')[2]>0) par['a0'] <- log(Pb76c)
-        } else if (anchor[1]==2 && length(anchor)>1){
-            tt <- anchor[2]
-            U8Pb6r <- 1/mclean(tt=tt,d=x$d)$Pb206U238
-            abx <- inithelper(yd=yd,x0=U8Pb6r)
-            if (length(anchor)>2 && anchor[3]>0) par['t'] <- log(tt)
-            par['a0'] <- log(abx['a'])
-        } else {
-            abx <- inithelper(yd)
-            tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
-            par['t'] <- log(tt)
-            par['a0'] <- log(abx['a'])
-        }
-    } else if (x$format<7){
-        yda <- data2york(x,option=3)
-        ydb <- data2york(x,option=4)
-        if (anchor[1]==1){
-            if (type%in%c('joint',0,1)){
-                Pb64c <- iratio('Pb206Pb204')[1]
-                abxa <- inithelper(yd=yda,y0=1/Pb64c)
-                tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
-                par['t'] <- log(tt)
-                if (iratio('Pb206Pb204')[2]>0) par['a0'] <- log(Pb64c)
-            }
-            if (type%in%c('joint',0,2)){
-                Pb74c <- iratio('Pb207Pb204')[1]
-                abxb <- inithelper(yd=ydb,y0=1/Pb74c)
-            }
-            if (type==2){
-                tt <- get.Pb206U238.age(x=abxb['x0inv'],d=x$d)[1]
-                par['t'] <- log(tt)
-            }
-            if (type%in%c('joint',0,2)){
-                if (iratio('Pb207Pb204')[2]>0) par['b0'] <- log(Pb74c)
-            }
-        } else if (anchor[1]==2 && length(anchor)>1){
-            tt <- anchor[2]
-            if ((length(anchor)>2 && anchor[3]>0)) par['t'] <- log(tt)
-            if (type%in%c('joint',0,1)){
-                Pb6U8r <- mclean(tt=tt)$Pb206U238
-                abxa <- inithelper(yd=yda,x0=1/Pb6U8r)
-                par['a0'] <- log(1/abxa['a'])
-            }
-            if (type%in%c('joint',0,2)){
-                Pb7U5r <- mclean(tt=tt)$Pb207U235
-                abxb <- inithelper(yd=ydb,x0=1/Pb7U5r)
-                par['b0'] <- log(1/abxb['a'])
-            }
-        } else {
-            if (type%in%c('joint',0,1)){
-                abxa <- inithelper(yd=yda)
-                tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
-            }
-            if (type%in%c('joint',0,2)){
-                abxb <- inithelper(yd=ydb)
-            }
-            if (type==2){
-                tt <- get.Pb207U235.age(x=abxb['x0inv'],d=x$d)[1]
-            }
-            par['t'] <- log(tt)
-            if (type%in%c('joint',0,1)){
-                par['a0'] <- log(1/abxa['a'])
-            }
-            if (type%in%c('joint',0,2)){
-                par['b0'] <- log(1/abxb['a'])
-            }
-        }
-    } else { # formats 7 and 8
-        if (anchor[1]==1){
+        init <- init.ludwig(x,anchor=anchor,type=type,buffer=buffer)
+        fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
+                              upper=init$upper,x=x,anchor=anchor,type=type)
+        E <- inverthess(fit$hessian)
+        par <- fit$par
+        par['w'] <- fit$par['t']/100
+        tt <- exp(fit$par['t']) # needed for anchored regression
+    } else {
+        par <- vector()
+        if (x$format<4){
             yd <- data2york(x,option=2)
-            abx <- inithelper(yd=yd)
-            pilott <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
-            if (type==1){ # 0806 vs 38/06
-                yd <- data2york(x,option=6,tt=pilott)
-                y0 <- iratio('Pb208Pb206')[1]
-            } else if (type==2){ # 0807 vs 35/07
-                yd <- data2york(x,option=7,tt=pilott)
-                y0 <- iratio('Pb208Pb207')[1]
-            } else if (type==3){ # 0608 vs 32/08
-                yd <- data2york(x,option=8,tt=pilott)
-                y0 <- 1/iratio('Pb208Pb206')[1]
-            } else if (type==4){ # 0708 vs 32/08
-                yd <- data2york(x,option=9,tt=pilott)
-                y0 <- 1/iratio('Pb208Pb207')[1]
-            } else { # joint, 0 or 1
-                y0 <- iratio('Pb207Pb206')[1]
-            }
-            abx <- inithelper(yd=yd,y0=y0)
-            if (type==1){
-                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(y0)
-            } else if (type==2){
-                par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(y0)
-            } else if (type==3){
-                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(1/y0)
-            } else if (type==4){
-                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(1/y0)
-            } else { # joint, 0 or 1
-                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-                if (iratio('Pb208Pb206')[2]>0){
-                    par['a0'] <- log(iratio('Pb208Pb206')[1])
-                }
-                if (iratio('Pb208Pb207')[2]>0){
-                    par['b0'] <- log(iratio('Pb208Pb207')[1])
-                }
-            }
-        } else if (anchor[1]==2 && length(anchor)>1){
-            tt <- anchor[2]
-            if (length(anchor)>2 && anchor[3]>0) par['t'] <- log(tt)
-            if (type==2){ # 0807 vs 35/07
-                yd <- data2york(x,option=7,tt=tt)
-                x0 <- age_to_U235Pb207_ratio(tt)[1]
-            } else if (type==3){ # 0608 vs 32/08
-                yd <- data2york(x,option=8,tt=tt)
-                x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
-            } else if (type==4){ # 0708 vs 32/08
-                yd <- data2york(x,option=9,tt=tt)
-                x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
-            } else { # joint, 0 or 1: 0806 vs 38/06
-                yd <- data2york(x,option=6,tt=tt)
-                x0 <- age_to_U238Pb206_ratio(tt)[1]
-            }
-            abx <- inithelper(yd=yd,x0=x0)
-            if (type==1){
-                par['a0'] <- log(1/abx['a'])
-            } else if (type==2){
-                par['b0'] <- log(1/abx['a'])
-            } else if (type==3){
+            if (anchor[1]==1){
+                Pb76c <- iratio('Pb207Pb206')[1]
+                abx <- inithelper(yd=yd,y0=Pb76c)
+                tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+                par['t'] <- log(tt)
+                if (iratio('Pb207Pb206')[2]>0) par['a0'] <- log(Pb76c)
+            } else if (anchor[1]==2 && length(anchor)>1){
+                tt <- anchor[2]
+                U8Pb6r <- 1/mclean(tt=tt,d=x$d)$Pb206U238
+                abx <- inithelper(yd=yd,x0=U8Pb6r)
+                if (length(anchor)>2 && anchor[3]>0) par['t'] <- log(tt)
                 par['a0'] <- log(abx['a'])
-            } else if (type==4){
-                par['b0'] <- log(abx['a'])
             } else {
-                par['a0'] <- log(1/abx['a'])
-                ydb <- data2york(x,option=7)
-                abxb <- inithelper(yd=ydb,x0=x0)
-                par['b0'] <- log(1/abxb['a'])
-            }            
-        } else {
-            yd <- data2york(x,option=2)
-            abx <- inithelper(yd=yd)
-            pilott <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
-            if (type==1){ # 0806 vs 38/06
-                yd <- data2york(x,option=6,tt=pilott)
-            } else if (type==2){ # 0807 vs 35/07
-                yd <- data2york(x,option=7,tt=pilott)
-            } else if (type==3){ # 0608 vs 32/08
-                yd <- data2york(x,option=8,tt=pilott)
-            } else if (type==4){ # 0708 vs 32/08
-                yd <- data2york(x,option=9,tt=pilott)
-            } else { # joint, 0 or 1
-                # keep yd
-            }
-            abx <- inithelper(yd=yd)
-            if (type==1){ # 0806 vs 38/06
-                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-                par['a0'] <- log(1/abx['a'])
-            } else if (type==2){ # 0807 vs 35/07
-                par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
-                par['b0'] <- log(1/abx['a'])
-            } else if (type==3){ # 0608 vs 32/08
-                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                abx <- inithelper(yd)
+                tt <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+                par['t'] <- log(tt)
                 par['a0'] <- log(abx['a'])
-            } else if (type==4){ # 0708 vs 32/08
-                par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-                par['b0'] <- log(abx['a'])
-            } else { # joint, 0 or 1
-                par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-                yda <- data2york(x,option=6)
-                ydb <- data2york(x,option=7)
-                abxa <- inithelper(yd=yda)
-                abxb <- inithelper(yd=ydb)
-                par['a0'] <- log(1/abxa['a'])
-                par['b0'] <- log(1/abxb['a'])
-            }            
+            }
+        } else if (x$format<7){
+            yda <- data2york(x,option=3)
+            ydb <- data2york(x,option=4)
+            if (type==1) yd <- yda
+            if (type==2) yd <- ydb
+            if (anchor[1]==1){
+                if (type%in%c('joint',0,1)){
+                    Pb64c <- iratio('Pb206Pb204')[1]
+                    abxa <- inithelper(yd=yda,y0=1/Pb64c)
+                    tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
+                    par['t'] <- log(tt)
+                    if (iratio('Pb206Pb204')[2]>0) par['a0'] <- log(Pb64c)
+                }
+                if (type%in%c('joint',0,2)){
+                    Pb74c <- iratio('Pb207Pb204')[1]
+                    abxb <- inithelper(yd=ydb,y0=1/Pb74c)
+                }
+                if (type==2){
+                    tt <- get.Pb206U238.age(x=abxb['x0inv'],d=x$d)[1]
+                    par['t'] <- log(tt)
+                }
+                if (type%in%c('joint',0,2)){
+                    if (iratio('Pb207Pb204')[2]>0) par['b0'] <- log(Pb74c)
+                }
+            } else if (anchor[1]==2 && length(anchor)>1){
+                tt <- anchor[2]
+                if ((length(anchor)>2 && anchor[3]>0)) par['t'] <- log(tt)
+                if (type%in%c('joint',0,1)){
+                    Pb6U8r <- mclean(tt=tt)$Pb206U238
+                    abxa <- inithelper(yd=yda,x0=1/Pb6U8r)
+                    par['a0'] <- log(1/abxa['a'])
+                }
+                if (type%in%c('joint',0,2)){
+                    Pb7U5r <- mclean(tt=tt)$Pb207U235
+                    abxb <- inithelper(yd=ydb,x0=1/Pb7U5r)
+                    par['b0'] <- log(1/abxb['a'])
+                }
+            } else {
+                if (type%in%c('joint',0,1)){
+                    abxa <- inithelper(yd=yda)
+                    tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
+                }
+                if (type%in%c('joint',0,2)){
+                    abxb <- inithelper(yd=ydb)
+                }
+                if (type==2){
+                    tt <- get.Pb207U235.age(x=abxb['x0inv'],d=x$d)[1]
+                }
+                par['t'] <- log(tt)
+                if (type%in%c('joint',0,1)){
+                    par['a0'] <- log(1/abxa['a'])
+                }
+                if (type%in%c('joint',0,2)){
+                    par['b0'] <- log(1/abxb['a'])
+                }
+            }
+        } else { # formats 7 and 8
+            if (anchor[1]==1){
+                yd <- data2york(x,option=2)
+                abx <- inithelper(yd=yd)
+                pilott <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+                if (type==1){ # 0806 vs 38/06
+                    yd <- data2york(x,option=6,tt=pilott)
+                    y0 <- iratio('Pb208Pb206')[1]
+                } else if (type==2){ # 0807 vs 35/07
+                    yd <- data2york(x,option=7,tt=pilott)
+                    y0 <- iratio('Pb208Pb207')[1]
+                } else if (type==3){ # 0608 vs 32/08
+                    yd <- data2york(x,option=8,tt=pilott)
+                    y0 <- 1/iratio('Pb208Pb206')[1]
+                } else if (type==4){ # 0708 vs 32/08
+                    yd <- data2york(x,option=9,tt=pilott)
+                    y0 <- 1/iratio('Pb208Pb207')[1]
+                } else { # joint, 0 or 1
+                    y0 <- iratio('Pb207Pb206')[1]
+                }
+                abx <- inithelper(yd=yd,y0=y0)
+                if (type==1){
+                    par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                    if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(y0)
+                } else if (type==2){
+                    par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
+                    if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(y0)
+                } else if (type==3){
+                    par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                    if (iratio('Pb208Pb206')[2]>0) par['a0'] <- log(1/y0)
+                } else if (type==4){
+                    par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
+                    if (iratio('Pb208Pb207')[2]>0) par['b0'] <- log(1/y0)
+                } else { # joint, 0 or 1
+                    par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                    if (iratio('Pb208Pb206')[2]>0){
+                        par['a0'] <- log(iratio('Pb208Pb206')[1])
+                    }
+                    if (iratio('Pb208Pb207')[2]>0){
+                        par['b0'] <- log(iratio('Pb208Pb207')[1])
+                    }
+                }
+            } else if (anchor[1]==2 && length(anchor)>1){
+                tt <- anchor[2]
+                if (length(anchor)>2 && anchor[3]>0) par['t'] <- log(tt)
+                if (type==2){ # 0807 vs 35/07
+                    yd <- data2york(x,option=7,tt=tt)
+                    x0 <- age_to_U235Pb207_ratio(tt)[1]
+                } else if (type==3){ # 0608 vs 32/08
+                    yd <- data2york(x,option=8,tt=tt)
+                    x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
+                } else if (type==4){ # 0708 vs 32/08
+                    yd <- data2york(x,option=9,tt=tt)
+                    x0 <- 1/age_to_Pb208Th232_ratio(tt)[1]
+                } else { # joint, 0 or 1: 0806 vs 38/06
+                    yd <- data2york(x,option=6,tt=tt)
+                    x0 <- age_to_U238Pb206_ratio(tt)[1]
+                }
+                abx <- inithelper(yd=yd,x0=x0)
+                if (type==1){
+                    par['a0'] <- log(1/abx['a'])
+                } else if (type==2){
+                    par['b0'] <- log(1/abx['a'])
+                } else if (type==3){
+                    par['a0'] <- log(abx['a'])
+                } else if (type==4){
+                    par['b0'] <- log(abx['a'])
+                } else {
+                    par['a0'] <- log(1/abx['a'])
+                    ydb <- data2york(x,option=7)
+                    abxb <- inithelper(yd=ydb,x0=x0)
+                    par['b0'] <- log(1/abxb['a'])
+                }  
+            } else {
+                yd <- data2york(x,option=2)
+                abx <- inithelper(yd=yd)
+                pilott <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
+                if (type==1){ # 0806 vs 38/06
+                    yd <- data2york(x,option=6,tt=pilott)
+                } else if (type==2){ # 0807 vs 35/07
+                    yd <- data2york(x,option=7,tt=pilott)
+                } else if (type==3){ # 0608 vs 32/08
+                    yd <- data2york(x,option=8,tt=pilott)
+                } else if (type==4){ # 0708 vs 32/08
+                    yd <- data2york(x,option=9,tt=pilott)
+                } else { # joint, 0 or 1
+                                        # keep yd
+                }
+                abx <- inithelper(yd=yd)
+                par['t'] <- log(pilott)
+                if (type==1){ # 0806 vs 38/06
+                    par['a0'] <- log(1/abx['a'])
+                } else if (type==2){ # 0807 vs 35/07
+                    par['b0'] <- log(1/abx['a'])
+                } else if (type==3){ # 0608 vs 32/08
+                    par['a0'] <- log(abx['a'])
+                } else if (type==4){ # 0708 vs 32/08
+                    par['b0'] <- log(abx['a'])
+                } else { # joint, 0 or 1
+                    par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+                    yda <- data2york(x,option=6)
+                    ydb <- data2york(x,option=7)
+                    abxa <- inithelper(yd=yda)
+                    abxb <- inithelper(yd=ydb)
+                    par['a0'] <- log(1/abxa['a'])
+                    par['b0'] <- log(1/abxb['a'])
+                }            
+            }
         }
     }
-    if (model==3) par['w'] <- log(w)
     if (x$d$U48$option==2 || x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
     }
@@ -606,12 +606,19 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
     if (model==3){
         ta0b0w['w'] <- exp(par['w'])
     }
-    if (model==2 && (type%in%c('joint',0) || x$format<4)){
-        LL <- LL + LL.ludwig.model2(ta0b0w,x=X,exterr=exterr)
-    } else if (type%in%c('joint',0) || x$format<4){
-        LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
+    if (model==2){
+        if (type%in%c('joint',0) && x$format>3){
+            LL <- LL + LL.ludwig.model2(ta0b0w,x=X,exterr=exterr)
+        } else {
+            LL <- LL + LL.ludwig.model2.2d(ta0b0w,x=X,exterr=exterr,type=type)
+        }
     } else {
-        LL <- LL + LL.ludwig.2d(ta0b0w,x=X,model=model,exterr=exterr,type=type)
+        if (type%in%c('joint',0) && x$format>3){
+            LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
+        } else {
+            LL <- LL + data2ludwig.2d(ta0b0w,x=X,model=model,
+                                      exterr=exterr,type=type)$LL
+        }
     }
     if (x$d$U48$option==1 && 'U48i'%in%pnames){
         LL <- LL - stats::dnorm(x=par['U48i'],mean=x$d$U48$x,
@@ -648,17 +655,15 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE,debug=FALSE){
     U <- iratio('U238U235')[1]
     tt <- ta0b0w['t']
     a0 <- ta0b0w['a0']
-    if (x$format>3) b0 <- ta0b0w['b0']
+    b0 <- ta0b0w['b0']
+    model3 <- 'w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])
     ns <- length(x)
     zeros <- rep(0,ns)
     X <- zeros
     Y <- zeros
     K0 <- zeros
-    D <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format%in%c(1,2,3)){
-        NP <- 2 # number of fit parameters (tt, a0)
-        NR <- 2 # number of isotopic ratios (X, Y)
-    } else if (x$format%in%c(4,5,6)){
+    McL <- mclean(tt=tt,d=x$d,exterr=exterr)
+    if (x$format%in%c(4,5,6)){
         Z <- zeros
         L0 <- zeros
         NP <- 3 # tt, a0, b0
@@ -675,7 +680,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE,debug=FALSE){
     E <- matrix(0,NR*ns+7,NR*ns+7)
     J <- matrix(0,NP*ns,NR*ns+7)
     J[1:(NP*ns),1:(NP*ns)] <- diag(NP*ns)
-    nc <- length(D$ThUi) # nc>1 if each aliquot has its own diseq correction
+    nc <- length(McL$ThUi) # nc>1 if each aliquot has its own diseq correction
     j <- 1
     for (i in 1:ns){
         wd <- wetherill(x,i=i)
@@ -687,307 +692,421 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE,debug=FALSE){
             Z[i] <- wd$x['Pb208Th232']
             W[i] <- wd$x['Th232U238']
         }
-        E[(0:(NR-1))*ns+i,(0:(NR-1))*ns+i] <- wd$cov
+        ii <- (0:(NR-1))*ns+i
+        E[ii,ii] <- wd$cov
         if (nc>1) j <- i
-        J[i,NR*ns+2] <- -D$dPb207U235dl35[j]     #dKdl35
-        J[i,NR*ns+5] <- -D$dPb207U235dl31[j]     #dKdl31
-        J[ns+i,NR*ns+1] <- -D$dPb206U238dl38[j]  #dLdl38
-        J[ns+i,NR*ns+3] <- -D$dPb206U238dl34[j]  #dLdl34
-        J[ns+i,NR*ns+6] <- -D$dPb206U238dl30[j]  #dLdl30
-        J[ns+i,NR*ns+7] <- -D$dPb206U238dl26[j]  #dLdl26
-        if (x$format>6) J[2*ns+i,NR*ns+4] <- -D$dPb208Th232dl32[j] # dMdl32
+        J[i,NR*ns+2] <- -McL$dPb207U235dl35[j]     #dKdl35
+        J[i,NR*ns+5] <- -McL$dPb207U235dl31[j]     #dKdl31
+        J[ns+i,NR*ns+1] <- -McL$dPb206U238dl38[j]  #dLdl38
+        J[ns+i,NR*ns+3] <- -McL$dPb206U238dl34[j]  #dLdl34
+        J[ns+i,NR*ns+6] <- -McL$dPb206U238dl30[j]  #dLdl30
+        J[ns+i,NR*ns+7] <- -McL$dPb206U238dl26[j]  #dLdl26
+        if (x$format>6) J[2*ns+i,NR*ns+4] <- -McL$dPb208Th232dl32[j] # dMdl32
     }
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
-    ED <- J%*%E%*%t(J)
-    if ('w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])){
-        Ew <- get.Ewd(w=ta0b0w['w'],format=x$format,ns=ns,D=D)
-        ED <- ED + Ew
+    EE <- J%*%E%*%t(J)
+    if (model3){
+        Ew <- getEw(w=ta0b0w['w'],x=x,McL=McL)
+        EE <- EE + Ew
     }
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
-    if (x$format<4){
-        O <- blockinverse(AA=ED[i1,i1],BB=ED[i1,i2],
-                          CC=ED[i2,i1],DD=ED[i2,i2],doall=TRUE)
-    } else {
-        i3 <- (2*ns+1):(3*ns)
-        O <- blockinverse3x3(AA=ED[i1,i1],BB=ED[i1,i2],CC=ED[i1,i3],
-                             DD=ED[i2,i1],EE=ED[i2,i2],FF=ED[i2,i3],
-                             GG=ED[i3,i1],HH=ED[i3,i2],II=ED[i3,i3])
-    }
-    if (x$format%in%c(1,2,3)){
-        K0 <- X - D$Pb207U235 + a0*U*(D$Pb206U238 - Y)
-        A <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*a0*U +
-               K0%*%(O[i1,i2]+t(O[i2,i1])))
-        B <- -(a0*U*(O[i1,i1]+t(O[i1,i1]))*a0*U +
-               (O[i2,i2]+t(O[i2,i2])) +
-               a0*U*(O[i1,i2]+t(O[i1,i2])) +
-               (O[i2,i1]+t(O[i2,i1]))*a0*U)
-        L <- as.vector(solve(B,A))
-        c0 <- Y - D$Pb206U238 - L
-        K <- X - D$Pb207U235 - a0*U*c0
-        KLM <- c(K,L)
-    } else if (x$format%in%c(4,5,6)){
-        K0 <- X - D$Pb207U235 - U*b0*Z
-        L0 <- Y - D$Pb206U238 - a0*Z
-        V <- t(K0%*%(O[i1,i1]+t(O[i1,i1]))*U*b0 +
-               L0%*%(O[i1,i2]+t(O[i2,i1]))*U*b0 +
-               K0%*%(O[i1,i2]+t(O[i2,i1]))*a0 +
-               L0%*%(O[i2,i2]+t(O[i2,i2]))*a0 +
-               K0%*%(O[i1,i3]+t(O[i3,i1])) +
-               L0%*%(O[i2,i3]+t(O[i3,i2])))
-        W <- -(U*b0*(O[i1,i1]+t(O[i1,i1]))*U*b0 +
-               U*b0*(O[i1,i2]+t(O[i1,i2]))*a0 +
-               U*b0*(O[i1,i3]+t(O[i1,i3])) +
-               a0*(O[i2,i1]+t(O[i2,i1]))*U*b0 +
-               a0*(O[i2,i2]+t(O[i2,i2]))*a0 +
-               a0*(O[i2,i3]+t(O[i2,i3])) +
-               (O[i3,i1]+t(O[i3,i1]))*U*b0 +
-               (O[i3,i2]+t(O[i3,i2]))*a0 +
-               (O[i3,i3]+t(O[i3,i3])))
-        M <- as.vector(solve(W,V))
-        c0 <- as.vector(Z - M)
-        K <- as.vector(X - D$Pb207U235 - U*b0*c0)
-        L <- as.vector(Y - D$Pb206U238 - a0*c0)
-        KLM <- c(K,L,M)
+    i3 <- (2*ns+1):(3*ns)
+    O <- blockinverse3x3(AA=EE[i1,i1],BB=EE[i1,i2],CC=EE[i1,i3],
+                         DD=EE[i2,i1],EE=EE[i2,i2],FF=EE[i2,i3],
+                         GG=EE[i3,i1],HH=EE[i3,i2],II=EE[i3,i3])
+    if (x$format%in%c(4,5,6)){
+        C1 <- U*b0
+        C2 <- a0
+        C3 <- rep(0,ns)
     } else if (x$format%in%c(7,8)){
-        Wd <- diag(W)
-        K0 <- X - D$Pb207U235 - (Z-D$Pb208Th232)*U*W*b0
-        L0 <- Y - D$Pb206U238 - (Z-D$Pb208Th232)*W*a0
-        AA <- (Wd%*%O[i1,i1]%*%Wd)*(U*b0)^2 +
-            (Wd%*%O[i2,i2]%*%Wd)*a0^2 + O[i3,i3] +
-            U*a0*b0*Wd%*%(O[i1,i2]+O[i2,i1])%*%Wd +
-            U*b0*(Wd%*%O[i1,i3]+O[i3,i1]%*%Wd) +
-            a0*(Wd%*%O[i2,i3]+O[i3,i2]%*%Wd)
-        BT <- t(U*b0*K0%*%O[i1,i1]%*%Wd +
-                a0*L0%*%O[i2,i2]%*%Wd +
-                a0*K0%*%O[i1,i2]%*%Wd +
-                U*b0*L0%*%O[i2,i1]%*%Wd +
-                K0%*%O[i1,i3] + L0%*%O[i2,i3])
-        CC <- U*b0*Wd%*%O[i1,i1]%*%K0 +
-            a0*Wd%*%O[i2,i2]%*%L0 +
-            a0*Wd%*%O[i2,i1]%*%K0 +
-            U*b0*Wd%*%O[i1,i2]%*%L0 +
-            O[i3,i1]%*%K0 + O[i3,i2]%*%L0
-        M <- as.vector(solve(-(AA+t(AA)),(BT+CC)))
-        c0 <- as.vector(Z - D$Pb208Th232 - M)
-        K <- as.vector(X - D$Pb207U235 - c0*b0*U*W)
-        L <- as.vector(Y - D$Pb206U238 - c0*a0*W)
-        KLM <- c(K,L,M)
+        C1 <- U*b0*W
+        C2 <- a0*W
+        C3 <- -rep(McL$Pb208Th232,ns)
     }
-    out$c0 <- c0
+    K0 <- X - C1*Z - McL$Pb207U235
+    L0 <- Y - C2*Z - McL$Pb206U238
+    AA <- C1*O[i1,i1]*C1 + C1*O[i1,i2]*C2 + C1*O[i1,i3] +
+        C2*O[i2,i1]*C1 + C2*O[i2,i2]*C2 + C2*O[i2,i3] +
+        O[i3,i1]*C1 + O[i3,i2]*C2 + O[i3,i3]
+    BB <- C1*O[i1,i1]%*%K0 + C1*O[i1,i2]%*%L0 + C1*O[i1,i3]%*%C3 +
+        C2*O[i2,i1]%*%K0 + C2*O[i2,i2]%*%L0 + C2*O[i2,i3]%*%C3 +
+        O[i3,i1]%*%K0 + O[i3,i2]%*%L0 + O[i3,i3]%*%C3
+    N <- as.vector(solve(-AA,BB))
+    K <- as.vector(K0 + C1*N)
+    L <- as.vector(L0 + C2*N)
+    M <- N + C3
+    KLM <- c(K,L,M)
+    out$c0 <- as.vector(Z - N)
     out$SS <- KLM%*%O%*%KLM
-    detED <- determinant(ED,logarithm=TRUE)$modulus
-    out$LL <- (NP*ns*log(2*pi) + detED + out$SS)/2
+    detEE <- determinant(EE,logarithm=TRUE)$modulus
+    out$LL <- (NP*ns*log(2*pi) + detEE + out$SS)/2
     out
 }
 
-get.Ewd <- function(w=0,format=1,ns=1,D=mclean()){
+getEw <- function(w=0,x,McL=mclean(),type='joint'){
+    format <- x$format
+    ns <- length(x)
+    joint <- type%in%c('joint',0)
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
-    if (format<4) {
-        J <- matrix(0,2*ns,ns)
-    } else {
+    if (format>3 && joint){ # 3D regression
         J <- matrix(0,3*ns,ns)
         i3 <- (2*ns+1):(3*ns)
+    } else { # 2D regression
+        J <- matrix(0,2*ns,ns)
     }
-    diag(J[i1,i1]) <- -D$dPb207U235dt      # dKdt
-    diag(J[i2,i1]) <- -D$dPb206U238dt      # dLdt
-    if (format>6) {
-        diag(J[i3,i1]) <- -D$dPb208Th232dt # dMdt
+    if (joint && format>3){
+        diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
+        diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
+        if (format>6) {
+            diag(J[i3,i1]) <- -McL$dPb208Th232dt # dMdt
+        }
+    } else if (format<4){
+        diag(J[i1,i1]) <- -McL$dPb206U238dt      # dKdt
+        diag(J[i2,i1]) <- -McL$dPb207U235dt      # dLdt        
+    } else if (format<7){
+        if (type==1){
+            diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
+        } else if (type==2){
+            diag(J[i2,i1]) <- -McL$dPb207U235dt   # dLdt
+        } else {
+            stop('invalid isochron type')
+        }
+    } else if (format<9){
+        ThU <- x$x[,'Th232U238']
+        U85 <- iratio('U238U235')[1]
+        if (type==1){
+            diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU      # dKdt
+            diag(J[i2,i1]) <- -McL$dPb206U238dt           # dLdt
+        } else if (type==2){
+            diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU*U85  # dKdt
+            diag(J[i2,i1]) <- -McL$dPb207U235dt           # dLdt
+        } else if (type==3){
+            diag(J[i1,i1]) <- -McL$dPb206U238dt/ThU       # dKdt
+            diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
+        } else if (type==4){
+            diag(J[i1,i1]) <- -McL$dPb206U238dt/(ThU*U85) # dKdt
+            diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
+        } else {
+            stop('invalid isochron type')
+        }
+    } else {
+        stop('invalid format')
     }
     dEdx <- w^2
     dEdx*J%*%t(J)
 }
 
 LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
-    pnames <- names(ta0b0)
     tt <- ta0b0['t']
     a0 <- ta0b0['a0']
-    if ('b0'%in%pnames) b0 <- ta0b0['b0']
-    nn <- length(x)
-    D <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format<4){
-        xy <- data2york(x,option=2)[,c('X','Y'),drop=FALSE]
-        xr <- 1/D$Pb206U238
-        yr <- D$Pb207Pb206
-        xx <- xy[,'X',drop=FALSE]
-        yy <- xy[,'Y',drop=FALSE]
-        dem <- deming(a=a0,b=(yr-a0)/xr,x=xx,y=yy)
-        SS <- sum(dem$d^2)
-        if (exterr){
-            dbdxr <- (a0-yr)/xr^2
-            dbdyr <- 1/xr
-            dxrdPbU <- -xr^2
-            dyrdPbPb <- 1
-            dddPbU <- dem$dddb*dbdxr*dxrdPbU
-            dddPbPb <- dem$dddb*dbdyr*dyrdPbPb
-            dPbUdl <- dPbPbdl <- rep(0,7)
-            dPbUdl[1] <- D$dPb206U238dl38
-            dPbUdl[3] <- D$dPb206U238dl34
-            dPbUdl[6] <- D$dPb206U238dl30
-            dPbUdl[7] <- D$dPb206U238dl26
-            dPbPbdl[1] <- D$dPb207Pb206dl38
-            dPbPbdl[2] <- D$dPb207Pb206dl35
-            dPbPbdl[3] <- D$dPb207Pb206dl34
-            dPbPbdl[5] <- D$dPb207Pb206dl31
-            dPbPbdl[6] <- D$dPb207Pb206dl30
-            dPbPbdl[7] <- D$dPb207Pb206dl26
-            J <- dddPbU%*%dPbUdl + dddPbPb%*%dPbPbdl
-            covmat <- diag(SS/(nn-2),nn,nn) + J%*%getEl()%*%t(J)
-            LL <- LL.norm(as.vector(dem$d),covmat)
-        } else {
-            LL <- SS2LL(SS=SS,nn=nn)
-        }
+    b0 <- ta0b0['b0']
+    ns <- length(x)
+    McL <- mclean(tt=tt,d=x$d,exterr=exterr)
+    if (x$format<7){
+        XY <- get.UPb.isochron.ratios.204(x)
     } else {
-        if (x$format<7){
-            xy <- get.UPb.isochron.ratios.204(x)
-        } else {
-            xy <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
-        }
-        x6 <- xy[,1,drop=FALSE] # U238Pb206
-        y6 <- xy[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
-        x7 <- xy[,3,drop=FALSE] # U235Pb207
-        y7 <- xy[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
-        r86 <- 1/D$Pb206U238
-        r57 <- 1/D$Pb207U235
-        dem6 <- deming(a=1/a0,b=-1/(a0*r86),x=x6,y=y6)
-        dem7 <- deming(a=1/b0,b=-1/(b0*r57),x=x7,y=y7)
-        SS6 <- sum(dem6$d^2)
-        SS7 <- sum(dem7$d^2)
-        if (exterr){
-            dbd86 <- 1/(a0*r86^2)
-            dbd57 <- 1/(b0*r57^2)
-            dr68d86 <- -r86^2
-            dr57d75 <- -r57^2
-            dd6d68 <- dem6$dddb*dbd86*dr68d86
-            dd7d75 <- dem7$dddb*dbd57*dr57d75
-            d68dl <- matrix(0,1,7)
-            d68dl[1] <- D$dPb206U238dl38
-            d68dl[3] <- D$dPb206U238dl34
-            d68dl[6] <- D$dPb206U238dl30
-            d68dl[7] <- D$dPb206U238dl26
-            d75dl <- matrix(0,1,7)
-            d75dl[2] <- D$dPb207U235dl35
-            d75dl[5] <- D$dPb207U235dl31
-            J6 <- dd6d68%*%d68dl
-            J7 <- dd7d75%*%d75dl
-            E6 <- diag(SS6/(nn-2),nn,nn) + J6%*%getEl()%*%t(J6)
-            E7 <- diag(SS7/(nn-2),nn,nn) + J7%*%getEl()%*%t(J7)
-            LL <- LL.norm(as.vector(dem6$d),E6) + LL.norm(as.vector(dem7$d),E7)
-        } else {
-            LL <- SS2LL(SS=SS6+SS7,nn=2*nn)
-        }
+        XY <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
     }
-    LL
+    X6 <- XY[,1,drop=FALSE] # U238Pb206
+    Y6 <- XY[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
+    X7 <- XY[,3,drop=FALSE] # U235Pb207
+    Y7 <- XY[,4,drop=FALSE] # Pb204Pb207 or Pb208cPb207
+    a6 <- 1/a0
+    a7 <- 1/b0
+    b6 <- -a6*McL$Pb206U238
+    b7 <- -a7*McL$Pb207U235
+    N6 <- (Y6-a6-b6*X6)*b6
+    D6 <- 1+b6^2
+    x6 <- X6 + N6/D6
+    N7 <- (Y7-a7-b7*X7)*b7
+    D7 <- 1+b7^2
+    x7 <- X7 + N7/D7
+    D <- cbind(X6-x6,X7-x7)
+    E <- stats::cov(D)
+    DD <- c(X6-x6,X7-x7)
+    EE <- matrix(0,2*ns,2*ns)
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    diag(EE[i1,i1]) <- E[1,1]
+    diag(EE[i2,i2]) <- E[2,2]
+    diag(EE[i1,i2]) <- diag(EE[i2,i1]) <- E[1,2]
+    if (exterr){
+        db6dl38 <- -a6*McL$dPb206U238dl38
+        db6dl34 <- -a6*McL$dPb206U238dl34
+        db6dl30 <- -a6*McL$dPb206U238dl30
+        db6dl26 <- -a6*McL$dPb206U238dl26
+        db7dl35 <- -a7*McL$dPb207U235dl35
+        db7dl31 <- -a7*McL$dPb207U235dl31
+        dN6dl38 <-  (Y6-a6)*db6dl38 - 2*X6*b6*db6dl38 # N6 = (Y6-a6)*b6 - X6*b6^2
+        dN6dl34 <-  (Y6-a6)*db6dl34 - 2*X6*b6*db6dl34
+        dN6dl30 <-  (Y6-a6)*db6dl30 - 2*X6*b6*db6dl30
+        dN6dl26 <-  (Y6-a6)*db6dl26 - 2*X6*b6*db6dl26
+        dD6dl38 <- 2*b6*db6dl38                       # D6 = 1+b6^2
+        dD6dl34 <- 2*b6*db6dl34
+        dD6dl30 <- 2*b6*db6dl30
+        dD6dl26 <- 2*b6*db6dl26 
+        dN7dl35 <-  (Y7-a7)*db7dl35 - 2*X7*b7*db7dl35 # N7 = (Y7-a7)*b7 - X7*b7^2
+        dN7dl31 <-  (Y7-a7)*db7dl31 - 2*X7*b7*db7dl31
+        dD7dl35 <- 2*b7*db7dl35                       # D7 = 1+b7^2
+        dD7dl31 <- 2*b7*db7dl31
+        dx6dl38 <- (dN6dl38*D6-N6*dD6dl38)/D6^2         # x6 = N6/D6
+        dx6dl34 <- (dN6dl34*D6-N6*dD6dl34)/D6^2
+        dx6dl30 <- (dN6dl30*D6-N6*dD6dl30)/D6^2
+        dx6dl26 <- (dN6dl26*D6-N6*dD6dl26)/D6^2
+        dx7dl35 <- (dN7dl35*D7-N7*dD7dl35)/D7^2         # x7 = N7/D7
+        dx7dl31 <- (dN7dl31*D7-N7*dD7dl31)/D7^2
+        El <- getEl()
+        J <- matrix(0,2*ns,7)
+        colnames(J) <- colnames(El)
+        J[i1,'U238'] <- -dx6dl38
+        J[i1,'U234'] <- -dx6dl34
+        J[i1,'Th230'] <- -dx6dl30
+        J[i1,'Ra226'] <- -dx6dl26
+        J[i2,'U235'] <- -dx7dl35
+        J[i2,'Pa231'] <- -dx7dl31
+        EE <- EE + J%*%El%*%t(J)
+    }
+    LL.norm(DD,EE)
 }
 
-LL.ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,LL=TRUE){
+data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
+    out <- list()
     pnames <- names(ta0b0w)
     tt <- ta0b0w['t']
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format %in% (4:6)){
-        if (type==1){
-            O <- data2york(x,option=3)
-            a <- 1/ta0b0w['a0']
-            r68 <- McL$Pb206U238
-            b <- -a*r68
-            dbdt <- -a*McL$dPb206U238dt
+    if ('a0'%in%pnames) a0 <- ta0b0w['a0']
+    if ('b0'%in%pnames) b0 <- ta0b0w['b0']
+    model3 <- 'w'%in%pnames && !is.na(ta0b0w['w'])
+    ns <- length(x)
+    l8 <- lambda('U238')[1]
+    l5 <- lambda('U235')[1]
+    l2 <- lambda('Th232')[1]
+    U85 <- iratio('U238U235')[1]
+    multiplier <- 1
+    if (x$format<4){
+        yd <- data2york(x,option=1) # X=06/38, Y=07/35
+        yd[,c('X','sX','Y','sY','rXY')] <- yd[,c('Y','sY','X','sX','rXY')]
+        A <- rep(McL$Pb206U238,ns)
+        L0 <- yd[,'Y'] - McL$Pb207U235 - a0*yd[,'X']*U85
+        b <- a0*U85
+    } else if (x$format<7){
+        if (type==1){               # X=04/38, Y=06/38
+            yd <- data2york.UPb(x,option=10)
+            A <- rep(0,ns)
+            L0 <- yd[,'Y'] - McL$Pb206U238 - a0*yd[,'X']
+            b <- a0
+        } else if (type==2){        # X=04/35, Y=07/35
+            yd <- data2york.UPb(x,option=11)
+            A <- rep(0,ns)
+            L0 <- yd[,'Y'] - McL$Pb207U235 - b0*yd[,'X']
+            b <- b0
         } else {
-            O <- data2york(x,option=4)
-            a <- 1/ta0b0w['b0']
-            r75 <- McL$Pb207U235
-            b <- -a*r75
-            dbdt <- -a*McL$dPb207U235dt
+            stop('invalid isochron type')
         }
     } else if (x$format %in% (7:8)){
+        ThU <- x$x[,'Th232U238']
         if (type==1){
-            O <- data2york(x,option=6,tt=tt)
-            a <- 1/ta0b0w['a0']
-            r68 <- McL$Pb206U238
-            b <- -a*r68
-            dbdt <- -a*McL$dPb206U238dt
+            yd <- data2york.UPb(x,option=12) # X=08/38, Y=06/38
+            A <- McL$Pb208Th232*ThU
+            L0 <- yd[,'Y'] - McL$Pb206U238 - a0*yd[,'X']
+            b <- a0
+            multiplier <- ThU
         } else if (type==2){
-            O <- data2york(x,option=7,tt=tt)
-            a <- 1/ta0b0w['b0']
-            r75 <- McL$Pb207U235
-            b <- -a*r75
-            dbdt <- -a*McL$dPb207U235dt
+            yd <- data2york.UPb(x,option=13) # X=08/35, Y=07/35
+            A <- McL$Pb208Th232*ThU*U85
+            L0 <- yd[,'Y'] - McL$Pb207U235 - b0*yd[,'X']
+            b <- b0
+            multiplier <- ThU*U85
         } else if (type==3){
-            O <- data2york(x,option=8,tt=tt)
-            a <- ta0b0w['a0']
-            r82 <- age_to_Pb208Th232_ratio(tt)[1]
-            b <- -a*r82
-            dbdt <- -a*McL$dPb208Th232dt
+            yd <- data2york.UPb(x,option=14) # X=06/32, Y=08/32
+            A <- McL$Pb206U238/ThU
+            L0 <- yd[,'Y'] - McL$Pb208Th232 - yd[,'X']/a0
+            b <- 1/a0
         } else if (type==4){
-            O <- data2york(x,option=9,tt=tt)
-            a <- ta0b0w['b0']
-            r82 <- age_to_Pb208Th232_ratio(tt)[1]
-            b <- -a*r82
-            dbdt <- -a*McL$dPb208Th232dt
+            yd <- data2york.UPb(x,option=15) # X=07/32, Y=08/32
+            A <- McL$Pb206U238/(ThU*U85)
+            L0 <- yd[,'Y'] - McL$Pb208Th232- yd[,'X']/b0
+            b <- 1/b0
+        } else {
+            stop('invalid isochron type')
         }
     } else {
-        stop('LL.ludwig.2d is only relevant to U-Pb formats 4-8')
+        stop('data2ludwig.2d is only relevant to U-Pb formats 4-8')
     }
-    ns <- length(x)
-    if (model==2){
-        dem <- deming(a=a,b=b,x=O[,'X'],y=O[,'Y'])
-        D <- as.vector(dem$d)
-        SS <- sum(D^2)
-        E <- diag(SS,ns,ns)/(ns-2)
-        if (exterr){
-            J <- matrix(0,ns,7)
-            El <- getEl()
-            colnames(J) <- colnames(El)
-            McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-            if (type==1){
-                J[,'U238'] <- -dem$dddb*a*McL$dPb206U238dl38
-                J[,'U234'] <- -dem$dddb*a*McL$dPb206U238dl34
-                J[,'Th230'] <- -dem$dddb*a*McL$dPb206U238dl30
-                J[,'Ra226'] <- -dem$dddb*a*McL$dPb206U238dl26
-            } else if (type==2){
-                J[,'U235'] <- -dem$dddb*a*McL$dPb207U235dl35
-                J[,'Pa231'] <- -dem$dddb*a*McL$dPb207U235dl31
-            } else {
-                J[,'Th232'] <- -dem$dddb*a*McL$dPb208Th232dl32
-            }
-            E <- E + J %*% El %*% t(J)
-        }
-    } else {
-        if ('w'%in%names(ta0b0w) && !is.na(ta0b0w['w'])){
-            # convert w from age to slope:
-            ww <- ta0b0w['w']*abs(dbdt)
-            DE <- york2DE(XY=O,a=a,b=b,w=ww)
-        } else {
-            DE <- york2DE(XY=O,a=a,b=b)
-        }
-        D <- DE$D
-        if (exterr){
-            ix <- 1:ns
-            iy <- (ns+1):(2*ns)
-            El <- getEl()
-            J <- matrix(0,2*ns,7)
-            colnames(J) <- colnames(El)
-            P <- get.york.xy(XY=O,a=a,b=b)
-            if (type==1){
-                J[iy,'U238'] <- a*McL$dPb206U238dl38*P[,'x']
-                J[iy,'U234'] <- a*McL$dPb206U238dl34*P[,'x']
-                J[iy,'Th230'] <- a*McL$dPb206U238dl30*P[,'x']
-                J[iy,'Ra226'] <- a*McL$dPb206U238dl26*P[,'x']
-            } else if (type==2){
-                J[iy,'U235'] <- a*McL$dPb207U235dl35*P[,'x']
-                J[iy,'Pa231'] <- a*McL$dPb207U235dl31*P[,'x']
-            } else {
-                J[iy,'Th232'] <- a*McL$dPb208Th232dl32*P[,'x']
-            }
-            E <- DE$E + J %*% El %*% t(J)
-        } else {
-            E <- DE$E
-        }
-        if (!LL) SS <- stats::mahalanobis(D,center=FALSE,cov=E)
+    E <- matrix(0,nrow=2*ns,ncol=2*ns)
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    diag(E)[i1] <- yd[,'sX']^2
+    diag(E)[i2] <- yd[,'sY']^2
+    diag(E[i1,i2]) <- diag(E[i2,i1]) <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
+    if (model3){
+        Ew <- getEw(w=ta0b0w['w'],x=x,McL=McL,type=type)
+        E <- E + Ew
     }
-    if (LL) out <- LL.norm(D,E)
-    else out <- SS
+    if (exterr){
+        El <- getEl()
+        J <- matrix(0,2*ns,7)
+        colnames(J) <- colnames(El)
+        if (x$format<4){
+            J[i1,'U238'] <- -McL$dPb206U238dl38
+            J[i1,'U234'] <- -McL$dPb206U238dl34
+            J[i1,'Th230'] <- -McL$dPb206U238dl30
+            J[i1,'Ra226'] <- -McL$dPb206U238dl26
+            J[i2,'U235'] <- -McL$dPb207U235dl35
+            J[i2,'Pa231'] <- -McL$dPb207U235dl31
+        } else if (x$format<7){
+            if (type==1){
+                J[i2,'U238'] <- -McL$dPb206U238dl38
+                J[i2,'U234'] <- -McL$dPb206U238dl34
+                J[i2,'Th230'] <- -McL$dPb206U238dl30
+                J[i2,'Ra226'] <- -McL$dPb206U238dl26
+            } else if (type==2){
+                J[i2,'U235'] <- -McL$dPb207U235dl35
+                J[i2,'Pa231'] <- -McL$dPb207U235dl31                
+            } else {
+                stop('illegal type')
+            }
+        } else if (x$format<9){
+            if (type==1){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32*ThU
+                J[i2,'U238'] <- -McL$dPb206U238dl38
+                J[i2,'U234'] <- -McL$dPb206U238dl34
+                J[i2,'Th230'] <- -McL$dPb206U238dl30
+                J[i2,'Ra226'] <- -McL$dPb206U238dl26
+            } else if (type==2){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32*ThU*U85
+                J[i2,'U235'] <- -McL$dPb207U235dl35
+                J[i2,'Pa231'] <- -McL$dPb207U235dl31                
+            } else if (type==3){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32/ThU
+                J[i2,'U238'] <- -McL$dPb206U238dl38
+                J[i2,'U234'] <- -McL$dPb206U238dl34
+                J[i2,'Th230'] <- -McL$dPb206U238dl30
+                J[i2,'Ra226'] <- -McL$dPb206U238dl26                
+            } else if (type==4){
+                J[i1,'Th232'] <- -McL$dPb208Th232dl32/(ThU*U85)
+                J[i2,'U235'] <- -McL$dPb207U235dl35
+                J[i2,'Pa231'] <- -McL$dPb207U235dl31                
+            } else {
+                stop('illegal type')
+            }
+        } else {
+            stop('illegal format')
+        }
+        E <- E + J %*% El %*% t(J)
+    }
+    O <- blockinverse(AA=E[i1,i1],BB=E[i1,i2],
+                      CC=E[i2,i1],DD=E[i2,i2],doall=TRUE)
+    BB <- O[i1,i1] + O[i1,i2]*b + b*O[i2,i1] + b*O[i2,i2]*b
+    CC <- O[i1,i2]%*%L0 + b*O[i2,i2]%*%L0 - O[i1,i1]%*%A - b*O[i1,i2]%*%A
+    DD <- t(CC)
+    M <- -solve(BB,CC)
+    K <- M-A
+    L <- L0+b*M
+    KL <- c(K,L)
+    out$c0 <- (yd[,'X']-M)/multiplier
+    out$SS <- KL%*%O%*%KL
+    out$LL <- LL.norm(KL,E)
     out
+}
+
+LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
+    pnames <- names(ta0b0)
+    tt <- ta0b0['t']
+    if ('a0'%in%pnames) a0 <- ta0b0['a0']
+    else if ('b0'%in%pnames) b0 <- ta0b0['b0']
+    else stop('neither a0 nor b0 were supplied')
+    McL <- mclean(tt=tt,d=x$d,exterr=exterr)
+    dbdl38 <- dbdl34 <- dbdl30 <- dbdl26 <- dbdl35 <- dbdl31 <- dbdl32 <- 0
+    if (x$format %in% (1:3)){ # X=07/06, Y=38/06
+        yd <- data2york(x,option=2,tt=tt)
+        a <- a0
+        b <- -McL$Pb206U238*a0
+        dbdl38 <- -McL$dPb206U238dl38*a0
+        dbdl34 <- -McL$dPb206U238dl34*a0
+        dbdl30 <- -McL$dPb206U238dl30*a0
+        dbdl26 <- -McL$dPb206U238dl26*a0
+    } else if (x$format %in% (4:6)){
+        if (type==1){         # X=38/06, Y=04/06
+            yd <- data2york(x,option=3,tt=tt)
+            a <- 1/a0
+            b <- -McL$Pb206U238/a0
+            dbdl38 <- -McL$dPb206U238dl38/a0
+            dbdl34 <- -McL$dPb206U238dl34/a0
+            dbdl30 <- -McL$dPb206U238dl30/a0
+            dbdl26 <- -McL$dPb206U238dl26/a0
+        } else if (type==2){  # X=35/07, Y=04/07
+            yd <- data2york(x,option=4,tt=tt)
+            a <- 1/b0
+            b <- -McL$Pb207U235/b0
+            dbdl35 <- -McL$dPb207U235dl35/b0
+            dbdl31 <- -McL$dPb207U235dl31/b0
+        } else {
+            stop('invalid type')
+        }
+    } else if (x$format %in% (7:8)){
+        if (type==1){         # X=38/06, Y=08c/06
+            yd <- data2york(x,option=6,tt=tt)
+            a <- 1/a0
+            b <- -McL$Pb206U238/a0
+            dbdl38 <- -McL$dPb206U238dl38/a0
+            dbdl34 <- -McL$dPb206U238dl34/a0
+            dbdl30 <- -McL$dPb206U238dl30/a0
+            dbdl26 <- -McL$dPb206U238dl26/a0
+        } else if (type==2){  # X=35/07, Y=08c/07
+            yd <- data2york(x,option=7,tt=tt)
+            a <- 1/b0
+            b <- -McL$Pb207U235/b0
+            dbdl35 <- -McL$dPb207U235dl35/b0
+            dbdl31 <- -McL$dPb207U235dl31/b0
+        } else if (type==3){  # X=32/08, Y=06c/08
+            yd <- data2york(x,option=8,tt=tt)
+            a <- a0
+            b <- -McL$Pb208Th232*a0
+            dbdl32 <- -McL$dPb208Th232dl32*a0
+        } else if (type==4){  # X=32/08, Y=07c/08
+            yd <- data2york(x,option=9,tt=tt)
+            a <- b0
+            b <- -McL$Pb208Th232*b0
+            dbdl32 <- -McL$dPb208Th232dl32*b0
+        } else {
+            stop('invalid type')
+        }
+    } else {
+        stop('illegal format')
+    }
+    X <- yd[,'X',drop=FALSE]
+    Y <- yd[,'Y',drop=FALSE]
+    # Deming regression:
+    num <- Y-a-b*X
+    den <- sqrt(1+b^2)
+    sigma <- stats::sd(num/den)
+    if (exterr){
+        ns <- length(x)
+        El <- getEl()
+        J <- matrix(0,ns,7)
+        colnames(J) <- colnames(El)
+        dnumdb <- -X
+        ddendb <- -b/den
+        dxdb <- (dnumdb*den-num*ddendb)/den^2
+        J[,'U238'] <- -dxdb*dbdl38
+        J[,'U235'] <- -dxdb*dbdl35
+        J[,'U234'] <- -dxdb*dbdl34
+        J[,'Th232'] <- -dxdb*dbdl32
+        J[,'Pa231'] <- -dxdb*dbdl31
+        J[,'Th230'] <- -dxdb*dbdl30
+        J[,'Ra226'] <- -dxdb*dbdl26
+        D <- as.vector(num/den)
+        E <- diag(0,ns,ns)
+        diag(E) <- stats::var(D)
+        E <- E + J%*%El%*%t(J)
+        LL <- LL.norm(D,E)
+    } else {
+        LL <- -sum(stats::dnorm(x=num/den,mean=0,sd=sigma,log=TRUE))
+    }
+    LL
 }
 
 mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
@@ -1002,10 +1121,10 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     X <- x
     if (x$d$U48$option==2) X$d$U48 <- list(x=unname(fit$par['U48i']),option=1)
     if (x$d$ThU$option==2) X$d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
-    if (type%in%c('joint',0)){
+    if (type%in%c('joint',0) && x$format>3){
         SS <- data2ludwig(X,ta0b0w=fit$par)$SS
     } else {
-        SS <- LL.ludwig.2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr,LL=FALSE)
+        SS <- data2ludwig.2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr)$SS
     }
     if (out$df>0){
         out$mswd <- as.vector(SS/out$df)

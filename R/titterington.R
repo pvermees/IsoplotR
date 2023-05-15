@@ -100,56 +100,63 @@ titterington <- function(x){
     out
 }
 
-get.titterington.xyz <- function(XYZ,a,b,A,B){
-    omega <- invertcovmat(sx=XYZ[,'sX'],sy=XYZ[,'sY'],sz=XYZ[,'sZ'],
-                          sxy=XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY'],
-                          sxz=XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ'],
-                          syz=XYZ[,'rYZ']*XYZ[,'sY']*XYZ[,'sZ'])
+get.titterington.xyz <- function(XYZ,a,b,A,B,w=0,wtype=NA){
+    vX <- XYZ[,'sX']^2
+    vY <- XYZ[,'sY']^2
+    vZ <- XYZ[,'sZ']^2
+    if (wtype=='a') vX <- vX + w^2
+    if (wtype=='A') vZ <- vZ + w^2
+    sXY <- XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY']
+    sXZ <- XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ']
+    sYZ <- XYZ[,'rYZ']*XYZ[,'sY']*XYZ[,'sZ']
+    omega <- invertcovmat(vx=vX,vy=vY,vz=vZ,sxy=sXY,sxz=sXZ,syz=sYZ)
     r <- XYZ[,'Y']-a-b*XYZ[,'X']
     R <- XYZ[,'Z']-A-B*XYZ[,'X']
     alpha <- omega[,'xx'] + omega[,'yy']*b^2 + omega[,'zz']*B^2 +
         2*omega[,'xy']*b + 2*omega[,'xz']*B + 2*omega[,'yz']*b*B
     beta <- r*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
         R*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz'])
-    x <- XYZ[,'X'] + beta/alpha
+    if (wtype%in%c('b','B')){
+        slopetitroot <- function(p,XYZi,a,b,A,B,w){
+            E <- dEdx <- matrix(0,3,3)
+            E[1,1] <- XYZi['sX']^2
+            if (wtype=='b'){
+                E[2,2] <- XYZi['sY']^2 + (w*p)^2
+                dEdx[2,2] <- 2*p*w^2
+            } else {
+                E[2,2] <- XYZi['sY']^2
+            }
+            if (wtype=='B') {
+                E[3,3] <- XYZi['sZ']^2 + (w*p)^2
+                dEdx[3,3] <- 2*p*w^2
+            } else {
+                E[3,3] <- XYZi['sZ']^2
+            }
+            dDdx <- c(-1,-b,-B)
+            E[1,2] <- E[2,1] <- XYZi['rXY']*XYZi['sX']*XYZi['sY']
+            E[1,3] <- E[3,1] <- XYZi['rXZ']*XYZi['sX']*XYZi['sZ']
+            E[2,3] <- E[3,2] <- XYZi['rYZ']*XYZi['sY']*XYZi['sZ']
+            D <- c(XYZi['X']-p,XYZi['Y']-a-b*p,XYZi['Z']-A-B*p)
+            O <- solve(E)
+            sum(diag(O%*%dEdx)) + 2*D%*%O%*%dDdx - D%*%O%*%dEdx%*%O%*%D
+        }
+        slopetithelper <- function(i,XYZ,a,b,A,B,w,lower,upper){
+            stats::uniroot(f=slopetitroot,lower=lower[i],upper=upper[i],
+                           XYZi=XYZ[i,],a=a,b=b,A=A,B=B,w=w,extendInt='yes',
+                           tol=.Machine$double.eps^0.5)
+        }
+        ns <- nrow(XYZ)
+        init <- XYZ[,'X'] + beta/alpha
+        dx <- diff(range(XYZ[,'X']))
+        fit <- sapply(1:ns,slopetithelper,lower=init-dx,
+                      upper=init+dx,XYZ=XYZ,a=a,b=b,A=A,B=B,w=w)
+        x <- unlist(fit[1,])
+    } else {
+        x <- XYZ[,'X'] + beta/alpha
+    }
     y <- a+b*x
     z <- A+B*x
-    drda <- -1
-    drdb <- -XYZ[,'X']
-    drdA <- drdB <- dRda <- dRdb <- 0
-    dRdA <- -1
-    dRdB <- -XYZ[,'X']
-    dalphada <- dalphadA <- 0
-    dalphadb <- 2*omega[,'yy']*b + 2*omega[,'xy'] + 2*omega[,'yz']*B
-    dalphadB <- 2*omega[,'zz']*B + 2*omega[,'xz'] + 2*omega[,'yz']*b
-    dbetada <- drda*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
-        dRda*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz'])
-    dbetadb <- drdb*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
-        r*omega[,'yy'] +
-        dRdb*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz']) +
-        R*omega[,'yz']
-    dbetadA <- drdA*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
-        dRdA*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz'])
-    dbetadB <- drdB*(omega[,'xy'] + b*omega[,'yy'] + B*omega[,'yz']) +
-        r*omega[,'yz'] +
-        dRdB*(omega[,'xz'] + b*omega[,'yz'] + B*omega[,'zz']) +
-        R*omega[,'zz']
-    dxda <- (dbetada*alpha-beta*dalphada)/alpha^2
-    dxdb <- (dbetadb*alpha-beta*dalphadb)/alpha^2
-    dxdA <- (dbetadA*alpha-beta*dalphadA)/alpha^2
-    dxdB <- (dbetadB*alpha-beta*dalphadB)/alpha^2
-    dyda <- 1+b*dxda
-    dydb <- x+b*dxdb
-    dydA <- b*dxdA
-    dydB <- b*dxdB
-    dzda <- B*dxda
-    dzdb <- B*dxdb
-    dzdA <- 1+B*dxdA
-    dzdB <- x+B*dxdB
-    cbind('x'=x,'y'=y,'z'=z,
-          'dxda'=dxda,'dxdb'=dxdb,'dxdA'=dxdA,'dxdB'=dxdB,
-          'dyda'=dyda,'dydb'=dydb,'dydA'=dydA,'dydB'=dydB,
-          'dzda'=dzda,'dzdb'=dzdb,'dzdA'=dzdA,'dzdB'=dzdB)
+    cbind('x'=x,'y'=y,'z'=z)
 }
 
 mswd.tit <- function(abAB,dat){

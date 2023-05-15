@@ -164,6 +164,23 @@
 #'
 #' \code{3}: Error-weighted least squares with overdispersion term
 #'
+#' @param wtype controls the parameter responsible for the
+#'     overdispersion in model-3 regression.
+#'
+#' \code{0}, \code{'a'} or \code{'intercept'}: attributes the
+#' overdispersion to the y-intercept of the isochron.
+#'
+#' \code{1}, \code{'b'} or \code{'slope'}: attributes the
+#' overdispersion to the slope of the isochron.
+#'
+#' \code{'A'}: only available if \code{x} has class \code{ThU} and
+#' \code{x$format} is 1 or 2. Attributes the overdispersion to the
+#' authigenic \eqn{^{230}}Th/\eqn{^{238}}U-intercept of the isochron.
+#'
+#' \code{'B'}: only available if \code{x} has class \code{ThU} and
+#' \code{x$format} is 1 or 2. Attributes the overdispersion to the
+#' \eqn{^{230}}Th/\eqn{^{232}}Th-slope of the isochron.
+#' 
 #' @param show.ellipses show the data as:
 #'
 #' \code{0}: points
@@ -469,9 +486,9 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
     }
     invisible(fit)
 }
-#' @param anchor
-#' control parameters to fix the intercept age or common Pb
-#' composition of the isochron fit. This can be a scalar or a vector.
+#' @param anchor control parameters to fix the intercept age or common
+#'     Pb composition of the isochron fit. This can be a scalar or a
+#'     vector.
 #'
 #' If \code{anchor[1]=0}: do not anchor the isochron.
 #'
@@ -480,6 +497,40 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 #'
 #' If \code{anchor[1]=2}: force the isochron line to intersect the
 #' concordia line at an age equal to \code{anchor[2]}.
+#' 
+#' @param type if \code{x} has class \code{UPb} and \code{x$format=4},
+#'     \code{5} or \code{6}:
+#'
+#' \code{1}: \eqn{^{204}}Pb/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
+#'
+#' \code{2}: \eqn{^{204}}Pb/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
+#'
+#' if \code{x} has class \code{UPb} and \code{x$format=7} or \code{8}:
+#'
+#' \code{1}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
+#'
+#' \code{2}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
+#' 
+#' \code{3}: \eqn{^{206}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
+#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
+#'
+#' \code{4}: \eqn{^{207}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
+#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
+#' 
+#' if \code{x} has class \code{ThU}, and following the classification
+#' of Ludwig and Titterington (1994), one of either:
+#'
+#' \code{1}: `Rosholt type-II' isochron, setting out
+#' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
+#'
+#' \code{2}: `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
+#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
+#'
+#' \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
+#' vs. \eqn{^{238}}U/\eqn{^{232}}Th
+#'
+#' \code{4}: `Osmond type-II' isochron, setting out
+#' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
 #' 
 #' @param joint logical. Only applies to U-Pb data formats 4 and
 #'     above. If \code{TRUE}, carries out three dimensional
@@ -555,25 +606,25 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         md <- mediand(x$d)
         if (md$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
         if (md$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
-        D <- mclean(tt,d=md,exterr=exterr)
+        McL <- mclean(tt,d=md,exterr=exterr)
         if (type==1){                           # 04-08c/06 vs. 38/06
-            x0inv <- D$Pb206U238
-            dx0invdt <- D$dPb206U238dt
+            x0inv <- McL$Pb206U238
+            dx0invdt <- McL$dPb206U238dt
             E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^238*'U/'^206*'Pb')
         } else if (type==2){                    # 04-08c/07 vs. 35/07
-            x0inv <- D$Pb207U235
-            dx0invdt <- D$dPb207U235dt
+            x0inv <- McL$Pb207U235
+            dx0invdt <- McL$dPb207U235dt
             E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^235*'U/'^207*'Pb')
         } else if (type==3 & x$format%in%c(7,8)){  # 06c/08 vs. 32/08
             x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-            dx0invdt <- D$dPb208Th232dt
+            dx0invdt <- McL$dPb208Th232dt
             E <- fit$cov[c('t','a0'),c('t','a0')]
             x.lab <- quote(''^232*'Th/'^208*'Pb')
         } else if (type==4 & x$format%in%c(7,8)){  # 07c/08 vs. 32/08
             x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-            dx0invdt <- D$dPb208Th232dt
+            dx0invdt <- McL$dPb208Th232dt
             E <- fit$cov[c('t','b0'),c('t','b0')]
             x.lab <- quote(''^232*'Th/'^208*'Pb')
         } else {
@@ -641,14 +692,15 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
             graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
-                                          y0option=y0option),xlab=x.lab,ylab=y.lab)
+                                          y0option=y0option,dispunits=' Ma'),
+                            xlab=x.lab,ylab=y.lab)
         }
     }
     invisible(out)
 }
 
 getUPby0 <- function(out,fmt=1,type=1,option=1){
-    out$y0 <- c()
+    out$y0 <- c('y'=NA,'s[y]'=NA)
     if (option==1){
         if (fmt<4){                              # 07/06 vs. 38/06
             out$y0['y'] <- out$par['a0']
@@ -753,12 +805,12 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,growth=FALSE,
-                          show.ellipses=1*(model!=2),hide=NULL,
+                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
+                          growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=ifelse(inverse,0,1))
+    out <- regression(d2calc,model=model,wtype=wtype)
     if (inverse){
         R76 <- out$a
         out$y0[c('y','s[y]')] <- out$b
@@ -777,8 +829,13 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3){
+    disp2age <- (inverse && wtype%in%c('intercept',0,'a')) ||
+                (!inverse && wtype%in%c('slope',1,'b'))
+    if (model==3 && disp2age){
         out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
+        dispunits <- ' Ma'
+    } else {
+        dispunits <- ''   
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
@@ -808,7 +865,8 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         } else {
             out$ski <- NULL
         }
-        tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',ski=out$ski)
+        tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',
+                             dispunits=dispunits,ski=out$ski)
         graphics::title(tit,xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
@@ -839,16 +897,16 @@ SK.intersection <- function(fit,inverse,m=0,M=5000){
 }
 #' @rdname isochron
 #' @export
-isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
+isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model)
+    out <- regression(d2calc,model=model,wtype=wtype)
     a <- out$a['a']
     sa <- out$a['s[a]']
     b <- out$b['b']
@@ -875,11 +933,20 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
                                            x$J[1],x$J[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
+    dispunits <- ''
     if (model==3){
-        l40 <- lambda('K40')[1]
-        dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
-        d09db <- ifelse(inverse,1/a,1)
-        out$disp <- dtd09*d09db*out$disp
+        if (wtype%in%c('slope',1,'b')){
+            l40 <- lambda('K40')[1]
+            dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
+            d09db <- ifelse(inverse,1/a,1)
+            out$disp <- dtd09*d09db*out$disp
+            dispunits <- ' Ma'
+        } else if (inverse){ # wtype%in%c('intercept',0,'a')
+            w <- out$disp[1]
+            sw <- out$disp[2]
+            out$disp[1] <- w/a^2
+            out$disp[2] <- out$disp[1]*sw/w
+        }
     }
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
@@ -889,7 +956,8 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2, show.numbers=FALSE,levels=NA,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Ar-Ar'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                      dispunits=dispunits,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
@@ -900,7 +968,7 @@ isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Th232',oerr=oerr,sigdig=sigdig,
@@ -908,9 +976,9 @@ isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,show.ellipses=show.ellipses,
-                hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,...)
+                exterr=exterr,model=model,wtype=wtype,
+                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 #' @rdname isochron
 #' @export
@@ -918,7 +986,7 @@ isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                          clabel="",inverse=FALSE,ci.col='gray80',
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',line.col='black',
-                         lwd=1, plot=TRUE,exterr=TRUE,model=1,
+                         lwd=1, plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
                          show.ellipses=1*(model!=2),hide=NULL,
                          omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='K40',oerr=oerr,sigdig=sigdig,
@@ -926,9 +994,9 @@ isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,show.ellipses=show.ellipses,
-                bratio=0.895,hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,...)
+                exterr=exterr,model=model,wtype=wtype,
+                show.ellipses=show.ellipses,bratio=0.895,hide=hide,
+                omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 #' @rdname isochron
 #' @export
@@ -936,7 +1004,7 @@ isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',
-                          lwd=1,plot=TRUE,exterr=TRUE,model=1,
+                          lwd=1,plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Rb87',oerr=oerr,sigdig=sigdig,
@@ -944,9 +1012,9 @@ isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,show.ellipses=show.ellipses,
-                hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,...)
+                exterr=exterr,model=model,wtype=wtype,
+                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 #' @rdname isochron
 #' @export
@@ -954,7 +1022,7 @@ isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Re187',oerr=oerr,sigdig=sigdig,
@@ -962,9 +1030,9 @@ isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,show.ellipses=show.ellipses,
-                hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,...)
+                exterr=exterr,model=model,wtype=wtype,
+                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 #' @rdname isochron
 #' @export
@@ -972,7 +1040,7 @@ isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Sm147',oerr=oerr,sigdig=sigdig,
@@ -980,9 +1048,9 @@ isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,show.ellipses=show.ellipses,
-                hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,...)
+                exterr=exterr,model=model,wtype=wtype,
+                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 #' @rdname isochron
 #' @export
@@ -990,7 +1058,7 @@ isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,
+                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Lu176',oerr=oerr,sigdig=sigdig,
@@ -998,9 +1066,9 @@ isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,show.ellipses=show.ellipses,
-                hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,...)
+                exterr=exterr,model=model,wtype=wtype,
+                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 #' @rdname isochron
 #' @export
@@ -1008,11 +1076,12 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                            clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,model=1,
-                           show.ellipses=2*(model!=2),hide=NULL,
-                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                           wtype='intercept',show.ellipses=2*(model!=2),
+                           hide=NULL,omit=NULL,omit.fill=NA,
+                           omit.stroke='grey',...){
     y <- data2york(x)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model)
+    out <- regression(d2calc,model=model,wtype=wtype)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
     if (inflate(out)){
@@ -1020,7 +1089,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     out$y0label <- quote('He'[0]*'=')
-    if (plot) {
+    if (plot){
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
@@ -1032,42 +1101,6 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
     }
     invisible(out)
 }
-#' @param type
-#'
-#' if \code{x} has class \code{UPb} and \code{x$format=4}, \code{5} or 
-#' \code{6}:
-#'
-#' \code{1}: \eqn{^{204}}Pb/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
-#'
-#' \code{2}: \eqn{^{204}}Pb/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
-#'
-#' if \code{x} has class \code{UPb} and \code{x$format=7} or \code{8}:
-#'
-#' \code{1}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{206}}Pb vs. \eqn{^{238}}U/\eqn{^{206}}Pb
-#'
-#' \code{2}: \eqn{^{208}}Pb\eqn{{}_\circ}/\eqn{^{207}}Pb vs. \eqn{^{235}}U/\eqn{^{207}}Pb
-#' 
-#' \code{3}: \eqn{^{206}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
-#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
-#'
-#' \code{4}: \eqn{^{207}}Pb\eqn{{}_\circ}/\eqn{^{208}}Pb
-#' vs. \eqn{^{232}}Th/\eqn{^{208}}Pb
-#' 
-#' if \code{x} has class \code{ThU}, and following the classification
-#' of Ludwig and Titterington (1994), one of either:
-#'
-#' \code{1}: `Rosholt type-II' isochron, setting out
-#' \eqn{^{230}}Th/\eqn{^{232}}Th vs. \eqn{^{238}}U/\eqn{^{232}}Th
-#'
-#' \code{2}: `Osmond type-II' isochron, setting out \eqn{^{230}}Th/\eqn{^{238}}U
-#' vs. \eqn{^{232}}Th/\eqn{^{238}}U
-#'
-#' \code{3}: `Rosholt type-II' isochron, setting out \eqn{^{234}}U/\eqn{^{232}}Th
-#' vs. \eqn{^{238}}U/\eqn{^{232}}Th
-#'
-#' \code{4}: `Osmond type-II' isochron, setting out
-#' \eqn{^{234}}U/\eqn{^{238}}U vs. \eqn{^{232}}Th/\eqn{^{238}}U
-#' 
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
@@ -1075,19 +1108,51 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
-                          exterr=TRUE,model=1,show.ellipses=1*(model!=2),
+                          exterr=TRUE,model=1,wtype='a',
+                          show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
+    displabel <- 'dispersion = '
+    dispunits <- ''
     if (x$format %in% c(1,2)){
-        out <- isochron_ThU_3D(x,type=type,model=model,exterr=exterr,
+        out <- isochron_ThU_3D(x,type=type,model=model,wtype=wtype,exterr=exterr,
                                hide=hide,omit=omit,y0option=y0option)
-        displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
+        if (model==3){
+            if (wtype=='a'){
+                displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
+            } else if (wtype=='b'){
+                displabel <- quote('('^234*'U/'^232*'Th)-dispersion = ')
+            } else if (wtype=='A'){
+                displabel <- quote('('^230*'Th/'^238*'U)'[a]*'-dispersion = ')
+            } else if (wtype=='B'){
+                displabel <- quote('('^230*'Th/'^232*'Th)-dispersion = ')
+            }
+        }
         dispunits <- ''
     } else if (x$format %in% c(3,4)){
-        out <- isochron_ThU_2D(x,type=type,model=model,exterr=exterr,
-                               hide=hide,omit=omit)
-        displabel <- 'dispersion ='
-        dispunits <- ' ka'
+        out <- isochron_ThU_2D(x,type=type,model=model,wtype=wtype,
+                               exterr=exterr,hide=hide,omit=omit)
+        if (model==3){
+            if (type==1 && wtype%in%c('slope',1,'b')){
+                age2disp <- TRUE
+                Th230U238 <- out$b[1]
+            } else if (type==2 && wtype%in%c('intercept',0,'a')){
+                age2disp <- TRUE
+                Th230U238 <- out$a[1]
+            } else {
+                age2disp <- FALSE
+            }
+            if (age2disp){
+                l0 <- lambda('Th230')[1]
+                dtd08 <- 1/(l0*(1-Th230U238))
+                out$disp <- out$disp*dtd08
+                dispunits <- ' ka'
+            } else {
+                displabel <- quote('('^230*'Th/'^232*'Th)'[0]*'-dispersion = ')
+            }
+        }
+    } else {
+        stop('Illegal Th-U data format.')
     }
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
@@ -1104,12 +1169,11 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     invisible(out)
 }
 
-isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
-                            hide=NULL,omit=NULL){
+isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
+                            exterr=TRUE,hide=NULL,omit=NULL){
     y <- data2york(x,type=type)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,type="york",
-                      wtype=ifelse(type==1,'slope','intercept'))
+    out <- regression(d2calc,model=model,type="york",wtype=wtype)
     out$xyz <- y
     if (type==1){
         Th230U238 <- out$b
@@ -1135,17 +1199,12 @@ isochron_ThU_2D <- function(x,type=2,model=1,exterr=TRUE,
                                               Th230Th232[1],
                                               sqrt(out$mswd)*Th230Th232[2])[2]
     }
-    if (model==3){
-        l0 <- lambda('Th230')[1]
-        dtd08 <- 1/(l0*(1-Th230U238))
-        out$disp <- out$disp*dtd08
-    }
     out$xlab <- x.lab
     out$ylab <- y.lab
     out$y0label <- quote('('^230*'Th/'^232*'Th)'[0]*'=')
     out
 }
-isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
+isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=TRUE,
                             hide=NULL,omit=NULL,y0option=4){
     if (type == 1){ # 0/2 vs 8/2
         osmond <- FALSE
@@ -1190,7 +1249,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,exterr=TRUE,
     }
     tit <- data2tit(x,osmond=osmond)
     d2calc <- clear(tit,hide,omit)
-    out <- regression(d2calc,model=model,type="titterington")
+    out <- regression(d2calc,model=model,type="titterington",wtype=wtype)
     out$xyz <- tit
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
@@ -1265,12 +1324,12 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',inverse=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
-                        plot=TRUE,exterr=TRUE,model=1,
+                        plot=TRUE,exterr=TRUE,model=1,wtype=NA,
                         show.ellipses=1*(model!=2),bratio=1,
                         hide=NULL,omit=NULL,...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model)
+    out <- regression(d2calc,model=model,wtype=wtype)
     out$y0[c('y','s[y]')] <- out$a
     if (inverse){
         DP <- -out$b[1]/out$a[1]
@@ -1287,10 +1346,13 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                                          exterr=exterr,bratio=bratio)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3){
+    if (wtype%in%c('slope',1,'b')){
         dDPdt <- lambda(nuclide)[1]*(1+DP)
         dDPdb <- ifelse(inverse,1/out$a[1],1)
         out$disp <- out$disp*dDPdb/dDPdt
+        dispunits <- ' Ma'
+    } else {
+        dispunits <- ''
     }
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[0]*'=')))
@@ -1301,7 +1363,8 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                     ellipse.stroke=ellipse.stroke,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,...)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='PD'),
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                      type='PD',dispunits=dispunits),
                         xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
@@ -1381,7 +1444,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 
 isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                           units=' Ma',displabel='dispersion =',
-                          dispunits=units,ski=NULL,y0option=1,...){
+                          dispunits='',ski=NULL,y0option=1,...){
     content <- list()
     if (is.null(type)){
         content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,
@@ -1410,8 +1473,9 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                     units='',prefix=fit$y0label,
                                     sigdig=sigdig,oerr=oerr,df=fit$df)
         } else {
-            content[[2]] <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],ntit='',
-                                     sigdig=sigdig,oerr=oerr,units='',prefix=fit$y0label)
+            content[[2]] <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],
+                                     ntit='',sigdig=sigdig,oerr=oerr,units='',
+                                     prefix=fit$y0label)
         }
     } else {
         content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
@@ -1423,7 +1487,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     }
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
-    } else if (fit$model==3){
+    } else if (fit$model%in%c(3,4)){
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
                                 oerr=oerr,prefix=displabel,units=dispunits)
     }

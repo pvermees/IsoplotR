@@ -124,26 +124,44 @@ york <- function(x){
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
-get.york.xy <- function(XY,a,b){
+get.york.xy <- function(XY,a,b,w=0,wtype=NA){
     X <- XY[,'X']
-    sX <- XY[,'sX']
+    vX <- XY[,'sX']^2
     Y <- XY[,'Y']
-    sY <- XY[,'sY']
-    sXY <- XY[,'rXY']*sX*sY
-    O <- invertcovmat(sx=sX,sy=sY,sxy=sXY)
+    vY <- XY[,'sY']^2
+    sXY <- XY[,'rXY']*XY[,'sX']*XY[,'sY']
+    if (wtype%in%c('intercept',0,'a')) vY <- vY + w^2
+    O <- invertcovmat(vx=vX,vy=vY,sxy=sXY)
     N <- O[,'xx']*X + O[,'xy']*b*X + O[,'xy']*(Y-a) + b*(Y-a)*O[,'yy']
     D <- O[,'xx'] + 2*b*O[,'xy'] + O[,'yy']*b^2
-    x <- N/D
+    if (wtype%in%c('slope',1,'b')){
+        slopeyorkroot <- function(p,XYi,a,b,w){
+            E <- dEdx <- matrix(0,2,2)
+            E[1,1] <- XYi['sX']^2
+            E[2,2] <- XYi['sY']^2 + (w*p)^2
+            E[1,2] <- E[2,1] <- XYi['rXY']*XYi['sX']*XYi['sY']
+            D <- c(XYi['X']-p,XYi['Y']-a-b*p)
+            dEdx[2,2] <- 2*p*w^2
+            dDdx <- c(-1,-b)
+            O <- solve(E)
+            sum(diag(O%*%dEdx)) + 2*D%*%O%*%dDdx - D%*%O%*%dEdx%*%O%*%D
+        }
+        slopeyorkhelper <- function(i,XY,a,b,w,lower,upper){
+            stats::uniroot(f=slopeyorkroot,lower=lower[i],upper=upper[i],
+                           XYi=XY[i,],a=a,b=b,w=w,extendInt='yes',
+                           tol=.Machine$double.eps^0.5)
+        }
+        ns <- nrow(XY)
+        init <- N/D
+        dx <- diff(range(XY[,'X']))
+        fit <- sapply(1:ns,slopeyorkhelper,lower=init-dx,
+                      upper=init+dx,XY=XY,a=a,b=b,w=w)
+        x <- unlist(fit[1,])
+    } else {
+        x <- N/D
+    }
     y <- a + b*x
-    dNda <- - O[,'xy'] - b*O[,'yy']
-    dNdb <- O[,'xy']*X + (Y-a)*O[,'yy']
-    dDda <- 0
-    dDdb <- 2*O[,'xy'] + 2*O[,'yy']*b
-    dxda <- (dNda*D-N*dDda)/D^2
-    dxdb <- (dNdb*D-N*dDdb)/D^2
-    dyda <- 1 + b*dxda
-    dydb <- x + b*dxdb
-    cbind('x'=x,'y'=y,'dxda'=dxda,'dxdb'=dxdb,'dyda'=dyda,'dydb'=dydb)
+    cbind(x=x,y=y)
 }
 
 #' @title Prepare geochronological data for York regression
@@ -285,18 +303,64 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
         }
+    } else if (option==10 && x$format%in%c(4,5,6)){ # 06/38 vs. 04/38 
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb206U238')
+        }
+    } else if (option==11 && x$format%in%c(4,5,6)){ # 07/35 vs. 04/35
+        J <- diag(2)
+        J[1,1] <- iratio('U238U235')[1]
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb207U235',J=J)
+        }
+    } else if (option==12 && x$format%in%c(7,8)){ # 06/38 vs. 08/38
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- x$x[i,'Th232U238']
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb208Th232',i2='Pb206U238',J=J)
+        }
+    } else if (option==13 && x$format%in%c(7,8)){ # 07/35 vs. 08/35
+        U85 <- iratio('U238U235')[1]
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- x$x[i,'Th232U238']*U85
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb208Th232',i2='Pb207U235',J=J)
+        }
+    } else if (option==14 && x$format%in%c(7,8)){ # 08/32 vs. 06/32
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- 1/x$x[i,'Th232U238']
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb206U238',i2='Pb208Th232',J=J)
+        }
+    } else if (option==15 && x$format%in%c(7,8)){ # 08/32 vs. 07/32
+        U85 <- iratio('U238U235')[1]
+        J <- diag(2)
+        for (i in 1:ns){
+            wd <- wetherill(x,i=i)
+            J[1,1] <- 1/(x$x[i,'Th232U238']*U85)
+            out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb208Th232',J=J)
+        }
     } else {
         stop('Incompatible input format and concordia type.')
     }
     colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-data2york_UPb_helper <- function(x,i1=1,i2=2){
-    X <- x$x[i1]
-    sX <- sqrt(x$cov[i1,i1])
-    Y <- x$x[i2]
-    sY <- sqrt(x$cov[i2,i2])
-    rXY <- x$cov[i1,i2]/(sX*sY)
+data2york_UPb_helper <- function(x,i1=1,i2=2,J=diag(2)){
+    XYin <- x$x[c(i1,i2)]
+    Ein <- x$cov[c(i1,i2),c(i1,i2)]
+    XYout <- J%*%XYin
+    Eout <- J%*%Ein%*%t(J)
+    X <- XYout[1]
+    sX <- sqrt(Eout[1,1])
+    Y <- XYout[2]
+    sY <- sqrt(Eout[2,2])
+    rXY <- Eout[1,2]/(sX*sY)
     c(X,sX,Y,sY,rXY)
 }
 #' @param inverse toggles between normal and inverse isochron
