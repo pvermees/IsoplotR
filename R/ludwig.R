@@ -255,7 +255,11 @@ inithelper <- function(yd,x0=NULL,y0=NULL){
         } else {
             out['b'] <- yd[i,'Y']/(0-x0)
         }
-        out['a'] <- abs(out['b']*x0)
+        if (is.finite(x0)){
+            out['a'] <- abs(out['b']*x0)
+        } else {
+            out['a'] <- mean(yd[,'Y'])
+        }
     } else { # anchor y
         i <- which.min(yd[,'Y'])
         if (y0>yd[i,'Y']){
@@ -277,8 +281,18 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
                               upper=init$upper,x=x,anchor=anchor,type=type)
         E <- inverthess(fit$hessian)
         par <- fit$par
-        par['w'] <- fit$par['t']/100
-        tt <- exp(fit$par['t']) # needed for anchored regression
+        if (anchor[1]==2 && length(anchor)>1){
+            tt <- anchor[2]
+            if (length(anchor)>2 && anchor[3]>0){
+                par['t'] <- log(tt)
+                par['w'] <- log(anchor[3])
+            } else {
+                par['w'] <- ifelse(tt>0,log(tt)-4,0)
+            }
+        } else {
+            tt <- exp(fit$par['t'])
+            par['w'] <- fit$par['t'] + log(E['t','t'])/2
+        }
     } else {
         par <- vector()
         if (x$format<4){
@@ -504,6 +518,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             upper['PaUi'] <- x$d$PaU$M - x$d$buffer
         }
     }
+    
     list(par=par,lower=lower,upper=upper)
 }
 
