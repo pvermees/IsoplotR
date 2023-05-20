@@ -424,8 +424,8 @@ normal.mixtures <- function(x,k,...){
         biu[,i] <- -(1-(yu-betai[i]*xu)^2)*xu^2
     }
     E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
-    out <- format.peaks(peaks=betai,peaks.err=sqrt(diag(E)[k:(2*k-1)]),
-                        props=pii,props.err=get.props.err(E),df=n-2*k+1)
+    out <- formatPeaks(peaks=betai,peaks.err=sqrt(diag(E)[k:(2*k-1)]),
+                       props=pii,props.err=get.props.err(E),df=n-2*k+1)
     out$L <- L
     out
 }
@@ -481,13 +481,13 @@ binomial.mixtures <- function(x,k,exterr=TRUE,...){
     E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
     beta.var <- diag(E)[k:(2*k-1)]
     pe <- theta2age(x,thetai,beta.var,exterr)
-    out <- format.peaks(peaks=pe$peaks,peaks.err=pe$peaks.err,
+    out <- formatPeaks(peaks=pe$peaks,peaks.err=pe$peaks.err,
                         props=pii,props.err=get.props.err(E),df=n-2*k+1)
     out$L <- L
     out
 }
 
-format.peaks <- function(peaks,peaks.err,props,props.err,df){
+formatPeaks <- function(peaks,peaks.err,props,props.err,df){
     out <- list()
     k <- length(peaks)
     out$peaks <- matrix(0,2,k)

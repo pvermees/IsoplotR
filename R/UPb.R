@@ -403,8 +403,10 @@ age_to_wetherill_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     J <- matrix(0,2,3)
     J[1,1] <- D$dPb207U235dt
     J[2,1] <- D$dPb206U238dt
-    J[1,2] <- D$dPb207U235dl35
-    J[2,3] <- D$dPb206U238dl38
+    if (exterr){
+        J[1,2] <- D$dPb207U235dl35
+        J[2,3] <- D$dPb206U238dl38
+    }
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
     rownames(out$cov) <- labels
@@ -431,10 +433,12 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     J <- matrix(0,2,4)
     J[1,1] <- -d68dt/D$Pb206U238^2
     J[2,1] <- (d75dt*D$Pb206U238-D$Pb207U235*d68dt)/(U*D$Pb206U238^2)
-    J[1,3] <- -d68dl38/D$Pb206U238^2
-    J[2,2] <- d75dl35/(U*D$Pb206U238)
-    J[2,3] <- -Pb207Pb206*d68dl38/D$Pb206U238
-    J[2,4] <- -Pb207Pb206/U
+    if (exterr){
+        J[1,3] <- -d68dl38/D$Pb206U238^2
+        J[2,2] <- d75dl35/(U*D$Pb206U238)
+        J[2,3] <- -Pb207Pb206*d68dl38/D$Pb206U238
+        J[2,4] <- -Pb207Pb206/U
+    }
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
     rownames(out$cov) <- labels
@@ -455,8 +459,10 @@ age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     J <- matrix(0,2,3)
     J[1,1] <- D$dPb206U238dt
     J[2,1] <- l2*exp(l2*tt)
-    J[1,2] <- D$dPb206U238dl38
-    J[2,3] <- tt*exp(l2*tt)
+    if (exterr){
+        J[1,2] <- D$dPb206U238dl38
+        J[2,3] <- tt*exp(l2*tt)
+    }
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
     rownames(out$cov) <- labels
@@ -864,7 +870,7 @@ get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
 }
 
 get.Pb206U238.age <- function(x,...){ UseMethod("get.Pb206U238.age",x) }
-get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq()){
+get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)

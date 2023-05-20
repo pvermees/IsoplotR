@@ -138,10 +138,10 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                               non.plateau.col=non.plateau.col,
                               random.effects=random.effects,oerr=oerr)
     if (plateau){
-        plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
+        plot_plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
         graphics::title(plateau.title(pc$plat,oerr=oerr,sigdig=sigdig,Ar=FALSE))
     }
-    plot.spectrum(XY=XY,col=pc$col)
+    plot_spectrum(XY=XY,col=pc$col)
     colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
@@ -182,11 +182,11 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
                               random.effects=random.effects,oerr=oerr)
     if (plateau){
         if (exterr) pc$plat <- add.exterr.to.wtdmean(x,pc$plat)
-        plot.plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
+        plot_plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
         graphics::title(plateau.title(pc$plat,oerr=oerr,sigdig=sigdig,
                                       Ar=TRUE,units=' Ma'))
     }
-    plot.spectrum(XY=XY,col=pc$col)
+    plot_spectrum(XY=XY,col=pc$col)
     colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
@@ -229,14 +229,14 @@ get.plateau.colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,omit=NULL,
     }
     list(col=colour,plat=plat)
 }
-plot.spectrum <- function(XY,col){
+plot_spectrum <- function(XY,col){
     ns <- length(XY$X)
     for (i in 1:ns){
         graphics::rect(XY$X[i],XY$Yl[i],XY$X[i+1],XY$Yu[i],col=col[i])
         if (i<ns) graphics::lines(rep(XY$X[i+1],2),c(XY$Yl[i],XY$Yu[i+1]))
     }
 }
-plot.plateau <- function(fit,line.col='red',lwd=2){
+plot_plateau <- function(fit,line.col='red',lwd=2){
     ci.exterr <- fit$plotpar$ci.exterr
     if (!all(is.na(ci.exterr))){
         ci.exterr$x <- c(0,1,1,0)
