@@ -1,3 +1,7 @@
+# IsoplotR 5.3
+
+May 19, 2023: Improved model-3 regression for York and Ludwig algorithms.
+
 # IsoplotR 5.2 
 
 Feb 21, 2023: Adds Wasserstein distance to MDS plots; propagates disequilibrium activity ratio errors for U-Pb isochrons, as well as common-Pb and concordia age anchor errors. Replaces ordinary with total least squares in model-2 regression. Recasts model-3 regression terms of ages rather than y-intercepts. Changes default output errors back from 2-sigma to Studentised confidence intervals.

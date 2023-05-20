@@ -448,6 +448,10 @@ age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
     age.PD(x,nuclide='Lu176',isochron=isochron,i2i=i2i,exterr=exterr,
            i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
+#' @param nuclide a text string corresponding to a valid entry for
+#'     \code{settings('lambda',...)}
+#' @rdname age
+#' @export
 age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
                    i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     if (isochron){

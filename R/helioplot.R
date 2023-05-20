@@ -669,7 +669,7 @@ renormalise <- function(xyz,fact=c(1,1,1)){
     out
 }
 
-geomean.Sm <- function(x){
+geomean.Sm <- function(x,...){
     UVW <- colMeans(UThHe2uvw(x),na.rm=TRUE)
     exp(UVW[3])/(exp(UVW[1])+exp(UVW[2])+exp(UVW[3])+1)
 }

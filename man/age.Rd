@@ -15,6 +15,7 @@
 \alias{age.SmNd}
 \alias{age.RbSr}
 \alias{age.LuHf}
+\alias{age.PD}
 \title{Calculate isotopic ages}
 \usage{
 age(x, ...)
@@ -145,6 +146,19 @@ age(x, ...)
 
 \method{age}{LuHf}(
   x,
+  isochron = TRUE,
+  i2i = TRUE,
+  exterr = FALSE,
+  i = NULL,
+  oerr = 1,
+  sigdig = NA,
+  projerr = FALSE,
+  ...
+)
+
+\method{age}{PD}(
+  x,
+  nuclide,
   isochron = TRUE,
   i2i = TRUE,
   exterr = FALSE,
@@ -361,6 +375,9 @@ stored in \code{x} by the \code{read.data()} function.
 \code{3}: correct the data using an assumed initial
 \eqn{^{230}}Th/\eqn{^{232}}Th-ratio for the detritus (only relevant
 if \code{x$format} is \code{1} or \code{2}).}
+
+\item{nuclide}{a text string corresponding to a valid entry for
+\code{settings('lambda',...)}}
 }
 \value{
 \enumerate{

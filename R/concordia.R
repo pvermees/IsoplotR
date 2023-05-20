@@ -319,8 +319,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                                         y0option=y0option,
                                         sigdig=sigdig,oerr=oerr,...))
     }
-    plot.concordia.line(X2plot,lims=lims,type=type,col=concordia.col,
-                        oerr=oerr,exterr=exterr,ticks=ticks)
+    plotConcordiaLine(X2plot,lims=lims,type=type,col=concordia.col,
+                      oerr=oerr,exterr=exterr,ticks=ticks)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
     else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
@@ -342,8 +342,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
 }
 
 # helper function for plot.concordia
-plot.concordia.line <- function(x,lims,type=1,col='darksalmon',
-                                oerr=3,exterr=TRUE,ticks=5){
+plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
+                              oerr=3,exterr=TRUE,ticks=5){
     if (length(ticks)<2)
         ticks <- prettier(lims$t,type=type,n=ticks,
                           binary=measured.disequilibrium(x$d))
@@ -900,6 +900,6 @@ emptyconcordia <- function(tlim=NULL,oerr=3,type=1,exterr=TRUE,
         stop('Invalid concordia type.')
     }
     lims <- prepare.concordia.line(x=dat,tlim=tlim,type=type,...)
-    plot.concordia.line(x=dat,lims=lims,type=type,col=concordia.col,
-                        oerr=oerr,exterr=exterr,ticks=ticks)
+    plotConcordiaLine(x=dat,lims=lims,type=type,col=concordia.col,
+                      oerr=oerr,exterr=exterr,ticks=ticks)
 }

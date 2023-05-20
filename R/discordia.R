@@ -156,7 +156,6 @@ intersection.misfit.ludwig <- function(t1,t2,disc.slope,d=diseq()){
 intersection.misfit.york <- function(tt,a,b,d=diseq()){
     D <- mclean(tt=tt,d=d)
     # misfit is based on difference in slope in TW space
-    #D$Pb207U235/U - a*D$Pb206U238 - b
     (D$Pb207Pb206-a)*D$Pb206U238 - b
 }
 

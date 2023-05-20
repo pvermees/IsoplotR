@@ -542,6 +542,14 @@ sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
 }
 
 project.concordia <- function(m86,m76,c76,d=diseq()){
+    get.search.limit <- function(a,b,d,m,M){
+        ttt <- seq(from=m,to=M,length.out=100)
+        for (tt in ttt){
+            misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
+            if (misfit<0) return(tt)
+        }
+        return(NA)
+    }
     t68 <- get.Pb206U238.age(1/m86,d=d)[1]
     t76 <- get.Pb207Pb206.age(m76,d=d)[1]
     a <- c76
@@ -586,12 +594,4 @@ project.concordia <- function(m86,m76,c76,d=diseq()){
         out <- t68
     }
     out
-}
-get.search.limit <- function(a,b,d,m,M){
-    ttt <- seq(from=m,to=M,length.out=100)
-    for (tt in ttt){
-        misfit <- intersection.misfit.york(tt,a=a,b=b,d=d)
-        if (misfit<0) return(tt)
-    }
-    return(NA)
 }
