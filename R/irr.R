@@ -1,9 +1,3 @@
-
-
-LLABw <- function(ABw,XY){
-    UVEOslope()
-}
-
 irr.model1 <- function(XY){
     getUVEOslope <- function(XY,A=0,B=0){
         ns <- nrow(XY)
@@ -96,40 +90,115 @@ irr.model1 <- function(XY){
 }
 
 irr.model3 <- function(XY,wtype=1){
-    LLui <- function(ui,A,B,lw,XYi,wtype=1){
+    dLLdui <- function(ui,A,B,lw,XYi,wtype=1){
         Ui <- log(XYi[1])
         Vi <- log(XYi[3])
         vi <- log(exp(A)+B*exp(ui))
-        uvi <- c(ui,vi)
-        UVi <- c(Ui,Vi)
+        w <- exp(lw)
+        DD <- c(Ui-ui,Vi-vi)
         E11 <- (XYi[2]/XYi[1])^2
         E22 <- (XYi[4]/XYi[3])^2
         E12 <- XYi[5]*sqrt(E11*E22)
-        if (wtype==1) disp <- exp(A)*exp(lw)/(exp(A)+B*exp(ui))
-        else if (wtype==2) disp <- exp(ui)*exp(lw)/(exp(A)+B*exp(ui))
+        EE <- rbind(c(E11,E12),c(E12,E22))
+        duidui <- 1
+        dvidui <- B*exp(ui)/(exp(A)+B*exp(ui))
+        duidw <- 0
+        d2uidwdui <- 0
+        if (wtype==1) {
+            dvidw <- exp(A)/(exp(A)+B*exp(ui))
+            d2vidwdui <- -B*exp(A+ui)/(exp(A)+B*exp(ui))^2
+        } else if (wtype==2) {
+            dvidw <- exp(ui)/(exp(A)+B*exp(ui))
+            d2vidwdui <- -exp(A+ui)/(exp(A)+B*exp(ui))^2
+        } else {
+            dvidw <- 0
+            d2vidwdui <- 0
+        }
+        Jw <- rbind(-duidw,-dvidw)
+        Ew <- EE + Jw%*%(w^2)%*%t(Jw)
+        Ow <- solve(Ew)
+        dJwdui <- rbind(-d2uidwdui,-d2vidwdui)
+        dDDdui <- rbind(-duidui,-dvidui)
+        dEwdui <- dJwdui%*%(w^2)%*%t(Jw) + Jw%*%(w^2)%*%t(dJwdui)
+        dLLdui <- sum(diag(Ow%*%dEwdui)) + t(dDDdui)%*%Ow%*%DD +
+            t(DD)%*%Ow%*%dDDdui - t(DD)%*%(Ow%*%dEwdui%*%Ow)%*%DD
+        return(dLLdui)
+    }
+    LLu <- function(u,A,B,lw,XY,wtype=1){
+        U <- log(XY[,1])
+        V <- log(XY[,3])
+        v <- log(exp(A)+B*exp(u))
+        D1 <- U-u
+        D2 <- V-v
+        E11 <- (XY[,2]/XY[,1])^2
+        E22 <- (XY[,4]/XY[,3])^2
+        E12 <- XY[,5]*sqrt(E11*E22)
+        if (wtype==1) disp <- exp(A+lw)/(exp(A)+B*exp(u))
+        else if (wtype==2) disp <- exp(u+lw)/(exp(A)+B*exp(u))
         else disp <- 0
         E22 <- E22 + disp^2
         detE <- E11*E22-E12^2
-        Oi <- rbind(c(E22,-E12),c(-E12,E11))/detE
-        SS <- stats::mahalanobis(x=UVi,center=uvi,cov=Oi,inverted=TRUE)
-        log(detE) + SS
+        O11 <- E22/detE
+        O22 <- E11/detE
+        O12 <- -E12/detE
+        SS <- O11*D1^2 + 2*O12*D1*D2 + O22*D2^2
+        (log(detE) + SS)/2
     }
     getui <- function(i,A,B,lw,XY,wtype=1){
-        ll <- -100
-        if (B<0) ul <- log(-exp(A)/B)-(1e-10)
-        else ul <- 100
-        ui <- optimise(LLui,interval=c(ll,ul),A=A,B=B,lw=lw,XYi=XY[i,],wtype=wtype)
+        XYi <- XY[i,,drop=FALSE]
+        dui <- 1e-1
+        ll <- -10
+        if (B<0) ul <- log(-exp(A)/B)-dui
+        else ul <- 10
+        mid <- min(ul-dui,log(XYi[1]))
+        dLLdui_ll <- dLLdui(ll,A=A,B=B,lw=lw,XYi=XYi,wtype=wtype)
+        dLLdui_mid <- dLLdui(mid,A=A,B=B,lw=lw,XYi=XYi,wtype=wtype)
+        dLLdui_ul <- dLLdui(ul,A=A,B=B,lw=lw,XYi=XYi,wtype=wtype)
+        # check if the gradient crosses zero
+        haslower <- (dLLdui_ll*dLLdui_mid<0)
+        hasupper <- (dLLdui_ul*dLLdui_mid<0)
+        if (haslower){
+            lui <- uniroot(dLLdui,interval=c(ll,mid),A=A,B=B,lw=lw,
+                           XYi=XYi,wtype=wtype)$root
+        }
+        if (hasupper){
+            uui <- uniroot(dLLdui,interval=c(mid,ul),A=A,B=B,lw=lw,
+                           XYi=XYi,wtype=wtype)$root
+        }
+        if (haslower && hasupper){
+            LLlui <- LLu(lui,A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
+            LLuui <- LLu(uui,A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
+            ui <- ifelse(LLlui<LLuui,lui,uui)
+        } else if (haslower){
+            ui <- lui
+        } else if (hasupper){
+            ui <- uui
+        } else { # no uniroot solution => optimise the log-likelihood
+            lfit <- optimise(LLu,interval=c(ll,mid),
+                             A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
+            ufit <- optimise(LLu,interval=c(mid,ul),
+                             A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
+            if (lfit$objective<ufit$objective){
+                ui <- lfit$minimum
+            } else {
+                ui <- ufit$minimum
+            }
+        }
+        return(ui)
     }
     LLABlw <- function(ABlw,XY){
-        us <- sapply(X=1:nrow(XY),FUN=getui,
-                     A=ABlw[1],B=ABlw[2],lw=ABlw[3],XY=XY)
-        sum(unlist(us['objective',]))
+        A <- ABlw[1]
+        B <- ABlw[2]
+        lw <- ABlw[3]
+        us <- sapply(X=1:nrow(XY),FUN=getui,A=A,B=B,lw=lw,XY=XY)
+        LL <- LLu(us,A=A,B=B,lw=lw,XY=XY,wtype=wtype)
+        sum(LL)
     }
     yfit <- york(XY)
     init <- c(A=unname(log(yfit$a[1])),B=unname(yfit$b[1]),lw=0)
-    if (wtype==1) init['lw'] <- yfit$a[2]/yfit$a[1]
-    else if (wtype==2) init['lw'] <- yfit$b[2]/yfit$b[1]
-    else init['lw'] <- -Inf
+    if (wtype==1) init['lw'] <- log(yfit$a[2])
+    else if (wtype==2) init['lw'] <- log(yfit$b[2])
+    else init['lw'] <- -Inf    
     fit <- optim(par=init,fn=LLABlw,XY=XY,hessian=TRUE)
     fit
 }
