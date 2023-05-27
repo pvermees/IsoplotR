@@ -151,24 +151,6 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     out
 }
 
-robustludwig <- function(init,X,anchor,type,model,exterr,control){
-    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=init$lower,upper=init$upper,control=control,
-                        x=X,anchor=anchor,type=type,
-                        model=model,exterr=exterr,hessian=TRUE)
-    NMfit <- stats::optim(init$par,fn=LL.ludwig,x=X,
-                          anchor=anchor,type=type,
-                          model=model,exterr=exterr,hessian=TRUE)
-    if (fit$value>NMfit$value){
-        fit <- NMfit
-        warning('L-BFGS-B did not converge. Switched to Nelder-Mead.')
-    }
-    if (fit$convergence>0){
-        warning('ludwig() did not converge.')
-    }
-    fit
-}
-
 anchormerge <- function(fit,x,anchor=0,type='joint'){
     out <- fit
     inames <- names(fit$par)

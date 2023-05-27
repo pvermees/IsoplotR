@@ -104,10 +104,10 @@ irr.model3 <- function(XY,wtype=1){
         dvidui <- B*exp(ui)/(exp(A)+B*exp(ui))
         duidw <- 0
         d2uidwdui <- 0
-        if (wtype==1) {
+        if (wtype%in%c(1,'a','intercept')) {
             dvidw <- exp(A)/(exp(A)+B*exp(ui))
             d2vidwdui <- -B*exp(A+ui)/(exp(A)+B*exp(ui))^2
-        } else if (wtype==2) {
+        } else if (wtype%in%c(2,'b','slope')) {
             dvidw <- exp(ui)/(exp(A)+B*exp(ui))
             d2vidwdui <- -exp(A+ui)/(exp(A)+B*exp(ui))^2
         } else {
@@ -133,8 +133,8 @@ irr.model3 <- function(XY,wtype=1){
         E11 <- (XY[,2]/XY[,1])^2
         E22 <- (XY[,4]/XY[,3])^2
         E12 <- XY[,5]*sqrt(E11*E22)
-        if (wtype==1) disp <- exp(A+lw)/(exp(A)+B*exp(u))
-        else if (wtype==2) disp <- exp(u+lw)/(exp(A)+B*exp(u))
+        if (wtype%in%c(1,'a','intercept')) disp <- exp(A+lw)/(exp(A)+B*exp(u))
+        else if (wtype%in%c(2,'b','slope')) disp <- exp(u+lw)/(exp(A)+B*exp(u))
         else disp <- 0
         E22 <- E22 + disp^2
         detE <- E11*E22-E12^2
@@ -186,41 +186,40 @@ irr.model3 <- function(XY,wtype=1){
         }
         return(ui)
     }
-    LLABlw <- function(ABlw,XY){
+    LLABlw <- function(ABlw,XY,wtype=1){
         A <- ABlw[1]
         B <- ABlw[2]
         lw <- ABlw[3]
-        us <- sapply(X=1:nrow(XY),FUN=getui,A=A,B=B,lw=lw,XY=XY)
+        us <- sapply(X=1:nrow(XY),FUN=getui,A=A,B=B,lw=lw,XY=XY,wtype=wtype)
         LL <- LLu(us,A=A,B=B,lw=lw,XY=XY,wtype=wtype)
         sum(LL)
     }
     yfit <- york(XY)
     init <- c(A=unname(log(yfit$a[1])),B=unname(yfit$b[1]),lw=0)
-    if (wtype==1) init['lw'] <- log(yfit$a[2])
-    else if (wtype==2) init['lw'] <- log(yfit$b[2])
+    if (wtype%in%c(1,'a','intercept')) init['lw'] <- log(yfit$a[2])
+    else if (wtype%in%c(2,'b','slope')) init['lw'] <- log(yfit$b[2])
     else init['lw'] <- -Inf    
-    fit <- optim(par=init,fn=LLABlw,XY=XY,hessian=TRUE)
+    fit <- optim(par=init,fn=LLABlw,XY=XY,hessian=TRUE,wtype=wtype)
     fit
 }
 
-irr <- function(XY,wtype=0){
-    if (wtype==0){
+irr <- function(XY,wtype=NA){
+    if (is.na(wtype)){
         fit <- irr.model1(XY)
+        J <- diag(2)
     } else {
         fit <- irr.model3(XY,wtype=wtype)
-    }
-    J <- 0*fit$hessian
-    J[1,1] <- exp(fit$par[1])
-    J[2,2] <- 1
-    if (wtype>0) {
         w <- sqrt(exp(fit$par[3]))
+        J <- diag(3)
         J[3,3] <- w/2
     }
+    J[1,1] <- exp(fit$par[1])
+    J[2,2] <- 1
     E <- J %*% inverthess(fit$hessian) %*% t(J)
     out <- list()
     out$a <- c(exp(fit$par[1]),sqrt(E[1,1]))
     out$b <- c(fit$par[2],sqrt(E[2,2]))
     out$cov.ab <- E[1,2]
-    if (wtype>0) out$w <- c(w,sqrt(E[3,3]))
+    if (!is.na(wtype)) out$w <- c(w,sqrt(E[3,3]))
     out
 }
