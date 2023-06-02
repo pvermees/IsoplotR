@@ -7,6 +7,12 @@ regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
     } else if (model==3){
         out <- model3regression(xyz2calc,type=type,wtype=wtype)
         out$wtype <- wtype
+    } else if (model==4 && identical(type,'york')){
+        out <- irr(xyz2calc)
+        out$wtype <- wtype
+    } else if (model==5 && identical(type,'york')){
+        out <- irr(xyz2calc,wtype=wtype)
+        out$wtype <- wtype        
     } else {
         stop('invalid regression model')
     }
@@ -163,10 +169,5 @@ LL.titterington <- function(abABlw,XYZ,wtype='a'){
         (O[,'xx']*DE[,'X-x']+O[,'xy']*DE[,'Y-y']+O[,'xz']*DE[,'Z-z'])*DE[,'X-x']+
         (O[,'xy']*DE[,'X-x']+O[,'yy']*DE[,'Y-y']+O[,'yz']*DE[,'Z-z'])*DE[,'Y-y']+
         (O[,'xz']*DE[,'X-x']+O[,'yz']*DE[,'Y-y']+O[,'zz']*DE[,'Z-z'])*DE[,'Z-z']
-    if (FALSE){
-        scatterplot(XYZ[,c('X','sX','Y','sY','rXY')])
-        points(x,a+b*x)
-        title(sum(log(detE) + maha)/2)
-    }
     sum(log(detE) + maha)/2
 }

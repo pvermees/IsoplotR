@@ -1,4 +1,4 @@
-dLLdui <- function(ui,A,B,lw,XYi,wtype=1){
+dLLdui <- function(ui,A,B,lw,XYi,wtype=NA){
     Ui <- log(XYi[1])
     Vi <- log(XYi[3])
     vi <- log(exp(A)+B*exp(ui))
@@ -33,7 +33,7 @@ dLLdui <- function(ui,A,B,lw,XYi,wtype=1){
     return(dLLdui)
 }
 
-LLu <- function(u,A,B,lw,XY,wtype=1){
+LLu <- function(u,A,B,lw,XY,wtype=NA){
     U <- log(XY[,1])
     V <- log(XY[,3])
     v <- log(exp(A)+B*exp(u))
@@ -55,7 +55,7 @@ LLu <- function(u,A,B,lw,XY,wtype=1){
     return(LL)
 }
 
-getui <- function(i,A,B,lw,XY,wtype=1){
+getui <- function(i,A,B,lw,XY,wtype=NA){
     XYi <- XY[i,,drop=FALSE]
     dui <- 1e-1
     ll <- -10
@@ -65,16 +65,16 @@ getui <- function(i,A,B,lw,XY,wtype=1){
     dLLdui_ll <- dLLdui(ll,A=A,B=B,lw=lw,XYi=XYi,wtype=wtype)
     dLLdui_mid <- dLLdui(mid,A=A,B=B,lw=lw,XYi=XYi,wtype=wtype)
     dLLdui_ul <- dLLdui(ul,A=A,B=B,lw=lw,XYi=XYi,wtype=wtype)
-                                        # check if the gradient crosses zero
+    # check if the gradient crosses zero
     haslower <- (dLLdui_ll*dLLdui_mid<0)
     hasupper <- (dLLdui_ul*dLLdui_mid<0)
     if (haslower){
-        lui <- uniroot(dLLdui,interval=c(ll,mid),A=A,B=B,lw=lw,
-                       XYi=XYi,wtype=wtype)$root
+        lui <- uniroot(dLLdui,interval=c(ll,mid),A=A,B=B,lw=lw,XYi=XYi,
+                       wtype=wtype,tol=.Machine$double.eps^0.5)$root
     }
     if (hasupper){
-        uui <- uniroot(dLLdui,interval=c(mid,ul),A=A,B=B,lw=lw,
-                       XYi=XYi,wtype=wtype)$root
+        uui <- uniroot(dLLdui,interval=c(mid,ul),A=A,B=B,lw=lw,XYi=XYi,
+                       wtype=wtype,tol=.Machine$double.eps^0.5)$root
     }
     if (haslower && hasupper){
         LLlui <- LLu(lui,A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
@@ -97,7 +97,8 @@ getui <- function(i,A,B,lw,XY,wtype=1){
     }
     return(ui)
 }
-LLABlw <- function(ABlw,XY,wtype=1){
+
+LLABlw <- function(ABlw,XY,wtype=NA){
     np <- length(ABlw)
     A <- ABlw[1]
     B <- ABlw[2]
@@ -108,20 +109,22 @@ LLABlw <- function(ABlw,XY,wtype=1){
     sum(LL)
 }
 
-irr <- function(XY,wtype=NA){
+irr <- function(XY,wtype=NA,
+                control=list(maxit=10000,reltol=.Machine$double.eps),...){
     yfit <- york(XY)
-    A <- unname(log(yfit$a[1]))
+    A <- unname(log(abs(yfit$a[1])))
     B <- unname(yfit$b[1])
     if (wtype%in%c(1,'a','intercept')){
         lw <- log(unname(yfit$b[2]))
         init <- c(A,B,lw)
     } else if (wtype%in%c(2,'b','slope')){
-        w <- log(unname(yfit$a[2]))
+        lw <- log(unname(yfit$a[2]))
         init <- c(A,B,lw)
     } else {
         init <- c(A,B)
     }
-    fit <- optim(par=init,fn=LLABlw,XY=XY,hessian=TRUE,wtype=wtype)
+    fit <- optim(par=init,fn=LLABlw,XY=XY,hessian=TRUE,
+                 wtype=wtype,control=control,...)
     np <- length(fit$par)
     if (np>2){
         w <- sqrt(exp(fit$par[3]))
@@ -137,6 +140,6 @@ irr <- function(XY,wtype=NA){
     out$a <- c(exp(fit$par[1]),sqrt(E[1,1]))
     out$b <- c(fit$par[2],sqrt(E[2,2]))
     out$cov.ab <- E[1,2]
-    if (np>2) out$w <- c(w,sqrt(E[3,3]))
+    if (np>2) out$disp <- c('w'=w,'s[w]'=sqrt(E[3,3]))
     out
 }

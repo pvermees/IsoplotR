@@ -1487,7 +1487,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     }
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
-    } else if (fit$model%in%c(3,4)){
+    } else if (fit$model%in%c(3,5)){
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
                                 oerr=oerr,prefix=displabel,units=dispunits)
     }

@@ -475,24 +475,3 @@ contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
     }
     fit
 }
-
-getparscale <- function(fn=LL.york,...){
-    pars <- list(...)
-    dp <- 1e-4
-    lpars <- upars <- pars
-    init <- pars[[1]]
-    np <- length(init)
-    dpdLL <- rep(NA,np)
-    for (i in 1:np){
-        lfact <- ufact <- rep(1,np)
-        ufact[i] <- 1+dp/2
-        lfact[i] <- 1-dp/2
-        upars[[1]] <- init*ufact
-        lpars[[1]] <- init*lfact
-        darg <- upars[[1]][i] - lpars[[1]][i]
-        LLu <- do.call(what=fn,args=upars)
-        LLl <- do.call(what=fn,args=lpars)
-        dpdLL[i] <- abs(darg/(LLu-LLl))
-    }
-    dpdLL/max(dpdLL)
-}
