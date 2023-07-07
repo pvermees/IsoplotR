@@ -69,12 +69,12 @@ getui <- function(i,A,B,lw,XY,wtype=NA){
     haslower <- (dLLdui_ll*dLLdui_mid<0)
     hasupper <- (dLLdui_ul*dLLdui_mid<0)
     if (haslower){
-        lui <- uniroot(dLLdui,interval=c(ll,mid),A=A,B=B,lw=lw,XYi=XYi,
-                       wtype=wtype,tol=.Machine$double.eps^0.5)$root
+        lui <- stats::uniroot(dLLdui,interval=c(ll,mid),A=A,B=B,lw=lw,XYi=XYi,
+                              wtype=wtype,tol=.Machine$double.eps^0.5)$root
     }
     if (hasupper){
-        uui <- uniroot(dLLdui,interval=c(mid,ul),A=A,B=B,lw=lw,XYi=XYi,
-                       wtype=wtype,tol=.Machine$double.eps^0.5)$root
+        uui <- stats::uniroot(dLLdui,interval=c(mid,ul),A=A,B=B,lw=lw,XYi=XYi,
+                              wtype=wtype,tol=.Machine$double.eps^0.5)$root
     }
     if (haslower && hasupper){
         LLlui <- LLu(lui,A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
@@ -85,10 +85,10 @@ getui <- function(i,A,B,lw,XY,wtype=NA){
     } else if (hasupper){
         ui <- uui
     } else { # no uniroot solution => optimise the log-likelihood
-        lfit <- optimise(LLu,interval=c(ll,mid),
-                         A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
-        ufit <- optimise(LLu,interval=c(mid,ul),
-                         A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
+        lfit <- stats::optimise(LLu,interval=c(ll,mid),
+                                A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
+        ufit <- stats::optimise(LLu,interval=c(mid,ul),
+                                A=A,B=B,lw=lw,XY=XYi,wtype=wtype)
         if (lfit$objective<ufit$objective){
             ui <- lfit$minimum
         } else {
