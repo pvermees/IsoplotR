@@ -123,8 +123,8 @@ irr <- function(XY,wtype=NA,
     } else {
         init <- c(A,B)
     }
-    fit <- optim(par=init,fn=LLABlw,XY=XY,hessian=TRUE,
-                 wtype=wtype,control=control,...)
+    fit <- stats::optim(par=init,fn=LLABlw,XY=XY,hessian=TRUE,
+                        wtype=wtype,control=control,...)
     np <- length(fit$par)
     if (np>2){
         w <- sqrt(exp(fit$par[3]))

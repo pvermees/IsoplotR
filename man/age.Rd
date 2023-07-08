@@ -180,8 +180,8 @@ age(x, ...)
 error, or the spontaneous and induced track densities \code{Ns} and
 \code{Ni},
 
-\item a four element vector containing \code{Ar40Ar39},
-\code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
+\item a two element vector containing \code{Ar40Ar39},
+\code{s[Ar40Ar39]},
 
 \item a two element vector containing \code{K40Ca40} and
 \code{s[K40Ca40]},
