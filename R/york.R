@@ -550,6 +550,20 @@ data2york.ThU <- function(x,type=2,generic=TRUE,...){
     out
 }
 
+data2york.isoratios <- function(x){
+    ns <- length(x$labels)
+    out <- matrix(0,nrow=ns,ncol=5)
+    colnames(out) <- c('X','sX','Y','sY','rXY')
+    iX <- 2*(1:ns)-1
+    iY <- 2*(1:ns)
+    out[,'X'] <- x$intercepts[iX]
+    out[,'Y'] <- x$intercepts[iY]
+    out[,'sX'] <- sqrt(diag(x$covmat)[iX])
+    out[,'sY'] <- sqrt(diag(x$covmat)[iY])
+    out[,'rXY'] <- x$covmat[cbind(iX,iY)]/(out[,'sX']*out[,'sY'])
+    out
+}
+
 ThConversionHelper <- function(x){
     ns <- length(x)
     J <- matrix(0,2,2)
