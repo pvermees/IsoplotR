@@ -185,8 +185,9 @@
 #' \code{format} is one of either:
 #'
 #' \describe{
+#' \item{\code{1}:}{\code{X, err[X], Y, err[Y], rho}}
+#' \item{\code{2}:}{\code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
 #' \item{\code{radial} or \code{average}:}{\code{X, err[X]}}
-#' \item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho}}
 #' \item{\code{spectrum}:}{\code{f, X, err[X]}} 
 #' }
 #' 
@@ -841,7 +842,7 @@ getErrCols <- function(gc,format=NA,ierr=1){
     PbPb12 <- (gc=='Pb-Pb' && format%in%(1:2))
     PbPb3 <- (gc=='Pb-Pb' && format==3)
     ThPb12 <- (gc=='Th-Pb' && format%in%(1:2))
-    ThPb3 <- (gc=='Th-Pb' && format==3)    
+    ThPb3 <- (gc=='Th-Pb' && format==3)
     ArAr12 <- (gc=='Ar-Ar' && format%in%(1:2))
     ArAr3 <- (gc=='Ar-Ar' && format==3)
     KCa12 <- (gc=='K-Ca' && format%in%(1:2))
@@ -852,12 +853,13 @@ getErrCols <- function(gc,format=NA,ierr=1){
     ThU12 <- (gc=='Th-U' && format<3)
     ThU34 <- (gc=='Th-U' && format>2)
     radial <- (gc=='other' && identical(format,'radial'))
-    regression <- (gc=='other' && identical(format,'regression'))
+    other1 <- (gc=='other' && format==1)
+    other3 <- (gc=='other' && format==3)
     spectrum <- (gc=='other' && identical(format,'spectrum'))
     average <- (gc=='other' && identical(format,'average'))
-    if (UPb12 | PbPb12 | ThPb12 | ArAr12 | KCa12 | PD12 | ThU34 | regression){
+    if (UPb12 | PbPb12 | ThPb12 | ArAr12 | KCa12 | PD12 | ThU34 | other1){
         cols <- c(2,4)
-    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12){
+    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12 | other3){
         cols <- c(2,4,6)
     } else if (UPb78){
         cols <- seq(from=2,to=8,by=2)
