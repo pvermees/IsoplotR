@@ -186,7 +186,9 @@
 #'
 #' \describe{
 #' \item{\code{1}:}{\code{X, err[X], Y, err[Y], rho}}
-#' \item{\code{2}:}{\code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
+#' \item{\code{3}:}{\code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
+#' \item{\code{4}:}{a \code{n x (n+1)} matrix obtained by prepending a
+#' vector of alternating \code{X,Y}-values to its covariance matrix}
 #' \item{\code{radial} or \code{average}:}{\code{X, err[X]}}
 #' \item{\code{spectrum}:}{\code{f, X, err[X]}} 
 #' }
@@ -859,7 +861,8 @@ getErrCols <- function(gc,format=NA,ierr=1){
     average <- (gc=='other' && identical(format,'average'))
     if (UPb12 | PbPb12 | ThPb12 | ArAr12 | KCa12 | PD12 | ThU34 | other1){
         cols <- c(2,4)
-    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12 | other3){
+    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 |
+               PD3 | UThHe | ThU12 | other3){
         cols <- c(2,4,6)
     } else if (UPb78){
         cols <- seq(from=2,to=8,by=2)

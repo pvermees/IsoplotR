@@ -1,33 +1,27 @@
-LL.ogls <- function(ab,dat){
-    get.fitted.x <- function(dat,a,b){
-        ns <- length(dat$x)/2
-        ix <- 1:ns
-        iy <- (ns+1):(2*ns)
-        X <- matrix(dat$x[ix],ns,1)
-        Y <- matrix(dat$x[iy],ns,1)
-        ry <- Y - a - b * X
-        O <- dat$omega
-        rx <- - solve(O[ix,ix]+2*b*O[ix,iy]+O[iy,iy]*b^2,
-        (O[ix,iy]+b*O[iy,iy])%*%ry)
-        out <- X - rx
-        out
-    }
-    ns <- length(dat$x)/2
+LL.ogls <- function(ab,dat,omega){
     a <- ab[1]
     b <- ab[2]
-    fitted.x <- get.fitted.x(dat,a=a,b=b)
-    rx <- dat$x[1:ns] - fitted.x[1:ns]
-    ry <- dat$x[(ns+1):(2*ns)] - a - b*fitted.x[1:ns]
+    ns <- nrow(dat)/2
+    iX <- seq(from=1,to=2*ns-1,length.out=ns)
+    iY <- seq(from=2,to=2*ns,length.out=ns)
+    X <- dat[iX,1,drop=FALSE]
+    Y <- dat[iY,1,drop=FALSE]
+    rY <- Y - a - b * X
+    AA <- omega[iX,iX]+2*b*omega[iX,iY]+omega[iY,iY]*b^2
+    BB <- (omega[iX,iY]+b*omega[iY,iY])%*%rY
+    rx <- - solve(AA,BB)
+    fitted.x <- X - rx
+    ry <- dat[iY,1] - a - b*fitted.x
     v <- matrix(c(rx,ry),nrow=1,ncol=2*ns)
-    (v %*% dat$omega %*% t(v))
+    (v %*% omega %*% t(v))
 }
 ogls <- function(dat){
     out <- list()
-    yorkdat <- data2york(dat)
-    yfit <- york(yorkdat)
-    out$init <- c(yfit$a[1],yfit$b[1])
-    dat$omega <- solve(dat$covmat)
-    fit <- optim(out$init,LL.ogls,dat=dat,hessian=TRUE)
+    ydat <- data2york.ogls(dat)
+    yfit <- york(ydat)
+    init <- c(yfit$a[1],yfit$b[1])
+    omega <- solve(dat[,-1])
+    fit <- optim(init,LL.ogls,dat=dat,omega=omega,hessian=TRUE)
     covmat <- solve(fit$hessian)
     out$a <- c(fit$par[1],sqrt(covmat[1,1]))
     out$b <- c(fit$par[2],sqrt(covmat[2,2]))

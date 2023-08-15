@@ -549,8 +549,7 @@ data2york.ThU <- function(x,type=2,generic=TRUE,...){
     if (generic) colnames(out) <- c('X','sX','Y','sY','rXY')
     out
 }
-#' @rdname data2york
-#' @export
+
 data2york.isoratios <- function(x){
     ns <- length(x$labels)
     out <- matrix(0,nrow=ns,ncol=5)
@@ -564,17 +563,19 @@ data2york.isoratios <- function(x){
     out[,'rXY'] <- x$covmat[cbind(iX,iY)]/(out[,'sX']*out[,'sY'])
     out
 }
-#' @rdname data2york
-#' @export
 data2york.ogls <- function(dat){
-    ns <- length(dat$x)/2
+    ns <- nrow(dat)/2
     out <- matrix(0,ns,5)
     colnames(out) <- c('X','sX','Y','sY','rXY')
-    out[,1] <- dat$x[1:ns]
-    out[,2] <- sqrt(diag(dat$covmat)[1:ns])
-    out[,3] <- dat$x[(ns+1):(2*ns)]
-    out[,4] <- sqrt(diag(dat$covmat)[(ns+1):(2*ns)])
-    out[,5] <- diag(dat$covmat[(ns+1):(2*ns),1:ns])/(out[,2]*out[,4])
+    iX <- seq(from=1,to=2*ns-1,length.out=ns)
+    iY <- seq(from=2,to=2*ns,length.out=ns)
+    XY <- dat[,1]
+    covmat <- dat[,-1]
+    out[,1] <- XY[iX]
+    out[,2] <- sqrt(diag(covmat[iX,iX]))
+    out[,3] <- XY[iY]
+    out[,4] <- sqrt(diag(covmat[iY,iY]))
+    out[,5] <- diag(covmat[iX,iY])/(out[,2]*out[,4])
     out
 }
 
