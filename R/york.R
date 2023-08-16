@@ -108,12 +108,16 @@ york <- function(x){
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
     out$type <- 'york'
-    # compute MSWD:
-    X2 <- sum(W*(Y-b*X-a)^2)
-    out$df <- nrow(x)-2
-    if (out$df>0){
-        out$mswd <- as.numeric(X2/out$df)
-        out$p.value <- as.numeric(1-stats::pchisq(X2,out$df))
+    out <- append(out,getMSWD(X2=sum(W*(Y-b*X-a)^2),df=nrow(x)-2))
+    out
+}
+
+getMSWD <- function(X2,df){
+    out <- list()
+    out$df <- df
+    if (df>0){
+        out$mswd <- as.numeric(X2/df)
+        out$p.value <- as.numeric(1-stats::pchisq(X2,df))
     } else {
         out$mswd <- 1
         out$p.value <- 1
@@ -204,16 +208,34 @@ data2york <- function(x,...){ UseMethod("data2york",x) }
 #' @rdname data2york
 #' @export
 data2york.default <- function(x,format=1,...){
-    cnames <- c('X','sX','Y','sY','rXY')
-    if (format==3){
-        X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
-                                       x[,4],x[,5],x[,6]))
-        opt <- NULL
+    if (format==6){
+        ns <- nrow(x)/2
+        covmat <- x[,-1]
+        iX <- seq(from=1,to=2*ns-1,by=2)
+        iY <- iX+1
+        sX <- sqrt(diag(covmat)[iX])
+        sY <- sqrt(diag(covmat)[iY])
+        rXY <- diag(covmat[iX,iY])/(sX*sY)
+        yd <- cbind(x[iX,1],sX,x[iY,1],sY,rXY)
+        out <- data2york(yd)
     } else {
-        X <- x
-        opt <- 5
+        cnames <- c('X','sX','Y','sY','rXY')
+        if (format==3){
+            X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
+                                           x[,4],x[,5],x[,6]))
+            opt <- NULL
+        } else {
+            X <- x
+            opt <- 5
+        }
+        out <- insert.data(x=X,cnames=cnames,opt=opt)
     }
-    insert.data(x=X,cnames=cnames,opt=opt)
+    out
+}
+#' @rdname data2york
+#' @export
+data2york.other <- function(x,...){
+    data2york(x$x,format=x$format)
 }
 
 #' @param option one of
@@ -547,35 +569,6 @@ data2york.ThU <- function(x,type=2,generic=TRUE,...){
         stop('Incorrect data format and/or plot type')
     }
     if (generic) colnames(out) <- c('X','sX','Y','sY','rXY')
-    out
-}
-
-data2york.isoratios <- function(x){
-    ns <- length(x$labels)
-    out <- matrix(0,nrow=ns,ncol=5)
-    colnames(out) <- c('X','sX','Y','sY','rXY')
-    iX <- 2*(1:ns)-1
-    iY <- 2*(1:ns)
-    out[,'X'] <- x$intercepts[iX]
-    out[,'Y'] <- x$intercepts[iY]
-    out[,'sX'] <- sqrt(diag(x$covmat)[iX])
-    out[,'sY'] <- sqrt(diag(x$covmat)[iY])
-    out[,'rXY'] <- x$covmat[cbind(iX,iY)]/(out[,'sX']*out[,'sY'])
-    out
-}
-data2york.ogls <- function(dat){
-    ns <- nrow(dat)/2
-    out <- matrix(0,ns,5)
-    colnames(out) <- c('X','sX','Y','sY','rXY')
-    iX <- seq(from=1,to=2*ns-1,length.out=ns)
-    iY <- seq(from=2,to=2*ns,length.out=ns)
-    XY <- dat[,1]
-    covmat <- dat[,-1]
-    out[,1] <- XY[iX]
-    out[,2] <- sqrt(diag(covmat[iX,iX]))
-    out[,3] <- XY[iY]
-    out[,4] <- sqrt(diag(covmat[iY,iY]))
-    out[,5] <- diag(covmat[iX,iY])/(out[,2]*out[,4])
     out
 }
 

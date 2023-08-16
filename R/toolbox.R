@@ -359,12 +359,17 @@ blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
 
 '%ni%' <- function(x,y)!('%in%'(x,y))
 
-clear <- function(x,...){
+clear <- function(x,...,OGLS=FALSE){
     i <- unlist(list(...))
-    if (is.matrix(x)) sn <- 1:nrow(x)
-    else sn <- 1:length(x)
-    if (length(i)>0) out <- subset(x,subset=sn%ni%i)
-    else out <- x
+    if (is.matrix(x)) ns <- ifelse(OGLS,nrow(x)/2,nrow(x))
+    else ns <- length(x)
+    keep <- (1:ns)%ni%i
+    if (length(i)>0){
+        if (is.matrix(x) && OGLS) out <- subset_ogls(x,subset=keep)
+        else out <- subset(x,subset=keep)
+    } else {
+        out <- x
+    }
     out
 }
 

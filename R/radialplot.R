@@ -446,6 +446,22 @@ radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,sigdig=2,
                col=col,markers=markers,k=k,np=np,exterr=FALSE,Th0i=Th0i,oerr=oerr,
                units=' ka',hide=hide,omit=omit,omit.col=omit.col,...)
 }
+#' @rdname radialplot
+#' @export
+radialplot.other <- function(x,from=NA,to=NA,z0=NA,transformation='log',
+                             sigdig=2,show.numbers=FALSE,pch=21,levels=NA,
+                             clabel="",bg=c("yellow","red"),col='black',
+                             k=0,np=3,markers=NULL,oerr=3,units='',
+                             hide=NA,omit=NULL,omit.col=NA,...){
+    if (x$format==2) X <- x$x
+    else if (x$format==3) X <- x$x[,c(2,3)]
+    else stop("radial plots are not available for this format")
+    radialplot(X,from=from,to=to,z0=z0,transformation=transformation,
+               sigdig=sigdig,show.numbers=show.numbers,pch=pch,levels=levels,
+               clabel=clabel,bg=bg,col=col,k=k,np=np,markers=markers,
+               oerr=oerr,units=units,hide=hide,omit=omit,omit.col=omit.col,...)
+}
+
 age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',type=4,
                        cutoff.76=1100,cutoff.disc=discfilter(),
                        show.numbers=FALSE,pch=21,levels=NA,sigdig=2,

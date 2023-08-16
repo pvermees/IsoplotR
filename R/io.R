@@ -185,12 +185,13 @@
 #' \code{format} is one of either:
 #'
 #' \describe{
-#' \item{\code{1}:}{\code{X, err[X], Y, err[Y], rho}}
-#' \item{\code{3}:}{\code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
-#' \item{\code{4}:}{a \code{n x (n+1)} matrix obtained by prepending a
+#' \item{\code{1}:}{\code{X}}
+#' \item{\code{2}:}{\code{X, err[X]}}
+#' \item{\code{3}:}{\code{f, X, err[X]}} 
+#' \item{\code{4}:}{\code{X, err[X], Y, err[Y], rho}}
+#' \item{\code{5}:}{\code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
+#' \item{\code{6}:}{a \code{n x (n+1)} matrix obtained by prepending a
 #' vector of alternating \code{X,Y}-values to its covariance matrix}
-#' \item{\code{radial} or \code{average}:}{\code{X, err[X]}}
-#' \item{\code{spectrum}:}{\code{f, X, err[X]}} 
 #' }
 #' 
 #' @param ierr indicates whether the analytical uncertainties of the
@@ -264,7 +265,7 @@
 #' #  four 'other' files (LudwigMixture.csv, LudwigSpectrum.csv,
 #' #  LudwigMean.csv, LudwigKDE.csv)
 #' f8 <- system.file("LudwigMixture.csv",package="IsoplotR")
-#' d8 <- read.data(f8,method="other")
+#' d8 <- read.data(f8,method="other",format=2)
 #' radialplot(d8)
 #'
 #' @rdname read.data
@@ -777,12 +778,20 @@ as.detritals <- function(x){
     }
     out
 }
-as.other <- function(x,format='generic',ierr=1){
+as.other <- function(x,format=NULL,ierr=1){
+    out <- list()
+    class(out) <- "other"
+    out$format <- format
     nc <- ncol(x)
     has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
     if (has.header) x <- x[-1,]
     X <- matrix(as.numeric(x),ncol=nc)
-    errconvert(X,gc='other',format=format,ierr=ierr)
+    if (format==6){
+        out$x <- X
+    } else {
+        out$x <- errconvert(X,gc='other',format=format,ierr=ierr)
+    }
+    out
 }
 
 # x = a numerical vector, br = length of the preamble with parameters
@@ -854,23 +863,21 @@ getErrCols <- function(gc,format=NA,ierr=1){
     UThHe <- (gc=='U-Th-He')
     ThU12 <- (gc=='Th-U' && format<3)
     ThU34 <- (gc=='Th-U' && format>2)
-    radial <- (gc=='other' && identical(format,'radial'))
-    other1 <- (gc=='other' && format==1)
+    other2 <- (gc=='other' && format==2)
     other3 <- (gc=='other' && format==3)
-    spectrum <- (gc=='other' && identical(format,'spectrum'))
-    average <- (gc=='other' && identical(format,'average'))
-    if (UPb12 | PbPb12 | ThPb12 | ArAr12 | KCa12 | PD12 | ThU34 | other1){
+    other4 <- (gc=='other' && format==4)
+    other5 <- (gc=='other' && format==5)
+    if (UPb12 | PbPb12 | ThPb12 | ArAr12 | KCa12 | PD12 | ThU34 | other4){
         cols <- c(2,4)
-    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 |
-               PD3 | UThHe | ThU12 | other3){
+    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12 | other5){
         cols <- c(2,4,6)
     } else if (UPb78){
         cols <- seq(from=2,to=8,by=2)
     } else if (UPb6){
         cols <- seq(from=2,to=12,by=2)
-    } else if (radial || average){
+    } else if (other2){
         cols <- 2
-    } else if (spectrum){
+    } else if (other3){
         cols <- 3
     } else {
         cols <- NULL

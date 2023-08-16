@@ -1,5 +1,5 @@
 regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
-    xyz2calc <- clear(xyz,omit)
+    xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
     if (model==1){
         out <- model1regression(xyz2calc,type=type)
     } else if (model==2){
@@ -12,13 +12,14 @@ regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
         out$wtype <- wtype
     } else if (model==5 && identical(type,'york')){
         out <- irr(xyz2calc,wtype=wtype)
-        out$wtype <- wtype        
+        out$wtype <- wtype
     } else {
         stop('invalid regression model')
     }
     out$xyz <- xyz
     out$model <- model
     out$n <- nrow(xyz2calc)
+    if (identical(type,'ogls')) out$n <- out$n/2
     out$omit <- omit
     out
 }
@@ -28,6 +29,8 @@ model1regression <- function(xyz,type='york'){
         out <- york(xyz)
     } else if (identical(type,'titterington')){
         out <- titterington(xyz)
+    } else if (identical(type,'ogls')){
+        out <- ogls(xyz)
     } else {
         stop('invalid output type for model 1 regression')
     }
@@ -44,6 +47,8 @@ model2regression <- function(xyz,type='york'){
     } else if (identical(type,'titterington')){
         out <- tls(xyz[,c('X','Y','Z')])
         out$df <- 2*nrow(xyz)-4
+    } else if (identical(type,'ogls')){
+        stop('not yet implemented')
     } else {
         stop('invalid output type for model 2 regression')
     }
@@ -74,6 +79,8 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
                               upper=upper,XYZ=xyz,wtype=wtype)
         out$cov <- E <- inverthess(out$hessian)
+    } else if (identical(type,'titterington')){
+        stop('not yet implemented')
     } else {
         stop('invalid output type for model 3 regression')
     }
