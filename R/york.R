@@ -235,7 +235,11 @@ data2york.default <- function(x,format=1,...){
 #' @rdname data2york
 #' @export
 data2york.other <- function(x,...){
-    data2york(x$x,format=x$format)
+    if (x$format==4) out <- data2york(x$x,format=1)
+    else if (x$format==5) out <- data2york(x$x,format=3)
+    else if (x$format==6) out <- data2york(x$x,format=6)
+    else stop('data2york is not available for this data format')
+    out
 }
 
 #' @param option one of

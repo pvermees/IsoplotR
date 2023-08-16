@@ -134,6 +134,21 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
     }
     invisible(X)
 }
+#' @rdname kde
+#' @export
+kde.other <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
+                      n=512,plot=TRUE,rug=TRUE,xlab="age [Ma]",
+                      ylab="",kde.col=rgb(1,0,1,0.6),
+                      hist.col=rgb(0,1,0,0.2),show.hist=TRUE,
+                      bty='n',binwidth=NA,hide=NULL,...){
+    if (x$format<3) X <- x$x[,1]
+    else if (x$format==3) X <- x$x[,2]
+    else stop("KDEs are not available for this format")
+    kde(X,from=from,to=to,bw=bw,adaptive=adaptive,log=log,
+        n=n,plot=plot,rug=rug,xlab=xlab,ylab=ylab,kde.col=kde.col,
+        hist.col=hist.col,show.hist=show.hist,bty=bty,
+        binwidth=binwidth,hide=hide,...)
+}
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the

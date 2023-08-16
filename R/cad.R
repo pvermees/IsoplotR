@@ -68,6 +68,15 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 }
 #' @rdname cad
 #' @export
+cad.other <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
+                      col='black',hide=NULL,...){
+    if (x$format<3) X <- x$x[,1]
+    else if (x$format==3) X <- x$x[,2]
+    else stop("CADs are not available for this format")
+    cad(X,pch=pch,verticals=verticals,xlab=xlab,col=col,hide=hide,...)
+}
+#' @rdname cad
+#' @export
 cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
                           col='rainbow',hide=NULL,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)

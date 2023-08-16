@@ -181,8 +181,7 @@
 #' or more U/Ca-ratios or U-concentration measurements (in ppm) and
 #' their analytical uncertainties.}  }
 #'
-#' if \code{method='other'}, \code{x} is read as a table, unless
-#' \code{format} is one of either:
+#' if \code{method='other'}, then \code{format} is one of either:
 #'
 #' \describe{
 #' \item{\code{1}:}{\code{X}}
