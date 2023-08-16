@@ -3,6 +3,7 @@
 \name{data2york}
 \alias{data2york}
 \alias{data2york.default}
+\alias{data2york.other}
 \alias{data2york.UPb}
 \alias{data2york.ArAr}
 \alias{data2york.ThPb}
@@ -16,6 +17,8 @@
 data2york(x, ...)
 
 \method{data2york}{default}(x, format = 1, ...)
+
+\method{data2york}{other}(x, ...)
 
 \method{data2york}{UPb}(x, option = 1, tt = 0, ...)
 

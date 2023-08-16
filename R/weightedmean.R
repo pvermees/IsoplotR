@@ -240,6 +240,25 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
     }
     invisible(out)
 }
+#' @rdname weightedmean
+#' @export
+weightedmean.other <- function(x,from=NA,to=NA,random.effects=FALSE,
+                                 detect.outliers=TRUE,plot=TRUE,
+                                 levels=NA,clabel="",
+                                 rect.col=c("#00FF0080","#FF000080"),
+                                 outlier.col="#00FFFF80",sigdig=2,
+                                 oerr=3,ranked=FALSE,hide=NULL,
+                                 omit=NULL,omit.col=NA,...){
+    if (x$format==2) X <- x$x
+    else if (x$format==3) X <- x$x[,c(2,3)]
+    else stop("Weighted mean plots are not available for this format")
+    weightedmean.default(X,from=from,to=to,random.effects=random.effects,
+                         detect.outliers=detect.outliers,plot=plot,
+                         levels=levels,clabel=clabel,rect.col=rect.col,
+                         outlier.col=outlier.col,sigdig=sigdig,
+                         oerr=oerr,ranked=ranked,hide=hide,
+                         omit=omit,omit.col=omit.col,...)
+}
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the

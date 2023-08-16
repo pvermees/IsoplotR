@@ -3,6 +3,7 @@
 \name{cad}
 \alias{cad}
 \alias{cad.default}
+\alias{cad.other}
 \alias{cad.detritals}
 \alias{cad.UPb}
 \alias{cad.PbPb}
@@ -21,6 +22,16 @@
 cad(x, ...)
 
 \method{cad}{default}(
+  x,
+  pch = NA,
+  verticals = TRUE,
+  xlab = "age [Ma]",
+  col = "black",
+  hide = NULL,
+  ...
+)
+
+\method{cad}{other}(
   x,
   pch = NA,
   verticals = TRUE,

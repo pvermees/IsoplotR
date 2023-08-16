@@ -3,6 +3,7 @@
 \name{weightedmean}
 \alias{weightedmean}
 \alias{weightedmean.default}
+\alias{weightedmean.other}
 \alias{weightedmean.UPb}
 \alias{weightedmean.PbPb}
 \alias{weightedmean.ThU}
@@ -20,6 +21,26 @@
 weightedmean(x, ...)
 
 \method{weightedmean}{default}(
+  x,
+  from = NA,
+  to = NA,
+  random.effects = FALSE,
+  detect.outliers = TRUE,
+  plot = TRUE,
+  levels = NA,
+  clabel = "",
+  rect.col = c("#00FF0080", "#FF000080"),
+  outlier.col = "#00FFFF80",
+  sigdig = 2,
+  oerr = 3,
+  ranked = FALSE,
+  hide = NULL,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
+
+\method{weightedmean}{other}(
   x,
   from = NA,
   to = NA,

@@ -21,7 +21,9 @@
 #' @return a list of the slope and intercept of the best fit line as
 #'     well as their standard errors and covariance.
 #' @examples
-#' @details
+#' fn <- system.file('UW137.csv',package='IsoplotR')
+#' UW137 <- read.data(fn,method='other',format=6)
+#' fit <- ogls(UW137)
 #' @rdname ogls
 #' @export
 ogls <- function(x,...){ UseMethod("ogls",x) }
@@ -33,7 +35,7 @@ ogls.default <- function(x,model=1,...){
     yfit <- york(ydat)
     init <- c(yfit$a[1],yfit$b[1])
     omega <- solve(x[,-1])
-    fit <- optim(init,LL.ogls,dat=x,omega=omega,hessian=TRUE)
+    fit <- stats::optim(init,LL.ogls,dat=x,omega=omega,hessian=TRUE)
     covmat <- solve(fit$hessian)
     out$a <- c('a'=unname(fit$par[1]),'s[a]'=unname(sqrt(covmat[1,1])))
     out$b <- c('b'=unname(fit$par[2]),'s[b]'=unname(sqrt(covmat[2,2])))

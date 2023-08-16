@@ -3,6 +3,7 @@
 \name{radialplot}
 \alias{radialplot}
 \alias{radialplot.default}
+\alias{radialplot.other}
 \alias{radialplot.fissiontracks}
 \alias{radialplot.UPb}
 \alias{radialplot.PbPb}
@@ -20,6 +21,30 @@
 radialplot(x, ...)
 
 \method{radialplot}{default}(
+  x,
+  from = NA,
+  to = NA,
+  z0 = NA,
+  transformation = "log",
+  sigdig = 2,
+  show.numbers = FALSE,
+  pch = 21,
+  levels = NA,
+  clabel = "",
+  bg = c("yellow", "red"),
+  col = "black",
+  k = 0,
+  np = 3,
+  markers = NULL,
+  oerr = 3,
+  units = "",
+  hide = NA,
+  omit = NULL,
+  omit.col = NA,
+  ...
+)
+
+\method{radialplot}{other}(
   x,
   from = NA,
   to = NA,

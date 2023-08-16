@@ -121,7 +121,6 @@
 #' @rdname agespectrum
 #' @export
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
-
 #' @rdname agespectrum
 #' @export
 agespectrum.default <- function(x,oerr=3,plateau=TRUE,
@@ -130,7 +129,7 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
                                 xlab='cumulative fraction',
-                                ylab='age [Ma]',hide=NULL,omit=NULL,...){
+                                ylab='X',hide=NULL,omit=NULL,...){
     XY <- plot.spectrum.axes(x=x,oerr=oerr,xlab=xlab,
                              ylab=ylab,hide=hide,...)
     pc <- get.plateau.colours(x=x,levels=levels,plateau=plateau,
@@ -144,6 +143,23 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
     plot_spectrum(XY=XY,col=pc$col)
     colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
+}
+#' @rdname agespectrum
+#' @export
+agespectrum.other <- function(x,oerr=3,plateau=TRUE,
+                              random.effects=FALSE,levels=NA,clabel="",
+                              plateau.col=c("#00FF0080","#FF000080"),
+                              non.plateau.col="#00FFFF80",
+                              sigdig=2,line.col='red',lwd=2,
+                              xlab='cumulative fraction',
+                              ylab='X',hide=NULL,omit=NULL,...){
+    if (x$format==3) X <- x$x
+    else stop("Age spectrum plots are not available for this format")
+    agespectrum(X,oerr=oerr,plateau=plateau,random.effects=random.effects,
+                levels=levels,clabel=clabel,plateau.col=plateau.col,
+                non.plateau.col=non.plateau.col,sigdig=sigdig,
+                line.col=line.col,lwd=lwd,xlab=xlab,ylab=ylab,
+                hide=hide,omit=omit,...)
 }
 
 #' @param i2i `isochron to intercept': calculates the initial (aka
