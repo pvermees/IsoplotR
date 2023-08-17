@@ -782,9 +782,9 @@ as.other <- function(x,format=NULL,ierr=1){
     class(out) <- "other"
     out$format <- format
     nc <- ncol(x)
-    has.header <- is.na(suppressWarnings(as.numeric(x[1,1])))
-    if (has.header) x <- x[-1,]
-    X <- matrix(as.numeric(x),ncol=nc)
+    nr <- nrow(x)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,1,nr,nc)
     if (format==6){
         out$x <- X
     } else {

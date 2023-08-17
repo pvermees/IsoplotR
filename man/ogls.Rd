@@ -4,13 +4,13 @@
 \alias{ogls}
 \alias{ogls.default}
 \alias{ogls.other}
-\title{Omnivariant Generalized Least-Squares Regression}
+\title{Omnivariant Generalised Least-Squares Regression}
 \usage{
 ogls(x, ...)
 
-\method{ogls}{default}(x, model = 1, ...)
+\method{ogls}{default}(x, random.effects = NA, ...)
 
-\method{ogls}{other}(x, model = 1, ...)
+\method{ogls}{other}(x, random.effects = NA, ...)
 }
 \arguments{
 \item{x}{either a \code{n x (n+1)} matrix obtained by prepending a
@@ -19,14 +19,6 @@ matrix OR an object of class \code{other} with
 \code{x$format=6}.}
 
 \item{...}{optional arguments}
-
-\item{model}{construct the isochron using either:
-
-\code{1}: Ordinary OGLS regression
-
-\code{2}: Total least squares regression
-
-\code{3}: OGLS regression with an overdispersion term}
 }
 \value{
 a list of the slope and intercept of the best fit line as

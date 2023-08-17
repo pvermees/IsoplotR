@@ -327,9 +327,9 @@ subset_helper <- function(x,...){
 }
 subset_ogls <- function(x,subset){
     ns <- nrow(x)/2
-    iX <- seq(from=1,to=2*ns-1,by=2)[subset]
-    iY <- (iX+1)[subset]
-    i <- sort(c(iX,iY))
+    iX <- (1:ns)[subset]
+    iY <- ((ns+1):(2*ns))[subset]
+    i <- c(iX,iY)
     x$x[i,i+1]
 }
 

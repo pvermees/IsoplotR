@@ -211,8 +211,8 @@ data2york.default <- function(x,format=1,...){
     if (format==6){
         ns <- nrow(x)/2
         covmat <- x[,-1]
-        iX <- seq(from=1,to=2*ns-1,by=2)
-        iY <- iX+1
+        iX <- 1:ns
+        iY <- (ns+1):(2*ns)
         sX <- sqrt(diag(covmat)[iX])
         sY <- sqrt(diag(covmat)[iY])
         rXY <- diag(covmat[iX,iY])/(sX*sY)
