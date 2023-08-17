@@ -330,7 +330,7 @@ subset_ogls <- function(x,subset){
     iX <- (1:ns)[subset]
     iY <- ((ns+1):(2*ns))[subset]
     i <- c(iX,iY)
-    x$x[i,i+1]
+    x[i,c(1,i+1)]
 }
 
 mediand <- function(d){
