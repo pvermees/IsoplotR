@@ -784,7 +784,7 @@ as.other <- function(x,format=NULL,ierr=1){
     nc <- ncol(x)
     nr <- nrow(x)
     if (is.numeric(x)) X <- x
-    else X <- shiny2matrix(x,1,nr,nc)
+    else X <- shiny2matrix(x,2,nr,nc)
     if (format==6){
         out$x <- X
     } else {
