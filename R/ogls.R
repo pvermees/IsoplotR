@@ -21,28 +21,43 @@
 ogls <- function(x,...){ UseMethod("ogls",x) }
 #' @rdname ogls
 #' @export
-ogls.default <- function(x,random.effects=NA,...){
+ogls.default <- function(x,random.effects=FALSE,...){
     out <- list()
     ydat <- data2york(x=x,format=6)
     yfit <- york(ydat)
-    init <- c(yfit$a[1],yfit$b[1])
-    omega <- solve(x[,-1])
-    fit <- stats::optim(init,LL.ogls,dat=x,omega=omega,hessian=TRUE)
-    covmat <- solve(fit$hessian)
-    out$a <- c('a'=unname(fit$par[1]),'s[a]'=unname(sqrt(covmat[1,1])))
-    out$b <- c('b'=unname(fit$par[2]),'s[b]'=unname(sqrt(covmat[2,2])))
+    ns <- nrow(x)/2
+    if (random.effects){
+        init <- c(yfit$a[1],yfit$b[1],lw=unname(log(yfit$a[2])))
+        out <- stats::optim(init,LLw.ogls,dat=x,hessian=TRUE)
+        SS <- LLw.ogls(out$par,dat=x,LL=FALSE)
+        df <- ns-3
+    } else {
+        init <- c(yfit$a[1],yfit$b[1])
+        omega <- solve(x[,-1])
+        out <- stats::optim(init,LL.ogls,dat=x,omega=omega,hessian=TRUE)
+        SS <- LL.ogls(out$par,dat=x,omega=omega,LL=FALSE)
+        df <- ns-2
+    }
+    covmat <- solve(out$hessian)
+    out$a <- c('a'=unname(out$par[1]),'s[a]'=unname(sqrt(covmat[1,1])))
+    out$b <- c('b'=unname(out$par[2]),'s[b]'=unname(sqrt(covmat[2,2])))
+    if (random.effects){
+        w <- exp(out$par[3])
+        sw <- w*sqrt(covmat[3,3])
+        out$w <- c('w'=unname(w),'s[w]'=unname(sw))
+    }
     out$cov.ab <- covmat[1,2]
     out$type <- "ogls"
-    out <- append(out,getMSWD(X2=fit$value,df=nrow(x)/2-2))
+    out <- append(out,getMSWD(X2=SS,df=df))
     out
 }
 #' @rdname ogls
 #' @export
-ogls.other <- function(x,random.effects=NA,...){
+ogls.other <- function(x,random.effects=FALSE,...){
     ogls(x=x$x,random.effects=random.effects)
 }
 
-LL.ogls <- function(ab,dat,omega){
+LL.ogls <- function(ab,dat,omega,LL=TRUE){
     a <- ab[1]
     b <- ab[2]
     ns <- nrow(dat)/2
@@ -57,5 +72,20 @@ LL.ogls <- function(ab,dat,omega){
     x <- X - rx
     ry <- dat[iY,1] - a - b*x
     v <- matrix(c(rx,ry),nrow=1,ncol=2*ns)
-    (v %*% omega %*% t(v))
+    SS <- (v %*% omega %*% t(v))
+    if (LL) {
+        out <- (log(2*pi) - determinant(omega,logarithmic=TRUE)$modulus + SS)/2
+    } else {
+        out <- SS
+    }
+    out
+}
+LLw.ogls <- function(ablw,dat,LL=TRUE){
+    w <- exp(ablw[3])
+    ns <- nrow(dat)/2
+    iX <- 1:ns
+    iY <- (ns+1):(2*ns)
+    E <- dat[,-1]
+    diag(E[iY,iY]) <- diag(E[iY,iY]) + w^2
+    LL.ogls(ab=ablw[-3],dat=dat,omega=solve(E),LL=LL)
 }
