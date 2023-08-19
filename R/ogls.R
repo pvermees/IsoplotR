@@ -57,7 +57,7 @@ ogls.other <- function(x,random.effects=FALSE,...){
     ogls(x=x$x,random.effects=random.effects)
 }
 
-LL.ogls <- function(ab,dat,omega,LL=TRUE){
+LL.ogls <- function(ab,dat,omega,LL=TRUE,plot=FALSE){
     a <- ab[1]
     b <- ab[2]
     ns <- nrow(dat)/2
@@ -66,7 +66,7 @@ LL.ogls <- function(ab,dat,omega,LL=TRUE){
     X <- dat[iX,1,drop=FALSE]
     Y <- dat[iY,1,drop=FALSE]
     rY <- Y - a - b * X
-    AA <- omega[iX,iX] + 2*b*omega[iX,iY] + omega[iY,iY]*b^2
+    AA <- omega[iX,iX] + b*omega[iX,iY] + b*omega[iY,iX] + omega[iY,iY]*b^2
     BB <- (omega[iX,iY]+b*omega[iY,iY])%*%rY
     rx <- - solve(AA,BB)
     x <- X - rx
@@ -77,6 +77,11 @@ LL.ogls <- function(ab,dat,omega,LL=TRUE){
         out <- (log(2*pi) - determinant(omega,logarithmic=TRUE)$modulus + SS)/2
     } else {
         out <- SS
+    }
+    if (plot){
+        plot(X,Y)
+        abline(a,b)
+        title(out)
     }
     out
 }

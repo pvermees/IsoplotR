@@ -30,7 +30,7 @@ model1regression <- function(xyz,type='york'){
     } else if (identical(type,'titterington')){
         out <- titterington(xyz)
     } else if (identical(type,'ogls')){
-        out <- ogls(xyz)
+        out <- ogls(xyz,random.effects=FALSE)
     } else {
         stop('invalid output type for model 1 regression')
     }
@@ -81,6 +81,9 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         out$cov <- E <- inverthess(out$hessian)
     } else if (identical(type,'titterington')){
         stop('not yet implemented')
+    } else if (identical(type,'ogls')){
+        out <- ogls(xyz,random.effects=TRUE)
+        out$cov <- E <- inverthess(out$hessian)
     } else {
         stop('invalid output type for model 3 regression')
     }
