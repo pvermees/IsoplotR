@@ -48,7 +48,8 @@ model2regression <- function(xyz,type='york'){
         out <- tls(xyz[,c('X','Y','Z')])
         out$df <- 2*nrow(xyz)-4
     } else if (identical(type,'ogls')){
-        stop('not yet implemented')
+        yd <- data2york(xyz,format=6)
+        out <- model2regression(yd,type='york')
     } else {
         stop('invalid output type for model 2 regression')
     }

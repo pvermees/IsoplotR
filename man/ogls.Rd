@@ -8,9 +8,9 @@
 \usage{
 ogls(x, ...)
 
-\method{ogls}{default}(x, random.effects = NA, ...)
+\method{ogls}{default}(x, random.effects = FALSE, ...)
 
-\method{ogls}{other}(x, random.effects = NA, ...)
+\method{ogls}{other}(x, random.effects = FALSE, ...)
 }
 \arguments{
 \item{x}{either a \code{n x (n+1)} matrix obtained by prepending a
@@ -19,6 +19,9 @@ matrix OR an object of class \code{other} with
 \code{x$format=6}.}
 
 \item{...}{optional arguments}
+
+\item{random.effects}{logical. If \code{TRUE}, quantifies the
+overdispersion associated with the y-intercept of the data.}
 }
 \value{
 a list of the slope and intercept of the best fit line as

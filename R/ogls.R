@@ -8,7 +8,8 @@
 #'     vector of alternating \code{X,Y}-values to its covariance
 #'     matrix OR an object of class \code{other} with
 #'     \code{x$format=6}.
-#' 
+#' @param random.effects logical. If \code{TRUE}, quantifies the
+#'     overdispersion associated with the y-intercept of the data.
 #' @param ... optional arguments
 #' @return a list of the slope and intercept of the best fit line as
 #'     well as their standard errors and covariance.
@@ -57,7 +58,7 @@ ogls.other <- function(x,random.effects=FALSE,...){
     ogls(x=x$x,random.effects=random.effects)
 }
 
-LL.ogls <- function(ab,dat,omega,LL=TRUE,plot=FALSE){
+LL.ogls <- function(ab,dat,omega,LL=TRUE){
     a <- ab[1]
     b <- ab[2]
     ns <- nrow(dat)/2
@@ -73,15 +74,10 @@ LL.ogls <- function(ab,dat,omega,LL=TRUE,plot=FALSE){
     ry <- dat[iY,1] - a - b*x
     v <- matrix(c(rx,ry),nrow=1,ncol=2*ns)
     SS <- (v %*% omega %*% t(v))
-    if (LL) {
+    if (LL){
         out <- (log(2*pi) - determinant(omega,logarithmic=TRUE)$modulus + SS)/2
     } else {
         out <- SS
-    }
-    if (plot){
-        plot(X,Y)
-        abline(a,b)
-        title(out)
     }
     out
 }

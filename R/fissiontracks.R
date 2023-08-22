@@ -286,20 +286,20 @@ get.ICP.age <- function(Ns,A,UsU,zeta){
 }
 
 LL.FT <- function(par,y,m){
-    mu <- par[1]
-    sigma <- exp(par[2])
     LL <- 0
-    ns <- length(y)
-    for (i in 1:ns){
-        LL <- LL + log(stats::integrate(pyumu,lower=mu-5*sigma,
-                                        upper=mu+5*sigma,mu=mu,
-                                        sigma=sigma,m=m[i],y=y[i])$value)
+    for (i in seq_along(y)){
+        p <- pyumu(mu=par[1],sigma=exp(par[2]),mi=m[i],yi=y[i])
+        LL <- LL + log(p)
     }
     LL
 }
-pyumu <- function(B,mu,sigma,m,y){
-    theta <- exp(B)/(1+exp(B))
-    stats::dbinom(y,m,theta)*stats::dnorm(B,mean=mu,sd=sigma)
+pyumu <- function(mu,sigma,mi,yi){
+    integrand <- function(B,mu,sigma,mi,yi){
+        theta <- exp(B)/(1+exp(B))
+        stats::dbinom(yi,mi,theta)*stats::dnorm(B,mean=mu,sd=sigma)
+    }
+    stats::integrate(integrand,lower=mu-5*sigma,upper=mu+5*sigma,
+                     mu=mu,sigma=sigma,mi=mi,yi=yi)$value
 }
 # Equation 18 of Galbraith and Roberts (2012)
 LL.sigma <- function(sigma,X,sX){
