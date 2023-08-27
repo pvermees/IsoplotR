@@ -17,6 +17,7 @@
 #' fn <- system.file('UW137.csv',package='IsoplotR')
 #' UW137 <- read.data(fn,method='other',format=6)
 #' fit <- ogls(UW137)
+#' @author Pieter Vermeesch and Mathieu Daëron
 #' @rdname ogls
 #' @export
 ogls <- function(x,...){ UseMethod("ogls",x) }

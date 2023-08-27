@@ -183,7 +183,7 @@ central.UThHe <- function(x,compositional=FALSE,model=1,...){
             names(out$disp) <- c('w','s[w]')
         }
     } else {
-        out <- central.default(x)
+        out <- central.default(age(x))
     }
     out
 }
