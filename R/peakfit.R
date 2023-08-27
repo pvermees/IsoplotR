@@ -147,10 +147,10 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
         out <- binomial.mixtures(x,k,exterr=exterr,...)
     }  else if (x$format == 3){
         tt <- get.ages(x)
-        out <- peakfit.default(tt,k=k,log=log,sigdig=sigdig,oerr=oerr)
+        out <- peakfit.default(tt,k=k,log=log,sigdig=sigdig,oerr=oerr,np=np)
     } else {
         out <- peakfit_helper(x,k=k,sigdig=sigdig,oerr=oerr,
-                              log=log,exterr=exterr,...)
+                              log=log,exterr=exterr,np=np,...)
     }
     out$legend <- peaks2legend(out,k=k,sigdig=sigdig,oerr=oerr)
     out
