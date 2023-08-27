@@ -36,31 +36,31 @@
 #'
 #' where \eqn{[He] + [U] + [Th] (+ [Sm]) = 1}. In the context of
 #' U-Th-(Sm)-He dating, the \emph{central} age is defined as the age
-#' that corresponds to the arithmetic mean composition in logratio
-#' space, which is equivalent to the geometric mean in compositional
-#' dataspace (Vermeesch, 2008).  \code{IsoplotR}'s \code{helioplot}
-#' function performs this calculation using the same algorithm that is
-#' used to obtain the weighted mean U-Pb composition for the
-#' \code{\link{concordia}} age calculation. Overdispersion is treated
-#' similarly as in a regression context (see \code{\link{isochron}}).
-#' Thus, there are options to augment the uncertainties with a factor
-#' \eqn{\sqrt{MSWD}} (model 1); to ignore the analytical uncertainties
-#' altogether (model 2); or to add a constant overdispersion term to
-#' the analytical uncertainties (model 3).  The \code{helioplot}
-#' function visualises U-Th-(Sm)-He data on either a ternary diagram
-#' or a bivariate \eqn{\ln[Th/U]} vs. \eqn{\ln[U/He]} contour
-#' plot. These diagrams provide a convenient way to simultaneously
-#' display the isotopic composition of samples as well as their
-#' chronological meaning. In this respect, they fulfil the same
-#' purpose as the U-Pb \code{\link{concordia}} diagram and the
-#' U-series \code{\link{evolution}} plot.
+#' that corresponds to the compositional mean, which is equivalent to
+#' the arithmetic mean composition in logratio space (Vermeesch,
+#' 2008).  \code{IsoplotR}'s \code{helioplot} function performs this
+#' calculation using the same algorithm that is used to obtain the
+#' weighted mean U-Pb composition for the \code{\link{concordia}} age
+#' calculation. Overdispersion is treated similarly as in a regression
+#' context (see \code{\link{isochron}}).  Thus, there are options to
+#' augment the uncertainties with a factor \eqn{\sqrt{MSWD}} (model
+#' 1); to ignore the analytical uncertainties altogether (model 2); or
+#' to add a constant overdispersion term to the analytical
+#' uncertainties (model 3).  The \code{helioplot} function visualises
+#' U-Th-(Sm)-He data on either a ternary diagram or a bivariate
+#' \eqn{\ln[Th/U]} vs. \eqn{\ln[U/He]} contour plot. These diagrams
+#' provide a convenient way to simultaneously display the isotopic
+#' composition of samples as well as their chronological meaning. In
+#' this respect, they fulfil the same purpose as the U-Pb
+#' \code{\link{concordia}} diagram and the U-series
+#' \code{\link{evolution}} plot.
 #'
 #' @param x an object of class \code{UThHe}
 #' @param logratio Boolean flag indicating whether the data should be
 #'     shown on bivariate log[He/Th] vs. log[U/He] diagram, or a
 #'     U-Th-He ternary diagram.
-#' @param show.central.comp show the geometric mean composition as a
-#'     white ellipse?
+#' @param show.central.comp show the mean composition as a white
+#'     ellipse?
 #' @param show.numbers show the grain numbers inside the error
 #'     ellipses?
 #' @param oerr indicates whether the analytical uncertainties of the
@@ -172,7 +172,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
     plotit <- (1:ns)%ni%hide
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
-    fit <- central.UThHe(x2calc,oerr=oerr,model=model)
+    fit <- central.UThHe(x2calc,compositional=TRUE,model=model)
     fill <- set.ellipse.colours(ns=ns,levels=levels,
                                 col=ellipse.fill,hide=hide,
                                 omit=omit,omit.col=omit.fill)
@@ -333,7 +333,7 @@ plot_helioplot_contours <- function(x,fact=c(1,1,1),
 
 helioplot_title <- function(fit,sigdig=2,oerr=3,...){
     line1 <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,df=fit$df,
-                     sigdig=sigdig,oerr=oerr,prefix="central age =")
+                     sigdig=sigdig,oerr=oerr,prefix="barycentric age =")
     line1line <- 1
     if (fit$model==1){
         line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)

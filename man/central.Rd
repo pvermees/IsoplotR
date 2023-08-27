@@ -5,13 +5,13 @@
 \alias{central.default}
 \alias{central.UThHe}
 \alias{central.fissiontracks}
-\title{Calculate U-Th-He and fission track central ages and compositions}
+\title{Fits random effects models to overdispersed datasets}
 \usage{
 central(x, ...)
 
 \method{central}{default}(x, ...)
 
-\method{central}{UThHe}(x, model = 1, ...)
+\method{central}{UThHe}(x, compositional = FALSE, model = 1, ...)
 
 \method{central}{fissiontracks}(x, exterr = FALSE, ...)
 }
@@ -22,7 +22,12 @@ uncertainties}
 
 \item{...}{optional arguments}
 
-\item{model}{if the scatter between the data points is solely
+\item{compositional}{logical. If \code{TRUE}, calculates the
+'barycentric' U-Th-He, age, i.e. the age corresponding to the
+weighted mean logratio composition.}
+
+\item{model}{only relevant if \code{compositional} is
+    \code{TRUE}. If the scatter between the data points is solely
     caused by the analytical uncertainty, then the MSWD value
     should be approximately equal to one. There are three
     strategies to deal with the case where MSWD>1.choose one of the
@@ -42,8 +47,8 @@ geological uncertainty, which manifests itself as an added
 the error propagation for the central age?}
 }
 \value{
-If \code{x} has class \code{UThHe}, returns a list containing the
-    following items:
+If \code{x} has class \code{UThHe} and \code{compositional}
+    is \code{TRUE}, returns a list containing the following items:
 
 \describe{
 
@@ -66,7 +71,7 @@ reported if \code{model=1}).}
 degrees of freedom (only reported if \code{model=1}.)}
 
 \item{age}{a two- or three-element vector with:\cr
-\code{t}: the central age.\cr
+\code{t}: the 'barycentric' age, i.e. the age corresponding to \code{uvw}.\cr
 \code{s[t]}: the standard error of \code{t}.\cr
 \code{disp[t]}: the standard error of \code{t} enhanced by a
 factor of \eqn{\sqrt{mswd}} (only reported if \code{model=1}). }
@@ -99,7 +104,7 @@ degrees of freedom}
 }
 }
 \description{
-Computes the geometric mean composition of a continuous mixture of
+Computes the logratio mean composition of a continuous mixture of
 fission track or U-Th-He data and returns the corresponding age and
 fitting parameters. Only propagates the systematic uncertainty
 associated with decay constants and calibration factors after
@@ -113,7 +118,7 @@ combination of two sources of scatter: analytical uncertainty and
 true geological dispersion.
 \enumerate{
 \item For fission track data, the analytical uncertainty is assumed
-to obey Poisson counting statistics and the geological dispersion
+to obey Binomial counting statistics and the geological dispersion
 is assumed to follow a lognormal distribution.
 \item For U-Th-He data, the U-Th-(Sm)-He compositions and
 uncertainties are assumed to follow a logistic normal distribution.
