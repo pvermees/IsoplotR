@@ -35,10 +35,11 @@
 #' \eqn{([Sm] = e^{w}/[e^{u}+e^{v}+(e^{w})+1])}
 #'
 #' where \eqn{[He] + [U] + [Th] (+ [Sm]) = 1}. In the context of
-#' U-Th-(Sm)-He dating, the \emph{central} age is defined as the age
-#' that corresponds to the compositional mean, which is equivalent to
-#' the arithmetic mean composition in logratio space (Vermeesch,
-#' 2008).  \code{IsoplotR}'s \code{helioplot} function performs this
+#' U-Th-(Sm)-He dating, the \emph{barycentric} age (which is
+#' equivalent to the 'central age' of Vermeesch, 2008) is defined as
+#' the date that corresponds to the compositional mean, which is
+#' equivalent to the arithmetic mean composition in logratio space.
+#' \code{IsoplotR}'s \code{helioplot} function performs this
 #' calculation using the same algorithm that is used to obtain the
 #' weighted mean U-Pb composition for the \code{\link{concordia}} age
 #' calculation. Overdispersion is treated similarly as in a regression
@@ -59,7 +60,7 @@
 #' @param logratio Boolean flag indicating whether the data should be
 #'     shown on bivariate log[He/Th] vs. log[U/He] diagram, or a
 #'     U-Th-He ternary diagram.
-#' @param show.central.comp show the mean composition as a white
+#' @param show.barycentre show the mean composition as a white
 #'     ellipse?
 #' @param show.numbers show the grain numbers inside the error
 #'     ellipses?
@@ -108,7 +109,7 @@
 #'     ellipses. Follows the same formatting guidelines as
 #'     \code{ellipse.fill}
 #'
-#' @param sigdig number of significant digits for the central age
+#' @param sigdig number of significant digits for the barycentric age
 #' @param xlim optional limits of the x-axis (log[U/He]) of the
 #'     logratio plot. If \code{xlim=NA}, the axis limits are
 #'     determined automatically.
@@ -140,7 +141,7 @@
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
-#'     but omitted from the central age calculation.
+#'     but omitted from the barycentric age calculation.
 #' @param omit.fill fill colour that should be used for the omitted
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
@@ -161,7 +162,7 @@
 #' dev.new()
 #' helioplot(UThHe,logratio=FALSE)
 #' @export
-helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
+helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
                       show.numbers=FALSE,oerr=3,contour.col=c('white','red'),
                       levels=NA,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
@@ -207,9 +208,9 @@ helioplot <- function(x,logratio=TRUE,model=1,show.central.comp=TRUE,
                                     show.numbers=show.numbers,hide=hide)
         }
     }
-    if (show.central.comp){
-        plot_central_ellipse(fit,fact=fact,logratio=logratio,
-                             oerr=oerr,doSm=doSm(x))
+    if (show.barycentre){
+        plot_barycentre(fit,fact=fact,logratio=logratio,
+                        oerr=oerr,doSm=doSm(x))
     }
     fit$n <- length(which(calcit))
     graphics::title(helioplot_title(fit,sigdig=sigdig,oerr=oerr))
@@ -275,8 +276,8 @@ plot_helioplot_points <- function(x,fact=c(1,1,1),bg=NA,
                 hide=hide,omit=omit,bg=bg,...)
 }
 
-plot_central_ellipse <- function(fit,fact=c(1,1,1),logratio=TRUE,
-                                 oerr=3,doSm=TRUE,...){
+plot_barycentre <- function(fit,fact=c(1,1,1),logratio=TRUE,
+                            oerr=3,doSm=TRUE,...){
     ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
                    covmat=fit$covmat[1:2,1:2],alpha=oerr2alpha(oerr))
     if (logratio){
