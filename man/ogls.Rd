@@ -35,6 +35,16 @@ fn <- system.file('UW137.csv',package='IsoplotR')
 UW137 <- read.data(fn,method='other',format=6)
 fit <- ogls(UW137)
 }
+\references{
+Daëron, M., 2023. Making the Case for Reconciled
+    \eqn{\Delta}47 Calibrations Using Omnivariant Generalized
+    Least-Squares Regression (No. EGU23-10066). Copernicus
+    Meetings.
+
+Daëron & Vermeesch, in prep. Omnivariant Generalized Least Squares
+Regression: Theory, Geochronological Applications, and Making the
+Case for Reconciled \eqn{\Delta}47 calibrations, Chemical Geology.
+}
 \author{
 Pieter Vermeesch and Mathieu Daëron
 }
