@@ -3,6 +3,7 @@
 \name{agespectrum}
 \alias{agespectrum}
 \alias{agespectrum.default}
+\alias{agespectrum.other}
 \alias{agespectrum.ArAr}
 \title{Plot a (40Ar/39Ar) release spectrum}
 \usage{
@@ -21,7 +22,26 @@ agespectrum(x, ...)
   line.col = "red",
   lwd = 2,
   xlab = "cumulative fraction",
-  ylab = "age [Ma]",
+  ylab = "X",
+  hide = NULL,
+  omit = NULL,
+  ...
+)
+
+\method{agespectrum}{other}(
+  x,
+  oerr = 3,
+  plateau = TRUE,
+  random.effects = FALSE,
+  levels = NA,
+  clabel = "",
+  plateau.col = c("#00FF0080", "#FF000080"),
+  non.plateau.col = "#00FFFF80",
+  sigdig = 2,
+  line.col = "red",
+  lwd = 2,
+  xlab = "cumulative fraction",
+  ylab = "X",
   hide = NULL,
   omit = NULL,
   ...

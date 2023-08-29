@@ -359,12 +359,17 @@ blockinverse3x3 <- function(AA,BB,CC,DD,EE,FF,GG,HH,II){
 
 '%ni%' <- function(x,y)!('%in%'(x,y))
 
-clear <- function(x,...){
+clear <- function(x,...,OGLS=FALSE){
     i <- unlist(list(...))
-    if (is.matrix(x)) sn <- 1:nrow(x)
-    else sn <- 1:length(x)
-    if (length(i)>0) out <- subset(x,subset=sn%ni%i)
-    else out <- x
+    if (is.matrix(x)) ns <- ifelse(OGLS,nrow(x)/2,nrow(x))
+    else ns <- length(x)
+    keep <- (1:ns)%ni%i
+    if (length(i)>0){
+        if (is.matrix(x) && OGLS) out <- subset_ogls(x,subset=keep)
+        else out <- subset(x,subset=keep)
+    } else {
+        out <- x
+    }
     out
 }
 
@@ -474,25 +479,4 @@ contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
         warning('Ill-conditioned Hessian matrix')
     }
     fit
-}
-
-getparscale <- function(fn=LL.york,...){
-    pars <- list(...)
-    dp <- 1e-4
-    lpars <- upars <- pars
-    init <- pars[[1]]
-    np <- length(init)
-    dpdLL <- rep(NA,np)
-    for (i in 1:np){
-        lfact <- ufact <- rep(1,np)
-        ufact[i] <- 1+dp/2
-        lfact[i] <- 1-dp/2
-        upars[[1]] <- init*ufact
-        lpars[[1]] <- init*lfact
-        darg <- upars[[1]][i] - lpars[[1]][i]
-        LLu <- do.call(what=fn,args=upars)
-        LLl <- do.call(what=fn,args=lpars)
-        dpdLL[i] <- abs(darg/(LLu-LLl))
-    }
-    dpdLL/max(dpdLL)
 }

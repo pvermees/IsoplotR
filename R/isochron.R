@@ -467,6 +467,51 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                              omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     fit <- regression(data2york(d2calc),model=model)
+    genericisochronplot(x=x,fit=fit,oerr=oerr,sigdig=sigdig,
+                        show.numbers=show.numbers,levels=levels,clabel=clabel,
+                        xlab=xlab,ylab=ylab,ellipse.fill=ellipse.fill,
+                        ellipse.stroke=ellipse.stroke,ci.col=ci.col,
+                        line.col=line.col,lwd=lwd,plot=plot,title=title,
+                        model=model,show.ellipses=1*(model!=2),
+                        hide=hide,omit=omit,omit.fill=omit.fill,
+                        omit.stroke=omit.stroke,...)
+}
+#' @rdname isochron
+#' @export
+isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
+                           levels=NA,clabel="",xlab='x',ylab='y',
+                           ellipse.fill=c("#00FF0080","#FF000080"),
+                           ellipse.stroke='black',ci.col='gray80',
+                           line.col='black',lwd=1,plot=TRUE,
+                           title=TRUE,model=1,show.ellipses=1*(model!=2),
+                           hide=NULL,omit=NULL,omit.fill=NA,
+                           omit.stroke='grey',...){
+    d2calc <- clear(x,hide,omit)
+    if (x$format%in%c(4,5)){
+        yd <- data2york(d2calc$x,format=d2calc$format)
+        fit <- regression(yd,model=model)
+    } else if (x$format==6){
+        fit <- regression(d2calc$x,model=model,type='ogls')
+    } else {
+        stop("Invalid data format for isochron regression.")
+    }
+    genericisochronplot(x=x,fit=fit,oerr=oerr,sigdig=sigdig,
+                        show.numbers=show.numbers,levels=levels,clabel=clabel,
+                        xlab=xlab,ylab=ylab,ellipse.fill=ellipse.fill,
+                        ellipse.stroke=ellipse.stroke,ci.col=ci.col,
+                        line.col=line.col,lwd=lwd,plot=plot,title=title,
+                        model=model,show.ellipses=1*(model!=2),
+                        hide=hide,omit=omit,omit.fill=omit.fill,
+                        omit.stroke=omit.stroke,...)
+}
+genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
+                                levels=NA,clabel="",xlab='x',ylab='y',
+                                ellipse.fill=c("#00FF0080","#FF000080"),
+                                ellipse.stroke='black',ci.col='gray80',
+                                line.col='black',lwd=1,plot=TRUE,
+                                title=TRUE,show.ellipses=TRUE,
+                                hide=NULL,omit=NULL,omit.fill=NA,
+                                omit.stroke='grey',...){
     if (inflate(fit)){
         fit$a['disp[a]'] <- sqrt(fit$mswd)*fit$a['s[a]']
         fit$b['disp[b]'] <- sqrt(fit$mswd)*fit$b['s[b]']
@@ -1487,7 +1532,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     }
     if (fit$model==1){
         content[[3]] <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
-    } else if (fit$model%in%c(3,4)){
+    } else if (fit$model%in%c(3,5)){
         content[[3]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
                                 oerr=oerr,prefix=displabel,units=dispunits)
     }

@@ -3,6 +3,7 @@
 \name{isochron}
 \alias{isochron}
 \alias{isochron.default}
+\alias{isochron.other}
 \alias{isochron.UPb}
 \alias{isochron.PbPb}
 \alias{isochron.ArAr}
@@ -19,6 +20,31 @@
 isochron(x, ...)
 
 \method{isochron}{default}(
+  x,
+  oerr = 3,
+  sigdig = 2,
+  show.numbers = FALSE,
+  levels = NA,
+  clabel = "",
+  xlab = "x",
+  ylab = "y",
+  ellipse.fill = c("#00FF0080", "#FF000080"),
+  ellipse.stroke = "black",
+  ci.col = "gray80",
+  line.col = "black",
+  lwd = 1,
+  plot = TRUE,
+  title = TRUE,
+  model = 1,
+  show.ellipses = 1 * (model != 2),
+  hide = NULL,
+  omit = NULL,
+  omit.fill = NA,
+  omit.stroke = "grey",
+  ...
+)
+
+\method{isochron}{other}(
   x,
   oerr = 3,
   sigdig = 2,

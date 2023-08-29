@@ -193,13 +193,16 @@ spontaneous tracks, the area over which these were counted and one
 or more U/Ca-ratios or U-concentration measurements (in ppm) and
 their analytical uncertainties.}  }
 
-if \code{method='other'}, \code{x} is read as a table, unless
-\code{format} is one of either:
+if \code{method='other'}, then \code{format} is one of either:
 
 \describe{
-\item{\code{radial} or \code{average}:}{\code{X, err[X]}}
-\item{\code{regression}:}{\code{X, err[X], Y, err[Y], rho}}
-\item{\code{spectrum}:}{\code{f, X, err[X]}} 
+\item{\code{1}:}{\code{X}}
+\item{\code{2}:}{\code{X, err[X]}}
+\item{\code{3}:}{\code{f, X, err[X]}} 
+\item{\code{4}:}{\code{X, err[X], Y, err[Y], rho}}
+\item{\code{5}:}{\code{X/Z, err[X/Z], Y/Z, err[Y/Z], X/Y, err[X/Y]}}
+\item{\code{6}:}{a \code{n x (n+1)} matrix obtained by prepending a
+vector of alternating \code{X,Y}-values to its covariance matrix}
 }}
 
 \item{ierr}{indicates whether the analytical uncertainties of the
@@ -307,7 +310,7 @@ kde(d7)
 #  four 'other' files (LudwigMixture.csv, LudwigSpectrum.csv,
 #  LudwigMean.csv, LudwigKDE.csv)
 f8 <- system.file("LudwigMixture.csv",package="IsoplotR")
-d8 <- read.data(f8,method="other")
+d8 <- read.data(f8,method="other",format=2)
 radialplot(d8)
 
 }

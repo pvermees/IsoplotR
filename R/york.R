@@ -108,12 +108,16 @@ york <- function(x){
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
     out$type <- 'york'
-    # compute MSWD:
-    X2 <- sum(W*(Y-b*X-a)^2)
-    out$df <- nrow(x)-2
-    if (out$df>0){
-        out$mswd <- as.numeric(X2/out$df)
-        out$p.value <- as.numeric(1-stats::pchisq(X2,out$df))
+    out <- append(out,getMSWD(X2=sum(W*(Y-b*X-a)^2),df=nrow(x)-2))
+    out
+}
+
+getMSWD <- function(X2,df){
+    out <- list()
+    out$df <- df
+    if (df>0){
+        out$mswd <- as.numeric(X2/df)
+        out$p.value <- as.numeric(1-stats::pchisq(X2,df))
     } else {
         out$mswd <- 1
         out$p.value <- 1
@@ -204,16 +208,38 @@ data2york <- function(x,...){ UseMethod("data2york",x) }
 #' @rdname data2york
 #' @export
 data2york.default <- function(x,format=1,...){
-    cnames <- c('X','sX','Y','sY','rXY')
-    if (format==3){
-        X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
-                                       x[,4],x[,5],x[,6]))
-        opt <- NULL
+    if (format==6){
+        ns <- nrow(x)/2
+        covmat <- x[,-1]
+        iX <- 1:ns
+        iY <- (ns+1):(2*ns)
+        sX <- sqrt(diag(covmat)[iX])
+        sY <- sqrt(diag(covmat)[iY])
+        rXY <- diag(covmat[iX,iY])/(sX*sY)
+        yd <- cbind(x[iX,1],sX,x[iY,1],sY,rXY)
+        out <- data2york(yd)
     } else {
-        X <- x
-        opt <- 5
+        cnames <- c('X','sX','Y','sY','rXY')
+        if (format==3){
+            X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
+                                           x[,4],x[,5],x[,6]))
+            opt <- NULL
+        } else {
+            X <- x
+            opt <- 5
+        }
+        out <- insert.data(x=X,cnames=cnames,opt=opt)
     }
-    insert.data(x=X,cnames=cnames,opt=opt)
+    out
+}
+#' @rdname data2york
+#' @export
+data2york.other <- function(x,...){
+    if (x$format==4) out <- data2york(x$x,format=1)
+    else if (x$format==5) out <- data2york(x$x,format=3)
+    else if (x$format==6) out <- data2york(x$x,format=6)
+    else stop('data2york is not available for this data format')
+    out
 }
 
 #' @param option one of

@@ -1,8 +1,8 @@
 #' @title
-#' Calculate U-Th-He and fission track central ages and compositions
+#' Fits random effects models to overdispersed datasets
 #'
 #' @description
-#' Computes the geometric mean composition of a continuous mixture of
+#' Computes the logratio mean composition of a continuous mixture of
 #' fission track or U-Th-He data and returns the corresponding age and
 #' fitting parameters. Only propagates the systematic uncertainty
 #' associated with decay constants and calibration factors after
@@ -16,7 +16,7 @@
 #' true geological dispersion.
 #' \enumerate{
 #' \item For fission track data, the analytical uncertainty is assumed
-#' to obey Poisson counting statistics and the geological dispersion
+#' to obey Binomial counting statistics and the geological dispersion
 #' is assumed to follow a lognormal distribution.
 #' \item For U-Th-He data, the U-Th-(Sm)-He compositions and
 #' uncertainties are assumed to follow a logistic normal distribution.
@@ -36,9 +36,8 @@
 #'     OR a 2-column matrix with (strictly positive) values and
 #'     uncertainties
 #' @param ... optional arguments
-#' @return
-#' If \code{x} has class \code{UThHe}, returns a list containing the
-#'     following items:
+#' @return If \code{x} has class \code{UThHe} and \code{compositional}
+#'     is \code{TRUE}, returns a list containing the following items:
 #'
 #' \describe{
 #'
@@ -61,7 +60,7 @@
 #' degrees of freedom (only reported if \code{model=1}.)}
 #'
 #' \item{age}{a two- or three-element vector with:\cr
-#' \code{t}: the central age.\cr
+#' \code{t}: the 'barycentric' age, i.e. the age corresponding to \code{uvw}.\cr
 #' \code{s[t]}: the standard error of \code{t}.\cr
 #' \code{disp[t]}: the standard error of \code{t} enhanced by a
 #' factor of \eqn{\sqrt{mswd}} (only reported if \code{model=1}). }
@@ -135,7 +134,11 @@ central.default <- function(x,...){
     names(out$disp) <- c('w','s[w]')
     out
 }
-#' @param model if the scatter between the data points is solely
+#' @param compositional logical. If \code{TRUE}, calculates the
+#'     'barycentric' U-Th-He, age, i.e. the age corresponding to the
+#'     weighted mean logratio composition.
+#' @param model only relevant if \code{compositional} is
+#'     \code{TRUE}. If the scatter between the data points is solely
 #'     caused by the analytical uncertainty, then the MSWD value
 #'     should be approximately equal to one. There are three
 #'     strategies to deal with the case where MSWD>1.choose one of the
@@ -153,30 +156,34 @@ central.default <- function(x,...){
 #'
 #' @rdname central
 #' @export
-central.UThHe <- function(x,model=1,...){
-    ns <- nrow(x)
-    doSm <- doSm(x)
-    fit <- UThHe_logratio_mean(x,model=model,w=0)
-    mswd <- mswd_UThHe(x,fit,doSm=doSm)
-    mswd$model <- model # to fulfil requirements of inflate function
-    if (inflate(mswd)){
-        fit$age['disp[t]'] <- uvw2age(fit,doSm=doSm,fact=mswd$mswd)[2]
-    }
-    if (model==1){
-        out <- c(fit,mswd)
-    } else if (model==2){
-        out <- fit
+central.UThHe <- function(x,compositional=FALSE,model=1,...){
+    if (compositional){
+        ns <- nrow(x)
+        doSm <- doSm(x)
+        fit <- UThHe_logratio_mean(x,model=model,w=0)
+        mswd <- mswd_UThHe(x,fit,doSm=doSm)
+        mswd$model <- model # to fulfil requirements of inflate function
+        if (inflate(mswd)){
+            fit$age['disp[t]'] <- uvw2age(fit,doSm=doSm,fact=mswd$mswd)[2]
+        }
+        if (model==1){
+            out <- c(fit,mswd)
+        } else if (model==2){
+            out <- fit
+        } else {
+            init <- log(sqrt(mswd$mswd)*fit$age['s[t]']/fit$age['t'])
+            lw <- stats::optimise(LL.uvw,interval=init+c(-5,5),
+                                  UVW=fit$uvw,x=x,doSm=doSm(x),
+                                  maximum=TRUE)$maximum
+            w <- exp(lw)
+            H <- stats::optimHess(lw,LL.uvw,UVW=fit$uvw,x=x,doSm=doSm(x))
+            sw <- w*solve(-H)
+            out <- UThHe_logratio_mean(x,model=model,w=w)
+            out$disp <- c(w,sw)
+            names(out$disp) <- c('w','s[w]')
+        }
     } else {
-        init <- log(sqrt(mswd$mswd)*fit$age['s[t]']/fit$age['t'])
-        lw <- stats::optimise(LL.uvw,interval=init+c(-5,5),
-                              UVW=fit$uvw,x=x,doSm=doSm(x),
-                              maximum=TRUE)$maximum
-        w <- exp(lw)
-        H <- stats::optimHess(lw,LL.uvw,UVW=fit$uvw,x=x,doSm=doSm(x))
-        sw <- w*solve(-H)
-        out <- UThHe_logratio_mean(x,model=model,w=w)
-        out$disp <- c(w,sw)
-        names(out$disp) <- c('w','s[w]')
+        out <- central.default(age(x))
     }
     out
 }

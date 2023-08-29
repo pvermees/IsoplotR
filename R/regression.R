@@ -1,5 +1,5 @@
 regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
-    xyz2calc <- clear(xyz,omit)
+    xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
     if (model==1){
         out <- model1regression(xyz2calc,type=type)
     } else if (model==2){
@@ -7,12 +7,19 @@ regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
     } else if (model==3){
         out <- model3regression(xyz2calc,type=type,wtype=wtype)
         out$wtype <- wtype
+    } else if (model==4 && identical(type,'york')){
+        out <- irr(xyz2calc)
+        out$wtype <- wtype
+    } else if (model==5 && identical(type,'york')){
+        out <- irr(xyz2calc,wtype=wtype)
+        out$wtype <- wtype
     } else {
         stop('invalid regression model')
     }
     out$xyz <- xyz
     out$model <- model
     out$n <- nrow(xyz2calc)
+    if (identical(type,'ogls')) out$n <- out$n/2
     out$omit <- omit
     out
 }
@@ -22,6 +29,8 @@ model1regression <- function(xyz,type='york'){
         out <- york(xyz)
     } else if (identical(type,'titterington')){
         out <- titterington(xyz)
+    } else if (identical(type,'ogls')){
+        out <- ogls(xyz,random.effects=FALSE)
     } else {
         stop('invalid output type for model 1 regression')
     }
@@ -38,6 +47,9 @@ model2regression <- function(xyz,type='york'){
     } else if (identical(type,'titterington')){
         out <- tls(xyz[,c('X','Y','Z')])
         out$df <- 2*nrow(xyz)-4
+    } else if (identical(type,'ogls')){
+        yd <- data2york(xyz,format=6)
+        out <- model2regression(yd,type='york')
     } else {
         stop('invalid output type for model 2 regression')
     }
@@ -67,6 +79,11 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
         lower <- init - c(5*pilot$par[c('a','b','A','B')],2)
         out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
                               upper=upper,XYZ=xyz,wtype=wtype)
+        out$cov <- E <- inverthess(out$hessian)
+    } else if (identical(type,'titterington')){
+        stop('not yet implemented')
+    } else if (identical(type,'ogls')){
+        out <- ogls(xyz,random.effects=TRUE)
         out$cov <- E <- inverthess(out$hessian)
     } else {
         stop('invalid output type for model 3 regression')
@@ -163,10 +180,5 @@ LL.titterington <- function(abABlw,XYZ,wtype='a'){
         (O[,'xx']*DE[,'X-x']+O[,'xy']*DE[,'Y-y']+O[,'xz']*DE[,'Z-z'])*DE[,'X-x']+
         (O[,'xy']*DE[,'X-x']+O[,'yy']*DE[,'Y-y']+O[,'yz']*DE[,'Z-z'])*DE[,'Y-y']+
         (O[,'xz']*DE[,'X-x']+O[,'yz']*DE[,'Y-y']+O[,'zz']*DE[,'Z-z'])*DE[,'Z-z']
-    if (FALSE){
-        scatterplot(XYZ[,c('X','sX','Y','sY','rXY')])
-        points(x,a+b*x)
-        title(sum(log(detE) + maha)/2)
-    }
     sum(log(detE) + maha)/2
 }

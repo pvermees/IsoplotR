@@ -204,6 +204,12 @@ length.fissiontracks <- function(x){
     if (x$format==1) return(nrow(x$x))
     else return(length(x$Ns))
 }
+#' @export
+length.other <- function(x){
+    if (x$format==1) return(length(x$x))
+    else if (x$format==6) return(nrow(x$x)/2)
+    else return(nrow(x$x))
+}
 
 #' @export
 `[.UPb` <- function(x,...){
@@ -302,10 +308,29 @@ subset.detritals <- function(x,subset,...){
     class(out) <- class(x)
     out
 }
+#' @export
+subset.other <- function(x,subset,...){
+    out <- x
+    if (x$format==1){
+        out$x <- x$x[,subset]
+    } else if (x$format==6){
+        out$x <- subset_ogls(x$x,subset)
+    } else {
+        out$x <- subset.matrix(out$x,subset=subset,...)
+    }
+    out
+}
 subset_helper <- function(x,...){
     out <- x
     out$x <- subset.matrix(x$x,...)
     out
+}
+subset_ogls <- function(x,subset){
+    ns <- nrow(x)/2
+    iX <- (1:ns)[subset]
+    iY <- ((ns+1):(2*ns))[subset]
+    i <- c(iX,iY)
+    x[i,c(1,i+1)]
 }
 
 mediand <- function(d){

@@ -17,8 +17,8 @@
 #' error, or the spontaneous and induced track densities \code{Ns} and
 #' \code{Ni},
 #'
-#' \item a four element vector containing \code{Ar40Ar39},
-#' \code{s[Ar40Ar39]}, \code{J}, \code{s[J]},
+#' \item a two element vector containing \code{Ar40Ar39},
+#' \code{s[Ar40Ar39]},
 #'
 #' \item a two element vector containing \code{K40Ca40} and
 #' \code{s[K40Ca40]},
@@ -111,7 +111,7 @@ age.default <- function(x,method='U238-Pb206',oerr=1,sigdig=NA,
         tst <- get.Pb208Th232.age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Ar-Ar')){
         tst <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
-                            J=x[3],sJ=x[4],exterr=exterr)
+                            J=J[1],sJ=J[2],exterr=exterr)
     } else if (identical(method,'K-Ca')){
         tst <- get.KCa.age(K40Ca40=x[1],sK40Ca40=x[2],exterr=exterr)
     } else if (identical(method,'Re-Os')){
