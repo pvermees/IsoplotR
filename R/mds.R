@@ -175,7 +175,6 @@ diss.default <- function(x,y,method='KS',...){
 #' @rdname diss
 #' @export
 diss.detritals <- function(x,method='W2',...) {
-    print(method)
     n <- length(x)
     d <- mat.or.vec(n,n)
     rownames(d) <- names(x)

@@ -1068,6 +1068,7 @@ UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
         nn <- length(x)
         out <- NULL
         for (i in 1:nn){
+            print(i)
             ti <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
                                  conc=conc,discordance=discordance)
             out <- rbind(out,ti)

@@ -128,7 +128,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
     out
 }
 
-                                        # x: raw data, X: common Pb corrected data (or not)
+# x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
     t.68 <- get.Pb206U238.age(X)[1]
     t.76 <- get.Pb207Pb206.age(X,t.68=t.68)[1]
@@ -145,20 +145,20 @@ discordance <- function(x,X,tt=NULL,option=4){
         U8Pb6.corr <- get.U238Pb206.ratios(x.corr)[,'U238Pb206']
         dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
     } else if (option%in%c(4,'a')){
+        U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
+        Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
         x76 <- age_to_U238Pb206_ratio(t.76)[,1]
         y68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
-        U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
-        Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
-        DX <- log(U8Pb6) - log(x76)
-        DY <- log(Pb76) - log(y68)
+        DX <- (log(U8Pb6) - log(x76))/sqrt(2)
+        DY <- (log((Pb76^2)/U8Pb6) - log((y68^2)/x76))/sqrt(6)
         dif <- 100*DX*sin(atan(DY/DX))
     } else if (option%in%c(5,'c')){
-        xc <- age_to_U238Pb206_ratio(t.conc)[,1]
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
-        dx <- log(xc) - log(U8Pb6)
-        yc <- age_to_Pb207Pb206_ratio(t.conc)[,1]
         Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
-        dy <- log(yc) - log(Pb76)
+        xc <- age_to_U238Pb206_ratio(t.conc)[,1]
+        yc <- age_to_Pb207Pb206_ratio(t.conc)[,1]
+        dx <- (log(xc) - log(U8Pb6))/sqrt(2)
+        dy <- (log((Pb76^2)/U8Pb6) - log((yc^2)/xc))/sqrt(6)
         dif <- 100*sign(t.76-t.68)*sqrt(dx^2+dy^2)
     } else {
         stop('Invalid discordance filter option.')
