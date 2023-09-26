@@ -147,18 +147,18 @@ discordance <- function(x,X,tt=NULL,option=4){
     } else if (option%in%c(4,'a')){
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
         Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
-        x76 <- age_to_U238Pb206_ratio(t.76)[,1]
-        y68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
-        DX <- (log(U8Pb6) - log(x76))/sqrt(2)
-        DY <- (log((Pb76^2)/U8Pb6) - log((y68^2)/x76))/sqrt(6)
+        r86.76 <- age_to_U238Pb206_ratio(t.76)[,1]
+        r76.68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
+        DX <- (log(U8Pb6) - log(r86.76))/sqrt(2)
+        DY <- (log(Pb76) - log(r76.68))/sqrt(2/3)
         dif <- 100*DX*sin(atan(DY/DX))
     } else if (option%in%c(5,'c')){
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
         Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
-        xc <- age_to_U238Pb206_ratio(t.conc)[,1]
-        yc <- age_to_Pb207Pb206_ratio(t.conc)[,1]
-        dx <- (log(xc) - log(U8Pb6))/sqrt(2)
-        dy <- (log((Pb76^2)/U8Pb6) - log((yc^2)/xc))/sqrt(6)
+        c86 <- age_to_U238Pb206_ratio(t.conc)[,1]
+        c76 <- age_to_Pb207Pb206_ratio(t.conc)[,1]
+        dx <- (log(U8Pb6) - log(c86))/sqrt(2)
+        dy <- (log((Pb76^2)/U8Pb6) - log((c76^2)/c86))/sqrt(6)
         dif <- 100*sign(t.76-t.68)*sqrt(dx^2+dy^2)
     } else {
         stop('Invalid discordance filter option.')
