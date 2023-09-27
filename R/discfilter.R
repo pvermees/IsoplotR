@@ -50,15 +50,15 @@
 #' @return a list with the input parameters. Default values for
 #'     \code{cutoff} are
 #'
-#' \code{c(-50,140)} if \code{option=='t'};
+#' \code{c(-48,140)} if \code{option=='t'};
 #'
 #' \code{c(-5,15)} if \code{option=='r'};
 #' 
-#' \code{c(-0.3,1)} if \code{option=='sk'};
+#' \code{c(-0.36,0.96)} if \code{option=='sk'};
 #'
-#' \code{c(-2,6)} if \code{option=='a'}; and
+#' \code{c(-1.6,4.7)} if \code{option=='a'}; and
 #' 
-#' \code{c(-2,7)} if \code{option=='c'}.
+#' \code{c(-2,5.8)} if \code{option=='c'}.
 #' 
 #' @seealso \code{\link{cad}}, \code{\link{kde}},
 #'     \code{\link{radialplot}}
@@ -75,11 +75,11 @@ discfilter <- function(option=0,before=TRUE,cutoff){
     out$option <- option
     out$before <- before
     if (missing(cutoff)){
-        if (option%in%c(1,'t')) cutoff <- c(-50,140)
+        if (option%in%c(1,'t')) cutoff <- c(-48,140)
         else if (option%in%c(2,'r')) cutoff <- c(-5,15)
-        else if (option%in%c(3,'sk')) cutoff <- c(-0.3,1)
-        else if (option%in%c(4,'a')) cutoff <- c(-2,6)
-        else if (option%in%c(5,'c')) cutoff <- c(-2,7)
+        else if (option%in%c(3,'sk')) cutoff <- c(-0.36,0.96)
+        else if (option%in%c(4,'a')) cutoff <- c(-1.6,4.7)
+        else if (option%in%c(5,'c')) cutoff <- c(-2,5.8)
         else cutoff <- c(-Inf,Inf)
     }
     out$cutoff <- cutoff
@@ -128,7 +128,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
     out
 }
 
-                                        # x: raw data, X: common Pb corrected data (or not)
+# x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
     t.68 <- get.Pb206U238.age(X)[1]
     t.76 <- get.Pb207Pb206.age(X,t.68=t.68)[1]
@@ -145,20 +145,20 @@ discordance <- function(x,X,tt=NULL,option=4){
         U8Pb6.corr <- get.U238Pb206.ratios(x.corr)[,'U238Pb206']
         dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
     } else if (option%in%c(4,'a')){
-        x76 <- age_to_U238Pb206_ratio(t.76)[,1]
-        y68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
         Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
-        DX <- log(U8Pb6) - log(x76)
-        DY <- log(Pb76) - log(y68)
+        r86.76 <- age_to_U238Pb206_ratio(t.76)[,1]
+        r76.68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
+        DX <- (log(U8Pb6) - log(r86.76))/sqrt(2)
+        DY <- (log(Pb76) - log(r76.68))/sqrt(2/3)
         dif <- 100*DX*sin(atan(DY/DX))
     } else if (option%in%c(5,'c')){
-        xc <- age_to_U238Pb206_ratio(t.conc)[,1]
         U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
-        dx <- log(xc) - log(U8Pb6)
-        yc <- age_to_Pb207Pb206_ratio(t.conc)[,1]
         Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
-        dy <- log(yc) - log(Pb76)
+        c86 <- age_to_U238Pb206_ratio(t.conc)[,1]
+        c76 <- age_to_Pb207Pb206_ratio(t.conc)[,1]
+        dx <- (log(U8Pb6) - log(c86))/sqrt(2)
+        dy <- (log((Pb76^2)/U8Pb6) - log((c76^2)/c86))/sqrt(6)
         dif <- 100*sign(t.76-t.68)*sqrt(dx^2+dy^2)
     } else {
         stop('Invalid discordance filter option.')
