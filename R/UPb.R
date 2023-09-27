@@ -1008,19 +1008,6 @@ get.Pb207Pb206.age.terawasserburg <- function(x,exterr=FALSE,...){
     sr76 <- x$cov['Pb207Pb206','Pb207Pb206']
     get.Pb207Pb206.age(r76,sr76,exterr=exterr,d=x$d)
 }
-get_Pb207Pb206_age_taylor <- function(x,sx=0){
-    a <- 0.1
-    l35 <- settings('lambda','U235')[1]
-    l38 <- settings('lambda','U238')[1]
-    U <- settings('iratio','U238U235')[1]
-    ta <- 1623.246466
-    num <- U*(exp(l38*ta)-1)
-    den <- l35*exp(l35*ta) - a*U*l38*exp(l38*ta)
-    dtdxa <- num/den
-    d2tdx2a <- num*l38*exp(l38*ta)/den^2
-    d3tdx3a <- (2*num*(l38*exp(l38*ta))^2)/den^3
-    ta + dtdxa*(x-a) + (d2tdx2a/2)*(x-a)^2 + (d3tdx3a/6)*(x-a)^3
-}
 
 get.Pb208Th232.age <- function(x,...){ UseMethod("get.Pb208Th232.age",x) }
 get.Pb208Th232.age.default <- function(x,sx=0,exterr=FALSE,...){
@@ -1081,7 +1068,6 @@ UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
         nn <- length(x)
         out <- NULL
         for (i in 1:nn){
-            print(i)
             ti <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
                                  conc=conc,discordance=discordance)
             out <- rbind(out,ti)

@@ -45,15 +45,15 @@ between the different options. To view them, enter
 a list with the input parameters. Default values for
     \code{cutoff} are
 
-\code{c(-50,140)} if \code{option=='t'};
+\code{c(-48,140)} if \code{option=='t'};
 
 \code{c(-5,15)} if \code{option=='r'};
 
-\code{c(-0.3,1)} if \code{option=='sk'};
+\code{c(-0.36,0.96)} if \code{option=='sk'};
 
-\code{c(-2,6)} if \code{option=='a'}; and
+\code{c(-1.6,4.7)} if \code{option=='a'}; and
 
-\code{c(-2,7)} if \code{option=='c'}.
+\code{c(-2,5.8)} if \code{option=='c'}.
 }
 \description{
 Define a discordance cutoff to filter U--Pb data.
