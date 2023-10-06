@@ -1,3 +1,7 @@
+# IsoplotR 5.5
+
+September 29, 2023: Redefined the Aitchison and concordia distances in terms of isometric logratios. Modified the default cutoffs accordingly.
+
 # IsoplotR 5.4
 
 August 28, 2023: Renamed U-Th-He 'central' ages in helioplots as 'barycentric' ages to avoid confusion with the central ages reported in radial plots. Added OGLS regression.

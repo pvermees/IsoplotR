@@ -452,7 +452,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         }
     }
     if (tt>0){
-        out$Pb207Pb206 <- out$Pb207U235/(U*out$Pb206U238)
+    
+    out$Pb207Pb206 <- out$Pb207U235/(U*out$Pb206U238)
         out$dPb207Pb206dt <- (out$dPb207U235dt*out$Pb206U238 -
                               out$dPb206U238dt*out$Pb207U235)/(U*out$Pb206U238^2)
     } else {
