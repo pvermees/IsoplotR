@@ -946,12 +946,12 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
         J <- matrix(0,2*ns,7)
         colnames(J) <- colnames(El)
         if (x$format<4){
-            J[i1,'U238'] <- -McL$dPb206U238dl38
-            J[i1,'U234'] <- -McL$dPb206U238dl34
-            J[i1,'Th230'] <- -McL$dPb206U238dl30
-            J[i1,'Ra226'] <- -McL$dPb206U238dl26
-            J[i2,'U235'] <- -McL$dPb207U235dl35
-            J[i2,'Pa231'] <- -McL$dPb207U235dl31
+            J[i1,'U235'] <- -McL$dPb207U235dl35
+            J[i1,'Pa231'] <- -McL$dPb207U235dl31
+            J[i2,'U238'] <- -McL$dPb206U238dl38
+            J[i2,'U234'] <- -McL$dPb206U238dl34
+            J[i2,'Th230'] <- -McL$dPb206U238dl30
+            J[i2,'Ra226'] <- -McL$dPb206U238dl26
         } else if (x$format<7){
             if (type==1){
                 J[i2,'U238'] <- -McL$dPb206U238dl38
@@ -1005,8 +1005,6 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
     out$c0 <- (yd[,'X']-M)/multiplier
     out$SS <- KL%*%O%*%KL
     out$LL <- LL.norm(KL,E)
-    print(ta0b0w)
-    print(out$LL)
     out
 }
 
