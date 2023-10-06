@@ -883,22 +883,21 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
     U85 <- iratio('U238U235')[1]
     multiplier <- 1
     if (x$format<4){
-        yd <- data2york(x,option=1) # X=06/38, Y=07/35
-        yd[,c('X','sX','Y','sY','rXY')] <- yd[,c('Y','sY','X','sX','rXY')]
-        A <- rep(McL$Pb206U238,ns)
-        L0 <- yd[,'Y'] - McL$Pb207U235 - a0*yd[,'X']*U85
-        b <- a0*U85
+        yd <- data2york(x,option=1) # X=07/35, Y=06/38
+        A <- rep(McL$Pb207U235,ns)
+        b <- 1/(a0*U85)
+        L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
     } else if (x$format<7){
         if (type==1){               # X=04/38, Y=06/38
             yd <- data2york.UPb(x,option=10)
             A <- rep(0,ns)
-            L0 <- yd[,'Y'] - McL$Pb206U238 - a0*yd[,'X']
             b <- a0
+            L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
         } else if (type==2){        # X=04/35, Y=07/35
             yd <- data2york.UPb(x,option=11)
             A <- rep(0,ns)
-            L0 <- yd[,'Y'] - McL$Pb207U235 - b0*yd[,'X']
             b <- b0
+            L0 <- yd[,'Y'] - McL$Pb207U235 - b*yd[,'X']
         } else {
             stop('invalid isochron type')
         }
@@ -907,25 +906,25 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
         if (type==1){
             yd <- data2york.UPb(x,option=12) # X=08/38, Y=06/38
             A <- McL$Pb208Th232*ThU
-            L0 <- yd[,'Y'] - McL$Pb206U238 - a0*yd[,'X']
             b <- a0
+            L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
             multiplier <- ThU
         } else if (type==2){
             yd <- data2york.UPb(x,option=13) # X=08/35, Y=07/35
             A <- McL$Pb208Th232*ThU*U85
-            L0 <- yd[,'Y'] - McL$Pb207U235 - b0*yd[,'X']
             b <- b0
+            L0 <- yd[,'Y'] - McL$Pb207U235 - b*yd[,'X']
             multiplier <- ThU*U85
         } else if (type==3){
             yd <- data2york.UPb(x,option=14) # X=06/32, Y=08/32
             A <- McL$Pb206U238/ThU
-            L0 <- yd[,'Y'] - McL$Pb208Th232 - yd[,'X']/a0
             b <- 1/a0
+            L0 <- yd[,'Y'] - McL$Pb208Th232 - b*yd[,'X']
         } else if (type==4){
             yd <- data2york.UPb(x,option=15) # X=07/32, Y=08/32
             A <- McL$Pb206U238/(ThU*U85)
-            L0 <- yd[,'Y'] - McL$Pb208Th232- yd[,'X']/b0
             b <- 1/b0
+            L0 <- yd[,'Y'] - McL$Pb208Th232- b*yd[,'X']
         } else {
             stop('invalid isochron type')
         }
@@ -1006,6 +1005,8 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
     out$c0 <- (yd[,'X']-M)/multiplier
     out$SS <- KL%*%O%*%KL
     out$LL <- LL.norm(KL,E)
+    print(ta0b0w)
+    print(out$LL)
     out
 }
 

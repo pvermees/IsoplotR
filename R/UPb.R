@@ -1134,8 +1134,7 @@ getEl <- function(parent){
     out[6,6] <- (lambda('Th230')[2]*1000)^2
     out[7,7] <- (lambda('Ra226')[2]*1000)^2
     rcnames <- c('U238','U235','U234','Th232','Pa231','Th230','Ra226')
-    rownames(out) <- rcnames
-    colnames(out) <- rcnames
+    rownames(out) <- colnames(out) <- rcnames
     if (missing(parent)){
         # do nothing
     } else if (identical(parent,'U238')){
