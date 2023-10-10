@@ -70,6 +70,11 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #'     which the KDEs should be divided.
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
+#' @param nmodes label the \code{nmodes} most prominent modes of the
+#'     distribution. Change to \code{'all'} to label all the modes.
+#' @param sigdig the number of significant digits to which the modes
+#'     should be labelled. Only used if \code{nmodes} is a positive
+#'     integer or \code{'all'}.
 #' @param ... optional arguments to be passed on to \code{R}'s
 #'     \code{density} function.
 #' @seealso \code{\link{radialplot}}, \code{\link{cad}}
@@ -86,6 +91,9 @@ kde <- function(x,...){ UseMethod("kde",x) }
 #' \item{ages}{ the data values from the input to
 #' the \code{kde} function}
 #' \item{log}{ copied from the input}
+#' \item{modes}{a two-column matrix with the \code{x} and \code{y}
+#' values of the \code{nmodes} most prominent modes. Only returned
+#' if \code{nmodes} is a positive integer or \code{'all'}.}
 #' }
 #'
 #' or, if \code{x} has class \code{=detritals}, an object of class
@@ -588,9 +596,9 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
     graphics::lines(x$x,x$y,col='black')
     if (rug) rug(ages)
     if (!is.null(x$modes)){
-        points(x=x$modes[,'x'],y=x$modes[,'y'],pch='|')
-        text(x=x$modes[,'x'],y=x$modes[,'y'],xpd=TRUE,pos=3,
-             labels=roundit(x$modes[,'x'],sigdig=sigdig))
+        graphics::points(x=x$modes[,'x'],y=x$modes[,'y'],pch='|')
+        graphics::text(x=x$modes[,'x'],y=x$modes[,'y'],xpd=TRUE,pos=3,
+                       labels=roundit(x$modes[,'x'],sigdig=sigdig))
     }
     mymtext(get.ntit(x$ages,m=m,M=M),line=0,adj=1)
 }
