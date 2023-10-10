@@ -508,8 +508,12 @@ getmodes <- function(x,y,miny=max(y)/1000,nmodes=0){
         toosmall <- y[imodes] < miny
         modes <- cbind(x=x[imodes[!toosmall]],y=y[imodes[!toosmall]])
     }
-    if (identical(nmodes,'all')) out <- modes
-    else out <- modes[1:nmodes,,drop=FALSE]
+    if (identical(nmodes,'all')){
+        out <- modes
+    } else {
+        nm <- min(c(nrow(modes),nmodes))
+        out <- modes[1:nm,,drop=FALSE]
+    }
     out
 }
 
