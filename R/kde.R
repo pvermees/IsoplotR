@@ -122,15 +122,15 @@ kde <- function(x,...){ UseMethod("kde",x) }
 kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                         n=512,plot=TRUE,rug=TRUE,xlab="age [Ma]",
                         ylab="",kde.col=rgb(1,0,1,0.6),
-                        hist.col=rgb(0,1,0,0.2),show.hist=TRUE,
-                        bty='n',binwidth=NA,hide=NULL,...){
+                        hist.col=rgb(0,1,0,0.2),show.hist=TRUE,bty='n',
+                        binwidth=NA,hide=NULL,nmodes=0,sigdig=2,...){
     x2calc <- clear(x,hide)
-    X <- getkde(x2calc,from=from,to=to,bw=bw,
-                adaptive=adaptive,log=log,n=n,...)
+    X <- getkde(x2calc,from=from,to=to,bw=bw,adaptive=adaptive,
+                log=log,n=n,nmodes=nmodes,...)
     if (plot) {
         plot.KDE(X,rug=rug,xlab=xlab,ylab=ylab,kde.col=kde.col,
                  hist.col=hist.col,show.hist=show.hist,bty=bty,
-                 binwidth=binwidth)
+                 binwidth=binwidth,sigdig=sigdig)
     }
     invisible(X)
 }
@@ -409,8 +409,8 @@ kde_helper <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 
 # helper functions for the generic kde function
 getkde <- function(x,...){ UseMethod("getkde",x) }
-getkde.default <- function(x,from=NA,to=NA,bw=NA,
-                           adaptive=TRUE,log=FALSE,n=512,...){
+getkde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
+                           log=FALSE,n=512,nmodes=0,...){
     out <- list()
     class(out) <- "KDE"
     out$name <- deparse(substitute(x))
@@ -430,14 +430,14 @@ getkde.default <- function(x,from=NA,to=NA,bw=NA,
     }
     out$x <- seq(from=from,to=to,length.out=n)
     if (adaptive){
-        out$y <- Abramson(d,from=from,to=to,bw=bw,n=n,...)
+        y <- Abramson(d,from=from,to=to,bw=bw,n=n,...)
     } else {
-        out$y <- stats::density(d,bw,from=from,to=to,n=n,...)$y
+        y <- stats::density(d,bw,from=from,to=to,n=n,...)$y
     }
     if (log) out$x <- exp(out$x)
-    out$y <- out$y/(sum(out$y)*(to-from)/n)
     out$x <- c(out$x[1],out$x,out$x[n])
-    out$y <- c(0,out$y,0)
+    out$y <- c(0,y/(sum(y)*(to-from)/n),0)
+    out$modes <- getmodes(x=out$x,y=out$y,nmodes=nmodes)
     out$bw <- bw
     out$ages <- x
     out
@@ -470,6 +470,21 @@ getkde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
     out$themax <- themax
     out$log <- log
     class(out) <- "KDEs"
+    out
+}
+
+getmodes <- function(x,y,nmodes=0){
+    if (nmodes==0){
+        return(NULL)
+    } else {
+        slope <- diff(y)
+        shape <- diff(sign(slope))
+        imax <- which(shape<0)+1
+        imodes <- imax[order(y[imax],decreasing=TRUE)]
+        modes <- cbind(x=x[imodes],y=y[imodes])
+    }
+    if (identical(nmodes,'all')) out <- modes
+    else out <- modes[1:nmodes,]
     out
 }
 
@@ -513,7 +528,7 @@ Abramson <- function(dat,from,to,bw,n=512,...){
 plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
                      hist.col=rgb(0,1,0,0.2),
-                     binwidth=NA,bty='n',...){
+                     binwidth=NA,bty='n',sigdig=2,...){
     m <- x$x[1]
     M <- utils::tail(x$x,n=1)
     inrange <- x$ages >= m & x$ages <= M
@@ -555,6 +570,11 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
     graphics::polygon(x$x,x$y,col=kde.col)
     graphics::lines(x$x,x$y,col='black')
     if (rug) rug(ages)
+    if (!is.null(x$modes)){
+        points(x=x$modes[,'x'],y=x$modes[,'y'],pch=16)
+        text(x=x$modes[,'x'],y=x$modes[,'y'],xpd=TRUE,pos=3,
+             labels=roundit(x$modes[,'x'],sigdig=sigdig))
+    }
     mymtext(get.ntit(x$ages,m=m,M=M),line=0,adj=1)
 }
 

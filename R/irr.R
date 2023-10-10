@@ -111,7 +111,7 @@ LLABlw <- function(ABlw,XY,wtype=NA){
 
 irr <- function(XY,wtype=NA,
                 control=list(maxit=10000,reltol=.Machine$double.eps),...){
-    yfit <- york(XY)
+    yfit <- IsoplotR::york(XY)
     A <- unname(log(abs(yfit$a[1])))
     B <- unname(yfit$b[1])
     if (wtype%in%c(1,'a','intercept')){
