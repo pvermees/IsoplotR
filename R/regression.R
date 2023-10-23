@@ -56,7 +56,6 @@ model2regression <- function(xyz,type='york'){
     out
 }
 
-# fixes signs and uses logs for numerical stability:
 model3regression <- function(xyz,type='york',model=3,wtype='a'){
     pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
@@ -104,8 +103,14 @@ init.york.lw <- function(XY,wtype='a',pilot){
 LL.york.lw <- function(lw,ab,XY,wtype='a'){
     LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
 }
-LL.york.ab <- function(ab,lw,XY,wtype='a'){
+LL.york.ab <- function(ab,lw=-Inf,XY,wtype='a'){
     LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
+}
+LL.york.a <- function(a,b,lw=-Inf,XY,wtype='a'){
+    LL.york(ablw=c(a,b,lw=unname(lw)),XY=XY,wtype=wtype)
+}
+LL.york.b <- function(b,a,lw=-Inf,XY,wtype='b'){
+    LL.york(ablw=c(a,b,lw=unname(lw)),XY=XY,wtype=wtype)
 }
 LL.york <- function(ablw,XY,wtype='a',debug=FALSE){
     if (debug) browser()

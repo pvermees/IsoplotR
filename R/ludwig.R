@@ -467,7 +467,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
         McL <- mclean(tt=tt,d=x$d)
     }
     lower <- par - buffer
-    upper <- par + buffer
+    upper <- par + log(2)
     if (type%in%c('joint',0,1,3)){
         if (x$d$U48$option==1 && x$d$U48$sx>0){
             par['U48i'] <- x$d$U48$x
