@@ -16,7 +16,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
             w <- unname(exp(fit$par[2]))
             sw <- unname(w*sqrt(E[2,2]))
         } else {
-            fit <- optimise(LL.MLyork.b,init,a=a,yd=yd,
+            fit <- optimise(LL.MLyork.b,a=a,yd=yd,
                             lower=init/5,upper=init*5,tol=tol)
             H <- optimHess(fit$minimum,LL.MLyork.b,a=a,yd=yd)
             E <- inverthess(H)
@@ -36,7 +36,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
             w <- unname(exp(fit$par[2]))
             sw <- unname(w*sqrt(E[2,2]))
         } else {
-            fit <- optimise(LL.MLyork.a,init,b=b,yd=yd,
+            fit <- optimise(LL.MLyork.a,b=b,yd=yd,
                             lower=init/5,upper=init*5,tol=tol)
             H <- optimHess(fit$minimum,LL.MLyork.a,b=b,yd=yd)
             E <- inverthess(H)
