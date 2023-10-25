@@ -1,5 +1,5 @@
 anchor2anchor <- function(x,anchor=0,inverse=TRUE){
-    if (anchor[1]==1 && length(anchor)>1){
+    if (anchor[1]==1){
         out <- common2anchor(x,inverse=inverse)
     } else if (anchor[1]==2 && length(anchor)>1){
         out <- age2anchor(x,anchor=anchor,inverse=inverse)

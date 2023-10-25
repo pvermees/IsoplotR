@@ -44,23 +44,24 @@ anchored.deming <- function(dat,anchor){
     out <- list()
     out$par <- c(NA,NA)
     out$cov <- matrix(0,2,2)
-    sa <- sb <- 0
     if (anchor[1]%in%c(1,'intercept','a') && length(anchor)>1){
         a <- anchor[2]
         init <- unname(lm(I(dat[,2]-a) ~ 0 + dat[,1])$coefficients)
         interval <- sort(init*c(1/5,5))
         fit <- optimise(deming.misfit.b,interval=interval,a=a,dat=dat)
-        H <- optimHess(fit$minimum,deming.misfit.b,a=a,dat=dat)
         out$par <- c('a'=a,'b'=fit$minimum)
-        out$cov[2,2] <- inverthess(H)
+        H <- optimHess(fit$minimum,deming.misfit.b,a=a,dat=dat)
+        ve <- var(deming_residuals(ab=out$par,dat=dat))
+        out$cov[2,2] <- inverthess(H)*ve
     } else if (anchor[1]%in%c(2,'slope','b') && length(anchor)>1){
         b <- anchor[2]
         init <- unname(mean(dat[,2]-b*dat[,1]))
         interval <- sort(init*c(1/5,5))
         fit <- optimise(deming.misfit.a,interval=interval,b=b,dat=dat)
-        H <- optimHess(fit$minimum,deming.misfit.a,b=b,dat=dat)
         out$par <- c('a'=fit$minimum,'b'=b)
-        out$cov[1,1] <- inverthess(H)
+        H <- optimHess(fit$minimum,deming.misfit.a,b=b,dat=dat)
+        ve <- var(deming_residuals(ab=out$par,dat=dat))
+        out$cov[1,1] <- inverthess(H)*ve
     } else {
         stop("Invalid anchor.")
     }
@@ -75,10 +76,13 @@ deming.misfit.b <- function(b,a,dat){
 }
 deming.misfit.ab <- function(ab,dat){
     if (ncol(dat)>2) stop("Anchored TLS regression currently only works in 2D")
+    e <-deming_residuals(ab,dat) 
+    sum(e^2)
+}
+deming_residuals <- function(ab,dat){
     a <- ab[1]
     b <- ab[2]
     x <- dat[,1]
     y <- dat[,2]    
-    e <- abs(y-a-b*x)/sqrt(1+b^2)
-    sum(e^2)/var(e)
+    (y-a-b*x)/sqrt(1+b^2)    
 }

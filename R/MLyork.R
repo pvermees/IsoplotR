@@ -19,7 +19,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
             init <- c(b=init,lw=0)
             fit <- optim(init,LL.MLyork.blw,a=p['a'],yd=yd,wtype=wtype,
                          control=list(reltol=tol),hessian=TRUE)
-            p[i] <- exp(fit$par)
+            p[i] <- fit$par
             E[i,i] <- inverthess(fit$hessian)
         } else {
             i <- 'b'
@@ -83,11 +83,11 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
     }
     fit$par <- p
     fit$cov <- E
-    fit$a <- c('a'=p['a'],'s[a]'=sqrt(E['a','a']))
-    fit$b <- c('b'=p['b'],'s[b]'=sqrt(E['b','b']))
+    fit$a <- c(p['a'],'s[a]'=unname(sqrt(E['a','a'])))
+    fit$b <- c(p['b'],'s[b]'=unname(sqrt(E['b','b'])))
     fit$cov.ab <- E['a','b']
-    fit$disp <- c('w'=exp(p['lw']),
-                  's[w]'=exp(p['lw'])*sqrt(E['lw','lw']))
+    fit$disp <- c('w'=unname(exp(p['lw'])),
+                  's[w]'=unname(exp(p['lw'])*sqrt(E['lw','lw'])))
     fit
 }
 
