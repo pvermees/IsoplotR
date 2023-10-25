@@ -1,11 +1,11 @@
-regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
+regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a',anchor=0){
     xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
     if (model==1){
-        out <- model1regression(xyz2calc,type=type)
+        out <- model1regression(xyz2calc,type=type,anchor=anchor)
     } else if (model==2){
-        out <- model2regression(xyz2calc,type=type)
+        out <- model2regression(xyz2calc,type=type,anchor=anchor)
     } else if (model==3){
-        out <- model3regression(xyz2calc,type=type,wtype=wtype)
+        out <- model3regression(xyz2calc,type=type,wtype=wtype,anchor=anchor)
         out$wtype <- wtype
     } else if (model==4 && identical(type,'york')){
         out <- irr(xyz2calc)
@@ -24,9 +24,10 @@ regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
     out
 }
 
-model1regression <- function(xyz,type='york'){
+model1regression <- function(xyz,type='york',anchor=0){
     if (identical(type,'york')){
-        out <- york(xyz)
+        if (anchor[1]<1 || length(anchor)<2) out <- york(xyz)
+        else out <- MLyork(xyz,anchor=anchor)
     } else if (identical(type,'titterington')){
         out <- titterington(xyz)
     } else if (identical(type,'ogls')){
@@ -37,13 +38,10 @@ model1regression <- function(xyz,type='york'){
     out
 }
 
-model2regression <- function(xyz,type='york'){
+model2regression <- function(xyz,type='york',anchor=0){
     if (identical(type,'york')){
-        out <- tls(xyz[,c('X','Y')])
+        out <- MLyork(xyz[,c('X','Y')],anchor=anchor,model=2)
         out$df <- nrow(xyz)-2
-        out$a <- c(out$par['a'],'s[a]'=unname(sqrt(out$cov['a','a'])))
-        out$b <- c(out$par['b'],'s[b]'=unname(sqrt(out$cov['b','b'])))
-        out$cov.ab <- out$cov['a','b']
     } else if (identical(type,'titterington')){
         out <- tls(xyz[,c('X','Y','Z')])
         out$df <- 2*nrow(xyz)-4
@@ -56,22 +54,12 @@ model2regression <- function(xyz,type='york'){
     out
 }
 
-model3regression <- function(xyz,type='york',model=3,wtype='a'){
-    pilot <- model1regression(xyz,type=type)
+model3regression <- function(xyz,type='york',wtype='a',anchor=0){
     if (identical(type,'york')){
-        ilw <- init.york.lw(XY=xyz,wtype=wtype,pilot=pilot)$minimum
-        init <- c(pilot$a['a'],pilot$b['b'],lw=ilw)
-        upper <- init + c(5*pilot$a['s[a]'],5*pilot$b['s[b]'],2)
-        lower <- init - c(5*pilot$a['s[a]'],5*pilot$b['s[b]'],2)
-        out <- contingencyfit(par=init,fn=LL.york,lower=lower,
-                              upper=upper,XY=xyz,wtype=wtype)
-        out$a <- c(out$par['a'],'s[a]'=NA)
-        out$b <- c(out$par['b'],'s[b]'=NA)
-        E <- inverthess(out$hessian)
-        out$a['s[a]'] <- unname(sqrt(E['a','a']))
-        out$b['s[b]'] <- unname(sqrt(E['b','b']))
-        out$cov.ab <- E['a','b']
+        out <- MLyork(yd=xyz,anchor=anchor,model=3,wtype=wtype)
+        E <- out$cov
     } else if (identical(type,'titterington')){
+        pilot <- model1regression(xyz,type=type)
         ilw <- init.titterington.lw(XYZ=xyz,wtype=wtype,pilot=pilot)$minimum
         init <- c(pilot$par,'lw'=unname(ilw))
         upper <- init + c(5*pilot$par[c('a','b','A','B')],2)
@@ -91,48 +79,6 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
     sdisp <- disp*sqrt(E['lw','lw'])
     out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
     out
-}
-
-init.york.lw <- function(XY,wtype='a',pilot){
-    err <- ifelse(wtype%in%c('intercept',0,'a'),
-                  pilot$a['s[a]'],pilot$b['s[b]'])
-    init <- log(sqrt(pilot$mswd)*err)
-    stats::optimise(f=LL.york.lw,interval=init+c(-10,5),
-                    ab=c(pilot$a['a'],pilot$b['b']),XY=XY,wtype=wtype)
-}
-LL.york.lw <- function(lw,ab,XY,wtype='a'){
-    LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
-}
-LL.york.ab <- function(ab,lw=-Inf,XY,wtype='a'){
-    LL.york(ablw=c(ab,lw=unname(lw)),XY=XY,wtype=wtype)
-}
-LL.york.a <- function(a,b,lw=-Inf,XY,wtype='a'){
-    LL.york(ablw=c(a,b,lw=unname(lw)),XY=XY,wtype=wtype)
-}
-LL.york.b <- function(b,a,lw=-Inf,XY,wtype='b'){
-    LL.york(ablw=c(a,b,lw=unname(lw)),XY=XY,wtype=wtype)
-}
-LL.york <- function(ablw,XY,wtype='a',debug=FALSE){
-    if (debug) browser()
-    ns <- nrow(XY)
-    a <- ablw['a']
-    b <- ablw['b']
-    w <- exp(ablw['lw'])
-    x <- get.york.xy(XY=XY,a=a,b=b,w=w,wtype=wtype)[,'x']
-    DE <- matrix(0,nrow=ns,ncol=5)
-    colnames(DE) <- c('X-x','Y-y','vX','vY','sXY')
-    DE[,'X-x'] <- XY[,'X']-x
-    DE[,'Y-y'] <- XY[,'Y']-a-b*x
-    DE[,'vX'] <- XY[,'sX']^2
-    if (wtype%in%c('intercept',0,'a')) DE[,'vY'] <- XY[,'sY']^2 + w^2
-    else if (wtype%in%c('slope',1,'b')) DE[,'vY'] <- XY[,'sY']^2 + (w*x)^2
-    else DE[,'vY'] <- XY[,'sY']^2
-    DE[,'sXY'] <- XY[,'rXY']*XY[,'sX']*XY[,'sY']
-    detE <- DE[,'vX']*DE[,'vY'] - DE[,'sXY']^2
-    O <- invertcovmat(vx=DE[,'vX'],vy=DE[,'vY'],sxy=DE[,'sXY'])
-    maha <- (O[,'xx']*DE[,'X-x'] + O[,'xy']*DE[,'Y-y'])*DE[,'X-x'] +
-        (O[,'xy']*DE[,'X-x'] + O[,'yy']*DE[,'Y-y'])*DE[,'Y-y']
-    sum(log(detE) + maha)/2
 }
 
 init.titterington.lw <- function(XYZ,wtype='a',pilot){

@@ -2,74 +2,92 @@
 # This is more flexible than the original least squares method
 MLyork <- function(yd,anchor=0,model=1,wtype='a'){
     tol <- 2*.Machine$double.eps
-    sa <- sb <- cov.ab <- w <- sw <- NA
+    p <- c(NA,NA,-Inf)
+    E <- matrix(0,3,3)
+    names(p) <- rownames(E) <- colnames(E) <- c('a','b','lw')
+    ns <- nrow(yd)
     if (anchor[1]==1 && length(anchor)>1){ # anchor intercept
-        a <- anchor[2]
-        init <- unname(lm(I(yd[,'Y']-a) ~ 0 + yd[,'X'])$coefficients)
+        p['a'] <- anchor[2]
+        init <- lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])$coefficients
         if (model==2){
-            stop("not implemented yet")
+            i <- 'b'
+            fit <- tls(yd[,c('X','Y')],anchor=anchor)
+            p[i] <- fit$par[2]
+            E[i,i] <- fit$cov[2,2]
         } else if (model==3){ # wtype = 2
+            i <- c('b','lw')
             init <- c(b=init,lw=0)
-            fit <- optim(init,LL.MLyork.blw,a=a,yd=yd,wtype=wtype,
+            fit <- optim(init,LL.MLyork.blw,a=p['a'],yd=yd,wtype=wtype,
                          control=list(reltol=tol),hessian=TRUE)
-            E <- inverthess(fit$hessian)
-            w <- unname(exp(fit$par[2]))
-            sw <- unname(w*sqrt(E[2,2]))
+            p[i] <- exp(fit$par)
+            E[i,i] <- inverthess(fit$hessian)
         } else {
-            fit <- optimise(LL.MLyork.b,a=a,yd=yd,
+            i <- 'b'
+            fit <- optimise(LL.MLyork.b,a=p['a'],yd=yd,
                             lower=init/5,upper=init*5,tol=tol)
-            H <- optimHess(fit$minimum,LL.MLyork.b,a=a,yd=yd)
-            E <- inverthess(H)
+            p[i] <- fit$minimum
+            H <- optimHess(fit$minimum,LL.MLyork.b,a=p['a'],yd=yd)
+            E[i,i] <- inverthess(H)
+            df <- ns-1
         }
-        b <- unname(fit$par[1])
-        sb <- unname(sqrt(E[1,1]))
     } else if (anchor[1]==2 && length(anchor)>1){ # anchor slope
-        b <- anchor[2]
-        init <- unname(mean(yd[,'Y']-b*yd[,'X']))
+        p['b'] <- anchor[2]
+        init <- mean(yd[,'Y']-p['b']*yd[,'X'])
         if (model==2){
-            stop("not implemented yet")
+            i <- 'a'
+            fit <- tls(yd[,c('X','Y')],anchor=anchor)
+            p[i] <- fit$par[1]
+            E[i,i] <- fit$cov[1,1]
         } else if (model==3){ # wtype = 1
+            i <- c('a','lw')
             init <- c(a=init,lw=0)
-            fit <- optim(init,LL.MLyork.alw,b=b,yd=yd,wtype=wtype,
+            fit <- optim(init,LL.MLyork.alw,b=p['b'],yd=yd,wtype=wtype,
                          control=list(reltol=tol),hessian=TRUE)
-            E <- inverthess(fit$hessian)
-            w <- unname(exp(fit$par[2]))
-            sw <- unname(w*sqrt(E[2,2]))
+            p[i] <- fit$par
+            E[i,i] <- inverthess(fit$hessian)
         } else {
-            fit <- optimise(LL.MLyork.a,b=b,yd=yd,
+            i <- 'a'
+            fit <- optimise(LL.MLyork.a,b=p['b'],yd=yd,
                             lower=init/5,upper=init*5,tol=tol)
-            H <- optimHess(fit$minimum,LL.MLyork.a,b=b,yd=yd)
-            E <- inverthess(H)
+            p[i] <- fit$minimum
+            H <- optimHess(fit$minimum,LL.MLyork.a,b=p['b'],yd=yd)
+            E[i,i] <- inverthess(H)
+            df <- ns-1
         }
-        a <- unname(fit$par[1])
-        sa <- unname(sqrt(E[1,1]))
     } else {
         ab <- unname(lm(yd[,'Y'] ~ yd[,'X'])$coefficients)
         if (model==2){
-            stop("not implemented yet")
+            i <- c('a','b')
+            fit <- tls(yd[,c('X','Y')])
+            p[i] <- fit$par
+            E[i,i] <- fit$cov
         } else if (model==3){
             init <- c(a=ab[1],b=ab[2],lw=0)
             fit <- optim(init,LL.MLyork.ablw,yd=yd,wtype=wtype,
                          control=list(reltol=tol),hessian=TRUE)
+            p <- fit$par
             E <- inverthess(fit$hessian)
-            w <- unname(exp(fit$par[3]))
-            sw <- unname(w*sqrt(E[3,3]))
-        } else {
+        } else { # this is equivalent to ordinary York regression
             init <- c(a=ab[1],b=ab[2])
             fit <- optim(init,LL.MLyork.ab,yd=yd,
                          control=list(reltol=tol),hessian=TRUE)
+            p <- fit$par
             E <- inverthess(fit$hessian)
+            SS <- LL.MLyork.ab(fit$par,yd=yd,SS=TRUE)
+            df <- ns-2
         }
-        a <- unname(fit$par[1])
-        sa <- unname(sqrt(E[1,1]))
-        b <- unname(fit$par[2])
-        sb <- unname(sqrt(E[2,2]))
-        cov.ab <- E[1,2]
     }
-    fit$a <- c('a'=a,'s[a]'=sa)
-    fit$b <- c('b'=b,'s[b]'=sb)
-    fit$cov.ab <- cov.ab
-    fit$disp <- c('w'=w,'s[w]'=sw)
+    if (model==1){
+        SS <- LL.MLyork.ablw(p,yd=yd,SS=TRUE)
+        fit <- append(fit,getMSWD(X2=SS,df=df))
+    }
+    fit$par <- p
+    fit$cov <- E
+    fit$a <- c('a'=p['a'],'s[a]'=sqrt(E['a','a']))
+    fit$b <- c('b'=p['b'],'s[b]'=sqrt(E['b','b']))
+    fit$cov.ab <- E['a','b']
+    fit$disp <- c('w'=exp(p['lw']),
+                  's[w]'=exp(p['lw'])*sqrt(E['lw','lw']))
     fit
 }
 
@@ -97,15 +115,16 @@ LL.MLyork.blw <- function(blw,a,yd,wtype='b'){
     LL.MLyork.ablw(c(a,blw),yd=yd,wtype=wtype)
 }
 
-LL.MLyork.ablw <- function(ablw,yd,wtype='a'){
+LL.MLyork.ablw <- function(ablw,yd,wtype='a',SS=FALSE){
     a <- ablw[1]
     b <- ablw[2]
     w <- exp(ablw[3])
     x <- MLY.getx(yd,a=a,b=b,w=w,wtype=wtype)
     E <- MLY.getE(yd,w=w,wtype=wtype,x=x)
     detE <- E[,1]*E[,2]-E[,3]^2
-    SS <- MLY.maha(a=a,b=b,x=x,X=yd[,'X'],Y=yd[,'Y'],O=MLY.getO(E))
-    sum(log(detE)+SS)/2
+    S <- MLY.maha(a=a,b=b,x=x,X=yd[,'X'],Y=yd[,'Y'],O=MLY.getO(E))
+    if (SS) return(sum(S))
+    else return(sum(log(detE)+S)/2)
 }
 
 MLY.getE <- function(yd,w=0,wtype='a',x=NA){
@@ -117,14 +136,7 @@ MLY.getE <- function(yd,w=0,wtype='a',x=NA){
     cbind(E11,E22,E12)
 }
 MLY.getO <- function(E){
-    E11 <- E[,1]
-    E22 <- E[,2]
-    E12 <- E[,3]
-    detE <- E11*E22 - E12^2
-    O11 <- E22/detE
-    O22 <- E11/detE
-    O12 <- -E12/detE
-    cbind(O11,O22,O12)
+    invertcovmat(vx=E[,1],vy=E[,2],sxy=E[,3])
 }
 MLY.maha <- function(yd,a,b,x,X,Y,O){
     O11 <- O[,1]; O22 <- O[,2]; O12 <- O[,3]

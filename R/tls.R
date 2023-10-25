@@ -40,7 +40,7 @@ tlspar <- function(dat){
     out
 }
 
-anchored.deming <- function(dat,anchor='a'){
+anchored.deming <- function(dat,anchor){
     out <- list()
     out$par <- c(NA,NA)
     out$cov <- matrix(0,2,2)
@@ -55,7 +55,7 @@ anchored.deming <- function(dat,anchor='a'){
         out$cov[2,2] <- inverthess(H)
     } else if (anchor[1]%in%c(2,'slope','b') && length(anchor)>1){
         b <- anchor[2]
-        init <- unname(mean(yd[,2]-b*yd[,1]))
+        init <- unname(mean(dat[,2]-b*dat[,1]))
         interval <- sort(init*c(1/5,5))
         fit <- optimise(deming.misfit.a,interval=interval,b=b,dat=dat)
         H <- optimHess(fit$minimum,deming.misfit.a,b=b,dat=dat)
@@ -74,7 +74,7 @@ deming.misfit.b <- function(b,a,dat){
     deming.misfit.ab(c(a,b),dat)
 }
 deming.misfit.ab <- function(ab,dat){
-    if (ncol(dat)>2) stop("Anchored TLS regression only works in 2D")
+    if (ncol(dat)>2) stop("Anchored TLS regression currently only works in 2D")
     a <- ab[1]
     b <- ab[2]
     x <- dat[,1]

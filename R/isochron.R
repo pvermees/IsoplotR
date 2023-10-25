@@ -463,10 +463,10 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                              ellipse.stroke='black',ci.col='gray80',
                              line.col='black',lwd=1,plot=TRUE,
                              title=TRUE,model=1,show.ellipses=1*(model!=2),
-                             hide=NULL,omit=NULL,omit.fill=NA,
+                             anchor=0,hide=NULL,omit=NULL,omit.fill=NA,
                              omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
-    fit <- regression(data2york(d2calc),model=model)
+    fit <- regression(data2york(d2calc),model=model,anchor=anchor)
     genericisochronplot(x=x,fit=fit,oerr=oerr,sigdig=sigdig,
                         show.numbers=show.numbers,levels=levels,clabel=clabel,
                         xlab=xlab,ylab=ylab,ellipse.fill=ellipse.fill,
@@ -484,12 +484,12 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,
                            title=TRUE,model=1,show.ellipses=1*(model!=2),
-                           hide=NULL,omit=NULL,omit.fill=NA,
+                           anchor=0,hide=NULL,omit=NULL,omit.fill=NA,
                            omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     if (x$format%in%c(4,5)){
         yd <- data2york(d2calc$x,format=d2calc$format)
-        fit <- regression(yd,model=model)
+        fit <- regression(yd,model=model,anchor=anchor)
     } else if (x$format==6){
         fit <- regression(d2calc$x,model=model,type='ogls')
     } else {
@@ -851,11 +851,13 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
-                          omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                          growth=FALSE,show.ellipses=1*(model!=2),
+                          anchor=0,hide=NULL,omit=NULL,omit.fill=NA,
+                          omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
+    anchor <- anchor2anchor(x,anchor=anchor,inverse=inverse)
+    out <- regression(d2calc,model=model,wtype=wtype,anchor=anchor)
     if (inverse){
         R76 <- out$a
         out$y0[c('y','s[y]')] <- out$b
@@ -947,11 +949,11 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          show.ellipses=1*(model!=2),hide=NULL,
+                          show.ellipses=1*(model!=2),anchor=0,hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
+    out <- regression(d2calc,model=model,wtype=wtype,anchor=anchor)
     a <- out$a['a']
     sa <- out$a['s[a]']
     b <- out$b['b']
@@ -1014,14 +1016,14 @@ isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          show.ellipses=1*(model!=2),hide=NULL,
+                          show.ellipses=1*(model!=2),anchor=0,hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Th232',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,
+                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
                 show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
@@ -1032,14 +1034,14 @@ isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',line.col='black',
                          lwd=1, plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                         show.ellipses=1*(model!=2),hide=NULL,
+                         show.ellipses=1*(model!=2),anchor=0,hide=NULL,
                          omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='K40',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,
+                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
                 show.ellipses=show.ellipses,bratio=0.895,hide=hide,
                 omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
@@ -1050,14 +1052,14 @@ isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',
                           lwd=1,plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          show.ellipses=1*(model!=2),hide=NULL,
+                          show.ellipses=1*(model!=2),anchor=0,hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Rb87',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,
+                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
                 show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
@@ -1068,14 +1070,14 @@ isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          show.ellipses=1*(model!=2),hide=NULL,
+                          show.ellipses=1*(model!=2),anchor=0,hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Re187',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,
+                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
                 show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
@@ -1086,14 +1088,14 @@ isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          show.ellipses=1*(model!=2),hide=NULL,
+                          show.ellipses=1*(model!=2),anchor=0,hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Sm147',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers, levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,
+                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
                 show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
@@ -1104,14 +1106,14 @@ isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          show.ellipses=1*(model!=2),hide=NULL,
+                          show.ellipses=1*(model!=2),anchor=0,hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     isochron_PD(x,nuclide='Lu176',oerr=oerr,sigdig=sigdig,
                 show.numbers=show.numbers,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,
+                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
                 show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
@@ -1122,11 +1124,11 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,model=1,
                            wtype='intercept',show.ellipses=2*(model!=2),
-                           hide=NULL,omit=NULL,omit.fill=NA,
+                           anchor=0,hide=NULL,omit=NULL,omit.fill=NA,
                            omit.stroke='grey',...){
     y <- data2york(x)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
+    out <- regression(d2calc,model=model,wtype=wtype,anchor=anchor)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
     if (inflate(out)){
@@ -1370,11 +1372,11 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                         ellipse.stroke='black',inverse=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
                         plot=TRUE,exterr=TRUE,model=1,wtype=NA,
-                        show.ellipses=1*(model!=2),bratio=1,
-                        hide=NULL,omit=NULL,...){
+                        show.ellipses=1*(model!=2),anchor=0,
+                        bratio=1,hide=NULL,omit=NULL,...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
+    out <- regression(d2calc,model=model,wtype=wtype,anchor=anchor)
     out$y0[c('y','s[y]')] <- out$a
     if (inverse){
         DP <- -out$b[1]/out$a[1]
