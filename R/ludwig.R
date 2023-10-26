@@ -1122,13 +1122,7 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     } else {
         SS <- data2ludwig.2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr)$SS
     }
-    if (out$df>0){
-        out$mswd <- as.vector(SS/out$df)
-        out$p.value <- as.numeric(1-stats::pchisq(SS,out$df))
-    } else {
-        out$mswd <- 1
-        out$p.value <- 1
-    }
+    out <- append(out,getMSWD(SS,out$df))
     out$n <- ns
     out
 }

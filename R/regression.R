@@ -1,4 +1,5 @@
-regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a',anchor=0){
+regression <- function(xyz,model=1,type='york',omit=NULL,
+                       wtype=1,anchor=0,flip=FALSE){
     xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
     if (model==1){
         out <- model1regression(xyz2calc,type=type,anchor=anchor)
@@ -54,7 +55,7 @@ model2regression <- function(xyz,type='york',anchor=0){
     out
 }
 
-model3regression <- function(xyz,type='york',wtype='a',anchor=0){
+model3regression <- function(xyz,type='york',wtype=1,anchor=0){
     if (identical(type,'york')){
         out <- MLyork(yd=xyz,anchor=anchor,model=3,wtype=wtype)
         E <- out$cov
@@ -81,7 +82,7 @@ model3regression <- function(xyz,type='york',wtype='a',anchor=0){
     out
 }
 
-init.titterington.lw <- function(XYZ,wtype='a',pilot){
+init.titterington.lw <- function(XYZ,wtype=1,pilot){
     fact <- max(1,sqrt(pilot$mswd))
     spar <- fact*sqrt(diag(pilot$cov))
     if (wtype%in%c('intercept',0,'a')) init <- log(spar['a'])
@@ -92,10 +93,10 @@ init.titterington.lw <- function(XYZ,wtype='a',pilot){
     stats::optimise(f=LL.titterington.lw,interval=init+c(-10,5),
                     abAB=pilot$par,XYZ=XYZ,wtype=wtype)
 }
-LL.titterington.lw <- function(lw,abAB,XYZ,wtype='a'){
+LL.titterington.lw <- function(lw,abAB,XYZ,wtype=1){
     LL.titterington(abABlw=c(abAB,lw=unname(lw)),XYZ=XYZ,wtype=wtype)
 }
-LL.titterington <- function(abABlw,XYZ,wtype='a'){
+LL.titterington <- function(abABlw,XYZ,wtype=1){
     ns <- nrow(XYZ)
     a <- abABlw['a']
     b <- abABlw['b']
@@ -111,13 +112,13 @@ LL.titterington <- function(abABlw,XYZ,wtype='a'){
     DE[,'vX'] <- XYZ[,'sX']^2
     DE[,'vY'] <- XYZ[,'sY']^2
     DE[,'vZ'] <- XYZ[,'sZ']^2
-    if (wtype=='a'){
+    if (wtype==1){
         DE[,'vY'] <- XYZ[,'sY']^2 + w^2
-    } else if (wtype=='b'){
+    } else if (wtype==2){
         DE[,'vY'] <- XYZ[,'sY']^2 + (w*x)^2
-    } else if (wtype=='A'){
+    } else if (wtype==3){
         DE[,'vZ'] <- XYZ[,'sZ']^2 + w^2
-    } else if (wtype=='B'){
+    } else if (wtype==4){
         DE[,'vZ'] <- XYZ[,'sZ']^2 + (w*x)^2
     }
     DE[,'sXY'] <- XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY']

@@ -112,19 +112,6 @@ york <- function(x){
     out
 }
 
-getMSWD <- function(X2,df){
-    out <- list()
-    out$df <- df
-    if (df>0){
-        out$mswd <- as.numeric(X2/df)
-        out$p.value <- as.numeric(1-stats::pchisq(X2,df))
-    } else {
-        out$mswd <- 1
-        out$p.value <- 1
-    }
-    out
-}
-
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities

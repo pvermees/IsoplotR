@@ -167,17 +167,27 @@
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
 #'
-#' \code{0}, \code{'a'} or \code{'intercept'}: attributes the
-#' overdispersion to the y-intercept of the isochron.
+#' \code{1}: depending on the class of \code{x}, attributes the overdispersion to:
 #'
-#' \code{1}, \code{'b'} or \code{'slope'}: attributes the
-#' overdispersion to the slope of the isochron.
+#' \describe{
+#' \item \code{PbPb}: the inherited \eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb-ratio.
+#' \item \code{ArAr}: the inherited \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar-ratio.
+#' \item \code{ThU}: the y-intercept of the isochron.
+#' }
+#' 
+#' \code{2}: depending on the class of \code{x},
+#' attributes the overdispersion to:
 #'
-#' \code{'A'}: only available if \code{x} has class \code{ThU} and
+#' \describe{
+#' \item \code{PbPb}, \code{ArAr}: diachroneity of the ages.
+#' \item \code{ThU}: the slope of the isochron.
+#' }
+#' 
+#' \code{3}: only available if \code{x} has class \code{ThU} and
 #' \code{x$format} is 1 or 2. Attributes the overdispersion to the
 #' authigenic \eqn{^{230}}Th/\eqn{^{238}}U-intercept of the isochron.
 #'
-#' \code{'B'}: only available if \code{x} has class \code{ThU} and
+#' \code{4}: only available if \code{x} has class \code{ThU} and
 #' \code{x$format} is 1 or 2. Attributes the overdispersion to the
 #' \eqn{^{230}}Th/\eqn{^{232}}Th-slope of the isochron.
 #' 
@@ -850,9 +860,9 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
+                          plot=TRUE,exterr=TRUE,model=1,wtype=1,anchor=0,
                           growth=FALSE,show.ellipses=1*(model!=2),
-                          anchor=0,hide=NULL,omit=NULL,omit.fill=NA,
+                          hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
@@ -948,12 +958,16 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
-                          show.ellipses=1*(model!=2),anchor=0,hide=NULL,
+                          plot=TRUE,exterr=TRUE,model=1,wtype=1,anchor=0,
+                          show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype,anchor=anchor)
+    anchor <- anchor2anchor(x,anchor=anchor,inverse=inverse)
+    if (anchor[1]==1) wtype <- 2
+    if (anchor[1]==2) wtype <- 1
+    flip <- flipper(x,model=model,inverse=inverse,wtype=wtype,anchor=anchor)
+    out <- regression(d2calc,model=model,wtype=wtype,anchor=anchor,flip=flip)
     a <- out$a['a']
     sa <- out$a['s[a]']
     b <- out$b['b']

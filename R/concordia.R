@@ -752,17 +752,18 @@ mswd.concordia <- function(x,cc,type=1,pars,exterr=TRUE){
     names(mswd) <- labels
     names(p.value) <- labels
     names(df) <- labels
-    mswd['equivalence'] <- SS.equivalence/df.equivalence
-    mswd['concordance'] <- SS.concordance/df.concordance
-    mswd['combined'] <- (SS.equivalence+SS.concordance)/
-        (df.equivalence+df.concordance)
-    p.value['equivalence'] <- 1-stats::pchisq(SS.equivalence,df.equivalence)
-    p.value['concordance'] <- 1-stats::pchisq(SS.concordance,df.concordance)
-    p.value['combined'] <- 1-stats::pchisq(SS.equivalence+SS.concordance,
-                                           df.equivalence+df.concordance)
     df['equivalence'] <- df.equivalence
     df['concordance'] <- df.concordance
     df['combined'] <- df.equivalence + df.concordance
+    mswdpequi <- getMSWD(SS.equivalence,df['equivalence'])
+    mswdpconc <- getMSWD(SS.concordance,df['concordance'])
+    mswdpcomb <- getMSWD(SS.equivalence+SS.concordance,df['combined'])
+    mswd['equivalence'] <- mswdpequi$mswd
+    mswd['concordance'] <- mswdpconc$mswd
+    mswd['combined'] <- mswdpcomb$mswd
+    p.value['equivalence'] <- mswdpequi$p.value
+    p.value['concordance'] <- mswdpconc$p.value
+    p.value['combined'] <- mswdpcomb$p.value
     list(mswd=mswd,p.value=p.value,df=df)
 }
 
