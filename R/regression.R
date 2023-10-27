@@ -1,20 +1,21 @@
 # dispatch functions for all the regression algorithms (except Ludwig)
 
-regression <- function(xyz,model=1,type='york',omit=NULL,wtype=1,anchor=0){
+regression <- function(xyz,model=1,type='york',omit=NULL,abwtype=1,abanchor=0){
     xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
     if (model==1){
-        out <- model1regression(xyz2calc,type=type,anchor=anchor)
+        out <- model1regression(xyz2calc,type=type,abanchor=abanchor)
     } else if (model==2){
-        out <- model2regression(xyz2calc,type=type,anchor=anchor)
+        out <- model2regression(xyz2calc,type=type,abanchor=abanchor)
     } else if (model==3){
-        out <- model3regression(xyz2calc,type=type,wtype=wtype,anchor=anchor)
-        out$wtype <- wtype
+        out <- model3regression(xyz2calc,type=type,
+                                abwtype=abwtype,abanchor=abanchor)
+        out$abwtype <- abwtype
     } else if (model==4 && identical(type,'york')){
         out <- irr(xyz2calc)
-        out$wtype <- wtype
+        out$abwtype <- abwtype
     } else if (model==5 && identical(type,'york')){
-        out <- irr(xyz2calc,wtype=wtype)
-        out$wtype <- wtype
+        out <- irr(xyz2calc,abwtype=abwtype)
+        out$abwtype <- abwtype
     } else {
         stop('invalid regression model')
     }
@@ -26,9 +27,9 @@ regression <- function(xyz,model=1,type='york',omit=NULL,wtype=1,anchor=0){
     out
 }
 
-model1regression <- function(xyz,type='york',anchor=0){
+model1regression <- function(xyz,type='york',abanchor=0){
     if (identical(type,'york')){
-        if (anchor[1]<1 | length(anchor)<2){
+        if (abanchor[1]<1 | length(abanchor)<2){
             out <- york(xyz)
             out$par <- c(out$a[1],out$b[1],lw=-Inf)
             out$cov <- rbind(c(out$a[2]^2,out$cov.ab,0),
@@ -37,7 +38,7 @@ model1regression <- function(xyz,type='york',anchor=0){
             names(out$par) <- colnames(out$cov) <-
                 rownames(out$cov) <- c('a','b','lw')
         } else {
-            out <- MLyork(xyz,anchor=anchor)
+            out <- MLyork(xyz,abanchor=abanchor)
         }
     } else if (identical(type,'titterington')){
         out <- titterington(xyz)
@@ -49,9 +50,9 @@ model1regression <- function(xyz,type='york',anchor=0){
     out
 }
 
-model2regression <- function(xyz,type='york',anchor=0){
+model2regression <- function(xyz,type='york',abanchor=0){
     if (identical(type,'york')){
-        out <- MLyork(xyz[,c('X','Y')],anchor=anchor,model=2)
+        out <- MLyork(xyz[,c('X','Y')],abanchor=abanchor,model=2)
         out$df <- nrow(xyz)-2
     } else if (identical(type,'titterington')){
         out <- tls(xyz[,c('X','Y','Z')])
@@ -65,18 +66,18 @@ model2regression <- function(xyz,type='york',anchor=0){
     out
 }
 
-model3regression <- function(xyz,type='york',wtype=1,anchor=0){
+model3regression <- function(xyz,type='york',abwtype=1,abanchor=0){
     if (identical(type,'york')){
-        out <- MLyork(yd=xyz,anchor=anchor,model=3,wtype=wtype)
+        out <- MLyork(yd=xyz,abanchor=abanchor,model=3,abwtype=abwtype)
         E <- out$cov
     } else if (identical(type,'titterington')){
         pilot <- model1regression(xyz,type=type)
-        ilw <- init.titterington.lw(XYZ=xyz,wtype=wtype,pilot=pilot)$minimum
+        ilw <- init.titterington.lw(XYZ=xyz,abwtype=abwtype,pilot=pilot)$minimum
         init <- c(pilot$par,'lw'=unname(ilw))
         upper <- init + c(5*pilot$par[c('a','b','A','B')],2)
         lower <- init - c(5*pilot$par[c('a','b','A','B')],2)
         out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
-                              upper=upper,XYZ=xyz,wtype=wtype)
+                              upper=upper,XYZ=xyz,abwtype=abwtype)
         out$cov <- E <- inverthess(out$hessian)
     } else if (identical(type,'titterington')){
         stop('not yet implemented')
@@ -92,19 +93,19 @@ model3regression <- function(xyz,type='york',wtype=1,anchor=0){
     out
 }
 
-init.titterington.lw <- function(XYZ,wtype=1,pilot){
+init.titterington.lw <- function(XYZ,abwtype=1,pilot){
     fact <- max(1,sqrt(pilot$mswd))
     spar <- fact*sqrt(diag(pilot$cov))
-    if (wtype%in%c('intercept',0,'a')) init <- log(spar['a'])
-    else if (wtype%in%c(1,'b')) init <- log(spar['b'])
-    else if (wtype%in%c(2,'A')) init <- log(spar['A'])
-    else if (wtype%in%c(3,'B')) init <- log(spar['B'])
-    else stop('illegal wtype')
+    if (abwtype%in%c('intercept',0,'a')) init <- log(spar['a'])
+    else if (abwtype%in%c(1,'b')) init <- log(spar['b'])
+    else if (abwtype%in%c(2,'A')) init <- log(spar['A'])
+    else if (abwtype%in%c(3,'B')) init <- log(spar['B'])
+    else stop('illegal abwtype')
     stats::optimise(f=LL.titterington.lw,interval=init+c(-10,5),
-                    abAB=pilot$par,XYZ=XYZ,wtype=wtype)
+                    abAB=pilot$par,XYZ=XYZ,abwtype=abwtype)
 }
-LL.titterington.lw <- function(lw,abAB,XYZ,wtype=1){
-    LL.titterington(abABlw=c(abAB,lw=unname(lw)),XYZ=XYZ,wtype=wtype)
+LL.titterington.lw <- function(lw,abAB,XYZ,abwtype=1){
+    LL.titterington(abABlw=c(abAB,lw=unname(lw)),XYZ=XYZ,abwtype=abwtype)
 }
 LL.titterington <- function(abABlw,XYZ,wtype=1){
     ns <- nrow(XYZ)

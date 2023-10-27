@@ -962,11 +962,10 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     fit <- flippedregression(x,model=model,inverse=inverse,
                              wtype=wtype,anchor=anchor,omit=omit,hide=hide)
-    DPDd <- generic2DPDd(fit)
-    R09 <- DPDd$DP[1]
-    sR09 <- DPDd$DP[2]
-    out <- fit
-    out$y0 <- DPDd$Dd
+    out <- flipback(fit,model=model,wtype=wtype)
+    R09 <- out$DP[1]
+    sR09 <- out$DP[2]
+    out$y0 <- out$Dd
     names(out$y0) <- c('y','s[y]')
     if (inverse) {
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
@@ -983,16 +982,11 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
     }
     dispunits <- ''
-    if (model==3){
-        if (wtype==2){
-            l40 <- lambda('K40')[1]
-            dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
-            out$disp <- dtd09*exp(DPDd$par['lw'])
-            dispunits <- ' Ma'
-        } else if (inverse){ # wtype%in%c('intercept',0,'a')
-            out$disp[1] <- exp(DPDd$par['lw'])
-            out$disp[2] <- w*sqrt(DPDd$cov['lw','lw'])
-        }
+    if (model==3 & wtype==2){
+        l40 <- lambda('K40')[1]
+        dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
+        out$disp <- dtd09*out$disp
+        dispunits <- ' Ma'
     }
     if (plot) {
         scatterplot(out$yd,oerr=oerr,show.ellipses=show.ellipses,
