@@ -68,8 +68,7 @@ model2regression <- function(xyz,type='york',abanchor=0){
 
 model3regression <- function(xyz,type='york',abwtype=1,abanchor=0){
     if (identical(type,'york')){
-        out <- MLyork(yd=xyz,abanchor=abanchor,model=3,abwtype=abwtype)
-        E <- out$cov
+        return(MLyork(yd=xyz,abanchor=abanchor,model=3,abwtype=abwtype))
     } else if (identical(type,'titterington')){
         pilot <- model1regression(xyz,type=type)
         ilw <- init.titterington.lw(XYZ=xyz,abwtype=abwtype,pilot=pilot)$minimum

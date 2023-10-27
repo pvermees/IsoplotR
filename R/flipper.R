@@ -83,6 +83,7 @@ flipback <- function(fit,model,wtype){
     ao <- ai <- unname(fit$a['a'])
     bo <- bi <- unname(fit$b['b'])
     lw <- unname(fit$par['lw'])
+    w <- NA
     JDPDd <- matrix(0,3,3)
     Jab <- cbind(diag(1,2,2),0)
     if (fit$inverse){
@@ -105,18 +106,18 @@ flipback <- function(fit,model,wtype){
             JDPDd[2,1] <- -1/ai^2
         }
     } else {
-        DP <- fit$b[1]
-        sDP <- fit$b[2]
-        Dd <- fit$a[1]
-        sDd <- fit$a[2]
+        DP <- bi
+        Dd <- ai
+        JDPDd[1,2] <- 1
+        JDPDd[2,1] <- 1
     }
-    if (model==3 & wtype==2 & fit$flipped){
+    if (model==3 & ( (wtype==2 & fit$flipped) | (wtype==1 & fit$inverse))){
         w <- exp(lw)/ai^2
         JDPDd[3,1] <- -w/ai
     } else {
         w <- exp(lw)
+        JDPDd[3,3] <- w
     }
-    JDPDd[3,3] <- w
     EDPDd <- unname(JDPDd %*% fit$cov %*% t(JDPDd))
     Eab <- unname(Jab %*% fit$cov %*% t(Jab))
     out <- list()

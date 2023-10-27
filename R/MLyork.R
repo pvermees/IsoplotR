@@ -63,7 +63,7 @@ MLyork <- function(yd,abanchor=0,model=1,abwtype=1){
             E[i,i] <- fit$cov
         } else if (model==3){
             init <- c(a=ab[1],b=ab[2],lw=0)
-            fit <- optim(init,LL.MLyork.ablw,yd=yd,
+            fit <- optim(init,LL.MLyork.ablw,yd=yd,abwtype=abwtype,
                          control=list(reltol=tol),hessian=TRUE)
             p <- fit$par
             E <- inverthess(fit$hessian)
