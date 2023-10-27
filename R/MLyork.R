@@ -8,7 +8,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
     ns <- nrow(yd)
     if (anchor[1]==1 && length(anchor)>1){ # anchor intercept
         p['a'] <- anchor[2]
-        init <- lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])$coefficients
+        init <- unname(lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])$coefficients)
         if (model==2){
             i <- 'b'
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
@@ -23,8 +23,8 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
             E[i,i] <- inverthess(fit$hessian)
         } else {
             i <- 'b'
-            fit <- optimise(LL.MLyork.b,a=p['a'],yd=yd,
-                            lower=init/5,upper=init*5,tol=tol)
+            interval <- sort(c(init/2,init*2))
+            fit <- optimise(LL.MLyork.b,a=p['a'],yd=yd,interval=interval,tol=tol)
             p[i] <- fit$minimum
             H <- optimHess(fit$minimum,LL.MLyork.b,a=p['a'],yd=yd)
             E[i,i] <- inverthess(H)
@@ -32,7 +32,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
         }
     } else if (anchor[1]==2 && length(anchor)>1){ # anchor slope
         p['b'] <- anchor[2]
-        init <- mean(yd[,'Y']-p['b']*yd[,'X'])
+        init <- unname(mean(yd[,'Y']-p['b']*yd[,'X']))
         if (model==2){
             i <- 'a'
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
@@ -48,7 +48,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
         } else {
             i <- 'a'
             fit <- optimise(LL.MLyork.a,b=p['b'],yd=yd,
-                            lower=init/5,upper=init*5,tol=tol)
+                            lower=init/2,upper=init*2,tol=tol)
             p[i] <- fit$minimum
             H <- optimHess(fit$minimum,LL.MLyork.a,b=p['b'],yd=yd)
             E[i,i] <- inverthess(H)

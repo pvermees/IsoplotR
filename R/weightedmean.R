@@ -612,7 +612,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
             out$disp['w'] <- fit$sigma[1]
             out$disp['s[w]'] <- fit$sigma[2]
             SS <- sum(((x-out$mean['t'])/sx)^2)
-            out <- append(out,getMSWD(SS,out$df)
+            out <- append(out,getMSWD(SS,out$df))
         }
     } else { # Ludwig's Isoplot approach:
         out$mean <- NULL
@@ -620,7 +620,7 @@ get.weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
         out$mean['t'] <- sum(w*x)/sum(w)
         out$mean['s[t]'] <- 1/sqrt(sum(w))
         SS <- sum(((x-out$mean['t'])/sx)^2)
-        out <- append(out,getMSWD(SS,out$df)
+        out <- append(out,getMSWD(SS,out$df))
         if (inflate(out))
             out$mean['disp[t]'] <- sqrt(out$mswd)*out$mean['s[t]']
     }

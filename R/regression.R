@@ -1,5 +1,6 @@
-regression <- function(xyz,model=1,type='york',omit=NULL,
-                       wtype=1,anchor=0,flip=FALSE){
+# dispatch functions for all the regression algorithms (except Ludwig)
+
+regression <- function(xyz,model=1,type='york',omit=NULL,wtype=1,anchor=0){
     xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
     if (model==1){
         out <- model1regression(xyz2calc,type=type,anchor=anchor)
@@ -27,8 +28,17 @@ regression <- function(xyz,model=1,type='york',omit=NULL,
 
 model1regression <- function(xyz,type='york',anchor=0){
     if (identical(type,'york')){
-        if (anchor[1]<1 || length(anchor)<2) out <- york(xyz)
-        else out <- MLyork(xyz,anchor=anchor)
+        if (anchor[1]<1 | length(anchor)<2){
+            out <- york(xyz)
+            out$par <- c(out$a[1],out$b[1],lw=-Inf)
+            out$cov <- rbind(c(out$a[2]^2,out$cov.ab,0),
+                             c(out$cov.ab,out$b[2]^2,0),
+                             c(0,0,0))
+            names(out$par) <- colnames(out$cov) <-
+                rownames(out$cov) <- c('a','b','lw')
+        } else {
+            out <- MLyork(xyz,anchor=anchor)
+        }
     } else if (identical(type,'titterington')){
         out <- titterington(xyz)
     } else if (identical(type,'ogls')){
