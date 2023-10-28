@@ -500,7 +500,6 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
             upper['PaUi'] <- x$d$PaU$M - x$d$buffer
         }
     }
-    
     list(par=par,lower=lower,upper=upper)
 }
 
