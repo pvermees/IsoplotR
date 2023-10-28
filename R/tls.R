@@ -1,8 +1,8 @@
 # total least squares using PCA, with jackknife error estimation
 # dat = data matrix whose first column is independent variable
-tls <- function(dat,abanchor=0){
-    if (abanchor[1]>0){
-        out <- abanchored.deming(dat,abanchor=abanchor)
+tls <- function(dat,anchor=0){
+    if (anchor[1]>0){
+        out <- anchored.deming(dat,anchor=anchor)
     } else {
         out <- list()
         out$par <- tlspar(dat)
@@ -40,12 +40,12 @@ tlspar <- function(dat){
     out
 }
 
-abanchored.deming <- function(dat,abanchor){
+anchored.deming <- function(dat,anchor){
     out <- list()
     out$par <- c(NA,NA)
     out$cov <- matrix(0,2,2)
-    if (abanchor[1]%in%c(0,'intercept','a') && length(abanchor)>1){
-        a <- abanchor[2]
+    if (anchor[1]%in%c(0,'intercept','a') && length(anchor)>1){
+        a <- anchor[2]
         init <- unname(lm(I(dat[,2]-a) ~ 0 + dat[,1])$coefficients)
         interval <- sort(init*c(1/5,5))
         fit <- optimise(deming.misfit.b,interval=interval,a=a,dat=dat)
@@ -53,8 +53,8 @@ abanchored.deming <- function(dat,abanchor){
         H <- optimHess(fit$minimum,deming.misfit.b,a=a,dat=dat)
         ve <- var(deming_residuals(ab=out$par,dat=dat))
         out$cov[2,2] <- inverthess(H)*ve
-    } else if (abanchor[1]%in%c(1,'slope','b') && length(abanchor)>1){
-        b <- abanchor[2]
+    } else if (anchor[1]%in%c(1,'slope','b') && length(anchor)>1){
+        b <- anchor[2]
         init <- unname(mean(dat[,2]-b*dat[,1]))
         interval <- sort(init*c(1/5,5))
         fit <- optimise(deming.misfit.a,interval=interval,b=b,dat=dat)

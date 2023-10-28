@@ -20,7 +20,7 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
     if (anchor[1]==1){
         Pb76c <- iratio('Pb207Pb206')[1]
         yfit <- MLyork(yd,anchor=c(1,Pb76c))
-        tm <- concordiaIntersection(yfit=yfit,d=x$d)
+        tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
         par['t'] <- log(tm[1])
         upper['t'] <- log(tm[2])
         if (iratio('Pb207Pb206')[2]>0){
@@ -36,14 +36,15 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
         McL <- mclean(tt,d=x$d)
         Xt <- McL$Pb207U235
         Yt <- McL$Pb207U235
+        YD <- yd
         YD[,'X'] <- yd[,'X'] - Xt # shift left
-        yfit <- york(YD,anchor=c(1,Yt))
+        yfit <- MLyork(YD,anchor=c(1,Yt))
         Pb76c <- 1/unname(yfit$b[1]*iratio('U238U235')[1])
         par['a0'] <- log(Pb76c)
         lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tt,d=x$d)[1])
     } else { # no anchor
         yfit <- york(yd)
-        tm <- concordiaIntersection(yfit=yfit,d=x$d)
+        tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
         par['t'] <- log(tm[1])
         upper['t'] <- log(tm[2])
         Pb76c <- 1/unname(yfit$b[1]*iratio('U238U235')[1])
@@ -228,7 +229,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2){
     list(par=par,lower=par-buffer,upper=par+buffer)
 }
 
-concordiaIntersection <- function(yfit,d=diseq()){
+WconcordiaIntersection <- function(yfit,d=diseq()){
     misfit <- function(tt,a,b,d,gradient=FALSE){
         McL <- mclean(tt=tt,d=d)
         if (gradient){
@@ -242,7 +243,7 @@ concordiaIntersection <- function(yfit,d=diseq()){
         }
         out
     }
-    a <- unname(yfit$a[1])
+    a <- unname(abs(yfit$a[1]))
     b <- unname(yfit$b[1])
     midpoint <- uniroot(misfit,lower=0,upper=4600,
                         a=a,b=b,d=d,gradient=TRUE)$root
