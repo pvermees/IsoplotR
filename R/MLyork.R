@@ -8,7 +8,8 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
     ns <- nrow(yd)
     if (anchor[1]==1 && length(anchor)>1){ # anchor intercept
         p['a'] <- anchor[2]
-        init <- unname(lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])$coefficients)
+        lmfit <- stats::lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])
+        init <- unname(lmfit$coefficients)
         if (model==2){
             i <- 'b'
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
@@ -56,7 +57,8 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
             df <- ns-1
         }
     } else {
-        ab <- unname(lm(yd[,'Y'] ~ yd[,'X'])$coefficients)
+        lmfit <- stats::lm(yd[,'Y'] ~ yd[,'X'])
+        ab <- unname(lmfit$coefficients)
         if (model==2){
             i <- c('a','b')
             fit <- tls(yd[,c('X','Y')])
