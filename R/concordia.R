@@ -309,7 +309,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
         fit <- concordia.age(X2calc,type=type,exterr=exterr)
     } else if (show.age>1){
         lfit <- ludwig(x2calc,exterr=exterr,model=(show.age-1),anchor=anchor)
-        fit <- concordia.intersection.ludwig(x2calc,fit=lfit,wetherill=(type==1))
+        fit <- discordia(x2calc,fit=lfit,wetherill=(type==1))
     }
     fit$n <- length(x2calc)
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)

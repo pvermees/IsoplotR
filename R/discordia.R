@@ -1,6 +1,6 @@
 # returns the lower and upper intercept age (for Wetherill concordia)
 # or the lower intercept age and 207Pb/206Pb intercept (for Tera-Wasserburg)
-concordia.intersection.ludwig <- function(x,fit,wetherill=TRUE){
+discordia <- function(x,fit,wetherill=TRUE){
     out <- fit
     out$format <- x$format
     if (wetherill){
@@ -22,36 +22,6 @@ concordia.intersection.ludwig <- function(x,fit,wetherill=TRUE){
     }
     colnames(out$err) <- names(out$par)
     out$err['s',] <- sqrt(diag(out$cov))
-    out
-}
-
-recursive.search <- function(tm,tM,a,b,d=diseq(),depth=1){
-    out <- c(NA,NA)
-    if (depth<3){
-        mid <- (tm+tM)/2
-        mfmin <- intersection.misfit.york(tm,a=a,b=b,d=d)
-        mfmid <- intersection.misfit.york(mid,a=a,b=b,d=d)
-        mfmax <- intersection.misfit.york(tM,a=a,b=b,d=d)
-        if (mfmin*mfmid<0){ # different signs
-            out[1] <- stats::uniroot(intersection.misfit.york,
-                                     interval=c(tm,mid),a=a,b=b,d=d)$root
-        } else {
-            out <- recursive.search(tm=tm,tM=mid,a=a,b=b,d=d,depth=depth+1)
-        }
-        if (mfmax*mfmid<0){ # different signs
-            out[2] <- stats::uniroot(intersection.misfit.york,
-                                     interval=c(mid,tM),a=a,b=b,d=d)$root
-        } else {
-            tlu <- recursive.search(tm=mid,tM=tM,a=a,b=b,d=d,depth=depth+1)
-            if (is.na(out[1])) out[1] <- tlu[1]
-            if (is.na(out[2])) out[2] <- tlu[2]
-        }
-        if (all(is.na(out))){ # no intersection
-            tlu <- stats::optimise(intersection.misfit.york,
-                                   interval=c(tm,tM),a=a,b=b,d=d)$minimum
-            out <- rep(tlu,2)
-        }
-    }
     out
 }
 

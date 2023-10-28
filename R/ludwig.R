@@ -224,8 +224,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
     out
 }
 
-init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
-    if (debug) browser()
+init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
     if (model==3){
         init <- init.ludwig(x,anchor=anchor,type=type,buffer=buffer)
         fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
@@ -288,9 +287,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1,debug=FALSE){
     list(par=par,lower=lower,upper=upper)
 }
 
-LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
-                      anchor=0,type='joint',debug=FALSE){
-    if (debug) browser()
+LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
     pnames <- names(par)
     if ('t' %in% pnames){
         tt <- exp(par['t'])
@@ -430,8 +427,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,
     LL
 }
 
-data2ludwig <- function(x,ta0b0w,exterr=FALSE,debug=FALSE){
-    if (debug) browser()
+data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     out <- list()
     U <- iratio('U238U235')[1]
     tt <- ta0b0w['t']
