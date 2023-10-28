@@ -44,7 +44,7 @@ abanchored.deming <- function(dat,abanchor){
     out <- list()
     out$par <- c(NA,NA)
     out$cov <- matrix(0,2,2)
-    if (abanchor[1]%in%c(1,'intercept','a') && length(abanchor)>1){
+    if (abanchor[1]%in%c(0,'intercept','a') && length(abanchor)>1){
         a <- abanchor[2]
         init <- unname(lm(I(dat[,2]-a) ~ 0 + dat[,1])$coefficients)
         interval <- sort(init*c(1/5,5))
@@ -53,7 +53,7 @@ abanchored.deming <- function(dat,abanchor){
         H <- optimHess(fit$minimum,deming.misfit.b,a=a,dat=dat)
         ve <- var(deming_residuals(ab=out$par,dat=dat))
         out$cov[2,2] <- inverthess(H)*ve
-    } else if (abanchor[1]%in%c(2,'slope','b') && length(abanchor)>1){
+    } else if (abanchor[1]%in%c(1,'slope','b') && length(abanchor)>1){
         b <- abanchor[2]
         init <- unname(mean(dat[,2]-b*dat[,1]))
         interval <- sort(init*c(1/5,5))

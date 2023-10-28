@@ -1,20 +1,20 @@
 # Maximum likelihood implementation of York regression
 # This is more flexible than the original least squares method
-MLyork <- function(yd,abanchor=0,model=1,abwtype=1){
+MLyork <- function(yd,anchor=0,model=1,wtype='a'){
     tol <- 2*.Machine$double.eps
     p <- c(NA,NA,-Inf)
     E <- matrix(0,3,3)
     names(p) <- rownames(E) <- colnames(E) <- c('a','b','lw')
     ns <- nrow(yd)
-    if (abanchor[1]==1 && length(abanchor)>1){ # anchor intercept
-        p['a'] <- abanchor[2]
+    if (anchor[1]==1 && length(anchor)>1){ # anchor intercept
+        p['a'] <- anchor[2]
         init <- unname(lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])$coefficients)
         if (model==2){
             i <- 'b'
-            fit <- tls(yd[,c('X','Y')],abanchor=abanchor)
+            fit <- tls(yd[,c('X','Y')],anchor=anchor)
             p[i] <- fit$par[2]
             E[i,i] <- fit$cov[2,2]
-        } else if (model==3){ # abwtype = 2
+        } else if (model==3){ # wtype = 'b'
             i <- c('b','lw')
             init <- c(b=init,lw=0)
             fit <- optim(init,LL.MLyork.blw,a=p['a'],yd=yd,
@@ -30,15 +30,15 @@ MLyork <- function(yd,abanchor=0,model=1,abwtype=1){
             E[i,i] <- inverthess(H)
             df <- ns-1
         }
-    } else if (abanchor[1]==2 && length(abanchor)>1){ # anchor slope
-        p['b'] <- abanchor[2]
+    } else if (anchor[1]==2 && length(anchor)>1){ # anchor slope
+        p['b'] <- anchor[2]
         init <- unname(mean(yd[,'Y']-p['b']*yd[,'X']))
         if (model==2){
             i <- 'a'
-            fit <- tls(yd[,c('X','Y')],abanchor=abanchor)
+            fit <- tls(yd[,c('X','Y')],anchor=anchor)
             p[i] <- fit$par[1]
             E[i,i] <- fit$cov[1,1]
-        } else if (model==3){ # abwtype = 1
+        } else if (model==3){ # wtype = 'a'
             i <- c('a','lw')
             init <- c(a=init,lw=0)
             fit <- optim(init,LL.MLyork.alw,b=p['b'],yd=yd,
@@ -63,7 +63,7 @@ MLyork <- function(yd,abanchor=0,model=1,abwtype=1){
             E[i,i] <- fit$cov
         } else if (model==3){
             init <- c(a=ab[1],b=ab[2],lw=0)
-            fit <- optim(init,LL.MLyork.ablw,yd=yd,abwtype=abwtype,
+            fit <- optim(init,LL.MLyork.ablw,yd=yd,wtype=wtype,
                          control=list(reltol=tol),hessian=TRUE)
             p <- fit$par
             E <- inverthess(fit$hessian)
@@ -101,29 +101,29 @@ LL.MLyork.ab <- function(ab,yd){
     LL.MLyork.ablw(c(ab,-Inf),yd=yd)
 }
 LL.MLyork.alw <- function(alw,b,yd){
-    LL.MLyork.ablw(c(alw[1],b,alw[2]),yd=yd,abwtype=1)
+    LL.MLyork.ablw(c(alw[1],b,alw[2]),yd=yd,wtype='a')
 }
 LL.MLyork.blw <- function(blw,a,yd){
-    LL.MLyork.ablw(c(a,blw),yd=yd,abwtype=2)
+    LL.MLyork.ablw(c(a,blw),yd=yd,wtype='b')
 }
 
-LL.MLyork.ablw <- function(ablw,yd,abwtype=1,SS=FALSE){
+LL.MLyork.ablw <- function(ablw,yd,wtype='a',SS=FALSE){
     a <- ablw[1]
     b <- ablw[2]
     w <- exp(ablw[3])
-    x <- MLY.getx(yd,a=a,b=b,w=w,abwtype=abwtype)
-    E <- MLY.getE(yd,w=w,abwtype=abwtype,x=x)
+    x <- MLY.getx(yd,a=a,b=b,w=w,wtype=wtype)
+    E <- MLY.getE(yd,w=w,wtype=wtype,x=x)
     detE <- E[,1]*E[,2]-E[,3]^2
     S <- MLY.maha(a=a,b=b,x=x,X=yd[,'X'],Y=yd[,'Y'],O=MLY.getO(E))
     if (SS) return(sum(S))
     else return(sum(log(detE)+S)/2)
 }
 
-MLY.getE <- function(yd,w=0,abwtype=1,x=NA){
+MLY.getE <- function(yd,w=0,wtype='a',x=NA){
     E11 <- yd[,'sX']^2
     E22 <- yd[,'sY']^2
     E12 <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
-    if (abwtype==2) E22 <- E22 + (w*x)^2
+    if (wtype%in%c(1,'slope','b')) E22 <- E22 + (w*x)^2
     else E22 <- E22 + w^2
     cbind(E11,E22,E12)
 }
@@ -134,10 +134,10 @@ MLY.maha <- function(yd,a,b,x,X,Y,O){
     O11 <- O[,1]; O22 <- O[,2]; O12 <- O[,3]
     (X-x)*(O11*(X-x)+O12*(Y-a-b*x)) + (Y-a-b*x)*(O12*(X-x)+O22*(Y-a-b*x))
 }
-MLY.getx <- function(yd,a,b,w=0,abwtype=1){
-    if (abwtype==2){
+MLY.getx <- function(yd,a,b,w=0,wtype='a'){
+    if (wtype%in%c(1,'slope','b')){
         misfit <- function(x,yd,a,b,w){
-            E <- MLY.getE(yd=yd,w=w,abwtype=abwtype,x=x)
+            E <- MLY.getE(yd=yd,w=w,wtype=wtype,x=x)
             O <- MLY.getO(E)
             SS <- MLY.maha(a=a,b=b,x=x,X=yd[,'X'],Y=yd[,'Y'],O=O)
             detE <- E[,1]*E[,2]-E[,3]^2
@@ -147,7 +147,7 @@ MLY.getx <- function(yd,a,b,w=0,abwtype=1){
     } else {
         X <- yd[,'X']
         Y <- yd[,'Y']
-        E <- MLY.getE(yd=yd,w=w,abwtype=abwtype)
+        E <- MLY.getE(yd=yd,w=w,wtype=wtype)
         O <- MLY.getO(E)
         O11 <- O[,1]; O22 <- O[,2]; O12 <- O[,3]
         num <- -((O22*a-O22*Y-O12*X)*b+O12*a-O12*Y-O11*X)

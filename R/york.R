@@ -112,19 +112,58 @@ york <- function(x){
     out
 }
 
+getMSWD <- function(X2,df){
+    out <- list()
+    out$df <- df
+    if (df>0){
+        out$mswd <- as.numeric(X2/df)
+        out$p.value <- as.numeric(1-stats::pchisq(X2,df))
+    } else {
+        out$mswd <- 1
+        out$p.value <- 1
+    }
+    out
+}
+
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
-get.york.xy <- function(XY,a,b){
+get.york.xy <- function(XY,a,b,w=0,wtype=NA){
     X <- XY[,'X']
     vX <- XY[,'sX']^2
     Y <- XY[,'Y']
     vY <- XY[,'sY']^2
     sXY <- XY[,'rXY']*XY[,'sX']*XY[,'sY']
+    if (wtype%in%c('intercept',0,'a')) vY <- vY + w^2
     O <- invertcovmat(vx=vX,vy=vY,sxy=sXY)
     N <- O[,'xx']*X + O[,'xy']*b*X + O[,'xy']*(Y-a) + b*(Y-a)*O[,'yy']
     D <- O[,'xx'] + 2*b*O[,'xy'] + O[,'yy']*b^2
-    x <- N/D
+    if (wtype%in%c('slope',1,'b')){
+        slopeyorkroot <- function(p,XYi,a,b,w){
+            E <- dEdx <- matrix(0,2,2)
+            E[1,1] <- XYi['sX']^2
+            E[2,2] <- XYi['sY']^2 + (w*p)^2
+            E[1,2] <- E[2,1] <- XYi['rXY']*XYi['sX']*XYi['sY']
+            D <- c(XYi['X']-p,XYi['Y']-a-b*p)
+            dEdx[2,2] <- 2*p*w^2
+            dDdx <- c(-1,-b)
+            O <- solve(E)
+            sum(diag(O%*%dEdx)) + 2*D%*%O%*%dDdx - D%*%O%*%dEdx%*%O%*%D
+        }
+        slopeyorkhelper <- function(i,XY,a,b,w,lower,upper){
+            stats::uniroot(f=slopeyorkroot,lower=lower[i],upper=upper[i],
+                           XYi=XY[i,],a=a,b=b,w=w,extendInt='yes',
+                           tol=.Machine$double.eps^0.5)
+        }
+        ns <- nrow(XY)
+        init <- N/D
+        dx <- diff(range(XY[,'X']))
+        fit <- sapply(1:ns,slopeyorkhelper,lower=init-dx,
+                      upper=init+dx,XY=XY,a=a,b=b,w=w)
+        x <- unlist(fit[1,])
+    } else {
+        x <- N/D
+    }
     y <- a + b*x
     cbind(x=x,y=y)
 }
