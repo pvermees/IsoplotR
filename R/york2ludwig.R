@@ -22,32 +22,37 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
         yfit <- MLyork(yd,anchor=c(1,Pb76c))
         tm <- concordiaIntersection(yfit=yfit,d=x$d)
         par['t'] <- log(tm[1])
-        if (iratio('Pb207Pb206')[2]>0) par['a0'] <- log(Pb76c)
+        upper['t'] <- log(tm[2])
+        if (iratio('Pb207Pb206')[2]>0){
+            par['a0'] <- log(Pb76c)
+            lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
+        }
     } else if (anchor[1]==2 & length(anchor)>1){
         tt <- anchor[2]
+        if ((length(anchor)>2 && anchor[3]>0)){
+            par['t'] <- log(tt)
+            upper['t'] <- par['t'] + buffer
+        }
         McL <- mclean(tt,d=x$d)
         Xt <- McL$Pb207U235
         Yt <- McL$Pb207U235
         YD[,'X'] <- yd[,'X'] - Xt # shift left
         yfit <- york(YD,anchor=c(1,Yt))
         Pb76c <- 1/unname(yfit$b[1]*iratio('U238U235')[1])
-        if ((length(anchor)>2 && anchor[3]>0)) par['t'] <- log(tt)
         par['a0'] <- log(Pb76c)
+        lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tt,d=x$d)[1])
     } else { # no anchor
         yfit <- york(yd)
         tm <- concordiaIntersection(yfit=yfit,d=x$d)
         par['t'] <- log(tm[1])
+        upper['t'] <- log(tm[2])
         Pb76c <- 1/unname(yfit$b[1]*iratio('U238U235')[1])
         par['a0'] <- log(Pb76c)
+        lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
     }
-    if ('t' %in% names(par)){
-        lower['t'] <- par['t'] - buffer
-        upper['t'] <- log(tm[2])
-    }
-    if ('a0' %in% names(par)){
-        lower['a0'] <- par['a0'] - buffer
-        upper['a0'] <- par['a0'] + buffer
-    }
+    pnames <- names(par)
+    if ('t' %in% pnames) lower['t'] <- par['t'] - buffer
+    if ('a0' %in% pnames) upper['a0'] <- par['a0'] + buffer
     list(par=par,lower=lower,upper=upper)
 }
 
