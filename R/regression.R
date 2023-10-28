@@ -7,12 +7,6 @@ regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
     } else if (model==3){
         out <- model3regression(xyz2calc,type=type,wtype=wtype)
         out$wtype <- wtype
-    } else if (model==4 && identical(type,'york')){
-        out <- irr(xyz2calc)
-        out$wtype <- wtype
-    } else if (model==5 && identical(type,'york')){
-        out <- irr(xyz2calc,wtype=wtype)
-        out$wtype <- wtype
     } else {
         stop('invalid regression model')
     }

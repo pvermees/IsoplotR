@@ -245,12 +245,12 @@ WconcordiaIntersection <- function(yfit,d=diseq()){
     }
     a <- unname(abs(yfit$a[1]))
     b <- unname(yfit$b[1])
-    midpoint <- uniroot(misfit,lower=0,upper=4600,
-                        a=a,b=b,d=d,gradient=TRUE)$root
+    midpoint <- stats::uniroot(misfit,lower=0,upper=4600,
+                               a=a,b=b,d=d,gradient=TRUE)$root
     if (misfit(tt=midpoint,a=a,b=b,d=d) > 0){
-        tt <- uniroot(misfit,lower=0,upper=midpoint,a=a,b=b,d=d)$root
+        tt <- stats::uniroot(misfit,lower=0,upper=midpoint,a=a,b=b,d=d)$root
     } else {
-        tt <- optimise(misfit,lower=0,upper=4600,a=a,b=b,d=d)$minimum
+        tt <- stats::optimise(misfit,lower=0,upper=4600,a=a,b=b,d=d)$minimum
     }
     c(tt,midpoint)
 }

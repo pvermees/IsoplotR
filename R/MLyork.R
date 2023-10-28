@@ -17,16 +17,17 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
         } else if (model==3){ # wtype = 'b'
             i <- c('b','lw')
             init <- c(b=init,lw=0)
-            fit <- optim(init,LL.MLyork.blw,a=p['a'],yd=yd,
-                         control=list(reltol=tol),hessian=TRUE)
+            fit <- stats::optim(init,LL.MLyork.blw,a=p['a'],yd=yd,
+                                control=list(reltol=tol),hessian=TRUE)
             p[i] <- fit$par
             E[i,i] <- inverthess(fit$hessian)
         } else {
             i <- 'b'
             interval <- sort(c(init/2,init*2))
-            fit <- optimise(LL.MLyork.b,a=p['a'],yd=yd,interval=interval,tol=tol)
+            fit <- stats::optimise(LL.MLyork.b,a=p['a'],yd=yd,
+                                   interval=interval,tol=tol)
             p[i] <- fit$minimum
-            H <- optimHess(fit$minimum,LL.MLyork.b,a=p['a'],yd=yd)
+            H <- stats::optimHess(fit$minimum,LL.MLyork.b,a=p['a'],yd=yd)
             E[i,i] <- inverthess(H)
             df <- ns-1
         }
@@ -41,16 +42,16 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
         } else if (model==3){ # wtype = 'a'
             i <- c('a','lw')
             init <- c(a=init,lw=0)
-            fit <- optim(init,LL.MLyork.alw,b=p['b'],yd=yd,
-                         control=list(reltol=tol),hessian=TRUE)
+            fit <- stats::optim(init,LL.MLyork.alw,b=p['b'],yd=yd,
+                                control=list(reltol=tol),hessian=TRUE)
             p[i] <- fit$par
             E[i,i] <- inverthess(fit$hessian)
         } else {
             i <- 'a'
-            fit <- optimise(LL.MLyork.a,b=p['b'],yd=yd,
-                            lower=init/2,upper=init*2,tol=tol)
+            fit <- stats::optimise(LL.MLyork.a,b=p['b'],yd=yd,
+                                   lower=init/2,upper=init*2,tol=tol)
             p[i] <- fit$minimum
-            H <- optimHess(fit$minimum,LL.MLyork.a,b=p['b'],yd=yd)
+            H <- stats::optimHess(fit$minimum,LL.MLyork.a,b=p['b'],yd=yd)
             E[i,i] <- inverthess(H)
             df <- ns-1
         }
@@ -63,14 +64,14 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
             E[i,i] <- fit$cov
         } else if (model==3){
             init <- c(a=ab[1],b=ab[2],lw=0)
-            fit <- optim(init,LL.MLyork.ablw,yd=yd,wtype=wtype,
-                         control=list(reltol=tol),hessian=TRUE)
+            fit <- stats::optim(init,LL.MLyork.ablw,yd=yd,wtype=wtype,
+                                control=list(reltol=tol),hessian=TRUE)
             p <- fit$par
             E <- inverthess(fit$hessian)
         } else { # this is equivalent to ordinary York regression
             init <- c(a=ab[1],b=ab[2])
-            fit <- optim(init,LL.MLyork.ab,yd=yd,
-                         control=list(reltol=tol),hessian=TRUE)
+            fit <- stats::optim(init,LL.MLyork.ab,yd=yd,
+                                control=list(reltol=tol),hessian=TRUE)
             p <- fit$par
             E <- inverthess(fit$hessian)
             SS <- LL.MLyork.ab(fit$par,yd=yd,SS=TRUE)
@@ -97,8 +98,8 @@ LL.MLyork.a <- function(a,b,yd){
 LL.MLyork.b <- function(b,a,yd){
     LL.MLyork.ablw(c(a,b,-Inf),yd=yd)
 }
-LL.MLyork.ab <- function(ab,yd){
-    LL.MLyork.ablw(c(ab,-Inf),yd=yd)
+LL.MLyork.ab <- function(ab,yd,SS=FALSE){
+    LL.MLyork.ablw(c(ab,-Inf),yd=yd,SS=SS)
 }
 LL.MLyork.alw <- function(alw,b,yd){
     LL.MLyork.ablw(c(alw[1],b,alw[2]),yd=yd,wtype='a')
@@ -143,7 +144,7 @@ MLY.getx <- function(yd,a,b,w=0,wtype='a'){
             detE <- E[,1]*E[,2]-E[,3]^2
             sum(log(detE)+SS)/2
         }
-        x <- optim(yd[,'X'],misfit,yd=yd,a=a,b=b,w=w)$par
+        x <- stats::optim(yd[,'X'],misfit,yd=yd,a=a,b=b,w=w)$par
     } else {
         X <- yd[,'X']
         Y <- yd[,'Y']

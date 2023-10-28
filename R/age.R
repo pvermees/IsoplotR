@@ -281,7 +281,7 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         out <- concordia.age(X,wetherill=TRUE,exterr=exterr)
     } else if (type %in% c(3,4,5)){
         fit <- ludwig(x,exterr=exterr,model=type-2)
-        out <- concordia.intersection.ludwig(x,fit=fit,wetherill=FALSE)
+        out <- discordia(x,fit=fit,wetherill=FALSE)
     }
     out
 }
