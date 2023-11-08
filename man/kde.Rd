@@ -39,6 +39,8 @@ kde(x, ...)
   bty = "n",
   binwidth = NA,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -60,6 +62,8 @@ kde(x, ...)
   bty = "n",
   binwidth = NA,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -85,6 +89,8 @@ kde(x, ...)
   cutoff.disc = discfilter(),
   common.Pb = 0,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -109,6 +115,8 @@ kde(x, ...)
   samebandwidth = TRUE,
   normalise = TRUE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -131,6 +139,8 @@ kde(x, ...)
   binwidth = NA,
   common.Pb = 2,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -153,6 +163,8 @@ kde(x, ...)
   binwidth = NA,
   i2i = FALSE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -175,6 +187,8 @@ kde(x, ...)
   binwidth = NA,
   i2i = FALSE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -197,6 +211,8 @@ kde(x, ...)
   binwidth = NA,
   i2i = FALSE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -219,6 +235,8 @@ kde(x, ...)
   binwidth = NA,
   Th0i = 0,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -241,6 +259,8 @@ kde(x, ...)
   binwidth = NA,
   i2i = TRUE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -263,6 +283,8 @@ kde(x, ...)
   binwidth = NA,
   i2i = TRUE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -285,6 +307,8 @@ kde(x, ...)
   binwidth = NA,
   i2i = TRUE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -307,6 +331,8 @@ kde(x, ...)
   binwidth = NA,
   i2i = TRUE,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -328,6 +354,8 @@ kde(x, ...)
   bty = "n",
   binwidth = NA,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 
@@ -349,6 +377,8 @@ kde(x, ...)
   bty = "n",
   binwidth = NA,
   hide = NULL,
+  nmodes = 0,
+  sigdig = 2,
   ...
 )
 }
@@ -407,6 +437,13 @@ number of data points) is used if \code{binwidth = NA}}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}
+
+\item{nmodes}{label the \code{nmodes} most prominent modes of the
+distribution. Change to \code{'all'} to label all the modes.}
+
+\item{sigdig}{the number of significant digits to which the modes
+should be labelled. Only used if \code{nmodes} is a positive
+integer or \code{'all'}.}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -501,6 +538,9 @@ If \code{x} has class \code{UPb}, \code{PbPb}, \code{ArAr},
 \item{ages}{ the data values from the input to
 the \code{kde} function}
 \item{log}{ copied from the input}
+\item{modes}{a two-column matrix with the \code{x} and \code{y}
+values of the \code{nmodes} most prominent modes. Only returned
+if \code{nmodes} is a positive integer or \code{'all'}.}
 }
 
 or, if \code{x} has class \code{=detritals}, an object of class

@@ -126,8 +126,7 @@ central.default <- function(x,...){
     # remove two d.o.f. for mu and sigma
     out$df <- length(zu)-2
     # add back one d.o.f. for the homogeneity test
-    out$mswd <- Chi2/(out$df+1)
-    out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
+    out <- append(out,getMSWD(Chi2,out$df+1))
     out$age <- c(tt,st)
     out$disp <- fit$sigma
     names(out$age) <- c('t','s[t]')

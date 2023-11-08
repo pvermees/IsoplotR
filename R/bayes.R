@@ -1,13 +1,12 @@
 initial2time <- function(x,anames,avalues,anchor=0,
-                         type='joint',model=1,debug=FALSE){
-    if (debug) browser()
+                         type='joint',model=1){
     X <- x
     for (i in seq_along(anames)){
         X$d[[anames[i]]]$x <- avalues[i]
         X$d[[anames[i]]]$sx <- 0
         X$d[[anames[i]]]$option <- 1
     }
-    init <- init.ludwig(x=X,model=model,anchor=anchor,type=type,debug=FALSE)
+    init <- init.ludwig(x=X,model=model,anchor=anchor,type=type)
     fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=FALSE,
                         x=x,X=X,anchor=anchor,type=type,model=model)
@@ -56,9 +55,8 @@ recursivelimitsearch_a <- function(aname,ll,ul,LLmax,x=x,anchor=0,type=1,
                            LLbuffer=LLbuffer,x=x,anchor=anchor,type=type,
                            model=model,maxlevel=maxlevel-1,side=side)
 }
-getsearchlimits_a <- function(fit,x,anchor=0,type='joint',maxlevel=5,
-                              LLbuffer=10,model=1,debug=FALSE){
-    if (debug) browser()
+getsearchlimits_a <- function(fit,x,anchor=0,type='joint',
+                              maxlevel=5,LLbuffer=10,model=1){
     helper <- function(aname,fit,x=x,anchor=0,type=1,model=1,maxlevel=5){
         m <- x$d[[aname]]$m
         M <- x$d[[aname]]$M
@@ -158,7 +156,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     for (i in 1:ng){
         message('Iteration ',i,'/',ng)
         tfit <- initial2time(x=x,anames=anames,avalues=igrid[i,inames],
-                             anchor=anchor,type=type,model=model,debug=FALSE)
+                             anchor=anchor,type=type,model=model)
         LLgrid[i,pnames] <- tfit$par[pnames]
         LLgrid[i,inames] <- igrid[i,inames]
         LLgrid[i,'LL'] <- -tfit$LL
