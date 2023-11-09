@@ -91,8 +91,10 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
     fit$a <- c(p['a'],'s[a]'=unname(sqrt(E['a','a'])))
     fit$b <- c(p['b'],'s[b]'=unname(sqrt(E['b','b'])))
     fit$cov.ab <- E['a','b']
-    fit$disp <- c('w'=unname(exp(p['lw'])),
-                  's[w]'=unname(exp(p['lw'])*sqrt(E['lw','lw'])))
+    if (model==3){
+        fit$disp <- c('w'=unname(exp(p['lw'])),
+                      's[w]'=unname(exp(p['lw'])*sqrt(E['lw','lw'])))
+    }
     fit
 }
 
