@@ -112,7 +112,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   growth = FALSE,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
@@ -591,10 +592,10 @@ If \code{inverse=FALSE}, then \code{X} =
 \item{wtype}{controls the parameter responsible for the
     overdispersion in model-3 regression.
 
-\code{0}, \code{'a'} or \code{'intercept'}: attributes the
+\code{1}, \code{'a'} or \code{'intercept'}: attributes the
 overdispersion to the y-intercept of the isochron.
 
-\code{1}, \code{'b'} or \code{'slope'}: attributes the
+\code{2}, \code{'b'} or \code{'slope'}: attributes the
 overdispersion to the slope of the isochron.
 
 \code{'A'}: only available if \code{x} has class \code{ThU} and

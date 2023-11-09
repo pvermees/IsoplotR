@@ -431,7 +431,7 @@ SS.SK.without.204 <- function(tt,x,i){
                 'Y'=Y,'sY'=sqrt(covmat[2,2]),
                 'rXY'=stats::cov2cor(covmat)[1,2])
     xy.fitted <- get.york.xy(xy,a,b)
-    d <- cbind(X-xy.fitted[1],Y-xy.fitted[2])
+    d <- cbind(X-xy.fitted[,"x"],Y-xy.fitted[,"y"])
     as.numeric(d %*% omega %*% t(d))
 }
 SS.SK.with.204 <- function(tt,x,i){
