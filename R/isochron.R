@@ -853,30 +853,10 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           plot=TRUE,exterr=TRUE,model=1,wtype=1,anchor=0,
                           growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    y <- data2york(x,inverse=inverse)
-    if (anchor[1]<1 & model<3){
-        fitinverse <- inverse
-        d2calc <- clear(y,hide,omit)
-        fit <- regression(d2calc,model=model)
-    } else if (anchor[1]==1 | wtype==1){
-        fitinverse <- FALSE
-        Y <- data2york(x,inverse=fitinverse)
-        d2calc <- clear(Y,hide,omit)
-        if (anchor[1]==1) anchor[2:3] <- iratio('Pb207Pb204')
-        fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
-    } else if (anchor[1]==2 | wtype==2){
-        fitinverse <- TRUE
-        Y <- data2york(x,inverse=fitinverse)
-        d2calc <- clear(Y,hide,omit)
-        if (anchor[1]==2) {
-            sR76 <- ifelse(length(anchor)<3,0,anchor[3])
-            anchor <- c(1,age_to_Pb207Pb206_ratio(anchor[2],sR76))
-        }
-        fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
-    } else {
-        stop("Invalid anchor and/or wtype value.")
-    }
-    if (fitinverse){
+    fit <- isochron_dispatch(x,inverse=inverse,model=model,wtype=wtype,
+                             anchor=anchor,hide=hide,omit=omit,
+                             rat='Pb207Pb204',t2rfun=age_to_Pb207Pb206_ratio)
+    if (fit$inverse){
         R76 <- fit$a
         fit$y0[c('y','s[y]')] <- fit$b
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
@@ -900,10 +880,10 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     } else {
         dispunits <- ''   
     }
-    if (inverse == fitinverse) out <- fit
+    if (inverse == fit$inverse) out <- fit
     else out <- invertfit(fit,type="d")
     if (plot) {
-        scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
+        scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
@@ -1587,4 +1567,34 @@ invertfit <- function(fit,type="p"){
         stop("Invalid isochron type.")
     }
     out
+}
+
+isochron_dispatch <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
+                              model=1,wtype=0,anchor=1,rat,t2rfun){
+    xyz <- data2york(x,inverse=inverse)
+    if (anchor[1]<1 & model<3){
+        fitinverse <- inverse
+        d2calc <- clear(xyz,hide,omit)
+        fit <- regression(d2calc,model=model)
+    } else if (anchor[1]==1 | wtype==1){
+        fitinverse <- FALSE
+        yd <- data2york(x,inverse=fitinverse)
+        d2calc <- clear(yd,hide,omit)
+        if (anchor[1]==1) anchor[2:3] <- iratio(rat)
+        fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
+    } else if (anchor[1]==2 | wtype==2){
+        fitinverse <- TRUE
+        yd <- data2york(x,inverse=fitinverse)
+        d2calc <- clear(yd,hide,omit)
+        if (anchor[1]==2) {
+            st <- ifelse(length(anchor)<3,0,anchor[3])
+            anchor <- c(1,do.call(t2rfun,args=list(t=anchor[2],st=st)))
+        }
+        fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
+    } else {
+        stop("Invalid anchor and/or wtype value.")
+    }
+    fit$inverse <- fitinverse
+    fit$xyz <- xyz
+    fit
 }
