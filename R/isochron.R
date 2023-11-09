@@ -874,7 +874,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 & wtype==2){
+    if (model==3 && out$wtype==2){
         out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
         dispunits <- ' Ma'
     } else {
@@ -953,8 +953,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                    J=x$J[1],sJ=x$J[2])
     if (inverse) {
         R09 <- quotient(X=out$a[1],sX=out$a[2],
-                        Y=-out$b[1],sY=out$b[2],
-                        rXY=out$cov.ab/(out$a[2]*out$b[2]))
+                        Y=-out$b[1],sY=out$b[2],sXY=out$cov.ab)
         out$y0[c('y','s[y]')] <- quotient(X=out$a[1],sX=out$a[2],Y=1,sY=0,rXY=0)
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
         y.lab <- quote(''^36*'Ar/'^40*'Ar')
@@ -971,7 +970,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                                            x$J[1],x$J[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 & wtype==2){
+    if (model==3 && out$wtype==2){
         l40 <- lambda('K40')[1]
         dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
         d09db <- ifelse(inverse,1/a,1)
@@ -1364,8 +1363,8 @@ isochron_PD <- function(x,nuclide,y0rat,t2rfun,oerr=3,sigdig=2,
                              y0rat=y0rat,t2rfun=t2rfun)
     fit$y0[c('y','s[y]')] <- fit$a
     if (fit$inverse){
-        DP <- quotient(X=fit$a[1],sX=fit$a[2],Y=-fit$b[1],sY=fit$b[2],
-                       rXY=fit$cov.ab/(fit$a[2]*fit$b[2]))
+        DP <- quotient(X=fit$a[1],sX=fit$a[2],
+                       Y=-fit$b[1],sY=fit$b[2],sXY=fit$cov.ab)
     } else {
         DP <- fit$b
     }

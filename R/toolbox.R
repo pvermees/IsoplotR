@@ -223,10 +223,15 @@ errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){
     sqrt(v)
 }
 
-quotient <- function(X,sX,Y,sY,rXY){
+quotient <- function(X,sX,Y,sY,rXY=NULL,sXY=NULL){
     YX <- Y/X
-    sYX <- errorprop1x2(J1=(-Y/X^2),J2=(1/X),
-                        E11=(sX^2),E22=(sY^2),E12=(rXY*sX*sY))
+    if (is.null(sXY)){
+        if (is.null(rXY)) E12 <- 0
+        else E12 <- rXY*sX*sY
+    } else {
+        E12 <- sXY
+    }
+    sYX <- errorprop1x2(J1=-Y/X^2,J2=1/X,E11=sX^2,E22=sY^2,E12=E12)
     cbind(YX,sYX)
 }
 
