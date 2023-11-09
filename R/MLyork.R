@@ -84,6 +84,8 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a'){
         SS <- LL.MLyork.ablw(p,yd=yd,SS=TRUE)
         fit <- append(fit,getMSWD(X2=SS,df=df))
     }
+    fit$model <- model
+    fit$n <- ns
     fit$par <- p
     fit$cov <- E
     fit$a <- c(p['a'],'s[a]'=unname(sqrt(E['a','a'])))
@@ -126,7 +128,7 @@ MLY.getE <- function(yd,w=0,wtype='a',x=NA){
     E11 <- yd[,'sX']^2
     E22 <- yd[,'sY']^2
     E12 <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
-    if (wtype%in%c(1,'slope','b')) E22 <- E22 + (w*x)^2
+    if (wtype%in%c(2,'slope','b')) E22 <- E22 + (w*x)^2
     else E22 <- E22 + w^2
     cbind(E11,E22,E12)
 }
@@ -138,7 +140,7 @@ MLY.maha <- function(yd,a,b,x,X,Y,O){
     (X-x)*(O11*(X-x)+O12*(Y-a-b*x)) + (Y-a-b*x)*(O12*(X-x)+O22*(Y-a-b*x))
 }
 MLY.getx <- function(yd,a,b,w=0,wtype='a'){
-    if (wtype%in%c(1,'slope','b')){
+    if (wtype%in%c(2,'slope','b')){
         misfit <- function(x,yd,a,b,w){
             E <- MLY.getE(yd=yd,w=w,wtype=wtype,x=x)
             O <- MLY.getO(E)
@@ -147,7 +149,7 @@ MLY.getx <- function(yd,a,b,w=0,wtype='a'){
             sum(log(detE)+SS)/2
         }
         x <- stats::optim(yd[,'X'],misfit,yd=yd,a=a,b=b,w=w)$par
-    } else {
+    } else { # wtype%in%c(1,'intercept','a')
         X <- yd[,'X']
         Y <- yd[,'Y']
         E <- MLY.getE(yd=yd,w=w,wtype=wtype)

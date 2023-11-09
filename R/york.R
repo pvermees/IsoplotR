@@ -134,11 +134,11 @@ get.york.xy <- function(XY,a,b,w=0,wtype=NA){
     Y <- XY[,'Y']
     vY <- XY[,'sY']^2
     sXY <- XY[,'rXY']*XY[,'sX']*XY[,'sY']
-    if (wtype%in%c('intercept',0,'a')) vY <- vY + w^2
+    if (wtype%in%c('intercept',1,'a')) vY <- vY + w^2
     O <- invertcovmat(vx=vX,vy=vY,sxy=sXY)
     N <- O[,'xx']*X + O[,'xy']*b*X + O[,'xy']*(Y-a) + b*(Y-a)*O[,'yy']
     D <- O[,'xx'] + 2*b*O[,'xy'] + O[,'yy']*b^2
-    if (wtype%in%c('slope',1,'b')){
+    if (wtype%in%c('slope',2,'b')){
         slopeyorkroot <- function(p,XYi,a,b,w){
             E <- dEdx <- matrix(0,2,2)
             E[1,1] <- XYi['sX']^2

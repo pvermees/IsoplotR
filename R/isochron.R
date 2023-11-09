@@ -167,10 +167,10 @@
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
 #'
-#' \code{0}, \code{'a'} or \code{'intercept'}: attributes the
+#' \code{1}, \code{'a'} or \code{'intercept'}: attributes the
 #' overdispersion to the y-intercept of the isochron.
 #'
-#' \code{1}, \code{'b'} or \code{'slope'}: attributes the
+#' \code{2}, \code{'b'} or \code{'slope'}: attributes the
 #' overdispersion to the slope of the isochron.
 #'
 #' \code{'A'}: only available if \code{x} has class \code{ThU} and
@@ -850,38 +850,58 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
+                          plot=TRUE,exterr=TRUE,model=1,wtype=1,anchor=0,
                           growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     y <- data2york(x,inverse=inverse)
-    d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
-    if (inverse){
-        R76 <- out$a
-        out$y0[c('y','s[y]')] <- out$b
+    if (anchor[1]<1 & model<3){
+        fitinverse <- inverse
+        d2calc <- clear(y,hide,omit)
+        fit <- regression(d2calc,model=model)
+    } else if (anchor[1]==1 | wtype==1){
+        fitinverse <- FALSE
+        Y <- data2york(x,inverse=fitinverse)
+        d2calc <- clear(Y,hide,omit)
+        if (anchor[1]==1) anchor[2:3] <- iratio('Pb207Pb204')
+        fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
+    } else if (anchor[1]==2 | wtype==2){
+        fitinverse <- TRUE
+        Y <- data2york(x,inverse=fitinverse)
+        d2calc <- clear(Y,hide,omit)
+        if (anchor[1]==2) {
+            sR76 <- ifelse(length(anchor)<3,0,anchor[3])
+            anchor <- c(1,age_to_Pb207Pb206_ratio(anchor[2],sR76))
+        }
+        fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
+    } else {
+        stop("Invalid anchor and/or wtype value.")
+    }
+    if (fitinverse){
+        R76 <- fit$a
+        fit$y0[c('y','s[y]')] <- fit$b
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
         y.lab <- quote(''^207*'Pb/'^206*'Pb')
     } else {
-        R76 <- out$b
-        out$y0[c('y','s[y]')] <- out$a
+        R76 <- fit$b
+        fit$y0[c('y','s[y]')] <- fit$a
         x.lab <- quote(''^206*'Pb/'^204*'Pb')
         y.lab <- quote(''^207*'Pb/'^204*'Pb')
     }
-    out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
-    out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
-    if (inflate(out)){
-        out$age['disp[t]'] <- 
-            get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
-        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
+    fit$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
+    fit$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
+    if (inflate(fit)){
+        fit$age['disp[t]'] <- 
+            get.Pb207Pb206.age(R76[1],sqrt(fit$mswd)*R76[2],exterr=exterr)[2]
+        fit$y0['disp[y]'] <- sqrt(fit$mswd)*fit$y0['s[y]']
     }
-    disp2age <- (inverse && wtype%in%c('intercept',0,'a')) ||
-                (!inverse && wtype%in%c('slope',1,'b'))
-    if (model==3 && disp2age){
-        out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
+    if (model==3 && wtype==2){
+        fit$disp <- fit$disp/mclean(fit$age['t'])$dPb207Pb206dt
         dispunits <- ' Ma'
     } else {
         dispunits <- ''   
     }
+    if (inverse == fitinverse) out <- fit
+    else out <- invertfit(fit,type="d")
     if (plot) {
         scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
@@ -980,13 +1000,13 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     }
     dispunits <- ''
     if (model==3){
-        if (wtype%in%c('slope',1,'b')){
+        if (wtype%in%c('slope',2,'b')){
             l40 <- lambda('K40')[1]
             dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
             d09db <- ifelse(inverse,1/a,1)
             out$disp <- dtd09*d09db*out$disp
             dispunits <- ' Ma'
-        } else if (inverse){ # wtype%in%c('intercept',0,'a')
+        } else if (inverse){ # wtype%in%c('intercept',1,'a')
             w <- out$disp[1]
             sw <- out$disp[2]
             out$disp[1] <- w/a^2
@@ -1178,10 +1198,10 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
         out <- isochron_ThU_2D(x,type=type,model=model,wtype=wtype,
                                exterr=exterr,hide=hide,omit=omit)
         if (model==3){
-            if (type==1 && wtype%in%c('slope',1,'b')){
+            if (type==1 && wtype%in%c('slope',2,'b')){
                 age2disp <- TRUE
                 Th230U238 <- out$b[1]
-            } else if (type==2 && wtype%in%c('intercept',0,'a')){
+            } else if (type==2 && wtype%in%c('intercept',1,'a')){
                 age2disp <- TRUE
                 Th230U238 <- out$a[1]
             } else {
@@ -1391,7 +1411,7 @@ isochron_PD <- function(x,nuclide,oerr=3,sigdig=2,
                                          exterr=exterr,bratio=bratio)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (wtype%in%c('slope',1,'b')){
+    if (wtype%in%c('slope',2,'b')){
         dDPdt <- lambda(nuclide)[1]*(1+DP)
         dDPdb <- ifelse(inverse,1/out$a[1],1)
         out$disp <- out$disp*dDPdb/dDPdt
@@ -1551,4 +1571,20 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     for (i in nl:1){
         mymtext(content[[i]],line=nl-i,...)
     }
+}
+
+invertfit <- function(fit,type="p"){
+    out <- fit
+    if (type%in%c(1,"p")){
+        out$a <- quotient(X=1,sX=0,Y=fit$a[1],sY=fit$a[2],rXY=0)
+        out$b <- quotient(X=-fit$b[1],sX=fit$b[2],
+                          Y=fit$a[1],sY=fit$a[2],
+                          rXY=fit$cov.ab/(fit$a[2]*fit$b[2]))
+    } else if (type%in%c(2,"d")){
+        out$a <- fit$b
+        out$b <- fit$a
+    } else {
+        stop("Invalid isochron type.")
+    }
+    out
 }

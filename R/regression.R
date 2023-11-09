@@ -50,7 +50,6 @@ model2regression <- function(xyz,type='york'){
     out
 }
 
-# fixes signs and uses logs for numerical stability:
 model3regression <- function(xyz,type='york',model=3,wtype='a'){
     pilot <- model1regression(xyz,type=type)
     if (identical(type,'york')){
@@ -89,7 +88,7 @@ model3regression <- function(xyz,type='york',model=3,wtype='a'){
 }
 
 init.york.lw <- function(XY,wtype='a',pilot){
-    err <- ifelse(wtype%in%c('intercept',0,'a'),
+    err <- ifelse(wtype%in%c('intercept',1,'a'),
                   pilot$a['s[a]'],pilot$b['s[b]'])
     init <- log(sqrt(pilot$mswd)*err)
     stats::optimise(f=LL.york.lw,interval=init+c(-10,5),
@@ -113,8 +112,8 @@ LL.york <- function(ablw,XY,wtype='a',debug=FALSE){
     DE[,'X-x'] <- XY[,'X']-x
     DE[,'Y-y'] <- XY[,'Y']-a-b*x
     DE[,'vX'] <- XY[,'sX']^2
-    if (wtype%in%c('intercept',0,'a')) DE[,'vY'] <- XY[,'sY']^2 + w^2
-    else if (wtype%in%c('slope',1,'b')) DE[,'vY'] <- XY[,'sY']^2 + (w*x)^2
+    if (wtype%in%c('intercept',1,'a')) DE[,'vY'] <- XY[,'sY']^2 + w^2
+    else if (wtype%in%c('slope',2,'b')) DE[,'vY'] <- XY[,'sY']^2 + (w*x)^2
     else DE[,'vY'] <- XY[,'sY']^2
     DE[,'sXY'] <- XY[,'rXY']*XY[,'sX']*XY[,'sY']
     detE <- DE[,'vX']*DE[,'vY'] - DE[,'sXY']^2
@@ -127,10 +126,10 @@ LL.york <- function(ablw,XY,wtype='a',debug=FALSE){
 init.titterington.lw <- function(XYZ,wtype='a',pilot){
     fact <- max(1,sqrt(pilot$mswd))
     spar <- fact*sqrt(diag(pilot$cov))
-    if (wtype%in%c('intercept',0,'a')) init <- log(spar['a'])
-    else if (wtype%in%c(1,'b')) init <- log(spar['b'])
-    else if (wtype%in%c(2,'A')) init <- log(spar['A'])
-    else if (wtype%in%c(3,'B')) init <- log(spar['B'])
+    if (wtype%in%c('intercept',1,'a')) init <- log(spar['a'])
+    else if (wtype%in%c(2,'b')) init <- log(spar['b'])
+    else if (wtype%in%c(3,'A')) init <- log(spar['A'])
+    else if (wtype%in%c(4,'B')) init <- log(spar['B'])
     else stop('illegal wtype')
     stats::optimise(f=LL.titterington.lw,interval=init+c(-10,5),
                     abAB=pilot$par,XYZ=XYZ,wtype=wtype)
