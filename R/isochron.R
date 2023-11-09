@@ -855,7 +855,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     fit <- isochron_dispatch(x,inverse=inverse,model=model,wtype=wtype,
                              anchor=anchor,hide=hide,omit=omit,
-                             rat='Pb207Pb204',t2rfun=age_to_Pb207Pb206_ratio)
+                             y0rat='Pb207Pb204',t2rfun=age_to_Pb207Pb206_ratio)
     if (fit$inverse){
         R76 <- fit$a
         fit$y0[c('y','s[y]')] <- fit$b
@@ -874,14 +874,14 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             get.Pb207Pb206.age(R76[1],sqrt(fit$mswd)*R76[2],exterr=exterr)[2]
         fit$y0['disp[y]'] <- sqrt(fit$mswd)*fit$y0['s[y]']
     }
-    if (model==3 && wtype==2){
-        fit$disp <- fit$disp/mclean(fit$age['t'])$dPb207Pb206dt
+    if (inverse == fit$inverse) out <- fit
+    else out <- invertfit(fit,type="d")
+    if (model==3 & wtype==2){
+        out$disp <- fit$disp/mclean(fit$age['t'])$dPb207Pb206dt
         dispunits <- ' Ma'
     } else {
         dispunits <- ''   
     }
-    if (inverse == fit$inverse) out <- fit
-    else out <- invertfit(fit,type="d")
     if (plot) {
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
@@ -946,55 +946,46 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=TRUE,model=1,wtype='intercept',
+                          plot=TRUE,exterr=TRUE,model=1,wtype=1,anchor=0,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    y <- data2york(x,inverse=inverse)
-    d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
-    a <- out$a['a']
-    sa <- out$a['s[a]']
-    b <- out$b['b']
-    sb <- out$b['s[b]']
-    if (inverse) {
-        R09 <- -b/a
-        sR09 <- R09*sqrt((sa/a)^2 + (sb/b)^2 - 2*out$cov.ab/(a*b))
-        out$y0['y'] <- 1/a
-        out$y0['s[y]'] <- sa/a^2
+    fit <- isochron_dispatch(x,inverse=inverse,model=model,wtype=wtype,
+                             anchor=anchor,hide=hide,omit=omit,
+                             y0rat='Ar40Ar36',t2rfun=get.ArAr.ratio,
+                             J=x$J[1],sJ=x$J[2])
+    if (fit$inverse) {
+        R09 <- quotient(X=fit$a[1],sX=fit$a[2],
+                        Y=-fit$b[1],sY=fit$b[2],
+                        rXY=fit$cov.ab/(fit$a[2]*fit$b[2]))
+        fit$y0[c('y','s[y]')] <- quotient(X=fit$a[1],sX=fit$a[2],Y=1,sY=0,rXY=0)
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
         y.lab <- quote(''^36*'Ar/'^40*'Ar')
     } else {
-        R09 <- b
-        sR09 <- sb
-        out$y0['y'] <- a
-        out$y0['s[y]'] <- sa
+        R09 <- fit$b
+        fit$y0[c('y','s[y]')] <- fit$a
         x.lab <- quote(''^39*'Ar/'^36*'Ar')
         y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
-    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
-    out$age[c('t','s[t]')] <- get.ArAr.age(R09,sR09,x$J[1],x$J[2],exterr=exterr)
-    if (inflate(out)){
-        out$age['disp[t]'] <- get.ArAr.age(R09,sqrt(out$mswd)*sR09,
+    fit$y0label <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
+    fit$age[c('t','s[t]')] <- get.ArAr.age(R09[1],R09[2],x$J[1],x$J[2],exterr=exterr)
+    if (inflate(fit)){
+        fit$age['disp[t]'] <- get.ArAr.age(R09[1],sqrt(fit$mswd)*R09[2],
                                            x$J[1],x$J[2],exterr=exterr)[2]
-        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
+        fit$y0['disp[y]'] <- sqrt(fit$mswd)*fit$y0['s[y]']
     }
-    dispunits <- ''
-    if (model==3){
-        if (wtype%in%c('slope',2,'b')){
-            l40 <- lambda('K40')[1]
-            dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
-            d09db <- ifelse(inverse,1/a,1)
-            out$disp <- dtd09*d09db*out$disp
-            dispunits <- ' Ma'
-        } else if (inverse){ # wtype%in%c('intercept',1,'a')
-            w <- out$disp[1]
-            sw <- out$disp[2]
-            out$disp[1] <- w/a^2
-            out$disp[2] <- out$disp[1]*sw/w
-        }
+    if (inverse == fit$inverse) out <- fit
+    else out <- invertfit(fit,type="p")
+    if (model==3 & wtype==2){
+        l40 <- lambda('K40')[1]
+        dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
+        d09db <- ifelse(inverse,1/a,1)
+        out$disp <- dtd09*d09db*fit$disp
+        dispunits <- ' Ma'
+    } else {
+        dispunits = ''
     }
     if (plot) {
-        scatterplot(y,oerr=oerr,show.ellipses=show.ellipses,
+        scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
@@ -1556,9 +1547,9 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
 invertfit <- function(fit,type="p"){
     out <- fit
     if (type%in%c(1,"p")){
-        out$a <- quotient(X=1,sX=0,Y=fit$a[1],sY=fit$a[2],rXY=0)
-        out$b <- quotient(X=-fit$b[1],sX=fit$b[2],
-                          Y=fit$a[1],sY=fit$a[2],
+        out$a <- quotient(X=fit$a[1],sX=fit$a[2],Y=1,sY=0,rXY=0)
+        out$b <- quotient(X=fit$a[1],sX=fit$a[2],
+                          Y=-fit$b[1],sY=fit$b[2],
                           rXY=fit$cov.ab/(fit$a[2]*fit$b[2]))
     } else if (type%in%c(2,"d")){
         out$a <- fit$b
@@ -1570,7 +1561,7 @@ invertfit <- function(fit,type="p"){
 }
 
 isochron_dispatch <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
-                              model=1,wtype=0,anchor=1,rat,t2rfun){
+                              model=1,wtype=0,anchor=1,y0rat,t2rfun,...){
     xyz <- data2york(x,inverse=inverse)
     if (anchor[1]<1 & model<3){
         fitinverse <- inverse
@@ -1580,7 +1571,7 @@ isochron_dispatch <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         fitinverse <- FALSE
         yd <- data2york(x,inverse=fitinverse)
         d2calc <- clear(yd,hide,omit)
-        if (anchor[1]==1) anchor[2:3] <- iratio(rat)
+        if (anchor[1]==1) anchor[2:3] <- iratio(y0rat)
         fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
     } else if (anchor[1]==2 | wtype==2){
         fitinverse <- TRUE
@@ -1588,7 +1579,7 @@ isochron_dispatch <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         d2calc <- clear(yd,hide,omit)
         if (anchor[1]==2) {
             st <- ifelse(length(anchor)<3,0,anchor[3])
-            anchor <- c(1,do.call(t2rfun,args=list(t=anchor[2],st=st)))
+            anchor <- c(1,do.call(t2rfun,args=list(t=anchor[2],st=st,...)))
         }
         fit <- MLyork(d2calc,anchor=anchor,model=model,wtype='a')
     } else {
