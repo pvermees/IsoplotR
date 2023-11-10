@@ -214,7 +214,9 @@ errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
 }
 # returns standard error
 errorprop1x2 <- function(J1,J2,E11,E22,E12){
-    v <- E11*J1^2 + 2*E12*J1*J2 + E22*J2^2
+    d <- E11*E22-E12^2
+    if (d<0 & d>(-1e-10)) v <- 0 # ignore rounding errors
+    else v <- E11*J1^2 + 2*E12*J1*J2 + E22*J2^2
     sqrt(v)
 }
 errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){

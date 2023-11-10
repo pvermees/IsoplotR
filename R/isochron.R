@@ -974,7 +974,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     if (model==3 && out$wtype==2){
         l40 <- lambda('K40')[1]
         dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
-        d09db <- ifelse(inverse,1/a,1)
+        d09db <- ifelse(inverse,1/out$a[1],1)
         out$disp <- dtd09*d09db*out$disp
         dispunits <- ' Ma'
     } else {

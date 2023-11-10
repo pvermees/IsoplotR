@@ -23,7 +23,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         d2calc <- clear(yd,hide,omit)
         st <- ifelse(length(anchor)<3,0,anchor[3])
         DP <- do.call(t2DPfun,args=list(t=anchor[2],st=st,...))
-        if(type=='d') y0 <- DP
+        if (type=='d') y0 <- DP
         else y0 <- quotient(X=DP[1],sX=DP[2],Y=1,sY=0,sXY=0)
         anchor <- c(1,y0)
         fit <- MLyork(d2calc,anchor=anchor,model=model)

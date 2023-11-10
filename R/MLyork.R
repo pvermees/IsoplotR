@@ -114,19 +114,53 @@ LL.MLyork.blw <- function(blw,a,yd){
     LL.MLyork.ablw(c(a,blw),yd=yd,wtype='b')
 }
 
-LL.MLyork.ablw <- function(ablw,yd,wtype='a',SS=FALSE){
+LL.MLyork.ablw <- function(ablw,yd,wtype='a',returnval='LL'){
     a <- ablw[1]
     b <- ablw[2]
     w <- exp(ablw[3])
-    x <- MLY.getx(yd,a=a,b=b,w=w,wtype=wtype)
-    E <- MLY.getE(yd,w=w,wtype=wtype,x=x)
-    detE <- E[,1]*E[,2]-E[,3]^2
-    S <- MLY.maha(a=a,b=b,x=x,X=yd[,'X'],Y=yd[,'Y'],O=MLY.getO(E))
-    if (SS) return(sum(S))
-    else return(sum(log(detE)+S)/2)
+    if (wtype%in%c(2,'slope','b')){
+        misfit <- function(x,yd,a,b,w,SS=FALSE){
+            E <- MLY.getE(yd=yd,w=w,wtype=wtype,x=x)
+            O <- MLY.getO(E)
+            ss <- MLY.maha(a=a,b=b,x=x,X=yd[,'X'],Y=yd[,'Y'],O=O)
+            if (SS) return(ss)
+            detE <- E[,1]*E[,2]-E[,3]^2
+            sum(log(detE)+ss)/2
+        }
+        fit <- stats::optim(yd[,'X'],misfit,yd=yd,a=a,b=b,w=w)
+        if (returnval=='LL'){
+            out <- fit$value
+        } else {
+            x <- fit$par
+            if (returnval=='x') out <- x
+            else if (returnval=='SS') out <- misfit(x=x,yd=yd,a=a,b=b,w=w,SS=TRUE)
+            else stop("Invalid returnval.")
+        }
+    } else { # wtype%in%c(1,'intercept','a')
+        X <- yd[,'X']
+        Y <- yd[,'Y']
+        E <- MLY.getE(yd=yd,w=w,wtype=wtype)
+        O <- MLY.getO(E)
+        O11 <- O[,1]; O22 <- O[,2]; O12 <- O[,3]
+        num <- -((O22*a-O22*Y-O12*X)*b+O12*a-O12*Y-O11*X)
+        den <- O22*b^2+2*O12*b+O11
+        x <- num/den
+        if (returnval=='x'){
+            out <- x
+        } else {
+            Ew <- MLY.getE(yd,w=w,wtype=wtype,x=x)
+            S <- MLY.maha(a=a,b=b,x=x,X=yd[,'X'],Y=yd[,'Y'],O=MLY.getO(Ew))
+            if (returnval=='SS'){
+                out <- SS
+            } else {
+                detEw <- Ew[,1]*Ew[,2]-Ew[,3]^2
+                out <- sum(log(detEw)+S)/2
+            }
+        }
+    }
 }
 
-MLY.getE <- function(yd,w=0,wtype='a',x=NA){
+MLY.getE <- function(yd,w=0,wtype='a',x=0){
     E11 <- yd[,'sX']^2
     E22 <- yd[,'sY']^2
     E12 <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
@@ -150,7 +184,7 @@ MLY.getx <- function(yd,a,b,w=0,wtype='a'){
             detE <- E[,1]*E[,2]-E[,3]^2
             sum(log(detE)+SS)/2
         }
-        x <- stats::optim(yd[,'X'],misfit,yd=yd,a=a,b=b,w=w)$par
+        s <- stats::optim(yd[,'X'],misfit,yd=yd,a=a,b=b,w=w)$par
     } else { # wtype%in%c(1,'intercept','a')
         X <- yd[,'X']
         Y <- yd[,'Y']
