@@ -790,7 +790,7 @@ get.Pb208Th232.ratios <- function(x){
         E12 <- x$x[,'rhoXZ']*x$x[,'errU238Pb206']*x$x[,'errPb208Pb206']
         E13 <- x$x[,'rhoXW']*x$x[,'errU238Pb206']*x$x[,'errTh232U238']
         E23 <- x$x[,'rhoZW']*x$x[,'errPb208Pb206']*x$x[,'errTh232U238']
-        out[,'errPb208Th232'] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23)
+        out[,'errPb208Th232'] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23))
     } else {
         stop('Wrong input format: no Pb208 or Th232 present in this dataset.')
     }
@@ -812,7 +812,7 @@ get.Pb208Pb206.ratios <- function(x){
         E12 <- x$x[,'rhoXZ']*x$x[,'Pb206U238']*x$x[,'Pb208Th232']
         E13 <- x$x[,'rhoXW']*x$x[,'Pb206U238']*x$x[,'Th232U238']
         E23 <- x$x[,'rhoZW']*x$x[,'Pb208Th232']*x$x[,'Th232U238']
-        out[,'errPb208Th232'] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23)
+        out[,'errPb208Th232'] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23))
     } else if (x$format == 8){
         out <- x$x[,labels]
     } else {

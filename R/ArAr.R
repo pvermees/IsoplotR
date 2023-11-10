@@ -30,8 +30,8 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=FALSE){
     E11 <- sAr40Ar39^2
     E22 <- sJ^2
     E33 <- lambda("K40")[2]^2
-    st <- errorprop1x3(J1,J2,J3,E11,E22,E33)
-    out <- cbind(tt,st)
+    vt <- errorprop1x3(J1,J2,J3,E11,E22,E33)
+    out <- cbind(tt,sqrt(vt))
     colnames(out) <- c('t','st')
     out
 }
@@ -63,8 +63,8 @@ ArAr.age <- function(x,exterr=FALSE,i=NULL,i2i=FALSE,projerr=FALSE,omit4c=NULL){
     E11 <- y[,'sX']^2
     E22 <- y[,'sY']^2
     E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
-    if (projerr) sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
-    else sDP <- errorprop1x2(J1,J2,E11,E22,E12)
+    if (projerr) sDP <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
+    else sDP <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     out <- get.ArAr.age(DP,sDP,x$J[1],x$J[2],exterr=exterr)
     if (!is.null(i)) out <- out[i,]
     colnames(out) <- c('t','s[t]')

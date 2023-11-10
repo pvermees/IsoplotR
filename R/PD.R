@@ -22,8 +22,8 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
     E12 <- 0
     J1 <- 1/(L[1]*(bratio + DP)) # dt.dDP
     J2 <- -tt/L[1]               # dt.dL
-    st <- errorprop1x2(J1,J2,E11,E22,E12)
-    out <- cbind(tt,st)
+    vt <- errorprop1x2(J1,J2,E11,E22,E12)
+    out <- cbind(tt,sqrt(vt))
     colnames(out) <- c('t','s[t]')
     out
 }
@@ -48,8 +48,8 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NULL,i2i=TRUE,
         E22 <- y[,'sY']^2
         E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
         E33 <- fit$b[2]^2
-        if (projerr) DP[,2] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
-        else DP[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
+        if (projerr) DP[,2] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
+        else DP[,2] <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     } else {
         initial <- get.nominal.initials(x)
         dat <- data2york(x,exterr=exterr)

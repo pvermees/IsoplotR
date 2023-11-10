@@ -1359,30 +1359,28 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                         plot=TRUE,exterr=TRUE,model=1,wtype=1,
                         anchor=0,show.ellipses=1*(model!=2),
                         bratio=1,hide=NULL,omit=NULL,...){
-    fit <- isochron_dispatch(x,inverse=inverse,model=model,wtype=wtype,
-                             anchor=anchor,hide=hide,omit=omit,
-                             y0rat=y0rat,t2DPfun=t2DPfun)
-    fit$y0[c('y','s[y]')] <- fit$a
-    if (fit$inverse){
-        DP <- quotient(X=fit$a[1],sX=fit$a[2],
-                       Y=fit$b[1],sY=fit$b[2],sXY=fit$cov.ab)
+    out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
+                   anchor=anchor,hide=hide,omit=omit,type="p",
+                   y0rat=y0rat,t2DPfun=t2DPfun)
+    out$y0[c('y','s[y]')] <- out$a
+    if (inverse){
+        DP <- quotient(X=out$a[1],sX=out$a[2],
+                       Y=out$b[1],sY=out$b[2],sXY=out$cov.ab)
         DP[1] <- -DP[1]
     } else {
-        DP <- fit$b
+        DP <- out$b
     }
-    fit$age[c('t','s[t]')] <- get.PD.age(DP[1],DP[2],nuclide,
+    out$age[c('t','s[t]')] <- get.PD.age(DP[1],DP[2],nuclide,
                                          exterr=exterr,bratio=bratio)
-    if (inflate(fit)){
-        fit$age['disp[t]'] <- get.PD.age(DP[1],sqrt(fit$mswd)*DP[2],nuclide,
+    if (inflate(out)){
+        out$age['disp[t]'] <- get.PD.age(DP[1],sqrt(out$mswd)*DP[2],nuclide,
                                          exterr=exterr,bratio=bratio)[2]
-        fit$y0['disp[y]'] <- sqrt(fit$mswd)*fit$y0['s[y]']
+        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (inverse == fit$inverse) out <- fit
-    else out <- invertfit(fit,type="p")
     if (model==3 & wtype==2){
         dDPdt <- lambda(nuclide)[1]*(1+DP[1])
         dDPdb <- ifelse(inverse,1/out$a[1],1)
-        out$disp <- fit$disp*dDPdb/dDPdt
+        out$disp <- out$disp*dDPdb/dDPdt
         dispunits <- ' Ma'
     } else {
         dispunits <- ''
@@ -1390,7 +1388,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse)
     out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[0]*'=')))
     if (plot){
-        scatterplot(fit$xyz,oerr=oerr,show.ellipses=show.ellipses,
+        scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,fit=out,
