@@ -243,6 +243,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
             tt <- exp(fit$par['t'])
             par['w'] <- fit$par['t'] + log(E['t','t'])/2
         }
+        lower <- par - buffer
+        upper <- par + buffer
     } else {
         init <- york2ludwig(x,anchor=anchor,buffer=buffer)
         par <- init$par
