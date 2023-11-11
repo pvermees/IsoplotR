@@ -1,10 +1,18 @@
+# IsoplotR 6.0
+
+Addition of anchored regression to all isochron functions, as well as model-3 fits whereby overdispersion can be attributed to either diachronous isotopic closure or the composition of the inherited component. Also adds an option to anchor U-Pb isochrons to the Stacey-Kramers mantle evolution model.
+
+# IsoplotR 5.6
+
+November 10, 2023: Improved initialisation of Ludwig regression for U-Pb formats 1, 2 and 3.
+
 # IsoplotR 5.5
 
-September 29, 2023: Redefined the Aitchison and concordia distances in terms of isometric logratios. Modified the default cutoffs accordingly.
+September 29, 2023: Redefines the Aitchison and concordia distances in terms of isometric logratios. Modifies the default cutoffs accordingly.
 
 # IsoplotR 5.4
 
-August 28, 2023: Renamed U-Th-He 'central' ages in helioplots as 'barycentric' ages to avoid confusion with the central ages reported in radial plots. Added OGLS regression.
+August 28, 2023: Renamed U-Th-He 'central' ages in helioplots as 'barycentric' ages to avoid confusion with the central ages reported in radial plots. Ads OGLS regression.
 
 # IsoplotR 5.3
 

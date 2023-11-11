@@ -1,6 +1,8 @@
 # Maximum likelihood implementation of York regression
 # This is more flexible than the original least squares method
-MLyork <- function(yd,anchor=0,model=1,wtype='a',control=list()){
+MLyork <- function(yd,anchor=0,model=1,wtype='a',
+                   tol=.Machine$double.eps^0.25,
+                   control=list(reltol=tol)){
     p <- c(NA,NA,-Inf)
     E <- matrix(0,3,3)
     names(p) <- rownames(E) <- colnames(E) <- c('a','b','lw')
@@ -18,7 +20,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',control=list()){
             i <- c('b','lw')
             init <- c(b=init,lw=0)
             fit <- stats::optim(init,LL.MLyork.blw,a=p['a'],yd=yd,
-                                control=control,hessian=TRUE)
+                                hessian=TRUE,control=control)
             p[i] <- fit$par
             E[i,i] <- inverthess(fit$hessian)
         } else {
@@ -27,7 +29,8 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',control=list()){
             fit <- stats::optimise(LL.MLyork.b,a=p['a'],yd=yd,
                                    interval=interval,tol=tol)
             p[i] <- fit$minimum
-            H <- stats::optimHess(fit$minimum,LL.MLyork.b,a=p['a'],yd=yd)
+            H <- stats::optimHess(fit$minimum,LL.MLyork.b,
+                                  a=p['a'],yd=yd,control=control)
             E[i,i] <- inverthess(H)
             df <- ns-1
         }
@@ -43,7 +46,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',control=list()){
             i <- c('a','lw')
             init <- c(a=init,lw=0)
             fit <- stats::optim(init,LL.MLyork.alw,b=p['b'],yd=yd,
-                                control=control,hessian=TRUE)
+                                hessian=TRUE,control=control)
             p[i] <- fit$par
             E[i,i] <- inverthess(fit$hessian)
         } else {
@@ -51,7 +54,8 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',control=list()){
             fit <- stats::optimise(LL.MLyork.a,b=p['b'],yd=yd,
                                    lower=init/2,upper=init*2,tol=tol)
             p[i] <- fit$minimum
-            H <- stats::optimHess(fit$minimum,LL.MLyork.a,b=p['b'],yd=yd)
+            H <- stats::optimHess(fit$minimum,LL.MLyork.a,
+                                  b=p['b'],yd=yd,control=control)
             E[i,i] <- inverthess(H)
             df <- ns-1
         }
@@ -66,13 +70,13 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',control=list()){
         } else if (model==3){
             init <- c(a=ab[1],b=ab[2],lw=0)
             fit <- stats::optim(init,LL.MLyork.ablw,yd=yd,wtype=wtype,
-                                control=control,hessian=TRUE)
+                                control=control,hessian=TRUE,control=control)
             p <- fit$par
             E <- inverthess(fit$hessian)
         } else { # this is equivalent to ordinary York regression
             init <- c(a=ab[1],b=ab[2])
             fit <- stats::optim(init,LL.MLyork.ab,yd=yd,
-                                control=control,hessian=TRUE)
+                                hessian=TRUE,control=control)
             p <- fit$par
             E <- inverthess(fit$hessian)
             SS <- LL.MLyork.ab(fit$par,yd=yd,returnval='SS')

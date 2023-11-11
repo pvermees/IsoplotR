@@ -65,7 +65,7 @@ flipfit <- function(fit,flip=FALSE){
     vcovab <- errorprop(J11,J12,J21,J22,E11,E22,E12)
     out$a <- c(a,sqrt(vcovab[1]))
     out$b <- c(b,sqrt(vcovab[2]))
-    out$cov.ab <- vcovab[3]
+    out$cov.ab <- unname(vcovab[3])
     out
 }
 
@@ -91,5 +91,7 @@ invertfit <- function(fit,type="p"){
     } else {
         stop("Invalid isochron type.")
     }
+    names(out$a) <- c('a','s[a]')
+    names(out$b) <- c('b','s[b]')
     out
 }

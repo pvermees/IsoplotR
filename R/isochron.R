@@ -167,19 +167,43 @@
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
 #'
-#' \code{1}, \code{'a'} or \code{'intercept'}: attributes the
-#' overdispersion to the y-intercept of the isochron.
+#' If \code{x} has class \code{PbPb}, \code{ArAr} or \code{PD},
+#' \code{wtype} can have one of two values:
 #'
-#' \code{2}, \code{'b'} or \code{'slope'}: attributes the
-#' overdispersion to the slope of the isochron.
+#' \itemize{
+#' \item \code{1}: attribute the overdispersion to variability in the
+#' non-radiogenic component, as controlled by \code{settings('iratio',...)}
 #'
-#' \code{'A'}: only available if \code{x} has class \code{ThU} and
+#' \item \code{2}: attribute the overdispersion to variability in the
+#' age, i.e. to diachronous closure of the isotope system.
+#' }
+#'
+#' otherwise, \code{wtype} can have one of four values:
+#'
+#' \itemize{
+#' \item \code{1}: attributes the overdispersion to the y-intercept of the isochron.
+#'
+#' \item \code{2}: attributes the overdispersion to the slope of the isochron.
+#'
+#' \item \code{'A'}: only available if \code{x} has class \code{ThU} and
 #' \code{x$format} is 1 or 2. Attributes the overdispersion to the
 #' authigenic \eqn{^{230}}Th/\eqn{^{238}}U-intercept of the isochron.
 #'
-#' \code{'B'}: only available if \code{x} has class \code{ThU} and
+#' \item \code{'B'}: only available if \code{x} has class \code{ThU} and
 #' \code{x$format} is 1 or 2. Attributes the overdispersion to the
 #' \eqn{^{230}}Th/\eqn{^{232}}Th-slope of the isochron.
+#' }
+#'
+#' @param anchor control parameters to fix the intercept age or
+#'     non-radiogenic composition of the isochron fit. This can be a
+#'     scalar or a vector.
+#'
+#' If \code{anchor[1]=0}: do not anchor the isochron.
+#'
+#' If \code{anchor[1]=1}: fix the non-radiogenic composition at the
+#' values stored in \code{settings('iratio',...)}.
+#'
+#' If \code{anchor[1]=2}: fix the age at the value stored in \code{anchor[2]}. 
 #' 
 #' @param show.ellipses show the data as:
 #'
@@ -222,7 +246,8 @@
 #'
 #' \item{cov.ab}{the covariance of the slope and intercept}
 #'
-#' \item{df}{the degrees of freedom of the linear fit (\eqn{df=n-2})}
+#' \item{df}{the degrees of freedom of the linear fit (\eqn{df=n-2}
+#' for non-anchored fits)}
 #'
 #' \item{y0}{a two- or three-element list containing:
 #'
@@ -257,7 +282,7 @@
 #' (omitted if \code{model=2})}
 #'
 #' \item{w}{the overdispersion term, i.e. a two-element vector with
-#' the standard deviation of the (assumed) Normally distributed
+#' the standard deviation of the (assumed) normally distributed
 #' geological scatter that underlies the measurements, and its
 #' standard error (only returned if \code{model=3}).}
 #'
