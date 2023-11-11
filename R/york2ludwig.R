@@ -19,7 +19,8 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
     yd <- data2york(x,option=1)
     if (anchor[1]==1){
         Pb76c <- iratio('Pb207Pb206')[1]
-        yfit <- MLyork(yd,anchor=c(1,Pb76c))
+        U85 <- iratio('U238U235')[1]
+        yfit <- MLyork(yd,anchor=c(2,1/(Pb76c*U85)))
         tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
         par['t'] <- log(tm[1])
         upper['t'] <- log(tm[2])
