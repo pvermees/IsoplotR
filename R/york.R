@@ -72,6 +72,9 @@
 #' scatterplot(dat,fit=fit)
 #' @export
 york <- function(x){
+    yorkhelper(x)
+}
+yorkhelper <- function(x,np=2){
     if (ncol(x)==4) x <- cbind(x,0)
     colnames(x) <- c('X','sX','Y','sY','rXY')
     X <- x[,'X']
@@ -108,7 +111,7 @@ york <- function(x){
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
     out$type <- 'york'
-    out <- append(out,getMSWD(X2=sum(W*(Y-b*X-a)^2),df=nrow(x)-2))
+    out <- append(out,getMSWD(X2=sum(W*(Y-b*X-a)^2),df=nrow(x)-np))
     out
 }
 

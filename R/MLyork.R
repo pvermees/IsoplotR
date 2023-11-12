@@ -1,7 +1,7 @@
 # Maximum likelihood implementation of York regression
 # This is more flexible than the original least squares method
 MLyork <- function(yd,anchor=0,model=1,wtype='a',
-                   tol=.Machine$double.eps^0.25,
+                   tol=.Machine$double.eps^0.5,
                    control=list(reltol=tol)){
     p <- c(NA,NA,-Inf)
     E <- matrix(0,3,3)
@@ -70,7 +70,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
         } else if (model==3){
             init <- c(a=ab[1],b=ab[2],lw=0)
             fit <- stats::optim(init,LL.MLyork.ablw,yd=yd,wtype=wtype,
-                                control=control,hessian=TRUE,control=control)
+                                hessian=TRUE,control=control)
             p <- fit$par
             E <- inverthess(fit$hessian)
         } else { # this is equivalent to ordinary York regression

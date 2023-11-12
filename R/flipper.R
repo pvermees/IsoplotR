@@ -13,7 +13,8 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         yd <- data2york(x,inverse=fitinverse)
         d2calc <- clear(yd,hide,omit)
         anchor[2:3] <- iratio(y0rat)
-        fit <- MLyork(d2calc,anchor=anchor,model=model)
+        if (model>1) fit <- MLyork(d2calc,anchor=anchor,model=model)
+        else fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         fit$wtype <- 2 # only the age can vary
     } else if (anchor[1]==2){
         fitinverse <- TRUE
@@ -26,7 +27,8 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         if (type=='d') y0 <- DP
         else y0 <- quotient(X=DP[1],sX=DP[2],Y=1,sY=0,sXY=0)
         anchor <- c(1,y0)
-        fit <- MLyork(d2calc,anchor=anchor,model=model)
+        if (model>1) fit <- MLyork(d2calc,anchor=anchor,model=model)
+        else fit <- anchoredYork(d2calc,y0=y0[1],sy0=y0[2])
         fit$wtype <- 1 # only the inherited composition can vary
     } else if (wtype==1){
         fitinverse <- FALSE
@@ -93,5 +95,15 @@ invertfit <- function(fit,type="p"){
     }
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
+    out
+}
+
+anchoredYork <- function(x,y0,sy0=0){
+    eps <- .Machine$double.eps
+    X <- rbind(x,c(0,eps,y0,max(sy0,eps),0))
+    out <- yorkhelper(X,np=1)
+    if (sy0==0) out$a[2] <- 0
+    out$model <- 1
+    out$n <- nrow(x)
     out
 }
