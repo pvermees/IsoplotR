@@ -23,6 +23,7 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
         yfit <- MLyork(yd,anchor=c(2,1/(Pb76c*U85)))
         tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
         par['t'] <- log(tm[1])
+        lower['t'] <- par['t'] - buffer
         upper['t'] <- log(tm[2])
         if (iratio('Pb207Pb206')[2]>0){
             par['a0'] <- log(Pb76c)
@@ -48,7 +49,7 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
         }
         McL <- mclean(tt,d=x$d)
         Xt <- McL$Pb207U235
-        Yt <- McL$Pb207U235
+        Yt <- McL$Pb206U238
         YD <- yd
         YD[,'X'] <- yd[,'X'] - Xt # shift left
         yfit <- MLyork(YD,anchor=c(1,Yt))
