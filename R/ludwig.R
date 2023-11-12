@@ -801,11 +801,13 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     if (x$format %in% (1:3)){ # X=07/06, Y=38/06
         yd <- data2york(x,option=2,tt=tt)
         a <- a0
-        b <- -McL$Pb206U238*a0
-        dbdl38 <- -McL$dPb206U238dl38*a0
-        dbdl34 <- -McL$dPb206U238dl34*a0
-        dbdl30 <- -McL$dPb206U238dl30*a0
-        dbdl26 <- -McL$dPb206U238dl26*a0
+        b <- -McL$Pb206U238*(a0-McL$Pb207Pb206)
+        dbdl38 <- -McL$dPb206U238dl38*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl38
+        dbdl34 <- -McL$dPb206U238dl34*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl34
+        dbdl30 <- -McL$dPb206U238dl30*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl30
+        dbdl26 <- -McL$dPb206U238dl26*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl26
+        dbdl35 <- McL$Pb206U238*McL$dPb207Pb206dl35
+        dbdl31 <- McL$Pb206U238*McL$dPb207Pb206dl31
     } else if (x$format %in% (4:6)){
         if (type==1){         # X=38/06, Y=04/06
             yd <- data2york(x,option=3,tt=tt)

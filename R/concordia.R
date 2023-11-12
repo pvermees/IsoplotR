@@ -304,12 +304,12 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
     fit <- NULL
+    X2calc <- subset(X,subset=calcit)
     if (show.age==1){
-        X2calc <- subset(X,subset=calcit)
         fit <- concordia.age(X2calc,type=type,exterr=exterr)
     } else if (show.age>1){
-        lfit <- ludwig(x2calc,exterr=exterr,model=(show.age-1),anchor=anchor)
-        fit <- discordia(x2calc,fit=lfit,wetherill=(type==1))
+        lfit <- ludwig(X2calc,exterr=exterr,model=(show.age-1),anchor=anchor)
+        fit <- discordia(X2calc,fit=lfit,wetherill=(type==1))
     }
     fit$n <- length(x2calc)
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
