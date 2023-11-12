@@ -1,7 +1,7 @@
 # helper function for isochron() that flips X- and Y- axis and back
 # if necessary to facilitate anchored regression and model-3 fits
 flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
-                    model=1,wtype=0,anchor=1,type,y0rat,t2DPfun,...){
+                    model=1,wtype=0,anchor=1,type='p',y0rat,t2DPfun,...){
     flip <- FALSE
     xyz <- data2york(x,inverse=inverse)
     if (anchor[1]<1 & model<3){
