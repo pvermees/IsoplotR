@@ -225,8 +225,10 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
+    init <- york2ludwig(x,anchor=anchor,buffer=buffer)
+    lower <- init$lower
+    upper <- init$upper
     if (model==3){
-        init <- init.ludwig(x,anchor=anchor,type=type,buffer=buffer)
         fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
                               upper=init$upper,x=x,anchor=anchor,type=type)
         E <- inverthess(fit$hessian)
@@ -243,13 +245,10 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
             tt <- exp(fit$par['t'])
             par['w'] <- fit$par['t'] + log(E['t','t'])/2
         }
-        lower <- par - buffer
-        upper <- par + buffer
+        lower['w'] <- par['w'] - max(buffer,10)
+        upper['w'] <- par['w'] + buffer
     } else {
-        init <- york2ludwig(x,anchor=anchor,buffer=buffer)
         par <- init$par
-        lower <- init$lower
-        upper <- init$upper
     }
     if (x$d$U48$option==2 | x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
