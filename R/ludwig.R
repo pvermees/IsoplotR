@@ -172,10 +172,19 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
         out$cov[inames,'t'] <- fit$cov[,'t']
     }
     if (type%in%c('joint',0,1,3)){
-        if ('a0'%ni%inames && anchor[1]==1){
-            if (x$format<4) out$par['a0'] <- iratio('Pb207Pb206')[1]
-            else if (x$format<7) out$par['a0'] <- iratio('Pb206Pb204')[1]
-            else out$par['a0'] <- 1/iratio('Pb208Pb206')[1]
+        if ('a0'%ni%inames){
+            if (anchor[1]==1){
+                if (x$format<4) out$par['a0'] <- iratio('Pb207Pb206')[1]
+                else if (x$format<7) out$par['a0'] <- iratio('Pb206Pb204')[1]
+                else out$par['a0'] <- 1/iratio('Pb208Pb206')[1]
+            } else if (anchor[1]==3){
+                sk <- stacey.kramers(fit$par['t'])
+                if (x$format<4) out$par['a0'] <- sk[1,'i74']/sk[1,'i64']
+                else if (x$format<7) out$par['a0'] <- sk[1,'i64']
+                else out$par['a0'] <- sk[1,'i64']/sk[1,'i84']
+            } else {
+                stop("Can't determine a0 for this dataset.")
+            }
         } else {
             out$par['a0'] <- fit$par['a0']
             out$cov['a0',inames] <- fit$cov['a0',]
@@ -185,9 +194,17 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
         out$par['a0'] <- NA
     }
     if (x$format>3 && type%in%c('joint',0,2,4)){
-        if ('b0'%ni%inames && anchor[1]==1){
-            if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
-            else out$par['b0'] <- 1/iratio('Pb208Pb207')[1]
+        if ('b0'%ni%inames){
+            if (anchor[1]==1){
+                if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
+                else out$par['b0'] <- 1/iratio('Pb208Pb207')[1]
+            } else if (anchor[1]==3){
+                sk <- stacey.kramers(fit$par['t'])
+                if (x$format<7) out$par['b0'] <- sk[1,'i74']
+                else out$par['b0'] <- sk[1,'i74']/sk[1,'i84']
+            } else {
+                stop("Can't determine b0 for this dataset.")
+            }
         } else {
             out$par['b0'] <- fit$par['b0']
             out$cov['b0',inames] <- fit$cov['b0',]
@@ -297,21 +314,34 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
     } else {
         stop('missing t')
     }
+    if (anchor[1]==3){
+        sk <- stacey.kramers(tt)
+    }
     if ('a0' %in% pnames){
         a0 <- exp(par['a0'])
     } else if (x$format<4){
-        a0 <- iratio('Pb207Pb206')[1]
+        a0 <- ifelse(anchor[1]==3,
+                     sk[1,'i74']/sk[1,'i64'],
+                     iratio('Pb207Pb206')[1])
     } else if (x$format<7 && type%in%c('joint',0,1)){
-        a0 <- iratio('Pb206Pb204')[1]
+        a0 <- ifelse(anchor[1]==3,
+                     sk[1,'i64'],
+                     iratio('Pb206Pb204')[1])
     } else if (type%in%c('joint',0,1,3)){
-        a0 <- 1/iratio('Pb208Pb206')[1]
+        a0 <- ifelse(anchor[1]==3,
+                     sk[1,'i64']/sk[1,'i84'],
+                     1/iratio('Pb208Pb206')[1])
     }
     if ('b0' %in% pnames){
         b0 <- exp(par['b0'])
     } else if (x$format%in%c(4,5,6) && type%in%c('joint',0,2)){
-        b0 <- iratio('Pb207Pb204')[1]
+        b0 <- ifelse(anchor[1]==3,
+                     sk[1,'i74'],
+                     iratio('Pb207Pb204')[1])
     } else if (x$format%in%c(7,8) && type%in%c('joint',0,2,4)){
-        b0 <- 1/iratio('Pb208Pb207')[1]
+        b0 <- ifelse(anchor[1]==3,
+                     sk[1,'i84']/sk[1,'i74'],
+                     1/iratio('Pb208Pb207')[1])
     }
     for (aname in c('U48','ThU','RaU','PaU')){
         pname <- paste0(aname,'i')

@@ -57,6 +57,11 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
         par['a0'] <- log(Pb76c)
         lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tt,d=x$d)[1])
         upper['a0'] <- par['a0'] + buffer
+    } else if (anchor[1]==3){
+        init <- york2ludwigTW(x,anchor=0,buffer=buffer)
+        par <- init$par['t']
+        lower <- init$lower['t']
+        upper <- init$upper['t']
     } else { # no anchor
         yfit <- york(yd)
         tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
