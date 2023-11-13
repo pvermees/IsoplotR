@@ -1,4 +1,4 @@
-fissiontrack.age <- function(x,i=NULL,exterr=TRUE){
+fissiontrack.age <- function(x,i=NULL,exterr=FALSE){
     if (x$format < 2){
         out <- EDM.age(x,i,exterr=exterr)
     } else if (x$format > 1){
@@ -146,7 +146,7 @@ get.absolute.zeta <- function(mineral,exterr=FALSE){
 #' Vermeesch, P., 2017. Statistics for LA-ICP-MS based fission track
 #' dating. Chemical Geology, 456, pp.19-27.
 #' @export
-set.zeta <- function(x,tst,exterr=TRUE,oerr=1,sigdig=NA,update=TRUE){
+set.zeta <- function(x,tst,exterr=FALSE,oerr=1,sigdig=NA,update=TRUE){
     N <- length(x$Ns)
     L8 <- lambda('U238')[1]
     tt <- tst[1]
@@ -180,7 +180,7 @@ set.zeta <- function(x,tst,exterr=TRUE,oerr=1,sigdig=NA,update=TRUE){
     out
 }
 
-ICP.age <- function(x,i=NULL,exterr=TRUE){
+ICP.age <- function(x,i=NULL,exterr=FALSE){
     ngrains <- length(x$Ns)
     tt <- rep(NA,ngrains)
     st <- rep(NA,ngrains)
@@ -248,7 +248,7 @@ get.UsU <- function(x){
     out
 }
 
-EDM.age <- function(x,i=NULL,exterr=TRUE){
+EDM.age <- function(x,i=NULL,exterr=FALSE){
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')

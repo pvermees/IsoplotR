@@ -99,14 +99,14 @@ ppm2ratios.SmNd <- function(x,exterr=FALSE,common=FALSE,...){
     out
 }
 
-get.SmNd.ratio <- function(tt,st,exterr=TRUE){
+get.SmNd.ratio <- function(tt,st,exterr=FALSE){
     get.PD.ratio(tt,st,'Sm147',exterr=exterr)
 }
 
-get.SmNd.age <- function(Nd143Sm147,sNd143Sm147,exterr=TRUE){
+get.SmNd.age <- function(Nd143Sm147,sNd143Sm147,exterr=FALSE){
     get.PD.age(Nd143Sm147,sNd143Sm147,'Sm147',exterr=exterr)
 }
 
-SmNd.age <- function(x,exterr=TRUE,i=NULL,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
+SmNd.age <- function(x,exterr=FALSE,i=NULL,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
     PD.age(x,'Sm147',exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
 }

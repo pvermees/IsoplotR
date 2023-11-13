@@ -346,7 +346,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
 
 # helper function for plot.concordia
 plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
-                              oerr=3,exterr=TRUE,ticks=5){
+                              oerr=3,exterr=FALSE,ticks=5){
     if (length(ticks)<2)
         ticks <- prettier(lims$t,type=type,n=ticks,
                           binary=measured.disequilibrium(x$d))
@@ -632,7 +632,7 @@ concordia.title <- function(fit,sigdig=2,oerr=3,...){
     mymtext(line2,line=0,...)
 }
 
-concordia.age <- function(x,i=NULL,type=1,exterr=TRUE,...){
+concordia.age <- function(x,i=NULL,type=1,exterr=FALSE,...){
     if (is.null(i)){
         cc <- concordia.comp(x,type=type)
         if (type==3){
@@ -742,7 +742,7 @@ concordia.comp <- function(x,type=1){
     out
 }
 
-mswd.concordia <- function(x,cc,type=1,pars,exterr=TRUE){
+mswd.concordia <- function(x,cc,type=1,pars,exterr=FALSE){
     SS.equivalence <- LL.concordia.comp(mu=cc$x,x=x,type=type,mswd=TRUE)
     SS.concordance <- LL.concordia.age(pars,cc=cc,type=type,exterr=exterr,
                                        d=mediand(x$d),mswd=TRUE)
@@ -793,7 +793,7 @@ LL.concordia.comp <- function(mu,x,type=1,mswd=FALSE,...){
     out
 }
 
-LL.concordia.age <- function(pars,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
+LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
     out <- 0
     tt <- pars['t']
     pnames <- names(pars)
@@ -873,7 +873,7 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=TRUE,d=diseq(),mswd=FALSE){
     out
 }
 
-emptyconcordia <- function(tlim=NULL,oerr=3,type=1,exterr=TRUE,
+emptyconcordia <- function(tlim=NULL,oerr=3,type=1,exterr=FALSE,
                            concordia.col='darksalmon',ticks=5,...){
     if (is.null(tlim)){
         if (type%in%c(1,3)) tlim <- c(1,4500)

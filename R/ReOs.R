@@ -82,14 +82,14 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
     out
 }
 
-get.ReOs.ratio <- function(tt,st,exterr=TRUE){
+get.ReOs.ratio <- function(tt,st,exterr=FALSE){
     get.PD.ratio(tt,st,'Re187',exterr)
 }
 
-get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=TRUE){
+get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=FALSE){
     get.PD.age(Os187Re187,sOs187Re187,'Re187',exterr=exterr)
 }
 
-ReOs.age <- function(x,exterr=TRUE,i=NULL,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
+ReOs.age <- function(x,exterr=FALSE,i=NULL,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
     PD.age(x,'Re187',exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
 }

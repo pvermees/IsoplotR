@@ -181,7 +181,7 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
                              random.effects=FALSE,levels=NA,clabel="",
                              plateau.col=c("#00FF0080","#FF000080"),
                              non.plateau.col="#00FFFF80",sigdig=2,
-                             exterr=TRUE,line.col='red',lwd=2,
+                             exterr=FALSE,line.col='red',lwd=2,
                              i2i=FALSE,hide=NULL,omit=NULL,...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
