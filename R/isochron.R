@@ -201,9 +201,15 @@
 #' If \code{anchor[1]=0}: do not anchor the isochron.
 #'
 #' If \code{anchor[1]=1}: fix the non-radiogenic composition at the
-#' values stored in \code{settings('iratio',...)}.
+#' values stored in \code{settings('iratio',...)}, OR, if \code{x} has
+#' class \code{other}, fix the intercept at the value stored in
+#' \code{anchor[2]}.
 #'
-#' If \code{anchor[1]=2}: fix the age at the value stored in \code{anchor[2]}. 
+#' If \code{anchor[1]=2}: fix the age at the value stored in \code{anchor[2]}.
+#'
+#' If \code{x} has class \code{UPb} and \code{anchor[1]=3}: anchor the
+#' non-radiogenic component to the Stacey-Kramers mantle evolution
+#' model.
 #' 
 #' @param show.ellipses show the data as:
 #'

@@ -54,6 +54,9 @@
 #' If \code{anchor[1]=2}: force the isochron line to intersect the
 #' concordia line at an age equal to \code{anchor[2]}.
 #'
+#' If \code{anchor[1]=3}: anchor the isochron line to the
+#' Stacey-Kramers mantle evolution model.
+#'
 #' @param type only relevant if \code{x$format>3}. Can take on the following
 #' values:
 #'
