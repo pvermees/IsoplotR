@@ -498,7 +498,7 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                              omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     if (model>1 || anchor[1]==2){
-        fit <- MLyork(d2calc,anchor=anchor,model=model)
+        fit <- MLyork(d2calc,anchor=anchor,model=model,wtype=wtype)
     } else {
         if (anchor[1]<1){
             fit <- regression(d2calc)
@@ -514,7 +514,7 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         xlab=xlab,ylab=ylab,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,ci.col=ci.col,
                         line.col=line.col,lwd=lwd,plot=plot,title=title,
-                        show.ellipses=1*(model!=2),hide=hide,omit=omit,
+                        show.ellipses=show.ellipses,hide=hide,omit=omit,
                         omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 #' @rdname isochron
@@ -527,19 +527,29 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                            title=TRUE,model=1,wtype=1,anchor=0,
                            show.ellipses=1*(model!=2),hide=NULL,
                            omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    d2calc <- clear(x,hide,omit)
     if (x$format==6){
+        d2calc <- clear(x,hide,omit)
         fit <- regression(d2calc$x,model=model,type='ogls')
+        genericisochronplot(x=x,fit=fit,oerr=oerr,sigdig=sigdig,
+                            show.numbers=show.numbers,levels=levels,clabel=clabel,
+                            xlab=xlab,ylab=ylab,ellipse.fill=ellipse.fill,
+                            ellipse.stroke=ellipse.stroke,ci.col=ci.col,
+                            line.col=line.col,lwd=lwd,plot=plot,title=title,
+                            show.ellipses=show.ellipses,hide=hide,omit=omit,
+                            omit.fill=omit.fill,omit.stroke=omit.stroke,...)
     } else {
-        invisible(isochron(d2calc))
-    }
-    genericisochronplot(x=x,fit=fit,oerr=oerr,sigdig=sigdig,
-                        show.numbers=show.numbers,levels=levels,clabel=clabel,
-                        xlab=xlab,ylab=ylab,ellipse.fill=ellipse.fill,
+        yd <- data2york(x)
+        fit <- isochron(yd,oerr=oerr,sigdig=sigdig,
+                        show.numbers=show.numbers,levels=levels,
+                        clabel=clabel,xlab=xlab,ylab=ylab,
+                        ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,ci.col=ci.col,
-                        line.col=line.col,lwd=lwd,plot=plot,title=title,
-                        show.ellipses=1*(model!=2),hide=hide,omit=omit,
+                        line.col=line.col,lwd=lwd,plot=plot,
+                        title=title,model=model,wtype=wtype,anchor=anchor,
+                        show.ellipses=show.ellipses,hide=hide,omit=omit,
                         omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+    }
+    invisible(fit)
 }
 genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
                                 levels=NA,clabel="",xlab='x',ylab='y',
