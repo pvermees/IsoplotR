@@ -1160,7 +1160,20 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                            omit.stroke='grey',...){
     y <- data2york(x)
     d2calc <- clear(y,hide,omit)
-    out <- regression(d2calc,model=model,wtype=wtype)
+    abanchor <- anchor
+    if (anchor[1]==2 && length(anchor)>1){
+        l2 <- lambda('Th232')[1]
+        l5 <- lambda('U235')[1]
+        l8 <- lambda('U238')[1]
+        U <- iratio('U238U235')[1]
+        He <- get.He(tt=anchor[2],U=1,Th=1)
+        P <- 8*l8*U/(1+U) + 7*l5/(1+U) + 6*l2
+        abanchor[2] <- He/P
+        if (length(anchor)>2){
+            abanchor[3] <- get.He(tt=anchor[3],U=1,Th=1)/P
+        }
+    }
+    out <- MLyork(d2calc,model=model,wtype=wtype,anchor=abanchor)
     out$y0[c('y','s[y]')] <- out$a
     out$age[c('t','s[t]')] <- out$b
     if (inflate(out)){

@@ -77,7 +77,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
             init <- c(a=ab[1],b=ab[2])
             fit <- stats::optim(init,LL.MLyork.ab,yd=yd,
                                 hessian=TRUE,control=control)
-            p <- fit$par
+            p[1:2] <- fit$par
             E <- inverthess(fit$hessian)
             SS <- LL.MLyork.ab(fit$par,yd=yd,returnval='SS')
             df <- ns-2

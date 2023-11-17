@@ -98,10 +98,11 @@ invertfit <- function(fit,type="p"){
     out
 }
 
-anchoredYork <- function(x,y0,sy0=0){
+anchoredYork <- function(x,y0=0,sy0=0){
     eps <- .Machine$double.eps
     X <- rbind(x,c(0,eps,y0,max(sy0,eps),0))
     out <- yorkhelper(X,np=1)
+    if (y0==0) out$a[1] <- 0
     if (sy0==0) out$a[2] <- 0
     out$model <- 1
     out$n <- nrow(x)
