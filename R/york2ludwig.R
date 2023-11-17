@@ -2,7 +2,12 @@
 # and the (log of) the common Pb intercept(s)
 # plus the search ranges for ludwig regression
 york2ludwig <- function(x,anchor=0,buffer=2){
-    if (x$format<4){
+    if (anchor[1]==3){
+        init <- york2ludwig(x=x,anchor=0,buffer=buffer)
+        out <- list(par=init$par['t'],
+                    lower=init$lower['t'],
+                    upper=init$upper['t'])
+    } else if (x$format<4){
         out <- york2ludwigTW(x=x,anchor=anchor,buffer=buffer)
     } else if (x$format<7){
         out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer)
@@ -57,11 +62,6 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
         par['a0'] <- log(Pb76c)
         lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tt,d=x$d)[1])
         upper['a0'] <- par['a0'] + buffer
-    } else if (anchor[1]==3){
-        init <- york2ludwigTW(x,anchor=0,buffer=buffer)
-        par <- init$par['t']
-        lower <- init$lower['t']
-        upper <- init$upper['t']
     } else { # no anchor
         yfit <- york(yd)
         tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
