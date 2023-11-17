@@ -138,7 +138,7 @@ peakfit.default <- function(x,k='auto',sigdig=2,oerr=3,log=TRUE,np=3,...){
 }
 #' @rdname peakfit
 #' @export
-peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.fissiontracks <- function(x,k=1,exterr=FALSE,sigdig=2,
                                   log=TRUE,oerr=3,np=3,...){
     out <- NULL
     if (k == 0) return(out)
@@ -196,7 +196,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=TRUE,sigdig=2,
 #' @export
 peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
                         cutoff.disc=discfilter(),common.Pb=0,
-                        exterr=TRUE,sigdig=2,log=TRUE,oerr=3,np=3,...){
+                        exterr=FALSE,sigdig=2,log=TRUE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,exterr=exterr,
                    sigdig=sigdig,log=log,oerr=oerr,
@@ -204,7 +204,7 @@ peakfit.UPb <- function(x,k=1,type=4,cutoff.76=1100,
 }
 #' @rdname peakfit
 #' @export
-peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.PbPb <- function(x,k=1,exterr=FALSE,sigdig=2,
                          log=TRUE,common.Pb=0,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,log=log,
                    common.Pb=common.Pb,oerr=oerr,np=np,...)
@@ -220,49 +220,49 @@ peakfit.PbPb <- function(x,k=1,exterr=TRUE,sigdig=2,
 #'     stored in \code{settings('iratio',...)}.
 #' @rdname peakfit
 #' @export
-peakfit.ArAr <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.ArAr <- function(x,k=1,exterr=FALSE,sigdig=2,
                          log=TRUE,i2i=FALSE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.ThPb <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.ThPb <- function(x,k=1,exterr=FALSE,sigdig=2,
                          log=TRUE,i2i=FALSE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.KCa <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.KCa <- function(x,k=1,exterr=FALSE,sigdig=2,
                         log=TRUE,i2i=FALSE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.ReOs <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.ReOs <- function(x,k=1,exterr=FALSE,sigdig=2,
                          log=TRUE,i2i=TRUE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.SmNd <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.SmNd <- function(x,k=1,exterr=FALSE,sigdig=2,
                          log=TRUE,i2i=TRUE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.RbSr <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.RbSr <- function(x,k=1,exterr=FALSE,sigdig=2,
                          log=TRUE,i2i=TRUE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,oerr=oerr,np=np,...)
 }
 #' @rdname peakfit
 #' @export
-peakfit.LuHf <- function(x,k=1,exterr=TRUE,sigdig=2,
+peakfit.LuHf <- function(x,k=1,exterr=FALSE,sigdig=2,
                          log=TRUE,i2i=TRUE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,exterr=exterr,sigdig=sigdig,
                    log=log,i2i=i2i,oerr=oerr,np=np,...)
@@ -298,7 +298,7 @@ peakfit.UThHe <- function(x,k=1,sigdig=2,log=TRUE,oerr=3,np=3,...){
     peakfit_helper(x,k=k,sigdig=sigdig,log=log,oerr=oerr,np=np,...)
 }
 peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
-                           exterr=TRUE,sigdig=2,log=TRUE,i2i=FALSE,
+                           exterr=FALSE,sigdig=2,log=TRUE,i2i=FALSE,
                            common.Pb=0,oerr=3,Th0i=0,np=3,...){
     if (k<1) return(NULL)
     if (identical(k,'auto')){
@@ -443,7 +443,7 @@ get.L.normal.mixture <- function(lpfiu){
     sum(fu)
 }
 
-binomial.mixtures <- function(x,k,exterr=TRUE,...){
+binomial.mixtures <- function(x,k,exterr=FALSE,...){
     yu <- x$x[,'Ns']
     mu <- x$x[,'Ns'] + x$x[,'Ni']
     NsNi <- (x$x[,'Ns']+0.5)/(x$x[,'Ni']+0.5)
@@ -503,7 +503,7 @@ formatPeaks <- function(peaks,peaks.err,props,props.err,df){
     out
 }
 
-theta2age <- function(x,theta,beta.var,exterr=TRUE){
+theta2age <- function(x,theta,beta.var,exterr=FALSE){
     rhoD <- x$rhoD
     zeta <- x$zeta
     if (!exterr) {

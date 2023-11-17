@@ -373,7 +373,7 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NULL,oerr=1,sigdig=NA,...
 #' @rdname age
 #' @export
 age.fissiontracks <- function(x,central=FALSE,i=NULL,
-                              oerr=1,sigdig=NA,exterr=TRUE,...){
+                              oerr=1,sigdig=NA,exterr=FALSE,...){
     if (central){
         out <- central(x)
     } else {

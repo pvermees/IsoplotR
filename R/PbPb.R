@@ -1,4 +1,4 @@
-PbPb.age <- function(x,exterr=TRUE,i=NULL,common.Pb=0,
+PbPb.age <- function(x,exterr=FALSE,i=NULL,common.Pb=0,
                      omit4c=NULL,projerr=FALSE){
     y <- data2york(x,inverse=TRUE)
     if (common.Pb == 0){
@@ -21,8 +21,8 @@ PbPb.age <- function(x,exterr=TRUE,i=NULL,common.Pb=0,
         E22 <- y[,'sY']^2
         E12 <- y[,'sX']*y[,'sY']*y[,'rXY']
         E33 <- b[2]^2
-        if (projerr) PbPb[,2] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
-        else PbPb[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
+        if (projerr) PbPb[,2] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
+        else PbPb[,2] <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     }
     PbPb2t(PbPb,exterr=exterr,i=i)
 }

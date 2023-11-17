@@ -1,4 +1,4 @@
-get.ArAr.ratio <- function(tt,st,J,sJ,exterr=TRUE){
+get.ArAr.ratio <- function(tt,st,J,sJ,exterr=FALSE){
     L <- lambda("K40")[1]
     sL <- lambda("K40")[2]
     R <- (exp(L*tt)-1)/J
@@ -16,7 +16,7 @@ get.ArAr.ratio <- function(tt,st,J,sJ,exterr=TRUE){
     out <- c(R,sR)
 }
 
-get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
+get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=FALSE){
     L <- lambda("K40")[1]
     tt <- log(J*Ar40Ar39+1)/L
     J1 <- J/(L*(J*Ar40Ar39+1))
@@ -30,15 +30,15 @@ get.ArAr.age <- function(Ar40Ar39,sAr40Ar39,J,sJ,exterr=TRUE){
     E11 <- sAr40Ar39^2
     E22 <- sJ^2
     E33 <- lambda("K40")[2]^2
-    st <- errorprop1x3(J1,J2,J3,E11,E22,E33)
-    out <- cbind(tt,st)
+    vt <- errorprop1x3(J1,J2,J3,E11,E22,E33)
+    out <- cbind(tt,sqrt(vt))
     colnames(out) <- c('t','st')
     out
 }
 
 # x an object of class \code{ArAr} returns a matrix 
 # of 40Ar/39Ar-ages and their uncertainties.
-ArAr.age <- function(x,exterr=TRUE,i=NULL,i2i=FALSE,projerr=FALSE,omit4c=NULL){
+ArAr.age <- function(x,exterr=FALSE,i=NULL,i2i=FALSE,projerr=FALSE,omit4c=NULL){
     ns <- length(x)
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)
@@ -63,8 +63,8 @@ ArAr.age <- function(x,exterr=TRUE,i=NULL,i2i=FALSE,projerr=FALSE,omit4c=NULL){
     E11 <- y[,'sX']^2
     E22 <- y[,'sY']^2
     E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
-    if (projerr) sDP <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
-    else sDP <- errorprop1x2(J1,J2,E11,E22,E12)
+    if (projerr) sDP <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
+    else sDP <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     out <- get.ArAr.age(DP,sDP,x$J[1],x$J[2],exterr=exterr)
     if (!is.null(i)) out <- out[i,]
     colnames(out) <- c('t','s[t]')

@@ -203,31 +203,38 @@ wtdmean3D <- function(x){
     out
 }
 
+fixroundingerr <- function(v){
+    v[(v<0) & (v>(-1e-10))] <- 0
+    v
+}
+
 # simultaneously performs error propagation for multiple samples
 errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
     out <- matrix(0,length(J11),3)
     colnames(out) <- c('varX','varY','cov')
-    out[,'varX'] <- J11*J11*E11 + J11*J12*E12 + J11*J12*E12 + J12*J12*E22
-    out[,'varY'] <- J21*J21*E11 + J21*J22*E12 + J21*J22*E12 + J22*J22*E22
+    out[,'varX'] <- fixroundingerr(J11*J11*E11 + J11*J12*E12 + J11*J12*E12 + J12*J12*E22)
+    out[,'varY'] <- fixroundingerr(J21*J21*E11 + J21*J22*E12 + J21*J22*E12 + J22*J22*E22)
     out[,'cov'] <- J11*J21*E11 + J12*J21*E12 + J11*J22*E12 + J12*J22*E22
     out
 }
 # returns standard error
 errorprop1x2 <- function(J1,J2,E11,E22,E12){
-    v <- E11*J1^2 + 2*E12*J1*J2 + E22*J2^2
-    sqrt(v)
+    fixroundingerr(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
 }
 errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){
-    v <- E11*J1^2 + E22*J2^2 + E33*J3^2 +
-        2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23
-    sqrt(v)
+    fixroundingerr(E11*J1^2 + E22*J2^2 + E33*J3^2 + 2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23)
 }
 
-quotient <- function(X,sX,Y,sY,rXY){
+quotient <- function(X,sX,Y,sY,rXY=NULL,sXY=NULL){
     YX <- Y/X
-    sYX <- errorprop1x2(J1=(-Y/X^2),J2=(1/X),
-                        E11=(sX^2),E22=(sY^2),E12=(rXY*sX*sY))
-    cbind(YX,sYX)
+    if (is.null(sXY)){
+        if (is.null(rXY)) E12 <- 0
+        else E12 <- rXY*sX*sY
+    } else {
+        E12 <- sXY
+    }
+    v <- errorprop1x2(J1=-Y/X^2,J2=1/X,E11=sX^2,E22=sY^2,E12=E12)
+    cbind(YX,sqrt(v))
 }
 
 # negative multivariate log likelihood to be fed into R's optim function
@@ -464,7 +471,10 @@ log_sum_exp <- function(u,v){
 contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
     fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
                         upper=upper,hessian=hessian,control=control,...)
-    if (fit$convergence>0 || (hessian && !invertible(fit$hessian))){
+    failed <- fit$convergence>0 ||
+        (hessian && !invertible(fit$hessian)) ||
+        any((fit$par-lower)==0) || any((upper-fit$par)==0)
+    if (failed){
         NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=control,...)
         if (NMfit$convergence>0){
             warning('Optimisation did not converge.')

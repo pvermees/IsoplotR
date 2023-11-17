@@ -54,6 +54,9 @@
 #' If \code{anchor[1]=2}: force the isochron line to intersect the
 #' concordia line at an age equal to \code{anchor[2]}.
 #'
+#' If \code{anchor[1]=3}: anchor the isochron line to the
+#' Stacey-Kramers mantle evolution model.
+#'
 #' @param type only relevant if \code{x$format>3}. Can take on the following
 #' values:
 #'
@@ -172,10 +175,19 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
         out$cov[inames,'t'] <- fit$cov[,'t']
     }
     if (type%in%c('joint',0,1,3)){
-        if ('a0'%ni%inames && anchor[1]==1){
-            if (x$format<4) out$par['a0'] <- iratio('Pb207Pb206')[1]
-            else if (x$format<7) out$par['a0'] <- iratio('Pb206Pb204')[1]
-            else out$par['a0'] <- 1/iratio('Pb208Pb206')[1]
+        if ('a0'%ni%inames){
+            if (anchor[1]==1){
+                if (x$format<4) out$par['a0'] <- iratio('Pb207Pb206')[1]
+                else if (x$format<7) out$par['a0'] <- iratio('Pb206Pb204')[1]
+                else out$par['a0'] <- 1/iratio('Pb208Pb206')[1]
+            } else if (anchor[1]==3){
+                sk <- stacey.kramers(fit$par['t'])
+                if (x$format<4) out$par['a0'] <- sk[1,'i74']/sk[1,'i64']
+                else if (x$format<7) out$par['a0'] <- sk[1,'i64']
+                else out$par['a0'] <- sk[1,'i64']/sk[1,'i84']
+            } else {
+                stop("Can't determine a0 for this dataset.")
+            }
         } else {
             out$par['a0'] <- fit$par['a0']
             out$cov['a0',inames] <- fit$cov['a0',]
@@ -185,9 +197,17 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
         out$par['a0'] <- NA
     }
     if (x$format>3 && type%in%c('joint',0,2,4)){
-        if ('b0'%ni%inames && anchor[1]==1){
-            if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
-            else out$par['b0'] <- 1/iratio('Pb208Pb207')[1]
+        if ('b0'%ni%inames){
+            if (anchor[1]==1){
+                if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
+                else out$par['b0'] <- 1/iratio('Pb208Pb207')[1]
+            } else if (anchor[1]==3){
+                sk <- stacey.kramers(fit$par['t'])
+                if (x$format<7) out$par['b0'] <- sk[1,'i74']
+                else out$par['b0'] <- sk[1,'i74']/sk[1,'i84']
+            } else {
+                stop("Can't determine b0 for this dataset.")
+            }
         } else {
             out$par['b0'] <- fit$par['b0']
             out$cov['b0',inames] <- fit$cov['b0',]
@@ -225,8 +245,10 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
+    init <- york2ludwig(x,anchor=anchor,buffer=buffer)
+    lower <- init$lower
+    upper <- init$upper
     if (model==3){
-        init <- init.ludwig(x,anchor=anchor,type=type,buffer=buffer)
         fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
                               upper=init$upper,x=x,anchor=anchor,type=type)
         E <- inverthess(fit$hessian)
@@ -243,13 +265,10 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
             tt <- exp(fit$par['t'])
             par['w'] <- fit$par['t'] + log(E['t','t'])/2
         }
-        lower <- par - buffer
-        upper <- par + buffer
+        lower['w'] <- par['w'] - max(buffer,10)
+        upper['w'] <- par['w'] + buffer
     } else {
-        init <- york2ludwig(x,anchor=anchor,buffer=buffer)
         par <- init$par
-        lower <- init$lower
-        upper <- init$upper
     }
     if (x$d$U48$option==2 | x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
@@ -298,21 +317,34 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
     } else {
         stop('missing t')
     }
+    if (anchor[1]==3){
+        sk <- stacey.kramers(tt)
+    }
     if ('a0' %in% pnames){
         a0 <- exp(par['a0'])
     } else if (x$format<4){
-        a0 <- iratio('Pb207Pb206')[1]
+        a0 <- ifelse(anchor[1]==3,
+                     sk[1,'i74']/sk[1,'i64'],
+                     iratio('Pb207Pb206')[1])
     } else if (x$format<7 && type%in%c('joint',0,1)){
-        a0 <- iratio('Pb206Pb204')[1]
+        a0 <- ifelse(anchor[1]==3,
+                     sk[1,'i64'],
+                     iratio('Pb206Pb204')[1])
     } else if (type%in%c('joint',0,1,3)){
-        a0 <- 1/iratio('Pb208Pb206')[1]
+        a0 <- ifelse(anchor[1]==3,
+                     sk[1,'i64']/sk[1,'i84'],
+                     1/iratio('Pb208Pb206')[1])
     }
     if ('b0' %in% pnames){
         b0 <- exp(par['b0'])
     } else if (x$format%in%c(4,5,6) && type%in%c('joint',0,2)){
-        b0 <- iratio('Pb207Pb204')[1]
+        b0 <- ifelse(anchor[1]==3,
+                     sk[1,'i74'],
+                     iratio('Pb207Pb204')[1])
     } else if (x$format%in%c(7,8) && type%in%c('joint',0,2,4)){
-        b0 <- 1/iratio('Pb208Pb207')[1]
+        b0 <- ifelse(anchor[1]==3,
+                     sk[1,'i84']/sk[1,'i74'],
+                     1/iratio('Pb208Pb207')[1])
     }
     for (aname in c('U48','ThU','RaU','PaU')){
         pname <- paste0(aname,'i')
@@ -801,11 +833,13 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     if (x$format %in% (1:3)){ # X=07/06, Y=38/06
         yd <- data2york(x,option=2,tt=tt)
         a <- a0
-        b <- -McL$Pb206U238*a0
-        dbdl38 <- -McL$dPb206U238dl38*a0
-        dbdl34 <- -McL$dPb206U238dl34*a0
-        dbdl30 <- -McL$dPb206U238dl30*a0
-        dbdl26 <- -McL$dPb206U238dl26*a0
+        b <- -McL$Pb206U238*(a0-McL$Pb207Pb206)
+        dbdl38 <- -McL$dPb206U238dl38*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl38
+        dbdl34 <- -McL$dPb206U238dl34*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl34
+        dbdl30 <- -McL$dPb206U238dl30*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl30
+        dbdl26 <- -McL$dPb206U238dl26*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl26
+        dbdl35 <- McL$Pb206U238*McL$dPb207Pb206dl35
+        dbdl31 <- McL$Pb206U238*McL$dPb207Pb206dl31
     } else if (x$format %in% (4:6)){
         if (type==1){         # X=38/06, Y=04/06
             yd <- data2york(x,option=3,tt=tt)

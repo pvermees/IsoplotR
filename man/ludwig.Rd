@@ -56,7 +56,10 @@ If \code{anchor[1]=1}: fix the common Pb composition at the values
 stored in \code{settings('iratio',...)}.
 
 If \code{anchor[1]=2}: force the isochron line to intersect the
-concordia line at an age equal to \code{anchor[2]}.}
+concordia line at an age equal to \code{anchor[2]}.
+
+If \code{anchor[1]=3}: anchor the isochron line to the
+Stacey-Kramers mantle evolution model.}
 
 \item{exterr}{propagate external sources of
 uncertainty (i.e. decay constants)?}

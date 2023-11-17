@@ -178,8 +178,8 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
             E11 <- fit$cov[1,1]
             E12 <- fit$cov[1,2]
             E22 <- fit$cov[2,2]
-            sy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
-            ciy <- ci(x=y,sx=sy,oerr=oerr,absolute=TRUE)
+            vy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
+            ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
             ul <- y + ciy
             ll <- y - ciy
             t75 <- get.Pb207U235.age(x,d=d)[,'t75']
@@ -210,8 +210,8 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
         dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
         J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
         J2 <- 1 - x*r68                                # dy/dy0
-        sy <- errorprop1x2(J1,J2,fit2d$cov[1,1],fit2d$cov[2,2],fit2d$cov[1,2])
-        ciy <- ci(x=y,sx=sy,oerr=oerr,absolute=TRUE)
+        vy <- errorprop1x2(J1,J2,fit2d$cov[1,1],fit2d$cov[2,2],fit2d$cov[1,2])
+        ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
         ul <- y + ciy
         ll <- y - ciy
         yconc <- rep(0,nsteps)

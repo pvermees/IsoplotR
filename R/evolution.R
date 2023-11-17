@@ -165,7 +165,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,oerr=3,transform=FALSE,
                       Th0i=0,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
-                      isochron=FALSE,model=1,exterr=TRUE,sigdig=2,
+                      isochron=FALSE,model=1,exterr=FALSE,sigdig=2,
                       hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (x$format %in% c(1,2)){
         if (transform){
@@ -274,7 +274,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
 
 Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
                         ylim=NULL,oerr=3,show.numbers=FALSE,
-                        exterr=TRUE,clabel="",levels=NA,
+                        exterr=FALSE,clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
                         line.col='darksalmon',hide=NULL,omit=NULL,

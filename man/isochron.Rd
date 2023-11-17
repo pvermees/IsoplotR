@@ -36,6 +36,8 @@ isochron(x, ...)
   plot = TRUE,
   title = TRUE,
   model = 1,
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -61,6 +63,8 @@ isochron(x, ...)
   plot = TRUE,
   title = TRUE,
   model = 1,
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -112,7 +116,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   growth = FALSE,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
@@ -138,7 +143,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -163,7 +169,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -188,7 +195,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -213,7 +221,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -238,7 +247,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -263,7 +273,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -288,7 +299,8 @@ isochron(x, ...)
   plot = TRUE,
   exterr = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -311,7 +323,8 @@ isochron(x, ...)
   lwd = 1,
   plot = TRUE,
   model = 1,
-  wtype = "intercept",
+  wtype = 1,
+  anchor = 0,
   show.ellipses = 2 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -442,6 +455,48 @@ intercept and slope.}
 
 \code{3}: Error-weighted least squares with overdispersion term}
 
+\item{wtype}{controls the parameter responsible for the
+    overdispersion in model-3 regression.
+
+If \code{x} has class \code{PbPb}, \code{ArAr} or \code{PD},
+\code{wtype} can have one of two values:
+
+\itemize{
+\item \code{1}: attribute the overdispersion to variability in the
+non-radiogenic component, as controlled by \code{settings('iratio',...)}
+
+\item \code{2}: attribute the overdispersion to variability in the
+age, i.e. to diachronous closure of the isotope system.
+}
+
+otherwise, \code{wtype} can have one of four values:
+
+\itemize{
+\item \code{1}: attributes the overdispersion to the y-intercept of the isochron.
+
+\item \code{2}: attributes the overdispersion to the slope of the isochron.
+
+\item \code{'A'}: only available if \code{x} has class \code{ThU} and
+\code{x$format} is 1 or 2. Attributes the overdispersion to the
+authigenic \eqn{^{230}}Th/\eqn{^{238}}U-intercept of the isochron.
+
+\item \code{'B'}: only available if \code{x} has class \code{ThU} and
+\code{x$format} is 1 or 2. Attributes the overdispersion to the
+\eqn{^{230}}Th/\eqn{^{232}}Th-slope of the isochron.
+}}
+
+\item{anchor}{control parameters to fix the intercept age or common
+    Pb composition of the isochron fit. This can be a scalar or a
+    vector.
+
+If \code{anchor[1]=0}: do not anchor the isochron.
+
+If \code{anchor[1]=1}: fix the common Pb composition at the values
+stored in \code{settings('iratio',...)}.
+
+If \code{anchor[1]=2}: force the isochron line to intersect the
+concordia line at an age equal to \code{anchor[2]}.}
+
 \item{show.ellipses}{show the data as:
 
 \code{0}: points
@@ -506,18 +561,6 @@ vs. \eqn{^{238}}U/\eqn{^{232}}Th
 
 \item{exterr}{propagate external sources of uncertainty
 (J, decay constant)?}
-
-\item{anchor}{control parameters to fix the intercept age or common
-    Pb composition of the isochron fit. This can be a scalar or a
-    vector.
-
-If \code{anchor[1]=0}: do not anchor the isochron.
-
-If \code{anchor[1]=1}: fix the common Pb composition at the values
-stored in \code{settings('iratio',...)}.
-
-If \code{anchor[1]=2}: force the isochron line to intersect the
-concordia line at an age equal to \code{anchor[2]}.}
 
 \item{y0option}{controls the type of y-intercept or activity ratio
     that is reported along with the isochron age. Only relevant to
@@ -588,23 +631,6 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{Y} = \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
 \code{LuHf}).}
 
-\item{wtype}{controls the parameter responsible for the
-    overdispersion in model-3 regression.
-
-\code{0}, \code{'a'} or \code{'intercept'}: attributes the
-overdispersion to the y-intercept of the isochron.
-
-\code{1}, \code{'b'} or \code{'slope'}: attributes the
-overdispersion to the slope of the isochron.
-
-\code{'A'}: only available if \code{x} has class \code{ThU} and
-\code{x$format} is 1 or 2. Attributes the overdispersion to the
-authigenic \eqn{^{230}}Th/\eqn{^{238}}U-intercept of the isochron.
-
-\code{'B'}: only available if \code{x} has class \code{ThU} and
-\code{x$format} is 1 or 2. Attributes the overdispersion to the
-\eqn{^{230}}Th/\eqn{^{232}}Th-slope of the isochron.}
-
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 }
 \value{
@@ -622,7 +648,8 @@ error.}
 
 \item{cov.ab}{the covariance of the slope and intercept}
 
-\item{df}{the degrees of freedom of the linear fit (\eqn{df=n-2})}
+\item{df}{the degrees of freedom of the linear fit (\eqn{df=n-2}
+for non-anchored fits)}
 
 \item{y0}{a two- or three-element list containing:
 
@@ -657,7 +684,7 @@ ratio.
 (omitted if \code{model=2})}
 
 \item{w}{the overdispersion term, i.e. a two-element vector with
-the standard deviation of the (assumed) Normally distributed
+the standard deviation of the (assumed) normally distributed
 geological scatter that underlies the measurements, and its
 standard error (only returned if \code{model=3}).}
 

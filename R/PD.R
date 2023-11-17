@@ -1,4 +1,4 @@
-get.PD.ratio <- function(tt,st,nuclide,exterr=TRUE,bratio=1){
+get.PD.ratio <- function(tt,st,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     R <- bratio*(exp(L[1]*tt)-1)
     Jac <- matrix(0,1,2)
@@ -11,7 +11,7 @@ get.PD.ratio <- function(tt,st,nuclide,exterr=TRUE,bratio=1){
     out <- c(R,sR)
 }
 
-get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
+get.PD.age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     tt <- log(1 + DP/bratio)/L[1]
     E <- matrix(0,2,2)
@@ -22,8 +22,8 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
     E12 <- 0
     J1 <- 1/(L[1]*(bratio + DP)) # dt.dDP
     J2 <- -tt/L[1]               # dt.dL
-    st <- errorprop1x2(J1,J2,E11,E22,E12)
-    out <- cbind(tt,st)
+    vt <- errorprop1x2(J1,J2,E11,E22,E12)
+    out <- cbind(tt,sqrt(vt))
     colnames(out) <- c('t','s[t]')
     out
 }
@@ -31,7 +31,7 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=TRUE,bratio=1){
 # i2i = isochron to intercept
 # bratio = branching ratio
 # projerr = isochron projection error
-PD.age <- function(x,nuclide,exterr=TRUE,i=NULL,i2i=TRUE,
+PD.age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
                    bratio=1,omit4c=NULL,projerr=FALSE,...){
     ns <- length(x)
     out <- matrix(0,ns,2)
@@ -48,8 +48,8 @@ PD.age <- function(x,nuclide,exterr=TRUE,i=NULL,i2i=TRUE,
         E22 <- y[,'sY']^2
         E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
         E33 <- fit$b[2]^2
-        if (projerr) DP[,2] <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12)
-        else DP[,2] <- errorprop1x2(J1,J2,E11,E22,E12)
+        if (projerr) DP[,2] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
+        else DP[,2] <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     } else {
         initial <- get.nominal.initials(x)
         dat <- data2york(x,exterr=exterr)
