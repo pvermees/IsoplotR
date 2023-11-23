@@ -870,7 +870,8 @@ get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
 }
 
 get.Pb206U238.age <- function(x,...){ UseMethod("get.Pb206U238.age",x) }
-get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
+get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
+                                      bayes=FALSE,plot=FALSE,...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -897,6 +898,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             t.68 <- tryCatch({
                 stats::optimise(diseq.68.misfit,interval=tlim,x=x,d=d)$minimum
             }, error = function(error_condition) {
+                warning("Failed to solve the Pb206U238 disequilibrium equation.")
                 t.init
             })
             D <- mclean(tt=t.68,d=d,exterr=exterr)

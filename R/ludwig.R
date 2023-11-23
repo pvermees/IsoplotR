@@ -245,7 +245,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
-    init <- york2ludwig(x,anchor=anchor,buffer=buffer)
+    init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
     lower <- init$lower
     upper <- init$upper
     if (model==3){

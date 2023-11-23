@@ -801,6 +801,12 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                        Y=out$b[1],sY=out$b[2],sXY=out$cov.ab)
         DP[1] <- -DP[1]
         out$age <- do.call(DP2tfun,args=list(x=DP[1],sx=DP[2],exterr=exterr,d=x$d))
+        out$par <- c('t'=unname(out$age[1]),'a0'=unname(out$a[1]))
+        if (measured.disequilibrium(x$d)){
+            X <- x
+            X$d <- mediand(x$d)
+            out$posterior <- bayeslud(out,x=X,anchor=anchor,model=model)
+        }
         out$y0 <- out$a
         out$y0label <- y0label
         names(out$age) <- c('t','s[t]')

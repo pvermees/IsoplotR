@@ -1,7 +1,7 @@
 # finds the (log of) the lower concordia intercept
 # and the (log of) the common Pb intercept(s)
 # plus the search ranges for ludwig regression
-york2ludwig <- function(x,anchor=0,buffer=2){
+york2ludwig <- function(x,anchor=0,buffer=2,type=0){
     if (anchor[1]==3){
         init <- york2ludwig(x=x,anchor=0,buffer=buffer)
         out <- list(par=init$par['t'],
@@ -10,9 +10,9 @@ york2ludwig <- function(x,anchor=0,buffer=2){
     } else if (x$format<4){
         out <- york2ludwigTW(x=x,anchor=anchor,buffer=buffer)
     } else if (x$format<7){
-        out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer)
+        out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer,type=type)
     } else if (x$format<9){
-        out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer)
+        out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer,type=type)
     } else {
         stop("Invalid U-Pb format")
     }
