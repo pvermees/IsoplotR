@@ -901,10 +901,12 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             })
             D <- mclean(tt=t.68,d=d,exterr=exterr)
             J[1,1] <- 1/D$dPb206U238dt
-            J[1,2] <- -D$dPb206U238dl38/D$dPb206U238dt # dt/dl38
-            J[1,3] <- -D$dPb206U238dl34/D$dPb206U238dt # dt/dl34
-            J[1,4] <- -D$dPb206U238dl30/D$dPb206U238dt # dt/dl30
-            J[1,5] <- -D$dPb206U238dl26/D$dPb206U238dt # dt/dl26
+            if (exterr){
+                J[1,2] <- -D$dPb206U238dl38/D$dPb206U238dt # dt/dl38
+                J[1,3] <- -D$dPb206U238dl34/D$dPb206U238dt # dt/dl34
+                J[1,4] <- -D$dPb206U238dl30/D$dPb206U238dt # dt/dl30
+                J[1,5] <- -D$dPb206U238dl26/D$dPb206U238dt # dt/dl26
+            }
         }
         st.68 <- sqrt(J %*% E %*% t(J))
         out <- c(t.68,st.68)

@@ -684,7 +684,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
         }
-    } else {
+    } else if (x$format<9){
         ns <- length(x)
         calcit <- (1:ns)%ni%c(hide,omit)
         x2calc <- subset(x,subset=calcit)
@@ -787,6 +787,22 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                                           y0option=y0option,dispunits=' Ma'),
                             xlab=x.lab,ylab=y.lab)
         }
+    } else if (x$format<10){
+        fit <- flipper(x$x,inverse=TRUE,model=model,wtype=wtype,
+                       anchor=anchor,hide=hide,omit=omit,type="p",
+                       y0rat='Pb208Pb206',t2DPfun=age_to_Pb206U238_ratio,d=x$d)
+        RPb6U8 <- quotient(X=fit$a[1],sX=fit$a[2],
+                           Y=fit$b[1],sY=fit$b[2],sXY=fit$cov.ab)
+        RPb6U8[1] <- -RPb6U8[1]
+        tst <- get.Pb206U238.age(x=RPb6U8[1],sx=RPb6U8[2],exterr=exterr,d=x$d)
+        out <- fit
+    } else if (x$format<11){
+        fit <- flipper(x$x,inverse=TRUE,model=model,wtype=wtype,
+                       anchor=anchor,hide=hide,omit=omit,type="p",
+                       y0rat='Pb208Pb207',t2DPfun=age_to_Pb207U235_ratio,d=x$d)
+        out <- fit
+    } else {
+        stop('Invalid input format.')
     }
     invisible(out)
 }
@@ -1461,7 +1477,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
     invisible(out)
 }
 
-get.isochron.labels <- function(nuclide,inverse=FALSE){
+get.isochron.labels <- function(nuclide,inverse=FALSE,i0=208){
     out <- list()
     if (identical(nuclide,'Th232')){
         if (inverse){
@@ -1510,6 +1526,14 @@ get.isochron.labels <- function(nuclide,inverse=FALSE){
         } else {
             out$x <- quote(''^40*'K/'^44*'Ca')
             out$y <- quote(''^40*'Ca/'^44*'Ca')
+        }
+    } else if (identical(nuclide,'U235')){
+        if (inverse){
+            out$x <- quote(''^235*'U/'^207*'Pb')
+            out$y <- substitute(''^x*'Pb/'^207*'Pb',list(x=i0))
+        } else {
+            out$x <- substitute(''^235*'U/'^x*'Pb',list(x=i0))
+            out$y <- substitute(''^207*'Pb/'^x*'Pb',list(x=i0))
         }
     }
     out

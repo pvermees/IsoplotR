@@ -380,6 +380,14 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'rhoXY','rhoXZ','rhoXW',
                     'rhoYZ','rhoYW','rhoZW')
         opt <- 8:14
+    } else if (format==9){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb20xPb206','errPb20xPb206','rho')
+        opt <- 5
+    } else if (format==10){
+        cnames <- c('U235Pb207','errU235Pb207',
+                    'Pb20xPb207','errPb20xPb207','rho')
+        opt <- 5
     } else {
         stop('Invalid input format')
     }
