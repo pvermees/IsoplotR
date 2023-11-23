@@ -13,6 +13,8 @@ york2ludwig <- function(x,anchor=0,buffer=2,type=0){
         out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer,type=type)
     } else if (x$format<9){
         out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer,type=type)
+    } else if (x$format<11){
+        out <- york2ludwigPD(x=x,anchor=anchor,buffer=buffer)
     } else {
         stop("Invalid U-Pb format")
     }
@@ -246,6 +248,15 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2){
         }            
     }
     list(par=par,lower=par-buffer,upper=par+buffer)
+}
+
+york2ludwigPD <- function(x,anchor=0,buffer=2){
+    if (x$format==9){
+        out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer,type=2)
+    } else if (x$format==10){
+        out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer,type=2)
+    }
+    out
 }
 
 WconcordiaIntersection <- function(yfit,d=diseq()){

@@ -395,7 +395,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         } else if (type==2){
             ta0b0w <- c('t'=unname(tt),'b0'=unname(b0))
         }
-    } else {
+    } else if (x$format<9){
         if (anchor[1]==1){
             if (type%in%c('joint',0,1,3) && (iratio('Pb208Pb206')[2]>0)){
                 LL <- LL - stats::dnorm(x=1/a0,
@@ -419,6 +419,8 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         } else if (type%in%c(2,4)){
             ta0b0w <- c('t'=unname(tt),'b0'=unname(b0))
         }
+    } else {
+        stop('Invalid U-Pb format.')
     }
     if (model==3){
         ta0b0w['w'] <- exp(par['w'])

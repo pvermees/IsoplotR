@@ -381,19 +381,25 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'rhoYZ','rhoYW','rhoZW')
         opt <- 8:14
     } else if (format==9){
-        cnames <- c('U238Pb206','errU238Pb206',
-                    'Pb20xPb206','errPb20xPb206','rho')
+        cnames <- c('U235Pb207','errU235Pb207',
+                    'Pb204Pb207','errPb204Pb207','rho')
         opt <- 5
     } else if (format==10){
         cnames <- c('U235Pb207','errU235Pb207',
-                    'Pb20xPb207','errPb20xPb207','rho')
-        opt <- 5
+                    'Pb208Pb207','errPb208Pb207',
+                    'Th232U238','errTh232U238',
+                    'rXY','rXZ','rYZ')
+        opt <- 6:9
     } else {
         stop('Invalid input format')
     }
     X <- insert.data(x=X,cnames=cnames,opt=opt)
     out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
-    if (format==3) out$x <- optionalredundancy2cor(X=out$x,nc=nc)
+    if (format==3){
+        out$x <- optionalredundancy2cor(X=out$x,nc=nc)
+    } else if (format%in%c(9,10)){
+        out$x <- convertUPb(out$x)
+    }
     out$d <- copy_diseq(x=out,d=d) # for Th/U based diseq corrections
     out
 }
@@ -432,6 +438,45 @@ optionalredundancy2cor <- function(X,nc){
                 'lead to impossible correlation coefficients. ',
                 'These were replaced with alternative values ',
                 'assuming zero Tera-Wasserburg correlations.')
+    }
+    out
+}
+# convert U-Pb format 9 to 4 and 10 to 7
+convertUPb <- function(x){
+    U85 <- iratio('U238U235')[1]
+    if (x$format==9){
+        # inames = c('U235Pb207','errU235Pb207','Pb204Pb207','errPb204Pb207','rho')
+        onames <- c('Pb207U235','errPb207U235',
+                    'Pb206U238','errPb206U238',
+                    'Pb204U238','errPb204U238',
+                    'rhoXY','rhoXZ','rhoYZ')
+        nc <- ncol(onames)
+        nr <- nrow(x)
+        out <- matrix(0,nr,nc)
+        colnames(out) <- onames
+        out[,'Pb207U235'] <- 1/x[,'U235Pb207']
+        out[,'Pb204U238'] <- x[,'Pb204Pb207']/(x[,'U235Pb207']*U85)
+        J <- matrix(0,nc,ncol(x))
+    } else if (x$format==10){
+        # inames = c('U235Pb207','errU235Pb207','Pb208Pb207',
+        #            'errPb208Pb207','Th232U238','errTh232U238',
+        #            'rXY','rXZ','rYZ')
+        onames <- c('Pb207U235','errPb207U235',
+                    'Pb206U238','errPb206U238',
+                    'Pb208Th232','errPb208Th232',
+                    'Th232U238','errTh232U238',
+                    'rhoXY','rhoXZ','rhoXW',
+                    'rhoYZ','rhoYW','rhoZW')
+        nc <- ncol(onames)
+        nr <- nrow(x)
+        out <- matrix(0,nr,nc)
+        colnames(out) <- onames
+        out[,'Pb207U235'] <- 1/x[,'U235Pb207']
+        out[,'Pb208Th232'] <- x[,'Pb208Pb207']*U85*x[,'Th232U238']/x[,'U235Pb207']
+        out[,'Th232U238'] <- x[,'Th232U238']
+        J <- matrix(0,nc,ncol(x))
+    } else {
+        stop('Invalid U-Pb format.')
     }
     out
 }
