@@ -684,7 +684,9 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
         }
-    } else if (x$format<9){
+        return(out)
+    }
+    if (x$format<9){
         ns <- length(x)
         calcit <- (1:ns)%ni%c(hide,omit)
         x2calc <- subset(x,subset=calcit)
@@ -775,34 +777,48 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
             out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
         }
-        if (plot){
-            scatterplot(XY,oerr=oerr,show.ellipses=show.ellipses,
-                        show.numbers=show.numbers,levels=levels,
-                        clabel=clabel,ellipse.fill=ellipse.fill,
-                        ellipse.stroke=ellipse.stroke,fit=out,
-                        ci.col=ci.col,line.col=line.col,lwd=lwd,
-                        hide=hide,omit=omit,omit.fill=omit.fill,
-                        omit.stroke=omit.stroke,...)
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
-                                          y0option=y0option,dispunits=' Ma'),
-                            xlab=x.lab,ylab=y.lab)
-        }
-    } else if (x$format<10){
-        fit <- flipper(x$x,inverse=TRUE,model=model,wtype=wtype,
-                       anchor=anchor,hide=hide,omit=omit,type="p",
-                       y0rat='Pb208Pb206',t2DPfun=age_to_Pb206U238_ratio,d=x$d)
-        RPb6U8 <- quotient(X=fit$a[1],sX=fit$a[2],
-                           Y=fit$b[1],sY=fit$b[2],sXY=fit$cov.ab)
-        RPb6U8[1] <- -RPb6U8[1]
-        tst <- get.Pb206U238.age(x=RPb6U8[1],sx=RPb6U8[2],exterr=exterr,d=x$d)
-        out <- fit
     } else if (x$format<11){
-        fit <- flipper(x$x,inverse=TRUE,model=model,wtype=wtype,
+        XY <- x$x
+        if (x$format==9){
+            y0rat <- 'Pb208Pb206'
+            t2DPfun <- age_to_Pb206U238_ratio
+            DP2tfun <- get.Pb206U238.age
+            y0label <- quote('('^208*'Pb/'^206*'Pb)'[c]*'=')
+            x.lab <- quote(''^238*'U/'^206*'Pb')
+            y.lab <- quote(''^208*'Pb/'^206*'Pb')
+        } else {
+            y0rat <- 'Pb208Pb207'
+            t2DPfun <- age_to_Pb207U235_ratio
+            DP2tfun <- get.Pb207U235.age
+            y0label <- quote('('^208*'Pb/'^207*'Pb)'[c]*'=')
+            x.lab <- quote(''^235*'U/'^207*'Pb')
+            y.lab <- quote(''^208*'Pb/'^207*'Pb')
+        }
+        out <- flipper(XY,inverse=TRUE,model=model,wtype=wtype,
                        anchor=anchor,hide=hide,omit=omit,type="p",
-                       y0rat='Pb208Pb207',t2DPfun=age_to_Pb207U235_ratio,d=x$d)
-        out <- fit
+                       y0rat=y0rat,t2DPfun=t2DPfun,d=x$d)
+        DP <- quotient(X=out$a[1],sX=out$a[2],
+                       Y=out$b[1],sY=out$b[2],sXY=out$cov.ab)
+        DP[1] <- -DP[1]
+        out$age <- do.call(DP2tfun,args=list(x=DP[1],sx=DP[2],exterr=exterr,d=x$d))
+        out$y0 <- out$a
+        out$y0label <- y0label
+        names(out$age) <- c('t','s[t]')
+        names(out$y0) <- c('y','s[y]')
     } else {
         stop('Invalid input format.')
+    }
+    if (plot){
+        scatterplot(XY,oerr=oerr,show.ellipses=show.ellipses,
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.fill=ellipse.fill,
+                    ellipse.stroke=ellipse.stroke,fit=out,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,
+                    hide=hide,omit=omit,omit.fill=omit.fill,
+                    omit.stroke=omit.stroke,...)
+        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
+                                      y0option=y0option,dispunits=' Ma'),
+                        xlab=x.lab,ylab=y.lab)
     }
     invisible(out)
 }

@@ -6,11 +6,15 @@ initial2time <- function(x,anames,avalues,anchor=0,
         X$d[[anames[i]]]$sx <- 0
         X$d[[anames[i]]]$option <- 1
     }
-    init <- init.ludwig(x=X,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
-                        lower=init$lower,upper=init$upper,hessian=FALSE,
-                        x=x,X=X,anchor=anchor,type=type,model=model)
-    lt <- ifelse('t'%in%names(fit$par),fit$par['t'],anchor[2])
+    if (x$format<9){
+        init <- init.ludwig(x=X,model=model,anchor=anchor,type=type)
+        fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+                            lower=init$lower,upper=init$upper,hessian=FALSE,
+                            x=x,X=X,anchor=anchor,type=type,model=model)
+        lt <- ifelse('t'%in%names(fit$par),fit$par['t'],anchor[2])
+    } else {
+        fit <- isochron(X)
+    }
     McL <- mclean(tt=exp(lt),d=X$d)
     out <- list()
     out$par <- fit$par
