@@ -269,6 +269,11 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
         upper['w'] <- par['w'] + buffer
     } else {
         par <- init$par
+        if (anchor[1]==2 && length(anchor)>1){
+            tt <- anchor[2]
+        } else {
+            tt <- exp(par['t'])
+        }
     }
     if (x$d$U48$option==2 | x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
