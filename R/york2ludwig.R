@@ -213,19 +213,20 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2){
             par['b0'] <- log(1/abxb['a'])
         }  
     } else {
-        yd <- data2york(x,option=2)
-        abx <- inithelper(yd=yd)
-        pilott <- get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1]
         if (type==1){ # 0806 vs 38/06
+            pilott <- min(get.Pb206U238.age(x)[,1])
             yd <- data2york(x,option=6,tt=pilott)
         } else if (type==2){ # 0807 vs 35/07
+            pilott <- min(get.Pb207U235.age(x)[,1])
             yd <- data2york(x,option=7,tt=pilott)
         } else if (type==3){ # 0608 vs 32/08
+            pilott <- min(get.Pb208Th232.age(x)[,1])
             yd <- data2york(x,option=8,tt=pilott)
         } else if (type==4){ # 0708 vs 32/08
+            pilott <- min(get.Pb208Th232.age(x)[,1])
             yd <- data2york(x,option=9,tt=pilott)
         } else { # joint, 0 or 1
-                                        # keep yd
+            # keep yd
         }
         abx <- inithelper(yd=yd)
         par['t'] <- log(pilott)

@@ -132,7 +132,7 @@ tera.wasserburg <- function(x,i=1,format){
         J[1,1] <- -U238Pb206^2
         J[2,2] <- 1
         out$cov <- J %*% E %*% t(J)
-    } else if (format == 4){
+    } else if (format %in% c(4,9)){
         U238U235 <- iratio('U238U235')[1]
         U238Pb206 <- 1/X[i,'Pb206U238']
         Pb207Pb206 <- X[i,'Pb207U235']/(X[i,'Pb206U238']*U238U235)
@@ -176,7 +176,7 @@ tera.wasserburg <- function(x,i=1,format){
         out$cov[2,1] <- out$cov[1,2]
         out$cov[3,1] <- out$cov[1,3]
         out$cov[3,2] <- out$cov[2,3]
-    } else if (format == 7){
+    } else if (format %in% c(7,10)){
         U238U235 <- iratio('U238U235')[1]
         U238Pb206 <- 1/X[i,'Pb206U238']
         Pb207Pb206 <- X[i,'Pb207U235']/(X[i,'Pb206U238']*U238U235)
@@ -680,7 +680,7 @@ get.Pb207U235.ratios <- function(x,exterr=FALSE){
     out <- matrix(0,ns,2)
     labels <- c('Pb207U235','errPb207U235')
     colnames(out) <- labels
-    if (x$format %in% c(1,3,4,6,7)){
+    if (x$format %in% c(1,3,4,6,7,9,10)){
         out <- subset(x$x,select=labels)
     } else if (x$format %in% c(2,5,8)){
         R <- iratio('U238U235')[1]
@@ -702,7 +702,7 @@ get.U235Pb207.ratios <- function(x,exterr=FALSE){
     out <- matrix(0,ns,2)
     labels <- c('U235Pb207','errU235Pb207')
     colnames(out) <- labels
-    if (x$format %in% c(1,3,4,6,7)){
+    if (x$format %in% c(1,3,4,6,7,9,10)){
         out[,'U235Pb207'] <- 1/x$x[,'Pb207U235']
         out[,'errU235Pb207'] <- out[,'U235Pb207']*
             x$x[,'errPb207U235']/x$x[,'Pb207U235']
@@ -857,10 +857,19 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     }
     out
 }
-get.Pb207U235.age.UPb <- function(x,i=1,exterr=FALSE,...){
+get.Pb207U235.age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     r75 <- get.Pb207U235.ratios(x)
-    get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],
-                      exterr=exterr,d=x$d[i])
+    if (is.null(i)){
+        ns <- length(x)
+        out <- matrix(0,ns,2)
+        for (j in 1:ns){
+            out[j,] <- get.Pb207U235.age.UPb(x,i=j,exterr=exterr,...)
+        }
+    } else {
+        out <- get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],
+                                 exterr=exterr,d=x$d[i],...)
+    }
+    out
 }
 get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb207U235'
