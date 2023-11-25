@@ -36,7 +36,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
         }
     } else if (anchor[1]==2 && length(anchor)>1){ # anchor slope
         p['b'] <- anchor[2]
-        init <- unname(mean(yd[,'Y']-p['b']*yd[,'X']))
+        init <- unname(median(yd[,'Y']-p['b']*yd[,'X']))
         if (model==2){
             i <- 'a'
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
