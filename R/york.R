@@ -276,7 +276,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             ir <- get.UPb.isochron.ratios.204(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb204Pb206')
         }
-    } else if (option==4 && x$format%in%c(4,5,6,9)){ # 04/07 vs. 35/07
+    } else if (option==4 && x$format%in%c(4,5,6)){ # 04/07 vs. 35/07
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios.204(x,i)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
@@ -291,17 +291,17 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208cPb206')
         }
-    } else if (option==7 && x$format%in%c(7,8,10)){ # 08/07 vs. 35/07
+    } else if (option==7 && x$format%in%c(7,8)){ # 08c/07 vs. 35/07
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
         }
-    } else if (option==8 && x$format%in%c(7,8)){ # 06/08 vs. 32/08
+    } else if (option==8 && x$format%in%c(7,8)){ # 06c/08 vs. 32/08
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb206cPb208')
         }
-    } else if (option==9 && x$format%in%c(7,8)){ # 07/08 vs. 32/08
+    } else if (option==9 && x$format%in%c(7,8)){ # 07c/08 vs. 32/08
         for (i in 1:ns){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
@@ -348,26 +348,11 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             J[1,1] <- 1/(x$x[i,'Th232U238']*U85)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb208Th232',J=J)
         }
-    } else if (x$format%in%c(9,10)){ # 07/35 vs. Pbc/35
-        if (x$format==9){
-            Pbc7 <- 'Pb204Pb207'
-            errPbc7 <- 'errPb204Pb207'
-        } else {
-            Pbc7 <- 'Pb208Pb207'
-            errPbc7 <- 'errPb208Pb207'
-        }
-        out[,1] <- 1/x$x[,'U235Pb207']
-        out[,3] <- x$x[,Pbc7]/x$x[,'U235Pb207']
-        covtab <- errorprop(J11=-1/x$x[,'U235Pb207']^2,
-                            J12=0,
-                            J21=-x$x[,Pbc7]/x$x[,'U235Pb207']^2,
-                            J22=1/x$x[,'U235Pb207'],
-                            E11=x$x[,'errU235Pb207']^2,
-                            E22=x$x[,errPbc7]^2,
-                            E12=x$x[,'rho']*x$x[,'errU235Pb207']*x$x[,errPbc7])
-        out[,2] <- sqrt(covtab[,1])
-        out[,4] <- sqrt(covtab[,2])
-        out[,5] <- covtab[,3]/(out[,2]*out[,4])
+    } else if (x$format==9){
+        out <- x$x
+    } else if (x$format==10){ # unfinished. No radiogenic Pb208 correction
+        out <- x$x[,c('U235Pb207','errU235Pb207',
+                      'Pb208Pb207','errPb208Pb207','rXY')]
     } else {
         stop('Incompatible input format and concordia type.')
     }

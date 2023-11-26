@@ -492,8 +492,6 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
         L0 <- zeros
         NP <- 3 # tt, a0, b0
         NR <- 4 # X, Y, Z, W
-    } else if (x$format%in%c(9,10)){
-        
     } else {
         stop('Incorrect input format.')
     }
@@ -751,18 +749,6 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
         } else {
             stop('invalid isochron type')
         }
-    } else if (x$format == 9){ # X=04/35, Y=07/35
-        yd <- data2york.UPb(x,option=11)
-        A <- rep(0,ns)
-        b <- b0
-        L0 <- yd[,'Y'] - McL$Pb207U235 - b*yd[,'X']
-    } else if (x$format == 10){ # X=08/35, Y=07/35
-        ThU <- x$x[,'Th232U238']
-        yd <- data2york.UPb(x,option=13)
-        A <- McL$Pb208Th232*ThU*U85
-        b <- b0
-        L0 <- yd[,'Y'] - McL$Pb207U235 - b*yd[,'X']
-        multiplier <- ThU*U85
     } else {
         stop('data2ludwig.2d is only relevant to U-Pb formats 4-8')
     }

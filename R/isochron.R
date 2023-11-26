@@ -787,8 +787,24 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                                           y0option=y0option,dispunits=' Ma'),
                             xlab=x.lab,ylab=y.lab)
         }
-    } else if (x$format<11){
-        
+    } else if (x$format<11){ # unfinished, undocumented, no 208Pb* correction
+        if (x$format==9){
+            option <- 4
+            y0rat <- "Pb208Pb204"
+            
+        } else {
+            option <- 7
+            y0rat <- "Pb208Pb207"
+        }
+        out <- isochron_PD(x,nuclide='U235',y0rat=y0rat,t2DPfun=get.Pb207U235.ratios,
+                           oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
+                           levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
+                           ellipse.stroke=ellipse.stroke,inverse=TRUE,
+                           ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
+                           exterr=exterr,model=model,wtype=2,anchor=anchor,
+                           show.ellipses=show.ellipses,hide=hide,omit=omit,
+                           omit.fill=omit.fill,omit.stroke=omit.stroke,
+                           option=option,d=x$d,...)
     } else {
         stop('Invalid U-Pb format.')
     }
@@ -1422,10 +1438,11 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                         ci.col='gray80',line.col='black',lwd=1,
                         plot=TRUE,exterr=FALSE,model=1,wtype=1,
                         anchor=0,show.ellipses=1*(model!=2),
-                        bratio=1,hide=NULL,omit=NULL,...){
+                        bratio=1,hide=NULL,omit=NULL,
+                        option=1,d=diseq(),...){
     out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="p",
-                   y0rat=y0rat,t2DPfun=t2DPfun)
+                   y0rat=y0rat,t2DPfun=t2DPfun,option=option)
     out$y0[c('y','s[y]')] <- out$a
     if (inverse){
         DP <- quotient(X=out$a[1],sX=out$a[2],
@@ -1434,11 +1451,12 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
     } else {
         DP <- out$b
     }
-    out$age[c('t','s[t]')] <- get.PD.age(DP[1],DP[2],nuclide,
-                                         exterr=exterr,bratio=bratio)
+    out$age[c('t','s[t]')] <-
+        get.isochron.PD.age(DP=DP[1],sDP=DP[2],nuclide=nuclide,bratio=bratio,d=d)
     if (inflate(out)){
-        out$age['disp[t]'] <- get.PD.age(DP[1],sqrt(out$mswd)*DP[2],nuclide,
-                                         exterr=exterr,bratio=bratio)[2]
+        out$age['disp[t]'] <-
+            get.isochron.PD.age(DP=DP[1],sDP=sqrt(out$mswd)*DP[2],
+                                nuclide=nuclide,exterr=exterr,bratio=bratio,d=d)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     if (model==3 & wtype==2){
@@ -1463,6 +1481,15 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                         xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
+}
+
+get.isochron.PD.age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1,d=diseq()){
+    if (nuclide=='U235'){
+        out <- get.Pb207U235.age(x=DP,sx=sDP,exterr=exterr,d=d)
+    } else {
+        out <- get.PD.age(DP=DP,sDP=sDP,nuclide=nuclide,exterr=exterr,bratio=bratio)
+    }
+    out
 }
 
 get.isochron.labels <- function(nuclide,inverse=FALSE,i0=208){
