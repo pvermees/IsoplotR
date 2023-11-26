@@ -397,8 +397,6 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
     if (format==3){
         out$x <- optionalredundancy2cor(X=out$x,nc=nc)
-    } else if (format%in%c(9,10)){
-        out$x <- convertUPb(tab=out$x,format=out$format)
     }
     out$d <- copy_diseq(x=out,d=d) # for Th/U based diseq corrections
     out
@@ -438,74 +436,6 @@ optionalredundancy2cor <- function(X,nc){
                 'lead to impossible correlation coefficients. ',
                 'These were replaced with alternative values ',
                 'assuming zero Tera-Wasserburg correlations.')
-    }
-    out
-}
-# convert U-Pb format 9 to 4 and 10 to 7
-convertUPb <- function(tab,format){
-    U85 <- iratio('U238U235')[1]
-    if (format==9){
-        # inames = c('U235Pb207','errU235Pb207','Pb204Pb207','errPb204Pb207','rho')
-        onames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238',
-                    'Pb204U238','errPb204U238',
-                    'rhoXY','rhoXZ','rhoYZ')
-        nc <- length(onames)
-        nr <- nrow(tab)
-        out <- matrix(0,nr,nc)
-        colnames(out) <- onames
-        out[,'Pb207U235'] <- 1/tab[,'U235Pb207']
-        out[,'Pb204U238'] <- tab[,'Pb204Pb207']/(tab[,'U235Pb207']*U85)
-        J11 <- -1/tab[,'U235Pb207']^2
-        J21 <- -tab[,'Pb204Pb207']/(U85*tab[,'U235Pb207']^2)
-        J22 <- 1/(tab[,'U235Pb207']*U85)
-        E11 <- tab[,'errU235Pb207']^2
-        E22 <- tab[,'errPb204Pb207']^2
-        E12 <- tab[,'rho']/(tab[,'errU235Pb207']*tab[,'errPb204Pb207'])
-        covtab <- errorprop(J11=J11,J12=0,J21=J21,J22=J22,E11=E11,E22=E22,E12=E12)
-        out[,'errPb207U235'] <- unname(sqrt(covtab[,'varX']))
-        out[,'errPb204U238'] <- unname(sqrt(covtab[,'varY']))
-        out[,'rhoXZ'] <- unname(covtab[,'cov']/sqrt(covtab[,'varX']*covtab[,'varY']))
-    } else if (format==10){
-        # inames = c('U235Pb207','errU235Pb207','Pb208Pb207',
-        #            'errPb208Pb207','Th232U238','errTh232U238',
-        #            'rXY','rXZ','rYZ')
-        onames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238',
-                    'Pb208Th232','errPb208Th232',
-                    'Th232U238','errTh232U238',
-                    'rhoXY','rhoXZ','rhoXW',
-                    'rhoYZ','rhoYW','rhoZW')
-        nc <- length(onames)
-        nr <- nrow(tab)
-        out <- matrix(0,nr,nc)
-        colnames(out) <- onames
-        out[,'Pb207U235'] <- 1/tab[,'U235Pb207']
-        out[,'Pb208Th232'] <- tab[,'Pb208Pb207']*U85*tab[,'Th232U238']/tab[,'U235Pb207']
-        out[,'Th232U238'] <- tab[,'Th232U238']
-        J <- E <- matrix(0,3,3)
-        for (i in 1:nr){
-            E[1,1] <- tab[i,'errU235Pb207']^2
-            E[2,2] <- tab[i,'errPb208Pb207']^2
-            E[3,3] <- tab[i,'errTh232U238']^2
-            E[1,2] <- E[2,1] <- tab[i,'rXY']*sqrt(E[1,1]*E[2,2])
-            E[1,3] <- E[3,1] <- tab[i,'rXZ']*sqrt(E[1,1]*E[3,3])
-            E[2,3] <- E[3,2] <- tab[i,'rYZ']*sqrt(E[2,2]*E[3,3])
-            J[1,1] <- -1/tab[i,'U235Pb207']^2
-            J[2,1] <- -tab[i,'Pb208Pb207']*U85*tab[i,'Th232U238']/tab[i,'U235Pb207']^2
-            J[2,2] <- U85*tab[i,'Th232U238']/tab[i,'U235Pb207']
-            J[2,3] <- tab[i,'Pb208Pb207']*U85/tab[i,'U235Pb207']
-            J[3,3] <- 1
-            covmat <- J %*% E %*% t(J)
-            out[i,'errPb207U235'] <- sqrt(covmat[1,1])
-            out[i,'errPb208Th232'] <- sqrt(covmat[2,2])
-            out[i,'Th232U238'] <- sqrt(covmat[3,3])
-            out[i,'rhoXZ'] <- ifelse(covmat[1,2]==0,0,covmat[1,2]/sqrt(covmat[1,1]*covmat[2,2]))
-            out[i,'rhoXW'] <- ifelse(covmat[1,3]==0,0,covmat[1,2]/sqrt(covmat[1,1]*covmat[3,3]))
-            out[i,'rhoZW'] <- ifelse(covmat[2,3]==0,0,covmat[2,3]/sqrt(covmat[2,2]*covmat[3,3]))
-        }
-    } else {
-        stop('Invalid U-Pb format.')
     }
     out
 }

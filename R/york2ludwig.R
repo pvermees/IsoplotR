@@ -2,7 +2,7 @@
 # and the (log of) the common Pb intercept(s)
 # plus the search ranges for ludwig regression
 york2ludwig <- function(x,anchor=0,buffer=2,type=0){
-    if (anchor[1]==3){
+    if (anchor[1]==3){ # stacey-kramers
         init <- york2ludwig(x=x,anchor=0,buffer=buffer)
         out <- list(par=init$par['t'],
                     lower=init$lower['t'],

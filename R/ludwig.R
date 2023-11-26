@@ -492,6 +492,8 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
         L0 <- zeros
         NP <- 3 # tt, a0, b0
         NR <- 4 # X, Y, Z, W
+    } else if (x$format%in%c(9,10)){
+        
     } else {
         stop('Incorrect input format.')
     }
@@ -703,18 +705,18 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
     l2 <- lambda('Th232')[1]
     U85 <- iratio('U238U235')[1]
     multiplier <- 1
-    if (x$format<4){
-        yd <- data2york(x,option=1) # X=07/35, Y=06/38
+    if (x$format<4){ # X=07/35, Y=06/38
+        yd <- data2york(x,option=1)
         A <- rep(McL$Pb207U235,ns)
         b <- 1/(a0*U85)
         L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
     } else if (x$format<7){
-        if (type==1){               # X=04/38, Y=06/38
+        if (type==1){ # X=04/38, Y=06/38
             yd <- data2york.UPb(x,option=10)
             A <- rep(0,ns)
             b <- a0
             L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
-        } else if (type==2){        # X=04/35, Y=07/35
+        } else if (type==2){ # X=04/35, Y=07/35
             yd <- data2york.UPb(x,option=11)
             A <- rep(0,ns)
             b <- b0
@@ -722,33 +724,45 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
         } else {
             stop('invalid isochron type')
         }
-    } else if (x$format %in% (7:8)){
+    } else if (x$format < 9){
         ThU <- x$x[,'Th232U238']
-        if (type==1){
-            yd <- data2york.UPb(x,option=12) # X=08/38, Y=06/38
+        if (type==1){ # X=08/38, Y=06/38
+            yd <- data2york.UPb(x,option=12)
             A <- McL$Pb208Th232*ThU
             b <- a0
             L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
             multiplier <- ThU
-        } else if (type==2){
-            yd <- data2york.UPb(x,option=13) # X=08/35, Y=07/35
+        } else if (type==2){ # X=08/35, Y=07/35
+            yd <- data2york.UPb(x,option=13)
             A <- McL$Pb208Th232*ThU*U85
             b <- b0
             L0 <- yd[,'Y'] - McL$Pb207U235 - b*yd[,'X']
             multiplier <- ThU*U85
-        } else if (type==3){
-            yd <- data2york.UPb(x,option=14) # X=06/32, Y=08/32
+        } else if (type==3){ # X=06/32, Y=08/32
+            yd <- data2york.UPb(x,option=14)
             A <- McL$Pb206U238/ThU
             b <- 1/a0
             L0 <- yd[,'Y'] - McL$Pb208Th232 - b*yd[,'X']
-        } else if (type==4){
-            yd <- data2york.UPb(x,option=15) # X=07/32, Y=08/32
+        } else if (type==4){ # X=07/32, Y=08/32
+            yd <- data2york.UPb(x,option=15)
             A <- McL$Pb206U238/(ThU*U85)
             b <- 1/b0
             L0 <- yd[,'Y'] - McL$Pb208Th232- b*yd[,'X']
         } else {
             stop('invalid isochron type')
         }
+    } else if (x$format == 9){ # X=04/35, Y=07/35
+        yd <- data2york.UPb(x,option=11)
+        A <- rep(0,ns)
+        b <- b0
+        L0 <- yd[,'Y'] - McL$Pb207U235 - b*yd[,'X']
+    } else if (x$format == 10){ # X=08/35, Y=07/35
+        ThU <- x$x[,'Th232U238']
+        yd <- data2york.UPb(x,option=13)
+        A <- McL$Pb208Th232*ThU*U85
+        b <- b0
+        L0 <- yd[,'Y'] - McL$Pb207U235 - b*yd[,'X']
+        multiplier <- ThU*U85
     } else {
         stop('data2ludwig.2d is only relevant to U-Pb formats 4-8')
     }
