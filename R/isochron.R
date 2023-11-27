@@ -794,7 +794,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             
         } else {
             option <- 7
-            y0rat <- "Pb208Pb207"
+            y0rat <- "Pb207Pb208"
         }
         out <- isochron_PD(x,nuclide='U235',y0rat=y0rat,t2DPfun=get.Pb207U235.ratios,
                            oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
@@ -803,8 +803,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                            ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
                            exterr=exterr,model=model,wtype=2,anchor=anchor,
                            show.ellipses=show.ellipses,hide=hide,omit=omit,
-                           omit.fill=omit.fill,omit.stroke=omit.stroke,
-                           option=option,d=x$d,...)
+                           omit.fill=omit.fill,omit.stroke=omit.stroke,...)
     } else {
         stop('Invalid U-Pb format.')
     }
@@ -1438,11 +1437,10 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                         ci.col='gray80',line.col='black',lwd=1,
                         plot=TRUE,exterr=FALSE,model=1,wtype=1,
                         anchor=0,show.ellipses=1*(model!=2),
-                        bratio=1,hide=NULL,omit=NULL,
-                        option=1,d=diseq(),...){
+                        bratio=1,hide=NULL,omit=NULL,...){
     out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="p",
-                   y0rat=y0rat,t2DPfun=t2DPfun,option=option)
+                   y0rat=y0rat,t2DPfun=t2DPfun)
     out$y0[c('y','s[y]')] <- out$a
     if (inverse){
         DP <- quotient(X=out$a[1],sX=out$a[2],
@@ -1451,6 +1449,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
     } else {
         DP <- out$b
     }
+    if ('UPb'%in%class(x)) d <- x$d else d <- NULL
     out$age[c('t','s[t]')] <-
         get.isochron.PD.age(DP=DP[1],sDP=DP[2],nuclide=nuclide,bratio=bratio,d=d)
     if (inflate(out)){

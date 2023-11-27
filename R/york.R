@@ -258,10 +258,17 @@ data2york.other <- function(x,...){
 #'
 #' @rdname data2york
 #' @export
-data2york.UPb <- function(x,option=1,tt=0,...){
+data2york.UPb <- function(x,option=1,tt=0,inverse=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    if (option==1){ # 06/38 vs. 07/35
+    if (x$format==9){
+        out <- x$x
+        if (!inverse) out <- normal2inverse(out)
+    } else if (x$format==10){ # unfinished. No radiogenic Pb208 correction
+        out <- x$x[,c('U235Pb207','errU235Pb207',
+                      'Pb208Pb207','errPb208Pb207','rXY')]
+        if (!inverse) out <- normal2inverse(out)
+    } else if (option==1){ # 06/38 vs. 07/35
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb206U238')
@@ -348,11 +355,6 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             J[1,1] <- 1/(x$x[i,'Th232U238']*U85)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb208Th232',J=J)
         }
-    } else if (x$format==9){
-        out <- x$x
-    } else if (x$format==10){ # unfinished. No radiogenic Pb208 correction
-        out <- x$x[,c('U235Pb207','errU235Pb207',
-                      'Pb208Pb207','errPb208Pb207','rXY')]
     } else {
         stop('Incompatible input format and concordia type.')
     }

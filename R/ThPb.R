@@ -6,6 +6,6 @@ get.ThPb.age <- function(Th232Pb208,sTh232Pb208,exterr=FALSE){
     get.PD.age(DP=Th232Pb208,sDP=sTh232Pb208,nuclide='Th232',exterr=exterr)
 }
 
-ThPb.age <- function(x,exterr=FALSE,i=NULL,sigdig=NA,i2i=TRUE,...){
-    PD.age(x,nuclide='Th232',exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,...)
+ThPb.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,...){
+    PD.age(x,nuclide='Th232',exterr=exterr,i=i,i2i=i2i,...)
 }
