@@ -303,6 +303,27 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
     }
     out
 }
+# returns a york table for U-Pb formats 11 and 12
+get.UPb.isochron.ratios.208.uncoupled <- function(x,tt=0){
+    if (x$format%ni%c(11,12)){
+        stop('Invalid U-Pb format for get.UPb.isochron.ratios.208.uncoupled')
+    }
+    out <- x$x[,c(1:4,7)]
+    l2 <- settings('lambda','Th232')[1]
+    out[,3] <- x$x[,3]-x$x[,'Th232U238']*(exp(l2*tt)-1)*x$x[,1]
+    J1 <- -x$x[,'Th232U238']*(exp(l2*tt)-1)
+    J2 <- 1
+    J3 <- -(exp(l2*tt)-1)*x$x[,1]
+    E11 <- x$x[,2]^2
+    E22 <- x$x[,4]^2
+    E33 <- x$x[,6]^2
+    E12 <- x$x[,7]*sqrt(x$x[,2]*x$x[,4])
+    E13 <- x$x[,8]*sqrt(x$x[,2]*x$x[,6])
+    E23 <- x$x[,9]*sqrt(x$x[,4]*x$x[,6])
+    v <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23)
+    out[,4] <- sqrt(v)
+    out
+}
 
 w2tw <- function(w,format){
     if (format %in% c(1,2,3)){
@@ -1164,76 +1185,4 @@ getEl <- function(parent){
         # do nothing
     }
     out[rcnames,rcnames]
-}
-
-# convert U-Pb format 9 to 4 and 10 to 7
-convert.UPb <- function(x){
-    tab <- x$x
-    U85 <- iratio('U238U235')[1]
-    if (x$format==9){ # convert to format 4
-        # inames = c('U235Pb207','errU235Pb207','Pb204Pb207','errPb204Pb207','rho')
-        onames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238',
-                    'Pb204U238','errPb204U238',
-                    'rhoXY','rhoXZ','rhoYZ')
-        nc <- length(onames)
-        nr <- nrow(x$x)
-        tab <- matrix(0,nr,nc)
-        colnames(tab) <- onames
-        tab[,'Pb207U235'] <- 1/x$x[,'U235Pb207']
-        tab[,'Pb204U238'] <- x$x[,'Pb204Pb207']/(x$x[,'U235Pb207']*U85)
-        J11 <- -1/x$x[,'U235Pb207']^2
-        J21 <- -x$x[,'Pb204Pb207']/(U85*x$x[,'U235Pb207']^2)
-        J22 <- 1/(x$x[,'U235Pb207']*U85)
-        E11 <- x$x[,'errU235Pb207']^2
-        E22 <- x$x[,'errPb204Pb207']^2
-        E12 <- x$x[,'rho']/(x$x[,'errU235Pb207']*x$x[,'errPb204Pb207'])
-        covtab <- errorprop(J11=J11,J12=0,J21=J21,J22=J22,E11=E11,E22=E22,E12=E12)
-        tab[,'errPb207U235'] <- unname(sqrt(covtab[,'varX']))
-        tab[,'errPb204U238'] <- unname(sqrt(covtab[,'varY']))
-        tab[,'rhoXZ'] <- unname(covtab[,'cov']/sqrt(covtab[,'varX']*covtab[,'varY']))
-        out <- as.UPb(tab,format=4)
-    } else if (x$format==10){ # convert to format 7
-        # inames = c('U235Pb207','errU235Pb207','Pb208Pb207',
-        #            'errPb208Pb207','Th232U238','errTh232U238',
-        #            'rXY','rXZ','rYZ')
-        onames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238',
-                    'Pb208Th232','errPb208Th232',
-                    'Th232U238','errTh232U238',
-                    'rhoXY','rhoXZ','rhoXW',
-                    'rhoYZ','rhoYW','rhoZW')
-        nc <- length(onames)
-        nr <- nrow(x$x)
-        tab <- matrix(0,nr,nc)
-        colnames(tab) <- onames
-        tab[,'Pb207U235'] <- 1/x$x[,'U235Pb207']
-        tab[,'Pb208Th232'] <- x$x[,'Pb208Pb207']*U85*x$x[,'Th232U238']/x$x[,'U235Pb207']
-        tab[,'Th232U238'] <- x$x[,'Th232U238']
-        J <- E <- matrix(0,3,3)
-        for (i in 1:nr){
-            E[1,1] <- x$x[i,'errU235Pb207']^2
-            E[2,2] <- x$x[i,'errPb208Pb207']^2
-            E[3,3] <- x$x[i,'errTh232U238']^2
-            E[1,2] <- E[2,1] <- x$x[i,'rXY']*sqrt(E[1,1]*E[2,2])
-            E[1,3] <- E[3,1] <- x$x[i,'rXZ']*sqrt(E[1,1]*E[3,3])
-            E[2,3] <- E[3,2] <- x$x[i,'rYZ']*sqrt(E[2,2]*E[3,3])
-            J[1,1] <- -1/x$x[i,'U235Pb207']^2
-            J[2,1] <- -x$x[i,'Pb208Pb207']*U85*x$x[i,'Th232U238']/x$x[i,'U235Pb207']^2
-            J[2,2] <- U85*x$x[i,'Th232U238']/x$x[i,'U235Pb207']
-            J[2,3] <- x$x[i,'Pb208Pb207']*U85/x$x[i,'U235Pb207']
-            J[3,3] <- 1
-            covmat <- J %*% E %*% t(J)
-            tab[i,'errPb207U235'] <- sqrt(covmat[1,1])
-            tab[i,'errPb208Th232'] <- sqrt(covmat[2,2])
-            tab[i,'Th232U238'] <- sqrt(covmat[3,3])
-            tab[i,'rhoXZ'] <- ifelse(covmat[1,2]==0,0,covmat[1,2]/sqrt(covmat[1,1]*covmat[2,2]))
-            tab[i,'rhoXW'] <- ifelse(covmat[1,3]==0,0,covmat[1,2]/sqrt(covmat[1,1]*covmat[3,3]))
-            tab[i,'rhoZW'] <- ifelse(covmat[2,3]==0,0,covmat[2,3]/sqrt(covmat[2,2]*covmat[3,3]))
-        }
-        out <- as.UPb(tab,format=7)
-    } else {
-        stop('Invalid U-Pb format.')
-    }
-    out
 }

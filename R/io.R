@@ -381,10 +381,20 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'rhoYZ','rhoYW','rhoZW')
         opt <- 8:14
     } else if (format==9){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb204Pb206','errPb204Pb206','rho')
+        opt <- 5
+    } else if (format==10){
         cnames <- c('U235Pb207','errU235Pb207',
                     'Pb204Pb207','errPb204Pb207','rho')
         opt <- 5
-    } else if (format==10){
+    } else if (format==11){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb208Pb206','errPb208Pb206',
+                    'Th232U238','errTh232U238',
+                    'rXY','rXZ','rYZ')
+        opt <- 6:9
+    } else if (format==12){
         cnames <- c('U235Pb207','errU235Pb207',
                     'Pb208Pb207','errPb208Pb207',
                     'Th232U238','errTh232U238',

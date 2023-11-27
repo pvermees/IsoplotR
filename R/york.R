@@ -261,12 +261,12 @@ data2york.other <- function(x,...){
 data2york.UPb <- function(x,option=1,tt=0,inverse=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    if (x$format==9){
-        out <- x$x
-        if (!inverse) out <- normal2inverse(out)
-    } else if (x$format==10){ # unfinished. No radiogenic Pb208 correction
-        out <- x$x[,c('U235Pb207','errU235Pb207',
-                      'Pb208Pb207','errPb208Pb207','rXY')]
+    if (x$format%in%(9:12)){
+        if (x$format%in%c(9,10)){
+            out <- x$x
+        } else if (x$format%in%c(11,12)){
+            out <- get.UPb.isochron.ratios.208.uncoupled(x,tt=tt)
+        }
         if (!inverse) out <- normal2inverse(out)
     } else if (option==1){ # 06/38 vs. 07/35
         for (i in 1:ns){
