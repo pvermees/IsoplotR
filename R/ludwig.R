@@ -130,7 +130,8 @@
 ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
-ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
+ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
+                   type='joint',plot=FALSE,...){
     X <- x
     X$d <- mediand(x$d)
     init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
@@ -140,7 +141,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,type='joint',plot=FALSE,...){
     fit$cov <- inverthess(fit$hessian)
     if (measured.disequilibrium(X$d) && type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
-                                  model=model,plot=plot)
+                                  model=model,plot=plot,...)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,X,anchor=anchor,type=type)
@@ -179,7 +180,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
             if (anchor[1]==1){
                 if (x$format<4) out$par['a0'] <- iratio('Pb207Pb206')[1]
                 else if (x$format<7) out$par['a0'] <- iratio('Pb206Pb204')[1]
-                else out$par['a0'] <- 1/iratio('Pb208Pb206')[1]
+                else out$par['a0'] <- iratio('Pb206Pb208')[1]
             } else if (anchor[1]==3){
                 sk <- stacey.kramers(fit$par['t'])
                 if (x$format<4) out$par['a0'] <- sk[1,'i74']/sk[1,'i64']
@@ -200,7 +201,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
         if ('b0'%ni%inames){
             if (anchor[1]==1){
                 if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
-                else out$par['b0'] <- 1/iratio('Pb208Pb207')[1]
+                else out$par['b0'] <- iratio('Pb207Pb208')[1]
             } else if (anchor[1]==3){
                 sk <- stacey.kramers(fit$par['t'])
                 if (x$format<7) out$par['b0'] <- sk[1,'i74']
@@ -338,7 +339,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
     } else if (type%in%c('joint',0,1,3)){
         a0 <- ifelse(anchor[1]==3,
                      sk[1,'i64']/sk[1,'i84'],
-                     1/iratio('Pb208Pb206')[1])
+                     iratio('Pb206Pb208')[1])
     }
     if ('b0' %in% pnames){
         b0 <- exp(par['b0'])
@@ -348,8 +349,8 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
                      iratio('Pb207Pb204')[1])
     } else if (x$format%in%c(7,8) && type%in%c('joint',0,2,4)){
         b0 <- ifelse(anchor[1]==3,
-                     sk[1,'i84']/sk[1,'i74'],
-                     1/iratio('Pb208Pb207')[1])
+                     sk[1,'i74']/sk[1,'i84'],
+                     iratio('Pb207Pb208')[1])
     }
     for (aname in c('U48','ThU','RaU','PaU')){
         pname <- paste0(aname,'i')
@@ -397,16 +398,16 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         }
     } else if (x$format<9){
         if (anchor[1]==1){
-            if (type%in%c('joint',0,1,3) && (iratio('Pb208Pb206')[2]>0)){
-                LL <- LL - stats::dnorm(x=1/a0,
-                                        mean=iratio('Pb208Pb206')[1],
-                                        sd=iratio('Pb208Pb206')[2],
+            if (type%in%c('joint',0,1,3) && (iratio('Pb206Pb208')[2]>0)){
+                LL <- LL - stats::dnorm(x=a0,
+                                        mean=iratio('Pb206Pb208')[1],
+                                        sd=iratio('Pb206Pb208')[2],
                                         log=TRUE)
             }
-            if (type%in%c('joint',0,2,4) && iratio('Pb208Pb207')[2]>0){
-                LL <- LL - stats::dnorm(x=1/b0,
-                                        mean=iratio('Pb208Pb207')[1],
-                                        sd=iratio('Pb208Pb207')[2],
+            if (type%in%c('joint',0,2,4) && iratio('Pb207Pb208')[2]>0){
+                LL <- LL - stats::dnorm(x=b0,
+                                        mean=iratio('Pb207Pb208')[1],
+                                        sd=iratio('Pb207Pb208')[2],
                                         log=TRUE)
             }
         } else if (anchor[1]==2 && (length(anchor)>2 && anchor[3]>0)){

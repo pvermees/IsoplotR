@@ -123,7 +123,7 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
 }
 
 bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
-                     nsteps=NULL,plot=FALSE){
+                     nsteps=NULL,plot=FALSE,add=FALSE){
     if (is.null(nsteps)){
         if (x$d$U48$option==2 && x$d$ThU$option==2) nsteps <- 20
         else nsteps <- 30
@@ -212,14 +212,14 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     }
     if (plot){
         nbpar <- length(out)
-        op <- graphics::par(mfrow=c(1,nbpar))
+        if (!add) op <- graphics::par(mfrow=c(1,nbpar))
         for (bpar in names(out)){
             plot(out[[bpar]],type='b',xlab=bpar)
             if (bpar=='t') xx <- exp(fit$par[bpar])
             else xx <- fit$par[bpar]
             graphics::lines(rep(xx,2),range(out[[bpar]][,2]))
         }
-        graphics::par(op)
+        if (!add) graphics::par(op)
     }
     out
 }

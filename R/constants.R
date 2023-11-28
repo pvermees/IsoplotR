@@ -88,7 +88,7 @@ alpha <- function(x=NULL){
 #' \code{"Hf176Hf177"}, \code{"Hf178Hf177"}, \code{"Hf179Hf177"},
 #' \code{"Hf180Hf177"}, \code{"U238U235"}, \code{"Pb207Pb206"},
 #' \code{"Pb206Pb204"}, \code{"Pb207Pb204"}, \code{"Pb208Pb204"},
-#' \code{"Pb208Pb206"}, \code{"Pb208Pb206"}) PLUS (optionally) the
+#' \code{"Pb206Pb208"}, \code{"Pb207Pb208"}) PLUS (optionally) the
 #' isotopic ratio and its analytical error.  Omitting the latter two
 #' numbers simply returns the existing values.
 #'

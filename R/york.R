@@ -313,7 +313,7 @@ data2york.UPb <- function(x,option=1,tt=0,inverse=TRUE,...){
             ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
         }
-    } else if (option==10 && x$format%in%c(4,5,6)){ # 06/38 vs. 04/38 
+    } else if (option==10 && x$format%in%c(4,5,6)){ # 06/38 vs. 04/38
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb206U238')

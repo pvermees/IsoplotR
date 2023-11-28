@@ -405,8 +405,8 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                            'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
-        c0806 <- settings('iratio','Pb208Pb206')[1]
-        c0807 <- settings('iratio','Pb208Pb207')[1]
+        c0806 <- 1/settings('iratio','Pb206Pb208')[1]
+        c0807 <- 1/settings('iratio','Pb207Pb208')[1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.with.208,interval=c(0,5000),
                                     c0806=c0806,c0807=c0807,x=x,i=i)$minimum
