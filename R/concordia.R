@@ -722,15 +722,15 @@ concordia.comp <- function(x,type=1){
     if (type==1){
         X <- data2york(x,option=1)
         colnames(X) <- c('Pb207U235','errPb207U235',
-                         'Pb206U238','errPb206U238','rhoXY')
+                         'Pb206U238','errPb206U238','rXY')
     } else if (type==2){
         X <- data2york(x,option=2)
         colnames(X) <- c('U238Pb206','errU238Pb206',
-                         'Pb207Pb206','errPb207Pb206','rhoXY')
+                         'Pb207Pb206','errPb207Pb206','rXY')
     } else if (type==3){
         X <- data2york(x,option=5)
         colnames(X) <- c('Pb206U238','errPb206U238',
-                         'Pb208Th232','errPb208Th232','rhoXY')
+                         'Pb208Th232','errPb208Th232','rXY')
     } else {
         stop('Incorrect concordia type.')
     }

@@ -9,9 +9,9 @@ york2ludwig <- function(x,anchor=0,buffer=2,type=0){
                     upper=init$upper['t'])
     } else if (x$format<4){
         out <- york2ludwigTW(x=x,anchor=anchor,buffer=buffer)
-    } else if (x$format<7){
+    } else if (x$format%in%c(4,5,6,9,10)){
         out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer,type=type)
-    } else if (x$format<9){
+    } else if (x$format%in%c(7,8,11,12)){
         out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer,type=type)
     } else {
         stop("Invalid U-Pb format")

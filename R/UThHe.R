@@ -79,7 +79,7 @@ flat.uvw.table <- function(x,w=0){
         out[i,9] <- uvwc$covmat[2,3]/(out[i,4]*out[i,6])
     }
     colnames(out) <- c('u','s[u]','v','s[v]','w','s[w]',
-                       'rho[u,v]','rho[u,w]','rho[v,w]')
+                       'r[u,v]','r[u,w]','r[v,w]')
     out
 }
 

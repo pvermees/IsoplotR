@@ -336,26 +336,26 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     opt <- NULL
     if (format==1){
         cnames <- c('Pb207U235','errPb207U235',
-                    'Pb206U238','errPb206U238','rhoXY')
+                    'Pb206U238','errPb206U238','rXY')
     } else if (format==2){
         cnames <- c('U238Pb206','errU238Pb206',
-                    'Pb207Pb206','errPb207Pb206','rhoXY')
+                    'Pb207Pb206','errPb207Pb206','rXY')
         opt <- 5
     } else if (format==3){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb207Pb206','errPb207Pb206',
-                    'rhoXY','rhoYZ')
+                    'rXY','rYZ')
     } else if (format==4){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb204U238','errPb204U238',
-                    'rhoXY','rhoXZ','rhoYZ')
+                    'rXY','rXZ','rYZ')
     } else if (format==5){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb204Pb206','errPb204Pb206',
-                    'rhoXY','rhoXZ','rhoYZ')
+                    'rXY','rXZ','rYZ')
         opt <- 7:9
     } else if (format==6){
         cnames <- c('Pb207U235','errPb207U235',
@@ -369,24 +369,24 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb206U238','errPb206U238',
                     'Pb208Th232','errPb208Th232',
                     'Th232U238','errTh232U238',
-                    'rhoXY','rhoXZ','rhoXW',
-                    'rhoYZ','rhoYW','rhoZW')
+                    'rXY','rXZ','rXW',
+                    'rYZ','rYW','rZW')
         opt <- 8:14
     } else if (format==8){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb208Pb206','errPb208Pb206',
                     'Th232U238','errTh232U238',
-                    'rhoXY','rhoXZ','rhoXW',
-                    'rhoYZ','rhoYW','rhoZW')
+                    'rXY','rXZ','rXW',
+                    'rYZ','rYW','rZW')
         opt <- 8:14
     } else if (format==9){
         cnames <- c('U238Pb206','errU238Pb206',
-                    'Pb204Pb206','errPb204Pb206','rho')
+                    'Pb204Pb206','errPb204Pb206','rXY')
         opt <- 5
     } else if (format==10){
         cnames <- c('U235Pb207','errU235Pb207',
-                    'Pb204Pb207','errPb204Pb207','rho')
+                    'Pb204Pb207','errPb204Pb207','rXY')
         opt <- 5
     } else if (format==11){
         cnames <- c('U238Pb206','errU238Pb206',
@@ -417,11 +417,11 @@ optionalredundancy2cor <- function(X,nc){
     out <- X
     nr <- nrow(X)
     if (nc > 6){
-        rhoXY <- X[,7]
-        i <- which(is.na(rhoXY))
+        rXY <- X[,7]
+        i <- which(is.na(rXY))
         if (nc > 7){
-            rhoYZ <- X[,8]
-            j <- which(is.na(rhoYZ))
+            rYZ <- X[,8]
+            j <- which(is.na(rYZ))
         } else {
             j <- 1:nr
         }
@@ -533,11 +533,11 @@ as.PbPb <- function(x,format=1,ierr=1){
     if (format==1 & nc>4){
         cnames <- c('Pb206Pb204','errPb206Pb204',
                     'Pb207Pb204','errPb207Pb204',
-                    'rho')
+                    'rXY')
     } else if (format==2 & nc>4) {
         cnames <- c('Pb204Pb206','errPb204Pb206',
                     'Pb207Pb206','errPb207Pb206',
-                    'rho')
+                    'rXY')
         opt <- 5
     } else if (format==3 & nc>5){
         cnames <- c('Pb206Pb204','errPb206Pb204',
@@ -562,11 +562,11 @@ as.ArAr <- function(x,format=3,ierr=1){
     if (format==1) {
         cnames <- c('Ar39Ar36','errAr39Ar36',
                     'Ar40Ar36','errAr40Ar36',
-                    'rho','Ar39')
+                    'rXY','Ar39')
     } else if (format==2) {
         cnames <- c('Ar39Ar40','errAr39Ar40',
                     'Ar36Ar40','errAr36Ar40',
-                    'rho','Ar39')
+                    'rXY','Ar39')
     } else if (format==3){
         cnames <- c('Ar39Ar40','errAr39Ar40',
                     'Ar36Ar40','errAr36Ar40',
@@ -592,10 +592,10 @@ as.ThPb <- function(x,format=1,ierr=1){
     X <- errconvert(X,gc='Th-Pb',format=format,ierr=ierr)
     if (format==1 & nc>3){
         cnames <- c('Th232Pb204','errTh232Pb204',
-                    'Pb208Pb204','errPb208Pb204','rho')
+                    'Pb208Pb204','errPb208Pb204','rXY')
     } else if (format==2 & nc>3){
         cnames <- c('Th232Pb208','errTh232Pb208',
-                    'Pb204Pb208','errPb204Pb208','rho')
+                    'Pb204Pb208','errPb204Pb208','rXY')
     } else if (format==3 & nc>5){
         cnames <- c('Th232Pb208','errTh232Pb208',
                     'Pb204Pb208','errPb204Pb208',
@@ -617,10 +617,10 @@ as.KCa <- function(x,format=1,ierr=1){
     X <- errconvert(X,gc='K-Ca',format=format,ierr=ierr)
     if (format==1 & nc>3){
         cnames <- c('K40Ca44','errK40Ca44',
-                    'Ca40Ca44','errCa40Ca44','rho')
+                    'Ca40Ca44','errCa40Ca44','rXY')
     } else if (format==2 & nc>3){
         cnames <- c('K40Ca40','errK40Ca40',
-                    'Ca44Ca40','errCa44Ca40','rho')
+                    'Ca44Ca40','errCa44Ca40','rXY')
     } else if (format==3 & nc>5){
         cnames <- c('K40Ca44','errK40Ca44',
                     'Ca40Ca44','errCa40Ca44',
@@ -634,10 +634,10 @@ as.KCa <- function(x,format=1,ierr=1){
 as.RbSr <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Rb87Sr86','errRb87Sr86',
-                    'Sr87Sr86','errSr87Sr86','rho')
+                    'Sr87Sr86','errSr87Sr86','rXY')
     } else if (format==2){
         cnames <- c('Rb87Sr87','errRb87Sr87',
-                    'Sr86Sr87','errSr86Sr87','rho')
+                    'Sr86Sr87','errSr86Sr87','rXY')
     } else if (format==3){
         cnames <- c('Rbppm','errRbppm','Srppm','errSrppm',
                     'Sr87Sr86','errSr87Sr86')
@@ -647,10 +647,10 @@ as.RbSr <- function(x,format=1,ierr=1){
 as.ReOs <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Re187Os188','errRe187Os188',
-                    'Os187Os188','errOs187Os188','rho')
+                    'Os187Os188','errOs187Os188','rXY')
     } else if (format==2){
         cnames <- c('Re187Os187','errRe187Os187',
-                    'Os188Os187','errOs188Os187','rho')
+                    'Os188Os187','errOs188Os187','rXY')
     } else if (format==3){
         cnames <- c('Reppm','errReppm','Osppm','errOsppm',
                     'Os187Os188','errOs187Os188')
@@ -660,10 +660,10 @@ as.ReOs <- function(x,format=1,ierr=1){
 as.SmNd <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Sm143Nd144','errSm143Nd144',
-                    'Nd143Nd144','errNd143Nd144','rho')
+                    'Nd143Nd144','errNd143Nd144','rXY')
     } else if (format==2){
         cnames <- c('Sm143Nd143','errSm143Nd143',
-                    'Nd144Nd143','errNd144Nd143','rho')
+                    'Nd144Nd143','errNd144Nd143','rXY')
     } else if (format==3){
         cnames <- c('Smppm','errSmppm','Ndppm','errNdppm',
                     'Nd143Nd144','errNd143Nd144')
@@ -673,10 +673,10 @@ as.SmNd <- function(x,format=1,ierr=1){
 as.LuHf <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Lu176Hf177','errLu176Hf177',
-                    'Hf176Hf177','errHf176Hf177','rho')
+                    'Hf176Hf177','errHf176Hf177','rXY')
     } else if (format==2){
         cnames <- c('Lu176Hf176','errLu176Hf176',
-                    'Hf177Hf176','errHf177Hf176','rho')
+                    'Hf177Hf176','errHf177Hf176','rXY')
     } else if (format==3){
         cnames <- c('Luppm','errLuppm','Hfppm','errHfppm',
                     'Hf176Hf177','errHf176Hf177')
@@ -717,22 +717,22 @@ as.ThU <- function(x,format=1,ierr=1,U8Th2=0,Th02i=c(0,0),
         cnames <- c('U238Th232','errU238Th232',
                     'U234Th232','errU234Th232',
                     'Th230Th232','errTh230Th232',
-                    'rhoXY','rhoXZ','rhoYZ')
+                    'rXY','rXZ','rYZ')
     } else if (format==2 & nc>8) {
         cnames <- c('Th232U238','errTh232U238',
                     'U234U238','errU234U238',
                     'Th230U238','errTh230U238',
-                    'rhoXY','rhoXZ','rhoYZ')
+                    'rXY','rXZ','rYZ')
     } else if (format==3 & nc>3) {
         if (nc==4) X <- cbind(subset(X,select=1:4),0)
         cnames <- c('U238Th232','errU238Th232',
                     'Th230Th232','errTh230Th232',
-                    'rho')
+                    'rXY')
     } else if (format==4 & nc>3) {
         if (nc==4) X <- cbind(subset(X,select=1:4),0)
         cnames <- c('Th232U238','errTh232U238',
                     'Th230U238','errTh230U238',
-                    'rho')
+                    'rXY')
     }
     out$x <- insert.data(x=X,cnames=cnames)
     out

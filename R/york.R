@@ -160,7 +160,7 @@ get.york.xy <- function(XY,a,b){
 #' @param format one of
 #'
 #' \code{1} or \code{2}: \code{X}, \code{s[X]}, \code{Y}, \code{s[Y]},
-#' \code{rho}; where \code{rho} is the error correlation between
+#' \code{rXY}; where \code{rXY} is the error correlation between
 #' \code{X} and \code{Y}; or
 #'
 #' \code{3}: \code{X/Z}, \code{s[X/Z]}, \code{Y/Z}, \code{s[Y/Z]},
@@ -225,32 +225,31 @@ data2york.other <- function(x,...){
 #' \code{sX=s[07/35]}, \code{Y=06/38}, \code{sY=s[06/38]}, \code{rXY}.
 #'
 #' \code{2}: Tera-Wasserburg ratios: \code{X=38/06},
-#' \code{sX=s[38/06]}, \code{Y=07/06}, \code{sY=s[07/06]},
-#' \code{rho=rXY}.
+#' \code{sX=s[38/06]}, \code{Y=07/06}, \code{sY=s[07/06]}, \code{rXY}.
 #'
 #' \code{3}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=04/06},
-#' \code{sY=s[04/06]}, \code{rho=rXY} (only valid if \code{x$format=4,5}
+#' \code{sY=s[04/06]}, \code{rXY} (only valid if \code{x$format=4,5}
 #' or \code{6}).
 #'
 #' \code{4}: \code{X=35/07}, \code{sX=s[35/07]}, \code{Y=04/07},
-#' \code{sY=s[04/07]}, \code{rho=rXY} (only valid if \code{x$format=4,5}
+#' \code{sY=s[04/07]}, \code{rXY} (only valid if \code{x$format=4,5}
 #' or \code{6}).
 #'
 #' \code{5}: U-Th-Pb concordia ratios: \code{X=06/38},
 #' \code{sX=s[06/38]}, \code{Y=08/32}, \code{sY=s[08/32]},
-#' \code{rho=rXY} (only valid if \code{x$format=7,8}).
+#' \code{rXY} (only valid if \code{x$format=7,8}).
 #'
 #' \code{6}: \code{X=38/06}, \code{sX=s[38/06]}, \code{Y=08/06},
-#' \code{sY=s[08/06]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
+#' \code{sY=s[08/06]}, \code{rXY} (only valid if \code{x$format=7,8}).
 #' 
 #' \code{7}: \code{X=35/07}, \code{sX=s[35/07]}, \code{Y=08/07},
-#' \code{sY=s[08/07]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
+#' \code{sY=s[08/07]}, \code{rXY} (only valid if \code{x$format=7,8}).
 #' 
 #' \code{8}: \code{X=32/08}, \code{sX=s[32/08]}, \code{Y=06/08},
-#' \code{sY=s[06/08]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
+#' \code{sY=s[06/08]}, \code{rXY} (only valid if \code{x$format=7,8}).
 #'
 #' \code{9}: \code{X=32/08}, \code{sX=s[32/08]}, \code{Y=07/08},
-#' \code{sY=s[07/08]}, \code{rho=rXY} (only valid if \code{x$format=7,8}).
+#' \code{sY=s[07/08]}, \code{rXY} (only valid if \code{x$format=7,8}).
 #'
 #' @param tt the age of the sample. This is only used if
 #'     \code{x$format=7} or \code{8}, in order to calculate the
@@ -258,17 +257,10 @@ data2york.other <- function(x,...){
 #'
 #' @rdname data2york
 #' @export
-data2york.UPb <- function(x,option=1,tt=0,inverse=TRUE,...){
+data2york.UPb <- function(x,option=1,tt=0,...){
     ns <- length(x)
     out <- matrix(0,ns,5)
-    if (x$format%in%(9:12)){
-        if (x$format%in%c(9,10)){
-            out <- x$x
-        } else if (x$format%in%c(11,12)){
-            out <- get.UPb.isochron.ratios.208.uncoupled(x,tt=tt)
-        }
-        if (!inverse) out <- normal2inverse(out)
-    } else if (option==1){ # 06/38 vs. 07/35
+    if (option==1){ # 06/38 vs. 07/35
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb207U235',i2='Pb206U238')
@@ -278,61 +270,85 @@ data2york.UPb <- function(x,option=1,tt=0,inverse=TRUE,...){
             td <- tera.wasserburg(x,i=i)
             out[i,] <- data2york_UPb_helper(td,i1='U238Pb206',i2='Pb207Pb206')
         }
-    } else if (option==3 && x$format%in%c(4,5,6)){ # 04/06 vs 38/06
-        for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.204(x,i)
-            out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb204Pb206')
+    } else if (option==3 && x$format%in%c(4,5,6,9)){ # 04/06 vs 38/06
+        if (x$format==9){
+            out <- x$x
+        } else {
+            for (i in 1:ns){
+                ir <- get.UPb.isochron.ratios.204(x,i)
+                out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb204Pb206')
+            }
         }
-    } else if (option==4 && x$format%in%c(4,5,6)){ # 04/07 vs. 35/07
-        for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.204(x,i)
-            out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
+    } else if (option==4 && x$format%in%c(4,5,6,10)){ # 04/07 vs. 35/07
+        if (x$format==10){
+            out <- x$x
+        } else {
+            for (i in 1:ns){
+                ir <- get.UPb.isochron.ratios.204(x,i)
+                out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
+            }
         }
-    } else if (option==5 && x$format%in%c(7,8)){ # 08/32 vs. 06/38
+    } else if (option==5 && x$format%in%c(7,8,11)){ # 08/32 vs. 06/38
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb206U238',i2='Pb208Th232')
-        }        
-    } else if (option==6 && x$format%in%c(7,8)){ # 08/06 vs. 38/06
-        for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
-            out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208cPb206')
         }
-    } else if (option==7 && x$format%in%c(7,8)){ # 08c/07 vs. 35/07
-        for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
-            out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
+    } else if (option==6 && x$format%in%c(7,8,11)){ # 08c/06 vs. 38/06
+        if (x$format==11){
+            out <- get.UPb.isochron.ratios.208.uncoupled(x,tt=tt)
+        } else {
+            for (i in 1:ns){
+                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208cPb206')
+            }
         }
-    } else if (option==8 && x$format%in%c(7,8)){ # 06c/08 vs. 32/08
-        for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
-            out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb206cPb208')
+    } else if (option==7 && x$format%in%c(7,8,12)){ # 08c/07 vs. 35/07
+        if (x$format==12){
+            out <- get.UPb.isochron.ratios.208.uncoupled(x,tt=tt)
+        } else {
+            for (i in 1:ns){
+                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
+            }
         }
-    } else if (option==9 && x$format%in%c(7,8)){ # 07c/08 vs. 32/08
-        for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
-            out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
+    } else if (option==8 && x$format%in%c(7,8,11)){ # 06c/08 vs. 32/08
+        if (x$format==11){
+            stop('Not implemented yet')
+        } else {
+            for (i in 1:ns){
+                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb206cPb208')
+            }
         }
-    } else if (option==10 && x$format%in%c(4,5,6)){ # 06/38 vs. 04/38
+    } else if (option==9 && x$format%in%c(7,8,12)){ # 07c/08 vs. 32/08
+        if (x$format==12){
+            stop('Not implemented yet')
+        } else {
+            for (i in 1:ns){
+                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
+            }
+        }
+    } else if (option==10 && x$format%in%c(4,5,6,9)){ # 06/38 vs. 04/38
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb206U238')
         }
-    } else if (option==11 && x$format%in%c(4,5,6)){ # 07/35 vs. 04/35
+    } else if (option==11 && x$format%in%c(4,5,6,10)){ # 07/35 vs. 04/35
         for (i in 1:ns){
             J <- diag(2)
             J[1,1] <- iratio('U238U235')[1]
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb207U235',J=J)
         }
-    } else if (option==12 && x$format%in%c(7,8)){ # 06/38 vs. 08/38
+    } else if (option==12 && x$format%in%c(7,8,11)){ # 06/38 vs. 08c/38
         J <- diag(2)
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             J[1,1] <- x$x[i,'Th232U238']
             out[i,] <- data2york_UPb_helper(wd,i1='Pb208Th232',i2='Pb206U238',J=J)
         }
-    } else if (option==13 && x$format%in%c(7,8)){ # 07/35 vs. 08/35
+    } else if (option==13 && x$format%in%c(7,8,12)){ # 07/35 vs. 08c/35
         U85 <- iratio('U238U235')[1]
         J <- diag(2)
         for (i in 1:ns){
@@ -340,14 +356,14 @@ data2york.UPb <- function(x,option=1,tt=0,inverse=TRUE,...){
             J[1,1] <- x$x[i,'Th232U238']*U85
             out[i,] <- data2york_UPb_helper(wd,i1='Pb208Th232',i2='Pb207U235',J=J)
         }
-    } else if (option==14 && x$format%in%c(7,8)){ # 08/32 vs. 06/32
+    } else if (option==14 && x$format%in%c(7,8,11)){ # 08/32 vs. 06c/32
         J <- diag(2)
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             J[1,1] <- 1/x$x[i,'Th232U238']
             out[i,] <- data2york_UPb_helper(wd,i1='Pb206U238',i2='Pb208Th232',J=J)
         }
-    } else if (option==15 && x$format%in%c(7,8)){ # 08/32 vs. 07/32
+    } else if (option==15 && x$format%in%c(7,8,12)){ # 08/32 vs. 07c/32
         U85 <- iratio('U238U235')[1]
         J <- diag(2)
         for (i in 1:ns){
@@ -530,29 +546,28 @@ data2york.UThHe <- function(x,...){
 #'     \code{X}, \code{sX}, \code{Y}, \code{sY}, \code{rXY}.
 #'
 #' If \code{FALSE} and \code{type=1}, uses \code{U238Th232},
-#'     \code{errU238Th232}, \code{Th230Th232}, \code{errTh230Th232},
-#'     \code{rho}
+#' \code{errU238Th232}, \code{Th230Th232}, \code{errTh230Th232}, \code{rXY}
 #'
 #' or if \code{FALSE} and \code{type=2}, uses \code{Th232U238},
-#'     \code{errTh232U238}, \code{Th230U238}, \code{errTh230U238},
-#'     \code{rho}.
+#' \code{errTh232U238}, \code{Th230U238}, \code{errTh230U238}, \code{rXY}.
+#' 
 #' @rdname data2york
 #' @export
 data2york.ThU <- function(x,type=2,generic=TRUE,...){
     if (x$format %in% c(1,3) & type==1){
         out <- subset(x$x,select=c('U238Th232','errU238Th232',
-                                   'Th230Th232','errTh230Th232','rho'))
+                                   'Th230Th232','errTh230Th232','rXY'))
     } else if (x$format %in% c(2,4) & type==2){
         out <- subset(x$x,select=c('Th232U238','errTh232U238',
-                                   'Th230U238','errTh230U238','rho'))
+                                   'Th230U238','errTh230U238','rXY'))
     } else if (x$format %in% c(2,4) & type==1){
         out <- ThConversionHelper(x)
         colnames(out) <- c('U238Th232','errU238Th232',
-                           'Th230Th232','errTh230Th232','rho')
+                           'Th230Th232','errTh230Th232','rXY')
     } else if (x$format %in% c(1,3) & type==2){
         out <- ThConversionHelper(x)
         colnames(out) <- c('Th232U238','errTh232U238',
-                           'Th230U238','errTh230U238','rho')
+                           'Th230U238','errTh230U238','rXY')
     } else {
         stop('Incorrect data format and/or plot type')
     }

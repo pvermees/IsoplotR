@@ -22,8 +22,8 @@
 #' function.
 #'
 #' @param x an \code{[nx9]} matrix with the following columns:
-#'     \code{X, sX,} \code{Y, sY,} \code{Z, sZ}, \code{rhoXY,}
-#'     \code{rhoXZ,} \code{rhoYZ}.
+#'     \code{X, sX,} \code{Y, sY,} \code{Z, sZ}, \code{rXY,}
+#'     \code{rXZ,} \code{rYZ}.
 #' @return A four-element list of vectors containing:
 #'
 #'     \describe{

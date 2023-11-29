@@ -120,7 +120,7 @@ get.cor.mult <- function(A,err.A,B,err.B,AB,err.AB){
 }
 
 # Implements Equations 6 & 7 of Ludwig (1998)
-# x is an [n x 5] matrix with columns X, sX, Y, sY, rhoXY
+# x is an [n x 5] matrix with columns X, sX, Y, sY, rXY
 wtdmean2D <- function(x){
     ns <- nrow(x)
     X <- x[,1]

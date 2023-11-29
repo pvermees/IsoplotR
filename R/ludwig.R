@@ -132,6 +132,7 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
                    type='joint',plot=FALSE,...){
+    type <- checkIsochronType(x,type)
     X <- x
     X$d <- mediand(x$d)
     init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
@@ -332,22 +333,22 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         a0 <- ifelse(anchor[1]==3,
                      sk[1,'i74']/sk[1,'i64'],
                      iratio('Pb207Pb206')[1])
-    } else if (x$format<7 && type%in%c('joint',0,1)){
+    } else if (x$format%in%c(4,5,6,9) && type%in%c('joint',0,1)){
         a0 <- ifelse(anchor[1]==3,
                      sk[1,'i64'],
                      iratio('Pb206Pb204')[1])
-    } else if (type%in%c('joint',0,1,3)){
+    } else if (x$format%in%c(7,8,11) && type%in%c('joint',0,1,3)){
         a0 <- ifelse(anchor[1]==3,
                      sk[1,'i64']/sk[1,'i84'],
                      iratio('Pb206Pb208')[1])
     }
     if ('b0' %in% pnames){
         b0 <- exp(par['b0'])
-    } else if (x$format%in%c(4,5,6) && type%in%c('joint',0,2)){
+    } else if (x$format%in%c(4,5,6,10) && type%in%c('joint',0,2)){
         b0 <- ifelse(anchor[1]==3,
                      sk[1,'i74'],
                      iratio('Pb207Pb204')[1])
-    } else if (x$format%in%c(7,8) && type%in%c('joint',0,2,4)){
+    } else if (x$format%in%c(7,8,12) && type%in%c('joint',0,2,4)){
         b0 <- ifelse(anchor[1]==3,
                      sk[1,'i74']/sk[1,'i84'],
                      iratio('Pb207Pb208')[1])
@@ -372,7 +373,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
             LL <- LL - stats::dnorm(x=tt,mean=anchor[2],sd=anchor[3],log=TRUE)
         }
         ta0b0w <- c('t'=unname(tt),'a0'=unname(a0))
-    } else if (x$format<7){
+    } else if (x$format%in%c(4,5,6,9,11)){
         if (anchor[1]==1){
             if (type%in%c('joint',0,1) && iratio('Pb206Pb204')[2]>0){
                 LL <- LL - stats::dnorm(x=a0,
@@ -396,7 +397,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         } else if (type==2){
             ta0b0w <- c('t'=unname(tt),'b0'=unname(b0))
         }
-    } else if (x$format<9){
+    } else if (x$format%in%c(7,8,10,12)){
         if (anchor[1]==1){
             if (type%in%c('joint',0,1,3) && (iratio('Pb206Pb208')[2]>0)){
                 LL <- LL - stats::dnorm(x=a0,
@@ -709,7 +710,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
         A <- rep(McL$Pb207U235,ns)
         b <- 1/(a0*U85)
         L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
-    } else if (x$format<7){
+    } else if (x$format%in%c(4,5,6,9,10)){
         if (type==1){ # X=04/38, Y=06/38
             yd <- data2york.UPb(x,option=10)
             A <- rep(0,ns)
@@ -723,7 +724,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
         } else {
             stop('invalid isochron type')
         }
-    } else if (x$format < 9){
+    } else if (x$format%in%c(7,8,11,12)){
         ThU <- x$x[,'Th232U238']
         if (type==1){ # X=08/38, Y=06/38
             yd <- data2york.UPb(x,option=12)
