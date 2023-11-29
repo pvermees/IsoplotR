@@ -160,7 +160,10 @@ tera.wasserburg <- function(x,i=1,format){
     out <- list()
     if (format < 4) labels <- c('U238Pb206','Pb207Pb206')
     else if (format < 7) labels <- c('U238Pb206','Pb207Pb206','Pb204Pb206')
-    else labels <- c('U238Pb206','Pb207Pb206','Pb208Pb206','Th232U238')
+    else if (format < 9) labels <- c('U238Pb206','Pb207Pb206','Pb208Pb206','Th232U238')
+    else if (format == 9) labels <- c('U238Pb206','Pb204Pb206')
+    else if (format == 11) labels <- c('U238Pb206','Pb208Pb206','Th232U238')
+    else stop('tera.wasserburg() is not available for this U-Pb format')
     if (format==1){
         U238U235 <- iratio('U238U235')[1]
         U238Pb206 <- 1/X[i,'Pb206U238']
@@ -185,7 +188,7 @@ tera.wasserburg <- function(x,i=1,format){
         J[1,1] <- -U238Pb206^2
         J[2,2] <- 1
         out$cov <- J %*% E %*% t(J)
-    } else if (format %in% c(4,9)){
+    } else if (format == 4){
         U238U235 <- iratio('U238U235')[1]
         U238Pb206 <- 1/X[i,'Pb206U238']
         Pb207Pb206 <- X[i,'Pb207U235']/(X[i,'Pb206U238']*U238U235)
@@ -229,7 +232,7 @@ tera.wasserburg <- function(x,i=1,format){
         out$cov[2,1] <- out$cov[1,2]
         out$cov[3,1] <- out$cov[1,3]
         out$cov[3,2] <- out$cov[2,3]
-    } else if (format %in% c(7,10)){
+    } else if (format == 7){
         U238U235 <- iratio('U238U235')[1]
         U238Pb206 <- 1/X[i,'Pb206U238']
         Pb207Pb206 <- X[i,'Pb207U235']/(X[i,'Pb206U238']*U238U235)
@@ -255,6 +258,15 @@ tera.wasserburg <- function(x,i=1,format){
                             X[i,'errPb208Pb206'],X[i,'errTh232U238'],
                             X[i,'rXY'],X[i,'rXZ'],X[i,'rXW'],
                             X[i,'rYZ'],X[i,'rYW'],X[i,'rZW'])
+    } else if (format == 9){
+        out$x <- X[i,labels]
+        out$cov <- matrix(0,2,2)
+        diag(out$cov) <- X[i,c('errU238Pb206','errPb204Pb206')]^2
+        out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb204Pb206'],X[i,'rXY'])
+    } else if (format == 11){
+        out$x <- X[i,labels]
+        out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb208Pb206'],X[i,'errTh232U238'],
+                            X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
     }
     names(out$x) <- labels
     colnames(out$cov) <- labels
@@ -943,7 +955,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb207U235.age(x[i],sxi,exterr=exterr,d=d[i])
+            out[i,] <- get.Pb207U235.age(x[i],sxi,exterr=exterr,d=d[i],...)
         }
     } else {
         l5 <- lambda('U235')[1]
@@ -993,7 +1005,7 @@ get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
 
 get.Pb206U238.age <- function(x,...){ UseMethod("get.Pb206U238.age",x) }
 get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
-                                      bayes=FALSE,plot=FALSE,...){
+                                      bayes=FALSE,plot=FALSE){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -1047,7 +1059,8 @@ get.Pb206U238.age.UPb <- function(x,i=NULL,exterr=FALSE,...){
             out[j,] <- get.Pb206U238.age.UPb(x,i=j,exterr=exterr,...)
         }
     } else {
-        out <- get.Pb206U238.age(r68[i,'Pb206U238'],r68[i,'errPb206U238'],
+        out <- get.Pb206U238.age(r68[i,'Pb206U238'],
+                                 r68[i,'errPb206U238'],
                                  exterr=exterr,d=x$d[i],...)
     }
     out
