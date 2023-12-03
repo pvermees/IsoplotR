@@ -28,9 +28,8 @@ roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
         if (is.na(sigdig) | min.err==0) {
             out <- dat
         } else {
-            nsmall <- min(10,max(0,-(trunc(log10(min.err))-sigdig)))
-            out <- format(dat,digits=sigdig,nsmall=nsmall,
-                          trim=TRUE,scientific=FALSE)
+            scientific <- abs(log10(min.err))>10
+            out <- format(dat,digits=sigdig,trim=TRUE,scientific=scientific)
         }
     }
     if (!text){
