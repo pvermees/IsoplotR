@@ -178,22 +178,13 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         for (pname in pnames[-ti]){
             init[,pname] <- stats::approx(x=LLgrid[,'t'],y=LLgrid[,pname],
                                           xout=log(tt),rule=2)$y
-        }
-        if ('a0' %in% pnames){
-            lower[,'a0'] <- init[,'a0']-1
-            upper[,'a0'] <- init[,'a0']+1
-        }
-        if ('b0' %in% pnames){
-            lower[,'b0'] <- init[,'b0']-1
-            upper[,'b0'] <- init[,'b0']+1
-        }
-        if ('U48i' %in% pnames){
-            lower[,'U48i'] <- init[,'U48i']/2
-            upper[,'U48i'] <- init[,'U48i']*2
-        }
-        if ('ThUi' %in% pnames){
-            lower[,'ThUi'] <- init[,'ThUi']/2
-            upper[,'ThUi'] <- init[,'ThUi']*2
+            if (pname %in% c('a0','b0','w')){
+                lower[,pname] <- init[,pname]-1
+                upper[,pname] <- init[,pname]+1
+            } else { # U48i, ThUi
+                lower[,pname] <- init[,pname]/2
+                upper[,pname] <- init[,pname]*2
+            }
         }
         LLgridt <- LLgrid[1:nsteps,]
         message('Calculating posterior distribution of the age')
