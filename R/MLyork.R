@@ -12,26 +12,20 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
         lmfit <- stats::lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])
         init <- unname(lmfit$coefficients)
         if (model==2){
-            i <- 'b'
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
-            p[i] <- fit$par[2]
-            E[i,i] <- fit$cov[2,2]
-        } else if (model==3){ # wtype = 'b'
-            i <- c('b','lw')
-            init <- c(b=init,lw=0)
-            fit <- stats::optim(init,LL.MLyork.blw,a=p['a'],yd=yd,
-                                hessian=TRUE,control=control)
-            p[i] <- fit$par
-            E[i,i] <- inverthess(fit$hessian)
+            p['b'] <- fit$par[2]
+            E['b','b'] <- fit$cov[2,2]
         } else {
-            i <- 'b'
             interval <- sort(c(init/2,init*2))
-            fit <- stats::optimise(LL.MLyork.b,a=p['a'],yd=yd,
+            lw <- ifelse(model==3 & length(anchor)>2, log(anchor[3]), -Inf)
+            fit <- stats::optimise(LL.MLyork.b,a=p['a'],lw=lw,yd=yd,
                                    interval=interval,tol=tol)
-            p[i] <- fit$minimum
+            p['b'] <- fit$minimum
+            p['lw'] <- lw
             H <- stats::optimHess(fit$minimum,LL.MLyork.b,
                                   a=p['a'],yd=yd,control=control)
-            E[i,i] <- inverthess(H)
+            E['b','b'] <- inverthess(H)
+            E['lw','lw'] <- 0
             df <- ns-1
         }
     } else if (anchor[1]==2 && length(anchor)>1){ # anchor slope
@@ -102,14 +96,14 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
     fit
 }
 
-LL.MLyork.a <- function(a,b,yd,returnval='LL'){
-    LL.MLyork.ablw(c(a,b,-Inf),yd=yd,returnval=returnval)
+LL.MLyork.a <- function(a,b,lw=-Inf,yd,returnval='LL'){
+    LL.MLyork.ablw(c(a,b,lw),yd=yd,returnval=returnval)
 }
-LL.MLyork.b <- function(b,a,yd,returnval='LL'){
-    LL.MLyork.ablw(c(a,b,-Inf),yd=yd,returnval=returnval)
+LL.MLyork.b <- function(b,a,lw=-Inf,yd,returnval='LL'){
+    LL.MLyork.ablw(c(a,b,lw),yd=yd,returnval=returnval)
 }
-LL.MLyork.ab <- function(ab,yd,returnval='LL'){
-    LL.MLyork.ablw(c(ab,-Inf),yd=yd,returnval=returnval)
+LL.MLyork.ab <- function(ab,lw=-Inf,yd,returnval='LL'){
+    LL.MLyork.ablw(c(ab,lw),yd=yd,returnval=returnval)
 }
 LL.MLyork.alw <- function(alw,b,yd,returnval='LL'){
     LL.MLyork.ablw(c(alw[1],b,alw[2]),yd=yd,

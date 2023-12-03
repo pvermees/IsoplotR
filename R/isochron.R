@@ -1453,7 +1453,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                                 nuclide=nuclide,exterr=exterr,bratio=bratio,d=d)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 & wtype==2){
+    if (model==3 & (wtype==2 | anchor[1]==2)){
         dDPdt <- lambda(nuclide)[1]*(1+DP[1])
         dDPdb <- ifelse(inverse,1/out$a[1],1)
         out$disp <- out$disp*dDPdb/dDPdt

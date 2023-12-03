@@ -15,7 +15,6 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         anchor[2:3] <- iratio(y0rat)
         if (model>1) fit <- MLyork(d2calc,anchor=anchor,model=model)
         else fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
-        fit$wtype <- 2 # only the age can vary
     } else if (anchor[1]==2){
         fitinverse <- TRUE
         yd <- data2york(x,inverse=fitinverse)
@@ -29,19 +28,16 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         anchor <- c(1,y0)
         if (model>1) fit <- MLyork(d2calc,anchor=anchor,model=model)
         else fit <- anchoredYork(d2calc,y0=y0[1],sy0=y0[2])
-        fit$wtype <- 1 # only the inherited composition can vary
     } else if (wtype==1){
         fitinverse <- FALSE
         yd <- data2york(x,inverse=fitinverse)
         d2calc <- clear(yd,hide,omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
-        fit$wtype <- wtype
     } else if (wtype==2){
         fitinverse <- TRUE
         yd <- data2york(x,inverse=fitinverse)
         d2calc <- clear(yd,hide,omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
-        fit$wtype <- wtype
     } else {
         stop("Invalid anchor and/or wtype value.")
     }
@@ -53,7 +49,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     out
 }
 
-flipfit <- function(fit,flip=FALSE){
+flipfit <- function(fit){
     out <- fit
     a <- -fit$a[1]/fit$b[1]
     b <- 1/fit$b[1]
@@ -68,6 +64,7 @@ flipfit <- function(fit,flip=FALSE){
     out$a <- c(a,sqrt(vcovab[1]))
     out$b <- c(b,sqrt(vcovab[2]))
     out$cov.ab <- unname(vcovab[3])
+    out$disp <- abs(b*fit$disp/fit$a[1])
     out
 }
 
@@ -87,6 +84,7 @@ invertfit <- function(fit,type="p"){
         out$a <- c(a,sqrt(vcovab[1]))
         out$b <- c(b,sqrt(vcovab[2]))
         out$cov.ab <- vcovab[3]
+        out$disp <- abs(b*fit$disp/fit$b[1])
     } else if (type%in%c(2,"d")){
         out$a <- fit$b
         out$b <- fit$a
