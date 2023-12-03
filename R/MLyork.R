@@ -51,8 +51,9 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
             E[i,i] <- inverthess(fit$hessian)
         } else {
             i <- 'a'
+            lims <- sort(init*c(1/2,2))
             fit <- stats::optimise(LL.MLyork.a,b=p['b'],yd=yd,
-                                   lower=init/2,upper=init*2,tol=tol)
+                                   lower=lims[1],upper=lims[2],tol=tol)
             p[i] <- fit$minimum
             H <- stats::optimHess(fit$minimum,LL.MLyork.a,
                                   b=p['b'],yd=yd,control=control)
