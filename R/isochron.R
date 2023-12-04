@@ -930,7 +930,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 && out$wtype==2){
+    if (model==3 & (wtype==2 | anchor[1]==2)){
         out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
         dispunits <- ' Ma'
     } else {
@@ -1003,15 +1003,15 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
-                   anchor=anchor,hide=hide,omit=omit,type="p",
-                   y0rat='Ar40Ar36',t2DPfun=get.ArAr.ratio,
-                   J=x$J[1],sJ=x$J[2])
+    out <- fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
+                          anchor=anchor,hide=hide,omit=omit,type="p",
+                          y0rat='Ar40Ar36',t2DPfun=get.ArAr.ratio,
+                          J=x$J[1],sJ=x$J[2])
     if (inverse) {
         R09 <- quotient(X=out$a[1],sX=out$a[2],
                         Y=out$b[1],sY=out$b[2],sXY=out$cov.ab)
         R09[1] <- -R09[1]
-        out$y0[c('y','s[y]')] <- quotient(X=out$a[1],sX=out$a[2],Y=1,sY=0,rXY=0)
+        out$y0[c('y','s[y]')] <- quotient(X=fit$a[1],sX=fit$a[2],Y=1,sY=0,rXY=0)
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
         y.lab <- quote(''^36*'Ar/'^40*'Ar')
     } else {
@@ -1027,14 +1027,17 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                                            x$J[1],x$J[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 && out$wtype==2){
-        l40 <- lambda('K40')[1]
-        dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
-        d09db <- ifelse(inverse,1/out$a[1],1)
-        out$disp <- dtd09*d09db*out$disp
-        dispunits <- ' Ma'
-    } else {
-        dispunits = ''
+    dispunits = ''
+    if (model==3){
+        if (anchor[1]==2 | (wtype==2 & anchor[1]!=1)){
+            l40 <- lambda('K40')[1]
+            dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
+            d09db <- ifelse(inverse,1/out$a[1],1)
+            out$disp <- dtd09*d09db*out$disp
+            dispunits <- ' Ma'
+        } else {
+            out$disp <- out$y0[1]*fit$disp/fit$a[1]
+        }
     }
     if (plot) {
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
@@ -1453,7 +1456,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                                 nuclide=nuclide,exterr=exterr,bratio=bratio,d=d)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 & wtype==2){
+    if (model==3 & (wtype==2 | anchor[1]==2)){
         dDPdt <- lambda(nuclide)[1]*(1+DP[1])
         dDPdb <- ifelse(inverse,1/out$a[1],1)
         out$disp <- out$disp*dDPdb/dDPdt
