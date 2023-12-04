@@ -294,22 +294,14 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             out[i,] <- data2york_UPb_helper(wd,i1='Pb206U238',i2='Pb208Th232')
         }
     } else if (option==6 && x$format%in%c(7,8,11)){ # 08c/06 vs. 38/06
-        if (x$format==11){
-            out <- get.UPb.isochron.ratios.208.uncoupled(x,tt=tt)
-        } else {
-            for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
-                out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208cPb206')
-            }
+        for (i in 1:ns){
+            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208cPb206')
         }
     } else if (option==7 && x$format%in%c(7,8,12)){ # 08c/07 vs. 35/07
-        if (x$format==12){
-            out <- get.UPb.isochron.ratios.208.uncoupled(x,tt=tt)
-        } else {
-            for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
-                out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
-            }
+        for (i in 1:ns){
+            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
         }
     } else if (option==8 && x$format%in%c(7,8,11)){ # 06c/08 vs. 32/08
         if (x$format==11){
@@ -336,10 +328,14 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         }
     } else if (option==11 && x$format%in%c(4,5,6,10)){ # 07/35 vs. 04/35
         for (i in 1:ns){
-            J <- diag(2)
-            J[1,1] <- iratio('U238U235')[1]
             wd <- wetherill(x,i=i)
-            out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb207U235',J=J)
+            if (x$format==10){
+                out[i,] <- data2york_UPb_helper(wd,i1='Pb204U235',i2='Pb207U235')
+            } else {
+                J <- diag(2)
+                J[1,1] <- iratio('U238U235')[1]
+                out[i,] <- data2york_UPb_helper(wd,i1='Pb204U238',i2='Pb207U235',J=J)
+            }
         }
     } else if (option==12 && x$format%in%c(7,8,11)){ # 06/38 vs. 08c/38
         J <- diag(2)
