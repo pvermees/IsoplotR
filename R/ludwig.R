@@ -247,10 +247,17 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
-    init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
-    lower <- init$lower
-    upper <- init$upper
-    if (model==3){
+    if (model!=3 | anchor[1]==2 | (x$format<4 & anchor!=0)){
+        if (length(anchor)>2) anchor <- anchor[1:2] # precision not wanted here
+        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
+        par <- init$par
+        if (anchor[1]==2 & length(anchor)>1){
+            tt <- anchor[2]
+        } else {
+            tt <- exp(par['t'])
+        }
+    } else { # model-3
+        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
         fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
                               upper=init$upper,x=x,anchor=anchor,type=type)
         E <- inverthess(fit$hessian)
@@ -267,16 +274,11 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
             tt <- exp(fit$par['t'])
             par['w'] <- fit$par['t'] + log(E['t','t'])/2
         }
-        lower['w'] <- par['w'] - max(buffer,10)
-        upper['w'] <- par['w'] + buffer
-    } else {
-        par <- init$par
-        if (anchor[1]==2 & length(anchor)>1){
-            tt <- anchor[2]
-        } else {
-            tt <- exp(par['t'])
-        }
+        init$lower['w'] <- par['w'] - max(buffer,10)
+        init$upper['w'] <- par['w'] + buffer
     }
+    lower <- init$lower
+    upper <- init$upper
     if (x$d$U48$option==2 | x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
     }
@@ -576,7 +578,7 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
     } else { # 2D regression
         J <- matrix(0,2*ns,ns)
     }
-    w <- w[1]
+    w2 <- diag(w[1]^2,2*ns,2*ns)
     if (joint & format>3){
         diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
         diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
@@ -615,8 +617,8 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
     } else {
         stop('invalid format')
     }
-    dEdx <- w^2
-    dEdx*J%*%t(J)
+    w2*J%*%t(J)
+
 }
 
 LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
