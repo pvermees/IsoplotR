@@ -576,6 +576,7 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
     } else { # 2D regression
         J <- matrix(0,2*ns,ns)
     }
+<<<<<<< HEAD
     w <- w[1]
     if (joint & format>3){
         diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
@@ -591,29 +592,52 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
             diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
         } else if (type==2){
             diag(J[i2,i1]) <- -McL$dPb207U235dt  # dLdt
+=======
+    if (wtype==1){
+        
+    } else if (wtype==2){
+        w <- w[1]
+        if (joint & format>3){
+            diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
+            diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
+            if (format>6) {
+                diag(J[i3,i1]) <- -McL$dPb208Th232dt # dMdt
+            }
+        } else if (format<4){
+            diag(J[i1,i1]) <- -McL$dPb206U238dt      # dKdt
+            diag(J[i2,i1]) <- -McL$dPb207U235dt      # dLdt
+        } else if (format<7){
+            if (type==1){
+                diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
+            } else if (type==2){
+                diag(J[i2,i1]) <- -McL$dPb207U235dt  # dLdt
+            } else {
+                stop('invalid isochron type')
+            }
+        } else if (format<9){
+            ThU <- x$x[,'Th232U238']
+            U85 <- iratio('U238U235')[1]
+            if (type==1){
+                diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU      # dKdt
+                diag(J[i2,i1]) <- -McL$dPb206U238dt           # dLdt
+            } else if (type==2){
+                diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU*U85  # dKdt
+                diag(J[i2,i1]) <- -McL$dPb207U235dt           # dLdt
+            } else if (type==3){
+                diag(J[i1,i1]) <- -McL$dPb206U238dt/ThU       # dKdt
+                diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
+            } else if (type==4){
+                diag(J[i1,i1]) <- -McL$dPb206U238dt/(ThU*U85) # dKdt
+                diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
+            } else {
+                stop('invalid isochron type')
+            }
+>>>>>>> 319d85f18f8477d043c4c2e36a3ac9dd568fa97a
         } else {
-            stop('invalid isochron type')
-        }
-    } else if (format<9){
-        ThU <- x$x[,'Th232U238']
-        U85 <- iratio('U238U235')[1]
-        if (type==1){
-            diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU      # dKdt
-            diag(J[i2,i1]) <- -McL$dPb206U238dt           # dLdt
-        } else if (type==2){
-            diag(J[i1,i1]) <- -McL$dPb208Th232dt*ThU*U85  # dKdt
-            diag(J[i2,i1]) <- -McL$dPb207U235dt           # dLdt
-        } else if (type==3){
-            diag(J[i1,i1]) <- -McL$dPb206U238dt/ThU       # dKdt
-            diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
-        } else if (type==4){
-            diag(J[i1,i1]) <- -McL$dPb206U238dt/(ThU*U85) # dKdt
-            diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
-        } else {
-            stop('invalid isochron type')
+            stop('invalid format')
         }
     } else {
-        stop('invalid format')
+        stop('invalid wtype')
     }
     dEdx <- w^2
     dEdx*J%*%t(J)
