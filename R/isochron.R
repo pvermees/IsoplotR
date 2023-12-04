@@ -738,12 +738,12 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             a <- 1/fit$par['b0']
             J[1,2] <- -a^2
             y.lab <- quote(''^204*'Pb/'^207*'Pb')
-        } else if (x$format%in%c(7,8,11) & type==1){   # 08/06 vs. 38/06
+        } else if (x$format%in%c(7,8,11) & type==1){   # 08c/06 vs. 38/06
             XY <- data2york(x,option=6,tt=tt)
             a <- 1/fit$par['a0']
             J[1,2] <- -a^2
             y.lab <- quote(''^208*'Pb'[c]*'/'^206*'Pb')
-        } else if (x$format%in%c(7,8,12) & type==2){   # 08/07 vs. 35/07
+        } else if (x$format%in%c(7,8,12) & type==2){   # 08c/07 vs. 35/07
             XY <- data2york(x,option=7,tt=tt)
             U <- settings('iratio','U238U235')[1]
             a <- 1/fit$par['b0']
