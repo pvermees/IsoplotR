@@ -311,9 +311,17 @@ get.UPb.isochron.ratios.204 <- function(x,i=NULL){
     out
 }
 get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
+    if (x$format%in%c(7,8)){
     labels <- c('U238Pb206','Pb208cPb206','U235Pb207',
                 'Pb208cPb207','Th232U238','Th232Pb208',
                 'Pb206cPb208','Pb207cPb208')
+    } else if (x$format==11){
+        labels <- c('U238Pb206','Pb208cPb206','Th232U238')
+    } else if (x$format==12){
+        labels <- c('U235Pb207','Pb208cPb207','Th232U238')
+    } else {
+        stop('Invalid format for get.UPb.isochron.ratios.208')
+    }
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,length(labels))
@@ -321,6 +329,7 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
             out[j,] <- get.UPb.isochron.ratios.208(x,i=j,tt=tt)$x
         }
         colnames(out) <- labels
+        return(out)
     } else if (x$format%in%c(7,8)){
         McL <- mclean(tt,d=x$d[i])
         l2 <- settings('lambda','Th232')[1]
@@ -359,34 +368,47 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
         out <- list()
         out$x <- c(U8Pb6,Pb8c6,U5Pb7,Pb8c7,
                    tw$x['Th232U238'],Th2Pb8,Pb6c8,Pb7c8)
-        out$cov <- J %*% tw$cov %*% t(J)
-        names(out$x) <- labels
-        colnames(out$cov) <- labels
-        rownames(out$cov) <- labels
+        E <- tw$cov
+    } else if (x$format==11){
+        l2 <- settings('lambda','Th232')[1]
+        U8Pb6 <- x$x[i,'U238Pb206']
+        Pb8c6 <- x$x[i,'Pb208Pb206'] -
+            x$x[i,'Th232U238']*x$x[i,'U238Pb206']*(exp(l2*tt)-1)
+        J <- diag(3)
+        J[2,1] <- -x$x[i,'Th232U238']*(exp(l2*tt)-1)
+        J[2,3] <- -x$x[i,'U238Pb206']*(exp(l2*tt)-1)
+        out <- list()
+        out$x <- c(U8Pb6,Pb8c6,x$x[i,'Th232U238'])
+        E <- cor2cov3(sX=x$x[i,'errU238Pb206'],
+                      sY=x$x[i,'errPb208Pb206'],
+                      sZ=x$x[i,'errTh232U238'],
+                      rXY=x$x[i,'rXY'],
+                      rXZ=x$x[i,'rXZ'],
+                      rYZ=x$x[i,'rYZ'])
+    } else if (x$format==12){
+        U85 <- iratio('U238U235')[1]
+        l2 <- settings('lambda','Th232')[1]
+        U5Pb7 <- x$x[i,'U235Pb207']
+        Pb8c7 <- x$x[i,'Pb208Pb207'] -
+            x$x[i,'Th232U238']*U85*x$x[i,'U235Pb207']*(exp(l2*tt)-1)
+        J <- diag(3)
+        J[2,1] <- -x$x[i,'Th232U238']*U85*(exp(l2*tt)-1)
+        J[2,3] <- -x$x[i,'U235Pb207']*U85*(exp(l2*tt)-1)
+        out <- list()
+        out$x <- c(U5Pb7,Pb8c7,x$x[i,'Th232U238'])
+        E <- cor2cov3(sX=x$x[i,'errU235Pb207'],
+                      sY=x$x[i,'errPb208Pb207'],
+                      sZ=x$x[i,'errTh232U238'],
+                      rXY=x$x[i,'rXY'],
+                      rXZ=x$x[i,'rXZ'],
+                      rYZ=x$x[i,'rYZ'])
     } else {
         stop('Invalid U-Pb format for get.UPb.isochron.ratios.208')
     }
-    out
-}
-# returns a york table for U-Pb formats 11 and 12
-get.UPb.isochron.ratios.208.uncoupled <- function(x,tt=0){
-    if (x$format%ni%c(11,12)){
-        stop('Invalid U-Pb format for get.UPb.isochron.ratios.208.uncoupled')
-    }
-    out <- x$x[,c(1:4,7)]
-    l2 <- settings('lambda','Th232')[1]
-    out[,3] <- x$x[,3]-x$x[,'Th232U238']*(exp(l2*tt)-1)*x$x[,1]
-    J1 <- -x$x[,'Th232U238']*(exp(l2*tt)-1)
-    J2 <- 1
-    J3 <- -(exp(l2*tt)-1)*x$x[,1]
-    E11 <- x$x[,2]^2
-    E22 <- x$x[,4]^2
-    E33 <- x$x[,6]^2
-    E12 <- x$x[,7]*sqrt(x$x[,2]*x$x[,4])
-    E13 <- x$x[,8]*sqrt(x$x[,2]*x$x[,6])
-    E23 <- x$x[,9]*sqrt(x$x[,4]*x$x[,6])
-    v <- errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23)
-    out[,4] <- sqrt(v)
+    out$cov <- J %*% E %*% t(J)
+    names(out$x) <- labels
+    colnames(out$cov) <- labels
+    rownames(out$cov) <- labels
     out
 }
 

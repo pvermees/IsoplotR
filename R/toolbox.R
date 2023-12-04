@@ -67,8 +67,7 @@ cor2cov2 <- function(sX,sY,rXY){
     covmat <- matrix(0,2,2)
     covmat[1,1] <- sX^2
     covmat[2,2] <- sY^2
-    covmat[1,2] <- rXY*sX*sY
-    covmat[2,1] <- covmat[1,2]
+    covmat[1,2] <- covmat[2,1] <- ifelse(rXY==0,0,rXY*sX*sY)
     covmat
 }
 cor2cov3 <- function(sX,sY,sZ,rXY,rXZ,rYZ){
@@ -76,12 +75,9 @@ cor2cov3 <- function(sX,sY,sZ,rXY,rXZ,rYZ){
     covmat[1,1] <- sX^2
     covmat[2,2] <- sY^2
     covmat[3,3] <- sZ^2
-    covmat[1,2] <- rXY*sX*sY
-    covmat[1,3] <- rXZ*sX*sZ
-    covmat[2,3] <- rYZ*sY*sZ
-    covmat[2,1] <- covmat[1,2]
-    covmat[3,1] <- covmat[1,3]
-    covmat[3,2] <- covmat[2,3]
+    covmat[1,2] <- covmat[2,1] <- ifelse(rXY==0,0,rXY*sX*sY)
+    covmat[1,3] <- covmat[3,1] <- ifelse(rXY==0,0,rXZ*sX*sZ)
+    covmat[2,3] <- covmat[3,2] <- ifelse(rYZ==0,0,rYZ*sY*sZ)
     covmat
 }
 cor2cov4 <- function(sW,sX,sY,sZ,rWX,rWY,rWZ,rXY,rXZ,rYZ){
@@ -90,18 +86,12 @@ cor2cov4 <- function(sW,sX,sY,sZ,rWX,rWY,rWZ,rXY,rXZ,rYZ){
     covmat[2,2] <- sX^2
     covmat[3,3] <- sY^2
     covmat[4,4] <- sZ^2
-    covmat[1,2] <- rWX*sW*sX
-    covmat[1,3] <- rWY*sW*sY
-    covmat[1,4] <- rWZ*sW*sZ
-    covmat[2,3] <- rXY*sX*sY
-    covmat[2,4] <- rXZ*sX*sZ
-    covmat[3,4] <- rYZ*sY*sZ
-    covmat[2,1] <- covmat[1,2]
-    covmat[3,1] <- covmat[1,3]
-    covmat[4,1] <- covmat[1,4]
-    covmat[3,2] <- covmat[2,3]
-    covmat[4,2] <- covmat[2,4]
-    covmat[4,3] <- covmat[3,4]
+    covmat[1,2] <- covmat[2,1] <- rWX*sW*sX
+    covmat[1,3] <- covmat[3,1] <- rWY*sW*sY
+    covmat[1,4] <- covmat[4,1] <- rWZ*sW*sZ
+    covmat[2,3] <- covmat[3,2] <- rXY*sX*sY
+    covmat[2,4] <- covmat[4,2] <- rXZ*sX*sZ
+    covmat[3,4] <- covmat[4,3] <- rYZ*sY*sZ
     covmat
 }
 

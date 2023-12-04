@@ -78,8 +78,8 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
 
 york2ludwig204 <- function(x,anchor=0,type=0,buffer=2){
     par <- lower <- upper <- vector()
-    yda <- data2york(x,option=3)
-    ydb <- data2york(x,option=4)
+    if (x$format%in%c(4,5,6,9)) yda <- data2york(x,option=3)
+    if (x$format%in%c(4,5,6,10)) ydb <- data2york(x,option=4)
     if (type==1) yd <- yda
     if (type==2) yd <- ydb
     if (anchor[1]==1){
