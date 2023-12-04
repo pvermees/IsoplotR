@@ -329,6 +329,7 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
             out[j,] <- get.UPb.isochron.ratios.208(x,i=j,tt=tt)$x
         }
         colnames(out) <- labels
+        return(out)
     } else if (x$format%in%c(7,8)){
         McL <- mclean(tt,d=x$d[i])
         l2 <- settings('lambda','Th232')[1]
