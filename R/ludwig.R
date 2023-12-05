@@ -150,7 +150,8 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     out$model <- model
     if (model==3){
         if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-            disp <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
+            disp <- fixDispersion(model=model,format=x$format,
+                                  anchor=anchor,type=type)
             sdisp <- 0
         } else {
             disp <- out$par['w']
@@ -325,12 +326,14 @@ fixedDispersion <- function(model,format,anchor,type){
     case1 <- model!=3
     case2 <- model==3 & anchor[1]==2
     case3 <- model==3 & format%in%c(1:3,9:12) & anchor[1]>0
-    case4 <- model==3 & format%in%(4:8) & type%ni%c('joint',0)
+    case4 <- model==3 & format%in%(4:8) & anchor[1]>0 & type%ni%c('joint',0)
     case1 | case2 | case3 | case4
 }
 
 fixDispersion <- function(model,format,anchor,type){
-    if (format<4){
+    if (model!=3){
+        w <- NULL
+    } else if (format<4){
         if (anchor[1]==1){
             w <- iratio('Pb207Pb206')[2]
         } else if (anchor[1]==2){
@@ -340,9 +343,9 @@ fixDispersion <- function(model,format,anchor,type){
         }
     } else if (format%in%c(4,5,6,9,10)){
         if (anchor[1]==1){
-            if (format==9 | type==1){
+            if (type==1){
                 w <- iratio('Pb206Pb204')[2]
-            } else if (format==10 | type==2){
+            } else if (type==2){
                 w <- iratio('Pb207Pb204')[2]
             } else {
                 w <- NULL
@@ -354,9 +357,9 @@ fixDispersion <- function(model,format,anchor,type){
         }
     } else if (format%in%c(7,8,11,12)){
         if (anchor[1]==1){
-            if (format==11 | type==1){
+            if (type==1){
                 w <- iratio('Pb206Pb208')[2]
-            } else if (format==12 | type==2){
+            } else if (type==2){
                 w <- iratio('Pb207Pb208')[2]
             } else {
                 stop('wrong format')
@@ -418,7 +421,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
     }
     LL <- 0
     if ('w'%in%pnames){
-        w <- exp(par['w'])
+        w <- exp(unname(par['w']))
     } else {
         w <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
     }
@@ -500,8 +503,8 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         if (type%in%c('joint',0) & x$format>3){
             LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
         } else {
-            LL <- LL + data2ludwig.2d(ta0b0w,x=X,model=model,
-                                      exterr=exterr,type=type)$LL
+            LL <- LL + data2ludwig.2d(ta0b0w,x=X,model=model,exterr=exterr,
+                                      type=type,anchor=anchor)$LL
         }
     }
     if (x$d$U48$option==1 & 'U48i'%in%pnames){
@@ -589,7 +592,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     EE <- J%*%E%*%t(J)
     if (model3){
-        Ew <- getEw(w=ta0b0w['w'],x=x,McL=McL)
+        Ew <- getEw2(w=ta0b0w['w'],x=x,McL=McL)
         EE <- EE + Ew
     }
     i1 <- 1:ns
@@ -627,7 +630,45 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     out
 }
 
-getEw <- function(w=0,x,McL=mclean(),type='joint'){
+# attributes overdispersion to common Pb (only for 2D isochrons)
+getEw1 <- function(w=0,x,McL=mclean(),type,a0=NA,b0=NA,c0){
+    format <- x$format
+    ns <- length(x)
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
+    J <- matrix(0,2*ns,ns)
+    U85 <- iratio('U238U235')[1]
+    if (format<4){
+        diag(J[i2,i1]) <- -c0/(U85*a0^2)     # dLda0
+    } else if (format%in%c(4,5,6,9,10)){
+        if (type==1){
+            diag(J[i2,i1]) <- -c0*U85        # dLda0
+        } else if (type==2){
+            diag(J[i2,i1]) <- -c0            # dLdb0
+        } else {
+            stop('invalid isochron type')
+        }
+    } else if (format%in%c(7,8,11,12)){
+        ThU <- x$x[,'Th232U238']
+        if (type==1){
+            diag(J[i2,i1]) <- -ThU*c0        # dLda0
+        } else if (type==2){
+            diag(J[i2,i1]) <- -ThU*U85       # dLdb0
+        } else if (type==3){
+            diag(J[i2,i1]) <- -c0*ThU/a0^2   # dLdt
+        } else if (type==4){
+            diag(J[i2,i1]) <- -c0*ThU*U/b0^2 # dLdt
+        } else {
+            stop('invalid isochron type')
+        }
+    } else {
+        stop('invalid format')
+    }
+    J%*%diag(w^2,ns,ns)%*%t(J)
+
+}
+# attributes overdispersion to t
+getEw2 <- function(w=0,x,McL=mclean(),type='joint'){
     format <- x$format
     ns <- length(x)
     joint <- type%in%c('joint',0)
@@ -639,7 +680,6 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
     } else { # 2D regression
         J <- matrix(0,2*ns,ns)
     }
-    w2 <- diag(w[1]^2,2*ns,2*ns)
     if (joint & format>3){
         diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
         diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
@@ -649,7 +689,7 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
     } else if (format<4){
         diag(J[i1,i1]) <- -McL$dPb206U238dt      # dKdt
         diag(J[i2,i1]) <- -McL$dPb207U235dt      # dLdt
-    } else if (format<7){
+    } else if (format%in%c(4,5,6,9,10)){
         if (type==1){
             diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
         } else if (type==2){
@@ -657,7 +697,7 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
         } else {
             stop('invalid isochron type')
         }
-    } else if (format<9){
+    } else if (format%in%c(7,8,11,12)){
         ThU <- x$x[,'Th232U238']
         U85 <- iratio('U238U235')[1]
         if (type==1){
@@ -678,8 +718,7 @@ getEw <- function(w=0,x,McL=mclean(),type='joint'){
     } else {
         stop('invalid format')
     }
-    w2*J%*%t(J)
-
+    J%*%diag(w^2,ns,ns)%*%t(J)
 }
 
 LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
@@ -755,14 +794,13 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     LL.norm(DD,EE)
 }
 
-data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
+data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
     out <- list()
     pnames <- names(ta0b0w)
     tt <- ta0b0w['t']
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if ('a0'%in%pnames) a0 <- ta0b0w['a0']
-    if ('b0'%in%pnames) b0 <- ta0b0w['b0']
-    model3 <- 'w'%in%pnames & !is.na(ta0b0w['w'])
+    a0 <- ifelse('a0'%in%pnames,ta0b0w['a0'],NA)
+    b0 <- ifelse('b0'%in%pnames,ta0b0w['b0'],NA)
     ns <- length(x)
     l8 <- lambda('U238')[1]
     l5 <- lambda('U235')[1]
@@ -824,8 +862,21 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
     diag(E)[i1] <- yd[,'sX']^2
     diag(E)[i2] <- yd[,'sY']^2
     diag(E[i1,i2]) <- diag(E[i2,i1]) <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
-    if (model3){
-        Ew <- getEw(w=ta0b0w['w'],x=x,McL=McL,type=type)
+    if (model==3){
+        if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
+            w <- fixDispersion(model=model,format=x$format,
+                               anchor=anchor,type=type)
+            if (anchor[1]==1){
+                c0 <- getc0SSLL(yd,A=A,b=b,L0=L0,E=E,multiplier=multiplier)$c0
+                Ew <- getEw1(w=w,x=x,McL=McL,type=type,a0=a0,b0=b0,c0=c0)
+            } else if (anchor[1]==2){
+                Ew <- getEw2(w=w,x=x,McL=McL,type=type)
+            } else {
+               stop('invalid anchor')
+            }
+        } else {
+            Ew <- getEw2(w=ta0b0w['w'],x=x,McL=McL,type=type)
+        }
         E <- E + Ew
     }
     if (exterr){
@@ -880,6 +931,13 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
         }
         E <- E + J %*% El %*% t(J)
     }
+    out <- append(out,getc0SSLL(yd,A=A,b=b,L0=L0,E=E,multiplier=multiplier))
+    out
+}
+getc0SSLL <- function(yd,A,b,L0,E,multiplier=1){
+    ns <- nrow(E)/2
+    i1 <- 1:ns
+    i2 <- (ns+1):(2*ns)
     O <- blockinverse(AA=E[i1,i1],BB=E[i1,i2],
                       CC=E[i2,i1],DD=E[i2,i2],doall=TRUE)
     BB <- O[i1,i1] + O[i1,i2]*b + b*O[i2,i1] + b*O[i2,i2]*b
@@ -889,6 +947,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1){
     K <- M-A
     L <- L0+b*M
     KL <- c(K,L)
+    out <- list()
     out$c0 <- (yd[,'X']-M)/multiplier
     out$SS <- KL%*%O%*%KL
     out$LL <- LL.norm(KL,E)
