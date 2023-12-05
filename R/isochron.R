@@ -784,8 +784,10 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
+            if (anchor[1]==1 & (x$format%ni%(4:8) | !joint)) dispunits <- ''
+            else dispunits <- ' Ma'
             graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
-                                          y0option=y0option,dispunits=' Ma'),
+                                          y0option=y0option,dispunits=dispunits),
                             xlab=x.lab,ylab=y.lab)
         }
     } else {
