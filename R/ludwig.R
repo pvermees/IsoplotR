@@ -185,14 +185,24 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
     if (type%in%c('joint',0,1,3)){
         if ('a0'%ni%inames){
             if (anchor[1]==1){
-                if (x$format<4) out$par['a0'] <- iratio('Pb207Pb206')[1]
-                else if (x$format<7) out$par['a0'] <- iratio('Pb206Pb204')[1]
-                else out$par['a0'] <- iratio('Pb206Pb208')[1]
+                if (x$format<4){
+                    out$par['a0'] <- iratio('Pb207Pb206')[1]
+                } else if (x$format%in%c(4,5,6,9)){
+                    out$par['a0'] <- iratio('Pb206Pb204')[1]
+                } else if (x$format%in%c(7,8,11)){
+                    out$par['a0'] <- iratio('Pb206Pb208')[1]
+                } else {
+                    stop('invalid format')
+                }
             } else if (anchor[1]==3){
                 sk <- stacey.kramers(fit$par['t'])
-                if (x$format<4) out$par['a0'] <- sk[1,'i74']/sk[1,'i64']
-                else if (x$format<7) out$par['a0'] <- sk[1,'i64']
-                else out$par['a0'] <- sk[1,'i64']/sk[1,'i84']
+                if (x$format<4){
+                    out$par['a0'] <- sk[1,'i74']/sk[1,'i64']
+                } else if (x$format%in%c(4,5,6,9)){
+                    out$par['a0'] <- sk[1,'i64']
+                } else if (x$format%in%c(7,8,11)){
+                    out$par['a0'] <- sk[1,'i64']/sk[1,'i84']
+                }
             } else {
                 stop("Can't determine a0 for this dataset.")
             }
@@ -207,12 +217,22 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
     if (x$format>3 & type%in%c('joint',0,2,4)){
         if ('b0'%ni%inames){
             if (anchor[1]==1){
-                if (x$format<7) out$par['b0'] <- iratio('Pb207Pb204')[1]
-                else out$par['b0'] <- iratio('Pb207Pb208')[1]
+                if (x$format%in%c(4,5,6,10)){
+                    out$par['b0'] <- iratio('Pb207Pb204')[1]
+                } else if (x$format%in%c(7,8,12)){
+                    out$par['b0'] <- iratio('Pb207Pb208')[1]
+                } else {
+                    stop('invalid format')
+                }
             } else if (anchor[1]==3){
                 sk <- stacey.kramers(fit$par['t'])
-                if (x$format<7) out$par['b0'] <- sk[1,'i74']
-                else out$par['b0'] <- sk[1,'i74']/sk[1,'i84']
+                if (x$format%in%c(4,5,6,10)){
+                    out$par['b0'] <- sk[1,'i74']
+                } else if (x$format%in%c(7,8,12)){
+                    out$par['b0'] <- sk[1,'i74']/sk[1,'i84']
+                } else {
+                    stop('invalid format')
+                }
             } else {
                 stop("Can't determine b0 for this dataset.")
             }
