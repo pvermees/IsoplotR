@@ -1,26 +1,27 @@
 # finds the (log of) the lower concordia intercept
 # and the (log of) the common Pb intercept(s)
 # plus the search ranges for ludwig regression
-york2ludwig <- function(x,anchor=0,buffer=2,type=0){
+# free=FALSE for anchored model-3 regression of 2D isochrons
+york2ludwig <- function(x,anchor=0,buffer=2,type=0,free=TRUE){
     if (anchor[1]==3){ # stacey-kramers
-        init <- york2ludwig(x=x,anchor=0,buffer=buffer)
+        init <- york2ludwig(x=x,anchor=0,buffer=buffer,free=free)
         out <- list(par=init$par['t'],
                     lower=init$lower['t'],
                     upper=init$upper['t'])
     } else if (x$format<4){
-        out <- york2ludwigTW(x=x,anchor=anchor,buffer=buffer)
+        out <- york2ludwigTW(x=x,anchor=anchor,buffer=buffer,free=free)
     } else if (x$format%in%c(4,5,6,9,10)){
-        out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer,type=type)
+        out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer,type=type,free=free)
     } else if (x$format%in%c(7,8,11,12)){
-        out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer,type=type)
+        out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer,type=type,free=free)
     } else {
         stop("Invalid U-Pb format")
     }
     out
 }
 
-york2ludwigTW <- function(x,anchor=0,buffer=2){
-    par <- lower <- upper <- c(t=NA,a0=NA)
+york2ludwigTW <- function(x,anchor=0,buffer=2,free=TRUE){
+    par <- lower <- upper <- c()
     yd <- data2york(x,option=1)
     if (anchor[1]==1){
         Pb76c <- iratio('Pb207Pb206')[1]
@@ -30,27 +31,17 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
         par['t'] <- log(tm[1])
         lower['t'] <- par['t'] - buffer
         upper['t'] <- log(tm[2])
-        if (iratio('Pb207Pb206')[2]>0){
+        if (free & iratio('Pb207Pb206')[2]>0){
             par['a0'] <- log(Pb76c)
             lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
             upper['a0'] <- par['a0'] + buffer
-        } else {
-            i <- which(names(par)=='a0')
-            par <- par[-i]
-            lower <- lower[-i]
-            upper <- upper[-i]
         }
     } else if (anchor[1]==2 & length(anchor)>1){
         tt <- anchor[2]
-        if ((length(anchor)>2 && anchor[3]>0)){
+        if (free & length(anchor)>2 | anchor[3]>0){
             par['t'] <- log(tt)
             lower['t'] <- par['t'] - buffer
             upper['t'] <- par['t'] + buffer
-        } else {
-            i <- which(names(par)=='t')
-            par <- par[-i]
-            lower <- lower[-i]
-            upper <- upper[-i]
         }
         McL <- mclean(tt,d=x$d)
         Xt <- McL$Pb207U235
@@ -76,7 +67,7 @@ york2ludwigTW <- function(x,anchor=0,buffer=2){
     list(par=par,lower=lower,upper=upper)
 }
 
-york2ludwig204 <- function(x,anchor=0,type=0,buffer=2){
+york2ludwig204 <- function(x,anchor=0,type=0,buffer=2,free=TRUE){
     par <- lower <- upper <- vector()
     if (x$format%in%c(4,5,6,9)) yda <- data2york(x,option=3)
     if (x$format%in%c(4,5,6,10)) ydb <- data2york(x,option=4)
@@ -88,7 +79,9 @@ york2ludwig204 <- function(x,anchor=0,type=0,buffer=2){
             abxa <- inithelper(yd=yda,y0=1/Pb64c)
             tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
             par['t'] <- log(tt)
-            if (iratio('Pb206Pb204')[2]>0) par['a0'] <- log(Pb64c)
+            if (free & iratio('Pb206Pb204')[2]>0){
+                par['a0'] <- log(Pb64c)
+            }
         }
         if (type%in%c('joint',0,2)){
             Pb74c <- iratio('Pb207Pb204')[1]
@@ -99,11 +92,15 @@ york2ludwig204 <- function(x,anchor=0,type=0,buffer=2){
             par['t'] <- log(tt)
         }
         if (type%in%c('joint',0,2)){
-            if (iratio('Pb207Pb204')[2]>0) par['b0'] <- log(Pb74c)
+            if (free & iratio('Pb207Pb204')[2]>0){
+                par['b0'] <- log(Pb74c)
+            }
         }
-    } else if (anchor[1]==2 && length(anchor)>1){
+    } else if (anchor[1]==2 & length(anchor)>1){
         tt <- anchor[2]
-        if ((length(anchor)>2 && anchor[3]>0)) par['t'] <- log(tt)
+        if (free & length(anchor)>2 & anchor[3]>0){
+            par['t'] <- log(tt)
+        }
         if (type%in%c('joint',0,1)){
             Pb6U8r <- mclean(tt=tt)$Pb206U238
             abxa <- inithelper(yd=yda,x0=1/Pb6U8r)
@@ -136,7 +133,7 @@ york2ludwig204 <- function(x,anchor=0,type=0,buffer=2){
     list(par=par,lower=par-buffer,upper=par+buffer)
 }
 
-york2ludwig208 <- function(x,anchor=0,type=0,buffer=2){
+york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,free=TRUE){
     par <- lower <- upper <- vector()
     if (anchor[1]==1){
         if (type==1){ # 0806 vs 38/06
@@ -156,33 +153,45 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2){
             yd <- data2york(x,option=9,tt=pilott)
             y0 <- iratio('Pb207Pb208')[1]
         } else { # joint, 0 or 1
+            yd <- data2york(x,option=2)
+            pilott <- min(get.Pb206U238.age(x=x)[,1])
             y0 <- iratio('Pb207Pb206')[1]
         }
         abx <- inithelper(yd=yd,y0=y0)
         if (type==1){
             par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-            if (iratio('Pb206Pb208')[2]>0) par['a0'] <- -log(y0)
+            if (free & iratio('Pb206Pb208')[2]>0){
+                par['a0'] <- -log(y0)
+            }
         } else if (type==2){
             par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
-            if (iratio('Pb207Pb208')[2]>0) par['b0'] <- -log(y0)
+            if (free & iratio('Pb207Pb208')[2]>0){
+                par['b0'] <- -log(y0)
+            }
         } else if (type==3){
             par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-            if (iratio('Pb206Pb208')[2]>0) par['a0'] <- log(y0)
+            if (free & iratio('Pb206Pb208')[2]>0){
+                par['a0'] <- log(y0)
+            }
         } else if (type==4){
             par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-            if (iratio('Pb207Pb208')[2]>0) par['b0'] <- log(y0)
+            if (free & iratio('Pb207Pb208')[2]>0){
+                par['b0'] <- log(y0)
+            }
         } else { # joint, 0 or 1
             par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-            if (iratio('Pb206Pb208')[2]>0){
+            if (free & iratio('Pb206Pb208')[2]>0){
                 par['a0'] <- -log(iratio('Pb206Pb208')[1])
             }
-            if (iratio('Pb207Pb208')[2]>0){
+            if (free & iratio('Pb207Pb208')[2]>0){
                 par['b0'] <- -log(iratio('Pb207Pb208')[1])
             }
         }
-    } else if (anchor[1]==2 && length(anchor)>1){
+    } else if (anchor[1]==2 & length(anchor)>1){
         tt <- anchor[2]
-        if (length(anchor)>2 && anchor[3]>0) par['t'] <- log(tt)
+        if (free & length(anchor)>2 & anchor[3]>0){
+            par['t'] <- log(tt)
+        }
         if (type==2){ # 0807 vs 35/07
             yd <- data2york(x,option=7,tt=tt)
             x0 <- age_to_U235Pb207_ratio(tt)[1]

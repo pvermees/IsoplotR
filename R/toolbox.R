@@ -460,9 +460,8 @@ log_sum_exp <- function(u,v){
 contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
     fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
                         upper=upper,hessian=hessian,control=control,...)
-    failed <- fit$convergence>0 ||
-        (hessian && !invertible(fit$hessian)) ||
-        any((fit$par-lower)==0) || any((upper-fit$par)==0)
+    failed <- fit$convergence>0 | (hessian & !invertible(fit$hessian)) |
+        any((fit$par-lower)==0) | any((upper-fit$par)==0)
     if (failed){
         NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=control,...)
         if (NMfit$convergence>0){
@@ -474,7 +473,7 @@ contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
             fit <- NMfit
         }
     }
-    if (hessian && !invertible(fit$hessian)){
+    if (hessian & !invertible(fit$hessian)){
         warning('Ill-conditioned Hessian matrix')
     }
     fit
