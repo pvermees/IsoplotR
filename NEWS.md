@@ -1,6 +1,6 @@
 # IsoplotR 6.0
 
-Addition of anchored regression to all isochron functions, as well as model-3 fits whereby overdispersion can be attributed to either diachronous isotopic closure or the composition of the inherited component. Also adds an option to anchor U-Pb isochrons to the Stacey-Kramers mantle evolution model.
+Addition of anchored regression to all isochron functions, as well as model-3 fits whereby overdispersion can be attributed to either diachronous isotopic closure or the composition of the inherited component. Also adds an option to anchor U-Pb isochrons to the Stacey-Kramers mantle evolution model. Adds four new U-Pb input formats. Finally, flips the Pb208/Pb207- and Pb208/Pb206- ratios around in the settings, which is a breaking change.
 
 # IsoplotR 5.6
 

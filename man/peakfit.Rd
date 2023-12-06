@@ -21,7 +21,16 @@ peakfit(x, ...)
 
 \method{peakfit}{default}(x, k = "auto", sigdig = 2, oerr = 3, log = TRUE, np = 3, ...)
 
-\method{peakfit}{fissiontracks}(x, k = 1, exterr = TRUE, sigdig = 2, log = TRUE, oerr = 3, np = 3, ...)
+\method{peakfit}{fissiontracks}(
+  x,
+  k = 1,
+  exterr = FALSE,
+  sigdig = 2,
+  log = TRUE,
+  oerr = 3,
+  np = 3,
+  ...
+)
 
 \method{peakfit}{UPb}(
   x,
@@ -30,7 +39,7 @@ peakfit(x, ...)
   cutoff.76 = 1100,
   cutoff.disc = discfilter(),
   common.Pb = 0,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   oerr = 3,
@@ -41,7 +50,7 @@ peakfit(x, ...)
 \method{peakfit}{PbPb}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   common.Pb = 0,
@@ -53,7 +62,7 @@ peakfit(x, ...)
 \method{peakfit}{ArAr}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
@@ -65,7 +74,7 @@ peakfit(x, ...)
 \method{peakfit}{ThPb}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
@@ -77,7 +86,7 @@ peakfit(x, ...)
 \method{peakfit}{KCa}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   i2i = FALSE,
@@ -89,7 +98,7 @@ peakfit(x, ...)
 \method{peakfit}{ReOs}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
@@ -101,7 +110,7 @@ peakfit(x, ...)
 \method{peakfit}{SmNd}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
@@ -113,7 +122,7 @@ peakfit(x, ...)
 \method{peakfit}{RbSr}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
@@ -125,7 +134,7 @@ peakfit(x, ...)
 \method{peakfit}{LuHf}(
   x,
   k = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   log = TRUE,
   i2i = TRUE,
@@ -223,8 +232,8 @@ class \code{\link{discfilter}}.}
 \code{PbPb} or \code{x} has class \code{UPb} and
 \code{3<x$format<7}); or
 
-\code{settings('iratio','Pb208Pb206')} and
-\code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+\code{settings('iratio','Pb206Pb208')} and
+\code{settings('iratio','Pb207Pb208')} (if \code{x} has class
 \code{UPb} and \code{x$format=7} or \code{8}).
 
 \code{2}: use the isochron intercept as the initial Pb-composition
@@ -325,7 +334,7 @@ fission track samples.
 attach(examples)
 peakfit(FT1,k=2)
 
-peakfit(LudwigMixture,k='min')
+peakfit(LudwigMixture$x,k='min')
 }
 \references{
 Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for

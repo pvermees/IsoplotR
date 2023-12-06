@@ -38,7 +38,7 @@ york2ludwigTW <- function(x,anchor=0,buffer=2,free=TRUE){
         }
     } else if (anchor[1]==2 & length(anchor)>1){
         tt <- anchor[2]
-        if (free & length(anchor)>2 | anchor[3]>0){
+        if (free & (length(anchor)>2 | anchor[3]>0)){
             par['t'] <- log(tt)
             lower['t'] <- par['t'] - buffer
             upper['t'] <- par['t'] + buffer

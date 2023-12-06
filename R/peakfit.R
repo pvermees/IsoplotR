@@ -100,7 +100,7 @@
 #' attach(examples)
 #' peakfit(FT1,k=2)
 #'
-#' peakfit(LudwigMixture,k='min')
+#' peakfit(LudwigMixture$x,k='min')
 #' @references
 #' Galbraith, R.F. and Laslett, G.M., 1993. Statistical models for
 #' mixed fission track ages. Nuclear Tracks and Radiation

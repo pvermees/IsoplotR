@@ -84,7 +84,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   oerr = 3,
   hide = NULL,
   omit = NULL,
@@ -111,7 +111,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   common.Pb = 0,
   oerr = 3,
   hide = NULL,
@@ -136,7 +136,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   common.Pb = 2,
   oerr = 3,
   hide = NULL,
@@ -161,7 +161,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = FALSE,
   oerr = 3,
   hide = NULL,
@@ -186,7 +186,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = FALSE,
   oerr = 3,
   hide = NULL,
@@ -211,7 +211,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
   hide = NULL,
@@ -259,7 +259,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
   hide = NULL,
@@ -284,7 +284,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
   hide = NULL,
@@ -309,7 +309,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
   hide = NULL,
@@ -334,7 +334,7 @@ radialplot(x, ...)
   markers = NULL,
   k = 0,
   np = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
   hide = NULL,
@@ -501,8 +501,8 @@ class \code{\link{discfilter}}.}
 \code{PbPb} or \code{x} has class \code{UPb} and
 \code{3<x$format<7}); or
 
-\code{settings('iratio','Pb208Pb206')} and
-\code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+\code{settings('iratio','Pb206Pb208')} and
+\code{settings('iratio','Pb207Pb208')} (if \code{x} has class
 \code{UPb} and \code{x$format=7} or \code{8}).
 
 \code{2}: remove the common Pb by projecting the data along an

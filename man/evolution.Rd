@@ -19,7 +19,7 @@ evolution(
   line.col = "darksalmon",
   isochron = FALSE,
   model = 1,
-  exterr = TRUE,
+  exterr = FALSE,
   sigdig = 2,
   hide = NULL,
   omit = NULL,

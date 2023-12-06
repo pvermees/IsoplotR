@@ -270,7 +270,7 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
                       show.numbers=FALSE,levels=NA,clabel="",
                       ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',concordia.col='darksalmon',
-                      exterr=FALSE,show.age=0,oerr=3,dispunits=' Ma',
+                      exterr=FALSE,show.age=0,oerr=3,
                       sigdig=2,common.Pb=0,ticks=5,anchor=0,
                       hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     concordia_helper(x=x,tlim=tlim,type=type,show.numbers=show.numbers,
@@ -281,7 +281,7 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
                      show.age=show.age,oerr=oerr,sigdig=sigdig,
                      common.Pb=common.Pb,ticks=ticks,anchor=anchor,
                      hide=hide,omit=omit,omit.fill=omit.fill,
-                     omit.stroke=omit.stroke,dispunits=dispunits,...)
+                     omit.stroke=omit.stroke,...)
 }
 
 # the only difference between concordia and concordia_helper
@@ -293,7 +293,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                              exterr=FALSE,show.age=0,oerr=3,y0option=1,
                              sigdig=2,common.Pb=0,ticks=5,anchor=0,
                              hide=NULL,omit=NULL,omit.fill=NA,
-                             omit.stroke='grey',dispunits=' Ma',...){
+                             omit.stroke='grey',...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -318,6 +318,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
     lims <- prepare.concordia.line(x=X2plot,tlim=tlim,type=type,...)
     if (show.age>1){
         discordia.line(fit,wetherill=(type==1),d=X2plot$d,oerr=oerr)
+        dispunits <- getDispUnits.UPb(x=x,joint=TRUE,anchor=anchor)
         graphics::title(discordia.title(fit,wetherill=(type==1),
                                         y0option=y0option,sigdig=sigdig,
                                         oerr=oerr,dispunits=dispunits,...))

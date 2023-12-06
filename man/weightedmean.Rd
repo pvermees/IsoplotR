@@ -76,7 +76,7 @@ weightedmean(x, ...)
   cutoff.76 = 1100,
   oerr = 3,
   cutoff.disc = discfilter(),
-  exterr = TRUE,
+  exterr = FALSE,
   ranked = FALSE,
   common.Pb = 0,
   hide = NULL,
@@ -98,7 +98,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   common.Pb = 2,
   ranked = FALSE,
   hide = NULL,
@@ -141,7 +141,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   ranked = FALSE,
   i2i = FALSE,
   hide = NULL,
@@ -163,7 +163,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   ranked = FALSE,
   i2i = FALSE,
   hide = NULL,
@@ -185,7 +185,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   ranked = FALSE,
   i2i = TRUE,
   hide = NULL,
@@ -207,7 +207,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   ranked = FALSE,
   i2i = TRUE,
   hide = NULL,
@@ -229,7 +229,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   ranked = FALSE,
   i2i = TRUE,
   hide = NULL,
@@ -251,7 +251,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = TRUE,
   ranked = FALSE,
   hide = NULL,
@@ -273,7 +273,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   i2i = TRUE,
   ranked = FALSE,
   hide = NULL,
@@ -315,7 +315,7 @@ weightedmean(x, ...)
   outlier.col = "#00FFFF80",
   sigdig = 2,
   oerr = 3,
-  exterr = TRUE,
+  exterr = FALSE,
   ranked = FALSE,
   hide = NULL,
   omit = NULL,
@@ -446,8 +446,8 @@ class \code{discfilter}}
 \code{PbPb} or \code{x} has class \code{UPb} and
 \code{3<x$format<7}); or
 
-\code{settings('iratio','Pb208Pb206')} and
-\code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+\code{settings('iratio','Pb206Pb208')} and
+\code{settings('iratio','Pb207Pb208')} (if \code{x} has class
 \code{UPb} and \code{x$format=7} or \code{8}).
 
 \code{2}: remove the common Pb by projecting the data along an
