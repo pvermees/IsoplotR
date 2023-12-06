@@ -4,7 +4,7 @@
 \alias{set.zeta}
 \title{Calculate the zeta calibration coefficient for fission track dating}
 \usage{
-set.zeta(x, tst, exterr = TRUE, oerr = 1, sigdig = NA, update = TRUE)
+set.zeta(x, tst, exterr = FALSE, oerr = 1, sigdig = NA, update = TRUE)
 }
 \arguments{
 \item{x}{an object of class \code{fissiontracks}}

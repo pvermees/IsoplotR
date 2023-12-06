@@ -57,7 +57,7 @@ agespectrum(x, ...)
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80",
   sigdig = 2,
-  exterr = TRUE,
+  exterr = FALSE,
   line.col = "red",
   lwd = 2,
   i2i = FALSE,

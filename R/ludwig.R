@@ -677,7 +677,7 @@ getEw1 <- function(w=0,x,McL=mclean(),type,a0=NA,b0=NA,c0){
         } else if (type==3){
             diag(J[i2,i1]) <- -c0*ThU/a0^2   # dLdt
         } else if (type==4){
-            diag(J[i2,i1]) <- -c0*ThU*U/b0^2 # dLdt
+            diag(J[i2,i1]) <- -c0*ThU*U85/b0^2 # dLdt
         } else {
             stop('invalid isochron type')
         }

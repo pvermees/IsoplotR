@@ -83,7 +83,7 @@ age(x, ...)
 
 \method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NULL, oerr = 1, sigdig = NA, ...)
 
-\method{age}{fissiontracks}(x, central = FALSE, i = NULL, oerr = 1, sigdig = NA, exterr = TRUE, ...)
+\method{age}{fissiontracks}(x, central = FALSE, i = NULL, oerr = 1, sigdig = NA, exterr = FALSE, ...)
 
 \method{age}{ThU}(
   x,
@@ -299,8 +299,8 @@ adding a geological (co)variance term.}
 \code{PbPb} or \code{x} has class \code{UPb} and
 \code{3<x$format<7}); or
 
-\code{settings('iratio','Pb208Pb206')} and
-\code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+\code{settings('iratio','Pb206Pb208')} and
+\code{settings('iratio','Pb207Pb208')} (if \code{x} has class
 \code{UPb} and \code{x$format=7} or \code{8}).
 
 \code{2}: use the isochron intercept as the initial Pb-composition

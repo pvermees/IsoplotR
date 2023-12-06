@@ -8,8 +8,8 @@ titterington(x)
 }
 \arguments{
 \item{x}{an \code{[nx9]} matrix with the following columns:
-\code{X, sX,} \code{Y, sY,} \code{Z, sZ}, \code{rhoXY,}
-\code{rhoXZ,} \code{rhoYZ}.}
+\code{X, sX,} \code{Y, sY,} \code{Z, sZ}, \code{rXY,}
+\code{rXZ,} \code{rYZ}.}
 }
 \value{
 A four-element list of vectors containing:

@@ -671,8 +671,6 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          show.ellipses=1*(model!=2),anchor=0,
                          hide=NULL,omit=NULL,omit.fill=NA,
                          omit.stroke='grey',y0option=1,...){
-    if (anchor[1]==1 & (x$format%ni%(4:8) | !joint)) dispunits <- ''
-    else dispunits <- ' Ma'
     if (x$format<4){
         if (plot){
             out <- concordia_helper(x,type=2,show.age=model+1,oerr=oerr,
@@ -682,13 +680,12 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                                     ellipse.stroke=ellipse.stroke,exterr=exterr,
                                     anchor=anchor,hide=hide,omit=omit,
                                     y0option=y0option,omit.fill=omit.fill,
-                                    omit.stroke=omit.stroke,
-                                    dispunits=dispunits,...)
+                                    omit.stroke=omit.stroke,...)
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
         }
     } else if (x$format<13){
-        type <- checkIsochronType(x,type)
+        type <- checkIsochronType(x,type=type)
         ns <- length(x)
         calcit <- (1:ns)%ni%c(hide,omit)
         x2calc <- subset(x,subset=calcit)
@@ -787,6 +784,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
+            dispunits <- getDispUnits.UPb(x=x,joint=joint,anchor=anchor)
             graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
                                           y0option=y0option,dispunits=dispunits),
                             xlab=x.lab,ylab=y.lab)
@@ -935,10 +933,8 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     }
     if (model==3 & (wtype==2 | anchor[1]==2)){
         out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
-        dispunits <- ' Ma'
-    } else {
-        dispunits <- ''   
     }
+    dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
@@ -1235,7 +1231,6 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                 displabel <- quote('('^230*'Th/'^232*'Th)-dispersion = ')
             }
         }
-        dispunits <- ''
     } else if (x$format %in% c(3,4)){
         out <- isochron_ThU_2D(x,type=type,model=model,wtype=wtype,
                                exterr=exterr,hide=hide,omit=omit)
@@ -1463,10 +1458,8 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
         dDPdt <- lambda(nuclide)[1]*(1+DP[1])
         dDPdb <- ifelse(inverse,1/out$a[1],1)
         out$disp <- out$disp*dDPdb/dDPdt
-        dispunits <- ' Ma'
-    } else {
-        dispunits <- ''
     }
+    dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse,i0=i0)
     out$y0label <- substitute(a*b*c,list(a='(',b=lab$y,c=quote(')'[0]*'=')))
     if (plot){
@@ -1646,4 +1639,11 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     for (i in nl:1){
         mymtext(content[[i]],line=nl-i,...)
     }
+}
+
+getDispUnits.UPb <- function(x,joint,anchor){
+    ifelse(anchor[1]==1 & (x$format%ni%(4:8) | !joint),'',' Ma')
+}
+getDispUnits <- function(model,wtype,anchor){
+    ifelse(model==3 & (wtype==2 | anchor[1]==2),'', ' Ma')
 }
