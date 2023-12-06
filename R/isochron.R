@@ -671,6 +671,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          show.ellipses=1*(model!=2),anchor=0,
                          hide=NULL,omit=NULL,omit.fill=NA,
                          omit.stroke='grey',y0option=1,...){
+    if (anchor[1]==1 & (x$format%ni%(4:8) | !joint)) dispunits <- ''
+    else dispunits <- ' Ma'
     if (x$format<4){
         if (plot){
             out <- concordia_helper(x,type=2,show.age=model+1,oerr=oerr,
@@ -680,7 +682,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                                     ellipse.stroke=ellipse.stroke,exterr=exterr,
                                     anchor=anchor,hide=hide,omit=omit,
                                     y0option=y0option,omit.fill=omit.fill,
-                                    omit.stroke=omit.stroke,...)
+                                    omit.stroke=omit.stroke,
+                                    dispunits=dispunits,...)
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
         }
@@ -784,8 +787,6 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
-            if (anchor[1]==1 & (x$format%ni%(4:8) | !joint)) dispunits <- ''
-            else dispunits <- ' Ma'
             graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
                                           y0option=y0option,dispunits=dispunits),
                             xlab=x.lab,ylab=y.lab)
