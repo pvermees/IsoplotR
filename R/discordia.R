@@ -253,7 +253,8 @@ tw3d2d <- function(fit){
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
-discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
+discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,
+                            y0option=1,dispunits=' Ma',...){
     if (is.null(fit$posterior) || 't'%ni%names(fit$posterior)){
         line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='lower intercept =')
@@ -303,7 +304,7 @@ discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,y0option=1,...){
         line4 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
     } else if (fit$model==3){
         line4 <- disptit(w=fit$disp['w'],sw=fit$disp['s[w]'],
-                         units=' Ma',sigdig=sigdig,oerr=oerr)
+                         units=dispunits,sigdig=sigdig,oerr=oerr)
     }
     extrarow <- fit$format>3 & !wetherill
     if (fit$model==1 & extrarow){

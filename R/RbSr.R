@@ -73,6 +73,6 @@ get.RbSr.age <- function(Rb87Sr86,sRb87Sr86,exterr=FALSE){
     get.PD.age(Rb87Sr86,sRb87Sr86,'Rb87',exterr=exterr)
 }
 
-RbSr.age <- function(x,exterr=FALSE,i=NULL,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
-    PD.age(x,'Rb87',exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
+RbSr.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
+    PD.age(x,'Rb87',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
 }

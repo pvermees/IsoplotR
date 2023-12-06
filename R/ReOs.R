@@ -90,6 +90,6 @@ get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=FALSE){
     get.PD.age(Os187Re187,sOs187Re187,'Re187',exterr=exterr)
 }
 
-ReOs.age <- function(x,exterr=FALSE,i=NULL,sigdig=NA,i2i=TRUE,projerr=FALSE,...){
-    PD.age(x,'Re187',exterr=exterr,i=i,sigdig=sigdig,i2i=i2i,projerr=projerr,...)
+ReOs.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
+    PD.age(x,'Re187',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
 }

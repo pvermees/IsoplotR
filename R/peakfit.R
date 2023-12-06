@@ -183,8 +183,8 @@ peakfit.fissiontracks <- function(x,k=1,exterr=FALSE,sigdig=2,
 #' \code{PbPb} or \code{x} has class \code{UPb} and
 #' \code{3<x$format<7}); or
 #'
-#' \code{settings('iratio','Pb208Pb206')} and
-#' \code{settings('iratio','Pb208Pb207')} (if \code{x} has class
+#' \code{settings('iratio','Pb206Pb208')} and
+#' \code{settings('iratio','Pb207Pb208')} (if \code{x} has class
 #' \code{UPb} and \code{x$format=7} or \code{8}).
 #'
 #' \code{2}: use the isochron intercept as the initial Pb-composition
@@ -592,20 +592,20 @@ min_age_model <- function(zs,np=3){
         out$peaks <- matrix(0,2,1)
         rownames(out$peaks) <- c('t','s[t]')
         out$peaks['t',] <- par[1]
-        out$peaks['s[t]',] <- if (E[1,1]<0) NA else sqrt(E[1,1])
+        out$peaks['s[t]',] <- ifelse(E[1,1]<0,NA,sqrt(E[1,1]))
         out$props <- matrix(0,2,1)
         rownames(out$props) <- c('p','s[p]')
         out$props['p',] <- par[2]
-        out$props['s[p]',] <- if (E[2,2]<0) NA else sqrt(E[2,2])
+        out$props['s[p]',] <- ifelse(E[2,2]<0,NA,sqrt(E[2,2]))
         out$disp <- matrix(0,2,1)
         rownames(out$disp) <- c('d','s[d]')
         out$disp['d',] <- par[3]
-        out$disp['s[d]',] <- if (E[3,3]<0) NA else sqrt(E[3,3])
+        out$disp['s[d]',] <- ifelse(E[3,3]<0,NA,sqrt(E[3,3]))
         if (np==4){
             out$mu <- matrix(0,2,1)
             rownames(out$mu) <- c('t','s[t]')
             out$mu['t',] <- par[4]
-            out$mu['s[t]',] <- if (E[4,4]<0) NA else sqrt(E[4,4])
+            out$mu['s[t]',] <- ifelse(E[4,4]<0,NA,sqrt(E[4,4]))
         }
     }
     out

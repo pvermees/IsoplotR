@@ -58,7 +58,7 @@ PD.age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
         DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
     }
     out <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
-                     nuclide,exterr=exterr,bratio=bratio)
+                     nuclide,exterr=exterr,bratio=bratio,...)
     if (!is.null(i)) out <- out[i,,drop=FALSE]
     colnames(out) <- c('t','s[t]')
     out

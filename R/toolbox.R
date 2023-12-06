@@ -28,9 +28,8 @@ roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
         if (is.na(sigdig) | min.err==0) {
             out <- dat
         } else {
-            nsmall <- min(10,max(0,-(trunc(log10(min.err))-sigdig)))
-            out <- format(dat,digits=sigdig,nsmall=nsmall,
-                          trim=TRUE,scientific=FALSE)
+            scientific <- abs(log10(min.err))>10
+            out <- format(dat,digits=sigdig,trim=TRUE,scientific=scientific)
         }
     }
     if (!text){
@@ -68,8 +67,7 @@ cor2cov2 <- function(sX,sY,rXY){
     covmat <- matrix(0,2,2)
     covmat[1,1] <- sX^2
     covmat[2,2] <- sY^2
-    covmat[1,2] <- rXY*sX*sY
-    covmat[2,1] <- covmat[1,2]
+    covmat[1,2] <- covmat[2,1] <- ifelse(rXY==0,0,rXY*sX*sY)
     covmat
 }
 cor2cov3 <- function(sX,sY,sZ,rXY,rXZ,rYZ){
@@ -77,12 +75,9 @@ cor2cov3 <- function(sX,sY,sZ,rXY,rXZ,rYZ){
     covmat[1,1] <- sX^2
     covmat[2,2] <- sY^2
     covmat[3,3] <- sZ^2
-    covmat[1,2] <- rXY*sX*sY
-    covmat[1,3] <- rXZ*sX*sZ
-    covmat[2,3] <- rYZ*sY*sZ
-    covmat[2,1] <- covmat[1,2]
-    covmat[3,1] <- covmat[1,3]
-    covmat[3,2] <- covmat[2,3]
+    covmat[1,2] <- covmat[2,1] <- ifelse(rXY==0,0,rXY*sX*sY)
+    covmat[1,3] <- covmat[3,1] <- ifelse(rXY==0,0,rXZ*sX*sZ)
+    covmat[2,3] <- covmat[3,2] <- ifelse(rYZ==0,0,rYZ*sY*sZ)
     covmat
 }
 cor2cov4 <- function(sW,sX,sY,sZ,rWX,rWY,rWZ,rXY,rXZ,rYZ){
@@ -91,18 +86,12 @@ cor2cov4 <- function(sW,sX,sY,sZ,rWX,rWY,rWZ,rXY,rXZ,rYZ){
     covmat[2,2] <- sX^2
     covmat[3,3] <- sY^2
     covmat[4,4] <- sZ^2
-    covmat[1,2] <- rWX*sW*sX
-    covmat[1,3] <- rWY*sW*sY
-    covmat[1,4] <- rWZ*sW*sZ
-    covmat[2,3] <- rXY*sX*sY
-    covmat[2,4] <- rXZ*sX*sZ
-    covmat[3,4] <- rYZ*sY*sZ
-    covmat[2,1] <- covmat[1,2]
-    covmat[3,1] <- covmat[1,3]
-    covmat[4,1] <- covmat[1,4]
-    covmat[3,2] <- covmat[2,3]
-    covmat[4,2] <- covmat[2,4]
-    covmat[4,3] <- covmat[3,4]
+    covmat[1,2] <- covmat[2,1] <- rWX*sW*sX
+    covmat[1,3] <- covmat[3,1] <- rWY*sW*sY
+    covmat[1,4] <- covmat[4,1] <- rWZ*sW*sZ
+    covmat[2,3] <- covmat[3,2] <- rXY*sX*sY
+    covmat[2,4] <- covmat[4,2] <- rXZ*sX*sZ
+    covmat[3,4] <- covmat[4,3] <- rYZ*sY*sZ
     covmat
 }
 
@@ -120,7 +109,7 @@ get.cor.mult <- function(A,err.A,B,err.B,AB,err.AB){
 }
 
 # Implements Equations 6 & 7 of Ludwig (1998)
-# x is an [n x 5] matrix with columns X, sX, Y, sY, rhoXY
+# x is an [n x 5] matrix with columns X, sX, Y, sY, rXY
 wtdmean2D <- function(x){
     ns <- nrow(x)
     X <- x[,1]
@@ -217,12 +206,12 @@ errorprop <- function(J11,J12,J21,J22,E11,E22,E12){
     out[,'cov'] <- J11*J21*E11 + J12*J21*E12 + J11*J22*E12 + J12*J22*E22
     out
 }
-# returns standard error
 errorprop1x2 <- function(J1,J2,E11,E22,E12){
     fixroundingerr(E11*J1^2 + 2*E12*J1*J2 + E22*J2^2)
 }
 errorprop1x3 <- function(J1,J2,J3,E11,E22,E33,E12=0,E13=0,E23=0){
-    fixroundingerr(E11*J1^2 + E22*J2^2 + E33*J3^2 + 2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23)
+    fixroundingerr(E11*J1^2 + E22*J2^2 + E33*J3^2 +
+                   2*J1*J2*E12 + 2*J1*J3*E13 + 2*J2*J3*E23)
 }
 
 quotient <- function(X,sX,Y,sY,rXY=NULL,sXY=NULL){
@@ -471,9 +460,8 @@ log_sum_exp <- function(u,v){
 contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
     fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
                         upper=upper,hessian=hessian,control=control,...)
-    failed <- fit$convergence>0 ||
-        (hessian && !invertible(fit$hessian)) ||
-        any((fit$par-lower)==0) || any((upper-fit$par)==0)
+    failed <- fit$convergence>0 | (hessian & !invertible(fit$hessian)) |
+        any((fit$par-lower)==0) | any((upper-fit$par)==0)
     if (failed){
         NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=control,...)
         if (NMfit$convergence>0){
@@ -485,7 +473,7 @@ contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
             fit <- NMfit
         }
     }
-    if (hessian && !invertible(fit$hessian)){
+    if (hessian & !invertible(fit$hessian)){
         warning('Ill-conditioned Hessian matrix')
     }
     fit

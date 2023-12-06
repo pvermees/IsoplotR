@@ -155,14 +155,14 @@ Pb0corr <- function(x,option=3,omit4c=NULL){
     } else if (x$format==4){
         out$x[,c('Pb207U235','errPb207U235',
                  'Pb206U238','errPb206U238')] <- x.corr[,1:4,drop=FALSE]
-        out$x[,'rhoXY'] <- x.corr[,5]
-        out$x[,c('Pb204U238','errPb204U238','rhoXZ','rhoYZ')] <- 0
+        out$x[,'rXY'] <- x.corr[,5]
+        out$x[,c('Pb204U238','errPb204U238','rXZ','rYZ')] <- 0
     } else if (x$format==5){
         tw <- w2tw(x.corr,format=1)
         out$x[,c('U238Pb206','errU238Pb206',
                  'Pb207Pb206','errPb207Pb206')] <- tw[,1:4,drop=FALSE]
-        out$x[,'rhoXY'] <- tw[,5]
-        out$x[,c('Pb204Pb206','errPb204Pb206','rhoXZ','rhoYZ')] <- 0
+        out$x[,'rXY'] <- tw[,5]
+        out$x[,c('Pb204Pb206','errPb204Pb206','rXZ','rYZ')] <- 0
     } else if (x$format==6){
         tw <- w2tw(x.corr,format=1)
         out$x[,c('Pb207U235','errPb207U235',
@@ -194,10 +194,10 @@ correct.common.Pb.without.204 <- function(x,i,c76,tt=NULL){
         E <- tw$cov[cnames,cnames]
         sr86 <- sqrt(E[1,1])
         sr76 <- sqrt(E[2,2])
-        rho <- stats::cov2cor(E)[1,2]
-        out <- c(r86,sr86,r76,sr76,rho)
+        rXY <- stats::cov2cor(E)[1,2]
+        out <- c(r86,sr86,r76,sr76,rXY)
         names(out) <- c('U238Pb206','errU238Pb206',
-                        'Pb207Pb206','errPb207Pb206','rhoXY')
+                        'Pb207Pb206','errPb207Pb206','rXY')
     } else {
         cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d[i])
         r86 <- cctw$x['U238Pb206']
@@ -243,7 +243,7 @@ correct.common.Pb.with.204 <- function(x,i,c46,c47,tt=NULL,cc=FALSE){
         colnames(out$cov) <- cnames
     } else {
         out <- rep(NA,5)
-        names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rhoXY')
+        names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238','rXY')
         out[1] <- 1/p3507
         out[3] <- 1/p3806
         out[c(2,4)] <- sqrt(diag(E))
@@ -287,7 +287,7 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806,c0807,cc=FALSE){
         out <- rep(NA,14)
         names(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                         'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
-                        'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
+                        'rXY','rXZ','rXW','rYZ','rYW','rZW')
         out[c(1,3,5,7)] <- c(1/p[1:3],p[4])
         cormat <- matrix(0,4,4)
         pos <- which(diag(E)>0)
@@ -305,7 +305,7 @@ common.Pb.stacey.kramers <- function(x){
     if (x$format %in% c(1,2,3)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('U238Pb206','errU238Pb206',
-                           'Pb207Pb206','errPb207Pb206','rhoXY')
+                           'Pb207Pb206','errPb207Pb206','rXY')
         for (i in 1:ns){
             maxt <- get.Pb207Pb206.age(x,i=i)[1]
             tint <- stats::optimise(SS.SK.without.204,
@@ -317,7 +317,7 @@ common.Pb.stacey.kramers <- function(x){
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
-                           'Pb206U238','errPb206U238','rhoXY')
+                           'Pb206U238','errPb206U238','rXY')
         for (i in 1:ns){
             maxt <- get.Pb207Pb206.age(x,i=i)[1]
             tint <- stats::optimise(SS.SK.with.204,interval=c(0,maxt),x=x,i=i)$minimum
@@ -330,7 +330,7 @@ common.Pb.stacey.kramers <- function(x){
         out <- matrix(0,ns,14)
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
-                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
+                           'rXY','rXZ','rXW','rYZ','rYW','rZW')
         for (i in 1:ns){
             maxt <- get.Pb208Th232.age(x,i=i)[1]
             tint <- stats::optimise(SS.SK.with.208,interval=c(0,maxt),x=x,i=i)$minimum
@@ -353,7 +353,7 @@ common.Pb.isochron <- function(x,omit=NULL){
     if (x$format %in% c(1,2,3)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('U238Pb206','errU238Pb206','Pb207Pb206',
-                           'errPb207Pb206','rhoXY')
+                           'errPb207Pb206','rXY')
         c76 <- fit$par['a0']
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76,tt=tt)
@@ -361,7 +361,7 @@ common.Pb.isochron <- function(x,omit=NULL){
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
-                           'Pb206U238','errPb206U238','rhoXY')
+                           'Pb206U238','errPb206U238','rXY')
         c46 <- 1/fit$par['a0']
         c47 <- 1/fit$par['b0']
         for (i in 1:ns){
@@ -371,7 +371,7 @@ common.Pb.isochron <- function(x,omit=NULL){
         out <- matrix(0,ns,14)
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
-                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
+                           'rXY','rXZ','rXW','rYZ','rYW','rZW')
         c0806 <- 1/fit$par['a0']
         c0807 <- 1/fit$par['b0']
         for (i in 1:ns){
@@ -386,7 +386,7 @@ common.Pb.nominal <- function(x){
     if (x$format %in% c(1,2,3)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('U238Pb206','errU238Pb206',
-                           'Pb207Pb206','errPb207Pb206','rhoXY')
+                           'Pb207Pb206','errPb207Pb206','rXY')
         c76 <- settings('iratio','Pb207Pb206')[1]
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76)
@@ -394,7 +394,7 @@ common.Pb.nominal <- function(x){
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
-                           'Pb206U238','errPb206U238','rhoXY')
+                           'Pb206U238','errPb206U238','rXY')
         c46 <- 1/settings('iratio','Pb206Pb204')[1]
         c47 <- 1/settings('iratio','Pb207Pb204')[1]
         for (i in 1:ns){
@@ -404,9 +404,9 @@ common.Pb.nominal <- function(x){
         out <- matrix(0,ns,14)
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
-                           'rhoXY','rhoXZ','rhoXW','rhoYZ','rhoYW','rhoZW')
-        c0806 <- settings('iratio','Pb208Pb206')[1]
-        c0807 <- settings('iratio','Pb208Pb207')[1]
+                           'rXY','rXZ','rXW','rYZ','rYW','rZW')
+        c0806 <- 1/settings('iratio','Pb206Pb208')[1]
+        c0807 <- 1/settings('iratio','Pb207Pb208')[1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.with.208,interval=c(0,5000),
                                     c0806=c0806,c0807=c0807,x=x,i=i)$minimum
