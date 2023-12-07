@@ -345,8 +345,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
 fixedDispersion <- function(model,format,anchor,type){
     case1 <- model!=3
     case2 <- model==3 & anchor[1]==2
-    case3 <- model==3 & format%in%c(1:3,9:12) & anchor[1]>0
-    case4 <- model==3 & format%in%(4:8) & anchor[1]>0 & type%ni%c('joint',0)
+    case3 <- model==3 & format%in%c(1:3,9:12) & anchor[1]%in%c(1,2)
+    case4 <- model==3 & format%in%(4:8) & anchor[1]%in%c(1,2) & type%ni%c('joint',0)
     case1 | case2 | case3 | case4
 }
 
