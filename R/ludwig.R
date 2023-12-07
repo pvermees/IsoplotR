@@ -274,14 +274,14 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
     if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,free=FALSE)
+        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,free=(model!=3))
         par <- init$par
         if (anchor[1]==2 & length(anchor)>1){
             tt <- anchor[2]
         } else {
             tt <- exp(par['t'])
         }
-    } else { # model-3
+    } else {
         init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
         fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
                               upper=init$upper,x=x,anchor=anchor,type=type)
@@ -345,8 +345,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
 fixedDispersion <- function(model,format,anchor,type){
     case1 <- model!=3
     case2 <- model==3 & anchor[1]==2
-    case3 <- model==3 & format%in%c(1:3,9:12) & anchor[1]>0
-    case4 <- model==3 & format%in%(4:8) & anchor[1]>0 & type%ni%c('joint',0)
+    case3 <- model==3 & format%in%c(1:3,9:12) & anchor[1]%in%c(1,2)
+    case4 <- model==3 & format%in%(4:8) & anchor[1]%in%c(1,2) & type%ni%c('joint',0)
     case1 | case2 | case3 | case4
 }
 
@@ -446,35 +446,30 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         w <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
     }
     if (x$format<4){
-        if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-            # do nothing
-        } else if (anchor[1]==1 & iratio('Pb207Pb206')[2]>0){
+        if ('a0'%in%pnames & anchor[1]==1 & iratio('Pb207Pb206')[2]>0){
             LL <- LL - stats::dnorm(x=a0,
                                     mean=iratio('Pb207Pb206')[1],
                                     sd=iratio('Pb207Pb206')[2],
                                     log=TRUE)
-        } else if (anchor[1]==2 &
-                   (length(anchor)>2 & anchor[3]>0)){
+        } else if ('t'%in%pnames & anchor[1]==2 & (length(anchor)>2 & anchor[3]>0)){
             LL <- LL - stats::dnorm(x=tt,mean=anchor[2],sd=anchor[3],log=TRUE)
         }
         ta0b0w <- c('t'=unname(tt),'a0'=unname(a0),'w'=w)
     } else if (x$format%in%c(4,5,6,9,10)){
-        if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-            # do nothing
-        } else if (anchor[1]==1){
-            if (type%in%c('joint',0,1) & iratio('Pb206Pb204')[2]>0){
+        if (anchor[1]==1){
+            if ('a0'%in%pnames & type%in%c('joint',0,1) & iratio('Pb206Pb204')[2]>0){
                 LL <- LL - stats::dnorm(x=a0,
                                         mean=iratio('Pb206Pb204')[1],
                                         sd=iratio('Pb206Pb204')[2],
                                         log=TRUE)
             }
-            if (type%in%c('joint',0,2) & iratio('Pb207Pb204')[2]>0){
+            if ('b0'%in%pnames & type%in%c('joint',0,2) & iratio('Pb207Pb204')[2]>0){
                 LL <- LL - stats::dnorm(x=b0,
                                         mean=iratio('Pb207Pb204')[1],
                                         sd=iratio('Pb207Pb204')[2],
                                         log=TRUE)
             }
-        } else if (anchor[1]==2 & (length(anchor)>2 & anchor[3]>0)){
+        } else if ('t'%in%pnames & anchor[1]==2 & (length(anchor)>2 & anchor[3]>0)){
             LL <- LL - stats::dnorm(x=tt,mean=anchor[2],sd=anchor[3],log=TRUE)
         }
         if (type%in%c('joint',0)){
@@ -485,22 +480,20 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
             ta0b0w <- c('t'=unname(tt),'b0'=unname(b0),'w'=w)
         }
     } else if (x$format%in%c(7,8,11,12)){
-        if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-            # do nothing
-        } else if (anchor[1]==1){
-            if (type%in%c('joint',0,1,3) & (iratio('Pb206Pb208')[2]>0)){
+        if (anchor[1]==1){
+            if ('a0'%in%pnames & type%in%c('joint',0,1,3) & (iratio('Pb206Pb208')[2]>0)){
                 LL <- LL - stats::dnorm(x=a0,
                                         mean=iratio('Pb206Pb208')[1],
                                         sd=iratio('Pb206Pb208')[2],
                                         log=TRUE)
             }
-            if (type%in%c('joint',0,2,4) & iratio('Pb207Pb208')[2]>0){
+            if ('b0'%in%pnames & type%in%c('joint',0,2,4) & iratio('Pb207Pb208')[2]>0){
                 LL <- LL - stats::dnorm(x=b0,
                                         mean=iratio('Pb207Pb208')[1],
                                         sd=iratio('Pb207Pb208')[2],
                                         log=TRUE)
             }
-        } else if (anchor[1]==2 & (length(anchor)>2 & anchor[3]>0)){
+        } else if ('t'%in%pnames & anchor[1]==2 & (length(anchor)>2 & anchor[3]>0)){
             LL <- LL - stats::dnorm(x=tt,mean=anchor[2],sd=anchor[3],log=TRUE)
         }
         if (type%in%c('joint',0)){
@@ -527,7 +520,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
                                       type=type,anchor=anchor)$LL
         }
     }
-    if (x$d$U48$option==1 & 'U48i'%in%pnames){
+    if ('U48i'%in%pnames & x$d$U48$option==1){
         LL <- LL - stats::dnorm(x=par['U48i'],mean=x$d$U48$x,
                                 sd=x$d$U48$sx,log=TRUE)
     } else if (x$d$U48$option==2 & x$d$U48$sx>0){
@@ -536,7 +529,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
                                 sd=x$d$U48$sx,log=TRUE) -
             prior(x=X$d$U48$x,a=X$d$U48)
     }
-    if (x$d$ThU$option==1 & 'ThUi'%in%pnames){
+    if ('ThUi'%in%pnames & x$d$ThU$option==1){
         LL <- LL - stats::dnorm(x=par['ThUi'],mean=x$d$ThU$x,
                                 sd=x$d$ThU$sx,log=TRUE)
     } else if (x$d$ThU$option==2 & x$d$ThU$sx>0){

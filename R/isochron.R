@@ -800,6 +800,11 @@ checkIsochronType <- function(x,type=1){
     else if (x$format%in%c(10,12) & type%ni%c(2,4)) return(2)
     else return(type)
 }
+checkWtype <- function(wtype=1,anchor=0,model=1){
+    if (anchor[1]==1 & model==3) return(1)
+    else if (anchor[1]==2 & model==3) return(2)
+    else return(wtype)
+}
 
 getUPby0 <- function(out,fmt=1,type=1,option=1){
     out$y0 <- c('y'=NA,'s[y]'=NA)
@@ -910,6 +915,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
                           growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+    wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
     out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="d",
                    y0rat='Pb207Pb204',t2DPfun=age_to_Pb207Pb206_ratio)
@@ -1002,6 +1008,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+    wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
     out <- fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                           anchor=anchor,hide=hide,omit=omit,type="p",
                           y0rat='Ar40Ar36',t2DPfun=get.ArAr.ratio,
@@ -1169,6 +1176,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                            wtype=1,anchor=0,show.ellipses=2*(model!=2),
                            hide=NULL,omit=NULL,omit.fill=NA,
                            omit.stroke='grey',...){
+    wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
     y <- data2york(x)
     d2calc <- clear(y,hide,omit)
     abanchor <- anchor
@@ -1429,6 +1437,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                         plot=TRUE,exterr=FALSE,model=1,wtype=1,
                         anchor=0,show.ellipses=1*(model!=2),
                         bratio=1,hide=NULL,omit=NULL,...){
+    wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
     out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="p",
                    y0rat=y0rat,t2DPfun=t2DPfun)
@@ -1645,5 +1654,5 @@ getDispUnits.UPb <- function(x,joint,anchor){
     ifelse(anchor[1]==1 & (x$format%ni%(4:8) | !joint),'',' Ma')
 }
 getDispUnits <- function(model,wtype,anchor){
-    ifelse(model==3 & (wtype==2 | anchor[1]==2),'', ' Ma')
+    ifelse(model==3 & (wtype==2 | anchor[1]==2), ' Ma','')
 }
