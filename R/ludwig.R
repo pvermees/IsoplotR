@@ -273,34 +273,39 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
-    if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,free=FALSE)
-        par <- init$par
-        if (anchor[1]==2 & length(anchor)>1){
-            tt <- anchor[2]
-        } else {
-            tt <- exp(par['t'])
-        }
-    } else { # model-3
-        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
-        fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
-                              upper=init$upper,x=x,anchor=anchor,type=type)
-        E <- inverthess(fit$hessian)
-        par <- fit$par
-        if (anchor[1]==2 & length(anchor)>1){
-            tt <- anchor[2]
-            if (length(anchor)>2 & anchor[3]>0){
-                par['t'] <- log(tt)
-                par['w'] <- log(anchor[3])
+    if (model==3){
+        if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
+            init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,free=FALSE)
+            par <- init$par
+            if (anchor[1]==2 & length(anchor)>1){
+                tt <- anchor[2]
             } else {
-                par['w'] <- ifelse(tt>0,log(tt)-4,0)
+                tt <- exp(par['t'])
             }
         } else {
-            tt <- exp(fit$par['t'])
-            par['w'] <- fit$par['t'] + log(E['t','t'])/2
+            init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
+            fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
+                                  upper=init$upper,x=x,anchor=anchor,type=type)
+            E <- inverthess(fit$hessian)
+            par <- fit$par
+            if (anchor[1]==2 & length(anchor)>1){
+                tt <- anchor[2]
+                if (length(anchor)>2 & anchor[3]>0){
+                    par['t'] <- log(tt)
+                    par['w'] <- log(anchor[3])
+                } else {
+                    par['w'] <- ifelse(tt>0,log(tt)-4,0)
+                }
+            } else {
+                tt <- exp(fit$par['t'])
+                par['w'] <- fit$par['t'] + log(E['t','t'])/2
+            }
+            init$lower['w'] <- par['w'] - max(buffer,10)
+            init$upper['w'] <- par['w'] + buffer
         }
-        init$lower['w'] <- par['w'] - max(buffer,10)
-        init$upper['w'] <- par['w'] + buffer
+    } else {
+        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,free=TRUE)
+        par <- init$par
     }
     lower <- init$lower
     upper <- init$upper
@@ -343,11 +348,10 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
 }
 
 fixedDispersion <- function(model,format,anchor,type){
-    case1 <- model!=3
-    case2 <- model==3 & anchor[1]==2
-    case3 <- model==3 & format%in%c(1:3,9:12) & anchor[1]>0
-    case4 <- model==3 & format%in%(4:8) & anchor[1]>0 & type%ni%c('joint',0)
-    case1 | case2 | case3 | case4
+    case1 <- model==3 & anchor[1]==2
+    case2 <- model==3 & format%in%c(1:3,9:12) & anchor[1]>0
+    case3 <- model==3 & format%in%(4:8) & anchor[1]>0 & type%ni%c('joint',0)
+    case1 | case2 | case3
 }
 
 fixDispersion <- function(model,format,anchor,type){
