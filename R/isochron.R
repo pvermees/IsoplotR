@@ -492,12 +492,12 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                              levels=NA,clabel="",xlab='x',ylab='y',
                              ellipse.fill=c("#00FF0080","#FF000080"),
                              ellipse.stroke='black',ci.col='gray80',
-                             line.col='black',lwd=1,plot=TRUE,
-                             title=TRUE,model=1,wtype=1,anchor=0,
-                             show.ellipses=1*(model!=2),hide=NULL,
-                             omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                             line.col='black',lwd=1,plot=TRUE,title=TRUE,
+                             model=1,wtype=1,anchor=0,show.ellipses=1*(model!=2),
+                             hide=NULL,omit=NULL,omit.fill=NA,
+                             omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
-    if (model>1 || anchor[1]==2){
+    if (model>1 | anchor[1]==2){
         fit <- MLyork(d2calc,anchor=anchor,model=model,wtype=wtype)
     } else {
         if (anchor[1]<1){
@@ -524,9 +524,10 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                            ellipse.fill=c("#00FF0080","#FF000080"),
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,
-                           title=TRUE,model=1,wtype=1,anchor=0,
-                           show.ellipses=1*(model!=2),hide=NULL,
-                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                           title=TRUE, model=1,wtype=1,anchor=0,
+                           inverse=FALSE,show.ellipses=1*(model!=2),
+                           hide=NULL,omit=NULL,omit.fill=NA,
+                           omit.stroke='grey',...){
     if (x$format==6){
         d2calc <- clear(x,hide,omit)
         fit <- regression(d2calc$x,model=model,type='ogls')
@@ -539,15 +540,16 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                             omit.fill=omit.fill,omit.stroke=omit.stroke,...)
     } else {
         yd <- data2york(x)
-        fit <- isochron(yd,oerr=oerr,sigdig=sigdig,
-                        show.numbers=show.numbers,levels=levels,
-                        clabel=clabel,xlab=xlab,ylab=ylab,
-                        ellipse.fill=ellipse.fill,
-                        ellipse.stroke=ellipse.stroke,ci.col=ci.col,
-                        line.col=line.col,lwd=lwd,plot=plot,
-                        title=title,model=model,wtype=wtype,anchor=anchor,
-                        show.ellipses=show.ellipses,hide=hide,omit=omit,
-                        omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+        wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
+        fit <- flipper(yd,inverse=inverse,model=model,wtype=wtype,
+                       anchor=anchor,hide=hide,omit=omit)
+        scatterplot(fit$xyz,oerr=oerr,show.ellipses=show.ellipses,
+                    show.numbers=show.numbers,levels=levels,
+                    clabel=clabel,ellipse.fill=ellipse.fill,
+                    ellipse.stroke=ellipse.stroke,fit=fit,
+                    ci.col=ci.col,line.col=line.col,lwd=lwd,
+                    hide=hide,omit=omit,omit.fill=omit.fill,
+                    omit.stroke=omit.stroke,...)
     }
     invisible(fit)
 }

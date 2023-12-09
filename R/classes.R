@@ -13,6 +13,11 @@
 #'     have overloaded versions of the generic \code{length()}
 #'     function and \code{`[`} subsetting method.
 #'
+#'     Additional functions for each class include \code{as.X(x)},
+#'     which converts the data table \code{x} to an object of class
+#'     \code{X}; and \code{is.X(x)}, which checks if \code{x} has
+#'     class \code{X}.
+#'
 #' \itemize{
 #' 
 #' \item\code{UPb}: a list containing:
@@ -117,7 +122,28 @@
 #'
 #' @param x a data object returned by \code{\link{read.data}} or
 #'     \code{\link{diseq}}.
-#' @return logical
+#' 
+#' @param format data format. See \code{\link{read.data}} for details.
+#' 
+#' @param ierr input error. See \code{\link{read.data}} for details.
+#' 
+#' @param Th02i 2-element vector with the assumed initial
+#'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for
+#'     Th-U formats 1 and 2) and its standard error.
+#' 
+#' @param Th02U48 9-element vector with the measured composition of
+#'     the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
+#'     \code{sY}, \code{Z=4/8}, \code{sZ}, \code{rXY}, \code{rXZ},
+#'     \code{rYZ}.
+#' 
+#' @param U8Th2 \eqn{^{238}}U/\eqn{^{232}}Th activity-ratio of the
+#'     whole rock. Used to estimate the initial
+#'     \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium (for Th-U formats 3
+#'     and 4).
+#' 
+#' @return \code{is.X(x)} returns a logical value.
+#'
+#' \code{as.X(x)} returns an object of class \code{X}.
 #' 
 #' @examples
 #' attach(examples)
@@ -130,7 +156,9 @@
 #' @aliases UPb PbPb ThPb ThU ArAr KCa PD RbSr SmNd LuHf ReOs UThHe
 #'     fissiontracks detritals is.UPb is.PbPb is.ThPb is.ThU is.ArAr
 #'     is.KCa is.PD is.RbSr is.SmNd is.LuHf is.ReOs is.UThHe
-#'     is.fissiontracks is.detritals
+#'     is.fissiontracks is.detritals is.other as.UPb as.PbPb as.ThPb
+#'     as.ThU as.ArAr as.KCa as.PD as.RbSr as.SmNd as.LuHf as.ReOs
+#'     as.UThHe as.fissiontracks as.detritals as.other
 NULL
 
 #' @rdname classes
@@ -175,6 +203,9 @@ is.fissiontracks <- function(x) inherits(x,"fissiontracks")
 #' @rdname classes
 #' @export
 is.detritals <- function(x) inherits(x,"detritals")
+#' @rdname classes
+#' @export
+is.other <- function(x) inherits(x,"other")
 #' @rdname classes
 #' @export
 is.diseq <- function(x) inherits(x,"diseq")
