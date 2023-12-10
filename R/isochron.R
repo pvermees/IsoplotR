@@ -210,6 +210,14 @@
 #' If \code{x} has class \code{UPb} and \code{anchor[1]=3}: anchor the
 #' non-radiogenic component to the Stacey-Kramers mantle evolution
 #' model.
+#'
+#' @param flippable controls if generic data (where \code{x} has class
+#'     \code{other} and \code{x$format} is either \code{4} or
+#'     \code{5}) should be treated as inverse isochrons
+#'     (\code{flippable=1}) or as conventional isochrons
+#'     (\code{flippable=2}). If \code{flippable=0} (which is the
+#'     default value), then the data are passed on to
+#'     \code{isochron.default}.
 #' 
 #' @param show.ellipses show the data as:
 #'
@@ -437,6 +445,20 @@
 #'
 #' }
 #'
+#' OR, if \code{x} has class \code{other} and \code{x$format} is
+#' either \code{4} or \code{5} and \code{flippable} is not \code{0},
+#' returns
+#'
+#' \code{Dd}: the ratio of the inherited radiogenic daughter to its
+#' nonradiogenic sister isotope
+#'
+#' \code{DP}: the ratio fo the radiogic daughter to its radioactive parent
+#'
+#' \code{cov.DdDP}: the covariance between \code{Dd} and \code{DP}.
+#'
+#' In the remaining types of \code{other} data, the intercept \code{a}
+#' and \code{b} are returned along with their covariance.
+#'
 #' @examples
 #' attach(examples)
 #' isochron(RbSr)
@@ -525,10 +547,12 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,
                            title=TRUE, model=1,wtype=1,anchor=0,
-                           inverse=FALSE,show.ellipses=1*(model!=2),
+                           flippable=0,show.ellipses=1*(model!=2),
                            hide=NULL,omit=NULL,omit.fill=NA,
                            omit.stroke='grey',...){
-    if (x$format==6){
+    if (x$format<4){
+        stop('Invalid format for isochron regression.')
+    } else if (x$format==6){
         d2calc <- clear(x,hide,omit)
         fit <- regression(d2calc$x,model=model,type='ogls')
         genericisochronplot(x=x,fit=fit,oerr=oerr,sigdig=sigdig,
@@ -538,11 +562,39 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                             line.col=line.col,lwd=lwd,plot=plot,title=title,
                             show.ellipses=show.ellipses,hide=hide,omit=omit,
                             omit.fill=omit.fill,omit.stroke=omit.stroke,...)
-    } else {
-        yd <- data2york(x)
+    } else if (flippable%in%c(1,2)){ # treat as geochronology data
         wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-        fit <- flipper(yd,inverse=inverse,model=model,wtype=wtype,
+        inverse <- (flippable==1)
+        fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                        anchor=anchor,hide=hide,omit=omit)
+        if (inverse){
+            Dd <- 1/fit$a[1]
+            DP <- -fit$b[1]/fit$a[1]
+            err <- errorprop(J11=-Dd/fit$a[1],
+                             J12=0,
+                             J21=-DP/fit$a[1],
+                             J22=-1/fit$a[1],
+                             E11=fit$a[2]^2,
+                             E22=fit$b[2]^2,
+                             E12=fit$cov.ab)
+            fit$Dd <- unname(c(Dd,sqrt(err[1])))
+            fit$DP <- unname(c(DP,sqrt(err[2])))
+            fit$cov.DdDp <- unname(err[3])
+            xlab <- 'P/D'
+            ylab <- 'd/D'
+        } else {
+            fit$Dd <- unname(fit$a)
+            fit$DP <- unname(fit$b)
+            fit$cov.DdDP <- unname(fit$cov.ab)
+            xlab <- 'P/d'
+            ylab <- 'D/d'
+        }
+        names(fit$Dd) <- c('Dd','s[Dd]')
+        names(fit$DP) <- c('DP','s[DP]')
+        if (inflate(fit)){
+            fit$Dd['disp[Dd]'] <- sqrt(fit$mswd)*fit$Dd['s[Dd]']
+            fit$DP['disp[DP]'] <- sqrt(fit$mswd)*fit$DP['s[DP]']
+        }
         scatterplot(fit$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -550,6 +602,19 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
+        graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,type='generic'),
+                        xlab=xlab,ylab=ylab)
+    } else { # general purpose regression
+        yd <- data2york(x)
+        fit <- isochron(yd,oerr=oerr,sigdig=sigdig,
+                        show.numbers=show.numbers,levels=levels,
+                        clabel=clabel,xlab=xlab,ylab=ylab,
+                        ellipse.fill=ellipse.fill,
+                        ellipse.stroke=ellipse.stroke,ci.col=ci.col,
+                        line.col=line.col,lwd=lwd,plot=plot,
+                        title=title,model=model,wtype=wtype,anchor=anchor,
+                        show.ellipses=show.ellipses,hide=hide,omit=omit,
+                        omit.fill=omit.fill,omit.stroke=omit.stroke,...)
     }
     invisible(fit)
 }
@@ -1597,8 +1662,15 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
         content[[2]] <- maintit(x=fit$b[1],sx=fit$b[-1],ntit='',
                                 units=units,prefix='slope =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
+    } else if (type=='generic'){
+        content[[1]] <- maintit(x=fit$Dd[1],sx=fit$Dd[-1],n=fit$n,
+                                units=units,prefix='[D/d]0 =',
+                                sigdig=sigdig,oerr=oerr,df=fit$df)
+        content[[2]] <- maintit(x=fit$DP[1],sx=fit$DP[-1],ntit='',
+                                units=units,prefix='[D/P]* =',
+                                sigdig=sigdig,oerr=oerr,df=fit$df)
     } else if (type=='U-Pb'){
-        if (is.null(fit$posterior) || 't'%ni%names(fit$posterior)){
+        if (is.null(fit$posterior) | 't'%ni%names(fit$posterior)){
             content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
                                     units=units,sigdig=sigdig,
                                     oerr=oerr,df=fit$df)
@@ -1609,8 +1681,8 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
         if(is.null(fit$posterior)) pnames <- NULL
         else pnames <- names(fit$posterior)
         if (is.null(pnames)) ipar <- NULL
-        else if (y0option==2 && 'U48i'%in%pnames) ipar <- 'U48i'
-        else if (y0option==3 && 'ThUi'%in%pnames) ipar <-'ThUi'
+        else if (y0option==2 & 'U48i'%in%pnames) ipar <- 'U48i'
+        else if (y0option==3 & 'ThUi'%in%pnames) ipar <-'ThUi'
         else ipar <- NULL
         if (is.null(ipar)){
             content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',

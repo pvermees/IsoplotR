@@ -23,7 +23,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         d2calc <- invertandclean(x=x,inverse=inverse,fitinverse=fitinverse,
                                  hide=hide,omit=omit)
         flip <- (type=='p')
-        if (flip) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c('Y','sY','X','sX','rXY')]
+        if (flip) d2calc[,c('X','sX','Y','sY','rXY')] <- d2calc[,c(3,4,1,2,5)]
         if (missing(t2DPfun)){
             DP <- anchor[2:3]
         } else {
@@ -46,7 +46,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
                                  fitinverse=fitinverse,
                                  hide=hide,omit=omit)
         flip <- (type=='p')
-        if (flip) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c('Y','sY','X','sX','rXY')]
+        if (flip) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")
@@ -60,8 +60,11 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
 }
 
 invertandclean <- function(x,inverse,fitinverse,hide,omit){
-    if (is.other(x) & inverse!=fitinverse) yd <- normal2inverse(x)
-    else yd <- data2york(x,inverse=fitinverse)
+    if (is.other(x) & inverse!=fitinverse){
+        yd <- normal2inverse(data2york(x))
+    } else {
+        yd <- data2york(x,inverse=fitinverse)
+    }
     clear(yd,hide,omit)
 }
 

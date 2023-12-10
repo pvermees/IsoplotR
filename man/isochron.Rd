@@ -65,7 +65,7 @@ isochron(x, ...)
   model = 1,
   wtype = 1,
   anchor = 0,
-  inverse = FALSE,
+  flippable = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -518,46 +518,13 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{inverse}{toggles between normal and inverse isochrons. If the
-    isochron plots \code{Y} against \code{X}, and
-
-If \code{inverse=TRUE}, then \code{X} =
-\eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb and \code{Y} =
-\eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb (if \code{x} has class
-\code{PbPb}), or \code{X} = \eqn{{}^{232}}Th/\eqn{{}^{208}}Pb and
-\code{Y} = \eqn{{}^{204}}Pb/\eqn{{}^{208}}Pb (if \code{x} has class
-\code{ThPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{40}}Ar and
-\code{Y} = \eqn{{}^{36}}Ar/\eqn{{}^{40}}Ar (if \code{x} has class
-\code{ArAr}), or \code{X} = \eqn{{}^{40}}K/\eqn{{}^{40}}Ca and
-\code{Y} = \eqn{{}^{44}}Ca/\eqn{{}^{40}}Ca (if \code{x} has class
-\code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{87}}Sr and
-\code{Y} = \eqn{{}^{86}}Sr/\eqn{{}^{87}}Sr (if \code{x} has class
-\code{RbSr}), or \code{X} = \eqn{{}^{147}}Sm/\eqn{{}^{143}}Nd and
-\code{Y} = \eqn{{}^{144}}Nd/\eqn{{}^{143}}Nd (if \code{x} has class
-\code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{187}}Os and
-\code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x} has class
-\code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and
-\code{Y} = \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
-\code{LuHf}).
-
-If \code{inverse=FALSE}, then \code{X} =
-\eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
-\eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
-\code{PbPb}), or \code{X} = \eqn{{}^{232}}Th/\eqn{{}^{204}}Pb and
-\code{Y} = \eqn{{}^{208}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
-\code{ThPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{36}}Ar and
-\code{Y} = \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar (if \code{x} has class
-\code{ArAr}), or \code{X} = \eqn{{}^{40}}K/\eqn{{}^{44}}Ca and
-\code{Y} = \eqn{{}^{40}}Ca/\eqn{{}^{44}}Ca (if \code{x} has class
-\code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{86}}Sr and
-\code{Y} = \eqn{{}^{87}}Sr/\eqn{{}^{86}}Sr (if \code{x} has class
-\code{RbSr}), or \code{X} = \eqn{{}^{147}}Sm/\eqn{{}^{144}}Nd and
-\code{Y} = \eqn{{}^{143}}Nd/\eqn{{}^{144}}Nd (if \code{x} has class
-\code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{188}}Os and
-\code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x} has class
-\code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and
-\code{Y} = \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
-\code{LuHf}).}
+\item{flippable}{controls if generic data (where \code{x} has class
+\code{other} and \code{x$format} is either \code{4} or
+\code{5}) should be treated as inverse isochrons
+(\code{flippable=1}) or as conventional isochrons
+(\code{flippable=2}). If \code{flippable=0} (which is the
+default value), then the data are passed on to
+\code{isochron.default}.}
 
 \item{joint}{logical. Only applies to U-Pb data formats 4 and
 above. If \code{TRUE}, carries out three dimensional
@@ -631,6 +598,47 @@ For Th-U data:
 
 \code{y0option=4} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
 activity ratio.}
+
+\item{inverse}{toggles between normal and inverse isochrons. If the
+    isochron plots \code{Y} against \code{X}, and
+
+If \code{inverse=TRUE}, then \code{X} =
+\eqn{{}^{204}}Pb/\eqn{{}^{206}}Pb and \code{Y} =
+\eqn{{}^{207}}Pb/\eqn{{}^{206}}Pb (if \code{x} has class
+\code{PbPb}), or \code{X} = \eqn{{}^{232}}Th/\eqn{{}^{208}}Pb and
+\code{Y} = \eqn{{}^{204}}Pb/\eqn{{}^{208}}Pb (if \code{x} has class
+\code{ThPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{40}}Ar and
+\code{Y} = \eqn{{}^{36}}Ar/\eqn{{}^{40}}Ar (if \code{x} has class
+\code{ArAr}), or \code{X} = \eqn{{}^{40}}K/\eqn{{}^{40}}Ca and
+\code{Y} = \eqn{{}^{44}}Ca/\eqn{{}^{40}}Ca (if \code{x} has class
+\code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{87}}Sr and
+\code{Y} = \eqn{{}^{86}}Sr/\eqn{{}^{87}}Sr (if \code{x} has class
+\code{RbSr}), or \code{X} = \eqn{{}^{147}}Sm/\eqn{{}^{143}}Nd and
+\code{Y} = \eqn{{}^{144}}Nd/\eqn{{}^{143}}Nd (if \code{x} has class
+\code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{187}}Os and
+\code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x} has class
+\code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and
+\code{Y} = \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
+\code{LuHf}).
+
+If \code{inverse=FALSE}, then \code{X} =
+\eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
+\eqn{{}^{207}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
+\code{PbPb}), or \code{X} = \eqn{{}^{232}}Th/\eqn{{}^{204}}Pb and
+\code{Y} = \eqn{{}^{208}}Pb/\eqn{{}^{204}}Pb (if \code{x} has class
+\code{ThPb}), or \code{X} = \eqn{{}^{39}}Ar/\eqn{{}^{36}}Ar and
+\code{Y} = \eqn{{}^{40}}Ar/\eqn{{}^{36}}Ar (if \code{x} has class
+\code{ArAr}), or \code{X} = \eqn{{}^{40}}K/\eqn{{}^{44}}Ca and
+\code{Y} = \eqn{{}^{40}}Ca/\eqn{{}^{44}}Ca (if \code{x} has class
+\code{KCa}), or \code{X} = \eqn{{}^{87}}Rb/\eqn{{}^{86}}Sr and
+\code{Y} = \eqn{{}^{87}}Sr/\eqn{{}^{86}}Sr (if \code{x} has class
+\code{RbSr}), or \code{X} = \eqn{{}^{147}}Sm/\eqn{{}^{144}}Nd and
+\code{Y} = \eqn{{}^{143}}Nd/\eqn{{}^{144}}Nd (if \code{x} has class
+\code{SmNd}), or \code{X} = \eqn{{}^{187}}Re/\eqn{{}^{188}}Os and
+\code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x} has class
+\code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and
+\code{Y} = \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
+\code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
 }
@@ -833,6 +841,20 @@ parameter \eqn{w}.}
 \item{ylab}{the y-label of the isochron plot}
 
 }
+
+OR, if \code{x} has class \code{other} and \code{x$format} is
+either \code{4} or \code{5} and \code{flippable} is not \code{0},
+returns
+
+\code{Dd}: the ratio of the inherited radiogenic daughter to its
+nonradiogenic sister isotope
+
+\code{DP}: the ratio fo the radiogic daughter to its radioactive parent
+
+\code{cov.DdDP}: the covariance between \code{Dd} and \code{DP}.
+
+In the remaining types of \code{other} data, the intercept \code{a}
+and \code{b} are returned along with their covariance.
 }
 \description{
 Plots cogenetic U-Pb, Ar-Ar, K-Ca, Pb-Pb, Th-Pb, Rb-Sr, Sm-Nd,
