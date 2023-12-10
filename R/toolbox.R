@@ -1,4 +1,4 @@
-roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
+roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE,maxprecision=8){
     if (oerr>3){
         out <- roundit(age,err*age/100,sigdig=sigdig)
         out[-1] <- signif(err,sigdig)
@@ -17,6 +17,9 @@ roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE){
             nc <- length(out)
         }
     } else {
+        if (err[1]>0 & log10(age/err[1])>maxprecision){ # impossibly good precision
+            err <- 0
+        }
         if (length(age)==1){
             dat <- c(age,err)
             nc <- length(dat)

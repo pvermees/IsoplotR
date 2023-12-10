@@ -602,7 +602,8 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,type='generic'),
+        graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,
+                                      units='',type='generic'),
                         xlab=xlab,ylab=ylab)
     } else { # general purpose regression
         yd <- data2york(x)
@@ -1663,11 +1664,11 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                 units=units,prefix='slope =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
     } else if (type=='generic'){
-        content[[1]] <- maintit(x=fit$Dd[1],sx=fit$Dd[-1],n=fit$n,
-                                units=units,prefix='[D/d]0 =',
+        content[[1]] <- maintit(x=fit$Dd[1],sx=fit$Dd[-1],n=fit$n,units=units,
+                                prefix=quote('[D/d]'[0]*' ='),
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
-        content[[2]] <- maintit(x=fit$DP[1],sx=fit$DP[-1],ntit='',
-                                units=units,prefix='[D/P]* =',
+        content[[2]] <- maintit(x=fit$DP[1],sx=fit$DP[-1],ntit='',units=units,
+                                prefix=quote('[D/P]* ='),
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
     } else if (type=='U-Pb'){
         if (is.null(fit$posterior) | 't'%ni%names(fit$posterior)){

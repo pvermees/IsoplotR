@@ -9,7 +9,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         d2calc <- clear(xyz,hide,omit)
         fit <- regression(d2calc,model=model)
     } else if (anchor[1]==1){
-        wtype <- 1
+        wtype <- 1 # override
         fitinverse <- FALSE
         d2calc <- invertandclean(x=x,inverse=inverse,
                                  fitinverse=fitinverse,
@@ -18,7 +18,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         if (model>1) fit <- MLyork(d2calc,anchor=anchor,model=model)
         else fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
     } else if (anchor[1]==2){
-        wtype <- 2
+        wtype <- 2 # override
         fitinverse <- TRUE
         d2calc <- invertandclean(x=x,inverse=inverse,fitinverse=fitinverse,
                                  hide=hide,omit=omit)
@@ -51,10 +51,17 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     } else {
         stop("Invalid anchor and/or wtype value.")
     }
-    if (flip) flipped <- flipfit(fit)
-    else flipped <- fit
-    if (inverse == fitinverse) out <- flipped
-    else out <- invertfit(flipped,type=type,wtype=wtype)
+    out <- list()
+    if (flip){
+        out$flippedfit <- fit
+        fit <- unflipfit(fit)
+    }
+    inverted <- (inverse != fitinverse)
+    if (inverted){
+        out$invertedfit <- fit
+        fit <- invertfit(fit,type=type,wtype=wtype)
+    }
+    out <- append(out,fit)
     out$xyz <- xyz
     out
 }
@@ -68,7 +75,10 @@ invertandclean <- function(x,inverse,fitinverse,hide,omit){
     clear(yd,hide,omit)
 }
 
-flipfit <- function(fit){
+# the purpose of flipping and inverting is always to use the intercept
+# to improve the fit, therefore the inverse operations always attribute
+# any overdispersion to the incoming intercept
+unflipfit <- function(fit){
     out <- fit
     a <- -fit$a[1]/fit$b[1]
     b <- 1/fit$b[1]
@@ -83,10 +93,9 @@ flipfit <- function(fit){
     out$a <- c(a,sqrt(vcovab[1]))
     out$b <- c(b,sqrt(vcovab[2]))
     out$cov.ab <- unname(vcovab[3])
-    out$disp <- abs(b*fit$disp/fit$a[1])
+    out$disp <- abs(fit$disp/fit$a[1]^2)
     out
 }
-
 invertfit <- function(fit,type="p",wtype=0){
     out <- fit
     if (type%in%c(1,"p")){
@@ -104,7 +113,7 @@ invertfit <- function(fit,type="p",wtype=0){
         out$b <- c(b,sqrt(vcovab[2]))
         out$cov.ab <- vcovab[3]
         if (wtype==1) out$disp <- a*fit$disp/fit$a[1]
-        else if (wtype==2) out$disp <- abs(b*fit$disp/fit$b[1])
+        else if (wtype==2) out$disp <- abs(b*fit$disp/fit$a[1])
     } else if (type%in%c(2,"d")){
         out$a <- fit$b
         out$b <- fit$a
