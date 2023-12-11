@@ -1758,7 +1758,7 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
         y0 <- fit$par['a0']
         cid <- ci(sx=fit$disp[1])
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
-    } else { # other UPb
+    } else if (type%in%c(1,2)){ # other UPb
         if (wtype==1){
             y0 <- fit$y0[1]
             if (type==1){
