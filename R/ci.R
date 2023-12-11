@@ -76,7 +76,7 @@ inflate <- function(fit){
 #'         '2se=',signif(err[1],2),'%, ',
 #'         '2se(with dispersion)=',signif(err[2],2),'%')
 #' @export
-ci <- function(x,sx,oerr=3,df=NULL,absolute=FALSE){
+ci <- function(x=0,sx,oerr=3,df=NULL,absolute=FALSE){
     fact <- rep(ntfact(alpha()),length(sx))
     if (!is.null(df) && df>0){
         fact[-1] <- stats::qt(1-alpha()/2,df=df)

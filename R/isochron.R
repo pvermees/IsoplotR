@@ -847,13 +847,16 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         }
         if (plot){
             scatterplot(XY,oerr=oerr,show.ellipses=show.ellipses,
-                        show.numbers=showo.numbers,levels=levels,
+                        show.numbers=show.numbers,levels=levels,
                         clabel=clabel,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,fit=out,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
             dispunits <- getDispUnits.UPb(x=x,joint=joint,anchor=anchor)
+            if (!joint | x$format>8){
+                showDispersion(out,inverse=TRUE,wtype=anchor[1],type=type)
+            }
             graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
                                           y0option=y0option,dispunits=dispunits),
                             xlab=x.lab,ylab=y.lab)
@@ -1741,19 +1744,35 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
     if (fit$model!=3) return()
     usr <- graphics::par('usr')
     if (usr[1]>0 & usr[3]>0) return() # axes out of focus
-    if (type%in%c('p','d')) w <- exp(fit$par['lw'])
-    else if (type=='UPb' & wtype==1) w <- fit$disp[1]
-    cid <- ci(x=0,sx=w)
     if ((type=='p' & wtype==1)|
         (type=='d' & wtype==2 & inverse) |
         (type=='d' & wtype==1 & !inverse)){
         y0 <- fit$a[1]
+        cid <- ci(sx=fit$disp[1])
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
     } else if (type=='p' & wtype==2 & inverse){
-        x0 <- -fit$a[1]/fit$b[1]
+        x0 <- fit$flippedfit$a[1]
+        cid <- ci(sx=fit$flippedfit$disp[1])
         graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
-    } else if (type=='UPb' & wtype==1){
+    } else if (type=='TW' & wtype==1){
         y0 <- fit$par['a0']
+        cid <- ci(sx=fit$disp[1])
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
+    } else { # other UPb
+        if (wtype==1){
+            y0 <- fit$y0[1]
+            if (type==1){
+                cid <- ci(sx=y0*fit$disp[1]/fit$par['a0'])
+            } else if (type==2){
+                cid <- ci(sx=y0*fit$disp[1]/fit$par['b0'])
+            } else { # not implemented yet
+                return()
+            }
+            graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
+        } else {
+            x0 <- -fit$a[1]/fit$b[1]
+            cid <- ci(sx=x0*fit$disp[1]/fit$age[1])
+            graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
+        }
     }
 }

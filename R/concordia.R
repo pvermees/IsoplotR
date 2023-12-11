@@ -335,7 +335,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.fill=omit.fill,
                 omit.stroke=omit.stroke,addcolourbar=FALSE,...)
-    showDispersion(fit,inverse=(type==2),wtype=anchor[1],type='UPb')
+    showDispersion(fit,inverse=(type==2),wtype=anchor[1],type='TW')
     if (show.age==1){
         ell <- ellipse(fit$x[1],fit$x[2],fit$ccov)
         graphics::polygon(ell,col='white')
