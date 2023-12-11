@@ -243,8 +243,7 @@
 #'
 #' @param ylab text label for the vertical plot axis
 #' 
-#' @param ... optional arguments to be passed on to the generic plot
-#'     function if \code{model=2}
+#' @param ... optional arguments to be passed on to \code{\link{scatterplot}}
 #'
 #' @return If \code{x} has class \code{PbPb}, \code{ThPb},
 #'     \code{ArAr}, \code{KCa}, \code{RbSr}, \code{SmNd}, \code{ReOs}
@@ -602,6 +601,7 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
+        if (model==3) showDispersion(fit,inverse=(flippable==1),wtype=wtype)
         graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,
                                       units='',type='generic'),
                         xlab=xlab,ylab=ylab)
@@ -1730,4 +1730,18 @@ getDispUnits.UPb <- function(x,joint,anchor){
 }
 getDispUnits <- function(model,wtype,anchor){
     ifelse(model==3 & (wtype==2 | anchor[1]==2), ' Ma','')
+}
+showDispersion <- function(fit,inverse,wtype){
+    usr <- graphics::par('usr')
+    if (inverse){
+        if (wtype==1){
+            
+        } else {
+            
+        }
+    } else {
+        if (wtype==1){
+            
+        }
+    }
 }

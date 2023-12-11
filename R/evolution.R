@@ -212,8 +212,6 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
     plotit <- (1:ns)%ni%hide
     ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,Th0i=Th0i)
     nsd <- 3
-    xaxs <- getaxs(parname='xaxs',xlim=xlim,ylim=ylim,...)
-    yaxs <- getaxs(parname='yaxs',xlim=xlim,ylim=ylim,...)
     if (is.null(xlim))
         xlim <- range(c(ta0[plotit,'t']-nsd*ta0[plotit,'s[t]'],
                         ta0[plotit,'t']+nsd*ta0[plotit,'s[t]']))
@@ -222,8 +220,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
                         ta0[plotit,'48_0']+nsd*ta0[plotit,'s[48_0]']))
     x.lab <- 'Age [ka]'
     y.lab <- expression(paste("("^"234","U/"^"238","U)"[0]))
-    graphics::plot(xlim,ylim,type='n',bty='n',
-                   xlab=x.lab,ylab=y.lab,xaxs=xaxs,yaxs=yaxs)
+    graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
     d <- ta0
     colnames(d) <- c('X','sX','Y','sY','rXY')
     d[,'rXY'] <- ta0[,'cov[t,48_0]']/(ta0[,'s[t]']*ta0[,'s[48_0]'])
@@ -382,8 +379,6 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
     maxt <- 400
     tt <- seq(from=0,to=maxt,by=50)
     nsd <- 3
-    xaxs <- getaxs(parname='xaxs',xlim=xlim,ylim=ylim,...)
-    yaxs <- getaxs(parname='yaxs',xlim=xlim,ylim=ylim,...)
     if (is.null(xlim)){
         min.dx <- 0
         max.dx <- max(d[,'Th230U238']+nsd*d[,'sTh230U238'])
@@ -421,8 +416,7 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
     }
     x.lab <- expression(paste(""^"230","Th/"^"238","U"))
     y.lab <- expression(paste(""^"234","U/"^"238","U"))
-    graphics::plot(xlim,ylim,type='n',xlab=x.lab,ylab=y.lab,
-                   bty=bty,xaxs=xaxs,yaxs=yaxs,...)
+    graphics::plot(xlim,ylim,type='n',xlab=x.lab,ylab=y.lab,bty=bty,...)
     na0 <- length(a0)
     for (i in 1:na0){
         ttt <- seq(0,maxt,length.out=nn)

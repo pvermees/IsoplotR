@@ -390,8 +390,6 @@ plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
 # helper function for plot.concordia
 prepare.concordia.line <- function(x,tlim,type=1,...){
     out <- get.concordia.limits(x,tlim=tlim,type=type,...)
-    xaxs <- getaxs(parname='xaxs',tlim=tlim,...)
-    yaxs <- getaxs(parname='yaxs',tlim=tlim,...)
     if (type==1){
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
@@ -404,8 +402,7 @@ prepare.concordia.line <- function(x,tlim,type=1,...){
     } else {
         stop('Incorrect input format.')
     }
-    graphics::plot(out$x,out$y,type='n',xlab=x.lab,ylab=y.lab,
-                   bty='n',xaxs=xaxs,yaxs=yaxs,...)
+    graphics::plot(out$x,out$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
     out
 }
 # concordia sequence
