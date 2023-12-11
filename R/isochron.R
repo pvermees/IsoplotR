@@ -601,8 +601,7 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        if (model==3 & anchor[1]>0)
-            showDispersion(fit,inverse=(flippable==1),wtype=wtype)
+        showDispersion(fit,inverse=(flippable==1),wtype=wtype)
         graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,
                                       units='',type='generic'),
                         xlab=xlab,ylab=ylab)
@@ -641,6 +640,7 @@ genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
+        showDispersion(fit,inverse=(flippable==1),wtype=wtype)
         if (title)
             graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,units=''),
                             xlab=xlab,ylab=ylab)
@@ -1038,6 +1038,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         } else {
             out$ski <- NULL
         }
+        showDispersion(out,inverse=inverse,wtype=wtype,type='d')
         tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',
                              dispunits=dispunits,ski=out$ski)
         graphics::title(tit,xlab=x.lab,ylab=y.lab)
@@ -1122,6 +1123,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
+        showDispersion(out,inverse=inverse,wtype=wtype)
         graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
                                       dispunits=dispunits,type='Ar-Ar'),
                         xlab=x.lab,ylab=y.lab)
@@ -1276,6 +1278,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+        showDispersion(out,inverse=FALSE,wtype=wtype)
         graphics::title(isochrontitle(out,sigdig=sigdig,oerr=oerr,type='U-Th-He'),
                         xlab="P",ylab="He")
     }
@@ -1547,6 +1550,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                     ellipse.stroke=ellipse.stroke,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,...)
+        showDispersion(out,inverse=inverse,wtype=wtype)
         graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
                                       type='PD',dispunits=dispunits),
                         xlab=lab$x,ylab=lab$y)
@@ -1732,23 +1736,19 @@ getDispUnits.UPb <- function(x,joint,anchor){
 getDispUnits <- function(model,wtype,anchor){
     ifelse(model==3 & (wtype==2 | anchor[1]==2), ' Ma','')
 }
-showDispersion <- function(fit,inverse,wtype){
+
+showDispersion <- function(fit,inverse,wtype,type='p'){
+    if (fit$model!=3) return()
     usr <- graphics::par('usr')
+    if (usr[1]>0 & usr[3]>0) return() # axes out of focus
     cid <- ci(x=0,sx=exp(fit$par['lw']))
-    if (usr[1]>0 & usr[3]>0){
-        # Do nothing, because x=0 and y=0 are not in focus anyway.
-    } else if (inverse){
-        if (wtype==1){
-            y0 <- fit$a[1]
-            graphics::arrows(0,y0-cid,0,y0+cid,code=3,length=0.1,angle=90)
-        } else {
-            x0 <- -fit$a[1]/fit$b[1]
-            graphics::arrows(x0-cid,0,x0+cid,0,code=3,length=0.1,angle=90)
-        }
-    } else {
-        if (wtype==1){
-            y0 <- fit$a[1]
-            graphics::arrows(0,y0-cid,0,y0+cid,code=3,length=0.1,angle=90)
-        }
+    if ((type=='p' & wtype==1)|
+        (type=='d' & wtype==2 & inverse) |
+        (type=='d' & wtype==1 & !inverse)){
+        y0 <- fit$a[1]
+        graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
+    } else if (type=='d' & wtype==2 & inverse){
+        x0 <- -fit$a[1]/fit$b[1]
+        graphics::arrows(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
     }
 }
