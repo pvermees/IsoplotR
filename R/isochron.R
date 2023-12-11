@@ -601,7 +601,8 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        if (model==3) showDispersion(fit,inverse=(flippable==1),wtype=wtype)
+        if (model==3 & anchor[1]>0)
+            showDispersion(fit,inverse=(flippable==1),wtype=wtype)
         graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,
                                       units='',type='generic'),
                         xlab=xlab,ylab=ylab)
@@ -1733,15 +1734,21 @@ getDispUnits <- function(model,wtype,anchor){
 }
 showDispersion <- function(fit,inverse,wtype){
     usr <- graphics::par('usr')
-    if (inverse){
+    cid <- ci(x=0,sx=exp(fit$par['lw']))
+    if (usr[1]>0 & usr[3]>0){
+        # Do nothing, because x=0 and y=0 are not in focus anyway.
+    } else if (inverse){
         if (wtype==1){
-            
+            y0 <- fit$a[1]
+            graphics::arrows(0,y0-cid,0,y0+cid,code=3,length=0.1,angle=90)
         } else {
-            
+            x0 <- -fit$a[1]/fit$b[1]
+            graphics::arrows(x0-cid,0,x0+cid,0,code=3,length=0.1,angle=90)
         }
     } else {
         if (wtype==1){
-            
+            y0 <- fit$a[1]
+            graphics::arrows(0,y0-cid,0,y0+cid,code=3,length=0.1,angle=90)
         }
     }
 }
