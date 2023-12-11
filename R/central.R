@@ -124,7 +124,7 @@ central.default <- function(x,...){
         sum(1/su^2,na.rm=TRUE)
     out <- list()
     # remove two d.o.f. for mu and sigma
-    out$df <- length(zu)-2
+    df <- length(zu)-2
     # add back one d.o.f. for the homogeneity test
     out <- append(out,getMSWD(Chi2,out$df+1))
     out$age <- c(tt,st)

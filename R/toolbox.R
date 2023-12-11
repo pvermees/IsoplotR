@@ -484,25 +484,12 @@ contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
 
 getMSWD <- function(X2,df){
     out <- list()
-    out$df <- df
     if (df>0){
         out$mswd <- as.numeric(X2/df)
         out$p.value <- as.numeric(1-stats::pchisq(X2,df))
     } else {
         out$mswd <- 1
         out$p.value <- 1
-    }
-    out
-}
-
-getaxs <- function(parname,tlim=NULL,xlim=NULL,ylim=NULL,...){
-    ellipsis <- list(...)
-    if (parname%in%names(ellipsis)){
-        out <- ellipsis[[parname]]
-    } else if (is.null(tlim) & is.null(xlim) & is.null(ylim)){
-        out <- 'r'
-    } else {
-        out <- 'i'
     }
     out
 }
