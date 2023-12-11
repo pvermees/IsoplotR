@@ -1747,8 +1747,8 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
         (type=='d' & wtype==1 & !inverse)){
         y0 <- fit$a[1]
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
-    } else if (type=='d' & wtype==2 & inverse){
+    } else if (type=='p' & wtype==2 & inverse){
         x0 <- -fit$a[1]/fit$b[1]
-        graphics::arrows(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
+        graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
     }
 }
