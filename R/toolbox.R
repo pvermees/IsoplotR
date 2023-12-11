@@ -494,3 +494,15 @@ getMSWD <- function(X2,df){
     }
     out
 }
+
+getaxs <- function(parname,tlim=NULL,xlim=NULL,ylim=NULL,...){
+    ellipsis <- list(...)
+    if (parname%in%names(ellipsis)){
+        out <- ellipsis[[parname]]
+    } else if (is.null(tlim) & is.null(xlim) & is.null(ylim)){
+        out <- 'r'
+    } else {
+        out <- 'i'
+    }
+    out
+}

@@ -145,20 +145,24 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
-                        asp=NA,log='',...){
+                        asp=NA,log='',box=TRUE,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
     plotit <- sn%ni%hide
     calcit <- sn%ni%c(hide,omit)
     colnames(xy) <- c('X','sX','Y','sY','rXY')
+    if (!add){
+        xaxs <- getaxs(parname='xaxs',xlim=xlim,ylim=ylim,...)
+        yaxs <- getaxs(parname='yaxs',xlim=xlim,ylim=ylim,...)
+    }
     if (is.null(xlim)) xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
     if (is.null(ylim)) ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
     if (!add){
         if (missing(xlab)) xlab <- ''
         if (missing(ylab)) ylab <- ''
         graphics::plot(xlim,ylim,type='n',xlab=xlab,ylab=ylab,
-                       bty='n',asp=asp,log=log)
+                       bty='n',asp=asp,log=log,xaxs=xaxs,yaxs=yaxs)
         if (empty) return()
     }
     if (!identical(fit,'none')){
@@ -166,7 +170,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         plot_isochron_line(fit,x=seq(usr[1],usr[2],length.out=100),
                            oerr=oerr,ci.col=ci.col,col=line.col,lwd=lwd)
     }
-    graphics::box()
+    if (box) graphics::box()
     nolevels <- all(is.na(levels))
     fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
                                 hide=hide,omit=omit,omit.col=omit.fill)
