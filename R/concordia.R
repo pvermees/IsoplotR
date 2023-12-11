@@ -176,7 +176,7 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
-#' @param ... optional arguments to the generic \code{plot} function
+#' @param ... optional arguments passed on to \code{\link{scatterplot}}
 #'
 #' @return
 #'
@@ -293,7 +293,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                              exterr=FALSE,show.age=0,oerr=3,y0option=1,
                              sigdig=2,common.Pb=0,ticks=5,anchor=0,
                              hide=NULL,omit=NULL,omit.fill=NA,
-                             omit.stroke='grey',...){
+                             omit.stroke='grey',box=TRUE,...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -324,7 +324,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                                         oerr=oerr,dispunits=dispunits,...))
     }
     plotConcordiaLine(X2plot,lims=lims,type=type,col=concordia.col,
-                      oerr=oerr,exterr=exterr,ticks=ticks)
+                      oerr=oerr,exterr=exterr,ticks=ticks,box=box)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
     else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
@@ -335,6 +335,9 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.fill=omit.fill,
                 omit.stroke=omit.stroke,addcolourbar=FALSE,...)
+    if (show.age==4){
+        showDispersion(fit,inverse=(type==2),wtype=anchor[1],type='TW')
+    }
     if (show.age==1){
         ell <- ellipse(fit$x[1],fit$x[2],fit$ccov)
         graphics::polygon(ell,col='white')
@@ -347,7 +350,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
 
 # helper function for plot.concordia
 plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
-                              oerr=3,exterr=FALSE,ticks=5){
+                              oerr=3,exterr=FALSE,ticks=5,box=TRUE){
     if (length(ticks)<2)
         ticks <- prettier(lims$t,type=type,n=ticks,
                           binary=measured.disequilibrium(x$d))
@@ -385,7 +388,7 @@ plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
         }
         graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
     }
-    graphics::box()
+    if (box) graphics::box()
 }
 # helper function for plot.concordia
 prepare.concordia.line <- function(x,tlim,type=1,...){
@@ -747,18 +750,12 @@ mswd.concordia <- function(x,cc,type=1,pars,exterr=FALSE){
     SS.equivalence <- LL.concordia.comp(mu=cc$x,x=x,type=type,mswd=TRUE)
     SS.concordance <- LL.concordia.age(pars,cc=cc,type=type,exterr=exterr,
                                        d=mediand(x$d),mswd=TRUE)
-    df.equivalence <- 2*length(x)-2
-    df.concordance <- 1
-    mswd <- rep(0,3)
-    p.value <- rep(0,3)
-    df <- rep(0,3)
+    mswd <- p.value <- df <- rep(0,3)
     labels <- c('equivalence','concordance','combined')
-    names(mswd) <- labels
-    names(p.value) <- labels
-    names(df) <- labels
-    df['equivalence'] <- df.equivalence
-    df['concordance'] <- df.concordance
-    df['combined'] <- df.equivalence + df.concordance
+    names(mswd) <- names(p.value) <- names(df) <- labels
+    df['equivalence'] <- 2*length(x)-2
+    df['concordance'] <- 1
+    df['combined'] <- df['equivalence'] + df['concordance']
     mswdpequi <- getMSWD(SS.equivalence,df['equivalence'])
     mswdpconc <- getMSWD(SS.concordance,df['concordance'])
     mswdpcomb <- getMSWD(SS.equivalence+SS.concordance,df['combined'])

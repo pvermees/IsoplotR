@@ -111,20 +111,8 @@ yorkhelper <- function(x,np=2){
     names(out$a) <- c('a','s[a]')
     names(out$b) <- c('b','s[b]')
     out$type <- 'york'
-    out <- append(out,getMSWD(X2=sum(W*(Y-b*X-a)^2),df=nrow(x)-np))
-    out
-}
-
-getMSWD <- function(X2,df){
-    out <- list()
-    out$df <- df
-    if (df>0){
-        out$mswd <- as.numeric(X2/df)
-        out$p.value <- as.numeric(1-stats::pchisq(X2,df))
-    } else {
-        out$mswd <- 1
-        out$p.value <- 1
-    }
+    out$df <- nrow(x)-np
+    out <- append(out,getMSWD(X2=sum(W*(Y-b*X-a)^2),df=out$df))
     out
 }
 

@@ -325,6 +325,8 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
     out
 }
 
+#' @rdname classes
+#' @export
 as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     out <- list()
     class(out) <- "UPb"
@@ -520,6 +522,8 @@ get.cov.47.75 <- function(Pb204Pb207,errPb204Pb207,
                  Pb207U235,errPb207U235,
                  Pb204U238,errPb204U238)
 }
+#' @rdname classes
+#' @export
 as.PbPb <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "PbPb"
@@ -549,6 +553,8 @@ as.PbPb <- function(x,format=1,ierr=1){
     out$x <- insert.data(x=X,cnames=cnames,opt=opt)
     out
 }
+#' @rdname classes
+#' @export
 as.ArAr <- function(x,format=3,ierr=1){
     out <- list()
     class(out) <- "ArAr"
@@ -581,6 +587,8 @@ as.ArAr <- function(x,format=3,ierr=1){
     }
     out
 }
+#' @rdname classes
+#' @export
 as.ThPb <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "ThPb"
@@ -606,6 +614,8 @@ as.ThPb <- function(x,format=1,ierr=1){
     out$x <- insert.data(x=X,cnames=cnames)
     out
 }
+#' @rdname classes
+#' @export
 as.KCa <- function(x,format=1,ierr=1){
     out <- list()
     class(out) <- "KCa"
@@ -631,6 +641,8 @@ as.KCa <- function(x,format=1,ierr=1){
     out$x <- insert.data(x=X,cnames=cnames)
     out
 }
+#' @rdname classes
+#' @export
 as.RbSr <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Rb87Sr86','errRb87Sr86',
@@ -644,6 +656,8 @@ as.RbSr <- function(x,format=1,ierr=1){
     }
     as.PD(x,"RbSr",cnames,format,ierr)
 }
+#' @rdname classes
+#' @export
 as.ReOs <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Re187Os188','errRe187Os188',
@@ -657,6 +671,8 @@ as.ReOs <- function(x,format=1,ierr=1){
     }
     as.PD(x,"ReOs",cnames,format,ierr)
 }
+#' @rdname classes
+#' @export
 as.SmNd <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Sm143Nd144','errSm143Nd144',
@@ -670,6 +686,8 @@ as.SmNd <- function(x,format=1,ierr=1){
     }
     as.PD(x,"SmNd",cnames,format,ierr)
 }
+#' @rdname classes
+#' @export
 as.LuHf <- function(x,format=1,ierr=1){
     if (format==1){
         cnames <- c('Lu176Hf177','errLu176Hf177',
@@ -698,6 +716,8 @@ as.PD <- function(x,classname,cnames,format,ierr){
     out$x <- insert.data(x=X,cnames=cnames,opt=opt)
     out
 }
+#' @rdname classes
+#' @export
 as.ThU <- function(x,format=1,ierr=1,U8Th2=0,Th02i=c(0,0),
                    Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     out <- list()
@@ -737,6 +757,8 @@ as.ThU <- function(x,format=1,ierr=1,U8Th2=0,Th02i=c(0,0),
     out$x <- insert.data(x=X,cnames=cnames)
     out
 }
+#' @rdname classes
+#' @export
 as.UThHe <- function(x,ierr=1){
     nc <- ncol(x)
     nr <- nrow(x)
@@ -750,6 +772,8 @@ as.UThHe <- function(x,ierr=1){
     class(out) <- append("UThHe",class(out))
     out
 }
+#' @rdname classes
+#' @export
 as.fissiontracks <- function(x,format=1,ierr=1){
     nr <- nrow(x)
     nc <- ncol(x)
@@ -785,6 +809,8 @@ as.fissiontracks <- function(x,format=1,ierr=1){
     }
     out
 }
+#' @rdname classes
+#' @export
 as.detritals <- function(x){
     out <- list()
     class(out) <- "detritals"
@@ -799,6 +825,8 @@ as.detritals <- function(x){
     }
     out
 }
+#' @rdname classes
+#' @export
 as.other <- function(x,format=NULL,ierr=1){
     out <- list()
     class(out) <- "other"

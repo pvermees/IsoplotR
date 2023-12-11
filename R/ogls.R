@@ -42,13 +42,13 @@ ogls.default <- function(x,random.effects=FALSE,...){
         init <- c(yfit$a[1],yfit$b[1],lw=unname(log(yfit$a[2])))
         out <- stats::optim(init,LLw.ogls,dat=x,hessian=TRUE)
         SS <- LLw.ogls(out$par,dat=x,LL=FALSE)
-        df <- ns-3
+        out$df <- ns-3
     } else {
         init <- c(yfit$a[1],yfit$b[1])
         omega <- solve(x[,-1])
         out <- stats::optim(init,LL.ogls,dat=x,omega=omega,hessian=TRUE)
         SS <- LL.ogls(out$par,dat=x,omega=omega,LL=FALSE)
-        df <- ns-2
+        out$df <- ns-2
     }
     covmat <- solve(out$hessian)
     out$a <- c('a'=unname(out$par[1]),'s[a]'=unname(sqrt(covmat[1,1])))
@@ -60,7 +60,7 @@ ogls.default <- function(x,random.effects=FALSE,...){
     }
     out$cov.ab <- covmat[1,2]
     out$type <- "ogls"
-    out <- append(out,getMSWD(X2=SS,df=df))
+    out <- append(out,getMSWD(X2=SS,df=out$df))
     out
 }
 #' @rdname ogls

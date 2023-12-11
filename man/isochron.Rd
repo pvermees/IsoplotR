@@ -65,6 +65,7 @@ isochron(x, ...)
   model = 1,
   wtype = 1,
   anchor = 0,
+  flippable = 0,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -517,6 +518,14 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
+\item{flippable}{controls if generic data (where \code{x} has class
+\code{other} and \code{x$format} is either \code{4} or
+\code{5}) should be treated as inverse isochrons
+(\code{flippable=1}) or as conventional isochrons
+(\code{flippable=2}). If \code{flippable=0} (which is the
+default value), then the data are passed on to
+\code{isochron.default}.}
+
 \item{joint}{logical. Only applies to U-Pb data formats 4 and
 above. If \code{TRUE}, carries out three dimensional
 regression.  If \code{FALSE}, uses two dimensional isochron
@@ -832,6 +841,20 @@ parameter \eqn{w}.}
 \item{ylab}{the y-label of the isochron plot}
 
 }
+
+OR, if \code{x} has class \code{other} and \code{x$format} is
+either \code{4} or \code{5} and \code{flippable} is not \code{0},
+returns
+
+\code{Dd}: the ratio of the inherited radiogenic daughter to its
+nonradiogenic sister isotope
+
+\code{DP}: the ratio fo the radiogic daughter to its radioactive parent
+
+\code{cov.DdDP}: the covariance between \code{Dd} and \code{DP}.
+
+In the remaining types of \code{other} data, the intercept \code{a}
+and \code{b} are returned along with their covariance.
 }
 \description{
 Plots cogenetic U-Pb, Ar-Ar, K-Ca, Pb-Pb, Th-Pb, Rb-Sr, Sm-Nd,

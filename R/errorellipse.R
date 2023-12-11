@@ -125,6 +125,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param asp the y/x aspect ratio, see `plot.window'.
 #' @param log same as the eponymous argument to the generic
 #'     \code{plot} function.
+#' @param box logical. If \code{TRUE}, draws a frame around the plot.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -145,7 +146,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
-                        asp=NA,log='',...){
+                        asp=NA,log='',box=TRUE,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -158,15 +159,13 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         if (missing(xlab)) xlab <- ''
         if (missing(ylab)) ylab <- ''
         graphics::plot(xlim,ylim,type='n',xlab=xlab,ylab=ylab,
-                       bty='n',asp=asp,log=log)
+                       bty='n',asp=asp,log=log,...)
         if (empty) return()
     }
     if (!identical(fit,'none')){
-        usr <- graphics::par('usr')
-        plot_isochron_line(fit,x=seq(usr[1],usr[2],length.out=100),
-                           oerr=oerr,ci.col=ci.col,col=line.col,lwd=lwd)
+        plot_isochron_line(fit,oerr=oerr,ci.col=ci.col,col=line.col,lwd=lwd)
     }
-    graphics::box()
+    if (box) graphics::box()
     nolevels <- all(is.na(levels))
     fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
                                 hide=hide,omit=omit,omit.col=omit.fill)
@@ -176,7 +175,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         if (missing(cex)) cex <- 1
         if (missing(bg)) bg <- fill
         plot_points(xy[,'X'],xy[,'Y'],bg=bg,cex=cex,col=stroke,
-                    show.numbers=show.numbers,hide=hide,omit=omit,...)
+                    show.numbers=show.numbers,hide=hide,omit=omit)
     } else if (show.ellipses==1){ # error ellipse
         if (missing(cex)) cex <- 0.25
         for (i in sn[plotit]){
@@ -212,11 +211,19 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
 }
 
 plot_isochron_line <- function(fit,x,oerr=3,ci.col='gray80',...){
+    usr <- graphics::par('usr')
+    from <- max(0,usr[1])
+    to <- ifelse(fit$b[1]<0,-fit$a[1]/fit$b[1],usr[2])
+    x <- c(from,to)
     y <- fit$a[1]+fit$b[1]*x
-    sy <- sqrt(fit$a[2]^2 + 2*x*fit$cov.ab + (fit$b[2]*x)^2)
-    e <- ci(x=y,sx=sy,oerr=oerr,absolute=TRUE)
-    cix <- c(x,rev(x))
-    ciy <- c(y+e,rev(y-e))
+    xci <- seq(usr[1],usr[2],length.out=100)
+    yci <- fit$a[1]+fit$b[1]*xci
+    syci <- sqrt(fit$a[2]^2 + 2*xci*fit$cov.ab + (fit$b[2]*xci)^2)
+    e <- ci(x=yci,sx=syci,oerr=oerr,absolute=TRUE)
+    cix <- c(xci,rev(xci))
+    cix[cix<0] <- 0
+    ciy <- c(yci+e,rev(yci-e))
+    ciy[ciy<0] <- 0
     graphics::polygon(cix,ciy,col=ci.col,border=NA)
     graphics::lines(x,y,...)
 }
