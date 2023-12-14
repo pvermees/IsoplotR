@@ -1744,9 +1744,19 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
     if (fit$model!=3) return()
     usr <- graphics::par('usr')
     if (usr[1]>0 & usr[3]>0) return() # axes out of focus
-    if ((type=='p' & wtype==1)|
-        (type=='d' & wtype==2 & inverse) |
-        (type=='d' & wtype==1 & !inverse)){
+    if (type=='p' & wtype==1){
+        y0 <- fit$a[1]
+        if ('invertedfit'%in%names(fit)){
+            cid <- ci(sx=y0*fit$invertedfit$disp[1]/fit$invertedfit$a[1])
+        } else {
+            cid <- ci(sx=fit$disp[1])
+        }
+        graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
+    } else if (type=='d' & wtype==2 & inverse){
+        y0 <- fit$a[1]
+        cid <- ci(sx=y0*fit$disp[1]/fit$age[1])
+        graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
+    } else if (type=='d' & wtype==1 & !inverse){
         y0 <- fit$a[1]
         cid <- ci(sx=fit$disp[1])
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)

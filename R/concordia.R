@@ -334,7 +334,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,addcolourbar=FALSE,...)
+                omit.stroke=omit.stroke,addcolourbar=FALSE,box=box,...)
     if (show.age==4){
         showDispersion(fit,inverse=(type==2),wtype=anchor[1],type='TW')
     }

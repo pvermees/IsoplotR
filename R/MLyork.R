@@ -7,7 +7,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
     E <- matrix(0,3,3)
     names(p) <- rownames(E) <- colnames(E) <- c('a','b','lw')
     ns <- nrow(yd)
-    if (anchor[1]==1 && length(anchor)>1){ # anchor intercept
+    if (anchor[1]==1 & length(anchor)>1){ # anchor intercept
         p['a'] <- anchor[2]
         lmfit <- stats::lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])
         init <- unname(lmfit$coefficients)
@@ -28,7 +28,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
             E['lw','lw'] <- 0
             df <- ns-1
         }
-    } else if (anchor[1]==2 && length(anchor)>1){ # anchor slope
+    } else if (anchor[1]==2 & length(anchor)>1){ # anchor slope
         p['b'] <- anchor[2]
         init <- unname(stats::median(yd[,'Y']-p['b']*yd[,'X']))
         if (model==2){
