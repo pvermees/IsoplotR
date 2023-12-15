@@ -150,14 +150,14 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     out$model <- model
     if (model==3){
         if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-            disp <- fixDispersion(model=model,format=x$format,
-                                  anchor=anchor,type=type)
-            sdisp <- 0
+            w <- fixDispersion(model=model,format=x$format,
+                               anchor=anchor,type=type)
+            sw <- 0
         } else {
-            disp <- out$par['w']
-            sdisp <- sqrt(out$cov['w','w'])
+            w <- out$par['w']
+            sw <- sqrt(out$cov['w','w'])
         }
-        out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
+        out$disp <- c('w'=unname(w),'s[w]'=unname(sw))
     }
     out
 }

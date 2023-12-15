@@ -10,13 +10,25 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
     if (anchor[1]==1 & length(anchor)>1){ # anchor intercept
         p['a'] <- anchor[2]
         lmfit <- stats::lm(I(yd[,'Y']-p['a']) ~ 0 + yd[,'X'])
-        init <- unname(lmfit$coefficients)
         if (model==2){
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
             p['b'] <- fit$par[2]
             E['b','b'] <- fit$cov[2,2]
+        } else if (model==3 & (length(anchor)<3 || anchor[3]<=0)){
+            binit <- unname(lmfit$coefficients)
+            lwinit <- log(vcov(lmfit))/2
+            init <- c(b=binit,lw=lwinit)
+            lower <- c(min(binit*c(2,1/2)),lwinit-2)
+            upper <- c(max(binit*c(2,1/2)),lwinit+2)
+            fit <- contingencyfit(init,LL.MLyork.blw,a=p['a'],
+                                  yd=yd,lower=lower,upper=upper)
+            pnames <- c('b','lw')
+            p[pnames] <- fit$par
+            E[pnames,pnames] <- inverthess(fit$hessian)
+            df <- ns-2
         } else {
-            interval <- sort(c(init/2,init*2))
+            binit <- unname(lmfit$coefficients)
+            interval <- sort(binit*c(2,1/2))
             lw <- ifelse(model==3 & length(anchor)>2, log(anchor[3]), -Inf)
             fit <- stats::optimise(LL.MLyork.b,a=p['a'],lw=lw,
                                    yd=yd,interval=interval,tol=tol)
@@ -35,6 +47,18 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
             p['a'] <- fit$par[1]
             E['a','a'] <- fit$cov[1,1]
+        } else if (model==3 & (length(anchor)<3 || anchor[3]<=0)){
+            ainit <- unname(lmfit$coefficients)
+            lwinit <- log(vcov(lmfit))/2
+            init <- c(a=ainit,lw=lwinit)
+            lower <- c(min(ainit*c(2,1/2)),lwinit-2)
+            upper <- c(max(ainit*c(2,1/2)),lwinit+2)
+            fit <- contingencyfit(init,LL.MLyork.alw,b=p['b'],
+                                  yd=yd,lower=lower,upper=upper)
+            pnames <- c('a','lw')
+            p[pnames] <- fit$par
+            E[pnames,pnames] <- inverthess(fit$hessian)
+            df <- ns-2
         } else {
             interval <- sort(c(init/2,init*2))
             lw <- ifelse(model==3 & length(anchor)>2, log(anchor[3]), -Inf)
@@ -84,8 +108,8 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
     fit$b <- c(p['b'],'s[b]'=unname(sqrt(E['b','b'])))
     fit$cov.ab <- E['a','b']
     if (model==3){
-        fit$disp <- c('w'=unname(exp(p['lw'])),
-                      's[w]'=unname(exp(p['lw'])*sqrt(E['lw','lw'])))
+        fit$w <- c('w'=unname(exp(p['lw'])),
+                   's[w]'=unname(exp(p['lw'])*sqrt(E['lw','lw'])))
     }
     fit
 }
@@ -101,11 +125,11 @@ LL.MLyork.ab <- function(ab,lw=-Inf,yd,returnval='LL'){
 }
 LL.MLyork.alw <- function(alw,b,yd,returnval='LL'){
     LL.MLyork.ablw(c(alw[1],b,alw[2]),yd=yd,
-                   wtype='a',returnval=returnval)
+                   wtype='b',returnval=returnval)
 }
 LL.MLyork.blw <- function(blw,a,yd,returnval='LL'){
     LL.MLyork.ablw(c(a,blw),yd=yd,
-                   wtype='b',returnval=returnval)
+                   wtype='a',returnval=returnval)
 }
 LL.MLyork.ablw <- function(ablw,yd,wtype='a',returnval='LL'){
     a <- ablw[1]

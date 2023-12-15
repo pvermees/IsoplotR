@@ -64,9 +64,9 @@ model3regression <- function(xyz,type='york',wtype='a'){
     } else {
         stop('invalid output type for model 3 regression')
     }
-    disp <- exp(out$par['lw'])
-    sdisp <- disp*sqrt(E['lw','lw'])
-    out$disp <- c('w'=unname(disp),'s[w]'=unname(sdisp))
+    w <- exp(out$par['lw'])
+    sw <- w*sqrt(E['lw','lw'])
+    out$w <- c('w'=unname(w),'s[w]'=unname(sw))
     out
 }
 

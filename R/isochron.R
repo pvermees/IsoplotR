@@ -594,6 +594,9 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             fit$Dd['disp[Dd]'] <- sqrt(fit$mswd)*fit$Dd['s[Dd]']
             fit$DP['disp[DP]'] <- sqrt(fit$mswd)*fit$DP['s[DP]']
         }
+        if (model==3){
+            fit$disp <- w2disp(x=x,fit=fit,wtype=wtype,inverse=inverse)
+        }
         scatterplot(fit$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -640,7 +643,6 @@ genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        showDispersion(fit,inverse=(flippable==1),wtype=wtype)
         if (title)
             graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,units=''),
                             xlab=xlab,ylab=ylab)
@@ -1009,8 +1011,8 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 & (wtype==2 | anchor[1]==2)){
-        out$disp <- out$disp/mclean(out$age['t'])$dPb207Pb206dt
+    if (model==3){
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
     }
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
@@ -1082,15 +1084,15 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-    out <- fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
-                          anchor=anchor,hide=hide,omit=omit,type="p",
-                          y0rat='Ar40Ar36',t2DPfun=get.ArAr.ratio,
-                          J=x$J[1],sJ=x$J[2])
+    out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
+                   anchor=anchor,hide=hide,omit=omit,type="p",
+                   y0rat='Ar40Ar36',t2DPfun=get.ArAr.ratio,
+                   J=x$J[1],sJ=x$J[2])
     if (inverse) {
         R09 <- quotient(X=out$a[1],sX=out$a[2],
                         Y=out$b[1],sY=out$b[2],sXY=out$cov.ab)
         R09[1] <- -R09[1]
-        out$y0[c('y','s[y]')] <- quotient(X=fit$a[1],sX=fit$a[2],Y=1,sY=0,rXY=0)
+        out$y0[c('y','s[y]')] <- quotient(X=out$a[1],sX=out$a[2],Y=1,sY=0,rXY=0)
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
         y.lab <- quote(''^36*'Ar/'^40*'Ar')
     } else {
@@ -1106,17 +1108,11 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                                            x$J[1],x$J[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    dispunits = ''
     if (model==3){
-        if (anchor[1]==2 | (wtype==2 & anchor[1]!=1)){
-            l40 <- lambda('K40')[1]
-            dtd09 <- (x$J[1]/l40)/(x$J[1]*R09+1)
-            d09db <- ifelse(inverse,1/out$a[1],1)
-            out$disp <- dtd09*d09db*out$disp
-            dispunits <- ' Ma'
-        } else {
-            out$disp <- out$y0[1]*fit$disp/fit$a[1]
-        }
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
+        dispunits <- ifelse(wtype==2,' Ma','')
+    } else {
+        dispunits <- ''
     }
     if (plot) {
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
@@ -1301,8 +1297,9 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     displabel <- 'dispersion = '
     dispunits <- ''
     if (x$format %in% c(1,2)){
-        out <- isochron_ThU_3D(x,type=type,model=model,wtype=wtype,exterr=exterr,
-                               hide=hide,omit=omit,y0option=y0option)
+        out <- isochron_ThU_3D(x,type=type,model=model,wtype=wtype,
+                               exterr=exterr,hide=hide,omit=omit,
+                               y0option=y0option)
         if (model==3){
             if (wtype=='a'){
                 displabel <- quote('('^234*'U/'^238*'U)'[a]*'-dispersion = ')
@@ -1330,7 +1327,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
             if (age2disp){
                 l0 <- lambda('Th230')[1]
                 dtd08 <- 1/(l0*(1-Th230U238))
-                out$disp <- out$disp*dtd08
+                out$disp <- out$w*dtd08
                 dispunits <- ' ka'
             } else {
                 displabel <- quote('('^230*'Th/'^232*'Th)'[0]*'-dispersion = ')
@@ -1541,7 +1538,7 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
     if (model==3 & (wtype==2 | anchor[1]==2)){
         dDPdt <- lambda(nuclide)[1]*(1+DP[1])
         dDPdb <- ifelse(inverse,1/out$a[1],1)
-        out$disp <- out$disp*dDPdb/dDPdt
+        out$disp <- out$w*dDPdb/dDPdt
     }
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse,i0=i0)
@@ -1745,25 +1742,22 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
     usr <- graphics::par('usr')
     if (usr[1]>0 & usr[3]>0) return() # axes out of focus
     if (type=='p' & wtype==1){
-        y0 <- fit$a[1]
         if ('invertedfit'%in%names(fit)){
-            cid <- ci(sx=y0*fit$invertedfit$disp[1]/fit$invertedfit$a[1])
+            reldisp <- fit$invertedfit$w[1]/fit$invertedfit$anchor[2]
         } else {
-            cid <- ci(sx=fit$disp[1])
+            reldisp <- fit$w[1]/fit$anchor[2]
         }
-        graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
-    } else if (type=='d' & wtype==2 & inverse){
         y0 <- fit$a[1]
-        cid <- ci(sx=y0*fit$disp[1]/fit$age[1])
-        graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
-    } else if (type=='d' & wtype==1 & !inverse){
-        y0 <- fit$a[1]
-        cid <- ci(sx=fit$disp[1])
+        cid <- ci(sx=y0*reldisp)
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
     } else if (type=='p' & wtype==2 & inverse){
         x0 <- fit$flippedfit$a[1]
-        cid <- ci(sx=fit$flippedfit$disp[1])
+        cid <- ci(sx=x0*fit$flippedfit$w[1]/fit$flippedfit$anchor[2])
         graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
+    } else if (type=='d' & ((wtype==2 & inverse) | (wtype==1 & !inverse))){
+        y0 <- fit$a[1]
+        cid <- ci(sx=y0*fit$w[1]/fit$anchor[2])
+        graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
     } else if (type=='TW' & wtype==1){
         y0 <- fit$par['a0']
         cid <- ci(sx=fit$disp[1])
@@ -1785,4 +1779,54 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
             graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
         }
     }
+}
+
+w2disp <- function(x,...){ UseMethod("w2disp",x) }
+w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
+    if (wtype==2){
+        out <- wa2wt(x=x,tt=fit$age[1],a=fit$flippedfit$a[1],wa=fit$flippedfit$w)
+    } else if (inverse){
+        out <- fit$y0[1]*fit$invertedfit$w/fit$invertedfit$a[1]
+    } else {
+        out <- fit$y0[1]*fit$w/fit$a[1]
+    }
+}
+w2disp.other <- function(x,fit,wtype,inverse,...){
+    if (wtype==2){
+        out <- fit$DP[1]*fit$flippedfit$w/fit$flippedfit$a[1]
+    } else if (inverse){
+        out <- fit$Dd[1]*fit$invertedfit$w/fit$invertedfit$a[1]
+    } else {
+        out <- fit$Dd[1]*fit$w/fit$a[1]
+    }
+    out
+}
+w2disp.PbPb <- function(x,fit,wtype,inverse){ # type = 'd'
+    if (inverse){
+        if (wtype==1){
+            out <- fit$y0[1]*fit$invertedfit$w/fit$invertedfit$a[1]
+        } else {
+            out <- wa2wt(x=x,tt=fit$age[1],a=fit$a[1],wa=fit$w)
+        }
+    } else {
+        if (wtype==1){
+            out <- fit$w
+        } else {
+            out <- wa2wt(x=x,tt=fit$age[1],a=fit$invertedfit$a[1],wa=fit$invertedfit$w)
+        }
+    }
+    out
+}
+
+wa2wt <- function(x,...){ UseMethod("wa2wt",x) }
+wa2wt.default <- function(x,...){stop("Not implemented.")}
+wa2wt.ArAr <- function(x,tt,a,wa){
+    l40 <- lambda('K40')[1]
+    dtda <- -x$J[1]/(l40*a*(a+x$J[1]))
+    abs(dtda*wa)
+}
+wa2wt.PbPb <- function(x,tt,a,wa){
+    McL <- mclean(tt=tt)
+    dtda <- 1/McL$dPb207Pb206dt
+    abs(dtda*wa)
 }
