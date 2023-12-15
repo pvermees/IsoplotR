@@ -990,26 +990,16 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-    out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
+    fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="d",
                    y0rat='Pb207Pb204',t2DPfun=age_to_Pb207Pb206_ratio)
+    out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr)
     if (inverse){
-        R76 <- out$a
-        out$y0[c('y','s[y]')] <- out$b
         x.lab <- quote(''^204*'Pb/'^206*'Pb')
         y.lab <- quote(''^207*'Pb/'^206*'Pb')
     } else {
-        R76 <- out$b
-        out$y0[c('y','s[y]')] <- out$a
         x.lab <- quote(''^206*'Pb/'^204*'Pb')
         y.lab <- quote(''^207*'Pb/'^204*'Pb')
-    }
-    out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
-    out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
-    if (inflate(out)){
-        out$age['disp[t]'] <- 
-            get.Pb207Pb206.age(R76[1],sqrt(out$mswd)*R76[2],exterr=exterr)[2]
-        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
     if (model==3){
         out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
@@ -1084,36 +1074,22 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           show.ellipses=1*(model!=2),hide=NULL,
                           omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-    out <- flipper(x,inverse=inverse,model=model,wtype=wtype,
+    fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="p",
                    y0rat='Ar40Ar36',t2DPfun=get.ArAr.ratio,
                    J=x$J[1],sJ=x$J[2])
-    if (inverse) {
-        R09 <- quotient(X=out$a[1],sX=out$a[2],
-                        Y=out$b[1],sY=out$b[2],sXY=out$cov.ab)
-        R09[1] <- -R09[1]
-        out$y0[c('y','s[y]')] <- quotient(X=out$a[1],sX=out$a[2],Y=1,sY=0,rXY=0)
+    out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr)
+    if (inverse){
         x.lab <- quote(''^39*'Ar/'^40*'Ar')
         y.lab <- quote(''^36*'Ar/'^40*'Ar')
     } else {
-        R09 <- out$b
-        out$y0[c('y','s[y]')] <- out$a
         x.lab <- quote(''^39*'Ar/'^36*'Ar')
         y.lab <- quote(''^40*'Ar/'^36*'Ar')
     }
-    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
-    out$age[c('t','s[t]')] <- get.ArAr.age(R09[1],R09[2],x$J[1],x$J[2],exterr=exterr)
-    if (inflate(out)){
-        out$age['disp[t]'] <- get.ArAr.age(R09[1],sqrt(out$mswd)*R09[2],
-                                           x$J[1],x$J[2],exterr=exterr)[2]
-        out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
-    }
     if (model==3){
         out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
-        dispunits <- ifelse(wtype==2,' Ma','')
-    } else {
-        dispunits <- ''
     }
+    dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
@@ -1535,10 +1511,8 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
                                 nuclide=nuclide,exterr=exterr,bratio=bratio,d=d)[2]
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     }
-    if (model==3 & (wtype==2 | anchor[1]==2)){
-        dDPdt <- lambda(nuclide)[1]*(1+DP[1])
-        dDPdb <- ifelse(inverse,1/out$a[1],1)
-        out$disp <- out$w*dDPdb/dDPdt
+    if (model==3){
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse,nuclide=nuclide)
     }
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     lab <- get.isochron.labels(nuclide=nuclide,inverse=inverse,i0=i0)
@@ -1820,13 +1794,59 @@ w2disp.PbPb <- function(x,fit,wtype,inverse){ # type = 'd'
 
 wa2wt <- function(x,...){ UseMethod("wa2wt",x) }
 wa2wt.default <- function(x,...){stop("Not implemented.")}
-wa2wt.ArAr <- function(x,tt,a,wa){
+wa2wt.ArAr <- function(x,tt,a,wa,...){
     l40 <- lambda('K40')[1]
     dtda <- -x$J[1]/(l40*a*(a+x$J[1]))
     abs(dtda*wa)
 }
-wa2wt.PbPb <- function(x,tt,a,wa){
+wa2wt.PD <- function(x,tt,a,wa,nuclide,...){
+    lambda <- lambda(nuclide)[1]
+    dtda <- -1/(lambda*(a+a^2))
+    abs(dtda*wa)
+}
+wa2wt.PbPb <- function(x,tt,a,wa,...){
     McL <- mclean(tt=tt)
     dtda <- 1/McL$dPb207Pb206dt
     abs(dtda*wa)
+}
+
+ab2y0t <- function(x,...){ UseMethod("ab2y0t",x) }
+ab2y0t.default <- function(x,...){stop("Not implemented.")}
+ab2y0t.PbPb <- function(x,fit,inverse,exterr,...){
+    out <- fit
+    if (inverse){
+        R76 <- fit$a
+        out$y0[c('y','s[y]')] <- fit$b
+    } else {
+        R76 <- fit$b
+        out$y0[c('y','s[y]')] <- fit$a
+    }
+    out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
+    out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
+    if (inflate(fit)){
+        out$age['disp[t]'] <- 
+            get.Pb207Pb206.age(R76[1],sqrt(fit$mswd)*R76[2],exterr=exterr)[2]
+        out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    }
+    out
+}
+ab2y0t.ArAr <- function(x,fit,inverse,exterr,...){
+    out <- fit
+    if (inverse) {
+        R09 <- quotient(X=fit$a[1],sX=fit$a[2],
+                        Y=fit$b[1],sY=fit$b[2],sXY=fit$cov.ab)
+        R09[1] <- -R09[1]
+        out$y0[c('y','s[y]')] <- quotient(X=fit$a[1],sX=fit$a[2],Y=1,sY=0,rXY=0)
+    } else {
+        R09 <- fit$b
+        out$y0[c('y','s[y]')] <- fit$a
+    }
+    out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
+    out$age[c('t','s[t]')] <- get.ArAr.age(R09[1],R09[2],x$J[1],x$J[2],exterr=exterr)
+    if (inflate(out)){
+        out$age['disp[t]'] <- get.ArAr.age(R09[1],sqrt(fit$mswd)*R09[2],
+                                           x$J[1],x$J[2],exterr=exterr)[2]
+        out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    }
+    out
 }
