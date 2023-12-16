@@ -149,15 +149,14 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     out <- mswd.lud(afit,x=X,exterr=exterr,type=type)
     out$model <- model
     if (model==3){
-        if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-            w <- fixDispersion(model=model,format=x$format,
-                               anchor=anchor,type=type)
-            sw <- 0
+        if ('w'%in%names(fit$par)){
+            w <- unname(exp(fit$par['w']))
+            sw <- unname(sqrt(fit$cov['w','w']))
         } else {
-            w <- out$par['w']
-            sw <- sqrt(out$cov['w','w'])
+            w <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
+            sw <- 0
         }
-        out$disp <- c('w'=unname(w),'s[w]'=unname(sw))
+        out$disp <- c('w'=w,'s[w]'=sw)
     }
     out
 }
@@ -273,124 +272,68 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 }
 
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
-    if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,free=(model!=3))
-        par <- init$par
-        if (anchor[1]==2 & length(anchor)>1){
-            tt <- anchor[2]
-        } else {
-            tt <- exp(par['t'])
-        }
-    } else {
-        init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type)
-        fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
-                              upper=init$upper,x=x,anchor=anchor,type=type)
-        E <- inverthess(fit$hessian)
-        par <- fit$par
-        if (anchor[1]==2 & length(anchor)>1){
-            tt <- anchor[2]
-            if (length(anchor)>2 & anchor[3]>0){
-                par['t'] <- log(tt)
-                par['w'] <- log(anchor[3])
-            } else {
-                par['w'] <- ifelse(tt>0,log(tt)-4,0)
-            }
-        } else {
-            tt <- exp(fit$par['t'])
-            par['w'] <- fit$par['t'] + log(E['t','t'])/2
-        }
-        init$lower['w'] <- par['w'] - max(buffer,10)
-        init$upper['w'] <- par['w'] + buffer
-    }
-    lower <- init$lower
-    upper <- init$upper
+    init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,model=model)
     if (x$d$U48$option==2 | x$d$ThU$option==2){
         McL <- mclean(tt=tt,d=x$d)
     }
     if (type%in%c('joint',0,1,3)){
         if (x$d$U48$option==1 & x$d$U48$sx>0){
-            par['U48i'] <- x$d$U48$x
+            init$par['U48i'] <- x$d$U48$x
         } else if (x$d$U48$option==2 & x$d$U48$sx>0){
-            par['U48i'] <- max(0,McL$U48i)
+            init$par['U48i'] <- max(0,McL$U48i)
         }
         if ('U48i'%in%names(par)){
-            lower['U48i'] <- x$d$U48$m + x$d$buffer
-            upper['U48i'] <- x$d$U48$M - x$d$buffer
+            init$lower['U48i'] <- x$d$U48$m + x$d$buffer
+            init$upper['U48i'] <- x$d$U48$M - x$d$buffer
         }
         if (x$d$ThU$option==1 & x$d$ThU$sx>0){
-            par['ThUi'] <- x$d$ThU$x
+            init$par['ThUi'] <- x$d$ThU$x
         } else if (x$d$ThU$option==2 & x$d$ThU$sx>0){
-            par['ThUi'] <- max(0,McL$ThUi)
+            init$par['ThUi'] <- max(0,McL$ThUi)
         }
         if ('ThUi'%in%names(par)){
-            lower['ThUi'] <- x$d$ThU$m + x$d$buffer
-            upper['ThUi'] <- x$d$ThU$M - x$d$buffer
+            init$lower['ThUi'] <- x$d$ThU$m + x$d$buffer
+            init$upper['ThUi'] <- x$d$ThU$M - x$d$buffer
         }
         if (x$d$RaU$option==1 & x$d$RaU$sx>0){
-            par['RaUi'] <- x$d$RaU$x
-            lower['RaUi'] <- x$d$RaU$m + x$d$buffer
-            upper['RaUi'] <- x$d$RaU$M - x$d$buffer
+            init$par['RaUi'] <- x$d$RaU$x
+            init$lower['RaUi'] <- x$d$RaU$m + x$d$buffer
+            init$upper['RaUi'] <- x$d$RaU$M - x$d$buffer
         }
     }
     if (type%in%c('joint',0,2,4)){
         if (x$d$PaU$option==1 & x$d$PaU$sx>0){
-            par['PaUi'] <- x$d$PaU$x
-            lower['PaUi'] <- x$d$PaU$m + x$d$buffer
-            upper['PaUi'] <- x$d$PaU$M - x$d$buffer
+            init$par['PaUi'] <- x$d$PaU$x
+            init$lower['PaUi'] <- x$d$PaU$m + x$d$buffer
+            init$upper['PaUi'] <- x$d$PaU$M - x$d$buffer
         }
     }
-    list(par=par,lower=lower,upper=upper)
-}
-
-fixedDispersion <- function(model,format,anchor,type){
-    case1 <- model!=3
-    case2 <- model==3 & anchor[1]==2
-    case3 <- model==3 & format%in%c(1:3,9:12) & anchor[1]%in%c(1,2)
-    case4 <- model==3 & format%in%(4:8) & anchor[1]%in%c(1,2) & type%ni%c('joint',0)
-    case1 | case2 | case3 | case4
+    init
 }
 
 fixDispersion <- function(model,format,anchor,type){
     if (model!=3){
-        w <- NULL
-    } else if (format<4){
-        if (anchor[1]==1){
-            w <- iratio('Pb207Pb206')[2]
-        } else if (anchor[1]==2){
-            w <- ifelse(length(anchor)>2,anchor[3],0)
-        } else {
-            w <- NULL
-        }
-    } else if (format%in%c(4,5,6,9,10)){
-        if (anchor[1]==1){
+        out <- NULL
+    } else if (anchor[1]==1){
+        if (format<4){
+            out <- iratio('Pb207Pb206')[2]
+        } else if (format%in%c(4,5,6,9,10)){
             if (type==1){
-                w <- iratio('Pb206Pb204')[2]
+                out <- iratio('Pb206Pb204')[2]
             } else if (type==2){
-                w <- iratio('Pb207Pb204')[2]
-            } else {
-                w <- NULL
+                out <- iratio('Pb207Pb204')[2]
             }
-        } else if (anchor[1]==2){
-            w <- ifelse(length(anchor)>2,anchor[3],0)
-        } else {
-            w <- NULL
-        }
-    } else if (format%in%c(7,8,11,12)){
-        if (anchor[1]==1){
+        } else if (format%in%c(7,8,11,12)){
             if (type==1){
-                w <- iratio('Pb206Pb208')[2]
+                out <- iratio('Pb206Pb208')[2]
             } else if (type==2){
-                w <- iratio('Pb207Pb208')[2]
-            } else {
-                stop('wrong format')
+                out <- iratio('Pb207Pb208')[2]
             }
-        } else if (anchor[1]==2){
-            w <- ifelse(length(anchor)>2,anchor[3],0)
-        } else {
-            w <- NULL
         }
+    } else if (anchor[1]==2 & length(anchor)>2){
+        out <- anchor[3]
     }
-    w
+    out
 }
 
 LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
@@ -876,17 +819,9 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
     diag(E)[i2] <- yd[,'sY']^2
     diag(E[i1,i2]) <- diag(E[i2,i1]) <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
     if (model==3){
-        if (fixedDispersion(model=model,format=x$format,anchor=anchor,type=type)){
-            w <- fixDispersion(model=model,format=x$format,
-                               anchor=anchor,type=type)
-            if (anchor[1]==1){
-                c0 <- getc0SSLL(yd,A=A,b=b,L0=L0,E=E,multiplier=multiplier)$c0
-                Ew <- getEw1(w=w,x=x,McL=McL,type=type,a0=a0,b0=b0,c0=c0)
-            } else if (anchor[1]==2){
-                Ew <- getEw2(w=w,x=x,McL=McL,type=type)
-            } else {
-               stop('invalid anchor')
-            }
+        if (anchor[1]==1){
+            c0 <- getc0SSLL(yd,A=A,b=b,L0=L0,E=E,multiplier=multiplier)$c0
+            Ew <- getEw1(w=ta0b0w['w'],x=x,McL=McL,type=type,a0=a0,b0=b0,c0=c0)
         } else {
             Ew <- getEw2(w=ta0b0w['w'],x=x,McL=McL,type=type)
         }
