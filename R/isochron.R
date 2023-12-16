@@ -1104,19 +1104,8 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
         out <- isochron_ThU_2D(x,type=type,model=model,wtype=wtype,
                                exterr=exterr,hide=hide,omit=omit)
         if (model==3){
-            if (type==1 && wtype%in%c('slope',2,'b')){
-                age2disp <- TRUE
-                Th230U238 <- out$b[1]
-            } else if (type==2 && wtype%in%c('intercept',1,'a')){
-                age2disp <- TRUE
-                Th230U238 <- out$a[1]
-            } else {
-                age2disp <- FALSE
-            }
-            if (age2disp){
-                l0 <- lambda('Th230')[1]
-                dtd08 <- 1/(l0*(1-Th230U238))
-                out$disp <- out$w*dtd08
+            if ((type==1 & wtype%in%c('slope',2,'b')) |
+                (type==2 & wtype%in%c('intercept',1,'a'))){
                 dispunits <- ' ka'
             } else {
                 displabel <- quote('('^230*'Th/'^232*'Th)'[0]*'-dispersion = ')
@@ -1125,6 +1114,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     } else {
         stop('Illegal Th-U data format.')
     }
+    out$disp <- w2disp(x,fit=out,type=type,wtype=wtype)
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1142,10 +1132,10 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
 
 isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
                             exterr=FALSE,hide=NULL,omit=NULL){
-    y <- data2york(x,type=type)
-    d2calc <- clear(y,hide,omit)
+    yd <- data2york(x,type=type)
+    d2calc <- clear(yd,hide,omit)
     out <- regression(d2calc,model=model,type="york",wtype=wtype)
-    out$xyz <- y
+    out$xyz <- yd
     if (type==1){
         Th230U238 <- out$b
         Th230Th232 <- out$a
@@ -1427,7 +1417,8 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
 w2disp <- function(x,...){ UseMethod("w2disp",x) }
 w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     if (wtype==2){
-        out <- wa2wt(x=x,tt=fit$age[1],a=fit$flippedfit$a[1],wa=fit$flippedfit$w)
+        out <- wa2wt(x=x,tt=fit$age[1],a=fit$flippedfit$a[1],
+                     wa=fit$flippedfit$w,...)
     } else if (inverse){
         out <- fit$y0[1]*fit$invertedfit$w/fit$invertedfit$a[1]
     } else {
@@ -1455,7 +1446,29 @@ w2disp.PbPb <- function(x,fit,wtype,inverse){ # type = 'd'
         if (wtype==1){
             out <- fit$w
         } else {
-            out <- wa2wt(x=x,tt=fit$age[1],a=fit$invertedfit$a[1],wa=fit$invertedfit$w)
+            out <- wa2wt(x=x,tt=fit$age[1],a=fit$invertedfit$a[1],
+                         wa=fit$invertedfit$w)
+        }
+    }
+    out
+}
+w2disp.ThU <- function(x,fit,type,wtype){
+    if (x$format%in%c(1,2)){
+        out <- fit$w
+    } else if (x$format%in%c(3,4)){
+        if (type==1 & wtype%in%c('slope',2,'b')){
+            age2disp <- TRUE
+            Th230U238 <- fit$b[1]
+        } else if (type==2 & wtype%in%c('intercept',1,'a')){
+            age2disp <- TRUE
+            Th230U238 <- fit$a[1]
+        } else {
+            age2disp <- FALSE
+        }
+        if (age2disp){
+            out <- wa2wt(x=x,tt=fit$age[1],a=Th230U238,wa=fit$w)
+        } else {
+            out <- fit$w
         }
     }
     out
@@ -1482,6 +1495,11 @@ wa2wt.PD <- function(x,tt,a,wa,nuclide,bratio=1,...){
 wa2wt.PbPb <- function(x,tt,a,wa,...){
     McL <- mclean(tt=tt)
     dtda <- 1/McL$dPb207Pb206dt
+    abs(dtda*wa)
+}
+wa2wt.ThU <- function(x,tt,a,wa,...){
+    l0 <- lambda('Th230')[1]
+    dtda <- 1/(l0*(1-a))
     abs(dtda*wa)
 }
 
@@ -1689,7 +1707,7 @@ getIsochronLabels.ThPb <- function(x,inverse,...){
         out$x <- quote(''^232*'Th/'^204*'Pb')
         out$y <- quote(''^208*'Pb/'^204*'Pb')
     }
-    out$y0 <- quote(''^208*'Pb/'^204*'Pb'[0]*'=')
+    out$y0 <- quote('('^208*'Pb/'^204*'Pb)'[0]*'=')
     out
 }
 getIsochronLabels.SmNd <- function(x,inverse,...){
@@ -1701,7 +1719,7 @@ getIsochronLabels.SmNd <- function(x,inverse,...){
         out$x <- quote(''^147*'Sm/'^144*'Nd')
         out$y <- quote(''^143*'Nd/'^144*'Nd')
     }
-    out$y0 <- quote(''^143*'Nd/'^144*'Nd'[0]*'=')
+    out$y0 <- quote('('^143*'Nd/'^144*'Nd)'[0]*'=')
     out
 }
 getIsochronLabels.ReOs <- function(x,inverse,...){
@@ -1713,7 +1731,7 @@ getIsochronLabels.ReOs <- function(x,inverse,...){
         out$x <- quote(''^187*'Re/'^188*'Os')
         out$y <- quote(''^187*'Os/'^188*'Os')
     }
-    out$y0 <- quote(''^187*'Os/'^188*'Os'[0]*'=')
+    out$y0 <- quote('('^187*'Os/'^188*'Os)'[0]*'=')
     out
 }
 getIsochronLabels.RbSr <- function(x,inverse,...){
@@ -1725,7 +1743,7 @@ getIsochronLabels.RbSr <- function(x,inverse,...){
         out$x <- quote(''^87*'Rb/'^86*'Sr')
         out$y <- quote(''^87*'Sr/'^86*'Sr')
     }
-    out$y0 <- quote(''^87*'Sr/'^86*'Sr'[0]*'=')
+    out$y0 <- quote('('^87*'Sr/'^86*'Sr)'[0]*'=')
     out
 }
 getIsochronLabels.LuHf <- function(x,inverse,...){
@@ -1737,7 +1755,7 @@ getIsochronLabels.LuHf <- function(x,inverse,...){
         out$x <- quote(''^176*'Lu/'^177*'Hf')
         out$y <- quote(''^176*'Hf/'^177*'Hf')
     }
-    out$y0 <- quote(''^176*'Hf/'^177*'Hf'[0]*'=')
+    out$y0 <- quote('('^176*'Hf/'^177*'Hf)'[0]*'=')
     out
 }
 getIsochronLabels.KCa <- function(x,inverse,...){
@@ -1749,7 +1767,7 @@ getIsochronLabels.KCa <- function(x,inverse,...){
         out$x <- quote(''^40*'K/'^44*'Ca')
         out$y <- quote(''^40*'Ca/'^44*'Ca')
     }
-    out$y0 <- quote(''^40*'Ca/'^44*'Ca'[0]*'=')
+    out$y0 <- quote('('^40*'Ca/'^44*'Ca)'[0]*'=')
     out
 }
 getIsochronLabels.UPb <- function(x,type=1,...){
@@ -1791,7 +1809,7 @@ getIsochronLabels.PbPb <- function(x,inverse,...){
         out$x <- quote(''^206*'Pb/'^204*'Pb')
         out$y <- quote(''^207*'Pb/'^204*'Pb')
     }
-    out$y0 <- quote(''^207*'Pb/'^204*'Pb'[c]*'=')
+    out$y0 <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
     out
 }
 getIsochronLabels.ArAr <- function(x,inverse,...){
@@ -1803,7 +1821,7 @@ getIsochronLabels.ArAr <- function(x,inverse,...){
         out$x <- quote(''^39*'Ar/'^36*'Ar')
         out$y <- quote(''^40*'Ar/'^36*'Ar')
     }
-    out$y0 <- quote(''^40*'Ar/'^36*'Ar'[0]*'=')
+    out$y0 <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
     out
 }
 getIsochronLabels.other <- function(x,inverse,...){
@@ -1818,7 +1836,7 @@ getIsochronLabels.other <- function(x,inverse,...){
     out$y0 <- quote('[D/d]'[0]*'=')
     out
 }
-getIsochronLabels.ThU <- function(x,inverse,...){
+getIsochronLabels.ThU <- function(x,type,...){
     out <- list()
     if (x$format%in%c(1,2)){
         if (type == 1){ # 0/2 vs 8/2
