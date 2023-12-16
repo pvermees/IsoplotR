@@ -519,6 +519,8 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                              omit.stroke='grey',...){
     d2calc <- clear(x,hide,omit)
     if (model>1 | anchor[1]==2){
+        ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@57@"]]));##:ess-bp-end:##
         fit <- MLyork(d2calc,anchor=anchor,model=model,wtype=wtype)
     } else {
         if (anchor[1]<1){
