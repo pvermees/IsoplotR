@@ -32,8 +32,12 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         }
         if (type=='d') y0 <- DP
         else y0 <- quotient(X=DP[1],sX=DP[2],Y=1,sY=0,sXY=0)
-        if (model>1) fit <- MLyork(d2calc,anchor=c(1,y0),model=model)
-        else fit <- anchoredYork(d2calc,y0=y0[1],sy0=y0[2])
+        if (model>1){
+            anchor <- c(1,y0)
+            fit <- MLyork(d2calc,anchor=anchor,model=model)
+        } else {
+            fit <- anchoredYork(d2calc,y0=y0[1],sy0=y0[2])
+        }
     } else if (wtype==1){
         fitinverse <- FALSE
         d2calc <- invertandclean(x=x,inverse=inverse,
@@ -51,6 +55,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     } else {
         stop("Invalid anchor and/or wtype value.")
     }
+    fit$anchor <- anchor
     out <- list()
     if (flip){
         out$flippedfit <- fit
@@ -93,7 +98,6 @@ unflipfit <- function(fit){
     out$a <- c(a,sqrt(vcovab[1]))
     out$b <- c(b,sqrt(vcovab[2]))
     out$cov.ab <- unname(vcovab[3])
-    out$disp <- abs(fit$disp/fit$a[1]^2)
     out
 }
 invertfit <- function(fit,type="p",wtype=0){
@@ -112,8 +116,6 @@ invertfit <- function(fit,type="p",wtype=0){
         out$a <- c(a,sqrt(vcovab[1]))
         out$b <- c(b,sqrt(vcovab[2]))
         out$cov.ab <- vcovab[3]
-        if (wtype==1) out$disp <- a*fit$disp/fit$a[1]
-        else if (wtype==2) out$disp <- abs(b*fit$disp/fit$a[1])
     } else if (type%in%c(2,"d")){
         out$a <- fit$b
         out$b <- fit$a
