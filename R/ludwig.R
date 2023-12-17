@@ -595,25 +595,25 @@ getEw1 <- function(w=0,x,McL=mclean(),type,a0=NA,b0=NA,c0){
     J <- matrix(0,2*ns,ns)
     U85 <- iratio('U238U235')[1]
     if (format<4){
-        diag(J[i2,i1]) <- -c0/(U85*a0^2)     # dLda0
+        diag(J[i2,i1]) <- -c0/(U85*a0^2)   # dLda0
     } else if (format%in%c(4,5,6,9,10)){
         if (type==1){
-            diag(J[i2,i1]) <- -c0*U85        # dLda0
+            diag(J[i2,i1]) <- -c0          # dLda0
         } else if (type==2){
-            diag(J[i2,i1]) <- -c0            # dLdb0
+            diag(J[i2,i1]) <- -c0          # dLdb0
         } else {
             stop('invalid isochron type')
         }
     } else if (format%in%c(7,8,11,12)){
         ThU <- x$x[,'Th232U238']
         if (type==1){
-            diag(J[i2,i1]) <- -ThU*c0        # dLda0
+            diag(J[i2,i1]) <- -c0          # dLda0
         } else if (type==2){
-            diag(J[i2,i1]) <- -ThU*U85       # dLdb0
+            diag(J[i2,i1]) <- -c0          # dLdb0
         } else if (type==3){
-            diag(J[i2,i1]) <- -c0*ThU/a0^2   # dLda0
+            diag(J[i2,i1]) <- -c0/a0^2     # dLda0
         } else if (type==4){
-            diag(J[i2,i1]) <- -c0*ThU*U85/b0^2 # dLdb0
+            diag(J[i2,i1]) <- -c0/b0^2     # dLdb0
         } else {
             stop('invalid isochron type')
         }
@@ -805,7 +805,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
             yd <- data2york.UPb(x,option=15)
             A <- McL$Pb206U238/(ThU*U85)
             b <- 1/b0
-            L0 <- yd[,'Y'] - McL$Pb208Th232- b*yd[,'X']
+            L0 <- yd[,'Y'] - McL$Pb208Th232 - b*yd[,'X']
         } else {
             stop('invalid isochron type')
         }
