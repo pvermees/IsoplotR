@@ -1395,15 +1395,20 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
         y0 <- fit$par['a0']
         cid <- ci(sx=fit$disp[1])
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
-    } else if (type%in%c(1,2)){ # other UPb
+    } else if (type%in%(1:4)){ # other UPb
         if (wtype==1){
-            y0 <- fit$y0[1]
             if (type==1){
-                cid <- ci(sx=y0*fit$disp[1]/fit$par['a0'])
+                y0 <- 1/fit$par['a0']
+                cid <- ci(sx=fit$disp[1]/fit$par['a0']^2)
             } else if (type==2){
-                cid <- ci(sx=y0*fit$disp[1]/fit$par['b0'])
-            } else { # not implemented yet
-                return()
+                y0 <- 1/fit$par['b0']
+                cid <- ci(sx=fit$disp[1]/fit$par['b0']^2)
+            } else if (type==3){
+                y0 <- fit$par['a0']
+                cid <- ci(sx=fit$disp[1])
+            } else if (type==4){
+                y0 <- fit$par['b0']
+                cid <- ci(sx=fit$disp[1])
             }
             graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
         } else {
@@ -1882,19 +1887,11 @@ getUPby0 <- function(out,fmt=1,type=1,option=1){
             out$y0['y'] <- out$par['b0']
             out$y0['s[y]'] <- sqrt(out$cov['b0','b0'])
             out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
-        } else if (fmt %in% c(7,8,11) & type==1){   # 08/06 vs. 38/06
-            out$y0['y'] <- 1/out$par['a0']
-            out$y0['s[y]'] <- out$y0[1]*sqrt(out$cov['a0','a0'])/out$par['a0']
-            out$y0label <- quote('('^208*'Pb/'^206*'Pb)'[c]*'=')
-        } else if (fmt %in% c(7,8,12) & type==2){   # 08/07 vs. 35/07
-            out$y0['y'] <- 1/out$par['b0']
-            out$y0['s[y]'] <- out$y0[1]*sqrt(out$cov['b0','b0'])/out$par['b0']
-            out$y0label <- quote('('^208*'Pb/'^207*'Pb)'[c]*'=')
-        } else if (fmt %in% c(7,8,11) & type==3){   # 06c/08 vs. 32/08
+        } else if (fmt %in% c(7,8,11) & type%in%c(1,3)){
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])
             out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[c]*'=')
-        } else if (fmt %in% c(7,8,12) & type==4){   # 07c/08 vs. 32/08
+        } else if (fmt %in% c(7,8,12) & type%in%c(2,4)){   # 08/07 vs. 35/07
             out$y0['y'] <- out$par['b0']
             out$y0['s[y]'] <- sqrt(out$cov['b0','b0'])
             out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[c]*'=')
