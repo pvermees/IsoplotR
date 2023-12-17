@@ -274,6 +274,9 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
     init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,model=model)
     if (x$d$U48$option==2 | x$d$ThU$option==2){
+        if ('t'%in%names(init)) tt <- par['t']
+        else if (anchor[1]==2) tt <- anchor[2]
+        else tt <- 0
         McL <- mclean(tt=tt,d=x$d)
     }
     if (type%in%c('joint',0,1,3)){
@@ -282,7 +285,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
         } else if (x$d$U48$option==2 & x$d$U48$sx>0){
             init$par['U48i'] <- max(0,McL$U48i)
         }
-        if ('U48i'%in%names(par)){
+        if ('U48i'%in%names(init$par)){
             init$lower['U48i'] <- x$d$U48$m + x$d$buffer
             init$upper['U48i'] <- x$d$U48$M - x$d$buffer
         }
@@ -291,7 +294,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
         } else if (x$d$ThU$option==2 & x$d$ThU$sx>0){
             init$par['ThUi'] <- max(0,McL$ThUi)
         }
-        if ('ThUi'%in%names(par)){
+        if ('ThUi'%in%names(init$par)){
             init$lower['ThUi'] <- x$d$ThU$m + x$d$buffer
             init$upper['ThUi'] <- x$d$ThU$M - x$d$buffer
         }
@@ -312,7 +315,7 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
 }
 
 fixDispersion <- function(model,format,anchor,type){
-    out <- -Inf
+    out <- 0
     if (model==3 & anchor[1]==1){
         if (format<4){
             out <- iratio('Pb207Pb206')[2]
