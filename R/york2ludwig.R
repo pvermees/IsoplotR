@@ -102,7 +102,7 @@ york2ludwig204 <- function(x,anchor=0,type=0,buffer=2,model=1){
             abxb <- inithelper(yd=ydb,y0=1/Pb74c[1])
         }
         if (type==2){
-            tt <- get.Pb206U238.age(x=abxb['x0inv'],d=x$d)[1]
+            tt <- get.Pb207U235.age(x=abxb['x0inv'],d=x$d)[1]
             par['t'] <- log(tt)
         }
         if (model==1 & type%in%c('joint',0,2) && Pb74c[2]>0){
