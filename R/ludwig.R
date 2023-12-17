@@ -312,9 +312,8 @@ init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
 }
 
 fixDispersion <- function(model,format,anchor,type){
-    if (model!=3){
-        out <- NULL
-    } else if (anchor[1]==1){
+    out <- -Inf
+    if (model==3 & anchor[1]==1){
         if (format<4){
             out <- iratio('Pb207Pb206')[2]
         } else if (format%in%c(4,5,6,9,10)){
@@ -328,9 +327,13 @@ fixDispersion <- function(model,format,anchor,type){
                 out <- iratio('Pb206Pb208')[2]
             } else if (type==2){
                 out <- iratio('Pb207Pb208')[2]
+            } else if (type==3){
+                out <- iratio('Pb206Pb208')[2]
+            } else if (type==4){
+                out <- iratio('Pb207Pb208')[2]
             }
         }
-    } else if (anchor[1]==2 & length(anchor)>2){
+    } else if (model==3 & anchor[1]==2 & length(anchor)>2){
         out <- anchor[3]
     }
     out
@@ -611,9 +614,9 @@ getEw1 <- function(w=0,x,McL=mclean(),type,a0=NA,b0=NA,c0){
         } else if (type==2){
             diag(J[i2,i1]) <- -c0*ThU*U85   # dLdb0
         } else if (type==3){
-            diag(J[i2,i1]) <- -c0*ThU/a0^2  # dLda0
+            diag(J[i2,i1]) <- -c0/a0^2  # dLda0
         } else if (type==4){
-            diag(J[i2,i1]) <- -c0*ThU/b0^2  # dLdb0
+            diag(J[i2,i1]) <- -c0/b0^2  # dLdb0
         } else {
             stop('invalid isochron type')
         }
@@ -621,7 +624,6 @@ getEw1 <- function(w=0,x,McL=mclean(),type,a0=NA,b0=NA,c0){
         stop('invalid format')
     }
     J%*%diag(w^2,ns,ns)%*%t(J)
-
 }
 # attributes overdispersion to t
 getEw2 <- function(w=0,x,McL=mclean(),type='joint'){

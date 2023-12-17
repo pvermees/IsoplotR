@@ -190,7 +190,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             yd <- data2york(x,option=6,tt=pilott)
             y0 <- 1/Pb68c[1]
         } else if (type==2){ # 0807 vs 35/07
-            P78c <- iratio('Pb207Pb208')
+            Pb78c <- iratio('Pb207Pb208')
             pilott <- min(get.Pb207U235.age(x=x)[,1])
             yd <- data2york(x,option=7,tt=pilott)
             y0 <- 1/Pb78c[1]
@@ -205,10 +205,9 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             yd <- data2york(x,option=9,tt=pilott)
             y0 <- Pb78c[1]
         } else { # joint, 0 or 1
-            Pb76c <- iratio('Pb207Pb206')
             yd <- data2york(x,option=2)
             pilott <- min(get.Pb206U238.age(x=x)[,1])
-            y0 <- Pb76c[1]
+            y0 <- iratio('Pb207Pb206')[1]
         }
         abx <- inithelper(yd=yd,y0=y0)
         if (type==1){
@@ -217,6 +216,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['a0'] <- -log(y0)
             } else if (model==3 & Pb68c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
+                upper['w'] <- log(Pb68c[1])
             }
         } else if (type==2){
             par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
@@ -224,6 +224,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['b0'] <- -log(y0)
             } else if (model==3 & Pb78c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
+                upper['w'] <- log(Pb78c[1])
             }
         } else if (type==3){
             par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
@@ -231,6 +232,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['a0'] <- log(y0)
             } else if (model==3 & Pb68c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY'])
+                upper['w'] <- log(Pb68c[1])
             }
         } else if (type==4){
             par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
@@ -238,12 +240,15 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['b0'] <- log(y0)
             } else if (model==3 & Pb78c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY'])
+                upper['w'] <- log(Pb78c[1])
             }
         } else { # joint, 0 or 1
             par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
+            Pb68c <- iratio('Pb206Pb208')
             if (model==1 & Pb68c[2]>0){
                 par['a0'] <- -log(Pb68c[1])
             }
+            Pb78c <- iratio('Pb207Pb208')
             if (model==1 & Pb78c[2]>0){
                 par['b0'] <- -log(Pb78c[1])
             }
@@ -342,10 +347,16 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             upper['w']  <- log(pilott)
         }
     }
+    for (pname in c('t','a0','b0')){
+        if (pname%in%names(par)){
+            lower[pname] <- par[pname] - buffer
+            upper[pname] <- par[pname] + buffer
+        }
+    }
     if ('w'%in%names(par)){
         lower['w'] <- par['w'] - max(buffer,10)
     }
-    list(par=par,lower=par-buffer,upper=par+buffer)
+    list(par=par,lower=lower,upper=upper)
 }
 
 WconcordiaIntersection <- function(yfit,d=diseq()){
