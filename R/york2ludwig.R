@@ -162,11 +162,10 @@ york2ludwig204 <- function(x,anchor=0,type=0,buffer=2,model=1){
         }
         if (model==3){
             if (type%in%c('joint',0,1)){
-                st <- stats::median(get.Pb206U238.age(x=x)[,2])
+                par['w'] <- log(stats::median(get.Pb206U238.age(x=x)[,2]))
             } else {
-                st <- stats::median(get.Pb207U235.age(x=x)[,2])
+                par['w'] <- log(stats::median(get.Pb207U235.age(x=x)[,2]))
             }
-            par['w'] <- log(st)
             upper['w']  <- log(tt)
         }
     }
@@ -186,54 +185,67 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
     par <- lower <- upper <- vector()
     if (anchor[1]==1){
         if (type==1){ # 0806 vs 38/06
+            Pb68c <- iratio('Pb206Pb208')
             pilott <- min(get.Pb206U238.age(x=x)[,1])
             yd <- data2york(x,option=6,tt=pilott)
-            y0 <- 1/iratio('Pb206Pb208')[1]
+            y0 <- 1/Pb68c[1]
         } else if (type==2){ # 0807 vs 35/07
+            P78c <- iratio('Pb207Pb208')
             pilott <- min(get.Pb207U235.age(x=x)[,1])
             yd <- data2york(x,option=7,tt=pilott)
-            y0 <- 1/iratio('Pb207Pb208')[1]
+            y0 <- 1/Pb78c[1]
         } else if (type==3){ # 0608 vs 32/08
+            Pb68c <- iratio('Pb206Pb208')
             pilott <- min(get.Pb208Th232.age(x=x)[,1])
             yd <- data2york(x,option=8,tt=pilott)
-            y0 <- iratio('Pb206Pb208')[1]
+            y0 <- Pb68c[1]
         } else if (type==4){ # 0708 vs 32/08
+            Pb78c <- iratio('Pb207Pb208')
             pilott <- min(get.Pb208Th232.age(x=x)[,1])
             yd <- data2york(x,option=9,tt=pilott)
-            y0 <- iratio('Pb207Pb208')[1]
+            y0 <- Pb78c[1]
         } else { # joint, 0 or 1
+            Pb76c <- iratio('Pb207Pb206')
             yd <- data2york(x,option=2)
             pilott <- min(get.Pb206U238.age(x=x)[,1])
-            y0 <- iratio('Pb207Pb206')[1]
+            y0 <- Pb76c[1]
         }
         abx <- inithelper(yd=yd,y0=y0)
         if (type==1){
             par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-            if (model==1 & iratio('Pb206Pb208')[2]>0){
+            if (model==1 & Pb68c[2]>0){
                 par['a0'] <- -log(y0)
+            } else if (model==3 & Pb68c[2]<=0){
+                par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
             }
         } else if (type==2){
             par['t'] <- log(get.Pb207U235.age(x=abx['x0inv'],d=x$d)[1])
-            if (model==1 & iratio('Pb207Pb208')[2]>0){
+            if (model==1 & Pb78c[2]>0){
                 par['b0'] <- -log(y0)
+            } else if (model==3 & Pb78c[2]<=0){
+                par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
             }
         } else if (type==3){
             par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-            if (model==1 & iratio('Pb206Pb208')[2]>0){
+            if (model==1 & Pb68c[2]>0){
                 par['a0'] <- log(y0)
+            } else if (model==3 & Pb68c[2]<=0){
+                par['w'] <- stats::median(yd[,'sY'])
             }
         } else if (type==4){
             par['t'] <- log(get.Pb208Th232.age(x=abx['x0inv'],d=x$d)[1])
-            if (model==1 & iratio('Pb207Pb208')[2]>0){
+            if (model==1 & Pb78c[2]>0){
                 par['b0'] <- log(y0)
+            } else if (model==3 & Pb78c[2]<=0){
+                par['w'] <- stats::median(yd[,'sY'])
             }
         } else { # joint, 0 or 1
             par['t'] <- log(get.Pb206U238.age(x=abx['x0inv'],d=x$d)[1])
-            if (model==1 & iratio('Pb206Pb208')[2]>0){
-                par['a0'] <- -log(iratio('Pb206Pb208')[1])
+            if (model==1 & Pb68c[2]>0){
+                par['a0'] <- -log(Pb68c[1])
             }
-            if (model==1 & iratio('Pb207Pb208')[2]>0){
-                par['b0'] <- -log(iratio('Pb207Pb208')[1])
+            if (model==1 & Pb78c[2]>0){
+                par['b0'] <- -log(Pb78c[1])
             }
         }
     } else if (anchor[1]==2 & length(anchor)>1){
@@ -268,7 +280,22 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             ydb <- data2york(x,option=7)
             abxb <- inithelper(yd=ydb,x0=x0)
             par['b0'] <- log(1/abxb['a'])
-        }  
+        }
+        if (model==3 & length(anchor)>2 && anchor[3]<=0){
+            if (type%in%c('joint',0,1)){
+                stPb6U8 <- get.Pb206U238.age(x)[,2]
+                par['w'] <- log(stats::median(stPb6U8))
+            } else if (type==2){
+                stPb7U5 <- get.Pb207U235.age(x)[,2]
+                par['w'] <- log(stats::median(stPb7U5))
+            } else if (type%in%c(3,4)){
+                stPb8Th2 <- get.Pb208Th232.age(x)[,2]
+                par['w'] <- log(stats::median(stPb8Th2))
+            } else {
+                stop('Invalid isochron type.')
+            }
+            upper['w'] <- log(tt)
+        }        
     } else {
         if (type==2){ # 0807 vs 35/07
             pilott <- min(get.Pb207U235.age(x)[,1])
@@ -302,6 +329,21 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             par['a0'] <- log(1/abxa['a'])
             par['b0'] <- log(1/abxb['a'])
         }            
+        if (model==3){
+            if (type%in%c('joint',0,1)){
+                par['w'] <- log(stats::median(get.Pb206U238.age(x=x)[,2]))
+            } else if (type==2){
+                par['w'] <- log(stats::median(get.Pb207U235.age(x=x)[,2]))
+            } else if (type%in%c(3,4)){
+                par['w'] <- log(stats::median(get.Pb208Th232.age(x=x)[,2]))
+            } else {
+                stop('Invalid isochron type.')
+            }
+            upper['w']  <- log(pilott)
+        }
+    }
+    if ('w'%in%names(par)){
+        lower['w'] <- par['w'] - max(buffer,10)
     }
     list(par=par,lower=par-buffer,upper=par+buffer)
 }
