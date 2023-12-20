@@ -1440,7 +1440,7 @@ w2disp.other <- function(x,fit,wtype,inverse,...){
     }
     out
 }
-w2disp.PbPb <- function(x,fit,wtype,inverse){ # type = 'd'
+w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     if (inverse){
         if (wtype==1){
             out <- fit$y0[1]*fit$invertedfit$w/fit$invertedfit$a[1]
@@ -1457,7 +1457,7 @@ w2disp.PbPb <- function(x,fit,wtype,inverse){ # type = 'd'
     }
     out
 }
-w2disp.ThU <- function(x,fit,type,wtype){
+w2disp.ThU <- function(x,fit,type,wtype,...){
     if (x$format%in%c(1,2)){
         out <- fit$w
     } else if (x$format%in%c(3,4)){
@@ -1517,7 +1517,7 @@ ab2y0t.default <- function(x,fit,...){
     }
     out
 }
-ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1){
+ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
     tt <- fit$par['t']
     a0 <- fit$par['a0']
     b0 <- fit$par['b0']

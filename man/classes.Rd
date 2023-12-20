@@ -124,6 +124,8 @@ as.other(x, format = NULL, ierr = 1)
 
 \item{ierr}{input error. See \code{\link{read.data}} for details.}
 
+\item{d}{an object of class \code{\link{diseq}}.}
+
 \item{U8Th2}{\eqn{^{238}}U/\eqn{^{232}}Th activity-ratio of the
 whole rock. Used to estimate the initial
 \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium (for Th-U formats 3

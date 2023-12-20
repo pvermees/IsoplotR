@@ -32,6 +32,7 @@ scatterplot(
   ylab,
   asp = NA,
   log = "",
+  box = TRUE,
   ...
 )
 }
@@ -144,6 +145,8 @@ omitted aliquots.}
 
 \item{log}{same as the eponymous argument to the generic
 \code{plot} function.}
+
+\item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
 
 \item{...}{optional arguments to format the points and text.}
 }

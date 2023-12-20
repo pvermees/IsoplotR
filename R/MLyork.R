@@ -16,7 +16,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
             E['b','b'] <- fit$cov[2,2]
         } else if (model==3 & (length(anchor)<3 || anchor[3]<=0)){
             binit <- unname(lmfit$coefficients)
-            lwinit <- log(vcov(lmfit))/2
+            lwinit <- log(stats::vcov(lmfit))/2
             init <- c(b=binit,lw=lwinit)
             lower <- c(min(binit*c(2,1/2)),lwinit-2)
             upper <- c(max(binit*c(2,1/2)),lwinit+2)
@@ -49,7 +49,7 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
             E['a','a'] <- fit$cov[1,1]
         } else if (model==3 & (length(anchor)<3 || anchor[3]<=0)){
             ainit <- unname(lmfit$coefficients)
-            lwinit <- log(vcov(lmfit))/2
+            lwinit <- log(stats::vcov(lmfit))/2
             init <- c(a=ainit,lw=lwinit)
             lower <- c(min(ainit*c(2,1/2)),lwinit-2)
             upper <- c(max(ainit*c(2,1/2)),lwinit+2)
