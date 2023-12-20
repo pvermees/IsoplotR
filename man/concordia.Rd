@@ -173,7 +173,7 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{...}{optional arguments to the generic \code{plot} function}
+\item{...}{optional arguments passed on to \code{\link{scatterplot}}}
 }
 \value{
 If \code{show.age=1}, returns a list with the following items:

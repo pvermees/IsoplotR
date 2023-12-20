@@ -126,6 +126,8 @@
 #' @param format data format. See \code{\link{read.data}} for details.
 #' 
 #' @param ierr input error. See \code{\link{read.data}} for details.
+#'
+#' @param d an object of class \code{\link{diseq}}.
 #' 
 #' @param Th02i 2-element vector with the assumed initial
 #'     \eqn{^{230}}Th/\eqn{^{232}}Th-ratio of the detritus (for

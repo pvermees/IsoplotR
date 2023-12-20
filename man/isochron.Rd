@@ -379,8 +379,7 @@ an object of class \code{ArAr}, \code{KCa}, \code{PbPb},
 \code{UPb}, \code{ThPb}, \code{ReOs}, \code{RbSr}, \code{SmNd},
 \code{LuHf}, \code{UThHe} or \code{ThU}.}
 
-\item{...}{optional arguments to be passed on to the generic plot
-function if \code{model=2}}
+\item{...}{optional arguments to be passed on to \code{\link{scatterplot}}}
 
 \item{oerr}{indicates whether the analytical uncertainties of the
     output are reported in the plot title as:

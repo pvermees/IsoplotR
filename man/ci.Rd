@@ -4,7 +4,7 @@
 \alias{ci}
 \title{Confidence intervals}
 \usage{
-ci(x, sx, oerr = 3, df = NULL, absolute = FALSE)
+ci(x = 0, sx, oerr = 3, df = NULL, absolute = FALSE)
 }
 \arguments{
 \item{x}{scalar estimate}
