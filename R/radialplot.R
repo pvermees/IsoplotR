@@ -204,7 +204,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
     peaks <- peakfit(x2calc,k=k,np=np,exterr=exterr,sigdig=sigdig,oerr=oerr)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x2plot,z0=z0,from=from,to=to,transformation=transformation)
-    pcol <- set.ellipse.colours(ns=ns,levels=levels[plotit],
+    pcol <- set.ellipse.colours(ns=ns,levels=levels,
                                 col=bg,hide=hide,omit=omit,
                                 omit.col=omit.col)
     tcol <- rep(col,ns)
