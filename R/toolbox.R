@@ -17,9 +17,8 @@ roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE,maxprecision=8){
             nc <- length(out)
         }
     } else {
-        if (err[1]>0 & log10(age/err[1])>maxprecision){ # impossibly good precision
-            err <- 0
-        }
+        impossible <- (err>0 & log10(age/err)>maxprecision)
+        err[impossible] <- 0 # impossibly good precision
         if (length(age)==1){
             dat <- c(age,err)
             nc <- length(dat)
