@@ -1278,7 +1278,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (x$format<9){
         if (conc){
             labels <- c(labels,'t.conc','s[t.conc]')
-            t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
+            t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)$age
         }
         if (discordance$option>0){
             xdi <- subset(xd,subset=((1:length(xd))%in%i))
@@ -1289,9 +1289,8 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
             dif <- discordance(x=xi,X=xdi,option=discordance$option)
         } else if (discordance$option%in%c(6,'p')){
             labels <- c(labels,'p[conc]')
-            t.conc <- concordia.age(x=xdi,exterr=exterr)
             SS.concordance <-
-                LL.concordia.age(pars=t.conc$age[1],
+                LL.concordia.age(pars=t.conc[1],
                                  cc=wetherill(xdi,i=1),
                                  mswd=TRUE,exterr=exterr,d=xdi$d)
             pval <- 1-stats::pchisq(SS.concordance,1)

@@ -667,15 +667,37 @@ concordia.age <- function(x,i=NULL,type=1,exterr=FALSE,...){
     }
     out
 }
+# cc is assumed to follow a wetherill or cottle format
 concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
-    if (type==1) Pb206U238 <- cc$x['Pb206U238']
-    else if (type==2) Pb206U238 <- 1/cc$x['U238Pb206']
-    else if (type==3) Pb206U238 <- cc$x['Pb206U238']
-    else stop('Incorrect concordia type.')
+    v <- eigen(cc$cov)$vectors[,1]
+    b <- v[2]/v[1]
+    a <- cc$x[2] - b*cc$x[1]
+    x0 <- -a/b
     lower <- upper <- init <- vector()
+    U85 <- iratio('U238U235')[1]
+    l8 <- lambda('U238')[1]
+    if (type==1){
+        l5 <- lambda('U235')[1]
+        if (b>0){
+            tmid <- log(b*l5/l8)/(l8-l5) # tangential to error ellipse
+            tmax <- get.Pb207Pb206.age(x=1/(b*U85),d=d)[1]
+        } else {
+            tmid <- log(-l8/(l5*b))/(l5-l8) # normal to error ellipse
+            tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
+        }
+    } else if (type==3){
+        l2 <- lambda('Th232')[1]
+        if (b>0){
+            tmid <- log(b*l8/l2)/(l2-l8) # tangential to error ellipse
+        } else {
+            tmid <- log(-l2/(l8*b))/(l8-l2) # normal to error ellipse
+        }
+        tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
+    } else {
+        stop('concordia_age_helper() is not available for concordia type ', 'type')
+    }
+    init['t'] <- upper['t'] <- NA # placeholder
     lower['t'] <- 0
-    upper['t'] <- get.Pb206U238.age(x=Pb206U238,d=d)[1]
-    init['t'] <- (lower['t']+upper['t'])/2
     if (d$U48$option>0){
         if (d$U48$option==2 && (is.null(d$U48$sx) || d$U48$sx<=0)){
             stop('Zero uncertainty of measured 234/238 activity ratio')
@@ -704,12 +726,14 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         lower['PaUi'] <- 0
         upper['PaUi'] <- 20
     }
+    upper['t'] <- tmid
+    init['t'] <- (lower['t'] + upper['t'])/2
     fit1 <- stats::optim(init,LL.concordia.age,method='L-BFGS-B',
                          lower=lower,upper=upper,exterr=exterr,
                          cc=cc,type=type,d=d,hessian=TRUE)
-    lower['t'] <- upper['t']
-    upper['t'] <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),5000)
-    init['t'] <- (lower['t']+upper['t'])/2
+    lower['t'] <- tmid
+    upper['t'] <- tmax
+    init['t'] <- (lower['t'] + upper['t'])/2
     fit2 <- stats::optim(init,LL.concordia.age,method='L-BFGS-B',
                          lower=lower,upper=upper,exterr=exterr,
                          cc=cc,type=type,d=d,hessian=TRUE)
