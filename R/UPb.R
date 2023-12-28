@@ -1244,43 +1244,60 @@ UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
 UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
                            conc=TRUE,discordance=discfilter(),...){
     Xi <- subset(X,subset=((1:length(X))%in%i))
-    labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
-    hasTh <- (x$format>6)
-    if (hasTh) labels <- c(labels,'t.82','s[t.82]')
-    if (conc) labels <- c(labels,'t.conc','s[t.conc]')
-    tlabels <- labels
-    if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c'))
-        labels <- c(labels,'disc')
-    if (discordance$option%in%c(6,'p'))
-        labels <- c(labels,'p[conc]')
-    t.75 <- get.Pb207U235.age(Xi,exterr=exterr)
-    t.68 <- get.Pb206U238.age(Xi,exterr=exterr)
-    t.76 <- get.Pb207Pb206.age(Xi,exterr=exterr,t.68=subset(t.68,select=1))
-    out <- c(t.75,t.68,t.76)
-    if (hasTh){
+    do68 <- do75 <- do76 <- do82 <- FALSE 
+    if (x$format<7){
+        do68 <- do75 <- do76 <- TRUE
+        labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
+    } else if (x$format<9){
+        do68 <- do75 <- do76 <- do82 <- TRUE
+        labels <- c('t.75','s[t.75]','t.68','s[t.68]',
+                    't.76','s[t.76]','t.82','s[t.82]')
+    } else if (x$format%in%c(9,11)){
+        do68 <- TRUE
+        labels <- c('t.68','s[t.68]')
+    } else if (x$format%in%c(10,12)){
+        do75 <- TRUE
+        labels <- c('t.75','s[t.75]')
+    } else {
+        stop('Invalid U-Pb format')
+    }
+    t.75 <- t.68 <- t.76 <- t.82 <- t.conc <- dif <- pval <- NULL
+    if (do75){
+        t.75 <- get.Pb207U235.age(Xi,exterr=exterr)
+    }
+    if (do68){
+        t.68 <- get.Pb206U238.age(Xi,exterr=exterr)
+    }
+    if (do76){
+        t.76 <- get.Pb207Pb206.age(Xi,exterr=exterr,
+                                   t.68=subset(t.68,select=1))
+    }
+    if (do82) {
         t.82 <- get.Pb208Th232.age(Xi,exterr=exterr)
-        out <- c(out,t.82)
     }
-    if (conc){
-        t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
-        out <- c(out,t.conc$age)
+    if (x$format<9){
+        if (conc){
+            labels <- c(labels,'t.conc','s[t.conc]')
+            t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)
+        }
+        if (discordance$option>0){
+            xdi <- subset(xd,subset=((1:length(xd))%in%i))
+        }
+        if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
+            labels <- c(labels,'disc')
+            xi <- subset(x,subset=((1:length(x))%in%i))
+            dif <- discordance(x=xi,X=xdi,option=discordance$option)
+        } else if (discordance$option%in%c(6,'p')){
+            labels <- c(labels,'p[conc]')
+            t.conc <- concordia.age(x=xdi,exterr=exterr)
+            SS.concordance <-
+                LL.concordia.age(pars=t.conc$age[1],
+                                 cc=wetherill(xdi,i=1),
+                                 mswd=TRUE,exterr=exterr,d=xdi$d)
+            pval <- 1-stats::pchisq(SS.concordance,1)
+        }
     }
-    if (discordance$option>0){
-        xdi <- subset(xd,subset=((1:length(xd))%in%i))
-    }
-    if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
-        xi <- subset(x,subset=((1:length(x))%in%i))
-        dif <- discordance(x=xi,X=xdi,option=discordance$option)
-        out <- c(out,dif)
-    }
-    if (discordance$option%in%c(6,'p')){
-        t.conc <- concordia.age(x=xdi,exterr=exterr)
-        SS.concordance <-
-            LL.concordia.age(pars=t.conc$age[1],cc=wetherill(xdi,i=1),
-                             mswd=TRUE,exterr=exterr,d=xdi$d)
-        p.value <- 1-stats::pchisq(SS.concordance,1)
-        out <- c(out,p.value)
-    }
+    out <- c(t.75,t.68,t.76,t.82,t.conc,dif,pval)
     names(out) <- labels
     out
 }
