@@ -670,31 +670,29 @@ concordia.age <- function(x,i=NULL,type=1,exterr=FALSE,...){
 # cc is assumed to follow a wetherill or cottle format
 concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
     v <- eigen(cc$cov)$vectors[,1]
-    b <- v[2]/v[1]
-    a <- cc$x[2] - b*cc$x[1]
-    x0 <- -a/b
+    slope <- v[2]/v[1]
     lower <- upper <- init <- vector()
     U85 <- iratio('U238U235')[1]
     l8 <- lambda('U238')[1]
     if (type==1){
         l5 <- lambda('U235')[1]
-        if (b>0){
-            tmid <- log(b*l5/l8)/(l8-l5) # tangential to error ellipse
-            tmax <- get.Pb207Pb206.age(x=1/(b*U85),d=d)[1]
+        if (slope>0){
+            tmid <- log(slope*l5/l8)/(l8-l5) # tangential to error ellipse
+            tmax <- get.Pb207Pb206.age(x=1/(slope*U85),d=d)[1]
         } else {
-            tmid <- log(-l8/(l5*b))/(l5-l8) # normal to error ellipse
+            tmid <- log(-l8/(l5*slope))/(l5-l8) # normal to error ellipse
             tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
         }
     } else if (type==3){
         l2 <- lambda('Th232')[1]
-        if (b>0){
-            tmid <- log(b*l8/l2)/(l2-l8) # tangential to error ellipse
+        if (slope>0){
+            tmid <- log(slope*l8/l2)/(l2-l8) # tangential to error ellipse
         } else {
-            tmid <- log(-l2/(l8*b))/(l8-l2) # normal to error ellipse
+            tmid <- log(-l2/(l8*slope))/(l8-l2) # normal to error ellipse
         }
         tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
     } else {
-        stop('concordia_age_helper() is not available for concordia type ', 'type')
+        stop('concordia_age_helper is not available for concordia type ', 'type')
     }
     init['t'] <- upper['t'] <- NA # placeholder
     lower['t'] <- 0

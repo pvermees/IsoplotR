@@ -319,6 +319,9 @@ weightedmean.UPb <- function(x,random.effects=FALSE,
                              cutoff.76=1100,oerr=3,cutoff.disc=discfilter(),
                              exterr=FALSE,ranked=FALSE,common.Pb=0,
                              hide=NULL,omit=NULL,omit.col=NA,...){
+    # override type if necessary:
+    if (x$format%in%c(9,11)) type <- 2
+    if (x$format%in%c(10,12)) type <- 1
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,

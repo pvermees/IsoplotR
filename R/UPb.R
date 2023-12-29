@@ -277,6 +277,10 @@ tera.wasserburg <- function(x,i=1,format){
 get.UPb.isochron.ratios.204 <- function(x,i=NULL){
     if (x$format%in%c(4,5,6)){
         labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
+    } else if (x$format==9){
+        labels <- c('U238Pb206','Pb204Pb206')
+    } else if (x$format==10){
+        labels <- c('U235Pb207','Pb204Pb207')
     } else {
         stop('Format does not contain 204Pb.')
     }
@@ -289,22 +293,27 @@ get.UPb.isochron.ratios.204 <- function(x,i=NULL){
         colnames(out) <- labels
         return(out)
     }
-    U <- iratio('U238U235')[1]
-    tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06
-    U8Pb6 <- tw$x['U238Pb206']
-    Pb46 <- tw$x['Pb204Pb206']
-    U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
-    Pb47 <- tw$x['Pb204Pb206']/tw$x['Pb207Pb206']
-    J <- matrix(0,4,3)
-    J[1,1] <- 1
-    J[2,3] <- 1
-    J[3,1] <- 1/(U*tw$x['Pb207Pb206'])
-    J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']
-    J[4,2] <- -Pb47/tw$x['Pb207Pb206']
-    J[4,3] <- 1/tw$x['Pb207Pb206']
     out <- list()
-    out$x <- c(U8Pb6,Pb46,U5Pb7,Pb47)
-    out$cov <- J %*% tw$cov %*% t(J)
+    if (x$format%in%c(9,10)){
+        out$x <- x$x[i,c(1,3)]
+        out$cov <- cor2cov2(sX=x$x[i,2],sY=x$x[i,4],rXY=x$x[i,5])
+    } else {
+        U <- iratio('U238U235')[1]
+        tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06
+        U8Pb6 <- tw$x['U238Pb206']
+        Pb46 <- tw$x['Pb204Pb206']
+        U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
+        Pb47 <- tw$x['Pb204Pb206']/tw$x['Pb207Pb206']
+        J <- matrix(0,4,3)
+        J[1,1] <- 1
+        J[2,3] <- 1
+        J[3,1] <- 1/(U*tw$x['Pb207Pb206'])
+        J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']
+        J[4,2] <- -Pb47/tw$x['Pb207Pb206']
+        J[4,3] <- 1/tw$x['Pb207Pb206']
+        out$x <- c(U8Pb6,Pb46,U5Pb7,Pb47)
+        out$cov <- J %*% tw$cov %*% t(J)
+    }
     names(out$x) <- labels
     colnames(out$cov) <- labels
     rownames(out$cov) <- labels
