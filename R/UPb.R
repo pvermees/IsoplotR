@@ -1277,8 +1277,6 @@ UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
 #      (raw if before==TRUE, common Pb corrected if before==FALSE)
 UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
                            conc=TRUE,discordance=discfilter(),...){
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@16@"]]));##:ess-bp-end:##
     Xi <- subset(X,subset=((1:length(X))%in%i))
     do68 <- do75 <- do76 <- do82 <- FALSE 
     if (x$format<7){
@@ -1289,11 +1287,11 @@ browser(expr=is.null(.ESSBP.[["@16@"]]));##:ess-bp-end:##
         labels <- c('t.75','s[t.75]','t.68','s[t.68]',
                     't.76','s[t.76]','t.82','s[t.82]')
     } else if (x$format%in%c(9,11)){
-        do68 <- TRUE
-        labels <- c('t.68','s[t.68]')
+        do68 <- do82 <- TRUE
+        labels <- c('t.68','s[t.68]','t.82','s[t.82]')
     } else if (x$format%in%c(10,12)){
-        do75 <- TRUE
-        labels <- c('t.75','s[t.75]')
+        do75 <- do82 <- TRUE
+        labels <- c('t.75','s[t.75]','t.82','s[t.82]')
     } else {
         stop('Invalid U-Pb format')
     }

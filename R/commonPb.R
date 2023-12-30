@@ -518,8 +518,9 @@ common.Pb.nominal <- function(x){
             out[i,] <- correct.common.Pb.with.204(x,i=i,c47=c47)
         }
     } else if (x$format==11){
-        out <- matrix(0,ns,2)
-        colnames(out) <- c('Pb206U238','errPb206U238')
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb206U238','errPb206U238',
+                           'Pb208Th232','errPb208Th232','rXY')
         c0806 <- 1/settings('iratio','Pb206Pb208')[1]
         tmax <- get.Pb208Th232.age(x=x)[,1]
         for (i in 1:ns){
@@ -528,9 +529,9 @@ common.Pb.nominal <- function(x){
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0806=c0806)
         }
     } else if (x$format==12){
-        cnames <- c('Pb207U235','errPb207U235')
-        out <- matrix(0,ns,2)
-        colnames(out) <- cnames
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb207U235','errPb207U235',
+                           'Pb208Th232','errPb208Th232','rXY')
         c0807 <- 1/settings('iratio','Pb207Pb208')[1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.with.208,interval=c(0,5000),
@@ -576,12 +577,20 @@ SS.SK.with.208 <- function(tt,x,i){
 }
 SS.with.208 <- function(tt,x,i,c0806=NULL,c0807=NULL){
     cc <- correct.common.Pb.with.208(x,i=i,tt=tt,c0806=c0806,c0807=c0807,cc=TRUE)
-    if (x$format%in%c(7,8)) type <- 1
-    else if (x$format==11) type <- 3
-    else if (x$format==12) type <- 4
-    else stop('Invalid U-Pb type')
+    if (x$format%in%c(7,8)){
+        type <- 1
+        model2 <- FALSE
+    } else if (x$format==11){
+        type <- 3
+        model2 <- TRUE
+    } else if (x$format==12) {
+        type <- 4
+        model2 <- TRUE
+    } else {
+        stop('Invalid U-Pb type')
+    }
     out <- LL.concordia.age(stats::setNames(tt,'t'),cc,type=type,
-                            mswd=TRUE,exterr=FALSE,d=x$d[i])
+                            mswd=TRUE,exterr=FALSE,d=x$d[i],model2=model2)
     out
 }
 

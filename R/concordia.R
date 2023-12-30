@@ -813,7 +813,8 @@ LL.concordia.comp <- function(mu,x,type=1,mswd=FALSE,...){
     out
 }
 
-LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
+LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),
+                             mswd=FALSE,model2=FALSE){
     out <- 0
     tt <- pars['t']
     pnames <- names(pars)
@@ -894,13 +895,9 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
         E <- J %*% Lcov %*% t(J)
         covmat <- covmat + E
     }
-    if (mswd) out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
+    if (model2) out <- dx%*%t(dx) # for U-Pb formats 11 and 12
+    else if (mswd) out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
     else out <- LL.norm(dx,covmat)
-    print('LL.concordia.age')
-    print(tt)
-    print(dx)
-    print(covmat)
-    print(out)
     out
 }
 
