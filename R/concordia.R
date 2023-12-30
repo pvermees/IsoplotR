@@ -860,8 +860,11 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
         y <- age_to_terawasserburg_ratios(tt,d=D)
         cols <- c('U238Pb206','Pb207Pb206')
     } else if (type==3){
-        y <- age_to_cottle_ratios(tt,d=D)
+        y <- age_to_cottle_ratios(tt,d=D,option=1)
         cols <- c('Pb206U238','Pb208Th232')
+    } else if (type==3){
+        y <- age_to_cottle_ratios(tt,d=D,option=2)
+        cols <- c('Pb207U235','Pb208Th232')
     } else {
         stop('Incorrect concordia type.')
     }
@@ -881,8 +884,11 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
             J[1,2] <- -McL$dPb206U238dl38/McL$Pb206U238^2
             J[2,1] <- McL$dPb207U235dl35/(U*McL$Pb206U238)
             J[2,2] <- -McL$dPb206U238dl38/(U*McL$Pb206U238^2)
-        } else { # type == 3
+        } else if (type==3){
             J[1,2] <- McL$dPb206U238dl38
+            J[2,3] <- tt*exp(l2[1]*tt)
+        } else { # type == 4
+            J[1,2] <- McL$dPb207U235dl35
             J[2,3] <- tt*exp(l2[1]*tt)
         }
         E <- J %*% Lcov %*% t(J)
@@ -890,6 +896,11 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
     }
     if (mswd) out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
     else out <- LL.norm(dx,covmat)
+    print('LL.concordia.age')
+    print(tt)
+    print(dx)
+    print(covmat)
+    print(out)
     out
 }
 

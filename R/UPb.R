@@ -325,12 +325,15 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
                 'Pb208cPb207','Th232U238','Th232Pb208',
                 'Pb206cPb208','Pb207cPb208')
     } else if (x$format==11){
-        labels <- c('U238Pb206','Pb208cPb206','Th232U238')
+        labels <- c('U238Pb206','Pb208cPb206',
+                    'Th232Pb208','Pb206cPb208')
     } else if (x$format==12){
-        labels <- c('U235Pb207','Pb208cPb207','Th232U238')
+        labels <- c('U235Pb207','Pb208cPb207',
+                    'Th232Pb208','Pb207cPb208')
     } else {
         stop('Invalid format for get.UPb.isochron.ratios.208')
     }
+    McL <- mclean(tt,d=x$d[i])
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,length(labels))
@@ -340,7 +343,6 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
         colnames(out) <- labels
         return(out)
     } else if (x$format%in%c(7,8)){
-        McL <- mclean(tt,d=x$d[i])
         l2 <- settings('lambda','Th232')[1]
         U85 <- iratio('U238U235')[1]
         tw <- tera.wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
@@ -350,10 +352,9 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
         U5Pb7 <- tw$x['U238Pb206']/(U85*tw$x['Pb207Pb206'])
         Pb8c7 <- Pb8c6/tw$x['Pb207Pb206']
         Th2Pb8 <- tw$x['Th232U238']*tw$x['U238Pb206']/tw$x['Pb208Pb206']
-        Pb6c8 <- 1/tw$x['Pb208Pb206'] -
-            McL$Pb206U238*tw$x['U238Pb206']/tw$x['Pb208Pb206']
-        Pb7c8 <- tw$x['Pb207Pb206']/tw$x['Pb208Pb206'] -
-            McL$Pb207U235*tw$x['U238Pb206']/(U85*tw$x['Pb208Pb206'])
+        Pb6c8 <- (1 - McL$Pb206U238*tw$x['U238Pb206'])/tw$x['Pb208Pb206']
+        Pb7c8 <- (tw$x['Pb207Pb206'] - McL$Pb207U235*tw$x['U238Pb206'])/
+            (U85*tw$x['Pb208Pb206'])
         J <- matrix(0,8,4)
         J[1,1] <- 1
         J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
@@ -383,11 +384,19 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
         U8Pb6 <- x$x[i,'U238Pb206']
         Pb8c6 <- x$x[i,'Pb208Pb206'] -
             x$x[i,'Th232U238']*x$x[i,'U238Pb206']*(exp(l2*tt)-1)
-        J <- diag(3)
+        Th2Pb8 <- x$x[i,'Th232U238']*x$x[i,'U238Pb206']/x$x[i,'Pb208Pb206']
+        Pb6c8 <- (1 - McL$Pb206U238*x$x[i,'U238Pb206'])/x$x[i,'Pb208Pb206']
+        J <- matrix(0,4,3)
+        J[1,1] <- J[2,2] <- 1
         J[2,1] <- -x$x[i,'Th232U238']*(exp(l2*tt)-1)
         J[2,3] <- -x$x[i,'U238Pb206']*(exp(l2*tt)-1)
+        J[3,1] <- x$x[i,'Th232U238']/x$x[i,'Pb208Pb206']
+        J[3,2] <- -Th2Pb8/x$x[i,'Pb208Pb206']
+        J[3,3] <- x$x[i,'U238Pb206']/x$x[i,'Pb208Pb206']
+        J[4,1] <- -McL$Pb206U238/x$x[i,'Pb208Pb206']
+        J[4,2] <- -Pb6c8/x$x[i,'Pb208Pb206']
         out <- list()
-        out$x <- c(U8Pb6,Pb8c6,x$x[i,'Th232U238'])
+        out$x <- c(U8Pb6,Pb8c6,Th2Pb8,Pb6c8)
         E <- cor2cov3(sX=x$x[i,'errU238Pb206'],
                       sY=x$x[i,'errPb208Pb206'],
                       sZ=x$x[i,'errTh232U238'],
@@ -400,11 +409,19 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
         U5Pb7 <- x$x[i,'U235Pb207']
         Pb8c7 <- x$x[i,'Pb208Pb207'] -
             x$x[i,'Th232U238']*U85*x$x[i,'U235Pb207']*(exp(l2*tt)-1)
-        J <- diag(3)
+        Th2Pb8 <- x$x[i,'Th232U238']*U85*x$x[i,'U235Pb207']/x$x[i,'Pb208Pb207']
+        Pb7c8 <- (1 - McL$Pb207U235*x$x[i,'U235Pb207'])/x$x[i,'Pb208Pb207']
+        J <- matrix(0,4,3)
+        J[1,1] <- J[2,2] <- 1
         J[2,1] <- -x$x[i,'Th232U238']*U85*(exp(l2*tt)-1)
         J[2,3] <- -x$x[i,'U235Pb207']*U85*(exp(l2*tt)-1)
+        J[3,1] <- x$x[i,'Th232U238']*U85/x$x[i,'Pb208Pb207']
+        J[3,2] <- -Th2Pb8/x$x[i,'Pb208Pb207']
+        J[3,3] <- U85*x$x[i,'U235Pb207']/x$x[i,'Pb208Pb207']
+        J[4,1] <- -McL$Pb207U235/x$x[i,'Pb208Pb207']
+        J[4,2] <- -Pb7c8/x$x[i,'Pb208Pb207']
         out <- list()
-        out$x <- c(U5Pb7,Pb8c7,x$x[i,'Th232U238'])
+        out$x <- c(U5Pb7,Pb8c7,Th2Pb8,Pb7c8)
         E <- cor2cov3(sX=x$x[i,'errU235Pb207'],
                       sY=x$x[i,'errPb208Pb207'],
                       sZ=x$x[i,'errTh232U238'],
@@ -560,23 +577,31 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     colnames(out$cov) <- labels
     out
 }
-age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
+age_to_cottle_ratios <- function(tt,st=0,exterr=FALSE,d=diseq(),option=1){
     out <- list()
-    labels <- c('Pb206U238','Pb208Th232')
-    l8 <- settings('lambda','U238')[1]
     l2 <- settings('lambda','Th232')[1]
     McL <- mclean(tt=tt,d=d,exterr=exterr)
-    Pb6U8 <- McL$Pb206U238
     Pb8Th2 <- exp(l2*tt)-1
-    out$x <- c(Pb6U8,Pb8Th2)
     E <- matrix(0,3,3)
-    diag(E) <- c(st,lambda('U238')[2],lambda('Th232')[2])^2
     J <- matrix(0,2,3)
-    J[1,1] <- McL$dPb206U238dt
     J[2,1] <- l2*exp(l2*tt)
-    if (exterr){
-        J[1,2] <- McL$dPb206U238dl38
-        J[2,3] <- tt*exp(l2*tt)
+    if (exterr) J[2,3] <- tt*exp(l2*tt)
+    if (option==2){
+        labels <- c('Pb207U235','Pb208Th232')
+        l5 <- settings('lambda','U235')[1]
+        Pb7U5 <- McL$Pb207U235
+        out$x <- c(Pb7U5,Pb8Th2)
+        diag(E) <- c(st,lambda('U235')[2],lambda('Th232')[2])^2
+        J[1,1] <- McL$dPb207U235dt
+        if (exterr) J[1,2] <- McL$dPb207U235dl35
+    } else {
+        labels <- c('Pb206U238','Pb208Th232')
+        l8 <- settings('lambda','U238')[1]
+        Pb6U8 <- McL$Pb206U238
+        out$x <- c(Pb6U8,Pb8Th2)
+        diag(E) <- c(st,lambda('U238')[2],lambda('Th232')[2])^2
+        J[1,1] <- McL$dPb206U238dt
+        if (exterr) J[1,2] <- McL$dPb206U238dl38
     }
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
@@ -1252,6 +1277,8 @@ UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
 #      (raw if before==TRUE, common Pb corrected if before==FALSE)
 UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
                            conc=TRUE,discordance=discfilter(),...){
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@16@"]]));##:ess-bp-end:##
     Xi <- subset(X,subset=((1:length(X))%in%i))
     do68 <- do75 <- do76 <- do82 <- FALSE 
     if (x$format<7){
