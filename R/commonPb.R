@@ -280,22 +280,22 @@ correct.common.Pb.with.204 <- function(x,i,c46=NULL,c47=NULL,tt=NULL,cc=FALSE){
     }
     out
 }
-correct.common.Pb.with.208 <- function(x,i,tt,c0806=NULL,c0807=NULL,cc=FALSE){
+correct.common.Pb.with.208 <- function(x,i,tt,c0608=NULL,c0708=NULL,cc=FALSE){
     # (3806, 08c06), (3507, 08c07), (3238, 3208), (06c08), (07c08):
     ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
     if (x$format%in%c(7,8,12)){
         r3507 <- age_to_U235Pb207_ratio(tt,d=x$d[i])[1]
-        p3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507/c0807
+        p3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507*c0708
     }
     if (x$format%in%c(7,8,11)){
         r3806 <- age_to_U238Pb206_ratio(tt,d=x$d[i])[1]
-        p3806 <- ir$x['U238Pb206'] + ir$x['Pb208cPb206']*r3806/c0806
+        p3806 <- ir$x['U238Pb206'] + ir$x['Pb208cPb206']*r3806*c0608
     }
     r3208 <- 1/age_to_Pb208Th232_ratio(tt)[1]
-    if (x$format==12){
-        p3208 <- ir$x['Th232Pb208'] + ir$x['Pb207cPb208']*r3208*c0807
+    if (x$format==11){
+        p3208 <- ir$x['Th232Pb208'] + ir$x['Pb206cPb208']*r3208/c0608
     } else {
-        p3208 <- ir$x['Th232Pb208'] + ir$x['Pb206cPb208']*r3208*c0806
+        p3208 <- ir$x['Th232Pb208'] + ir$x['Pb207cPb208']*r3208/c0708
     }
     # projected compositions:
     if (x$format%in%c(7,8)){
@@ -313,24 +313,24 @@ correct.common.Pb.with.208 <- function(x,i,tt,c0806=NULL,c0807=NULL,cc=FALSE){
     if (x$format%in%c(7,8)){
         Jp <- matrix(0,4,8)
         Jp[1,3] <- 1
-        Jp[1,4] <- r3507/c0807
+        Jp[1,4] <- r3507*c0708
         Jp[2,1] <- 1
-        Jp[2,2] <- r3806/c0806
+        Jp[2,2] <- r3806*c0608
         Jp[3,6] <- 1
-        Jp[3,8] <- r3208*c0807
+        Jp[3,8] <- r3208/c0708
         Jp[4,5] <- 1
     } else if (x$format==11){
         Jp <- matrix(0,2,4)
         Jp[1,1] <- 1
-        Jp[1,2] <- r3806/c0806
+        Jp[1,2] <- r3806*c0608
         Jp[2,3] <- 1
-        Jp[2,4] <- r3208*c0806
+        Jp[2,4] <- r3208/c0608
     } else if (x$format==12){
         Jp <- matrix(0,2,4)
         Jp[1,1] <- 1
-        Jp[1,2] <- r3507/c0807
+        Jp[1,2] <- r3507*c0708
         Jp[2,3] <- 1
-        Jp[2,4] <- r3208*c0807
+        Jp[2,4] <- r3208/c0708
     }
     Ep <- Jp %*% ir$cov %*% t(Jp)
     if (x$format%in%c(7,8)){
@@ -425,9 +425,9 @@ common.Pb.stacey.kramers <- function(x){
             maxt <- get.Pb208Th232.age(x,i=i)[1]
             tint <- stats::optimise(SS.SK.with.208,interval=c(0,maxt),x=x,i=i)$minimum
             c678 <- stacey.kramers(tint)
-            c86 <- c678[,'i84']/c678[,'i64']
-            c87 <- c678[,'i84']/c678[,'i74']
-            out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0806=c86,c0807=c87)
+            c68 <- c678[,'i64']/c678[,'i84']
+            c78 <- c678[,'i74']/c678[,'i84']
+            out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0608=c68,c0708=c78)
         }
     } else {
         stop('Invalid input format.')
@@ -462,10 +462,10 @@ common.Pb.isochron <- function(x,omit=NULL){
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                            'rXY','rXZ','rXW','rYZ','rYW','rZW')
-        c0806 <- 1/fit$par['a0']
-        c0807 <- 1/fit$par['b0']
+        c0608 <- fit$par['a0']
+        c0708 <- fit$par['b0']
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0806=c0806,c0807=c0807)
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0608=c0608,c0708=c0708)
         }
     }
     out
@@ -495,13 +495,13 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                            'rXY','rXZ','rXW','rYZ','rYW','rZW')
-        c0806 <- 1/settings('iratio','Pb206Pb208')[1]
-        c0807 <- 1/settings('iratio','Pb207Pb208')[1]
+        c0608 <- settings('iratio','Pb206Pb208')[1]
+        c0708 <- settings('iratio','Pb207Pb208')[1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.with.208,interval=c(0,5000),
-                                    c0806=c0806,c0807=c0807,x=x,i=i)$minimum
+                                    c0608=c0608,c0708=c0708,x=x,i=i)$minimum
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,
-                                                  c0806=c0806,c0807=c0807)
+                                                  c0608=c0608,c0708=c0708)
         }
     } else if (x$format==9){
         out <- matrix(0,ns,2)
@@ -521,22 +521,42 @@ common.Pb.nominal <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','rXY')
-        c0806 <- 1/settings('iratio','Pb206Pb208')[1]
-        tmax <- get.Pb208Th232.age(x=x)[,1]
+        c0608 <- settings('iratio','Pb206Pb208')[1]
+        ts <- cbind(get.Pb208Th232.age(x=x)[,1],
+                    get.Pb206U238.age(x=x)[,1])
+        tmax <- apply(ts,1,max)
+        misfit <- function(tt,xi=xi,c0608=c0608){
+            l2 <- lambda('Th232')[1]
+            l8 <- lambda('U238')[1]
+            Pb6U8 <- 1/xi['U238Pb206']
+            Pb8Th2 <- xi['Pb208Pb206']/(xi['U238Pb206']*xi['Th232U238'])
+            (Pb6U8-c0608*xi['Th232U238']*(Pb8Th2-exp(l2*tt)+1)-exp(l8*tt)+1)^2
+        }
         for (i in 1:ns){
-            tint <- stats::optimise(SS.with.208,interval=c(0,tmax[i]),
-                                    c0806=c0806,x=x,i=i)$minimum
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0806=c0806)
+            tint <- stats::optimise(misfit,interval=c(0,tmax[i]),
+                                    xi=x$x[i,],c0608=c0608)$minimum
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0608=c0608)
         }
     } else if (x$format==12){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb208Th232','errPb208Th232','rXY')
-        c0807 <- 1/settings('iratio','Pb207Pb208')[1]
+        c0708 <- settings('iratio','Pb207Pb208')[1]
+        ts <- cbind(get.Pb208Th232.age(x=x)[,1],
+                    get.Pb207U235.age(x=x)[,1])
+        tmax <- apply(ts,1,max)
+        misfit <- function(tt,xi=xi,c0708=c0708){
+            U85 <- iratio('U238U235')[1]
+            l2 <- lambda('Th232')[1]
+            l5 <- lambda('U235')[1]
+            Pb7U5 <- 1/xi['U235Pb207']
+            Pb8Th2 <- xi['Pb208Pb207']/(xi['U235Pb207']*U85*xi['Th232U238'])
+            (Pb7U5-c0708*xi['Th232U238']*U85*(Pb8Th2-exp(l2*tt)+1)-exp(l5*tt)+1)^2
+        }
         for (i in 1:ns){
-            tint <- stats::optimise(SS.with.208,interval=c(0,5000),
-                                    c0807=c0807,x=x,i=i)$minimum
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0807=c0807)
+            tint <- stats::optimise(misfit,interval=c(0,tmax[i]),
+                                    xi=x$x[i,],c0708=c0708)$minimum
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0708=c0708)
         }
     } else {
         stop('Invalid U-Pb format')
@@ -571,27 +591,14 @@ SS.SK.with.204 <- function(tt,x,i){
 }
 SS.SK.with.208 <- function(tt,x,i){
     i678 <- stacey.kramers(tt)
-    c0806 <- i678[,'i84']/i678[,'i64']
-    c0807 <- i678[,'i84']/i678[,'i74']
-    SS.with.208(tt,x,i,c0806,c0807)
+    c0608 <- i678[,'i64']/i678[,'i84']
+    c0708 <- i678[,'i74']/i678[,'i84']
+    SS.with.208(tt,x,i,c0608,c0708)
 }
-SS.with.208 <- function(tt,x,i,c0806=NULL,c0807=NULL){
-    cc <- correct.common.Pb.with.208(x,i=i,tt=tt,c0806=c0806,c0807=c0807,cc=TRUE)
-    if (x$format%in%c(7,8)){
-        type <- 1
-        model2 <- FALSE
-    } else if (x$format==11){
-        type <- 3
-        model2 <- TRUE
-    } else if (x$format==12) {
-        type <- 4
-        model2 <- TRUE
-    } else {
-        stop('Invalid U-Pb type')
-    }
-    out <- LL.concordia.age(stats::setNames(tt,'t'),cc,type=type,
-                            mswd=TRUE,exterr=FALSE,d=x$d[i],model2=model2)
-    out
+SS.with.208 <- function(tt,x,i,c0608=NULL,c0708=NULL){
+    cc <- correct.common.Pb.with.208(x,i=i,tt=tt,c0608=c0608,c0708=c0708,cc=TRUE)
+    LL.concordia.age(stats::setNames(tt,'t'),cc=cc,type=1,
+                     mswd=TRUE,exterr=FALSE,d=x$d[i])
 }
 
 stacey.kramers <- function(tt,inverse=FALSE){

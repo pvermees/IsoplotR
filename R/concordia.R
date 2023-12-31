@@ -813,8 +813,7 @@ LL.concordia.comp <- function(mu,x,type=1,mswd=FALSE,...){
     out
 }
 
-LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),
-                             mswd=FALSE,model2=FALSE){
+LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
     out <- 0
     tt <- pars['t']
     pnames <- names(pars)
@@ -863,9 +862,6 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),
     } else if (type==3){
         y <- age_to_cottle_ratios(tt,d=D,option=1)
         cols <- c('Pb206U238','Pb208Th232')
-    } else if (type==3){
-        y <- age_to_cottle_ratios(tt,d=D,option=2)
-        cols <- c('Pb207U235','Pb208Th232')
     } else {
         stop('Incorrect concordia type.')
     }
@@ -895,8 +891,7 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),
         E <- J %*% Lcov %*% t(J)
         covmat <- covmat + E
     }
-    if (model2) out <- dx%*%t(dx) # for U-Pb formats 11 and 12
-    else if (mswd) out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
+    if (mswd) out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
     else out <- LL.norm(dx,covmat)
     out
 }
