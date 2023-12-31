@@ -1004,6 +1004,7 @@ get.Pb208Pb206.ratios <- function(x){
 
 get.Pb207U235.age <- function(x,...){ UseMethod("get.Pb207U235.age",x) }
 get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
+    if (is.na(x)) return(c('t75'=NA,'s[t75]'=NA))
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -1062,6 +1063,7 @@ get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
 get.Pb206U238.age <- function(x,...){ UseMethod("get.Pb206U238.age",x) }
 get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
                                       bayes=FALSE,plot=FALSE,...){
+    if (is.na(x)) return(c('t68'=NA,'s[t68]'=NA))
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -1142,6 +1144,7 @@ twslope <- function(tt=0,d=diseq()){
 
 get.Pb207Pb206.age <- function(x,...){ UseMethod("get.Pb207Pb206.age",x) }
 get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,...){
+    if (is.na(x)) return(c('t68'=NA,'s[t68]'=NA))
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -1206,6 +1209,7 @@ get.Pb207Pb206.age.terawasserburg <- function(x,exterr=FALSE,...){
 
 get.Pb208Th232.age <- function(x,...){ UseMethod("get.Pb208Th232.age",x) }
 get.Pb208Th232.age.default <- function(x,sx=0,exterr=FALSE,...){
+    if (is.na(x)) return(c('t82'=NA,'s[t82]'=NA))
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)

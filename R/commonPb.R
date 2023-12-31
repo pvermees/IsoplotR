@@ -533,9 +533,13 @@ common.Pb.nominal <- function(x){
             (Pb6U8-c0608*xi['Th232U238']*(Pb8Th2-exp(l2*tt)+1)-exp(l8*tt)+1)^2
         }
         for (i in 1:ns){
-            tint <- stats::optimise(misfit,interval=c(0,tmax[i]),
+            tint <- stats::optimise(misfit,interval=c(-1,tmax[i]),
                                     xi=x$x[i,],c0608=c0608)$minimum
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0608=c0608)
+            if (tint<0){
+                out[i,] <- NA
+            } else {
+                out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0608=c0608)
+            }
         }
     } else if (x$format==12){
         out <- matrix(0,ns,5)
@@ -554,9 +558,13 @@ common.Pb.nominal <- function(x){
             (Pb7U5-c0708*xi['Th232U238']*U85*(Pb8Th2-exp(l2*tt)+1)-exp(l5*tt)+1)^2
         }
         for (i in 1:ns){
-            tint <- stats::optimise(misfit,interval=c(0,tmax[i]),
+            tint <- stats::optimise(misfit,interval=c(-1,tmax[i]),
                                     xi=x$x[i,],c0708=c0708)$minimum
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0708=c0708)
+            if (tint<0){
+                out[i,] <- NA
+            } else {
+                out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0708=c0708)
+            }
         }
     } else {
         stop('Invalid U-Pb format')
