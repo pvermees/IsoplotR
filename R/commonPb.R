@@ -431,8 +431,9 @@ common.Pb.stacey.kramers <- function(x){
     } else if (x$format==9){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb206U238','errPb206U238')
+        tmax <- get.Pb206U238.age(x=x)[,1]
         for (i in 1:ns){
-            tint <- stats::uniroot(SKmisfit,interval=c(0,5000),x=x,i=i)$root
+            tint <- stats::uniroot(SKmisfit,interval=c(0,tmax[i]),x=x,i=i)$root
             c6474 <- stacey.kramers(tint)
             c46 <- 1/c6474[,'i64']
             out[i,] <- correct.common.Pb.with.204(x,i=i,tt=tint,c46=c46)
@@ -440,15 +441,43 @@ common.Pb.stacey.kramers <- function(x){
     } else if (x$format==10){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb207U235','errPb207U235')
+        tmax <- get.Pb207U235.age(x=x)[,1]
         for (i in 1:ns){
-            tint <- stats::uniroot(SKmisfit,interval=c(0,5000),x=x,i=i)$root
+            tint <- stats::uniroot(SKmisfit,interval=c(0,tmax[i]),x=x,i=i)$root
             c6474 <- stacey.kramers(tint)
             c47 <- 1/c6474[,'i74']
             out[i,] <- correct.common.Pb.with.204(x,i=i,tt=tint,c47=c47)
         }
     } else if (x$format==11){
-        
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb206U238','errPb206U238',
+                           'Pb208Th232','errPb208Th232','rXY')
+        tmax <- get.Pb208Th232.age(x=x)[,1]
+        for (i in 1:ns){
+            tint <- stats::optimise(SKmisfit,interval=c(-1,tmax[i]),x=x,i=i)$minimum
+            if (tint>0){
+                c678 <- stacey.kramers(tint)
+                c0608 <- c678[,'i64']/c678[,'i84']
+                out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0608=c0608)
+            } else {
+                out[i,] <- NA
+            }
+        }
     } else if (x$format==12){
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb207U235','errPb207U235',
+                           'Pb208Th232','errPb208Th232','rXY')
+        tmax <- get.Pb208Th232.age(x=x)[,1]
+        for (i in 1:ns){
+            tint <- stats::optimise(SKmisfit,interval=c(-1,tmax[i]),x=x,i=i)$minimum
+            if (tint>0){
+                c678 <- stacey.kramers(tint)
+                c0708 <- c678[,'i74']/c678[,'i84']
+                out[i,] <- correct.common.Pb.with.208(x,i=i,tt=tint,c0708=c0708)
+            } else {
+                out[i,] <- NA
+            }
+        }
     } else {
         stop('Invalid input format.')
     }
@@ -647,6 +676,16 @@ SKmisfit <- function(tt,x,i){
         p0735 <- correct.common.Pb.with.204(x=x,i=i,c47=c47,tt=tt)[1]
         b <- -p0735/c6474[1,'i74']
         out <- a + b*x$x[i,'U235Pb207'] - x$x[i,'Pb204Pb207']
+    } else if (x$format==11){ # sum of squares
+        i678 <- stacey.kramers(tt)
+        c0608 <- i678[,'i64']/i678[,'i84']
+        out <- SS.Pb0(tt=tt,x=x,i=i,c0608=c0608)
+    } else if (x$format==12){ # sum of squares
+        i678 <- stacey.kramers(tt)
+        c0708 <- i678[,'i74']/i678[,'i84']
+        out <- SS.Pb0(tt=tt,x=x,i=i,c0708=c0708)
+    } else {
+        stop('Invalid U-Pb format for SSmisfit().')
     }
     out
 }
@@ -794,23 +833,25 @@ project.concordia <- function(m86,m76,c76,d=diseq()){
         search.range <- c(0,t68)
         go.ahead <- TRUE
     } else if (neg & below){
+        from <- 0
+        to <- 5000
         if (neg){
-            search.range[1] <- 0
-            search.range[2] <- get.search.limit(a=a,b=b,d=d,m=0,M=5000)
+            search.range[1] <- from
+            search.range[2] <- get.search.limit(a=a,b=b,d=d,m=from,M=to)
             if (!is.na(search.range[2])) go.ahead <- TRUE
         } else {
-            tm <- get.search.limit(a=a,b=b,d=d,m=0,M=5000)
-            tM <- get.search.limit(a=a,b=b,d=d,m=5000,M=0)
+            tm <- get.search.limit(a=a,b=b,d=d,m=from,M=to)
+            tM <- get.search.limit(a=a,b=b,d=d,m=to,M=from)
             if (!is.na(tm) | !is.na(tM))
                 go.ahead <- TRUE
             if (is.na(tm) & !is.na(tM))
-                search.range <- c(tM,5000)
+                search.range <- c(tM,to)
             else if (is.na(tM) & !is.na(tm))
-                search.range <- c(0,tm)
+                search.range <- c(from,tm)
             else if (!is.na(tm) & !is.na(tM) & (t68<tm))
-                search.range <- c(0,tm)
+                search.range <- c(from,tm)
             else if (!is.na(tm) & !is.na(tM) & (t68>tM))
-                search.range <- c(tM,5000)
+                search.range <- c(tM,to)
         }                
     }
     if (go.ahead){
