@@ -479,7 +479,7 @@ common.Pb.nominal <- function(x){
                            'Pb207Pb206','errPb207Pb206','rXY')
         c76 <- settings('iratio','Pb207Pb206')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.without.204(x,i=i,c76=c76)
+            out[i,] <- correct.common.Pb.without.204(x=x,i=i,c76=c76)
         }
     } else if (x$format %in% c(4,5,6)){
         out <- matrix(0,ns,5)
@@ -488,7 +488,7 @@ common.Pb.nominal <- function(x){
         c46 <- 1/settings('iratio','Pb206Pb204')[1]
         c47 <- 1/settings('iratio','Pb207Pb204')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.204(x,i=i,c46=c46,c47=c47)
+            out[i,] <- correct.common.Pb.with.204(x=x,i=i,c46=c46,c47=c47)
         }
     } else if (x$format%in%c(7,8)){
         out <- matrix(0,ns,14)
@@ -497,48 +497,46 @@ common.Pb.nominal <- function(x){
                            'rXY','rXZ','rXW','rYZ','rYW','rZW')
         c0608 <- settings('iratio','Pb206Pb208')[1]
         c0708 <- settings('iratio','Pb207Pb208')[1]
+        tmax <- get.Pb208Th232.age(x=x)[,1]
         for (i in 1:ns){
-            tint <- stats::optimise(SS.with.208,interval=c(0,5000),
+            tint <- stats::optimise(SS.with.208,interval=c(0,tmax),
                                     c0608=c0608,c0708=c0708,x=x,i=i)$minimum
-            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,
-                                                  c0608=c0608,c0708=c0708)
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0608=c0608,c0708=c0708)
         }
     } else if (x$format==9){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb206U238','errPb206U238')
         c46 <- 1/settings('iratio','Pb206Pb204')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.204(x,i=i,c46=c46)
+            out[i,] <- correct.common.Pb.with.204(x=x,i=i,c46=c46)
         }
     } else if (x$format==10){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb207U235','errPb207U235')
         c47 <- 1/settings('iratio','Pb207Pb204')[1]
         for (i in 1:ns){
-            out[i,] <- correct.common.Pb.with.204(x,i=i,c47=c47)
+            out[i,] <- correct.common.Pb.with.204(x=x,i=i,c47=c47)
         }
     } else if (x$format==11){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','rXY')
         c0608 <- settings('iratio','Pb206Pb208')[1]
-        ts <- cbind(get.Pb208Th232.age(x=x)[,1],
-                    get.Pb206U238.age(x=x)[,1])
-        tmax <- apply(ts,1,max)
-        misfit <- function(tt,xi=xi,c0608=c0608){
-            l2 <- lambda('Th232')[1]
-            l8 <- lambda('U238')[1]
+        tmax <- get.Pb208Th232.age(x=x)[,1]
+        misfit <- function(tt,x=x,i=i,c0608=c0608){
+            xi <- x$x[i,]
+            McL <- mclean(tt=tt,d=x$d)
             Pb6U8 <- 1/xi['U238Pb206']
             Pb8Th2 <- xi['Pb208Pb206']/(xi['U238Pb206']*xi['Th232U238'])
-            (Pb6U8-c0608*xi['Th232U238']*(Pb8Th2-exp(l2*tt)+1)-exp(l8*tt)+1)^2
+            (Pb6U8-c0608*xi['Th232U238']*(Pb8Th2-McL$Pb208Th232)-McL$Pb206U238)^2
         }
         for (i in 1:ns){
             tint <- stats::optimise(misfit,interval=c(-1,tmax[i]),
-                                    xi=x$x[i,],c0608=c0608)$minimum
-            if (tint<0){
-                out[i,] <- NA
+                                    x=x,i=i,c0608=c0608)$minimum
+            if (tint>0){
+                out[i,] <- correct.common.Pb.with.208(x=x,i=i,tt=tint,c0608=c0608)
             } else {
-                out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0608=c0608)
+                out[i,] <- NA
             }
         }
     } else if (x$format==12){
@@ -546,24 +544,22 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb208Th232','errPb208Th232','rXY')
         c0708 <- settings('iratio','Pb207Pb208')[1]
-        ts <- cbind(get.Pb208Th232.age(x=x)[,1],
-                    get.Pb207U235.age(x=x)[,1])
-        tmax <- apply(ts,1,max)
-        misfit <- function(tt,xi=xi,c0708=c0708){
+        tmax <- get.Pb208Th232.age(x=x)[,1]
+        misfit <- function(tt,x=x,i=i,c0708=c0708){
+            xi <- x$x[i,]
+            McL <- mclean(tt=tt,d=x$d)
             U85 <- iratio('U238U235')[1]
-            l2 <- lambda('Th232')[1]
-            l5 <- lambda('U235')[1]
             Pb7U5 <- 1/xi['U235Pb207']
             Pb8Th2 <- xi['Pb208Pb207']/(xi['U235Pb207']*U85*xi['Th232U238'])
-            (Pb7U5-c0708*xi['Th232U238']*U85*(Pb8Th2-exp(l2*tt)+1)-exp(l5*tt)+1)^2
+            (Pb7U5-c0708*xi['Th232U238']*U85*(Pb8Th2-McL$Pb208Th232)-McL$Pb207U235)^2
         }
         for (i in 1:ns){
             tint <- stats::optimise(misfit,interval=c(-1,tmax[i]),
-                                    xi=x$x[i,],c0708=c0708)$minimum
-            if (tint<0){
-                out[i,] <- NA
+                                    x=x,i=i,c0708=c0708)$minimum
+            if (tint>0){
+                out[i,] <- correct.common.Pb.with.208(x=x,i=i,tt=tint,c0708=c0708)
             } else {
-                out[i,] <- correct.common.Pb.with.208(x,i,tt=tint,c0708=c0708)
+                out[i,] <- NA
             }
         }
     } else {

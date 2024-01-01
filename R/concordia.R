@@ -871,7 +871,7 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
         l5 <- settings('lambda','U235')
         l8 <- settings('lambda','U238')
         l2 <- settings('lambda','Th232')
-        U <- settings('iratio','U238U235')
+        U85 <- settings('iratio','U238U235')[1]
         Lcov <- diag(c(l5[2],l8[2],l2[2]))^2
         J <- matrix(0,2,3)
         if (type==1){
@@ -879,13 +879,10 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
             J[2,2] <- McL$dPb206U238dl38
         } else if (type==2){
             J[1,2] <- -McL$dPb206U238dl38/McL$Pb206U238^2
-            J[2,1] <- McL$dPb207U235dl35/(U*McL$Pb206U238)
-            J[2,2] <- -McL$dPb206U238dl38/(U*McL$Pb206U238^2)
-        } else if (type==3){
+            J[2,1] <- McL$dPb207U235dl35/(U85*McL$Pb206U238)
+            J[2,2] <- -McL$dPb206U238dl38/(U85*McL$Pb206U238^2)
+        } else { # type==3
             J[1,2] <- McL$dPb206U238dl38
-            J[2,3] <- tt*exp(l2[1]*tt)
-        } else { # type == 4
-            J[1,2] <- McL$dPb207U235dl35
             J[2,3] <- tt*exp(l2[1]*tt)
         }
         E <- J %*% Lcov %*% t(J)

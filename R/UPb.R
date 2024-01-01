@@ -498,27 +498,32 @@ tw2w <- function(tw,format){
 
 wtw_helper <- function(x,covmat,cnames){
     nc <- length(cnames)
-    out <- rep(0,nc)
-    names(out) <- cnames
-    err <- sqrt(diag(covmat))
-    cormat <- 0*covmat
-    pos <- which(diag(covmat)>0)
-    cormat[pos,pos] <- stats::cov2cor(covmat[pos,pos])
-    out[c(1,3)] <- x[1:2]
-    out[c(2,4)] <- err[1:2]
-    out['rXY'] <- cormat[1,2]
-    if (nc>5){
-        out[5] <- x[3]
-        out[6] <- err[3]
-        out['rXZ'] <- cormat[1,3]
-        out['rYZ'] <- cormat[2,3]
-    }
-    if (nc>9){
-        out[7] <- x[4]
-        out[8] <- err[4]
-        out['rXW'] <- cormat[1,4]
-        out['rYW'] <- cormat[2,4]
-        out['rZW'] <- cormat[3,4]
+    if (any(is.na(x))){
+        out <- rep(NA,nc)
+        names(out) <- cnames
+    } else {
+        out <- rep(0,nc)
+        names(out) <- cnames
+        err <- sqrt(diag(covmat))
+        cormat <- 0*covmat
+        pos <- which(diag(covmat)>0)
+        cormat[pos,pos] <- stats::cov2cor(covmat[pos,pos])
+        out[c(1,3)] <- x[1:2]
+        out[c(2,4)] <- err[1:2]
+        out['rXY'] <- cormat[1,2]
+        if (nc>5){
+            out[5] <- x[3]
+            out[6] <- err[3]
+            out['rXZ'] <- cormat[1,3]
+            out['rYZ'] <- cormat[2,3]
+        }
+        if (nc>9){
+            out[7] <- x[4]
+            out[8] <- err[4]
+            out['rXW'] <- cormat[1,4]
+            out['rYW'] <- cormat[2,4]
+            out['rZW'] <- cormat[3,4]
+        }
     }
     out
 }
