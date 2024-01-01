@@ -467,6 +467,38 @@ common.Pb.isochron <- function(x,omit=NULL){
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0608=c0608,c0708=c0708)
         }
+    } else if (x$format==9){
+        out <- matrix(0,ns,2)
+        colnames(out) <- c('Pb206U238','errPb206U238')
+        c46 <- 1/fit$par['a0']
+        for (i in 1:ns){
+            out[i,] <- correct.common.Pb.with.204(x,i=i,c46=c46,tt=tt)
+        }
+    } else if (x$format==10){
+        out <- matrix(0,ns,2)
+        colnames(out) <- c('Pb207U235','errPb207U235')
+        c47 <- 1/fit$par['b0']
+        for (i in 1:ns){
+            out[i,] <- correct.common.Pb.with.204(x,i=i,c47=c47,tt=tt)
+        }
+    } else if (x$format==11){
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb206U238','errPb206U238',
+                           'Pb208Th232','errPb208Th232','rXY')
+        c0608 <- fit$par['a0']
+        for (i in 1:ns){
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0608=c0608)
+        }
+    } else if (x$format==12){
+        out <- matrix(0,ns,5)
+        colnames(out) <- c('Pb207U235','errPb207U235',
+                           'Pb208Th232','errPb208Th232','rXY')
+        c0708 <- fit$par['b0']
+        for (i in 1:ns){
+            out[i,] <- correct.common.Pb.with.208(x,i,tt=tt,c0708=c0708)
+        }
+    } else {
+        stop('Invalid U-Pb format.')
     }
     out
 }
