@@ -667,15 +667,35 @@ concordia.age <- function(x,i=NULL,type=1,exterr=FALSE,...){
     }
     out
 }
+# cc is assumed to follow a wetherill or cottle format
 concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
-    if (type==1) Pb206U238 <- cc$x['Pb206U238']
-    else if (type==2) Pb206U238 <- 1/cc$x['U238Pb206']
-    else if (type==3) Pb206U238 <- cc$x['Pb206U238']
-    else stop('Incorrect concordia type.')
+    v <- eigen(cc$cov)$vectors[,1]
+    slope <- v[2]/v[1]
     lower <- upper <- init <- vector()
+    U85 <- iratio('U238U235')[1]
+    l8 <- lambda('U238')[1]
+    if (type==1){
+        l5 <- lambda('U235')[1]
+        if (slope>0){
+            tmid <- log(slope*l5/l8)/(l8-l5) # tangential to error ellipse
+            tmax <- get.Pb207Pb206.age(x=1/(slope*U85),d=d)[1]
+        } else {
+            tmid <- log(-l8/(l5*slope))/(l5-l8) # normal to error ellipse
+            tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
+        }
+    } else if (type==3){
+        l2 <- lambda('Th232')[1]
+        if (slope>0){
+            tmid <- log(slope*l8/l2)/(l2-l8) # tangential to error ellipse
+        } else {
+            tmid <- log(-l2/(l8*slope))/(l8-l2) # normal to error ellipse
+        }
+        tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
+    } else {
+        stop('concordia_age_helper is not available for concordia type ', 'type')
+    }
+    init['t'] <- upper['t'] <- NA # placeholder
     lower['t'] <- 0
-    upper['t'] <- get.Pb206U238.age(x=Pb206U238,d=d)[1]
-    init['t'] <- (lower['t']+upper['t'])/2
     if (d$U48$option>0){
         if (d$U48$option==2 && (is.null(d$U48$sx) || d$U48$sx<=0)){
             stop('Zero uncertainty of measured 234/238 activity ratio')
@@ -704,12 +724,14 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         lower['PaUi'] <- 0
         upper['PaUi'] <- 20
     }
+    upper['t'] <- tmid
+    init['t'] <- (lower['t'] + upper['t'])/2
     fit1 <- stats::optim(init,LL.concordia.age,method='L-BFGS-B',
                          lower=lower,upper=upper,exterr=exterr,
                          cc=cc,type=type,d=d,hessian=TRUE)
-    lower['t'] <- upper['t']
-    upper['t'] <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),5000)
-    init['t'] <- (lower['t']+upper['t'])/2
+    lower['t'] <- tmid
+    upper['t'] <- tmax
+    init['t'] <- (lower['t'] + upper['t'])/2
     fit2 <- stats::optim(init,LL.concordia.age,method='L-BFGS-B',
                          lower=lower,upper=upper,exterr=exterr,
                          cc=cc,type=type,d=d,hessian=TRUE)
@@ -838,7 +860,7 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
         y <- age_to_terawasserburg_ratios(tt,d=D)
         cols <- c('U238Pb206','Pb207Pb206')
     } else if (type==3){
-        y <- age_to_cottle_ratios(tt,d=D)
+        y <- age_to_cottle_ratios(tt,d=D,option=1)
         cols <- c('Pb206U238','Pb208Th232')
     } else {
         stop('Incorrect concordia type.')
@@ -849,7 +871,7 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
         l5 <- settings('lambda','U235')
         l8 <- settings('lambda','U238')
         l2 <- settings('lambda','Th232')
-        U <- settings('iratio','U238U235')
+        U85 <- settings('iratio','U238U235')[1]
         Lcov <- diag(c(l5[2],l8[2],l2[2]))^2
         J <- matrix(0,2,3)
         if (type==1){
@@ -857,9 +879,9 @@ LL.concordia.age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
             J[2,2] <- McL$dPb206U238dl38
         } else if (type==2){
             J[1,2] <- -McL$dPb206U238dl38/McL$Pb206U238^2
-            J[2,1] <- McL$dPb207U235dl35/(U*McL$Pb206U238)
-            J[2,2] <- -McL$dPb206U238dl38/(U*McL$Pb206U238^2)
-        } else { # type == 3
+            J[2,1] <- McL$dPb207U235dl35/(U85*McL$Pb206U238)
+            J[2,2] <- -McL$dPb206U238dl38/(U85*McL$Pb206U238^2)
+        } else { # type==3
             J[1,2] <- McL$dPb206U238dl38
             J[2,3] <- tt*exp(l2[1]*tt)
         }

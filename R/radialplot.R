@@ -221,13 +221,15 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
+
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
 #'     (\code{type}=4), the concordia age (\code{type}=5), or the
-#'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).
+#'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).  Ignored if
+#'     \code{x$format>8}.
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age is used. This parameter is
@@ -272,6 +274,9 @@ radialplot.UPb <- function(x,from=NA,to=NA,z0=NA,
                            col='black',markers=NULL,k=0,np=3,
                            exterr=FALSE,common.Pb=0,oerr=3,hide=NULL,
                            omit=NULL,omit.col=NA,...){
+    # override type if necessary:
+    if (x$format%in%c(9,11)) type <- 2
+    if (x$format%in%c(10,12)) type <- 1
     age2radial(x,from=from,to=to,z0=z0,sigdig=sigdig,
                transformation=transformation,type=type,
                cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
