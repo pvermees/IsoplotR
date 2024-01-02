@@ -411,7 +411,13 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
         out$x <- optionalredundancy2cor(X=out$x,nc=nc)
     }
     out$d <- copy_diseq(x=out,d=d) # for Th/U based diseq corrections
+    if (format%in%c(7,8,11,12)) out$format <- ThUcheck(out)
     out
+}
+ThUcheck <- function(x){
+    cond1 <- any(is.na(x$x[,'Th232U238']))
+    cond2 <- !all(x$x[,'Th232U238']>0)
+    ifelse(cond1 || cond2, paste0(x$format,'b'), x$format) 
 }
 # for U-Pb format 3, the correlation coefficients are optional
 # and can be inferred from the redundancy of the ratios
