@@ -353,8 +353,8 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
         Pb8c7 <- Pb8c6/tw$x['Pb207Pb206']
         Th2Pb8 <- tw$x['Th232U238']*tw$x['U238Pb206']/tw$x['Pb208Pb206']
         Pb6c8 <- (1 - McL$Pb206U238*tw$x['U238Pb206'])/tw$x['Pb208Pb206']
-        Pb7c8 <- (tw$x['Pb207Pb206'] - McL$Pb207U235*tw$x['U238Pb206'])/
-            (U85*tw$x['Pb208Pb206'])
+        Pb7c8 <- tw$x['Pb207Pb206']/tw$x['Pb208Pb206'] -
+            McL$Pb207U235*tw$x['U238Pb206']/(U85*tw$x['Pb208Pb206'])
         J <- matrix(0,8,4)
         J[1,1] <- 1
         J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
