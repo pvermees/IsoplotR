@@ -221,8 +221,6 @@ tera.wasserburg <- function(x,i=1,format){
         out$cov <- J %*% E %*% t(J)
     } else if (format == 2){
         out$x <- X[i,labels]
-        out$cov <- matrix(0,2,2)
-        diag(out$cov) <- X[i,c('errU238Pb206','errPb207Pb206')]^2
         out$cov <- cor2cov2(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],X[i,'rXY'])
     } else if (format == 3){
         U238Pb206 <- 1/X[i,'Pb206U238']
@@ -250,11 +248,8 @@ tera.wasserburg <- function(x,i=1,format){
         out$cov <- J %*% E %*% t(J)
     } else if (format == 5){
         out$x <- X[i,labels]
-        out$cov <- matrix(0,3,3)
-        diag(out$cov) <- X[i,c('errU238Pb206','errPb207Pb206','errPb204Pb206')]^2
-        out$cov <-
-            cor2cov3(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],X[i,'errPb204Pb206'],
-                     X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
+        out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],
+                            X[i,'errPb204Pb206'],X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
     } else if (format == 6){
         U238Pb206 <- 1/X[i,'Pb206U238']
         Pb207Pb206 <- X[i,'Pb207Pb206']
@@ -505,8 +500,6 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
 }
 
 w2tw <- function(w,format){
-    ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@2@"]]));##:ess-bp-end:##
     if (format < 4){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206','rXY')
@@ -926,22 +919,6 @@ check.zero.UPb <- function(tt){
     out
 }
 
-get.Pb204U238.ratios <- function(x){
-    labels <- c('Pb204U238','errPb204U238')
-    if (x$format %in% c(4,6)){
-        out <- subset(x$x,select=labels)
-    } else if (x$format %in% c(5,9)){
-        Pb204U238 <- x$x[,'Pb204Pb206']/x$x[,'U238Pb206']
-        errPb204U238 <-
-            Pb204U238*sqrt( (x$x[,'errPb204Pb206']/x$x[,'Pb204Pb206'])^2 +
-                            (x$x[,'errU238Pb206']/x$x[,'U238Pb206'])^2 )
-        out <- cbind(Pb204U238,errPb204U238)
-    } else {
-        stop('No 204Pb measurements available!')
-    }
-    colnames(out) <- labels
-    out
-}
 get.Pb207U235.ratios <- function(x,exterr=FALSE){
     ns <- length(x)
     out <- matrix(0,ns,2)
@@ -949,7 +926,7 @@ get.Pb207U235.ratios <- function(x,exterr=FALSE){
     colnames(out) <- labels
     if (x$format %in% c(1,3,4,6,7)){
         out <- subset(x$x,select=labels)
-    } else if (x$format %in% c(2,5,8)){
+    } else if (x$format %in% c(2,5,8,85)){
         R <- iratio('U238U235')[1]
         sR <- iratio('U238U235')[2]
         X <- x$x[,'U238Pb206']
@@ -961,40 +938,12 @@ get.Pb207U235.ratios <- function(x,exterr=FALSE){
         relerr2 <- (sX/X)^2 -2*covXY/(X*Y) + (sY/Y)^2
         if (exterr) relerr2 <- relerr2 + (sR/R)^2
         out[,'errPb207U235'] <- sqrt(relerr2)*out[,'Pb207U235']
-    } else if (x$format %in% c(10,12)){
+    } else if (x$format %in% c(10,12,1210)){
         out[,'Pb207U235'] <- 1/x$x[,'U235Pb207']
         out[,'errPb207U235'] <-
             out[,'Pb207U235']*x$x[,'errU235Pb207']/x$x[,'U235Pb207']
     } else {
         stop('Invalid U-Pb format for get.Pb207U235.ratios')
-    }
-    out
-}
-get.U235Pb207.ratios <- function(x,exterr=FALSE){
-    ns <- length(x)
-    out <- matrix(0,ns,2)
-    labels <- c('U235Pb207','errU235Pb207')
-    colnames(out) <- labels
-    if (x$format %in% c(1,3,4,6,7)){
-        out[,'U235Pb207'] <- 1/x$x[,'Pb207U235']
-        out[,'errU235Pb207'] <- out[,'U235Pb207']*
-            x$x[,'errPb207U235']/x$x[,'Pb207U235']
-    } else if (x$format %in% c(2,5,8)){
-        R <- iratio('U238U235')[1]
-        sR <- iratio('U238U235')[2]
-        X <- x$x[,'U238Pb206']
-        sX <- x$x[,'errU238Pb206']
-        Y <- x$x[,'Pb207Pb206']
-        sY <- x$x[,'errPb207Pb206']
-        covXY <- x$x[,'rXY']*sX*sY
-        out[,'U235Pb207'] <- X/(R*Y)
-        relerr2 <- (sX/X)^2 -2*covXY/(X*Y) + (sY/Y)^2
-        if (exterr) relerr2 <- relerr2 + (sR/R)^2
-        out[,'errU235Pb207'] <- sqrt(relerr2)*out[,'U235Pb207']
-    } else if (x$format %in% c(10,12)){
-        out <- subset(x$x,select=labels)
-    } else {
-        stop('Invalid U-Pb format for get.U235Pb207.ratios')
     }
     out
 }
@@ -1005,7 +954,7 @@ get.Pb206U238.ratios <- function(x){
     colnames(out) <- labels
     if (x$format %in% c(1,3,4,6,7)){
         out <- subset(x$x,select=labels)
-    } else if (x$format %in% c(2,5,8,9,11)){
+    } else if (x$format %in% c(2,5,8,9,11,85,115)){
         out[,'Pb206U238'] <- 1/x$x[,'U238Pb206']
         out[,'errPb206U238'] <- out[,'Pb206U238']*
             x$x[,'errU238Pb206']/x$x[,'U238Pb206']
@@ -1023,7 +972,7 @@ get.U238Pb206.ratios <- function(x){
         out[,'U238Pb206'] <- 1/x$x[,'Pb206U238']
         out[,'errU238Pb206'] <- out[,'U238Pb206']*
             x$x[,'errPb206U238']/x$x[,'Pb206U238']
-    } else if (x$format %in% c(2,5,8,9,11)){
+    } else if (x$format %in% c(2,5,8,9,11,85,115)){
         out <- subset(x$x,select=labels)
     } else {
         stop('Invalid U-Pb format for get.U238Pb206.ratios')
@@ -1048,7 +997,7 @@ get.Pb207Pb206.ratios <- function(x,exterr=FALSE){
         relerr2 <- (sX/X)^2 - 2*covXY/(X*Y) + (sY/Y)^2
         if (exterr) relerr2 <- relerr2 + (sR/R)^2
         out[,'errPb207Pb206'] <- sqrt(relerr2)*out[,'Pb207Pb206']
-    } else if (x$format %in% c(2,3,5,6,8)){
+    } else if (x$format %in% c(2,3,5,6,8,85)){
         out <- subset(x$x,select=labels)
     } else {
         stop('Invalid U-Pb format for get.Pb207Pb206.ratios')
@@ -1121,7 +1070,7 @@ get.Pb208Pb206.ratios <- function(x){
         E23 <- x$x[,'rZW']*x$x[,'Pb208Th232']*x$x[,'Th232U238']
         out[,'errPb208Th232'] <-
             sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23))
-    } else if (x$format %in% c(8,11)){
+    } else if (x$format %in% c(8,11,85,115)){
         out <- x$x[,labels]
     } else {
         stop('Wrong input format: no Pb208 present in this dataset.')
@@ -1410,17 +1359,17 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
                            conc=TRUE,discordance=discfilter(),...){
     Xi <- subset(X,subset=((1:length(X))%in%i))
     do68 <- do75 <- do76 <- do82 <- FALSE 
-    if (x$format<7){
+    if (x$format<7 || x$format==85){
         do68 <- do75 <- do76 <- TRUE
         labels <- c('t.75','s[t.75]','t.68','s[t.68]','t.76','s[t.76]')
     } else if (x$format<9){
         do68 <- do75 <- do76 <- do82 <- TRUE
         labels <- c('t.75','s[t.75]','t.68','s[t.68]',
                     't.76','s[t.76]','t.82','s[t.82]')
-    } else if (x$format==9){
+    } else if (x$format%in%c(9,115)){
         labels <- c('t.68','s[t.68]')
         do68 <- TRUE
-    } else if (x$format==10){
+    } else if (x$format%in%c(10,1210)){
         labels <- c('t.75','s[t.75]')
         do75 <- TRUE
     } else if (x$format==11){
@@ -1446,7 +1395,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (do82) {
         t.82 <- get.Pb208Th232.age(Xi,exterr=exterr)
     }
-    if (x$format<9){
+    if (x$format<9 || x$format==85){
         if (conc){
             labels <- c(labels,'t.conc','s[t.conc]')
             t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)$age

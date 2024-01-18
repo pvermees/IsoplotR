@@ -402,6 +402,20 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Th232U238','errTh232U238',
                     'rXY','rXZ','rYZ')
         opt <- 6:9
+    } else if (format==85){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb207Pb206','errPb207Pb206',
+                    'Pb208Pb206','errPb208Pb206',
+                    'rXY','rXZ','rYZ')
+        opt <- 7:9
+    } else if (format==115){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb208Pb206','errPb208Pb206','rXY')
+        opt <- 5
+    } else if (format==1210){
+        cnames <- c('U235Pb207','errU235Pb207',
+                    'Pb208Pb207','errPb208Pb207','rXY')
+        opt <- 5
     } else {
         stop('Invalid input format')
     }
