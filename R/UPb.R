@@ -34,7 +34,7 @@ wetherill <- function(x,i=1,format){
     } else if (format==4){
         out$x <- X[i,labels]
         out$cov <- cor2cov3(X[i,'errPb207U235'],X[i,'errPb206U238'],
-                            X[i,'errPb207U235'],X[i,'rXY'],
+                            X[i,'errPb204U238'],X[i,'rXY'],
                             X[i,'rXZ'],X[i,'rYZ'])
     } else if (format == 5){
         U238U235 <- iratio('U238U235')[1]
