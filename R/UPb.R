@@ -6,13 +6,17 @@ wetherill <- function(x,i=1,format){
         X <- x
     }
     out <- list()
-    if (format < 4) labels <- c('Pb207U235','Pb206U238')
-    else if (format < 7) labels <- c('Pb207U235','Pb206U238','Pb204U238')
+    if (format%in%(1:3)) labels <- c('Pb207U235','Pb206U238')
+    else if (format%in%(4:6)) labels <- c('Pb207U235','Pb206U238','Pb204U238')
+    else if (format%in%(7:8)) labels <- c('Pb207U235','Pb206U238','Pb208Th232','Th232U238')
     else if (format==9) labels <- c('Pb206U238','Pb204U238')
     else if (format==10) labels <- c('Pb207U235','Pb204U235')
     else if (format==11) labels <- c('Pb206U238','Pb208Th232','Th232U238')
     else if (format==12) labels <- c('Pb207U235','Pb208Th232','Th232U238')
-    else labels <- c('Pb207U235','Pb206U238','Pb208Th232','Th232U238')
+    else if (format==85) labels <- c('Pb207U235','Pb206U238','Pb208U238')
+    else if (format==119) labels <- c('Pb206U238','Pb208U238')
+    else if (format==1210) labels <- c('Pb207U235','Pb208U235')
+    else stop('Invalid U-Pb format for wetherill() function.')
     if (format %in% c(1,3)){
         out$x <- X[i,labels]
         out$cov <- cor2cov2(X[i,'errPb207U235'],X[i,'errPb206U238'],X[i,'rXY'])
@@ -27,10 +31,10 @@ wetherill <- function(x,i=1,format){
         J[2,1] <- -1/X[i,'U238Pb206']^2
         E <- cor2cov2(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],X[i,'rXY'])
         out$cov <- J %*% E %*% t(J)
-    } else if (format == 4){
+    } else if (format==4){
         out$x <- X[i,labels]
         out$cov <- cor2cov3(X[i,'errPb207U235'],X[i,'errPb206U238'],
-                            X[i,'errPb204U238'],X[i,'rXY'],
+                            X[i,'errPb207U235'],X[i,'rXY'],
                             X[i,'rXZ'],X[i,'rYZ'])
     } else if (format == 5){
         U238U235 <- iratio('U238U235')[1]
@@ -142,7 +146,40 @@ wetherill <- function(x,i=1,format){
         J[3,3] <- 1
         E <- cor2cov3(X[i,'errU235Pb207'],X[i,'errPb208Pb207'],X[i,'errTh232U238'],
                       X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
-        out$cov <- J %*% E %*% t(J)        
+        out$cov <- J %*% E %*% t(J)
+    } else if (format == 85){
+        U238U235 <- iratio('U238U235')[1]
+        Pb207U235 <- U238U235*X[i,'Pb207Pb206']/X[i,'U238Pb206']
+        Pb206U238 <- 1/X[i,'U238Pb206']
+        Pb208U238 <- X[i,'Pb208Pb206']/X[i,'U238Pb206']
+        out$x <- c(Pb207U235,Pb206U238,Pb208U238)
+        J <- matrix(0,3,3)
+        J[1,1] <- -Pb207U235/X[i,'U238Pb206']
+        J[1,2] <- U238U235/X[i,'U238Pb206']
+        J[2,1] <- -Pb206U238/X[i,'U238Pb206']
+        J[3,1] <- -Pb208U238/X[i,'U238Pb206']
+        J[3,3] <- 1/X[i,'U238Pb206']
+        E <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],
+                      X[i,'errPb208Pb206'],X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
+        out$cov <- J %*% E %*% t(J)
+    } else if (format == 119){
+        Pb206U238 <- 1/X[i,'U238Pb206']
+        Pb208U238 <- X[i,'Pb208Pb206']/X[i,'U238Pb206']
+        out$x <- c(Pb206U238,Pb208U238)
+        J <- matrix(0,2,2)
+        J[1,1] <- -Pb206U238/X[i,'U238Pb206']
+        J[2,1] <- -Pb208U238/X[i,'U238Pb206']
+        J[2,2] <- 1/X[i,'U238Pb206']
+        out$cov <- J %*% E %*% t(J)
+    } else if (format == 1210){
+        Pb207U235 <- 1/X[i,'U235Pb207']
+        Pb208U235 <- X[i,'Pb208Pb207']/X[i,'U235Pb207']
+        out$x <- c(Pb207U235,Pb208U235)
+        J <- matrix(0,2,2)
+        J[1,1] <- -Pb207U235/X[i,'U235Pb207']
+        J[2,1] <- -Pb208U235/X[i,'U235Pb207']
+        J[2,2] <- 1/X[i,'U235Pb207']
+        out$cov <- J %*% E %*% t(J)
     }
     names(out$x) <- labels
     colnames(out$cov) <- labels
@@ -162,7 +199,12 @@ tera.wasserburg <- function(x,i=1,format){
     else if (format < 7) labels <- c('U238Pb206','Pb207Pb206','Pb204Pb206')
     else if (format < 9) labels <- c('U238Pb206','Pb207Pb206','Pb208Pb206','Th232U238')
     else if (format == 9) labels <- c('U238Pb206','Pb204Pb206')
+    else if (format == 10) labels <- c('U235Pb207','Pb204Pb207')
     else if (format == 11) labels <- c('U238Pb206','Pb208Pb206','Th232U238')
+    else if (format == 12) labels <- c('U235Pb207','Pb208Pb207','Th232U238')
+    else if (format == 85) labels <- c('U238Pb206','Pb207Pb206','Pb208Pb206')
+    else if (format == 119) labels <- c('U238Pb206','Pb208Pb206')
+    else if (format == 1210) labels <- c('U235Pb207','Pb208Pb207')
     else stop('tera.wasserburg() is not available for this U-Pb format')
     if (format==1){
         U238U235 <- iratio('U238U235')[1]
@@ -260,13 +302,28 @@ tera.wasserburg <- function(x,i=1,format){
                             X[i,'rYZ'],X[i,'rYW'],X[i,'rZW'])
     } else if (format == 9){
         out$x <- X[i,labels]
-        out$cov <- matrix(0,2,2)
-        diag(out$cov) <- X[i,c('errU238Pb206','errPb204Pb206')]^2
         out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb204Pb206'],X[i,'rXY'])
+    } else if (format == 10){
+        out$x <- X[i,labels]
+        out$cov <- cor2cov3(X[i,'errU235Pb207'],X[i,'errPb204Pb207'],X[i,'rXY'])
     } else if (format == 11){
         out$x <- X[i,labels]
-        out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb208Pb206'],X[i,'errTh232U238'],
-                            X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
+        out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb208Pb206'],
+                            X[i,'errTh232U238'],X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
+    } else if (format == 12){
+        out$x <- X[i,labels]
+        out$cov <- cor2cov3(X[i,'errU235Pb207'],X[i,'errPb208Pb207'],
+                            X[i,'errTh232U238'],X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
+    } else if (format == 85){
+        out$x <- X[i,labels]
+        out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb207Pb206'],
+                            X[i,'errPb208Pb206'],X[i,'rXY'],X[i,'rXZ'],X[i,'rYZ'])
+    } else if (format == 119){
+        out$x <- X[i,labels]
+        out$cov <- cor2cov2(X[i,'errU238Pb206'],X[i,'errPb208Pb206'],X[i,'rXY'])
+    } else if (format == 1210){
+        out$x <- X[i,labels]
+        out$cov <- cor2cov2(X[i,'errU235Pb207'],X[i,'errPb208Pb207'],X[i,'rXY'])
     }
     names(out$x) <- labels
     colnames(out$cov) <- labels
