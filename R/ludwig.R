@@ -688,10 +688,10 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     b0 <- ta0b0['b0']
     ns <- length(x)
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format<7){
-        XY <- get.UPb.isochron.ratios.204(x)
-    } else {
+    if (x$format%in%c(7,8,11,12)){
         XY <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+    } else {
+        XY <- get.UPb.isochron.ratios.20x(x)
     }
     X6 <- XY[,1,drop=FALSE] # U238Pb206
     Y6 <- XY[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206

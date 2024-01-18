@@ -6,16 +6,16 @@ wetherill <- function(x,i=1,format){
         X <- x
     }
     out <- list()
-    if (format%in%(1:3)) labels <- c('Pb207U235','Pb206U238')
-    else if (format%in%(4:6)) labels <- c('Pb207U235','Pb206U238','Pb204U238')
-    else if (format%in%(7:8)) labels <- c('Pb207U235','Pb206U238','Pb208Th232','Th232U238')
-    else if (format==9) labels <- c('Pb206U238','Pb204U238')
-    else if (format==10) labels <- c('Pb207U235','Pb204U235')
-    else if (format==11) labels <- c('Pb206U238','Pb208Th232','Th232U238')
-    else if (format==12) labels <- c('Pb207U235','Pb208Th232','Th232U238')
-    else if (format==85) labels <- c('Pb207U235','Pb206U238','Pb208U238')
-    else if (format==119) labels <- c('Pb206U238','Pb208U238')
-    else if (format==1210) labels <- c('Pb207U235','Pb208U235')
+    if (format < 4) labels <- c('Pb207U235','Pb206U238')
+    else if (format < 7) labels <- c('Pb207U235','Pb206U238','Pb204U238')
+    else if (format < 9) labels <- c('Pb207U235','Pb206U238','Pb208Th232','Th232U238')
+    else if (format == 9) labels <- c('Pb206U238','Pb204U238')
+    else if (format == 10) labels <- c('Pb207U235','Pb204U235')
+    else if (format == 11) labels <- c('Pb206U238','Pb208Th232','Th232U238')
+    else if (format == 12) labels <- c('Pb207U235','Pb208Th232','Th232U238')
+    else if (format == 85) labels <- c('Pb207U235','Pb206U238','Pb208U238')
+    else if (format == 119) labels <- c('Pb206U238','Pb208U238')
+    else if (format == 1210) labels <- c('Pb207U235','Pb208U235')
     else stop('Invalid U-Pb format for wetherill() function.')
     if (format %in% c(1,3)){
         out$x <- X[i,labels]
@@ -170,6 +170,7 @@ wetherill <- function(x,i=1,format){
         J[1,1] <- -Pb206U238/X[i,'U238Pb206']
         J[2,1] <- -Pb208U238/X[i,'U238Pb206']
         J[2,2] <- 1/X[i,'U238Pb206']
+        E <- cor2cov2(X[i,'errU238Pb206'],X[i,'errPb208Pb206'],X[i,'rXY'])
         out$cov <- J %*% E %*% t(J)
     } else if (format == 1210){
         Pb207U235 <- 1/X[i,'U235Pb207']
@@ -179,6 +180,7 @@ wetherill <- function(x,i=1,format){
         J[1,1] <- -Pb207U235/X[i,'U235Pb207']
         J[2,1] <- -Pb208U235/X[i,'U235Pb207']
         J[2,2] <- 1/X[i,'U235Pb207']
+        E <- cor2cov2(X[i,'errU235Pb207'],X[i,'errPb208Pb207'],X[i,'rXY'])
         out$cov <- J %*% E %*% t(J)
     }
     names(out$x) <- labels
@@ -302,10 +304,10 @@ tera.wasserburg <- function(x,i=1,format){
                             X[i,'rYZ'],X[i,'rYW'],X[i,'rZW'])
     } else if (format == 9){
         out$x <- X[i,labels]
-        out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb204Pb206'],X[i,'rXY'])
+        out$cov <- cor2cov2(X[i,'errU238Pb206'],X[i,'errPb204Pb206'],X[i,'rXY'])
     } else if (format == 10){
         out$x <- X[i,labels]
-        out$cov <- cor2cov3(X[i,'errU235Pb207'],X[i,'errPb204Pb207'],X[i,'rXY'])
+        out$cov <- cor2cov2(X[i,'errU235Pb207'],X[i,'errPb204Pb207'],X[i,'rXY'])
     } else if (format == 11){
         out$x <- X[i,labels]
         out$cov <- cor2cov3(X[i,'errU238Pb206'],X[i,'errPb208Pb206'],
@@ -331,44 +333,51 @@ tera.wasserburg <- function(x,i=1,format){
     class(out) <- "terawasserburg"
     out
 }
-get.UPb.isochron.ratios.204 <- function(x,i=NULL){
+get.UPb.isochron.ratios.20x <- function(x,i=NULL){
     if (x$format%in%c(4,5,6)){
         labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
     } else if (x$format==9){
         labels <- c('U238Pb206','Pb204Pb206')
     } else if (x$format==10){
         labels <- c('U235Pb207','Pb204Pb207')
+    } else if (x$format==85){
+        labels <- c('U238Pb206','Pb208Pb206','U235Pb207','Pb208Pb207')
+    } else if (x$format==119){
+        labels <- c('U238Pb206','Pb208Pb206')
+    } else if (x$format==1210){
+        labels <- c('U235Pb207','Pb208Pb207')
     } else {
-        stop('Format does not contain 204Pb.')
+        stop('Invalid U-Pb format for get.UPb.isochron.ratios.20x.')
     }
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,length(labels))
         for (j in 1:ns){
-            out[j,] <- get.UPb.isochron.ratios.204(x,i=j)$x
+            out[j,] <- get.UPb.isochron.ratios.20x(x,i=j)$x
         }
         colnames(out) <- labels
         return(out)
     }
     out <- list()
-    if (x$format%in%c(9,10)){
+    if (x$format%in%c(9,10,119,1210)){
         out$x <- x$x[i,c(1,3)]
         out$cov <- cor2cov2(sX=x$x[i,2],sY=x$x[i,4],rXY=x$x[i,5])
-    } else {
+    } else { # formats 4, 5, and 6
+        Pbx6label <- ifelse(x$format<11,'Pb204Pb206','Pb208Pb206')
         U <- iratio('U238U235')[1]
-        tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 04/06
+        tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 0x/06
         U8Pb6 <- tw$x['U238Pb206']
-        Pb46 <- tw$x['Pb204Pb206']
+        Pbx6 <- tw$x[Pbx6label]
         U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
-        Pb47 <- tw$x['Pb204Pb206']/tw$x['Pb207Pb206']
+        Pbx7 <- tw$x[Pbx6label]/tw$x['Pb207Pb206']
         J <- matrix(0,4,3)
         J[1,1] <- 1
         J[2,3] <- 1
         J[3,1] <- 1/(U*tw$x['Pb207Pb206'])
         J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']
-        J[4,2] <- -Pb47/tw$x['Pb207Pb206']
+        J[4,2] <- -Pbx7/tw$x['Pb207Pb206']
         J[4,3] <- 1/tw$x['Pb207Pb206']
-        out$x <- c(U8Pb6,Pb46,U5Pb7,Pb47)
+        out$x <- c(U8Pb6,Pbx6,U5Pb7,Pbx7)
         out$cov <- J %*% tw$cov %*% t(J)
     }
     names(out$x) <- labels
@@ -496,21 +505,50 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
 }
 
 w2tw <- function(w,format){
-    if (format %in% c(1,2,3)){
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@2@"]]));##:ess-bp-end:##
+    if (format < 4){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206','rXY')
-    } else if (format%in%c(4,5,6)){
+    } else if (format < 7){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb206Pb206','errPb204Pb206',
                     'rXY','rXZ','rYZ')
-    } else if (format%in%c(7,8)){
+    } else if (format < 9){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb207Pb206','errPb207Pb206',
                     'Pb208Pb206','errPb208Pb206',
                     'Th232U238','errTh232U238',
                     'rXY','rXZ','rXW',
                     'rYZ','rYW','rZW')
+    } else if (format==9){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb204Pb206','errPb204Pb206','rXY')
+    } else if (format==10){
+        cnames <- c('U235Pb207','errU235Pb207',
+                    'Pb204Pb207','errPb204Pb207','rXY')
+    } else if (format==11){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb208Pb206','errPb208Pb206',
+                    'Th232U238','errTh232U238',
+                    'rXY','rXZ','rYZ')
+    } else if (format==12){
+        cnames <- c('U235Pb207','errU235Pb207',
+                    'Pb208Pb207','errPb208Pb207',
+                    'Th232U238','errTh232U238',
+                    'rXY','rXZ','rYZ')
+    } else if (format==85){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb207Pb206','errPb207Pb206',
+                    'Pb208Pb206','errPb208Pb206',
+                    'rXY','rXZ','rYZ')
+    } else if (format==119){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb208Pb206','errPb208Pb206','rXY')
+    } else if (format==1210){
+        cnames <- c('U235Pb207','errU235Pb207',
+                    'Pb208Pb207','errPb208Pb207','rXY')
     } else {
         stop('Invalid input format.')
     }
@@ -525,21 +563,48 @@ w2tw <- function(w,format){
 }
 
 tw2w <- function(tw,format){
-    if (format %in% c(1,2,3)){
+    if (format < 4){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238','rXY')
-    } else if (format%in%c(4,5,6)){
+    } else if (format < 7){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb204U238','errPb204U238',
                     'rXY','rXZ','rYZ')
-    } else if (format%in%c(7,8)){
+    } else if (format < 9){
         cnames <- c('Pb207U235','errPb207U235',
                     'Pb206U238','errPb206U238',
                     'Pb208Th232','errPb208Th232',
                     'Th232U238','errTh232U238',
                     'rXY','rXZ','rXW',
                     'rYZ','rYW','rZW')
+    } else if (format==9){
+        cnames <- c('Pb206U238','errPb206U238',
+                    'Pb204U238','errPb204U238','rXY')
+    } else if (format==10){
+        cnames <- c('Pb207U235','errPb207U235',
+                    'Pb204U235','errPb204U235','rXY')
+    } else if (format==11){
+        cnames <- c('Pb206U238','errPb206U238',
+                    'Pb208Th232','errPb208Th232',
+                    'Th232U238','errTh232U238',
+                    'rXY','rXZ','rYZ')
+    } else if (format==12){
+        cnames <- c('Pb207U235','errPb207U235',
+                    'Pb208Th232','errPb208Th232',
+                    'Th232U238','errTh232U238',
+                    'rXY','rXZ','rYZ')
+    } else if (format==85){
+        cnames <- c('Pb207U235','errPb207U235',
+                    'Pb206U238','errPb206U238',
+                    'Pb208U238','errPb208U238',
+                    'rXY','rXZ','rYZ')
+    } else if (format==119){
+        cnames <- c('Pb206U238','errPb206U238',
+                    'Pb208U238','errPb208U238','rXY')
+    } else if (format==1210){
+        cnames <- c('Pb207U235','errPb207U235',
+                    'Pb208U235','errPb208U235','rXY')
     } else {
         stop('Invalid input format.')
     }

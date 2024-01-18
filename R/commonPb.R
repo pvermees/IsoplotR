@@ -225,7 +225,7 @@ correct.common.Pb.without.204 <- function(x,i,c76,tt=NULL){
     out
 }
 correct.common.Pb.with.204 <- function(x,i,c46=NULL,c47=NULL,tt=NULL,cc=FALSE){
-    ir <- get.UPb.isochron.ratios.204(x,i=i) # (3806, 0406), (3507, 0407)
+    ir <- get.UPb.isochron.ratios.20x(x,i=i) # (3806, 0406), (3507, 0407)
     ni <- ifelse(x$format%in%c(4,5,6),2,1)
     Jp <- matrix(0,ni,2*ni)
     if (is.null(tt)){ # line through measurement

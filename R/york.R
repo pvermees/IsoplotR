@@ -263,7 +263,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             out <- x$x
         } else {
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.204(x,i)
+                ir <- get.UPb.isochron.ratios.20x(x,i)
                 out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb204Pb206')
             }
         }
@@ -272,7 +272,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             out <- x$x
         } else {
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.204(x,i)
+                ir <- get.UPb.isochron.ratios.20x(x,i)
                 out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb204Pb207')
             }
         }

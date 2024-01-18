@@ -417,9 +417,10 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
 ThUcheck <- function(x){
     noTh <- any(is.na(x$x[,'Th232U238'])) || !all(x$x[,'Th232U238']>0)
     if (noTh){
-        else if (x$format==8) return(85)
+        if (x$format==8) return(85)
         else if (x$format==11) return(119)
         else if (x$format==12) return(1210)
+        else stop('invalid U-Pb format for ThUcheck()')
     } else {
         return(x$format)
     }
