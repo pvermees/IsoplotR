@@ -408,7 +408,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb208Pb206','errPb208Pb206',
                     'rXY','rXZ','rYZ')
         opt <- 7:9
-    } else if (format==115){
+    } else if (format==119){
         cnames <- c('U238Pb206','errU238Pb206',
                     'Pb208Pb206','errPb208Pb206','rXY')
         opt <- 5

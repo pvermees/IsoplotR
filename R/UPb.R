@@ -954,7 +954,7 @@ get.Pb206U238.ratios <- function(x){
     colnames(out) <- labels
     if (x$format %in% c(1,3,4,6,7)){
         out <- subset(x$x,select=labels)
-    } else if (x$format %in% c(2,5,8,9,11,85,115)){
+    } else if (x$format %in% c(2,5,8,9,11,85,119)){
         out[,'Pb206U238'] <- 1/x$x[,'U238Pb206']
         out[,'errPb206U238'] <- out[,'Pb206U238']*
             x$x[,'errU238Pb206']/x$x[,'U238Pb206']
@@ -972,7 +972,7 @@ get.U238Pb206.ratios <- function(x){
         out[,'U238Pb206'] <- 1/x$x[,'Pb206U238']
         out[,'errU238Pb206'] <- out[,'U238Pb206']*
             x$x[,'errPb206U238']/x$x[,'Pb206U238']
-    } else if (x$format %in% c(2,5,8,9,11,85,115)){
+    } else if (x$format %in% c(2,5,8,9,11,85,119)){
         out <- subset(x$x,select=labels)
     } else {
         stop('Invalid U-Pb format for get.U238Pb206.ratios')
@@ -1070,7 +1070,7 @@ get.Pb208Pb206.ratios <- function(x){
         E23 <- x$x[,'rZW']*x$x[,'Pb208Th232']*x$x[,'Th232U238']
         out[,'errPb208Th232'] <-
             sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23))
-    } else if (x$format %in% c(8,11,85,115)){
+    } else if (x$format %in% c(8,11,85,119)){
         out <- x$x[,labels]
     } else {
         stop('Wrong input format: no Pb208 present in this dataset.')
@@ -1366,7 +1366,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
         do68 <- do75 <- do76 <- do82 <- TRUE
         labels <- c('t.75','s[t.75]','t.68','s[t.68]',
                     't.76','s[t.76]','t.82','s[t.82]')
-    } else if (x$format%in%c(9,115)){
+    } else if (x$format%in%c(9,119)){
         labels <- c('t.68','s[t.68]')
         do68 <- TRUE
     } else if (x$format%in%c(10,1210)){

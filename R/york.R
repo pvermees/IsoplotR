@@ -258,11 +258,11 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             td <- tera.wasserburg(x,i=i)
             out[i,] <- data2york_UPb_helper(td,i1='U238Pb206',i2='Pb207Pb206')
         }
-    } else if (option==3 && x$format%in%c(4,5,6,9,85,115)){ # 0x/06 vs 38/06
+    } else if (option==3 && x$format%in%c(4,5,6,9,85,119)){ # 0x/06 vs 38/06
         if (x$format==9){
             out <- x$x
         } else {
-            Pbx6label <- ifelse(x$format%in%c(85,115),'Pb208Pb206','Pb204Pb206')
+            Pbx6label <- ifelse(x$format%in%c(85,119),'Pb208Pb206','Pb204Pb206')
             for (i in 1:ns){
                 ir <- get.UPb.isochron.ratios.20x(x,i)
                 out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2=Pbx6label)
@@ -311,8 +311,8 @@ data2york.UPb <- function(x,option=1,tt=0,...){
                 out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
             }
         }
-    } else if (option==10 && x$format%in%c(4,5,6,9,85,115)){ # 06/38 vs. 0x/38
-        PbxU8label <- ifelse(x$format%in%c(85,115),'Pb208U238','Pb204U238')
+    } else if (option==10 && x$format%in%c(4,5,6,9,85,119)){ # 06/38 vs. 0x/38
+        PbxU8label <- ifelse(x$format%in%c(85,119),'Pb208U238','Pb204U238')
         for (i in 1:ns){
             wd <- wetherill(x,i=i)
             out[i,] <- data2york_UPb_helper(wd,i1=PbxU8label,i2='Pb206U238')
