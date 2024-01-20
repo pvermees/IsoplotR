@@ -565,7 +565,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     O <- blockinverse3x3(AA=EE[i1,i1],BB=EE[i1,i2],CC=EE[i1,i3],
                          DD=EE[i2,i1],EE=EE[i2,i2],FF=EE[i2,i3],
                          GG=EE[i3,i1],HH=EE[i3,i2],II=EE[i3,i3])
-    if (x$format%in%c(4,5,6)){
+    if (x$format%in%c(4,5,6,85)){
         C1 <- U*b0
         C2 <- a0
         C3 <- rep(0,ns)

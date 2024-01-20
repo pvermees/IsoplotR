@@ -7,8 +7,8 @@ york2ludwig <- function(x,anchor=0,buffer=2,type=0,model=1){
                     upper=init$upper['t'])
     } else if (x$format<4){
         out <- york2ludwigTW(x=x,anchor=anchor,buffer=buffer,model=model)
-    } else if (x$format%in%c(4,5,6,9,10)){
-        out <- york2ludwig204(x=x,anchor=anchor,buffer=buffer,type=type,model=model)
+    } else if (x$format%in%c(4,5,6,9,10,85,119,1210)){
+        out <- york2ludwig20x(x=x,anchor=anchor,buffer=buffer,type=type,model=model)
     } else if (x$format%in%c(7,8,11,12)){
         out <- york2ludwig208(x=x,anchor=anchor,buffer=buffer,type=type,model=model)
     } else {
@@ -81,40 +81,48 @@ york2ludwigTW <- function(x,anchor=0,buffer=2,model=1){
     list(par=par,lower=lower,upper=upper)
 }
 
-york2ludwig204 <- function(x,anchor=0,type=0,buffer=2,model=1){
+york2ludwig20x <- function(x,anchor=0,type=0,buffer=2,model=1){
     par <- lower <- upper <- vector()
-    if (x$format%in%c(4,5,6,9)) yda <- data2york(x,option=3)
-    if (x$format%in%c(4,5,6,10)) ydb <- data2york(x,option=4)
+    if (x$format%in%c(4,5,6,9,85,119)) yda <- data2york(x,option=3)
+    if (x$format%in%c(4,5,6,10,85,1210)) ydb <- data2york(x,option=4)
     if (type==1) yd <- yda
     if (type==2) yd <- ydb
     if (anchor[1]==1){
         if (type%in%c('joint',0,1)){
-            Pb64c <- iratio('Pb206Pb204')
-            abxa <- inithelper(yd=yda,y0=1/Pb64c[1])
+            if (x$format%in%c(85,119)){
+                Pb6xc <- iratio('Pb206Pb208')
+            } else {
+                Pb6xc <- iratio('Pb206Pb204')
+            }
+            abxa <- inithelper(yd=yda,y0=1/Pb6xc[1])
             tt <- get.Pb206U238.age(x=abxa['x0inv'],d=x$d)[1]
             par['t'] <- log(tt)
-            if (model==1 & Pb64c[2]>0){
-                par['a0'] <- log(Pb64c[1])
+            if (model==1 & Pb6xc[2]>0){
+                par['a0'] <- log(Pb6xc[1])
             }
         }
         if (type%in%c('joint',0,2)){
-            Pb74c <- iratio('Pb207Pb204')
-            abxb <- inithelper(yd=ydb,y0=1/Pb74c[1])
+            if (x$format%in%c(85,1210)){
+                Pb7xc <- iratio('Pb207Pb208')
+            } else {
+                Pb7xc <- iratio('Pb207Pb204')
+            }
+            abxb <- inithelper(yd=ydb,y0=1/Pb7xc[1])
         }
         if (type==2){
             tt <- get.Pb207U235.age(x=abxb['x0inv'],d=x$d)[1]
             par['t'] <- log(tt)
         }
-        if (model==1 & type%in%c('joint',0,2) && Pb74c[2]>0){
-            par['b0'] <- log(Pb74c[1])
+        if (model==1 & type%in%c('joint',0,2) && Pb7xc[2]>0){
+            par['b0'] <- log(Pb7xc[1])
         }
         if (model==3){
-            if (type==1 && Pb64c[2]<=0){
+            if (type==1 && Pb6xc[2]<=0){
                 par['w'] <- log(stats::median(yda[,'sY']))
-                upper['w'] <- log(Pb64c[1])
-            } else if (type==2 && Pb74c[2]<=0){
+                upper['w'] <- log(Pb6xc[1])
+            } else if (type==2 && Pb7xc[2]<=0){
                 par['w'] <- log(stats::median(ydb[,'sY']))
-                upper['w'] <- log(Pb74c[1])
+                upper['w'] <- log(Pb7xc[1])
             }
         }
     } else if (anchor[1]==2 & length(anchor)>1){

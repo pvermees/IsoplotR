@@ -575,7 +575,7 @@ common.Pb.nominal <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('U238Pb206','errU238Pb206',
                            'Pb207Pb206','errPb207Pb206','rXY')
-        c76 <- settings('iratio','Pb207Pb206')[1]
+        c76 <- iratio('Pb207Pb206')[1]
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.without.20x(x=x,i=i,c76=c76)
         }
@@ -584,8 +584,8 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb206U238','errPb206U238','rXY')
         if (x$format==85){
-            cx6 <- iratio('Pb208Pb204')[1]/iratio('Pb206Pb204')[1]
-            cx7 <- iratio('Pb208Pb204')[1]/iratio('Pb207Pb204')[1]
+            cx6 <- 1/iratio('Pb206Pb208')[1]
+            cx7 <- 1/iratio('Pb207Pb208')[1]
         } else {
             cx6 <- 1/iratio('Pb206Pb204')[1]
             cx7 <- 1/iratio('Pb207Pb204')[1]
@@ -598,8 +598,8 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('Pb207U235','errPb207U235','Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                            'rXY','rXZ','rXW','rYZ','rYW','rZW')
-        c0608 <- settings('iratio','Pb206Pb208')[1]
-        c0708 <- settings('iratio','Pb207Pb208')[1]
+        c0608 <- iratio('Pb206Pb208')[1]
+        c0708 <- iratio('Pb207Pb208')[1]
         tmax <- get.Pb208Th232.age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.Pb0,interval=c(0,tmax),
@@ -609,14 +609,18 @@ common.Pb.nominal <- function(x){
     } else if (x$format%in%c(9,119)){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb206U238','errPb206U238')
-        cx6 <- ifelse(x$format==119,iratio('Pb208Pb204')[1],1)/iratio('Pb206Pb204')[1]
+        cx6 <- 1/ifelse(x$format==119,
+                        iratio('Pb206Pb208')[1],
+                        iratio('Pb206Pb204')[1])
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.20x(x=x,i=i,cx6=cx6)
         }
     } else if (x$format%in%c(10,1210)){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb207U235','errPb207U235')
-        cx7 <- ifelse(x$format==1210,iratio('Pb208Pb204')[1],1)/iratio('Pb207Pb204')[1]
+        cx7 <- 1/ifelse(x$format==1210,
+                        iratio('Pb207Pb208')[1],
+                        iratio('Pb207Pb204')[1])
         for (i in 1:ns){
             out[i,] <- correct.common.Pb.with.20x(x=x,i=i,cx7=cx7)
         }
@@ -624,7 +628,7 @@ common.Pb.nominal <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','rXY')
-        c0608 <- settings('iratio','Pb206Pb208')[1]
+        c0608 <- iratio('Pb206Pb208')[1]
         tmax <- get.Pb208Th232.age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.Pb0,interval=c(-1,tmax[i]),
@@ -639,7 +643,7 @@ common.Pb.nominal <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb208Th232','errPb208Th232','rXY')
-        c0708 <- settings('iratio','Pb207Pb208')[1]
+        c0708 <- iratio('Pb207Pb208')[1]
         tmax <- get.Pb208Th232.age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.Pb0,interval=c(-1,tmax[i]),
@@ -766,7 +770,7 @@ stacey.kramers <- function(tt,inverse=FALSE){
     sk.238.204[old] <- 7.19
     sk.232.204[old] <- 33.21
     ti[old] <- 4570
-    U238U235 <- settings('iratio','U238U235')[1]
+    U238U235 <- iratio('U238U235')[1]
     l2 <- lambda('Th232')[1]
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
