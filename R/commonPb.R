@@ -191,12 +191,16 @@ Pb0corr <- function(x,option=3,omit4c=NULL){
         out$x[,'U235Pb207'] <- 1/x.corr[,'Pb207U235']
         out$x[,'errU235Pb207'] <- x.corr[,'errPb207U235']*out$x[,'U235Pb207']^2
         out$x[,c('Pb208Pb207','errPb208Pb207','rXY')] <- 0
-    } else if (x$format%in%c(85,119)){
+    } else if (x$format==85){
         tw <- w2tw(x.corr,format=1)
         out$x[,c('U238Pb206','errU238Pb206',
                  'Pb207Pb206','errPb207Pb206')] <- tw[,1:4,drop=FALSE]
         out$x[,'rXY'] <- tw[,5]
         out$x[,c('Pb208Pb206','errPb208Pb206','rXZ','rYZ')] <- 0
+    } else if (x$format==119){
+        out$x[,'U238Pb206'] <- 1/x.corr[,'Pb206U238']
+        out$x[,'errU238Pb206'] <- x.corr[,'errPb206U238']*out$x[,'U238Pb206']^2
+        out$x[,c('Pb208Pb206','errPb208Pb206','rXY')] <- 0
     } else if (x$format==1210){
         out$x[,'U235Pb207'] <- 1/x.corr[,'Pb207U235']
         out$x[,'errU235Pb207'] <- x.corr[,'errPb207U235']*out$x[,'U235Pb207']^2
