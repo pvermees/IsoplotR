@@ -701,10 +701,16 @@ SKmisfit <- function(tt,x,i){
         out <- SS.Pb0(tt=tt,x=x,i=i,c0608=c0608,c0708=c0708)
     } else if (x$format%in%c(9,119)){ # predicted - observed
         c6784 <- stacey.kramers(tt)
-        a <- cx6 <- ifelse(x$format==119,c6784[1,'i84'],1)/c6784[1,'i64']
+        if (x$format==9){
+            a <- cx6 <- 1/c6784[1,'i64']
+            Pbx6label <- 'Pb204Pb206'
+        } else { # format == 119
+            a <- cx6 <- c6784[1,'i84']/c6784[1,'i64']
+            Pbx6label <- 'Pb208Pb206'
+        }
         p0638 <- correct.common.Pb.with.20x(x=x,i=i,cx6=cx6,tt=tt)[1]
         b <- -p0638*cx6
-        out <- a + b*x$x[i,'U238Pb206'] - x$x[i,'Pb204Pb206']
+        out <- a + b*x$x[i,'U238Pb206'] - x$x[i,Pbx6label]
     } else if (x$format%in%c(10,1210)){ # predicted - observed
         c6784 <- stacey.kramers(tt)
         a <- cx7 <- ifelse(x$format==1210,c6784[1,'i84'],1)/c6784[1,'i74']
