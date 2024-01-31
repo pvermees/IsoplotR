@@ -477,7 +477,8 @@ the error propagation for the central age and mixture models?}
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
 (\code{type}=4), the concordia age (\code{type}=5), or the
-\eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).}
+\eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).  Ignored if
+\code{x$format>8}.}
 
 \item{cutoff.76}{the age (in Ma) below which the
 \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
