@@ -674,14 +674,14 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
     lower <- upper <- init <- vector()
     U85 <- iratio('U238U235')[1]
     l8 <- lambda('U238')[1]
+    tmin <- 0
+    tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
     if (type==1){
         l5 <- lambda('U235')[1]
         if (slope>0){
             tmid <- log(slope*l5/l8)/(l8-l5) # tangential to error ellipse
-            tmax <- get.Pb207Pb206.age(x=1/(slope*U85),d=d)[1]
         } else {
             tmid <- log(-l8/(l5*slope))/(l5-l8) # normal to error ellipse
-            tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
         }
     } else if (type==3){
         l2 <- lambda('Th232')[1]
@@ -690,12 +690,9 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         } else {
             tmid <- log(-l2/(l8*slope))/(l8-l2) # normal to error ellipse
         }
-        tmax <- ifelse(measured.disequilibrium(d),meas.diseq.maxt(d),10000)
     } else {
-        stop('concordia_age_helper is not available for concordia type ', 'type')
+        stop('concordia_age_helper is not available for concordia type ', type)
     }
-    init['t'] <- upper['t'] <- NA # placeholder
-    lower['t'] <- 0
     if (d$U48$option>0){
         if (d$U48$option==2 && (is.null(d$U48$sx) || d$U48$sx<=0)){
             stop('Zero uncertainty of measured 234/238 activity ratio')
@@ -724,6 +721,7 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         lower['PaUi'] <- 0
         upper['PaUi'] <- 20
     }
+    lower['t'] <- tmin
     upper['t'] <- tmid
     init['t'] <- (lower['t'] + upper['t'])/2
     fit1 <- stats::optim(init,LL.concordia.age,method='L-BFGS-B',
