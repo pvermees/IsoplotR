@@ -188,7 +188,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
                     out$par['a0'] <- iratio('Pb207Pb206')[1]
                 } else if (x$format%in%c(4,5,6,9)){
                     out$par['a0'] <- iratio('Pb206Pb204')[1]
-                } else if (x$format%in%c(7,8,11)){
+                } else if (x$format%in%c(7,8,11,85,119)){
                     out$par['a0'] <- iratio('Pb206Pb208')[1]
                 } else {
                     stop('invalid format')
@@ -199,7 +199,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
                     out$par['a0'] <- sk[1,'i74']/sk[1,'i64']
                 } else if (x$format%in%c(4,5,6,9)){
                     out$par['a0'] <- sk[1,'i64']
-                } else if (x$format%in%c(7,8,11)){
+                } else if (x$format%in%c(7,8,11,85,119)){
                     out$par['a0'] <- sk[1,'i64']/sk[1,'i84']
                 }
             } else {
@@ -218,7 +218,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
             if (anchor[1]==1){
                 if (x$format%in%c(4,5,6,10)){
                     out$par['b0'] <- iratio('Pb207Pb204')[1]
-                } else if (x$format%in%c(7,8,12)){
+                } else if (x$format%in%c(7,8,12,85,1210)){
                     out$par['b0'] <- iratio('Pb207Pb208')[1]
                 } else {
                     stop('invalid format')
@@ -227,7 +227,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
                 sk <- stacey.kramers(fit$par['t'])
                 if (x$format%in%c(4,5,6,10)){
                     out$par['b0'] <- sk[1,'i74']
-                } else if (x$format%in%c(7,8,12)){
+                } else if (x$format%in%c(7,8,12,85,1210)){
                     out$par['b0'] <- sk[1,'i74']/sk[1,'i84']
                 } else {
                     stop('invalid format')
@@ -325,7 +325,7 @@ fixDispersion <- function(model,format,anchor,type){
             } else if (type==2){
                 out <- iratio('Pb207Pb204')[2]
             }
-        } else if (format%in%c(7,8,11,12)){
+        } else if (format%in%c(7,8,11,12,85,119,1210)){
             if (type==1){
                 out <- iratio('Pb206Pb208')[2]
             } else if (type==2){
@@ -364,7 +364,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         a0 <- ifelse(anchor[1]==3,
                      sk[1,'i64'],
                      iratio('Pb206Pb204')[1])
-    } else if (x$format%in%c(7,8,11) & type%in%c('joint',0,1,3)){
+    } else if (x$format%in%c(7,8,11,85,119) & type%in%c('joint',0,1,3)){
         a0 <- ifelse(anchor[1]==3,
                      sk[1,'i64']/sk[1,'i84'],
                      iratio('Pb206Pb208')[1])
@@ -375,7 +375,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         b0 <- ifelse(anchor[1]==3,
                      sk[1,'i74'],
                      iratio('Pb207Pb204')[1])
-    } else if (x$format%in%c(7,8,12) & type%in%c('joint',0,2,4)){
+    } else if (x$format%in%c(7,8,12,85,1210) & type%in%c('joint',0,2,4)){
         b0 <- ifelse(anchor[1]==3,
                      sk[1,'i74']/sk[1,'i84'],
                      iratio('Pb207Pb208')[1])
@@ -428,7 +428,7 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
         } else if (type==2){
             ta0b0w <- c('t'=unname(tt),'b0'=unname(b0),'w'=w)
         }
-    } else if (x$format%in%c(7,8,11,12)){
+    } else if (x$format%in%c(7,8,11,12,85,119,1210)){
         if (anchor[1]==1){
             if ('a0'%in%pnames & type%in%c('joint',0,1,3) & (iratio('Pb206Pb208')[2]>0)){
                 LL <- LL - stats::dnorm(x=a0,
@@ -511,7 +511,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     Y <- zeros
     K0 <- zeros
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format%in%c(4,5,6)){
+    if (x$format%in%c(4,5,6,85)){
         Z <- zeros
         L0 <- zeros
         NP <- 3 # tt, a0, b0
@@ -536,7 +536,9 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
         Y[i] <- wd$x['Pb206U238']
         if (x$format%in%c(4,5,6)){
             Z[i] <- wd$x['Pb204U238']
-        } else if (x$format>6){
+        } else if (x$format==85){
+            Z[i] <- wd$x['Pb208U238']
+        } else if (x$format%in%c(7,8)){
             Z[i] <- wd$x['Pb208Th232']
             W[i] <- wd$x['Th232U238']
         }
@@ -563,7 +565,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
     O <- blockinverse3x3(AA=EE[i1,i1],BB=EE[i1,i2],CC=EE[i1,i3],
                          DD=EE[i2,i1],EE=EE[i2,i2],FF=EE[i2,i3],
                          GG=EE[i3,i1],HH=EE[i3,i2],II=EE[i3,i3])
-    if (x$format%in%c(4,5,6)){
+    if (x$format%in%c(4,5,6,85)){
         C1 <- U*b0
         C2 <- a0
         C3 <- rep(0,ns)
@@ -602,7 +604,7 @@ getEw1 <- function(w=0,x,McL=mclean(),type,a0=NA,b0=NA,c0){
     U85 <- iratio('U238U235')[1]
     if (format<4){
         diag(J[i2,i1]) <- -c0/(U85*a0^2)   # dLda0
-    } else if (format%in%c(4,5,6,9,10)){
+    } else if (format%in%c(4,5,6,9,10,85,119,1210)){
         if (type==1){
             diag(J[i2,i1]) <- -c0          # dLda0
         } else if (type==2){
@@ -613,13 +615,13 @@ getEw1 <- function(w=0,x,McL=mclean(),type,a0=NA,b0=NA,c0){
     } else if (format%in%c(7,8,11,12)){
         ThU <- x$x[,'Th232U238']
         if (type==1){
-            diag(J[i2,i1]) <- -c0*ThU       # dLda0
+            diag(J[i2,i1]) <- -c0*ThU      # dLda0
         } else if (type==2){
-            diag(J[i2,i1]) <- -c0*ThU*U85   # dLdb0
+            diag(J[i2,i1]) <- -c0*ThU*U85  # dLdb0
         } else if (type==3){
-            diag(J[i2,i1]) <- -c0/a0^2  # dLda0
+            diag(J[i2,i1]) <- -c0/a0^2     # dLda0
         } else if (type==4){
-            diag(J[i2,i1]) <- -c0/b0^2  # dLdb0
+            diag(J[i2,i1]) <- -c0/b0^2     # dLdb0
         } else {
             stop('invalid isochron type')
         }
@@ -635,22 +637,22 @@ getEw2 <- function(w=0,x,McL=mclean(),type='joint'){
     joint <- type%in%c('joint',0)
     i1 <- 1:ns
     i2 <- (ns+1):(2*ns)
-    if (format>3 & joint){ # 3D regression
+    if (joint & format%in%c(4:8,85)){ # 3D regression
         J <- matrix(0,3*ns,ns)
         i3 <- (2*ns+1):(3*ns)
     } else { # 2D regression
         J <- matrix(0,2*ns,ns)
     }
-    if (joint & format>3){
+    if (joint & format%in%c(4:8,85)){
         diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
         diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
-        if (format>6) {
+        if (format%in%c(7,8)) {
             diag(J[i3,i1]) <- -McL$dPb208Th232dt # dMdt
         }
     } else if (format<4){
         diag(J[i1,i1]) <- -McL$dPb206U238dt      # dKdt
         diag(J[i2,i1]) <- -McL$dPb207U235dt      # dLdt
-    } else if (format%in%c(4,5,6,9,10)){
+    } else if (format%in%c(4,5,6,9,10,85,119,1210)){
         if (type==1){
             diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
         } else if (type==2){
@@ -688,10 +690,10 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
     b0 <- ta0b0['b0']
     ns <- length(x)
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
-    if (x$format<7){
-        XY <- get.UPb.isochron.ratios.204(x)
-    } else {
+    if (x$format%in%c(7,8,11,12)){
         XY <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+    } else {
+        XY <- get.UPb.isochron.ratios.20x(x)
     }
     X6 <- XY[,1,drop=FALSE] # U238Pb206
     Y6 <- XY[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
@@ -773,13 +775,13 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
         A <- rep(McL$Pb207U235,ns)
         b <- 1/(a0*U85)
         L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
-    } else if (x$format%in%c(4,5,6,9,10)){
-        if (type==1){ # X=04/38, Y=06/38
+    } else if (x$format%in%c(4,5,6,9,10,85,119,1210)){
+        if (type==1){ # X=0x/38, Y=06/38
             yd <- data2york.UPb(x,option=10)
             A <- rep(0,ns)
             b <- a0
             L0 <- yd[,'Y'] - McL$Pb206U238 - b*yd[,'X']
-        } else if (type==2){ # X=04/35, Y=07/35
+        } else if (type==2){ # X=0x/35, Y=07/35
             yd <- data2york.UPb(x,option=11)
             A <- rep(0,ns)
             b <- b0
@@ -815,7 +817,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
             stop('invalid isochron type')
         }
     } else {
-        stop('data2ludwig.2d is only relevant to U-Pb formats 4-8')
+        stop('Invalid U-Pb format for data2ludwig.2d')
     }
     E <- matrix(0,nrow=2*ns,ncol=2*ns)
     i1 <- 1:ns
@@ -843,7 +845,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
             J[i2,'U234'] <- -McL$dPb206U238dl34
             J[i2,'Th230'] <- -McL$dPb206U238dl30
             J[i2,'Ra226'] <- -McL$dPb206U238dl26
-        } else if (x$format<7){
+        } else if (x$format%in%c(4,5,6,9,10,85,119,1210)){
             if (type==1){
                 J[i2,'U238'] <- -McL$dPb206U238dl38
                 J[i2,'U234'] <- -McL$dPb206U238dl34
@@ -855,7 +857,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
             } else {
                 stop('illegal type')
             }
-        } else if (x$format<9){
+        } else if (x$format%in%c(7,8)){
             if (type==1){
                 J[i1,'Th232'] <- -McL$dPb208Th232dl32*ThU
                 J[i2,'U238'] <- -McL$dPb206U238dl38
@@ -915,18 +917,22 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
     else stop('neither a0 nor b0 were supplied')
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     dbdl38 <- dbdl34 <- dbdl30 <- dbdl26 <- dbdl35 <- dbdl31 <- dbdl32 <- 0
-    if (x$format %in% (1:3)){ # X=07/06, Y=38/06
+    if (x$format<4){ # X=07/06, Y=38/06
         yd <- data2york(x,option=2,tt=tt)
         a <- a0
         b <- -McL$Pb206U238*(a0-McL$Pb207Pb206)
-        dbdl38 <- -McL$dPb206U238dl38*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl38
-        dbdl34 <- -McL$dPb206U238dl34*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl34
-        dbdl30 <- -McL$dPb206U238dl30*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl30
-        dbdl26 <- -McL$dPb206U238dl26*(a0-McL$Pb207Pb206) + McL$Pb206U238*McL$dPb207Pb206dl26
+        dbdl38 <- -McL$dPb206U238dl38*(a0-McL$Pb207Pb206) +
+            McL$Pb206U238*McL$dPb207Pb206dl38
+        dbdl34 <- -McL$dPb206U238dl34*(a0-McL$Pb207Pb206) +
+            McL$Pb206U238*McL$dPb207Pb206dl34
+        dbdl30 <- -McL$dPb206U238dl30*(a0-McL$Pb207Pb206) +
+            McL$Pb206U238*McL$dPb207Pb206dl30
+        dbdl26 <- -McL$dPb206U238dl26*(a0-McL$Pb207Pb206) +
+            McL$Pb206U238*McL$dPb207Pb206dl26
         dbdl35 <- McL$Pb206U238*McL$dPb207Pb206dl35
         dbdl31 <- McL$Pb206U238*McL$dPb207Pb206dl31
-    } else if (x$format %in% (4:6)){
-        if (type==1){         # X=38/06, Y=04/06
+    } else if (x$format%in%c(4,5,6,9,10,85,119,1210)){
+        if (type==1){         # X=38/06, Y=0x/06
             yd <- data2york(x,option=3,tt=tt)
             a <- 1/a0
             b <- -McL$Pb206U238/a0
@@ -934,7 +940,7 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
             dbdl34 <- -McL$dPb206U238dl34/a0
             dbdl30 <- -McL$dPb206U238dl30/a0
             dbdl26 <- -McL$dPb206U238dl26/a0
-        } else if (type==2){  # X=35/07, Y=04/07
+        } else if (type==2){  # X=35/07, Y=0x/07
             yd <- data2york(x,option=4,tt=tt)
             a <- 1/b0
             b <- -McL$Pb207U235/b0
@@ -943,7 +949,7 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
         } else {
             stop('invalid type')
         }
-    } else if (x$format %in% (7:8)){
+    } else if (x$format%in%c(7,8)){
         if (type==1){         # X=38/06, Y=08c/06
             yd <- data2york(x,option=6,tt=tt)
             a <- 1/a0
@@ -1010,7 +1016,7 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     out <- fit
     ns <- length(x)
     np <- sum(diag(fit$cov)>0)
-    if (x$format<4 || type%ni%c('joint',0)){
+    if (x$format%in%c(1,2,3,9,10,119,1210) || type%ni%c('joint',0)){
         out$df <- ns-np
     } else {
         out$df <- 2*ns-np
@@ -1018,7 +1024,7 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     X <- x
     if (x$d$U48$option==2) X$d$U48 <- list(x=unname(fit$par['U48i']),option=1)
     if (x$d$ThU$option==2) X$d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
-    if (type%in%c('joint',0) & x$format>3){
+    if (type%in%c('joint',0) && x$format%in%c(4,5,6,7,8,11,12,85)){
         SS <- data2ludwig(X,ta0b0w=fit$par)$SS
     } else {
         SS <- data2ludwig.2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr)$SS

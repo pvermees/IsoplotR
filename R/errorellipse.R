@@ -142,7 +142,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         show.ellipses=1,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke="black",fit='none',add=FALSE,
-                        empty=FALSE, ci.col='gray80',line.col='black',
+                        empty=FALSE,ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
@@ -163,7 +163,9 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         if (empty) return()
     }
     if (!identical(fit,'none')){
-        plot_isochron_line(fit,oerr=oerr,ci.col=ci.col,col=line.col,lwd=lwd)
+        nonneg <- !any(xy[,'X']<0 | xy[,'Y']<0)
+        plot_isochron_line(fit,oerr=oerr,ci.col=ci.col,
+                           col=line.col,nonneg=nonneg,lwd=lwd)
     }
     if (box) graphics::box()
     nolevels <- all(is.na(levels))
@@ -210,9 +212,9 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     }
 }
 
-plot_isochron_line <- function(fit,x,oerr=3,ci.col='gray80',...){
+plot_isochron_line <- function(fit,oerr=3,ci.col='gray80',nonneg=TRUE,...){
     usr <- graphics::par('usr')
-    from <- max(0,usr[1])
+    from <- ifelse(nonneg,max(0,usr[1]),usr[1])
     to <- ifelse(fit$b[1]<0,-fit$a[1]/fit$b[1],usr[2])
     x <- c(from,to)
     y <- fit$a[1]+fit$b[1]*x
@@ -221,9 +223,11 @@ plot_isochron_line <- function(fit,x,oerr=3,ci.col='gray80',...){
     syci <- sqrt(fit$a[2]^2 + 2*xci*fit$cov.ab + (fit$b[2]*xci)^2)
     e <- ci(x=yci,sx=syci,oerr=oerr,absolute=TRUE)
     cix <- c(xci,rev(xci))
-    cix[cix<0] <- 0
     ciy <- c(yci+e,rev(yci-e))
-    ciy[ciy<0] <- 0
+    if (nonneg){
+        cix[cix<0] <- 0
+        ciy[ciy<0] <- 0
+    }
     graphics::polygon(cix,ciy,col=ci.col,border=NA)
     graphics::lines(x,y,...)
 }

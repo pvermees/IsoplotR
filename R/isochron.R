@@ -728,7 +728,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
         }
-    } else if (x$format<13){
+    } else {
         type <- checkIsochronType(x,type=type)
         ns <- length(x)
         calcit <- (1:ns)%ni%c(hide,omit)
@@ -753,15 +753,13 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                                           y0option=y0option,dispunits=dispunits),
                             xlab=lab$x,ylab=lab$y)
         }
-    } else {
-        stop('Invalid U-Pb format.')
     }
     invisible(out)
 }
 
 checkIsochronType <- function(x,type=1){
-    if (x$format%in%c(9,11) & type%ni%c(1,3)) return(1)
-    else if (x$format%in%c(10,12) & type%ni%c(2,4)) return(2)
+    if (x$format%in%c(9,11,119) & type%ni%c(1,3)) return(1)
+    else if (x$format%in%c(10,12,1210) & type%ni%c(2,4)) return(2)
     else return(type)
 }
 checkWtype <- function(wtype=1,anchor=0,model=1){
@@ -1521,8 +1519,8 @@ ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
     tt <- fit$par['t']
     a0 <- fit$par['a0']
     b0 <- fit$par['b0']
-    l8 <- settings('lambda','U238')[1]
-    l5 <- settings('lambda','U235')[1]
+    l8 <- lambda('U238')[1]
+    l5 <- lambda('U235')[1]
     md <- mediand(x$d)
     if (md$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
     if (md$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
@@ -1551,11 +1549,11 @@ ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
     out$age['t'] <- tt
     out$age['s[t]'] <- sqrt(fit$cov['t','t'])
     J <- matrix(0,2,2)
-    if (x$format%in%c(4,5,6,9) & type==1){         # 04/06 vs. 38/06
+    if (x$format%in%c(4,5,6,9,85,119) & type==1){          # 0x/06 vs. 38/06
         out$XY <- data2york(x,option=3)
         a <- 1/fit$par['a0']
         J[1,2] <- -a^2
-    } else if (x$format%in%c(4,5,6,10) & type==2){ # 04/07 vs. 35/07
+    } else if (x$format%in%c(4,5,6,10,85,1210) & type==2){ # 0x/07 vs. 35/07
         out$XY <- data2york(x,option=4)
         a <- 1/fit$par['b0']
         J[1,2] <- -a^2
@@ -1790,8 +1788,12 @@ getIsochronLabels.UPb <- function(x,type=1,...){
     }
     if (x$format%in%c(4,5,6,9) & type==1){
         out$y <- quote(''^204*'Pb/'^206*'Pb')
+    } else if (x$format%in%c(85,119) & type==1){
+        out$y <- quote(''^208*'Pb/'^206*'Pb')
     } else if (x$format%in%c(4,5,6,10) & type==2){
         out$y <- quote(''^204*'Pb/'^207*'Pb')
+    } else if (x$format%in%c(85,1210) & type==2){
+        out$y <- quote(''^208*'Pb/'^207*'Pb')
     } else if (x$format%in%c(7,8,11) & type==1){
         out$y <- quote(''^208*'Pb'[c]*'/'^206*'Pb')
     } else if (x$format%in%c(7,8,12) & type==2){
@@ -1879,14 +1881,22 @@ getUPby0 <- function(out,fmt=1,type=1,option=1){
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- out$err['s','a0']
             out$y0label <- quote('('^207*'Pb/'^206*'Pb)'[c]*'=')
-        } else if (fmt %in% c(4,5,6,9) & type==1){ # 04/06 vs. 38/06
+        } else if (fmt %in% c(4,5,6,9,85,119) & type==1){ # 0x/06 vs. 38/06
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])
-            out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[c]*'=')
-        } else if (fmt %in% c(4,5,6,10) & type==2){ # 04/07 vs. 35/07
+            if (fmt%in%c(85,119)){
+                out$y0label <- quote('('^206*'Pb/'^208*'Pb)'[c]*'=')
+            } else {
+                out$y0label <- quote('('^206*'Pb/'^204*'Pb)'[c]*'=')
+            }
+        } else if (fmt %in% c(4,5,6,10,85,1210) & type==2){ # 0x/07 vs. 35/07
             out$y0['y'] <- out$par['b0']
             out$y0['s[y]'] <- sqrt(out$cov['b0','b0'])
-            out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
+            if (fmt%in%c(85,1210)){
+                out$y0label <- quote('('^207*'Pb/'^208*'Pb)'[c]*'=')
+            } else {
+                out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
+            }
         } else if (fmt %in% c(7,8,11) & type%in%c(1,3)){
             out$y0['y'] <- out$par['a0']
             out$y0['s[y]'] <- sqrt(out$cov['a0','a0'])

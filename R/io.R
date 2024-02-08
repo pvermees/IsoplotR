@@ -49,8 +49,8 @@
 #' if \code{method='U-Pb'}, then \code{format} is one of either:
 #'
 #' \enumerate{
-#' \item{\code{07/35, err[07/35],} \code{06/38, err[06/38], rho}} 
-#' \item{\code{38/06, err[38/06],}\code{07/06, err[07/06] (, rho)}}
+#' \item{\code{X=07/35, err[X],} \code{Y=06/38, err[Y], rho[X,Y]}} 
+#' \item{\code{X=38/06, err[X],}\code{Y=07/06, err[Y] (, rho[X,Y])}}
 #' \item{\code{X=07/35, err[X],} \code{Y=06/38, err[Y],}
 #'       \code{Z=07/06, err[Z]} \code{(, rho[X,Y]) (, rho[Y,Z])}} 
 #' \item{\code{X=07/35, err[X], Y=06/38, err[Y], Z=04/38, }
@@ -61,13 +61,19 @@
 #'       \code{04/38, err[04/38]}, \code{07/06, err[07/06]},
 #'       \code{04/07, err[04/07]}, \code{04/06, err[04/06]}}
 #' \item{\code{W=07/35, err[W]}, \code{X=06/38, err[X]},
-#'       \code{Y=08/32, err[Y]}, and \code{Z=32/38, err[Z]},
-#'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
-#'       \code{rho[X,Z], rho[Y,Z]}}
+#'       \code{Y=08/32, err[Y]}, \code{Z=32/38, err[Z]},
+#'       (\code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
+#'       \code{rho[X,Z], rho[Y,Z]})}
 #' \item{\code{W=38/06, err[W]}, \code{X=07/06, err[X]},
-#'       \code{Y=08/06, err[Y]}, and \code{Z=32/38, (err[Z]},
+#'       \code{Y=08/06, err[Y]}, (\code{Z=32/38, err[Z]},
 #'       \code{rho[W,X], rho[W,Y]}, \code{rho[W,Z], rho[X,Y]},
 #'       \code{rho[X,Z], rho[Y,Z])}}
+#' \item{\code{X=38/06, err[X]}, \code{Y=04/06, err[Y]}, (\code{rho[X,Y]})}
+#' \item{\code{X=35/07, err[X]}, \code{Y=04/07, err[Y]}, (\code{rho[X,Y]})}
+#' \item{\code{X=38/06, err[X]}, \code{Y=08/06, err[Y]},
+#'       (\code{Z=32/38, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]})}
+#' \item{\code{X=35/07, err[X]}, \code{Y=08/07, err[Y]},
+#'       (\code{Z=32/38, err[Z]}, \code{rho[X,Y], rho[X,Z], rho[Y,Z]})}
 #' }
 #'
 #' where optional columns are marked in round brackets
@@ -395,13 +401,27 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
                     'Pb208Pb206','errPb208Pb206',
                     'Th232U238','errTh232U238',
                     'rXY','rXZ','rYZ')
-        opt <- 6:9
+        opt <- 5:9
     } else if (format==12){
         cnames <- c('U235Pb207','errU235Pb207',
                     'Pb208Pb207','errPb208Pb207',
                     'Th232U238','errTh232U238',
                     'rXY','rXZ','rYZ')
-        opt <- 6:9
+        opt <- 5:9
+    } else if (format==85){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb207Pb206','errPb207Pb206',
+                    'Pb208Pb206','errPb208Pb206',
+                    'rXY','rXZ','rYZ')
+        opt <- 7:9
+    } else if (format==119){
+        cnames <- c('U238Pb206','errU238Pb206',
+                    'Pb208Pb206','errPb208Pb206','rXY')
+        opt <- 5
+    } else if (format==1210){
+        cnames <- c('U235Pb207','errU235Pb207',
+                    'Pb208Pb207','errPb208Pb207','rXY')
+        opt <- 5
     } else {
         stop('Invalid input format')
     }
@@ -411,7 +431,19 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
         out$x <- optionalredundancy2cor(X=out$x,nc=nc)
     }
     out$d <- copy_diseq(x=out,d=d) # for Th/U based diseq corrections
+    if (format%in%c(8,11,12)) out$format <- ThUcheck(out)
     out
+}
+ThUcheck <- function(x){
+    noTh <- any(is.na(x$x[,'Th232U238'])) || !all(x$x[,'Th232U238']>0)
+    if (noTh){
+        if (x$format==8) return(85)
+        else if (x$format==11) return(119)
+        else if (x$format==12) return(1210)
+        else stop('invalid U-Pb format for ThUcheck()')
+    } else {
+        return(x$format)
+    }
 }
 # for U-Pb format 3, the correlation coefficients are optional
 # and can be inferred from the redundancy of the ratios
