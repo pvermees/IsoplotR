@@ -3,7 +3,6 @@
 \docType{package}
 \name{IsoplotR}
 \alias{IsoplotR}
-\alias{_PACKAGE}
 \alias{IsoplotR-package}
 \title{library(IsoplotR)}
 \description{

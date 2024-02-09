@@ -124,7 +124,7 @@ geological (co)variance term.}
 \item{sigdig}{number of significant digits for the
 concordia/discordia age}
 
-\item{common.Pb}{common lead correction:
+\item{common.Pb}{common lead projection:
 
 \code{0}:none
 
@@ -138,7 +138,10 @@ concordia/discordia age}
 \code{settings('iratio','Pb208Pb206')} and
 \code{settings('iratio','Pb208Pb207')} (if \code{x$format>6}).
 
-\code{2}: use the isochron intercept as the initial Pb-composition
+\code{2}: use the isochron intercept as the initial
+Pb-composition. If \code{show.age>1}, the data are projected along
+the isochron line, but the isochron itself is based on the
+uncorrected data.
 
 \code{3}: use the Stacey-Kramers two-stage model to infer the initial
 Pb-composition.}

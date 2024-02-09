@@ -131,7 +131,7 @@
 #' @param sigdig number of significant digits for the
 #'     concordia/discordia age
 #' 
-#' @param common.Pb common lead correction:
+#' @param common.Pb common lead projection:
 #'
 #' \code{0}:none
 #'
@@ -145,7 +145,10 @@
 #' \code{settings('iratio','Pb208Pb206')} and
 #' \code{settings('iratio','Pb208Pb207')} (if \code{x$format>6}).
 #' 
-#' \code{2}: use the isochron intercept as the initial Pb-composition
+#' \code{2}: use the isochron intercept as the initial
+#' Pb-composition. If \code{show.age>1}, the data are projected along
+#' the isochron line, but the isochron itself is based on the
+#' uncorrected data.
 #'
 #' \code{3}: use the Stacey-Kramers two-stage model to infer the initial
 #' Pb-composition.
@@ -307,7 +310,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
     else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
     fit <- NULL
-    X2calc <- subset(X,subset=calcit)
+    if (show.age>1) X2calc <- x2calc
+    else X2calc <- subset(X,subset=calcit)
     if (show.age==1){
         fit <- concordia.age(X2calc,type=type,exterr=exterr)
     } else if (show.age>1){
