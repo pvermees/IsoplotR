@@ -1,3 +1,7 @@
+# IsoplotR 6.1
+
+Adds four new U-Pb formats for decoupled 206Pb/238U and 207Pb/235U dating. Makes the Th/U ratio optional for U-Pb formats 8, 11 and 12. No longer applies a common Pb correction to discordia fits.
+
 # IsoplotR 6.0
 
 Adds anchored regression to all isochron functions, as well as model-3 fits whereby overdispersion can be attributed to either diachronous isotopic closure or the composition of the inherited component. Also adds an option to anchor U-Pb isochrons to the Stacey-Kramers mantle evolution model. Adds four new U-Pb input formats. Finally, flips the Pb208/Pb207- and Pb208/Pb206- ratios around in the settings, which is a breaking change.
