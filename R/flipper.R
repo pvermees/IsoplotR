@@ -50,7 +50,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
                                  fitinverse=fitinverse,
                                  hide=hide,omit=omit)
         flip <- (type=='p')
-        if (flip) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
+        if (flip) d2calc[,c('X','sX','Y','sY','rXY')] <- d2calc[,c(3,4,1,2,5)]
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")

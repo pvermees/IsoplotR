@@ -1650,7 +1650,8 @@ ab2y0t.PD <- function(x,fit,inverse,exterr,nuclide,bratio=1,...){
     }
     out$y0[c('y','s[y]')] <- unname(Dd)
     out$age[c('t','s[t]')] <-
-        get.isochron.PD.age(DP=DP[1],sDP=DP[2],nuclide=nuclide,bratio=bratio)
+        get.isochron.PD.age(DP=DP[1],sDP=DP[2],nuclide=nuclide,
+                            exterr=exterr,bratio=bratio)
     if (inflate(fit)){
         out$age['disp[t]'] <-
             get.isochron.PD.age(DP=DP[1],sDP=sqrt(fit$mswd)*DP[2],
