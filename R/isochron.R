@@ -520,6 +520,7 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
     d2calc <- clear(x,hide,omit)
     if (model>1 | anchor[1]==2){
         fit <- MLyork(d2calc,anchor=anchor,model=model,wtype=wtype)
+        if (model==3) fit$disp <- fit$w
     } else {
         if (anchor[1]<1){
             fit <- regression(d2calc)
