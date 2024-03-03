@@ -557,11 +557,9 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         d2calc <- clear(x,hide,omit)
         fit <- regression(d2calc$x,model=model,type='ogls')
         out <- ab2y0t(x=d2calc$x,fit=fit)
-        lab <- getIsochronLabels(x=x,inverse=inverse)
-        out$y0label <- lab$y0
         genericisochronplot(x=x,fit=out,oerr=oerr,sigdig=sigdig,
                             show.numbers=show.numbers,levels=levels,clabel=clabel,
-                            xlab=lab$x,ylab=lab$y,ellipse.fill=ellipse.fill,
+                            xlab=xlab,ylab=ylab,ellipse.fill=ellipse.fill,
                             ellipse.stroke=ellipse.stroke,ci.col=ci.col,
                             line.col=line.col,lwd=lwd,plot=plot,title=title,
                             show.ellipses=show.ellipses,hide=hide,omit=omit,
@@ -571,10 +569,7 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         inverse <- (flippable==1)
         fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                        anchor=anchor,hide=hide,omit=omit)
-        out <- ab2y0t(x=x,fit=fit,inverse=inverse)
-        if (model==3){
-            out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
-        }
+        out <- ab2y0t(x=x,fit=fit,inverse=inverse,wtype=wtype)
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
                     show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -827,8 +822,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="d",
                    y0rat='Pb207Pb204',t2DPfun=age_to_Pb207Pb206_ratio)
-    out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr)
-    if (model==3) out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
+    out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr,wtype=wtype)
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
@@ -904,8 +898,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                    anchor=anchor,hide=hide,omit=omit,type="p",
                    y0rat='Ar40Ar36',t2DPfun=get.ArAr.ratio,
                    J=x$J[1],sJ=x$J[2])
-    out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr)
-    if (model==3) out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
+    out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr,wtype=wtype)
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
         scatterplot(out$xyz,oerr=oerr,show.ellipses=show.ellipses,
@@ -1057,7 +1050,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         }
     }
     fit <- MLyork(d2calc,model=model,wtype=wtype,anchor=abanchor)
-    out <- ab2y0t(x,fit=fit)
+    out <- ab2y0t(x,fit=fit,wtype=wtype)
     if (plot){
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1237,11 +1230,8 @@ isochron_PD <- function(x,nuclide,y0rat,t2DPfun,oerr=3,sigdig=2,
     fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="p",
                    y0rat=y0rat,t2DPfun=t2DPfun)
-    out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr,
-                  nuclide=nuclide,bratio=bratio)
-    if (model==3){
-        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse,nuclide=nuclide)
-    }
+    out <- ab2y0t(x=x,fit=fit,inverse=inverse,wtype=wtype,
+                  exterr=exterr,nuclide=nuclide,bratio=bratio)
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     lab <- getIsochronLabels(x=x,inverse=inverse)
     out$y0label <- lab$y0
@@ -1375,20 +1365,20 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
     if (usr[1]>0 & usr[3]>0) return() # axes out of focus
     if (type=='p' & wtype==1){
         if ('invertedfit'%in%names(fit)){
-            reldisp <- fit$invertedfit$w[1]/fit$invertedfit$anchor[2]
+            reldisp <- fit$invertedfit$w[1]/fit$invertedfit$a[1]
         } else {
-            reldisp <- fit$w[1]/fit$anchor[2]
+            reldisp <- fit$w[1]/fit$a[1]
         }
         y0 <- fit$a[1]
         cid <- ci(sx=y0*reldisp)
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
     } else if (type=='p' & wtype==2 & inverse){
         x0 <- fit$flippedfit$a[1]
-        cid <- ci(sx=x0*fit$flippedfit$w[1]/fit$flippedfit$anchor[2])
+        cid <- ci(sx=x0*fit$flippedfit$w[1]/fit$flippedfit$a[1])
         graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
     } else if (type=='d' & ((wtype==2 & inverse) | (wtype==1 & !inverse))){
         y0 <- fit$a[1]
-        cid <- ci(sx=y0*fit$w[1]/fit$anchor[2])
+        cid <- ci(sx=y0*fit$w[1]/fit$a[1])
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
     } else if (type=='TW' & wtype==1){
         y0 <- fit$par['a0']
@@ -1428,6 +1418,7 @@ w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     } else {
         out <- fit$y0[1]*fit$w/fit$a[1]
     }
+    out
 }
 w2disp.other <- function(x,fit,wtype,inverse,...){
     if (wtype==2){
@@ -1513,6 +1504,8 @@ ab2y0t.default <- function(x,fit,...){
     if (inflate(fit)){
         out$a['disp[a]'] <- sqrt(fit$mswd)*fit$a['s[a]']
         out$b['disp[b]'] <- sqrt(fit$mswd)*fit$b['s[b]']
+    } else if (fit$model==3){
+        out$disp <- fit$w
     }
     out
 }
@@ -1594,7 +1587,7 @@ ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
     }
     out
 }
-ab2y0t.PbPb <- function(x,fit,inverse,exterr,...){
+ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse){
         R76 <- fit$a
@@ -1609,10 +1602,12 @@ ab2y0t.PbPb <- function(x,fit,inverse,exterr,...){
         out$age['disp[t]'] <- 
             get.Pb207Pb206.age(R76[1],sqrt(fit$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    } else if (fit$model==3){
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
     }
     out
 }
-ab2y0t.ArAr <- function(x,fit,inverse,exterr,...){
+ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse) {
         R09 <- quotient(X=fit$a[1],sX=fit$a[2],
@@ -1629,16 +1624,20 @@ ab2y0t.ArAr <- function(x,fit,inverse,exterr,...){
         out$age['disp[t]'] <- get.ArAr.age(R09[1],sqrt(fit$mswd)*R09[2],
                                            x$J[1],x$J[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    } else if (fit$model==3){
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
     }
     out
 }
-ab2y0t.ThPb <- function(x,fit,inverse,exterr,...){
-    ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,nuclide='Th232')
+ab2y0t.ThPb <- function(x,fit,inverse,exterr,wtype,...){
+    ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
+              nuclide='Th232',wtype=wtype)
 }
-ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=1,...){
-    ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,nuclide='K40',bratio=bratio)
+ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
+    ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
+              nuclide='K40',bratio=bratio,wtype=wtype)
 }
-ab2y0t.PD <- function(x,fit,inverse,exterr,nuclide,bratio=1,...){
+ab2y0t.PD <- function(x,fit,inverse,exterr,nuclide,bratio=1,wtype,...){
     out <- fit
     if (inverse){
         Dd <- c(1,fit$a[2]/fit$a[1])/fit$a[1]
@@ -1658,21 +1657,25 @@ ab2y0t.PD <- function(x,fit,inverse,exterr,nuclide,bratio=1,...){
             get.isochron.PD.age(DP=DP[1],sDP=sqrt(fit$mswd)*DP[2],
                                 nuclide=nuclide,exterr=exterr,bratio=bratio)[2]
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    } else if (fit$model==3){
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse,nuclide=nuclide)
     }
     out
 }
-ab2y0t.UThHe <- function(x,fit,...){
+ab2y0t.UThHe <- function(x,fit,wtype,...){
     out <- fit
     out$y0[c('y','s[y]')] <- fit$a
     out$age[c('t','s[t]')] <- fit$b
     if (inflate(out)){
         out$age['disp[t]'] <- sqrt(fit$mswd)*out$age['s[t]']
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    } else if (fit$model==3){
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=FALSE)
     }
     out$y0label <- quote('He'[0]*'=')
     out
 }
-ab2y0t.other <- function(x,fit,inverse,...){
+ab2y0t.other <- function(x,fit,inverse,wtype,...){
     out <- fit
     if (inverse){
         Dd <- 1/fit$a[1]
@@ -1697,6 +1700,8 @@ ab2y0t.other <- function(x,fit,inverse,...){
     if (inflate(fit)){
         out$Dd['disp[Dd]'] <- sqrt(fit$mswd)*out$Dd['s[Dd]']
         out$DP['disp[DP]'] <- sqrt(fit$mswd)*out$DP['s[DP]']
+    } else if (fit$model==3){
+        out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
     }
     out
 }
