@@ -1051,6 +1051,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
     }
     fit <- MLyork(d2calc,model=model,wtype=wtype,anchor=abanchor)
     out <- ab2y0t(x,fit=fit,wtype=wtype)
+    dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot){
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1059,7 +1060,8 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         showDispersion(out,inverse=FALSE,wtype=wtype)
-        graphics::title(isochrontitle(out,sigdig=sigdig,oerr=oerr,type='U-Th-He'),
+        graphics::title(isochrontitle(out,sigdig=sigdig,oerr=oerr,
+                                      dispunits=dispunits,type='U-Th-He'),
                         xlab="P",ylab="He")
     }
     invisible(out)
@@ -1465,6 +1467,14 @@ w2disp.ThU <- function(x,fit,type,wtype,...){
         } else {
             out <- fit$w
         }
+    }
+    out
+}
+w2disp.UThHe <- function(x,fit,wtype,...){
+    if (wtype==2){
+        out <- fit$age[1]*fit$w/fit$b[1]
+    } else {
+        out <- fit$y0[1]*fit$w/fit$a[1]
     }
     out
 }
