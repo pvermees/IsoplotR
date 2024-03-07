@@ -173,7 +173,9 @@ ThU.convert <- function(x){
 get.Th230Th232_0 <- function(tt,Th230Th232,errTh230Th232=0){
     l0 <- settings('lambda','Th230')[1]
     Th230Th232_0 <- Th230Th232 * exp(l0*tt)
-    errTh230Th232_0 <- errTh230Th232/Th230Th232
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@3@"]]));##:ess-bp-end:##
+    errTh230Th232_0 <- errTh230Th232 * exp(l0*tt)
     c(Th230Th232_0,errTh230Th232_0)
 }
 
