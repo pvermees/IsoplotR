@@ -1137,19 +1137,31 @@ isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
         Th230U238 <- out$a
         Th230Th232 <- out$b
     }
-    out$age[c('t','s[t]')] <-
-        get.ThU.age(Th230U238[1],Th230U238[2],
-                    exterr=exterr)[c('t','s[t]')]
-    out$y0[c('y','s[y]')] <-
-        get.Th230Th232_0(out$age['t'],Th230Th232[1],Th230Th232[2])
+    cov0802 <- out$cov.ab
+    
+    l0 <- lambda('Th230')
+    tt <- -log(1-Th230U238[1])/l0[1]
+    y0 <- Th230Th232[1]/(1-Th230U238[1])
+    J <- matrix(0,2,3)
+    J[1,2] <- 1/(l0[1]*(1-Th230U238[1]))
+    J[2,1] <- 1/(1-Th230U238[1])
+    J[2,2] <- Th230Th232[1]/(1-Th230U238[1])^2
+    if (exterr) J[1,3] <- -tt/l0[1]
+    E <- matrix(0,3,3)
+    diag(E) <- c(Th230Th232[2],Th230U238[2],l0[2])^2
+    E[1,2] <- E[2,1] <- cov0802
+    
+    covmat = J %*% E %*% t(J)
+    out$age[c('t','s[t]')] <- c(tt,sqrt(covmat[1,1]))
+    out$y0[c('y','s[y]')] <- c(y0,sqrt(covmat[2,2]))
+    
     if (inflate(out)){
-        out$age['disp[t]'] <- get.ThU.age(Th230U238[1],
-                                          sqrt(out$mswd)*Th230U238[2],
-                                          exterr=exterr)['s[t]']
-        out$y0['disp[y]'] <- get.Th230Th232_0(out$age['t'],
-                                              Th230Th232[1],
-                                              sqrt(out$mswd)*Th230Th232[2])[2]
+        E[1:2,1:2] <- out$mswd*E[1:2,1:2]
+        covmat = J %*% E %*% t(J)
+        out$age['disp[t]'] <- sqrt(covmat[1,1])
+        out$y0['disp[y]'] <- sqrt(covmat[2,2])
     }
+    
     lab <- getIsochronLabels(x=x,type=type)
     out$xlab <- lab$x
     out$ylab <- lab$y
