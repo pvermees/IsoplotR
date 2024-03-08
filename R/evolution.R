@@ -349,8 +349,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
             graphics::points(x$U8Th2,x$U8Th2,pch=16)
         }
     }
-    colourbar(z=levels[calcit],fill=ellipse.fill,
-              stroke=ellipse.stroke,clabel=clabel)
+    invisible(colourbar(z=levels[calcit],fill=ellipse.fill,
+                        stroke=ellipse.stroke,clabel=clabel))
 }
 
 evolution.title <- function(fit,sigdig=2,oerr=3,...){
