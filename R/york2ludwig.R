@@ -1,7 +1,7 @@
 # helper function for init.ludwig
 york2ludwig <- function(x,anchor=0,buffer=2,type=0,model=1){
     if (anchor[1]==3){ # stacey-kramers
-        init <- york2ludwig(x=x,anchor=0,buffer=buffer,model=model)
+        init <- york2ludwig(x=x,anchor=0,buffer=buffer,type=type,model=model)
         out <- list(par=init$par['t'],
                     lower=init$lower['t'],
                     upper=init$upper['t'])
