@@ -356,7 +356,7 @@ get.UPb.isochron.ratios.20x <- function(x,i=NULL){
     out <- list()
     if (x$format%in%c(9,10,119,1210)){
         out$x <- x$x[i,c(1,3)]
-        out$cov <- cor2cov2(sX=x$x[i,2],sY=x$x[i,4],rXY=x$x[i,5])
+        out$cov <- cor2cov2(sX=x$x[i,2],sY=x$x[i,4],rXY=x$x[i,'rXY'])
     } else { # formats 4, 5, and 6
         Pbx6label <- ifelse(x$format<11,'Pb204Pb206','Pb208Pb206')
         U <- iratio('U238U235')[1]

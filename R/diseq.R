@@ -532,7 +532,7 @@ get.76.misfit <- function(tt,x,d=diseq()){
     get.5678.misfit(obs=x,pred)
 }
 get.5678.misfit <- function(obs,pred){
-    log(abs(obs-pred))
+    (log(obs)-log(pred))^2
 }
 
 meas.diseq.maxt <- function(d,nuclide='auto'){
