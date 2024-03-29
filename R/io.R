@@ -927,38 +927,38 @@ errAdjust <- function(x,i=2,ierr=1){
 }
 
 getErrCols <- function(gc,format=NA,ierr=1){
-    UPb12 <- (gc=='U-Pb' && format%in%(1:2))
-    UPb345 <- (gc=='U-Pb' && format%in%(3:5))
+    UPb2 <- (gc=='U-Pb' && format%in%c(1,2,9,10))
+    UPb3 <- (gc=='U-Pb' && format%in%c(3,4,5,11,12))
+    UPb4 <- (gc=='U-Pb' && format%in%(7:8))
     UPb6 <- (gc=='U-Pb' && format==6)
-    UPb78 <- (gc=='U-Pb' && format%in%(7:8))
-    PbPb12 <- (gc=='Pb-Pb' && format%in%(1:2))
+    PbPb2 <- (gc=='Pb-Pb' && format%in%(1:2))
     PbPb3 <- (gc=='Pb-Pb' && format==3)
-    ThPb12 <- (gc=='Th-Pb' && format%in%(1:2))
+    ThPb2 <- (gc=='Th-Pb' && format%in%(1:2))
     ThPb3 <- (gc=='Th-Pb' && format==3)
-    ArAr12 <- (gc=='Ar-Ar' && format%in%(1:2))
+    ArAr2 <- (gc=='Ar-Ar' && format%in%(1:2))
     ArAr3 <- (gc=='Ar-Ar' && format==3)
-    KCa12 <- (gc=='K-Ca' && format%in%(1:2))
+    KCa2 <- (gc=='K-Ca' && format%in%(1:2))
     KCa3 <- (gc=='K-Ca' && format==3)
-    PD12 <- (gc=='PD' && format%in%(1:2))
+    PD2 <- (gc=='PD' && format%in%(1:2))
     PD3 <- (gc=='PD' && format==3)
     UThHe <- (gc=='U-Th-He')
-    ThU12 <- (gc=='Th-U' && format<3)
-    ThU34 <- (gc=='Th-U' && format>2)
-    other2 <- (gc=='other' && format==2)
-    other3 <- (gc=='other' && format==3)
-    other4 <- (gc=='other' && format==4)
-    other5 <- (gc=='other' && format==5)
-    if (UPb12 | PbPb12 | ThPb12 | ArAr12 | KCa12 | PD12 | ThU34 | other4){
+    ThU2 <- (gc=='Th-U' && format>2)
+    ThU3 <- (gc=='Th-U' && format<3)
+    other1a <- (gc=='other' && format==2)
+    other1b <- (gc=='other' && format==3)
+    other2 <- (gc=='other' && format==4)
+    other3 <- (gc=='other' && format==5)
+    if (UPb2 | PbPb2 | ThPb2 | ArAr2 | KCa2 | PD2 | ThU2 | other2){
         cols <- c(2,4)
-    } else if (UPb345 | PbPb3 | ThPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU12 | other5){
+    } else if (UPb3 | PbPb3 | ThPb3 | ArAr3 | KCa3 | PD3 | UThHe | ThU3 | other3){
         cols <- c(2,4,6)
-    } else if (UPb78){
+    } else if (UPb4){
         cols <- seq(from=2,to=8,by=2)
     } else if (UPb6){
         cols <- seq(from=2,to=12,by=2)
-    } else if (other2){
+    } else if (other1a){
         cols <- 2
-    } else if (other3){
+    } else if (other1b){
         cols <- 3
     } else {
         cols <- NULL
