@@ -80,7 +80,7 @@ invertandclean <- function(x,inverse,fitinverse,hide,omit){
     clear(yd,hide,omit)
 }
 
-# the purpose of flipping and inverting is always to use the intercept
+# the purpose of flipping and inverting is to always use the intercept
 # to improve the fit, therefore the inverse operations always attribute
 # any overdispersion to the incoming intercept
 unflipfit <- function(fit){
