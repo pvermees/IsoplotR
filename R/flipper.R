@@ -47,16 +47,14 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     }
     fit$anchor <- anchor
     out <- list()
+    out$invertedfit <- out$flippedfit <- fit
     if (ifi[3]){
-        out$invertedfit <- fit
         fit <- invertfit(fit,type=type,wtype=wtype)
     }
     if (ifi[2]){
-        out$flippedfit <- fit
         fit <- unflipfit(fit)
     }
     if (ifi[1]){
-        out$invertedfit <- fit
         fit <- invertfit(fit,type=type,wtype=wtype)
     }
     out <- append(out,fit)
