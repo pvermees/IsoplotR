@@ -2,28 +2,23 @@
 # if necessary to facilitate anchored regression and model-3 fits
 flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
                     wtype=0,anchor=0,type='p',y0rat,t2DPfun,...){
-    flip <- FALSE
+    ifi <- rep(FALSE,3) # invert - flip - invert
     xyz <- data2york(x,inverse=inverse)
     if (model<3 & anchor[1]<1){
-        fitinverse <- inverse
         d2calc <- clear(xyz,hide,omit)
         fit <- regression(d2calc,model=model)
     } else if (anchor[1]==1){
         wtype <- 1 # override
-        fitinverse <- FALSE
-        d2calc <- invertandclean(x=x,inverse=inverse,
-                                 fitinverse=fitinverse,
-                                 hide=hide,omit=omit)
+        ifi[1] <- inverse
+        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
         if (!missing(y0rat)) anchor[2:3] <- iratio(y0rat)
-        if (model>1) fit <- MLyork(d2calc,anchor=anchor,model=model)
-        else fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
+        if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
+        else fit <- MLyork(d2calc,anchor=anchor,model=model)
     } else if (anchor[1]==2){
         wtype <- 2 # override
-        fitinverse <- TRUE
-        d2calc <- invertandclean(x=x,inverse=inverse,fitinverse=fitinverse,
-                                 hide=hide,omit=omit)
-        flip <- (type=='p')
-        if (flip) d2calc[,c('X','sX','Y','sY','rXY')] <- d2calc[,c(3,4,1,2,5)]
+        ifi[1] <- !inverse
+        ifi[2] <- ifi[3] <- (type=='p')
+        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
         if (missing(t2DPfun)){
             DP <- anchor[2:3]
         } else {
@@ -32,37 +27,35 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         }
         if (type=='d') y0 <- DP
         else y0 <- quotient(X=DP[1],sX=DP[2],Y=1,sY=0,sXY=0)
-        if (model>1){
+        if (model<2){
+            fit <- anchoredYork(d2calc,y0=y0[1],sy0=y0[2])
+        } else {
             anchor <- c(1,y0)
             fit <- MLyork(d2calc,anchor=anchor,model=model)
-        } else {
-            fit <- anchoredYork(d2calc,y0=y0[1],sy0=y0[2])
         }
     } else if (wtype==1){
-        fitinverse <- FALSE
-        d2calc <- invertandclean(x=x,inverse=inverse,
-                                 fitinverse=fitinverse,
-                                 hide=hide,omit=omit)
+        ifi[1] <- inverse
+        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else if (wtype==2){
-        fitinverse <- TRUE
-        d2calc <- invertandclean(x=x,inverse=inverse,
-                                 fitinverse=fitinverse,
-                                 hide=hide,omit=omit)
-        flip <- (type=='p')
-        if (flip) d2calc[,c('X','sX','Y','sY','rXY')] <- d2calc[,c(3,4,1,2,5)]
+        ifi[1] <- !inverse
+        ifi[2] <- ifi[3] <- (type=='p')
+        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")
     }
     fit$anchor <- anchor
     out <- list()
-    if (flip){
+    if (ifi[3]){
+        out$invertedfit <- fit
+        fit <- invertfit(fit,type=type,wtype=wtype)
+    }
+    if (ifi[2]){
         out$flippedfit <- fit
         fit <- unflipfit(fit)
     }
-    inverted <- (inverse != fitinverse)
-    if (inverted){
+    if (ifi[1]){
         out$invertedfit <- fit
         fit <- invertfit(fit,type=type,wtype=wtype)
     }
@@ -71,12 +64,11 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     out
 }
 
-invertandclean <- function(x,inverse,fitinverse,hide,omit){
-    if (is.other(x) & inverse!=fitinverse){
-        yd <- normal2inverse(data2york(x))
-    } else {
-        yd <- data2york(x,inverse=fitinverse)
-    }
+flipinvert <- function(x,ifi=rep(FALSE,3),hide,omit){
+    yd <- data2york(x)
+    if (ifi[1]) yd <- normal2inverse(yd)
+    if (ifi[2]) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
+    if (ifi[3]) yd <- normal2inverse(yd)
     clear(yd,hide,omit)
 }
 

@@ -737,11 +737,11 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         dN7dl31 <-  (Y7-a7)*db7dl31 - 2*X7*b7*db7dl31
         dD7dl35 <- 2*b7*db7dl35                       # D7 = 1+b7^2
         dD7dl31 <- 2*b7*db7dl31
-        dx6dl38 <- (dN6dl38*D6-N6*dD6dl38)/D6^2         # x6 = N6/D6
+        dx6dl38 <- (dN6dl38*D6-N6*dD6dl38)/D6^2       # x6 = N6/D6
         dx6dl34 <- (dN6dl34*D6-N6*dD6dl34)/D6^2
         dx6dl30 <- (dN6dl30*D6-N6*dD6dl30)/D6^2
         dx6dl26 <- (dN6dl26*D6-N6*dD6dl26)/D6^2
-        dx7dl35 <- (dN7dl35*D7-N7*dD7dl35)/D7^2         # x7 = N7/D7
+        dx7dl35 <- (dN7dl35*D7-N7*dD7dl35)/D7^2       # x7 = N7/D7
         dx7dl31 <- (dN7dl31*D7-N7*dD7dl31)/D7^2
         El <- getEl()
         J <- matrix(0,2*ns,7)
