@@ -1424,8 +1424,8 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
 w2disp <- function(x,...){ UseMethod("w2disp",x) }
 w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     if (wtype==2){
-        out <- wa2wt(x=x,tt=fit$age[1],a=fit$flippedfit$a[1],
-                     wa=fit$flippedfit$w,...)
+        out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
+                      wDP=fit$flippedfit$w,...)
     } else if (inverse){
         out <- fit$y0[1]*fit$flippedfit$w/fit$flippedfit$a[1]
     } else {
@@ -1448,14 +1448,14 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
         if (wtype==1){
             out <- fit$y0[1]*fit$flippedfit$w/fit$flippedfit$a[1]
         } else {
-            out <- wa2wt(x=x,tt=fit$age[1],a=fit$a[1],wa=fit$w)
+            out <- wDP2wt(x=x,DP=fit$a[1],wDP=fit$w)
         }
     } else {
         if (wtype==1){
             out <- fit$w
         } else {
-            out <- wa2wt(x=x,tt=fit$age[1],a=fit$flippedfit$a[1],
-                         wa=fit$flippedfit$w)
+            out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
+                          wDP=fit$flippedfit$w)
         }
     }
     out
@@ -1474,7 +1474,7 @@ w2disp.ThU <- function(x,fit,type,wtype,...){
             age2disp <- FALSE
         }
         if (age2disp){
-            out <- wa2wt(x=x,tt=fit$age[1],a=Th230U238,wa=fit$w)
+            out <- wDP2wt(x=x,DP=Th230U238,wDP=fit$w)
         } else {
             out <- fit$w
         }
@@ -1490,33 +1490,33 @@ w2disp.UThHe <- function(x,fit,wtype,...){
     out
 }
 
-wa2wt <- function(x,...){ UseMethod("wa2wt",x) }
-wa2wt.default <- function(x,...){stop("Not implemented.")}
-wa2wt.ArAr <- function(x,tt,a,wa,...){
+wDP2wt <- function(x,...){ UseMethod("wDP2wt",x) }
+wDP2wt.default <- function(x,...){stop("Not implemented.")}
+wDP2wt.ArAr <- function(x,DP,wDP,...){
     l40 <- lambda('K40')[1]
-    dtda <- -x$J[1]/(l40*a*(a+x$J[1]))
-    abs(dtda*wa)
+    dtdDP <- x$J[1]/(l40*(1+DP*x$J[1]))
+    abs(dtdDP*wDP)
 }
-wa2wt.ThPb <- function(x,tt,a,wa,...){
-    wa2wt.PD(x=x,tt=tt,a=a,wa=wa,nuclide='Th232')
+wDP2wt.ThPb <- function(x,DP,wDP,...){
+    wDP2wt.DP(x=x,DP=DP,wDP=wDP,nuclide='Th232')
 }
-wa2wt.KCa <- function(x,tt,a,wa,bratio=1,...){
-    wa2wt.PD(x=x,tt=tt,a=a,wa=wa,nuclide='K40',bratio=bratio)
+wDP2wt.KCa <- function(x,DP,wDP,bratio=1,...){
+    wDP2wt.DP(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
 }
-wa2wt.PD <- function(x,tt,a,wa,nuclide,bratio=1,...){
+wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]
-    dtda <- -1/(lambda*a*(a*bratio+1))
-    abs(dtda*wa)
+    dtdDP <- 1/(lambda(1+DP*bratio))
+    abs(dtdDP*wDP)
 }
-wa2wt.PbPb <- function(x,tt,a,wa,...){
+wDP2wt.PbPb <- function(x,DP,wDP,...){
     McL <- mclean(tt=tt)
-    dtda <- 1/McL$dPb207Pb206dt
-    abs(dtda*wa)
+    dtdDP <- 1/McL$dPb207Pb206dt
+    abs(dtdDP*wDP)
 }
-wa2wt.ThU <- function(x,tt,a,wa,...){
+wDP2wt.ThU <- function(x,DP,wDP,...){
     l0 <- lambda('Th230')[1]
-    dtda <- 1/(l0*(1-a))
-    abs(dtda*wa)
+    dtdDP <- 1/(l0*(1-DP))
+    abs(dtdDP*wDP)
 }
 
 ab2y0t <- function(x,...){ UseMethod("ab2y0t",x) }
