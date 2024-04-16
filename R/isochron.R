@@ -1378,17 +1378,15 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
     usr <- graphics::par('usr')
     if (usr[1]>0 & usr[3]>0) return() # axes out of focus
     if (type=='p' & wtype==1){
-        if ('invertedfit'%in%names(fit)){
-            reldisp <- fit$invertedfit$w[1]/fit$invertedfit$a[1]
-        } else {
-            reldisp <- fit$w[1]/fit$a[1]
-        }
+        reldisp <- ifelse(inverse,
+                          fit$flippedfit$w[1]/fit$flippedfit$a[1],
+                          fit$w[1]/fit$a[1])
         y0 <- fit$a[1]
         cid <- ci(sx=y0*reldisp)
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
     } else if (type=='p' & wtype==2 & inverse){
         x0 <- fit$flippedfit$a[1]
-        cid <- ci(sx=x0*fit$flippedfit$w[1]/fit$flippedfit$a[1])
+        cid <- ci(sx=fit$flippedfit$w[1])
         graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
     } else if (type=='d' & ((wtype==2 & inverse) | (wtype==1 & !inverse))){
         y0 <- fit$a[1]
@@ -1428,7 +1426,7 @@ w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
         out <- wa2wt(x=x,tt=fit$age[1],a=fit$flippedfit$a[1],
                      wa=fit$flippedfit$w,...)
     } else if (inverse){
-        out <- fit$y0[1]*fit$invertedfit$w/fit$invertedfit$a[1]
+        out <- fit$y0[1]*fit$flippedfit$w/fit$flippedfit$a[1]
     } else {
         out <- fit$y0[1]*fit$w/fit$a[1]
     }
@@ -1438,7 +1436,7 @@ w2disp.other <- function(x,fit,wtype,inverse,...){
     if (wtype==2){
         out <- fit$DP[1]*fit$flippedfit$w/fit$flippedfit$a[1]
     } else if (inverse){
-        out <- fit$Dd[1]*fit$invertedfit$w/fit$invertedfit$a[1]
+        out <- fit$Dd[1]*fit$flippedfit$w/fit$flippedfit$a[1]
     } else {
         out <- fit$Dd[1]*fit$w/fit$a[1]
     }
@@ -1447,7 +1445,7 @@ w2disp.other <- function(x,fit,wtype,inverse,...){
 w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     if (inverse){
         if (wtype==1){
-            out <- fit$y0[1]*fit$invertedfit$w/fit$invertedfit$a[1]
+            out <- fit$y0[1]*fit$flippedfit$w/fit$flippedfit$a[1]
         } else {
             out <- wa2wt(x=x,tt=fit$age[1],a=fit$a[1],wa=fit$w)
         }
@@ -1455,8 +1453,8 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
         if (wtype==1){
             out <- fit$w
         } else {
-            out <- wa2wt(x=x,tt=fit$age[1],a=fit$invertedfit$a[1],
-                         wa=fit$invertedfit$w)
+            out <- wa2wt(x=x,tt=fit$age[1],a=fit$flippedfit$a[1],
+                         wa=fit$flippedfit$w)
         }
     }
     out
