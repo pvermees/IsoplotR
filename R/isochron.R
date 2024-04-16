@@ -1385,8 +1385,9 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
         cid <- ci(sx=y0*reldisp)
         graphics::lines(x=c(0,0),y=y0+cid*c(-1,1),lwd=2)
     } else if (type=='p' & wtype==2 & inverse){
-        x0 <- fit$flippedfit$a[1]
-        cid <- ci(sx=fit$flippedfit$w[1])
+        reldisp <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
+        x0 <- 1/fit$flippedfit$a[1]
+        cid <- ci(sx=x0*reldisp)
         graphics::lines(x=x0+cid*c(-1,1),y=c(0,0),lwd=2)
     } else if (type=='d' & ((wtype==2 & inverse) | (wtype==1 & !inverse))){
         y0 <- fit$a[1]
