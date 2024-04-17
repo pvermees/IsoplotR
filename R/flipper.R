@@ -2,23 +2,21 @@
 # if necessary to facilitate anchored regression and model-3 fits
 flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
                     wtype=0,anchor=0,type='p',y0rat,t2DPfun,...){
-    ifi <- rep(FALSE,3) # invert - flip - invert
-    xyz <- data2york(x,inverse=inverse)
+    yd <- data2york(x,inverse=inverse)
+    flip <- invert <- FALSE
     if (model<3 & anchor[1]<1){
-        d2calc <- clear(xyz,hide,omit)
+        d2calc <- clear(yd,hide,omit)
         fit <- regression(d2calc,model=model)
     } else if (anchor[1]==1){
         wtype <- 1 # override
-        ifi[1] <- inverse
-        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,hide=hide,omit=omit)
         if (!missing(y0rat)) anchor[2:3] <- iratio(y0rat)
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
     } else if (anchor[1]==2){
         wtype <- 2 # override
-        ifi[1] <- !inverse
-        ifi[2] <- ifi[3] <- (type=='p')
-        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
+        flip <- invert <- (type=='p')
+        d2calc <- flipinvert(yd=yd,flip=flip,invert=invert,hide=hide,omit=omit)
         if (missing(t2DPfun)){
             DP <- anchor[2:3]
         } else {
@@ -34,13 +32,11 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
             fit <- MLyork(d2calc,anchor=anchor,model=model)
         }
     } else if (wtype==1){
-        ifi[1] <- inverse
-        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else if (wtype==2){
-        ifi[1] <- !inverse
-        ifi[2] <- ifi[3] <- (type=='p')
-        d2calc <- flipinvert(x=x,ifi=ifi,hide=hide,omit=omit)
+        flip <- invert <- (type=='p')
+        d2calc <- flipinvert(yd=yd,flip=flip,invert=invert,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")
@@ -48,25 +44,20 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     fit$anchor <- anchor
     out <- list()
     out$flippedfit <- fit
-    if (ifi[3]){
+    if (invert){
         fit <- invertfit(fit,type=type,wtype=wtype)
     }
-    if (ifi[2]){
+    if (flip){
         fit <- unflipfit(fit)
     }
-    if (ifi[1]){
-        fit <- invertfit(fit,type=type,wtype=wtype)
-    }
     out <- append(out,fit)
-    out$xyz <- xyz
+    out$xyz <- yd
     out
 }
 
-flipinvert <- function(x,ifi=rep(FALSE,3),hide,omit){
-    yd <- data2york(x)
-    if (ifi[1]) yd <- normal2inverse(yd)
-    if (ifi[2]) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
-    if (ifi[3]) yd <- normal2inverse(yd)
+flipinvert <- function(yd,flip=FALSE,invert=FALSE,hide=NULL,omit=NULL){
+    if (flip) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
+    if (invert) yd <- normal2inverse(yd)
     clear(yd,hide,omit)
 }
 
