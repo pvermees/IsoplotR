@@ -1,7 +1,9 @@
 # helper function for isochron() that flips X- and Y- axis and back
 # if necessary to facilitate anchored regression and model-3 fits
-flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
-                    wtype=0,anchor=0,type='p',y0rat,t2DPfun,...){
+flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
+                    model=1,wtype=0,anchor=0,type='p',...){
+    y0rat <- gety0rat(x)
+    DPrat <- getDPrat(x)
     yd <- data2york(x,inverse=inverse)
     if (model<3 & anchor[1]<1){
         ifi <- rep(FALSE,3)
@@ -11,18 +13,18 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         wtype <- 1 # override
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
-        if (!missing(y0rat)) anchor[2:3] <- iratio(y0rat)
+        if (!is.null(y0rat)) anchor[2:3] <- iratio(y0rat)
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
     } else if (anchor[1]==2){
         wtype <- 2 # override
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
-        if (missing(t2DPfun)){
+        if (is.null(DPrat)){
             DP <- anchor[2:3]
         } else {
             st <- ifelse(length(anchor)<3,0,anchor[3])
-            DP <- do.call(t2DPfun,args=list(t=anchor[2],st=st,...))
+            DP <- do.call(age2ratio,args=list(tt=anchor[2],st=st,ratio=DPrat,...))
         }
         if (model<2){
             fit <- anchoredYork(d2calc,y0=DP[1],sy0=DP[2])
@@ -152,3 +154,34 @@ anchoredYork <- function(x,y0=0,sy0=0){
     out$n <- nrow(x)
     out
 }
+
+gety0rat <- function(x,...){ UseMethod("gety0rat",x) }
+gety0rat.default <- function(x,...){ NULL }
+gety0rat.ArAr <- function(x){ 'Ar40Ar36' }
+gety0rat.PbPb <- function(x){ 'Pb207Pb204' }
+gety0rat.ThPb <- function(x){ 'Pb208Pb204' }
+gety0rat.KCa <- function(x){ 'Ca40Ca44' }
+gety0rat.RbSr <- function(x){ 'Sr87Sr86' }
+gety0rat.ReOs <- function(x){ 'Os187Os192' }
+gety0rat.SmNd <- function(x){ 'Sm143Sm144' }
+gety0rat.LuHf <- function(x){ 'Hf176Hf177' }
+
+getDPrat <- function(x,...){ UseMethod("getDPrat",x) }
+getDPrat.default <- function(x,...){ NULL }
+getDPrat.ArAr <- function(x){ 'Ar40Ar39' }
+getDPrat.PbPb <- function(x){ 'Pb207Pb206' }
+getDPrat.ThPb <- function(x){ 'Pb208Th232' }
+getDPrat.KCa <- function(x){ 'Ca40K40' }
+getDPrat.RbSr <- function(x){ 'Sr87Rb87' }
+getDPrat.ReOs <- function(x){ 'Os187Re187' }
+getDPrat.SmNd <- function(x){ 'Nd143Sm147' }
+getDPrat.LuHf <- function(x){ 'Hf176Lu176' }
+
+getParent <- function(x,...){ UseMethod("getParent",x) }
+getParent.default <- function(x,...){ NULL }
+getParent.ThPb <- function(x){ 'Th232' }
+getParent.KCa <- function(x){ 'K40' }
+getParent.RbSr <- function(x){ 'Rb87' }
+getParent.ReOs <- function(x){ 'Re187' }
+getParent.SmNd <- function(x){ 'Sm147' }
+getParent.LuHf <- function(x){ 'Lu176' }

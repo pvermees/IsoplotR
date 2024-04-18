@@ -606,7 +606,8 @@ get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #'      print(r)
 #' }
 #' @export
-age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,d=diseq(),J,sJ){
+age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,
+                      d=diseq(),J,sJ,bratio=1){
     if (ratio=='Pb206U238'){
         out <- age_to_Pb206U238_ratio(tt,st,d=d,exterr=exterr)
     } else if (ratio=='Pb207U235'){
@@ -626,7 +627,7 @@ age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,d=diseq(),J,sJ){
     } else if (ratio=='Ar40Ar39'){
         out <- get.ArAr.ratio(tt,st,J=J,sJ=sJ,exterr=exterr)
     } else if (ratio=='Ca40K40'){
-        out <- get.KCa.ratio(tt,st,exterr=exterr)
+        out <- get.KCa.ratio(tt,st,exterr=exterr,bratio=bratio)
     } else if (ratio=='Hf176Lu176'){
         out <- get.LuHf.ratio(tt,st,exterr=exterr)
     } else if (ratio=='Sr87Rb87'){
