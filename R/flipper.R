@@ -3,8 +3,8 @@
 flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
                     wtype=0,anchor=0,type='p',y0rat,t2DPfun,...){
     yd <- data2york(x,inverse=inverse)
-    ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
     if (model<3 & anchor[1]<1){
+        ifi <- rep(FALSE,3)
         d2calc <- clear(yd,hide,omit)
         fit <- regression(d2calc,model=model)
     } else if (anchor[1]==1){
@@ -33,9 +33,11 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
             fit <- MLyork(d2calc,anchor=anchor,model=model)
         }
     } else if (wtype==1){
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else if (wtype==2){
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
@@ -72,7 +74,7 @@ get_ifi <- function(wtype,type,inverse){
             } else {
                 out <- c(TRUE,TRUE,TRUE)
             }
-        } else if (type=='3'){
+        } else if (type=='d'){
             if (inverse){
                 out <- c(FALSE,FALSE,FALSE)
             } else {

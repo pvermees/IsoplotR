@@ -1509,6 +1509,7 @@ wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     abs(dtdDP*wDP)
 }
 wDP2wt.PbPb <- function(x,DP,wDP,...){
+    tt <- get.Pb207Pb206.age(DP)[1]
     McL <- mclean(tt=tt)
     dtdDP <- 1/McL$dPb207Pb206dt
     abs(dtdDP*wDP)
