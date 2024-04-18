@@ -10,14 +10,14 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     } else if (anchor[1]==1){
         wtype <- 1 # override
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         if (!missing(y0rat)) anchor[2:3] <- iratio(y0rat)
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
     } else if (anchor[1]==2){
         wtype <- 2 # override
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         if (missing(t2DPfun)){
             DP <- anchor[2:3]
         } else {
@@ -32,11 +32,11 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
         }
     } else if (wtype==1){
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else if (wtype==2){
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")
@@ -88,8 +88,8 @@ get_ifi <- function(wtype,type,inverse){
     out
 }
 
-flipinvert <- function(yd,ifi=rep(FALSE,3),hide=NULL,omit=NULL){
-    if (ifi[1]) yd <- normal2inverse(yd)
+flipinvert <- function(yd,ifi=rep(FALSE,3),type='p',hide=NULL,omit=NULL){
+    if (ifi[1]) yd <- normal2inverse(yd,type=type)
     if (ifi[2]) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
     if (ifi[3]) yd <- normal2inverse(yd)
     clear(yd,hide,omit)

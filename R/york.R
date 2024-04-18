@@ -588,22 +588,33 @@ ThConversionHelper <- function(x){
     out
 }
 
-normal2inverse <- function(x){
+normal2inverse <- function(x,type='p'){
     out <- x
     iX <- 1
     isX <- 2
     iY <- 3
     isY <- 4
     irXY <- 5
-    out[,iX] <- x[,iX]/x[,iY]
-    out[,iY] <- 1/x[,iY]
     E11 <- x[,isX]^2
     E22 <- x[,isY]^2
     E12 <- x[,irXY]*x[,isX]*x[,isY]
-    J11 <- 1/x[,iY]
-    J12 <- -out[,iX]/x[,iY]
-    J21 <- rep(0,nrow(x))
-    J22 <- -out[,iY]/x[,iY]
+    if (type=='p'){
+        out[,iX] <- x[,iX]/x[,iY]
+        out[,iY] <- 1/x[,iY]
+        J11 <- 1/x[,iY]
+        J12 <- -out[,iX]/x[,iY]
+        J21 <- rep(0,nrow(x))
+        J22 <- -out[,iY]/x[,iY]
+    } else if (type=='d'){
+        out[,iX] <- 1/x[,iX]
+        out[,iY] <- x[,iY]/x[,iX]
+        J11 <- -out[,iX]/x[,iX]
+        J12 <- rep(0,nrow(x))
+        J21 <- -out[,iY]/x[,iX]
+        J22 <- 1/x[,iX]
+    } else {
+        stop('Invalid type')
+    }
     err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
     out[,isX] <- sqrt(err[,'varX'])
     out[,isY] <- sqrt(err[,'varY'])
