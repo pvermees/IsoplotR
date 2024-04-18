@@ -1498,10 +1498,10 @@ wDP2wt.ArAr <- function(x,DP,wDP,...){
     abs(dtdDP*wDP)
 }
 wDP2wt.ThPb <- function(x,DP,wDP,...){
-    wDP2wt.DP(x=x,DP=DP,wDP=wDP,nuclide='Th232')
+    wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='Th232')
 }
 wDP2wt.KCa <- function(x,DP,wDP,bratio=1,...){
-    wDP2wt.DP(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
+    wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
 }
 wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]

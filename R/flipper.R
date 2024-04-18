@@ -24,12 +24,10 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
             st <- ifelse(length(anchor)<3,0,anchor[3])
             DP <- do.call(t2DPfun,args=list(t=anchor[2],st=st,...))
         }
-        if (type=='d') y0 <- DP
-        else y0 <- quotient(X=DP[1],sX=DP[2],Y=1,sY=0,sXY=0)
         if (model<2){
-            fit <- anchoredYork(d2calc,y0=y0[1],sy0=y0[2])
+            fit <- anchoredYork(d2calc,y0=DP[1],sy0=DP[2])
         } else {
-            anchor <- c(1,y0)
+            anchor <- c(1,DP)
             fit <- MLyork(d2calc,anchor=anchor,model=model)
         }
     } else if (wtype==1){
@@ -60,6 +58,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     out
 }
 
+# ifi = invert, flip, invert
 get_ifi <- function(wtype,type,inverse){
     if (wtype==1){
         if (inverse){
