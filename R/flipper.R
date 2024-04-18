@@ -3,20 +3,21 @@
 flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
                     wtype=0,anchor=0,type='p',y0rat,t2DPfun,...){
     yd <- data2york(x,inverse=inverse)
-    flip <- invert <- FALSE
+    ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
     if (model<3 & anchor[1]<1){
         d2calc <- clear(yd,hide,omit)
         fit <- regression(d2calc,model=model)
     } else if (anchor[1]==1){
         wtype <- 1 # override
-        d2calc <- flipinvert(yd=yd,hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
         if (!missing(y0rat)) anchor[2:3] <- iratio(y0rat)
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
     } else if (anchor[1]==2){
         wtype <- 2 # override
-        flip <- invert <- (type=='p')
-        d2calc <- flipinvert(yd=yd,flip=flip,invert=invert,hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
         if (missing(t2DPfun)){
             DP <- anchor[2:3]
         } else {
@@ -32,11 +33,10 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
             fit <- MLyork(d2calc,anchor=anchor,model=model)
         }
     } else if (wtype==1){
-        d2calc <- flipinvert(yd=yd,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else if (wtype==2){
-        flip <- invert <- (type=='p')
-        d2calc <- flipinvert(yd=yd,flip=flip,invert=invert,hide=hide,omit=omit)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")
@@ -44,20 +44,53 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,model=1,
     fit$anchor <- anchor
     out <- list()
     out$flippedfit <- fit
-    if (invert){
+    if (ifi[3]){
         fit <- invertfit(fit,type=type,wtype=wtype)
     }
-    if (flip){
+    if (ifi[2]){
         fit <- unflipfit(fit)
+    }
+    if (ifi[1]){
+        fit <- invertfit(fit,type=type,wtype=wtype)
     }
     out <- append(out,fit)
     out$xyz <- yd
     out
 }
 
-flipinvert <- function(yd,flip=FALSE,invert=FALSE,hide=NULL,omit=NULL){
-    if (flip) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
-    if (invert) yd <- normal2inverse(yd)
+get_ifi <- function(wtype,type,inverse){
+    if (wtype==1){
+        if (inverse){
+            out <- c(TRUE,FALSE,FALSE)
+        } else {
+            out <- c(FALSE,FALSE,FALSE)
+        }
+    } else if (wtype==2){
+        if (type=='p'){
+            if (inverse){
+                out <- c(FALSE,TRUE,TRUE)
+            } else {
+                out <- c(TRUE,TRUE,TRUE)
+            }
+        } else if (type=='3'){
+            if (inverse){
+                out <- c(FALSE,FALSE,FALSE)
+            } else {
+                out <- c(TRUE,FALSE,FALSE)
+            }
+        } else {
+            stop('Invalid type')
+        }
+    } else {
+        out <- rep(FALSE,3)
+    }
+    out
+}
+
+flipinvert <- function(yd,ifi=rep(FALSE,3),hide=NULL,omit=NULL){
+    if (ifi[1]) yd <- normal2inverse(yd)
+    if (ifi[2]) yd[,c('X','sX','Y','sY','rXY')] <- yd[,c(3,4,1,2,5)]
+    if (ifi[3]) yd <- normal2inverse(yd)
     clear(yd,hide,omit)
 }
 
