@@ -24,7 +24,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
             DP <- anchor[2:3]
         } else {
             st <- ifelse(length(anchor)<3,0,anchor[3])
-            DP <- do.call(age2ratio,args=list(tt=anchor[2],st=st,ratio=DPrat,...))
+            DP <- age2ratio(tt=anchor[2],st=st,ratio=DPrat,...)
         }
         if (model<2){
             fit <- anchoredYork(d2calc,y0=DP[1],sy0=DP[2])
@@ -162,7 +162,7 @@ gety0rat.PbPb <- function(x){ 'Pb207Pb204' }
 gety0rat.ThPb <- function(x){ 'Pb208Pb204' }
 gety0rat.KCa <- function(x){ 'Ca40Ca44' }
 gety0rat.RbSr <- function(x){ 'Sr87Sr86' }
-gety0rat.ReOs <- function(x){ 'Os187Os192' }
+gety0rat.ReOs <- function(x){ 'Os187Os188' }
 gety0rat.SmNd <- function(x){ 'Sm143Sm144' }
 gety0rat.LuHf <- function(x){ 'Hf176Hf177' }
 
