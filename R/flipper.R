@@ -162,8 +162,8 @@ gety0rat.PbPb <- function(x){ 'Pb207Pb204' }
 gety0rat.ThPb <- function(x){ 'Pb208Pb204' }
 gety0rat.KCa <- function(x){ 'Ca40Ca44' }
 gety0rat.RbSr <- function(x){ 'Sr87Sr86' }
-gety0rat.ReOs <- function(x){ 'Os187Os188' }
-gety0rat.SmNd <- function(x){ 'Sm143Sm144' }
+gety0rat.ReOs <- function(x){ 'Os187Os192' }
+gety0rat.SmNd <- function(x){ 'Nd143Nd144' }
 gety0rat.LuHf <- function(x){ 'Hf176Hf177' }
 
 getDPrat <- function(x,...){ UseMethod("getDPrat",x) }
