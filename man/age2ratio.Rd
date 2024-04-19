@@ -4,7 +4,16 @@
 \alias{age2ratio}
 \title{Predict isotopic ratios from ages}
 \usage{
-age2ratio(tt, st = 0, ratio = "Pb206U238", exterr = FALSE, d = diseq(), J, sJ)
+age2ratio(
+  tt,
+  st = 0,
+  ratio = "Pb206U238",
+  exterr = FALSE,
+  d = diseq(),
+  J,
+  sJ = 0,
+  bratio = 1
+)
 }
 \arguments{
 \item{tt}{a scalar or (except when \code{ratio} =

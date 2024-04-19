@@ -98,6 +98,7 @@ isochron(x, ...)
   omit.fill = NA,
   omit.stroke = "grey",
   y0option = 1,
+  taxis = FALSE,
   ...
 )
 
@@ -151,6 +152,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -177,6 +179,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -203,6 +206,8 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
+  bratio = 0.895,
   ...
 )
 
@@ -229,6 +234,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -255,6 +261,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -281,6 +288,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -307,6 +315,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 

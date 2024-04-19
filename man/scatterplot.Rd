@@ -13,7 +13,7 @@ scatterplot(
   clabel = "",
   ellipse.fill = c("#00FF0080", "#FF000080"),
   ellipse.stroke = "black",
-  fit = "none",
+  fit = NULL,
   add = FALSE,
   empty = FALSE,
   ci.col = "gray80",
@@ -33,6 +33,8 @@ scatterplot(
   asp = NA,
   log = "",
   box = TRUE,
+  taxis = FALSE,
+  xaxt = ifelse(taxis, "n", "s"),
   ...
 )
 }
