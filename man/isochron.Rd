@@ -607,6 +607,11 @@ For Th-U data:
 \code{y0option=4} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
 activity ratio.}
 
+\item{taxis}{logical. If \code{TRUE}, replaces the x-axis of the
+inverse isochron with a time scale. Only applies if
+\code{inverse} is \code{TRUE} or, when \code{x} has class
+\code{U-Pb}, if \code{x$format} is 4 or higher.}
+
 \item{inverse}{toggles between normal and inverse isochrons. If the
     isochron plots \code{Y} against \code{X}, and
 

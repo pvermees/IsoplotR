@@ -700,6 +700,11 @@ genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
 #' \code{y0option=4} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
 #' activity ratio.
 #'
+#' @param taxis logical. If \code{TRUE}, replaces the x-axis of the
+#'     inverse isochron with a time scale. Only applies if
+#'     \code{inverse} is \code{TRUE} or, when \code{x} has class
+#'     \code{U-Pb}, if \code{x$format} is 4 or higher.
+#'
 #' @rdname isochron
 #' @export
 isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
@@ -1413,7 +1418,9 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
     }
 }
 
+#' @export
 w2disp <- function(x,...){ UseMethod("w2disp",x) }
+#' @export
 w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     if (wtype==2){
         out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
@@ -1425,6 +1432,7 @@ w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     }
     out
 }
+#' @export
 w2disp.other <- function(x,fit,wtype,inverse,...){
     if (wtype==2){
         out <- fit$DP[1]*fit$flippedfit$w/fit$flippedfit$a[1]
@@ -1435,6 +1443,7 @@ w2disp.other <- function(x,fit,wtype,inverse,...){
     }
     out
 }
+#' @export
 w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     if (inverse){
         if (wtype==1){
@@ -1452,6 +1461,7 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     }
     out
 }
+#' @export
 w2disp.ThU <- function(x,fit,type,wtype,...){
     if (x$format%in%c(1,2)){
         out <- fit$w
@@ -1473,6 +1483,7 @@ w2disp.ThU <- function(x,fit,type,wtype,...){
     }
     out
 }
+#' @export
 w2disp.UThHe <- function(x,fit,wtype,...){
     if (wtype==2){
         out <- fit$age[1]*fit$w/fit$b[1]
@@ -1482,37 +1493,47 @@ w2disp.UThHe <- function(x,fit,wtype,...){
     out
 }
 
+#' @export
 wDP2wt <- function(x,...){ UseMethod("wDP2wt",x) }
+#' @export
 wDP2wt.default <- function(x,...){stop("Not implemented.")}
+#' @export
 wDP2wt.ArAr <- function(x,DP,wDP,...){
     l40 <- lambda('K40')[1]
     dtdDP <- x$J[1]/(l40*(1+DP*x$J[1]))
     abs(dtdDP*wDP)
 }
+#' @export
 wDP2wt.ThPb <- function(x,DP,wDP,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='Th232')
 }
+#' @export
 wDP2wt.KCa <- function(x,DP,wDP,bratio=1,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
 }
+#' @export
 wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]
     dtdDP <- 1/(lambda(1+DP*bratio))
     abs(dtdDP*wDP)
 }
+#' @export
 wDP2wt.PbPb <- function(x,DP,wDP,...){
     tt <- get.Pb207Pb206.age(DP)[1]
     McL <- mclean(tt=tt)
     dtdDP <- 1/McL$dPb207Pb206dt
     abs(dtdDP*wDP)
 }
+#' @export
 wDP2wt.ThU <- function(x,DP,wDP,...){
     l0 <- lambda('Th230')[1]
     dtdDP <- 1/(l0*(1-DP))
     abs(dtdDP*wDP)
 }
 
+#' @export
 ab2y0t <- function(x,...){ UseMethod("ab2y0t",x) }
+#' @export
 ab2y0t.default <- function(x,fit,...){
     out <- fit
     if (inflate(fit)){
@@ -1523,6 +1544,7 @@ ab2y0t.default <- function(x,fit,...){
     }
     out
 }
+#' @export
 ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
     tt <- fit$par['t']
     a0 <- fit$par['a0']
@@ -1601,6 +1623,7 @@ ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
     }
     out
 }
+#' @export
 ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse){
@@ -1621,6 +1644,7 @@ ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
     }
     out
 }
+#' @export
 ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse) {
@@ -1643,14 +1667,17 @@ ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     }
     out
 }
+#' @export
 ab2y0t.ThPb <- function(x,fit,inverse,exterr,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='Th232',wtype=wtype)
 }
+#' @export
 ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='K40',bratio=bratio,wtype=wtype)
 }
+#' @export
 ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     nuclide <- getParent(x)
     out <- fit
@@ -1677,6 +1704,7 @@ ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     }
     out
 }
+#' @export
 ab2y0t.UThHe <- function(x,fit,wtype,...){
     out <- fit
     out$y0[c('y','s[y]')] <- fit$a
@@ -1690,6 +1718,7 @@ ab2y0t.UThHe <- function(x,fit,wtype,...){
     out$y0label <- quote('He'[0]*'=')
     out
 }
+#' @export
 ab2y0t.other <- function(x,fit,inverse,wtype,...){
     out <- fit
     if (inverse){
@@ -1721,8 +1750,11 @@ ab2y0t.other <- function(x,fit,inverse,wtype,...){
     out
 }
 
+#' @export
 getIsochronLabels <- function(x,...){ UseMethod("getIsochronLabels",x) }
+#' @export
 getIsochronLabels.default <- function(x,...){stop("Not implemented.")}
+#' @export
 getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1740,6 +1772,7 @@ getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^208*'Pb/'^204*'Pb)'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1757,6 +1790,7 @@ getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^143*'Nd/'^144*'Nd)'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1774,6 +1808,7 @@ getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^187*'Os/'^188*'Os)'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1791,6 +1826,7 @@ getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^87*'Sr/'^86*'Sr)'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1808,6 +1844,7 @@ getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^176*'Hf/'^177*'Hf)'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1825,6 +1862,7 @@ getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^40*'Ca/'^44*'Ca)'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1861,6 +1899,7 @@ getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     }
     out
 }
+#' @export
 getIsochronLabels.PbPb <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -1873,6 +1912,7 @@ getIsochronLabels.PbPb <- function(x,inverse,...){
     out$y0 <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
     out
 }
+#' @export
 getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1890,6 +1930,7 @@ getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.other <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -1902,6 +1943,7 @@ getIsochronLabels.other <- function(x,inverse,...){
     out$y0 <- quote('[D/d]'[0]*'=')
     out
 }
+#' @export
 getIsochronLabels.ThU <- function(x,type,...){
     out <- list()
     if (x$format%in%c(1,2)){

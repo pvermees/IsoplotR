@@ -155,33 +155,61 @@ anchoredYork <- function(x,y0=0,sy0=0){
     out
 }
 
+#' @export
 gety0rat <- function(x,...){ UseMethod("gety0rat",x) }
+#' @export
 gety0rat.default <- function(x,...){ NULL }
+#' @export
 gety0rat.ArAr <- function(x){ 'Ar40Ar36' }
+#' @export
 gety0rat.PbPb <- function(x){ 'Pb207Pb204' }
+#' @export
 gety0rat.ThPb <- function(x){ 'Pb208Pb204' }
+#' @export
 gety0rat.KCa <- function(x){ 'Ca40Ca44' }
+#' @export
 gety0rat.RbSr <- function(x){ 'Sr87Sr86' }
+#' @export
 gety0rat.ReOs <- function(x){ 'Os187Os192' }
+#' @export
 gety0rat.SmNd <- function(x){ 'Nd143Nd144' }
+#' @export
 gety0rat.LuHf <- function(x){ 'Hf176Hf177' }
 
+#' @export
 getDPrat <- function(x,...){ UseMethod("getDPrat",x) }
+#' @export
 getDPrat.default <- function(x,...){ NULL }
+#' @export
 getDPrat.ArAr <- function(x){ 'Ar40Ar39' }
+#' @export
 getDPrat.PbPb <- function(x){ 'Pb207Pb206' }
+#' @export
 getDPrat.ThPb <- function(x){ 'Pb208Th232' }
+#' @export
 getDPrat.KCa <- function(x){ 'Ca40K40' }
+#' @export
 getDPrat.RbSr <- function(x){ 'Sr87Rb87' }
+#' @export
 getDPrat.ReOs <- function(x){ 'Os187Re187' }
+#' @export
 getDPrat.SmNd <- function(x){ 'Nd143Sm147' }
+#' @export
 getDPrat.LuHf <- function(x){ 'Hf176Lu176' }
 
+#' @export
 getParent <- function(x,...){ UseMethod("getParent",x) }
+#' @export
 getParent.default <- function(x,...){ NULL }
+#' @export
 getParent.ThPb <- function(x){ 'Th232' }
+#' @export
 getParent.KCa <- function(x){ 'K40' }
+#' @export
 getParent.RbSr <- function(x){ 'Rb87' }
+#' @export
 getParent.ReOs <- function(x){ 'Re187' }
+#' @export
 getParent.SmNd <- function(x){ 'Sm147' }
+#' @export
 getParent.LuHf <- function(x){ 'Lu176' }
