@@ -740,9 +740,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         ci.col=ci.col,line.col=line.col,lwd=lwd,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,taxis=taxis,...)
-            if (taxis){
-                add_taxis(x=x,xlim=range(out$XY[,1],graphics::par('usr')[2]),type=type)
-            }
+            if (taxis) add_taxis(x=x,fit=out,type=type)
             dispunits <- getDispUnits.UPb(x=x,joint=joint,anchor=anchor)
             if (!joint | x$format>8){
                 showDispersion(out,inverse=TRUE,wtype=anchor[1],type=type)
@@ -912,7 +910,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,taxis=taxis,...)
-        if (taxis) add_taxis(x=x,xlim=c(min(out$xyz[,1]),graphics::par('usr')[2]))
+        if (taxis) add_taxis(x=x,fit=out)
         showDispersion(out,inverse=inverse,wtype=wtype)
         lab <- getIsochronLabels(x=x,inverse=inverse,taxis=taxis)
         graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
@@ -947,13 +945,13 @@ isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                          lwd=1, plot=TRUE,exterr=FALSE,model=1,wtype=1,
                          anchor=0,show.ellipses=1*(model!=2),hide=NULL,
                          omit=NULL,omit.fill=NA,omit.stroke='grey',
-                         taxis=FALSE,...){
+                         taxis=FALSE,bratio=0.895,...){
     isochron_PD(x,oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
                 exterr=exterr,model=model,wtype=wtype,anchor=anchor,
-                show.ellipses=show.ellipses,bratio=0.895,hide=hide,
+                show.ellipses=show.ellipses,bratio=bratio,hide=hide,
                 omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
 }
 #' @rdname isochron
@@ -1255,11 +1253,7 @@ isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                     ellipse.stroke=ellipse.stroke,fit=out,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,taxis=taxis,...)
-        if (taxis){
-            add_taxis(x=x,
-                      xlim=c(min(out$xyz[,1]),graphics::par('usr')[2]),
-                      bratio=bratio)
-        }
+        if (taxis) add_taxis(x=x,fit=out,bratio=bratio)
         showDispersion(out,inverse=inverse,wtype=wtype)
         graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
                                       type='PD',dispunits=dispunits),
@@ -2037,47 +2031,74 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
 }
 
 add_taxis <- function(x,...){ UseMethod("add_taxis",x) }
-add_taxis.default <- function(x,xlim,...){ stop("No default method for add_taxis") }
-add_taxis.UPb <- function(x,xlim,type=1,...){
-    if (type==1){
-        tlim <- get.Pb206U238.age(x=1/xlim,d=x$d)[,1]
-    } else if (type==2){
-        tlim <- get.Pb207U235.age(x=1/xlim,d=x$d)[,1]
-    } else if (type==3){
-        tlim <- get.Pb208Th232.age(x=1/xlim)[,1]
+add_taxis.default <- function(x,fit,...){
+    xlim <- graphics::par('usr')[1:2]
+    xmid <- xlim[1] + diff(xlim)/3
+    tmin <- get.PD.age(DP=1/xlim[2],sDP=0,nuclide=getParent(x),...)[1]
+    xzero <- 1/age2ratio(tt=5000,st=0,ratio=getDPrat(x),...)[1]
+    if (xzero<xmid){ # 5Ga is to the left of the middle
+        tmid <- get.PD.age(DP=1/xmid,sDP=0,nuclide=getParent(x),...)[1]
     } else {
-        stop("Invalid type")
+        tmid <- get.PD.age(DP=1/xzero,sDP=0,nuclide=getParent(x),...)[1]
     }
-    tticks <- taxisticks(tlim)
-    if (type==1){
-        xticks <- age_to_U238Pb206_ratio(tt=tticks,d=x$d)[,1]
-    } else if (type==2){
-        xticks <- age_to_U235Pb207_ratio(tt=tticks,d=x$d)[,1]
-    } else if (type==3){
-        xticks <- age_to_Th232Pb208_ratio(tt=tticks,d=x$d)[,1]
-    }
-    axis(1,at=xticks,labels=signif(tticks,5))
-}
-add_taxis.ArAr <- function(x,xlim,...){
-    tlim <- get.ArAr.age(Ar40Ar39=1/xlim,sAr40Ar39=0,J=x$J[1],sJ=0)[,1]
-    xticks <- tticks <- taxisticks(tlim)
-    for (i in seq_along(tticks)){
-        xticks[i] <- 1/age2ratio(tticks[i],st=0,ratio='Ar40Ar39',J=x$J[1],sJ=0)[1]
-    }
-    axis(1,at=xticks,labels=signif(tticks,5))
-}
-add_taxis.PD <- function(x,xlim,...){
-    tlim <- get.PD.age(DP=1/xlim,sDP=0,nuclide=getParent(x))[,1]
+    tmax <- max(tmid,fit$age[1] + 3*tail(fit$age,1))
+    tlim <- c(tmin,tmax)
     xticks <- tticks <- taxisticks(tlim)
     for (i in seq_along(tticks)){
         xticks[i] <- 1/age2ratio(tt=tticks[i],st=0,ratio=getDPrat(x),...)[1]
     }
     axis(1,at=xticks,labels=signif(tticks,5))
 }
+add_taxis.UPb <- function(x,fit,type=1,...){
+    xlim <- graphics::par('usr')[1:2]
+    xmid <- xlim[1] + diff(xlim)/3
+    if (type==1){
+        tfun <- get.Pb206U238.age
+        ratio <- 'Pb206U238'
+    } else if (type==2){
+        tfun <- get.Pb207U235.age
+        ratio <- 'Pb207U235'
+    } else if (type==3){
+        tfun <- get.Pb208Th232.age
+        ratio <- 'Pb208Th232'
+    } else {
+        stop("Invalid type")
+    }
+    tmin <- tfun(x=1/xlim[2],d=x$d)[1]
+    xzero <- 1/age2ratio(tt=5000,ratio=ratio,d=x$d)[1]
+    if (xzero<xmid){ # 5Ga is to the left of the middle
+        tmid <- tfun(x=1/xmid,sx=0,d=x$d)[1]
+    } else {
+        tmid <- tfun(x=1/xzero,sx=0,d=x$d)[1]
+    }
+    tmax <- max(tmid,fit$age[1] + 3*tail(fit$age,1))
+    tlim <- c(tmin,tmax)
+    tticks <- taxisticks(tlim)
+    xticks <- 1/age2ratio(tt=tticks,ratio=ratio,d=x$d)[,1]
+    axis(1,at=xticks,labels=signif(tticks,5))
+}
+add_taxis.ArAr <- function(x,fit,...){
+    xlim <- graphics::par('usr')[1:2]
+    xmid <- xlim[1] + diff(xlim)/3
+    tmin <- get.ArAr.age(Ar40Ar39=1/xlim[2],J=x$J[1])[1]
+    xzero <- 1/age2ratio(tt=5000,ratio='Ar40Ar39',J=x$J[1])[1]
+    if (xzero<xmid){ # 5Ga is to the left of the middle
+        tmid <- get.ArAr.age(Ar40Ar39=1/xmid,J=x$J[1])[1]
+    } else {
+        tmid <- get.ArAr.age(Ar40Ar39=1/xzero,J=x$J[1])[1]
+    }
+    tmax <- max(tmid,fit$age[1] + 3*tail(fit$age,1))
+    tlim <- c(tmin,tmax)
+    xticks <- tticks <- taxisticks(tlim)
+    for (i in seq_along(tticks)){
+        xticks[i] <- 1/age2ratio(tticks[i],st=0,ratio='Ar40Ar39',J=x$J[1],sJ=0)[1]
+    }
+    axis(1,at=xticks,labels=signif(tticks,5))
+}
 
 taxisticks <- function(tlim){
-    tticks <- pretty(range(min(tlim),min(4600,max(tlim))))
-    extraticks <- prettier(tticks[1:2])
+    tticks <- pretty(tlim)
+    extraticks <- pretty(tticks[1:2])
     tticks[1] <- min(extraticks[extraticks>min(tlim)])
     tticks
 }

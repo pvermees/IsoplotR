@@ -157,7 +157,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     if (is.null(xlim)){
         xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
         if (taxis & !is.null(fit)){
-            xlim[2] <- -fit$a[1]/fit$b[1] + diff(xlim)/10
+            xlim[2] <- -fit$a[1]/(fit$b[1]+2*fit$b[2])
         }
     }
     if (is.null(ylim)){
