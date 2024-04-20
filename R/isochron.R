@@ -1677,9 +1677,9 @@ ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
         out$y0[c('y','s[y]')] <- fit$a
     }
     out$y0label <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
-    out$age[c('t','s[t]')] <- get.ArAr.age(R09[1],R09[2],x$J[1],x$J[2],exterr=exterr)
+    out$age[c('t','s[t]')] <- get_ArAr_age(R09[1],R09[2],x$J[1],x$J[2],exterr=exterr)
     if (inflate(out)){
-        out$age['disp[t]'] <- get.ArAr.age(R09[1],sqrt(fit$mswd)*R09[2],
+        out$age['disp[t]'] <- get_ArAr_age(R09[1],sqrt(fit$mswd)*R09[2],
                                            x$J[1],x$J[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
     } else if (fit$model==3){
@@ -2123,14 +2123,14 @@ add_taxis.ArAr <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
     ratio <- 'Ar40Ar39'
-    tmin <- get.ArAr.age(Ar40Ar39=1/xlim[2],J=x$J[1])[1]
+    tmin <- get_ArAr_age(Ar40Ar39=1/xlim[2],J=x$J[1])[1]
     xzero <- 1/age2ratio(tt=5000,ratio=ratio,J=x$J[1])[1]
     if (xzero<xmid){ # 5Ga is to the left of the middle
-        tmid <- get.ArAr.age(Ar40Ar39=1/xmid,J=x$J[1])[1]
+        tmid <- get_ArAr_age(Ar40Ar39=1/xmid,J=x$J[1])[1]
     } else {
-        tmid <- get.ArAr.age(Ar40Ar39=1/xzero,J=x$J[1])[1]
+        tmid <- get_ArAr_age(Ar40Ar39=1/xzero,J=x$J[1])[1]
     }
-    plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,J=x$j[1])
+    plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,J=x$J[1])
 }
 #' @param type controls the isochron projection
 #' @noRd

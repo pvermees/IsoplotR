@@ -110,7 +110,7 @@ age.default <- function(x,method='U238-Pb206',oerr=1,sigdig=NA,
     } else if (identical(method,'Th232-Pb208')){
         tst <- get_Pb208Th232_age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Ar-Ar')){
-        tst <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
+        tst <- get_ArAr_age(Ar40Ar39=x[1],sAr40Ar39=x[2],
                             J=J[1],sJ=J[2],exterr=exterr)
     } else if (identical(method,'K-Ca')){
         tst <- get.KCa.age(K40Ca40=x[1],sK40Ca40=x[2],exterr=exterr)
@@ -484,7 +484,7 @@ add_exterr <- function(x,tt,st,cutoff.76=1100,type=4){
         out <- get_Pb207Pb206_age(R[1],R[2],exterr=TRUE)
     } else if (is.ArAr(x)){
         R <- get_ArAr_ratio(tt,st,x$J[1],0,exterr=FALSE)
-        out <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
+        out <- get_ArAr_age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
     } else if (is.KCa(x)){
         R <- get_KCa_ratio(tt,st,exterr=FALSE)
         out <- get.KCa.age(R[1],R[2],exterr=TRUE)
