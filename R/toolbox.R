@@ -51,16 +51,17 @@ getmM <- function(x,from=NA,to=NA,log=FALSE){
     else { getm <- FALSE }
     if (is.na(to)) { to <- max(x,na.rm=TRUE); getM <- TRUE }
     else { getM <- FALSE }
+    dx <- to-from
     if (getm) {
-        if (log) { from <- from/2 }
+        if (log) { from <- max(from/2,from-dx) }
         else {
-            if (2*from-to<0) {from <- 0}
-            else {from <- from-(to-from)/10}
+            if ((2*from-to)<0) {from <- 0}
+            else {from <- from-dx/10}
         }
     }
     if (getM) {
-        if (log) { to <- 2*to }
-        else { to <- to+(to-from)/10 }
+        if (log) { to <- min(2*to,to+dx) }
+        else { to <- to+dx/10 }
     }
     list(m=from,M=to)
 }
@@ -369,15 +370,6 @@ clear <- function(x,...,OGLS=FALSE){
         out <- x
     }
     out
-}
-
-geomean <- function(x,...){ UseMethod("geomean",x) }
-geomean.default <- function(x,...){
-    exp(mean(log(x),na.rm=TRUE))
-}
-
-trace <- function(x){
-    sum(diag(x))
 }
 
 logit <- function(x,m=0,M=1,inverse=FALSE){

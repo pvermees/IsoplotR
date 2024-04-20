@@ -562,14 +562,14 @@ weightedmean_helper <- function(x,random.effects=FALSE,
                                 sigdig=2,oerr=3,exterr=FALSE,ranked=FALSE,
                                 i2i=FALSE,common.Pb=1,units='',Th0i=0,
                                 hide=NULL,omit=NULL,omit.col=NA,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+    tt <- get_ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,omit4c=unique(c(hide,omit)),
                    common.Pb=common.Pb,Th0i=Th0i)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 oerr=oerr,plot=FALSE,hide=hide,omit=omit)
     if (exterr)
-        out <- add.exterr.to.wtdmean(x,fit,oerr=oerr,
+        out <- add_exterr.to.wtdmean(x,fit,oerr=oerr,
                                      cutoff.76=cutoff.76,type=type)
     else out <- fit
     if (plot){
@@ -710,8 +710,9 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
 wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
     line1 <- maintit(x=fit$mean[1],sx=fit$mean[-1],
-                     ntit=ntit.valid(fit$valid),sigdig=sigdig,df=fit$df,
-                     oerr=oerr,units=units,prefix=paste0('mean',ast,' ='))
+                     ntit=paste0('(',sum(fit$valid),'/',length(fit$valid),')'),
+                     sigdig=sigdig,df=fit$df,oerr=oerr,units=units,
+                     prefix=paste0('mean',ast,' ='))
     if (fit$random.effects){
         line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,
                          oerr=oerr,units=units)
@@ -756,16 +757,16 @@ chauvenet <- function(X,sX,valid,random.effects=FALSE){
     valid
 }
 
-add.exterr.to.wtdmean <- function(x,fit,oerr=3,cutoff.76=1100,type=4){
+add_exterr.to.wtdmean <- function(x,fit,oerr=3,cutoff.76=1100,type=4){
     out <- fit
     out$mean[c('t','s[t]')] <-
-        add.exterr(x,
+        add_exterr(x,
                    tt=fit$mean['t'],
                    st=fit$mean['s[t]'],
                    cutoff.76=cutoff.76,type=type)
     if (inflate(c(fit,model=1+2*fit$random.effects))){
         out$mean['disp[t]'] <-
-            add.exterr(x,
+            add_exterr(x,
                        tt=fit$mean['t'],
                        st=sqrt(fit$mswd)*fit$mean['s[t]'],
                        cutoff.76=cutoff.76,type=type)[2]

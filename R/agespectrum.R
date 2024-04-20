@@ -130,9 +130,9 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                                 sigdig=2,line.col='red',lwd=2,
                                 xlab='cumulative fraction',
                                 ylab='X',hide=NULL,omit=NULL,...){
-    XY <- plot.spectrum.axes(x=x,oerr=oerr,xlab=xlab,
+    XY <- plot_spectrum_axes(x=x,oerr=oerr,xlab=xlab,
                              ylab=ylab,hide=hide,...)
-    pc <- get.plateau.colours(x=x,levels=levels,plateau=plateau,
+    pc <- get_plateau_colours(x=x,levels=levels,plateau=plateau,
                               hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
                               random.effects=random.effects,oerr=oerr)
@@ -190,14 +190,14 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     y.lab='age [Ma]'
-    XY <- plot.spectrum.axes(x=X,oerr=oerr,xlab=x.lab,
+    XY <- plot_spectrum_axes(x=X,oerr=oerr,xlab=x.lab,
                              ylab=y.lab,hide=hide,...)
-    pc <- get.plateau.colours(x=X,levels=levels,plateau=plateau,
+    pc <- get_plateau_colours(x=X,levels=levels,plateau=plateau,
                               hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
                               random.effects=random.effects,oerr=oerr)
     if (plateau){
-        if (exterr) pc$plat <- add.exterr.to.wtdmean(x,pc$plat)
+        if (exterr) pc$plat <- add_exterr.to.wtdmean(x,pc$plat)
         plot_plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
         graphics::title(plateau.title(pc$plat,oerr=oerr,sigdig=sigdig,
                                       Ar=TRUE,units=' Ma'))
@@ -207,7 +207,7 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
     if (plateau) return(invisible(pc$plat))
 }
 
-plot.spectrum.axes <- function(x,oerr=3,xlab='cumulative fraction',
+plot_spectrum_axes <- function(x,oerr=3,xlab='cumulative fraction',
                                ylab='age [Ma]',hide=NULL,...){
     ns <- nrow(x)
     x <- clear(x[,1:3,drop=FALSE],hide)
@@ -223,7 +223,7 @@ plot.spectrum.axes <- function(x,oerr=3,xlab='cumulative fraction',
     graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
     list(X=X,Yl=Yl,Yu=Yu,ylim=c(minY,maxY))
 }
-get.plateau.colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,omit=NULL,
+get_plateau_colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,omit=NULL,
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 random.effects=FALSE,oerr=3){

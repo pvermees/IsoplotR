@@ -1,4 +1,4 @@
-get.ArAr.ratio <- function(tt,st=0,J,sJ=0,exterr=FALSE){
+get_ArAr_ratio <- function(tt,st=0,J,sJ=0,exterr=FALSE){
     L <- lambda("K40")[1]
     sL <- lambda("K40")[2]
     R <- (exp(L*tt)-1)/J

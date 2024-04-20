@@ -101,8 +101,13 @@ errlabelswapper <- function(errnames){
     out
 }
 
-# formats table or vector of ages and errors
+#' Formats table or vector of ages and errors
+#' @param x an IsoplotR data object
+#' @noRd
 agerr <- function(x,...){ UseMethod("agerr",x) }
+#' @param oerr output error (1:4 for 1 or 2 sigma, absolute or relative)
+#' @param sigdig number of significant digits
+#' @noRd
 agerr.default <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
     tst[2] <- ci(x=x[1],sx=x[2],oerr=oerr)
@@ -110,6 +115,7 @@ agerr.default <- function(x,oerr=1,sigdig=NA,...){
     names(out) <- names(tst) <- errlabelswapper(names(x))
     out
 }
+#' @noRd
 agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
     nc <- ncol(x)
@@ -239,8 +245,18 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
     out
 }
 
-get.ntit <- function(x,...){ UseMethod("get.ntit",x) }
-get.ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
+#' Get a sample size label for the plot title
+#' @param x an IsoplotR data object or a data vector
+#' @noRd
+get_ntit <- function(x,...){
+    UseMethod("get_ntit",x)
+}
+#' @param m minimum cutoff. Values below this are removed from the
+#'     total sample size
+#' @param M maximum cutoff. Valus above this are removed from the
+#'     total sample size
+#' @noRd
+get_ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
     ns <- length(x)
     bad <- which(is.na(x) | x<m | x>M)
     nisnan <- length(bad)
@@ -248,14 +264,12 @@ get.ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
     if (nisnan>0) out <- paste0(out,ns-nisnan,'/')
     paste0(out,ns,')')
 }
-get.ntit.fissiontracks <- function(x,...){
+#' @noRd
+get_ntit.fissiontracks <- function(x,...){
     if (x$format<2){
-        out <- get.ntit.default(x$x[,'Ns'])
+        out <- get_ntit.default(x$x[,'Ns'])
     } else {
-        out <- get.ntit.default(x$Ns)
+        out <- get_ntit.default(x$Ns)
     }
     out    
-}
-ntit.valid <- function(valid,...){
-    paste0('(',sum(valid),'/',length(valid),')')
 }

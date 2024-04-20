@@ -50,7 +50,7 @@ twfit2wfit <- function(fit,x){
     disc.slope <- 1/(U*Pb76)
     conc.slope <- D$dPb206U238dt/D$dPb207U235dt
     if (disc.slope < conc.slope){
-        search.range <- c(tt,get.Pb207Pb206.age(Pb76,d=md)[1])+buffer
+        search.range <- c(tt,get_Pb207Pb206_age(Pb76,d=md)[1])+buffer
         tl <- tt
         tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
                              t2=tt,disc.slope=disc.slope,d=md)$root
@@ -182,7 +182,7 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
             ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
             ul <- y + ciy
             ll <- y - ciy
-            t75 <- get.Pb207U235.age(x,d=d)[,'t75']
+            t75 <- get_Pb207U235_age(x,d=d)[,'t75']
             yconc <- age_to_Pb206U238_ratio(t75,d=d)[,'68']
             overshot <- ul>yconc
             ul[overshot] <- yconc[overshot]
@@ -199,7 +199,7 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
-        tl <- check.zero.UPb(fit2d$par['t'])
+        tl <- check_zero_UPb(fit2d$par['t'])
         U <- settings('iratio','U238U235')[1]
         nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
@@ -215,7 +215,7 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
         ul <- y + ciy
         ll <- y - ciy
         yconc <- rep(0,nsteps)
-        t68 <- get.Pb206U238.age(1/x,d=d)[,'t68']
+        t68 <- get_Pb206U238_age(1/x,d=d)[,'t68']
         yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope

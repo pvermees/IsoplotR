@@ -212,7 +212,7 @@ Pb0corr <- function(x,option=3,omit4c=NULL){
 }
 
 correct.common.Pb.without.20x <- function(x,i,c76,tt=NULL){
-    tw <- tera.wasserburg(x,i)
+    tw <- tera_wasserburg(x,i)
     m86 <- tw$x['U238Pb206']
     m76 <- tw$x['Pb207Pb206']
     if (is.null(tt)){
@@ -239,7 +239,7 @@ correct.common.Pb.without.20x <- function(x,i,c76,tt=NULL){
     out
 }
 correct.common.Pb.with.20x <- function(x,i,cx6=NULL,cx7=NULL,tt=NULL,cc=FALSE){
-    ir <- get.UPb.isochron.ratios.20x(x,i=i) # (3806, 0406), (3507, 0407)
+    ir <- get_UPb_isochron_ratios_20x(x,i=i) # (3806, 0406), (3507, 0407)
     ni <- ifelse(x$format%in%c(4,5,6),2,1)
     Jp <- matrix(0,ni,2*ni)
     Pbx6label <- ifelse(x$format%in%c(85,119),'Pb208Pb206','Pb204Pb206')
@@ -298,7 +298,7 @@ correct.common.Pb.with.20x <- function(x,i,cx6=NULL,cx7=NULL,tt=NULL,cc=FALSE){
 }
 correct.common.Pb.with.208 <- function(x,i,tt,c0608=NULL,c0708=NULL,cc=FALSE){
     # (3806, 08c06), (3507, 08c07), (3238, 3208), (06c08), (07c08):
-    ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+    ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
     if (x$format%in%c(7,8,12)){
         r3507 <- age_to_U235Pb207_ratio(tt,d=x$d[i])[1]
         p3507 <- ir$x['U235Pb207'] + ir$x['Pb208cPb207']*r3507*c0708
@@ -413,7 +413,7 @@ common.Pb.stacey.kramers <- function(x){
         colnames(out) <- c('U238Pb206','errU238Pb206',
                            'Pb207Pb206','errPb207Pb206','rXY')
         for (i in 1:ns){
-            maxt <- get.Pb207Pb206.age(x,i=i)[1]
+            maxt <- get_Pb207Pb206_age(x,i=i)[1]
             tint <- stats::optimise(SKmisfit,interval=c(0,maxt),x=x,i=i)$minimum
             i6474 <- stacey.kramers(tint)
             c76 <- i6474[,'i74']/i6474[,'i64']
@@ -424,7 +424,7 @@ common.Pb.stacey.kramers <- function(x){
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb206U238','errPb206U238','rXY')
         for (i in 1:ns){
-            maxt <- get.Pb207Pb206.age(x,i=i)[1]
+            maxt <- get_Pb207Pb206_age(x,i=i)[1]
             tint <- stats::optimise(SKmisfit,interval=c(0,maxt),x=x,i=i)$minimum
             c6784 <- stacey.kramers(tint)
             if (x$format==85){
@@ -442,7 +442,7 @@ common.Pb.stacey.kramers <- function(x){
                            'Pb208Th232','errPb208Th232','Th232U238','errTh232U238',
                            'rXY','rXZ','rXW','rYZ','rYW','rZW')
         for (i in 1:ns){
-            maxt <- get.Pb208Th232.age(x,i=i)[1]
+            maxt <- get_Pb208Th232_age(x,i=i)[1]
             tint <- stats::optimise(SKmisfit,interval=c(0,maxt),x=x,i=i)$minimum
             c678 <- stacey.kramers(tint)
             c68 <- c678[,'i64']/c678[,'i84']
@@ -452,7 +452,7 @@ common.Pb.stacey.kramers <- function(x){
     } else if (x$format%in%c(9,119)){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb206U238','errPb206U238')
-        tmax <- get.Pb206U238.age(x=x)[,1]
+        tmax <- get_Pb206U238_age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::uniroot(SKmisfit,interval=c(0,tmax[i]),x=x,i=i)$root
             c6784 <- stacey.kramers(tint)
@@ -462,7 +462,7 @@ common.Pb.stacey.kramers <- function(x){
     } else if (x$format%in%c(10,1210)){
         out <- matrix(0,ns,2)
         colnames(out) <- c('Pb207U235','errPb207U235')
-        tmax <- get.Pb207U235.age(x=x)[,1]
+        tmax <- get_Pb207U235_age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::uniroot(SKmisfit,interval=c(0,tmax[i]),x=x,i=i)$root
             c6784 <- stacey.kramers(tint)
@@ -473,7 +473,7 @@ common.Pb.stacey.kramers <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','rXY')
-        tmax <- get.Pb208Th232.age(x=x)[,1]
+        tmax <- get_Pb208Th232_age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SKmisfit,interval=c(-1,tmax[i]),x=x,i=i)$minimum
             if (tint>0){
@@ -488,7 +488,7 @@ common.Pb.stacey.kramers <- function(x){
         out <- matrix(0,ns,5)
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb208Th232','errPb208Th232','rXY')
-        tmax <- get.Pb208Th232.age(x=x)[,1]
+        tmax <- get_Pb208Th232_age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SKmisfit,interval=c(-1,tmax[i]),x=x,i=i)$minimum
             if (tint>0){
@@ -604,7 +604,7 @@ common.Pb.nominal <- function(x){
                            'rXY','rXZ','rXW','rYZ','rYW','rZW')
         c0608 <- iratio('Pb206Pb208')[1]
         c0708 <- iratio('Pb207Pb208')[1]
-        tmax <- get.Pb208Th232.age(x=x)[,1]
+        tmax <- get_Pb208Th232_age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.Pb0,interval=c(0,tmax),
                                     c0608=c0608,c0708=c0708,x=x,i=i)$minimum
@@ -633,7 +633,7 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('Pb206U238','errPb206U238',
                            'Pb208Th232','errPb208Th232','rXY')
         c0608 <- iratio('Pb206Pb208')[1]
-        tmax <- get.Pb208Th232.age(x=x)[,1]
+        tmax <- get_Pb208Th232_age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.Pb0,interval=c(-1,tmax[i]),
                                     x=x,i=i,c0608=c0608)$minimum
@@ -648,7 +648,7 @@ common.Pb.nominal <- function(x){
         colnames(out) <- c('Pb207U235','errPb207U235',
                            'Pb208Th232','errPb208Th232','rXY')
         c0708 <- iratio('Pb207Pb208')[1]
-        tmax <- get.Pb208Th232.age(x=x)[,1]
+        tmax <- get_Pb208Th232_age(x=x)[,1]
         for (i in 1:ns){
             tint <- stats::optimise(SS.Pb0,interval=c(-1,tmax[i]),
                                     x=x,i=i,c0708=c0708)$minimum
@@ -666,7 +666,7 @@ common.Pb.nominal <- function(x){
 
 SKmisfit <- function(tt,x,i){
     if (x$format%in%c(1,2,3)){ # sum of squares
-        tw <- tera.wasserburg(x,i)
+        tw <- tera_wasserburg(x,i)
         X <- tw$x['U238Pb206']
         Y <- tw$x['Pb207Pb206']
         i6474 <- stacey.kramers(tt)
@@ -862,8 +862,8 @@ project.concordia <- function(m86,m76,c76,d=diseq()){
         }
         return(NA)
     }
-    t68 <- get.Pb206U238.age(1/m86,d=d)[1]
-    t76 <- get.Pb207Pb206.age(m76,d=d)[1]
+    t68 <- get_Pb206U238_age(1/m86,d=d)[1]
+    t76 <- get_Pb207Pb206_age(m76,d=d)[1]
     a <- c76
     b <- (m76-c76)/m86
     neg <- (c76>m76) # negative slope?

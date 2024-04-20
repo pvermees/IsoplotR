@@ -255,7 +255,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         }
     } else if (option==2){ # 07/06 vs. 38/06
         for (i in 1:ns){
-            td <- tera.wasserburg(x,i=i)
+            td <- tera_wasserburg(x,i=i)
             out[i,] <- data2york_UPb_helper(td,i1='U238Pb206',i2='Pb207Pb206')
         }
     } else if (option==3 && x$format%in%c(4,5,6,9,85,119)){ # 0x/06 vs 38/06
@@ -264,7 +264,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         } else {
             Pbx6label <- ifelse(x$format%in%c(85,119),'Pb208Pb206','Pb204Pb206')
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.20x(x,i)
+                ir <- get_UPb_isochron_ratios_20x(x,i)
                 out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2=Pbx6label)
             }
         }
@@ -274,7 +274,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         } else {
             Pbx7label <- ifelse(x$format%in%c(85,1210),'Pb208Pb207','Pb204Pb207')
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.20x(x,i)
+                ir <- get_UPb_isochron_ratios_20x(x,i)
                 out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2=Pbx7label)
             }
         }
@@ -285,12 +285,12 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         }
     } else if (option==6 && x$format%in%c(7,8,11)){ # 08c/06 vs. 38/06
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208cPb206')
         }
     } else if (option==7 && x$format%in%c(7,8,12)){ # 08c/07 vs. 35/07
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
         }
     } else if (option==8 && x$format%in%c(7,8,11)){ # 06c/08 vs. 32/08
@@ -298,7 +298,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             stop('Not implemented yet')
         } else {
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
                 out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb206cPb208')
             }
         }
@@ -307,7 +307,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             stop('Not implemented yet')
         } else {
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
                 out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
             }
         }

@@ -361,7 +361,8 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=50){
     if (doSm){
         uvw <- UThHe2uvw(x)
         w <- mean(uvw[,'w'],na.rm=TRUE)
-        Sm <- geomean.Sm(x)
+        UVW <- colMeans(UThHe2uvw(x),na.rm=TRUE)
+        Sm <- exp(UVW[3])/(exp(UVW[1])+exp(UVW[2])+exp(UVW[3])+1)
     } else {
         uv <- UThHe2uv(x)
         w <- 0
@@ -668,11 +669,6 @@ renormalise <- function(xyz,fact=c(1,1,1)){
         out <- xyz*fact/sum(xyz*fact)
     }
     out
-}
-
-geomean.Sm <- function(x,...){
-    UVW <- colMeans(UThHe2uvw(x),na.rm=TRUE)
-    exp(UVW[3])/(exp(UVW[1])+exp(UVW[2])+exp(UVW[3])+1)
 }
 
 getfact <- function(x,fit){

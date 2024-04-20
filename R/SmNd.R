@@ -1,7 +1,7 @@
-# convert isotope dilution derived concentrations to ratios
-# x = matrix with columns 'Sm[ppm]','errSm[ppm]', 'Nd[ppm]','errNd[ppm]' 
-# and 'Nd143Nd144','errNd143Nd144'
-#' @export
+#' convert isotope dilution derived concentrations to ratios
+#' x = matrix with columns 'Sm[ppm]','errSm[ppm]', 'Nd[ppm]','errNd[ppm]' 
+#' and 'Nd143Nd144','errNd143Nd144'
+#' @noRd
 ppm2ratios.SmNd <- function(x,exterr=FALSE,common=FALSE,...){
     R4452Sm <- iratio('Sm144Sm152')[1]
     R4752Sm <- iratio('Sm147Sm152')[1]
@@ -100,12 +100,12 @@ ppm2ratios.SmNd <- function(x,exterr=FALSE,common=FALSE,...){
     out
 }
 
-get.SmNd.ratio <- function(tt,st,exterr=FALSE){
-    get.PD.ratio(tt,st,'Sm147',exterr=exterr)
+get_SmNd_ratio <- function(tt,st,exterr=FALSE){
+    getPDratio(tt,st,'Sm147',exterr=exterr)
 }
 
 get.SmNd.age <- function(Nd143Sm147,sNd143Sm147,exterr=FALSE){
-    get.PD.age(Nd143Sm147,sNd143Sm147,'Sm147',exterr=exterr)
+    getPDage(Nd143Sm147,sNd143Sm147,'Sm147',exterr=exterr)
 }
 
 SmNd.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){

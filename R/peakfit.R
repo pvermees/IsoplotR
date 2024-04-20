@@ -146,7 +146,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=FALSE,sigdig=2,
     if (x$format == 1 & !identical(k,'min')){
         out <- binomial.mixtures(x,k,exterr=exterr,...)
     }  else if (x$format == 3){
-        tt <- get.ages(x)
+        tt <- get_ages(x)
         out <- peakfit.default(tt,k=k,log=log,sigdig=sigdig,oerr=oerr,np=np)
     } else {
         out <- peakfit_helper(x,k=k,sigdig=sigdig,oerr=oerr,
@@ -305,14 +305,14 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,i2i=i2i,
                      cutoff.disc=cutoff.disc,Th0i=Th0i,common.Pb=common.Pb)
     }
-    tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,
+    tt <- get_ages(x,i2i=i2i,common.Pb=common.Pb,type=type,
                    cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,Th0i=Th0i)
     fit <- peakfit.default(tt,k=k,np=np,log=log,oerr=oerr,sigdig=sigdig)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
         for (i in 1:numpeaks){
-            age.with.exterr <- add.exterr(x,fit$peaks['t',i],
+            age.with.exterr <- add_exterr(x,fit$peaks['t',i],
                                           fit$peaks['s[t]',i],type=type)
             fit$peaks['s[t]',i] <- age.with.exterr[2]
         }

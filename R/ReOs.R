@@ -1,6 +1,10 @@
-# convert isotope dilution derived concentrations to ratios
-# x = matrix with columns 'Reppm','errReppm', 'Osppt','errOsppt' 
-# and 'Os187Os188','errOs187Os188'
+#' convert isotope dilution derived concentrations to ratios
+#' x = matrix with columns 'Reppm','errReppm', 'Osppt','errOsppt' 
+#' and 'Os187Os188','errOs187Os188'
+#' @param exterr propagate the decay constant errors?
+#' @param common remove the non-radiogenic component using the
+#'     isotopic ratios stored in \code{settings('iratio',...)}
+#' @noRd
 ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
     R57Re <- iratio('Re185Re187')[1]
     R48Os <- iratio('Os184Os188')[1]
@@ -77,12 +81,12 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
     out
 }
 
-get.ReOs.ratio <- function(tt,st,exterr=FALSE){
-    get.PD.ratio(tt,st,'Re187',exterr)
+get_ReOs_ratio <- function(tt,st,exterr=FALSE){
+    getPDratio(tt,st,'Re187',exterr)
 }
 
 get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=FALSE){
-    get.PD.age(Os187Re187,sOs187Re187,'Re187',exterr=exterr)
+    getPDage(Os187Re187,sOs187Re187,'Re187',exterr=exterr)
 }
 
 ReOs.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){

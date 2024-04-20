@@ -1269,11 +1269,11 @@ isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 
 get.isochron.PD.age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1,d=diseq()){
     if (nuclide=='U238'){
-        out <- get.Pb206U238.age(x=DP,sx=sDP,exterr=exterr,d=d)
+        out <- get_Pb206U238_age(x=DP,sx=sDP,exterr=exterr,d=d)
     } else if (nuclide=='U235'){
-        out <- get.Pb207U235.age(x=DP,sx=sDP,exterr=exterr,d=d)
+        out <- get_Pb207U235_age(x=DP,sx=sDP,exterr=exterr,d=d)
     } else {
-        out <- get.PD.age(DP=DP,sDP=sDP,nuclide=nuclide,exterr=exterr,bratio=bratio)
+        out <- getPDage(DP=DP,sDP=sDP,nuclide=nuclide,exterr=exterr,bratio=bratio)
     }
     out
 }
@@ -1418,9 +1418,14 @@ showDispersion <- function(fit,inverse,wtype,type='p'){
     }
 }
 
-#' @export
+#' Convert w parameter to meaningful dispersion estimate
+#' @param x IsoplotR data object
+#' @noRd
 w2disp <- function(x,...){ UseMethod("w2disp",x) }
-#' @export
+#' @param fit a linear model with a parameter w
+#' @param wtype the dispersion type (0, 1, or 2)
+#' @param inverse logical
+#' @noRd
 w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     if (wtype==2){
         out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
@@ -1432,7 +1437,7 @@ w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     }
     out
 }
-#' @export
+#' @noRd
 w2disp.other <- function(x,fit,wtype,inverse,...){
     if (wtype==2){
         out <- fit$DP[1]*fit$flippedfit$w/fit$flippedfit$a[1]
@@ -1443,7 +1448,7 @@ w2disp.other <- function(x,fit,wtype,inverse,...){
     }
     out
 }
-#' @export
+#' @noRd
 w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     if (inverse){
         if (wtype==1){
@@ -1461,7 +1466,7 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     }
     out
 }
-#' @export
+#' @noRd
 w2disp.ThU <- function(x,fit,type,wtype,...){
     if (x$format%in%c(1,2)){
         out <- fit$w
@@ -1483,7 +1488,7 @@ w2disp.ThU <- function(x,fit,type,wtype,...){
     }
     out
 }
-#' @export
+#' @noRd
 w2disp.UThHe <- function(x,fit,wtype,...){
     if (wtype==2){
         out <- fit$age[1]*fit$w/fit$b[1]
@@ -1493,47 +1498,56 @@ w2disp.UThHe <- function(x,fit,wtype,...){
     out
 }
 
-#' @export
+#' Convert isotope ratio dispersion to age dispersion
+#' @param x an IsoplotR data object
+#' @noRd
 wDP2wt <- function(x,...){ UseMethod("wDP2wt",x) }
-#' @export
+#' @noRd
 wDP2wt.default <- function(x,...){stop("Not implemented.")}
-#' @export
+#' @noRd
 wDP2wt.ArAr <- function(x,DP,wDP,...){
     l40 <- lambda('K40')[1]
     dtdDP <- x$J[1]/(l40*(1+DP*x$J[1]))
     abs(dtdDP*wDP)
 }
-#' @export
+#' @param DP a daughter-parent ratio
+#' @param wDP the overdispersion of DP
+#' @noRd
 wDP2wt.ThPb <- function(x,DP,wDP,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='Th232')
 }
-#' @export
+#' @param bratio branching ratio
+#' @noRd
 wDP2wt.KCa <- function(x,DP,wDP,bratio=1,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
 }
-#' @export
+#' @param nuclide the parent nuclide
+#' @noRd
 wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]
     dtdDP <- 1/(lambda(1+DP*bratio))
     abs(dtdDP*wDP)
 }
-#' @export
+#' @noRd
 wDP2wt.PbPb <- function(x,DP,wDP,...){
-    tt <- get.Pb207Pb206.age(DP)[1]
+    tt <- get_Pb207Pb206_age(DP)[1]
     McL <- mclean(tt=tt)
     dtdDP <- 1/McL$dPb207Pb206dt
     abs(dtdDP*wDP)
 }
-#' @export
+#' @noRd
 wDP2wt.ThU <- function(x,DP,wDP,...){
     l0 <- lambda('Th230')[1]
     dtdDP <- 1/(l0*(1-DP))
     abs(dtdDP*wDP)
 }
 
-#' @export
+#' Convert generic intercept and slope to inherited ratio and age
+#' @param x an IsoplotR data object
+#' @noRd
 ab2y0t <- function(x,...){ UseMethod("ab2y0t",x) }
-#' @export
+#' @param fit the output of york(), MLyork() or ludwig()
+#' @noRd
 ab2y0t.default <- function(x,fit,...){
     out <- fit
     if (inflate(fit)){
@@ -1544,8 +1558,11 @@ ab2y0t.default <- function(x,fit,...){
     }
     out
 }
-#' @export
-ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
+#' @param type isochron type (see ?isochron)
+#' @param exterr propagate decay constant errors?
+#' @param y0option for datasets containing 204Pb or 208Pb (see ?isochron)
+#' @noRd
+ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
     tt <- fit$par['t']
     a0 <- fit$par['a0']
     b0 <- fit$par['b0']
@@ -1623,7 +1640,9 @@ ab2y0t.UPb <- function(x,fit,type,exterr,y0option=1,...){
     }
     out
 }
-#' @export
+#' @param inverse logical
+#' @param wtype controls type of dispersion (0, 1 or 2)
+#' @noRd
 ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse){
@@ -1634,17 +1653,17 @@ ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
         out$y0[c('y','s[y]')] <- fit$a
     }
     out$y0label <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
-    out$age[c('t','s[t]')] <- get.Pb207Pb206.age(R76[1],R76[2],exterr=exterr)
+    out$age[c('t','s[t]')] <- get_Pb207Pb206_age(R76[1],R76[2],exterr=exterr)
     if (inflate(fit)){
         out$age['disp[t]'] <- 
-            get.Pb207Pb206.age(R76[1],sqrt(fit$mswd)*R76[2],exterr=exterr)[2]
+            get_Pb207Pb206_age(R76[1],sqrt(fit$mswd)*R76[2],exterr=exterr)[2]
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
     } else if (fit$model==3){
         out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
     }
     out
 }
-#' @export
+#' @noRd
 ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse) {
@@ -1667,17 +1686,18 @@ ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     }
     out
 }
-#' @export
+#' @noRd
 ab2y0t.ThPb <- function(x,fit,inverse,exterr,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='Th232',wtype=wtype)
 }
-#' @export
+#' @noRd
 ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='K40',bratio=bratio,wtype=wtype)
 }
-#' @export
+#' @param bratio branching ratio
+#' @noRd
 ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     nuclide <- getParent(x)
     out <- fit
@@ -1704,7 +1724,7 @@ ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     }
     out
 }
-#' @export
+#' @noRd
 ab2y0t.UThHe <- function(x,fit,wtype,...){
     out <- fit
     out$y0[c('y','s[y]')] <- fit$a
@@ -1718,7 +1738,7 @@ ab2y0t.UThHe <- function(x,fit,wtype,...){
     out$y0label <- quote('He'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 ab2y0t.other <- function(x,fit,inverse,wtype,...){
     out <- fit
     if (inverse){
@@ -1750,11 +1770,15 @@ ab2y0t.other <- function(x,fit,inverse,wtype,...){
     out
 }
 
-#' @export
+#' Generates expressions for x- and y- axis labels of isochron plots
+#' @param x an IsoplotR data object
+#' @noRd
 getIsochronLabels <- function(x,...){ UseMethod("getIsochronLabels",x) }
-#' @export
+#' @noRd
 getIsochronLabels.default <- function(x,...){stop("Not implemented.")}
-#' @export
+#' @param inverse logical
+#' @param taxis label the x-axis with time
+#' @noRd
 getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1772,7 +1796,7 @@ getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^208*'Pb/'^204*'Pb)'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1790,7 +1814,7 @@ getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^143*'Nd/'^144*'Nd)'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1808,7 +1832,7 @@ getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^187*'Os/'^188*'Os)'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1826,7 +1850,7 @@ getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^87*'Sr/'^86*'Sr)'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1844,7 +1868,7 @@ getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^176*'Hf/'^177*'Hf)'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1862,7 +1886,8 @@ getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^40*'Ca/'^44*'Ca)'[0]*'=')
     out
 }
-#' @export
+#' @param type controls the isochron projection
+#' @noRd
 getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1899,7 +1924,7 @@ getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     }
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.PbPb <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -1912,7 +1937,7 @@ getIsochronLabels.PbPb <- function(x,inverse,...){
     out$y0 <- quote('('^207*'Pb/'^204*'Pb)'[c]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1930,7 +1955,7 @@ getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out$y0 <- quote('('^40*'Ar/'^36*'Ar)'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.other <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -1943,7 +1968,7 @@ getIsochronLabels.other <- function(x,inverse,...){
     out$y0 <- quote('[D/d]'[0]*'=')
     out
 }
-#' @export
+#' @noRd
 getIsochronLabels.ThU <- function(x,type,...){
     out <- list()
     if (x$format%in%c(1,2)){
@@ -2072,16 +2097,21 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
     out
 }
 
+#' Add a time axis to a scatterplot
+#' @param x an IsoplotR data object
+#' @noRd
 add_taxis <- function(x,...){ UseMethod("add_taxis",x) }
+#' @param fit the output of york(), MLyork() or ludwig()
+#' @noRd
 add_taxis.default <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
-    tmin <- get.PD.age(DP=1/xlim[2],sDP=0,nuclide=getParent(x),...)[1]
+    tmin <- getPDage(DP=1/xlim[2],sDP=0,nuclide=getParent(x),...)[1]
     xzero <- 1/age2ratio(tt=5000,st=0,ratio=getDPrat(x),...)[1]
     if (xzero<xmid){ # 5Ga is to the left of the middle
-        tmid <- get.PD.age(DP=1/xmid,sDP=0,nuclide=getParent(x),...)[1]
+        tmid <- getPDage(DP=1/xmid,sDP=0,nuclide=getParent(x),...)[1]
     } else {
-        tmid <- get.PD.age(DP=1/xzero,sDP=0,nuclide=getParent(x),...)[1]
+        tmid <- getPDage(DP=1/xzero,sDP=0,nuclide=getParent(x),...)[1]
     }
     tmax <- max(tmid,fit$age[1] + 3*tail(fit$age,1))
     tlim <- c(tmin,tmax)
@@ -2091,17 +2121,19 @@ add_taxis.default <- function(x,fit,...){
     }
     axis(1,at=xticks,labels=signif(tticks,5))
 }
+#' @param type controls the isochron projection
+#' @noRd
 add_taxis.UPb <- function(x,fit,type=1,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
     if (type==1){
-        tfun <- get.Pb206U238.age
+        tfun <- get_Pb206U238_age
         ratio <- 'Pb206U238'
     } else if (type==2){
-        tfun <- get.Pb207U235.age
+        tfun <- get_Pb207U235_age
         ratio <- 'Pb207U235'
     } else if (type==3){
-        tfun <- get.Pb208Th232.age
+        tfun <- get_Pb208Th232_age
         ratio <- 'Pb208Th232'
     } else {
         stop("Invalid type")
@@ -2119,6 +2151,7 @@ add_taxis.UPb <- function(x,fit,type=1,...){
     xticks <- 1/age2ratio(tt=tticks,ratio=ratio,d=x$d)[,1]
     axis(1,at=xticks,labels=signif(tticks,5))
 }
+#' @noRd
 add_taxis.ArAr <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3

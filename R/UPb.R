@@ -58,15 +58,15 @@ wetherill <- function(x,i=1,format){
         diag(out$cov) <-
             X[i,c('errPb207U235','errPb206U238','errPb204U238')]^2
         out$cov[1,2] <-
-            get.cov.75.68(X[i,'Pb207U235'],X[i,'errPb207U235'],
+            get_cov_75_68(X[i,'Pb207U235'],X[i,'errPb207U235'],
                           X[i,'Pb206U238'],X[i,'errPb206U238'],
                           X[i,'Pb207Pb206'],X[i,'errPb207Pb206'])
         out$cov[1,3] <-
-            get.cov.75.48(X[i,'Pb207U235'],X[i,'errPb207U235'],
+            get_cov_75_48(X[i,'Pb207U235'],X[i,'errPb207U235'],
                           X[i,'Pb204U238'],X[i,'errPb204U238'],
                           X[i,'Pb204Pb207'],X[i,'errPb204Pb207'])
         out$cov[2,3] <-
-            get.cov.68.48(X[i,'Pb206U238'],X[i,'errPb206U238'],
+            get_cov_68_48(X[i,'Pb206U238'],X[i,'errPb206U238'],
                           X[i,'Pb204U238'],X[i,'errPb204U238'],
                           X[i,'Pb204Pb206'],X[i,'errPb204Pb206'])
         out$cov[2,1] <- out$cov[1,2]
@@ -189,7 +189,7 @@ wetherill <- function(x,i=1,format){
     class(out) <- "wetherill"
     out
 }
-tera.wasserburg <- function(x,i=1,format){
+tera_wasserburg <- function(x,i=1,format){
     if (missing(format)){
         X <- x$x
         format <- x$format
@@ -207,7 +207,7 @@ tera.wasserburg <- function(x,i=1,format){
     else if (format == 85) labels <- c('U238Pb206','Pb207Pb206','Pb208Pb206')
     else if (format == 119) labels <- c('U238Pb206','Pb208Pb206')
     else if (format == 1210) labels <- c('U235Pb207','Pb208Pb207')
-    else stop('tera.wasserburg() is not available for this U-Pb format')
+    else stop('tera_wasserburg() is not available for this U-Pb format')
     if (format==1){
         U238U235 <- iratio('U238U235')[1]
         U238Pb206 <- 1/X[i,'Pb206U238']
@@ -328,7 +328,7 @@ tera.wasserburg <- function(x,i=1,format){
     class(out) <- "terawasserburg"
     out
 }
-get.UPb.isochron.ratios.20x <- function(x,i=NULL){
+get_UPb_isochron_ratios_20x <- function(x,i=NULL){
     if (x$format%in%c(4,5,6)){
         labels <- c('U238Pb206','Pb204Pb206','U235Pb207','Pb204Pb207')
     } else if (x$format==9){
@@ -342,13 +342,13 @@ get.UPb.isochron.ratios.20x <- function(x,i=NULL){
     } else if (x$format==1210){
         labels <- c('U235Pb207','Pb208Pb207')
     } else {
-        stop('Invalid U-Pb format for get.UPb.isochron.ratios.20x.')
+        stop('Invalid U-Pb format for get_UPb_isochron_ratios_20x.')
     }
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,length(labels))
         for (j in 1:ns){
-            out[j,] <- get.UPb.isochron.ratios.20x(x,i=j)$x
+            out[j,] <- get_UPb_isochron_ratios_20x(x,i=j)$x
         }
         colnames(out) <- labels
         return(out)
@@ -360,7 +360,7 @@ get.UPb.isochron.ratios.20x <- function(x,i=NULL){
     } else { # formats 4, 5, and 6
         Pbx6label <- ifelse(x$format<11,'Pb204Pb206','Pb208Pb206')
         U <- iratio('U238U235')[1]
-        tw <- tera.wasserburg(x,i) # 38/06, 07/06 and 0x/06
+        tw <- tera_wasserburg(x,i) # 38/06, 07/06 and 0x/06
         U8Pb6 <- tw$x['U238Pb206']
         Pbx6 <- tw$x[Pbx6label]
         U5Pb7 <- tw$x['U238Pb206']/(U*tw$x['Pb207Pb206'])
@@ -380,7 +380,7 @@ get.UPb.isochron.ratios.20x <- function(x,i=NULL){
     rownames(out$cov) <- labels
     out
 }
-get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
+get_UPb_isochron_ratios_208 <- function(x,i=NULL,tt=0){
     if (x$format%in%c(7,8)){
     labels <- c('U238Pb206','Pb208cPb206','U235Pb207',
                 'Pb208cPb207','Th232U238','Th232Pb208',
@@ -392,21 +392,21 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
         labels <- c('U235Pb207','Pb208cPb207',
                     'Th232Pb208','Pb207cPb208')
     } else {
-        stop('Invalid format for get.UPb.isochron.ratios.208')
+        stop('Invalid format for get_UPb_isochron_ratios_208')
     }
     McL <- mclean(tt,d=x$d[i])
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,length(labels))
         for (j in 1:ns){
-            out[j,] <- get.UPb.isochron.ratios.208(x,i=j,tt=tt)$x
+            out[j,] <- get_UPb_isochron_ratios_208(x,i=j,tt=tt)$x
         }
         colnames(out) <- labels
         return(out)
     } else if (x$format%in%c(7,8)){
         l2 <- settings('lambda','Th232')[1]
         U85 <- iratio('U238U235')[1]
-        tw <- tera.wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
+        tw <- tera_wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
         U8Pb6 <- tw$x['U238Pb206']
         Pb8c6 <- tw$x['Pb208Pb206'] -
             tw$x['Th232U238']*tw$x['U238Pb206']*McL$Pb208Th232
@@ -490,7 +490,7 @@ get.UPb.isochron.ratios.208 <- function(x,i=NULL,tt=0){
                       rXZ=x$x[i,'rXZ'],
                       rYZ=x$x[i,'rYZ'])
     } else {
-        stop('Invalid U-Pb format for get.UPb.isochron.ratios.208')
+        stop('Invalid U-Pb format for get_UPb_isochron_ratios_208')
     }
     out$cov <- J %*% E %*% t(J)
     names(out$x) <- labels
@@ -549,7 +549,7 @@ w2tw <- function(w,format){
     out <- w*0
     colnames(out) <- cnames
     for (i in 1:ns){
-        tw <- tera.wasserburg(x=w,i=i,format=format)
+        tw <- tera_wasserburg(x=w,i=i,format=format)
         out[i,] <- wtw_helper(x=tw$x,covmat=tw$cov,cnames=cnames)
     }
     out
@@ -671,7 +671,7 @@ age_to_terawasserburg_ratios <- function(tt,st=0,exterr=FALSE,d=diseq()){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
     U <- iratio('U238U235')[1]
-    tt <- check.zero.UPb(tt)
+    tt <- check_zero_UPb(tt)
     McL <- mclean(tt=tt,d=d,exterr=exterr)
     U238Pb206 <- 1/McL$Pb206U238
     Pb207Pb206 <- McL$Pb207U235/(U*McL$Pb206U238)
@@ -826,7 +826,7 @@ age_to_U238Pb206_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
         }
     } else {
         l8 <- lambda('U238')[1]
-        tt <- check.zero.UPb(tt)
+        tt <- check_zero_UPb(tt)
         McL <- mclean(tt=tt,d=d,exterr=exterr)
         R <- 1/McL$Pb206U238
         if (exterr){
@@ -857,7 +857,7 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
     } else {
         l5 <- lambda('U235')[1]
         l8 <- lambda('U238')[1]
-        tt <- check.zero.UPb(tt)
+        tt <- check_zero_UPb(tt)
         U <- iratio('U238U235')[1]
         McL <- mclean(tt=tt,d=d,exterr=exterr)
         R <- (1/U)*McL$Pb207U235/McL$Pb206U238
@@ -907,7 +907,7 @@ age_to_Pb208Th232_ratio <- function(tt,st=0,exterr=FALSE){
     out    
 }
 
-check.zero.UPb <- function(tt){
+check_zero_UPb <- function(tt){
     smallnum <- 2*.Machine$double.neg.eps/lambda('U238')[1]
     if (length(tt)>1){
         pos <- which(tt>0)
@@ -919,7 +919,7 @@ check.zero.UPb <- function(tt){
     out
 }
 
-get.Pb207U235.ratios <- function(x,exterr=FALSE){
+get_Pb207U235_ratios <- function(x,exterr=FALSE){
     ns <- length(x)
     out <- matrix(0,ns,2)
     labels <- c('Pb207U235','errPb207U235')
@@ -943,11 +943,11 @@ get.Pb207U235.ratios <- function(x,exterr=FALSE){
         out[,'errPb207U235'] <-
             out[,'Pb207U235']*x$x[,'errU235Pb207']/x$x[,'U235Pb207']
     } else {
-        stop('Invalid U-Pb format for get.Pb207U235.ratios')
+        stop('Invalid U-Pb format for get_Pb207U235_ratios')
     }
     out
 }
-get.Pb206U238.ratios <- function(x){
+get_Pb206U238_ratios <- function(x){
     ns <- length(x)
     out <- matrix(0,ns,2)
     labels <- c('Pb206U238','errPb206U238')
@@ -959,11 +959,11 @@ get.Pb206U238.ratios <- function(x){
         out[,'errPb206U238'] <- out[,'Pb206U238']*
             x$x[,'errU238Pb206']/x$x[,'U238Pb206']
     } else {
-        stop('Invalid U-Pb format for get.Pb206U238.ratios')
+        stop('Invalid U-Pb format for get_Pb206U238_ratios')
     }
     out
 }
-get.U238Pb206.ratios <- function(x){
+get_U238Pb206_ratios <- function(x){
     ns <- length(x)
     out <- matrix(0,ns,2)
     labels <- c('U238Pb206','errU238Pb206')
@@ -975,11 +975,11 @@ get.U238Pb206.ratios <- function(x){
     } else if (x$format %in% c(2,5,8,9,11,85,119)){
         out <- subset(x$x,select=labels)
     } else {
-        stop('Invalid U-Pb format for get.U238Pb206.ratios')
+        stop('Invalid U-Pb format for get_U238Pb206_ratios')
     }
     out
 }
-get.Pb207Pb206.ratios <- function(x,exterr=FALSE){
+get_Pb207Pb206_ratios <- function(x,exterr=FALSE){
     ns <- length(x)
     out <- matrix(0,ns,2)
     labels <- c('Pb207Pb206','errPb207Pb206')
@@ -1000,11 +1000,11 @@ get.Pb207Pb206.ratios <- function(x,exterr=FALSE){
     } else if (x$format %in% c(2,3,5,6,8,85)){
         out <- subset(x$x,select=labels)
     } else {
-        stop('Invalid U-Pb format for get.Pb207Pb206.ratios')
+        stop('Invalid U-Pb format for get_Pb207Pb206_ratios')
     }
     out
 }
-get.Pb208Th232.ratios <- function(x){
+get_Pb208Th232_ratios <- function(x){
     labels <- c('Pb208Th232','errPb208Th232')
     if (x$format == 7){
         out <- x$x[,labels,drop=FALSE]
@@ -1052,7 +1052,7 @@ get.Pb208Th232.ratios <- function(x){
     }
     out
 }
-get.Pb208Pb206.ratios <- function(x){
+get_Pb208Pb206_ratios <- function(x){
     labels <- c('Pb208Pb206','errPb208Pb206')
     if (x$format == 7){
         ns <- length(x)
@@ -1078,8 +1078,17 @@ get.Pb208Pb206.ratios <- function(x){
     out
 }
 
-get.Pb207U235.age <- function(x,...){ UseMethod("get.Pb207U235.age",x) }
-get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
+#' Compute Pb207/U235 age(s)
+#' @param x either an object of class \code{UPb} or a Pb207/U235-ratio
+#' @noRd
+get_Pb207U235_age <- function(x,...){
+    UseMethod("get_Pb207U235_age",x)
+}
+#' @param sx the standard error of \code{x}
+#' @param exterr propagate the decay constant uncertainty?
+#' @param d an object of class \code{diseq}
+#' @noRd
+get_Pb207U235_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -1087,7 +1096,7 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb207U235.age(x[i],sxi,exterr=exterr,d=d[i],...)
+            out[i,] <- get_Pb207U235_age(x[i],sxi,exterr=exterr,d=d[i],...)
         }
     } else {
         if (is.na(x)) return(c('t75'=NA,'s[t75]'=NA))
@@ -1115,29 +1124,45 @@ get.Pb207U235.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     }
     out
 }
-get.Pb207U235.age.UPb <- function(x,i=NULL,exterr=FALSE,...){
-    r75 <- get.Pb207U235.ratios(x)
+#' @param i an aliquot number. If \code{NULL}, returns all ages
+#' @noRd
+get_Pb207U235_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
+    r75 <- get_Pb207U235_ratios(x)
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,2)
         for (j in 1:ns){
-            out[j,] <- get.Pb207U235.age.UPb(x,i=j,exterr=exterr,...)
+            out[j,] <- get_Pb207U235_age.UPb(x,i=j,exterr=exterr,...)
         }
     } else {
-        out <- get.Pb207U235.age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],
+        out <- get_Pb207U235_age(r75[i,'Pb207U235'],r75[i,'errPb207U235'],
                                  exterr=exterr,d=x$d[i],...)
     }
     out
 }
-get.Pb207U235.age.wetherill <- function(x,exterr=FALSE,...){
+#' @noRd
+get_Pb207U235_age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb207U235'
     r75 <- x$x[i]
     sr75 <- sqrt(x$cov[i,i])
-    get.Pb207U235.age(r75,sr75,exterr=exterr,d=x$d,...)
+    get_Pb207U235_age(r75,sr75,exterr=exterr,d=x$d,...)
 }
 
-get.Pb206U238.age <- function(x,...){ UseMethod("get.Pb206U238.age",x) }
-get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
+#' Compute Pb206/U238 age(s)
+#' @param x either an object of class \code{UPb} or a Pb206/U238-ratio
+#' @noRd
+get_Pb206U238_age <- function(x,...){
+    UseMethod("get_Pb206U238_age",x)
+}
+#' @param sx the standard error of \code{x}
+#' @param exterr propagate the decay constant uncertainty?
+#' @param d an object of class \code{diseq}
+#' @param bayes if \code{TRUE}, computes the posterior distribution
+#'     for the disequilibrium correction
+#' @param plot if \code{TRUE}, plots the aforementioned posterior
+#'     distribution
+#' @noRd
+get_Pb206U238_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
                                       bayes=FALSE,plot=FALSE,...){
     ns <- length(x)
     if (ns>1){
@@ -1146,7 +1171,7 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb206U238.age(x[i],sxi,exterr=exterr,d=d[i])
+            out[i,] <- get_Pb206U238_age(x[i],sxi,exterr=exterr,d=d[i])
         }
     } else {
         if (is.na(x)) return(c('t68'=NA,'s[t68]'=NA))
@@ -1184,33 +1209,37 @@ get.Pb206U238.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
     }
     out
 }
-get.Pb206U238.age.UPb <- function(x,i=NULL,exterr=FALSE,...){
-    r68 <- get.Pb206U238.ratios(x)
+#' @param i an aliquote number. If \code{NULL}, returns all ages
+#' @noRd
+get_Pb206U238_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
+    r68 <- get_Pb206U238_ratios(x)
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,2)
         for (j in 1:ns){
-            out[j,] <- get.Pb206U238.age.UPb(x,i=j,exterr=exterr,...)
+            out[j,] <- get_Pb206U238_age.UPb(x,i=j,exterr=exterr,...)
         }
     } else {
-        out <- get.Pb206U238.age(r68[i,'Pb206U238'],
+        out <- get_Pb206U238_age(r68[i,'Pb206U238'],
                                  r68[i,'errPb206U238'],
                                  exterr=exterr,d=x$d[i],...)
     }
     out
 }
-get.Pb206U238.age.wetherill <- function(x,exterr=FALSE,...){
+#' @noRd
+get_Pb206U238_age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb206U238'
     r68 <- x$x[i]
     sr68 <- sqrt(x$cov[i,i])
-    get.Pb206U238.age(r68,sr68,exterr=exterr,d=x$d,...)
+    get_Pb206U238_age(r68,sr68,exterr=exterr,d=x$d,...)
 }
-get.Pb206U238.age.terawasserburg <- function(x,exterr=FALSE,...){
+#' @noRd
+get_Pb206U238_age.terawasserburg <- function(x,exterr=FALSE,...){
     i <- 'U238Pb206'
     r86 <- x$x[i]
     r68 <- 1/r86
     sr68 <- sqrt(x$cov[i,i])/r86
-    get.Pb206U238.age(r68,sr68,exterr=exterr,d=x$d,...)
+    get_Pb206U238_age(r68,sr68,exterr=exterr,d=x$d,...)
 }
 
 twslope <- function(tt=0,d=diseq()){
@@ -1218,8 +1247,18 @@ twslope <- function(tt=0,d=diseq()){
     McL$dPb207U235dt/McL$dPb206U238dt
 }
 
-get.Pb207Pb206.age <- function(x,...){ UseMethod("get.Pb207Pb206.age",x) }
-get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,...){
+#' Compute Pb207/Pb206 age(s)
+#' @param x either an object of class \code{UPb} or a Pb207/Pb206-ratio
+#' @noRd
+get_Pb207Pb206_age <- function(x,...){
+    UseMethod("get_Pb207Pb206_age",x)
+}
+#' @param sx the standard error of \code{x}
+#' @param exterr propagate the decay constant uncertainty?
+#' @param d an object of class \code{diseq}
+#' @param t.68 a Pb206/U238-age to initialise the calculation
+#' @noRd
+get_Pb207Pb206_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -1227,7 +1266,7 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,.
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb207Pb206.age(x[i],sxi,exterr=exterr,d=d[i],t.68=t.68)
+            out[i,] <- get_Pb207Pb206_age(x[i],sxi,exterr=exterr,d=d[i],t.68=t.68)
         }
     } else {
         if (is.na(x)) return(c('t68'=NA,'s[t68]'=NA))
@@ -1260,14 +1299,17 @@ get.Pb207Pb206.age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,.
         out <- c(t.76,st.76)
         names(out) <- c('t76','s[t76]')
     }
-    out    
+    out
 }
-get.Pb207Pb206.age.UPb <- function(x,i=1,exterr=FALSE,...){
-    r76 <- get.Pb207Pb206.ratios(x)
-    get.Pb207Pb206.age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],
+#' @param i and aliquot number
+#' @noRd
+get_Pb207Pb206_age.UPb <- function(x,i=1,exterr=FALSE,...){
+    r76 <- get_Pb207Pb206_ratios(x)
+    get_Pb207Pb206_age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],
                        exterr=exterr,d=x$d[i],...)
 }
-get.Pb207Pb206.age.wetherill <- function(x,exterr=FALSE,...){
+#' @noRd
+get_Pb207Pb206_age.wetherill <- function(x,exterr=FALSE,...){
     U <- iratio('U238U235')[1]
     r76 <- x$x['Pb207U235']/(U*x$x['Pb206U238'])
     J <- matrix(0,1,2)
@@ -1275,16 +1317,25 @@ get.Pb207Pb206.age.wetherill <- function(x,exterr=FALSE,...){
     J[1,1] <- 1/(U*x$x['Pb206U238'])                   # d76d75
     J[1,2] <- -x$x['Pb207U235']/(U*x$x['Pb206U238']^2) # d76d68
     sr76 <- J %*% E %*% t(J)
-    get.Pb207Pb206.age(r76,sr76,exterr=exterr,d=x$d)
+    get_Pb207Pb206_age(r76,sr76,exterr=exterr,d=x$d)
 }
-get.Pb207Pb206.age.terawasserburg <- function(x,exterr=FALSE,...){
+#' @noRd
+get_Pb207Pb206_age.terawasserburg <- function(x,exterr=FALSE,...){
     r76 <- x$x['Pb207Pb206']
     sr76 <- x$cov['Pb207Pb206','Pb207Pb206']
-    get.Pb207Pb206.age(r76,sr76,exterr=exterr,d=x$d)
+    get_Pb207Pb206_age(r76,sr76,exterr=exterr,d=x$d)
 }
 
-get.Pb208Th232.age <- function(x,...){ UseMethod("get.Pb208Th232.age",x) }
-get.Pb208Th232.age.default <- function(x,sx=0,exterr=FALSE,...){
+#' Compute Pb208/Th232 age(s)
+#' @param x either an object of class \code{UPb} or a Pb208/Th232-ratio
+#' @noRd
+get_Pb208Th232_age <- function(x,...){
+    UseMethod("get_Pb208Th232_age",x)
+}
+#' @param sx the standard error of \code{x}
+#' @param exterr propagate the decay constant uncertainty?
+#' @noRd
+get_Pb208Th232_age.default <- function(x,sx=0,exterr=FALSE,...){
     ns <- length(x)
     if (ns>1){
         out <- matrix(0,ns,2)
@@ -1292,7 +1343,7 @@ get.Pb208Th232.age.default <- function(x,sx=0,exterr=FALSE,...){
         for (i in 1:ns){
             if (length(sx) < ns) sxi <- sx[1]
             else sxi <- sx[i]
-            out[i,] <- get.Pb208Th232.age(x[i],sxi,exterr=exterr)
+            out[i,] <- get_Pb208Th232_age(x[i],sxi,exterr=exterr)
         }
     } else {
         if (is.na(x)) return(c('t82'=NA,'s[t82]'=NA))
@@ -1312,16 +1363,18 @@ get.Pb208Th232.age.default <- function(x,sx=0,exterr=FALSE,...){
     }
     out
 }
-get.Pb208Th232.age.UPb <- function(x,i=NULL,exterr=FALSE,...){
-    r82 <- get.Pb208Th232.ratios(x)
+#' @param i an aliquot number
+#' @noRd
+get_Pb208Th232_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
+    r82 <- get_Pb208Th232_ratios(x)
     if (is.null(i)){
         ns <- length(x)
         out <- matrix(0,ns,2)
         for (j in 1:ns){
-            out[j,] <- get.Pb208Th232.age.UPb(x,i=j,exterr=exterr,...)
+            out[j,] <- get_Pb208Th232_age.UPb(x,i=j,exterr=exterr,...)
         }
     } else {
-        out <- get.Pb208Th232.age(r82[i,'Pb208Th232'],r82[i,'errPb208Th232'],
+        out <- get_Pb208Th232_age(r82[i,'Pb208Th232'],r82[i,'errPb208Th232'],
                                  exterr=exterr,...)
     }
     out
@@ -1383,17 +1436,17 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     }
     t.75 <- t.68 <- t.76 <- t.82 <- t.conc <- dif <- pval <- NULL
     if (do75){
-        t.75 <- get.Pb207U235.age(Xi,exterr=exterr)
+        t.75 <- get_Pb207U235_age(Xi,exterr=exterr)
     }
     if (do68){
-        t.68 <- get.Pb206U238.age(Xi,exterr=exterr)
+        t.68 <- get_Pb206U238_age(Xi,exterr=exterr)
     }
     if (do76){
-        t.76 <- get.Pb207Pb206.age(Xi,exterr=exterr,
+        t.76 <- get_Pb207Pb206_age(Xi,exterr=exterr,
                                    t.68=subset(t.68,select=1))
     }
     if (do82) {
-        t.82 <- get.Pb208Th232.age(Xi,exterr=exterr)
+        t.82 <- get_Pb208Th232_age(Xi,exterr=exterr)
     }
     if (x$format<9 || x$format==85){
         if (conc){

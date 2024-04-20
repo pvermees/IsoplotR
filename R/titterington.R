@@ -363,10 +363,20 @@ L.tit <- function(abAB,dat){
     S/2
 }
 
-data2tit <- function(x,...){ UseMethod("data2tit",x) }
-data2tit.default <- function(x,...){ stop('default function undefined') }
-# osmond = FALSE: 8/2 - 4/2 - 0/2
-# osmond = TRUE : 2/8 - 4/8 - 0/8
+#' Convert IsoplotR data to Titterington ratios
+#' @noRd
+data2tit <- function(x,...){
+    UseMethod("data2tit",x)
+}
+#' @noRd
+data2tit.default <- function(x,...){
+    stop('default function undefined')
+}
+#' @param osmond if \code{TRUE}, generates 2/8 - 4/8 - 0/8 ratios
+#' if \code{FALSE}, generates 8/2 - 4/2 - 0/2 ratios
+#' @param generic \if \code{TRUE}, uses X, Y, Z labels,
+#' otherwise uses isotopic ratio labels
+#' @noRd
 data2tit.ThU <- function(x,osmond=TRUE,generic=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,9)

@@ -498,21 +498,21 @@ get.cor.68.76 <- function(Pb207U235,errPb207U235,
                  Pb207Pb206,errPb207Pb206,
                  Pb207U235,errPb207U235)
 }
-get.cov.75.68 <- function(Pb207U235,errPb207U235,
+get_cov_75_68 <- function(Pb207U235,errPb207U235,
                           Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
     get.cov.div(Pb207U235,errPb207U235,
                 Pb206U238,errPb206U238,
                 Pb207Pb206,errPb207Pb206)
 }
-get.cov.75.48 <- function(Pb207U235,errPb207U235,
+get_cov_75_48 <- function(Pb207U235,errPb207U235,
                           Pb204U238,errPb204U238,
                           Pb204Pb207,errPb204Pb207){
     get.cov.div(Pb207U235,errPb207U235,
                 Pb204U238,errPb204U238,
                 Pb204Pb207,errPb204Pb207)
 }
-get.cov.68.48 <- function(Pb206U238,errPb206U238,
+get_cov_68_48 <- function(Pb206U238,errPb206U238,
                           Pb204U238,errPb204U238,
                           Pb204Pb206,errPb204Pb206){
     get.cov.div(Pb206U238,errPb206U238,

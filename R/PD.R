@@ -1,4 +1,4 @@
-get.PD.ratio <- function(tt,st,nuclide,exterr=FALSE,bratio=1){
+getPDratio <- function(tt,st,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     R <- bratio*(exp(L[1]*tt)-1)
     Jac <- matrix(0,1,2)
@@ -11,7 +11,7 @@ get.PD.ratio <- function(tt,st,nuclide,exterr=FALSE,bratio=1){
     out <- c(R,sR)
 }
 
-get.PD.age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1){
+getPDage <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     tt <- log(1 + DP/bratio)/L[1]
     E <- matrix(0,2,2)
@@ -57,7 +57,7 @@ PD.age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
         if (projerr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
         DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
     }
-    out <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
+    out <- getPDage(subset(DP,select=1),subset(DP,select=2),
                      nuclide,exterr=exterr,bratio=bratio,...)
     if (!is.null(i)) out <- out[i,,drop=FALSE]
     colnames(out) <- c('t','s[t]')
@@ -87,7 +87,11 @@ get.nominal.initials <- function(x){
     list(y0=out[1],sy0=out[2])
 }
 
+#' Convert isotope dilution derived concentrations to ratios
+#' @param x an IsoplotR data object with \code{x$format=3}
+#' @noRd
 ppm2ratios <- function(x,...){ UseMethod("ppm2ratios",x) }
+#' @noRd
 ppm2ratios.default <- function(x,...){
     stop('Method ppm2ratios not available for this class.')
 }

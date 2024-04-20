@@ -231,7 +231,7 @@ central.fissiontracks <- function(x,exterr=FALSE,...){
         out <- central.default(tst)
     }
     if (exterr){
-        out$age[1:2] <- add.exterr(x,tt=out$age[1],st=out$age[2])
+        out$age[1:2] <- add_exterr(x,tt=out$age[1],st=out$age[2])
     }
     out
 }

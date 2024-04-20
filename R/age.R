@@ -102,13 +102,13 @@ age.default <- function(x,method='U238-Pb206',oerr=1,sigdig=NA,
                         rhoD=c(NA,NA),d=diseq(),...){
     if (length(x)==1) x <- c(x,0)
     if (identical(method,'U235-Pb207')){
-        tst <- get.Pb207U235.age(x=x[1],sx=x[2],exterr=exterr,d=d)
+        tst <- get_Pb207U235_age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'U238-Pb206')){
-        tst <- get.Pb206U238.age(x=x[1],sx=x[2],exterr=exterr,d=d)
+        tst <- get_Pb206U238_age(x=x[1],sx=x[2],exterr=exterr,d=d)
     } else if (identical(method,'Pb207-Pb206')){
-        tst <- get.Pb207Pb206.age(x=x[1],sx=x[2],exterr,d=d)
+        tst <- get_Pb207Pb206_age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Th232-Pb208')){
-        tst <- get.Pb208Th232.age(x=x[1],sx=x[2],exterr,d=d)
+        tst <- get_Pb208Th232_age(x=x[1],sx=x[2],exterr,d=d)
     } else if (identical(method,'Ar-Ar')){
         tst <- get.ArAr.age(Ar40Ar39=x[1],sAr40Ar39=x[2],
                             J=J[1],sJ=J[2],exterr=exterr)
@@ -465,40 +465,40 @@ age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
 }
 # tt and st are the age and error (scalars produced by peakfit or weightedmean)
 # calculated without taking into account the external errors
-add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
+add_exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out <- c(tt,st)
     if (is.UPb(x)){
         md <- mediand(x$d)
         if (type==1){
             R <- age_to_Pb207U235_ratio(tt,st,d=md)
-            out <- get.Pb207U235.age(R[1],R[2],d=md,exterr=TRUE)
+            out <- get_Pb207U235_age(R[1],R[2],d=md,exterr=TRUE)
         } else if (type==2 | (type==4 & (tt<cutoff.76)) | (type==5)){
             R <- age_to_Pb206U238_ratio(tt,st,d=md)
-            out <- get.Pb206U238.age(R[1],R[2],d=md,exterr=TRUE)
+            out <- get_Pb206U238_age(R[1],R[2],d=md,exterr=TRUE)
         } else if (type==3 | (type==4 & (tt>=cutoff.76))){
             R <- age_to_Pb207Pb206_ratio(tt,st,d=md)
-            out <- get.Pb207Pb206.age(R[1],R[2],d=md,exterr=TRUE)
+            out <- get_Pb207Pb206_age(R[1],R[2],d=md,exterr=TRUE)
         }
     } else if (is.PbPb(x)){
         R <- age_to_Pb207Pb206_ratio(tt,st)
-        out <- get.Pb207Pb206.age(R[1],R[2],exterr=TRUE)
+        out <- get_Pb207Pb206_age(R[1],R[2],exterr=TRUE)
     } else if (is.ArAr(x)){
-        R <- get.ArAr.ratio(tt,st,x$J[1],0,exterr=FALSE)
+        R <- get_ArAr_ratio(tt,st,x$J[1],0,exterr=FALSE)
         out <- get.ArAr.age(R[1],R[2],x$J[1],x$J[2],exterr=TRUE)
     } else if (is.KCa(x)){
-        R <- get.KCa.ratio(tt,st,exterr=FALSE)
+        R <- get_KCa_ratio(tt,st,exterr=FALSE)
         out <- get.KCa.age(R[1],R[2],exterr=TRUE)
     } else if (is.ReOs(x)){
-        R <- get.ReOs.ratio(tt,st,exterr=FALSE)
+        R <- get_ReOs_ratio(tt,st,exterr=FALSE)
         out <- get.ReOs.age(R[1],R[2],exterr=TRUE)
     } else if (is.SmNd(x)){
-        R <- get.SmNd.ratio(tt,st,exterr=FALSE)
+        R <- get_SmNd_ratio(tt,st,exterr=FALSE)
         out <- get.SmNd.age(R[1],R[2],exterr=TRUE)
     } else if (is.RbSr(x)){
-        R <- get.RbSr.ratio(tt,st,exterr=FALSE)
+        R <- get_RbSr_ratio(tt,st,exterr=FALSE)
         out <- get.RbSr.age(R[1],R[2],exterr=TRUE)
     } else if (is.LuHf(x)){
-        R <- get.LuHf.ratio(tt,st,exterr=FALSE)
+        R <- get_LuHf_ratio(tt,st,exterr=FALSE)
         out <- get.LuHf.age(R[1],R[2],exterr=TRUE)
     } else if (is.fissiontracks(x)){
         zeta <- c(1,0)
@@ -518,10 +518,10 @@ add.exterr <- function(x,tt,st,cutoff.76=1100,type=4){
     out
 }
 
-get.ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
+get_ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
                      cutoff.disc=discfilter(),common.Pb=0,Th0i=0){
     if (is.UPb(x)){
-        out <- filter.UPb.ages(x,type=type,cutoff.76=cutoff.76,
+        out <- filter_UPb_ages(x,type=type,cutoff.76=cutoff.76,
                                cutoff.disc=cutoff.disc,omit4c=omit4c,
                                exterr=FALSE,common.Pb=common.Pb)
     } else if (is.PbPb(x)){
@@ -625,17 +625,17 @@ age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,
     } else if (ratio=='U-Th-Pb'){
         out <- age_to_cottle_ratios(tt,st,d=d,exterr=exterr)
     } else if (ratio=='Ar40Ar39'){
-        out <- get.ArAr.ratio(tt,st,J=J,sJ=sJ,exterr=exterr)
+        out <- get_ArAr_ratio(tt,st,J=J,sJ=sJ,exterr=exterr)
     } else if (ratio=='Ca40K40'){
-        out <- get.KCa.ratio(tt,st,exterr=exterr,bratio=bratio)
+        out <- get_KCa_ratio(tt,st,exterr=exterr,bratio=bratio)
     } else if (ratio=='Hf176Lu176'){
-        out <- get.LuHf.ratio(tt,st,exterr=exterr)
+        out <- get_LuHf_ratio(tt,st,exterr=exterr)
     } else if (ratio=='Sr87Rb87'){
-        out <- get.RbSr.ratio(tt,st,exterr=exterr)
+        out <- get_RbSr_ratio(tt,st,exterr=exterr)
     } else if (ratio=='Os187Re187'){
-        out <- get.ReOs.ratio(tt,st,exterr=exterr)
+        out <- get_ReOs_ratio(tt,st,exterr=exterr)
     } else if (ratio=='Nd143Sm147'){
-        out <- get.SmNd.ratio(tt,st,exterr=exterr)
+        out <- get_SmNd_ratio(tt,st,exterr=exterr)
     } else if (ratio=='Stacey-Kramers'){
         out <- stacey.kramers(tt)
     } else {

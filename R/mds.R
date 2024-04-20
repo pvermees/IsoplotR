@@ -228,6 +228,7 @@ Wasserstein.diss <- function(x,y,p=2) {
     out
 }
 
+#' @noRd
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
                      col='black',bg='white',xlab=NA,ylab=NA,asp=1,pch,...){
     if (shepard & !x$classical){

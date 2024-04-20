@@ -166,7 +166,7 @@ radialplot.default <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                   hide=hide,omit=omit,omit.col=omit.col,...)
     fit <- central(x2calc)
     graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,
-                                 units=units,ntit=get.ntit(x2calc[,1])))
+                                 units=units,ntit=get_ntit(x2calc[,1])))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -217,7 +217,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
     fit <- central(x2calc,exterr=exterr)
     graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,
-                                 units=' Ma',ntit=get.ntit(x2calc)))
+                                 units=' Ma',ntit=get_ntit(x2calc)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
 }
@@ -478,7 +478,7 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',type=4,
                      oerr=oerr,i2i=i2i,type=type,cutoff.76=cutoff.76,
                      cutoff.disc=cutoff.disc,common.Pb=common.Pb,Th0i=Th0i)
     markers <- c(markers,peaks$peaks['t',])
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,i2i=i2i,
+    tt <- get_ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,i2i=i2i,
                    omit4c=unique(c(hide,omit)),Th0i=Th0i,common.Pb=common.Pb)
     radial_helper(tt,from=from,to=to,z0=z0,transformation=transformation,
                   show.numbers=show.numbers,pch=pch,levels=levels,
@@ -487,11 +487,11 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,transformation='log',type=4,
     selection <- clear(1:nrow(tt),unique(c(hide,omit)))
     fit <- central(tt[selection,])
     if (exterr){
-        fit$age[1:2] <- add.exterr(x2calc,tt=fit$age[1],st=fit$age[2],
+        fit$age[1:2] <- add_exterr(x2calc,tt=fit$age[1],st=fit$age[2],
                                    cutoff.76=cutoff.76,type=type)
     }
     graphics::title(radial.title(fit,sigdig=sigdig,oerr=oerr,
-                                 units=units,ntit=get.ntit(tt[,1]),
+                                 units=units,ntit=get_ntit(tt[,1]),
                                  caveat=(i2i|common.Pb==2|Th0i==1)))
     if (!is.null(peaks$legend))
         graphics::legend('bottomleft',legend=peaks$legend,bty='n')
@@ -672,7 +672,17 @@ get.radial.tticks <- function(x){
     out
 }
 
-x2zs <- function(x,...){ UseMethod("x2zs",x) }
+#' Data transformation for radial plots
+#' @param x an IsoplotR data object
+#' @noRd
+x2zs <- function(x,...){
+    UseMethod("x2zs",x)
+}
+#' @param z0 central value
+#' @param from minimum value
+#' @param to maximum value
+#' @param transformation either 'log', 'linear', 'sqrt', 'arcsin' or NA
+#' @noRd
 x2zs.default <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
     out <- list()
     if (is.na(transformation)) out$transformation <- 'log'
@@ -695,7 +705,7 @@ x2zs.default <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
         out$s <- x[,2]
         out$xlab <- expression(1/sigma)
     }
-    out$z0 <- get.z0(out,z0,from,to)
+    out$z0 <- get_z0(out,z0,from,to)
     # reset limits if necessary
     if (is.na(from)){
         min.z <- get.min.z(out)
@@ -721,6 +731,7 @@ x2zs.default <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
     }
     out
 }
+#' @noRd
 x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
     out <- list()
     if (transformation %in% c('linear','log','arcsin','sqrt')){
@@ -736,14 +747,14 @@ x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
             tt <- fissiontrack.age(x,exterr=FALSE)
             out$z <- tt[,'t']
             out$s <- tt[,'s[t]']
-            out$z0 <- get.z0(out,z0,from,to)
+            out$z0 <- get_z0(out,z0,from,to)
             out$xlab <- expression(1/sigma)
         }
         if (identical(transformation,'sqrt')){
             tt <- fissiontrack.age(x,exterr=FALSE)
             out$z <- sqrt(tt[,'t'])
             out$s <- 0.5*tt[,'s[t]']/out$z
-            out$z0 <- get.z0(out,z0,from,to)
+            out$z0 <- get_z0(out,z0,from,to)
             out$xlab <- 'precision'
         }
         if (identical(transformation,'log')){
@@ -754,7 +765,7 @@ x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
                 out$offset <- 0
                 out$z <- log(tt[,'t'])
                 out$s <- tt[,'s[t]']/tt[,'t']
-                out$z0 <- get.z0(out,z0,from,to)
+                out$z0 <- get_z0(out,z0,from,to)
                 out$xlab <- expression(t/sigma)
             }
         }
@@ -814,7 +825,7 @@ x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
 # only for log and lin transformation
 # x is a list containing the items z, s, transformation
 # and (if transformation=='log) offset
-get.z0 <- function(x,z0=NA,from=NA,to=NA){
+get_z0 <- function(x,z0=NA,from=NA,to=NA){
     if (is.na(z0)){
         if (is.na(from) | is.na(to)) {
             z0 <- mean(x$z,na.rm=TRUE)
