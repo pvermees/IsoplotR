@@ -156,66 +156,80 @@ anchoredYork <- function(x,y0=0,sy0=0){
 }
 
 #' Returns the dependent variable of a conventional isochron
+#'
+#' Helper function that returns a string with the Dd ratio of a given
+#' chronometer
 #' @param x an IsoplotR data object
+#' @param ... optional arguments
 #' @noRd
 gety0rat <- function(x,...){ UseMethod("gety0rat",x) }
 #' @noRd
 gety0rat.default <- function(x,...){ NULL }
 #' @noRd
-gety0rat.ArAr <- function(x){ 'Ar40Ar36' }
+gety0rat.ArAr <- function(x,...){ 'Ar40Ar36' }
 #' @noRd
-gety0rat.PbPb <- function(x){ 'Pb207Pb204' }
+gety0rat.PbPb <- function(x,...){ 'Pb207Pb204' }
 #' @noRd
-gety0rat.ThPb <- function(x){ 'Pb208Pb204' }
+gety0rat.ThPb <- function(x,...){ 'Pb208Pb204' }
 #' @noRd
-gety0rat.KCa <- function(x){ 'Ca40Ca44' }
+gety0rat.KCa <- function(x,...){ 'Ca40Ca44' }
 #' @noRd
-gety0rat.RbSr <- function(x){ 'Sr87Sr86' }
+gety0rat.RbSr <- function(x,...){ 'Sr87Sr86' }
 #' @noRd
-gety0rat.ReOs <- function(x){ 'Os187Os192' }
+gety0rat.ReOs <- function(x,...){ 'Os187Os192' }
 #' @noRd
-gety0rat.SmNd <- function(x){ 'Nd143Nd144' }
+gety0rat.SmNd <- function(x,...){ 'Nd143Nd144' }
 #' @noRd
-gety0rat.LuHf <- function(x){ 'Hf176Hf177' }
+gety0rat.LuHf <- function(x,...){ 'Hf176Hf177' }
 
-#' Returns the Daughter-Parent ratio of chronometer
+#' Returns the Daughter-Parent ratio
+#'
+#' Helper function that returns a string with the DP-ratio of a given
+#' chronometer
+#' 
 #' @param x an IsoplotR data object
+#' @param ... optional arguments
 #' @noRd
 getDPrat <- function(x,...){ UseMethod("getDPrat",x) }
 #' @noRd
 getDPrat.default <- function(x,...){ NULL }
 #' @noRd
-getDPrat.ArAr <- function(x){ 'Ar40Ar39' }
+getDPrat.ArAr <- function(x,...){ 'Ar40Ar39' }
 #' @noRd
-getDPrat.PbPb <- function(x){ 'Pb207Pb206' }
+getDPrat.PbPb <- function(x,...){ 'Pb207Pb206' }
 #' @noRd
-getDPrat.ThPb <- function(x){ 'Pb208Th232' }
+getDPrat.ThPb <- function(x,...){ 'Pb208Th232' }
 #' @noRd
-getDPrat.KCa <- function(x){ 'Ca40K40' }
+getDPrat.KCa <- function(x,...){ 'Ca40K40' }
 #' @noRd
-getDPrat.RbSr <- function(x){ 'Sr87Rb87' }
+getDPrat.RbSr <- function(x,...){ 'Sr87Rb87' }
 #' @noRd
-getDPrat.ReOs <- function(x){ 'Os187Re187' }
+getDPrat.ReOs <- function(x,...){ 'Os187Re187' }
 #' @noRd
-getDPrat.SmNd <- function(x){ 'Nd143Sm147' }
+getDPrat.SmNd <- function(x,...){ 'Nd143Sm147' }
 #' @noRd
-getDPrat.LuHf <- function(x){ 'Hf176Lu176' }
+getDPrat.LuHf <- function(x,...){ 'Hf176Lu176' }
 
-#' Returns the radioactive parent of a geochronometer
+#' Returns the radioactive parent
+#'
+#' Helper function that returns a string with the parent nuclide
+#' of a given chronometer
+#' 
 #' @param x an IsoplotR data object
+#' @param ... optional arguments
 #' @noRd
 getParent <- function(x,...){ UseMethod("getParent",x) }
 #' @noRd
 getParent.default <- function(x,...){ NULL }
 #' @noRd
-getParent.ThPb <- function(x){ 'Th232' }
+getParent.ThPb <- function(x,...){ 'Th232' }
 #' @noRd
-getParent.KCa <- function(x){ 'K40' }
+getParent.KCa <- function(x,...){ 'K40' }
 #' @noRd
-getParent.RbSr <- function(x){ 'Rb87' }
+getParent.RbSr <- function(x,...){ 'Rb87' }
 #' @noRd
-getParent.ReOs <- function(x){ 'Re187' }
+getParent.ReOs <- function(x,...){ 'Re187' }
 #' @noRd
-getParent.SmNd <- function(x){ 'Sm147' }
+getParent.SmNd <- function(x,...){ 'Sm147' }
 #' @noRd
-getParent.LuHf <- function(x){ 'Lu176' }
+getParent.LuHf <- function(x,...){ 'Lu176' }
