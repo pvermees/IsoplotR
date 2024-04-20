@@ -162,13 +162,15 @@ set.zeta <- function(x,tst,exterr=FALSE,oerr=1,sigdig=NA,update=TRUE){
         zsz[2] <- zsz[1] * sqrt( (L8*exp(L8*tt)*st/(exp(L8*tt)-1))^2 +
                                  (rhoD[2]/rhoD[1])^2 + 1/Ns + 1/Ni )
     } else {
-        Ns <- sum(x$Ns)
-        UsU <- get.UsU(x)
-        UA <- sum(UsU[,1]*x$A)
-        UAerr <- sqrt( sum(UsU[,2]*x$A)^2 )
-        zsz[1] <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
-        zsz[2] <- zsz[1] * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
-                                 1/Ns + (UAerr/UA)^2 )
+        Ns <- x$Ns
+        UsU <- get_UsU(x)
+        UA <- UsU[,1]*x$A
+        UAerr <- UsU[,2]*x$A
+        z <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
+        sz <- z * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
+                        1/Ns + (UAerr/UA)^2 )
+        fit <- continuous_mixture(log(z),sz/z)
+        zsz <- exp(fit$mu[1])*c(1,fit$mu[2])
     }
     if (update){
         out <- x
@@ -191,7 +193,7 @@ ICP.age <- function(x,i=NULL,exterr=FALSE){
     }
     ipos <- which(x$Ns>0)
     izero <- which(x$Ns<1)
-    UsU <- get.UsU(x)
+    UsU <- get_UsU(x)
     # first calculate the ages of the non-zero track data:
     for (i in ipos){
         tst <- get.ICP.age(x$Ns[i],x$A[i],UsU[i,],zeta)
@@ -210,7 +212,7 @@ ICP.age <- function(x,i=NULL,exterr=FALSE){
     out
 }
 
-get.UsU <- function(x){
+get_UsU <- function(x){
     Aicp <- pi*(x$spotSize/2)^2
     n <- length(x$U)
     nspots <- length(stats::na.omit(unlist(x$U)))
