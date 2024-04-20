@@ -82,7 +82,7 @@ ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
 }
 
 get_ReOs_ratio <- function(tt,st,exterr=FALSE){
-    getPDratio(tt,st,'Re187',exterr)
+    getDPratio(tt,st,'Re187',exterr)
 }
 
 get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=FALSE){

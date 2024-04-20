@@ -101,7 +101,7 @@ ppm2ratios.SmNd <- function(x,exterr=FALSE,common=FALSE,...){
 }
 
 get_SmNd_ratio <- function(tt,st,exterr=FALSE){
-    getPDratio(tt,st,'Sm147',exterr=exterr)
+    getDPratio(tt,st,'Sm147',exterr=exterr)
 }
 
 get.SmNd.age <- function(Nd143Sm147,sNd143Sm147,exterr=FALSE){

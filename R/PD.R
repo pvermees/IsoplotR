@@ -1,28 +1,26 @@
-getPDratio <- function(tt,st,nuclide,exterr=FALSE,bratio=1){
+getDPratio <- function(tt,st=0,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     R <- bratio*(exp(L[1]*tt)-1)
-    Jac <- matrix(0,1,2)
-    E <- matrix(0,2,2)
-    Jac[1,1] <- bratio*L[1]*exp(L[1]*tt)
-    if (exterr) Jac[1,2] <- bratio*tt*exp(L[1]*tt)
-    E[1,1] <- st^2
-    E[2,2] <- L[2]^2
-    sR <- sqrt(Jac %*% E %*% t(Jac))
-    out <- c(R,sR)
+    J1 <- bratio*L[1]*exp(L[1]*tt)
+    if (exterr) J2 <- bratio*tt*exp(L[1]*tt)
+    else J2 <- 0
+    E11 <- st^2
+    E22 <- L[2]^2
+    vR <- errorprop1x2(J1,J2,E11,E22)
+    out <- cbind(R,sqrt(vR))
+    colnames(out) <- c('PD','s[PD]')
+    out
 }
 
-getPDage <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1){
+getPDage <- function(DP,sDP=0,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     tt <- log(1 + DP/bratio)/L[1]
-    E <- matrix(0,2,2)
-    J <- matrix(0,1,2)
     E11 <- sDP^2
     if (exterr) E22 <- L[2]^2
     else E22 <- 0
-    E12 <- 0
     J1 <- 1/(L[1]*(bratio + DP)) # dt.dDP
     J2 <- -tt/L[1]               # dt.dL
-    vt <- errorprop1x2(J1,J2,E11,E22,E12)
+    vt <- errorprop1x2(J1,J2,E11,E22)
     out <- cbind(tt,sqrt(vt))
     colnames(out) <- c('t','s[t]')
     out

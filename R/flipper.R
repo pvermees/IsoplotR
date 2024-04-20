@@ -155,61 +155,64 @@ anchoredYork <- function(x,y0=0,sy0=0){
     out
 }
 
-#' @export
+#' Returns the dependent variable of a conventional isochron
+#' @noRd
 gety0rat <- function(x,...){ UseMethod("gety0rat",x) }
-#' @export
+#' @noRd
 gety0rat.default <- function(x,...){ NULL }
-#' @export
+#' @noRd
 gety0rat.ArAr <- function(x){ 'Ar40Ar36' }
-#' @export
+#' @noRd
 gety0rat.PbPb <- function(x){ 'Pb207Pb204' }
-#' @export
+#' @noRd
 gety0rat.ThPb <- function(x){ 'Pb208Pb204' }
-#' @export
+#' @noRd
 gety0rat.KCa <- function(x){ 'Ca40Ca44' }
-#' @export
+#' @noRd
 gety0rat.RbSr <- function(x){ 'Sr87Sr86' }
-#' @export
+#' @noRd
 gety0rat.ReOs <- function(x){ 'Os187Os192' }
-#' @export
+#' @noRd
 gety0rat.SmNd <- function(x){ 'Nd143Nd144' }
-#' @export
+#' @noRd
 gety0rat.LuHf <- function(x){ 'Hf176Hf177' }
 
-#' @export
+#' Returns the Daughter-Parent ratio of chronometer
+#' @noRd
 getDPrat <- function(x,...){ UseMethod("getDPrat",x) }
-#' @export
+#' @noRd
 getDPrat.default <- function(x,...){ NULL }
-#' @export
+#' @noRd
 getDPrat.ArAr <- function(x){ 'Ar40Ar39' }
-#' @export
+#' @noRd
 getDPrat.PbPb <- function(x){ 'Pb207Pb206' }
-#' @export
+#' @noRd
 getDPrat.ThPb <- function(x){ 'Pb208Th232' }
-#' @export
+#' @noRd
 getDPrat.KCa <- function(x){ 'Ca40K40' }
-#' @export
+#' @noRd
 getDPrat.RbSr <- function(x){ 'Sr87Rb87' }
-#' @export
+#' @noRd
 getDPrat.ReOs <- function(x){ 'Os187Re187' }
-#' @export
+#' @noRd
 getDPrat.SmNd <- function(x){ 'Nd143Sm147' }
-#' @export
+#' @noRd
 getDPrat.LuHf <- function(x){ 'Hf176Lu176' }
 
-#' @export
+#' Returns the radioactive parent of a geochronometer
+#' @noRd
 getParent <- function(x,...){ UseMethod("getParent",x) }
-#' @export
+#' @noRd
 getParent.default <- function(x,...){ NULL }
-#' @export
+#' @noRd
 getParent.ThPb <- function(x){ 'Th232' }
-#' @export
+#' @noRd
 getParent.KCa <- function(x){ 'K40' }
-#' @export
+#' @noRd
 getParent.RbSr <- function(x){ 'Rb87' }
-#' @export
+#' @noRd
 getParent.ReOs <- function(x){ 'Re187' }
-#' @export
+#' @noRd
 getParent.SmNd <- function(x){ 'Sm147' }
-#' @export
+#' @noRd
 getParent.LuHf <- function(x){ 'Lu176' }

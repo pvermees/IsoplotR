@@ -75,7 +75,7 @@ ppm2ratios.LuHf <- function(x,exterr=FALSE,common=FALSE,...){
 }
 
 get_LuHf_ratio <- function(tt,st,exterr=FALSE){
-    getPDratio(tt,st,nuclide='Lu176',exterr=exterr)
+    getDPratio(tt,st,nuclide='Lu176',exterr=exterr)
 }
 
 get.LuHf.age <- function(Hf176Lu176,sHf176Lu176,exterr=FALSE){

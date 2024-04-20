@@ -2106,23 +2106,32 @@ add_taxis <- function(x,...){ UseMethod("add_taxis",x) }
 add_taxis.default <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
-    tmin <- getPDage(DP=1/xlim[2],sDP=0,nuclide=getParent(x),...)[1]
-    xzero <- 1/age2ratio(tt=5000,st=0,ratio=getDPrat(x),...)[1]
+    ratio <- getDPrat(x)
+    parent <- getParent(x)
+    tmin <- getPDage(DP=1/xlim[2],nuclide=parent,...)[1]
+    xzero <- 1/age2ratio(tt=5000,st=0,ratio=ratio,...)[1]
     if (xzero<xmid){ # 5Ga is to the left of the middle
-        tmid <- getPDage(DP=1/xmid,sDP=0,nuclide=getParent(x),...)[1]
+        tmid <- getPDage(DP=1/xmid,sDP=0,nuclide=parent,...)[1]
     } else {
-        tmid <- getPDage(DP=1/xzero,sDP=0,nuclide=getParent(x),...)[1]
+        tmid <- getPDage(DP=1/xzero,sDP=0,nuclide=parent,...)[1]
     }
-    tmax <- max(tmid,fit$age[1] + 3*tail(fit$age,1))
-    tlim <- c(tmin,tmax)
-    xticks <- tticks <- taxisticks(tlim)
-    for (i in seq_along(tticks)){
-        xticks[i] <- 1/age2ratio(tt=tticks[i],st=0,ratio=getDPrat(x),...)[1]
+    plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,...)
+}
+#' @noRd
+add_taxis.ArAr <- function(x,fit,...){
+    xlim <- graphics::par('usr')[1:2]
+    xmid <- xlim[1] + diff(xlim)/3
+    ratio <- 'Ar40Ar39'
+    tmin <- get.ArAr.age(Ar40Ar39=1/xlim[2],J=x$J[1])[1]
+    xzero <- 1/age2ratio(tt=5000,ratio=ratio,J=x$J[1])[1]
+    if (xzero<xmid){ # 5Ga is to the left of the middle
+        tmid <- get.ArAr.age(Ar40Ar39=1/xmid,J=x$J[1])[1]
+    } else {
+        tmid <- get.ArAr.age(Ar40Ar39=1/xzero,J=x$J[1])[1]
     }
-    axis(1,at=xticks,labels=signif(tticks,5))
+    plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,J=x$j[1])
 }
 #' @param type controls the isochron projection
-#' @noRd
 add_taxis.UPb <- function(x,fit,type=1,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
@@ -2145,30 +2154,15 @@ add_taxis.UPb <- function(x,fit,type=1,...){
     } else {
         tmid <- tfun(x=1/xzero,sx=0,d=x$d)[1]
     }
-    tmax <- max(tmid,fit$age[1] + 3*tail(fit$age,1))
+    plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,d=x$d,...)
+}
+
+plot_taxis <- function(x,fit,tmin,tmid,ratio,...){
+    tmax <- max(tmid,fit$age[1] + 3*utils::tail(fit$age,1))
     tlim <- c(tmin,tmax)
     tticks <- taxisticks(tlim)
-    xticks <- 1/age2ratio(tt=tticks,ratio=ratio,d=x$d)[,1]
-    axis(1,at=xticks,labels=signif(tticks,5))
-}
-#' @noRd
-add_taxis.ArAr <- function(x,fit,...){
-    xlim <- graphics::par('usr')[1:2]
-    xmid <- xlim[1] + diff(xlim)/3
-    tmin <- get.ArAr.age(Ar40Ar39=1/xlim[2],J=x$J[1])[1]
-    xzero <- 1/age2ratio(tt=5000,ratio='Ar40Ar39',J=x$J[1])[1]
-    if (xzero<xmid){ # 5Ga is to the left of the middle
-        tmid <- get.ArAr.age(Ar40Ar39=1/xmid,J=x$J[1])[1]
-    } else {
-        tmid <- get.ArAr.age(Ar40Ar39=1/xzero,J=x$J[1])[1]
-    }
-    tmax <- max(tmid,fit$age[1] + 3*tail(fit$age,1))
-    tlim <- c(tmin,tmax)
-    xticks <- tticks <- taxisticks(tlim)
-    for (i in seq_along(tticks)){
-        xticks[i] <- 1/age2ratio(tticks[i],st=0,ratio='Ar40Ar39',J=x$J[1],sJ=0)[1]
-    }
-    axis(1,at=xticks,labels=signif(tticks,5))
+    xticks <- 1/age2ratio(tt=tticks,ratio=ratio,...)[,1]
+    graphics::axis(1,at=xticks,labels=signif(tticks,5))
 }
 
 taxisticks <- function(tlim){

@@ -67,7 +67,7 @@ ppm2ratios.RbSr <- function(x,exterr=FALSE,common=FALSE,...){
 }
 
 get_RbSr_ratio <- function(tt,st,exterr=FALSE){
-    getPDratio(tt,st,'Rb87',exterr)
+    getDPratio(tt,st,'Rb87',exterr)
 }
 
 get.RbSr.age <- function(Rb87Sr86,sRb87Sr86,exterr=FALSE){

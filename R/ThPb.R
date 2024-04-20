@@ -1,5 +1,5 @@
 get.ThPb.ratio <- function(tt,st,exterr=FALSE){
-    getPDratio(tt=tt,st=st,nuclide='Th232',exterr=exterr)
+    getDPratio(tt=tt,st=st,nuclide='Th232',exterr=exterr)
 }
 
 get.ThPb.age <- function(Pb208Th232,sPb208Th232,exterr=FALSE){
