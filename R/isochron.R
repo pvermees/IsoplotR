@@ -941,6 +941,7 @@ isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                 show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
 }
+#' @param bratio the \eqn{^{40}}K branching ratio.
 #' @rdname isochron
 #' @export
 isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
@@ -1518,7 +1519,7 @@ wDP2wt.ThPb <- function(x,DP,wDP,...){
 }
 #' @param bratio branching ratio
 #' @noRd
-wDP2wt.KCa <- function(x,DP,wDP,bratio=1,...){
+wDP2wt.KCa <- function(x,DP,wDP,bratio=0.895,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
 }
 #' @param nuclide the parent nuclide
@@ -1692,7 +1693,7 @@ ab2y0t.ThPb <- function(x,fit,inverse,exterr,wtype,...){
               nuclide='Th232',wtype=wtype)
 }
 #' @noRd
-ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
+ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=0.895,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='K40',bratio=bratio,wtype=wtype)
 }
@@ -2132,6 +2133,7 @@ add_taxis.ArAr <- function(x,fit,...){
     plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,J=x$j[1])
 }
 #' @param type controls the isochron projection
+#' @noRd
 add_taxis.UPb <- function(x,fit,type=1,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3

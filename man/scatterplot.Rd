@@ -150,6 +150,12 @@ omitted aliquots.}
 
 \item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
 
+\item{taxis}{logical. If \code{TRUE}, replaces the x-axis of an
+inverse isochron with a time scale. Only used if
+\code{inverse=TRUE}.}
+
+\item{xaxt}{see \code{?par}}
+
 \item{...}{optional arguments to format the points and text.}
 }
 \description{

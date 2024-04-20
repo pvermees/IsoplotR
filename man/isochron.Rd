@@ -654,6 +654,8 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
+
+\item{bratio}{the \eqn{^{40}}K branching ratio.}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ThPb},

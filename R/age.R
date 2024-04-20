@@ -577,6 +577,7 @@ get_ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #'     \code{ratio} is \code{'Ar40Ar39'}).
 #' @param sJ the standard error of \code{J} (only used if \code{ratio}
 #'     is \code{'Ar40Ar39'}).
+#' @param bratio branching ratio of \eqn{^40}K
 #' @return If \code{ratio} is \code{'Pb207U235'}, \code{'U238Pb206'},
 #'     \code{'Pb207Pb206'}, \code{'Pb208Th232'}, \code{'Ar40Ar39'},
 #'     \code{'Ca40K40'}, \code{'Hf176Lu176'}, \code{'Sr87Rb87'},
@@ -607,7 +608,7 @@ get_ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #' }
 #' @export
 age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,
-                      d=diseq(),J,sJ=0,bratio=1){
+                      d=diseq(),J,sJ=0,bratio=0.895){
     if (ratio=='Pb206U238'){
         out <- age_to_Pb206U238_ratio(tt,st,d=d,exterr=exterr)
     } else if (ratio=='Pb207U235'){

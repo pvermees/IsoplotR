@@ -156,6 +156,7 @@ anchoredYork <- function(x,y0=0,sy0=0){
 }
 
 #' Returns the dependent variable of a conventional isochron
+#' @param x an IsoplotR data object
 #' @noRd
 gety0rat <- function(x,...){ UseMethod("gety0rat",x) }
 #' @noRd
@@ -178,6 +179,7 @@ gety0rat.SmNd <- function(x){ 'Nd143Nd144' }
 gety0rat.LuHf <- function(x){ 'Hf176Hf177' }
 
 #' Returns the Daughter-Parent ratio of chronometer
+#' @param x an IsoplotR data object
 #' @noRd
 getDPrat <- function(x,...){ UseMethod("getDPrat",x) }
 #' @noRd
@@ -200,6 +202,7 @@ getDPrat.SmNd <- function(x){ 'Nd143Sm147' }
 getDPrat.LuHf <- function(x){ 'Hf176Lu176' }
 
 #' Returns the radioactive parent of a geochronometer
+#' @param x an IsoplotR data object
 #' @noRd
 getParent <- function(x,...){ UseMethod("getParent",x) }
 #' @noRd

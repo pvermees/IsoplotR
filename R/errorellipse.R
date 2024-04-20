@@ -126,6 +126,10 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param log same as the eponymous argument to the generic
 #'     \code{plot} function.
 #' @param box logical. If \code{TRUE}, draws a frame around the plot.
+#' @param taxis logical. If \code{TRUE}, replaces the x-axis of an
+#'     inverse isochron with a time scale. Only used if
+#'     \code{inverse=TRUE}.
+#' @param xaxt see \code{?par}
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
