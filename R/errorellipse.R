@@ -160,14 +160,25 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     colnames(xy) <- c('X','sX','Y','sY','rXY')
     if (is.null(xlim)){
         if (taxis & !is.null(fit)){
-            xlim <- c(0,-fit$a[1]/(fit$b[1]+2*fit$b[2]))
+            if (fit$model==3 && fit$wtype%in%c(2,'b')){
+                x0 <- -fit$a[1]/fit$b[1]
+                relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
+                xlim <- c(0,x0+ci(sx=x0*relerr))
+            } else {
+                xlim <- c(0,-fit$a[1]/(fit$b[1]+ci(sx=fit$b[2])))
+            }
         } else {
             xlim <- get_limits(xy[plotit,'X'],xy[plotit,'sX'])
         }
     }
     if (is.null(ylim)){
         if (taxis & !is.null(fit)){
-            ylim <- c(0,fit$a[1]+2*fit$a[2])
+            if (fit$model==3 && fit$wtype%in%c(1,'a')){
+                relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
+                ylim <- c(0,fit$a[1]+ci(sx=fit$a[1]*relerr))
+            } else {
+                ylim <- c(0,fit$a[1]+ci(sx=fit$a[2]))
+            }
         } else {
             ylim <- get_limits(xy[plotit,'Y'],xy[plotit,'sY'])
         }

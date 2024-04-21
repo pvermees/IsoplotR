@@ -55,6 +55,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
     if (ifi[1]){
         fit <- invertfit(fit,type=type,wtype=wtype)
     }
+    out$wtype <- wtype
     out <- append(out,fit)
     out$xyz <- yd
     out
