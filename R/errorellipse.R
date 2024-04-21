@@ -125,10 +125,10 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param asp the y/x aspect ratio, see `plot.window'.
 #' @param log same as the eponymous argument to the generic
 #'     \code{plot} function.
-#' @param box logical. If \code{TRUE}, draws a frame around the plot.
 #' @param taxis logical. If \code{TRUE}, replaces the x-axis of an
 #'     inverse isochron with a time scale. Only used if
 #'     \code{inverse=TRUE}.
+#' @param box logical. If \code{TRUE}, draws a frame around the plot.
 #' @param xaxt see \code{?par}
 #' @param ... optional arguments to format the points and text.
 #' 
@@ -150,7 +150,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
-                        asp=NA,log='',box=TRUE,taxis=FALSE,
+                        asp=NA,log='',taxis=FALSE,box=!taxis,
                         xaxt=ifelse(taxis,'n','s'),...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
@@ -159,14 +159,18 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     calcit <- sn%ni%c(hide,omit)
     colnames(xy) <- c('X','sX','Y','sY','rXY')
     if (is.null(xlim)){
-        xlim <- get_limits(xy[plotit,'X'],xy[plotit,'sX'])
         if (taxis & !is.null(fit)){
-            xlim[2] <- -fit$a[1]/(fit$b[1]+2*fit$b[2])
+            xlim <- c(0,-fit$a[1]/(fit$b[1]+2*fit$b[2]))
+        } else {
+            xlim <- get_limits(xy[plotit,'X'],xy[plotit,'sX'])
         }
     }
     if (is.null(ylim)){
-        ylim <- get_limits(xy[plotit,'Y'],xy[plotit,'sY'])
-        if (taxis) ylim[1] <- 0
+        if (taxis & !is.null(fit)){
+            ylim <- c(0,fit$a[1]+2*fit$a[2])
+        } else {
+            ylim <- get_limits(xy[plotit,'Y'],xy[plotit,'sY'])
+        }
     }
     if (!add){
         if (missing(xlab)) xlab <- ''
