@@ -156,7 +156,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
     out$RaU <- patch(RaU)
     out$PaU <- patch(PaU)
     out$buffer <- buffer
-    out$equilibrium <- check.equilibrium(d=out)
+    out$equilibrium <- check_equilibrium(d=out)
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000
     l30 <- settings('lambda','Th230')[1]*1000
@@ -214,7 +214,7 @@ copy_diseq <- function(x,d=diseq()){
 }
 
 # to infer initial 38,34,30,35 from measured 34/38 and 30/38
-mexp.8405 <- function(){
+mexp_8405 <- function(){
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000
     l30 <- settings('lambda','Th230')[1]*1000
@@ -237,7 +237,7 @@ mexp.8405 <- function(){
 }
 
 # to infer initial 38,34,35 from measured 34/38
-mexp.845 <- function(nratios=3){
+mexp_845 <- function(nratios=3){
     l38 <- settings('lambda','U238')[1]
     l34 <- settings('lambda','U234')[1]*1000
     l30 <- settings('lambda','Th230')[1]*1000
@@ -274,7 +274,7 @@ forward <- function(tt,d=diseq(),derivative=0){
     nt
 }
 
-check.equilibrium <- function(d=diseq()){
+check_equilibrium <- function(d=diseq()){
     checkratio <- function(r){
         r$option == 0 || all(r$x==1) & all(r$sx==0)
     }
@@ -285,12 +285,12 @@ check.equilibrium <- function(d=diseq()){
     U48 & ThU & RaU & PaU
 }
 
-measured.disequilibrium <- function(d=diseq()){
+measured_disequilibrium <- function(d=diseq()){
     measured <- (d$U48$option==2 | d$ThU$option==2)
     !d$equilibrium & measured
 }
 
-#' @title Predict disequilibrium concordia compositions
+#' @title Predict disequilibrium concordia_compositions
 #' 
 #' @description
 #' Returns the predicted \eqn{{}^{206}}Pb/\eqn{{}^{238}}U and
@@ -368,10 +368,10 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             out$dPb207U235dl35 <- rep(tt*exp(l35*tt),nc)
         }
     } else {
-        nt <- meas.diseq.nt(d=d,nc=nc)[c('U238','U234','Th230','U235'),,drop=FALSE]
+        nt <- meas_diseq_nt(d=d,nc=nc)[c('U238','U234','Th230','U235'),,drop=FALSE]
         if (d$U48$option==2){
-            t234cutoff <- meas.diseq.maxt(d=d,nuclide='U234')
-            n0 <- reverse(tt=min(tt,t234cutoff),mexp=mexp.8405(),nt=nt)
+            t234cutoff <- meas_diseq_maxt(d=d,nuclide='U234')
+            n0 <- reverse(tt=min(tt,t234cutoff),mexp=mexp_8405(),nt=nt)
             U48i <- (n0['U234',]*l34)/(n0['U238',]*l38)
             if (any(U48i<0)){
                 d$U48 <- list(x=0,sx=0,option=1)
@@ -383,8 +383,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             }
         }
         if (d$ThU$option==2){
-            t230cutoff <- meas.diseq.maxt(d=d,nuclide='Th230')
-            n0 <- reverse(tt=min(tt,t230cutoff),mexp=mexp.8405(),nt=nt)
+            t230cutoff <- meas_diseq_maxt(d=d,nuclide='Th230')
+            n0 <- reverse(tt=min(tt,t230cutoff),mexp=mexp_8405(),nt=nt)
             ThUi <- (n0['Th230',]*l30)/(n0['U238',]*l38)
             if (any(ThUi<0)){
                 d$ThU <- list(x=0,sx=0,option=1)
@@ -405,20 +405,20 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             } else if (d$ThU$option==2){ # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
                 nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
-                d$n0['Th230',] <- reverse(tt=tt,mexp=mexp.8405(),nt=nt)['Th230',]
+                d$n0['Th230',] <- reverse(tt=tt,mexp=mexp_8405(),nt=nt)['Th230',]
             }
         } else {                    # measured 234U
             if (d$ThU$option<2){ # initial 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','U235'),,drop=FALSE]
                 nt['U234',] <- d$U48$x*nt['U238',]*l38/l34 # overwrite
-                d$n0['U234',] <- reverse(tt=tt,mexp=mexp.845(),nt=nt)['U234',]
+                d$n0['U234',] <- reverse(tt=tt,mexp=mexp_845(),nt=nt)['U234',]
                 if (d$ThU$option==1) d$n0['Th230',] <- d$ThU$x/l30
             } else {                # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
                 nt['U234',] <- d$U48$x*nt['U238',]*l38/l34  # overwrite
                 nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
                 d$n0[c('U234','Th230'),] <-
-                    reverse(tt=tt,mexp=mexp.8405(),nt=nt)[c('U234','Th230'),]
+                    reverse(tt=tt,mexp=mexp_8405(),nt=nt)[c('U234','Th230'),]
             }
         }
         if (d$RaU$option>0) d$n0['Ra226',] <- d$RaU$x/l26
@@ -442,7 +442,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$n0 <- linkUseries(n=d$n0,U=U*exp((l38-l35)*tt))
         out$nt <- linkUseries(n=d$nt,U=U)
         if (exterr){
-            K <- get.diseq.K(tt=tt,d=d)
+            K <- get_diseq_K(tt=tt,d=d)
             out$dPb206U238dl38 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U238')
             out$dPb206U238dl34 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='U234')
             out$dPb206U238dl30 <- drdl(d=d,K=K,den='U238',num='Pb206',parent='Th230')
@@ -486,7 +486,7 @@ linkUseries <- function(n,U){
     rbind(U*U8series,U5series)
 }
 
-get.diseq.K <- function(tt=0,d=diseq()){
+get_diseq_K <- function(tt=0,d=diseq()){
     nl <- length(d$L)
     out <- matrix(0,nl,nl)
     colnames(out) <- names(d$L)
@@ -519,11 +519,11 @@ drdl <- function(tt=0,K=matrix(0,8,8),d=diseq(),
     out <- (d$nt[den,]*dntdl[num,]-d$nt[num,]*dntdl[den,])/d$nt[den,,drop=FALSE]^2
     as.vector(out)
 }
-diseq.75.misfit <- function(tt,x,d){
+diseq_75_misfit <- function(tt,x,d){
     pred <- subset(age_to_Pb207U235_ratio(tt,d=d),select='75')
     get.5678.misfit(obs=x,pred)
 }
-diseq.68.misfit <- function(tt,x,d){
+diseq_68_misfit <- function(tt,x,d){
     pred <- subset(age_to_Pb206U238_ratio(tt,d=d),select='68')
     get.5678.misfit(obs=x,pred)
 }
@@ -535,7 +535,7 @@ get.5678.misfit <- function(obs,pred){
     (log(obs)-log(pred))^2
 }
 
-meas.diseq.maxt <- function(d,nuclide='auto'){
+meas_diseq_maxt <- function(d,nuclide='auto'){
     if ((d$ThU$option==2 && nuclide!='U234') || nuclide=='Th230'){
         out <- 20*log(2)/d$L['Th230']
     } else if (d$U48$option==2 || nuclide=='U234'){
@@ -561,7 +561,7 @@ measured2initial <- function(x,fit){
     out
 }
 
-meas.diseq.nt <- function(d,nc=1){
+meas_diseq_nt <- function(d,nc=1){
     nt <- 0*d$L
     nt[d$L>0] <- 1/d$L[d$L>0]
     if (d$U48$option==2){

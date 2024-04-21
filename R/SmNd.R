@@ -104,7 +104,7 @@ get_SmNd_ratio <- function(tt,st,exterr=FALSE){
     getDPratio(tt,st,'Sm147',exterr=exterr)
 }
 
-get.SmNd.age <- function(Nd143Sm147,sNd143Sm147,exterr=FALSE){
+get_SmNd_age <- function(Nd143Sm147,sNd143Sm147,exterr=FALSE){
     getPDage(Nd143Sm147,sNd143Sm147,'Sm147',exterr=exterr)
 }
 

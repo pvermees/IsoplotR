@@ -40,14 +40,14 @@ ogls.default <- function(x,random.effects=FALSE,...){
     ns <- nrow(x)/2
     if (random.effects){
         init <- c(yfit$a[1],yfit$b[1],lw=unname(log(yfit$a[2])))
-        out <- stats::optim(init,LLw.ogls,dat=x,hessian=TRUE)
-        SS <- LLw.ogls(out$par,dat=x,LL=FALSE)
+        out <- stats::optim(init,LLw_ogls,dat=x,hessian=TRUE)
+        SS <- LLw_ogls(out$par,dat=x,LL=FALSE)
         out$df <- ns-3
     } else {
         init <- c(yfit$a[1],yfit$b[1])
         omega <- solve(x[,-1])
-        out <- stats::optim(init,LL.ogls,dat=x,omega=omega,hessian=TRUE)
-        SS <- LL.ogls(out$par,dat=x,omega=omega,LL=FALSE)
+        out <- stats::optim(init,LL_ogls,dat=x,omega=omega,hessian=TRUE)
+        SS <- LL_ogls(out$par,dat=x,omega=omega,LL=FALSE)
         out$df <- ns-2
     }
     covmat <- solve(out$hessian)
@@ -69,7 +69,7 @@ ogls.other <- function(x,random.effects=FALSE,...){
     ogls(x=x$x,random.effects=random.effects)
 }
 
-LL.ogls <- function(ab,dat,omega,LL=TRUE){
+LL_ogls <- function(ab,dat,omega,LL=TRUE){
     a <- ab[1]
     b <- ab[2]
     ns <- nrow(dat)/2
@@ -92,12 +92,12 @@ LL.ogls <- function(ab,dat,omega,LL=TRUE){
     }
     out
 }
-LLw.ogls <- function(ablw,dat,LL=TRUE){
+LLw_ogls <- function(ablw,dat,LL=TRUE){
     w <- exp(ablw[3])
     ns <- nrow(dat)/2
     iX <- 1:ns
     iY <- (ns+1):(2*ns)
     E <- dat[,-1]
     diag(E[iY,iY]) <- diag(E[iY,iY]) + w^2
-    LL.ogls(ab=ablw[-3],dat=dat,omega=solve(E),LL=LL)
+    LL_ogls(ab=ablw[-3],dat=dat,omega=solve(E),LL=LL)
 }

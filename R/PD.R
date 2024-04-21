@@ -49,7 +49,7 @@ PD.age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
         if (projerr) DP[,2] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
         else DP[,2] <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     } else {
-        initial <- get.nominal.initials(x)
+        initial <- get_nominal_initials(x)
         dat <- data2york(x,exterr=exterr)
         dat[,'Y'] <- dat[,'Y'] - initial$y0
         if (projerr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
@@ -62,7 +62,7 @@ PD.age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
     out
 }
 
-get.nominal.initials <- function(x){
+get_nominal_initials <- function(x){
     if (is.RbSr(x)){
         out <- settings('iratio','Sr87Sr86')
     } else if (is.SmNd(x)){

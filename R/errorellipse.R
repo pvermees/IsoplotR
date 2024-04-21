@@ -159,13 +159,13 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     calcit <- sn%ni%c(hide,omit)
     colnames(xy) <- c('X','sX','Y','sY','rXY')
     if (is.null(xlim)){
-        xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
+        xlim <- get_limits(xy[plotit,'X'],xy[plotit,'sX'])
         if (taxis & !is.null(fit)){
             xlim[2] <- -fit$a[1]/(fit$b[1]+2*fit$b[2])
         }
     }
     if (is.null(ylim)){
-        ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
+        ylim <- get_limits(xy[plotit,'Y'],xy[plotit,'sY'])
         if (taxis) ylim[1] <- 0
     }
     if (!add){
@@ -182,9 +182,9 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     }
     if (box) graphics::box()
     nolevels <- all(is.na(levels))
-    fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
+    fill <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.fill,
                                 hide=hide,omit=omit,omit.col=omit.fill)
-    stroke <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.stroke,
+    stroke <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.stroke,
                                   hide=hide,omit=omit,omit.col=omit.stroke)
     if (show.ellipses==0){ # points and or text
         if (missing(cex)) cex <- 1
@@ -245,7 +245,7 @@ plot_isochron_line <- function(fit,oerr=3,ci.col='gray80',nonneg=TRUE,...){
     graphics::lines(x,y,...)
 }
 
-get.limits <- function(x,sx){
+get_limits <- function(x,sx){
     minx <- min(x-3*sx,na.rm=TRUE)
     maxx <- max(x+3*sx,na.rm=TRUE)
     c(minx,maxx)

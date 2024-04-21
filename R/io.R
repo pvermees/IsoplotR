@@ -425,7 +425,7 @@ as.UPb <- function(x,format=3,ierr=1,d=diseq()){
     } else {
         stop('Invalid input format')
     }
-    X <- insert.data(x=X,cnames=cnames,opt=opt)
+    X <- insert_data(x=X,cnames=cnames,opt=opt)
     out$x <- errconvert(X,gc='U-Pb',format=format,ierr=ierr)
     if (format==3){
         out$x <- optionalredundancy2cor(X=out$x,nc=nc)
@@ -463,8 +463,8 @@ optionalredundancy2cor <- function(X,nc){
         i <- 1:nr
         j <- 1:nr
     }
-    out[i,7] <- get.cor.75.68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
-    out[j,8] <- get.cor.68.76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
+    out[i,7] <- get_cor_75_68(X[i,1],X[i,2],X[i,3],X[i,4],X[i,5],X[i,6])
+    out[j,8] <- get_cor_68_76(X[j,1],X[j,2],X[j,3],X[j,4],X[j,5],X[j,6])
     if ( any(abs(out[i,7])>1) | any(abs(out[j,8])>1) ){
         out[,8] <- 0
         U <- iratio('U238U235')[1]
@@ -484,73 +484,73 @@ optionalredundancy2cor <- function(X,nc){
     out
 }
 
-get.cor.75.68 <- function(Pb207U235,errPb207U235,
+get_cor_75_68 <- function(Pb207U235,errPb207U235,
                           Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
-    get.cor.div(Pb207U235,errPb207U235,
+    get_cor_div(Pb207U235,errPb207U235,
                 Pb206U238,errPb206U238,
                 Pb207Pb206,errPb207Pb206)
 }
-get.cor.68.76 <- function(Pb207U235,errPb207U235,
+get_cor_68_76 <- function(Pb207U235,errPb207U235,
                           Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
-    get.cor.mult(Pb206U238,errPb206U238,
+    get_cor_mult(Pb206U238,errPb206U238,
                  Pb207Pb206,errPb207Pb206,
                  Pb207U235,errPb207U235)
 }
 get_cov_75_68 <- function(Pb207U235,errPb207U235,
                           Pb206U238,errPb206U238,
                           Pb207Pb206,errPb207Pb206){
-    get.cov.div(Pb207U235,errPb207U235,
+    get_cov_div(Pb207U235,errPb207U235,
                 Pb206U238,errPb206U238,
                 Pb207Pb206,errPb207Pb206)
 }
 get_cov_75_48 <- function(Pb207U235,errPb207U235,
                           Pb204U238,errPb204U238,
                           Pb204Pb207,errPb204Pb207){
-    get.cov.div(Pb207U235,errPb207U235,
+    get_cov_div(Pb207U235,errPb207U235,
                 Pb204U238,errPb204U238,
                 Pb204Pb207,errPb204Pb207)
 }
 get_cov_68_48 <- function(Pb206U238,errPb206U238,
                           Pb204U238,errPb204U238,
                           Pb204Pb206,errPb204Pb206){
-    get.cov.div(Pb206U238,errPb206U238,
+    get_cov_div(Pb206U238,errPb206U238,
                 Pb204U238,errPb204U238,
                 Pb204Pb206,errPb204Pb206)
 }
-get.cov.76.86 <- function(Pb207Pb206,errPb207Pb206,
+get_cov_76_86 <- function(Pb207Pb206,errPb207Pb206,
                           U238Pb206,errU238Pb206,
                           Pb207U235,errPb207U235){
-    get.cov.div(Pb207Pb206,errPb207Pb206,
+    get_cov_div(Pb207Pb206,errPb207Pb206,
                 U238Pb206,errU238Pb206,
                 Pb207U235,errPb207U235)
 }
-get.cov.46.86 <- function(Pb204Pb206,errPb204Pb206,
+get_cov_46_86 <- function(Pb204Pb206,errPb204Pb206,
                           U238Pb206,errU238Pb206,
                           Pb204U238,errPb204U238){
-    get.cov.div(Pb204Pb206,errPb204Pb206,
+    get_cov_div(Pb204Pb206,errPb204Pb206,
                 U238Pb206,errU238Pb206,
                 Pb204U238,errPb204U238)
 }
-get.cov.46.68 <- function(Pb204Pb206,errPb204Pb206,
+get_cov_46_68 <- function(Pb204Pb206,errPb204Pb206,
                           Pb206U238,errPb206U238,
                           Pb204U238,errPb204U238){
-    get.cov.mult(Pb204Pb206,errPb204Pb206,
+    get_cov_mult(Pb204Pb206,errPb204Pb206,
                  Pb206U238,errPb206U238,
                  Pb204U238,errPb204U238)
 }
-get.cov.46.76 <- function(Pb204Pb206,errPb204Pb206,
+get_cov_46_76 <- function(Pb204Pb206,errPb204Pb206,
                           Pb207Pb206,errPb207Pb206,
                           Pb204Pb207,errPb204Pb207){
-    get.cov.div(Pb204Pb206,errPb204Pb206,
+    get_cov_div(Pb204Pb206,errPb204Pb206,
                 Pb207Pb206,errPb207Pb206,
                 Pb204Pb207,errPb204Pb207)
 }
-get.cov.47.75 <- function(Pb204Pb207,errPb204Pb207,
+get_cov_47_75 <- function(Pb204Pb207,errPb204Pb207,
                           Pb207U235,errPb207U235,
                           Pb204U238,errPb204U238){
-    get.cov.mult(Pb204Pb207,errPb204Pb207,
+    get_cov_mult(Pb204Pb207,errPb204Pb207,
                  Pb207U235,errPb207U235,
                  Pb204U238,errPb204U238)
 }
@@ -582,7 +582,7 @@ as.PbPb <- function(x,format=1,ierr=1){
     } else {
         stop('Invalid PbPb input format')
     }
-    out$x <- insert.data(x=X,cnames=cnames,opt=opt)
+    out$x <- insert_data(x=X,cnames=cnames,opt=opt)
     out
 }
 #' @rdname classes
@@ -612,7 +612,7 @@ as.ArAr <- function(x,format=3,ierr=1){
     } else {
         stop('Invalid input format.')
     }
-    out$x <- insert.data(x=X,cnames=cnames)
+    out$x <- insert_data(x=X,cnames=cnames)
     if (ncol(X)<ncol(out$x)){
         ns <- nr-bi+1
         out$x[,'Ar39'] <- 1/ns
@@ -643,7 +643,7 @@ as.ThPb <- function(x,format=1,ierr=1){
     } else {
         stop("Incorrect format or insufficient columns")
     }
-    out$x <- insert.data(x=X,cnames=cnames)
+    out$x <- insert_data(x=X,cnames=cnames)
     out
 }
 #' @rdname classes
@@ -670,7 +670,7 @@ as.KCa <- function(x,format=1,ierr=1){
     } else {
         stop("Incorrect format or insufficient columns")
     }
-    out$x <- insert.data(x=X,cnames=cnames)
+    out$x <- insert_data(x=X,cnames=cnames)
     out
 }
 #' @rdname classes
@@ -745,7 +745,7 @@ as.PD <- function(x,classname,cnames,format,ierr){
     X <- errconvert(X,gc='PD',format=format,ierr=ierr)
     if (format<3) opt <- 5
     else opt <- NULL
-    out$x <- insert.data(x=X,cnames=cnames,opt=opt)
+    out$x <- insert_data(x=X,cnames=cnames,opt=opt)
     out
 }
 #' @rdname classes
@@ -786,7 +786,7 @@ as.ThU <- function(x,format=1,ierr=1,U8Th2=0,Th02i=c(0,0),
                     'Th230U238','errTh230U238',
                     'rXY')
     }
-    out$x <- insert.data(x=X,cnames=cnames)
+    out$x <- insert_data(x=X,cnames=cnames)
     out
 }
 #' @rdname classes
@@ -800,7 +800,7 @@ as.UThHe <- function(x,ierr=1){
     X <- errconvert(X,gc='U-Th-He',ierr=ierr)
     if (nc>5) cnames <- c('He','errHe','U','errU','Th','errTh')
     if (nc>7) cnames <- c(cnames,'Sm','errSm')
-    out <- insert.data(x=X,cnames=cnames)
+    out <- insert_data(x=X,cnames=cnames)
     class(out) <- append("UThHe",class(out))
     out
 }
@@ -817,7 +817,7 @@ as.fissiontracks <- function(x,format=1,ierr=1){
         out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
         out$rhoD <- errAdjust(as.numeric(x[4,1:2]),ierr=ierr)
         X <- shiny2matrix(x,si,nr,nc)
-        out$x <- insert.data(x=X,cnames=c('Ns','Ni'))
+        out$x <- insert_data(x=X,cnames=c('Ns','Ni'))
     } else {
         if (format==2) out$zeta <- errAdjust(as.numeric(x[2,1:2]),ierr=ierr)
         else out$mineral <- x[2,1]
@@ -883,7 +883,7 @@ shiny2matrix <- function(x,br,nr,nc){
     )
 }
 
-insert.data <- function(x,cnames,opt=NULL){
+insert_data <- function(x,cnames,opt=NULL){
     nr <- nrow(x)
     nc <- length(cnames)
     out <- matrix(0,nr,nc)

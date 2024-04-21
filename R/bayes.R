@@ -67,7 +67,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
             anchor <- c(2,tt[i])
-            ifit <- contingencyfit(par=init[i,],fn=LL.ludwig,lower=lower[i,],
+            ifit <- contingencyfit(par=init[i,],fn=LL_ludwig,lower=lower[i,],
                                    upper=upper[i,],hessian=FALSE,x=x,
                                    anchor=anchor,type=type,model=model)
             LLgridt[i,'t'] <- tt[i]
@@ -98,8 +98,8 @@ initial2time <- function(x,anames,avalues,anchor=0,
         X$d[[anames[i]]]$sx <- 0
         X$d[[anames[i]]]$option <- 1
     }
-    init <- init.ludwig(x=X,model=model,anchor=anchor,type=type)
-    fit <- stats::optim(init$par,fn=LL.ludwig,method='L-BFGS-B',
+    init <- init_ludwig(x=X,model=model,anchor=anchor,type=type)
+    fit <- stats::optim(init$par,fn=LL_ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=FALSE,
                         x=x,X=X,anchor=anchor,type=type,model=model)
     lt <- ifelse('t'%in%names(fit$par),fit$par['t'],anchor[2])
@@ -193,7 +193,7 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
     for (i in 1:10){
         if ((LLmint < (LLmax+LLbuffer)) && (mint > dt/4)){
             mint <- (mint-dt/4)
-            ifit <- stats::optim(init,fn=LL.ludwig,hessian=FALSE,x=x,
+            ifit <- stats::optim(init,fn=LL_ludwig,hessian=FALSE,x=x,
                                  anchor=c(2,mint),type=type,model=model)
             LLmint <- ifit$value
         } else {
@@ -204,7 +204,7 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
     for (i in 1:10){
         if (LLmaxt < (LLmax+LLbuffer)){
             maxt <- (maxt+dt/4)
-            ifit <- stats::optim(init,fn=LL.ludwig,hessian=FALSE,x=x,
+            ifit <- stats::optim(init,fn=LL_ludwig,hessian=FALSE,x=x,
                                  anchor=c(2,maxt),type=type,model=model)
             LLmaxt <- ifit$value
         } else {
@@ -227,13 +227,4 @@ prior <- function(x,a,log=TRUE){
     lx <- logit(x,m=a$m,M=a$M)
     mu <- logit(a$x0,m=a$m,M=a$M)
     stats::dnorm(lx,mean=mu,sd=a$sd,log=log)
-}
-
-logit <- function(x,m=0,M=1,inverse=FALSE){
-    if (inverse){
-        out <- m+(M-m)*exp(x)/(1+exp(x))
-    } else {
-        out <- log(x-m)/log(M-x)
-    }
-    out
 }

@@ -259,13 +259,13 @@ tera_wasserburg <- function(x,i=1,format){
         out$cov[1,1] <- (U238Pb206*X[i,'errPb206U238']/X[i,'Pb206U238'])^2
         out$cov[2,2] <- X[i,'errPb207Pb206']^2
         out$cov[3,3] <- X[i,'errPb204Pb206']^2
-        out$cov[1,2] <- get.cov.76.86(X[i,'Pb207Pb206'],X[i,'errPb207Pb206'],
+        out$cov[1,2] <- get_cov_76_86(X[i,'Pb207Pb206'],X[i,'errPb207Pb206'],
                                       X[i,'Pb206U238'],X[i,'errPb206U238'],
                                       X[i,'Pb207U235'],X[i,'errPb207U235'])
-        out$cov[1,3] <- get.cov.46.86(X[i,'Pb204Pb206'],X[i,'errPb204Pb206'],
+        out$cov[1,3] <- get_cov_46_86(X[i,'Pb204Pb206'],X[i,'errPb204Pb206'],
                                       X[i,'Pb206U238'],X[i,'errPb206U238'],
                                       X[i,'Pb204U238'],X[i,'errPb204U238'])
-        out$cov[2,3] <- get.cov.46.76(X[i,'Pb204Pb206'],X[i,'errPb204Pb206'],
+        out$cov[2,3] <- get_cov_46_76(X[i,'Pb204Pb206'],X[i,'errPb204Pb206'],
                                       X[i,'Pb207Pb206'],X[i,'errPb207Pb206'],
                                       X[i,'Pb204Pb207'],X[i,'errPb204Pb207'])
         out$cov[2,1] <- out$cov[1,2]
@@ -1111,7 +1111,7 @@ get_Pb207U235_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
             J[1,1] <- 1/(l5*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l5^2   # dt/dl5
         } else { # apply a disequilibrium correction
-            t.75 <- stats::optimise(diseq.75.misfit,x=x,d=d,
+            t.75 <- stats::optimise(diseq_75_misfit,x=x,d=d,
                                     interval=t.init*c(.5,2))$minimum
             McL <- mclean(tt=t.75,d=d,exterr=exterr)    
             J[1,1] <- 1/McL$dPb207U235dt                 # dt/dx
@@ -1186,10 +1186,10 @@ get_Pb206U238_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
             J[1,1] <- 1/(l8*(1+x))                       # dt/dx
             if (exterr & x>-1) J[1,2] <- log(1+x)/l8^2   # dt/dl38
         } else { # apply a disequilibrium correction
-            if (measured.disequilibrium(d)) tlim <- c(0,meas.diseq.maxt(d))
+            if (measured_disequilibrium(d)) tlim <- c(0,meas_diseq_maxt(d))
             else tlim <- c(0,4600)
             t.68 <- tryCatch({
-                stats::optimise(diseq.68.misfit,interval=tlim,x=x,d=d)$minimum
+                stats::optimise(diseq_68_misfit,interval=tlim,x=x,d=d)$minimum
             }, error = function(error_condition) {
                 warning("Failed to solve the Pb206U238 disequilibrium equation.")
                 t.init
@@ -1279,7 +1279,7 @@ get_Pb207Pb206_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,.
                 interval[1] <- midpoint
             }
         }
-        if (measured.disequilibrium(d)) interval[2] <- meas.diseq.maxt(d)
+        if (measured_disequilibrium(d)) interval[2] <- meas_diseq_maxt(d)
         t.76 <- stats::optimise(get.76.misfit,x=x,d=d,interval=interval)$minimum
         McL <- mclean(tt=t.76,d=d,exterr=exterr)
         E <- matrix(0,9,9)
@@ -1382,7 +1382,7 @@ get_Pb208Th232_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
 
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
-# and concordia ages and their uncertainties.
+# and concordia_ages and their uncertainties.
 UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
                     discordance=discfilter(),common.Pb=0,...){
     if (discordance$option==0 | discordance$before) xd <- x
@@ -1406,7 +1406,7 @@ UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
 
 # x = raw data
 # X = common Pb corrected data (if common.Pb>0)
-# xd = data to be used for concordia age calculation 
+# xd = data to be used for concordia_age calculation 
 #      (raw if before==TRUE, common Pb corrected if before==FALSE)
 UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
                            conc=TRUE,discordance=discfilter(),...){
@@ -1451,7 +1451,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (x$format<9 || x$format==85){
         if (conc){
             labels <- c(labels,'t.conc','s[t.conc]')
-            t.conc <- concordia.age(x=Xi,i=1,exterr=exterr)$age
+            t.conc <- concordia_age(x=Xi,i=1,exterr=exterr)$age
         }
         if (discordance$option>0){
             xdi <- subset(xd,subset=((1:length(xd))%in%i))
@@ -1463,7 +1463,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
         } else if (discordance$option%in%c(6,'p')){
             labels <- c(labels,'p[conc]')
             SS.concordance <-
-                LL.concordia.age(pars=t.conc[1],
+                LL_concordia_age(pars=t.conc[1],
                                  cc=wetherill(xdi,i=1),
                                  mswd=TRUE,exterr=exterr,d=xdi$d)
             pval <- 1-stats::pchisq(SS.concordance,1)

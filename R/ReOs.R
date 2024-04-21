@@ -85,7 +85,7 @@ get_ReOs_ratio <- function(tt,st,exterr=FALSE){
     getDPratio(tt,st,'Re187',exterr)
 }
 
-get.ReOs.age <- function(Os187Re187,sOs187Re187,exterr=FALSE){
+get_ReOs_age <- function(Os187Re187,sOs187Re187,exterr=FALSE){
     getPDage(Os187Re187,sOs187Re187,'Re187',exterr=exterr)
 }
 

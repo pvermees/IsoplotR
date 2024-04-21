@@ -34,7 +34,7 @@
 #'
 #' \code{5} or \code{'c'}: logratio distance (\%) measured along a
 #' line connecting the measured composition and the corresponding
-#' single grain concordia age composition.
+#' single grain concordia_age composition.
 #'
 #' Further details in Vermeesch (2021).
 #'
@@ -142,7 +142,7 @@ discordance <- function(x,X,tt=NULL,option=4){
     t.68 <- get_Pb206U238_age(X)[1]
     t.76 <- get_Pb207Pb206_age(X,t.68=t.68)[1]
     if (option%in%c(5,'c')){
-        t.conc <- concordia.age(x=X,i=1)$age[1]
+        t.conc <- concordia_age(x=X,i=1)$age[1]
     }
     if (option%in%c(1,'t')){
         dif <- t.76-t.68

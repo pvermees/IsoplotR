@@ -78,7 +78,7 @@ get_LuHf_ratio <- function(tt,st,exterr=FALSE){
     getDPratio(tt,st,nuclide='Lu176',exterr=exterr)
 }
 
-get.LuHf.age <- function(Hf176Lu176,sHf176Lu176,exterr=FALSE){
+get_LuHf_age <- function(Hf176Lu176,sHf176Lu176,exterr=FALSE){
     getPDage(Hf176Lu176,sHf176Lu176,nuclide='Lu176',exterr=exterr)
 }
 

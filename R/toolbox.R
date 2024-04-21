@@ -98,17 +98,17 @@ cor2cov4 <- function(sW,sX,sY,sZ,rWX,rWY,rWZ,rXY,rXZ,rYZ){
     covmat
 }
 
-get.cov.div <- function(A,err.A,B,err.B,AB,err.AB){
+get_cov_div <- function(A,err.A,B,err.B,AB,err.AB){
     0.5*A*B*((err.A/A)^2+(err.B/B)^2-(err.AB/AB)^2)
 }
-get.cor.div <- function(A,err.A,B,err.B,AB,err.AB){
-    get.cov.div(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
+get_cor_div <- function(A,err.A,B,err.B,AB,err.AB){
+    get_cov_div(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
 }
-get.cov.mult <- function(A,err.A,B,err.B,AB,err.AB){
+get_cov_mult <- function(A,err.A,B,err.B,AB,err.AB){
     0.5*A*B*((err.AB/AB)^2 - (err.A/A)^2 - (err.B/B)^2)
 }
-get.cor.mult <- function(A,err.A,B,err.B,AB,err.AB){
-    get.cov.mult(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
+get_cor_mult <- function(A,err.A,B,err.B,AB,err.AB){
+    get_cov_mult(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
 }
 
 # Implements Equations 6 & 7 of Ludwig (1998)
@@ -230,14 +230,14 @@ quotient <- function(X,sX,Y,sY,rXY=NULL,sXY=NULL){
 }
 
 # negative multivariate log likelihood to be fed into R's optim function
-LL.norm <- function(x,covmat){
+LL_norm <- function(x,covmat){
     tryCatch({
         (log(2*pi) + determinant(covmat,logarithmic=TRUE)$modulus
             + stats::mahalanobis(x,center=FALSE,cov=covmat))/2
     },error=function(e) Inf)
 }
 
-set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
+set_ellipse_colours <- function(ns=1,levels=NA,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
     nl <- length(levels)
     if (nl > 1){

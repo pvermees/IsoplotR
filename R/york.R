@@ -119,7 +119,7 @@ yorkhelper <- function(x,np=2){
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
-get.york.xy <- function(XY,a,b){
+get_york_xy <- function(XY,a,b){
     X <- XY[,'X']
     vX <- XY[,'sX']^2
     Y <- XY[,'Y']
@@ -186,14 +186,14 @@ data2york.default <- function(x,format=1,...){
     } else {
         cnames <- c('X','sX','Y','sY','rXY')
         if (format==3){
-            X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
+            X <- cbind(x[,1:4],get_cor_div(x[,1],x[,2],x[,3],
                                            x[,4],x[,5],x[,6]))
             opt <- NULL
         } else {
             X <- x
             opt <- 5
         }
-        out <- insert.data(x=X,cnames=cnames,opt=opt)
+        out <- insert_data(x=X,cnames=cnames,opt=opt)
     }
     out
 }

@@ -746,7 +746,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,taxis=taxis,...)
             if (taxis) add_taxis(x=x,fit=out,type=type)
-            dispunits <- getDispUnits.UPb(x=x,joint=joint,anchor=anchor)
+            dispunits <- getDispUnits_UPb(x=x,joint=joint,anchor=anchor)
             if (!joint | x$format>8){
                 showDispersion(out,inverse=TRUE,wtype=anchor[1],type=type)
             }
@@ -853,7 +853,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             tmin <- max(min(tx),min(ty))
             tmax <- min(max(tx),max(ty))
             plot_PbPb_evolution(from=tmin,to=tmax,inverse=inverse)
-            out$ski <- SK.intersection(out,inverse=inverse)
+            out$ski <- SK_intersection(out,inverse=inverse)
         } else {
             out$ski <- NULL
         }
@@ -865,8 +865,8 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     }
     invisible(out)
 }
-SK.intersection <- function(fit,inverse,m=0,M=5000){
-    SKi.misfit <- function(tt,a,b){
+SK_intersection <- function(fit,inverse,m=0,M=5000){
+    SKi_misfit <- function(tt,a,b){
         i6474 <- stacey.kramers(tt)
         pred74 <- a + b*i6474[1]
         pred74-i6474[2]
@@ -880,12 +880,12 @@ SK.intersection <- function(fit,inverse,m=0,M=5000){
     }
     if ((M-m)<10){
         out <- NULL
-    } else if (sign(SKi.misfit(m,a,b)) == sign(SKi.misfit(M,a,b))){
-        ski1 <- SK.intersection(fit,inverse,m=m,M=m+(M-m)/2)
-        ski2 <- SK.intersection(fit,inverse,m=m+(M-m)/2,M=M)
+    } else if (sign(SKi_misfit(m,a,b)) == sign(SKi_misfit(M,a,b))){
+        ski1 <- SK_intersection(fit,inverse,m=m,M=m+(M-m)/2)
+        ski2 <- SK_intersection(fit,inverse,m=m+(M-m)/2,M=M)
         out <- unique(c(ski1,ski2))
     } else {
-        out <- stats::uniroot(SKi.misfit,interval=c(m,M),a=a,b=b)$root
+        out <- stats::uniroot(SKi_misfit,interval=c(m,M),a=a,b=b)$root
     }
     out
 }
@@ -1046,11 +1046,11 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
         l5 <- lambda('U235')[1]
         l8 <- lambda('U238')[1]
         U <- iratio('U238U235')[1]
-        He <- get.He(tt=anchor[2],U=1,Th=1)
+        He <- get_He(tt=anchor[2],U=1,Th=1)
         P <- 8*l8*U/(1+U) + 7*l5/(1+U) + 6*l2
         abanchor[2] <- He/P
         if (length(anchor)>2){
-            abanchor[3] <- get.He(tt=anchor[3],U=1,Th=1)/P
+            abanchor[3] <- get_He(tt=anchor[3],U=1,Th=1)/P
         }
     }
     fit <- MLyork(d2calc,model=model,wtype=wtype,anchor=abanchor)
@@ -1217,13 +1217,13 @@ isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
     out$PAR <- out$par[c(i48,i08,i02)]
     out$COV <- out$cov[c(i48,i08,i02),c(i48,i08,i02)]
     names(out$PAR) <- rownames(out$COV) <- colnames(out$COV) <- c('i48','i08','i02')
-    tst <- get.ThU.age(out$par[i08],sqrt(out$cov[i08,i08]),
+    tst <- get_ThU_age(out$par[i08],sqrt(out$cov[i08,i08]),
                        out$par[i48],sqrt(out$cov[i48,i48]),
                        out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
     out$age['t'] <- tst['t']
     out$age['s[t]'] <- tst['s[t]']
     if (inflate(out)){
-        tst <- get.ThU.age(out$par[i08],sqrt(out$mswd*out$cov[i08,i08]),
+        tst <- get_ThU_age(out$par[i08],sqrt(out$mswd*out$cov[i08,i08]),
                            out$par[i48],sqrt(out$mswd*out$cov[i48,i48]),
                            out$mswd*out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
         out$age['disp[t]'] <- tst['s[t]']
@@ -1268,7 +1268,7 @@ isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
     invisible(out)
 }
 
-get.isochron.PD.age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1,d=diseq()){
+get_isochron_PD_age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1,d=diseq()){
     if (nuclide=='U238'){
         out <- get_Pb206U238_age(x=DP,sx=sDP,exterr=exterr,d=d)
     } else if (nuclide=='U235'){
@@ -1364,7 +1364,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     }
 }
 
-getDispUnits.UPb <- function(x,joint,anchor){
+getDispUnits_UPb <- function(x,joint,anchor){
     ifelse(anchor[1]==1 & (x$format%ni%(4:8) | !joint),'',' Ma')
 }
 getDispUnits <- function(model,wtype,anchor){
@@ -1713,11 +1713,11 @@ ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     }
     out$y0[c('y','s[y]')] <- unname(Dd)
     out$age[c('t','s[t]')] <-
-        get.isochron.PD.age(DP=DP[1],sDP=DP[2],nuclide=nuclide,
+        get_isochron_PD_age(DP=DP[1],sDP=DP[2],nuclide=nuclide,
                             exterr=exterr,bratio=bratio)
     if (inflate(fit)){
         out$age['disp[t]'] <-
-            get.isochron.PD.age(DP=DP[1],sDP=sqrt(fit$mswd)*DP[2],
+            get_isochron_PD_age(DP=DP[1],sDP=sqrt(fit$mswd)*DP[2],
                                 nuclide=nuclide,exterr=exterr,bratio=bratio)[2]
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
     } else if (fit$model==3){
