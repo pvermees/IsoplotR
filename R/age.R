@@ -273,7 +273,7 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
                     oerr=1,sigdig=NA,common.Pb=0,
                     discordance=discfilter(),...){
     if (type==1){
-        tst <- UPb.age(x,exterr=exterr,i=i,discordance=discordance,
+        tst <- UPb_age(x,exterr=exterr,i=i,discordance=discordance,
                        common.Pb=common.Pb,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     } else if (type==2){
@@ -298,7 +298,7 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- PbPb.age(x,exterr=exterr,i=i,
+        tst <- PbPb_age(x,exterr=exterr,i=i,
                         common.Pb=common.Pb,projerr=projerr)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
@@ -329,7 +329,7 @@ age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- ArAr.age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+        tst <- ArAr_age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -342,7 +342,7 @@ age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- KCa.age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+        tst <- KCa_age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -360,7 +360,7 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NULL,oerr=1,sigdig=NA,...
     } else if (central) {
         out <- central(x)
     } else {
-        tst <- UThHe.age(x,i=i)
+        tst <- UThHe_age(x,i=i)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -377,7 +377,7 @@ age.fissiontracks <- function(x,central=FALSE,i=NULL,
     if (central){
         out <- central(x)
     } else {
-        tst <- fissiontrack.age(x,i=i,exterr=exterr)
+        tst <- fissiontrack_age(x,i=i,exterr=exterr)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -408,7 +408,7 @@ age.ThU <- function(x,isochron=FALSE,Th0i=0,
     if (isochron) {
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- ThU.age(x,exterr=exterr,i=i,Th0i=Th0i,...)
+        tst <- ThU_age(x,exterr=exterr,i=i,Th0i=Th0i,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -457,7 +457,7 @@ age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE)
     } else {
-        tst <- PD.age(x,nuclide,exterr=exterr,i=i,
+        tst <- PD_age(x,nuclide,exterr=exterr,i=i,
                       i2i=i2i,projerr=projerr,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
@@ -525,27 +525,27 @@ get_ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
                                cutoff.disc=cutoff.disc,omit4c=omit4c,
                                exterr=FALSE,common.Pb=common.Pb)
     } else if (is.PbPb(x)){
-        out <- PbPb.age(x,exterr=FALSE,common.Pb=common.Pb,omit4c=omit4c)
+        out <- PbPb_age(x,exterr=FALSE,common.Pb=common.Pb,omit4c=omit4c)
     } else if (is.ArAr(x)){
-        out <- ArAr.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
+        out <- ArAr_age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (is.ThPb(x)){
-        out <- ThPb.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
+        out <- ThPb_age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (is.KCa(x)){
-        out <- KCa.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
+        out <- KCa_age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (is.UThHe(x)){
-        out <- UThHe.age(x)
+        out <- UThHe_age(x)
     } else if (is.ReOs(x)){
-        out <- ReOs.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
+        out <- ReOs_age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (is.SmNd(x)){
-        out <- SmNd.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
+        out <- SmNd_age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (is.RbSr(x)){
-        out <- RbSr.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
+        out <- RbSr_age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (is.LuHf(x)){
-        out <- LuHf.age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
+        out <- LuHf_age(x,exterr=FALSE,i2i=i2i,omit4c=omit4c)
     } else if (is.fissiontracks(x)){
-        out <- fissiontrack.age(x,exterr=FALSE)
+        out <- fissiontrack_age(x,exterr=FALSE)
     } else if (is.ThU(x)){
-        out <- ThU.age(x,exterr=FALSE,Th0i=Th0i,omit4c=omit4c)
+        out <- ThU_age(x,exterr=FALSE,Th0i=Th0i,omit4c=omit4c)
     }
     out
 }

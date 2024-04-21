@@ -1,11 +1,11 @@
-fissiontrack.age <- function(x,i=NULL,exterr=FALSE){
+fissiontrack_age <- function(x,i=NULL,exterr=FALSE){
     if (x$format < 2){
-        out <- EDM.age(x,i,exterr=exterr)
+        out <- EDM_age(x,i,exterr=exterr)
     } else if (x$format > 1){
         if (x$format == 3){
             x$zeta <- get_absolute_zeta(x$mineral,exterr=exterr);
         }
-        out <- ICP.age(x,i,exterr=exterr)
+        out <- ICP_age(x,i,exterr=exterr)
     }
     out
 }
@@ -182,7 +182,7 @@ set.zeta <- function(x,tst,exterr=FALSE,oerr=1,sigdig=NA,update=TRUE){
     out
 }
 
-ICP.age <- function(x,i=NULL,exterr=FALSE){
+ICP_age <- function(x,i=NULL,exterr=FALSE){
     ngrains <- length(x$Ns)
     tt <- rep(NA,ngrains)
     st <- rep(NA,ngrains)
@@ -250,7 +250,7 @@ get_UsU <- function(x){
     out
 }
 
-EDM.age <- function(x,i=NULL,exterr=FALSE){
+EDM_age <- function(x,i=NULL,exterr=FALSE){
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')

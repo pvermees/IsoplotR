@@ -16,7 +16,7 @@
 \alias{radialplot.RbSr}
 \alias{radialplot.LuHf}
 \alias{radialplot.ThU}
-\title{Visualise heteroscedastic data on a radial plot}
+\title{Visualise heteroscedastic data on a radial_plot}
 \usage{
 radialplot(x, ...)
 
@@ -380,9 +380,9 @@ and object of class \code{fissiontracks}, \code{UThHe},
 \item{...}{additional arguments to the generic \code{points}
 function}
 
-\item{from}{minimum age limit of the radial scale}
+\item{from}{minimum age limit of the radial_scale}
 
-\item{to}{maximum age limit of the radial scale}
+\item{to}{maximum age limit of the radial_scale}
 
 \item{z0}{central value}
 
@@ -460,7 +460,7 @@ plot.}
 \item{units}{measurement units to be displayed in the legend.}
 
 \item{hide}{vector with indices of aliquots that should be removed
-from the radial plot.}
+from the radial_plot.}
 
 \item{omit}{vector with indices of aliquots that should be plotted
 but omitted from the central age calculation or mixture models.}
@@ -476,7 +476,7 @@ the error propagation for the central age and mixture models?}
 \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-(\code{type}=4), the concordia age (\code{type}=5), or the
+(\code{type}=4), the concordia_age (\code{type}=5), or the
 \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).  Ignored if
 \code{x$format>8}.}
 
@@ -526,7 +526,7 @@ ratio from an isochron fit. Setting \code{i2i} to \code{FALSE} uses
 the default values stored in \code{settings('iratio',...)}.
 
 Note that choosing this option introduces a degree of circularity
-in the central age calculation. In this case the radial plot plot
+in the central age calculation. In this case the radial_plot plot
 just serves as a way to visualise the residuals of the data around
 the isochron, and one should be careful not to over-interpret the
 numerical output.}
@@ -567,7 +567,7 @@ standard errors. Serves as a vehicle to display finite and continuous
 mixture models.
 }
 \details{
-The radial plot (Galbraith, 1988, 1990) is a graphical device that
+The radial_plot (Galbraith, 1988, 1990) is a graphical device that
 was specifically designed to display heteroscedastic data, and is
 constructed as follows.  Consider a set of dates
 \eqn{\{t_1,...,t_i,...,t_n\}} and uncertainties
@@ -582,14 +582,14 @@ slope of a line connecting the origin of this scatter plot with any
 of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
 the date \eqn{t_i}.
 
-These dates can be more easily visualised by drawing a radial scale
+These dates can be more easily visualised by drawing a radial_scale
 at some convenient distance from the origin and annotating it with
 labelled ticks at the appropriate angles. While the angular
 position of each data point represents the date, its horizontal
 distance from the origin is proportional to the
 precision. Imprecise measurements plot on the left hand side of the
-radial plot, whereas precise age determinations are found further
-towards the right. Thus, radial plots allow the observer to assess
+radial_plot, whereas precise age determinations are found further
+towards the right. Thus, radial_plots allow the observer to assess
 both the magnitude and the precision of quantitative data in one
 glance.
 }
@@ -605,7 +605,7 @@ Galbraith, R.F., 1988. Graphical display of estimates
     having differing standard errors. Technometrics, 30(3),
     pp.271-281.
 
-Galbraith, R.F., 1990. The radial plot: graphical assessment of
+Galbraith, R.F., 1990. The radial_plot: graphical assessment of
 spread in ages. International Journal of Radiation Applications and
 Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
 17(3), pp.207-214.

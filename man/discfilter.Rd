@@ -28,7 +28,7 @@ measured composition.
 
 \code{5} or \code{'c'}: logratio distance (\%) measured along a
 line connecting the measured composition and the corresponding
-single grain concordia age composition.
+single grain concordia_age composition.
 
 Further details in Vermeesch (2021).}
 

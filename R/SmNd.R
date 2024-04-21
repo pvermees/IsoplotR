@@ -108,6 +108,6 @@ get_SmNd_age <- function(Nd143Sm147,sNd143Sm147,exterr=FALSE){
     getPDage(Nd143Sm147,sNd143Sm147,'Sm147',exterr=exterr)
 }
 
-SmNd.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
-    PD.age(x,'Sm147',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+SmNd_age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
+    PD_age(x,'Sm147',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
 }

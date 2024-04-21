@@ -98,7 +98,7 @@ filter_UPb_ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
         else if (x$format==119) type <- 2
         else if (x$format==1210) type <- 1
     }
-    tt <- UPb.age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
+    tt <- UPb_age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
                   common.Pb=common.Pb,discordance=cutoff.disc)
     if (cutoff.disc$option==0){
         is.concordant <- rep(TRUE,length(x))

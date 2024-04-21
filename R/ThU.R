@@ -1,4 +1,4 @@
-ThU.age <- function(x,exterr=FALSE,i=NULL,Th0i=0,
+ThU_age <- function(x,exterr=FALSE,i=NULL,Th0i=0,
                     cor=TRUE,omit4c=NULL){
     if (x$format %in% c(1,2)){
         out <- get_ThU_age_corals(x,exterr=exterr,i=i,cor=cor,

@@ -744,21 +744,21 @@ x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
         Ns <- x$x[,'Ns']
         Ni <- x$x[,'Ni']
         if (identical(transformation,'linear')){
-            tt <- fissiontrack.age(x,exterr=FALSE)
+            tt <- fissiontrack_age(x,exterr=FALSE)
             out$z <- tt[,'t']
             out$s <- tt[,'s[t]']
             out$z0 <- get_z0(out,z0,from,to)
             out$xlab <- expression(1/sigma)
         }
         if (identical(transformation,'sqrt')){
-            tt <- fissiontrack.age(x,exterr=FALSE)
+            tt <- fissiontrack_age(x,exterr=FALSE)
             out$z <- sqrt(tt[,'t'])
             out$s <- 0.5*tt[,'s[t]']/out$z
             out$z0 <- get_z0(out,z0,from,to)
             out$xlab <- 'precision'
         }
         if (identical(transformation,'log')){
-            tt <- fissiontrack.age(x,exterr=FALSE)
+            tt <- fissiontrack_age(x,exterr=FALSE)
             if (any(tt[,'t']<=0)) {
                 out$transformation <- 'arcsin'
             } else {
@@ -814,7 +814,7 @@ x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
             out$to <- to
         }
     } else {
-        tt <- fissiontrack.age(x,exterr=FALSE)
+        tt <- fissiontrack_age(x,exterr=FALSE)
         if (identical(transformation,'arcsin')) transformation <- 'log'
         out <- x2zs.default(tt,z0=z0,from=from,to=to,
                             transformation=transformation)

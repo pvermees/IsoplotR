@@ -40,7 +40,7 @@ get_ArAr_age <- function(Ar40Ar39,sAr40Ar39=0,J,sJ=0,exterr=FALSE){
 
 # x an object of class \code{ArAr} returns a matrix 
 # of 40Ar/39Ar-ages and their uncertainties.
-ArAr.age <- function(x,exterr=FALSE,i=NULL,i2i=FALSE,projerr=FALSE,omit4c=NULL){
+ArAr_age <- function(x,exterr=FALSE,i=NULL,i2i=FALSE,projerr=FALSE,omit4c=NULL){
     ns <- length(x)
     if (ns<2) i2i <- FALSE
     out <- matrix(0,ns,2)

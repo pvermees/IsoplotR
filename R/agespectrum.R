@@ -186,7 +186,7 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    tt <- ArAr.age(x,exterr=FALSE,i2i=i2i,omit4c=unique(c(hide,omit)))
+    tt <- ArAr_age(x,exterr=FALSE,i2i=i2i,omit4c=unique(c(hide,omit)))
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
     x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
     y.lab='age [Ma]'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/diseq.R
 \name{mclean}
 \alias{mclean}
-\title{Predict disequilibrium concordia compositions}
+\title{Predict disequilibrium concordia_compositions}
 \usage{
 mclean(tt = 0, d = diseq(), exterr = FALSE)
 }

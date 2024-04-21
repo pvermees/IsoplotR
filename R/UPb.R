@@ -1383,7 +1383,7 @@ get_Pb208Th232_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
 # x is an object of class \code{UPb}
 # returns a matrix of 7/5, 6/8, 7/6
 # and concordia_ages and their uncertainties.
-UPb.age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
+UPb_age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
                     discordance=discfilter(),common.Pb=0,...){
     if (discordance$option==0 | discordance$before) xd <- x
     else xd <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
