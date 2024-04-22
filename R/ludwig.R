@@ -150,8 +150,8 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     out$model <- model
     if (model==3){
         if ('w'%in%names(fit$par)){
-            w <- unname(exp(fit$par['w']))
-            sw <- unname(sqrt(fit$cov['w','w']))
+            w <- unname(afit$par['w'])
+            sw <- sqrt(afit$cov['w','w'])
         } else {
             w <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
             sw <- 0

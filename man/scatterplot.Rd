@@ -32,8 +32,8 @@ scatterplot(
   ylab,
   asp = NA,
   log = "",
-  box = TRUE,
   taxis = FALSE,
+  box = !taxis,
   xaxt = ifelse(taxis, "n", "s"),
   ...
 )
@@ -148,11 +148,11 @@ omitted aliquots.}
 \item{log}{same as the eponymous argument to the generic
 \code{plot} function.}
 
-\item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
-
 \item{taxis}{logical. If \code{TRUE}, replaces the x-axis of an
 inverse isochron with a time scale. Only used if
 \code{inverse=TRUE}.}
+
+\item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
 
 \item{xaxt}{see \code{?par}}
 
