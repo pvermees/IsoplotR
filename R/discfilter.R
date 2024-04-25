@@ -34,7 +34,7 @@
 #'
 #' \code{5} or \code{'c'}: logratio distance (\%) measured along a
 #' line connecting the measured composition and the corresponding
-#' single grain concordia age composition.
+#' single grain concordia_age composition.
 #'
 #' Further details in Vermeesch (2021).
 #'
@@ -87,7 +87,7 @@ discfilter <- function(option=0,before=TRUE,cutoff){
     out
 }
 
-filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
+filter_UPb_ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                             cutoff.disc=discfilter(),common.Pb=0,omit4c=NULL){
     if (x$format>8){ # override type if necessary:
         if (x$format==9) type <- 2
@@ -98,7 +98,7 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
         else if (x$format==119) type <- 2
         else if (x$format==1210) type <- 1
     }
-    tt <- UPb.age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
+    tt <- UPb_age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
                   common.Pb=common.Pb,discordance=cutoff.disc)
     if (cutoff.disc$option==0){
         is.concordant <- rep(TRUE,length(x))
@@ -139,10 +139,10 @@ filter.UPb.ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
 
 # x: raw data, X: common Pb corrected data (or not)
 discordance <- function(x,X,tt=NULL,option=4){
-    t.68 <- get.Pb206U238.age(X)[1]
-    t.76 <- get.Pb207Pb206.age(X,t.68=t.68)[1]
+    t.68 <- get_Pb206U238_age(X)[1]
+    t.76 <- get_Pb207Pb206_age(X,t.68=t.68)[1]
     if (option%in%c(5,'c')){
-        t.conc <- concordia.age(x=X,i=1)$age[1]
+        t.conc <- concordia_age(x=X,i=1)$age[1]
     }
     if (option%in%c(1,'t')){
         dif <- t.76-t.68
@@ -150,20 +150,20 @@ discordance <- function(x,X,tt=NULL,option=4){
         dif <- (1-t.68/t.76)*100
     } else if (option%in%c(3,'sk')){
         x.corr <- Pb0corr(x,option=3)
-        U8Pb6.raw <- get.U238Pb206.ratios(x)[,'U238Pb206']
-        U8Pb6.corr <- get.U238Pb206.ratios(x.corr)[,'U238Pb206']
+        U8Pb6.raw <- get_U238Pb206_ratios(x)[,'U238Pb206']
+        U8Pb6.corr <- get_U238Pb206_ratios(x.corr)[,'U238Pb206']
         dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
     } else if (option%in%c(4,'a')){
-        U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
-        Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
+        U8Pb6 <- get_U238Pb206_ratios(X)[,'U238Pb206']
+        Pb76 <- get_Pb207Pb206_ratios(X)[,'Pb207Pb206']
         r86.76 <- age_to_U238Pb206_ratio(t.76)[,1]
         r76.68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
         DX <- (log(U8Pb6) - log(r86.76))/sqrt(2)
         DY <- (log(Pb76) - log(r76.68))/sqrt(2/3)
         dif <- 100*DX*sin(atan(DY/DX))
     } else if (option%in%c(5,'c')){
-        U8Pb6 <- get.U238Pb206.ratios(X)[,'U238Pb206']
-        Pb76 <- get.Pb207Pb206.ratios(X)[,'Pb207Pb206']
+        U8Pb6 <- get_U238Pb206_ratios(X)[,'U238Pb206']
+        Pb76 <- get_Pb207Pb206_ratios(X)[,'Pb207Pb206']
         c86 <- age_to_U238Pb206_ratio(t.conc)[,1]
         c76 <- age_to_Pb207Pb206_ratio(t.conc)[,1]
         dx <- (log(U8Pb6) - log(c86))/sqrt(2)

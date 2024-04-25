@@ -171,11 +171,11 @@ central.UThHe <- function(x,compositional=FALSE,model=1,...){
             out <- fit
         } else {
             init <- log(sqrt(mswd$mswd)*fit$age['s[t]']/fit$age['t'])
-            lw <- stats::optimise(LL.uvw,interval=init+c(-5,5),
+            lw <- stats::optimise(LL_uvw,interval=init+c(-5,5),
                                   UVW=fit$uvw,x=x,doSm=doSm(x),
                                   maximum=TRUE)$maximum
             w <- exp(lw)
-            H <- stats::optimHess(lw,LL.uvw,UVW=fit$uvw,x=x,doSm=doSm(x))
+            H <- stats::optimHess(lw,LL_uvw,UVW=fit$uvw,x=x,doSm=doSm(x))
             sw <- w*solve(-H)
             out <- UThHe_logratio_mean(x,model=model,w=w)
             out$disp <- c(w,sw)
@@ -222,7 +222,7 @@ central.fissiontracks <- function(x,exterr=FALSE,...){
         out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
         out$age <- c(tt,st)
         kappa <- log(sigma)
-        H <- stats::optimHess(par=c(mu,kappa),fn=LL.FT,y=Nsj,m=mj)
+        H <- stats::optimHess(par=c(mu,kappa),fn=LL_FT,y=Nsj,m=mj)
         out$disp <- c(sigma,sqrt(solve(-H)[2,2])*sigma)
         names(out$age) <- c('t','s[t]')
         names(out$disp) <- c('w','s[w]')
@@ -231,7 +231,7 @@ central.fissiontracks <- function(x,exterr=FALSE,...){
         out <- central.default(tst)
     }
     if (exterr){
-        out$age[1:2] <- add.exterr(x,tt=out$age[1],st=out$age[2])
+        out$age[1:2] <- add_exterr(x,tt=out$age[1],st=out$age[2])
     }
     out
 }
@@ -248,13 +248,13 @@ UThHe_logratio_mean <- function(x,model=1,w=0,fact=1){
 uvw2age <- function(fit,doSm,fact=1){
     if (doSm){
         cc <- uvw2UThHe(fit$uvw,fact*fit$covmat)
-        out <- get.UThHe.age(cc['U'],cc['sU'],
+        out <- get_UThHe_age(cc['U'],cc['sU'],
                              cc['Th'],cc['sTh'],
                              cc['He'],cc['sHe'],
                              cc['Sm'],cc['sSm'])
     } else {
         cc <- uv2UThHe(fit$uvw,fact*fit$covmat)
-        out <- get.UThHe.age(cc['U'],cc['sU'],
+        out <- get_UThHe_age(cc['U'],cc['sU'],
                              cc['Th'],cc['sTh'],
                              cc['He'],cc['sHe'])
     }
@@ -266,12 +266,12 @@ average_uvw <- function(x,model=1,w=0){
     doSm <- doSm(x)
     if (doSm(x)){
         nms <- c('u','v','w')
-        logratios <- flat.uvw.table(x,w=w)
+        logratios <- flat_uvw_table(x,w=w)
         fit <- wtdmean3D(logratios)
         uvw <- logratios[,c(1,3,5),drop=FALSE]
     } else {
         nms <- c('u','v')
-        logratios <- flat.uv.table(x,w=w)
+        logratios <- flat_uv_table(x,w=w)
         fit <- wtdmean2D(logratios)
         uvw <- logratios[,c(1,3),drop=FALSE]
     }
@@ -288,15 +288,15 @@ average_uvw <- function(x,model=1,w=0){
     out
 }
 
-LL.uvw <- function(lw,UVW,x,doSm=TRUE,LL=TRUE){
+LL_uvw <- function(lw,UVW,x,doSm=TRUE,LL=TRUE){
     w <- exp(lw)
     out <- 0
     for (i in 1:length(x)){
         if (doSm){
-            uvwc <- UThHe2uvw.covmat(x,i,w=w)
+            uvwc <- UThHe2uvw_covmat(x,i,w=w)
             X <- UVW-uvwc$uvw
         } else {
-            uvwc <- UThHe2uv.covmat(x,i,w=w)
+            uvwc <- UThHe2uv_covmat(x,i,w=w)
             X <- UVW-uvwc$uv
         }
         E <- uvwc$covmat
@@ -313,7 +313,7 @@ mswd_UThHe <- function(x,fit,doSm=FALSE){
     out <- list()
     if (doSm) nd <- 3
     else nd <- 2
-    SS <- LL.uvw(lw=log(fit$disp),fit$uvw[1:nd],x,doSm=doSm,LL=FALSE)
+    SS <- LL_uvw(lw=log(fit$disp),fit$uvw[1:nd],x,doSm=doSm,LL=FALSE)
     out$df <- nd*(length(x)-1)
     out$mswd <- as.numeric(SS/out$df)
     out$p.value <- 1-stats::pchisq(SS,out$df)

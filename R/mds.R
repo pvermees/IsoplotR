@@ -166,9 +166,9 @@ diss <- function(x,...){ UseMethod("diss",x) }
 #' @export
 diss.default <- function(x,y,method='KS',...){
     if (identical(method,'W2')){
-        out <- Wasserstein.diss(x,y)
+        out <- Wasserstein_diss(x,y)
     } else {
-        out <- KS.diss(x,y)
+        out <- KS_diss(x,y)
     }
     out
 }
@@ -185,7 +185,7 @@ diss.detritals <- function(x,method='W2',...) {
     }   }
     stats::as.dist(d)
 }
-KS.diss <- function(x,y) {
+KS_diss <- function(x,y) {
     xx <- sort(x)
     cdftmp <- stats::ecdf(xx)
     cdf1 <- cdftmp(xx)
@@ -197,7 +197,7 @@ KS.diss <- function(x,y) {
     max(dif)
 }
 # modified after the wasserstein1d function of the transport package
-Wasserstein.diss <- function(x,y,p=2) {
+Wasserstein_diss <- function(x,y,p=2) {
     m <- length(x)
     n <- length(y)
     stopifnot(m>0 && n>0)
@@ -228,6 +228,7 @@ Wasserstein.diss <- function(x,y,p=2) {
     out
 }
 
+#' @noRd
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
                      col='black',bg='white',xlab=NA,ylab=NA,asp=1,pch,...){
     if (shepard & !x$classical){

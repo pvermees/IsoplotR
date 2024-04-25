@@ -28,7 +28,7 @@ discordia <- function(x,fit,wetherill=TRUE){
 # extract the lower and upper discordia intercept from the parameters
 # of a Ludwig fit (initial Pb ratio and lower intercept age)
 twfit2wfit <- function(fit,x){
-    if (measured.disequilibrium(x$d)) x <- measured2initial(x,fit)
+    if (measured_disequilibrium(x$d)) x <- measured2initial(x,fit)
     tt <- fit$par['t']
     buffer <- 1 # start searching 1Ma above or below first intercept age
     l5 <- lambda('U235')[1]
@@ -50,15 +50,15 @@ twfit2wfit <- function(fit,x){
     disc.slope <- 1/(U*Pb76)
     conc.slope <- D$dPb206U238dt/D$dPb207U235dt
     if (disc.slope < conc.slope){
-        search.range <- c(tt,get.Pb207Pb206.age(Pb76,d=md)[1])+buffer
+        search.range <- c(tt,get_Pb207Pb206_age(Pb76,d=md)[1])+buffer
         tl <- tt
-        tu <- stats::uniroot(intersection.misfit.ludwig,interval=search.range,
+        tu <- stats::uniroot(intersection_misfit_ludwig,interval=search.range,
                              t2=tt,disc.slope=disc.slope,d=md)$root
     } else {
         search.range <- c(0,tt-buffer)
-        if (check.equilibrium(d=x$d)) search.range[1] <- -1000
+        if (check_equilibrium(d=x$d)) search.range[1] <- -1000
         tl <- tryCatch(
-            stats::uniroot(intersection.misfit.ludwig,
+            stats::uniroot(intersection_misfit_ludwig,
                            interval=search.range,
                            t2=tt,disc.slope=disc.slope,d=md)$root
           , error=function(e){
@@ -109,7 +109,7 @@ twfit2wfit <- function(fit,x){
 }
 
 # t1 = 1st Wetherill intercept, t2 = 2nd Wetherill intercept
-intersection.misfit.ludwig <- function(t1,t2,disc.slope,d=diseq()){
+intersection_misfit_ludwig <- function(t1,t2,disc.slope,d=diseq()){
     tl <- min(t1,t2)
     tu <- max(t1,t2)
     l5 <- lambda('U235')[1]
@@ -123,13 +123,13 @@ intersection.misfit.ludwig <- function(t1,t2,disc.slope,d=diseq()){
     YY - disc.slope*XX
 }
 # a = intercept, b = slope on TW concordia
-intersection.misfit.york <- function(tt,a,b,d=diseq()){
+intersection_misfit_york <- function(tt,a,b,d=diseq()){
     D <- mclean(tt=tt,d=d)
     # misfit is based on difference in slope in TW space
     (D$Pb207Pb206-a)*D$Pb206U238 - b
 }
 
-discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
+discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
     X <- c(0,0)
     Y <- c(0,0)
     l5 <- lambda('U235')[1]
@@ -139,7 +139,7 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
     if (d$U48$option==2) d$U48 <- list(x=unname(fit$par['U48i']),option=1)
     if (d$ThU$option==2) d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
     if (wetherill){
-        if (measured.disequilibrium(d)){
+        if (measured_disequilibrium(d)){
             U85 <- iratio('U238U235')[1]
             fit2d <- tw3d2d(fit)
             xy1 <- age_to_wetherill_ratios(fit$par[1],d=d)
@@ -182,7 +182,7 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
             ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
             ul <- y + ciy
             ll <- y - ciy
-            t75 <- get.Pb207U235.age(x,d=d)[,'t75']
+            t75 <- get_Pb207U235_age(x,d=d)[,'t75']
             yconc <- age_to_Pb206U238_ratio(t75,d=d)[,'68']
             overshot <- ul>yconc
             ul[overshot] <- yconc[overshot]
@@ -199,7 +199,7 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
         xl <- X[1]
         yl <- Y[1]
         y0 <- Y[2]
-        tl <- check.zero.UPb(fit2d$par['t'])
+        tl <- check_zero_UPb(fit2d$par['t'])
         U <- settings('iratio','U238U235')[1]
         nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
@@ -215,7 +215,7 @@ discordia.line <- function(fit,wetherill,d=diseq(),oerr=3){
         ul <- y + ciy
         ll <- y - ciy
         yconc <- rep(0,nsteps)
-        t68 <- get.Pb206U238.age(1/x,d=d)[,'t68']
+        t68 <- get_Pb206U238_age(1/x,d=d)[,'t68']
         yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope
@@ -253,7 +253,7 @@ tw3d2d <- function(fit){
 }
 
 # this would be much easier in unicode but that doesn't render in PDF:
-discordia.title <- function(fit,wetherill,sigdig=2,oerr=1,
+discordia_title <- function(fit,wetherill,sigdig=2,oerr=1,
                             y0option=1,dispunits=' Ma',...){
     if (is.null(fit$posterior) || 't'%ni%names(fit$posterior)){
         line1 <- maintit(x=fit$par[1],sx=fit$err[,1],n=fit$n,df=fit$df,

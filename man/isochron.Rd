@@ -98,6 +98,7 @@ isochron(x, ...)
   omit.fill = NA,
   omit.stroke = "grey",
   y0option = 1,
+  taxis = FALSE,
   ...
 )
 
@@ -151,6 +152,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -177,6 +179,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -203,6 +206,8 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
+  bratio = 0.895,
   ...
 )
 
@@ -229,6 +234,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -255,6 +261,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -281,6 +288,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -307,6 +315,7 @@ isochron(x, ...)
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  taxis = FALSE,
   ...
 )
 
@@ -598,6 +607,11 @@ For Th-U data:
 \code{y0option=4} reports the initial \eqn{^{234}}U/\eqn{^{238}}U
 activity ratio.}
 
+\item{taxis}{logical. If \code{TRUE}, replaces the x-axis of the
+inverse isochron with a time scale. Only applies if
+\code{inverse} is \code{TRUE} or, when \code{x} has class
+\code{U-Pb}, if \code{x$format} is 4 or higher.}
+
 \item{inverse}{toggles between normal and inverse isochrons. If the
     isochron plots \code{Y} against \code{X}, and
 
@@ -640,6 +654,8 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
+
+\item{bratio}{the \eqn{^{40}}K branching ratio.}
 }
 \value{
 If \code{x} has class \code{PbPb}, \code{ThPb},

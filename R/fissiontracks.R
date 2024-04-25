@@ -1,16 +1,16 @@
-fissiontrack.age <- function(x,i=NULL,exterr=FALSE){
+fissiontrack_age <- function(x,i=NULL,exterr=FALSE){
     if (x$format < 2){
-        out <- EDM.age(x,i,exterr=exterr)
+        out <- EDM_age(x,i,exterr=exterr)
     } else if (x$format > 1){
         if (x$format == 3){
-            x$zeta <- get.absolute.zeta(x$mineral,exterr=exterr);
+            x$zeta <- get_absolute_zeta(x$mineral,exterr=exterr);
         }
-        out <- ICP.age(x,i,exterr=exterr)
+        out <- ICP_age(x,i,exterr=exterr)
     }
     out
 }
 
-get.absolute.zeta <- function(mineral,exterr=FALSE){
+get_absolute_zeta <- function(mineral,exterr=FALSE){
     R <- iratio('U238U235')[1]
     MM <- imass('U')[1]
     qap <- etchfact(mineral)
@@ -162,13 +162,15 @@ set.zeta <- function(x,tst,exterr=FALSE,oerr=1,sigdig=NA,update=TRUE){
         zsz[2] <- zsz[1] * sqrt( (L8*exp(L8*tt)*st/(exp(L8*tt)-1))^2 +
                                  (rhoD[2]/rhoD[1])^2 + 1/Ns + 1/Ni )
     } else {
-        Ns <- sum(x$Ns)
-        UsU <- get.UsU(x)
-        UA <- sum(UsU[,1]*x$A)
-        UAerr <- sqrt( sum(UsU[,2]*x$A)^2 )
-        zsz[1] <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
-        zsz[2] <- zsz[1] * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
-                                 1/Ns + (UAerr/UA)^2 )
+        Ns <- x$Ns
+        UsU <- get_UsU(x)
+        UA <- UsU[,1]*x$A
+        UAerr <- UsU[,2]*x$A
+        z <- 2*UA*(exp(L8*tt)-1)/(L8*Ns)
+        sz <- z * sqrt( ((L8*exp(L8*tt)*st)/(exp(L8*tt)-1))^2 +
+                        1/Ns + (UAerr/UA)^2 )
+        fit <- continuous_mixture(log(z),sz/z)
+        zsz <- exp(fit$mu[1])*c(1,fit$mu[2])
     }
     if (update){
         out <- x
@@ -180,7 +182,7 @@ set.zeta <- function(x,tst,exterr=FALSE,oerr=1,sigdig=NA,update=TRUE){
     out
 }
 
-ICP.age <- function(x,i=NULL,exterr=FALSE){
+ICP_age <- function(x,i=NULL,exterr=FALSE){
     ngrains <- length(x$Ns)
     tt <- rep(NA,ngrains)
     st <- rep(NA,ngrains)
@@ -191,10 +193,10 @@ ICP.age <- function(x,i=NULL,exterr=FALSE){
     }
     ipos <- which(x$Ns>0)
     izero <- which(x$Ns<1)
-    UsU <- get.UsU(x)
+    UsU <- get_UsU(x)
     # first calculate the ages of the non-zero track data:
     for (i in ipos){
-        tst <- get.ICP.age(x$Ns[i],x$A[i],UsU[i,],zeta)
+        tst <- get_ICP_age(x$Ns[i],x$A[i],UsU[i,],zeta)
         tt[i] <- tst[1]
         st[i] <- tst[2]
     }
@@ -202,7 +204,7 @@ ICP.age <- function(x,i=NULL,exterr=FALSE){
     for (i in izero){
         rho <- UsU[i,'U']/(x$A[i]*UsU[i,'sU']^2)
         Ni <- x$A[i]*UsU[i,'U']*rho
-        tst <- get.EDM.age(x$Ns[i],Ni,zeta*1e6,c(rho,0))
+        tst <- get_EDM_age(x$Ns[i],Ni,zeta*1e6,c(rho,0))
         tt[i] <- tst[1]
         st[i] <- tst[2]
     }
@@ -210,7 +212,7 @@ ICP.age <- function(x,i=NULL,exterr=FALSE){
     out
 }
 
-get.UsU <- function(x){
+get_UsU <- function(x){
     Aicp <- pi*(x$spotSize/2)^2
     n <- length(x$U)
     nspots <- length(stats::na.omit(unlist(x$U)))
@@ -248,7 +250,7 @@ get.UsU <- function(x){
     out
 }
 
-EDM.age <- function(x,i=NULL,exterr=FALSE){
+EDM_age <- function(x,i=NULL,exterr=FALSE){
     ns <- nrow(x$x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
@@ -260,14 +262,14 @@ EDM.age <- function(x,i=NULL,exterr=FALSE){
         rhoD <- c(x$rhoD[1],0)
     }
     for (j in 1:ns){
-        out[j,] <- get.EDM.age(x$x[j,'Ns'],x$x[j,'Ni'],zeta,rhoD)
+        out[j,] <- get_EDM_age(x$x[j,'Ns'],x$x[j,'Ni'],zeta,rhoD)
     }
     if (!is.null(i)) out <- out[i,]
     out
 }
 
 # zeta and rhoD are two-element vectors
-get.EDM.age <- function(Ns,Ni,zeta,rhoD=c(1,0)){
+get_EDM_age <- function(Ns,Ni,zeta,rhoD=c(1,0)){
     L8 <- lambda('U238')[1]
     if (Ns<1){
         Ns <- Ns+0.5
@@ -278,14 +280,14 @@ get.EDM.age <- function(Ns,Ni,zeta,rhoD=c(1,0)){
     c(tt,st)
 }
 # zeta is a two-element vector
-get.ICP.age <- function(Ns,A,UsU,zeta){
+get_ICP_age <- function(Ns,A,UsU,zeta){
     L8 <- lambda('U238')[1]
     tt <- log(1+L8*zeta[1]*Ns/(2*UsU[1]*A))/L8
     st <- tt * sqrt(1/Ns + (zeta[2]/zeta[1])^2 + (UsU[2]/UsU[1])^2)
     c(tt,st)
 }
 
-LL.FT <- function(par,y,m){
+LL_FT <- function(par,y,m){
     LL <- 0
     for (i in seq_along(y)){
         p <- pyumu(mu=par[1],sigma=exp(par[2]),mi=m[i],yi=y[i])
@@ -302,7 +304,7 @@ pyumu <- function(mu,sigma,mi,yi){
                      mu=mu,sigma=sigma,mi=mi,yi=yi)$value
 }
 # Equation 18 of Galbraith and Roberts (2012)
-LL.sigma <- function(sigma,X,sX){
+LL_sigma <- function(sigma,X,sX){
     wi <- 1/(sigma^2+sX^2)
     mu <- sum(wi*X)/sum(wi)
     sum(log(wi) - wi*(X-mu)^2)/2

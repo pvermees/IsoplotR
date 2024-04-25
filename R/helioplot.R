@@ -174,10 +174,10 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
     fit <- central.UThHe(x2calc,compositional=TRUE,model=model)
-    fill <- set.ellipse.colours(ns=ns,levels=levels,
+    fill <- set_ellipse_colours(ns=ns,levels=levels,
                                 col=ellipse.fill,hide=hide,
                                 omit=omit,omit.col=omit.fill)
-    stroke <- set.ellipse.colours(ns=ns,levels=levels,
+    stroke <- set_ellipse_colours(ns=ns,levels=levels,
                                   col=ellipse.stroke,hide=hide,
                                   omit=omit,omit.col=omit.stroke)
     if (logratio) {
@@ -239,7 +239,7 @@ plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,
                                    show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
-        uvc <- UThHe2uv.covmat(x,i)
+        uvc <- UThHe2uv_covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
         ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=oerr2alpha(oerr))
@@ -252,7 +252,7 @@ plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=3,
                                     show.numbers=FALSE,levels=NA,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
-        uvc <- UThHe2uv.covmat(x,i)
+        uvc <- UThHe2uv_covmat(x,i)
         x0 <- uvc$uv[1]
         y0 <- uvc$uv[2]
         ell <- ellipse(x=x0,y=y0,covmat=uvc$covmat,alpha=oerr2alpha(oerr))
@@ -292,7 +292,7 @@ plot_barycentre <- function(fit,fact=c(1,1,1),logratio=TRUE,
 
 plot_logratio_contours <- function(x,contour.col=c('white','red'),
                                    xlim=NA,ylim=NA,...){
-    cntrs <- get.logratio.contours(x,xlim=xlim,ylim=ylim)
+    cntrs <- get_logratio_contours(x,xlim=xlim,ylim=ylim)
     plot_logratio_frame(cntrs$lims,...)
     tticks <- cntrs$tticks
     nt <- length(tticks)
@@ -314,7 +314,7 @@ plot_logratio_contours <- function(x,contour.col=c('white','red'),
 plot_helioplot_contours <- function(x,fact=c(1,1,1),
                                     contour.col=c('white','red'),
                                     xlim=NA,ylim=NA,...){
-    cntrs <- get.helioplot.contours(x,fact=fact)
+    cntrs <- get_helioplot_contours(x,fact=fact)
     plot_helioplot_frame(cntrs$lims,fact=fact,
                          fill.col=contour.col[2],...)
     tticks <- cntrs$tticks
@@ -348,7 +348,7 @@ helioplot_title <- function(fit,sigdig=2,oerr=3,...){
     mymtext(line1,line=line1line,...)
 }
 
-get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=50){
+get_logratio_contours <- function(x,xlim=NA,ylim=NA,res=50){
     out <- list()
     R <- iratio('U238U235')[1]
     L8 <- lambda('U238')[1]
@@ -361,7 +361,8 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=50){
     if (doSm){
         uvw <- UThHe2uvw(x)
         w <- mean(uvw[,'w'],na.rm=TRUE)
-        Sm <- geomean.Sm(x)
+        UVW <- colMeans(UThHe2uvw(x),na.rm=TRUE)
+        Sm <- exp(UVW[3])/(exp(UVW[1])+exp(UVW[2])+exp(UVW[3])+1)
     } else {
         uv <- UThHe2uv(x)
         w <- 0
@@ -372,7 +373,7 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=50){
     if (all(is.finite(ylim))) out$lims[3:4] <- ylim
     du <- out$lims[2]-out$lims[1]
     dv <- out$lims[4]-out$lims[3]
-    tticks <- get.logratio.tticks(out$lims,Sm=Sm)
+    tticks <- get_logratio_tticks(out$lims,Sm=Sm)
     out$uv <- list()
     out$tticks <- NULL
     nt <- 0
@@ -414,14 +415,14 @@ get.logratio.contours <- function(x,xlim=NA,ylim=NA,res=50){
     }
     out
 }
-get.helioplot.contours <- function(x,fact=c(1,1,1),res=50){
+get_helioplot_contours <- function(x,fact=c(1,1,1),res=50){
     out <- list()
     doSm <- doSm(x)
     if (doSm){
         uvw <- UThHe2uvw(x)
         SmU <- exp(mean(uvw[,'w']-uvw[,'u'],na.rm=TRUE))
     }
-    out$tticks <- get.helioplot.tticks(fact)
+    out$tticks <- get_helioplot_tticks(fact)
     out$xyz <- list()
     nt <- length(out$tticks)
     for (i in 1:nt){
@@ -430,7 +431,7 @@ get.helioplot.contours <- function(x,fact=c(1,1,1),res=50){
         Th <- seq(0,1,length.out=res)
         if (doSm) Sm <- SmU*U
         else Sm <- 0
-        He <- get.He(tt,U,Th,Sm)
+        He <- get_He(tt,U,Th,Sm)
         out$xyz[[i]] <- cbind(He,U,Th)
     }
     out
@@ -438,7 +439,7 @@ get.helioplot.contours <- function(x,fact=c(1,1,1),res=50){
 
 # f = the distance from the X- and Y-margins for
 # the maximum and minimum age contours to be plotted
-get.logratio.tticks <- function(lims,f=0.05,Sm=0){
+get_logratio_tticks <- function(lims,f=0.05,Sm=0){
     uv.lims <- rep(0,4)
     uv.lims[1] <- lims[1]+f*(lims[3]-lims[1])
     uv.lims[2] <- lims[2]+f*(lims[4]-lims[2])
@@ -450,20 +451,20 @@ get.logratio.tticks <- function(lims,f=0.05,Sm=0){
     Umin <- exp(uv.lims[2])/(exp(uv.lims[2])+exp(uv.lims[4])+1)
     Thmin <- exp(uv.lims[4])/(exp(uv.lims[2])+exp(uv.lims[4])+1)
     Hemin <- 1/(exp(uv.lims[2])+exp(uv.lims[4])+1)
-    mint <- get.UThHe.age(Umin,0,Thmin,0,Hemin,0,Sm,0)[1]
-    maxt <- get.UThHe.age(Umax,0,Thmax,0,Hemax,0,Sm,0)[1]
-    get.tticks(mint,maxt)
+    mint <- get_UThHe_age(Umin,0,Thmin,0,Hemin,0,Sm,0)[1]
+    maxt <- get_UThHe_age(Umax,0,Thmax,0,Hemax,0,Sm,0)[1]
+    get_tticks(mint,maxt)
 }
 # f = the distance from the ternary corners for
 # the maximum and minimum age contours to be plotted
-get.helioplot.tticks <- function(fact,f=0.05,Sm=0){
+get_helioplot_tticks <- function(fact,f=0.05,Sm=0){
     m <- c(f,1-f,0)/fact
     M <- c(1-f,f,0)/fact
-    mint <- get.UThHe.age(m[2],0,m[3],0,m[1],0,Sm,0)[1]
-    maxt <- get.UThHe.age(M[2],0,M[3],0,M[1],0,Sm,0)[1]
-    get.tticks(mint,maxt)
+    mint <- get_UThHe_age(m[2],0,m[3],0,m[1],0,Sm,0)[1]
+    maxt <- get_UThHe_age(M[2],0,M[3],0,M[1],0,Sm,0)[1]
+    get_tticks(mint,maxt)
 }
-get.tticks <- function(mint,maxt){
+get_tticks <- function(mint,maxt){
     m <- log10(mint)
     M <- log10(maxt)
     grDevices::axisTicks(usr=c(m,M),log=TRUE)
@@ -477,7 +478,7 @@ get.logratioplot.limits <- function(x,nse=3){
     minv <- Inf
     maxv <- -Inf
     for (i in 1:ns){
-        d <- UThHe2uv.covmat(x,i)
+        d <- UThHe2uv_covmat(x,i)
         uv <- d$uv
         uv.err <- sqrt(diag(d$covmat)[c('u','v')])
         umin <- uv['u'] - nse*uv.err['u']
@@ -587,7 +588,7 @@ uv2HeUTh <- function(uv){
     cbind(He,U,Th)
 }
 
-UThHe2uvw.covmat <- function(x,i,w=0){
+UThHe2uvw_covmat <- function(x,i,w=0){
     U <- x[i,'U']
     sU <- x[i,'errU']
     Th <- x[i,'Th']
@@ -614,7 +615,7 @@ UThHe2uvw.covmat <- function(x,i,w=0){
     colnames(out$covmat) <- c("u","v","w")
     out
 }
-UThHe2uv.covmat <- function(x,i,w=0){
+UThHe2uv_covmat <- function(x,i,w=0){
     out <- list()
     U <- x[i,'U']
     sU <- x[i,'errU']
@@ -668,11 +669,6 @@ renormalise <- function(xyz,fact=c(1,1,1)){
         out <- xyz*fact/sum(xyz*fact)
     }
     out
-}
-
-geomean.Sm <- function(x,...){
-    UVW <- colMeans(UThHe2uvw(x),na.rm=TRUE)
-    exp(UVW[3])/(exp(UVW[1])+exp(UVW[2])+exp(UVW[3])+1)
 }
 
 getfact <- function(x,fit){

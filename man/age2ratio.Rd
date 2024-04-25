@@ -4,7 +4,16 @@
 \alias{age2ratio}
 \title{Predict isotopic ratios from ages}
 \usage{
-age2ratio(tt, st = 0, ratio = "Pb206U238", exterr = FALSE, d = diseq(), J, sJ)
+age2ratio(
+  tt,
+  st = 0,
+  ratio = "Pb206U238",
+  exterr = FALSE,
+  d = diseq(),
+  J,
+  sJ = 0,
+  bratio = 0.895
+)
 }
 \arguments{
 \item{tt}{a scalar or (except when \code{ratio} =
@@ -35,6 +44,8 @@ uncertainties into \code{st}. Not used when \code{ratio} =
 
 \item{sJ}{the standard error of \code{J} (only used if \code{ratio}
 is \code{'Ar40Ar39'}).}
+
+\item{bratio}{branching ratio of \eqn{^40}K}
 }
 \value{
 If \code{ratio} is \code{'Pb207U235'}, \code{'U238Pb206'},

@@ -119,7 +119,7 @@ yorkhelper <- function(x,np=2){
 # get fitted X and Y given a dataset x=cbind(X,sX,Y,sY,rXY),
 # an intercept a and slope b. This function is useful
 # for evaluating log-likelihoods of derived quantities
-get.york.xy <- function(XY,a,b){
+get_york_xy <- function(XY,a,b){
     X <- XY[,'X']
     vX <- XY[,'sX']^2
     Y <- XY[,'Y']
@@ -186,14 +186,14 @@ data2york.default <- function(x,format=1,...){
     } else {
         cnames <- c('X','sX','Y','sY','rXY')
         if (format==3){
-            X <- cbind(x[,1:4],get.cor.div(x[,1],x[,2],x[,3],
+            X <- cbind(x[,1:4],get_cor_div(x[,1],x[,2],x[,3],
                                            x[,4],x[,5],x[,6]))
             opt <- NULL
         } else {
             X <- x
             opt <- 5
         }
-        out <- insert.data(x=X,cnames=cnames,opt=opt)
+        out <- insert_data(x=X,cnames=cnames,opt=opt)
     }
     out
 }
@@ -255,7 +255,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         }
     } else if (option==2){ # 07/06 vs. 38/06
         for (i in 1:ns){
-            td <- tera.wasserburg(x,i=i)
+            td <- tera_wasserburg(x,i=i)
             out[i,] <- data2york_UPb_helper(td,i1='U238Pb206',i2='Pb207Pb206')
         }
     } else if (option==3 && x$format%in%c(4,5,6,9,85,119)){ # 0x/06 vs 38/06
@@ -264,7 +264,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         } else {
             Pbx6label <- ifelse(x$format%in%c(85,119),'Pb208Pb206','Pb204Pb206')
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.20x(x,i)
+                ir <- get_UPb_isochron_ratios_20x(x,i)
                 out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2=Pbx6label)
             }
         }
@@ -274,7 +274,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         } else {
             Pbx7label <- ifelse(x$format%in%c(85,1210),'Pb208Pb207','Pb204Pb207')
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.20x(x,i)
+                ir <- get_UPb_isochron_ratios_20x(x,i)
                 out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2=Pbx7label)
             }
         }
@@ -285,12 +285,12 @@ data2york.UPb <- function(x,option=1,tt=0,...){
         }
     } else if (option==6 && x$format%in%c(7,8,11)){ # 08c/06 vs. 38/06
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U238Pb206',i2='Pb208cPb206')
         }
     } else if (option==7 && x$format%in%c(7,8,12)){ # 08c/07 vs. 35/07
         for (i in 1:ns){
-            ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+            ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
             out[i,] <- data2york_UPb_helper(ir,i1='U235Pb207',i2='Pb208cPb207')
         }
     } else if (option==8 && x$format%in%c(7,8,11)){ # 06c/08 vs. 32/08
@@ -298,7 +298,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             stop('Not implemented yet')
         } else {
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
                 out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb206cPb208')
             }
         }
@@ -307,7 +307,7 @@ data2york.UPb <- function(x,option=1,tt=0,...){
             stop('Not implemented yet')
         } else {
             for (i in 1:ns){
-                ir <- get.UPb.isochron.ratios.208(x,i,tt=tt)
+                ir <- get_UPb_isochron_ratios_208(x,i,tt=tt)
                 out[i,] <- data2york_UPb_helper(ir,i1='Th232Pb208',i2='Pb207cPb208')
             }
         }
@@ -588,22 +588,33 @@ ThConversionHelper <- function(x){
     out
 }
 
-normal2inverse <- function(x){
+normal2inverse <- function(x,type='p'){
     out <- x
     iX <- 1
     isX <- 2
     iY <- 3
     isY <- 4
     irXY <- 5
-    out[,iX] <- x[,iX]/x[,iY]
-    out[,iY] <- 1/x[,iY]
     E11 <- x[,isX]^2
     E22 <- x[,isY]^2
     E12 <- x[,irXY]*x[,isX]*x[,isY]
-    J11 <- 1/x[,iY]
-    J12 <- -out[,iX]/x[,iY]
-    J21 <- rep(0,nrow(x))
-    J22 <- -out[,iY]/x[,iY]
+    if (type=='p'){
+        out[,iX] <- x[,iX]/x[,iY]
+        out[,iY] <- 1/x[,iY]
+        J11 <- 1/x[,iY]
+        J12 <- -out[,iX]/x[,iY]
+        J21 <- rep(0,nrow(x))
+        J22 <- -out[,iY]/x[,iY]
+    } else if (type=='d'){
+        out[,iX] <- 1/x[,iX]
+        out[,iY] <- x[,iY]/x[,iX]
+        J11 <- -out[,iX]/x[,iX]
+        J12 <- rep(0,nrow(x))
+        J21 <- -out[,iY]/x[,iX]
+        J22 <- 1/x[,iX]
+    } else {
+        stop('Invalid type')
+    }
     err <- errorprop(J11,J12,J21,J22,E11,E22,E12)
     out[,isX] <- sqrt(err[,'varX'])
     out[,isY] <- sqrt(err[,'varY'])

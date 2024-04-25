@@ -25,7 +25,7 @@
 #' 
 #' @param model one of three regression models:
 #'
-#' \code{1}: fit a discordia line through the data using the maximum
+#' \code{1}: fit a discordia_line through the data using the maximum
 #' likelihood algorithm of Ludwig (1998), which assumes that the
 #' scatter of the data is solely due to the analytical
 #' uncertainties. In this case, \code{IsoplotR} will either calculate
@@ -36,9 +36,9 @@
 #' than \code{alpha()}, then the analytical uncertainties are augmented
 #' by a factor \eqn{\sqrt{MSWD}}.
 #'
-#' \code{2}: fit a discordia line ignoring the analytical uncertainties
+#' \code{2}: fit a discordia_line ignoring the analytical uncertainties
 #'
-#' \code{3}: fit a discordia line using a modified maximum likelihood
+#' \code{3}: fit a discordia_line using a modified maximum likelihood
 #' algorithm that includes accounts for any overdispersion by adding a
 #' geological (co)variance term.
 #' 
@@ -135,23 +135,23 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     type <- checkIsochronType(x,type)
     X <- x
     X$d <- mediand(x$d)
-    init <- init.ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
-    fit <- contingencyfit(par=init$par,fn=LL.ludwig,lower=init$lower,
+    init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
+    fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
                           upper=init$upper,x=X,anchor=anchor,
                           type=type,model=model,exterr=exterr)
     fit$cov <- inverthess(fit$hessian)
-    if (measured.disequilibrium(X$d) & type%in%c('joint',0,1,3)){
+    if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
                                   model=model,plot=plot,...)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,X,anchor=anchor,type=type)
-    out <- mswd.lud(afit,x=X,exterr=exterr,type=type)
+    out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
     out$model <- model
     if (model==3){
         if ('w'%in%names(fit$par)){
-            w <- unname(exp(fit$par['w']))
-            sw <- unname(sqrt(fit$cov['w','w']))
+            w <- unname(afit$par['w'])
+            sw <- sqrt(afit$cov['w','w'])
         } else {
             w <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
             sw <- 0
@@ -271,7 +271,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
     out
 }
 
-init.ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
+init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
     init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,model=model)
     if (x$d$U48$option==2 | x$d$ThU$option==2){
         if ('t'%in%names(init$par)) tt <- init$par['t']
@@ -342,7 +342,7 @@ fixDispersion <- function(model,format,anchor,type){
     out
 }
 
-LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
+LL_ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
     pnames <- names(par)
     if ('t' %in% pnames){
         tt <- exp(par['t'])
@@ -457,15 +457,15 @@ LL.ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
     }
     if (model==2){
         if (type%in%c('joint',0) & x$format>3){
-            LL <- LL + LL.ludwig.model2(ta0b0w,x=X,exterr=exterr)
+            LL <- LL + LL_ludwig_model2(ta0b0w,x=X,exterr=exterr)
         } else {
-            LL <- LL + LL.ludwig.model2.2d(ta0b0w,x=X,exterr=exterr,type=type)
+            LL <- LL + LL_ludwig_model2_2d(ta0b0w,x=X,exterr=exterr,type=type)
         }
     } else {
         if (type%in%c('joint',0) & x$format>3){
             LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
         } else {
-            LL <- LL + data2ludwig.2d(ta0b0w,x=X,model=model,exterr=exterr,
+            LL <- LL + data2ludwig_2d(ta0b0w,x=X,model=model,exterr=exterr,
                                       type=type,anchor=anchor)$LL
         }
     }
@@ -684,16 +684,16 @@ getEw2 <- function(w=0,x,McL=mclean(),type='joint'){
     J%*%diag(w^2,ns,ns)%*%t(J)
 }
 
-LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
+LL_ludwig_model2 <- function(ta0b0,x,exterr=FALSE){
     tt <- ta0b0['t']
     a0 <- ta0b0['a0']
     b0 <- ta0b0['b0']
     ns <- length(x)
     McL <- mclean(tt=tt,d=x$d,exterr=exterr)
     if (x$format%in%c(7,8,11,12)){
-        XY <- get.UPb.isochron.ratios.208(x,tt=tt)[,1:4]
+        XY <- get_UPb_isochron_ratios_208(x,tt=tt)[,1:4]
     } else {
-        XY <- get.UPb.isochron.ratios.20x(x)
+        XY <- get_UPb_isochron_ratios_20x(x)
     }
     X6 <- XY[,1,drop=FALSE] # U238Pb206
     Y6 <- XY[,2,drop=FALSE] # Pb204Pb206 or Pb208cPb206
@@ -737,11 +737,11 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         dN7dl31 <-  (Y7-a7)*db7dl31 - 2*X7*b7*db7dl31
         dD7dl35 <- 2*b7*db7dl35                       # D7 = 1+b7^2
         dD7dl31 <- 2*b7*db7dl31
-        dx6dl38 <- (dN6dl38*D6-N6*dD6dl38)/D6^2         # x6 = N6/D6
+        dx6dl38 <- (dN6dl38*D6-N6*dD6dl38)/D6^2       # x6 = N6/D6
         dx6dl34 <- (dN6dl34*D6-N6*dD6dl34)/D6^2
         dx6dl30 <- (dN6dl30*D6-N6*dD6dl30)/D6^2
         dx6dl26 <- (dN6dl26*D6-N6*dD6dl26)/D6^2
-        dx7dl35 <- (dN7dl35*D7-N7*dD7dl35)/D7^2         # x7 = N7/D7
+        dx7dl35 <- (dN7dl35*D7-N7*dD7dl35)/D7^2       # x7 = N7/D7
         dx7dl31 <- (dN7dl31*D7-N7*dD7dl31)/D7^2
         El <- getEl()
         J <- matrix(0,2*ns,7)
@@ -754,10 +754,10 @@ LL.ludwig.model2 <- function(ta0b0,x,exterr=FALSE){
         J[i2,'Pa231'] <- -dx7dl31
         EE <- EE + J%*%El%*%t(J)
     }
-    LL.norm(DD,EE)
+    LL_norm(DD,EE)
 }
 
-data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
+data2ludwig_2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
     out <- list()
     pnames <- names(ta0b0w)
     tt <- ta0b0w['t']
@@ -817,7 +817,7 @@ data2ludwig.2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
             stop('invalid isochron type')
         }
     } else {
-        stop('Invalid U-Pb format for data2ludwig.2d')
+        stop('Invalid U-Pb format for data2ludwig_2d')
     }
     E <- matrix(0,nrow=2*ns,ncol=2*ns)
     i1 <- 1:ns
@@ -905,11 +905,11 @@ getc0SSLL <- function(yd,A,b,L0,E,multiplier=1){
     out <- list()
     out$c0 <- (yd[,'X']-M)/multiplier
     out$SS <- KL%*%O%*%KL
-    out$LL <- LL.norm(KL,E)
+    out$LL <- LL_norm(KL,E)
     out
 }
 
-LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
+LL_ludwig_model2_2d <- function(ta0b0,x,exterr=FALSE,type=1){
     pnames <- names(ta0b0)
     tt <- ta0b0['t']
     if ('a0'%in%pnames) a0 <- ta0b0['a0']
@@ -1005,14 +1005,14 @@ LL.ludwig.model2.2d <- function(ta0b0,x,exterr=FALSE,type=1){
         E <- diag(0,ns,ns)
         diag(E) <- stats::var(D)
         E <- E + J%*%El%*%t(J)
-        LL <- LL.norm(D,E)
+        LL <- LL_norm(D,E)
     } else {
         LL <- -sum(stats::dnorm(x=num/den,mean=0,sd=sigma,log=TRUE))
     }
     LL
 }
 
-mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
+mswd_lud <- function(fit,x,exterr=FALSE,type='joint'){
     out <- fit
     ns <- length(x)
     np <- sum(diag(fit$cov)>0)
@@ -1027,7 +1027,7 @@ mswd.lud <- function(fit,x,exterr=FALSE,type='joint'){
     if (type%in%c('joint',0) && x$format%in%c(4,5,6,7,8,11,12,85)){
         SS <- data2ludwig(X,ta0b0w=fit$par)$SS
     } else {
-        SS <- data2ludwig.2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr)$SS
+        SS <- data2ludwig_2d(ta0b0w=fit$par,x=X,type=type,exterr=exterr)$SS
     }
     out <- append(out,getMSWD(SS,out$df))
     out$n <- ns

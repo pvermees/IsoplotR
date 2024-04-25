@@ -450,7 +450,7 @@ integer or \code{'all'}.}
 \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-(\code{type}=4), the concordia age (\code{type}=5), or the
+(\code{type}=4), the concordia_age (\code{type}=5), or the
 \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).}
 
 \item{cutoff.76}{the age (in Ma) below which the

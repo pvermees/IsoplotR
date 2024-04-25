@@ -133,7 +133,7 @@ kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                         hist.col=rgb(0,1,0,0.2),show.hist=TRUE,bty='n',
                         binwidth=NA,hide=NULL,nmodes=0,sigdig=2,...){
     x2calc <- clear(x,hide)
-    X <- getkde(x2calc,from=from,to=to,bw=bw,adaptive=adaptive,
+    X <- get_kde(x2calc,from=from,to=to,bw=bw,adaptive=adaptive,
                 log=log,n=n,nmodes=nmodes,...)
     if (plot) {
         plot.KDE(X,rug=rug,xlab=xlab,ylab=ylab,kde.col=kde.col,
@@ -163,7 +163,7 @@ kde.other <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), the concordia age (\code{type}=5), or the
+#'     (\code{type}=4), the concordia_age (\code{type}=5), or the
 #'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
@@ -231,7 +231,7 @@ kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                           hide=NULL,nmodes=0,sigdig=2,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
-    X <- getkde(x2plot,from=from,to=to,bw=bw,adaptive=adaptive,
+    X <- get_kde(x2plot,from=from,to=to,bw=bw,adaptive=adaptive,
                 log=log,n=n,samebandwidth=samebandwidth,
                 normalise=normalise,nmodes=nmodes,...)
     if (plot){
@@ -421,7 +421,7 @@ kde_helper <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                        cutoff.76=1100,cutoff.disc=discfilter(),
                        common.Pb=0,i2i=FALSE,Th0i=0,hide=NULL,
                        nmodes=0,sigdig=2,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,
+    tt <- get_ages(x,type=type,cutoff.76=cutoff.76,
                    cutoff.disc=cutoff.disc,i2i=i2i,
                    common.Pb=common.Pb,Th0i=Th0i,omit4c=hide)
     kde.default(tt[,1],from=from,to=to,bw=bw,adaptive=adaptive,
@@ -431,9 +431,19 @@ kde_helper <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,log=FALSE,
                 nmodes=nmodes,sigdig=sigdig,...)
 }
 
-# helper functions for the generic kde function
-getkde <- function(x,...){ UseMethod("getkde",x) }
-getkde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
+#' Helper functions for the generic kde function
+#' @param x an IsoplotR object or a vector of numbers
+#' @noRd
+get_kde <- function(x,...){ UseMethod("get_kde",x) }
+#' @param from minimum limit
+#' @param to maximum limit
+#' @param bw bandwidth
+#' @param adaptive if \code{TRUE}, adjusts the bandwidth by density
+#' @param log if \code{TRUE}, forms a KDE of the logarithms
+#' @param n the number of steps at which the KDE is evaluated
+#' @param nmodes the number of modes to be labelled
+#' @noRd
+get_kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                            log=FALSE,n=512,nmodes=0,...){
     out <- list()
     class(out) <- "KDE"
@@ -452,22 +462,32 @@ getkde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
         from <- log(from)
         to <- log(to)
     }
-    out$x <- seq(from=from,to=to,length.out=n)
+    xx <- seq(from=from,to=to,length.out=n)
     if (adaptive){
-        y <- Abramson(d,from=from,to=to,bw=bw,n=n,...)
+        yy <- Abramson(d,from=from,to=to,bw=bw,n=n,...)
     } else {
-        y <- stats::density(d,bw,from=from,to=to,n=n,...)$y
+        yy <- stats::density(d,bw,from=from,to=to,n=n,...)$y
     }
-    if (log) out$x <- exp(out$x)
+    if (log){ # back-transform
+        dxin <- diff(xx)
+        out$x <- exp(xx)
+        dxout <- diff(out$x)
+        yy <- c(dxin,utils::tail(dxin,1))*yy/c(dxout,utils::tail(dxout,1))
+    } else {
+        out$x <- xx
+    }
     out$x <- c(out$x[1],out$x,out$x[n])
-    out$y <- c(0,y/(sum(y)*(to-from)/n),0)
+    out$y <- c(0,yy/(sum(yy)*(to-from)/n),0)
     out$modes <- getmodes(x=out$x,y=out$y,nmodes=nmodes)
     out$bw <- bw
     out$ages <- x
     out
 }
-getkde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
-                             log=FALSE, n=512,samebandwidth=TRUE,
+#' @param samebandwidth use the median bandwidth for all samples?
+#' @param normalise rescale the KDEs to cover the same area
+#' @noRd
+get_kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
+                             log=FALSE,n=512,samebandwidth=TRUE,
                              normalise=TRUE,nmodes=0,...){
     if (is.na(from) | is.na(to)) {
         mM <- getmM(unlist(x),from,to,log)
@@ -554,6 +574,7 @@ Abramson <- function(dat,from,to,bw,n=512,...){
     dens
 }
 
+#' @noRd
 plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
                      hist.col=rgb(0,1,0,0.2),
@@ -604,9 +625,10 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
         graphics::text(x=x$modes[,'x'],y=x$modes[,'y'],xpd=TRUE,pos=3,
                        labels=roundit(x$modes[,'x'],sigdig=sigdig))
     }
-    mymtext(get.ntit(x$ages,m=m,M=M),line=0,adj=1)
+    mymtext(get_ntit(x$ages,m=m,M=M),line=0,adj=1)
 }
 
+#' @noRd
 plot.KDEs <- function(x,ncol=NA,rug=FALSE,xlab="age [Ma]",ylab="",
                       kde.col=rgb(1,0,1,0.6),show.hist=TRUE,
                       hist.col=rgb(0,1,0,0.2),

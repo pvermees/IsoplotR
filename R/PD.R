@@ -1,28 +1,26 @@
-get.PD.ratio <- function(tt,st,nuclide,exterr=FALSE,bratio=1){
+getDPratio <- function(tt,st=0,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     R <- bratio*(exp(L[1]*tt)-1)
-    Jac <- matrix(0,1,2)
-    E <- matrix(0,2,2)
-    Jac[1,1] <- bratio*L[1]*exp(L[1]*tt)
-    if (exterr) Jac[1,2] <- bratio*tt*exp(L[1]*tt)
-    E[1,1] <- st^2
-    E[2,2] <- L[2]^2
-    sR <- sqrt(Jac %*% E %*% t(Jac))
-    out <- c(R,sR)
+    J1 <- bratio*L[1]*exp(L[1]*tt)
+    if (exterr) J2 <- bratio*tt*exp(L[1]*tt)
+    else J2 <- 0
+    E11 <- st^2
+    E22 <- L[2]^2
+    vR <- errorprop1x2(J1,J2,E11,E22)
+    out <- cbind(R,sqrt(vR))
+    colnames(out) <- c('PD','s[PD]')
+    out
 }
 
-get.PD.age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1){
+getPDage <- function(DP,sDP=0,nuclide,exterr=FALSE,bratio=1){
     L <- lambda(nuclide)
     tt <- log(1 + DP/bratio)/L[1]
-    E <- matrix(0,2,2)
-    J <- matrix(0,1,2)
     E11 <- sDP^2
     if (exterr) E22 <- L[2]^2
     else E22 <- 0
-    E12 <- 0
     J1 <- 1/(L[1]*(bratio + DP)) # dt.dDP
     J2 <- -tt/L[1]               # dt.dL
-    vt <- errorprop1x2(J1,J2,E11,E22,E12)
+    vt <- errorprop1x2(J1,J2,E11,E22)
     out <- cbind(tt,sqrt(vt))
     colnames(out) <- c('t','s[t]')
     out
@@ -31,7 +29,7 @@ get.PD.age <- function(DP,sDP,nuclide,exterr=FALSE,bratio=1){
 # i2i = isochron to intercept
 # bratio = branching ratio
 # projerr = isochron projection error
-PD.age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
+PD_age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
                    bratio=1,omit4c=NULL,projerr=FALSE,...){
     ns <- length(x)
     out <- matrix(0,ns,2)
@@ -51,20 +49,20 @@ PD.age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
         if (projerr) DP[,2] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
         else DP[,2] <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     } else {
-        initial <- get.nominal.initials(x)
+        initial <- get_nominal_initials(x)
         dat <- data2york(x,exterr=exterr)
         dat[,'Y'] <- dat[,'Y'] - initial$y0
         if (projerr) dat[,'sY'] <- sqrt(dat[,'sY']^2 + initial$sy0^2)
         DP <- quotient(dat[,'X'],dat[,'sX'],dat[,'Y'],dat[,'sY'],dat[,'rXY'])
     }
-    out <- get.PD.age(subset(DP,select=1),subset(DP,select=2),
+    out <- getPDage(subset(DP,select=1),subset(DP,select=2),
                      nuclide,exterr=exterr,bratio=bratio,...)
     if (!is.null(i)) out <- out[i,,drop=FALSE]
     colnames(out) <- c('t','s[t]')
     out
 }
 
-get.nominal.initials <- function(x){
+get_nominal_initials <- function(x){
     if (is.RbSr(x)){
         out <- settings('iratio','Sr87Sr86')
     } else if (is.SmNd(x)){
@@ -87,7 +85,11 @@ get.nominal.initials <- function(x){
     list(y0=out[1],sy0=out[2])
 }
 
+#' Convert isotope dilution derived concentrations to ratios
+#' @param x an IsoplotR data object with \code{x$format=3}
+#' @noRd
 ppm2ratios <- function(x,...){ UseMethod("ppm2ratios",x) }
+#' @noRd
 ppm2ratios.default <- function(x,...){
     stop('Method ppm2ratios not available for this class.')
 }

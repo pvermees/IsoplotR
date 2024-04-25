@@ -125,7 +125,11 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param asp the y/x aspect ratio, see `plot.window'.
 #' @param log same as the eponymous argument to the generic
 #'     \code{plot} function.
+#' @param taxis logical. If \code{TRUE}, replaces the x-axis of an
+#'     inverse isochron with a time scale. Only used if
+#'     \code{inverse=TRUE}.
 #' @param box logical. If \code{TRUE}, draws a frame around the plot.
+#' @param xaxt see \code{?par}
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -141,37 +145,61 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         show.ellipses=1,levels=NA,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
-                        ellipse.stroke="black",fit='none',add=FALSE,
+                        ellipse.stroke="black",fit=NULL,add=FALSE,
                         empty=FALSE,ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",addcolourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
-                        asp=NA,log='',box=TRUE,...){
+                        asp=NA,log='',taxis=FALSE,box=!taxis,
+                        xaxt=ifelse(taxis,'n','s'),...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
     plotit <- sn%ni%hide
     calcit <- sn%ni%c(hide,omit)
     colnames(xy) <- c('X','sX','Y','sY','rXY')
-    if (is.null(xlim)) xlim <- get.limits(xy[plotit,'X'],xy[plotit,'sX'])
-    if (is.null(ylim)) ylim <- get.limits(xy[plotit,'Y'],xy[plotit,'sY'])
+    if (is.null(xlim)){
+        if (taxis & !is.null(fit)){
+            if (fit$model==3 && fit$wtype%in%c(2,'b')){
+                x0 <- -fit$a[1]/fit$b[1]
+                relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
+                xlim <- c(0,x0+ci(sx=x0*relerr))
+            } else {
+                xlim <- c(0,-fit$a[1]/(fit$b[1]+ci(sx=fit$b[2])))
+            }
+        } else {
+            xlim <- get_limits(xy[plotit,'X'],xy[plotit,'sX'])
+        }
+    }
+    if (is.null(ylim)){
+        if (taxis & !is.null(fit)){
+            if (fit$model==3 && fit$wtype%in%c(1,'a')){
+                relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
+                ylim <- c(0,fit$a[1]+ci(sx=fit$a[1]*relerr))
+            } else {
+                ylim <- c(0,fit$a[1]+ci(sx=fit$a[2]))
+            }
+        } else {
+            ylim <- get_limits(xy[plotit,'Y'],xy[plotit,'sY'])
+        }
+    }
     if (!add){
         if (missing(xlab)) xlab <- ''
         if (missing(ylab)) ylab <- ''
         graphics::plot(xlim,ylim,type='n',xlab=xlab,ylab=ylab,
-                       bty='n',asp=asp,log=log,...)
+                       bty='n',asp=asp,log=log,xaxt=xaxt,...)
         if (empty) return()
     }
-    if (!identical(fit,'none')){
+    if (!is.null(fit)){
         nonneg <- !any(xy[,'X']<0 | xy[,'Y']<0)
         plot_isochron_line(fit,oerr=oerr,ci.col=ci.col,
                            col=line.col,nonneg=nonneg,lwd=lwd)
     }
     if (box) graphics::box()
     nolevels <- all(is.na(levels))
-    fill <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.fill,
+    fill <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.fill,
                                 hide=hide,omit=omit,omit.col=omit.fill)
-    stroke <- set.ellipse.colours(ns=ns,levels=levels,col=ellipse.stroke,
+    stroke <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.stroke,
                                   hide=hide,omit=omit,omit.col=omit.stroke)
     if (show.ellipses==0){ # points and or text
         if (missing(cex)) cex <- 1
@@ -230,4 +258,10 @@ plot_isochron_line <- function(fit,oerr=3,ci.col='gray80',nonneg=TRUE,...){
     }
     graphics::polygon(cix,ciy,col=ci.col,border=NA)
     graphics::lines(x,y,...)
+}
+
+get_limits <- function(x,sx){
+    minx <- min(x-3*sx,na.rm=TRUE)
+    maxx <- max(x+3*sx,na.rm=TRUE)
+    c(minx,maxx)
 }

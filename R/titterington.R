@@ -81,8 +81,8 @@ titterington <- function(x){
     B <- fitXZ$b[1]
     init <- c(a,b,A,B)
     dat <- matrix2covlist(x)
-    fit <- stats::optim(init,fn=L.tit,method="BFGS",gr=gr.tit,dat=dat)
-    fish <- fisher.tit(fit$par,dat)
+    fit <- stats::optim(init,fn=L_tit,method="BFGS",gr=gr_tit,dat=dat)
+    fish <- fisher_tit(fit$par,dat)
     AA <- fish[1:ns,1:ns]
     BB <- fish[1:ns,(ns+1):(ns+4)]
     CC <- fish[(ns+1):(ns+4),1:ns]
@@ -90,7 +90,7 @@ titterington <- function(x){
     out <- list()
     out$par <- fit$par
     out$cov <- blockinverse(AA,BB,CC,DD)
-    mswd <- mswd.tit(fit$par,dat)
+    mswd <- mswd_tit(fit$par,dat)
     out <- c(out,mswd)
     parnames <- c('a','b','A','B')
     names(out$par) <- parnames
@@ -100,7 +100,7 @@ titterington <- function(x){
     out
 }
 
-get.titterington.xyz <- function(XYZ,a,b,A,B,w=0,wtype=NA){
+get_titterington_xyz <- function(XYZ,a,b,A,B,w=0,wtype=NA){
     vX <- XYZ[,'sX']^2
     vY <- XYZ[,'sY']^2
     vZ <- XYZ[,'sZ']^2
@@ -159,7 +159,7 @@ get.titterington.xyz <- function(XYZ,a,b,A,B,w=0,wtype=NA){
     cbind('x'=x,'y'=y,'z'=z)
 }
 
-mswd.tit <- function(abAB,dat){
+mswd_tit <- function(abAB,dat){
     a <- abAB[1]
     b <- abAB[2]
     A <- abAB[3]
@@ -172,7 +172,7 @@ mswd.tit <- function(abAB,dat){
         X <- XYZ[[i]][1]
         Y <- XYZ[[i]][2]
         Z <- XYZ[[i]][3]
-        abg <- alpha.beta.gamma(a,b,A,B,XYZ[[i]],omega[[i]])
+        abg <- alpha_beta_gamma(a,b,A,B,XYZ[[i]],omega[[i]])
         alpha <- abg[1]
         beta <- abg[2]
         gamma <- abg[3]
@@ -199,7 +199,7 @@ matrix2covlist <- function(x){
     out
 }
 
-alpha.beta.gamma <- function(a,b,A,B,XYZ,omega){
+alpha_beta_gamma <- function(a,b,A,B,XYZ,omega){
     r <- XYZ[2]-a-b*XYZ[1]
     R <- XYZ[3]-A-B*XYZ[1]
     alpha <- omega[1,1] + omega[2,2]*b^2 + omega[3,3]*B^2 +
@@ -210,7 +210,7 @@ alpha.beta.gamma <- function(a,b,A,B,XYZ,omega){
     c(alpha,beta,gamma)
 }
 
-fisher.tit <- function(abAB,dat){
+fisher_tit <- function(abAB,dat){
     a <- abAB[1] # y intercept
     b <- abAB[2] # y slope
     A <- abAB[3] # z intercept
@@ -233,7 +233,7 @@ fisher.tit <- function(abAB,dat){
         Y <- XYZ[2]
         Z <- XYZ[3]
         omega <- dat$omega[[i]]
-        abg <- alpha.beta.gamma(a,b,A,B,XYZ,omega)
+        abg <- alpha_beta_gamma(a,b,A,B,XYZ,omega)
         alpha <- abg[1]
         beta <- abg[2]
         gamma <- abg[3]
@@ -285,7 +285,7 @@ fisher.tit <- function(abAB,dat){
     out
 }
 
-gr.tit <- function(abAB,dat){
+gr_tit <- function(abAB,dat){
     ns <- length(dat)
     a <- abAB[1] # y intercept
     b <- abAB[2] # y slope
@@ -312,7 +312,7 @@ gr.tit <- function(abAB,dat){
         omega <- dat$omega[[i]]
         r <- Y-a-b*X
         R <- Z-A-B*X
-        abg <- alpha.beta.gamma(a,b,A,B,XYZ,omega)
+        abg <- alpha_beta_gamma(a,b,A,B,XYZ,omega)
         alpha <- abg[1]
         beta <- abg[2]
         gamma <- abg[3]
@@ -346,7 +346,7 @@ gr.tit <- function(abAB,dat){
     c(dS.da,dS.db,dS.dA,dS.dB)*dL.dS
 }
 
-L.tit <- function(abAB,dat){
+L_tit <- function(abAB,dat){
     ns <- length(dat)
     a <- abAB[1] # y intercept
     b <- abAB[2] # y slope
@@ -354,7 +354,7 @@ L.tit <- function(abAB,dat){
     B <- abAB[4] # z slope
     S <- 0       # initialise sum of squares
     for (i in 1:ns){
-        abg <- alpha.beta.gamma(a,b,A,B,dat$XYZ[[i]],dat$omega[[i]])
+        abg <- alpha_beta_gamma(a,b,A,B,dat$XYZ[[i]],dat$omega[[i]])
         alpha <- abg[1]
         beta <- abg[2]
         gamma <- abg[3]
@@ -363,10 +363,20 @@ L.tit <- function(abAB,dat){
     S/2
 }
 
-data2tit <- function(x,...){ UseMethod("data2tit",x) }
-data2tit.default <- function(x,...){ stop('default function undefined') }
-# osmond = FALSE: 8/2 - 4/2 - 0/2
-# osmond = TRUE : 2/8 - 4/8 - 0/8
+#' Convert IsoplotR data to Titterington ratios
+#' @noRd
+data2tit <- function(x,...){
+    UseMethod("data2tit",x)
+}
+#' @noRd
+data2tit.default <- function(x,...){
+    stop('default function undefined')
+}
+#' @param osmond if \code{TRUE}, generates 2/8 - 4/8 - 0/8 ratios
+#' if \code{FALSE}, generates 8/2 - 4/2 - 0/2 ratios
+#' @param generic \if \code{TRUE}, uses X, Y, Z labels,
+#' otherwise uses isotopic ratio labels
+#' @noRd
 data2tit.ThU <- function(x,osmond=TRUE,generic=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,9)
@@ -374,7 +384,7 @@ data2tit.ThU <- function(x,osmond=TRUE,generic=TRUE,...){
         out <- x$x
     } else {
         for (i in 1:ns){
-            out[i,] <- ThU.convert(x$x[i,])
+            out[i,] <- ThU_convert(x$x[i,])
         }
     }
     if (generic){

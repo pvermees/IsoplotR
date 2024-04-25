@@ -1,6 +1,7 @@
-# convert isotope dilution derived concentrations to ratios
-# x = matrix with columns 'Rbppm','errRbppm', 'Srppt','errSrppt' 
-# and 'Sr87Sr86','errSr87Sr86'
+#' convert isotope dilution derived concentrations to ratios
+#' x = matrix with columns 'Rbppm','errRbppm', 'Srppt','errSrppt' 
+#' and 'Sr87Sr86','errSr87Sr86'
+#' @noRd
 ppm2ratios.RbSr <- function(x,exterr=FALSE,common=FALSE,...){
     R57Rb <- iratio('Rb85Rb87')[1]
     R46Sr <- iratio('Sr84Sr86')[1]
@@ -65,14 +66,14 @@ ppm2ratios.RbSr <- function(x,exterr=FALSE,common=FALSE,...){
     out
 }
 
-get.RbSr.ratio <- function(tt,st,exterr=FALSE){
-    get.PD.ratio(tt,st,'Rb87',exterr)
+get_RbSr_ratio <- function(tt,st,exterr=FALSE){
+    getDPratio(tt,st,'Rb87',exterr)
 }
 
-get.RbSr.age <- function(Rb87Sr86,sRb87Sr86,exterr=FALSE){
-    get.PD.age(Rb87Sr86,sRb87Sr86,'Rb87',exterr=exterr)
+get_RbSr_age <- function(Rb87Sr86,sRb87Sr86,exterr=FALSE){
+    getPDage(Rb87Sr86,sRb87Sr86,'Rb87',exterr=exterr)
 }
 
-RbSr.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
-    PD.age(x,'Rb87',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+RbSr_age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
+    PD_age(x,'Rb87',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
 }

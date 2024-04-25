@@ -51,11 +51,11 @@ model3regression <- function(xyz,type='york',wtype='a'){
         return(MLyork(xyz,model=3,wtype=wtype))
     } else if (identical(type,'titterington')){
         pilot <- model1regression(xyz,type=type)
-        ilw <- init.titterington.lw(XYZ=xyz,wtype=wtype,pilot=pilot)$minimum
+        ilw <- init_titterington_lw(XYZ=xyz,wtype=wtype,pilot=pilot)$minimum
         init <- c(pilot$par,'lw'=unname(ilw))
         upper <- init + c(5*pilot$par[c('a','b','A','B')],2)
         lower <- init - c(5*pilot$par[c('a','b','A','B')],2)
-        out <- contingencyfit(par=init,fn=LL.titterington,lower=lower,
+        out <- contingencyfit(par=init,fn=LL_titterington,lower=lower,
                               upper=upper,XYZ=xyz,wtype=wtype)
         out$cov <- E <- inverthess(out$hessian)
     } else if (identical(type,'ogls')){
@@ -70,7 +70,7 @@ model3regression <- function(xyz,type='york',wtype='a'){
     out
 }
 
-init.titterington.lw <- function(XYZ,wtype='a',pilot){
+init_titterington_lw <- function(XYZ,wtype='a',pilot){
     fact <- max(1,sqrt(pilot$mswd))
     spar <- fact*sqrt(diag(pilot$cov))
     if (wtype%in%c('intercept',1,'a')) init <- log(spar['a'])
@@ -78,20 +78,20 @@ init.titterington.lw <- function(XYZ,wtype='a',pilot){
     else if (wtype%in%c(3,'A')) init <- log(spar['A'])
     else if (wtype%in%c(4,'B')) init <- log(spar['B'])
     else stop('illegal wtype')
-    stats::optimise(f=LL.titterington.lw,interval=init+c(-10,5),
+    stats::optimise(f=LL_titterington_lw,interval=init+c(-10,5),
                     abAB=pilot$par,XYZ=XYZ,wtype=wtype)
 }
-LL.titterington.lw <- function(lw,abAB,XYZ,wtype='a'){
-    LL.titterington(abABlw=c(abAB,lw=unname(lw)),XYZ=XYZ,wtype=wtype)
+LL_titterington_lw <- function(lw,abAB,XYZ,wtype='a'){
+    LL_titterington(abABlw=c(abAB,lw=unname(lw)),XYZ=XYZ,wtype=wtype)
 }
-LL.titterington <- function(abABlw,XYZ,wtype='a'){
+LL_titterington <- function(abABlw,XYZ,wtype='a'){
     ns <- nrow(XYZ)
     a <- abABlw['a']
     b <- abABlw['b']
     A <- abABlw['A']
     B <- abABlw['B']
     w <- exp(abABlw['lw'])
-    x <- get.titterington.xyz(XYZ=XYZ,a=a,b=b,A=A,B=B,w=w,wtype=wtype)[,'x']
+    x <- get_titterington_xyz(XYZ=XYZ,a=a,b=b,A=A,B=B,w=w,wtype=wtype)[,'x']
     DE <- matrix(0,nrow=ns,ncol=9)
     colnames(DE) <- c('X-x','Y-y','Z-z','vX','vY','vZ','sXY','sXZ','sYZ')
     DE[,'X-x'] <- XYZ[,'X']-x

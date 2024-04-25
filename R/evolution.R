@@ -189,7 +189,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,oerr=3,transform=FALSE,
             fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,
                                 model=model,hide=hide,omit=omit,oerr=oerr)
             fit$n <- length(x)-length(hide)-length(omit)
-            graphics::title(evolution.title(fit,sigdig=sigdig,oerr=oerr))
+            graphics::title(evolution_title(fit,sigdig=sigdig,oerr=oerr))
         }
     } else {
         Th02vsU8Th2(x,isochron=isochron,model=model,Th0i=Th0i,
@@ -210,7 +210,7 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
                     omit.stroke='grey',...){
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
-    ta0 <- get.ThU.age.corals(x,exterr=FALSE,cor=FALSE,Th0i=Th0i)
+    ta0 <- get_ThU_age_corals(x,exterr=FALSE,cor=FALSE,Th0i=Th0i)
     nsd <- 3
     if (is.null(xlim))
         xlim <- range(c(ta0[plotit,'t']-nsd*ta0[plotit,'s[t]'],
@@ -243,7 +243,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
     calcit <- (1:ns)%ni%c(hide,omit)
     y <- data2evolution(x,Th0i=Th0i,omit4c=unique(c(hide,omit)))
     d2plot <- subset(y,subset=plotit)
-    lim <- evolution.lines(d2plot,xlim=xlim,ylim=ylim,...)
+    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim,...)
     if (isochron){
         fit <- isochron(x,type=3,plot=FALSE,
                         model=model,hide=hide,omit=omit)
@@ -353,7 +353,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
                         stroke=ellipse.stroke,clabel=clabel))
 }
 
-evolution.title <- function(fit,sigdig=2,oerr=3,...){
+evolution_title <- function(fit,sigdig=2,oerr=3,...){
     content <- list()
     content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
                             oerr=oerr,prefix='isochron age =',units=' ka',df=fit$df)
@@ -373,7 +373,7 @@ evolution.title <- function(fit,sigdig=2,oerr=3,...){
     }
 }
 
-evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
+evolution_lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
                             line.col='darksalmon',...){
     nn <- 20
     maxt <- 400
@@ -389,10 +389,10 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
     if (is.null(ylim)){
         min.dy <- min(d[,'U234U238']-nsd*d[,'sU234U238'])
         max.dy <- max(d[,'U234U238']+nsd*d[,'sU234U238'])
-        a01 <- get.ThU.age(min.dx,0,min.dy,0,0,exterr=FALSE)['48_0']
-        a02 <- get.ThU.age(min.dx,0,max.dy,0,0,exterr=FALSE)['48_0']
-        a03 <- get.ThU.age(max.dx,0,min.dy,0,0,exterr=FALSE)['48_0']
-        a04 <- get.ThU.age(max.dx,0,max.dy,0,0,exterr=FALSE)['48_0']
+        a01 <- get_ThU_age(min.dx,0,min.dy,0,0,exterr=FALSE)['48_0']
+        a02 <- get_ThU_age(min.dx,0,max.dy,0,0,exterr=FALSE)['48_0']
+        a03 <- get_ThU_age(max.dx,0,min.dy,0,0,exterr=FALSE)['48_0']
+        a04 <- get_ThU_age(max.dx,0,max.dy,0,0,exterr=FALSE)['48_0']
         a0min <- min(a01,a02,a03,a04)
         a0max <- max(a01,a02,a03,a04)
     } else {
@@ -404,8 +404,8 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
         a0max <- 1.5
     }
     if (is.null(xlim)){
-        xlim <- range(pretty(c(min(get.Th230U238.ratio(tt,a0min)),
-                               max(get.Th230U238.ratio(tt,a0max)))))
+        xlim <- range(pretty(c(min(get_Th230U238_ratio(tt,a0min)),
+                               max(get_Th230U238_ratio(tt,a0max)))))
     }
     a0 <- pretty(c(a0min,a0max))
     if (is.null(ylim)){
@@ -420,14 +420,14 @@ evolution.lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
     na0 <- length(a0)
     for (i in 1:na0){
         ttt <- seq(0,maxt,length.out=nn)
-        x <- get.Th230U238.ratio(ttt,a0[i])
-        y <- get.U234U238.ratio(ttt,a0[i])
+        x <- get_Th230U238_ratio(ttt,a0[i])
+        y <- get_U234U238_ratio(ttt,a0[i])
         graphics::lines(x,y,col=line.col)
     }
     for (i in 2:nn){
-        x <- get.Th230U238.ratio(tt[i],a0)
-        y <- get.U234U238.ratio(tt[i],a0)
-        x0 <- get.Th230U238.ratio(tt[i],1)
+        x <- get_Th230U238_ratio(tt[i],a0)
+        y <- get_U234U238_ratio(tt[i],a0)
+        x0 <- get_Th230U238_ratio(tt[i],1)
         graphics::lines(c(x0,x),c(1,y),col=line.col)
         graphics::text(x[na0],y[na0],tt[i],pos=4,col=line.col)
     }
@@ -440,12 +440,12 @@ data2evolution <- function(x,Th0i=0,omit4c=NULL){
     if (x$format %in% c(1,2)){
         td <- data2tit(x,osmond=TRUE,generic=FALSE) # 2/8 - 4/8 - 0/8
         if (Th0i==1){
-            out <- Th230correction.isochron(td,omit4c=omit4c)
+            out <- Th230correction_isochron(td,omit4c=omit4c)
         } else if (Th0i==2){
-            out <- Th230correction.measured.detritus(td,Th02U48=x$Th02U48)
+            out <- Th230correction_measured_detritus(td,Th02U48=x$Th02U48)
         } else if (Th0i==3){
-            tt <- get.ThU.age.corals(x,Th0i=Th0i)[,'t']
-            out <- Th230correction.assumed.detritus(td,age=tt,Th02i=x$Th02i)
+            tt <- get_ThU_age_corals(x,Th0i=Th0i)[,'t']
+            out <- Th230correction_assumed_detritus(td,age=tt,Th02i=x$Th02i)
         } else {
             out <- td
         }
@@ -455,14 +455,14 @@ data2evolution <- function(x,Th0i=0,omit4c=NULL){
     out
 }
 
-Th230correction.isochron <- function(td,omit4c=NULL){
+Th230correction_isochron <- function(td,omit4c=NULL){
     fit <- titterington(clear(td,omit4c))
     out <- td
     out[,'U234U238'] <- td[,'U234U238'] - fit$par['b']*td[,'Th232U238']
     out[,'Th230U238'] <- td[,'Th230U238'] - fit$par['B']*td[,'Th232U238']
     out
 }
-Th230correction.assumed.detritus <- function(td,age=Inf,Th02i=c(0,0)){
+Th230correction_assumed_detritus <- function(td,age=Inf,Th02i=c(0,0)){
     out <- td
     l0 <- lambda('Th230')[1]
     A <- Th02i[1]*exp(-l0*age)*td[,'Th232U238']
@@ -474,7 +474,7 @@ Th230correction.assumed.detritus <- function(td,age=Inf,Th02i=c(0,0)){
     out[,'sTh230U238'] <- sqrt(td[,'sTh230U238']^2 + sA^2)         
     out
 }
-Th230correction.measured.detritus <- function(td,Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
+Th230correction_measured_detritus <- function(td,Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     X1 <- td[,'Th232U238']
     sX1 <- td[,'sTh232U238']
     Y1 <- td[,'U234U238']

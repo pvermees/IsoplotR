@@ -229,7 +229,7 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
             else { break }
         }
     }
-    out <- get.weightedmean(X,sX,random.effects=random.effects,
+    out <- get_weightedmean(X,sX,random.effects=random.effects,
                             valid=valid,oerr=oerr)
     if (plot){
         plot_weightedmean(X,sX,fit=out,from=from,to=to,levels=levels,
@@ -264,7 +264,7 @@ weightedmean.other <- function(x,from=NA,to=NA,random.effects=FALSE,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), the concordia age (\code{type}=5), or the
+#'     (\code{type}=4), the concordia_age (\code{type}=5), or the
 #'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age and above which the
@@ -562,14 +562,14 @@ weightedmean_helper <- function(x,random.effects=FALSE,
                                 sigdig=2,oerr=3,exterr=FALSE,ranked=FALSE,
                                 i2i=FALSE,common.Pb=1,units='',Th0i=0,
                                 hide=NULL,omit=NULL,omit.col=NA,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+    tt <- get_ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,omit4c=unique(c(hide,omit)),
                    common.Pb=common.Pb,Th0i=Th0i)
     fit <- weightedmean.default(tt,random.effects=random.effects,
                                 detect.outliers=detect.outliers,
                                 oerr=oerr,plot=FALSE,hide=hide,omit=omit)
     if (exterr)
-        out <- add.exterr.to.wtdmean(x,fit,oerr=oerr,
+        out <- add_exterr_to_wtdmean(x,fit,oerr=oerr,
                                      cutoff.76=cutoff.76,type=type)
     else out <- fit
     if (plot){
@@ -583,7 +583,7 @@ weightedmean_helper <- function(x,random.effects=FALSE,
     invisible(out)
 }
 
-get.weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
+get_weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
     ns <- length(X)
     x <- X[valid]
     sx <- sX[valid]
@@ -656,7 +656,7 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
     NS <- length(X)
     plotit <- (1:NS)%ni%hide
     calcit <- (1:NS)%ni%c(hide,omit)
-    colour <- set.ellipse.colours(ns=NS,levels=levels,col=rect.col,
+    colour <- set_ellipse_colours(ns=NS,levels=levels,col=rect.col,
                                   hide=hide,omit=which(!fit$valid),
                                   omit.col=omit.col)
     Xerr <- ci(X,sX,oerr=oerr,absolute=TRUE)
@@ -703,15 +703,16 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NA,clabel="",
                        xright=i+0.4,ytop=x[i]+xerr[i],col=col)
     }
     colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
-    graphics::title(wtdmean.title(fit,oerr=oerr,sigdig=sigdig,
+    graphics::title(wtdmean_title(fit,oerr=oerr,sigdig=sigdig,
                                   units=units,caveat=caveat))
 }
 
-wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
+wtdmean_title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
     line1 <- maintit(x=fit$mean[1],sx=fit$mean[-1],
-                     ntit=ntit.valid(fit$valid),sigdig=sigdig,df=fit$df,
-                     oerr=oerr,units=units,prefix=paste0('mean',ast,' ='))
+                     ntit=paste0('(',sum(fit$valid),'/',length(fit$valid),')'),
+                     sigdig=sigdig,df=fit$df,oerr=oerr,units=units,
+                     prefix=paste0('mean',ast,' ='))
     if (fit$random.effects){
         line2 <- disptit(fit$disp[1],fit$disp[-1],sigdig=sigdig,
                          oerr=oerr,units=units)
@@ -728,7 +729,7 @@ wtdmean.title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){
 # measurements have already been rejected or not
 chauvenet <- function(X,sX,valid,random.effects=FALSE){
     if (sum(valid)<2) return(valid)
-    fit <- get.weightedmean(X,sX,random.effects=random.effects,valid=valid)
+    fit <- get_weightedmean(X,sX,random.effects=random.effects,valid=valid)
     if (random.effects){
         if (all(X>0,na.rm=TRUE)){
             x <- log(X)
@@ -756,16 +757,16 @@ chauvenet <- function(X,sX,valid,random.effects=FALSE){
     valid
 }
 
-add.exterr.to.wtdmean <- function(x,fit,oerr=3,cutoff.76=1100,type=4){
+add_exterr_to_wtdmean <- function(x,fit,oerr=3,cutoff.76=1100,type=4){
     out <- fit
     out$mean[c('t','s[t]')] <-
-        add.exterr(x,
+        add_exterr(x,
                    tt=fit$mean['t'],
                    st=fit$mean['s[t]'],
                    cutoff.76=cutoff.76,type=type)
     if (inflate(c(fit,model=1+2*fit$random.effects))){
         out$mean['disp[t]'] <-
-            add.exterr(x,
+            add_exterr(x,
                        tt=fit$mean['t'],
                        st=sqrt(fit$mswd)*fit$mean['s[t]'],
                        cutoff.76=cutoff.76,type=type)[2]

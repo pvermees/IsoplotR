@@ -1,6 +1,7 @@
-# convert isotope dilution derived concentrations to ratios x = matrix
-# with columns 'Luppm','errLuppm', 'Hfppm','errHfppm' and
-# 'Hf176Hf177','errHf176Hf177'
+#' convert isotope dilution derived concentrations to ratios x = matrix
+#' with columns 'Luppm','errLuppm', 'Hfppm','errHfppm' and
+#' 'Hf176Hf177','errHf176Hf177'
+#' @noRd
 ppm2ratios.LuHf <- function(x,exterr=FALSE,common=FALSE,...){
     R65Lu <- iratio('Lu176Lu175')[1]
     R47Hf <- iratio('Hf174Hf177')[1]
@@ -73,14 +74,14 @@ ppm2ratios.LuHf <- function(x,exterr=FALSE,common=FALSE,...){
     out
 }
 
-get.LuHf.ratio <- function(tt,st,exterr=FALSE){
-    get.PD.ratio(tt,st,nuclide='Lu176',exterr=exterr)
+get_LuHf_ratio <- function(tt,st,exterr=FALSE){
+    getDPratio(tt,st,nuclide='Lu176',exterr=exterr)
 }
 
-get.LuHf.age <- function(Hf176Lu176,sHf176Lu176,exterr=FALSE){
-    get.PD.age(Hf176Lu176,sHf176Lu176,nuclide='Lu176',exterr=exterr)
+get_LuHf_age <- function(Hf176Lu176,sHf176Lu176,exterr=FALSE){
+    getPDage(Hf176Lu176,sHf176Lu176,nuclide='Lu176',exterr=exterr)
 }
 
-LuHf.age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
-    PD.age(x,'Lu176',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+LuHf_age <- function(x,exterr=FALSE,i=NULL,i2i=TRUE,projerr=FALSE,...){
+    PD_age(x,'Lu176',exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
 }

@@ -64,7 +64,7 @@ cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     graphics::plot(range(d,na.rm=TRUE),c(0,1),type='n',
                    ylab='cumulative probability',xlab=xlab,...)
     graphics::lines(stats::ecdf(d),pch=pch,verticals=verticals,col=col)
-    mymtext(get.ntit(d),line=0,adj=1)
+    mymtext(get_ntit(d),line=0,adj=1)
 }
 #' @rdname cad
 #' @export
@@ -100,7 +100,7 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), the concordia age (\code{type}=5), or the
+#'     (\code{type}=4), the concordia_age (\code{type}=5), or the
 #'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).
 #' 
 #' @param cutoff.76 the age (in Ma) below which the
@@ -263,7 +263,7 @@ cad.fissiontracks <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 cad_helper <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',col='black',
                        hide=NULL,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                        common.Pb=0,i2i=FALSE,Th0i=0,...){
-    tt <- get.ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
+    tt <- get_ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,common.Pb=common.Pb,Th0i=Th0i,omit4c=hide)
     cad.default(tt[,1],pch=pch,verticals=verticals,xlab=xlab,col=col,hide=hide,...)
 }

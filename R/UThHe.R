@@ -1,16 +1,16 @@
-UThHe.age <- function(x,i=NULL){
+UThHe_age <- function(x,i=NULL){
     ns <- nrow(x)
     doSm <- doSm(x)
     out <- matrix(0,ns,2)
     colnames(out) <- c('t','s[t]')
     for (j in 1:ns){
         if (doSm){
-            out[j,] <- get.UThHe.age(U=x[j,'U'],sU=x[j,'errU'],
+            out[j,] <- get_UThHe_age(U=x[j,'U'],sU=x[j,'errU'],
                                      Th=x[j,'Th'],sTh=x[j,'errTh'],
                                      He=x[j,'He'],sHe=x[j,'errHe'],
                                      Sm=x[j,'Sm'],sSm=x[j,'errSm'])
         } else {
-            out[j,] <- get.UThHe.age(U=x[j,'U'],sU=x[j,'errU'],
+            out[j,] <- get_UThHe_age(U=x[j,'U'],sU=x[j,'errU'],
                                      Th=x[j,'Th'],sTh=x[j,'errTh'],
                                      He=x[j,'He'],sHe=x[j,'errHe'])
         }
@@ -19,7 +19,7 @@ UThHe.age <- function(x,i=NULL){
     out
 }
 
-get.UThHe.age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
+get_UThHe_age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
     R <- iratio('U238U235')[1]
     L8 <- lambda('U238')[1]
     L5 <- lambda('U235')[1]
@@ -52,11 +52,11 @@ get.UThHe.age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
     c(tt,st)
 }
 
-flat.uv.table <- function(x,w=0){
+flat_uv_table <- function(x,w=0){
     ns <- length(x)
     out <- matrix(0,ns,5)
     for (i in 1:ns){
-        uvc <- UThHe2uv.covmat(x,i,w=w)
+        uvc <- UThHe2uv_covmat(x,i,w=w)
         out[i,c(1,3)] <- uvc$uv
         out[i,2] <- sqrt(uvc$covmat[1,1])
         out[i,4] <- sqrt(uvc$covmat[2,2])
@@ -65,11 +65,11 @@ flat.uv.table <- function(x,w=0){
     colnames(out) <- c('u','s[u]','v','s[v]','cor[u,v]')
     out
 }
-flat.uvw.table <- function(x,w=0){
+flat_uvw_table <- function(x,w=0){
     ns <- length(x)
     out <- matrix(0,ns,9)
     for (i in 1:ns){
-        uvwc <- UThHe2uvw.covmat(x,i,w=w)
+        uvwc <- UThHe2uvw_covmat(x,i,w=w)
         out[i,c(1,3,5)] <- uvwc$uvw
         out[i,2] <- sqrt(uvwc$covmat[1,1])
         out[i,4] <- sqrt(uvwc$covmat[2,2])
@@ -83,7 +83,7 @@ flat.uvw.table <- function(x,w=0){
     out
 }
 
-get.He <- function(tt,U,Th,Sm=0){
+get_He <- function(tt,U,Th,Sm=0){
     R <- iratio('U238U235')[1]
     L8 <- lambda('U238')[1]
     L5 <- lambda('U235')[1]

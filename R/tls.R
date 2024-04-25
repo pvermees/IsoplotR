@@ -48,18 +48,18 @@ anchored.deming <- function(dat,anchor){
         a <- anchor[2]
         init <- unname(stats::lm(I(dat[,2]-a) ~ 0 + dat[,1])$coefficients)
         interval <- sort(init*c(1/5,5))
-        fit <- stats::optimise(deming.misfit.b,interval=interval,a=a,dat=dat)
+        fit <- stats::optimise(deming_misfit_b,interval=interval,a=a,dat=dat)
         out$par <- c('a'=a,'b'=fit$minimum)
-        H <- stats::optimHess(fit$minimum,deming.misfit.b,a=a,dat=dat)
+        H <- stats::optimHess(fit$minimum,deming_misfit_b,a=a,dat=dat)
         ve <- stats::var(deming_residuals(ab=out$par,dat=dat))
         out$cov[2,2] <- inverthess(H)*ve
     } else if (anchor[1]%in%c(2,'slope','b') && length(anchor)>1){
         b <- anchor[2]
         init <- unname(mean(dat[,2]-b*dat[,1]))
         interval <- sort(init*c(1/5,5))
-        fit <- stats::optimise(deming.misfit.a,interval=interval,b=b,dat=dat)
+        fit <- stats::optimise(deming_misfit_a,interval=interval,b=b,dat=dat)
         out$par <- c('a'=fit$minimum,'b'=b)
-        H <- stats::optimHess(fit$minimum,deming.misfit.a,b=b,dat=dat)
+        H <- stats::optimHess(fit$minimum,deming_misfit_a,b=b,dat=dat)
         ve <- stats::var(deming_residuals(ab=out$par,dat=dat))
         out$cov[1,1] <- inverthess(H)*ve
     } else {
@@ -68,13 +68,13 @@ anchored.deming <- function(dat,anchor){
     out
 }
 
-deming.misfit.a <- function(a,b,dat){
-    deming.misfit.ab(c(a,b),dat)
+deming_misfit_a <- function(a,b,dat){
+    deming_misfit_ab(c(a,b),dat)
 }
-deming.misfit.b <- function(b,a,dat){
-    deming.misfit.ab(c(a,b),dat)
+deming_misfit_b <- function(b,a,dat){
+    deming_misfit_ab(c(a,b),dat)
 }
-deming.misfit.ab <- function(ab,dat){
+deming_misfit_ab <- function(ab,dat){
     if (ncol(dat)>2) stop("Anchored TLS regression currently only works in 2D")
     e <-deming_residuals(ab,dat) 
     sum(e^2)

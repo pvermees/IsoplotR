@@ -13,7 +13,7 @@ scatterplot(
   clabel = "",
   ellipse.fill = c("#00FF0080", "#FF000080"),
   ellipse.stroke = "black",
-  fit = "none",
+  fit = NULL,
   add = FALSE,
   empty = FALSE,
   ci.col = "gray80",
@@ -32,7 +32,9 @@ scatterplot(
   ylab,
   asp = NA,
   log = "",
-  box = TRUE,
+  taxis = FALSE,
+  box = !taxis,
+  xaxt = ifelse(taxis, "n", "s"),
   ...
 )
 }
@@ -146,7 +148,13 @@ omitted aliquots.}
 \item{log}{same as the eponymous argument to the generic
 \code{plot} function.}
 
+\item{taxis}{logical. If \code{TRUE}, replaces the x-axis of an
+inverse isochron with a time scale. Only used if
+\code{inverse=TRUE}.}
+
 \item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
+
+\item{xaxt}{see \code{?par}}
 
 \item{...}{optional arguments to format the points and text.}
 }

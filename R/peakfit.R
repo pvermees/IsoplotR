@@ -125,9 +125,9 @@ peakfit.default <- function(x,k='auto',sigdig=2,oerr=3,log=TRUE,np=3,...){
     if (identical(k,'min')) {
         out <- min_age_model(X,np=np)
     } else if (identical(k,'auto')) {
-        out <- normal.mixtures(X,k=BIC_fit(X,5),...)
+        out <- normal_mixtures(X,k=BIC_fit(X,5),...)
     } else {
-        out <- normal.mixtures(X,k,...)
+        out <- normal_mixtures(X,k,...)
     }
     if (log) {
         out$peaks['t',] <- exp(out$peaks['t',])
@@ -144,9 +144,9 @@ peakfit.fissiontracks <- function(x,k=1,exterr=FALSE,sigdig=2,
     if (k == 0) return(out)
     if (identical(k,'auto')) k <- BIC_fit(x,5,log=log)
     if (x$format == 1 & !identical(k,'min')){
-        out <- binomial.mixtures(x,k,exterr=exterr,...)
+        out <- binomial_mixtures(x,k,exterr=exterr,...)
     }  else if (x$format == 3){
-        tt <- get.ages(x)
+        tt <- get_ages(x)
         out <- peakfit.default(tt,k=k,log=log,sigdig=sigdig,oerr=oerr,np=np)
     } else {
         out <- peakfit_helper(x,k=k,sigdig=sigdig,oerr=oerr,
@@ -160,7 +160,7 @@ peakfit.fissiontracks <- function(x,k=1,exterr=FALSE,sigdig=2,
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U age (\code{type}=2), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb age (\code{type}=3), the
 #'     \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U age
-#'     (\code{type}=4), the concordia age (\code{type}=5), or the
+#'     (\code{type}=4), the concordia_age (\code{type}=5), or the
 #'     \eqn{^{208}}Pb/\eqn{^{232}}Th age (\code{type}=6).
 #' @param cutoff.76 the age (in Ma) below which the
 #'     \eqn{^{206}}Pb/\eqn{^{238}}U and above which the
@@ -305,14 +305,14 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
         k <- BIC_fit(x,5,log=log,type=type,cutoff.76=cutoff.76,i2i=i2i,
                      cutoff.disc=cutoff.disc,Th0i=Th0i,common.Pb=common.Pb)
     }
-    tt <- get.ages(x,i2i=i2i,common.Pb=common.Pb,type=type,
+    tt <- get_ages(x,i2i=i2i,common.Pb=common.Pb,type=type,
                    cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,Th0i=Th0i)
     fit <- peakfit.default(tt,k=k,np=np,log=log,oerr=oerr,sigdig=sigdig)
     if (exterr){
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
         for (i in 1:numpeaks){
-            age.with.exterr <- add.exterr(x,fit$peaks['t',i],
+            age.with.exterr <- add_exterr(x,fit$peaks['t',i],
                                           fit$peaks['s[t]',i],type=type)
             fit$peaks['s[t]',i] <- age.with.exterr[2]
         }
@@ -321,7 +321,7 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
     fit
 }
 
-get.peakfit.covmat <- function(k,pii,piu,aiu,biu){
+get_peakfit_covmat <- function(k,pii,piu,aiu,biu){
     Au <- matrix(0,k-1,k-1)
     Bu <- matrix(0,k-1,k)
     Cu <- matrix(0,k,k)
@@ -352,7 +352,7 @@ get.peakfit.covmat <- function(k,pii,piu,aiu,biu){
     out
 }
 
-get.props.err <- function(E){
+get_props_err <- function(E){
     vars <- diag(E)
     k <- (nrow(E)+1)/2
     J <- -1 * matrix(1,1,k-1)
@@ -384,7 +384,7 @@ peaks2legend <- function(fit,k=NULL,sigdig=2,oerr=3){
     out
 }
 
-normal.mixtures <- function(x,k,...){
+normal_mixtures <- function(x,k,...){
     good <- !is.na(x[,1]+x[,2])
     zu <- x[good,1]
     su <- x[good,2]
@@ -413,7 +413,7 @@ normal.mixtures <- function(x,k,...){
             lpfiu[,i] <- log(pii[i]) +
                 stats::dnorm(yu,betai[i]*xu,1,log=TRUE)
         }
-        newL <- get.L.normal.mixture(lpfiu)
+        newL <- get_L_normal_mixture(lpfiu)
         if (((newL-L)/newL)^2 < 1e-20) break;
         L <- newL
     }
@@ -423,14 +423,14 @@ normal.mixtures <- function(x,k,...){
         aiu[,i] <- xu*(yu-betai[i]*xu)
         biu[,i] <- -(1-(yu-betai[i]*xu)^2)*xu^2
     }
-    E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
+    E <- get_peakfit_covmat(k,pii,piu,aiu,biu)
     out <- formatPeaks(peaks=betai,peaks.err=sqrt(diag(E)[k:(2*k-1)]),
-                       props=pii,props.err=get.props.err(E),df=n-2*k+1)
+                       props=pii,props.err=get_props_err(E),df=n-2*k+1)
     out$L <- L
     out
 }
 # uses log-of-sums identity from Wikipedia
-get.L.normal.mixture <- function(lpfiu){
+get_L_normal_mixture <- function(lpfiu){
     if (ncol(lpfiu)<2){
         fu <- lpfiu
     } else {
@@ -443,7 +443,7 @@ get.L.normal.mixture <- function(lpfiu){
     sum(fu)
 }
 
-binomial.mixtures <- function(x,k,exterr=FALSE,...){
+binomial_mixtures <- function(x,k,exterr=FALSE,...){
     yu <- x$x[,'Ns']
     mu <- x$x[,'Ns'] + x$x[,'Ni']
     NsNi <- (x$x[,'Ns']+0.5)/(x$x[,'Ni']+0.5)
@@ -478,11 +478,11 @@ binomial.mixtures <- function(x,k,exterr=FALSE,...){
         aiu[,i] <- yu-thetai[i]*mu
         biu[,i] <- (yu-thetai[i]*mu)^2 - thetai[i]*(1-thetai[i])*mu
     }
-    E <- get.peakfit.covmat(k,pii,piu,aiu,biu)
+    E <- get_peakfit_covmat(k,pii,piu,aiu,biu)
     beta.var <- diag(E)[k:(2*k-1)]
     pe <- theta2age(x,thetai,beta.var,exterr)
     out <- formatPeaks(peaks=pe$peaks,peaks.err=pe$peaks.err,
-                        props=pii,props.err=get.props.err(E),df=n-2*k+1)
+                        props=pii,props.err=get_props_err(E),df=n-2*k+1)
     out$L <- L
     out
 }
@@ -556,7 +556,7 @@ min_age_model <- function(zs,np=3){
     }
     # computes the log-likelihood function using the transformed parameters
     LL <- function(par,zs,Mz){
-        get.minage.L(pars=mappar(par,Mz),zs=zs)
+        get_minage_L(pars=mappar(par,Mz),zs=zs)
     }
     mz <- min(zs[,1])
     Mz <- max(zs[,1])
@@ -612,7 +612,7 @@ min_age_model <- function(zs,np=3){
 }
 
 # Section 6.11 of Galbraith (2005)
-get.minage.L <- function(pars,zs){
+get_minage_L <- function(pars,zs){
     z <- zs[,1]
     s <- zs[,2]
     gam <- pars[1]
