@@ -274,7 +274,7 @@ discordia_title <- function(fit,wetherill,sigdig=2,oerr=1,
         else ipar <- NULL
         fit <- getUPby0(fit,option=y0option)
         if (is.null(ipar)){
-            line2 <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
+            line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
                              sigdig=sigdig,oerr=oerr,units='',df=fit$df,
                              prefix=fit$y0label)
         } else {
