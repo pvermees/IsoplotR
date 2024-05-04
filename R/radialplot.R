@@ -1,5 +1,5 @@
 #' @title
-#' Visualise heteroscedastic data on a radial_plot
+#' Visualise heteroscedastic data on a radial plot
 #' 
 #' @description
 #' Implementation of a graphical device developed by Rex Galbraith to
@@ -8,7 +8,7 @@
 #' mixture models.
 #' 
 #' @details
-#' The radial_plot (Galbraith, 1988, 1990) is a graphical device that
+#' The radial plot (Galbraith, 1988, 1990) is a graphical device that
 #' was specifically designed to display heteroscedastic data, and is
 #' constructed as follows.  Consider a set of dates
 #' \eqn{\{t_1,...,t_i,...,t_n\}} and uncertainties
@@ -23,14 +23,14 @@
 #' of the \eqn{(x_i,y_i)}s is proportional to \eqn{z_i} and, hence,
 #' the date \eqn{t_i}.
 #'
-#' These dates can be more easily visualised by drawing a radial_scale
+#' These dates can be more easily visualised by drawing a radial scale
 #' at some convenient distance from the origin and annotating it with
 #' labelled ticks at the appropriate angles. While the angular
 #' position of each data point represents the date, its horizontal
 #' distance from the origin is proportional to the
 #' precision. Imprecise measurements plot on the left hand side of the
-#' radial_plot, whereas precise age determinations are found further
-#' towards the right. Thus, radial_plots allow the observer to assess
+#' radial plot, whereas precise age determinations are found further
+#' towards the right. Thus, radial plots allow the observer to assess
 #' both the magnitude and the precision of quantitative data in one
 #' glance.
 #' 
@@ -42,8 +42,8 @@
 #' and object of class \code{fissiontracks}, \code{UThHe},
 #' \code{ArAr}, \code{KCa}, \code{ReOs}, \code{SmNd}, \code{RbSr},
 #' \code{LuHf}, \code{ThU}, \code{PbPb}, \code{ThPb} or \code{UPb}
-#' @param from minimum age limit of the radial_scale
-#' @param to maximum age limit of the radial_scale
+#' @param from minimum age limit of the radial scale
+#' @param to maximum age limit of the radial scale
 #' @param z0 central value
 #' @param transformation one of either \code{log}, \code{linear},
 #'     \code{sqrt} or \code{arcsin} (if \code{x} has class
@@ -109,7 +109,7 @@
 #'
 #' @param units measurement units to be displayed in the legend.
 #' @param hide vector with indices of aliquots that should be removed
-#'     from the radial_plot.
+#'     from the radial plot.
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from the central age calculation or mixture models.
 #' @param omit.col colour that should be used for the omitted
@@ -130,7 +130,7 @@
 #'     having differing standard errors. Technometrics, 30(3),
 #'     pp.271-281.
 #'
-#' Galbraith, R.F., 1990. The radial_plot: graphical assessment of
+#' Galbraith, R.F., 1990. The radial plot: graphical assessment of
 #' spread in ages. International Journal of Radiation Applications and
 #' Instrumentation. Part D. Nuclear Tracks and Radiation Measurements,
 #' 17(3), pp.207-214.
@@ -538,6 +538,15 @@ radial_plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
     plot_radial_points(x,show.points=show.points,
                        show.numbers=show.numbers,
                        pch=pch,bg=bg,col=col,sn=sn,...)
+}
+# To be removed. Kept for backwards compatibility in provenance 4.2
+radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
+                        show.numbers=FALSE,levels=NA,clabel="",
+                        markers=NULL,pch=21,bg='yellow',col='black',
+                        sn=1:length(x$z),...){
+    radial_plot(x=x,zeta=zeta,rhoD=rhoD,asprat=asprat,
+                show.numbers=show.numbers,levels=levels,clabel=clabel,
+                markers=markers,pch=pch,bg=bg,col=col,sn=sn,...)
 }
 
 plot_radial_points <- function(x,show.points=TRUE,show.numbers=FALSE,
