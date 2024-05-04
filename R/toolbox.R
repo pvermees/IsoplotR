@@ -259,7 +259,7 @@ set_ellipse_colours <- function(ns=1,levels=NA,col=c('yellow','red'),
 # To be removed. Kept for backwards compatibility in provenance 4.2
 set.ellipse.colours <- function(ns=1,levels=NA,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
-    set.ellipse.colours(ns=ns,levels=levels,col=col,
+    set_ellipse_colours(ns=ns,levels=levels,col=col,
                         hide=hide,omit=omit,omit.col=omit.col)
 }
 
