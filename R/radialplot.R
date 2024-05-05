@@ -539,15 +539,6 @@ radial_plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                        show.numbers=show.numbers,
                        pch=pch,bg=bg,col=col,sn=sn,...)
 }
-# To be removed. Kept for backwards compatibility in provenance 4.2
-radial.plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
-                        show.numbers=FALSE,levels=NA,clabel="",
-                        markers=NULL,pch=21,bg='yellow',col='black',
-                        sn=1:length(x$z),...){
-    radial_plot(x=x,zeta=zeta,rhoD=rhoD,asprat=asprat,
-                show.numbers=show.numbers,levels=levels,clabel=clabel,
-                markers=markers,pch=pch,bg=bg,col=col,sn=sn,...)
-}
 
 plot_radial_points <- function(x,show.points=TRUE,show.numbers=FALSE,
                                bg='yellow',pch=21,col='black',
