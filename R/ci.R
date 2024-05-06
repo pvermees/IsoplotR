@@ -220,8 +220,8 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
         lq <- -2
         uq <- 2
     } else if (oerr%in%c(3,6)){
-        lq <- stats::qnorm(alpha())
-        uq <- stats::qnorm(1-alpha())
+        lq <- stats::qnorm(alpha()/2)
+        uq <- stats::qnorm(1-alpha()/2)
     }
     cdf <- cumsum(XL[,'L'])/sum(XL[,'L'])
     increasing <- which(diff(cdf)>1e-20)

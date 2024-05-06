@@ -824,7 +824,7 @@ data2ludwig_2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
     i2 <- (ns+1):(2*ns)
     diag(E)[i1] <- yd[,'sX']^2
     diag(E)[i2] <- yd[,'sY']^2
-    diag(E[i1,i2]) <- diag(E[i2,i1]) <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
+    E[i1,i2] <- E[i2,i1] <- diag(ns)*yd[,'rXY']*yd[,'sX']*yd[,'sY']
     if (model==3){
         if (anchor[1]==1){
             c0 <- getc0SSLL(yd,A=A,b=b,L0=L0,E=E,multiplier=multiplier)$c0
