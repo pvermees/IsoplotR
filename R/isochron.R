@@ -1638,6 +1638,22 @@ ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
     if (inflate(out)){
         out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
+    } else if (out$model==3){ # wx0 and wy0 set error bars in scatterplot
+        out$wx0 <- out$wy0 <- 0
+        if (fit$wtype==1){
+            out$wy0 <- out$disp[1]
+        } else if (type==1){ # 06/38
+            Pb6U8 <- age2ratio(out$age[1],out$disp[1],ratio='Pb206U238',d=x$d)
+            out$wx0 <- Pb6U8[2]/Pb6U8[1]^2
+        } else if (type==2){ # 07/35
+            Pb7U5 <- age2ratio(out$age[1],out$disp[1],ratio='Pb207U235',d=x$d)
+            out$wx0 <- Pb7U5[2]/Pb7U5[1]^2
+        } else if (type%in%c(3,4)){ # 08/32
+            Pb8Th2 <- age2ratio(out$age[1],out$disp[1],ratio='Pb208Th232')
+            out$wx0 <- Pb8Th2[2]/Pb8Th2[1]^2
+        } else {
+            stop('Invalid isochron type')
+        }
     }
     out
 }

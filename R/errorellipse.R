@@ -162,8 +162,12 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         if (taxis & !is.null(fit)){
             if (fit$model==3 && fit$wtype%in%c(2,'b')){
                 x0 <- -fit$a[1]/fit$b[1]
-                relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
-                xlim <- c(0,x0+ci(sx=x0*relerr))
+                if (is.null(fit$flippedfit)){ # U-Pb
+                    xlim <- c(0,x0+ci(sx=fit$wx0))
+                } else {
+                    relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
+                    xlim <- c(0,x0+ci(sx=x0*relerr))
+                }
             } else {
                 b <- fit$b[1]
                 db <- ci(sx=fit$b[2])
@@ -177,8 +181,12 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     if (is.null(ylim)){
         if (taxis & !is.null(fit)){
             if (fit$model==3 && fit$wtype%in%c(1,'a')){
-                relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
-                ylim <- c(0,fit$a[1]+ci(sx=fit$a[1]*relerr))
+                if (is.null(fit$flippedfit)){ # U-Pb
+                    ylim <- c(0,fit$a[1]+ci(sx=fit$wy0))
+                } else {
+                    relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
+                    ylim <- c(0,fit$a[1]+ci(sx=fit$a[1]*relerr))
+                }
             } else {
                 ylim <- c(0,fit$a[1]+ci(sx=fit$a[2]))
             }

@@ -149,11 +149,13 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
     out$model <- model
     if (model==3){
+        out$wtype <- anchor[1]
         if ('w'%in%names(fit$par)){
             w <- unname(afit$par['w'])
             sw <- sqrt(afit$cov['w','w'])
         } else {
-            w <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
+            w <- fixDispersion(model=model,format=x$format,
+                               anchor=anchor,type=type)
             sw <- 0
         }
         out$disp <- c('w'=w,'s[w]'=sw)
