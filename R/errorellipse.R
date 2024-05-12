@@ -179,19 +179,19 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         }
     }
     if (is.null(ylim)){
+        ylim <- get_limits(xy[plotit,'Y'],xy[plotit,'sY'])
         if (taxis & !is.null(fit)){
             if (fit$model==3 && fit$wtype%in%c(1,'a')){
                 if (is.null(fit$flippedfit)){ # U-Pb
-                    ylim <- c(0,fit$a[1]+ci(sx=fit$wy0))
+                    ymax <- max(ylim[2],fit$a[1]+ci(sx=fit$wy0))
                 } else {
                     relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
-                    ylim <- c(0,fit$a[1]+ci(sx=fit$a[1]*relerr))
+                    ymax <- max(ylim[2],fit$a[1]+ci(sx=fit$a[1]*relerr))
                 }
             } else {
-                ylim <- c(0,fit$a[1]+ci(sx=fit$a[2]))
+                ymax <- max(ylim[2],fit$a[1]+ci(sx=fit$a[2]))
             }
-        } else {
-            ylim <- get_limits(xy[plotit,'Y'],xy[plotit,'sY'])
+            ylim <- c(0,ymax)
         }
     }
     if (!add){
