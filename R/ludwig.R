@@ -276,7 +276,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
     init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,model=model)
     if (x$d$U48$option==2 | x$d$ThU$option==2){
-        if ('t'%in%names(init$par)) tt <- init$par['t']
+        if ('t'%in%names(init$par)) tt <- exp(init$par['t'])
         else if (anchor[1]==2) tt <- anchor[2]
         else tt <- 0
         McL <- mclean(tt=tt,d=x$d)
