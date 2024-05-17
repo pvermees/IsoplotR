@@ -136,8 +136,6 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
     l8 <- lambda('U238')[1]
     J <- matrix(0,1,2)
     usr <- graphics::par('usr')
-    if (d$U48$option==2) d$U48 <- list(x=unname(fit$par['U48i']),option=1)
-    if (d$ThU$option==2) d$ThU <- list(x=unname(fit$par['ThUi']),option=1)
     if (wetherill){
         if (measured_disequilibrium(d)){
             U85 <- iratio('U238U235')[1]
@@ -214,7 +212,6 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
         ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
         ul <- y + ciy
         ll <- y - ciy
-        yconc <- rep(0,nsteps)
         t68 <- get_Pb206U238_age(1/x,d=d)[,'t68']
         yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
         # correct overshot confidence intervals:
