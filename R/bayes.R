@@ -59,7 +59,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
                 upper[,pname] <- init[,pname]+1
             } else { # U48i, ThUi
                 lower[,pname] <- init[,pname]/2
-                upper[,pname] <- init[,pname]*2
+                upper[,pname] <- min(init[,pname]*2,x$d[[pname]]$M)
             }
         }
         LLgridt <- LLgrid[1:nsteps,]
@@ -67,9 +67,10 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         for (i in 1:nsteps){
             message('Iteration ',i,'/',nsteps)
             anchor <- c(2,tt[i])
-            ifit <- contingencyfit(par=init[i,],fn=LL_ludwig,lower=lower[i,],
-                                   upper=upper[i,],hessian=FALSE,x=x,
-                                   anchor=anchor,type=type,model=model)
+            ifit <- contingencyfit(par=init[i,],fn=LL_ludwig,
+                                   lower=lower[i,],upper=upper[i,],
+                                   hessian=FALSE,x=x,anchor=anchor,
+                                   type=type,model=model)
             LLgridt[i,'t'] <- tt[i]
             LLgridt[i,names(ifit$par)] <- ifit$par
             LLgridt[i,'LL'] <- -ifit$value

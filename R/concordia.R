@@ -356,8 +356,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
 plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
                               oerr=3,exterr=FALSE,ticks=5,box=TRUE){
     if (length(ticks)<2){
-        ticks <- prettier(lims$t,type=type,n=ticks,
-                          binary=measured_disequilibrium(x$d))
+        ticks <- prettier(lims$t,type=type,n=ticks)
     }
     m <- min(lims$t[1],ticks[1])
     M <- max(lims$t[2],utils::tail(ticks,1))
