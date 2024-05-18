@@ -285,7 +285,7 @@ init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
         if (x$d$U48$option==1 & x$d$U48$sx>0){
             init$par['U48i'] <- x$d$U48$x
         } else if (x$d$U48$option==2 & x$d$U48$sx>0){
-            init$par['U48i'] <- max(0,McL$U48i)
+            init$par['U48i'] <- max(x$d$buffer,McL$U48i)
         }
         if ('U48i'%in%names(init$par)){
             init$lower['U48i'] <- x$d$U48$m + x$d$buffer
@@ -294,7 +294,7 @@ init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
         if (x$d$ThU$option==1 & x$d$ThU$sx>0){
             init$par['ThUi'] <- x$d$ThU$x
         } else if (x$d$ThU$option==2 & x$d$ThU$sx>0){
-            init$par['ThUi'] <- max(0,McL$ThUi)
+            init$par['ThUi'] <- max(x$d$buffer,McL$ThUi)
         }
         if ('ThUi'%in%names(init$par)){
             init$lower['ThUi'] <- x$d$ThU$m + x$d$buffer
