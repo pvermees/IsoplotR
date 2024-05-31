@@ -84,9 +84,9 @@ ellipses. Follows the same formatting guidelines as
 
 \code{0}: plot the data without calculating an age
 
-\code{1}: fit a concordia_composition and age
+\code{1}: fit a concordia composition and age
 
-\code{2}: fit a discordia_line through the data using the maximum
+\code{2}: fit a discordia line through the data using the maximum
 likelihood algorithm of Ludwig (1998), which assumes that the
 scatter of the data is solely due to the analytical
 uncertainties. In this case, \code{IsoplotR} will either calculate
@@ -96,9 +96,9 @@ lower intercept age and common
 Tera-Wasserburg). If \code{mswd}>0, then the analytical
 uncertainties are augmented by a factor \eqn{\sqrt{mswd}}.
 
-\code{3}: fit a discordia_line ignoring the analytical uncertainties
+\code{3}: fit a discordia line ignoring the analytical uncertainties
 
-\code{4}: fit a discordia_line using a modified maximum likelihood
+\code{4}: fit a discordia line using a modified maximum likelihood
 algorithm that includes accounts for any overdispersion by adding a
 geological (co)variance term.}
 

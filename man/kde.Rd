@@ -541,6 +541,8 @@ the \code{kde} function}
 \item{modes}{a two-column matrix with the \code{x} and \code{y}
 values of the \code{nmodes} most prominent modes. Only returned
 if \code{nmodes} is a positive integer or \code{'all'}.}
+\item{h}{ an object of class \code{histogram}.
+Only returned if \code{show.hist} is \code{TRUE}}
 }
 
 or, if \code{x} has class \code{=detritals}, an object of class

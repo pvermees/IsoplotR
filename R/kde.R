@@ -450,13 +450,9 @@ get_kde <- function(x,...){ UseMethod("get_kde",x) }
 get_kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                             log=FALSE,n=512,nmodes=0,
                             show.hist=TRUE,binwidth=NA,...){
-    out <- list()
-    class(out) <- "KDE"
-    out$name <- deparse(substitute(x))
-    out$log <- log
-    if (log) d <- log(x)
-    else d <- x
-    if (is.na(bw)) bw <- botev(d)
+    if (log) dat <- log(x)
+    else dat <- x
+    if (is.na(bw)) bw <- botev(dat)
     if (is.na(from) | is.na(to)) {
         mM <- getmM(x,from,to,log)
         to <- mM$M + bw
@@ -469,24 +465,20 @@ get_kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
     }
     xx <- seq(from=from,to=to,length.out=n)
     if (adaptive){
-        yy <- Abramson(d,from=from,to=to,bw=bw,n=n,...)
+        yy <- Abramson(dat,from=from,to=to,bw=bw,n=n,...)
     } else {
-        yy <- stats::density(d,bw,from=from,to=to,n=n,...)$y
+        yy <- stats::density(dat,bw,from=from,to=to,n=n,...)$y
     }
-    if (log){ # back-transform
-        dxin <- diff(xx)
-        out$x <- exp(xx)
-        dxout <- diff(out$x)
-        yy <- c(dxin,utils::tail(dxin,1))*yy/c(dxout,utils::tail(dxout,1))
-    } else {
-        out$x <- xx
-    }
-    out$x <- c(out$x[1],out$x,out$x[n])
+    out <- list()
+    class(out) <- "KDE"
+    out$name <- deparse(substitute(x))
+    out$x <- c(xx[1],xx,xx[n])
     out$y <- c(0,yy/(sum(yy)*(to-from)/n),0)
     out$modes <- getmodes(x=out$x,y=out$y,nmodes=nmodes)
+    out$log <- log
     out$bw <- bw
-    out$ages <- x
-    if (show.hist) out$h <- get_hist(x=out,log=log,binwidth=binwidth)
+    out$dat <- dat
+    if (show.hist) out$h <- get_hist(x=out,binwidth=binwidth)
     out
 }
 #' @param samebandwidth use the median bandwidth for all samples?
@@ -512,7 +504,7 @@ get_kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                                    binwidth=binwidth,...)
         if (normalise){
             maxval <- max(c(thekdes[[name]]$y,thekdes[[name]]$h$dens))
-            if (themax < maxval) {themax <- maxval}
+            if (themax < maxval) themax <- maxval
         }
     }
     out <- list()
@@ -523,6 +515,20 @@ get_kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
     out$log <- log
     class(out) <- "KDEs"
     out
+}
+# x = output of get_kde
+get_hist <- function(x,binwidth=NA){
+    m <- x$x[1]
+    M <- rev(x$x)[1]
+    inrange <- (x$dat >= m) & (x$dat <= M)
+    dat <- x$dat[inrange]
+    if (is.na(binwidth)) {
+        nb <- log2(length(dat))+1 # Sturges' Rule
+        breaks <- seq(m,M,length.out=nb+1)
+    } else {
+        breaks <- seq(m,M+binwidth,by=binwidth)
+    }
+    graphics::hist(dat,breaks=breaks,plot=FALSE)
 }
 
 getmodes <- function(x,y,miny=max(y)/1000,nmodes=0){
@@ -582,49 +588,27 @@ Abramson <- function(dat,from,to,bw,n=512,...){
     dens
 }
 
-# x = output of get_kde
-get_hist <- function(x,log=FALSE,binwidth=NA){
-    m <- x$x[1]
-    M <- utils::tail(x$x,n=1)
-    inrange <- x$ages >= m & x$ages <= M
-    ages <- x$ages[inrange]
-    if (is.na(binwidth)) nb <- log2(length(ages))+1 # Sturges' Rule
-    if (log){
-        if (is.na(binwidth)) {
-            breaks <- exp(seq(log(m),log(M),length.out=nb+1))
-        } else {
-            breaks <- exp(seq(log(m),log(M)+binwidth,by=binwidth))
-        }
-        if (M/m < breaks[2]/breaks[1]) h <- NULL
-        else h <- graphics::hist(log(ages),breaks=log(breaks),plot=FALSE)
-    } else {
-        if (is.na(binwidth)) {
-            breaks <- seq(m,M,length.out=nb+1)
-        } else {
-            breaks <- seq(m,M+binwidth,by=binwidth)
-        }
-        h <- graphics::hist(ages,breaks=breaks,plot=FALSE)
-    }
-    h
-}
-
 #' @noRd
 plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      bty='n',sigdig=2,...){
     h <- x$h
     maxy <- ifelse(is.null(h),max(x$y),max(x$y,h$density))
-    graphics::plot(range(x$x),c(0,maxy),type='n',log=ifelse(x$log,'x',''),
+    xlim <- range(x$x)
+    xx <- x$x
+    dat <- x$dat
+    breaks <- h$breaks
+    if (x$log){
+        xlim <- exp(xlim)
+        xx <- exp(xx)
+        breaks <- exp(breaks)
+        dat <- exp(x$dat)
+    }
+    graphics::plot(x=xlim,y=c(0,maxy),type='n',log=ifelse(x$log,'x',''),
                    xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
     if (!is.null(h)){
-        nb <- length(h$breaks)-1
-        left <- h$breaks[1:nb]
-        right <- h$breaks[2:(nb+1)]
-        if (x$log){
-            left <- exp(left)
-            right <- exp(right)
-        }
-        graphics::rect(xleft=left,xright=right,
+        nb <- length(breaks)-1
+        graphics::rect(xleft=breaks[1:nb],xright=breaks[2:(nb+1)],
                        ybottom=0,ytop=h$density,col=hist.col)
         if (graphics::par('yaxt')!='n') {
             fact <- max(h$counts)/max(h$density)
@@ -633,15 +617,18 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
             graphics::axis(2,at=at,labels=lbls)
         }
     }
-    graphics::polygon(x$x,x$y,col=kde.col)
-    graphics::lines(x$x,x$y,col='black')
-    if (rug) rug(x$ages)
+    graphics::polygon(xx,x$y,col=kde.col)
+    graphics::lines(xx,x$y,col='black')
+    if (rug) rug(dat)
     if (!is.null(x$modes)){
-        graphics::points(x=x$modes[,'x'],y=x$modes[,'y'],pch='|')
-        graphics::text(x=x$modes[,'x'],y=x$modes[,'y'],xpd=TRUE,pos=3,
-                       labels=roundit(x$modes[,'x'],sigdig=sigdig))
+        if (x$log) xmodes <- exp(x$modes[,'x'])
+        else xmodes <- x$modes[,'x']
+        ymodes <- x$modes[,'y']
+        graphics::points(x=xmodes,y=ymodes,pch='|')
+        graphics::text(x=xmodes,y=ymodes,xpd=TRUE,pos=3,
+                       labels=roundit(xmodes,sigdig=sigdig))
     }
-    mymtext(get_ntit(x$ages,m=x$x[1],M=rev(x$x)[1]),line=0,adj=1)
+    mymtext(get_ntit(dat,m=x$x[1],M=rev(x$x)[1]),line=0,adj=1)
 }
 
 #' @noRd

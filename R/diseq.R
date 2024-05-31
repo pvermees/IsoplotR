@@ -553,14 +553,14 @@ concordia_end <- function(d,nuclide='auto'){
             n0 <- reverse(tt,mexp=mexp_8405(),nt=nt)
             n0['Th230',]^2
         }
-        out <- optimise(misfit,tlim,d=d)$minimum
+        out <- stats::optimise(misfit,tlim,d=d)$minimum
     } else if (d$U48$option==2 || nuclide=='U234'){
         misfit <- function(tt,d){
             n0 <- reverse(tt,mexp=mexp_8405(),nt=nt)
             U48i <- (n0['U234',]*d$L['U234'])/(n0['U238',]*d$L['U238'])
             ifelse(d$U48$x<1,U48i^2,(U48i-20)^2)
         }
-        out <- optimise(misfit,tlim,d=d)$minimum
+        out <- stats::optimise(misfit,tlim,d=d)$minimum
     } else {
         out <- 4500
     }
