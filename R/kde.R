@@ -597,16 +597,16 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
     xlim <- range(x$x)
     plotx <- x$x
     dat <- x$dat
-    breaks <- h$breaks
     if (x$log){
         xlim <- exp(xlim)
         plotx <- exp(plotx)
-        breaks <- exp(breaks)
         dat <- exp(x$dat)
     }
     graphics::plot(x=xlim,y=c(0,maxy),type='n',log=ifelse(x$log,'x',''),
                    xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
     if (!is.null(h)){
+        if (x$log) breaks <- exp(h$breaks)
+        else breaks <- h$breaks
         nb <- length(breaks)-1
         graphics::rect(xleft=breaks[1:nb],xright=breaks[2:(nb+1)],
                        ybottom=0,ytop=h$density,col=hist.col)
