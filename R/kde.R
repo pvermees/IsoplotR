@@ -595,12 +595,12 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
     h <- x$h
     maxy <- ifelse(is.null(h),max(x$y),max(x$y,h$density))
     xlim <- range(x$x)
-    xx <- x$x
+    plotx <- x$x
     dat <- x$dat
     breaks <- h$breaks
     if (x$log){
         xlim <- exp(xlim)
-        xx <- exp(xx)
+        plotx <- exp(plotx)
         breaks <- exp(breaks)
         dat <- exp(x$dat)
     }
@@ -617,8 +617,8 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
             graphics::axis(2,at=at,labels=lbls)
         }
     }
-    graphics::polygon(xx,x$y,col=kde.col)
-    graphics::lines(xx,x$y,col='black')
+    graphics::polygon(plotx,x$y,col=kde.col)
+    graphics::lines(plotx,x$y,col='black')
     if (rug) rug(dat)
     if (!is.null(x$modes)){
         if (x$log) xmodes <- exp(x$modes[,'x'])
@@ -628,7 +628,7 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
         graphics::text(x=xmodes,y=ymodes,xpd=TRUE,pos=3,
                        labels=roundit(xmodes,sigdig=sigdig))
     }
-    mymtext(get_ntit(dat,m=x$x[1],M=rev(x$x)[1]),line=0,adj=1)
+    mymtext(get_ntit(dat,m=plotx[1],M=rev(plotx)[1]),line=0,adj=1)
 }
 
 #' @noRd
