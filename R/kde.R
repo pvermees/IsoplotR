@@ -613,16 +613,18 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      bty='n',sigdig=2,...){
     h <- x$h
-    if (is.null(h)){
-        maxy <- max(x$y)
-    } else {
-        maxy <- max(c(x$y,h$density))
-    }
+    maxy <- ifelse(is.null(h),max(x$y),max(x$y,h$density))
     graphics::plot(range(x$x),c(0,maxy),type='n',log=ifelse(x$log,'x',''),
                    xlab=xlab,ylab=ylab,yaxt='n',bty=bty,...)
     if (!is.null(h)){
         nb <- length(h$breaks)-1
-        graphics::rect(xleft=h$breaks[1:nb],xright=h$breaks[2:(nb+1)],
+        left <- h$breaks[1:nb]
+        right <- h$breaks[2:(nb+1)]
+        if (x$log){
+            left <- exp(left)
+            right <- exp(right)
+        }
+        graphics::rect(xleft=left,xright=right,
                        ybottom=0,ytop=h$density,col=hist.col)
         if (graphics::par('yaxt')!='n') {
             fact <- max(h$counts)/max(h$density)
