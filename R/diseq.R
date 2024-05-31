@@ -545,6 +545,27 @@ meas_diseq_maxt <- function(d,nuclide='auto'){
     }
     out
 }
+concordia_end <- function(d,nuclide='auto'){
+    tlim <- c(0,meas_diseq_maxt(d=d,nuclide=nuclide))
+    nt <- meas_diseq_nt(d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
+    if ((d$ThU$option==2 && nuclide!='U234') || nuclide=='Th230'){
+        misfit <- function(tt,d){
+            n0 <- reverse(tt,mexp=mexp_8405(),nt=nt)
+            n0['Th230',]^2
+        }
+        out <- optimise(misfit,tlim,d=d)$minimum
+    } else if (d$U48$option==2 || nuclide=='U234'){
+        misfit <- function(tt,d){
+            n0 <- reverse(tt,mexp=mexp_8405(),nt=nt)
+            U48i <- (n0['U234',]*d$L['U234'])/(n0['U238',]*d$L['U238'])
+            ifelse(d$U48$x<1,U48i^2,(U48i-20)^2)
+        }
+        out <- optimise(misfit,tlim,d=d)$minimum
+    } else {
+        out <- 4500
+    }
+    out
+}
 
 measured2initial <- function(x,fit){
     out <- x

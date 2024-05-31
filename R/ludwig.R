@@ -149,11 +149,13 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
     out$model <- model
     if (model==3){
+        out$wtype <- anchor[1]
         if ('w'%in%names(fit$par)){
             w <- unname(afit$par['w'])
             sw <- sqrt(afit$cov['w','w'])
         } else {
-            w <- fixDispersion(model=model,format=x$format,anchor=anchor,type=type)
+            w <- fixDispersion(model=model,format=x$format,
+                               anchor=anchor,type=type)
             sw <- 0
         }
         out$disp <- c('w'=w,'s[w]'=sw)
@@ -274,7 +276,7 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
 init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
     init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,model=model)
     if (x$d$U48$option==2 | x$d$ThU$option==2){
-        if ('t'%in%names(init$par)) tt <- init$par['t']
+        if ('t'%in%names(init$par)) tt <- exp(init$par['t'])
         else if (anchor[1]==2) tt <- anchor[2]
         else tt <- 0
         McL <- mclean(tt=tt,d=x$d)
@@ -283,7 +285,7 @@ init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
         if (x$d$U48$option==1 & x$d$U48$sx>0){
             init$par['U48i'] <- x$d$U48$x
         } else if (x$d$U48$option==2 & x$d$U48$sx>0){
-            init$par['U48i'] <- max(0,McL$U48i)
+            init$par['U48i'] <- max(x$d$buffer,McL$U48i)
         }
         if ('U48i'%in%names(init$par)){
             init$lower['U48i'] <- x$d$U48$m + x$d$buffer
@@ -292,7 +294,7 @@ init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
         if (x$d$ThU$option==1 & x$d$ThU$sx>0){
             init$par['ThUi'] <- x$d$ThU$x
         } else if (x$d$ThU$option==2 & x$d$ThU$sx>0){
-            init$par['ThUi'] <- max(0,McL$ThUi)
+            init$par['ThUi'] <- max(x$d$buffer,McL$ThUi)
         }
         if ('ThUi'%in%names(init$par)){
             init$lower['ThUi'] <- x$d$ThU$m + x$d$buffer
@@ -824,7 +826,7 @@ data2ludwig_2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
     i2 <- (ns+1):(2*ns)
     diag(E)[i1] <- yd[,'sX']^2
     diag(E)[i2] <- yd[,'sY']^2
-    diag(E[i1,i2]) <- diag(E[i2,i1]) <- yd[,'rXY']*yd[,'sX']*yd[,'sY']
+    E[i1,i2] <- E[i2,i1] <- diag(ns)*yd[,'rXY']*yd[,'sX']*yd[,'sY']
     if (model==3){
         if (anchor[1]==1){
             c0 <- getc0SSLL(yd,A=A,b=b,L0=L0,E=E,multiplier=multiplier)$c0

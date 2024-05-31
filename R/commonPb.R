@@ -3,7 +3,7 @@
 #' @description
 #' Applies a common-Pb correction to a U-Pb dataset using either the
 #' Stacey-Kramers mantle evolution model, isochron regression, or any
-#' nominal inital Pb isotope composition.
+#' nominal initial Pb isotope composition.
 #'
 #' @details
 #'

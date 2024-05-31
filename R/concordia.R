@@ -110,9 +110,9 @@
 #'
 #' \code{0}: plot the data without calculating an age
 #'
-#' \code{1}: fit a concordia_composition and age
+#' \code{1}: fit a concordia composition and age
 #'
-#' \code{2}: fit a discordia_line through the data using the maximum
+#' \code{2}: fit a discordia line through the data using the maximum
 #' likelihood algorithm of Ludwig (1998), which assumes that the
 #' scatter of the data is solely due to the analytical
 #' uncertainties. In this case, \code{IsoplotR} will either calculate
@@ -122,9 +122,9 @@
 #' Tera-Wasserburg). If \code{mswd}>0, then the analytical
 #' uncertainties are augmented by a factor \eqn{\sqrt{mswd}}.
 #'
-#' \code{3}: fit a discordia_line ignoring the analytical uncertainties
+#' \code{3}: fit a discordia line ignoring the analytical uncertainties
 #'
-#' \code{4}: fit a discordia_line using a modified maximum likelihood
+#' \code{4}: fit a discordia line using a modified maximum likelihood
 #' algorithm that includes accounts for any overdispersion by adding a
 #' geological (co)variance term.
 #'
@@ -355,9 +355,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
 # helper function for plot.concordia
 plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
                               oerr=3,exterr=FALSE,ticks=5,box=TRUE){
-    if (length(ticks)<2)
-        ticks <- prettier(lims$t,type=type,n=ticks,
-                          binary=measured_disequilibrium(x$d))
+    if (length(ticks)<2) ticks <- prettier(lims$t,type=type,n=ticks)
     m <- min(lims$t[1],ticks[1])
     M <- max(lims$t[2],utils::tail(ticks,1))
     nn <- 30 # number of segments into which the concordia line is divided
@@ -484,7 +482,7 @@ get_concordia_limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
     else out$t <- tlim
     md <- mediand(x$d)
     if (measured_disequilibrium(md)){
-        if (is.null(tlim)) out$t[2] <- meas_diseq_maxt(md)
+        if (is.null(tlim)) out$t[2] <- concordia_end(md)
         if (type==1){
             if (!xset){
                 Pb7U5 <- get_Pb207U235_ratios(x)
