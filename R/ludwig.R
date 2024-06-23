@@ -1017,7 +1017,7 @@ LL_ludwig_model2_2d <- function(ta0b0,x,exterr=FALSE,type=1){
 mswd_lud <- function(fit,x,exterr=FALSE,type='joint'){
     out <- fit
     ns <- length(x)
-    np <- sum(diag(fit$cov)>0)
+    np <- sum(diag(fit$cov[1:4,1:4])>0)
     if (x$format%in%c(1,2,3,9,10,119,1210) || type%ni%c('joint',0)){
         out$df <- ns-np
     } else {
