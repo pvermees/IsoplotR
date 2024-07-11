@@ -225,6 +225,7 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
     }
     cdf <- cumsum(XL[,'L'])/sum(XL[,'L'])
     increasing <- which(diff(cdf)>1e-20)
+    increasing <- append(increasing,utils::tail(increasing,n=1)+1)
     ll <- stats::spline(x=cdf[increasing],y=XL[increasing,'x'],
                         xout=stats::pnorm(lq),method='hyman')
     ul <- stats::spline(x=cdf[increasing],y=XL[increasing,'x'],
