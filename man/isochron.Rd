@@ -481,9 +481,12 @@ age, i.e. to diachronous closure of the isotope system.
 otherwise, \code{wtype} can have one of four values:
 
 \itemize{
-\item \code{1}: attributes the overdispersion to the y-intercept of the isochron.
 
-\item \code{2}: attributes the overdispersion to the slope of the isochron.
+\item \code{1}: attributes the overdispersion to the y-intercept of
+the equivalent conventional isochron.
+
+\item \code{2}: attributes the overdispersion to the slope of the
+equivalent conventional isochron.
 
 \item \code{'A'}: only available if \code{x} has class \code{ThU} and
 \code{x$format} is 1 or 2. Attributes the overdispersion to the
