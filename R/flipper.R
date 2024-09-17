@@ -180,7 +180,7 @@ gety0rat.KCa <- function(x,...){ 'Ca40Ca44' }
 #' @noRd
 gety0rat.RbSr <- function(x,...){ 'Sr87Sr86' }
 #' @noRd
-gety0rat.ReOs <- function(x,...){ 'Os187Os192' }
+gety0rat.ReOs <- function(x,...){ 'Os187Os188' }
 #' @noRd
 gety0rat.SmNd <- function(x,...){ 'Nd143Nd144' }
 #' @noRd
