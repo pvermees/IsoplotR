@@ -68,9 +68,7 @@ get_nominal_initials <- function(x){
     } else if (is.SmNd(x)){
         out <- settings('iratio','Nd143Nd144')
     } else if (is.ReOs(x)){
-        Os72 <- settings('iratio','Os187Os192')
-        Os82 <- settings('iratio','Os188Os192')
-        out <- quotient(Os82[1],Os82[2],Os72[1],Os72[2],0)
+        out <- settings('iratio','Os187Os188')
     } else if (is.LuHf(x)){
         out <- settings('iratio','Hf176Hf177')
     } else if (is.KCa(x)){
