@@ -1451,7 +1451,11 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (x$format<9 || x$format==85){
         if (conc){
             labels <- c(labels,'t.conc','s[t.conc]')
-            t.conc <- concordia_age(x=Xi,i=1,exterr=exterr)$age
+            t.conc <- tryCatch({
+                concordia_age(x=Xi,i=1,exterr=exterr)$age
+            }, error = function(e){
+                c(NA,NA)
+            })
         }
         if (discordance$option>0){
             xdi <- subset(xd,subset=((1:length(xd))%in%i))
