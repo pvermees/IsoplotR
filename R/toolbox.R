@@ -6,7 +6,7 @@ roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE,maxprecision=8){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
         nc <- 1
-    } else if (any(age<0)){
+    } else if (any(age<0,na.rm=TRUE)){
         s <- sign(age)
         out <- roundit(age=abs(age),err=err,sigdig=sigdig)
         if (is.matrix(out)){
