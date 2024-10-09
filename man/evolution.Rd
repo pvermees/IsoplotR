@@ -8,6 +8,8 @@ evolution(
   x,
   xlim = NULL,
   ylim = NULL,
+  tticks = NULL,
+  aticks = NULL,
   oerr = 3,
   transform = FALSE,
   Th0i = 0,
@@ -34,6 +36,10 @@ evolution(
 \item{xlim}{x-axis limits}
 
 \item{ylim}{y-axis limits}
+
+\item{tticks}{time intervals of the evolution grid}
+
+\item{aticks}{initial activity ratio ticks of the evolution grid}
 
 \item{oerr}{indicates whether the analytical uncertainties of the
     output are reported in the plot title as:
