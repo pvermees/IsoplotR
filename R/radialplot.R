@@ -45,6 +45,8 @@
 #' @param from minimum age limit of the radial scale
 #' @param to maximum age limit of the radial scale
 #' @param z0 central value
+#' @param xlim maximum limit of the x-axis. If provided as a vector,
+#'     uses the last value of that vector and ignores the first one.
 #' @param transformation one of either \code{log}, \code{linear},
 #'     \code{sqrt} or \code{arcsin} (if \code{x} has class
 #'     \code{fissiontracks} and \code{fissiontracks$format} \eqn{\neq
@@ -546,7 +548,8 @@ radial_scale <- function(x,zeta=0,rhoD=0,xlim=NULL,...){
     zM <- t2z(x$to,x,zeta,rhoD)
     padding <- 1.1
     N <- 50
-    a <- grDevices::dev.size()[2]/grDevices::dev.size()[1] # aspect ratio
+    pin <- graphics::par('pin')
+    a <- pin[2]/pin[1] # aspect ratio
     e <- a/(zM-zm) # ellipticity of the arc
     # get rxM
     theta <- atan(e*(x$z-x$z0))
@@ -555,7 +558,8 @@ radial_scale <- function(x,zeta=0,rhoD=0,xlim=NULL,...){
         xdist <- (rxy[,1]^2+rxy[,2]^2)/(cos(theta)^2+(sin(theta)/e)^2)
         xM <- padding*sqrt(max(xdist,na.rm=TRUE))
     } else {
-        xM <- tail(xlim,1)
+        xM <- utils::tail(xlim,1)
+        if (x$transformation=='arcsin') xM <- 2*sqrt(xM)
     }
     # plot arc
     Z <- seq(zm-x$z0,zM-x$z0,length.out=N)
