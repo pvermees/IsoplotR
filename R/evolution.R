@@ -277,7 +277,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
 }
 
 Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
-                        ylim=NULL,ticks=NULL,oerr=3,show.numbers=FALSE,
+                        ylim=NULL,tticks=NULL,oerr=3,show.numbers=FALSE,
                         exterr=FALSE,clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -289,8 +289,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
     d <- data2evolution(x,omit4c=unique(c(hide,omit)))
     d2plot <- subset(d,subset=plotit)
     scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
-    if (is.null(ticks)) ticks <- c(0,5,10,20,50,100,200,Inf)
-    nt <- length(ticks)
+    if (is.null(tticks)) tticks <- c(0,5,10,20,50,100,200,Inf)
+    nt <- length(tticks)
     X <- graphics::par('usr')[1:2]
     Y <- X
     minY <- graphics::par('usr')[3]
@@ -300,17 +300,17 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
-        anchor <- cbind(0,fit$y0[1]*exp(-l0*ticks))
+        anchor <- cbind(0,fit$y0[1]*exp(-l0*tticks))
     } else if (Th0i==2){
         anchor <- matrix(x$U8Th2,nt-1,2)
-        ticks <- ticks[is.finite(ticks)]
+        tticks <- tticks[is.finite(tticks)]
     } else {
         anchor <- matrix(0,nt,2)
     }
-    for (i in seq_along(ticks)){ # plot isolines
-        if (is.finite(ticks[i])) ticktext <- ticks[i]
+    for (i in seq_along(tticks)){ # plot isolines
+        if (is.finite(tticks[i])) ticktext <- tticks[i]
         else ticktext <- expression(infinity)
-        slope <- 1-exp(-l0*ticks[i])
+        slope <- 1-exp(-l0*tticks[i])
         Y <- anchor[i,2] + slope*(X-anchor[i,1])
         graphics::lines(X,Y,col=line.col,...)
         if (Y[2]<minY){
