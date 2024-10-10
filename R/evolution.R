@@ -36,6 +36,8 @@
 #' @param x an object of class \code{ThU}
 #' @param xlim x-axis limits
 #' @param ylim y-axis limits
+#' @param tticks time intervals of the evolution grid
+#' @param aticks initial activity ratio ticks of the evolution grid
 #' @param oerr indicates whether the analytical uncertainties of the
 #'     output are reported in the plot title as:
 #' 
@@ -161,8 +163,8 @@
 #'     errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
-evolution <- function(x,xlim=NULL,ylim=NULL,oerr=3,transform=FALSE,
-                      Th0i=0,show.numbers=FALSE,levels=NA,
+evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
+                      transform=FALSE,Th0i=0,show.numbers=FALSE,levels=NA,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
                       isochron=FALSE,model=1,exterr=FALSE,sigdig=2,
@@ -177,9 +179,10 @@ evolution <- function(x,xlim=NULL,ylim=NULL,oerr=3,transform=FALSE,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
-                        ylim=ylim,oerr=oerr,Th0i=Th0i,
-                        show.numbers=show.numbers,levels=levels,
-                        clabel=clabel,ellipse.fill=ellipse.fill,
+                        ylim=ylim,tticks=tticks,aticks=aticks,
+                        oerr=oerr,Th0i=Th0i,show.numbers=show.numbers,
+                        levels=levels,clabel=clabel,
+                        ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,
                         line.col=line.col,show.ellipses=(model!=2),
                         hide=hide,omit=omit,omit.fill=omit.fill,
@@ -193,9 +196,10 @@ evolution <- function(x,xlim=NULL,ylim=NULL,oerr=3,transform=FALSE,
         }
     } else {
         Th02vsU8Th2(x,isochron=isochron,model=model,Th0i=Th0i,
-                    xlim=xlim,ylim=ylim,oerr=oerr,show.numbers=show.numbers,
-                    exterr=exterr,sigdig=sigdig,levels=levels,
-                    clabel=clabel,ellipse.fill=ellipse.fill,
+                    xlim=xlim,ylim=ylim,tticks=tticks,aticks=aticks,
+                    oerr=oerr,show.numbers=show.numbers,exterr=exterr,
+                    sigdig=sigdig,levels=levels,clabel=clabel,
+                    ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,line.col=line.col,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
@@ -273,7 +277,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
 }
 
 Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
-                        ylim=NULL,oerr=3,show.numbers=FALSE,
+                        ylim=NULL,tticks=NULL,oerr=3,show.numbers=FALSE,
                         exterr=FALSE,clabel="",levels=NA,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -285,8 +289,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
     d <- data2evolution(x,omit4c=unique(c(hide,omit)))
     d2plot <- subset(d,subset=plotit)
     scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
-    ticks <- c(0,5,10,20,50,100,200,Inf)
-    nt <- length(ticks)
+    if (is.null(tticks)) tticks <- c(0,5,10,20,50,100,200,Inf)
+    nt <- length(tticks)
     X <- graphics::par('usr')[1:2]
     Y <- X
     minY <- graphics::par('usr')[3]
@@ -296,17 +300,17 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
-        anchor <- cbind(0,fit$y0[1]*exp(-l0*ticks))
+        anchor <- cbind(0,fit$y0[1]*exp(-l0*tticks))
     } else if (Th0i==2){
         anchor <- matrix(x$U8Th2,nt-1,2)
-        ticks <- rev(rev(ticks)[-1]) # remove infinity
+        tticks <- tticks[is.finite(tticks)]
     } else {
         anchor <- matrix(0,nt,2)
     }
-    for (i in seq_along(ticks)){ # plot isolines
-        if (is.finite(ticks[i])) ticktext <- ticks[i]
+    for (i in seq_along(tticks)){ # plot isolines
+        if (is.finite(tticks[i])) ticktext <- tticks[i]
         else ticktext <- expression(infinity)
-        slope <- 1-exp(-l0*ticks[i])
+        slope <- 1-exp(-l0*tticks[i])
         Y <- anchor[i,2] + slope*(X-anchor[i,1])
         graphics::lines(X,Y,col=line.col,...)
         if (Y[2]<minY){
@@ -355,8 +359,10 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
 
 evolution_title <- function(fit,sigdig=2,oerr=3,...){
     content <- list()
-    content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],sigdig=sigdig,n=fit$n,
-                            oerr=oerr,prefix='isochron age =',units=' ka',df=fit$df)
+    content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],
+                            sigdig=sigdig,n=fit$n,
+                            oerr=oerr,prefix='isochron age =',
+                            units=' ka',df=fit$df)
     content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],sigdig=sigdig,ntit='',
                             oerr=oerr,prefix=fit$y0label,units='',df=fit$df)
     if (fit$model==1){
@@ -373,11 +379,10 @@ evolution_title <- function(fit,sigdig=2,oerr=3,...){
     }
 }
 
-evolution_lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
-                            line.col='darksalmon',...){
-    nn <- 20
-    maxt <- 400
-    tt <- seq(from=0,to=maxt,by=50)
+evolution_lines <- function(d,xlim=NULL,ylim=NULL,
+                            tticks=NULL,aticks=NULL,
+                            bty='n',line.col='darksalmon',...){
+    if (is.null(tticks)) tticks <- seq(0,500,by=50)
     nsd <- 3
     if (is.null(xlim)){
         min.dx <- 0
@@ -404,32 +409,37 @@ evolution_lines <- function(d,xlim=NULL,ylim=NULL,bty='n',
         a0max <- 1.5
     }
     if (is.null(xlim)){
-        xlim <- range(pretty(c(min(get_Th230U238_ratio(tt,a0min)),
-                               max(get_Th230U238_ratio(tt,a0max)))))
+        xlim <- range(pretty(c(min.dx,
+                               min(get_Th230U238_ratio(tticks,a0min)),
+                               max(get_Th230U238_ratio(tticks,a0max)),
+                               max.dx)))
     }
-    a0 <- pretty(c(a0min,a0max))
+    if (is.null(aticks)) aticks <- pretty(c(a0min,a0max))
     if (is.null(ylim)){
-        ylim <- range(a0)
-        a0 <- a0[a0>0]
+        ylim <- range(aticks)
+        aticks <- aticks[aticks>0]
     } else {
-        a0 <- c(a0[a0>0 & a0<ylim[2]],ylim[2])
+        aticks <- c(aticks[aticks>0 & aticks<ylim[2]],ylim[2])
     }
     x.lab <- expression(paste(""^"230","Th/"^"238","U"))
     y.lab <- expression(paste(""^"234","U/"^"238","U"))
     graphics::plot(xlim,ylim,type='n',xlab=x.lab,ylab=y.lab,bty=bty,...)
-    na0 <- length(a0)
+    na0 <- length(aticks)
+    nn <- 100
     for (i in 1:na0){
-        ttt <- seq(0,maxt,length.out=nn)
-        x <- get_Th230U238_ratio(ttt,a0[i])
-        y <- get_U234U238_ratio(ttt,a0[i])
+        tt <- seq(0,2000,length.out=nn)
+        x <- get_Th230U238_ratio(tt,aticks[i])
+        y <- get_U234U238_ratio(tt,aticks[i])
         graphics::lines(x,y,col=line.col)
     }
-    for (i in 2:nn){
-        x <- get_Th230U238_ratio(tt[i],a0)
-        y <- get_U234U238_ratio(tt[i],a0)
-        x0 <- get_Th230U238_ratio(tt[i],1)
+    for (i in 1:nn){
+        x <- get_Th230U238_ratio(tticks[i],aticks)
+        y <- get_U234U238_ratio(tticks[i],aticks)
+        x0 <- get_Th230U238_ratio(tticks[i],1)
         graphics::lines(c(x0,x),c(1,y),col=line.col)
-        graphics::text(x[na0],y[na0],tt[i],pos=4,col=line.col)
+        if (is.finite(tticks[i])) ticktext <- tticks[i]
+        else ticktext <- expression(infinity)
+        graphics::text(x[na0],y[na0],ticktext,pos=4,col=line.col)
     }
     rbind(xlim,ylim)
 }

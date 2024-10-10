@@ -49,6 +49,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   transformation = "log",
   sigdig = 2,
   show.numbers = FALSE,
@@ -73,6 +74,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   transformation = "arcsin",
   sigdig = 2,
   show.numbers = FALSE,
@@ -97,6 +99,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   transformation = "log",
   type = 4,
   cutoff.76 = 1100,
@@ -125,6 +128,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -150,6 +154,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -175,6 +180,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -200,6 +206,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -224,6 +231,7 @@ radialplot(x, ...)
   x,
   from = NA,
   to = NA,
+  xlim = NULL,
   z0 = NA,
   sigdig = 2,
   transformation = "log",
@@ -248,6 +256,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -273,6 +282,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -298,6 +308,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -323,6 +334,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -348,6 +360,7 @@ radialplot(x, ...)
   from = NA,
   to = NA,
   z0 = NA,
+  xlim = NULL,
   sigdig = 2,
   transformation = "log",
   show.numbers = FALSE,
@@ -467,6 +480,9 @@ but omitted from the central age calculation or mixture models.}
 
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
+
+\item{xlim}{maximum limit of the x-axis. If provided as a vector,
+uses the last value of that vector and ignores the first one.}
 
 \item{exterr}{include the external sources of uncertainty into
 the error propagation for the central age and mixture models?}
