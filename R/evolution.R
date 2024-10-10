@@ -382,7 +382,7 @@ evolution_title <- function(fit,sigdig=2,oerr=3,...){
 evolution_lines <- function(d,xlim=NULL,ylim=NULL,
                             tticks=NULL,aticks=NULL,
                             bty='n',line.col='darksalmon',...){
-    if (is.null(tticks)) tticks <- prettier(c(0,500),n=8)
+    if (is.null(tticks)) tticks <- seq(0,500,by=50)
     nsd <- 3
     if (is.null(xlim)){
         min.dx <- 0
@@ -409,8 +409,10 @@ evolution_lines <- function(d,xlim=NULL,ylim=NULL,
         a0max <- 1.5
     }
     if (is.null(xlim)){
-        xlim <- range(pretty(c(min(get_Th230U238_ratio(tticks,a0min)),
-                               max(get_Th230U238_ratio(tticks,a0max)))))
+        xlim <- range(pretty(c(min.dx,
+                               min(get_Th230U238_ratio(tticks,a0min)),
+                               max(get_Th230U238_ratio(tticks,a0max)),
+                               max.dx)))
     }
     if (is.null(aticks)) aticks <- pretty(c(a0min,a0max))
     if (is.null(ylim)){
@@ -430,7 +432,7 @@ evolution_lines <- function(d,xlim=NULL,ylim=NULL,
         y <- get_U234U238_ratio(tt,aticks[i])
         graphics::lines(x,y,col=line.col)
     }
-    for (i in 2:nn){
+    for (i in 1:nn){
         x <- get_Th230U238_ratio(tticks[i],aticks)
         y <- get_U234U238_ratio(tticks[i],aticks)
         x0 <- get_Th230U238_ratio(tticks[i],1)
