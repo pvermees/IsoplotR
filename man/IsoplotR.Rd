@@ -20,8 +20,8 @@ Vermeesch, P., 2018, IsoplotR: a free and open toolbox
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://www.ucl.ac.uk/~ucfbpve/isoplotr/}
   \item \url{https://github.com/pvermees/IsoplotR/}
+  \item \url{https://isoplotr.es.ucl.ac.uk/home/index.html}
 }
 
 }
