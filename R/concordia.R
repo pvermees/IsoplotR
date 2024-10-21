@@ -671,30 +671,18 @@ concordia_age <- function(x,i=NULL,type=1,exterr=FALSE,...){
 }
 # cc is assumed to follow a wetherill or cottle format
 concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
-    v <- eigen(cc$cov)$vectors[,1]
-    slope <- v[2]/v[1]
     lower <- upper <- init <- vector()
-    U85 <- iratio('U238U235')[1]
-    l8 <- lambda('U238')[1]
     tmin <- 0
-    tmax <- ifelse(measured_disequilibrium(d),meas_diseq_maxt(d),10000)
     if (type==1){
-        l5 <- lambda('U235')[1]
-        if (slope>0){
-            tmid <- log(slope*l5/l8)/(l8-l5) # tangential to error ellipse
-        } else {
-            tmid <- log(-l8/(l5*slope))/(l5-l8) # normal to error ellipse
-        }
+        tmid1 <- get_Pb207U235_age(cc$x['Pb207U235'],d=d)[1]
+        tmid2 <- get_Pb206U238_age(cc$x['Pb206U238'],d=d)[1]
     } else if (type==3){
-        l2 <- lambda('Th232')[1]
-        if (slope>0){
-            tmid <- log(slope*l8/l2)/(l2-l8) # tangential to error ellipse
-        } else {
-            tmid <- log(-l2/(l8*slope))/(l8-l2) # normal to error ellipse
-        }
+        tmid1 <- get_Pb206U238_age(cc$x['Pb206U238'],d=d)[1]
+        tmid2 <- get_Pb208Th232_age(cc$x['Pb208Th232'])[1]
     } else {
         stop('concordia_age_helper is not available for concordia type ', type)
     }
+    tmax <- ifelse(measured_disequilibrium(d),meas_diseq_maxt(d),10000)
     if (d$U48$option>0){
         if (d$U48$option==2 && (is.null(d$U48$sx) || d$U48$sx<=0)){
             stop('Zero uncertainty of measured 234/238 activity ratio')
@@ -723,22 +711,19 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         lower['PaUi'] <- 0
         upper['PaUi'] <- 20
     }
-    lower['t'] <- tmin
-    upper['t'] <- tmid
-    init['t'] <- (lower['t'] + upper['t'])/2
-    fit1 <- stats::optim(init,LL_concordia_age,method='L-BFGS-B',
-                         lower=lower,upper=upper,exterr=exterr,
-                         cc=cc,type=type,d=d,hessian=TRUE)
-    lower['t'] <- tmid
-    upper['t'] <- tmax
-    init['t'] <- (lower['t'] + upper['t'])/2
-    fit2 <- stats::optim(init,LL_concordia_age,method='L-BFGS-B',
-                         lower=lower,upper=upper,exterr=exterr,
-                         cc=cc,type=type,d=d,hessian=TRUE)
-    o1 <- fit1$value
-    o2 <- fit2$value
-    if (is.finite(o1)) out <- fit1
-    if (is.finite(o2) && o2<o1) out <- fit2
+    tt <- sort(c(tmin,tmid1,tmid2,tmax))
+    out <- list(value=Inf)
+    for (i in 2:length(tt)){
+        lower['t'] <- tt[i-1]
+        upper['t'] <- tt[i]
+        init['t'] <- (lower['t'] + upper['t'])/2
+        fit <- stats::optim(init,LL_concordia_age,method='L-BFGS-B',
+                            lower=lower,upper=upper,exterr=exterr,
+                            cc=cc,type=type,d=d,hessian=TRUE)
+        if (is.finite(fit$value) && fit$value<out$value){
+            out <- fit
+        }
+    }
     out$cov <- inverthess(out$hessian)
     out
 }
