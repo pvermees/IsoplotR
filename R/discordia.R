@@ -262,7 +262,7 @@ discordia_title <- function(fit,wetherill,sigdig=2,oerr=1,
     if (wetherill){
         line2 <- maintit(x=fit$par[2],sx=fit$err[,2],ntit='',df=fit$df,
                          sigdig=sigdig,oerr=oerr,prefix='upper intercept =')
-    } else if (fit$format<4){
+    } else if (fit$format %in% c(1,2,3)){
         if (is.null(fit$posterior)) pnames <- NULL
         else pnames <- names(fit$posterior)
         if (is.null(pnames)) ipar <- NULL
@@ -278,14 +278,14 @@ discordia_title <- function(fit,wetherill,sigdig=2,oerr=1,
             line2 <- bayestit(x=fit$par[ipar],XL=fit$posterior[[ipar]],ntit='',
                               sigdig=sigdig,oerr=oerr,units='',prefix=fit$y0label)
         }
-    } else if (fit$format<7){
+    } else if (fit$format%in%c(4,5,6)){
         line2 <- maintit(x=fit$par['a0'],sx=fit$err[,'a0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
                          prefix=quote('('^206*'Pb/'^204*'Pb)'[c]*'='))
         line3 <- maintit(x=fit$par['b0'],sx=fit$err[,'b0'],ntit='',
                          sigdig=sigdig,oerr=oerr,units='',df=fit$df,
                          prefix=quote('('^207*'Pb/'^204*'Pb)'[c]*'='))
-    } else if (fit$format<9){
+    } else if (fit$format%in%c(7,8,85)){
         i86 <- 1/fit$par['a0']
         i87 <- 1/fit$par['b0']
         i86err <- i86*fit$err[,'a0']/fit$par['a0']
