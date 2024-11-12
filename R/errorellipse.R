@@ -159,23 +159,24 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     calcit <- sn%ni%c(hide,omit)
     colnames(xy) <- c('X','sX','Y','sY','rXY')
     if (is.null(xlim)){
+        xlim <- get_limits(xy[plotit,'X'],xy[plotit,'sX'])
         if (taxis & !is.null(fit)){
             if (fit$model==3 && fit$wtype%in%c(2,'b')){
                 x0 <- -fit$a[1]/fit$b[1]
                 if (is.null(fit$flippedfit)){ # U-Pb
-                    xlim <- c(0,x0+ci(sx=fit$wx0))
+                    taxismaxx <- x0+ci(sx=fit$wx0)
                 } else {
                     relerr <- fit$flippedfit$w[1]/fit$flippedfit$a[1]
-                    xlim <- c(0,x0+ci(sx=x0*relerr))
+                    taxismaxx <- x0+ci(sx=x0*relerr)
                 }
             } else {
                 b <- fit$b[1]
                 db <- ci(sx=fit$b[2])
                 minb <- ifelse(b+db>0,b/2,b+db)
-                xlim <- c(0,-fit$a[1]/minb)
+                taxismaxx <- -fit$a[1]/minb
             }
-        } else {
-            xlim <- get_limits(xy[plotit,'X'],xy[plotit,'sX'])
+            xlim[1] <- min(xlim[1],0)
+            xlim[2] <- max(xlim[2],taxismaxx)
         }
     }
     if (is.null(ylim)){
