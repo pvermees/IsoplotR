@@ -8,7 +8,7 @@ em <- function(x, k = 2, tol = 1e-6, max_iter = 1000) {
     n <- length(x)
     
     mu <- seq(from=min(x),to=max(x),length.out=k)
-    sigma <- rep(var(x), k)
+    sigma <- rep(stats::var(x), k)
     prop <- rep(1/k, k)
   
     log_likelihood <- 0
@@ -19,7 +19,7 @@ em <- function(x, k = 2, tol = 1e-6, max_iter = 1000) {
         # E-step: calculate responsibilities
         gam <- matrix(0, n, k)
         for (j in 1:k) {
-            gam[, j] <- prop[j] * dnorm(x, mean = mu[j], sd = sqrt(sigma[j]))
+            gam[, j] <- prop[j] * stats::dnorm(x, mean = mu[j], sd = sqrt(sigma[j]))
         }
         gam <- gam / rowSums(gam)
     
@@ -32,7 +32,10 @@ em <- function(x, k = 2, tol = 1e-6, max_iter = 1000) {
         }
     
         # Check for convergence
-        LL <- sapply(1:k,function(j) prop[j] * dnorm(x, mean = mu[j], sd = sqrt(sigma[j])))
+        LL <- sapply(1:k,
+                     function(j)
+                         prop[j] * stats::dnorm(x, mean = mu[j], sd = sqrt(sigma[j]))
+                     )
         new_log_likelihood <- sum(log(rowSums(LL)))
         log_likelihoods[iter] <- new_log_likelihood
 
