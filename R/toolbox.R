@@ -277,17 +277,17 @@ validLevels <- function(levels){
 }
 
 colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
-                      stroke='black',strip.width=0.02,clabel="",...){
+                      stroke='black',strip.width=0.02,clabel=""){
     if (!validLevels(z)) return()
     if (all(is.na(fill)) | length(unique(fill))==1) col <- stroke
     else col <- fill
-    ucoord <- graphics::par()$usr
-    plotwidth <- (ucoord[2]-ucoord[1])
-    plotheight <- (ucoord[4]-ucoord[3])
-    xe <- ucoord[2]
+    usr <- graphics::par()$usr
+    plotwidth <- (usr[2]-usr[1])
+    plotheight <- (usr[4]-usr[3])
+    xe <- usr[2]
     xb <- xe - strip.width*plotwidth
-    yb <- ucoord[3]
-    ye <- ucoord[4]
+    yb <- usr[3]
+    ye <- usr[4]
     ndiv <- 50 # number of divisions
     dx <- (xe-xb)/ndiv
     dy <- (ye-yb)/ndiv
@@ -297,9 +297,9 @@ colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
         graphics::rect(xb,yb+(i-1)*dy,xe,yb+i*dy,col=cc[i],border=NA)
     }
     graphics::rect(xb,yb,xe,ye)
-    graphics::par(new=T)
-    graphics::plot(rep(xe,length(z)),z,type='n',
-                   axes=F,xlab=NA,ylab=NA,...)
+    graphics::par(new=TRUE)
+    graphics::plot(usr[1:2],range(z),type='n',
+                   axes=FALSE,xlab=NA,ylab=NA,xaxs='i')
     graphics::axis(side=4)
     mymtext(text=clabel,side=3,adj=1)
 }
