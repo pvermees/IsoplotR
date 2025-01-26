@@ -21,6 +21,7 @@ concordia(
   common.Pb = 0,
   ticks = 5,
   anchor = 0,
+  cutoff.disc = discfilter(),
   hide = NULL,
   omit = NULL,
   omit.fill = NA,
@@ -163,6 +164,9 @@ concordia line at an age equal to \code{anchor[2]}.
 
 If \code{anchor[1]=3}: anchor the non-radiogenic component to the
 Stacey-Kramers mantle evolution model.}
+
+\item{cutoff.disc}{discordance cutoff filter. This is an object of
+class \code{\link{discfilter}}.}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the concordia diagram}

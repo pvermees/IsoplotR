@@ -168,6 +168,8 @@
 #' If \code{anchor[1]=3}: anchor the non-radiogenic component to the
 #' Stacey-Kramers mantle evolution model.
 #'
+#' @param cutoff.disc discordance cutoff filter. This is an object of
+#'     class \code{\link{discfilter}}.
 #' @param ticks either a scalar indicating the desired number of age
 #'     ticks to be placed along the concordia line, OR a vector of
 #'     tick ages.
@@ -275,7 +277,8 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
                       ellipse.stroke='black',concordia.col='darksalmon',
                       exterr=FALSE,show.age=0,oerr=3,
                       sigdig=2,common.Pb=0,ticks=5,anchor=0,
-                      hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                      cutoff.disc=discfilter(),hide=NULL,
+                      omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     concordia_helper(x=x,tlim=tlim,type=type,show.numbers=show.numbers,
                      levels=levels,clabel=clabel,
                      ellipse.fill=ellipse.fill,
@@ -283,7 +286,8 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
                      concordia.col=concordia.col,exterr=exterr,
                      show.age=show.age,oerr=oerr,sigdig=sigdig,
                      common.Pb=common.Pb,ticks=ticks,anchor=anchor,
-                     hide=hide,omit=omit,omit.fill=omit.fill,
+                     cutoff.disc=cutoff.disc,hide=hide,
+                     omit=omit,omit.fill=omit.fill,
                      omit.stroke=omit.stroke,...)
 }
 
@@ -295,30 +299,42 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                              ellipse.stroke='black',concordia.col='darksalmon',
                              exterr=FALSE,show.age=0,oerr=3,y0option=1,
                              sigdig=2,common.Pb=0,ticks=5,anchor=0,
-                             hide=NULL,omit=NULL,omit.fill=NA,
-                             omit.stroke='grey',box=TRUE,...){
+                             cutoff.disc=discfilter(),hide=NULL,
+                             omit=NULL,omit.fill=NA,omit.stroke='grey',
+                             box=TRUE,...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
         return(invisible(NULL))
     }
+    if (common.Pb>0){
+        X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
+    } else {
+        X <- x
+    }
+    if (cutoff.disc$before){
+        discordant <- is.discordant(x=x,cutoff.disc=cutoff.disc)
+    } else {
+        discordant <- is.discordant(x=x,xd=X,cutoff.disc=cutoff.disc)
+    }
+    omit <- unique(c(omit,discordant))
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
     calcit <- (1:ns)%ni%c(hide,omit)
-    x2calc <- subset(x,subset=calcit)
-    if (common.Pb<1) X <- x
-    else X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     X2plot <- subset(X,subset=plotit)
+    if (show.age>1) {
+        X2calc <- subset(x,subset=calcit)
+    } else {
+        X2calc <- subset(X,subset=calcit)
+    }
     fit <- NULL
-    if (show.age>1) X2calc <- x2calc
-    else X2calc <- subset(X,subset=calcit)
     if (show.age==1){
         fit <- concordia_age(X2calc,type=type,exterr=exterr)
     } else if (show.age>1){
         lfit <- ludwig(X2calc,exterr=exterr,model=(show.age-1),anchor=anchor)
         fit <- discordia(X2calc,fit=lfit,wetherill=(type==1))
     }
-    fit$n <- length(x2calc)
+    fit$n <- length(X2calc)
     lims <- prepare_concordia_line(x=X2plot,tlim=tlim,type=type,...)
     if (show.age>1){
         discordia_line(fit,wetherill=(type==1),d=X2plot$d,oerr=oerr)
