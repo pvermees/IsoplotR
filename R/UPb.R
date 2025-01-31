@@ -1457,19 +1457,15 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
                 c(NA,NA)
             })
         }
-        if (discordance$option>0){
-            xdi <- subset(xd,subset=((1:length(xd))%in%i))
-        }
         if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
             labels <- c(labels,'disc')
-            xi <- subset(x,subset=((1:length(x))%in%i))
-            dif <- discordance(x=xi,X=xdi,option=discordance$option)
+            dif <- discordance(x=x,xd=xd,i=i,option=discordance$option)
         } else if (discordance$option%in%c(6,'p')){
             labels <- c(labels,'p[conc]')
             SS.concordance <-
                 LL_concordia_age(pars=t.conc[1],
-                                 cc=wetherill(xdi,i=1),
-                                 mswd=TRUE,exterr=exterr,d=xdi$d)
+                                 cc=wetherill(xd,i=i),
+                                 mswd=TRUE,exterr=exterr,d=xd$d)
             pval <- 1-stats::pchisq(SS.concordance,1)
         }
     }
