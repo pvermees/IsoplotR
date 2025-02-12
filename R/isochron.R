@@ -581,9 +581,13 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
         showDispersion(out,inverse=(flippable==1),wtype=wtype)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                      units='',type='generic'),
-                        xlab=xlab,ylab=ylab)
+        if (title){
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  units='',type='generic')
+        } else {
+            main <- NULL
+        }
+        graphics::title(main=main,xlab=xlab,ylab=ylab)
     } else { # general purpose regression
         yd <- data2york(x)
         out <- isochron(yd,oerr=oerr,sigdig=sigdig,
@@ -615,9 +619,12 @@ genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
                     ci.col=ci.col,line.col=line.col,lwd=lwd,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
-        if (title)
-            graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,units=''),
-                            xlab=xlab,ylab=ylab)
+        if (title){
+            main <- isochrontitle(fit,oerr=oerr,sigdig=sigdig,units='')
+        } else {
+            main <- NULL
+        }
+        graphics::title(main=main,xlab=xlab,ylab=ylab)
     }
     invisible(fit)
 }
@@ -715,7 +722,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',type=1,
                          ci.col='gray80',line.col='black',lwd=1,
-                         plot=TRUE,exterr=FALSE,model=1,
+                         plot=TRUE,title=TRUE,exterr=FALSE,model=1,
                          show.ellipses=1*(model!=2),anchor=0,
                          hide=NULL,omit=NULL,omit.fill=NA,
                          omit.stroke='grey',y0option=1,taxis=FALSE,...){
@@ -749,14 +756,18 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,taxis=taxis,...)
             if (taxis) add_taxis(x=x,fit=out,type=type)
-            dispunits <- getDispUnits_UPb(x=x,joint=joint,anchor=anchor)
             if (!joint | x$format>8){
                 showDispersion(out,inverse=TRUE,wtype=anchor[1],type=type)
             }
+            dispunits <- getDispUnits_UPb(x=x,joint=joint,anchor=anchor)
+            if (title){
+                main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
+                                      y0option=y0option,dispunits=dispunits)
+            } else {
+                main <- NULL
+            }
             lab <- getIsochronLabels(x=x,type=type,taxis=taxis)
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
-                                          y0option=y0option,dispunits=dispunits),
-                            xlab=lab$x,ylab=lab$y)
+            graphics::title(main=main,xlab=lab$x,ylab=lab$y)
         }
     }
     invisible(out)
@@ -824,9 +835,9 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
-                          growth=FALSE,show.ellipses=1*(model!=2),hide=NULL,
-                          omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,
+                          wtype=1,anchor=0,growth=FALSE,show.ellipses=1*(model!=2),
+                          hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
     fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                    anchor=anchor,hide=hide,omit=omit,type="d")
@@ -861,10 +872,14 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
             out$ski <- NULL
         }
         showDispersion(out,inverse=inverse,wtype=wtype,type='d')
-        tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',
-                             dispunits=dispunits,ski=out$ski)
+        if (title){
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',
+                                  dispunits=dispunits,ski=out$ski)
+        } else {
+            main <- NULL
+        }
         lab <- getIsochronLabels(x=x,inverse=inverse)
-        graphics::title(tit,xlab=lab$x,ylab=lab$y)
+        graphics::title(main=main,xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
 }
@@ -899,8 +914,8 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=FALSE,model=1,wtype=1,
-                          anchor=0,show.ellipses=1*(model!=2),
+                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,
+                          wtype=1,anchor=0,show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',taxis=FALSE,...){
     taxis <- taxis & inverse
@@ -920,10 +935,14 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     omit.stroke=omit.stroke,taxis=taxis,...)
         if (taxis) add_taxis(x=x,fit=out)
         showDispersion(out,inverse=inverse,wtype=wtype)
+        if (title){
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  dispunits=dispunits,type='Ar-Ar')
+        } else {
+            main <- NULL
+        }
         lab <- getIsochronLabels(x=x,inverse=inverse,taxis=taxis)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                      dispunits=dispunits,type='Ar-Ar'),
-                        xlab=lab$x,ylab=lab$y)
+        graphics::title(main=main,xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
 }
@@ -933,16 +952,18 @@ isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
-                          show.ellipses=1*(model!=2),hide=NULL,omit=NULL,
-                          omit.fill=NA,omit.stroke='grey',taxis=FALSE,...){
+                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,
+                          wtype=1,anchor=0,show.ellipses=1*(model!=2),
+                          hide=NULL,omit=NULL,omit.fill=NA,
+                          omit.stroke='grey',taxis=FALSE,...){
     isochron_PD(x,oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
-                show.ellipses=show.ellipses,hide=hide,omit=omit,
-                omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
+                title=title,exterr=exterr,model=model,wtype=wtype,
+                anchor=anchor,show.ellipses=show.ellipses,hide=hide,
+                omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,
+                taxis=taxis,...)
 }
 #' @param bratio the \eqn{^{40}}K branching ratio.
 #' @rdname isochron
@@ -951,17 +972,18 @@ isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                          clabel="",inverse=FALSE,ci.col='gray80',
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',line.col='black',
-                         lwd=1, plot=TRUE,exterr=FALSE,model=1,wtype=1,
-                         anchor=0,show.ellipses=1*(model!=2),hide=NULL,
-                         omit=NULL,omit.fill=NA,omit.stroke='grey',
+                         lwd=1,plot=TRUE,title=TRUE,exterr=FALSE,model=1,
+                         wtype=1,anchor=0,show.ellipses=1*(model!=2),
+                         hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',
                          taxis=FALSE,bratio=0.895,...){
     isochron_PD(x,oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
-                show.ellipses=show.ellipses,bratio=bratio,hide=hide,
-                omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
+                title=title,exterr=exterr,model=model,wtype=wtype,
+                anchor=anchor,show.ellipses=show.ellipses,bratio=bratio,
+                hide=hide,omit=omit,omit.fill=omit.fill,
+                omit.stroke=omit.stroke,taxis=taxis,...)
 }
 #' @rdname isochron
 #' @export
@@ -969,15 +991,16 @@ isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
-                          show.ellipses=1*(model!=2),hide=NULL,omit=NULL,
-                          omit.fill=NA,omit.stroke='grey',taxis=FALSE,...){
+                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,wtype=1,
+                          anchor=0,show.ellipses=1*(model!=2),hide=NULL,
+                          omit=NULL,omit.fill=NA,omit.stroke='grey',
+                          taxis=FALSE,...){
     isochron_PD(x,oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
-                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                title=title,exterr=exterr,model=model,wtype=wtype,
+                anchor=anchor,show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
 }
 #' @rdname isochron
@@ -986,15 +1009,15 @@ isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
-                          show.ellipses=1*(model!=2),hide=NULL,omit=NULL,
+                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,wtype=1,
+                          anchor=0,show.ellipses=1*(model!=2),hide=NULL,omit=NULL,
                           omit.fill=NA,omit.stroke='grey',taxis=FALSE,...){
     isochron_PD(x,oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
-                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                title=title,exterr=exterr,model=model,wtype=wtype,
+                anchor=anchor,show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
 }
 #' @rdname isochron
@@ -1003,15 +1026,15 @@ isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
-                          show.ellipses=1*(model!=2),hide=NULL,omit=NULL,
+                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,wtype=1,
+                          anchor=0,show.ellipses=1*(model!=2),hide=NULL,omit=NULL,
                           omit.fill=NA,omit.stroke='grey',taxis=FALSE,...){
     isochron_PD(x,oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
-                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                title=title,exterr=exterr,model=model,wtype=wtype,
+                anchor=anchor,show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
 }
 #' @rdname isochron
@@ -1019,16 +1042,16 @@ isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
-                          ci.col='gray80',line.col='black',lwd=1,
-                          plot=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
+                          ci.col='gray80',line.col='black',lwd=1,plot=TRUE,
+                          title=TRUE,exterr=FALSE,model=1,wtype=1,anchor=0,
                           show.ellipses=1*(model!=2),hide=NULL,omit=NULL,
                           omit.fill=NA,omit.stroke='grey',taxis=FALSE,...){
     isochron_PD(x,oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
                 levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,inverse=inverse,
                 ci.col=ci.col,line.col=line.col,lwd=lwd,plot=plot,
-                exterr=exterr,model=model,wtype=wtype,anchor=anchor,
-                show.ellipses=show.ellipses,hide=hide,omit=omit,
+                title=title,exterr=exterr,model=model,wtype=wtype,
+                anchor=anchor,show.ellipses=show.ellipses,hide=hide,omit=omit,
                 omit.fill=omit.fill,omit.stroke=omit.stroke,taxis=taxis,...)
 }
 #' @rdname isochron
@@ -1036,8 +1059,8 @@ isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                            clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                            ellipse.stroke='black',ci.col='gray80',
-                           line.col='black',lwd=1,plot=TRUE,model=1,
-                           wtype=1,anchor=0,show.ellipses=2*(model!=2),
+                           line.col='black',lwd=1,plot=TRUE,title=TRUE,
+                           model=1,wtype=1,anchor=0,show.ellipses=2*(model!=2),
                            hide=NULL,omit=NULL,omit.fill=NA,
                            omit.stroke='grey',...){
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
@@ -1058,7 +1081,6 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
     }
     fit <- MLyork(d2calc,model=model,wtype=wtype,anchor=abanchor)
     out <- ab2y0t(x,fit=fit,wtype=wtype)
-    dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot){
         scatterplot(y,oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1067,9 +1089,14 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         showDispersion(out,inverse=FALSE,wtype=wtype)
-        graphics::title(isochrontitle(out,sigdig=sigdig,oerr=oerr,
-                                      dispunits=dispunits,type='U-Th-He'),
-                        xlab="P",ylab="He")
+        dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
+        if (title){
+            main <- isochrontitle(out,sigdig=sigdig,oerr=oerr,
+                                  dispunits=dispunits,type='U-Th-He')
+        } else {
+            main <- NULL
+        }
+        graphics::title(main=main,xlab="P",ylab="He")
     }
     invisible(out)
 }
@@ -1080,7 +1107,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
-                          exterr=FALSE,model=1,wtype='a',
+                          title=TRUE,exterr=FALSE,model=1,wtype='a',
                           show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
@@ -1123,10 +1150,14 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                      type='Th-U',units=' ka',
-                                      displabel=displabel,dispunits=dispunits),
-                        xlab=out$xlab,ylab=out$ylab)
+        if (title){
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  type='Th-U',units=' ka',
+                                  displabel=displabel,dispunits=dispunits)
+        } else {
+            main <- NULL
+        }
+        graphics::title(main=main,xlab=out$xlab,ylab=out$ylab)
     }
     invisible(out)
 }
@@ -1243,8 +1274,8 @@ isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                         clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',inverse=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
-                        plot=TRUE,exterr=FALSE,model=1,wtype=1,
-                        anchor=0,show.ellipses=1*(model!=2),
+                        plot=TRUE,title=TRUE,exterr=FALSE,model=1,
+                        wtype=1,anchor=0,show.ellipses=1*(model!=2),
                         bratio=1,hide=NULL,omit=NULL,taxis=FALSE,...){
     taxis <- taxis & inverse
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
@@ -1264,9 +1295,13 @@ isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
                     hide=hide,omit=omit,taxis=taxis,...)
         if (taxis) add_taxis(x=x,fit=out,bratio=bratio)
         showDispersion(out,inverse=inverse,wtype=wtype)
-        graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                      type='PD',dispunits=dispunits),
-                        xlab=lab$x,ylab=lab$y)
+        if (title){
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  type='PD',dispunits=dispunits)
+        } else {
+            main <- NULL
+        }
+        graphics::title(main=main,xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
 }
