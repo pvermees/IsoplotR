@@ -582,10 +582,12 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                     omit.stroke=omit.stroke,...)
         showDispersion(out,inverse=(flippable==1),wtype=wtype)
         if (title){
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                          units='',type='generic'),
-                            xlab=xlab,ylab=ylab)
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  units='',type='generic')
+        } else {
+            main <- NULL
         }
+        graphics::title(main=main,xlab=xlab,ylab=ylab)
     } else { # general purpose regression
         yd <- data2york(x)
         out <- isochron(yd,oerr=oerr,sigdig=sigdig,
@@ -618,9 +620,11 @@ genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
         if (title){
-            graphics::title(isochrontitle(fit,oerr=oerr,sigdig=sigdig,units=''),
-                            xlab=xlab,ylab=ylab)
+            main <- isochrontitle(fit,oerr=oerr,sigdig=sigdig,units='')
+        } else {
+            main <- NULL
         }
+        graphics::title(main=main,xlab=xlab,ylab=ylab)
     }
     invisible(fit)
 }
@@ -755,13 +759,15 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
             if (!joint | x$format>8){
                 showDispersion(out,inverse=TRUE,wtype=anchor[1],type=type)
             }
+            dispunits <- getDispUnits_UPb(x=x,joint=joint,anchor=anchor)
             if (title){
-                dispunits <- getDispUnits_UPb(x=x,joint=joint,anchor=anchor)
-                lab <- getIsochronLabels(x=x,type=type,taxis=taxis)
-                graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
-                                              y0option=y0option,dispunits=dispunits),
-                                xlab=lab$x,ylab=lab$y)
+                main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='U-Pb',
+                                      y0option=y0option,dispunits=dispunits)
+            } else {
+                main <- NULL
             }
+            lab <- getIsochronLabels(x=x,type=type,taxis=taxis)
+            graphics::title(main=main,xlab=lab$x,ylab=lab$y)
         }
     }
     invisible(out)
@@ -867,11 +873,13 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         }
         showDispersion(out,inverse=inverse,wtype=wtype,type='d')
         if (title){
-            lab <- getIsochronLabels(x=x,inverse=inverse)
-            tit <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',
-                                 dispunits=dispunits,ski=out$ski)
-            graphics::title(tit,xlab=lab$x,ylab=lab$y)
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,type='Pb-Pb',
+                                  dispunits=dispunits,ski=out$ski)
+        } else {
+            main <- NULL
         }
+        lab <- getIsochronLabels(x=x,inverse=inverse)
+        graphics::title(main=main,xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
 }
@@ -928,11 +936,13 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         if (taxis) add_taxis(x=x,fit=out)
         showDispersion(out,inverse=inverse,wtype=wtype)
         if (title){
-            lab <- getIsochronLabels(x=x,inverse=inverse,taxis=taxis)
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                          dispunits=dispunits,type='Ar-Ar'),
-                            xlab=lab$x,ylab=lab$y)
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  dispunits=dispunits,type='Ar-Ar')
+        } else {
+            main <- NULL
         }
+        lab <- getIsochronLabels(x=x,inverse=inverse,taxis=taxis)
+        graphics::title(main=main,xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
 }
@@ -1079,12 +1089,14 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         showDispersion(out,inverse=FALSE,wtype=wtype)
+        dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
         if (title){
-            dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
-            graphics::title(isochrontitle(out,sigdig=sigdig,oerr=oerr,
-                                          dispunits=dispunits,type='U-Th-He'),
-                            xlab="P",ylab="He")
+            main <- isochrontitle(out,sigdig=sigdig,oerr=oerr,
+                                  dispunits=dispunits,type='U-Th-He')
+        } else {
+            main <- NULL
         }
+        graphics::title(main=main,xlab="P",ylab="He")
     }
     invisible(out)
 }
@@ -1139,11 +1151,13 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         if (title){
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                          type='Th-U',units=' ka',
-                                          displabel=displabel,dispunits=dispunits),
-                            xlab=out$xlab,ylab=out$ylab)
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  type='Th-U',units=' ka',
+                                  displabel=displabel,dispunits=dispunits)
+        } else {
+            main <- NULL
         }
+        graphics::title(main=main,xlab=out$xlab,ylab=out$ylab)
     }
     invisible(out)
 }
@@ -1282,10 +1296,12 @@ isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
         if (taxis) add_taxis(x=x,fit=out,bratio=bratio)
         showDispersion(out,inverse=inverse,wtype=wtype)
         if (title){
-            graphics::title(isochrontitle(out,oerr=oerr,sigdig=sigdig,
-                                          type='PD',dispunits=dispunits),
-                            xlab=lab$x,ylab=lab$y)
+            main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
+                                  type='PD',dispunits=dispunits)
+        } else {
+            main <- NULL
         }
+        graphics::title(main=main,xlab=lab$x,ylab=lab$y)
     }
     invisible(out)
 }
