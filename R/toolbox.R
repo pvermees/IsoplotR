@@ -237,7 +237,7 @@ LL_norm <- function(x,covmat){
     },error=function(e) Inf)
 }
 
-set_ellipse_colours <- function(ns=1,levels=NA,col=c('yellow','red'),
+set_ellipse_colours <- function(ns=1,levels=NULL,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
     nl <- length(levels)
     if (nl > 1){
@@ -245,7 +245,7 @@ set_ellipse_colours <- function(ns=1,levels=NA,col=c('yellow','red'),
         levels[!is.numeric(levels)] <- NA
     }
     out <- NULL
-    if (all(is.na(levels)) ||
+    if (is.null(levels) ||
         (min(levels,na.rm=TRUE)==max(levels,na.rm=TRUE))){
         out <- rep(col[1],ns)
     } else if (nl<ns){

@@ -143,7 +143,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' scatterplot(dat,fit=york(dat),show.ellipses=2)
 #' @export
 scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
-                        show.ellipses=1,levels=NA,clabel="",
+                        show.ellipses=1,levels=NULL,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke="black",fit=NULL,add=FALSE,
                         empty=FALSE,ci.col='gray80',line.col='black',
@@ -208,7 +208,6 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                            col=line.col,nonneg=nonneg,lwd=lwd)
     }
     if (box) graphics::box()
-    nolevels <- all(is.na(levels))
     fill <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.fill,
                                 hide=hide,omit=omit,omit.col=omit.fill)
     stroke <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.stroke,
@@ -246,7 +245,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                          xy[plotit,'X']+dx,xy[plotit,'Y'],
                          code=3,angle=90,length=0.05,col=stroke)
     }
-    if (!nolevels & addcolourbar){
+    if (!is.null(levels) & addcolourbar){
         colourbar(z=levels[calcit],fill=ellipse.fill,
                   stroke=ellipse.stroke,clabel=clabel)
     }

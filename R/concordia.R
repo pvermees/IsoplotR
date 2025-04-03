@@ -77,7 +77,7 @@
 #'     as different background colours within the error ellipses.
 #' 
 #' @param clabel label for the colour legend (only used if
-#'     \code{levels} is not \code{NA}).
+#'     \code{levels} is not \code{NULL}).
 #' 
 #' @param ellipse.fill
 #' Fill colour for the error ellipses. This can either be a single
@@ -272,7 +272,7 @@
 #'     pp.665-676.
 #' @export
 concordia <- function(x=NULL,tlim=NULL,type=1,
-                      show.numbers=FALSE,levels=NA,clabel="",
+                      show.numbers=FALSE,levels=NULL,clabel="",
                       ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',concordia.col='darksalmon',
                       exterr=FALSE,show.age=0,oerr=3,
@@ -294,7 +294,7 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
 # the only difference between concordia and concordia_helper
 # is the y0option argument, which is used by isochron.UPb
 concordia_helper <- function(x=NULL,tlim=NULL,type=1,
-                             show.numbers=FALSE,levels=NA,clabel="",
+                             show.numbers=FALSE,levels=NULL,clabel="",
                              ellipse.fill=c("#00FF0080","#FF000080"),
                              ellipse.stroke='black',concordia.col='darksalmon',
                              exterr=FALSE,show.age=0,oerr=3,y0option=1,
