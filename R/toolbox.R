@@ -245,13 +245,14 @@ set_ellipse_colours <- function(ns=1,levels=NULL,col=c('yellow','red'),
         levels[!is.numeric(levels)] <- NA
     }
     out <- NULL
-    if (is.null(levels) ||
-        (min(levels,na.rm=TRUE)==max(levels,na.rm=TRUE))){
-        out <- rep(col[1],ns)
-    } else if (nl<ns){
-        out[1:nl] <- levels2colours(levels=levels,col=col)
+    if (validLevels(levels)){
+        colours <- levels2colours(levels=levels,col=col)
+        if (nl<ns) out[1:nl] <- colours
+        else out <- colours[1:ns]
+    } else if (length(col)==ns){
+        out <- col
     } else {
-        out <- levels2colours(levels=levels,col=col)[1:ns]
+        out <- rep(col[1],ns)
     }
     out[omit] <- omit.col
     out
@@ -273,7 +274,7 @@ levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
 }
 
 validLevels <- function(levels){
-    (length(levels)>0 & all(is.numeric(levels)) & !any(is.na(levels)))
+    length(levels)>0 && all(is.numeric(levels)) && diff(range(levels,na.rm=TRUE))!=0
 }
 
 colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),

@@ -12,7 +12,7 @@ helioplot(
   show.numbers = FALSE,
   oerr = 3,
   contour.col = c("white", "red"),
-  levels = NA,
+  levels = NULL,
   clabel = "",
   ellipse.fill = c("#00FF0080", "#0000FF80"),
   ellipse.stroke = "black",
