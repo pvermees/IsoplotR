@@ -67,7 +67,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
 # ifi = invert, flip, invert
 get_ifi <- function(wtype,type,inverse){
     if (wtype==1){
-        if (type=='d' & inverse){
+        if (inverse){
             out <- c(TRUE,FALSE,FALSE)
         } else {
             out <- c(FALSE,FALSE,FALSE)

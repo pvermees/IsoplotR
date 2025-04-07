@@ -274,11 +274,10 @@ levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
 }
 
 validLevels <- function(levels){
-    notempty <- length(levels)>0
-    allnumeric <- all(is.numeric(levels))
-    notallna <- !all(is.na(levels))
-    hasrange <- diff(range(levels,na.rm=TRUE))
-    notempty && allnumeric && notallna && hasrange
+    length(levels)>0 &&
+    all(is.numeric(levels)) &&
+    !all(is.na(levels)) &&
+    diff(range(levels,na.rm=TRUE))
 }
 
 colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
