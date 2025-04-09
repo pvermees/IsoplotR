@@ -226,6 +226,9 @@
 #'     \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium (for Th-U formats 3
 #'     and 4).
 #'
+#' @param sister the non-radiogenic (`sister') isotope of Ca that is
+#'     to be used for K-Ca isochrons.
+#'
 #' @param ... optional arguments to the \code{read.csv} function
 #' 
 #' @seealso \code{\link{examples}}, \code{\link{settings}}
@@ -280,24 +283,26 @@ read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @export
 read.data.default <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                               Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                              U8Th2=0,...){
+                              U8Th2=0,sister=44,...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
     read.data.matrix(X,method=method,format=format,ierr=ierr,d=d,
-                     Th02i=Th02i,Th02U48=Th02U48,U8Th2=U8Th2)
+                     Th02i=Th02i,Th02U48=Th02U48,U8Th2=U8Th2,sister=sister)
 }
 #' @rdname read.data
 #' @export
 read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                                  Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                                 U8Th2=0,...){
+                                 U8Th2=0,sister=44,...){
     read.data.matrix(as.matrix(x),method=method,format=format,
-                     ierr=ierr,d=d,Th02i=Th02i,Th02U48=Th02U48,U8Th2=U8Th2,...)
+                     ierr=ierr,d=d,Th02i=Th02i,
+                     Th02U48=Th02U48,U8Th2=U8Th2,
+                     sister=sister,...)
 }
 #' @rdname read.data
 #' @export
 read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                              Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                             U8Th2=0,...){
+                             U8Th2=0,sister=44,...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format=format,ierr=ierr,d=d)
     } else if (identical(method,'Pb-Pb')){
@@ -307,7 +312,7 @@ read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
     } else if (identical(method,'Th-Pb')){
         out <- as.ThPb(x,format=format,ierr=ierr)
     } else if (identical(method,'K-Ca')){
-        out <- as.KCa(x,format=format,ierr=ierr)
+        out <- as.KCa(x,format=format,ierr=ierr,sister=sister)
     } else if (identical(method,'Re-Os')){
         out <- as.ReOs(x,format=format,ierr=ierr)
     } else if (identical(method,'Rb-Sr')){
@@ -648,24 +653,32 @@ as.ThPb <- function(x,format=1,ierr=1){
 }
 #' @rdname classes
 #' @export
-as.KCa <- function(x,format=1,ierr=1){
+as.KCa <- function(x,format=1,ierr=1,sister=44){
     out <- list()
     class(out) <- "KCa"
     out$format <- format
+    out$sister <- sister
     nc <- ncol(x)
     nr <- nrow(x)
     bi <- 2 # begin index
     X <- shiny2matrix(x,bi,nr,nc)
     X <- errconvert(X,gc='K-Ca',format=format,ierr=ierr)
     if (format==1 & nc>3){
-        cnames <- c('K40Ca44','errK40Ca44',
-                    'Ca40Ca44','errCa40Ca44','rXY')
+        cnames <- c(paste0("K40Ca",sister),
+                    paste0("errK40Ca",sister),
+                    paste0("Ca40Ca",sister),
+                    paste0("errCa40Ca",sister),
+                    'rXY')
     } else if (format==2 & nc>3){
         cnames <- c('K40Ca40','errK40Ca40',
-                    'Ca44Ca40','errCa44Ca40','rXY')
+                    paste0("Ca",sister,"Ca40"),
+                    paste0("errCa",sister,"Ca40"),
+                    'rXY')
     } else if (format==3 & nc>5){
-        cnames <- c('K40Ca44','errK40Ca44',
-                    'Ca40Ca44','errCa40Ca44',
+        cnames <- c(paste0('K40Ca',sister),
+                    paste0('errK40Ca',sister),
+                    paste0('Ca40Ca',sister),
+                    paste0('errCa40Ca',sister),
                     'K40Ca40','errK40Ca40')
     } else {
         stop("Incorrect format or insufficient columns")

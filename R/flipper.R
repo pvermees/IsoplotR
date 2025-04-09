@@ -67,7 +67,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
 # ifi = invert, flip, invert
 get_ifi <- function(wtype,type,inverse){
     if (wtype==1){
-        if (type=='d' & inverse){
+        if (inverse){
             out <- c(TRUE,FALSE,FALSE)
         } else {
             out <- c(FALSE,FALSE,FALSE)
@@ -176,7 +176,7 @@ gety0rat.PbPb <- function(x,...){ 'Pb207Pb204' }
 #' @noRd
 gety0rat.ThPb <- function(x,...){ 'Pb208Pb204' }
 #' @noRd
-gety0rat.KCa <- function(x,...){ 'Ca40Ca44' }
+gety0rat.KCa <- function(x,...){ paste0('Ca40Ca',x$sister) }
 #' @noRd
 gety0rat.RbSr <- function(x,...){ 'Sr87Sr86' }
 #' @noRd
