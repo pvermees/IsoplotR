@@ -1931,14 +1931,14 @@ getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     } else if (inverse){
         out$x <- quote(''^40*'K/'^40*'Ca')
     } else {
-        out$x <- quote(''^40*'K/'^44*'Ca')
+        out$x <- substitute(''^40*'K/'^s*'Ca',list(s=x$sister))
     }
     if (inverse){
-        out$y <- quote(''^44*'Ca/'^40*'Ca')
+        out$y <- substitute(''^s*'Ca/'^40*'Ca',list(s=x$sister))
     } else {
-        out$y <- quote(''^40*'Ca/'^44*'Ca')
+        out$y <- substitute(''^40*'Ca/'^s*'Ca',list(s=x$sister))
     }
-    out$y0 <- quote('('^40*'Ca/'^44*'Ca)'[0]*'=')
+    out$y0 <- substitute('('^40*'Ca/'^s*'Ca)'[0]*'=',list(s=x$sister))
     out
 }
 #' @param type controls the isochron projection
