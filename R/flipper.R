@@ -13,10 +13,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         wtype <- 1 # override
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
-        if (!is.null(y0rat)){
-            anchor[2:3] <- iratio(y0rat)
-            if (inverse) anchor[2:3] <- c(1,anchor[3]/anchor[2])/anchor[2]
-        }
+        anchor[2:3] <- iratio(y0rat)
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
     } else if (anchor[1]==2){
