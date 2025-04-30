@@ -35,22 +35,23 @@ analytical error.  Omitting the latter two numbers simply returns
 the existing values.
 
 For \code{'iratio'}: the isotopic ratio of interest (one of either
-\code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Ca40Ca44"},
-\code{"K39K41"}, \code{"K40K41"}, \code{"Rb85Rb87"},
-\code{"Sr88Sr86"}, \code{"Sr87Sr86"}, \code{"Sr84Sr86"},
-\code{"Re185Re187"}, \code{"Os184Os188"} \code{"Os186Os188"},
-\code{"Os187Os188"}, \code{"Os189Os188"}, \code{"Os190Os188"},
-\code{"Os192Os188"}, \code{"Sm144Sm152"}, \code{"Sm147Sm152"},
-\code{"Sm148Sm152"}, \code{"Sm149Sm152"}, \code{"Sm150Sm152"},
-\code{"Sm154Sm152"}, \code{"Nd142Nd144"}, \code{"Nd143Nd144"},
-\code{"Nd145Nd144"}, \code{"Nd146Nd144"}, \code{"Nd148Nd144"},
-\code{"Nd150Nd144"}, \code{"Lu176Lu175"}, \code{"Hf174Hf177"},
-\code{"Hf176Hf177"}, \code{"Hf178Hf177"}, \code{"Hf179Hf177"},
-\code{"Hf180Hf177"}, \code{"U238U235"}, \code{"Pb207Pb206"},
-\code{"Pb206Pb204"}, \code{"Pb207Pb204"}, \code{"Pb208Pb204"},
-\code{"Pb206Pb208"}, \code{"Pb207Pb208"}) PLUS (optionally) the
-isotopic ratio and its analytical error.  Omitting the latter two
-numbers simply returns the existing values.
+\code{"Ar40Ar36"}, \code{"Ar38Ar36"}, \code{"Ca40Ca42"},
+\code{"Ca40Ca43"}, \code{"Ca40Ca44"}, \code{"Ca40Ca46"},
+\code{"Ca40Ca48"}, \code{"K39K41"}, \code{"K40K41"},
+\code{"Rb85Rb87"}, \code{"Sr88Sr86"}, \code{"Sr87Sr86"},
+\code{"Sr84Sr86"}, \code{"Re185Re187"}, \code{"Os184Os188"}
+\code{"Os186Os188"}, \code{"Os187Os188"}, \code{"Os189Os188"},
+\code{"Os190Os188"}, \code{"Os192Os188"}, \code{"Sm144Sm152"},
+\code{"Sm147Sm152"}, \code{"Sm148Sm152"}, \code{"Sm149Sm152"},
+\code{"Sm150Sm152"}, \code{"Sm154Sm152"}, \code{"Nd142Nd144"},
+\code{"Nd143Nd144"}, \code{"Nd145Nd144"}, \code{"Nd146Nd144"},
+\code{"Nd148Nd144"}, \code{"Nd150Nd144"}, \code{"Lu176Lu175"},
+\code{"Hf174Hf177"}, \code{"Hf176Hf177"}, \code{"Hf178Hf177"},
+\code{"Hf179Hf177"}, \code{"Hf180Hf177"}, \code{"U238U235"},
+\code{"Pb207Pb206"}, \code{"Pb206Pb204"}, \code{"Pb207Pb204"},
+\code{"Pb208Pb204"}, \code{"Pb206Pb208"}, \code{"Pb207Pb208"}) PLUS
+(optionally) the isotopic ratio and its analytical error.  Omitting
+the latter two numbers simply returns the existing values.
 
 For \code{'imass'}: the (isotopic) molar mass of interest (one of
 either \code{"U"}, \code{"Th"}, \code{"Rb"}, \code{"Rb85"},
@@ -178,9 +179,10 @@ Geochimica et Cosmochimica Acta 70.17 (2006): 4507-4512.
 sample of potassium". J. Res. Natl. Bur. Stand. A
 79.6 (1975): 713-725.
 
-\item Ca: Moore, L.J. and Machlan, L.A., 1972. High-accuracy
-determination of calcium in blood serum by isotope dilution mass
-spectrometry. Analytical chemistry, 44(14), pp.2291-2296.
+\item Ca: Russell, W. A., D. A. Papanastassiou, and
+T. A. Tombrello. "Ca isotope fractionation on the Earth and
+other solar system materials." Geochimica et Cosmochimica Acta
+42.8 (1978): 1075-1090.
 
 \item Rb: Catanzaro, E. J., et al. "Absolute isotopic abundance ratio and
 atomic weight of terrestrial rubidium." J. Res. Natl. Bur. Stand. A 73
