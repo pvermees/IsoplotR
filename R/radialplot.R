@@ -223,6 +223,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
                 bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],xlim=xlim,...)
     colourbar(z=levels[calcit],fill=bg,stroke=col,clabel=clabel)
     fit <- central(x2calc,exterr=exterr)
+    fit$pooled <- pooled_age(x2calc,exterr=exterr)
     if (title){
         tit <- radial_title(fit,sigdig=sigdig,oerr=oerr,
                             units=' Ma',ntit=get_ntit(x2calc))
@@ -892,22 +893,31 @@ iatt <- function(z,zeta,rhoD){
 
 radial_title <- function(fit,sigdig=2,oerr=3,units='',ntit,caveat=FALSE,...){
     ast <- ifelse(caveat,'*','')
-    line1 <- maintit(fit$age[1],fit$age[2],ntit=ntit,
-                     units=units,sigdig=sigdig,oerr=oerr,
-                     prefix=paste0('central age',ast,' ='))
-    line2 <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
-    if (fit$p.value<alpha()){
-        line3 <- disptit(w=fit$disp[1],sw=fit$disp[2],
-                         sigdig=sigdig,oerr=oerr,units='%')
-        mymtext(line3,line=0,...)
-        line1line <- 2
-        line2line <- 1
+    if ('pooled' %in% names(fit)){
+        pooled_title <- maintit(fit$pooled[1],fit$pooled[2],ntit=ntit,
+                                units=units,sigdig=sigdig,oerr=oerr,
+                                prefix='pooled age =')
+        ntit = ''
     } else {
-        line1line <- 1
-        line2line <- 0
+        pooled_title <- NULL
     }
-    mymtext(line1,line=line1line,...)
-    mymtext(line2,line=line2line,...)    
+    central_title <- maintit(fit$age[1],fit$age[2],ntit=ntit,
+                             units=units,sigdig=sigdig,oerr=oerr,
+                             prefix=paste0('central age',ast,' ='))
+    mswd_title <- mswdtit(mswd=fit$mswd,p=fit$p.value,sigdig=sigdig)
+    if (fit$p.value<alpha()){
+        disp_title <- disptit(w=fit$disp[1],sw=fit$disp[2],
+                              sigdig=sigdig,oerr=oerr,units='%')
+    } else {
+        disp_title <- NULL
+    }
+    nextline <- 0
+    for (tit in c(disp_title,mswd_title,central_title,pooled_title)){
+        if (!is.null(tit)){
+            mymtext(tit,line=nextline)
+            nextline <- nextline + 1
+        }
+    }
 }
 
 get_offset <- function(x,from=NA){
