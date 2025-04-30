@@ -3,7 +3,7 @@ fissiontrack_age <- function(x,i=NULL,exterr=FALSE){
         out <- EDM_age(x,i,exterr=exterr)
     } else if (x$format > 1){
         if (x$format == 3){
-            x$zeta <- get_absolute_zeta(x$mineral,exterr=exterr);
+            x$zeta <- get_absolute_zeta(x$mineral,exterr=exterr)
         }
         out <- ICP_age(x,i,exterr=exterr)
     }
@@ -308,4 +308,36 @@ LL_sigma <- function(sigma,X,sX){
     wi <- 1/(sigma^2+sX^2)
     mu <- sum(wi*X)/sum(wi)
     sum(log(wi) - wi*(X-mu)^2)/2
+}
+
+pooled_age <- function(x,exterr=FALSE){
+    if (x$format<2){
+        Ns <- sum(x$x[,'Ns'])
+        Ni <- sum(x$x[,'Ni'])
+        if (exterr){
+            zeta <- x$zeta
+            rhoD <- x$rhoD
+        } else {
+            zeta <- c(x$zeta[1],0)
+            rhoD <- c(x$rhoD[1],0)
+        }
+        out <- get_EDM_age(Ns,Ni,zeta,rhoD)
+    } else if (x$format>1){
+        if (x$format == 3){
+            zeta <- get_absolute_zeta(x$mineral,exterr=exterr)
+        } else {
+            zeta <- x$zeta
+        }
+        if (!exterr){
+            zeta[2] <- 0
+        }
+        Ns <- sum(x$Ns)
+        A <- sum(x$A)
+        UsU <- get_UsU(x)
+        Uhat <- sum(x$A*UsU[,'U'])/A
+        sUhat <- sqrt(sum((x$A*UsU[,'sU']^2)))/A
+        UsUhat <- cbind(U=Uhat,sU=sUhat)
+        out <- get_ICP_age(Ns,A,UsUhat,zeta)
+    }
+    out
 }
