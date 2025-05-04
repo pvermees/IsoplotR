@@ -18,6 +18,7 @@ read.data(x, ...)
   Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
   U8Th2 = 0,
+  sister = 44,
   ...
 )
 
@@ -30,6 +31,7 @@ read.data(x, ...)
   Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
   U8Th2 = 0,
+  sister = 44,
   ...
 )
 
@@ -42,6 +44,7 @@ read.data(x, ...)
   Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
   U8Th2 = 0,
+  sister = 44,
   ...
 )
 }
@@ -237,6 +240,9 @@ the detritus, containing \code{X=0/8}, \code{sX}, \code{Y=2/8},
 whole rock. Used to estimate the initial
 \eqn{^{230}}Th/\eqn{^{238}}U disequilibrium (for Th-U formats 3
 and 4).}
+
+\item{sister}{the non-radiogenic (`sister') isotope of Ca that is
+to be used for K-Ca isochrons.}
 }
 \value{
 An object of class \code{UPb}, \code{PbPb}, \code{ThPb},

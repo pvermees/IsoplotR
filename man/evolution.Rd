@@ -14,7 +14,7 @@ evolution(
   transform = FALSE,
   Th0i = 0,
   show.numbers = FALSE,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   ellipse.fill = c("#00FF0080", "#FF000080"),
   ellipse.stroke = "black",

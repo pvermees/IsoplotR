@@ -164,7 +164,7 @@
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
                       show.numbers=FALSE,oerr=3,contour.col=c('white','red'),
-                      levels=NA,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
+                      levels=NULL,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
                       omit.fill=NA,omit.stroke='grey',...){
@@ -236,7 +236,7 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
 }
 
 plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,
-                                   show.numbers=FALSE,levels=NA,hide=NULL){
+                                   show.numbers=FALSE,levels=NULL,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv_covmat(x,i)
@@ -249,7 +249,7 @@ plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,
     }
 }
 plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=3,
-                                    show.numbers=FALSE,levels=NA,hide=NULL){
+                                    show.numbers=FALSE,levels=NULL,hide=NULL){
     sn <- clear(1:length(x),hide)
     for (i in sn){
         uvc <- UThHe2uv_covmat(x,i)

@@ -9,7 +9,7 @@ scatterplot(
   oerr = 3,
   show.numbers = FALSE,
   show.ellipses = 1,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   ellipse.fill = c("#00FF0080", "#FF000080"),
   ellipse.stroke = "black",

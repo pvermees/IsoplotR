@@ -164,7 +164,7 @@
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
 evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
-                      transform=FALSE,Th0i=0,show.numbers=FALSE,levels=NA,
+                      transform=FALSE,Th0i=0,show.numbers=FALSE,levels=NULL,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
                       isochron=FALSE,model=1,exterr=FALSE,sigdig=2,
@@ -207,7 +207,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
 }
 
 U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
-                    show.numbers=FALSE,levels=NA,clabel="",
+                    show.numbers=FALSE,levels=NULL,clabel="",
                     ellipse.fill=c("#00FF0080","#FF000080"),
                     ellipse.stroke='black',show.ellipses=TRUE,
                     hide=NULL,omit=NULL,omit.fill=NA,
@@ -231,13 +231,13 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
     scatterplot(d,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
-                ellipse.stroke=ellipse.stroke,add=TRUE, hide=hide,
+                ellipse.stroke=ellipse.stroke,add=TRUE,hide=hide,
                 omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
                         xlim=NULL,ylim=NULL,oerr=3,
-                        show.numbers=FALSE,levels=NA,clabel="",
+                        show.numbers=FALSE,levels=NULL,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
                         show.ellipses=TRUE,hide=NULL,omit=NULL,
@@ -270,15 +270,16 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
     scatterplot(pdat,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
-                ellipse.stroke=ellipse.stroke,add=TRUE,hide=hide,
-                omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+                ellipse.stroke=ellipse.stroke,add=TRUE,
+                hide=hide,omit=omit,omit.fill=omit.fill,
+                omit.stroke=omit.stroke,addcolourbar=FALSE,...)
     colourbar(z=levels[calcit],fill=ellipse.fill,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
 Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
                         ylim=NULL,tticks=NULL,oerr=3,show.numbers=FALSE,
-                        exterr=FALSE,clabel="",levels=NA,
+                        exterr=FALSE,clabel="",levels=NULL,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
                         line.col='darksalmon',hide=NULL,omit=NULL,
@@ -337,7 +338,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
                     levels=levels,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
-                    omit.fill=omit.fill,omit.stroke=omit.stroke)
+                    omit.fill=omit.fill,omit.stroke=omit.stroke,
+                    addcolourbar=FALSE)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)

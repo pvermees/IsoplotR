@@ -89,7 +89,7 @@ as.ArAr(x, format = 3, ierr = 1)
 
 as.ThPb(x, format = 1, ierr = 1)
 
-as.KCa(x, format = 1, ierr = 1)
+as.KCa(x, format = 1, ierr = 1, sister = 44)
 
 as.RbSr(x, format = 1, ierr = 1)
 
@@ -125,6 +125,9 @@ as.other(x, format = NULL, ierr = 1)
 \item{ierr}{input error. See \code{\link{read.data}} for details.}
 
 \item{d}{an object of class \code{\link{diseq}}.}
+
+\item{sister}{the non-radiogenic (`sister') isotope of Ca that is
+to be used for K-Ca isochrons.}
 
 \item{U8Th2}{\eqn{^{238}}U/\eqn{^{232}}Th activity-ratio of the
 whole rock. Used to estimate the initial

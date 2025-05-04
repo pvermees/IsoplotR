@@ -366,15 +366,19 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NULL,oerr=1,sigdig=NA,...
     out
 }
 
-#' @param zeta two-element vector with the zeta-factor and its standard
-#'     error.
+#' @param pooled if \code{TRUE}, returns the pooled fission track
+#'     age. Overrides the value of \code{central}.
+#' @param zeta two-element vector with the zeta-factor and its
+#'     standard error.
 #' @param rhoD two-element vector with the track density of the
 #'     dosimeter glass and its standard error.
 #' @rdname age
 #' @export
-age.fissiontracks <- function(x,central=FALSE,i=NULL,
+age.fissiontracks <- function(x,central=FALSE,pooled=FALSE,i=NULL,
                               oerr=1,sigdig=NA,exterr=FALSE,...){
-    if (central){
+    if (pooled){
+        out <- pooled_age(x)
+    } else if (central){
         out <- central(x)
     } else {
         tst <- fissiontrack_age(x,i=i,exterr=exterr)

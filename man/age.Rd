@@ -83,7 +83,16 @@ age(x, ...)
 
 \method{age}{UThHe}(x, isochron = FALSE, central = FALSE, i = NULL, oerr = 1, sigdig = NA, ...)
 
-\method{age}{fissiontracks}(x, central = FALSE, i = NULL, oerr = 1, sigdig = NA, exterr = FALSE, ...)
+\method{age}{fissiontracks}(
+  x,
+  central = FALSE,
+  pooled = FALSE,
+  i = NULL,
+  oerr = 1,
+  sigdig = NA,
+  exterr = FALSE,
+  ...
+)
 
 \method{age}{ThU}(
   x,
@@ -256,8 +265,8 @@ calibration factor) uncertainties?}
 \item{J}{two-element vector with the J-factor and its standard
 error.}
 
-\item{zeta}{two-element vector with the zeta-factor and its standard
-error.}
+\item{zeta}{two-element vector with the zeta-factor and its
+standard error.}
 
 \item{rhoD}{two-element vector with the track density of the
 dosimeter glass and its standard error.}
@@ -357,6 +366,9 @@ stored in \code{settings('iratio',...)}.}
 be considered separately (\code{central=FALSE}) or a central
 age should be calculated from all analyses together
 (\code{central=TRUE}).}
+
+\item{pooled}{if \code{TRUE}, returns the pooled fission track
+age. Overrides the value of \code{central}.}
 
 \item{Th0i}{initial \eqn{^{230}}Th correction.
 

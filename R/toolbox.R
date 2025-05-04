@@ -237,7 +237,7 @@ LL_norm <- function(x,covmat){
     },error=function(e) Inf)
 }
 
-set_ellipse_colours <- function(ns=1,levels=NA,col=c('yellow','red'),
+set_ellipse_colours <- function(ns=1,levels=NULL,col=c('yellow','red'),
                                 hide=NULL,omit=NULL,omit.col=NA){
     nl <- length(levels)
     if (nl > 1){
@@ -245,13 +245,12 @@ set_ellipse_colours <- function(ns=1,levels=NA,col=c('yellow','red'),
         levels[!is.numeric(levels)] <- NA
     }
     out <- NULL
-    if (all(is.na(levels)) ||
-        (min(levels,na.rm=TRUE)==max(levels,na.rm=TRUE))){
-        out <- rep(col[1],ns)
-    } else if (nl<ns){
-        out[1:nl] <- levels2colours(levels=levels,col=col)
+    if (validLevels(levels)){
+        colours <- levels2colours(levels=levels,col=col)
+        if (nl<ns) out[1:nl] <- colours
+        else out <- colours[1:ns]
     } else {
-        out <- levels2colours(levels=levels,col=col)[1:ns]
+        out <- rep(col[1],ns)
     }
     out[omit] <- omit.col
     out
@@ -273,7 +272,10 @@ levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
 }
 
 validLevels <- function(levels){
-    (length(levels)>0 & all(is.numeric(levels)) & !any(is.na(levels)))
+    length(levels)>0 &&
+    all(is.numeric(levels)) &&
+    !all(is.na(levels)) &&
+    diff(range(levels,na.rm=TRUE))
 }
 
 colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),

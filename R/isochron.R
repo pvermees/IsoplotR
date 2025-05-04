@@ -513,7 +513,7 @@ isochron <- function(x,...){ UseMethod("isochron",x) }
 #' @rdname isochron
 #' @export
 isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
-                             levels=NA,clabel="",xlab='x',ylab='y',
+                             levels=NULL,clabel="",xlab='x',ylab='y',
                              ellipse.fill=c("#00FF0080","#FF000080"),
                              ellipse.stroke='black',ci.col='gray80',
                              line.col='black',lwd=1,plot=TRUE,title=TRUE,
@@ -546,7 +546,7 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 #' @rdname isochron
 #' @export
 isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
-                           levels=NA,clabel="",xlab='x',ylab='y',
+                           levels=NULL,clabel="",xlab='x',ylab='y',
                            ellipse.fill=c("#00FF0080","#FF000080"),
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,
@@ -603,7 +603,7 @@ isochron.other <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
     invisible(out)
 }
 genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
-                                levels=NA,clabel="",xlab='x',ylab='y',
+                                levels=NULL,clabel="",xlab='x',ylab='y',
                                 ellipse.fill=c("#00FF0080","#FF000080"),
                                 ellipse.stroke='black',ci.col='gray80',
                                 line.col='black',lwd=1,plot=TRUE,
@@ -718,7 +718,7 @@ genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
 #' @rdname isochron
 #' @export
 isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
-                         levels=NA,clabel="",joint=TRUE,
+                         levels=NULL,clabel="",joint=TRUE,
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',type=1,
                          ci.col='gray80',line.col='black',lwd=1,
@@ -831,7 +831,7 @@ checkWtype <- function(wtype=1,anchor=0,model=1){
 #' @param growth add Stacey-Kramers Pb-evolution curve to the plot?
 #' @rdname isochron
 #' @export
-isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
@@ -910,7 +910,7 @@ SK_intersection <- function(fit,inverse,m=0,M=5000){
 #' @rdname isochron
 #' @export
 isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
-                          levels=NA,clabel="",
+                          levels=NULL,clabel="",
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
@@ -948,7 +948,7 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
 }
 #' @rdname isochron
 #' @export
-isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
@@ -968,7 +968,7 @@ isochron.ThPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 #' @param bratio the \eqn{^{40}}K branching ratio.
 #' @rdname isochron
 #' @export
-isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                          clabel="",inverse=FALSE,ci.col='gray80',
                          ellipse.fill=c("#00FF0080","#FF000080"),
                          ellipse.stroke='black',line.col='black',
@@ -987,7 +987,7 @@ isochron.KCa <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 }
 #' @rdname isochron
 #' @export
-isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
@@ -1005,7 +1005,7 @@ isochron.RbSr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 }
 #' @rdname isochron
 #' @export
-isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
@@ -1022,7 +1022,7 @@ isochron.ReOs <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 }
 #' @rdname isochron
 #' @export
-isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,
@@ -1039,7 +1039,7 @@ isochron.SmNd <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 }
 #' @rdname isochron
 #' @export
-isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',inverse=FALSE,
                           ci.col='gray80',line.col='black',lwd=1,plot=TRUE,
@@ -1056,7 +1056,7 @@ isochron.LuHf <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
 }
 #' @rdname isochron
 #' @export
-isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
+isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NULL,
                            clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                            ellipse.stroke='black',ci.col='gray80',
                            line.col='black',lwd=1,plot=TRUE,title=TRUE,
@@ -1103,7 +1103,7 @@ isochron.UThHe <- function(x,sigdig=2,oerr=3,show.numbers=FALSE,levels=NA,
 #' @rdname isochron
 #' @export
 isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
-                          show.numbers=FALSE,levels=NA,clabel="",
+                          show.numbers=FALSE,levels=NULL,clabel="",
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
@@ -1270,7 +1270,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
     out
 }
 
-isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NA,
+isochron_PD <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                         clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',inverse=FALSE,
                         ci.col='gray80',line.col='black',lwd=1,
@@ -1564,7 +1564,7 @@ wDP2wt.KCa <- function(x,DP,wDP,bratio=0.895,...){
 #' @noRd
 wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]
-    dtdDP <- 1/(lambda(1+DP*bratio))
+    dtdDP <- 1/(lambda*(1+DP*bratio))
     abs(dtdDP*wDP)
 }
 #' @noRd
@@ -1931,14 +1931,14 @@ getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     } else if (inverse){
         out$x <- quote(''^40*'K/'^40*'Ca')
     } else {
-        out$x <- quote(''^40*'K/'^44*'Ca')
+        out$x <- substitute(''^40*'K/'^s*'Ca',list(s=x$sister))
     }
     if (inverse){
-        out$y <- quote(''^44*'Ca/'^40*'Ca')
+        out$y <- substitute(''^s*'Ca/'^40*'Ca',list(s=x$sister))
     } else {
-        out$y <- quote(''^40*'Ca/'^44*'Ca')
+        out$y <- substitute(''^40*'Ca/'^s*'Ca',list(s=x$sister))
     }
-    out$y0 <- quote('('^40*'Ca/'^44*'Ca)'[0]*'=')
+    out$y0 <- substitute('('^40*'Ca/'^s*'Ca)'[0]*'=',list(s=x$sister))
     out
 }
 #' @param type controls the isochron projection

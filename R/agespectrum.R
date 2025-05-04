@@ -62,7 +62,7 @@
 #' @param plateau.col
 #' Fill colours of the rectangles used to mark the steps belonging to
 #' the age plateau. This can either be a single colour or multiple
-#' colours to form a colour ramp (to be used if \code{levels!=NA}):
+#' colours to form a colour ramp (to be used if \code{levels!=NULL}):
 #'
 #' a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
 #' \code{'white'}, etc.;
@@ -124,7 +124,7 @@ agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 #' @rdname agespectrum
 #' @export
 agespectrum.default <- function(x,oerr=3,plateau=TRUE,
-                                random.effects=FALSE,levels=NA,clabel="",
+                                random.effects=FALSE,levels=NULL,clabel="",
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
@@ -147,7 +147,7 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
 #' @rdname agespectrum
 #' @export
 agespectrum.other <- function(x,oerr=3,plateau=TRUE,
-                              random.effects=FALSE,levels=NA,clabel="",
+                              random.effects=FALSE,levels=NULL,clabel="",
                               plateau.col=c("#00FF0080","#FF000080"),
                               non.plateau.col="#00FFFF80",
                               sigdig=2,line.col='red',lwd=2,
@@ -178,7 +178,7 @@ agespectrum.other <- function(x,oerr=3,plateau=TRUE,
 #' @rdname agespectrum
 #' @export
 agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
-                             random.effects=FALSE,levels=NA,clabel="",
+                             random.effects=FALSE,levels=NULL,clabel="",
                              plateau.col=c("#00FF0080","#FF000080"),
                              non.plateau.col="#00FFFF80",sigdig=2,
                              exterr=FALSE,line.col='red',lwd=2,
@@ -223,7 +223,7 @@ plot_spectrum_axes <- function(x,oerr=3,xlab='cumulative fraction',
     graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
     list(X=X,Yl=Yl,Yu=Yu,ylim=c(minY,maxY))
 }
-get_plateau_colours <- function(x,levels=NA,plateau=TRUE,hide=NULL,omit=NULL,
+get_plateau_colours <- function(x,levels=NULL,plateau=TRUE,hide=NULL,omit=NULL,
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 random.effects=FALSE,oerr=3){

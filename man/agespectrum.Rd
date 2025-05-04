@@ -14,7 +14,7 @@ agespectrum(x, ...)
   oerr = 3,
   plateau = TRUE,
   random.effects = FALSE,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80",
@@ -33,7 +33,7 @@ agespectrum(x, ...)
   oerr = 3,
   plateau = TRUE,
   random.effects = FALSE,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80",
@@ -52,7 +52,7 @@ agespectrum(x, ...)
   oerr = 3,
   plateau = TRUE,
   random.effects = FALSE,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80",
@@ -118,7 +118,7 @@ different background colours of the plot symbols.}
 
 \item{plateau.col}{Fill colours of the rectangles used to mark the steps belonging to
 the age plateau. This can either be a single colour or multiple
-colours to form a colour ramp (to be used if \code{levels!=NA}):
+colours to form a colour ramp (to be used if \code{levels!=NULL}):
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
 \code{'white'}, etc.;

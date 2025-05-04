@@ -9,7 +9,7 @@ concordia(
   tlim = NULL,
   type = 1,
   show.numbers = FALSE,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   ellipse.fill = c("#00FF0080", "#FF000080"),
   ellipse.stroke = "black",
@@ -53,7 +53,7 @@ numbers)}
 as different background colours within the error ellipses.}
 
 \item{clabel}{label for the colour legend (only used if
-\code{levels} is not \code{NA}).}
+\code{levels} is not \code{NULL}).}
 
 \item{ellipse.fill}{Fill colour for the error ellipses. This can either be a single
 colour or multiple colours to form a colour ramp. Examples:

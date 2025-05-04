@@ -127,6 +127,9 @@
 #' 
 #' @param ierr input error. See \code{\link{read.data}} for details.
 #'
+#' @param sister the non-radiogenic (`sister') isotope of Ca that is
+#'     to be used for K-Ca isochrons.
+#' 
 #' @param d an object of class \code{\link{diseq}}.
 #' 
 #' @param Th02i 2-element vector with the assumed initial

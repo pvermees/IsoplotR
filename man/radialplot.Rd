@@ -26,10 +26,11 @@ radialplot(x, ...)
   to = NA,
   z0 = NA,
   transformation = "log",
+  xlab = NULL,
   sigdig = 2,
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -37,6 +38,7 @@ radialplot(x, ...)
   np = 3,
   markers = NULL,
   oerr = 3,
+  title = TRUE,
   units = "",
   hide = NA,
   omit = NULL,
@@ -54,7 +56,7 @@ radialplot(x, ...)
   sigdig = 2,
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -63,6 +65,7 @@ radialplot(x, ...)
   markers = NULL,
   oerr = 3,
   units = "",
+  title = TRUE,
   hide = NA,
   omit = NULL,
   omit.col = NA,
@@ -79,7 +82,7 @@ radialplot(x, ...)
   sigdig = 2,
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -88,6 +91,7 @@ radialplot(x, ...)
   np = 3,
   exterr = FALSE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -100,6 +104,7 @@ radialplot(x, ...)
   to = NA,
   z0 = NA,
   xlim = NULL,
+  xlab = NULL,
   transformation = "log",
   type = 4,
   cutoff.76 = 1100,
@@ -107,7 +112,7 @@ radialplot(x, ...)
   show.numbers = FALSE,
   pch = 21,
   sigdig = 2,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -117,6 +122,7 @@ radialplot(x, ...)
   exterr = FALSE,
   common.Pb = 0,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -130,10 +136,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -143,6 +150,7 @@ radialplot(x, ...)
   exterr = FALSE,
   common.Pb = 2,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -156,10 +164,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -169,6 +178,7 @@ radialplot(x, ...)
   exterr = FALSE,
   i2i = FALSE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -182,10 +192,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -195,6 +206,7 @@ radialplot(x, ...)
   exterr = FALSE,
   i2i = FALSE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -208,10 +220,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -221,6 +234,7 @@ radialplot(x, ...)
   exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -234,10 +248,11 @@ radialplot(x, ...)
   xlim = NULL,
   z0 = NA,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -245,6 +260,7 @@ radialplot(x, ...)
   k = 0,
   np = 3,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -258,10 +274,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -271,6 +288,7 @@ radialplot(x, ...)
   exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -284,10 +302,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -297,6 +316,7 @@ radialplot(x, ...)
   exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -310,10 +330,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -323,6 +344,7 @@ radialplot(x, ...)
   exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -336,10 +358,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -349,6 +372,7 @@ radialplot(x, ...)
   exterr = FALSE,
   i2i = TRUE,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -362,10 +386,11 @@ radialplot(x, ...)
   z0 = NA,
   xlim = NULL,
   sigdig = 2,
+  xlab = NULL,
   transformation = "log",
   show.numbers = FALSE,
   pch = 21,
-  levels = NA,
+  levels = NULL,
   clabel = "",
   bg = c("yellow", "red"),
   col = "black",
@@ -374,6 +399,7 @@ radialplot(x, ...)
   np = 3,
   Th0i = 0,
   oerr = 3,
+  title = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -404,6 +430,8 @@ function}
 \code{fissiontracks} and \code{fissiontracks$format} \eqn{\neq
 1}).}
 
+\item{xlab}{x-axis label. Is set automatically by default.}
+
 \item{sigdig}{the number of significant digits of the numerical
 values reported in the title of the graphical output.}
 
@@ -419,7 +447,7 @@ different background colours of the plot symbols.}
 
 \item{bg}{Fill colour for the plot symbols. This can either be a
     single colour or multiple colours to form a colour ramp (to be
-    used if \code{levels!=NA}):
+    used if \code{levels!=NULL}):
 
 a single colour: \code{rgb(0,1,0,0.5)}, \code{'#FF000080'},
 \code{'white'}, etc.;
@@ -469,6 +497,8 @@ plot.}
 \code{6}: relative (1-\eqn{\alpha})\% confidence intervals, where
 \eqn{\alpha} equales the value that is stored in
 \code{settings('alpha')}.}
+
+\item{title}{add a title to the plot?}
 
 \item{units}{measurement units to be displayed in the legend.}
 
@@ -566,15 +596,14 @@ stored in \code{x} by the \code{read.data()} function.
 if \code{x$format} is \code{1} or \code{2}).}
 }
 \value{
-does not produce any numerical output, but does report the
-    central age and the results of any mixture modelling in the
-    title. An asterisk is added to the plot title if the initial
-    daughter correction is based on an isochron regression, to
-    highlight the circularity of using an isochron to compute a
-    central age, and to indicate that the reported uncertainties do
-    not include the uncertainty of the initial daughter correction.
-    This is because this uncertainty is neither purely random nor
-    purely systematic.
+returns the central age and reports the results of any
+    mixture modelling in the title. An asterisk is added to the
+    plot title if the initial daughter correction is based on an
+    isochron regression, to highlight the circularity of using an
+    isochron to compute a central age, and to indicate that the
+    reported uncertainties do not include the uncertainty of the
+    initial daughter correction.  This is because this uncertainty
+    is neither purely random nor purely systematic.
 }
 \description{
 Implementation of a graphical device developed by Rex Galbraith to
