@@ -249,8 +249,6 @@ set_ellipse_colours <- function(ns=1,levels=NULL,col=c('yellow','red'),
         colours <- levels2colours(levels=levels,col=col)
         if (nl<ns) out[1:nl] <- colours
         else out <- colours[1:ns]
-    } else if (length(col)==ns){
-        out <- col
     } else {
         out <- rep(col[1],ns)
     }
