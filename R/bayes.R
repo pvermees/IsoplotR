@@ -78,19 +78,21 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
         L <- exp(LLgridt[,'LL'] - log_sum_exp(LLgridt[,'LL']))
         out[['t']] <- cbind(x=tt,L=L)
     }
-    if (plot){
-        nbpar <- length(out)
-        if (!add) op <- graphics::par(mfrow=c(1,nbpar))
-        for (bpar in names(out)){
-            plot(out[[bpar]],type='b',xlab=bpar)
-            if (bpar=='t') xx <- exp(fit$par[bpar])
-            else xx <- fit$par[bpar]
-            graphics::lines(rep(xx,2),range(out[[bpar]][,2]))
-        }
-        if (!add) graphics::par(op)
-    }
+    if (plot) bayesplot(out,fit,add=add)
     out
 }
+bayesplot <- function(LLlist,fit,add=FALSE){
+        nbpar <- length(LLlist)
+        if (!add) op <- graphics::par(mfrow=c(1,nbpar))
+        for (bpar in names(LLlist)){
+            plot(LLlist[[bpar]],type='b',xlab=bpar)
+            if (bpar=='t') xx <- exp(fit$par[bpar])
+            else xx <- fit$par[bpar]
+            graphics::lines(rep(xx,2),range(LLlist[[bpar]][,2]))
+        }
+        if (!add) graphics::par(op)
+}
+
 initial2time <- function(x,anames,avalues,anchor=0,
                          type='joint',model=1){
     X <- x
