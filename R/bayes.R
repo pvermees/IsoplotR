@@ -21,13 +21,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     ng <- nrow(igrid)
     LLgrid <- matrix(NA,nrow=ng,ncol=np+1)
     colnames(LLgrid) <- c(pnames,'LL')
-    aname1 <- ifelse(inames[1]=='U48i','U48','ThU')
-    if (length(inames)==1){
-        anames <- aname1
-    } else {
-        aname2 <- ifelse(inames[2]=='U48i','U48','ThU')
-        anames <- c(aname1,aname2)
-    }
+    anames <- c(U48i='U48',ThUi='ThU')[inames]
     message('Calculating posterior distribution of the initial activity ratios')
     for (i in 1:ng){
         message('Iteration ',i,'/',ng)
@@ -58,8 +52,9 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
                 lower[,pname] <- init[,pname]-1
                 upper[,pname] <- init[,pname]+1
             } else { # U48i, ThUi
-                lower[,pname] <- init[,pname]/2
-                upper[,pname] <- min(init[,pname]*2,x$d[[pname]]$M)
+                aname <- anames[pname]
+                lower[,pname] <- (init[,pname]+9*x$d[[aname]]$m)/10
+                upper[,pname] <- (init[,pname]+9*x$d[[aname]]$M)/10
             }
         }
         LLgridt <- LLgrid[1:nsteps,]
