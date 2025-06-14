@@ -213,6 +213,23 @@ peaktit <- function(x,sx,p=NULL,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
 }
 bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
                      sigdig=2,oerr=3,units=' Ma',prefix='age ='){
+    lims <- bayesci(x,XL,oerr=oerr)    
+    le <- (x-lims['ll'])
+    ue <- (lims['ul']-x)
+    if (oerr>3) {
+        le <- 100*le/x
+        ue <- 100*ue/x
+    }
+    rounded <- roundit(x,c(ue,le),sigdig=sigdig,oerr=oerr,text=TRUE)
+    lst <- list(p=prefix,a=rounded[1],b=rounded[2],c=rounded[3],u=units,n=ntit)
+    if (oerr>3){
+        out <- substitute(p~a*u+b/-c*'%'~n,lst)
+    } else {
+        out <- substitute(p~a+b/-c*u~n,lst)
+    }
+    out
+}
+bayesci <- function(x,XL,oerr=3){
     if (oerr%in%c(1,4)){
         lq <- -1
         uq <- 1
@@ -230,20 +247,7 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
                         xout=stats::pnorm(lq),method='hyman')
     ul <- stats::spline(x=cdf[increasing],y=XL[increasing,'x'],
                         xout=stats::pnorm(uq),method='hyman')
-    le <- (x-ll$y)
-    ue <- (ul$y-x)
-    if (oerr>3) {
-        le <- 100*le/x
-        ue <- 100*ue/x
-    }
-    rounded <- roundit(x,c(ue,le),sigdig=sigdig,oerr=oerr,text=TRUE)
-    lst <- list(p=prefix,a=rounded[1],b=rounded[2],c=rounded[3],u=units,n=ntit)
-    if (oerr>3){
-        out <- substitute(p~a*u+b/-c*'%'~n,lst)
-    } else {
-        out <- substitute(p~a+b/-c*u~n,lst)
-    }
-    out
+    c(ll=ll$y,ul=ul$y)
 }
 
 #' Get a sample size label for the plot title
