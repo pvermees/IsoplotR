@@ -147,7 +147,7 @@ diseq <- function(U48=list(x=1,sx=0,option=0,m=0,M=20,x0=1,sd=10),
         if (is.null(aratio$M)) out$M <- 20
         if (is.null(aratio$x0)) out$x0 <- 1
         if (is.null(aratio$sd)) out$sd <- 10
-        if ((out$x<out$m)||(out$x0>out$M)) out$x0 <- (out$m+out$M)/2
+        if ((out$x0<out$m)||(out$x0>out$M)) out$x0 <- (out$m+out$M)/2
         out
     }
     out <- list()

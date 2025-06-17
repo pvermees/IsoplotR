@@ -213,7 +213,7 @@ peaktit <- function(x,sx,p=NULL,sigdig=2,oerr=3,unit='Ma',prefix=NULL){
 }
 bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
                      sigdig=2,oerr=3,units=' Ma',prefix='age ='){
-    lims <- bayesci(x,XL,oerr=oerr)    
+    lims <- bayesci(XL,oerr=oerr)    
     le <- (x-lims['ll'])
     ue <- (lims['ul']-x)
     if (oerr>3) {
@@ -229,7 +229,7 @@ bayestit <- function(x,XL,n=NULL,ntit=paste0('(n=',n,')'),
     }
     out
 }
-bayesci <- function(x,XL,oerr=3){
+bayesci <- function(XL,oerr=3){
     if (oerr%in%c(1,4)){
         lq <- -1
         uq <- 1
