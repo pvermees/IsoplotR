@@ -51,6 +51,10 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
             if (pname %in% c('a0','b0','w')){
                 lower[,pname] <- init[,pname]-1
                 upper[,pname] <- init[,pname]+1
+            } else if (pname %in% c('RaUi','PaUi')){
+                aname <- substr(pname, 1, nchar(pname) - 1)
+                lower[,pname] <- max(x$d[[aname]]$m,init[,pname]-5*x$d[[aname]]$sx)
+                upper[,pname] <- min(init[,pname]+5*x$d[[aname]]$sx,x$d[[aname]]$M)
             } else { # U48i, ThUi
                 aname <- anames[pname]
                 lower[,pname] <- (init[,pname]+9*x$d[[aname]]$m)/10
