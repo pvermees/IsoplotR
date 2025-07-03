@@ -725,7 +725,8 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,
                          show.ellipses=1*(model!=2),anchor=0,
                          hide=NULL,omit=NULL,omit.fill=NA,
-                         omit.stroke='grey',y0option=1,taxis=FALSE,...){
+                         omit.stroke='grey',y0option=1,
+                         taxis=FALSE,nsteps=NULL,...){
     if (x$format<4){
         if (plot){
             out <- concordia_helper(x,type=2,show.age=model+1,oerr=oerr,
@@ -737,15 +738,15 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                                     y0option=y0option,omit.fill=omit.fill,
                                     omit.stroke=omit.stroke,...)
         } else {
-            out <- ludwig(x,exterr=exterr,model=model,anchor=anchor)
+            out <- ludwig(x,exterr=exterr,model=model,anchor=anchor,nsteps=nsteps)
         }
     } else {
         type <- checkIsochronType(x,type=type)
         ns <- length(x)
         calcit <- (1:ns)%ni%c(hide,omit)
         x2calc <- subset(x,subset=calcit)
-        fit <- ludwig(x2calc,model=model,anchor=anchor,
-                      exterr=exterr,type=ifelse(joint,0,type))
+        fit <- ludwig(x2calc,model=model,anchor=anchor,exterr=exterr,
+                      type=ifelse(joint,0,type),nsteps=nsteps)
         out <- ab2y0t(x=x,fit=fit,type=type,exter=exterr,y0option=y0option)
         if (plot){
             scatterplot(out$XY,oerr=oerr,show.ellipses=show.ellipses,
