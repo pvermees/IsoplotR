@@ -245,6 +245,10 @@
 #'     omitted aliquots.
 #'
 #' @param ylab text label for the vertical plot axis
+#'
+#' @param nsteps resolution of the posterior distributions for
+#'     Bayesian credible intervals of disequilibrium-corrected U-Pb
+#'     isochrons
 #' 
 #' @param ... optional arguments to be passed on to \code{\link{scatterplot}}
 #'
