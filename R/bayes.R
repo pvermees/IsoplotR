@@ -21,13 +21,7 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     ng <- nrow(igrid)
     LLgrid <- matrix(NA,nrow=ng,ncol=np+1)
     colnames(LLgrid) <- c(pnames,'LL')
-    aname1 <- ifelse(inames[1]=='U48i','U48','ThU')
-    if (length(inames)==1){
-        anames <- aname1
-    } else {
-        aname2 <- ifelse(inames[2]=='U48i','U48','ThU')
-        anames <- c(aname1,aname2)
-    }
+    anames <- c(U48i='U48',ThUi='ThU')[inames]
     message('Calculating posterior distribution of the initial activity ratios')
     for (i in 1:ng){
         message('Iteration ',i,'/',ng)
@@ -41,7 +35,8 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     for (iname in inames){
         LL <- marginal(LLgrid,iigrid,iilist,iname=iname)
         dx <- diff(ilist[[iname]])
-        L <- exp(LL-log_sum_exp(LL+log(c(dx,utils::tail(dx,n=1)))))
+        ldx <- log(c(dx,utils::tail(dx,n=1)))
+        L <- exp(LL - log_sum_exp(LL + ldx))
         out[[iname]] <- cbind(x=ilist[[iname]],L=L)
     }
     if ('t'%in%pnames){
@@ -57,9 +52,14 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
             if (pname %in% c('a0','b0','w')){
                 lower[,pname] <- init[,pname]-1
                 upper[,pname] <- init[,pname]+1
+            } else if (pname %in% c('RaUi','PaUi')){
+                aname <- substr(pname, 1, nchar(pname) - 1)
+                lower[,pname] <- max(x$d[[aname]]$m,init[,pname]-5*x$d[[aname]]$sx)
+                upper[,pname] <- min(init[,pname]+5*x$d[[aname]]$sx,x$d[[aname]]$M)
             } else { # U48i, ThUi
-                lower[,pname] <- init[,pname]/2
-                upper[,pname] <- min(init[,pname]*2,x$d[[pname]]$M)
+                aname <- anames[pname]
+                lower[,pname] <- (init[,pname]+9*x$d[[aname]]$m)/10
+                upper[,pname] <- (init[,pname]+9*x$d[[aname]]$M)/10
             }
         }
         LLgridt <- LLgrid[1:nsteps,]
@@ -75,22 +75,27 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
             LLgridt[i,names(ifit$par)] <- ifit$par
             LLgridt[i,'LL'] <- -ifit$value
         }
-        L <- exp(LLgridt[,'LL'] - log_sum_exp(LLgridt[,'LL']))
+        dt <- diff(tt)
+        ldt <- log(c(dt,utils::tail(dt,n=1)))
+        L <- exp(LLgridt[,'LL'] - log_sum_exp(LLgridt[,'LL'] + ldt))
         out[['t']] <- cbind(x=tt,L=L)
     }
-    if (plot){
-        nbpar <- length(out)
-        if (!add) op <- graphics::par(mfrow=c(1,nbpar))
-        for (bpar in names(out)){
-            plot(out[[bpar]],type='b',xlab=bpar)
-            if (bpar=='t') xx <- exp(fit$par[bpar])
-            else xx <- fit$par[bpar]
-            graphics::lines(rep(xx,2),range(out[[bpar]][,2]))
-        }
-        if (!add) graphics::par(op)
-    }
+    if (plot) bayesplot(out,fit,add=add)
     out
 }
+bayesplot <- function(Llist,fit,add=FALSE){
+    nbpar <- length(Llist)
+        if (!add) op <- graphics::par(mfrow=c(1,nbpar))
+        for (bpar in names(Llist)){
+            plot(Llist[[bpar]],type='b',xlab=bpar,
+                 ylab='posterior probability')
+            if (bpar=='t') xx <- exp(fit$par[bpar])
+            else xx <- fit$par[bpar]
+            graphics::lines(rep(xx,2),range(Llist[[bpar]][,2]))
+        }
+        if (!add) graphics::par(op)
+}
+
 initial2time <- function(x,anames,avalues,anchor=0,
                          type='joint',model=1){
     X <- x
@@ -188,10 +193,9 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
     mint <- exp(LLgrid[mini,'t'])
     maxt <- exp(LLgrid[maxi,'t'])
     dt <- maxt-mint
-    LLmint <- -LLgrid[mini,'LL']
-    LLmax <- fit$value
+    LLmint <- LLmaxt <- LLmax <- fit$value
     lims <- init <- fit$par[-1]
-    for (i in 1:10){
+    for (i in 1:20){
         if ((LLmint < (LLmax+LLbuffer)) && (mint > dt/4)){
             mint <- (mint-dt/4)
             ifit <- stats::optim(init,fn=LL_ludwig,hessian=FALSE,x=x,
@@ -201,8 +205,7 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
             break
         }
     }
-    LLmaxt <- -LLgrid[maxi,'LL']
-    for (i in 1:10){
+    for (i in 1:20){
         if (LLmaxt < (LLmax+LLbuffer)){
             maxt <- (maxt+dt/4)
             ifit <- stats::optim(init,fn=LL_ludwig,hessian=FALSE,x=x,

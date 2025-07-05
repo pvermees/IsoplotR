@@ -119,10 +119,10 @@ york2ludwig20x <- function(x,anchor=0,type=0,buffer=2,model=1){
         if (model==3){
             if (type==1 && Pb6xc[2]<=0){
                 par['w'] <- log(stats::median(yda[,'sY']))
-                upper['w'] <- log(Pb6xc[1])
+                upper_w <- log(Pb6xc[1])
             } else if (type==2 && Pb7xc[2]<=0){
                 par['w'] <- log(stats::median(ydb[,'sY']))
-                upper['w'] <- log(Pb7xc[1])
+                upper_w <- log(Pb7xc[1])
             }
         }
     } else if (anchor[1]==2 & length(anchor)>1){
@@ -148,7 +148,7 @@ york2ludwig20x <- function(x,anchor=0,type=0,buffer=2,model=1){
                 stPb7U5 <- get_Pb207U235_age(x)[,2]
                 par['w'] <- log(stats::median(stPb7U5))
             }
-            upper['w'] <- log(tt)
+            upper_w <- log(tt)
         }
     } else {
         if (type%in%c('joint',0,1)){
@@ -174,7 +174,7 @@ york2ludwig20x <- function(x,anchor=0,type=0,buffer=2,model=1){
             } else {
                 par['w'] <- log(stats::median(get_Pb207U235_age(x=x)[,2]))
             }
-            upper['w']  <- log(tt)
+            upper_w  <- log(tt)
         }
     }
     for (pname in c('t','a0','b0')){
@@ -185,6 +185,7 @@ york2ludwig20x <- function(x,anchor=0,type=0,buffer=2,model=1){
     }
     if ('w'%in%names(par)){
         lower['w'] <- par['w'] - max(buffer,10)
+        upper['w'] <- upper_w
     }
     list(par=par,lower=lower,upper=upper)
 }
@@ -224,7 +225,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['a0'] <- -log(y0)
             } else if (model==3 & Pb68c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
-                upper['w'] <- log(Pb68c[1])
+                upper_w <- log(Pb68c[1])
             }
         } else if (type==2){
             par['t'] <- log(get_Pb207U235_age(x=abx['x0inv'],d=x$d)[1])
@@ -232,7 +233,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['b0'] <- -log(y0)
             } else if (model==3 & Pb78c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
-                upper['w'] <- log(Pb78c[1])
+                upper_w <- log(Pb78c[1])
             }
         } else if (type==3){
             par['t'] <- log(get_Pb208Th232_age(x=abx['x0inv'],d=x$d)[1])
@@ -240,7 +241,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['a0'] <- log(y0)
             } else if (model==3 & Pb68c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY'])
-                upper['w'] <- log(Pb68c[1])
+                upper_w <- log(Pb68c[1])
             }
         } else if (type==4){
             par['t'] <- log(get_Pb208Th232_age(x=abx['x0inv'],d=x$d)[1])
@@ -248,7 +249,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
                 par['b0'] <- log(y0)
             } else if (model==3 & Pb78c[2]<=0){
                 par['w'] <- stats::median(yd[,'sY'])
-                upper['w'] <- log(Pb78c[1])
+                upper_w <- log(Pb78c[1])
             }
         } else { # joint, 0 or 1
             par['t'] <- log(get_Pb206U238_age(x=abx['x0inv'],d=x$d)[1])
@@ -307,7 +308,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             } else {
                 stop('Invalid isochron type.')
             }
-            upper['w'] <- log(tt)
+            upper_w <- log(tt)
         }        
     } else {
         if (type==2){ # 0807 vs 35/07
@@ -352,7 +353,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             } else {
                 stop('Invalid isochron type.')
             }
-            upper['w']  <- log(pilott)
+            upper_w  <- log(pilott)
         }
     }
     for (pname in c('t','a0','b0')){
@@ -363,6 +364,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
     }
     if ('w'%in%names(par)){
         lower['w'] <- par['w'] - max(buffer,10)
+        upper['w'] <- upper_w
     }
     list(par=par,lower=lower,upper=upper)
 }

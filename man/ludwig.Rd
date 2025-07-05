@@ -12,6 +12,7 @@ ludwig(
   exterr = FALSE,
   type = "joint",
   plot = FALSE,
+  nsteps = NULL,
   ...
 )
 
@@ -22,6 +23,7 @@ ludwig(
   exterr = FALSE,
   type = "joint",
   plot = FALSE,
+  nsteps = NULL,
   ...
 )
 }
@@ -92,6 +94,10 @@ of \eqn{{}^{208}}Pb/\eqn{{}^{207}}Pb vs.
 \item{plot}{logical. Only relevant for datasets with measured
 disequilibrium. If \code{TRUE}, plots the posterior
 distribution of the age and initial activity ratios.}
+
+\item{nsteps}{resolution of the posterior distributions for
+Bayesian credible intervals of disequilibrium-corrected U-Pb
+isochrons}
 
 \item{...}{optional arguments}
 }

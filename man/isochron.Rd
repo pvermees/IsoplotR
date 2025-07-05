@@ -100,6 +100,7 @@ isochron(x, ...)
   omit.stroke = "grey",
   y0option = 1,
   taxis = FALSE,
+  nsteps = NULL,
   ...
 )
 
@@ -625,6 +626,10 @@ activity ratio.}
 inverse isochron with a time scale. Only applies if
 \code{inverse} is \code{TRUE} or, when \code{x} has class
 \code{U-Pb}, if \code{x$format} is 4 or higher.}
+
+\item{nsteps}{resolution of the posterior distributions for
+Bayesian credible intervals of disequilibrium-corrected U-Pb
+isochrons}
 
 \item{inverse}{toggles between normal and inverse isochrons. If the
     isochron plots \code{Y} against \code{X}, and
