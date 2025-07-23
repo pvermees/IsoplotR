@@ -205,6 +205,7 @@ weightedmean <- function(x,...){
 #'     but omitted from the weighted mean calculation.
 #' @param omit.col colour that should be used for the omitted
 #'     aliquots.
+#' @param title add a title to the plot?
 #' @importFrom grDevices rgb
 #' @rdname weightedmean
 #' @export
@@ -214,7 +215,7 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
                                  rect.col=c("#00FF0080","#FF000080"),
                                  outlier.col="#00FFFF80",sigdig=2,
                                  oerr=3,ranked=FALSE,hide=NULL,
-                                 omit=NULL,omit.col=NA,...){
+                                 omit=NULL,omit.col=NA,title=TRUE,...){
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     X <- x[,1]
@@ -236,7 +237,7 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
                           clabel=clabel,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
                           oerr=oerr,ranked=ranked,hide=hide,
-                          omit=omit,omit.col=omit.col,...)
+                          omit=omit,omit.col=omit.col,title=title,...)
     }
     invisible(out)
 }
@@ -652,7 +653,8 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NULL,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,units='',ranked=FALSE,hide=NULL,
-                              omit=NULL,omit.col=NA,caveat=FALSE,...){
+                              omit=NULL,omit.col=NA,
+                              caveat=FALSE,title=TRUE,...){
     NS <- length(X)
     plotit <- (1:NS)%ni%hide
     calcit <- (1:NS)%ni%c(hide,omit)
@@ -703,8 +705,11 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NULL,clabel="",
                        xright=i+0.4,ytop=x[i]+xerr[i],col=col)
     }
     colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
-    graphics::title(wtdmean_title(fit,oerr=oerr,sigdig=sigdig,
-                                  units=units,caveat=caveat))
+    if (title){
+        tit <- wtdmean_title(fit,oerr=oerr,sigdig=sigdig,
+                             units=units,caveat=caveat)
+        graphics::title(tit)
+    }
 }
 
 wtdmean_title <- function(fit,oerr=3,sigdig=2,units='',caveat=FALSE,...){

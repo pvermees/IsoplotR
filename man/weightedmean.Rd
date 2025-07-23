@@ -37,6 +37,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  title = TRUE,
   ...
 )
 
@@ -413,6 +414,8 @@ but omitted from the weighted mean calculation.}
 
 \item{omit.col}{colour that should be used for the omitted
 aliquots.}
+
+\item{title}{add a title to the plot?}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
