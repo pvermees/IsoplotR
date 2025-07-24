@@ -244,12 +244,12 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
 #' @rdname weightedmean
 #' @export
 weightedmean.other <- function(x,from=NA,to=NA,random.effects=FALSE,
-                                 detect.outliers=TRUE,plot=TRUE,
-                                 levels=NULL,clabel="",
-                                 rect.col=c("#00FF0080","#FF000080"),
-                                 outlier.col="#00FFFF80",sigdig=2,
-                                 oerr=3,ranked=FALSE,hide=NULL,
-                                 omit=NULL,omit.col=NA,...){
+                               detect.outliers=TRUE,plot=TRUE,
+                               levels=NULL,clabel="",
+                               rect.col=c("#00FF0080","#FF000080"),
+                               outlier.col="#00FFFF80",sigdig=2,
+                               oerr=3,ranked=FALSE,hide=NULL,
+                               omit=NULL,omit.col=NA,...){
     if (x$format==2) X <- x$x
     else if (x$format==3) X <- x$x[,c(2,3)]
     else stop("Weighted mean plots are not available for this format")
