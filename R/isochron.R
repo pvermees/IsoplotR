@@ -724,7 +724,8 @@ genericisochronplot <- function(x,fit,oerr=3,sigdig=2,show.numbers=FALSE,
 isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          levels=NULL,clabel="",joint=TRUE,
                          ellipse.fill=c("#00FF0080","#FF000080"),
-                         ellipse.stroke='black',type=1,
+                         ellipse.stroke='black',
+                         type=ifelse(x$format<4,2,1),
                          ci.col='gray80',line.col='black',lwd=1,
                          plot=TRUE,title=TRUE,exterr=FALSE,model=1,
                          show.ellipses=1*(model!=2),anchor=0,
@@ -733,7 +734,7 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          taxis=FALSE,nsteps=NULL,...){
     if (x$format<4){
         if (plot){
-            out <- concordia_helper(x,type=2,show.age=model+1,oerr=oerr,
+            out <- concordia_helper(x,type=type,show.age=model+1,oerr=oerr,
                                     sigdig=sigdig,show.numbers=show.numbers,
                                     levels=levels,clabel=clabel,
                                     ellipse.fill=ellipse.fill,
