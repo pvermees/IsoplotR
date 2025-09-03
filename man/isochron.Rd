@@ -84,7 +84,7 @@ isochron(x, ...)
   joint = TRUE,
   ellipse.fill = c("#00FF0080", "#FF000080"),
   ellipse.stroke = "black",
-  type = 1,
+  type = ifelse(x$format < 4, 2, 1),
   ci.col = "gray80",
   line.col = "black",
   lwd = 1,

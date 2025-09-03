@@ -16,6 +16,7 @@ concordia(
   concordia.col = "darksalmon",
   exterr = FALSE,
   show.age = 0,
+  title = TRUE,
   oerr = 3,
   sigdig = 2,
   common.Pb = 0,
@@ -102,6 +103,8 @@ uncertainties are augmented by a factor \eqn{\sqrt{mswd}}.
 \code{4}: fit a discordia line using a modified maximum likelihood
 algorithm that includes accounts for any overdispersion by adding a
 geological (co)variance term.}
+
+\item{title}{add a title to the plot?}
 
 \item{oerr}{indicates whether the analytical uncertainties of the
     output are reported in the plot title as:
