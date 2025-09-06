@@ -1,7 +1,22 @@
-# helper function for isochron() that flips X- and Y- axis and back
-# if necessary to facilitate anchored regression and model-3 fits
-flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
-                    model=1,wtype=0,anchor=0,type='p',...){
+#' helper function for isochron() that flips X- and Y- axis and back
+#' if necessary to facilitate anchored regression and model-3 fits
+#' @param x an IsoplotR data object
+#' @param inverse toggles between normal and inverse isochrons
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the plot.
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from the isochron age calculation.
+#' @param model York (1), TLS (2) or ML with overdispersion (3)
+#' @param wtype controls the parameter responsible for the
+#'     overdispersion in model-3 regression.
+#' @param anchor fix the non-radiogenic composition (1) or intercept
+#'     age (2).
+#' @param ... optional arguments
+#' @noRd
+flipper <- function(x,...){ UseMethod("flipper",x) }
+#' @noRd
+flipper.default <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
+                            model=1,wtype=0,anchor=0,...){
     y0rat <- gety0rat(x)
     DPrat <- getDPrat(x)
     yd <- data2york(x,inverse=inverse)
@@ -11,15 +26,15 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         fit <- regression(d2calc,model=model)
     } else if (anchor[1]==1){
         wtype <- 1 # override
-        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
         anchor[2:3] <- iratio(y0rat)
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
     } else if (anchor[1]==2){
         wtype <- 2 # override
-        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
         if (is.null(DPrat)){
             DP <- anchor[2:3]
         } else {
@@ -33,12 +48,12 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
             fit <- MLyork(d2calc,anchor=anchor,model=model)
         }
     } else if (wtype==1){
-        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else if (wtype==2){
-        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")
@@ -47,13 +62,74 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
     out <- list()
     out$flippedfit <- fit
     if (ifi[3]){
-        fit <- invertfit(fit,type=type,wtype=wtype)
+        fit <- invertfit(fit,type='p',wtype=wtype)
     }
     if (ifi[2]){
         fit <- unflipfit(fit)
     }
     if (ifi[1]){
-        fit <- invertfit(fit,type=type,wtype=wtype)
+        fit <- invertfit(fit,type='p',wtype=wtype)
+    }
+    out$wtype <- wtype
+    out <- append(out,fit)
+    out$xyz <- yd
+    out
+}
+#' @noRd
+flipper.PbPb <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
+                         model=1,wtype=0,anchor=0,...){
+    y0rat <- gety0rat(x)
+    DPrat <- getDPrat(x)
+    yd <- data2york(x,inverse=inverse)
+    if (model<3 & anchor[1]<1){
+        ifi <- rep(FALSE,3)
+        d2calc <- clear(yd,hide,omit)
+        fit <- regression(d2calc,model=model)
+    } else if (anchor[1]==1){
+        wtype <- 1 # override
+        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
+        anchor[2:3] <- iratio(y0rat)
+        if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
+        else fit <- MLyork(d2calc,anchor=anchor,model=model)
+    } else if (anchor[1]==2){
+        wtype <- 2 # override
+        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
+        if (is.null(DPrat)){
+            DP <- anchor[2:3]
+        } else {
+            st <- ifelse(length(anchor)<3,0,anchor[3])
+            DP <- age2ratio(tt=anchor[2],st=st,ratio=DPrat,...)
+        }
+        if (model<2){
+            fit <- anchoredYork(d2calc,y0=DP[1],sy0=DP[2])
+        } else {
+            anchor <- c(1,DP)
+            fit <- MLyork(d2calc,anchor=anchor,model=model)
+        }
+    } else if (wtype==1){
+        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
+        fit <- MLyork(d2calc,model=model,wtype='a')
+    } else if (wtype==2){
+        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
+        fit <- MLyork(d2calc,model=model,wtype='a')
+    } else {
+        stop("Invalid anchor and/or wtype value.")
+    }
+    fit$anchor <- anchor
+    out <- list()
+    out$flippedfit <- fit
+    if (ifi[3]){
+        fit <- invertfit(fit,type='d',wtype=wtype)
+    }
+    if (ifi[2]){
+        fit <- unflipfit(fit)
+    }
+    if (ifi[1]){
+        fit <- invertfit(fit,type='d',wtype=wtype)
     }
     out$wtype <- wtype
     out <- append(out,fit)
