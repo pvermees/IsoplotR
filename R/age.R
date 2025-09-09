@@ -483,6 +483,9 @@ add_exterr <- function(x,tt,st,cutoff.76=1100,type=4){
             R <- age_to_Pb207Pb206_ratio(tt,st,d=md)
             out <- get_Pb207Pb206_age(R[1],R[2],d=md,exterr=TRUE)
         }
+    } else if (is.ThPb(x)){
+        R <- age_to_Pb208Th232_ratio(tt,st)
+        out <- get_Pb208Th232_age(R[1],R[2],exterr=TRUE)
     } else if (is.PbPb(x)){
         R <- age_to_Pb207Pb206_ratio(tt,st)
         out <- get_Pb207Pb206_age(R[1],R[2],exterr=TRUE)
