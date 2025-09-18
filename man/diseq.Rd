@@ -10,7 +10,7 @@ diseq(
   ThU = list(x = 1, sx = 0, option = 0, m = 0, M = 20, x0 = 1, sd = 10),
   RaU = list(x = 1, sx = 0, option = 0, m = 0, M = 20, x0 = 1, sd = 10),
   PaU = list(x = 1, sx = 0, option = 0, m = 0, M = 20, x0 = 1, sd = 10),
-  buffer = 0.00001
+  buffer = 1e-05
 )
 }
 \arguments{

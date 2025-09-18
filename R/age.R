@@ -377,9 +377,9 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NULL,oerr=1,sigdig=NA,...
 age.fissiontracks <- function(x,central=FALSE,pooled=FALSE,i=NULL,
                               oerr=1,sigdig=NA,exterr=FALSE,...){
     if (pooled){
-        out <- pooled_age(x)
+        out <- pooled_age(x,exterr=exterr)
     } else if (central){
-        out <- central(x)
+        out <- central(x,exterr=exterr)
     } else {
         tst <- fissiontrack_age(x,i=i,exterr=exterr)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
