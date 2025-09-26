@@ -7,16 +7,16 @@
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from the isochron age calculation.
 #' @param model York (1), TLS (2) or ML with overdispersion (3)
+#' @param type either 'p' for 'parent-daughter isochron' or 'd' for
+#'     'daughter-daughter isochron' (i.e., Pb-Pb).
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
 #' @param anchor fix the non-radiogenic composition (1) or intercept
 #'     age (2).
 #' @param ... optional arguments
 #' @noRd
-flipper <- function(x,...){ UseMethod("flipper",x) }
-#' @noRd
-flipper.default <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
-                            model=1,wtype=0,anchor=0,...){
+flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
+                    model=1,type='p',wtype=0,anchor=0,...){
     y0rat <- gety0rat(x)
     DPrat <- getDPrat(x)
     yd <- data2york(x,inverse=inverse)
@@ -26,15 +26,29 @@ flipper.default <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         fit <- regression(d2calc,model=model)
     } else if (anchor[1]==1){
         wtype <- 1 # override
-        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
-        anchor[2:3] <- iratio(y0rat)
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
+        anchor[2:3] <- iratio(y0rat[1])
+        if (type=='d'){ # shift left by Pb206Pb204c
+            anchor[4:5] <- iratio(y0rat[2])
+            d2calc[,'X'] <- d2calc[,'X'] - anchor[4]
+        }
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
+        if (type=='d'){ # shift right by Pb206Pb204c
+            fit$a[1] <- fit$a[1] - fit$b[1]*anchor[4]
+            J <- rbind(c(1,-anchor[4]),c(0,1))
+            E <- rbind(c(fit$a[2]^2,fit$cov.ab),
+                       c(fit$cov.ab,fit$b[2]^2))
+            covmat <- J %*% E %*% t(J)
+            fit$a[2] <- sqrt(covmat[1,1])
+            fit$b[2] <- sqrt(covmat[2,2])
+            fit$cov.ab <- covmat[1,2]
+        }
     } else if (anchor[1]==2){
         wtype <- 2 # override
-        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         if (is.null(DPrat)){
             DP <- anchor[2:3]
         } else {
@@ -48,12 +62,12 @@ flipper.default <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
             fit <- MLyork(d2calc,anchor=anchor,model=model)
         }
     } else if (wtype==1){
-        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else if (wtype==2){
-        ifi <- get_ifi(wtype=wtype,type='p',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='p',hide=hide,omit=omit)
+        ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
+        d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
     } else {
         stop("Invalid anchor and/or wtype value.")
@@ -62,74 +76,13 @@ flipper.default <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
     out <- list()
     out$flippedfit <- fit
     if (ifi[3]){
-        fit <- invertfit(fit,type='p',wtype=wtype)
+        fit <- invertfit(fit,type=type,wtype=wtype)
     }
     if (ifi[2]){
         fit <- unflipfit(fit)
     }
     if (ifi[1]){
-        fit <- invertfit(fit,type='p',wtype=wtype)
-    }
-    out$wtype <- wtype
-    out <- append(out,fit)
-    out$xyz <- yd
-    out
-}
-#' @noRd
-flipper.PbPb <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
-                         model=1,wtype=0,anchor=0,...){
-    y0rat <- gety0rat(x)
-    DPrat <- getDPrat(x)
-    yd <- data2york(x,inverse=inverse)
-    if (model<3 & anchor[1]<1){
-        ifi <- rep(FALSE,3)
-        d2calc <- clear(yd,hide,omit)
-        fit <- regression(d2calc,model=model)
-    } else if (anchor[1]==1){
-        wtype <- 1 # override
-        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
-        anchor[2:3] <- iratio(y0rat)
-        if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
-        else fit <- MLyork(d2calc,anchor=anchor,model=model)
-    } else if (anchor[1]==2){
-        wtype <- 2 # override
-        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
-        if (is.null(DPrat)){
-            DP <- anchor[2:3]
-        } else {
-            st <- ifelse(length(anchor)<3,0,anchor[3])
-            DP <- age2ratio(tt=anchor[2],st=st,ratio=DPrat,...)
-        }
-        if (model<2){
-            fit <- anchoredYork(d2calc,y0=DP[1],sy0=DP[2])
-        } else {
-            anchor <- c(1,DP)
-            fit <- MLyork(d2calc,anchor=anchor,model=model)
-        }
-    } else if (wtype==1){
-        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
-        fit <- MLyork(d2calc,model=model,wtype='a')
-    } else if (wtype==2){
-        ifi <- get_ifi(wtype=wtype,type='d',inverse=inverse)
-        d2calc <- flipinvert(yd=yd,ifi=ifi,type='d',hide=hide,omit=omit)
-        fit <- MLyork(d2calc,model=model,wtype='a')
-    } else {
-        stop("Invalid anchor and/or wtype value.")
-    }
-    fit$anchor <- anchor
-    out <- list()
-    out$flippedfit <- fit
-    if (ifi[3]){
-        fit <- invertfit(fit,type='d',wtype=wtype)
-    }
-    if (ifi[2]){
-        fit <- unflipfit(fit)
-    }
-    if (ifi[1]){
-        fit <- invertfit(fit,type='d',wtype=wtype)
+        fit <- invertfit(fit,type=type,wtype=wtype)
     }
     out$wtype <- wtype
     out <- append(out,fit)
@@ -238,6 +191,8 @@ anchoredYork <- function(x,y0=0,sy0=0){
 #' chronometer
 #' @param x an IsoplotR data object
 #' @param ... optional arguments
+#' @return a string, except if \code{x} has class \code{PbPb}, in
+#'     which case the function returns a vector of two strings
 #' @noRd
 gety0rat <- function(x,...){ UseMethod("gety0rat",x) }
 #' @noRd
@@ -245,9 +200,9 @@ gety0rat.default <- function(x,...){ NULL }
 #' @noRd
 gety0rat.ArAr <- function(x,...){ 'Ar40Ar36' }
 #' @noRd
-gety0rat.PbPb <- function(x,...){ 'Pb207Pb204' }
-#' @noRd
 gety0rat.ThPb <- function(x,...){ 'Pb208Pb204' }
+#' @noRd
+gety0rat.PbPb <- function(x,...){ c('Pb207Pb204','Pb206Pb204') }
 #' @noRd
 gety0rat.KCa <- function(x,...){ paste0('Ca40Ca',x$sister) }
 #' @noRd
