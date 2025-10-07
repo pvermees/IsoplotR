@@ -335,7 +335,7 @@ pooled_age <- function(x,exterr=FALSE){
         A <- sum(x$A)
         UsU <- get_UsU(x)
         Uhat <- sum(x$A*UsU[,'U'])/A
-        sUhat <- sqrt(sum((x$A*UsU[,'sU']^2)))/A
+        sUhat <- sqrt(sum((x$A*UsU[,'sU'])^2))/A
         UsUhat <- cbind(U=Uhat,sU=sUhat)
         out <- get_ICP_age(Ns,A,UsUhat,zeta)
     }
