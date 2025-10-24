@@ -2,7 +2,7 @@
 #'
 #' @description A list of documented functions may be viewed by typing
 #'     \code{help(package='IsoplotR')}.  Detailed instructions are
-#'     provided at \url{https://www.ucl.ac.uk/~ucfbpve/isoplotr/}. Further
+#'     provided at \url{https://isoplotr.es.ucl.ac.uk/}. Further
 #'     details about the theoretical background are provided by
 #'     Vermeesch (2018).
 #'
