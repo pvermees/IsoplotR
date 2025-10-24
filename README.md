@@ -43,15 +43,15 @@ isochron(RbSr)
 
 ## Further information
 
-See [https://isoplotr.london-geochron.com](https://www.ucl.ac.uk/~ucfbpve/isoplotr/)
+See [https://isoplotr.es.ucl.ac.uk/home/index.html](https://isoplotr.es.ucl.ac.uk/home/index.html)
 
 [Vermeesch, P., 2018, IsoplotR: a free and open toolbox for
 geochronology. Geoscience Frontiers, v.9, p.1479-1493, doi:
-10.1016/j.gsf.2018.04.001.](https://www.ucl.ac.uk/~ucfbpve/papers/VermeeschGSF2018/)
+10.1016/j.gsf.2018.04.001.](https://pieter-vermeesch.es.ucl.ac.uk/papers/VermeeschGSF2018/)
 
 ## Author
 
-[Pieter Vermeesch](https://www.ucl.ac.uk/~ucfbpve/)
+[Pieter Vermeesch](https://pieter-vermeesch.es.ucl.ac.uk)
 
 ## License
 
