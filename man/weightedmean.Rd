@@ -38,9 +38,7 @@ weightedmean(x, ...)
   omit = NULL,
   omit.col = NA,
   title = TRUE,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -61,9 +59,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -89,9 +85,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -114,9 +108,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -138,9 +130,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -163,9 +153,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -188,9 +176,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -213,9 +199,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -238,9 +222,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -263,9 +245,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  extra = function() {
- },
-  addcolourbar = TRUE,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -288,9 +268,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -313,9 +291,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -336,9 +312,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -360,9 +334,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 }
@@ -459,11 +431,8 @@ aliquots.}
 
 \item{title}{add a title to the plot?}
 
-\item{addcolourbar}{add a colour bar to display the colours used to
-\code{levels}}
-
-\item{extra}{function with additional intructions to be carried out
-in the main plot window, such as text annotations.}
+\item{show.colourbar}{add a colour bar to display the colours
+assigned to \code{levels}}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the

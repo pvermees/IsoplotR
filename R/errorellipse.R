@@ -113,8 +113,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
-#' @param addcolourbar add a colour bar to display the colours used to
-#'     \code{levels}
+#' @param show.colourbar add a colour bar to display the colours
+#'     assigned to \code{levels}
 #' @param bg background colour for the plot symbols (only used if
 #'     \code{show.ellipses=0}).
 #' @param cex plot symbol magnification.
@@ -132,8 +132,6 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     \code{inverse=TRUE}.
 #' @param box logical. If \code{TRUE}, draws a frame around the plot.
 #' @param xaxt see \code{?par}
-#' @param extra function with extra intructions to be carried out in
-#'     the main plot window, such as text annotations.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -152,11 +150,10 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         ellipse.stroke="black",fit=NULL,add=FALSE,
                         empty=FALSE,ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
-                        omit.stroke="grey",addcolourbar=TRUE,
+                        omit.stroke="grey",show.colourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
                         asp=NA,log='',taxis=FALSE,box=!taxis,
-                        xaxt=ifelse(taxis,'n','s'),
-                        extra=function(){},...){
+                        xaxt=ifelse(taxis,'n','s'),...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -252,8 +249,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     } else {
         # blank plot
     }
-    extra()
-    if (!is.null(levels) & addcolourbar){
+    if (!is.null(levels) & show.colourbar){
         colourbar(z=levels[calcit],fill=ellipse.fill,
                   stroke=ellipse.stroke,clabel=clabel)
     }

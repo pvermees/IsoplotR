@@ -230,6 +230,8 @@
 #'
 #' \code{2}: error crosses
 #'
+#' any other value results in a blank plot
+#'
 #' @param xlab text label for the horizontal plot axis
 #' 
 #' @param hide vector with indices of aliquots that should be removed

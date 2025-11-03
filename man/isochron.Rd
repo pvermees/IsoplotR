@@ -527,7 +527,9 @@ concordia line at an age equal to \code{anchor[2]}.}
 
 \code{1}: error ellipses
 
-\code{2}: error crosses}
+\code{2}: error crosses
+
+any other value results in a blank plot}
 
 \item{hide}{vector with indices of aliquots that should be removed
 from the plot.}

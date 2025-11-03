@@ -23,7 +23,7 @@ scatterplot(
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
-  addcolourbar = TRUE,
+  show.colourbar = TRUE,
   bg,
   cex,
   xlim = NULL,
@@ -35,8 +35,6 @@ scatterplot(
   taxis = FALSE,
   box = !taxis,
   xaxt = ifelse(taxis, "n", "s"),
-  extra = function() {
- },
   ...
 )
 }
@@ -129,8 +127,8 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{addcolourbar}{add a colour bar to display the colours used to
-\code{levels}}
+\item{show.colourbar}{add a colour bar to display the colours
+assigned to \code{levels}}
 
 \item{bg}{background colour for the plot symbols (only used if
 \code{show.ellipses=0}).}
@@ -159,9 +157,6 @@ inverse isochron with a time scale. Only used if
 \item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
 
 \item{xaxt}{see \code{?par}}
-
-\item{extra}{function with extra intructions to be carried out in
-the main plot window, such as text annotations.}
 
 \item{...}{optional arguments to format the points and text.}
 }

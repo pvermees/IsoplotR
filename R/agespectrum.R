@@ -101,10 +101,8 @@
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from age plateau calculation
 #' @param title add a title to the plot?
-#' @param addcolourbar add a colour bar to display the colours used to
-#'     \code{levels}
-#' @param extra function with additional intructions to be carried out
-#'     in the main plot window, such as text annotations.
+#' @param show.colourbar add a colour bar to display the colours
+#'     assigned to \code{levels}
 #' @param ... optional parameters to the generic \code{plot} function
 #'
 #' @return
@@ -135,8 +133,7 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                                 sigdig=2,line.col='red',lwd=2,
                                 xlab='cumulative fraction',
                                 ylab='X',hide=NULL,omit=NULL,
-                                title=TRUE,addcolourbar=TRUE,
-                                extra=function(){},...){
+                                title=TRUE,show.colourbar=TRUE,...){
     XY <- plot_spectrum_axes(x=x,oerr=oerr,xlab=xlab,
                              ylab=ylab,hide=hide,...)
     pc <- get_plateau_colours(x=x,levels=levels,plateau=plateau,
@@ -150,8 +147,8 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
             graphics::title(tit)
         }
     }
-    plot_spectrum(XY=XY,col=pc$col,extra=extra,...)
-    if (addcolourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
+    plot_spectrum(XY=XY,col=pc$col,...)
+    if (show.colourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
 #' @rdname agespectrum
@@ -163,16 +160,14 @@ agespectrum.other <- function(x,oerr=3,plateau=TRUE,
                               sigdig=2,line.col='red',lwd=2,
                               xlab='cumulative fraction',
                               ylab='X',hide=NULL,omit=NULL,
-                              addcolourbar=TRUE,
-                              extra=function(){},...){
+                              show.colourbar=TRUE,...){
     if (x$format==3) X <- x$x
     else stop("Age spectrum plots are not available for this format")
     agespectrum.default(X,oerr=oerr,plateau=plateau,random.effects=random.effects,
                         levels=levels,clabel=clabel,plateau.col=plateau.col,
                         non.plateau.col=non.plateau.col,sigdig=sigdig,
                         line.col=line.col,lwd=lwd,xlab=xlab,ylab=ylab,
-                        hide=hide,omit=omit,addcolourbar=addcolourbar,
-                        extra=extra,...)
+                        hide=hide,omit=omit,show.colourbar=show.colourbar,...)
 }
 
 #' @param i2i `isochron to intercept': calculates the initial (aka
@@ -197,8 +192,7 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
                              exterr=FALSE,line.col='red',lwd=2,
                              xlab=expression("cumulative "^39*"Ar fraction"),
                              ylab="age [Ma]",i2i=FALSE,hide=NULL,
-                             omit=NULL,title=TRUE,addcolourbar=TRUE,
-                             extra=function(){},...){
+                             omit=NULL,title=TRUE,show.colourbar=TRUE,...){
     tt <- ArAr_age(x,exterr=FALSE,i2i=i2i,omit4c=unique(c(hide,omit)))
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
     XY <- plot_spectrum_axes(x=X,oerr=oerr,xlab=xlab,ylab=ylab,hide=hide,...)
@@ -215,8 +209,8 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
             graphics::title(tit)
         }
     }
-    plot_spectrum(XY=XY,col=pc$col,extra=extra,...)
-    if (addcolourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
+    plot_spectrum(XY=XY,col=pc$col,...)
+    if (show.colourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
 
@@ -258,13 +252,12 @@ get_plateau_colours <- function(x,levels=NULL,plateau=TRUE,hide=NULL,omit=NULL,
     }
     list(col=colour,plat=plat)
 }
-plot_spectrum <- function(XY,col,extra=function(){}){
+plot_spectrum <- function(XY,col){
     ns <- length(XY$X)
     for (i in 1:ns){
         graphics::rect(XY$X[i],XY$Yl[i],XY$X[i+1],XY$Yu[i],col=col[i])
         if (i<ns) graphics::lines(rep(XY$X[i+1],2),c(XY$Yl[i],XY$Yu[i+1]))
     }
-    extra()
 }
 plot_plateau <- function(fit,line.col='red',lwd=2){
     ci.exterr <- fit$plotpar$ci.exterr

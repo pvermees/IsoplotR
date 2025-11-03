@@ -24,9 +24,7 @@ helioplot(
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 }
@@ -137,11 +135,8 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{addcolourbar}{add a colour bar to display the colours used to
-\code{levels}}
-
-\item{extra}{function with additional intructions to be carried out
-in the main plot window, such as text annotations.}
+\item{show.colourbar}{add a colour bar to display the colours
+assigned to \code{levels}}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

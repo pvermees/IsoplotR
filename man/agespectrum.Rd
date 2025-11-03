@@ -26,9 +26,7 @@ agespectrum(x, ...)
   hide = NULL,
   omit = NULL,
   title = TRUE,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -48,9 +46,7 @@ agespectrum(x, ...)
   ylab = "X",
   hide = NULL,
   omit = NULL,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 
@@ -73,9 +69,7 @@ agespectrum(x, ...)
   hide = NULL,
   omit = NULL,
   title = TRUE,
-  addcolourbar = TRUE,
-  extra = function() {
- },
+  show.colourbar = TRUE,
   ...
 )
 }
@@ -170,11 +164,8 @@ but omitted from age plateau calculation}
 
 \item{title}{add a title to the plot?}
 
-\item{addcolourbar}{add a colour bar to display the colours used to
-\code{levels}}
-
-\item{extra}{function with additional intructions to be carried out
-in the main plot window, such as text annotations.}
+\item{show.colourbar}{add a colour bar to display the colours
+assigned to \code{levels}}
 
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}

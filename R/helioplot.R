@@ -146,10 +146,8 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
-#' @param addcolourbar add a colour bar to display the colours used to
-#'     \code{levels}
-#' @param extra function with additional intructions to be carried out
-#'     in the main plot window, such as text annotations.
+#' @param show.colourbar add a colour bar to display the colours
+#'     assigned to \code{levels}
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
 #' @references Aitchison, J., 1986, The statistical analysis of
@@ -173,7 +171,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
                       omit.fill=NA,omit.stroke='grey',
-                      addcolourbar=TRUE,extra=function(){},...){
+                      show.colourbar=TRUE,...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
@@ -220,8 +218,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
     }
     fit$n <- length(which(calcit))
     graphics::title(helioplot_title(fit,sigdig=sigdig,oerr=oerr))
-    extra()
-    if (addcolourbar){
+    if (show.colourbar){
         colourbar(z=levels[calcit],fill=ellipse.fill,
                   stroke=ellipse.stroke,clabel=clabel)
     }
