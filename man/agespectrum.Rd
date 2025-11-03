@@ -25,6 +25,10 @@ agespectrum(x, ...)
   ylab = "X",
   hide = NULL,
   omit = NULL,
+  title = TRUE,
+  addcolourbar = TRUE,
+  extra = function() {
+ },
   ...
 )
 
@@ -44,6 +48,9 @@ agespectrum(x, ...)
   ylab = "X",
   hide = NULL,
   omit = NULL,
+  addcolourbar = TRUE,
+  extra = function() {
+ },
   ...
 )
 
@@ -60,9 +67,15 @@ agespectrum(x, ...)
   exterr = FALSE,
   line.col = "red",
   lwd = 2,
+  xlab = expression("cumulative "^39 * "Ar fraction"),
+  ylab = "age [Ma]",
   i2i = FALSE,
   hide = NULL,
   omit = NULL,
+  title = TRUE,
+  addcolourbar = TRUE,
+  extra = function() {
+ },
   ...
 )
 }
@@ -154,6 +167,14 @@ from the plot.}
 
 \item{omit}{vector with indices of aliquots that should be plotted
 but omitted from age plateau calculation}
+
+\item{title}{add a title to the plot?}
+
+\item{addcolourbar}{add a colour bar to display the colours used to
+\code{levels}}
+
+\item{extra}{function with additional intructions to be carried out
+in the main plot window, such as text annotations.}
 
 \item{exterr}{propagate the external (decay constant and
 calibration factor) uncertainties?}

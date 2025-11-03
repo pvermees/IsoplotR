@@ -196,8 +196,8 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{extra}{function with extra intructions to be carried out in
-the main plot window, such as text annotations.}
+\item{extra}{function with additional intructions to be carried out
+in the main plot window, such as text annotations.}
 
 \item{...}{optional arguments passed on to
 \code{\link{scatterplot}}}

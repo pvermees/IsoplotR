@@ -24,6 +24,9 @@ helioplot(
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  addcolourbar = TRUE,
+  extra = function() {
+ },
   ...
 )
 }
@@ -134,7 +137,16 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
+\item{addcolourbar}{add a colour bar to display the colours used to
+\code{levels}}
+
+\item{extra}{function with additional intructions to be carried out
+in the main plot window, such as text annotations.}
+
 \item{...}{optional arguments to the generic \code{plot} function}
+}
+\value{
+the output of \code{central.UThHe}
 }
 \description{
 Plot U-Th(-Sm)-He data on a (log[He/Th] vs. log[U/He]) logratio

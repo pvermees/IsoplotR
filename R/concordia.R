@@ -193,8 +193,8 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
-#' @param extra function with extra intructions to be carried out in
-#'     the main plot window, such as text annotations.
+#' @param extra function with additional intructions to be carried out
+#'     in the main plot window, such as text annotations.
 #' @param ... optional arguments passed on to
 #'     \code{\link{scatterplot}}
 #'

@@ -88,6 +88,10 @@
 #'     if \code{FALSE}, attributes any excess dispersion to an
 #'     underestimation of the analytical uncertainties. This akin to a
 #'     `model-1' isochron regression.
+#' @param addcolourbar add a colour bar to display the colours used to
+#'     \code{levels}
+#' @param extra function with additional intructions to be carried out
+#'     in the main plot window, such as text annotations.
 #' @param ... optional arguments
 #' @seealso \code{\link{central}}
 #' 
@@ -215,7 +219,8 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
                                  rect.col=c("#00FF0080","#FF000080"),
                                  outlier.col="#00FFFF80",sigdig=2,
                                  oerr=3,ranked=FALSE,hide=NULL,
-                                 omit=NULL,omit.col=NA,title=TRUE,...){
+                                 omit=NULL,omit.col=NA,title=TRUE,
+                                 addcolourbar=TRUE,extra=function(){},...){
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     X <- x[,1]
@@ -237,7 +242,8 @@ weightedmean.default <- function(x,from=NA,to=NA,random.effects=FALSE,
                           clabel=clabel,rect.col=rect.col,
                           outlier.col=outlier.col,sigdig=sigdig,
                           oerr=oerr,ranked=ranked,hide=hide,
-                          omit=omit,omit.col=omit.col,title=title,...)
+                          omit=omit,omit.col=omit.col,title=title,
+                          addcolourbar=addcolourbar,extra=extra,...)
     }
     invisible(out)
 }
@@ -249,7 +255,9 @@ weightedmean.other <- function(x,from=NA,to=NA,random.effects=FALSE,
                                rect.col=c("#00FF0080","#FF000080"),
                                outlier.col="#00FFFF80",sigdig=2,
                                oerr=3,ranked=FALSE,hide=NULL,
-                               omit=NULL,omit.col=NA,...){
+                               omit=NULL,omit.col=NA,
+                               addcolourbar=TRUE,
+                               extra=function(){},...){
     if (x$format==2) X <- x$x
     else if (x$format==3) X <- x$x[,c(2,3)]
     else stop("Weighted mean plots are not available for this format")
@@ -258,7 +266,9 @@ weightedmean.other <- function(x,from=NA,to=NA,random.effects=FALSE,
                          levels=levels,clabel=clabel,rect.col=rect.col,
                          outlier.col=outlier.col,sigdig=sigdig,
                          oerr=oerr,ranked=ranked,hide=hide,
-                         omit=omit,omit.col=omit.col,...)
+                         omit=omit,omit.col=omit.col,
+                         addcolourbar=addcolourbar,
+                         extra=extra,...)
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -319,7 +329,9 @@ weightedmean.UPb <- function(x,random.effects=FALSE,
                              outlier.col="#00FFFF80",sigdig=2,type=4,
                              cutoff.76=1100,oerr=3,cutoff.disc=discfilter(),
                              exterr=FALSE,ranked=FALSE,common.Pb=0,
-                             hide=NULL,omit=NULL,omit.col=NA,...){
+                             hide=NULL,omit=NULL,omit.col=NA,
+                             addcolourbar=TRUE,
+                             extra=function(){},...){
     # override type if necessary:
     if (x$format%in%c(9,11)) type <- 2
     if (x$format%in%c(10,12)) type <- 1
@@ -331,7 +343,8 @@ weightedmean.UPb <- function(x,random.effects=FALSE,
                         cutoff.disc=cutoff.disc,sigdig=sigdig,
                         oerr=oerr,exterr=exterr,units=' Ma',
                         ranked=ranked,hide=hide,omit=omit,
-                        omit.col=omit.col,common.Pb=common.Pb,...)
+                        omit.col=omit.col,common.Pb=common.Pb,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -342,14 +355,16 @@ weightedmean.PbPb <- function(x,random.effects=FALSE,
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,exterr=FALSE,common.Pb=2,
                               ranked=FALSE,hide=NULL,omit=NULL,
-                              omit.col=NA,...){
+                              omit.col=NA,addcolourbar=TRUE,
+                              extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
                         units=' Ma',ranked=ranked,hide=hide,omit=omit,
-                        omit.col=omit.col,common.Pb=common.Pb,...)
+                        omit.col=omit.col,common.Pb=common.Pb,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @param i2i `isochron to intercept': calculates the initial
 #' (aka `inherited', `excess', or `common') \eqn{^{40}}Ar/\eqn{^{36}}Ar,
@@ -392,14 +407,17 @@ weightedmean.ThU <- function(x,random.effects=FALSE,
                              rect.col=c("#00FF0080","#FF000080"),
                              outlier.col="#00FFFF80",sigdig=2,
                              oerr=3,ranked=FALSE,Th0i=0,hide=NULL,
-                             omit=NULL,omit.col=NA,...){
+                             omit=NULL,omit.col=NA,
+                             addcolourbar=TRUE,
+                             extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,ranked=ranked,
                         Th0i=Th0i,units=' ka',hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -409,14 +427,17 @@ weightedmean.ArAr <- function(x,random.effects=FALSE,
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,exterr=FALSE,ranked=FALSE,i2i=FALSE,
-                              hide=NULL,omit=NULL,omit.col=NA,...){
+                              hide=NULL,omit=NULL,omit.col=NA,
+                              addcolourbar=TRUE,
+                              extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,i2i=i2i,
                         units=' Ma',ranked=ranked,hide=hide,omit=omit,
-                        omit.col=omit.col,...)
+                        omit.col=omit.col,addcolourbar=addcolourbar,
+                        extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -426,14 +447,17 @@ weightedmean.KCa <- function(x,random.effects=FALSE,
                              rect.col=c("#00FF0080","#FF000080"),
                              outlier.col="#00FFFF80",sigdig=2,
                              oerr=3,exterr=FALSE,ranked=FALSE,i2i=FALSE,
-                             hide=NULL,omit=NULL,omit.col=NA,...){
+                             hide=NULL,omit=NULL,omit.col=NA,
+                             addcolourbar=TRUE,
+                             extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
                         i2i=i2i,units=' Ma',ranked=ranked,hide=NULL,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -443,14 +467,17 @@ weightedmean.ThPb <- function(x,random.effects=FALSE,
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,exterr=FALSE,ranked=FALSE,i2i=TRUE,
-                              hide=NULL,omit=NULL,omit.col=NA,...){
+                              hide=NULL,omit=NULL,omit.col=NA,
+                              addcolourbar=TRUE,
+                              extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig, oerr=oerr,exterr=exterr,
                         i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -460,14 +487,17 @@ weightedmean.ReOs <- function(x,random.effects=FALSE,
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,exterr=FALSE,ranked=FALSE,i2i=TRUE,
-                              hide=NULL,omit=NULL,omit.col=NA,...){
+                              hide=NULL,omit=NULL,omit.col=NA,
+                              addcolourbar=TRUE,
+                              extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
                         i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -477,14 +507,16 @@ weightedmean.SmNd <- function(x,random.effects=FALSE,
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,exterr=FALSE,ranked=FALSE,
-                              i2i=TRUE,hide=NULL,omit=NULL,omit.col=NA,...){
+                              i2i=TRUE,hide=NULL,omit=NULL,omit.col=NA,
+                              extra=function(){},addcolourbar=TRUE,...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
                         i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -494,14 +526,17 @@ weightedmean.RbSr <- function(x,random.effects=FALSE,
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,exterr=FALSE,i2i=TRUE,ranked=FALSE,
-                              hide=NULL,omit=NULL,omit.col=NA,...){
+                              hide=NULL,omit=NULL,omit.col=NA,
+                              addcolourbar=TRUE,
+                              extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
                         i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -511,14 +546,17 @@ weightedmean.LuHf <- function(x,random.effects=FALSE,
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,exterr=FALSE,i2i=TRUE,ranked=FALSE,
-                              hide=NULL,omit=NULL,omit.col=NA,...){
+                              hide=NULL,omit=NULL,omit.col=NA,
+                              addcolourbar=TRUE,
+                              extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
                         i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -528,14 +566,17 @@ weightedmean.UThHe <- function(x,random.effects=FALSE,
                                rect.col=c("#00FF0080","#FF000080"),
                                outlier.col="#00FFFF80",sigdig=2,
                                oerr=3,ranked=FALSE,hide=NULL,
-                               omit=NULL,omit.col=NA,...){
+                               omit=NULL,omit.col=NA,
+                               addcolourbar=TRUE,
+                               extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=FALSE,
                         units=' Ma',ranked=ranked,hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 #' @rdname weightedmean
 #' @export
@@ -545,14 +586,17 @@ weightedmean.fissiontracks <- function(x,random.effects=FALSE,
                                        rect.col=c("#00FF0080","#FF000080"),
                                        outlier.col="#00FFFF80",
                                        sigdig=2,oerr=3,exterr=FALSE,ranked=FALSE,
-                                       hide=NULL,omit=NULL,omit.col=NA,...){
+                                       hide=NULL,omit=NULL,omit.col=NA,
+                                       addcolourbar=TRUE,
+                                       extra=function(){},...){
     weightedmean_helper(x,random.effects=random.effects,
                         detect.outliers=detect.outliers,plot=plot,
                         from=from,to=to,levels=levels,clabel=clabel,
                         rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
                         units=' Ma',ranked=ranked,hide=hide,
-                        omit=omit,omit.col=omit.col,...)
+                        omit=omit,omit.col=omit.col,
+                        addcolourbar=addcolourbar,extra=extra,...)
 }
 weightedmean_helper <- function(x,random.effects=FALSE,
                                 detect.outliers=TRUE,plot=TRUE,
@@ -562,7 +606,9 @@ weightedmean_helper <- function(x,random.effects=FALSE,
                                 cutoff.76=1100,cutoff.disc=discfilter(),
                                 sigdig=2,oerr=3,exterr=FALSE,ranked=FALSE,
                                 i2i=FALSE,common.Pb=1,units='',Th0i=0,
-                                hide=NULL,omit=NULL,omit.col=NA,...){
+                                hide=NULL,omit=NULL,omit.col=NA,
+                                addcolourbar=TRUE,
+                                extra=function(){},...){
     tt <- get_ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,omit4c=unique(c(hide,omit)),
                    common.Pb=common.Pb,Th0i=Th0i)
@@ -579,7 +625,8 @@ weightedmean_helper <- function(x,random.effects=FALSE,
                           rect.col=rect.col,outlier.col=outlier.col,
                           sigdig=sigdig,oerr=oerr,units=units,
                           ranked=ranked,hide=hide,omit=omit,omit.col=omit.col,
-                          caveat=(i2i|common.Pb==2|Th0i==1),...)
+                          caveat=(i2i|common.Pb==2|Th0i==1),
+                          addcolourbar=addcolourbar,extra=extra,...)
     }
     invisible(out)
 }
@@ -653,8 +700,9 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NULL,clabel="",
                               rect.col=c("#00FF0080","#FF000080"),
                               outlier.col="#00FFFF80",sigdig=2,
                               oerr=3,units='',ranked=FALSE,hide=NULL,
-                              omit=NULL,omit.col=NA,
-                              caveat=FALSE,title=TRUE,...){
+                              omit=NULL,omit.col=NA,caveat=FALSE,
+                              title=TRUE,addcolourbar=TRUE,
+                              extra=function(){},...){
     NS <- length(X)
     plotit <- (1:NS)%ni%hide
     calcit <- (1:NS)%ni%c(hide,omit)
@@ -704,11 +752,14 @@ plot_weightedmean <- function(X,sX,fit,from=NA,to=NA,levels=NULL,clabel="",
         graphics::rect(xleft=i-0.4,ybottom=x[i]-xerr[i],
                        xright=i+0.4,ytop=x[i]+xerr[i],col=col)
     }
-    colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
     if (title){
         tit <- wtdmean_title(fit,oerr=oerr,sigdig=sigdig,
                              units=units,caveat=caveat)
         graphics::title(tit)
+    }
+    extra()
+    if (addcolourbar){
+        colourbar(z=levels[valid],fill=rect.col,clabel=clabel)
     }
 }
 
