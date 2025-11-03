@@ -69,6 +69,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' \code{1}: error ellipses
 #' 
 #' \code{2}: error crosses
+#'
+#' any other value results in a blank plot
 #' 
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
@@ -130,6 +132,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     \code{inverse=TRUE}.
 #' @param box logical. If \code{TRUE}, draws a frame around the plot.
 #' @param xaxt see \code{?par}
+#' @param extra (optional) extra intructions to be carried out in the
+#'     main plot window, such as text annotations.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -151,7 +155,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         omit.stroke="grey",addcolourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
                         asp=NA,log='',taxis=FALSE,box=!taxis,
-                        xaxt=ifelse(taxis,'n','s'),...){
+                        xaxt=ifelse(taxis,'n','s'),extra=NULL,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -228,7 +232,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                 else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=cex)
             }
         }
-    } else { # error cross
+    } else if (show.ellipses==2){ # error cross
         if (missing(cex)) cex <- 0.5
         if (show.numbers)
             graphics::text(xy[plotit,'X'],xy[plotit,'Y'],
@@ -244,6 +248,11 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         graphics::arrows(xy[plotit,'X']-dx,xy[plotit,'Y'],
                          xy[plotit,'X']+dx,xy[plotit,'Y'],
                          code=3,angle=90,length=0.05,col=stroke)
+    } else {
+        # blank plot
+    }
+    if (!is.null(extra)){
+        extra
     }
     if (!is.null(levels) & addcolourbar){
         colourbar(z=levels[calcit],fill=ellipse.fill,

@@ -18,6 +18,8 @@ concordia(
   show.age = 0,
   title = TRUE,
   oerr = 3,
+  show.ellipses = 1 * (show.age != 3),
+  addcolourbar = TRUE,
   sigdig = 2,
   common.Pb = 0,
   ticks = 5,
@@ -27,6 +29,7 @@ concordia(
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  extra = NULL,
   ...
 )
 }
@@ -125,6 +128,19 @@ geological (co)variance term.}
 \eqn{\alpha} equales the value that is stored in
 \code{settings('alpha')}.}
 
+\item{show.ellipses}{show the data as:
+
+\code{0}: points
+
+\code{1}: error ellipses
+
+\code{2}: error crosses
+
+any other value results in a blank plot}
+
+\item{addcolourbar}{add a colour bar to display the colours used to
+\code{levels}}
+
 \item{sigdig}{number of significant digits for the
 concordia/discordia age}
 
@@ -183,7 +199,11 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{...}{optional arguments passed on to \code{\link{scatterplot}}}
+\item{extra}{(optional) extra intructions to be carried out in the
+main plot window, such as text annotations.}
+
+\item{...}{optional arguments passed on to
+\code{\link{scatterplot}}}
 }
 \value{
 If \code{show.age=1}, returns a list with the following items:

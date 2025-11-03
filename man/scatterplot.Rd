@@ -35,6 +35,7 @@ scatterplot(
   taxis = FALSE,
   box = !taxis,
   xaxt = ifelse(taxis, "n", "s"),
+  extra = NULL,
   ...
 )
 }
@@ -69,7 +70,9 @@ numbers)}
 
 \code{1}: error ellipses
 
-\code{2}: error crosses}
+\code{2}: error crosses
+
+any other value results in a blank plot}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
@@ -155,6 +158,9 @@ inverse isochron with a time scale. Only used if
 \item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
 
 \item{xaxt}{see \code{?par}}
+
+\item{extra}{(optional) extra intructions to be carried out in the
+main plot window, such as text annotations.}
 
 \item{...}{optional arguments to format the points and text.}
 }

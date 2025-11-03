@@ -58,6 +58,19 @@
 #' \eqn{\alpha} equales the value that is stored in
 #' \code{settings('alpha')}.
 #'
+#' @param show.ellipses show the data as:
+#' 
+#' \code{0}: points
+#' 
+#' \code{1}: error ellipses
+#' 
+#' \code{2}: error crosses
+#'
+#' any other value results in a blank plot
+#'
+#' @param addcolourbar add a colour bar to display the colours used to
+#'     \code{levels}
+#'
 #' @param type one of
 #'
 #' \code{1}: Wetherill -- \eqn{{}^{206}}Pb/\eqn{{}^{238}}U
@@ -183,7 +196,10 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
-#' @param ... optional arguments passed on to \code{\link{scatterplot}}
+#' @param extra (optional) extra intructions to be carried out in the
+#'     main plot window, such as text annotations.
+#' @param ... optional arguments passed on to
+#'     \code{\link{scatterplot}}
 #'
 #' @return
 #'
@@ -278,19 +294,23 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
                       ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',concordia.col='darksalmon',
                       exterr=FALSE,show.age=0,title=TRUE,oerr=3,
+                      show.ellipses=1*(show.age!=3),addcolourbar=TRUE,
                       sigdig=2,common.Pb=0,ticks=5,anchor=0,
                       cutoff.disc=discfilter(),hide=NULL,
-                      omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    concordia_helper(x=x,tlim=tlim,type=type,show.numbers=show.numbers,
+                      omit=NULL,omit.fill=NA,omit.stroke='grey',
+                      extra=NULL,...){
+    concordia_helper(x=x,tlim=tlim,type=type,
+                     show.numbers=show.numbers,
                      levels=levels,clabel=clabel,
                      ellipse.fill=ellipse.fill,
                      ellipse.stroke=ellipse.stroke,
                      concordia.col=concordia.col,exterr=exterr,
                      show.age=show.age,title=title,oerr=oerr,
+                     show.ellipses=show.ellipses,addcolourbar=addcolourbar,
                      sigdig=sigdig,common.Pb=common.Pb,ticks=ticks,
                      anchor=anchor,cutoff.disc=cutoff.disc,
                      hide=hide,omit=omit,omit.fill=omit.fill,
-                     omit.stroke=omit.stroke,...)
+                     omit.stroke=omit.stroke,extra=extra,...)
 }
 
 # the only difference between concordia and concordia_helper
@@ -300,10 +320,11 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                              ellipse.fill=c("#00FF0080","#FF000080"),
                              ellipse.stroke='black',concordia.col='darksalmon',
                              exterr=FALSE,show.age=0,title=TRUE,
+                             show.ellipses=1*(show.age!=3),addcolourbar=TRUE,
                              oerr=3,y0option=1,sigdig=2,common.Pb=0,
                              ticks=5,anchor=0,cutoff.disc=discfilter(),
                              hide=NULL,omit=NULL,omit.fill=NA,
-                             omit.stroke='grey',box=TRUE,...){
+                             omit.stroke='grey',box=TRUE,extra=NULL,...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks,...)
@@ -354,11 +375,12 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
     else if (x$format%in%c(7,8) & type==3) y <- data2york(X,option=5)
     else stop('Concordia type incompatible with this input format.')
     scatterplot(y,oerr=oerr,show.numbers=show.numbers,
-                show.ellipses=1*(show.age!=3),levels=levels,
+                show.ellipses=show.ellipses,levels=levels,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,addcolourbar=FALSE,box=box,...)
+                omit.stroke=omit.stroke,addcolourbar=FALSE,
+                box=box,extra=extra,...)
     if (show.age==4){
         showDispersion(fit,inverse=(type==2),wtype=anchor[1],type='TW')
     }
@@ -369,8 +391,10 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
             graphics::title(concordia_title(fit,sigdig=sigdig,oerr=oerr))
         }
     }
-    colourbar(z=levels[calcit],fill=ellipse.fill,
-              stroke=ellipse.stroke,clabel=clabel)
+    if (addcolourbar){
+        colourbar(z=levels[calcit],fill=ellipse.fill,
+                  stroke=ellipse.stroke,clabel=clabel)
+    }
     invisible(fit)
 }
 
