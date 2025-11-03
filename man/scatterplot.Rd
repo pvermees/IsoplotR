@@ -35,7 +35,8 @@ scatterplot(
   taxis = FALSE,
   box = !taxis,
   xaxt = ifelse(taxis, "n", "s"),
-  extra = NULL,
+  extra = function() {
+ },
   ...
 )
 }
@@ -159,8 +160,8 @@ inverse isochron with a time scale. Only used if
 
 \item{xaxt}{see \code{?par}}
 
-\item{extra}{(optional) extra intructions to be carried out in the
-main plot window, such as text annotations.}
+\item{extra}{function with extra intructions to be carried out in
+the main plot window, such as text annotations.}
 
 \item{...}{optional arguments to format the points and text.}
 }

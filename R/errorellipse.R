@@ -132,8 +132,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     \code{inverse=TRUE}.
 #' @param box logical. If \code{TRUE}, draws a frame around the plot.
 #' @param xaxt see \code{?par}
-#' @param extra (optional) extra intructions to be carried out in the
-#'     main plot window, such as text annotations.
+#' @param extra function with extra intructions to be carried out in
+#'     the main plot window, such as text annotations.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -155,7 +155,8 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         omit.stroke="grey",addcolourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
                         asp=NA,log='',taxis=FALSE,box=!taxis,
-                        xaxt=ifelse(taxis,'n','s'),extra=NULL,...){
+                        xaxt=ifelse(taxis,'n','s'),
+                        extra=function(){},...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -251,9 +252,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
     } else {
         # blank plot
     }
-    if (!is.null(extra)){
-        extra
-    }
+    extra()
     if (!is.null(levels) & addcolourbar){
         colourbar(z=levels[calcit],fill=ellipse.fill,
                   stroke=ellipse.stroke,clabel=clabel)
