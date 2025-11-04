@@ -7,6 +7,8 @@
 concordia(
   x = NULL,
   tlim = NULL,
+  xlim = NULL,
+  ylim = NULL,
   type = 1,
   show.numbers = FALSE,
   levels = NULL,
@@ -35,6 +37,10 @@ concordia(
 \item{x}{an object of class \code{UPb}}
 
 \item{tlim}{age limits of the concordia line}
+
+\item{xlim}{x axis limits}
+
+\item{ylim}{y axis limits}
 
 \item{type}{one of
 

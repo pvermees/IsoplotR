@@ -38,6 +38,10 @@
 #' @param x an object of class \code{UPb}
 #' 
 #' @param tlim age limits of the concordia line
+#'
+#' @param xlim x axis limits
+#'
+#' @param ylim y axis limits
 #' 
 #' @param oerr indicates whether the analytical uncertainties of the
 #'     output are reported in the plot title as:
@@ -284,7 +288,7 @@
 #'     uranium-lead ages. Geochimica et Cosmochimica Acta, 62(4),
 #'     pp.665-676.
 #' @export
-concordia <- function(x=NULL,tlim=NULL,type=1,
+concordia <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                       show.numbers=FALSE,levels=NULL,clabel="",
                       ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',concordia.col='darksalmon',
@@ -293,8 +297,8 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
                       sigdig=2,common.Pb=0,ticks=5,anchor=0,
                       cutoff.disc=discfilter(),hide=NULL,
                       omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    concordia_helper(x=x,tlim=tlim,type=type,
-                     show.numbers=show.numbers,
+    concordia_helper(x=x,tlim=tlim,xlim=xlim,ylim=ylim,
+                     type=type,show.numbers=show.numbers,
                      levels=levels,clabel=clabel,
                      ellipse.fill=ellipse.fill,
                      ellipse.stroke=ellipse.stroke,
@@ -309,7 +313,7 @@ concordia <- function(x=NULL,tlim=NULL,type=1,
 
 # the only difference between concordia and concordia_helper
 # is the y0option argument, which is used by isochron.UPb
-concordia_helper <- function(x=NULL,tlim=NULL,type=1,
+concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                              show.numbers=FALSE,levels=NULL,clabel="",
                              ellipse.fill=c("#00FF0080","#FF000080"),
                              ellipse.stroke='black',concordia.col='darksalmon',
@@ -320,7 +324,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
                              hide=NULL,omit=NULL,omit.fill=NA,
                              omit.stroke='grey',box=TRUE,...){
     if (is.null(x)){
-        emptyconcordia(tlim=tlim,oerr=oerr,type=type,exterr=exterr,
+        emptyconcordia(tlim=tlim,xlim=xlim,ylim=ylim,
+                       type=type,oerr=oerr,exterr=exterr,
                        concordia.col=concordia.col,ticks=ticks)
         return(invisible(NULL))
     }
@@ -352,7 +357,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,type=1,
         fit <- discordia(X2calc,fit=lfit,wetherill=(type==1))
     }
     fit$n <- length(X2calc)
-    lims <- prepare_concordia_line(x=X2plot,tlim=tlim,type=type)
+    lims <- prepare_concordia_line(x=X2plot,tlim=tlim,
+                                   xlim=xlim,ylim=ylim,type=type)
     if (show.age>1){
         discordia_line(fit,wetherill=(type==1),d=X2plot$d,oerr=oerr)
         if (title){
@@ -428,8 +434,8 @@ plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
     if (box) graphics::box()
 }
 # helper function for plot.concordia
-prepare_concordia_line <- function(x,tlim,type=1,...){
-    out <- get_concordia_limits(x,tlim=tlim,type=type,...)
+prepare_concordia_line <- function(x,tlim,xlim=NULL,ylim=NULL,type=1,...){
+    out <- get_concordia_limits(x,tlim=tlim,xlim=xlim,ylim=ylim,type=type,...)
     if (type==1){
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
@@ -492,9 +498,9 @@ age_to_concordia_ratios <- function(tt,type=1,exterr=FALSE,d=diseq()){
     else
         stop('Invalid concordia type.')
 }
-get_concordia_limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
+get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
     out <- list()
-    if (missing(xlim)) {
+    if (is.null(xlim)) {
         xset <- FALSE
         out$x <- c(NA,NA)
     } else {
@@ -503,7 +509,7 @@ get_concordia_limits <- function(x,tlim=NULL,type=1,xlim,ylim,...){
         minx <- xlim[1]
         maxx <- xlim[2]        
     }
-    if (missing(ylim)) {
+    if (is.null(ylim)) {
         yset <- FALSE
         out$y <- c(NA,NA)
     } else {
@@ -913,8 +919,9 @@ LL_concordia_age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
     out
 }
 
-emptyconcordia <- function(tlim=NULL,oerr=3,type=1,exterr=FALSE,
-                           concordia.col='darksalmon',ticks=5,...){
+emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,type=1,oerr=3,
+                           exterr=FALSE,concordia.col='darksalmon',
+                           ticks=5,...){
     if (is.null(tlim)){
         if (type%in%c(1,3)) tlim <- c(1,4500)
         else tlim <- c(100,4500)
@@ -943,7 +950,8 @@ emptyconcordia <- function(tlim=NULL,oerr=3,type=1,exterr=FALSE,
     } else {
         stop('Invalid concordia type.')
     }
-    lims <- prepare_concordia_line(x=dat,tlim=tlim,type=type,...)
+    lims <- prepare_concordia_line(x=dat,tlim=tlim,xlim=xlim,
+                                   ylim=ylim,type=type,...)
     plotConcordiaLine(x=dat,lims=lims,type=type,col=concordia.col,
                       oerr=oerr,exterr=exterr,ticks=ticks)
 }
