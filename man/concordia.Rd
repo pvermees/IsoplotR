@@ -24,6 +24,7 @@ concordia(
   sigdig = 2,
   common.Pb = 0,
   ticks = 5,
+  pos = NA,
   anchor = 0,
   cutoff.disc = discfilter(),
   hide = NULL,
@@ -170,6 +171,13 @@ Pb-composition.}
 \item{ticks}{either a scalar indicating the desired number of age
 ticks to be placed along the concordia line, OR a vector of
 tick ages.}
+
+\item{pos}{the position of the concordia age labels relative to the
+concordia ticks. If \code{NA}, places the labels automatically.
+Values of \code{1}, \code{2}, \code{3} and \code{4},
+respectively indicate positions below, to the left of, above
+and to the right of the ticks. A \code{NULL} value places the
+labels on top of the ticsk.}
 
 \item{anchor}{control parameters to fix the intercept age or common Pb
 composition of the isochron fit. This can be a scalar or a vector.

@@ -189,6 +189,12 @@
 #' @param ticks either a scalar indicating the desired number of age
 #'     ticks to be placed along the concordia line, OR a vector of
 #'     tick ages.
+#' @param pos the position of the concordia age labels relative to the
+#'     concordia ticks. If \code{NA}, places the labels automatically.
+#'     Values of \code{1}, \code{2}, \code{3} and \code{4},
+#'     respectively indicate positions below, to the left of, above
+#'     and to the right of the ticks. A \code{NULL} value places the
+#'     labels on top of the ticsk.
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the concordia diagram
 #' @param omit vector with indices of aliquots that should be plotted
@@ -294,7 +300,7 @@ concordia <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                       ellipse.stroke='black',concordia.col='darksalmon',
                       exterr=FALSE,show.age=0,title=TRUE,oerr=3,
                       show.ellipses=1*(show.age!=3),
-                      sigdig=2,common.Pb=0,ticks=5,anchor=0,
+                      sigdig=2,common.Pb=0,ticks=5,pos=NA,anchor=0,
                       cutoff.disc=discfilter(),hide=NULL,
                       omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     concordia_helper(x=x,tlim=tlim,xlim=xlim,ylim=ylim,
@@ -306,7 +312,7 @@ concordia <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                      show.age=show.age,title=title,oerr=oerr,
                      show.ellipses=show.ellipses,
                      sigdig=sigdig,common.Pb=common.Pb,ticks=ticks,
-                     anchor=anchor,cutoff.disc=cutoff.disc,
+                     pos=pos,anchor=anchor,cutoff.disc=cutoff.disc,
                      hide=hide,omit=omit,omit.fill=omit.fill,
                      omit.stroke=omit.stroke,...)
 }
@@ -320,13 +326,14 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                              exterr=FALSE,show.age=0,title=TRUE,
                              show.ellipses=1*(show.age!=3),
                              oerr=3,y0option=1,sigdig=2,common.Pb=0,
-                             ticks=5,anchor=0,cutoff.disc=discfilter(),
+                             ticks=5,pos=NA,anchor=0,cutoff.disc=discfilter(),
                              hide=NULL,omit=NULL,omit.fill=NA,
                              omit.stroke='grey',box=TRUE,...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,xlim=xlim,ylim=ylim,
                        type=type,oerr=oerr,exterr=exterr,
-                       concordia.col=concordia.col,ticks=ticks)
+                       concordia.col=concordia.col,
+                       ticks=ticks,pos=pos)
         return(invisible(NULL))
     }
     if (common.Pb>0){
@@ -368,7 +375,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                                             oerr=oerr,dispunits=dispunits))
         }
     }
-    plotConcordiaLine(X2plot,lims=lims,type=type,col=concordia.col,
+    plotConcordiaLine(X2plot,lims=lims,pos=pos,type=type,col=concordia.col,
                       oerr=oerr,exterr=exterr,ticks=ticks,box=box)
     if (type==1) y <- data2york(X,option=1)
     else if (type==2) y <- data2york(X,option=2)
@@ -394,7 +401,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
 }
 
 # helper function for plot.concordia
-plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
+plotConcordiaLine <- function(x,lims,pos=NA,type=1,col='darksalmon',
                               oerr=3,exterr=FALSE,ticks=5,box=TRUE){
     if (length(ticks)<2) ticks <- prettier(lims$t,type=type,n=ticks)
     m <- min(lims$t[1],ticks[1])
@@ -419,8 +426,15 @@ plotConcordiaLine <- function(x,lims,type=1,col='darksalmon',
     }
     graphics::lines(conc[,'x'],conc[,'y'],col=col,lwd=2)
     dx <- diff(graphics::par('usr')[1:2])
-    if (exterr & ((type==1 & dx<0.03) | (type==2 & dx<3) | (type==3 & dx<0.005)))
-    { pos <- NULL } else { pos <- 2 }
+    if (!is.null(pos) && is.na(pos)){
+        if (exterr & ((type==1 & dx<0.03) |
+                      (type==2 & dx<3) |
+                      (type==3 & dx<0.005))){
+            pos <- NULL
+        } else {
+            pos <- 2
+        }
+    }
     for (i in 1:length(ticks)){
         xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=md)
         if (exterr){ # show ticks as ellipse
@@ -919,9 +933,9 @@ LL_concordia_age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
     out
 }
 
-emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,type=1,oerr=3,
-                           exterr=FALSE,concordia.col='darksalmon',
-                           ticks=5,...){
+emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,pos=NA,
+                           type=1,oerr=3,exterr=FALSE,
+                           concordia.col='darksalmon',ticks=5,...){
     if (is.null(tlim)){
         if (type%in%c(1,3)) tlim <- c(1,4500)
         else tlim <- c(100,4500)
@@ -952,6 +966,7 @@ emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,type=1,oerr=3,
     }
     lims <- prepare_concordia_line(x=dat,tlim=tlim,xlim=xlim,
                                    ylim=ylim,type=type,...)
-    plotConcordiaLine(x=dat,lims=lims,type=type,col=concordia.col,
-                      oerr=oerr,exterr=exterr,ticks=ticks)
+    plotConcordiaLine(x=dat,lims=lims,pos=pos,type=type,
+                      col=concordia.col,oerr=oerr,
+                      exterr=exterr,ticks=ticks)
 }
