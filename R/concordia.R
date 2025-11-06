@@ -425,17 +425,8 @@ plotConcordiaLine <- function(x,lims,pos=NA,type=1,col='darksalmon',
         conc[i,] <- xy$x
     }
     graphics::lines(conc[,'x'],conc[,'y'],col=col,lwd=2)
-    dx <- diff(graphics::par('usr')[1:2])
-    if (!is.null(pos) && is.na(pos)){
-        if (exterr & ((type==1 & dx<0.03) |
-                      (type==2 & dx<3) |
-                      (type==3 & dx<0.005))){
-            pos <- NULL
-        } else {
-            pos <- 2
-        }
-    }
-    for (i in 1:length(ticks)){
+    poslist <- get_poslist(pos=pos,ticks=ticks,type=type,d=md,exterr=exterr)
+    for (i in seq_along(ticks)){
         xy <- age_to_concordia_ratios(ticks[i],type=type,exterr=exterr,d=md)
         if (exterr){ # show ticks as ellipse
             ell <- ellipse(xy$x[1],xy$x[2],xy$cov,alpha=oerr2alpha(oerr))
@@ -443,9 +434,67 @@ plotConcordiaLine <- function(x,lims,pos=NA,type=1,col='darksalmon',
         } else {
             graphics::points(xy$x[1],xy$x[2],pch=21,bg='white')
         }
-        graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=pos)
+        graphics::text(xy$x[1],xy$x[2],as.character(ticks[i]),pos=poslist[[i]])
     }
     if (box) graphics::box()
+}
+get_poslist <- function(pos,ticks,type,d=diseq(),exterr=FALSE){
+    if (is.null(pos) || length(pos)>1 || !is.na(pos)){
+        return(pos)
+    }
+    usr <- graphics::par('usr')
+    dx <- usr[2]-usr[1]
+    dy <- usr[4]-usr[3]
+    out <- rep(list(NULL),length(ticks))
+    for (i in seq_along(ticks)){
+        tick <- ticks[i]
+        McL <- mclean(tick,d=d)
+        if (type==1){
+            concordia_slope <- McL$dPb206U238dt/McL$dPb207U235dt
+        } else if (type==2){
+            dU238dPb206dt = -McL$dPb206U238dt/McL$Pb206U238^2
+            concordia_slope <- McL$dPb207Pb206dt/dU238dPb206dt
+        } else if (type==3){
+            concordia_slope <- McL$dPb208Th232dt/McL$dPb206U238dt
+        } else {
+            stop('Invalid concordia type')
+        }
+        plot_slope <- concordia_slope*dx/dy
+        if (type==2 & plot_slope > -1){
+            out[i] <- 1
+        } else if ((type%in%c(1,3) & plot_slope > 1) |
+                   (type==2 & plot_slope < -1)){
+            out[i] <- 2
+        } else if (type%in%c(1,3) & plot_slope < 1){
+            out[i] <- 3
+        } else {
+            out[i] <- list(NULL)
+        }
+        if (exterr){
+            if (type==1){
+                x_ratio <- 'Pb207U235'
+                y_ratio <- 'Pb206U238'
+            } else if (type==2){
+                x_ratio <- 'U238Pb206'
+                y_ratio <- 'Pb207Pb206'
+            } else { # type 3
+                x_ratio <- 'Pb206U238'
+                y_ratio <- 'Pb208Th232'
+            }
+            sx <- age2ratio(tt=tick,ratio=x_ratio,exterr=TRUE)[2]
+            sy <- age2ratio(tt=tick,ratio=y_ratio,exterr=TRUE)[2]
+            if (sx/dx > 0.01 & sy/dy > 0.01){
+                out[i] <- list(NULL)
+            } else if (sx/dx > 0.01){
+                out[i] <- ifelse(type==2,1,2)
+            } else if (sy/sy > 0.01){
+                out[i] <- 2
+            } else {
+                # keep same as for exterr = FALSE
+            }
+        }
+    }
+    out
 }
 # helper function for plot.concordia
 prepare_concordia_line <- function(x,tlim,xlim=NULL,ylim=NULL,type=1,...){
@@ -649,7 +698,7 @@ get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
                 miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=md)[,'76'])
             out$x <- c(minx,maxx)
             out$y <- c(miny,maxy)
-        } else if (is.null(tlim) & type==3){
+p        } else if (is.null(tlim) & type==3){
             if (!xset){
                 Pb206U238 <- get_Pb206U238_ratios(x)
                 minx <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)

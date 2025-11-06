@@ -408,7 +408,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
                 d$n0['Th230',] <- reverse(tt=tt,mexp=mexp_8405(),nt=nt)['Th230',]
             }
-        } else {                    # measured 234U
+        } else {                 # measured 234U
             if (d$ThU$option<2){ # initial 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','U235'),,drop=FALSE]
                 nt['U234',] <- d$U48$x*nt['U238',]*l38/l34 # overwrite
