@@ -463,9 +463,9 @@ get_poslist <- function(pos,ticks,type,d=diseq(),exterr=FALSE){
         if (type==2 & plot_slope > -1){
             out[i] <- 1
         } else if ((type%in%c(1,3) & plot_slope > 1) |
-                   (type==2 & plot_slope < -1)){
+                   (type==2 & plot_slope <= -1)){
             out[i] <- 2
-        } else if (type%in%c(1,3) & plot_slope < 1){
+        } else if (type%in%c(1,3) & plot_slope <= 1){
             out[i] <- 3
         } else {
             out[i] <- list(NULL)
@@ -698,7 +698,7 @@ get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
                 miny <- min(miny,age_to_Pb207Pb206_ratio(out$t[1],d=md)[,'76'])
             out$x <- c(minx,maxx)
             out$y <- c(miny,maxy)
-p        } else if (is.null(tlim) & type==3){
+        } else if (is.null(tlim) & type==3){
             if (!xset){
                 Pb206U238 <- get_Pb206U238_ratios(x)
                 minx <- min(Pb206U238[,1]-nse*Pb206U238[,2],na.rm=TRUE)
