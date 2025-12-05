@@ -746,7 +746,7 @@ age_to_Pb207U235_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
         R <- McL$Pb207U235
         J <- McL$dPb207U235dt
         if (exterr){
-            J <- c(J,McL$dPb207U235dl35)
+            J <- cbind(J,McL$dPb207U235dl35)
             sl5 <- lambda('U235')[2]
             E <- diag(c(st,sl5))^2
             R.err <- sqrt(J%*%E%*%t(J))
@@ -773,7 +773,7 @@ age_to_U235Pb207_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
         McL <- mclean(tt=tt,d=d,exterr=exterr)
         R <- 1/McL$Pb207U235
         if (exterr){
-            J <- -c(McL$dPb207U235dt,McL$dPb207U235l35)/McL$Pb207U235^2
+            J <- -cbind(McL$dPb207U235dt,McL$dPb207U235dl35)/McL$Pb207U235^2
             sl5 <- lambda('U235')[2]
             E <- diag(c(st,sl5))^2
             R.err <- sqrt(J%*%E%*%t(J))
@@ -802,7 +802,7 @@ age_to_Pb206U238_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
         R <- McL$Pb206U238
         J <- McL$dPb206U238dt
         if (exterr){
-            J <- c(J,McL$dPb206U238dl38)
+            J <- cbind(J,McL$dPb206U238dl38)
             sl8 <- lambda('U238')[2]
             E <- diag(c(st,sl8))^2
             R.err <- sqrt(J%*%E%*%t(J))
@@ -830,7 +830,7 @@ age_to_U238Pb206_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
         McL <- mclean(tt=tt,d=d,exterr=exterr)
         R <- 1/McL$Pb206U238
         if (exterr){
-            J <- -c(McL$dPb206U238dt,McL$dPb206U238l38)/McL$Pb206U238^2
+            J <- -cbind(McL$dPb206U238dt,McL$dPb206U238dl38)/McL$Pb206U238^2
             sl8 <- lambda('U238')[2]
             E <- diag(c(st,sl8))^2
             R.err <- sqrt(J%*%E%*%t(J))
@@ -838,7 +838,6 @@ age_to_U238Pb206_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
             J <- -McL$dPb206U238dt/McL$Pb206U238^2
             R.err <- abs(J*st)
         }
-        R.err <- abs(J*st)
         out <- cbind(R,R.err)
         colnames(out) <- c('86','s[86]')
     }
@@ -868,7 +867,7 @@ age_to_Pb207Pb206_ratio <- function(tt,st=0,d=diseq(),exterr=FALSE){
             sl8 <- lambda('U238')[2]
             d76dl35 <- (1/U)*McL$dPb207U235dl35/McL$Pb206U238
             d76dl38 <- -(1/U)*McL$Pb207U235*McL$dPb206U238dl38/McL$Pb206U238^2
-            J <- c(J,d76dl35,d76dl38)
+            J <- cbind(J,d76dl35,d76dl38)
             E <- diag(c(st,sl5,sl8))^2
             R.err <- sqrt(J%*%E%*%t(J))
         } else {
@@ -895,7 +894,7 @@ age_to_Pb208Th232_ratio <- function(tt,st=0,exterr=FALSE){
         J <- l2*exp(l2*tt)
         if (exterr){
             sl2 <- lambda('Th232')[2]
-            J <- c(J,tt*exp(l2*tt))
+            J <- cbind(J,tt*exp(l2*tt))
             E <- diag(c(st,sl2))^2
             R.err <- sqrt(J%*%E%*%t(J))
         } else {
@@ -1295,7 +1294,7 @@ get_Pb207Pb206_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,.
         J[1,7] <- McL$dPb207Pb206dl31/McL$dPb207Pb206dt # dt/dl31
         J[1,8] <- McL$dPb207Pb206dl30/McL$dPb207Pb206dt # dt/dl30
         J[1,9] <- McL$dPb207Pb206dl26/McL$dPb207Pb206dt # dt/dl26
-        st.76 <- sqrt( J %*% E %*% t(J) )
+        st.76 <- sqrt(J %*% E %*% t(J))
         out <- c(t.76,st.76)
         names(out) <- c('t76','s[t76]')
     }

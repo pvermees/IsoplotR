@@ -230,6 +230,8 @@
 #'
 #' \code{2}: error crosses
 #'
+#' any other value results in a blank plot
+#'
 #' @param xlab text label for the horizontal plot axis
 #' 
 #' @param hide vector with indices of aliquots that should be removed
@@ -1543,7 +1545,7 @@ w2disp.UThHe <- function(x,fit,wtype,...){
     if (wtype==2){
         out <- fit$age[1]*fit$w/fit$b[1]
     } else {
-        out <- fit$y0[1]*fit$w/fit$a[1]
+        out <- fit$w
     }
     out
 }

@@ -146,6 +146,8 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
+#' @param show.colourbar add a colour bar to display the colours
+#'     assigned to \code{levels}
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
 #' @references Aitchison, J., 1986, The statistical analysis of
@@ -161,13 +163,15 @@
 #' helioplot(UThHe)
 #' dev.new()
 #' helioplot(UThHe,logratio=FALSE)
+#' @return the output of \code{central.UThHe}
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
                       show.numbers=FALSE,oerr=3,contour.col=c('white','red'),
                       levels=NULL,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
-                      omit.fill=NA,omit.stroke='grey',...){
+                      omit.fill=NA,omit.stroke='grey',
+                      show.colourbar=TRUE,...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
@@ -214,8 +218,11 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
     }
     fit$n <- length(which(calcit))
     graphics::title(helioplot_title(fit,sigdig=sigdig,oerr=oerr))
-    invisible(colourbar(z=levels[calcit],fill=ellipse.fill,
-                        stroke=ellipse.stroke,clabel=clabel))
+    if (show.colourbar){
+        colourbar(z=levels[calcit],fill=ellipse.fill,
+                  stroke=ellipse.stroke,clabel=clabel)
+    }
+    invisible(fit)
 }
 
 plot_logratio_frame <- function(lims,...){

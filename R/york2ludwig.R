@@ -383,16 +383,28 @@ WconcordiaIntersection <- function(yfit,d=diseq()){
         }
         out
     }
-    a <- unname(abs(yfit$a[1]))
+    a <- unname(yfit$a[1])
     b <- unname(yfit$b[1])
-    midpoint <- stats::uniroot(misfit,lower=0,upper=4600,
-                               a=a,b=b,d=d,gradient=TRUE)$root
-    if (misfit(tt=midpoint,a=a,b=b,d=d) > 0){
-        tt <- stats::uniroot(misfit,lower=0,upper=midpoint,a=a,b=b,d=d)$root
+    if (b>0){
+        midpoint <- stats::uniroot(misfit,lower=0,upper=5000,
+                                   a=a,b=b,d=d,gradient=TRUE)$root
     } else {
-        tt <- stats::optimise(misfit,lower=0,upper=4600,a=a,b=b,d=d)$minimum
+        midpoint <- stats::uniroot(misfit,lower=0,upper=5000,a=a,b=b,d=d)$root
     }
-    c(tt,midpoint)
+    below <- misfit(tt=midpoint,a=a,b=b,d=d) > 0
+    if (below){
+        if (a > 0){
+            tt <- stats::uniroot(misfit,lower=0,upper=midpoint,a=a,b=b,d=d)$root
+            out <- c(tt,midpoint)
+        } else {
+            tt <- stats::uniroot(misfit,lower=midpoint,upper=5000,a=a,b=b,d=d)$root
+            out <- c(midpoint,tt)
+        }
+    } else {
+        tt <- stats::optimise(misfit,lower=0,upper=5000,a=a,b=b,d=d)$minimum
+        out <- c(tt,midpoint)
+    }
+    out
 }
 
 inithelper <- function(yd,x0=NULL,y0=NULL){

@@ -100,6 +100,9 @@
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from age plateau calculation
+#' @param title add a title to the plot?
+#' @param show.colourbar add a colour bar to display the colours
+#'     assigned to \code{levels}
 #' @param ... optional parameters to the generic \code{plot} function
 #'
 #' @return
@@ -129,7 +132,8 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
                                 xlab='cumulative fraction',
-                                ylab='X',hide=NULL,omit=NULL,...){
+                                ylab='X',hide=NULL,omit=NULL,
+                                title=TRUE,show.colourbar=TRUE,...){
     XY <- plot_spectrum_axes(x=x,oerr=oerr,xlab=xlab,
                              ylab=ylab,hide=hide,...)
     pc <- get_plateau_colours(x=x,levels=levels,plateau=plateau,
@@ -138,10 +142,13 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                               random.effects=random.effects,oerr=oerr)
     if (plateau){
         plot_plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
-        graphics::title(plateau_title(pc$plat,oerr=oerr,sigdig=sigdig,Ar=FALSE))
+        if (title){
+            tit <- plateau_title(pc$plat,oerr=oerr,sigdig=sigdig,Ar=FALSE)
+            graphics::title(tit)
+        }
     }
-    plot_spectrum(XY=XY,col=pc$col)
-    colourbar(z=levels,fill=plateau.col,clabel=clabel)
+    plot_spectrum(XY=XY,col=pc$col,...)
+    if (show.colourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
 #' @rdname agespectrum
@@ -152,14 +159,15 @@ agespectrum.other <- function(x,oerr=3,plateau=TRUE,
                               non.plateau.col="#00FFFF80",
                               sigdig=2,line.col='red',lwd=2,
                               xlab='cumulative fraction',
-                              ylab='X',hide=NULL,omit=NULL,...){
+                              ylab='X',hide=NULL,omit=NULL,
+                              show.colourbar=TRUE,...){
     if (x$format==3) X <- x$x
     else stop("Age spectrum plots are not available for this format")
-    agespectrum(X,oerr=oerr,plateau=plateau,random.effects=random.effects,
-                levels=levels,clabel=clabel,plateau.col=plateau.col,
-                non.plateau.col=non.plateau.col,sigdig=sigdig,
-                line.col=line.col,lwd=lwd,xlab=xlab,ylab=ylab,
-                hide=hide,omit=omit,...)
+    agespectrum.default(X,oerr=oerr,plateau=plateau,random.effects=random.effects,
+                        levels=levels,clabel=clabel,plateau.col=plateau.col,
+                        non.plateau.col=non.plateau.col,sigdig=sigdig,
+                        line.col=line.col,lwd=lwd,xlab=xlab,ylab=ylab,
+                        hide=hide,omit=omit,show.colourbar=show.colourbar,...)
 }
 
 #' @param i2i `isochron to intercept': calculates the initial (aka
@@ -182,16 +190,12 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
                              plateau.col=c("#00FF0080","#FF000080"),
                              non.plateau.col="#00FFFF80",sigdig=2,
                              exterr=FALSE,line.col='red',lwd=2,
-                             i2i=FALSE,hide=NULL,omit=NULL,...){
-    ns <- length(x)
-    plotit <- (1:ns)%ni%hide
-    calcit <- (1:ns)%ni%c(hide,omit)
+                             xlab=expression("cumulative "^39*"Ar fraction"),
+                             ylab="age [Ma]",i2i=FALSE,hide=NULL,
+                             omit=NULL,title=TRUE,show.colourbar=TRUE,...){
     tt <- ArAr_age(x,exterr=FALSE,i2i=i2i,omit4c=unique(c(hide,omit)))
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
-    x.lab <- expression(paste("cumulative ",""^"39","Ar fraction"))
-    y.lab='age [Ma]'
-    XY <- plot_spectrum_axes(x=X,oerr=oerr,xlab=x.lab,
-                             ylab=y.lab,hide=hide,...)
+    XY <- plot_spectrum_axes(x=X,oerr=oerr,xlab=xlab,ylab=ylab,hide=hide,...)
     pc <- get_plateau_colours(x=X,levels=levels,plateau=plateau,
                               hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
@@ -199,11 +203,14 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
     if (plateau){
         if (exterr) pc$plat <- add_exterr_to_wtdmean(x,pc$plat)
         plot_plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
-        graphics::title(plateau_title(pc$plat,oerr=oerr,sigdig=sigdig,
-                                      Ar=TRUE,units=' Ma'))
+        if (title){
+            tit <- plateau_title(pc$plat,oerr=oerr,sigdig=sigdig,
+                                 Ar=TRUE,units=' Ma')
+            graphics::title(tit)
+        }
     }
-    plot_spectrum(XY=XY,col=pc$col)
-    colourbar(z=levels,fill=plateau.col,clabel=clabel)
+    plot_spectrum(XY=XY,col=pc$col,...)
+    if (show.colourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
     if (plateau) return(invisible(pc$plat))
 }
 

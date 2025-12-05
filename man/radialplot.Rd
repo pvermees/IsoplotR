@@ -39,6 +39,7 @@ radialplot(x, ...)
   markers = NULL,
   oerr = 3,
   title = TRUE,
+  show.colourbar = TRUE,
   units = "",
   hide = NA,
   omit = NULL,
@@ -66,6 +67,7 @@ radialplot(x, ...)
   oerr = 3,
   units = "",
   title = TRUE,
+  show.colourbar = TRUE,
   hide = NA,
   omit = NULL,
   omit.col = NA,
@@ -92,6 +94,7 @@ radialplot(x, ...)
   exterr = FALSE,
   oerr = 3,
   title = TRUE,
+  show.colourbar = TRUE,
   hide = NULL,
   omit = NULL,
   omit.col = NA,
@@ -126,6 +129,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -154,6 +158,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -182,6 +187,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -210,6 +216,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -238,6 +245,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -264,6 +272,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -292,6 +301,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -320,6 +330,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -348,6 +359,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -376,6 +388,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -403,6 +416,7 @@ radialplot(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 }
@@ -499,6 +513,9 @@ plot.}
 \code{settings('alpha')}.}
 
 \item{title}{add a title to the plot?}
+
+\item{show.colourbar}{add a colour bar to display the colours
+assigned to \code{levels}}
 
 \item{units}{measurement units to be displayed in the legend.}
 

@@ -272,7 +272,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
                 clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.fill=omit.fill,
-                omit.stroke=omit.stroke,addcolourbar=FALSE,...)
+                omit.stroke=omit.stroke,show.colourbar=FALSE,...)
     colourbar(z=levels[calcit],fill=ellipse.fill,
               stroke=ellipse.stroke,clabel=clabel)
 }
@@ -339,7 +339,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
                     ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,
-                    addcolourbar=FALSE)
+                    show.colourbar=FALSE)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)

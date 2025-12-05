@@ -69,6 +69,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' \code{1}: error ellipses
 #' 
 #' \code{2}: error crosses
+#'
+#' any other value results in a blank plot
 #' 
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours within the error ellipses.
@@ -111,8 +113,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
-#' @param addcolourbar add a colour bar to display the colours used to
-#'     \code{levels}
+#' @param show.colourbar add a colour bar to display the colours
+#'     assigned to \code{levels}
 #' @param bg background colour for the plot symbols (only used if
 #'     \code{show.ellipses=0}).
 #' @param cex plot symbol magnification.
@@ -148,7 +150,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         ellipse.stroke="black",fit=NULL,add=FALSE,
                         empty=FALSE,ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
-                        omit.stroke="grey",addcolourbar=TRUE,
+                        omit.stroke="grey",show.colourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
                         asp=NA,log='',taxis=FALSE,box=!taxis,
                         xaxt=ifelse(taxis,'n','s'),...){
@@ -228,7 +230,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                 else graphics::points(xy[i,'X'],xy[i,'Y'],pch=19,cex=cex)
             }
         }
-    } else { # error cross
+    } else if (show.ellipses==2){ # error cross
         if (missing(cex)) cex <- 0.5
         if (show.numbers)
             graphics::text(xy[plotit,'X'],xy[plotit,'Y'],
@@ -244,8 +246,10 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         graphics::arrows(xy[plotit,'X']-dx,xy[plotit,'Y'],
                          xy[plotit,'X']+dx,xy[plotit,'Y'],
                          code=3,angle=90,length=0.05,col=stroke)
+    } else {
+        # blank plot
     }
-    if (!is.null(levels) & addcolourbar){
+    if (!is.null(levels) & show.colourbar){
         colourbar(z=levels[calcit],fill=ellipse.fill,
                   stroke=ellipse.stroke,clabel=clabel)
     }

@@ -23,7 +23,7 @@ scatterplot(
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
-  addcolourbar = TRUE,
+  show.colourbar = TRUE,
   bg,
   cex,
   xlim = NULL,
@@ -69,7 +69,9 @@ numbers)}
 
 \code{1}: error ellipses
 
-\code{2}: error crosses}
+\code{2}: error crosses
+
+any other value results in a blank plot}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
@@ -125,8 +127,8 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{addcolourbar}{add a colour bar to display the colours used to
-\code{levels}}
+\item{show.colourbar}{add a colour bar to display the colours
+assigned to \code{levels}}
 
 \item{bg}{background colour for the plot symbols (only used if
 \code{show.ellipses=0}).}

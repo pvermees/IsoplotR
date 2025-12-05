@@ -38,6 +38,7 @@ weightedmean(x, ...)
   omit = NULL,
   omit.col = NA,
   title = TRUE,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -58,6 +59,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -83,6 +85,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -105,6 +108,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -126,6 +130,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -148,6 +153,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -170,6 +176,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -192,6 +199,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -214,6 +222,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -236,6 +245,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -258,6 +268,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -280,6 +291,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -300,6 +312,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 
@@ -321,6 +334,7 @@ weightedmean(x, ...)
   hide = NULL,
   omit = NULL,
   omit.col = NA,
+  show.colourbar = TRUE,
   ...
 )
 }
@@ -416,6 +430,9 @@ but omitted from the weighted mean calculation.}
 aliquots.}
 
 \item{title}{add a title to the plot?}
+
+\item{show.colourbar}{add a colour bar to display the colours
+assigned to \code{levels}}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the

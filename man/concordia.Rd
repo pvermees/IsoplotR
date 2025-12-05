@@ -7,6 +7,8 @@
 concordia(
   x = NULL,
   tlim = NULL,
+  xlim = NULL,
+  ylim = NULL,
   type = 1,
   show.numbers = FALSE,
   levels = NULL,
@@ -18,9 +20,11 @@ concordia(
   show.age = 0,
   title = TRUE,
   oerr = 3,
+  show.ellipses = 1 * (show.age != 3),
   sigdig = 2,
   common.Pb = 0,
   ticks = 5,
+  pos = NA,
   anchor = 0,
   cutoff.disc = discfilter(),
   hide = NULL,
@@ -34,6 +38,10 @@ concordia(
 \item{x}{an object of class \code{UPb}}
 
 \item{tlim}{age limits of the concordia line}
+
+\item{xlim}{x axis limits}
+
+\item{ylim}{y axis limits}
 
 \item{type}{one of
 
@@ -125,6 +133,16 @@ geological (co)variance term.}
 \eqn{\alpha} equales the value that is stored in
 \code{settings('alpha')}.}
 
+\item{show.ellipses}{show the data as:
+
+\code{0}: points
+
+\code{1}: error ellipses
+
+\code{2}: error crosses
+
+any other value results in a blank plot}
+
 \item{sigdig}{number of significant digits for the
 concordia/discordia age}
 
@@ -153,6 +171,13 @@ Pb-composition.}
 \item{ticks}{either a scalar indicating the desired number of age
 ticks to be placed along the concordia line, OR a vector of
 tick ages.}
+
+\item{pos}{the position of the concordia age labels relative to the
+concordia ticks. If \code{NA}, places the labels automatically.
+Values of \code{1}, \code{2}, \code{3} and \code{4},
+respectively indicate positions below, to the left of, above
+and to the right of the ticks. A \code{NULL} value places the
+labels on top of the ticsk.}
 
 \item{anchor}{control parameters to fix the intercept age or common Pb
 composition of the isochron fit. This can be a scalar or a vector.
@@ -183,7 +208,8 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
 
-\item{...}{optional arguments passed on to \code{\link{scatterplot}}}
+\item{...}{optional arguments passed on to
+\code{\link{scatterplot}}}
 }
 \value{
 If \code{show.age=1}, returns a list with the following items:

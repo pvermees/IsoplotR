@@ -558,10 +558,11 @@ min_age_model <- function(zs,np=3){
     LL <- function(par,zs,Mz){
         get_minage_L(pars=mappar(par,Mz),zs=zs)
     }
-    mz <- min(zs[,1])
-    Mz <- max(zs[,1])
+    z <- sort(zs[,1])
+    mz <- z[1]
+    Mz <- tail(z,n=1)
     cfit <- continuous_mixture(zs[,1],zs[,2])
-    init <- c(mean(c(mz,cfit$mu[1])),0,log(cfit$sigma[1]),0)[1:np]
+    init <- c(mean(z[1:2]),0,log(cfit$sigma[1]),0)[1:np]
     ll <- c(mz,-20,init[3]-20,-20)[1:np]
     ul <- c(cfit$mu[1],20,init[3]+2,20)[1:np]
     fit <- stats::optim(init,LL,method='L-BFGS-B',zs=zs,Mz=Mz,lower=ll,upper=ul)
