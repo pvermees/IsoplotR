@@ -487,7 +487,7 @@ get_poslist <- function(pos,ticks,type,d=diseq(),exterr=FALSE){
                 out[i] <- list(NULL)
             } else if (sx/dx > 0.01){
                 out[i] <- ifelse(type==2,1,2)
-            } else if (sy/sy > 0.01){
+            } else if (sy/dy > 0.01){
                 out[i] <- 2
             } else {
                 # keep same as for exterr = FALSE
