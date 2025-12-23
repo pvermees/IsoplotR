@@ -228,7 +228,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
     tcol[omit] <- 'grey'
     radial_plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],show.numbers=show.numbers,
                 pch=pch,levels=levels[plotit],clabel=clabel,markers=markers,
-                bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],xlim=xlim,
+                fill=bg,bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],xlim=xlim,
                 show.colourbar=show.colourbar,...)
     fit <- central(x2calc,exterr=exterr)
     fit$pooled <- pooled_age(x2calc,exterr=exterr)
@@ -561,14 +561,15 @@ radial_helper <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
     tcol[omit] <- 'grey'
     radial_plot(X,show.numbers=show.numbers,pch=pch,
                 levels=levels[plotit],clabel=clabel,markers=markers,
-                bg=pcol[plotit],col=tcol[plotit],
+                fill=bg,bg=pcol[plotit],col=tcol[plotit],
                 sn=(1:ns)[plotit],xlim=xlim,
                 show.colourbar=show.colourbar,...)
 }
 
 radial_plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                         show.numbers=FALSE,levels=NULL,clabel="",
-                        markers=NULL,pch=21,bg='yellow',col='black',
+                        markers=NULL,pch=21,fill=c('yellow','red'),
+                        bg='yellow',col='black',
                         sn=1:length(x$z),xlim=NULL,
                         show.colourbar=TRUE,...){
     if (show.numbers & is.null(levels)) show.points <- FALSE
@@ -588,7 +589,7 @@ radial_plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                        show.numbers=show.numbers,
                        pch=pch,bg=bg,col=col,sn=sn,...)
     if (show.colourbar)
-        colourbar(z=levels,fill=bg,stroke=col,clabel=clabel)
+        colourbar(z=levels,fill=fill,stroke=col,clabel=clabel)
 }
 
 radial_scale <- function(x,zeta=0,rhoD=0,xlim=NULL,...){
