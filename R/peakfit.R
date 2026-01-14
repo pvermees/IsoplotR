@@ -560,7 +560,7 @@ min_age_model <- function(zs,np=3){
     }
     z <- sort(zs[,1])
     mz <- z[1]
-    Mz <- tail(z,n=1)
+    Mz <- utils::tail(z,n=1)
     cfit <- continuous_mixture(zs[,1],zs[,2])
     init <- c(mean(z[1:2]),0,log(cfit$sigma[1]),0)[1:np]
     ll <- c(mz,-20,init[3]-20,-20)[1:np]
