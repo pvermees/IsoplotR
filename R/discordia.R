@@ -216,9 +216,12 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
         yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
         # correct overshot confidence intervals:
         if (y0>yl){ # negative slope
-            overshot <- (ll<yconc & ll<y0/2)
+            xconc <- age_to_U238Pb206_ratio(t68,d=d)[,'86']
+            concordia_slope <- c(-Inf,diff(yconc)/diff(xconc))
+            discordia_slope <- (diff(y)/diff(x))[1]
+            overshot <- (ll<yconc & concordia_slope > discordia_slope)
             ll[overshot] <- yconc[overshot]
-            overshot <- (ul<yconc & ul<y0/2)
+            overshot <- (ul<yconc & concordia_slope > discordia_slope)
             ul[overshot] <- yconc[overshot]
         } else {    # positive slope
             overshot <- ul>yconc
