@@ -821,9 +821,9 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         lower['t'] <- tt[i-1]
         upper['t'] <- tt[i]
         init['t'] <- (lower['t'] + upper['t'])/2
-        fit <- stats::optim(init,LL_concordia_age,method='L-BFGS-B',
-                            lower=lower,upper=upper,exterr=exterr,
-                            cc=cc,type=type,d=d,hessian=TRUE)
+        fit <- contingencyfit(par=init,fn=LL_concordia_age,
+                              lower=lower,upper=upper,hessian=TRUE,
+                              exterr=exterr,cc=cc,type=type,d=d)
         if (is.finite(fit$value) && fit$value<out$value){
             out <- fit
         }
