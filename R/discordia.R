@@ -136,6 +136,7 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
     l8 <- lambda('U238')[1]
     J <- matrix(0,1,2)
     usr <- graphics::par('usr')
+    nsteps <- 100
     if (wetherill){
         if (measured_disequilibrium(d)){
             U85 <- iratio('U238U235')[1]
@@ -155,7 +156,7 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
             tu <- fit$par[2]
             X <- age_to_Pb207U235_ratio(c(tl,tu),d=d)[,'75']
             Y <- age_to_Pb206U238_ratio(c(tl,tu),d=d)[,'68']
-            x <- seq(from=max(0,usr[1],X[1]),to=min(usr[2],X[2]),length.out=50)
+            x <- seq(from=max(0,usr[1]),to=usr[2],length.out=nsteps)
             du <- mclean(tt=tu,d=d)
             dl <- mclean(tt=tl,d=d)
             aa <- du$Pb206U238 - dl$Pb206U238
@@ -182,8 +183,10 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
             ll <- y - ciy
             t75 <- get_Pb207U235_age(x,d=d)[,'t75']
             yconc <- age_to_Pb206U238_ratio(t75,d=d)[,'68']
-            overshot <- ul>yconc
+            overshot <- ul > yconc
             ul[overshot] <- yconc[overshot]
+            overshot <- ll > yconc
+            ll[overshot] <- yconc[overshot]
             cix <- c(x,rev(x))
             ciy <- c(ll,rev(ul))
         }
@@ -199,7 +202,6 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
         y0 <- Y[2]
         tl <- check_zero_UPb(fit2d$par['t'])
         U <- settings('iratio','U238U235')[1]
-        nsteps <- 100
         x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
         y <- yl + (y0-yl)*(1-x*r68) # = y0 + yl*x*r68 - y0*x*r68
         D <- mclean(tt=tl,d=d)
