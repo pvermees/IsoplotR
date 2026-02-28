@@ -26,8 +26,11 @@ cad(x, ...)
   pch = NA,
   verticals = TRUE,
   xlab = "age [Ma]",
+  ylab = "cumulative probability",
   col = "black",
   hide = NULL,
+  lwd = 1,
+  col.01line = "gray70",
   ...
 )
 
@@ -38,6 +41,7 @@ cad(x, ...)
   xlab = "age [Ma]",
   col = "black",
   hide = NULL,
+  lwd = 1,
   ...
 )
 
@@ -46,8 +50,12 @@ cad(x, ...)
   pch = NA,
   verticals = TRUE,
   xlab = "age [Ma]",
+  ylab = "cumulative probability",
   col = "rainbow",
   hide = NULL,
+  lwd = 1,
+  col.01line = "gray70",
+  legend = TRUE,
   ...
 )
 
@@ -210,18 +218,28 @@ the CAD should be connected by vertical lines}
 
 \item{xlab}{x-axis label}
 
+\item{ylab}{y-axis label}
+
 \item{col}{if \code{x} has class \code{detritals}, the name of one
-    of \code{R}'s built-in colour palettes (e.g.,
-    \code{'heat.colors'}, \code{'terrain.colors'},
-    \code{'topo.colors'}, \code{'cm.colors'}), OR a vector with the
-    names or codes of two colours to use as the start and end of a
-    colour ramp (e.g. \code{col=c('yellow','blue')}).
+of \code{R}'s built-in colour palettes (e.g.,
+\code{'heat.colors'}, \code{'terrain.colors'},
+\code{'topo.colors'}, \code{'cm.colors'}), OR a vector with the
+names or codes of two colours to use as the start and end of a
+colour ramp (e.g. \code{col=c('yellow','blue')}).}
+
+\item{hide}{vector with indices of aliquots that should be removed
+from the plot.}
+
+\item{lwd}{line width}
+
+\item{col.01line}{numeric or character specifying the color of the
+    horizontal lines at y = 0 and 1.
 
 For all other data formats, the name or code for a colour to give
     to a single sample dataset}
 
-\item{hide}{vector with indices of aliquots that should be removed
-from the plot.}
+\item{legend}{if \code{TRUE}, adds a legend with sample names to
+the bottom right of the CADs.}
 
 \item{type}{scalar indicating whether to plot the
 \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the

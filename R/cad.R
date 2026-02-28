@@ -38,14 +38,18 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' @param verticals logical flag indicating if the horizontal lines of
 #'     the CAD should be connected by vertical lines
 #' @param xlab x-axis label
+#' @param ylab y-axis label
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
+#' @param lwd line width
 #' @param col if \code{x} has class \code{detritals}, the name of one
 #'     of \code{R}'s built-in colour palettes (e.g.,
 #'     \code{'heat.colors'}, \code{'terrain.colors'},
 #'     \code{'topo.colors'}, \code{'cm.colors'}), OR a vector with the
 #'     names or codes of two colours to use as the start and end of a
 #'     colour ramp (e.g. \code{col=c('yellow','blue')}).
+#' @param col.01line numeric or character specifying the color of the
+#'     horizontal lines at y = 0 and 1.
 #'
 #' For all other data formats, the name or code for a colour to give
 #'     to a single sample dataset
@@ -57,28 +61,38 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #' cad(DZ,verticals=FALSE,pch=20)
 #' @rdname cad
 #' @export
-cad.default <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                        col='black',hide=NULL,...){
+cad.default <- function(x,pch=NA,verticals=TRUE,
+                        xlab='age [Ma]',
+                        ylab='cumulative probability',
+                        col='black',hide=NULL,lwd=1,
+                        col.01line="gray70",...){
     calcit <- (1:length(x))%ni%hide
     d <- x[calcit]
     graphics::plot(range(d,na.rm=TRUE),c(0,1),type='n',
-                   ylab='cumulative probability',xlab=xlab,...)
-    graphics::lines(stats::ecdf(d),pch=pch,verticals=verticals,col=col)
+                   xlab=xlab,ylab=ylab,...)
+    graphics::lines(stats::ecdf(d),pch=pch,verticals=verticals,
+                    col=col,lwd=lwd,col.01line=col.01line)
     mymtext(get_ntit(d),line=0,adj=1)
 }
 #' @rdname cad
 #' @export
 cad.other <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                      col='black',hide=NULL,...){
+                      col='black',hide=NULL,lwd=1,...){
     if (x$format<3) X <- x$x[,1]
     else if (x$format==3) X <- x$x[,2]
     else stop("CADs are not available for this format")
-    cad(X,pch=pch,verticals=verticals,xlab=xlab,col=col,hide=hide,...)
+    cad(X,pch=pch,verticals=verticals,xlab=xlab,col=col,hide=hide,lwd=lwd,...)
 }
+#' @param legend if \code{TRUE}, adds a legend with sample names to
+#'     the bottom right of the CADs.
 #' @rdname cad
 #' @export
-cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
-                          col='rainbow',hide=NULL,...){
+cad.detritals <- function(x,pch=NA,verticals=TRUE,
+                          xlab='age [Ma]',
+                          ylab='cumulative probability',
+                          col='rainbow',hide=NULL,lwd=1,
+                          col.01line = "gray70",
+                          legend=TRUE,...){
     if (is.character(hide)) hide <- which(names(x)%in%hide)
     x2plot <- clear(x,hide)
     ns <- length(x2plot)
@@ -87,13 +101,16 @@ cad.detritals <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
     } else {
         colour <- do.call(col,list(ns))
     }
-    graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',xlab=xlab,
-                   ylab='cumulative probability',...)
+    graphics::plot(range(x2plot,na.rm=TRUE),c(0,1),type='n',
+                   xlab=xlab,ylab=ylab,...)
     for (i in 1:ns){
         graphics::lines(stats::ecdf(x2plot[[i]]),pch=pch,
-                        verticals=verticals,col=colour[i])
+                        verticals=verticals,col=colour[i],lwd=lwd,
+                        col.01line=col.01line)
     }
-    graphics::legend("bottomright",legend=names(x2plot),lwd=1,col=colour)
+    if (legend){
+        graphics::legend("bottomright",legend=names(x2plot),lwd=lwd,col=colour)
+    }
 }
 #' @param type scalar indicating whether to plot the
 #'     \eqn{^{207}}Pb/\eqn{^{235}}U age (\code{type}=1), the
@@ -262,8 +279,9 @@ cad.fissiontracks <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',
 
 cad_helper <- function(x,pch=NA,verticals=TRUE,xlab='age [Ma]',col='black',
                        hide=NULL,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
-                       common.Pb=0,i2i=FALSE,Th0i=0,...){
+                       common.Pb=0,i2i=FALSE,Th0i=0,lwd=1,...){
     tt <- get_ages(x,type=type,cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                    i2i=i2i,common.Pb=common.Pb,Th0i=Th0i,omit4c=hide)
-    cad.default(tt[,1],pch=pch,verticals=verticals,xlab=xlab,col=col,hide=hide,...)
+    cad.default(tt[,1],pch=pch,verticals=verticals,
+                xlab=xlab,col=col,hide=hide,lwd=lwd,...)
 }
