@@ -48,7 +48,7 @@ cad <- function(x,...){ UseMethod("cad",x) }
 #'     \code{'topo.colors'}, \code{'cm.colors'}), OR a vector with the
 #'     names or codes of two colours to use as the start and end of a
 #'     colour ramp (e.g. \code{col=c('yellow','blue')}).
-#' @param col.01line numeric or character specifying the color of the
+#' @param col.01line numeric or character specifying the colour of the
 #'     horizontal lines at y = 0 and 1.
 #'
 #' For all other data formats, the name or code for a colour to give

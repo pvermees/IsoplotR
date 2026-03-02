@@ -1328,6 +1328,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     nn <- 50
     tijd <- seq(from=from,to=to,length.out=nn)
     ticks <- pretty(tijd)
+    ticks[length(ticks)] <- round(to)
     tijd[nn] <- max(ticks)
     xy <- stacey.kramers(tijd,inverse=inverse)
     graphics::lines(xy[,1],xy[,2])
