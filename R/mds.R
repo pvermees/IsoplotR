@@ -148,7 +148,8 @@ mds.detritals <- function(x,method="KS",classical=FALSE,plot=TRUE,
 #' @param x an object of class \code{detrital} OR a vector of numbers
 #' @param y a vector of numbers
 #' @param method either \code{'KS'} (for Kolmogorov-Smirnov distance),
-#'     or \code{'W2'} (for Wasserstein-2 distance).
+#'     \code{'W2'} (for Wasserstein-2 distance), or \code{`Euclidean`}
+#'     (which uses R's default \code{dist} function).
 #' @author Written by Pieter Vermeesch, using modified code from
 #'     Mathieu Vrac's \code{CDFt} package (\code{KolmogorovSmirnov}
 #'     function), and Dominic Schuhmacher's \code{transport} package
@@ -167,8 +168,10 @@ diss <- function(x,...){ UseMethod("diss",x) }
 diss.default <- function(x,y,method='KS',...){
     if (identical(method,'W2')){
         out <- Wasserstein_diss(x,y)
-    } else {
+    } else if (identical(method,'KS')){
         out <- KS_diss(x,y)
+    } else {
+        out <- stats::dist(x,y)
     }
     out
 }
