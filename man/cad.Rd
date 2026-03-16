@@ -232,7 +232,7 @@ from the plot.}
 
 \item{lwd}{line width}
 
-\item{col.01line}{numeric or character specifying the color of the
+\item{col.01line}{numeric or character specifying the colour of the
     horizontal lines at y = 0 and 1.
 
 For all other data formats, the name or code for a colour to give

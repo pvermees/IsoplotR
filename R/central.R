@@ -115,6 +115,10 @@ central <- function(x,...){ UseMethod("central",x) }
 #' @export
 central.default <- function(x,...){
     good <- !is.na(rowSums(x))
+    if (any(x[good,1])<=0){
+        warning("Dataset contains negative values. Can't compute central age.")
+        return(NULL)
+    }
     zu <- log(x[good,1])
     su <- x[good,2]/x[good,1]
     fit <- continuous_mixture(zu,su)
