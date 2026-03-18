@@ -22,39 +22,53 @@ LRisochron.PbPb <- function(x,...){
     a <- fit$par[4]
     sa <- sqrt(covmat[4,4])
     b <- -fit$par[1]
-    sb <- sqrt(covmat[2,2])
+    sb <- sqrt(covmat[1,1])
     list(a=c('a'=a,'s[a]'=sa),
          b=c('b'=b,'s[b]'=sb),
          cov.ab=covmat[1,4])
 }
 
-LRisochron.ThU <- function(x,...){
+LRisochron.ThU <- function(x,UTh=NULL,...){
     yd <- data2york(x,type=1)
-    lower <- c(-Inf,0,0,min(yd[,'Y']))
-    upper <- c(Inf,1,Inf,max(yd[,'Y']))
-    # init
-    y0i <- 1
+    lower <- c(-Inf,0,0)
+    upper <- c(Inf,1,Inf)
     gi <- 0
     propi <- 0.5
+    y0i <- ifelse(is.null(UTh),1,1/UTh)
     sigi <- sd((yd[,'Y']-y0i)/(yd[,'X']-y0i))
-    init <- c(gi,propi,sigi,y0i)
-    # fit
+    init <- c(gi,propi,sigi)
+    if (is.null(UTh)){
+        lower <- append(lower,min(yd[,'Y']))
+        upper <- append(lower,max(yd[,'Y']))
+        init <- append(init,y0i)
+        y0 <- NULL
+    } else {
+        y0 <- y0i
+    }
     fit <- stats::optim(par=init,fn=get_LRisochron_L,
                         method='L-BFGS-B',
                         lower=lower,upper=upper,
-                        yd=yd,fun=yd2ratios.ThU,
+                        yd=yd,y0=y0,fun=yd2ratios.ThU,
                         hessian=TRUE)
-    covmat <- solve(fit$hessian)
+    covmat <- inverthess(fit$hessian)
     b <- fit$par[1]
-    sb <- sqrt(covmat[2,2])
-    y0 <- fit$par[4]
-    sy0 <- sqrt(covmat[4,4])
+    sb <- sqrt(covmat[1,1])
+    if (is.null(UTh)){
+        y0 <- fit$par[4]
+        sy0 <- sqrt(covmat[4,4])
+        E <- errorprop(J11=-y0,J12=1-b,
+                       J21=1,J22=0,
+                       E11=covmat[1,1],
+                       E22=covmat[4,4],
+                       E12=covmat[1,4])
+    } else {
+        sy0 <- 0
+        E <- errorprop(J11=-y0,J12=1-b,
+                       J21=1,J22=0,
+                       E11=covmat[1,1],
+                       E22=0,E12=0)
+    }
     a <- y0*(1-b)
-    E <- errorprop(J11=-y0,J12=1-b,
-                   J21=1,J22=0,
-                   E11=covmat[1,1],
-                   E22=covmat[4,4],
-                   E12=covmat[1,4])
     sa <- sqrt(E[1,1])
     cov.ab <- E[1,2]
     list(y0=c('y0'=y0,'s[y0]'=sy0),
@@ -82,12 +96,12 @@ yd2ratios.ThU <- function(yd,y0){
     cbind(r,sr)
 }
 
-get_LRisochron_L <- function(pars,yd,fun=yd2ratios){
+get_LRisochron_L <- function(pars,yd,y0=NULL,fun=yd2ratios){
     gam <- pars[1]
     prop <- pars[2]
     sig <- pars[3]
     mu <- pars[1]
-    y0 <- pars[4]
+    if (is.null(y0)) y0 <- pars[4]
     zs <- fun(yd=yd,y0=y0)
     z <- zs[,1]
     s <- zs[,2]
