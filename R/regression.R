@@ -1,5 +1,9 @@
-regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
+regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a',left=0){
     xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
+    if (left != 0){
+        model <- 1
+        type <- ifelse(left,"left","right")
+    }
     if (model==1){
         out <- model1regression(xyz2calc,type=type)
     } else if (model==2){
