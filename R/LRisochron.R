@@ -1,31 +1,28 @@
 LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 LRisochron.default <- function(x,left=TRUE,...){
-    stop("No default method implemented yet.")
-}
-LRisochron.PbPb <- function(x,...){
-    yd <- data2york(x,inverse=TRUE)
-    lower <- c(-Inf,0,0,min(yd[,'Y']))
-    upper <- c(Inf,1,Inf,max(yd[,'Y']))
-    # init
-    y0i <- yd[which.min(yd[,'X']),'Y']
+    lower <- c(-Inf,0,0,min(x[,'Y']))
+    upper <- c(Inf,1,Inf,max(x[,'Y']))
+    y0i <- x[which.min(x[,'X']),'Y']
     gi <- 0
     propi <- 0.5
-    sigi <- sd((y0i-yd[,'Y'])/yd[,'X'])
+    sigi <- sd((y0i-x[,'Y'])/x[,'X'])
     init <- c(gi,propi,sigi,y0i)
-    # fit
-    fit <- stats::optim(par=init,fn=get_LRisochron_L,
-                        method='L-BFGS-B',
-                        lower=lower,upper=upper,
-                        yd=yd,fun=yd2ratios.PbPb,
-                        hessian=TRUE)
+    fun <- ifelse(left,yd2ratios.left,yd2ratios.right)
+    fit <- contingencyfit(par=init,fn=get_LRisochron_L,
+                          lower=lower,upper=upper,
+                          yd=x,fun=fun,hessian=TRUE)
     covmat <- solve(fit$hessian)
     a <- fit$par[4]
     sa <- sqrt(covmat[4,4])
-    b <- -fit$par[1]
+    b <- ifelse(left,-1,1) * fit$par[1]
     sb <- sqrt(covmat[1,1])
     list(a=c('a'=a,'s[a]'=sa),
          b=c('b'=b,'s[b]'=sb),
          cov.ab=covmat[1,4])
+}
+LRisochron.PbPb <- function(x,...){
+    yd <- data2york(x,inverse=TRUE)
+    LRisochron(yd,left=TRUE,...)
 }
 
 LRisochron.ThU <- function(x,UTh=NULL,...){
@@ -45,11 +42,10 @@ LRisochron.ThU <- function(x,UTh=NULL,...){
     } else {
         y0 <- y0i
     }
-    fit <- stats::optim(par=init,fn=get_LRisochron_L,
-                        method='L-BFGS-B',
-                        lower=lower,upper=upper,
-                        yd=yd,y0=y0,fun=yd2ratios.ThU,
-                        hessian=TRUE)
+    fit <- contingencyfit(par=init,fn=get_LRisochron_L,
+                          lower=lower,upper=upper,
+                          yd=yd,y0=y0,fun=yd2ratios.ThU,
+                          hessian=TRUE)
     covmat <- inverthess(fit$hessian)
     b <- fit$par[1]
     sb <- sqrt(covmat[1,1])
@@ -77,7 +73,7 @@ LRisochron.ThU <- function(x,UTh=NULL,...){
          cov.ab=cov.ab)
 }
 
-yd2ratios.PbPb <- function(yd,y0){
+yd2ratios.left <- function(yd,y0){
     r <- (y0-yd[,'Y'])/yd[,'X']
     sr <- sqrt(errorprop1x2(J1=-r/yd[,'X'],
                             J2=-1/yd[,'X'],
@@ -85,6 +81,15 @@ yd2ratios.PbPb <- function(yd,y0){
                             E22=yd[,'sY']^2,
                             E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
     cbind(r,sr)
+}
+yd2ratios.right <- function(yd,y0){
+    r <- (yd[,'Y']-y0)/yd[,'X']
+    sr <- sqrt(errorprop1x2(J1=-r/yd[,'X'],
+                            J2=1/yd[,'X'],
+                            E11=yd[,'sX']^2,
+                            E22=yd[,'sY']^2,
+                            E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
+    cbind(r,sr)    
 }
 yd2ratios.ThU <- function(yd,y0){
     r <- (yd[,'Y']-y0)/(yd[,'X']-y0)
