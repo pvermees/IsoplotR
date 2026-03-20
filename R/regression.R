@@ -1,9 +1,6 @@
-regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a',left=0){
+regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a'){
     xyz2calc <- clear(xyz,omit,OGLS=identical(type,'ogls'))
-    if (left != 0){
-        model <- 1
-        type <- ifelse(left,"left","right")
-    }
+    if (type %in% c('left','right')) model <- 1
     if (model==1){
         out <- model1regression(xyz2calc,type=type)
     } else if (model==2){
@@ -23,7 +20,11 @@ regression <- function(xyz,model=1,type='york',omit=NULL,wtype='a',left=0){
 }
 
 model1regression <- function(xyz,type='york'){
-    if (identical(type,'york')){
+    if (identical(type,'left')){
+        out <- LRisochron(xyz,left=TRUE)
+    } else if (identical(type,'right')){
+        out <- LRisochron(xyz,left=FALSE)
+    } else if (identical(type,'york')){
         out <- york(xyz)
     } else if (identical(type,'titterington')){
         out <- titterington(xyz)

@@ -18,7 +18,8 @@ LRisochron.default <- function(x,left=TRUE,...){
     sb <- sqrt(covmat[1,1])
     list(a=c('a'=a,'s[a]'=sa),
          b=c('b'=b,'s[b]'=sb),
-         cov.ab=covmat[1,4])
+         cov.ab=covmat[1,4],
+         model=1)
 }
 LRisochron.PbPb <- function(x,...){
     yd <- data2york(x,inverse=TRUE)
