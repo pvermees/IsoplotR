@@ -139,8 +139,8 @@ LRisochron.ThU <- function(x,type=1,UTh=NULL,hide=NULL,omit=NULL,...){
     if (type==1){
         out$xyz <- yd
     } else {
-        out <- invertfit(out,type="p")
-        out$xyz <- normal2inverse(out)
+        out <- invertfit(out,type='d')
+        out$xyz <- normal2inverse(yd,type='d')
     }
     out
 }

@@ -1178,7 +1178,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
 isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
                             exterr=FALSE,hide=NULL,omit=NULL){
     if (model==4){
-        out <- LRisochron(x,hide=hide,omit=omit)
+        out <- LRisochron(x,type=type,hide=hide,omit=omit)
     } else {
         yd <- data2york(x,type=type)
         d2calc <- clear(yd,hide,omit)

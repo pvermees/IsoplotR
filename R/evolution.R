@@ -298,7 +298,8 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
     maxY <- graphics::par('usr')[4]
     l0 <- lambda('Th230')[1]
     if (isochron|Th0i==1){
-        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
+        fit <- isochron.ThU(x,type=1,model=model,
+                            plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
         anchor <- cbind(0,fit$y0[1]*exp(-l0*tticks))
