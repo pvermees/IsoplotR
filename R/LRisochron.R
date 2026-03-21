@@ -21,7 +21,7 @@ LRisochron.default <- function(x,left=TRUE,...){
          cov.ab=covmat[1,4],
          model=1)
 }
-LRisochron.PbPb <- function(x,anchor=0,...){
+LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,...){
     yd <- data2york(x,inverse=TRUE)
     gi <- 0
     propi <- 0.5
@@ -71,12 +71,17 @@ LRisochron.PbPb <- function(x,anchor=0,...){
         rho <- -1
         cov.ab <- rho*sa*sb
     }
-    list(a=c('a'=a,'s[a]'=sa),
-         b=c('b'=b,'s[b]'=sb),
-         cov.ab=cov.ab)
+    out <- list(a=c('a'=unname(a),'s[a]'=unname(sa)),
+                b=c('b'=unname(b),'s[b]'=unname(sb)),
+                cov.ab=unname(cov.ab))
+    if (inverse){
+        return(out)
+    } else {
+        return(invertfit(out,type="d"))
+    }
 }
 
-LRisochron.ThU <- function(x,UTh=NULL,...){
+LRisochron.ThU <- function(x,type=1,UTh=NULL,...){
     if (x$format<3){
         stop("Rightmost isochrons are only available for ThU formats 3 and 4.")
     }
@@ -121,10 +126,15 @@ LRisochron.ThU <- function(x,UTh=NULL,...){
     a <- y0*(1-b)
     sa <- sqrt(E[1,1])
     cov.ab <- E[1,2]
-    list(y0=c('y0'=y0,'s[y0]'=sy0),
-         a=c('a'=a,'s[a]'=sa),
-         b=c('b'=b,'s[b]'=sb),
-         cov.ab=cov.ab)
+    out <- list(y0=c('y0'=unname(y0),'s[y0]'=unname(sy0)),
+                a=c('a'=unname(a),'s[a]'=unname(sa)),
+                b=c('b'=unname(b),'s[b]'=unname(sb)),
+                cov.ab=unname(cov.ab))
+    if (type==1){
+        return(out)
+    } else {
+        return(invertfit(out,type="p"))
+    }
 }
 
 yd2ratios.left <- function(yd,y0){
