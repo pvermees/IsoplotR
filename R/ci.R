@@ -14,6 +14,7 @@ ntfact <- function(alpha=0.05,mswd=NULL,df=NULL){
 }
 
 inflate <- function(fit){
+    if (is.null(fit$p.value)) return(FALSE)
     if (is.null(fit$model)) fit$model <- 1
     (fit$model==1) && (fit$p.value<alpha())
 }
