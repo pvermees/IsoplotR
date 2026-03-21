@@ -847,9 +847,14 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           wtype=1,anchor=0,growth=FALSE,
                           show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-    fit <- flipper(x,inverse=inverse,model=model,type='d',
-                   wtype=wtype,anchor=anchor,hide=hide,omit=omit)
+    if (model==4){
+        fit <- LRisochron(x,inverse=inverse,anchor=anchor,
+                          model=model,hid=hide,omit=omit)
+    } else {
+        wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
+        fit <- flipper(x,inverse=inverse,model=model,type='d',
+                       wtype=wtype,anchor=anchor,hide=hide,omit=omit)
+    }
     out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr,wtype=wtype)
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
