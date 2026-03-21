@@ -1177,10 +1177,14 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
 
 isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
                             exterr=FALSE,hide=NULL,omit=NULL){
-    yd <- data2york(x,type=type)
-    d2calc <- clear(yd,hide,omit)
-    out <- regression(d2calc,model=model,type="york",wtype=wtype)
-    out$xyz <- yd
+    if (model==4){
+        out <- LRisochron(x,hide=hide,omit=omit)
+    } else {
+        yd <- data2york(x,type=type)
+        d2calc <- clear(yd,hide,omit)
+        out <- regression(d2calc,model=model,type="york",wtype=wtype)
+        out$xyz <- yd
+    }
     if (type==1){
         Th230U238 <- out$b
         Th230Th232 <- out$a

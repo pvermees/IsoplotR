@@ -17,10 +17,10 @@ LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
     sa <- sqrt(covmat[4,4])
     b <- ifelse(left,-1,1) * fit$par[1]
     sb <- sqrt(covmat[1,1])
-    list(a=c('a'=a,'s[a]'=sa),
-         b=c('b'=b,'s[b]'=sb),
-         cov.ab=covmat[1,4],
-         model=1)
+    list(a=c('a'=unname(a),'s[a]'=unname(sa)),
+         b=c('b'=unname(b),'s[b]'=unname(sb)),
+         cov.ab=unname(covmat[1,4]),
+         xyz=x,model=4,n=nrow(x2calc))
 }
 LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     yd <- data2york(x,inverse=TRUE)
@@ -101,7 +101,7 @@ LRisochron.ThU <- function(x,type=1,UTh=NULL,hide=NULL,omit=NULL,...){
     init <- c(gi,propi,sigi)
     if (is.null(UTh)){
         lower <- append(lower,min(yd2calc[,'Y']))
-        upper <- append(lower,max(yd2calc[,'Y']))
+        upper <- append(upper,max(yd2calc[,'Y']))
         init <- append(init,y0i)
         y0 <- NULL
     } else {
@@ -132,8 +132,7 @@ LRisochron.ThU <- function(x,type=1,UTh=NULL,hide=NULL,omit=NULL,...){
     a <- y0*(1-b)
     sa <- sqrt(E[1,1])
     cov.ab <- E[1,2]
-    out <- list(y0=c('y0'=unname(y0),'s[y0]'=unname(sy0)),
-                a=c('a'=unname(a),'s[a]'=unname(sa)),
+    out <- list(a=c('a'=unname(a),'s[a]'=unname(sa)),
                 b=c('b'=unname(b),'s[b]'=unname(sb)),
                 cov.ab=unname(cov.ab),
                 model=4,n=nrow(yd2calc))
