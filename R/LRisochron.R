@@ -19,7 +19,7 @@ LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @noRd
 LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
     x2calc <- clear(x,hide,omit)
-    lower <- c(-Inf,0,0,min(x2calc[,'Y']))
+    lower <- c(-Inf,0,.Machine$double.eps,min(x2calc[,'Y']))
     upper <- c(Inf,1,Inf,max(x2calc[,'Y']))
     y0i <- x2calc[which.min(x2calc[,'X']),'Y']
     gi <- 0
@@ -49,10 +49,11 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     y0i <- yd2calc[which.min(yd[,'X']),'Y']
     sigi <- stats::sd((y0i-yd2calc[,'Y'])/yd2calc[,'X'])
     x1 <- y1 <- y0 <- NULL
+    eps <- .Machine$double.eps
     if (anchor[1]==1 & length(anchor)>1){
         y0 <- age2ratio(tt=anchor[2],ratio="Pb207Pb206")[1]
         init <- c(gi,propi,sigi)
-        lower <- c(-Inf,0,0)
+        lower <- c(-Inf,0,eps)
         upper <- c(Inf,1,Inf)
     } else if (anchor[1]==2){
         Pb74 <- iratio('Pb207Pb204')[1]
@@ -60,11 +61,11 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         y1 <- Pb74/Pb64
         x1 <- 1/Pb64
         init <- c(propi,sigi,y0i)
-        lower <- c(0,0,min(yd2calc[,'Y']))
+        lower <- c(0,eps,min(yd2calc[,'Y']))
         upper <- c(1,Inf,max(yd2calc[,'Y']))
     } else {
         init <- c(gi,propi,sigi,y0i)
-        lower <- c(-Inf,0,0,min(yd2calc[,'Y']))
+        lower <- c(-Inf,0,eps,min(yd2calc[,'Y']))
         upper <- c(Inf,1,Inf,max(yd2calc[,'Y']))
     }
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
@@ -105,61 +106,80 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     out
 }
 #' @noRd
-LRisochron.ThU <- function(x,type=1,UTh=NULL,hide=NULL,omit=NULL,...){
+LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     if (x$format<3){
         stop("Rightmost isochrons are only available for ThU formats 3 and 4.")
     }
     yd <- data2york(x,inverse=FALSE)
     yd2calc <- clear(yd,hide,omit)
-    lower <- c(-Inf,0,0)
-    upper <- c(Inf,1,Inf)
     gi <- 0
     propi <- 0.5
-    y0i <- ifelse(is.null(UTh),1,1/UTh)
+    y0i <- ifelse(anchor[1]==1,1/x$U8Th2,1)
     sigi <- stats::sd((yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i))
-    init <- c(gi,propi,sigi)
-    if (is.null(UTh)){
+    init <- c(propi,sigi)
+    lower <- c(0,.Machine$double.eps)
+    upper <- c(1,Inf)
+    y0 <- b <- NULL
+    if (anchor[1]==1){
+        y0 <- y0i
+        lower <- append(-Inf,lower)
+        upper <- append(Inf,upper)
+        init <- append(gi,init)
+    } else if (anchor[1]==2 & length(anchor)>1){
+        b <- age2ratio(tt=anchor[2],ratio='Th230U238')[1]
         lower <- append(lower,min(yd2calc[,'Y']))
         upper <- append(upper,max(yd2calc[,'Y']))
         init <- append(init,y0i)
-        y0 <- NULL
     } else {
-        y0 <- y0i
+        lower <- append(-Inf,lower,min(yd2calc[,'Y']))
+        upper <- append(Inf,upper,max(yd2calc[,'Y']))
+        init <- append(gi,init,y0i)
     }
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                           lower=lower,upper=upper,
-                          yd=yd2calc,y0=y0,fun=yd2ratios_ThU,
+                          yd=yd2calc,y0=y0,gam=b,
+                          fun=yd2ratios_ThU,
                           hessian=TRUE)
     covmat <- inverthess(fit$hessian)
-    b <- fit$par[1]
-    sb <- sqrt(covmat[1,1])
-    if (is.null(UTh)){
-        y0 <- fit$par[4]
-        sy0 <- sqrt(covmat[4,4])
-        E <- errorprop(J11=-y0,J12=1-b,
-                       J21=1,J22=0,
-                       E11=covmat[1,1],
-                       E22=covmat[4,4],
-                       E12=covmat[1,4])
-    } else {
+    np <- length(fit$par)
+    if (anchor[1]==1){
         sy0 <- 0
-        E <- errorprop(J11=-y0,J12=1-b,
-                       J21=1,J22=0,
-                       E11=covmat[1,1],
-                       E22=0,E12=0)
+        b <- fit$par[1]
+        sb <- sqrt(covmat[1,1])
+        J <- rbind(c(-y0,1-b),
+                   c(1,0))
+        E <- J %*% rbind(c(covmat[1,1],0),c(0,0)) %*% t(J)
+        a <- y0*(1-b)
+        sa <- sqrt(E[1,1])
+        cov.ab <- E[1,2]
+    } else if (anchor[1]==2 & length(anchor)>1){
+        y0 <- fit$par[np]
+        sy0 <- sqrt(covmat[np,np])
+        sb <- 0
+        a <- y0*(1-b)
+        sa <- sy0*(1-b)
+        cov.ab <- 0
+    } else {
+        y0 <- fit$par[np]
+        sy0 <- sqrt(covmat[np,np])
+        a <- y0*(1-b)
+        b <- fit$par[1]
+        sb <- sqrt(covmat[1,1])
+        J <- rbind(c(-y0,1-b),
+                   c(1,0))
+        E <- J %*% covmat[c(1,np),c(1,np)] %*% t(J)
+        sa <- sqrt(E[1,1])
+        cov.ab <- E[1,2]
     }
-    a <- y0*(1-b)
-    sa <- sqrt(E[1,1])
-    cov.ab <- E[1,2]
     out <- list(a=c('a'=unname(a),'s[a]'=unname(sa)),
                 b=c('b'=unname(b),'s[b]'=unname(sb)),
                 cov.ab=unname(cov.ab),
                 model=4,n=nrow(yd2calc))
-    if (type==1){
-        out$xyz <- yd
-    } else {
+    if (inverse){
         out <- invertfit(out,type='d')
         out$xyz <- normal2inverse(yd,type='d')
+    } else {
+        out$xyz <- yd
     }
     out
 }
@@ -192,18 +212,27 @@ yd2ratios_ThU <- function(yd,y0){
     cbind(r,sr)
 }
 
-get_LRisochron_L <- function(pars,yd,y0=NULL,x1=NULL,y1=NULL,fun=yd2ratios_left){
+get_LRisochron_L <- function(pars,yd,y0=NULL,
+                             x1=NULL,y1=NULL,gam=NULL,
+                             fun=yd2ratios_left){
     np <- length(pars)
     if (is.null(y0)){
         y0 <- pars[np]
     }
-    if (is.null(x1) || is.null(y1)){
-        gam <- pars[1]
+    if (is.null(gam)){
+        if (is.null(x1) || is.null(y1)){
+            gam <- pars[1]
+            prop <- pars[2]
+            sig <- pars[3]
+        } else {
+            gam <- (y0-y1)/x1
+            prop <- pars[1]
+            sig <- pars[2]
+        }
     } else {
-        gam <- (y0-y1)/x1
+        prop <- pars[1]
+        sig <- pars[2]
     }
-    prop <- pars[2]
-    sig <- pars[3]
     mu <- gam
     zs <- fun(yd=yd,y0=y0)
     z <- zs[,1]

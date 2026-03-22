@@ -1183,12 +1183,13 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
 
 isochron_ThU_2D <- function(x,type=2,model=1,anchor=0,wtype='a',
                             exterr=FALSE,hide=NULL,omit=NULL){
+    inverse <- (type==2)
     if (model==4){
-        out <- LRisochron(x,type=type,anchor=anchor,
+        out <- LRisochron(x,inverse=inverse,anchor=anchor,
                           hide=hide,omit=omit)
     } else {
         wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-        out <- flipper(x,inverse=(type==2),model=model,
+        out <- flipper(x,inverse=inverse,model=model,
                        type='d',wtype=wtype,anchor=anchor,
                        hide=hide,omit=omit)
     }
