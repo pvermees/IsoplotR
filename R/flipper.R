@@ -17,8 +17,6 @@
 #' @noRd
 flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
                     model=1,type='p',wtype=0,anchor=0,...){
-    y0rat <- gety0rat(x)
-    DPrat <- getDPrat(x)
     yd <- data2york(x,inverse=inverse)
     if (model<3 & anchor[1]<1){
         ifi <- rep(FALSE,3)
@@ -28,16 +26,15 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         wtype <- 1 # override
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
-        anchor[2:3] <- iratio(y0rat[1])
-        if (type=='d'){ # shift left by Pb206Pb204c
-            anchor[4:5] <- iratio(y0rat[2])
+        anchor <- iratio_anchor(x)
+        if (type=='d'){ # shift left by Pb206Pb204c or Th230U238i
             d2calc[,'X'] <- d2calc[,'X'] - anchor[4]
         }
         if (model<2) fit <- anchoredYork(d2calc,y0=anchor[2],sy0=anchor[3])
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
-        if (type=='d'){ # shift right by Pb206Pb204c
+        if (type=='d'){ # shift right by Pb206Pb204c or Th230U238i
             fit$a[1] <- fit$a[1] - fit$b[1]*anchor[4]
-            J <- rbind(c(1,-anchor[4]),c(0,1))
+            J <- rbind(c(1,-anchor[2]),c(0,1))
             E <- rbind(c(fit$a[2]^2,fit$cov.ab),
                        c(fit$cov.ab,fit$b[2]^2))
             covmat <- J %*% E %*% t(J)
@@ -49,6 +46,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         wtype <- 2 # override
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
+        DPrat <- getDPrat(x)
         if (is.null(DPrat)){
             DP <- anchor[2:3]
         } else {
@@ -185,6 +183,29 @@ anchoredYork <- function(x,y0=0,sy0=0){
     out
 }
 
+#' Append the initial ratio intercept to anchor=1
+#'
+#' Helper function for anchored regression
+#' @param x an IsoplotR data object
+#' @param ... unused optional arguments
+#' @return a vector of length 3 or 5 with the inherited ratios and uncertainties
+#' @noRd
+iratio_anchor <- function(x,...){ UseMethod("iratio_anchor",x) }
+#' @noRd
+iratio_anchor.default <- function(x,...){
+    y0rat <- gety0rat(x)
+    c(1,iratio(y0rat[1]))
+}
+#' @noRd
+iratio_anchor.PbPb <- function(x,...){
+    y0rat <- gety0rat(x)
+    c(1,iratio(y0rat[1]),iratio(y0rat[2]))
+}
+#' @noRd
+iratio_anchor.ThU <- function(x,...){
+    c(1,x$U8Th2,0,x$U8Th2,0)
+}
+
 #' Returns the dependent variable of a conventional isochron
 #'
 #' Helper function that returns a string with the Dd ratio of a given
@@ -213,6 +234,8 @@ gety0rat.ReOs <- function(x,...){ 'Os187Os188' }
 gety0rat.SmNd <- function(x,...){ 'Nd143Nd144' }
 #' @noRd
 gety0rat.LuHf <- function(x,...){ 'Hf176Hf177' }
+#' @noRd
+gety0rat.ThU <- function(x,...){ c('Th230Th232','U238Th232') }
 
 #' Returns the Daughter-Parent ratio
 #'
@@ -241,6 +264,8 @@ getDPrat.ReOs <- function(x,...){ 'Os187Re187' }
 getDPrat.SmNd <- function(x,...){ 'Nd143Sm147' }
 #' @noRd
 getDPrat.LuHf <- function(x,...){ 'Hf176Lu176' }
+#' @noRd
+getDPrat.ThU <- function(x,...){ 'Th230U238' }
 
 #' Returns the radioactive parent
 #'

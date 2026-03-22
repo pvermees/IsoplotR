@@ -164,6 +164,9 @@
 #'
 #' \code{3}: Error-weighted least squares with overdispersion term
 #'
+#' \code{4}: If \code{x} has class \code{PbPb} or \code{ThU}, calculate
+#' the leftmost or rightmost isochron, respectively
+#'
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
 #'
@@ -205,8 +208,10 @@
 #'
 #' If \code{anchor[1]=1}: fix the non-radiogenic composition at the
 #' values stored in \code{settings('iratio',...)}, OR, if \code{x} has
-#' class \code{other}, fix the intercept at the value stored in
-#' \code{anchor[2]}.
+#' class \code{ThU} and \code{x$format} = \code{3} or \code{4}, fix
+#' the intercept at the value stored in \code{x$U8Th2}, OR, if
+#' \code{x} has class \code{other}, fix the intercept at the value
+#' stored in \code{anchor[2]}.
 #'
 #' If \code{anchor[1]=2}: fix the age at the value stored in \code{anchor[2]}.
 #'
@@ -1120,8 +1125,8 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
-                          title=TRUE,exterr=FALSE,model=1,wtype='a',
-                          show.ellipses=1*(model!=2),
+                          title=TRUE,exterr=FALSE,model=1,
+                          anchor=0,wtype='a',show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
     displabel <- 'dispersion = '
@@ -1142,8 +1147,9 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
             }
         }
     } else if (x$format %in% c(3,4)){
-        out <- isochron_ThU_2D(x,type=type,model=model,wtype=wtype,
-                               exterr=exterr,hide=hide,omit=omit)
+        out <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
+                               wtype=wtype,exterr=exterr,
+                               hide=hide,omit=omit)
         if (model==3){
             if ((type==1 & wtype%in%c('slope',2,'b')) |
                 (type==2 & wtype%in%c('intercept',1,'a'))){
@@ -1155,7 +1161,6 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     } else {
         stop('Illegal Th-U data format.')
     }
-    out$disp <- w2disp(x,fit=out,type=type,wtype=wtype)
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1163,6 +1168,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+        showDispersion(out,inverse=(x$format %in% c(2,4)),wtype=wtype)
         if (title){
             main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
                                   type='Th-U',units=' ka',
@@ -1175,15 +1181,16 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     invisible(out)
 }
 
-isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
+isochron_ThU_2D <- function(x,type=2,model=1,anchor=0,wtype='a',
                             exterr=FALSE,hide=NULL,omit=NULL){
     if (model==4){
-        out <- LRisochron(x,type=type,hide=hide,omit=omit)
+        out <- LRisochron(x,type=type,anchor=anchor,
+                          hide=hide,omit=omit)
     } else {
-        yd <- data2york(x,type=type)
-        d2calc <- clear(yd,hide,omit)
-        out <- regression(d2calc,model=model,type="york",wtype=wtype)
-        out$xyz <- yd
+        wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
+        out <- flipper(x,inverse=(type==2),model=model,
+                       type='d',wtype=wtype,anchor=anchor,
+                       hide=hide,omit=omit)
     }
     if (type==1){
         Th230U238 <- out$b

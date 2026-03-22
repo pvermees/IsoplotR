@@ -371,6 +371,7 @@ isochron(x, ...)
   title = TRUE,
   exterr = FALSE,
   model = 1,
+  anchor = 0,
   wtype = "a",
   show.ellipses = 1 * (model != 2),
   hide = NULL,
@@ -474,7 +475,10 @@ intercept and slope.}
 
 \code{2}: Total least squares regression
 
-\code{3}: Error-weighted least squares with overdispersion term}
+\code{3}: Error-weighted least squares with overdispersion term
+
+\code{4}: If \code{x} has class \code{PbPb} or \code{ThU}, calculate
+the leftmost or rightmost isochron, respectively}
 
 \item{wtype}{controls the parameter responsible for the
     overdispersion in model-3 regression.

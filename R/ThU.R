@@ -39,7 +39,7 @@ get_ThU_age_corals <- function(x,exterr=FALSE,i=NULL,
 
 get_ThU_age_volcanics <- function(x,exterr=FALSE,i=NULL,Th0i=0,omit4c=NULL){
     ns <- length(x)
-    d <- data2york(x,type=2,generic=FALSE)
+    d <- data2york(x,inverse=TRUE,generic=FALSE)
     if (Th0i==1){
         fit <- isochron.ThU(x,type=2,plot=FALSE,exterr=FALSE,omit=omit4c)
         Th02 <- fit$b[1]
@@ -170,6 +170,18 @@ ThU_convert <- function(x){
     out
 }
 
+# for volcanic rocks in 234U/238U equilibrium
+get_ThU_ratio <- function(tt,st=0,exterr=FALSE){
+    l0 <- lambda('Th230')
+    r <- 1 - exp(-l0[1]*tt)
+    E22 <- ifelse(exterr,l0[2]^2,0)
+    vr <- errorprop1x2(J1=l0[1]*exp(-l0[1]*tt),
+                       J2=tt*exp(-l0[1]*tt),
+                       E11=st^2,E22=E22)
+    c('r'=r,'s[r]'=sqrt(vr))
+}
+
+# helper function for for evolution diagrams
 get_Th230U238_ratio <- function(tt,U234U238_0){
     l4 <- lambda('U234')
     l0 <- lambda('Th230')

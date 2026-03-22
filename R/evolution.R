@@ -463,7 +463,7 @@ data2evolution <- function(x,Th0i=0,omit4c=NULL){
             out <- td
         }
     } else if (x$format %in% c(3,4)){
-        out <- data2york(x,type=1,generic=FALSE) # 8/2 - 0/2
+        out <- data2york(x,inverse=FALSE,generic=FALSE) # 8/2 - 0/2
     }
     out
 }

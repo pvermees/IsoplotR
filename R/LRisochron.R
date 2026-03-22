@@ -1,4 +1,22 @@
+#' Leftmost and rightmost isochrons
+#'
+#' Modifies the Galbraith and Laslett's minimum age module to fit
+#' overdispersed Pb-Pb and Th-U isochron data.
+#' @param x an IsoplotR data object
+#' @param left logical, switches between leftmost and rightmost
+#'     isochrons
+#' @param hide vector with indices of aliquots that should be removed
+#'     from the plot.
+#' @param omit vector with indices of aliquots that should be plotted
+#'     but omitted from the isochron age calculation.
+#' @param inverse toggles between normal and inverse isochrons. See
+#'     \code{\link{isochron}}.
+#' @param ... unused optional arguments
+#' @return a list with the intercept (\code{a}), slope (\code{b}) and
+#'     other data that can be passed on to \code{scatterplot}.
+#' @noRd
 LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
+#' @noRd
 LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
     x2calc <- clear(x,hide,omit)
     lower <- c(-Inf,0,0,min(x2calc[,'Y']))
@@ -6,9 +24,9 @@ LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
     y0i <- x2calc[which.min(x2calc[,'X']),'Y']
     gi <- 0
     propi <- 0.5
-    sigi <- sd((y0i-x2calc[,'Y'])/x2calc[,'X'])
+    sigi <- stats::sd((y0i-x2calc[,'Y'])/x2calc[,'X'])
     init <- c(gi,propi,sigi,y0i)
-    fun <- ifelse(left,yd2ratios.left,yd2ratios.right)
+    fun <- ifelse(left,yd2ratios_left,yd2ratios_right)
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                           lower=lower,upper=upper,
                           yd=x2calc,fun=fun,hessian=TRUE)
@@ -22,13 +40,14 @@ LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
          cov.ab=unname(covmat[1,4]),
          xyz=x,model=4,n=nrow(x2calc))
 }
+#' @noRd
 LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     yd <- data2york(x,inverse=TRUE)
     yd2calc <- clear(yd,hide,omit)
     gi <- 0
     propi <- 0.5
     y0i <- yd2calc[which.min(yd[,'X']),'Y']
-    sigi <- sd((y0i-yd2calc[,'Y'])/yd2calc[,'X'])
+    sigi <- stats::sd((y0i-yd2calc[,'Y'])/yd2calc[,'X'])
     x1 <- y1 <- y0 <- NULL
     if (anchor[1]==1 & length(anchor)>1){
         y0 <- age2ratio(tt=anchor[2],ratio="Pb207Pb206")[1]
@@ -50,7 +69,7 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     }
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                           lower=lower,upper=upper,
-                          fun=yd2ratios.left,
+                          fun=yd2ratios_left,
                           yd=yd2calc,y0=y0,x1=x1,y1=y1,
                           hessian=TRUE)
     covmat <- inverthess(fit$hessian)
@@ -85,19 +104,19 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     }
     out
 }
-
+#' @noRd
 LRisochron.ThU <- function(x,type=1,UTh=NULL,hide=NULL,omit=NULL,...){
     if (x$format<3){
         stop("Rightmost isochrons are only available for ThU formats 3 and 4.")
     }
-    yd <- data2york(x,type=1)
+    yd <- data2york(x,inverse=FALSE)
     yd2calc <- clear(yd,hide,omit)
     lower <- c(-Inf,0,0)
     upper <- c(Inf,1,Inf)
     gi <- 0
     propi <- 0.5
     y0i <- ifelse(is.null(UTh),1,1/UTh)
-    sigi <- sd((yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i))
+    sigi <- stats::sd((yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i))
     init <- c(gi,propi,sigi)
     if (is.null(UTh)){
         lower <- append(lower,min(yd2calc[,'Y']))
@@ -109,7 +128,7 @@ LRisochron.ThU <- function(x,type=1,UTh=NULL,hide=NULL,omit=NULL,...){
     }
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                           lower=lower,upper=upper,
-                          yd=yd2calc,y0=y0,fun=yd2ratios.ThU,
+                          yd=yd2calc,y0=y0,fun=yd2ratios_ThU,
                           hessian=TRUE)
     covmat <- inverthess(fit$hessian)
     b <- fit$par[1]
@@ -145,7 +164,7 @@ LRisochron.ThU <- function(x,type=1,UTh=NULL,hide=NULL,omit=NULL,...){
     out
 }
 
-yd2ratios.left <- function(yd,y0){
+yd2ratios_left <- function(yd,y0){
     r <- (y0-yd[,'Y'])/yd[,'X']
     sr <- sqrt(errorprop1x2(J1=-r/yd[,'X'],
                             J2=-1/yd[,'X'],
@@ -154,7 +173,7 @@ yd2ratios.left <- function(yd,y0){
                             E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
     cbind(r,sr)
 }
-yd2ratios.right <- function(yd,y0){
+yd2ratios_right <- function(yd,y0){
     r <- (yd[,'Y']-y0)/yd[,'X']
     sr <- sqrt(errorprop1x2(J1=-r/yd[,'X'],
                             J2=1/yd[,'X'],
@@ -163,7 +182,7 @@ yd2ratios.right <- function(yd,y0){
                             E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
     cbind(r,sr)    
 }
-yd2ratios.ThU <- function(yd,y0){
+yd2ratios_ThU <- function(yd,y0){
     r <- (yd[,'Y']-y0)/(yd[,'X']-y0)
     sr <- sqrt(errorprop1x2(J1=-r/(yd[,'X']-y0),
                             J2=-y0/(yd[,'X']-y0),
@@ -173,7 +192,7 @@ yd2ratios.ThU <- function(yd,y0){
     cbind(r,sr)
 }
 
-get_LRisochron_L <- function(pars,yd,y0=NULL,x1=NULL,y1=NULL,fun=yd2ratios){
+get_LRisochron_L <- function(pars,yd,y0=NULL,x1=NULL,y1=NULL,fun=yd2ratios_left){
     np <- length(pars)
     if (is.null(y0)){
         y0 <- pars[np]

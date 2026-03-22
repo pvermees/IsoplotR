@@ -20,7 +20,8 @@ diss(x, ...)
 \item{y}{a vector of numbers}
 
 \item{method}{either \code{'KS'} (for Kolmogorov-Smirnov distance),
-or \code{'W2'} (for Wasserstein-2 distance).}
+\code{'W2'} (for Wasserstein-2 distance), or \code{`Euclidean`}
+(which uses R's default \code{dist} function).}
 }
 \value{
 an object of class \code{dist}.

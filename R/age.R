@@ -644,6 +644,8 @@ age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,
         out <- get_ReOs_ratio(tt,st,exterr=exterr)
     } else if (ratio=='Nd143Sm147'){
         out <- get_SmNd_ratio(tt,st,exterr=exterr)
+    } else if (ratio=='Th230U238'){
+        out <- get_ThU_ratio(tt,st,exterr=exterr)
     } else if (ratio=='Stacey-Kramers'){
         out <- stacey.kramers(tt)
     } else {
