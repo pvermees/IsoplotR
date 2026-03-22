@@ -162,12 +162,12 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     } else {
         y0 <- fit$par[np]
         sy0 <- sqrt(covmat[np,np])
-        a <- y0*(1-b)
         b <- fit$par[1]
         sb <- sqrt(covmat[1,1])
         J <- rbind(c(-y0,1-b),
                    c(1,0))
         E <- J %*% covmat[c(1,np),c(1,np)] %*% t(J)
+        a <- y0*(1-b)
         sa <- sqrt(E[1,1])
         cov.ab <- E[1,2]
     }
