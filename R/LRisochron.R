@@ -19,13 +19,14 @@ LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @noRd
 LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
     x2calc <- clear(x,hide,omit)
-    lower <- c(-Inf,0,.Machine$double.eps,min(x2calc[,'Y']))
-    upper <- c(Inf,1,Inf,max(x2calc[,'Y']))
-    y0i <- x2calc[which.min(x2calc[,'X']),'Y']
-    gi <- 0
+    yfit <- york(x2calc)
+    y0i <- yfit$a[1]
+    gi <- -yfit$b[1]
     propi <- 0.5
     sigi <- stats::sd((y0i-x2calc[,'Y'])/x2calc[,'X'])
     init <- c(gi,propi,sigi,y0i)
+    lower <- c(-Inf,0,.Machine$double.eps,-Inf)
+    upper <- c(Inf,1,Inf,Inf)
     fun <- ifelse(left,yd2ratios_left,yd2ratios_right)
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                           lower=lower,upper=upper,
@@ -44,9 +45,10 @@ LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
 LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     yd <- data2york(x,inverse=TRUE)
     yd2calc <- clear(yd,hide,omit)
-    gi <- 0
+    yfit <- york(yd2calc)
+    y0i <- yfit$a[1]
+    gi <- -yfit$b[1]
     propi <- 0.5
-    y0i <- yd2calc[which.min(yd[,'X']),'Y']
     sigi <- stats::sd((y0i-yd2calc[,'Y'])/yd2calc[,'X'])
     x1 <- y1 <- y0 <- NULL
     eps <- .Machine$double.eps
@@ -61,12 +63,12 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         y1 <- Pb74/Pb64
         x1 <- 1/Pb64
         init <- c(propi,sigi,y0i)
-        lower <- c(0,eps,min(yd2calc[,'Y']))
-        upper <- c(1,Inf,max(yd2calc[,'Y']))
+        lower <- c(0,eps,-Inf)
+        upper <- c(1,Inf,Inf)
     } else {
         init <- c(gi,propi,sigi,y0i)
-        lower <- c(-Inf,0,eps,min(yd2calc[,'Y']))
-        upper <- c(Inf,1,Inf,max(yd2calc[,'Y']))
+        lower <- c(-Inf,0,eps,-Inf)
+        upper <- c(Inf,1,Inf,Inf)
     }
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                           lower=lower,upper=upper,
@@ -112,9 +114,10 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     }
     yd <- data2york(x,inverse=FALSE)
     yd2calc <- clear(yd,hide,omit)
-    gi <- 0
+    yfit <- york(yd2calc)
+    gi <- yfit$b[1]
+    y0i <- ifelse(anchor[1]==1,1/x$U8Th2,yfit$a[1])
     propi <- 0.5
-    y0i <- ifelse(anchor[1]==1,1/x$U8Th2,1)
     sigi <- stats::sd((yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i))
     init <- c(propi,sigi)
     lower <- c(0,.Machine$double.eps)
@@ -122,18 +125,18 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     y0 <- b <- NULL
     if (anchor[1]==1){
         y0 <- y0i
-        lower <- append(-Inf,lower)
-        upper <- append(Inf,upper)
-        init <- append(gi,init)
+        lower <- c(-Inf,lower)
+        upper <- c(Inf,upper)
+        init <- c(gi,init)
     } else if (anchor[1]==2 & length(anchor)>1){
         b <- age2ratio(tt=anchor[2],ratio='Th230U238')[1]
-        lower <- append(lower,min(yd2calc[,'Y']))
-        upper <- append(upper,max(yd2calc[,'Y']))
-        init <- append(init,y0i)
+        lower <- c(lower,-Inf)
+        upper <- c(upper,Inf)
+        init <- c(init,y0i)
     } else {
-        lower <- append(-Inf,lower,min(yd2calc[,'Y']))
-        upper <- append(Inf,upper,max(yd2calc[,'Y']))
-        init <- append(gi,init,y0i)
+        lower <- c(-Inf,lower,-Inf)
+        upper <- c(Inf,upper,Inf)
+        init <- c(gi,init,y0i)
     }
     fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                           lower=lower,upper=upper,
