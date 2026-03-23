@@ -1177,6 +1177,9 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
 
 isochron_ThU_2D <- function(x,type=2,model=1,anchor=0,wtype=1,
                             exterr=FALSE,hide=NULL,omit=NULL){
+    if (x$format<3){
+        stop("isochron_ThU_2D is only available for Th-U formats 3 and 4 ")
+    }
     inverse <- (type==2)
     if (model==4){
         fit <- LRisochron(x,inverse=inverse,anchor=anchor,

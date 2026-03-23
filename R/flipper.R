@@ -59,11 +59,11 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
             anchor <- c(1,DP)
             fit <- MLyork(d2calc,anchor=anchor,model=model)
         }
-    } else if (wtype%in%c('intercept',1,'a')){
+    } else if (wtype %in% c('intercept',1,'a')){
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
-    } else if (wtype%in%c('slope',2,'b')){
+    } else if (wtype %in% c('slope',2,'b')){
         ifi <- get_ifi(wtype=wtype,type=type,inverse=inverse)
         d2calc <- flipinvert(yd=yd,ifi=ifi,type=type,hide=hide,omit=omit)
         fit <- MLyork(d2calc,model=model,wtype='a')
