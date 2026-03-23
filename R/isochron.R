@@ -1508,22 +1508,22 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
 #' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
 #' @noRd
 w2disp.ThU <- function(x,fit,type,wtype,...){
-    if (x$format%in%c(1,2)){
+    if (x$format < 3){
         out <- fit$w
-    } else if (x$format%in%c(3,4)){
-        if (type==1 & wtype%in%c('slope',2,'b')){
-            age2disp <- TRUE
-            Th230U238 <- fit$b[1]
-        } else if (type==2 & wtype%in%c('intercept',1,'a')){
-            age2disp <- TRUE
-            Th230U238 <- fit$a[1]
+    } else {
+        if (type==1){
+            if (wtype==1){
+                out <- fit$w
+            } else {
+                out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
+                              wDP=fit$flippedfit$w)
+            }
         } else {
-            age2disp <- FALSE
-        }
-        if (age2disp){
-            out <- wDP2wt(x=x,DP=Th230U238,wDP=fit$w)
-        } else {
-            out <- fit$w
+            if (wtype==1){
+                out <- fit$y0[1]*fit$flippedfit$w/fit$flippedfit$a[1]
+            } else {
+                out <- wDP2wt(x=x,DP=fit$a[1],wDP=fit$w)
+            }
         }
     }
     out
