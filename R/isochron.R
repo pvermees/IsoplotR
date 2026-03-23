@@ -1129,8 +1129,8 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           anchor=0,wtype='a',show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
-    displabel <- 'dispersion = '
     dispunits <- ''
+    displabel <- 'dispersion = '
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,wtype=wtype,
                                exterr=exterr,hide=hide,omit=omit,
@@ -1147,17 +1147,11 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
             }
         }
     } else if (x$format %in% c(3,4)){
+        wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
         out <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
                                wtype=wtype,exterr=exterr,
                                hide=hide,omit=omit)
-        if (model==3){
-            if ((type==1 & wtype%in%c('slope',2,'b')) |
-                (type==2 & wtype%in%c('intercept',1,'a'))){
-                dispunits <- ' ka'
-            } else {
-                displabel <- quote('('^230*'Th/'^232*'Th)'[0]*'-dispersion = ')
-            }
-        }
+        dispunits <- getDispUnits_ThU(model=model,wtype=wtype,anchor=anchor)
     } else {
         stop('Illegal Th-U data format.')
     }
@@ -1168,7 +1162,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
-        showDispersion(out,inverse=(x$format %in% c(2,4)),wtype=wtype)
+        showDispersion(out,inverse=(x$format %in% c(2,4)),wtype=wtype,type='d')
         if (title){
             main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
                                   type='Th-U',units=' ka',
@@ -1181,50 +1175,18 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     invisible(out)
 }
 
-isochron_ThU_2D <- function(x,type=2,model=1,anchor=0,wtype='a',
+isochron_ThU_2D <- function(x,type=2,model=1,anchor=0,wtype=1,
                             exterr=FALSE,hide=NULL,omit=NULL){
     inverse <- (type==2)
     if (model==4){
-        out <- LRisochron(x,inverse=inverse,anchor=anchor,
+        fit <- LRisochron(x,inverse=inverse,anchor=anchor,
                           hide=hide,omit=omit)
     } else {
-        wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-        out <- flipper(x,inverse=inverse,model=model,
+        fit <- flipper(x,inverse=inverse,model=model,
                        type='d',wtype=wtype,anchor=anchor,
                        hide=hide,omit=omit)
     }
-    if (type==1){
-        Th230U238 <- out$b
-        Th230Th232 <- out$a
-    } else if (type==2) {
-        Th230U238 <- out$a
-        Th230Th232 <- out$b
-    }
-    cov0802 <- out$cov.ab
-    
-    l0 <- lambda('Th230')
-    tt <- -log(1-Th230U238[1])/l0[1]
-    y0 <- Th230Th232[1]/(1-Th230U238[1])
-    J <- matrix(0,2,3)
-    J[1,2] <- 1/(l0[1]*(1-Th230U238[1]))
-    J[2,1] <- 1/(1-Th230U238[1])
-    J[2,2] <- Th230Th232[1]/(1-Th230U238[1])^2
-    if (exterr) J[1,3] <- -tt/l0[1]
-    E <- matrix(0,3,3)
-    diag(E) <- c(Th230Th232[2],Th230U238[2],l0[2])^2
-    E[1,2] <- E[2,1] <- cov0802
-    
-    covmat = J %*% E %*% t(J)
-    out$age[c('t','s[t]')] <- c(tt,sqrt(covmat[1,1]))
-    out$y0[c('y','s[y]')] <- c(y0,sqrt(covmat[2,2]))
-    
-    if (inflate(out)){
-        E[1:2,1:2] <- out$mswd*E[1:2,1:2]
-        covmat = J %*% E %*% t(J)
-        out$age['disp[t]'] <- sqrt(covmat[1,1])
-        out$y0['disp[y]'] <- sqrt(covmat[2,2])
-    }
-    
+    out <- ab2y0t(x=x,fit=fit,type=type,exterr=exterr,wtype=wtype)
     lab <- getIsochronLabels(x=x,type=type)
     out$xlab <- lab$x
     out$ylab <- lab$y
@@ -1397,7 +1359,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                      ntit='',sigdig=sigdig,oerr=oerr,units='',
                                      prefix=fit$y0label)
         }
-    } else if (type=='Pb-Pb'){
+    } else if (type%in%c('Pb-Pb','Th-U')){
         content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
                                 units=units,sigdig=sigdig,
                                 oerr=oerr,df=fit$df)
@@ -1416,7 +1378,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     } else if (fit$model%in%c(3,5)){
         nl <- nl+1
         content[[nl]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                       oerr=oerr,prefix=displabel,units=dispunits)
+                                 oerr=oerr,prefix=displabel,units=dispunits)
     }
     if (!is.null(ski)){
         growthline <- paste0('intercepts growth curve at ',
@@ -1439,6 +1401,9 @@ getDispUnits_UPb <- function(x,joint,anchor){
 }
 getDispUnits <- function(model,wtype,anchor){
     ifelse(model==3 & (wtype==2 | anchor[1]==2), ' Ma','')
+}
+getDispUnits_ThU <- function(model,wtype,anchor){
+    ifelse(model==3 & (wtype==2 | anchor[1]==2), ' ka','')
 }
 
 showDispersion <- function(fit,inverse,wtype,type='p'){
@@ -1537,6 +1502,7 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     }
     out
 }
+#' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
 #' @noRd
 w2disp.ThU <- function(x,fit,type,wtype,...){
     if (x$format%in%c(1,2)){
@@ -1747,6 +1713,31 @@ ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
     } else if (fit$model==3){
         out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
+    }
+    out
+}
+#' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
+#' @noRd
+ab2y0t.ThU <- function(x,fit,type,exterr,wtype,...){
+    if (x$format<3){
+        stop('ab2y0t only works for Th-U formats 3 and 4.')
+    }
+    out <- fit
+    if (type==2){
+        R08 <- fit$a
+        out$y0[c('y','s[y]')] <- fit$b
+    } else {
+        R08 <- fit$b
+        out$y0[c('y','s[y]')] <- fit$a
+    }
+    out$y0label <- quote('('^230*'Th/'^238*'U)'[c]*'=')
+    out$age[c('t','s[t]')] <- get_ThU_age(R08[1],R08[2],exterr=exterr)[1:2]
+    if (inflate(fit)){
+        out$age['disp[t]'] <- 
+            get_ThU_age(R08[1],sqrt(fit$mswd)*R08[2],exterr=exterr)[2]
+        out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    } else if (fit$model==3){
+        out$disp <- w2disp(x=x,fit=out,type=type,wtype=wtype)
     }
     out
 }
