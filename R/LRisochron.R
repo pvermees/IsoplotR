@@ -19,9 +19,13 @@ LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @noRd
 LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
     x2calc <- clear(x,hide,omit)
-    yfit <- york(x2calc)
-    y0i <- yfit$a[1]
-    gi <- -yfit$b[1]
+    if (left){
+        init_fit <- init_left(yd=x2calc)
+    } else {
+        init_fit <- init_right(yd=x2calc)
+    }
+    y0i <- init_fit$a
+    gi <- -init_fit$b
     propi <- 0.5
     sigi <- stats::sd((y0i-x2calc[,'Y'])/x2calc[,'X'])
     init <- c(gi,propi,sigi,y0i)
@@ -45,9 +49,9 @@ LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
 LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     yd <- data2york(x,inverse=TRUE)
     yd2calc <- clear(yd,hide,omit)
-    yfit <- york(yd2calc)
-    y0i <- yfit$a[1]
-    gi <- -yfit$b[1]
+    init_fit <- init_left(yd2calc)
+    y0i <- init_fit$a
+    gi <- -init_fit$b
     propi <- 0.5
     sigi <- stats::sd((y0i-yd2calc[,'Y'])/yd2calc[,'X'])
     x1 <- y1 <- y0 <- NULL
@@ -114,9 +118,9 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     }
     yd <- data2york(x,inverse=FALSE)
     yd2calc <- clear(yd,hide,omit)
-    yfit <- york(yd2calc)
-    gi <- yfit$b[1]
-    y0i <- ifelse(anchor[1]==1,1/x$U8Th2,yfit$a[1])
+    init <- init_right(yd2calc)
+    gi <- -init$b
+    y0i <- ifelse(anchor[1]==1,1/x$U8Th2,init$a)
     propi <- 0.5
     sigi <- stats::sd((yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i))
     init <- c(propi,sigi)
@@ -185,6 +189,26 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         out$xyz <- yd
     }
     out
+}
+
+init_left <- function(yd){
+    X <- yd[,'X']
+    Y <- yd[,'Y']
+    leftmost <- which.min(X)
+    topmost <- which.max(Y)
+    if (leftmost==topmost){
+        fit <- lm(Y ~ X)
+        a <- fit$coefficients[1]
+        b <- fit$coefficients[2]
+    } else {
+        a <- Y[leftmost]
+        b <- (Y[topmost]-Y[leftmost])/(X[topmost]-X[leftmost])
+    }
+    list(a=a,b=b)
+}
+init_right <- function(yd){
+    bottommost <- which.min(yd[,'Y'])
+    list(a=yd[bottommost,'Y'],b=0)
 }
 
 yd2ratios_left <- function(yd,y0){
