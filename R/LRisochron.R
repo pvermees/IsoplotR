@@ -194,15 +194,15 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
 init_left <- function(yd){
     X <- yd[,'X']
     Y <- yd[,'Y']
-    leftmost <- which.min(X)
-    topmost <- which.max(Y)
-    if (leftmost==topmost){
-        fit <- lm(Y ~ X)
+    fit <- lm(Y ~ X)
+    if (summary(fit)$r.squared>0.8){
         a <- fit$coefficients[1]
         b <- fit$coefficients[2]
     } else {
-        a <- Y[leftmost]
+        leftmost <- which.min(X)
+        topmost <- which.max(Y)
         b <- (Y[topmost]-Y[leftmost])/(X[topmost]-X[leftmost])
+        a <- Y[leftmost] - b*X[leftmost]
     }
     list(a=a,b=b)
 }
