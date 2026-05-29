@@ -142,7 +142,7 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     } else {
         yd2calc <- clear(yd,hide,omit)
         propi <- 0.5
-        y0i <- gi <- y0 <- b <- NULL
+        y0i <- gi <- y0 <- b <- NULL # note: y0 = Th2U8i
         if (anchor[1]==1 & length(anchor)>1){
             b <- age2ratio(tt=anchor[2],ratio='Th230U238')[1]
             leftmost <- which.min(yd[,'X'])
