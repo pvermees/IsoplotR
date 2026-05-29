@@ -281,8 +281,8 @@
 #' \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
 #' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
 #' \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#' \eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{208}}Pb/\eqn{^{204}}Pb
-#' ratio.
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf, \eqn{^{208}}Pb/\eqn{^{204}}Pb
+#' or \eqn{^{230}}Th/\eqn{^{238}}U ratio.
 #'
 #' \code{s[y]}: the standard error of \code{y}
 #'
@@ -1726,13 +1726,25 @@ ab2y0t.ThU <- function(x,fit,type,exterr,wtype,...){
         stop('ab2y0t only works for Th-U formats 3 and 4.')
     }
     out <- fit
-    if (type==2){
-        R08 <- fit$a
-        out$y0[c('y','s[y]')] <- fit$b
-    } else {
+    if (type==1){
         R08 <- fit$b
-        out$y0[c('y','s[y]')] <- fit$a
+        y0 <- unname(fit$a[1]/(1-fit$b[1]))
+        vy0 <- errorprop1x2(J1=fit$a[1]/(1-fit$b[1])^2,
+                            J2=1/(1-fit$b[1]),
+                            E11=fit$b[2]^2,
+                            E22=fit$a[2]^2,
+                            E12=fit$cov.ab)
+    } else {
+        R08 <- fit$a
+        y0 <- unname(fit$b[1]/(1-fit$a[1]))
+        vy0 <- errorprop1x2(J1=fit$b[1]/(1-fit$a[1])^2,
+                            J2=1/(1-fit$a[1]),
+                            E11=fit$a[2]^2,
+                            E22=fit$b[2]^2,
+                            E12=fit$cov.ab)
     }
+    sy0 <- unname(sqrt(vy0))
+    out$y0[c('y','s[y]')] <- c(y0,sy0)
     out$y0label <- quote('('^230*'Th/'^238*'U)'[c]*'=')
     out$age[c('t','s[t]')] <- get_ThU_age(R08[1],R08[2],exterr=exterr)[1:2]
     if (inflate(fit)){
