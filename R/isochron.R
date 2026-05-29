@@ -282,7 +282,7 @@
 #' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
 #' \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
 #' \eqn{^{176}}Hf/\eqn{^{177}}Hf, \eqn{^{208}}Pb/\eqn{^{204}}Pb
-#' or \eqn{^{230}}Th/\eqn{^{238}}U ratio.
+#' or \eqn{^{230}}Th/\eqn{^{232}}Th ratio.
 #'
 #' \code{s[y]}: the standard error of \code{y}
 #'
@@ -1234,6 +1234,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
     tit <- data2tit(x,osmond=osmond)
     d2calc <- clear(tit,hide,omit)
     out <- regression(d2calc,model=model,type="titterington",wtype=wtype)
+    out$disp <- w2disp(x=x,fit=out,type=type,wtype=wtype)
     out$xyz <- tit
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
@@ -1362,7 +1363,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                      ntit='',sigdig=sigdig,oerr=oerr,units='',
                                      prefix=fit$y0label)
         }
-    } else if (type%in%c('Pb-Pb','Th-U')){
+    } else if (type=='Pb-Pb'){
         content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
                                 units=units,sigdig=sigdig,
                                 oerr=oerr,df=fit$df)

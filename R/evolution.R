@@ -309,7 +309,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
                             omit.stroke=omit.stroke)
         anchor <- matrix(fit$y0[1],nt,2)
     } else if (Th0i==2){
-        anchor <- matrix(x$U8Th2,nt-1,2)
+        anchor <- matrix(1/x$U8Th2,nt-1,2)
         tticks <- tticks[is.finite(tticks)]
     } else {
         anchor <- matrix(0,nt,2)

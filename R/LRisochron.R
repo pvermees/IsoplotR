@@ -66,9 +66,7 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         yd2calc <- clear(yd,hide,omit)
         propi <- 0.5
         y0i <- gi <- y0 <- x1 <- y1 <- NULL
-        if (anchor[1]==1 & length(anchor)>1){
-            y0i <- y0 <- age2ratio(tt=anchor[2],ratio="Pb207Pb206")[1]
-        } else if (anchor[1]==2){
+        if (anchor[1]==1){
             Pb74 <- iratio('Pb207Pb204')[1]
             Pb64 <- iratio('Pb206Pb204')[1]
             y1 <- Pb74/Pb64
@@ -77,6 +75,8 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
             x2 <- yd2calc[leftmost,'X']
             y2 <- yd2calc[leftmost,'Y']
             y0i <- y1 - x1*(y2-y1)/(x2-x1)
+        } else if (anchor[1]==2 & length(anchor)>1){
+            y0i <- y0 <- age2ratio(tt=anchor[2],ratio="Pb207Pb206")[1]
         } else {
             stop("Invalid anchor.")
         }
@@ -84,14 +84,14 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         sigi <- stats::sd(g)
         eps <- .Machine$double.eps
         if (anchor[1]==1){
+            init <- c(propi,sigi,y0i)
+            lower <- c(0,eps,-Inf)
+            upper <- c(1,Inf,Inf)
+        } else {
             gi <- mean(g)
             init <- c(gi,propi,sigi)
             lower <- c(-Inf,0,eps)
             upper <- c(Inf,1,Inf)
-        } else {
-            init <- c(propi,sigi,y0i)
-            lower <- c(0,eps,-Inf)
-            upper <- c(1,Inf,Inf)
         }
         fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                               lower=lower,upper=upper,
@@ -143,14 +143,14 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         yd2calc <- clear(yd,hide,omit)
         propi <- 0.5
         y0i <- gi <- y0 <- b <- NULL # note: y0 = Th2U8i
-        if (anchor[1]==1 & length(anchor)>1){
+        if (anchor[1]==1){
+            y0i <- y0 <- 1/x$U8Th2
+        } else if (anchor[1]==2 & length(anchor)>1){
             b <- age2ratio(tt=anchor[2],ratio='Th230U238')[1]
             leftmost <- which.min(yd[,'X'])
             x2 <- yd2calc[leftmost,'X']
             y2 <- yd2calc[leftmost,'Y']
             y0i <- y2 - b * x2
-        } else if (anchor[1]==2){
-            y0i <- y0 <- 1/x$U8Th2
         } else {
             stop("Invalid anchor")
         }
@@ -158,14 +158,14 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         sigi <- stats::sd(g)
         eps <- .Machine$double.eps
         if (anchor[1]==1){
-            init <- c(propi,sigi,y0i)
-            lower <- c(0,eps,-Inf)
-            upper <- c(1,Inf,Inf)
-        } else {
             gi <- mean(g)
             init <- c(gi,propi,sigi)
             lower <- c(-Inf,0,eps)
             upper <- c(Inf,1,Inf)
+        } else {
+            init <- c(propi,sigi,y0i)
+            lower <- c(0,eps,-Inf)
+            upper <- c(1,Inf,Inf)
         }
         fit <- contingencyfit(par=init,fn=get_LRisochron_L,
                               lower=lower,upper=upper,
@@ -175,13 +175,6 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         covmat <- inverthess(fit$hessian)
         np <- length(fit$par)
         if (anchor[1]==1){
-            y0 <- fit$par[np]
-            sy0 <- sqrt(covmat[np,np])
-            sb <- 0
-            a <- y0*(1-b)
-            sa <- sy0*(1-b)
-            cov.ab <- 0
-        } else {
             sy0 <- 0
             b <- fit$par[1]
             a <- y0*(1-b)
@@ -191,6 +184,13 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
             sa <- sqrt(E[1,1])
             sb <- sqrt(covmat[1,1])
             cov.ab <- E[1,2]
+        } else {
+            y0 <- fit$par[np]
+            sy0 <- sqrt(covmat[np,np])
+            sb <- 0
+            a <- y0*(1-b)
+            sa <- sy0*(1-b)
+            cov.ab <- 0
         }
         out <- list(a=c('a'=unname(a),'s[a]'=unname(sa)),
                     b=c('b'=unname(b),'s[b]'=unname(sb)),
