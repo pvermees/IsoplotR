@@ -456,7 +456,7 @@ log_sum_exp <- function(u,v){
 }
 
 contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
-    if (any(lower<upper)){
+    if (all(lower<upper)){
         fit <- stats::optim(par=par,fn=fn,method='L-BFGS-B',lower=lower,
                             upper=upper,hessian=hessian,control=control,...)
     } else {

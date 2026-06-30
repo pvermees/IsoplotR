@@ -164,6 +164,9 @@
 #'
 #' \code{3}: Error-weighted least squares with overdispersion term
 #'
+#' \code{4}: If \code{x} has class \code{PbPb} or \code{ThU}, calculate
+#' the leftmost or rightmost isochron, respectively
+#'
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
 #'
@@ -205,8 +208,10 @@
 #'
 #' If \code{anchor[1]=1}: fix the non-radiogenic composition at the
 #' values stored in \code{settings('iratio',...)}, OR, if \code{x} has
-#' class \code{other}, fix the intercept at the value stored in
-#' \code{anchor[2]}.
+#' class \code{ThU} and \code{x$format} = \code{3} or \code{4}, fix
+#' the intercept at the value stored in \code{x$U8Th2}, OR, if
+#' \code{x} has class \code{other}, fix the intercept at the value
+#' stored in \code{anchor[2]}.
 #'
 #' If \code{anchor[1]=2}: fix the age at the value stored in \code{anchor[2]}.
 #'
@@ -276,8 +281,8 @@
 #' \code{y}: the atmospheric \eqn{^{40}}Ar/\eqn{^{36}}Ar or initial
 #' \eqn{^{40}}Ca/\eqn{^{44}}Ca, \eqn{^{187}}Os/\eqn{^{188}}Os,
 #' \eqn{^{87}}Sr/\eqn{^{87}}Rb, \eqn{^{143}}Nd/\eqn{^{144}}Nd,
-#' \eqn{^{176}}Hf/\eqn{^{177}}Hf or \eqn{^{208}}Pb/\eqn{^{204}}Pb
-#' ratio.
+#' \eqn{^{176}}Hf/\eqn{^{177}}Hf, \eqn{^{208}}Pb/\eqn{^{204}}Pb
+#' or \eqn{^{230}}Th/\eqn{^{232}}Th ratio.
 #'
 #' \code{s[y]}: the standard error of \code{y}
 #'
@@ -844,11 +849,17 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,title=TRUE,exterr=FALSE,model=1,
-                          wtype=1,anchor=0,growth=FALSE,show.ellipses=1*(model!=2),
+                          wtype=1,anchor=0,growth=FALSE,
+                          show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
-    wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-    fit <- flipper(x,inverse=inverse,model=model,type='d',
-                   wtype=wtype,anchor=anchor,hide=hide,omit=omit)
+    if (model==4){
+        fit <- LRisochron(x,inverse=inverse,anchor=anchor,
+                          model=model,hid=hide,omit=omit)
+    } else {
+        wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
+        fit <- flipper(x,inverse=inverse,model=model,type='d',
+                       wtype=wtype,anchor=anchor,hide=hide,omit=omit)
+    }
     out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr,wtype=wtype)
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
@@ -1114,12 +1125,12 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
-                          title=TRUE,exterr=FALSE,model=1,wtype='a',
-                          show.ellipses=1*(model!=2),
+                          title=TRUE,exterr=FALSE,model=1,
+                          anchor=0,wtype='a',show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
-    displabel <- 'dispersion = '
     dispunits <- ''
+    displabel <- 'dispersion = '
     if (x$format %in% c(1,2)){
         out <- isochron_ThU_3D(x,type=type,model=model,wtype=wtype,
                                exterr=exterr,hide=hide,omit=omit,
@@ -1136,20 +1147,14 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
             }
         }
     } else if (x$format %in% c(3,4)){
-        out <- isochron_ThU_2D(x,type=type,model=model,wtype=wtype,
-                               exterr=exterr,hide=hide,omit=omit)
-        if (model==3){
-            if ((type==1 & wtype%in%c('slope',2,'b')) |
-                (type==2 & wtype%in%c('intercept',1,'a'))){
-                dispunits <- ' ka'
-            } else {
-                displabel <- quote('('^230*'Th/'^232*'Th)'[0]*'-dispersion = ')
-            }
-        }
+        wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
+        out <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
+                               wtype=wtype,exterr=exterr,
+                               hide=hide,omit=omit)
+        dispunits <- getDispUnits_ThU(model=model,wtype=wtype,anchor=anchor)
     } else {
         stop('Illegal Th-U data format.')
     }
-    out$disp <- w2disp(x,fit=out,type=type,wtype=wtype)
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,
@@ -1157,6 +1162,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
+        showDispersion(out,inverse=(x$format %in% c(2,4)),wtype=wtype,type='d')
         if (title){
             main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
                                   type='Th-U',units=' ka',
@@ -1169,44 +1175,21 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     invisible(out)
 }
 
-isochron_ThU_2D <- function(x,type=2,model=1,wtype='a',
+isochron_ThU_2D <- function(x,type=2,model=1,anchor=0,wtype=1,
                             exterr=FALSE,hide=NULL,omit=NULL){
-    yd <- data2york(x,type=type)
-    d2calc <- clear(yd,hide,omit)
-    out <- regression(d2calc,model=model,type="york",wtype=wtype)
-    out$xyz <- yd
-    if (type==1){
-        Th230U238 <- out$b
-        Th230Th232 <- out$a
-    } else if (type==2) {
-        Th230U238 <- out$a
-        Th230Th232 <- out$b
+    if (x$format<3){
+        stop("isochron_ThU_2D is only available for Th-U formats 3 and 4 ")
     }
-    cov0802 <- out$cov.ab
-    
-    l0 <- lambda('Th230')
-    tt <- -log(1-Th230U238[1])/l0[1]
-    y0 <- Th230Th232[1]/(1-Th230U238[1])
-    J <- matrix(0,2,3)
-    J[1,2] <- 1/(l0[1]*(1-Th230U238[1]))
-    J[2,1] <- 1/(1-Th230U238[1])
-    J[2,2] <- Th230Th232[1]/(1-Th230U238[1])^2
-    if (exterr) J[1,3] <- -tt/l0[1]
-    E <- matrix(0,3,3)
-    diag(E) <- c(Th230Th232[2],Th230U238[2],l0[2])^2
-    E[1,2] <- E[2,1] <- cov0802
-    
-    covmat = J %*% E %*% t(J)
-    out$age[c('t','s[t]')] <- c(tt,sqrt(covmat[1,1]))
-    out$y0[c('y','s[y]')] <- c(y0,sqrt(covmat[2,2]))
-    
-    if (inflate(out)){
-        E[1:2,1:2] <- out$mswd*E[1:2,1:2]
-        covmat = J %*% E %*% t(J)
-        out$age['disp[t]'] <- sqrt(covmat[1,1])
-        out$y0['disp[y]'] <- sqrt(covmat[2,2])
+    inverse <- (type==2)
+    if (model==4){
+        fit <- LRisochron(x,inverse=inverse,anchor=anchor,
+                          hide=hide,omit=omit)
+    } else {
+        fit <- flipper(x,inverse=inverse,model=model,
+                       type='d',wtype=wtype,anchor=anchor,
+                       hide=hide,omit=omit)
     }
-    
+    out <- ab2y0t(x=x,fit=fit,type=type,exterr=exterr,wtype=wtype)
     lab <- getIsochronLabels(x=x,type=type)
     out$xlab <- lab$x
     out$ylab <- lab$y
@@ -1251,6 +1234,7 @@ isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
     tit <- data2tit(x,osmond=osmond)
     d2calc <- clear(tit,hide,omit)
     out <- regression(d2calc,model=model,type="titterington",wtype=wtype)
+    out$disp <- w2disp(x=x,fit=out,type=type,wtype=wtype)
     out$xyz <- tit
     out$a <- c(out$par[ia],sqrt(out$cov[ia,ia]))
     out$b <- c(out$par[ib],sqrt(out$cov[ib,ib]))
@@ -1328,6 +1312,7 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
     nn <- 50
     tijd <- seq(from=from,to=to,length.out=nn)
     ticks <- pretty(tijd)
+    ticks[length(ticks)] <- round(to)
     tijd[nn] <- max(ticks)
     xy <- stacey.kramers(tijd,inverse=inverse)
     graphics::lines(xy[,1],xy[,2])
@@ -1397,7 +1382,7 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
     } else if (fit$model%in%c(3,5)){
         nl <- nl+1
         content[[nl]] <- disptit(w=fit$disp[1],sw=fit$disp[2],sigdig=sigdig,
-                                       oerr=oerr,prefix=displabel,units=dispunits)
+                                 oerr=oerr,prefix=displabel,units=dispunits)
     }
     if (!is.null(ski)){
         growthline <- paste0('intercepts growth curve at ',
@@ -1420,6 +1405,9 @@ getDispUnits_UPb <- function(x,joint,anchor){
 }
 getDispUnits <- function(model,wtype,anchor){
     ifelse(model==3 & (wtype==2 | anchor[1]==2), ' Ma','')
+}
+getDispUnits_ThU <- function(model,wtype,anchor){
+    ifelse(model==3 & (wtype==2 | anchor[1]==2), ' ka','')
 }
 
 showDispersion <- function(fit,inverse,wtype,type='p'){
@@ -1518,24 +1506,25 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     }
     out
 }
+#' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
 #' @noRd
 w2disp.ThU <- function(x,fit,type,wtype,...){
-    if (x$format%in%c(1,2)){
+    if (x$format < 3){
         out <- fit$w
-    } else if (x$format%in%c(3,4)){
-        if (type==1 & wtype%in%c('slope',2,'b')){
-            age2disp <- TRUE
-            Th230U238 <- fit$b[1]
-        } else if (type==2 & wtype%in%c('intercept',1,'a')){
-            age2disp <- TRUE
-            Th230U238 <- fit$a[1]
+    } else {
+        if (type==1){
+            if (wtype==1){
+                out <- fit$w
+            } else {
+                out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
+                              wDP=fit$flippedfit$w)
+            }
         } else {
-            age2disp <- FALSE
-        }
-        if (age2disp){
-            out <- wDP2wt(x=x,DP=Th230U238,wDP=fit$w)
-        } else {
-            out <- fit$w
+            if (wtype==1){
+                out <- fit$y0[1]*fit$flippedfit$w/fit$flippedfit$a[1]
+            } else {
+                out <- wDP2wt(x=x,DP=fit$a[1],wDP=fit$w)
+            }
         }
     }
     out
@@ -1728,6 +1717,43 @@ ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
         out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
     } else if (fit$model==3){
         out$disp <- w2disp(x=x,fit=out,wtype=wtype,inverse=inverse)
+    }
+    out
+}
+#' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
+#' @noRd
+ab2y0t.ThU <- function(x,fit,type,exterr,wtype,...){
+    if (x$format<3){
+        stop('ab2y0t only works for Th-U formats 3 and 4.')
+    }
+    out <- fit
+    if (type==1){
+        R08 <- fit$b
+        y0 <- unname(fit$a[1]/(1-fit$b[1]))
+        vy0 <- errorprop1x2(J1=fit$a[1]/(1-fit$b[1])^2,
+                            J2=1/(1-fit$b[1]),
+                            E11=fit$b[2]^2,
+                            E22=fit$a[2]^2,
+                            E12=fit$cov.ab)
+    } else {
+        R08 <- fit$a
+        y0 <- unname(fit$b[1]/(1-fit$a[1]))
+        vy0 <- errorprop1x2(J1=fit$b[1]/(1-fit$a[1])^2,
+                            J2=1/(1-fit$a[1]),
+                            E11=fit$a[2]^2,
+                            E22=fit$b[2]^2,
+                            E12=fit$cov.ab)
+    }
+    sy0 <- unname(sqrt(vy0))
+    out$y0[c('y','s[y]')] <- c(y0,sy0)
+    out$y0label <- quote('('^230*'Th/'^238*'U)'[c]*'=')
+    out$age[c('t','s[t]')] <- get_ThU_age(R08[1],R08[2],exterr=exterr)[1:2]
+    if (inflate(fit)){
+        out$age['disp[t]'] <- 
+            get_ThU_age(R08[1],sqrt(fit$mswd)*R08[2],exterr=exterr)[2]
+        out$y0['disp[y]'] <- sqrt(fit$mswd)*out$y0['s[y]']
+    } else if (fit$model==3){
+        out$disp <- w2disp(x=x,fit=out,type=type,wtype=wtype)
     }
     out
 }

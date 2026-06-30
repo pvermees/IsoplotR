@@ -146,7 +146,7 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     fit$cov <- inverthess(fit$hessian)
     if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
-                                  model=model,plot=plot,nsteps=nsteps)
+                                  model=model,plot=plot,nsteps=nsteps,...)
     }
     efit <- exponentiate(fit)
     afit <- anchormerge(efit,X,anchor=anchor,type=type)

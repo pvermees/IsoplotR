@@ -34,7 +34,7 @@ data2york(x, ...)
 
 \method{data2york}{UThHe}(x, ...)
 
-\method{data2york}{ThU}(x, type = 2, generic = TRUE, ...)
+\method{data2york}{ThU}(x, inverse = TRUE, generic = TRUE, ...)
 }
 \arguments{
 \item{x}{a five or six column matrix OR an object of class
@@ -112,7 +112,9 @@ If \code{inverse=TRUE}, then \code{X} =
 \code{Y} = \eqn{{}^{188}}Os/\eqn{{}^{187}}Os (if \code{x} has class
 \code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{176}}Hf and
 \code{Y} = \eqn{{}^{177}}Hf/\eqn{{}^{176}}Hf (if \code{x} has class
-\code{LuHf}).
+\code{LuHf}), or \code{X} = \eqn{{}^{232}}Th/\eqn{{}^{238}}U and
+\code{Y} = \eqn{{}^{230}}Th/\eqn{{}^{238}}U (if \code{x} has class
+\code{ThU}, an `Osmond' isochron).
 
 If \code{inverse=FALSE}, then \code{X} =
 \eqn{{}^{206}}Pb/\eqn{{}^{204}}Pb and \code{Y} =
@@ -131,27 +133,23 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{Y} = \eqn{{}^{187}}Os/\eqn{{}^{188}}Os (if \code{x} has class
 \code{ReOs}), or \code{X} = \eqn{{}^{176}}Lu/\eqn{{}^{177}}Hf and
 \code{Y} = \eqn{{}^{176}}Hf/\eqn{{}^{177}}Hf (if \code{x} has class
-\code{LuHf}).}
+\code{LuHf}), or \code{X} = \eqn{{}^{238}}U/\eqn{{}^{232}}Th and
+\code{Y} = \eqn{{}^{230}}Th/\eqn{{}^{232}}Th (if \code{x} has class
+\code{ThU}, a `Rosholt' isochron).}
 
 \item{exterr}{If \code{TRUE}, propagates the external uncertainties
 (e.g. decay constants) into the output errors.}
 
-\item{type}{Return `Rosholt' or `Osmond' ratios?
-
-Rosholt (\code{type=1}) returns \code{X=8/2}, \code{sX=s[8/2]},
-\code{Y=0/2}, \code{sY=s[0/2]}, \code{rXY}.
-
-Osmond (\code{type=2}) returns \code{X=2/8}, \code{sX=s[2/8]},
-\code{Y=0/8}, \code{sY=s[0/8]}, \code{rXY}.}
-
 \item{generic}{If \code{TRUE}, uses the following column headers:
     \code{X}, \code{sX}, \code{Y}, \code{sY}, \code{rXY}.
 
-If \code{FALSE} and \code{type=1}, uses \code{U238Th232},
-\code{errU238Th232}, \code{Th230Th232}, \code{errTh230Th232}, \code{rXY}
+If \code{generic=FALSE} and \code{inverse=FALSE}, uses
+\code{U238Th232}, \code{errU238Th232}, \code{Th230Th232},
+\code{errTh230Th232}, \code{rXY}
 
-or if \code{FALSE} and \code{type=2}, uses \code{Th232U238},
-\code{errTh232U238}, \code{Th230U238}, \code{errTh230U238}, \code{rXY}.}
+or if \code{generic=FALSE} and \code{inverse=TRUE}, uses
+\code{Th232U238}, \code{errTh232U238}, \code{Th230U238},
+\code{errTh230U238}, \code{rXY}.}
 }
 \value{
 a five-column table that can be used as input for

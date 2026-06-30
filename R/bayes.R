@@ -83,17 +83,17 @@ bayeslud <- function(fit,x,anchor=0,type='joint',model=1,
     if (plot) bayesplot(out,fit,add=add)
     out
 }
-bayesplot <- function(Llist,fit,add=FALSE){
+bayesplot <- function(Llist,fit,add=FALSE,...){
     nbpar <- length(Llist)
-        if (!add) op <- graphics::par(mfrow=c(1,nbpar))
-        for (bpar in names(Llist)){
-            plot(Llist[[bpar]],type='b',xlab=bpar,
-                 ylab='posterior probability')
-            if (bpar=='t') xx <- exp(fit$par[bpar])
-            else xx <- fit$par[bpar]
-            graphics::lines(rep(xx,2),range(Llist[[bpar]][,2]))
-        }
-        if (!add) graphics::par(op)
+    if (!add) op <- graphics::par(mfrow=c(1,nbpar))
+    for (bpar in names(Llist)){
+        plot(Llist[[bpar]],type='b',xlab=bpar,
+             ylab='posterior probability',...)
+        if (bpar=='t') xx <- exp(fit$par[bpar])
+        else xx <- fit$par[bpar]
+        graphics::lines(rep(xx,2),range(Llist[[bpar]][,2]))
+    }
+    if (!add) graphics::par(op)
 }
 
 initial2time <- function(x,anames,avalues,anchor=0,

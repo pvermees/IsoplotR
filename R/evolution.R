@@ -137,6 +137,10 @@
 #' attribute it to the presence of geological uncertainty, which
 #' manifests itself as an added (co)variance term.
 #'
+#' \code{4}: If \code{x$format} is \code{3} or \code{4}, calculate the
+#' rightmost isochron, corrsponding to the minimum age component of a
+#' contaminated system.
+#' 
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
@@ -178,8 +182,8 @@ evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
                     show.ellipses=(model!=2),hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
-            U4U8vsTh0U8(x,isochron=isochron,model=model,xlim=xlim,
-                        ylim=ylim,tticks=tticks,aticks=aticks,
+            U4U8vsTh0U8(x,isochron=isochron,model=model,
+                        xlim=xlim,ylim=ylim,tticks=tticks,aticks=aticks,
                         oerr=oerr,Th0i=Th0i,show.numbers=show.numbers,
                         levels=levels,clabel=clabel,
                         ellipse.fill=ellipse.fill,
@@ -189,8 +193,8 @@ evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
                         omit.stroke=omit.stroke,...)
         }
         if (isochron){
-            fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,
-                                model=model,hide=hide,omit=omit,oerr=oerr)
+            fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,model=model,
+                                hide=hide,omit=omit,oerr=oerr)
             fit$n <- length(x)-length(hide)-length(omit)
             graphics::title(evolution_title(fit,sigdig=sigdig,oerr=oerr))
         }
@@ -277,8 +281,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
-                        ylim=NULL,tticks=NULL,oerr=3,show.numbers=FALSE,
+Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
+                        xlim=NULL,ylim=NULL,tticks=NULL,
+                        oerr=3,show.numbers=FALSE,
                         exterr=FALSE,clabel="",levels=NULL,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -297,13 +302,14 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
     minY <- graphics::par('usr')[3]
     maxY <- graphics::par('usr')[4]
     l0 <- lambda('Th230')[1]
-    if (isochron|Th0i==1){
-        fit <- isochron.ThU(x,type=1,plot=FALSE,exterr=FALSE,
+    if (Th0i==1){
+        fit <- isochron.ThU(x,type=1,model=model,
+                            plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
-        anchor <- cbind(0,fit$y0[1]*exp(-l0*tticks))
+        anchor <- matrix(fit$y0[1],nt,2)
     } else if (Th0i==2){
-        anchor <- matrix(x$U8Th2,nt-1,2)
+        anchor <- matrix(1/x$U8Th2,nt-1,2)
         tticks <- tticks[is.finite(tticks)]
     } else {
         anchor <- matrix(0,nt,2)
@@ -327,7 +333,9 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,xlim=NULL,
         }
     }
     if (isochron){ # plot the data and isochron line fit
-        isochron.ThU(x,type=1,oerr=oerr,plot=TRUE,show.numbers=show.numbers,
+        isochron.ThU(x,type=1,oerr=oerr,plot=TRUE,
+                     show.numbers=show.numbers,
+                     anchor=ifelse(Th0i==2,1,0),
                      levels=levels,ellipse.fill=ellipse.fill,
                      ellipse.stroke=ellipse.stroke,
                      line.col='black',exterr=exterr,sigdig=sigdig,
@@ -462,7 +470,7 @@ data2evolution <- function(x,Th0i=0,omit4c=NULL){
             out <- td
         }
     } else if (x$format %in% c(3,4)){
-        out <- data2york(x,type=1,generic=FALSE) # 8/2 - 0/2
+        out <- data2york(x,inverse=FALSE,generic=FALSE) # 8/2 - 0/2
     }
     out
 }

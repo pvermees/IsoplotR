@@ -172,7 +172,7 @@ radialplot.default <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                   markers=markers,hide=hide,omit=omit,omit.col=omit.col,
                   show.colourbar=show.colourbar,...)
     fit <- central(x2calc)
-    if (title){
+    if (title & !is.null(fit)){
         tit <- radial_title(fit,sigdig=sigdig,oerr=oerr,
                             units=units,ntit=get_ntit(x2calc[,1]))
         graphics::title(tit)
@@ -232,7 +232,7 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
                 show.colourbar=show.colourbar,...)
     fit <- central(x2calc,exterr=exterr)
     fit$pooled <- pooled_age(x2calc,exterr=exterr)
-    if (title){
+    if (title & !is.null(fit)){
         tit <- radial_title(fit,sigdig=sigdig,oerr=oerr,
                             units=' Ma',ntit=get_ntit(x2calc))
         graphics::title(tit)
@@ -525,11 +525,11 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log',
                   show.colourbar=show.colourbar,...)
     selection <- clear(1:nrow(tt),unique(c(hide,omit)))
     fit <- central(tt[selection,])
-    if (exterr){
+    if (exterr & !is.null(fit)){
         fit$age[1:2] <- add_exterr(x2calc,tt=fit$age[1],st=fit$age[2],
                                    cutoff.76=cutoff.76,type=type)
     }
-    if (title){
+    if (title & !is.null(fit)){
         tit <- radial_title(fit,sigdig=sigdig,oerr=oerr,
                             units=units,ntit=get_ntit(tt[,1]),
                             caveat=(i2i|common.Pb==2|Th0i==1))

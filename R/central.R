@@ -115,6 +115,10 @@ central <- function(x,...){ UseMethod("central",x) }
 #' @export
 central.default <- function(x,...){
     good <- !is.na(rowSums(x))
+    if (any(x[good,1]<=0)){
+        warning("Dataset contains negative values. Can't compute central age.")
+        return(NULL)
+    }
     zu <- log(x[good,1])
     su <- x[good,2]/x[good,1]
     fit <- continuous_mixture(zu,su)
@@ -222,8 +226,13 @@ central.fissiontracks <- function(x,exterr=FALSE,...){
         out$p.value <- 1-stats::pchisq(Chi2,out$df+1)
         out$age <- c(tt,st)
         kappa <- log(sigma)
-        H <- stats::optimHess(par=c(mu,kappa),fn=LL_FT,y=Nsj,m=mj)
-        out$disp <- c(sigma,sqrt(solve(-H)[2,2])*sigma)
+        disperr <- tryCatch({
+            H <- stats::optimHess(par=c(mu,kappa),fn=LL_FT,y=Nsj,m=mj)
+            sqrt(solve(-H)[2,2])*sigma
+        }, error = function(e){
+            NA
+        })
+        out$disp <- c(sigma,disperr)
         names(out$age) <- c('t','s[t]')
         names(out$disp) <- c('w','s[w]')
     } else if (x$format>1){
