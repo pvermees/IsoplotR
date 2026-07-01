@@ -116,7 +116,7 @@ central <- function(x,...){ UseMethod("central",x) }
 central.default <- function(x,...){
     good <- !is.na(rowSums(x))
     if (any(x[good,1]<=0)){
-        warning("Dataset contains negative values. Can't compute central age.")
+        warning("Dataset contains non-positive values. Can't compute central age.")
         return(NULL)
     }
     zu <- log(x[good,1])

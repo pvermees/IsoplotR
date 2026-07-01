@@ -171,7 +171,7 @@ diss.default <- function(x,y,method='KS',...){
     } else if (identical(method,'KS')){
         out <- KS_diss(x,y)
     } else {
-        out <- stats::dist(x,y)
+        out <- stats::dist(rbind(x,y))
     }
     out
 }

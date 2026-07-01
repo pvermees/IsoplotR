@@ -794,6 +794,8 @@ checkIsochronType <- function(x,type=1){
 checkWtype <- function(wtype=1,anchor=0,model=1){
     if (anchor[1]==1 & model==3) return(1)
     else if (anchor[1]==2 & model==3) return(2)
+    else if (wtype%in%c('a','A')) return(1)
+    else if (wtype%in%c('b','B')) return(2)
     else return(wtype)
 }
 
@@ -854,7 +856,7 @@ isochron.PbPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,levels=NULL,
                           hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (model==4){
         fit <- LRisochron(x,inverse=inverse,anchor=anchor,
-                          model=model,hid=hide,omit=omit)
+                          model=model,hide=hide,omit=omit)
     } else {
         wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
         fit <- flipper(x,inverse=inverse,model=model,type='d',

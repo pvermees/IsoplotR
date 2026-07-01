@@ -143,7 +143,11 @@ analytical uncertainties.
 instead of attributing any overdispersion (MSWD > 1) to
 underestimated analytical uncertainties (model 1), one can also
 attribute it to the presence of geological uncertainty, which
-manifests itself as an added (co)variance term.}
+manifests itself as an added (co)variance term.
+
+\code{4}: If \code{x$format} is \code{3} or \code{4}, calculate the
+rightmost isochron, corresponding to the minimum age component of a
+contaminated system.}
 
 \item{exterr}{propagate the decay constant uncertainty in the
 isochron age?}
