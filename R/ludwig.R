@@ -135,18 +135,19 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
-                   type='joint',plot=FALSE,nsteps=NULL,...){
+                   type='joint',plot=FALSE,nsteps=NULL,
+                   y2l=x$format%in%c(119,1210)||type%in%1:4,...){
     type <- checkIsochronType(x,type)
     X <- x
     X$d <- mediand(x$d)
-#    if (x$format %in% c(1,2,3,9,10,119,1210)){
-#        fit <- york2ludwig(X,model=model,anchor=anchor,type=type)
-#    } else {
+    if (y2l){
+        fit <- york2ludwig(X,model=model,anchor=anchor,type=type)
+    } else {
         init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
         fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
                               upper=init$upper,x=X,anchor=anchor,
                               type=type,model=model,exterr=exterr)
-#    }
+    }
     fit$cov <- inverthess(fit$hessian)
     if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3)){
         fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
