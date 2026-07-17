@@ -256,18 +256,20 @@ mexp_845 <- function(nratios=3){
     out
 }
 
-reverse <- function(tt,mexp,nt){
-    n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+reverse <- function(tt,mexp,nt,derivative=0){
+    if (derivative==1){
+        n0 <- (mexp$Q %*% diag(mexp$L*exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    } else {
+        n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    }
     rownames(n0) <- rownames(nt)
     n0
 }
 forward <- function(tt,d=diseq(),derivative=0){
     if (derivative==1){
-        nt <- (d$Q %*% diag(exp(-d$L)) %*%
-               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        nt <- (d$Q %*% diag(-d$L*exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     } else if (derivative==2){
-        nt <- (d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
-               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        nt <- (d$Q %*% diag(exp(-d$L*tt)*d$L^2) %*% d$Qinv %*% d$n0)
     } else {
         nt <- (d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     }

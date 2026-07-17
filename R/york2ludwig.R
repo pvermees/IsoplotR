@@ -65,11 +65,16 @@ TWconcordiaIntersection <- function(yfit,d=diseq()){
         y_midpoint <- 1/McL$Pb207Pb206
         if (y_midpoint > yfit$a[1] + yfit$b[1]*x_midpoint){ # two roots
             t1 <- uniroot(f=misfit,lower=init$ll,upper=init$midpoint,yfit=yfit,d=d)$root
-            t2 <- uniroot(f=misfit,lower=init$midpoint,upper=init$ul,yfit=yfit,d=d)$root
+            t2 <- uniroot(f=misfit,lower=init$midpoint,upper=init$ul,yfit=yfit)$root
             st1 <- error(tt=t1,yfit=yfit,d=d)
             st2 <- error(tt=t2,yfit=yfit,d=d)
         } else { # no roots
             t1 <- t2 <- NULL
+        }
+        if (measured_disequilibrium(d)){
+            McL <- mclean(tt=t1,d=d)
+            U48i <- McL$U48i
+            message("york2ludwig incomplete")
         }
     }
     out$t1 <- c(t1,st1)
