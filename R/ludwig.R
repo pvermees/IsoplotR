@@ -135,13 +135,12 @@ ludwig <- function(x,...){ UseMethod("ludwig",x) }
 #' @rdname ludwig
 #' @export
 ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
-                   type='joint',plot=FALSE,nsteps=NULL,
-                   y2l=x$format%in%c(119,1210)||type%in%1:4,...){
+                   type='joint',plot=FALSE,nsteps=NULL,...){
     type <- checkIsochronType(x,type)
     X <- x
     X$d <- mediand(x$d)
-    if (y2l){
-        fit <- york2ludwig(X,model=model,anchor=anchor,type=type)
+    if (anchor[1]==0 && model<2 && x$format%in%c(1:3,9,10,119,1210)){
+        fit <- york2ludwig(X,type=type)
     } else {
         init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
         fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
