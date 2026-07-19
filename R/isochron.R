@@ -1607,81 +1607,32 @@ ab2y0t.default <- function(x,fit,...){
 #' @noRd
 ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
     tt <- fit$par['t']
-    a0 <- fit$par['a0']
-    b0 <- fit$par['b0']
-    l8 <- lambda('U238')[1]
-    l5 <- lambda('U235')[1]
-    md <- mediand(x$d)
-    if (md$U48$option==2) md$U48 <- list(x=unname(fit$par['U48i']),option=1)
-    if (md$ThU$option==2) md$ThU <- list(x=unname(fit$par['ThUi']),option=1)
-    McL <- mclean(tt,d=md,exterr=exterr)
-    if (type==1){                           # 04-08c/06 vs. 38/06
-        x0inv <- McL$Pb206U238
-        dx0invdt <- McL$dPb206U238dt
-        E <- fit$cov[c('t','a0'),c('t','a0')]
-    } else if (type==2){                    # 04-08c/07 vs. 35/07
-        x0inv <- McL$Pb207U235
-        dx0invdt <- McL$dPb207U235dt
-        E <- fit$cov[c('t','b0'),c('t','b0')]
-    } else if (type==3 & x$format%in%c(7,8)){  # 06c/08 vs. 32/08
-        x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-        dx0invdt <- McL$dPb208Th232dt
-        E <- fit$cov[c('t','a0'),c('t','a0')]
-    } else if (type==4 & x$format%in%c(7,8)){  # 07c/08 vs. 32/08
-        x0inv <- age_to_Pb208Th232_ratio(tt=tt,st=0)[1]
-        dx0invdt <- McL$dPb208Th232dt
-        E <- fit$cov[c('t','b0'),c('t','b0')]
-    } else {
-        stop('Invalid isochron type.')
-    }
     out <- fit
-    out$age <- NULL
-    out$age['t'] <- tt
-    out$age['s[t]'] <- sqrt(fit$cov['t','t'])
-    J <- matrix(0,2,2)
+    out$age <- c(tt,'s[t]'=unname(sqrt(fit$cov['t','t'])))
     if (x$format%in%c(4,5,6,9,85,119) & type==1){          # 0x/06 vs. 38/06
         out$XY <- data2york(x,option=3)
-        a <- 1/fit$par['a0']
-        J[1,2] <- -a^2
     } else if (x$format%in%c(4,5,6,10,85,1210) & type==2){ # 0x/07 vs. 35/07
         out$XY <- data2york(x,option=4)
-        a <- 1/fit$par['b0']
-        J[1,2] <- -a^2
     } else if (x$format%in%c(7,8,11) & type==1){   # 08c/06 vs. 38/06
         out$XY <- data2york(x,option=6,tt=tt)
-        a <- 1/fit$par['a0']
-        J[1,2] <- -a^2
     } else if (x$format%in%c(7,8,12) & type==2){   # 08c/07 vs. 35/07
         out$XY <- data2york(x,option=7,tt=tt)
-        U <- settings('iratio','U238U235')[1]
-        a <- 1/fit$par['b0']
-        J[1,2] <- -a^2
     } else if (x$format%in%c(7,8,11) & type==3){   # 06c/08 vs. 32/08
         out$XY <- data2york(x,option=8,tt=tt)
-        a <- fit$par['a0']
-        J[1,2] <- 1
     } else if (x$format%in%c(7,8,12) & type==4){   # 07c/08 vs. 32/08
         out$XY <- data2york(x,option=9,tt=tt)
-        a <- fit$par['b0']
-        J[1,2] <- 1
     } else {
         stop('Isochron regression is not available for this input format.')
     }
-    b <- -a*x0inv
-    J[2,1] <- -a*dx0invdt
-    J[2,2] <- x0inv*a^2
-    cov.ab <- J%*%E%*%t(J)
-    out$a <- c(a,sqrt(cov.ab[1,1]))
-    out$b <- c(b,sqrt(cov.ab[2,2]))
-    names(out$a) <- c('a','s[a]')
-    names(out$b) <- c('b','s[b]')
-    out$cov.ab <- cov.ab[1,2]
+    yfit <- york(out$XY)
+    out$a <- yfit$a
+    out$b <- yfit$b
+    out$cov.ab <- yfit$cov.ab
     out <- getUPby0(out,fmt=x$format,type=type,option=y0option)
     if (inflate(out)){
         out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     } else if (out$model==3){ # wx0 and wy0 set error bars in scatterplot
-        out$wx0 <- out$wy0 <- 0
         if (fit$wtype==1){
             out$wy0 <- out$disp[1]
         } else if (type==1){ # 06/38
