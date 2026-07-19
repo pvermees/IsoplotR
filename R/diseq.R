@@ -258,7 +258,7 @@ mexp_845 <- function(nratios=3){
 
 reverse <- function(tt,mexp,nt,derivative=0){
     if (derivative==1){
-        n0 <- (mexp$Q %*% diag(mexp$L*exp(mexp$L*tt)) %*% mexp$Qinv %*% nt) 
+        n0 <- (mexp$Q %*% diag(mexp$L*exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
     } else {
         n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
     }
