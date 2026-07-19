@@ -138,31 +138,78 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
                    type='joint',plot=FALSE,nsteps=NULL,...){
     type <- checkIsochronType(x,type)
     X <- x
-    X$d <- mediand(x$d)
-    init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
-    fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
-                          upper=init$upper,x=X,anchor=anchor,
-                          type=type,model=model,exterr=exterr)
-    fit$cov <- inverthess(fit$hessian)
-    if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3)){
-        fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
-                                  model=model,plot=plot,nsteps=nsteps,...)
-    }
-    efit <- exponentiate(fit)
-    afit <- anchormerge(efit,X,anchor=anchor,type=type)
-    out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
-    out$model <- model
-    if (model==3){
-        out$wtype <- anchor[1]
-        if ('w'%in%names(fit$par)){
-            w <- unname(afit$par['w'])
-            sw <- sqrt(afit$cov['w','w'])
+    if (measured_disequilibrium(X$d) & anchor==0){
+        X$d <- diseq()
+        init <- ludwig(X,model=model,anchor=anchor,type=type)
+        Pb64c <- iratio('Pb206Pb204')
+        Pb74c <- iratio('Pb207Pb204')
+        Pb68c <- iratio('Pb206Pb208')
+        Pb78c <- iratio('Pb207Pb208')
+        Pb76c <- iratio('Pb207Pb206')
+        if (x$format%in%1:3){
+            iratio('Pb207Pb206',init$par['a0'])
+        } else if (x$format%in%4:6){
+            if (type=='joint'){
+                iratio('Pb206Pb204',init$par['a0'])
+                iratio('Pb207Pb204',init$par['b0'])
+            } else if (type==1){
+                iratio('Pb206Pb204',init$par['a0'])
+            } else {
+                iratio('Pb207Pb204',init$par['b0'])
+            }
+        } else if (x$format%in%7:8){
+            if (type=='joint'){
+                iratio('Pb206Pb208',init$par['a0'])
+                iratio('Pb207Pb208',init$par['b0'])
+            } else if (type==1){
+                iratio('Pb206Pb208',init$par['a0'])
+            } else {
+                iratio('Pb207Pb208',init$par['b0'])
+            }
+        } else if (x$format==9){
+            iratio('Pb206Pb204',init$par['a0'])
+        } else if (x$format==10){
+            iratio('Pb207Pb204',init$par['b0'])
+        } else if (x$format==119){
+            iratio('Pb206Pb208',init$par['a0'])
+        } else if (x$format==1210){
+            iratio('Pb207Pb208',init$par['b0'])
         } else {
-            w <- fixDispersion(model=model,format=x$format,
-                               anchor=anchor,type=type)
-            sw <- 0
+            stop('Invalid U-Pb format')
         }
-        out$disp <- c('w'=w,'s[w]'=sw)
+        out <- fit <- ludwig(x,model=model,anchor=1,type=type)
+        iratio('Pb206Pb204',Pb64c[1])
+        iratio('Pb207Pb204',Pb74c[1])
+        iratio('Pb206Pb208',Pb68c[1])
+        iratio('Pb207Pb208',Pb78c[1])
+        iratio('Pb207Pb206',Pb76c[1])
+    } else {
+        X$d <- mediand(x$d)
+        init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
+        fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
+                              upper=init$upper,x=X,anchor=anchor,
+                              type=type,model=model,exterr=exterr)
+        fit$cov <- inverthess(fit$hessian)
+        if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3)){
+            fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
+                                      model=model,plot=plot,nsteps=nsteps,...)
+        }
+        efit <- exponentiate(fit)
+        afit <- anchormerge(efit,X,anchor=anchor,type=type)
+        out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
+        out$model <- model
+        if (model==3){
+            out$wtype <- anchor[1]
+            if ('w'%in%names(fit$par)){
+                w <- unname(afit$par['w'])
+                sw <- sqrt(afit$cov['w','w'])
+            } else {
+                w <- fixDispersion(model=model,format=x$format,
+                                   anchor=anchor,type=type)
+                sw <- 0
+            }
+            out$disp <- c('w'=w,'s[w]'=sw)
+        }
     }
     out
 }

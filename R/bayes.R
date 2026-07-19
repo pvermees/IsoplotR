@@ -198,9 +198,9 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
     for (i in 1:20){
         if ((LLmint < (LLmax+LLbuffer)) && (mint > dt/4)){
             mint <- (mint-dt/4)
-            ifit <- stats::optim(init,fn=LL_ludwig,hessian=FALSE,x=x,
-                                 anchor=c(2,mint),type=type,model=model)
-            LLmint <- ifit$value
+            ifit <- stats::nlm(f=LL_ludwig,p=init,hessian=FALSE,x=x,
+                               anchor=c(2,mint),type=type,model=model)
+            LLmint <- ifit$minimum
         } else {
             break
         }
@@ -208,9 +208,9 @@ getsearchlimits_t <- function(LLgrid,LLbuffer,x,fit,type,model){
     for (i in 1:20){
         if (LLmaxt < (LLmax+LLbuffer)){
             maxt <- (maxt+dt/4)
-            ifit <- stats::optim(init,fn=LL_ludwig,hessian=FALSE,x=x,
-                                 anchor=c(2,maxt),type=type,model=model)
-            LLmaxt <- ifit$value
+            ifit <- stats::nlm(f=LL_ludwig,p=init,hessian=FALSE,x=x,
+                               anchor=c(2,maxt),type=type,model=model)
+            LLmaxt <- ifit$minimum
         } else {
             break
         }

@@ -464,15 +464,21 @@ contingencyfit <- function(par,fn,lower,upper,hessian=TRUE,control=NULL,...){
                             hessian=hessian,control=control,...)
     }
     if (fit$convergence>0 | (hessian & !invertible(fit$hessian))){
-        NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=control,...)
-        if (NMfit$convergence>0){
-            warning('Optimisation did not converge.')
-            if (NMfit$value<fit$value) {
-                fit <- NMfit
+        if (length(par)<2){
+            nlmfit <- stats::nlm(f=fn,p=par,hessian=hessian,...)
+            converged <- nlmfit$code<2
+            if (converged || nlmfit$minimum<fit$value){
+                fit$par <- nlmfit$estimate
+                fit$value <- nlmfit$minimum
+                fit$hessian <- nlmfit$hessian
+                fit$gradient <- nlmfit$gradient
             }
         } else {
-            fit <- NMfit
+            NMfit <- stats::optim(par=par,fn=fn,hessian=hessian,control=control,...)
+            converged <- NMfit$convergence==0
+            if (converged) fit <- NMfit
         }
+        if (!converged) warning('Optimisation did not converge.')
     }
     if (hessian & !invertible(fit$hessian)){
         warning('Ill-conditioned Hessian matrix')
