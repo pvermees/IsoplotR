@@ -139,22 +139,22 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     type <- checkIsochronType(x,type)
     X <- x
     X$d <- mediand(x$d)
-    if (anchor[1]==0 && model<2 && x$format%in%c(1:3,9,10,119,1210)){
-        fit <- york2ludwig(X,type=type)
+    if (measured_disequilibrium(X$d) & anchor[1]==0 && model<2 && x$format%in%c(1:3,9,10,119,1210)){
+        out <- fit <- york2ludwig(X)
     } else {
         init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
         fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
                               upper=init$upper,x=X,anchor=anchor,
                               type=type,model=model,exterr=exterr)
+        fit$cov <- inverthess(fit$hessian)
+        efit <- exponentiate(fit)
+        afit <- anchormerge(efit,X,anchor=anchor,type=type)
+        out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
     }
-    fit$cov <- inverthess(fit$hessian)
-    if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3)){
-        fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
+    if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3) & anchor[1]<2){
+        out$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
                                   model=model,plot=plot,nsteps=nsteps,...)
     }
-    efit <- exponentiate(fit)
-    afit <- anchormerge(efit,X,anchor=anchor,type=type)
-    out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
     out$model <- model
     if (model==3){
         out$wtype <- anchor[1]

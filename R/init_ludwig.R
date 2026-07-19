@@ -57,18 +57,21 @@ init_ludwig <- function(x,anchor=0,buffer=2,type=0,model=1){
 
 init_ludwig_TW <- function(x,anchor=0,buffer=2,model=1){
     par <- lower <- upper <- c()
-    yd <- data2york(x,option=1)
+    yd <- data2york(x,option=2)
     if (anchor[1]==1){
         Pb76c <- iratio('Pb207Pb206')
         U85 <- iratio('U238U235')[1]
-        yfit <- MLyork(yd,anchor=c(2,1/(Pb76c[1]*U85)))
-        tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
-        par['t'] <- log(tm[1])
+        yfit <- MLyork(yd,anchor=c(1,Pb76c[1]))
+        TWi <- TWconcordiaIntersection(yfit=yfit,d=x$d)
+        t1 <- TWi$t1[1]
+        t2 <- TWi$t2[1]
+        tm <- (t1+t2)/2
+        par['t'] <- log(t1)
         lower['t'] <- par['t'] - buffer
-        upper['t'] <- log(tm[2])
+        upper['t'] <- log(tm)
         if (model==1 & Pb76c[2]>0){
             par['a0'] <- log(Pb76c[1])
-            lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
+            lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm,d=x$d)[1])
             upper['a0'] <- par['a0'] + buffer
         } else if (model==3 & Pb76c[2]<=0){
             Pb76err <- data2york(x,option=2)[,'sY']
@@ -84,12 +87,12 @@ init_ludwig_TW <- function(x,anchor=0,buffer=2,model=1){
             upper['t'] <- par['t'] + buffer
         }
         McL <- mclean(tt,d=x$d)
-        Xt <- McL$Pb207U235
-        Yt <- McL$Pb206U238
+        Xt <- 1/McL$Pb206U238
+        Yt <- McL$Pb207Pb206
         YD <- yd
         YD[,'X'] <- yd[,'X'] - Xt # shift left
         yfit <- MLyork(YD,anchor=c(1,Yt))
-        Pb76c <- 1/unname(yfit$b[1]*iratio('U238U235')[1])
+        Pb76c <- yfit$a[1] - Xt*yfit$b[1]
         par['a0'] <- log(Pb76c)
         lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tt,d=x$d)[1])
         upper['a0'] <- par['a0'] + buffer
@@ -101,13 +104,16 @@ init_ludwig_TW <- function(x,anchor=0,buffer=2,model=1){
         }
     } else { # no anchor
         yfit <- york(yd)
-        tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
-        par['t'] <- log(tm[1])
+        TWi <- TWconcordiaIntersection(yfit=yfit,d=x$d)
+        t1 <- TWi$t['t[l]']
+        t2 <- TWi$t['t[u]']
+        tm <- (t1+t2)/2
+        par['t'] <- log(t1)
         lower['t'] <- par['t'] - buffer
-        upper['t'] <- log(tm[2])
-        Pb76c <- 1/unname(yfit$b[1]*iratio('U238U235')[1])
+        upper['t'] <- log(tm)
+        Pb76c <- unname(yfit$a[1])
         par['a0'] <- log(Pb76c)
-        lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
+        lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm,d=x$d)[1])
         upper['a0'] <- par['a0'] + buffer
         if (model==3){
             stPb68 <- get_Pb206U238_age(x)[,2]
@@ -405,44 +411,6 @@ init_ludwig_208 <- function(x,anchor=0,type=0,buffer=2,model=1){
         upper['w'] <- upper_w
     }
     list(par=par,lower=lower,upper=upper)
-}
-
-WconcordiaIntersection <- function(yfit,d=diseq()){
-    misfit <- function(tt,a,b,d,gradient=FALSE){
-        McL <- mclean(tt=tt,d=d)
-        if (gradient){
-            dXydt <- McL$dPb207U235dt
-            dYwdt <- McL$dPb206U238dt
-            out <- dYwdt - b*dXydt
-        } else {
-            Xy <- McL$Pb207U235 # York coordinate
-            Yw <- McL$Pb206U238 # Wetherill coordinate
-            out <- Yw - a - b*Xy
-        }
-        out
-    }
-    a <- unname(yfit$a[1])
-    b <- unname(yfit$b[1])
-    if (b>0){
-        midpoint <- stats::uniroot(misfit,lower=0,upper=5000,
-                                   a=a,b=b,d=d,gradient=TRUE)$root
-    } else {
-        midpoint <- stats::uniroot(misfit,lower=0,upper=5000,a=a,b=b,d=d)$root
-    }
-    below <- misfit(tt=midpoint,a=a,b=b,d=d) > 0
-    if (below){
-        if (a > 0){
-            tt <- stats::uniroot(misfit,lower=0,upper=midpoint,a=a,b=b,d=d)$root
-            out <- c(tt,midpoint)
-        } else {
-            tt <- stats::uniroot(misfit,lower=midpoint,upper=5000,a=a,b=b,d=d)$root
-            out <- c(midpoint,tt)
-        }
-    } else {
-        tt <- stats::optimise(misfit,lower=0,upper=5000,a=a,b=b,d=d)$minimum
-        out <- c(tt,midpoint)
-    }
-    out
 }
 
 init_ludwig_helper <- function(yd,x0=NULL,y0=NULL){

@@ -333,7 +333,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
         emptyconcordia(tlim=tlim,xlim=xlim,ylim=ylim,
                        type=type,oerr=oerr,exterr=exterr,
                        concordia.col=concordia.col,
-                       ticks=ticks,pos=pos)
+                       ticks=ticks,pos=pos,...)
         return(invisible(NULL))
     }
     if (common.Pb>0){
@@ -370,9 +370,10 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
         discordia_line(fit,wetherill=(type==1),d=X2plot$d,oerr=oerr)
         if (title){
             dispunits <- getDispUnits_UPb(x=x,joint=TRUE,anchor=anchor)
-            graphics::title(discordia_title(fit,wetherill=(type==1),
-                                            y0option=y0option,sigdig=sigdig,
-                                            oerr=oerr,dispunits=dispunits))
+            disctit <- discordia_title(fit,wetherill=(type==1),
+                                       y0option=y0option,sigdig=sigdig,
+                                       oerr=oerr,dispunits=dispunits)
+            graphics::title(disctit)
         }
     }
     plotConcordiaLine(X2plot,lims=lims,pos=pos,type=type,col=concordia.col,
@@ -984,14 +985,15 @@ LL_concordia_age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
 
 emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,pos=NA,
                            type=1,oerr=3,exterr=FALSE,
-                           concordia.col='darksalmon',ticks=5,...){
+                           concordia.col='darksalmon',
+                           ticks=5,d=diseq(),...){
     if (is.null(tlim)){
         if (type%in%c(1,3)) tlim <- c(1,4500)
         else tlim <- c(100,4500)
     } 
     dat <- list()
     class(dat) <- 'UPb'
-    dat$d <- diseq()
+    dat$d <- d
     if (type==1){
         dat$x <- rbind(c(age_to_Pb207U235_ratio(tlim[1]),0,
                          age_to_Pb206U238_ratio(tlim[1]),0,0),

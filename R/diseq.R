@@ -256,18 +256,20 @@ mexp_845 <- function(nratios=3){
     out
 }
 
-reverse <- function(tt,mexp,nt){
-    n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+reverse <- function(tt,mexp,nt,derivative=0){
+    if (derivative==1){
+        n0 <- (mexp$Q %*% diag(mexp$L*exp(mexp$L*tt)) %*% mexp$Qinv %*% nt) 
+    } else {
+        n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    }
     rownames(n0) <- rownames(nt)
     n0
 }
 forward <- function(tt,d=diseq(),derivative=0){
     if (derivative==1){
-        nt <- (d$Q %*% diag(exp(-d$L)) %*%
-               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        nt <- (d$Q %*% diag(-d$L*exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     } else if (derivative==2){
-        nt <- (d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
-               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        nt <- (d$Q %*% diag(exp(-d$L*tt)*d$L^2) %*% d$Qinv %*% d$n0)
     } else {
         nt <- (d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     }
@@ -382,6 +384,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 d$U48 <- list(x=d$U48$M,sx=0,option=1)
                 out$truncated <- TRUE
             }
+            if (out$truncated) out$dU48idt <- 0
         }
         if (d$ThU$option==2){
             t230cutoff <- meas_diseq_maxt(d=d,nuclide='Th230')
@@ -395,6 +398,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 d$ThU <- list(x=d$ThU$M,sx=0,option=1)
                 out$truncated <- TRUE
             }
+            if (out$truncated) out$dThUidt <- 0
         }
         n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
         d$n0 <- (n0 %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
@@ -404,7 +408,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             if (d$ThU$option==1){ # initial 230Th
                 d$n0['Th230',] <- d$ThU$x/l30
             } else if (d$ThU$option==2){ # measured 230Th
-                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
+                nuclides <- c('U238','U234','Th230','U235')
+                nt <- forward(tt=tt,d=d)[nuclides,,drop=FALSE]
                 nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
                 d$n0['Th230',] <- reverse(tt=tt,mexp=mexp_8405(),nt=nt)['Th230',]
             }
@@ -414,7 +419,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 nt['U234',] <- d$U48$x*nt['U238',]*l38/l34 # overwrite
                 d$n0['U234',] <- reverse(tt=tt,mexp=mexp_845(),nt=nt)['U234',]
                 if (d$ThU$option==1) d$n0['Th230',] <- d$ThU$x/l30
-            } else {                # measured 230Th
+            } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
                 nt['U234',] <- d$U48$x*nt['U238',]*l38/l34  # overwrite
                 nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
@@ -436,6 +441,16 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$ThUi <- (d$n0['Th230',]*l30)/(d$n0['U238',]*l38)
         out$RaUi <- (d$n0['Ra226',]*l26)/(d$n0['U238',]*l38)
         out$PaUi <- (d$n0['Pa231',]*l31)/(d$n0['U235',]*l35)
+        if (d$U48$option==2){
+            dn0dt <- reverse(tt=tt,mexp=mexp_845(),nt=nt,derivative=1)
+            out$dU48idt <- (dn0dt['U234',]*l34)/(d$n0['U238',]*l38) -
+                out$U48i*dn0dt['U238',]/d$n0['U238',]
+        }
+        if (d$ThU$option==2){
+            dn0dt <- reverse(tt=tt,mexp=mexp_8405(),nt=nt,derivative=1)
+            out$dThUidt <- (dn0dt['Th230',]*l30)/(d$n0['U238',]*l38) -
+                out$ThUi*dn0dt['U238',]/d$n0['U238',]
+        }
         out$U48 <- (d$nt['U234',]*l34)/(d$nt['U238',]*l38)
         out$ThU <- (d$nt['Th230',]*l30)/(d$nt['U238',]*l38)
         out$RaU <- (d$nt['Ra226',]*l26)/(d$nt['U238',]*l38)

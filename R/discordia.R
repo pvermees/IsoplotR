@@ -174,9 +174,6 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
             dddtu <- 0
             J1 <- dadtl*bb/cc + dbdtl*aa/cc - dcdtl*aa*bb/cc^2 + dddtl # dydtl
             J2 <- dadtu*bb/cc + dbdtu*aa/cc - dcdtu*aa*bb/cc^2 + dddtu # dydtu
-            E11 <- fit$cov[1,1]
-            E12 <- fit$cov[1,2]
-            E22 <- fit$cov[2,2]
             vy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
             ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
             ul <- y + ciy
