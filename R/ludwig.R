@@ -139,22 +139,18 @@ ludwig <- function(x,model=1,anchor=0,exterr=FALSE,
     type <- checkIsochronType(x,type)
     X <- x
     X$d <- mediand(x$d)
-    if (measured_disequilibrium(X$d) & anchor[1]==0 && model<2 && x$format%in%c(1:3,9,10,119,1210)){
-        out <- fit <- york2ludwig(X)
-    } else {
-        init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
-        fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
-                              upper=init$upper,x=X,anchor=anchor,
-                              type=type,model=model,exterr=exterr)
-        fit$cov <- inverthess(fit$hessian)
-        efit <- exponentiate(fit)
-        afit <- anchormerge(efit,X,anchor=anchor,type=type)
-        out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
-    }
-    if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3) & anchor[1]<2){
-        out$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
+    init <- init_ludwig(X,model=model,anchor=anchor,type=type,buffer=2)
+    fit <- contingencyfit(par=init$par,fn=LL_ludwig,lower=init$lower,
+                          upper=init$upper,x=X,anchor=anchor,
+                          type=type,model=model,exterr=exterr)
+    fit$cov <- inverthess(fit$hessian)
+    if (measured_disequilibrium(X$d) & type%in%c('joint',0,1,3)){
+        fit$posterior <- bayeslud(fit,x=X,anchor=anchor,type=type,
                                   model=model,plot=plot,nsteps=nsteps,...)
     }
+    efit <- exponentiate(fit)
+    afit <- anchormerge(efit,X,anchor=anchor,type=type)
+    out <- mswd_lud(afit,x=X,exterr=exterr,type=type)
     out$model <- model
     if (model==3){
         out$wtype <- anchor[1]
@@ -279,6 +275,49 @@ anchormerge <- function(fit,x,anchor=0,type='joint'){
         }
     }
     out
+}
+
+init_ludwig <- function(x,model=1,anchor=0,type='joint',buffer=1){
+    init <- york2ludwig(x,anchor=anchor,buffer=buffer,type=type,model=model)
+    if (x$d$U48$option==2 | x$d$ThU$option==2){
+        if ('t'%in%names(init$par)) tt <- exp(init$par['t'])
+        else if (anchor[1]==2) tt <- anchor[2]
+        else tt <- 0
+        McL <- mclean(tt=tt,d=x$d)
+    }
+    if (type%in%c('joint',0,1,3)){
+        if (x$d$U48$option==1 & x$d$U48$sx>0){
+            init$par['U48i'] <- x$d$U48$x
+        } else if (x$d$U48$option==2 & x$d$U48$sx>0){
+            init$par['U48i'] <- max(x$d$buffer,McL$U48i)
+        }
+        if ('U48i'%in%names(init$par)){
+            init$lower['U48i'] <- x$d$U48$m + x$d$buffer
+            init$upper['U48i'] <- x$d$U48$M - x$d$buffer
+        }
+        if (x$d$ThU$option==1 & x$d$ThU$sx>0){
+            init$par['ThUi'] <- x$d$ThU$x
+        } else if (x$d$ThU$option==2 & x$d$ThU$sx>0){
+            init$par['ThUi'] <- max(x$d$buffer,McL$ThUi)
+        }
+        if ('ThUi'%in%names(init$par)){
+            init$lower['ThUi'] <- x$d$ThU$m + x$d$buffer
+            init$upper['ThUi'] <- x$d$ThU$M - x$d$buffer
+        }
+        if (x$d$RaU$option==1 & x$d$RaU$sx>0){
+            init$par['RaUi'] <- x$d$RaU$x
+            init$lower['RaUi'] <- x$d$RaU$m + x$d$buffer
+            init$upper['RaUi'] <- x$d$RaU$M - x$d$buffer
+        }
+    }
+    if (type%in%c('joint',0,2,4)){
+        if (x$d$PaU$option==1 & x$d$PaU$sx>0){
+            init$par['PaUi'] <- x$d$PaU$x
+            init$lower['PaUi'] <- x$d$PaU$m + x$d$buffer
+            init$upper['PaUi'] <- x$d$PaU$M - x$d$buffer
+        }
+    }
+    init
 }
 
 fixDispersion <- function(model,format,anchor,type){
