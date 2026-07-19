@@ -384,7 +384,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 d$U48 <- list(x=d$U48$M,sx=0,option=1)
                 out$truncated <- TRUE
             }
-            if (out$truncated) out$dU48idt <- 0
         }
         if (d$ThU$option==2){
             t230cutoff <- meas_diseq_maxt(d=d,nuclide='Th230')
@@ -398,7 +397,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 d$ThU <- list(x=d$ThU$M,sx=0,option=1)
                 out$truncated <- TRUE
             }
-            if (out$truncated) out$dThUidt <- 0
         }
         n0 <- c(1/l38,1/l34,1/l30,1/l26,0,1/l35,1/l31,0)
         d$n0 <- (n0 %*% matrix(1,nrow=1,ncol=nc)) # duplicate columns
@@ -441,16 +439,6 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
         out$ThUi <- (d$n0['Th230',]*l30)/(d$n0['U238',]*l38)
         out$RaUi <- (d$n0['Ra226',]*l26)/(d$n0['U238',]*l38)
         out$PaUi <- (d$n0['Pa231',]*l31)/(d$n0['U235',]*l35)
-        if (d$U48$option==2){
-            dn0dt <- reverse(tt=tt,mexp=mexp_845(),nt=nt,derivative=1)
-            out$dU48idt <- (dn0dt['U234',]*l34)/(d$n0['U238',]*l38) -
-                out$U48i*dn0dt['U238',]/d$n0['U238',]
-        }
-        if (d$ThU$option==2){
-            dn0dt <- reverse(tt=tt,mexp=mexp_8405(),nt=nt,derivative=1)
-            out$dThUidt <- (dn0dt['Th230',]*l30)/(d$n0['U238',]*l38) -
-                out$ThUi*dn0dt['U238',]/d$n0['U238',]
-        }
         out$U48 <- (d$nt['U234',]*l34)/(d$nt['U238',]*l38)
         out$ThU <- (d$nt['Th230',]*l30)/(d$nt['U238',]*l38)
         out$RaU <- (d$nt['Ra226',]*l26)/(d$nt['U238',]*l38)
