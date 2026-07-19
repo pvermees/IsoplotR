@@ -498,8 +498,10 @@ get_poslist <- function(pos,ticks,type,d=diseq(),exterr=FALSE){
     out
 }
 # helper function for plot.concordia
-prepare_concordia_line <- function(x,tlim,xlim=NULL,ylim=NULL,type=1,...){
-    out <- get_concordia_limits(x,tlim=tlim,xlim=xlim,ylim=ylim,type=type,...)
+prepare_concordia_line <- function(x,tlim,xlim=NULL,ylim=NULL,
+                                   type=1,add=FALSE,...){
+    out <- get_concordia_limits(x,tlim=tlim,xlim=xlim,
+                                ylim=ylim,type=type,...)
     if (type==1){
         y.lab <- expression(paste(""^"206","Pb/"^"238","U"))
         x.lab <- expression(paste(""^"207","Pb/"^"235","U"))
@@ -512,7 +514,10 @@ prepare_concordia_line <- function(x,tlim,xlim=NULL,ylim=NULL,type=1,...){
     } else {
         stop('Incorrect input format.')
     }
-    graphics::plot(out$x,out$y,type='n',xlab=x.lab,ylab=y.lab,bty='n',...)
+    if (!add){
+        graphics::plot(out$x,out$y,type='n',
+                       xlab=x.lab,ylab=y.lab,bty='n',...)
+    }
     out
 }
 # concordia sequence
