@@ -995,22 +995,32 @@ emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,pos=NA,
     class(dat) <- 'UPb'
     dat$d <- d
     if (type==1){
-        dat$x <- rbind(c(age_to_Pb207U235_ratio(tlim[1]),0,
-                         age_to_Pb206U238_ratio(tlim[1]),0,0),
-                       c(age_to_Pb207U235_ratio(tlim[2]),0,
-                         age_to_Pb206U238_ratio(tlim[2]),0,0))
+        dat$x <- cbind(Pb207U235=c(age_to_Pb207U235_ratio(tlim[1]),
+                                   age_to_Pb207U235_ratio(tlim[2])),
+                       errPb207U235=c(0,0),
+                       Pb206U238=c(age_to_Pb206U238_ratio(tlim[1]),
+                                   age_to_Pb206U238_ratio(tlim[2])),
+                       errPb206U238=c(0,0))
         dat$format <- 1
     } else if (type==2){
-        dat$x <- rbind(c(age_to_U238Pb206_ratio(tlim[1]),0,
-                         age_to_Pb207Pb206_ratio(tlim[1]),0,0),
-                       c(age_to_U238Pb206_ratio(tlim[2]),0,
-                         age_to_Pb207Pb206_ratio(tlim[2]),0,0))
+        dat$x <- cbind(U238Pb206=c(age_to_U238Pb206_ratio(tlim[1]),
+                                   age_to_U238Pb206_ratio(tlim[2])),
+                       errU238Pb206=c(0,0),
+                       Pb207Pb206=c(age_to_Pb207Pb206_ratio(tlim[1]),
+                                    age_to_Pb207Pb206_ratio(tlim[2])),
+                       errPb207Pb206=c(0,0))
         dat$format <- 2
     } else if (type==3){
-        dat$x <- rbind(c(0,0,age_to_Pb206U238_ratio(tlim[1]),0,
-                         age_to_Pb208Th232_ratio(tlim[1]),0,rep(0,8)),
-                       c(0,0,age_to_Pb206U238_ratio(tlim[2]),0,
-                         age_to_Pb208Th232_ratio(tlim[2]),0,rep(0,8)))
+        dat$x <- cbind(Pb207U235=c(0,0),errPb207U235=c(0,0),
+                       Pb206U238=c(age_to_Pb206U238_ratio(tlim[1]),
+                                   age_to_Pb206U238_ratio(tlim[2])),
+                       errPb206U238=c(0,0),
+                       Pb208Th232=c(age_to_Pb208Th232_ratio(tlim[1]),
+                                    age_to_Pb208Th232_ratio(tlim[2])),
+                       errPb208Th232=c(0,0),
+                       Th232U238=c(0,0),errTh232U238=c(0,0),
+                       rXY=c(0,0),rXZ=c(0,0),rXW=c(0,0),
+                       rYZ=c(0,0),rYW=c(0,0),rZW=c(0,0))
         dat$format <- 7
     } else {
         stop('Invalid concordia type.')
