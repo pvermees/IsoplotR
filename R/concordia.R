@@ -618,7 +618,7 @@ get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
                 minx <- min(U8Pb6[,1]-nse*U8Pb6[,2],U8Pb6t,na.rm=TRUE)
                 maxx <- max(U8Pb6[,1]+nse*U8Pb6[,2],U8Pb6t,na.rm=TRUE)
             }
-            if (is.null(tlim) & maxx>U8Pb6t[1])
+            if (xset || is.null(tlim) & maxx>U8Pb6t[1])
                 out$t[1] <- get_Pb206U238_age(1/maxx,d=md)[1]
             Pb76 <- get_Pb207Pb206_ratios(x)
             if (!yset){
