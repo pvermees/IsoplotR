@@ -576,7 +576,7 @@ get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
         xset <- TRUE
         out$x <- xlim
         minx <- xlim[1]
-        maxx <- xlim[2]        
+        maxx <- xlim[2]
     }
     if (is.null(ylim)) {
         yset <- FALSE
@@ -699,10 +699,10 @@ get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
                 maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
             }
             out$t[1] <- get_Pb206U238_age(1/maxx,d=md)[1]
-            if (minx>0)
-                out$t[2] <- get_Pb206U238_age(1/minx,d=md)[1]
-            else
+            if (is.null(xlim) | minx==0)
                 out$t[2] <- get_Pb207Pb206_age(maxy,d=md,interval=c(out$t[1],10000))[1]
+            else
+                out$t[2] <- get_Pb206U238_age(1/minx,d=md)[1]
             if (!xset)
                 minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=md)[,'86'])
             if (!yset)
@@ -996,14 +996,55 @@ LL_concordia_age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
 emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,pos=NA,
                            type=1,oerr=3,exterr=FALSE,
                            concordia.col='darksalmon',
-                           ticks=5,d=diseq(),...){
-    if (is.null(tlim)){
-        if (type%in%c(1,3)) tlim <- c(1,4500)
-        else tlim <- c(100,4500)
-    } 
+                           ticks=5,d=diseq(),add=FALSE,...){
+    if (add){
+        usr <- graphics::par('usr')
+        xlim <- usr[1:2]
+        ylim <- usr[3:4]
+        tlim <- NULL
+    }
     dat <- list()
     class(dat) <- 'UPb'
-    dat$d <- d
+    md <- mediand(d)
+    if (is.null(tlim)){
+        mint <- ifelse(type==2,100,1)
+        maxt <- concordia_end(md)
+        if (!is.null(xlim)){
+            if (type==1){
+                maxx <- age_to_Pb207U235_ratio(maxt,d=md)[1]
+                if (xlim[1]<maxx) mint <- min(mint,get_Pb207U235_age(x=xlim[1],d=md)[1])
+                if (xlim[2]<maxx) maxt <- get_Pb207U235_age(x=xlim[2],d=md)[1]
+            } else if (type==2){
+                minx <- age_to_U238Pb206_ratio(maxt,d=md)[1]
+                if (xlim[2]>minx) mint <- min(mint,get_Pb206U238_age(x=1/xlim[2],d=md)[1])
+                if (xlim[1]>minx) maxt <- get_Pb206U238_age(x=1/xlim[1],d=md)[1]
+            } else if (type==3){
+                maxx <- age_to_Pb206U238_ratio(maxt,d=md)[1]
+                if (xlim[1]<maxx) mint <- min(mint,get_Pb206U238_age(x=xlim[1],d=md)[1])
+                if (xlim[2]<maxx) maxt <- get_Pb206U238_age(x=xlim[2],d=md)[1]
+            } else {
+                stop("Invalid type for emptyconcordia.")
+            }
+        } else if (!is.null(ylim)){
+            if (type==1){
+                maxy <- age_to_Pb206U238_ratio(maxt,d=md)[1]
+                if (ylim[1]<maxy) mint <- min(mint,get_Pb206U238_age(x=ylim[1],d=md)[1])
+                if (ylim[2]<maxy) maxt <- get_Pb206U238_age(x=ylim[2],d=md)[1]
+            } else if (type==2){
+                maxy <- age_to_Pb207Pb206_ratio(maxt,d=md)[1]
+                if (ylim[1]<maxy) mint <- min(mint,get_Pb207Pb206_age(x=ylim[1],d=md)[1])
+                if (ylim[2]<maxy) maxt <- get_Pb207Pb206_age(x=ylim[2],d=md)[1]
+            } else if (type==3){
+                maxy <- age_to_Pb208Th232_ratio(maxt)[1]
+                if (ylim[1]<maxy) mint <- min(mint,get_Pb208Th232_age(x=ylim[1])[1])
+                if (ylim[2]<maxy) maxt <- get_Pb208Th232_age(x=ylim[2])[1]
+            } else {
+                stop("Invalid type for emptyconcordia.")
+            }
+        }
+        tlim <- c(mint,maxt)
+    }
+    dat$d <- md
     if (type==1){
         dat$x <- cbind(Pb207U235=c(age_to_Pb207U235_ratio(tlim[1]),
                                    age_to_Pb207U235_ratio(tlim[2])),
@@ -1036,7 +1077,7 @@ emptyconcordia <- function(tlim=NULL,xlim=NULL,ylim=NULL,pos=NA,
         stop('Invalid concordia type.')
     }
     lims <- prepare_concordia_line(x=dat,tlim=tlim,xlim=xlim,
-                                   ylim=ylim,type=type,...)
+                                   ylim=ylim,type=type,add=add,...)
     plotConcordiaLine(x=dat,lims=lims,pos=pos,type=type,
                       col=concordia.col,oerr=oerr,
                       exterr=exterr,ticks=ticks)
