@@ -367,7 +367,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
     lims <- prepare_concordia_line(x=X2plot,tlim=tlim,
                                    xlim=xlim,ylim=ylim,type=type)
     if (show.age>1){
-        discordia_line(fit,wetherill=(type==1),d=X2plot$d,oerr=oerr)
+        discordia_line(x=X2calc,fit=fit,wetherill=(type==1),oerr=oerr)
         if (title){
             dispunits <- getDispUnits_UPb(x=x,joint=TRUE,anchor=anchor)
             disctit <- discordia_title(fit,wetherill=(type==1),
