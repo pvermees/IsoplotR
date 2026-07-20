@@ -620,6 +620,8 @@ get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
             }
             if (xset || is.null(tlim) & maxx>U8Pb6t[1])
                 out$t[1] <- get_Pb206U238_age(1/maxx,d=md)[1]
+            if (is.null(tlim) & minx>U8Pb6t[2])
+                out$t[2] <- get_Pb206U238_age(1/minx,d=md)[1]
             Pb76 <- get_Pb207Pb206_ratios(x)
             if (!yset){
                 Pb76t <- age_to_Pb207Pb206_ratio(out$t,d=x$d)[,'76']
@@ -697,7 +699,10 @@ get_concordia_limits <- function(x,tlim=NULL,xlim=NULL,ylim=NULL,type=1,...){
                 maxy <- max(Pb207Pb206[,1]+nse*Pb207Pb206[,2],na.rm=TRUE)
             }
             out$t[1] <- get_Pb206U238_age(1/maxx,d=md)[1]
-            out$t[2] <- get_Pb207Pb206_age(maxy,d=md,interval=c(out$t[1],10000))[1]
+            if (minx>0)
+                out$t[2] <- get_Pb206U238_age(1/minx,d=md)[1]
+            else
+                out$t[2] <- get_Pb207Pb206_age(maxy,d=md,interval=c(out$t[1],10000))[1]
             if (!xset)
                 minx <- min(minx,age_to_U238Pb206_ratio(out$t[2],d=md)[,'86'])
             if (!yset)
