@@ -384,31 +384,31 @@ initConcordiaIntersection <- function(yfit,d=diseq(),buffer=2){
         }
         out
     }
-    m <- 0
-    M <- 5000
-    a <- unname(yfit$a[1])
-    b <- unname(yfit$b[1])
+    m <- from <- 1e-5
+    M <- to <- 5000
+    a <- yfit$a[1]
+    b <- yfit$b[1]
     if (b>0){
         midpoint <- stats::uniroot(misfit,lower=m,upper=M,
                                    a=a,b=b,gradient=TRUE)$root
-    } else {
-        midpoint <- stats::uniroot(misfit,lower=m,upper=M,a=a,b=b)$root
-    }
-    below <- misfit(tt=midpoint,a=a,b=b) > 0
-    if (below){
-        if (a > 0){
-            tt <- stats::uniroot(misfit,lower=m,upper=midpoint,a=a,b=b,d=d)$root
-            from <- tt/buffer
-            to <- midpoint
+        below <- misfit(tt=midpoint,a=a,b=b) > 0
+        if (below){
+            if (a > 0){
+                tt <- stats::uniroot(misfit,lower=m,upper=midpoint,a=a,b=b,d=d)$root
+                from <- tt/buffer
+                to <- midpoint
+            } else {
+                tt <- stats::uniroot(misfit,lower=midpoint,upper=M,a=a,b=b)$root
+                from <- midpoint
+                to <- min(M,tt*buffer)
+            }
         } else {
-            tt <- stats::uniroot(misfit,lower=midpoint,upper=M,a=a,b=b)$root
-            from <- midpoint
-            to <- min(M,tt*buffer)
+            tt <- midpoint
         }
     } else {
-        tt <- midpoint
-        from <- 1e-4
-        to <- M
+        tt <- stats::uniroot(misfit,lower=m,upper=M,a=a,b=b)$root
+        from <- tt/buffer
+        to <- tt*buffer
     }
     log(c(from,tt,to))
 }
