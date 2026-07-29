@@ -129,41 +129,40 @@ intersection_misfit_york <- function(tt,a,b,d=diseq()){
     (D$Pb207Pb206-a)*D$Pb206U238 - b
 }
 
-discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
+discordia_line <- function(x,fit,wetherill,oerr=3){
     X <- c(0,0)
     Y <- c(0,0)
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
     J <- matrix(0,1,2)
     usr <- graphics::par('usr')
     nsteps <- 100
     if (wetherill){
-        if (measured_disequilibrium(d)){
-            U85 <- iratio('U238U235')[1]
-            fit2d <- tw3d2d(fit)
-            xy1 <- age_to_wetherill_ratios(fit$par[1],d=d)
+        if (measured_disequilibrium(x$d)){
+            yd <- data2york(x,option=1)
+            yfit <- york(yd)
+            xy1 <- age_to_wetherill_ratios(fit$par[1],d=x$d)
             x1 <- xy1$x[1]
             x2 <- usr[2]
             y1 <- xy1$x[2]
-            dydx <- 1/(U85*fit$par[2])
+            dydx <- yfit$b[1]
             y2 <- y1 + (x2-x1)*dydx
             X <- c(x1,x2)
             Y <- c(y1,y2)
-            cix <- NA # computing confidence envelopes is very tricky
-            ciy <- NA # for this rarely used function -> don't bother
+            xx <- seq(from=x1,to=x2,length.out=nsteps)
+            yy <- yfit$a[1] + yfit$b[1]*xx
+            vy <- errorprop1x2(J1=1,J2=xx,E11=fit$a[2]^2,E22=fit$b[2]^2,E12=fit$cov.ab)
         } else {
             tl <- fit$par[1]
             tu <- fit$par[2]
-            X <- age_to_Pb207U235_ratio(c(tl,tu),d=d)[,'75']
-            Y <- age_to_Pb206U238_ratio(c(tl,tu),d=d)[,'68']
-            x <- seq(from=max(0,usr[1]),to=usr[2],length.out=nsteps)
-            du <- mclean(tt=tu,d=d)
-            dl <- mclean(tt=tl,d=d)
+            X <- age_to_Pb207U235_ratio(c(tl,tu),d=x$d)[,'75']
+            Y <- age_to_Pb206U238_ratio(c(tl,tu),d=x$d)[,'68']
+            xx <- seq(from=max(0,usr[1]),to=usr[2],length.out=nsteps)
+            du <- mclean(tt=tu,d=x$d)
+            dl <- mclean(tt=tl,d=x$d)
             aa <- du$Pb206U238 - dl$Pb206U238
-            bb <- x - dl$Pb207U235
+            bb <- xx - dl$Pb207U235
             cc <- du$Pb207U235 - dl$Pb207U235
             dd <- dl$Pb206U238
-            y <- aa*bb/cc + dd
+            yy <- aa*bb/cc + dd
             dadtl <- -dl$dPb206U238dt
             dbdtl <- -dl$dPb207U235dt
             dcdtl <- -dl$dPb207U235dt
@@ -174,53 +173,63 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
             dddtu <- 0
             J1 <- dadtl*bb/cc + dbdtl*aa/cc - dcdtl*aa*bb/cc^2 + dddtl # dydtl
             J2 <- dadtu*bb/cc + dbdtu*aa/cc - dcdtu*aa*bb/cc^2 + dddtu # dydtu
-            E11 <- fit$cov[1,1]
-            E12 <- fit$cov[1,2]
-            E22 <- fit$cov[2,2]
-            vy <- errorprop1x2(J1,J2,fit$cov[1,1],fit$cov[2,2],fit$cov[1,2])
-            ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
-            ul <- y + ciy
-            ll <- y - ciy
-            t75 <- get_Pb207U235_age(x,d=d)[,'t75']
-            yconc <- age_to_Pb206U238_ratio(t75,d=d)[,'68']
-            overshot <- ul > yconc
-            ul[overshot] <- yconc[overshot]
-            overshot <- ll > yconc
-            ll[overshot] <- yconc[overshot]
-            cix <- c(x,rev(x))
-            ciy <- c(ll,rev(ul))
+            vy <- errorprop1x2(J1,J2,E11=fit$cov[1,1],E22=fit$cov[2,2],E12=fit$cov[1,2])
         }
+        ciy <- ci(x=yy,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
+        ul <- yy + ciy
+        ll <- yy - ciy
+        t75 <- get_Pb207U235_age(xx,d=x$d)[,'t75']
+        yconc <- age_to_Pb206U238_ratio(t75,d=x$d)[,'68']
+        overshot <- ul > yconc
+        ul[overshot] <- yconc[overshot]
+        overshot <- ll > yconc
+        ll[overshot] <- yconc[overshot]
+        cix <- c(xx,rev(xx))
+        ciy <- c(ll,rev(ul))
     } else {
-        fit2d <- tw3d2d(fit)
-        X[1] <- age_to_U238Pb206_ratio(fit2d$par['t'],d=d)[,'86']
-        Y[1] <- age_to_Pb207Pb206_ratio(fit2d$par['t'],d=d)[,'76']
-        r75 <- age_to_Pb207U235_ratio(fit2d$par['t'],d=d)[,'75']
-        r68 <- 1/X[1]
-        Y[2] <- fit2d$par['a0']
-        xl <- X[1]
-        yl <- Y[1]
-        y0 <- Y[2]
-        tl <- check_zero_UPb(fit2d$par['t'])
-        U <- settings('iratio','U238U235')[1]
-        x <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
-        y <- yl + (y0-yl)*(1-x*r68) # = y0 + yl*x*r68 - y0*x*r68
-        D <- mclean(tt=tl,d=d)
-        d75dtl <- D$dPb207U235dt
-        d68dtl <- D$dPb206U238dt
-        dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
-        J1 <- dyldtl*x*r68 + yl*x*d68dtl - y0*x*d68dtl # dy/dtl
-        J2 <- 1 - x*r68                                # dy/dy0
-        vy <- errorprop1x2(J1,J2,fit2d$cov[1,1],fit2d$cov[2,2],fit2d$cov[1,2])
-        ciy <- ci(x=y,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
-        ul <- y + ciy
-        ll <- y - ciy
-        t68 <- get_Pb206U238_age(1/x,d=d)[,'t68']
-        yconc <- age_to_Pb207Pb206_ratio(t68,d=d)[,'76']
+        if (measured_disequilibrium(x$d)){
+            yd <- data2york(x,option=2)
+            yfit <- york(yd)
+            X[1] <- age_to_U238Pb206_ratio(fit$par['t'],d=x$d)[,'86']
+            Y[1] <- age_to_Pb207Pb206_ratio(fit$par['t'],d=x$d)[,'76']
+            Y[2] <- yfit$a[1]
+            xx <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
+            yy <- yfit$a[1] + yfit$b[1]*xx
+            vy <- errorprop1x2(J1=1,J2=xx,E11=yfit$a[2]^2,E22=yfit$b[2]^2,E12=yfit$cov.ab)
+            ciy <- ci(x=yy,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
+            ul <- yy + ciy
+            ll <- yy - ciy
+            t68 <- get_Pb206U238_age(1/xx,d=x$d)[,'t68']
+            yconc <- age_to_Pb207Pb206_ratio(t68,d=x$d)[,'76']
+        } else {
+            fit2d <- tw3d2d(fit)
+            X[1] <- xl <- age_to_U238Pb206_ratio(fit2d$par['t'],d=x$d)[,'86']
+            Y[1] <- yl <- age_to_Pb207Pb206_ratio(fit2d$par['t'],d=x$d)[,'76']
+            r75 <- age_to_Pb207U235_ratio(fit2d$par['t'],d=x$d)[,'75']
+            r68 <- 1/X[1]
+            Y[2] <- y0 <- fit2d$par['a0']
+            tl <- check_zero_UPb(fit2d$par['t'])
+            U <- iratio('U238U235')[1]
+            xx <- seq(from=max(.Machine$double.xmin,usr[1]),to=usr[2],length.out=nsteps)
+            yy <- yl + (y0-yl)*(1-xx*r68) # = y0 + yl*x*r68 - y0*x*r68
+            D <- mclean(tt=tl,d=x$d)
+            d75dtl <- D$dPb207U235dt
+            d68dtl <- D$dPb206U238dt
+            dyldtl <- (d75dtl*r68 - r75*d68dtl)/(U*r68^2)
+            J1 <- dyldtl*xx*r68 + yl*xx*d68dtl - y0*xx*d68dtl # dy/dtl
+            J2 <- 1 - xx*r68                                  # dy/dy0
+            vy <- errorprop1x2(J1,J2,fit2d$cov[1,1],fit2d$cov[2,2],fit2d$cov[1,2])
+            ciy <- ci(x=yy,sx=sqrt(vy),oerr=oerr,absolute=TRUE)
+            ul <- yy + ciy
+            ll <- yy - ciy
+            t68 <- get_Pb206U238_age(1/xx,d=x$d)[,'t68']
+            yconc <- age_to_Pb207Pb206_ratio(t68,d=x$d)[,'76']
+        }
         # correct overshot confidence intervals:
-        if (y0>yl){ # negative slope
-            xconc <- age_to_U238Pb206_ratio(t68,d=d)[,'86']
+        if (Y[2]>Y[1]){ # negative slope
+            xconc <- age_to_U238Pb206_ratio(t68,d=x$d)[,'86']
             concordia_slope <- c(-Inf,diff(yconc)/diff(xconc))
-            discordia_slope <- (diff(y)/diff(x))[1]
+            discordia_slope <- (diff(yy)/diff(xx))[1]
             overshot <- (is.finite(concordia_slope) & ll<yconc & concordia_slope>discordia_slope)
             ll[overshot] <- yconc[overshot]
             overshot <- (is.finite(concordia_slope) & ul<yconc & concordia_slope>discordia_slope)
@@ -231,7 +240,7 @@ discordia_line <- function(fit,wetherill,d=diseq(),oerr=3){
             overshot <- ll>yconc
             ll[overshot] <- yconc[overshot]
         }
-        cix <- c(x,rev(x))
+        cix <- c(xx,rev(xx))
         ciy <- c(ll,rev(ul))
     }
     graphics::polygon(cix,ciy,col='gray80',border=NA)

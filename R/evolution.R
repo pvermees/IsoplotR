@@ -138,7 +138,7 @@
 #' manifests itself as an added (co)variance term.
 #'
 #' \code{4}: If \code{x$format} is \code{3} or \code{4}, calculate the
-#' rightmost isochron, corrsponding to the minimum age component of a
+#' rightmost isochron, corresponding to the minimum age component of a
 #' contaminated system.
 #' 
 #' @param hide vector with indices of aliquots that should be removed

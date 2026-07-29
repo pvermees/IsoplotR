@@ -256,18 +256,20 @@ mexp_845 <- function(nratios=3){
     out
 }
 
-reverse <- function(tt,mexp,nt){
-    n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+reverse <- function(tt,mexp,nt,derivative=0){
+    if (derivative==1){
+        n0 <- (mexp$Q %*% diag(mexp$L*exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    } else {
+        n0 <- (mexp$Q %*% diag(exp(mexp$L*tt)) %*% mexp$Qinv %*% nt)
+    }
     rownames(n0) <- rownames(nt)
     n0
 }
 forward <- function(tt,d=diseq(),derivative=0){
     if (derivative==1){
-        nt <- (d$Q %*% diag(exp(-d$L)) %*%
-               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        nt <- (d$Q %*% diag(-d$L*exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     } else if (derivative==2){
-        nt <- (d$Q %*% diag(exp(-d$L)) %*% diag(exp(-d$L)) %*%
-               diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
+        nt <- (d$Q %*% diag(exp(-d$L*tt)*d$L^2) %*% d$Qinv %*% d$n0)
     } else {
         nt <- (d$Q %*% diag(exp(-d$L*tt)) %*% d$Qinv %*% d$n0)
     }
@@ -404,7 +406,8 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
             if (d$ThU$option==1){ # initial 230Th
                 d$n0['Th230',] <- d$ThU$x/l30
             } else if (d$ThU$option==2){ # measured 230Th
-                nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
+                nuclides <- c('U238','U234','Th230','U235')
+                nt <- forward(tt=tt,d=d)[nuclides,,drop=FALSE]
                 nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite
                 d$n0['Th230',] <- reverse(tt=tt,mexp=mexp_8405(),nt=nt)['Th230',]
             }
@@ -414,7 +417,7 @@ mclean <- function(tt=0,d=diseq(),exterr=FALSE){
                 nt['U234',] <- d$U48$x*nt['U238',]*l38/l34 # overwrite
                 d$n0['U234',] <- reverse(tt=tt,mexp=mexp_845(),nt=nt)['U234',]
                 if (d$ThU$option==1) d$n0['Th230',] <- d$ThU$x/l30
-            } else {                # measured 230Th
+            } else {             # measured 230Th
                 nt <- forward(tt=tt,d=d)[c('U238','U234','Th230','U235'),,drop=FALSE]
                 nt['U234',] <- d$U48$x*nt['U238',]*l38/l34  # overwrite
                 nt['Th230',] <- d$ThU$x*nt['U238',]*l38/l30 # overwrite

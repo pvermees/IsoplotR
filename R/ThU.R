@@ -181,7 +181,7 @@ get_ThU_ratio <- function(tt,st=0,exterr=FALSE){
     c('r'=r,'s[r]'=sqrt(vr))
 }
 
-# helper function for for evolution diagrams
+# helper function for evolution diagrams
 get_Th230U238_ratio <- function(tt,U234U238_0){
     l4 <- lambda('U234')
     l0 <- lambda('Th230')

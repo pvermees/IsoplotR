@@ -260,7 +260,7 @@ anchoredLRisochron <- function(yd2calc,fun,
 init_left <- function(yd){
     X <- yd[,'X']
     Y <- yd[,'Y']
-    fit <- lm(Y ~ X)
+    fit <- stats::lm(Y ~ X)
     if (summary(fit)$r.squared>0.8){
         a <- fit$coefficients[1]
         b <- fit$coefficients[2]

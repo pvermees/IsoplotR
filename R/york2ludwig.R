@@ -24,10 +24,10 @@ york2ludwigTW <- function(x,anchor=0,buffer=2,model=1){
         Pb76c <- iratio('Pb207Pb206')
         U85 <- iratio('U238U235')[1]
         yfit <- MLyork(yd,anchor=c(2,1/(Pb76c[1]*U85)))
-        tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
-        par['t'] <- log(tm[1])
-        lower['t'] <- par['t'] - buffer
-        upper['t'] <- log(tm[2])
+        log_mtM <- initConcordiaIntersection(yfit=yfit,d=x$d,buffer=buffer)
+        lower['t'] <- log_mtM[1]
+        par['t'] <- log_mtM[2]
+        upper['t'] <- log_mtM[3]
         if (model==1 & Pb76c[2]>0){
             par['a0'] <- log(Pb76c[1])
             lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
@@ -63,13 +63,13 @@ york2ludwigTW <- function(x,anchor=0,buffer=2,model=1){
         }
     } else { # no anchor
         yfit <- york(yd)
-        tm <- WconcordiaIntersection(yfit=yfit,d=x$d)
-        par['t'] <- log(tm[1])
-        lower['t'] <- par['t'] - buffer
-        upper['t'] <- log(tm[2])
-        Pb76c <- 1/unname(yfit$b[1]*iratio('U238U235')[1])
-        par['a0'] <- log(Pb76c)
-        lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
+        log_mtM <- initConcordiaIntersection(yfit=yfit,d=x$d)
+        lower['t'] <- log_mtM[1]
+        par['t'] <- log_mtM[2]
+        upper['t'] <- log_mtM[3]
+        Pb76c <- york(data2york(x,option=2))$a
+        par['a0'] <- log(Pb76c[1])
+        lower['a0'] <- par['a0'] - buffer
         upper['a0'] <- par['a0'] + buffer
         if (model==3){
             stPb68 <- get_Pb206U238_age(x)[,2]
@@ -369,8 +369,9 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
     list(par=par,lower=lower,upper=upper)
 }
 
-WconcordiaIntersection <- function(yfit,d=diseq()){
-    misfit <- function(tt,a,b,d,gradient=FALSE){
+# yfit = York fit through Wetherill data
+initConcordiaIntersection <- function(yfit,d=diseq(),buffer=2){
+    misfit <- function(tt,a,b,d=diseq(),gradient=FALSE){
         McL <- mclean(tt=tt,d=d)
         if (gradient){
             dXydt <- McL$dPb207U235dt
@@ -383,28 +384,33 @@ WconcordiaIntersection <- function(yfit,d=diseq()){
         }
         out
     }
-    a <- unname(yfit$a[1])
-    b <- unname(yfit$b[1])
+    m <- from <- 1e-5
+    M <- to <- 5000
+    a <- yfit$a[1]
+    b <- yfit$b[1]
     if (b>0){
-        midpoint <- stats::uniroot(misfit,lower=0,upper=5000,
-                                   a=a,b=b,d=d,gradient=TRUE)$root
-    } else {
-        midpoint <- stats::uniroot(misfit,lower=0,upper=5000,a=a,b=b,d=d)$root
-    }
-    below <- misfit(tt=midpoint,a=a,b=b,d=d) > 0
-    if (below){
-        if (a > 0){
-            tt <- stats::uniroot(misfit,lower=0,upper=midpoint,a=a,b=b,d=d)$root
-            out <- c(tt,midpoint)
+        midpoint <- stats::uniroot(misfit,lower=m,upper=M,
+                                   a=a,b=b,gradient=TRUE)$root
+        below <- misfit(tt=midpoint,a=a,b=b) > 0
+        if (below){
+            if (a > 0){
+                tt <- stats::uniroot(misfit,lower=m,upper=midpoint,a=a,b=b,d=d)$root
+                from <- tt/buffer
+                to <- midpoint
+            } else {
+                tt <- stats::uniroot(misfit,lower=midpoint,upper=M,a=a,b=b)$root
+                from <- midpoint
+                to <- min(M,tt*buffer)
+            }
         } else {
-            tt <- stats::uniroot(misfit,lower=midpoint,upper=5000,a=a,b=b,d=d)$root
-            out <- c(midpoint,tt)
+            tt <- midpoint
         }
     } else {
-        tt <- stats::optimise(misfit,lower=0,upper=5000,a=a,b=b,d=d)$minimum
-        out <- c(tt,midpoint)
+        tt <- stats::uniroot(misfit,lower=m,upper=M,a=a,b=b)$root
+        from <- tt/buffer
+        to <- tt*buffer
     }
-    out
+    log(c(from,tt,to))
 }
 
 inithelper <- function(yd,x0=NULL,y0=NULL){

@@ -34,7 +34,7 @@ flipper <- function(x,inverse=FALSE,hide=NULL,omit=NULL,
         else fit <- MLyork(d2calc,anchor=anchor,model=model)
         if (type=='d'){ # shift right by Pb206Pb204c or Th230U238i
             fit$a[1] <- fit$a[1] - fit$b[1]*anchor[4]
-            J <- rbind(c(1,-anchor[2]),c(0,1))
+            J <- rbind(c(1,-anchor[4]),c(0,1))
             E <- rbind(c(fit$a[2]^2,fit$cov.ab),
                        c(fit$cov.ab,fit$b[2]^2))
             covmat <- J %*% E %*% t(J)
