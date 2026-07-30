@@ -149,7 +149,7 @@ discordia_line <- function(x,fit,wetherill,oerr=3){
             Y <- c(y1,y2)
             xx <- seq(from=x1,to=x2,length.out=nsteps)
             yy <- yfit$a[1] + yfit$b[1]*xx
-            vy <- errorprop1x2(J1=1,J2=xx,E11=fit$a[2]^2,E22=fit$b[2]^2,E12=fit$cov.ab)
+            vy <- errorprop1x2(J1=1,J2=xx,E11=yfit$a[2]^2,E22=yfit$b[2]^2,E12=yfit$cov.ab)
         } else {
             tl <- fit$par[1]
             tu <- fit$par[2]
