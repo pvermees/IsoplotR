@@ -24,13 +24,13 @@ york2ludwigTW <- function(x,anchor=0,buffer=2,model=1){
         Pb76c <- iratio('Pb207Pb206')
         U85 <- iratio('U238U235')[1]
         yfit <- MLyork(yd,anchor=c(2,1/(Pb76c[1]*U85)))
-        log_mtM <- initConcordiaIntersection(yfit=yfit,d=x$d,buffer=buffer)
-        lower['t'] <- log_mtM[1]
-        par['t'] <- log_mtM[2]
-        upper['t'] <- log_mtM[3]
+        mtM <- initConcordiaIntersection(yfit=yfit,d=x$d,buffer=buffer)
+        lower['t'] <- log(mtM[1])
+        par['t'] <- log(mtM[2])
+        upper['t'] <- log(mtM[3])
         if (model==1 & Pb76c[2]>0){
             par['a0'] <- log(Pb76c[1])
-            lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=tm[2],d=x$d)[1])
+            lower['a0'] <- log(age_to_Pb207Pb206_ratio(tt=mtM[1],d=x$d)[1])
             upper['a0'] <- par['a0'] + buffer
         } else if (model==3 & Pb76c[2]<=0){
             Pb76err <- data2york(x,option=2)[,'sY']
@@ -63,10 +63,10 @@ york2ludwigTW <- function(x,anchor=0,buffer=2,model=1){
         }
     } else { # no anchor
         yfit <- york(yd)
-        log_mtM <- initConcordiaIntersection(yfit=yfit,d=x$d)
-        lower['t'] <- log_mtM[1]
-        par['t'] <- log_mtM[2]
-        upper['t'] <- log_mtM[3]
+        mtM <- initConcordiaIntersection(yfit=yfit,d=x$d,buffer=buffer)
+        lower['t'] <- log(mtM[1])
+        par['t'] <- log(mtM[2])
+        upper['t'] <- log(mtM[3])
         Pb76c <- york(data2york(x,option=2))$a
         par['a0'] <- log(Pb76c[1])
         lower['a0'] <- par['a0'] - buffer
@@ -410,7 +410,7 @@ initConcordiaIntersection <- function(yfit,d=diseq(),buffer=2){
         from <- tt/buffer
         to <- tt*buffer
     }
-    log(c(from,tt,to))
+    c(from,tt,to)
 }
 
 inithelper <- function(yd,x0=NULL,y0=NULL){

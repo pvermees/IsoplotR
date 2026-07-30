@@ -1633,6 +1633,7 @@ ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
         out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
         out$y0['disp[y]'] <- sqrt(out$mswd)*out$y0['s[y]']
     } else if (out$model==3){ # wx0 and wy0 set error bars in scatterplot
+        out$wx0 <- out$wy0 <- 0
         if (fit$wtype==1){
             out$wy0 <- out$disp[1]
         } else if (type==1){ # 06/38
