@@ -392,23 +392,23 @@ initConcordiaIntersection <- function(yfit,d=diseq(),buffer=2){
         midpoint <- stats::uniroot(misfit,lower=m,upper=M,
                                    a=a,b=b,gradient=TRUE)$root
         below <- misfit(tt=midpoint,a=a,b=b) > 0
-        if (below){
+        if (below){ # two intersections
             if (a > 0){
                 tt <- stats::uniroot(misfit,lower=m,upper=midpoint,a=a,b=b,d=d)$root
-                from <- tt/buffer
+                from <- tt/exp(buffer)
                 to <- midpoint
             } else {
                 tt <- stats::uniroot(misfit,lower=midpoint,upper=M,a=a,b=b)$root
                 from <- midpoint
-                to <- min(M,tt*buffer)
+                to <- min(M,tt*exp(buffer))
             }
-        } else {
+        } else { # no intersections
             tt <- midpoint
         }
-    } else {
+    } else { # one intersection
         tt <- stats::uniroot(misfit,lower=m,upper=M,a=a,b=b)$root
-        from <- tt/buffer
-        to <- tt*buffer
+        from <- tt/exp(buffer)
+        to <- tt*exp(buffer)
     }
     c(from,tt,to)
 }
