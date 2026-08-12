@@ -632,8 +632,8 @@ as.ThPb <- function(x,format=1,ierr=1){
     out$format <- format
     nc <- ncol(x)
     nr <- nrow(x)
-    bi <- 2 # begin index
-    X <- shiny2matrix(x,bi,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     X <- errconvert(X,gc='Th-Pb',format=format,ierr=ierr)
     if (format==1 & nc>3){
         cnames <- c('Th232Pb204','errTh232Pb204',
@@ -660,8 +660,8 @@ as.KCa <- function(x,format=1,ierr=1,sister=44){
     out$sister <- sister
     nc <- ncol(x)
     nr <- nrow(x)
-    bi <- 2 # begin index
-    X <- shiny2matrix(x,bi,nr,nc)
+    if (is.numeric(x)) X <- x
+    else X <- shiny2matrix(x,2,nr,nc)
     X <- errconvert(X,gc='K-Ca',format=format,ierr=ierr)
     if (format==1 & nc>3){
         cnames <- c(paste0("K40Ca",sister),
