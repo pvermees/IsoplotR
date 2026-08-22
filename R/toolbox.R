@@ -280,7 +280,6 @@ validLevels <- function(levels){
 
 colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
                       stroke='black',strip.width=0.02,clabel=""){
-    op <- graphics::par(no.readonly = TRUE)
     if (!validLevels(z)) return()
     if (all(is.na(fill)) | length(unique(fill))==1) col <- stroke
     else col <- fill
@@ -300,12 +299,11 @@ colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
         graphics::rect(xb,yb+(i-1)*dy,xe,yb+i*dy,col=cc[i],border=NA)
     }
     graphics::rect(xb,yb,xe,ye)
-    graphics::par(new=TRUE)
-    graphics::plot(usr[1:2],range(z),type='n',
-                   axes=FALSE,xlab=NA,ylab=NA,xaxs='i')
-    graphics::axis(side=4)
+    zticks <- pretty(range(z))
+    zticks <- zticks[zticks >= min(z) & zticks <= max(z)]
+    zpos <- yb + (zticks-min(z))/(max(z)-min(z))*(ye-yb)
+    graphics::axis(side=4,at=zpos,labels=zticks)
     mymtext(text=clabel,side=3,adj=1)
-    graphics::par(op)
 }
 
 plot_points <- function(x,y,bg='yellow',pch=21,cex=1.5,pos,col,
