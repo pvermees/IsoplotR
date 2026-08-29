@@ -750,18 +750,15 @@ concordia_title <- function(fit,sigdig=2,oerr=3,...){
 }
 
 concordia_age <- function(x,i=NULL,type=1,exterr=FALSE,...){
-    if (is.null(i)){
-        cc <- concordia_comp(x,type=type)
-        if (type==3){
-            cc4age <- cc
-            type4age <- 3
-        } else { # use Wetherill
-            cc4age <- concordia_comp(x,type=1)
-            type4age <- 1
-        }
-    } else {
-        cc <- wetherill(x,i)
+    if (!is.null(i)){
+        x$x <- x$x[i,,drop=FALSE]
+    }
+    cc <- concordia_comp(x,type=type)
+    if (type==3){
         cc4age <- cc
+        type4age <- 3
+    } else { # use Wetherill
+        cc4age <- concordia_comp(x,type=1)
         type4age <- 1
     }
     out <- concordia_age_helper(cc4age,d=mediand(x$d),type=type4age,exterr=exterr)

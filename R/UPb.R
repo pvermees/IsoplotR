@@ -1450,7 +1450,7 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (x$format<9 || x$format==85){
         if (conc | discordance$option != 0){
             tc <- tryCatch({
-                concordia_age(x=Xi,i=1,exterr=exterr)
+                concordia_age(x=xd,i=i,exterr=exterr)
             }, error = function(e){
                 list(age=c(NA,NA),p.value=NA)
             })
