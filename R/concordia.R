@@ -2,13 +2,13 @@
 #'
 #' @description
 #' Plots U-Pb data on Wetherill, Tera-Wasserburg or U-Th-Pb concordia
-#' diagrams, calculates concordia_ages and compositions, evaluates the
+#' diagrams, calculates concordia ages and compositions, evaluates the
 #' equivalence of multiple
 #' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U,
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U, or
 #' \eqn{^{208}}Th/\eqn{^{232}}Th-\eqn{^{206}}Pb/\eqn{^{238}}U)
 #' compositions, computes the weighted mean isotopic composition and
-#' the corresponding concordia_age using the method of maximum
+#' the corresponding concordia age using the method of maximum
 #' likelihood, computes the MSWD of equivalence and concordance and
 #' their respective Chi-squared p-values. Performs linear regression
 #' and computes the upper and lower intercept ages (for Wetherill) or
@@ -231,7 +231,7 @@
 #' freedom used for the \code{mswd} calculation. }
 #'
 #' \item{age}{a two-or three-element vector with:\cr
-#' \code{t}: the concordia_age (in Ma)\cr
+#' \code{t}: the concordia age (in Ma)\cr
 #' \code{s[t]}: the standard error of \code{t}\cr
 #' \code{disp[t]}: the standard error of \code{t} augmented by
 #' \eqn{\sqrt{mswd}} to account for any overdispersion. }
@@ -341,11 +341,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
     } else {
         X <- x
     }
-    if (cutoff.disc$before){
-        discordant <- is.discordant(x=x,cutoff.disc=cutoff.disc)
-    } else {
-        discordant <- is.discordant(x=x,xd=X,cutoff.disc=cutoff.disc)
-    }
+    discordant <- which(is.discordant(x=x,X=X,cutoff.disc=cutoff.disc))
     omit <- unique(c(omit,discordant))
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
@@ -770,9 +766,9 @@ concordia_age <- function(x,i=NULL,type=1,exterr=FALSE,...){
     }
     out <- concordia_age_helper(cc4age,d=mediand(x$d),type=type4age,exterr=exterr)
     out$age <- c('t'=unname(out$par['t']),'s[t]'=unname(sqrt(out$cov['t','t'])))
-    if (is.null(i)){ # these calculations are only relevant to weighted means
-        out <- c(out,mswd_concordia(x,cc4age,type=type4age,
-                                    pars=out$par,exterr=exterr))
+    mc <- mswd_concordia(x,cc4age,type=type4age,pars=out$par,exterr=exterr)
+    if (is.null(i)){
+        out <- c(out,mc)
         mswd <- list(mswd=out$mswd['combined'],model=1,
                      p.value=out$p.value['combined'],
                      df=out$df['combined'])
@@ -781,6 +777,8 @@ concordia_age <- function(x,i=NULL,type=1,exterr=FALSE,...){
         }
         out$x <- cc$x
         out$ccov <- cc$cov
+    } else {
+        out$p.value <- mc$p.value['concordance']
     }
     out
 }
@@ -832,10 +830,10 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         lower['t'] <- tt[i-1]
         upper['t'] <- tt[i]
         init['t'] <- (lower['t'] + upper['t'])/2
-        fit <- contingencyfit(par=init,fn=LL_concordia_age,
-                              lower=lower,upper=upper,hessian=TRUE,
-                              exterr=exterr,cc=cc,type=type,d=d)
-        if (is.finite(fit$value) && fit$value<out$value){
+        fit <- stats::optim(par=init,fn=LL_concordia_age,method='L-BFGS-B',
+                            lower=lower,upper=upper,hessian=TRUE,
+                            exterr=exterr,cc=cc,type=type,d=d)
+        if (fit$convergence==0 && is.finite(fit$value) && fit$value<out$value){
             out <- fit
         }
     }

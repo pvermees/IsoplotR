@@ -1397,7 +1397,7 @@ UPb_age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
         for (i in 1:nn){
             ti <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
                                  conc=conc,discordance=discordance)
-            out <- rbind(out,ti)
+            out <- rbind(out,ti,deparse.level=0)
         }
     }
     out
@@ -1448,27 +1448,26 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
         t.82 <- get_Pb208Th232_age(Xi,exterr=exterr)
     }
     if (x$format<9 || x$format==85){
-        if (conc){
-            labels <- c(labels,'t.conc','s[t.conc]')
-            t.conc <- tryCatch({
-                concordia_age(x=Xi,i=1,exterr=exterr)$age
+        if (conc | discordance$option != 0){
+            tc <- tryCatch({
+                concordia_age(x=Xi,i=1,exterr=exterr)
             }, error = function(e){
-                c(NA,NA)
+                list(age=c(NA,NA),p.value=NA)
             })
+        }
+        if (conc){
+            labels <- c(labels,'t.conc','s[t.conc]','p[conc]')
+            t.conc <- tc$age
+            pval <- tc$p.value
         }
         if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
             labels <- c(labels,'disc')
-            dif <- discordance(x=x,xd=xd,i=i,option=discordance$option)
-        } else if (discordance$option%in%c(6,'p')){
-            labels <- c(labels,'p[conc]')
-            SS.concordance <-
-                LL_concordia_age(pars=t.conc[1],
-                                 cc=wetherill(xd,i=i),
-                                 mswd=TRUE,exterr=exterr,d=xd$d)
-            pval <- 1-stats::pchisq(SS.concordance,1)
+            dif <- discordance(x=x,xd=xd,i=i,
+                               t.68=t.68[1],t.76=t.76[1],t.conc=tc$age[1],
+                               option=discordance$option)
         }
     }
-    out <- c(t.75,t.68,t.76,t.82,t.conc,dif,pval)
+    out <- c(t.75,t.68,t.76,t.82,t.conc,pval,dif)
     names(out) <- labels
     out
 }

@@ -88,7 +88,8 @@ discfilter <- function(option=0,before=TRUE,cutoff){
 }
 
 filter_UPb_ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
-                            cutoff.disc=discfilter(),common.Pb=0,omit4c=NULL){
+                            cutoff.disc=discfilter(),
+                            common.Pb=0,omit4c=NULL){
     if (x$format>8){ # override type if necessary:
         if (x$format==9) type <- 2
         else if (x$format==10) type <- 1
@@ -139,55 +140,52 @@ filter_UPb_ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
 }
 
 # x: raw data, xd: common Pb corrected data (or not)
-discordance <- function(x,xd=x,i=NULL,option=4){
-    if (is.null(i)){
-        ns <- length(x)
-        dif <- rep(0,ns)
-        for (j in 1:ns){
-            dif[j] <- discordance(x,xd=x,i=j,option=option)
-        }
+discordance <- function(x,xd=x,i=NULL,t.68,t.76,t.conc,option=4){
+    xi <- subset(x,subset=((1:length(x))%in%i))
+    xdi <- subset(xd,subset=((1:length(xd))%in%i))
+    if (option%in%c(1,'t')){
+        dif <- t.76-t.68
+    } else if (option%in%c(2,'r')){
+        dif <- (1-t.68/t.76)*100
+    } else if (option%in%c(3,'sk')){
+        x.corr <- Pb0corr(xi,option=3)
+        U8Pb6.raw <- get_U238Pb206_ratios(xi)[,'U238Pb206']
+        U8Pb6.corr <- get_U238Pb206_ratios(x.corr)[,'U238Pb206']
+        dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
+    } else if (option%in%c(4,'a')){
+        U8Pb6 <- get_U238Pb206_ratios(xdi)[,'U238Pb206']
+        Pb76 <- get_Pb207Pb206_ratios(xdi)[,'Pb207Pb206']
+        r86.76 <- age_to_U238Pb206_ratio(t.76)[,1]
+        r76.68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
+        DX <- (log(U8Pb6) - log(r86.76))/sqrt(2)
+        DY <- (log(Pb76) - log(r76.68))/sqrt(2/3)
+        dif <- 100*DX*sin(atan(DY/DX))
+    } else if (option%in%c(5,'c')){
+        U8Pb6 <- get_U238Pb206_ratios(xdi)[,'U238Pb206']
+        Pb76 <- get_Pb207Pb206_ratios(xdi)[,'Pb207Pb206']
+        c86 <- age_to_U238Pb206_ratio(t.conc)[,1]
+        c76 <- age_to_Pb207Pb206_ratio(t.conc)[,1]
+        dx <- (log(U8Pb6) - log(c86))/sqrt(2)
+        dy <- (log((Pb76^2)/U8Pb6) - log((c76^2)/c86))/sqrt(6)
+        dif <- 100*sign(t.76-t.68)*sqrt(dx^2+dy^2)
     } else {
-        xi <- subset(x,subset=((1:length(x))%in%i))
-        xdi <- subset(xd,subset=((1:length(xd))%in%i))
-        t.68 <- get_Pb206U238_age(xdi)[1]
-        t.76 <- get_Pb207Pb206_age(xdi,t.68=t.68)[1]
-        if (option%in%c(5,'c')){
-            t.conc <- concordia_age(x=xd,i=i)$age[1]
-        }
-        if (option%in%c(1,'t')){
-            dif <- t.76-t.68
-        } else if (option%in%c(2,'r')){
-            dif <- (1-t.68/t.76)*100
-        } else if (option%in%c(3,'sk')){
-            x.corr <- Pb0corr(xi,option=3)
-            U8Pb6.raw <- get_U238Pb206_ratios(xi)[,'U238Pb206']
-            U8Pb6.corr <- get_U238Pb206_ratios(x.corr)[,'U238Pb206']
-            dif <- (1-U8Pb6.raw/U8Pb6.corr)*100
-        } else if (option%in%c(4,'a')){
-            U8Pb6 <- get_U238Pb206_ratios(xdi)[,'U238Pb206']
-            Pb76 <- get_Pb207Pb206_ratios(xdi)[,'Pb207Pb206']
-            r86.76 <- age_to_U238Pb206_ratio(t.76)[,1]
-            r76.68 <- age_to_Pb207Pb206_ratio(t.68)[,1]
-            DX <- (log(U8Pb6) - log(r86.76))/sqrt(2)
-            DY <- (log(Pb76) - log(r76.68))/sqrt(2/3)
-            dif <- 100*DX*sin(atan(DY/DX))
-        } else if (option%in%c(5,'c')){
-            U8Pb6 <- get_U238Pb206_ratios(xdi)[,'U238Pb206']
-            Pb76 <- get_Pb207Pb206_ratios(xdi)[,'Pb207Pb206']
-            c86 <- age_to_U238Pb206_ratio(t.conc)[,1]
-            c76 <- age_to_Pb207Pb206_ratio(t.conc)[,1]
-            dx <- (log(U8Pb6) - log(c86))/sqrt(2)
-            dy <- (log((Pb76^2)/U8Pb6) - log((c76^2)/c86))/sqrt(6)
-            dif <- 100*sign(t.76-t.68)*sqrt(dx^2+dy^2)
-        } else {
-            dif <- 0
-        }
+        dif <- 0
     }
     dif
 }
 
-is.discordant <- function(x,xd=x,cutoff.disc=discfilter()){
-    disc <- discordance(x=x,xd=xd,option=cutoff.disc$option)
-    out <- which(disc < cutoff.disc$cutoff[1] | disc > cutoff.disc$cutoff[2])
+is.discordant <- function(x,X=x,cutoff.disc=discfilter()){
+    ns <- length(x)
+    out <- rep(FALSE,ns)
+    if (cutoff.disc$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
+        if (cutoff.disc$before) xd <- x
+        else xd <- X
+        for (i in 1:ns){
+            ages <- UPb_age_helper(x=x,X=X,xd=xd,i=i,discordance=cutoff.disc)
+            out[i] <- (ages['p[conc]'] < alpha()) &
+                (ages['disc'] < cutoff.disc$cutoff[1] | ages['disc'] > cutoff.disc$cutoff[2])
+            
+        }
+    }
     out
 }
