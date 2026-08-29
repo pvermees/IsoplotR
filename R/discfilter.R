@@ -100,16 +100,17 @@ filter_UPb_ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
         else if (x$format==1210) type <- 1
         else stop('Invalid UPb format')
     }
-    tt <- UPb_age(x,exterr=exterr,conc=(type==5),omit4c=omit4c,
+    conc <- (type==5) | (cutoff.disc$option!=0)
+    tt <- UPb_age(x,exterr=exterr,conc=conc,omit4c=omit4c,
                   common.Pb=common.Pb,discordance=cutoff.disc)
+    ns <- nrow(tt)
     if (cutoff.disc$option==0){
-        is.concordant <- rep(TRUE,length(x))
+        concordant <- rep(TRUE,ns)
     } else {
-        dcol <- which(colnames(tt)%in%c('disc','p[conc]'))
-        is.concordant <- (tt[,dcol]>cutoff.disc$cutoff[1]) &
-            (tt[,dcol]<cutoff.disc$cutoff[2])
+        concordant <- is_concordant(disc=tt[,'disc'],pval=tt[,'p[conc]'],
+                                    cutoff.disc=cutoff.disc)
     }
-    if (!any(is.concordant)){
+    if (!any(concordant)){
         stop(paste0('There are no concordant grains in this sample.',
                     'Try adjusting the discordance limits OR ',
                     'apply a common-Pb correction OR ',
@@ -117,23 +118,23 @@ filter_UPb_ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
                     'apply the discordance filter before the ',
                     'common-Pb correction.'))
     }
-    out <- matrix(NA,length(x),2)
+    out <- matrix(NA,ns,2)
     if (type==1){
-        out[is.concordant,] <- tt[is.concordant,c('t.75','s[t.75]'),drop=FALSE]
+        out[concordant,] <- tt[concordant,c('t.75','s[t.75]'),drop=FALSE]
     } else if (type==2){
-        out[is.concordant,] <- tt[is.concordant,c('t.68','s[t.68]'),drop=FALSE]
+        out[concordant,] <- tt[concordant,c('t.68','s[t.68]'),drop=FALSE]
     } else if (type==3){
-        out[is.concordant,] <- tt[is.concordant,c('t.76','s[t.76]'),drop=FALSE]
+        out[concordant,] <- tt[concordant,c('t.76','s[t.76]'),drop=FALSE]
     } else if (type==4){
         do.76 <- (tt[,'t.68']>cutoff.76)
-        i.76 <- as.vector(which(do.76 & is.concordant))
-        i.68 <- as.vector(which(!do.76 & is.concordant))
+        i.76 <- as.vector(which(do.76 & concordant))
+        i.68 <- as.vector(which(!do.76 & concordant))
         out[i.76,] <- tt[i.76,c('t.76','s[t.76]'),drop=FALSE]
         out[i.68,] <- tt[i.68,c('t.68','s[t.68]'),drop=FALSE]
     } else if (type==5){
-        out[is.concordant,] <- tt[is.concordant,c('t.conc','s[t.conc]'),drop=FALSE]
+        out[concordant,] <- tt[concordant,c('t.conc','s[t.conc]'),drop=FALSE]
     } else if (type==6){
-        out[is.concordant,] <- tt[is.concordant,c('t.82','s[t.82]'),drop=FALSE]
+        out[concordant,] <- tt[concordant,c('t.82','s[t.82]'),drop=FALSE]
     }
     colnames(out) <- c('t','s[t]')
     out
@@ -174,17 +175,25 @@ discordance <- function(x,xd=x,i=NULL,t.68,t.76,t.conc,option=4){
     dif
 }
 
-is.discordant <- function(x,X=x,cutoff.disc=discfilter()){
+is_concordant <- function(disc,pval,cutoff.disc=discfilter()){
+    if (cutoff.disc$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
+        out <- (pval > alpha()) | (disc > cutoff.disc$cutoff[1] & disc < cutoff.disc$cutoff[2])
+    } else {
+        ns <- length(disc)
+        out <- rep(TRUE,ns)
+    }
+    out
+}
+is_discordant <- function(x,X=x,cutoff.disc=discfilter()){
     ns <- length(x)
     out <- rep(FALSE,ns)
     if (cutoff.disc$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
         if (cutoff.disc$before) xd <- x
         else xd <- X
         for (i in 1:ns){
-            ages <- UPb_age_helper(x=x,X=X,xd=xd,i=i,discordance=cutoff.disc)
-            out[i] <- (ages['p[conc]'] < alpha()) &
-                (ages['disc'] < cutoff.disc$cutoff[1] | ages['disc'] > cutoff.disc$cutoff[2])
-            
+            tt <- UPb_age_helper(x=x,X=X,xd=xd,i=i,discordance=cutoff.disc)
+            out[i] <- !is_concordant(disc=tt['disc'],pval=tt['p[conc]'],
+                                     cutoff.disc=cutoff.disc)
         }
     }
     out

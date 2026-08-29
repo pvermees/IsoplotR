@@ -341,7 +341,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
     } else {
         X <- x
     }
-    discordant <- which(is.discordant(x=x,X=X,cutoff.disc=cutoff.disc))
+    discordant <- which(is_discordant(x=x,X=X,cutoff.disc=cutoff.disc))
     omit <- unique(c(omit,discordant))
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
