@@ -5,7 +5,7 @@
 #' Calculates U-Pb, Pb-Pb, Th-Pb, Ar-Ar, K-Ca, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf,
 #' U-Th-He, Th-U and fission track ages and propagates their
 #' analytical uncertainties. Includes options for single grain,
-#' isochron and concordia_ages.
+#' isochron and concordia ages.
 #'
 #' @param x can be:
 #' 
@@ -144,7 +144,7 @@ age.default <- function(x,method='U238-Pb206',oerr=1,sigdig=NA,
 #' \code{1}: each U-Pb analysis should be considered separately,
 #'
 #' \code{2}: all the measurements should be combined to calculate a
-#' concordia_age,
+#' concordia age,
 #'
 #' \code{3}: a discordia_line should be fitted through all the U-Pb
 #'     analyses using the maximum likelihood algorithm of Ludwig
@@ -224,7 +224,7 @@ age.default <- function(x,method='U238-Pb206',oerr=1,sigdig=NA,
 #' \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, (the
 #' \eqn{^{208}}Pb/\eqn{^{232}}Th-age and standard error,) the single
-#' grain concordia_age and standard error, (and the \% discordance or
+#' grain concordia age and standard error, (and the \% discordance or
 #' p-value for concordance,) respectively.
 #'
 #' \item if \code{x} has class \code{UPb} and \code{type=2, 3, 4} or
@@ -273,9 +273,15 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
                     oerr=1,sigdig=NA,common.Pb=0,
                     discordance=discfilter(),...){
     if (type==1){
-        tst <- UPb_age(x,exterr=exterr,i=i,discordance=discordance,
+        tst <- UPb_age(x,exterr=exterr,i=i,
+                       discordance=discordance,
                        common.Pb=common.Pb,...)
-        out <- agerr(tst,oerr=oerr,sigdig=sigdig)
+        if (is.na(sigdig)){
+            out <- tst
+        } else {
+            out <- cbind(agerr(tst[,1:6],oerr=oerr,sigdig=sigdig),
+                         signif(tst[,-(1:6)],sigdig))
+        }
     } else if (type==2){
         X <- Pb0corr(x,option=common.Pb)
         out <- concordia_age(X,wetherill=TRUE,exterr=exterr)

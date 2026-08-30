@@ -336,11 +336,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                        ticks=ticks,pos=pos,...)
         return(invisible(NULL))
     }
-    if (common.Pb>0){
-        X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
-    } else {
-        X <- x
-    }
+    X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
     discordant <- which(is_discordant(x=x,X=X,cutoff.disc=cutoff.disc))
     omit <- unique(c(omit,discordant))
     ns <- length(x)
@@ -749,10 +745,7 @@ concordia_title <- function(fit,sigdig=2,oerr=3,...){
     mymtext(line2,line=0,...)
 }
 
-concordia_age <- function(x,i=NULL,type=1,exterr=FALSE,...){
-    if (!is.null(i)){
-        x$x <- x$x[i,,drop=FALSE]
-    }
+concordia_age <- function(x,type=1,exterr=FALSE,...){
     cc <- concordia_comp(x,type=type)
     if (type==3){
         cc4age <- cc
@@ -764,19 +757,15 @@ concordia_age <- function(x,i=NULL,type=1,exterr=FALSE,...){
     out <- concordia_age_helper(cc4age,d=mediand(x$d),type=type4age,exterr=exterr)
     out$age <- c('t'=unname(out$par['t']),'s[t]'=unname(sqrt(out$cov['t','t'])))
     mc <- mswd_concordia(x,cc4age,type=type4age,pars=out$par,exterr=exterr)
-    if (is.null(i)){
-        out <- c(out,mc)
-        mswd <- list(mswd=out$mswd['combined'],model=1,
-                     p.value=out$p.value['combined'],
-                     df=out$df['combined'])
-        if (inflate(mswd)){
-            out$age['disp[t]'] <- sqrt(mswd$mswd)*out$age['s[t]']
-        }
-        out$x <- cc$x
-        out$ccov <- cc$cov
-    } else {
-        out$p.value <- mc$p.value['concordance']
+    out <- c(out,mc)
+    mswd <- list(mswd=out$mswd['combined'],model=1,
+                 p.value=out$p.value['combined'],
+                 df=out$df['combined'])
+    if (inflate(mswd)){
+        out$age['disp[t]'] <- sqrt(mswd$mswd)*out$age['s[t]']
     }
+    out$x <- cc$x
+    out$ccov <- cc$cov
     out
 }
 # cc is assumed to follow a wetherill or cottle format
