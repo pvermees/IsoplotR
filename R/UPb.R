@@ -1443,7 +1443,7 @@ UPb_age_helper <- function(x,X=x,i=1,exterr=FALSE,
         t.82 <- get_Pb208Th232_age(Xi,exterr=exterr)
     }
     if (x$format<9 || x$format==85){
-        if (conc & discordance$option==0){
+        if (conc){
             labels <- c(labels,'t.conc','s[t.conc]')
             tc <- tryCatch({
                 concordia_age(x=Xi,exterr=exterr)

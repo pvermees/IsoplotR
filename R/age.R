@@ -279,8 +279,9 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         if (is.na(sigdig)){
             out <- tst
         } else {
-            out <- cbind(agerr(tst[,1:6],oerr=oerr,sigdig=sigdig),
-                         signif(tst[,-(1:6)],sigdig))
+            nc <- ncol(tst)
+            out <- cbind(agerr(tst[,1:max(nc,8)],oerr=oerr,sigdig=sigdig),
+                         signif(tst[,-(1:max(nc,8))],sigdig))
         }
     } else if (type==2){
         X <- Pb0corr(x,option=common.Pb)
