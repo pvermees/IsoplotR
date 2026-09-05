@@ -102,13 +102,19 @@ get_cov_div <- function(A,err.A,B,err.B,AB,err.AB){
     0.5*A*B*((err.A/A)^2+(err.B/B)^2-(err.AB/AB)^2)
 }
 get_cor_div <- function(A,err.A,B,err.B,AB,err.AB){
-    get_cov_div(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
+    if (all(err.A>0) & all(err.B>0))
+        get_cov_div(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
+    else
+        stop('Dataset contains zero or negative uncertainties')
 }
 get_cov_mult <- function(A,err.A,B,err.B,AB,err.AB){
     0.5*A*B*((err.AB/AB)^2 - (err.A/A)^2 - (err.B/B)^2)
 }
 get_cor_mult <- function(A,err.A,B,err.B,AB,err.AB){
-    get_cov_mult(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
+    if (all(err.A>0) & all(err.B>0))
+        get_cov_mult(A,err.A,B,err.B,AB,err.AB)/(err.A*err.B)
+    else
+        stop('Dataset contains zero or negative uncertainties')
 }
 
 # Implements Equations 6 & 7 of Ludwig (1998)
