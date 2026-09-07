@@ -283,7 +283,7 @@ read.data <- function(x,...){ UseMethod("read.data",x) }
 #' @export
 read.data.default <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                               Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                              U8Th2=0,sister=44,...){
+                              U8Th2=1,sister=44,...){
     X <- as.matrix(utils::read.table(x,sep=',',...))
     read.data.matrix(X,method=method,format=format,ierr=ierr,d=d,
                      Th02i=Th02i,Th02U48=Th02U48,U8Th2=U8Th2,sister=sister)
@@ -292,7 +292,7 @@ read.data.default <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
 #' @export
 read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                                  Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                                 U8Th2=0,sister=44,...){
+                                 U8Th2=1,sister=44,...){
     read.data.matrix(as.matrix(x),method=method,format=format,
                      ierr=ierr,d=d,Th02i=Th02i,
                      Th02U48=Th02U48,U8Th2=U8Th2,
@@ -302,7 +302,7 @@ read.data.data.frame <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
 #' @export
 read.data.matrix <- function(x,method='U-Pb',format=1,ierr=1,d=diseq(),
                              Th02i=c(0,0),Th02U48=c(0,0,1e6,0,0,0,0,0,0),
-                             U8Th2=0,sister=44,...){
+                             U8Th2=1,sister=44,...){
     if (identical(method,'U-Pb')){
         out <- as.UPb(x,format=format,ierr=ierr,d=d)
     } else if (identical(method,'Pb-Pb')){
@@ -763,7 +763,7 @@ as.PD <- function(x,classname,cnames,format,ierr){
 }
 #' @rdname classes
 #' @export
-as.ThU <- function(x,format=1,ierr=1,U8Th2=0,Th02i=c(0,0),
+as.ThU <- function(x,format=1,ierr=1,U8Th2=1,Th02i=c(0,0),
                    Th02U48=c(0,0,1e6,0,0,0,0,0,0)){
     out <- list()
     class(out) <- "ThU"
