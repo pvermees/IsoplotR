@@ -17,7 +17,7 @@ read.data(x, ...)
   d = diseq(),
   Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
-  U8Th2 = 0,
+  U8Th2 = 1,
   sister = 44,
   ...
 )
@@ -30,7 +30,7 @@ read.data(x, ...)
   d = diseq(),
   Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
-  U8Th2 = 0,
+  U8Th2 = 1,
   sister = 44,
   ...
 )
@@ -43,7 +43,7 @@ read.data(x, ...)
   d = diseq(),
   Th02i = c(0, 0),
   Th02U48 = c(0, 0, 1e+06, 0, 0, 0, 0, 0, 0),
-  U8Th2 = 0,
+  U8Th2 = 1,
   sister = 44,
   ...
 )
