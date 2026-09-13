@@ -205,6 +205,9 @@
 #'     omitted aliquots.
 #' @param ... optional arguments passed on to
 #'     \code{\link{scatterplot}}
+#' @param nsteps resolution of the posterior distributions for
+#'     Bayesian credible intervals of disequilibrium-corrected U-Pb
+#'     isochrons
 #'
 #' @return
 #'
@@ -302,7 +305,8 @@ concordia <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                       show.ellipses=1*(show.age!=3),
                       sigdig=2,common.Pb=0,ticks=5,pos=NA,anchor=0,
                       cutoff.disc=discfilter(),hide=NULL,
-                      omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                      omit=NULL,omit.fill=NA,omit.stroke='grey',
+                      nsteps=NULL,...){
     concordia_helper(x=x,tlim=tlim,xlim=xlim,ylim=ylim,
                      type=type,show.numbers=show.numbers,
                      levels=levels,clabel=clabel,
@@ -314,7 +318,7 @@ concordia <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                      sigdig=sigdig,common.Pb=common.Pb,ticks=ticks,
                      pos=pos,anchor=anchor,cutoff.disc=cutoff.disc,
                      hide=hide,omit=omit,omit.fill=omit.fill,
-                     omit.stroke=omit.stroke,...)
+                     omit.stroke=omit.stroke,nsteps=nsteps,...)
 }
 
 # the only difference between concordia and concordia_helper
@@ -328,7 +332,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                              oerr=3,y0option=1,sigdig=2,common.Pb=0,
                              ticks=5,pos=NA,anchor=0,cutoff.disc=discfilter(),
                              hide=NULL,omit=NULL,omit.fill=NA,
-                             omit.stroke='grey',box=TRUE,...){
+                             omit.stroke='grey',box=TRUE,nsteps=NULL,...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,xlim=xlim,ylim=ylim,
                        type=type,oerr=oerr,exterr=exterr,
@@ -352,7 +356,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
     if (show.age==1){
         fit <- concordia_age(X2calc,type=type,exterr=exterr)
     } else if (show.age>1){
-        lfit <- ludwig(X2calc,exterr=exterr,model=(show.age-1),anchor=anchor)
+        lfit <- ludwig(X2calc,exterr=exterr,model=(show.age-1),
+                       anchor=anchor,nsteps=nsteps)
         fit <- discordia(X2calc,fit=lfit,wetherill=(type==1))
     }
     fit$n <- length(X2calc)

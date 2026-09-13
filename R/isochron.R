@@ -742,13 +742,14 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
     if (x$format<4){
         if (plot){
             out <- concordia_helper(x,type=type,show.age=model+1,title=title,
-                                    oerr=oerr,sigdig=sigdig,show.numbers=show.numbers,
+                                    oerr=oerr,sigdig=sigdig,
+                                    show.numbers=show.numbers,
                                     levels=levels,clabel=clabel,
                                     ellipse.fill=ellipse.fill,
                                     ellipse.stroke=ellipse.stroke,exterr=exterr,
                                     anchor=anchor,hide=hide,omit=omit,
                                     y0option=y0option,omit.fill=omit.fill,
-                                    omit.stroke=omit.stroke,...)
+                                    omit.stroke=omit.stroke,nsteps=nsteps,...)
         } else {
             out <- ludwig(x,exterr=exterr,model=model,anchor=anchor,nsteps=nsteps)
         }
