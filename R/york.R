@@ -77,6 +77,10 @@ york <- function(x){
 yorkhelper <- function(x,np=2){
     if (ncol(x)==4) x <- cbind(x,0)
     colnames(x) <- c('X','sX','Y','sY','rXY')
+    positive_errors <- (x[,'sX']>0) & (x[,'sY']>0)
+    if (!all(positive_errors)){
+        stop('Dataset contains zero or negative uncertainties.')
+    }
     X <- x[,'X']
     Y <- x[,'Y']
     ab <- stats::lm(Y ~ X)$coefficients # initial guess
@@ -186,8 +190,9 @@ data2york.default <- function(x,format=1,...){
     } else {
         cnames <- c('X','sX','Y','sY','rXY')
         if (format==3){
-            X <- cbind(x[,1:4],get_cor_div(x[,1],x[,2],x[,3],
-                                           x[,4],x[,5],x[,6]))
+            X <- cbind(x[,1:4],
+                       get_cor_div(x[,1],x[,2],x[,3],
+                                   x[,4],x[,5],x[,6]))
             opt <- NULL
         } else {
             X <- x

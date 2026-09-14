@@ -2,13 +2,13 @@
 #'
 #' @description
 #' Plots U-Pb data on Wetherill, Tera-Wasserburg or U-Th-Pb concordia
-#' diagrams, calculates concordia_ages and compositions, evaluates the
+#' diagrams, calculates concordia ages and compositions, evaluates the
 #' equivalence of multiple
 #' (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U,
 #' \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U, or
 #' \eqn{^{208}}Th/\eqn{^{232}}Th-\eqn{^{206}}Pb/\eqn{^{238}}U)
 #' compositions, computes the weighted mean isotopic composition and
-#' the corresponding concordia_age using the method of maximum
+#' the corresponding concordia age using the method of maximum
 #' likelihood, computes the MSWD of equivalence and concordance and
 #' their respective Chi-squared p-values. Performs linear regression
 #' and computes the upper and lower intercept ages (for Wetherill) or
@@ -205,6 +205,9 @@
 #'     omitted aliquots.
 #' @param ... optional arguments passed on to
 #'     \code{\link{scatterplot}}
+#' @param nsteps resolution of the posterior distributions for
+#'     Bayesian credible intervals of disequilibrium-corrected U-Pb
+#'     isochrons
 #'
 #' @return
 #'
@@ -231,7 +234,7 @@
 #' freedom used for the \code{mswd} calculation. }
 #'
 #' \item{age}{a two-or three-element vector with:\cr
-#' \code{t}: the concordia_age (in Ma)\cr
+#' \code{t}: the concordia age (in Ma)\cr
 #' \code{s[t]}: the standard error of \code{t}\cr
 #' \code{disp[t]}: the standard error of \code{t} augmented by
 #' \eqn{\sqrt{mswd}} to account for any overdispersion. }
@@ -302,7 +305,8 @@ concordia <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                       show.ellipses=1*(show.age!=3),
                       sigdig=2,common.Pb=0,ticks=5,pos=NA,anchor=0,
                       cutoff.disc=discfilter(),hide=NULL,
-                      omit=NULL,omit.fill=NA,omit.stroke='grey',...){
+                      omit=NULL,omit.fill=NA,omit.stroke='grey',
+                      nsteps=NULL,...){
     concordia_helper(x=x,tlim=tlim,xlim=xlim,ylim=ylim,
                      type=type,show.numbers=show.numbers,
                      levels=levels,clabel=clabel,
@@ -314,7 +318,7 @@ concordia <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                      sigdig=sigdig,common.Pb=common.Pb,ticks=ticks,
                      pos=pos,anchor=anchor,cutoff.disc=cutoff.disc,
                      hide=hide,omit=omit,omit.fill=omit.fill,
-                     omit.stroke=omit.stroke,...)
+                     omit.stroke=omit.stroke,nsteps=nsteps,...)
 }
 
 # the only difference between concordia and concordia_helper
@@ -328,7 +332,7 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                              oerr=3,y0option=1,sigdig=2,common.Pb=0,
                              ticks=5,pos=NA,anchor=0,cutoff.disc=discfilter(),
                              hide=NULL,omit=NULL,omit.fill=NA,
-                             omit.stroke='grey',box=TRUE,...){
+                             omit.stroke='grey',box=TRUE,nsteps=NULL,...){
     if (is.null(x)){
         emptyconcordia(tlim=tlim,xlim=xlim,ylim=ylim,
                        type=type,oerr=oerr,exterr=exterr,
@@ -336,16 +340,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
                        ticks=ticks,pos=pos,...)
         return(invisible(NULL))
     }
-    if (common.Pb>0){
-        X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
-    } else {
-        X <- x
-    }
-    if (cutoff.disc$before){
-        discordant <- is.discordant(x=x,cutoff.disc=cutoff.disc)
-    } else {
-        discordant <- is.discordant(x=x,xd=X,cutoff.disc=cutoff.disc)
-    }
+    X <- Pb0corr(x,option=common.Pb,omit4c=unique(c(hide,omit)))
+    discordant <- which(is_discordant(x=x,X=X,cutoff.disc=cutoff.disc))
     omit <- unique(c(omit,discordant))
     ns <- length(x)
     plotit <- (1:ns)%ni%hide
@@ -360,7 +356,8 @@ concordia_helper <- function(x=NULL,tlim=NULL,xlim=NULL,ylim=NULL,type=1,
     if (show.age==1){
         fit <- concordia_age(X2calc,type=type,exterr=exterr)
     } else if (show.age>1){
-        lfit <- ludwig(X2calc,exterr=exterr,model=(show.age-1),anchor=anchor)
+        lfit <- ludwig(X2calc,exterr=exterr,model=(show.age-1),
+                       anchor=anchor,nsteps=nsteps)
         fit <- discordia(X2calc,fit=lfit,wetherill=(type==1))
     }
     fit$n <- length(X2calc)
@@ -753,35 +750,27 @@ concordia_title <- function(fit,sigdig=2,oerr=3,...){
     mymtext(line2,line=0,...)
 }
 
-concordia_age <- function(x,i=NULL,type=1,exterr=FALSE,...){
-    if (is.null(i)){
-        cc <- concordia_comp(x,type=type)
-        if (type==3){
-            cc4age <- cc
-            type4age <- 3
-        } else { # use Wetherill
-            cc4age <- concordia_comp(x,type=1)
-            type4age <- 1
-        }
-    } else {
-        cc <- wetherill(x,i)
+concordia_age <- function(x,type=1,exterr=FALSE,...){
+    cc <- concordia_comp(x,type=type)
+    if (type==3){
         cc4age <- cc
+        type4age <- 3
+    } else { # use Wetherill
+        cc4age <- concordia_comp(x,type=1)
         type4age <- 1
     }
     out <- concordia_age_helper(cc4age,d=mediand(x$d),type=type4age,exterr=exterr)
     out$age <- c('t'=unname(out$par['t']),'s[t]'=unname(sqrt(out$cov['t','t'])))
-    if (is.null(i)){ # these calculations are only relevant to weighted means
-        out <- c(out,mswd_concordia(x,cc4age,type=type4age,
-                                    pars=out$par,exterr=exterr))
-        mswd <- list(mswd=out$mswd['combined'],model=1,
-                     p.value=out$p.value['combined'],
-                     df=out$df['combined'])
-        if (inflate(mswd)){
-            out$age['disp[t]'] <- sqrt(mswd$mswd)*out$age['s[t]']
-        }
-        out$x <- cc$x
-        out$ccov <- cc$cov
+    mc <- mswd_concordia(x,cc4age,type=type4age,pars=out$par,exterr=exterr)
+    out <- c(out,mc)
+    mswd <- list(mswd=out$mswd['combined'],model=1,
+                 p.value=out$p.value['combined'],
+                 df=out$df['combined'])
+    if (inflate(mswd)){
+        out$age['disp[t]'] <- sqrt(mswd$mswd)*out$age['s[t]']
     }
+    out$x <- cc$x
+    out$ccov <- cc$cov
     out
 }
 # cc is assumed to follow a wetherill or cottle format
@@ -832,10 +821,10 @@ concordia_age_helper <- function(cc,d=diseq(),type=1,exterr=FALSE,...){
         lower['t'] <- tt[i-1]
         upper['t'] <- tt[i]
         init['t'] <- (lower['t'] + upper['t'])/2
-        fit <- contingencyfit(par=init,fn=LL_concordia_age,
-                              lower=lower,upper=upper,hessian=TRUE,
-                              exterr=exterr,cc=cc,type=type,d=d)
-        if (is.finite(fit$value) && fit$value<out$value){
+        fit <- stats::optim(par=init,fn=LL_concordia_age,method='L-BFGS-B',
+                            lower=lower,upper=upper,hessian=TRUE,
+                            exterr=exterr,cc=cc,type=type,d=d)
+        if (fit$convergence==0 && is.finite(fit$value) && fit$value<out$value){
             out <- fit
         }
     }

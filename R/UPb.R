@@ -1384,32 +1384,27 @@ get_Pb208Th232_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
 # and concordia_ages and their uncertainties.
 UPb_age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
                     discordance=discfilter(),common.Pb=0,...){
-    if (discordance$option==0 | discordance$before) xd <- x
-    else xd <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
-    if (common.Pb==0) X <- x
-    else X <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
-    if (!is.null(i)){
-        out <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
-                              conc=conc,discordance=discordance)
-    } else {
-        nn <- length(x)
+    X <- Pb0corr(x,option=common.Pb,omit4c=omit4c)
+    if (is.null(i)){
         out <- NULL
-        for (i in 1:nn){
-            ti <- UPb_age_helper(x=x,X=X,xd=xd,i=i,exterr=exterr,
+        for (i in 1:length(x)){
+            ti <- UPb_age_helper(x=x,X=X,i=i,exterr=exterr,
                                  conc=conc,discordance=discordance)
-            out <- rbind(out,ti)
+            out <- rbind(out,ti,deparse.level=0)
         }
+    } else {
+        out <- UPb_age_helper(x=x,X=X,i=i,exterr=exterr,
+                              conc=conc,discordance=discordance)
     }
     out
 }
 
 # x = raw data
-# X = common Pb corrected data (if common.Pb>0)
-# xd = data to be used for concordia_age calculation 
-#      (raw if before==TRUE, common Pb corrected if before==FALSE)
-UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
+# X = common Pb corrected data
+UPb_age_helper <- function(x,X=x,i=1,exterr=FALSE,
                            conc=TRUE,discordance=discfilter(),...){
-    Xi <- subset(X,subset=((1:length(X))%in%i))
+    ns <- length(x)
+    Xi <- subset(X,subset=(1:ns)%in%i)
     do68 <- do75 <- do76 <- do82 <- FALSE 
     if (x$format<7 || x$format==85){
         do68 <- do75 <- do76 <- TRUE
@@ -1450,23 +1445,22 @@ UPb_age_helper <- function(x,X,xd,i=1,exterr=FALSE,
     if (x$format<9 || x$format==85){
         if (conc){
             labels <- c(labels,'t.conc','s[t.conc]')
-            t.conc <- tryCatch({
-                concordia_age(x=Xi,i=1,exterr=exterr)$age
+            tc <- tryCatch({
+                concordia_age(x=Xi,exterr=exterr)
             }, error = function(e){
-                c(NA,NA)
+                list(age=c(NA,NA),pval=NA)
             })
+            t.conc <- tc$age[1:2]
+            pval <- tc$p.value['concordance']
         }
         if (discordance$option%in%c(1,'t',2,'r',3,'sk',4,'a',5,'c')){
             labels <- c(labels,'disc')
-            dif <- discordance(x=x,xd=xd,i=i,option=discordance$option)
-        } else if (discordance$option%in%c(6,'p')){
-            labels <- c(labels,'p[conc]')
-            SS.concordance <-
-                LL_concordia_age(pars=t.conc[1],
-                                 cc=wetherill(xd,i=i),
-                                 mswd=TRUE,exterr=exterr,d=xd$d)
-            pval <- 1-stats::pchisq(SS.concordance,1)
+            xi <- subset(x,subset=(1:ns)%in%i)
+            dc <- discordance(x=xi,X=Xi,discordance=discordance)
+            dif <- dc$dif
+            pval <- dc$pval
         }
+        if (!is.null(pval)) labels <- c(labels,'p[conc]')
     }
     out <- c(t.75,t.68,t.76,t.82,t.conc,dif,pval)
     names(out) <- labels

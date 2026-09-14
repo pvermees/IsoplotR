@@ -235,7 +235,7 @@ combined goodness of fit, respectively. }
 freedom used for the \code{mswd} calculation. }
 
 \item{age}{a two-or three-element vector with:\cr
-\code{t}: the concordia_age (in Ma)\cr
+\code{t}: the concordia age (in Ma)\cr
 \code{s[t]}: the standard error of \code{t}\cr
 \code{disp[t]}: the standard error of \code{t} augmented by
 \eqn{\sqrt{mswd}} to account for any overdispersion. }
@@ -285,13 +285,13 @@ w.r.t the analytical uncertainties (not reported if
 }
 \description{
 Plots U-Pb data on Wetherill, Tera-Wasserburg or U-Th-Pb concordia
-diagrams, calculates concordia_ages and compositions, evaluates the
+diagrams, calculates concordia ages and compositions, evaluates the
 equivalence of multiple
 (\eqn{^{206}}Pb/\eqn{^{238}}U-\eqn{^{207}}Pb/\eqn{^{235}}U,
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-\eqn{^{206}}Pb/\eqn{^{238}}U, or
 \eqn{^{208}}Th/\eqn{^{232}}Th-\eqn{^{206}}Pb/\eqn{^{238}}U)
 compositions, computes the weighted mean isotopic composition and
-the corresponding concordia_age using the method of maximum
+the corresponding concordia age using the method of maximum
 likelihood, computes the MSWD of equivalence and concordance and
 their respective Chi-squared p-values. Performs linear regression
 and computes the upper and lower intercept ages (for Wetherill) or

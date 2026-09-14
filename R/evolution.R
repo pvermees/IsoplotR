@@ -299,37 +299,35 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
     nt <- length(tticks)
     X <- graphics::par('usr')[1:2]
     Y <- X
-    minY <- graphics::par('usr')[3]
-    maxY <- graphics::par('usr')[4]
+    usr <- graphics::par('usr')
     l0 <- lambda('Th230')[1]
     if (Th0i==1){
         fit <- isochron.ThU(x,type=1,model=model,
                             plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
-        anchor <- matrix(fit$y0[1],nt,2)
+        xy0 <- fit$y0[1]
     } else if (Th0i==2){
-        anchor <- matrix(1/x$U8Th2,nt-1,2)
-        tticks <- tticks[is.finite(tticks)]
+        xy0 <- x$U8Th2
     } else {
-        anchor <- matrix(0,nt,2)
+        xy0 <- 1
     }
-    for (i in seq_along(tticks)){ # plot isolines
+    for (i in seq_along(tticks)){ # plot isolines 
         if (is.finite(tticks[i])) ticktext <- tticks[i]
         else ticktext <- expression(infinity)
         slope <- 1-exp(-l0*tticks[i])
-        Y <- anchor[i,2] + slope*(X-anchor[i,1])
+        Y <- xy0 + slope*(X-xy0)
         graphics::lines(X,Y,col=line.col,...)
-        if (Y[2]<minY){
+        if (Y[2]<usr[3]){
             # do nothing
-        } else if (Y[2]>maxY){ # label below upper margin
-            xtext <- anchor[i,1] + (maxY-anchor[i,2])/slope
-            ytext <- maxY
+        } else if (Y[2]>usr[4]){ # label below upper margin
+            xtext <- xy0 + (usr[4]-xy0)/slope
+            ytext <- usr[4]
             graphics::text(xtext,ytext,ticktext,pos=1,col=line.col)
         } else { # label to the left of the right margin
-            xtext <- X[2]
-            ytext <- Y[2]
-            graphics::text(xtext,ytext,ticktext,pos=2,col=line.col)
+            xtext <- X[2] - (usr[2]-usr[1])/50
+            ytext <- Y[2] - (usr[4]-usr[3])/50
+            graphics::text(xtext,ytext,ticktext,pos=2,col=line.col,xpd=NA)
         }
     }
     if (isochron){ # plot the data and isochron line fit
@@ -351,17 +349,6 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
-        if (Th0i==0){
-            tit <- expression(paste("[isochrons assume ("^"230","Th/"^
-                                    "232","Th)"[i]*" = 0]"))
-            mymtext(tit,line=0,...)
-        }
-        if (Th0i==2){ # add equiline
-            middle <- max(X[1],minY)/2 + min(X[2],maxY)/2
-            graphics::text(middle,middle,'1:1',pos=3)
-            graphics::lines(X,X)
-            graphics::points(x$U8Th2,x$U8Th2,pch=16)
-        }
     }
     invisible(colourbar(z=levels[calcit],fill=ellipse.fill,
                         stroke=ellipse.stroke,clabel=clabel))

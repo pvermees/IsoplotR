@@ -278,7 +278,7 @@ dosimeter glass and its standard error.}
 \code{1}: each U-Pb analysis should be considered separately,
 
 \code{2}: all the measurements should be combined to calculate a
-concordia_age,
+concordia age,
 
 \code{3}: a discordia_line should be fitted through all the U-Pb
     analyses using the maximum likelihood algorithm of Ludwig
@@ -406,7 +406,7 @@ table with the following columns: \code{t.75}, \code{err[t.75]},
 \eqn{^{206}}Pb/\eqn{^{238}}U-age and standard error, the
 \eqn{^{207}}Pb/\eqn{^{206}}Pb-age and standard error, (the
 \eqn{^{208}}Pb/\eqn{^{232}}Th-age and standard error,) the single
-grain concordia_age and standard error, (and the \% discordance or
+grain concordia age and standard error, (and the \% discordance or
 p-value for concordance,) respectively.
 
 \item if \code{x} has class \code{UPb} and \code{type=2, 3, 4} or
@@ -444,7 +444,7 @@ and \code{central=TRUE}, returns the output of the
 Calculates U-Pb, Pb-Pb, Th-Pb, Ar-Ar, K-Ca, Re-Os, Sm-Nd, Rb-Sr, Lu-Hf,
 U-Th-He, Th-U and fission track ages and propagates their
 analytical uncertainties. Includes options for single grain,
-isochron and concordia_ages.
+isochron and concordia ages.
 }
 \examples{
 attach(examples)

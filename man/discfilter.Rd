@@ -4,7 +4,7 @@
 \alias{discfilter}
 \title{Set up a discordance filter}
 \usage{
-discfilter(option = 0, before = TRUE, cutoff)
+discfilter(option = 0, before = FALSE, cutoff)
 }
 \arguments{
 \item{option}{one of five options:
