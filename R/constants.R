@@ -39,6 +39,8 @@ alpha <- function(x=NULL){
     invisible(old)
 }
 
+settingnames <- c("lambda", "iratio", "imass", "etchfact", "tracklength", "mindens")
+
 #' @title Retrieve and record global settings
 #'
 #' @description
@@ -284,24 +286,27 @@ settings <- function(setting=NA,...,fname=NA,reset=FALSE){
             if (nargs<1){
                 out <- alpha()
             } else {
-                alpha(args[[1]])
+                alpha(as.numeric(args[[1]]))
             }
-        } else if (!is.na(setting) & nargs>0){
-            if (nargs==1){
-                Rcommand <- paste0(setting,"('",args[[1]],"')")
-                return(eval(parse(text=Rcommand)))
-            } else if (nargs==2) {
-                Rcommand <- paste0(setting,"('",args[[1]],"',",args[[2]],")")
-            } else if (nargs==3) {
-                Rcommand <- paste0(setting,"('",args[[1]],"',",
-                                   args[[2]],",",args[[3]],")")
-            } else {
-                warning('incorrect number of arguments')
-            }
-            out <- eval(parse(text=Rcommand))
-        } else {
+        } else if (is.na(setting)) {
             preferences <- as.list(.IsoplotR)
             out <- toJSON(preferences)
+        } else if (setting %in% settingnames & nargs>0){
+            mineral <- args[[1]]
+            if (nargs==1){
+                return(do.call(setting, list(mineral)))
+            }
+            x <- as.numeric(args[[2]])
+            if (nargs==2) {
+                return(do.call(setting, list(mineral, x)))
+            }
+            e <- as.numeric(args[[3]])
+            if (nargs==3) {
+                return(do.call(setting, list(mineral, x, e)))
+            }
+            warning('incorrect number of arguments')
+        } else {
+            warning('unknown setting')
         }
     }
     invisible(out)
