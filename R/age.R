@@ -276,13 +276,9 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         tst <- UPb_age(x,exterr=exterr,i=i,
                        discordance=discordance,
                        common.Pb=common.Pb,...)
-        if (is.na(sigdig)){
-            out <- tst
-        } else {
-            nc <- ifelse(ncol(tst)>7,8,6)
-            out <- cbind(agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig),
-                         signif(tst[,-(1:nc),drop=FALSE],sigdig))
-        }
+        nc <- ifelse(ncol(tst)>7,8,6)
+        out <- cbind(agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig),
+                     signif(tst[,-(1:nc),drop=FALSE],sigdig))
     } else if (type==2){
         X <- Pb0corr(x,option=common.Pb)
         out <- concordia_age(X,wetherill=TRUE,exterr=exterr)

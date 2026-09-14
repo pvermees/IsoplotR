@@ -1448,7 +1448,8 @@ UPb_age_helper <- function(x,X=x,i=1,exterr=FALSE,
             tc <- tryCatch({
                 concordia_age(x=Xi,exterr=exterr)
             }, error = function(e){
-                list(age=c(NA,NA),pval=NA)
+                list(age=c(NA,NA),
+                     p.value=c('concordance'=NA))
             })
             t.conc <- tc$age[1:2]
             pval <- tc$p.value['concordance']
