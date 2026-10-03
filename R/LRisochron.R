@@ -17,56 +17,33 @@
 #' @noRd
 LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @noRd
-LRisochron.default <- function(x,left=TRUE,
+LRisochron.default <- function(x,left=FALSE,
                                hide=NULL,omit=NULL,
                                a=NULL,b=NULL,...){
     x2calc <- clear(x,hide,omit)
-    sgn <- ifelse(left,-1,1)
-    x2calc[,'Y'] <- sgn*x2calc[,'Y']
-    X <- x2calc[,'X']
-    Y <- x2calc[,'Y']
-    h <- chull(X,Y)
-    num_vertices <- length(h)
-    hull_indices <- c(h,h[1])
-    anchor <- 0
-    if (is.null(b)){
-        b <- diff(Y[hull_indices])/diff(X[hull_indices])
-    } else {
-        anchor <- 'b'
-        b <- rep(b,num_vertices)
-    }
+    init <- init_LRisochron(x2calc,a=a,b=b,left=left)
+    out <- stats::optim(par=init,fn=get_LRisochron_L,
+                        yd=x2calc,a=a,b=b,left=left,
+                        hessian=TRUE)
+    covmat <- inverthess(out$hessian)
+    np <- length(out$par)
+    J <- matrix(0,nrow=2,ncol=np)
     if (is.null(a)){
-        a <- Y[h] - b*X[h]
-    } else {
-        anchor <- 'a'
-        a <- rep(a,num_vertices)
+        a <- exp(out$par[3])
+        J[1,3] <- a
     }
-    lpi <- 0
-    misfit <- Inf
-    bestfit <- NULL
-    for (i in 1:num_vertices){
-        lsi <- log(sd((Y-a[i])/X))
-        init <- c(lpi,lsi,a[i],b[i])
-        testfit <- stats::optim(par=init,fn=get_LRisochron_L,
-                                yd=x2calc,hessian=TRUE)
-        if (testfit$value < misfit){
-            gof <- testfit$value
-            bestfit <- testfit
-        }
-        fit <- list(a=c(testfit$par[3],0.01),
-                    b=c(testfit$par[4],0.01),
-                    cov.ab=0)
-        scatterplot(x2calc,fit=fit)
+    if (is.null(b)){
+        b <- exp(out$par[np])
+        J[2,np] <- b
     }
-    covmat <- inverthess(bestfit$hessian)
-    a <- sgn*bestfit$par[3]
-    sa <- sqrt(covmat[3,3])
-    b <- sgn*bestfit$par[4]
-    sb <- sqrt(covmat[4,4])
-    list(a=c('a'=unname(a),'s[a]'=unname(sa)),
-         b=c('b'=unname(b),'s[b]'=unname(sb)),
-         cov.ab=unname(covmat[3,4]),
-         xyz=x,model=4,n=nrow(x2calc))
+    E <- J %*% covmat %*% t(J)
+    out$a <- c('a'=unname(a),'s[a]'=unname(sqrt(E[1,1])))
+    out$b <- c('b'=unname(b),'s[b]'=unname(sqrt(E[2,2])))
+    out$cov.ab <- unname(E[1,2])
+    out$xyz <- x
+    out$model <- 4
+    out$n <- nrow(x2calc)
+    out
 }
 #' @param anchor control parameters to fix the intercept age or
 #'     non-radiogenic composition of the isochron fit. This can be a
@@ -92,11 +69,10 @@ LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
         y0 <- Pb74/Pb64
         offset <- 1/Pb64
         yd2calc[,'X'] <- yd2calc[,'X'] - offset
-        fit <- anchoredLRisochron(yd2calc,fun=yd2ratios_left,y0=y0)
         stop("TODO")
     } else if (anchor[1]==2 & length(anchor)>1){
         y0 <- age2ratio(tt=anchor[2],ratio="Pb207Pb206")[1]
-        out <- anchoredLRisochron(yd2calc,fun=yd2ratios_left,y0=y0)
+        stop("TODO")
     } else {
         stop("Invalid anchor.")
     }
@@ -125,9 +101,7 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
             g <- (yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i)
             lsi <- log(stats::sd(g))
             gi <- mean(g)
-            out <- anchoredLRisochron(yd2calc, fun=yd2ratios_ThU,
-                                      gi=gi, lpi=lpi, lsi=lsi,
-                                      y0=y0, gam=NULL)
+            stop("TODO")
         } else if (anchor[1]==2 & length(anchor)>1){
             b <- age2ratio(tt=anchor[2],ratio='Th230U238')[1]
             leftmost <- which.min(yd[,'X'])
@@ -136,9 +110,7 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
             y0i <- y2 - b * x2
             g <- (yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i)
             lsi <- log(stats::sd(g))
-            out <- anchoredLRisochron(yd2calc, fun=yd2ratios_ThU,
-                                      gi=NULL, lpi=lpi, lsi=lsi,
-                                      y0i=y0i, y0=NULL, gam=b)
+            stop("TODO")
         } else {
             stop("Invalid anchor")
         }
@@ -152,142 +124,74 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     out
 }
 
-anchoredLRisochron <- function(yd2calc,fun,gam=NULL,y0=NULL,...){
+init_LRisochron <- function(yd,a=NULL,b=NULL,left=FALSE){
+    X <- yd[,1]
+    Y <- yd[,3]
     lpi <- 0
-    if (is.null(gam) && !is.null(y0)){
-        anchor <- 'a'
-        g <- (yd2calc[,'Y']-y0)/yd2calc[,'X']
-        gi <- mean(g)
-        lsi <- log(stats::sd(g))
-        init <- c(gi,lpi,lsi)
-    } else if (is.null(y0) && !is.null(gam)){
-        anchor <- 'b'
-        
-        init <- c(lpi,lsi,y0i)
-    } else {
-        stop("Either gam or y0 must be specified.")
-    }
-    fit <- stats::optim(par=init,fn=get_LRisochron_L,
-                        yd=yd2calc,y0=y0,gam=gam,
-                        fun=fun,...,hessian=TRUE)
-    covmat <- inverthess(fit$hessian)
-    np <- length(fit$par)
-    if (anchor=='a'){
-        sy0 <- 0
-        b <- fit$par[1]
-        sb <- sqrt(covmat[1,1])
-        J <- rbind(c(-y0,1-b),
-                   c(1,0))
-        E <- J %*% rbind(c(covmat[1,1],0),c(0,0)) %*% t(J)
-        a <- y0*(1-b)
-        sa <- sqrt(E[1,1])
-        cov.ab <- E[1,2]
-    } else { # anchor == 'b'
-        y0 <- fit$par[np]
-        sy0 <- sqrt(covmat[np,np])
-        b <- if (identical(fun,yd2ratios_left)) -gam else gam
-        sb <- 0
-        a <- y0*(1-b)
-        sa <- sy0*(1-b)
-        cov.ab <- 0
-    }
-    list(a=c('a'=unname(a),'s[a]'=unname(sa)),
-         b=c('b'=unname(b),'s[b]'=unname(sb)),
-         cov.ab=unname(cov.ab),
-         model=4,n=nrow(yd2calc))
-}
-
-init_LRisochron <- function(yd,a=NULL,b=NULL,left=TRUE){
-    X <- yd[,'X']
-    Y <- yd[,'Y']
-    anchor <- 0
     if (is.null(a) && is.null(b)){
-        fit <- stats::lm(Y ~ X)
+        anchor <- 0
+        h <- chull(X,Y)
+        nh <- length(h)
+        vertices <- c(h,h[1])
+        gr <- diff(Y[vertices])/diff(X[vertices])
+        misfit <- Inf
+        for (i in which(gr>0)){
+            b <- gr[i]
+            a <- Y[vertices[i]] - b * X[vertices[i]]
+            if (a>0){
+                if (left) lsi <- log(stats::sd((Y-a)/X))
+                else lsi <- log(stats::sd(X/(Y-a)))
+                init <- c(lpi,lsi,log(a),log(b))
+                fit <- stats::optim(par=init,fn=get_LRisochron_L,yd=yd,left=left)
+                if (fit$value < misfit){
+                    misfit <- fit$value
+                    out <- fit$par
+                }
+            }
+        }
     } else if (is.null(b)){
         anchor <- 'a'
         fit <- stats::lm(I(Y - a) ~ X - 1)
-    } else {
+        lbi <- log(abs(fit$coefficients[2]))
+        lsi <- log(stats::sd((Y-a)/X))
+        out <- c(lpi,lsi,lbi)
+    } else if (is.null(a)){
         anchor <- 'b'
         fit <- stats::lm(Y ~ 1 + offset(b * X))
-    }
-    if (summary(fit)$r.squared>0.8){
-        a <- fit$coefficients[1]
-        b <- fit$coefficients[2]
+        ai <- fit$coefficients[1]
+        lsi <- log(stats::sd((Y-ai)/X))
+        out <- c(lpi,lsi,ai)
     } else {
-        if (anchor=='a'){
-            if (left){
-                b <- max((Y-a)/X)
-            } else {
-                b <- min((Y-a)/X)
-            }
-        } else if (anchor=='b'){
-            if (left){
-                a <- max(Y - b*X)
-            } else {
-                a <- min(Y - b*X)
-            }
-        } else { # not anchored
-            hull_indices <- chull(X,Y)
-            if (left){
-                leftmost <- which.min(X)
-                topmost <- which.max(Y)
-                a <- Y[leftmost]
-                b <- (Y[topmost]-a)/(X[topmost]-Y[leftmost])
-            } else {
-                rightmost <- which.max(X)
-                a <- min(Y)
-                b <- (Y[rightmost]-a)/X[rightmost]
-            }
-        }
-    }
-    gi <- ifelse(left,-b,b)
-    lpi <- 0
-    lsi <- log(stats::sd((Y-a)/X))
-    y0i <- a
-    if (anchor=='a'){
-        out <- c(gi,lpi,lsi)
-    } else if (anchor=='b'){
-        out <- c(lpi,lsi,y0i)
-    } else {
-        out <- c(gi,lpi,lsi,y0i)
+        lsi <- log(stats::sd((Y-a)/X))
+        out <- c(lpi,lsi)
     }
     out
 }
 
-yd2ratios <- function(yd,y0){
-    r <- (yd[,'Y']-y0)/yd[,'X']
-    sr <- sqrt(errorprop1x2(J1=-r/yd[,'X'],
-                            J2=1/yd[,'X'],
-                            E11=yd[,'sX']^2,
-                            E22=yd[,'sY']^2,
-                            E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
-    cbind(r,sr)
-}
-
-get_LRisochron_L <- function(pars,yd,a=NULL,b=NULL){
-    np <- length(pars)
-    if (is.null(a)){
-        y0 <- pars[3]
+get_LRisochron_L <- function(pars,yd,a=NULL,b=NULL,left=FALSE,...){
+    mappar <- function(pars,b=NULL,left=FALSE){
+        prop <- 1/(exp(pars[1])+1)
+        sig <- exp(pars[2])
+        if (is.null(b)) b <- exp(tail(pars,n=1))
+        gam <- ifelse(left,1/b,b)
+        mu <- gam
+        c(gam,prop,sig,mu)
     }
-    if (is.null(b)){
-        gam <- pars[np]
+    get_zs <- function(yd,a=0,left=FALSE){
+        z <- (yd[,'Y']-a)/yd[,'X']
+        sz <- sqrt(errorprop1x2(J1=-z/yd[,'X'],
+                                J2=1/yd[,'X'],
+                                E11=yd[,'sX']^2,
+                                E22=yd[,'sY']^2,
+                                E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
+        if (left){
+            sz <- sz/z^2
+            z <- 1/z
+        }   
+        cbind(z,sz)
     }
-    prop <- 1/(exp(pars[1])+1)
-    sig <- exp(pars[2])
-    mu <- gam
-    zs <- yd2ratios(yd=yd,y0=y0)
-    z <- zs[,1]
-    s <- zs[,2]
-    AA  <- prop/sqrt(2*pi*s^2)
-    BB <- -0.5*((z-gam)/s)^2
-    CC <- (1-prop)/sqrt(2*pi*(sig^2+s^2))
-    mu0 <- (mu/sig^2 + z/s^2)/(1/sig^2 + 1/s^2)
-    s0 <- 1/sqrt(1/sig^2 + 1/s^2)
-    DD <- 1-stats::pnorm((gam-mu0)/s0)
-    EE <- 1-stats::pnorm((gam-mu)/sig)
-    FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
-    fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
-    fu[fu<.Machine$double.xmin] <- .Machine$double.xmin
-    fu[fu>.Machine$double.xmax] <- .Machine$double.xmax
-    sum(-log(fu))
+    minage_pars <- mappar(pars,b=b,left=left)
+    if (is.null(a)) a <- exp(pars[3])
+    zs <- get_zs(yd,a=a,left=left)
+    get_minage_L(pars=minage_pars,zs=zs)
 }
