@@ -211,30 +211,31 @@ Pb0corr <- function(x,option=3,omit4c=NULL){
     out
 }
 
-correct_common_Pb_without_20x <- function(x,i,c76,tt=NULL){
+correct_common_Pb_without_20x <- function(x,i,c76,tt=NULL,projerr=TRUE){
     tw <- tera_wasserburg(x,i)
     m86 <- tw$x['U238Pb206']
     m76 <- tw$x['Pb207Pb206']
-    if (is.null(tt)){
+    if (is.null(tt)){ # line through measurement
         tt <- project_concordia(m86,m76,c76,d=x$d[i])
         cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d[i])
         r86 <- cctw$x['U238Pb206']
         r76 <- cctw$x['Pb207Pb206']
         cnames <- c('U238Pb206','Pb207Pb206')
-        E <- tw$cov[cnames,cnames]
+        mag <- ifelse(projerr,(r86/m86)^2,1)
+        E <- mag*tw$cov[cnames,cnames]
         sr86 <- sqrt(E[1,1])
         sr76 <- sqrt(E[2,2])
         rXY <- stats::cov2cor(E)[1,2]
         out <- c(r86,sr86,r76,sr76,rXY)
         names(out) <- c('U238Pb206','errU238Pb206',
                         'Pb207Pb206','errPb207Pb206','rXY')
-    } else {
+    } else { # line parallel to isochron
         cctw <- age_to_terawasserburg_ratios(tt=tt,st=0,d=x$d[i])
         r86 <- cctw$x['U238Pb206']
         r76 <- cctw$x['Pb207Pb206']
         slope <- (c76-r76)/r86
         p76 <- m76 + slope*m86
-        out <- correct_common_Pb_without_20x(x=x,i=i,c76=p76)
+        out <- correct_common_Pb_without_20x(x=x,i=i,c76=p76,projerr=projerr)
     }
     out
 }
@@ -417,7 +418,7 @@ common_Pb_stacey_kramers <- function(x){
             tint <- stats::optimise(SKmisfit,interval=c(0,maxt),x=x,i=i)$minimum
             i6474 <- stacey.kramers(tint)
             c76 <- i6474[,'i74']/i6474[,'i64']
-            out[i,] <- correct_common_Pb_without_20x(x=x,i=i,c76=c76,tt=tint)
+            out[i,] <- correct_common_Pb_without_20x(x=x,i=i,c76=c76,tt=tint,projerr=TRUE)
         }
     } else if (x$format %in% c(4,5,6,85)){
         out <- matrix(0,ns,5)
@@ -516,7 +517,7 @@ common_Pb_isochron <- function(x,omit=NULL){
                            'errPb207Pb206','rXY')
         c76 <- fit$par['a0']
         for (i in 1:ns){
-            out[i,] <- correct_common_Pb_without_20x(x,i=i,c76=c76,tt=tt)
+            out[i,] <- correct_common_Pb_without_20x(x,i=i,c76=c76,tt=tt,projerr=FALSE)
         }
     } else if (x$format %in% c(4,5,6,85)){
         out <- matrix(0,ns,5)
@@ -581,7 +582,7 @@ common_Pb_nominal <- function(x){
                            'Pb207Pb206','errPb207Pb206','rXY')
         c76 <- iratio('Pb207Pb206')[1]
         for (i in 1:ns){
-            out[i,] <- correct_common_Pb_without_20x(x=x,i=i,c76=c76)
+            out[i,] <- correct_common_Pb_without_20x(x=x,i=i,c76=c76,projerr=TRUE)
         }
     } else if (x$format %in% c(4,5,6,85)){
         out <- matrix(0,ns,5)
