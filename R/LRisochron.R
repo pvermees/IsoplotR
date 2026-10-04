@@ -1,7 +1,7 @@
 #' Leftmost and rightmost isochrons
 #'
 #' Modifies the Galbraith and Laslett's minimum age module to fit
-#' overdispersed Pb-Pb and Th-U isochron data.
+#' overdispersed (Th-U) isochron data.
 #' @param x an IsoplotR data object
 #' @param left logical, switches between leftmost and rightmost
 #'     isochrons
@@ -17,32 +17,33 @@
 #' @noRd
 LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @noRd
-LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
+LRisochron.default <- function(x,left=FALSE,
+                               hide=NULL,omit=NULL,
+                               a=NULL,b=NULL,...){
     x2calc <- clear(x,hide,omit)
-    if (left){
-        init_fit <- init_left(yd=x2calc)
-    } else {
-        init_fit <- init_right(yd=x2calc)
+    init <- init_LRisochron(x2calc,a=a,b=b,left=left,...)
+    out <- stats::optim(par=init,fn=get_LRisochron_L,
+                        yd=x2calc,a=a,b=b,left=left,
+                        hessian=TRUE,...)
+    covmat <- inverthess(out$hessian)
+    np <- length(out$par)
+    J <- matrix(0,nrow=2,ncol=np)
+    if (is.null(a)){
+        a <- exp(out$par[3])
+        J[1,3] <- a
     }
-    y0i <- init_fit$a
-    gi <- -init_fit$b
-    lpi <- 0 # log((1-propi)/propi)
-    sigi <- stats::sd((y0i-x2calc[,'Y'])/x2calc[,'X'])
-    lsi <- log(sigi)
-    init <- c(gi,lpi,lsi,y0i)
-    fun <- ifelse(left,yd2ratios_left,yd2ratios_right)
-    fit <- stats::optim(par=init,fn=get_LRisochron_L,
-                        yd=x2calc,fun=fun,hessian=TRUE)
-    covmat <- inverthess(fit$hessian)
-    a <- fit$par[4]
-    sa <- sqrt(covmat[4,4])
-    sgn <- ifelse(left,-1,1)
-    b <- sgn * fit$par[1]
-    sb <- sqrt(covmat[1,1])
-    list(a=c('a'=unname(a),'s[a]'=unname(sa)),
-         b=c('b'=unname(b),'s[b]'=unname(sb)),
-         cov.ab=unname(sgn*covmat[1,4]),
-         xyz=x,model=4,n=nrow(x2calc))
+    if (is.null(b)){
+        b <- exp(out$par[np])
+        J[2,np] <- b
+    }
+    E <- J %*% covmat %*% t(J)
+    out$a <- c('a'=unname(a),'s[a]'=unname(sqrt(E[1,1])))
+    out$b <- c('b'=unname(b),'s[b]'=unname(sqrt(E[2,2])))
+    out$cov.ab <- unname(E[1,2])
+    out$xyz <- x
+    out$model <- 4
+    out$n <- nrow(x2calc)
+    out
 }
 #' @param anchor control parameters to fix the intercept age or
 #'     non-radiogenic composition of the isochron fit. This can be a
@@ -50,137 +51,37 @@ LRisochron.default <- function(x,left=TRUE,hide=NULL,omit=NULL,...){
 #'
 #' If \code{anchor[1]=0}: do not anchor the isochron.
 #'
-#' If \code{anchor[1]=1}: fix the non-radiogenic composition at the
-#' values stored in \code{settings('iratio',...)}, OR, if \code{x} has
-#' class \code{ThU} and \code{x$format} = \code{3} or \code{4}, fix
-#' the intercept at the value stored in \code{x$U8Th2}.
+#' If \code{anchor[1]=1}: fix the intercept at the value stored in \code{x$U8Th2}.
 #'
 #' If \code{anchor[1]=2}: fix the age at the value stored in \code{anchor[2]}.
 #' @noRd
-LRisochron.PbPb <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
-    yd <- data2york(x,inverse=TRUE)
-    if (anchor[1]<1){
-        out <- LRisochron.default(yd,left=TRUE,hide=hide,omit=omit)
-    } else {
-        yd2calc <- clear(yd,hide,omit)
-        lpi <- 0
-        y0i <- gi <- y0 <- x1 <- y1 <- NULL
-        if (anchor[1]==1){
-            Pb74 <- iratio('Pb207Pb204')[1]
-            Pb64 <- iratio('Pb206Pb204')[1]
-            y1 <- Pb74/Pb64
-            x1 <- 1/Pb64
-            leftmost <- which.min(yd2calc[,'X'])
-            x2 <- yd2calc[leftmost,'X']
-            y2 <- yd2calc[leftmost,'Y']
-            y0i <- y1 - x1*(y2-y1)/(x2-x1)
-        } else if (anchor[1]==2 & length(anchor)>1){
-            y0i <- y0 <- age2ratio(tt=anchor[2],ratio="Pb207Pb206")[1]
-        } else {
-            stop("Invalid anchor.")
-        }
-        g <- (y0i-yd2calc[,'Y'])/yd2calc[,'X']
-        lsi <- log(stats::sd(g))
-        if (anchor[1]==1){
-            init <- c(lpi,lsi,y0i)
-        } else {
-            gi <- mean(g)
-            init <- c(gi,lpi,lsi)
-        }
-        fit <- stats::optim(par=init,fn=get_LRisochron_L,
-                            fun=yd2ratios_left,yd=yd2calc,
-                            y0=y0,x1=x1,y1=y1,hessian=TRUE)
-        covmat <- inverthess(fit$hessian)
-        np <- length(fit$par)
-        if (is.null(y0)){
-            a <- fit$par[np]
-            sa <- sqrt(covmat[np,np])
-        } else {
-            a <- y0
-            sa <- 0
-            cov.ab <- 0
-        }
-        if (is.null(x1) | is.null(y1)){
-            b <- -fit$par[1]
-            sb <- sqrt(covmat[1,1])
-            if (is.null(y0)) cov.ab <- (-covmat[1,np])
-        } else {
-            b <- (y1-a)/x1
-            sb <- sa/x1
-            rho <- -1
-            cov.ab <- rho*sa*sb
-        }
-        out <- list(a=c('a'=unname(a),'s[a]'=unname(sa)),
-                    b=c('b'=unname(b),'s[b]'=unname(sb)),
-                    cov.ab=unname(cov.ab),
-                    model=4,n=nrow(yd2calc))
-    }
-    if (inverse){
-        out$xyz <- yd
-    } else {
-        out <- invertfit(out,type='d')
-        out$xyz <- normal2inverse(yd,type='d')
-    }
-    out
-}
-#' @noRd
-LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
+LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,
+                           hide=NULL,omit=NULL,left=FALSE,...){
     if (x$format<3){
         stop("Rightmost isochrons are only available for ThU formats 3 and 4.")
     }
     yd <- data2york(x,inverse=FALSE)
-    if (anchor[1]<1){
-        out <- LRisochron.default(yd,left=FALSE,hide=hide,omit=omit)
+    if (anchor[1]==1){
+        x0 <- 1/x$U8Th2
+        yd2calc <- yd
+        yd2calc[,'X'] <- yd[,'X'] - x0
+        out <- LRisochron.default(x=yd2calc,omit=omit,hide=hide,
+                                  a=x0,left=left)
+        out$a[1] <- out$a[1] - x0*out$b[1]
+        J <- diag(2)
+        J[1,2] <- -x0
+        E <- diag(c(out$a[2],out$b[2]))^2
+        E[1,2] <- E[2,1] <- out$cov.ab
+        covmat <- J %*% E %*% t(J)
+        out$a[2] <- sqrt(covmat[1,1])
+        out$cov.ab <- covmat[1,2]
+    } else if (anchor[1]==2 & length(anchor)>1){
+        b <- age2ratio(tt=anchor[2],ratio='Th230U238')[1]
+        out <- LRisochron.default(x=yd,b=b,omit=omit,hide=hide,
+                                  left=left,ThU=TRUE)
     } else {
-        yd2calc <- clear(yd,hide,omit)
-        lpi <- 0
-        y0i <- gi <- y0 <- b <- NULL # note: y0 = Th2U8i
-        if (anchor[1]==1){
-            y0i <- y0 <- 1/x$U8Th2
-        } else if (anchor[1]==2 & length(anchor)>1){
-            b <- age2ratio(tt=anchor[2],ratio='Th230U238')[1]
-            leftmost <- which.min(yd[,'X'])
-            x2 <- yd2calc[leftmost,'X']
-            y2 <- yd2calc[leftmost,'Y']
-            y0i <- y2 - b * x2
-        } else {
-            stop("Invalid anchor")
-        }
-        g <- (yd2calc[,'Y']-y0i)/(yd2calc[,'X']-y0i)
-        lsi <- log(stats::sd(g))
-        if (anchor[1]==1){
-            gi <- mean(g)
-            init <- c(gi,lpi,lsi)
-        } else {
-            init <- c(lpi,lsi,y0i)
-        }
-        fit <- stats::optim(par=init,fn=get_LRisochron_L,
-                            yd=yd2calc,y0=y0,gam=b,
-                            fun=yd2ratios_ThU,hessian=TRUE)
-        covmat <- inverthess(fit$hessian)
-        np <- length(fit$par)
-        if (anchor[1]==1){
-            sy0 <- 0
-            b <- fit$par[1]
-            a <- y0*(1-b)
-            J <- rbind(c(-y0,1-b),
-                       c(1,0))
-            E <- J %*% rbind(c(covmat[1,1],0),c(0,0)) %*% t(J)
-            sa <- sqrt(E[1,1])
-            sb <- sqrt(covmat[1,1])
-            cov.ab <- E[1,2]
-        } else {
-            y0 <- fit$par[np]
-            sy0 <- sqrt(covmat[np,np])
-            sb <- 0
-            a <- y0*(1-b)
-            sa <- sy0*(1-b)
-            cov.ab <- 0
-        }
-        out <- list(a=c('a'=unname(a),'s[a]'=unname(sa)),
-                    b=c('b'=unname(b),'s[b]'=unname(sb)),
-                    cov.ab=unname(cov.ab),
-                    model=4,n=nrow(yd2calc))
+        out <- LRisochron.default(x=yd,omit=omit,hide=hide,
+                                  left=left,ThU=TRUE)
     }
     if (inverse){
         out <- invertfit(out,type='d')
@@ -191,134 +92,99 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,hide=NULL,omit=NULL,...){
     out
 }
 
-anchoredLRisochron <- function(yd2calc,fun,
-                               gi=NULL,lpi,lsi,y0i=NULL,
-                               gam=NULL,y0=NULL,...){
-    if (is.null(y0i)){
-        anchor <- 'a'
-    } else if (is.null(gi)){
-        anchor <- 'b'
+init_lsi <- function(yd,a,b,left=FALSE,ThU=FALSE){
+    if (ThU){
+        x0 <- y0 <- a/(1-b)
     } else {
-        stop("Either y0i or gi must be specified.")
+        x0 <- 0
+        y0 <- a
     }
-    if (anchor=='a'){
-        init <- c(gi,lpi,lsi)
-    } else { # anchor == 'b'
-        init <- c(lpi,lsi,y0i)
-    }
-    fit <- stats::optim(par=init,fn=get_LRisochron_L,
-                        yd=yd2calc,y0=y0,gam=gam,
-                        fun=fun,...,hessian=TRUE)
-    covmat <- inverthess(fit$hessian)
-    np <- length(fit$par)
-    if (anchor=='a'){
-        sy0 <- 0
-        b <- fit$par[1]
-        sb <- sqrt(covmat[1,1])
-        J <- rbind(c(-y0,1-b),
-                   c(1,0))
-        E <- J %*% rbind(c(covmat[1,1],0),c(0,0)) %*% t(J)
-        a <- y0*(1-b)
-        sa <- sqrt(E[1,1])
-        cov.ab <- E[1,2]
-    } else { # anchor == 'b'
-        y0 <- fit$par[np]
-        sy0 <- sqrt(covmat[np,np])
-        b <- -gam
-        sb <- 0
-        a <- y0*(1-b)
-        sa <- sy0*(1-b)
-        cov.ab <- 0
-    }        
-    list(a=c('a'=unname(a),'s[a]'=unname(sa)),
-         b=c('b'=unname(b),'s[b]'=unname(sb)),
-         cov.ab=unname(cov.ab),
-         model=4,n=nrow(yd2calc))
+    zsz <- x0y02zs(yd=yd,x0=x0,y0=y0,left=left)
+    log(stats::sd(zsz[,1]))
 }
 
-init_left <- function(yd){
-    X <- yd[,'X']
-    Y <- yd[,'Y']
-    fit <- stats::lm(Y ~ X)
-    if (summary(fit)$r.squared>0.8){
-        a <- fit$coefficients[1]
-        b <- fit$coefficients[2]
-    } else {
-        leftmost <- which.min(X)
-        topmost <- which.max(Y)
-        b <- (Y[topmost]-Y[leftmost])/(X[topmost]-X[leftmost])
-        a <- Y[leftmost] - b*X[leftmost]
-    }
-    list(a=unname(a),b=unname(b))
-}
-init_right <- function(yd){
-    bottommost <- which.min(yd[,'Y'])
-    list(a=unname(yd[bottommost,'Y']),b=0)
-}
-
-yd2ratios_left <- function(yd,y0){
-    r <- (y0-yd[,'Y'])/yd[,'X']
-    sr <- sqrt(errorprop1x2(J1=-r/yd[,'X'],
-                            J2=-1/yd[,'X'],
-                            E11=yd[,'sX']^2,
-                            E22=yd[,'sY']^2,
-                            E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
-    cbind(r,sr)
-}
-yd2ratios_right <- function(yd,y0){
-    r <- (yd[,'Y']-y0)/yd[,'X']
-    sr <- sqrt(errorprop1x2(J1=-r/yd[,'X'],
-                            J2=1/yd[,'X'],
-                            E11=yd[,'sX']^2,
-                            E22=yd[,'sY']^2,
-                            E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
-    cbind(r,sr)    
-}
-yd2ratios_ThU <- function(yd,y0){
-    r <- (yd[,'Y']-y0)/(yd[,'X']-y0)
-    sr <- sqrt(errorprop1x2(J1=-r/(yd[,'X']-y0),
-                            J2=-y0/(yd[,'X']-y0),
-                            E11=yd[,'sX']^2,
-                            E22=yd[,'sY']^2,
-                            E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
-    cbind(r,sr)
-}
-
-get_LRisochron_L <- function(pars,yd,y0=NULL,
-                             x1=NULL,y1=NULL,gam=NULL,
-                             fun=yd2ratios_left){
-    np <- length(pars)
-    if (is.null(y0)){
-        y0 <- pars[np]
-    }
-    if (is.null(gam)){
-        if (is.null(x1) || is.null(y1)){
-            gam <- pars[1]
-            prop <- 1/(exp(pars[2])+1)
-            sig <- exp(pars[3])
-        } else {
-            gam <- (y0-y1)/x1
-            prop <- 1/(exp(pars[1])+1)
-            sig <- exp(pars[2])
+init_LRisochron <- function(yd,a=NULL,b=NULL,left=FALSE,ThU=FALSE){
+    X <- yd[,1]
+    Y <- yd[,3]
+    lpi <- 0
+    x0 <- 0
+    if (is.null(a) && is.null(b)){
+        h <- grDevices::chull(X,Y)
+        nh <- length(h)
+        vertices <- c(h,h[1])
+        gr <- diff(Y[vertices])/diff(X[vertices])
+        misfit <- Inf
+        for (i in which(gr>0)){
+            b <- gr[i]
+            a <- Y[vertices[i]] - b * X[vertices[i]]
+            if (a>0){
+                lsi <- init_lsi(yd=yd,a=a,b=b,left=left,ThU=ThU)
+                init <- c(lpi,lsi,log(a),log(b))
+                fit <- stats::optim(par=init,fn=get_LRisochron_L,
+                                    yd=yd,left=left,ThU=ThU)
+                if (fit$value < misfit){
+                    misfit <- fit$value
+                    out <- fit$par
+                }
+            }
         }
+    } else if (is.null(b)){
+        fit <- stats::lm(I(Y - a) ~ X - 1)
+        b <- unname(abs(fit$coefficients))
+        lbi <- log(b)
+        lsi <- init_lsi(yd=yd,a=a,b=b,left=left,ThU=ThU)
+        out <- c(lpi,lsi,lbi)
+    } else if (is.null(a)){
+        fit <- stats::lm(Y ~ 1 + offset(b * X))
+        a <- unname(abs(fit$coefficients))
+        lsi <- init_lsi(yd=yd,a=a,b=b,left=left,ThU=ThU)
+        out <- c(lpi,lsi,log(a))
     } else {
-        prop <- 1/(exp(pars[1])+1)
-        sig <- exp(pars[2])
+        lsi <- init_lsi(yd=yd,a=a,b=b,left=left,ThU=ThU)
+        out <- c(lpi,lsi)
     }
-    mu <- gam
-    zs <- fun(yd=yd,y0=y0)
-    z <- zs[,1]
-    s <- zs[,2]
-    AA  <- prop/sqrt(2*pi*s^2)
-    BB <- -0.5*((z-gam)/s)^2
-    CC <- (1-prop)/sqrt(2*pi*(sig^2+s^2))
-    mu0 <- (mu/sig^2 + z/s^2)/(1/sig^2 + 1/s^2)
-    s0 <- 1/sqrt(1/sig^2 + 1/s^2)
-    DD <- 1-stats::pnorm((gam-mu0)/s0)
-    EE <- 1-stats::pnorm((gam-mu)/sig)
-    FF <- -0.5*((z-mu)^2)/(sig^2+s^2)
-    fu <- AA*exp(BB) + CC*(DD/EE)*exp(FF)
-    fu[fu<.Machine$double.xmin] <- .Machine$double.xmin
-    fu[fu>.Machine$double.xmax] <- .Machine$double.xmax
-    sum(-log(fu))
+    out
+}
+
+x0y02zs <- function(yd,x0=0,y0=0,left=FALSE){
+    z <- (yd[,'Y']-y0)/(yd[,'X']-x0)
+    sz <- sqrt(errorprop1x2(J1=-z/(yd[,'X']-x0),
+                            J2=1/(yd[,'X']-x0),
+                            E11=yd[,'sX']^2,
+                            E22=yd[,'sY']^2,
+                            E12=yd[,'rXY']*yd[,'sX']*yd[,'sY']))
+    if (left){
+        sz <- sz/z^2
+        z <- 1/z
+    }   
+    cbind(z,sz)
+}
+
+get_LRisochron_L <- function(pars,yd,
+                             a=NULL,b=NULL,
+                             left=FALSE,ThU=FALSE){
+    mappar <- function(pars,b=NULL,left=FALSE){
+        prop <- logit(pars[1],inverse=TRUE)
+        sig <- exp(pars[2])
+        if (is.null(b)) b <- exp(utils::tail(pars,n=1))
+        gam <- ifelse(left,1/b,b)
+        mu <- gam
+        c(gam,prop,sig,mu)
+    }
+    minage_pars <- mappar(pars,b=b,left=left)
+    if (is.null(a)){
+        a <- exp(pars[3])
+    }
+    if (is.null(b)){
+        gam <- minage_pars[1]
+        b <- ifelse(left,1/gam,gam)
+    }
+    if (ThU){
+        x0 <- y0 <- a/(1-b)
+    } else {
+        x0 <- 0
+        y0 <- a
+    }
+    zs <- x0y02zs(yd=yd,x0=x0,y0=y0,left=left)
+    get_minage_L(pars=minage_pars,zs=zs)
 }
