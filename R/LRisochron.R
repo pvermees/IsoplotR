@@ -109,7 +109,7 @@ init_LRisochron <- function(yd,a=NULL,b=NULL,left=FALSE,ThU=FALSE){
     lpi <- 0
     x0 <- 0
     if (is.null(a) && is.null(b)){
-        h <- chull(X,Y)
+        h <- grDevices::chull(X,Y)
         nh <- length(h)
         vertices <- c(h,h[1])
         gr <- diff(Y[vertices])/diff(X[vertices])
@@ -166,7 +166,7 @@ get_LRisochron_L <- function(pars,yd,
     mappar <- function(pars,b=NULL,left=FALSE){
         prop <- logit(pars[1],inverse=TRUE)
         sig <- exp(pars[2])
-        if (is.null(b)) b <- exp(tail(pars,n=1))
+        if (is.null(b)) b <- exp(utils::tail(pars,n=1))
         gam <- ifelse(left,1/b,b)
         mu <- gam
         c(gam,prop,sig,mu)
