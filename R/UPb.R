@@ -408,8 +408,7 @@ get_UPb_isochron_ratios_208 <- function(x,i=NULL,tt=0){
         U85 <- iratio('U238U235')[1]
         tw <- tera_wasserburg(x,i) # 38/06, 07/06, 08/06, 32/38
         U8Pb6 <- tw$x['U238Pb206']
-        Pb8c6 <- tw$x['Pb208Pb206'] -
-            tw$x['Th232U238']*tw$x['U238Pb206']*McL$Pb208Th232
+        Pb8c6 <- tw$x['Pb208Pb206'] - McL$Pb208Th232*tw$x['Th232U238']*tw$x['U238Pb206']
         U5Pb7 <- tw$x['U238Pb206']/(U85*tw$x['Pb207Pb206'])
         Pb8c7 <- Pb8c6/tw$x['Pb207Pb206']
         Th2Pb8 <- tw$x['Th232U238']*tw$x['U238Pb206']/tw$x['Pb208Pb206']
@@ -417,25 +416,25 @@ get_UPb_isochron_ratios_208 <- function(x,i=NULL,tt=0){
         Pb7c8 <- tw$x['Pb207Pb206']/tw$x['Pb208Pb206'] -
             McL$Pb207U235*tw$x['U238Pb206']/(U85*tw$x['Pb208Pb206'])
         J <- matrix(0,8,4)
-        J[1,1] <- 1
-        J[2,1] <- -tw$x['Th232U238']*(exp(l2*tt)-1)
-        J[2,3] <- 1
-        J[2,4] <- -tw$x['U238Pb206']*(exp(l2*tt)-1)
-        J[3,1] <- 1/(U85*tw$x['Pb207Pb206'])
-        J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']
-        J[4,1] <- J[2,1]/tw$x['Pb207Pb206']
-        J[4,2] <- -Pb8c7/tw$x['Pb207Pb206']
-        J[4,3] <- J[2,3]/tw$x['Pb207Pb206']
-        J[4,4] <- J[2,4]/tw$x['Pb207Pb206']
-        J[5,4] <- 1
-        J[6,1] <- tw$x['Th232U238']/tw$x['Pb208Pb206']
-        J[6,3] <- -Th2Pb8/tw$x['Pb208Pb206']
-        J[6,4] <- tw$x['U238Pb206']/tw$x['Pb208Pb206']
-        J[7,1] <- -McL$Pb206U238/tw$x['Pb208Pb206']
-        J[7,3] <- -Pb6c8/tw$x['Pb208Pb206']
-        J[8,1] <- -McL$Pb207U235/(U85*tw$x['Pb208Pb206'])
-        J[8,2] <- 1/tw$x['Pb208Pb206']
-        J[8,3] <- -Pb7c8/tw$x['Pb208Pb206']
+        J[1,1] <- 1                                        # dU8Pb6_dU8Pb6
+        J[2,1] <- -McL$Pb208Th232*tw$x['Th232U238']        # dPb8c6_dU8Pb6
+        J[2,3] <- 1                                        # dPb8c6_dPb86
+        J[2,4] <- -McL$Pb208Th232*tw$x['U238Pb206']        # dPb8c6_dThU
+        J[3,1] <- 1/(U85*tw$x['Pb207Pb206'])               # dU5Pb7_dU8Pb6
+        J[3,2] <- -U5Pb7/tw$x['Pb207Pb206']                # dU5Pb7_dPb76
+        J[4,1] <- J[2,1]/tw$x['Pb207Pb206']                # dPb8c7_dU8Pb6
+        J[4,2] <- -Pb8c7/tw$x['Pb207Pb206']                # dPb8c7_dPb76
+        J[4,3] <- J[2,3]/tw$x['Pb207Pb206']                # dPb8c7_dPb86
+        J[4,4] <- J[2,4]/tw$x['Pb207Pb206']                # dPb8c7_dThU
+        J[5,4] <- 1                                        # dThU_dThU
+        J[6,1] <- tw$x['Th232U238']/tw$x['Pb208Pb206']     # dTh2Pb8_dU8Pb6
+        J[6,3] <- -Th2Pb8/tw$x['Pb208Pb206']               # dTh2Pb8_dPb86
+        J[6,4] <- tw$x['U238Pb206']/tw$x['Pb208Pb206']     # dTh2Pb8_dThU
+        J[7,1] <- -McL$Pb206U238/tw$x['Pb208Pb206']        # dPb6c8_dU8Pb6
+        J[7,3] <- -Pb6c8/tw$x['Pb208Pb206']                # dPb6c8_dPb86
+        J[8,1] <- -McL$Pb207U235/(U85*tw$x['Pb208Pb206'])  # dPb7c8_dU8Pb6
+        J[8,2] <- 1/tw$x['Pb208Pb206']                     # dPb7c8_dPb76
+        J[8,3] <- -Pb7c8/tw$x['Pb208Pb206']                # dPb7c8_dPb86
         out <- list()
         out$x <- c(U8Pb6,Pb8c6,U5Pb7,Pb8c7,
                    tw$x['Th232U238'],Th2Pb8,Pb6c8,Pb7c8)
