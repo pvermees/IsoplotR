@@ -324,8 +324,7 @@ correct_common_Pb_with_208 <- function(x,i,tt,c0608,c0708,
         p3208 <- ir$x['Th232Pb208']*c0608p/(c0608p-ir$x['Pb206cPb208'])
         dp3208d3208 <- c0608p/(c0608p-ir$x['Pb206cPb208'])
         dp3208d6c8 <- p3208/(c0608p-ir$x['Pb206cPb208'])
-    }
-    if (x$format==12){
+    } else {
         c0708p <- ir$x['Pb207cPb208'] + ir$x['Th232Pb208']*c0708/r3208
         p3208 <- ir$x['Th232Pb208']*c0708p/(c0708p-ir$x['Pb207cPb208'])
         dp3208d3208 <- c0708p/(c0708p-ir$x['Pb207cPb208'])
