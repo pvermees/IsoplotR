@@ -276,7 +276,7 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         tst <- UPb_age(x,exterr=exterr,i=i,
                        discordance=discordance,
                        common.Pb=common.Pb,...)
-        nc <- ifelse(ncol(tst)>7,8,6)
+        nc <- ifelse(ncol(tst)>7,8,min(ncol(tst),6))
         out <- cbind(agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig),
                      signif(tst[,-(1:nc),drop=FALSE],sigdig))
     } else if (type==2){
