@@ -324,7 +324,8 @@ correct_common_Pb_with_208 <- function(x,i,tt,c0608,c0708,
         p3208 <- ir$x['Th232Pb208']*c0608p/(c0608p-ir$x['Pb206cPb208'])
         dp3208d3208 <- c0608p/(c0608p-ir$x['Pb206cPb208'])
         dp3208d6c8 <- p3208/(c0608p-ir$x['Pb206cPb208'])
-    } else {
+    }
+    if (x$format==12){
         c0708p <- ir$x['Pb207cPb208'] + ir$x['Th232Pb208']*c0708/r3208
         p3208 <- ir$x['Th232Pb208']*c0708p/(c0708p-ir$x['Pb207cPb208'])
         dp3208d3208 <- c0708p/(c0708p-ir$x['Pb207cPb208'])
@@ -349,8 +350,8 @@ correct_common_Pb_with_208 <- function(x,i,tt,c0608,c0708,
         Jp[1,4] <- ifelse(projerr,dp3507d8c7,0)
         Jp[2,1] <- ifelse(projerr,dp3806d3806,1)
         Jp[2,2] <- ifelse(projerr,dp3806d8c6,0)
-        Jp[3,6] <- 1 # dp3208d3208
-        Jp[3,8] <- 0 # dp3208d7c8
+        Jp[3,6] <- ifelse(projerr,dp3208d3208,1)
+        Jp[3,8] <- ifelse(projerr,dp3208d7c8,0)
         Jp[4,5] <- 1 # dp3238d3238
     } else if (x$format==11){
         Jp <- matrix(0,2,4)
