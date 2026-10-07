@@ -477,8 +477,8 @@ intercept and slope.}
 
 \code{3}: Error-weighted least squares with overdispersion term
 
-\code{4}: If \code{x} has class \code{PbPb} or \code{ThU}, calculate
-the leftmost or rightmost isochron, respectively}
+\code{4}: If \code{x} has class \code{ThU}, calculate the rightmost
+isochron.}
 
 \item{wtype}{controls the parameter responsible for the
     overdispersion in model-3 regression.
