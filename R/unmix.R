@@ -27,29 +27,47 @@
 #' @param nboot number of bootstrap replicates.
 #' @param recurse logical flag indicating whether to recursively test
 #'     solutions in which one or more source proportions are zero.
+#' @param hide vector with indices of samples that should be removed
+#'     from the plot.
 #' @param ... additional graphical parameters passed to the plots.
 #' @return If \code{boot=FALSE}, a matrix with one row per sink and
-#'     columns for the estimated source proportions and the
-#'     Cramer-von Mises fit statistic. If \code{boot=TRUE}, a list
-#'     containing this matrix (\code{prop}) and matrices of lower
-#'     (\code{ll}) and upper (\code{ul}) bootstrap confidence limits
-#'     for the source proportions.
+#'     columns for the estimated source proportions and the Cramer-von
+#'     Mises fit statistic. If \code{boot=TRUE}, a list containing
+#'     this matrix (\code{prop}) and matrices of lower (\code{ll}) and
+#'     upper (\code{ul}) bootstrap confidence limits for the source
+#'     proportions.
 #' @examples
 #' attach(examples)
 #' fit <- unmix(DZ, sources=c('N1','N4','N14'), plot=FALSE)
 #' print(fit)
 #' @export
-unmix <- function(x,nsources=2,
+unmix <- function(x,
+                  nsources=2,
                   source_names=names(x)[1:nsources],
                   plot=TRUE,
                   boot=FALSE,
                   nboot=500,
-                  recurse=TRUE,...){
-    sorted_data <- lapply(x, sort)
+                  recurse=TRUE,
+                  hide=NULL,...){
+    wrong_names <- !(source_names %in% names(x))
+    if (any(wrong_names)){
+        missing_names <- paste(source_names[wrong_names],collapse=", ")
+        num_missing <- length(missing_names)
+        do_es <- ifelse(num_missing>1," do "," does ")
+        stop(missing_names,do_es,"not exist in this dataset.")
+    }
+    if (is.character(hide)){
+        hide <- which(names(x)%in%hide)
+    }
+    x2calc <- clear(x,hide)
+    sorted_data <- lapply(x2calc, sort)
     sample_names <- names(sorted_data)
     is_source <- sample_names %in% source_names
     sink_names <- sample_names[!is_source]
     num_sources <- length(source_names)
+    if (num_sources<2){
+        stop("You must specify at least two sources")
+    }
     num_sinks <- length(sink_names)
     prop <- matrix(NA,nrow=num_sinks,ncol=num_sources+1)
     rownames(prop) <- sink_names
@@ -66,11 +84,11 @@ unmix <- function(x,nsources=2,
         W_replicates <- array(NA, dim=c(nboot, num_sinks, num_sources))
         dimnames(W_replicates) <- list(NULL, sink_names, source_names)
         for (b in 1:nboot) {
-            x_boot <- x
+            x_boot <- x2calc
             for (source_name in source_names) {
-                n_source <- length(x[[source_name]])
+                n_source <- length(x2calc[[source_name]])
                 idx <- sample(1:n_source, replace=TRUE)
-                x_boot[[source_name]] <- x[[source_name]][idx]
+                x_boot[[source_name]] <- x2calc[[source_name]][idx]
             }
             fit <- unmix(x_boot, nsources=nsources,
                          source_names=source_names,

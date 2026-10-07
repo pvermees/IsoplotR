@@ -12,6 +12,7 @@ unmix(
   boot = FALSE,
   nboot = 500,
   recurse = TRUE,
+  hide = NULL,
   ...
 )
 }
@@ -37,15 +38,18 @@ datasets to estimate confidence limits for the proportions.}
 \item{recurse}{logical flag indicating whether to recursively test
 solutions in which one or more source proportions are zero.}
 
+\item{hide}{vector with indices of samples that should be removed
+from the plot.}
+
 \item{...}{additional graphical parameters passed to the plots.}
 }
 \value{
 If \code{boot=FALSE}, a matrix with one row per sink and
-    columns for the estimated source proportions and the
-    Cramer-von Mises fit statistic. If \code{boot=TRUE}, a list
-    containing this matrix (\code{prop}) and matrices of lower
-    (\code{ll}) and upper (\code{ul}) bootstrap confidence limits
-    for the source proportions.
+    columns for the estimated source proportions and the Cramer-von
+    Mises fit statistic. If \code{boot=TRUE}, a list containing
+    this matrix (\code{prop}) and matrices of lower (\code{ll}) and
+    upper (\code{ul}) bootstrap confidence limits for the source
+    proportions.
 }
 \description{
 Estimates the proportions of specified source datasets in each sink
