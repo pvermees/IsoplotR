@@ -25,8 +25,9 @@
 #' @param boot logical flag indicating whether to bootstrap the source
 #'     datasets to estimate confidence limits for the proportions.
 #' @param nboot number of bootstrap replicates.
-#' @param recurse logical flag indicating whether to recursively test
-#'     solutions in which one or more source proportions are zero.
+#' @param recurse logical flag indicating whether or not to
+#'     recursively test solutions in which one or more source
+#'     proportions are zero.
 #' @param hide vector with indices of samples that should be removed
 #'     from the plot.
 #' @param ... additional graphical parameters passed to the plots.
@@ -45,10 +46,11 @@ unmix <- function(x,
                   nsources=2,
                   source_names=names(x)[1:nsources],
                   plot=TRUE,
-                  boot=FALSE,
+                  boot=(length(x)-length(source_names)==1),
                   nboot=500,
                   recurse=TRUE,
                   hide=NULL,...){
+    # 1. data prep
     wrong_names <- !(source_names %in% names(x))
     if (any(wrong_names)){
         missing_names <- paste(source_names[wrong_names],collapse=", ")
@@ -72,13 +74,28 @@ unmix <- function(x,
     prop <- matrix(NA,nrow=num_sinks,ncol=num_sources+1)
     rownames(prop) <- sink_names
     colnames(prop) <- c(source_names,'CvM')
+    # 2. get the mixing proportions
     XYWCvM <- list()
+    prop <- matrix(NA,nrow=num_sinks,ncol=num_sources+1)
+    rownames(prop) <- sink_names
+    colnames(prop) <- c(source_names,'CvM')
     for (sink_name in sink_names){
-        XYWCvM[[sink_name]] <- unmix1(source_data=sorted_data[source_names],
-                                      sink_data=sorted_data[[sink_name]],
-                                      recurse=recurse)
-        prop[sink_name,source_names] <- XYWCvM[[sink_name]]$W
-        prop[sink_name,'CvM'] <- XYWCvM[[sink_name]]$CvM
+        sink_data <- sorted_data[[sink_name]]
+        length_sink <- length(sink_data)
+        X <- matrix(0,nrow=length_sink,ncol=num_sources)
+        colnames(X) <- source_names
+        for (source_name in colnames(X)){
+            source_data <- sorted_data[[source_name]]
+            X[,source_name] <- stats::ecdf(source_data)(sink_data)
+        }
+        Y <- matrix(seq(from=1/(2*length_sink),
+                        to=(2*length_sink-1)/(2*length_sink),
+                        length.out=length_sink),
+                    nrow=length_sink,ncol=1)
+        XYWCvM[[sink_name]] <- list(X=X,Y=Y)
+        fit <- XY2WCvM(X=X,Y=Y,recurse=recurse)
+        XYWCvM[[sink_name]]$W <- prop[sink_name,source_names] <- fit$W
+        XYWCvM[[sink_name]]$CvM <- prop[sink_name,'CvM'] <- fit$CvM
     }
     if (boot){
         W_replicates <- array(NA, dim=c(nboot, num_sinks, num_sources))
@@ -126,7 +143,7 @@ XY2WCvM <- function(X,Y,recurse=TRUE){
             CvM <- Inf
         }
         for (i in 1:num_sources){
-            fit <- XY2WCvM(X=X[,-i,drop=FALSE],Y=Y,recurse=TRUE)
+            fit <- XY2WCvM(X=X[,-i,drop=FALSE],Y=Y,recurse=recurse)
             if (!any(fit$W < 0) && !any(fit$W > 1) && fit$CvM < CvM){
                 W <- rep(0,num_sources)
                 W[-i] <- fit$W
@@ -135,23 +152,6 @@ XY2WCvM <- function(X,Y,recurse=TRUE){
         }
     }
     list(W=W,CvM=CvM)
-}
-
-# source_data is a list of vectors, sink_data is a vector
-unmix1 <- function(source_data,sink_data,recurse=TRUE){
-    num_sources <- length(source_data)
-    length_sink <- length(sink_data)
-    X <- matrix(0,nrow=length_sink,ncol=num_sources)
-    colnames(X) <- names(source_data)
-    for (source_name in colnames(X)){
-        X[,source_name] <- stats::ecdf(source_data[[source_name]])(sink_data)
-    }
-    Y <- matrix(seq(from=1/(2*length_sink),
-                    to=(2*length_sink-1)/(2*length_sink),
-                    length.out=length_sink),
-                nrow=length_sink,ncol=1)
-    fit <- XY2WCvM(X=X,Y=Y,recurse=recurse)
-    list(X=X,Y=Y,W=fit$W,CvM=fit$CvM)
 }
 
 empty_ecdf_plot <- function(data_range,...){
