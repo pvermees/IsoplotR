@@ -159,7 +159,11 @@ plot_unmix <- function(XYWCvM,
     } else {
         h <- c(3,4,2,2,2,3)
     }
+    cex <- graphics::par('cex')
     graphics::layout(layout_matrix,widths=w,heights=h)
+    layout_cex <- graphics::par('cex')
+    graphics::par(cex=layout_cex*cex)
+    layout_cex <- graphics::par('cex')
     colours <- grDevices::hcl.colors(num_sources)
     op <- graphics::par(mar=rep(0,4),mgp=c(1.5,0.75,0))
     graphics::plot.new()
@@ -178,7 +182,7 @@ plot_unmix <- function(XYWCvM,
                        col=colours[i],add=TRUE,col.01line=NULL)
     }
     graphics::axis(side=3)
-    graphics::mtext(text=xlab,side=3,line=1.75,cex=0.8)
+    graphics::mtext(text=xlab,side=3,line=1.75,cex=cex*0.8)
     W <- matrix(NA,nrow=num_sinks,ncol=num_sources)
     rownames(W) <- sink_names
     colnames(W) <- source_names
@@ -197,7 +201,7 @@ plot_unmix <- function(XYWCvM,
         W[sink_name,] <- 100*XYWCvM[[sink_name]]$W
     }
     graphics::axis(side=1)
-    graphics::mtext(text=xlab,side=1,line=1.75,cex=0.8)
+    graphics::mtext(text=xlab,side=1,line=1.75,cex=cex*0.8)
     if (num_sinks>1){
         graphics::plot(x=c(0,100),y=c(1,num_sinks),type='n',
                        xaxs = "i", yaxs = "i",
@@ -213,14 +217,14 @@ plot_unmix <- function(XYWCvM,
                            xpd=NA,col='grey40')
         }
         graphics::axis(side=1)
-        graphics::mtext(text='%',side=1,line=1.75,cex=0.8)
+        graphics::mtext(text='%',side=1,line=1.75,cex=cex*0.8)
     } else {
         graphics::plot(1,type="n",xlim=c(0,10),ylim=c(0,10),
                        xlab="",ylab="",axes=FALSE)
         graphics::legend('center',
                          legend=paste0(source_names,' = ',
                                        round(W[1,]),'%'),
-                         bty='n',cex=1.2,xpd=NA)
+                         bty='n',cex=cex*1.2,xpd=NA)
     }
     graphics::par(op)
 }
