@@ -25,9 +25,6 @@
 #' @param boot logical flag indicating whether to bootstrap the source
 #'     datasets to estimate confidence limits for the proportions.
 #' @param nboot number of bootstrap replicates.
-#' @param recurse logical flag indicating whether or not to
-#'     recursively test solutions in which one or more source
-#'     proportions are zero.
 #' @param hide vector with indices of samples that should be removed
 #'     from the plot.
 #' @param ... additional graphical parameters passed to the plots.
@@ -42,14 +39,9 @@
 #' fit <- unmix(DZ, sources=c('N1','N4','N14'), plot=FALSE)
 #' print(fit)
 #' @export
-unmix <- function(x,
-                  nsources=2,
-                  source_names=names(x)[1:nsources],
-                  plot=TRUE,
-                  boot=(length(x)-length(source_names)==1),
-                  nboot=500,
-                  recurse=TRUE,
-                  hide=NULL,...){
+unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
+                  plot=TRUE,boot=(length(x)-length(source_names)==1),
+                  nboot=500,hide=NULL,...){
     # 1. data prep
     wrong_names <- !(source_names %in% names(x))
     if (any(wrong_names)){
@@ -93,7 +85,7 @@ unmix <- function(x,
                         length.out=length_sink),
                     nrow=length_sink,ncol=1)
         XYWCvM[[sink_name]] <- list(X=X,Y=Y)
-        fit <- XY2WCvM(X=X,Y=Y,recurse=recurse)
+        fit <- XY2WCvM(X=X,Y=Y)
         XYWCvM[[sink_name]]$W <- prop[sink_name,source_names] <- fit$W
         XYWCvM[[sink_name]]$CvM <- prop[sink_name,'CvM'] <- fit$CvM
     }
@@ -109,8 +101,7 @@ unmix <- function(x,
             }
             fit <- unmix(x_boot, nsources=nsources,
                          source_names=source_names,
-                         plot=FALSE, boot=FALSE,
-                         recurse=recurse)
+                         plot=FALSE, boot=FALSE)
             W_replicates[b, , ] <- fit[1:num_sources]
         }
         alpha <- settings('alpha')
@@ -129,7 +120,7 @@ unmix <- function(x,
     out
 }
 
-XY2WCvM <- function(X,Y,recurse=TRUE){
+XY2WCvM <- function(X,Y){
     num_sources <- ncol(X)
     tXXinv <- solve(t(X)%*%X)
     WOLS <- tXXinv%*%t(X)%*%Y
@@ -138,17 +129,10 @@ XY2WCvM <- function(X,Y,recurse=TRUE){
     fact <- (1-r1%*%WOLS)/(r1%*%tXXinv%*%c1)
     W <- WOLS + fact[1,1] * tXXinv %*% c1
     CvM <- sum((X %*% W - Y)^2)
-    bad <- any(W<0) || any(W>1)
-    if (recurse && num_sources>1 && bad){
-        CvM <- Inf
-        for (i in 1:num_sources){
-            fit <- XY2WCvM(X=X[,-i,drop=FALSE],Y=Y,recurse=recurse)
-            if (!any(fit$W < 0) && !any(fit$W > 1) && fit$CvM < CvM){
-                W <- rep(0,num_sources)
-                W[-i] <- fit$W
-                CvM <- fit$CvM
-            }
-        }
+    if (any(W<0) || any(W>1)){
+        nnls_fit <- nnls_r(rbind(X,1e4),rbind(Y,1e4))
+        W <- nnls_fit$x
+        CvM <- nnls_fit$deviance
     }
     list(W=W,CvM=CvM)
 }
@@ -180,9 +164,11 @@ plot_unmix <- function(XYWCvM,
     op <- graphics::par(mar=rep(0,4),mgp=c(1.5,0.75,0))
     graphics::plot.new()
     graphics::legend('topright',legend=source_names,
-                     bty='n',lty=rep(1,num_sources),col=colours)
+                     lty=rep(1,num_sources),col=colours,
+                     bty='n',xpd=NA)
     graphics::legend('topleft',legend=c('observed','fitted'),
-                     bty='n',lty=rep(1,2),col=c('red','blue'))
+                     lty=rep(1,2),col=c('red','blue'),
+                     bty='n',xpd=NA)
     data_range <- range(unlist(sorted_data))
     empty_ecdf_plot(data_range=data_range,...)
     for (i in 1:num_sources){
