@@ -138,10 +138,9 @@ XY2WCvM <- function(X,Y,recurse=TRUE){
     fact <- (1-r1%*%WOLS)/(r1%*%tXXinv%*%c1)
     W <- WOLS + fact[1,1] * tXXinv %*% c1
     CvM <- sum((X %*% W - Y)^2)
-    if (recurse && num_sources>1){
-        if (any(W<0) || any(W>1)){
-            CvM <- Inf
-        }
+    bad <- any(W<0) || any(W>1)
+    if (recurse && num_sources>1 && bad){
+        CvM <- Inf
         for (i in 1:num_sources){
             fit <- XY2WCvM(X=X[,-i,drop=FALSE],Y=Y,recurse=recurse)
             if (!any(fit$W < 0) && !any(fit$W > 1) && fit$CvM < CvM){
@@ -235,7 +234,7 @@ plot_unmix <- function(XYWCvM,
         graphics::legend('center',
                          legend=paste0(source_names,' = ',
                                        round(W[1,]),'%'),
-                         bty='n',cex=1.2)
+                         bty='n',cex=1.2,xpd=NA)
     }
     graphics::par(op)
 }
