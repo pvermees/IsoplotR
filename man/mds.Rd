@@ -78,7 +78,7 @@ MDS coordinates, respectively.}
 \item{method}{either \code{'KS'} (for the Kolmogorov-Smirnov
 distance) or \code{'W2'} (for the Wasserstein-2 distance).}
 
-\item{hide}{vector with indices of aliquots that should be removed
+\item{hide}{vector with indices of samples that should be removed
 from the plot.}
 }
 \value{

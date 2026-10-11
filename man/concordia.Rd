@@ -31,6 +31,7 @@ concordia(
   omit = NULL,
   omit.fill = NA,
   omit.stroke = "grey",
+  nsteps = NULL,
   ...
 )
 }
@@ -207,6 +208,10 @@ aliquots.}
 
 \item{omit.stroke}{stroke colour that should be used for the
 omitted aliquots.}
+
+\item{nsteps}{resolution of the posterior distributions for
+Bayesian credible intervals of disequilibrium-corrected U-Pb
+isochrons}
 
 \item{...}{optional arguments passed on to
 \code{\link{scatterplot}}}

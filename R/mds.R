@@ -66,7 +66,7 @@
 #' @param bg background colour (may be a vector)
 #' @param xlab a string with the label of the x axis
 #' @param ylab a string with the label of the y axis
-#' @param hide vector with indices of aliquots that should be removed
+#' @param hide vector with indices of samples that should be removed
 #'     from the plot.
 #' @param asp aspect ratio of the MDS configuration. See
 #'     \code{plot.window} for further details.
