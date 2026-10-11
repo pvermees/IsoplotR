@@ -131,13 +131,13 @@ XY2WCvM <- function(X,Y){
     fact <- (1-r1%*%WOLS)/(r1%*%tXXinv%*%c1)
     W <- WOLS + fact[1,1] * tXXinv %*% c1
     n <- length(Y)
-    CvM <- 1/(12*n) + sum((X %*% W - Y)^2)
+    misfit <- sum((X %*% W - Y)^2)
     if (any(W<0) || any(W>1)){
-        nnls_fit <- nnls_r(rbind(X,1e4),rbind(Y,1e4))
+        nnls_fit <- nnls(rbind(X,1e4),rbind(Y,1e4))
         W <- nnls_fit$x
-        CvM <- nnls_fit$deviance
+        misfit <- nnls_fit$deviance
     }
-    list(W=W,CvM=CvM)
+    list(W=W,CvM=1/(12*n)+misfit)
 }
 
 empty_ecdf_plot <- function(data_range,...){
