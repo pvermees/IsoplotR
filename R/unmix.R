@@ -27,6 +27,7 @@
 #' @param nboot number of bootstrap replicates.
 #' @param hide vector with indices of samples that should be removed
 #'     from the plot.
+#' @param sigdig the number of significant digits for the results plot.
 #' @param ... additional graphical parameters passed to the plots.
 #' @return If \code{boot=FALSE}, a matrix with one row per sink and
 #'     columns for the estimated source proportions and the Cramer-von
@@ -41,7 +42,7 @@
 #' @export
 unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
                   plot=TRUE,boot=(length(x)-length(source_names)==1),
-                  nboot=500,hide=NULL,...){
+                  nboot=500,hide=NULL,sigdig=2,...){
     # 1. data prep
     wrong_names <- !(source_names %in% names(x))
     if (any(wrong_names)){
@@ -112,10 +113,11 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
         out <- prop
     }
     if (plot){
-        plot_unmix(XYWCvM=XYWCvM,
+        plot_unmix(XYWCvM,out=out,
                    sorted_data=sorted_data,
                    source_names=source_names,
-                   sink_names=sink_names,...)
+                   sink_names=sink_names,
+                   sigdig=sigdig,...)
     }
     out
 }
@@ -142,10 +144,9 @@ empty_ecdf_plot <- function(data_range,...){
          yaxt='n',xlab=NULL,ylab=NULL,...)
 }
 
-plot_unmix <- function(XYWCvM,
-                       sorted_data,
+plot_unmix <- function(XYWCvM,out,sorted_data,
                        source_names,sink_names,
-                       xlab='t (Ma)',...){
+                       xlab='t (Ma)',sigdig=2,...){
     num_sources <- length(source_names)
     num_sinks <- length(sink_names)
     cads <- c(3,3:(2+num_sinks),2+num_sinks)
@@ -194,7 +195,7 @@ plot_unmix <- function(XYWCvM,
                        pch=NA,main='',col='red',xaxt='n',yaxt='n',
                        xlab=NULL,ylab=NULL,add=TRUE,col.01line=NULL)
         graphics::lines(x=samp,y=c(Y),type='s',col='blue')
-        CvM <- signif(XYWCvM[[sink_name]]$CvM,2)
+        CvM <- signif(XYWCvM[[sink_name]]$CvM,digits=sigdig)
         graphics::legend('bottomright',
                          legend=c(sink_name,paste0('CvM = ',CvM)),
                          bty='n',text.col=c('blue','black'))
@@ -213,17 +214,22 @@ plot_unmix <- function(XYWCvM,
                               y=c(num_sinks,num_sinks:1,1),
                               col=colours[i])
             xtext <- (sum_of_weights[,i+1]+sum_of_weights[,i])/2
-            graphics::text(x=xtext,y=num_sinks:1,labels=round(W[,i]),
+            graphics::text(x=xtext,y=num_sinks:1,
+                           labels=signif(W[,i],digits=sigdig),
                            xpd=NA,col='grey40')
         }
         graphics::axis(side=1)
         graphics::mtext(text='%',side=1,line=1.75,cex=cex*0.8)
     } else {
+        result <- paste0(source_names,' = ',round(W[1,]),'%')
+        if (isa(out,'list')){
+            ll <- signif(100*out$ll,digits=sigdig)
+            ul <- signif(100*out$ul,digits=sigdig)
+            result <- paste0(result,paste0(' [',ll,'-',ul,'%]'))
+        }
         graphics::plot(1,type="n",xlim=c(0,10),ylim=c(0,10),
                        xlab="",ylab="",axes=FALSE)
-        graphics::legend('center',
-                         legend=paste0(source_names,' = ',
-                                       round(W[1,]),'%'),
+        graphics::legend('center',legend=result,
                          bty='n',cex=cex*1.2,xpd=NA)
     }
     graphics::par(op)
