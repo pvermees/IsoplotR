@@ -130,7 +130,8 @@ XY2WCvM <- function(X,Y){
     r1 <- matrix(1,nrow=1,ncol=num_sources)
     fact <- (1-r1%*%WOLS)/(r1%*%tXXinv%*%c1)
     W <- WOLS + fact[1,1] * tXXinv %*% c1
-    CvM <- sum((X %*% W - Y)^2)
+    n <- length(Y)
+    CvM <- 1/(12*n) + sum((X %*% W - Y)^2)
     if (any(W<0) || any(W>1)){
         nnls_fit <- nnls_r(rbind(X,1e4),rbind(Y,1e4))
         W <- nnls_fit$x

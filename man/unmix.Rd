@@ -9,10 +9,10 @@ unmix(
   nsources = 2,
   source_names = names(x)[1:nsources],
   plot = TRUE,
-  boot = FALSE,
+  boot = (length(x) - length(source_names) == 1),
   nboot = 500,
-  recurse = TRUE,
   hide = NULL,
+  sigdig = 2,
   ...
 )
 }
@@ -35,11 +35,10 @@ datasets to estimate confidence limits for the proportions.}
 
 \item{nboot}{number of bootstrap replicates.}
 
-\item{recurse}{logical flag indicating whether to recursively test
-solutions in which one or more source proportions are zero.}
-
 \item{hide}{vector with indices of samples that should be removed
 from the plot.}
+
+\item{sigdig}{the number of significant digits for the results plot.}
 
 \item{...}{additional graphical parameters passed to the plots.}
 }
