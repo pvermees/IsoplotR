@@ -121,7 +121,14 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
 
 XY2WCvM <- function(X,Y){
     num_sources <- ncol(X)
-    tXXinv <- solve(t(X)%*%X)
+    tXX <- t(X) %*% X
+    tXXinv <- tryCatch({
+        solve(tXX)
+    }, error = function(e){
+        warning("Non positive definite source matrix: ",
+                "using generalised inverse fallback.")
+        MASS::ginv(tXX)
+    })
     WOLS <- tXXinv%*%t(X)%*%Y
     c1 <- matrix(1,nrow=num_sources,ncol=1)
     r1 <- matrix(1,nrow=1,ncol=num_sources)
