@@ -69,9 +69,6 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
     colnames(prop) <- c(source_names,'CvM')
     # 2. get the mixing proportions
     XYWCvM <- list()
-    prop <- matrix(NA,nrow=num_sinks,ncol=num_sources+1)
-    rownames(prop) <- sink_names
-    colnames(prop) <- c(source_names,'CvM')
     for (sink_name in sink_names){
         sink_data <- sorted_data[[sink_name]]
         length_sink <- length(sink_data)
@@ -95,10 +92,10 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
         dimnames(W_replicates) <- list(NULL, sink_names, source_names)
         for (b in 1:nboot) {
             x_boot <- x2calc
-            for (source_name in source_names) {
-                n_source <- length(x2calc[[source_name]])
-                idx <- sample(1:n_source, replace=TRUE)
-                x_boot[[source_name]] <- x2calc[[source_name]][idx]
+            for (samp_name in c(source_names,sink_names)) {
+                ng <- length(x2calc[[samp_name]])
+                idx <- sample(1:ng, replace=TRUE)
+                x_boot[[samp_name]] <- x2calc[[samp_name]][idx]
             }
             fit <- unmix(x_boot, nsources=nsources,
                          source_names=source_names,
