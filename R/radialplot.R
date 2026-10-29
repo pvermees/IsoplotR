@@ -740,6 +740,7 @@ x2zs <- function(x,...){
 #' @param to maximum value
 #' @param transformation either 'log', 'linear', 'sqrt', 'arcsin' or NA
 #' @noRd
+#' @export
 x2zs.default <- function(x,z0=NA,from=NA,to=NA,transformation=NA,xlab=NULL,...){
     out <- list()
     if (is.na(transformation)) out$transformation <- 'log'
@@ -799,6 +800,7 @@ x2zs.default <- function(x,z0=NA,from=NA,to=NA,transformation=NA,xlab=NULL,...){
     out
 }
 #' @noRd
+#' @export
 x2zs.fissiontracks <- function(x,z0=NA,from=NA,to=NA,transformation=NA,...){
     out <- list()
     if (transformation %in% c('linear','log','arcsin','sqrt')){

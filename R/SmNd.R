@@ -2,6 +2,7 @@
 #' x = matrix with columns 'Sm[ppm]','errSm[ppm]', 'Nd[ppm]','errNd[ppm]' 
 #' and 'Nd143Nd144','errNd143Nd144'
 #' @noRd
+#' @export
 ppm2ratios.SmNd <- function(x,exterr=FALSE,common=FALSE,...){
     R4452Sm <- iratio('Sm144Sm152')[1]
     R4752Sm <- iratio('Sm147Sm152')[1]

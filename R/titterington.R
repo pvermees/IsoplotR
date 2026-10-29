@@ -368,6 +368,7 @@ data2tit <- function(x,...){
     UseMethod("data2tit",x)
 }
 #' @noRd
+#' @export
 data2tit.default <- function(x,...){
     stop('default function undefined')
 }
@@ -376,6 +377,7 @@ data2tit.default <- function(x,...){
 #' @param generic \if \code{TRUE}, uses X, Y, Z labels,
 #' otherwise uses isotopic ratio labels
 #' @noRd
+#' @export
 data2tit.ThU <- function(x,osmond=TRUE,generic=TRUE,...){
     ns <- length(x)
     out <- matrix(0,ns,9)

@@ -2,6 +2,7 @@
 #' x = matrix with columns 'Rbppm','errRbppm', 'Srppt','errSrppt' 
 #' and 'Sr87Sr86','errSr87Sr86'
 #' @noRd
+#' @export
 ppm2ratios.RbSr <- function(x,exterr=FALSE,common=FALSE,...){
     R57Rb <- iratio('Rb85Rb87')[1]
     R46Sr <- iratio('Sr84Sr86')[1]

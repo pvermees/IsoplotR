@@ -192,16 +192,19 @@ anchoredYork <- function(x,y0=0,sy0=0){
 #' @noRd
 iratio_anchor <- function(x,...){ UseMethod("iratio_anchor",x) }
 #' @noRd
+#' @export
 iratio_anchor.default <- function(x,...){
     y0rat <- gety0rat(x)
     c(1,iratio(y0rat[1]))
 }
 #' @noRd
+#' @export
 iratio_anchor.PbPb <- function(x,...){
     y0rat <- gety0rat(x)
     c(1,iratio(y0rat[1]),iratio(y0rat[2]))
 }
 #' @noRd
+#' @export
 iratio_anchor.ThU <- function(x,...){
     c(1,x$U8Th2,0,x$U8Th2,0)
 }
@@ -217,24 +220,34 @@ iratio_anchor.ThU <- function(x,...){
 #' @noRd
 gety0rat <- function(x,...){ UseMethod("gety0rat",x) }
 #' @noRd
+#' @export
 gety0rat.default <- function(x,...){ NULL }
 #' @noRd
+#' @export
 gety0rat.ArAr <- function(x,...){ 'Ar40Ar36' }
 #' @noRd
+#' @export
 gety0rat.ThPb <- function(x,...){ 'Pb208Pb204' }
 #' @noRd
+#' @export
 gety0rat.PbPb <- function(x,...){ c('Pb207Pb204','Pb206Pb204') }
 #' @noRd
+#' @export
 gety0rat.KCa <- function(x,...){ paste0('Ca40Ca',x$sister) }
 #' @noRd
+#' @export
 gety0rat.RbSr <- function(x,...){ 'Sr87Sr86' }
 #' @noRd
+#' @export
 gety0rat.ReOs <- function(x,...){ 'Os187Os188' }
 #' @noRd
+#' @export
 gety0rat.SmNd <- function(x,...){ 'Nd143Nd144' }
 #' @noRd
+#' @export
 gety0rat.LuHf <- function(x,...){ 'Hf176Hf177' }
 #' @noRd
+#' @export
 gety0rat.ThU <- function(x,...){ c('Th230Th232','U238Th232') }
 
 #' Returns the Daughter-Parent ratio
@@ -247,24 +260,34 @@ gety0rat.ThU <- function(x,...){ c('Th230Th232','U238Th232') }
 #' @noRd
 getDPrat <- function(x,...){ UseMethod("getDPrat",x) }
 #' @noRd
+#' @export
 getDPrat.default <- function(x,...){ NULL }
 #' @noRd
+#' @export
 getDPrat.ArAr <- function(x,...){ 'Ar40Ar39' }
 #' @noRd
+#' @export
 getDPrat.PbPb <- function(x,...){ 'Pb207Pb206' }
 #' @noRd
+#' @export
 getDPrat.ThPb <- function(x,...){ 'Pb208Th232' }
 #' @noRd
+#' @export
 getDPrat.KCa <- function(x,...){ 'Ca40K40' }
 #' @noRd
+#' @export
 getDPrat.RbSr <- function(x,...){ 'Sr87Rb87' }
 #' @noRd
+#' @export
 getDPrat.ReOs <- function(x,...){ 'Os187Re187' }
 #' @noRd
+#' @export
 getDPrat.SmNd <- function(x,...){ 'Nd143Sm147' }
 #' @noRd
+#' @export
 getDPrat.LuHf <- function(x,...){ 'Hf176Lu176' }
 #' @noRd
+#' @export
 getDPrat.ThU <- function(x,...){ 'Th230U238' }
 
 #' Returns the radioactive parent
@@ -277,16 +300,23 @@ getDPrat.ThU <- function(x,...){ 'Th230U238' }
 #' @noRd
 getParent <- function(x,...){ UseMethod("getParent",x) }
 #' @noRd
+#' @export
 getParent.default <- function(x,...){ NULL }
 #' @noRd
+#' @export
 getParent.ThPb <- function(x,...){ 'Th232' }
 #' @noRd
+#' @export
 getParent.KCa <- function(x,...){ 'K40' }
 #' @noRd
+#' @export
 getParent.RbSr <- function(x,...){ 'Rb87' }
 #' @noRd
+#' @export
 getParent.ReOs <- function(x,...){ 'Re187' }
 #' @noRd
+#' @export
 getParent.SmNd <- function(x,...){ 'Sm147' }
 #' @noRd
+#' @export
 getParent.LuHf <- function(x,...){ 'Lu176' }

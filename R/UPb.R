@@ -1086,6 +1086,7 @@ get_Pb207U235_age <- function(x,...){
 #' @param exterr propagate the decay constant uncertainty?
 #' @param d an object of class \code{diseq}
 #' @noRd
+#' @export
 get_Pb207U235_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
     ns <- length(x)
     if (ns>1){
@@ -1124,6 +1125,7 @@ get_Pb207U235_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),...){
 }
 #' @param i an aliquot number. If \code{NULL}, returns all ages
 #' @noRd
+#' @export
 get_Pb207U235_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     r75 <- get_Pb207U235_ratios(x)
     if (is.null(i)){
@@ -1139,6 +1141,7 @@ get_Pb207U235_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 get_Pb207U235_age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb207U235'
     r75 <- x$x[i]
@@ -1160,6 +1163,7 @@ get_Pb206U238_age <- function(x,...){
 #' @param plot if \code{TRUE}, plots the aforementioned posterior
 #'     distribution
 #' @noRd
+#' @export
 get_Pb206U238_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
                                       bayes=FALSE,plot=FALSE,...){
     ns <- length(x)
@@ -1209,6 +1213,7 @@ get_Pb206U238_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),
 }
 #' @param i an aliquote number. If \code{NULL}, returns all ages
 #' @noRd
+#' @export
 get_Pb206U238_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     r68 <- get_Pb206U238_ratios(x)
     if (is.null(i)){
@@ -1225,6 +1230,7 @@ get_Pb206U238_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 get_Pb206U238_age.wetherill <- function(x,exterr=FALSE,...){
     i <- 'Pb206U238'
     r68 <- x$x[i]
@@ -1232,6 +1238,7 @@ get_Pb206U238_age.wetherill <- function(x,exterr=FALSE,...){
     get_Pb206U238_age(r68,sr68,exterr=exterr,d=x$d,...)
 }
 #' @noRd
+#' @export
 get_Pb206U238_age.terawasserburg <- function(x,exterr=FALSE,...){
     i <- 'U238Pb206'
     r86 <- x$x[i]
@@ -1256,6 +1263,7 @@ get_Pb207Pb206_age <- function(x,...){
 #' @param d an object of class \code{diseq}
 #' @param t.68 a Pb206/U238-age to initialise the calculation
 #' @noRd
+#' @export
 get_Pb207Pb206_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,...){
     ns <- length(x)
     if (ns>1){
@@ -1301,12 +1309,14 @@ get_Pb207Pb206_age.default <- function(x,sx=0,exterr=FALSE,d=diseq(),t.68=NULL,.
 }
 #' @param i and aliquot number
 #' @noRd
+#' @export
 get_Pb207Pb206_age.UPb <- function(x,i=1,exterr=FALSE,...){
     r76 <- get_Pb207Pb206_ratios(x)
     get_Pb207Pb206_age(r76[i,'Pb207Pb206'],r76[i,'errPb207Pb206'],
                        exterr=exterr,d=x$d[i],...)
 }
 #' @noRd
+#' @export
 get_Pb207Pb206_age.wetherill <- function(x,exterr=FALSE,...){
     U <- iratio('U238U235')[1]
     r76 <- x$x['Pb207U235']/(U*x$x['Pb206U238'])
@@ -1318,6 +1328,7 @@ get_Pb207Pb206_age.wetherill <- function(x,exterr=FALSE,...){
     get_Pb207Pb206_age(r76,sr76,exterr=exterr,d=x$d)
 }
 #' @noRd
+#' @export
 get_Pb207Pb206_age.terawasserburg <- function(x,exterr=FALSE,...){
     r76 <- x$x['Pb207Pb206']
     sr76 <- x$cov['Pb207Pb206','Pb207Pb206']
@@ -1333,6 +1344,7 @@ get_Pb208Th232_age <- function(x,...){
 #' @param sx the standard error of \code{x}
 #' @param exterr propagate the decay constant uncertainty?
 #' @noRd
+#' @export
 get_Pb208Th232_age.default <- function(x,sx=0,exterr=FALSE,...){
     ns <- length(x)
     if (ns>1){
@@ -1363,6 +1375,7 @@ get_Pb208Th232_age.default <- function(x,sx=0,exterr=FALSE,...){
 }
 #' @param i an aliquot number
 #' @noRd
+#' @export
 get_Pb208Th232_age.UPb <- function(x,i=NULL,exterr=FALSE,...){
     r82 <- get_Pb208Th232_ratios(x)
     if (is.null(i)){

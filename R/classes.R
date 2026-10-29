@@ -159,11 +159,9 @@
 #' @seealso read.data diseq
 #' @name classes
 #' @aliases UPb PbPb ThPb ThU ArAr KCa PD RbSr SmNd LuHf ReOs UThHe
-#'     fissiontracks detritals is.UPb is.PbPb is.ThPb is.ThU is.ArAr
-#'     is.KCa is.PD is.RbSr is.SmNd is.LuHf is.ReOs is.UThHe
-#'     is.fissiontracks is.detritals is.other as.UPb as.PbPb as.ThPb
-#'     as.ThU as.ArAr as.KCa as.PD as.RbSr as.SmNd as.LuHf as.ReOs
-#'     as.UThHe as.fissiontracks as.detritals as.other
+#' @aliases fissiontracks detritals is.UPb is.PbPb is.ThPb is.ThU is.ArAr is.KCa is.PD is.RbSr is.SmNd is.LuHf
+#' @aliases is.ReOs is.UThHe is.fissiontracks is.detritals is.other as.UPb as.PbPb as.ThPb as.ThU as.ArAr as.KCa as.PD
+#' @aliases as.RbSr as.SmNd as.LuHf as.ReOs as.UThHe as.fissiontracks as.detritals as.other
 NULL
 
 #' @rdname classes

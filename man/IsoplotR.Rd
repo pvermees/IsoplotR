@@ -28,4 +28,9 @@ Useful links:
 \author{
 \strong{Maintainer}: Pieter Vermeesch \email{p.vermeesch@ucl.ac.uk}
 
+Authors:
+\itemize{
+  \item Pieter Vermeesch \email{p.vermeesch@ucl.ac.uk}
+}
+
 }

@@ -17,6 +17,7 @@
 #' @noRd
 LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @noRd
+#' @export
 LRisochron.default <- function(x,left=FALSE,
                                hide=NULL,omit=NULL,
                                a=NULL,b=NULL,...){
@@ -55,6 +56,7 @@ LRisochron.default <- function(x,left=FALSE,
 #'
 #' If \code{anchor[1]=2}: fix the age at the value stored in \code{anchor[2]}.
 #' @noRd
+#' @export
 LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,
                            hide=NULL,omit=NULL,left=FALSE,...){
     if (x$format<3){
