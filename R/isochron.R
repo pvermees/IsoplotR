@@ -1464,6 +1464,7 @@ w2disp <- function(x,...){ UseMethod("w2disp",x) }
 #' @param wtype the dispersion type (0, 1, or 2)
 #' @param inverse logical
 #' @noRd
+#' @export
 w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     if (wtype==2){
         out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
@@ -1476,6 +1477,7 @@ w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     out
 }
 #' @noRd
+#' @export
 w2disp.other <- function(x,fit,wtype,inverse,...){
     if (wtype==2){
         out <- fit$DP[1]*fit$flippedfit$w/fit$flippedfit$a[1]
@@ -1487,6 +1489,7 @@ w2disp.other <- function(x,fit,wtype,inverse,...){
     out
 }
 #' @noRd
+#' @export
 w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     if (inverse){
         if (wtype==1){
@@ -1506,6 +1509,7 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
 }
 #' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
 #' @noRd
+#' @export
 w2disp.ThU <- function(x,fit,type,wtype,...){
     if (x$format < 3){
         out <- fit$w
@@ -1528,6 +1532,7 @@ w2disp.ThU <- function(x,fit,type,wtype,...){
     out
 }
 #' @noRd
+#' @export
 w2disp.UThHe <- function(x,fit,wtype,...){
     if (wtype==2){
         out <- fit$age[1]*fit$w/fit$b[1]
@@ -1542,8 +1547,10 @@ w2disp.UThHe <- function(x,fit,wtype,...){
 #' @noRd
 wDP2wt <- function(x,...){ UseMethod("wDP2wt",x) }
 #' @noRd
+#' @export
 wDP2wt.default <- function(x,...){stop("Not implemented.")}
 #' @noRd
+#' @export
 wDP2wt.ArAr <- function(x,DP,wDP,...){
     l40 <- lambda('K40')[1]
     dtdDP <- x$J[1]/(l40*(1+DP*x$J[1]))
@@ -1552,22 +1559,26 @@ wDP2wt.ArAr <- function(x,DP,wDP,...){
 #' @param DP a daughter-parent ratio
 #' @param wDP the overdispersion of DP
 #' @noRd
+#' @export
 wDP2wt.ThPb <- function(x,DP,wDP,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='Th232')
 }
 #' @param bratio branching ratio
 #' @noRd
+#' @export
 wDP2wt.KCa <- function(x,DP,wDP,bratio=0.895,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
 }
 #' @param nuclide the parent nuclide
 #' @noRd
+#' @export
 wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]
     dtdDP <- 1/(lambda*(1+DP*bratio))
     abs(dtdDP*wDP)
 }
 #' @noRd
+#' @export
 wDP2wt.PbPb <- function(x,DP,wDP,...){
     tt <- get_Pb207Pb206_age(DP)[1]
     McL <- mclean(tt=tt)
@@ -1575,6 +1586,7 @@ wDP2wt.PbPb <- function(x,DP,wDP,...){
     abs(dtdDP*wDP)
 }
 #' @noRd
+#' @export
 wDP2wt.ThU <- function(x,DP,wDP,...){
     l0 <- lambda('Th230')[1]
     dtdDP <- 1/(l0*(1-DP))
@@ -1587,6 +1599,7 @@ wDP2wt.ThU <- function(x,DP,wDP,...){
 ab2y0t <- function(x,...){ UseMethod("ab2y0t",x) }
 #' @param fit the output of york(), MLyork() or ludwig()
 #' @noRd
+#' @export
 ab2y0t.default <- function(x,fit,...){
     out <- fit
     if (inflate(fit)){
@@ -1601,6 +1614,7 @@ ab2y0t.default <- function(x,fit,...){
 #' @param exterr propagate decay constant errors?
 #' @param y0option for datasets containing 204Pb or 208Pb (see ?isochron)
 #' @noRd
+#' @export
 ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
     tt <- fit$par['t']
     out <- fit
@@ -1650,6 +1664,7 @@ ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
 #' @param inverse logical
 #' @param wtype controls type of dispersion (0, 1 or 2)
 #' @noRd
+#' @export
 ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse){
@@ -1672,6 +1687,7 @@ ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
 }
 #' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
 #' @noRd
+#' @export
 ab2y0t.ThU <- function(x,fit,type,exterr,wtype,...){
     if (x$format<3){
         stop('ab2y0t only works for Th-U formats 3 and 4.')
@@ -1708,6 +1724,7 @@ ab2y0t.ThU <- function(x,fit,type,exterr,wtype,...){
     out
 }
 #' @noRd
+#' @export
 ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse) {
@@ -1731,17 +1748,20 @@ ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     out
 }
 #' @noRd
+#' @export
 ab2y0t.ThPb <- function(x,fit,inverse,exterr,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='Th232',wtype=wtype)
 }
 #' @noRd
+#' @export
 ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=0.895,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='K40',bratio=bratio,wtype=wtype)
 }
 #' @param bratio branching ratio
 #' @noRd
+#' @export
 ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     nuclide <- getParent(x)
     out <- fit
@@ -1769,6 +1789,7 @@ ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     out
 }
 #' @noRd
+#' @export
 ab2y0t.UThHe <- function(x,fit,wtype,...){
     out <- fit
     out$y0[c('y','s[y]')] <- fit$a
@@ -1783,6 +1804,7 @@ ab2y0t.UThHe <- function(x,fit,wtype,...){
     out
 }
 #' @noRd
+#' @export
 ab2y0t.other <- function(x,fit,inverse,wtype,...){
     out <- fit
     if (inverse){
@@ -1819,10 +1841,12 @@ ab2y0t.other <- function(x,fit,inverse,wtype,...){
 #' @noRd
 getIsochronLabels <- function(x,...){ UseMethod("getIsochronLabels",x) }
 #' @noRd
+#' @export
 getIsochronLabels.default <- function(x,...){stop("Not implemented.")}
 #' @param inverse logical
 #' @param taxis label the x-axis with time
 #' @noRd
+#' @export
 getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1841,6 +1865,7 @@ getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1859,6 +1884,7 @@ getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1877,6 +1903,7 @@ getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1895,6 +1922,7 @@ getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1913,6 +1941,7 @@ getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1932,6 +1961,7 @@ getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
 }
 #' @param type controls the isochron projection
 #' @noRd
+#' @export
 getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1969,6 +1999,7 @@ getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.PbPb <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -1982,6 +2013,7 @@ getIsochronLabels.PbPb <- function(x,inverse,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -2000,6 +2032,7 @@ getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.other <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -2013,6 +2046,7 @@ getIsochronLabels.other <- function(x,inverse,...){
     out
 }
 #' @noRd
+#' @export
 getIsochronLabels.ThU <- function(x,type,...){
     out <- list()
     if (x$format%in%c(1,2)){
@@ -2147,6 +2181,7 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
 add_taxis <- function(x,...){ UseMethod("add_taxis",x) }
 #' @param fit the output of york(), MLyork() or ludwig()
 #' @noRd
+#' @export
 add_taxis.default <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
@@ -2162,6 +2197,7 @@ add_taxis.default <- function(x,fit,...){
     plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,...)
 }
 #' @noRd
+#' @export
 add_taxis.ArAr <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
@@ -2177,6 +2213,7 @@ add_taxis.ArAr <- function(x,fit,...){
 }
 #' @param type controls the isochron projection
 #' @noRd
+#' @export
 add_taxis.UPb <- function(x,fit,type=1,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3

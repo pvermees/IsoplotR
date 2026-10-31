@@ -109,6 +109,7 @@ agerr <- function(x,...){ UseMethod("agerr",x) }
 #' @param oerr output error (1:4 for 1 or 2 sigma, absolute or relative)
 #' @param sigdig number of significant digits
 #' @noRd
+#' @export
 agerr.default <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
     tst[2] <- ci(x=x[1],sx=x[2],oerr=oerr)
@@ -117,6 +118,7 @@ agerr.default <- function(x,oerr=1,sigdig=NA,...){
     out
 }
 #' @noRd
+#' @export
 agerr.matrix <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
     nc <- ncol(x)
@@ -262,6 +264,7 @@ get_ntit <- function(x,...){
 #' @param M maximum cutoff. Valus above this are removed from the
 #'     total sample size
 #' @noRd
+#' @export
 get_ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
     ns <- length(x)
     bad <- which(is.na(x) | x<m | x>M)
@@ -271,6 +274,7 @@ get_ntit.default <- function(x,m=min(x,na.rm=TRUE),M=max(x,na.rm=TRUE),...){
     paste0(out,ns,')')
 }
 #' @noRd
+#' @export
 get_ntit.fissiontracks <- function(x,...){
     if (x$format<2){
         out <- get_ntit.default(x$x[,'Ns'])

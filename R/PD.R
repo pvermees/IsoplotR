@@ -88,6 +88,7 @@ get_nominal_initials <- function(x){
 #' @noRd
 ppm2ratios <- function(x,...){ UseMethod("ppm2ratios",x) }
 #' @noRd
+#' @export
 ppm2ratios.default <- function(x,...){
     stop('Method ppm2ratios not available for this class.')
 }

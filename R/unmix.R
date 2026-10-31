@@ -100,7 +100,7 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
             fit <- unmix(x_boot, nsources=nsources,
                          source_names=source_names,
                          plot=FALSE, boot=FALSE)
-            W_replicates[b, , ] <- fit[1:num_sources]
+            W_replicates[b, , ] <- fit[,1:num_sources]
         }
         alpha <- settings('alpha')
         ll <- apply(W_replicates, c(2,3), stats::quantile, probs=alpha/2)
@@ -120,20 +120,10 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
 }
 
 XY2WCvM <- function(X,Y){
-    num_sources <- ncol(X)
-    tXXinv <- solve(t(X)%*%X)
-    WOLS <- tXXinv%*%t(X)%*%Y
-    c1 <- matrix(1,nrow=num_sources,ncol=1)
-    r1 <- matrix(1,nrow=1,ncol=num_sources)
-    fact <- (1-r1%*%WOLS)/(r1%*%tXXinv%*%c1)
-    W <- WOLS + fact[1,1] * tXXinv %*% c1
     n <- length(Y)
-    misfit <- sum((X %*% W - Y)^2)
-    if (any(W<0) || any(W>1)){
-        nnls_fit <- nnls(rbind(X,1e4),rbind(Y,1e4))
-        W <- nnls_fit$x
-        misfit <- nnls_fit$deviance
-    }
+    nnls_fit <- nnls(rbind(X,1e4),rbind(Y,1e4))
+    W <- nnls_fit$x
+    misfit <- nnls_fit$deviance
     list(W=W,CvM=1/(12*n)+misfit)
 }
 

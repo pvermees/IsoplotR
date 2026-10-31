@@ -232,6 +232,7 @@ Wasserstein_diss <- function(x,y,p=2) {
 }
 
 #' @noRd
+#' @export
 plot.MDS <- function(x,nnlines=FALSE,pos=NULL,shepard=FALSE,
                      col='black',bg='white',xlab=NA,ylab=NA,asp=1,pch,...){
     if (shepard & !x$classical){

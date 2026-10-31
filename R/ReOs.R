@@ -5,6 +5,7 @@
 #' @param common remove the non-radiogenic component using the
 #'     isotopic ratios stored in \code{settings('iratio',...)}
 #' @noRd
+#' @export
 ppm2ratios.ReOs <- function(x,exterr=FALSE,common=FALSE,...){
     R57Re <- iratio('Re185Re187')[1]
     R48Os <- iratio('Os184Os188')[1]

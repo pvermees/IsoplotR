@@ -2,6 +2,7 @@
 #' with columns 'Luppm','errLuppm', 'Hfppm','errHfppm' and
 #' 'Hf176Hf177','errHf176Hf177'
 #' @noRd
+#' @export
 ppm2ratios.LuHf <- function(x,exterr=FALSE,common=FALSE,...){
     R65Lu <- iratio('Lu176Lu175')[1]
     R47Hf <- iratio('Hf174Hf177')[1]
