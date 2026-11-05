@@ -411,11 +411,13 @@ invertible <- function(hess){
 
 inverthess <- function(hess){
     if (invertible(hess)){
-        return(solve(hess))
+        out <- MASS::ginv(hess)
     } else {
         H <- nearPD(hess)
-        return(solve(H))
+        out <- MASS::ginv(H)
     }
+    dimnames(out) <- dimnames(hess)
+    out
 }
 
 det3x3 <- function(vx,vy,vz,sxy,sxz,syz){

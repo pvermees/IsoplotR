@@ -543,20 +543,21 @@ BIC_fit <- function(x,max.k,...){
     }) 
 }
 
+# maps the parameters from -Inf/+Inf to model space
+min_age_model_mappar <- function(par,Mz=NA){
+    np <- length(par)
+    gam <- par[1]
+    prop <- exp(par[2])/(1+exp(par[2]))
+    sig <- exp(par[3])
+    if (np<4) mu <- gam
+    else mu <- gam + (Mz-gam)*exp(par[4])/(1+exp(par[4]))
+    c(gam,prop,sig,mu)
+}
+
 min_age_model <- function(zs,np=3){
-    # maps the parameters from -Inf/+Inf to model space
-    mappar <- function(par,Mz){
-        np <- length(par)
-        gam <- par[1]
-        prop <- exp(par[2])/(1+exp(par[2]))
-        sig <- exp(par[3])
-        if (np<4) mu <- gam
-        else mu <- gam + (Mz-gam)*exp(par[4])/(1+exp(par[4]))
-        c(gam,prop,sig,mu)
-    }
     # computes the log-likelihood function using the transformed parameters
     LL <- function(par,zs,Mz){
-        get_minage_L(pars=mappar(par,Mz),zs=zs)
+        get_minage_L(pars=min_age_model_mappar(par,Mz),zs=zs)
     }
     z <- sort(zs[,1])
     mz <- z[1]
@@ -574,7 +575,7 @@ min_age_model <- function(zs,np=3){
         return(min_age_model(zs=zs,np=3))
     }
     lE <- inverthess(H)
-    par <- mappar(fit$par,Mz)
+    par <- min_age_model_mappar(fit$par,Mz)
     # propagate the uncertainties from -Inf/+Inf to model space
     J <- diag(np)
     J[2,2] <- exp(fit$par[2])/(1+exp(fit$par[2]))^2
@@ -588,8 +589,7 @@ min_age_model <- function(zs,np=3){
         warning('Singular covariance matrix, reduced number of parameters from 4 to 3')
         out <- min_age_model(zs=zs,np=3)
     } else {
-        out <- list()
-        out$L <- fit$value
+        out <- fit
         out$peaks <- matrix(0,2,1)
         rownames(out$peaks) <- c('t','s[t]')
         out$peaks['t',] <- par[1]

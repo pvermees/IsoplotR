@@ -932,13 +932,19 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,title=TRUE,exterr=FALSE,model=1,
-                          wtype=1,anchor=0,show.ellipses=1*(model!=2),
+                          wtype=1,anchor=0,left=FALSE,
+                          show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',taxis=FALSE,...){
     taxis <- taxis & inverse
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-    fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
-                   anchor=anchor,hide=hide,omit=omit,J=x$J[1],sJ=x$J[2])
+    if (model==4){
+        fit <- LRisochron(x,inverse=inverse,
+                          left=left,hide=hide,omit=omit)
+    } else {
+        fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
+                       anchor=anchor,hide=hide,omit=omit,J=x$J[1],sJ=x$J[2])
+    }
     out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr,wtype=wtype)
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
@@ -1321,17 +1327,18 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 
 isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                           units=' Ma',displabel='dispersion =',
-                          dispunits='',ski=NULL,y0option=1,...){
+                          dispunits='',ski=NULL,
+                          y0option=1,n=fit$n,...){
     content <- list()
     if (is.null(type)){
-        content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,
+        content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=n,
                                 units=units,prefix='intercept =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$b[1],sx=fit$b[-1],ntit='',
                                 units=units,prefix='slope =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
     } else if (type=='generic'){
-        content[[1]] <- maintit(x=fit$Dd[1],sx=fit$Dd[-1],n=fit$n,units=units,
+        content[[1]] <- maintit(x=fit$Dd[1],sx=fit$Dd[-1],n=n,units=units,
                                 prefix=quote('[D/d]'[0]*' ='),
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$DP[1],sx=fit$DP[-1],ntit='',units=units,
@@ -1339,12 +1346,12 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
     } else if (type=='U-Pb'){
         if (is.null(fit$posterior) | 't'%ni%names(fit$posterior)){
-            content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+            content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=n,
                                     units=units,sigdig=sigdig,
                                     oerr=oerr,df=fit$df)
         } else {
             content[[1]] <- bayestit(x=fit$par['t'],XL=fit$posterior$t,
-                                     n=fit$n,sigdig=sigdig,oerr=oerr)
+                                     n=n,sigdig=sigdig,oerr=oerr)
         }
         if(is.null(fit$posterior)) pnames <- NULL
         else pnames <- names(fit$posterior)
@@ -1362,11 +1369,11 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                      prefix=fit$y0label)
         }
     } else if (type=='Pb-Pb'){
-        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=n,
                                 units=units,sigdig=sigdig,
                                 oerr=oerr,df=fit$df)
     } else {
-        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=n,
                                 units=units,sigdig=sigdig,
                                 oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
