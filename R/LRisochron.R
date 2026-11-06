@@ -2,7 +2,8 @@
 #'
 #' Modifies the Galbraith and Laslett's minimum age module to fit
 #' overdispersed (Th-U) isochron data.
-#' @param x an IsoplotR data object
+#' @param x an IsoplotR data object or an \eqn{n \times 5} matrix of
+#'     inverse isochron data.
 #' @param left logical, switches between leftmost and rightmost
 #'     isochrons
 #' @param hide vector with indices of aliquots that should be removed
@@ -20,23 +21,16 @@ LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @export
 LRisochron.default <- function(x,left=FALSE,hide=NULL,omit=NULL...){
     d2calc <- clear(x,hide,omit)
-    init <- init_y0(d2calc)
-    y0 <- optimise(f=LL_y0,lower=init$ll,upper=init$ul,
-                   yd=d2calc,left=left)$minimum
-    zs <- y02zs(y0=y0,yd=d2calc,left=left)
-    fit <- min_age_model(zs=zs)
-    H <- optimHess(par=c(fit$par,log(y0)),
-                   fn=LL_LRisochron,yd=d2calc)
-    covmat <- inverthess(H)
+    init <- init_LRisochron(d2calc,left=left)
+    fit <- optim(init,fn=LL_LRisochron,yd=d2calc,hessian=TRUE)
+    covmat <- inverthess(fit$hessian)
     x0 <- exp(ifelse(left,1,-1)*fit$par[1])
-    a <- y0
+    a <- y0 <- exp(fit$par[4])
     b <- -y0/x0
-    prop <- exp(fit$par[2])/(1+exp(fit$par[2]))
-    J <- matrix(0,nrow=3,ncol=4)
-    J[1,4] <- y0                                    # a
-    J[2,1] <- y0/x0                                 # b
-    J[2,4] <- b
-    J[3,2] <- exp(fit$par[2])/(1+exp(fit$par[2]))^2 # prop
+    J <- matrix(0,nrow=2,ncol=4)
+    J[1,4] <- y0    # d(a)/d(log[y0])
+    J[2,1] <- y0/x0 # d(b)/d(log[x0])
+    J[2,4] <- b     # d(b)/d(log[y0])
     E <- J %*% covmat %*% t(J)
     list(a=unname(c(a,sqrt(E[1,1]))),
          b=unname(c(b,sqrt(E[2,2]))),
@@ -66,11 +60,13 @@ LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,
     stop('Not implemented yet')
 }
 
-init_y0 <- function(yd){
+init_LRisochron <- function(yd,left=FALSE){
     dy <- max(yd[,3]) - min(yd[,3])
     dx <- max(yd[,1]) - min(yd[,1])
-    init <- (max(yd[,3]) + min(yd[,1])*dy/dx)
-    list(ll=max(yd[,3]),ul=10*init)
+    y0 <- (max(yd[,3]) + min(yd[,1])*dy/dx)
+    zs <- y02zs(y0=y0,yd=yd,left=left)
+    fit <- min_age_model(zs=zs)
+    c(fit$par,log(y0))
 }
 
 y02zs <- function(y0,yd,left=FALSE){
@@ -87,11 +83,6 @@ y02zs <- function(y0,yd,left=FALSE){
     z[pos] <- sgn*log(DP[pos])
     s <- sDP/DP
     cbind(z,s)
-}
-
-LL_y0 <- function(y0,yd,left=FALSE){
-    zs <- y02zs(y0=y0,yd=yd,left=left)
-    min_age_model(zs=zs)$value
 }
 
 LL_LRisochron <- function(p,yd,left=FALSE){
