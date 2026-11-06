@@ -939,8 +939,8 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
     taxis <- taxis & inverse
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
     if (model==4){
-        fit <- LRisochron(x,inverse=inverse,
-                          left=left,hide=hide,omit=omit)
+        fit <- LRisochron(x,inverse=inverse,left=left,
+                          hide=hide,omit=omit,anchor=anchor)
     } else {
         fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
                        anchor=anchor,hide=hide,omit=omit,J=x$J[1],sJ=x$J[2])
