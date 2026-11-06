@@ -71,7 +71,7 @@ get_ThU_age <- function(Th230U238,sTh230U238,
     sa <- sU234U238
     sA <- sTh230U238
     covAa <- cov4808
-    fit <- stats::optimize(ThU_misfit,interval=c(0,2000),
+    fit <- stats::optimise(ThU_misfit,interval=c(0,2000),
                            A=A,a=a,l0=l0,l4=l4,
                            Th2U8=Th232U238,Th02i=Th230Th232i)
     tt <- fit$minimum

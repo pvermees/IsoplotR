@@ -23,7 +23,8 @@ LRisochron.default <- function(x,left=FALSE,
                                hide=NULL,omit=NULL,
                                anchor=0,...){
     d2calc <- clear(x,hide,omit)
-    init <- init_LRisochron(d2calc,left=left,anchor=anchor)
+    init <- init_LRisochron(d2calc,left=left,
+                            anchor=anchor)
     fit <- optim(init,fn=LL_LRisochron,yd=d2calc,
                  anchor=anchor,hessian=TRUE)
     covmat <- matrix(0,4,4)
@@ -80,7 +81,18 @@ LRisochron.ArAr <- function(x,inverse=TRUE,left=FALSE,
 #' @export
 LRisochron.ThU <- function(x,inverse=TRUE,anchor=0,
                            hide=NULL,omit=NULL,left=FALSE,...){
-    stop('Not implemented yet')
+    if (x$format<3){
+        stop("Rightmost isochrons are only available for ThU formats 3 and 4.")
+    }
+    x2calc <- clear(x,hide,omit)
+    init <- init_LRisochron_ThU(x2calc,anchor=anchor,left=left)
+    if (inverse){
+        out <- invertfit(out,type='d')
+        out$xyz <- normal2inverse(yd,type='d')
+    } else {
+        out$xyz <- yd
+    }
+    out
 }
 
 init_LRisochron <- function(yd,left=FALSE,anchor=0){
@@ -107,6 +119,20 @@ init_LRisochron <- function(yd,left=FALSE,anchor=0){
     }
     out
 }
+init_LRisochron_ThU <- function(x,left=FALSE,anchor=0){
+    if (anchor[1]==1){
+        y0 <- x$U8Th2
+    } else if (anchor[1]==2 & length(anchor)>1){
+        gam <- log(anchor[2])
+    } else {
+        y0 <- 1
+    }
+    tst <- get_ThU_age_volcanics(x=x,Th0i=y0)
+    zs <- cbind(log(tst[,1]),tst[,2]/tst[,1])
+    fit <- min_age_model(zs=zs)
+    out <- c(fit$par,log(y0))
+    out
+}
 
 y02zs <- function(y0,yd,left=FALSE){
     DP <- yd[,'X']*y0/(y0-yd[,'Y'])
@@ -122,6 +148,12 @@ y02zs <- function(y0,yd,left=FALSE){
     z[pos] <- sgn*log(DP[pos])
     s <- sDP/DP
     cbind(z,s)
+}
+y02zs_ThU <- function(y0,yd,left=FALSE){
+    tst <- get_ThU_age(Th230U238=yd[,'Y'],sTh230U238=yd[,'sY'],
+                       Th232U238=yd[,'X'],sTh232U238=yd[,'sX'],
+                       Th230Th232i=y0,sTh230Th232i=0)
+    cbind(log(tst[,1]),tst[,2]/tst[,1])
 }
 
 LL_LRisochron <- function(p,yd,left=FALSE,anchor=0){
