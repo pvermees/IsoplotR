@@ -618,7 +618,7 @@ get_ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #' }
 #' @export
 age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,
-                      d=diseq(),J,sJ=0,bratio=0.895){
+                      d=diseq(),J=NULL,sJ=0,bratio=0.895){
     if (ratio=='Pb206U238'){
         out <- age_to_Pb206U238_ratio(tt,st,d=d,exterr=exterr)
     } else if (ratio=='Pb207U235'){

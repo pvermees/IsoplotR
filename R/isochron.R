@@ -1581,7 +1581,7 @@ wDP2wt.KCa <- function(x,DP,wDP,bratio=0.895,...){
 #' @export
 wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]
-    dtdDP <- 1/(lambda*(1+DP*bratio))
+    dtdDP <- 1/(lambda*(bratio+DP))
     abs(dtdDP*wDP)
 }
 #' @noRd
