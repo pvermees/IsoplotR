@@ -111,7 +111,7 @@
 #' @param exterr propagate the decay constant uncertainty in the
 #'     isochron age?
 #' @param sigdig number of significant digits for the isochron age
-#' @param model if \code{isochron=TRUE}, choose one of three
+#' @param model if \code{isochron=TRUE}, choose one of four
 #'     regression models:
 #'
 #' \code{1}: maximum likelihood regression, using either the modified
@@ -140,6 +140,9 @@
 #' \code{4}: If \code{x$format} is \code{3} or \code{4}, calculate the
 #' rightmost isochron, corresponding to the minimum age component of a
 #' contaminated system.
+#'
+#' @param left logical. If \code{TRUE} and \code{model=4}, fits the
+#'     lefmost isochron to the data.
 #' 
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
@@ -171,7 +174,7 @@ evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
                       transform=FALSE,Th0i=0,show.numbers=FALSE,levels=NULL,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
-                      isochron=FALSE,model=1,exterr=FALSE,sigdig=2,
+                      isochron=FALSE,model=1,left=FALSE,exterr=FALSE,sigdig=2,
                       hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (x$format %in% c(1,2)){
         if (transform){
@@ -199,11 +202,11 @@ evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
             graphics::title(evolution_title(fit,sigdig=sigdig,oerr=oerr))
         }
     } else {
-        Th02vsU8Th2(x,isochron=isochron,model=model,Th0i=Th0i,
-                    xlim=xlim,ylim=ylim,tticks=tticks,aticks=aticks,
-                    oerr=oerr,show.numbers=show.numbers,exterr=exterr,
-                    sigdig=sigdig,levels=levels,clabel=clabel,
-                    ellipse.fill=ellipse.fill,
+        Th02vsU8Th2(x,isochron=isochron,model=model,left=left,
+                    Th0i=Th0i,xlim=xlim,ylim=ylim,tticks=tticks,
+                    aticks=aticks,oerr=oerr,show.numbers=show.numbers,
+                    exterr=exterr,sigdig=sigdig,levels=levels,
+                    clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,line.col=line.col,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
@@ -281,8 +284,8 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
               stroke=ellipse.stroke,clabel=clabel)
 }
 
-Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
-                        xlim=NULL,ylim=NULL,tticks=NULL,
+Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,left=FALSE,
+                        Th0i=0,xlim=NULL,ylim=NULL,tticks=NULL,
                         oerr=3,show.numbers=FALSE,
                         exterr=FALSE,clabel="",levels=NULL,
                         ellipse.fill=c("#00FF0080","#FF000080"),
@@ -302,7 +305,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
     usr <- graphics::par('usr')
     l0 <- lambda('Th230')[1]
     if (Th0i==1){
-        fit <- isochron.ThU(x,type=1,model=model,
+        fit <- isochron.ThU(x,type=1,model=model,left=left,
                             plot=FALSE,exterr=FALSE,
                             hide=hide,omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)

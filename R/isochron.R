@@ -164,8 +164,11 @@
 #'
 #' \code{3}: Error-weighted least squares with overdispersion term
 #'
-#' \code{4}: If \code{x} has class \code{ThU}, calculate the rightmost
-#' isochron.
+#' \code{4}: If \code{x} has class \code{ArAr} or \code{ThU},
+#' calculate the leftmost or rightmost isochron.
+#'
+#' @param left logical. If \code{TRUE} and \code{model=4}, fits the
+#'     lefmost isochron to the data.
 #'
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
