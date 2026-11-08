@@ -22,59 +22,39 @@ LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 LRisochron.default <- function(x,left=FALSE,hide=NULL,omit=NULL,
                                anchor=0,inverse=FALSE,...){
     y0rat <- gety0rat(x)
-    DPrat <- getDPrat(x)
-    op <- iratio(y0rat)
     x2calc <- clear(x,hide=hide,omit=omit)
-    init <- init_LRisochron(x2calc,left=left,anchor=anchor,y0rat=y0rat)
+    init <- init_LRisochron(x2calc,left=left,
+                            anchor=anchor,y0rat=y0rat)
     fit <- optim(init$par,fn=LL_LRisochron,
-                 x=x2calc,gam=init$gam,y0=init$y0,y0rat=y0rat,
+                 x=x2calc,gam=init$gam,
+                 y0=init$y0,y0rat=y0rat[1],
                  left=left,hessian=TRUE)
-    iratio(y0rat,x=op[1],e=op[2])
-    E <- inverthess(fit$hessian)
-    covmat <- matrix(0,4,4)
-    J <- matrix(0,2,4)
-    if (!is.null(init$gam)){
-        a <- exp(fit$par[3])
-        b <- age2ratio(tt=exp(init$gam),ratio=DPrat,...)[1]
-        covmat[2:4,2:4] <- E
-        J[1,4] <- a
-    } else if (!is.null(init$y0)){
-        tt <- exp(fit$par[1])
-        a <- init$y0
-        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
-        covmat[1:3,1:3] <- E
-        J[2,1] <- dDPdt(x=x,tt=tt,...)*tt
-    } else {
-        tt <- exp(fit$par[1])
-        a <- exp(fit$par[4])
-        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
-        covmat <- E
-        J[1,4] <- a
-        J[2,1] <- dDPdt(x=x,tt=tt,...)*tt
-    }
-    E <- J %*% covmat %*% t(J)
-    out <- list(a=c(a,sqrt(E[1,1])),
-                b=c(b,sqrt(E[2,2])),
-                cov.ab=E[1,2])
-    if (inverse) out <- invertfit(out)
+    out <- fit2LRisochron(x=x,fit=fit,gam=init$gam,
+                          y0=init$y0,inverse=inverse,...)
     out$xyz <- data2york(x,inverse=inverse)
-    out$model <- 4
-    out$n <- length(x2calc)
     out
 }
 #' @noRd
 #' @export
 LRisochron.ArAr <- function(x,left=FALSE,hide=NULL,omit=NULL,
                             anchor=0,inverse=FALSE,...){
-    LRisochron.default(x,left=left,hide=hide,omit=omit,
-                       anchor=anchor,inverse=inverse,J=x$J[1],...)
+    y0rat <- gety0rat(x)
+    op <- iratio(y0rat)
+    out <- LRisochron.default(x,left=left,hide=hide,omit=omit,
+                              anchor=anchor,inverse=inverse,
+                              J=x$J[1],...)
+    iratio(y0rat,x=op[1],e=op[2])
+    out
 }
 #' @noRd
 #' @export
 LRisochron.ThU <- function(x,left=FALSE,hide=NULL,omit=NULL,
-                            anchor=0,inverse=FALSE,...){
-    LRisochron.default(x,left=left,hide=hide,omit=omit,
-                       anchor=anchor,inverse=inverse,...)
+                           anchor=0,inverse=FALSE,...){
+    U8Th2 <- x$U8Th2
+    out <- LRisochron.default(x,left=left,hide=hide,omit=omit,
+                              anchor=anchor,inverse=inverse,...)
+    x$U8Th2 <- U8Th2
+    out
 }
 
 #' @noRd
@@ -95,17 +75,20 @@ dDPdt.ThU <- function(x,tt,...){
     exp(-L*tt)*L
 }
 
-
-init_LRisochron <- function(x,left=FALSE,anchor=0,y0rat){
-    tst <- age(x,i2i=FALSE,exterr=FALSE)
+init_LRisochron <- function(x,...){ UseMethod("init_LRisochron",x) }
+init_LRisochron.default <- function(x,left=FALSE,anchor=0,y0rat,...){
+    if (anchor[1]==1){
+        y0 <- iratio(y0rat)[1]
+    } else {
+        y0 <- NULL
+    }
+    gam <- NULL
+    tst <- age(x)
     sgn <- ifelse(left,-1,1)
     zs <- cbind(sgn*log(tst[,1]),tst[,2]/tst[,1])
     fit <- min_age_model(zs=zs)
-    y0 <- gam <- NULL
-    gam <- NULL
     if (anchor[1]==1){
         p <- fit$par
-        y0 <- iratio(y0rat)[1]
     } else if (anchor[1]==2 & length(anchor)>1){
         p <- c(fit$par[-1],log(iratio(y0rat)[1]))
         gam <- log(anchor[2])
@@ -114,8 +97,31 @@ init_LRisochron <- function(x,left=FALSE,anchor=0,y0rat){
     }
     list(par=p,y0=y0,gam=gam)
 }
+init_LRisochron.ThU <- function(x,left=FALSE,anchor=0,y0rat,...){
+    if (anchor[1]==1){
+        y0 <- 1/x$U8Th2
+        tst <- age(x,Th0i=2)
+    } else {
+        y0 <- NULL
+        tst <- age(x)
+    }
+    gam <- NULL
+    sgn <- ifelse(left,-1,1)
+    zs <- cbind(sgn*log(tst[,1]),tst[,2]/tst[,1])
+    fit <- min_age_model(zs=zs)
+    if (anchor[1]==1){
+        p <- fit$par
+    } else if (anchor[1]==2 & length(anchor)>1){
+        p <- c(fit$par[-1],-log(x$U8Th2))
+        gam <- log(anchor[2])
+    } else {
+        p <- c(fit$par,0)
+    }
+    list(par=p,y0=y0,gam=gam)
+}
 
-LL_LRisochron <- function(p,x,left=FALSE,gam=NULL,y0=NULL,y0rat){
+LL_LRisochron <- function(p,x,left=FALSE,gam=NULL,
+                          y0=NULL,y0rat){
     if (!is.null(gam)){
         p <- c(gam,p)
     }
@@ -123,14 +129,106 @@ LL_LRisochron <- function(p,x,left=FALSE,gam=NULL,y0=NULL,y0rat){
         y0 <- exp(tail(p,1))
     }
     gps <- min_age_model_mappar(p[1:3])
-    iratio(y0rat,y0)
-    tst <- age(x,i2i=FALSE,exterr=FALSE)
     sgn <- ifelse(left,-1,1)
+    tst <- age4LRisochron(x,y0rat=y0rat,y0=y0)
     if (any(tst[,1]<0)){
         out <- Inf
     } else {
         zs <- cbind(sgn*log(tst[,1]),tst[,2]/tst[,1])
         out <- get_minage_L(c(gps,gps[1]),zs)
     }
+    out
+}
+
+age4LRisochron <- function(x,...){ UseMethod("age4LRisochron",x) }
+age4LRisochron.default <- function(x,y0rat,y0,...){
+    iratio(y0rat,y0)
+    age(x,i2i=FALSE)
+}
+age4LRisochron.ThU <- function(x,y0,...){
+    x$U8Th2 <- y0
+    age(x,Th0i=2)
+}
+
+fit2LRisochron <- function(x,...){ UseMethod("fit2LRisochron",x) }
+fit2LRisochron.default <- function(x,fit,gam=NULL,
+                                   y0=NULL,inverse=FALSE,...){
+    DPrat <- getDPrat(x)
+    E <- inverthess(fit$hessian)
+    covmat <- matrix(0,4,4)
+    J <- matrix(0,2,4)
+    if (!is.null(gam)){
+        a <- exp(fit$par[3])
+        b <- age2ratio(tt=exp(gam),ratio=DPrat,...)[1]
+        covmat[2:4,2:4] <- E
+        J[1,4] <- a
+    } else if (!is.null(y0)){
+        tt <- exp(fit$par[1])
+        a <- y0
+        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
+        covmat[1:3,1:3] <- E
+        J[2,1] <- dDPdt(x=x,tt=tt,...)*tt
+    } else {
+        tt <- exp(fit$par[1])
+        a <- exp(fit$par[4])
+        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
+        covmat <- E
+        J[1,4] <- a
+        J[2,1] <- dDPdt(x=x,tt=tt,...)*tt
+    }
+    fit2LRisochron_helper(x=x,covmat=covmat,J=J,
+                          a=a,b=b,inverse=inverse)
+}
+fit2LRisochron.ThU <- function(x,fit,gam=NULL,
+                               y0=NULL,inverse=FALSE,...){
+    DPrat <- "Th230U238"
+    E <- inverthess(fit$hessian)
+    covmat <- matrix(0,4,4)
+    J <- matrix(0,2,4)
+    if (!is.null(gam)){
+        tt <- exp(gam)
+        st <- 0
+        y0 <- exp(fit$par[3])
+        sy0 <- sqrt(covmat[3,3])
+        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
+        a <- y0*(1-b)
+        covmat[2:4,2:4] <- E
+        J[1,4] <- a
+    } else if (!is.null(y0)){
+        dtdg <- tt <- exp(fit$par[1])
+        st <- sqrt(E[1,1])
+        sy0 <- 0
+        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
+        a <- y0*(1-b)
+        dbdt <- dDPdt(x=x,tt=tt,...)
+        covmat[1:3,1:3] <- E
+        J[2,1] <- dbdg*dtdg
+    } else {
+        dtdg <- tt <- exp(fit$par[1])
+        st <- sqrt(E[1,1])
+        y0 <- exp(fit$par[4])
+        sy0 <- sqrt(E[4,4])
+        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
+        a <- y0*(1-b)
+        dbdg <- dDPdt(x=x,tt=tt,...)
+        covmat <- E
+        J[1,4] <- a
+        J[2,1] <- dbdg*dtdg
+    }
+    out <- fit2LRisochron_helper(x=x,covmat=covmat,J=J,a=a,b=b,
+                                 inverse=inverse,type="d")
+    out$age <- c('t'=tt,'s[t]'=st)
+    out$y0 <- c('y'=y0,'s[y]'=st)
+    out
+}
+fit2LRisochron_helper <- function(x,covmat,J,a,b,
+                                  inverse=FALSE,type="p"){
+    E <- J %*% covmat %*% t(J)
+    out <- list(a=c(a,sqrt(E[1,1])),
+                b=c(b,sqrt(E[2,2])),
+                cov.ab=E[1,2])
+    if (inverse) out <- invertfit(out,type=type)
+    out$model <- 4
+    out$n <- length(x)
     out
 }

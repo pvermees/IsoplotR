@@ -412,7 +412,7 @@ age.fissiontracks <- function(x,central=FALSE,pooled=FALSE,i=NULL,
 #' @export
 age.ThU <- function(x,isochron=FALSE,Th0i=0,
                     exterr=FALSE,i=NULL,oerr=1,sigdig=NA,...){
-    if (isochron) {
+    if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
         tst <- ThU_age(x,exterr=exterr,i=i,Th0i=Th0i,...)

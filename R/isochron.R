@@ -1152,9 +1152,14 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
         }
     } else if (x$format %in% c(3,4)){
         wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-        out <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
-                               wtype=wtype,exterr=exterr,
-                               hide=hide,omit=omit)
+        if (model==4){
+            out <- LRisochron(x,inverse=(type==2),left=FALSE,
+                              hide=hide,omit=omit,anchor=anchor)
+        } else {
+            out <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
+                                   wtype=wtype,exterr=exterr,
+                                   hide=hide,omit=omit)
+        }
         dispunits <- getDispUnits_ThU(model=model,wtype=wtype,anchor=anchor)
     } else {
         stop('Illegal Th-U data format.')
