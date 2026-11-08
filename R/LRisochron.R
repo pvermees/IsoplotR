@@ -10,25 +10,28 @@
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from the isochron age calculation.
+#' @param anchor see \code{isochron}
+#' @param inverse see \code{isochron}
 #' @param inverse toggles between normal and inverse isochrons. See
 #'     \code{\link{isochron}}.
 #' @param ... arguments to be passed on to \code{age2ratio}
 #' @return a list with the intercept (\code{a}), slope (\code{b}) and
-#'     other data that can be passed on to \code{scatterplot}.
+#'     other data that can be passed on to \code{scatterplot}. If
+#'     \code{x} has class \code{ThU}, also returns \code{age} and
+#'     \code{y0}.
 #' @noRd
 LRisochron <- function(x,...){ UseMethod("LRisochron",x) }
 #' @noRd
-#' @export
 LRisochron.default <- function(x,left=FALSE,hide=NULL,omit=NULL,
                                anchor=0,inverse=FALSE,...){
     y0rat <- gety0rat(x)
     x2calc <- clear(x,hide=hide,omit=omit)
     init <- init_LRisochron(x2calc,left=left,
                             anchor=anchor,y0rat=y0rat)
-    fit <- optim(init$par,fn=LL_LRisochron,
-                 x=x2calc,gam=init$gam,
-                 y0=init$y0,y0rat=y0rat[1],
-                 left=left,hessian=TRUE)
+    fit <- stats::optim(init$par,fn=LL_LRisochron,
+                        x=x2calc,gam=init$gam,
+                        y0=init$y0,y0rat=y0rat[1],
+                        left=left,hessian=TRUE)
     out <- fit2LRisochron(x=x,fit=fit,gam=init$gam,
                           y0=init$y0,left=left,
                           inverse=inverse,...)
@@ -36,7 +39,6 @@ LRisochron.default <- function(x,left=FALSE,hide=NULL,omit=NULL,
     out
 }
 #' @noRd
-#' @export
 LRisochron.ArAr <- function(x,left=FALSE,hide=NULL,omit=NULL,
                             anchor=0,inverse=FALSE,...){
     y0rat <- gety0rat(x)
@@ -48,7 +50,6 @@ LRisochron.ArAr <- function(x,left=FALSE,hide=NULL,omit=NULL,
     out
 }
 #' @noRd
-#' @export
 LRisochron.ThU <- function(x,left=FALSE,hide=NULL,omit=NULL,
                            anchor=0,inverse=FALSE,...){
     U8Th2 <- x$U8Th2
@@ -58,25 +59,27 @@ LRisochron.ThU <- function(x,left=FALSE,hide=NULL,omit=NULL,
     out
 }
 
+#' Derivative of the daughter-parent ratio w.r.t time
 #' @noRd
 dDPdt <- function(x,...){ UseMethod("dDPdt",x) }
 #' @noRd
-#' @export
 dDPdt.default <- function(x,...){ stop("No default method implemented.") }
+#' @param J the J-factor
 #' @noRd
-#' @export
 dDPdt.ArAr <- function(x,tt,J,...){
     L <- lambda('K40')[1]
     exp(L*tt)*L/J
 }
 #' @noRd
-#' @export
 dDPdt.ThU <- function(x,tt,...){
     L <- lambda('Th230')[1]
     exp(-L*tt)*L
 }
 
+#' Initialise the LRisochron parameters
+#' @noRd
 init_LRisochron <- function(x,...){ UseMethod("init_LRisochron",x) }
+#' @noRd
 init_LRisochron.default <- function(x,left=FALSE,anchor=0,y0rat,...){
     if (anchor[1]==1){
         y0 <- iratio(y0rat)[1]
@@ -98,6 +101,7 @@ init_LRisochron.default <- function(x,left=FALSE,anchor=0,y0rat,...){
     }
     list(par=p,y0=y0,gam=gam)
 }
+#' @noRd
 init_LRisochron.ThU <- function(x,left=FALSE,anchor=0,y0rat,...){
     if (anchor[1]==1){
         y0 <- 1/x$U8Th2
@@ -127,7 +131,7 @@ LL_LRisochron <- function(p,x,left=FALSE,gam=NULL,
         p <- c(gam,p)
     }
     if (is.null(y0)){
-        y0 <- exp(tail(p,1))
+        y0 <- exp(utils::tail(p,1))
     }
     sgn <- ifelse(left,-1,1)
     gps <- min_age_model_mappar(p[1:3])
@@ -141,17 +145,24 @@ LL_LRisochron <- function(p,x,left=FALSE,gam=NULL,
     out
 }
 
+#' Calculate single grain ages given the non-radiogenic ratio \code{y0}
+#' @noRd
 age4LRisochron <- function(x,...){ UseMethod("age4LRisochron",x) }
+#' @noRd
 age4LRisochron.default <- function(x,y0rat,y0,...){
     iratio(y0rat,y0)
     age(x,i2i=FALSE)
 }
+#' @noRd
 age4LRisochron.ThU <- function(x,y0,...){
     x$U8Th2 <- y0
     age(x,Th0i=2)
 }
 
+#' Error propagation for the LRisochron fit
+#' @noRd
 fit2LRisochron <- function(x,...){ UseMethod("fit2LRisochron",x) }
+#' @noRd
 fit2LRisochron.default <- function(x,fit,gam=NULL,y0=NULL,
                                    inverse=FALSE,left=FALSE,...){
     DPrat <- getDPrat(x)
@@ -181,6 +192,7 @@ fit2LRisochron.default <- function(x,fit,gam=NULL,y0=NULL,
     fit2LRisochron_helper(x=x,covmat=covmat,J=J,
                           a=a,b=b,inverse=inverse)
 }
+#' @noRd
 fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
                                inverse=FALSE,left=FALSE,...){
     DPrat <- "Th230U238"

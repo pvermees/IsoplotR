@@ -21,6 +21,7 @@ evolution(
   line.col = "darksalmon",
   isochron = FALSE,
   model = 1,
+  left = FALSE,
   exterr = FALSE,
   sigdig = 2,
   hide = NULL,
@@ -119,7 +120,7 @@ ellipses. Follows the same formatting guidelines as
 
 \item{isochron}{fit an isochron to the data?}
 
-\item{model}{if \code{isochron=TRUE}, choose one of three
+\item{model}{if \code{isochron=TRUE}, choose one of four
     regression models:
 
 \code{1}: maximum likelihood regression, using either the modified
@@ -148,6 +149,9 @@ manifests itself as an added (co)variance term.
 \code{4}: If \code{x$format} is \code{3} or \code{4}, calculate the
 rightmost isochron, corresponding to the minimum age component of a
 contaminated system.}
+
+\item{left}{logical. If \code{TRUE} and \code{model=4}, fits the
+lefmost isochron to the data.}
 
 \item{exterr}{propagate the decay constant uncertainty in the
 isochron age?}

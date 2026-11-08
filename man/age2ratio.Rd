@@ -10,7 +10,7 @@ age2ratio(
   ratio = "Pb206U238",
   exterr = FALSE,
   d = diseq(),
-  J,
+  J = NULL,
   sJ = 0,
   bratio = 0.895
 )
