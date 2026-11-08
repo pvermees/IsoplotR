@@ -201,18 +201,12 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
     J <- matrix(0,2,4)
     sgn <- ifelse(left,-1,1)
     if (!is.null(gam)){
-        tt <- exp(sgn*gam)
-        st <- 0
-        y0 <- exp(fit$par[3])
-        sy0 <- sqrt(E[3,3])
-        b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
-        a <- y0*(1-b)
+        b <- age2ratio(tt=exp(sgn*gam),ratio=DPrat,...)[1]
+        a <- exp(fit$par[3])*(1-b)
         covmat[2:4,2:4] <- E
         J[1,4] <- a
     } else if (!is.null(y0)){
         dtdg <- tt <- exp(sgn*fit$par[1])
-        st <- sqrt(E[1,1])
-        sy0 <- 0
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         a <- y0*(1-b)
         dbdt <- dDPdt(x=x,tt=tt,...)
@@ -221,9 +215,7 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
         J[2,1] <- dbdt*dtdg
     } else {
         dtdg <- tt <- exp(sgn*fit$par[1])
-        st <- sqrt(E[1,1])
         y0 <- exp(fit$par[4])
-        sy0 <- sqrt(E[4,4])
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         a <- y0*(1-b)
         dbdg <- dDPdt(x=x,tt=tt,...)
@@ -231,11 +223,8 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
         J[1,4] <- a
         J[2,1] <- dbdg*dtdg
     }
-    out <- fit2LRisochron_helper(x=x,covmat=covmat,J=J,a=a,b=b,
-                                 inverse=inverse,type="d")
-    out$age <- c('t'=tt,'s[t]'=st)
-    out$y0 <- c('y'=y0,'s[y]'=sy0)
-    out
+    fit2LRisochron_helper(x=x,covmat=covmat,J=J,a=a,b=b,
+                          inverse=inverse,type="d")
 }
 fit2LRisochron_helper <- function(x,covmat,J,a,b,
                                   inverse=FALSE,type="p"){
