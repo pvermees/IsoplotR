@@ -30,7 +30,8 @@ LRisochron.default <- function(x,left=FALSE,hide=NULL,omit=NULL,
                  y0=init$y0,y0rat=y0rat[1],
                  left=left,hessian=TRUE)
     out <- fit2LRisochron(x=x,fit=fit,gam=init$gam,
-                          y0=init$y0,inverse=inverse,...)
+                          y0=init$y0,left=left,
+                          inverse=inverse,...)
     out$xyz <- data2york(x,inverse=inverse)
     out
 }
@@ -91,7 +92,7 @@ init_LRisochron.default <- function(x,left=FALSE,anchor=0,y0rat,...){
         p <- fit$par
     } else if (anchor[1]==2 & length(anchor)>1){
         p <- c(fit$par[-1],log(iratio(y0rat)[1]))
-        gam <- log(anchor[2])
+        gam <- sgn*log(anchor[2])
     } else {
         p <- c(fit$par,log(iratio(y0rat)[1]))
     }
@@ -113,7 +114,7 @@ init_LRisochron.ThU <- function(x,left=FALSE,anchor=0,y0rat,...){
         p <- fit$par
     } else if (anchor[1]==2 & length(anchor)>1){
         p <- c(fit$par[-1],-log(x$U8Th2))
-        gam <- log(anchor[2])
+        gam <- sgn*log(anchor[2])
     } else {
         p <- c(fit$par,0)
     }
@@ -128,8 +129,8 @@ LL_LRisochron <- function(p,x,left=FALSE,gam=NULL,
     if (is.null(y0)){
         y0 <- exp(tail(p,1))
     }
-    gps <- min_age_model_mappar(p[1:3])
     sgn <- ifelse(left,-1,1)
+    gps <- min_age_model_mappar(p[1:3])
     tst <- age4LRisochron(x,y0rat=y0rat,y0=y0)
     if (any(tst[,1]<0)){
         out <- Inf
@@ -151,25 +152,26 @@ age4LRisochron.ThU <- function(x,y0,...){
 }
 
 fit2LRisochron <- function(x,...){ UseMethod("fit2LRisochron",x) }
-fit2LRisochron.default <- function(x,fit,gam=NULL,
-                                   y0=NULL,inverse=FALSE,...){
+fit2LRisochron.default <- function(x,fit,gam=NULL,y0=NULL,
+                                   inverse=FALSE,left=FALSE,...){
     DPrat <- getDPrat(x)
     E <- inverthess(fit$hessian)
     covmat <- matrix(0,4,4)
     J <- matrix(0,2,4)
+    sgn <- ifelse(left,-1,1)
     if (!is.null(gam)){
         a <- exp(fit$par[3])
-        b <- age2ratio(tt=exp(gam),ratio=DPrat,...)[1]
+        b <- age2ratio(tt=exp(sgn*gam),ratio=DPrat,...)[1]
         covmat[2:4,2:4] <- E
         J[1,4] <- a
     } else if (!is.null(y0)){
-        tt <- exp(fit$par[1])
+        tt <- exp(sgn*fit$par[1])
         a <- y0
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         covmat[1:3,1:3] <- E
         J[2,1] <- dDPdt(x=x,tt=tt,...)*tt
     } else {
-        tt <- exp(fit$par[1])
+        tt <- exp(sgn*fit$par[1])
         a <- exp(fit$par[4])
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         covmat <- E
@@ -179,14 +181,15 @@ fit2LRisochron.default <- function(x,fit,gam=NULL,
     fit2LRisochron_helper(x=x,covmat=covmat,J=J,
                           a=a,b=b,inverse=inverse)
 }
-fit2LRisochron.ThU <- function(x,fit,gam=NULL,
-                               y0=NULL,inverse=FALSE,...){
+fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
+                               inverse=FALSE,left=FALSE,...){
     DPrat <- "Th230U238"
     E <- inverthess(fit$hessian)
     covmat <- matrix(0,4,4)
     J <- matrix(0,2,4)
+    sgn <- ifelse(left,-1,1)
     if (!is.null(gam)){
-        tt <- exp(gam)
+        tt <- exp(sgn*gam)
         st <- 0
         y0 <- exp(fit$par[3])
         sy0 <- sqrt(E[3,3])
@@ -195,7 +198,7 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,
         covmat[2:4,2:4] <- E
         J[1,4] <- a
     } else if (!is.null(y0)){
-        dtdg <- tt <- exp(fit$par[1])
+        dtdg <- tt <- exp(sgn*fit$par[1])
         st <- sqrt(E[1,1])
         sy0 <- 0
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
@@ -205,7 +208,7 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,
         J[1,1] <- -y0*dbdt*dtdg
         J[2,1] <- dbdt*dtdg
     } else {
-        dtdg <- tt <- exp(fit$par[1])
+        dtdg <- tt <- exp(sgn*fit$par[1])
         st <- sqrt(E[1,1])
         y0 <- exp(fit$par[4])
         sy0 <- sqrt(E[4,4])
