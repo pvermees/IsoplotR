@@ -1129,7 +1129,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
-                          title=TRUE,exterr=FALSE,model=1,
+                          title=TRUE,exterr=FALSE,model=1,left=FALSE,
                           anchor=0,wtype='a',show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
@@ -1153,7 +1153,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
     } else if (x$format %in% c(3,4)){
         wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
         if (model==4){
-            out <- LRisochron(x,inverse=(type==2),left=FALSE,
+            out <- LRisochron(x,inverse=(type==2),left=left,
                               hide=hide,omit=omit,anchor=anchor)
         } else {
             out <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
@@ -1161,6 +1161,9 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                                    hide=hide,omit=omit)
         }
         dispunits <- getDispUnits_ThU(model=model,wtype=wtype,anchor=anchor)
+        lab <- getIsochronLabels(x=x,type=type)
+        out$xlab <- lab$x
+        out$ylab <- lab$y
     } else {
         stop('Illegal Th-U data format.')
     }
@@ -1263,9 +1266,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
         out$age['disp[t]'] <- tst['s[t]']
     }
     out <- getThUy0(out,tst=tst,option=y0option,exterr=exterr)
-    lab <- getIsochronLabels(x=x,type=type)
-    out$xlab <- lab$x
-    out$ylab <- lab$y
     out$xyz <- subset(out$xyz,select=id)
     out
 }

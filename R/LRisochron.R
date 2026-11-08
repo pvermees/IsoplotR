@@ -189,7 +189,7 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,
         tt <- exp(gam)
         st <- 0
         y0 <- exp(fit$par[3])
-        sy0 <- sqrt(covmat[3,3])
+        sy0 <- sqrt(E[3,3])
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         a <- y0*(1-b)
         covmat[2:4,2:4] <- E
@@ -202,7 +202,8 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,
         a <- y0*(1-b)
         dbdt <- dDPdt(x=x,tt=tt,...)
         covmat[1:3,1:3] <- E
-        J[2,1] <- dbdg*dtdg
+        J[1,1] <- -y0*dbdt*dtdg
+        J[2,1] <- dbdt*dtdg
     } else {
         dtdg <- tt <- exp(fit$par[1])
         st <- sqrt(E[1,1])
@@ -218,7 +219,7 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,
     out <- fit2LRisochron_helper(x=x,covmat=covmat,J=J,a=a,b=b,
                                  inverse=inverse,type="d")
     out$age <- c('t'=tt,'s[t]'=st)
-    out$y0 <- c('y'=y0,'s[y]'=st)
+    out$y0 <- c('y'=y0,'s[y]'=sy0)
     out
 }
 fit2LRisochron_helper <- function(x,covmat,J,a,b,
