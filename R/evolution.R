@@ -152,7 +152,7 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the omitted
 #'     aliquots.
-#' @param ... optional arguments to the generic \code{plot} function
+#' @param ... optional arguments to the \code{scatterplot} function.
 #' @seealso \code{\link{isochron}}
 #'
 #' @examples
@@ -254,7 +254,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
     calcit <- (1:ns)%ni%c(hide,omit)
     y <- data2evolution(x,Th0i=Th0i,omit4c=unique(c(hide,omit)))
     d2plot <- subset(y,subset=plotit)
-    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim,...)
+    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim)
     if (isochron){
         fit <- isochron(x,type=3,plot=FALSE,
                         model=model,hide=hide,omit=omit)
@@ -267,7 +267,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
         initial[4] <- sqrt(fit$cov['B','B'])
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
         scatterplot(initial,oerr=oerr,line.col='black',add=TRUE,
-                    ellipse.fill=grDevices::rgb(1,1,1,0.85))
+                    ellipse.fill=grDevices::rgb(1,1,1,0.85),...)
         e48 <- 1
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
@@ -297,7 +297,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,left=FALSE,
     calcit <- (1:ns)%ni%c(hide,omit)
     d <- data2evolution(x,omit4c=unique(c(hide,omit)))
     d2plot <- subset(d,subset=plotit)
-    scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
+    scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE,...)
     if (is.null(tticks)) tticks <- c(0,5,10,20,50,100,200,Inf)
     nt <- length(tticks)
     X <- graphics::par('usr')[1:2]
@@ -320,7 +320,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,left=FALSE,
         else ticktext <- expression(infinity)
         slope <- 1-exp(-l0*tticks[i])
         Y <- xy0 + slope*(X-xy0)
-        graphics::lines(X,Y,col=line.col,...)
+        graphics::lines(X,Y,col=line.col)
         if (Y[2]<usr[3]){
             # do nothing
         } else if (Y[2]>usr[4]){ # label below upper margin
@@ -348,7 +348,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,left=FALSE,
                     ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,
-                    show.colourbar=FALSE)
+                    show.colourbar=FALSE,...)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)

@@ -203,11 +203,10 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the
 #'     omitted aliquots.
-#' @param ... optional arguments passed on to
-#'     \code{\link{scatterplot}}
+#' @param ... optional arguments passed on to \code{\link{scatterplot}}
 #' @param nsteps resolution of the posterior distributions for
 #'     Bayesian credible intervals of disequilibrium-corrected U-Pb
-#'     isochrons
+#'     isochrons.
 #'
 #' @return
 #'

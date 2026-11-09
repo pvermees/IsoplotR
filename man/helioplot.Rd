@@ -25,6 +25,7 @@ helioplot(
   omit.fill = NA,
   omit.stroke = "grey",
   show.colourbar = TRUE,
+  sort = FALSE,
   ...
 )
 }
@@ -137,6 +138,9 @@ omitted aliquots.}
 
 \item{show.colourbar}{add a colour bar to display the colours
 assigned to \code{levels}}
+
+\item{sort}{logical. If \code{TRUE}, sorts the error ellipses by
+size, so that the small ellipses plot on top of the large ones.}
 
 \item{...}{optional arguments to the generic \code{plot} function}
 }

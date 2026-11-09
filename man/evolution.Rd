@@ -170,7 +170,7 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the omitted
 aliquots.}
 
-\item{...}{optional arguments to the generic \code{plot} function}
+\item{...}{optional arguments to the \code{scatterplot} function.}
 }
 \description{
 Plots Th-U data on a

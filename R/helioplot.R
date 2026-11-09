@@ -148,6 +148,8 @@
 #'     omitted aliquots.
 #' @param show.colourbar add a colour bar to display the colours
 #'     assigned to \code{levels}
+#' @param sort logical. If \code{TRUE}, sorts the error ellipses by
+#'     size, so that the small ellipses plot on top of the large ones.
 #' @param ... optional arguments to the generic \code{plot} function
 #' @seealso \code{\link{radialplot}}
 #' @references Aitchison, J., 1986, The statistical analysis of
@@ -171,7 +173,7 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
                       omit.fill=NA,omit.stroke='grey',
-                      show.colourbar=TRUE,...){
+                      show.colourbar=TRUE,sort=FALSE,...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
@@ -195,7 +197,8 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
         } else {
             plot_logratio_ellipses(x,fill=fill,stroke=stroke,
                                    oerr=oerr,levels=levels,
-                                   show.numbers=show.numbers,hide=hide)
+                                   show.numbers=show.numbers,
+                                   hide=hide,sort=sort)
         }
     } else {
         if (all(is.na(fact))) fact <- getfact(x2plot,fit)
@@ -209,7 +212,8 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
         } else {
             plot_helioplot_ellipses(x,fill=fill,stroke=stroke,fact=fact,
                                     oerr=oerr,levels=levels,
-                                    show.numbers=show.numbers,hide=hide)
+                                    show.numbers=show.numbers,
+                                    hide=hide,sort=sort)
         }
     }
     if (show.barycentre){
@@ -242,9 +246,18 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1),xpd=NA)
 }
 
-plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,
-                                   show.numbers=FALSE,levels=NULL,hide=NULL){
+sort_logratio_ellipses <- function(x,i){
+    cvHe <- x[i,'errHe']/x[i,'He']
+    cvU <- x[i,'errU']/x[i,'U']
+    cvTh <- x[i,'errTh']/x[i,'Th']
+    d <- (cvHe*cvU)^2 + (cvHe*cvTh)^2 + (cvU*cvTh)^2
+    i[order(d)]
+}
+
+plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,show.numbers=FALSE,
+                                   levels=NULL,hide=NULL,sort=FALSE){
     sn <- clear(1:length(x),hide)
+    if (sort) sn <- sort_logratio_ellipses(x,sn)
     for (i in sn){
         uvc <- UThHe2uv_covmat(x,i)
         x0 <- uvc$uv[1]
@@ -256,8 +269,10 @@ plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,
     }
 }
 plot_helioplot_ellipses <- function(x,fill,stroke,fact=c(1,1,1),oerr=3,
-                                    show.numbers=FALSE,levels=NULL,hide=NULL){
+                                    show.numbers=FALSE,levels=NULL,
+                                    hide=NULL,sort=FALSE){
     sn <- clear(1:length(x),hide)
+    if (sort) sn <- sort_logratio_ellipses(x,sn)
     for (i in sn){
         uvc <- UThHe2uv_covmat(x,i)
         x0 <- uvc$uv[1]
@@ -286,7 +301,8 @@ plot_helioplot_points <- function(x,fact=c(1,1,1),bg=NA,
 plot_barycentre <- function(fit,fact=c(1,1,1),logratio=TRUE,
                             oerr=3,doSm=TRUE,...){
     ell <- ellipse(x=fit$uvw[1],y=fit$uvw[2],
-                   covmat=fit$covmat[1:2,1:2],alpha=oerr2alpha(oerr))
+                   covmat=fit$covmat[1:2,1:2],
+                   alpha=oerr2alpha(oerr))
     if (logratio){
         graphics::polygon(ell,col="#FFFFFFBF")
     } else {

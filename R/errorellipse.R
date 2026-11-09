@@ -132,6 +132,8 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #'     \code{inverse=TRUE}.
 #' @param box logical. If \code{TRUE}, draws a frame around the plot.
 #' @param xaxt see \code{?par}
+#' @param sort logical. If \code{TRUE}, sorts the error ellipses by
+#'     size, so that the small ellipses plot on top of the large ones.
 #' @param ... optional arguments to format the points and text.
 #' 
 #' @examples
@@ -153,7 +155,7 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         omit.stroke="grey",show.colourbar=TRUE,
                         bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
                         asp=NA,log='',taxis=FALSE,box=!taxis,
-                        xaxt=ifelse(taxis,'n','s'),...){
+                        xaxt=ifelse(taxis,'n','s'),sort=FALSE,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
     sn <- 1:ns
@@ -221,7 +223,14 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                     show.numbers=show.numbers,hide=hide,omit=omit)
     } else if (show.ellipses==1){ # error ellipse
         if (missing(cex)) cex <- 0.25
-        for (i in sn[plotit]){
+        if (sort){
+            ellipse_size <- (1-xy[plotit,'rXY']^2)*(xy[plotit,'sX']*xy[plotit,'sY'])^2
+            rangschikking <- order(ellipse_size,decreasing=TRUE)
+            selection <- sn[plotit][rangschikking]
+        } else {
+            selection <- sn[plotit]
+        }
+        for (i in selection){
             if (!any(is.na(xy[i,]))){
                 covmat <- cor2cov2(xy[i,'sX'],xy[i,'sY'],xy[i,'rXY'])
                 ell <- ellipse(xy[i,'X'],xy[i,'Y'],covmat,alpha=oerr2alpha(oerr))

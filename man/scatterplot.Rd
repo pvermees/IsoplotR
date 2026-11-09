@@ -35,6 +35,7 @@ scatterplot(
   taxis = FALSE,
   box = !taxis,
   xaxt = ifelse(taxis, "n", "s"),
+  sort = FALSE,
   ...
 )
 }
@@ -157,6 +158,9 @@ inverse isochron with a time scale. Only used if
 \item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
 
 \item{xaxt}{see \code{?par}}
+
+\item{sort}{logical. If \code{TRUE}, sorts the error ellipses by
+size, so that the small ellipses plot on top of the large ones.}
 
 \item{...}{optional arguments to format the points and text.}
 }

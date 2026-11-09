@@ -211,10 +211,9 @@ omitted aliquots.}
 
 \item{nsteps}{resolution of the posterior distributions for
 Bayesian credible intervals of disequilibrium-corrected U-Pb
-isochrons}
+isochrons.}
 
-\item{...}{optional arguments passed on to
-\code{\link{scatterplot}}}
+\item{...}{optional arguments passed on to \code{\link{scatterplot}}}
 }
 \value{
 If \code{show.age=1}, returns a list with the following items:
