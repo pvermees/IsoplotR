@@ -114,7 +114,7 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
                    sorted_data=sorted_data,
                    source_names=source_names,
                    sink_names=sink_names,
-                   sigdig=sigdig,...)
+                   sigdig=sigdig,boot=boot,...)
     }
     out
 }
@@ -134,7 +134,8 @@ empty_ecdf_plot <- function(data_range,...){
 
 plot_unmix <- function(XYWCvM,out,sorted_data,
                        source_names,sink_names,
-                       xlab='t (Ma)',sigdig=2,...){
+                       xlab='t (Ma)',sigdig=2,
+                       boot=FALSE,...){
     num_sources <- length(source_names)
     num_sinks <- length(sink_names)
     cads <- c(3,3:(2+num_sinks),2+num_sinks)
@@ -187,7 +188,7 @@ plot_unmix <- function(XYWCvM,out,sorted_data,
         graphics::legend('bottomright',
                          legend=c(sink_name,paste0('CvM = ',CvM)),
                          bty='n',text.col=c('blue','black'))
-        W[sink_name,] <- 100*XYWCvM[[sink_name]]$W
+        W[sink_name,] <- signif(100*XYWCvM[[sink_name]]$W,digits=sigdig)
     }
     graphics::axis(side=1)
     graphics::mtext(text=xlab,side=1,line=1.75,cex=cex*0.8)
@@ -201,16 +202,17 @@ plot_unmix <- function(XYWCvM,out,sorted_data,
             graphics::polygon(x=c(0,sum_of_weights[,i+1],0),
                               y=c(num_sinks,num_sinks:1,1),
                               col=colours[i])
+        }
+        for (i in num_sources:1){
             xtext <- (sum_of_weights[,i+1]+sum_of_weights[,i])/2
             graphics::text(x=xtext,y=num_sinks:1,
-                           labels=signif(W[,i],digits=sigdig),
-                           xpd=NA,col='grey40')
+                           labels=W[,i],xpd=NA,col='grey40')
         }
         graphics::axis(side=1)
         graphics::mtext(text='%',side=1,line=1.75,cex=cex*0.8)
     } else {
-        result <- paste0(source_names,' = ',round(W[1,]),'%')
-        if (isa(out,'list')){
+        result <- paste0(source_names,' = ',W[1,],'%')
+        if (boot){
             ll <- signif(100*out$ll,digits=sigdig)
             ul <- signif(100*out$ul,digits=sigdig)
             result <- paste0(result,paste0(' [',ll,'-',ul,'%]'))
