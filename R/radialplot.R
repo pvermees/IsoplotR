@@ -60,6 +60,7 @@
 #' @param levels a vector with additional values to be displayed as
 #'     different background colours of the plot symbols.
 #' @param clabel label of the colour legend
+#' @param clim (optional) limits of the colour scale.
 #' @param bg Fill colour for the plot symbols. This can either be a
 #'     single colour or multiple colours to form a colour ramp (to be
 #'     used if \code{levels!=NULL}):
@@ -156,8 +157,9 @@ radialplot <- function(x,...){ UseMethod("radialplot",x) }
 #' @export
 radialplot.default <- function(x,from=NA,to=NA,z0=NA,transformation='log',
                                xlab=NULL,sigdig=2,show.numbers=FALSE,pch=21,
-                               levels=NULL,clabel="",bg=c("yellow","red"),
-                               col='black',k=0,np=3,markers=NULL,oerr=3,
+                               levels=NULL,clabel="",clim=NULL,
+                               bg=c("yellow","red"),col='black',
+                               k=0,np=3,markers=NULL,oerr=3,
                                title=TRUE,show.colourbar=TRUE,units='',
                                hide=NA,omit=NULL,omit.col=NA,...){
     x <- x[,c(1,2),drop=FALSE]
@@ -168,7 +170,7 @@ radialplot.default <- function(x,from=NA,to=NA,z0=NA,transformation='log',
     markers <- c(markers,peaks$peaks['t',])
     radial_helper(x,from=from,to=to,z0=z0,transformation=transformation,
                   xlab=xlab,show.numbers=show.numbers,pch=pch,
-                  levels=levels,clabel=clabel,bg=bg,col=col,
+                  levels=levels,clabel=clabel,clim=clim,bg=bg,col=col,
                   markers=markers,hide=hide,omit=omit,omit.col=omit.col,
                   show.colourbar=show.colourbar,...)
     fit <- central(x2calc)
@@ -186,9 +188,9 @@ radialplot.default <- function(x,from=NA,to=NA,z0=NA,transformation='log',
 #' @export
 radialplot.other <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log',
                              sigdig=2,show.numbers=FALSE,pch=21,levels=NULL,
-                             clabel="",bg=c("yellow","red"),col='black',
-                             k=0,np=3,markers=NULL,oerr=3,units='',
-                             title=TRUE,show.colourbar=TRUE,
+                             clabel="",clim=NULL,bg=c("yellow","red"),
+                             col='black',k=0,np=3,markers=NULL,oerr=3,
+                             units='',title=TRUE,show.colourbar=TRUE,
                              hide=NA,omit=NULL,omit.col=NA,...){
     if (x$format==2) X <- x$x
     else if (x$format==3) X <- x$x[,c(2,3)]
@@ -196,8 +198,8 @@ radialplot.other <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log
     radialplot.default(X,from=from,to=to,z0=z0,xlim=xlim,
                        transformation=transformation,
                        sigdig=sigdig,show.numbers=show.numbers,pch=pch,
-                       levels=levels,clabel=clabel,bg=bg,col=col,k=k,np=np,
-                       markers=markers,oerr=oerr,title=title,
+                       levels=levels,clabel=clabel,clim=clim,bg=bg,
+                       col=col,k=k,np=np,markers=markers,oerr=oerr,title=title,
                        show.colourbar=show.colourbar,units=units,hide=hide,
                        omit=omit,omit.col=omit.col,...)
 }
@@ -208,11 +210,11 @@ radialplot.other <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log
 radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
                                      transformation='arcsin',sigdig=2,
                                      show.numbers=FALSE,pch=21,
-                                     levels=NULL,clabel="",bg=c("yellow","red"),
-                                     col='black',markers=NULL,k=0,np=3,
-                                     exterr=FALSE,oerr=3,title=TRUE,
-                                     show.colourbar=TRUE,hide=NULL,
-                                     omit=NULL,omit.col=NA,...){
+                                     levels=NULL,clabel="",clim=NULL,
+                                     bg=c("yellow","red"),col='black',
+                                     markers=NULL,k=0,np=3,exterr=FALSE,
+                                     oerr=3,title=TRUE,show.colourbar=TRUE,
+                                     hide=NULL,omit=NULL,omit.col=NA,...){
     ns <- length(x)
     calcit <- (1:ns)%ni%c(hide,omit)
     plotit <- (1:ns)%ni%hide
@@ -221,15 +223,14 @@ radialplot.fissiontracks <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
     peaks <- peakfit(x2calc,k=k,np=np,exterr=exterr,sigdig=sigdig,oerr=oerr)
     markers <- c(markers,peaks$peaks['t',])
     X <- x2zs(x2plot,z0=z0,from=from,to=to,transformation=transformation)
-    pcol <- set_ellipse_colours(ns=ns,levels=levels,
-                                col=bg,hide=hide,omit=omit,
-                                omit.col=omit.col)
+    pcol <- set_ellipse_colours(ns=ns,levels=levels,col=bg,clim=clim,
+                                hide=hide,omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
     tcol[omit] <- 'grey'
     radial_plot(X,zeta=x$zeta[1],rhoD=x$rhoD[1],show.numbers=show.numbers,
-                pch=pch,levels=levels[plotit],clabel=clabel,markers=markers,
-                fill=bg,bg=pcol[plotit],col=tcol[plotit],sn=(1:ns)[plotit],xlim=xlim,
-                show.colourbar=show.colourbar,...)
+                pch=pch,levels=levels[plotit],clabel=clabel,clim=clim,
+                markers=markers,fill=bg,bg=pcol[plotit],col=tcol[plotit],
+                sn=(1:ns)[plotit],xlim=xlim,show.colourbar=show.colourbar,...)
     fit <- central(x2calc,exterr=exterr)
     fit$pooled <- pooled_age(x2calc,exterr=exterr)
     if (title & !is.null(fit)){
@@ -291,10 +292,10 @@ radialplot.UPb <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
                            xlab=NULL,transformation='log',type=4,
                            cutoff.76=1100,cutoff.disc=discfilter(),
                            show.numbers=FALSE,pch=21,sigdig=2,
-                           levels=NULL,clabel="",bg=c("yellow","red"),
-                           col='black',markers=NULL,k=0,np=3,
-                           exterr=FALSE,common.Pb=0,oerr=3,title=TRUE,
-                           hide=NULL,omit=NULL,omit.col=NA,
+                           levels=NULL,clabel="",clim=NULL,
+                           bg=c("yellow","red"),col='black',markers=NULL,
+                           k=0,np=3,exterr=FALSE,common.Pb=0,oerr=3,
+                           title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
                            show.colourbar=TRUE,...){
     # override type if necessary:
     if (x$format%in%c(9,11)) type <- 2
@@ -303,7 +304,7 @@ radialplot.UPb <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
                xlab=xlab,transformation=transformation,type=type,
                cutoff.76=cutoff.76,cutoff.disc=cutoff.disc,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
                k=k,np=np,exterr=exterr,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,common.Pb=common.Pb,
                show.colourbar=show.colourbar,...)
@@ -326,16 +327,16 @@ radialplot.UPb <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
 #' @export
 radialplot.PbPb <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             xlab=NULL,transformation='log',show.numbers=FALSE,
-                            pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                            col='black',markers=NULL,k=0,np=3,
-                            exterr=FALSE,common.Pb=2,oerr=3,title=TRUE,
-                            hide=NULL,omit=NULL,omit.col=NA,
+                            pch=21,levels=NULL,clabel="",clim=NULL,
+                            bg=c("yellow","red"),col='black',markers=NULL,
+                            k=0,np=3,exterr=FALSE,common.Pb=2,oerr=3,
+                            title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
                             show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=exterr,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,common.Pb=common.Pb,
                show.colourbar=show.colourbar,...)
 }
@@ -343,15 +344,15 @@ radialplot.PbPb <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.ArAr <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             xlab=NULL,transformation='log',show.numbers=FALSE,
-                            pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                            col='black',markers=NULL,k=0,np=3,exterr=FALSE,
-                            i2i=FALSE,oerr=3,title=TRUE,hide=NULL,
-                            omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
+                            pch=21,levels=NULL,clabel="",clim=NULL,
+                            bg=c("yellow","red"),col='black',markers=NULL,
+                            k=0,np=3,exterr=FALSE,i2i=FALSE,oerr=3,title=TRUE,
+                            hide=NULL,omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
+               clabel=clabel,bg=bg,col=col,clim=clim,markers=markers,
+               k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -359,16 +360,16 @@ radialplot.ArAr <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.KCa <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                            xlab=NULL,transformation='log',show.numbers=FALSE,
-                           pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                           col='black',markers=NULL,k=0,np=3,exterr=FALSE,
-                           i2i=FALSE,oerr=3,title=TRUE,
-                           hide=NULL,omit=NULL,omit.col=NA,
+                           pch=21,levels=NULL,clabel="",clim=NULL,
+                           bg=c("yellow","red"),col='black',markers=NULL,
+                           k=0,np=3,exterr=FALSE,i2i=FALSE,oerr=3,
+                           title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
                            show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                transformation=transformation,xlab=xlab,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -376,15 +377,15 @@ radialplot.KCa <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.ThPb <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             xlab=NULL,transformation='log',show.numbers=FALSE,
-                            pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                            col='black',markers=NULL,k=0,np=3,exterr=FALSE,i2i=TRUE,
-                            oerr=3,title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
-                            show.colourbar=TRUE,...){
+                            pch=21,levels=NULL,clabel="",clim=NULL,
+                            bg=c("yellow","red"),col='black',markers=NULL,
+                            k=0,np=3,exterr=FALSE,i2i=TRUE,oerr=3,title=TRUE,
+                            hide=NULL,omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -392,15 +393,15 @@ radialplot.ThPb <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.UThHe <- function(x,from=NA,to=NA,xlim=NULL,z0=NA,sigdig=2,
                              xlab=NULL,transformation='log',show.numbers=FALSE,
-                             pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                             col='black',markers=NULL,k=0,np=3,oerr=3,title=TRUE,
-                             hide=NULL,omit=NULL,omit.col=NA,
-                             show.colourbar=TRUE,...){
+                             pch=21,levels=NULL,clabel="",clim=NULL,
+                             bg=c("yellow","red"),col='black',markers=NULL,
+                             k=0,np=3,oerr=3,title=TRUE,hide=NULL,omit=NULL,
+                             omit.col=NA,show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=FALSE,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=FALSE,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -408,15 +409,15 @@ radialplot.UThHe <- function(x,from=NA,to=NA,xlim=NULL,z0=NA,sigdig=2,
 #' @export
 radialplot.ReOs <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             xlab=NULL,transformation='log',show.numbers=FALSE,
-                            pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                            col='black',markers=NULL,k=0,np=3,exterr=FALSE,i2i=TRUE,
-                            oerr=3,title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
-                           show.colourbar=TRUE,...){
+                            pch=21,levels=NULL,clabel="",clim=NULL,
+                            bg=c("yellow","red"),col='black',markers=NULL,
+                            k=0,np=3,exterr=FALSE,i2i=TRUE,oerr=3,title=TRUE,
+                            hide=NULL,omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -424,15 +425,15 @@ radialplot.ReOs <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.SmNd <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             xlab=NULL,transformation='log',show.numbers=FALSE,
-                            pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
+                            pch=21,levels=NULL,clabel="",clim=NULL,bg=c("yellow","red"),
                             col='black',markers=NULL,k=0,np=3,exterr=FALSE,i2i=TRUE,
                             oerr=3,title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
                             show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -440,16 +441,16 @@ radialplot.SmNd <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.RbSr <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             xlab=NULL,transformation='log',show.numbers=FALSE,
-                            pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                            col='black',markers=NULL,k=0,np=3,exterr=FALSE,
-                            i2i=TRUE,oerr=3,title=TRUE,
-                            hide=NULL,omit=NULL,omit.col=NA,
+                            pch=21,levels=NULL,clabel="",clim=NULL,
+                            bg=c("yellow","red"),col='black',markers=NULL,
+                            k=0,np=3,exterr=FALSE,i2i=TRUE,oerr=3,
+                            title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
                             show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -457,15 +458,15 @@ radialplot.RbSr <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.LuHf <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             xlab=NULL,transformation='log',show.numbers=FALSE,
-                            pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                            col='black',markers=NULL,k=0,np=3,exterr=FALSE,i2i=TRUE,
-                            oerr=3,title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
-                            show.colourbar=TRUE,...){
+                            pch=21,levels=NULL,clabel="",clim=NULL,
+                            bg=c("yellow","red"),col='black',markers=NULL,
+                            k=0,np=3,exterr=FALSE,i2i=TRUE,oerr=3,title=TRUE,
+                            hide=NULL,omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
                xlab=NULL,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
-               clabel=clabel,bg=bg,col=col,markers=markers,k=k,
-               np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
+               clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
+               k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
                hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
@@ -491,13 +492,13 @@ radialplot.LuHf <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 #' @export
 radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                            xlab=NULL,transformation='log',show.numbers=FALSE,
-                           pch=21,levels=NULL,clabel="",bg=c("yellow","red"),
-                           col='black',markers=NULL,k=0,np=3,Th0i=0,oerr=3,
-                           title=TRUE,hide=NULL,omit=NULL,omit.col=NA,
-                           show.colourbar=TRUE,...){
+                           pch=21,levels=NULL,clabel="",clim=NULL,
+                           bg=c("yellow","red"),col='black',markers=NULL,
+                           k=0,np=3,Th0i=0,oerr=3,title=TRUE,hide=NULL,omit=NULL,
+                           omit.col=NA,show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,xlab=xlab,
                transformation=transformation,show.numbers=show.numbers,
-               pch=pch,levels=levels,clabel=clabel,bg=bg,col=col,
+               pch=pch,levels=levels,clabel=clabel,clim=clim,bg=bg,col=col,
                markers=markers,k=k,np=np,exterr=FALSE,Th0i=Th0i,oerr=oerr,
                units=' ka',hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
@@ -506,11 +507,10 @@ radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
 age2radial <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log',
                        xlab=NULL,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
                        show.numbers=FALSE,pch=21,levels=NULL,sigdig=2,
-                       clabel="",bg=c("yellow","red"),col='black',markers=NULL,
-                       k=0,np=3,exterr=FALSE,i2i=FALSE,Th0i=0,common.Pb=0,
-                       oerr=3,units=' Ma',title=TRUE,
-                       hide=NULL,omit=NULL,omit.col=NA,
-                       show.colourbar=TRUE,...){
+                       clabel="",clim=NULL,bg=c("yellow","red"),col='black',
+                       markers=NULL,k=0,np=3,exterr=FALSE,i2i=FALSE,Th0i=0,
+                       common.Pb=0,oerr=3,units=' Ma',title=TRUE,hide=NULL,
+                       omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
     x2calc <- clear(x,hide,omit)
     peaks <- peakfit(x2calc,k=k,np=np,exterr=exterr,sigdig=sigdig,
                      oerr=oerr,i2i=i2i,type=type,cutoff.76=cutoff.76,
@@ -520,7 +520,7 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log',
                    omit4c=unique(c(hide,omit)),Th0i=Th0i,common.Pb=common.Pb)
     radial_helper(tt,from=from,to=to,z0=z0,xlim=xlim,xlab=xlab,
                   transformation=transformation,show.numbers=show.numbers,
-                  pch=pch,levels=levels,clabel=clabel,bg=bg,col=col,
+                  pch=pch,levels=levels,clabel=clabel,clim=clim,bg=bg,col=col,
                   markers=markers,hide=hide,omit=omit,omit.col=omit.col,
                   show.colourbar=show.colourbar,...)
     selection <- clear(1:nrow(tt),unique(c(hide,omit)))
@@ -543,10 +543,10 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log',
 
 radial_helper <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
                           transformation='log',xlab=NULL,
-                          show.numbers=FALSE,pch=21,levels=NULL,clabel="",
-                          bg=c("yellow","red"),col='black',markers=NULL,
-                          hide=NULL,omit=NULL,omit.col=NA,
-                          show.colourbar=TRUE,...){
+                          show.numbers=FALSE,pch=21,levels=NULL,
+                          clabel="",clim=NULL,bg=c("yellow","red"),
+                          col='black',markers=NULL,hide=NULL,
+                          omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
     x <- x[,c(1,2),drop=FALSE]
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -555,22 +555,22 @@ radial_helper <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,
     x2plot <- clear(x,hide)
     X <- x2zs(x2plot,z0=z0,from=from,to=to,
               transformation=transformation,xlab=xlab)
-    pcol <- set_ellipse_colours(ns=ns,levels=levels,col=bg,hide=hide,
-                                omit=omit,omit.col=omit.col)
+    pcol <- set_ellipse_colours(ns=ns,levels=levels,clim=clim,col=bg,
+                                hide=hide,omit=omit,omit.col=omit.col)
     tcol <- rep(col,ns)
     tcol[omit] <- 'grey'
     radial_plot(X,show.numbers=show.numbers,pch=pch,
-                levels=levels[plotit],clabel=clabel,markers=markers,
-                fill=bg,bg=pcol[plotit],col=tcol[plotit],
-                sn=(1:ns)[plotit],xlim=xlim,
+                levels=levels[plotit],clabel=clabel,clim=clim,
+                markers=markers,fill=bg,bg=pcol[plotit],
+                col=tcol[plotit],sn=(1:ns)[plotit],xlim=xlim,
                 show.colourbar=show.colourbar,...)
 }
 
 radial_plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                         show.numbers=FALSE,levels=NULL,clabel="",
-                        markers=NULL,pch=21,fill=c('yellow','red'),
-                        bg='yellow',col='black',
-                        sn=1:length(x$z),xlim=NULL,
+                        clim=NULL,markers=NULL,pch=21,
+                        fill=c('yellow','red'),bg='yellow',
+                        col='black',sn=1:length(x$z),xlim=NULL,
                         show.colourbar=TRUE,...){
     if (show.numbers & is.null(levels)) show.points <- FALSE
     else show.points <- TRUE
@@ -578,8 +578,8 @@ radial_plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
     tticks <- get_radial_tticks(x)
     labelpos <- 4
     if (validLevels(levels)) labelpos <- 2
-    plot_radial_lines(tticks,l=0.025,x,exM[1],exM[2],zeta,rhoD,
-                      label=TRUE,pos=labelpos)
+    plot_radial_lines(tticks,l=0.025,x,exM[1],exM[2],zeta,
+                      rhoD,label=TRUE,pos=labelpos)
     if (!is.null(markers)){
         plot_radial_lines(markers,x,exM[1],exM[2],
                           zeta,rhoD,label=FALSE)
@@ -589,7 +589,7 @@ radial_plot <- function(x,zeta=0,rhoD=0,asprat=3/4,
                        show.numbers=show.numbers,
                        pch=pch,bg=bg,col=col,sn=sn,...)
     if (show.colourbar)
-        colourbar(z=levels,fill=fill,stroke=col,clabel=clabel)
+        colourbar(z=levels,fill=fill,stroke=col,clabel=clabel,clim=clim)
 }
 
 radial_scale <- function(x,zeta=0,rhoD=0,xlim=NULL,...){

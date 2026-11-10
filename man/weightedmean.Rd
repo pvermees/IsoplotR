@@ -29,6 +29,7 @@ weightedmean(x, ...)
   plot = TRUE,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -51,6 +52,7 @@ weightedmean(x, ...)
   plot = TRUE,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -72,6 +74,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -98,6 +101,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -121,6 +125,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -143,6 +148,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -166,6 +172,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -189,6 +196,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -212,6 +220,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -235,6 +244,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -258,6 +268,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -281,6 +292,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -304,6 +316,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -325,6 +338,7 @@ weightedmean(x, ...)
   to = NA,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   rect.col = c("#00FF0080", "#FF000080"),
   outlier.col = "#00FFFF80",
   sigdig = 2,
@@ -372,7 +386,9 @@ user.}
 \item{levels}{a vector with additional values to be displayed as
 different background colours of the plot symbols.}
 
-\item{clabel}{label of the colour legend}
+\item{clabel}{label of the colour legend.}
+
+\item{clim}{(optional) limits of the colour scale.}
 
 \item{rect.col}{Fill colour for the measurements or age estimates. This can
     either be a single colour or multiple colours to form a colour

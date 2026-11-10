@@ -348,7 +348,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,left=FALSE,
                      line.col='black',exterr=exterr,
                      sigdig=sigdig,add=TRUE,model=model,
                      hide=hide,omit=omit,omit.fill=omit.fill,
-                     omit.stroke=omit.stroke)
+                     omit.stroke=omit.stroke,show.colourbar=FALSE)
     } else { # plot just the data
         scatterplot(d,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,clim=clim,

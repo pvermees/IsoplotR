@@ -16,6 +16,7 @@ agespectrum(x, ...)
   random.effects = FALSE,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80",
   sigdig = 2,
@@ -37,6 +38,7 @@ agespectrum(x, ...)
   random.effects = FALSE,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80",
   sigdig = 2,
@@ -57,6 +59,7 @@ agespectrum(x, ...)
   random.effects = FALSE,
   levels = NULL,
   clabel = "",
+  clim = NULL,
   plateau.col = c("#00FF0080", "#FF000080"),
   non.plateau.col = "#00FFFF80",
   sigdig = 2,
@@ -122,6 +125,8 @@ returns a list with plateau parameters.}
 different background colours of the plot symbols.}
 
 \item{clabel}{label of the colour legend}
+
+\item{clim}{(optional) limits of the colour scale.}
 
 \item{plateau.col}{Fill colours of the rectangles used to mark the steps belonging to
 the age plateau. This can either be a single colour or multiple

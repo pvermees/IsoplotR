@@ -12,5 +12,6 @@
 #' @references Vermeesch, P., 2018, IsoplotR: a free and open toolbox
 #'     for geochronology. Geoscience Frontiers, 9, 1479-1493, doi:
 #'     10.1016/j.gsf.2018.04.001.
+#' @author Pieter Vermeesch
 "_PACKAGE"
 #> [1] "_PACKAGE"
