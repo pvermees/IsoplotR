@@ -120,6 +120,7 @@ ellipse <- function(x,y,covmat,alpha=0.05,n=50){
 #' @param cex plot symbol magnification.
 #' @param xlim (optional) two-element vector with the x-axis limits
 #' @param ylim (optional) two-element vector with the y-axis limits
+#' @param clim (optional) two-element vector with the colour-axis limits
 #' @param xlab (optional) x-axis label (only used when
 #'     \code{add=FALSE})
 #' @param ylab (optional) y-axis label (only used when
@@ -153,8 +154,8 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                         empty=FALSE,ci.col='gray80',line.col='black',
                         lwd=1,hide=NULL,omit=NULL,omit.fill=NA,
                         omit.stroke="grey",show.colourbar=TRUE,
-                        bg,cex,xlim=NULL,ylim=NULL,xlab,ylab,
-                        asp=NA,log='',taxis=FALSE,box=!taxis,
+                        bg,cex,xlim=NULL,ylim=NULL,clim=NULL,
+                        xlab,ylab,asp=NA,log='',taxis=FALSE,box=!taxis,
                         xaxt=ifelse(taxis,'n','s'),sort=FALSE,...){
     ns <- nrow(xy)
     if (ncol(xy)==4) xy <- cbind(xy,rep(0,ns))
@@ -212,10 +213,12 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
                            col=line.col,nonneg=nonneg,lwd=lwd)
     }
     if (box) graphics::box()
-    fill <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.fill,
-                                hide=hide,omit=omit,omit.col=omit.fill)
-    stroke <- set_ellipse_colours(ns=ns,levels=levels,col=ellipse.stroke,
-                                  hide=hide,omit=omit,omit.col=omit.stroke)
+    fill <- set_ellipse_colours(ns=ns,levels=levels,clim=clim,
+                                col=ellipse.fill,hide=hide,
+                                omit=omit,omit.col=omit.fill)
+    stroke <- set_ellipse_colours(ns=ns,levels=levels,clim=clim,
+                                  col=ellipse.stroke,hide=hide,
+                                  omit=omit,omit.col=omit.stroke)
     if (show.ellipses==0){ # points and or text
         if (missing(cex)) cex <- 1
         if (missing(bg)) bg <- fill
@@ -259,8 +262,8 @@ scatterplot <- function(xy,oerr=3,show.numbers=FALSE,
         # blank plot
     }
     if (!is.null(levels) & show.colourbar){
-        colourbar(z=levels[calcit],fill=ellipse.fill,
-                  stroke=ellipse.stroke,clabel=clabel)
+        colourbar(z=levels[calcit],clim=clim,clabel=clabel,
+                  fill=ellipse.fill,stroke=ellipse.stroke)
     }
 }
 

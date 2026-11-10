@@ -28,6 +28,7 @@ scatterplot(
   cex,
   xlim = NULL,
   ylim = NULL,
+  clim = NULL,
   xlab,
   ylab,
   asp = NA,
@@ -139,6 +140,8 @@ assigned to \code{levels}}
 \item{xlim}{(optional) two-element vector with the x-axis limits}
 
 \item{ylim}{(optional) two-element vector with the y-axis limits}
+
+\item{clim}{(optional) two-element vector with the colour-axis limits}
 
 \item{xlab}{(optional) x-axis label (only used when
 \code{add=FALSE})}

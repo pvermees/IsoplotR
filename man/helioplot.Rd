@@ -13,6 +13,7 @@ helioplot(
   oerr = 3,
   contour.col = c("white", "red"),
   levels = NULL,
+  clim = NULL,
   clabel = "",
   ellipse.fill = c("#00FF0080", "#0000FF80"),
   ellipse.stroke = "black",
@@ -86,6 +87,9 @@ assigned to the minimum and maximum age contour}
 
 \item{levels}{a vector with additional values to be displayed as
 different background colours within the error ellipses.}
+
+\item{clim}{optional limits of the colour scale (if \code{levels}
+is not \code{NULL}).}
 
 \item{clabel}{label of the colour scale}
 

@@ -8,6 +8,7 @@ evolution(
   x,
   xlim = NULL,
   ylim = NULL,
+  clim = NULL,
   tticks = NULL,
   aticks = NULL,
   oerr = 3,
@@ -34,9 +35,11 @@ evolution(
 \arguments{
 \item{x}{an object of class \code{ThU}}
 
-\item{xlim}{x-axis limits}
+\item{xlim}{(optional) x-axis limits}
 
-\item{ylim}{y-axis limits}
+\item{ylim}{(optional) y-axis limits}
+
+\item{clim}{(optional) two-element vector with the colour-axis limits}
 
 \item{tticks}{time intervals of the evolution grid}
 

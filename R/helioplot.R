@@ -116,6 +116,8 @@
 #' @param ylim optional limits of the y-axis (log[Th/He]) of the
 #'     logratio plot. If \code{ylim=NA}, the axis limits are
 #'     determined automatically.
+#' @param clim optional limits of the colour scale (if \code{levels}
+#'     is not \code{NULL}).
 #' @param fact three-element vector with scaling factors of the
 #'     ternary diagram if \code{fact=NA}, these will be determined
 #'     automatically
@@ -169,7 +171,8 @@
 #' @export
 helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
                       show.numbers=FALSE,oerr=3,contour.col=c('white','red'),
-                      levels=NULL,clabel="",ellipse.fill=c("#00FF0080","#0000FF80"),
+                      levels=NULL,clim=NULL,clabel="",
+                      ellipse.fill=c("#00FF0080","#0000FF80"),
                       ellipse.stroke='black',sigdig=2,xlim=NA,
                       ylim=NA,fact=NA,hide=NULL,omit=NULL,
                       omit.fill=NA,omit.stroke='grey',
@@ -180,10 +183,10 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
     x2calc <- clear(x,hide,omit)
     x2plot <- clear(x,hide)
     fit <- central.UThHe(x2calc,compositional=TRUE,model=model)
-    fill <- set_ellipse_colours(ns=ns,levels=levels,
+    fill <- set_ellipse_colours(ns=ns,levels=levels,clim=clim,
                                 col=ellipse.fill,hide=hide,
                                 omit=omit,omit.col=omit.fill)
-    stroke <- set_ellipse_colours(ns=ns,levels=levels,
+    stroke <- set_ellipse_colours(ns=ns,levels=levels,clim=clim,
                                   col=ellipse.stroke,hide=hide,
                                   omit=omit,omit.col=omit.stroke)
     if (logratio) {
@@ -210,8 +213,8 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
                                   fact=fact,hide=hide,omit=omit,
                                   bg=fill,col=stroke,...)
         } else {
-            plot_helioplot_ellipses(x,fill=fill,stroke=stroke,fact=fact,
-                                    oerr=oerr,levels=levels,
+            plot_helioplot_ellipses(x,fill=fill,stroke=stroke,
+                                    fact=fact,oerr=oerr,levels=levels,
                                     show.numbers=show.numbers,
                                     hide=hide,sort=sort)
         }
@@ -223,8 +226,10 @@ helioplot <- function(x,logratio=TRUE,model=1,show.barycentre=TRUE,
     fit$n <- length(which(calcit))
     graphics::title(helioplot_title(fit,sigdig=sigdig,oerr=oerr))
     if (show.colourbar){
-        colourbar(z=levels[calcit],fill=ellipse.fill,
-                  stroke=ellipse.stroke,clabel=clabel)
+        colourbar(z=levels[calcit],
+                  fill=ellipse.fill,
+                  stroke=ellipse.stroke,
+                  clim=clim,clabel=clabel)
     }
     invisible(fit)
 }

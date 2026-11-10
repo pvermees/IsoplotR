@@ -243,8 +243,9 @@ LL_norm <- function(x,covmat){
     },error=function(e) Inf)
 }
 
-set_ellipse_colours <- function(ns=1,levels=NULL,col=c('yellow','red'),
-                                hide=NULL,omit=NULL,omit.col=NA){
+set_ellipse_colours <- function(ns=1,levels=NULL,clim=NULL,
+                                col=c('yellow','red'),hide=NULL,
+                                omit=NULL,omit.col=NA){
     nl <- length(levels)
     if (nl > 1){
         levels[c(hide,omit)] <- NA
@@ -252,7 +253,7 @@ set_ellipse_colours <- function(ns=1,levels=NULL,col=c('yellow','red'),
     }
     out <- NULL
     if (validLevels(levels)){
-        colours <- levels2colours(levels=levels,col=col)
+        colours <- levels2colours(levels=levels,col=col,clim=clim)
         if (nl<ns) out[1:nl] <- colours
         else out <- colours[1:ns]
     } else {
@@ -262,13 +263,19 @@ set_ellipse_colours <- function(ns=1,levels=NULL,col=c('yellow','red'),
     out
 }
 
-levels2colours <- function(levels=c(0,1),col=c('yellow','red')){
-    m <- min(levels,na.rm=TRUE)
-    M <- max(levels,na.rm=TRUE)
+levels2colours <- function(levels=c(0,1),col=c('yellow','red'),clim=NULL){
+    if (length(clim)<2){
+        m <- min(levels,na.rm=TRUE)
+        M <- max(levels,na.rm=TRUE)
+    } else {
+        m <- clim[1]
+        M <- clim[2]
+    }
     fn <- grDevices::colorRamp(colors=col,alpha=TRUE)
     normalised.levels <- (levels-m)/(M-m)
-    nan <- is.na(normalised.levels)
-    normalised.levels[nan] <- 0
+    normalised.levels[is.na(normalised.levels)] <- 0
+    normalised.levels[normalised.levels<0] <- 0
+    normalised.levels[normalised.levels>1] <- 1
     col.matrix <- fn(normalised.levels)/255
     red <- col.matrix[,1]
     green <- col.matrix[,2]
@@ -284,8 +291,9 @@ validLevels <- function(levels){
     diff(range(levels,na.rm=TRUE))
 }
 
-colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
-                      stroke='black',strip.width=0.02,clabel=""){
+colourbar <- function(z=c(0,1),strip.width=0.02,
+                      fill=c("#00FF0080","#FF000080"),
+                      stroke='black',clim=NULL,clabel=""){
     if (!validLevels(z)) return()
     if (all(is.na(fill)) | length(unique(fill))==1) col <- stroke
     else col <- fill
@@ -299,15 +307,20 @@ colourbar <- function(z=c(0,1),fill=c("#00FF0080","#FF000080"),
     ndiv <- 50 # number of divisions
     dx <- (xe-xb)/ndiv
     dy <- (ye-yb)/ndiv
-    mz <- min(z,na.rm=TRUE)
-    Mz <- max(z,na.rm=TRUE)
+    if (length(clim)<2){
+        mz <- min(z,na.rm=TRUE)
+        Mz <- max(z,na.rm=TRUE)
+    } else {
+        mz <- clim[1]
+        Mz <- clim[2]
+    }
     zz <- seq(from=mz,to=Mz,length.out=ndiv)
-    cc <- levels2colours(levels=zz,col=col)
+    cc <- levels2colours(levels=zz,col=col,clim=clim)
     for (i in 1:ndiv){
         graphics::rect(xb,yb+(i-1)*dy,xe,yb+i*dy,col=cc[i],border=NA)
     }
     graphics::rect(xb,yb,xe,ye)
-    zticks <- pretty(range(z,na.rm=TRUE))
+    zticks <- pretty(c(mz,Mz))
     zticks <- zticks[zticks >= mz & zticks <= Mz]
     zpos <- yb + (zticks-mz)/(Mz-mz)*(ye-yb)
     graphics::axis(side=4,at=zpos,labels=zticks)
