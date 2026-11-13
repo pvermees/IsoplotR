@@ -27,7 +27,11 @@
 #' @param nboot number of bootstrap replicates.
 #' @param hide vector with indices of samples that should be removed
 #'     from the plot.
-#' @param sigdig the number of significant digits for the results plot.
+#' @param sigdig the number of significant digits for the results
+#'     plot.
+#' @param stratigraphic logical. If \code{true} and the dataset
+#'     contains more than one sink, plots the results as a
+#'     stratigraphic plot.
 #' @param ... additional graphical parameters passed to the plots.
 #' @return If \code{boot=FALSE}, a matrix with one row per sink and
 #'     columns for the estimated source proportions and the Cramer-von
@@ -238,13 +242,15 @@ plot_unmix <- function(XYWCvM,out,stratigraphic=TRUE,
                            type='n', xaxs="i", yaxs="i",
                            xaxt='n',yaxt='n',
                            xlab=NULL,ylab=NULL)
-            for (i in num_sinks:1){
+            for (i in 1:num_sinks){
                 xleft <- sum_of_weights[i,1:num_sources]
                 xright <- sum_of_weights[i,2:(num_sources+1)]
                 graphics::rect(xleft=xleft,xright=xright,
-                               ybottom=i-1,ytop=i,col=colours)
+                               ybottom=num_sinks-i,
+                               ytop=num_sinks-i+1,
+                               col=colours)
                 xtext <- (xleft+xright)/2
-                graphics::text(x=xtext,y=i-0.5,
+                graphics::text(x=xtext,y=num_sinks-i+0.5,
                                labels=signif(W[i,],digits=sigdig),
                                xpd=NA,col='grey40')
             }
