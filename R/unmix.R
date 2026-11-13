@@ -144,7 +144,7 @@ plot_unmix <- function(XYWCvM,out,stratigraphic=TRUE,
                        sigdig=2,boot=FALSE,...){
     num_sources <- length(source_names)
     num_sinks <- length(sink_names)
-    if (stratigraphic & num_sinks>1){
+    if (stratigraphic & num_sinks>1 & !boot){
         cads <- c(3,3:(2+num_sinks),2+num_sinks)
         zigzag <- c(0,rep(3+num_sinks,num_sinks),0)
         top <- c(0,1,2,2,0)
@@ -208,13 +208,21 @@ plot_unmix <- function(XYWCvM,out,stratigraphic=TRUE,
     }
     graphics::axis(side=1)
     graphics::mtext(text=xlab,side=1,line=1.75,cex=cex*0.8)
-    if (num_sinks<2){
-        result <- paste0(source_names,' = ',signif(W[1,],digits=sigdig),'%')
-        if (boot){
-            ll <- signif(100*out$ll,digits=sigdig)
-            ul <- signif(100*out$ul,digits=sigdig)
-            result <- paste0(result,paste0(' [',ll,'-',ul,'%]'))
+    if (boot){
+        graphics::plot(x=c(0,num_sources+1),y=c(0,num_sinks),
+                       type="n",xlab="",ylab="",axes=FALSE,yaxs="i")
+        graphics::axis(side=1,at=1:num_sources,labels=source_names)
+        ww <- signif(100*out$prop[,1:num_sources,drop=FALSE],digits=sigdig)
+        ll <- signif(100*out$ll,digits=sigdig)
+        ul <- signif(100*out$ul,digits=sigdig)
+        for (i in 1:num_sinks){
+            graphics::text(x=1:num_sources,y=num_sinks-i+2/3,
+                           labels=paste0(ww[i,],"%"),xpd=NA)
+            graphics::text(x=1:num_sources,y=num_sinks-i+1/3,
+                           labels=paste0("[",ll[i,],"-",ul[i,],"]"),xpd=NA)
         }
+    } else if (num_sinks<2){
+        result <- paste0(source_names,' = ',signif(W[1,],digits=sigdig),'%')
         graphics::plot(1,type="n",xlim=c(0,10),ylim=c(0,10),
                        xlab="",ylab="",axes=FALSE)
         graphics::legend('center',legend=result,
