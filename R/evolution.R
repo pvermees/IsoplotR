@@ -34,8 +34,9 @@
 #' decorated with a fanning set of \code{\link{isochron}} lines.
 #'
 #' @param x an object of class \code{ThU}
-#' @param xlim x-axis limits
-#' @param ylim y-axis limits
+#' @param xlim (optional) x-axis limits
+#' @param ylim (optional) y-axis limits
+#' @param clim (optional) two-element vector with the colour-axis limits
 #' @param tticks time intervals of the evolution grid
 #' @param aticks initial activity ratio ticks of the evolution grid
 #' @param oerr indicates whether the analytical uncertainties of the
@@ -111,7 +112,7 @@
 #' @param exterr propagate the decay constant uncertainty in the
 #'     isochron age?
 #' @param sigdig number of significant digits for the isochron age
-#' @param model if \code{isochron=TRUE}, choose one of three
+#' @param model if \code{isochron=TRUE}, choose one of four
 #'     regression models:
 #'
 #' \code{1}: maximum likelihood regression, using either the modified
@@ -140,6 +141,9 @@
 #' \code{4}: If \code{x$format} is \code{3} or \code{4}, calculate the
 #' rightmost isochron, corresponding to the minimum age component of a
 #' contaminated system.
+#'
+#' @param left logical. If \code{TRUE} and \code{model=4}, fits the
+#'     lefmost isochron to the data.
 #' 
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
@@ -149,7 +153,7 @@
 #'     aliquots.
 #' @param omit.stroke stroke colour that should be used for the omitted
 #'     aliquots.
-#' @param ... optional arguments to the generic \code{plot} function
+#' @param ... optional arguments to the \code{scatterplot} function.
 #' @seealso \code{\link{isochron}}
 #'
 #' @examples
@@ -167,50 +171,51 @@
 #'     errors for \eqn{^{230}}Th/U geochronology. Reviews in Mineralogy and
 #'     Geochemistry, 52(1), pp.631-656.
 #' @export
-evolution <- function(x,xlim=NULL,ylim=NULL,tticks=NULL,aticks=NULL,oerr=3,
-                      transform=FALSE,Th0i=0,show.numbers=FALSE,levels=NULL,
+evolution <- function(x,xlim=NULL,ylim=NULL,clim=NULL,tticks=NULL,aticks=NULL,
+                      oerr=3,transform=FALSE,Th0i=0,show.numbers=FALSE,levels=NULL,
                       clabel="",ellipse.fill=c("#00FF0080","#FF000080"),
                       ellipse.stroke='black',line.col='darksalmon',
-                      isochron=FALSE,model=1,exterr=FALSE,sigdig=2,
+                      isochron=FALSE,model=1,left=FALSE,exterr=FALSE,sigdig=2,
                       hide=NULL,omit=NULL,omit.fill=NA,omit.stroke='grey',...){
     if (x$format %in% c(1,2)){
         if (transform){
-            U4U8vst(x,Th0i=Th0i,xlim=xlim,ylim=ylim,oerr=oerr,
-                    show.numbers=show.numbers,levels=levels,
+            U4U8vst(x,Th0i=Th0i,xlim=xlim,ylim=ylim,clim=clim,
+                    oerr=oerr,show.numbers=show.numbers,levels=levels,
                     clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     show.ellipses=(model!=2),hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
         } else {
             U4U8vsTh0U8(x,isochron=isochron,model=model,
-                        xlim=xlim,ylim=ylim,tticks=tticks,aticks=aticks,
-                        oerr=oerr,Th0i=Th0i,show.numbers=show.numbers,
-                        levels=levels,clabel=clabel,
-                        ellipse.fill=ellipse.fill,
+                        xlim=xlim,ylim=ylim,clim=clim,tticks=tticks,
+                        aticks=aticks,oerr=oerr,Th0i=Th0i,
+                        show.numbers=show.numbers,levels=levels,
+                        clabel=clabel,ellipse.fill=ellipse.fill,
                         ellipse.stroke=ellipse.stroke,
                         line.col=line.col,show.ellipses=(model!=2),
                         hide=hide,omit=omit,omit.fill=omit.fill,
                         omit.stroke=omit.stroke,...)
         }
         if (isochron){
-            fit <- isochron.ThU(x,type=3,plot=FALSE,exterr=exterr,model=model,
+            fit <- isochron.ThU(x,type=3,plot=FALSE,
+                                exterr=exterr,model=model,
                                 hide=hide,omit=omit,oerr=oerr)
             fit$n <- length(x)-length(hide)-length(omit)
             graphics::title(evolution_title(fit,sigdig=sigdig,oerr=oerr))
         }
     } else {
-        Th02vsU8Th2(x,isochron=isochron,model=model,Th0i=Th0i,
-                    xlim=xlim,ylim=ylim,tticks=tticks,aticks=aticks,
-                    oerr=oerr,show.numbers=show.numbers,exterr=exterr,
-                    sigdig=sigdig,levels=levels,clabel=clabel,
-                    ellipse.fill=ellipse.fill,
+        Th02vsU8Th2(x,isochron=isochron,model=model,left=left,
+                    Th0i=Th0i,xlim=xlim,ylim=ylim,clim=clim,tticks=tticks,
+                    aticks=aticks,oerr=oerr,show.numbers=show.numbers,
+                    exterr=exterr,sigdig=sigdig,levels=levels,
+                    clabel=clabel,ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,line.col=line.col,
                     hide=hide,omit=omit,omit.fill=omit.fill,
                     omit.stroke=omit.stroke,...)
     }
 }
 
-U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
+U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,clim=NULL,oerr=3,
                     show.numbers=FALSE,levels=NULL,clabel="",
                     ellipse.fill=c("#00FF0080","#FF000080"),
                     ellipse.stroke='black',show.ellipses=TRUE,
@@ -220,12 +225,14 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
     plotit <- (1:ns)%ni%hide
     ta0 <- get_ThU_age_corals(x,exterr=FALSE,cor=FALSE,Th0i=Th0i)
     nsd <- 3
-    if (is.null(xlim))
+    if (is.null(xlim)){
         xlim <- range(c(ta0[plotit,'t']-nsd*ta0[plotit,'s[t]'],
                         ta0[plotit,'t']+nsd*ta0[plotit,'s[t]']))
-    if (is.null(ylim))
+    }
+    if (is.null(ylim)){
         ylim <- range(c(ta0[plotit,'48_0']-nsd*ta0[plotit,'s[48_0]'],
                         ta0[plotit,'48_0']+nsd*ta0[plotit,'s[48_0]']))
+    }
     x.lab <- 'Age [ka]'
     y.lab <- expression(paste("("^"234","U/"^"238","U)"[0]))
     graphics::plot(xlim,ylim,type='n',bty='n',xlab=x.lab,ylab=y.lab)
@@ -234,13 +241,13 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,oerr=3,
     d[,'rXY'] <- ta0[,'cov[t,48_0]']/(ta0[,'s[t]']*ta0[,'s[48_0]'])
     scatterplot(d,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
-                clabel=clabel,ellipse.fill=ellipse.fill,
+                clim=clim,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,hide=hide,
                 omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke,...)
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
-                        xlim=NULL,ylim=NULL,oerr=3,
+                        xlim=NULL,ylim=NULL,clim=NULL,oerr=3,
                         show.numbers=FALSE,levels=NULL,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
@@ -251,7 +258,7 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
     calcit <- (1:ns)%ni%c(hide,omit)
     y <- data2evolution(x,Th0i=Th0i,omit4c=unique(c(hide,omit)))
     d2plot <- subset(y,subset=plotit)
-    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim,...)
+    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim)
     if (isochron){
         fit <- isochron(x,type=3,plot=FALSE,
                         model=model,hide=hide,omit=omit)
@@ -263,8 +270,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
         initial[3] <- b48
         initial[4] <- sqrt(fit$cov['B','B'])
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
-        scatterplot(initial,oerr=oerr,line.col='black',add=TRUE,
-                    ellipse.fill=grDevices::rgb(1,1,1,0.85))
+        scatterplot(initial,oerr=oerr,line.col='black',
+                    ellipse.fill=grDevices::rgb(1,1,1,0.85),
+                    add=TRUE,clim=clim,...)
         e48 <- 1
         e08 <- b08 + fit$par['A']*(e48-b48)/fit$par['a']
         graphics::lines(c(b08,e08),c(b48,e48))
@@ -273,17 +281,17 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
                  'U234U238','sU234U238','rYZ'),drop=FALSE]
     scatterplot(pdat,oerr=oerr,show.numbers=show.numbers,
                 show.ellipses=show.ellipses,levels=levels,
-                clabel=clabel,ellipse.fill=ellipse.fill,
+                clim=clim,clabel=clabel,ellipse.fill=ellipse.fill,
                 ellipse.stroke=ellipse.stroke,add=TRUE,
                 hide=hide,omit=omit,omit.fill=omit.fill,
                 omit.stroke=omit.stroke,show.colourbar=FALSE,...)
     colourbar(z=levels[calcit],fill=ellipse.fill,
-              stroke=ellipse.stroke,clabel=clabel)
+              stroke=ellipse.stroke,clim=clim,clabel=clabel)
 }
 
-Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
-                        xlim=NULL,ylim=NULL,tticks=NULL,
-                        oerr=3,show.numbers=FALSE,
+Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,left=FALSE,
+                        Th0i=0,xlim=NULL,ylim=NULL,clim=NULL,
+                        tticks=NULL,oerr=3,show.numbers=FALSE,
                         exterr=FALSE,clabel="",levels=NULL,
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',sigdig=2,
@@ -294,7 +302,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
     calcit <- (1:ns)%ni%c(hide,omit)
     d <- data2evolution(x,omit4c=unique(c(hide,omit)))
     d2plot <- subset(d,subset=plotit)
-    scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE)
+    scatterplot(d2plot,xlim=xlim,ylim=ylim,empty=TRUE,...)
     if (is.null(tticks)) tticks <- c(0,5,10,20,50,100,200,Inf)
     nt <- length(tticks)
     X <- graphics::par('usr')[1:2]
@@ -302,9 +310,9 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
     usr <- graphics::par('usr')
     l0 <- lambda('Th230')[1]
     if (Th0i==1){
-        fit <- isochron.ThU(x,type=1,model=model,
-                            plot=FALSE,exterr=FALSE,
-                            hide=hide,omit=omit,omit.fill=omit.fill,
+        fit <- isochron.ThU(x,type=1,model=model,left=left,
+                            plot=FALSE,exterr=FALSE,hide=hide,
+                            omit=omit,omit.fill=omit.fill,
                             omit.stroke=omit.stroke)
         xy0 <- fit$y0[1]
     } else if (Th0i==2){
@@ -317,7 +325,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
         else ticktext <- expression(infinity)
         slope <- 1-exp(-l0*tticks[i])
         Y <- xy0 + slope*(X-xy0)
-        graphics::lines(X,Y,col=line.col,...)
+        graphics::lines(X,Y,col=line.col)
         if (Y[2]<usr[3]){
             # do nothing
         } else if (Y[2]>usr[4]){ # label below upper margin
@@ -334,24 +342,28 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,Th0i=0,
         isochron.ThU(x,type=1,oerr=oerr,plot=TRUE,
                      show.numbers=show.numbers,
                      anchor=ifelse(Th0i==2,1,0),
-                     levels=levels,ellipse.fill=ellipse.fill,
+                     levels=levels,clim=clim,
+                     ellipse.fill=ellipse.fill,
                      ellipse.stroke=ellipse.stroke,
-                     line.col='black',exterr=exterr,sigdig=sigdig,
-                     add=TRUE,model=model,hide=hide,
-                     omit=omit,omit.fill=omit.fill,omit.stroke=omit.stroke)
+                     line.col='black',exterr=exterr,
+                     sigdig=sigdig,add=TRUE,model=model,
+                     hide=hide,omit=omit,omit.fill=omit.fill,
+                     omit.stroke=omit.stroke,show.colourbar=FALSE)
     } else { # plot just the data
         scatterplot(d,oerr=oerr,show.numbers=show.numbers,
-                    levels=levels,ellipse.fill=ellipse.fill,
+                    levels=levels,clim=clim,
+                    ellipse.fill=ellipse.fill,
                     ellipse.stroke=ellipse.stroke,
                     add=TRUE,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,
-                    show.colourbar=FALSE)
+                    show.colourbar=FALSE,...)
         xlab <- expression(paste(""^"238","U/"^"232","Th"))
         ylab <- expression(paste(""^"230","Th/"^"232","Th"))
         graphics::title(xlab=xlab,ylab=ylab)
     }
     invisible(colourbar(z=levels[calcit],fill=ellipse.fill,
-                        stroke=ellipse.stroke,clabel=clabel))
+                        stroke=ellipse.stroke,
+                        clim=clim,clabel=clabel))
 }
 
 evolution_title <- function(fit,sigdig=2,oerr=3,...){

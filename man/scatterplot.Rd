@@ -28,6 +28,7 @@ scatterplot(
   cex,
   xlim = NULL,
   ylim = NULL,
+  clim = NULL,
   xlab,
   ylab,
   asp = NA,
@@ -35,6 +36,7 @@ scatterplot(
   taxis = FALSE,
   box = !taxis,
   xaxt = ifelse(taxis, "n", "s"),
+  sort = FALSE,
   ...
 )
 }
@@ -139,6 +141,8 @@ assigned to \code{levels}}
 
 \item{ylim}{(optional) two-element vector with the y-axis limits}
 
+\item{clim}{(optional) two-element vector with the colour-axis limits}
+
 \item{xlab}{(optional) x-axis label (only used when
 \code{add=FALSE})}
 
@@ -157,6 +161,9 @@ inverse isochron with a time scale. Only used if
 \item{box}{logical. If \code{TRUE}, draws a frame around the plot.}
 
 \item{xaxt}{see \code{?par}}
+
+\item{sort}{logical. If \code{TRUE}, sorts the error ellipses by
+size, so that the small ellipses plot on top of the large ones.}
 
 \item{...}{optional arguments to format the points and text.}
 }

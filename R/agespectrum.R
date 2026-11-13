@@ -82,6 +82,8 @@
 #' @param non.plateau.col if \code{plateau=TRUE}, the steps that do
 #'     NOT belong to the plateau are given a different colour.
 #' @param clabel label of the colour legend
+#' @param clim (optional) limits of the colour scale.
+#' @param ylim (optional) limits of the y-axis.
 #' @param sigdig the number of significant digits of the numerical
 #'     values reported in the title of the graphical output.
 #' @param line.col colour of the average age line
@@ -126,8 +128,8 @@
 agespectrum <- function(x,...){ UseMethod("agespectrum",x) }
 #' @rdname agespectrum
 #' @export
-agespectrum.default <- function(x,oerr=3,plateau=TRUE,
-                                random.effects=FALSE,levels=NULL,clabel="",
+agespectrum.default <- function(x,oerr=3,plateau=TRUE,random.effects=FALSE,
+                                levels=NULL,clabel="",clim=NULL,ylim=NULL,
                                 plateau.col=c("#00FF0080","#FF000080"),
                                 non.plateau.col="#00FFFF80",
                                 sigdig=2,line.col='red',lwd=2,
@@ -135,10 +137,10 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
                                 ylab='X',hide=NULL,omit=NULL,
                                 title=TRUE,show.colourbar=TRUE,...){
     XY <- plot_spectrum_axes(x=x,oerr=oerr,xlab=xlab,
-                             ylab=ylab,hide=hide,...)
+                             ylab=ylab,hide=hide,ylim=ylim,...)
     pc <- get_plateau_colours(x=x,levels=levels,plateau=plateau,
                               hide=hide,omit=omit,plateau.col=plateau.col,
-                              non.plateau.col=non.plateau.col,
+                              non.plateau.col=non.plateau.col,clim=clim,
                               random.effects=random.effects,oerr=oerr)
     if (plateau){
         plot_plateau(fit=pc$plat,line.col=line.col,lwd=lwd)
@@ -147,14 +149,15 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,
             graphics::title(tit)
         }
     }
-    plot_spectrum(XY=XY,col=pc$col,...)
-    if (show.colourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
+    plot_spectrum(XY=XY,col=pc$col)
+    if (show.colourbar) colourbar(z=levels,fill=plateau.col,
+                                  clabel=clabel,clim=clim)
     if (plateau) return(invisible(pc$plat))
 }
 #' @rdname agespectrum
 #' @export
-agespectrum.other <- function(x,oerr=3,plateau=TRUE,
-                              random.effects=FALSE,levels=NULL,clabel="",
+agespectrum.other <- function(x,oerr=3,plateau=TRUE,random.effects=FALSE,
+                              levels=NULL,clabel="",clim=NULL,ylim=NULL,
                               plateau.col=c("#00FF0080","#FF000080"),
                               non.plateau.col="#00FFFF80",
                               sigdig=2,line.col='red',lwd=2,
@@ -164,9 +167,9 @@ agespectrum.other <- function(x,oerr=3,plateau=TRUE,
     if (x$format==3) X <- x$x
     else stop("Age spectrum plots are not available for this format")
     agespectrum.default(X,oerr=oerr,plateau=plateau,random.effects=random.effects,
-                        levels=levels,clabel=clabel,plateau.col=plateau.col,
-                        non.plateau.col=non.plateau.col,sigdig=sigdig,
-                        line.col=line.col,lwd=lwd,xlab=xlab,ylab=ylab,
+                        levels=levels,clabel=clabel,clim=clim,ylim=ylim,
+                        plateau.col=plateau.col,non.plateau.col=non.plateau.col,
+                        sigdig=sigdig,line.col=line.col,lwd=lwd,xlab=xlab,ylab=ylab,
                         hide=hide,omit=omit,show.colourbar=show.colourbar,...)
 }
 
@@ -185,8 +188,8 @@ agespectrum.other <- function(x,oerr=3,plateau=TRUE,
 #' agespectrum(ArAr,omit=1:6)
 #' @rdname agespectrum
 #' @export
-agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
-                             random.effects=FALSE,levels=NULL,clabel="",
+agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,random.effects=FALSE,
+                             levels=NULL,clabel="",clim=NULL,ylim=NULL,
                              plateau.col=c("#00FF0080","#FF000080"),
                              non.plateau.col="#00FFFF80",sigdig=2,
                              exterr=FALSE,line.col='red',lwd=2,
@@ -195,8 +198,9 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
                              omit=NULL,title=TRUE,show.colourbar=TRUE,...){
     tt <- ArAr_age(x,exterr=FALSE,i2i=i2i,omit4c=unique(c(hide,omit)))
     X <- cbind(x$x[,'Ar39',drop=FALSE],tt)
-    XY <- plot_spectrum_axes(x=X,oerr=oerr,xlab=xlab,ylab=ylab,hide=hide,...)
-    pc <- get_plateau_colours(x=X,levels=levels,plateau=plateau,
+    XY <- plot_spectrum_axes(x=X,oerr=oerr,xlab=xlab,ylab=ylab,
+                             hide=hide,ylim=ylim,...)
+    pc <- get_plateau_colours(x=X,levels=levels,clim=clim,plateau=plateau,
                               hide=hide,omit=omit,plateau.col=plateau.col,
                               non.plateau.col=non.plateau.col,
                               random.effects=random.effects,oerr=oerr)
@@ -209,13 +213,14 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,
             graphics::title(tit)
         }
     }
-    plot_spectrum(XY=XY,col=pc$col,...)
-    if (show.colourbar) colourbar(z=levels,fill=plateau.col,clabel=clabel)
+    plot_spectrum(XY=XY,col=pc$col)
+    if (show.colourbar) colourbar(z=levels,fill=plateau.col,
+                                  clabel=clabel,clim=clim)
     if (plateau) return(invisible(pc$plat))
 }
 
 plot_spectrum_axes <- function(x,oerr=3,xlab='cumulative fraction',
-                               ylab='age [Ma]',hide=NULL,...){
+                               ylab='age [Ma]',hide=NULL,ylim=NULL,...){
     ns <- nrow(x)
     x <- clear(x[,1:3,drop=FALSE],hide)
     valid <- !is.na(rowSums(x))
@@ -227,12 +232,13 @@ plot_spectrum_axes <- function(x,oerr=3,xlab='cumulative fraction',
     Yu <- Y+Yerr
     minY <- min(Yl,na.rm=TRUE)
     maxY <- max(Yu,na.rm=TRUE)
-    graphics::plot(c(0,1),c(minY,maxY),type='n',xlab=xlab,ylab=ylab,...)
-    list(X=X,Yl=Yl,Yu=Yu,ylim=c(minY,maxY))
+    if (is.null(ylim) || length(ylim)<2) ylim <- c(minY,maxY)
+    graphics::plot(x=c(0,1),y=ylim,type='n',xlab=xlab,ylab=ylab,...)
+    list(X=X,Yl=Yl,Yu=Yu)
 }
 get_plateau_colours <- function(x,levels=NULL,plateau=TRUE,hide=NULL,omit=NULL,
                                 plateau.col=c("#00FF0080","#FF000080"),
-                                non.plateau.col="#00FFFF80",
+                                non.plateau.col="#00FFFF80",clim=NULL,
                                 random.effects=FALSE,oerr=3){
     ns <- nrow(x)
     calcit <- (1:ns)%ni%c(hide,omit)
@@ -242,12 +248,12 @@ get_plateau_colours <- function(x,levels=NULL,plateau=TRUE,hide=NULL,omit=NULL,
         colour <- rep(non.plateau.col,ns)
         np <- length(plat$i)
         cols <- set_ellipse_colours(ns=np,levels=levels[plat$i],
-                                    hide=hide,col=plateau.col)
+                                    clim=clim,hide=hide,col=plateau.col)
         colour[plat$i] <- cols
         plat$n <- ns
     } else {
         plat <- NA
-        colour <- set_ellipse_colours(ns=ns,levels=levels,
+        colour <- set_ellipse_colours(ns=ns,levels=levels,clim=clim,
                                       hide=hide,col=plateau.col)
     }
     list(col=colour,plat=plat)

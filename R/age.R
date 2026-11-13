@@ -276,9 +276,13 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         tst <- UPb_age(x,exterr=exterr,i=i,
                        discordance=discordance,
                        common.Pb=common.Pb,...)
-        nc <- ifelse(ncol(tst)>7,8,min(ncol(tst),6))
-        out <- cbind(agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig),
-                     signif(tst[,-(1:nc),drop=FALSE],sigdig))
+        if (is.na(sigdig)){
+            out <- tst
+        } else {
+            nc <- ifelse(ncol(tst)>7,8,min(ncol(tst),6))
+            out <- cbind(agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig),
+                         signif(tst[,-(1:nc),drop=FALSE],sigdig))
+        }
     } else if (type==2){
         X <- Pb0corr(x,option=common.Pb)
         out <- concordia_age(X,wetherill=TRUE,exterr=exterr)
@@ -412,7 +416,7 @@ age.fissiontracks <- function(x,central=FALSE,pooled=FALSE,i=NULL,
 #' @export
 age.ThU <- function(x,isochron=FALSE,Th0i=0,
                     exterr=FALSE,i=NULL,oerr=1,sigdig=NA,...){
-    if (isochron) {
+    if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
         tst <- ThU_age(x,exterr=exterr,i=i,Th0i=Th0i,...)
@@ -618,7 +622,7 @@ get_ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #' }
 #' @export
 age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,
-                      d=diseq(),J,sJ=0,bratio=0.895){
+                      d=diseq(),J=NULL,sJ=0,bratio=0.895){
     if (ratio=='Pb206U238'){
         out <- age_to_Pb206U238_ratio(tt,st,d=d,exterr=exterr)
     } else if (ratio=='Pb207U235'){

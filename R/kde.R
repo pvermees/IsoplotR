@@ -447,7 +447,6 @@ get_kde <- function(x,...){ UseMethod("get_kde",x) }
 #' @param show.hist logical
 #' @param binwidth histogram bin width
 #' @noRd
-#' @export
 get_kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                             log=FALSE,n=512,nmodes=0,
                             show.hist=TRUE,binwidth=NA,...){
@@ -485,7 +484,6 @@ get_kde.default <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
 #' @param samebandwidth use the median bandwidth for all samples?
 #' @param normalise rescale the KDEs to cover the same area
 #' @noRd
-#' @export
 get_kde.detritals <- function(x,from=NA,to=NA,bw=NA,adaptive=TRUE,
                              log=FALSE,n=512,samebandwidth=TRUE,
                              normalise=TRUE,nmodes=0,
@@ -591,7 +589,6 @@ Abramson <- function(dat,from,to,bw,n=512,...){
 }
 
 #' @noRd
-#' @export
 plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      bty='n',sigdig=2,...){
@@ -635,7 +632,6 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
 }
 
 #' @noRd
-#' @export
 plot.KDEs <- function(x,ncol=NA,rug=FALSE,xlab="age [Ma]",ylab="",
                       kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                       bty='n',sigdig=2,...){

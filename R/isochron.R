@@ -164,8 +164,11 @@
 #'
 #' \code{3}: Error-weighted least squares with overdispersion term
 #'
-#' \code{4}: If \code{x} has class \code{ThU}, calculate the rightmost
-#' isochron.
+#' \code{4}: If \code{x} has class \code{ArAr} or \code{ThU},
+#' calculate the leftmost or rightmost isochron.
+#'
+#' @param left logical. If \code{TRUE} and \code{model=4}, fits the
+#'     lefmost isochron to the data.
 #'
 #' @param wtype controls the parameter responsible for the
 #'     overdispersion in model-3 regression.
@@ -932,13 +935,19 @@ isochron.ArAr <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                           ellipse.stroke='black',inverse=TRUE,
                           ci.col='gray80',line.col='black',lwd=1,
                           plot=TRUE,title=TRUE,exterr=FALSE,model=1,
-                          wtype=1,anchor=0,show.ellipses=1*(model!=2),
+                          wtype=1,anchor=0,left=FALSE,
+                          show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',taxis=FALSE,...){
     taxis <- taxis & inverse
     wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-    fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
-                   anchor=anchor,hide=hide,omit=omit,J=x$J[1],sJ=x$J[2])
+    if (model==4){
+        fit <- LRisochron(x,inverse=inverse,left=left,
+                          hide=hide,omit=omit,anchor=anchor)
+    } else {
+        fit <- flipper(x,inverse=inverse,model=model,wtype=wtype,
+                       anchor=anchor,hide=hide,omit=omit,J=x$J[1],sJ=x$J[2])
+    }
     out <- ab2y0t(x=x,fit=fit,inverse=inverse,exterr=exterr,wtype=wtype)
     dispunits <- getDispUnits(model=model,wtype=wtype,anchor=anchor)
     if (plot) {
@@ -1123,7 +1132,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                           ellipse.fill=c("#00FF0080","#FF000080"),
                           ellipse.stroke='black',ci.col='gray80',
                           line.col='black',lwd=1,plot=TRUE,
-                          title=TRUE,exterr=FALSE,model=1,
+                          title=TRUE,exterr=FALSE,model=1,left=FALSE,
                           anchor=0,wtype='a',show.ellipses=1*(model!=2),
                           hide=NULL,omit=NULL,omit.fill=NA,
                           omit.stroke='grey',y0option=4,...){
@@ -1146,10 +1155,20 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
         }
     } else if (x$format %in% c(3,4)){
         wtype <- checkWtype(wtype=wtype,anchor=anchor,model=model)
-        out <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
-                               wtype=wtype,exterr=exterr,
-                               hide=hide,omit=omit)
+        if (model==4){
+            fit <- LRisochron(x,inverse=(type==2),left=left,
+                              hide=hide,omit=omit,anchor=anchor)
+        } else {
+            fit <- isochron_ThU_2D(x,type=type,model=model,anchor=anchor,
+                                   wtype=wtype,exterr=exterr,
+                                   hide=hide,omit=omit)
+        }
         dispunits <- getDispUnits_ThU(model=model,wtype=wtype,anchor=anchor)
+        out <- ab2y0t(x=x,fit=fit,type=type,exterr=exterr,wtype=wtype)
+        lab <- getIsochronLabels(x=x,type=type)
+        out$xlab <- lab$x
+        out$ylab <- lab$y
+        out$y0label <- lab$y0
     } else {
         stop('Illegal Th-U data format.')
     }
@@ -1187,12 +1206,7 @@ isochron_ThU_2D <- function(x,type=2,model=1,anchor=0,wtype=1,
                        type='d',wtype=wtype,anchor=anchor,
                        hide=hide,omit=omit)
     }
-    out <- ab2y0t(x=x,fit=fit,type=type,exterr=exterr,wtype=wtype)
-    lab <- getIsochronLabels(x=x,type=type)
-    out$xlab <- lab$x
-    out$ylab <- lab$y
-    out$y0label <- lab$y0
-    out
+    fit
 }
 isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
                             hide=NULL,omit=NULL,y0option=4){
@@ -1252,9 +1266,6 @@ isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
         out$age['disp[t]'] <- tst['s[t]']
     }
     out <- getThUy0(out,tst=tst,option=y0option,exterr=exterr)
-    lab <- getIsochronLabels(x=x,type=type)
-    out$xlab <- lab$x
-    out$ylab <- lab$y
     out$xyz <- subset(out$xyz,select=id)
     out
 }
@@ -1321,17 +1332,18 @@ plot_PbPb_evolution <- function(from=0,to=4570,inverse=TRUE){
 
 isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                           units=' Ma',displabel='dispersion =',
-                          dispunits='',ski=NULL,y0option=1,...){
+                          dispunits='',ski=NULL,
+                          y0option=1,n=fit$n,...){
     content <- list()
     if (is.null(type)){
-        content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=fit$n,
+        content[[1]] <- maintit(x=fit$a[1],sx=fit$a[-1],n=n,
                                 units=units,prefix='intercept =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$b[1],sx=fit$b[-1],ntit='',
                                 units=units,prefix='slope =',
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
     } else if (type=='generic'){
-        content[[1]] <- maintit(x=fit$Dd[1],sx=fit$Dd[-1],n=fit$n,units=units,
+        content[[1]] <- maintit(x=fit$Dd[1],sx=fit$Dd[-1],n=n,units=units,
                                 prefix=quote('[D/d]'[0]*' ='),
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$DP[1],sx=fit$DP[-1],ntit='',units=units,
@@ -1339,12 +1351,12 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                 sigdig=sigdig,oerr=oerr,df=fit$df)
     } else if (type=='U-Pb'){
         if (is.null(fit$posterior) | 't'%ni%names(fit$posterior)){
-            content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+            content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=n,
                                     units=units,sigdig=sigdig,
                                     oerr=oerr,df=fit$df)
         } else {
             content[[1]] <- bayestit(x=fit$par['t'],XL=fit$posterior$t,
-                                     n=fit$n,sigdig=sigdig,oerr=oerr)
+                                     n=n,sigdig=sigdig,oerr=oerr)
         }
         if(is.null(fit$posterior)) pnames <- NULL
         else pnames <- names(fit$posterior)
@@ -1362,11 +1374,11 @@ isochrontitle <- function(fit,oerr=3,sigdig=2,type=NULL,
                                      prefix=fit$y0label)
         }
     } else if (type=='Pb-Pb'){
-        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=n,
                                 units=units,sigdig=sigdig,
                                 oerr=oerr,df=fit$df)
     } else {
-        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=fit$n,
+        content[[1]] <- maintit(x=fit$age[1],sx=fit$age[-1],n=n,
                                 units=units,sigdig=sigdig,
                                 oerr=oerr,df=fit$df)
         content[[2]] <- maintit(x=fit$y0[1],sx=fit$y0[-1],ntit='',
@@ -1464,7 +1476,6 @@ w2disp <- function(x,...){ UseMethod("w2disp",x) }
 #' @param wtype the dispersion type (0, 1, or 2)
 #' @param inverse logical
 #' @noRd
-#' @export
 w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     if (wtype==2){
         out <- wDP2wt(x=x,DP=fit$flippedfit$a[1],
@@ -1477,7 +1488,6 @@ w2disp.default <- function(x,fit,wtype,inverse,...){ # type = 'p'
     out
 }
 #' @noRd
-#' @export
 w2disp.other <- function(x,fit,wtype,inverse,...){
     if (wtype==2){
         out <- fit$DP[1]*fit$flippedfit$w/fit$flippedfit$a[1]
@@ -1489,7 +1499,6 @@ w2disp.other <- function(x,fit,wtype,inverse,...){
     out
 }
 #' @noRd
-#' @export
 w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
     if (inverse){
         if (wtype==1){
@@ -1509,7 +1518,6 @@ w2disp.PbPb <- function(x,fit,wtype,inverse,...){ # type = 'd'
 }
 #' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
 #' @noRd
-#' @export
 w2disp.ThU <- function(x,fit,type,wtype,...){
     if (x$format < 3){
         out <- fit$w
@@ -1532,7 +1540,6 @@ w2disp.ThU <- function(x,fit,type,wtype,...){
     out
 }
 #' @noRd
-#' @export
 w2disp.UThHe <- function(x,fit,wtype,...){
     if (wtype==2){
         out <- fit$age[1]*fit$w/fit$b[1]
@@ -1547,10 +1554,8 @@ w2disp.UThHe <- function(x,fit,wtype,...){
 #' @noRd
 wDP2wt <- function(x,...){ UseMethod("wDP2wt",x) }
 #' @noRd
-#' @export
 wDP2wt.default <- function(x,...){stop("Not implemented.")}
 #' @noRd
-#' @export
 wDP2wt.ArAr <- function(x,DP,wDP,...){
     l40 <- lambda('K40')[1]
     dtdDP <- x$J[1]/(l40*(1+DP*x$J[1]))
@@ -1559,26 +1564,22 @@ wDP2wt.ArAr <- function(x,DP,wDP,...){
 #' @param DP a daughter-parent ratio
 #' @param wDP the overdispersion of DP
 #' @noRd
-#' @export
 wDP2wt.ThPb <- function(x,DP,wDP,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='Th232')
 }
 #' @param bratio branching ratio
 #' @noRd
-#' @export
 wDP2wt.KCa <- function(x,DP,wDP,bratio=0.895,...){
     wDP2wt.PD(x=x,DP=DP,wDP=wDP,nuclide='K40',bratio=bratio)
 }
 #' @param nuclide the parent nuclide
 #' @noRd
-#' @export
 wDP2wt.PD <- function(x,DP,wDP,nuclide,bratio=1,...){
     lambda <- lambda(nuclide)[1]
-    dtdDP <- 1/(lambda*(1+DP*bratio))
+    dtdDP <- 1/(lambda*(bratio+DP))
     abs(dtdDP*wDP)
 }
 #' @noRd
-#' @export
 wDP2wt.PbPb <- function(x,DP,wDP,...){
     tt <- get_Pb207Pb206_age(DP)[1]
     McL <- mclean(tt=tt)
@@ -1586,7 +1587,6 @@ wDP2wt.PbPb <- function(x,DP,wDP,...){
     abs(dtdDP*wDP)
 }
 #' @noRd
-#' @export
 wDP2wt.ThU <- function(x,DP,wDP,...){
     l0 <- lambda('Th230')[1]
     dtdDP <- 1/(l0*(1-DP))
@@ -1599,7 +1599,6 @@ wDP2wt.ThU <- function(x,DP,wDP,...){
 ab2y0t <- function(x,...){ UseMethod("ab2y0t",x) }
 #' @param fit the output of york(), MLyork() or ludwig()
 #' @noRd
-#' @export
 ab2y0t.default <- function(x,fit,...){
     out <- fit
     if (inflate(fit)){
@@ -1614,7 +1613,6 @@ ab2y0t.default <- function(x,fit,...){
 #' @param exterr propagate decay constant errors?
 #' @param y0option for datasets containing 204Pb or 208Pb (see ?isochron)
 #' @noRd
-#' @export
 ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
     tt <- fit$par['t']
     out <- fit
@@ -1664,7 +1662,6 @@ ab2y0t.UPb <- function(x,fit,type,exterr=FALSE,y0option=1,...){
 #' @param inverse logical
 #' @param wtype controls type of dispersion (0, 1 or 2)
 #' @noRd
-#' @export
 ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse){
@@ -1687,7 +1684,6 @@ ab2y0t.PbPb <- function(x,fit,inverse,exterr,wtype,...){
 }
 #' @param type either \code{1} (`Rosholt') or \code{2} (`Osmond')
 #' @noRd
-#' @export
 ab2y0t.ThU <- function(x,fit,type,exterr,wtype,...){
     if (x$format<3){
         stop('ab2y0t only works for Th-U formats 3 and 4.')
@@ -1724,7 +1720,6 @@ ab2y0t.ThU <- function(x,fit,type,exterr,wtype,...){
     out
 }
 #' @noRd
-#' @export
 ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     out <- fit
     if (inverse) {
@@ -1748,20 +1743,17 @@ ab2y0t.ArAr <- function(x,fit,inverse,exterr,wtype,...){
     out
 }
 #' @noRd
-#' @export
 ab2y0t.ThPb <- function(x,fit,inverse,exterr,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='Th232',wtype=wtype)
 }
 #' @noRd
-#' @export
 ab2y0t.KCa <- function(x,fit,inverse,exterr,bratio=0.895,wtype,...){
     ab2y0t.PD(x=x,fit=fit,inverse=inverse,exterr=exterr,
               nuclide='K40',bratio=bratio,wtype=wtype)
 }
 #' @param bratio branching ratio
 #' @noRd
-#' @export
 ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     nuclide <- getParent(x)
     out <- fit
@@ -1789,7 +1781,6 @@ ab2y0t.PD <- function(x,fit,inverse,exterr,bratio=1,wtype,...){
     out
 }
 #' @noRd
-#' @export
 ab2y0t.UThHe <- function(x,fit,wtype,...){
     out <- fit
     out$y0[c('y','s[y]')] <- fit$a
@@ -1804,7 +1795,6 @@ ab2y0t.UThHe <- function(x,fit,wtype,...){
     out
 }
 #' @noRd
-#' @export
 ab2y0t.other <- function(x,fit,inverse,wtype,...){
     out <- fit
     if (inverse){
@@ -1841,12 +1831,10 @@ ab2y0t.other <- function(x,fit,inverse,wtype,...){
 #' @noRd
 getIsochronLabels <- function(x,...){ UseMethod("getIsochronLabels",x) }
 #' @noRd
-#' @export
 getIsochronLabels.default <- function(x,...){stop("Not implemented.")}
 #' @param inverse logical
 #' @param taxis label the x-axis with time
 #' @noRd
-#' @export
 getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1865,7 +1853,6 @@ getIsochronLabels.ThPb <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1884,7 +1871,6 @@ getIsochronLabels.SmNd <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1903,7 +1889,6 @@ getIsochronLabels.ReOs <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1922,7 +1907,6 @@ getIsochronLabels.RbSr <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1941,7 +1925,6 @@ getIsochronLabels.LuHf <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1961,7 +1944,6 @@ getIsochronLabels.KCa <- function(x,inverse,taxis=FALSE,...){
 }
 #' @param type controls the isochron projection
 #' @noRd
-#' @export
 getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -1999,7 +1981,6 @@ getIsochronLabels.UPb <- function(x,type=1,taxis=FALSE,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.PbPb <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -2013,7 +1994,6 @@ getIsochronLabels.PbPb <- function(x,inverse,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out <- list()
     if (taxis){
@@ -2032,7 +2012,6 @@ getIsochronLabels.ArAr <- function(x,inverse,taxis=FALSE,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.other <- function(x,inverse,...){
     out <- list()
     if (inverse){
@@ -2046,7 +2025,6 @@ getIsochronLabels.other <- function(x,inverse,...){
     out
 }
 #' @noRd
-#' @export
 getIsochronLabels.ThU <- function(x,type,...){
     out <- list()
     if (x$format%in%c(1,2)){
@@ -2181,7 +2159,6 @@ getThUy0 <- function(out,tst,option=1,exterr=FALSE){
 add_taxis <- function(x,...){ UseMethod("add_taxis",x) }
 #' @param fit the output of york(), MLyork() or ludwig()
 #' @noRd
-#' @export
 add_taxis.default <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
@@ -2197,7 +2174,6 @@ add_taxis.default <- function(x,fit,...){
     plot_taxis(x=x,fit=fit,tmin=tmin,tmid=tmid,ratio=ratio,...)
 }
 #' @noRd
-#' @export
 add_taxis.ArAr <- function(x,fit,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3
@@ -2213,7 +2189,6 @@ add_taxis.ArAr <- function(x,fit,...){
 }
 #' @param type controls the isochron projection
 #' @noRd
-#' @export
 add_taxis.UPb <- function(x,fit,type=1,...){
     xlim <- graphics::par('usr')[1:2]
     xmid <- xlim[1] + diff(xlim)/3

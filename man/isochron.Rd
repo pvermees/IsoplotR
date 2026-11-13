@@ -151,6 +151,7 @@ isochron(x, ...)
   model = 1,
   wtype = 1,
   anchor = 0,
+  left = FALSE,
   show.ellipses = 1 * (model != 2),
   hide = NULL,
   omit = NULL,
@@ -371,6 +372,7 @@ isochron(x, ...)
   title = TRUE,
   exterr = FALSE,
   model = 1,
+  left = FALSE,
   anchor = 0,
   wtype = "a",
   show.ellipses = 1 * (model != 2),
@@ -477,8 +479,8 @@ intercept and slope.}
 
 \code{3}: Error-weighted least squares with overdispersion term
 
-\code{4}: If \code{x} has class \code{ThU}, calculate the rightmost
-isochron.}
+\code{4}: If \code{x} has class \code{ArAr} or \code{ThU},
+calculate the leftmost or rightmost isochron.}
 
 \item{wtype}{controls the parameter responsible for the
     overdispersion in model-3 regression.
@@ -679,6 +681,9 @@ If \code{inverse=FALSE}, then \code{X} =
 \code{LuHf}).}
 
 \item{growth}{add Stacey-Kramers Pb-evolution curve to the plot?}
+
+\item{left}{logical. If \code{TRUE} and \code{model=4}, fits the
+lefmost isochron to the data.}
 
 \item{bratio}{the \eqn{^{40}}K branching ratio.}
 }

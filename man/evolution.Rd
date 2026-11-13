@@ -8,6 +8,7 @@ evolution(
   x,
   xlim = NULL,
   ylim = NULL,
+  clim = NULL,
   tticks = NULL,
   aticks = NULL,
   oerr = 3,
@@ -21,6 +22,7 @@ evolution(
   line.col = "darksalmon",
   isochron = FALSE,
   model = 1,
+  left = FALSE,
   exterr = FALSE,
   sigdig = 2,
   hide = NULL,
@@ -33,9 +35,11 @@ evolution(
 \arguments{
 \item{x}{an object of class \code{ThU}}
 
-\item{xlim}{x-axis limits}
+\item{xlim}{(optional) x-axis limits}
 
-\item{ylim}{y-axis limits}
+\item{ylim}{(optional) y-axis limits}
+
+\item{clim}{(optional) two-element vector with the colour-axis limits}
 
 \item{tticks}{time intervals of the evolution grid}
 
@@ -119,7 +123,7 @@ ellipses. Follows the same formatting guidelines as
 
 \item{isochron}{fit an isochron to the data?}
 
-\item{model}{if \code{isochron=TRUE}, choose one of three
+\item{model}{if \code{isochron=TRUE}, choose one of four
     regression models:
 
 \code{1}: maximum likelihood regression, using either the modified
@@ -149,6 +153,9 @@ manifests itself as an added (co)variance term.
 rightmost isochron, corresponding to the minimum age component of a
 contaminated system.}
 
+\item{left}{logical. If \code{TRUE} and \code{model=4}, fits the
+lefmost isochron to the data.}
+
 \item{exterr}{propagate the decay constant uncertainty in the
 isochron age?}
 
@@ -166,7 +173,7 @@ aliquots.}
 \item{omit.stroke}{stroke colour that should be used for the omitted
 aliquots.}
 
-\item{...}{optional arguments to the generic \code{plot} function}
+\item{...}{optional arguments to the \code{scatterplot} function.}
 }
 \description{
 Plots Th-U data on a

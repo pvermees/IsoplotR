@@ -9,6 +9,7 @@ unmix(
   nsources = 2,
   source_names = names(x)[1:nsources],
   plot = TRUE,
+  stratigraphic = TRUE,
   boot = (length(x) - length(source_names) == 1),
   nboot = 500,
   hide = NULL,
@@ -30,6 +31,10 @@ sink datasets.}
 cumulative distributions, fitted distributions, and estimated
 proportions.}
 
+\item{stratigraphic}{logical. If \code{true} and the dataset
+contains more than one sink, plots the results as a
+stratigraphic plot.}
+
 \item{boot}{logical flag indicating whether to bootstrap the source
 datasets to estimate confidence limits for the proportions.}
 
@@ -38,7 +43,8 @@ datasets to estimate confidence limits for the proportions.}
 \item{hide}{vector with indices of samples that should be removed
 from the plot.}
 
-\item{sigdig}{the number of significant digits for the results plot.}
+\item{sigdig}{the number of significant digits for the results
+plot.}
 
 \item{...}{additional graphical parameters passed to the plots.}
 }
