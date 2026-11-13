@@ -41,7 +41,8 @@
 #' print(fit)
 #' @export
 unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
-                  plot=TRUE,boot=(length(x)-length(source_names)==1),
+                  plot=TRUE,stratigraphic=TRUE,
+                  boot=(length(x)-length(source_names)==1),
                   nboot=500,hide=NULL,sigdig=2,...){
     # 1. data prep
     wrong_names <- !(source_names %in% names(x))
@@ -111,6 +112,7 @@ unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],
     }
     if (plot){
         plot_unmix(XYWCvM,out=out,
+                   stratigraphic=stratigraphic,
                    sorted_data=sorted_data,
                    source_names=source_names,
                    sink_names=sink_names,
@@ -132,22 +134,32 @@ empty_ecdf_plot <- function(data_range,...){
          yaxt='n',xlab=NULL,ylab=NULL,...)
 }
 
-plot_unmix <- function(XYWCvM,out,sorted_data,
-                       source_names,sink_names,
-                       xlab='t (Ma)',sigdig=2,
-                       boot=FALSE,...){
+plot_unmix <- function(XYWCvM,out,stratigraphic=TRUE,
+                       sorted_data,source_names,
+                       sink_names,xlab='t (Ma)',
+                       sigdig=2,boot=FALSE,...){
     num_sources <- length(source_names)
     num_sinks <- length(sink_names)
-    cads <- c(3,3:(2+num_sinks),2+num_sinks)
-    zigzag <- c(0,rep(3+num_sinks,num_sinks),0)
-    top <- c(0,1,2,2,0)
-    bottom <- cbind(0,cads,0,zigzag,0)
-    layout_matrix <- rbind(0,top,bottom,0)
-    w <- c(1,6,1,12,1)
-    if (num_sinks>1){
+    if (stratigraphic & num_sinks>1){
+        cads <- c(3,3:(2+num_sinks),2+num_sinks)
+        zigzag <- c(0,rep(3+num_sinks,num_sinks),0)
+        top <- c(0,1,2,2,0)
+        bottom <- cbind(0,cads,0,zigzag,0)
+        layout_matrix <- rbind(0,top,bottom,0)
+        w <- c(1,6,1,12,1)
         h <- c(3,4,2,2,rep(4,num_sinks-2),2,2,3)
     } else {
-        h <- c(3,4,2,2,2,3)
+        cads <- c(3:(2+num_sinks))
+        zigzag <- rep(3+num_sinks,num_sinks)
+        top <- c(0,1,2,0)
+        bottom <- cbind(0,cads,zigzag,0)
+        layout_matrix <- rbind(0,top,bottom,0)
+        w <- c(1,6,12,1)
+        if (num_sinks>1){
+            h <- c(3,4,rep(4,num_sinks),3)
+        } else {
+            h <- c(3,4,4,3)
+        }
     }
     cex <- graphics::par('cex')
     graphics::layout(layout_matrix,widths=w,heights=h)
@@ -188,30 +200,12 @@ plot_unmix <- function(XYWCvM,out,sorted_data,
         graphics::legend('bottomright',
                          legend=c(sink_name,paste0('CvM = ',CvM)),
                          bty='n',text.col=c('blue','black'))
-        W[sink_name,] <- signif(100*XYWCvM[[sink_name]]$W,digits=sigdig)
+        W[sink_name,] <- 100*XYWCvM[[sink_name]]$W
     }
     graphics::axis(side=1)
     graphics::mtext(text=xlab,side=1,line=1.75,cex=cex*0.8)
-    if (num_sinks>1){
-        graphics::plot(x=c(0,100),y=c(1,num_sinks),type='n',
-                       xaxs = "i", yaxs = "i",
-                       xaxt='n',yaxt='n',
-                       xlab=NULL,ylab=NULL)
-        sum_of_weights <- cbind(0,t(apply(W,1,cumsum)))
-        for (i in num_sources:1){
-            graphics::polygon(x=c(0,sum_of_weights[,i+1],0),
-                              y=c(num_sinks,num_sinks:1,1),
-                              col=colours[i])
-        }
-        for (i in num_sources:1){
-            xtext <- (sum_of_weights[,i+1]+sum_of_weights[,i])/2
-            graphics::text(x=xtext,y=num_sinks:1,
-                           labels=W[,i],xpd=NA,col='grey40')
-        }
-        graphics::axis(side=1)
-        graphics::mtext(text='%',side=1,line=1.75,cex=cex*0.8)
-    } else {
-        result <- paste0(source_names,' = ',W[1,],'%')
+    if (num_sinks<2){
+        result <- paste0(source_names,' = ',signif(W[1,],digits=sigdig),'%')
         if (boot){
             ll <- signif(100*out$ll,digits=sigdig)
             ul <- signif(100*out$ul,digits=sigdig)
@@ -221,6 +215,42 @@ plot_unmix <- function(XYWCvM,out,sorted_data,
                        xlab="",ylab="",axes=FALSE)
         graphics::legend('center',legend=result,
                          bty='n',cex=cex*1.2,xpd=NA)
+    } else {
+        sum_of_weights <- cbind(0,t(apply(W,1,cumsum)))
+        if (stratigraphic){
+            graphics::plot(x=c(0,100),y=c(1,num_sinks),type='n',
+                           xaxs = "i", yaxs = "i",
+                           xaxt='n',yaxt='n',
+                           xlab=NULL,ylab=NULL)
+            for (i in num_sources:1){
+                graphics::polygon(x=c(0,sum_of_weights[,i+1],0),
+                                  y=c(num_sinks,num_sinks:1,1),
+                                  col=colours[i])
+            }
+            for (i in num_sources:1){
+                xtext <- (sum_of_weights[,i+1]+sum_of_weights[,i])/2
+                graphics::text(x=xtext,y=num_sinks:1,
+                               labels=signif(W[,i],digits=sigdig),
+                               xpd=NA,col='grey40')
+            }
+        } else {
+            graphics::plot(x=c(0,100), y=c(0,num_sinks),
+                           type='n', xaxs="i", yaxs="i",
+                           xaxt='n',yaxt='n',
+                           xlab=NULL,ylab=NULL)
+            for (i in num_sinks:1){
+                xleft <- sum_of_weights[i,1:num_sources]
+                xright <- sum_of_weights[i,2:(num_sources+1)]
+                graphics::rect(xleft=xleft,xright=xright,
+                               ybottom=i-1,ytop=i,col=colours)
+                xtext <- (xleft+xright)/2
+                graphics::text(x=xtext,y=i-0.5,
+                               labels=signif(W[i,],digits=sigdig),
+                               xpd=NA,col='grey40')
+            }
+        }
+        graphics::axis(side=1)
+        graphics::mtext(text='%',side=1,line=1.75,cex=cex*0.8)
     }
     graphics::par(op)
 }
