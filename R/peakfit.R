@@ -589,7 +589,9 @@ min_age_model <- function(zs,np=3){
         warning('Singular covariance matrix, reduced number of parameters from 4 to 3')
         out <- min_age_model(zs=zs,np=3)
     } else {
-        out <- fit
+        out <- list()
+        out$L <- fit$value
+        out$par <- fit$par
         out$peaks <- matrix(0,2,1)
         rownames(out$peaks) <- c('t','s[t]')
         out$peaks['t',] <- par[1]

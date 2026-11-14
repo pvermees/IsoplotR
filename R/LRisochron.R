@@ -2,18 +2,15 @@
 #'
 #' Modifies the Galbraith and Laslett's minimum age module to fit
 #' overdispersed (Th-U) isochron data.
-#' @param x an IsoplotR data object or an \eqn{n \times 5} matrix of
-#'     inverse isochron data.
+#' @param x an IsoplotR data object.
 #' @param left logical, switches between leftmost and rightmost
 #'     isochrons
 #' @param hide vector with indices of aliquots that should be removed
 #'     from the plot.
 #' @param omit vector with indices of aliquots that should be plotted
 #'     but omitted from the isochron age calculation.
-#' @param anchor see \code{isochron}
-#' @param inverse see \code{isochron}
-#' @param inverse toggles between normal and inverse isochrons. See
-#'     \code{\link{isochron}}.
+#' @param anchor see \code{\link{isochron}}.
+#' @param inverse see \code{\link{isochron}}.
 #' @param ... arguments to be passed on to \code{age2ratio}
 #' @return a list with the intercept (\code{a}), slope (\code{b}) and
 #'     other data that can be passed on to \code{scatterplot}. If
@@ -36,6 +33,7 @@ LRisochron.default <- function(x,left=FALSE,hide=NULL,omit=NULL,
                           y0=init$y0,left=left,
                           inverse=inverse,...)
     out$xyz <- data2york(x,inverse=inverse)
+    out$n <- nrow(x2calc$x)
     out
 }
 #' @noRd
@@ -43,20 +41,17 @@ LRisochron.ArAr <- function(x,left=FALSE,hide=NULL,omit=NULL,
                             anchor=0,inverse=FALSE,...){
     y0rat <- gety0rat(x)
     op <- iratio(y0rat)
+    on.exit(iratio(y0rat,x=op[1],e=op[2]))
     out <- LRisochron.default(x,left=left,hide=hide,omit=omit,
                               anchor=anchor,inverse=inverse,
                               J=x$J[1],...)
-    iratio(y0rat,x=op[1],e=op[2])
     out
 }
 #' @noRd
 LRisochron.ThU <- function(x,left=FALSE,hide=NULL,omit=NULL,
                            anchor=0,inverse=FALSE,...){
-    U8Th2 <- x$U8Th2
-    out <- LRisochron.default(x,left=left,hide=hide,omit=omit,
-                              anchor=anchor,inverse=inverse,...)
-    x$U8Th2 <- U8Th2
-    out
+    LRisochron.default(x,left=left,hide=hide,omit=omit,
+                       anchor=anchor,inverse=inverse,...)
 }
 
 #' Derivative of the daughter-parent ratio w.r.t time
@@ -104,7 +99,7 @@ init_LRisochron.default <- function(x,left=FALSE,anchor=0,y0rat,...){
 #' @noRd
 init_LRisochron.ThU <- function(x,left=FALSE,anchor=0,y0rat,...){
     if (anchor[1]==1){
-        y0 <- 1/x$U8Th2
+        y0 <- x$U8Th2
         tst <- age(x,Th0i=2)
     } else {
         y0 <- NULL
@@ -117,7 +112,7 @@ init_LRisochron.ThU <- function(x,left=FALSE,anchor=0,y0rat,...){
     if (anchor[1]==1){
         p <- fit$par
     } else if (anchor[1]==2 & length(anchor)>1){
-        p <- c(fit$par[-1],-log(x$U8Th2))
+        p <- c(fit$par[-1],log(x$U8Th2))
         gam <- sgn*log(anchor[2])
     } else {
         p <- c(fit$par,0)
@@ -180,14 +175,14 @@ fit2LRisochron.default <- function(x,fit,gam=NULL,y0=NULL,
         a <- y0
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         covmat[1:3,1:3] <- E
-        J[2,1] <- dDPdt(x=x,tt=tt,...)*tt
+        J[2,1] <- sgn*dDPdt(x=x,tt=tt,...)*tt
     } else {
         tt <- exp(sgn*fit$par[1])
         a <- exp(fit$par[4])
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         covmat <- E
         J[1,4] <- a
-        J[2,1] <- dDPdt(x=x,tt=tt,...)*tt
+        J[2,1] <- sgn*dDPdt(x=x,tt=tt,...)*tt
     }
     fit2LRisochron_helper(x=x,covmat=covmat,J=J,
                           a=a,b=b,inverse=inverse)
@@ -218,10 +213,11 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
         y0 <- exp(fit$par[4])
         b <- age2ratio(tt=tt,ratio=DPrat,...)[1]
         a <- y0*(1-b)
-        dbdg <- dDPdt(x=x,tt=tt,...)
+        dbdt <- dDPdt(x=x,tt=tt,...)
         covmat <- E
+        J[1,1] <- -y0*dbdt*dtdg*sgn
         J[1,4] <- a
-        J[2,1] <- dbdg*dtdg
+        J[2,1] <- dbdt*dtdg
     }
     fit2LRisochron_helper(x=x,covmat=covmat,J=J,a=a,b=b,
                           inverse=inverse,type="d")
@@ -234,6 +230,5 @@ fit2LRisochron_helper <- function(x,covmat,J,a,b,
                 cov.ab=E[1,2])
     if (inverse) out <- invertfit(out,type=type)
     out$model <- 4
-    out$n <- length(x)
     out
 }
