@@ -272,7 +272,11 @@ levels2colours <- function(levels=c(0,1),col=c('yellow','red'),clim=NULL){
         M <- clim[2]
     }
     fn <- grDevices::colorRamp(colors=col,alpha=TRUE)
-    normalised.levels <- (levels-m)/(M-m)
+    if (m==M){
+        normalised.levels <- rep(0,length(levels))
+    } else {
+        normalised.levels <- (levels-m)/(M-m)
+    }
     normalised.levels[is.na(normalised.levels)] <- 0
     normalised.levels[normalised.levels<0] <- 0
     normalised.levels[normalised.levels>1] <- 1
@@ -285,10 +289,7 @@ levels2colours <- function(levels=c(0,1),col=c('yellow','red'),clim=NULL){
 }
 
 validLevels <- function(levels){
-    length(levels)>0 &&
-    all(is.numeric(levels)) &&
-    !all(is.na(levels)) &&
-    diff(range(levels,na.rm=TRUE))
+    length(levels)>0 && all(is.numeric(levels)) && !all(is.na(levels))
 }
 
 colourbar <- function(z=c(0,1),strip.width=0.02,
@@ -424,10 +425,10 @@ invertible <- function(hess){
 
 inverthess <- function(hess){
     if (invertible(hess)){
-        out <- MASS::ginv(hess)
+        out <- solve(hess)
     } else {
         H <- nearPD(hess)
-        out <- MASS::ginv(H)
+        out <- solve(H)
     }
     dimnames(out) <- dimnames(hess)
     out

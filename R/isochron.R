@@ -1165,13 +1165,13 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
         }
         dispunits <- getDispUnits_ThU(model=model,wtype=wtype,anchor=anchor)
         out <- ab2y0t(x=x,fit=fit,type=type,exterr=exterr,wtype=wtype)
-        lab <- getIsochronLabels(x=x,type=type)
-        out$xlab <- lab$x
-        out$ylab <- lab$y
-        out$y0label <- lab$y0
     } else {
         stop('Illegal Th-U data format.')
     }
+    lab <- getIsochronLabels(x=x,type=type)
+    out$xlab <- lab$x
+    out$ylab <- lab$y
+    out$y0label <- lab$y0
     if (plot){
         scatterplot(out$xyz,oerr=oerr,show.numbers=show.numbers,
                     levels=levels,clabel=clabel,ellipse.fill=ellipse.fill,

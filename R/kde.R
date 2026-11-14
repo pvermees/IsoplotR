@@ -589,6 +589,7 @@ Abramson <- function(dat,from,to,bw,n=512,...){
 }
 
 #' @noRd
+#' @export
 plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
                      kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                      bty='n',sigdig=2,...){
@@ -632,6 +633,7 @@ plot.KDE <- function(x,rug=TRUE,xlab="age [Ma]",ylab="",
 }
 
 #' @noRd
+#' @export
 plot.KDEs <- function(x,ncol=NA,rug=FALSE,xlab="age [Ma]",ylab="",
                       kde.col=rgb(1,0,1,0.6),hist.col=rgb(0,1,0,0.2),
                       bty='n',sigdig=2,...){

@@ -276,12 +276,13 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         tst <- UPb_age(x,exterr=exterr,i=i,
                        discordance=discordance,
                        common.Pb=common.Pb,...)
+        nc <- ifelse(ncol(tst)>7,8,min(ncol(tst),6))
+        rounded_ages <- agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig)
+        correlations <- tst[,-(1:nc),drop=FALSE]
         if (is.na(sigdig)){
-            out <- tst
+            out <- cbind(rounded_ages,correlations)
         } else {
-            nc <- ifelse(ncol(tst)>7,8,min(ncol(tst),6))
-            out <- cbind(agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig),
-                         signif(tst[,-(1:nc),drop=FALSE],sigdig))
+            out <- cbind(rounded_ages,signif(correlations,sigdig))
         }
     } else if (type==2){
         X <- Pb0corr(x,option=common.Pb)
@@ -622,7 +623,7 @@ get_ages <- function(x,type=4,cutoff.76=1100,i2i=FALSE,omit4c=NULL,
 #' }
 #' @export
 age2ratio <- function(tt,st=0,ratio='Pb206U238',exterr=FALSE,
-                      d=diseq(),J=NULL,sJ=0,bratio=0.895){
+                      d=diseq(),J,sJ=0,bratio=0.895){
     if (ratio=='Pb206U238'){
         out <- age_to_Pb206U238_ratio(tt,st,d=d,exterr=exterr)
     } else if (ratio=='Pb207U235'){

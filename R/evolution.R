@@ -346,7 +346,7 @@ Th02vsU8Th2 <- function(x,isochron=FALSE,model=1,left=FALSE,
                      ellipse.fill=ellipse.fill,
                      ellipse.stroke=ellipse.stroke,
                      line.col='black',exterr=exterr,
-                     sigdig=sigdig,add=TRUE,model=model,
+                     sigdig=sigdig,add=TRUE,model=model,left=left,
                      hide=hide,omit=omit,omit.fill=omit.fill,
                      omit.stroke=omit.stroke,show.colourbar=FALSE)
     } else { # plot just the data

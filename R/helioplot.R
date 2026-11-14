@@ -256,7 +256,7 @@ sort_logratio_ellipses <- function(x,i){
     cvU <- x[i,'errU']/x[i,'U']
     cvTh <- x[i,'errTh']/x[i,'Th']
     d <- (cvHe*cvU)^2 + (cvHe*cvTh)^2 + (cvU*cvTh)^2
-    i[order(d)]
+    i[order(d,decreasing=TRUE)]
 }
 
 plot_logratio_ellipses <- function(x,fill,stroke,oerr=3,show.numbers=FALSE,
