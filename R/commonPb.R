@@ -242,7 +242,7 @@ correct_common_Pb_without_20x <- function(x,i,c76,tt=NULL,projerr=TRUE){
 correct_common_Pb_with_20x <- function(x,i,cx6=NULL,cx7=NULL,
                                        tt=NULL,cc=FALSE,projerr=TRUE){
     ir <- get_UPb_isochron_ratios_20x(x,i=i) # (3806, 0406), (3507, 0407)
-    ni <- ifelse(x$format%in%c(4,5,6),2,1)
+    ni <- ifelse(x$format%in%c(4,5,6,85),2,1)
     Jp <- matrix(0,ni,2*ni)
     Pbx6label <- ifelse(x$format%in%c(85,119),'Pb208Pb206','Pb204Pb206')
     Pbx7label <- ifelse(x$format%in%c(85,1210),'Pb208Pb207','Pb204Pb207')

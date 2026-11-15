@@ -902,45 +902,8 @@ LL_concordia_comp <- function(mu,x,type=1,mswd=FALSE,...){
 }
 
 LL_concordia_age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
-    out <- 0
     tt <- pars['t']
-    pnames <- names(pars)
     D <- d
-    if ('U48i'%in%pnames){
-        D$U48$x <- pars['U48i']
-        D$U48$option <- 1
-    }
-    if ('ThUi'%in%pnames){
-        D$ThU$x <- pars['ThUi']
-        D$ThU$option <- 1
-    }
-    if ('RaUi'%in%pnames){
-        D$RaU$x <- pars['RaUi']
-    }
-    if ('PaUi'%in%pnames){
-        D$PaU$x <- pars['PaUi']
-    }
-    McL <- mclean(tt=tt,d=D,exterr=exterr)
-    if (d$U48$option>0 && !is.null(d$U48$sx) && d$U48$sx>0){
-        if (d$U48$option==2){
-            out <- out + stats::dnorm(McL$U48,x=d$U48$x,sd=d$U48$sx,log=TRUE)
-        } else {
-            out <- out + stats::dnorm(pars['U48i'],x=d$U48$x,sd=d$U48$sx,log=TRUE)
-        }
-    }
-    if (d$ThU$option>0 && !is.null(d$ThU$sx) && d$ThU$sx>0){
-        if (d$ThU$option==2){
-            out <- out + stats::dnorm(McL$ThU,x=d$ThU$x,sd=d$ThU$sx,log=TRUE)
-        } else {
-            out <- out + stats::dnorm(pars['ThUi'],x=d$ThU$x,sd=d$ThU$sx,log=TRUE)
-        }
-    }
-    if (d$RaU$option>0 && !is.null(d$RaU$sx) && d$RaU$sx>0){
-        out <- out + stats::dnorm(pars['RaUi'],x=d$RaU$x,sd=d$RaU$sx,log=TRUE)
-    }
-    if (d$PaU$option>0 && !is.null(d$PaU$sx) && d$PaU$sx>0){
-        out <- out + stats::dnorm(pars['PaUi'],x=d$PaU$x,sd=d$PaU$sx,log=TRUE)
-    }
     if (type==1){
         y <- age_to_wetherill_ratios(tt,d=D)
         cols <- c('Pb207U235','Pb206U238')
@@ -976,8 +939,47 @@ LL_concordia_age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
         E <- J %*% Lcov %*% t(J)
         covmat <- covmat + E
     }
-    if (mswd) out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
-    else out <- LL_norm(dx,covmat)
+    if (mswd){
+        out <- stats::mahalanobis(x=dx,center=FALSE,cov=covmat)
+    } else {
+        out <- LL_norm(dx,covmat)
+        pnames <- names(pars)
+        if ('U48i'%in%pnames){
+            D$U48$x <- pars['U48i']
+            D$U48$option <- 1
+        }
+        if ('ThUi'%in%pnames){
+            D$ThU$x <- pars['ThUi']
+            D$ThU$option <- 1
+        }
+        if ('RaUi'%in%pnames){
+            D$RaU$x <- pars['RaUi']
+        }
+        if ('PaUi'%in%pnames){
+            D$PaU$x <- pars['PaUi']
+        }
+        McL <- mclean(tt=tt,d=D,exterr=exterr)
+        if (d$U48$option>0 && !is.null(d$U48$sx) && d$U48$sx>0){
+            if (d$U48$option==2){
+                out <- out - stats::dnorm(McL$U48,x=d$U48$x,sd=d$U48$sx,log=TRUE)
+            } else {
+                out <- out - stats::dnorm(pars['U48i'],x=d$U48$x,sd=d$U48$sx,log=TRUE)
+            }
+        }
+        if (d$ThU$option>0 && !is.null(d$ThU$sx) && d$ThU$sx>0){
+            if (d$ThU$option==2){
+                out <- out - stats::dnorm(McL$ThU,x=d$ThU$x,sd=d$ThU$sx,log=TRUE)
+            } else {
+                out <- out - stats::dnorm(pars['ThUi'],x=d$ThU$x,sd=d$ThU$sx,log=TRUE)
+            }
+        }
+        if (d$RaU$option>0 && !is.null(d$RaU$sx) && d$RaU$sx>0){
+            out <- out - stats::dnorm(pars['RaUi'],x=d$RaU$x,sd=d$RaU$sx,log=TRUE)
+        }
+        if (d$PaU$option>0 && !is.null(d$PaU$sx) && d$PaU$sx>0){
+            out <- out - stats::dnorm(pars['PaUi'],x=d$PaU$x,sd=d$PaU$sx,log=TRUE)
+        }
+    }
     out
 }
 
