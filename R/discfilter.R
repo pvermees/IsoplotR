@@ -95,7 +95,7 @@ filter_UPb_ages <- function(x,type=5,cutoff.76=1100,exterr=FALSE,
         else if (x$format==10) type <- 1
         else if (x$format==11 && type!=6) type <- 2
         else if (x$format==12 && type!=6) type <- 1
-        else if (x$format==85 && type==6) type <- 2
+        else if (x$format==85 && !(type%in%c(1,4,5))) type <- 2
         else if (x$format==119) type <- 2
         else if (x$format==1210) type <- 1
         else stop('Invalid UPb format')
