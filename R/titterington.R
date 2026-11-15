@@ -285,7 +285,7 @@ fisher_tit <- function(abAB,dat){
 }
 
 gr_tit <- function(abAB,dat){
-    ns <- length(dat)
+    ns <- length(dat$XYZ)
     a <- abAB[1] # y intercept
     b <- abAB[2] # y slope
     A <- abAB[3] # z intercept
@@ -346,7 +346,7 @@ gr_tit <- function(abAB,dat){
 }
 
 L_tit <- function(abAB,dat){
-    ns <- length(dat)
+    ns <- length(dat$XYZ)
     a <- abAB[1] # y intercept
     b <- abAB[2] # y slope
     A <- abAB[3] # z intercept
