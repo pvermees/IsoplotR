@@ -911,7 +911,7 @@ SK_intersection <- function(fit,inverse,m=0,M=5000){
     }
     if (inverse){
         a <- fit$b[1]
-        b <- fit$y0[1]
+        b <- fit$a[1]
     } else {
         a <- fit$a[1]
         b <- fit$b[1]

@@ -1027,8 +1027,6 @@ get_Pb208Th232_ratios <- function(x){
             E13 <- x$x[,'rXZ']*x$x[,'errU238Pb206']*x$x[,'errTh232U238']
             E23 <- x$x[,'rYZ']*x$x[,'errPb208Pb206']*x$x[,'errTh232U238']
         }
-        out[,'errPb208Th232'] <-
-            sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23))
     } else if (x$format == 12){
         ns <- length(x)
         out <- matrix(0,ns,2)
@@ -1048,6 +1046,7 @@ get_Pb208Th232_ratios <- function(x){
     } else {
         stop('Wrong input format: no Pb208 or Th232 present in this dataset.')
     }
+    out[,'errPb208Th232'] <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12,E13,E23))
     out
 }
 get_Pb208Pb206_ratios <- function(x){
