@@ -1259,13 +1259,16 @@ isochron_ThU_3D <- function(x,type=2,model=1,wtype='a',exterr=FALSE,
                        out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
     out$age['t'] <- tst['t']
     out$age['s[t]'] <- tst['s[t]']
+    ThUy0 <- getThUy0(out,tst=tst,option=y0option,exterr=exterr)
+    out <- append(out,ThUy0)
     if (inflate(out)){
         tst <- get_ThU_age(out$par[i08],sqrt(out$mswd*out$cov[i08,i08]),
                            out$par[i48],sqrt(out$mswd*out$cov[i48,i48]),
-                           out$mswd*out$cov[i48,i08],exterr=exterr,jacobian=TRUE)
+                           out$mswd*out$cov[i48,i08],exterr=exterr)
         out$age['disp[t]'] <- tst['s[t]']
+        ThUy0 <- getThUy0(out,tst=tst,option=y0option,exterr=exterr)
+        out$y0['disp[y]'] <- ThUy0$y0['s[y]']
     }
-    out <- getThUy0(out,tst=tst,option=y0option,exterr=exterr)
     out$xyz <- subset(out$xyz,select=id)
     out
 }
@@ -2107,47 +2110,24 @@ getUPby0 <- function(out,fmt=1,type=1,option=1){
     }
     out
 }
-getThUy0 <- function(out,tst,option=1,exterr=FALSE){
+getThUy0 <- function(fit,tst,option=1,exterr=FALSE){
+    out <- list()
     if (option==1){
-        out$y0['y'] <- out$PAR['i48']
-        out$y0['s[y]'] <- sqrt(out$COV['i48','i48'])
+        out$y0['y'] <- fit$PAR['i48']
+        out$y0['s[y]'] <- sqrt(fit$COV['i48','i48'])
         out$y0label <- quote('('^234*'U/'^238*'U)'[a]*'=')
     } else if (option==2){
-        out$y0['y'] <- out$PAR['i02']
-        out$y0['s[y]'] <- sqrt(out$COV['i02','i02'])
+        out$y0['y'] <- fit$PAR['i02']
+        out$y0['s[y]'] <- sqrt(fit$COV['i02','i02'])
         out$y0label <- quote('('^230*'Th/'^232*'Th)'[d]*'=')
     } else if (option==3){
-        out$y0['y'] <- out$PAR['i08']
-        out$y0['s[y]'] <- sqrt(out$COV['i08','i08'])
+        out$y0['y'] <- fit$PAR['i08']
+        out$y0['s[y]'] <- sqrt(fit$COV['i08','i08'])
         out$y0label <- quote('('^230*'Th/'^238*'U)'[a]*'=')
     } else {
-        l4 <- lambda('U234')
-        out$y0['y'] <- 1 + (out$PAR['i48']-1)*exp(l4[1]*tst['t'])
-        E <- matrix(0,2,2)
-        E[1,1] <- out$COV['i48','i48']
-        E[2,2] <- l4[2]^2
-        J <- matrix(0,3,2)
-        J[1,1] <- tst['dt.d48']
-        J[2,1] <- 1
-        J[3,2] <- ifelse(exterr,1,0)
-        E2 <- J %*% E %*% t(J)
-        J2 <- rep(0,3)
-        J2[1] <- l4[1]*(out$PAR['i48']-1)*exp(l4[1]*tst['t'])
-        J2[2] <- exp(l4[1]*tst['t'])
-        J2[3] <- ifelse(exterr,(out$PAR['i48']-1)*exp(l4[1]*tst['t'])*tst['t'],0)
-        out$y0['s[y]'] <- sqrt(J2 %*% E2 %*% J2)
+        out$y0['y'] <- tst['48_0']
+        out$y0['s[y]'] <- tst['s[48_0]']
         out$y0label <- quote('('^234*'U/'^238*'U)'[i]*'=')
-    }
-    if (inflate(out)){ # overwrite dispersion to remove decay constant errors
-        if (option<4){
-            out$age['disp[t]'] <- sqrt(out$mswd)*out$age['s[t]']
-            out$age['disp[y]'] <- sqrt(out$mswd)*out$age['s[y]']
-        } else {
-            E[1,1] <- out$mswd*out$COV['i48','i48']
-            E3 <- J2 %*% (J %*% E %*% t(J)) %*% J2
-            out$age['disp[t]'] <- sqrt(E3[1,1])
-            out$y0['disp[y]'] <- sqrt(E3[2,2])
-        }
     }
     out
 }

@@ -519,10 +519,10 @@ data2york.UThHe <- function(x,...){
         E[8,8] <- R[2]^2
         E[9,9] <- f147[2]^2
         if (doSm(x)) {
-            P <- P + f147[1]*L7[1]*x[i,'Sm']
-            J[1,3] <- f147[1]*L7[1]       # dP.dSm
-            J[1,7] <- f147[1]*x[i,'Sm']   # dP.dL7
-            J[1,9] <- L7[1]*x[i,'Sm']     # dP.df147
+            P[i] <- P[i] + f147[1]*L7[1]*x[i,'Sm']
+            J[1,3] <- f147[1]*L7[1]                         # dP.dSm
+            J[1,7] <- f147[1]*x[i,'Sm']                     # dP.dL7
+            J[1,9] <- L7[1]*x[i,'Sm']                       # dP.df147
             E[3,3] <- x[i,'errSm']^2
         }
         sP[i] <- sqrt(J %*% E %*% t(J))
