@@ -656,8 +656,8 @@ getEw2 <- function(w=0,x,McL=mclean(),type='joint'){
             diag(J[i3,i1]) <- -McL$dPb208Th232dt # dMdt
         }
     } else if (format<4){
-        diag(J[i1,i1]) <- -McL$dPb206U238dt      # dKdt
-        diag(J[i2,i1]) <- -McL$dPb207U235dt      # dLdt
+        diag(J[i1,i1]) <- -McL$dPb207U235dt      # dKdt
+        diag(J[i2,i1]) <- -McL$dPb206U238dt      # dLdt
     } else if (format%in%c(4,5,6,9,10,85,119,1210)){
         if (type==1){
             diag(J[i2,i1]) <- -McL$dPb206U238dt  # dLdt
@@ -679,7 +679,7 @@ getEw2 <- function(w=0,x,McL=mclean(),type='joint'){
             diag(J[i1,i1]) <- -McL$dPb206U238dt/ThU       # dKdt
             diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
         } else if (type==4){
-            diag(J[i1,i1]) <- -McL$dPb206U238dt/(ThU*U85) # dKdt
+            diag(J[i1,i1]) <- -McL$dPb207U235dt/(ThU*U85) # dKdt
             diag(J[i2,i1]) <- -McL$dPb208Th232dt          # dLdt
         } else {
             stop('invalid isochron type')
@@ -816,7 +816,7 @@ data2ludwig_2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
             L0 <- yd[,'Y'] - McL$Pb208Th232 - b*yd[,'X']
         } else if (type==4){ # X=07/32, Y=08/32
             yd <- data2york.UPb(x,option=15)
-            A <- McL$Pb206U238/(ThU*U85)
+            A <- McL$Pb207U235/(ThU*U85)
             b <- 1/b0
             L0 <- yd[,'Y'] - McL$Pb208Th232 - b*yd[,'X']
         } else {
@@ -875,15 +875,15 @@ data2ludwig_2d <- function(ta0b0w,x,model=1,exterr=FALSE,type=1,anchor=0){
                 J[i2,'U235'] <- -McL$dPb207U235dl35
                 J[i2,'Pa231'] <- -McL$dPb207U235dl31                
             } else if (type==3){
-                J[i1,'Th232'] <- -McL$dPb208Th232dl32/ThU
-                J[i2,'U238'] <- -McL$dPb206U238dl38
-                J[i2,'U234'] <- -McL$dPb206U238dl34
-                J[i2,'Th230'] <- -McL$dPb206U238dl30
-                J[i2,'Ra226'] <- -McL$dPb206U238dl26                
+                J[i1,'U238'] <- -McL$dPb206U238dl38
+                J[i1,'U234'] <- -McL$dPb206U238dl34
+                J[i1,'Th230'] <- -McL$dPb206U238dl30
+                J[i1,'Ra226'] <- -McL$dPb206U238dl26
+                J[i2,'Th232'] <- -McL$dPb208Th232dl32/ThU
             } else if (type==4){
-                J[i1,'Th232'] <- -McL$dPb208Th232dl32/(ThU*U85)
-                J[i2,'U235'] <- -McL$dPb207U235dl35
-                J[i2,'Pa231'] <- -McL$dPb207U235dl31                
+                J[i1,'U235'] <- -McL$dPb207U235dl35
+                J[i1,'Pa231'] <- -McL$dPb207U235dl31
+                J[i2,'Th232'] <- -McL$dPb208Th232dl32/(ThU*U85)
             } else {
                 stop('illegal type')
             }
@@ -998,7 +998,7 @@ LL_ludwig_model2_2d <- function(ta0b0,x,exterr=FALSE,type=1){
         J <- matrix(0,ns,7)
         colnames(J) <- colnames(El)
         dnumdb <- -X
-        ddendb <- -b/den
+        ddendb <- b/den
         dxdb <- (dnumdb*den-num*ddendb)/den^2
         J[,'U238'] <- -dxdb*dbdl38
         J[,'U235'] <- -dxdb*dbdl35

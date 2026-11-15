@@ -35,8 +35,8 @@ get_UThHe_age <- function(U,sU,Th,sTh,He,sHe,Sm=0,sSm=0){
     dDdt <- 8*L8*exp(L8*tt)*U*R/(1+R) + 7*L5*exp(L5*tt)*U/(1+R) +
             6*L2*exp(L2*tt)*Th + f147*L7*exp(L7*tt)*Sm
     dDdU <- 8*(exp(L8*tt)-1)*R/(1+R) + 7*(exp(L5*tt)-1)/(1+R)
-    dDdTh <- 6*L2*exp(L2*tt)
-    dDdSm <- f147*L7*exp(L7*tt)
+    dDdTh <- 6*L2*(exp(L2*tt)-1)
+    dDdSm <- f147*L7*(exp(L7*tt)-1)
     dDdHe <- -1
     J <- matrix(0,1,4)
     E <- matrix(0,4,4)
