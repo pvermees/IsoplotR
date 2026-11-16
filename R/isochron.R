@@ -542,7 +542,7 @@ isochron.default <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
         if (anchor[1]<1){
             fit <- regression(d2calc)
         } else {
-            if (length(anchor>1)) y0 <- anchor[2]
+            if (length(anchor)>1) y0 <- anchor[2]
             else stop("anchor must be a vector of at least two numbers.")
             sy0 <- ifelse(length(anchor)>2,anchor[3],0)
             fit <- anchoredYork(d2calc,y0=y0,sy0=sy0)
@@ -742,6 +742,9 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                          hide=NULL,omit=NULL,omit.fill=NA,
                          omit.stroke='grey',y0option=1,
                          taxis=FALSE,nsteps=NULL,...){
+    ns <- length(x)
+    calcit <- (1:ns)%ni%c(hide,omit)
+    x2calc <- subset(x,subset=calcit)
     if (x$format<4){
         if (plot){
             out <- concordia_helper(x,type=type,show.age=model+1,title=title,
@@ -754,13 +757,11 @@ isochron.UPb <- function(x,oerr=3,sigdig=2,show.numbers=FALSE,
                                     y0option=y0option,omit.fill=omit.fill,
                                     omit.stroke=omit.stroke,nsteps=nsteps,...)
         } else {
-            out <- ludwig(x,exterr=exterr,model=model,anchor=anchor,nsteps=nsteps)
+            out <- ludwig(x2calc,exterr=exterr,model=model,
+                          anchor=anchor,nsteps=nsteps)
         }
     } else {
         type <- checkIsochronType(x,type=type)
-        ns <- length(x)
-        calcit <- (1:ns)%ni%c(hide,omit)
-        x2calc <- subset(x,subset=calcit)
         fit <- ludwig(x2calc,model=model,anchor=anchor,exterr=exterr,
                       type=ifelse(joint,0,type),nsteps=nsteps)
         out <- ab2y0t(x=x,fit=fit,type=type,exter=exterr,y0option=y0option)
@@ -1179,7 +1180,7 @@ isochron.ThU <- function (x,type=2,oerr=3,sigdig=2,
                     show.ellipses=show.ellipses,ci.col=ci.col,
                     line.col=line.col,lwd=lwd,hide=hide,omit=omit,
                     omit.fill=omit.fill,omit.stroke=omit.stroke,...)
-        showDispersion(out,inverse=(x$format %in% c(2,4)),wtype=wtype,type='d')
+        showDispersion(out,inverse=(type %in% c(2,4)),wtype=wtype,type='d')
         if (title){
             main <- isochrontitle(out,oerr=oerr,sigdig=sigdig,
                                   type='Th-U',units=' ka',
@@ -2177,7 +2178,7 @@ add_taxis.UPb <- function(x,fit,type=1,...){
     } else if (type==2){
         tfun <- get_Pb207U235_age
         ratio <- 'Pb207U235'
-    } else if (type==3){
+    } else if (type<5){
         tfun <- get_Pb208Th232_age
         ratio <- 'Pb208Th232'
     } else {

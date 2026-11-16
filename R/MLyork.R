@@ -42,14 +42,15 @@ MLyork <- function(yd,anchor=0,model=1,wtype='a',
         }
     } else if (anchor[1]==2 & length(anchor)>1){ # anchor slope
         p['b'] <- anchor[2]
-        init <- unname(stats::median(yd[,'Y']-p['b']*yd[,'X']))
+        residuals <- yd[,'Y']-p['b']*yd[,'X']
+        init <- unname(stats::median(residuals))
         if (model==2){
             fit <- tls(yd[,c('X','Y')],anchor=anchor)
             p['a'] <- fit$par[1]
             E['a','a'] <- fit$cov[1,1]
         } else if (model==3 & (length(anchor)<3 || anchor[3]<=0)){
-            ainit <- unname(lmfit$coefficients)
-            lwinit <- log(stats::vcov(lmfit))/2
+            ainit <- init
+            lwinit <- log(unname(stats::sd(residuals)))
             init <- c(a=ainit,lw=lwinit)
             lower <- c(min(ainit*c(2,1/2)),lwinit-2)
             upper <- c(max(ainit*c(2,1/2)),lwinit+2)

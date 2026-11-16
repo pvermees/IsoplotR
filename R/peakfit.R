@@ -125,9 +125,10 @@ peakfit.default <- function(x,k='auto',sigdig=2,oerr=3,log=TRUE,np=3,...){
     if (identical(k,'min')) {
         out <- min_age_model(X,np=np)
     } else if (identical(k,'auto')) {
-        out <- normal_mixtures(X,k=BIC_fit(X,5),...)
+        k <- BIC_fit(x=X,max.k=5,log=FALSE)
+        out <- normal_mixtures(x=X,k=k,...)
     } else {
-        out <- normal_mixtures(X,k,...)
+        out <- normal_mixtures(x=X,k=k,...)
     }
     if (log) {
         out$peaks['t',] <- exp(out$peaks['t',])
@@ -524,11 +525,11 @@ theta2age <- function(x,theta,beta.var,exterr=FALSE){
 }
 
 BIC_fit <- function(x,max.k,...){
-    n <- length(x)
+    n <- ifelse(is.matrix(x),nrow(x),length(x))
     BIC <- Inf
     tryCatch({
         for (k in 1:max.k){
-            fit <- peakfit(x,k,...)
+            fit <- peakfit(x=x,k=k,...)
             p <- 2*k-1
             newBIC <- -2*fit$L+p*log(n)
             if (newBIC<BIC) {

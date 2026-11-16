@@ -446,7 +446,7 @@ weightedmean.KCa <- function(x,random.effects=FALSE,
                         from=from,to=to,levels=levels,clabel=clabel,
                         clim=clim,rect.col=rect.col,outlier.col=outlier.col,
                         sigdig=sigdig,oerr=oerr,exterr=exterr,
-                        i2i=i2i,units=' Ma',ranked=ranked,hide=NULL,
+                        i2i=i2i,units=' Ma',ranked=ranked,hide=hide,
                         omit=omit,omit.col=omit.col,
                         show.colourbar=show.colourbar,...)
 }

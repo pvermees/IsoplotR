@@ -108,8 +108,8 @@ initial2time <- function(x,anames,avalues,anchor=0,
     fit <- stats::optim(init$par,fn=LL_ludwig,method='L-BFGS-B',
                         lower=init$lower,upper=init$upper,hessian=FALSE,
                         x=x,X=X,anchor=anchor,type=type,model=model)
-    lt <- ifelse('t'%in%names(fit$par),fit$par['t'],anchor[2])
-    McL <- mclean(tt=exp(lt),d=X$d)
+    tt <- ifelse('t'%in%names(fit$par),exp(fit$par['t']),anchor[2])
+    McL <- mclean(tt=tt,d=X$d)
     out <- list()
     out$par <- fit$par
     for (aname in anames){

@@ -468,7 +468,7 @@ LL_ludwig <- function(par,x,X=x,model=1,exterr=FALSE,anchor=0,type='joint'){
             LL <- LL + LL_ludwig_model2_2d(ta0b0w,x=X,exterr=exterr,type=type)
         }
     } else {
-        if (type%in%c('joint',0) & x$format>3){
+        if (type%in%c('joint',0) & x$format%in%c(4:8,85)){
             LL <- LL + data2ludwig(X,ta0b0w,exterr=exterr)$LL
         } else {
             LL <- LL + data2ludwig_2d(ta0b0w,x=X,model=model,exterr=exterr,
@@ -557,7 +557,7 @@ data2ludwig <- function(x,ta0b0w,exterr=FALSE){
         J[ns+i,NR*ns+3] <- -McL$dPb206U238dl34[j]  #dLdl34
         J[ns+i,NR*ns+6] <- -McL$dPb206U238dl30[j]  #dLdl30
         J[ns+i,NR*ns+7] <- -McL$dPb206U238dl26[j]  #dLdl26
-        if (x$format>6) J[2*ns+i,NR*ns+4] <- -McL$dPb208Th232dl32[j] # dMdl32
+        if (x$format%in%c(7,8)) J[2*ns+i,NR*ns+4] <- -McL$dPb208Th232dl32[j] # dMdl32
     }
     E[NR*ns+1:7,NR*ns+1:7] <- getEl()
     EE <- J%*%E%*%t(J)

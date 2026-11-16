@@ -871,7 +871,7 @@ sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
     out[small64] <- ti.old
     out[mid64] <- log( exp(l8*ti.young) +
                        (sk.206.204.young-Pb206Pb204[mid64])/sk.238.204.young )/l8
-    if (any(mid64) && out[mid64]>ti.young)
+    if (any(mid64) & out[mid64]>ti.young)
         out[mid64] <- log( exp(l8*ti.old) +
                            (sk.206.204.old-Pb206Pb204[mid64])/sk.238.204.old )/l8
     # 2. 207/204
@@ -887,7 +887,7 @@ sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
                        U*(sk.207.204.young-Pb207Pb204[mid74])/sk.238.204.young )/l5
     if (any(mid74) && out[mid74]>ti.young)
         out[mid74] <- log( exp(l5*ti.old) +
-                           (sk.207.204.old-Pb207Pb204[mid74])/sk.238.204.old )/l5
+                           U*(sk.207.204.old-Pb207Pb204[mid74])/sk.238.204.old )/l5
     out
 }
 

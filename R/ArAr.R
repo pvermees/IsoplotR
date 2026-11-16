@@ -68,7 +68,7 @@ ArAr_age <- function(x,exterr=FALSE,i=NULL,i2i=FALSE,projerr=FALSE,omit4c=NULL){
     if (projerr) sDP <- sqrt(errorprop1x3(J1,J2,J3,E11,E22,E33,E12))
     else sDP <- sqrt(errorprop1x2(J1,J2,E11,E22,E12))
     out <- get_ArAr_age(DP,sDP,x$J[1],x$J[2],exterr=exterr)
-    if (!is.null(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,,drop=FALSE]
     colnames(out) <- c('t','s[t]')
     out
 }

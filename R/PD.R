@@ -72,7 +72,8 @@ get_nominal_initials <- function(x){
     } else if (is.LuHf(x)){
         out <- settings('iratio','Hf176Hf177')
     } else if (is.KCa(x)){
-        out <- settings('iratio','Ca40Ca44')
+        ratio <- paste0('Ca40Ca',x$sister)
+        out <- settings('iratio',ratio)
     } else if (is.ThPb(x)){
         out <- settings('iratio','Pb208Pb204')
     } else if (is.ArAr(x)){
