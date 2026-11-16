@@ -292,7 +292,8 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
         } else {
             par['a0'] <- log(1/abx['a'])
             ydb <- data2york(x,option=7,tt=tt)
-            abxb <- inithelper(yd=ydb,x0=x0)
+            x0b <- age_to_U235Pb207_ratio(tt)[1]
+            abxb <- inithelper(yd=ydb,x0=x0b)
             par['b0'] <- log(1/abxb['a'])
         }
         if (model==3 & length(anchor)>2 && anchor[3]<=0){
@@ -335,9 +336,10 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
         } else if (type==4){ # 0708 vs 32/08
             par['b0'] <- log(abx['a'])
         } else { # joint or 0
-            par['t'] <- log(get_Pb206U238_age(x=abx['x0inv'],d=x$d)[1])
-            yda <- data2york(x,option=6)
-            ydb <- data2york(x,option=7)
+            tt <- get_Pb206U238_age(x=abx['x0inv'],d=x$d)[1]
+            par['t'] <- log(tt)
+            yda <- data2york(x,option=6,tt=tt)
+            ydb <- data2york(x,option=7,tt=tt)
             abxa <- inithelper(yd=yda)
             abxb <- inithelper(yd=ydb)
             par['a0'] <- log(1/abxa['a'])
