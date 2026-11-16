@@ -467,7 +467,7 @@ age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
 age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
                    i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     if (isochron){
-        out <- isochron(x,plot=FALSE)
+        out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
         tst <- PD_age(x,nuclide,exterr=exterr,i=i,
                       i2i=i2i,projerr=projerr,...)

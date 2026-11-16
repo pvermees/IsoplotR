@@ -79,7 +79,7 @@ cor2cov3 <- function(sX,sY,sZ,rXY,rXZ,rYZ){
     covmat[2,2] <- sY^2
     covmat[3,3] <- sZ^2
     covmat[1,2] <- covmat[2,1] <- ifelse(rXY==0,0,rXY*sX*sY)
-    covmat[1,3] <- covmat[3,1] <- ifelse(rXY==0,0,rXZ*sX*sZ)
+    covmat[1,3] <- covmat[3,1] <- ifelse(rXZ==0,0,rXZ*sX*sZ)
     covmat[2,3] <- covmat[3,2] <- ifelse(rYZ==0,0,rYZ*sY*sZ)
     covmat
 }

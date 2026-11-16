@@ -41,7 +41,7 @@ PD_age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
         DP[,1] <- 1/(y[,'X'] - y[,'Y']/fit$b[1])
         J1 <- -DP[,1]^2
         J2 <- (DP[,1]^2)/fit$b[1]
-        J3 <- y[,'Y']/(y[,'Y']^2 - (fit$b[1]*y[,'X'])^2)
+        J3 <- -y[,'Y']/(fit$b[1]*y[,'X'] - y[,'Y'])^2
         E11 <- y[,'sX']^2
         E22 <- y[,'sY']^2
         E12 <- y[,'rXY']*y[,'sX']*y[,'sY']

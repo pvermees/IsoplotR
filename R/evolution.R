@@ -266,9 +266,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
         b08 <- fit$par['B']
         initial <- matrix(0,1,5)
         initial[1] <- b08
-        initial[2] <- sqrt(fit$cov['b','b'])
+        initial[2] <- sqrt(fit$cov['B','B'])
         initial[3] <- b48
-        initial[4] <- sqrt(fit$cov['B','B'])
+        initial[4] <- sqrt(fit$cov['b','b'])
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
         scatterplot(initial,oerr=oerr,line.col='black',
                     ellipse.fill=grDevices::rgb(1,1,1,0.85),
@@ -509,9 +509,9 @@ Th230correction_measured_detritus <- function(td,Th02U48=c(0,0,1e6,0,0,0,0,0,0))
     X2 <- Th02U48[3]
     Y2 <- Th02U48[5]
     Z2 <- Th02U48[1]
-    sX2 <- Th02U48[4]^2
-    sY2 <- Th02U48[6]^2
-    sZ2 <- Th02U48[2]^2
+    sX2 <- Th02U48[4]
+    sY2 <- Th02U48[6]
+    sZ2 <- Th02U48[2]
     covX2Y2 <- Th02U48[9]*Th02U48[4]*Th02U48[6]
     covX2Z2 <- Th02U48[7]*Th02U48[2]*Th02U48[4]
     covY2Z2 <- Th02U48[8]*Th02U48[2]*Th02U48[6]
