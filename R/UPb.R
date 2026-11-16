@@ -1387,20 +1387,20 @@ UPb_age <- function(x,exterr=FALSE,i=NULL,conc=TRUE,omit4c=NULL,
         out <- NULL
         for (i in 1:length(x)){
             ti <- UPb_age_helper(x=x,X=X,i=i,exterr=exterr,
-                                 conc=conc,discordance=discordance)
+                                 conc=conc,discordance=discordance,...)
             out <- rbind(out,ti,deparse.level=0)
         }
     } else {
         out <- UPb_age_helper(x=x,X=X,i=i,exterr=exterr,
-                              conc=conc,discordance=discordance)
+                              conc=conc,discordance=discordance,...)
     }
     out
 }
 
 # x = raw data
 # X = common Pb corrected data
-UPb_age_helper <- function(x,X=x,i=1,exterr=FALSE,
-                           conc=TRUE,discordance=discfilter(),...){
+UPb_age_helper <- function(x,X=x,i=1,exterr=FALSE,conc=TRUE,
+                           discordance=discfilter(),as.matrix=FALSE,...){
     ns <- length(x)
     Xi <- subset(X,subset=(1:ns)%in%i)
     do68 <- do75 <- do76 <- do82 <- FALSE 
@@ -1463,6 +1463,7 @@ UPb_age_helper <- function(x,X=x,i=1,exterr=FALSE,
     }
     out <- c(t.75,t.68,t.76,t.82,t.conc,dif,pval)
     names(out) <- labels
+    if (as.matrix) out <- t(as.matrix(out))
     out
 }
 

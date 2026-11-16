@@ -313,8 +313,10 @@ peakfit_helper <- function(x,k=1,type=4,cutoff.76=1100,cutoff.disc=discfilter(),
         if (identical(k,'min')) numpeaks <- 1
         else numpeaks <- k
         for (i in 1:numpeaks){
-            age.with.exterr <- add_exterr(x,fit$peaks['t',i],
-                                          fit$peaks['s[t]',i],type=type)
+            age.with.exterr <- add_exterr(x=x,tt=fit$peaks['t',i],
+                                          st=fit$peaks['s[t]',i],
+                                          cutoff.76=cutoff.76,
+                                          type=type)
             fit$peaks['s[t]',i] <- age.with.exterr[2]
         }
     }

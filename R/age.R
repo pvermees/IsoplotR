@@ -273,18 +273,22 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
                     oerr=1,sigdig=NA,common.Pb=0,
                     discordance=discfilter(),...){
     if (type==1){
-        tst <- UPb_age(x,exterr=exterr,i=i,
+        tst <- UPb_age(x,exterr=exterr,i=i[1],
                        discordance=discordance,
-                       common.Pb=common.Pb,...)
-        ##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@9@"]]));##:ess-bp-end:##
-        nc <- ifelse(ncol(tst)>7,8,min(ncol(tst),6))
-        rounded_ages <- agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig)
-        correlations <- tst[,-(1:nc),drop=FALSE]
-        if (is.na(sigdig)){
-            out <- cbind(rounded_ages,correlations)
+                       common.Pb=common.Pb,
+                       as.matrix=TRUE,...)
+        nc <- ncol(tst)
+        if (colnames(tst)[nc]=='p[conc]'){
+            out <- agerr(tst[,1:(nc-1),drop=FALSE],oerr=oerr,sigdig=sigdig)
+            pconc <- tst[,nc,drop=FALSE]
+            if (is.na(sigdig)){
+                out <- cbind(out,pconc)
+            } else {
+                rounded_pconc <- signif(pconc,digits=sigdig)
+                out <- cbind(out,rounded_pconc)
+            }
         } else {
-            out <- cbind(rounded_ages,signif(correlations,sigdig))
+            out <- agerr(tst[,1:nc,drop=FALSE],oerr=oerr,sigdig=sigdig)
         }
     } else if (type==2){
         X <- Pb0corr(x,option=common.Pb)
@@ -308,7 +312,7 @@ age.PbPb <- function(x,isochron=TRUE,common.Pb=2,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- PbPb_age(x,exterr=exterr,i=i,
+        tst <- PbPb_age(x,exterr=exterr,i=i[1],
                         common.Pb=common.Pb,projerr=projerr)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
@@ -339,7 +343,7 @@ age.ArAr <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- ArAr_age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+        tst <- ArAr_age(x,exterr=exterr,i=i[1],i2i=i2i,projerr=projerr,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -352,7 +356,7 @@ age.KCa <- function(x,isochron=FALSE,i2i=TRUE,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- KCa_age(x,exterr=exterr,i=i,i2i=i2i,projerr=projerr,...)
+        tst <- KCa_age(x,exterr=exterr,i=i[1],i2i=i2i,projerr=projerr,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -370,7 +374,7 @@ age.UThHe <- function(x,isochron=FALSE,central=FALSE,i=NULL,oerr=1,sigdig=NA,...
     } else if (central) {
         out <- central(x)
     } else {
-        tst <- UThHe_age(x,i=i)
+        tst <- UThHe_age(x,i=i[1])
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -391,7 +395,7 @@ age.fissiontracks <- function(x,central=FALSE,pooled=FALSE,i=NULL,
     } else if (central){
         out <- central(x,exterr=exterr)
     } else {
-        tst <- fissiontrack_age(x,i=i,exterr=exterr)
+        tst <- fissiontrack_age(x,i=i[1],exterr=exterr)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -422,7 +426,7 @@ age.ThU <- function(x,isochron=FALSE,Th0i=0,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- ThU_age(x,exterr=exterr,i=i,Th0i=Th0i,...)
+        tst <- ThU_age(x,exterr=exterr,i=i[1],Th0i=Th0i,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }
     out
@@ -432,35 +436,35 @@ age.ThU <- function(x,isochron=FALSE,Th0i=0,
 age.ThPb <-function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
                     i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Th232',isochron=isochron,i2i=i2i,exterr=exterr,
-           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
+           i=i[1],oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.ReOs <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
                      i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Re187',isochron=isochron,i2i=i2i,exterr=exterr,
-           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
+           i=i[1],oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.SmNd <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
                      i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Sm147',isochron=isochron,i2i=i2i,exterr=exterr,
-           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
+           i=i[1],oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.RbSr <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
                      i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Rb87',isochron=isochron,i2i=i2i,exterr=exterr,
-           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
+           i=i[1],oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @rdname age
 #' @export
 age.LuHf <- function(x,isochron=TRUE,i2i=TRUE,exterr=FALSE,
                      i=NULL,oerr=1,sigdig=NA,projerr=FALSE,...){
     age.PD(x,nuclide='Lu176',isochron=isochron,i2i=i2i,exterr=exterr,
-           i=i,oerr=oerr,sigdig=sigdig,projerr=projerr,...)
+           i=i[1],oerr=oerr,sigdig=sigdig,projerr=projerr,...)
 }
 #' @param nuclide a text string corresponding to a valid entry for
 #'     \code{settings('lambda',...)}
@@ -471,7 +475,7 @@ age.PD <- function(x,nuclide,isochron=TRUE,i2i=TRUE,exterr=FALSE,
     if (isochron){
         out <- isochron(x,plot=FALSE,exterr=exterr,...)
     } else {
-        tst <- PD_age(x,nuclide,exterr=exterr,i=i,
+        tst <- PD_age(x,nuclide,exterr=exterr,i=i[1],
                       i2i=i2i,projerr=projerr,...)
         out <- agerr(tst,oerr=oerr,sigdig=sigdig)
     }

@@ -919,6 +919,7 @@ LL_concordia_age <- function(pars,cc,type=1,exterr=FALSE,d=diseq(),mswd=FALSE){
     dx <- matrix(cc$x[cols]-y$x[cols],1,2)
     covmat <- cc$cov[cols,cols]
     if (exterr){
+        McL <- mclean(tt=tt,d=d,exterr=TRUE)
         l5 <- settings('lambda','U235')
         l8 <- settings('lambda','U238')
         l2 <- settings('lambda','Th232')

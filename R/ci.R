@@ -113,7 +113,7 @@ agerr.default <- function(x,oerr=1,sigdig=NA,...){
     out <- tst <- x
     tst[2] <- ci(x=x[1],sx=x[2],oerr=oerr)
     out <- roundit(age=tst[1],err=tst[2],sigdig=sigdig)
-    names(out) <- names(tst) <- errlabelswapper(names(x))
+    colnames(out) <- errlabelswapper(names(x))
     out
 }
 #' @noRd
