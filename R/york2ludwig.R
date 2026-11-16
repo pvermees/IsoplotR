@@ -224,7 +224,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             if (model==1 & Pb68c[2]>0){
                 par['a0'] <- -log(y0)
             } else if (model==3 & Pb68c[2]<=0){
-                par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
+                par['w'] <- log(stats::median(yd[,'sY']))
                 upper_w <- log(Pb68c[1])
             }
         } else if (type==2){
@@ -232,7 +232,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             if (model==1 & Pb78c[2]>0){
                 par['b0'] <- -log(y0)
             } else if (model==3 & Pb78c[2]<=0){
-                par['w'] <- stats::median(yd[,'sY']/yd[,'Y']^2)
+                par['w'] <- log(stats::median(yd[,'sY']))
                 upper_w <- log(Pb78c[1])
             }
         } else if (type==3){
@@ -240,7 +240,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             if (model==1 & Pb68c[2]>0){
                 par['a0'] <- log(y0)
             } else if (model==3 & Pb68c[2]<=0){
-                par['w'] <- stats::median(yd[,'sY'])
+                par['w'] <- log(stats::median(yd[,'sY']))
                 upper_w <- log(Pb68c[1])
             }
         } else if (type==4){
@@ -291,7 +291,7 @@ york2ludwig208 <- function(x,anchor=0,type=0,buffer=2,model=1){
             par['b0'] <- log(abx['a'])
         } else {
             par['a0'] <- log(1/abx['a'])
-            ydb <- data2york(x,option=7)
+            ydb <- data2york(x,option=7,tt=tt)
             abxb <- inithelper(yd=ydb,x0=x0)
             par['b0'] <- log(1/abxb['a'])
         }
