@@ -480,7 +480,7 @@ optionalredundancy2cor <- function(X,nc){
         E11 <- X[,4]^2
         E22 <- X[,6]^2
         E12 <- 0
-        out[,7] <- errorprop(J11,J12,J21,J22,E11,E22,E12)[,'cov']/sqrt(X[,2]*X[,4])
+        out[,7] <- errorprop(J11,J12,J21,J22,E11,E22,E12)[,'cov']/sqrt(X[,4]*X[,6])
         warning('Redundant ratios of U-Pb data format ',
                 'lead to impossible correlation coefficients. ',
                 'These were replaced with alternative values ',

@@ -276,6 +276,8 @@ age.UPb <- function(x,type=1,exterr=FALSE,i=NULL,
         tst <- UPb_age(x,exterr=exterr,i=i,
                        discordance=discordance,
                        common.Pb=common.Pb,...)
+        ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@9@"]]));##:ess-bp-end:##
         nc <- ifelse(ncol(tst)>7,8,min(ncol(tst),6))
         rounded_ages <- agerr(tst[,1:nc],oerr=oerr,sigdig=sigdig)
         correlations <- tst[,-(1:nc),drop=FALSE]
