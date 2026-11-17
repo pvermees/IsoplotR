@@ -245,8 +245,8 @@ plot_helioplot_frame <- function(lims,fact=c(1,1,1),fill.col=NA,...){
     corners <- xyz2xy(matrix(c(1,0,0,1,0,1,0,0,0,0,1,0),ncol=3))
     graphics::polygon(corners,col=fill.col)
     HeLabel <- paste0(fact[1],' x He')
-    ULabel <- paste0(fact[3],' x U')
-    ThLabel <- paste0(fact[2],' x Th')
+    ULabel <- paste0(fact[2],' x U')
+    ThLabel <- paste0(fact[3],' x Th')
     labels <- c(HeLabel,ULabel,ThLabel)
     graphics::text(corners[1:3,],labels=labels,pos=c(3,1,1),xpd=NA)
 }

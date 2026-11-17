@@ -247,7 +247,8 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,clim=NULL,oerr=3,
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
-                        xlim=NULL,ylim=NULL,clim=NULL,oerr=3,
+                        xlim=NULL,ylim=NULL,clim=NULL,
+                        tticks=NULL,aticks=NULL,oerr=3,
                         show.numbers=FALSE,levels=NULL,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
@@ -258,7 +259,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
     calcit <- (1:ns)%ni%c(hide,omit)
     y <- data2evolution(x,Th0i=Th0i,omit4c=unique(c(hide,omit)))
     d2plot <- subset(y,subset=plotit)
-    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim)
+    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim,
+                           tticks=tticks,aticks=aticks,
+                           line.col=line.col)
     if (isochron){
         fit <- isochron(x,type=3,plot=FALSE,
                         model=model,hide=hide,omit=omit)

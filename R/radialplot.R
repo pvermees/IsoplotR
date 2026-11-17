@@ -463,7 +463,7 @@ radialplot.LuHf <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                             k=0,np=3,exterr=FALSE,i2i=TRUE,oerr=3,title=TRUE,
                             hide=NULL,omit=NULL,omit.col=NA,show.colourbar=TRUE,...){
     age2radial(x,from=from,to=to,z0=z0,xlim=xlim,sigdig=sigdig,
-               xlab=NULL,transformation=transformation,
+               xlab=xlab,transformation=transformation,
                show.numbers=show.numbers,pch=pch,levels=levels,
                clabel=clabel,clim=clim,bg=bg,col=col,markers=markers,
                k=k,np=np,exterr=exterr,i2i=i2i,oerr=oerr,title=title,
@@ -500,7 +500,7 @@ radialplot.ThU <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,sigdig=2,
                transformation=transformation,show.numbers=show.numbers,
                pch=pch,levels=levels,clabel=clabel,clim=clim,bg=bg,col=col,
                markers=markers,k=k,np=np,exterr=FALSE,Th0i=Th0i,oerr=oerr,
-               units=' ka',hide=hide,omit=omit,omit.col=omit.col,
+               title=title,units=' ka',hide=hide,omit=omit,omit.col=omit.col,
                show.colourbar=show.colourbar,...)
 }
 
@@ -524,14 +524,14 @@ age2radial <- function(x,from=NA,to=NA,z0=NA,xlim=NULL,transformation='log',
                   markers=markers,hide=hide,omit=omit,omit.col=omit.col,
                   show.colourbar=show.colourbar,...)
     selection <- clear(1:nrow(tt),unique(c(hide,omit)))
-    fit <- central(tt[selection,])
+    fit <- central(tt[selection,,drop=FALSE])
     if (exterr & !is.null(fit)){
         fit$age[1:2] <- add_exterr(x2calc,tt=fit$age[1],st=fit$age[2],
                                    cutoff.76=cutoff.76,type=type)
     }
     if (title & !is.null(fit)){
         tit <- radial_title(fit,sigdig=sigdig,oerr=oerr,
-                            units=units,ntit=get_ntit(tt[,1]),
+                            units=units,ntit=get_ntit(tt[,1,drop=FALSE]),
                             caveat=(i2i|common.Pb==2|Th0i==1))
         graphics::title(tit)
     }

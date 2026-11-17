@@ -620,7 +620,7 @@ get_weightedmean <- function(X,sX,random.effects=FALSE,valid=TRUE,oerr=1){
     sx <- sX[valid]
     out <- list()
     out$valid <- valid
-    if (length(x)<=1){
+    if (length(x)==1){
         out$mean <- c(x,sx)
         out$mswd <- 0
         out$p.value <- 1

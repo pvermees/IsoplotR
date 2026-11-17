@@ -206,8 +206,8 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
         a <- y0*(1-b)
         dbdt <- dDPdt(x=x,tt=tt,...)
         covmat[1:3,1:3] <- E
-        J[1,1] <- -y0*dbdt*dtdg
-        J[2,1] <- dbdt*dtdg
+        J[1,1] <- -y0*dbdt*dtdg*sgn
+        J[2,1] <- dbdt*dtdg*sgn
     } else {
         dtdg <- tt <- exp(sgn*fit$par[1])
         y0 <- exp(fit$par[4])
@@ -217,7 +217,7 @@ fit2LRisochron.ThU <- function(x,fit,gam=NULL,y0=NULL,
         covmat <- E
         J[1,1] <- -y0*dbdt*dtdg*sgn
         J[1,4] <- a
-        J[2,1] <- dbdt*dtdg
+        J[2,1] <- dbdt*dtdg*sgn
     }
     fit2LRisochron_helper(x=x,covmat=covmat,J=J,a=a,b=b,
                           inverse=inverse,type="d")

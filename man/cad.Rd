@@ -128,17 +128,6 @@ cad(x, ...)
   ...
 )
 
-\method{cad}{ThPb}(
-  x,
-  pch = NA,
-  verticals = TRUE,
-  xlab = "age [Ma]",
-  col = "black",
-  i2i = TRUE,
-  hide = NULL,
-  ...
-)
-
 \method{cad}{ReOs}(
   x,
   pch = NA,

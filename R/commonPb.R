@@ -832,7 +832,7 @@ stacey.kramers <- function(tt,inverse=FALSE){
     i74 <- sk.207.204 + sk.238.204*(exp(l5*ti)-exp(l5*tt))/U238U235
     i84 <- sk.208.204 + sk.232.204*(exp(l2*ti)-exp(l2*tt))
     if (inverse){ # for Pb-Pb data
-        out <- cbind(1/i64,i74/i64,i84/64)
+        out <- cbind(1/i64,i74/i64,i84/i64)
         colnames(out) <- c('i46','i76','i86')
     } else {
         out <- cbind(i64,i74,i84)

@@ -1813,7 +1813,7 @@ ab2y0t.other <- function(x,fit,inverse,wtype,...){
                          E12=fit$cov.ab)
         out$Dd <- unname(c(Dd,sqrt(err[1])))
         out$DP <- unname(c(DP,sqrt(err[2])))
-        out$cov.DdDp <- unname(err[3])
+        out$cov.DdDP <- unname(err[3])
     } else {
         out$Dd <- unname(fit$a)
         out$DP <- unname(fit$b)

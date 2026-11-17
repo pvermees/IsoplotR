@@ -720,10 +720,10 @@ as.ReOs <- function(x,format=1,ierr=1){
 #' @export
 as.SmNd <- function(x,format=1,ierr=1){
     if (format==1){
-        cnames <- c('Sm143Nd144','errSm143Nd144',
+        cnames <- c('Sm147Nd144','errSm147Nd144',
                     'Nd143Nd144','errNd143Nd144','rXY')
     } else if (format==2){
-        cnames <- c('Sm143Nd143','errSm143Nd143',
+        cnames <- c('Sm147Nd143','errSm147Nd143',
                     'Nd144Nd143','errNd144Nd143','rXY')
     } else if (format==3){
         cnames <- c('Smppm','errSmppm','Ndppm','errNdppm',
