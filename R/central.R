@@ -180,7 +180,7 @@ central.UThHe <- function(x,compositional=FALSE,model=1,...){
                                   maximum=TRUE)$maximum
             w <- exp(lw)
             H <- stats::optimHess(lw,LL_uvw,UVW=fit$uvw,x=x,doSm=doSm(x))
-            sw <- w*solve(-H)
+            sw <- w*sqrt(solve(-H))
             out <- UThHe_logratio_mean(x,model=model,w=w)
             out$disp <- c(w,sw)
             names(out$disp) <- c('w','s[w]')

@@ -41,7 +41,7 @@ PD_age <- function(x,nuclide,exterr=FALSE,i=NULL,i2i=TRUE,
         DP[,1] <- 1/(y[,'X'] - y[,'Y']/fit$b[1])
         J1 <- -DP[,1]^2
         J2 <- (DP[,1]^2)/fit$b[1]
-        J3 <- y[,'Y']/(y[,'Y']^2 - (fit$b[1]*y[,'X'])^2)
+        J3 <- -y[,'Y']/(fit$b[1]*y[,'X'] - y[,'Y'])^2
         E11 <- y[,'sX']^2
         E22 <- y[,'sY']^2
         E12 <- y[,'rXY']*y[,'sX']*y[,'sY']
@@ -72,7 +72,8 @@ get_nominal_initials <- function(x){
     } else if (is.LuHf(x)){
         out <- settings('iratio','Hf176Hf177')
     } else if (is.KCa(x)){
-        out <- settings('iratio','Ca40Ca44')
+        ratio <- paste0('Ca40Ca',x$sister)
+        out <- settings('iratio',ratio)
     } else if (is.ThPb(x)){
         out <- settings('iratio','Pb208Pb204')
     } else if (is.ArAr(x)){

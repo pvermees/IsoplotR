@@ -5,7 +5,7 @@ fissiontrack_age <- function(x,i=NULL,exterr=FALSE){
         if (x$format == 3){
             x$zeta <- get_absolute_zeta(x$mineral,exterr=exterr)
         }
-        out <- ICP_age(x,i,exterr=exterr)
+        out <- ICP_age(x,i=i,exterr=exterr)
     }
     out
 }
@@ -195,20 +195,21 @@ ICP_age <- function(x,i=NULL,exterr=FALSE){
     izero <- which(x$Ns<1)
     UsU <- get_UsU(x)
     # first calculate the ages of the non-zero track data:
-    for (i in ipos){
-        tst <- get_ICP_age(x$Ns[i],x$A[i],UsU[i,],zeta)
-        tt[i] <- tst[1]
-        st[i] <- tst[2]
+    for (j in ipos){
+        tst <- get_ICP_age(x$Ns[j],x$A[j],UsU[j,],zeta)
+        tt[j] <- tst[1]
+        st[j] <- tst[2]
     }
     # then use the equivalent induced track approach:
-    for (i in izero){
-        rho <- UsU[i,'U']/(x$A[i]*UsU[i,'sU']^2)
-        Ni <- x$A[i]*UsU[i,'U']*rho
-        tst <- get_EDM_age(x$Ns[i],Ni,zeta*1e6,c(rho,0))
-        tt[i] <- tst[1]
-        st[i] <- tst[2]
+    for (j in izero){
+        rho <- UsU[j,'U']/(x$A[j]*UsU[j,'sU']^2)
+        Ni <- x$A[j]*UsU[j,'U']*rho
+        tst <- get_EDM_age(x$Ns[j],Ni,zeta*1e6,c(rho,0))
+        tt[j] <- tst[1]
+        st[j] <- tst[2]
     }
     out <- cbind('t'=tt,'s[t]'=st)
+    if (!is.null(i)) out <- out[i,,drop=FALSE]
     out
 }
 
@@ -264,7 +265,7 @@ EDM_age <- function(x,i=NULL,exterr=FALSE){
     for (j in 1:ns){
         out[j,] <- get_EDM_age(x$x[j,'Ns'],x$x[j,'Ni'],zeta,rhoD)
     }
-    if (!is.null(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,,drop=FALSE]
     out
 }
 

@@ -103,7 +103,7 @@ get_titterington_xyz <- function(XYZ,a,b,A,B,w=0,wtype=NA){
     vX <- XYZ[,'sX']^2
     vY <- XYZ[,'sY']^2
     vZ <- XYZ[,'sZ']^2
-    if (wtype=='a') vX <- vX + w^2
+    if (wtype=='a') vY <- vY + w^2
     if (wtype=='A') vZ <- vZ + w^2
     sXY <- XYZ[,'rXY']*XYZ[,'sX']*XYZ[,'sY']
     sXZ <- XYZ[,'rXZ']*XYZ[,'sX']*XYZ[,'sZ']

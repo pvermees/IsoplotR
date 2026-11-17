@@ -1,7 +1,14 @@
 roundit <- function(age,err,sigdig=2,oerr=3,text=FALSE,maxprecision=8){
     if (oerr>3){
-        out <- roundit(age,err*age/100,sigdig=sigdig)
-        out[-1] <- signif(err,sigdig)
+        out <- roundit(age,err*abs(age)/100,sigdig=sigdig)
+        rounded_error <- signif(err,sigdig)
+        if (is.matrix(out)){
+            nc <- ncol(out)
+            out[,2:nc] <- rounded_error
+        } else {
+            nc <- length(out)
+            out[2:nc] <- rounded_error
+        }
     } else if (missing(err)){
         if (is.na(sigdig)) out <- age
         else out <- signif(age,digits=sigdig)
@@ -79,7 +86,7 @@ cor2cov3 <- function(sX,sY,sZ,rXY,rXZ,rYZ){
     covmat[2,2] <- sY^2
     covmat[3,3] <- sZ^2
     covmat[1,2] <- covmat[2,1] <- ifelse(rXY==0,0,rXY*sX*sY)
-    covmat[1,3] <- covmat[3,1] <- ifelse(rXY==0,0,rXZ*sX*sZ)
+    covmat[1,3] <- covmat[3,1] <- ifelse(rXZ==0,0,rXZ*sX*sZ)
     covmat[2,3] <- covmat[3,2] <- ifelse(rYZ==0,0,rYZ*sY*sZ)
     covmat
 }
@@ -402,8 +409,8 @@ logit <- function(x,m=0,M=1,inverse=FALSE){
         toobig <- x>1000
         toosmall <- x<(-1000)
         easy <- !(toobig|toosmall)
-        out[easy] <- m + M*exp(x[easy])/(1+exp(x[easy]))
-        out[toobig] <- m + M
+        out[easy] <- m + (M-m)*exp(x[easy])/(1+exp(x[easy]))
+        out[toobig] <- M
         out[toosmall] <- m
     } else {
         easy <- (x>m & x<M)

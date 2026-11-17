@@ -41,7 +41,7 @@
 #'     proportions.
 #' @examples
 #' attach(examples)
-#' fit <- unmix(DZ, sources=c('N1','N4','N14'), plot=FALSE)
+#' fit <- unmix(DZ, source_names=c('N1','N4','N14'), plot=FALSE)
 #' print(fit)
 #' @export
 unmix <- function(x,nsources=2,source_names=names(x)[1:nsources],

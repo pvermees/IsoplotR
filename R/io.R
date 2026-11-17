@@ -480,7 +480,7 @@ optionalredundancy2cor <- function(X,nc){
         E11 <- X[,4]^2
         E22 <- X[,6]^2
         E12 <- 0
-        out[,7] <- errorprop(J11,J12,J21,J22,E11,E22,E12)[,'cov']/sqrt(X[,2]*X[,4])
+        out[,7] <- errorprop(J11,J12,J21,J22,E11,E22,E12)[,'cov']/sqrt(X[,4]*X[,6])
         warning('Redundant ratios of U-Pb data format ',
                 'lead to impossible correlation coefficients. ',
                 'These were replaced with alternative values ',
@@ -720,10 +720,10 @@ as.ReOs <- function(x,format=1,ierr=1){
 #' @export
 as.SmNd <- function(x,format=1,ierr=1){
     if (format==1){
-        cnames <- c('Sm143Nd144','errSm143Nd144',
+        cnames <- c('Sm147Nd144','errSm147Nd144',
                     'Nd143Nd144','errNd143Nd144','rXY')
     } else if (format==2){
-        cnames <- c('Sm143Nd143','errSm143Nd143',
+        cnames <- c('Sm147Nd143','errSm147Nd143',
                     'Nd144Nd143','errNd144Nd143','rXY')
     } else if (format==3){
         cnames <- c('Smppm','errSmppm','Ndppm','errNdppm',

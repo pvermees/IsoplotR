@@ -832,7 +832,7 @@ stacey.kramers <- function(tt,inverse=FALSE){
     i74 <- sk.207.204 + sk.238.204*(exp(l5*ti)-exp(l5*tt))/U238U235
     i84 <- sk.208.204 + sk.232.204*(exp(l2*ti)-exp(l2*tt))
     if (inverse){ # for Pb-Pb data
-        out <- cbind(1/i64,i74/i64,i84/64)
+        out <- cbind(1/i64,i74/i64,i84/i64)
         colnames(out) <- c('i46','i76','i86')
     } else {
         out <- cbind(i64,i74,i84)
@@ -844,6 +844,7 @@ stacey.kramers <- function(tt,inverse=FALSE){
 sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
     l5 <- lambda('U235')[1]
     l8 <- lambda('U238')[1]
+    U <- iratio('U238U235')[1]
     ti.young <- 3700
     sk.206.204.young <- 11.152
     sk.207.204.young <- 12.998
@@ -856,9 +857,6 @@ sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
     sk.208.204.old <- 29.487
     sk.238.204.old <- 7.19
     sk.232.204.old <- 33.21
-    l5 <- lambda('U235')[1]
-    l8 <- lambda('U238')[1]
-    U <- iratio('U238U235')[1]
     out <- c(0,ti.old)
     # 1. 206/204
     min64 <- sk.206.204.old
@@ -869,11 +867,9 @@ sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
     mid64 <- good64 & !big64 & !small64
     out[big64] <- 0
     out[small64] <- ti.old
-    out[mid64] <- log( exp(l8*ti.young) +
-                       (sk.206.204.young-Pb206Pb204[mid64])/sk.238.204.young )/l8
-    if (any(mid64) && out[mid64]>ti.young)
-        out[mid64] <- log( exp(l8*ti.old) +
-                           (sk.206.204.old-Pb206Pb204[mid64])/sk.238.204.old )/l8
+    out[mid64] <- log( exp(l8*ti.young) + (sk.206.204.young-Pb206Pb204[mid64])/sk.238.204.young )/l8
+    old <- mid64 & (out > ti.young)
+    out[old] <- log( exp(l8*ti.old) + (sk.206.204.old-Pb206Pb204[old])/sk.238.204.old )/l8
     # 2. 207/204
     min74 <- sk.207.204.old
     max74 <- sk.207.204.young + sk.238.204.young*(exp(l5*ti.young)-1)/U
@@ -883,11 +879,9 @@ sk2t <- function(Pb206Pb204=rep(NA,2),Pb207Pb204=rep(NA,2)){
     mid74 <- good74 & !big74 & !small74
     out[big74] <- 0
     out[small74] <- ti.old
-    out[mid74] <- log( exp(l5*ti.young) +
-                       U*(sk.207.204.young-Pb207Pb204[mid74])/sk.238.204.young )/l5
-    if (any(mid74) && out[mid74]>ti.young)
-        out[mid74] <- log( exp(l5*ti.old) +
-                           (sk.207.204.old-Pb207Pb204[mid74])/sk.238.204.old )/l5
+    out[mid74] <- log( exp(l5*ti.young) + U*(sk.207.204.young-Pb207Pb204[mid74])/sk.238.204.young )/l5
+    old <- mid74 & (out > ti.young)
+    out[old] <- log( exp(l5*ti.old) + U*(sk.207.204.old-Pb207Pb204[old])/sk.238.204.old )/l5
     out
 }
 

@@ -247,7 +247,8 @@ U4U8vst <- function(x,Th0i=0,xlim=NULL,ylim=NULL,clim=NULL,oerr=3,
 }
 
 U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
-                        xlim=NULL,ylim=NULL,clim=NULL,oerr=3,
+                        xlim=NULL,ylim=NULL,clim=NULL,
+                        tticks=NULL,aticks=NULL,oerr=3,
                         show.numbers=FALSE,levels=NULL,clabel="",
                         ellipse.fill=c("#00FF0080","#FF000080"),
                         ellipse.stroke='black',line.col='darksalmon',
@@ -258,7 +259,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
     calcit <- (1:ns)%ni%c(hide,omit)
     y <- data2evolution(x,Th0i=Th0i,omit4c=unique(c(hide,omit)))
     d2plot <- subset(y,subset=plotit)
-    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim)
+    lim <- evolution_lines(d2plot,xlim=xlim,ylim=ylim,
+                           tticks=tticks,aticks=aticks,
+                           line.col=line.col)
     if (isochron){
         fit <- isochron(x,type=3,plot=FALSE,
                         model=model,hide=hide,omit=omit)
@@ -266,9 +269,9 @@ U4U8vsTh0U8 <- function(x,isochron=FALSE,model=1,Th0i=0,
         b08 <- fit$par['B']
         initial <- matrix(0,1,5)
         initial[1] <- b08
-        initial[2] <- sqrt(fit$cov['b','b'])
+        initial[2] <- sqrt(fit$cov['B','B'])
         initial[3] <- b48
-        initial[4] <- sqrt(fit$cov['B','B'])
+        initial[4] <- sqrt(fit$cov['b','b'])
         initial[5] <- fit$cov['b','B']/(initial[2]*initial[4])
         scatterplot(initial,oerr=oerr,line.col='black',
                     ellipse.fill=grDevices::rgb(1,1,1,0.85),
@@ -509,9 +512,9 @@ Th230correction_measured_detritus <- function(td,Th02U48=c(0,0,1e6,0,0,0,0,0,0))
     X2 <- Th02U48[3]
     Y2 <- Th02U48[5]
     Z2 <- Th02U48[1]
-    sX2 <- Th02U48[4]^2
-    sY2 <- Th02U48[6]^2
-    sZ2 <- Th02U48[2]^2
+    sX2 <- Th02U48[4]
+    sY2 <- Th02U48[6]
+    sZ2 <- Th02U48[2]
     covX2Y2 <- Th02U48[9]*Th02U48[4]*Th02U48[6]
     covX2Z2 <- Th02U48[7]*Th02U48[2]*Th02U48[4]
     covY2Z2 <- Th02U48[8]*Th02U48[2]*Th02U48[6]

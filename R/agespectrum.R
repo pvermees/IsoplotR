@@ -147,10 +147,12 @@ agespectrum.default <- function(x,oerr=3,plateau=TRUE,random.effects=FALSE,
             tit <- plateau_title(pc$plat,oerr=oerr,sigdig=sigdig,Ar=FALSE)
             graphics::title(tit)
         }
+        z <- levels[pc$plat$i]
+    } else {
+        z <- clear(levels,hide,omit)
     }
-    plot_spectrum(XY=XY,col=pc$col)
-    if (show.colourbar) colourbar(z=levels,fill=plateau.col,
-                                  clabel=clabel,clim=clim)
+    plot_spectrum(XY=XY,col=clear(pc$col,hide))
+    if (show.colourbar) colourbar(z,fill=plateau.col,clabel=clabel,clim=clim)
     if (plateau) return(invisible(pc$plat))
 }
 #' @rdname agespectrum
@@ -210,10 +212,12 @@ agespectrum.ArAr <- function(x,oerr=3,plateau=TRUE,random.effects=FALSE,
                                  Ar=TRUE,units=' Ma')
             graphics::title(tit)
         }
+        z <- levels[pc$plat$i]
+    } else {
+        z <- clear(levels,hide,omit)
     }
-    plot_spectrum(XY=XY,col=pc$col)
-    if (show.colourbar) colourbar(z=levels,fill=plateau.col,
-                                  clabel=clabel,clim=clim)
+    plot_spectrum(XY=XY,col=clear(pc$col,hide))
+    if (show.colourbar) colourbar(z=z,fill=plateau.col,clabel=clabel,clim=clim)
     if (plateau) return(invisible(pc$plat))
 }
 
@@ -244,14 +248,13 @@ get_plateau_colours <- function(x,levels=NULL,plateau=TRUE,hide=NULL,omit=NULL,
         plat$valid <- NULL
         colour <- rep(non.plateau.col,ns)
         np <- length(plat$i)
-        cols <- set_ellipse_colours(ns=np,levels=levels[plat$i],
-                                    clim=clim,hide=hide,col=plateau.col)
+        cols <- set_ellipse_colours(ns=np,levels=levels[plat$i],clim=clim,col=plateau.col)
         colour[plat$i] <- cols
         plat$n <- ns
     } else {
         plat <- NA
         colour <- set_ellipse_colours(ns=ns,levels=levels,clim=clim,
-                                      hide=hide,col=plateau.col)
+                                      hide=hide,omit=omit,col=plateau.col)
     }
     list(col=colour,plat=plat)
 }

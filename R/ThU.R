@@ -32,7 +32,7 @@ get_ThU_age_corals <- function(x,exterr=FALSE,i=NULL,
                                Th230Th232i=Th02i[1],sTh230Th232i=Th02i[2],
                                exterr=exterr,cor=cor)
     }
-    if (!is.null(i)) out <- out[i,]
+    if (!is.null(i)) out <- out[i,,drop=FALSE]
     colnames(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     out
 }
@@ -122,7 +122,7 @@ get_ThU_age <- function(Th230U238,sTh230U238,
     out <- c(tt,st,a0,sa0,covmat[1,2])
     names(out) <- c('t','s[t]','48_0','s[48_0]','cov[t,48_0]')
     if (cor){
-        out[5] <- covmat[1,2]*st*sa0
+        out[5] <- covmat[1,2]/(st*sa0)
         names(out)[5] <- 'cor[t,48_0]'
     }
     if (jacobian){
