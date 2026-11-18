@@ -76,8 +76,8 @@ deming_misfit_b <- function(b,a,dat){
 }
 deming_misfit_ab <- function(ab,dat){
     if (ncol(dat)>2) stop("Anchored TLS regression currently only works in 2D")
-    e <-deming_residuals(ab,dat) 
-    sum(e^2)
+    e <- deming_residuals(ab,dat) 
+    sum(e^2)/2
 }
 deming_residuals <- function(ab,dat){
     a <- ab[1]
